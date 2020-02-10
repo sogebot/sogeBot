@@ -1,6 +1,6 @@
 {
   "name": "sogebot",
-  "version": "10.6.0-SNAPSHOT",
+  "version": "10.6.0",
   "lockfileVersion": 1,
   "requires": true,
   "dependencies": {
@@ -99,9 +99,9 @@
       }
     },
     "@fortawesome/fontawesome-common-types": {
-      "version": "0.2.26",
-      "resolved": "https://registry.npmjs.org/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-0.2.26.tgz",
-      "integrity": "sha512-CcM/fIFwZlRdiWG/25xE/wHbtyUuCtqoCTrr6BsWw7hH072fR++n4L56KPydAr3ANgMJMjT8v83ZFIsDc7kE+A==",
+      "version": "0.2.27",
+      "resolved": "https://registry.npmjs.org/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-0.2.27.tgz",
+      "integrity": "sha512-97GaByGaXDGMkzcJX7VmR/jRJd8h1mfhtA7RsxDBN61GnWE/PPCZhOdwG/8OZYktiRUF0CvFOr+VgRkJrt6TWg==",
       "dev": true
     },
     "@fortawesome/fontawesome-svg-core": {
@@ -838,9 +838,9 @@
       "dev": true
     },
     "@types/pino": {
-      "version": "5.15.4",
-      "resolved": "https://registry.npmjs.org/@types/pino/-/pino-5.15.4.tgz",
-      "integrity": "sha512-7DaTWeUPerXShJICqXwe/igZknWSGLHf+S3L6lBvMRLeLoi27kvP+nnZKS1x2wzLGInfUJuCgo1OW07JbCQKPQ==",
+      "version": "5.15.5",
+      "resolved": "https://registry.npmjs.org/@types/pino/-/pino-5.15.5.tgz",
+      "integrity": "sha512-UWEzZVLZ9NGNMeQrkckfsUuyPNwmIIhSNBulLL13Eh0QEebsq/QXd4x8OKsb1O+OkYBlWl5F90HZ9UFOjWWCbg==",
       "requires": {
         "@types/node": "*",
         "@types/pino-std-serializers": "*",
@@ -878,9 +878,9 @@
       "dev": true
     },
     "@types/qs": {
-      "version": "6.9.0",
-      "resolved": "https://registry.npmjs.org/@types/qs/-/qs-6.9.0.tgz",
-      "integrity": "sha512-c4zji5CjWv1tJxIZkz1oUtGcdOlsH3aza28Nqmm+uNDWBRHoMsjooBEN4czZp1V3iXPihE/VRUOBqg+4Xq0W4g=="
+      "version": "6.9.1",
+      "resolved": "https://registry.npmjs.org/@types/qs/-/qs-6.9.1.tgz",
+      "integrity": "sha512-lhbQXx9HKZAPgBkISrBcmAcMpZsmpe/Cd/hY7LGZS5OfkySUBItnPZHgQPssWYUET8elF+yCFBbP1Q0RZPTdaw=="
     },
     "@types/range-parser": {
       "version": "1.2.3",
@@ -3733,9 +3733,9 @@
       }
     },
     "caniuse-lite": {
-      "version": "1.0.30001025",
-      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001025.tgz",
-      "integrity": "sha512-SKyFdHYfXUZf5V85+PJgLYyit27q4wgvZuf8QTOk1osbypcROihMBlx9GRar2/pIcKH2r4OehdlBr9x6PXetAQ==",
+      "version": "1.0.30001027",
+      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001027.tgz",
+      "integrity": "sha512-7xvKeErvXZFtUItTHgNtLgS9RJpVnwBlWX8jSo/BO8VsF6deszemZSkJJJA1KOKrXuzZH4WALpAJdq5EyfgMLg==",
       "dev": true
     },
     "capture-stack-trace": {
@@ -6163,9 +6163,9 @@
       "dev": true
     },
     "electron-to-chromium": {
-      "version": "1.3.345",
-      "resolved": "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.3.345.tgz",
-      "integrity": "sha512-f8nx53+Z9Y+SPWGg3YdHrbYYfIJAtbUjpFfW4X1RwTZ94iUG7geg9tV8HqzAXX7XTNgyWgAFvce4yce8ZKxKmg==",
+      "version": "1.3.346",
+      "resolved": "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.3.346.tgz",
+      "integrity": "sha512-Yy4jF5hJd57BWmGPt0KjaXc25AmWZeQK75kdr4zIzksWVtiT6DwaNtvTb9dt+LkQKwUpvBfCyyPsXXtbY/5GYw==",
       "dev": true
     },
     "elegant-spinner": {
@@ -9722,13 +9722,10 @@
       "dev": true
     },
     "is-finite": {
-      "version": "1.0.2",
-      "resolved": "https://registry.npmjs.org/is-finite/-/is-finite-1.0.2.tgz",
-      "integrity": "sha1-zGZ3aVYCvlUO8R6LSqYwU0K20Ko=",
-      "dev": true,
-      "requires": {
-        "number-is-nan": "^1.0.0"
-      }
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/is-finite/-/is-finite-1.1.0.tgz",
+      "integrity": "sha512-cdyMtqX/BOqqNBBiKlIVkytNHm49MtMlYyn1zxzvJKWmFMlGzm+ry5BBfYyeY9YmNKbRSo/o7OX9w9ale0wg3w==",
+      "dev": true
     },
     "is-fullwidth-code-point": {
       "version": "1.0.0",
@@ -10678,9 +10675,9 @@
           }
         },
         "rimraf": {
-          "version": "3.0.1",
-          "resolved": "https://registry.npmjs.org/rimraf/-/rimraf-3.0.1.tgz",
-          "integrity": "sha512-IQ4ikL8SjBiEDZfk+DFVwqRK8md24RWMEJkdSlgNLkyyAImcjf8SWvU1qFMDOb4igBClbTQ/ugPqXcRwdFTxZw==",
+          "version": "3.0.2",
+          "resolved": "https://registry.npmjs.org/rimraf/-/rimraf-3.0.2.tgz",
+          "integrity": "sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==",
           "dev": true,
           "requires": {
             "glob": "^7.1.3"
@@ -12590,9 +12587,9 @@
       }
     },
     "node-releases": {
-      "version": "1.1.47",
-      "resolved": "https://registry.npmjs.org/node-releases/-/node-releases-1.1.47.tgz",
-      "integrity": "sha512-k4xjVPx5FpwBUj0Gw7uvFOTF4Ep8Hok1I6qjwL3pLfwe7Y0REQSAqOwwv9TWBCUtMHxcXfY4PgRLRozcChvTcA==",
+      "version": "1.1.48",
+      "resolved": "https://registry.npmjs.org/node-releases/-/node-releases-1.1.48.tgz",
+      "integrity": "sha512-Hr8BbmUl1ujAST0K0snItzEA5zkJTQup8VNTKNfT6Zw8vTJkIiagUPNfxHmgDOyfFYNfKAul40sD0UEYTvwebw==",
       "dev": true,
       "requires": {
         "semver": "^6.3.0"
@@ -15916,9 +15913,9 @@
       }
     },
     "resolve": {
-      "version": "1.15.0",
-      "resolved": "https://registry.npmjs.org/resolve/-/resolve-1.15.0.tgz",
-      "integrity": "sha512-+hTmAldEGE80U2wJJDC1lebb5jWqvTYAfm3YZ1ckk1gBr0MnCqUKlwK1e+anaFljIl+F5tR5IoZcm4ZDA1zMQw==",
+      "version": "1.15.1",
+      "resolved": "https://registry.npmjs.org/resolve/-/resolve-1.15.1.tgz",
+      "integrity": "sha512-84oo6ZTtoTUpjgNEr5SJyzQhzL72gaRodsSfyxC/AXRvwu0Yse9H8eF9IpGo7b8YetZhlI6v7ZQ6bKBFV/6S7w==",
       "dev": true,
       "requires": {
         "path-parse": "^1.0.6"
@@ -17400,6 +17397,11 @@
       "requires": {
         "is-utf8": "^0.2.0"
       }
+    },
+    "strip-comments": {
+      "version": "2.0.1",
+      "resolved": "https://registry.npmjs.org/strip-comments/-/strip-comments-2.0.1.tgz",
+      "integrity": "sha512-ZprKx+bBLXv067WTCALv8SSz5l2+XhpYCsVtSqlMnkAXMWDq+/ekVbl1ghqP9rUHTzv6sm/DwCOiYutU/yp1fw=="
     },
     "strip-dirs": {
       "version": "2.1.0",
