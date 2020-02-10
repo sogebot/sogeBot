@@ -3,6 +3,7 @@ import axios from 'axios';
 import _ from 'lodash';
 import { setTimeout } from 'timers';
 import { filter, get, isNil, map, sample } from 'lodash';
+import strip from 'strip-comments';
 
 import Message from './message';
 import { permission } from './helpers/permissions';
@@ -183,10 +184,13 @@ class CustomVariables {
         userId: await users.getIdByName(sender),
       };
     }
+
+    const strippedScript = strip(script);
     // we need to check +1 variables, as they are part of commentary
-    const containUsers = isNil(script.match(/users/g)) && script.match(/users/g)?.length > 1;
-    const containRandom = isNil(script.replace(/Math\.random|_\.random/g, '').match(/random/g));
-    const containOnline = isNil(script.match(/online/g));
+    const containUsers = strippedScript.match(/users/g) !== null;
+    const containRandom = strippedScript.replace(/Math\.random|_\.random/g, '').match(/random/g) !== null;
+    const containOnline = strippedScript.match(/online/g) !== null;
+    debug('customvariables.eval', { strippedScript, containOnline, containRandom, containUsers});
 
     let usersList: UserInterface[] = [];
     if (containUsers || containRandom) {
@@ -194,46 +198,34 @@ class CustomVariables {
     }
 
     let onlineViewers: string[] = [];
-    const onlineSubscribers: string[] = [];
-    const onlineFollowers: string[] = [];
+    let onlineSubscribers: string[] = [];
+    let onlineFollowers: string[] = [];
 
     if (containOnline) {
       onlineViewers = await getAllOnlineUsernames();
-
-      for (const viewer of onlineViewers) {
-        const user = await getRepository(User).findOne({
-          where: {
-            username: viewer,
-            isSubscriber: true,
-          },
-        });
-        if (user) {
-          onlineSubscribers.push(user.username);
-        };
-      }
-
-      for (const viewer of onlineViewers) {
-        const user = await getRepository(User).findOne({
-          where: {
-            username: viewer,
-            isFollower: true,
-          },
-        });
-        if (user) {
-          onlineFollowers.push(user.username);
-        };
-      }
+      onlineSubscribers = (await getRepository(User).find({
+        where: {
+          isSubscriber: true,
+          isOnline: true,
+        },
+      })).map(o => o.username);
+      onlineFollowers = (await getRepository(User).find({
+        where: {
+          isFollower: true,
+          isOnline: true,
+        },
+      })).map(o => o.username);
     }
 
     const randomVar = {
       online: {
-        viewer: sample(map(onlineViewers, 'username')),
-        follower: sample(map(onlineFollowers, 'username')),
-        subscriber: sample(map(onlineSubscribers, 'username')),
+        viewer: sample(onlineViewers),
+        follower: sample(onlineFollowers),
+        subscriber: sample(onlineSubscribers),
       },
       viewer: sample(map(usersList, 'username')),
-      follower: sample(map(filter(usersList, (o) => get(o, 'is.follower', false)), 'username')),
-      subscriber: sample(map(filter(usersList, (o) => get(o, 'is.subscriber', false)), 'username')),
+      follower: sample(map(filter(usersList, (o) => get(o, 'isFollower', false)), 'username')),
+      subscriber: sample(map(filter(usersList, (o) => get(o, 'isSubscriber', false)), 'username')),
     };
 
     // get custom variables
