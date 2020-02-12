@@ -39,11 +39,31 @@ if (argv._[0] === 'cli') {
     const body = spawnSync('git', ['log', commit, '-n', '1', '--pretty=format:%B']);
     const fixesRegexp = /(Fixes|Closes|Fixed|Closed)\s(\#\d*)/gmi;
     const fixesRegexpForum = /(Fixes|Closes|Fixed|Closed)\s(.*)/gmi;
+    const fixesRegexpDiscord = /(Fixes|Closes|Fixed|Closed)\s.*discordapp.*?(\d+)$/gmi
+    const fixesRegexpIdeas = /(Fixes|Closes|Fixed|Closed)\s.*ideas\.sogebot\.xyz.*?(\d+)/gmi
     let fixes = []
-    if (body.stdout.toString().match(fixesRegexp)) {
+    if (body.stdout.toString().match(fixesRegexpIdeas)) {
+      const text = body.stdout.toString().match(fixesRegexpIdeas)[0];
+      const link = text.split(' ')[1];
+      if (link) {
+        const number = link.match(/\d*$/)[0];
+        fixes = [
+          `Fixes [ideas(deprecated)#${number}](${link})`,
+        ];
+      }
+    } else if (body.stdout.toString().match(fixesRegexpDiscord)) {
+      const text = body.stdout.toString().match(fixesRegexpDiscord)[0];
+      const link = text.split(' ')[1];
+      if (link) {
+        const number = link.match(/\d*$/)[0];
+        fixes = [
+          `Fixes [discord#${number}](${link})`,
+        ];
+      }
+    } else if (body.stdout.toString().match(fixesRegexp)) {
       fixes = body.stdout.toString().match(fixesRegexp)
     } else if (body.stdout.toString().match(fixesRegexpForum)) {
-      const text = body.stdout.toString().match(fixesRegexpForum)[0]
+      const text = body.stdout.toString().match(fixesRegexpForum)[0];
       const link = text.split(' ')[1];
       if (link) {
         const number = link.match(/\d*$/)[0];
