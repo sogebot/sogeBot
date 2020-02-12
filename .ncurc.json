@@ -3,6 +3,7 @@
   "reject": [
     "vue-plyr",
     "plyr",
-    "core-js"
+    "core-js",
+    "node-hue-api"
   ]
 }
