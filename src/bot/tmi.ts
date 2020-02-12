@@ -13,7 +13,7 @@ import Core from './_interface';
 import * as constants from './constants';
 import { settings, ui } from './decorators';
 import { globalIgnoreList } from './data/globalIgnoreList';
-import { ban, cheer, error, host, info, raid, resub, sub, subcommunitygift, subgift } from './helpers/log';
+import { ban, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning } from './helpers/log';
 import { triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub } from './helpers/interface/triggers';
 import { isDebugEnabled } from './helpers/log';
 import { getLocalizedName, getOwner, isBot, isIgnored, isOwner, prepare, sendMessage } from './commons';
@@ -332,6 +332,7 @@ class TMI extends Core {
   }
 
   usernotice(message) {
+    debug('tmi.usernotice', message);
     if (message.event === 'RAID') {
       raid(`${message.parameters.login}, viewers: ${message.parameters.viewerCount}`);
 
@@ -358,6 +359,8 @@ class TMI extends Core {
       this.subscription(message);
     } else if (message.event === 'RESUBSCRIPTION') {
       this.resub(message);
+    } else if (message.event === 'REWARDGIFT') {
+      warning('REWARDGIFT event is being ignored');
     } else if (message.event === 'SUBSCRIPTION_GIFT') {
       this.subgift(message);
     } else if (message.event === 'SUBSCRIPTION_GIFT_COMMUNITY') {
