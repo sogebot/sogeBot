@@ -382,7 +382,8 @@ class CustomCommands extends System {
     }
     let $rank: string | null = null;
     if (ranks.enabled) {
-      $rank = await ranks.get($userObject);
+      const rank = await ranks.get($userObject);
+      $rank = typeof rank.current === 'string' || rank.current === null ? rank.current : rank.current.rank;
     }
 
     const $is = {

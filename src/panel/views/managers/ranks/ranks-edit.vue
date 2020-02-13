@@ -9,7 +9,6 @@
           <template v-if="$route.params.id">
             <small><fa icon="angle-right"/></small>
             {{item.rank}}
-            <small class="text-muted text-monospace" style="font-size:0.7rem">{{$route.params.id}}</small>
           </template>
         </span>
       </b-col>
@@ -48,20 +47,31 @@
       </b-form-group>
 
       <b-form-group
-        :label="translate('hours')"
+        :label="translate('type')"
+        label-for="type"
+      >
+        <b-form-select v-model="item.type" class="mb-3">
+          <b-form-select-option value="viewer">Watch Time</b-form-select-option>
+          <b-form-select-option value="follower">Follow time</b-form-select-option>
+          <b-form-select-option value="subscriber">Sub time</b-form-select-option>
+        </b-form-select>
+      </b-form-group>
+
+      <b-form-group
+        :label="item.type === 'viewer' ? translate('hours') : translate('months')"
         label-for="name"
       >
         <b-input-group>
           <b-form-input
             id="name"
-            v-model.number="item.hours"
+            v-model.number="item.value"
             type="number"
             min="0"
-            @input="$v.item.hours.$touch()"
-            :state="$v.item.hours.$invalid && $v.item.hours.$dirty ? false : null"
+            @input="$v.item.value.$touch()"
+            :state="$v.item.value.$invalid && $v.item.value.$dirty ? false : null"
           ></b-form-input>
         </b-input-group>
-        <b-form-invalid-feedback :state="!($v.item.hours.$invalid && $v.item.hours.$dirty)">{{ translate('dialog.errors.minValue').replace('$value', 0) }}</b-form-invalid-feedback>
+        <b-form-invalid-feedback :state="!($v.item.value.$invalid && $v.item.value.$dirty)">{{ translate('dialog.errors.minValue').replace('$value', 0) }}</b-form-invalid-feedback>
       </b-form-group>
     </b-form>
   </b-container>
@@ -109,8 +119,9 @@ export default class ranksEdit extends Vue {
 
   item: RankInterface = {
     id: uuid(),
-    hours: 0,
+    value: 0,
     rank: '',
+    type: 'viewer',
   }
 
 
@@ -118,7 +129,7 @@ export default class ranksEdit extends Vue {
   validations = {
     item: {
       rank: {required},
-      hours: {required, minValue: minValue(0)},
+      value: {required, minValue: minValue(0)},
     }
   }
 

@@ -2,7 +2,7 @@
 
 import * as _ from 'lodash';
 
-import { prepare, sendMessage } from '../commons';
+import { getLocalizedName, prepare, sendMessage } from '../commons';
 import { command, default_permission } from '../decorators';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
@@ -15,12 +15,21 @@ import users from '../users';
 import { translate } from '../translate';
 
 /*
- * !rank                       - show user rank
- * !rank add <hours> <rank>    - add <rank> for selected <hours>
- * !rank remove <hours>        - remove rank for selected <hours>
- * !rank list                  - show rank list
- * !rank set <username> <rank> - set custom <rank> for <username>
- * !rank unset <username>      - unset custom rank for <username>
+ * !rank                          - show user rank
+ * !rank add <hours> <rank>       - add <rank> for selected <hours>
+ * !rank add-flw <months> <rank>  - add <rank> for selected <hours>
+ * !rank add-sub <months> <rank>  - add <rank> for selected <hours>
+ * !rank rm <hours>               - remove rank for selected <hours>
+ * !rank rm-flw <months>          - remove rank for selected <months> of followers
+ * !rank rm-sub <months>          - remove rank for selected <months> of subscribers
+ * !rank list                     - show rank list
+ * !rank list-flw                 - show rank list for followers
+ * !rank list-sub                 - show rank list for subcribers
+ * !rank edit <hours> <rank>      - edit rank
+ * !rank edit-flw <months> <rank> - edit rank for followers
+ * !rank edit-sub <months> <rank> - edit rank for subcribers
+ * !rank set <username> <rank>    - set custom <rank> for <username>
+ * !rank unset <username>         - unset custom rank for <username>
  */
 
 class Ranks extends System {
@@ -33,7 +42,7 @@ class Ranks extends System {
     adminEndpoint(this.nsp, 'ranks::getAll', async (cb) => {
       cb(await getRepository(Rank).find({
         order: {
-          hours: 'ASC',
+          value: 'ASC',
         },
       }));
     });
@@ -56,7 +65,7 @@ class Ranks extends System {
 
   @command('!rank add')
   @default_permission(permission.CASTERS)
-  async add (opts) {
+  async add (opts, type: RankInterface['type'] = 'viewer') {
     const parsed = opts.parameters.match(/^(\d+) ([\S].+)$/);
 
     if (_.isNil(parsed)) {
@@ -66,21 +75,33 @@ class Ranks extends System {
     }
 
 
-    const hours = parseInt(parsed[1], 10);
-    const rank = await getRepository(Rank).findOne({ hours });
+    const value = parseInt(parsed[1], 10);
+    const rank = await getRepository(Rank).findOne({ value });
     if (!rank) {
       await getRepository(Rank).save({
-        hours, rank: parsed[2],
+        value, rank: parsed[2], type,
       });
     }
 
-    const message = await prepare(!rank ? 'ranks.rank-was-added' : 'ranks.ranks-already-exist', { rank: parsed[2], hours });
+    const message = await prepare(!rank ? 'ranks.rank-was-added' : 'ranks.ranks-already-exist', { rank: parsed[2], value, type });
     sendMessage(message, opts.sender, opts.attr);
+  }
+
+  @command('!rank add-flw')
+  @default_permission(permission.CASTERS)
+  async addflw (opts) {
+    this.add(opts, 'follower');
+  }
+
+  @command('!rank add-sub')
+  @default_permission(permission.CASTERS)
+  async addsub (opts) {
+    this.add(opts, 'subscriber');
   }
 
   @command('!rank edit')
   @default_permission(permission.CASTERS)
-  async edit (opts) {
+  async edit (opts, type: RankInterface['type'] = 'viewer') {
     const parsed = opts.parameters.match(/^(\d+) ([\S].+)$/);
 
     if (_.isNil(parsed)) {
@@ -89,12 +110,12 @@ class Ranks extends System {
       return false;
     }
 
-    const hours = parsed[1];
+    const value = parsed[1];
     const rank = parsed[2];
 
-    const item = await getRepository(Rank).findOne({ hours: parseInt(hours, 10) });
+    const item = await getRepository(Rank).findOne({ value: parseInt(value, 10), type });
     if (!item) {
-      const message = await prepare('ranks.rank-was-not-found', { hours: hours });
+      const message = await prepare('ranks.rank-was-not-found', { value: value });
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
@@ -102,8 +123,20 @@ class Ranks extends System {
     await getRepository(Rank).save({
       ...item, rank,
     });
-    const message = await prepare('ranks.rank-was-edited', { hours: parseInt(hours, 10), rank: rank });
+    const message = await prepare('ranks.rank-was-edited', { value: parseInt(value, 10), rank, type });
     sendMessage(message, opts.sender, opts.attr);
+  }
+
+  @command('!rank edit-flw')
+  @default_permission(permission.CASTERS)
+  async editflw (opts) {
+    this.edit(opts, 'follower');
+  }
+
+  @command('!rank edit-sub')
+  @default_permission(permission.CASTERS)
+  async editsub (opts) {
+    this.edit(opts, 'subscriber');
   }
 
   @command('!rank set')
@@ -141,22 +174,38 @@ class Ranks extends System {
   @command('!rank help')
   @default_permission(permission.CASTERS)
   help (opts) {
-    sendMessage(translate('core.usage') + ': !rank add <hours> <rank> | !rank edit <hours> <rank> | !rank remove <hour> | !rank list | !rank set <username> <rank> | !rank unset <username>', opts.sender, opts.attr);
+    let url = 'http://sogehige.github.io/sogeBot/#/commands/ranks';
+    if ((process.env?.npm_package_version ?? 'x.y.z-SNAPSHOT').includes('SNAPSHOT')) {
+      url = 'http://sogehige.github.io/sogeBot/#/_master/commands/ranks';
+    }
+    sendMessage(translate('core.usage') + ' => ' + url, opts.sender);
   }
 
   @command('!rank list')
   @default_permission(permission.CASTERS)
-  async list (opts) {
-    const ranks = await getRepository(Rank).find();
-    const output = await prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', { list: _.map(_.orderBy(ranks, 'hours', 'asc'), function (l) {
-      return l.hours + 'h - ' + l.rank;
+  async list (opts, type: RankInterface['type'] = 'viewer') {
+    const ranks = await getRepository(Rank).find({ type });
+    const output = await prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', { list: _.map(_.orderBy(ranks, 'value', 'asc'), function (l) {
+      return l.value + 'h - ' + l.rank;
     }).join(', ') });
     sendMessage(output, opts.sender, opts.attr);
   }
 
-  @command('!rank remove')
+  @command('!rank list-flw')
   @default_permission(permission.CASTERS)
-  async remove (opts) {
+  async listflw (opts) {
+    this.list(opts, 'follower');
+  }
+
+  @command('!rank list-sub')
+  @default_permission(permission.CASTERS)
+  async listsub (opts) {
+    this.list(opts, 'subscriber');
+  }
+
+  @command('!rank rm')
+  @default_permission(permission.CASTERS)
+  async rm (opts, type: RankInterface['type'] = 'viewer') {
     const parsed = opts.parameters.match(/^(\d+)$/);
     if (_.isNil(parsed)) {
       const message = await prepare('ranks.rank-parse-failed');
@@ -164,78 +213,135 @@ class Ranks extends System {
       return false;
     }
 
-    const hours = parseInt(parsed[1], 10);
-    const removed = await getRepository(Rank).delete({ hours: hours });
+    const value = parseInt(parsed[1], 10);
+    const removed = await getRepository(Rank).delete({ value, type });
 
-    const message = await prepare(removed ? 'ranks.rank-was-removed' : 'ranks.rank-was-not-found', { hours: hours });
+    const message = await prepare(removed ? 'ranks.rank-was-removed' : 'ranks.rank-was-not-found', { value, type });
     sendMessage(message, opts.sender, opts.attr);
+  }
+
+  @command('!rank rm-flw')
+  @default_permission(permission.CASTERS)
+  async rmflw (opts) {
+    this.rm(opts, 'follower');
+  }
+
+  @command('!rank rm-sub')
+  @default_permission(permission.CASTERS)
+  async rmsub (opts) {
+    this.rm(opts, 'subscriber');
   }
 
   @command('!rank')
   async main (opts) {
+    const user = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
     const watched = await users.getWatchedOf(opts.sender.userId);
-    const rank = await this.get(opts.sender.username);
+    const rank = await this.get(user);
 
-    const ranks = await getRepository(Rank).find({
-      order: {
-        hours: 'DESC',
-      },
-    });
-    const current = ranks.find(o => o.rank === rank);
-
-    let nextRank: null | { hours: number; rank: string } = null;
-    for (const _rank of ranks) {
-      if (_rank.hours > watched / 1000 / 60 / 60) {
-        nextRank = _rank;
-      } else {
-        break;
-      }
-    }
-
-    if (_.isNil(rank) || !current) {
+    if (_.isNil(rank.current)) {
       const message = await prepare('ranks.user-dont-have-rank');
       sendMessage(message, opts.sender, opts.attr);
       return true;
     }
 
-    if (!_.isNil(nextRank)) {
-      const toNextRank = nextRank.hours - current.hours;
-      const toNextRankWatched = watched / 1000 / 60 / 60 - current.hours;
-      const toWatch = (toNextRank - toNextRankWatched);
-      const percentage = 100 - (((toWatch) / toNextRank) * 100);
-      const message = await prepare('ranks.show-rank-with-next-rank', { rank: rank, nextrank: `${nextRank.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)}h)` });
-      sendMessage(message, opts.sender, opts.attr);
+    if (!_.isNil(rank.next) && typeof rank.current === 'object') {
+
+      if (rank.next.type === 'viewer') {
+        const toNextRank = rank.next.value - (rank.current.type === 'viewer' ? rank.current.value : 0);
+        const toNextRankWatched = watched / 1000 / 60 / 60 - (rank.current.type === 'viewer' ? rank.current.value : 0);
+        const toWatch = (toNextRank - toNextRankWatched);
+        const percentage = 100 - (((toWatch) / toNextRank) * 100);
+        const message = await prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), 'core.hours')})` });
+        sendMessage(message, opts.sender, opts.attr);
+      }
+      if (rank.next.type === 'follower') {
+        const toNextRank = rank.next.value - (rank.current.type === 'follower' ? rank.current.value : 0);
+        const toNextRankFollow = (Date.now() - (user?.followedAt || 0)) / 1000 / 60 / 60 / 31 - (rank.current.type === 'follower' ? rank.current.value : 0);
+        const toWatch = (toNextRank - toNextRankFollow);
+        const percentage = 100 - (((toWatch) / toNextRank) * 100);
+        const message = await prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), 'core.months')})` });
+        sendMessage(message, opts.sender, opts.attr);
+      }
+      if (rank.next.type === 'subscriber') {
+        const toNextRank = rank.next.value - (rank.current.type === 'subscriber' ? rank.current.value : 0);
+        const toNextRankSub = (user?.subscribeCumulativeMonths || 0) - (rank.current.type === 'subscriber' ? rank.current.value : 0);
+        const toWatch = (toNextRank - toNextRankSub);
+        const percentage = 100 - (((toWatch) / toNextRank) * 100);
+        const message = await prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), 'core.months')})` });
+        sendMessage(message, opts.sender, opts.attr);
+      }
       return true;
     }
 
-    const message = await prepare('ranks.show-rank-without-next-rank', { rank: rank });
+    const message = await prepare('ranks.show-rank-without-next-rank', { rank: typeof rank.current === 'string' ? rank.current : rank.current.rank });
     sendMessage(message, opts.sender, opts.attr);
+    return true;
   }
 
-  async get (user: Required<UserInterface> | undefined) {
+  async get (user: Required<UserInterface> | undefined): Promise<{current: null | string | Required<RankInterface>; next: null | Required<RankInterface>}> {
     if (!user) {
-      return '';
+      return { current: null, next: null };
     }
 
     if (user.haveCustomRank) {
-      return user.rank;
+      return { current: user.rank, next: null };
     }
 
     const ranks = await getRepository(Rank).find({
       order: {
-        hours: 'ASC',
+        value: 'DESC',
       },
     });
-    let rankToReturn: null | string = null;
 
-    for (const rank of ranks) {
-      if (user.watchedTime / 1000 / 60 / 60 >= rank.hours) {
-        rankToReturn = rank.rank;
-      } else {
-        break;
+    let rankToReturn: null | Required<RankInterface> = null;
+    let subNextRank: null | Required<RankInterface> = null;
+    let flwNextRank: null | Required<RankInterface> = null;
+    let nextRank: null | Required<RankInterface> = null;
+
+    if (user.isSubscriber) {
+      // search for sub rank
+      const subRanks = ranks.filter(o => o.type === 'subscriber');
+      for (const rank of subRanks) {
+        if (user.subscribeCumulativeMonths >= rank.value) {
+          rankToReturn = rank;
+          break;
+        } else {
+          subNextRank = rank;
+        }
+      }
+
+      if (rankToReturn) {
+        return { current: rankToReturn, next: subNextRank};
       }
     }
-    return rankToReturn;
+
+    if (user.isFollower) {
+      // search for follower rank
+      const flwRank = ranks.filter(o => o.type === 'follower');
+      for (const rank of flwRank) {
+        if (user.followedAt / 1000 / 60 / 60 >= rank.value) {
+          rankToReturn = rank;
+          break;
+        } else {
+          flwNextRank = rank;
+        }
+      }
+
+      if (rankToReturn) {
+        return { current: rankToReturn, next: subNextRank || flwNextRank};
+      }
+    }
+
+    // watched time rank
+    for (const rank of ranks) {
+      if (user.watchedTime / 1000 / 60 / 60 >= rank.value) {
+        rankToReturn = rank;
+        break;
+      } else {
+        nextRank = rank;
+      }
+    }
+    return { current: rankToReturn, next: subNextRank || flwNextRank || nextRank};
   }
 }
 

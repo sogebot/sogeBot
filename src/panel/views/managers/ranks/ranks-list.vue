@@ -22,28 +22,79 @@
     </panel>
 
     <loading v-if="state.loading !== $state.success"/>
-    <b-alert show variant="danger" v-else-if="state.loading === $state.success && fItems.length === 0 && search.length > 0">
-      <fa icon="search"/> <span v-html="translate('systems.ranks.emptyAfterSearch').replace('$search', search)"/>
-    </b-alert>
-    <b-alert show v-else-if="state.loading === $state.success && items.length === 0">
-      {{translate('systems.ranks.empty')}}
-    </b-alert>
-    <b-table v-else striped small hover :items="fItems" :fields="fields" @row-clicked="linkTo($event)">
-      <template v-slot:cell(hours)="data">
-        <span class="font-weight-bold text-primary font-bigger">{{ data.item.hours }}</span>
-      </template>
-      <template v-slot:cell(buttons)="data">
-        <div class="float-right" style="width: max-content !important;">
-          <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/ranks/edit/' + data.item.id">
-            {{ translate('dialog.buttons.edit') }}
-          </button-with-icon>
-          <hold-button @trigger="remove(data.item.id)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
-            <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-            <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
-          </hold-button>
-        </div>
-      </template>
-    </b-table>
+    <template v-else>
+      <b-row>
+        <b-col md="4" sm="12">
+          <span class="title"><small>Watch time</small></span>
+          <b-table striped small hover :items="fViewerItems" :fields="fields" @row-clicked="linkTo($event)" show-empty>
+            <template v-slot:empty>
+              <b-alert show variant="danger" class="m-0" v-if="search.length > 0"><fa icon="search"/> <span v-html="translate('systems.ranks.emptyAfterSearch').replace('$search', search)"/></b-alert>
+              <b-alert show class="m-0" v-else>{{translate('systems.ranks.empty')}}</b-alert>
+            </template>
+            <template v-slot:cell(value)="data">
+              <span class="font-weight-bold text-primary font-bigger">{{ data.item.value }}</span>
+            </template>
+            <template v-slot:cell(buttons)="data">
+              <div class="float-right" style="width: max-content !important;">
+                <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/ranks/edit/' + data.item.id">
+                  {{ translate('dialog.buttons.edit') }}
+                </button-with-icon>
+                <hold-button @trigger="remove(data.item.id)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
+                  <template slot="title">{{translate('dialog.buttons.delete')}}</template>
+                  <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+                </hold-button>
+              </div>
+            </template>
+          </b-table>
+        </b-col>
+        <b-col md="4" sm="12">
+          <span class="title"><small>Follow time</small></span>
+          <b-table striped small hover :items="fFollowerItems" :fields="fields2" @row-clicked="linkTo($event)" show-empty>
+            <template v-slot:empty>
+              <b-alert show variant="danger" class="m-0" v-if="search.length > 0"><fa icon="search"/> <span v-html="translate('systems.ranks.emptyAfterSearch').replace('$search', search)"/></b-alert>
+              <b-alert show class="m-0" v-else>{{translate('systems.ranks.empty')}}</b-alert>
+            </template>
+            <template v-slot:cell(value)="data">
+              <span class="font-weight-bold text-primary font-bigger">{{ data.item.value }}</span>
+            </template>
+            <template v-slot:cell(buttons)="data">
+              <div class="float-right" style="width: max-content !important;">
+                <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/ranks/edit/' + data.item.id">
+                  {{ translate('dialog.buttons.edit') }}
+                </button-with-icon>
+                <hold-button @trigger="remove(data.item.id)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
+                  <template slot="title">{{translate('dialog.buttons.delete')}}</template>
+                  <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+                </hold-button>
+              </div>
+            </template>
+          </b-table>
+        </b-col>
+        <b-col md="4" sm="12">
+          <span class="title"><small>Sub time</small></span>
+          <b-table striped small hover :items="fSubscriberItems" :fields="fields2" @row-clicked="linkTo($event)" show-empty>
+            <template v-slot:empty>
+              <b-alert show variant="danger" class="m-0" v-if="search.length > 0"><fa icon="search"/> <span v-html="translate('systems.ranks.emptyAfterSearch').replace('$search', search)"/></b-alert>
+              <b-alert show class="m-0" v-else>{{translate('systems.ranks.empty')}}</b-alert>
+            </template>
+            <template v-slot:cell(value)="data">
+              <span class="font-weight-bold text-primary font-bigger">{{ data.item.value }}</span>
+            </template>
+            <template v-slot:cell(buttons)="data">
+              <div class="float-right" style="width: max-content !important;">
+                <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/ranks/edit/' + data.item.id">
+                  {{ translate('dialog.buttons.edit') }}
+                </button-with-icon>
+                <hold-button @trigger="remove(data.item.id)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
+                  <template slot="title">{{translate('dialog.buttons.delete')}}</template>
+                  <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+                </hold-button>
+              </div>
+            </template>
+          </b-table>
+        </b-col>
+      </b-row>
+    </template>
   </b-container>
 </template>
 
@@ -74,17 +125,50 @@ export default class ranksList extends Vue {
   }
 
   fields = [
-    { key: 'hours', label: capitalize(this.translate('hours')), sortable: true },
+    { key: 'value', label: capitalize(this.translate('hours')), sortable: true },
     { key: 'rank', label: this.translate('rank'), sortable: true },
     { key: 'buttons', label: '' },
   ];
 
-  get fItems() {
-    if (this.search.length === 0) return this.items
+  fields2 = [
+    { key: 'value', label: capitalize(this.translate('months')), sortable: true },
+    { key: 'rank', label: this.translate('rank'), sortable: true },
+    { key: 'buttons', label: '' },
+  ];
+
+  get fViewerItems() {
+    if (this.search.length === 0) {
+      return this.items.filter((o) => o.type === 'viewer');
+    }
     return this.items.filter((o) => {
-      const isSearchInHours = !isNil(String(o.hours).match(new RegExp(escape(this.search), 'ig')))
+      const isViewer = o.type === 'viewer';
+      const isSearchInHours = !isNil(String(o.value).match(new RegExp(escape(this.search), 'ig')))
       const isSearchInValue = !isNil(o.rank.match(new RegExp(escape(this.search), 'ig')))
-      return isSearchInHours || isSearchInValue
+      return isViewer && (isSearchInHours || isSearchInValue);
+    })
+  }
+
+  get fFollowerItems() {
+    if (this.search.length === 0) {
+      return this.items.filter((o) => o.type === 'follower');
+    }
+    return this.items.filter((o) => {
+      const isFollower = o.type === 'follower';
+      const isSearchInHours = !isNil(String(o.value).match(new RegExp(escape(this.search), 'ig')))
+      const isSearchInValue = !isNil(o.rank.match(new RegExp(escape(this.search), 'ig')))
+      return isFollower && (isSearchInHours || isSearchInValue);
+    })
+  }
+
+  get fSubscriberItems() {
+    if (this.search.length === 0) {
+      return this.items.filter((o) => o.type === 'subscriber');
+    }
+    return this.items.filter((o) => {
+      const isSubscriber = o.type === 'subscriber';
+      const isSearchInHours = !isNil(String(o.value).match(new RegExp(escape(this.search), 'ig')))
+      const isSearchInValue = !isNil(o.rank.match(new RegExp(escape(this.search), 'ig')))
+      return isSubscriber && (isSearchInHours || isSearchInValue);
     })
   }
 

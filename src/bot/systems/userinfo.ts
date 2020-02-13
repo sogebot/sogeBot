@@ -210,8 +210,8 @@ class UserInfo extends System {
       if (message.includes('$rank')) {
         const idx = message.indexOf('$rank');
         const rank = await ranks.get(await getRepository(User).findOne({ userId: opts.sender.userId }));
-        if (ranks.enabled && !_.isNull(rank)) {
-          message[idx] = rank;
+        if (ranks.enabled && !_.isNull(rank.current)) {
+          message[idx] = typeof rank.current === 'string' ? rank.current : rank.current.rank;
         } else {
           message.splice(idx, 1);
         }
