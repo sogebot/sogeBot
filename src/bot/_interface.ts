@@ -14,6 +14,7 @@ import { PermissionCommands, Permissions as PermissionsEntity } from './database
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import { flatten, unflatten } from './helpers/flatten';
 import { existsSync } from 'fs';
+import { isDbConnected } from './helpers/database';
 
 let socket: import('./socket').Socket | any = null;
 let panel: null | any = null;
@@ -114,29 +115,37 @@ class Module {
 
     // prepare proxies for variables
     this._sockets();
-    setTimeout(() => {
-      this.loadVariableValue('enabled').then((value) => {
-        const onStartup = () => {
-          if (loadingInProgress.length > 0) {
-            // wait until all settings are loaded
-            return setTimeout(() => onStartup(), 100);
-          }
-          this._enabled = typeof value === 'undefined' ? this._enabled : value;
-          this.status({ state: this._enabled, quiet: !isMainThread });
-          if (isMainThread) {
-            const path = this._name === 'core' ? this.constructor.name.toLowerCase() : `${this._name}.${this.constructor.name.toLowerCase()}`;
-            for (const event of getFunctionList('startup', path)) {
-              this[event.fName]('enabled', value);
-            }
-          };
-        };
-        onStartup();
-      });
 
-      // require panel/socket
-      socket = (require('./socket')).default;
-      panel = (require('./panel')).default;
-    }, 5000); // slow down little bit to have everything preloaded or in progress of loading
+    const load = () => {
+      if (isDbConnected) {
+        setTimeout(() => {
+          this.loadVariableValue('enabled').then((value) => {
+            const onStartup = () => {
+              if (loadingInProgress.length > 0) {
+                // wait until all settings are loaded
+                return setTimeout(() => onStartup(), 100);
+              }
+              this._enabled = typeof value === 'undefined' ? this._enabled : value;
+              this.status({ state: this._enabled, quiet: !isMainThread });
+              if (isMainThread) {
+                const path = this._name === 'core' ? this.constructor.name.toLowerCase() : `${this._name}.${this.constructor.name.toLowerCase()}`;
+                for (const event of getFunctionList('startup', path)) {
+                  this[event.fName]('enabled', value);
+                }
+              };
+            };
+            onStartup();
+          });
+
+          // require panel/socket
+          socket = (require('./socket')).default;
+          panel = (require('./panel')).default;
+        }, 5000); // slow down little bit to have everything preloaded or in progress of loading
+      } else {
+        setTimeout(() => load(), 1000);
+      }
+    };
+    load();
 
     setInterval(async () => {
       this.areDependenciesEnabled = await this._areDependenciesEnabled;

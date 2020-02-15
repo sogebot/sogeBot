@@ -35,6 +35,7 @@ import eventlist from './overlays/eventlist';
 import stats from './stats';
 import { getFunctionList } from './decorators/on';
 import { linesParsed, setStatus } from './helpers/parser';
+import { isDbConnected } from './helpers/database';
 
 const setImmediateAwait = () => {
   return new Promise(resolve => {
@@ -389,6 +390,10 @@ class API extends Core {
   async getChannelChattersUnofficialAPI (opts) {
     if (!isMainThread) {
       throw new Error('API can run only on master');
+    }
+
+    if (!isDbConnected) {
+      return { state: false, opts };
     }
 
     const event = await getRepository(ThreadEvent).findOne({ event: 'getChannelChattersUnofficialAPI' });
