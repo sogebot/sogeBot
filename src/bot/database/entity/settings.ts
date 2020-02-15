@@ -28,10 +28,8 @@ export const Settings = new EntitySchema<SettingsInterface>({
   indices: [
     {
       name: 'IDX_d8a83b9ffce680092c8dfee37d',
-      columns: [ 'namespace' ],
-    }, {
-      name: 'IDX_ca7857276d2a30f4dcfa0e42cd',
-      columns: [ 'name' ],
+      columns: [ 'namespace', 'name' ],
+      unique: true,
     },
   ],
 });
