@@ -1,6 +1,6 @@
-FROM node:13.3.0-alpine
+FROM node:alpine
 
-ENV LAST_UPDATED 2019-12-11-1247
+ENV LAST_UPDATED 2020-15-02-1837
 
 ENV NODE_ENV production
 ENV ENV production
