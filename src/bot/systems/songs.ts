@@ -20,6 +20,8 @@ import { translate } from '../translate';
 
 const defaultApiKey = 'AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0';
 
+let importInProgress = false;
+
 class Songs extends System {
   interval: { [id: string]: NodeJS.Timeout } = {};
 
@@ -143,14 +145,25 @@ class Songs extends System {
       await getRepository(SongBan).delete({ videoId });
       cb();
     });
+    adminEndpoint(this.nsp, 'stop.import', () => {
+      importInProgress = false;
+    });
     adminEndpoint(this.nsp, 'import.ban', async (url, cb) => {
       cb(null, await this.banSongById({ parameters: this.getIdFromURL(url), sender: null }));
     });
     adminEndpoint(this.nsp, 'import.playlist', async (playlist, cb) => {
-      cb(null, await this.importPlaylist({ parameters: playlist, sender: null }));
+      try {
+        cb(null, await this.importPlaylist({ parameters: playlist, sender: null }));
+      } catch (e) {
+        cb(e, null);
+      }
     });
     adminEndpoint(this.nsp, 'import.video', async (url, cb) => {
-      cb(null, await this.addSongToPlaylist({ parameters: url, sender: null }));
+      try {
+        cb(null, await this.addSongToPlaylist({ parameters: url, sender: null }));
+      } catch (e) {
+        cb(e, null);
+      }
     });
     adminEndpoint(this.nsp, 'next', async () => {
       this.sendNextSongID();
@@ -674,59 +687,52 @@ class Songs extends System {
     } else {
       let imported = 0;
       let done = 0;
+      importInProgress = true;
 
       const idsFromDB = (await getRepository(SongPlaylist).find()).map(o => o.videoId);
       const banFromDb = (await getRepository(SongBan).find()).map(o => o.videoId);
 
       for (const id of ids) {
-        if (idsFromDB.includes(id)) {
+        if (!importInProgress) {
+          info(`=> Skipped ${id} - Importing was canceled`);
+        } else if (idsFromDB.includes(id)) {
           info(`=> Skipped ${id} - Already in playlist`);
           done++;
         } else if (banFromDb.includes(id)) {
           info(`=> Skipped ${id} - Song is banned`);
           done++;
         } else {
-          ytdl.getInfo('https://www.youtube.com/watch?v=' + id, async (err, videoInfo) => {
-            done++;
-            if (err) {
-              return error(`=> Skipped ${id} - ${err.message}`);
-            } else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title)) {
-              info(`=> Imported ${id} - ${videoInfo.title}`);
-              await getRepository(SongPlaylist).save({
-                videoId: id,
-                title: videoInfo.title,
-                loudness: Number(videoInfo.loudness ?? - 15),
-                length: Number(videoInfo.length_seconds),
-                lastPlayedAt: Date.now(),
-                seed: 1,
-                volume: 20,
-                startTime: 0,
-                endTime: Number(videoInfo.length_seconds),
-              });
-              imported++;
-            }
+          await new Promise(resolve => {
+            ytdl.getInfo('https://www.youtube.com/watch?v=' + id, async (err, videoInfo) => {
+              done++;
+              if (err) {
+                error(`=> Skipped ${id} - ${err.message}`);
+                resolve();
+              } else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title)) {
+                info(`=> Imported ${id} - ${videoInfo.title}`);
+                await getRepository(SongPlaylist).save({
+                  videoId: id,
+                  title: videoInfo.title,
+                  loudness: Number(videoInfo.loudness ?? - 15),
+                  length: Number(videoInfo.length_seconds),
+                  lastPlayedAt: Date.now(),
+                  seed: 1,
+                  volume: 20,
+                  startTime: 0,
+                  endTime: Number(videoInfo.length_seconds),
+                });
+                imported++;
+                resolve();
+              }
+            });
           });
         }
       }
 
-      const waitForImport = function () {
-        return new Promise((resolve) => {
-          const check = (resolve) => {
-            if (done === ids.length) {
-              resolve();
-            } else {
-              setTimeout(() => check(resolve), 500);
-            }
-          };
-          check(resolve);
-        });
-      };
-
-      await waitForImport();
-
       await this.refreshPlaylistVolume();
       await this.getMeanLoudness();
       sendMessage(await prepare('songs.playlist-imported', { imported, skipped: done - imported }), opts.sender, opts.attr);
+      info(`=> Playlist import done, ${imported} imported, ${done - imported} skipped`);
       return { imported, skipped: done - imported };
     }
   }

@@ -27,10 +27,16 @@
             <b-input-group-append>
               <b-button type="submit" v-if="state.import == 0" variant="primary" class="btn mr-2" v-on:click="addSongOrPlaylist()">
                 <fa icon="plus"></fa> {{ translate('systems.songs.add_or_import') }}</b-button>
-              <b-button v-else-if="state.import == 1" class="btn mr-2" variant="info" disabled="disabled">
-                <fa icon="circle-notch" spin></fa> {{ translate('systems.songs.importing') }}</b-button>
-              <b-button v-else class="btn mr-2" variant="success" disabled="disabled">
+              <b-button-group v-else-if="state.import == 1">
+                <b-button class="btn" variant="info" disabled="disabled">
+                  <fa icon="circle-notch" spin fixed-width></fa> {{ translate('systems.songs.importing') }}</b-button>
+                <b-button variant="danger" @click="stopImport()">
+                  <fa icon="stop" fixed-width></fa></b-button>
+              </b-button-group>
+              <b-button v-else-if="state.import == 2" class="btn mr-2" variant="success" disabled="disabled">
                 <fa icon="check"></fa> {{ translate('systems.songs.importing_done') }}</b-button>
+              <b-button v-else class="btn mr-2" variant="danger" disabled="disabled">
+                <fa icon="times"></fa> {{ translate('dialog.buttons.something-went-wrong') }}</b-button>
             </b-input-group-append>
           </b-input-group>
           <div class="text-info">{{ importInfo }}</div>
@@ -191,6 +197,15 @@ export default class playlist extends Vue {
     return `https://img.youtube.com/vi/${videoId}/1.jpg`
   }
 
+  stopImport() {
+    if (this.state.import === 1) {
+      this.state.import = 0
+      this.socket.emit('stop.import', () => {
+        this.refreshPlaylist()
+      })
+    }
+  }
+
   addSongOrPlaylist(evt) {
     if (evt) {
       evt.preventDefault()
@@ -198,10 +213,18 @@ export default class playlist extends Vue {
     if (this.state.import === 0) {
       this.state.import = 1
       this.socket.emit(this.toAdd.includes('playlist') ? 'import.playlist' : 'import.video', this.toAdd, (err, info) => {
-        this.state.import = 2
-        this.refreshPlaylist()
-        this.toAdd = ''
-        this.showImportInfo(info)
+        if (err) {
+          this.state.import = 3
+          setTimeout(() => {
+            this.importInfo = ''
+            this.state.import = 0
+          }, 2000)
+        } else {
+          this.state.import = 2
+          this.refreshPlaylist()
+          this.toAdd = ''
+          this.showImportInfo(info)
+        }
       })
     }
   }
@@ -211,7 +234,7 @@ export default class playlist extends Vue {
     setTimeout(() => {
       this.importInfo = ''
       this.state.import = 0
-    }, 5000)
+    }, 2000)
   }
 
   updateItem(videoId) {
