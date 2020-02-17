@@ -123,6 +123,11 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
   attr = attr || {};
   sender = sender || null;
 
+  if (tmi.sendWithMe) {
+    // replace /me in message if we are already sending with /me
+    messageToSend = messageToSend.replace(/^(\/me)/gi, '').trim();
+  }
+
   debug('commons.sendMessage', JSON.stringify({messageToSend, sender, attr}));
 
   if (sender) {
