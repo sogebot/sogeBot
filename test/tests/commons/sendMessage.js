@@ -10,7 +10,7 @@ const assert = require('chai').assert;
 
 const { sendMessage, getOwnerAsSender } = require('../../../dest/commons');
 
-describe.only('lib/commons - sendMessage()', () => {
+describe('lib/commons - sendMessage()', () => {
   describe('remove /me when in color mode', () => {
     before(async () => {
       await db.cleanup();
