@@ -118,24 +118,26 @@ class Module {
 
     const load = () => {
       if (isDbConnected) {
-        setTimeout(() => {
-          this.loadVariableValue('enabled').then((value) => {
-            const onStartup = () => {
-              if (loadingInProgress.length > 0) {
-                // wait until all settings are loaded
-                return setTimeout(() => onStartup(), 100);
+        setTimeout(async () => {
+          let enabled = true;
+          if (this._name !== 'core') {
+            enabled = await this.loadVariableValue('enabled');
+          }
+          const onStartup = () => {
+            if (loadingInProgress.length > 0) {
+              // wait until all settings are loaded
+              return setTimeout(() => onStartup(), 100);
+            }
+            this._enabled = typeof enabled === 'undefined' ? this._enabled : enabled;
+            this.status({ state: this._enabled, quiet: !isMainThread });
+            if (isMainThread) {
+              const path = this._name === 'core' ? this.constructor.name.toLowerCase() : `${this._name}.${this.constructor.name.toLowerCase()}`;
+              for (const event of getFunctionList('startup', path)) {
+                this[event.fName]('enabled', enabled);
               }
-              this._enabled = typeof value === 'undefined' ? this._enabled : value;
-              this.status({ state: this._enabled, quiet: !isMainThread });
-              if (isMainThread) {
-                const path = this._name === 'core' ? this.constructor.name.toLowerCase() : `${this._name}.${this.constructor.name.toLowerCase()}`;
-                for (const event of getFunctionList('startup', path)) {
-                  this[event.fName]('enabled', value);
-                }
-              };
             };
-            onStartup();
-          });
+          };
+          onStartup();
 
           // require panel/socket
           socket = (require('./socket')).default;
@@ -201,7 +203,7 @@ class Module {
 
   public _sockets() {
     if (panel === null || socket === null) {
-      this.timeouts[`${this.constructor.name}._sockets`] = setTimeout(() => this._sockets(), 1000);
+      setTimeout(() => this._sockets(), 100);
     } else {
       this.socket = panel.io.of(this.nsp).use(socket.authorize);
       this.sockets();
@@ -372,10 +374,8 @@ class Module {
 
   public addMenu(opts) {
     if (isMainThread) {
-      clearTimeout(this.timeouts[`${this.constructor.name}.${opts.id}.addMenu`]);
-
       if (_.isNil(panel)) {
-        this.timeouts[`${this.constructor.name}.${opts.id}.addMenu`] = setTimeout(() => this.addMenu(opts), 1000);
+        setTimeout(() => this.addMenu(opts), 1000);
       } else {
         panel.addMenu(opts);
       }
