@@ -8,15 +8,24 @@ import uuid from 'uuid/v4';
 import { getRepository, LessThan, MoreThan, Not } from 'typeorm';
 import { Settings } from './database/entity/settings';
 import { Changelog } from './database/entity/changelog';
+import { isDbConnected } from './helpers/database';
 
 let lastTimestamp = Date.now();
 const threadId = uuid();
 
 export const change = ((namespace) => {
-  getRepository(Changelog).save({ namespace, timestamp: Date.now(), threadId });
+  if (!isDbConnected) {
+    setTimeout(() => change(namespace), 1000);
+  } else {
+    getRepository(Changelog).save({ namespace, timestamp: Date.now(), threadId });
+  }
 });
 
 export const changelog = async () => {
+  if (!isDbConnected) {
+    return setTimeout(() => changelog(), 1000);
+  }
+
   const changes = await getRepository(Changelog).find({
     where: {
       timestamp: MoreThan(lastTimestamp),

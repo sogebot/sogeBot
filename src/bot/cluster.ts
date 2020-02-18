@@ -5,7 +5,7 @@ import io from 'socket.io';
 import ioClient from 'socket.io-client';
 import http from 'http';
 
-import { isDebugEnabled as debugIsEnabled } from './helpers/log';
+import { isDebugEnabled as debugIsEnabled, warning } from './helpers/log';
 import config from '@config';
 import { chatIn, chatOut, info, whisperIn, whisperOut } from './helpers/log';
 import oauth from './oauth';
@@ -26,8 +26,13 @@ let lastSocketIdx = 0;
 let socketIO, clientIO;
 
 export const init = async () => {
+  if (process.env.CLUSTER && config.cluster.enabled === 'false') {
+    warning('You are trying to run in cluster-mode without proper settings.');
+    process.exit(1);
+  }
+
   if (config.cluster.enabled === 'true') {
-    if (typeof panel === 'undefined') {
+    if (typeof panel === 'undefined' && isMainThread) {
       setTimeout(() => {
         init();
       }, 1000);

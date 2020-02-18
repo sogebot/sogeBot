@@ -32,9 +32,7 @@ const connect = async function () {
 };
 
 async function main () {
-  if (isMainThread) {
-    await connect();
-  }
+  await connect();
   let translate, panel;
   try {
     clusterInit();
