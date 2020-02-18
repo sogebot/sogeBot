@@ -20,6 +20,8 @@ import { getUserFromTwitch } from './getUserFromTwitch';
 import { clusteredFetchAccountAge } from '../cluster';
 import { debug, warning } from '../helpers/log';
 
+const isThreadingEnabled = process.env.THREAD !== '0';
+
 export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: boolean; partedUsers: string[]; joinedUsers: string[] }> => {
   if (!isMainThread) {
     const connectionOptions = await getConnectionOptions();
@@ -30,7 +32,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
   const connection = await getConnection();
 
   // spin up worker
-  if (isMainThread && connection.options.type !== 'sqlite') {
+  if (isMainThread && connection.options.type !== 'sqlite' && isThreadingEnabled) {
     const value = await new Promise((resolve, reject) => {
       const worker = new Worker(__filename);
       worker.on('message', resolve);
@@ -44,7 +46,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
     });
     return value as unknown as { modStatus: boolean; partedUsers: string[]; joinedUsers: string[] };
   }
-
+  debug('microservice', 'isThreadingEnabled::getChannelChattersUnofficialAPI ' + isThreadingEnabled);
   debug('microservice', 'start::getChannelChattersUnofficialAPI');
   try {
     // lock thread
