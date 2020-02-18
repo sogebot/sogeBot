@@ -37,67 +37,69 @@ async function main () {
   }
   let translate, panel;
   try {
-    clusterInit();
-    changelog();
+
+    const version = _.get(process, 'env.npm_package_version', 'x.y.z');
+    if (!existsSync('./restart.pid')) {
+      process.stdout.write(figlet.textSync('sogeBot ' + version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'), {
+        font: 'ANSI Shadow',
+        horizontalLayout: 'default',
+        verticalLayout: 'default',
+      }));
+      process.stdout.write('\n\n\n');
+      info('Bot is starting up');
+    }
 
     // Initialize all core singletons
-    require('./general');
-    require('./socket');
-    require('./ui');
-    require('./currency');
-    require('./stats');
-    require('./users');
-    require('./events');
-    require('./customvariables');
-    panel = require('./panel');
-    require('./twitch');
-    require('./permissions');
-    translate = require('./translate');
-    require('./oauth');
-    require('./webhooks');
-    require('./api');
+    setTimeout(() => {
+      clusterInit();
+      changelog();
+      require('./general');
+      require('./socket');
+      require('./ui');
+      require('./currency');
+      require('./stats');
+      require('./users');
+      require('./events');
+      require('./customvariables');
+      panel = require('./panel');
+      require('./twitch');
+      require('./permissions');
+      translate = require('./translate');
+      require('./oauth');
+      require('./webhooks');
+      require('./api');
+      translate.default._load().then(async () => {
+        await autoLoad('./dest/stats/');
+        await autoLoad('./dest/registries/');
+        await autoLoad('./dest/systems/');
+        await autoLoad('./dest/widgets/');
+        await autoLoad('./dest/overlays/');
+        await autoLoad('./dest/games/');
+        await autoLoad('./dest/integrations/');
+
+        if (isMainThread) {
+          panel.default.expose();
+        }
+
+        if (process.env.HEAP) {
+          warning(chalk.bgRed.bold('HEAP debugging is ENABLED'));
+          setTimeout(() => require('./heapdump.js').init('heap/'), 120000);
+        }
+
+        // load tmi last
+        require('./tmi');
+
+        setTimeout(() => {
+          if (existsSync('./restart.pid')) {
+            unlinkSync('./restart.pid');
+          }
+        }, 30000);
+      });
+    }, 5000);
   } catch (e) {
     error(e);
     process.exit();
   }
-
-  const version = _.get(process, 'env.npm_package_version', 'x.y.z');
-  if (!existsSync('./restart.pid')) {
-    process.stdout.write(figlet.textSync('sogeBot ' + version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'), {
-      font: 'ANSI Shadow',
-      horizontalLayout: 'default',
-      verticalLayout: 'default',
-    }));
-    process.stdout.write('\n\n\n');
-    info('Bot is starting up');
-  }
-  translate.default._load().then(async () => {
-    await autoLoad('./dest/stats/');
-    await autoLoad('./dest/registries/');
-    await autoLoad('./dest/systems/');
-    await autoLoad('./dest/widgets/');
-    await autoLoad('./dest/overlays/');
-    await autoLoad('./dest/games/');
-    await autoLoad('./dest/integrations/');
-
-    if (isMainThread) {
-      panel.default.expose();
-    }
-
-    if (process.env.HEAP) {
-      warning(chalk.bgRed.bold('HEAP debugging is ENABLED'));
-      setTimeout(() => require('./heapdump.js').init('heap/'), 120000);
-    }
-
-    // load tmi last
-    require('./tmi');
-
-    setTimeout(() => {
-      if (existsSync('./restart.pid')) {
-        unlinkSync('./restart.pid');
-      }
-    }, 30000);
-  });
 }
 
 main();
