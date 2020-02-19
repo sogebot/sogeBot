@@ -3,7 +3,7 @@ SHELL   := /bin/bash
 VERSION := `node -pe "require('./package.json').version"`
 ENV     ?= production
 
-all : clean prepare dependencies patch css ui bot info
+all : info clean prepare dependencies patch css ui bot
 .PHONY : all
 
 info:
@@ -21,7 +21,6 @@ patch:
 	@echo -ne "\n\t ----- Going through node_modules patches\n"
 	# How to create node_modules patch: https://opensource.christmas/2019/4
 	patch --forward node_modules/twitch-js/types/index.d.ts < patches/twitch-js-types.patch
-	patch --forward node_modules/popyt/out/entities/video.js < patches/fixed-popyt-video-fields.patch
 
 eslint:
 	@echo -ne "\n\t ----- Checking eslint\n"
