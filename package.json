@@ -85,8 +85,8 @@
     "test:config:sqlite": "cp src/bot/data/config.example.json config.json && cp src/bot/data/ormconfig.sqlite.json ormconfig.json",
     "migrate": "node ./tools/migrate && node ./tools/migrate --delete",
     "start": "cross-env NODE_ENV=production node --always_compact --optimize_for_size --gc_interval=100 --max_old_space_size=920  -r module-alias/register -r source-map-support/register  ./dest/main || true",
-    "debug": "cross-env NODE_ENV=development node --trace-warnings --always_compact --optimize_for_size --max_old_space_size=920 --gc_interval=100  -r module-alias/register --require source-map-support/register --inspect --nolazy --inspect-brk=9229 ./dest/main || true",
-    "gc": "cross-env NODE_ENV=development node --trace-warnings --trace_gc --trace_gc_verbose --always_compact --optimize_for_size --max_old_space_size=920 --gc_interval=100  -r module-alias/register --require source-map-support/register --inspect --nolazy --inspect-brk=9229 ./dest/main || true",
+    "debug": "cross-env NODE_ENV=development node --trace-warnings --always_compact --optimize_for_size --max_old_space_size=920 --gc_interval=100  -r module-alias/register --require source-map-support/register --inspect=0.0.0.0:9229 --nolazy ./dest/main || true",
+    "gc": "cross-env NODE_ENV=development node --trace-warnings --trace_gc --trace_gc_verbose --always_compact --optimize_for_size --max_old_space_size=920 --gc_interval=100  -r module-alias/register --require source-map-support/register --inspect=0.0.0.0:9229 --nolazy ./dest/main || true",
     "cleanup": "node ./tools/cleanup.js || true"
   },
   "devDependencies": {
