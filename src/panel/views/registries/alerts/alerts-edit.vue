@@ -355,6 +355,7 @@ export default class AlertsEdit extends Vue {
         volume: 1,
         rate: 1,
         pitch: 1,
+        minAmountToPlay: 0,
       },
       font: {
         family: 'PT Sans',

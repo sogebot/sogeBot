@@ -17,6 +17,22 @@
           <b-form-group
             label-cols-sm="4"
             label-cols-lg="3"
+            :label="translate('registry.alerts.minAmountToPlay.name')"
+            :label-for="'tts-minAmountToPlay' + uuid"
+          >
+            <b-form-input
+              :id="'tts-minAmountToPlay' + uuid"
+              v-model="data.minAmountToPlay"
+              type="number"
+              min="0"
+              :placeholder="translate('registry.alerts.minAmountToPlay.placeholder')"
+            >
+            ></b-form-input>
+          </b-form-group>
+
+          <b-form-group
+            label-cols-sm="4"
+            label-cols-lg="3"
             :label-for="'tts-skipUrls' + uuid"
             :label="translate('registry.alerts.skipUrls')"
           >
@@ -138,18 +154,16 @@ export default class TTS extends Vue {
   voices: {text: string; value: string}[] = [];
 
   beforeDestroy() {
-    this.$unloadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.configuration.integrations.responsiveVoice.api.key)
+    this.$unloadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.configuration.integrations.responsivevoice.api.key)
   }
 
   mounted() {
     this.state.loaded = this.$state.progress;
-    if (this.configuration.integrations.responsiveVoice.api.key.trim().length === 0) {
+    if (this.configuration.integrations.responsivevoice.api.key.trim().length === 0) {
       this.state.loaded = this.$state.fail;
     } else {
-      this.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.configuration.integrations.responsiveVoice.api.key)
-        .then(() => {
-          this.initResponsiveVoice();
-        })
+      this.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.configuration.integrations.responsivevoice.api.key)
+        .then(() => this.initResponsiveVoice());
     }
   }
 
