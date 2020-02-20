@@ -115,6 +115,9 @@
   "minAmountToShow": {
     "name": "Minimal amount to show"
   },
+  "minAmountToPlay": {
+    "name": "Minimal amount to play"
+  },
   "allowEmotes": {
     "name": "Allow emotes"
   },

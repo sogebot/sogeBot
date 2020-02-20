@@ -5,7 +5,7 @@ import { settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import config from '@config';
-import { filter, isNil, isString } from 'lodash';
+import { filter, isNil, isString, set } from 'lodash';
 import moment from 'moment';
 import { getBroadcaster } from './commons';
 import { isMainThread } from './cluster';
@@ -14,6 +14,7 @@ import general from './general';
 import currency from './currency';
 import webhooks from './webhooks';
 import glob from 'glob';
+import path from 'path';
 
 class UI extends Core {
   @settings()
@@ -62,13 +63,13 @@ class UI extends Core {
         data.core[system] = await self.getAllSettings();
       }
       for (const dir of ['systems', 'games', 'overlays', 'integrations']) {
-        for (let system of glob.sync('./' + dir + '/*')) {
+        for (let system of glob.sync(path.join(__dirname, dir, '*'))) {
+          system = system.split('/' + dir + '/')[1].replace('.js', '');
           if (system.startsWith('_')) {
             continue;
           }
-          system = system.replace('./' + dir + '/', '').replace('.js', '');
-          const self = (require('./' + dir + '/' + system.toLowerCase())).default;
-          data[dir][system] = await self.getAllSettings();
+          const self = (require(path.join(__dirname, dir, system))).default;
+          set(data, `${dir}.${system}`, await self.getAllSettings());
         }
       }
       // currencies
@@ -90,13 +91,13 @@ class UI extends Core {
       const data: any = {};
 
       for (const dir of ['systems', 'games']) {
-        for (let system of glob.sync('./' + dir + '/*')) {
+        for (let system of glob.sync(path.join(__dirname, dir, '*'))) {
+          system = system.split('/' + dir + '/')[1].replace('.js', '');
           if (system.startsWith('_')) {
             continue;
           }
-          system = system.replace('./' + dir + '/', '').replace('.js', '');
-          const self = (require('./' + dir + '/' + system.toLowerCase())).default;
-          data[dir][system] = await self.getAllSettings();
+          const self = (require(path.join(__dirname, dir, system))).default;
+          set(data, `${dir}.${system}`, await self.getAllSettings());
         }
       }
 

@@ -268,7 +268,8 @@ export default class AlertsRegistryOverlays extends Vue {
         if (this.runningAlert.showTextAt <= Date.now() && !this.runningAlert.isShowingText) {
           console.debug('showing text');
           this.runningAlert.isShowingText = true;
-          if (this.runningAlert.alert.tts.enabled && typeof window.responsiveVoice !== 'undefined') {
+          const isAmountForTTSInRange = this.runningAlert.alert.tts.minAmountToPlay <= this.runningAlert.amount;
+          if (this.runningAlert.alert.tts.enabled && isAmountForTTSInRange && typeof window.responsiveVoice !== 'undefined') {
             waitingForTTS = true;
           }
         }

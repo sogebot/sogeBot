@@ -65,6 +65,7 @@ export interface CommonSettingsInterface {
     pitch: number;
     volume: number;
     rate: number;
+    minAmountToPlay: number;
   };
   font: {
     family: string;

@@ -115,6 +115,9 @@
   "minAmountToShow": {
     "name": "Minimální počet k zobrazení"
   },
+  "minAmountToPlay": {
+    "name": "Minimální počet k přehrání"
+  },
   "allowEmotes": {
     "name": "Povolit emotikony"
   },
