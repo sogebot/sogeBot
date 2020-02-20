@@ -60,7 +60,7 @@
             :value.sync="response.filter"
             v-bind:placeholder="translate('systems.customcommands.filter.placeholder')"
             v-on:update="response.filter = $event"
-            v-bind:filters="['sender', 'haveParam', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'rank', 'game', 'title', 'views', 'followers', 'hosts', 'subscribers']"></textarea-with-tags>
+            v-bind:filters="['sender', 'haveParam', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'rank', 'game', 'language', 'title', 'views', 'followers', 'hosts', 'subscribers']"></textarea-with-tags>
           <div class="h-auto w-auto" style="flex-shrink: 0;">
             <b-dropdown variant="outline-dark" toggle-class="border-0 h-auto w-auto" class="h-100">
               <template v-slot:button-content>

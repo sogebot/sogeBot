@@ -113,6 +113,7 @@ const processFollowerState = async (user: Required<UserInterface>, f: any, quiet
 class API extends Core {
   @shared(true)
   stats: {
+    language: string;
     currentWatchedTime: number;
     currentViewers: number;
     maxViewers: number;
@@ -126,6 +127,7 @@ class API extends Core {
     currentHosts: number;
     newChatters: number;
   } = {
+    language: 'en',
     currentWatchedTime: 0,
     currentViewers: 0,
     maxViewers: 0,
@@ -677,6 +679,7 @@ class API extends Core {
           this.retries.getChannelDataOldAPI = 0;
         }
 
+        this.stats.language = request.data.language;
         this.stats.currentGame = request.data.game;
         this.stats.currentTitle = request.data.status;
         this.gameCache = request.data.game;

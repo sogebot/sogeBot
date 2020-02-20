@@ -285,6 +285,7 @@
         "sender": "User who initiated",
         "title": "Current title",
         "game": "Current game",
+        "language": "Current stream language",
         "viewers": "Current viewers count",
         "views": "Current views count",
         "hosts": "Current hosts count",

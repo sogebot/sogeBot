@@ -291,6 +291,7 @@
         "sender": "Uživatel, který inicioval",
         "title": "Aktuální název",
         "game": "Aktuální hra",
+        "language": "Aktuální jazyk streamu",
         "viewers": "Aktuální počet diváků",
         "views": "Aktuální počet zobrazení",
         "hosts": "Aktuální počet hostů",
