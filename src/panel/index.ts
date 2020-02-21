@@ -196,6 +196,11 @@ const main = async () => {
 
         this.$root.$on('bv::dropdown::hidden', bvEvent => {
           this.dropdownHide();
+
+          // force unfocus
+          setTimeout(() => {
+            (document.activeElement as HTMLElement).blur();
+          }, 10);
         });
 
         // set proper moment locale
@@ -223,22 +228,19 @@ const main = async () => {
           }
         },
         dropdownShow(bvEvent, retry = 0) {
-          if (!this.isDropdownHidden && retry < 1000) {
-            // try next tick again - wait for cleanup
-            console.debug('waiting to next tick for dropdownShow');
-            //this.$nextTick(() => this.dropdownShow(bvEvent, true));
-            setTimeout(() => this.dropdownShow(bvEvent, retry++), 1);
-          } else {
-            this.isDropdownHidden = false;
-            const child = bvEvent.target;
-            child.style.position = 'absolute';
-            child.style['z-index'] = 99999999;
-            child.remove();
-            document.getElementsByTagName('BODY')[0].appendChild(child);
-            this.dropdown = child;
-            this.dropdownVue = bvEvent.vueTarget;
-            this.dropdownVue.show();
+          if (!this.isDropdownHidden) {
+            this.dropdownHide();
           }
+
+          this.isDropdownHidden = false;
+          const child = bvEvent.target;
+          child.style.position = 'absolute';
+          child.style['z-index'] = 99999999;
+          child.remove();
+          document.getElementsByTagName('BODY')[0].appendChild(child);
+          this.dropdown = child;
+          this.dropdownVue = bvEvent.vueTarget;
+          this.dropdownVue.show();
         },
       },
       template: `
