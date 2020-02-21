@@ -409,6 +409,7 @@ class CustomCommands extends System {
       $haveParam: opts.parameters.length > 0,
       // add global variables
       $game: api.stats.currentGame || 'n/a',
+      $language: api.stats.language || 'en',
       $title: api.stats.currentTitle || 'n/a',
       $views: api.stats.currentViews,
       $followers: api.stats.currentFollowers,

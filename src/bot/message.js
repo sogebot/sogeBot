@@ -39,13 +39,14 @@ class Message {
   async global (opts) {
     let variables = {
       game: api.stats.currentGame,
+      language: api.stats.language,
       viewers: api.stats.currentViewers,
       views: api.stats.currentViews,
       followers: api.stats.currentFollowers,
       hosts: api.stats.currentHosts,
       subscribers: api.stats.currentSubscribers,
       bits: api.stats.currentBits,
-      title: api.stats.currentTitle
+      title: api.stats.currentTitle,
     };
     for (let variable of Object.keys(variables)) {
       const regexp = new RegExp(`\\$${variable}`, 'g');

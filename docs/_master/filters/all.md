@@ -10,6 +10,8 @@
 
 `$title` - return current status
 
+`$language` - return current stream language
+
 `$viewers` - return current viewers count
 
 `$views` - return current views count
