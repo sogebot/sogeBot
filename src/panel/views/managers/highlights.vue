@@ -19,34 +19,29 @@
     <panel search @search="search = $event"/>
 
     <loading v-if="state.loading !== $state.success"/>
-    <template v-if="filtered.length > 0">
-      <div :key="'highlight-' + index" class="card" v-for="(item, index) of filtered" v-bind:class="{ 'mt-3': index !== 0 }">
-        <div class="card-body row p-0">
-          <div class="col-sm-11 pr-0">
-            <a class="btn btn-block btn-outline-dark border-0 h-100 text-left p-0" target="_blank" v-bind:href="'https://www.twitch.tv/videos/' + item.id + '?t=' + timestampToString(item.timestamp)">
-              <img class="float-left pr-3" v-bind:src="generateThumbnail(item.game)">
-              <div style="padding-top:0.8rem !important">
-                {{ item.title }}
-                <small class="d-block">
-                  <fa :icon="[ 'far', 'clock' ]"></fa> {{ timestampToString(item.timestamp) }}
-                  <fa class="ml-2" :icon="['far', 'calendar-alt']"></fa> {{ new Date(item.createdAt).toLocaleString() }}
-                  <fa class="ml-2" :icon="['fas', 'gamepad']"></fa> {{ item.game }}
-                </small>
-              </div>
-            </a>
-          </div>
-
-          <div class="col-sm-1 pl-0">
-            <b-dropdown variant="outline-dark" toggle-class="border-0 h-100 w-100" class="h-100 w-100" size="sm" no-caret>
-              <template v-slot:button-content><fa icon="ellipsis-v"></fa></template>
-              <b-dropdown-item @click="deleteItem(item.id)">
-                <fa icon="trash-alt"></fa> {{ translate('delete') }}
-              </b-dropdown-item>
-            </b-dropdown>
-          </div>
+    <b-table v-else striped small :items="filtered" :fields="fields" class="table-p-0">
+      <template v-slot:cell(thumbnail)="data">
+        <img class="float-left pr-3" v-bind:src="generateThumbnail(data.item.game)">
+      </template>
+      <template v-slot:cell(title)="data">
+        {{ data.item.title }}
+        <small class="d-block">
+          <fa :icon="[ 'far', 'clock' ]"></fa> {{ timestampToString(data.item.timestamp) }}
+          <fa class="ml-2" :icon="['far', 'calendar-alt']"></fa> {{ new Date(data.item.createdAt).toLocaleString() }}
+          <fa class="ml-2" :icon="['fas', 'gamepad']"></fa> {{ data.item.game }}
+        </small>
+      </template>
+      <template v-slot:cell(buttons)="data">
+        <div class="float-right pr-2" style="width: max-content !important;">
+          <button-with-icon class="btn-only-icon btn-secondary btn-reverse" icon="link" :href="'https://www.twitch.tv/videos/' + data.item.videoId + '?t=' + timestampToString(data.item.timestamp)">
+          </button-with-icon>
+          <hold-button @trigger="deleteItem(data.item.id)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
+            <template slot="title">{{translate('dialog.buttons.delete')}}</template>
+            <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+          </hold-button>
         </div>
-      </div>
-    </template>
+      </template>
+    </b-table>
   </b-container>
 </template>
 
@@ -69,6 +64,13 @@ export default class highlightsList extends Vue {
   socket = getSocket('/systems/highlights');
   items: any[] = [];
   search: string = '';
+
+  fields = [
+    { key: 'thumbnail', label: '', tdClass: 'fitThumbnail' },
+    { key: 'title', label: '' },
+    { key: 'buttons', label: '' },
+  ];
+
   state: {
     loading: number;
   } = {
@@ -114,3 +116,12 @@ export default class highlightsList extends Vue {
   }
 }
 </script>
+
+<style>
+.table-p-0 td {
+  padding: 0 !important;
+}
+.fitThumbnail {
+  width: 100px;
+}
+</style>
