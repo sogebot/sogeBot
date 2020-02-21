@@ -29,8 +29,8 @@
                 {{ item.title }}
                 <small class="d-block">
                   <fa :icon="[ 'far', 'clock' ]"></fa> {{ timestampToString(item.timestamp) }}
-                  <fa class="pl-2" :icon="['far', 'fa-calendar-alt']"></fa> {{ new Date(item.createdAt).toLocaleString() }}
-                  <fa class="pl-2" :icon="['fas', 'fa-gamepad']"></fa> {{ item.game }}
+                  <fa class="ml-2" :icon="['far', 'calendar-alt']"></fa> {{ new Date(item.createdAt).toLocaleString() }}
+                  <fa class="ml-2" :icon="['fas', 'gamepad']"></fa> {{ item.game }}
                 </small>
               </div>
             </a>
@@ -43,10 +43,6 @@
                 <fa icon="trash-alt"></fa> {{ translate('delete') }}
               </b-dropdown-item>
             </b-dropdown>
-            <!--button data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100"><fa icon="ellipsis-v"></fa></button>
-            <div class="dropdown-menu p-0">
-              <button class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="deleteItem(item._id)"><fa icon="trash-alt"></fa> {{ translate('delete') }}</button>
-            </div-->
           </div>
         </div>
       </div>
@@ -58,6 +54,11 @@
 import { getSocket } from 'src/panel/helpers/socket';
 import { Vue, Component } from 'vue-property-decorator';
 import { isNil } from 'lodash-es';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faGamepad } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarAlt } from '@fortawesome/free-regular-svg-icons';
+library.add(faGamepad, faCalendarAlt);
 
 @Component({
   components: {
