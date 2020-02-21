@@ -45,7 +45,7 @@
     </panel>
 
     <loading v-if="state.loading !== $state.success"/>
-    <b-table v-else striped small :items="fItems" :fields="fields" class="table-p-0" hover @row-clicked="linkTo($event)">
+    <b-table v-else striped small :items="fItems" :fields="fields" class="table-p-0">
       <template v-slot:cell(thumbnail)="data">
         <img class="float-left pr-3" v-bind:src="generateThumbnail(data.item.videoId)">
       </template>
@@ -53,15 +53,17 @@
         {{ data.item.title }}
         <small class="d-block">
           <fa :icon="[ 'far', 'clock' ]"></fa> {{ data.item.length | formatTime }}
-          <fa class="pl-3" :icon="['fas', 'fa-volume-up']"></fa> {{ Number(data.item.volume).toFixed(1) }}%
-          <fa class="pl-3" :icon="['fas', 'fa-step-backward']"></fa>
+          <fa class="ml-3" :icon="['fas', 'volume-up']"></fa> {{ Number(data.item.volume).toFixed(1) }}%
+          <fa class="ml-3" :icon="['fas', 'step-backward']"></fa>
           {{ data.item.startTime | formatTime }} - {{ data.item.endTime | formatTime }}
           <fa icon="step-forward"></fa>
-          <fa class="pl-3" :icon="['fas', 'fa-music']"/> {{ new Date(data.item.lastPlayedAt).toLocaleString() }}
+          <fa class="ml-3" :icon="['fas', 'music']"/> {{ new Date(data.item.lastPlayedAt).toLocaleString() }}
         </small>
       </template>
       <template v-slot:cell(buttons)="data">
         <div class="float-right pr-2" style="width: max-content !important;">
+          <button-with-icon class="btn-only-icon btn-secondary btn-reverse" icon="link" :href="'http://youtu.be/' + data.item.videoId">
+          </button-with-icon>
           <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" @click="data.toggleDetails">
             {{ translate('dialog.buttons.edit') }}
           </button-with-icon>
@@ -124,6 +126,10 @@ import { getSocket } from 'src/panel/helpers/socket';
 
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { SongPlaylistInterface } from 'src/bot/database/entity/song';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faStepBackward, faStepForward } from '@fortawesome/free-solid-svg-icons';
+library.add(faStepBackward, faStepForward);
 
 @Component({
   components: {
@@ -262,11 +268,6 @@ export default class playlist extends Vue {
     this.socket.emit('delete.playlist', id, () => {
       this.items = this.items.filter((o) => o.videoId !== id)
     })
-  }
-
-  linkTo(item) {
-    console.debug('Clicked', item.videoId);
-    window.location.href = `http://youtu.be/${item.videoId}`;
   }
 }
 </script>

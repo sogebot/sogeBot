@@ -30,7 +30,7 @@
     </panel>
 
     <loading v-if="state.loading !== $state.success"/>
-    <b-table v-else striped small :items="fItems" :fields="fields" class="table-p-0" hover @row-clicked="linkTo($event)">
+    <b-table v-else striped small :items="fItems" :fields="fields" class="table-p-0">
       <template v-slot:cell(thumbnail)="data">
         <img class="float-left pr-3" v-bind:src="generateThumbnail(data.item.videoId)">
       </template>
@@ -39,6 +39,8 @@
       </template>
       <template v-slot:cell(buttons)="data">
         <div class="float-right pr-2" style="width: max-content !important;">
+          <button-with-icon class="btn-only-icon btn-secondary btn-reverse" icon="link" :href="'http://youtu.be/' + data.item.videoId">
+          </button-with-icon>
           <hold-button @trigger="deleteItem(data.item.videoId)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
             <template slot="title">{{translate('dialog.buttons.delete')}}</template>
             <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
