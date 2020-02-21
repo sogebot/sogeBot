@@ -2,7 +2,7 @@
   <perfect-scrollbar class="main-menu" :options="{useBothWheelAxes: true, suppressScrollY: true}">
     <nav id="menu-detach" class="nav d-flex justify-content-between" style="width: max-content">
       <span v-for="category of categories" :key="category">
-        <b-dropdown variant="light" ref="navbarmenu">
+        <b-dropdown variant="light">
           <template v-slot:button-content>
             {{ translate('menu.' + category) }}
           </template>
