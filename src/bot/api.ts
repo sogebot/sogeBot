@@ -605,14 +605,19 @@ class API extends Core {
 
     // update subscribers tier and set them active
     for (const user of subscribers) {
-      await getRepository(User).update({
-        userId: user.user_id,
-      },
-      {
-        username: user.user_name.toLowerCase(),
-        isSubscriber: true,
-        subscribeTier: String(user.tier / 1000),
-      });
+      const current = currentSubscribers.find(o => Number(o.userId) === Number(user.user_id));
+      const isNotCurrentSubscriber = !current;
+      const valuesNotMatch = current && (current.subscribeTier !== String(user.tier / 1000) || current.isSubscriber === false);
+      if (isNotCurrentSubscriber || valuesNotMatch) {
+        await getRepository(User).update({
+          userId: user.user_id,
+        },
+        {
+          username: user.user_name.toLowerCase(),
+          isSubscriber: true,
+          subscribeTier: String(user.tier / 1000),
+        });
+      }
     }
   }
 
