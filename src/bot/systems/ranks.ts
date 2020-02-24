@@ -83,7 +83,7 @@ class Ranks extends System {
       });
     }
 
-    const message = await prepare(!rank ? 'ranks.rank-was-added' : 'ranks.ranks-already-exist', { rank: parsed[2], value, type });
+    const message = await prepare(!rank ? 'ranks.rank-was-added' : 'ranks.ranks-already-exist', { rank: parsed[2], hours: value, type });
     sendMessage(message, opts.sender, opts.attr);
   }
 

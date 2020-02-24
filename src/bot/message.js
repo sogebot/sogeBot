@@ -449,8 +449,18 @@ class Message {
             )).join(', ');
             return list.length > 0 ? list : ' ';
           case 'ranks':
-            list = _.map(_.orderBy(ranks, 'hours', 'asc'), (o) => {
-              return `${o.rank} (${o.hours}h)`;
+            list = _.map(_.orderBy(ranks.filter(o => o.type === 'viewer'), 'value', 'asc'), (o) => {
+              return `${o.rank} (${o.value}h)`;
+            }).join(', ');
+            return list.length > 0 ? list : ' ';
+          case 'ranks.follow':
+            list = _.map(_.orderBy(ranks.filter(o => o.type === 'follower'), 'value', 'asc'), (o) => {
+              return `${o.rank} (${o.value} ${getLocalizedName(o.value, 'core.months')})`;
+            }).join(', ');
+            return list.length > 0 ? list : ' ';
+          case 'ranks.sub':
+            list = _.map(_.orderBy(ranks.filter(o => o.type === 'subcriber'), 'value', 'asc'), (o) => {
+              return `${o.rank} (${o.value} ${getLocalizedName(o.value, 'core.months')})`;
             }).join(', ');
             return list.length > 0 ? list : ' ';
           default:

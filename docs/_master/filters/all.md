@@ -246,6 +246,10 @@ e.g. `(api|https://httpbin.org/get?test=a\\nb) Lorem (api.args.test)`
 
 `(list.ranks)` - list of your ranks
 
+`(list.ranks.follow)` - list of your ranks
+
+`(list.ranks.sub)` - list of your ranks
+
 **Usage:**
 - _command:_ `!list`
 - _response:_ `My uber super awesome command list: (list.commands)`
