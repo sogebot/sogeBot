@@ -9,7 +9,6 @@ const commons = require('./commons')
 const { flatten } = require('./helpers/flatten')
 const gitCommitInfo = require('git-commit-info');
 import { adminEndpoint } from './helpers/socket';
-import glob from 'glob';
 
 import { error, info } from './helpers/log';
 import { CacheTitles } from './database/entity/cacheTitles';
