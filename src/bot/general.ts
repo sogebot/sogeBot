@@ -15,10 +15,10 @@ import { Widget } from './database/entity/dashboard';
 import oauth from './oauth';
 import translateLib, { translate } from './translate';
 import tmi from './tmi';
-import glob from 'glob';
 import { HOUR, MINUTE } from './constants';
 import api from './api';
 import { socketsConnected } from './panel';
+import { list } from './helpers/register';
 
 let threadStartTimestamp = Date.now();
 const gracefulExit = () => {
@@ -108,15 +108,10 @@ class General extends Core {
       systems: [], games: [], integrations: [],
     };
     for (const category of ['systems', 'games', 'integrations']) {
-      for (let system of glob.sync(__dirname + '/' + category + '/*')) {
-        system = system.split('/' + category + '/')[1].replace('.js', '');
-        if (system.startsWith('_')) {
-          continue;
-        }
-        const self = (require('./' + category + '/' + system.toLowerCase())).default;
-        const enabled = self.enabled;
-        const areDependenciesEnabled = self.areDependenciesEnabled;
-        const isDisabledByEnv = !isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*');
+      for (const system of list(category)) {
+        const enabled = system.enabled;
+        const areDependenciesEnabled = system.areDependenciesEnabled;
+        const isDisabledByEnv = !isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.constructor.name.toLowerCase()) || process.env.DISABLE === '*');
 
         if (!enabled) {
           enabledSystems[category].push('-' + system);
@@ -205,13 +200,8 @@ class General extends Core {
       }
 
       let found = false;
-      for (let system of glob.sync(__dirname + '/' + type + 's' + '/' + name + '*')) {
-        system = system.split('/' + type + 's' + '/')[1].replace('.js', '');
-        if (system.startsWith('_')) {
-          continue;
-        }
-        const self = (require('./' + type + 's' + '/' + system.toLowerCase())).default;
-        self.status({ state: opts.enable });
+      for (const system of list(type + 's')) {
+        system.status({ state: opts.enable });
         found = true;
         break;
       }

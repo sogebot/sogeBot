@@ -31,6 +31,7 @@ import oauth from './oauth';
 import songs from './systems/songs';
 import spotify from './integrations/spotify';
 import { linesParsed, status as statusObj } from './helpers/parser';
+import { systems, list } from './helpers/register'
 const config = require('@config')
 
 let app;
@@ -413,17 +414,12 @@ function Panel () {
     // send enabled systems
     socket.on('systems', async (cb) => {
       const toEmit = [];
-      for (let system of glob.sync(__dirname + '/systems/*')) {
-        system = system.split('/systems/')[1].replace('.js', '');
-        if (system.startsWith('_')) {
-          continue;
-        }
-        self = (require('./systems/' + system.toLowerCase())).default;
+      for (const system of systems) {
         toEmit.push({
-          name: system.toLowerCase(),
-          enabled: self.enabled,
-          areDependenciesEnabled: await self.areDependenciesEnabled,
-          isDisabledByEnv: self.isDisabledByEnv,
+          name: system.constructor.name.toLowerCase(),
+          enabled: system.enabled,
+          areDependenciesEnabled: await system.areDependenciesEnabled,
+          isDisabledByEnv: system.isDisabledByEnv,
         });
       }
       cb(null, toEmit);
@@ -439,60 +435,45 @@ function Panel () {
     })
     socket.on('integrations', async (cb) => {
       const toEmit = [];
-      for (let system of glob.sync(__dirname + '/integrations/*')) {
-        system = system.split('/integrations/')[1].replace('.js', '');
-        if (system.startsWith('_')) {
-          continue;
-        }
-        self = (require('./integrations/' + system.toLowerCase())).default;
-        if (!self.showInUI) {
+      for (const system of list('integrations')) {
+        if (!system.showInUI) {
           continue;
         }
         toEmit.push({
-          name: system.toLowerCase(),
-          enabled: self.enabled,
-          areDependenciesEnabled: await self.areDependenciesEnabled,
-          isDisabledByEnv: self.isDisabledByEnv,
+          name: system.constructor.name.toLowerCase(),
+          enabled: system.enabled,
+          areDependenciesEnabled: await system.areDependenciesEnabled,
+          isDisabledByEnv: system.isDisabledByEnv,
         });
       }
       cb(null, toEmit);
     });
     socket.on('overlays', async (cb) => {
       const toEmit = [];
-      for (let system of glob.sync(__dirname + '/overlays/*')) {
-        system = system.split('/overlays/')[1].replace('.js', '');
-        if (system.startsWith('_')) {
-          continue;
-        }
-        self = (require('./overlays/' + system.toLowerCase())).default;
-        if (!self.showInUI) {
+      for (const system of list('overlays')) {
+        if (!system.showInUI) {
           continue;
         }
         toEmit.push({
-          name: system.toLowerCase(),
-          enabled: self.enabled,
-          areDependenciesEnabled: await self.areDependenciesEnabled,
-          isDisabledByEnv: self.isDisabledByEnv,
+          name: system.constructor.name.toLowerCase(),
+          enabled: system.enabled,
+          areDependenciesEnabled: await system.areDependenciesEnabled,
+          isDisabledByEnv: system.isDisabledByEnv,
         });
       }
       cb(null, toEmit);
     });
     socket.on('games', async (cb) => {
       const toEmit = [];
-      for (let system of glob.sync(__dirname + '/games/*')) {
-        system = system.split('/games/')[1].replace('.js', '');
-        if (system.startsWith('_')) {
-          continue;
-        }
-        self = (require('./games/' + system.toLowerCase())).default;
-        if (!self.showInUI) {
+      for (const system of list('games')) {
+        if (!system.showInUI) {
           continue;
         }
         toEmit.push({
-          name: system.toLowerCase(),
-          enabled: self.enabled,
-          areDependenciesEnabled: await self.areDependenciesEnabled,
-          isDisabledByEnv: self.isDisabledByEnv,
+          name: system.constructor.name.toLowerCase(),
+          enabled: system.enabled,
+          areDependenciesEnabled: await system.areDependenciesEnabled,
+          isDisabledByEnv: system.isDisabledByEnv,
         });
       }
       cb(null, toEmit);

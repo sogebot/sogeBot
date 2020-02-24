@@ -15,6 +15,7 @@ import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import { flatten, unflatten } from './helpers/flatten';
 import { existsSync } from 'fs';
 import { isDbConnected } from './helpers/database';
+import { register } from './helpers/register';
 
 let socket: import('./socket').Socket | any = null;
 let panel: null | any = null;
@@ -112,6 +113,8 @@ class Module {
     this._ui = {};
     this._name = name;
     this._enabled = enabled;
+
+    register(this._name as any, this);
 
     // prepare proxies for variables
     this._sockets();
