@@ -13,8 +13,7 @@ import oauth from './oauth';
 import general from './general';
 import currency from './currency';
 import webhooks from './webhooks';
-import glob from 'glob';
-import path from 'path';
+import { list } from './helpers/register';
 
 class UI extends Core {
   @settings()
@@ -63,13 +62,8 @@ class UI extends Core {
         data.core[system] = await self.getAllSettings();
       }
       for (const dir of ['systems', 'games', 'overlays', 'integrations']) {
-        for (let system of glob.sync(path.join(__dirname, dir, '*'))) {
-          system = system.split('/' + dir + '/')[1].replace('.js', '');
-          if (system.startsWith('_')) {
-            continue;
-          }
-          const self = (require(path.join(__dirname, dir, system))).default;
-          set(data, `${dir}.${system}`, await self.getAllSettings());
+        for (const system of list(dir)) {
+          set(data, `${dir}.${system.constructor.name}`, await system.getAllSettings());
         }
       }
       // currencies
@@ -91,13 +85,8 @@ class UI extends Core {
       const data: any = {};
 
       for (const dir of ['systems', 'games']) {
-        for (let system of glob.sync(path.join(__dirname, dir, '*'))) {
-          system = system.split('/' + dir + '/')[1].replace('.js', '');
-          if (system.startsWith('_')) {
-            continue;
-          }
-          const self = (require(path.join(__dirname, dir, system))).default;
-          set(data, `${dir}.${system}`, await self.getAllSettings());
+        for (const system of list(dir)) {
+          set(data, `${dir}.${system.constructor.name}`, await system.getAllSettings());
         }
       }
 

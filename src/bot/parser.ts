@@ -14,8 +14,8 @@ import { translate } from './translate';
 import currency from './currency';
 import general from './general';
 import tmi from './tmi';
-import glob from 'glob';
 import { UserStateTags } from 'twitch-js';
+import { list } from './helpers/register';
 
 class Parser {
   started_at = Date.now();
@@ -142,7 +142,7 @@ class Parser {
   }
 
   populateList () {
-    const list: any = [
+    const populatedList: any = [
       currency,
       events,
       users,
@@ -152,16 +152,11 @@ class Parser {
       tmi,
     ];
     for (const dir of ['systems', 'games', 'overlays', 'integrations', 'registries']) {
-      for (let system of glob.sync(__dirname + '/' + dir + '/*')) {
-        system = system.split('/' + dir + '/')[1].replace('.js', '');
-        if (system.startsWith('_')) {
-          continue;
-        }
-        const self = (require('./' + dir + '/' + system.toLowerCase())).default;
-        list.push(self);
+      for (const system of list(dir)) {
+        populatedList.push(system);
       }
     }
-    return list;
+    return populatedList;
   }
 
   /**
