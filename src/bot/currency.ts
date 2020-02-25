@@ -1,7 +1,6 @@
 'use strict';
 import Core from './_interface';
 
-import axios from 'axios';
 import chalk from 'chalk';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import _ from 'lodash';
@@ -13,6 +12,8 @@ import { error, info, warning } from './helpers/log';
 import { getRepository } from 'typeorm';
 import { UserTip } from './database/entity/user';
 import { onLoad } from './decorators/on';
+
+import request from 'request';
 
 class Currency extends Core {
   mainCurrencyLoaded = false;
@@ -83,15 +84,29 @@ class Currency extends Core {
     try {
       info(chalk.yellow('CURRENCY:') + ' fetching rates');
       // base is always CZK
-      const result = await axios.get('http://www.cnb.cz/cs/financni_trhy/devizovy_trh/kurzy_devizoveho_trhu/denni_kurz.txt');
+      // using IP because dns may fail occasionally, 193.85.3.250 => cnb.cz
+      const result: string = await new Promise((resolve, reject) => {
+        request({
+          url: 'http://193.85.3.250/cs/financni_trhy/devizovy_trh/kurzy_devizoveho_trhu/denni_kurz.txt',
+          agentOptions: {
+            rejectUnauthorized: false,
+          },
+        }, function (err, resp, body) {
+          if (err) {
+            reject(err) ;
+          } else {
+            resolve(body);
+          }
+        });
+      });
       let linenum = 0;
-      for (const line of result.data.toString().split('\n')) {
+      for (const line of result.split('\n')) {
         if (linenum < 2 || line.trim().length === 0) {
           linenum++;
           continue;
         }
         const [,, count, code, rate] = line.split('|');
-        this.rates[code] = Number((rate.replace(',', '.') / count).toFixed(3));
+        this.rates[code] = Number((Number(rate.replace(',', '.')) / Number(count)).toFixed(3));
       }
       info(chalk.yellow('CURRENCY:') + ' fetched rates');
 
