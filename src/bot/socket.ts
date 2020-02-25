@@ -11,6 +11,7 @@ import { getRepository, LessThanOrEqual } from 'typeorm';
 import { Socket as SocketEntity, SocketInterface } from './database/entity/socket';
 import permissions from './permissions';
 import { debug } from './helpers/log';
+import { isDbConnected } from './helpers/database';
 
 let _self: any = null;
 
@@ -44,18 +45,22 @@ class Socket extends Core {
     if (isMainThread) {
       setInterval(() => {
         // remove expired tokens
-        getRepository(SocketEntity).delete({
-          refreshTokenTimestamp: LessThanOrEqual(Date.now()),
-        });
+        if (isDbConnected) {
+          getRepository(SocketEntity).delete({
+            refreshTokenTimestamp: LessThanOrEqual(Date.now()),
+          });
+        }
       }, MINUTE);
 
       setInterval(() => {
         // expire access token
-        getRepository(SocketEntity).update({
-          accessTokenTimestamp: LessThanOrEqual(Date.now()),
-        }, {
-          accessToken: null,
-        });
+        if (isDbConnected) {
+          getRepository(SocketEntity).update({
+            accessTokenTimestamp: LessThanOrEqual(Date.now()),
+          }, {
+            accessToken: null,
+          });
+        }
       }, 10 * SECOND);
     }
   }
