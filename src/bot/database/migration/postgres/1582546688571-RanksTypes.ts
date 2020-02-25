@@ -6,7 +6,8 @@ export class RanksTypes1582546688571 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
     await queryRunner.query(`DROP INDEX "IDX_93c78c94804a13befdace81904"`, undefined);
     await queryRunner.query(`ALTER TABLE "rank" RENAME COLUMN "hours" TO "value"`, undefined);
-    await queryRunner.query(`ALTER TABLE "rank" ADD "type" character varying NOT NULL`, undefined);
+    await queryRunner.query(`ALTER TABLE "rank" ADD "type" character varying NOT NULL DEFAULT 'viewer'`, undefined);
+    await queryRunner.query(`ALTER TABLE "rank" ALTER COLUMN "type" drop default`, undefined);
     await queryRunner.query(`CREATE UNIQUE INDEX "IDX_93c78c94804a13befdace81904" ON "rank" ("type", "value") `, undefined);
   }
 
