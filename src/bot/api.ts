@@ -440,7 +440,6 @@ class API extends Core {
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
 
     if (needToWait || notEnoughAPICalls) {
-      delete opts.cursor;
       return { state: false, opts };
     }
 
@@ -454,17 +453,21 @@ class API extends Core {
       const tags = request.data.data;
 
       for(const tag of tags) {
+        const localizationNames = await getRepository(TwitchTagLocalizationName).find({ tagId: tag.tag_id });
+        const localizationDescriptions = await getRepository(TwitchTagLocalizationDescription).find({ tagId: tag.tag_id });
         await getRepository(TwitchTag).save({
           tag_id: tag.tag_id,
           is_auto: tag.is_auto,
           localization_names: Object.keys(tag.localization_names).map(key => {
             return {
+              id: localizationNames.find(o => o.locale === key && o.tagId === tag.tag_id)?.id,
               locale: key,
               value: tag.localization_names[key],
             };
           }),
           localization_descriptions: Object.keys(tag.localization_descriptions).map(key => {
             return {
+              id: localizationDescriptions.find(o => o.locale === key && o.tagId === tag.tag_id)?.id,
               locale: key,
               value: tag.localization_descriptions[key],
             };
@@ -490,7 +493,7 @@ class API extends Core {
     } catch (e) {
       error(`${url} - ${e.message}`);
       if (panel && panel.io) {
-        panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
+        panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getAllStreamTags', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
       }
     }
     delete opts.cursor;
