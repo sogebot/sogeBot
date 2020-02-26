@@ -20,6 +20,7 @@
 !> If you want to use **SQLite**, be sure to use `./shared/sogebot.db` path to
    your db file, so you have an access outside of docker.
 
+
 !> Note that **localhost** is accessing docker localhost. You need to use full
    IP address for your database connections.
 
@@ -28,11 +29,6 @@
     - Without GIT as [ZIP](https://github.com/sogehige/sogeBot-docker/archive/master.zip)
 2. Configure properly ormconfig.json in `conf/` directory
     - You can find examples at [our GitHub repository](https://github.com/sogehige/sogeBot/tree/master/src/bot/data)
-
-> You need [to be logged on github docker registry](https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-docker-for-use-with-github-packages)
-  until github allows public access to docker registry.
-  More info about issue [Registry fail with "no basic auth credentials"](https://github.community/t5/GitHub-Actions/docker-pull-from-public-GitHub-Package-Registry-fail-with-quot/td-p/32782).
-
 3. Download bot images with `docker compose`
     - Release version: `docker-compose pull`
     - Nightly version: `docker-compose -f docker-compose-nightly.yml pull`
@@ -45,11 +41,9 @@
 ### Installation
 
 - Download latest release from [GitHub sogeBot release page](https://github.com/sogehige/sogeBot/releases)
-- Copy `config.example.json` to `config.json` and set everything as desired in
- `config` part
+- Copy `config.example.json` to `config.json` and set everything as desired in `config` part
 - Set your [ormconfig.json](configuration/database)
-- if you want to use `!title` and `!game` you need to add bot as channel editor
-  in [Permissions settings](http://twitch.tv/dashboard/permissions) on Twitch
+- if you want to use `!title` and `!game` you need to add bot as channel editor in [Permissions settings](http://twitch.tv/dashboard/permissions) on Twitch
 - before starting a bot, you need to install npm dependencies
 
     `npm install`
@@ -58,8 +52,7 @@
 
     `npm start`
 
-- To access webpanel, go to `http://localhost:<port>` where port is configured
-  in config.json (default: 20000)
+- To access webpanel, go to `http://localhost:<port>` where port is configured in config.json (default: 20000)
 
 ## From git
 
@@ -71,11 +64,9 @@
 
 - Download [latest master zip](https://github.com/sogehige/sogeBot/archive/master.zip)
   or clone repository `git clone https://github.com/sogehige/sogeBot.git`
-- Copy `config.example.json` to `config.json` and set everything as desired in
-  `config` part
+- Copy `config.example.json` to `config.json` and set everything as desired in `config` part
 - Set your [ormconfig.json](configuration/database)
-- if you want to use `!title` and `!game` you need to add bot as channel editor
-  in [Permissions settings](http://twitch.tv/dashboard/permissions) on Twitch
+- if you want to use `!title` and `!game` you need to add bot as channel editor in [Permissions settings](http://twitch.tv/dashboard/permissions) on Twitch
 - before starting a bot, you need to build a bot
 
     `make`
@@ -84,8 +75,7 @@
 
     `npm start`
 
-- To access webpanel, go to `http://localhost:<port>` where port is configured
-  in config.json (default: 20000)
+- To access webpanel, go to `http://localhost:<port>` where port is configured in config.json (default: 20000)
 
 !> Upgrade from versions below 9.10x is **NOT SUPPORTED**
 
@@ -113,8 +103,7 @@
 ## Oauth generation
 
 Generate your oauth tokens in `ui->settings->general->oauth` and paste your
-`accessToken` and `refreshToken` from [Twitch Token Generator](https://twitchtokengenerator.com)
-to your bot.
+`accessToken` and `refreshToken` from https://twitchtokengenerator.com to your bot.
 
 !> Make sure you login into correct accounts. Anonymous/Privacy modes can help
    you with login into correct accounts (Right click on generate button -> Open

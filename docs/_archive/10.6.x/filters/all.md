@@ -10,8 +10,6 @@
 
 `$title` - return current status
 
-`$language` - return current stream language
-
 `$viewers` - return current viewers count
 
 `$views` - return current views count
@@ -245,10 +243,6 @@ e.g. `(api|https://httpbin.org/get?test=a\\nb) Lorem (api.args.test)`
 `(list.cooldown)` - will return list of your cooldowns (keywords and !commands)
 
 `(list.ranks)` - list of your ranks
-
-`(list.ranks.follow)` - list of your ranks
-
-`(list.ranks.sub)` - list of your ranks
 
 **Usage:**
 - _command:_ `!list`
