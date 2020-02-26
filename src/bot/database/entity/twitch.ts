@@ -110,7 +110,7 @@ export const TwitchTag = new EntitySchema<Readonly<Required<TwitchTagInterface>>
 export const TwitchTagLocalizationName = new EntitySchema<Readonly<Required<TwitchTagLocalizationInterface>>>({
   name: 'twitch_tag_localization_name',
   columns: {
-    id: { type: String, generated: 'uuid', primary: true },
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
     locale: { type: String },
     value: { type: String },
     tagId: { type: String, nullable: true, name: 'tagId' },
@@ -128,7 +128,8 @@ export const TwitchTagLocalizationName = new EntitySchema<Readonly<Required<Twit
   indices: [
     {
       name: 'IDX_dcf417a56c907f3a6788476047',
-      columns: [ 'tagId' ],
+      unique: true,
+      columns: [ 'tagId', 'locale' ],
     },
   ],
 });
@@ -136,7 +137,7 @@ export const TwitchTagLocalizationName = new EntitySchema<Readonly<Required<Twit
 export const TwitchTagLocalizationDescription = new EntitySchema<Readonly<Required<TwitchTagLocalizationInterface>>>({
   name: 'twitch_tag_localization_description',
   columns: {
-    id: { type: String, generated: 'uuid', primary: true },
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
     locale: { type: String },
     value: { type: 'text' },
     tagId: { type: String, nullable: true, name: 'tagId' },
@@ -154,7 +155,8 @@ export const TwitchTagLocalizationDescription = new EntitySchema<Readonly<Requir
   indices: [
     {
       name: 'IDX_4d8108fc3e8dcbe5c112f53dd3',
-      columns: [ 'tagId' ],
+      unique: true,
+      columns: [ 'tagId', 'locale' ],
     },
   ],
 });
