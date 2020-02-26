@@ -30,10 +30,3 @@ Enables extended debugging, by default its disabled
 
 - `DEBUG=api.call` - will save `api.bot.csv` and `api.broadcaster.csv` files
 - `DEBUG=webhooks.stream`, `DEBUG=api.stream`
-
-## THREAD
-
-Force worker_threads to be disabled in special cases (e.g. getChannelChattersUnofficialAPI)
-
-- `THREAD=0`
-- nothing is set *default*

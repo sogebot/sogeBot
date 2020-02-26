@@ -44,6 +44,7 @@
 * How To
   * [Connection to socket](/howto/connection-to-socket.md)
   * [Phillips Hue](/howto/phillipshue.md)
+  * [Run bot in cluster](/howto/run-bot-in-cluster.md)
   * [Eval snippets](/howto/eval.md)
   * [Run random command](/howto/run-random-command.md)
   * [Write own system](/howto/write-own-system.md)
