@@ -67,9 +67,8 @@ export const VariableWatcher = {
             value: JSON.stringify(value),
           });
 
-          const path = type === 'core' ? `${name}.${variable}` : `${type}.${name}.${variable}`;
-          change(path);
-          for (const event of getFunctionList('change', path)) {
+          change(`${type}.${name}.${variable}`);
+          for (const event of getFunctionList('change', type === 'core' ? `${name}.${variable}` : `${type}.${name}.${variable}`)) {
             if (typeof self[event.fName] === 'function') {
               self[event.fName](variable, cloneDeep(value));
             } else {
