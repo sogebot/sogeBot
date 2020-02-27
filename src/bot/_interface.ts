@@ -76,8 +76,8 @@ class Module {
       _.set(this, '_enabled', value);
       getRepository(Settings).findOne({
         where: {
+          name: 'enabled',
           namespace: this.nsp,
-          value: JSON.stringify(value),
         },
       }).then(data => {
         getRepository(Settings).save({
