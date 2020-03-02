@@ -21,6 +21,7 @@ import { translate } from '../translate';
 import spotify from '../integrations/spotify';
 import songs from './songs';
 import aliasSystem from './alias';
+import users from '../users';
 
 class Moderation extends System {
   @settings('lists')
@@ -116,7 +117,7 @@ class Moderation extends System {
     await getRepository(ModerationWarning).delete({
       timestamp: LessThan(1000 * 60 * 60),
     });
-    const warnings = await getRepository(ModerationWarning).find({ username: sender.username });
+    const warnings = await getRepository(ModerationWarning).find({ userId: Number(sender.userId) });
     const silent = await this.isSilent(type);
 
     text = text.trim();
@@ -133,9 +134,9 @@ class Moderation extends System {
       msg = await new Message(warning.replace(/\$count/g, this.cWarningsAllowedCount - warnings.length)).parse();
       timeoutLog(`${sender.username} [${type}] ${time}s timeout | ${text}`);
       timeout(sender.username, msg, time);
-      await getRepository(ModerationWarning).delete({ username: sender.username });
+      await getRepository(ModerationWarning).delete({ userId: Number(sender.userId) });
     } else {
-      await getRepository(ModerationWarning).insert({ username: sender.username, timestamp: Date.now() });
+      await getRepository(ModerationWarning).insert({ userId: Number(sender.userId), timestamp: Date.now() });
       const warningsLeft = this.cWarningsAllowedCount - warnings.length;
       warning = await new Message(warning.replace(/\$count/g, warningsLeft < 0 ? 0 : warningsLeft)).parse();
       if (this.cWarningsShouldClearChat) {
@@ -214,8 +215,9 @@ class Moderation extends System {
         count = parseInt(parsed[2], 10);
       }
 
+      const userId = await users.getIdByName(parsed[1].toLowerCase());
       for (let i = 0; i < count; i++) {
-        await getRepository(ModerationPermit).insert({ username: parsed[1].toLowerCase() });
+        await getRepository(ModerationPermit).insert({ userId });
       }
 
       const m = await prepare('moderation.user-have-link-permit', { username: parsed[1].toLowerCase(), link: getLocalizedName(count, 'core.links'), count: count });
@@ -242,7 +244,7 @@ class Moderation extends System {
       : /[a-zA-Z0-9]+([a-zA-Z0-9-]+)?\.(aero|bet|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|shop|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|mn|mo|money|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|sk|sl|sm|sn|so|sr|st|su|sv|sy|sz|tc|td|tf|tg|th|tj|tk|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|um|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zr|zw)\b/ig;
 
     if (whitelisted.search(urlRegex) >= 0) {
-      const permit = await getRepository(ModerationPermit).findOne({ username: opts.sender.username });
+      const permit = await getRepository(ModerationPermit).findOne({ userId: Number(opts.sender.userId) });
       if (permit) {
         await getRepository(ModerationPermit).remove(permit);
         return true;

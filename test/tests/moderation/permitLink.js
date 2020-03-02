@@ -10,7 +10,7 @@ const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 const assert = require('chai').assert;
 
-const owner = Object.freeze({ username: 'soge__', badges: {} });
+const owner = Object.freeze({ username: 'soge__', badges: {}, userId: 12345 });
 
 describe('systems/moderation - permitLink()', () => {
   before(async () => {
