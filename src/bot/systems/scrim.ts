@@ -56,7 +56,7 @@ class Scrim extends System {
         .toggler({name: 'c'})
         .string({name: 'type'})
         .number({name: 'minutes'})
-        .toArray();
+        .exec().toArray();
       if (this.closingAt !== 0) {
         throw Error(String(ERROR.ALREADY_OPENED));
       }  // ignore if its already opened
@@ -96,7 +96,7 @@ class Scrim extends System {
       if (opts.parameters.length === 0) {
         this.currentMatches();
       } else {
-        const [matchId] = new Expects(opts.parameters).everything({name: 'matchId'}).toArray();
+        const [matchId] = new Expects(opts.parameters).everything({name: 'matchId'}).exec().toArray();
         const scrimMatchId = await getRepository(ScrimMatchId).findOne({ username: opts.sender.username});
         await getRepository(ScrimMatchId).save({
           ...scrimMatchId,

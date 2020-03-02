@@ -139,6 +139,7 @@ class Bets extends System {
         .argument({ name: 'timeout', optional: true, default: 2, type: Number })
         .argument({ name: 'title', optional: false, multi: true })
         .list({ delimiter: '|' })
+        .exec()
         .toArray();
       if (options.length < 2) {
         throw new Error(ERROR_NOT_ENOUGH_OPTIONS);
@@ -160,6 +161,7 @@ class Bets extends System {
         command: this.getCommand('!bet'),
       }), opts.sender);
     } catch (e) {
+      console.log(e);
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
           sendMessage(translate('bets.notEnoughOptions'), opts.sender, opts.attr);
@@ -173,8 +175,7 @@ class Bets extends System {
             }), opts.sender);
           break;
         default:
-          warning(e.stack);
-          sendMessage(translate('core.error'), opts.sender, opts.attr);
+          sendMessage([this.getCommand('!bet open'), e.message].join(' '), opts.sender, opts.attr);
       }
     }
   }
@@ -204,7 +205,7 @@ class Bets extends System {
 
     try {
       // tslint:disable-next-line:prefer-const
-      let [index, tickets] = new Expects(opts.parameters).number({ optional: true }).points({ optional: true }).toArray();
+      let [index, tickets] = new Expects(opts.parameters).number({ optional: true }).points({ optional: true }).exec().exec().toArray();
       index--;
       if (!_.isNil(tickets) && !_.isNil(index)) {
         const pointsOfUser = await points.getPointsOf(opts.sender.userId);

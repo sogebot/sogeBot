@@ -162,7 +162,7 @@ class Polls extends System {
         .switch({ name: 'type', values: ['tips', 'bits', 'normal'], optional: true, default: 'normal' })
         .argument({ name: 'title', optional: false, multi: true })
         .list({ delimiter: '|' })
-        .toArray();
+        .exec().toArray();
       if (options.length < 2) {
         throw new Error(String(ERROR.NOT_ENOUGH_OPTIONS));
       }
@@ -270,7 +270,7 @@ class Polls extends System {
         // we expects number
         [index] = new Expects(opts.parameters)
           .number()
-          .toArray();
+          .exec().toArray();
         index = index - 1;
         if (cVote.options.length < index + 1 || index < 0) {
           throw new Error(String(ERROR.INVALID_VOTE));

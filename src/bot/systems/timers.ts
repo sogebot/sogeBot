@@ -329,7 +329,7 @@ class Timers extends System {
     const [id, name] = new Expects(opts.parameters)
       .argument({ type: 'uuid', name: 'id', optional: true })
       .argument({ type: String, name: 'name', optional: true })
-      .toArray();
+      .exec().toArray();
 
     if ((_.isNil(id) && _.isNil(name)) || (!_.isNil(id) && !_.isNil(name))) {
       sendMessage(translate('timers.id-or-name-must-be-defined'), opts.sender, opts.attr);

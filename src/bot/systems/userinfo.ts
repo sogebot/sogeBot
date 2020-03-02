@@ -50,7 +50,7 @@ class UserInfo extends System {
 
   @command('!followage')
   protected async followage(opts: CommandOptions) {
-    const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
+    const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).exec().toArray();
 
     const id = await users.getIdByName(username);
     const isFollowerUpdate = await api.isFollowerUpdate(await getRepository(User).findOne({ userId: id }));
@@ -83,7 +83,7 @@ class UserInfo extends System {
 
   @command('!subage')
   protected async subage(opts: CommandOptions) {
-    const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
+    const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).exec().toArray();
 
     const user = await getRepository(User).findOne({ username });
     const subCumulativeMonths = user?.subscribeCumulativeMonths;
@@ -123,7 +123,7 @@ class UserInfo extends System {
 
   @command('!age')
   protected async age(opts: CommandOptions) {
-    const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
+    const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).exec().toArray();
 
     const user = await getRepository(User).findOne({ username });
     if (!user || user.createdAt === 0) {
@@ -151,7 +151,7 @@ class UserInfo extends System {
   @command('!lastseen')
   protected async lastseen(opts: CommandOptions) {
     try {
-      const [username] = new Expects(opts.parameters).username().toArray();
+      const [username] = new Expects(opts.parameters).username().exec().toArray();
       const user = await getRepository(User).findOne({ username: username });
       if (!user || user.seenAt === 0) {
         sendMessage(translate('lastseen.success.never').replace(/\$username/g, username), opts.sender, opts.attr);
@@ -169,7 +169,7 @@ class UserInfo extends System {
   @command('!watched')
   protected async watched(opts: CommandOptions) {
     try {
-      const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
+      const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).exec().toArray();
 
       let id;
       if (opts.sender.username === username) {

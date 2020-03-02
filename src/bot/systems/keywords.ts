@@ -85,7 +85,7 @@ class Keywords extends System {
         = new Expects(opts.parameters)
           .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
           .argument({ name: 'r', optional: false, multi: true, delimiter: '' })
-          .toArray();
+          .exec().toArray();
       const data: Required<KeywordInterface> = {
         id: uuidv4(),
         keyword: keywordRegex,
@@ -117,7 +117,7 @@ class Keywords extends System {
         = new Expects(opts.parameters)
           .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
           .argument({ name: 'r', optional: false, multi: true, delimiter: '' })
-          .toArray();
+          .exec().toArray();
 
       let keywords: Required<KeywordInterface>[] = [];
       if (isUUID(keywordRegexOrUUID)) {
@@ -189,7 +189,7 @@ class Keywords extends System {
       const [keywordRegexOrUUID]
         = new Expects(opts.parameters)
           .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
-          .toArray();
+          .exec().toArray();
 
       let keywords: Required<KeywordInterface>[] = [];
       if (isUUID(keywordRegexOrUUID)) {
@@ -231,7 +231,7 @@ class Keywords extends System {
       const [keywordRegexOrUUID]
         = new Expects(opts.parameters)
           .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
-          .toArray();
+          .exec().toArray();
 
       let keywords: Required<KeywordInterface>[] = [];
       if (isUUID(keywordRegexOrUUID)) {

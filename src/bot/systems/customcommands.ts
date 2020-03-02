@@ -99,7 +99,7 @@ class CustomCommands extends System {
         .argument({ name: 'c', type: String, multi: true, delimiter: '' })
         .argument({ name: 'rid', type: Number })
         .argument({ name: 'r', type: String, multi: true, delimiter: '' })
-        .toArray();
+        .exec().toArray();
 
       if (!command.startsWith('!')) {
         throw Error('Command should start with !');
@@ -147,7 +147,7 @@ class CustomCommands extends System {
         .argument({ optional: true, name: 's', default: false, type: Boolean })
         .argument({ name: 'c', type: String, multi: true, delimiter: '' })
         .argument({ name: 'r', type: String, multi: true, delimiter: '' })
-        .toArray();
+        .exec().toArray();
 
       if (!command.startsWith('!')) {
         throw Error('Command should start with !');
@@ -350,7 +350,7 @@ class CustomCommands extends System {
   @default_permission(permission.CASTERS)
   async remove (opts: CommandOptions) {
     try {
-      const [command] = new Expects(opts.parameters).command().toArray();
+      const [command] = new Expects(opts.parameters).command().exec().toArray();
 
       const command_db = await getRepository(Commands).findOne({
         where: { command },
