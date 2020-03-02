@@ -173,8 +173,7 @@ class Bets extends System {
             }), opts.sender);
           break;
         default:
-          warning(e.stack);
-          sendMessage(translate('core.error'), opts.sender, opts.attr);
+          sendMessage([this.getCommand('!bet open'), e.message].join(' '), opts.sender, opts.attr);
       }
     }
   }
