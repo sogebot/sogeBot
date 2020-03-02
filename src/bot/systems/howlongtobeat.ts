@@ -102,7 +102,7 @@ class HowLongToBeat extends System {
   async currentGameInfo(opts: CommandOptions, retry = false) {
     let [game] = new Expects(opts.parameters)
       .everything({ optional: true })
-      .exec().toArray();
+      .toArray();
 
     if (!game) {
       if (!api.stats.currentGame) {

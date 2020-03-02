@@ -487,7 +487,7 @@ class Spotify extends Integration {
     try {
       const [spotifyId] = new Expects(opts.parameters)
         .everything()
-        .exec().toArray();
+        .toArray();
 
       if (spotifyId.startsWith('spotify:') || spotifyId.startsWith('https://open.spotify.com/track/')) {
         let id = '';

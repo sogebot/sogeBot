@@ -120,7 +120,7 @@ class Cooldown extends System {
     const [command, subcommand] = new Expects(opts.message)
       .command({ optional: true })
       .string({ optional: true })
-      .exec().toArray();
+      .toArray();
 
     if (!_.isNil(command)) { // command
       let name = subcommand ? `${command} ${subcommand}` : command;
@@ -252,7 +252,7 @@ class Cooldown extends System {
     const [command, subcommand] = new Expects(opts.message)
       .command({ optional: true })
       .string({ optional: true })
-      .exec().toArray();
+      .toArray();
 
     if (!_.isNil(command)) { // command
       let name = subcommand ? `${command} ${subcommand}` : command;

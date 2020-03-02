@@ -142,7 +142,7 @@ class Alias extends System {
         .permission({ optional: true, default: permission.VIEWERS })
         .argument({ name: 'a', type: String, multi: true, delimiter: '' }) // set as multi as alias can contain spaces
         .argument({ name: 'c', type: String, multi: true, delimiter: '' }) // set as multi as command can contain spaces
-        .exec().toArray();
+        .toArray();
 
       if (!alias.startsWith('!') || !command.startsWith('!')) {
         throw Error('Alias or Command doesn\'t start with !');
@@ -176,7 +176,7 @@ class Alias extends System {
         .permission({ optional: true, default: permission.VIEWERS })
         .argument({ name: 'a', type: String, multi: true, delimiter: '' }) // set as multi as alias can contain spaces
         .argument({ name: 'c', type: String, multi: true, delimiter: '' }) // set as multi as command can contain spaces
-        .exec().toArray();
+        .toArray();
 
       if (!alias.startsWith('!') || !command.startsWith('!')) {
         throw Error('Alias or Command doesn\'t start with !');
@@ -216,7 +216,7 @@ class Alias extends System {
     try {
       const [alias] = new Expects(opts.parameters)
         .everything()
-        .exec().toArray();
+        .toArray();
 
       if (!alias.startsWith('!')) {
         throw Error('Not starting with !');
@@ -243,7 +243,7 @@ class Alias extends System {
     try {
       const [alias] = new Expects(opts.parameters)
         .everything()
-        .exec().toArray();
+        .toArray();
 
       if (!alias.startsWith('!')) {
         throw Error('Not starting with !');
@@ -270,7 +270,7 @@ class Alias extends System {
     try {
       const [alias] = new Expects(opts.parameters)
         .everything()
-        .exec().toArray();
+        .toArray();
 
       if (!alias.startsWith('!')) {
         throw Error('Not starting with !');

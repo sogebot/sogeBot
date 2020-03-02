@@ -268,7 +268,7 @@ class Points extends System {
   @default_permission(permission.CASTERS)
   async set (opts: CommandOptions) {
     try {
-      const [username, points] = new Expects(opts.parameters).username().points({ all: false }).exec().toArray();
+      const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
 
       await getRepository(User).update({ username }, { points });
 
@@ -287,7 +287,7 @@ class Points extends System {
   @command('!points give')
   async give (opts: CommandOptions) {
     try {
-      const [username, points] = new Expects(opts.parameters).username().points({ all: true }).exec().toArray();
+      const [username, points] = new Expects(opts.parameters).username().points({ all: true }).toArray();
       if (opts.sender.username.toLowerCase() === username.toLowerCase()) {
         return;
       }
@@ -395,7 +395,7 @@ class Points extends System {
   @default_permission(permission.CASTERS)
   async get (opts: CommandOptions) {
     try {
-      const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).exec().toArray();
+      const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
       const user = await getRepository(User).findOne({ username });
 
       if (!user) {
@@ -500,7 +500,7 @@ class Points extends System {
   @default_permission(permission.CASTERS)
   async add (opts: CommandOptions) {
     try {
-      const [username, points] = new Expects(opts.parameters).username().points({ all: false }).exec().toArray();
+      const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
 
       const user = await getRepository(User).findOne({ username });
 
@@ -528,7 +528,7 @@ class Points extends System {
   @default_permission(permission.CASTERS)
   async remove (opts: CommandOptions) {
     try {
-      const [username, points] = new Expects(opts.parameters).username().points({ all: true }).exec().toArray();
+      const [username, points] = new Expects(opts.parameters).username().points({ all: true }).toArray();
 
       const user = await getRepository(User).findOne({ username });
       if (!user) {

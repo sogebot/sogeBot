@@ -15,6 +15,7 @@ class Expects {
   text = '';
   match: any[] = [];
   toExec: {fnc: string; opts: any}[] = [];
+  isExecuted = false;
 
   constructor (text?: string) {
     if (text) {
@@ -31,6 +32,7 @@ class Expects {
     for (const ex of this.toExec) {
       this[ex.fnc]({...ex.opts, exec: true});
     }
+    this.isExecuted = true;
     return this;
   }
 
@@ -140,6 +142,9 @@ class Expects {
   }
 
   toArray () {
+    if (!this.isExecuted) {
+      this.exec();
+    }
     return this.match;
   }
 
