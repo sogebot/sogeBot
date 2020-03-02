@@ -303,8 +303,8 @@ class OAuth extends Core {
       this[type + 'RefreshToken'] = request.data.refresh;
 
       warning('Access token of ' + type + ' was refreshed.');
-      warning('New access token of ' + type + ': ' + request.data.token);
-      warning('New refresh token of ' + type + ': ' + request.data.refresh);
+      warning('New access token of ' + type + ': ' + request.data.token.replace(/(.{25})/, '*'.repeat(25)));
+      warning('New refresh token of ' + type + ': ' + request.data.refresh.replace(/(.{45})/, '*'.repeat(45)));
       this.validateOAuth(type);
 
       return request.data.token;
