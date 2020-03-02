@@ -161,7 +161,6 @@ class Bets extends System {
         command: this.getCommand('!bet'),
       }), opts.sender);
     } catch (e) {
-      console.log(e);
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
           sendMessage(translate('bets.notEnoughOptions'), opts.sender, opts.attr);
