@@ -215,7 +215,7 @@ export default {
   methods: {
     cleanup: function () {
       console.log('Cleanup => eventlist')
-      this.socket.emit('widget.eventlist.cleanup')
+      this.socket.emit('cleanup')
       this.events = []
     },
     prepareMessage: function (event) {
