@@ -31,6 +31,7 @@ import songs from './systems/songs';
 import spotify from './integrations/spotify';
 import { linesParsed, status as statusObj } from './helpers/parser';
 import { systems, list } from './helpers/register'
+import customvariables from './customvariables';
 const config = require('@config')
 
 let app;
