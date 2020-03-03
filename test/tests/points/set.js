@@ -27,6 +27,7 @@ describe('Points - set()', () => {
     it('!points get should return 0', async () => {
       await points.get({ sender: user, parameters: '' });
       await message.isSent('points.defaults.pointsResponse', { username: user.username }, {
+        order: 1, count: 1,
         amount: Math.floor(0),
         username: user.username,
         pointsName: await points.getPointsName(Math.floor(0)),
@@ -45,6 +46,7 @@ describe('Points - set()', () => {
     it('!points get should return 5', async () => {
       await points.get({ sender: user, parameters: '' });
       await message.isSent('points.defaults.pointsResponse', { username: user.username }, {
+        order: 1, count: 1,
         amount: Math.floor(5),
         username: user.username,
         pointsName: await points.getPointsName(Math.floor(5)),
@@ -54,6 +56,7 @@ describe('Points - set()', () => {
     it('!points set should correctly set value 10', async () => {
       await points.set({ sender: user, parameters: user.username + ' 10' });
       await message.isSent('points.success.set', { username: user.username }, {
+        order: 1, count: 1,
         amount: Math.floor(10),
         username: user.username,
         pointsName: await points.getPointsName(Math.floor(10)),
@@ -63,6 +66,7 @@ describe('Points - set()', () => {
     it('!points get should return 10', async () => {
       await points.get({ sender: user, parameters: '' });
       await message.isSent('points.defaults.pointsResponse', { username: user.username }, {
+        order: 1, count: 1,
         amount: Math.floor(10),
         username: user.username,
         pointsName: await points.getPointsName(Math.floor(10)),

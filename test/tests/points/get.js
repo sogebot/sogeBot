@@ -31,6 +31,7 @@ describe('Points - get()', () => {
         amount: Math.floor(Number.MAX_SAFE_INTEGER),
         username: hugePointsUser.username,
         pointsName: await points.getPointsName(Math.floor(Number.MAX_SAFE_INTEGER)),
+        count: 1, order: 1,
       });
     });
   });
@@ -46,7 +47,33 @@ describe('Points - get()', () => {
         amount: 100,
         username: tinyPointsUser.username,
         pointsName: await points.getPointsName(100),
+        count: 2, order: 2,
       });
     });
+  });
+
+  describe('Users should have correct order', () => {
+    before(async () => {
+      await db.cleanup();
+      await message.prepare();
+    });
+
+    for (let i = 1; i <= 10; i++) {
+      it(`create user${i} with ${i*100} points`, async () => {
+        await getRepository(User).save({ username: `user${i}`, userId: i, points: i*100 });
+      });
+    }
+
+    for (let i = 1; i <= 10; i++) {
+      it(`user${i} should have correct order and position`, async () => {
+        await points.get({ sender: { username: `user${i}`, userId: i }, parameters: '' });
+        await message.isSent('points.defaults.pointsResponse', { username: `user${i}` }, {
+          amount: i * 100,
+          username: `user${i}`,
+          pointsName: await points.getPointsName(i * 100),
+          count: 10, order: 10 - (i - 1),
+        });
+      });
+    }
   });
 });
