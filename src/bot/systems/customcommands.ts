@@ -11,7 +11,7 @@ import Expects from '../expects';
 import { getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, message, prepare, sendMessage } from '../commons';
 import { getAllCountOfCommandUsage, getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage } from '../helpers/commands/count';
 
-import { chatOut } from '../helpers/log';
+import { chatOut, warning } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
 import { Commands, CommandsInterface, CommandsResponsesInterface } from '../database/entity/commands';
@@ -199,7 +199,6 @@ class CustomCommands extends System {
           relations: ['responses'],
           where: {
             command: cmdArray.join(' '),
-            enabled: true,
           },
         });
       for (const command of db_commands) {
@@ -228,6 +227,10 @@ class CustomCommands extends System {
     // go through all commands
     let atLeastOnePermissionOk = false;
     for (const command of commands) {
+      if (!command.command.enabled) {
+        warning(`Custom command ${command.command.command} (${command.command.id}) is disabled!`);
+        continue;
+      }
       const _responses: CommandsResponsesInterface[] = [];
       // remove found command from message to get param
       const param = opts.message.replace(new RegExp('^(' + command.cmdArray.join(' ') + ')', 'i'), '').trim();
