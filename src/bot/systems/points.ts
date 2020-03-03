@@ -11,7 +11,7 @@ import { permission } from '../helpers/permissions';
 import System from './_interface';
 import { debug, error, warning } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
-import { FindConditions, getRepository } from 'typeorm';
+import { FindConditions, getConnection, getRepository } from 'typeorm';
 import { User, UserInterface } from '../database/entity/user';
 import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
 import { onChange, onLoad } from '../decorators/on';
@@ -407,10 +407,32 @@ class Points extends System {
         return;
       }
 
+      const connection = await getConnection();
+      const query = (type) => {
+        switch(type) {
+          case 'postgres':
+          case 'sqlite':
+            return `SELECT COUNT(*) as "order" FROM "user" WHERE "points" > (SELECT "points" FROM "user" WHERE "username"='${user.username}')`;
+          case 'mysql':
+          case 'mariadb':
+          default:
+            return `SELECT COUNT(*) as \`order\` FROM \`user\` WHERE \`points\` > (SELECT \`points\` FROM \`user\` WHERE \`username\`="${user.username}")`;
+        }
+      };
+
+      const orderQuery = await getRepository(User).query(query(connection.options.type));
+      const count = await getRepository(User).count();
+
+      let order: number | string = '?';
+      if (orderQuery.length > 0) {
+        order = Number(orderQuery[0].order) + 1;
+      }
+
       const message = await prepare('points.defaults.pointsResponse', {
         amount: this.maxSafeInteger(user.points),
         username: username,
         pointsName: await this.getPointsName(this.maxSafeInteger(user.points)),
+        order, count,
       });
       sendMessage(message, opts.sender, opts.attr);
     } catch (err) {

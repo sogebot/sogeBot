@@ -904,7 +904,7 @@
         "multi": "points",
         "xmulti": ""
       },
-      "pointsResponse": "$username has currently $amount $pointsName"
+      "pointsResponse": "$username has currently $amount $pointsName. Your position is $order/$count."
     }
   },
   "songs": {
