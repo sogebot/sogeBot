@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import * as constants from './constants';
 import { sendMessage } from './commons';
-import { debug, error } from './helpers/log';
+import { debug, error, warning } from './helpers/log';
 import { incrementCountOfCommandUsage } from './helpers/commands/count';
 import { getRepository } from 'typeorm';
 import { PermissionCommands } from './database/entity/permissions';
@@ -249,6 +249,7 @@ class Parser {
       return;
     }; // command not found, do nothing
     if (command.permission === null) {
+      warning(`Command ${command.command} is disabled!`);
       return;
     }; // command is disabled
 
