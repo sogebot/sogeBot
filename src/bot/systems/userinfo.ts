@@ -299,7 +299,7 @@ class UserInfo extends System {
       }, true);
       sendMessage(response.replace('$sender', '$touser'), opts.sender, { ...opts.attr, param: username });
     } catch (e) {
-      if (e.message.includes('Expected parameter')) {
+      if (e.message.includes('<username>')) {
         this.showMe(opts); // fallback to me without param
       } else {
         error(e.stack);
