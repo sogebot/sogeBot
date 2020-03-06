@@ -1,10 +1,9 @@
 # SogeBot
-[![Discord](https://img.shields.io/discord/317348946144002050.svg?style=flat-square)](https://discordapp.com/invite/52KpmuH)
-[![Build Status](https://github.com/sogehige/sogebot/workflows/Tests/badge.svg)](https://github.com/sogehige/sogeBot/actions)
-[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](http://standardjs.com/)
-[![GitHub release](https://img.shields.io/github/release/sogehige/sogebot.svg?style=flat-square)](https://github.com/sogehige/sogeBot/releases)
-[![Downloads](https://img.shields.io/github/downloads/sogehige/sogebot/total.svg?style=flat-square)](https://github.com/sogehige/sogeBot/releases)
-[![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg?style=flat-square)](https://www.paypal.me/sogetwitch/5eur)
+
+[![Discord](https://img.shields.io/discord/317348946144002050.svg?style=for-the-badge&logo=discord)](https://discordapp.com/invite/52KpmuH)
+[![GitHub release](https://img.shields.io/github/release/sogehige/sogebot.svg?style=for-the-badge)](https://github.com/sogehige/sogeBot/releases)
+[![Downloads](https://img.shields.io/github/downloads/sogehige/sogebot/total.svg?style=for-the-badge)](https://github.com/sogehige/sogeBot/releases)
+[![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg?style=for-the-badge&logo=paypal)](https://www.paypal.me/sogetwitch/5eur)
 [![Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.herokuapp.com%2Fsoge__&style=for-the-badge)](https://www.patreon.com/soge)
 
 Free Twitch Bot built on Node.js
