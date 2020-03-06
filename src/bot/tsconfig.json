@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es2017",
     "strict": true,
-    "module": "esnext",
+    "module": "commonjs",
     "incremental": true,
     "removeComments": true,
     "noImplicitAny": false,
@@ -18,9 +18,6 @@
     "noResolve": false,
     "allowJs": true,
     "baseUrl": "src/bot",
-    "paths": {
-      "@config": ["../../config.json", "../../data/config.example.json"]
-    },
     "outDir": "../../dest",
     "inlineSourceMap": true
   },

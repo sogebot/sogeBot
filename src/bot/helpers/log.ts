@@ -2,16 +2,13 @@ import 'module-alias/register';
 
 import fs from 'fs';
 import moment from 'moment-timezone';
-import * as configfile from '@config';
 import os from 'os';
 import util from 'util';
 import stripAnsi from 'strip-ansi';
 import { getFunctionNameFromStackTrace } from './stacktrace';
 
-const config: any = configfile;
-
 const logDir = './logs';
-config.timezone = typeof config.timezone === 'undefined' || config.timezone === 'system' ? moment.tz.guess() : config.timezone;
+const timezone = (process.env.TIMEZONE ?? 'system') === 'system' || !process.env.TIMEZONE ? moment.tz.guess() : process.env.TIMEZONE;
 
 if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir);
@@ -70,7 +67,7 @@ const levelFormat = {
 
 
 function format(level: Levels, message: string | object, category?: string) {
-  const timestamp = moment().tz(config.timezone).format('YYYY-MM-DD[T]HH:mm:ss.SSS');
+  const timestamp = moment().tz(timezone).format('YYYY-MM-DD[T]HH:mm:ss.SSS');
 
   if (typeof message === 'object') {
     message = util.inspect(message);

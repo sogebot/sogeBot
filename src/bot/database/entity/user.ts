@@ -1,7 +1,5 @@
-import { EntitySchema, getConnectionOptions } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer, SafeNumberTransformer } from './_transformer';
-
-const connOpts = await getConnectionOptions();
 
 export interface UserInterface {
   id?: string; userId: number; username: string; displayname?: string; profileImageUrl?: string;
@@ -119,8 +117,8 @@ export const UserTip = new EntitySchema<Readonly<Required<UserTipInterface>>>({
       primary: true,
       generated: 'rowid',
     },
-    amount: { type: 'float', precision: connOpts.type === 'mysql' ? 12 : undefined  },
-    sortAmount: { type: 'float', precision: connOpts.type === 'mysql' ? 12 : undefined  },
+    amount: { type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined  },
+    sortAmount: { type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined  },
     currency: { type: String },
     message: { type: 'text' },
     tippedAt: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },

@@ -1,7 +1,5 @@
 require('module-alias/register');
-import { EntitySchema, getConnectionOptions } from 'typeorm';
-
-const connOpts = await getConnectionOptions();
+import { EntitySchema } from 'typeorm';
 
 export interface GalleryInterface {
   id?: string;
@@ -15,7 +13,7 @@ export const Gallery = new EntitySchema<Readonly<Required<GalleryInterface>>>({
   columns: {
     id: { type: String, primary: true, generated: 'uuid' },
     type: { type: String },
-    data: { type: connOpts.type === 'mysql' ? 'longtext' : 'text' },
+    data: { type: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 'longtext' : 'text' },
     name: { type: String },
   },
 });

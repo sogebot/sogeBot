@@ -45,15 +45,11 @@ bot:
 	@echo -ne "\n\t ----- Building bot\n"
 	@npx tsc -p src/bot
 
-release:
-	@cp ./src/bot/data/config.example.json ./
-	ENV version=${VERSION} node tools/release.js
-
 pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"
-	@cp ./src/bot/data/config.example.json ./
-	@cp ./src/bot/data/ormconfig*.json ./
-	@npx bestzip sogeBot-$(VERSION).zip .npmrc ormconfig*.json npm-shrinkwrap.json config.example.json dest/ locales/ public/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ fonts.json
+	@cp ./src/bot/data/.env* ./
+	@cp ./src/bot/data/.env-sqlite ./.env
+	@npx bestzip sogeBot-$(VERSION).zip .npmrc .env* npm-shrinkwrap.json dest/ locales/ public/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ fonts.json
 
 prepare:
 	@echo -ne "\n\t ----- Cleaning up node_modules\n"

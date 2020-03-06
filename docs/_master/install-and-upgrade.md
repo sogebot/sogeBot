@@ -26,7 +26,7 @@
 1. Download `Docker Compose` files
     - From GIT: `git clone git@github.com:sogehige/sogeBot-docker.git`
     - Without GIT as [ZIP](https://github.com/sogehige/sogeBot-docker/archive/master.zip)
-2. Configure properly ormconfig.json in `conf/` directory
+2. Configure properly .env file in `root` directory
     - You can find examples at [our GitHub repository](https://github.com/sogehige/sogeBot/tree/master/src/bot/data)
 
 > You need [to be logged on github docker registry](https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-docker-for-use-with-github-packages)
@@ -47,7 +47,7 @@
 - Download latest release from [GitHub sogeBot release page](https://github.com/sogehige/sogeBot/releases)
 - Copy `config.example.json` to `config.json` and set everything as desired in
  `config` part
-- Set your [ormconfig.json](configuration/database)
+- Set your [database environment](configuration/database)
 - if you want to use `!title` and `!game` you need to add bot as channel editor
   in [Permissions settings](http://twitch.tv/dashboard/permissions) on Twitch
 - before starting a bot, you need to install npm dependencies
@@ -59,7 +59,7 @@
     `npm start`
 
 - To access webpanel, go to `http://localhost:<port>` where port is configured
-  in config.json (default: 20000)
+  as PORT env variable, e.g. `PORT=20001 npm start`
 
 ## From git
 
@@ -73,7 +73,7 @@
   or clone repository `git clone https://github.com/sogehige/sogeBot.git`
 - Copy `config.example.json` to `config.json` and set everything as desired in
   `config` part
-- Set your [ormconfig.json](configuration/database)
+- Set your [database environment](configuration/database)
 - if you want to use `!title` and `!game` you need to add bot as channel editor
   in [Permissions settings](http://twitch.tv/dashboard/permissions) on Twitch
 - before starting a bot, you need to build a bot
@@ -87,15 +87,6 @@
 - To access webpanel, go to `http://localhost:<port>` where port is configured
   in config.json (default: 20000)
 
-!> Upgrade from versions below 9.10x is **NOT SUPPORTED**
-
-## Upgrade from **9.10.x**
-
-- run **npm install**
-- Backup your current database
-- Set your [ormconfig.json](configuration/database)
-- Migrate your database files to new system
-
 ### NEDB
 
 - run `node tools/database.js --from nedb`
@@ -103,12 +94,6 @@
 ### MongoDB
 
 - run `node tools/database.js --from mongodb --mongoUri <your-mongouri>`
-
-## Upgrade after **9.10.x**
-
-- unzip new sogeBot version
-- copy your ormconfig.json and config.json into your new bot directory
-- run **npm install** and you're ready!
 
 ## Oauth generation
 

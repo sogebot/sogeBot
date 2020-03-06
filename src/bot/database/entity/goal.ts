@@ -1,7 +1,5 @@
-import { EntitySchema, getConnectionOptions } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
-
-const connOpts = await getConnectionOptions();
 
 export interface GoalGroupInterface {
   id?: string;
@@ -79,8 +77,8 @@ export const Goal = new EntitySchema<Readonly<Required<GoalInterface>>>({
     countBitsAsTips: { type: Boolean },
     display: { type: 'varchar', length: 20 },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-    goalAmount: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: connOpts.type === 'mysql' ? 12 : undefined },
-    currentAmount: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: connOpts.type === 'mysql' ? 12 : undefined },
+    goalAmount: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined },
+    currentAmount: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined },
     endAfter: { type: String },
     endAfterIgnore: { type: Boolean },
     customizationBar: { type: 'simple-json' },

@@ -1,18 +1,15 @@
 export const isMainThread = typeof process.env.CLUSTER === 'undefined';
 
-import 'module-alias/register';
 import io from 'socket.io';
 import ioClient from 'socket.io-client';
 import http from 'http';
 
-import { isDebugEnabled as debugIsEnabled, warning } from './helpers/log';
-import config from '@config';
-import { chatIn, chatOut, info, whisperIn, whisperOut } from './helpers/log';
-import oauth from './oauth';
-import api from './api';
-import panel from './panel';
-import tmi from './tmi';
-import { avgResponse } from './helpers/parser';
+import { chatIn, chatOut, isDebugEnabled as debugIsEnabled, info, whisperIn, whisperOut } from './helpers/log.js';
+import oauth from './oauth.js';
+import api from './api.js';
+import panel from './panel.js';
+import tmi from './tmi.js';
+import { avgResponse } from './helpers/parser.js';
 
 const availableSockets: {
   [socketId: string]: {
@@ -25,13 +22,13 @@ let lastSocketIdx = 0;
 
 let socketIO, clientIO;
 
-export const init = async () => {
-  if (process.env.CLUSTER && config.cluster.enabled === 'false') {
-    warning('You are trying to run in cluster-mode without proper settings.');
-    process.exit(1);
-  }
+const isClusterEnabled = /^true$/i.test(process.env.CLUSTER ?? 'false');
+const clusterId = process.env.CLUSTER_ID ?? 'e77f8113-5be4-474e-a603-b435d839ab00';
+const clusterMainThreadUrl = process.env.CLUSTER_MAIN_THREAD_URL ?? 'http://localhost';
+const clusterPort = process.env.CLUSTER_PORT ?? '20003';
 
-  if (config.cluster.enabled === 'true') {
+export const init = async () => {
+  if (isClusterEnabled) {
     if (typeof panel === 'undefined' && isMainThread) {
       setTimeout(() => {
         init();
@@ -42,10 +39,10 @@ export const init = async () => {
       const server = http.createServer();
 
       socketIO = io(server);
-      server.listen(config.cluster.port);
+      server.listen(clusterPort);
 
       socketIO.use(function (socket, next) {
-        if (config.cluster.id.trim() === socket.request._query.id) {
+        if (clusterId.trim() === socket.request._query.id) {
           next();
         }
         return false;
@@ -77,9 +74,9 @@ export const init = async () => {
       });
     } else {
       info('Clustered mode: you will see only messages handled by this node');
-      clientIO = ioClient.connect(config.cluster.mainThreadUrl + ':' + config.cluster.port, {
+      clientIO = ioClient.connect(clusterMainThreadUrl + ':' + clusterPort, {
         query: {
-          id: config.cluster.id,
+          id: clusterId,
         },
       });
 

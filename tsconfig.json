@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es2017",
     "strict": true,
-    "module": "esnext",
+    "module": "commonjs",
     "incremental": true,
     "removeComments": true,
     "noImplicitAny": false,
@@ -18,9 +18,6 @@
     "noResolve": false,
     "allowJs": true,
     "baseUrl": "./",
-    "paths": {
-      "@config": ["config.json", "src/bot/data/config.example.json"]
-    },
     "sourceMap": true
   },
   "include": [
@@ -33,7 +30,6 @@
   ],
   "exclude": [
     "src/bot",
-    "node_modules",
-    "config.json"
+    "node_modules"
   ]
 }

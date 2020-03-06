@@ -4,7 +4,6 @@ import moment from 'moment-timezone';
 require('moment-precise-range-plugin');
 
 import { isMainThread } from './cluster';
-import { isNil } from 'lodash';
 
 import { getTime, isIgnored, prepare, sendMessage } from './commons';
 import { command, default_permission, settings } from './decorators';
@@ -12,7 +11,6 @@ import { permission } from './helpers/permissions';
 import Core from './_interface';
 
 
-import * as configFile from '@config';
 import { adminEndpoint } from './helpers/socket';
 
 import { getRepository } from 'typeorm';
@@ -24,8 +22,7 @@ import oauth from './oauth';
 import { translate } from './translate';
 import general from './general';
 
-const config = configFile as any;
-config.timezone = config.timezone === 'system' || isNil(config.timezone) ? moment.tz.guess() : config.timezone;
+const timezone = (process.env.TIMEZONE ?? 'system') === 'system' || !process.env.TIMEZONE ? moment.tz.guess() : process.env.TIMEZONE;
 
 class Twitch extends Core {
   @settings('general')
@@ -57,7 +54,7 @@ class Twitch extends Core {
 
   @command('!time')
   async time (opts) {
-    const message = await prepare('time', { time: moment().tz(config.timezone).format('LTS') });
+    const message = await prepare('time', { time: moment().tz(timezone).format('LTS') });
     sendMessage(message, opts.sender);
   }
 

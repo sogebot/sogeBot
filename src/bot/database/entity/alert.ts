@@ -1,9 +1,6 @@
 import { ColumnNumericTransformer } from './_transformer';
 import type { EntitySchemaColumnOptions } from 'typeorm';
-import { EntitySchema, getConnectionOptions } from 'typeorm';
-
-const connOpts = await getConnectionOptions();
-console.log({connOpts});
+import { EntitySchema } from 'typeorm';
 
 export interface EmitData {
   name: string;
@@ -241,7 +238,7 @@ export const AlertMedia = new EntitySchema<Readonly<Required<AlertMediaInterface
   columns: {
     primaryId: { type: Number, primary: true, generated: true },
     id: { type: String },
-    b64data: { type: ['mysql', 'mariadb'].includes(connOpts.type) ? 'longtext' : 'text' },
+    b64data: { type: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'sqlite') ? 'longtext' : 'text' },
     chunkNo: { type: Number },
   },
   indices: [

@@ -6,14 +6,13 @@ dest/*
 package-lock.json*
 yarn.lock
 *.zip
-config.json
 db/
 *.db
 report
 tsconfig.tsbuildinfo
-ormconfig.json
 sogebot.db*
 restart.pid
+.env
 
 public/dist/*
 public/custom/*
