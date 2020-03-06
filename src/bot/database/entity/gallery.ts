@@ -1,4 +1,3 @@
-require('module-alias/register');
 import { EntitySchema } from 'typeorm';
 
 export interface GalleryInterface {

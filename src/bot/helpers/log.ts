@@ -1,5 +1,3 @@
-import 'module-alias/register';
-
 import fs from 'fs';
 import moment from 'moment-timezone';
 import os from 'os';

@@ -17,7 +17,6 @@ async function retest() {
         console.log('------------------------------------------------------------------------------')
         const p = child_process.spawn('npx', [
           'mocha',
-          '-r',  'module-alias/register',
           '-r', 'source-map-support/register',
           '--timeout', '20000',
           '--exit',
@@ -67,7 +66,6 @@ async function test() {
   await new Promise((resolve) => {
     const p = child_process.spawn('npx', [
       'mocha',
-      '-r', 'module-alias/register',
       '-r', 'source-map-support/register',
       '--timeout', '20000',
       '--exit',

@@ -1,7 +1,5 @@
 'use strict';
 
-require('module-alias/register');
-
 import glob from 'glob';
 import fs from 'fs';
 import _  from 'lodash';
