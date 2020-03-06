@@ -61,6 +61,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const webpackConfig = {
+  cache: { type: 'filesystem', version: process.env.CACHE || 'not-available'  },
   watchOptions: {
     ignored: /node_modules/
   },

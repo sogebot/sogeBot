@@ -1,7 +1,8 @@
-PATH    := node_modules/.bin:$(PATH)
-SHELL   := /bin/bash
-VERSION := `node -pe "require('./package.json').version"`
-ENV     ?= production
+PATH         := node_modules/.bin:$(PATH)
+SHELL        := /bin/bash
+VERSION      := `node -pe "require('./package.json').version"`
+ENV          ?= production
+WEBPACKCACHE := `find src/panel -type f -print0 | sort -z | xargs -0 sha1sum | sha1sum | sed 's/ .*//'`
 
 all : info clean dependencies patch css ui bot
 refresh : info clean prepare dependencies2 patch
@@ -40,8 +41,8 @@ css:
 	@npx postcss public/dist/css/*.css --use autoprefixer -d public/dist/css/
 
 ui:
-	@echo -ne "\n\t ----- Bundling with webpack\n"
-	@NODE_ENV=$(ENV) npx webpack
+	@echo -ne "\n\t ----- Bundling with webpack ($(ENV) cache:${WEBPACKCACHE})\n"
+	@NODE_ENV=$(ENV) CACHE=${WEBPACKCACHE} npx webpack
 
 bot:
 	@echo -ne "\n\t ----- Building bot\n"
