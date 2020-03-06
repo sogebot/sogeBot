@@ -1,5 +1,3 @@
-const fs = require('fs');
-
 global.mocha = true;
 require('../dest/main.js');
 
