@@ -33,7 +33,7 @@ describe('Raffles - pick()', () => {
       await message.isSent('raffles.announce-ticket-raffle', { username: 'bot' }, {
         keyword: '!winme',
         eligibility: await commons.prepare('raffles.eligibility-everyone-item'),
-        min: 0,
+        min: 1,
         max: max,
       });
     });
@@ -105,7 +105,7 @@ describe('Raffles - pick()', () => {
       await message.isSent('raffles.announce-ticket-raffle', { username: 'bot' }, {
         keyword: '!winme',
         eligibility: await commons.prepare('raffles.eligibility-everyone-item'),
-        min: 0,
+        min: 1,
         max: max,
       });
     });
@@ -151,7 +151,7 @@ describe('Raffles - pick()', () => {
       await message.isSent('raffles.announce-ticket-raffle', { username: 'bot' }, {
         keyword: '!winme',
         eligibility: await commons.prepare('raffles.eligibility-everyone-item'),
-        min: 0,
+        min: 1,
         max: max,
       });
     });
@@ -194,7 +194,7 @@ describe('Raffles - pick()', () => {
       await message.isSent('raffles.announce-ticket-raffle', { username: 'bot' }, {
         keyword: '!winme',
         eligibility: await commons.prepare('raffles.eligibility-everyone-item'),
-        min: 0,
+        min: 1,
         max: max,
       });
     });
@@ -237,7 +237,7 @@ describe('Raffles - pick()', () => {
       await message.isSent('raffles.announce-ticket-raffle', { username: 'bot' }, {
         keyword: '!winme',
         eligibility: await commons.prepare('raffles.eligibility-everyone-item'),
-        min: 0,
+        min: 1,
         max: max,
       });
     });
