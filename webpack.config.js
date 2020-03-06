@@ -12,6 +12,7 @@ const optimization = {
   chunkIds: 'named',
   usedExports: true,
   splitChunks: {
+    name: false,
     chunks: 'async',
     minSize: 30000,
     maxSize: 0,
@@ -19,8 +20,6 @@ const optimization = {
     maxAsyncRequests: Infinity,
     maxInitialRequests: Infinity,
     automaticNameDelimiter: '~',
-    automaticNameMaxLength: 30,
-    name: true,
     cacheGroups: {
       fortAwesomeVendor: {
         test: /[\\/]node_modules[\\/]\@fortawesome[\\/]/,
@@ -61,9 +60,15 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const webpackConfig = {
-  cache: { type: 'filesystem', version: process.env.CACHE || 'not-available'  },
+  cache: {
+    type: 'filesystem',
+    version: process.env.CACHE || 'not-available',
+    buildDependencies: {
+      config: [ __filename ] // you may omit this when your CLI automatically adds it
+    }
+  },
   watchOptions: {
-    ignored: /node_modules/
+    ignored: ['/node_modules/*'],
   },
   mode: process.env.NODE_ENV,
   performance: { hints: false },
