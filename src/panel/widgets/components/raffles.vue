@@ -17,7 +17,7 @@
           template(v-else)
             b-button(variant="outline-primary" :disabled="true").border-0 {{ translate('widget-title-raffles') }}
 
-        b-tab(active)
+        b-tab
           template(v-slot:title)
             small {{ participants.length }}
             fa(icon="users" fixed-width).ml-1
@@ -38,7 +38,7 @@
                 fa(icon="eye-slash").mr-1
                 | {{Math.abs(fParticipants.length - participants.length)}} {{translate('hidden')}}
 
-        b-tab
+        b-tab(active)
           template(v-slot:title)
             fa(icon="gift" fixed-width)
           b-card-text
@@ -212,9 +212,11 @@ export default {
       keyword: '',
       running: false,
       ticketsMax: 100,
-      ticketsMin: 0,
+      ticketsMin: 1,
       winner: null,
       participants: [],
+
+      cacheInterval: 0,
 
       socket: getSocket('/systems/raffles'),
       updated: String(new Date())
@@ -233,6 +235,9 @@ export default {
       } else return []
     }
   },
+  destroyed () {
+    clearInterval(this.cacheInterval);
+  },
   created: function () {
     this.socket.emit('settings', (err, data) => {
       this.raffleAnnounceInterval = data.raffleAnnounceInterval
@@ -240,9 +245,27 @@ export default {
       this.luck.followersPercent = data.luck.followersPercent
     })
 
-    if (localStorage.getItem('/widget/raffles/eligibility/all')) this.eligibility.all = JSON.parse(localStorage.getItem('/widget/raffles/eligibility/all'))
-    if (localStorage.getItem('/widget/raffles/eligibility/followers')) this.eligibility.followers = JSON.parse(localStorage.getItem('/widget/raffles/eligibility/followers'))
-    if (localStorage.getItem('/widget/raffles/eligibility/subscribers')) this.eligibility.subscribers = JSON.parse(localStorage.getItem('/widget/raffles/eligibility/subscribers'))
+    const cache = localStorage.getItem('/widget/raffles/');
+    if (cache) {
+      for (const [key, value] of Object.entries(JSON.parse(cache)))
+      this[key] = value;
+    }
+
+    // better would be to have watcher, but there is no simple way
+    // to catch all relevant props without lot of a code
+    this.cacheInterval = setInterval(() => {
+      localStorage.setItem('/widget/raffles/', JSON.stringify({
+        eligibility: {
+          all: this.eligibility.all,
+          followers: this.eligibility.followers,
+          subscribers: this.eligibility.subscribers,
+        },
+        isTypeKeywords: this.isTypeKeywords,
+        keyword: this.keyword,
+        ticketsMax: this.ticketsMax,
+        ticketsMin: this.ticketsMin,
+      }))
+    }, 1000);
 
     this.refresh()
   },
