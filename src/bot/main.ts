@@ -22,6 +22,7 @@ import { autoLoad } from './commons';
 import chalk from 'chalk';
 import { existsSync, unlinkSync } from 'fs';
 import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
+import { normalize } from 'path';
 
 const connect = async function () {
   const connectionOptions = await getConnectionOptions();
@@ -51,20 +52,17 @@ const connect = async function () {
       migrationsRun: true,
     });
   }
+  const typeToLog = {
+    sqlite: 'SQLite3',
+    mariadb: 'MySQL/MariaDB',
+    mysql: 'MySQL/MariaDB',
+    postgres: 'PostgreSQL',
+  };
+  info(`Initialized ${typeToLog[type]} database (${normalize(String(connectionOptions.database))})`);
 };
 
 async function main () {
   try {
-    await connect();
-  } catch (e) {
-    error('Bot was unable to connect to database, check your database configuration');
-    error(e);
-    error('Exiting bot.');
-    process.exit(1);
-  }
-  let translate, panel;
-  try {
-
     const version = _.get(process, 'env.npm_package_version', 'x.y.z');
     if (!existsSync('./restart.pid')) {
       process.stdout.write(figlet.textSync('sogeBot ' + version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'), {
@@ -75,7 +73,15 @@ async function main () {
       process.stdout.write('\n\n\n');
       info('Bot is starting up');
     }
-
+    await connect();
+  } catch (e) {
+    error('Bot was unable to connect to database, check your database configuration');
+    error(e);
+    error('Exiting bot.');
+    process.exit(1);
+  }
+  let translate, panel;
+  try {
     // Initialize all core singletons
     setTimeout(() => {
       clusterInit();
