@@ -34,7 +34,7 @@ jobs:
       with:
         node-version: 13
     - name: Install eslint and dependencies
-      run: npm install typescript eslint jsonlint-mod @typescript-eslint/parser @typescript-eslint/eslint-plugin --only=dev
+      run: npm install typescript eslint jsonlint-mod @typescript-eslint/parser @typescript-eslint/eslint-plugin mkdirp@latest --only=dev
     - name: Run eslint
       run: make eslint
     - name: Run jsonlint
