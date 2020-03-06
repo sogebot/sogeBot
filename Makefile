@@ -28,7 +28,6 @@ eslint:
 
 jsonlint:
 	@echo -ne "\n\t ----- Checking jsonlint\n"
-	npx jsonlint src/bot/data/config.example.json -q
 	for a in $$(find ./locales -type f -iname "*.json" -print); do /bin/false; jsonlint $$a -q; done
 
 css:
