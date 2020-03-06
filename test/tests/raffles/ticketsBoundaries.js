@@ -71,18 +71,18 @@ describe('Raffles - user should be able to compete within boundaries of tickets'
   });
 
   it('we should have only 2 raffle participants', async () => {
-    assert.equal(await getRepository(RaffleParticipant).count(), 2);
+    assert.strictEqual(await getRepository(RaffleParticipant).count(), 2);
   });
 
   for (const viewer of [testuser.username, testuser2.username]) {
     it(`user ${viewer} should be in raffle participants`, async () => {
-      assert.equal(await getRepository(RaffleParticipant).count({ username: viewer }), 1);
+      assert.strictEqual(await getRepository(RaffleParticipant).count({ username: viewer }), 1);
     });
   }
 
   for (const viewer of [testuser3.username, testuser4.username]) {
     it(`user ${viewer} should not be in raffle participants`, async () => {
-      assert.equal(await getRepository(RaffleParticipant).count({ username: viewer }), 0);
+      assert.strictEqual(await getRepository(RaffleParticipant).count({ username: viewer }), 0);
     });
   }
 });
