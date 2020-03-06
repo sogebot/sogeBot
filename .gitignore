@@ -3,7 +3,6 @@ heap
 heap-*.csv
 logs/*
 dest/*
-package-lock.json*
 yarn.lock
 *.zip
 db/

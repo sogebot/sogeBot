@@ -52,7 +52,7 @@
   in [Permissions settings](http://twitch.tv/dashboard/permissions) on Twitch
 - before starting a bot, you need to install npm dependencies
 
-    `npm install`
+    `npm ci`
 
 - start bot
 
