@@ -19,8 +19,7 @@
     "allowJs": true,
     "baseUrl": "./",
     "paths": {
-      "@config": ["config.json", "src/bot/data/config.example.json"],
-      "@ormconfig": ["ormconfig.json", "src/bot/data/ormconfig.sqlite.json"]
+      "@config": ["config.json", "src/bot/data/config.example.json"]
     },
     "sourceMap": true
   },
