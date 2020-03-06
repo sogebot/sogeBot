@@ -5,7 +5,7 @@
 [![GitHub release](https://img.shields.io/github/release/sogehige/sogebot.svg?style=flat-square)](https://github.com/sogehige/sogeBot/releases)
 [![Downloads](https://img.shields.io/github/downloads/sogehige/sogebot/total.svg?style=flat-square)](https://github.com/sogehige/sogeBot/releases)
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg?style=flat-square)](https://www.paypal.me/sogetwitch/5eur)
-[![Patreon](https://img.shields.io/endpoint.svg?url=https://shieldsio-patreon.herokuapp.com/soge/pledges&style=for-the-badge)](https://www.patreon.com/soge)
+[![Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.herokuapp.com%2Fsoge%2Fpledges&style=for-the-badge)](https://www.patreon.com/soge)
 
 Free Twitch Bot built on Node.js
 
