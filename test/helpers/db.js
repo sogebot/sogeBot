@@ -14,7 +14,7 @@ const { Settings } = require('../../dest/database/entity/settings');
 const { Quotes } = require('../../dest/database/entity/quotes');
 const { User, UserTip, UserBit } = require('../../dest/database/entity/user');
 const { ModerationPermit } = require('../../dest/database/entity/moderation');
-const { Raffle } = require('../../dest/database/entity/raffle');
+const { Raffle, RaffleParticipant } = require('../../dest/database/entity/raffle');
 const { Price } = require('../../dest/database/entity/price');
 const { Rank } = require('../../dest/database/entity/rank');
 const { Timer, TimerResponse } = require('../../dest/database/entity/timer');
@@ -49,7 +49,7 @@ module.exports = {
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));
       await waitMs(400); // wait ittle bit for transactions to be done
 
-      const entities = [Rank, PermissionCommands, Event, EventOperation, Variable, VariableHistory, VariableURL, Raffle, Duel, PollVote, Poll, TimerResponse, Timer, BetsParticipations, UserTip, UserBit, CommandsResponses, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Settings, Cooldown, Keyword, Price];
+      const entities = [RaffleParticipant, Rank, PermissionCommands, Event, EventOperation, Variable, VariableHistory, VariableURL, Raffle, Duel, PollVote, Poll, TimerResponse, Timer, BetsParticipations, UserTip, UserBit, CommandsResponses, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Settings, Cooldown, Keyword, Price];
       if (['postgres', 'mysql'].includes((await getManager()).connection.options.type)) {
         const metadatas = [];
         for (const entity of entities) {

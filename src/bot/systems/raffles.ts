@@ -192,14 +192,14 @@ class Raffles extends System {
       type = TYPE_NORMAL;
     } // force normal type if points are disabled
 
-    let minTickets = 0;
+    let minTickets = 1;
     let maxTickets = 100;
 
     if (type === TYPE_TICKETS) {
       let match;
       match = opts.parameters.match(/-min (\d+)/);
       if (!_.isNil(match)) {
-        minTickets = match[1];
+        minTickets = Math.max(match[1], minTickets);
       }
 
       match = opts.parameters.match(/-max (\d+)/);

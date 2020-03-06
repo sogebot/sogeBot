@@ -120,11 +120,11 @@
                     div.input-group
                       div.input-group-prepend
                         span.input-group-text min
-                      input(type="number" v-model="ticketsMin" class="form-control" placeholder="0" id="minTickets" min="0" :disabled="running")
+                      input(type="number" v-model.number="ticketsMin" class="form-control" placeholder="0" id="minTickets" min="1" :disabled="running")
                     div.input-group
                       div.input-group-prepend
                         span.input-group-text max
-                      input(type="number" v-model="ticketsMax" class="form-control" placeholder="100" id="maxTickets" min="0" :disabled="running")
+                      input(type="number" v-model.number="ticketsMax" class="form-control" placeholder="100" id="maxTickets" :min="String(ticketsMin)" :disabled="running")
 
         b-tab(v-if="winner")
           template(v-slot:title)
@@ -279,8 +279,6 @@ export default {
     'luck.subscribersPercent': function () {
       this.socket.emit('settings.update', { luck: this.luck }, () => {})
     },
-    ticketsMin: function () { this.ticketsMin = Number(this.ticketsMin) },
-    ticketsMax: function () { this.ticketsMax = Number(this.ticketsMax) },
     keyword: function () {
       if (!this.keyword.startsWith('!')) this.keyword = '!' + this.keyword
     }
