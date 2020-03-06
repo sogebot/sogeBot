@@ -42,7 +42,7 @@ css:
 
 ui:
 	@echo -ne "\n\t ----- Bundling with webpack ($(ENV) cache:${WEBPACKCACHE})\n"
-	@NODE_ENV=$(ENV) CACHE=${WEBPACKCACHE} npx webpack
+	@NODE_ENV=$(ENV) CACHE=${WEBPACKCACHE} npx webpack --progress
 
 bot:
 	@echo -ne "\n\t ----- Building bot\n"

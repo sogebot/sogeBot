@@ -192,6 +192,7 @@
     "url-regex": "5.0.0",
     "v-clipboard": "2.2.2",
     "v-runtime-template": "1.10.0",
+    "vm-browserify": "1.1.2",
     "vue-audio-visual": "1.4.1",
     "vue-chartkick": "0.6.0",
     "vue-class-component": "7.2.3",

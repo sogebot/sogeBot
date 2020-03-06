@@ -8,14 +8,12 @@ const bundleAnalyze = !!process.env.BUNDLE
 
 const optimization = {
   minimize: process.env.NODE_ENV === 'production',
-  moduleIds: 'hashed',
+  moduleIds: 'deterministic',
   chunkIds: 'named',
   usedExports: true,
   splitChunks: {
     name: false,
     chunks: 'async',
-    minSize: 30000,
-    maxSize: 0,
     minChunks: 1,
     maxAsyncRequests: Infinity,
     maxInitialRequests: Infinity,
@@ -62,7 +60,7 @@ if (process.env.NODE_ENV === 'production') {
 const webpackConfig = {
   cache: {
     type: 'filesystem',
-    version: process.env.CACHE || 'not-available',
+    version: process.env.CACHE || undefined,
     buildDependencies: {
       config: [ __filename ] // you may omit this when your CLI automatically adds it
     }
@@ -86,6 +84,7 @@ const webpackConfig = {
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
       src: path.resolve(__dirname, 'src'),
+      "vm": "vm-browserify",
     }
   },
   output: {
