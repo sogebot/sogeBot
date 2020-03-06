@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    // this enables stricter inference for data properties on `this`
+    "target": "es2017",
     "strict": true,
-    "module": "commonjs",
+    "module": "esnext",
     "incremental": true,
     "removeComments": true,
     "noImplicitAny": false,
@@ -17,21 +16,20 @@
     "experimentalDecorators": true,
     "declaration": false,
     "noResolve": false,
-    "allowJs": true, /* REMOVE when jsfiles are gone */
+    "allowJs": true,
     "baseUrl": "src/bot",
     "paths": {
-      "@config": ["../../config.json", "../../data/config.example.json"],
-      "@ormconfig": ["../../ormconfig.json", "../..//data/ormconfig.sqlite.json"]
+      "@config": ["../../config.json", "../../data/config.example.json"]
     },
     "outDir": "../../dest",
-    "inlineSourceMap": true,
+    "inlineSourceMap": true
   },
   "include": [
     "./",
     "../../d.ts/types.d.ts",
-    "../../d.ts/*",
+    "../../d.ts/*"
   ],
   "exclude": [
-    "node_modules",
+    "node_modules"
   ]
 }
