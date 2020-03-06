@@ -32,7 +32,14 @@ const connect = async function () {
 };
 
 async function main () {
-  await connect();
+  try {
+    await connect();
+  } catch (e) {
+    error('Bot was unable to connect to database, check your ormconfig.json');
+    error(e);
+    error('Exiting bot.');
+    process.exit(1);
+  }
   let translate, panel;
   try {
 
