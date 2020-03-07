@@ -5,7 +5,6 @@ ENV          ?= production
 WEBPACKCACHE := `find src/panel -type f -print0 | sort -z | xargs -0 sha1sum | sha1sum | sed 's/ .*//'`
 
 all : info clean dependencies patch css ui bot
-refresh : info clean prepare dependencies2 patch
 .PHONY : all
 
 info:
@@ -14,12 +13,10 @@ info:
 	@git log --oneline -3 | cat
 
 dependencies:
-	@echo -ne "\n\t ----- Installation of dependencies(npm ci)\n"
-	@npm ci
-
-dependencies2:
-	@echo -ne "\n\t ----- Installation of dependencies (npm install)\n"
-	@npm install
+	@echo -ne "\n\t ----- Installation of production dependencies\n"
+	@npm install --production
+	@echo -ne "\n\t ----- Installation of development dependencies\n"
+	@npm install --only=dev
 
 patch:
 	@echo -ne "\n\t ----- Going through node_modules patches\n"
@@ -52,10 +49,7 @@ pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"
 	@cp ./src/bot/data/.env* ./
 	@cp ./src/bot/data/.env-sqlite ./.env
-	@cp ./.npmrc ./.npmrc-bak
-	@echo 'only=production' >> ./.npmrc
 	@npx bestzip sogeBot-$(VERSION).zip .npmrc .env* package-lock.json dest/ locales/ public/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ fonts.json
-	@cp ./.npmrc-bak ./.npmrc
 
 prepare:
 	@echo -ne "\n\t ----- Cleaning up node_modules\n"
