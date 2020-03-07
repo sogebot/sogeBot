@@ -8,44 +8,7 @@ const bundleAnalyze = !!process.env.BUNDLE
 
 const optimization = {
   minimize: process.env.NODE_ENV === 'production',
-  moduleIds: 'deterministic',
-  chunkIds: 'named',
-  usedExports: true,
-  splitChunks: {
-    name: false,
-    chunks: 'async',
-    minChunks: 1,
-    maxAsyncRequests: Infinity,
-    maxInitialRequests: Infinity,
-    automaticNameDelimiter: '~',
-    cacheGroups: {
-      fortAwesomeVendor: {
-        test: /[\\/]node_modules[\\/]\@fortawesome[\\/]/,
-        name: "fasvendor",
-        chunks: "initial",
-      },
-      lodashVendor: {
-        test: /[\\/]node_modules[\\/](lodash|lodash-es)[\\/]/,
-        name: "lodashvendor",
-        chunks: "initial",
-      },
-      bootstrapVendor: {
-        test: /[\\/]node_modules[\\/](bootstrap|bootstrap-vue)[\\/]/,
-        name: "bootstrapvendor",
-        chunks: "initial",
-      },
-      vendors: {
-        test: /[\\/]node_modules[\\/]/,
-        chunks: "initial",
-        priority: -30,
-      },
-      default: {
-        minChunks: 2,
-        priority: -20,
-        reuseExistingChunk: true
-      }
-    }
-  }
+  usedExports: false, /* disable for now in webpack 5 */
 };
 
 if (process.env.NODE_ENV === 'production') {
@@ -84,14 +47,14 @@ const webpackConfig = {
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
       src: path.resolve(__dirname, 'src'),
-      "vm": "vm-browserify",
+      'vm': 'vm-browserify',
     }
   },
   output: {
     path: path.resolve(__dirname, 'public', 'dist', 'js'),
-    filename: '[name].[hash].js',
-    chunkFilename: '[name].[hash].js',
-    publicPath: '/dist/js/'
+    filename: '[name].[contenthash].js',
+    chunkFilename: '[name].[contenthash].js',
+    publicPath: '/dist/js/',
   },
   plugins: [
     new VueLoaderPlugin(),
@@ -143,7 +106,6 @@ const webpackConfig = {
       },
       {
         test: /\.ts$/,
-        exclude: /(node_modules|bower_components)/,
         use: [{
           loader: 'ts-loader',
           options: {
@@ -154,8 +116,7 @@ const webpackConfig = {
       },
       {
         test: /\.vue$/,
-        exclude: /(node_modules|bower_components)/,
-        use: ['vue-loader'],
+        loader: 'vue-loader'
       },
       {
         test: /\.pug$/,

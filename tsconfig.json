@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "es6",
     "strict": true,
     "module": "commonjs",
     "incremental": true,
