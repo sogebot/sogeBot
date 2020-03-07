@@ -1,14 +1,3 @@
-const fs = require('fs');
-
-// setup config
-const config = require('../config.json');
-require('./mocks');
-
-config.metrics = config.metrics || {};
-config.metrics.translations = false;
-
-fs.writeFileSync('../config.json', JSON.stringify(config));
-
 global.mocha = true;
 require('../dest/main.js');
 

@@ -1,7 +1,8 @@
-import * as configFile from '@ormconfig';
-
 import { EntitySchema } from 'typeorm';
-import { ColumnNumericTransformer } from './_transformer';
+import { ColumnNumericTransformer } from './_transformer.js';
+
+
+
 
 // Cache mirror from tags endpoint
 /* {
@@ -174,7 +175,7 @@ export const TwitchStats = new EntitySchema<Readonly<Required<TwitchStatsInterfa
     currentHosts: { type: Number, default: 0 },
     newChatters: { type: Number, default: 0 },
     currentBits: { type: 'bigint', transformer: new ColumnNumericTransformer() },
-    currentTips: { type: 'float', transformer: new ColumnNumericTransformer(), precision: configFile.type === 'mysql' ? 12 : undefined  },
+    currentTips: { type: 'float', transformer: new ColumnNumericTransformer(), precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined  },
     currentWatched: { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },
 });

@@ -1,7 +1,5 @@
 'use strict'
 
-require('module-alias/register')
-
 const _ = require('lodash')
 const term = require('terminal-kit').terminal
 

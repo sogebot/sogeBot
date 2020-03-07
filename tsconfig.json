@@ -1,31 +1,24 @@
 {
   "compilerOptions": {
-    // this aligns with Vue's browser support
     "target": "es6",
-    // this enables stricter inference for data properties on `this`
     "strict": true,
-    // if using webpack 2+ or rollup, to leverage tree shaking:
     "module": "commonjs",
     "incremental": true,
     "removeComments": true,
     "noImplicitAny": false,
     "noImplicitThis": true,
     "noUnusedLocals": true,
-    "moduleResolution": "node",
-    "lib": ["es6", "dom"],
-    "declaration": false,
     "esModuleInterop": true,
+    "moduleResolution": "node",
+    "lib": ["es2018", "dom"],
     "resolveJsonModule": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "declaration": false,
     "noResolve": false,
-    "skipLibCheck": false,
+    "allowJs": true,
     "baseUrl": "./",
-    "paths": {
-      "@config": ["config.json", "src/bot/data/config.example.json"],
-      "@ormconfig": ["ormconfig.json", "src/bot/data/ormconfig.sqlite.json"]
-    },
-    "sourceMap": true,
+    "sourceMap": true
   },
   "include": [
     "src/**/*.js",
@@ -37,7 +30,6 @@
   ],
   "exclude": [
     "src/bot",
-    "node_modules",
-    "config.json"
+    "node_modules"
   ]
 }

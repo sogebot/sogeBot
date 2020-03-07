@@ -1,5 +1,3 @@
-import * as configFile from '@ormconfig';
-
 import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
@@ -27,8 +25,8 @@ export const HowLongToBeatGame = new EntitySchema<Readonly<Required<HowLongToBea
     startedAt: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
     timeToBeatMain: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
     timeToBeatCompletionist: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-    gameplayMain: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: configFile.type === 'mysql' ? 12 : undefined  },
-    gameplayCompletionist: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: configFile.type === 'mysql' ? 12 : undefined  },
+    gameplayMain: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined  },
+    gameplayCompletionist: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined  },
   },
   indices: [
     { name: 'IDX_301758e0e3108fc902d5436527', columns: ['game'], unique: true },

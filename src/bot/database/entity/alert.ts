@@ -1,5 +1,3 @@
-import * as configFile from '@ormconfig';
-
 import { ColumnNumericTransformer } from './_transformer';
 import type { EntitySchemaColumnOptions } from 'typeorm';
 import { EntitySchema } from 'typeorm';
@@ -240,7 +238,7 @@ export const AlertMedia = new EntitySchema<Readonly<Required<AlertMediaInterface
   columns: {
     primaryId: { type: Number, primary: true, generated: true },
     id: { type: String },
-    b64data: { type: ['mysql', 'mariadb'].includes(configFile.type.toLowerCase()) ? 'longtext' : 'text' },
+    b64data: { type: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'sqlite') ? 'longtext' : 'text' },
     chunkNo: { type: Number },
   },
   indices: [

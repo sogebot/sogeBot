@@ -32,7 +32,6 @@ import spotify from './integrations/spotify';
 import { linesParsed, status as statusObj } from './helpers/parser';
 import { systems, list } from './helpers/register'
 import customvariables from './customvariables';
-const config = require('@config')
 
 let app;
 let server;
@@ -46,7 +45,7 @@ function Panel () {
   app.use(bodyParser.urlencoded({ extended: true }))
 
   server = http.createServer(app)
-  this.port = process.env.PORT ?? config.panel.port;
+  this.port = process.env.PORT ?? '20000';
 
   // webhooks integration
   app.post('/webhooks/hub/follows', (req, res) => {

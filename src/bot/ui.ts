@@ -1,11 +1,8 @@
-import 'module-alias/register';
-
 import Core from './_interface';
 import { settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
-import config from '@config';
-import { filter, isNil, isString, set } from 'lodash';
+import { filter, isString, set } from 'lodash';
 import moment from 'moment';
 import { getBroadcaster } from './commons';
 import { isMainThread } from './cluster';
@@ -14,6 +11,8 @@ import general from './general';
 import currency from './currency';
 import webhooks from './webhooks';
 import { list } from './helpers/register';
+
+const timezone = (process.env.TIMEZONE ?? 'system') === 'system' || !process.env.TIMEZONE ? moment.tz.guess() : process.env.TIMEZONE;
 
 class UI extends Core {
   @settings()
@@ -71,7 +70,7 @@ class UI extends Core {
       data.currencySymbol = currency.symbol(currency.mainCurrency);
 
       // timezone
-      data.timezone = config.timezone === 'system' || isNil(config.timezone) ? moment.tz.guess() : config.timezone;
+      data.timezone = timezone;
 
       // lang
       data.lang = general.lang;
@@ -95,7 +94,7 @@ class UI extends Core {
       data.currencySymbol = currency.symbol(currency.mainCurrency);
 
       // timezone
-      data.timezone = config.timezone === 'system' || isNil(config.timezone) ? moment.tz.guess() : config.timezone;
+      data.timezone = timezone;
 
       // lang
       data.lang = general.lang;

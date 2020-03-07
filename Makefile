@@ -1,9 +1,11 @@
-PATH    := node_modules/.bin:$(PATH)
-SHELL   := /bin/bash
-VERSION := `node -pe "require('./package.json').version"`
-ENV     ?= production
+PATH         := node_modules/.bin:$(PATH)
+SHELL        := /bin/bash
+VERSION      := `node -pe "require('./package.json').version"`
+ENV          ?= production
+WEBPACKCACHE := `find src/panel -type f -print0 | sort -z | xargs -0 sha1sum | sha1sum | sed 's/ .*//'`
 
-all : info clean prepare dependencies patch css ui bot
+all : info clean dependencies patch css ui bot
+refresh : info clean prepare dependencies2 patch
 .PHONY : all
 
 info:
@@ -12,10 +14,12 @@ info:
 	@git log --oneline -3 | cat
 
 dependencies:
-	@echo -ne "\n\t ----- Installation of production dependencies\n"
-	@npm install --production
-	@echo -ne "\n\t ----- Installation of development dependencies\n"
-	@npm install --only=dev
+	@echo -ne "\n\t ----- Installation of dependencies(npm ci)\n"
+	@npm ci
+
+dependencies2:
+	@echo -ne "\n\t ----- Installation of dependencies (npm install)\n"
+	@npm install
 
 patch:
 	@echo -ne "\n\t ----- Going through node_modules patches\n"
@@ -28,7 +32,6 @@ eslint:
 
 jsonlint:
 	@echo -ne "\n\t ----- Checking jsonlint\n"
-	npx jsonlint src/bot/data/config.example.json -q
 	for a in $$(find ./locales -type f -iname "*.json" -print); do /bin/false; jsonlint $$a -q; done
 
 css:
@@ -38,22 +41,21 @@ css:
 	@npx postcss public/dist/css/*.css --use autoprefixer -d public/dist/css/
 
 ui:
-	@echo -ne "\n\t ----- Bundling with webpack\n"
-	@NODE_ENV=$(ENV) npx webpack
+	@echo -ne "\n\t ----- Bundling with webpack ($(ENV) cache:${WEBPACKCACHE})\n"
+	@NODE_ENV=$(ENV) CACHE=${WEBPACKCACHE} npx webpack --progress
 
 bot:
 	@echo -ne "\n\t ----- Building bot\n"
 	@npx tsc -p src/bot
 
-release:
-	@cp ./src/bot/data/config.example.json ./
-	ENV version=${VERSION} node tools/release.js
-
 pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"
-	@cp ./src/bot/data/config.example.json ./
-	@cp ./src/bot/data/ormconfig*.json ./
-	@npx bestzip sogeBot-$(VERSION).zip .npmrc ormconfig*.json npm-shrinkwrap.json config.example.json dest/ locales/ public/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ fonts.json
+	@cp ./src/bot/data/.env* ./
+	@cp ./src/bot/data/.env-sqlite ./.env
+	@cp ./.npmrc ./.npmrc-bak
+	@echo 'only=production' >> ./.npmrc
+	@npx bestzip sogeBot-$(VERSION).zip .npmrc .env* package-lock.json dest/ locales/ public/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ fonts.json
+	@cp ./.npmrc-bak ./.npmrc
 
 prepare:
 	@echo -ne "\n\t ----- Cleaning up node_modules\n"

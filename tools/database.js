@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 'use strict';
-require('module-alias/register');
 
 const fs = require('fs');
 

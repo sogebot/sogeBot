@@ -27,9 +27,6 @@ RUN make
 # Remove dev dependencies (not needed anymore)
 RUN npm prune --production
 
-# Copy config example
-RUN cp src/bot/data/config.example.json config.json
-
 # Expose API port to the outside
 EXPOSE 20000
 

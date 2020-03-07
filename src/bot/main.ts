@@ -1,10 +1,11 @@
+require('dotenv').config();
+
 if (Number(process.versions.node.split('.')[0]) < 11) {
   process.stdout.write('Upgrade your version of NodeJs! You need at least NodeJs 11.0.0, https://nodejs.org/en/. Current version is ' + process.versions.node + '\n');
   process.exit(1);
 }
 
 import 'reflect-metadata';
-import 'module-alias/register';
 
 import { debug, error, info, warning } from './helpers/log';
 
@@ -20,29 +21,48 @@ import { changelog } from './changelog';
 import { autoLoad } from './commons';
 import chalk from 'chalk';
 import { existsSync, unlinkSync } from 'fs';
+import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
+import { normalize } from 'path';
 
 const connect = async function () {
   const connectionOptions = await getConnectionOptions();
+  const type = process.env.TYPEORM_CONNECTION;
+  if (!type) {
+    error('Set your db in .env or as ENVIROMNENT VARIABLES');
+    process.exit(1);
+  }
+
   debug('connection', { connectionOptions });
-  await createConnection({
-    ...connectionOptions,
-    synchronize: false,
-    migrationsRun: true,
-  });
+
+  if (type === 'mysql' || type === 'mariadb') {
+    await createConnection({
+      type,
+      logging: ['error'],
+      ...connectionOptions,
+      synchronize: false,
+      migrationsRun: true,
+      charset: 'UTF8_GENERAL_CI',
+    } as MysqlConnectionOptions);
+  } else {
+    await createConnection({
+      type,
+      logging: ['error'],
+      ...connectionOptions,
+      synchronize: false,
+      migrationsRun: true,
+    });
+  }
+  const typeToLog = {
+    sqlite: 'SQLite3',
+    mariadb: 'MySQL/MariaDB',
+    mysql: 'MySQL/MariaDB',
+    postgres: 'PostgreSQL',
+  };
+  info(`Initialized ${typeToLog[type]} database (${normalize(String(connectionOptions.database))})`);
 };
 
 async function main () {
   try {
-    await connect();
-  } catch (e) {
-    error('Bot was unable to connect to database, check your ormconfig.json');
-    error(e);
-    error('Exiting bot.');
-    process.exit(1);
-  }
-  let translate, panel;
-  try {
-
     const version = _.get(process, 'env.npm_package_version', 'x.y.z');
     if (!existsSync('./restart.pid')) {
       process.stdout.write(figlet.textSync('sogeBot ' + version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'), {
@@ -53,7 +73,15 @@ async function main () {
       process.stdout.write('\n\n\n');
       info('Bot is starting up');
     }
-
+    await connect();
+  } catch (e) {
+    error('Bot was unable to connect to database, check your database configuration');
+    error(e);
+    error('Exiting bot.');
+    process.exit(1);
+  }
+  let translate, panel;
+  try {
     // Initialize all core singletons
     setTimeout(() => {
       clusterInit();

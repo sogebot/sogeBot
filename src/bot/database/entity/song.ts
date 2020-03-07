@@ -1,5 +1,3 @@
-import * as configFile from '@ormconfig';
-
 import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
@@ -35,9 +33,9 @@ export const SongPlaylist = new EntitySchema<Readonly<Required<SongPlaylistInter
   columns: {
     videoId: { type: String, primary: true },
     lastPlayedAt: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-    seed: { type: 'float', precision: configFile.type === 'mysql' ? 12 : undefined  },
+    seed: { type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined  },
     title: { type: String },
-    loudness: { type: 'float', precision: configFile.type === 'mysql' ? 12 : undefined  },
+    loudness: { type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined  },
     length: { type: Number },
     volume: { type: Number },
     startTime: { type: Number },
@@ -53,7 +51,7 @@ export const SongRequest = new EntitySchema<Readonly<Required<SongRequestInterfa
     videoId: { type: String },
     addedAt: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
     title: { type: String },
-    loudness: { type: 'float', precision: configFile.type === 'mysql' ? 12 : undefined  },
+    loudness: { type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined  },
     length: { type: Number },
     username: { type: String },
   },

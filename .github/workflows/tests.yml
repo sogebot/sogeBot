@@ -19,7 +19,7 @@ jobs:
     - uses: actions/cache@v1
       with:
         path: ${{ steps.npm-cache.outputs.dir }}
-        key: ${{ runner.os }}-node-${{ hashFiles('**/npm-shrinkwrap.json') }}
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
         restore-keys: |
           ${{ runner.os }}-node-
     - name: All test should be run - tests are not containing describe.only
@@ -34,11 +34,11 @@ jobs:
       with:
         node-version: 13
     - name: Install eslint and dependencies
-      run: npm install typescript eslint jsonlint-mod @typescript-eslint/parser @typescript-eslint/eslint-plugin --only=dev
+      run: npm install typescript eslint jsonlint-mod @typescript-eslint/parser @typescript-eslint/eslint-plugin mkdirp@latest glob
     - name: Run eslint
-      run: make eslint
+      run: ENV=development make eslint
     - name: Run jsonlint
-      run: make jsonlint
+      run: ENV=development make jsonlint
   sqlite:
     name: SQLite tests
     if: contains(github.event.pull_request.body, '[skip-tests]') != true
@@ -53,7 +53,7 @@ jobs:
     - uses: actions/cache@v1
       with:
         path: ${{ steps.npm-cache.outputs.dir }}
-        key: ${{ runner.os }}-node-${{ hashFiles('**/npm-shrinkwrap.json') }}
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
         restore-keys: |
           ${{ runner.os }}-node-
     - name: install node v13
@@ -61,7 +61,7 @@ jobs:
       with:
         node-version: 13
     - name: Install all dependencies
-      run: make
+      run: ENV=development make
     - name: Set proper db to use
       run: npm run test:config:sqlite
     - name: Run migration test
@@ -98,7 +98,7 @@ jobs:
     - uses: actions/cache@v1
       with:
         path: ${{ steps.npm-cache.outputs.dir }}
-        key: ${{ runner.os }}-node-${{ hashFiles('**/npm-shrinkwrap.json') }}
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
         restore-keys: |
           ${{ runner.os }}-node-
     - name: install node v13
@@ -106,7 +106,7 @@ jobs:
       with:
         node-version: 12
     - name: Install all dependencies
-      run: make
+      run: ENV=development make
     - name: Set proper db to use
       run: npm run test:config:postgres
     - name: Run migration test
@@ -145,7 +145,7 @@ jobs:
     - uses: actions/cache@v1
       with:
         path: ${{ steps.npm-cache.outputs.dir }}
-        key: ${{ runner.os }}-node-${{ hashFiles('**/npm-shrinkwrap.json') }}
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
         restore-keys: |
           ${{ runner.os }}-node-
     - name: install node v13
@@ -153,7 +153,7 @@ jobs:
       with:
         node-version: 12
     - name: Install all dependencies
-      run: make
+      run: ENV=development make
     - name: Set proper db to use
       run: npm run test:config:mysql
     - name: Run migration test

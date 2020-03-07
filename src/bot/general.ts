@@ -1,5 +1,3 @@
-import 'module-alias/register';
-
 import { readdirSync, writeFileSync } from 'fs';
 import gitCommitInfo from 'git-commit-info';
 import { get, isBoolean, isFinite, isNil, isNumber, isString, map } from 'lodash';

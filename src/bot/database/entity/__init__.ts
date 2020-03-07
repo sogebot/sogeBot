@@ -1,2 +1,1 @@
-// needed for @ormconfig import
-require('module-alias/register');
+require('dotenv').config();
