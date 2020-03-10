@@ -183,6 +183,7 @@
     "pug": "2.0.4",
     "pug-plain-loader": "1.0.0",
     "raw-loader": "4.0.0",
+    "run-node": "2.0.0",
     "sinon": "9.0.0",
     "terser": "4.6.6",
     "terser-webpack-plugin": "2.3.5",
