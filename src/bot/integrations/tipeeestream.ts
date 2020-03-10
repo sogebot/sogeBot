@@ -7,7 +7,7 @@ import Integration from './_interface';
 import { onChange, onStartup } from '../decorators/on.js';
 import { settings } from '../decorators';
 import { ui } from '../decorators.js';
-import { info, tip, error } from '../helpers/log.js';
+import { error, info, tip } from '../helpers/log.js';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
 
 import { getRepository } from 'typeorm';
@@ -48,7 +48,7 @@ class TipeeeStream extends Integration {
     if (this.socketToTipeeestream !== null) {
       this.socketToTipeeestream.removeAllListeners();
       this.socketToTipeeestream.disconnect();
-      this.socketToTipeeestream = null
+      this.socketToTipeeestream = null;
     }
   }
 
@@ -79,7 +79,7 @@ class TipeeeStream extends Integration {
     if (this.socketToTipeeestream !== null) {
       this.socketToTipeeestream.on('connect_error', (e) => {
         error(chalk.red('TIPEEESTREAM.COM:') + ' error while connecting, ' + e);
-      })
+      });
       this.socketToTipeeestream.on('connect', () => {
         if (this.socketToTipeeestream !== null) {
           this.socketToTipeeestream.emit('join-room', { room: this.apiKey.trim(), username: this.username.trim() });
