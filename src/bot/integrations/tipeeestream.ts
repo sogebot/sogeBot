@@ -138,24 +138,24 @@ class TipeeeStream extends Integration {
         autohost: false,
       });
 
-      const getUser = async (username, id) => {
+      const getUser = async (username: string) => {
         const userByUsername = await getRepository(User).findOne({ where: { username }});
+
         if (userByUsername) {
           return userByUsername;
         }
 
-        const user = await getRepository(User).findOne({ where: { userId: id }});
-        if (user) {
-          return user;
-        } else {
-          return getRepository(User).save({
-            userId: Number(id),
-            username,
-          });
-        }
+        const userId = await users.getIdByName(username);
+
+        const user = await getRepository(User).findOne({ where: { userId }});
+
+        return user || await getRepository(User).save({
+          userId: userId,
+          username,
+        });
       };
 
-      const user = await getUser(username, await users.getIdByName(username));
+      const user = await getUser(username);
       const newTip: UserTipInterface = {
         amount,
         currency: donationCurrency,
