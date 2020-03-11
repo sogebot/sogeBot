@@ -2,7 +2,6 @@ import { YouTube } from 'popyt';
 import * as _ from 'lodash';
 import { isMainThread } from '../cluster';
 import { setInterval } from 'timers';
-import ytsearch from 'youtube-search';
 import ytdl from 'ytdl-core';
 import ytpl from 'ytpl';
 
@@ -18,14 +17,12 @@ import { SongBan, SongPlaylist, SongPlaylistInterface, SongRequest } from '../da
 import oauth from '../oauth';
 import { translate } from '../translate';
 
-const defaultApiKey = 'AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0';
-
 let importInProgress = false;
 
 class Songs extends System {
   interval: { [id: string]: NodeJS.Timeout } = {};
 
-  youtubeApi: any = null;
+  youtubeApi: YouTube | null = null;
 
   @shared()
   meanLoudness = -15;
@@ -81,7 +78,7 @@ class Songs extends System {
     if (this.apiKey.trim().length > 0) {
       this.youtubeApi = new YouTube(this.apiKey);
     } else {
-      this.youtubeApi = new YouTube(defaultApiKey);
+      error('SONGS: Missing YouTube API key.');
     }
   }
 
@@ -506,17 +503,20 @@ class Songs extends System {
     const match = opts.parameters.match(urlRegex);
     const videoID = (match && match[1].length === 11) ? match[1] : opts.parameters;
 
-    if (_.isNil(videoID.match(idRegex))) { // not id or url
-      ytsearch(opts.parameters, { maxResults: 1, key: this.apiKey.trim().length > 0 ? this.apiKey : defaultApiKey }, (err, results) => {
-        if (err) {
-          return error(err);
+    if (_.isNil(videoID.match(idRegex))) { // not id or url]
+      try {
+        if (!this.youtubeApi) {
+          throw new Error('API not initialized. Missing YouTube API key.');
         }
-        if (typeof results !== 'undefined' && results[0].id) {
-          opts.parameters = results[0].id;
+        const search = await this.youtubeApi.searchVideos(opts.parameters, 1);
+        if (search.results.length > 0) {
+          opts.parameters = search.results[0].id;
           this.addSongToQueue(opts);
         }
-      });
-      return;
+        return;
+      } catch (e) {
+        error(`SONGS: ${e.message}`);
+      }
     }
 
     // is song banned?
@@ -529,11 +529,16 @@ class Songs extends System {
     // is correct category?
     if (this.onlyMusicCategory) {
       try {
+        if (!this.youtubeApi) {
+          throw new Error('API not initialized. Missing YouTube API key.');
+        }
         const video = await this.youtubeApi.getVideo(videoID);
         if (video.data.snippet.categoryId !== '10') {
           return sendMessage(translate('songs.incorrect-category'), opts.sender, opts.attr);
         }
-      } catch (e) {}
+      } catch (e) {
+        error(`SONGS: ${e.message}`);
+      }
     }
 
     ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, async (err, videoInfo) => {
