@@ -38,9 +38,9 @@ jobs:
         npm install glob;
         npm install --only=dev typescript eslint jsonlint-mod @typescript-eslint/parser @typescript-eslint/eslint-plugin mkdirp@latest;
     - name: Run eslint
-      run: ENV=development make eslint
+      run: ENV=development make info clean dependencies patch bot eslint
     - name: Run jsonlint
-      run: ENV=development make jsonlint
+      run: ENV=development make info clean dependencies patch bot jsonlint
   sqlite:
     name: SQLite tests
     if: contains(github.event.pull_request.body, '[skip-tests]') != true
@@ -62,8 +62,8 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 13
-    - name: Install all dependencies
-      run: ENV=development make
+    - name: Install all dependencies and build just a bot
+      run: ENV=development make info clean dependencies patch bot
     - name: Set proper db to use
       run: npm run test:config:sqlite
     - name: Run migration test
@@ -107,8 +107,8 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 12
-    - name: Install all dependencies
-      run: ENV=development make
+    - name: Install all dependencies and build just a bot
+      run: ENV=development make info clean dependencies patch bot
     - name: Set proper db to use
       run: npm run test:config:postgres
     - name: Run migration test
@@ -154,8 +154,8 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 12
-    - name: Install all dependencies
-      run: ENV=development make
+    - name: Install all dependencies and build just a bot
+      run: ENV=development make info clean dependencies patch bot
     - name: Set proper db to use
       run: npm run test:config:mysql
     - name: Run migration test
@@ -164,6 +164,37 @@ jobs:
       run: npm test
   mysql2:
     name: MySQL/MariaDB tests
+    if: contains(github.event.pull_request.body, '[skip-tests]') == true
+    runs-on: ubuntu-latest
+    steps:
+    - name: Skipped OK
+      run: 'echo "[skip-tests] found"'
+  fullbuild:
+    name: Make test
+    if: contains(github.event.pull_request.body, '[skip-tests]') != true
+    needs: eslint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Get npm cache directory
+      id: npm-cache
+      run: |
+        echo "::set-output name=dir::$(npm config get cache)"
+    - uses: actions/cache@v1
+      with:
+        path: ${{ steps.npm-cache.outputs.dir }}
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+    - name: install node v13
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - name: Install all dependencies and build everything
+      run: ENV=development make
+    - name: Set proper db to use
+  fullbuild2:
+    name: Make test
     if: contains(github.event.pull_request.body, '[skip-tests]') == true
     runs-on: ubuntu-latest
     steps:
