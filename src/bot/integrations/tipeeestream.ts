@@ -96,85 +96,93 @@ class TipeeeStream extends Integration {
       });
 
       this.socketToTipeeestream.on('new-event', async (data) => {
-        if (data.event.type !== 'donation') {
-          return;
-        }
-        const { amount, message } = data.event.parameters;
-        const username = data.event.parameters.username.toLowerCase();
-        const donationCurrency = data.event.parameters.currency;
-
-        eventlist.add({
-          event: 'tip',
-          amount,
-          currency: donationCurrency,
-          username,
-          message,
-          timestamp: Date.now(),
-        });
-
-        events.fire('tip', {
-          username,
-          amount: parseFloat(amount).toFixed(2),
-          currency: donationCurrency,
-          amountInBotCurrency: Number(currency.exchange(amount, donationCurrency, currency.mainCurrency)).toFixed(2),
-          currencyInBot: currency.mainCurrency,
-          message,
-        });
-
-        alerts.trigger({
-          event: 'tips',
-          name: username,
-          amount: Number(parseFloat(amount).toFixed(2)),
-          currency: donationCurrency,
-          monthsName: '',
-          message,
-          autohost: false,
-        });
-
-        if (!data._is_test_alert) {
-          const getUser = async (username, id) => {
-            const userByUsername = await getRepository(User).findOne({ where: { username }});
-            if (userByUsername) {
-              return userByUsername;
-            }
-
-            const user = await getRepository(User).findOne({ where: { userId: id }});
-            if (user) {
-              return user;
-            } else {
-              return getRepository(User).save({
-                userId: Number(id),
-                username,
-              });
-            }
-          };
-
-          const user = await getUser(username, await users.getIdByName(username));
-          const newTip: UserTipInterface = {
-            amount,
-            currency: donationCurrency,
-            sortAmount: currency.exchange(Number(amount), donationCurrency, 'EUR'),
-            message,
-            tippedAt: Date.now(),
-          };
-          user.tips.push(newTip);
-          getRepository(User).save(user);
-
-          tip(`${username}${user.userId ? '#' + user.userId : ''}, amount: ${amount.toFixed(2)}${donationCurrency}, message: ${message}`);
-
-          if (api.isStreamOnline) {
-            api.stats.currentTips += Number(currency.exchange(amount, donationCurrency, currency.mainCurrency));
-          }
-        }
-
-        triggerInterfaceOnTip({
-          username,
-          amount,
-          message,
-          currency: donationCurrency,
-          timestamp: _.now(),
-        });
+        this.parse(data);
       });
+    }
+  }
+
+  async parse(data) {
+    if (data.event.type !== 'donation') {
+      return;
+    }
+    try {
+      const { amount, message } = data.event.parameters;
+      const username = data.event.parameters.username.toLowerCase();
+      const donationCurrency = data.event.parameters.currency;
+
+      eventlist.add({
+        event: 'tip',
+        amount,
+        currency: donationCurrency,
+        username,
+        message,
+        timestamp: Date.now(),
+      });
+
+      events.fire('tip', {
+        username,
+        amount: parseFloat(amount).toFixed(2),
+        currency: donationCurrency,
+        amountInBotCurrency: Number(currency.exchange(amount, donationCurrency, currency.mainCurrency)).toFixed(2),
+        currencyInBot: currency.mainCurrency,
+        message,
+      });
+
+      alerts.trigger({
+        event: 'tips',
+        name: username,
+        amount: Number(parseFloat(amount).toFixed(2)),
+        currency: donationCurrency,
+        monthsName: '',
+        message,
+        autohost: false,
+      });
+
+      if (!data._is_test_alert) {
+        const getUser = async (username, id) => {
+          const userByUsername = await getRepository(User).findOne({ where: { username }});
+          if (userByUsername) {
+            return userByUsername;
+          }
+
+          const user = await getRepository(User).findOne({ where: { userId: id }});
+          if (user) {
+            return user;
+          } else {
+            return getRepository(User).save({
+              userId: Number(id),
+              username,
+            });
+          }
+        };
+
+        const user = await getUser(username, await users.getIdByName(username));
+        const newTip: UserTipInterface = {
+          amount,
+          currency: donationCurrency,
+          sortAmount: currency.exchange(Number(amount), donationCurrency, 'EUR'),
+          message,
+          tippedAt: Date.now(),
+        };
+        user.tips.push(newTip);
+        getRepository(User).save(user);
+
+        tip(`${username}${user.userId ? '#' + user.userId : ''}, amount: ${amount.toFixed(2)}${donationCurrency}, message: ${message}`);
+
+        if (api.isStreamOnline) {
+          api.stats.currentTips += Number(currency.exchange(amount, donationCurrency, currency.mainCurrency));
+        }
+      }
+
+      triggerInterfaceOnTip({
+        username,
+        amount,
+        message,
+        currency: donationCurrency,
+        timestamp: _.now(),
+      });
+    } catch (e) {
+      error(e);
     }
   }
 }
