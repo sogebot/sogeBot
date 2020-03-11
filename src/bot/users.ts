@@ -151,7 +151,6 @@ class Users extends Core {
     }
 
     const userId = await this.getIdByName(username);
-
     const userById = await getRepository(User).findOne({ where: { userId }});
 
     return userById || await getRepository(User).save({
