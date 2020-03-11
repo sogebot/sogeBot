@@ -61,7 +61,7 @@ class TipeeeStream extends Integration {
     }
 
     // get current avaliable host and port
-    // destucted response from https://api.tipeeestream.com/v2.0/site/socket
+    // destructured response from https://api.tipeeestream.com/v2.0/site/socket
     // example response: { "code": 200, "message": "success", "datas": { "port": "443", "host": "https://sso-cf.tipeeestream.com" } }
     const { data: { datas: { host, port }}} = await axios.get('https://api.tipeeestream.com/v2.0/site/socket');
 
