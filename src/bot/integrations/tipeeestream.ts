@@ -65,7 +65,7 @@ class TipeeeStream extends Integration {
     // example response: { "code": 200, "message": "success", "datas": { "port": "443", "host": "https://sso-cf.tipeeestream.com" } }
     const { data: { datas: { host, port }}} = await axios.get('https://api.tipeeestream.com/v2.0/site/socket');
 
-    this.socketToTipeeestream = io(`${host}:${port}`,
+    this.socketToTipeeestream = io.connect(`${host}:${port}`,
       {
         reconnection: true,
         reconnectionDelay: 1000,
