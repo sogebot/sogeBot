@@ -30,10 +30,6 @@ class TipeeeStream extends Integration {
   @ui({ type: 'text-input', secret: true })
   apiKey = '';
 
-  constructor () {
-    super();
-  }
-
   @onStartup()
   @onChange('enabled')
   onStateChange (key: string, val: boolean) {
