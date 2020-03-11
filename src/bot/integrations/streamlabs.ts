@@ -5,7 +5,7 @@ import chalk from 'chalk';
 import Integration from './_interface';
 import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import { info, tip } from '../helpers/log';
+import { debug, info, tip } from '../helpers/log';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 
 import { getRepository } from 'typeorm';
@@ -74,25 +74,17 @@ class Streamlabs extends Integration {
   async parse(eventData) {
     if (eventData.type === 'donation') {
       for (const event of eventData.message) {
+        debug('streamlabs', event);
         if (!event.isTest) {
-          const getUser = async (username, id) => {
-            const userByUsername = await getRepository(User).findOne({ where: { username: username.toLowerCase() }});
-            if (userByUsername) {
-              return userByUsername;
-            }
+          const user = await users.getUserByUsername(event.from.toLowerCase());
 
-            const user = await getRepository(User).findOne({ where: { userId: id }});
-            if (user) {
-              return user;
-            } else {
-              return getRepository(User).save({
-                userId: Number(id),
-                username: username.toLowerCase(),
-              });
-            }
-          };
+          // workaround for https://github.com/sogehige/sogeBot/issues/3338
+          // incorrect currency on event rerun
+          const parsedCurrency = (event.formatted_amount as string).match(/(?<currency>[A-Z\$]{3}|\$)/);
+          if (parsedCurrency && parsedCurrency.groups) {
+            event.currency = parsedCurrency.groups.currency === '$' ? 'USD' : parsedCurrency.groups.currency;
+          }
 
-          const user = await getUser(event.from.toLowerCase(), await users.getIdByName(event.from.toLowerCase().toLowerCase()));
           const newTip: UserTipInterface = {
             amount: Number(event.amount),
             currency: event.currency,
