@@ -28,9 +28,9 @@ jobs:
         npm install glob;
         npm install --only=dev typescript eslint jsonlint-mod @typescript-eslint/parser @typescript-eslint/eslint-plugin mkdirp@latest;
     - name: Run eslint
-      run: ENV=development make info clean dependencies patch bot eslint
+      run: ENV=development make eslint
     - name: Run jsonlint
-      run: ENV=development make info clean dependencies patch bot jsonlint
+      run: ENV=development make jsonlint
   sqlite:
     name: SQLite tests
     if: contains(github.event.pull_request.body, '[skip-tests]') != true
