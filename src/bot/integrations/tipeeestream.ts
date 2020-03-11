@@ -138,40 +138,38 @@ class TipeeeStream extends Integration {
         autohost: false,
       });
 
-      if (!data._is_test_alert) {
-        const getUser = async (username, id) => {
-          const userByUsername = await getRepository(User).findOne({ where: { username }});
-          if (userByUsername) {
-            return userByUsername;
-          }
-
-          const user = await getRepository(User).findOne({ where: { userId: id }});
-          if (user) {
-            return user;
-          } else {
-            return getRepository(User).save({
-              userId: Number(id),
-              username,
-            });
-          }
-        };
-
-        const user = await getUser(username, await users.getIdByName(username));
-        const newTip: UserTipInterface = {
-          amount,
-          currency: donationCurrency,
-          sortAmount: currency.exchange(Number(amount), donationCurrency, 'EUR'),
-          message,
-          tippedAt: Date.now(),
-        };
-        user.tips.push(newTip);
-        getRepository(User).save(user);
-
-        tip(`${username}${user.userId ? '#' + user.userId : ''}, amount: ${amount.toFixed(2)}${donationCurrency}, message: ${message}`);
-
-        if (api.isStreamOnline) {
-          api.stats.currentTips += Number(currency.exchange(amount, donationCurrency, currency.mainCurrency));
+      const getUser = async (username, id) => {
+        const userByUsername = await getRepository(User).findOne({ where: { username }});
+        if (userByUsername) {
+          return userByUsername;
         }
+
+        const user = await getRepository(User).findOne({ where: { userId: id }});
+        if (user) {
+          return user;
+        } else {
+          return getRepository(User).save({
+            userId: Number(id),
+            username,
+          });
+        }
+      };
+
+      const user = await getUser(username, await users.getIdByName(username));
+      const newTip: UserTipInterface = {
+        amount,
+        currency: donationCurrency,
+        sortAmount: currency.exchange(Number(amount), donationCurrency, 'EUR'),
+        message,
+        tippedAt: Date.now(),
+      };
+      user.tips.push(newTip);
+      getRepository(User).save(user);
+
+      tip(`${username}${user.userId ? '#' + user.userId : ''}, amount: ${amount.toFixed(2)}${donationCurrency}, message: ${message}`);
+
+      if (api.isStreamOnline) {
+        api.stats.currentTips += Number(currency.exchange(amount, donationCurrency, currency.mainCurrency));
       }
 
       triggerInterfaceOnTip({
