@@ -143,6 +143,23 @@ class Users extends Core {
     return user.userId;
   }
 
+  async getUserByUsername(username: string) {
+    const userByUsername = await getRepository(User).findOne({ where: { username }});
+
+    if (userByUsername) {
+      return userByUsername;
+    }
+
+    const userId = await this.getIdByName(username);
+
+    const userById = await getRepository(User).findOne({ where: { userId }});
+
+    return userById || await getRepository(User).save({
+      userId,
+      username,
+    });
+  }
+
   sockets () {
     adminEndpoint(this.nsp, 'viewers::updateId', async (opts: { userId: number; username: string }, cb) => {
       try {
