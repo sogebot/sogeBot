@@ -54,50 +54,54 @@ class TipeeeStream extends Integration {
 
   @onChange('apiKey')
   async connect () {
-    this.disconnect();
+    try {
+      this.disconnect();
 
-    if (this.username.trim() === '' || this.apiKey.trim() === '' || !this.enabled) {
-      return;
-    }
+      if (this.username.trim() === '' || this.apiKey.trim() === '' || !this.enabled) {
+        return;
+      }
 
-    // get current avaliable host and port
-    // destructured response from https://api.tipeeestream.com/v2.0/site/socket
-    // example response: { "code": 200, "message": "success", "datas": { "port": "443", "host": "https://sso-cf.tipeeestream.com" } }
-    const { data: { datas: { host, port }}} = await axios.get('https://api.tipeeestream.com/v2.0/site/socket');
+      // get current avaliable host and port
+      // destructured response from https://api.tipeeestream.com/v2.0/site/socket
+      // example response: { "code": 200, "message": "success", "datas": { "port": "443", "host": "https://sso-cf.tipeeestream.com" } }
+      const { data: { datas: { host, port }}} = await axios.get('https://api.tipeeestream.com/v2.0/site/socket');
 
-    this.socketToTipeeestream = io.connect(`${host}:${port}`,
-      {
-        reconnection: true,
-        reconnectionDelay: 1000,
-        reconnectionDelayMax: 5000,
-        reconnectionAttempts: Infinity,
-        query: {
-          access_token: this.apiKey.trim(),
-        },
-      });
+      this.socketToTipeeestream = io.connect(`${host}:${port}`,
+        {
+          reconnection: true,
+          reconnectionDelay: 1000,
+          reconnectionDelayMax: 5000,
+          reconnectionAttempts: Infinity,
+          query: {
+            access_token: this.apiKey.trim(),
+          },
+        });
 
-    if (this.socketToTipeeestream !== null) {
-      this.socketToTipeeestream.on('connect_error', (e) => {
-        error(chalk.red('TIPEEESTREAM.COM:') + ' error while connecting, ' + e);
-      });
-      this.socketToTipeeestream.on('connect', () => {
-        if (this.socketToTipeeestream !== null) {
-          this.socketToTipeeestream.emit('join-room', { room: this.apiKey.trim(), username: this.username.trim() });
-        }
-        info(chalk.yellow('TIPEEESTREAM.COM:') + ' Successfully connected socket to service');
-      });
-      this.socketToTipeeestream.on('reconnect_attempt', () => {
-        info(chalk.yellow('TIPEEESTREAM.COM:') + ' Trying to reconnect to service');
-      });
-      this.socketToTipeeestream.on('disconnect', () => {
-        info(chalk.yellow('TIPEEESTREAM.COM:') + ' Socket disconnected from service');
-        this.disconnect();
-        this.socketToTipeeestream = null;
-      });
+      if (this.socketToTipeeestream !== null) {
+        this.socketToTipeeestream.on('connect_error', (e) => {
+          error(chalk.red('TIPEEESTREAM.COM:') + ' error while connecting, ' + e);
+        });
+        this.socketToTipeeestream.on('connect', () => {
+          if (this.socketToTipeeestream !== null) {
+            this.socketToTipeeestream.emit('join-room', { room: this.apiKey.trim(), username: this.username.trim() });
+          }
+          info(chalk.yellow('TIPEEESTREAM.COM:') + ' Successfully connected socket to service');
+        });
+        this.socketToTipeeestream.on('reconnect_attempt', () => {
+          info(chalk.yellow('TIPEEESTREAM.COM:') + ' Trying to reconnect to service');
+        });
+        this.socketToTipeeestream.on('disconnect', () => {
+          info(chalk.yellow('TIPEEESTREAM.COM:') + ' Socket disconnected from service');
+          this.disconnect();
+          this.socketToTipeeestream = null;
+        });
 
-      this.socketToTipeeestream.on('new-event', async (data) => {
-        this.parse(data);
-      });
+        this.socketToTipeeestream.on('new-event', async (data) => {
+          this.parse(data);
+        });
+      }
+    } catch (e) {
+      error(e);
     }
   }
 
