@@ -12,16 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: Get npm cache directory
-      id: npm-cache
-      run: |
-        echo "::set-output name=dir::$(npm config get cache)"
-    - uses: actions/cache@v1
-      with:
-        path: ${{ steps.npm-cache.outputs.dir }}
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
     - name: All test should be run - tests are not containing describe.only
       run: |
           if ! grep -r -l 'describe.only' ./test/; then
@@ -48,22 +38,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: Get npm cache directory
-      id: npm-cache
-      run: |
-        echo "::set-output name=dir::$(npm config get cache)"
-    - uses: actions/cache@v1
-      with:
-        path: ${{ steps.npm-cache.outputs.dir }}
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
     - name: install node v13
       uses: actions/setup-node@v1
       with:
         node-version: 13
-    - name: Install all dependencies
-      run: ENV=development make
+    - name: Install all dependencies and build just a bot
+      run: ENV=development make info clean dependencies patch bot
     - name: Set proper db to use
       run: npm run test:config:sqlite
     - name: Run migration test
@@ -93,22 +73,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: Get npm cache directory
-      id: npm-cache
-      run: |
-        echo "::set-output name=dir::$(npm config get cache)"
-    - uses: actions/cache@v1
-      with:
-        path: ${{ steps.npm-cache.outputs.dir }}
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
     - name: install node v13
       uses: actions/setup-node@v1
       with:
         node-version: 12
-    - name: Install all dependencies
-      run: ENV=development make
+    - name: Install all dependencies and build just a bot
+      run: ENV=development make info clean dependencies patch bot
     - name: Set proper db to use
       run: npm run test:config:postgres
     - name: Run migration test
@@ -140,22 +110,12 @@ jobs:
         mysql database: 'sogebot' # Optional, default value is "test". The specified database which will be create
         mysql root password: 'Passw0rd' # Required if "mysql user" is empty, default is empty. The root superuser password
     - uses: actions/checkout@master
-    - name: Get npm cache directory
-      id: npm-cache
-      run: |
-        echo "::set-output name=dir::$(npm config get cache)"
-    - uses: actions/cache@v1
-      with:
-        path: ${{ steps.npm-cache.outputs.dir }}
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
     - name: install node v13
       uses: actions/setup-node@v1
       with:
         node-version: 12
-    - name: Install all dependencies
-      run: ENV=development make
+    - name: Install all dependencies and build just a bot
+      run: ENV=development make info clean dependencies patch bot
     - name: Set proper db to use
       run: npm run test:config:mysql
     - name: Run migration test
@@ -164,6 +124,26 @@ jobs:
       run: npm test
   mysql2:
     name: MySQL/MariaDB tests
+    if: contains(github.event.pull_request.body, '[skip-tests]') == true
+    runs-on: ubuntu-latest
+    steps:
+    - name: Skipped OK
+      run: 'echo "[skip-tests] found"'
+  fullbuild:
+    name: Make test
+    if: contains(github.event.pull_request.body, '[skip-tests]') != true
+    needs: eslint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: install node v13
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - name: Install all dependencies and build everything
+      run: ENV=development make
+  fullbuild2:
+    name: Make test
     if: contains(github.event.pull_request.body, '[skip-tests]') == true
     runs-on: ubuntu-latest
     steps:
