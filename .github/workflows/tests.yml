@@ -192,7 +192,6 @@ jobs:
         node-version: 12
     - name: Install all dependencies and build everything
       run: ENV=development make
-    - name: Set proper db to use
   fullbuild2:
     name: Make test
     if: contains(github.event.pull_request.body, '[skip-tests]') == true
