@@ -29,6 +29,8 @@ class Module {
   public on: InterfaceSettings.On;
   public socket: any = null;
 
+  onStartupTriggered = false;
+
   get isDisabledByEnv(): boolean {
     const isDisableIgnored = typeof process.env.ENABLE !== 'undefined' && process.env.ENABLE.toLowerCase().split(',').includes(this.constructor.name.toLowerCase());
     return typeof process.env.DISABLE !== 'undefined'
@@ -139,6 +141,7 @@ class Module {
                 this[event.fName]('enabled', enabled);
               }
             };
+            this.onStartupTriggered = true;
           };
           onStartup();
 
@@ -351,7 +354,7 @@ class Module {
     } // force disable if dependencies are disabled or disabled by env
 
     // on.change handler on enabled
-    if (isMainThread && isStatusChanged) {
+    if (isMainThread && isStatusChanged && this.onStartupTriggered) {
       const path = this._name === 'core' ? this.constructor.name.toLowerCase() : `${this._name}.${this.constructor.name.toLowerCase()}`;
       for (const event of getFunctionList('change', path + '.enabled')) {
         if (typeof this[event.fName] === 'function') {
