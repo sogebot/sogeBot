@@ -7,7 +7,8 @@
     },
     "accessToken": {
       "title": "Access token",
-      "help": "Currently, we don't have way to obtain access token, but you can use PhantomBot.tv https://phantombot.tv/streamlabs/"
-    }
+      "help": "Get your access token at https://www.sogebot.xyz/integrations/#StreamLabs"
+    },
+    "accessTokenBtn": "StreamLabs access token generator"
   }
 }

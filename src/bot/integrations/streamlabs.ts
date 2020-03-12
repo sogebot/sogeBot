@@ -29,6 +29,15 @@ class Streamlabs extends Integration {
   @ui({ type: 'text-input', secret: true })
   accessToken = '';
 
+  @ui({
+    type: 'link',
+    href: 'https://www.sogebot.xyz/integrations/#StreamLabs',
+    class: 'btn btn-primary btn-block',
+    target: '_blank',
+    text: 'integrations.streamlabs.settings.accessTokenBtn',
+  })
+  accessTokenBtn = null;
+
   @settings()
   @ui({ type: 'text-input', secret: true })
   socketToken = '';
