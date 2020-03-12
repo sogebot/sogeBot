@@ -1,11 +1,12 @@
 import * as _ from 'lodash';
 import io from 'socket.io-client';
 import chalk from 'chalk';
+import axios from 'axios';
 
 import Integration from './_interface';
-import { settings, ui } from '../decorators';
+import { settings, shared, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import { debug, info, tip } from '../helpers/log';
+import { debug, error, info, tip } from '../helpers/log';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 
 import { getRepository } from 'typeorm';
@@ -20,9 +21,27 @@ import alerts from '../registries/alerts';
 class Streamlabs extends Integration {
   socketToStreamlabs: SocketIOClient.Socket | null = null;
 
+  // save last donationId which rest api had
+  @shared(true)
+  afterDonationId = '';
+
+  @settings()
+  @ui({ type: 'text-input', secret: true })
+  accessToken = '';
+
   @settings()
   @ui({ type: 'text-input', secret: true })
   socketToken = '';
+
+  constructor() {
+    super();
+
+    setInterval(() => {
+      if (this.onStartupTriggered) {
+        this.restApiInterval();
+      };
+    }, 30000);
+  }
 
   @onStartup()
   @onChange('enabled')
@@ -38,6 +57,39 @@ class Streamlabs extends Integration {
     if (this.socketToStreamlabs !== null) {
       this.socketToStreamlabs.removeAllListeners();
       this.socketToStreamlabs.disconnect();
+    }
+  }
+
+  async restApiInterval () {
+    if (this.enabled && this.accessToken.length > 0) {
+      try {
+        const after = String(this.afterDonationId).length > 0 ? `&after=${this.afterDonationId}` : '';
+        const result = (await axios.get('https://streamlabs.com/api/v1.0/donations?access_token=' + this.accessToken + after)).data;
+        debug('streamlabs', 'https://streamlabs.com/api/v1.0/donations?access_token=' + this.accessToken + after);
+        debug('streamlabs', result);
+        let donationIdSet = false;
+        for (const item of result.data) {
+          if (!donationIdSet) {
+            this.afterDonationId = item.donation_id;
+            donationIdSet = true;
+          }
+
+          const { name, currency, amount, message, created_at } = item;
+          this.parse({
+            type: 'donation',
+            message: [{
+              formatted_amount: `${currency}${amount}`,
+              amount: Number(amount),
+              message: decodeURI(message),
+              from: name,
+              isTest: false,
+              created_at: Number(created_at),
+            }],
+          });
+        }
+      } catch (e) {
+        error(e);
+      }
     }
   }
 
@@ -85,12 +137,22 @@ class Streamlabs extends Integration {
             event.currency = parsedCurrency.groups.currency === '$' ? 'USD' : parsedCurrency.groups.currency;
           }
 
+          const created_at = (event.created_at * 1000) || Date.now();
+          // check if it is new tip (by message and by tippedAt time interval)
+          if (user.tips.find(item => {
+            return item.message === event.message
+            && (item.tippedAt || 0) - 30000 < created_at
+            && (item.tippedAt || 0) + 30000 > created_at;
+          })) {
+            return; // we already have this one
+          }
+
           const newTip: UserTipInterface = {
             amount: Number(event.amount),
             currency: event.currency,
             sortAmount: currency.exchange(Number(event.amount), event.currency, 'EUR'),
             message: event.message,
-            tippedAt: Date.now(),
+            tippedAt: created_at,
           };
           user.tips.push(newTip);
           getRepository(User).save(user);

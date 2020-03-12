@@ -4,6 +4,10 @@
     "socketToken": {
       "title": "Socket token",
       "help": "Get socket token from streamlabs dashboard API settings->API tokens->Your Socket API Token"
+    },
+    "accessToken": {
+      "title": "Access token",
+      "help": "Currently, we don't have way to obtain access token, but you can use PhantomBot.tv https://phantombot.tv/streamlabs/"
     }
   }
 }

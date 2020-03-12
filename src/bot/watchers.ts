@@ -6,6 +6,7 @@ import { getRepository } from 'typeorm';
 import { Settings } from './database/entity/settings';
 import { getFunctionList } from './decorators/on';
 import { isDbConnected } from './helpers/database';
+import { list } from './helpers/register';
 
 const variables: {
   [x: string]: any;
@@ -33,9 +34,9 @@ export const VariableWatcher = {
       let checkedModule;
 
       if (k.startsWith('core')) {
-        checkedModule = (require(`./${k.split('.')[1]}`)).default;
+        checkedModule = list('core').find(m => m.constructor.name.toLowerCase() === k.split('.')[1]);
       } else {
-        checkedModule = (require(`./${k.split('.')[0]}/${k.split('.')[1]}`)).default;
+        checkedModule = list(k.split('.')[0]).find(m => m.constructor.name.toLowerCase() === k.split('.')[1]);
       }
       const variable = k.split('.').slice(2).join('.');
       const value = cloneDeep(get(checkedModule, variable, undefined));
