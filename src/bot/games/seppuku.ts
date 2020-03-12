@@ -18,7 +18,7 @@ class Seppuku extends Game {
       return;
     }
 
-    const isMod = await isModerator(opts.sender);
+    const isMod = isModerator(opts.sender);
     if (isMod) {
       sendMessage(translate('gambling.seppuku.mod'), opts.sender, opts.attr);
       return;

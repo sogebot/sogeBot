@@ -160,7 +160,7 @@ class Duel extends Game {
       } else {
         // check if under gambling cooldown
         const cooldown = this.cooldown;
-        const isMod = await isModerator(opts.sender);
+        const isMod = isModerator(opts.sender);
         if (new Date().getTime() - new Date(this._cooldown).getTime() > cooldown * 1000
           || (this.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {
           // save new cooldown if not bypassed

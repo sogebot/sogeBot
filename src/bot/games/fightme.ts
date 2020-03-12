@@ -86,8 +86,8 @@ class FightMe extends Game {
     if (challenge) {
       const winner = _.random(0, 1, false);
       const isMod = {
-        user: await isModerator(user),
-        sender: await isModerator(challenger),
+        user: isModerator(user),
+        sender: isModerator(challenger),
       };
 
       // vs broadcaster
@@ -154,7 +154,7 @@ class FightMe extends Game {
     } else {
       // check if under gambling cooldown
       const cooldown = this.cooldown;
-      const isMod = await isModerator(opts.sender);
+      const isMod = isModerator(opts.sender);
       if (new Date().getTime() - new Date(this._cooldown).getTime() < cooldown * 1000
         && !(this.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {
         sendMessage(prepare('gambling.fightme.cooldown', {

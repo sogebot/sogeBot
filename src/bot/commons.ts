@@ -280,19 +280,19 @@ export function isBroadcaster(user) {
   }
 }
 
-export async function isModerator(user: UserInterface | undefined): Promise<boolean> {
+export function isModerator(user: UserInterface | undefined): boolean {
   return user?.isModerator ?? false;
 }
 
-export async function isVIP(user: UserInterface | undefined): Promise<boolean> {
+export function isVIP(user: UserInterface | undefined): boolean {
   return user?.isVIP ?? false;
 }
 
-export async function isFollower(user: UserInterface | undefined): Promise<boolean> {
+export function isFollower(user: UserInterface | undefined): boolean {
   return user?.isFollower ?? false;
 }
 
-export async function isSubscriber(user: UserInterface | undefined): Promise<boolean> {
+export function isSubscriber(user: UserInterface | undefined): boolean {
   return user?.isSubscriber ?? false;
 }
 

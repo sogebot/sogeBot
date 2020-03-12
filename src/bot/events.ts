@@ -120,9 +120,9 @@ class Events extends Core {
 
       // add is object
       attributes.is = {
-        moderator: await isModerator(user),
-        subscriber: await isSubscriber(user),
-        vip: await isVIP(user),
+        moderator: isModerator(user),
+        subscriber: isSubscriber(user),
+        vip: isVIP(user),
         broadcaster: isBroadcaster(attributes.username),
         bot: isBot(attributes.username),
         owner: isOwner(attributes.username),
@@ -140,9 +140,9 @@ class Events extends Core {
 
       // add is object
       attributes.recipientis = {
-        moderator: await isModerator(user),
-        subscriber: await isSubscriber(user),
-        vip: await isVIP(user),
+        moderator: isModerator(user),
+        subscriber: isSubscriber(user),
+        vip: isVIP(user),
         broadcaster: isBroadcaster(attributes.recipient),
         bot: isBot(attributes.recipient),
         owner: isOwner(attributes.recipient),
