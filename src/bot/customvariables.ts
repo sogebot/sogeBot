@@ -298,7 +298,7 @@ class CustomVariables {
             follower: get(_user, 'is.follower', false),
             vip: get(_user, 'is.vip', false),
             subscriber: get(_user, 'is.subscriber', false),
-            mod: await isModerator(username),
+            mod: isModerator(username),
           },
         };
         return userObj;

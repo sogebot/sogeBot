@@ -219,16 +219,16 @@ class Permissions extends Core {
           }
           break;
         case 'moderators':
-          shouldProceed = await isModerator(user);
+          shouldProceed = isModerator(user);
           break;
         case 'subscribers':
-          shouldProceed = await isSubscriber(user);
+          shouldProceed = isSubscriber(user);
           break;
         case 'vip':
-          shouldProceed = await isVIP(user);
+          shouldProceed = isVIP(user);
           break;
         case 'followers':
-          shouldProceed = await isFollower(user);
+          shouldProceed = isFollower(user);
           break;
         default:
           shouldProceed = false; // we don't have any automation

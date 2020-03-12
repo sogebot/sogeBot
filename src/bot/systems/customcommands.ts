@@ -390,9 +390,9 @@ class CustomCommands extends System {
     }
 
     const $is = {
-      moderator: await isModerator($userObject),
-      subscriber: await isSubscriber($userObject),
-      vip: await isVIP($userObject),
+      moderator: isModerator($userObject),
+      subscriber: isSubscriber($userObject),
+      vip: isVIP($userObject),
       broadcaster: isBroadcaster(opts.sender.username),
       bot: isBot(opts.sender.username),
       owner: isOwner(opts.sender.username),
