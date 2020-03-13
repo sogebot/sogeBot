@@ -154,15 +154,15 @@ export default class TTS extends Vue {
   voices: {text: string; value: string}[] = [];
 
   beforeDestroy() {
-    this.$unloadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.configuration.integrations.responsivevoice.api.key)
+    this.$unloadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.configuration.integrations.ResponsiveVoice.api.key)
   }
 
   mounted() {
     this.state.loaded = this.$state.progress;
-    if (this.configuration.integrations.responsivevoice.api.key.trim().length === 0) {
+    if (this.configuration.integrations.ResponsiveVoice.api.key.trim().length === 0) {
       this.state.loaded = this.$state.fail;
     } else {
-      this.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.configuration.integrations.responsivevoice.api.key)
+      this.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.configuration.integrations.ResponsiveVoice.api.key)
         .then(() => this.initResponsiveVoice());
     }
   }
