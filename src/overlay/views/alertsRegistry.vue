@@ -1,10 +1,10 @@
 <template>
   <div>
+    <div v-if="urlParam('debug')" class="debug">
+      <json-viewer :value="{data}" boxed copyable :expand-depth="2"></json-viewer>
+      <json-viewer :value="{runningAlert}" boxed copyable :expand-depth="2"></json-viewer>
+    </div>
     <template v-if="state.loaded === $state.success">
-      <div v-if="urlParam('debug')" class="debug">
-        <json-viewer :value="{data}" v-if="data" boxed copyable :expand-depth="2"></json-viewer>
-        <json-viewer :value="{runningAlert}" v-if="runningAlert" boxed copyable :expand-depth="2"></json-viewer>
-      </div>
       <div v-if="runningAlert">
         <audio ref="audio">
           <source :src="'/registry/alerts/' + runningAlert.alert.soundId">
@@ -501,65 +501,70 @@ export default class AlertsRegistryOverlays extends Vue {
         this.updatedAt = updatedAt;
         await new Promise((resolve) => {
           this.socket.emit('alerts::getOne', this.id, async (data: AlertInterface) => {
-            if (this.runningAlert !== null) {
-              return; // skip any changes if alert in progress
-            }
-            if (!isEqual(data, this.data)) {
-              this.data = data;
-
-              for (const [lang, isEnabled] of Object.entries(this.data.loadStandardProfanityList)) {
-                if (isEnabled) {
-                  let list = require('../../bot/data/vulgarities/' + lang + '.txt');
-                  this.defaultProfanityList = [...this.defaultProfanityList, ...list.default.split(/\r?\n/)]
-
-                  let listHappyWords = require('../../bot/data/happyWords/' + lang + '.txt');
-                  this.listHappyWords = [...this.listHappyWords, ...listHappyWords.default.split(/\r?\n/)].filter(o => o.trim().length > 0)
-                }
+            try {
+              if (this.runningAlert !== null) {
+                return; // skip any changes if alert in progress
               }
+              if (!isEqual(data, this.data)) {
+                this.data = data;
 
-              this.defaultProfanityList = [
-                ...this.defaultProfanityList,
-                ...data.customProfanityList.split(',').map(o => o.trim()),
-              ].filter(o => o.trim().length > 0)
+                for (const [lang, isEnabled] of Object.entries(this.data.loadStandardProfanityList)) {
+                  if (isEnabled) {
+                    let list = require('../../bot/data/vulgarities/' + lang + '.txt');
+                    this.defaultProfanityList = [...this.defaultProfanityList, ...list.default.split(/\r?\n/)]
 
-              console.debug('Profanity list', this.defaultProfanityList);
-              console.debug('Happy words', this.listHappyWords);
-              this.state.loaded = this.$state.success;
-
-              const head = document.getElementsByTagName('head')[0]
-              const style = document.createElement('style')
-              style.type = 'text/css';
-              for (const event of [
-                ...data.cheers,
-                ...data.follows,
-                ...data.hosts,
-                ...data.raids,
-                ...data.resubs,
-                ...data.subgifts,
-                ...data.subs,
-                ...data.tips,
-              ]) {
-                if (!this.loadedFonts.includes(event.font.family)) {
-                  console.debug('Loading font', event.font.family)
-                  this.loadedFonts.push(event.font.family)
-                  const font = event.font.family.replace(/ /g, '+')
-                  const css = "@import url('https://fonts.googleapis.com/css?family=" + font + "');"
-                  style.appendChild(document.createTextNode(css));
+                    let listHappyWords = require('../../bot/data/happyWords/' + lang + '.txt');
+                    this.listHappyWords = [...this.listHappyWords, ...listHappyWords.default.split(/\r?\n/)].filter(o => o.trim().length > 0)
+                  }
                 }
-              }
-              head.appendChild(style);
 
-              // load emotes
-              await new Promise((done) => {
-                this.socketEmotes.emit('getCache', (data) => {
-                  this.emotes = data;
-                  console.debug('= Emotes loaded')
-                  done();
+                this.defaultProfanityList = [
+                  ...this.defaultProfanityList,
+                  ...data.customProfanityList.split(',').map(o => o.trim()),
+                ].filter(o => o.trim().length > 0)
+
+                console.debug('Profanity list', this.defaultProfanityList);
+                console.debug('Happy words', this.listHappyWords);
+                this.state.loaded = this.$state.success;
+
+                const head = document.getElementsByTagName('head')[0]
+                const style = document.createElement('style')
+                style.type = 'text/css';
+                for (const event of [
+                  ...data.cheers,
+                  ...data.follows,
+                  ...data.hosts,
+                  ...data.raids,
+                  ...data.resubs,
+                  ...data.subgifts,
+                  ...data.subs,
+                  ...data.tips,
+                ]) {
+                  if (!this.loadedFonts.includes(event.font.family)) {
+                    console.debug('Loading font', event.font.family)
+                    this.loadedFonts.push(event.font.family)
+                    const font = event.font.family.replace(/ /g, '+')
+                    const css = "@import url('https://fonts.googleapis.com/css?family=" + font + "');"
+                    style.appendChild(document.createTextNode(css));
+                  }
+                }
+                head.appendChild(style);
+
+                // load emotes
+                await new Promise((done) => {
+                  this.socketEmotes.emit('getCache', (data) => {
+                    this.emotes = data;
+                    console.debug('= Emotes loaded')
+                    done();
+                  })
                 })
-              })
 
-              console.debug('== alerts ready ==')
-              resolve();
+                console.debug('== alerts ready ==')
+                resolve();
+              }
+            } catch (e) {
+              console.error({data});
+              console.error(e);
             }
           })
         })
