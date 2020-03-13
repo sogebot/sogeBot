@@ -220,29 +220,35 @@ class Users extends Core {
       const connection = await getConnection();
       opts.page = opts.page ?? 0;
 
+
+      /*
+        SQL query:
+          select user.*, COALESCE(sumTips, 0) as sumTips, COALESCE(sumBits, 0) as sumBits
+          from user
+            left join (select userUserId, sum(sortAmount) as sumTips from user_tip group by userUserId) user_tip on user.userId = user_tip.userUserId
+            left join (select userUserId, sum(amount) as sumBits from user_bit group by userUserId) user_bit on user.userId = user_bit.userUserId
+      */
       let query;
       if (connection.options.type === 'postgres') {
         query = getRepository(User).createQueryBuilder('user')
           .orderBy(opts.order?.orderBy ?? 'user.username' , opts.order?.sortOrder ?? 'ASC')
-          .select('COALESCE(SUM("user_bit"."amount"), 0)', 'sumBits')
-          .addSelect('COALESCE(SUM("user_tip"."sortAmount"), 0)', 'sumTips')
+          .select('COALESCE("sumTips", 0)', 'sumTips')
+          .addSelect('COALESCE("sumBits", 0)', 'sumBits')
           .addSelect('"user".*')
           .offset(opts.page * 25)
           .limit(25)
-          .leftJoin('user_bit', 'user_bit', '"user_bit"."userUserId" = "user"."userId"')
-          .leftJoin('user_tip', 'user_tip', '"user_tip"."userUserId" = "user"."userId"')
-          .groupBy('user.userId');
+          .leftJoin('(select "userUserId", sum("amount") as "sumBits" from "user_bit" group by "userUserId")', 'user_bit', '"user_bit"."userUserId" = "user"."userId"')
+          .leftJoin('(select "userUserId", sum("sortAmount") as "sumTips" from "user_tip" group by "userUserId")', 'user_tip', '"user_tip"."userUserId" = "user"."userId"');
       } else {
         query = getRepository(User).createQueryBuilder('user')
           .orderBy(opts.order?.orderBy ?? 'user.username' , opts.order?.sortOrder ?? 'ASC')
-          .select('COALESCE(SUM(user_bit.amount), 0)', 'sumBits')
-          .addSelect('COALESCE(SUM(user_tip.sortAmount), 0)', 'sumTips')
+          .select('COALESCE(sumTips, 0)', 'sumTips')
+          .addSelect('COALESCE(sumBits, 0)', 'sumBits')
           .addSelect('user.*')
           .offset(opts.page * 25)
           .limit(25)
-          .leftJoin('user_bit', 'user_bit', 'user_bit.userUserId = user.userId')
-          .leftJoin('user_tip', 'user_tip', 'user_tip.userUserId = user.userId')
-          .groupBy('user.userId');
+          .leftJoin('(select userUserId, sum(amount) as sumBits from user_bit group by userUserId)', 'user_bit', 'user_bit.userUserId = user.userId')
+          .leftJoin('(select userUserId, sum(sortAmount) as sumTips from user_tip group by userUserId)', 'user_tip', 'user_tip.userUserId = user.userId');
       }
 
       if (typeof opts.order !== 'undefined') {
@@ -269,18 +275,18 @@ class Users extends Core {
 
       if (typeof opts.search !== 'undefined') {
         query.andWhere(new Brackets(w => {
-          w.where('"user"."username" like :like', { like: `%${opts.search}%` });
-          w.orWhere('CAST("user"."userId" AS TEXT) like :like', { like: `%${opts.search}%` });
+          if (connection.options.type === 'postgres') {
+            w.where('"user"."username" like :like', { like: `%${opts.search}%` });
+            w.orWhere('CAST("user"."userId" AS TEXT) like :like', { like: `%${opts.search}%` });
+          } else {
+            w.where('`user`.`username` like :like', { like: `%${opts.search}%` });
+            w.orWhere('CAST(`user`.`userId` AS CHAR) like :like', { like: `%${opts.search}%` });
+          }
         }));
       }
 
       const viewers = await query.getRawMany();
       const count = await query.getCount();
-
-      for (const viewer of viewers) {
-        // recount sumTips to bot currency
-        viewer.sumTips = await currency.exchange(viewer.sumTips, 'EUR', currency.mainCurrency);
-      }
 
       cb(viewers, count, opts.state);
     });

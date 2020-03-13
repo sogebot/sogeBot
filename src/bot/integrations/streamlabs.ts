@@ -159,7 +159,7 @@ class Streamlabs extends Integration {
           const newTip: UserTipInterface = {
             amount: Number(event.amount),
             currency: event.currency,
-            sortAmount: currency.exchange(Number(event.amount), event.currency, 'EUR'),
+            sortAmount: currency.exchange(Number(event.amount), event.currency, currency.mainCurrency),
             message: event.message,
             tippedAt: created_at,
           };

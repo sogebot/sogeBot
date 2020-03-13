@@ -1,5 +1,6 @@
 /* global describe it before */
 const commons = require('../../../dest/commons');
+const currency = require('../../../dest/currency').default;
 
 
 require('../../general.js');
@@ -36,7 +37,7 @@ describe('Top - !top tips', () => {
       for (let j = 0; j <= i; j++) {
         user.tips.push({
           amount: j,
-          sortAmount: j,
+          sortAmount: 2*j,
           currency: 'EUR',
           message: 'test',
           timestamp: Date.now(),
@@ -45,6 +46,10 @@ describe('Top - !top tips', () => {
 
       await getRepository(User).save(user);
     }
+  });
+
+  it('Update change rates', async() => {
+    await currency.updateRates();
   });
 
   it('run !top tips and expect correct output', async () => {

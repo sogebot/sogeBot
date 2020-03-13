@@ -142,7 +142,7 @@ class TipeeeStream extends Integration {
       const newTip: UserTipInterface = {
         amount,
         currency: donationCurrency,
-        sortAmount: currency.exchange(Number(amount), donationCurrency, 'EUR'),
+        sortAmount: currency.exchange(Number(amount), donationCurrency, currency.mainCurrency),
         message,
         tippedAt: Date.now(),
       };

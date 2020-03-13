@@ -91,7 +91,7 @@ class Qiwi extends Integration {
         const newTip: UserTipInterface = {
           amount: Number(amount),
           currency: DONATION_CURRENCY,
-          sortAmount: currency.exchange(Number(amount), DONATION_CURRENCY, 'EUR'),
+          sortAmount: currency.exchange(Number(amount), DONATION_CURRENCY, currency.mainCurrency),
           message: message,
           tippedAt: Date.now(),
         };
