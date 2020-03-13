@@ -162,6 +162,7 @@ class Streamlabs extends Integration {
             sortAmount: currency.exchange(Number(event.amount), event.currency, currency.mainCurrency),
             message: event.message,
             tippedAt: created_at,
+            exchangeRates: currency.rates,
           };
           user.tips.push(newTip);
           getRepository(User).save(user);

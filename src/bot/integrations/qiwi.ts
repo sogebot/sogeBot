@@ -94,6 +94,7 @@ class Qiwi extends Integration {
           sortAmount: currency.exchange(Number(amount), DONATION_CURRENCY, currency.mainCurrency),
           message: message,
           tippedAt: Date.now(),
+          exchangeRates: currency.rates,
         };
         user.tips.push(newTip);
         getRepository(User).save(user);

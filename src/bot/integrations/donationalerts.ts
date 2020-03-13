@@ -143,6 +143,7 @@ class Donationalerts extends Integration {
             sortAmount: currency.exchange(Number(data.amount), data.currency, currency.mainCurrency),
             message: data.message,
             tippedAt: Date.now(),
+            exchangeRates: currency.rates,
           };
           user.tips.push(newTip);
           getRepository(User).save(user);

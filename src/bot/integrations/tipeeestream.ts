@@ -144,6 +144,7 @@ class TipeeeStream extends Integration {
         currency: donationCurrency,
         sortAmount: currency.exchange(Number(amount), donationCurrency, currency.mainCurrency),
         message,
+        exchangeRates: currency.rates,
         tippedAt: Date.now(),
       };
       user.tips.push(newTip);

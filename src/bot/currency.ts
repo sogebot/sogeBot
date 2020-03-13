@@ -11,9 +11,11 @@ import { isMainThread } from './cluster';
 import * as constants from './constants';
 import { settings, shared, ui } from './decorators';
 import { error, info, warning } from './helpers/log';
+import { onChange, onLoad } from './decorators/on';
 import { getRepository } from 'typeorm';
 import { UserTip } from './database/entity/user';
-import { onChange, onLoad } from './decorators/on';
+
+export type currency = 'USD' | 'AUD' | 'BGN' | 'BRL' | 'CAD' | 'CHF' | 'CNY' | 'CZK' | 'DKK' | 'EUR' | 'GBP' | 'HKD' | 'HRK' | 'HUF' | 'IDR' | 'ILS' | 'INR' | 'ISK' | 'JPY' | 'KRW' | 'MXN' | 'MYR' | 'NOK' | 'NZD' | 'PHP' | 'PLN' | 'RON' | 'RUB' | 'SEK' | 'SGD' | 'THB' | 'TRY' | 'ZAR';
 
 class Currency extends Core {
   mainCurrencyLoaded = false;
@@ -23,10 +25,15 @@ class Currency extends Core {
     type: 'selector',
     values: ['USD', 'AUD', 'BGN', 'BRL', 'CAD', 'CHF', 'CNY', 'CZK', 'DKK', 'EUR', 'GBP', 'HKD', 'HRK', 'HUF', 'IDR', 'ILS', 'INR', 'ISK', 'JPY', 'KRW', 'MXN', 'MYR', 'NOK', 'NZD', 'PHP', 'PLN', 'RON', 'RUB', 'SEK', 'SGD', 'THB', 'TRY', 'ZAR'],
   })
-  public mainCurrency: 'USD' | 'AUD' | 'BGN' | 'BRL' | 'CAD' | 'CHF' | 'CNY' | 'CZK' | 'DKK' | 'EUR' | 'GBP' | 'HKD' | 'HRK' | 'HUF' | 'IDR' | 'ILS' | 'INR' | 'ISK' | 'JPY' | 'KRW' | 'MXN' | 'MYR' | 'NOK' | 'NZD' | 'PHP' | 'PLN' | 'RON' | 'RUB' | 'SEK' | 'SGD' | 'THB' | 'TRY' | 'ZAR' = 'EUR';
+  public mainCurrency: currency = 'EUR';
 
   @shared()
-  public rates: { [x: string]: number } = {};
+  public rates: { [key in currency]: number } = {
+    AUD: 0, BGN: 0, BRL: 0, CAD: 0, CHF: 0, CNY: 0, CZK: 1 /* CZK:CZK 1:1 */,
+    DKK: 0, EUR: 0, GBP: 0, HKD: 0, HRK: 0, HUF: 0, IDR: 0, ILS: 0, INR: 0,
+    ISK: 0, JPY: 0, KRW: 0, MXN: 0, MYR: 0, NOK: 0, NZD: 0, PHP: 0, PLN: 0,
+    RON: 0, RUB: 0, SEK: 0, SGD: 0, THB: 0, TRY: 0, USD: 0, ZAR: 0,
+  };
 
   public timeouts: any = {};
   public base = 'CZK';
@@ -46,24 +53,25 @@ class Currency extends Core {
     return getSymbolFromCurrency(code);
   }
 
-  public exchange(value: number, from: string, to: string): number {
+  public exchange(value: number, from: string, to: string, rates?: { [key in currency]: number }): number {
+    if (!rates) {
+      rates = _.cloneDeep(this.rates);
+    }
     try {
-      this.rates[this.base] = 1; // base is always 1:1
-
       if (from.toLowerCase().trim() === to.toLowerCase().trim()) {
         return Number(value); // nothing to do
       }
-      if (_.isNil(this.rates[from])) {
+      if (_.isNil(rates[from])) {
         throw Error(`${from} code was not found`);
       }
-      if (_.isNil(this.rates[to]) && to.toLowerCase().trim() !== this.base.toLowerCase().trim()) {
+      if (_.isNil(rates[to]) && to.toLowerCase().trim() !== this.base.toLowerCase().trim()) {
         throw Error(`${to} code was not found`);
       }
 
       if (to.toLowerCase().trim() !== this.base.toLowerCase().trim()) {
-        return (value * this.rates[from]) / this.rates[to];
+        return (value * rates[from]) / rates[to];
       } else {
-        return value * this.rates[from];
+        return value * rates[from];
       }
     } catch (e) {
       warning(`Currency exchange error - ${e.message}`);
@@ -78,6 +86,18 @@ class Currency extends Core {
   }
 
   @onChange('mainCurrency')
+  public async recalculateSortAmount() {
+    info(chalk.yellow('CURRENCY:') + ' Recalculating tips (in progress).');
+    const result = await getRepository(UserTip).find();
+    for (const tip of result) {
+      await getRepository(UserTip).save({
+        ...tip,
+        sortAmount: this.exchange(tip.amount, tip.currency, this.mainCurrency, tip.exchangeRates),
+      });
+    }
+    info(chalk.yellow('CURRENCY:') + ' Recalculating tips (completed).');
+  }
+
   public async updateRates() {
     clearTimeout(this.timeouts.updateRates);
 
@@ -102,21 +122,6 @@ class Currency extends Core {
         this.rates[code] = Number((Number(rate.replace(',', '.')) / Number(count)).toFixed(3));
       }
       info(chalk.yellow('CURRENCY:') + ' fetched rates');
-
-      await new Promise((resolve) => {
-        const wait = () => {
-          if (this.mainCurrencyLoaded) {
-            resolve();
-          } else {
-            setTimeout(() => wait(), 10);
-          }
-        };
-        wait();
-      });
-      for (const tip of await getRepository(UserTip).find()) {
-        await getRepository(UserTip).update({ id: tip.id }, { sortAmount: this.exchange(Number(tip.amount), tip.currency, this.mainCurrency) });
-      }
-      info(chalk.yellow('CURRENCY:') + ' Tips exchange rate updated');
     } catch (e) {
       error(e.stack);
       refresh = constants.SECOND;
