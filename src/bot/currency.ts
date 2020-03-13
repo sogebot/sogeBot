@@ -13,7 +13,7 @@ import { settings, shared, ui } from './decorators';
 import { error, info, warning } from './helpers/log';
 import { getRepository } from 'typeorm';
 import { UserTip } from './database/entity/user';
-import { onLoad } from './decorators/on';
+import { onChange, onLoad } from './decorators/on';
 
 class Currency extends Core {
   mainCurrencyLoaded = false;
@@ -77,6 +77,7 @@ class Currency extends Core {
     this.mainCurrencyLoaded = true;
   }
 
+  @onChange('mainCurrency')
   public async updateRates() {
     clearTimeout(this.timeouts.updateRates);
 
@@ -112,9 +113,10 @@ class Currency extends Core {
         };
         wait();
       });
-      for (const tip of await getRepository(UserTip).find({ where: { currency: this.mainCurrency }})) {
-        getRepository(UserTip).update({ id: tip.id }, { sortAmount: this.exchange(Number(tip.amount), tip.currency, 'EUR') });
+      for (const tip of await getRepository(UserTip).find()) {
+        await getRepository(UserTip).update({ id: tip.id }, { sortAmount: this.exchange(Number(tip.amount), tip.currency, this.mainCurrency) });
       }
+      info(chalk.yellow('CURRENCY:') + ' Tips exchange rate updated');
     } catch (e) {
       error(e.stack);
       refresh = constants.SECOND;

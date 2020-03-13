@@ -140,7 +140,7 @@ class Donationalerts extends Integration {
           const newTip: UserTipInterface = {
             amount: Number(data.amount),
             currency: data.currency,
-            sortAmount: currency.exchange(Number(data.amount), data.currency, 'EUR'),
+            sortAmount: currency.exchange(Number(data.amount), data.currency, currency.mainCurrency),
             message: data.message,
             tippedAt: Date.now(),
           };
