@@ -12,7 +12,7 @@
 
     <panel cards search @search="search = $event">
       <template v-slot:left>
-        <button-with-icon class="btn-primary btn-reverse" icon="plus" href="#/registry/goals/edit">{{translate('registry.goals.addGoalGroupInterface')}}</button-with-icon>
+        <button-with-icon class="btn-primary btn-reverse" icon="plus" href="#/registry/goals/edit">{{translate('registry.goals.addGoalGroup')}}</button-with-icon>
       </template>
     </panel>
 
