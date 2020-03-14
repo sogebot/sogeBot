@@ -10,6 +10,7 @@ const assert = require('assert');
 const { permission } = require('../../../dest/helpers/permissions');
 const permissions = (require('../../../dest/permissions')).default;
 const Parser = require('../../../dest/parser').default;
+const currency = require('../../../dest/currency').default;
 
 const { getRepository } = require('typeorm');
 const { Permissions, PermissionCommands } = require('../../../dest/database/entity/permissions');
@@ -25,7 +26,7 @@ const users = [
   { username: '__viewer_points__', userId: 7, id: 7, points: 100 },
   { username: '__viewer_watched__', userId: 8, id: 8, watchedTime: 100 * (60 * 60 * 1000 /*hours*/) },
   { username: '__viewer_tips__', userId: 9, id: 9, tips: [{
-    currency: 'EUR', amount: 100, sortAmount: 100, timestamp: Math.random(), message: '',
+    exchangeRates: currency.rates, currency: 'EUR', amount: 100, sortAmount: 100, timestamp: Math.random(), message: '',
   }] },
   { username: '__viewer_bits__', userId: 10, id: 10, bits: [{
     amount: 100, timestamp: Math.random(), message: '',

@@ -41,6 +41,7 @@ describe('Top - !top tips', () => {
           currency: 'EUR',
           message: 'test',
           timestamp: Date.now(),
+          exchangeRates: currency.rates,
         });
       }
 
@@ -49,7 +50,7 @@ describe('Top - !top tips', () => {
   });
 
   it('Update change rates', async() => {
-    await currency.updateRates();
+    await currency.recalculateSortAmount();
   });
 
   it('run !top tips and expect correct output', async () => {

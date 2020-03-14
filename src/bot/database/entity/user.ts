@@ -1,6 +1,8 @@
 import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer, SafeNumberTransformer } from './_transformer';
 
+import type { currency } from '../../currency';
+
 export interface UserInterface {
   id?: string; userId: number; username: string; displayname?: string; profileImageUrl?: string;
   isOnline?: boolean; isVIP?: boolean; isFollower?: boolean; isModerator?: boolean; isSubscriber?: boolean;
@@ -14,6 +16,7 @@ export interface UserInterface {
 
 export interface UserTipInterface {
   id?: string; user?: UserInterface; amount: number; currency: string; message: string; tippedAt?: number; sortAmount: number;
+  exchangeRates: { [key in currency]: number };
 }
 
 export interface UserBitInterface {
@@ -119,6 +122,7 @@ export const UserTip = new EntitySchema<Readonly<Required<UserTipInterface>>>({
     },
     amount: { type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined  },
     sortAmount: { type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined  },
+    exchangeRates: { type: 'simple-json' },
     currency: { type: String },
     message: { type: 'text' },
     tippedAt: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
