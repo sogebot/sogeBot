@@ -51,7 +51,7 @@ export class tipsExchangeRates1584106270435 implements MigrationInterface {
         continue;
       }
       await queryRunner.query(
-        `INSERT INTO user_tip (amount, sortAmount, exchangeRates, currency, message, tippedAt, userUserId) VALUES ('${tip.amount}', '${tip.sortAmount}', '${JSON.stringify(tip.exchangeRates)}', '${tip.currency}', '${tip.message}', '${tip.tippedAt}', '${tip.userUserId}')`, undefined);
+        `INSERT INTO user_tip (amount, sortAmount, exchangeRates, currency, message, tippedAt, userUserId) VALUES ('${tip.amount}', '${tip.sortAmount}', '${JSON.stringify(tip.exchangeRates)}', '${tip.currency}', '${tip.message.replace(/\'/g, '\\\'')}', '${tip.tippedAt}', '${tip.userUserId}')`, undefined);
     }
   }
 
