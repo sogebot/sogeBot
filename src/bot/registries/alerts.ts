@@ -45,7 +45,6 @@ class Alerts extends Registry {
       }
     });
 
-
     adminEndpoint(this.nsp, 'alerts::deleteMedia', async (id: string, cb) => {
       cb(
         await getRepository(AlertMedia).delete({ id })
@@ -82,7 +81,7 @@ class Alerts extends Registry {
         cb(e, null);
       }
     });
-    adminEndpoint(this.nsp, 'alerts::getOne', async (id: string, cb) => {
+    publicEndpoint(this.nsp, 'alerts::getOne', async (id: string, cb) => {
       cb(
         await getRepository(Alert).findOne({
           where: { id },
