@@ -174,7 +174,7 @@
     "lint-staged": "10.0.7",
     "locate-path": "5.0.0",
     "lodash-es": "4.17.15",
-    "minimist": "1.2.0",
+    "minimist": "1.2.2",
     "mocha": "7.1.0",
     "node-sass": "4.13.1",
     "postcss-cli": "7.1.0",
