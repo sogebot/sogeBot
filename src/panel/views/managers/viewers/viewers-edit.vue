@@ -396,12 +396,13 @@ export default class viewersEdit extends Vue {
 
   save() {
     this.state.save = this.$state.progress
-    this.socket.emit('viewers::save', this.viewer, (err) => {
+    this.socket.emit('viewers::save', this.viewer, (err, viewer) => {
       if (err) {
         console.error(err)
         return this.state.save = this.$state.fail;
       }
       this.state.save = this.$state.success;
+      this.viewer = viewer; // replace with new data (e.g. ids on tips etc)
       this.$nextTick(() => { this.state.pending = false });
       setTimeout(() => this.state.save = this.$state.idle, 1000)
     })
