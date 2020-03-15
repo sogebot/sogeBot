@@ -190,19 +190,23 @@ class Users extends Core {
     });
     adminEndpoint(this.nsp, 'viewers::save', async (viewer: Required<UserInterface>, cb) => {
       try {
-        // recount sortAmount
+        // recount sortAmount and add exchangeRates if needed
         for (const tip of viewer.tips) {
+          if (typeof tip.exchangeRates === 'undefined') {
+            tip.exchangeRates = currency.rates;
+          }
           tip.sortAmount = currency.exchange(Number(tip.amount), tip.currency, 'EUR');
         }
 
         if (viewer.messages < viewer.pointsByMessageGivenAt) {
           viewer.pointsByMessageGivenAt = viewer.messages;
         }
-        await getRepository(User).save(viewer);
-        cb();
+
+        const result = await getRepository(User).save(viewer);
+        cb(null, result);
       } catch (e) {
         error(e);
-        cb(e);
+        cb(e, viewer);
       }
     });
     adminEndpoint(this.nsp, 'viewers::remove', async (viewer: Required<UserInterface>, cb) => {
