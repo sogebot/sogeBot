@@ -16,11 +16,12 @@ export interface UserInterface {
 
 export interface UserTipInterface {
   id?: string; user?: UserInterface; amount: number; currency: string; message: string; tippedAt?: number; sortAmount: number;
-  exchangeRates: { [key in currency]: number };
+  exchangeRates: { [key in currency]: number }; userId?: number;
 }
 
 export interface UserBitInterface {
   id?: string; user?: UserInterface; amount: number; message: string; cheeredAt?: number;
+  userId?: number;
 }
 
 export const User = new EntitySchema<Readonly<Required<UserInterface>>>({
@@ -126,12 +127,14 @@ export const UserTip = new EntitySchema<Readonly<Required<UserTipInterface>>>({
     currency: { type: String },
     message: { type: 'text' },
     tippedAt: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
+    userId: { type: String, nullable: true, name: 'userUserId' },
   },
   relations: {
     user: {
       type: 'many-to-one',
       target: 'user',
       inverseSide: 'tips',
+      joinColumn: { name: 'userUserId' },
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     },
@@ -149,11 +152,13 @@ export const UserBit = new EntitySchema<Readonly<Required<UserBitInterface>>>({
     amount: { type: 'bigint', transformer: new ColumnNumericTransformer() },
     message: { type: 'text' },
     cheeredAt: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
+    userId: { type: String, nullable: true, name: 'userUserId' },
   },
   relations: {
     user: {
       type: 'many-to-one',
       target: 'user',
+      joinColumn: { name: 'userUserId' },
       inverseSide: 'bits',
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',

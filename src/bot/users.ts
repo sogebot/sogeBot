@@ -8,7 +8,7 @@ import { setTimeout } from 'timers';
 import { permission } from './helpers/permissions';
 import { error } from './helpers/log';
 import { adminEndpoint, viewerEndpoint } from './helpers/socket';
-import { Brackets, getConnection, getRepository } from 'typeorm';
+import { Brackets, getConnection, getRepository, IsNull } from 'typeorm';
 import { User, UserBit, UserInterface, UserTip } from './database/entity/user';
 import permissions from './permissions';
 import oauth from './oauth';
@@ -203,6 +203,9 @@ class Users extends Core {
         }
 
         const result = await getRepository(User).save(viewer);
+        // as cascade remove set ID as null, we need to get rid of tips/bits
+        await getRepository(UserTip).delete({ userId: IsNull() });
+        await getRepository(UserBit).delete({ userId: IsNull() });
         cb(null, result);
       } catch (e) {
         error(e);
