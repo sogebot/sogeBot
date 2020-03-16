@@ -10,7 +10,7 @@ const { flatten } = require('./helpers/flatten')
 const gitCommitInfo = require('git-commit-info');
 import { adminEndpoint } from './helpers/socket';
 
-import { error, info } from './helpers/log';
+import { info } from './helpers/log';
 import { CacheTitles } from './database/entity/cacheTitles';
 import uuid from 'uuid'
 import { getConnection, getManager, getRepository } from 'typeorm';
