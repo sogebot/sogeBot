@@ -294,7 +294,10 @@ export default class viewersList extends Vue {
     this.state.loading = this.$state.progress;
     this.socket.emit('find.viewers', { page: (this.currentPage - 1), order: {
       orderBy: this.sort, sortOrder: this.sortDesc ? 'DESC' : 'ASC'
-    }, filter: this.filter, search: this.search.length > 0 ? this.search : undefined }, (items, count) => {
+    }, filter: this.filter, search: this.search.length > 0 ? this.search : undefined }, (err, items, count) => {
+      if (err) {
+        return console.error(err);
+      }
       this.items = items;
       this.count = count;
       this.state.loading = this.$state.success;
@@ -305,7 +308,10 @@ export default class viewersList extends Vue {
   created() {
     console.time('find.viewers');
     this.state.loading = this.$state.progress;
-    this.socket.emit('find.viewers', { page: 0 }, (items, count) => {
+    this.socket.emit('find.viewers', { page: 0 }, (err, items, count) => {
+      if (err) {
+        return console.error(err);
+      }
       this.items = items;
       this.count = count;
       this.state.loading = this.$state.success;

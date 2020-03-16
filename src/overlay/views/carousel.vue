@@ -32,7 +32,12 @@ export default class CarouselOverlay extends Vue {
   }
 
   created() {
-    this.socket.emit('carousel::getAll', images => this.images = images)
+    this.socket.emit('carousel::getAll', (err, images) => {
+      if (err) {
+        return console.error(err)
+      }
+      this.images = images
+    })
     this.interval.push(setInterval(() => {
       this.triggerAnimation()
     }, 100));

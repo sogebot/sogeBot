@@ -36,7 +36,11 @@ class Twitch extends Core {
 
   sockets() {
     adminEndpoint(this.nsp, 'broadcaster', (cb) => {
-      cb((oauth.broadcasterUsername).toLowerCase());
+      try {
+        cb(null, (oauth.broadcasterUsername).toLowerCase());
+      } catch (e) {
+        cb(e, '');
+      }
     });
   }
 

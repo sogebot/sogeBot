@@ -188,7 +188,10 @@ export default {
     },
     refresh: function () {
       return new Promise((resolve) => {
-        this.socket.emit('randomizer::getAll', (data) => {
+        this.socket.emit('randomizer::getAll', (err, data) => {
+          if (err) {
+            return console.error(err);
+          }
           console.log('Loaded', data);
           this.items = data
           resolve()

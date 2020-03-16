@@ -19,13 +19,25 @@ class Cmdboard extends Widget {
 
   public sockets() {
     adminEndpoint(this.nsp, 'cmdboard::getAll', async (cb) => {
-      cb(await getRepository(CommandsBoard).find());
+      try {
+        cb(null, await getRepository(CommandsBoard).find());
+      } catch (e) {
+        cb(e, []);
+      }
     });
     adminEndpoint(this.nsp, 'cmdboard::save', async (items: CommandsBoardInterface[], cb) => {
-      cb(await getRepository(CommandsBoard).save(items));
+      try {
+        cb(null, await getRepository(CommandsBoard).save(items));
+      } catch (e) {
+        cb(e, []);
+      }
     });
     adminEndpoint(this.nsp, 'cmdboard::remove', async (item: Required<CommandsBoardInterface>, cb) => {
-      cb(await getRepository(CommandsBoard).remove(item));
+      try {
+        cb(null, await getRepository(CommandsBoard).remove(item));
+      } catch (e) {
+        cb(e);
+      }
     });
     adminEndpoint(this.nsp, 'cmdboard::run', (command) => {
       tmi.message({

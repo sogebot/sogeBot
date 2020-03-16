@@ -48,10 +48,16 @@ class CustomCommands extends System {
       cb(null);
     });
     adminEndpoint(this.nsp, 'commands::setById', async (id, dataset: CommandsInterface, cb: Function | SocketIOClient.Socket) => {
-      const item = await getRepository(Commands).findOne({ id });
-      await getRepository(Commands).save({ ...item, ...dataset});
-      if (typeof cb === 'function') {
-        cb(null, item);
+      try {
+        const item = await getRepository(Commands).findOne({ id });
+        await getRepository(Commands).save({ ...item, ...dataset});
+        if (typeof cb === 'function') {
+          cb(null, item);
+        }
+      } catch (e) {
+        if (typeof cb === 'function') {
+          cb(e);
+        }
       }
     });
     adminEndpoint(this.nsp, 'commands::deleteById', async (id, cb) => {
@@ -59,25 +65,33 @@ class CustomCommands extends System {
       cb();
     });
     adminEndpoint(this.nsp, 'commands::getAll', async (cb) => {
-      const commands = await getRepository(Commands).find({
-        relations: ['responses'],
-        order: {
-          command: 'ASC',
-        },
-      });
-      const count = await getAllCountOfCommandUsage();
-      cb(commands, count);
+      try {
+        const commands = await getRepository(Commands).find({
+          relations: ['responses'],
+          order: {
+            command: 'ASC',
+          },
+        });
+        const count = await getAllCountOfCommandUsage();
+        cb(null, commands, count);
+      } catch (e) {
+        cb(e, [], null);
+      }
     });
     adminEndpoint(this.nsp, 'commands::getById', async (id, cb) => {
-      const command = await getRepository(Commands).findOne({
-        where: { id },
-        relations: ['responses'],
-      });
-      if (!command) {
-        cb('Command not found');
-      } else {
-        const count = await getCountOfCommandUsage(command.command);
-        cb(null, command, count);
+      try {
+        const command = await getRepository(Commands).findOne({
+          where: { id },
+          relations: ['responses'],
+        });
+        if (!command) {
+          cb('Command not found');
+        } else {
+          const count = await getCountOfCommandUsage(command.command);
+          cb(null, command, count);
+        }
+      } catch (e) {
+        cb (e);
       }
     });
   }

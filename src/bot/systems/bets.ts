@@ -57,11 +57,15 @@ class Bets extends System {
 
   sockets() {
     adminEndpoint(this.nsp, 'bets::getCurrentBet', async (cb) => {
-      const currentBet = await getRepository(BetsEntity).findOne({
-        relations: ['participations'],
-        order: { createdAt: 'DESC' },
-      });
-      cb(null, currentBet);
+      try {
+        const currentBet = await getRepository(BetsEntity).findOne({
+          relations: ['participations'],
+          order: { createdAt: 'DESC' },
+        });
+        cb(null, currentBet);
+      } catch (e) {
+        cb(e);
+      }
     });
 
     adminEndpoint(this.nsp, 'close', async (option) => {

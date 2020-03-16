@@ -230,7 +230,10 @@
         })
         this.socket.emit('getUserTwitchGames');
 
-        this.socket.emit('panel.sendStreamData', (data) => {
+        this.socket.emit('panel.sendStreamData', (err, data) => {
+          if (err) {
+            return console.error(err);
+          }
           console.groupCollapsed('changegamedialog::panel.sendStreamData')
           console.log(data)
           console.groupEnd();

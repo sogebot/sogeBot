@@ -51,15 +51,19 @@ class Gallery extends Overlay {
       }
     });
     adminEndpoint(this.nsp, 'gallery::upload', async (data, cb) => {
-      const filename = data[0];
-      const filedata = data[1];
-      const matches = filedata.match(/^data:([0-9A-Za-z-+/]+);base64,(.+)$/);
-      if (matches.length !== 3) {
-        return false;
+      try {
+        const filename = data[0];
+        const filedata = data[1];
+        const matches = filedata.match(/^data:([0-9A-Za-z-+/]+);base64,(.+)$/);
+        if (matches.length !== 3) {
+          return false;
+        }
+        const type = matches[1];
+        const item = await getRepository(GalleryEntity).save({ id: uuid(), type, data: filedata, name: filename });
+        cb(null, { type, id: item.id, name: filename });
+      } catch (e) {
+        cb(e);
       }
-      const type = matches[1];
-      const item = await getRepository(GalleryEntity).save({ id: uuid(), type, data: filedata, name: filename });
-      cb({ type, id: item.id, name: filename });
     });
   }
 }

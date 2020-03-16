@@ -221,81 +221,88 @@ class Users extends Core {
       }
     });
     adminEndpoint(this.nsp, 'getNameById', async (id, cb) => {
-      cb(await this.getNameById(id));
+      try {
+        cb(null, await this.getNameById(id));
+      } catch (e) {
+        cb(e, null);
+      }
     });
     adminEndpoint(this.nsp, 'find.viewers', async (opts: { state?: any; search?: string; filter?: { subscribers: null | boolean; followers: null | boolean; active: null | boolean; vips: null | boolean }; page: number; order?: { orderBy: string; sortOrder: 'ASC' | 'DESC' } }, cb) => {
-      const connection = await getConnection();
-      opts.page = opts.page ?? 0;
+      try {
+        const connection = await getConnection();
+        opts.page = opts.page ?? 0;
 
-
-      /*
-        SQL query:
-          select user.*, COALESCE(sumTips, 0) as sumTips, COALESCE(sumBits, 0) as sumBits
-          from user
-            left join (select userUserId, sum(sortAmount) as sumTips from user_tip group by userUserId) user_tip on user.userId = user_tip.userUserId
-            left join (select userUserId, sum(amount) as sumBits from user_bit group by userUserId) user_bit on user.userId = user_bit.userUserId
-      */
-      let query;
-      if (connection.options.type === 'postgres') {
-        query = getRepository(User).createQueryBuilder('user')
-          .orderBy(opts.order?.orderBy ?? 'user.username' , opts.order?.sortOrder ?? 'ASC')
-          .select('COALESCE("sumTips", 0)', 'sumTips')
-          .addSelect('COALESCE("sumBits", 0)', 'sumBits')
-          .addSelect('"user".*')
-          .offset(opts.page * 25)
-          .limit(25)
-          .leftJoin('(select "userUserId", sum("amount") as "sumBits" from "user_bit" group by "userUserId")', 'user_bit', '"user_bit"."userUserId" = "user"."userId"')
-          .leftJoin('(select "userUserId", sum("sortAmount") as "sumTips" from "user_tip" group by "userUserId")', 'user_tip', '"user_tip"."userUserId" = "user"."userId"');
-      } else {
-        query = getRepository(User).createQueryBuilder('user')
-          .orderBy(opts.order?.orderBy ?? 'user.username' , opts.order?.sortOrder ?? 'ASC')
-          .select('COALESCE(sumTips, 0)', 'sumTips')
-          .addSelect('COALESCE(sumBits, 0)', 'sumBits')
-          .addSelect('user.*')
-          .offset(opts.page * 25)
-          .limit(25)
-          .leftJoin('(select userUserId, sum(amount) as sumBits from user_bit group by userUserId)', 'user_bit', 'user_bit.userUserId = user.userId')
-          .leftJoin('(select userUserId, sum(sortAmount) as sumTips from user_tip group by userUserId)', 'user_tip', 'user_tip.userUserId = user.userId');
-      }
-
-      if (typeof opts.order !== 'undefined') {
+        /*
+          SQL query:
+            select user.*, COALESCE(sumTips, 0) as sumTips, COALESCE(sumBits, 0) as sumBits
+            from user
+              left join (select userUserId, sum(sortAmount) as sumTips from user_tip group by userUserId) user_tip on user.userId = user_tip.userUserId
+              left join (select userUserId, sum(amount) as sumBits from user_bit group by userUserId) user_bit on user.userId = user_bit.userUserId
+        */
+        let query;
         if (connection.options.type === 'postgres') {
-          opts.order.orderBy = opts.order.orderBy.split('.').map(o => `"${o}"`).join('.');
+          query = getRepository(User).createQueryBuilder('user')
+            .orderBy(opts.order?.orderBy ?? 'user.username' , opts.order?.sortOrder ?? 'ASC')
+            .select('COALESCE("sumTips", 0)', 'sumTips')
+            .addSelect('COALESCE("sumBits", 0)', 'sumBits')
+            .addSelect('"user".*')
+            .offset(opts.page * 25)
+            .limit(25)
+            .leftJoin('(select "userUserId", sum("amount") as "sumBits" from "user_bit" group by "userUserId")', 'user_bit', '"user_bit"."userUserId" = "user"."userId"')
+            .leftJoin('(select "userUserId", sum("sortAmount") as "sumTips" from "user_tip" group by "userUserId")', 'user_tip', '"user_tip"."userUserId" = "user"."userId"');
+        } else {
+          query = getRepository(User).createQueryBuilder('user')
+            .orderBy(opts.order?.orderBy ?? 'user.username' , opts.order?.sortOrder ?? 'ASC')
+            .select('COALESCE(sumTips, 0)', 'sumTips')
+            .addSelect('COALESCE(sumBits, 0)', 'sumBits')
+            .addSelect('user.*')
+            .offset(opts.page * 25)
+            .limit(25)
+            .leftJoin('(select userUserId, sum(amount) as sumBits from user_bit group by userUserId)', 'user_bit', 'user_bit.userUserId = user.userId')
+            .leftJoin('(select userUserId, sum(sortAmount) as sumTips from user_tip group by userUserId)', 'user_tip', 'user_tip.userUserId = user.userId');
         }
-        query.orderBy({ [opts.order.orderBy]: opts.order.sortOrder });
-      }
 
-      if (typeof opts.filter !== 'undefined') {
-        if (opts.filter.subscribers !== null) {
-          query.andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: opts.filter.subscribers });
-        }
-        if (opts.filter.followers !== null) {
-          query.andWhere('user.isFollower = :isFollower', { isFollower: opts.filter.followers });
-        }
-        if (opts.filter.vips !== null) {
-          query.andWhere('user.isVIP = :isVIP', { isVIP: opts.filter.vips });
-        }
-        if (opts.filter.active !== null) {
-          query.andWhere('user.isOnline = :isOnline', { isOnline: opts.filter.active });
-        }
-      }
-
-      if (typeof opts.search !== 'undefined') {
-        query.andWhere(new Brackets(w => {
+        if (typeof opts.order !== 'undefined') {
           if (connection.options.type === 'postgres') {
-            w.where('"user"."username" like :like', { like: `%${opts.search}%` });
-            w.orWhere('CAST("user"."userId" AS TEXT) like :like', { like: `%${opts.search}%` });
-          } else {
-            w.where('`user`.`username` like :like', { like: `%${opts.search}%` });
-            w.orWhere('CAST(`user`.`userId` AS CHAR) like :like', { like: `%${opts.search}%` });
+            opts.order.orderBy = opts.order.orderBy.split('.').map(o => `"${o}"`).join('.');
           }
-        }));
+          query.orderBy({ [opts.order.orderBy]: opts.order.sortOrder });
+        }
+
+        if (typeof opts.filter !== 'undefined') {
+          if (opts.filter.subscribers !== null) {
+            query.andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: opts.filter.subscribers });
+          }
+          if (opts.filter.followers !== null) {
+            query.andWhere('user.isFollower = :isFollower', { isFollower: opts.filter.followers });
+          }
+          if (opts.filter.vips !== null) {
+            query.andWhere('user.isVIP = :isVIP', { isVIP: opts.filter.vips });
+          }
+          if (opts.filter.active !== null) {
+            query.andWhere('user.isOnline = :isOnline', { isOnline: opts.filter.active });
+          }
+        }
+
+        if (typeof opts.search !== 'undefined') {
+          query.andWhere(new Brackets(w => {
+            if (connection.options.type === 'postgres') {
+              w.where('"user"."username" like :like', { like: `%${opts.search}%` });
+              w.orWhere('CAST("user"."userId" AS TEXT) like :like', { like: `%${opts.search}%` });
+            } else {
+              w.where('`user`.`username` like :like', { like: `%${opts.search}%` });
+              w.orWhere('CAST(`user`.`userId` AS CHAR) like :like', { like: `%${opts.search}%` });
+            }
+          }));
+        }
+
+        const viewers = await query.getRawMany();
+        const count = await query.getCount();
+
+        cb(null, viewers, count, opts.state);
+      } catch (e) {
+        cb(e, [], null, null);
       }
-
-      const viewers = await query.getRawMany();
-      const count = await query.getCount();
-
-      cb(viewers, count, opts.state);
     });
     adminEndpoint(this.nsp, 'viewers::followedAt', async (id, cb) => {
       try {
@@ -323,36 +330,30 @@ class Users extends Core {
       }
     });
     viewerEndpoint(this.nsp, 'viewers::findOne', async (userId, cb) => {
-      const viewer = await getRepository(User).findOne({
-        where: { userId },
-      });
+      try {
+        const viewer = await getRepository(User).findOne({
+          where: { userId },
+        });
 
-      if (viewer) {
-        const aggregatedTips = viewer.tips.map((o) => currency.exchange(o.amount, o.currency, currency.mainCurrency)).reduce((a, b) => a + b, 0);
-        const aggregatedBits = viewer.bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0);
+        if (viewer) {
+          const aggregatedTips = viewer.tips.map((o) => currency.exchange(o.amount, o.currency, currency.mainCurrency)).reduce((a, b) => a + b, 0);
+          const aggregatedBits = viewer.bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0);
 
-        const permId = await permissions.getUserHighestPermission(userId);
-        let permissionGroup;
-        if (permId) {
-          permissionGroup = await permissions.get(permId);
+          const permId = await permissions.getUserHighestPermission(userId);
+          let permissionGroup;
+          if (permId) {
+            permissionGroup = await permissions.get(permId);
+          } else {
+            permissionGroup = permission.VIEWERS;
+          }
+
+          cb(null, {...viewer, aggregatedBits, aggregatedTips, permission: permissionGroup});
         } else {
-          permissionGroup = permission.VIEWERS;
+          cb(null);
         }
-
-        cb({...viewer, aggregatedBits, aggregatedTips, permission: permissionGroup});
-      } else {
-        cb();
+      } catch (e) {
+        cb(e);
       }
-    });
-    adminEndpoint(this.nsp, 'delete.viewer', async (userId, cb) => {
-      const viewer = await getRepository(User).findOne({ userId });
-      if (viewer) {
-        await getRepository(User).remove(viewer);
-      }
-      cb(null);
-    });
-    adminEndpoint(this.nsp, 'update.viewer', async (opts, cb) => {
-      cb(null);
     });
   }
 }

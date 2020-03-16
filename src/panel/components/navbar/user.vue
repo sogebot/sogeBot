@@ -114,7 +114,10 @@ export default class User extends Vue {
     if (typeof this.$loggedUser === 'undefined') {
       return setTimeout(() => this.refreshViewer(), 100);
     }
-    this.socket.emit('viewers::findOne', this.$loggedUser.id, (viewer) => {
+    this.socket.emit('viewers::findOne', this.$loggedUser.id, (err, viewer) => {
+      if (err) {
+        return console.error(err);
+      }
       if (viewer) {
         console.log('Logged in as', viewer);
         this.viewer = viewer;

@@ -108,7 +108,10 @@ export default class carouselOverlayList extends Vue {
 
   refresh() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('carousel::getAll', (items) => {
+    this.socket.emit('carousel::getAll', (err, items) => {
+      if (err) {
+        return console.error(err);
+      }
       this.items = items;
       this.state.loading = this.$state.success;
     })
@@ -130,7 +133,11 @@ export default class carouselOverlayList extends Vue {
       }
       return o
     })
-    this.socket.emit('carousel::save', this.items, () => {});
+    this.socket.emit('carousel::save', this.items, (err) => {
+      if (err) {
+        return console.error(err);
+      }
+    });
   }
 
   moveDown(order) {
@@ -142,7 +149,11 @@ export default class carouselOverlayList extends Vue {
       }
       return o
     })
-    this.socket.emit('carousel::save', this.items, () => {});
+    this.socket.emit('carousel::save', this.items, (err) => {
+      if (err) {
+        return console.error(err);
+      }
+    });
   }
 
   filesChange(files) {
@@ -153,7 +164,10 @@ export default class carouselOverlayList extends Vue {
     for (let i = 0, l = files.length; i < l; i++) {
       const reader = new FileReader()
       reader.onload = ((e: any )=> {
-        this.socket.emit('carousel::insert', e.target.result, (image) => {
+        this.socket.emit('carousel::insert', e.target.result, (err, image) => {
+          if (err) {
+            return console.error(err);
+          }
           this.uploadedFiles++
           this.items.push(image)
         })
@@ -168,7 +182,10 @@ export default class carouselOverlayList extends Vue {
   }
 
   remove(item) {
-    this.socket.emit('carousel::remove', item.id, () => {
+    this.socket.emit('carousel::remove', item.id, (err) => {
+      if (err) {
+        return console.error(err);
+      }
       this.refresh();
     });
   }

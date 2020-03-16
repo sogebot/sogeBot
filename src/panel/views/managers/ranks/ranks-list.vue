@@ -174,7 +174,10 @@ export default class ranksList extends Vue {
 
   created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('ranks::getAll', (items) => {
+    this.socket.emit('ranks::getAll', (err, items) => {
+      if (err) {
+        return console.error(err);
+      }
       console.debug('Loaded', items)
       this.items = items;
       this.state.loading = this.$state.success;

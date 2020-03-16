@@ -101,7 +101,10 @@ export default class keywordsList extends Vue {
 
   refresh() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('keywords::getAll', (data: KeywordInterface[]) => {
+    this.socket.emit('keywords::getAll', (err, data: KeywordInterface[]) => {
+      if (err) {
+        return console.error(err);
+      }
       this.items = data;
       this.state.loading = this.$state.success;
     })

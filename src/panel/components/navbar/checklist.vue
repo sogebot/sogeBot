@@ -69,7 +69,10 @@ export default {
       this.bDisplay = !this.bDisplay
     },
     update: function () {
-      this.socket.emit('checklist::getAll', (items, checkedItems) => {
+      this.socket.emit('checklist::getAll', (err, items, checkedItems) => {
+        if (err) {
+          return console.error(err);
+        }
         this.checkedItems = checkedItems;
         this.items = items;
       })

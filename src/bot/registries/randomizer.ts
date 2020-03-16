@@ -17,11 +17,16 @@ class Randomizer extends Registry {
 
   sockets () {
     adminEndpoint(this.nsp, 'randomizer::getAll', async (cb) => {
-      cb(
-        await getRepository(RandomizerEntity).find({
-          relations: ['items'],
-        })
-      );
+      try {
+        cb(
+          null,
+          await getRepository(RandomizerEntity).find({
+            relations: ['items'],
+          })
+        );
+      } catch (e) {
+        cb(e, []);
+      }
     });
     adminEndpoint(this.nsp, 'randomizer::remove', async (item: Required<RandomizerInterface>, cb) => {
       const result = await getRepository(RandomizerEntity).remove(item);

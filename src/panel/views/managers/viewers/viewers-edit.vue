@@ -514,7 +514,10 @@ export default class viewersEdit extends Vue {
 
   created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('viewers::findOne', this.$route.params.id, (data) => {
+    this.socket.emit('viewers::findOne', this.$route.params.id, (err, data) => {
+      if (err) {
+        return console.error(err);
+      }
       data.tips = orderBy(data.tips, 'tippedAt', 'desc');
       data.bits = orderBy(data.bits, 'cheeredAt', 'desc');
       console.log('Loaded viewer', data);

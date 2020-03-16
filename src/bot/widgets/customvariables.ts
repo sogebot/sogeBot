@@ -21,30 +21,46 @@ class CustomVariables extends Widget {
 
   public sockets() {
     adminEndpoint(this.nsp, 'watched::save', async (items: VariableWatchInterface[], cb) => {
-      await getRepository(VariableWatch).delete({});
-      const variables = await getRepository(VariableWatch).save(items);
-      cb(null, variables);
+      try {
+        await getRepository(VariableWatch).delete({});
+        const variables = await getRepository(VariableWatch).save(items);
+        cb(null, variables);
+      } catch (e) {
+        cb(e, []);
+      }
     });
     adminEndpoint(this.nsp, 'list.variables', async (cb) => {
-      const variables = await getRepository(Variable).find();
-      cb(null, variables);
+      try {
+        const variables = await getRepository(Variable).find();
+        cb(null, variables);
+      } catch (e) {
+        cb(e, []);
+      }
     });
     adminEndpoint(this.nsp, 'list.watch', async (cb) => {
-      const variables = await getRepository(VariableWatch).find({
-        order: {
-          order: 'ASC',
-        },
-      });
-      cb(null, variables);
+      try {
+        const variables = await getRepository(VariableWatch).find({
+          order: {
+            order: 'ASC',
+          },
+        });
+        cb(null, variables);
+      } catch (e) {
+        cb(e, []);
+      }
     });
     adminEndpoint(this.nsp, 'watched::setValue', async (opts, cb) => {
-      const variable = await customvariables.isVariableSetById(opts.id);
-      if (variable) {
-        await customvariables.setValueOf(variable.variableName, opts.value, {
-          readOnlyBypass: true,
-        });
+      try {
+        const variable = await customvariables.isVariableSetById(opts.id);
+        if (variable) {
+          await customvariables.setValueOf(variable.variableName, opts.value, {
+            readOnlyBypass: true,
+          });
+        }
+        cb(null);
+      } catch (e) {
+        cb(e);
       }
-      cb(null);
     });
   }
 }

@@ -40,14 +40,22 @@ class Ranks extends System {
 
   sockets () {
     adminEndpoint(this.nsp, 'ranks::getAll', async (cb) => {
-      cb(await getRepository(Rank).find({
-        order: {
-          value: 'ASC',
-        },
-      }));
+      try {
+        cb(null, await getRepository(Rank).find({
+          order: {
+            value: 'ASC',
+          },
+        }));
+      } catch (e) {
+        cb(e, []);
+      }
     });
     adminEndpoint(this.nsp, 'ranks::getOne', async (id, cb) => {
-      cb(await getRepository(Rank).findOne(id));
+      try {
+        cb(null, await getRepository(Rank).findOne(id));
+      } catch(e) {
+        cb(e, undefined);
+      }
     });
     adminEndpoint(this.nsp, 'ranks::remove', async (id, cb) => {
       await getRepository(Rank).delete(id);

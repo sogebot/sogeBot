@@ -51,55 +51,63 @@ class UI extends Core {
 
   sockets() {
     adminEndpoint(this.nsp, 'configuration', async (cb) => {
-      const data: any = {};
+      try {
+        const data: any = {};
 
-      for (const system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch']) {
-        if (typeof data.core === 'undefined') {
-          data.core = {};
+        for (const system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch']) {
+          if (typeof data.core === 'undefined') {
+            data.core = {};
+          }
+          const self = (require('./' + system.toLowerCase())).default;
+          data.core[system] = await self.getAllSettings();
         }
-        const self = (require('./' + system.toLowerCase())).default;
-        data.core[system] = await self.getAllSettings();
-      }
-      for (const dir of ['systems', 'games', 'overlays', 'integrations']) {
-        for (const system of list(dir)) {
-          set(data, `${dir}.${system.constructor.name}`, await system.getAllSettings());
+        for (const dir of ['systems', 'games', 'overlays', 'integrations']) {
+          for (const system of list(dir)) {
+            set(data, `${dir}.${system.constructor.name}`, await system.getAllSettings());
+          }
         }
+        // currencies
+        data.currency = currency.mainCurrency;
+        data.currencySymbol = currency.symbol(currency.mainCurrency);
+
+        // timezone
+        data.timezone = timezone;
+
+        // lang
+        data.lang = general.lang;
+
+        data.isCastersSet = filter(oauth.generalOwners, (o) => isString(o) && o.trim().length > 0).length > 0 || getBroadcaster() !== '';
+
+        cb(null, data);
+      } catch (e) {
+        cb(e);
       }
-      // currencies
-      data.currency = currency.mainCurrency;
-      data.currencySymbol = currency.symbol(currency.mainCurrency);
-
-      // timezone
-      data.timezone = timezone;
-
-      // lang
-      data.lang = general.lang;
-
-      data.isCastersSet = filter(oauth.generalOwners, (o) => isString(o) && o.trim().length > 0).length > 0 || getBroadcaster() !== '';
-
-      cb(data);
     });
 
     publicEndpoint(this.nsp, 'configuration', async (cb) => {
-      const data: any = {};
+      try {
+        const data: any = {};
 
-      for (const dir of ['systems', 'games']) {
-        for (const system of list(dir)) {
-          set(data, `${dir}.${system.constructor.name}`, await system.getAllSettings());
+        for (const dir of ['systems', 'games']) {
+          for (const system of list(dir)) {
+            set(data, `${dir}.${system.constructor.name}`, await system.getAllSettings());
+          }
         }
+
+        // currencies
+        data.currency = currency.mainCurrency;
+        data.currencySymbol = currency.symbol(currency.mainCurrency);
+
+        // timezone
+        data.timezone = timezone;
+
+        // lang
+        data.lang = general.lang;
+
+        cb(null, data);
+      } catch (e) {
+        cb(e);
       }
-
-      // currencies
-      data.currency = currency.mainCurrency;
-      data.currencySymbol = currency.symbol(currency.mainCurrency);
-
-      // timezone
-      data.timezone = timezone;
-
-      // lang
-      data.lang = general.lang;
-
-      cb(data);
     });
   }
 }

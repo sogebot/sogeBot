@@ -247,7 +247,10 @@
         this.showChartCommands = JSON.parse(localStorage.getItem('/stats/commandcount/showChartCommands') || '[]')
       }
 
-      this.socket.emit('commands::count', (val) => {
+      this.socket.emit('commands::count', (err, val) => {
+        if (err) {
+          return console.error(err);
+        }
         this.commandsUsage = val;
       })
     }

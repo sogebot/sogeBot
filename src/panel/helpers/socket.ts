@@ -63,7 +63,10 @@ export const getTranslations = async () => {
 export const getConfiguration = async () => {
   console.debug('Getting configuration');
   return new Promise((resolve) => {
-    getSocket('/core/ui', true).emit('configuration', (configuration) => {
+    getSocket('/core/ui', true).emit('configuration', (err, configuration) => {
+      if (err) {
+        return console.error(err);
+      }
       resolve(configuration);
     });
   });

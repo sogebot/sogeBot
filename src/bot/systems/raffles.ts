@@ -54,26 +54,41 @@ class Raffles extends System {
 
   sockets () {
     adminEndpoint(this.nsp, 'raffle::getWinner', async (username: string, cb) => {
-      cb(
-        await getRepository(User).findOne({username}),
-      );
+      try {
+        cb(
+          null,
+          await getRepository(User).findOne({username}),
+        );
+      } catch (e) {
+        cb(e);
+      }
     });
     adminEndpoint(this.nsp, 'raffle::updateParticipant', async (participant: RaffleParticipantInterface, cb) => {
-      cb(
-        await getRepository(RaffleParticipant).save(participant),
-      );
+      try {
+        cb(
+          null,
+          await getRepository(RaffleParticipant).save(participant),
+        );
+      } catch (e) {
+        cb(e);
+      }
     });
     adminEndpoint(this.nsp, 'raffle:getLatest', async (cb) => {
-      cb(
-        await getRepository(Raffle).findOne({
-          relations: ['participants', 'participants.messages'],
-          order: {
-            timestamp: 'DESC',
-          },
-        }),
-      );
+      try {
+        cb(
+          null,
+          await getRepository(Raffle).findOne({
+            relations: ['participants', 'participants.messages'],
+            order: {
+              timestamp: 'DESC',
+            },
+          }),
+        );
+      } catch (e) {
+        cb (e);
+      }
     });
-    adminEndpoint(this.nsp, 'raffle::pick', async (cb) => {
+    adminEndpoint(this.nsp, 'raffle::pick', async () => {
       this.pick();
     });
     adminEndpoint(this.nsp, 'raffle::open', async (message) => {

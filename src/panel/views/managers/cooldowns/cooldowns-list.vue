@@ -117,7 +117,10 @@ export default class cooldownList extends Vue {
 
   created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('cooldown::getAll', (items) => {
+    this.socket.emit('cooldown::getAll', (err, items) => {
+      if (err) {
+        return console.error(err);
+      }
       console.debug('Loaded', items)
       this.items = items;
       this.state.loading = this.$state.success;

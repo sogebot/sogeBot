@@ -199,7 +199,10 @@ export default class textOverlayEdit extends Vue {
     // load up from db
     if (this.$route.params.id) {
       this.id = this.$route.params.id
-      this.socket.emit('text::getOne', this.$route.params.id, (data) => {
+      this.socket.emit('text::getOne', this.$route.params.id, (err, data) => {
+        if (err) {
+          return console.error(err);
+        }
         this.name = data.name
         this.html = data.text
         this.js = data.js
@@ -220,7 +223,10 @@ export default class textOverlayEdit extends Vue {
         js: this.js,
         css: this.css,
         external: this.external
-      }, () => {
+      }, (err) => {
+        if (err) {
+          return console.error(err);
+        }
         resolve();
       })
     })

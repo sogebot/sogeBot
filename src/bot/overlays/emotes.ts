@@ -102,7 +102,11 @@ class Emotes extends Overlay {
 
   sockets () {
     publicEndpoint(this.nsp, 'getCache', async (cb) => {
-      cb(await getRepository(CacheEmotes).find());
+      try {
+        cb(null, await getRepository(CacheEmotes).find());
+      } catch (e) {
+        cb(e, []);
+      }
     });
     adminEndpoint(this.nsp, 'removeCache', (cb) => {
       this.removeCache();

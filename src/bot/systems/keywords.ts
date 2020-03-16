@@ -41,21 +41,29 @@ class Keywords extends System {
       cb();
     });
     adminEndpoint(this.nsp, 'keywords::getAll', async (cb) => {
-      const items = await getRepository(Keyword).find({
-        order: {
-          keyword: 'ASC',
-        },
-      });
-      cb(items);
+      try {
+        const items = await getRepository(Keyword).find({
+          order: {
+            keyword: 'ASC',
+          },
+        });
+        cb(null, items);
+      } catch (e) {
+        cb(e, []);
+      }
     });
     adminEndpoint(this.nsp, 'keywords::getById', async (id, cb) => {
-      const item = await getRepository(Keyword).findOne({
-        where: { id },
-      });
-      if (!item) {
-        cb('Item not found');
-      } else {
-        cb(null, item);
+      try {
+        const item = await getRepository(Keyword).findOne({
+          where: { id },
+        });
+        if (!item) {
+          cb('Item not found');
+        } else {
+          cb(null, item);
+        }
+      } catch (e) {
+        cb(e);
       }
     });
   }

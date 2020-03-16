@@ -42,30 +42,42 @@ class Timers extends System {
 
   sockets () {
     adminEndpoint(this.nsp, 'timers::getAll', async (callback) => {
-      const timers = await getRepository(Timer).find({
-        relations: ['messages'],
-      });
-      callback(null, timers);
+      try {
+        const timers = await getRepository(Timer).find({
+          relations: ['messages'],
+        });
+        callback(null, timers);
+      } catch(e) {
+        callback(e, []);
+      }
     });
     adminEndpoint(this.nsp, 'timers::getOne', async (id, callback) => {
-      const timer = await getRepository(Timer).findOne({
-        relations: ['messages'],
-        where: {
-          id,
-        },
-      });
-      callback(null, timer);
+      try {
+        const timer = await getRepository(Timer).findOne({
+          relations: ['messages'],
+          where: {
+            id,
+          },
+        });
+        callback(null, timer);
+      } catch (e) {
+        callback(e);
+      }
     });
     adminEndpoint(this.nsp, 'timers::remove', async (id, callback) => {
-      const timer = await getRepository(Timer).findOne({
-        where: {
-          id,
-        },
-      });
-      if (timer) {
-        await getRepository(Timer).remove(timer);
+      try {
+        const timer = await getRepository(Timer).findOne({
+          where: {
+            id,
+          },
+        });
+        if (timer) {
+          await getRepository(Timer).remove(timer);
+        }
+        callback(null);
+      } catch (e) {
+        callback(e);
       }
-      callback(null);
     });
     adminEndpoint(this.nsp, 'timers::save', async (data, callback) => {
       try {
