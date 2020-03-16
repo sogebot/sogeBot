@@ -210,9 +210,6 @@ class Module {
   }
 
   public async registerCommands() {
-    if (!isDbConnected) {
-      return setTimeout(() => this.registerCommands(), 100);
-    }
     try {
       for (const { opts: options, m } of commandsToRegister.filter(command => {
         return command.m.type === this._name
