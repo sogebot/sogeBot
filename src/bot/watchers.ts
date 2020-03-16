@@ -52,7 +52,7 @@ export const VariableWatcher = {
           throw new Error(`${type}.${name} not found in list`);
         }
 
-        if (isMainThread && self) {
+        if (isMainThread) {
           const savedSetting = await getRepository(Settings).findOne({
             where: {
               name: variable,
@@ -77,8 +77,6 @@ export const VariableWatcher = {
         }
       }
       for (const k of Object.keys(readonly)) {
-        let checkedModule;
-
         const [ type, name ] = k.split('.');
         const self = list(type).find(m => m.constructor.name.toLowerCase() === name.toLowerCase());
         if (!self) {
@@ -86,11 +84,11 @@ export const VariableWatcher = {
         }
 
         const variable = k.split('.').slice(2).join('.');
-        const value = cloneDeep(get(checkedModule, variable, null));
+        const value = cloneDeep(get(self, variable, null));
         if (!isEqual(value, readonly[k])) {
           const [type, name, variable] = k.split('.');
           error(`Cannot change read-only variable, forcing initial value for ${type}.${name}.${variable}`);
-          checkedModule[variable] = readonly[k];
+          self[variable] = readonly[k];
         }
       }
     }
