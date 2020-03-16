@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { setTimeout } from 'timers';
 import { isMainThread } from './cluster';
 
-import { loadingInProgress, permissions as permissionsList } from './decorators';
+import { commandsToRegister, loadingInProgress, permissions as permissionsList } from './decorators';
 import { getFunctionList } from './decorators/on';
 import { permission } from './helpers/permissions';
 import { error, info, warning } from './helpers/log';
@@ -148,6 +148,8 @@ class Module {
           // require panel/socket
           socket = (require('./socket')).default;
           panel = (require('./panel')).default;
+
+          this.registerCommands();
         }, 5000); // slow down little bit to have everything preloaded or in progress of loading
       } else {
         setTimeout(() => load(), 1000);
@@ -206,6 +208,53 @@ class Module {
     opts.isHelper = opts.isHelper || false;
     return opts;
   }
+
+  public async registerCommands() {
+    if (!isDbConnected) {
+      return setTimeout(() => this.registerCommands(), 100);
+    }
+    try {
+      for (const { opts: options, m } of commandsToRegister.filter(command => {
+        return command.m.type === this._name
+          && command.m.name === this.constructor.name.toLowerCase();
+      })) {
+        const opts = typeof options === 'string' ? { name: options } : options;
+        opts.fnc = m.fnc; // force function to decorated function
+        const c = this.prepareCommand(opts);
+
+        if (typeof this._commands === 'undefined') {
+          this._commands = [];
+        }
+
+        this.settingsList.push({ category: 'commands', key: c.name });
+
+        // load command from db
+        const dbc = await getRepository(Settings)
+          .createQueryBuilder('settings')
+          .select('settings')
+          .where('namespace = :namespace', { namespace: this.nsp })
+          .andWhere('name = :name', { name: 'commands.' + c.name })
+          .getOne();
+        if (dbc) {
+          dbc.value = JSON.parse(dbc.value);
+          if (c.name === dbc.value) {
+            // remove if default value
+            await getRepository(Settings)
+              .createQueryBuilder('settings')
+              .delete()
+              .where('namespace = :namespace', { namespace: this.nsp })
+              .andWhere('name = :name', { name: 'commands.' + c.name })
+              .execute();
+          }
+          c.command = dbc.value;
+        }
+        this._commands.push(c);
+      }
+    } catch (e) {
+      error(e);
+    }
+  }
+
 
   public _sockets() {
     if (panel === null || socket === null) {
