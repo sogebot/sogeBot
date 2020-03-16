@@ -48,7 +48,7 @@ bot:
 pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"
 	@cp ./src/bot/data/.env* ./
-	@cp ./src/bot/data/.env-sqlite ./.env
+	@cp ./src/bot/data/.env.sqlite ./.env
 	@npx bestzip sogeBot-$(VERSION).zip .npmrc .env* package-lock.json dest/ locales/ public/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ fonts.json
 
 prepare:
