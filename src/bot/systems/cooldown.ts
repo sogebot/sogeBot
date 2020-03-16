@@ -40,29 +40,41 @@ class Cooldown extends System {
 
   sockets () {
     adminEndpoint(this.nsp, 'cooldown::save', async (dataset: CooldownInterface, cb) => {
-      const item = await getRepository(CooldownEntity).save(dataset);
-      cb(null, item);
+      try {
+        const item = await getRepository(CooldownEntity).save(dataset);
+        cb(null, item);
+      } catch (e) {
+        cb(e);
+      }
     });
     adminEndpoint(this.nsp, 'cooldown::deleteById', async (id, cb) => {
       await getRepository(CooldownEntity).delete({ id });
       cb();
     });
     adminEndpoint(this.nsp, 'cooldown::getAll', async (cb) => {
-      const cooldown = await getRepository(CooldownEntity).find({
-        order: {
-          name: 'ASC',
-        },
-      });
-      cb(cooldown);
+      try {
+        const cooldown = await getRepository(CooldownEntity).find({
+          order: {
+            name: 'ASC',
+          },
+        });
+        cb(null, cooldown);
+      } catch (e) {
+        cb(e);
+      }
     });
     adminEndpoint(this.nsp, 'cooldown::getById', async (id, cb) => {
-      const cooldown = await getRepository(CooldownEntity).findOne({
-        where: { id },
-      });
-      if (!cooldown) {
-        cb('Cooldown not found');
-      } else {
-        cb(null, cooldown);
+      try {
+        const cooldown = await getRepository(CooldownEntity).findOne({
+          where: { id },
+        });
+        if (!cooldown) {
+          cb('Cooldown not found');
+        } else {
+          cb(null, cooldown);
+        }
+      } catch (e) {
+        cb(e);
       }
     });
   }

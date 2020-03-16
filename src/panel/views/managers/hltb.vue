@@ -121,7 +121,10 @@
       this.interval = window.setInterval(() => {
         this.domWidth = (this.$refs['window'] as HTMLElement).clientWidth
       }, 100)
-      this.socket.emit('hltb::getAll', { order: { startedAt: 'DESC' } }, (data) => {
+      this.socket.emit('hltb::getAll', { order: { startedAt: 'DESC' } }, (err, data) => {
+        if (err) {
+          return console.error(err);
+        }
         this.games = data;
       })
     },

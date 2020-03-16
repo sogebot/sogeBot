@@ -219,7 +219,11 @@ class Module {
 
       // default socket listeners
       adminEndpoint(this.nsp, 'settings', async (cb) => {
-        cb(null, await this.getAllSettings(), await this.getUI());
+        try {
+          cb(null, await this.getAllSettings(), await this.getUI());
+        } catch (e) {
+          cb(e, null, null);
+        }
       });
       adminEndpoint(this.nsp, 'settings.update', async (data: { [x: string]: any }, cb) => {
         // flatten and remove category
@@ -320,13 +324,21 @@ class Module {
       });
 
       adminEndpoint(this.nsp, 'set.value', async (variable, value, cb) => {
-        this[variable] = value;
-        if (typeof cb === 'function') {
-          cb(null, {variable, value});
+        try {
+          this[variable] = value;
+          if (typeof cb === 'function') {
+            cb(null, {variable, value});
+          }
+        } catch (e) {
+          cb(e, null);
         }
       });
       publicEndpoint(this.nsp, 'get.value', async (variable, cb) => {
-        cb(null, await this[variable]);
+        try {
+          cb(null, await this[variable]);
+        } catch (e) {
+          cb(e, undefined);
+        }
       });
     }
   }

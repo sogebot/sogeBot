@@ -180,7 +180,10 @@ export default class commandsList extends Vue {
       this.permissions = data;
       this.state.loadingPerm = this.$state.success;
     })
-    this.socket.emit('commands::getAll', ( commands, count ) => {
+    this.socket.emit('commands::getAll', ( err, commands, count ) => {
+      if (err) {
+        return console.error(err);
+      }
       console.debug({ commands, count })
       this.count = count;
       this.commands = commands;
@@ -231,7 +234,11 @@ export default class commandsList extends Vue {
   }
 
   sendUpdate (id) {
-    this.socket.emit('commands::setById', id, this.commands.find((o) => o.id === id), () => {});
+    this.socket.emit('commands::setById', id, this.commands.find((o) => o.id === id), (err) => {
+      if (err) {
+        return console.error(err);
+      }
+    });
   }
 }
 </script>

@@ -180,7 +180,6 @@ export default class cooldownEdit extends Vue {
     if (this.$route.params.id) {
       await new Promise((resolve, reject) => {
         this.socket.emit('cooldown::getById', this.$route.params.id, (err, data: CooldownInterface) => {
-          console.log({data});
           if (err) {
             this.$router.push({ name: 'cooldownsManagerList' });
             reject(err)

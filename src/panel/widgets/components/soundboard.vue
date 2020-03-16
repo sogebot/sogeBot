@@ -58,7 +58,12 @@ export default {
     }
   },
   created: function () {
-    this.socket.emit('getSoundBoardSounds', (sounds) => this.sounds = sounds)
+    this.socket.emit('getSoundBoardSounds', (err, sounds) => {
+      if (err) {
+        return console.error(err);
+      }
+      this.sounds = sounds;
+    })
     if (localStorage.getItem('/widget/soundboard/volume')) this.volume = JSON.parse(localStorage.getItem('/widget/soundboard/volume'))
   },
   methods: {

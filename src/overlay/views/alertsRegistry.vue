@@ -495,12 +495,18 @@ export default class AlertsRegistryOverlays extends Vue {
   }
 
   refreshAlert() {
-    this.socket.emit('isAlertUpdated', { updatedAt: this.updatedAt, id: this.id }, async (isUpdated: boolean, updatedAt: number) => {
+    this.socket.emit('isAlertUpdated', { updatedAt: this.updatedAt, id: this.id }, async (err: Error | null, isUpdated: boolean, updatedAt: number) => {
+      if (err) {
+        return console.error(err)
+      }
       if (isUpdated) {
         console.debug('Alert is updating')
         this.updatedAt = updatedAt;
         await new Promise((resolve) => {
-          this.socket.emit('alerts::getOne', this.id, async (data: AlertInterface) => {
+          this.socket.emit('alerts::getOne', this.id, async (err, data: AlertInterface) => {
+            if (err) {
+              return console.error(err);
+            }
             try {
               if (this.runningAlert !== null) {
                 return; // skip any changes if alert in progress
@@ -552,7 +558,10 @@ export default class AlertsRegistryOverlays extends Vue {
 
                 // load emotes
                 await new Promise((done) => {
-                  this.socketEmotes.emit('getCache', (data) => {
+                  this.socketEmotes.emit('getCache', (err, data) => {
+                    if (err) {
+                      return console.error(err);
+                    }
                     this.emotes = data;
                     console.debug('= Emotes loaded')
                     done();

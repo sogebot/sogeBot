@@ -104,7 +104,10 @@
 
       for (const id of this.currentIds) {
         if (!this.currentUsers.find(o => o.id === id)) {
-          this.usersSocket.emit('getNameById', id, (username) => {
+          this.usersSocket.emit('getNameById', id, (err, username) => {
+            if (err) {
+              return console.error(err);
+            }
             this.currentUsers.push({
               id, username
             });
@@ -138,7 +141,10 @@
         } else {
           this.testUsername = val;
           console.log({val})
-          this.usersSocket.emit('find.viewers', { search: val, state }, (r, c, state) => {
+          this.usersSocket.emit('find.viewers', { search: val, state }, (err, r, c, state) => {
+            if (err) {
+              return console.error(err);
+            }
             if (state === this.stateSearch) {
               // expecting this data
               this.searchData = r;

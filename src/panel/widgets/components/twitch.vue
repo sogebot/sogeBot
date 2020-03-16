@@ -50,7 +50,10 @@ export default {
     }
   },
   created: function () {
-    this.socket.emit('broadcaster', (room) => {
+    this.socket.emit('broadcaster', (err, room) => {
+      if (err) {
+        return console.error(err);
+      }
       this.room = room;
     })
   },

@@ -43,31 +43,49 @@ class Queue extends System {
 
   sockets () {
     adminEndpoint(this.nsp, 'queue::getAllPicked', async(cb) => {
-      cb(this.pickedUsers);
+      try {
+        cb(null, this.pickedUsers);
+      } catch (e) {
+        cb(e, []);
+      }
     });
     adminEndpoint(this.nsp, 'queue::getAll', async(cb) => {
-      cb(
-        await getRepository(QueueEntity).find(),
-      );
+      try {
+        cb(
+          null,
+          await getRepository(QueueEntity).find(),
+        );
+      } catch (e) {
+        cb(e, []);
+      }
     });
     adminEndpoint(this.nsp, 'queue::clear', async(cb) => {
-      cb(
-        await getRepository(QueueEntity).clear(),
-      );
+      try {
+        cb(
+          null,
+          await getRepository(QueueEntity).clear(),
+        );
+      } catch (e) {
+        cb(e);
+      }
     });
     adminEndpoint(this.nsp, 'queue::pick', async (data, cb) => {
-      if (data.username) {
-        const users: any[] = [];
-        if (_.isString(data.username)) {
-          data.username = [data.username];
+      try {
+        if (data.username) {
+          const users: any[] = [];
+          if (_.isString(data.username)) {
+            data.username = [data.username];
+          }
+          for (let user of data.username) {
+            user = await getRepository(QueueEntity).findOne({ username: user });
+            users.push(user);
+          }
+          cb(null, await this.pickUsers({ sender: getOwner(), users }, data.random));
+        } else {
+          cb(null, await this.pickUsers({ sender: getOwner(), parameters: String(data.count) }, data.random));
         }
-        for (let user of data.username) {
-          user = await getRepository(QueueEntity).findOne({ username: user });
-          users.push(user);
-        }
-        cb(null, await this.pickUsers({ sender: getOwner(), users }, data.random));
-      } else {
-        cb(null, await this.pickUsers({ sender: getOwner(), parameters: String(data.count) }, data.random));
+      } catch (e) {
+        cb(e);
       }
     });
   }

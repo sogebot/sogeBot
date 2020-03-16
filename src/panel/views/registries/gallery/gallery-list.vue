@@ -175,7 +175,10 @@ export default class galleryRegistryEdit extends Vue {
     for (let i = 0, l = files.length; i < l; i++) {
       const reader = new FileReader()
       reader.onload = ((e: any) => {
-        this.socket.emit('gallery::upload', [files[i].name, e.target.result], (item) => {
+        this.socket.emit('gallery::upload', [files[i].name, e.target.result], (err, item) => {
+          if (err) {
+            return console.error(err);
+          }
           this.uploadedFiles++
           this.items.push(item)
         })

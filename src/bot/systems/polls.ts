@@ -56,12 +56,16 @@ class Polls extends System {
 
   public async sockets() {
     adminEndpoint(this.nsp, 'polls::getAll', async (cb) => {
-      cb(await getRepository(Poll).find({
-        relations: ['votes'],
-        order: {
-          openedAt: 'DESC',
-        },
-      }));
+      try {
+        cb(null, await getRepository(Poll).find({
+          relations: ['votes'],
+          order: {
+            openedAt: 'DESC',
+          },
+        }));
+      } catch(e) {
+        cb(e, []);
+      }
     });
     adminEndpoint(this.nsp, 'create', async (vote: Poll, cb) => {
       try {

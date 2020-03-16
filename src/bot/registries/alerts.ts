@@ -36,12 +36,16 @@ class Alerts extends Registry {
   }
 
   sockets () {
-    publicEndpoint(this.nsp, 'isAlertUpdated', async ({updatedAt, id}: { updatedAt: number; id: string }, cb: (isUpdated: boolean, updatedAt: number) => void) => {
-      const alert = await getRepository(Alert).findOne({ id });
-      if (alert) {
-        cb(updatedAt < (alert.updatedAt || 0), alert.updatedAt || 0);
-      } else {
-        cb(false, 0);
+    publicEndpoint(this.nsp, 'isAlertUpdated', async ({updatedAt, id}: { updatedAt: number; id: string }, cb: (err: Error | null, isUpdated: boolean, updatedAt: number) => void) => {
+      try {
+        const alert = await getRepository(Alert).findOne({ id });
+        if (alert) {
+          cb(null, updatedAt < (alert.updatedAt || 0), alert.updatedAt || 0);
+        } else {
+          cb(null, false, 0);
+        }
+      } catch (e) {
+        cb(e, false, 0);
       }
     });
 
@@ -68,7 +72,7 @@ class Alerts extends Registry {
         );
 
       } catch (e) {
-        cb(null, []);
+        cb(e, []);
       }
     });
     adminEndpoint(this.nsp, 'alerts::save', async (item: AlertInterface, cb) => {
@@ -82,19 +86,29 @@ class Alerts extends Registry {
       }
     });
     publicEndpoint(this.nsp, 'alerts::getOne', async (id: string, cb) => {
-      cb(
-        await getRepository(Alert).findOne({
-          where: { id },
-          relations: ['cheers', 'follows', 'hosts', 'raids', 'resubs', 'subgifts', 'subs', 'tips'],
-        })
-      );
+      try {
+        cb(
+          null,
+          await getRepository(Alert).findOne({
+            where: { id },
+            relations: ['cheers', 'follows', 'hosts', 'raids', 'resubs', 'subgifts', 'subs', 'tips'],
+          })
+        );
+      } catch (e) {
+        cb(e);
+      }
     });
     adminEndpoint(this.nsp, 'alerts::getAll', async (cb) => {
-      cb(
-        await getRepository(Alert).find({
-          relations: ['cheers', 'follows', 'hosts', 'raids', 'resubs', 'subgifts', 'subs', 'tips'],
-        })
-      );
+      try {
+        cb(
+          null,
+          await getRepository(Alert).find({
+            relations: ['cheers', 'follows', 'hosts', 'raids', 'resubs', 'subgifts', 'subs', 'tips'],
+          })
+        );
+      } catch (e) {
+        cb (e, []);
+      }
     });
     adminEndpoint(this.nsp, 'alerts::delete', async (item: Required<AlertInterface>, cb) => {
       try {

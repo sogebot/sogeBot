@@ -107,7 +107,10 @@ export default {
     }
   },
   created: function () {
-      this.socket.emit('cmdboard::getAll', (items) => {
+      this.socket.emit('cmdboard::getAll', (err, items) => {
+        if (err) {
+          return console.error(err);
+        }
         this.items = items
         this.state.loading = this.$state.success;
       })
@@ -139,7 +142,11 @@ export default {
     save() {
       this.state.editation = this.$state.idle;
       console.debug('saving', { items: Array(...this.items) })
-      this.socket.emit('cmdboard::save', this.items, () => {})
+      this.socket.emit('cmdboard::save', this.items, (err) => {
+        if (err) {
+          return console.error(err);
+        }
+      })
     },
     emit: function (item) {
       this.socket.emit('cmdboard::run', item.command)
@@ -150,7 +157,10 @@ export default {
           text: this.name,
           command: this.command,
           order: this.items.length,
-        }], (items) => {
+        }], (err, items) => {
+        if (err) {
+          return console.error(err);
+        }
         this.items = [...this.items, ...items]
       })
       this.name = ''

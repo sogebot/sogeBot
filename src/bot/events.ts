@@ -578,97 +578,117 @@ class Events extends Core {
 
   public sockets() {
     adminEndpoint(this.nsp, 'events::getAll', async (cb) => {
-      cb(await getRepository(Event).find({
-        relations: ['operations'],
-      }));
+      try {
+        cb(null, await getRepository(Event).find({
+          relations: ['operations'],
+        }));
+      } catch (e) {
+        cb(e, []);
+      }
     });
     adminEndpoint(this.nsp, 'events::getOne', async (eventId: string, cb) => {
-      const event = await getRepository(Event).findOne({
-        relations: ['operations'],
-        where: { id: eventId },
-      });
-      cb(event);
+      try {
+        const event = await getRepository(Event).findOne({
+          relations: ['operations'],
+          where: { id: eventId },
+        });
+        cb(null, event);
+      } catch (e) {
+        cb(e, undefined);
+      }
     });
-    adminEndpoint(this.nsp, 'list.supported.events', (callback) => {
-      callback(null, this.supportedEventsList);
+    adminEndpoint(this.nsp, 'list.supported.events', (cb) => {
+      try {
+        cb(null, this.supportedEventsList);
+      } catch (e) {
+        cb(e, []);
+      }
     });
-    adminEndpoint(this.nsp, 'list.supported.operations', (callback) => {
-      callback(null, this.supportedOperationsList);
+    adminEndpoint(this.nsp, 'list.supported.operations', (cb) => {
+      try {
+        cb(null, this.supportedOperationsList);
+      } catch (e) {
+        cb(e, []);
+      }
     });
 
     adminEndpoint(this.nsp, 'test.event', async (eventId, cb) => {
-      const username = _.sample(['short', 'someFreakingLongUsername', generateUsername()]) || 'short';
-      const recipient = _.sample(['short', 'someFreakingLongUsername', generateUsername()]) || 'short';
-      const months = _.random(0, 99, false);
-      const attributes = {
-        test: true,
-        userId: 0,
-        username,
-        is: {
-          moderator: _.random(0, 1, false) === 0,
-          subscriber: _.random(0, 1, false) === 0,
-          broadcaster: _.random(0, 1, false) === 0,
-          bot: _.random(0, 1, false) === 0,
-          owner: _.random(0, 1, false) === 0,
-        },
-        recipient,
-        recipientis: {
-          moderator: _.random(0, 1, false) === 0,
-          subscriber: _.random(0, 1, false) === 0,
-          broadcaster: _.random(0, 1, false) === 0,
-          bot: _.random(0, 1, false) === 0,
-          owner: _.random(0, 1, false) === 0,
-        },
-        subStreakShareEnabled: _.random(0, 1, false) === 0,
-        subStreak: _.random(10, 99, false),
-        subStreakName: getLocalizedName(_.random(10, 99, false), 'core.months'),
-        subCumulativeMonths: _.random(10, 99, false),
-        subCumulativeMonthsName: getLocalizedName(_.random(10, 99, false), 'core.months'),
-        months,
-        tier: _.random(0, 3, false),
-        monthsName: getLocalizedName(months, 'core.months'),
-        message: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
-        viewers: _.random(0, 9999, false),
-        autohost: _.random(0, 1, false) === 0,
-        bits: _.random(1, 1000000, false),
-        duration: _.sample([30, 60, 90, 120, 150, 180]),
-        reason: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
-        command: '!testcommand',
-        count: _.random(0, 9999, false),
-        method: _.random(0, 1, false) === 0 ? 'Twitch Prime' : '',
-        amount: _.random(0, 9999, true).toFixed(2),
-        currency: _.sample(['CZK', 'USD', 'EUR']),
-        currencyInBot: currency.mainCurrency,
-        amountInBotCurrency: _.random(0, 9999, true).toFixed(2),
-      };
+      try {
+        const username = _.sample(['short', 'someFreakingLongUsername', generateUsername()]) || 'short';
+        const recipient = _.sample(['short', 'someFreakingLongUsername', generateUsername()]) || 'short';
+        const months = _.random(0, 99, false);
+        const attributes = {
+          test: true,
+          userId: 0,
+          username,
+          is: {
+            moderator: _.random(0, 1, false) === 0,
+            subscriber: _.random(0, 1, false) === 0,
+            broadcaster: _.random(0, 1, false) === 0,
+            bot: _.random(0, 1, false) === 0,
+            owner: _.random(0, 1, false) === 0,
+          },
+          recipient,
+          recipientis: {
+            moderator: _.random(0, 1, false) === 0,
+            subscriber: _.random(0, 1, false) === 0,
+            broadcaster: _.random(0, 1, false) === 0,
+            bot: _.random(0, 1, false) === 0,
+            owner: _.random(0, 1, false) === 0,
+          },
+          subStreakShareEnabled: _.random(0, 1, false) === 0,
+          subStreak: _.random(10, 99, false),
+          subStreakName: getLocalizedName(_.random(10, 99, false), 'core.months'),
+          subCumulativeMonths: _.random(10, 99, false),
+          subCumulativeMonthsName: getLocalizedName(_.random(10, 99, false), 'core.months'),
+          months,
+          tier: _.random(0, 3, false),
+          monthsName: getLocalizedName(months, 'core.months'),
+          message: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
+          viewers: _.random(0, 9999, false),
+          autohost: _.random(0, 1, false) === 0,
+          bits: _.random(1, 1000000, false),
+          duration: _.sample([30, 60, 90, 120, 150, 180]),
+          reason: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
+          command: '!testcommand',
+          count: _.random(0, 9999, false),
+          method: _.random(0, 1, false) === 0 ? 'Twitch Prime' : '',
+          amount: _.random(0, 9999, true).toFixed(2),
+          currency: _.sample(['CZK', 'USD', 'EUR']),
+          currencyInBot: currency.mainCurrency,
+          amountInBotCurrency: _.random(0, 9999, true).toFixed(2),
+        };
 
-      const event = await getRepository(Event).findOne({
-        relations: ['operations'],
-        where: { id: eventId },
-      });
-      if (event) {
-        for (const operation of event.operations) {
-          if (!_.isNil(attributes.is)) {
-            // flatten is
-            const is = attributes.is;
-            _.merge(attributes, flatten({ is }));
-          }
-          if (!_.isNil(attributes.recipientis)) {
-            // flatten recipientis
-            const recipientis = attributes.recipientis;
-            _.merge(attributes, flatten({ recipientis }));
-          }
-          const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.name));
-          if (isOperationSupported) {
-            const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.name);
-            if (foundOp) {
-              foundOp.fire(operation.definitions, attributes);
+        const event = await getRepository(Event).findOne({
+          relations: ['operations'],
+          where: { id: eventId },
+        });
+        if (event) {
+          for (const operation of event.operations) {
+            if (!_.isNil(attributes.is)) {
+              // flatten is
+              const is = attributes.is;
+              _.merge(attributes, flatten({ is }));
+            }
+            if (!_.isNil(attributes.recipientis)) {
+              // flatten recipientis
+              const recipientis = attributes.recipientis;
+              _.merge(attributes, flatten({ recipientis }));
+            }
+            const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.name));
+            if (isOperationSupported) {
+              const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.name);
+              if (foundOp) {
+                foundOp.fire(operation.definitions, attributes);
+              }
             }
           }
         }
-      }
 
-      cb();
+        cb(null);
+      } catch (e) {
+        cb(e);
+      }
     });
 
     adminEndpoint(this.nsp, 'events::save', async (event: EventInterface, cb) => {

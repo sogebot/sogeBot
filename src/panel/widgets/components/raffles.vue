@@ -287,7 +287,10 @@ export default {
     refresh: async function () {
       await Promise.all([
         new Promise((resolve) => {
-          this.socket.emit('raffle:getLatest', (raffle) => {
+          this.socket.emit('raffle:getLatest', (err, raffle) => {
+            if (err) {
+              return console.error(err);
+            }
             if (raffle) {
               this.participants = raffle.participants;
               this.running = !raffle.isClosed;
@@ -296,7 +299,12 @@ export default {
                 this.winner = null
               } else {
                 if (this.winner === null) {
-                  this.socket.emit('raffle::getWinner', raffle.winner, (user) => this.winner = user)
+                  this.socket.emit('raffle::getWinner', raffle.winner, (err, user) => {
+                    if (err) {
+                      return console.error(err);
+                    }
+                    this.winner = user
+                  });
                 }
               }
 
@@ -327,7 +335,11 @@ export default {
     },
     toggleEligibility: function (participant) {
       participant.isEligible = !participant.isEligible;
-      this.socket.emit('raffle::updateParticipant', participant, () => {});
+      this.socket.emit('raffle::updateParticipant', participant, (err) => {
+        if (err) {
+          return console.error(err);
+        }
+      });
     },
     toggle: function (pick) {
       Vue.set(this.eligibility, pick, !this.eligibility[pick])

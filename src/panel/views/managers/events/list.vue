@@ -223,7 +223,10 @@
       },
     },
     mounted() {
-      this.socket.emit('events::getAll', (data: EventInterface[]) => {
+      this.socket.emit('events::getAll', (err, data: EventInterface[]) => {
+        if (err) {
+          return console.error(err);
+        }
         this.events = data;
         this.state.loading = this.$state.idle;
       });
@@ -252,7 +255,10 @@
         }, delay)
       },
       deleteEvent(event) {
-        this.socket.emit('events::remove', event, () => {
+        this.socket.emit('events::remove', event, (err) => {
+          if (err) {
+            return console.error(err);
+          }
           this.events = this.events.filter((o) => o.id !== event.id)
         })
       },
@@ -266,7 +272,11 @@
         });
       },
       sendUpdate(event) {
-        this.socket.emit('events::save', event, () => {})
+        this.socket.emit('events::save', event, (err) => {
+          if (err) {
+            console.error(err);
+          }
+        })
       },
       isSettingsShown(id) {
         return this.showSettingsOfEvent.includes(id)

@@ -267,7 +267,10 @@
         return options >= 2
       },
       refresh: function () {
-        this.socket.emit('polls::getAll', (data) =>  {
+        this.socket.emit('polls::getAll', (err, data) =>  {
+          if (err) {
+            return console.error(err);
+          }
           console.debug('Loaded', data);
           this.votes = data
         })

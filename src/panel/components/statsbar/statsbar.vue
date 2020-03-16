@@ -444,8 +444,16 @@
       })
 
 
-      this.socket.emit('getLatestStats', (data) => { this.averageStats = data });
-      this.socket.emit('panel.sendStreamData', async (data) => {
+      this.socket.emit('getLatestStats', (err, data) => {
+        if (err) {
+          return console.error(err);
+        }
+        this.averageStats = data
+      });
+      this.socket.emit('panel.sendStreamData', async (err, data) => {
+        if (err) {
+          return console.error(err);
+        }
         for (let [key, value] of Object.entries(data)) {
           this[key] = value // populate data
         }
@@ -458,8 +466,16 @@
       });
 
       setInterval(() => {
-      this.socket.emit('getLatestStats', (data) => { this.averageStats = data });
-      this.socket.emit('panel.sendStreamData', async (data) => {
+      this.socket.emit('getLatestStats', (err, data) => {
+        if (err) {
+          return console.error(err);
+        }
+        this.averageStats = data
+      });
+      this.socket.emit('panel.sendStreamData', async (err, data) => {
+        if (err) {
+          return console.error(err);
+        }
         for (let [key, value] of Object.entries(data)) {
           this[key] = value // populate data
         }

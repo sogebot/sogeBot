@@ -39,17 +39,29 @@ class Alias extends System {
 
   sockets() {
     publicEndpoint(this.nsp, 'alias:getAll', async (cb) => {
-      cb(null, await getRepository(AliasEntity).find());
+      try {
+        cb(null, await getRepository(AliasEntity).find());
+      } catch (e) {
+        cb(e, []);
+      }
     });
 
     adminEndpoint(this.nsp, 'getById', async (id, cb) => {
-      cb(null, await getRepository(AliasEntity).findOne({ id }));
+      try {
+        cb(null, await getRepository(AliasEntity).findOne({ id }));
+      } catch (e) {
+        cb(e);
+      }
     });
 
     adminEndpoint(this.nsp, 'setById', async (id, dataset: AliasInterface, cb) => {
-      const item = await getRepository(AliasEntity).findOne({ id });
-      await getRepository(AliasEntity).save({ ...item, ...dataset});
-      cb(null, item);
+      try {
+        const item = await getRepository(AliasEntity).findOne({ id });
+        await getRepository(AliasEntity).save({ ...item, ...dataset});
+        cb(null, item);
+      } catch (e) {
+        cb(e);
+      }
     });
 
     adminEndpoint(this.nsp, 'deleteById', async (id, cb) => {

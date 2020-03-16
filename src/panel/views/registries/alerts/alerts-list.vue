@@ -149,7 +149,10 @@ export default class customVariablesList extends Vue {
 
   refresh() {
     this.state.loaded = this.$state.progress;
-    this.socket.emit('alerts::getAll', (data: AlertInterface[]) => {
+    this.socket.emit('alerts::getAll', (err, data: AlertInterface[]) => {
+      if (err) {
+        return console.error(err);
+      }
       console.debug('Loaded', data)
       this.items = data;
       this.state.loaded = this.$state.success;

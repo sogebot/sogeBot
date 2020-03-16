@@ -216,7 +216,10 @@ export default class carouselOverlayEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
 
-      this.socket.emit('carousel::save', this.item, (data) => {
+      this.socket.emit('carousel::save', this.item, (err, data) => {
+        if (err) {
+          return console.error(err);
+        }
         this.state.save = this.$state.success;
         this.state.pending = false;
         this.$router.push({ name: 'carouselRegistryEdit', params: { id: String(data.id) } })
@@ -228,14 +231,20 @@ export default class carouselOverlayEdit extends Vue {
   }
 
   del() {
-    this.socket.emit('carousel::remove', this.item.id, () => {
+    this.socket.emit('carousel::remove', this.item.id, (err) => {
+      if (err) {
+        return console.error(err);
+      }
       this.$router.push({ name: 'carouselRegistryList' })
     })
   }
 
   created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('carousel::getOne', this.$route.params.id, (item) => {
+    this.socket.emit('carousel::getOne', this.$route.params.id, (err, item) => {
+      if (err) {
+        return console.error(err);
+      }
       this.item = item;
       this.$nextTick(() => {
         this.state.loading = this.$state.success;

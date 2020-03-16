@@ -41,7 +41,11 @@ class Highlights extends System {
       this.main({ parameters: '', sender: null });
     });
     adminEndpoint(this.nsp, 'highlights::getAll', async (cb) => {
-      cb(null, await getRepository(Highlight).find({ order: { createdAt: 'DESC' } }));
+      try {
+        cb(null, await getRepository(Highlight).find({ order: { createdAt: 'DESC' } }));
+      } catch (e) {
+        cb(e);
+      }
     });
     adminEndpoint(this.nsp, 'highlights::deleteById', async (id, cb) => {
       await getRepository(Highlight).delete({ id });

@@ -63,13 +63,13 @@ class Stats {
           stats.newChatters = Number(Number(stats.newChatters / statsFromDb.length).toFixed(0));
           stats.currentHosts = Number(Number(stats.currentHosts / statsFromDb.length).toFixed(0));
           stats.currentWatched = Number(Number(stats.currentWatched / statsFromDb.length).toFixed(0));
-          cb(stats);
+          cb(null, stats);
         } else {
-          cb({});
+          cb(null, {});
         }
       } catch (e) {
         error(e);
-        cb({});
+        cb(e, {});
       };
     });
   }

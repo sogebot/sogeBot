@@ -16,13 +16,22 @@ class Text extends Registry {
     const regexp = new RegExp('\\$_[a-zA-Z0-9_]+', 'g');
 
     adminEndpoint(this.nsp, 'text::remove', async(item: Required<TextInterface>, cb) => {
-      await getRepository(TextEntity).remove(item);
-      cb();
+      try {
+        await getRepository(TextEntity).remove(item);
+        cb(null);
+      } catch (e) {
+        cb(e);
+      }
     });
     adminEndpoint(this.nsp, 'text::getAll', async(cb) => {
-      cb(
-        await getRepository(TextEntity).find(),
-      );
+      try {
+        cb(
+          null,
+          await getRepository(TextEntity).find(),
+        );
+      } catch (e) {
+        cb(e);
+      }
     });
     adminEndpoint(this.nsp, 'text::save', async(item: TextInterface, cb) => {
       try {
@@ -35,22 +44,26 @@ class Text extends Registry {
       }
     });
     publicEndpoint(this.nsp, 'text::getOne', async (id, callback) => {
-      const item = await getRepository(TextEntity).findOne({ id });
-      let text = '';
-      if (item) {
-        text = item.text;
-        for (const variable of item.text.match(regexp) || []) {
-          const isVariable = await customvariables.isVariableSet(variable);
-          let value = `<strong>$_${variable.replace('$_', '')}</strong>`;
-          if (isVariable) {
-            value = await customvariables.getValueOf(variable) || '';
+      try {
+        const item = await getRepository(TextEntity).findOne({ id });
+        let text = '';
+        if (item) {
+          text = item.text;
+          for (const variable of item.text.match(regexp) || []) {
+            const isVariable = await customvariables.isVariableSet(variable);
+            let value = `<strong>$_${variable.replace('$_', '')}</strong>`;
+            if (isVariable) {
+              value = await customvariables.getValueOf(variable) || '';
+            }
+            text = text.replace(new RegExp(`\\${variable}`, 'g'), value);
           }
-          text = text.replace(new RegExp(`\\${variable}`, 'g'), value);
+          text = await new Message(text).parse();
+          callback(null, {...item, text});
         }
-        text = await new Message(text).parse();
-        callback({...item, text});
+        callback(null, null);
+      } catch(e) {
+        callback(e, null);
       }
-      callback(null);
     });
   }
 }

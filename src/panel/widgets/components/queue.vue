@@ -104,16 +104,25 @@ export default {
   },
   created: function () {
     this.interval.push(
-      setInterval(() => this.socket.emit('queue::getAllPicked', (users) => {
+      setInterval(() => this.socket.emit('queue::getAllPicked', (err, users) => {
+        if (err) {
+          return console.error(err)
+        }
         this.picked = users
       }), 1000)
     );
     this.interval.push(
-      setInterval(() => this.socket.emit('queue::getAll', (users) => {
+      setInterval(() => this.socket.emit('queue::getAll', (err, users) => {
+        if (err) {
+          return console.error(err)
+        }
         this.users = users
       }), 1000)
     )
     this.socket.emit('settings', (err, data) => {
+      if (err) {
+        return console.error(err)
+      }
       this.eligibilityAll = data.eligibility.eligibilityAll
       this.eligibilityFollowers = data.eligibility.eligibilityFollowers
       this.eligibilitySubscribers = data.eligibility.eligibilitySubscribers
@@ -171,7 +180,11 @@ export default {
   },
   methods: {
     clear: function () {
-      this.socket.emit('queue::clear', () => {})
+      this.socket.emit('queue::clear', (err) => {
+        if (err) {
+          return console.error(err)
+        }
+      })
     },
     pick: function (username) {
       const data = {
@@ -179,7 +192,10 @@ export default {
         count: this.selectCount,
         username
       }
-      this.socket.emit('queue::pick', data, users => {
+      this.socket.emit('queue::pick', data, (err, users) => {
+        if (err) {
+          return console.error(err)
+        }
         this.tabIndex = 0
         this.picked = users
         this.multiSelection = false

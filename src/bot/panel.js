@@ -595,9 +595,9 @@ Panel.prototype.sendStreamData = async function (cb) {
       currentWatched: api.stats.currentWatchedTime,
       tags: tagResults,
     }
-    cb(data)
+    cb(null, data)
   } catch (e) {
-    error(e.stack);
+    cb(e, data);
   }
 }
 

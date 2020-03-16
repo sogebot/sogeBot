@@ -21,27 +21,43 @@ class Quotes extends System {
 
   sockets() {
     publicEndpoint(this.nsp, 'quotes:getAll', async (_opts, cb) => {
-      const items = await getRepository(QuotesEntity).find();
-      cb(null, await Promise.all(items.map(async (item) => {
-        return {
-          ...item,
-          quotedByName: await users.getNameById(item.quotedBy),
-        };
-      })));
+      try {
+        const items = await getRepository(QuotesEntity).find();
+        cb(null, await Promise.all(items.map(async (item) => {
+          return {
+            ...item,
+            quotedByName: await users.getNameById(item.quotedBy),
+          };
+        })));
+      } catch (e) {
+        cb(e, []);
+      }
     });
 
     adminEndpoint(this.nsp, 'getById', async (id, cb) => {
-      const item = await getRepository(QuotesEntity).findOne({ id });
-      cb(null, item);
+      try {
+        const item = await getRepository(QuotesEntity).findOne({ id });
+        cb(null, item);
+      } catch (e) {
+        cb(e);
+      }
     });
 
     adminEndpoint(this.nsp, 'setById', async (id, dataset, cb) => {
-      cb(null, await getRepository(QuotesEntity).save({ ...(await getRepository(QuotesEntity).findOne({ id })), ...dataset }));
+      try {
+        cb(null, await getRepository(QuotesEntity).save({ ...(await getRepository(QuotesEntity).findOne({ id })), ...dataset }));
+      } catch (e) {
+        cb(e);
+      }
     });
 
     adminEndpoint(this.nsp, 'deleteById', async (id, cb) => {
-      await getRepository(QuotesEntity).delete({ id });
-      cb(null);
+      try {
+        await getRepository(QuotesEntity).delete({ id });
+        cb(null);
+      } catch(e) {
+        cb(e);
+      }
     });
   }
 

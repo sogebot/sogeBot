@@ -337,7 +337,10 @@
     },
     mounted() {
       if (this.$route.params.id) {
-        this.socket.emit('events::getOne', this.$route.params.id, (event: Required<EventInterface>) => {
+        this.socket.emit('events::getOne', this.$route.params.id, (err, event: Required<EventInterface>) => {
+          if (err) {
+            return console.error(err);
+          }
           this.watchEventChange = false;
 
           if (event.operations[event.operations.length - 1].name !== 'do-nothing') {
@@ -445,7 +448,10 @@
         return get(this, '$v.event.definitions.' + key, { $invalid: false });
       },
       del: function () {
-        this.socket.emit('events::remove', this.event, () => {
+        this.socket.emit('events::remove', this.event, (err) => {
+          if (err) {
+            return console.error(err);
+          }
           this.$router.push({ name: 'EventsManagerList' })
         })
       },
