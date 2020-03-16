@@ -47,11 +47,9 @@ export const VariableWatcher = {
         const [type, name, variable] = k.split('.');
 
         variables[k] = value;
-        let self;
-        if (type === 'core') {
-          self = (require('./' + name)).default;
-        } else {
-          self = (require('./' + type + '/' + name)).default;
+        const self = list(type).find(m => m.constructor.name.toLowerCase() === name.toLowerCase());
+        if (!self) {
+          throw new Error(`${type}.${name} not found in list`);
         }
 
         if (isMainThread && self) {
@@ -81,11 +79,12 @@ export const VariableWatcher = {
       for (const k of Object.keys(readonly)) {
         let checkedModule;
 
-        if (k.startsWith('core')) {
-          checkedModule = (require(`./${k.split('.')[1]}`)).default;
-        } else {
-          checkedModule = (require(`./${k.split('.')[0]}/${k.split('.')[1]}`)).default;
+        const [ type, name ] = k.split('.');
+        const self = list(type).find(m => m.constructor.name.toLowerCase() === name.toLowerCase());
+        if (!self) {
+          throw new Error(`${type}.${name} not found in list`);
         }
+
         const variable = k.split('.').slice(2).join('.');
         const value = cloneDeep(get(checkedModule, variable, null));
         if (!isEqual(value, readonly[k])) {

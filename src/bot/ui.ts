@@ -58,7 +58,10 @@ class UI extends Core {
           if (typeof data.core === 'undefined') {
             data.core = {};
           }
-          const self = (require('./' + system.toLowerCase())).default;
+          const self = list('core').find(m => m.constructor.name.toLowerCase() === system.toLowerCase());
+          if (!self) {
+            throw new Error(`core.${name} not found in list`);
+          }
           data.core[system] = await self.getAllSettings();
         }
         for (const dir of ['systems', 'games', 'overlays', 'integrations']) {

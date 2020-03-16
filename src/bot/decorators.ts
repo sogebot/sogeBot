@@ -6,6 +6,7 @@ import { isMainThread } from './cluster';
 import { getRepository } from 'typeorm';
 import { Settings } from './database/entity/settings';
 import { isDbConnected } from './helpers/database';
+import { list } from './helpers/register';
 
 export let loadingInProgress: string[] = [];
 export let areDecoratorsLoaded = false;
@@ -58,11 +59,9 @@ export function ui(opts, category?: string) {
         return setTimeout(() => register(0), 1000);
       }
       try {
-        let self;
-        if (type === 'core') {
-          self = (require('./' + name)).default;
-        } else {
-          self = (require('./' + type + '/' + name)).default;
+        const self = list(type).find(m => m.constructor.name.toLowerCase() === name.toLowerCase());
+        if (!self) {
+          throw new Error(`${type}.${name} not found in list`);
         }
         // get category from settingsList
         if (!category) {
@@ -95,11 +94,9 @@ export function settings(category?: string, isReadOnly = false) {
     }
 
     const registerSettings = async () => {
-      let self;
-      if (type === 'core') {
-        self = (require('./' + name)).default;
-      } else {
-        self = (require('./' + type + '/' + name)).default;
+      const self = list(type).find(m => m.constructor.name.toLowerCase() === name.toLowerCase());
+      if (!self) {
+        throw new Error(`${type}.${name} not found in list`);
       }
       if (!isDbConnected) {
         return setTimeout(() => registerSettings(), 1000);
@@ -151,11 +148,9 @@ export function permission_settings(category?: string) {
         return setTimeout(() => register(), 1000);
       }
       try {
-        let self;
-        if (type === 'core') {
-          self = (require('./' + name)).default;
-        } else {
-          self = (require('./' + type + '/' + name)).default;
+        const self = list(type).find(m => m.constructor.name.toLowerCase() === name.toLowerCase());
+        if (!self) {
+          throw new Error(`${type}.${name} not found in list`);
         }
         if (category === key) {
           throw Error(`Category and variable name cannot be same - ${type}.${name}.${key} in category ${category}`);
@@ -203,11 +198,9 @@ export function shared(db = false) {
         return setTimeout(() => register(), 1000);
       }
       try {
-        let self;
-        if (type === 'core') {
-          self = (require('./' + name)).default;
-        } else {
-          self = (require('./' + type + '/' + name)).default;
+        const self = list(type).find(m => m.constructor.name.toLowerCase() === name.toLowerCase());
+        if (!self) {
+          throw new Error(`${type}.${name} not found in list`);
         }
         const defaultValue = self[key];
         VariableWatcher.add(`${type}.${name}.${key}`, defaultValue, false);
@@ -289,10 +282,9 @@ async function registerCommand(opts: string | Command, m) {
   }
   let self;
   try {
-    if (m.type === 'core') {
-      self = (require('./' + m.name)).default;
-    } else {
-      self = (require('./' + m.type + '/' + m.name)).default;
+    self = list(m.type).find(module => module.constructor.name.toLowerCase() === m.name.toLowerCase());
+    if (!self) {
+      throw new Error(`${m.type}.${m.name} not found in list`);
     }
     if (typeof opts === 'string') {
       opts = {
@@ -344,11 +336,9 @@ async function registerCommand(opts: string | Command, m) {
 function registerHelper(m, retry = 0) {
   setTimeout(() => {
     try {
-      let self;
-      if (m.type === 'core') {
-        self = (require('./' + m.name)).default;
-      } else {
-        self = (require('./' + m.type + '/' + m.name)).default;
+      const self = list(m.type).find(module => module.constructor.name.toLowerCase() === m.name.toLowerCase());
+      if (!self) {
+        throw new Error(`${m.type}.${m.name} not found in list`);
       }
       // find command with function
       const c = self._commands.find((o) => o.fnc === m.fnc);
@@ -370,11 +360,9 @@ function registerHelper(m, retry = 0) {
 function registerRollback(m) {
   setTimeout(() => {
     try {
-      let self;
-      if (m.type === 'core') {
-        self = (require('./' + m.name)).default;
-      } else {
-        self = (require('./' + m.type + '/' + m.name)).default;
+      const self = list(m.type).find(module => module.constructor.name.toLowerCase() === m.name.toLowerCase());
+      if (!self) {
+        throw new Error(`${m.type}.${m.name} not found in list`);
       }    self._rollback.push({
         name: m.fnc,
       });
@@ -387,11 +375,9 @@ function registerRollback(m) {
 function registerParser(opts, m) {
   setTimeout(() => {
     try {
-      let self;
-      if (m.type === 'core') {
-        self = (require('./' + m.name)).default;
-      } else {
-        self = (require('./' + m.type + '/' + m.name)).default;
+      const self = list(m.type).find(module => module.constructor.name.toLowerCase() === m.name.toLowerCase());
+      if (!self) {
+        throw new Error(`${m.type}.${m.name} not found in list`);
       }
       self._parsers.push({
         name: m.fnc,

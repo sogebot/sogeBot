@@ -151,11 +151,10 @@ class General extends Core {
       return sendMessage(`$sender, settings does not exists`, opts.sender, opts.attr);
     }
 
-    let self;
-    if (pointer.startsWith('core')) {
-      self = (require(`./${pointer.split('.')[1]}`)).default;
-    } else {
-      self = (require(`./${pointer.split('.')[0]}/${pointer.split('.')[1]}`)).default;
+    const [ type, module ] = pointer.split('.');
+    const self = list(type).find(m => m.constructor.name.toLowerCase() === module);
+    if (!self) {
+      throw new Error(`${type}.${name} not found in list`);
     }
 
     const currentValue = self[pointer.split('.')[2]];
