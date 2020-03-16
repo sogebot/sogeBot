@@ -6,7 +6,6 @@ require('moment-precise-range-plugin'); // moment.preciseDiff
 import { isMainThread } from './cluster';
 import chalk from 'chalk';
 import { defaults, filter, get, isNil, isNull, map } from 'lodash';
-import path from 'path';
 
 import * as constants from './constants';
 import Core from './_interface';
@@ -36,6 +35,7 @@ import stats from './stats';
 import { getFunctionList } from './decorators/on';
 import { linesParsed, setStatus } from './helpers/parser';
 import { isDbConnected } from './helpers/database';
+import { list } from './helpers/register';
 
 const setImmediateAwait = () => {
   return new Promise(resolve => {
@@ -1117,9 +1117,14 @@ class API extends Core {
             justStarted = true;
 
             for (const event of getFunctionList('streamStart')) {
-              const pathToModule = path.join(__dirname, ...event.path.split('.'));
-              const self = (require(pathToModule)).default;
-              self[event.fName]();
+              const type = !event.path.includes('.') ? 'core' : event.path.split('.')[0];
+              const module = !event.path.includes('.') ? event.path.split('.')[0] : event.path.split('.')[1];
+              const self = list(type).find(m => m.constructor.name.toLowerCase() === module);
+              if (self) {
+                self[event.fName]();
+              } else {
+                error(`streamStart: ${event.path} not found`);
+              }
             }
           }
         }
@@ -1175,10 +1180,15 @@ class API extends Core {
             events.fire('stream-is-running-x-minutes', { reset: true });
             events.fire('number-of-viewers-is-at-least-x', { reset: true });
 
-            for (const event of getFunctionList('streamEnd')) {
-              const pathToModule = path.join(__dirname, ...event.path.split('.'));
-              const self = (require(pathToModule)).default;
-              self[event.fName]();
+            for (const event of getFunctionList('streamStart')) {
+              const type = !event.path.includes('.') ? 'core' : event.path.split('.')[0];
+              const module = !event.path.includes('.') ? event.path.split('.')[0] : event.path.split('.')[1];
+              const self = list(type).find(m => m.constructor.name.toLowerCase() === module);
+              if (self) {
+                self[event.fName]();
+              } else {
+                error(`streamStart: ${event.path} not found`);
+              }
             }
 
             this.streamId = null;

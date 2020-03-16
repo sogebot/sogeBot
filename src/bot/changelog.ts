@@ -9,6 +9,7 @@ import { getRepository, LessThan, MoreThan, Not } from 'typeorm';
 import { Settings } from './database/entity/settings';
 import { Changelog } from './database/entity/changelog';
 import { isDbConnected } from './helpers/database';
+import { list } from './helpers/register';
 
 let lastTimestamp = Date.now();
 const threadId = uuid();
@@ -33,16 +34,13 @@ export const changelog = async () => {
     },
   });
   for (const change of changes.sort((a, b) => a.timestamp - b.timestamp )) {
-    let self: null | any = null;
 
     const [type, name, variable] = change.namespace.split('.');
 
-    if (type === 'core') {
-      self = (require('./' + name.toLowerCase())).default;
-    } else {
-      self = (require('./' + type + '/' + name.toLowerCase())).default;
+    const self = list(type).find(m => m.constructor.name.toLowerCase() === name.toLowerCase());
+    if (!self) {
+      throw new Error(`${type}.${name} not found in list`);
     }
-
     const variableFromDb
      = await getRepository(Settings).createQueryBuilder('settings').select('settings')
        .where('namespace = :namespace', { namespace: self.nsp })
@@ -50,11 +48,10 @@ export const changelog = async () => {
        .getOne();
     if (variableFromDb) {
       const value = JSON.stringify(variableFromDb.value);
-      let self;
-      if (change.namespace.startsWith('core')) {
-        self = (require(`./${change.namespace.split('.')[1]}`)).default;
-      } else {
-        self = (require(`./${change.namespace.split('.')[0]}/${change.namespace.split('.')[1]}`)).default;
+      const [ type, name ] = change.namespace.split('.');
+      const self = list(type).find(m => m.constructor.name.toLowerCase() === name.toLowerCase());
+      if (!self) {
+        throw new Error(`${type}.${name} not found in list`);
       }
       self[change.namespace.split('.')[2]] = value;
     }

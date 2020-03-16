@@ -24,8 +24,8 @@ class Module {
   public dependsOn: Module[] = [];
   public showInUI = true;
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
-  public settingsList: { category: string; key: string }[] = [];
-  public settingsPermList: { category: string; key: string }[] = [];
+  public settingsList: { category?: string; key: string }[] = [];
+  public settingsPermList: { category?: string; key: string }[] = [];
   public on: InterfaceSettings.On;
   public socket: any = null;
 
@@ -92,11 +92,11 @@ class Module {
     }
   }
 
-  protected _name: string;
+  public _name: string;
   protected _ui: InterfaceSettings.UI;
-  protected _commands: Command[];
-  protected _parsers: Parser[];
-  protected _rollback: { name: string }[];
+  public _commands: Command[];
+  public _parsers: Parser[];
+  public _rollback: { name: string }[];
   protected _enabled: boolean | null = true;
 
   constructor(name = 'core', enabled = true) {

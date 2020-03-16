@@ -47,14 +47,12 @@ export const VariableWatcher = {
         const [type, name, variable] = k.split('.');
 
         variables[k] = value;
-        let self;
-        if (type === 'core') {
-          self = (require('./' + name)).default;
-        } else {
-          self = (require('./' + type + '/' + name)).default;
+        const self = list(type).find(m => m.constructor.name.toLowerCase() === name.toLowerCase());
+        if (!self) {
+          throw new Error(`${type}.${name} not found in list`);
         }
 
-        if (isMainThread && self) {
+        if (isMainThread) {
           const savedSetting = await getRepository(Settings).findOne({
             where: {
               name: variable,
@@ -79,19 +77,18 @@ export const VariableWatcher = {
         }
       }
       for (const k of Object.keys(readonly)) {
-        let checkedModule;
-
-        if (k.startsWith('core')) {
-          checkedModule = (require(`./${k.split('.')[1]}`)).default;
-        } else {
-          checkedModule = (require(`./${k.split('.')[0]}/${k.split('.')[1]}`)).default;
+        const [ type, name ] = k.split('.');
+        const self = list(type).find(m => m.constructor.name.toLowerCase() === name.toLowerCase());
+        if (!self) {
+          throw new Error(`${type}.${name} not found in list`);
         }
+
         const variable = k.split('.').slice(2).join('.');
-        const value = cloneDeep(get(checkedModule, variable, null));
+        const value = cloneDeep(get(self, variable, null));
         if (!isEqual(value, readonly[k])) {
           const [type, name, variable] = k.split('.');
           error(`Cannot change read-only variable, forcing initial value for ${type}.${name}.${variable}`);
-          checkedModule[variable] = readonly[k];
+          self[variable] = readonly[k];
         }
       }
     }
