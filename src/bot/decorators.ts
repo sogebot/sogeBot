@@ -3,8 +3,6 @@ import { parse, sep as separator } from 'path';
 import { VariableWatcher } from './watchers';
 import { debug, error } from './helpers/log';
 import { isMainThread } from './cluster';
-import { getRepository } from 'typeorm';
-import { Settings } from './database/entity/settings';
 import { isDbConnected } from './helpers/database';
 import { list } from './helpers/register';
 
@@ -14,6 +12,11 @@ export const permissions: { [command: string]: string | null } = {};
 
 let lastLoadingInProgressCount = 1000;
 let lastLoadingRetryCount = 100;
+
+export const commandsToRegister: {
+  opts: string | Command;
+  m: { type: string; name: string; fnc: string };
+}[] = [];
 
 setTimeout(() => {
   const interval = setInterval(() => {
@@ -245,7 +248,7 @@ export function command(opts: string) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: object, key: string, descriptor: PropertyDescriptor) => {
-    registerCommand(opts, { type, name, fnc: key });
+    commandsToRegister.push({ opts, m: { type, name, fnc: key } });
     return descriptor;
   };
 }
@@ -274,63 +277,6 @@ export function rollback() {
     registerRollback({ type, name, fnc: key });
     return descriptor;
   };
-}
-
-async function registerCommand(opts: string | Command, m) {
-  if (!isDbConnected) {
-    return setTimeout(() => registerCommand(opts, m), 1000);
-  }
-  let self;
-  try {
-    self = list(m.type).find(module => module.constructor.name.toLowerCase() === m.name.toLowerCase());
-    if (!self) {
-      throw new Error(`${m.type}.${m.name} not found in list`);
-    }
-    if (typeof opts === 'string') {
-      opts = {
-        name: opts,
-      };
-    }
-    opts.fnc = m.fnc; // force function to decorated function
-    let c;
-    try {
-      c = self.prepareCommand(opts);
-    } catch (e) {
-      setTimeout(() => registerCommand(opts, m), 10);
-      return;
-    }
-
-    if (typeof self._commands === 'undefined') {
-      self._commands = [];
-    }
-
-    self.settingsList.push({ category: 'commands', key: c.name });
-
-    // load command from db
-    const dbc = await getRepository(Settings)
-      .createQueryBuilder('settings')
-      .select('settings')
-      .where('namespace = :namespace', { namespace: self.nsp })
-      .andWhere('name = :name', { name: 'commands.' + c.name })
-      .getOne();
-    if (dbc) {
-      dbc.value = JSON.parse(dbc.value);
-      if (c.name === dbc.value) {
-        // remove if default value
-        await getRepository(Settings)
-          .createQueryBuilder('settings')
-          .delete()
-          .where('namespace = :namespace', { namespace: self.nsp })
-          .andWhere('name = :name', { name: 'commands.' + c.name })
-          .execute();
-      }
-      c.command = dbc.value;
-    }
-    self._commands.push(c);
-  } catch (e) {
-    error(JSON.stringify({isDbConnected, opts, m}));
-    error(e);
-  }
 }
 
 function registerHelper(m, retry = 0) {
