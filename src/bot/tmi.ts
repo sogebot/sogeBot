@@ -174,9 +174,15 @@ class TMI extends Core {
     } else {
       if (channel === '') {
         info(`TMI: ${type} is not properly set, cannot join empty channel`);
+        if (type ==='bot') {
+          setStatus('TMI', constants.DISCONNECTED);
+        }
       } else {
         await (this.client[type] as TwitchJs).chat.join(channel);
         info(`TMI: ${type} joined channel ${channel}`);
+        if (type ==='bot') {
+          setStatus('TMI', constants.CONNECTED);
+        }
         this.channel = channel;
       }
     }
