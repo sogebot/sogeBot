@@ -3,21 +3,38 @@
 
 !> Update **!!! ONLY !!!** your connection informations
 
-## How to configure your database
+## SQLite3
 
-1. Select from your supported database and pick proper .env file
-   from root folder
+?> SQLite is **default** db, if you didn't set MySQL/MariaDB or PostgreSQL, you don't need to do anything
+
+1. Rename `/path/to/sogebot/.env.sqlite` to `/path/to/sogebot/.env`
+2. **DON'T UPDATE ANY OTHER INFORMATIONS (LIKE MIGRATION, ENTITIES),
+   OTHERWISE DATABASE WON'T WORK**
+3. Start bot
+
+## MySQL/MariaDB
+
+1. Rename `/path/to/sogebot/.env.mysql` to `/path/to/sogebot/.env`
 2. Update your connection options, see
    [TypeORM Connection Options](https://typeorm.io/#/connection-options)
    for detailed information.
 3. **DON'T UPDATE ANY OTHER INFORMATIONS (LIKE MIGRATION, ENTITIES),
    OTHERWISE DATABASE WON'T WORK**
-4. ???
-5. Working bot
+4. Start bot
+
+## PostgreSQL
+
+1. Rename `/path/to/sogebot/.env.postgres` to `/path/to/sogebot/.env`
+2. Update your connection options, see
+   [TypeORM Connection Options](https://typeorm.io/#/connection-options)
+   for detailed information.
+3. **DON'T UPDATE ANY OTHER INFORMATIONS (LIKE MIGRATION, ENTITIES),
+   OTHERWISE DATABASE WON'T WORK**
+4. Start bot
 
 ## Supported databases
 
-- SQLite(**default**)
+- SQLite3(**default**)
 - PostgreSQL 11.5
 - MySQL 5.7
   - you need to set `character-set-server=utf8`
