@@ -272,7 +272,10 @@ export default class AlertsEdit extends Vue {
   async mounted() {
     this.state.loaded = this.$state.progress;
     if (this.$route.params.id) {
-      this.socket.emit('alerts::getOne', this.$route.params.id, (data: AlertInterface) => {
+      this.socket.emit('alerts::getOne', this.$route.params.id, (err, data: AlertInterface) => {
+        if (err) {
+          return console.error(err);
+        }
         console.debug('Loaded', {data});
         this.item = data;
         this.state.loaded = this.$state.success;
