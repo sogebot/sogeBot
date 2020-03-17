@@ -903,7 +903,7 @@ class API extends Core {
 
         if (followers.length === 100) {
           // move to next page
-          return this.getChannelFollowers({ cursor: request.data.pagination.cursor, count: opts.followers.length + opts.count, followers: opts.followers });
+          return this.getChannelFollowers({ cursor: request.data.pagination.cursor, followers: opts.followers });
         } else {
           // check if user id is in db, not in db load username from API
           for (const f of opts.followers) {
@@ -933,7 +933,7 @@ class API extends Core {
         panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelFollowers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
       }
     }
-    delete opts.count;
+    delete opts.cursor;
     return { state: true, opts };
   }
 
