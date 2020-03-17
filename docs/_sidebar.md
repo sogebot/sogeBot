@@ -2,6 +2,7 @@
 * [Install and upgrade](/install-and-upgrade.md)
 * [FAQ](/faq.md)
 * Configuration
+  * [Color](/configuration/color.md)
   * [Database](/configuration/database.md)
   * [Environment variables](/configuration/env.md)
   * [Timezone](/configuration/timezone.md)

@@ -5,7 +5,7 @@
 
 ## How to configure your database
 
-1. Select from your supported database and pick proper .env file
+1. Select from your supported database and pick proper ormconfig.json
    from root folder
 2. Update your connection options, see
    [TypeORM Connection Options](https://typeorm.io/#/connection-options)
