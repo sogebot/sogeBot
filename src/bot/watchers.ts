@@ -31,14 +31,9 @@ export const VariableWatcher = {
   },
   async check() {
     for (const k of Object.keys(variables)) {
-      let checkedModule;
-
-      if (k.startsWith('core')) {
-        checkedModule = list('core').find(m => m.constructor.name.toLowerCase() === k.split('.')[1]);
-      } else {
-        checkedModule = list(k.split('.')[0]).find(m => m.constructor.name.toLowerCase() === k.split('.')[1]);
-      }
-      const variable = k.split('.').slice(2).join('.');
+      const [ type, name, ...variableArr ] = k.split('.');
+      const checkedModule = list(type).find(m => m.constructor.name.toLowerCase() === name);
+      const variable = variableArr.join('.');
       const value = cloneDeep(get(checkedModule, variable, undefined));
       if (typeof value === 'undefined') {
         throw new Error('Value not found, check your code!!! ' + JSON.stringify({k, variable, value}));
