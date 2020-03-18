@@ -80,7 +80,6 @@ class Permissions extends Core {
     });
     adminEndpoint(this.nsp, 'test.user', async (opts, cb) => {
       const userByName = await getRepository(User).findOne({ username: opts.value });
-      const userById = await getRepository(User).findOne({ userId: Number(opts.value) });
       if (userByName) {
         const status = await this.check(userByName.userId, opts.pid);
         const partial = await this.check(userByName.userId, opts.pid, true);
@@ -89,23 +88,27 @@ class Permissions extends Core {
           partial,
           state: opts.state,
         });
-      } else if (userById) {
-        const status = await this.check(userById.userId, opts.pid);
-        const partial = await this.check(userById.userId, opts.pid, true);
-        cb({
-          status,
-          partial,
-          state: opts.state,
-        });
-      } else {
-        cb({
-          status: { access: 2 },
-          partial: { access: 2 },
-          state: opts.state,
-        });
+        return;
+      } else if(isFinite(opts.value)) {
+        const userById = await getRepository(User).findOne({ userId: Number(opts.value) });
+        if (userById) {
+          const status = await this.check(userById.userId, opts.pid);
+          const partial = await this.check(userById.userId, opts.pid, true);
+          cb({
+            status,
+            partial,
+            state: opts.state,
+          });
+          return;
+        }
       }
+      cb({
+        status: { access: 2 },
+        partial: { access: 2 },
+        state: opts.state,
+      });
     });
-  }
+  };
 
   public async getCommandPermission(commandArg: string): Promise<string | null | undefined> {
     const cItem = await getRepository(PermissionCommands).findOne({ name: commandArg });
