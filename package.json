@@ -109,7 +109,7 @@
     "@types/jquery": "3.3.33",
     "@types/lodash": "4.14.149",
     "@types/lodash-es": "4.17.3",
-    "@types/mathjs": "6.6.1",
+    "@types/mathjs": "6.0.4",
     "@types/minimist": "1.2.0",
     "@types/mocha": "7.0.2",
     "@types/module-alias": "2.0.0",
