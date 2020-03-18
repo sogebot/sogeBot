@@ -29,6 +29,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
     await createConnection({
       ...connectionOptions,
     });
+    await new Promise( resolve => setTimeout(resolve, 3000) );
   }
   debug('microservice', 'getChannelChattersUnofficialAPI::getConnection');
   const connection = await getConnection();

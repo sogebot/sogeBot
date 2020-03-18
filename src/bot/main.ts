@@ -58,6 +58,7 @@ const connect = async function () {
     mysql: 'MySQL/MariaDB',
     postgres: 'PostgreSQL',
   };
+  await new Promise( resolve => setTimeout(resolve, 3000) );
   info(`Initialized ${typeToLog[type]} database (${normalize(String(connectionOptions.database))})`);
 };
 
