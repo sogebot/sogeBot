@@ -239,7 +239,7 @@ class Message {
             return '';
           } else {
             // command
-            return state.setValue;
+            return state.isOk && !state.isEval ? state.setValue : state.updated.currentValue;
           }
         }
         return customvariables.getValueOf(variable, { sender: attr.sender, param: attr.param });

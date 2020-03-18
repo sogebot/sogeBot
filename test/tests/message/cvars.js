@@ -8,7 +8,6 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const msg = require('../../general.js').message;
 const Message = require('../../../dest/message').default;
-const constants = require('../../../dest/constants');
 const assert = require('chai').assert;
 const _ = require('lodash');
 
@@ -25,6 +24,39 @@ describe('Message - cvars filter', async () => {
     { username: '__viewer__', userId: Math.floor(Math.random() * 100000), permission: permission.VIEWERS },
   ];
   const tests = [
+    {
+      test: '$_test',
+      variable: '$_test',
+      initialValue: 5,
+      afterValue: 10,
+      type: 'number',
+      command: 'This is $_test',
+      expectedSent: false,
+      params: { param: '+5' },
+      responseType: 2,
+    },
+    {
+      test: '$_test',
+      variable: '$_test',
+      initialValue: 5,
+      afterValue: 0,
+      type: 'number',
+      command: 'This is $_test',
+      expectedSent: false,
+      params: { param: '-5' },
+      responseType: 2,
+    },
+    {
+      test: '$_test',
+      variable: '$_test',
+      initialValue: 0,
+      afterValue: 0,
+      type: 'number',
+      command: 'This is $_test',
+      expectedSent: false,
+      params: { param: 'asd' },
+      responseType: 2,
+    },
     {
       test: '$_test',
       variable: '$_test',
@@ -134,7 +166,7 @@ describe('Message - cvars filter', async () => {
                   variableName: test.variable,
                   readOnly: false,
                   currentValue: test.initialValue,
-                  type: test.type, responseType: 0,
+                  type: test.type, responseType: typeof test.responseType === 'undefined' ? 0 : test.responseType,
                   permission: permission[p],
                   evalValue: '',
                   usableOptions: [],
@@ -148,7 +180,11 @@ describe('Message - cvars filter', async () => {
               });
               it('message parsed correctly', async () => {
                 if (user.username === '__owner__' || (user.username === '__viewer__' && p === 'VIEWERS')) {
-                  assert.equal(message, '');
+                  if (test.responseType === 2 ) {
+                    assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.afterValue));
+                  } else {
+                    assert.equal(message, '');
+                  }
                 } else {
                   assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.initialValue));
                 }
