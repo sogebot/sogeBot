@@ -21,16 +21,21 @@ import { debug, warning } from '../helpers/log';
 const isThreadingEnabled = process.env.THREAD !== '0';
 
 export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: boolean; partedUsers: string[]; joinedUsers: string[] }> => {
-  if (!isMainThread) {
+  debug('microservice', 'getChannelChattersUnofficialAPI::isThreadingEnabled ' + isThreadingEnabled);
+  debug('microservice', 'getChannelChattersUnofficialAPI::start');
+  if (!isMainThread && isThreadingEnabled) {
+    debug('microservice', 'getChannelChattersUnofficialAPI::createConnection');
     const connectionOptions = await getConnectionOptions();
     await createConnection({
       ...connectionOptions,
     });
   }
+  debug('microservice', 'getChannelChattersUnofficialAPI::getConnection');
   const connection = await getConnection();
 
   // spin up worker
   if (isMainThread && connection.options.type !== 'sqlite' && isThreadingEnabled) {
+    debug('microservice', 'getChannelChattersUnofficialAPI::worker');
     const value = await new Promise((resolve, reject) => {
       const worker = new Worker(__filename);
       worker.on('message', resolve);
@@ -44,8 +49,6 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
     });
     return value as unknown as { modStatus: boolean; partedUsers: string[]; joinedUsers: string[] };
   }
-  debug('microservice', 'isThreadingEnabled::getChannelChattersUnofficialAPI ' + isThreadingEnabled);
-  debug('microservice', 'start::getChannelChattersUnofficialAPI');
   try {
     // lock thread
     await getManager()
@@ -138,7 +141,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
     if (!isMainThread) {
       parentPort?.postMessage({ modStatus: false, partedUsers: [], joinedUsers: [] });
     }
-    debug('microservice', 'return::getChannelChattersUnofficialAPI');
+    debug('microservice', 'getChannelChattersUnofficialAPI::return');
     debug('microservice', { modStatus: false, partedUsers: [], joinedUsers: [] });
     return { modStatus: false, partedUsers: [], joinedUsers: [] };
   } finally {
@@ -150,7 +153,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
       .where('event = :event', { event: 'getChannelChattersUnofficialAPI' })
       .execute();
     if (!isMainThread) {
-      debug('microservice', 'kill::getChannelChattersUnofficialAPI');
+      debug('microservice', 'getChannelChattersUnofficialAPI::kill');
       process.exit(0);
     }
   };
