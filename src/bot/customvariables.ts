@@ -395,17 +395,19 @@ class CustomVariables {
         isOk = false;
       } else {
         if (item.type === 'number') {
-          if (['+', '-'].includes(currentValue)) {
-            if (currentValue === '+') {
-              itemCurrentValue = String(Number(itemCurrentValue) + 1);
-            } else {
-              itemCurrentValue = String(Number(itemCurrentValue) - 1);
+          const match = /(?<sign>[+\-])([ ]*)?(?<number>\d*)?/g.exec(currentValue);
+          if (match && match.groups) {
+            const number = Number((match.groups.number || 1));
+            if (match.groups.sign === '+') {
+              itemCurrentValue = String(Number(itemCurrentValue) + number);
+            } else if (match.groups.sign === '-') {
+              itemCurrentValue = String(Number(itemCurrentValue) - number);
             }
-            isOk = true;
           } else {
             const isNumber = isFinite(Number(currentValue));
             isOk = isNumber;
-            itemCurrentValue = isNumber ? currentValue : itemCurrentValue;
+            // we need to retype to get rid of +/-
+            itemCurrentValue = isNumber ? String(Number(currentValue)) : String(Number(itemCurrentValue));
           }
         } else if (item.type === 'options') {
           // check if is in usableOptions
