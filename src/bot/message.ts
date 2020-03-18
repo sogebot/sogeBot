@@ -1,23 +1,21 @@
-const mathjs = require('mathjs');
-const axios = require('axios');
-const safeEval = require('safe-eval');
-const decode = require('decode-html');
-const querystring = require('querystring');
-const _ = require('lodash');
-const crypto = require('crypto');
-const commons = require('./commons');
-const gitCommitInfo = require('git-commit-info');
-const Entities = require('html-entities').AllHtmlEntities;
+import mathjs from 'mathjs';
+import axios, { AxiosResponse } from 'axios';
+import safeEval from 'safe-eval';
+import querystring from 'querystring';
+import _ from 'lodash';
+import crypto from 'crypto';
+import gitCommitInfo from 'git-commit-info';
+import { AllHtmlEntities as Entities} from 'html-entities';
 
 import { warning } from './helpers/log';
 import { getCountOfCommandUsage } from './helpers/commands/count';
-import { getManager, getRepository } from 'typeorm';
+import { getRepository } from 'typeorm';
 
 import { Alias } from './database/entity/alias';
 import { Commands } from './database/entity/commands';
 import { Cooldown } from './database/entity/cooldown';
 import { EventList } from './database/entity/eventList';
-import { User } from './database/entity/user';
+import { User, UserInterface } from './database/entity/user';
 import { Price } from './database/entity/price';
 import { Rank } from './database/entity/rank';
 
@@ -29,15 +27,22 @@ import spotify from './integrations/spotify';
 import songs from './systems/songs';
 import Parser from './parser';
 import { translate } from './translate';
+import { getLocalizedName, isIgnored, prepare, sendMessage } from './commons';
+import currency from './currency';
+import points from './systems/points';
+import permissions from './permissions';
+import users from './users';
 
 
 class Message {
+  message = '';
+
   constructor (message) {
     this.message = Entities.decode(message);
   }
 
   async global (opts) {
-    let variables = {
+    const variables = {
       game: api.stats.currentGame,
       language: api.stats.language,
       viewers: api.stats.currentViewers,
@@ -48,7 +53,7 @@ class Message {
       bits: api.stats.currentBits,
       title: api.stats.currentTitle,
     };
-    for (let variable of Object.keys(variables)) {
+    for (const variable of Object.keys(variables)) {
       const regexp = new RegExp(`\\$${variable}`, 'g');
       this.message = this.message.replace(regexp, variables[variable]);
     }
@@ -56,16 +61,16 @@ class Message {
     const version = _.get(process, 'env.npm_package_version', 'x.y.z');
     this.message = this.message.replace(/\$version/g, version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'));
 
-    const latestFollower = await getManager().createQueryBuilder()
-      .select('events').from(EventList, 'events')
+    const latestFollower = await getRepository(EventList).createQueryBuilder('events')
+      .select('events')
       .orderBy('events.timestamp', 'DESC')
       .where('events.event >= :event', { event: 'follow' })
       .getOne();
     this.message = this.message.replace(/\$latestFollower/g, !_.isNil(latestFollower) ? latestFollower.username : 'n/a');
 
     // latestSubscriber
-    const latestSubscriber = await getManager().createQueryBuilder()
-      .select('events').from(EventList, 'events')
+    const latestSubscriber = await getRepository(EventList).createQueryBuilder('events')
+      .select('events')
       .orderBy('events.timestamp', 'DESC')
       .where('events.event >= :event', { event: 'sub' })
       .orWhere('events.event >= :event', { event: 'resub' })
@@ -74,8 +79,8 @@ class Message {
     this.message = this.message.replace(/\$latestSubscriber/g, !_.isNil(latestSubscriber) ? latestSubscriber.username : 'n/a');
 
     // latestTip, latestTipAmount, latestTipCurrency, latestTipMessage
-    const latestTip = await getManager().createQueryBuilder()
-      .select('events').from(EventList, 'events')
+    const latestTip = await getRepository(EventList).createQueryBuilder('events')
+      .select('events')
       .orderBy('events.timestamp', 'DESC')
       .where('events.event >= :event', { event: 'tip' })
       .getOne();
@@ -85,12 +90,12 @@ class Message {
     this.message = this.message.replace(/\$latestTip/g, !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).username : 'n/a');
 
     // latestCheer, latestCheerAmount, latestCheerCurrency, latestCheerMessage
-    const latestCheer = await getManager().createQueryBuilder()
-      .select('events').from(EventList, 'events')
+    const latestCheer = await getRepository(EventList).createQueryBuilder('events')
+      .select('events')
       .orderBy('events.timestamp', 'DESC')
       .where('events.event >= :event', { event: 'cheer' })
       .getOne();
-    this.message = this.message.replace(/\$latestCheerAmount/g, !_.isNil(latestCheer) ? parseInt(JSON.parse(latestCheer.values_json).amount, 10) : 'n/a');
+    this.message = this.message.replace(/\$latestCheerAmount/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).amount : 'n/a');
     this.message = this.message.replace(/\$latestCheerMessage/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).message : 'n/a');
     this.message = this.message.replace(/\$latestCheer/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).username : 'n/a');
 
@@ -103,7 +108,9 @@ class Message {
         spotifySong.artist = spotifySong.artist.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`);
       }
       this.message = this.message.replace(/\$spotifySong/g, format.replace(/\$song/g, spotifySong.song).replace(/\$artist/g, spotifySong.artist));
-    } else {this.message = this.message.replace(/\$spotifySong/g, translate('songs.not-playing'))};
+    } else {
+      this.message = this.message.replace(/\$spotifySong/g, translate('songs.not-playing'));
+    };
 
 
     if (songs.enabled
@@ -114,12 +121,14 @@ class Message {
         currentSong = currentSong.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`);
       }
       this.message = this.message.replace(/\$ytSong/g, currentSong);
-    } else {this.message = this.message.replace(/\$ytSong/g, translate('songs.not-playing'))};
+    } else {
+      this.message = this.message.replace(/\$ytSong/g, translate('songs.not-playing'));
+    };
 
     return Entities.decode(this.message);
   }
 
-  async parse (attr) {
+  async parse (attr: { [name: string]: any }) {
     this.message = await this.message; // if is promise
 
     const random = {
@@ -131,9 +140,11 @@ class Message {
           .cache(true)
           .getMany())
           .filter(o => {
-            return !commons.isIgnored({ username: o.username, userId: o.userId });
+            return !isIgnored({ username: o.username, userId: o.userId });
           });
-        if (viewers.length === 0) {return 'unknown'};
+        if (viewers.length === 0) {
+          return 'unknown';
+        };
         return _.sample(viewers.map(o => o.username ));
       },
       '(random.online.follower)': async function () {
@@ -144,9 +155,11 @@ class Message {
           .andWhere('user.isOnline = :isOnline', { isOnline: true })
           .cache(true)
           .getMany()).filter(o => {
-          return !commons.isIgnored({ username: o.username, userId: o.userId });
+          return !isIgnored({ username: o.username, userId: o.userId });
         });
-        if (followers.length === 0) {return 'unknown'};
+        if (followers.length === 0) {
+          return 'unknown';
+        };
         return _.sample(followers.map(o => o.username ));
       },
       '(random.online.subscriber)': async function () {
@@ -157,9 +170,11 @@ class Message {
           .andWhere('user.isOnline = :isOnline', { isOnline: true })
           .cache(true)
           .getMany()).filter(o => {
-          return !commons.isIgnored({ username: o.username, userId: o.userId });
+          return !isIgnored({ username: o.username, userId: o.userId });
         });
-        if (subscribers.length === 0) {return 'unknown'};
+        if (subscribers.length === 0) {
+          return 'unknown';
+        };
         return _.sample(subscribers.map(o => o.username ));
       },
       '(random.viewer)': async function () {
@@ -168,9 +183,11 @@ class Message {
           .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
           .cache(true)
           .getMany()).filter(o => {
-          return !commons.isIgnored({ username: o.username, userId: o.userId });
+          return !isIgnored({ username: o.username, userId: o.userId });
         });
-        if (viewers.length === 0) {return 'unknown'};
+        if (viewers.length === 0) {
+          return 'unknown';
+        };
         return _.sample(viewers.map(o => o.username ));
       },
       '(random.follower)': async function () {
@@ -180,9 +197,11 @@ class Message {
           .andWhere('user.isFollower = :isFollower', { isFollower: true })
           .cache(true)
           .getMany()).filter(o => {
-          return !commons.isIgnored({ username: o.username, userId: o.userId });
+          return !isIgnored({ username: o.username, userId: o.userId });
         });
-        if (followers.length === 0) {return 'unknown'};
+        if (followers.length === 0) {
+          return 'unknown';
+        };
         return _.sample(followers.map(o => o.username ));
       },
       '(random.subscriber)': async function () {
@@ -192,22 +211,26 @@ class Message {
           .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
           .cache(true)
           .getMany()).filter(o => {
-          return !commons.isIgnored({ username: o.username, userId: o.userId });
+          return !isIgnored({ username: o.username, userId: o.userId });
         });
-        if (subscribers.length === 0) {return 'unknown'};
+        if (subscribers.length === 0) {
+          return 'unknown';
+        };
         return _.sample(subscribers.map(o => o.username ));
       },
       '(random.number-#-to-#)': async function (filter) {
-        let numbers = filter.replace('(random.number-', '')
+        const numbers = filter.replace('(random.number-', '')
           .replace(')', '')
           .split('-to-');
 
         try {
           let lastParamUsed = 0;
-          for (let index in numbers) {
+          for (const index in numbers) {
             if (!_.isFinite(parseInt(numbers[index], 10))) {
-              let param = attr.param.split(' ');
-              if (_.isNil(param[lastParamUsed])) {return 0};
+              const param = attr.param.split(' ');
+              if (_.isNil(param[lastParamUsed])) {
+                return 0;
+              };
 
               numbers[index] = param[lastParamUsed];
               lastParamUsed++;
@@ -220,22 +243,22 @@ class Message {
       },
       '(random.true-or-false)': async function () {
         return Math.random() < 0.5;
-      }
+      },
     };
-    let custom = {
+    const custom = {
       '$_#': async (variable) => {
         if (!_.isNil(attr.param) && attr.param.length !== 0) {
-          let state = await customvariables.setValueOf(variable, attr.param, { sender: attr.sender });
+          const state = await customvariables.setValueOf(variable, attr.param, { sender: attr.sender });
           if (state.updated.responseType === 0) {
             // default
             if (state.isOk && !state.isEval) {
-              let msg = await commons.prepare('filters.setVariable', { value: state.setValue, variable: variable });
-              commons.sendMessage(msg, attr.sender, { skip: true, quiet: _.get(attr, 'quiet', false) });
+              const msg = await prepare('filters.setVariable', { value: state.setValue, variable: variable });
+              sendMessage(msg, attr.sender, { skip: true, quiet: _.get(attr, 'quiet', false) });
             }
             return state.updated.currentValue;
           } else if (state.updated.responseType === 1) {
             // custom
-            commons.sendMessage(state.updated.responseText.replace('$value', state.setValue), attr.sender, { skip: true, quiet: _.get(attr, 'quiet', false) });
+            sendMessage(state.updated.responseText.replace('$value', state.setValue), attr.sender, { skip: true, quiet: _.get(attr, 'quiet', false) });
             return '';
           } else {
             // command
@@ -248,7 +271,7 @@ class Message {
       '$!_#': async (variable) => {
         variable = variable.replace('$!_', '$_');
         if (!_.isNil(attr.param) && attr.param.length !== 0) {
-          let state = await customvariables.setValueOf(variable, attr.param, { sender: attr.sender });
+          const state = await customvariables.setValueOf(variable, attr.param, { sender: attr.sender });
           return state.updated.currentValue;
         }
         return customvariables.getValueOf(variable, { sender: attr.sender, param: attr.param });
@@ -260,9 +283,9 @@ class Message {
           await customvariables.setValueOf(variable, attr.param, { sender: attr.sender });
         }
         return '';
-      }
+      },
     };
-    let param = {
+    const param = {
       '$touser': async function (filter) {
         if (typeof attr.param !== 'undefined') {
           attr.param = attr.param.replace('@', '');
@@ -276,45 +299,52 @@ class Message {
         return (tmi.showWithAt ? '@' : '') + attr.sender.username;
       },
       '$param': async function (filter) {
-        if (!_.isUndefined(attr.param) && attr.param.length !== 0) {return attr.param};
+        if (!_.isUndefined(attr.param) && attr.param.length !== 0) {
+          return attr.param;
+        };
         return '';
       },
       '$!param': async function (filter) {
-        if (!_.isUndefined(attr.param) && attr.param.length !== 0) {return attr.param};
+        if (!_.isUndefined(attr.param) && attr.param.length !== 0) {
+          return attr.param;
+        };
         return 'n/a';
-      }
+      },
     };
-    let qs = {
+    const qs = {
       '$querystring': async function (filter) {
-        if (!_.isUndefined(attr.param) && attr.param.length !== 0) {return querystring.escape(attr.param)};
+        if (!_.isUndefined(attr.param) && attr.param.length !== 0) {
+          return querystring.escape(attr.param);
+        };
         return '';
       },
       '(url|#)': async function (filter) {
         try {
-          return encodeURI(/\(url\|(.*)\)/g.exec(filter)[1]);
+          return encodeURI(attr.param);
         } catch (e) {
           return '';
         }
-      }
+      },
     };
-    let info = {
+    const info = {
       '$toptip.#.#': async function (filter) {
         const match = filter.match(/\$toptip\.(?<type>overall|stream)\.(?<value>username|amount|message|currency)/);
         if (!match) {
           return '';
         }
 
-        let tips = (await getManager().createQueryBuilder()
-          .select('events').from(EventList, 'events')
+        let tips = (await getRepository(EventList).createQueryBuilder('events')
+          .select('events')
           .orderBy('events.timestamp', 'DESC')
           .where('events.event >= :event', { event: 'tip' })
           .getMany())
-
           .sort((a, b) => {
-            const aTip = currency.exchange(a.amount, a.currency, currency.mainCurrency);
-            const bTip = currency.exchange(b.amount, b.currency, currency.mainCurrency);
+            const aValue = JSON.parse(a.values_json);
+            const bValue = JSON.parse(b.values_json);
+            const aTip = currency.exchange(aValue.amount, aValue.currency, currency.mainCurrency);
+            const bTip = currency.exchange(bValue.amount, bValue.currency, currency.mainCurrency);
             return bTip - aTip;
-          }, 0);
+          });
 
         if (match.groups.type === 'stream') {
           const whenOnline = api.isStreamOnline ? api.streamStatusChangeSince : null;
@@ -339,12 +369,12 @@ class Message {
       },
       '(status)': async function (filter) {
         return api.stats.currentTitle || 'n/a';
-      }
+      },
     };
-    let command = {
+    const command = {
       '$count(\'#\')': async function (filter) {
         const countRegex = new RegExp('\\$count\\(\\\'(?<command>\\!\\S*)\\\'\\)', 'gm');
-        let match = countRegex.exec(filter);
+        const match = countRegex.exec(filter);
         if (match && match.groups) {
           return String(await getCountOfCommandUsage(match.groups.command));
         }
@@ -374,38 +404,35 @@ class Message {
         const parse = new Parser({ sender: attr.sender, message: cmd, skip: true, quiet: false });
         await parse.process();
         return '';
-      }
+      },
     };
-    let price = {
+    const price = {
       '(price)': async function (filter) {
-        let price = 0;
-        if (price.enabled) {
-          let command = await getRepository(Price).findOne({ command: attr.cmd });
-          price = command?.price ?? 0;
-        }
+        const command = await getRepository(Price).findOne({ command: attr.cmd, enabled: true });
+        const price = command?.price ?? 0;
         return [price, await points.getPointsName(price)].join(' ');
-      }
+      },
     };
-    let online = {
+    const online = {
       '(onlineonly)': async function (filter) {
         return api.isStreamOnline;
       },
       '(offlineonly)': async function (filter) {
         return !(api.isStreamOnline);
-      }
+      },
     };
-    let list = {
-      '(list.#)': async function (filter) {
-        let [system, permission] = filter.replace('(list.', '').replace(')', '').split('.');
-
+    const list = {
+      '(list.#)': async function (filter: string) {
+        const [system, permission] = filter.replace('(list.', '').replace(')', '').split('.');
         let [alias, commands, cooldowns, ranks, prices] = await Promise.all([
           getRepository(Alias).find({ where: { visible: true, enabled: true } }),
           getRepository(Commands).find({ relations: ['responses'], where: { visible: true, enabled: true } }),
           getRepository(Cooldown).find({ where: { enabled: true } }),
           getRepository(Rank).find(),
-          getRepository(Price).find({ where: { enabled: true } })
+          getRepository(Price).find({ where: { enabled: true } }),
         ]);
 
+        let listOutput: any = [];
         switch (system) {
           case 'alias':
             return _.size(alias) === 0 ? ' ' : (_.map(alias, (o) => o.alias.replace('!', ''))).sort().join(', ');
@@ -416,7 +443,7 @@ class Message {
               const responses = commands.map(o => o.responses).flat();
               const _permission = await permissions.get(permission);
               if (_permission) {
-                const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.cid);
+                const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.id);
                 commands = commands.filter((o) => commandIds.includes(o.id));
               } else {
                 commands = [];
@@ -428,7 +455,7 @@ class Message {
               const responses = commands.map(o => o.responses).flat();
               const _permission = await permissions.get(permission);
               if (_permission) {
-                const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.cid);
+                const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.id);
                 commands = commands.filter((o) => commandIds.includes(o.id));
               } else {
                 commands = [];
@@ -436,48 +463,48 @@ class Message {
             }
             return _.size(commands) === 0 ? ' ' : (_.map(commands, 'command')).sort().join(', ');
           case 'cooldown':
-            list = _.map(cooldowns, function (o, k) {
+            listOutput = _.map(cooldowns, function (o, k) {
               const time = o.miliseconds;
-              return o.name + ': ' + (parseInt(time, 10) / 1000) + 's';
+              return o.name + ': ' + (time / 1000) + 's';
             }).sort().join(', ');
-            return list.length > 0 ? list : ' ';
+            return listOutput.length > 0 ? listOutput : ' ';
           case 'price':
-            list = (await Promise.all(
+            listOutput = (await Promise.all(
               _.map(prices, async (o) => {
                 return `${o.command} (${o.price}${await points.getPointsName(o.price)})`;
               })
             )).join(', ');
-            return list.length > 0 ? list : ' ';
+            return listOutput.length > 0 ? listOutput : ' ';
           case 'ranks':
-            list = _.map(_.orderBy(ranks.filter(o => o.type === 'viewer'), 'value', 'asc'), (o) => {
+            listOutput = _.map(_.orderBy(ranks.filter(o => o.type === 'viewer'), 'value', 'asc'), (o) => {
               return `${o.rank} (${o.value}h)`;
             }).join(', ');
-            return list.length > 0 ? list : ' ';
+            return listOutput.length > 0 ? listOutput : ' ';
           case 'ranks.follow':
-            list = _.map(_.orderBy(ranks.filter(o => o.type === 'follower'), 'value', 'asc'), (o) => {
+            listOutput = _.map(_.orderBy(ranks.filter(o => o.type === 'follower'), 'value', 'asc'), (o) => {
               return `${o.rank} (${o.value} ${getLocalizedName(o.value, 'core.months')})`;
             }).join(', ');
-            return list.length > 0 ? list : ' ';
+            return listOutput.length > 0 ? listOutput : ' ';
           case 'ranks.sub':
-            list = _.map(_.orderBy(ranks.filter(o => o.type === 'subcriber'), 'value', 'asc'), (o) => {
+            listOutput = _.map(_.orderBy(ranks.filter(o => o.type === 'subscriber'), 'value', 'asc'), (o) => {
               return `${o.rank} (${o.value} ${getLocalizedName(o.value, 'core.months')})`;
             }).join(', ');
-            return list.length > 0 ? list : ' ';
+            return listOutput.length > 0 ? listOutput : ' ';
           default:
             warning('unknown list system ' + system);
             return '';
         }
-      }
+      },
     };
-    let math = {
+    const math = {
       '(math.#)': async function (filter) {
         let toEvaluate = filter.replace(/\(math./g, '').replace(/\)/g, '');
 
         // check if custom variables are here
         const regexp = /(\$_\w+)/g;
-        let match = toEvaluate.match(regexp);
+        const match = toEvaluate.match(regexp);
         if (match) {
-          for (let variable of match) {
+          for (const variable of match) {
             const currentValue = await customvariables.getValueOf(variable);
             toEvaluate = toEvaluate.replace(
               variable,
@@ -486,9 +513,9 @@ class Message {
           }
         }
         return mathjs.evaluate(toEvaluate);
-      }
+      },
     };
-    let evaluate = {
+    const evaluate = {
       '(eval#)': async function (filter) {
         let toEvaluate = filter.replace('(eval ', '').slice(0, -1);
 
@@ -497,9 +524,9 @@ class Message {
         const containOnline = !_.isNil(toEvaluate.match(/online/g));
         const containUrl = !_.isNil(toEvaluate.match(/url\(['"](.*?)['"]\)/g));
 
-        let urls = [];
+        const urls: { id: string; response: AxiosResponse<any> }[] = [];
         if (containUrl) {
-          for (let match of toEvaluate.match(/url\(['"](.*?)['"]\)/g)) {
+          for (const match of toEvaluate.match(/url\(['"](.*?)['"]\)/g)) {
             const id = 'url' + crypto.randomBytes(64).toString('hex').slice(0, 5);
             const url = match.replace(/url\(['"]|["']\)/g, '');
             let response = await axios.get(url);
@@ -514,15 +541,15 @@ class Message {
           }
         }
 
-        let users = [];
+        let allUsers: Readonly<Required<UserInterface>>[] = [];
         if (containUsers || containRandom) {
-          users = await users.getAll();
+          allUsers = await getRepository(User).find();
         }
-        let user = await users.get(attr.sender.username);
+        const user = await users.getUserByUsername(attr.sender.username);
 
-        let onlineViewers = [];
-        let onlineSubscribers = [];
-        let onlineFollowers = [];
+        let onlineViewers: Readonly<Required<UserInterface>>[] = [];
+        let onlineSubscribers: Readonly<Required<UserInterface>>[] = [];
+        let onlineFollowers: Readonly<Required<UserInterface>>[] = [];
 
         if (containOnline) {
           const viewers = (await getRepository(User).createQueryBuilder('user')
@@ -530,7 +557,7 @@ class Message {
             .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
             .andWhere('user.isOnline = :isOnline', { isOnline: true })
             .getMany()).filter(o => {
-            return commons.isIgnored({ username: o.username, userId: o.userId });
+            return isIgnored({ username: o.username, userId: o.userId });
           });
 
           onlineViewers = viewers;
@@ -538,130 +565,148 @@ class Message {
           onlineFollowers = viewers.filter(o => o.isFollower);
         }
 
-        let randomVar = {
+        const randomVar = {
           online: {
             viewer: _.sample(_.map(onlineViewers, 'username')),
             follower: _.sample(_.map(onlineFollowers, 'username')),
-            subscriber: _.sample(_.map(onlineSubscribers, 'username'))
+            subscriber: _.sample(_.map(onlineSubscribers, 'username')),
           },
-          viewer: _.sample(_.map(users, 'username')),
-          follower: _.sample(_.map(_.filter(users, (o) => _.get(o, 'is.follower', false)), 'username')),
-          subscriber: _.sample(_.map(_.filter(users, (o) => _.get(o, 'is.subscriber', false)), 'username'))
+          viewer: _.sample(_.map(allUsers, 'username')),
+          follower: _.sample(_.map(_.filter(allUsers, (o) => _.get(o, 'is.follower', false)), 'username')),
+          subscriber: _.sample(_.map(_.filter(allUsers, (o) => _.get(o, 'is.subscriber', false)), 'username')),
         };
-        let is = user.is;
+        const is = {
+          follower: user.isFollower, subscriber: user.isSubscriber, moderator: user.isModerator, vip: user.isVIP, online: user.isOnline,
+        };
 
-        let toEval = `(function evaluation () {  ${toEvaluate} })()`;
-        let context = {
+        const toEval = `(function evaluation () {  ${toEvaluate} })()`;
+        const context = {
           _: _,
-          users: users,
+          users: allUsers,
           is: is,
           random: randomVar,
           sender: tmi.showWithAt ? `@${attr.sender.username}` : `${attr.sender.username}`,
-          param: _.isNil(attr.param) ? null : attr.param
+          param: _.isNil(attr.param) ? null : attr.param,
         };
 
         if (containUrl) {
           // add urls to context
-          for (let url of urls) {
+          for (const url of urls) {
             context[url.id] = url.response;
           }
         }
 
         return (safeEval(toEval, context));
-      }
+      },
     };
-    let ifp = {
+    const ifp = {
       '(if#)': async function (filter) {
         // (if $days>2|More than 2 days|Less than 2 days)
         try {
-          let toEvaluate = filter
+          const toEvaluate = filter
             .replace('(if ', '')
             .slice(0, -1)
             .replace(/\$param|\$!param/g, attr.param); // replace params
           let [check, ifTrue, ifFalse] = toEvaluate.split('|');
           check = check.startsWith('>') || check.startsWith('<') || check.startsWith('=') ? false : check; // force check to false if starts with comparation
-          if (_.isNil(ifTrue)) {return};
-          if (safeEval(check)) {return ifTrue};
+          if (_.isNil(ifTrue)) {
+            return;
+          };
+          if (safeEval(check)) {
+            return ifTrue;
+          };
           return _.isNil(ifFalse) ? '' : ifFalse;
         } catch (e) {
           return '';
         }
-      }
+      },
     };
-    let stream = {
+    const stream = {
       '(stream|#|game)': async function (filter) {
         const channel = filter.replace('(stream|', '').replace('|game)', '');
 
         const token = await oauth.botAccessToken;
-        if (token === '') {return 'n/a'};
+        if (token === '') {
+          return 'n/a';
+        };
 
         try {
           let request = await axios.get(`https://api.twitch.tv/kraken/users?login=${channel}`, {
             headers: {
               'Accept': 'application/vnd.twitchtv.v5+json',
-              'Authorization': 'OAuth ' + token
-            }
+              'Authorization': 'OAuth ' + token,
+            },
           });
           const channelId = request.data.users[0]._id;
           request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
             headers: {
-              'Authorization': 'Bearer ' + token
-            }
+              'Authorization': 'Bearer ' + token,
+            },
           });
           return api.getGameFromId(request.data.data[0].game_id);
-        } catch (e) { return 'n/a'; } // return nothing on error
+        } catch (e) {
+          return 'n/a';
+        } // return nothing on error
       },
       '(stream|#|title)': async function (filter) {
         const channel = filter.replace('(stream|', '').replace('|title)', '');
 
         const token = await oauth.botAccessToken;
-        if (token === '') {return 'n/a'};
+        if (token === '') {
+          return 'n/a';
+        };
 
         try {
           let request = await axios.get(`https://api.twitch.tv/kraken/users?login=${channel}`, {
             headers: {
               'Accept': 'application/vnd.twitchtv.v5+json',
-              'Authorization': 'OAuth ' + token
-            }
+              'Authorization': 'OAuth ' + token,
+            },
           });
 
           const channelId = request.data.users[0]._id;
           request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
             headers: {
-              'Authorization': 'Bearer ' + token
-            }
+              'Authorization': 'Bearer ' + token,
+            },
           });
           // save remaining api calls
           api.calls.bot.remaining = request.headers['ratelimit-remaining'];
           api.calls.bot.refresh = request.headers['ratelimit-reset'];
           return request.data.data[0].title;
-        } catch (e) { return 'n/a'; } // return nothing on error
+        } catch (e) {
+          return 'n/a';
+        } // return nothing on error
       },
       '(stream|#|viewers)': async function (filter) {
         const channel = filter.replace('(stream|', '').replace('|viewers)', '');
 
         const token = await oauth.botAccessToken;
-        if (token === '') {return '0'};
+        if (token === '') {
+          return '0';
+        };
 
         try {
           let request = await axios.get(`https://api.twitch.tv/kraken/users?login=${channel}`, {
             headers: {
               'Accept': 'application/vnd.twitchtv.v5+json',
-              'Authorization': 'OAuth ' + token
-            }
+              'Authorization': 'OAuth ' + token,
+            },
           });
           const channelId = request.data.users[0]._id;
           request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
             headers: {
-              'Authorization': 'Bearer ' + token
-            }
+              'Authorization': 'Bearer ' + token,
+            },
           });
           // save remaining api calls
           api.calls.bot.remaining = request.headers['ratelimit-remaining'];
           api.calls.bot.refresh = request.headers['ratelimit-reset'];
           return request.data.data[0].viewer_count;
-        } catch (e) { return '0'; } // return nothing on error
-      }
+        } catch (e) {
+          return '0';
+        } // return nothing on error
+      },
     };
 
     await this.global({});
@@ -671,7 +716,7 @@ class Message {
     await this.parseMessageEach(random);
     await this.parseMessageEach(ifp, false);
     await this.parseMessageVariables(custom);
-    await this.parseMessageEval(evaluate, decode(this.message));
+    await this.parseMessageEval(evaluate);
     await this.parseMessageEach(param, true);
     // local replaces
     if (!_.isNil(attr)) {
@@ -698,31 +743,37 @@ class Message {
   }
 
   async parseMessageApi () {
-    if (this.message.trim().length === 0) {return};
+    if (this.message.trim().length === 0) {
+      return;
+    };
 
-    let rMessage = this.message.match(/\(api\|(http\S+)\)/i);
+    const rMessage = this.message.match(/\(api\|(http\S+)\)/i);
     if (!_.isNil(rMessage) && !_.isNil(rMessage[1])) {
       this.message = this.message.replace(rMessage[0], '').trim(); // remove api command from message
-      let url = rMessage[1].replace(/&amp;/g, '&');
-      let response = await axios.get(url);
+      const url = rMessage[1].replace(/&amp;/g, '&');
+      const response = await axios.get(url);
       if (response.status !== 200) {
         return translate('core.api.error');
       }
 
       // search for api datas in this.message
-      let rData = this.message.match(/\(api\.(?!_response)(\S*?)\)/gi);
+      const rData = this.message.match(/\(api\.(?!_response)(\S*?)\)/gi);
       if (_.isNil(rData)) {
         if (_.isObject(response.data)) {
           // Stringify object
           this.message = this.message.replace('(api._response)', JSON.stringify(response.data));
-        } else {this.message = this.message.replace('(api._response)', response.data.toString().replace(/^"(.*)"/, '$1'))};
+        } else {
+          this.message = this.message.replace('(api._response)', response.data.toString().replace(/^"(.*)"/, '$1'));
+        };
       } else {
-        if (_.isBuffer(response.data)) {response.data = JSON.parse(response.data.toString())};
-        for (let tag of rData) {
+        if (_.isBuffer(response.data)) {
+          response.data = JSON.parse(response.data.toString());
+        };
+        for (const tag of rData) {
           let path = response.data;
-          let ids = tag.replace('(api.', '').replace(')', '').split('.');
+          const ids = tag.replace('(api.', '').replace(')', '').split('.');
           _.each(ids, function (id) {
-            let isArray = id.match(/(\S+)\[(\d+)\]/i);
+            const isArray = id.match(/(\S+)\[(\d+)\]/i);
             if (isArray) {
               path = path[isArray[1]][isArray[2]];
             } else {
@@ -736,18 +787,22 @@ class Message {
   }
 
   async parseMessageCommand (filters) {
-    if (this.message.trim().length === 0) {return};
-    for (var key in filters) {
-      if (!filters.hasOwnProperty(key)) {continue};
+    if (this.message.trim().length === 0) {
+      return;
+    };
+    for (const key in filters) {
+      if (!filters.hasOwnProperty(key)) {
+        continue;
+      };
 
-      let fnc = filters[key];
+      const fnc = filters[key];
       let regexp = _.escapeRegExp(key);
 
       // we want to handle # as \w - number in regexp
       regexp = regexp.replace(/#/g, '.*?');
-      let rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
+      const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
       if (!_.isNull(rMessage)) {
-        for (var bkey in rMessage) {
+        for (const bkey in rMessage) {
           this.message = this.message.replace(rMessage[bkey], await fnc(rMessage[bkey])).trim();
         }
       }
@@ -755,18 +810,22 @@ class Message {
   }
 
   async parseMessageOnline (filters) {
-    if (this.message.trim().length === 0) {return};
-    for (var key in filters) {
-      if (!filters.hasOwnProperty(key)) {continue};
+    if (this.message.trim().length === 0) {
+      return;
+    };
+    for (const key in filters) {
+      if (!filters.hasOwnProperty(key)) {
+        continue;
+      };
 
-      let fnc = filters[key];
+      const fnc = filters[key];
       let regexp = _.escapeRegExp(key);
 
       // we want to handle # as \w - number in regexp
       regexp = regexp.replace(/#/g, '(\\S+)');
-      let rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
+      const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
       if (!_.isNull(rMessage)) {
-        for (var bkey in rMessage) {
+        for (const bkey in rMessage) {
           if (!(await fnc(rMessage[bkey]))) {
             this.message = '';
           } else {
@@ -778,56 +837,68 @@ class Message {
   }
 
   async parseMessageEval (filters) {
-    if (this.message.trim().length === 0) {return};
-    for (var key in filters) {
-      if (!filters.hasOwnProperty(key)) {continue};
+    if (this.message.trim().length === 0) {
+      return;
+    };
+    for (const key in filters) {
+      if (!filters.hasOwnProperty(key)) {
+        continue;
+      };
 
-      let fnc = filters[key];
+      const fnc = filters[key];
       let regexp = _.escapeRegExp(key);
 
       // we want to handle # as \w - number in regexp
       regexp = regexp.replace(/#/g, '([\\S ]+)');
-      let rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
+      const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
       if (!_.isNull(rMessage)) {
-        for (var bkey in rMessage) {
-          let newString = await fnc(rMessage[bkey]);
-          if (_.isUndefined(newString) || newString.length === 0) {this.message = ''};
+        for (const bkey in rMessage) {
+          const newString = await fnc(rMessage[bkey]);
+          if (_.isUndefined(newString) || newString.length === 0) {
+            this.message = '';
+          };
           this.message = this.message.replace(rMessage[bkey], newString).trim();
         }
       }
     }
   }
 
-  async parseMessageVariables (filters, removeWhenEmpty) {
-    if (_.isNil(removeWhenEmpty)) {removeWhenEmpty = true};
+  async parseMessageVariables (filters, removeWhenEmpty = true) {
+    if (this.message.trim().length === 0) {
+      return;
+    };
+    for (const key in filters) {
+      if (!filters.hasOwnProperty(key)) {
+        continue;
+      };
 
-    if (this.message.trim().length === 0) {return};
-    for (var key in filters) {
-      if (!filters.hasOwnProperty(key)) {continue};
-
-      let fnc = filters[key];
+      const fnc = filters[key];
       let regexp = _.escapeRegExp(key);
 
       regexp = regexp.replace(/#/g, '([a-zA-Z0-9_]+)');
-      let rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
+      const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
       if (!_.isNull(rMessage)) {
-        for (var bkey in rMessage) {
-          let newString = await fnc(rMessage[bkey]);
-          if ((_.isNil(newString) || newString.length === 0) && removeWhenEmpty) {this.message = ''};
+        for (const bkey in rMessage) {
+          const newString = await fnc(rMessage[bkey]);
+          if ((_.isNil(newString) || newString.length === 0) && removeWhenEmpty) {
+            this.message = '';
+          };
           this.message = this.message.replace(rMessage[bkey], newString).trim();
         }
       }
     }
   }
 
-  async parseMessageEach (filters, removeWhenEmpty) {
-    if (_.isNil(removeWhenEmpty)) {removeWhenEmpty = true};
+  async parseMessageEach (filters, removeWhenEmpty = true) {
+    if (this.message.trim().length === 0) {
+      return;
+    };
+    for (const key in filters) {
+      if (!filters.hasOwnProperty(key)) {
+        continue;
+      };
 
-    if (this.message.trim().length === 0) {return};
-    for (var key in filters) {
-      if (!filters.hasOwnProperty(key)) {continue};
-
-      let fnc = filters[key];
+      const fnc = filters[key];
       let regexp = _.escapeRegExp(key);
 
       if (key.startsWith('$')) {
@@ -835,11 +906,13 @@ class Message {
       } else {
         regexp = regexp.replace(/#/g, '([\\S ]+?)'); // default behavior for if
       }
-      let rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
+      const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
       if (!_.isNull(rMessage)) {
-        for (var bkey in rMessage) {
-          let newString = await fnc(rMessage[bkey]);
-          if ((_.isNil(newString) || newString.length === 0) && removeWhenEmpty) {this.message = ''};
+        for (const bkey in rMessage) {
+          const newString = await fnc(rMessage[bkey]);
+          if ((_.isNil(newString) || newString.length === 0) && removeWhenEmpty) {
+            this.message = '';
+          };
           this.message = this.message.replace(rMessage[bkey], newString).trim();
         }
       }
