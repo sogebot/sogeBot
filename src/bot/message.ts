@@ -128,7 +128,7 @@ class Message {
     return Entities.decode(this.message);
   }
 
-  async parse (attr: { [name: string]: any }) {
+  async parse (attr: { [name: string]: any } = {}) {
     this.message = await this.message; // if is promise
 
     const random = {
