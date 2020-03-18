@@ -3,7 +3,7 @@ rm -rf sogeBot-master;
 wget https://github.com/sogehige/sogeBot/archive/master.zip;
 unzip master.zip;
 cd sogeBot-master;
-make;
+HUSKY_SKIP_INSTALL=1 make;
 make pack;
 cp *.zip ../;
 cd ../;
