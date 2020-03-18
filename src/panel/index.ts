@@ -119,6 +119,7 @@ const main = async () => {
         { path: '/stats/api', name: 'APIStats', component: () => import('./views/stats/api.vue') },
         { path: '/stats/commandcount', name: 'CommandCountStats', component: () => import('./views/stats/commandcount.vue') },
         { path: '/stats/tips', name: 'TipsStats', component: () => import('./views/stats/tips.vue') },
+        { path: '/stats/bits', name: 'BitsStats', component: () => import('./views/stats/bits.vue') },
 
         { path: '/manage/alias/', redirect: '/manage/alias/list' },
         { path: '/manage/alias/list', name: 'aliasManagerList', component: () => import('./views/managers/alias/alias-list.vue') },
