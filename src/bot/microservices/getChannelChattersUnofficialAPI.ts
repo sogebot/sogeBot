@@ -35,6 +35,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
 
   // spin up worker
   if (isMainThread && connection.options.type !== 'sqlite' && isThreadingEnabled) {
+    debug('microservice', 'getChannelChattersUnofficialAPI::worker');
     const value = await new Promise((resolve, reject) => {
       const worker = new Worker(__filename);
       worker.on('message', resolve);
