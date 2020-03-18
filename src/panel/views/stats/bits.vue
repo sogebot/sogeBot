@@ -26,14 +26,16 @@
       :fields="fields"
       :sort-by.sync="sortBy"
       :sort-desc.sync="sortDesc">
-      <template v-slot:cell(tippedAt)='data'>
-        {{ moment(Number(data.item.tippedAt)).format('LLL') }}
+      <template v-slot:cell(cheeredAt)='data'>
+        {{ moment(Number(data.item.cheeredAt)).format('LLL') }}
       </template>
       <template v-slot:cell(sortAmount)='data'>
         {{ data.item.amount }}
       </template>
       <template v-slot:cell(user)='data'>
-        {{ data.item.user.username }} ({{ data.item.user.userId }})
+        <router-link :to="{ name: 'viewersManagerEdit', params: { id: data.item.user.userId }}">
+          {{ data.item.user.username }}&nbsp;<small class="text-muted">{{ data.item.user.userId }}</small>
+        </router-link>
       </template>
     </b-table>
   </div>
