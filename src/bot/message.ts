@@ -1,4 +1,4 @@
-import mathjs from 'mathjs';
+import { evaluate as mathJsEvaluate } from 'mathjs';
 import axios, { AxiosResponse } from 'axios';
 import safeEval from 'safe-eval';
 import querystring from 'querystring';
@@ -512,7 +512,7 @@ class Message {
             );
           }
         }
-        return mathjs.evaluate(toEvaluate);
+        return mathJsEvaluate(toEvaluate);
       },
     };
     const evaluate = {
