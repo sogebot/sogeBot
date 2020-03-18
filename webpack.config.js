@@ -24,7 +24,6 @@ if (process.env.NODE_ENV === 'production') {
 const webpackConfig = {
   cache: {
     type: 'filesystem',
-    version: process.env.CACHE || undefined,
     buildDependencies: {
       config: [ __filename ] // you may omit this when your CLI automatically adds it
     }
