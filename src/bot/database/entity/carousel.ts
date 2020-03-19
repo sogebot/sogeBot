@@ -29,6 +29,6 @@ export const Carousel = new EntitySchema<Readonly<Required<CarouselInterface>>>(
     animationOut: { type: String },
     animationOutDuration: { type: Number },
     showOnlyOncePerStream: { type: Boolean },
-    base64: { type: 'text' },
+    base64: { type: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 'longtext' : 'text' },
   },
 });
