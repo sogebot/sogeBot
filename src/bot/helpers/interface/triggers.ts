@@ -35,7 +35,7 @@ function trigger(opts: onEventMessage | onEventSub | onEventBit | onEventTip | o
     }
 
     if (typeof self[event.fName] === 'function') {
-      debug('trigger', `event ${on_trigger} => ${self.constructor.name}`);
+      debug('trigger', `event ${on_trigger} => ${self.__moduleName__}`);
       self[event.fName](opts);
     }
   }

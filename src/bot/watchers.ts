@@ -65,7 +65,7 @@ export const VariableWatcher = {
             if (typeof checkedModule[event.fName] === 'function') {
               checkedModule[event.fName](variable, cloneDeep(value));
             } else {
-              error(`${event.fName}() is not function in ${checkedModule._name}/${checkedModule.constructor.name.toLowerCase()}`);
+              error(`${event.fName}() is not function in ${checkedModule._name}/${checkedModule.__moduleName__.toLowerCase()}`);
             }
           }
         }

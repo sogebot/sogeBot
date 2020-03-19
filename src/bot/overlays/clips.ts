@@ -29,7 +29,7 @@ class Clips extends Overlay {
     }
 
     panel.io
-      .of('/' + this._name + '/' + this.constructor.name.toLowerCase())
+      .of('/' + this._name + '/' + this.__moduleName__.toLowerCase())
       .emit('clips', {
         clips,
         settings: {

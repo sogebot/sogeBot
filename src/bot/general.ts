@@ -109,7 +109,7 @@ class General extends Core {
       for (const system of list(category)) {
         const enabled = system.enabled;
         const areDependenciesEnabled = system.areDependenciesEnabled;
-        const isDisabledByEnv = !isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.constructor.name.toLowerCase()) || process.env.DISABLE === '*');
+        const isDisabledByEnv = !isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.__moduleName__.toLowerCase()) || process.env.DISABLE === '*');
 
         if (!enabled) {
           enabledSystems[category].push('-' + system);

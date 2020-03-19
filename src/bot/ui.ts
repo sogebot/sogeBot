@@ -66,7 +66,7 @@ class UI extends Core {
         }
         for (const dir of ['systems', 'games', 'overlays', 'integrations']) {
           for (const system of list(dir)) {
-            set(data, `${dir}.${system.constructor.name}`, await system.getAllSettings());
+            set(data, `${dir}.${system.__moduleName__}`, await system.getAllSettings());
           }
         }
         // currencies
@@ -93,7 +93,7 @@ class UI extends Core {
 
         for (const dir of ['systems', 'games']) {
           for (const system of list(dir)) {
-            set(data, `${dir}.${system.constructor.name}`, await system.getAllSettings());
+            set(data, `${dir}.${system.__moduleName__}`, await system.getAllSettings());
           }
         }
 

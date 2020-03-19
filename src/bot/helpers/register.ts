@@ -51,10 +51,7 @@ export const find = (type: string, name: string) => {
       }
       return String(m.__moduleName__).toLowerCase() === name.toLowerCase();
     } catch (e) {
-      console.log(e);
-      console.log(m);
-      process.exit(1);
-      error(m);
+      error(e);
     }
   });
 };
