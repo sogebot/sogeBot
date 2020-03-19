@@ -62,10 +62,10 @@ export const VariableWatcher = {
 
           change(`${type}.${name}.${variable}`);
           for (const event of getFunctionList('change', type === 'core' ? `${name}.${variable}` : `${type}.${name}.${variable}`)) {
-            if (typeof self[event.fName] === 'function') {
-              self[event.fName](variable, cloneDeep(value));
+            if (typeof checkedModule[event.fName] === 'function') {
+              checkedModule[event.fName](variable, cloneDeep(value));
             } else {
-              error(`${event.fName}() is not function in ${checkedModule._name}/${self.constructor.name.toLowerCase()}`);
+              error(`${event.fName}() is not function in ${checkedModule._name}/${checkedModule.constructor.name.toLowerCase()}`);
             }
           }
         }
