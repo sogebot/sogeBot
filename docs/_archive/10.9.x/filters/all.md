@@ -116,10 +116,6 @@
     - _chat:_ `!mmr +` < only for owners and mods
     - _bot response_: `@soge__, mmr was set to 1001.`
     - _chat:_ `!mmr -` < only for owners and mods
-    - _bot response_: `My MMR value is 1000`
-    - _chat:_ `!mmr +500` < only for owners and mods
-    - _bot response_: `@soge__, mmr was set to 1500.`
-    - _chat:_ `!mmr -500` < only for owners and mods
     - _bot response_: `@soge__, mmr was set to 1000.`
 
 `$!_#` - same as variable above, except set message is always silent
