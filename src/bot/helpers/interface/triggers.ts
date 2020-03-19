@@ -1,7 +1,7 @@
 import { getFunctionNameFromStackTrace } from '../stacktrace';
 import { debug } from '../log';
 import { getFunctionList } from '../../decorators/on';
-import { list } from '../register';
+import { find } from '../register';
 
 export function triggerInterfaceOnMessage(opts: onEventMessage) {
   trigger(opts);
@@ -29,7 +29,7 @@ function trigger(opts: onEventMessage | onEventSub | onEventBit | onEventTip | o
 
   for (const event of getFunctionList(on_trigger)) {
     const [ type, name ] = event.path.split('.');
-    const self = list(type).find(m => m.constructor.name.toLowerCase() === name.toLowerCase());
+    const self = find(type, name);
     if (!self) {
       throw new Error(`${type}.${name} not found in list`);
     }

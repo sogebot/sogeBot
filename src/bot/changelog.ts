@@ -9,7 +9,7 @@ import { getRepository, LessThan, MoreThan, Not } from 'typeorm';
 import { Settings } from './database/entity/settings';
 import { Changelog } from './database/entity/changelog';
 import { isDbConnected } from './helpers/database';
-import { list } from './helpers/register';
+import { find } from './helpers/register';
 
 let lastTimestamp = Date.now();
 const threadId = uuid();
@@ -37,7 +37,7 @@ export const changelog = async () => {
 
     const [type, name, variable] = change.namespace.split('.');
 
-    const self = list(type).find(m => m.constructor.name.toLowerCase() === name.toLowerCase());
+    const self = find(type, name);
     if (!self) {
       throw new Error(`${type}.${name} not found in list`);
     }
@@ -49,7 +49,7 @@ export const changelog = async () => {
     if (variableFromDb) {
       const value = JSON.stringify(variableFromDb.value);
       const [ type, name ] = change.namespace.split('.');
-      const self = list(type).find(m => m.constructor.name.toLowerCase() === name.toLowerCase());
+      const self = find(type, name);
       if (!self) {
         throw new Error(`${type}.${name} not found in list`);
       }

@@ -31,6 +31,8 @@ class Module {
 
   onStartupTriggered = false;
 
+  __moduleName__: null | string = null;
+
   get isDisabledByEnv(): boolean {
     const isDisableIgnored = typeof process.env.ENABLE !== 'undefined' && process.env.ENABLE.toLowerCase().split(',').includes(this.constructor.name.toLowerCase());
     return typeof process.env.DISABLE !== 'undefined'
@@ -100,6 +102,8 @@ class Module {
   protected _enabled: boolean | null = true;
 
   constructor(name = 'core', enabled = true) {
+    this.__moduleName__ = this.constructor.name;
+
     this.on = {
       change: {
         enabled: [],

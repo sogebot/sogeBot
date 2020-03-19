@@ -35,7 +35,7 @@ import stats from './stats';
 import { getFunctionList } from './decorators/on';
 import { linesParsed, setStatus } from './helpers/parser';
 import { isDbConnected } from './helpers/database';
-import { list } from './helpers/register';
+import { find } from './helpers/register';
 
 const setImmediateAwait = () => {
   return new Promise(resolve => {
@@ -1119,7 +1119,7 @@ class API extends Core {
             for (const event of getFunctionList('streamStart')) {
               const type = !event.path.includes('.') ? 'core' : event.path.split('.')[0];
               const module = !event.path.includes('.') ? event.path.split('.')[0] : event.path.split('.')[1];
-              const self = list(type).find(m => m.constructor.name.toLowerCase() === module);
+              const self = find(type, module);
               if (self) {
                 self[event.fName]();
               } else {
@@ -1183,7 +1183,7 @@ class API extends Core {
             for (const event of getFunctionList('streamStart')) {
               const type = !event.path.includes('.') ? 'core' : event.path.split('.')[0];
               const module = !event.path.includes('.') ? event.path.split('.')[0] : event.path.split('.')[1];
-              const self = list(type).find(m => m.constructor.name.toLowerCase() === module);
+              const self = find(type, module);
               if (self) {
                 self[event.fName]();
               } else {

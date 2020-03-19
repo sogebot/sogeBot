@@ -16,7 +16,7 @@ import tmi from './tmi';
 import { HOUR, MINUTE } from './constants';
 import api from './api';
 import { socketsConnected } from './panel';
-import { list } from './helpers/register';
+import { find, list } from './helpers/register';
 
 let threadStartTimestamp = Date.now();
 const gracefulExit = () => {
@@ -152,7 +152,7 @@ class General extends Core {
     }
 
     const [ type, module ] = pointer.split('.');
-    const self = list(type).find(m => m.constructor.name.toLowerCase() === module);
+    const self = find(type, module);
     if (!self) {
       throw new Error(`${type}.${name} not found in list`);
     }
