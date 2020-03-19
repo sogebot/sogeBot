@@ -44,7 +44,7 @@ class Cooldown extends System {
         const item = await getRepository(CooldownEntity).save(dataset);
         cb(null, item);
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
     adminEndpoint(this.nsp, 'cooldown::deleteById', async (id, cb) => {
@@ -60,7 +60,7 @@ class Cooldown extends System {
         });
         cb(null, cooldown);
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
     adminEndpoint(this.nsp, 'cooldown::getById', async (id, cb) => {
@@ -74,7 +74,7 @@ class Cooldown extends System {
           cb(null, cooldown);
         }
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
   }

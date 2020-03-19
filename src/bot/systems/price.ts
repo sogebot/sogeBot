@@ -54,7 +54,7 @@ class Price extends System {
         cb(null);
       } catch (e) {
         error(e);
-        cb(e);
+        cb(e.stack);
       }
     });
 
@@ -64,7 +64,7 @@ class Price extends System {
         cb(null);
       } catch (e) {
         error(e);
-        cb(e);
+        cb(e.stack);
       }
     });
   }

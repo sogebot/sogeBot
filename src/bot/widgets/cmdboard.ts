@@ -22,21 +22,21 @@ class Cmdboard extends Widget {
       try {
         cb(null, await getRepository(CommandsBoard).find());
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
     adminEndpoint(this.nsp, 'cmdboard::save', async (items: CommandsBoardInterface[], cb) => {
       try {
         cb(null, await getRepository(CommandsBoard).save(items));
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
     adminEndpoint(this.nsp, 'cmdboard::remove', async (item: Required<CommandsBoardInterface>, cb) => {
       try {
         cb(null, await getRepository(CommandsBoard).remove(item));
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
     adminEndpoint(this.nsp, 'cmdboard::run', (command) => {

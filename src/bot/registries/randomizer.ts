@@ -25,7 +25,7 @@ class Randomizer extends Registry {
           })
         );
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
     adminEndpoint(this.nsp, 'randomizer::remove', async (item: Required<RandomizerInterface>, cb) => {

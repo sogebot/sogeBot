@@ -39,7 +39,7 @@ class Gallery extends Overlay {
         });
         cb(null, items);
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
     adminEndpoint(this.nsp, 'gallery::delete', async (id: string, cb) => {
@@ -47,7 +47,7 @@ class Gallery extends Overlay {
         await getRepository(GalleryEntity).delete({ id });
         cb(null);
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
     adminEndpoint(this.nsp, 'gallery::upload', async (data, cb) => {
@@ -62,7 +62,7 @@ class Gallery extends Overlay {
         const item = await getRepository(GalleryEntity).save({ id: uuid(), type, data: filedata, name: filename });
         cb(null, { type, id: item.id, name: filename });
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
   }

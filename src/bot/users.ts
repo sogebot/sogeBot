@@ -165,7 +165,7 @@ class Users extends Core {
         await getRepository(User).update({ userId: opts.userId }, { username: opts.username });
         cb(null);
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
     adminEndpoint(this.nsp, 'viewers::resetPointsAll', async (cb) => {
@@ -209,7 +209,7 @@ class Users extends Core {
         cb(null, result);
       } catch (e) {
         error(e);
-        cb(e, viewer);
+        cb(e.stack, viewer);
       }
     });
     adminEndpoint(this.nsp, 'viewers::remove', async (viewer: Required<UserInterface>, cb) => {
@@ -217,14 +217,14 @@ class Users extends Core {
         await getRepository(User).remove(viewer);
       } catch (e) {
         error(e);
-        cb(e);
+        cb(e.stack);
       }
     });
     adminEndpoint(this.nsp, 'getNameById', async (id, cb) => {
       try {
         cb(null, await this.getNameById(id));
       } catch (e) {
-        cb(e, null);
+        cb(e.stack, null);
       }
     });
     adminEndpoint(this.nsp, 'find.viewers', async (opts: { state?: any; search?: string; filter?: { subscribers: null | boolean; followers: null | boolean; active: null | boolean; vips: null | boolean }; page: number; order?: { orderBy: string; sortOrder: 'ASC' | 'DESC' } }, cb) => {
@@ -301,7 +301,7 @@ class Users extends Core {
 
         cb(null, viewers, count, opts.state);
       } catch (e) {
-        cb(e, [], null, null);
+        cb(e.stack, [], null, null);
       }
     });
     adminEndpoint(this.nsp, 'viewers::followedAt', async (id, cb) => {
@@ -352,7 +352,7 @@ class Users extends Core {
           cb(null);
         }
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
   }

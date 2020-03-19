@@ -17,7 +17,7 @@ class Checklist extends System {
         const checkedItems = await getRepository(ChecklistEntity).find();
         cb(null, this.itemsArray, checkedItems);
       } catch(e) {
-        cb(e, [], []);
+        cb(e.stack, [], []);
       }
     });
     adminEndpoint(this.nsp, 'checklist::save', async (checklistItem, cb) => {

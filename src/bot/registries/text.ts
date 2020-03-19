@@ -20,7 +20,7 @@ class Text extends Registry {
         await getRepository(TextEntity).remove(item);
         cb(null);
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
     adminEndpoint(this.nsp, 'text::getAll', async(cb) => {
@@ -30,7 +30,7 @@ class Text extends Registry {
           await getRepository(TextEntity).find(),
         );
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
     adminEndpoint(this.nsp, 'text::save', async(item: TextInterface, cb) => {
@@ -40,7 +40,7 @@ class Text extends Registry {
           await getRepository(TextEntity).save(item),
         );
       } catch (e) {
-        cb(e, null);
+        cb(e.stack, null);
       }
     });
     publicEndpoint(this.nsp, 'text::getOne', async (id, callback) => {

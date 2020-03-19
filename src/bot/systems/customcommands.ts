@@ -56,7 +56,7 @@ class CustomCommands extends System {
         }
       } catch (e) {
         if (typeof cb === 'function') {
-          cb(e);
+          cb(e.stack);
         }
       }
     });
@@ -75,7 +75,7 @@ class CustomCommands extends System {
         const count = await getAllCountOfCommandUsage();
         cb(null, commands, count);
       } catch (e) {
-        cb(e, [], null);
+        cb(e.stack, [], null);
       }
     });
     adminEndpoint(this.nsp, 'commands::getById', async (id, cb) => {

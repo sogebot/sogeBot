@@ -26,7 +26,7 @@ class Carousel extends Overlay {
       try {
         cb(null, await getRepository(CarouselEntity).findOne({ id }));
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
     publicEndpoint(this.nsp, 'carousel::getAll', async (cb) => {
@@ -37,14 +37,14 @@ class Carousel extends Overlay {
           },
         }));
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
     adminEndpoint(this.nsp, 'carousel::save', async (items: CarouselInterface[], cb) => {
       try {
         cb(await getRepository(CarouselEntity).save(items));
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
 
@@ -65,7 +65,7 @@ class Carousel extends Overlay {
         }));
         cb(null);
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
 
@@ -100,7 +100,7 @@ class Carousel extends Overlay {
         });
         cb(null, image);
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
   }

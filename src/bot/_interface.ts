@@ -31,10 +31,12 @@ class Module {
 
   onStartupTriggered = false;
 
+  __moduleName__ = '';
+
   get isDisabledByEnv(): boolean {
-    const isDisableIgnored = typeof process.env.ENABLE !== 'undefined' && process.env.ENABLE.toLowerCase().split(',').includes(this.constructor.name.toLowerCase());
+    const isDisableIgnored = typeof process.env.ENABLE !== 'undefined' && process.env.ENABLE.toLowerCase().split(',').includes(this.__moduleName__.toLowerCase());
     return typeof process.env.DISABLE !== 'undefined'
-      && (process.env.DISABLE.toLowerCase().split(',').includes(this.constructor.name.toLowerCase()) || process.env.DISABLE === '*')
+      && (process.env.DISABLE.toLowerCase().split(',').includes(this.__moduleName__.toLowerCase()) || process.env.DISABLE === '*')
       && !isDisableIgnored;
   };
 
@@ -48,7 +50,7 @@ class Module {
             if (retry > 0) {
               setTimeout(() => check(--retry), 10);
             } else {
-              throw new Error(`[${this.constructor.name}] Dependency error - possibly wrong path`);
+              throw new Error(`[${this.__moduleName__}] Dependency error - possibly wrong path`);
             }
             return;
           } else {
@@ -62,7 +64,7 @@ class Module {
   }
 
   get nsp(): string {
-    return '/' + this._name + '/' + this.constructor.name.toLowerCase();
+    return '/' + this._name + '/' + this.__moduleName__.toLowerCase();
   }
 
   get enabled(): boolean {
@@ -100,6 +102,8 @@ class Module {
   protected _enabled: boolean | null = true;
 
   constructor(name = 'core', enabled = true) {
+    this.__moduleName__ = this.constructor.name;
+
     this.on = {
       change: {
         enabled: [],
@@ -136,7 +140,7 @@ class Module {
             this._enabled = typeof enabled === 'undefined' ? this._enabled : enabled;
             this.status({ state: this._enabled, quiet: !isMainThread });
             if (isMainThread) {
-              const path = this._name === 'core' ? this.constructor.name.toLowerCase() : `${this._name}.${this.constructor.name.toLowerCase()}`;
+              const path = this._name === 'core' ? this.__moduleName__.toLowerCase() : `${this._name}.${this.__moduleName__.toLowerCase()}`;
               for (const event of getFunctionList('startup', path)) {
                 this[event.fName]('enabled', enabled);
               }
@@ -180,7 +184,7 @@ class Module {
       .andWhere('name=:name', { name: key })
       .getOne();
 
-    const path = this._name === 'core' ? this.constructor.name.toLowerCase() : `${this._name}.${this.constructor.name.toLowerCase()}`;
+    const path = this._name === 'core' ? this.__moduleName__.toLowerCase() : `${this._name}.${this.__moduleName__.toLowerCase()}`;
     for (const event of getFunctionList('load', `${path}.${key}` )) {
       this[event.fName]();
     }
@@ -199,7 +203,7 @@ class Module {
   }
 
   public prepareCommand(opts:  Command) {
-    const defaultPermission = permissionsList[`${this._name}.${this.constructor.name.toLowerCase()}.${(opts.fnc || '').toLowerCase()}`];
+    const defaultPermission = permissionsList[`${this._name}.${this.__moduleName__.toLowerCase()}.${(opts.fnc || '').toLowerCase()}`];
     if (typeof defaultPermission === 'undefined') {
       opts.permission = opts.permission || permission.VIEWERS;
     } else {
@@ -213,7 +217,7 @@ class Module {
     try {
       for (const { opts: options, m } of commandsToRegister.filter(command => {
         return command.m.type === this._name
-          && command.m.name === this.constructor.name.toLowerCase();
+          && command.m.name === this.__moduleName__.toLowerCase();
       })) {
         const opts = typeof options === 'string' ? { name: options } : options;
         opts.fnc = m.fnc; // force function to decorated function
@@ -268,7 +272,7 @@ class Module {
         try {
           cb(null, await this.getAllSettings(), await this.getUI());
         } catch (e) {
-          cb(e, null, null);
+          cb(e.stack, null, null);
         }
       });
       adminEndpoint(this.nsp, 'settings.update', async (data: { [x: string]: any }, cb) => {
@@ -376,14 +380,14 @@ class Module {
             cb(null, {variable, value});
           }
         } catch (e) {
-          cb(e, null);
+          cb(e.stack, null);
         }
       });
       publicEndpoint(this.nsp, 'get.value', async (variable, cb) => {
         try {
           cb(null, await this[variable]);
         } catch (e) {
-          cb(e, undefined);
+          cb(e.stack, undefined);
         }
       });
     }
@@ -413,23 +417,23 @@ class Module {
 
     // on.change handler on enabled
     if (isMainThread && isStatusChanged && this.onStartupTriggered) {
-      const path = this._name === 'core' ? this.constructor.name.toLowerCase() : `${this._name}.${this.constructor.name.toLowerCase()}`;
+      const path = this._name === 'core' ? this.__moduleName__.toLowerCase() : `${this._name}.${this.__moduleName__.toLowerCase()}`;
       for (const event of getFunctionList('change', path + '.enabled')) {
         if (typeof this[event.fName] === 'function') {
           this[event.fName]('enabled', opts.state);
         } else {
-          error(`${event.fName}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`);
+          error(`${event.fName}() is not function in ${this._name}/${this.__moduleName__.toLowerCase()}`);
         }
       }
     }
 
     if ((isMasterAndStatusOnly || isStatusChanged) && !opts.quiet) {
       if (this.isDisabledByEnv) {
-        info(`${chalk.red('DISABLED BY ENV')}: ${this.constructor.name} (${this._name})`);
+        info(`${chalk.red('DISABLED BY ENV')}: ${this.__moduleName__} (${this._name})`);
       } else if (this.areDependenciesEnabled) {
-        info(`${opts.state ? chalk.green('ENABLED') : chalk.red('DISABLED')}: ${this.constructor.name} (${this._name})`);
+        info(`${opts.state ? chalk.green('ENABLED') : chalk.red('DISABLED')}: ${this.__moduleName__} (${this._name})`);
       } else {
-        info(`${chalk.red('DISABLED BY DEP')}: ${this.constructor.name} (${this._name})`);
+        info(`${chalk.red('DISABLED BY DEP')}: ${this.__moduleName__} (${this._name})`);
       }
     }
 
@@ -448,10 +452,10 @@ class Module {
 
   public addWidget(...opts) {
     if (isMainThread) {
-      clearTimeout(this.timeouts[`${this.constructor.name}.${opts[0]}.addWidget`]);
+      clearTimeout(this.timeouts[`${this.__moduleName__}.${opts[0]}.addWidget`]);
 
       if (_.isNil(panel)) {
-        this.timeouts[`${this.constructor.name}.${opts[0]}.addWidget`] = setTimeout(() => this.addWidget(...opts), 1000);
+        this.timeouts[`${this.__moduleName__}.${opts[0]}.addWidget`] = setTimeout(() => this.addWidget(...opts), 1000);
       } else {
         panel.addWidget(opts[0], opts[1], opts[2]);
       }
@@ -548,7 +552,7 @@ class Module {
 
       parsers.push({
         this: this,
-        name: `${this.constructor.name}.${parser.name}`,
+        name: `${this.__moduleName__}.${parser.name}`,
         fnc: this[parser.name],
         permission: parser.permission,
         priority: parser.priority,
@@ -575,7 +579,7 @@ class Module {
 
       rollbacks.push({
         this: this,
-        name: `${this.constructor.name}.${rollback.name}`,
+        name: `${this.__moduleName__}.${rollback.name}`,
         fnc: this[rollback.name],
       });
     }

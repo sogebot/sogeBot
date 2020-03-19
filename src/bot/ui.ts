@@ -10,7 +10,7 @@ import oauth from './oauth';
 import general from './general';
 import currency from './currency';
 import webhooks from './webhooks';
-import { list } from './helpers/register';
+import { find, list } from './helpers/register';
 
 const timezone = (process.env.TIMEZONE ?? 'system') === 'system' || !process.env.TIMEZONE ? moment.tz.guess() : process.env.TIMEZONE;
 
@@ -58,7 +58,7 @@ class UI extends Core {
           if (typeof data.core === 'undefined') {
             data.core = {};
           }
-          const self = list('core').find(m => m.constructor.name.toLowerCase() === system.toLowerCase());
+          const self = find('core', system);
           if (!self) {
             throw new Error(`core.${name} not found in list`);
           }
@@ -66,7 +66,7 @@ class UI extends Core {
         }
         for (const dir of ['systems', 'games', 'overlays', 'integrations']) {
           for (const system of list(dir)) {
-            set(data, `${dir}.${system.constructor.name}`, await system.getAllSettings());
+            set(data, `${dir}.${system.__moduleName__}`, await system.getAllSettings());
           }
         }
         // currencies
@@ -83,7 +83,7 @@ class UI extends Core {
 
         cb(null, data);
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
 
@@ -93,7 +93,7 @@ class UI extends Core {
 
         for (const dir of ['systems', 'games']) {
           for (const system of list(dir)) {
-            set(data, `${dir}.${system.constructor.name}`, await system.getAllSettings());
+            set(data, `${dir}.${system.__moduleName__}`, await system.getAllSettings());
           }
         }
 
@@ -109,7 +109,7 @@ class UI extends Core {
 
         cb(null, data);
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
   }

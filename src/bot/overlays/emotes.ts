@@ -105,7 +105,7 @@ class Emotes extends Overlay {
       try {
         cb(null, await getRepository(CacheEmotes).find());
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
     adminEndpoint(this.nsp, 'removeCache', (cb) => {

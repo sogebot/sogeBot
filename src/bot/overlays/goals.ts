@@ -23,7 +23,7 @@ class Goals extends Overlay {
         await getRepository(GoalGroup).remove(item);
         cb(null);
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
     adminEndpoint(this.nsp, 'goals::save', async (item: Required<GoalGroupInterface>, cb) => {
@@ -33,7 +33,7 @@ class Goals extends Overlay {
         getRepository(Goal).delete({ groupId: IsNull() });
         cb(null, item);
       } catch (e) {
-        cb(e, item);
+        cb(e.stack, item);
       }
     });
     adminEndpoint(this.nsp, 'goals::getAll', async (cb) => {
@@ -43,7 +43,7 @@ class Goals extends Overlay {
         });
         cb(null, items);
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
 
@@ -55,7 +55,7 @@ class Goals extends Overlay {
         });
         cb(null, item);
       } catch (e) {
-        cb(e, null);
+        cb(e.stack, null);
       }
     });
     publicEndpoint(this.nsp, 'goals::current', async (cb) => {

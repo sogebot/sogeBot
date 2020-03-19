@@ -37,7 +37,7 @@ class HowLongToBeat extends System {
       try {
         cb(null, await getRepository(HowLongToBeatGame).find({...opts}));
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
     adminEndpoint(this.nsp, 'hltb::save', async (dataset: HowLongToBeatGameInterface, cb) => {
@@ -45,7 +45,7 @@ class HowLongToBeat extends System {
         const item = await getRepository(HowLongToBeatGame).save(dataset);
         cb(null, item);
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
   }

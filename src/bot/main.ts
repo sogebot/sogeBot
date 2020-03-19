@@ -23,6 +23,7 @@ import chalk from 'chalk';
 import { existsSync, unlinkSync } from 'fs';
 import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 import { normalize } from 'path';
+import { startWatcher } from './watchers';
 
 const connect = async function () {
   const connectionOptions = await getConnectionOptions();
@@ -127,6 +128,7 @@ async function main () {
           if (existsSync('./restart.pid')) {
             unlinkSync('./restart.pid');
           }
+          startWatcher();
         }, 30000);
       });
     }, 5000);

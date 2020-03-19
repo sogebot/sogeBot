@@ -4,7 +4,7 @@ import { VariableWatcher } from './watchers';
 import { debug, error } from './helpers/log';
 import { isMainThread } from './cluster';
 import { isDbConnected } from './helpers/database';
-import { list } from './helpers/register';
+import { find } from './helpers/register';
 
 export let loadingInProgress: string[] = [];
 export let areDecoratorsLoaded = false;
@@ -62,7 +62,7 @@ export function ui(opts, category?: string) {
         return setTimeout(() => register(0), 1000);
       }
       try {
-        const self = list(type).find(m => m.constructor.name.toLowerCase() === name.toLowerCase());
+        const self = find(type, name);
         if (!self) {
           throw new Error(`${type}.${name} not found in list`);
         }
@@ -97,7 +97,7 @@ export function settings(category?: string, isReadOnly = false) {
     }
 
     const registerSettings = async () => {
-      const self = list(type).find(m => m.constructor.name.toLowerCase() === name.toLowerCase());
+      const self = find(type, name);
       if (!self) {
         throw new Error(`${type}.${name} not found in list`);
       }
@@ -151,7 +151,7 @@ export function permission_settings(category?: string) {
         return setTimeout(() => register(), 1000);
       }
       try {
-        const self = list(type).find(m => m.constructor.name.toLowerCase() === name.toLowerCase());
+        const self = find(type, name);
         if (!self) {
           throw new Error(`${type}.${name} not found in list`);
         }
@@ -201,7 +201,7 @@ export function shared(db = false) {
         return setTimeout(() => register(), 1000);
       }
       try {
-        const self = list(type).find(m => m.constructor.name.toLowerCase() === name.toLowerCase());
+        const self = find(type, name);
         if (!self) {
           throw new Error(`${type}.${name} not found in list`);
         }
@@ -282,7 +282,7 @@ export function rollback() {
 function registerHelper(m, retry = 0) {
   setTimeout(() => {
     try {
-      const self = list(m.type).find(module => module.constructor.name.toLowerCase() === m.name.toLowerCase());
+      const self = find(m.type, m.name);
       if (!self) {
         throw new Error(`${m.type}.${m.name} not found in list`);
       }
@@ -306,7 +306,7 @@ function registerHelper(m, retry = 0) {
 function registerRollback(m) {
   setTimeout(() => {
     try {
-      const self = list(m.type).find(module => module.constructor.name.toLowerCase() === m.name.toLowerCase());
+      const self = find(m.type, m.name);
       if (!self) {
         throw new Error(`${m.type}.${m.name} not found in list`);
       }    self._rollback.push({
@@ -321,7 +321,7 @@ function registerRollback(m) {
 function registerParser(opts, m) {
   setTimeout(() => {
     try {
-      const self = list(m.type).find(module => module.constructor.name.toLowerCase() === m.name.toLowerCase());
+      const self = find(m.type, m.name);
       if (!self) {
         throw new Error(`${m.type}.${m.name} not found in list`);
       }

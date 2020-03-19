@@ -415,7 +415,7 @@ function Panel () {
       const toEmit = [];
       for (const system of systems) {
         toEmit.push({
-          name: system.constructor.name.toLowerCase(),
+          name: system.__moduleName__.toLowerCase(),
           enabled: system.enabled,
           areDependenciesEnabled: await system.areDependenciesEnabled,
           isDisabledByEnv: system.isDisabledByEnv,
@@ -439,7 +439,7 @@ function Panel () {
           continue;
         }
         toEmit.push({
-          name: system.constructor.name.toLowerCase(),
+          name: system.__moduleName__.toLowerCase(),
           enabled: system.enabled,
           areDependenciesEnabled: await system.areDependenciesEnabled,
           isDisabledByEnv: system.isDisabledByEnv,
@@ -454,7 +454,7 @@ function Panel () {
           continue;
         }
         toEmit.push({
-          name: system.constructor.name.toLowerCase(),
+          name: system.__moduleName__.toLowerCase(),
           enabled: system.enabled,
           areDependenciesEnabled: await system.areDependenciesEnabled,
           isDisabledByEnv: system.isDisabledByEnv,
@@ -469,7 +469,7 @@ function Panel () {
           continue;
         }
         toEmit.push({
-          name: system.constructor.name.toLowerCase(),
+          name: system.__moduleName__.toLowerCase(),
           enabled: system.enabled,
           areDependenciesEnabled: await system.areDependenciesEnabled,
           isDisabledByEnv: system.isDisabledByEnv,
@@ -597,7 +597,7 @@ Panel.prototype.sendStreamData = async function (cb) {
     }
     cb(null, data)
   } catch (e) {
-    cb(e, data);
+    cb(e.stack, data);
   }
 }
 

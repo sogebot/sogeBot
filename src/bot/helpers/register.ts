@@ -1,3 +1,5 @@
+import { error, warning } from './log';
+
 export const core: import('../_interface').Module[] = [];
 export const systems: import('../_interface').Module[] = [];
 export const integrations: import('../_interface').Module[] = [];
@@ -36,6 +38,22 @@ export const register = (type: 'core' | 'systems' | 'integrations' | 'games' | '
     default:
       throw new Error(`Unknown type ${type} to register`);
   }
+};
+
+export const find = (type: string, name: string) => {
+  return list(type).find(m => {
+    try {
+      if (typeof m.__moduleName__ === 'undefined') {
+        throw new Error('Module name undefined');
+      }
+      if (m.__moduleName__ === null) {
+        warning(`Some modules are not loaded yet`);
+      }
+      return String(m.__moduleName__).toLowerCase() === name.toLowerCase();
+    } catch (e) {
+      error(e);
+    }
+  });
 };
 
 export const list = (type: null | string) => {

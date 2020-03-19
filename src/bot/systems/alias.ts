@@ -42,7 +42,7 @@ class Alias extends System {
       try {
         cb(null, await getRepository(AliasEntity).find());
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
 
@@ -50,7 +50,7 @@ class Alias extends System {
       try {
         cb(null, await getRepository(AliasEntity).findOne({ id }));
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
 
@@ -60,7 +60,7 @@ class Alias extends System {
         await getRepository(AliasEntity).save({ ...item, ...dataset});
         cb(null, item);
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
 
