@@ -1,6 +1,7 @@
 <!-- _navbar.md -->
 
 * **Archive ▾**
+  * [10.9.x](/_archive/10.9.x/)
   * [10.8.x](/_archive/10.8.x/)
   * [10.7.x](/_archive/10.7.x/)
   * [10.6.x](/_archive/10.6.x/)
@@ -13,5 +14,5 @@
   * [9.10.x](/_archive/9.10.x/)
   * [9.9.x](/_archive/9.9.x/)
   * [9.8.x](/_archive/9.8.x/)
-* **Current:** [10.9.x](/)
+* **Current:** [10.10.x](/)
 * **Next:** [master](/_master/)
