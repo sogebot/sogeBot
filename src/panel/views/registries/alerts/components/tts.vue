@@ -154,7 +154,9 @@ export default class TTS extends Vue {
   voices: {text: string; value: string}[] = [];
 
   beforeDestroy() {
-    this.$unloadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.configuration.integrations.ResponsiveVoice.api.key)
+    if (this.state.loaded === this.$state.success) {
+      this.$unloadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.configuration.integrations.ResponsiveVoice.api.key).catch(() => {});
+    }
   }
 
   mounted() {
@@ -162,8 +164,12 @@ export default class TTS extends Vue {
     if (this.configuration.integrations.ResponsiveVoice.api.key.trim().length === 0) {
       this.state.loaded = this.$state.fail;
     } else {
-      this.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.configuration.integrations.ResponsiveVoice.api.key)
-        .then(() => this.initResponsiveVoice());
+      if (typeof window.responsiveVoice === 'undefined') {
+        this.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.configuration.integrations.ResponsiveVoice.api.key)
+          .then(() => this.initResponsiveVoice());
+      } else {
+        this.state.loaded = this.$state.success;
+      }
     }
   }
 
