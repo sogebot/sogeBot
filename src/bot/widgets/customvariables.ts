@@ -26,7 +26,7 @@ class CustomVariables extends Widget {
         const variables = await getRepository(VariableWatch).save(items);
         cb(null, variables);
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
     adminEndpoint(this.nsp, 'list.variables', async (cb) => {
@@ -34,7 +34,7 @@ class CustomVariables extends Widget {
         const variables = await getRepository(Variable).find();
         cb(null, variables);
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
     adminEndpoint(this.nsp, 'list.watch', async (cb) => {
@@ -46,7 +46,7 @@ class CustomVariables extends Widget {
         });
         cb(null, variables);
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
     adminEndpoint(this.nsp, 'watched::setValue', async (opts, cb) => {
@@ -59,7 +59,7 @@ class CustomVariables extends Widget {
         }
         cb(null);
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
   }

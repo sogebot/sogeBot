@@ -30,7 +30,7 @@ class Quotes extends System {
           };
         })));
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
 
@@ -39,7 +39,7 @@ class Quotes extends System {
         const item = await getRepository(QuotesEntity).findOne({ id });
         cb(null, item);
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
 
@@ -47,7 +47,7 @@ class Quotes extends System {
       try {
         cb(null, await getRepository(QuotesEntity).save({ ...(await getRepository(QuotesEntity).findOne({ id })), ...dataset }));
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
 
@@ -56,7 +56,7 @@ class Quotes extends System {
         await getRepository(QuotesEntity).delete({ id });
         cb(null);
       } catch(e) {
-        cb(e);
+        cb(e.stack);
       }
     });
   }

@@ -64,7 +64,7 @@ class Polls extends System {
           },
         }));
       } catch(e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
     adminEndpoint(this.nsp, 'create', async (vote: Poll, cb) => {

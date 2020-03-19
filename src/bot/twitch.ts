@@ -39,7 +39,7 @@ class Twitch extends Core {
       try {
         cb(null, (oauth.broadcasterUsername).toLowerCase());
       } catch (e) {
-        cb(e, '');
+        cb(e.stack, '');
       }
     });
   }

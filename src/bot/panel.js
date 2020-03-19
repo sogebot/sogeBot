@@ -597,7 +597,7 @@ Panel.prototype.sendStreamData = async function (cb) {
     }
     cb(null, data)
   } catch (e) {
-    cb(e, data);
+    cb(e.stack, data);
   }
 }
 

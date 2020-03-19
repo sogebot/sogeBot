@@ -45,7 +45,7 @@ class Alerts extends Registry {
           cb(null, false, 0);
         }
       } catch (e) {
-        cb(e, false, 0);
+        cb(e.stack, false, 0);
       }
     });
 
@@ -61,7 +61,7 @@ class Alerts extends Registry {
           await getRepository(AlertMedia).save(items)
         );
       } catch (e) {
-        cb(e, null);
+        cb(e.stack, null);
       }
     });
     adminEndpoint(this.nsp, 'alerts::getOneMedia', async (id: string, cb) => {
@@ -72,7 +72,7 @@ class Alerts extends Registry {
         );
 
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
     adminEndpoint(this.nsp, 'alerts::save', async (item: AlertInterface, cb) => {
@@ -82,7 +82,7 @@ class Alerts extends Registry {
           await getRepository(Alert).save(item)
         );
       } catch (e) {
-        cb(e, null);
+        cb(e.stack, null);
       }
     });
     publicEndpoint(this.nsp, 'alerts::getOne', async (id: string, cb) => {
@@ -95,7 +95,7 @@ class Alerts extends Registry {
           })
         );
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
     adminEndpoint(this.nsp, 'alerts::getAll', async (cb) => {
@@ -123,7 +123,7 @@ class Alerts extends Registry {
         await getRepository(AlertResub).delete({ alertId: IsNull() });
         cb();
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
     adminEndpoint(this.nsp, 'clear-media', async () => {

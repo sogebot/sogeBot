@@ -231,7 +231,7 @@ class Points extends System {
         }
         cb(null, intervals);
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
 

@@ -14,7 +14,7 @@ class CommandCount extends Stats {
       try {
         cb(null, await getRepository(CommandsCount).find());
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
   }

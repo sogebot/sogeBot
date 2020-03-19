@@ -47,14 +47,14 @@ class Ranks extends System {
           },
         }));
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
     adminEndpoint(this.nsp, 'ranks::getOne', async (id, cb) => {
       try {
         cb(null, await getRepository(Rank).findOne(id));
       } catch(e) {
-        cb(e, undefined);
+        cb(e.stack, undefined);
       }
     });
     adminEndpoint(this.nsp, 'ranks::remove', async (id, cb) => {
@@ -66,7 +66,7 @@ class Ranks extends System {
         await getRepository(Rank).save(item);
         cb(null, item);
       } catch (e) {
-        cb(e, item);
+        cb(e.stack, item);
       }
     });
   }

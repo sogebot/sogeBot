@@ -583,7 +583,7 @@ class Events extends Core {
           relations: ['operations'],
         }));
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
     adminEndpoint(this.nsp, 'events::getOne', async (eventId: string, cb) => {
@@ -594,21 +594,21 @@ class Events extends Core {
         });
         cb(null, event);
       } catch (e) {
-        cb(e, undefined);
+        cb(e.stack, undefined);
       }
     });
     adminEndpoint(this.nsp, 'list.supported.events', (cb) => {
       try {
         cb(null, this.supportedEventsList);
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
     adminEndpoint(this.nsp, 'list.supported.operations', (cb) => {
       try {
         cb(null, this.supportedOperationsList);
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
 
@@ -687,7 +687,7 @@ class Events extends Core {
 
         cb(null);
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
 
@@ -695,7 +695,7 @@ class Events extends Core {
       try {
         cb(null, await getRepository(Event).save({...event, operations: event.operations.filter(o => o.name !== 'do-nothing')}));
       } catch (e) {
-        cb(e, event);
+        cb(e.stack, event);
       }
     });
 

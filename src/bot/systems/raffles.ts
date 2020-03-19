@@ -60,7 +60,7 @@ class Raffles extends System {
           await getRepository(User).findOne({username}),
         );
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
     adminEndpoint(this.nsp, 'raffle::updateParticipant', async (participant: RaffleParticipantInterface, cb) => {
@@ -70,7 +70,7 @@ class Raffles extends System {
           await getRepository(RaffleParticipant).save(participant),
         );
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
     adminEndpoint(this.nsp, 'raffle:getLatest', async (cb) => {

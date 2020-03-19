@@ -44,7 +44,7 @@ class Highlights extends System {
       try {
         cb(null, await getRepository(Highlight).find({ order: { createdAt: 'DESC' } }));
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
     adminEndpoint(this.nsp, 'highlights::deleteById', async (id, cb) => {

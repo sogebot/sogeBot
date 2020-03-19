@@ -49,7 +49,7 @@ class Keywords extends System {
         });
         cb(null, items);
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
     adminEndpoint(this.nsp, 'keywords::getById', async (id, cb) => {
@@ -63,7 +63,7 @@ class Keywords extends System {
           cb(null, item);
         }
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
   }

@@ -64,7 +64,7 @@ class Bets extends System {
         });
         cb(null, currentBet);
       } catch (e) {
-        cb(e);
+        cb(e.stack);
       }
     });
 

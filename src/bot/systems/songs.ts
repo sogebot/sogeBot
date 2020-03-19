@@ -152,14 +152,14 @@ class Songs extends System {
       try {
         cb(null, await this.importPlaylist({ parameters: playlist, sender: null }));
       } catch (e) {
-        cb(e, null);
+        cb(e.stack, null);
       }
     });
     adminEndpoint(this.nsp, 'import.video', async (url, cb) => {
       try {
         cb(null, await this.addSongToPlaylist({ parameters: url, sender: null }));
       } catch (e) {
-        cb(e, null);
+        cb(e.stack, null);
       }
     });
     adminEndpoint(this.nsp, 'next', async () => {

@@ -27,7 +27,7 @@ class SoundBoard extends Widget {
           cb(null, sounds);
         });
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
   }

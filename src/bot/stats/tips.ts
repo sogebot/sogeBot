@@ -16,7 +16,7 @@ class Tips extends Stats {
           relations: ['user'],
         }));
       } catch (e) {
-        cb(e, []);
+        cb(e.stack, []);
       }
     });
   }
