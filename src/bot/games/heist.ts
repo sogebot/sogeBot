@@ -244,8 +244,6 @@ class Heist extends Game {
 
   @command('!bankheist')
   async main (opts) {
-    const expects = new Expects();
-
     const [entryCooldown, lastHeistTimestamp, copsCooldown] = await Promise.all([
       this.entryCooldownInSeconds,
       this.lastHeistTimestamp,
@@ -285,7 +283,7 @@ class Heist extends Game {
 
     let points;
     try {
-      points = expects.check(opts.parameters).points().toArray()[0];
+      points = new Expects(opts.parameters).points().toArray()[0];
     } catch (e) {
       if (!newHeist) {
         sendMessage(
