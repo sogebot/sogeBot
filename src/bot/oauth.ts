@@ -9,6 +9,7 @@ import { error, info, warning } from './helpers/log';
 import api from './api';
 import tmi from './tmi';
 import { setStatus } from './helpers/parser';
+import { cleanViewersCache } from './helpers/permissions';
 
 class OAuth extends Core {
   private toWait = 10;
@@ -121,6 +122,12 @@ class OAuth extends Core {
       this.validateOAuth('broadcaster');
       this.getChannelId();
     }, 10000);
+  }
+
+  @onChange('generalOwner')
+  @onChange('broadcasterUsername')
+  clearCache() {
+    cleanViewersCache();
   }
 
   public async getChannelId() {
