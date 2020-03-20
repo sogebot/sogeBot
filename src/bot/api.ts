@@ -394,7 +394,11 @@ class API extends Core {
       throw new Error('API can run only on master');
     }
 
-    if (!isDbConnected) {
+    const oAuthIsSet = oauth.botUsername.length > 0
+      && oauth.channelId.length > 0
+      && oauth.currentChannel.length > 0;
+
+    if (!isDbConnected || !oAuthIsSet) {
       return { state: false, opts };
     }
 
