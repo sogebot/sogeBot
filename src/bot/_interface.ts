@@ -257,10 +257,10 @@ class Module {
 
 
   public _sockets() {
-    if (socket === null) {
+    if (socket === null || ioServer === null) {
       setTimeout(() => this._sockets(), 100);
     } else {
-      this.socket = ioServer?.of(this.nsp).use(socket.authorize);
+      this.socket = ioServer.of(this.nsp).use(socket.authorize);
       this.sockets();
       this.sockets = function() {
         error(this.nsp + ': Cannot initialize sockets second time');
