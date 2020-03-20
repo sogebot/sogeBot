@@ -21,7 +21,7 @@ import api from './api';
 import oauth from './oauth';
 import events from './events';
 import customvariables from './customvariables';
-import panel from './panel';
+import { ioServer } from './helpers/panel';
 import clips from './overlays/clips';
 import tmi from './tmi';
 import emotes from './overlays/emotes';
@@ -262,7 +262,7 @@ class Events extends Core {
     if (!_.includes(sound, 'http')) {
       sound = 'dist/soundboard/' + sound + '.mp3';
     }
-    panel.io.emit('play-sound', sound);
+    ioServer?.emit('play-sound', sound);
   }
 
   public async fireRunCommand(operation, attributes) {

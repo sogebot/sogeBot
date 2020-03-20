@@ -3,7 +3,7 @@
  * change to update it on memory on cluster
  */
 
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 
 import { getRepository, LessThan, MoreThan, Not } from 'typeorm';
 import { Settings } from './database/entity/settings';

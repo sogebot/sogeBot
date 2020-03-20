@@ -1,7 +1,7 @@
 import Overlay from './_interface';
 import { settings, ui } from '../decorators';
 import api from '../api';
-import panel from '../panel';
+import { ioServer } from '../helpers/panel';
 
 class Clips extends Overlay {
   @ui({
@@ -28,8 +28,7 @@ class Clips extends Overlay {
       c.mp4 = c.thumbnail_url.replace('-preview-480x272.jpg', '.mp4');
     }
 
-    panel.io
-      .of('/' + this._name + '/' + this.__moduleName__.toLowerCase())
+    ioServer?.of('/' + this._name + '/' + this.__moduleName__.toLowerCase())
       .emit('clips', {
         clips,
         settings: {

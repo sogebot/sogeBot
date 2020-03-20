@@ -285,7 +285,7 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { chunk, orderBy, get } from 'lodash-es';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { getSocket } from 'src/panel/helpers/socket';
 
 import { codemirror } from 'vue-codemirror';

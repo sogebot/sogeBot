@@ -7,7 +7,6 @@ import http from 'http';
 import { chatIn, chatOut, isDebugEnabled as debugIsEnabled, info, whisperIn, whisperOut } from './helpers/log.js';
 import oauth from './oauth.js';
 import api from './api.js';
-import panel from './panel.js';
 import tmi from './tmi.js';
 import { avgResponse } from './helpers/parser.js';
 
@@ -29,12 +28,6 @@ const clusterPort = process.env.CLUSTER_PORT ?? '20003';
 
 export const init = async () => {
   if (isClusterEnabled) {
-    if (typeof panel === 'undefined' && isMainThread) {
-      setTimeout(() => {
-        init();
-      }, 1000);
-      return;
-    }
     if (isMainThread) {
       const server = http.createServer();
 

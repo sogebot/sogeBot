@@ -35,7 +35,7 @@
   import Vue from 'vue'
 
   import { getSocket } from '../../helpers/socket';
-  import uuid from 'uuid/v4';
+  import { v4 as uuid } from 'uuid';
 
   import { library } from '@fortawesome/fontawesome-svg-core'
   import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';

@@ -1,6 +1,6 @@
 import Overlay from './_interface';
 import { ui } from '../decorators';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';

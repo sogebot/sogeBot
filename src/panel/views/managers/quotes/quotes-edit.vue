@@ -79,7 +79,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { Validations } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators';
 
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 
 import { getUsernameById } from '../../../helpers/userById';
 import { QuotesInterface } from 'src/bot/database/entity/quotes';

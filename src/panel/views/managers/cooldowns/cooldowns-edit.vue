@@ -98,7 +98,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { Validations } from 'vuelidate-property-decorators';
 import { required, minValue } from 'vuelidate/lib/validators'
 
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCheck, faTimes, faVolumeUp, faVolumeOff } from '@fortawesome/free-solid-svg-icons';

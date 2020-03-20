@@ -16,7 +16,6 @@
     "experimentalDecorators": true,
     "declaration": false,
     "noResolve": false,
-    "allowJs": true,
     "baseUrl": "./",
     "sourceMap": true
   },

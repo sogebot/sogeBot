@@ -73,7 +73,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { Validate } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators'
 
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { KeywordInterface } from 'src/bot/database/entity/keyword';
 
 @Component({

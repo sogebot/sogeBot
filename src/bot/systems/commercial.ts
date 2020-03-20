@@ -11,7 +11,7 @@ import { error } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import oauth from '../oauth';
 import events from '../events';
-import panel from '../panel';
+import { ioServer } from '../helpers/panel';
 import tmi from '../tmi';
 
 /*
@@ -85,8 +85,8 @@ class Commercial extends System {
         }
       } catch (e) {
         error(`API: ${url} - ${e.stack}`);
-        if (panel && panel.io) {
-          panel.io.emit('api.stats', { timestamp: Date.now(), call: 'commercial', api: 'kraken', endpoint: url, code: e.response.status, data: e.stack });
+        if (ioServer) {
+          ioServer.emit('api.stats', { timestamp: Date.now(), call: 'commercial', api: 'kraken', endpoint: url, code: e.response.status, data: e.stack });
         }
       }
     } else {
