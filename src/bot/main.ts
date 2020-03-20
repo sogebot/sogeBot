@@ -1,5 +1,7 @@
 require('dotenv').config();
 
+Error.stackTraceLimit = Infinity;
+
 if (Number(process.versions.node.split('.')[0]) < 11) {
   process.stdout.write('Upgrade your version of NodeJs! You need at least NodeJs 11.0.0, https://nodejs.org/en/. Current version is ' + process.versions.node + '\n');
   process.exit(1);
@@ -24,6 +26,8 @@ import { existsSync, unlinkSync } from 'fs';
 import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 import { normalize } from 'path';
 import { startWatcher } from './watchers';
+
+import { expose as panelExpose, init as panelInit } from './panel';
 
 const connect = async function () {
   const connectionOptions = await getConnectionOptions();
@@ -82,12 +86,13 @@ async function main () {
     error('Exiting bot.');
     process.exit(1);
   }
-  let translate, panel;
+  let translate;
   try {
     // Initialize all core singletons
     setTimeout(() => {
       clusterInit();
       changelog();
+      panelInit();
       require('./general');
       require('./socket');
       require('./ui');
@@ -96,7 +101,6 @@ async function main () {
       require('./users');
       require('./events');
       require('./customvariables');
-      panel = require('./panel');
       require('./twitch');
       require('./permissions');
       translate = require('./translate');
@@ -113,7 +117,7 @@ async function main () {
         await autoLoad('./dest/integrations/');
 
         if (isMainThread) {
-          panel.default.expose();
+          panelExpose();
         }
 
         if (process.env.HEAP) {

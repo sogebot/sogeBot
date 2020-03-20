@@ -138,7 +138,7 @@ import { orderBy } from  'lodash-es'
 import { Validations } from 'vuelidate-property-decorators';
 import { required, minLength } from 'vuelidate/lib/validators';
 
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faExclamationTriangle, faPlay, faStop, faKey, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';

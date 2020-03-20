@@ -16,7 +16,7 @@ import { Highlight, HighlightInterface } from '../database/entity/highlight';
 import api from '../api';
 import oauth from '../oauth';
 import { translate } from '../translate';
-import panel from '../panel';
+import { ioServer } from '../helpers/panel';
 
 const ERROR_STREAM_NOT_ONLINE = '1';
 const ERROR_MISSING_TOKEN = '2';
@@ -114,11 +114,10 @@ class Highlights extends System {
         createdAt: Date.now(),
       };
 
-      panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: request.status, remaining: api.calls.bot.remaining });
-
+      ioServer?.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: request.status, remaining: api.calls.bot.remaining });
       this.add(highlight, timestamp, opts.sender);
     } catch (e) {
-      panel.io.emit('api.stats', { timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: e.stack, remaining: api.calls.bot.remaining });
+      ioServer?.emit('api.stats', { timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: e.stack, remaining: api.calls.bot.remaining });
       switch (e.message) {
         case ERROR_STREAM_NOT_ONLINE:
           error('Cannot highlight - stream offline');

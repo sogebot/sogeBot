@@ -10,6 +10,7 @@ export interface DashboardInterface {
 
 export interface WidgetInterface {
   id?: string;
+  dashboardId?: string;
   dashboard?: DashboardInterface;
   name: string;
   positionX: number;
@@ -49,6 +50,7 @@ export const Widget = new EntitySchema<Readonly<Required<WidgetInterface>>>({
     dashboard: {
       type: 'many-to-one',
       target: 'dashboard',
+      joinColumn: { name: 'dashboardId' },
       inverseSide: 'widgets',
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',

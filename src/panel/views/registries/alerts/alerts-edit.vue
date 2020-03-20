@@ -167,7 +167,7 @@ import defaultAudio from '!!base64-loader!./media/456968__funwithsound__success-
 import { Validations } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators';
 
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 
 Component.registerHooks([
   'beforeRouteEnter',

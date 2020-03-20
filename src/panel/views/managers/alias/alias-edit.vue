@@ -91,7 +91,7 @@ import { Validations } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators'
 import { orderBy } from 'lodash-es'
 
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faKey } from '@fortawesome/free-solid-svg-icons';

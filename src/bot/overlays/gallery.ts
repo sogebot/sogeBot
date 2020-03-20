@@ -1,11 +1,11 @@
 import Overlay from './_interface';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { isMainThread } from '../cluster';
 import { adminEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
 import { Gallery as GalleryEntity } from '../database/entity/gallery';
-import panel from '../panel';
+import { app } from '../helpers/panel';
 
 class Gallery extends Overlay {
   showInUI = false;
@@ -15,7 +15,7 @@ class Gallery extends Overlay {
     this.addMenu({ category: 'registry', name: 'gallery', id: 'registry.gallery/list' });
 
     if (isMainThread) {
-      panel.getApp().get('/gallery/:id', async (req, res) => {
+      app?.get('/gallery/:id', async (req, res) => {
         const file = await getRepository(GalleryEntity).findOne({ id: req.params.id });
         if (file) {
           const data = Buffer.from(file.data.split(',')[1], 'base64');

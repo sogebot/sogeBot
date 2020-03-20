@@ -1,13 +1,10 @@
-'use strict'
+'use strict';
 
-var express = require('express')
-const bodyParser = require('body-parser')
-var http = require('http')
-var path = require('path')
-var _ = require('lodash')
-const commons = require('./commons')
-const { flatten } = require('./helpers/flatten')
-const gitCommitInfo = require('git-commit-info');
+import express from 'express';
+import bodyParser from 'body-parser';
+import path from 'path';
+import { flatten } from './helpers/flatten';
+import gitCommitInfo from 'git-commit-info';
 import { adminEndpoint } from './helpers/socket';
 
 import { info } from './helpers/log';
@@ -15,8 +12,9 @@ import { CacheTitles } from './database/entity/cacheTitles';
 import { v4 as uuid} from 'uuid';
 import { getConnection, getManager, getRepository } from 'typeorm';
 import { Dashboard, Widget } from './database/entity/dashboard';
-import { Translation } from './database/entity/translation'
-import { TwitchTag, TwitchTagLocalizationName } from './database/entity/twitch'
+import { Translation } from './database/entity/translation';
+import { TwitchTag } from './database/entity/twitch';
+import { User } from './database/entity/user';
 
 import socket from './socket';
 import Parser from './parser';
@@ -30,101 +28,99 @@ import oauth from './oauth';
 import songs from './systems/songs';
 import spotify from './integrations/spotify';
 import { linesParsed, status as statusObj } from './helpers/parser';
-import { systems, list } from './helpers/register'
+import { list, systems } from './helpers/register';
 import customvariables from './customvariables';
+import highlights from './systems/highlights';
+import _ from 'lodash';
+import { getOwnerAsSender, getTime } from './commons';
+import { app, ioServer, menu, server, setApp, setIOServer, setServer, widgets } from './helpers/panel';
 
-let app;
-let server;
+const port = process.env.PORT ?? '20000';
 
 export let socketsConnected = 0;
 
-function Panel () {
-  // setup static server
-  app = express()
-  app.use(bodyParser.json())
-  app.use(bodyParser.urlencoded({ extended: true }))
-
-  server = http.createServer(app)
-  this.port = process.env.PORT ?? '20000';
+export const init = () => {
+  setApp(express());
+  app?.use(bodyParser.json());
+  app?.use(bodyParser.urlencoded({ extended: true }));
+  setServer();
+  setIOServer(server);
 
   // webhooks integration
-  app.post('/webhooks/hub/follows', (req, res) => {
-    webhooks.follower(req.body)
-    res.sendStatus(200)
-  })
-  app.post('/webhooks/hub/streams', (req, res) => {
-    webhooks.stream(req.body)
-    res.sendStatus(200)
-  })
+  app?.post('/webhooks/hub/follows', (req, res) => {
+    webhooks.follower(req.body);
+    res.sendStatus(200);
+  });
+  app?.post('/webhooks/hub/streams', (req, res) => {
+    webhooks.stream(req.body);
+    res.sendStatus(200);
+  });
 
-  app.get('/webhooks/hub/follows', (req, res) => {
-    webhooks.challenge(req, res)
-  })
-  app.get('/webhooks/hub/streams', (req, res) => {
-    webhooks.challenge(req, res)
-  })
+  app?.get('/webhooks/hub/follows', (req, res) => {
+    webhooks.challenge(req, res);
+  });
+  app?.get('/webhooks/hub/streams', (req, res) => {
+    webhooks.challenge(req, res);
+  });
 
   // highlights system
-  app.get('/highlights/:id', (req, res) => {
-    highlights.url(req, res)
-  })
+  app?.get('/highlights/:id', (req, res) => {
+    highlights.url(req, res);
+  });
 
   // customvariables system
-  app.get('/customvariables/:id', (req, res) => {
-    customvariables.getURL(req, res)
-  })
-  app.post('/customvariables/:id', (req, res) => {
-    customvariables.postURL(req, res)
-  })
+  app?.get('/customvariables/:id', (req, res) => {
+    customvariables.getURL(req, res);
+  });
+  app?.post('/customvariables/:id', (req, res) => {
+    customvariables.postURL(req, res);
+  });
 
   // static routing
-  app.use('/dist', express.static(path.join(__dirname, '..', 'public', 'dist')))
-  app.get('/popout/', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'popout.html'))
-  })
-  app.get('/oauth', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'oauth.html'))
-  })
-  app.get('/login', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'login.html'))
-  })
-  app.get('/oauth/:page', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'oauth-' + req.params.page + '.html'))
-  })
-  app.get('/overlays/:overlay', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'overlays.html'))
-  })
-  app.get('/overlays/:overlay/:id', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'overlays.html'))
-  })
-  app.get('/custom/:custom', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'custom', req.params.custom + '.html'))
-  })
-  app.get('/public/', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'public.html'))
-  })
-  app.get('/fonts', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'fonts.json'))
-  })
-  app.get('/favicon.ico', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'favicon.ico'))
-  })
-  app.get('/', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'))
-  })
+  app?.use('/dist', express.static(path.join(__dirname, '..', 'public', 'dist')));
+  app?.get('/popout/', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'popout.html'));
+  });
+  app?.get('/oauth', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'oauth.html'));
+  });
+  app?.get('/login', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'login.html'));
+  });
+  app?.get('/oauth/:page', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'oauth-' + req.params.page + '.html'));
+  });
+  app?.get('/overlays/:overlay', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'overlays.html'));
+  });
+  app?.get('/overlays/:overlay/:id', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'overlays.html'));
+  });
+  app?.get('/custom/:custom', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'custom', req.params.custom + '.html'));
+  });
+  app?.get('/public/', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'public.html'));
+  });
+  app?.get('/fonts', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'fonts.json'));
+  });
+  app?.get('/favicon.ico', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'favicon.ico'));
+  });
+  app?.get('/', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+  });
 
-  this.io = require('socket.io')(server)
-  this.menu = [{ category: 'main', name: 'dashboard', id: 'dashboard' }]
-  this.widgets = []
+  menu.push({ category: 'main', name: 'dashboard', id: 'dashboard' });
 
   setTimeout(() => {
-    adminEndpoint('/', 'panel.sendStreamData', this.sendStreamData);
-  }, 5000)
+    adminEndpoint('/', 'panel.sendStreamData', sendStreamData);
+  }, 5000);
 
-  this.io.use(socket.authorize);
+  ioServer?.use(socket.authorize);
 
-  this.io.on('connection', async (socket) => {
-    var self = this
+  ioServer?.on('connection', async (socket) => {
     socket.on('disconnect', () => {
       socketsConnected--;
     });
@@ -134,7 +130,7 @@ function Panel () {
       id: 'c287b750-b620-4017-8b3e-e48757ddaa83', // constant ID
       name: 'Main',
       createdAt: 0,
-    })
+    });
 
     socket.on('getCachedTags', async (cb) => {
       const connection = await getConnection();
@@ -146,7 +142,7 @@ function Panel () {
         .addSelect('tags.tag_id', 'tag_id')
         .addSelect('tags.is_auto', 'is_auto')
         .addSelect('tags.is_current', 'is_current')
-        .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `${joinQuery} like :tag`)
+        .leftJoinAndSelect('twitch_tag_localization_name', 'names', `${joinQuery} like :tag`)
         .setParameter('tag', '%' + general.lang +'%');
 
       let results = await query.execute();
@@ -161,22 +157,20 @@ function Panel () {
           .addSelect('tags.tag_id', 'tag_id')
           .addSelect('tags.is_auto', 'is_auto')
           .addSelect('tags.is_current', 'is_current')
-          .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `${joinQuery} = :tag`)
+          .leftJoinAndSelect('twitch_tag_localization_name', 'names', `${joinQuery} = :tag`)
           .setParameter('tag', 'en-us');
         results = await query.execute();
       }
       cb(results);
     });
     // twitch game and title change
-    socket.on('getGameFromTwitch', function (game) { api.sendGameFromTwitch(api, socket, game) })
+    socket.on('getGameFromTwitch', function (game) {
+      api.sendGameFromTwitch(api, socket, game);
+    });
     socket.on('getUserTwitchGames', async () => {
-      const titles = await getManager()
-        .createQueryBuilder()
-        .select('titles')
-        .from(CacheTitles, 'titles')
-        .getMany();
+      const titles = await getRepository(CacheTitles).find();
       socket.emit('sendUserTwitchGamesAndTitles', titles) ;
-    })
+    });
     socket.on('deleteUserTwitchGame', async (game) => {
       await getManager()
         .createQueryBuilder()
@@ -184,11 +178,7 @@ function Panel () {
         .from(CacheTitles, 'titles')
         .where('game = :game', { game })
         .execute();
-      const titles = await getManager()
-        .createQueryBuilder()
-        .select('titles')
-        .from(CacheTitles, 'titles')
-        .getMany();
+      const titles = await getRepository(CacheTitles).find();
       socket.emit('sendUserTwitchGamesAndTitles', titles);
     });
     socket.on('cleanupGameAndTitle', async (data, cb) => {
@@ -221,11 +211,7 @@ function Panel () {
       }
 
       // remove removed titles
-      let allTitles = await getManager()
-        .createQueryBuilder()
-        .select('titles')
-        .from(CacheTitles, 'titles')
-        .getMany();
+      let allTitles = await getRepository(CacheTitles).find();
       for (const t of allTitles) {
         const titles = updateTitles.filter(o => o.game === t.game && o.title === t.title);
         if (titles.length === 0) {
@@ -241,16 +227,12 @@ function Panel () {
       }
 
       // remove duplicates
-      allTitles = await getManager()
-        .createQueryBuilder()
-        .select('titles')
-        .from(CacheTitles, 'titles')
-        .getMany();
+      allTitles = await getRepository(CacheTitles).find();
       for (const t of allTitles) {
         const titles = allTitles.filter(o => o.game === t.game && o.title === t.title);
         if (titles.length > 1) {
           // remove title if we have more than one title
-          allTitles = allTitles.filter(o => String(o._id) !== String(t._id));
+          allTitles = allTitles.filter(o => String(o.id) !== String(t.id));
           await getManager()
             .createQueryBuilder()
             .delete()
@@ -262,7 +244,7 @@ function Panel () {
       cb(null, allTitles);
     });
     socket.on('updateGameAndTitle', async (data, cb) => {
-      const status = await api.setTitleAndGame(null, data)
+      const status = await api.setTitleAndGame(null, data);
       await api.setTags(null, data.tags);
 
       if (!status) { // twitch refused update
@@ -272,13 +254,10 @@ function Panel () {
       data.title = data.title.trim();
       data.game = data.game.trim();
 
-      const item = await getManager()
-        .createQueryBuilder()
-        .select('titles')
-        .from(CacheTitles, 'titles')
-        .where('game = :game', { game: data.game })
-        .andWhere('title = :title', { title: data.title })
-        .getOne();
+      const item = await getRepository(CacheTitles).findOne({
+        game: data.game,
+        title: data.title,
+      });
 
       if (!item) {
         await getManager()
@@ -290,37 +269,41 @@ function Panel () {
           ])
           .execute();
       }
-      cb(null)
-    })
+      cb(null);
+    });
     socket.on('joinBot', async () => {
-      tmi.join('bot', tmi.channel)
-    })
+      tmi.join('bot', tmi.channel);
+    });
     socket.on('leaveBot', async () => {
-      tmi.part('bot')
+      tmi.part('bot');
       // force all users offline
       await getRepository(User).update({}, { isOnline: false });
-    })
+    });
 
     // custom var
     socket.on('custom.variable.value', async (variable, cb) => {
-      let value = translate('webpanel.not-available')
-      let isVariableSet = await customvariables.isVariableSet(variable)
-      if (isVariableSet) value = await customvariables.getValueOf(variable)
-      cb(null, value)
-    })
+      let value = translate('webpanel.not-available');
+      const isVariableSet = await customvariables.isVariableSet(variable);
+      if (isVariableSet) {
+        value = await customvariables.getValueOf(variable);
+      }
+      cb(null, value);
+    });
 
     socket.on('responses.get', async function (at, callback) {
-      const responses = flatten(!_.isNil(at) ? translateLib.translations[general.lang][at] : translateLib.translations[general.lang])
+      const responses = flatten(!_.isNil(at) ? translateLib.translations[general.lang][at] : translateLib.translations[general.lang]);
       _.each(responses, function (value, key) {
-        let _at = !_.isNil(at) ? at + '.' + key : key
-        responses[key] = {} // remap to obj
-        responses[key].default = translate(_at, true)
-        responses[key].current = translate(_at)
-      })
-      callback(responses)
-    })
+        const _at = !_.isNil(at) ? at + '.' + key : key;
+        responses[key] = {}; // remap to obj
+        responses[key].default = translate(_at, true);
+        responses[key].current = translate(_at);
+      });
+      callback(responses);
+    });
     socket.on('responses.set', function (data) {
-      _.remove(translateLib.custom, function (o) { return o.key === data.key });
+      _.remove(translateLib.custom, function (o: any) {
+        return o.key === data.key;
+      });
       translateLib.custom.push(data);
       translateLib._save();
 
@@ -333,7 +316,9 @@ function Panel () {
       socket.emit('lang', lang);
     });
     socket.on('responses.revert', async function (data, callback) {
-      _.remove(translateLib.custom, function (o) { return o.name === data.name });
+      _.remove(translateLib.custom, function (o: any) {
+        return o.name === data.name;
+      });
       await getRepository(Translation).delete({ name: data.name });
       callback(translate(data.name));
     });
@@ -342,7 +327,7 @@ function Panel () {
       const dashboards = await getRepository(Dashboard).find({
         relations: ['widgets'],
       });
-      let widgetList = [];
+      let widgetList: string[] = [];
       for (const dashboard of dashboards) {
         widgetList = [
           ...widgetList,
@@ -350,8 +335,8 @@ function Panel () {
         ];
       }
 
-      const sendWidgets = [];
-      for(const widget of this.widgets) {
+      const sendWidgets: typeof widgets = [];
+      for(const widget of widgets) {
         if (!widgetList.includes(widget.id)) {
           sendWidgets.push(widget);
         }
@@ -386,33 +371,41 @@ function Panel () {
         relations: ['widgets'],
         where: { id } ,
       });
-      let y = 0;
-      for (const w of dashboard.widgets) {
-        y = Math.max(y, w.positionY + w.height);
+      if (dashboard) {
+        let y = 0;
+        for (const w of dashboard.widgets) {
+          y = Math.max(y, w.positionY + w.height);
+        }
+        dashboard.widgets.push({
+          name: widgetName,
+          positionX: 0,
+          positionY: y,
+          width: 4,
+          height: 3,
+        });
+        cb(await getRepository(Dashboard).save(dashboard));
+      } else {
+        cb(undefined);
       }
-      dashboard.widgets.push({
-        name: widgetName,
-        positionX: 0,
-        positionY: y,
-        width: 4,
-        height: 3,
-      });
-      cb(await getRepository(Dashboard).save(dashboard));
-    })
+    });
     socket.on('updateWidgets', async (dashboards) => {
       await getRepository(Dashboard).save(dashboards);
     });
-    socket.on('connection_status', cb => { cb(statusObj) });
+    socket.on('connection_status', cb => {
+      cb(statusObj);
+    });
     socket.on('saveConfiguration', function (data) {
       _.each(data, async function (index, value) {
-        if (value.startsWith('_')) return true
-        general.setValue({ sender: { username: commons.getOwner() }, parameters: value + ' ' + index, quiet: data._quiet })
-      })
-    })
+        if (value.startsWith('_')) {
+          return true;
+        }
+        general.setValue({ sender: getOwnerAsSender(), command: '', parameters: value + ' ' + index, attr: { quiet: data._quiet }});
+      });
+    });
 
     // send enabled systems
     socket.on('systems', async (cb) => {
-      const toEmit = [];
+      const toEmit: { name: string; enabled: boolean; areDependenciesEnabled: boolean; isDisabledByEnv: boolean }[] = [];
       for (const system of systems) {
         toEmit.push({
           name: system.__moduleName__.toLowerCase(),
@@ -424,16 +417,16 @@ function Panel () {
       cb(null, toEmit);
     });
     socket.on('core', async (cb) => {
-      const toEmit = [];
+      const toEmit: { name: string }[] = [];
       for (const system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch', 'socket']) {
         toEmit.push({
-          name: system.toLowerCase()
+          name: system.toLowerCase(),
         });
       };
       cb(null, toEmit);
-    })
+    });
     socket.on('integrations', async (cb) => {
-      const toEmit = [];
+      const toEmit: { name: string; enabled: boolean; areDependenciesEnabled: boolean; isDisabledByEnv: boolean }[] = [];
       for (const system of list('integrations')) {
         if (!system.showInUI) {
           continue;
@@ -448,7 +441,7 @@ function Panel () {
       cb(null, toEmit);
     });
     socket.on('overlays', async (cb) => {
-      const toEmit = [];
+      const toEmit: { name: string; enabled: boolean; areDependenciesEnabled: boolean; isDisabledByEnv: boolean }[] = [];
       for (const system of list('overlays')) {
         if (!system.showInUI) {
           continue;
@@ -463,7 +456,7 @@ function Panel () {
       cb(null, toEmit);
     });
     socket.on('games', async (cb) => {
-      const toEmit = [];
+      const toEmit: { name: string; enabled: boolean; areDependenciesEnabled: boolean; isDisabledByEnv: boolean }[] = [];
       for (const system of list('games')) {
         if (!system.showInUI) {
           continue;
@@ -480,69 +473,61 @@ function Panel () {
 
     socket.on('name', function (cb) {
       cb(oauth.botUsername);
-    })
+    });
     socket.on('version', function (cb) {
       const version = _.get(process, 'env.npm_package_version', 'x.y.z');
       cb(version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'));
-    })
+    });
 
     socket.on('parser.isRegistered', function (data) {
-      socket.emit(data.emit, { isRegistered: new Parser().find(data.command) })
-    })
+      socket.emit(data.emit, { isRegistered: new Parser().find(data.command) });
+    });
 
     socket.on('menu', (cb) => {
-      cb(this.menu);
+      cb(menu);
     });
 
     socket.on('translations', (cb) => {
-      let lang = {}
+      const lang = {};
       _.merge(
         lang,
         translate({ root: 'webpanel' }),
         translate({ root: 'ui' }) // add ui root -> slowly refactoring to new name
-      )
+      );
       cb(lang);
-    })
+    });
 
     // send webpanel translations
-    let lang = {}
+    const lang = {};
     _.merge(
       lang,
       translate({ root: 'webpanel' }),
       translate({ root: 'ui' }) // add ui root -> slowly refactoring to new name
-    )
-    socket.emit('lang', lang)
-  })
-}
-
-Panel.prototype.getServer = function () {
-  return server;
-}
-
-Panel.prototype.getApp = function () {
-  return app;
-}
-
-Panel.prototype.expose = function () {
-  server.listen(this.port, () => {
-    info(`WebPanel is available at http://localhost:${this.port}`)
+    );
+    socket.emit('lang', lang);
   });
 };
 
-Panel.prototype.addMenu = function (menu) {
-  if (!this.menu.find(o => o.id === menu.id)) {
-    this.menu.push(menu);
-  }
-}
+export const getServer = function () {
+  return server;
+};
 
-Panel.prototype.addWidget = function (id, name, icon) { this.widgets.push({ id: id, name: name, icon: icon }) }
+export const getApp = function () {
+  return app;
+};
 
-Panel.prototype.sendStreamData = async function (cb) {
+export const expose = function () {
+  server.listen(port, () => {
+    info(`WebPanel is available at http://localhost:${port}`);
+  });
+};
+
+const sendStreamData = async function (cb) {
   try {
     const ytCurrentSong = Object.values(songs.isPlaying).find(o => o) ? _.get(JSON.parse(songs.currentSong), 'title', null) : null;
     let spotifyCurrentSong = _.get(JSON.parse(spotify.currentSong), 'song', '') + ' - ' + _.get(JSON.parse(spotify.currentSong), 'artist', '');
     if (spotifyCurrentSong.trim().length === 1 /* '-' */  || !_.get(JSON.parse(spotify.currentSong), 'is_playing', false)) {
-      spotifyCurrentSong = null;
+      spotifyCurrentSong = JSON.stringify(null);
     }
 
     const connection = await getConnection();
@@ -555,7 +540,7 @@ Panel.prototype.sendStreamData = async function (cb) {
       .addSelect('tags.is_auto', 'is_auto')
       .addSelect('tags.is_current', 'is_current')
       .where('tags.is_current = True')
-      .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `${joinQuery} like :tag`)
+      .leftJoinAndSelect('twitch_tag_localization_name', 'names', `${joinQuery} like :tag`)
       .setParameter('tag', '%' + general.lang +'%');
 
     let tagResults = await tagQuery.execute();
@@ -569,14 +554,14 @@ Panel.prototype.sendStreamData = async function (cb) {
         .addSelect('tags.is_auto', 'is_auto')
         .addSelect('tags.is_current', 'is_current')
         .where('tags.is_current = True')
-        .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `${joinQuery} = :tag`)
+        .leftJoinAndSelect('twitch_tag_localization_name', 'names', `${joinQuery} = :tag`)
         .setParameter('tag', 'en-us');
       tagResults = await tagQuery.execute();
     }
 
     const data = {
       broadcasterType: oauth.broadcasterType,
-      uptime: commons.getTime(api.isStreamOnline ? api.streamStatusChangeSince : null, false),
+      uptime: getTime(api.isStreamOnline ? api.streamStatusChangeSince : null, false),
       currentViewers: api.stats.currentViewers,
       currentSubscribers: api.stats.currentSubscribers,
       currentBits: api.stats.currentBits,
@@ -594,11 +579,9 @@ Panel.prototype.sendStreamData = async function (cb) {
       currentHosts: api.stats.currentHosts,
       currentWatched: api.stats.currentWatchedTime,
       tags: tagResults,
-    }
-    cb(null, data)
+    };
+    cb(null, data);
   } catch (e) {
-    cb(e.stack, data);
+    cb(e.stack, undefined);
   }
-}
-
-export default new Panel();
+};

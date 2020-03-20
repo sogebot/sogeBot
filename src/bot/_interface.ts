@@ -16,9 +16,9 @@ import { flatten, unflatten } from './helpers/flatten';
 import { existsSync } from 'fs';
 import { isDbConnected } from './helpers/database';
 import { register } from './helpers/register';
+import { addMenu, addWidget, ioServer } from './helpers/panel';
 
 let socket: import('./socket').Socket | any = null;
-let panel: null | any = null;
 
 class Module {
   public dependsOn: Module[] = [];
@@ -151,7 +151,6 @@ class Module {
 
           // require panel/socket
           socket = (require('./socket')).default;
-          panel = (require('./panel')).default;
 
           this.registerCommands();
         }, 5000); // slow down little bit to have everything preloaded or in progress of loading
@@ -258,10 +257,10 @@ class Module {
 
 
   public _sockets() {
-    if (panel === null || socket === null) {
+    if (socket === null) {
       setTimeout(() => this._sockets(), 100);
     } else {
-      this.socket = panel.io.of(this.nsp).use(socket.authorize);
+      this.socket = ioServer?.of(this.nsp).use(socket.authorize);
       this.sockets();
       this.sockets = function() {
         error(this.nsp + ': Cannot initialize sockets second time');
@@ -442,23 +441,13 @@ class Module {
 
   public addMenu(opts) {
     if (isMainThread) {
-      if (_.isNil(panel)) {
-        setTimeout(() => this.addMenu(opts), 1000);
-      } else {
-        panel.addMenu(opts);
-      }
+      addMenu(opts);
     }
   }
 
   public addWidget(...opts) {
     if (isMainThread) {
-      clearTimeout(this.timeouts[`${this.__moduleName__}.${opts[0]}.addWidget`]);
-
-      if (_.isNil(panel)) {
-        this.timeouts[`${this.__moduleName__}.${opts[0]}.addWidget`] = setTimeout(() => this.addWidget(...opts), 1000);
-      } else {
-        panel.addWidget(opts[0], opts[1], opts[2]);
-      }
+      addWidget(opts[0], opts[1], opts[2]);
     }
   }
 

@@ -22,7 +22,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import Clipboard from 'v-clipboard'
 Vue.use(Clipboard)
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 
 @Component({})
 export default class uuidGenerator extends Vue {

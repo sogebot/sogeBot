@@ -116,7 +116,7 @@ import 'codemirror/lib/codemirror.css';
 import { Validate } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators'
 
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 
 @Component({
   components: {

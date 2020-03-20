@@ -60,7 +60,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import uuid from 'uuid/v4';
+  import { v4 as uuid } from 'uuid';
   import { chunk } from 'lodash-es';
   import { getSocket } from 'src/panel/helpers/socket';
 

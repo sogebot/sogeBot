@@ -2,7 +2,7 @@ import Core from './_interface';
 import { settings, ui } from './decorators';
 import { MINUTE, SECOND } from './constants';
 import { isMainThread } from './cluster';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { permission } from './helpers/permissions';
 import { adminEndpoint, endpoints } from './helpers/socket';
 import { onLoad } from './decorators/on';

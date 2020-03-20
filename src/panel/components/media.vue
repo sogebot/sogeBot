@@ -51,7 +51,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, PropSync, Watch } from 'vue-property-decorator';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { getSocket } from '../helpers/socket';
 
 import AudioVisual from 'vue-audio-visual'

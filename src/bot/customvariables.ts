@@ -17,7 +17,7 @@ import { addToViewersCache, getFromViewersCache } from './helpers/permissions';
 import users from './users';
 import api from './api';
 import permissions from './permissions';
-import panel from './panel';
+import { addMenu, ioServer } from './helpers/panel';
 import custom_variables from './widgets/customvariables';
 import currency from './currency';
 import { isDbConnected } from './helpers/database';
@@ -100,20 +100,14 @@ class CustomVariables {
   }
 
   async addMenuAndListenersToPanel () {
-    clearTimeout(this.timeouts[`${this.constructor.name}.addMenuAndListenersToPanel`]);
-
-    if (isNil(panel)) {
-      this.timeouts[`${this.constructor.name}.addMenuAndListenersToPanel`] = setTimeout(() => this.addMenuAndListenersToPanel(), 1000);
-    } else {
-      panel.addMenu({ category: 'registry', name: 'custom-variables', id: 'registry.customVariables/list' });
-      this.sockets();
-    }
+    addMenu({ category: 'registry', name: 'custom-variables', id: 'registry.customVariables/list' });
+    this.sockets();
   }
 
   sockets () {
-    const io = panel.io.of('/registry/customVariables');
+    const io = ioServer?.of('/registry/customVariables');
 
-    io.on('connection', (socket) => {
+    io?.on('connection', (socket) => {
       socket.on('list.variables', async (cb) => {
         const variables = await getRepository(Variable).find();
         cb(null, variables);

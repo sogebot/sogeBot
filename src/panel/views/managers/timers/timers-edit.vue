@@ -126,7 +126,7 @@ import { required } from 'vuelidate/lib/validators';
 
 import { TimerInterface, TimerResponseInterface } from 'src/bot/database/entity/timer';
 
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 
 Component.registerHooks([
   'beforeRouteEnter',

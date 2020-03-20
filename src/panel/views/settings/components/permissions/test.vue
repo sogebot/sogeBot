@@ -54,7 +54,7 @@
 <script lang="ts">
   import Vue from 'vue'
   import { getSocket } from 'src/panel/helpers/socket';
-  import uuid from 'uuid/v4';
+  import { v4 as uuid } from 'uuid';
 
   export default Vue.extend({
     props: ['ids'],

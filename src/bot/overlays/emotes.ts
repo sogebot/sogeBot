@@ -13,7 +13,7 @@ import { getManager, getRepository } from 'typeorm';
 import { CacheEmotes, CacheEmotesInterface } from '../database/entity/cacheEmotes';
 import { v4 as uuid} from 'uuid';
 import oauth from '../oauth';
-import panel from '../panel';
+import { ioServer } from '../helpers/panel';
 
 
 class Emotes extends Overlay {
@@ -313,7 +313,7 @@ class Emotes extends Overlay {
   }
 
   async _test () {
-    panel.io.of('/overlays/emotes').emit('emote', {
+    ioServer?.of('/overlays/emotes').emit('emote', {
       url: 'https://static-cdn.jtvnw.net/emoticons/v1/9/' + this.cEmotesSize + '.0',
       settings: {
         emotes: {
@@ -326,7 +326,7 @@ class Emotes extends Overlay {
 
   async firework (data: string[]) {
     const emotes = await this.parseEmotes(data);
-    panel.io.of('/overlays/emotes').emit('emote.firework', {
+    ioServer?.of('/overlays/emotes').emit('emote.firework', {
       emotes,
       settings: {
         emotes: {
@@ -342,7 +342,7 @@ class Emotes extends Overlay {
 
   async explode (data: string[]) {
     const emotes = await this.parseEmotes(data);
-    panel.io.of('/overlays/emotes').emit('emote.explode', {
+    ioServer?.of('/overlays/emotes').emit('emote.explode', {
       emotes,
       settings: {
         emotes: {
@@ -420,7 +420,7 @@ class Emotes extends Overlay {
 
     const emotes = _.shuffle(parsed);
     for (let i = 0; i < this.cEmotesMaxEmotesPerMessage && i < emotes.length; i++) {
-      panel.io.of('/overlays/emotes').emit('emote', {
+      ioServer?.of('/overlays/emotes').emit('emote', {
         url: usedEmotes[emotes[i]].urls[String(this.cEmotesSize)],
         settings: {
           emotes: {

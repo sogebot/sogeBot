@@ -8,9 +8,9 @@ import { flatten } from './helpers/flatten';
 import { warning } from './helpers/log';
 import { getRepository } from 'typeorm';
 import { Translation } from './database/entity/translation';
-import panel from './panel';
 import general from './general';
 import { areDecoratorsLoaded } from './decorators';
+import { addMenu } from './helpers/panel';
 
 let translate_class: any = null;
 let translate: any = null;
@@ -22,7 +22,7 @@ class Translate {
   isLoaded = false;
 
   constructor () {
-    panel.addMenu({ category: 'settings', name: 'translations', id: 'settings/translations' });
+    addMenu({ category: 'settings', name: 'translations', id: 'settings/translations' });
   }
 
   async _load () {
