@@ -48,7 +48,6 @@
     "pg": "7.18.2",
     "plyr": "3.5.3",
     "popper.js": "1.16.1",
-    "popyt": "3.0.0",
     "reflect-metadata": "0.1.13",
     "request": "2.88.2",
     "safe-eval": "0.4.1",
@@ -72,7 +71,8 @@
     "xregexp": "4.3.0",
     "yargs": "15.3.1",
     "ytdl-core": "2.0.0",
-    "ytpl": "0.1.20"
+    "ytpl": "0.1.20",
+    "ytsr": "0.1.11"
   },
   "scripts": {
     "watch": "cross-env NODE_ENV=development npx webpack --watch --progress",

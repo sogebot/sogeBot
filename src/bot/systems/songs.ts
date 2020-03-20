@@ -1,15 +1,15 @@
-import { YouTube } from 'popyt';
 import * as _ from 'lodash';
 import { isMainThread } from '../cluster';
 import { setInterval } from 'timers';
 import ytdl from 'ytdl-core';
+import ytsr from 'ytsr';
 import ytpl from 'ytpl';
 
 import { getBot, prepare, sendMessage, timeout } from '../commons';
 import { command, default_permission, settings, shared, ui } from '../decorators';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
-import { onChange, onLoad } from '../decorators/on';
+import { onChange } from '../decorators/on';
 import { error, info } from '../helpers/log';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { Brackets, getConnection, getRepository } from 'typeorm';
@@ -19,10 +19,17 @@ import { translate } from '../translate';
 
 let importInProgress = false;
 
+type ytsrResult = {
+  query: string;
+  items: {
+    type: string; title: string; link: string; thumbnail: string;
+    author: { name: string; ref: string; verified: boolean };
+    description: string; views: number; duration: string; uploaded_at: string;
+  }[];
+};
+
 class Songs extends System {
   interval: { [id: string]: NodeJS.Timeout } = {};
-
-  youtubeApi: YouTube | null = null;
 
   @shared()
   meanLoudness = -15;
@@ -31,9 +38,6 @@ class Songs extends System {
   @shared()
   isPlaying: {[socketId: string]: boolean } = {};
 
-  @settings()
-  @ui({ type: 'text-input', secret: true })
-  apiKey = '';
   @settings()
   @ui({
     type: 'number-input',
@@ -69,16 +73,6 @@ class Songs extends System {
         this.addWidget('ytplayer', 'widget-title-ytplayer', 'fas fa-headphones');
 
       }, 10000);
-    }
-  }
-
-  @onChange('apiKey')
-  @onLoad('apiKey')
-  initYoutubeApi() {
-    if (this.apiKey.trim().length > 0) {
-      this.youtubeApi = new YouTube(this.apiKey);
-    } else {
-      error('SONGS: Missing YouTube API key.');
     }
   }
 
@@ -505,12 +499,21 @@ class Songs extends System {
 
     if (_.isNil(videoID.match(idRegex))) { // not id or url]
       try {
-        if (!this.youtubeApi) {
-          throw new Error('API not initialized. Missing YouTube API key.');
-        }
-        const search = await this.youtubeApi.searchVideos(opts.parameters, 1);
-        if (search.results.length > 0) {
-          opts.parameters = search.results[0].id;
+        const search: ytsrResult['items'] = await new Promise((resolve, reject) => {
+          ytsr(opts.parameters, { limit: 1 }, (err, results: ytsrResult) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(results.items);
+            }
+          });
+        });
+        if (search.length > 0) {
+          const videoId = /^\S+(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)(?<videoId>[^#&?]*).*/gi.exec(search[0].link)?.groups?.videoId;
+          if (!videoId) {
+            throw new Error('VideoID not parsed from ' + search[0].link);
+          }
+          opts.parameters = videoId;
           this.addSongToQueue(opts);
         }
         return;
@@ -526,21 +529,6 @@ class Songs extends System {
       return;
     }
 
-    // is correct category?
-    if (this.onlyMusicCategory) {
-      try {
-        if (!this.youtubeApi) {
-          throw new Error('API not initialized. Missing YouTube API key.');
-        }
-        const video = await this.youtubeApi.getVideo(videoID);
-        if (video.data.snippet.categoryId !== '10') {
-          return sendMessage(translate('songs.incorrect-category'), opts.sender, opts.attr);
-        }
-      } catch (e) {
-        error(`SONGS: ${e.message}`);
-      }
-    }
-
     ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, async (err, videoInfo) => {
       if (err) {
         return error(err);
@@ -549,8 +537,10 @@ class Songs extends System {
         sendMessage(translate('songs.song-was-not-found'), opts.sender, opts.attr);
       } else if (Number(videoInfo.length_seconds) / 60 > this.duration) {
         sendMessage(translate('songs.song-is-too-long'), opts.sender, opts.attr);
+      } else if (videoInfo.media.category_url !== 'https://www.youtube.com/channel/UC-9-kyTW8ZkZNDHQJ6FgpwQ' && this.onlyMusicCategory) {
+        sendMessage(translate('songs.incorrect-category'), opts.sender, opts.attr);
       } else {
-        getRepository(SongRequest).save({
+        await getRepository(SongRequest).save({
           videoId: videoID,
           title: videoInfo.title,
           addedAt: Date.now(),
