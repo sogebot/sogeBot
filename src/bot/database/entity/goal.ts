@@ -52,7 +52,7 @@ export interface GoalInterface {
 export const GoalGroup = new EntitySchema<Readonly<Required<GoalGroupInterface>>>({
   name: 'goal_group',
   columns: {
-    id: { type: String, primary: true, generated: 'uuid' },
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
     createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
     name: { type: String },
     display: { type: 'simple-json' },
@@ -93,8 +93,8 @@ export const Goal = new EntitySchema<Readonly<Required<GoalInterface>>>({
   relations: {
     group: {
       type: 'many-to-one',
-      target: 'goal',
-      inverseSide: 'group',
+      target: 'goal_group',
+      inverseSide: 'goals',
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
       joinColumn: { name: 'groupId' },
