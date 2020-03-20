@@ -116,7 +116,10 @@ export default class textOverlayList extends Vue {
 
     created() {
       this.state.loaded = false;
-      this.socket.emit('text::getAll', (items) => {
+      this.socket.emit('text::getAll', (err, items) => {
+        if (err) {
+          return console.error(err)
+        }
         this.items = orderBy(items, 'name', 'asc')
         this.items.map(o => { o.show = 'html'; return o })
         this.state.loaded = true;
