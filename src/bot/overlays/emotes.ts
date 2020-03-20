@@ -11,7 +11,7 @@ import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 
 import { getManager, getRepository } from 'typeorm';
 import { CacheEmotes, CacheEmotesInterface } from '../database/entity/cacheEmotes';
-import uuid from 'uuid';
+import { v4 as uuid} from 'uuid';
 import oauth from '../oauth';
 import panel from '../panel';
 

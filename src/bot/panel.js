@@ -12,7 +12,7 @@ import { adminEndpoint } from './helpers/socket';
 
 import { info } from './helpers/log';
 import { CacheTitles } from './database/entity/cacheTitles';
-import uuid from 'uuid'
+import { v4 as uuid} from 'uuid';
 import { getConnection, getManager, getRepository } from 'typeorm';
 import { Dashboard, Widget } from './database/entity/dashboard';
 import { Translation } from './database/entity/translation'

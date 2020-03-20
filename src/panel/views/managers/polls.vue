@@ -169,7 +169,7 @@
   import { getSocket } from 'src/panel/helpers/socket';
   import { PollInterface } from 'src/bot/database/entity/poll';
 
-  import uuid from 'uuid'
+  import { v4 as uuid } from 'uuid'
 
   Vue.use(VueMoment, {
       moment, momentTimezone
