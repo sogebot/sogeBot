@@ -8,30 +8,38 @@ import { getRepository, In, IsNull, Not } from 'typeorm';
 import { Alert, AlertCheer, AlertFollow, AlertHost, AlertInterface, AlertMedia, AlertMediaInterface, AlertRaid, AlertResub, AlertSub, AlertSubgift, AlertTip, EmitData } from '../database/entity/alert';
 import { app, ioServer } from '../helpers/panel';
 import currency from '../currency';
+import { debug } from '../helpers/log';
 
 class Alerts extends Registry {
   constructor() {
     super();
     this.addMenu({ category: 'registry', name: 'alerts', id: 'registry/alerts/list' });
     if (isMainThread) {
-      // wait for panel start
-      setTimeout(() => {
-        app?.get('/registry/alerts/:mediaid', async (req, res) => {
-          const media = await getRepository(AlertMedia).find({ id: req.params.mediaid });
-          const b64data = media.sort((a,b) => a.chunkNo - b.chunkNo).map(o => o.b64data).join('');
-          if (b64data.trim().length === 0) {
-            res.send(404);
-          } else {
-            const match = (b64data.match(/^data:\w+\/\w+;base64,/) || [ 'data:image/gif;base64,' ])[0];
-            const data = Buffer.from(b64data.replace(/^data:\w+\/\w+;base64,/, ''), 'base64');
-            res.writeHead(200, {
-              'Content-Type': match.replace('data:', '').replace(';base64,', ''),
-              'Content-Length': data.length,
-            });
-            res.end(data);
-          }
-        });
-      }, 1000);
+      const init = (retry = 0) => {
+        if (retry === 10000) {
+          throw new Error('Registry alert media endpoint failed.');
+        } else if (!app) {
+          setTimeout(() => init(retry++), 100);
+        } else {
+          debug('ui', 'Registry alert media endpoint OK.');
+          app.get('/registry/alerts/:mediaid', async (req, res) => {
+            const media = await getRepository(AlertMedia).find({ id: req.params.mediaid });
+            const b64data = media.sort((a,b) => a.chunkNo - b.chunkNo).map(o => o.b64data).join('');
+            if (b64data.trim().length === 0) {
+              res.send(404);
+            } else {
+              const match = (b64data.match(/^data:\w+\/\w+;base64,/) || [ 'data:image/gif;base64,' ])[0];
+              const data = Buffer.from(b64data.replace(/^data:\w+\/\w+;base64,/, ''), 'base64');
+              res.writeHead(200, {
+                'Content-Type': match.replace('data:', '').replace(';base64,', ''),
+                'Content-Length': data.length,
+              });
+              res.end(data);
+            }
+          });
+        }
+      };
+      init();
     }
   }
 
