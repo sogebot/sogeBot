@@ -267,10 +267,7 @@
 
         <div class="col-12 col-sm-12 col-md-4 col-lg-4 stream-info">
           <span class="data">
-            <span v-if="currentSong.length === 0">{{translate('not-available')}}</span>
-            <span v-else>
-                {{ currentSong }}
-            </span>
+            {{ currentSong }}
           </span>
           <h2>
             <span>{{ translate('currentsong') }}</span>
@@ -314,7 +311,7 @@
         currentHosts: number,
         currentViews: number,
         currentBits: number,
-        currentSong: string,
+        currentSong: null | string,
         currentWatched: number,
         currentSubscribers: number,
         currentFollowers: number,
@@ -360,7 +357,7 @@
         currentSubscribers: 0,
         currentFollowers: 0,
         currentTips: 0,
-        currentSong: '',
+        currentSong: null,
         currency: 'n/a',
         broadcasterType: '',
         tags: [],
