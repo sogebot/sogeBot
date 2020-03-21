@@ -400,16 +400,19 @@ class Songs extends System {
   async getCurrentSong () {
     let translation = 'songs.no-song-is-currently-playing';
     const currentSong = JSON.parse(this.currentSong);
-    if (Object.values(this.isPlaying).find(o => o)) {
-      if (!_.isNil(currentSong.title)) {
-        if (currentSong.type === 'playlist') {
-          translation = 'songs.current-song-from-playlist';
-        } else {
-          translation = 'songs.current-song-from-songrequest';
+    if (currentSong.videoId !== null) {
+      if (Object.values(this.isPlaying).find(o => o)) {
+        if (!_.isNil(currentSong.title)) {
+          if (currentSong.type === 'playlist') {
+            translation = 'songs.current-song-from-playlist';
+          } else {
+            translation = 'songs.current-song-from-songrequest';
+          }
         }
       }
     }
-    const message = await prepare(translation, { name: currentSong.title, username: currentSong.username });
+
+    const message = await prepare(translation, currentSong.videoID !== null ? { name: currentSong.title, username: currentSong.username } : {});
     sendMessage(message, {
       username: oauth.botUsername,
       displayName: oauth.botUsername,
