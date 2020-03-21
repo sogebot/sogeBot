@@ -6,6 +6,7 @@ import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
 import { Gallery as GalleryEntity } from '../database/entity/gallery';
 import { app } from '../helpers/panel';
+import { debug } from '../helpers/log';
 
 class Gallery extends Overlay {
   showInUI = false;
@@ -15,19 +16,29 @@ class Gallery extends Overlay {
     this.addMenu({ category: 'registry', name: 'gallery', id: 'registry.gallery/list' });
 
     if (isMainThread) {
-      app?.get('/gallery/:id', async (req, res) => {
-        const file = await getRepository(GalleryEntity).findOne({ id: req.params.id });
-        if (file) {
-          const data = Buffer.from(file.data.split(',')[1], 'base64');
-          res.writeHead(200, {
-            'Content-Type': file.type,
-            'Content-Length': data.length,
-          }),
-          res.end(data);
+      const init = (retry = 0) => {
+        if (retry === 10000) {
+          throw new Error('Gallery endpoint failed.');
+        } else if (!app) {
+          setTimeout(() => init(retry++), 100);
         } else {
-          res.sendStatus(404);
+          debug('ui', 'Gallery endpoint OK.');
+          app.get('/gallery/:id', async (req, res) => {
+            const file = await getRepository(GalleryEntity).findOne({ id: req.params.id });
+            if (file) {
+              const data = Buffer.from(file.data.split(',')[1], 'base64');
+              res.writeHead(200, {
+                'Content-Type': file.type,
+                'Content-Length': data.length,
+              }),
+              res.end(data);
+            } else {
+              res.sendStatus(404);
+            }
+          });
         }
-      });
+      };
+      init();
     }
   }
 
