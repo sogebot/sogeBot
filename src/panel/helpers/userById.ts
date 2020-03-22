@@ -6,8 +6,11 @@ const socket = getSocket('/core/users');
 
 export const getUsernameById = async function (id: string) {
   if (typeof cache[id] === 'undefined') {
-    const username = await new Promise((resolve: (value: string | null) => void) => {
-      socket.emit('getNameById', id, (username: string | null) => {
+    const username = await new Promise((resolve: (value: string | null) => void, reject) => {
+      socket.emit('getNameById', id, (err, username: string | null) => {
+        if (err) {
+          reject(err);
+        }
         resolve(username);
       });
     });

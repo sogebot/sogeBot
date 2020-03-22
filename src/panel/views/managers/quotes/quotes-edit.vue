@@ -152,8 +152,12 @@ export default class QuotesEdit extends Vue {
     this.state.loaded = this.$state.progress;
     if (this.$route.params.id) {
       this.socket.emit('getById', this.$route.params.id, async (err, data: QuotesInterface) => {
-        console.debug('Loaded', {data});
-        this.item = data;
+        console.group('Quotes::getById')
+        console.log('Loaded', {data});
+        console.groupEnd();
+        for (const [ key, value ] of Object.entries(data)) {
+          Vue.set(this.item, key, value)
+        }
         this.state.loaded = this.$state.success;
         this.$nextTick(() => {
           this.pending = false;

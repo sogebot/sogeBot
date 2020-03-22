@@ -58,6 +58,12 @@
         <span class="p-2 m-1 text-light bg-dark" v-for="tag of data.item.tags" v-bind:key="tag" variant="dark">{{ tag }}</span>
       </template>
 
+      <template v-slot:cell(quotedByName)="data">
+        <router-link :to="{ name: 'viewersManagerEdit', params: { id: data.item.quotedBy }}">
+          {{ data.item.quotedByName }}&nbsp;<small class="text-muted">{{ data.item.quotedBy }}</small>
+        </router-link>
+      </template>
+
       <template v-slot:cell(buttons)="data">
         <div class="text-right">
           <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/quotes/edit/' + data.item.id">
@@ -104,7 +110,7 @@ export default class quotesList extends Vue {
     { key: 'createdAt', label: this.translate('systems.quotes.date.name'), sortable: true },
     { key: 'quote', label: this.translate('systems.quotes.quote.name'), sortable: true },
     { key: 'tags', label: this.translate('systems.quotes.tags.name') },
-    { key: 'quotedBy', label: this.translate('systems.quotes.by.name'), sortable: true },
+    { key: 'quotedByName', label: this.translate('systems.quotes.by.name'), sortable: true },
     // virtual attributes
     { key: 'buttons', label: '' },
   ]
