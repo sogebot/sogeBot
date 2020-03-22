@@ -34,7 +34,7 @@ describe('Songs - addSongToQueue()', () => {
     });
 
     it(`Song is correctly added to queue`, async () => {
-      await message.isSent('songs.song-was-added-to-queue', user.owner, { name: 'Adele - Someone Like You' });
+      await message.isSent('songs.song-was-added-to-queue', user.owner, { name: 'Adele - Someone Like You (Official Music Video)' });
     });
 
     it(`Queue contains song`, async () => {
@@ -62,7 +62,7 @@ describe('Songs - addSongToQueue()', () => {
     });
 
     it(`Song is correctly added to queue`, async () => {
-      await message.isSent('songs.song-was-added-to-queue', user.owner, { name: 'Adele - Someone Like You' });
+      await message.isSent('songs.song-was-added-to-queue', user.owner, { name: 'Adele - Someone Like You (Official Music Video)' });
     });
 
     it(`Queue contains song`, async () => {
@@ -78,7 +78,7 @@ describe('Songs - addSongToQueue()', () => {
       await user.prepare();
       songs.onlyMusicCategory = false;
     });
-    const videoSearch = 'Adele - Someone Like You';
+    const videoSearch = 'Adele - Someone Like You (Official Music Video)';
 
     it(`Queue is empty`, async () => {
       const count = await getRepository(SongRequest).count();
@@ -90,7 +90,7 @@ describe('Songs - addSongToQueue()', () => {
     });
 
     it(`Song is correctly added to queue`, async () => {
-      await message.isSent('songs.song-was-added-to-queue', user.owner, { name: 'Adele - Someone Like You' });
+      await message.isSent('songs.song-was-added-to-queue', user.owner, { name: 'Adele - Someone Like You (Official Music Video)' });
     });
 
     it(`Queue contains song`, async () => {
@@ -118,7 +118,7 @@ describe('Songs - addSongToQueue()', () => {
     });
 
     it(`Song is correctly added to queue`, async () => {
-      await message.isSent('songs.song-was-added-to-queue', user.owner, { name: 'Adele - Someone Like You' });
+      await message.isSent('songs.song-was-added-to-queue', user.owner, { name: 'Adele - Someone Like You (Official Music Video)' });
     });
 
     it(`Queue contains song`, async () => {
@@ -146,7 +146,7 @@ describe('Songs - addSongToQueue()', () => {
     });
 
     it(`Song is correctly added to queue`, async () => {
-      await message.isSent('songs.song-was-added-to-queue', user.owner, { name: 'Adele - Someone Like You' });
+      await message.isSent('songs.song-was-added-to-queue', user.owner, { name: 'Adele - Someone Like You (Official Music Video)' });
     });
 
     it(`Queue contains song`, async () => {
@@ -162,7 +162,7 @@ describe('Songs - addSongToQueue()', () => {
       await user.prepare();
       songs.onlyMusicCategory = true;
     });
-    const videoSearch = 'Adele - Someone Like You';
+    const videoSearch = 'Adele - Someone Like You (Official Music Video)';
 
     it(`Queue is empty`, async () => {
       const count = await getRepository(SongRequest).count();
@@ -174,7 +174,7 @@ describe('Songs - addSongToQueue()', () => {
     });
 
     it(`Song is correctly added to queue`, async () => {
-      await message.isSent('songs.song-was-added-to-queue', user.owner, { name: 'Adele - Someone Like You' });
+      await message.isSent('songs.song-was-added-to-queue', user.owner, { name: 'Adele - Someone Like You (Official Music Video)' });
     });
 
     it(`Queue contains song`, async () => {
