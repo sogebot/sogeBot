@@ -188,6 +188,8 @@
 import { getSocket } from 'src/panel/helpers/socket';
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { orderBy } from 'lodash-es';
+import Vue from 'vue';
+
 export default {
   props: ['popout', 'nodrag'],
   data: function () {
@@ -239,11 +241,7 @@ export default {
     clearInterval(this.cacheInterval);
   },
   created: function () {
-    this.socket.emit('settings', (err, data) => {
-      this.raffleAnnounceInterval = data.raffleAnnounceInterval
-      this.luck.subscribersPercent = data.luck.subscribersPercent
-      this.luck.followersPercent = data.luck.followersPercent
-    })
+    this.getSettings();
 
     const cache = localStorage.getItem('/widget/raffles/');
     if (cache) {
@@ -284,14 +282,26 @@ export default {
     }
   },
   methods: {
+    getSettings() {
+      this.socket.emit('settings', (err, data) => {
+        try {
+          this.raffleAnnounceInterval = data.raffleAnnounceInterval;
+          this.luck.subscribersPercent = data.luck.subscribersPercent;
+          this.luck.followersPercent = data.luck.followersPercent;
+        } catch (e) {
+          this.getSettings();
+        }
+      })
+    },
     refresh: async function () {
       await Promise.all([
-        new Promise((resolve) => {
+        new Promise((resolve, reject) => {
           this.socket.emit('raffle:getLatest', (err, raffle) => {
             if (err) {
-              return console.error(err);
+              reject(err);
             }
             if (raffle) {
+              console.log(raffle.participants);
               this.participants = raffle.participants;
               this.running = !raffle.isClosed;
 
@@ -301,7 +311,7 @@ export default {
                 if (this.winner === null) {
                   this.socket.emit('raffle::getWinner', raffle.winner, (err, user) => {
                     if (err) {
-                      return console.error(err);
+                      reject(err);
                     }
                     this.winner = user
                   });
@@ -329,7 +339,9 @@ export default {
             resolve()
           })
         }),
-      ])
+      ]).catch(err => {
+        console.error(err);
+      })
 
       setTimeout(() => this.refresh(), 1000)
     },
