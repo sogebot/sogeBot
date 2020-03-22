@@ -92,6 +92,8 @@ class Raffles extends System {
       this.pick();
     });
     adminEndpoint(this.nsp, 'raffle::open', async (message) => {
+      // force close raffles
+      await getRepository(Raffle).update({}, { isClosed: true });
       this.open({ username: getOwner(), parameters: message });
     });
     adminEndpoint(this.nsp, 'raffle::close', async () => {
