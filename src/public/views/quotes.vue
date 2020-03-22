@@ -41,7 +41,7 @@ export default class playlist extends Vue {
     { key: 'createdAt', label: this.translate('systems.quotes.date.name'), sortable: true },
     { key: 'quote', label: this.translate('systems.quotes.quote.name'), sortable: true },
     { key: 'tags', label: this.translate('systems.quotes.tags.name') },
-    { key: 'quotedBy', label: this.translate('systems.quotes.by.name'), sortable: true },
+    { key: 'quotedByName', label: this.translate('systems.quotes.by.name'), sortable: true },
     // virtual attributes
     { key: 'buttons', label: '' },
   ]
