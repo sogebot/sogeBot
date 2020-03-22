@@ -50,6 +50,10 @@
         {{ data.item.createdAt | moment('LL')}} {{ data.item.createdAt | moment('LTS') }}
       </template>
 
+      <template v-slot:cell(quotes)="data">
+        <span style="word-break: break-word;"> {{ data.item.quote }}</span>
+      </template>
+
       <template v-slot:cell(tags)="data">
         <span class="p-2 m-1 text-light bg-dark" v-for="tag of data.item.tags" v-bind:key="tag" variant="dark">{{ tag }}</span>
       </template>
