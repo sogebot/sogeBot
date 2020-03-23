@@ -66,7 +66,7 @@ describe('Quotes - remove()', () => {
               .select('quotes')
               .from(Quotes, 'quotes')
               .getMany();
-            assert.isEmpty(items);
+            assert(items.length === 0);
           });
         } else {
           it('Should sent not-found message', async () => {
