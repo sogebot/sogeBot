@@ -46,6 +46,8 @@
             loading(v-if="state.loading === $state.progress")
             b-list-group(v-else)
               b-list-group-item(
+                @mouseover="isHovered = event.id"
+                @mouseleave="isHovered = ''"
                 v-for="(event, index) of fEvents"
                 :key="index"
                 style="border-left: 0; border-right: 0; padding: 0.2rem 1.25rem 0.4rem 1.25rem"
@@ -58,17 +60,21 @@
                       span(:title="event.username" style="z-index: 9") {{event.username}}
                       span(v-html="prepareMessage(event)").pl-1
                     div(style="flex-shrink: 15;")
-                      fa(v-if="event.event === 'follow'" icon="heart" :class="[`icon-${event.event}`, 'icon']")
-                      fa(v-if="event.event === 'host'" icon="tv" :class="[`icon-${event.event}`, 'icon']")
-                      fa(v-if="event.event === 'raid'" icon="random" :class="[`icon-${event.event}`, 'icon']")
-                      fa(v-if="event.event === 'sub'" icon="star" :class="[`icon-${event.event}`, 'icon']")
-                      fa(v-if="event.event === 'subgift'" icon="gift" :class="[`icon-${event.event}`, 'icon']")
-                      fa(v-if="event.event === 'subcommunitygift'" icon="box-open" :class="[`icon-${event.event}`, 'icon']")
-                      font-awesome-layers(v-if="event.event === 'resub'" :class="[`icon-${event.event}`, 'icon']")
-                        fa(icon="star-half")
-                        fa(icon="long-arrow-alt-right")
-                      fa(v-if="event.event === 'cheer'" icon="gem" :class="[`icon-${event.event}`, 'icon']")
-                      fa(v-if="event.event === 'tip'" icon="dollar-sign" :class="[`icon-${event.event}`, 'icon']")
+                      span(v-if="isHovered !== event.id")
+                        fa(v-if="event.event === 'follow'" icon="heart" :class="[`icon-${event.event}`, 'icon']")
+                        fa(v-if="event.event === 'host'" icon="tv" :class="[`icon-${event.event}`, 'icon']")
+                        fa(v-if="event.event === 'raid'" icon="random" :class="[`icon-${event.event}`, 'icon']")
+                        fa(v-if="event.event === 'sub'" icon="star" :class="[`icon-${event.event}`, 'icon']")
+                        fa(v-if="event.event === 'subgift'" icon="gift" :class="[`icon-${event.event}`, 'icon']")
+                        fa(v-if="event.event === 'subcommunitygift'" icon="box-open" :class="[`icon-${event.event}`, 'icon']")
+                        font-awesome-layers(v-if="event.event === 'resub'" :class="[`icon-${event.event}`, 'icon']")
+                          fa(icon="star-half")
+                          fa(icon="long-arrow-alt-right")
+                        fa(v-if="event.event === 'cheer'" icon="gem" :class="[`icon-${event.event}`, 'icon']")
+                        fa(v-if="event.event === 'tip'" icon="dollar-sign" :class="[`icon-${event.event}`, 'icon']")
+                      span(v-else)
+                        fa(icon="redo-alt" :class="['icon']" @click="resendAlert(event.id)").pointer
+
         b-tab
           template(v-slot:title)
             fa(icon="cog" fixed-width)
@@ -112,6 +118,7 @@ export default {
   data: function () {
     return {
       EventBus,
+      isHovered: '',
       socket: getSocket('/widgets/eventlist'),
       settings: {
         widgetEventlistFollows: true,
@@ -213,6 +220,10 @@ export default {
     }
   },
   methods: {
+    resendAlert(id) {
+      console.log(`resendAlert => ${id}`);
+      this.socket.emit('resend', id);
+    },
     cleanup: function () {
       console.log('Cleanup => eventlist')
       this.socket.emit('cleanup')

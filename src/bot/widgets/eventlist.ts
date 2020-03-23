@@ -3,6 +3,9 @@ import Widget from './_interface';
 import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
 import { EventList as EventListDB } from '../database/entity/eventList';
+import { error } from '../helpers/log';
+import alerts from '../registries/alerts';
+import { getLocalizedName } from '../commons';
 
 class EventList extends Widget {
   @settings()
@@ -42,6 +45,89 @@ class EventList extends Widget {
 
     adminEndpoint(this.nsp, 'cleanup', () => {
       getRepository(EventListDB).delete({});
+    });
+
+    adminEndpoint(this.nsp, 'resend', async (id) => {
+      const event = await getRepository(EventListDB).findOne({ id });
+      if (event) {
+        const values = JSON.parse(event.values_json);
+        const eventType = event.event + 's';
+        switch(eventType) {
+          case 'follows':
+          case 'subs':
+            alerts.trigger({
+              event: eventType,
+              name: event.username,
+              amount: 0,
+              currency: '',
+              monthsName: '',
+              message: '',
+              autohost: false,
+            });
+            break;
+          case 'hosts':
+          case 'raids':
+            alerts.trigger({
+              event: eventType,
+              name: event.username,
+              amount: Number(values.viewers),
+              currency: '',
+              monthsName: '',
+              message: '',
+              autohost: values.autohost ?? false,
+            });
+            break;
+          case 'resubs':
+            alerts.trigger({
+              event: eventType,
+              name: event.username,
+              amount: Number(values.subCumulativeMonths),
+              currency: '',
+              monthsName: getLocalizedName(values.subCumulativeMonths, 'core.months'),
+              message: values.message,
+              autohost: false,
+            });
+            break;
+          case 'subgifts':
+            alerts.trigger({
+              event: eventType,
+              name: event.username,
+              amount: Number(values.count),
+              currency: '',
+              monthsName: '',
+              message: '',
+              autohost: false,
+            });
+            break;
+          case 'cheers':
+            alerts.trigger({
+              event: eventType,
+              name: event.username,
+              amount: Number(values.bits),
+              currency: '',
+              monthsName: '',
+              message: values.message,
+              autohost: false,
+            });
+            break;
+          case 'tips':
+            alerts.trigger({
+              event: eventType,
+              name: event.username,
+              amount: Number(values.amount),
+              currency: values.currency,
+              monthsName: '',
+              message: values.message,
+              autohost: false,
+            });
+            break;
+          default:
+            error(`Eventtype ${event.event} cannot be retriggered`);
+        }
+
+      } else {
+        error(`Event ${id} not found.`);
+      }
     });
   }
 
