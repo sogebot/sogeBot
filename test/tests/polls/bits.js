@@ -15,7 +15,7 @@ const tmi = (require('../../../dest/tmi')).default;
 const { getRepository } = require('typeorm');
 const { Poll, PollVote } = require('../../../dest/database/entity/poll');
 
-const assert = require('chai').assert;
+const assert = require('assert');
 
 const owner = { username: 'soge__', userId: Math.floor(Math.random() * 10000) };
 
@@ -28,32 +28,32 @@ describe('Polls - bits', () => {
 
   describe('Close not opened voting', () => {
     it('Close voting should fail', async () => {
-      assert.isNotTrue(await polls.close({ sender: owner }));
+      assert(!(await polls.close({ sender: owner })));
     });
   });
 
   describe('Close opened voting', () => {
     it('Open new voting', async () => {
-      assert.isTrue(await polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum test?" Lorem | Ipsum | Dolor Sit' }));
+      assert(await polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum test?" Lorem | Ipsum | Dolor Sit' }));
     });
     it('Close voting', async () => {
-      assert.isTrue(await polls.close({ sender: owner }));
+      assert(await polls.close({ sender: owner }));
     });
   });
 
   describe('Voting full workflow', () => {
     let vid = null;
     it('Open new voting', async () => {
-      assert.isTrue(await polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum?" Lorem | Ipsum | Dolor Sit' }));
+      assert(await polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum?" Lorem | Ipsum | Dolor Sit' }));
     });
     it('Open another voting should fail', async () => {
-      assert.isFalse(await polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum2?" Lorem2 | Ipsum2 | Dolor Sit2' }));
+      assert(!(await polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum2?" Lorem2 | Ipsum2 | Dolor Sit2' })));
     });
     it('Voting should be correctly in db', async () => {
       const cVote = await getRepository(Poll).findOne({ isOpened: true });
       assert.deepEqual(cVote.options, ['Lorem', 'Ipsum', 'Dolor Sit']);
       assert.deepEqual(cVote.type, 'bits');
-      assert.equal(cVote.title, 'Lorem Ipsum?');
+      assert.strictEqual(cVote.title, 'Lorem Ipsum?');
       vid = cVote.id;
     });
     it(`!vote should return correct vote status`, async () => {
@@ -70,7 +70,7 @@ describe('Polls - bits', () => {
       it(`User ${owner.username} will vote for option ${o} - should fail`, async () => {
         await polls.main({ sender: owner, parameters: String(o) });
         const vote = await getRepository(PollVote).findOne({ votedBy: owner.username });
-        assert.isUndefined(vote, 'Expected ' + JSON.stringify({ votedBy: owner.username, vid }) + ' to not be found in db');
+        assert(typeof vote === 'undefined', 'Expected ' + JSON.stringify({ votedBy: owner.username, vid }) + ' to not be found in db');
       });
     }
     it(`10 users will vote through bits for option 1 and another 10 for option 2`, async () => {
@@ -89,8 +89,8 @@ describe('Polls - bits', () => {
           await until(async (setError) => {
             try {
               const vote = await getRepository(PollVote).findOne({ votedBy: user });
-              assert.isTrue(typeof vote !== 'undefined', 'Expected ' + JSON.stringify({ votedBy: user, vid }) + ' to be found in db');
-              assert.equal(vote.option, o - 1);
+              assert(typeof vote !== 'undefined', 'Expected ' + JSON.stringify({ votedBy: user, vid }) + ' to be found in db');
+              assert.strictEqual(vote.option, o - 1);
               return true;
             } catch (err) {
               return setError(
@@ -115,7 +115,7 @@ describe('Polls - bits', () => {
       await time.waitMs(1000);
       await message.prepare();
 
-      assert.isTrue(await polls.close({ sender: owner }));
+      assert(await polls.close({ sender: owner }));
       await message.isSent('systems.polls.status_closed', owner, { title: 'Lorem Ipsum?' });
       await message.isSentRaw(`#vote1 - Lorem - 100 ${commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner);
       await message.isSentRaw(`#vote2 - Ipsum - 100 ${commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner);

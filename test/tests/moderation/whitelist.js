@@ -15,7 +15,7 @@ const songs = (require('../../../dest/systems/songs')).default;
 const owner = { username: 'soge__' };
 
 const _ = require('lodash');
-const assert = require('chai').assert;
+const assert = require('assert');
 
 const tests = {
   'osu.ppy.sh': {
@@ -181,14 +181,14 @@ describe('systems/moderation - whitelist()', () => {
       it(`pattern '${pattern}' should change '${text}'`, async () => {
         moderation.cListsWhitelist = [pattern];
         const result = await moderation.whitelist(text, '0efd7b1c-e460-4167-8e06-8aaf2c170311');
-        assert.isTrue(text !== result);
+        assert(text !== result);
       });
     }
     for (const text of _.get(test, 'should.return.same', [])) {
       it(`pattern '${pattern}' should not change '${text}'`, async () => {
         moderation.cListsWhitelist = [pattern];
         const result = await moderation.whitelist(text, '0efd7b1c-e460-4167-8e06-8aaf2c170311');
-        assert.isTrue(text === result);
+        assert(text === result);
       });
     }
   }
@@ -201,7 +201,7 @@ describe('systems/moderation - whitelist()', () => {
     it('!zahrej command should be whitelisted', async () => {
       const text = '!zahrej https://youtu.be/HmZYgqBp1gI';
       const result = await moderation.whitelist(text, '0efd7b1c-e460-4167-8e06-8aaf2c170311');
-      assert.isTrue(text !== result);
+      assert(text !== result);
     });
   });
 });

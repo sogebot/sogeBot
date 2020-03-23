@@ -7,7 +7,7 @@ const db = require('../../general.js').db;
 const variable = require('../../general.js').variable;
 const message = require('../../general.js').message;
 const user = require('../../general.js').user;
-const assert = require('chai').assert;
+const assert = require('assert');
 
 const moderation = (require('../../../dest/systems/moderation')).default;
 
@@ -31,13 +31,13 @@ describe('systems/moderation - longMessage()', () => {
 
     for (const test of tests.timeout) {
       it(`message '${test}' should not timeout`, async () => {
-        assert.isTrue(await moderation.longMessage({ sender: user.viewer, message: test }));
+        assert(await moderation.longMessage({ sender: user.viewer, message: test }));
       });
     }
 
     for (const test of tests.ok) {
       it(`message '${test}' should not timeout`, async () => {
-        assert.isTrue(await moderation.longMessage({ sender: user.viewer, message: test }));
+        assert(await moderation.longMessage({ sender: user.viewer, message: test }));
       });
     }
   });
@@ -51,13 +51,13 @@ describe('systems/moderation - longMessage()', () => {
 
     for (const test of tests.timeout) {
       it(`message '${test}' should timeout`, async () => {
-        assert.isFalse(await moderation.longMessage({ sender: user.viewer, message: test }));
+        assert(!(await moderation.longMessage({ sender: user.viewer, message: test })));
       });
     }
 
     for (const test of tests.ok) {
       it(`message '${test}' should not timeout`, async () => {
-        assert.isTrue(await moderation.longMessage({ sender: user.viewer, message: test }));
+        assert(await moderation.longMessage({ sender: user.viewer, message: test }));
       });
     }
   });

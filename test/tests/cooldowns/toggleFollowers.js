@@ -1,7 +1,7 @@
 /* global describe it beforeEach */
 require('../../general.js');
 
-const assert = require('chai').assert;
+const assert = require('assert');
 const _ = require('lodash');
 
 const db = require('../../general.js').db;
@@ -45,17 +45,17 @@ describe('Cooldowns - toggleFollowers()', () => {
     await message.isSent('cooldowns.cooldown-was-disabled-for-followers', owner, { command: command, sender: owner.username });
 
     let isOk = await cooldown.check({ sender: follower, message: '!me' });
-    assert.isTrue(isOk);
+    assert(isOk);
     isOk = await cooldown.check({ sender: follower, message: '!me' });
-    assert.isTrue(isOk);
+    assert(isOk);
 
     cooldown.toggleFollowers({ sender: owner, parameters: `${command} ${type}` });
     await message.isSent('cooldowns.cooldown-was-enabled-for-followers', owner, { command: command, sender: owner.username });
 
     isOk = await cooldown.check({ sender: follower, message: '!me' });
-    assert.isTrue(isOk);
+    assert(isOk);
     isOk = await cooldown.check({ sender: follower, message: '!me' });
-    assert.isFalse(isOk);
+    assert(!isOk);
   });
 
   it('correct toggle - common user', async () => {
@@ -64,17 +64,17 @@ describe('Cooldowns - toggleFollowers()', () => {
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
     let isOk = await cooldown.check({ sender: commonUser, message: '!me' });
-    assert.isTrue(isOk);
+    assert(isOk);
     isOk = await cooldown.check({ sender: commonUser, message: '!me' });
-    assert.isFalse(isOk);
+    assert(!isOk);
 
     cooldown.toggleFollowers({ sender: owner, parameters: `${command} ${type}` });
     await message.isSent('cooldowns.cooldown-was-disabled-for-followers', owner, { command: command, sender: owner.username });
 
     isOk = await cooldown.check({ sender: commonUser, message: '!me' });
-    assert.isFalse(isOk);
+    assert(!isOk);
     isOk = await cooldown.check({ sender: commonUser, message: '!me' });
-    assert.isFalse(isOk);
+    assert(!isOk);
   });
 
   it('correct toggle - common user2', async () => {
@@ -83,16 +83,16 @@ describe('Cooldowns - toggleFollowers()', () => {
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
     let isOk = await cooldown.check({ sender: commonUser2, message: '!me' });
-    assert.isTrue(isOk);
+    assert(isOk);
     isOk = await cooldown.check({ sender: commonUser2, message: '!me' });
-    assert.isFalse(isOk);
+    assert(!isOk);
 
     cooldown.toggleFollowers({ sender: owner, parameters: `${command} ${type}` });
     await message.isSent('cooldowns.cooldown-was-disabled-for-followers', owner, { command: command, sender: owner.username });
 
     isOk = await cooldown.check({ sender: commonUser2, message: '!me' });
-    assert.isFalse(isOk);
+    assert(!isOk);
     isOk = await cooldown.check({ sender: commonUser2, message: '!me' });
-    assert.isFalse(isOk);
+    assert(!isOk);
   });
 });

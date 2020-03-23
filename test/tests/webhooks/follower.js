@@ -1,6 +1,6 @@
 /* global describe it before */
 
-const assert = require('chai').assert;
+const assert = require('assert');
 const _ = require('lodash');
 require('../../general.js');
 
@@ -28,7 +28,7 @@ describe('libs/webhooks - follower()', () => {
   });
 
   it('testuser should not be in webhooks cache', async () => {
-    assert.isFalse(webhooks.existsInCache('follow', id));
+    assert(!webhooks.existsInCache('follow', id));
   });
 
   it('add testuser (id:' + id + ') to db', async () => {
@@ -36,7 +36,7 @@ describe('libs/webhooks - follower()', () => {
   });
 
   it('follow event should not be called', async () => {
-    assert.isFalse(events.fire.called);
+    assert(!events.fire.called);
   });
 
   it('testuser payload for follower() several times', async () => {
@@ -53,11 +53,11 @@ describe('libs/webhooks - follower()', () => {
   });
 
   it('testuser should be in webhooks cache', async () => {
-    assert.isTrue(webhooks.existsInCache('follow', id));
+    assert(webhooks.existsInCache('follow', id));
   });
 
   it('follow event should be fired only once', async () => {
-    assert.isTrue(events.fire.calledOnce);
+    assert(events.fire.calledOnce);
   });
 
   it('testuser payload for follower() several times for incorrect channel id', async () => {
@@ -74,6 +74,6 @@ describe('libs/webhooks - follower()', () => {
   });
 
   it('testuser should not be in webhooks cache', async () => {
-    assert.isFalse(webhooks.existsInCache('follow', 3));
+    assert(!webhooks.existsInCache('follow', 3));
   });
 });

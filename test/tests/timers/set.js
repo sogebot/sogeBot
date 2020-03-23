@@ -1,7 +1,7 @@
 /* global describe it beforeEach */
 
 
-const assert = require('chai').assert;
+const assert = require('assert');
 require('../../general.js');
 
 const db = require('../../general.js').db;
@@ -34,8 +34,8 @@ describe('Timers - set()', () => {
       relations: ['messages'],
       where: { name: 'test' },
     });
-    assert.equal(item.triggerEverySecond, 60);
-    assert.equal(item.triggerEveryMessage, 0);
+    assert.strictEqual(item.triggerEverySecond, 60);
+    assert.strictEqual(item.triggerEveryMessage, 0);
   });
 
   it('-name test -seconds 20', async () => {
@@ -46,8 +46,8 @@ describe('Timers - set()', () => {
       relations: ['messages'],
       where: { name: 'test' },
     });
-    assert.equal(item.triggerEverySecond, 20);
-    assert.equal(item.triggerEveryMessage, 0);
+    assert.strictEqual(item.triggerEverySecond, 20);
+    assert.strictEqual(item.triggerEveryMessage, 0);
   });
 
   it('-name test -seconds 0', async () => {
@@ -57,7 +57,7 @@ describe('Timers - set()', () => {
       relations: ['messages'],
       where: { name: 'test' },
     });
-    assert.isUndefined(item);
+    assert(typeof item === 'undefined');
   });
 
   it('-name test -messages 20', async () => {
@@ -68,8 +68,8 @@ describe('Timers - set()', () => {
       relations: ['messages'],
       where: { name: 'test' },
     });
-    assert.equal(item.triggerEverySecond, 60);
-    assert.equal(item.triggerEveryMessage, 20);
+    assert.strictEqual(item.triggerEverySecond, 60);
+    assert.strictEqual(item.triggerEveryMessage, 20);
   });
 
   it('-name test -messages 0', async () => {
@@ -80,8 +80,8 @@ describe('Timers - set()', () => {
       relations: ['messages'],
       where: { name: 'test' },
     });
-    assert.equal(item.triggerEverySecond, 60);
-    assert.equal(item.triggerEveryMessage, 0);
+    assert.strictEqual(item.triggerEverySecond, 60);
+    assert.strictEqual(item.triggerEveryMessage, 0);
   });
 
   it('-name test -seconds 0 -messages 0', async () => {
@@ -92,7 +92,7 @@ describe('Timers - set()', () => {
       relations: ['messages'],
       where: { name: 'test' },
     });
-    assert.isUndefined(item);
+    assert(typeof item === 'undefined');
   });
 
   it('-name test -seconds 5 -messages 6', async () => {
@@ -103,7 +103,7 @@ describe('Timers - set()', () => {
       relations: ['messages'],
       where: { name: 'test' },
     });
-    assert.equal(item.triggerEverySecond, 5);
-    assert.equal(item.triggerEveryMessage, 6);
+    assert.strictEqual(item.triggerEverySecond, 5);
+    assert.strictEqual(item.triggerEveryMessage, 6);
   });
 });

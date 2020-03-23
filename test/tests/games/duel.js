@@ -44,7 +44,7 @@ describe('Gambling - duel', () => {
         await getRepository(Duel).save({ tickets: 1, username: 'user' + i, id: i });
       }
       const items = await getRepository(Duel).find();
-      assert.equal(items.length, 200);
+      assert.strictEqual(items.length, 200);
     });
 
     it('Bank should have 200 tickets', async () => {

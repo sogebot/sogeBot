@@ -1,6 +1,6 @@
 /* global describe it before */
 
-const assert = require('chai').assert;
+const assert = require('assert');
 require('../../general.js');
 
 const db = require('../../general.js').db;
@@ -87,11 +87,11 @@ describe('TMI - User should have counted messages - https://github.com/sogehige/
 
   it ('testuser1 should have 10 messages', async () => {
     const user = await getRepository(User).findOne({ userId: testuser1.userId })
-    assert.isTrue(user.messages === 10, `Expected 10 messages, got ${user.messages} messages`);
+    assert(user.messages === 10, `Expected 10 messages, got ${user.messages} messages`);
   });
 
   it ('testuser2 should have 5 messages', async () => {
     const user = await getRepository(User).findOne({ userId: testuser2.userId })
-    assert.isTrue(user.messages === 5, `Expected 5 messages, got ${user.messages} messages`);
+    assert(user.messages === 5, `Expected 5 messages, got ${user.messages} messages`);
   });
 });

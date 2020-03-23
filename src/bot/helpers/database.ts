@@ -1,6 +1,7 @@
 import { getManager } from 'typeorm';
 
 export let isDbConnected = false;
+export let isBotStarted = false;
 
 async function setIsDbConnected () {
   try {
@@ -10,6 +11,18 @@ async function setIsDbConnected () {
     setTimeout(() => setIsDbConnected(), 1000);
   }
 }
+
+export async function setIsBotStarted () {
+  isBotStarted = true;
+}
 setTimeout(() => {
   setIsDbConnected();
 }, 5000);
+
+export function getIsBotStarted () {
+  return isBotStarted;
+}
+
+export function getIsDbConnected () {
+  return isDbConnected;
+}

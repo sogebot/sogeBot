@@ -5,7 +5,7 @@
 require('../../general.js');
 
 const db = require('../../general.js').db;
-const assert = require('chai').assert;
+const assert = require('assert');
 const message = require('../../general.js').message;
 
 const { getManager } = require('typeorm');
@@ -53,7 +53,7 @@ describe('Quotes - remove()', () => {
             .select('quotes')
             .from(Quotes, 'quotes')
             .getMany();
-          assert.isNotEmpty(items);
+          assert(items.length > 0);
         });
       } else {
         if (test.exist) {
@@ -66,7 +66,7 @@ describe('Quotes - remove()', () => {
               .select('quotes')
               .from(Quotes, 'quotes')
               .getMany();
-            assert.isEmpty(items);
+            assert(items.length === 0);
           });
         } else {
           it('Should sent not-found message', async () => {
@@ -78,7 +78,7 @@ describe('Quotes - remove()', () => {
               .select('quotes')
               .from(Quotes, 'quotes')
               .getMany();
-            assert.isNotEmpty(items);
+            assert(items.length > 0);
           });
         }
       }

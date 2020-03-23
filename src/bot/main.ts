@@ -28,6 +28,7 @@ import { normalize } from 'path';
 import { startWatcher } from './watchers';
 
 import { expose as panelExpose, init as panelInit } from './panel';
+import { setIsBotStarted } from './helpers/database';
 
 const connect = async function () {
   const connectionOptions = await getConnectionOptions();
@@ -133,6 +134,7 @@ async function main () {
             unlinkSync('./restart.pid');
           }
           startWatcher();
+          setIsBotStarted();
         }, 30000);
       });
     }, 5000);

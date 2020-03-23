@@ -3,7 +3,7 @@
 require('../../general.js');
 
 const db = require('../../general.js').db;
-const assert = require('chai').assert;
+const assert = require('assert');
 const message = require('../../general.js').message;
 const _ = require('lodash');
 
@@ -102,7 +102,7 @@ describe('Bets - workflow()', () => {
               relations: ['participations'],
               order: { createdAt: 'DESC' },
             });
-            assert.isUndefined(currentBet);
+            assert(typeof currentBet === 'undefined');
           });
         } else {
           it ('!bet open should have correct message', async () => {
@@ -120,9 +120,9 @@ describe('Bets - workflow()', () => {
               order: { createdAt: 'DESC' },
             });
 
-            assert.isFalse(typeof currentBet === 'undefined');
-            assert.equal(currentBet.title, t.title);
-            assert.isTrue(_.isEqual(currentBet.options, t.options),
+            assert(typeof currentBet !== 'undefined');
+            assert.strictEqual(currentBet.title, t.title);
+            assert(_.isEqual(currentBet.options, t.options),
               `\nExpected: ${JSON.stringify(t.options)}\nActual:   ${JSON.stringify(currentBet.options)}\n\t`);
           });
 
@@ -182,9 +182,9 @@ describe('Open bet twice should fail', () => {
       order: { createdAt: 'DESC' },
     });
 
-    assert.isFalse(typeof currentBet === 'undefined');
-    assert.equal(currentBet.title, tests.true[0].title);
-    assert.isTrue(_.isEqual(currentBet.options, tests.true[0].options),
+    assert(typeof currentBet !== 'undefined');
+    assert.strictEqual(currentBet.title, tests.true[0].title);
+    assert(_.isEqual(currentBet.options, tests.true[0].options),
       `\nExpected: ${JSON.stringify(tests.true[0].options)}\nActual:   ${JSON.stringify(currentBet.options)}\n\t`);
   });
 
@@ -253,9 +253,9 @@ describe('Bet close should fail if wrong option is given', () => {
       order: { createdAt: 'DESC' },
     });
 
-    assert.isFalse(typeof currentBet === 'undefined');
-    assert.equal(currentBet.title, tests.true[0].title);
-    assert.isTrue(_.isEqual(currentBet.options, tests.true[0].options),
+    assert(typeof currentBet !== 'undefined');
+    assert.strictEqual(currentBet.title, tests.true[0].title);
+    assert(_.isEqual(currentBet.options, tests.true[0].options),
       `\nExpected: ${JSON.stringify(tests.true[0].options)}\nActual:   ${JSON.stringify(currentBet.options)}\n\t`);
   });
 
@@ -300,9 +300,9 @@ describe('Incorrect participate should show info', () => {
       order: { createdAt: 'DESC' },
     });
 
-    assert.isFalse(typeof currentBet === 'undefined');
-    assert.equal(currentBet.title, tests.true[0].title);
-    assert.isTrue(_.isEqual(currentBet.options, tests.true[0].options),
+    assert(typeof currentBet !== 'undefined');
+    assert.strictEqual(currentBet.title, tests.true[0].title);
+    assert(_.isEqual(currentBet.options, tests.true[0].options),
       `\nExpected: ${JSON.stringify(tests.true[0].options)}\nActual:   ${JSON.stringify(currentBet.options)}\n\t`);
   });
 
@@ -355,9 +355,9 @@ describe('Bet info should show all correct states', () => {
       order: { createdAt: 'DESC' },
     });
 
-    assert.isFalse(typeof currentBet === 'undefined');
-    assert.equal(currentBet.title, tests.true[0].title);
-    assert.isTrue(_.isEqual(currentBet.options, tests.true[0].options),
+    assert(typeof currentBet !== 'undefined');
+    assert.strictEqual(currentBet.title, tests.true[0].title);
+    assert(_.isEqual(currentBet.options, tests.true[0].options),
       `\nExpected: ${JSON.stringify(tests.true[0].options)}\nActual:   ${JSON.stringify(currentBet.options)}\n\t`);
   });
 

@@ -4,7 +4,7 @@
 require('../../general.js');
 
 const currency = (require('../../../dest/currency')).default;
-const assert = require('chai').assert;
+const assert = require('assert');
 
 describe('Currency - rates check', () => {
   const rates = {

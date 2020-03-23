@@ -1,4 +1,4 @@
-const assert = require('chai').assert;
+const assert = require('assert');
 const until = require('test-until');
 const chalk = require('chalk');
 const sinon = require('sinon');
@@ -85,7 +85,7 @@ module.exports = {
             break;
           }
         }
-        assert.isTrue(isCorrectlyCalled);
+        assert(isCorrectlyCalled);
         log.warning.reset();
         return true;
       } catch (err) {
@@ -144,7 +144,7 @@ module.exports = {
             break;
           }
         }
-        assert.isTrue(isCorrectlyCalled);
+        assert(isCorrectlyCalled);
         return true;
       } catch (err) {
         return setError(
@@ -176,7 +176,7 @@ module.exports = {
             break;
           }
         }
-        assert.isTrue(isOK);
+        assert(isOK);
         return true;
       } catch (err) {
         return setError(
@@ -199,7 +199,7 @@ module.exports = {
         setTimeout(() => resolve(false), wait);
       }),
     ]);
-    assert.isTrue(!race, 'Message was unexpectedly sent ' + expected);
+    assert(!race, 'Message was unexpectedly sent ' + expected);
   },
   isNotSentRaw: async function (expected, user, wait) {
     if (typeof user === 'string') {
@@ -214,6 +214,6 @@ module.exports = {
         setTimeout(() => resolve(false), wait);
       }),
     ]);
-    assert.isTrue(!race, 'Message was unexpectedly sent ' + expected);
+    assert(!race, 'Message was unexpectedly sent ' + expected);
   },
 };

@@ -1,7 +1,7 @@
 /* global describe it beforeEach */
 
 
-const assert = require('chai').assert;
+const assert = require('assert');
 const _ = require('lodash');
 require('../../general.js');
 
@@ -70,7 +70,7 @@ describe('Price - check()', () => {
       await getRepository(User).update({ userId: user.userId }, { points: test.points });
       await getRepository(Price).save({ command: test.command, price: test.price });
       const haveEnoughPoints = await price.check({ sender: { username: test.user, userId: test.userId }, message: test.command });
-      assert.isTrue(haveEnoughPoints === test.expected);
+      assert(haveEnoughPoints === test.expected);
     });
   }
 });

@@ -3,6 +3,7 @@ const chalk = require('chalk');
 
 const { debug } = require('../../dest/helpers/log');
 const waitMs = require('./time').waitMs;
+const { getIsDbConnected, getIsBotStarted } = require('../../dest/helpers/database');
 
 const { getManager, getRepository } = require('typeorm');
 const { Alias } = require('../../dest/database/entity/alias');
@@ -30,25 +31,15 @@ const tmi = (require('../../dest/tmi')).default;
 const permissions = (require('../../dest/permissions')).default;
 const translation = (require('../../dest/translate')).default;
 
-
-let justStarted = true;
-
 module.exports = {
   cleanup: async function () {
     const waitForIt = async (resolve, reject) => {
-      try {
-        isDbConnected = (await getManager()).connection.isConnected;
-        if (justStarted) {
-          await waitMs(5000);
-          justStarted = false;
-        }
-      } catch (e) {}
-      if (!isDbConnected || !translation.isLoaded) {
+      if (!getIsBotStarted() || !translation.isLoaded || !getIsDbConnected()) {
         return setTimeout(() => waitForIt(resolve, reject), 1000);
       }
 
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));
-      await waitMs(400); // wait ittle bit for transactions to be done
+      await waitMs(400); // wait little bit for transactions to be done
 
       const entities = [SongRequest, RaffleParticipant, Rank, PermissionCommands, Event, EventOperation, Variable, VariableHistory, VariableURL, Raffle, Duel, PollVote, Poll, TimerResponse, Timer, BetsParticipations, UserTip, UserBit, CommandsResponses, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Settings, Cooldown, Keyword, Price];
       if (['postgres', 'mysql'].includes((await getManager()).connection.options.type)) {

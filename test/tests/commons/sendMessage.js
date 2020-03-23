@@ -6,7 +6,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 const tmi = (require('../../../dest/tmi')).default;
-const assert = require('chai').assert;
+const assert = require('assert');
 
 const { sendMessage, getOwnerAsSender } = require('../../../dest/commons');
 

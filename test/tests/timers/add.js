@@ -1,7 +1,7 @@
 /* global describe it beforeEach */
 
 
-const assert = require('chai').assert;
+const assert = require('assert');
 require('../../general.js');
 
 const db = require('../../general.js').db;
@@ -50,7 +50,7 @@ describe('Timers - add()', () => {
     await timers.add({ sender: owner, parameters: '-name test -response "Lorem Ipsum"' });
 
     const item = await getRepository(TimerResponse).findOne({ response: 'Lorem Ipsum' });
-    assert.isTrue(typeof item !== 'undefined');
+    assert(typeof item !== 'undefined');
 
     await message.isSent('timers.response-was-added', owner, { id: item.id, name: 'test', response: 'Lorem Ipsum', sender: owner.username });
   });

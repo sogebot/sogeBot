@@ -1,7 +1,7 @@
 /* global describe it beforeEach */
 
 
-const assert = require('chai').assert;
+const assert = require('assert');
 require('../../general.js');
 const uuid = require('uuid/v4');
 
@@ -41,14 +41,14 @@ describe('Timers - unset()', () => {
     await message.isSent('timers.timer-deleted', owner, { name: 'test', sender: owner.username });
 
     const item = await getRepository(Timer).findOne({ name: 'test' });
-    assert.isUndefined(item);
+    assert(typeof item === 'undefined');
   });
   it('-name nonexistent', async () => {
     timers.unset({ sender: owner, parameters: '-name nonexistent' });
     await message.isSent('timers.timer-not-found', owner, { name: 'nonexistent', sender: owner.username });
 
     const item = await getRepository(Timer).findOne({ name: 'test' });
-    assert.equal(item.triggerEverySecond, 60);
-    assert.equal(item.triggerEveryMessage, 0);
+    assert.strictEqual(item.triggerEverySecond, 60);
+    assert.strictEqual(item.triggerEveryMessage, 0);
   });
 });
