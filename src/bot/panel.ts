@@ -10,8 +10,8 @@ import { adminEndpoint } from './helpers/socket';
 import { info } from './helpers/log';
 import { CacheTitles } from './database/entity/cacheTitles';
 import { v4 as uuid} from 'uuid';
-import { getConnection, getManager, getRepository } from 'typeorm';
-import { Dashboard, Widget } from './database/entity/dashboard';
+import { getConnection, getManager, getRepository, IsNull } from 'typeorm';
+import { Dashboard, DashboardInterface, Widget } from './database/entity/dashboard';
 import { Translation } from './database/entity/translation';
 import { TwitchTag } from './database/entity/twitch';
 import { User } from './database/entity/user';
@@ -125,12 +125,6 @@ export const init = () => {
       socketsConnected--;
     });
     socketsConnected++;
-    // create main dashboard if needed;
-    await getRepository(Dashboard).save({
-      id: 'c287b750-b620-4017-8b3e-e48757ddaa83', // constant ID
-      name: 'Main',
-      createdAt: 0,
-    });
 
     socket.on('getCachedTags', async (cb) => {
       const connection = await getConnection();
@@ -323,46 +317,45 @@ export const init = () => {
       callback(translate(data.name));
     });
 
-    socket.on('getWidgetList', async (cb) => {
+    adminEndpoint('/', 'panel::availableWidgets', async (userId: number, type: DashboardInterface['type'], cb) => {
       const dashboards = await getRepository(Dashboard).find({
-        relations: ['widgets'],
-      });
-      let widgetList: string[] = [];
-      for (const dashboard of dashboards) {
-        widgetList = [
-          ...widgetList,
-          ...dashboard.widgets.map(o => o.name),
-        ];
-      }
-
-      const sendWidgets: typeof widgets = [];
-      for(const widget of widgets) {
-        if (!widgetList.includes(widget.id)) {
-          sendWidgets.push(widget);
-        }
-      }
-      cb(sendWidgets, dashboards);
-    });
-
-    socket.on('getWidgets', async (cb) => {
-      const dashboards = await getRepository(Dashboard).find({
+        where: {
+          userId, type,
+        },
         relations: ['widgets'],
         order: {
           createdAt: 'ASC',
         },
       });
-      cb(dashboards);
-    });
 
-    socket.on('createDashboard', async (name, cb) => {
-      cb(await getRepository(Dashboard).save({ name, createdAt: Date.now(), id: uuid() }));
-    });
-
-    socket.on('removeDashboard', async (id) => {
-      if (id !== 'c287b750-b620-4017-8b3e-e48757ddaa83') {
-        await getRepository(Widget).delete({ dashboardId: id });
-        await getRepository(Dashboard).delete({ id });
+      const sendWidgets: typeof widgets = [];
+      const dashWidgets = dashboards.map(o => o.widgets).flat();
+      for(const widget of widgets) {
+        if (!dashWidgets.find(o => o.name === widget.id)) {
+          sendWidgets.push(widget);
+        }
       }
+      cb(null, sendWidgets);
+    });
+
+    adminEndpoint('/', 'panel::dashboards', async (userId: number, type: DashboardInterface['type'], cb) => {
+      getRepository(Widget).delete({ dashboardId: IsNull() });
+      const dashboards = await getRepository(Dashboard).find({
+        where: { userId, type },
+        relations: ['widgets'],
+        order: { createdAt: 'ASC' },
+      });
+      cb(null, dashboards);
+    });
+
+    adminEndpoint('/', 'panel::dashboards::remove', async (userId: number, type: DashboardInterface['type'], id: string, cb) => {
+      await getRepository(Dashboard).delete({ userId, type, id });
+      await getRepository(Widget).delete({ dashboardId: IsNull() });
+      cb(null);
+    });
+
+    adminEndpoint('/', 'panel::dashboards::create', async (userId: number, name: string, cb) => {
+      cb(null, await getRepository(Dashboard).save({ name, createdAt: Date.now(), id: uuid(), userId, type: 'admin' }));
     });
 
     socket.on('addWidget', async function (widgetName, id, cb) {
@@ -388,9 +381,12 @@ export const init = () => {
         cb(undefined);
       }
     });
-    socket.on('updateWidgets', async (dashboards) => {
+
+    adminEndpoint('/', 'panel::dashboards::save', async (dashboards) => {
       await getRepository(Dashboard).save(dashboards);
+      await getRepository(Widget).delete({ dashboardId: IsNull() });
     });
+
     socket.on('connection_status', cb => {
       cb(statusObj);
     });

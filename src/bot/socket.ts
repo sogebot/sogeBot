@@ -12,8 +12,63 @@ import { Socket as SocketEntity, SocketInterface } from './database/entity/socke
 import permissions from './permissions';
 import { debug } from './helpers/log';
 import { isDbConnected } from './helpers/database';
+import { Dashboard } from './database/entity/dashboard';
+import { isModerator } from './commons';
+import { User } from './database/entity/user';
 
 let _self: any = null;
+
+enum Authorized {
+  inProgress,
+  NotAuthorized,
+  Authorized,
+}
+
+const createDashboardIfNeeded = async (userId: number, opts: { haveAdminPrivileges: Authorized; haveModPrivileges: Authorized; haveViewerPrivileges: Authorized }) => {
+  // create main admin dashboard if needed;
+  if (opts.haveAdminPrivileges === Authorized.Authorized) {
+    const mainDashboard = await getRepository(Dashboard).findOne({
+      userId, name: 'Main', type: 'admin',
+    });
+    if (!mainDashboard) {
+      await getRepository(Dashboard).save({
+        name: 'Main', createdAt: 0, userId, type: 'admin',
+      });
+    }
+  }
+
+  // create main admin dashboard if needed;
+  if (opts.haveModPrivileges === Authorized.Authorized) {
+    const mainDashboard = await getRepository(Dashboard).findOne({
+      userId, name: 'Main', type: 'mod',
+    });
+    if (!mainDashboard) {
+      await getRepository(Dashboard).save({
+        name: 'Main', createdAt: 0, userId, type: 'mod',
+      });
+    }
+  }
+
+  // create main viewer dashboard if needed;
+  if (opts.haveViewerPrivileges === Authorized.Authorized) {
+    const mainDashboard = await getRepository(Dashboard).findOne({
+      userId, name: 'Main', type: 'viewer',
+    });
+    if (!mainDashboard) {
+      await getRepository(Dashboard).save({
+        name: 'Main', createdAt: 0, userId, type: 'viewer',
+      });
+    }
+  }
+};
+
+const getPrivileges = async(type: SocketInterface['type'], userId: number) => {
+  const user = await getRepository(User).findOne({ userId });
+  return {
+    haveAdminPrivileges: type === 'admin' ? Authorized.Authorized : Authorized.NotAuthorized,
+    haveModPrivileges: isModerator(user) ? Authorized.Authorized : Authorized.NotAuthorized,
+    haveViewerPrivileges: Authorized.Authorized };
+};
 
 class Socket extends Core {
   @settings('connection')
@@ -66,12 +121,8 @@ class Socket extends Core {
   }
 
   async authorize(socket, next) {
-    enum Authorized {
-      inProgress,
-      NotAuthorized,
-      Authorized,
-    }
     let haveAdminPrivileges = Authorized.inProgress;
+    let haveModPrivileges = Authorized.inProgress;
     let haveViewerPrivileges = Authorized.inProgress;
 
     const sendAuthorized = (socket, auth) => {
@@ -86,6 +137,7 @@ class Socket extends Core {
           // check if we have global socket
           if (cb.token === _self.socketToken) {
             haveAdminPrivileges = Authorized.Authorized;
+            haveModPrivileges = Authorized.Authorized;
             haveViewerPrivileges = Authorized.Authorized;
             sendAuthorized(socket, {
               type: 'admin',
@@ -99,6 +151,7 @@ class Socket extends Core {
           }
 
           haveAdminPrivileges = Authorized.NotAuthorized;
+          haveModPrivileges = Authorized.NotAuthorized;
           haveViewerPrivileges = Authorized.NotAuthorized;
           return socket.emit('unauthorized');
         }
@@ -106,6 +159,7 @@ class Socket extends Core {
         if (cb.token === '' || !cb.token) {
           // we don't have anything
           haveAdminPrivileges = Authorized.NotAuthorized;
+          haveModPrivileges = Authorized.NotAuthorized;
           haveViewerPrivileges = Authorized.NotAuthorized;
           return socket.emit('unauthorized');
         } else {
@@ -127,18 +181,24 @@ class Socket extends Core {
                   debug('sockets', `Login OK by refresh token - ${cb.token}, access token set to ${auth.accessToken}`);
                   sendAuthorized(socket, auth);
 
-                  if (auth.type === 'admin') {
-                    haveAdminPrivileges = Authorized.Authorized;
-                  } else {
-                    haveAdminPrivileges = Authorized.NotAuthorized;
-                  }
-                  haveViewerPrivileges = Authorized.Authorized;
+                  const privileges = await getPrivileges(auth.type, cb.userId);
+                  haveAdminPrivileges = privileges.haveAdminPrivileges;
+                  haveModPrivileges = privileges.haveModPrivileges;
+                  haveViewerPrivileges = privileges.haveViewerPrivileges;
+                  await createDashboardIfNeeded(cb.userId, { haveAdminPrivileges, haveModPrivileges, haveViewerPrivileges });
                 }
               });
             } else {
               // update refreshToken timestamp to expire only if not used
               auth.refreshTokenTimestamp = Date.now() + (_self.refreshTokenExpirationTime * 1000);
               await getRepository(SocketEntity).save(auth);
+
+              const privileges = await getPrivileges(auth.type, auth.userId);
+              haveAdminPrivileges = privileges.haveAdminPrivileges;
+              haveModPrivileges = privileges.haveModPrivileges;
+              haveViewerPrivileges = privileges.haveViewerPrivileges;
+              await createDashboardIfNeeded(auth.userId, { haveAdminPrivileges, haveModPrivileges, haveViewerPrivileges });
+
               debug('sockets', `Login OK by access token - ${cb.token}`);
               sendAuthorized(socket, auth);
 
