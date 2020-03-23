@@ -59,7 +59,7 @@ describe('game/roulette - !roulette', () => {
 
     it(`User should not have negative points`, async () => {
       const user = await getRepository(User).findOne({ userId: tests[0].user.userId });
-      assert.equal(user.points, 0);
+      assert.strictEqual(user.points, 0);
     });
   });
 });

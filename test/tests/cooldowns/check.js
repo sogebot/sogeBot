@@ -9,7 +9,7 @@ const { Cooldown, CooldownViewer } = require('../../../dest/database/entity/cool
 const { User } = require('../../../dest/database/entity/user');
 const { Keyword } = require('../../../dest/database/entity/keyword');
 
-const assert = require('chai').assert;
+const assert = require('assert');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
@@ -35,32 +35,32 @@ describe('Cooldowns - check()', () => {
 
     it('Command !_debug should pass', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!_debug' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('Command !$debug should pass', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!$debug' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('Command `!_debug test` should pass', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!_debug test' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('Command `!$debug test` should pass', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!$debug test' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('Command `!_debug te$st` should pass', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!_debug te$st' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('Command `!$debug te$st` should pass', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!$debug te$st' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
   });
 
@@ -93,12 +93,12 @@ describe('Cooldowns - check()', () => {
 
     it('First user should PASS', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!cmd (*)' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('Second user should FAIL', async () => {
       const isOk = await cooldown.check({ sender: testUser2, message: '!cmd (*)' });
-      assert.isFalse(isOk);
+      assert(!isOk);
     });
   });
 
@@ -140,13 +140,13 @@ describe('Cooldowns - check()', () => {
 
     it('First user should PASS', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: 'KonCha' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     for (const user of [testUser, testUser2, owner, usermod1, subuser1]) {
       it('Other users should FAIL', async () => {
         const isOk = await cooldown.check({ sender: user, message: 'koncha' });
-        assert.isFalse(isOk);
+        assert(!isOk);
       });
     }
   });
@@ -181,23 +181,23 @@ describe('Cooldowns - check()', () => {
 
     it('First user should PASS', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!followage' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('Owner user should PASS', async () => {
       const isOk = await cooldown.check({ sender: owner, message: '!followage' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('Moderator user should PASS', async () => {
       const isOk = await cooldown.check({ sender: usermod1, message: '!followage' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     for (const user of [testUser, testUser2, subuser1]) {
       it('Other users should FAIL', async () => {
         const isOk = await cooldown.check({ sender: user, message: '!followage' });
-        assert.isFalse(isOk);
+        assert(!isOk);
       });
     }
   });
@@ -233,42 +233,42 @@ describe('Cooldowns - check()', () => {
 
     it('testuser should not be affected by cooldown', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!фортуна 10' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('testuser should be affected by cooldown second time', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!фортуна 15' });
-      assert.isFalse(isOk); // second should fail
+      assert(!isOk); // second should fail
     });
 
     it('testuser2 should not be affected by cooldown', async () => {
       const isOk = await cooldown.check({ sender: testUser2, message: '!фортуна 20' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('testuser2 should be affected by cooldown second time', async () => {
       const isOk = await cooldown.check({ sender: testUser2, message: '!фортуна 25' });
-      assert.isFalse(isOk); // second should fail
+      assert(!isOk); // second should fail
     });
 
     it('owner should be affected by cooldown', async () => {
       const isOk = await cooldown.check({ sender: owner, message: '!фортуна 20' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('owner should be affected by cooldown second time', async () => {
       const isOk = await cooldown.check({ sender: owner, message: '!фортуна 25' });
-      assert.isFalse(isOk);
+      assert(!isOk);
     });
 
     it('owner should be affected by cooldown second time', async () => {
       const isOk = await cooldown.check({ sender: owner, message: '!фортуна 25' });
-      assert.isFalse(isOk);
+      assert(!isOk);
     });
 
     it('testuser should be affected by cooldown third time', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!фортуна 15' });
-      assert.isFalse(isOk);
+      assert(!isOk);
     });
   });
 
@@ -294,42 +294,42 @@ describe('Cooldowns - check()', () => {
 
     it('check if cooldown is created', async () => {
       const item = await getRepository(Cooldown).findOne({ where: { name: '!play' } });
-      assert.notEmpty(item);
+      assert(item.length !== 0);
     });
 
     it('testuser should not be affected by cooldown', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!play 10' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('testuser should be affected by cooldown second time', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!play 15' });
-      assert.isFalse(isOk); // second should fail
+      assert(!isOk); // second should fail
     });
 
     it('testuser2 should not be affected by cooldown', async () => {
       const isOk = await cooldown.check({ sender: testUser2, message: '!play 20' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('testuser2 should be affected by cooldown second time', async () => {
       const isOk = await cooldown.check({ sender: testUser2, message: '!play 25' });
-      assert.isFalse(isOk); // second should fail
+      assert(!isOk); // second should fail
     });
 
     it('owner should not be affected by cooldown', async () => {
       const isOk = await cooldown.check({ sender: owner, message: '!play 20' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('owner should not be affected by cooldown second time', async () => {
       const isOk = await cooldown.check({ sender: owner, message: '!play 25' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('owner should not be affected by cooldown second time', async () => {
       const isOk = await cooldown.check({ sender: owner, message: '!play 25' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
   });
 
@@ -356,27 +356,27 @@ describe('Cooldowns - check()', () => {
 
     it('check if cooldown is created', async () => {
       const item = await getRepository(Cooldown).findOne({ where: { name: '!play' } });
-      assert.notEmpty(item);
+      assert(item.length !== 0);
     });
 
     it('testuser should not be affected by cooldown', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!play 10' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('testuser should be affected by cooldown second time', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!play 15' });
-      assert.isFalse(isOk); // second should fail
+      assert(!isOk); // second should fail
     });
 
     it('testuser2 should be affected by cooldown second time', async () => {
       const isOk = await cooldown.check({ sender: testUser2, message: '!play 25' });
-      assert.isFalse(isOk); // third should fail
+      assert(!isOk); // third should fail
     });
 
     it('owner should not be affected by cooldown second time', async () => {
       const isOk = await cooldown.check({ sender: owner, message: '!play 25' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
   });
 
@@ -394,19 +394,19 @@ describe('Cooldowns - check()', () => {
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
       const item = await getRepository(Cooldown).findOne({ where: { name: '!gamble' } });
-      assert.notEmpty(item);
+      assert(item.length !== 0);
 
       let isOk = await cooldown.check({ sender: testUser, message: '!gamble 10' });
-      assert.isTrue(isOk);
+      assert(isOk);
 
       isOk = await cooldown.check({ sender: testUser, message: '!gamble 15' });
-      assert.isFalse(isOk); // second should fail
+      assert(!isOk); // second should fail
 
       isOk = await cooldown.check({ sender: testUser2, message: '!gamble 20' });
-      assert.isTrue(isOk);
+      assert(isOk);
 
       isOk = await cooldown.check({ sender: testUser2, message: '!gamble 25' });
-      assert.isFalse(isOk); // second should fail
+      assert(!isOk); // second should fail
     });
   });
 
@@ -424,13 +424,13 @@ describe('Cooldowns - check()', () => {
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
       const item = await getRepository(Cooldown).findOne({ where: { name: '!test' } });
-      assert.notEmpty(item);
+      assert(item.length !== 0);
 
       let isOk = await cooldown.check({ sender: testUser, message: 'Lorem Ipsum !test' });
-      assert.isTrue(isOk);
+      assert(isOk);
 
       isOk = await cooldown.check({ sender: testUser, message: 'Lorem Ipsum !test' });
-      assert.isTrue(isOk); // second should fail
+      assert(isOk); // second should fail
     });
   });
 
@@ -455,47 +455,47 @@ describe('Cooldowns - check()', () => {
 
     it('check if cooldown is created', async () => {
       const item = await getRepository(Cooldown).findOne({ where: { name: '!test me' } });
-      assert.notEmpty(item);
+      assert(item.length !== 0);
     });
 
     it('testuser with `!test me` should not be affected by cooldown', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!test me 10' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('testuser with `!test me` should be affected by cooldown second time', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!test me 11' });
-      assert.isFalse(isOk); // second should fail
+      assert(!isOk); // second should fail
     });
 
     it('testuser2 with `!test me` should not be affected by cooldown', async () => {
       const isOk = await cooldown.check({ sender: testUser2, message: '!test me 12' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('testuser2 with `!test me` should be affected by cooldown second time', async () => {
       const isOk = await cooldown.check({ sender: testUser2, message: '!test me 13' });
-      assert.isFalse(isOk); // second should fail
+      assert(!isOk); // second should fail
     });
 
     it('testuser with `!test` should not be affected by cooldown', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!test' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('testuser with `!test` should not be affected by cooldown second time', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!test' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('testuser2 with `!test` should not be affected by cooldown', async () => {
       const isOk = await cooldown.check({ sender: testUser2, message: '!test' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('testuser2 with `!test` should not be affected by cooldown second time', async () => {
       const isOk = await cooldown.check({ sender: testUser2, message: '!test' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
   });
 
@@ -515,27 +515,27 @@ describe('Cooldowns - check()', () => {
 
     it('check if cooldown is created', async () => {
       const item = await getRepository(Cooldown).findOne({ where: { name: '!test' } });
-      assert.notEmpty(item);
+      assert(item.length !== 0);
     });
 
     it('testuser should not be affected by cooldown', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!test 10' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('testuser should be affected by cooldown second time', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!test 15' });
-      assert.isFalse(isOk); // second should fail
+      assert(!isOk); // second should fail
     });
 
     it('testuser2 should not be affected by cooldown', async () => {
       const isOk = await cooldown.check({ sender: testUser2, message: '!test 25' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('testuser2 should be affected by cooldown second time', async () => {
       const isOk = await cooldown.check({ sender: testUser2, message: '!test 15' });
-      assert.isFalse(isOk); // second should fail
+      assert(!isOk); // second should fail
     });
   });
 
@@ -555,22 +555,22 @@ describe('Cooldowns - check()', () => {
 
     it('check if cooldown is created', async () => {
       const item = await getRepository(Cooldown).findOne({ where: { name: '!test' } });
-      assert.notEmpty(item);
+      assert(item.length !== 0);
     });
 
     it('testuser should not be affected by cooldown', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!test 10' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
 
     it('testuser should be affected by cooldown second time', async () => {
       const isOk = await cooldown.check({ sender: testUser, message: '!test 15' });
-      assert.isFalse(isOk);
+      assert(!isOk);
     });
 
     it('testuser2 should be affected by cooldown', async () => {
       const isOk = await cooldown.check({ sender: testUser2, message: '!test 15' });
-      assert.isFalse(isOk);
+      assert(!isOk);
     });
   });
 
@@ -594,16 +594,16 @@ describe('Cooldowns - check()', () => {
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
       const item = await getRepository(Cooldown).findOne({ where: { name: 'me' } });
-      assert.isTrue(typeof item !== 'undefined');
+      assert(typeof item !== 'undefined');
 
       let isOk = await cooldown.check({ sender: testUser, message: 'me' });
-      assert.isTrue(isOk);
+      assert(isOk);
 
       isOk = await cooldown.check({ sender: testUser, message: 'me' });
-      assert.isFalse(isOk); // second should fail
+      assert(!isOk); // second should fail
 
       isOk = await cooldown.check({ sender: testUser2, message: 'me' });
-      assert.isTrue(isOk);
+      assert(isOk);
     });
   });
 
@@ -627,16 +627,16 @@ describe('Cooldowns - check()', () => {
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
       const item = await getRepository(Cooldown).findOne({ where: { name: 'me' } });
-      assert.isTrue(typeof item !== 'undefined');
+      assert(typeof item !== 'undefined');
 
       let isOk = await cooldown.check({ sender: testUser, message: 'me' });
-      assert.isTrue(isOk);
+      assert(isOk);
 
       isOk = await cooldown.check({ sender: testUser, message: 'me' });
-      assert.isFalse(isOk); // second should fail
+      assert(!isOk); // second should fail
 
       isOk = await cooldown.check({ sender: testUser2, message: 'me' });
-      assert.isFalse(isOk); // another user should fail as well
+      assert(!isOk); // another user should fail as well
     });
   });
 });

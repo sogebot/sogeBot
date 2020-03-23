@@ -2,7 +2,7 @@
 require('../../general.js');
 
 const db = require('../../general.js').db;
-const assert = require('chai').assert;
+const assert = require('assert');
 const message = require('../../general.js').message;
 
 const { permission } = require('../../../dest/helpers/permissions');

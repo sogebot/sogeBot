@@ -4,7 +4,7 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const msg = require('../../general.js').message;
 const Message = require('../../../dest/message').default;
-const assert = require('chai').assert;
+const assert = require('assert');
 const sinon = require('sinon');
 
 describe('Message - api filter', () => {
@@ -20,7 +20,7 @@ describe('Message - api filter', () => {
 
     it('Expecting response Lorem a\\\\nb', async () => {
       const message = await new Message(toParse).parse({ });
-      assert.isTrue(message === 'Lorem a\\nb');
+      assert(message === 'Lorem a\\nb');
     });
   });
 });

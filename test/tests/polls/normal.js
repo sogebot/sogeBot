@@ -16,7 +16,7 @@ const { User } = require('../../../dest/database/entity/user');
 
 const polls = (require('../../../dest/systems/polls')).default;
 
-const assert = require('chai').assert;
+const assert = require('assert');
 
 const owner = { username: 'soge__', userId: Math.floor(Math.random() * 10000) };
 
@@ -35,26 +35,26 @@ describe('Polls - normal', () => {
 
   describe('Close opened voting', () => {
     it('Open new voting', async () => {
-      assert.isTrue(await polls.open({ sender: owner, parameters: '-title "Lorem Ipsum test?" Lorem | Ipsum | Dolor Sit' }));
+      assert(await polls.open({ sender: owner, parameters: '-title "Lorem Ipsum test?" Lorem | Ipsum | Dolor Sit' }));
     });
     it('Close voting', async () => {
-      assert.isTrue(await polls.close({ sender: owner }));
+      assert(await polls.close({ sender: owner }));
     });
   });
 
   describe('Voting full workflow', () => {
     let vid = null;
     it('Open new voting', async () => {
-      assert.isTrue(await polls.open({ sender: owner, parameters: '-title "Lorem Ipsum?" Lorem | Ipsum | Dolor Sit' }));
+      assert(await polls.open({ sender: owner, parameters: '-title "Lorem Ipsum?" Lorem | Ipsum | Dolor Sit' }));
     });
     it('Open another voting should fail', async () => {
-      assert.isFalse(await polls.open({ sender: owner, parameters: '-title "Lorem Ipsum2?" Lorem2 | Ipsum2 | Dolor Sit2' }));
+      assert(!(await polls.open({ sender: owner, parameters: '-title "Lorem Ipsum2?" Lorem2 | Ipsum2 | Dolor Sit2' })));
     });
     it('Voting should be correctly in db', async () => {
       const cVote = await getRepository(Poll).findOne({ isOpened: true });
       assert.deepEqual(cVote.type, 'normal');
       assert.deepEqual(cVote.options, ['Lorem', 'Ipsum', 'Dolor Sit']);
-      assert.equal(cVote.title, 'Lorem Ipsum?');
+      assert.strictEqual(cVote.title, 'Lorem Ipsum?');
       vid = cVote.id;
     });
     it(`!vote should return correct vote status`, async () => {
@@ -70,18 +70,18 @@ describe('Polls - normal', () => {
     it(`User ${owner.username} will vote for option 0 - should fail`, async () => {
       await polls.main({ sender: owner, parameters: '0' });
       const vote = await getRepository(PollVote).findOne({ votedBy: owner.username });
-      assert.isUndefined(vote);
+      assert(typeof vote === 'undefined');
     });
     it(`User ${owner.username} will vote for option 4 - should fail`, async () => {
       await polls.main({ sender: owner, parameters: '4' });
       const vote = await getRepository(PollVote).findOne({ votedBy: owner.username });
-      assert.isUndefined(vote);
+      assert(typeof vote === 'undefined');
     });
     for (const o of [1,2,3]) {
       it(`User ${owner.username} will vote for option ${o} - should be saved in db`, async () => {
         await polls.main({ sender: owner, parameters: String(o) });
         const vote = await getRepository(PollVote).findOne({ votedBy: owner.username });
-        assert.equal(vote.option, o - 1);
+        assert.strictEqual(vote.option, o - 1);
       });
     }
     it(`10 users will vote for option 1 and another 10 for option 2`, async () => {
@@ -94,7 +94,7 @@ describe('Polls - normal', () => {
           await until(async (setError) => {
             try {
               const vote = await getRepository(PollVote).findOne({ votedBy: user });
-              assert.equal(vote.option, o - 1);
+              assert.strictEqual(vote.option, o - 1);
               return true;
             } catch (err) {
               return setError(
@@ -120,7 +120,7 @@ describe('Polls - normal', () => {
       await time.waitMs(1000);
       await message.prepare();
 
-      assert.isTrue(await polls.close({ sender: owner }));
+      assert(await polls.close({ sender: owner }));
       await message.isSent('systems.polls.status_closed', owner, { title: 'Lorem Ipsum?' });
       await message.isSentRaw(polls.getCommand('!vote') + ` 1 - Lorem - 10 ${commons.getLocalizedName(10, 'systems.polls.votes')}, 47.62%`, owner);
       await message.isSentRaw(polls.getCommand('!vote') + ` 2 - Ipsum - 10 ${commons.getLocalizedName(10, 'systems.polls.votes')}, 47.62%`, owner);

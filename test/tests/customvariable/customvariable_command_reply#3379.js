@@ -10,7 +10,7 @@ const message = require('../../general.js').message;
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 const user = require('../../general.js').user;
 
-const assert = require('chai').assert;
+const assert = require('assert');
 const _ = require('lodash');
 
 const { getRepository } = require('typeorm');

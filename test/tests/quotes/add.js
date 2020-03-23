@@ -5,7 +5,7 @@
 require('../../general.js');
 
 const db = require('../../general.js').db;
-const assert = require('chai').assert;
+const assert = require('assert');
 const message = require('../../general.js').message;
 
 const { getManager } = require('typeorm');
@@ -65,7 +65,7 @@ describe('Quotes - add()', () => {
             .select('quotes')
             .from(Quotes, 'quotes')
             .getMany();
-          assert.isNotEmpty(items);
+          assert(items.length > 0);
         });
       }
     });

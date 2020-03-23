@@ -1,7 +1,7 @@
 /* global describe it beforeEach */
 
 
-const assert = require('chai').assert;
+const assert = require('assert');
 require('../../general.js');
 
 const db = require('../../general.js').db;
@@ -46,7 +46,7 @@ describe('Alias - run()', () => {
     alias.remove({ sender: owner, parameters: '!a' });
     await message.isSent('alias.alias-was-removed', owner, { alias: '!a', sender: owner.username });
 
-    assert.isEmpty(alias.run({ sender: owner, message: '!a' }));
+    assert(await alias.run({ sender: owner, message: '!a' }));
   });
 
   it('#668 - alias is case insensitive', async () => {
@@ -59,7 +59,7 @@ describe('Alias - run()', () => {
     alias.remove({ sender: owner, parameters: '!a' });
     await message.isSent('alias.alias-was-removed', owner, { alias: '!a', sender: owner.username });
 
-    assert.isEmpty(alias.run({ sender: owner, message: '!a' }));
+    assert(await alias.run({ sender: owner, message: '!a' }));
   });
 
   it('!a with spaces - will show !duel', async () => {
@@ -72,7 +72,7 @@ describe('Alias - run()', () => {
     alias.remove({ sender: owner, parameters: '!a with spaces' });
     await message.isSent('alias.alias-was-removed', owner, { alias: '!a with spaces', sender: owner.username });
 
-    assert.isEmpty(alias.run({ sender: owner, message: '!a with spaces' }));
+    assert(await alias.run({ sender: owner, message: '!a with spaces' }));
   });
 
   it('!한국어 - will show !duel', async () => {
@@ -85,7 +85,7 @@ describe('Alias - run()', () => {
     alias.remove({ sender: owner, parameters: '!한국어' });
     await message.isSent('alias.alias-was-removed', owner, { alias: '!한국어', sender: owner.username });
 
-    assert.isEmpty(alias.run({ sender: owner, message: '!한국어' }));
+    assert(await alias.run({ sender: owner, message: '!한국어' }));
   });
 
   it('!русский - will show !duel', async () => {
@@ -98,7 +98,7 @@ describe('Alias - run()', () => {
     alias.remove({ sender: owner, parameters: '!русский' });
     await message.isSent('alias.alias-was-removed', owner, { alias: '!русский', sender: owner.username });
 
-    assert.isEmpty(alias.run({ sender: owner, message: '!русский' }));
+    assert(await alias.run({ sender: owner, message: '!русский' }));
   });
 
   it('!крутить 1000 - will show !gamble 1000', async () => {
@@ -111,6 +111,6 @@ describe('Alias - run()', () => {
     alias.remove({ sender: owner, parameters: '!крутить' });
     await message.isSent('alias.alias-was-removed', owner, { alias: '!крутить', sender: owner.username });
 
-    assert.isEmpty(alias.run({ sender: owner, message: '!крутить' }));
+    assert(await alias.run({ sender: owner, message: '!крутить' }));
   });
 });

@@ -8,7 +8,7 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const msg = require('../../general.js').message;
 const Message = require('../../../dest/message').default;
-const assert = require('chai').assert;
+const assert = require('assert');
 const _ = require('lodash');
 
 const { getRepository } = require('typeorm');
@@ -181,12 +181,12 @@ describe('Message - cvars filter', async () => {
               it('message parsed correctly', async () => {
                 if (user.username === '__owner__' || (user.username === '__viewer__' && p === 'VIEWERS')) {
                   if (test.responseType === 2 ) {
-                    assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.afterValue));
+                    assert.strictEqual(message, test.command.replace(/\$_test|\$!_test/g, test.afterValue));
                   } else {
-                    assert.equal(message, '');
+                    assert.strictEqual(message, '');
                   }
                 } else {
-                  assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.initialValue));
+                  assert.strictEqual(message, test.command.replace(/\$_test|\$!_test/g, test.initialValue));
                 }
               });
 
@@ -203,7 +203,7 @@ describe('Message - cvars filter', async () => {
                     } catch (e) {
                       notSent = true;
                     }
-                    assert.isTrue(notSent);
+                    assert(notSent);
                   });
                 }
               }
@@ -211,12 +211,12 @@ describe('Message - cvars filter', async () => {
               if (user.username === '__owner__' || (user.username === '__viewer__' && p === 'VIEWERS')) {
                 it(`check if after value is ${test.afterValue}`, async () => {
                   const cvar = await getRepository(Variable).findOne({ variableName: test.variable });
-                  assert.equal(cvar.currentValue, test.afterValue);
+                  assert.strictEqual(String(cvar.currentValue), String(test.afterValue));
                 });
               } else {
                 it(`check if after value is ${test.initialValue}`, async () => {
                   const cvar = await getRepository(Variable).findOne({ variableName: test.variable });
-                  assert.equal(cvar.currentValue, test.initialValue);
+                  assert.strictEqual(String(cvar.currentValue), String(test.initialValue));
                 });
               }
 
@@ -230,9 +230,9 @@ describe('Message - cvars filter', async () => {
               });
               it('message parsed correctly', async () => {
                 if (user.username === '__owner__' || (user.username === '__viewer__' && p === 'VIEWERS')) {
-                  assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.afterValue));
+                  assert.strictEqual(message, test.command.replace(/\$_test|\$!_test/g, test.afterValue));
                 } else {
-                  assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.initialValue));
+                  assert.strictEqual(message, test.command.replace(/\$_test|\$!_test/g, test.initialValue));
                 }
               });
             });
@@ -269,7 +269,7 @@ describe('Message - cvars filter', async () => {
                 });
               });
               it('message parsed correctly', async () => {
-                assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.initialValue));
+                assert.strictEqual(message, test.command.replace(/\$_test|\$!_test/g, test.initialValue));
               });
 
               if (test.params.param) {
@@ -280,13 +280,13 @@ describe('Message - cvars filter', async () => {
                   } catch (e) {
                     notSent = true;
                   }
-                  assert.isTrue(notSent);
+                  assert(notSent);
                 });
               }
 
               it(`check if after value is ${test.initialValue}`, async () => {
                 const cvar = await getRepository(Variable).findOne({ variableName: test.variable });
-                assert.equal(cvar.currentValue, test.initialValue);
+                assert.strictEqual(String(cvar.currentValue), String(test.initialValue));
               });
 
               it(`parse '${test.command}' without params`, async () => {
@@ -298,7 +298,7 @@ describe('Message - cvars filter', async () => {
                 });
               });
               it('message parsed correctly', async () => {
-                assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.initialValue));
+                assert.strictEqual(message, test.command.replace(/\$_test|\$!_test/g, test.initialValue));
               });
             });
           }

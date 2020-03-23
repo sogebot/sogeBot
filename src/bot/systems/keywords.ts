@@ -1,4 +1,4 @@
-import uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import Expects from '../expects';
 import Message from '../message';
 import { command, default_permission, parser } from '../decorators';

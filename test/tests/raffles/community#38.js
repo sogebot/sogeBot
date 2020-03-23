@@ -13,7 +13,7 @@ const { Raffle } = require('../../../dest/database/entity/raffle');
 
 const raffles = (require('../../../dest/systems/raffles')).default;
 
-const assert = require('chai').assert;
+const assert = require('assert');
 
 const owner = { username: 'soge__', userId: Number(_.random(999999, false)) };
 
@@ -39,7 +39,7 @@ describe('/t/raffle-everyone-can-join-even-raffle-runned-for-subscribers/38', ()
 
     it('Add user ' + v + ' to raffle should fail', async () => {
       const a = await raffles.participate({ sender: { username: v, userId: Number('100' + id) }, message: '!winme' });
-      assert.isFalse(a);
+      assert(!a);
     });
 
     it('User should not be in raffle', async () => {
@@ -60,7 +60,7 @@ describe('/t/raffle-everyone-can-join-even-raffle-runned-for-subscribers/38', ()
 
     it('Add user ' + v + ' to raffle should fail', async () => {
       const a = await raffles.participate({ sender: { username: v, userId: Number('100' + id) }, message: '!winme' });
-      assert.isFalse(a);
+      assert(!a);
     });
 
     it('User should not be in raffle', async () => {
@@ -81,7 +81,7 @@ describe('/t/raffle-everyone-can-join-even-raffle-runned-for-subscribers/38', ()
 
     it('Add user ' + v + ' to raffle', async () => {
       const a = await raffles.participate({ sender: { username: v, userId: Number('100' + id) }, message: '!winme' });
-      assert.isTrue(a);
+      assert(a);
     });
 
     it('User should be in raffle', async () => {

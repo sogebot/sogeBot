@@ -9,7 +9,7 @@ const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 
 const _ = require('lodash');
-const assert = require('chai').assert;
+const assert = require('assert');
 
 const moderation = (require('../../../dest/systems/moderation')).default;
 
@@ -108,14 +108,14 @@ describe('systems/moderation - blacklist()', () => {
       it(`pattern '${pattern}' should ignore '${text}'`, async () => {
         moderation.cListsBlacklist = [pattern];
         const result = await moderation.blacklist({ sender: user.viewer, message: text });
-        assert.isTrue(result);
+        assert(result);
       });
     }
     for (const text of _.get(test, 'should.return.false', [])) {
       it(`pattern '${pattern}' should timeout on '${text}'`, async () => {
         moderation.cListsBlacklist = [pattern];
         const result = await moderation.blacklist({ sender: user.viewer, message: text });
-        assert.isFalse(result);
+        assert(!result);
       });
     }
   }

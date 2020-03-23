@@ -18,7 +18,7 @@ async function retest() {
         const p = child_process.spawn('npx', [
           'mocha',
           '-r', 'source-map-support/register',
-          '--timeout', '20000',
+          '--timeout', '60000',
           '--exit',
           '--grep="' + suite + '"',
           '--recursive',
@@ -67,7 +67,7 @@ async function test() {
     const p = child_process.spawn('npx', [
       'mocha',
       '-r', 'source-map-support/register',
-      '--timeout', '20000',
+      '--timeout', '60000',
       '--exit',
       '--recursive',
       'test/'

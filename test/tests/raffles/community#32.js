@@ -13,7 +13,7 @@ const { Raffle } = require('../../../dest/database/entity/raffle');
 
 const raffles = (require('../../../dest/systems/raffles')).default;
 
-const assert = require('chai').assert;
+const assert = require('assert');
 
 const max = Math.floor(Number.MAX_SAFE_INTEGER / 10000000);
 
@@ -38,7 +38,7 @@ describe('/t/raffle-owner-can-join-raffle-more-then-1-time/32', () => {
   it('loop through owner participations', async () => {
     for (let i = 0; i < 100; i++) {
       const a = await raffles.participate({ sender: commons.getOwnerAsSender(), message: `!winme` });
-      assert.isTrue(a);
+      assert(a);
     }
   });
 

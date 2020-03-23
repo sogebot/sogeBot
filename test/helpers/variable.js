@@ -1,4 +1,4 @@
-const assert = require('chai').assert;
+const assert = require('assert');
 const until = require('test-until');
 const _ = require('lodash');
 const util = require('util');
@@ -13,7 +13,7 @@ module.exports = {
 
       const current = _.get(global, variablePath.replace('global.', ''));
       try {
-        assert.isTrue(_.isEqual(current, expected));
+        assert(_.isEqual(current, expected));
         isOk = true;
       } catch (err) {
         return setError(

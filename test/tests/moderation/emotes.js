@@ -7,7 +7,7 @@ const db = require('../../general.js').db;
 const variable = require('../../general.js').variable;
 const message = require('../../general.js').message;
 const user = require('../../general.js').user;
-const assert = require('chai').assert;
+const assert = require('assert');
 
 const moderation = (require('../../../dest/systems/moderation')).default;
 
@@ -23,7 +23,7 @@ describe('systems/moderation - Emotes()', () => {
     });
 
     it(`message '${cEmotesEmojisAreEmotes.message}' should not timeout`, async () => {
-      assert.isTrue(await moderation.emotes({ sender: cEmotesEmojisAreEmotes.sender, message: cEmotesEmojisAreEmotes.message }));
+      assert(await moderation.emotes({ sender: cEmotesEmojisAreEmotes.sender, message: cEmotesEmojisAreEmotes.message }));
     });
   });
 
@@ -36,7 +36,7 @@ describe('systems/moderation - Emotes()', () => {
     });
 
     it(`message '${cEmotesEmojisAreEmotes.message}' should timeout`, async () => {
-      assert.isFalse(await moderation.emotes({ sender: cEmotesEmojisAreEmotes.sender, message: cEmotesEmojisAreEmotes.message }));
+      assert(!(await moderation.emotes({ sender: cEmotesEmojisAreEmotes.sender, message: cEmotesEmojisAreEmotes.message })));
     });
   });
 });

@@ -4,7 +4,7 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const msg = require('../../general.js').message;
 const Message = require('../../../dest/message').default;
-const assert = require('chai').assert;
+const assert = require('assert');
 
 describe('Message - if filter', () => {
   beforeEach(async () => {
@@ -17,11 +17,11 @@ describe('Message - if filter', () => {
 
     it('Check true condition', async () => {
       const message = await new Message(toParse).parse({ param: 'n/a' });
-      assert.isTrue(message === '$sender unknown chosed');
+      assert(message === '$sender unknown chosed');
     });
     it('Check false condition', async () => {
       const message = await new Message(toParse).parse({ param: 'asd' });
-      assert.isNotEmpty(message.match(/\$sender and asd \d{1,3}%/));
+      assert(message.match(/\$sender and asd \d{1,3}%/).length > 0);
     });
   });
 });

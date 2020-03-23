@@ -5,7 +5,7 @@
 require('../../general.js');
 
 const db = require('../../general.js').db;
-const assert = require('chai').assert;
+const assert = require('assert');
 const message = require('../../general.js').message;
 
 const { getManager } = require('typeorm');
@@ -74,7 +74,7 @@ describe('Quotes - set()', () => {
               .from(Quotes, 'quote')
               .where('id = :id', { id: test.id })
               .getOne();
-            assert.isUndefined(item);
+            assert(typeof item === 'undefined');
           });
         }
       }

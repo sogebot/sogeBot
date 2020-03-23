@@ -13,7 +13,7 @@ const { Raffle } = require('../../../dest/database/entity/raffle');
 
 const raffles = (require('../../../dest/systems/raffles')).default;
 
-const assert = require('chai').assert;
+const assert = require('assert');
 
 const max = Math.floor(Number.MAX_SAFE_INTEGER / 10000000);
 
@@ -46,7 +46,7 @@ describe('Raffles - pick()', () => {
         }
       })
       await message.isSent('raffles.no-participants-to-pick-winner', { username: 'bot' })
-      assert.isTrue(raffle.isClosed);
+      assert(raffle.isClosed);
       assert.isNull(raffle.winner);
     });
   });
@@ -72,7 +72,7 @@ describe('Raffles - pick()', () => {
 
       it('Add user ' + v + ' to raffle', async () => {
         const a = await raffles.participate({ sender: { username: v, userId: Number('100' + id) }, message: '!winme' });
-        assert.isTrue(a);
+        assert(a);
       });
     }
 
@@ -120,12 +120,12 @@ describe('Raffles - pick()', () => {
 
     it('testuser bets max', async () => {
       const a = await raffles.participate({ sender: testuser, message: `!winme ${max}` });
-      assert.isTrue(a);
+      assert(a);
     });
 
     it('testuser2 bets half of max', async () => {
       const a = await raffles.participate({ sender: testuser2, message: `!winme ${max / 2}` });
-      assert.isTrue(a);
+      assert(a);
     });
 
     it('pick a winner', async () => {
@@ -165,12 +165,12 @@ describe('Raffles - pick()', () => {
 
     it('testuser bets 100', async () => {
       const a = await raffles.participate({ sender: testuser, message: '!winme 100' });
-      assert.isTrue(a);
+      assert(a);
     });
 
     it('testuser2 bets 100', async () => {
       const a = await raffles.participate({ sender: testuser2, message: '!winme 100' });
-      assert.isTrue(a);
+      assert(a);
     });
 
     it('pick a winner', async () => {
@@ -208,12 +208,12 @@ describe('Raffles - pick()', () => {
 
     it('testuser bets 100', async () => {
       const a = await raffles.participate({ sender: testuser, message: '!winme 100' });
-      assert.isTrue(a);
+      assert(a);
     });
 
     it('testuser2 bets 100', async () => {
       const a = await raffles.participate({ sender: testuser2, message: '!winme 100' });
-      assert.isTrue(a);
+      assert(a);
     });
 
     it('pick a winner', async () => {
@@ -251,12 +251,12 @@ describe('Raffles - pick()', () => {
 
     it('testuser bets 100', async () => {
       const a = await raffles.participate({ sender: testuser, message: '!winme 100' });
-      assert.isTrue(a);
+      assert(a);
     });
 
     it('testuser2 bets 100', async () => {
       const a = await raffles.participate({ sender: testuser2, message: '!winme 100' });
-      assert.isTrue(a);
+      assert(a);
     });
 
     it('pick a winner', async () => {

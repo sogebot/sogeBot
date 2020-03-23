@@ -1,7 +1,7 @@
 /* global describe it beforeEach */
 require('../../general.js');
 
-const assert = require('chai').assert;
+const assert = require('assert');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
@@ -36,9 +36,9 @@ describe('Cooldowns - toggleEnabled()', () => {
     await message.isSent('cooldowns.cooldown-was-disabled', owner, { command: command, sender: owner.username });
 
     let isOk = await cooldown.check({ sender: testUser, message: '!me' });
-    assert.isTrue(isOk);
+    assert(isOk);
     isOk = await cooldown.check({ sender: testUser, message: '!me' });
-    assert.isTrue(isOk);
+    assert(isOk);
 
     cooldown.toggleEnabled({ sender: owner, parameters: `${command} ${type}` });
     await message.isSent('cooldowns.cooldown-was-enabled', owner, { command: command, sender: owner.username });

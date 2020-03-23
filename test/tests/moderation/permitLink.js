@@ -8,7 +8,7 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const user = require('../../general.js').user;
-const assert = require('chai').assert;
+const assert = require('assert');
 
 const owner = Object.freeze({ username: 'soge__', badges: {}, userId: 12345 });
 
@@ -32,11 +32,11 @@ describe('systems/moderation - permitLink()', () => {
       });
       it('should not timeout user 100 messages', async () => {
         for (let i = 0; i < 100; i++) {
-          assert.isTrue(await moderation.containsLink({ sender: user.viewer, message: 'http://www.google.com' }));
+          assert(await moderation.containsLink({ sender: user.viewer, message: 'http://www.google.com' }));
         }
       });
       it('should timeout user on 1001 message', async function () {
-        assert.isFalse(await moderation.containsLink({ sender: user.viewer, message: 'http://www.google.com' }));
+        assert(!(await moderation.containsLink({ sender: user.viewer, message: 'http://www.google.com' })));
       });
     });
     describe('parsing \'!permit [username]\'', function () {
@@ -45,10 +45,10 @@ describe('systems/moderation - permitLink()', () => {
         await message.isSent('moderation.user-have-link-permit', owner, { username: '__viewer__', count: 1, link: 'link' });
       });
       it('should not timeout user on first link message', async () => {
-        assert.isTrue(await moderation.containsLink({ sender: user.viewer, message: 'http://www.google.com' }));
+        assert(await moderation.containsLink({ sender: user.viewer, message: 'http://www.google.com' }));
       });
       it('should timeout user on second link message', async function () {
-        assert.isFalse(await moderation.containsLink({ sender: user.viewer, message: 'http://www.google.com' }));
+        assert(!(await moderation.containsLink({ sender: user.viewer, message: 'http://www.google.com' })));
       });
     });
     describe('parsing \'!permit [username]\' - case sensitive test', function () {
@@ -57,10 +57,10 @@ describe('systems/moderation - permitLink()', () => {
         await message.isSent('moderation.user-have-link-permit', owner, { username: '__viewer__', count: 1, link: 'link' });
       });
       it('should not timeout user on first link message', async () => {
-        assert.isTrue(await moderation.containsLink({ sender: user.viewer, message: 'http://www.google.com' }));
+        assert(await moderation.containsLink({ sender: user.viewer, message: 'http://www.google.com' }));
       });
       it('should timeout user on second link message', async function () {
-        assert.isFalse(await moderation.containsLink({ sender: user.viewer, message: 'http://www.google.com' }));
+        assert(!(await moderation.containsLink({ sender: user.viewer, message: 'http://www.google.com' })));
       });
     });
   });

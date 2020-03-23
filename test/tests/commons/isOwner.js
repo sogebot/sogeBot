@@ -11,7 +11,7 @@ const oauth = (require('../../../dest/oauth')).default;
 
 const { isOwner } = require('../../../dest/commons');
 
-const assert = require('chai').assert;
+const assert = require('assert');
 
 const owner = { username: 'soge__' };
 const notOwner = { username: 'testuser' };
@@ -25,10 +25,10 @@ describe('lib/commons - isOwner()', () => {
   });
 
   it('should be returned as owner', async () => {
-    assert.isTrue(isOwner(owner));
+    assert(isOwner(owner));
   });
 
   it('should not be returned as owner', async () => {
-    assert.isFalse(isOwner(notOwner));
+    assert(!isOwner(notOwner));
   });
 });
