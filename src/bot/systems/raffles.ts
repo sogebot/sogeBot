@@ -42,6 +42,8 @@ class Raffles extends System {
 
   @settings()
   raffleAnnounceInterval = 10;
+  @settings()
+  allowOverTicketing = false;
 
   constructor () {
     super();
@@ -373,7 +375,15 @@ class Raffles extends System {
     if (newTickets > raffle.maxTickets) {
       newTickets = raffle.maxTickets;
     }
-    tickets = newTickets - curTickets;
+
+    const userPoints = await points.getPointsOf(opts.sender.userId);
+    if (raffle.type === TYPE_TICKETS && userPoints < tickets) {
+      if (this.allowOverTicketing) {
+        newTickets = curTickets + userPoints;
+      } else {
+        return false;
+      }
+    } // user doesn't have enough points
 
     const selectedParticipant = {
       ...participant,
@@ -385,10 +395,6 @@ class Raffles extends System {
       isFollower: user.isFollower,
       isSubscriber: user.isSubscriber,
     };
-
-    if (raffle.type === TYPE_TICKETS && await points.getPointsOf(opts.sender.userId) < tickets) {
-      return false;
-    } // user doesn't have enough points
 
     if (raffle.forFollowers && raffle.forSubscribers && selectedParticipant.isEligible) {
       selectedParticipant.isEligible = user.isFollower || user.isSubscriber;
