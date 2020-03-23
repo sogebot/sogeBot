@@ -63,23 +63,11 @@ const createDashboardIfNeeded = async (userId: number, opts: { haveAdminPrivileg
 };
 
 const getPrivileges = async(type: SocketInterface['type'], userId: number) => {
-  let haveAdminPrivileges = Authorized.NotAuthorized;
-  let haveViewerPrivileges = Authorized.NotAuthorized;
-  let haveModPrivileges = Authorized.NotAuthorized;
-
-  if (type === 'admin') {
-    haveAdminPrivileges = Authorized.Authorized;
-  } else {
-    haveAdminPrivileges = Authorized.NotAuthorized;
-  }
-  haveViewerPrivileges = Authorized.Authorized;
-
   const user = await getRepository(User).findOne({ userId });
-  haveModPrivileges = Authorized.NotAuthorized;
-  if (user) {
-    haveModPrivileges = isModerator(user) ? Authorized.Authorized : Authorized.NotAuthorized;
-  }
-  return { haveAdminPrivileges, haveModPrivileges, haveViewerPrivileges };
+  return {
+    haveAdminPrivileges: type === 'admin' ? Authorized.Authorized : Authorized.NotAuthorized,
+    haveModPrivileges: isModerator(user) ? Authorized.Authorized : Authorized.NotAuthorized,
+    haveViewerPrivileges: Authorized.Authorized };
 };
 
 class Socket extends Core {
