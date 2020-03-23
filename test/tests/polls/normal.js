@@ -29,7 +29,7 @@ describe('Polls - normal', () => {
 
   describe('Close not opened voting', () => {
     it('Close voting should fail', async () => {
-      assert.isNotTrue(await polls.close({ sender: owner }));
+      assert(!(await polls.close({ sender: owner })));
     });
   });
 

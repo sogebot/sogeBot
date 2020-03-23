@@ -47,7 +47,7 @@ describe('Raffles - pick()', () => {
       })
       await message.isSent('raffles.no-participants-to-pick-winner', { username: 'bot' })
       assert(raffle.isClosed);
-      assert.isNull(raffle.winner);
+      assert(raffle.winner === null);
     });
   });
 

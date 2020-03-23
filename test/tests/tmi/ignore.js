@@ -86,7 +86,7 @@ describe('TMI - ignore', () => {
       await message.isSent('ignore.user.is.ignored', owner, testuser);
       assert(await commons.isIgnored(testuser));
       assert(typeof item !== 'undefined');
-      assert.include(item.value, 'testuser');
+      assert(item.value.includes('testuser'));
     });
 
     it('@testuser2 should be in ignore list', async () => {
@@ -101,7 +101,7 @@ describe('TMI - ignore', () => {
       await message.isSent('ignore.user.is.ignored', owner, testuser2);
       assert(await commons.isIgnored(testuser2));
       assert(typeof item !== 'undefined');
-      assert.include(item.value, 'testuser2');
+      assert(item.value.includes('testuser2'));
     });
 
     it('testuser3 should not be in ignore list', async () => {
@@ -116,7 +116,7 @@ describe('TMI - ignore', () => {
       await message.isSent('ignore.user.is.not.ignored', owner, testuser3);
       assert(!(await commons.isIgnored(testuser3)));
       assert(typeof item !== 'undefined');
-      assert.notInclude(item.value, 'testuser3');
+      assert(!item.value.includes('testuser3'));
 
     });
 
