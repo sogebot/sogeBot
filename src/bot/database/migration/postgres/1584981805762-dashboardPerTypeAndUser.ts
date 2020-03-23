@@ -2,7 +2,7 @@ import {MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 let broadcasterId: null | number = null;
 
-const columnUserIdWithoutDefault = new TableColumn({ type: 'integer', name: 'userId' });
+const columnUserIdWithoutDefault = new TableColumn({ type: 'int', name: 'userId' });
 const columnTypeWithoutDefault = new TableColumn({ type: 'varchar', name: 'type', length: '6' });
 
 export class dashboardPerTypeAndUser1584981805762 implements MigrationInterface {
@@ -17,7 +17,7 @@ export class dashboardPerTypeAndUser1584981805762 implements MigrationInterface 
         throw new Error('broadcasterId');
       }
 
-      const columnUserId = new TableColumn({ type: 'integer', default: broadcasterId, name: 'userId' });
+      const columnUserId = new TableColumn({ type: 'int', default: broadcasterId, name: 'userId' });
       const columnType = new TableColumn({ type: 'varchar', default: '\'admin\'', name: 'type', length: '6' });
 
       const widgets = await queryRunner.query(`SELECT * from widget WHERE dashboardId NOT NULL`);
@@ -31,7 +31,7 @@ export class dashboardPerTypeAndUser1584981805762 implements MigrationInterface 
       await queryRunner.changeColumn('dashboard', 'userId', columnUserIdWithoutDefault);
       await queryRunner.changeColumn('dashboard', 'type', columnTypeWithoutDefault);
 
-      await queryRunner.clearTable('widget');
+      await queryRunner.query('TRUNCATE TABLE widget CASCADE');
       for (const widget of widgets) {
         await queryRunner.query(
           'INSERT INTO widget(id, name, positionX, positionY, height, width, dashboardId) values(?, ?, ?, ?, ?, ? ,?)',
@@ -41,8 +41,8 @@ export class dashboardPerTypeAndUser1584981805762 implements MigrationInterface 
       if (e.message !== 'broadcasterId') {
         throw new Error(e);
       }
-      await queryRunner.clearTable('widget');
-      await queryRunner.clearTable('dashboard');
+      await queryRunner.query('TRUNCATE TABLE widget CASCADE');
+      await queryRunner.query('TRUNCATE TABLE dashboard CASCADE');
       // add new columns without default values
       await queryRunner.addColumns('dashboard', [
         columnUserIdWithoutDefault, columnTypeWithoutDefault,
