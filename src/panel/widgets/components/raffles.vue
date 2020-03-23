@@ -301,7 +301,6 @@ export default {
               reject(err);
             }
             if (raffle) {
-              console.log(raffle.participants);
               this.participants = raffle.participants;
               this.running = !raffle.isClosed;
 
