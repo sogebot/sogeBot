@@ -69,7 +69,7 @@
 
     <div class="w-100"></div>
     <widget-create v-bind:dashboardId="currentDashboard" class="pt-4" @addWidget="addWidget"></widget-create>
-    <dashboard-remove v-if="currentDashboard !== 'c287b750-b620-4017-8b3e-e48757ddaa83'" v-bind:dashboardId="currentDashboard" class="pt-4" @update="currentDashboard = 'c287b750-b620-4017-8b3e-e48757ddaa83'" @removeDashboard="removeDashboard"></dashboard-remove>
+    <dashboard-remove v-if="currentDashboard !== mainDashboard" v-bind:dashboardId="currentDashboard" class="pt-4" @update="currentDashboard = mainDashboard" @removeDashboard="removeDashboard"></dashboard-remove>
   </div>
 </div>
 </template>
@@ -114,16 +114,22 @@ export default {
 
       dashboardName: '',
       addDashboard: false,
-      currentDashboard: 'c287b750-b620-4017-8b3e-e48757ddaa83',
+      currentDashboard: '',
+      mainDashboard: '',
       show: true,
       isLoaded: false,
       layout: {'null': []},
       socket: getSocket('/')
     }
   },
-  created() {
+  mounted() {
     this.isLoaded = false;
-    this.socket.emit('getWidgets', (dashboards) => {
+    this.socket.emit('panel::dashboards', Number(this.$loggedUser.id), 'admin', (err, dashboards) => {
+      if (err) {
+        return console.error(err);
+      }
+      this.mainDashboard = dashboards[0].id
+      this.currentDashboard = dashboards[0].id;
       this.dashboards = dashboards;
       this.refreshWidgets();
       this.isLoaded = true;
@@ -154,7 +160,7 @@ export default {
       for (const dashboard of this.dashboards) {
         dashboard.widgets = dashboard.widgets.filter(o => o.name !== name);
       }
-      this.socket.emit('updateWidgets', this.dashboards)
+      this.socket.emit('panel::dashboards::save', this.dashboards)
       this.refreshWidgets();
     },
     updateLayout(layout) {
@@ -169,23 +175,29 @@ export default {
           };
         });
       };
-      this.socket.emit('updateWidgets', this.dashboards)
+      this.socket.emit('panel::dashboards::save', this.dashboards)
     },
     removeDashboard: function (dashboardId) {
       this.dashboards = this.dashboards.filter(o => String(o.id) !== dashboardId)
-      this.currentDashboard = 'c287b750-b620-4017-8b3e-e48757ddaa83'
-      this.socket.emit('updateWidgets', this.dashboards)
+      this.currentDashboard = this.dashboards[0].id
+      this.socket.emit('panel::dashboards::save', this.dashboards)
       this.refreshWidgets();
     },
     addWidget: function () {
-      this.socket.emit('getWidgets', (dashboards) => {
+      this.socket.emit('panel::dashboards', Number(this.$loggedUser.id), 'admin', (err, dashboards) => {
+        if (err) {
+          return console.error(err);
+        }
         this.dashboards = dashboards;
         this.refreshWidgets();
         this.isLoaded = true;
       });
     },
     createDashboard: function () {
-      this.socket.emit('createDashboard', this.dashboardName, (created) => {
+      this.socket.emit('panel::dashboards::create', Number(this.$loggedUser.id), this.dashboardName, (err, created) => {
+        if (err) {
+          return console.error(err);
+        }
         this.dashboards.push(created)
       })
       this.dashboardName = ''

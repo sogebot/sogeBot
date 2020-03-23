@@ -49,8 +49,11 @@ export default {
     },
     load: function () {
       this.state = 1
-      this.socket.emit('getWidgetList', (widgets, dashboards) => {
-        this.widgets = widgets
+      this.socket.emit('panel::availableWidgets', Number(this.$loggedUser.id), 'admin', (err, widgets) => {
+        if (err) {
+          return console.error(err);
+        }
+        this.widgets = widgets;
         this.state = 2
       })
     }

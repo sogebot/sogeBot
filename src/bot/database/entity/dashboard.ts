@@ -6,6 +6,8 @@ export interface DashboardInterface {
   widgets?: WidgetInterface[];
   name: string;
   createdAt: number;
+  type: 'admin' | 'mod' | 'viewer';
+  userId: number;
 };
 
 export interface WidgetInterface {
@@ -24,6 +26,8 @@ export const Dashboard = new EntitySchema<Readonly<Required<DashboardInterface>>
   columns: {
     id: { type: 'uuid', primary: true, generated: 'uuid' },
     name: { type: String },
+    type: { type: String, length: 6 },
+    userId: { type: Number },
     createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },
   relations: {
@@ -45,6 +49,7 @@ export const Widget = new EntitySchema<Readonly<Required<WidgetInterface>>>({
     positionY: { type: Number },
     height: { type: Number },
     width: { type: Number },
+    dashboardId: { type: 'uuid' },
   },
   relations: {
     dashboard: {
