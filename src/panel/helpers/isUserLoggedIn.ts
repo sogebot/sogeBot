@@ -37,25 +37,10 @@ export const isUserLoggedIn = async function (mustBeLogged = true) {
       const newAuthorization = localStorage.getItem('newAuthorization');
       if (newAuthorization !== null) {
         await new Promise((resolve) => {
-          getSocket('/', true).emit('newAuthorization', data.id, () => resolve());
+          getSocket('/', true).emit('newAuthorization', data.id, data.login, () => resolve());
         });
       }
       localStorage.removeItem('newAuthorization');
-
-      // save userId to db
-      await new Promise((resolve, reject) => {
-        const socket = getSocket('/core/users', !mustBeLogged);
-        socket.emit('viewers::updateId', {
-          userId: Number(data.id),
-          username: data.login,
-        }, (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        });
-      });
       return data;
     } catch(e) {
       console.debug(e);
