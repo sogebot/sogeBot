@@ -160,14 +160,6 @@ class Users extends Core {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'viewers::updateId', async (opts: { userId: number; username: string }, cb) => {
-      try {
-        await getRepository(User).update({ userId: opts.userId }, { username: opts.username });
-        cb(null);
-      } catch (e) {
-        cb(e.stack);
-      }
-    });
     adminEndpoint(this.nsp, 'viewers::resetPointsAll', async (cb) => {
       await getRepository(User).update({}, { points: 0 });
       cb();
