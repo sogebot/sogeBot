@@ -3,6 +3,7 @@
     header.w-100
       b-row.flex-nowrap.justify-content-between.align-items-center
         b-col.d-flex.justify-content-end.align-items-center
+          theme
           user
     navmenu
 </template>
@@ -22,6 +23,7 @@ library.add(faBars, faSignInAlt, faSignOutAlt);
   components: {
     user: () => import('src/panel/components/navbar/user.vue'),
     navmenu: () => import('./menu.vue'),
+    theme: () => import('src/panel/components/navbar/theme.vue'),
   },
 })
 export default class navbar extends Vue {
