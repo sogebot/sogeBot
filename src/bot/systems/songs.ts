@@ -543,9 +543,15 @@ class Songs extends System {
       } else if (Number(videoInfo.length_seconds) / 60 > this.duration) {
         sendMessage(translate('songs.song-is-too-long'), opts.sender, opts.attr);
       } else if (videoInfo.media.category_url !== 'https://www.youtube.com/channel/UC-9-kyTW8ZkZNDHQJ6FgpwQ' && this.onlyMusicCategory) {
-        if (Number(opts.retry ?? 0) < 2) {
+        if (Number(opts.retry ?? 0) < 5) {
           // try once more to be sure
-          return this.addSongToQueue({ ...opts, retry: (opts.retry ?? 0) + 1 });
+          setTimeout(() => {
+            this.addSongToQueue({ ...opts, retry: (opts.retry ?? 0) + 1 });
+          }, 500);
+          return ;
+        }
+        if (global.mocha) {
+          error(videoInfo.media);
         }
         sendMessage(translate('songs.incorrect-category'), opts.sender, opts.attr);
       } else {

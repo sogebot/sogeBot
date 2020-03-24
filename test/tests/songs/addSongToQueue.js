@@ -202,7 +202,7 @@ describe('Songs - addSongToQueue()', () => {
     });
 
     it(`Song is not added to queue (incorrect category)`, async () => {
-      await message.isSent('songs.incorrect-category', user.owner, {});
+      await message.isSent('songs.incorrect-category', user.owner, {}, 10000);
     });
 
     it(`Queue is empty`, async () => {
@@ -230,7 +230,7 @@ describe('Songs - addSongToQueue()', () => {
     });
 
     it(`Song is not added to queue (incorrect category)`, async () => {
-      await message.isSent('songs.incorrect-category', user.owner, {});
+      await message.isSent('songs.incorrect-category', user.owner, {}, 10000);
     });
 
     it(`Queue is empty`, async () => {
@@ -258,7 +258,7 @@ describe('Songs - addSongToQueue()', () => {
     });
 
     it(`Song is not added to queue (incorrect category)`, async () => {
-      await message.isSent('songs.incorrect-category', user.owner, {});
+      await message.isSent('songs.incorrect-category', user.owner, {}, 10000);
     });
 
     it(`Queue is empty`, async () => {
