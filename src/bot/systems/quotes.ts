@@ -17,6 +17,7 @@ class Quotes extends System {
     super();
 
     this.addMenu({ category: 'manage', name: 'quotes', id: 'manage/quotes/list' });
+    this.addMenuPublic({ id: 'quotes', name: 'quotes'});
   }
 
   sockets() {

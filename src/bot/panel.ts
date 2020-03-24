@@ -5,7 +5,7 @@ import bodyParser from 'body-parser';
 import path from 'path';
 import { flatten } from './helpers/flatten';
 import gitCommitInfo from 'git-commit-info';
-import { adminEndpoint } from './helpers/socket';
+import { adminEndpoint, publicEndpoint } from './helpers/socket';
 
 import { info } from './helpers/log';
 import { CacheTitles } from './database/entity/cacheTitles';
@@ -33,7 +33,7 @@ import customvariables from './customvariables';
 import highlights from './systems/highlights';
 import _ from 'lodash';
 import { getOwnerAsSender, getTime } from './commons';
-import { app, ioServer, menu, server, setApp, setIOServer, setServer, widgets } from './helpers/panel';
+import { app, ioServer, menu, menuPublic, server, setApp, setIOServer, setServer, widgets } from './helpers/panel';
 
 const port = process.env.PORT ?? '20000';
 
@@ -479,8 +479,12 @@ export const init = () => {
       socket.emit(data.emit, { isRegistered: new Parser().find(data.command) });
     });
 
-    socket.on('menu', (cb) => {
+    adminEndpoint('/', 'menu', (cb) => {
       cb(menu);
+    });
+
+    publicEndpoint('/', 'menu::public', (cb) => {
+      cb(menuPublic);
     });
 
     socket.on('translations', (cb) => {

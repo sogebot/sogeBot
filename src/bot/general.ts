@@ -57,6 +57,8 @@ class General extends Core {
   constructor() {
     super();
     setInterval(gracefulExit, 1000);
+
+    this.addMenuPublic({ name: 'dashboard', id: '' });
   }
 
   @command('!enable')

@@ -16,7 +16,7 @@ import { flatten, unflatten } from './helpers/flatten';
 import { existsSync } from 'fs';
 import { isDbConnected } from './helpers/database';
 import { register } from './helpers/register';
-import { addMenu, addWidget, ioServer } from './helpers/panel';
+import { addMenu, addMenuPublic, addWidget, ioServer, menuPublic } from './helpers/panel';
 
 let socket: import('./socket').Socket | any = null;
 
@@ -442,6 +442,12 @@ class Module {
   public addMenu(opts) {
     if (isMainThread) {
       addMenu(opts);
+    }
+  }
+
+  public addMenuPublic(opts: typeof menuPublic[0]) {
+    if (isMainThread) {
+      addMenuPublic(opts);
     }
   }
 

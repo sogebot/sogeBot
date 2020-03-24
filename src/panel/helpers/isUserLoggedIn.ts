@@ -2,17 +2,22 @@ import axios from 'axios';
 import { get } from 'lodash-es';
 import { getSocket } from './socket';
 
-export const isUserLoggedIn = async function () {
+export const isUserLoggedIn = async function (mustBeLogged = true) {
   // check if we have auth code
   const code = localStorage.getItem('code') || '';
   if (code.trim().length === 0) {
-    console.log('Redirecting, user is not authenticated');
-    if (window.location.href.includes('popout')) {
-      window.location.replace(window.location.origin + '/login#error=popout+must+be+logged#url=' + window.location.href);
-      return false;
+    if (mustBeLogged) {
+      console.log('Redirecting, user is not authenticated');
+      if (window.location.href.includes('popout')) {
+        window.location.replace(window.location.origin + '/login#error=popout+must+be+logged#url=' + window.location.href);
+        return false;
+      } else {
+        window.location.replace(window.location.origin + '/login');
+        return false;
+      }
     } else {
-      window.location.replace(window.location.origin + '/login');
-      return false;
+      console.debug('User is not needed to be logged, returning null');
+      return null;
     }
   } else {
     try {
@@ -39,7 +44,7 @@ export const isUserLoggedIn = async function () {
 
       // save userId to db
       await new Promise((resolve, reject) => {
-        const socket = getSocket('/core/users');
+        const socket = getSocket('/core/users', !mustBeLogged);
         socket.emit('viewers::updateId', {
           userId: Number(data.id),
           username: data.login,
@@ -54,17 +59,19 @@ export const isUserLoggedIn = async function () {
       return data;
     } catch(e) {
       console.debug(e);
-      if (e === 'User doesn\'t have access to this endpoint') {
-        window.location.replace(window.location.origin + '/login#error=must+be+caster');
-      } else {
-        console.log('Redirecting, user code expired');
-        if (window.location.href.includes('popout')) {
-          window.location.replace(window.location.origin + '/login#error=popout+must+be+logged');
+      if (mustBeLogged) {
+        if (e === 'User doesn\'t have access to this endpoint') {
+          window.location.replace(window.location.origin + '/login#error=must+be+caster');
         } else {
-          window.location.replace(window.location.origin + '/login');
+          console.log('Redirecting, user code expired');
+          if (window.location.href.includes('popout')) {
+            window.location.replace(window.location.origin + '/login#error=popout+must+be+logged');
+          } else {
+            window.location.replace(window.location.origin + '/login');
+          }
         }
       }
-      return;
+      return null;
     }
   }
 };
