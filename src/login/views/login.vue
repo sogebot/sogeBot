@@ -48,7 +48,7 @@ export default class Login extends Vue {
       JSON.stringify({
         popoutUrl: this.popoutUrl,
         url: this.url,
-        refferer: document.referrer,
+        referrer: document.referrer,
       })
     )))
   }
