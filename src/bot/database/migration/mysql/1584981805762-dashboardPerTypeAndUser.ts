@@ -20,7 +20,7 @@ export class dashboardPerTypeAndUser1584981805762 implements MigrationInterface 
       const columnUserId = new TableColumn({ type: 'int', default: broadcasterId, name: 'userId' });
       const columnType = new TableColumn({ type: 'varchar', default: '\'admin\'', name: 'type', length: '6' });
 
-      const widgets = await queryRunner.query(`SELECT * from widget WHERE dashboardId NOT NULL`);
+      const widgets = await queryRunner.query('SELECT * from `widget` WHERE `dashboardId` IS NOT NULL');
 
       // add new columns with default values
       await queryRunner.addColumns('dashboard', [
@@ -34,7 +34,7 @@ export class dashboardPerTypeAndUser1584981805762 implements MigrationInterface 
       await queryRunner.query('DELETE FROM `widget` WHERE `id` > 0');
       for (const widget of widgets) {
         await queryRunner.query(
-          'INSERT INTO widget(id, name, positionX, positionY, height, width, dashboardId) values(?, ?, ?, ?, ?, ? ,?)',
+          'INSERT INTO `widget`(`id`, `name`, `positionX`, `positionY`, `height`, `width`, `dashboardId`) values(?, ?, ?, ?, ?, ? ,?)',
           [widget.id, widget.name, widget.positionX, widget.positionY, widget.height, widget.width, widget.dashboardId]);
       }
     } catch (e) {
