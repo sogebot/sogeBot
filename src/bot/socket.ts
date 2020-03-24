@@ -214,11 +214,15 @@ class Socket extends Core {
       });
     };
 
-    socket.on('newAuthorization', async (userId, username, cb) => {
+    socket.on('newAuthorization', async (userData, cb) => {
+      const userId = Number(userData.userId);
+      const username = userData.username;
+
       const userPermission = await permissions.getUserHighestPermission(userId);
       const user = await getRepository(User).findOne({ userId });
       await getRepository(User).save({
         ...user,
+        userId,
         username,
       });
       const auth: Readonly<SocketInterface> = {
