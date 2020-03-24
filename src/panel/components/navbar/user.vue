@@ -31,17 +31,12 @@
         <loading no-margin/>
       </b-dropdown-text>
     </b-dropdown>
-    <b-dropdown v-else no-caret variant="light" toggle-class="btn-sm p-0 pl-1 pr-1">
-      <template v-slot:button-content>
-        <b-img blank-color="#777" src="https://via.placeholder.com/50?text=?" rounded="circle" alt="Circle image" style="width:30px;"></b-img>
+    <template v-else>
+      <b-button @click="login" class="border-0 ml-1 p-1 pl-2 pr-2 btn-sm" variant="light">
+        <fa icon="user-circle" fixed-width/>
         Not logged in
-      </template>
-      <b-dropdown-text style="width:300px;">
-        <b-button variant="success" class="float-right" @click="login">
-          <fa icon="sign-in-alt" fixed-width /> Login
-        </b-button>
-      </b-dropdown-text>
-    </b-dropdown>
+      </b-button>
+    </template>
   </div>
 </template>
 
@@ -50,6 +45,10 @@
 import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import { PermissionsInterface } from 'src/bot/database/entity/permissions'
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faUserCircle } from '@fortawesome/free-solid-svg-icons'
+library.add(faUserCircle);
 
 @Component({
   components: {
