@@ -107,6 +107,11 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 import { chunk, debounce, get, isNil } from 'lodash-es';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faRedoAlt } from '@fortawesome/free-solid-svg-icons';
+library.add(faRedoAlt);
+
 import moment from 'moment';
 export default {
   props: ['popout', 'nodrag'],
