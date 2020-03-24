@@ -31,6 +31,17 @@
         <loading no-margin/>
       </b-dropdown-text>
     </b-dropdown>
+    <b-dropdown v-else no-caret variant="light" toggle-class="btn-sm p-0 pl-1 pr-1">
+      <template v-slot:button-content>
+        <b-img blank-color="#777" src="https://via.placeholder.com/50?text=?" rounded="circle" alt="Circle image" style="width:30px;"></b-img>
+        Not logged in
+      </template>
+      <b-dropdown-text style="width:300px;">
+        <b-button variant="success" class="float-right" @click="login">
+          <fa icon="sign-in-alt" fixed-width /> Login
+        </b-button>
+      </b-dropdown-text>
+    </b-dropdown>
   </div>
 </template>
 
@@ -47,7 +58,7 @@ import { PermissionsInterface } from 'src/bot/database/entity/permissions'
 })
 export default class User extends Vue {
   data: any = null;
-  socket = getSocket('/core/users');
+  socket = getSocket('/core/users', true);
   interval = 0;
 
   isViewerLoaded: boolean = false;
@@ -110,9 +121,13 @@ export default class User extends Vue {
     window.location.replace(window.location.origin + '/login#error=logged+out');
   }
 
+  login() {
+    window.location.replace(window.location.origin + '/login');
+  }
+
   refreshViewer() {
-    if (typeof this.$loggedUser === 'undefined') {
-      return setTimeout(() => this.refreshViewer(), 100);
+    if (typeof this.$loggedUser === 'undefined'|| this.$loggedUser === null) {
+      return;
     }
     this.socket.emit('viewers::findOne', this.$loggedUser.id, (err, viewer) => {
       if (err) {

@@ -1,5 +1,5 @@
 <template lang="pug">
-  b-container.fluid
+  b-container.fluid.pt-2
     b-row
       b-col
         span.title.text-default.mb-2 {{ translate('song-requests') }}

@@ -5,6 +5,9 @@ const sockets: {[namespace: string]: SocketIOClient.Socket} = {};
 const authorizeInProgress = false;
 
 export function getSocket(namespace: string, continueOnUnauthorized = false) {
+  /* if (!continueOnUnauthorized) {
+    throw new Error('Redirecting, user is not authenticated');
+  } */
   if (typeof sockets[namespace] === 'undefined') {
     const socket = io(namespace, { forceNew: true });
     socket.on('authorize', (cb) => {

@@ -12,7 +12,6 @@ import VueMoment from 'vue-moment';
 import translate from 'src/panel/helpers/translate';
 import { ButtonStates, states } from 'src/panel/helpers/buttonStates';
 import { setMainLoaded } from 'src/panel/helpers/isAvailableVariable';
-import { getListOf } from 'src/panel/helpers/getListOf';
 import { getConfiguration, getTranslations } from 'src/panel/helpers/socket';
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -33,6 +32,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faCaretLeft,
 } from '@fortawesome/free-solid-svg-icons';
+import { isUserLoggedIn } from 'src/panel/helpers/isUserLoggedIn';
 library.add(faCaretLeft);
 
 export interface Global {
@@ -49,24 +49,6 @@ declare module 'vue/types/vue' {
     urlParam(key: string): string | null;
     translate(id: string): string;
     $loggedUser: any | null;
-    $systems: {
-      name: string;
-      enabled: boolean;
-      areDependenciesEnabled: boolean;
-      isDisabledByEnv: boolean;
-    }[];
-    $core: {
-      name: string;
-      enabled: boolean;
-      areDependenciesEnabled: boolean;
-      isDisabledByEnv: boolean;
-    }[];
-    $integrations: {
-      name: string;
-      enabled: boolean;
-      areDependenciesEnabled: boolean;
-      isDisabledByEnv: boolean;
-    }[];
   }
 }
 
@@ -75,13 +57,9 @@ Vue.use(VueRouter);
 const main = async () => {
   // init prototypes
   Vue.prototype.translate = (v) => translate(v);
-
+  Vue.prototype.$loggedUser = await isUserLoggedIn(false);
   await getTranslations();
   Vue.prototype.configuration = await getConfiguration();
-
-  Vue.prototype.$core = await getListOf('core');
-  Vue.prototype.$systems = await getListOf('systems');
-  Vue.prototype.$integrations = await getListOf('integrations');
 
   Vue.prototype.$state = ButtonStates;
 
@@ -100,11 +78,17 @@ const main = async () => {
 
   new Vue({
     router,
+    components: {
+      navbar: () => import('./components/navbar/navbar.vue'),
+      twitch: () => import('./components/twitch.vue'),
+    },
     created() {
       this.$moment.locale(Vue.prototype.configuration.lang); // set proper moment locale
     },
     template: `
       <div id="app">
+        <navbar/>
+        <twitch/>
         <router-view class="view"></router-view>
       </div>
     `,
