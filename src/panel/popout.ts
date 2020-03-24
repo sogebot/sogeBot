@@ -120,10 +120,11 @@ const main = async () => {
         this.$moment.locale(get(Vue, 'prototype.configuration.lang', 'en'));
 
         // theme load
+        const theme = localStorage.getItem('theme');
         const head = document.getElementsByTagName('head')[0];
         const link = (document.createElement('link') as any);
         link.setAttribute('rel', 'stylesheet');
-        link.setAttribute('href',`/dist/css/${get(Vue, 'prototype.configuration.core.ui.theme', 'light')}.css`);
+        link.setAttribute('href',`/dist/css/${theme || 'light'}.css`);
         head.appendChild(link);
       },
       template: `

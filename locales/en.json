@@ -16,7 +16,6 @@
       "error": "$sender, API is not responding correctly!",
       "not-available": "not available"
     },
-    "theme": "",
     "percentage": {
       "true": "", "false": ""
     },
@@ -763,8 +762,6 @@
     "noisy": "noisy",
     "true": "true",
     "false": "false",
-    "light": "light theme",
-    "dark": "dark theme",
     "gambling": "Gambling",
     "seppukuTimeout": "Timeout for !seppuku",
     "rouletteTimeout": "Timeout for !roulette",

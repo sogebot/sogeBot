@@ -187,21 +187,21 @@
                       <codemirror style="font-size: 1.1em;" v-if="customShow === 'html'" class="w-100" v-model="currentGoal.customizationHtml" :options="{
                         tabSize: 4,
                         mode: 'text/html',
-                        theme: 'base16-' + configuration.core.ui.theme,
+                        theme: 'base16-' + (localStorage.getItem('theme') || 'light'),
                         lineNumbers: true,
                         line: true,
                       }"></codemirror>
                       <codemirror style="font-size: 1.1em;" v-if="customShow === 'js'" class="w-100" v-model="currentGoal.customizationJs" :options="{
                         tabSize: 4,
                         mode: 'text/javascript',
-                        theme: 'base16-' + configuration.core.ui.theme,
+                        theme: 'base16-' + (localStorage.getItem('theme') || 'light'),
                         lineNumbers: true,
                         line: true,
                       }"></codemirror>
                       <codemirror style="font-size: 1.1em;" v-if="customShow === 'css'" class="w-100"  v-model="currentGoal.customizationCss" :options="{
                         tabSize: 4,
                         mode: 'text/css',
-                        theme: 'base16-' + configuration.core.ui.theme,
+                        theme: 'base16-' + (localStorage.getItem('theme') || 'light'),
                         lineNumbers: true,
                         line: true,
                       }"></codemirror>

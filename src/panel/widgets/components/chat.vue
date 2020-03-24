@@ -81,7 +81,7 @@ export default {
         + '//twitch.tv/embed/'
         + this.room
         + '/chat'
-        + (this.configuration.core.ui.theme.includes('dark') ? '?darkpopout' : '')
+        + ((localStorage.getItem('theme') || 'light') === 'dark' ? '?darkpopout' : '')
     }
   },
   methods: {

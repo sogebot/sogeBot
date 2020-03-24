@@ -1,5 +1,5 @@
 import Core from './_interface';
-import { settings, ui } from './decorators';
+import { settings } from './decorators';
 import { onChange, onLoad } from './decorators/on';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import { filter, isString, set } from 'lodash';
@@ -15,13 +15,6 @@ import { find, list } from './helpers/register';
 const timezone = (process.env.TIMEZONE ?? 'system') === 'system' || !process.env.TIMEZONE ? moment.tz.guess() : process.env.TIMEZONE;
 
 class UI extends Core {
-  @settings()
-  @ui({
-    type: 'selector',
-    values: ['light', 'dark'],
-  })
-  public theme: 'light' | 'dark' = 'light';
-
   @settings()
   public domain = 'localhost';
 

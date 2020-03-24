@@ -9,6 +9,7 @@
               span.d-none.d-sm-inline.pl-2 {{ version }}
         b-col.d-flex.justify-content-end.align-items-center
           checklist
+          theme
           user
 
           b-dropdown(variant="light" toggle-class="text-decoration-none" no-caret)
@@ -39,6 +40,7 @@ library.add(faBars, faSignInAlt, faSignOutAlt);
     checklist: () => import('./checklist.vue'),
     user: () => import('./user.vue'),
     navmenu: () => import('./menu.vue'),
+    theme: () => import('./theme.vue'),
   },
 })
 export default class navbar extends Vue {
