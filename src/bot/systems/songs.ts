@@ -547,7 +547,7 @@ class Songs extends System {
           // try once more to be sure
           setTimeout(() => {
             this.addSongToQueue({ ...opts, retry: (opts.retry ?? 0) + 1 });
-          }, 1000);
+          }, 500);
           return ;
         }
         if (global.mocha) {
