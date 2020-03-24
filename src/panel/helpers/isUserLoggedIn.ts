@@ -2,7 +2,7 @@ import axios from 'axios';
 import { get } from 'lodash-es';
 import { getSocket } from './socket';
 
-export const isUserLoggedIn = async function (mustBeLogged = true) {
+export const isUserLoggedIn = async function (mustBeLogged = true, mustBeAdmin = true) {
   // check if we have auth code
   const code = localStorage.getItem('code') || '';
   if (code.trim().length === 0) {
@@ -37,9 +37,32 @@ export const isUserLoggedIn = async function (mustBeLogged = true) {
       const newAuthorization = localStorage.getItem('newAuthorization');
       if (newAuthorization !== null) {
         await new Promise((resolve) => {
-          getSocket('/', true).emit('newAuthorization', { userId: Number(data.id), username: data.login }, () => resolve());
+          getSocket('/', true).emit('newAuthorization', { userId: Number(data.id), username: data.login }, () => {
+            resolve();
+          });
         });
       }
+
+      if (mustBeAdmin) {
+        await new Promise((resolve, reject) => {
+          const check = () => {
+            const userType = localStorage.getItem('userType');
+            if (!userType) {
+              setTimeout(() => check(), 100);
+            }
+
+            if (userType) {
+              if (userType === 'admin') {
+                resolve();
+              } else {
+                reject('User doesn\'t have access to this endpoint');
+              }
+            }
+          };
+          check();
+        });
+      }
+
       localStorage.removeItem('newAuthorization');
       return data;
     } catch(e) {

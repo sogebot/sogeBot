@@ -57,7 +57,7 @@ Vue.use(VueRouter);
 const main = async () => {
   // init prototypes
   Vue.prototype.translate = (v) => translate(v);
-  Vue.prototype.$loggedUser = await isUserLoggedIn(false);
+  Vue.prototype.$loggedUser = await isUserLoggedIn(false, false);
   await getTranslations();
   Vue.prototype.configuration = await getConfiguration();
 
