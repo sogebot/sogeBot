@@ -214,6 +214,18 @@ class Socket extends Core {
       });
     };
 
+    socket.on('logout', async(tokens: { accessToken: string | null; refreshToken: string | null}) => {
+      debug('sockets', 'user::logout');
+      debug('sockets', tokens);
+      if (tokens.accessToken) {
+        await getRepository(SocketEntity).delete({ accessToken: tokens.accessToken });
+      }
+
+      if (tokens.refreshToken) {
+        await getRepository(SocketEntity).delete({ refreshToken: tokens.refreshToken });
+      }
+    });
+
     socket.on('newAuthorization', async (userData, cb) => {
       const userId = Number(userData.userId);
       const username = userData.username;

@@ -116,7 +116,14 @@ export default class User extends Vue {
   }
 
   logout() {
+    this.socket.emit('logout', {
+      accessToken: localStorage.getItem('accessToken'),
+      refreshToken: localStorage.getItem('refreshToken'),
+    });
     localStorage.setItem('code', '');
+    localStorage.setItem('accessToken', '');
+    localStorage.setItem('refreshToken', '');
+    localStorage.setItem('userType', 'unauthorized');
     window.location.replace(window.location.origin + '/login#error=logged+out');
   }
 
