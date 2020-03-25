@@ -60,6 +60,7 @@ const main = async () => {
   Vue.prototype.$loggedUser = await isUserLoggedIn(false, false);
   await getTranslations();
   Vue.prototype.configuration = await getConfiguration();
+  console.log(Vue.prototype.configuration);
 
   Vue.prototype.$state = ButtonStates;
 

@@ -1,5 +1,6 @@
 {
   "settings": {
+    "theme": "Default theme",
     "domain": "Doména",
     "percentage": "Rozdíl v procentech",
     "shortennumbers": "Zkrácený formát čísel",

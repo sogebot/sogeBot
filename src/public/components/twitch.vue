@@ -26,6 +26,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
+import { get } from 'lodash-es';
 
 @Component({})
 export default class navbar extends Vue {
@@ -40,7 +41,7 @@ export default class navbar extends Vue {
     })
 
     setInterval(() => {
-      this.theme = (localStorage.getItem('theme') || 'light');
+      this.theme = (localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light'));
     }, 100)
   }
 

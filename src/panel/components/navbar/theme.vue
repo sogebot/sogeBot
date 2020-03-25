@@ -7,6 +7,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
+import { get } from 'lodash-es';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSun, faMoon } from '@fortawesome/free-solid-svg-icons';
@@ -18,7 +19,7 @@ export default class User extends Vue {
 
   async mounted() {
     const theme = localStorage.getItem('theme');
-    this.loadTheme(theme || 'light');
+    this.loadTheme(theme || get(Vue, 'prototype.configuration.core.ui.theme', 'light'));
 
   }
 

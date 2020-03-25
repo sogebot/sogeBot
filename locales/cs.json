@@ -773,6 +773,8 @@
     "noisy": "hlasitý",
     "true": "ano",
     "false": "ne",
+    "light": "světlý theme",
+    "dark": "tmavý theme",
     "gambling": "Gambling",
     "seppukuTimeout": "Timeout pro !seppuku",
     "rouletteTimeout": "Timeout pro !roulette",

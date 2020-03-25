@@ -54,6 +54,7 @@
 import { getSocket } from 'src/panel/helpers/socket';
 import { sortedUniq, flatten } from 'lodash-es';
 import { EventBus } from 'src/panel/helpers/event-bus';
+import { get } from 'lodash-es';
 
 export default {
   props: ['popout', 'nodrag'],
@@ -81,7 +82,7 @@ export default {
         + '//twitch.tv/embed/'
         + this.room
         + '/chat'
-        + ((localStorage.getItem('theme') || 'light') === 'dark' ? '?darkpopout' : '')
+        + ((localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light')) === 'dark' ? '?darkpopout' : '')
     }
   },
   methods: {

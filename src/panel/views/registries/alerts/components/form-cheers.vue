@@ -186,21 +186,21 @@
       <codemirror style="font-size: 0.8em;" v-if="customShow === 'html'" class="w-100" v-model="data.advancedMode.html" :options="{
         tabSize: 4,
         mode: 'text/html',
-        theme: 'base16-' + (localStorage.getItem('theme') || 'light'),
+        theme: 'base16-' + (localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light')),
         lineNumbers: true,
         line: true,
       }"></codemirror>
       <codemirror style="font-size: 0.8em;" v-if="customShow === 'js'" class="w-100" v-model="data.advancedMode.js" :options="{
         tabSize: 4,
         mode: 'text/javascript',
-        theme: 'base16-' + (localStorage.getItem('theme') || 'light'),
+        theme: 'base16-' + (localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light')),
         lineNumbers: true,
         line: true,
       }"></codemirror>
       <codemirror style="font-size: 0.8em;" v-if="customShow === 'css'" class="w-100"  v-model="data.advancedMode.css" :options="{
         tabSize: 4,
         mode: 'text/css',
-        theme: 'base16-' + (localStorage.getItem('theme') || 'light'),
+        theme: 'base16-' + (localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light')),
         lineNumbers: true,
         line: true,
       }"></codemirror>
@@ -452,6 +452,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, PropSync, Watch } from 'vue-property-decorator';
 import type { AlertTipInterface } from 'src/bot/database/entity/alert';
+import { get } from 'lodash-es';
 
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/mode/javascript/javascript.js';
@@ -485,6 +486,7 @@ export default class AlertsEditCheersForm extends Vue {
 
   customShow: 'html' | 'css' | 'js' = 'html';
   fonts: {text: string; value: string}[] = [];
+  get = get;
 
   @Watch('$v', { deep: true })
   emitValidation() {
