@@ -39,6 +39,16 @@ const port = process.env.PORT ?? '20000';
 
 export let socketsConnected = 0;
 
+export type UIError = { name: string; message: string };
+
+const errors: UIError[] = [];
+
+export const addUIError = (error: UIError) => {
+  errors.push(error);
+};
+
+addUIError({ name: 'SPOTIFY', message: 'Refreshing access token failed.' });
+
 export const init = () => {
   setApp(express());
   app?.use(bodyParser.json());
@@ -315,6 +325,23 @@ export const init = () => {
       });
       await getRepository(Translation).delete({ name: data.name });
       callback(translate(data.name));
+    });
+
+    adminEndpoint('/', 'panel::errors', (cb) => {
+      const errorsToShow: typeof errors  = [];
+      do {
+        const error = errors.shift();
+        if (!error) {
+          break;
+        }
+
+        if (!errorsToShow.find((o) => {
+          return o.name === error.name && o.message === error.message;
+        })) {
+          errorsToShow.push(error);
+        }
+      } while (errors.length > 0);
+      cb(null, errorsToShow);
     });
 
     adminEndpoint('/', 'panel::availableWidgets', async (userId: number, type: DashboardInterface['type'], cb) => {

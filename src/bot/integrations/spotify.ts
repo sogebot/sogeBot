@@ -13,6 +13,7 @@ import Integration from './_interface';
 import { debug, error, info, warning } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import api from '../api';
+import { addUIError } from '../panel';
 
 /*
  * How to integrate:
@@ -326,6 +327,10 @@ class Spotify extends Integration {
         this.authenticatedScopes = [];
       }
     }
+
+    if (this.retry.IRefreshToken >= 5) {
+      addUIError({ name: 'SPOTIFY', message: 'Refreshing access token failed.' });
+    }
     this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
   }
 
@@ -444,6 +449,7 @@ class Spotify extends Integration {
               this.retry.IRefreshToken = 0;
             }, (err) => {
               if (err) {
+                addUIError({ name: 'SPOTIFY', message: 'Getting of accessToken and refreshToken failed.' });
                 info(chalk.yellow('SPOTIFY: ') + 'Getting of accessToken and refreshToken failed');
               }
             });
@@ -453,6 +459,7 @@ class Spotify extends Integration {
         }
       } catch (e) {
         error(e.stack);
+        addUIError({ name: 'SPOTIFY', message: 'Client connection failed.' });
         info(chalk.yellow('SPOTIFY: ') + 'Client connection failed');
       }
     } catch (e) {
