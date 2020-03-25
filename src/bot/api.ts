@@ -5,7 +5,7 @@ import moment from 'moment';
 require('moment-precise-range-plugin'); // moment.preciseDiff
 import { isMainThread } from './cluster';
 import chalk from 'chalk';
-import { defaults, filter, get, isNil, isNull, map } from 'lodash';
+import { cloneDeep, defaults, filter, get, isNil, isNull, map } from 'lodash';
 
 import * as constants from './constants';
 import Core from './_interface';
@@ -37,6 +37,17 @@ import { getFunctionList } from './decorators/on';
 import { linesParsed, setStatus } from './helpers/parser';
 import { isDbConnected } from './helpers/database';
 import { find } from './helpers/register';
+
+let intervals = 0;
+
+const isAPIFree = (intervals) => {
+  for (const key of Object.keys(intervals)) {
+    if (intervals[key].inProgress) {
+      return false;
+    }
+  }
+  return true;
+};
 
 const setImmediateAwait = () => {
   return new Promise(resolve => {
@@ -174,6 +185,7 @@ class API extends Core {
   api_timeouts: {
     [fnc: string]: {
       isRunning: boolean;
+      inProgress: boolean;
       opts: any;
     };
   } = {};
@@ -185,7 +197,7 @@ class API extends Core {
     if (isMainThread) {
       this.interval('getCurrentStreamData', constants.MINUTE);
       this.interval('getCurrentStreamTags', constants.MINUTE);
-      this.interval('updateChannelViewsAndBroadcasterType', constants.MINUTE);
+      this.interval('updateChannelViewsAndBroadcasterType', constants.HOUR);
       this.interval('getLatest100Followers', constants.MINUTE);
       this.interval('getChannelFollowers', constants.DAY);
       this.interval('getChannelHosts', 5 * constants.MINUTE);
@@ -193,7 +205,7 @@ class API extends Core {
       this.interval('getChannelChattersUnofficialAPI', 5 * constants.MINUTE);
       this.interval('getChannelDataOldAPI', constants.MINUTE);
       this.interval('checkClips', constants.MINUTE);
-      this.interval('getAllStreamTags', constants.HOUR * 12);
+      this.interval('getAllStreamTags', constants.DAY);
 
       setTimeout(() => {
         // free thread_event
@@ -227,36 +239,40 @@ class API extends Core {
   }
 
   async interval (fnc, interval) {
-    setInterval(async () => {
-      if (typeof this.api_timeouts[fnc] === 'undefined') {
-        this.api_timeouts[fnc] = { opts: {}, isRunning: false };
-      }
-
-      if (!this.api_timeouts[fnc].isRunning) {
-        this.api_timeouts[fnc].isRunning = true;
-        const started_at = Date.now();
-        debug('api.interval', chalk.yellow(fnc + '() ') + 'start');
-        const value = await this[fnc](this.api_timeouts[fnc].opts);
-        debug('api.interval', chalk.yellow(fnc + '(time: ' + (Date.now() - started_at) + ') ') + JSON.stringify(value));
-
-        if (value.disable) {
-          return;
+    intervals++;
+    setTimeout(() => {
+      setInterval(async () => {
+        if (typeof this.api_timeouts[fnc] === 'undefined') {
+          this.api_timeouts[fnc] = { opts: {}, isRunning: false, inProgress: false };
         }
-        if (value.state) { // if is ok, update opts and run unlock after a while
-          if (typeof value.opts !== 'undefined') {
-            this.api_timeouts[fnc].opts = value.opts;
+
+        if (!this.api_timeouts[fnc].isRunning && isAPIFree(cloneDeep(this.api_timeouts))) {
+          this.api_timeouts[fnc].inProgress = true;
+          this.api_timeouts[fnc].isRunning = true;
+          const started_at = Date.now();
+          debug('api.interval', chalk.yellow(fnc + '() ') + 'start');
+          const value = await this[fnc](this.api_timeouts[fnc].opts);
+          debug('api.interval', chalk.yellow(fnc + '(time: ' + (Date.now() - started_at) + ') ') + JSON.stringify(value));
+          this.api_timeouts[fnc].inProgress = false;
+          if (value.disable) {
+            return;
           }
-          setTimeout(() => {
+          if (value.state) { // if is ok, update opts and run unlock after a while
+            if (typeof value.opts !== 'undefined') {
+              this.api_timeouts[fnc].opts = value.opts;
+            }
+            setTimeout(() => {
+              this.api_timeouts[fnc].isRunning = false;
+            }, interval);
+          } else { // else run next tick
+            if (typeof value.opts !== 'undefined') {
+              this.api_timeouts[fnc].opts = value.opts;
+            }
             this.api_timeouts[fnc].isRunning = false;
-          }, interval);
-        } else { // else run next tick
-          if (typeof value.opts !== 'undefined') {
-            this.api_timeouts[fnc].opts = value.opts;
           }
-          this.api_timeouts[fnc].isRunning = false;
         }
-      }
-    }, 1000);
+      }, 30000);
+    }, intervals * 1000);
   }
 
   async followerUpdatePreCheck (username: string) {
