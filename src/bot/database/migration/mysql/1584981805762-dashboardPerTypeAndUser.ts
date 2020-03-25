@@ -31,7 +31,7 @@ export class dashboardPerTypeAndUser1584981805762 implements MigrationInterface 
       await queryRunner.changeColumn('dashboard', 'userId', columnUserIdWithoutDefault);
       await queryRunner.changeColumn('dashboard', 'type', columnTypeWithoutDefault);
 
-      await queryRunner.query('DELETE FROM `widget` WHERE `id` > 0');
+      await queryRunner.query('DELETE FROM `widget` WHERE 1=1');
       for (const widget of widgets) {
         await queryRunner.query(
           'INSERT INTO `widget`(`id`, `name`, `positionX`, `positionY`, `height`, `width`, `dashboardId`) values(?, ?, ?, ?, ?, ? ,?)',
@@ -41,8 +41,8 @@ export class dashboardPerTypeAndUser1584981805762 implements MigrationInterface 
       if (e.message !== 'broadcasterId') {
         throw new Error(e);
       }
-      await queryRunner.query('DELETE FROM `widget` WHERE `id` > 0');
-      await queryRunner.query('DELETE FROM `dashboard` WHERE `id` > 0');
+      await queryRunner.query('DELETE FROM `widget` WHERE 1=1');
+      await queryRunner.query('DELETE FROM `dashboard` WHERE 1=1');
       // add new columns without default values
       await queryRunner.addColumns('dashboard', [
         columnUserIdWithoutDefault, columnTypeWithoutDefault,
