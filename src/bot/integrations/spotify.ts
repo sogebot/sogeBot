@@ -72,8 +72,7 @@ class Spotify extends Integration {
   @settings('connection')
   @ui({ type: 'text-input', readOnly: true })
   username = '';
-  @settings('connection')
-  @ui({ type: 'checklist', current: 'authenticatedScopes' })
+
   scopes: string[] = [
     'user-read-currently-playing',
     'user-read-private',
@@ -84,10 +83,6 @@ class Spotify extends Integration {
     'playlist-modify-private',
     'playlist-read-private',
     'user-modify-playback-state' ];
-  @settings('connection')
-  @ui({ ignore: true })
-  authenticatedScopes: string[] = [];
-  _authenticatedScopes: string[] = []; // to save scopes for retries
 
   @ui({
     type: 'btn-emit',
@@ -318,12 +313,10 @@ class Spotify extends Integration {
           this.client.setAccessToken(data.body.access_token);
           this._accessToken = data.body.access_token;
           this.retry.IRefreshToken = 0;
-          this.authenticatedScopes = [...this._authenticatedScopes];
         }
       } catch (e) {
         this.retry.IRefreshToken++;
         info(chalk.yellow('SPOTIFY: ') + 'Refreshing access token failed ' + (this.retry.IRefreshToken > 0 ? 'retrying #' + this.retry.IRefreshToken : ''));
-        this.authenticatedScopes = [];
       }
     }
     this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
@@ -369,7 +362,6 @@ class Spotify extends Integration {
       this.userId = null;
       this._accessToken = null;
       this._refreshToken = null;
-      this.authenticatedScopes = [];
       this.username = '';
       this.currentSong = JSON.stringify({});
 
@@ -434,8 +426,6 @@ class Spotify extends Integration {
         if (opts.token && !_.isNil(this.client)) {
           this.client.authorizationCodeGrant(opts.token)
             .then((data) => {
-              this.authenticatedScopes = data.body.scope.split(' ');
-              this._authenticatedScopes = data.body.scope.split(' ');
               this._accessToken = data.body.access_token;
               this._refreshToken = data.body.refresh_token;
 
