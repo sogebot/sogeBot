@@ -279,6 +279,13 @@ class Songs extends System {
         const ban = (resolve) => {
           ytdl.getInfo('https://www.youtube.com/watch?v=' + opts.parameters, async (err, videoInfo) => {
             if (err) {
+              if (Number(opts.retry ?? 0) < 5) {
+                // try once more to be sure
+                setTimeout(() => {
+                  this.banSongById({ ...opts, retry: (opts.retry ?? 0) + 1 });
+                }, 500);
+                return;
+              }
               error(err);
             } else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title)) {
               banned++;
@@ -536,6 +543,13 @@ class Songs extends System {
 
     ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, async (err, videoInfo) => {
       if (err) {
+        if (Number(opts.retry ?? 0) < 5) {
+          // try once more to be sure
+          setTimeout(() => {
+            this.addSongToQueue({ ...opts, retry: (opts.retry ?? 0) + 1 });
+          }, 500);
+          return;
+        }
         return error(err);
       }
       if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
@@ -548,7 +562,7 @@ class Songs extends System {
           setTimeout(() => {
             this.addSongToQueue({ ...opts, retry: (opts.retry ?? 0) + 1 });
           }, 500);
-          return ;
+          return;
         }
         if (global.mocha) {
           error(videoInfo.media);
