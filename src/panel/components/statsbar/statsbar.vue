@@ -1,5 +1,8 @@
 <template>
   <div class="stream-info-container container-fluid" :class="{ 'sticky-top': b_sticky }" :style="{ 'top': b_sticky ? top + 'px' : undefined }" ref="quickwindow">
+    <b-toast :title="error.name" visible variant="danger" v-for="error of errors" :key="error.name + error.message">
+      {{ error.message }}
+    </b-toast>
     <b-toast title="Owner and broadcaster oauth is not set" no-auto-hide visible variant="danger" solid v-if="!configuration.isCastersSet">
       Please set your <a href="#/settings/core/oauth">broadcaster oauth or owners</a>, or all users <strong>will have access</strong> to this dashboard and will be considered as <strong>casters</strong>.
     </b-toast>
@@ -285,6 +288,8 @@
   import { EventBus } from 'src/panel/helpers/event-bus';
   import { getSocket } from 'src/panel/helpers/socket';
 
+  import type { UIError } from 'src/bot/panel';
+
   import { library } from '@fortawesome/fontawesome-svg-core';
   import {
     faCaretDown, faCaretUp
@@ -294,6 +299,7 @@
   export default Vue.extend({
     data: function () {
       const object: {
+        errors: UIError[],
         highlightsSocket: any,
 
         averageStats: any,
@@ -335,6 +341,7 @@
         widthOfMenuInterval: number,
         socket: SocketIOClient.Socket
       } = {
+        errors: [],
         highlightsSocket: getSocket('/systems/highlights'),
         averageStats: {},
 
@@ -440,6 +447,15 @@
         }
       })
 
+      this.socket.emit('panel::errors', (err, data) => {
+        if (err) {
+          return console.error(err);
+        }
+        for (const error of data) {
+          console.error(`UIError: ${error.name} ¦ ${error.message}`);
+        }
+        this.errors = data;
+      });
 
       this.socket.emit('getLatestStats', (err, data) => {
         if (err) {
