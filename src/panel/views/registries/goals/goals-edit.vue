@@ -187,21 +187,21 @@
                       <codemirror style="font-size: 1.1em;" v-if="customShow === 'html'" class="w-100" v-model="currentGoal.customizationHtml" :options="{
                         tabSize: 4,
                         mode: 'text/html',
-                        theme: 'base16-' + (localStorage.getItem('theme') || 'light'),
+                        theme: 'base16-' + (localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light')),
                         lineNumbers: true,
                         line: true,
                       }"></codemirror>
                       <codemirror style="font-size: 1.1em;" v-if="customShow === 'js'" class="w-100" v-model="currentGoal.customizationJs" :options="{
                         tabSize: 4,
                         mode: 'text/javascript',
-                        theme: 'base16-' + (localStorage.getItem('theme') || 'light'),
+                        theme: 'base16-' + (localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light')),
                         lineNumbers: true,
                         line: true,
                       }"></codemirror>
                       <codemirror style="font-size: 1.1em;" v-if="customShow === 'css'" class="w-100"  v-model="currentGoal.customizationCss" :options="{
                         tabSize: 4,
                         mode: 'text/css',
-                        theme: 'base16-' + (localStorage.getItem('theme') || 'light'),
+                        theme: 'base16-' + (localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light')),
                         lineNumbers: true,
                         line: true,
                       }"></codemirror>
@@ -305,6 +305,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { get } from 'lodash-es';
 
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/mode/javascript/javascript.js'
@@ -330,6 +331,7 @@ export default Vue.extend({
   },
   data: function () {
     const object: {
+      get: typeof get,
       socket: any,
       search: string,
       groupId: string,
@@ -346,6 +348,7 @@ export default Vue.extend({
       },
       dateTimePicker: any,
     } = {
+      get: get,
       socket: getSocket('/overlays/goals'),
       search: '',
       groupId: uuid(),

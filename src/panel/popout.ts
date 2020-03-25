@@ -124,7 +124,7 @@ const main = async () => {
         const head = document.getElementsByTagName('head')[0];
         const link = (document.createElement('link') as any);
         link.setAttribute('rel', 'stylesheet');
-        link.setAttribute('href',`/dist/css/${theme || 'light'}.css`);
+        link.setAttribute('href',`/dist/css/${theme || get(Vue, 'prototype.configuration.core.ui.theme', 'light')}.css`);
         head.appendChild(link);
       },
       template: `
