@@ -47,8 +47,6 @@ export const addUIError = (error: UIError) => {
   errors.push(error);
 };
 
-addUIError({ name: 'SPOTIFY', message: 'Refreshing access token failed.' });
-
 export const init = () => {
   setApp(express());
   app?.use(bodyParser.json());
