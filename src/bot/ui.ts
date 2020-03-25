@@ -11,6 +11,7 @@ import general from './general';
 import currency from './currency';
 import webhooks from './webhooks';
 import { find, list } from './helpers/register';
+import { default as uiModule } from './ui';
 
 const timezone = (process.env.TIMEZONE ?? 'system') === 'system' || !process.env.TIMEZONE ? moment.tz.guess() : process.env.TIMEZONE;
 
@@ -106,6 +107,9 @@ class UI extends Core {
 
         // lang
         data.lang = general.lang;
+
+        // theme
+        set(data, 'core.ui.theme', uiModule.theme);
 
         cb(null, data);
       } catch (e) {
