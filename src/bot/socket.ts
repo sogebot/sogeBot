@@ -29,19 +29,19 @@ const latestAuthorizationPerToken: { [accessToken: string]: number } = new Proxy
   },
   deleteProperty: function(obj, prop) {
     if (obj[prop]) {
-      debug('sockets', 'Deleting property ' + String(prop));
+      debug('sockets.tokens', 'Deleting property ' + String(prop));
       delete obj[prop];
     } else {
-      debug('sockets', 'Property ' + String(prop) + ' already deleted');
+      debug('sockets.tokens', 'Property ' + String(prop) + ' already deleted');
     }
     return true;
   },
   set: function (obj, prop, value) {
     if (!Object.keys(invalidatedTokens).includes(String(prop))) {
-      debug('sockets', 'Setting property ' + String(prop));
+      debug('sockets.tokens', 'Setting property ' + String(prop));
       obj[prop] = value;
     } else {
-      debug('sockets', 'Skipping setting invalidated property ' + String(prop));
+      debug('sockets.tokens', 'Skipping setting invalidated property ' + String(prop));
     }
     return true;
   },
@@ -55,7 +55,7 @@ enum Authorized {
 
 if (isDebugEnabled('sockets')) {
   setInterval(() => {
-    debug('sockets', {latestAuthorizationPerToken, invalidatedTokens});
+    debug('sockets.tokens', {latestAuthorizationPerToken, invalidatedTokens});
   }, 10000);
 }
 
@@ -63,6 +63,11 @@ setInterval(() => {
   for (const [token, timestamp] of Object.entries(invalidatedTokens)) {
     if (Date.now() - timestamp > 10 * MINUTE) {
       delete invalidatedTokens[token];
+    }
+  }
+  for (const [token, timestamp] of Object.entries(latestAuthorizationPerToken)) {
+    if (Date.now() - timestamp > 10 * MINUTE) {
+      delete latestAuthorizationPerToken[token];
     }
   }
 }, MINUTE);
@@ -110,7 +115,8 @@ const getPrivileges = async(type: SocketInterface['type'], userId: number) => {
   return {
     haveAdminPrivileges: type === 'admin' ? Authorized.Authorized : Authorized.NotAuthorized,
     haveModPrivileges: isModerator(user) ? Authorized.Authorized : Authorized.NotAuthorized,
-    haveViewerPrivileges: Authorized.Authorized };
+    haveViewerPrivileges: Authorized.Authorized,
+  };
 };
 
 class Socket extends Core {
@@ -185,7 +191,7 @@ class Socket extends Core {
     });
 
     const sendAuthorized = (socket, auth: Readonly<SocketInterface>) => {
-      socket.emit('authorized', { accessToken: auth.accessToken, refreshToken: auth.refreshToken, type: auth.type });
+      socket.emit('authorized', auth);
     };
     const emitAuthorize = (socket) => {
       socket.emit('authorize', async (cb: { token: string; type: 'socket' | 'access' }) => {
