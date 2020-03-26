@@ -240,6 +240,9 @@ class Socket extends Core {
               auth = await getRepository(SocketEntity).findOne({ userId: cb.userId, refreshToken: cb.token });
               if (!auth) {
                 debug('sockets', `Incorrect refresh token for userId - ${cb.token}, ${cb.userId}`);
+                haveAdminPrivileges = Authorized.NotAuthorized;
+                haveModPrivileges = Authorized.NotAuthorized;
+                haveViewerPrivileges = Authorized.NotAuthorized;
                 return socket.emit('unauthorized');
               } else {
                 auth.accessToken = uuid();
