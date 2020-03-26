@@ -2,7 +2,20 @@ import io from 'socket.io-client';
 import { setTranslations } from './translate';
 const sockets: {[namespace: string]: SocketIOClient.Socket} = {};
 
-const authorizeInProgress = false;
+let authorizeInProgress = false;
+
+const waitForAuthorization = async () => {
+  return new Promise((resolve) => {
+    const check = () => {
+      if (!authorizeInProgress) {
+        resolve();
+      } else {
+        setTimeout(() => check(), 100);
+      }
+    };
+    check();
+  });
+};
 
 export function getSocket(namespace: string, continueOnUnauthorized = false) {
   /* if (!continueOnUnauthorized) {
@@ -10,12 +23,11 @@ export function getSocket(namespace: string, continueOnUnauthorized = false) {
   } */
   if (typeof sockets[namespace] === 'undefined') {
     const socket = io(namespace, { forceNew: true });
-    socket.on('authorize', (cb) => {
-      if (!authorizeInProgress) {
-        // we are sending access token here
-        const token = localStorage.getItem('accessToken') || '';
-        cb({token, type: 'access'});
-      }
+    socket.on('authorize', async (cb) => {
+      await waitForAuthorization();
+      authorizeInProgress = true;
+      const token = localStorage.getItem('accessToken') || '';
+      cb({token, type: 'access'});
     });
 
     // we didn't have correct accessToken -> refreshToken
@@ -30,6 +42,7 @@ export function getSocket(namespace: string, continueOnUnauthorized = false) {
       localStorage.setItem('accessToken', cb.accessToken);
       localStorage.setItem('refreshToken', cb.refreshToken);
       localStorage.setItem('userType', cb.type);
+      authorizeInProgress = false;
     });
     socket.on('unauthorized', (cb) => {
       localStorage.setItem('accessToken', '');
@@ -46,6 +59,7 @@ export function getSocket(namespace: string, continueOnUnauthorized = false) {
       }
       console.debug(window.location.href);
       console.debug('UNAUTHORIZED ACCESS (OK): ' + namespace);
+      authorizeInProgress = false;
     });
     sockets[namespace] = socket;
   }

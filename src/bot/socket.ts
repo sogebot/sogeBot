@@ -10,7 +10,7 @@ import { onLoad } from './decorators/on';
 import { getRepository, LessThanOrEqual } from 'typeorm';
 import { Socket as SocketEntity, SocketInterface } from './database/entity/socket';
 import permissions from './permissions';
-import { debug } from './helpers/log';
+import { debug, isDebugEnabled } from './helpers/log';
 import { isDbConnected } from './helpers/database';
 import { Dashboard } from './database/entity/dashboard';
 import { isModerator } from './commons';
@@ -18,11 +18,54 @@ import { User } from './database/entity/user';
 
 let _self: any = null;
 
+const invalidatedTokens: { [token: string]: number } = {};
+const latestAuthorizationPerToken: { [accessToken: string]: number } = new Proxy({}, {
+  get: function (obj, prop) {
+    if (typeof obj[prop] === 'undefined') {
+      return 0;
+    } else {
+      return obj[prop];
+    }
+  },
+  deleteProperty: function(obj, prop) {
+    if (obj[prop]) {
+      debug('sockets', 'Deleting property ' + String(prop));
+      delete obj[prop];
+    } else {
+      debug('sockets', 'Property ' + String(prop) + ' already deleted');
+    }
+    return true;
+  },
+  set: function (obj, prop, value) {
+    if (!Object.keys(invalidatedTokens).includes(String(prop))) {
+      debug('sockets', 'Setting property ' + String(prop));
+      obj[prop] = value;
+    } else {
+      debug('sockets', 'Skipping setting invalidated property ' + String(prop));
+    }
+    return true;
+  },
+});
+
 enum Authorized {
   inProgress,
   NotAuthorized,
   Authorized,
 }
+
+if (isDebugEnabled('sockets')) {
+  setInterval(() => {
+    debug('sockets', {latestAuthorizationPerToken, invalidatedTokens});
+  }, 10000);
+}
+
+setInterval(() => {
+  for (const [token, timestamp] of Object.entries(invalidatedTokens)) {
+    if (Date.now() - timestamp > 10 * MINUTE) {
+      delete invalidatedTokens[token];
+    }
+  }
+}, MINUTE);
 
 const createDashboardIfNeeded = async (userId: number, opts: { haveAdminPrivileges: Authorized; haveModPrivileges: Authorized; haveViewerPrivileges: Authorized }) => {
   // create main admin dashboard if needed;
@@ -124,12 +167,25 @@ class Socket extends Core {
     let haveAdminPrivileges = Authorized.inProgress;
     let haveModPrivileges = Authorized.inProgress;
     let haveViewerPrivileges = Authorized.inProgress;
+    let accessToken: null | string = null;
+    const interval = setInterval(() => {
+      if (accessToken && (typeof latestAuthorizationPerToken[accessToken] === 'undefined' || Date.now() - latestAuthorizationPerToken[accessToken] > MINUTE)) {
+        latestAuthorizationPerToken[accessToken] = Date.now();
+        accessToken = null;
+        emitAuthorize(socket);
+      }
+    }, SECOND);
 
-    const sendAuthorized = (socket, auth) => {
+    socket.on('disconnect', () => {
+      clearInterval(interval);
+      if (accessToken) {
+        invalidatedTokens[accessToken] = Date.now();
+        delete latestAuthorizationPerToken[accessToken];
+      }
+    });
+
+    const sendAuthorized = (socket, auth: Readonly<SocketInterface>) => {
       socket.emit('authorized', { accessToken: auth.accessToken, refreshToken: auth.refreshToken, type: auth.type });
-
-      // reauth every minute
-      setTimeout(() => emitAuthorize(socket), MINUTE);
     };
     const emitAuthorize = (socket) => {
       socket.emit('authorize', async (cb: { token: string; type: 'socket' | 'access' }) => {
@@ -142,6 +198,7 @@ class Socket extends Core {
             sendAuthorized(socket, {
               type: 'admin',
               accessToken: _self.socketToken,
+              userId: 0,
               refreshToken: '',
               accessTokenTimestamp: 0,
               refreshTokenTimestamp: 0,
@@ -165,9 +222,16 @@ class Socket extends Core {
         } else {
           let auth;
           if (cb.type === 'access') {
-            auth = await getRepository(SocketEntity).findOne({ accessToken: cb.token });
+            if (Object.keys(invalidatedTokens).includes(cb.token)) {
+              debug('sockets', `Invalidated access token - ${cb.token} used.`);
+            } else {
+              auth = await getRepository(SocketEntity).findOne({ accessToken: cb.token });
+            }
             if (!auth) {
               debug('sockets', `Incorrect access token - ${cb.token}, asking for refresh token`);
+              invalidatedTokens[cb.token] = Date.now();
+              delete latestAuthorizationPerToken[cb.token];
+
               return socket.emit('refreshToken', async (cb: { userId: number; token: string }) => {
                 auth = await getRepository(SocketEntity).findOne({ userId: cb.userId, refreshToken: cb.token });
                 if (!auth) {
@@ -175,24 +239,32 @@ class Socket extends Core {
                   return socket.emit('unauthorized');
                 } else {
                   auth.accessToken = uuid();
+
+                  latestAuthorizationPerToken[auth.accessToken] = Date.now();
+                  accessToken = auth.accessToken;
+
                   auth.accessTokenTimestamp = Date.now() + (_self.accessTokenExpirationTime * 1000);
                   auth.refreshTokenTimestamp = Date.now() + (_self.refreshTokenExpirationTime * 1000);
                   await getRepository(SocketEntity).save(auth);
                   debug('sockets', `Login OK by refresh token - ${cb.token}, access token set to ${auth.accessToken}`);
-                  sendAuthorized(socket, auth);
 
                   const privileges = await getPrivileges(auth.type, cb.userId);
                   haveAdminPrivileges = privileges.haveAdminPrivileges;
                   haveModPrivileges = privileges.haveModPrivileges;
                   haveViewerPrivileges = privileges.haveViewerPrivileges;
                   await createDashboardIfNeeded(cb.userId, { haveAdminPrivileges, haveModPrivileges, haveViewerPrivileges });
+
+                  sendAuthorized(socket, auth);
                 }
               });
             } else {
               // update refreshToken timestamp to expire only if not used
               auth.refreshTokenTimestamp = Date.now() + (_self.refreshTokenExpirationTime * 1000);
-              await getRepository(SocketEntity).save(auth);
 
+              latestAuthorizationPerToken[auth.accessToken] = Date.now();
+              accessToken = auth.accessToken;
+
+              await getRepository(SocketEntity).save(auth);
               const privileges = await getPrivileges(auth.type, auth.userId);
               haveAdminPrivileges = privileges.haveAdminPrivileges;
               haveModPrivileges = privileges.haveModPrivileges;
@@ -215,9 +287,12 @@ class Socket extends Core {
     };
 
     socket.on('logout', async(tokens: { accessToken: string | null; refreshToken: string | null}) => {
+      clearInterval(interval);
       debug('sockets', 'user::logout');
       debug('sockets', tokens);
       if (tokens.accessToken) {
+        invalidatedTokens[tokens.accessToken] = Date.now();
+        delete latestAuthorizationPerToken[tokens.accessToken];
         await getRepository(SocketEntity).delete({ accessToken: tokens.accessToken });
       }
 
