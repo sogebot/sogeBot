@@ -191,6 +191,7 @@ class Socket extends Core {
     });
 
     const sendAuthorized = (socket, auth: Readonly<SocketInterface>) => {
+      debug('socket', auth);
       socket.emit('authorized', auth);
     };
     const emitAuthorize = (socket) => {
@@ -219,74 +220,70 @@ class Socket extends Core {
           return socket.emit('unauthorized');
         }
 
-        if (cb.token === '' || !cb.token) {
-          // we don't have anything
-          haveAdminPrivileges = Authorized.NotAuthorized;
-          haveModPrivileges = Authorized.NotAuthorized;
-          haveViewerPrivileges = Authorized.NotAuthorized;
-          return socket.emit('unauthorized');
-        } else {
-          let auth;
-          if (cb.type === 'access') {
-            if (Object.keys(invalidatedTokens).includes(cb.token)) {
-              debug('sockets', `Invalidated access token - ${cb.token} used.`);
-            } else {
-              auth = await getRepository(SocketEntity).findOne({ accessToken: cb.token });
-            }
+        let auth;
+        if (cb.type === 'access') {
+          if (cb.token === '' || !cb.token) {
+            debug('sockets', `Missing access token`);
+          } else if (Object.keys(invalidatedTokens).includes(cb.token)) {
+            debug('sockets', `Invalidated access token - ${cb.token} used.`);
+          } else {
+            auth = await getRepository(SocketEntity).findOne({ accessToken: cb.token });
             if (!auth) {
               debug('sockets', `Incorrect access token - ${cb.token}, asking for refresh token`);
-              invalidatedTokens[cb.token] = Date.now();
-              delete latestAuthorizationPerToken[cb.token];
-
-              return socket.emit('refreshToken', async (cb: { userId: number; token: string }) => {
-                auth = await getRepository(SocketEntity).findOne({ userId: cb.userId, refreshToken: cb.token });
-                if (!auth) {
-                  debug('sockets', `Incorrect refresh token for userId - ${cb.token}, ${cb.userId}`);
-                  return socket.emit('unauthorized');
-                } else {
-                  auth.accessToken = uuid();
-
-                  latestAuthorizationPerToken[auth.accessToken] = Date.now();
-                  accessToken = auth.accessToken;
-
-                  auth.accessTokenTimestamp = Date.now() + (_self.accessTokenExpirationTime * 1000);
-                  auth.refreshTokenTimestamp = Date.now() + (_self.refreshTokenExpirationTime * 1000);
-                  await getRepository(SocketEntity).save(auth);
-                  debug('sockets', `Login OK by refresh token - ${cb.token}, access token set to ${auth.accessToken}`);
-
-                  const privileges = await getPrivileges(auth.type, cb.userId);
-                  haveAdminPrivileges = privileges.haveAdminPrivileges;
-                  haveModPrivileges = privileges.haveModPrivileges;
-                  haveViewerPrivileges = privileges.haveViewerPrivileges;
-                  await createDashboardIfNeeded(cb.userId, { haveAdminPrivileges, haveModPrivileges, haveViewerPrivileges });
-
-                  sendAuthorized(socket, auth);
-                }
-              });
-            } else {
-              // update refreshToken timestamp to expire only if not used
-              auth.refreshTokenTimestamp = Date.now() + (_self.refreshTokenExpirationTime * 1000);
-
-              latestAuthorizationPerToken[auth.accessToken] = Date.now();
-              accessToken = auth.accessToken;
-
-              await getRepository(SocketEntity).save(auth);
-              const privileges = await getPrivileges(auth.type, auth.userId);
-              haveAdminPrivileges = privileges.haveAdminPrivileges;
-              haveModPrivileges = privileges.haveModPrivileges;
-              haveViewerPrivileges = privileges.haveViewerPrivileges;
-              await createDashboardIfNeeded(auth.userId, { haveAdminPrivileges, haveModPrivileges, haveViewerPrivileges });
-
-              debug('sockets', `Login OK by access token - ${cb.token}`);
-              sendAuthorized(socket, auth);
-
-              if (auth.type === 'admin') {
-                haveAdminPrivileges = Authorized.Authorized;
-              } else {
-                haveAdminPrivileges = Authorized.NotAuthorized;
-              }
-              haveViewerPrivileges = Authorized.Authorized;
             }
+          }
+          if (!auth) {
+            invalidatedTokens[cb.token] = Date.now();
+            delete latestAuthorizationPerToken[cb.token];
+
+            return socket.emit('refreshToken', async (cb: { userId: number; token: string }) => {
+              auth = await getRepository(SocketEntity).findOne({ userId: cb.userId, refreshToken: cb.token });
+              if (!auth) {
+                debug('sockets', `Incorrect refresh token for userId - ${cb.token}, ${cb.userId}`);
+                return socket.emit('unauthorized');
+              } else {
+                auth.accessToken = uuid();
+
+                latestAuthorizationPerToken[auth.accessToken] = Date.now();
+                accessToken = auth.accessToken;
+
+                auth.accessTokenTimestamp = Date.now() + (_self.accessTokenExpirationTime * 1000);
+                auth.refreshTokenTimestamp = Date.now() + (_self.refreshTokenExpirationTime * 1000);
+                await getRepository(SocketEntity).save(auth);
+                debug('sockets', `Login OK by refresh token - ${cb.token}, access token set to ${auth.accessToken}`);
+
+                const privileges = await getPrivileges(auth.type, cb.userId);
+                haveAdminPrivileges = privileges.haveAdminPrivileges;
+                haveModPrivileges = privileges.haveModPrivileges;
+                haveViewerPrivileges = privileges.haveViewerPrivileges;
+                await createDashboardIfNeeded(cb.userId, { haveAdminPrivileges, haveModPrivileges, haveViewerPrivileges });
+
+                sendAuthorized(socket, auth);
+              }
+            });
+          } else {
+            // update refreshToken timestamp to expire only if not used
+            auth.refreshTokenTimestamp = Date.now() + (_self.refreshTokenExpirationTime * 1000);
+
+            latestAuthorizationPerToken[auth.accessToken] = Date.now();
+            accessToken = auth.accessToken;
+
+            await getRepository(SocketEntity).save(auth);
+            const privileges = await getPrivileges(auth.type, auth.userId);
+            haveAdminPrivileges = privileges.haveAdminPrivileges;
+            haveModPrivileges = privileges.haveModPrivileges;
+            haveViewerPrivileges = privileges.haveViewerPrivileges;
+            await createDashboardIfNeeded(auth.userId, { haveAdminPrivileges, haveModPrivileges, haveViewerPrivileges });
+
+            debug('sockets', `Login OK by access token - ${cb.token}`);
+            sendAuthorized(socket, auth);
+
+            if (auth.type === 'admin') {
+              haveAdminPrivileges = Authorized.Authorized;
+            } else {
+              haveAdminPrivileges = Authorized.NotAuthorized;
+            }
+            haveViewerPrivileges = Authorized.Authorized;
           }
         }
       });
