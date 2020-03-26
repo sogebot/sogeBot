@@ -331,7 +331,6 @@ class Socket extends Core {
 
       cb();
     });
-    emitAuthorize(socket);
 
     for (const endpoint of endpoints.filter(o => o.type === 'public' && o.nsp === socket.nsp.name)) {
       socket.removeAllListeners(endpoint.on);
@@ -348,7 +347,7 @@ class Socket extends Core {
             if (haveAdminPrivileges !== Authorized.inProgress) {
               resolve();
             } else {
-              setTimeout(waitForAuthorization, 10);
+              setTimeout(waitForAuthorization, 100);
             }
           };
           waitForAuthorization();
@@ -362,6 +361,8 @@ class Socket extends Core {
           if (publicEndpoint) {
             publicEndpoint.callback(...args, socket);
           } else {
+            debug('sockets', `User dont have admin access to ${socket.nsp.name}`);
+            debug('sockets', {haveAdminPrivileges, haveModPrivileges, haveViewerPrivileges});
             for (const arg of args) {
               if (typeof arg === 'function') {
                 arg('User doesn\'t have access to this endpoint', null);
@@ -380,7 +381,7 @@ class Socket extends Core {
             if (haveViewerPrivileges !== Authorized.inProgress) {
               resolve();
             } else {
-              setTimeout(waitForAuthorization, 10);
+              setTimeout(waitForAuthorization, 100);
             }
           };
           waitForAuthorization();
@@ -389,6 +390,8 @@ class Socket extends Core {
         if (haveViewerPrivileges === Authorized.Authorized) {
           endpoint.callback(...args, socket);
         } else {
+          debug('sockets', `User dont have viewer access to ${socket.nsp.name}`);
+          debug('sockets', {haveAdminPrivileges, haveModPrivileges, haveViewerPrivileges});
           for (const arg of args) {
             if (typeof arg === 'function') {
               arg('User doesn\'t have access to this endpoint', null);
@@ -398,6 +401,7 @@ class Socket extends Core {
       });
     }
 
+    emitAuthorize(socket);
     next();
   }
 
