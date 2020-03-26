@@ -201,7 +201,7 @@
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
-          <span class="data">{{ isStreamOnline ? Number(currentTips).toFixed(2) : 0.00 }}</span><span class="data ml-0 pl-0">{{ currency }}</span>
+          <span class="data">{{ isStreamOnline ? Number(currentTips).toFixed(2) : '0.00' }}</span><span class="data ml-0 pl-0">{{ currency }}</span>
           <span class="stats">
             <small v-if="b_showAvgDiff && isStreamOnline && currentTips - averageStats.currentTips !== 0"
                   :class="{
@@ -220,7 +220,7 @@
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
-          <span class="data">{{ isStreamOnline ? Number(currentWatched / 1000 / 60 / 60).toFixed(1) : 0.0 }}</span><span class="data ml-0 pl-0">h</span>
+          <span class="data">{{ isStreamOnline ? Number(currentWatched / 1000 / 60 / 60).toFixed(1) : '0.0' }}</span><span class="data ml-0 pl-0">h</span>
           <span class="stats">
             <small v-if="b_showAvgDiff && isStreamOnline && currentWatched - averageStats.currentWatched !== 0"
                   :class="{
