@@ -38,8 +38,14 @@ import { linesParsed, setStatus } from './helpers/parser';
 import { isDbConnected } from './helpers/database';
 import { find } from './helpers/register';
 
-let intervals = 0;
+export const currentStreamTags: {
+  is_auto: boolean;
+  localization_names: {
+    [lang: string]: string;
+  };
+}[] = [];
 
+let intervals = 0;
 const isAPIFree = (intervals) => {
   for (const key of Object.keys(intervals)) {
     if (intervals[key].inProgress) {
@@ -1010,9 +1016,13 @@ class API extends Core {
 
       if (request.status === 200 && !isNil(request.data.data[0])) {
         const tags = request.data.data;
-        await getRepository(TwitchTag).update({}, { is_current: false });
+        while (currentStreamTags.length) {
+          currentStreamTags.pop();
+        }
         for (const tag of tags) {
-          await getRepository(TwitchTag).update({ tag_id: tag.tag_id }, { is_current: true });
+          currentStreamTags.push({
+            is_auto: tag.is_auto, localization_names: tag.localization_names,
+          });
         }
       }
     } catch (e) {
