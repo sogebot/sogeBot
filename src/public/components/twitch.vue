@@ -50,7 +50,7 @@ export default class navbar extends Vue {
       + '//twitch.tv/embed/'
       + this.room
       + '/chat'
-      + ( this.theme === 'dark' ? '?darkpopout' : '')
+      + (this.theme === 'dark' ? '?darkpopout' : '')
   }
 }
 </script>
