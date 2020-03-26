@@ -240,8 +240,9 @@
           if (!this.currentGame) {
             this.currentGame = data.game;
             this.currentTitle = data.status;
-            this.currentTags = data.tags.filter(o => o.is_current === 1 && o.is_auto === 0).map(o => {
-              return o.value;
+            this.currentTags = data.tags.filter(o => !o.is_auto).map(o => {
+              const key = Object.keys(o.localization_names).find(key => key.includes(this.configuration.lang))
+              return o.localization_names[key || 'en-us'];
             })
           }
         });

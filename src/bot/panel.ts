@@ -21,7 +21,7 @@ import Parser from './parser';
 import webhooks from './webhooks';
 import general from './general';
 import translateLib, { translate } from './translate';
-import api from './api';
+import api, { currentStreamTags } from './api';
 import tmi from './tmi';
 import currency from './currency';
 import oauth from './oauth';
@@ -555,35 +555,6 @@ const sendStreamData = async function (cb) {
       spotifyCurrentSong = null;
     }
 
-    const connection = await getConnection();
-    const joinQuery = connection.options.type === 'postgres' ? '"names"."tagId" = "tag_id" AND "names"."locale"' : 'names.tagId = tag_id AND names.locale';
-    let tagQuery = getRepository(TwitchTag)
-      .createQueryBuilder('tags')
-      .select('names.locale', 'locale')
-      .addSelect('names.value', 'value')
-      .addSelect('tags.tag_id', 'tag_id')
-      .addSelect('tags.is_auto', 'is_auto')
-      .addSelect('tags.is_current', 'is_current')
-      .where('tags.is_current = True')
-      .leftJoinAndSelect('twitch_tag_localization_name', 'names', `${joinQuery} like :tag`)
-      .setParameter('tag', '%' + general.lang +'%');
-
-    let tagResults = await tagQuery.execute();
-    if (tagResults.length === 0) {
-      // if we don';t have results with our selected locale => reload with en-us
-      tagQuery = getRepository(TwitchTag)
-        .createQueryBuilder('tags')
-        .select('names.locale', 'locale')
-        .addSelect('names.value', 'value')
-        .addSelect('tags.tag_id', 'tag_id')
-        .addSelect('tags.is_auto', 'is_auto')
-        .addSelect('tags.is_current', 'is_current')
-        .where('tags.is_current = True')
-        .leftJoinAndSelect('twitch_tag_localization_name', 'names', `${joinQuery} = :tag`)
-        .setParameter('tag', 'en-us');
-      tagResults = await tagQuery.execute();
-    }
-
     const data = {
       broadcasterType: oauth.broadcasterType,
       uptime: getTime(api.isStreamOnline ? api.streamStatusChangeSince : null, false),
@@ -603,7 +574,7 @@ const sendStreamData = async function (cb) {
       currentSong: ytCurrentSong || spotifyCurrentSong || translate('songs.not-playing'),
       currentHosts: api.stats.currentHosts,
       currentWatched: api.stats.currentWatchedTime,
-      tags: tagResults,
+      tags: currentStreamTags,
     };
     cb(null, data);
   } catch (e) {

@@ -479,27 +479,31 @@
       });
 
       setInterval(() => {
-      this.socket.emit('getLatestStats', (err, data) => {
-        if (err) {
-          return console.error(err);
-        }
-        this.averageStats = data
-      });
-      this.socket.emit('panel.sendStreamData', async (err, data) => {
-        if (err) {
-          return console.error(err);
-        }
-        for (let [key, value] of Object.entries(data)) {
-          this[key] = value // populate data
-        }
         this.timestamp = Date.now()
-        this.isLoaded = true
+      }, 1000);
 
-        this.title = await this.generateTitle(data.status, data.rawStatus);
-        this.rawStatus = data.rawStatus;
-        this.game = data.game;
-      });
-      }, 1000)
+      setInterval(() => {
+        this.timestamp = Date.now()
+        this.socket.emit('getLatestStats', (err, data) => {
+          if (err) {
+            return console.error(err);
+          }
+          this.averageStats = data
+        });
+        this.socket.emit('panel.sendStreamData', async (err, data) => {
+          if (err) {
+            return console.error(err);
+          }
+          for (let [key, value] of Object.entries(data)) {
+            this[key] = value // populate data
+          }
+          this.isLoaded = true
+
+          this.title = await this.generateTitle(data.status, data.rawStatus);
+          this.rawStatus = data.rawStatus;
+          this.game = data.game;
+        });
+      }, 10000);
     },
     computed: {
       isStreamOnline() {
@@ -570,8 +574,9 @@
       },
       filterTags (is_auto) {
         return this.tags.filter(o => !!o.is_auto === is_auto).map((o) => {
+          const key = Object.keys(o.localization_names).find(key => key.includes(this.configuration.lang))
           return {
-            name: o.value, is_auto: !!o.is_auto
+            name: o.localization_names[key || 'en-us'], is_auto: !!o.is_auto
           }
         }).sort((a, b) => {
           if ((a || { name: ''}).name < (b || { name: ''}).name)  { //sort string ascending
