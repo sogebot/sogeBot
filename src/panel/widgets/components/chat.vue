@@ -55,11 +55,13 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { sortedUniq, flatten } from 'lodash-es';
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { get } from 'lodash-es';
+import Vue from 'vue';
 
 export default {
   props: ['popout', 'nodrag'],
   data: function () {
     return {
+      theme: 'light',
       socket: getSocket('/widgets/chat'),
       chatMessage: '',
       chatters: [],
@@ -82,7 +84,7 @@ export default {
         + '//twitch.tv/embed/'
         + this.room
         + '/chat'
-        + ((localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light')) === 'dark' ? '?darkpopout' : '')
+        + (this.theme === 'dark' ? '?darkpopout' : '')
     }
   },
   methods: {
@@ -118,6 +120,10 @@ export default {
       this.room = room
       this._chatters();
     })
+
+    this.interval.push(setInterval(() => {
+      this.theme = (localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light'));
+    }, 100));
   }
 }
 </script>
