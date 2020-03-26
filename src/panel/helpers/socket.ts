@@ -55,8 +55,6 @@ export function getSocket(namespace: string, continueOnUnauthorized = false) {
       authorizeInProgress = false;
     });
     socket.on('unauthorized', (cb) => {
-      localStorage.setItem('accessToken', '');
-      localStorage.setItem('refreshToken', '');
       localStorage.setItem('userType', 'unauthorized');
       if (!continueOnUnauthorized) {
         console.debug(window.location.href);
