@@ -27,7 +27,7 @@
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info" v-on:click="toggleViewerShow">
           <span class="data">
-            <template v-if="!hideStats">{{ currentViewers }}</template>
+            <template v-if="!hideStats">{{ isStreamOnline ? currentViewers : 0 }}</template>
             <small v-else>{{translate('hidden')}}</small>
           </span>
           <span class="stats">&nbsp;</span>
@@ -39,7 +39,7 @@
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info" v-on:click="toggleViewerShow">
           <span class="data">
-            <template v-if="!hideStats">{{ maxViewers }}</template>
+            <template v-if="!hideStats">{{ isStreamOnline ? maxViewers : 0 }}</template>
             <small v-else>{{translate('hidden')}}</small>
           </span>
           <span class="stats" v-if="!hideStats">
@@ -65,7 +65,7 @@
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info" v-on:click="toggleViewerShow">
           <span class="data">
-            <template v-if="!hideStats">{{ newChatters }}</template>
+            <template v-if="!hideStats">{{ isStreamOnline ? newChatters : 0 }}</template>
             <small v-else>{{translate('hidden')}}</small>
           </span>
           <span class="stats" v-if="!hideStats">
@@ -90,7 +90,7 @@
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
-          <span class="data" v-bind:title="chatMessages">{{ shortenNumber(chatMessages, b_shortenNumber) }}</span>
+          <span class="data" v-bind:title="chatMessages">{{ isStreamOnline ? shortenNumber(chatMessages, b_shortenNumber) : 0 }}</span>
           <span class="stats">
             <small v-if="b_showAvgDiff && isStreamOnline && chatMessages - averageStats.chatMessages !== 0"
                    :class="{
@@ -128,7 +128,7 @@
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
-          <span class="data">{{ currentHosts }}</span>
+          <span class="data">{{ isStreamOnline ? currentHosts : 0 }}</span>
           <span class="stats">&nbsp;</span>
           <h2>{{ translate('hosts') }}</h2>
         </div>
@@ -178,7 +178,7 @@
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
           <template v-if="broadcasterType !== ''">
-            <span class="data" v-bind:title="currentBits">{{ shortenNumber(currentBits, b_shortenNumber) }}</span>
+            <span class="data" v-bind:title="currentBits">{{ isStreamOnline ? shortenNumber(currentBits, b_shortenNumber) : 0 }}</span>
             <span class="stats">
               <small v-if="b_showAvgDiff && isStreamOnline && currentBits - averageStats.currentBits !== 0"
                     :class="{
@@ -201,7 +201,7 @@
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
-          <span class="data">{{ Number(currentTips).toFixed(2) }}</span><span class="data ml-0 pl-0">{{ currency }}</span>
+          <span class="data">{{ isStreamOnline ? Number(currentTips).toFixed(2) : 0.00 }}</span><span class="data ml-0 pl-0">{{ currency }}</span>
           <span class="stats">
             <small v-if="b_showAvgDiff && isStreamOnline && currentTips - averageStats.currentTips !== 0"
                   :class="{
@@ -220,7 +220,7 @@
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
-          <span class="data">{{ Number(currentWatched / 1000 / 60 / 60).toFixed(1) }}</span><span class="data ml-0 pl-0">h</span>
+          <span class="data">{{ isStreamOnline ? Number(currentWatched / 1000 / 60 / 60).toFixed(1) : 0.0 }}</span><span class="data ml-0 pl-0">h</span>
           <span class="stats">
             <small v-if="b_showAvgDiff && isStreamOnline && currentWatched - averageStats.currentWatched !== 0"
                   :class="{
@@ -458,42 +458,24 @@
       });
 
       this.socket.emit('getLatestStats', (err, data) => {
+        console.groupCollapsed('navbar::getLatestStats')
         if (err) {
           return console.error(err);
         }
+        console.log(data);
+        console.groupEnd();
         this.averageStats = data
       });
-      this.socket.emit('panel.sendStreamData', async (err, data) => {
-        if (err) {
-          return console.error(err);
-        }
-        for (let [key, value] of Object.entries(data)) {
-          this[key] = value // populate data
-        }
-        this.timestamp = Date.now()
-        this.isLoaded = true
-
-        this.title = await this.generateTitle(data.status, data.rawStatus);
-        this.rawStatus = data.rawStatus;
-        this.game = data.game;
-      });
 
       setInterval(() => {
         this.timestamp = Date.now()
-      }, 1000);
-
-      setInterval(() => {
-        this.timestamp = Date.now()
-        this.socket.emit('getLatestStats', (err, data) => {
-          if (err) {
-            return console.error(err);
-          }
-          this.averageStats = data
-        });
         this.socket.emit('panel.sendStreamData', async (err, data) => {
+          console.groupCollapsed('navbar::panel.sendStreamData')
           if (err) {
             return console.error(err);
           }
+          console.log(data)
+          console.groupEnd();
           for (let [key, value] of Object.entries(data)) {
             this[key] = value // populate data
           }
@@ -503,24 +485,11 @@
           this.rawStatus = data.rawStatus;
           this.game = data.game;
         });
-      }, 10000);
+      }, 1000);
     },
     computed: {
       isStreamOnline() {
         return (this as any).uptime !== '00:00:00';
-      }
-    },
-    watch: {
-      timestamp() {
-        if (this.uptime === '') this.uptime = '00:00:00'
-        if (this.uptime === '00:00:00') {
-          this.currentViewers = 0
-          this.maxViewers = 0
-          this.chatMessages = 0
-          this.newChatters = 0
-          this.currentHosts = 0
-          this.currentWatched = 0
-        }
       }
     },
     methods: {
