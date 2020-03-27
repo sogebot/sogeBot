@@ -1554,6 +1554,10 @@ class API extends Core {
   }
 
   async fetchAccountAge (username, id) {
+    if (id === 0) {
+      return;
+    }
+
     if (!isMainThread) {
       throw new Error('API can run only on master');
     }
