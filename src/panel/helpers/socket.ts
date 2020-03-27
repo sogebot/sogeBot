@@ -30,7 +30,7 @@ export function getSocket(namespace: string, continueOnUnauthorized = false) {
       await waitForAuthorization();
       authorizeInProgress = true;
       const token = localStorage.getItem('accessToken') || '';
-      console.groupCollapsed('socket::authorize');
+      console.groupCollapsed('socket::authorize ' + namespace);
       console.debug({token, type: 'access'});
       console.groupEnd();
       cb({token, type: 'access'});

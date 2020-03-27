@@ -29,7 +29,7 @@ class CustomVariables extends Widget {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'list.variables', async (cb) => {
+    adminEndpoint(this.nsp, 'customvariables::list', async (cb) => {
       try {
         const variables = await getRepository(Variable).find();
         cb(null, variables);

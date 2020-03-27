@@ -316,7 +316,7 @@ const State: State = { IDLE: 0, PROGRESS: 1, DONE: 2, ERROR: 3 }
   }
 })
 export default class customVariablesEdit extends Vue {
-  socket = getSocket('/registry/customVariables');
+  socket = getSocket('/core/customvariables');
   psocket = getSocket('/core/permissions');
 
   error: any = null;
@@ -533,7 +533,7 @@ export default class customVariablesEdit extends Vue {
 
   testScript () {
     this.state.test = State.PROGRESS;
-    this.socket.emit('test.script', { evalValue: this.evalValue, currentValue: this.currentValue }, (err, response) => {
+    this.socket.emit('customvariables::testScript', { evalValue: this.evalValue, currentValue: this.currentValue }, (err, response) => {
       if (err) {
         this.evalError = err;
       } else {
@@ -560,7 +560,7 @@ export default class customVariablesEdit extends Vue {
       await Promise.all([
         // check if variable name is unique
         new Promise((resolve, reject) => {
-          this.socket.emit('isUnique', { variable: this.variableName, id: this.$route.params.id }, (err, isUnique) => {
+          this.socket.emit('customvariables::isUnique', { variable: this.variableName, id: this.$route.params.id }, (err, isUnique) => {
             if (!isUnique) {
               reject(this.translate('registry.customvariables.variable.error.isNotUnique'))
             }

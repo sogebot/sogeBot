@@ -98,7 +98,7 @@ library.add(faExclamationTriangle)
 })
 export default class customVariablesList extends Vue {
   psocket: SocketIOClient.Socket = getSocket('/core/permissions');
-  socket: SocketIOClient.Socket =  getSocket('/registry/customVariables');
+  socket: SocketIOClient.Socket =  getSocket('/core/customvariables');
 
   fields = [
     { key: 'variableName', label: '$_', sortable: true },
@@ -144,7 +144,11 @@ export default class customVariablesList extends Vue {
 
   mounted() {
     this.state.loaded = false;
-    this.socket.emit('list.variables', (err, data) => {
+    console.log(this.socket);
+    this.socket.emit('customvariables::list', (err, data) => {
+      if (err) {
+        return console.error(err);
+      }
       this.variables = data;
       this.state.loaded = true;
     })
@@ -167,7 +171,7 @@ export default class customVariablesList extends Vue {
   }
 
   runScript(id) {
-    this.socket.emit('run.script', id, (err, item) => {
+    this.socket.emit('customvariables::runScript', id, (err, item) => {
       // update variable data
       let variable = this.variables.filter((o) => o.id === id)[0]
       variable.currentValue = item.currentValue

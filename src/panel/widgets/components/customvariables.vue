@@ -241,7 +241,10 @@ export default {
     },
     refreshVariablesList: function () {
       return new Promise((resolve) => {
-        this.socket.emit('list.variables', (err, data) => {
+        this.socket.emit('customvariables::list', (err, data) => {
+          if (err) {
+            return console.error(err);
+          }
           console.log('Loaded', data);
           this.variables = data
           resolve()
