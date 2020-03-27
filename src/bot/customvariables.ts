@@ -17,20 +17,22 @@ import { addToViewersCache, getFromViewersCache } from './helpers/permissions';
 import users from './users';
 import api from './api';
 import permissions from './permissions';
-import { addMenu, ioServer } from './helpers/panel';
 import custom_variables from './widgets/customvariables';
 import currency from './currency';
 import { isDbConnected } from './helpers/database';
 import { linesParsed } from './helpers/parser';
 import { debug, info, warning } from './helpers/log';
+import Core from './_interface';
+import { adminEndpoint } from './helpers/socket';
 
-class CustomVariables {
+class CustomVariables extends Core {
   timeouts: {
     [x: string]: NodeJS.Timeout;
   } = {};
 
   constructor () {
-    this.addMenuAndListenersToPanel();
+    super();
+    this.addMenu({ category: 'registry', name: 'custom-variables', id: 'registry.customVariables/list' });
     this.checkIfCacheOrRefresh();
   }
 
@@ -99,72 +101,64 @@ class CustomVariables {
     }
   }
 
-  async addMenuAndListenersToPanel () {
-    addMenu({ category: 'registry', name: 'custom-variables', id: 'registry.customVariables/list' });
-    this.sockets();
-  }
-
   sockets () {
-    const io = ioServer?.of('/registry/customVariables');
-
-    io?.on('connection', (socket) => {
-      socket.on('list.variables', async (cb) => {
-        const variables = await getRepository(Variable).find();
-        cb(null, variables);
-      });
-      socket.on('run.script', async (id, cb) => {
-        let item;
-        try {
-          const item = await getRepository(Variable).findOne({ id });
-          if (!item) {
-            throw new Error('Variable not found');
-          }
-          const newCurrentValue = await this.runScript(item.evalValue, { _current: item.currentValue });
-          const runAt = Date.now();
-          cb(null, await getRepository(Variable).save({
-            ...item, currentValue: newCurrentValue, runAt,
-          }));
-        } catch (e) {
-          cb(e.stack, null);
-        }
-        cb(null, item);
-      });
-      socket.on('test.script', async (opts, cb) => {
-        let returnedValue;
-        try {
-          returnedValue = await this.runScript(opts.evalValue, { _current: opts.currentValue, sender: { username: 'testuser', userId: 0 }});
-        } catch (e) {
-          cb(e.stack, null);
-        }
-        cb(null, returnedValue);
-      });
-      socket.on('isUnique', async ({ variable, id }, cb) => {
-        cb(null, (await getRepository(Variable).find({ variableName: String(variable) })).filter(o => o.id !== id).length === 0);
-      });
-      socket.on('delete', async (id, cb) => {
+    adminEndpoint(this.nsp, 'customvariables::list', async (cb) => {
+      const variables = await getRepository(Variable).find();
+      cb(null, variables);
+    });
+    adminEndpoint(this.nsp, 'customvariables::runScript', async (id, cb) => {
+      let item;
+      try {
         const item = await getRepository(Variable).findOne({ id });
-        if (item) {
-          await getRepository(Variable).remove(item);
-          await getRepository(VariableWatch).delete({ variableId: id });
-          this.updateWidgetAndTitle();
+        if (!item) {
+          throw new Error('Variable not found');
         }
-        cb();
-      });
-      socket.on('load', async (id, cb) => {
-        cb(await getRepository(Variable).findOne({
-          relations: ['history', 'urls'],
-          where: { id },
+        const newCurrentValue = await this.runScript(item.evalValue, { _current: item.currentValue });
+        const runAt = Date.now();
+        cb(null, await getRepository(Variable).save({
+          ...item, currentValue: newCurrentValue, runAt,
         }));
-      });
-      socket.on('save', async (item: VariableInterface, cb) => {
-        try {
-          await getRepository(Variable).save(item);
-          this.updateWidgetAndTitle(item.variableName);
-          cb(null, item.id);
-        } catch (e) {
-          cb(e.stack, item.id);
-        }
-      });
+      } catch (e) {
+        cb(e.stack, null);
+      }
+      cb(null, item)
+      ;
+    });
+    adminEndpoint(this.nsp, 'customvariables::testScript', async (opts, cb) => {
+      let returnedValue;
+      try {
+        returnedValue = await this.runScript(opts.evalValue, { _current: opts.currentValue, sender: { username: 'testuser', userId: 0 }});
+      } catch (e) {
+        cb(e.stack, null);
+      }
+      cb(null, returnedValue);
+    });
+    adminEndpoint(this.nsp, 'customvariables::isUnique', async ({ variable, id }, cb) => {
+      cb(null, (await getRepository(Variable).find({ variableName: String(variable) })).filter(o => o.id !== id).length === 0);
+    });
+    adminEndpoint(this.nsp, 'delete', async (id, cb) => {
+      const item = await getRepository(Variable).findOne({ id });
+      if (item) {
+        await getRepository(Variable).remove(item);
+        await getRepository(VariableWatch).delete({ variableId: id });
+        this.updateWidgetAndTitle();
+      }
+      cb();
+    });
+    adminEndpoint(this.nsp, 'load', async (id, cb) => {
+      cb(await getRepository(Variable).findOne({
+        relations: ['history', 'urls'],
+        where: { id },
+      }));
+    });
+    adminEndpoint(this.nsp, 'save', async (item: VariableInterface, cb) => {
+      try {
+        await getRepository(Variable).save(item);
+        this.updateWidgetAndTitle(item.variableName);
+        cb(null, item.id);
+      } catch (e) {
+        cb(e.stack, item.id);
+      }
     });
   }
 
