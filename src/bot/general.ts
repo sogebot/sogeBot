@@ -114,13 +114,13 @@ class General extends Core {
         const isDisabledByEnv = !isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.__moduleName__.toLowerCase()) || process.env.DISABLE === '*');
 
         if (!enabled) {
-          enabledSystems[category].push('-' + system);
+          enabledSystems[category].push('-' + system.__moduleName__);
         } else if (!areDependenciesEnabled) {
-          enabledSystems[category].push('-dep-' + system);
+          enabledSystems[category].push('-dep-' + system.__moduleName__);
         } else if (isDisabledByEnv) {
-          enabledSystems[category].push('-env-' + system);
+          enabledSystems[category].push('-env-' + system.__moduleName__);
         } else {
-          enabledSystems[category].push(system);
+          enabledSystems[category].push(system.__moduleName__);
         }
       }
     }
@@ -131,7 +131,7 @@ class General extends Core {
     debug('*', `             | Bot version: ${version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT')}`);
     debug('*', `             | DB: ${connection.options.type}`);
     debug('*', `             | HEAP: ${Number(process.memoryUsage().heapUsed / 1048576).toFixed(2)} MB`);
-    debug('*', `             | Uptime: ${Math.trunc(process.uptime())} seconds`);
+    debug('*', `             | Uptime: ${new Date(1000 * process.uptime()).toISOString().substr(11, 8)}`);
     debug('*', `             | Language: ${lang}`);
     debug('*', `             | Mute: ${mute}`);
     debug('*', `SYSTEMS      | ${enabledSystems.systems.join(', ')}`);
