@@ -187,21 +187,21 @@
                       <codemirror style="font-size: 1.1em;" v-if="customShow === 'html'" class="w-100" v-model="currentGoal.customizationHtml" :options="{
                         tabSize: 4,
                         mode: 'text/html',
-                        theme: 'base16-' + (localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light')),
+                        theme: 'base16-' + theme,
                         lineNumbers: true,
                         line: true,
                       }"></codemirror>
                       <codemirror style="font-size: 1.1em;" v-if="customShow === 'js'" class="w-100" v-model="currentGoal.customizationJs" :options="{
                         tabSize: 4,
                         mode: 'text/javascript',
-                        theme: 'base16-' + (localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light')),
+                        theme: 'base16-' + theme,
                         lineNumbers: true,
                         line: true,
                       }"></codemirror>
                       <codemirror style="font-size: 1.1em;" v-if="customShow === 'css'" class="w-100"  v-model="currentGoal.customizationCss" :options="{
                         tabSize: 4,
                         mode: 'text/css',
-                        theme: 'base16-' + (localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light')),
+                        theme: 'base16-' + theme,
                         lineNumbers: true,
                         line: true,
                       }"></codemirror>
@@ -327,7 +327,7 @@ export default Vue.extend({
     panel: () => import('../../../components/panel.vue'),
     holdButton: () => import('../../../components/holdButton.vue'),
     datetime: VueFlatPickr,
-    codemirror
+    codemirror,
   },
   data: function () {
     const object: {
@@ -341,6 +341,7 @@ export default Vue.extend({
       typeOpts: ['followers', 'currentFollowers', 'currentSubscribers', 'subscribers', 'tips', 'bits'],
       displayOpts: ['simple', 'full', 'custom'],
       groupDisplayOpts: ['fade', 'multi'],
+      theme: string,
 
       customShow: string,
       state: {
@@ -367,6 +368,7 @@ export default Vue.extend({
       typeOpts: ['followers', 'currentFollowers', 'currentSubscribers', 'subscribers', 'tips', 'bits'],
       displayOpts: ['simple', 'full', 'custom'],
       groupDisplayOpts: ['fade', 'multi'],
+      theme: localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light'),
 
       customShow: 'html',
       state: {
