@@ -30,3 +30,15 @@ jobs:
           REGISTRY: docker.pkg.github.com
           IMAGE_NAME: "sogehige/sogebot"
           TAG_NAME: release:latest
+      - name: Docker Build & Push to Docker Hub
+        uses: opspresso/action-docker@v0.2.8
+        with:
+          args: --docker
+        env:
+          USERNAME: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
+          PASSWORD: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+          DOCKERFILE: "Dockerfile"
+          IMAGE_NAME: "sogebot/release"
+          TAG_NAME: ${{ steps.get_version.outputs.VERSION }}
+          LATEST: "true"
+
