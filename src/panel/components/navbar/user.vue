@@ -23,9 +23,17 @@
             <div><strong style="font-size: 0.9rem" class="text-muted">{{translate('tips')}}:</strong>  {{viewer.aggregatedTips}} {{configuration.currency}}</div>
           </div>
         </div>
-        <b-button variant="danger" class="float-right" @click="logout">
-          <fa icon="sign-out-alt" fixed-width /> Logout
-        </b-button>
+        <b-button-group class="pt-2 w-100">
+          <b-button variant="dark" v-if="isPublicPage() && viewer.permission.id === permission.CASTERS" href="/">
+            Go to Admin
+          </b-button>
+          <b-button variant="dark" v-if="!isPublicPage()" href="/public/">
+            Go to Public
+          </b-button>
+          <b-button variant="danger" class="float-right" @click="logout">
+            <fa icon="sign-out-alt" fixed-width /> Logout
+          </b-button>
+        </b-button-group>
       </b-dropdown-text>
       <b-dropdown-text v-else style="width:300px;">
         <loading no-margin/>
@@ -46,6 +54,8 @@ import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import { PermissionsInterface } from 'src/bot/database/entity/permissions'
 
+import { permission } from 'src/bot/helpers/permissions'
+
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons'
 library.add(faUserCircle);
@@ -59,6 +69,8 @@ export default class User extends Vue {
   data: any = null;
   socket = getSocket('/core/users', true);
   interval = 0;
+
+  permission = permission;
 
   isViewerLoaded: boolean = false;
   viewer: {
@@ -113,6 +125,10 @@ export default class User extends Vue {
     this.interval = window.setInterval(() => {
       this.refreshViewer();
     }, 60000)
+  }
+
+  isPublicPage() {
+    return window.location.href.includes('public');
   }
 
   logout() {
