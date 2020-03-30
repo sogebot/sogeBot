@@ -28,11 +28,6 @@
     - Without GIT as [ZIP](https://github.com/sogehige/sogeBot-docker/archive/master.zip)
 2. Configure properly .env file in `root` directory
     - You can find examples at [our GitHub repository](https://github.com/sogehige/sogeBot/tree/master/src/bot/data)
-
-> You need [to be logged on github docker registry](https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-docker-for-use-with-github-packages)
-  until github allows public access to docker registry.
-  More info about issue [Registry fail with "no basic auth credentials"](https://github.community/t5/GitHub-Actions/docker-pull-from-public-GitHub-Package-Registry-fail-with-quot/td-p/32782).
-
 3. Download bot images with `docker compose`
     - Release version: `docker-compose pull`
     - Nightly version: `docker-compose -f docker-compose-nightly.yml pull`
