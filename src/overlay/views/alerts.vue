@@ -222,6 +222,7 @@ export default class AlertsOverlay extends Vue {
                       a.leaveAnimation = true // trigger leave animation
                       a.finished = true
                       console.error('Something went wrong with your video file')
+                      console.error(el.error);
                     }
                   }
                 }
