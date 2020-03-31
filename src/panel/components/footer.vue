@@ -7,7 +7,7 @@
     <span class="alert" :class="[classNameResponse(data.RES)]" style="padding:0;" :title="'Average bot response ' + data.RES + 'ms'">{{data.RES}}ms</span>
     <a href="https://github.com/sogehige/SogeBot">GitHub</a> |
     <a href="https://github.com/sogehige/SogeBot/issues">Issues</a> |
-    <a href="https://github.com/sogehige/SogeBot/blob/master/LICENSE">MIT License</a>
+    <a href="https://github.com/sogehige/SogeBot/blob/master/LICENSE">GPL-3.0 License</a>
   </footer>
 </template>
 
