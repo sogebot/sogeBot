@@ -197,25 +197,28 @@ export default class AlertsOverlay extends Vue {
                         if (!a.thumbnail) {
                           a.thumbnail = true
                           el.volume = 0
-                          el.play().catch((err) => {
-                            if (err) {
-                              console.error('Something went wrong with your video file')
-                              console.error(err.message);
-                              if ((a.url.startsWith('https://') && window.location.protocol.startsWith('http:'))
-                                  || (a.url.startsWith('http://') && window.location.protocol.startsWith('https:'))) {
-                                console.error('You are using mixed content https + http')
-                              }
-                              a.finished = true;
-                            }
-                          })
-                          setTimeout(() => {
-                            el.pause()
-                            setTimeout(() => {
-                              if (a.volume) el.volume = Number(a.volume) / 100
-                              a.isLoaded = true
-                              el.play()
-                            }, 1000)
-                          }, 100)
+                          el.play()
+                              .catch((err) => {
+                                if (err) {
+                                  console.error('Something went wrong with your video file')
+                                  console.error(err.message);
+                                  if ((a.url.startsWith('https://') && window.location.protocol.startsWith('http:'))
+                                      || (a.url.startsWith('http://') && window.location.protocol.startsWith('https:'))) {
+                                    console.error('You are using mixed content https + http')
+                                  }
+                                  a.finished = true;
+                                }
+                              }).then(() => {
+                                setTimeout(() => {
+                                  el.pause()
+                                  setTimeout(() => {
+                                    if (a.volume) el.volume = Number(a.volume) / 100
+                                    a.isLoaded = true
+                                    el.play()
+                                    console.log('Playing video ' + el.dataset.src);
+                                  }, 1000)
+                                }, 150)
+                              })
                         }
                       }
                     } else {
