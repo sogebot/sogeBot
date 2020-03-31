@@ -27,11 +27,17 @@ class Gallery extends Overlay {
             const file = await getRepository(GalleryEntity).findOne({ id: req.params.id });
             if (file) {
               const data = Buffer.from(file.data.split(',')[1], 'base64');
-              res.writeHead(200, {
-                'Content-Type': file.type,
-                'Content-Length': data.length,
-              }),
-              res.end(data);
+              if (req.headers['if-none-match'] === req.params.id + '-' + data.length) {
+                res.sendStatus(304);
+              } else {
+                res.writeHead(200, {
+                  'Content-Type': file.type,
+                  'Content-Length': data.length,
+                  'Cache-Control': 'public, max-age=31536000',
+                  'ETag': req.params.id + '-' + data.length,
+                }),
+                res.end(data);
+              }
             } else {
               res.sendStatus(404);
             }
