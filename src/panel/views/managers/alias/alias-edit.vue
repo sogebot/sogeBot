@@ -156,6 +156,13 @@ export default class aliasEdit extends Vue {
     }
   }
 
+  @Watch('item.alias')
+  checkAliasFormat(val) {
+    if (!val.startsWith('!')) {
+      Vue.set(this.item, 'alias', '!' + val);
+    }
+  }
+
   async mounted() {
     await new Promise((resolve) => {
       this.psocket.emit('permissions', (data) => {
@@ -219,6 +226,9 @@ export default class aliasEdit extends Vue {
           return console.error(err);
         }
 
+        console.groupCollapsed('alias::setById')
+        console.log({data})
+        console.groupEnd();
         this.state.save = this.$state.success;
         this.state.pending = false;
         this.$router.push({ name: 'aliasManagerEdit', params: { id: String(data.id) } })
