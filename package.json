@@ -75,6 +75,7 @@
     "ytsr": "0.1.11"
   },
   "scripts": {
+    "prestart": "echo '.. Migration in progress, please wait...' && typeorm migration:run >logs/migration.log 2>&1",
     "watch": "cross-env NODE_ENV=development npx webpack --watch --progress",
     "build": "cross-env ENV=development make bot",
     "test": "node tools/runTests.js",
