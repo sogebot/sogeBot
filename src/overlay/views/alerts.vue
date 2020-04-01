@@ -79,6 +79,17 @@ export default class AlertsOverlay extends Vue {
   }
 
   mounted () {
+    this.socket.emit('cache', async (err, data) => {
+      if (err) {
+        return console.error(err);
+      }
+      for (const galleryItem of data) {
+        await fetch(new Request('/gallery/' + galleryItem, {
+          cache: 'default',
+        }))
+        console.log('/gallery/' + galleryItem + ' loaded.')
+      }
+    })
     this.socket.on('alert', data => {
       for (let d of data) {
         d.run = false

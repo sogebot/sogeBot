@@ -1,10 +1,13 @@
 import { isNil } from 'lodash';
 
-import { command, default_permission, ui } from '../decorators';
+import { command, default_permission, settings, ui } from '../decorators';
 import Message from '../message';
 import { permission } from '../helpers/permissions';
 import Overlay from './_interface';
 import api from '../api';
+import { publicEndpoint } from '../helpers/socket';
+import { Gallery } from '../database/entity/gallery';
+import { getRepository } from 'typeorm';
 
 class Alerts extends Overlay {
   @ui({
@@ -16,8 +19,24 @@ class Alerts extends Overlay {
   }, 'links')
   linkBtn = null;
 
-  constructor() {
-    super();
+  @settings()
+  galleryCache = false;
+  @settings()
+  @ui({ type: 'number-input', step: '0.5', min: '0.5' })
+  galleryCacheLimitInMb = 50;
+
+  sockets() {
+    publicEndpoint(this.nsp, 'cache', async (cb: (err: string | null, ids: string[]) => void) => {
+      if (this.galleryCache) {
+        const items = await getRepository(Gallery).createQueryBuilder('gallery').select('id').addSelect('data').execute();
+        cb(null, items
+          .filter(o => Buffer.from(o.data.split(',')[1], 'base64').length <= this.galleryCacheLimitInMb * 1024 * 1024)
+          .map(o => o.id)
+        );
+      } else {
+        cb('Gallery cache disabled.', []);
+      }
+    });
   }
 
   @command('!alert')

@@ -1,0 +1,6 @@
+{
+  "settings": {
+    "galleryCache": "Udělat cache galerie",
+    "galleryCacheLimitInMb": "Maximální velikost položky (v MB)"
+  }
+}
