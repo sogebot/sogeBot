@@ -42,7 +42,7 @@ class Carousel extends Overlay {
     });
     adminEndpoint(this.nsp, 'carousel::save', async (items: CarouselInterface[], cb) => {
       try {
-        cb(await getRepository(CarouselEntity).save(items));
+        cb(null, await getRepository(CarouselEntity).save(items));
       } catch (e) {
         cb(e.stack, []);
       }
