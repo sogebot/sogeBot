@@ -27,6 +27,7 @@ class Gallery extends Overlay {
             const request = await getRepository(GalleryEntity).createQueryBuilder('gallery').select('sum(length(data))', 'size').where('id=:id', { id: req.params.id }).getRawOne();
             if (!request) {
               res.sendStatus(404);
+              return;
             }
             if (req.headers['if-none-match'] === req.params.id + '-' + request.size) {
               res.sendStatus(304);
