@@ -68,6 +68,7 @@
     "uuid": "7.0.2",
     "velocity-animate": "1.5.2",
     "vue": "2.6.11",
+    "vue-scrollto": "2.17.1",
     "vue-select": "3.9.3",
     "xregexp": "4.3.0",
     "yargs": "15.3.1",

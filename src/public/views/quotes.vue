@@ -1,5 +1,5 @@
 <template lang="pug">
-  b-container.fluid.pt-2
+  b-container(ref="quotes" style="min-height: calc(100vh - 49px);").fluid.pt-2
     b-row
       b-col
         span.title.text-default.mb-2 {{ translate('menu.quotes') }}
@@ -19,6 +19,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
+import VueScrollTo from 'vue-scrollto';
 
 import { getSocket } from 'src/panel/helpers/socket';
 
@@ -53,6 +54,9 @@ export default class playlist extends Vue {
       console.debug('Loaded', {items})
       this.items = items
       this.state.loading = this.$state.success;
+    })
+    this.$nextTick(() => {
+      VueScrollTo.scrollTo(this.$refs.quotes as Element, 500, { container: 'body', force: true, cancelable: true, offset: -49 })
     })
   }
 }
