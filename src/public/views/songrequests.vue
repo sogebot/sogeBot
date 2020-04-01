@@ -1,5 +1,5 @@
 <template lang="pug">
-  b-container.fluid.pt-2
+  b-container(ref="songrequests" style="min-height: calc(100vh - 49px);").fluid.pt-2
     b-row
       b-col
         span.title.text-default.mb-2 {{ translate('song-requests') }}
@@ -16,6 +16,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
+import VueScrollTo from 'vue-scrollto';
 
 import { getSocket } from 'src/panel/helpers/socket';
 
@@ -64,6 +65,9 @@ export default class songrequest extends Vue {
         this.state.loading.requests = this.$state.success;
       })
     }, 2000)
+    this.$nextTick(() => {
+      VueScrollTo.scrollTo(this.$refs.songrequests as Element, 500, { container: 'body', force: true, cancelable: true, offset: -49 })
+    })
   }
 
   generateThumbnail(videoId) {
