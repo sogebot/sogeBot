@@ -75,8 +75,8 @@ export default class songrequest extends Vue {
   }
 
   linkTo(item) {
-    console.debug('Clicked', item.videoID);
-    window.location.href = `http://youtu.be/${item.videoID}`;
+    console.debug('Clicked', item.videoId);
+    window.location.href = `http://youtu.be/${item.videoId}`;
   }
 }
   </script>
