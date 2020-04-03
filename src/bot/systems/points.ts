@@ -2,10 +2,9 @@
 
 import * as _ from 'lodash';
 import * as cronparser from 'cron-parser';
-import cron from 'node-cron';
 
 import { isBot, prepare, sendMessage } from '../commons';
-import { command, default_permission, parser, permission_settings, settings, ui } from '../decorators';
+import { command, default_permission, parser, permission_settings, settings, shared, ui } from '../decorators';
 import Expects from '../expects';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
@@ -19,6 +18,7 @@ import permissions from '../permissions';
 import api from '../api';
 import users from '../users';
 import { translate } from '../translate';
+import { MINUTE } from '../constants';
 
 class Points extends System {
   cronTask: any = null;
@@ -31,7 +31,9 @@ class Points extends System {
     'type': 'cron',
     'emit': 'parseCron',
   })
-  resetIntervalCron = '0 12 1 * *';
+  resetIntervalCron = '@monthly';
+  @shared(true)
+  lastCronRun = 0;
 
   @settings('points')
   name = 'point|points'; // default is <singular>|<plural> | in some languages can be set with custom <singular>|<x:multi>|<plural> where x <= 10
@@ -60,32 +62,33 @@ class Points extends System {
   @permission_settings('points')
   perMessageOfflineInterval = 0;
 
-  @onLoad('resetIntervalCron')
-  @onLoad('isPointResetIntervalEnabled')
-  initCron(key: string) {
-    this.isLoaded.push(key);
-    if (this.isLoaded.length === 2) {
-      if (this.resetIntervalCron) {
-        this.cronTask = cron.schedule(this.resetIntervalCron, () => {
-          warning('Points were reset by cron');
-          getRepository(User).update({}, { points: 0 });
-        });
+
+  constructor() {
+    super();
+
+    setInterval(() => {
+      try {
+        const interval = cronparser.parseExpression(this.resetIntervalCron);
+        const lastProbableRun = new Date(interval.prev().toISOString()).getTime();
+        if (lastProbableRun > this.lastCronRun) {
+          if (this.isPointResetIntervalEnabled) {
+            warning('Points were reset by cron');
+            getRepository(User).update({}, { points: 0 });
+          } else {
+            debug('points.cron', 'Cron would run, but it is disabled.');
+          }
+          this.lastCronRun = Date.now();
+        }
+      } catch (e) {
+        error(e);
       }
-    }
+    }, MINUTE);
   }
 
   @onChange('resetIntervalCron')
   @onChange('isPointResetIntervalEnabled')
-  resetCron() {
-    if (this.cronTask) {
-      this.cronTask.destroy();
-    }
-    if (this.resetIntervalCron) {
-      this.cronTask = cron.schedule(this.resetIntervalCron, () => {
-        warning('Points were reset by cron');
-        getRepository(User).update({}, { points: 0 });
-      });
-    }
+  resetLastCronRun() {
+    this.lastCronRun = Date.now();
   }
 
   @onLoad('enabled')
