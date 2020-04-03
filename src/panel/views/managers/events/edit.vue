@@ -108,22 +108,24 @@
                   :class="{'pt-2': indexDef === 0}">
 
                   <label for="type_selector">{{ translate("events.definitions." + defKey + ".label") }}</label>
-                  <textarea-with-tags
-                    v-if="['messageToSend', 'commandToRun'].includes(defKey)"
-                    :value.sync="operation.definitions[defKey]"
-                    :placeholder="translate('events.definitions.' + defKey + '.placeholder')"
-                    :error="false"
-                    :filters="['global', ...(supported.events.find((o) => o.id === event.name) || { variables: []}).variables]"
-                    @update="operation.definitions[defKey] = $event"
-                  />
-                  <select class="form-control"
-                          v-else-if="Array.isArray(supported.operations.find(o => o.id === operation.name).definitions[defKey])" v-model="operation.definitions[defKey]">
-                    <option v-for="value of supported.operations.find(o => o.id === operation.name).definitions[defKey]" :key="value">{{value}}</option>
-                  </select>
-                  <input v-else-if="typeof operation.definitions[defKey] === 'string'" type="text" class="form-control" v-model="operation.definitions[defKey]" :placeholder="translate('events.definitions.' + defKey + '.placeholder')"/>
-                  <template v-else-if="typeof operation.definitions[defKey] === 'boolean'">
-                    <button type="button" class="btn btn-success" v-if="operation.definitions[defKey]" @click="operation.definitions[defKey] = false">{{translate("dialog.buttons.yes")}}</button>
-                    <button type="button" class="btn btn-danger" v-else @click="operation.definitions[defKey] = true">{{translate("dialog.buttons.no")}}</button>
+                  <template v-if="supported.operations.find(o => o.id === operation.name)">
+                    <textarea-with-tags
+                      v-if="['messageToSend', 'commandToRun'].includes(defKey)"
+                      :value.sync="operation.definitions[defKey]"
+                      :placeholder="translate('events.definitions.' + defKey + '.placeholder')"
+                      :error="false"
+                      :filters="['global', ...(supported.events.find((o) => o.id === event.name) || { variables: []}).variables]"
+                      @update="operation.definitions[defKey] = $event"
+                    />
+                    <select class="form-control"
+                            v-else-if="Array.isArray(supported.operations.find(o => o.id === operation.name).definitions[defKey])" v-model="operation.definitions[defKey]">
+                      <option v-for="value of supported.operations.find(o => o.id === operation.name).definitions[defKey]" :key="value">{{value}}</option>
+                    </select>
+                    <input v-else-if="typeof operation.definitions[defKey] === 'string'" type="text" class="form-control" v-model="operation.definitions[defKey]" :placeholder="translate('events.definitions.' + defKey + '.placeholder')"/>
+                    <template v-else-if="typeof operation.definitions[defKey] === 'boolean'">
+                      <button type="button" class="btn btn-success" v-if="operation.definitions[defKey]" @click="operation.definitions[defKey] = false">{{translate("dialog.buttons.yes")}}</button>
+                      <button type="button" class="btn btn-danger" v-else @click="operation.definitions[defKey] = true">{{translate("dialog.buttons.no")}}</button>
+                    </template>
                   </template>
                 </div>
               </div>
@@ -315,17 +317,20 @@
         },
         deep: true
       },
-      'event': {
-        handler: function (val) {
+      'event.name': {
+        handler: function (val, oldVal) {
           if (!this.watchEventChange) return;
 
           this.watchEventChange = false;
-          this.$set(this.event, 'definitions', {}) // reload definitions
 
-          const defaultEvent = this.supported.events.find((o) => o.id === val.name)
-          if (defaultEvent) {
-            if (defaultEvent.definitions) {
-              this.$set(this.event, 'definitions', defaultEvent.definitions)
+          if (val !== oldVal) {
+            this.$set(this.event, 'definitions', {}) // reload definitions
+
+            const defaultEvent = this.supported.events.find((o) => o.id === val)
+            if (defaultEvent) {
+              if (defaultEvent.definitions) {
+                this.$set(this.event, 'definitions', defaultEvent.definitions)
+              }
             }
           }
           this.$nextTick(() => {
