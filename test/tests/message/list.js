@@ -90,6 +90,7 @@ describe('Message - list filter', () => {
           rank: 'test',
           hours: 20,
           sender: owner.username,
+          type: 'viewer',
           hlocale: 'hours',
         });
     });
@@ -101,6 +102,7 @@ describe('Message - list filter', () => {
           rank: 'test2',
           hours: 40,
           sender: owner.username,
+          type: 'viewer',
           hlocale: 'hours',
         });
     });
