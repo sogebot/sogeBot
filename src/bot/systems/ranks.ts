@@ -13,6 +13,7 @@ import { Rank, RankInterface } from '../database/entity/rank';
 import { adminEndpoint } from '../helpers/socket';
 import users from '../users';
 import { translate } from '../translate';
+import moment from 'moment';
 
 /*
  * !rank                          - show user rank
@@ -84,14 +85,20 @@ class Ranks extends System {
 
 
     const value = parseInt(parsed[1], 10);
-    const rank = await getRepository(Rank).findOne({ value });
+    const rank = await getRepository(Rank).findOne({ value, type });
     if (!rank) {
       await getRepository(Rank).save({
         value, rank: parsed[2], type,
       });
     }
 
-    const message = await prepare(!rank ? 'ranks.rank-was-added' : 'ranks.ranks-already-exist', { rank: parsed[2], hours: value, type });
+    const message = await prepare(!rank ? 'ranks.rank-was-added' : 'ranks.rank-already-exist',
+      {
+        rank: parsed[2],
+        hours: value,
+        type,
+        hlocale: getLocalizedName(value, type === 'viewer' ? 'core.hours' : 'core.months'),
+      });
     sendMessage(message, opts.sender, opts.attr);
   }
 
@@ -131,7 +138,13 @@ class Ranks extends System {
     await getRepository(Rank).save({
       ...item, rank,
     });
-    const message = await prepare('ranks.rank-was-edited', { value: parseInt(value, 10), rank, type });
+    const message = await prepare('ranks.rank-was-edited',
+      {
+        hours: parseInt(value, 10),
+        rank,
+        type,
+        hlocale: getLocalizedName(value, type === 'viewer' ? 'core.hours' : 'core.months'),
+      });
     sendMessage(message, opts.sender, opts.attr);
   }
 
@@ -224,7 +237,12 @@ class Ranks extends System {
     const value = parseInt(parsed[1], 10);
     const removed = await getRepository(Rank).delete({ value, type });
 
-    const message = await prepare(removed ? 'ranks.rank-was-removed' : 'ranks.rank-was-not-found', { value, type });
+    const message = await prepare(removed ? 'ranks.rank-was-removed' : 'ranks.rank-was-not-found',
+      {
+        hours: value,
+        type,
+        hlocale: getLocalizedName(value, type === 'viewer' ? 'core.hours' : 'core.months'),
+      });
     sendMessage(message, opts.sender, opts.attr);
   }
 
@@ -253,7 +271,6 @@ class Ranks extends System {
     }
 
     if (!_.isNil(rank.next) && typeof rank.current === 'object') {
-
       if (rank.next.type === 'viewer') {
         const toNextRank = rank.next.value - (rank.current.type === 'viewer' ? rank.current.value : 0);
         const toNextRankWatched = watched / 1000 / 60 / 60 - (rank.current.type === 'viewer' ? rank.current.value : 0);
@@ -264,7 +281,7 @@ class Ranks extends System {
       }
       if (rank.next.type === 'follower') {
         const toNextRank = rank.next.value - (rank.current.type === 'follower' ? rank.current.value : 0);
-        const toNextRankFollow = (Date.now() - (user?.followedAt || 0)) / 1000 / 60 / 60 / 31 - (rank.current.type === 'follower' ? rank.current.value : 0);
+        const toNextRankFollow = moment(Date.now()).diff(moment(user?.followedAt || 0), 'months', true);
         const toWatch = (toNextRank - toNextRankFollow);
         const percentage = 100 - (((toWatch) / toNextRank) * 100);
         const message = await prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), 'core.months')})` });
@@ -327,7 +344,8 @@ class Ranks extends System {
       // search for follower rank
       const flwRank = ranks.filter(o => o.type === 'follower');
       for (const rank of flwRank) {
-        if (user.followedAt / 1000 / 60 / 60 >= rank.value) {
+        const followedAtDiff = moment(Date.now()).diff(moment(user.followedAt), 'months', true);
+        if (followedAtDiff >= rank.value) {
           rankToReturn = rank;
           break;
         } else {
