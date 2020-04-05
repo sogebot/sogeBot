@@ -23,12 +23,12 @@ function generateCommand(opts) {
   return [k, r].join(' ').trim();
 }
 
-const failedTests = [/*
+const failedTests = [
   { keyword: null, response: null },
   { keyword: null, response: 'Lorem Ipsum' },
   { keyword: 'ahoj', response: null },
   { keyword: 'ahoj|nebo', response: null },
-*/];
+];
 
 const successTests = [
   {
@@ -37,7 +37,7 @@ const successTests = [
       { type: 'add' },
       { type: 'run', triggers: ['This line will be triggered test'], '-triggers': [] },
     ],
-  },/*
+  },
   {
     keyword: 'привет ты', response: randomString(),
     tests: [
@@ -94,7 +94,7 @@ const successTests = [
       { type: 'remove' },
       { type: 'run', triggers: [], '-triggers': ['Lorem ipsum dolor sit amet nevim co dal psat ahoj jak je ty vole?', 'ahoj', 'ahojda', 'ahoj jak je', 'jak je ahoj', 'sorry jako'] },
     ],
-  },*/
+  },
 ];
 
 
