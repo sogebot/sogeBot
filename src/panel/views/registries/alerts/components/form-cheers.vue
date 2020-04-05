@@ -186,21 +186,21 @@
       <codemirror style="font-size: 0.8em;" v-if="customShow === 'html'" class="w-100" v-model="data.advancedMode.html" :options="{
         tabSize: 4,
         mode: 'text/html',
-        theme: 'base16-' + (localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light')),
+        theme: 'base16-' + theme,
         lineNumbers: true,
         line: true,
       }"></codemirror>
       <codemirror style="font-size: 0.8em;" v-if="customShow === 'js'" class="w-100" v-model="data.advancedMode.js" :options="{
         tabSize: 4,
         mode: 'text/javascript',
-        theme: 'base16-' + (localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light')),
+        theme: 'base16-' + theme,
         lineNumbers: true,
         line: true,
       }"></codemirror>
       <codemirror style="font-size: 0.8em;" v-if="customShow === 'css'" class="w-100"  v-model="data.advancedMode.css" :options="{
         tabSize: 4,
         mode: 'text/css',
-        theme: 'base16-' + (localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light')),
+        theme: 'base16-' + theme,
         lineNumbers: true,
         line: true,
       }"></codemirror>
@@ -483,6 +483,8 @@ import { required, minValue } from 'vuelidate/lib/validators'
 export default class AlertsEditCheersForm extends Vue {
   @PropSync('alert') readonly data !: AlertTipInterface
   @Prop() readonly index !: number
+
+  theme = localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light');
 
   customShow: 'html' | 'css' | 'js' = 'html';
   fonts: {text: string; value: string}[] = [];
