@@ -17,6 +17,8 @@ import currency from '../currency';
 import ranks from './ranks';
 import points from './points';
 import Expects from '../expects';
+import { getUserFromTwitch } from '../microservices/getUserFromTwitch';
+import { clusteredFetchAccountAge } from '../cluster';
 
 /*
  * !me
@@ -122,12 +124,31 @@ class UserInfo extends System {
   }
 
   @command('!age')
-  protected async age(opts: CommandOptions) {
+  protected async age(opts: CommandOptions, retry = false) {
     const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
 
     const user = await getRepository(User).findOne({ username });
     if (!user || user.createdAt === 0) {
-      sendMessage(prepare('age.failed', { username }), opts.sender, opts.attr);
+      try {
+        const { id: userId } = await getUserFromTwitch(username);
+        if (!user) {
+          await getRepository(User).save({
+            userId: Number(userId),
+            username: username,
+          });
+        }
+        await clusteredFetchAccountAge(Number(userId));
+        if (!retry) {
+          this.age(opts, retry = true);
+        } else {
+          throw new Error('retry');
+        }
+      } catch (e) {
+        if (e.message !== 'retry') {
+          error(e);
+        }
+        sendMessage(prepare('age.failed', { username }), opts.sender, opts.attr);
+      }
     } else {
       const units: string[] = ['years', 'months', 'days', 'hours', 'minutes'];
       const diff = dateDiff(new Date(user.createdAt).getTime(), Date.now());

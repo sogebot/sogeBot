@@ -1553,8 +1553,8 @@ class API extends Core {
     return (await isClipChecked(clipId)) ? clipId : null;
   }
 
-  async fetchAccountAge (username, id) {
-    if (id === 0) {
+  async fetchAccountAge (id) {
+    if (id === 0 || id === null || typeof id === 'undefined') {
       return;
     }
 

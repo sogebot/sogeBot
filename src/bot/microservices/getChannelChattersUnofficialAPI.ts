@@ -106,10 +106,11 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
       for (const username of joinedUsers) {
         const user = await getRepository(User).findOne({ where: { username }});
         if (user) {
-          if (user.createdAt === 0) {
-            clusteredFetchAccountAge(username, user.userId);
-          }
           await getRepository(User).save({...user, isOnline: true});
+          if (user.createdAt === 0) {
+            // run this after we save new user
+            await clusteredFetchAccountAge(user.userId);
+          }
         } else {
           // add new user to db
           try {
@@ -121,7 +122,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
               profileImageUrl: twitchObj.profile_image_url,
             });
 
-            clusteredFetchAccountAge(twitchObj.login, Number(twitchObj.id));
+            await clusteredFetchAccountAge(Number(twitchObj.id));
           } catch (e) {
             process.stderr.write('Something went wrong when getting user data of ' + username + '\n');
             continue;
