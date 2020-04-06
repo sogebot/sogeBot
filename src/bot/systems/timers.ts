@@ -16,6 +16,8 @@ import oauth from '../oauth';
 import { translate } from '../translate';
 import { linesParsed } from '../helpers/parser';
 import { isDbConnected } from '../helpers/database';
+import api from '../api';
+import { MINUTE, SECOND } from '../constants';
 
 /*
  * !timers                                                                                                                      - gets an info about timers usage
@@ -130,6 +132,12 @@ class Timers extends System {
   async check () {
     clearTimeout(this.timeouts.timersCheck);
 
+    if (!api.isStreamOnline) {
+      await getRepository(Timer).update({}, { triggeredAtMessages: linesParsed, triggeredAtTimestamp: Date.now() });
+      this.timeouts.timersCheck = global.setTimeout(() => this.check(), MINUTE / 2); // this will run check 1s after full check is correctly done
+      return;
+    }
+
     const timers = await getRepository(Timer).find({
       relations: ['messages'],
       where: { isEnabled: true },
@@ -158,7 +166,7 @@ class Timers extends System {
       }
       await getRepository(Timer).save({ ...timer, triggeredAtMessages: linesParsed, triggeredAtTimestamp: Date.now() });
     }
-    this.timeouts.timersCheck = global.setTimeout(() => this.check(), 1000); // this will run check 1s after full check is correctly done
+    this.timeouts.timersCheck = global.setTimeout(() => this.check(), SECOND); // this will run check 1s after full check is correctly done
   }
 
   async editName (self, socket, data) {
