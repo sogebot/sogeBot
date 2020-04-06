@@ -49,7 +49,10 @@ export const init = async () => {
         socket.on('clusteredChatIn', (message) => clusteredChatIn(message));
         socket.on('clusteredWhisperOut', (message) => clusteredWhisperOut(message));
         socket.on('clusteredChatOut', (message) => clusteredChatOut(message));
-        socket.on('clusteredFetchAccountAge', (username, userId) => clusteredFetchAccountAge(username, userId));
+        socket.on('clusteredFetchAccountAge', async (userId, cb) => {
+          await clusteredFetchAccountAge(userId);
+          cb(); // return when done
+        });
 
         socket.on('received:message', (cb) => {
           // cb is average time
@@ -154,10 +157,14 @@ export const clusteredChatOut = (message) => {
   }
 };
 
-export const clusteredFetchAccountAge = (username, userId) => {
+export const clusteredFetchAccountAge = async (userId) => {
   if (isMainThread) {
-    api.fetchAccountAge(username, userId);
+    await api.fetchAccountAge(userId);
   } else {
-    clientIO.emit('clusteredFetchAccountAge', username, userId);
+    await new Promise(resolve => {
+      clientIO.emit('clusteredFetchAccountAge', userId, () => {
+        resolve();
+      });
+    });
   }
 };
