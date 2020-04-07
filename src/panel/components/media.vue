@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :key="createdAt + id">
     <b-card
       v-if="type === 'image'"
       overlay
@@ -25,14 +25,14 @@
     <b-card v-else-if="type === 'audio'">
       <loading no-margin slow v-if="isUploading"/>
       <b-card-text v-show="b64data.length > 0" :style="{position: b64data.length === 0 ? 'absolute' : 'inherit'}">
-        <audio :src="b64data" :ref="id" controls="true" preload="metadata" style="visibility:hidden; position: absolute;" ></audio>
-        <av-line canv-class="w-100" :ref-link="id" :canv-width="1000" v-show="b64data.length > 0"></av-line>
+        <audio :src="b64data" :ref="createdAt + id" controls="true" preload="metadata" style="visibility:hidden; position: absolute;" ></audio>
+        <av-line canv-class="w-100" :ref-link="createdAt + id" :canv-width="1000" v-show="b64data.length > 0"></av-line>
       </b-card-text>
       <b-card-text class="absolute">
         <b-button squared variant="outline-danger" class="border-0" @click="removeMedia()" v-if="b64data.length > 0">
           <fa icon="times" class="mr-1"/> {{ translate('dialog.buttons.delete') }}
         </b-button>
-        <b-button squared variant="outline-primary" class="border-0" v-if="b64data.length > 0" @click="$refs[id].play()">
+        <b-button squared variant="outline-primary" class="border-0" v-if="b64data.length > 0" @click="$refs[createdAt + id].play()">
           <fa icon="play" class="mr-1"/> {{ translate('dialog.buttons.play') }} ({{duration}}s)
         </b-button>
         <b-button squared variant="outline-dark" class="border-0" @click="$refs['uploadAudio-' + id].click()">
@@ -77,6 +77,8 @@ export default class MediaForm extends Vue {
   io: any = null;
   isUploading = false;
 
+  createdAt = 0;
+
   @Watch('volume')
   @Watch('data')
   setVolume() {
@@ -90,9 +92,12 @@ export default class MediaForm extends Vue {
   }
 
   created() {
+    this.createdAt = Date.now();
     this.io = getSocket(this.socket);
     this.io.emit('alerts::getOneMedia', this.id, (err, data: AlertMediaInterface[]) => {
-      console.log({data})
+      console.groupCollapsed('alerts::getOneMedia')
+      console.log(data)
+      console.groupEnd();
       this.b64data = data.sort((a,b) => a.chunkNo - b.chunkNo).map(o => o.b64data).join('');
     });
   }
@@ -105,7 +110,7 @@ export default class MediaForm extends Vue {
           return;
         }
         this.setVolume();
-        this.duration = (this.$refs[this.id] as HTMLAudioElement).duration;
+        this.duration = (this.$refs[this.createdAt + '' + this.id] as HTMLAudioElement).duration;
         if (isNaN(this.duration)) {
           this.duration = 0;
         } else {
