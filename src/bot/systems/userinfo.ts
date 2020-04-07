@@ -3,7 +3,6 @@ import moment from 'moment';
 
 import { dateDiff, getLocalizedName, prepare, sendMessage } from '../commons';
 import { command, default_permission, settings, ui } from '../decorators';
-import { onMessage } from '../decorators/on';
 import System from './_interface';
 import { debug, error } from '../helpers/log';
 import { getRepository } from 'typeorm';
@@ -327,18 +326,6 @@ class UserInfo extends System {
       }
     }
 
-  }
-
-  @onMessage()
-  public async onMessage(opts: onEventMessage) {
-    if (!_.isNil(opts.sender) && !_.isNil(opts.sender.userId) && !_.isNil(opts.sender.username)) {
-      await getRepository(User).update({
-        userId: opts.sender.userId,
-      }, {
-        seenAt: Date.now(),
-        isSubscriber: typeof opts.sender !== 'undefined',
-      });
-    }
   }
 }
 
