@@ -326,7 +326,7 @@ class Cooldown extends System {
     }
 
     const user = await getRepository(User).save({
-      ...(await getRepository(User).findOne({ userId: opts.sender.userId })),
+      ...(await getRepository(User).findOne({ userId: Number(opts.sender.userId) })),
       userId: Number(opts.sender.userId),
       username: opts.sender.username,
       isSubscriber: typeof opts.sender.badges.subscriber !== 'undefined',
