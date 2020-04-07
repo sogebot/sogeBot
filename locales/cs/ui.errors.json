@@ -8,5 +8,6 @@
   "something_went_wrong": "Něco se pokazilo",
   "permission_must_exist": "Oprávnění musí existovat",
   "minValue_of_value_is": "Minimální hodnota je $value.",
-  "invalid_format": "Nesprávný formát hodnoty"
+  "invalid_format": "Nesprávný formát hodnoty.",
+  "invalid_regexp_format": "Toto není validní regex."
 }

@@ -46,7 +46,10 @@
           :state="$v.keyword.$invalid && $v.keyword.$dirty ? false : null"
           @input="$v.keyword.$touch()"
         ></b-form-input>
-        <b-form-invalid-feedback :state="!($v.keyword.$invalid && $v.keyword.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+        <b-form-invalid-feedback :state="!($v.keyword.$invalid && $v.keyword.$dirty)">
+          <template v-if="!$v.keyword.isValidRegex">{{ translate('errors.invalid_regexp_format') }}</template>
+          <template v-else>{{ translate('dialog.errors.required') }}</template>
+        </b-form-invalid-feedback>
         <small class="form-text text-muted" v-html="translate('systems.keywords.keyword.help')"></small>
       </b-form-group>
       <b-form-group
@@ -76,6 +79,15 @@ import { required } from 'vuelidate/lib/validators'
 import { v4 as uuid } from 'uuid';
 import { KeywordInterface } from 'src/bot/database/entity/keyword';
 
+const isValidRegex = (val) => {
+  try {
+    new RegExp(val);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 @Component({
   components: {
     'loading': () => import('../../../components/loading.vue'),
@@ -95,7 +107,7 @@ export default class keywordsEdit extends Vue {
   }
 
   id: string = uuid();
-  @Validate({ required })
+  @Validate({ required, isValidRegex })
   keyword: string = '';
   @Validate({ required })
   response: string = '';
