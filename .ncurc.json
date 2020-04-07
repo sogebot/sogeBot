@@ -1,9 +1,6 @@
 {
   "upgrade": true,
   "reject": [
-    "vue-plyr",
-    "plyr",
-    "core-js",
     "node-hue-api"
   ]
 }
