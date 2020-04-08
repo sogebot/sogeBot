@@ -51,7 +51,7 @@ class Spotify extends Integration {
   @settings()
   songRequests = true;
   @settings()
-  fetchCurrentSongWhenOffline = true;
+  fetchCurrentSongWhenOffline = false;
 
   @settings('output')
   format = '$song - $artist';
