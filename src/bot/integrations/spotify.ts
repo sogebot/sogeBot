@@ -102,11 +102,6 @@ class Spotify extends Integration {
   constructor () {
     super();
 
-    setInterval(() => {
-      console.log('next song from playlist test');
-      this.playNextSongFromPlaylist();
-    }, 30000);
-
     this.addWidget('spotify', 'widget-title-spotify', 'fab fa-spotify');
 
     if (isMainThread) {
