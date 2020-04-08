@@ -17,6 +17,7 @@ import { existsSync } from 'fs';
 import { isDbConnected } from './helpers/database';
 import { register } from './helpers/register';
 import { addMenu, addMenuPublic, addWidget, ioServer, menuPublic } from './helpers/panel';
+import { v4 as uuid } from 'uuid';
 
 let socket: import('./socket').Socket | any = null;
 
@@ -28,6 +29,7 @@ class Module {
   public settingsPermList: { category?: string; key: string }[] = [];
   public on: InterfaceSettings.On;
   public socket: any = null;
+  public uuid = uuid();
 
   onStartupTriggered = false;
 

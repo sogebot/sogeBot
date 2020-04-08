@@ -11,8 +11,7 @@ import { error, info } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import { debounce } from '../helpers/debounce';
 
-import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
-const NAMESPACE = uuidv4();
+import { v5 as uuidv5 } from 'uuid';
 
 class Discord extends Integration {
   client: DiscordJs.Client | null = null;
@@ -43,7 +42,7 @@ class Discord extends Integration {
   @onChange('enabled')
   @onChange('token')
   async onStateChange(key: string, value: boolean) {
-    if (await debounce(uuidv5('onStateChange', NAMESPACE), 1000)) {
+    if (await debounce(uuidv5('onStateChange', this.uuid), 1000)) {
       if (this.enabled && this.token.length > 0) {
         this.initClient();
         if (this.client) {
