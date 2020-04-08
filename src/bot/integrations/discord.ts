@@ -7,7 +7,7 @@ import * as DiscordJs from 'discord.js';
 import Integration from './_interface';
 import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import { chatIn, chatOut, error, info } from '../helpers/log';
+import { chatIn, chatOut, error, info, whisperOut } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import { debounce } from '../helpers/debounce';
 
@@ -81,16 +81,23 @@ class Discord extends Integration {
               chatIn(`#${msg.channel.name}: ${msg.content} [${msg.author.tag}]`);
               if (msg.content === '!link') {
                 const uuid = uuidv4();
-                msg.author.send(`Hello ${msg.author.tag}, to link this account with your Twitch account on ${oauth.broadcasterUsername} channel, go to https://twitch.tv/${oauth.broadcasterUsername} and send to chat \`!link ${uuid}\``);
+                msg.author.send(`Hello ${msg.author.tag}, to link this Discord account with your Twitch account on ${oauth.broadcasterUsername} channel, go to https://twitch.tv/${oauth.broadcasterUsername}, login to your account and send this command to chat \n\n\t\t\`!link ${uuid}\`\n\nNOTE: This expires in 10 minutes.`);
+                whisperOut(`${msg.author.tag}: Hello ${msg.author.tag}, to link this Discord account with your Twitch account on ${oauth.broadcasterUsername} channel, go to https://twitch.tv/${oauth.broadcasterUsername}, login to your account and send this command to chat \\n\\n\\t\\t\`!link ${uuid}\`\\n\\nNOTE: This expires in 10 minutes.`);
+
                 const reply = await msg.reply('check your DMs for steps to link your account.');
                 chatOut(`#${msg.channel.name}: @${msg.author.tag}, check your DMs for steps to link your account. [${msg.author.tag}]`);
                 setTimeout(() => {
                   msg.delete();
                   reply.delete();
                 }, 10000);
-              } else if (msg.content === 'ping') {
-                msg.reply('pong');
-                chatOut(`#${msg.channel.name}: @${msg.author.tag}, pong [${msg.author.tag}]`);
+              } else if (msg.content === '!ping') {
+                const message = `Pong! \`${Date.now() - msg.createdTimestamp}ms\``;
+                const reply = await msg.reply(message);
+                chatOut(`#${msg.channel.name}: @${msg.author.tag}, ${message} [${msg.author.tag}]`);
+                setTimeout(() => {
+                  msg.delete();
+                  reply.delete();
+                }, 10000);
               }
             }
           }
