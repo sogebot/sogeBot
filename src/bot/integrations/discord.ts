@@ -7,11 +7,12 @@ import * as DiscordJs from 'discord.js';
 import Integration from './_interface';
 import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import { error, info } from '../helpers/log';
+import { chatIn, chatOut, error, info } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import { debounce } from '../helpers/debounce';
 
-import { v5 as uuidv5 } from 'uuid';
+import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
+import oauth from '../oauth';
 
 class Discord extends Integration {
   client: DiscordJs.Client | null = null;
@@ -46,7 +47,7 @@ class Discord extends Integration {
       if (this.enabled && this.token.length > 0) {
         this.initClient();
         if (this.client) {
-          this.client.login('token').catch((reason) => {
+          this.client.login(this.token).catch((reason) => {
             error(chalk.bgRedBright('DISCORD') + ': ' + reason);
           });
         }
@@ -67,12 +68,30 @@ class Discord extends Integration {
         }
       });
 
-      this.client.on('message', msg => {
-        const channels = this.listenAtChannels.split(',').map(o => o.trim());
-        if (msg.channel.type === 'text' && channels.length > 0) {
-          if (channels.includes(msg.channel.name) || channels.includes(msg.channel.id)) {
-            if (msg.content === 'ping') {
-              msg.reply('pong');
+      this.client.on('message', async (msg) => {
+        if (this.client) {
+          if (msg.author.tag === get(this.client, 'user.tag', null)) {
+            // don't do anything on self messages;
+            return;
+          }
+
+          const channels = this.listenAtChannels.split(',').map(o => o.trim());
+          if (msg.channel.type === 'text' && channels.length > 0) {
+            if (channels.includes(msg.channel.name) || channels.includes(msg.channel.id)) {
+              chatIn(`#${msg.channel.name}: ${msg.content} [${msg.author.tag}]`);
+              if (msg.content === '!link') {
+                const uuid = uuidv4();
+                msg.author.send(`Hello ${msg.author.tag}, to link this account with your Twitch account on ${oauth.broadcasterUsername} channel, go to https://twitch.tv/${oauth.broadcasterUsername} and send to chat \`!link ${uuid}\``);
+                const reply = await msg.reply('check your DMs for steps to link your account.');
+                chatOut(`#${msg.channel.name}: @${msg.author.tag}, check your DMs for steps to link your account. [${msg.author.tag}]`);
+                setTimeout(() => {
+                  msg.delete();
+                  reply.delete();
+                }, 10000);
+              } else if (msg.content === 'ping') {
+                msg.reply('pong');
+                chatOut(`#${msg.channel.name}: @${msg.author.tag}, pong [${msg.author.tag}]`);
+              }
             }
           }
         }
