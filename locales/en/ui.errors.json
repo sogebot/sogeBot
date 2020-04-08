@@ -8,5 +8,6 @@
   "something_went_wrong": "Something went wrong",
   "permission_must_exist": "Permission must exist",
   "minValue_of_value_is": "Minimal value is $value",
-  "invalid_format": "Invalid value format"
+  "invalid_format": "Invalid value format.",
+  "invalid_regexp_format": "This is not valid regex."
 }
