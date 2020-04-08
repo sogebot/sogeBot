@@ -9,35 +9,10 @@ import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import { error, info } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
+import { debounce } from '../helpers/debounce';
 
-const debouncing: { [func: string]: number } = {};
-const isDebounced = async (func: string, ms: number): Promise<boolean> => {
-  if (debouncing[func]) {
-    const shouldBeDeleted = Date.now() - debouncing[func] > ms + 50;
-    if (shouldBeDeleted) {
-      delete debouncing[func];
-    }
-  }
-
-  const isAlreadyWaiting = typeof debouncing[func] !== 'undefined';
-  debouncing[func] = Date.now();
-  if (isAlreadyWaiting) {
-    return false; // do nothing after this (we have first waiting function)
-  } else {
-    // initial function - waiting for expected ms
-    return new Promise((resolve) => {
-      const check = () => {
-        const shouldBeRun = Date.now() - debouncing[func] > ms;
-        if (shouldBeRun) {
-          resolve(true);
-        } else {
-          setTimeout(() => check(), 10);
-        }
-      };
-      check();
-    });
-  }
-};
+import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
+const NAMESPACE = uuidv4();
 
 class Discord extends Integration {
   client: DiscordJs.Client | null = null;
@@ -68,7 +43,7 @@ class Discord extends Integration {
   @onChange('enabled')
   @onChange('token')
   async onStateChange(key: string, value: boolean) {
-    if (await isDebounced('OnStateChange', 1000)) {
+    if (await debounce(uuidv5('onStateChange', NAMESPACE), 1000)) {
       if (this.enabled && this.token.length > 0) {
         this.initClient();
         if (this.client) {
@@ -96,8 +71,6 @@ class Discord extends Integration {
       this.client.on('message', msg => {
         const channels = this.listenAtChannels.split(',').map(o => o.trim());
         if (msg.channel.type === 'text' && channels.length > 0) {
-          console.log(msg.channel.name);
-          console.log(msg.channel.id);
           if (channels.includes(msg.channel.name) || channels.includes(msg.channel.id)) {
             if (msg.content === 'ping') {
               msg.reply('pong');
