@@ -358,8 +358,11 @@ class Raffles extends System {
     opts.message = opts.message.toString().replace(raffle.keyword, '');
     let tickets = opts.message.trim() === 'all' && !_.isNil(await points.getPointsOf(opts.sender.userId)) ? await points.getPointsOf(opts.sender.userId) : parseInt(opts.message.trim(), 10);
 
-    if ((!_.isFinite(tickets) || tickets <= 0 || tickets > raffle.maxTickets || tickets < raffle.minTickets) && raffle.type === TYPE_TICKETS) {
+    if ((!_.isFinite(tickets) || tickets <= 0 || tickets < raffle.minTickets) && raffle.type === TYPE_TICKETS) {
       return false;
+    }
+    if (tickets > raffle.maxTickets && raffle.type === TYPE_TICKETS) {
+      tickets = raffle.maxTickets;
     }
     if (!_.isFinite(tickets)) {
       tickets = 0;
