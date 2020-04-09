@@ -5,14 +5,22 @@ import * as DiscordJs from 'discord.js';
 
 // bot libraries
 import Integration from './_interface';
-import { settings, ui } from '../decorators';
+import { command, settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import { chatIn, chatOut, error, info, whisperOut } from '../helpers/log';
+import { chatIn, chatOut, error, info, warning, whisperOut } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import { debounce } from '../helpers/debounce';
 
-import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
+import { v5 as uuidv5 } from 'uuid';
 import oauth from '../oauth';
+import Expects from '../expects';
+import { isUUID, sendMessage } from '../commons';
+
+import { getRepository, IsNull, LessThan, Not } from 'typeorm';
+import { DiscordLink } from '../database/entity/discord';
+import { User } from '../database/entity/user';
+import { MINUTE } from '../constants';
+import userinfo from '../systems/userinfo';
 
 class Discord extends Integration {
   client: DiscordJs.Client | null = null;
@@ -39,6 +47,9 @@ class Discord extends Integration {
   @settings('bot')
   sendOnlineAnnounceToChannel = '';
 
+  @settings('bot')
+  deleteMessagesAfterWhile = false;
+
   @onStartup()
   @onChange('enabled')
   @onChange('token')
@@ -55,6 +66,47 @@ class Discord extends Integration {
         if (this.client) {
           this.client.destroy();
         }
+      }
+    }
+  }
+
+  removeExpiredLinks() {
+    // remove expired links
+    getRepository(DiscordLink).delete({
+      userId: IsNull(), createdAt: LessThan(Date.now() - (MINUTE * 10)),
+    });
+  }
+
+  @command('!unlink')
+  async unlinkAccounts(opts: CommandOptions) {
+    this.removeExpiredLinks();
+    await getRepository(DiscordLink).delete({ userId: Number(opts.sender.userId) });
+    sendMessage('all links were deleted', opts.sender);
+  }
+
+  @command('!link')
+  async linkAccounts(opts: CommandOptions) {
+    enum error { NOT_UUID };
+    this.removeExpiredLinks();
+
+    try {
+      const [ uuid ] = new Expects(opts.parameters).everything().toArray();
+      if (!isUUID(uuid)) {
+        throw new Error(String(error.NOT_UUID));
+      }
+
+      const link = await getRepository(DiscordLink).findOneOrFail({ id: uuid });
+      // link user
+      await getRepository(DiscordLink).save({
+        ...link, userId: opts.sender.userId,
+      });
+      sendMessage(`this account was linked with ${link.tag}`, opts.sender);
+    } catch (e) {
+      if (e.message === String(error.NOT_UUID)) {
+        sendMessage('invalid token', opts.sender);
+      } else {
+        warning(e.stack);
+        sendMessage('something went wrong', opts.sender);
       }
     }
   }
@@ -80,24 +132,70 @@ class Discord extends Integration {
             if (channels.includes(msg.channel.name) || channels.includes(msg.channel.id)) {
               chatIn(`#${msg.channel.name}: ${msg.content} [${msg.author.tag}]`);
               if (msg.content === '!link') {
-                const uuid = uuidv4();
-                msg.author.send(`Hello ${msg.author.tag}, to link this Discord account with your Twitch account on ${oauth.broadcasterUsername} channel, go to https://twitch.tv/${oauth.broadcasterUsername}, login to your account and send this command to chat \n\n\t\t\`!link ${uuid}\`\n\nNOTE: This expires in 10 minutes.`);
-                whisperOut(`${msg.author.tag}: Hello ${msg.author.tag}, to link this Discord account with your Twitch account on ${oauth.broadcasterUsername} channel, go to https://twitch.tv/${oauth.broadcasterUsername}, login to your account and send this command to chat \\n\\n\\t\\t\`!link ${uuid}\`\\n\\nNOTE: This expires in 10 minutes.`);
+                this.removeExpiredLinks();
+                const link = await getRepository(DiscordLink).save({
+                  userId: null,
+                  tag: msg.author.tag,
+                  createdAt: Date.now(),
+                });
+                msg.author.send(`Hello ${msg.author.tag}, to link this Discord account with your Twitch account on ${oauth.broadcasterUsername} channel, go to https://twitch.tv/${oauth.broadcasterUsername}, login to your account and send this command to chat \n\n\t\t\`!link ${link.id}\`\n\nNOTE: This expires in 10 minutes.`);
+                whisperOut(`${msg.author.tag}: Hello ${msg.author.tag}, to link this Discord account with your Twitch account on ${oauth.broadcasterUsername} channel, go to https://twitch.tv/${oauth.broadcasterUsername}, login to your account and send this command to chat \\n\\n\\t\\t\`!link ${link.id}\`\\n\\nNOTE: This expires in 10 minutes.`);
 
                 const reply = await msg.reply('check your DMs for steps to link your account.');
                 chatOut(`#${msg.channel.name}: @${msg.author.tag}, check your DMs for steps to link your account. [${msg.author.tag}]`);
-                setTimeout(() => {
-                  msg.delete();
-                  reply.delete();
-                }, 10000);
+                if (this.deleteMessagesAfterWhile) {
+                  setTimeout(() => {
+                    msg.delete();
+                    reply.delete();
+                  }, 10000);
+                }
+              } else if (msg.content === '!unlink') {
+                await getRepository(DiscordLink).delete({ tag: msg.author.tag });
+                msg.reply('all links were deleted');
               } else if (msg.content === '!ping') {
                 const message = `Pong! \`${Date.now() - msg.createdTimestamp}ms\``;
                 const reply = await msg.reply(message);
                 chatOut(`#${msg.channel.name}: @${msg.author.tag}, ${message} [${msg.author.tag}]`);
-                setTimeout(() => {
-                  msg.delete();
-                  reply.delete();
-                }, 10000);
+                if (this.deleteMessagesAfterWhile) {
+                  setTimeout(() => {
+                    msg.delete();
+                    reply.delete();
+                  }, 10000);
+                }
+              } else {
+                try {
+                  // get linked account
+                  const link = await getRepository(DiscordLink).findOneOrFail({ tag: msg.author.tag, userId: Not(IsNull()) });
+                  if (link.userId) {
+                    const user = await getRepository(User).findOneOrFail({ userId: link.userId });
+                    const message = await userinfo.showMe({
+                      sender: {
+                        badges: {}, color: '',  displayName: '', emoteSets: [], emotes: [], userId: link.userId, username: user.username, userType: 'viewer',
+                        mod: 'false', subscriber: 'false', turbo: 'false',
+                      },
+                      parameters: '',
+                      command: '!me',
+                    }, true);
+                    const reply = await msg.reply(message);
+                    chatOut(`#${msg.channel.name}: @${msg.author.tag}, ${message} [${msg.author.tag}]`);
+                    if (this.deleteMessagesAfterWhile) {
+                      setTimeout(() => {
+                        msg.delete();
+                        reply.delete();
+                      }, 10000);
+                    }
+                  }
+                } catch (e) {
+                  const message = `your account is not linked, use \`!link\``;
+                  const reply = await msg.reply(message);
+                  chatOut(`#${msg.channel.name}: @${msg.author.tag}, ${message} [${msg.author.tag}]`);
+                  if (this.deleteMessagesAfterWhile) {
+                    setTimeout(() => {
+                      msg.delete();
+                      reply.delete();
+                    }, 10000);
+                  }
+                }
               }
             }
           }

@@ -140,7 +140,7 @@ interface UIHighlightsUrlGenerator {
 }
 
 interface CommandOptions {
-  sender: UserStateTags;
+  sender: UserStateTags & { userId: number };
   command: string;
   parameters: string;
   attr?: {

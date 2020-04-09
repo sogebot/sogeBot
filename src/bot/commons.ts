@@ -197,11 +197,10 @@ export async function timeout(username, reason, timeMs) {
   clusteredClientTimeout(username, timeMs, reason);
 }
 
-export function getOwnerAsSender(): Readonly<UserStateTags> {
+export function getOwnerAsSender(): Readonly<UserStateTags & { userId: number }> {
   return {
     username: getOwner(),
     displayName: getOwner(),
-    userId: 0,
     emotes: [],
     badges: {
       subscriber: 1,
@@ -210,6 +209,7 @@ export function getOwnerAsSender(): Readonly<UserStateTags> {
     color: '#000000',
     userType: 'empty',
     emoteSets: [],
+    userId: Number(oauth.channelId),
   };
 }
 
