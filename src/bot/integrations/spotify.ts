@@ -42,8 +42,6 @@ class Spotify extends Integration {
   @shared()
   userId: string | null = null;
   @shared()
-  playlistId: string | null = null;
-  @shared()
   currentSong: string = JSON.stringify({});
 
   @settings()
@@ -168,7 +166,7 @@ class Spotify extends Integration {
     }
   }
 
-  async playNextSongFromPlaylist() {
+  async playNextSongFromPlaylist(retries = 0) {
     try {
       // play from playlist
       const offset = this.originalUri ? { uri: this.originalUri } : undefined;
@@ -194,11 +192,21 @@ class Spotify extends Integration {
       });
       this.currentUris = null;
     } catch (e) {
-      warning('Cannot continue playlist from ' + String(this.originalUri));
-      warning('Playlist will continue from random track');
+      if (this.originalUri) {
+        warning('Cannot continue playlist from ' + String(this.originalUri));
+        warning('Playlist will continue from random track');
+      } else {
+        if (retries < 5) {
+          warning(`Cannot continue playlist from random song. Retry ${retries + 1} of 5 in 5 seconds.`);
+          setTimeout(() => {
+            this.playNextSongFromPlaylist(retries++);
+          }, 5000);
+        } else {
+          warning(`Cannot continue playlist from random song. Retries limit reached.`);
+          error(e.stack);
+        }
+      }
       this.originalUri = null;
-    } finally {
-
     }
   }
 
