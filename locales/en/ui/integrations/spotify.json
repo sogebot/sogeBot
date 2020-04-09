@@ -18,7 +18,7 @@
     "authorizeBtn": "Authorize user",
     "scopes": "Scopes",
     "playlistToPlay": {
-      "title": "Main playlist",
+      "title": "Spotify URI of main playlist",
       "help": "If set, after request finished this playlist will continue"
     },
     "continueOnPlaylistAfterRequest": "Continue on playing of playlist after song request"

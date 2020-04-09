@@ -18,7 +18,7 @@
     "authorizeBtn": "Autorizovat uživatele",
     "scopes": "Scopes",
     "playlistToPlay": {
-      "title": "Hlavní playlist",
+      "title": "Spotify URI hlavního playlistu",
       "help": "Pokud bude nastaveno, po requestu bude hrát tento playlist"
     },
     "continueOnPlaylistAfterRequest": "Pokračovat v přehrávání playlistu po požadavku na skladbu"
