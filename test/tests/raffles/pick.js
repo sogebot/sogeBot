@@ -231,7 +231,7 @@ describe('Raffles - pick()', () => {
     });
   });
 
-  describe.only('Raffle with subscriber and follower should return winner', () => {
+  describe('Raffle with subscriber and follower should return winner', () => {
     it('create ticket raffle', async () => {
       raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
       await message.isSent('raffles.announce-ticket-raffle', { username: 'bot' }, {
