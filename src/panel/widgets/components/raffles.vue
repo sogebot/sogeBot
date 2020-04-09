@@ -128,10 +128,15 @@
 
         b-tab(v-if="winner")
           template(v-slot:title)
-            fa(icon="trophy" fixed-width).mr-1
-            | {{ winner.username }}
+            template(v-if="waitingForNewWinner")
+              fa(icon="spinner" spin fixed-width).mr-1
+            template(v-else)
+              fa(icon="trophy" fixed-width).mr-1
+              | {{ winner.username }}
           b-card-text
-            template(v-if="winner")
+            template(v-if="waitingForNewWinner")
+              loading
+            template(v-else-if="winner")
               div(style="text-align: center")
                 strong(style="font-size: 30px")
                   fa(:icon="['fab', 'twitch']").mr-1
@@ -141,9 +146,17 @@
                 div.d-flex
                   div(class="w-100 btn" style="cursor: initial" :class="[winner.isFollower ? 'text-success' : 'text-danger']") {{translate('follower')}}
                   div(class="w-100 btn" style="cursor: initial" :class="[winner.isSubscriber ? 'text-success' : 'text-danger']") {{translate('subscriber')}}
-                  button(type="button" class="btn btn-outline-secondary border-0 btn-block" @click="socket.emit('raffle::pick')")
-                    fa(icon="sync").mr-1
-                    | {{translate('roll-again')}}
+                  template(v-if="countEligibleParticipants > 0")
+                    button(type="button" class="btn btn-outline-dark border-0 btn-block" @click="socket.emit('raffle::pick'); waitingForNewWinner = true")
+                      fa(icon="sync").mr-1
+                      | {{translate('roll-again')}}
+                  template(v-else)
+                    div(class="w-100 btn text-dark" style="cursor: initial")
+                      font-awesome-layers.mr-2
+                        fa(icon="slash" :mask="['fas', 'sync']")
+                        fa(icon="slash" transform="down-2 left-2")
+                      | {{translate('no-eligible-participants')}}
+
 
               div(class="table-responsive" style="margin-top: 0; padding-left: 10px; padding-right: 10px;")
                 table.table.table-sm
@@ -190,8 +203,15 @@ import { EventBus } from 'src/panel/helpers/event-bus';
 import { orderBy } from 'lodash-es';
 import Vue from 'vue';
 
+import loading from 'src/panel/components/loading.vue';
+import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
+
 export default {
   props: ['popout', 'nodrag'],
+  components: {
+    loading, /* somehow () => import() is not working in this context */
+    'font-awesome-layers': FontAwesomeLayers,
+  },
   data: function () {
     return {
       EventBus,
@@ -201,6 +221,8 @@ export default {
         subscribersPercent: 0,
         followersPercent: 0
       },
+
+      waitingForNewWinner: false,
 
       search: '',
 
@@ -235,7 +257,10 @@ export default {
       if (this.winner) {
         return this.participants.find(o => o.username === this.winner.username).messages
       } else return []
-    }
+    },
+    countEligibleParticipants () {
+      return (this.participants.filter(o => o.isEligible)).length
+    },
   },
   destroyed () {
     clearInterval(this.cacheInterval);
@@ -303,11 +328,12 @@ export default {
             if (raffle) {
               this.participants = raffle.participants;
               this.running = !raffle.isClosed;
+              this.waitingForNewWinner = false;
 
               if (!raffle.winner) {
                 this.winner = null
               } else {
-                if (this.winner === null) {
+                if (this.winner === null || this.winner.username !== raffle.winner) {
                   this.socket.emit('raffle::getWinner', raffle.winner, (err, user) => {
                     if (err) {
                       reject(err);
