@@ -16,7 +16,7 @@ import { globalIgnoreList } from './data/globalIgnoreList';
 import { ban, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning } from './helpers/log';
 import { triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub } from './helpers/interface/triggers';
 import { isDebugEnabled } from './helpers/log';
-import { getLocalizedName, getOwner, isBot, isIgnored, isOwner, prepare, sendMessage } from './commons';
+import { getLocalizedName, getOwner, isBot, isIgnored, isOwner, prepare } from './commons';
 import { clusteredChatIn, clusteredWhisperIn, isMainThread, manageMessage } from './cluster';
 
 import { getRepository } from 'typeorm';
@@ -84,10 +84,11 @@ class TMI extends Core {
         ]
         )];
       // update ignore list
-      sendMessage(prepare('ignore.user.is.added', { username }), opts.sender);
+      return [{ response: await prepare('ignore.user.is.added', { username }), ...opts}];
     } catch (e) {
       error(e.message);
     }
+    return [];
   }
 
   @command('!ignore remove')
@@ -97,10 +98,11 @@ class TMI extends Core {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
       tmi.ignorelist = tmi.ignorelist.filter(o => o !== username);
       // update ignore list
-      sendMessage(prepare('ignore.user.is.removed', { username }), opts.sender);
+      return [{ response: await prepare('ignore.user.is.removed', { username }), ...opts}];
     } catch (e) {
       error(e.message);
     }
+    return [];
   }
 
   @command('!ignore check')
@@ -109,9 +111,11 @@ class TMI extends Core {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
       const isUserIgnored = isIgnored({ username });
-      sendMessage(prepare(isUserIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored', { username }), opts.sender);
-      return isUserIgnored;
-    } catch (e) {}
+      return [{ response: await prepare(isUserIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored'), ...opts}];
+    } catch (e) {
+      error(e.stack);
+    }
+    return [];
   }
 
   async initClient (type: 'bot' | 'broadcaster') {

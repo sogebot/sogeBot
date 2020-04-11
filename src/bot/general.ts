@@ -2,7 +2,6 @@ import { readdirSync, writeFileSync } from 'fs';
 import gitCommitInfo from 'git-commit-info';
 import { get, isBoolean, isNil, isNumber, isString, map } from 'lodash';
 import Core from './_interface';
-import { sendMessage } from './commons';
 import { command, default_permission, settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
 import { permission } from './helpers/permissions';
@@ -150,7 +149,7 @@ class General extends Core {
     const pointer = splitted.shift();
     let newValue = splitted.join(' ');
     if (!pointer) {
-      return sendMessage(`$sender, settings does not exists`, opts.sender, opts.attr);
+      return [{ response: `$sender, settings does not exists`, ...opts }];
     }
 
     const [ type, module ] = pointer.split('.');
@@ -165,25 +164,25 @@ class General extends Core {
         newValue = newValue.toLowerCase().trim();
         if (['true', 'false'].includes(newValue)) {
           self[pointer.split('.')[2]] = newValue === 'true';
-          sendMessage(`$sender, ${pointer} set to ${newValue}`, opts.sender, opts.attr);
+          return [{ response: `$sender, ${pointer} set to ${newValue}`, ...opts }];
         } else {
-          sendMessage('$sender, !set error: bool is expected', opts.sender, opts.attr);
+          return [{ response: `$sender, !set error: bool is expected`, ...opts }];
         }
       } else if (isNumber(currentValue)) {
         if (isFinite(Number(newValue))) {
           self[pointer.split('.')[2]] = Number(newValue);
-          sendMessage(`$sender, ${pointer} set to ${newValue}`, opts.sender, opts.attr);
+          return [{ response: `$sender, ${pointer} set to ${newValue}`, ...opts }];
         } else {
-          sendMessage('$sender, !set error: number is expected', opts.sender, opts.attr);
+          return [{ response: `$sender, !set error: number is expected`, ...opts }];
         }
       } else if (isString(currentValue)) {
         self[pointer.split('.')[2]] = newValue;
-        sendMessage(`$sender, ${pointer} set to '${newValue}'`, opts.sender, opts.attr);
+        return [{ response: `$sender, ${pointer} set to '${newValue}'`, ...opts }];
       } else {
-        sendMessage(`$sender, ${pointer} is not supported settings to change`, opts.sender, opts.attr);
+        return [{ response: `$sender, ${pointer} is not supported settings to change`, ...opts }];
       }
     } else {
-      sendMessage(`$sender, ${pointer} settings not exists`, opts.sender, opts.attr);
+      return [{ response: `$sender, ${pointer} settings not exists`, ...opts }];
     }
   }
 

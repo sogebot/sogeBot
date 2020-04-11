@@ -3,7 +3,7 @@ require('moment-precise-range-plugin');
 
 import { isMainThread } from './cluster';
 
-import { getTime, isIgnored, prepare, sendMessage } from './commons';
+import { getTime, isIgnored, prepare } from './commons';
 import { command, default_permission, settings } from './decorators';
 import { permission } from './helpers/permissions';
 import Core from './_interface';
@@ -47,17 +47,21 @@ class Twitch extends Core {
   @command('!uptime')
   async uptime (opts) {
     const time = getTime(api.streamStatusChangeSince, true) as any;
-    sendMessage(translate(api.isStreamOnline ? 'uptime.online' : 'uptime.offline')
-      .replace(/\$days/g, time.days)
-      .replace(/\$hours/g, time.hours)
-      .replace(/\$minutes/g, time.minutes)
-      .replace(/\$seconds/g, time.seconds), opts.sender);
+    return [
+      {
+        response: await translate(api.isStreamOnline ? 'uptime.online' : 'uptime.offline')
+          .replace(/\$days/g, time.days)
+          .replace(/\$hours/g, time.hours)
+          .replace(/\$minutes/g, time.minutes)
+          .replace(/\$seconds/g, time.seconds),
+        ...opts,
+      },
+    ];
   }
 
   @command('!time')
   async time (opts) {
-    const message = await prepare('time', { time: moment().tz(timezone).format('LTS') });
-    sendMessage(message, opts.sender);
+    return [ { response: await prepare('time', { time: moment().tz(timezone).format('LTS') }), ...opts }];
   }
 
   @command('!followers')
@@ -86,12 +90,12 @@ class Twitch extends Core {
       lastFollowAgo = moment(events[0].timestamp).fromNow();
     }
 
-    const message = await prepare('followers', {
+    const response = await prepare('followers', {
       lastFollowAgo: lastFollowAgo,
       lastFollowUsername: lastFollowUsername,
       onlineFollowersCount: onlineFollowers.length,
     });
-    sendMessage(message, opts.sender);
+    return [ { response, ...opts }];
   }
 
   @command('!subs')
@@ -123,48 +127,44 @@ class Twitch extends Core {
       lastSubAgo = moment(events[0].timestamp).fromNow();
     }
 
-    const message = await prepare('subs', {
+    const response = await prepare('subs', {
       lastSubAgo: lastSubAgo,
       lastSubUsername: lastSubUsername,
       onlineSubCount: onlineSubscribers.length,
     });
-    sendMessage(message, opts.sender);
+    return [ { response, ...opts }];
   }
 
   @command('!title')
   async getTitle (opts) {
-    sendMessage(translate('title.current')
-      .replace(/\$title/g, api.stats.currentTitle || 'n/a'), opts.sender);
+    return [ { response: translate('title.current').replace(/\$title/g, api.stats.currentTitle || 'n/a'), ...opts }];
   }
 
   @command('!title set')
   @default_permission(permission.CASTERS)
   async setTitle (opts) {
     if (opts.parameters.length === 0) {
-      sendMessage(translate('title.current')
-        .replace(/\$title/g, api.stats.currentTitle || 'n/a'), opts.sender);
-      return;
+      return [ { response: await translate('title.current').replace(/\$title/g, api.stats.currentTitle || 'n/a'), ...opts }];
     }
-    api.setTitleAndGame(opts.sender, { title: opts.parameters });
+    const status = await api.setTitleAndGame(opts.sender, { title: opts.parameters });
+    return [ { response: status.response, ...opts }];
   }
 
   @command('!game')
   async getGame (opts) {
-    sendMessage(translate('game.current')
-      .replace(/\$game/g, api.stats.currentGame || 'n/a'), opts.sender);
+    return [ { response: translate('game.current').replace(/\$title/g, api.stats.currentGame || 'n/a'), ...opts }];
   }
 
   @command('!game set')
   @default_permission(permission.CASTERS)
   async setGame (opts) {
     if (opts.parameters.length === 0) {
-      sendMessage(translate('game.current')
-        .replace(/\$game/g, api.stats.currentGame || 'n/a'), opts.sender);
-      return;
+      return [ { response: translate('game.current').replace(/\$title/g, api.stats.currentGame || 'n/a'), ...opts }];
     }
     const games = await api.sendGameFromTwitch (api, null, opts.parameters);
     if (Array.isArray(games) && games.length > 0) {
-      api.setTitleAndGame(opts.sender, { game: games[0] });
+      const status = await api.setTitleAndGame(opts.sender, { game: games[0] });
+      return [ { response: status.response, ...opts }];
     }
   }
 }

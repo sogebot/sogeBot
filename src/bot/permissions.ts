@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import Core from './_interface';
 import {
-  getBroadcaster, isBot, isBroadcaster, isFollower, isModerator, isOwner, isSubscriber, isVIP, prepare, sendMessage,
+  getBroadcaster, isBot, isBroadcaster, isFollower, isModerator, isOwner, isSubscriber, isVIP, prepare,
 } from './commons';
 import { debug, warning } from './helpers/log';
 import { addToCachedHighestPermission, cleanViewersCache, getFromCachedHighestPermission, permission } from './helpers/permissions';
@@ -310,19 +310,19 @@ class Permissions extends Core {
 
   @command('!permission list')
   @default_permission(permission.CASTERS)
-  protected async list(opts: CommandOptions): Promise<void> {
+  protected async list(opts: CommandOptions): Promise<CommandResponse[]> {
     const permissions = await getRepository(PermissionsEntity).find({
       order: {
         order: 'ASC',
       },
     });
-    sendMessage(prepare('core.permissions.list'), opts.sender, opts.attr);
+    const responses: CommandResponse[] = [];
+    responses.push({ response: await prepare('core.permissions.list'), ...opts });
     for (let i = 0; i < permissions.length; i++) {
-      setTimeout(() => {
-        const symbol = permissions[i].isWaterfallAllowed ? '≥' : '=';
-        sendMessage(`${symbol} | ${permissions[i].name} | ${permissions[i].id}`, opts.sender, opts.attr);
-      }, 500 * i);
+      const symbol = permissions[i].isWaterfallAllowed ? '≥' : '=';
+      responses.push({ response: `${symbol} | ${permissions[i].name} | ${permissions[i].id}`, ...opts });
     }
+    return responses;
   }
 
   public async ensurePreservedPermissionsInDb(): Promise<void> {

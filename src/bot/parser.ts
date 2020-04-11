@@ -142,7 +142,7 @@ class Parser {
           for (let i = 0; i < responses.length; i++) {
             setTimeout(() => {
               sendMessage(responses[i].response, responses[i].sender, responses[i].attr);
-            }, 1000 * i);
+            }, 500 * i);
           }
         }
       });

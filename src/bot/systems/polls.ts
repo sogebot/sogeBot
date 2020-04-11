@@ -74,6 +74,7 @@ class Polls extends System {
           command: this.getCommand('!poll open'),
           parameters,
           sender: getOwnerAsSender(),
+          attr: { skip: false, quiet: false },
         });
         cb(null, null);
       } catch (e) {
@@ -86,6 +87,7 @@ class Polls extends System {
           command: this.getCommand('!poll close'),
           parameters: '',
           sender: getOwnerAsSender(),
+          attr: { skip: false, quiet: false },
         });
         cb(null);
       } catch (e) {

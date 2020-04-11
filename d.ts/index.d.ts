@@ -139,13 +139,20 @@ interface UIHighlightsUrlGenerator {
   if?: () => boolean;
 }
 
+interface CommandResponse {
+  response: string;
+  sender: UserStateTags & { userId: number };
+  attr: CommandOptions['attr'];
+}
+
 interface CommandOptions {
   sender: UserStateTags & { userId: number };
   command: string;
   parameters: string;
-  attr?: {
+  attr: {
     skip?: boolean;
     quiet?: boolean;
+    [attr: string]: any;
   };
 }
 
