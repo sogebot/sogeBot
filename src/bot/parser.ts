@@ -137,7 +137,15 @@ class Parser {
       }
     }
     if (this.isCommand) {
-      this.command(this.sender, this.message.trim());
+      this.command(this.sender, this.message.trim()).then(responses => {
+        if (responses) {
+          for (let i = 0; i < responses.length; i++) {
+            setTimeout(() => {
+              sendMessage(responses[i].response, responses[i].sender, responses[i].attr);
+            }, 1000 * i);
+          }
+        }
+      });
     }
   }
 
@@ -282,7 +290,7 @@ class Parser {
       if (typeof command.fnc === 'function' && !_.isNil(command.id)) {
         incrementCountOfCommandUsage(command.command);
         debug('parser.command', 'Running ' + command.command);
-        command.fnc.apply(command.this, [opts]);
+        return command.fnc.apply(command.this, [opts]);
       } else {
         error(command.command + ' have wrong undefined function ' + command._fncName + '() registered!');
       };

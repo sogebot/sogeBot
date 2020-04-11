@@ -20,7 +20,8 @@ import { getRepository, IsNull, LessThan, Not } from 'typeorm';
 import { DiscordLink } from '../database/entity/discord';
 import { User } from '../database/entity/user';
 import { MINUTE } from '../constants';
-import userinfo from '../systems/userinfo';
+import Parser from '../parser';
+import { Message } from '../message';
 
 class Discord extends Integration {
   client: DiscordJs.Client | null = null;
@@ -168,22 +169,36 @@ class Discord extends Integration {
                   const link = await getRepository(DiscordLink).findOneOrFail({ tag: msg.author.tag, userId: Not(IsNull()) });
                   if (link.userId) {
                     const user = await getRepository(User).findOneOrFail({ userId: link.userId });
-                    const message = await userinfo.showMe({
-                      sender: {
+                    const parser = new Parser();
+                    parser.command(
+                      {
                         badges: {}, color: '',  displayName: '', emoteSets: [], emotes: [], userId: link.userId, username: user.username, userType: 'viewer',
                         mod: 'false', subscriber: 'false', turbo: 'false',
                       },
-                      parameters: '',
-                      command: '!me',
-                    }, true);
-                    const reply = await msg.reply(message);
-                    chatOut(`#${msg.channel.name}: @${msg.author.tag}, ${message} [${msg.author.tag}]`);
-                    if (this.deleteMessagesAfterWhile) {
-                      setTimeout(() => {
-                        msg.delete();
-                        reply.delete();
-                      }, 10000);
-                    }
+                      msg.content,
+                    ).then(responses => {
+                      if (responses) {
+                        for (let i = 0; i < responses.length; i++) {
+                          setTimeout(async () => {
+                            if (msg.channel.type === 'text' && channels.length > 0) {
+                              const messageToSend = await new Message(responses[i].response).parse({
+                                ...responses[i].attr,
+                                forceWithoutAt: true, // we dont need @
+                                sender: { ...responses[i].sender, username: msg.author },
+                              }) as string;
+                              const reply = await msg.channel.send(messageToSend);
+                              chatOut(`#${msg.channel.name}: ${messageToSend} [${msg.author.tag}]`);
+                              if (this.deleteMessagesAfterWhile) {
+                                setTimeout(() => {
+                                  msg.delete();
+                                  reply.delete();
+                                }, 10000);
+                              }
+                            };
+                          }, 1000 * i);
+                        };
+                      }
+                    });
                   }
                 } catch (e) {
                   const message = `your account is not linked, use \`!link\``;

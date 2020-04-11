@@ -205,7 +205,7 @@ class UserInfo extends System {
   }
 
   @command('!me')
-  async showMe(opts: CommandOptions, returnOnly = false): Promise<string> {
+  async showMe(opts: CommandOptions, returnOnly = false): Promise<string | { response: string; sender: any; attr: any }[]> {
     try {
       const message: (string | null)[] = [];
       const user = await getRepository(User).findOne({
@@ -289,12 +289,11 @@ class UserInfo extends System {
       if (returnOnly) {
         return response;
       } else {
-        sendMessage(response, opts.sender, opts.attr);
-        return response;
+        return [{ response, sender: opts.sender, attr: opts.attr }];
       }
     } catch (e) {
       error(e.stack);
-      return '';
+      return [];
     }
   }
 
@@ -317,12 +316,17 @@ class UserInfo extends System {
           userId: user.userId,
         },
       }, true);
-      sendMessage(response.replace('$sender', '$touser'), opts.sender, { ...opts.attr, param: username });
+      if (typeof response === 'string') {
+        return [
+          { response: response.replace('$sender', '$touser'), sender: opts.sender, attr: { ...opts.attr, param: username } },
+        ];
+      }
     } catch (e) {
       if (e.message.includes('<username>')) {
-        this.showMe(opts); // fallback to me without param
+        return this.showMe(opts); // fallback to me without param
       } else {
         error(e.stack);
+        return [];
       }
     }
 

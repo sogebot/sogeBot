@@ -722,9 +722,9 @@ class Message {
       for (let [key, value] of Object.entries(attr)) {
         if (_.includes(['sender'], key)) {
           if (typeof value.username !== 'undefined') {
-            value = tmi.showWithAt ? `@${value.username}` : value.username;
+            value = tmi.showWithAt && attr.forceWithoutAt !== true ? `@${value.username}` : value.username;
           } else {
-            value = tmi.showWithAt ? `@${value}` : value;
+            value = tmi.showWithAt && attr.forceWithoutAt !== true ? `@${value}` : value;
           }
         }
         this.message = this.message.replace(new RegExp('[$]' + key, 'g'), value);
