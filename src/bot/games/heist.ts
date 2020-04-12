@@ -4,13 +4,12 @@ import { isMainThread } from '../cluster';
 import Expects from '../expects.js';
 import Game from './_interface';
 import { command, settings, shared, ui } from '../decorators';
-import { getLocalizedName, sendMessage } from '../commons.js';
+import { announce, getLocalizedName } from '../commons.js';
 import { warning } from '../helpers/log.js';
 
 import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
 import { HeistUser } from '../database/entity/heist';
-import oauth from '../oauth';
 import { translate } from '../translate';
 import tmi from '../tmi';
 import { default as pointsSystem } from '../systems/points';
@@ -130,14 +129,7 @@ class Heist extends Game {
       }
 
       if (users.length === 0) {
-        sendMessage(this.noUser, {
-          username: oauth.botUsername,
-          displayName: oauth.botUsername,
-          userId: Number(oauth.botId),
-          emotes: [],
-          badges: {},
-          'message-type': 'chat',
-        });
+        announce(this.noUser);
         // cleanup
         this.startedAt = null;
         await getRepository(HeistUser).clear();
@@ -145,14 +137,7 @@ class Heist extends Game {
         return;
       }
 
-      sendMessage(started.replace('$bank', level.name), {
-        username: oauth.botUsername,
-        displayName: oauth.botUsername,
-        userId: Number(oauth.botId),
-        emotes: [],
-        badges: {},
-        'message-type': 'chat',
-      });
+      announce(started.replace('$bank', level.name));
 
       if (users.length === 1) {
         // only one user
@@ -160,14 +145,7 @@ class Heist extends Game {
         const user = users[0];
         const outcome = isSurvivor ? this.singleUserSuccess : this.singleUserFailed;
         global.setTimeout(async () => {
-          sendMessage(outcome.replace('$user', (tmi.showWithAt ? '@' : '') + user.username), {
-            username: oauth.botUsername,
-            displayName: oauth.botUsername,
-            userId: Number(oauth.botId),
-            emotes: [],
-            badges: {},
-            'message-type': 'chat',
-          });
+          announce(outcome.replace('$user', (tmi.showWithAt ? '@' : '') + user.username));
         }, 5000);
 
         if (isSurvivor) {
@@ -189,14 +167,9 @@ class Heist extends Game {
         const ordered = _.orderBy(this.resultsValues, [(o) => o.percentage], 'asc');
         const result = _.find(ordered, (o) => o.percentage >= percentage);
         global.setTimeout(async () => {
-          sendMessage(_.isNil(result) ? '' : result.message, {
-            username: oauth.botUsername,
-            displayName: oauth.botUsername,
-            userId: Number(oauth.botId),
-            emotes: [],
-            badges: {},
-            'message-type': 'chat',
-          });
+          if (!_.isNil(result)) {
+            announce(result.message);
+          }
         }, 5000);
         if (winners.length > 0) {
           global.setTimeout(async () => {
@@ -209,14 +182,7 @@ class Heist extends Game {
             if (andXMore > 0) {
               message = message + ' ' + (await translate('games.heist.andXMore')).replace('$count', andXMore);
             }
-            sendMessage(message, {
-              username: oauth.botUsername,
-              displayName: oauth.botUsername,
-              userId: Number(oauth.botId),
-              emotes: [],
-              badges: {},
-              'message-type': 'chat',
-            });
+            announce(message);
           }, 5500);
         }
       }
@@ -230,20 +196,13 @@ class Heist extends Game {
     // check if cops done patrolling
     if (lastHeistTimestamp !== 0 && Date.now() - lastHeistTimestamp >= copsCooldown * 60000) {
       this.lastHeistTimestamp = 0;
-      sendMessage((this.copsCooldown), {
-        username: oauth.botUsername,
-        displayName: oauth.botUsername,
-        userId: Number(oauth.botId),
-        emotes: [],
-        badges: {},
-        'message-type': 'chat',
-      });
+      announce(this.copsCooldown);
     }
     this.timeouts.iCheckFinished = global.setTimeout(() => this.iCheckFinished(), 10000);
   }
 
   @command('!bankheist')
-  async main (opts) {
+  async main (opts): Promise<CommandResponse[]> {
     const [entryCooldown, lastHeistTimestamp, copsCooldown] = await Promise.all([
       this.entryCooldownInSeconds,
       this.lastHeistTimestamp,
@@ -256,11 +215,9 @@ class Heist extends Game {
       const minutesLeft = Number(copsCooldown - (Date.now() - lastHeistTimestamp) / 60000).toFixed(1);
       if (Date.now() - (this.lastAnnouncedCops) >= 60000) {
         this.lastAnnouncedCops = Date.now();
-        sendMessage(
-          (this.copsOnPatrol)
-            .replace('$cooldown', minutesLeft + ' ' + getLocalizedName(minutesLeft, 'core.minutes')), opts.sender, opts.attr);
+        return [{ response: this.copsOnPatrol.replace('$cooldown', minutesLeft + ' ' + getLocalizedName(minutesLeft, 'core.minutes')), ...opts }];
       }
-      return;
+      return [];
     }
 
     let newHeist = false;
@@ -269,16 +226,15 @@ class Heist extends Game {
       this.startedAt = Date.now(); // set startedAt
       if (Date.now() - (this.lastAnnouncedStart) >= 60000) {
         this.lastAnnouncedStart = Date.now();
-        sendMessage((await translate('games.heist.entryMessage')).replace('$command', opts.command), opts.sender);
+        return [{ response: translate('games.heist.entryMessage').replace('$command', opts.command), ...opts }];
       }
+      return [];
     }
 
     // is heist in progress?
     if (!newHeist && Date.now() - this.startedAt > entryCooldown * 1000 && Date.now() - (this.lastAnnouncedHeistInProgress) >= 60000) {
       this.lastAnnouncedHeistInProgress = Date.now();
-      sendMessage(
-        (await translate('games.heist.lateEntryMessage')).replace('$command', opts.command), opts.sender, opts.attr);
-      return;
+      return [{ response: translate('games.heist.lateEntryMessage').replace('$command', opts.command), ...opts }];
     }
 
     let points: number | string = 0;
@@ -286,20 +242,17 @@ class Heist extends Game {
       points = new Expects(opts.parameters).points().toArray()[0] as (number | string);
     } catch (e) {
       if (!newHeist) {
-        sendMessage(
-          (await translate('games.heist.entryInstruction')).replace('$command', opts.command), opts.sender, opts.attr);
         warning(`${opts.command} ${e.message}`);
+        return [{ response: translate('games.heist.entryInstruction').replace('$command', opts.command), ...opts }];
       }
-      return;
+      return [];
     }
 
     points = points === 'all' && !_.isNil(await pointsSystem.getPointsOf(opts.sender.userId)) ? await pointsSystem.getPointsOf(opts.sender.userId) : Number(points); // set all points
     points = points > await pointsSystem.getPointsOf(opts.sender.userId) ? await pointsSystem.getPointsOf(opts.sender.userId) : points; // bet only user points
 
     if (points === 0 || _.isNil(points) || _.isNaN(points)) {
-      sendMessage(
-        (await translate('games.heist.entryInstruction')).replace('$command', opts.command), opts.sender, opts.attr);
-      return;
+      return [{ response: translate('games.heist.entryInstruction').replace('$command', opts.command), ...opts }];
     } // send entryInstruction if command is not ok
 
     await Promise.all([
@@ -322,15 +275,16 @@ class Heist extends Game {
       if (this.lastAnnouncedLevel !== level.name) {
         this.lastAnnouncedLevel = level.name;
         if (nextLevel) {
-          sendMessage(this.nextLevelMessage
+          return [{ response: this.nextLevelMessage
             .replace('$bank', level.name)
-            .replace('$nextBank', nextLevel.name), opts.sender, opts.attr);
+            .replace('$nextBank', nextLevel.name), ...opts }];
         } else {
-          sendMessage(this.maxLevelMessage
-            .replace('$bank', level.name), opts.sender, opts.attr);
+          return [{ response: this.maxLevelMessage
+            .replace('$bank', level.name), ...opts }];
         }
       }
     }
+    return [];
   }
 }
 

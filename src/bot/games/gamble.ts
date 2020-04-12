@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import Game from './_interface';
 import { command, settings } from '../decorators';
-import { prepare, sendMessage } from '../commons';
+import { prepare } from '../commons';
 import { error } from '../helpers/log';
 
 import { getRepository } from 'typeorm';
@@ -28,7 +28,7 @@ class Gamble extends Game {
   chanceToWin = 50;
 
   @command('!gamble')
-  async main (opts) {
+  async main (opts): Promise<CommandResponse[]> {
     let points, message;
 
     opts.sender['message-type'] = 'chat'; // force responses to chat
@@ -59,13 +59,13 @@ class Gamble extends Game {
           pointsName: await pointsSystem.getPointsName(updatedPoints),
           points: updatedPoints,
         });
-        sendMessage(message, opts.sender, opts.attr);
+        return [{ response: message, ...opts }];
       } else {
         message = await prepare('gambling.gamble.lose', {
           pointsName: await pointsSystem.getPointsName(await pointsSystem.getPointsOf(opts.sender.userId)),
           points: await pointsSystem.getPointsOf(opts.sender.userId),
         });
-        sendMessage(message, opts.sender, opts.attr);
+        return [{ response: message, ...opts }];
       }
     } catch (e) {
       switch (e.message) {
@@ -73,29 +73,25 @@ class Gamble extends Game {
           message = await prepare('gambling.gamble.zeroBet', {
             pointsName: await pointsSystem.getPointsName(0),
           });
-          sendMessage(message, opts.sender, opts.attr);
-          break;
+          return [{ response: message, ...opts }];
         case ERROR_NOT_ENOUGH_OPTIONS:
-          sendMessage(translate('gambling.gamble.notEnoughOptions'), opts.sender, opts.attr);
-          break;
+          return [{ response: translate('gambling.gamble.notEnoughOptions'), ...opts }];
         case ERROR_NOT_ENOUGH_POINTS:
           message = await prepare('gambling.gamble.notEnoughPoints', {
             pointsName: await pointsSystem.getPointsName(points),
             points: points,
           });
-          sendMessage(message, opts.sender, opts.attr);
-          break;
+          return [{ response: message, ...opts }];
         case ERROR_MINIMAL_BET:
           points = this.minimalBet;
           message = await prepare('gambling.gamble.lowerThanMinimalBet', {
             pointsName: await pointsSystem.getPointsName(points),
             points: points,
           });
-          sendMessage(message, opts.sender, opts.attr);
-          break;
+          return [{ response: message, ...opts }];
         default:
           error(e.stack);
-          sendMessage(translate('core.error'), opts.sender, opts.attr);
+          return [{ response: translate('core.error'), ...opts }];
       }
     }
   }
