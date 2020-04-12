@@ -28,7 +28,7 @@ export function announce(message: string) {
   }, { force: true });
 
   if (Discord.sendGeneralAnnounceToChannel.length > 0 && Discord.client) {
-    // search discord channel by ID or name
+    // search discord channel by ID
     for (const [ id, channel ] of Discord.client.channels.cache) {
       if (channel.type === 'text') {
         if (id === Discord.sendGeneralAnnounceToChannel || (channel as TextChannel).name === Discord.sendGeneralAnnounceToChannel) {

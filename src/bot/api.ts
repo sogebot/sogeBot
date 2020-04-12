@@ -782,6 +782,7 @@ class API extends Core {
       this.calls.bot.limit = request.headers['ratelimit-limit'];
 
       if (request.data.data.length > 0) {
+        oauth.profileImageUrl = request.data.data[0].profile_image_url;
         oauth.broadcasterType = request.data.data[0].broadcaster_type;
         this.stats.currentViews = request.data.data[0].view_count;
       }

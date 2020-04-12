@@ -6,7 +6,7 @@ import * as DiscordJs from 'discord.js';
 // bot libraries
 import Integration from './_interface';
 import { command, settings, ui } from '../decorators';
-import { onChange, onStartup } from '../decorators/on';
+import { onChange, onStartup, onStreamEnd, onStreamStart } from '../decorators/on';
 import { chatIn, chatOut, error, info, warning, whisperOut } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import { debounce } from '../helpers/debounce';
@@ -22,9 +22,18 @@ import { User } from '../database/entity/user';
 import { MINUTE } from '../constants';
 import Parser from '../parser';
 import { Message } from '../message';
+import api from '../api';
+import moment from 'moment';
+import general from '../general';
+
+const timezone = (process.env.TIMEZONE ?? 'system') === 'system' || !process.env.TIMEZONE ? moment.tz.guess() : process.env.TIMEZONE;
 
 class Discord extends Integration {
   client: DiscordJs.Client | null = null;
+
+  embed: DiscordJs.MessageEmbed | null = null;
+  embedMessage: DiscordJs.Message | null = null;
+  embedStartedAt = '';
 
   @settings('general')
   @ui({ type: 'text-input', secret: true })
@@ -115,12 +124,83 @@ class Discord extends Integration {
     }
   }
 
+  @onStreamEnd()
+  updateStreamStartAnnounce() {
+    if (this.embed && this.embedMessage) {
+      this.embed.setColor(0xff0000);
+      this.embed.setDescription(`${oauth.broadcasterUsername} is not streaming anymore! Check it next time!`);
+      this.embed.spliceFields(0, this.embed.fields.length);
+      this.embed.addFields([
+        { name: 'Now Playing', value: api.stats.currentGame},
+        { name: 'Stream Title', value: api.stats.currentTitle},
+        { name: 'Started At', value: this.embedStartedAt, inline: true},
+        { name: 'Stopped At', value: moment().tz(timezone).format('LLL'), inline: true},
+        { name: 'Total Views', value: api.stats.currentViews, inline: true},
+        { name: 'Followers', value: api.stats.currentFollowers, inline: true},
+      ]);
+
+      if (oauth.broadcasterType !== '') {
+        this.embed.addField('Subscribers', api.stats.currentSubscribers, true);
+      }
+      this.embedMessage.edit(this.embed);
+    }
+    this.embed = null;
+    this.embedMessage = null;
+  }
+
+  @onStreamStart()
+  async sendStreamStartAnnounce() {
+    moment.locale(general.lang); // set moment locale
+
+    if (this.client && this.sendOnlineAnnounceToChannel.length > 0) {
+      // search discord channel by ID
+      for (const [ id, channel ] of this.client.channels.cache) {
+        if (channel.type === 'text') {
+          if (id === this.sendOnlineAnnounceToChannel || (channel as DiscordJs.TextChannel).name === this.sendGeneralAnnounceToChannel) {
+            const ch = this.client.channels.cache.find(ch => ch.id === id);
+            if (ch) {
+              this.embedStartedAt = moment().tz(timezone).format('LLL');
+              const embed = new DiscordJs.MessageEmbed()
+                .setURL('https://twitch.tv/' + oauth.broadcasterUsername)
+                .addFields([
+                  { name: 'Now Playing', value: api.stats.currentGame},
+                  { name: 'Stream Title', value: api.stats.currentTitle},
+                  { name: 'Started At', value: this.embedStartedAt, inline: true},
+                  { name: 'Total Views', value: api.stats.currentViews, inline: true},
+                  { name: 'Followers', value: api.stats.currentFollowers, inline: true},
+                ])
+                // Set the title of the field
+                .setTitle('https://twitch.tv/' + oauth.broadcasterUsername)
+                // Set the color of the embed
+                .setColor(0x00ff00)
+                // Set the main content of the embed
+                .setDescription(`${oauth.broadcasterUsername} started stream! Check it out!`)
+                .setThumbnail(oauth.profileImageUrl)
+                .setFooter('Announced by sogeBot - https://www.sogebot.xyz');
+
+              if (oauth.broadcasterType !== '') {
+                embed.addField('Subscribers', api.stats.currentSubscribers, true);
+              }
+              // Send the embed to the same channel as the message
+              this.embedMessage = await (ch as DiscordJs.TextChannel).send(embed);
+              chatOut(`#${(ch as DiscordJs.TextChannel).name}: [[online announce embed]] [${this.client.user?.tag}]`);
+              this.embed = embed;
+            }
+          }
+        }
+      }
+    }
+  }
+
   initClient() {
     if (!this.client) {
       this.client = new DiscordJs.Client();
       this.client.on('ready', () => {
         if (this.client) {
           info(chalk.yellow('DISCORD: ') + `Logged in as ${get(this.client, 'user.tag', 'unknown')}!`);
+
+          // test
+          this.sendStreamStartAnnounce();
         }
       });
 
