@@ -63,6 +63,29 @@ class Discord extends Integration {
   @settings('bot')
   deleteMessagesAfterWhile = false;
 
+  constructor() {
+    super();
+
+    // embed updater
+    setInterval(() => {
+      if (this.embed && this.embedMessage && api.isStreamOnline) {
+        this.embed.spliceFields(0, this.embed.fields.length);
+        this.embed.addFields([
+          { name: 'Now Playing', value: api.stats.currentGame},
+          { name: 'Stream Title', value: api.stats.currentTitle},
+          { name: 'Started At', value: this.embedStartedAt, inline: true},
+          { name: 'Total Views', value: api.stats.currentViews, inline: true},
+          { name: 'Followers', value: api.stats.currentFollowers, inline: true},
+        ]);
+
+        if (oauth.broadcasterType !== '') {
+          this.embed.addField('Subscribers', api.stats.currentSubscribers, true);
+        }
+        this.embedMessage.edit(this.embed);
+      }
+    }, MINUTE * 10);
+  }
+
   @onStartup()
   @onChange('enabled')
   @onChange('token')
