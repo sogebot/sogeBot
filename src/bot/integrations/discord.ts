@@ -156,8 +156,7 @@ class Discord extends Integration {
       this.embed.addFields([
         { name: 'Now Playing', value: api.stats.currentGame},
         { name: 'Stream Title', value: api.stats.currentTitle},
-        { name: 'Started At', value: this.embedStartedAt, inline: true},
-        { name: 'Stopped At', value: moment().tz(timezone).format('LLL'), inline: true},
+        { name: 'Streamed At', value: `${this.embedStartedAt} - ${moment().tz(timezone).format('LLL')}`, inline: true},
         { name: 'Total Views', value: api.stats.currentViews, inline: true},
         { name: 'Followers', value: api.stats.currentFollowers, inline: true},
       ]);
