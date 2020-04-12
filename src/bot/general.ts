@@ -141,6 +141,17 @@ class General extends Core {
     debug('*', '======= END OF DEBUG MESSAGE =======');
   }
 
+  @command('!ping')
+  ping(opts: CommandOptions): CommandResponse[] {
+    if (opts.sender.discord) {
+      const response = `$sender, Pong! \`${Date.now() - opts.createdAt}ms\``;
+      return [{response, ...opts}];
+    } else {
+      const response = `$sender, Pong! ${Date.now() - opts.createdAt}ms`;
+      return [{response, ...opts}];
+    }
+  }
+
   @command('!set')
   @default_permission(permission.CASTERS)
   public async setValue(opts: CommandOptions) {

@@ -420,7 +420,7 @@ export const init = () => {
         if (value.startsWith('_')) {
           return true;
         }
-        general.setValue({ sender: getOwnerAsSender(), command: '', parameters: value + ' ' + index, attr: { quiet: data._quiet }});
+        general.setValue({ sender: getOwnerAsSender(), createdAt: 0, command: '', parameters: value + ' ' + index, attr: { quiet: data._quiet }});
       });
     });
 

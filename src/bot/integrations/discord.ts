@@ -14,7 +14,7 @@ import { debounce } from '../helpers/debounce';
 import { v5 as uuidv5 } from 'uuid';
 import oauth from '../oauth';
 import Expects from '../expects';
-import { isUUID, sendMessage } from '../commons';
+import { isUUID } from '../commons';
 
 import { getRepository, IsNull, LessThan, Not } from 'typeorm';
 import { DiscordLink } from '../database/entity/discord';
@@ -117,7 +117,7 @@ class Discord extends Integration {
   async unlinkAccounts(opts: CommandOptions) {
     this.removeExpiredLinks();
     await getRepository(DiscordLink).delete({ userId: Number(opts.sender.userId) });
-    sendMessage('all links were deleted', opts.sender);
+    return [{ response: '$sender, all links were deleted', ...opts }];
   }
 
   @command('!link')
@@ -136,13 +136,13 @@ class Discord extends Integration {
       await getRepository(DiscordLink).save({
         ...link, userId: opts.sender.userId,
       });
-      sendMessage(`this account was linked with ${link.tag}`, opts.sender);
+      return [{ response: `$sender, this account was linked with ${link.tag}.`, ...opts }];
     } catch (e) {
       if (e.message === String(error.NOT_UUID)) {
-        sendMessage('invalid token', opts.sender);
+        return [{ response: '$sender, invalid token.', ...opts }];
       } else {
         warning(e.stack);
-        sendMessage('something went wrong', opts.sender);
+        return [{ response: '$sender, something went wrong.', ...opts }];
       }
     }
   }
@@ -220,9 +220,6 @@ class Discord extends Integration {
       this.client.on('ready', () => {
         if (this.client) {
           info(chalk.yellow('DISCORD: ') + `Logged in as ${get(this.client, 'user.tag', 'unknown')}!`);
-
-          // test
-          this.sendStreamStartAnnounce();
         }
       });
 
@@ -258,16 +255,6 @@ class Discord extends Integration {
               } else if (msg.content === '!unlink') {
                 await getRepository(DiscordLink).delete({ tag: msg.author.tag });
                 msg.reply('all links were deleted');
-              } else if (msg.content === '!ping') {
-                const message = `Pong! \`${Date.now() - msg.createdTimestamp}ms\``;
-                const reply = await msg.reply(message);
-                chatOut(`#${msg.channel.name}: @${msg.author.tag}, ${message} [${msg.author.tag}]`);
-                if (this.deleteMessagesAfterWhile) {
-                  setTimeout(() => {
-                    msg.delete();
-                    reply.delete();
-                  }, 10000);
-                }
               } else {
                 try {
                   // get linked account
@@ -275,6 +262,7 @@ class Discord extends Integration {
                   if (link.userId) {
                     const user = await getRepository(User).findOneOrFail({ userId: link.userId });
                     const parser = new Parser();
+                    parser.started_at = msg.createdTimestamp;
                     parser.command(
                       {
                         badges: {}, color: '',  displayName: '', emoteSets: [], emotes: [], userId: link.userId, username: user.username, userType: 'viewer',

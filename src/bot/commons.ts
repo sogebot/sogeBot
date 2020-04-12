@@ -267,7 +267,7 @@ export function getBotID() {
     return 0;
   }
 }
-export function getBotSender(): Readonly<UserStateTags> {
+export function getBotSender(): Readonly<CommandOptions['sender']> {
   return {
     username: getBot(),
     displayName: getBot(),

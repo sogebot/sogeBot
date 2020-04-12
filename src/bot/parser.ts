@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import * as constants from './constants';
-import { sendMessage } from './commons';
+import { getBotSender, sendMessage } from './commons';
 import { debug, error, warning } from './helpers/log';
 import { incrementCountOfCommandUsage } from './helpers/commands/count';
 import { getRepository } from 'typeorm';
@@ -14,13 +14,12 @@ import { translate } from './translate';
 import currency from './currency';
 import general from './general';
 import tmi from './tmi';
-import { UserStateTags } from 'twitch-js';
 import { list } from './helpers/register';
 
 class Parser {
   started_at = Date.now();
   message = '';
-  sender: Partial<UserStateTags> | null = null;
+  sender: CommandOptions['sender'] | null = null;
   skip = false;
   quiet = false;
   successfullParserRuns: any[] = [];
@@ -246,7 +245,7 @@ class Parser {
     return commands;
   }
 
-  async command (sender: Partial<UserStateTags> | null, message: string) {
+  async command (sender: CommandOptions['sender'] | null, message: string) {
     debug('parser.command', { sender, message });
     if (!message.startsWith('!')) {
       return;
@@ -273,10 +272,11 @@ class Parser {
       || getFromViewersCache(this.sender.userId, command.permission)
     ) {
       const text = message.trim().replace(new RegExp('^(' + command.command + ')', 'i'), '').trim();
-      const opts = {
-        sender: sender,
+      const opts: CommandOptions = {
+        sender: sender || getBotSender(),
         command: command.command,
         parameters: text.trim(),
+        createdAt: this.started_at,
         attr: {
           skip: this.skip,
           quiet: this.quiet,
