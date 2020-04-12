@@ -295,13 +295,17 @@ class Discord extends Integration {
                               chatOut(`#${msg.channel.name}: ${messageToSend} [${msg.author.tag}]`);
                               if (this.deleteMessagesAfterWhile) {
                                 setTimeout(() => {
-                                  msg.delete();
                                   reply.delete();
                                 }, 10000);
                               }
                             };
                           }, 1000 * i);
                         };
+                      }
+                      if (this.deleteMessagesAfterWhile) {
+                        setTimeout(() => {
+                          msg.delete();
+                        }, 10000);
                       }
                     });
                   }
