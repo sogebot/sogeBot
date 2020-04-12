@@ -181,7 +181,7 @@ class Discord extends Integration {
                         for (let i = 0; i < responses.length; i++) {
                           setTimeout(async () => {
                             if (msg.channel.type === 'text' && channels.length > 0) {
-                              const messageToSend = await new Message(responses[i].response).parse({
+                              const messageToSend = await new Message(await responses[i].response).parse({
                                 ...responses[i].attr,
                                 forceWithoutAt: true, // we dont need @
                                 sender: { ...responses[i].sender, username: msg.author },

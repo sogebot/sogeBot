@@ -119,17 +119,20 @@ class Duel extends Game {
     const users = await getRepository(DuelEntity).find();
     const bank = users.map((o) => o.tickets).reduce((a, b) => a + b, 0);
 
-    sendMessage(
-      prepare('gambling.duel.bank', {
+    return [{
+      response: prepare('gambling.duel.bank', {
         command: this.getCommand('!duel'),
         points: bank,
         pointsName: await points.getPointsName(bank),
-      }), opts.sender);
+      }),
+      ...opts,
+    }];
   }
 
   @command('!duel')
   async main (opts) {
-    let message, bet;
+    const responses: CommandResponse[] = [];
+    let bet;
 
     opts.sender['message-type'] = 'chat'; // force responses to chat
     try {
@@ -174,12 +177,11 @@ class Duel extends Game {
           });
           await points.decrement({ userId: opts.sender.userId }, parseInt(bet, 10));
         } else {
-          message = await prepare('gambling.fightme.cooldown', {
+          const response = await prepare('gambling.fightme.cooldown', {
             minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60), 'core.minutes'),
             cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60),
             command: opts.command });
-          sendMessage(message, opts.sender, opts.attr);
-          return true;
+          return [{ response, ...opts }];
         }
       }
 
@@ -187,54 +189,49 @@ class Duel extends Game {
       const isNewDuel = (this._timestamp) === 0;
       if (isNewDuel) {
         this._timestamp = Number(new Date());
-        message = await prepare('gambling.duel.new', {
+        const response = await prepare('gambling.duel.new', {
           minutesName: getLocalizedName(5, 'core.minutes'),
           minutes: this.duration,
           command: opts.command });
-        sendMessage(message, opts.sender, opts.attr);
+        responses.push({ response, ...opts });
       }
 
       const tickets = (await getRepository(DuelEntity).findOne({ id: opts.sender.userId }))?.tickets ?? 0;
-      global.setTimeout(async () => {
-        message = await prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
-          pointsName: await points.getPointsName(tickets),
-          points: tickets,
-        });
-        sendMessage(message, opts.sender, opts.attr);
-      }, isNewDuel ? 500 : 0);
-      return true;
+      const response = await prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
+        pointsName: await points.getPointsName(tickets),
+        points: tickets,
+      });
+      responses.push({ response, ...opts });
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
-          sendMessage(translate('gambling.duel.notEnoughOptions'), opts.sender, opts.attr);
+          responses.push({ response: translate('gambling.duel.notEnoughOptions'), ...opts });
           break;
         case ERROR_ZERO_BET:
-          message = await prepare('gambling.duel.zeroBet', {
+          responses.push({ response: await prepare('gambling.duel.zeroBet', {
             pointsName: await points.getPointsName(0),
-          });
-          sendMessage(message, opts.sender, opts.attr);
+          }), ...opts });
           break;
         case ERROR_NOT_ENOUGH_POINTS:
-          message = await prepare('gambling.duel.notEnoughPoints', {
+          responses.push({ response: await prepare('gambling.duel.notEnoughPoints', {
             pointsName: await points.getPointsName(bet),
             points: bet,
-          });
-          sendMessage(message, opts.sender, opts.attr);
+          }), ...opts });
           break;
         case ERROR_MINIMAL_BET:
           bet = this.minimalBet;
-          message = await prepare('gambling.duel.lowerThanMinimalBet', {
+          responses.push({ response: await prepare('gambling.duel.lowerThanMinimalBet', {
             pointsName: await points.getPointsName(bet),
             points: bet,
             command: opts.command,
-          });
-          sendMessage(message, opts.sender, opts.attr);
+          }), ...opts });
           break;
         default:
           error(e.stack);
-          sendMessage(translate('core.error'), opts.sender, opts.attr);
+          responses.push({ response: translate('core.error'), ...opts });
       }
     }
+    return responses;
   }
 }
 

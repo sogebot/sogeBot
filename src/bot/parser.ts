@@ -136,7 +136,7 @@ class Parser {
         debug('parser.process', 'Skipped ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ')');
       }
     }
-    if (this.isCommand) {
+    if (this.isCommand && this.sender !== null) {
       this.command(this.sender, this.message.trim()).then(responses => {
         if (responses) {
           for (let i = 0; i < responses.length; i++) {
@@ -246,7 +246,7 @@ class Parser {
     return commands;
   }
 
-  async command (sender, message) {
+  async command (sender: Partial<UserStateTags> | null, message: string) {
     debug('parser.command', { sender, message });
     if (!message.startsWith('!')) {
       return;
@@ -295,10 +295,6 @@ class Parser {
         error(command.command + ' have wrong undefined function ' + command._fncName + '() registered!');
       };
     } else {
-      // user doesn't have permissions for command
-      sender['message-type'] = 'whisper';
-      sendMessage(translate('permissions.without-permission').replace(/\$command/g, message), sender, {});
-
       // do all rollbacks when permission failed
       const rollbacks = await this.rollbacks();
       for (const r of rollbacks) {
@@ -313,6 +309,12 @@ class Parser {
         } else {
           debug('parser.process', 'Rollback skipped for ' + r.name);
         }
+      }
+
+      // user doesn't have permissions for command
+      if (sender) {
+        sender['message-type'] = 'whisper';
+        return[{ response: translate('permissions.without-permission').replace(/\$command/g, message), sender, attr: {} }];
       }
     }
   }
