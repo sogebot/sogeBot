@@ -94,7 +94,7 @@ class Duel extends Game {
         winner: winnerUser.username,
       });
 
-      announce(m, { force: true });
+      announce(m);
 
       // give user his points
       await getRepository(User).increment({ userId: winnerUser.id }, 'points', total);

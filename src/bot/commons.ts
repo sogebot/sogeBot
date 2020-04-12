@@ -17,7 +17,7 @@ import { UserStateTags } from 'twitch-js';
 import Discord from './integrations/discord';
 import { TextChannel } from 'discord.js';
 
-export function announce(message: string, attr: { [attr: string]: any } = {}) {
+export function announce(message: string) {
   sendMessage(message, {
     username: oauth.botUsername,
     displayName: oauth.botUsername,
