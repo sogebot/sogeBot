@@ -151,7 +151,7 @@ class Discord extends Integration {
   updateStreamStartAnnounce() {
     if (this.embed && this.embedMessage) {
       this.embed.setColor(0xff0000);
-      this.embed.setDescription(`${oauth.broadcasterUsername} is not streaming anymore! Check it next time!`);
+      this.embed.setDescription(`${oauth.broadcasterUsername.charAt(0).toUpperCase() + oauth.broadcasterUsername.slice(1)} is not streaming anymore! Check it next time!`);
       this.embed.spliceFields(0, this.embed.fields.length);
       this.embed.addFields([
         { name: 'Now Playing', value: api.stats.currentGame},
@@ -197,7 +197,7 @@ class Discord extends Integration {
                 // Set the color of the embed
                 .setColor(0x00ff00)
                 // Set the main content of the embed
-                .setDescription(`${oauth.broadcasterUsername} started stream! Check it out!`)
+                .setDescription(`${oauth.broadcasterUsername.charAt(0).toUpperCase() + oauth.broadcasterUsername.slice(1)} started stream! Check it out!`)
                 .setThumbnail(oauth.profileImageUrl)
                 .setFooter('Announced by sogeBot - https://www.sogebot.xyz');
 
