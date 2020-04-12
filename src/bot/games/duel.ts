@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { isMainThread } from '../cluster';
 
-import { getLocalizedName, isBroadcaster, isModerator, prepare, sendMessage } from '../commons';
+import { announce, getLocalizedName, isBroadcaster, isModerator, prepare, sendMessage } from '../commons';
 import { command, settings, shared } from '../decorators';
 import Game from './_interface';
 import { error } from '../helpers/log';
@@ -9,7 +9,6 @@ import { error } from '../helpers/log';
 import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
 import { Duel as DuelEntity, DuelInterface } from '../database/entity/duel';
-import oauth from '../oauth';
 import { translate } from '../translate';
 import points from '../systems/points';
 import { isDbConnected } from '../helpers/database';
@@ -94,14 +93,8 @@ class Duel extends Game {
         tickets: winnerUser.tickets,
         winner: winnerUser.username,
       });
-      sendMessage(m, {
-        username: oauth.botUsername,
-        displayName: oauth.botUsername,
-        userId: Number(oauth.botId),
-        emotes: [],
-        badges: {},
-        'message-type': 'chat',
-      }, { force: true });
+
+      announce(m, { force: true });
 
       // give user his points
       await getRepository(User).increment({ userId: winnerUser.id }, 'points', total);
@@ -193,6 +186,10 @@ class Duel extends Game {
           minutesName: getLocalizedName(5, 'core.minutes'),
           minutes: this.duration,
           command: opts.command });
+        if (opts.sender.discord) {
+          // if we have discord, we want to send notice on twitch channel as well
+          sendMessage(response, opts.sender, opts.attr);
+        }
         responses.push({ response, ...opts });
       }
 

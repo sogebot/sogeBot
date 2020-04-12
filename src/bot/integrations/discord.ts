@@ -49,6 +49,9 @@ class Discord extends Integration {
   sendOnlineAnnounceToChannel = '';
 
   @settings('bot')
+  sendGeneralAnnounceToChannel = '';
+
+  @settings('bot')
   deleteMessagesAfterWhile = false;
 
   @onStartup()
@@ -173,7 +176,7 @@ class Discord extends Integration {
                     parser.command(
                       {
                         badges: {}, color: '',  displayName: '', emoteSets: [], emotes: [], userId: link.userId, username: user.username, userType: 'viewer',
-                        mod: 'false', subscriber: 'false', turbo: 'false',
+                        mod: 'false', subscriber: 'false', turbo: 'false', discord: { author: msg.author, channel: msg.channel },
                       },
                       msg.content,
                     ).then(responses => {
