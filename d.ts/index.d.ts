@@ -143,7 +143,7 @@ interface UIHighlightsUrlGenerator {
 }
 
 interface CommandResponse {
-  response: string;
+  response: string | Promise<string>;
   sender: CommandOptions['sender'];
   attr: CommandOptions['attr'];
 }

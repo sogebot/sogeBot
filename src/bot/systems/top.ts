@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import moment from 'moment-timezone';
 
-import { getIgnoreList, getLocalizedName, isIgnored, sendMessage } from '../commons';
+import { getIgnoreList, getLocalizedName, isIgnored } from '../commons';
 import { command, default_permission } from '../decorators';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
@@ -41,68 +41,68 @@ enum TYPE {
 class Top extends System {
   @command('!top time')
   @default_permission(permission.CASTERS)
-  public time(opts) {
+  async time(opts) {
     opts.parameters = TYPE.TIME;
     this.showTop(opts);
   }
 
   @command('!top tips')
   @default_permission(permission.CASTERS)
-  public tips(opts) {
+  async tips(opts) {
     opts.parameters = TYPE.TIPS;
     this.showTop(opts);
   }
 
   @command('!top points')
   @default_permission(permission.CASTERS)
-  public points(opts) {
+  async points(opts) {
     opts.parameters = TYPE.POINTS;
     this.showTop(opts);
   }
 
   @command('!top messages')
   @default_permission(permission.CASTERS)
-  public messages(opts) {
+  async messages(opts) {
     opts.parameters = TYPE.MESSAGES;
-    this.showTop(opts);
+    return this.showTop(opts);
   }
 
   @command('!top followage')
   @default_permission(permission.CASTERS)
-  public followage(opts) {
+  async followage(opts) {
     opts.parameters = TYPE.FOLLOWAGE;
-    this.showTop(opts);
+    return this.showTop(opts);
   }
 
   @command('!top subage')
   @default_permission(permission.CASTERS)
-  public subage(opts) {
+  async subage(opts) {
     opts.parameters = TYPE.SUBAGE;
-    this.showTop(opts);
+    return this.showTop(opts);
   }
 
   @command('!top submonths')
   @default_permission(permission.CASTERS)
-  public submonths(opts) {
+  async submonths(opts) {
     opts.parameters = TYPE.SUBMONTHS;
-    this.showTop(opts);
+    return this.showTop(opts);
   }
 
   @command('!top bits')
   @default_permission(permission.CASTERS)
-  public bits(opts) {
+  async bits(opts) {
     opts.parameters = TYPE.BITS;
-    this.showTop(opts);
+    return this.showTop(opts);
   }
 
   @command('!top gifts')
   @default_permission(permission.CASTERS)
-  public gifts(opts) {
+  async gifts(opts) {
     opts.parameters = TYPE.GIFTS;
-    this.showTop(opts);
+    return this.showTop(opts);
   }
 
-  private async showTop(opts) {
+  private async showTop(opts): Promise<CommandResponse[]> {
     let sorted: {username: string; value: number}[] = [];
     let message;
     let i = 0;
@@ -146,7 +146,7 @@ class Top extends System {
         break;
       case TYPE.POINTS:
         if (!points.enabled) {
-          return;
+          return [];
         }
         sorted
          = (await getRepository(User).createQueryBuilder('user')
@@ -288,7 +288,7 @@ class Top extends System {
       message += 'no data available';
     }
     debug('systems.top', message);
-    sendMessage(message, opts.sender, opts.attr);
+    return [{ response: message, ...opts }];
   }
 }
 
