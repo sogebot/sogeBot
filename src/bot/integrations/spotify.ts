@@ -510,6 +510,7 @@ class Spotify extends Integration {
   @default_permission(null)
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
     if (!(api.isStreamOnline)) {
+      error(`${chalk.bgRed('SPOTIFY')}: stream is offline.`);
       return [];
     } // don't do anything on offline stream
     if (!this.songRequests) {
