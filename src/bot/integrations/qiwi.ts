@@ -119,7 +119,7 @@ class Qiwi extends Integration {
       events.fire('tip', {
         username: username || 'Anonymous',
         amount,
-        currency,
+        currency: DONATION_CURRENCY,
         amountInBotCurrency: Number(currency.exchange(amount, DONATION_CURRENCY, currency.mainCurrency)).toFixed(2),
         currencyInBot: currency.mainCurrency,
         message,
