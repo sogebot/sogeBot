@@ -135,7 +135,8 @@ class Parser {
         debug('parser.process', 'Skipped ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ')');
       }
     }
-    if (this.isCommand && this.sender !== null) {
+
+    if (this.isCommand) {
       this.command(this.sender, this.message.trim()).then(responses => {
         if (responses) {
           for (let i = 0; i < responses.length; i++) {
@@ -245,19 +246,19 @@ class Parser {
     return commands;
   }
 
-  async command (sender: CommandOptions['sender'] | null, message: string) {
+  async command (sender: CommandOptions['sender'] | null, message: string): Promise<CommandResponse[]> {
     debug('parser.command', { sender, message });
     if (!message.startsWith('!')) {
-      return;
+      return [];
     }; // do nothing, this is not a command or user is ignored
     const command = await this.find(message, null);
     debug('parser.command', { command });
     if (_.isNil(command)) {
-      return;
+      return [];
     }; // command not found, do nothing
     if (command.permission === null) {
       warning(`Command ${command.command} is disabled!`);
-      return;
+      return [];
     }; // command is disabled
 
     if (this.sender) {
@@ -290,9 +291,10 @@ class Parser {
       if (typeof command.fnc === 'function' && !_.isNil(command.id)) {
         incrementCountOfCommandUsage(command.command);
         debug('parser.command', 'Running ' + command.command);
-        return command.fnc.apply(command.this, [opts]);
+        return command.fnc.apply(command.this, [opts]) as CommandResponse[];
       } else {
         error(command.command + ' have wrong undefined function ' + command._fncName + '() registered!');
+        return [];
       };
     } else {
       // do all rollbacks when permission failed
@@ -316,6 +318,7 @@ class Parser {
         sender['message-type'] = 'whisper';
         return[{ response: translate('permissions.without-permission').replace(/\$command/g, message), sender, attr: {} }];
       }
+      return [];
     }
   }
 }

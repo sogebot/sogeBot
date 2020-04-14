@@ -113,7 +113,7 @@ class Duel extends Game {
     const bank = users.map((o) => o.tickets).reduce((a, b) => a + b, 0);
 
     return [{
-      response: prepare('gambling.duel.bank', {
+      response: await prepare('gambling.duel.bank', {
         command: this.getCommand('!duel'),
         points: bank,
         pointsName: await points.getPointsName(bank),
