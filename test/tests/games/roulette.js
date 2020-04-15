@@ -61,7 +61,7 @@ describe('game/roulette - !roulette', () => {
         isAlive = r[1].isAlive;
       }
       const msg1 = prepare('gambling.roulette.dead');
-      assert(r[1].response === msg1, JSON.stringify({r, msg1}, 2));
+      assert(r[1].response === msg1, JSON.stringify({r, msg1}));
     });
 
     it(`User should not have negative points`, async () => {
