@@ -78,7 +78,7 @@ class Ranks extends System {
     const parsed = opts.parameters.match(/^(\d+) ([\S].+)$/);
 
     if (_.isNil(parsed)) {
-      const message = await prepare('ranks.rank-parse-failed');
+      const message = prepare('ranks.rank-parse-failed');
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
@@ -92,7 +92,7 @@ class Ranks extends System {
       });
     }
 
-    const message = await prepare(!rank ? 'ranks.rank-was-added' : 'ranks.rank-already-exist',
+    const message = prepare(!rank ? 'ranks.rank-was-added' : 'ranks.rank-already-exist',
       {
         rank: parsed[2],
         hours: value,
@@ -120,7 +120,7 @@ class Ranks extends System {
     const parsed = opts.parameters.match(/^(\d+) ([\S].+)$/);
 
     if (_.isNil(parsed)) {
-      const message = await prepare('ranks.rank-parse-failed');
+      const message = prepare('ranks.rank-parse-failed');
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
@@ -130,7 +130,7 @@ class Ranks extends System {
 
     const item = await getRepository(Rank).findOne({ value: parseInt(value, 10), type });
     if (!item) {
-      const message = await prepare('ranks.rank-was-not-found', { value: value });
+      const message = prepare('ranks.rank-was-not-found', { value: value });
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
@@ -138,7 +138,7 @@ class Ranks extends System {
     await getRepository(Rank).save({
       ...item, rank,
     });
-    const message = await prepare('ranks.rank-was-edited',
+    const message = prepare('ranks.rank-was-edited',
       {
         hours: parseInt(value, 10),
         rank,
@@ -166,13 +166,13 @@ class Ranks extends System {
     const parsed = opts.parameters.match(/^([\S]+) ([\S ]+)$/);
 
     if (_.isNil(parsed)) {
-      const message = await prepare('ranks.rank-parse-failed');
+      const message = prepare('ranks.rank-parse-failed');
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
     await getRepository(User).update({ userId: parsed[1] }, { haveCustomRank: true, rank: parsed[2].trim() });
-    const message = await prepare('ranks.custom-rank-was-set-to-user', { rank: parsed[2].trim(), username: parsed[1] });
+    const message = prepare('ranks.custom-rank-was-set-to-user', { rank: parsed[2].trim(), username: parsed[1] });
     sendMessage(message, opts.sender, opts.attr);
   }
 
@@ -182,13 +182,13 @@ class Ranks extends System {
     const parsed = opts.parameters.match(/^([\S]+)$/);
 
     if (_.isNil(parsed)) {
-      const message = await prepare('ranks.rank-parse-failed');
+      const message = prepare('ranks.rank-parse-failed');
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
     await getRepository(User).update({ userId: parsed[1] }, { haveCustomRank: false, rank: '' });
-    const message = await prepare('ranks.custom-rank-was-unset-for-user', { username: parsed[1] });
+    const message = prepare('ranks.custom-rank-was-unset-for-user', { username: parsed[1] });
     sendMessage(message, opts.sender, opts.attr);
   }
 
@@ -206,7 +206,7 @@ class Ranks extends System {
   @default_permission(permission.CASTERS)
   async list (opts, type: RankInterface['type'] = 'viewer') {
     const ranks = await getRepository(Rank).find({ type });
-    const output = await prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', { list: _.map(_.orderBy(ranks, 'value', 'asc'), function (l) {
+    const output = prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', { list: _.map(_.orderBy(ranks, 'value', 'asc'), function (l) {
       return l.value + 'h - ' + l.rank;
     }).join(', ') });
     sendMessage(output, opts.sender, opts.attr);
@@ -229,7 +229,7 @@ class Ranks extends System {
   async rm (opts, type: RankInterface['type'] = 'viewer') {
     const parsed = opts.parameters.match(/^(\d+)$/);
     if (_.isNil(parsed)) {
-      const message = await prepare('ranks.rank-parse-failed');
+      const message = prepare('ranks.rank-parse-failed');
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
@@ -237,7 +237,7 @@ class Ranks extends System {
     const value = parseInt(parsed[1], 10);
     const removed = await getRepository(Rank).delete({ value, type });
 
-    const message = await prepare(removed ? 'ranks.rank-was-removed' : 'ranks.rank-was-not-found',
+    const message = prepare(removed ? 'ranks.rank-was-removed' : 'ranks.rank-was-not-found',
       {
         hours: value,
         type,
@@ -265,7 +265,7 @@ class Ranks extends System {
     const rank = await this.get(user);
 
     if (_.isNil(rank.current)) {
-      const message = await prepare('ranks.user-dont-have-rank');
+      const message = prepare('ranks.user-dont-have-rank');
       sendMessage(message, opts.sender, opts.attr);
       return true;
     }
@@ -276,7 +276,7 @@ class Ranks extends System {
         const toNextRankWatched = watched / 1000 / 60 / 60 - (rank.current.type === 'viewer' ? rank.current.value : 0);
         const toWatch = (toNextRank - toNextRankWatched);
         const percentage = 100 - (((toWatch) / toNextRank) * 100);
-        const message = await prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), 'core.hours')})` });
+        const message = prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), 'core.hours')})` });
         sendMessage(message, opts.sender, opts.attr);
       }
       if (rank.next.type === 'follower') {
@@ -284,7 +284,7 @@ class Ranks extends System {
         const toNextRankFollow = moment(Date.now()).diff(moment(user?.followedAt || 0), 'months', true);
         const toWatch = (toNextRank - toNextRankFollow);
         const percentage = 100 - (((toWatch) / toNextRank) * 100);
-        const message = await prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), 'core.months')})` });
+        const message = prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), 'core.months')})` });
         sendMessage(message, opts.sender, opts.attr);
       }
       if (rank.next.type === 'subscriber') {
@@ -292,13 +292,13 @@ class Ranks extends System {
         const toNextRankSub = (user?.subscribeCumulativeMonths || 0) - (rank.current.type === 'subscriber' ? rank.current.value : 0);
         const toWatch = (toNextRank - toNextRankSub);
         const percentage = 100 - (((toWatch) / toNextRank) * 100);
-        const message = await prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), 'core.months')})` });
+        const message = prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), 'core.months')})` });
         sendMessage(message, opts.sender, opts.attr);
       }
       return true;
     }
 
-    const message = await prepare('ranks.show-rank-without-next-rank', { rank: typeof rank.current === 'string' ? rank.current : rank.current.rank });
+    const message = prepare('ranks.show-rank-without-next-rank', { rank: typeof rank.current === 'string' ? rank.current : rank.current.rank });
     sendMessage(message, opts.sender, opts.attr);
     return true;
   }

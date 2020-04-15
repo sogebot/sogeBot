@@ -163,16 +163,16 @@ class Raffles extends System {
 
     const eligibility: string[] = [];
     if (raffle.forFollowers === true) {
-      eligibility.push(await prepare('raffles.eligibility-followers-item'));
+      eligibility.push(prepare('raffles.eligibility-followers-item'));
     }
     if (raffle.forSubscribers === true) {
-      eligibility.push(await prepare('raffles.eligibility-subscribers-item'));
+      eligibility.push(prepare('raffles.eligibility-subscribers-item'));
     }
     if (_.isEmpty(eligibility)) {
-      eligibility.push(await prepare('raffles.eligibility-everyone-item'));
+      eligibility.push(prepare('raffles.eligibility-everyone-item'));
     }
 
-    const message = await prepare(locale, {
+    const message = prepare(locale, {
       keyword: raffle.keyword,
       min: raffle.minTickets,
       max: raffle.maxTickets,
@@ -229,7 +229,7 @@ class Raffles extends System {
 
     let keyword = opts.parameters.match(/(![\S]+)/);
     if (_.isNil(keyword)) {
-      const message = await prepare('raffles.cannot-create-raffle-without-keyword');
+      const message = prepare('raffles.cannot-create-raffle-without-keyword');
       sendMessage(message, opts.sender, opts.attr);
       return;
     }
@@ -238,7 +238,7 @@ class Raffles extends System {
     // check if raffle running
     const raffle = await getRepository(Raffle).findOne({ winner: null, isClosed: false });
     if (raffle) {
-      const message = await prepare('raffles.raffle-is-already-running', { keyword: raffle.keyword });
+      const message = prepare('raffles.raffle-is-already-running', { keyword: raffle.keyword });
       sendMessage(message, opts.sender, opts.attr);
       return;
     }
@@ -257,16 +257,16 @@ class Raffles extends System {
 
     const eligibility: string[] = [];
     if (followers) {
-      eligibility.push(await prepare('raffles.eligibility-followers-item'));
+      eligibility.push(prepare('raffles.eligibility-followers-item'));
     }
     if (subscribers) {
-      eligibility.push(await prepare('raffles.eligibility-subscribers-item'));
+      eligibility.push(prepare('raffles.eligibility-subscribers-item'));
     }
     if (_.isEmpty(eligibility)) {
-      eligibility.push(await prepare('raffles.eligibility-everyone-item'));
+      eligibility.push(prepare('raffles.eligibility-everyone-item'));
     }
 
-    const message = await prepare(type === TYPE_NORMAL ? 'raffles.announce-raffle' : 'raffles.announce-ticket-raffle', {
+    const message = prepare(type === TYPE_NORMAL ? 'raffles.announce-raffle' : 'raffles.announce-ticket-raffle', {
       keyword: keyword,
       eligibility: eligibility.join(', '),
       min: minTickets,
@@ -289,7 +289,7 @@ class Raffles extends System {
     const raffle = await getRepository(Raffle).findOne({ winner: null, isClosed: false });
 
     if (!raffle) {
-      const message = await prepare('raffles.no-raffle-is-currently-running');
+      const message = prepare('raffles.no-raffle-is-currently-running');
       sendMessage(message, opts.sender, opts.attr);
       return;
     }
@@ -301,16 +301,16 @@ class Raffles extends System {
 
     const eligibility: string[] = [];
     if (raffle.forFollowers === true) {
-      eligibility.push(await prepare('raffles.eligibility-followers-item'));
+      eligibility.push(prepare('raffles.eligibility-followers-item'));
     }
     if (raffle.forSubscribers === true) {
-      eligibility.push(await prepare('raffles.eligibility-subscribers-item'));
+      eligibility.push(prepare('raffles.eligibility-subscribers-item'));
     }
     if (_.isEmpty(eligibility)) {
-      eligibility.push(await prepare('raffles.eligibility-everyone-item'));
+      eligibility.push(prepare('raffles.eligibility-everyone-item'));
     }
 
-    const message = await prepare(locale, {
+    const message = prepare(locale, {
       keyword: raffle.keyword,
       min: raffle.minTickets,
       max: raffle.maxTickets,
@@ -438,7 +438,7 @@ class Raffles extends System {
     } // no raffle ever
 
     if (raffle.participants.length === 0) {
-      const message = await prepare('raffles.no-participants-to-pick-winner');
+      const message = prepare('raffles.no-participants-to-pick-winner');
       sendMessage(message, {
         username: oauth.botUsername,
         displayName: oauth.botUsername,
@@ -504,7 +504,7 @@ class Raffles extends System {
         getRepository(Raffle).save({...raffle, winner: winner.username, isClosed: true, timestamp: Date.now()}),
       ]);
 
-      const message = await prepare('raffles.raffle-winner-is', {
+      const message = prepare('raffles.raffle-winner-is', {
         username: winner.username,
         keyword: raffle.keyword,
         probability: _.round(probability, 2),

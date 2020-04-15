@@ -166,13 +166,13 @@ class Alias extends System {
 
       const item = await getRepository(AliasEntity).findOne({ alias });
       if (!item) {
-        const message = await prepare('alias.alias-was-not-found', { alias });
+        const message = prepare('alias.alias-was-not-found', { alias });
         sendMessage(message, opts.sender, opts.attr);
         return false;
       }
       await getRepository(AliasEntity).save({...item, command: cmd, permission: pItem.id ?? permission.VIEWERS});
 
-      const message = await prepare('alias.alias-was-edited', { alias, command: cmd });
+      const message = prepare('alias.alias-was-edited', { alias, command: cmd });
       sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
       sendMessage(prepare('alias.alias-parse-failed'), opts.sender, opts.attr);
@@ -198,7 +198,7 @@ class Alias extends System {
         throw Error('Permission ' + perm + ' not found.');
       }
 
-      const message = await prepare('alias.alias-was-added',
+      const message = prepare('alias.alias-was-added',
         await getRepository(AliasEntity).save({
           alias,
           command: cmd,
@@ -235,15 +235,15 @@ class Alias extends System {
 
       const item = await getRepository(AliasEntity).findOne({ alias });
       if (!item) {
-        const message = await prepare('alias.alias-was-not-found', { alias });
+        const message = prepare('alias.alias-was-not-found', { alias });
         sendMessage(message, opts.sender, opts.attr);
         return;
       }
       await getRepository(AliasEntity).save({...item, enabled: !item.enabled});
-      const message = await prepare(!item.enabled ? 'alias.alias-was-enabled' : 'alias.alias-was-disabled', item);
+      const message = prepare(!item.enabled ? 'alias.alias-was-enabled' : 'alias.alias-was-disabled', item);
       sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
-      const message = await prepare('alias.alias-parse-failed');
+      const message = prepare('alias.alias-parse-failed');
       sendMessage(message, opts.sender, opts.attr);
     }
   }
@@ -262,15 +262,15 @@ class Alias extends System {
 
       const item = await getRepository(AliasEntity).findOne({ alias });
       if (!item) {
-        const message = await prepare('alias.alias-was-not-found', { alias });
+        const message = prepare('alias.alias-was-not-found', { alias });
         sendMessage(message, opts.sender, opts.attr);
         return false;
       }
       await getRepository(AliasEntity).save({...item, visible: !item.visible});
-      const message = await prepare(!item.visible ? 'alias.alias-was-exposed' : 'alias.alias-was-concealed', item);
+      const message = prepare(!item.visible ? 'alias.alias-was-exposed' : 'alias.alias-was-concealed', item);
       sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
-      const message = await prepare('alias.alias-parse-failed');
+      const message = prepare('alias.alias-parse-failed');
       sendMessage(message, opts.sender, opts.attr);
     }
   }
@@ -289,16 +289,16 @@ class Alias extends System {
 
       const item = await getRepository(AliasEntity).findOne({ alias });
       if (!item) {
-        const message = await prepare('alias.alias-was-not-found', { alias });
+        const message = prepare('alias.alias-was-not-found', { alias });
         sendMessage(message, opts.sender, opts.attr);
         return false;
       }
       await getRepository(AliasEntity).remove(item);
 
-      const message = await prepare('alias.alias-was-removed', { alias });
+      const message = prepare('alias.alias-was-removed', { alias });
       sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
-      const message = await prepare('alias.alias-parse-failed');
+      const message = prepare('alias.alias-parse-failed');
       sendMessage(message, opts.sender, opts.attr);
     }
   }

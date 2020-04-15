@@ -317,7 +317,7 @@ class Permissions extends Core {
       },
     });
     const responses: CommandResponse[] = [];
-    responses.push({ response: await prepare('core.permissions.list'), ...opts });
+    responses.push({ response: prepare('core.permissions.list'), ...opts });
     for (let i = 0; i < permissions.length; i++) {
       const symbol = permissions[i].isWaterfallAllowed ? '≥' : '=';
       responses.push({ response: `${symbol} | ${permissions[i].name} | ${permissions[i].id}`, ...opts });

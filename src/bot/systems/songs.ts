@@ -242,7 +242,7 @@ class Songs extends System {
     }
 
     await getRepository(SongBan).save({ videoId: currentSong.videoID, title: currentSong.title });
-    const message = await prepare('songs.song-was-banned', { name: currentSong.title });
+    const message = prepare('songs.song-was-banned', { name: currentSong.title });
     sendMessage(message, opts.sender, opts.attr);
 
     // send timeouts to all users who requested song
@@ -421,7 +421,7 @@ class Songs extends System {
       }
     }
 
-    const message = await prepare(translation, currentSong.videoID !== null ? { name: currentSong.title, username: currentSong.username } : {});
+    const message = prepare(translation, currentSong.videoID !== null ? { name: currentSong.title, username: currentSong.username } : {});
     sendMessage(message, {
       username: oauth.botUsername,
       displayName: oauth.botUsername,
@@ -444,7 +444,7 @@ class Songs extends System {
     } else {
       return;
     }
-    const message = await prepare(translation, { name: currentSong.title, username: currentSong.username });
+    const message = prepare(translation, { name: currentSong.title, username: currentSong.username });
     sendMessage(message, {
       username: oauth.botUsername,
       displayName: oauth.botUsername,
@@ -577,7 +577,7 @@ class Songs extends System {
           length: Number(videoInfo.length_seconds),
           username: opts.sender.username,
         });
-        const message = await prepare('songs.song-was-added-to-queue', { name: videoInfo.title });
+        const message = prepare('songs.song-was-added-to-queue', { name: videoInfo.title });
         sendMessage(message, opts.sender, opts.attr);
         this.getMeanLoudness();
       }
@@ -592,7 +592,7 @@ class Songs extends System {
     });
     if (sr) {
       getRepository(SongRequest).remove(sr);
-      const m = await prepare('songs.song-was-removed-from-queue', { name: sr.title });
+      const m = prepare('songs.song-was-removed-from-queue', { name: sr.title });
       sendMessage(m, opts.sender, opts.attr);
       this.getMeanLoudness();
     }
@@ -661,7 +661,7 @@ class Songs extends System {
 
     this.refreshPlaylistVolume();
     this.getMeanLoudness();
-    sendMessage(await prepare('songs.playlist-imported', { imported, skipped: done - imported }), opts.sender, opts.attr);
+    sendMessage(prepare('songs.playlist-imported', { imported, skipped: done - imported }), opts.sender, opts.attr);
     return { imported, skipped: done - imported };
   }
 
@@ -676,7 +676,7 @@ class Songs extends System {
     const song = await getRepository(SongPlaylist).findOne({ videoId: videoID });
     if (song) {
       getRepository(SongPlaylist).delete({ videoId: videoID });
-      const message = await prepare('songs.song-was-removed-from-playlist', { name: song.title });
+      const message = prepare('songs.song-was-removed-from-playlist', { name: song.title });
       sendMessage(message, opts.sender, opts.attr);
     } else {
       sendMessage(translate('songs.song-was-not-found'), opts.sender, opts.attr);
@@ -707,7 +707,7 @@ class Songs extends System {
     const ids = await this.getSongsIdsFromPlaylist(opts.parameters);
 
     if (ids.length === 0) {
-      sendMessage(await prepare('songs.playlist-is-empty'), opts.sender, opts.attr);
+      sendMessage(prepare('songs.playlist-is-empty'), opts.sender, opts.attr);
     } else {
       let imported = 0;
       let done = 0;
@@ -755,7 +755,7 @@ class Songs extends System {
 
       await this.refreshPlaylistVolume();
       await this.getMeanLoudness();
-      sendMessage(await prepare('songs.playlist-imported', { imported, skipped: done - imported }), opts.sender, opts.attr);
+      sendMessage(prepare('songs.playlist-imported', { imported, skipped: done - imported }), opts.sender, opts.attr);
       info(`=> Playlist import done, ${imported} imported, ${done - imported} skipped`);
       return { imported, skipped: done - imported };
     }

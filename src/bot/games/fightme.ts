@@ -98,7 +98,7 @@ class FightMe extends Game {
           return !(ch.opponent === opts.sender.username
             && ch.challenger === user.username);
         });
-        return [{ response: await prepare('gambling.fightme.broadcaster', {
+        return [{ response: prepare('gambling.fightme.broadcaster', {
           winner: isBroadcaster(opts.sender) ? opts.sender.username : user.username,
           loser: isBroadcaster(opts.sender) ? user.username : opts.sender.username,
         }), ...opts }];
@@ -110,7 +110,7 @@ class FightMe extends Game {
           return !(ch.opponent === opts.sender.username
             && ch.challenger === user.username);
         });
-        return [{ response: await prepare('gambling.fightme.bothModerators', { challenger: user.username }), ...opts }];
+        return [{ response: prepare('gambling.fightme.bothModerators', { challenger: user.username }), ...opts }];
       }
 
       // vs mod
@@ -120,7 +120,7 @@ class FightMe extends Game {
           return !(ch.opponent === opts.sender.username
             && ch.challenger === user.username);
         });
-        return [{ response: await prepare('gambling.fightme.oneModerator', {
+        return [{ response: prepare('gambling.fightme.oneModerator', {
           winner: isMod.sender ? opts.sender.username : user.username,
           loser: isMod.sender ? user.username : opts.sender.username,
         }), ...opts }];
@@ -135,7 +135,7 @@ class FightMe extends Game {
         return !(ch.opponent === opts.sender.username
           && ch.challenger === user.username);
       });
-      return [{ response: await prepare('gambling.fightme.winner', {
+      return [{ response: prepare('gambling.fightme.winner', {
         username: user.username,
         winner: winner ? user.username : opts.sender.username,
         loser: winner ? opts.sender.username : user.username,
@@ -146,7 +146,7 @@ class FightMe extends Game {
       const isMod = isModerator(opts.sender);
       if (new Date().getTime() - new Date(this._cooldown).getTime() < cooldown * 1000
         && !(this.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {
-        return [{ response: await prepare('gambling.fightme.cooldown', {
+        return [{ response: prepare('gambling.fightme.cooldown', {
           command: opts.command,
           cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60),
           minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60), 'core.minutes'),

@@ -164,8 +164,8 @@ class HowLongToBeat extends System {
         game: gameInput, hltbMain: gameplayMain, hltbCompletionist: gameplayCompletionist, currentMain: timeToBeatMain.toFixed(1), currentCompletionist: timeToBeatCompletionist.toFixed(1),
         percentMain: Number((timeToBeatMain / gameplayMain) * 100).toFixed(2),
         percentCompletionist: Number((timeToBeatCompletionist / gameplayCompletionist) * 100).toFixed(2),
-        doneMain: finishedMain ? await prepare('systems.howlongtobeat.done') : '',
-        doneCompletionist: finishedCompletionist ? await prepare('systems.howlongtobeat.done') : '',
+        doneMain: finishedMain ? prepare('systems.howlongtobeat.done') : '',
+        doneCompletionist: finishedCompletionist ? prepare('systems.howlongtobeat.done') : '',
       }), opts.sender, opts.attr);
   }
 }

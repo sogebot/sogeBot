@@ -155,7 +155,7 @@ class Bets extends System {
         options: options,
       });
 
-      sendMessage(await prepare('bets.opened', {
+      sendMessage(prepare('bets.opened', {
         username: getOwner(),
         title,
         maxIndex: options.length,
@@ -190,7 +190,7 @@ class Bets extends System {
     if (!currentBet) {
       sendMessage(translate('bets.notRunning'), opts.sender, opts.attr);
     } else {
-      sendMessage(await prepare(currentBet.isLocked ? 'bets.lockedInfo' : 'bets.info', {
+      sendMessage(prepare(currentBet.isLocked ? 'bets.lockedInfo' : 'bets.info', {
         command: opts.command,
         title: currentBet.title,
         maxIndex: String(currentBet.options.length),
@@ -261,7 +261,7 @@ class Bets extends System {
           sendMessage(translate('bets.notRunning'), opts.sender, opts.attr);
           break;
         case ERROR_UNDEFINED_BET:
-          sendMessage(await prepare('bets.undefinedBet', { command: opts.command }), opts.sender, opts.attr);
+          sendMessage(prepare('bets.undefinedBet', { command: opts.command }), opts.sender, opts.attr);
           break;
         case ERROR_IS_LOCKED:
           sendMessage(translate('bets.timeUpBet'), opts.sender, opts.attr);
@@ -272,7 +272,7 @@ class Bets extends System {
           break;
         default:
           warning(e.stack);
-          sendMessage((await prepare('bets.error', { command: opts.command })).replace(/\$maxIndex/g, String((currentBet as BetsInterface).options.length)), opts.sender, opts.attr);
+          sendMessage((prepare('bets.error', { command: opts.command })).replace(/\$maxIndex/g, String((currentBet as BetsInterface).options.length)), opts.sender, opts.attr);
       }
     }
   }
@@ -351,7 +351,7 @@ class Bets extends System {
           sendMessage(translate('bets.notRunning'), opts.sender, opts.attr);
           break;
         case ERROR_NOT_OPTION:
-          sendMessage(await prepare('bets.notOption', { command: opts.command }), opts.sender, opts.attr);
+          sendMessage(prepare('bets.notOption', { command: opts.command }), opts.sender, opts.attr);
           break;
         default:
           warning(e.stack);

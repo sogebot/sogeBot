@@ -84,7 +84,7 @@ class TMI extends Core {
         ]
         )];
       // update ignore list
-      return [{ response: await prepare('ignore.user.is.added', { username }), ...opts}];
+      return [{ response: prepare('ignore.user.is.added', { username }), ...opts}];
     } catch (e) {
       error(e.message);
     }
@@ -98,7 +98,7 @@ class TMI extends Core {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
       tmi.ignorelist = tmi.ignorelist.filter(o => o !== username);
       // update ignore list
-      return [{ response: await prepare('ignore.user.is.removed', { username }), ...opts}];
+      return [{ response: prepare('ignore.user.is.removed', { username }), ...opts}];
     } catch (e) {
       error(e.message);
     }
@@ -111,7 +111,7 @@ class TMI extends Core {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
       const isUserIgnored = isIgnored({ username });
-      return [{ response: await prepare(isUserIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored'), ...opts}];
+      return [{ response: prepare(isUserIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored'), ...opts}];
     } catch (e) {
       error(e.stack);
     }

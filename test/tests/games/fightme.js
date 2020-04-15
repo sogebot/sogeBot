@@ -1,15 +1,17 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* global describe it before */
 
-
 require('../../general.js');
-
+const assert = require('assert');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
+const { prepare } = require('../../../dest/commons');
 
 const fightme = (require('../../../dest/games/fightme')).default;
+const translate = require('../../../dest/translate').translate;
 
 const command = '!fightme';
 
@@ -59,6 +61,7 @@ const tests = [
 describe('game/fightme - !fightme', () => {
   for (const test of tests) {
     describe(`challenger: ${test.challenger.username} | challenging: ${test.challenging.username} => ${test.expected}`, async () => {
+      let responses = [];
       before(async () => {
         await db.cleanup();
         await message.prepare();
@@ -71,24 +74,23 @@ describe('game/fightme - !fightme', () => {
       });
 
       it('Challenger is starting !fightme', async () => {
-        fightme.main({ command, sender: test.challenger, parameters: test.challenging.username });
+        responses = await fightme.main({ command, sender: test.challenger, parameters: test.challenging.username });
       });
       if (test.challenging.username.length === 0 || test.challenging.username === test.challenger.username) {
         it(`Expecting ${test.expected}`, async () => {
-          await message.isSent(test.expected, test.challenger);
+          assert.strictEqual(responses[0].response, translate(test.expected), JSON.stringify({responses}));
         });
       } else {
         it('Expecting gambling.fightme.challenge', async () => {
-          await message.isSent('gambling.fightme.challenge', test.challenger, { username: test.challenging.username, command });
+          assert.strictEqual(responses[0].response, prepare('gambling.fightme.challenge', { username: test.challenging.username, command, sender: test.challenger.username }), JSON.stringify({responses}));
         });
         it('Challenged user is responding !fightme', async () => {
-          fightme.main({ command, sender: test.challenging, parameters: test.challenger.username });
+          responses = await fightme.main({ command, sender: test.challenging, parameters: test.challenger.username });
         });
         it(`Expecting ${test.expected}`, async () => {
-          await message.isSent(test.expected, test.challenging, [
-            { winner: test.challenging.username, loser: test.challenger.username, challenger: test.challenging.username },
-            { winner: test.challenger.username, loser: test.challenging.username, challenger: test.challenger.username },
-          ]);
+          const firstMessage = prepare(test.expected, { winner: test.challenging.username, loser: test.challenger.username, challenger: test.challenging.username });
+          const secondMessage = prepare(test.expected, { winner: test.challenger.username, loser: test.challenging.username, challenger: test.challenger.username });
+          assert(responses[0].response === firstMessage || responses[0].response === secondMessage, JSON.stringify({responses}));
         });
       }
     });

@@ -306,7 +306,7 @@ class CustomCommands extends System {
       }
       for (const r of _.orderBy(command_with_responses.responses, 'order', 'asc')) {
         const perm = await permissions.get(r.permission);
-        const response = await prepare('customcmds.response', { command: cmd, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: perm?.name ?? 'n/a' });
+        const response = prepare('customcmds.response', { command: cmd, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: perm?.name ?? 'n/a' });
         chatOut(`${response} [${opts.sender.username}]`);
         message(tmi.sendWithMe ? 'me' : 'say', getOwner(), response);
       }
@@ -318,7 +318,7 @@ class CustomCommands extends System {
   async toggle (opts: CommandOptions) {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP) as unknown as { [x: string]: string } | null;
     if (_.isNil(match)) {
-      const response = await prepare('customcmds.commands-parse-failed');
+      const response = prepare('customcmds.commands-parse-failed');
       sendMessage(response, opts.sender, opts.attr);
       return false;
     }
@@ -326,7 +326,7 @@ class CustomCommands extends System {
       where: { command: match.command },
     });
     if (!cmd) {
-      const response = await prepare('customcmds.command-was-not-found', { command: match.command });
+      const response = prepare('customcmds.command-was-not-found', { command: match.command });
       sendMessage(response, opts.sender, opts.attr);
       return false;
     }
@@ -335,7 +335,7 @@ class CustomCommands extends System {
       enabled: !cmd.enabled,
     });
 
-    sendMessage(await prepare(!cmd.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: cmd.command }), opts.sender, opts.attr);
+    sendMessage(prepare(!cmd.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: cmd.command }), opts.sender, opts.attr);
   }
 
   @command('!command toggle-visibility')
@@ -343,7 +343,7 @@ class CustomCommands extends System {
   async toggleVisibility (opts: CommandOptions) {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP) as unknown as { [x: string]: string } | null;
     if (_.isNil(match)) {
-      const response = await prepare('customcmds.commands-parse-failed');
+      const response = prepare('customcmds.commands-parse-failed');
       sendMessage(response, opts.sender, opts.attr);
       return false;
     }
@@ -352,13 +352,13 @@ class CustomCommands extends System {
       where: { command: match.command },
     });
     if (!cmd) {
-      const response = await prepare('customcmds.command-was-not-found', { command: match.command });
+      const response = prepare('customcmds.command-was-not-found', { command: match.command });
       sendMessage(response, opts.sender, opts.attr);
       return false;
     }
     await getRepository(Commands).save({...cmd, visible: !cmd.visible});
 
-    const response = await prepare(!cmd.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: cmd.command });
+    const response = prepare(!cmd.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: cmd.command });
     sendMessage(response, opts.sender, opts.attr);
   }
 

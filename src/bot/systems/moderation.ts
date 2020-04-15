@@ -220,7 +220,7 @@ class Moderation extends System {
         await getRepository(ModerationPermit).insert({ userId });
       }
 
-      const m = await prepare('moderation.user-have-link-permit', { username: parsed[1].toLowerCase(), link: getLocalizedName(count, 'core.links'), count: count });
+      const m = prepare('moderation.user-have-link-permit', { username: parsed[1].toLowerCase(), link: getLocalizedName(count, 'core.links'), count: count });
       sendMessage(m, opts.sender, opts.attr);
     } catch (e) {
       sendMessage(translate('moderation.permit-parse-failed'), opts.sender, opts.attr);

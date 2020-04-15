@@ -247,7 +247,7 @@ class Queue extends System {
     ]);
     const queueList = users.map(o => atUsername ? `@${o.username}` : o).join(', ');
     sendMessage(
-      await prepare('queue.list', { users: queueList }), opts.sender
+      prepare('queue.list', { users: queueList }), opts.sender
     );
   }
 }

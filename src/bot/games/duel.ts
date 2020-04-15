@@ -85,7 +85,7 @@ class Duel extends Game {
     if (winnerUser) {
       const probability = winnerUser.tickets / (total / 100);
 
-      const m = await prepare(_.size(users) === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
+      const m = prepare(_.size(users) === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
         pointsName: await points.getPointsName(total),
         points: total,
         probability: _.round(probability, 2),
@@ -113,7 +113,7 @@ class Duel extends Game {
     const bank = users.map((o) => o.tickets).reduce((a, b) => a + b, 0);
 
     return [{
-      response: await prepare('gambling.duel.bank', {
+      response: prepare('gambling.duel.bank', {
         command: this.getCommand('!duel'),
         points: bank,
         pointsName: await points.getPointsName(bank),
@@ -170,7 +170,7 @@ class Duel extends Game {
           });
           await points.decrement({ userId: opts.sender.userId }, parseInt(bet, 10));
         } else {
-          const response = await prepare('gambling.fightme.cooldown', {
+          const response = prepare('gambling.fightme.cooldown', {
             minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60), 'core.minutes'),
             cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60),
             command: opts.command });
@@ -182,7 +182,7 @@ class Duel extends Game {
       const isNewDuel = (this._timestamp) === 0;
       if (isNewDuel) {
         this._timestamp = Number(new Date());
-        const response = await prepare('gambling.duel.new', {
+        const response = prepare('gambling.duel.new', {
           minutesName: getLocalizedName(5, 'core.minutes'),
           minutes: this.duration,
           command: opts.command });
@@ -194,7 +194,7 @@ class Duel extends Game {
       }
 
       const tickets = (await getRepository(DuelEntity).findOne({ id: opts.sender.userId }))?.tickets ?? 0;
-      const response = await prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
+      const response = prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
         pointsName: await points.getPointsName(tickets),
         points: tickets,
       });
@@ -205,19 +205,19 @@ class Duel extends Game {
           responses.push({ response: translate('gambling.duel.notEnoughOptions'), ...opts });
           break;
         case ERROR_ZERO_BET:
-          responses.push({ response: await prepare('gambling.duel.zeroBet', {
+          responses.push({ response: prepare('gambling.duel.zeroBet', {
             pointsName: await points.getPointsName(0),
           }), ...opts });
           break;
         case ERROR_NOT_ENOUGH_POINTS:
-          responses.push({ response: await prepare('gambling.duel.notEnoughPoints', {
+          responses.push({ response: prepare('gambling.duel.notEnoughPoints', {
             pointsName: await points.getPointsName(bet),
             points: bet,
           }), ...opts });
           break;
         case ERROR_MINIMAL_BET:
           bet = this.minimalBet;
-          responses.push({ response: await prepare('gambling.duel.lowerThanMinimalBet', {
+          responses.push({ response: prepare('gambling.duel.lowerThanMinimalBet', {
             pointsName: await points.getPointsName(bet),
             points: bet,
             command: opts.command,

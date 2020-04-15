@@ -85,7 +85,7 @@ class Cooldown extends System {
     const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP_SET) as unknown as { [x: string]: string } | null;
 
     if (_.isNil(match)) {
-      const message = await prepare('cooldowns.cooldown-parse-failed');
+      const message = prepare('cooldowns.cooldown-parse-failed');
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
@@ -100,7 +100,7 @@ class Cooldown extends System {
       if (cooldown) {
         await getRepository(CooldownEntity).remove(cooldown);
       }
-      const message = await prepare('cooldowns.cooldown-was-unset', { type: match.type, command: match.command });
+      const message = prepare('cooldowns.cooldown-was-unset', { type: match.type, command: match.command });
       sendMessage(message, opts.sender, opts.attr);
       return;
     }
@@ -120,7 +120,7 @@ class Cooldown extends System {
       isFollowerAffected: true,
     });
 
-    const message = await prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command });
+    const message = prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command });
     sendMessage(message, opts.sender, opts.attr);
   }
 
@@ -238,13 +238,13 @@ class Cooldown extends System {
         } else {
           if (!cooldown.isErrorMsgQuiet && this.cooldownNotifyAsWhisper) {
             opts.sender['message-type'] = 'whisper'; // we want to whisp cooldown message
-            const message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
-            await sendMessage(message, opts.sender, opts.attr);
+            const response = prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
+            return [{ response, ...opts }];
           }
           if (!cooldown.isErrorMsgQuiet && this.cooldownNotifyAsChat) {
             opts.sender['message-type'] = 'chat';
-            const message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
-            await sendMessage(message, opts.sender, opts.attr);
+            const response = prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
+            return [{ response, ...opts }];
           }
           debug('cooldown.check', `${opts.sender.username}#${opts.sender.userId} have ${cooldown.name} on cooldown, remaining ${Math.ceil((cooldown.miliseconds - now + timestamp) / 1000)}s`);
           result = false;
@@ -356,7 +356,7 @@ class Cooldown extends System {
     const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP) as unknown as { [x: string]: string } | null;
 
     if (_.isNil(match)) {
-      const message = await prepare('cooldowns.cooldown-parse-failed');
+      const message = prepare('cooldowns.cooldown-parse-failed');
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
@@ -369,7 +369,7 @@ class Cooldown extends System {
       },
     });
     if (!cooldown) {
-      const message = await prepare('cooldowns.cooldown-not-found', { command: match.command });
+      const message = prepare('cooldowns.cooldown-not-found', { command: match.command });
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
@@ -405,7 +405,7 @@ class Cooldown extends System {
       return;
     } // those two are setable only from dashboard
 
-    const message = await prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.name });
+    const message = prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.name });
     sendMessage(message, opts.sender, opts.attr);
   }
 

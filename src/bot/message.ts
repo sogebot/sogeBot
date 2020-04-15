@@ -252,7 +252,7 @@ class Message {
           if (state.updated.responseType === 0) {
             // default
             if (state.isOk && !state.isEval) {
-              const msg = await prepare('filters.setVariable', { value: state.setValue, variable: variable });
+              const msg = prepare('filters.setVariable', { value: state.setValue, variable: variable });
               sendMessage(msg, attr.sender, { skip: true, quiet: _.get(attr, 'quiet', false) });
             }
             return state.updated.currentValue;

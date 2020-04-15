@@ -1,10 +1,11 @@
-/* global describe it beforeEach */
+/* global describe it */
 require('../../general.js');
 
 const db = require('../../general.js').db;
 const msg = require('../../general.js').message;
 const Message = require('../../../dest/message').default;
 const assert = require('assert');
+const { prepare } = require('../../../dest/commons');
 
 const owner = { userId: Math.floor(Math.random() * 100000), username: 'soge__' };
 const ignoredUser = { userId: Math.floor(Math.random() * 100000), username: 'ignoreduser' };
@@ -32,13 +33,13 @@ describe('Message - random filter', () => {
       await getRepository(User).save(ignoredUser);
       await getRepository(User).save(user);
 
-      tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
-      await msg.isSent('ignore.user.is.removed', owner, { username: 'ignoreduser' });
+      const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { username: 'ignoreduser' }));
     });
 
     it('add user ignoreduser to ignore list', async () => {
-      tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
-      await msg.isSent('ignore.user.is.added', owner, { username: 'ignoreduser' });
+      const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { username: 'ignoreduser' }));
     });
 
     it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
@@ -59,12 +60,12 @@ describe('Message - random filter', () => {
       await getRepository(User).save(ignoredUser);
       await getRepository(User).save(user);
 
-      tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
-      await msg.isSent('ignore.user.is.removed', owner, { username: 'ignoreduser' });
+      const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { username: 'ignoreduser' }));
     });
     it('add user ignoreduser to ignore list', async () => {
-      tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
-      await msg.isSent('ignore.user.is.added', owner, { username: 'ignoreduser' });
+      const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { username: 'ignoreduser' }));
     });
 
     const users = ['ignoreduser', 'user1'];
@@ -92,12 +93,12 @@ describe('Message - random filter', () => {
       await getRepository(User).save(ignoredUser);
       await getRepository(User).save(user);
 
-      tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
-      await msg.isSent('ignore.user.is.removed', owner, { username: 'ignoreduser' });
+      const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { username: 'ignoreduser' }));
     });
     it('add user ignoreduser to ignore list', async () => {
-      tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
-      await msg.isSent('ignore.user.is.added', owner, { username: 'ignoreduser' });
+      const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { username: 'ignoreduser' }));
     });
 
     const users = ['ignoreduser', 'user1'];
@@ -125,13 +126,13 @@ describe('Message - random filter', () => {
       await getRepository(User).save(ignoredUser);
       await getRepository(User).save(user);
 
-      tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
-      await msg.isSent('ignore.user.is.removed', owner, { username: 'ignoreduser' });
+      const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { username: 'ignoreduser' }));
     });
 
     it('add user ignoreduser to ignore list', async () => {
-      tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
-      await msg.isSent('ignore.user.is.added', owner, { username: 'ignoreduser' });
+      const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { username: 'ignoreduser' }));
     });
 
     const users = ['ignoreduser', 'user1'];
@@ -158,12 +159,12 @@ describe('Message - random filter', () => {
       await getRepository(User).save(ignoredUser);
       await getRepository(User).save(user);
 
-      tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
-      await msg.isSent('ignore.user.is.removed', owner, { username: 'ignoreduser' });
+      const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { username: 'ignoreduser' }));
     });
     it('add user ignoreduser to ignore list', async () => {
-      tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
-      await msg.isSent('ignore.user.is.added', owner, { username: 'ignoreduser' });
+      const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { username: 'ignoreduser' }));
     });
 
     const users = ['ignoreduser', 'user1'];
@@ -190,12 +191,12 @@ describe('Message - random filter', () => {
       await getRepository(User).save(ignoredUser);
       await getRepository(User).save(user);
 
-      tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
-      await msg.isSent('ignore.user.is.removed', owner, { username: 'ignoreduser' });
+      const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { username: 'ignoreduser' }));
     });
     it('add user ignoreduser to ignore list', async () => {
-      tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
-      await msg.isSent('ignore.user.is.added', owner, { username: 'ignoreduser' });
+      const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { username: 'ignoreduser' }));
     });
 
     const users = ['ignoreduser', 'user1'];

@@ -190,7 +190,7 @@ class Events extends Core {
     const cid = await api.createClip({ hasDelay: operation.hasDelay });
     if (cid) { // OK
       if (Boolean(operation.announce) === true) {
-        const message = await prepare('api.clips.created', { link: `https://clips.twitch.tv/${cid}` });
+        const message = prepare('api.clips.created', { link: `https://clips.twitch.tv/${cid}` });
         sendMessage(message, {
           username: oauth.botUsername,
           displayName: oauth.botUsername,

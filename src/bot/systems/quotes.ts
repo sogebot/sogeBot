@@ -78,11 +78,11 @@ class Quotes extends System {
         .into(QuotesEntity)
         .values({ tags, quote, quotedBy: opts.sender.userId, createdAt: Date.now() })
         .execute();
-      const message = await prepare('systems.quotes.add.ok', { id: result.identifiers[0].id, quote, tags: tags.join(', ') });
+      const message = prepare('systems.quotes.add.ok', { id: result.identifiers[0].id, quote, tags: tags.join(', ') });
       sendMessage(message, opts.sender, opts.attr);
       return { id: result.identifiers[0].id, quote, tags };
     } catch (e) {
-      const message = await prepare('systems.quotes.add.error', { command: opts.command });
+      const message = prepare('systems.quotes.add.error', { command: opts.command });
       sendMessage(message, opts.sender, opts.attr);
       return {};
     }
@@ -99,16 +99,16 @@ class Quotes extends System {
       const item = await getRepository(QuotesEntity).findOne({id});
 
       if (!item) {
-        const message = await prepare('systems.quotes.remove.not-found', { id });
+        const message = prepare('systems.quotes.remove.not-found', { id });
         sendMessage(message, opts.sender, opts.attr);
         return;
       } else {
         await getRepository(QuotesEntity).delete({id});
-        const message = await prepare('systems.quotes.remove.ok', { id });
+        const message = prepare('systems.quotes.remove.ok', { id });
         sendMessage(message, opts.sender, opts.attr);
       }
     } catch (e) {
-      const message = await prepare('systems.quotes.remove.error');
+      const message = prepare('systems.quotes.remove.error');
       sendMessage(message, opts.sender, opts.attr);
     }
   }
@@ -131,14 +131,14 @@ class Quotes extends System {
           .where('id = :id', { id })
           .set({ tags })
           .execute();
-        const message = await prepare('systems.quotes.set.ok', { id, tags: tags.join(', ') });
+        const message = prepare('systems.quotes.set.ok', { id, tags: tags.join(', ') });
         sendMessage(message, opts.sender, opts.attr);
       } else {
-        const message = await prepare('systems.quotes.set.error.not-found-by-id', { id });
+        const message = prepare('systems.quotes.set.error.not-found-by-id', { id });
         sendMessage(message, opts.sender, opts.attr);
       }
     } catch (e) {
-      const message = await prepare('systems.quotes.set.error.no-parameters', { command: opts.command });
+      const message = prepare('systems.quotes.set.error.no-parameters', { command: opts.command });
       sendMessage(message, opts.sender, opts.attr);
     }
   }
@@ -146,7 +146,7 @@ class Quotes extends System {
   @command('!quote list')
   async list (opts) {
     const urlBase = ui.domain;
-    const message = await prepare(
+    const message = prepare(
       (['localhost', '127.0.0.1'].includes(urlBase) ? 'systems.quotes.list.is-localhost' : 'systems.quotes.list.ok'),
       { urlBase });
     return sendMessage(message, opts.sender, opts.attr);
@@ -156,7 +156,7 @@ class Quotes extends System {
   async main (opts) {
     const [id, tag] = new Expects(opts.parameters).argument({ type: 'uuid', name: 'id', optional: true }).argument({ name: 'tag', optional: true, multi: true, delimiter: '' }).toArray();
     if (_.isNil(id) && _.isNil(tag) || id === '-tag') {
-      const message = await prepare('systems.quotes.show.error.no-parameters', { command: opts.command });
+      const message = prepare('systems.quotes.show.error.no-parameters', { command: opts.command });
       return sendMessage(message, opts.sender, opts.attr);
     }
 
@@ -164,10 +164,10 @@ class Quotes extends System {
       const quote = await getRepository(QuotesEntity).findOne({id});
       if (!_.isEmpty(quote) && typeof quote !== 'undefined') {
         const quotedBy = (await users.getUsernamesFromIds([quote.quotedBy]))[quote.quotedBy];
-        const message = await prepare('systems.quotes.show.ok', { quote: quote.quote, id: quote.id, quotedBy });
+        const message = prepare('systems.quotes.show.ok', { quote: quote.quote, id: quote.id, quotedBy });
         sendMessage(message, opts.sender, opts.attr);
       } else {
-        const message = await prepare('systems.quotes.show.error.not-found-by-id', { id });
+        const message = prepare('systems.quotes.show.error.not-found-by-id', { id });
         sendMessage(message, opts.sender, opts.attr);
       }
     } else {
@@ -183,11 +183,11 @@ class Quotes extends System {
         const quote = _.sample(quotesWithTags);
         if (typeof quote !== 'undefined') {
           const quotedBy = (await users.getUsernamesFromIds([quote.quotedBy]))[quote.quotedBy];
-          const message = await prepare('systems.quotes.show.ok', { quote: quote.quote, id: quote.id, quotedBy });
+          const message = prepare('systems.quotes.show.ok', { quote: quote.quote, id: quote.id, quotedBy });
           sendMessage(message, opts.sender, opts.attr);
         }
       } else {
-        const message = await prepare('systems.quotes.show.error.not-found-by-tag', { tag });
+        const message = prepare('systems.quotes.show.error.not-found-by-tag', { tag });
         sendMessage(message, opts.sender, opts.attr);
       }
     }

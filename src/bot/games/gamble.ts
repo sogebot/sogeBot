@@ -55,13 +55,13 @@ class Gamble extends Game {
       if (_.random(0, 100, false) <= this.chanceToWin) {
         await getRepository(User).increment({ userId: opts.sender.userId }, 'points', parseInt(points, 10) * 2);
         const updatedPoints = await pointsSystem.getPointsOf(opts.sender.userId);
-        message = await prepare('gambling.gamble.win', {
+        message = prepare('gambling.gamble.win', {
           pointsName: await pointsSystem.getPointsName(updatedPoints),
           points: updatedPoints,
         });
         return [{ response: message, ...opts }];
       } else {
-        message = await prepare('gambling.gamble.lose', {
+        message = prepare('gambling.gamble.lose', {
           pointsName: await pointsSystem.getPointsName(await pointsSystem.getPointsOf(opts.sender.userId)),
           points: await pointsSystem.getPointsOf(opts.sender.userId),
         });
@@ -70,21 +70,21 @@ class Gamble extends Game {
     } catch (e) {
       switch (e.message) {
         case ERROR_ZERO_BET:
-          message = await prepare('gambling.gamble.zeroBet', {
+          message = prepare('gambling.gamble.zeroBet', {
             pointsName: await pointsSystem.getPointsName(0),
           });
           return [{ response: message, ...opts }];
         case ERROR_NOT_ENOUGH_OPTIONS:
           return [{ response: translate('gambling.gamble.notEnoughOptions'), ...opts }];
         case ERROR_NOT_ENOUGH_POINTS:
-          message = await prepare('gambling.gamble.notEnoughPoints', {
+          message = prepare('gambling.gamble.notEnoughPoints', {
             pointsName: await pointsSystem.getPointsName(points),
             points: points,
           });
           return [{ response: message, ...opts }];
         case ERROR_MINIMAL_BET:
           points = this.minimalBet;
-          message = await prepare('gambling.gamble.lowerThanMinimalBet', {
+          message = prepare('gambling.gamble.lowerThanMinimalBet', {
             pointsName: await pointsSystem.getPointsName(points),
             points: points,
           });

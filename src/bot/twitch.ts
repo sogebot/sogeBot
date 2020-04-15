@@ -61,7 +61,7 @@ class Twitch extends Core {
 
   @command('!time')
   async time (opts) {
-    return [ { response: await prepare('time', { time: moment().tz(timezone).format('LTS') }), ...opts }];
+    return [ { response: prepare('time', { time: moment().tz(timezone).format('LTS') }), ...opts }];
   }
 
   @command('!followers')
@@ -90,7 +90,7 @@ class Twitch extends Core {
       lastFollowAgo = moment(events[0].timestamp).fromNow();
     }
 
-    const response = await prepare('followers', {
+    const response = prepare('followers', {
       lastFollowAgo: lastFollowAgo,
       lastFollowUsername: lastFollowUsername,
       onlineFollowersCount: onlineFollowers.length,
@@ -127,7 +127,7 @@ class Twitch extends Core {
       lastSubAgo = moment(events[0].timestamp).fromNow();
     }
 
-    const response = await prepare('subs', {
+    const response = prepare('subs', {
       lastSubAgo: lastSubAgo,
       lastSubUsername: lastSubUsername,
       onlineSubCount: onlineSubscribers.length,

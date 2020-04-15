@@ -81,7 +81,7 @@ class Price extends System {
     const parsed = opts.parameters.match(/^(![\S]+) ([0-9]+)$/);
 
     if (_.isNil(parsed)) {
-      const message = await prepare('price.price-parse-failed');
+      const message = prepare('price.price-parse-failed');
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
@@ -96,7 +96,7 @@ class Price extends System {
       ...(await getRepository(PriceEntity).findOne({ command: cmd })),
       command: cmd, price: argPrice,
     });
-    const message = await prepare('price.price-was-set', { command: cmd, amount: parseInt(argPrice, 10), pointsName: await points.getPointsName(price) });
+    const message = prepare('price.price-was-set', { command: cmd, amount: parseInt(argPrice, 10), pointsName: await points.getPointsName(price) });
     sendMessage(message, opts.sender, opts.attr);
   }
 
@@ -106,14 +106,14 @@ class Price extends System {
     const parsed = opts.parameters.match(/^(![\S]+)$/);
 
     if (_.isNil(parsed)) {
-      const message = await prepare('price.price-parse-failed');
+      const message = prepare('price.price-parse-failed');
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
     const cmd = parsed[1];
     await getRepository(PriceEntity).delete({ command: cmd });
-    const message = await prepare('price.price-was-unset', { command: cmd });
+    const message = prepare('price.price-was-unset', { command: cmd });
     sendMessage(message, opts.sender, opts.attr);
   }
 
@@ -123,7 +123,7 @@ class Price extends System {
     const parsed = opts.parameters.match(/^(![\S]+)$/);
 
     if (_.isNil(parsed)) {
-      const message = await prepare('price.price-parse-failed');
+      const message = prepare('price.price-parse-failed');
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
@@ -131,13 +131,13 @@ class Price extends System {
     const cmd = parsed[1];
     const price = await getRepository(PriceEntity).findOne({ command: cmd });
     if (!price) {
-      const message = await prepare('price.price-was-not-found', { command: cmd });
+      const message = prepare('price.price-was-not-found', { command: cmd });
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
     await getRepository(PriceEntity).save({...price, enabled: !price.enabled});
-    const message = await prepare(price.enabled ? 'price.price-was-enabled' : 'price.price-was-disabled', { command: cmd });
+    const message = prepare(price.enabled ? 'price.price-was-enabled' : 'price.price-was-disabled', { command: cmd });
     sendMessage(message, opts.sender, opts.attr);
   }
 
@@ -170,7 +170,7 @@ class Price extends System {
     const removePts = price.price;
     const haveEnoughPoints = availablePts >= removePts;
     if (!haveEnoughPoints) {
-      const message = await prepare('price.user-have-not-enough-points', { amount: removePts, command: `${price.command}`, pointsName: await points.getPointsName(removePts) });
+      const message = prepare('price.user-have-not-enough-points', { amount: removePts, command: `${price.command}`, pointsName: await points.getPointsName(removePts) });
       sendMessage(message, opts.sender, opts.attr);
     } else {
       await points.decrement({ userId: opts.sender.userId }, removePts);
