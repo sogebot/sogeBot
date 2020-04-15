@@ -82,6 +82,10 @@ describe('Raffles - allowOverTicketing', () => {
       raffles.allowOverTicketing = true;
     });
 
+    after(() => {
+      raffles.allowOverTicketing = false;
+    });
+
     it('create ticket raffle', async () => {
       raffles.open({ sender: user.owner, parameters: '!winme -min 0 -max 500' });
       await message.isSent('raffles.announce-ticket-raffle', { username: 'bot' }, {
