@@ -226,9 +226,8 @@ class Heist extends Game {
       this.startedAt = Date.now(); // set startedAt
       if (Date.now() - (this.lastAnnouncedStart) >= 60000) {
         this.lastAnnouncedStart = Date.now();
-        return [{ response: translate('games.heist.entryMessage').replace('$command', opts.command), ...opts }];
+        announce(translate('games.heist.entryMessage').replace('$command', opts.command));
       }
-      return [];
     }
 
     // is heist in progress?
