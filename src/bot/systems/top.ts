@@ -43,21 +43,21 @@ class Top extends System {
   @default_permission(permission.CASTERS)
   async time(opts) {
     opts.parameters = TYPE.TIME;
-    this.showTop(opts);
+    return this.showTop(opts);
   }
 
   @command('!top tips')
   @default_permission(permission.CASTERS)
   async tips(opts) {
     opts.parameters = TYPE.TIPS;
-    this.showTop(opts);
+    return this.showTop(opts);
   }
 
   @command('!top points')
   @default_permission(permission.CASTERS)
   async points(opts) {
     opts.parameters = TYPE.POINTS;
-    this.showTop(opts);
+    return this.showTop(opts);
   }
 
   @command('!top messages')

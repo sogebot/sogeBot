@@ -58,7 +58,7 @@ class Roulette extends Game {
     } else {
       await points.decrement({ userId: opts.sender.userId }, Number(this.loserWillLose));
     }
-    responses.push({ response: isAlive ? translate('gambling.roulette.alive') : translate('gambling.roulette.dead'), ...opts });
+    responses.push({ response: isAlive ? translate('gambling.roulette.alive') : translate('gambling.roulette.dead'), ...opts, isAlive });
     return responses;
   }
 }

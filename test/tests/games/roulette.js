@@ -8,6 +8,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const assert = require('assert');
 const _ = require('lodash');
+const { prepare } = require('../../../dest/commons');
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
@@ -23,17 +24,20 @@ const tests = [
 describe('game/roulette - !roulette', () => {
   for (const test of tests) {
     describe(`${test.user.username} uses !roulette`, async () => {
+      let r;
       before(async () => {
         await db.cleanup();
         await message.prepare();
       });
 
       it(`${test.user.username} starts roulette`, async () => {
-        roulette.main({ sender: test.user });
+        r = await roulette.main({ sender: test.user });
       });
 
       it('Expecting win or lose', async () => {
-        await message.isSent(['gambling.roulette.dead', 'gambling.roulette.alive'], test.user);
+        const msg1 = prepare('gambling.roulette.dead');
+        const msg2 = prepare('gambling.roulette.alive');
+        assert(r[1].response === msg1 || r[1].response === msg2, JSON.stringify({r, msg1, msg2}));
       });
     });
   }
@@ -51,10 +55,13 @@ describe('game/roulette - !roulette', () => {
 
     it(`User starts roulette and we are waiting for lose`, async () => {
       let isAlive = true;
+      let r;
       while(isAlive) {
-        isAlive = await roulette.main({ sender: tests[0].user });
+        r = await roulette.main({ sender: tests[0].user });
+        isAlive = r[1].isAlive;
       }
-      await message.isSent('gambling.roulette.dead', tests[0].user);
+      const msg1 = prepare('gambling.roulette.dead');
+      assert(r[1].response === msg1, JSON.stringify({r, msg1}, 2));
     });
 
     it(`User should not have negative points`, async () => {

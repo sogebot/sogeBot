@@ -111,7 +111,7 @@ class TMI extends Core {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
       const isUserIgnored = isIgnored({ username });
-      return [{ response: prepare(isUserIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored'), ...opts}];
+      return [{ response: prepare(isUserIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored', { username }), ...opts}];
     } catch (e) {
       error(e.stack);
     }
