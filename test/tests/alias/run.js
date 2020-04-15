@@ -2,6 +2,7 @@
 
 
 const assert = require('assert');
+const { prepare } = (require('../../../dest/commons'));
 require('../../general.js');
 
 const db = require('../../general.js').db;
@@ -26,90 +27,89 @@ describe('Alias - run()', () => {
   });
 
   it('!a should show correctly command with link (skip is true)', async () => {
-    alias.add({ sender: owner, parameters: '-a !a -c !test http://google.com' });
-    await message.isSent('alias.alias-was-added', owner, { alias: '!a', command: '!test http://google.com', sender: owner.username });
+    const r = await alias.add({ sender: owner, parameters: '-a !a -c !test http://google.com' });
+    const r2 = await customCommands.add({ sender: owner, parameters: '-c !test -r $param' });
+    await alias.run({ sender: user, message: '!a' });
 
-    customCommands.add({ sender: owner, parameters: '-c !test -r $param' });
-    await message.isSent('customcmds.command-was-added', owner, { response: '$param', command: '!test', sender: owner.username });
-
-    alias.run({ sender: user, message: '!a' });
-    await message.isSentRaw('http://google.com', user);
+    assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!a', command: '!test http://google.com' }));
+    assert.strictEqual(r2[0].response, prepare('customcmds.command-was-added', { response: '$param', command: '!test' }));
+    await message.debug('alias.process', 'http://google.com');
   });
 
   it('!a will show !duel', async () => {
-    alias.add({ sender: owner, parameters: '-a !a -c !duel' });
-    await message.isSent('alias.alias-was-added', owner, { alias: '!a', command: '!duel', sender: owner.username });
+    const r = await alias.add({ sender: owner, parameters: '-a !a -c !duel' });
+    assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!a', command: '!duel' }));
 
     alias.run({ sender: owner, message: '!a' });
     await message.debug('alias.process', '!duel');
 
-    alias.remove({ sender: owner, parameters: '!a' });
-    await message.isSent('alias.alias-was-removed', owner, { alias: '!a', sender: owner.username });
+    const r2 = await alias.remove({ sender: owner, parameters: '!a' });
+    assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!a' }));
 
     assert(await alias.run({ sender: owner, message: '!a' }));
   });
 
   it('#668 - alias is case insensitive', async () => {
-    alias.add({ sender: owner, parameters: '-a !a -c !duel' });
-    await message.isSent('alias.alias-was-added', owner, { alias: '!a', command: '!duel', sender: owner.username });
+    const r = await alias.add({ sender: owner, parameters: '-a !a -c !duel' });
+    assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!a', command: '!duel' }));
 
     alias.run({ sender: owner, message: '!A' });
     await message.debug('alias.process', '!duel');
 
-    alias.remove({ sender: owner, parameters: '!a' });
-    await message.isSent('alias.alias-was-removed', owner, { alias: '!a', sender: owner.username });
+    const r2 = await alias.remove({ sender: owner, parameters: '!a' });
+    assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!a' }));
 
     assert(await alias.run({ sender: owner, message: '!a' }));
   });
 
   it('!a with spaces - will show !duel', async () => {
-    alias.add({ sender: owner, parameters: '-a !a with spaces -c !duel' });
-    await message.isSent('alias.alias-was-added', owner, { alias: '!a with spaces', command: '!duel', sender: owner.username });
+    const r = await alias.add({ sender: owner, parameters: '-a !a with spaces -c !duel' });
+    assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!a with spaces', command: '!duel' }));
 
     alias.run({ sender: owner, message: '!a with spaces' });
     await message.debug('alias.process', '!duel');
 
-    alias.remove({ sender: owner, parameters: '!a with spaces' });
-    await message.isSent('alias.alias-was-removed', owner, { alias: '!a with spaces', sender: owner.username });
+    const r2 = await alias.remove({ sender: owner, parameters: '!a with spaces' });
+    assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!a with spaces' }));
 
     assert(await alias.run({ sender: owner, message: '!a with spaces' }));
   });
 
   it('!한국어 - will show !duel', async () => {
-    alias.add({ sender: owner, parameters: '-a !한국어 -c !duel' });
-    await message.isSent('alias.alias-was-added', owner, { alias: '!한국어', command: '!duel', sender: owner.username });
+    const r = await alias.add({ sender: owner, parameters: '-a !한국어 -c !duel' });
+    assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!한국어', command: '!duel' }));
 
     alias.run({ sender: owner, message: '!한국어' });
     await message.debug('alias.process', '!duel');
 
-    alias.remove({ sender: owner, parameters: '!한국어' });
-    await message.isSent('alias.alias-was-removed', owner, { alias: '!한국어', sender: owner.username });
+    const r2 = await alias.remove({ sender: owner, parameters: '!한국어' });
+    assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!한국어' }));
 
     assert(await alias.run({ sender: owner, message: '!한국어' }));
   });
 
   it('!русский - will show !duel', async () => {
-    alias.add({ sender: owner, parameters: '-a !русский -c !duel' });
-    await message.isSent('alias.alias-was-added', owner, { alias: '!русский', command: '!duel', sender: owner.username });
+    const r = await alias.add({ sender: owner, parameters: '-a !русский -c !duel' });
+    assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!русский', command: '!duel' }));
 
     alias.run({ sender: owner, message: '!русский' });
     await message.debug('alias.process', '!duel');
 
-    alias.remove({ sender: owner, parameters: '!русский' });
-    await message.isSent('alias.alias-was-removed', owner, { alias: '!русский', sender: owner.username });
+    const r2 = await alias.remove({ sender: owner, parameters: '!русский' });
+    assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!русский' }));
 
     assert(await alias.run({ sender: owner, message: '!русский' }));
   });
 
   it('!крутить 1000 - will show !gamble 1000', async () => {
-    alias.add({ sender: owner, parameters: '-a !крутить -c !gamble' });
-    await message.isSent('alias.alias-was-added', owner, { alias: '!крутить', command: '!gamble', sender: owner.username });
+    const r = await alias.add({ sender: owner, parameters: '-a !крутить -c !gamble' });
+    assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!крутить', command: '!gamble' }));
 
     alias.run({ sender: owner, message: '!крутить 1000' });
     await message.debug('alias.process', '!gamble 1000');
 
-    alias.remove({ sender: owner, parameters: '!крутить' });
-    await message.isSent('alias.alias-was-removed', owner, { alias: '!крутить', sender: owner.username });
+    const r2 = await alias.remove({ sender: owner, parameters: '!крутить' });
+    assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!крутить' }));
 
     assert(await alias.run({ sender: owner, message: '!крутить' }));
   });

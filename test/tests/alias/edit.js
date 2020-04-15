@@ -6,6 +6,8 @@ const message = require('../../general.js').message;
 
 const { permission } = require('../../../dest/helpers/permissions');
 const alias = (require('../../../dest/systems/alias')).default;
+const assert = require('assert');
+const { prepare } = (require('../../../dest/commons'));
 
 // users
 const owner = { username: 'soge__' };
@@ -63,8 +65,8 @@ describe('Alias - edit()', () => {
   describe('Expected parsed fail', () => {
     for (const t of parseFailedTests) {
       it(generateCommand(t), async () => {
-        alias.edit({ sender: owner, parameters: generateCommand(t) });
-        await message.isSent('alias.alias-parse-failed', owner, { sender: owner.username });
+        const r = await alias.edit({ sender: owner, parameters: generateCommand(t) });
+        assert.strictEqual(r[0].response, prepare('alias.alias-parse-failed'));
       });
     }
   });
@@ -72,8 +74,8 @@ describe('Alias - edit()', () => {
   describe('Expected not found fail', () => {
     for (const t of notFoundTests) {
       it(generateCommand(t), async () => {
-        alias.edit({ sender: owner, parameters: generateCommand(t) });
-        await message.isSent('alias.alias-was-not-found', owner, { alias: t.alias, sender: owner.username });
+        const r = await alias.edit({ sender: owner, parameters: generateCommand(t) });
+        assert.strictEqual(r[0].response, prepare('alias.alias-was-not-found', { alias: t.alias }));
       });
     }
   });
@@ -81,11 +83,11 @@ describe('Alias - edit()', () => {
   describe('Expected to pass', () => {
     for (const t of successTests) {
       it(generateCommand(t.from) + ' => ' + generateCommand(t.to), async () => {
-        alias.add({ sender: owner, parameters: generateCommand(t.from) });
-        await message.isSent('alias.alias-was-added', owner, { alias: t.from.alias, command: t.from.command, sender: owner.username });
+        const r = await alias.add({ sender: owner, parameters: generateCommand(t.from) });
+        assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: t.from.alias, command: t.from.command }));
 
-        alias.edit({ sender: owner, parameters: generateCommand(t.to) });
-        await message.isSent('alias.alias-was-edited', owner, { alias: t.from.alias, command: t.to.command, sender: owner.username });
+        const r2 = await alias.edit({ sender: owner, parameters: generateCommand(t.to) });
+        assert.strictEqual(r2[0].response, prepare('alias.alias-was-edited', { alias: t.from.alias, command: t.to.command }));
       });
     }
   });

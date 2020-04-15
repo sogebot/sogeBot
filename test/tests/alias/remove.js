@@ -4,6 +4,8 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const alias = (require('../../../dest/systems/alias')).default;
+const assert = require('assert');
+const { prepare } = (require('../../../dest/commons'));
 
 // users
 const owner = { username: 'soge__' };
@@ -15,60 +17,60 @@ describe('Alias - remove()', () => {
   });
 
   it('', async () => {
-    alias.remove({ sender: owner, parameters: '' });
-    await message.isSent('alias.alias-parse-failed', owner, { sender: owner.username });
+    const r = await alias.remove({ sender: owner, parameters: '' });
+    assert.strictEqual(r[0].response, prepare('alias.alias-parse-failed'));
   });
 
   it('!alias', async () => {
-    alias.remove({ sender: owner, parameters: '!alias' });
-    await message.isSent('alias.alias-was-not-found', owner, { alias: '!alias', sender: owner.username });
+    const r = await alias.remove({ sender: owner, parameters: '!alias' });
+    assert.strictEqual(r[0].response, prepare('alias.alias-was-not-found', { alias: '!alias' }));
   });
 
   it('alias', async () => {
-    alias.remove({ sender: owner, parameters: 'alias' });
-    await message.isSent('alias.alias-parse-failed', owner, { sender: owner.username });
+    const r = await alias.remove({ sender: owner, parameters: 'alias' });
+    assert.strictEqual(r[0].response, prepare('alias.alias-parse-failed'));
   });
 
   it('!a', async () => {
-    alias.add({ sender: owner, parameters: '-a !a -c !me' });
-    await message.isSent('alias.alias-was-added', owner, { alias: '!a', command: '!me', sender: owner.username });
+    const r = await alias.add({ sender: owner, parameters: '-a !a -c !me' });
+    assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!a', command: '!me' }));
 
-    alias.remove({ sender: owner, parameters: '!a' });
-    await message.isSent('alias.alias-was-removed', owner, { alias: '!a', sender: owner.username });
+    const r2 = await alias.remove({ sender: owner, parameters: '!a' });
+    assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!a' }));
   });
 
   it('!a with spaces', async () => {
-    alias.add({ sender: owner, parameters: '-a !a with spaces -c !me' });
-    await message.isSent('alias.alias-was-added', owner, { alias: '!a with spaces', command: '!me', sender: owner.username });
+    const r = await alias.add({ sender: owner, parameters: '-a !a with spaces -c !me' });
+    assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!a with spaces', command: '!me' }));
 
-    alias.remove({ sender: owner, parameters: '!a with spaces' });
-    await message.isSent('alias.alias-was-removed', owner, { alias: '!a with spaces', sender: owner.username });
+    const r2 = await alias.remove({ sender: owner, parameters: '!a with spaces' });
+    assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!a with spaces' }));
   });
 
   it('!한국어', async () => {
-    alias.add({ sender: owner, parameters: '-a !한국어 -c !me' });
-    await message.isSent('alias.alias-was-added', owner, { alias: '!한국어', command: '!me', sender: owner.username });
+    const r = await alias.add({ sender: owner, parameters: '-a !한국어 -c !me' });
+    assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!한국어', command: '!me' }));
 
-    alias.remove({ sender: owner, parameters: '!한국어' });
-    await message.isSent('alias.alias-was-removed', owner, { alias: '!한국어', sender: owner.username });
+    const r2 = await alias.remove({ sender: owner, parameters: '!한국어' });
+    assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!한국어' }));
   });
 
   it('!русский', async () => {
-    alias.add({ sender: owner, parameters: '-a !русский -c !me' });
-    await message.isSent('alias.alias-was-added', owner, { alias: '!русский', command: '!me', sender: owner.username });
+    const r = await alias.add({ sender: owner, parameters: '-a !русский -c !me' });
+    assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!русский', command: '!me' }));
 
-    alias.remove({ sender: owner, parameters: '!русский' });
-    await message.isSent('alias.alias-was-removed', owner, { alias: '!русский', sender: owner.username });
+    const r2 = await alias.remove({ sender: owner, parameters: '!русский' });
+    assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!русский' }));
   });
 
   it('2x - !a !me', async () => {
-    alias.add({ sender: owner, parameters: '-a !a -c !me' });
-    await message.isSent('alias.alias-was-added', owner, { alias: '!a', command: '!me', sender: owner.username });
+    const r = await alias.add({ sender: owner, parameters: '-a !a -c !me' });
+    assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!a', command: '!me' }));
 
-    alias.remove({ sender: owner, parameters: '!a' });
-    await message.isSent('alias.alias-was-removed', owner, { alias: '!a', sender: owner.username });
+    const r2 = await alias.remove({ sender: owner, parameters: '!a' });
+    assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!a' }));
 
-    alias.remove({ sender: owner, parameters: '!a' });
-    await message.isSent('alias.alias-was-not-found', owner, { alias: '!a', sender: owner.username });
+    const r3 = await alias.remove({ sender: owner, parameters: '!a' });
+    assert.strictEqual(r3[0].response, prepare('alias.alias-was-not-found', { alias: '!a' }));
   });
 });

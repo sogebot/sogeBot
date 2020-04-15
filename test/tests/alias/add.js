@@ -6,6 +6,8 @@ const message = require('../../general.js').message;
 
 const { permission } = require('../../../dest/helpers/permissions');
 const alias = (require('../../../dest/systems/alias')).default;
+const assert = require('assert');
+const { prepare } = (require('../../../dest/commons'));
 
 // users
 const owner = { username: 'soge__' };
@@ -47,8 +49,8 @@ describe('Alias - add()', () => {
   describe('Expected parsed fail', () => {
     for (const t of failedTests) {
       it(generateCommand(t), async () => {
-        alias.add({ sender: owner, parameters: generateCommand(t) });
-        await message.isSent('alias.alias-parse-failed', owner, { sender: owner.username });
+        const r = await alias.add({ sender: owner, parameters: generateCommand(t) });
+        assert.strictEqual(r[0].response, prepare('alias.alias-parse-failed'));
       });
     }
   });
@@ -56,17 +58,17 @@ describe('Alias - add()', () => {
   describe('Expected to pass', () => {
     for (const t of successTests) {
       it(generateCommand(t), async () => {
-        alias.add({ sender: owner, parameters: generateCommand(t) });
-        await message.isSent('alias.alias-was-added', owner, { alias: t.alias, command: t.command, sender: owner.username });
+        const r = await alias.add({ sender: owner, parameters: generateCommand(t) });
+        assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { ...t }));
       });
     }
 
     it('2x - -a !a -c !me', async () => {
-      alias.add({ sender: owner, parameters: '-a !a -c !me' });
-      await message.isSent('alias.alias-was-added', owner, { alias: '!a', command: '!me', sender: owner.username });
+      const r = await alias.add({ sender: owner, parameters: '-a !a -c !me' });
+      assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!a', command: '!me' }));
 
-      alias.add({ sender: owner, parameters: '-a !a -c !me' });
-      await message.isSent('alias.alias-was-added', owner, { alias: '!a', command: '!me', sender: owner.username });
+      const r2 = await alias.add({ sender: owner, parameters: '-a !a -c !me' });
+      assert.strictEqual(r2[0].response, prepare('alias.alias-was-added', { alias: '!a', command: '!me' }));
     });
   });
 });
