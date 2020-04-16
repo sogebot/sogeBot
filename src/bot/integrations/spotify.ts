@@ -15,6 +15,8 @@ import { adminEndpoint } from '../helpers/socket';
 import api from '../api';
 import { addUIError } from '../panel';
 
+import fs from 'fs';
+
 /*
  * How to integrate:
  * 1. Create app in https://beta.developer.spotify.com/dashboard/applications
@@ -306,6 +308,21 @@ class Spotify extends Integration {
       currentSong.is_playing = data.body.is_playing;
       currentSong.is_enabled = this.enabled;
       this.currentSong = JSON.stringify(currentSong);
+
+      let stream = fs.createWriteStream('spotify-nowplaying.txt');
+      if (currentSong.is_playing) {
+        stream.once('open', function(fd) {
+          stream.write(currentSong.artist);
+          stream.write(' - ');
+          stream.write(currentSong.song);
+          stream.end();
+        });
+      } else {
+        stream.once('open', function(fd) {
+          stream.write('');
+          stream.end();
+        });
+      }
     } catch (e) {
       this.currentSong = JSON.stringify({});
     }
