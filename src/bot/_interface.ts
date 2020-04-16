@@ -128,16 +128,13 @@ class Module {
     const load = () => {
       if (isDbConnected) {
         setTimeout(async () => {
-          let enabled = true;
-          if (this._name !== 'core') {
-            enabled = await this.loadVariableValue('enabled');
-          }
+          const enabled2 = this._name !== 'core' ? true : await this.loadVariableValue('enabled');
           const onStartup = () => {
             if (loadingInProgress.length > 0) {
               // wait until all settings are loaded
               return setTimeout(() => onStartup(), 100);
             }
-            this._enabled = typeof enabled === 'undefined' ? this._enabled : enabled;
+            this._enabled = typeof enabled2 === 'undefined' ? this._enabled : enabled2;
             this.status({ state: this._enabled, quiet: !isMainThread });
             if (isMainThread) {
               const path = this._name === 'core' ? this.__moduleName__.toLowerCase() : `${this._name}.${this.__moduleName__.toLowerCase()}`;
@@ -289,7 +286,7 @@ class Module {
 
           const toRemove: string[] = [];
           for (const possibleVariable of o.split('.')) {
-            const isVariableFound = this.settingsList.find(o => possibleVariable === o.key);
+            const isVariableFound = this.settingsList.find(o2 => possibleVariable === o2.key);
             if (isVariableFound) {
               return {
                 key: o,
@@ -313,13 +310,13 @@ class Module {
           }
 
           const joinedToRemove = toRemove.join('.');
-          for (const key of Object.keys(data)) {
+          for (const key2 of Object.keys(data)) {
             if (joinedToRemove.length > 0) {
-              const value = data[key];
-              data[key.replace(joinedToRemove + '.', '')] = value;
+              const value = data[key2];
+              data[key2.replace(joinedToRemove + '.', '')] = value;
 
-              if (key.replace(joinedToRemove + '.', '') !== key) {
-                delete data[key];
+              if (key2.replace(joinedToRemove + '.', '') !== key2) {
+                delete data[key2];
               }
             }
           }

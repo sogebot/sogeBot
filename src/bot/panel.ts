@@ -16,7 +16,7 @@ import { Translation } from './database/entity/translation';
 import { TwitchTag } from './database/entity/twitch';
 import { User } from './database/entity/user';
 
-import socket from './socket';
+import { default as socketSystem } from './socket';
 import Parser from './parser';
 import webhooks from './webhooks';
 import general from './general';
@@ -126,7 +126,7 @@ export const init = () => {
     adminEndpoint('/', 'panel.sendStreamData', sendStreamData);
   }, 5000);
 
-  ioServer?.use(socket.authorize);
+  ioServer?.use(socketSystem.authorize);
 
   ioServer?.on('connection', async (socket) => {
     socket.on('disconnect', () => {

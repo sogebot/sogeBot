@@ -35,7 +35,10 @@ module.exports = {
   cleanup: async function () {
     const waitForIt = async (resolve, reject) => {
       if (!getIsBotStarted() || !translation.isLoaded || !getIsDbConnected()) {
+        debug('test', `Bot is not yet started, waiting 1s, bot: ${getIsBotStarted()} | db: ${getIsDbConnected()} | translation: ${translation.isLoaded}`);
         return setTimeout(() => waitForIt(resolve, reject), 1000);
+      } else {
+        debug('test', `Bot is started`);
       }
 
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));

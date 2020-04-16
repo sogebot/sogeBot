@@ -3,6 +3,7 @@
   "plugins": ["@typescript-eslint"],
   "extends": ["plugin:@typescript-eslint/recommended"],
   "rules": {
+      "no-shadow": ["error", { "builtinGlobals": true }],
       "indent": "off",
       "@typescript-eslint/indent": ["error", 2],
       "@typescript-eslint/explicit-member-accessibility": "off",

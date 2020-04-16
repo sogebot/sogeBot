@@ -126,7 +126,7 @@ class TMI extends Core {
         token,
         username,
         log,
-        onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(token => token),
+        onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(refresh_token => refresh_token),
       });
       this.loadListeners(type);
       await (this.client[type] as TwitchJs).chat.connect();
@@ -159,7 +159,7 @@ class TMI extends Core {
         info(`TMI: ${type} is reconnecting`);
 
         await this.client[type]?.chat.part(this.channel);
-        await this.client[type]?.chat.reconnect({ token, username, onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(token => token) });
+        await this.client[type]?.chat.reconnect({ token, username, onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(refresh_token => refresh_token) });
 
         await this.join(type, channel);
       }

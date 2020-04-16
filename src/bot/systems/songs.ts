@@ -276,7 +276,7 @@ class Songs extends System {
     let banned = 0;
     const waitForBan = () => {
       return new Promise((resolve, reject) => {
-        const ban = (resolve) => {
+        const ban = () => {
           ytdl.getInfo('https://www.youtube.com/watch?v=' + opts.parameters, async (err, videoInfo) => {
             if (err) {
               if (Number(opts.retry ?? 0) < 5) {
@@ -310,7 +310,7 @@ class Songs extends System {
             resolve();
           });
         };
-        ban(resolve);
+        ban();
       });
     };
     await waitForBan();
@@ -646,14 +646,14 @@ class Songs extends System {
 
     const waitForImport = function () {
       return new Promise((resolve) => {
-        const check = (resolve) => {
+        const check = () => {
           if (done === 1) {
             resolve();
           } else {
-            setTimeout(() => check(resolve), 500);
+            setTimeout(() => check(), 500);
           }
         };
-        check(resolve);
+        check();
       });
     };
 
@@ -686,11 +686,11 @@ class Songs extends System {
   async getSongsIdsFromPlaylist (playlist) {
     const get = function ():  Promise<{ items: any[] }> {
       return new Promise((resolve, reject): any => {
-        ytpl(playlist, { limit: Number.MAX_SAFE_INTEGER }, function (err, playlist: { items: any[] }) {
+        ytpl(playlist, { limit: Number.MAX_SAFE_INTEGER }, function (err, pl: { items: any[] }) {
           if (err) {
             reject(err);
           }
-          resolve(playlist);
+          resolve(pl);
         });
       });
     };

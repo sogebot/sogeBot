@@ -33,9 +33,8 @@ export const changelog = async () => {
       threadId: Not(threadId),
     },
   });
-  for (const change of changes.sort((a, b) => a.timestamp - b.timestamp )) {
-
-    const [type, name, variable] = change.namespace.split('.');
+  for (const change2 of changes.sort((a, b) => a.timestamp - b.timestamp )) {
+    const [type, name, variable] = change2.namespace.split('.');
 
     const self = find(type, name);
     if (!self) {
@@ -48,14 +47,14 @@ export const changelog = async () => {
        .getOne();
     if (variableFromDb) {
       const value = JSON.stringify(variableFromDb.value);
-      const [ type, name ] = change.namespace.split('.');
-      const self = find(type, name);
-      if (!self) {
+      const [ type2, name2 ] = change2.namespace.split('.');
+      const self2 = find(type2, name2);
+      if (!self2) {
         throw new Error(`${type}.${name} not found in list`);
       }
-      self[change.namespace.split('.')[2]] = value;
+      self[change2.namespace.split('.')[2]] = value;
     }
-    lastTimestamp = change.timestamp;
+    lastTimestamp = change2.timestamp;
   }
   setTimeout(() => changelog(), 1000);
 };

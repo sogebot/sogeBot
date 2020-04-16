@@ -152,15 +152,13 @@ class Events extends Core {
       return this.reset(eventId);
     }
 
-    const events = await getRepository(Event).find({
+    for (const event of (await getRepository(Event).find({
       relations: ['operations'],
       where: {
         name: eventId,
         isEnabled: true,
       },
-    });
-
-    for (const event of events) {
+    }))) {
       const [shouldRunByFilter, shouldRunByDefinition] = await Promise.all([
         this.checkFilter(event, attributes),
         this.checkDefinition(_.clone(event), attributes),
@@ -712,12 +710,11 @@ class Events extends Core {
     }
 
     try {
-      const events = await getRepository(Event)
+      for (const event of (await getRepository(Event)
         .createQueryBuilder('event')
         .where('event.name = :event1', { event1: 'command-send-x-times' })
         .orWhere('event.name = :event2', { event2: 'keyword-send-x-times '})
-        .getMany();
-      for (const event of events) {
+        .getMany())) {
         if (_.isNil(_.get(event, 'triggered.fadeOutInterval', null))) {
           // fadeOutInterval init
           event.triggered.fadeOutInterval = Date.now();

@@ -1,6 +1,6 @@
 import { readdirSync, writeFileSync } from 'fs';
 import gitCommitInfo from 'git-commit-info';
-import { get, isBoolean, isFinite, isNil, isNumber, isString, map } from 'lodash';
+import { get, isBoolean, isNil, isNumber, isString, map } from 'lodash';
 import Core from './_interface';
 import { sendMessage } from './commons';
 import { command, default_permission, settings, ui } from './decorators';

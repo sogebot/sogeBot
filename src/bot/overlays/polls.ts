@@ -36,15 +36,14 @@ class Polls extends Overlay {
         relations: ['votes'],
         where: { isOpened: true },
       });
-      const settings = {
+      callback(currentVote, currentVote?.votes, {
         display: {
           align: this.cDisplayAlign,
           theme: this.cDisplayTheme,
           hideAfterInactivity: this.cDisplayHideAfterInactivity,
           inactivityTime: this.cDisplayInactivityTime,
         },
-      };
-      callback(currentVote, currentVote?.votes, settings);
+      });
     });
   }
 }

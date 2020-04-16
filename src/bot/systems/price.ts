@@ -86,17 +86,17 @@ class Price extends System {
       return false;
     }
 
-    const [command, argPrice] = parsed.slice(1);
+    const [cmd, argPrice] = parsed.slice(1);
     if (parseInt(argPrice, 10) === 0) {
       this.unset(opts);
       return false;
     }
 
     const price = await getRepository(PriceEntity).save({
-      ...(await getRepository(PriceEntity).findOne({ command })),
-      command, price: argPrice,
+      ...(await getRepository(PriceEntity).findOne({ command: cmd })),
+      command: cmd, price: argPrice,
     });
-    const message = await prepare('price.price-was-set', { command, amount: parseInt(argPrice, 10), pointsName: await points.getPointsName(price) });
+    const message = await prepare('price.price-was-set', { command: cmd, amount: parseInt(argPrice, 10), pointsName: await points.getPointsName(price) });
     sendMessage(message, opts.sender, opts.attr);
   }
 
@@ -111,9 +111,9 @@ class Price extends System {
       return false;
     }
 
-    const command = parsed[1];
-    await getRepository(PriceEntity).delete({ command });
-    const message = await prepare('price.price-was-unset', { command });
+    const cmd = parsed[1];
+    await getRepository(PriceEntity).delete({ command: cmd });
+    const message = await prepare('price.price-was-unset', { command: cmd });
     sendMessage(message, opts.sender, opts.attr);
   }
 
@@ -128,16 +128,16 @@ class Price extends System {
       return false;
     }
 
-    const command = parsed[1];
-    const price = await getRepository(PriceEntity).findOne({ command });
+    const cmd = parsed[1];
+    const price = await getRepository(PriceEntity).findOne({ command: cmd });
     if (!price) {
-      const message = await prepare('price.price-was-not-found', { command });
+      const message = await prepare('price.price-was-not-found', { command: cmd });
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
     await getRepository(PriceEntity).save({...price, enabled: !price.enabled});
-    const message = await prepare(price.enabled ? 'price.price-was-enabled' : 'price.price-was-disabled', { command });
+    const message = await prepare(price.enabled ? 'price.price-was-enabled' : 'price.price-was-disabled', { command: cmd });
     sendMessage(message, opts.sender, opts.attr);
   }
 

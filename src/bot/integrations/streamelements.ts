@@ -8,12 +8,12 @@ import { info, tip } from '../helpers/log';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 import { getRepository } from 'typeorm';
 import { User, UserTipInterface } from '../database/entity/user';
-import users from '../users';
 import events from '../events';
 import alerts from '../registries/alerts';
 import currency from '../currency';
 import eventlist from '../overlays/eventlist';
 import api from '../api.js';
+import users from '../users';
 
 /* example payload (eventData)
 {
@@ -108,24 +108,7 @@ class StreamElements extends Integration {
     const { username, amount, message } = eventData.data;
     const DONATION_CURRENCY = eventData.data.currency;
 
-    const getUser = async (username, id) => {
-      const userByUsername = await getRepository(User).findOne({ where: { username: username.toLowerCase() }});
-      if (userByUsername) {
-        return userByUsername;
-      }
-
-      const user = await getRepository(User).findOne({ where: { userId: id }});
-      if (user) {
-        return user;
-      } else {
-        return getRepository(User).save({
-          userId: Number(id),
-          username: username.toLowerCase(),
-        });
-      }
-    };
-
-    const user = await getUser(username, await users.getIdByName(username.toLowerCase()));
+    const user = await users.getUserByUsername(username);
     const newTip: UserTipInterface = {
       amount: Number(amount),
       currency: DONATION_CURRENCY,
