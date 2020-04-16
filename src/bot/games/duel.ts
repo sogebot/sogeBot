@@ -60,7 +60,7 @@ class Duel extends Game {
       this._timestamp,
       this.duration,
     ]);
-    const total = users.reduce((total, v) => total + v.tickets, 0);
+    const total = users.reduce((a, b) => a + b.tickets, 0);
 
     if (timestamp === 0 || new Date().getTime() - timestamp < 1000 * 60 * duelDuration) {
       this.timeouts.pickDuelWinner = global.setTimeout(() => this.pickDuelWinner(), 30000);

@@ -14,6 +14,9 @@ if (!fs.existsSync(logDir)) {
 
 const logLevel = process.env.LOGLEVEL ? process.env.LOGLEVEL.toLowerCase().trim() : 'info';
 const logFile = fs.createWriteStream('./logs/sogebot.log', { flags: 'a' });
+
+// until https://github.com/typescript-eslint/typescript-eslint/pull/1898 fixed
+/* eslint-disable */
 enum Levels {
   debug,
   error,
@@ -38,6 +41,8 @@ enum Levels {
   stop,
   info,
 };
+/* eslint-enable */
+
 const levelFormat = {
   error: '!!! ERROR !!!',
   debug: 'DEBUG:',

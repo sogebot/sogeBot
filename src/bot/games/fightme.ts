@@ -79,9 +79,9 @@ class FightMe extends Game {
     }
 
     // check if you are challenged by user
-    const challenge = fightMeChallenges.find(challenge => {
-      return challenge.opponent === opts.sender.username
-        && challenge.challenger === user.username;
+    const challenge = fightMeChallenges.find(ch => {
+      return ch.opponent === opts.sender.username
+        && ch.challenger === user.username;
     });
     if (challenge) {
       const winner = _.random(0, 1, false);
@@ -102,9 +102,9 @@ class FightMe extends Game {
         if (!isBroadcasterModCheck) {
           timeout(isBroadcaster(opts.sender) ? user.username : opts.sender.username, null, this.timeout);
         }
-        fightMeChallenges = fightMeChallenges.filter(challenge => {
-          return !(challenge.opponent === opts.sender.username
-            && challenge.challenger === user.username);
+        fightMeChallenges = fightMeChallenges.filter(ch => {
+          return !(ch.opponent === opts.sender.username
+            && ch.challenger === user.username);
         });
         return;
       }
@@ -114,9 +114,9 @@ class FightMe extends Game {
         sendMessage(
           prepare('gambling.fightme.bothModerators', { challenger: user.username }),
           opts.sender);
-        fightMeChallenges = fightMeChallenges.filter(challenge => {
-          return !(challenge.opponent === opts.sender.username
-            && challenge.challenger === user.username);
+        fightMeChallenges = fightMeChallenges.filter(ch => {
+          return !(ch.opponent === opts.sender.username
+            && ch.challenger === user.username);
         });
         return;
       }
@@ -130,9 +130,9 @@ class FightMe extends Game {
           }),
           opts.sender);
         timeout(isMod.sender ? user.username : opts.sender.username, null, this.timeout);
-        fightMeChallenges = fightMeChallenges.filter(challenge => {
-          return !(challenge.opponent === opts.sender.username
-            && challenge.challenger === user.username);
+        fightMeChallenges = fightMeChallenges.filter(ch => {
+          return !(ch.opponent === opts.sender.username
+            && ch.challenger === user.username);
         });
         return;
       }
@@ -147,9 +147,9 @@ class FightMe extends Game {
         winner: winner ? user.username : opts.sender.username,
         loser: winner ? opts.sender.username : user.username,
       }), opts.sender, opts.attr);
-      fightMeChallenges = fightMeChallenges.filter(challenge => {
-        return !(challenge.opponent === opts.sender.username
-          && challenge.challenger === user.username);
+      fightMeChallenges = fightMeChallenges.filter(ch => {
+        return !(ch.opponent === opts.sender.username
+          && ch.challenger === user.username);
       });
     } else {
       // check if under gambling cooldown
@@ -170,9 +170,9 @@ class FightMe extends Game {
         this._cooldown = String(new Date());
       }
 
-      const isAlreadyChallenged = fightMeChallenges.find(challenge => {
-        return challenge.challenger === opts.sender.username
-          && challenge.opponent === user.username;
+      const isAlreadyChallenged = fightMeChallenges.find(ch => {
+        return ch.challenger === opts.sender.username
+          && ch.opponent === user.username;
       });
       if (!isAlreadyChallenged) {
         fightMeChallenges.push({

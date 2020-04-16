@@ -54,22 +54,21 @@ class Highlights extends System {
   }
 
   public async url(req: Request, res: Response) {
-    const url = req.get('host') + req.originalUrl;
-    const settings = this.urls.find((o) => o.url.endsWith(url));
-    if (settings) {
+    const url = this.urls.find((o) => o.url.endsWith(req.get('host') + req.originalUrl));
+    if (url) {
       if (!this.enabled) {
         return res.status(412).send({ error: 'Highlights system is disabled' });
       } else {
         if (!(api.isStreamOnline)) {
           return res.status(412).send({ error: 'Stream is offline' });
         } else {
-          if (settings.clip) {
+          if (url.clip) {
             const cid = await api.createClip({ hasDelay: false });
             if (!cid) { // Something went wrong
               return res.status(403).send({ error: 'Clip was not created!'});
             }
           }
-          if (settings.highlight) {
+          if (url.highlight) {
             this.main({ parameters: '', sender: null });
           }
           return res.status(200).send({ ok: true });

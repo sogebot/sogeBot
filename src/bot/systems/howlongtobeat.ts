@@ -108,18 +108,18 @@ class HowLongToBeat extends System {
   @command('!hltb')
   @default_permission(permission.CASTERS)
   async currentGameInfo(opts: CommandOptions, retry = false) {
-    let [game] = new Expects(opts.parameters)
+    let [gameInput] = new Expects(opts.parameters)
       .everything({ optional: true })
       .toArray();
 
-    if (!game) {
+    if (!gameInput) {
       if (!api.stats.currentGame) {
         return; // skip if we don't have game
       } else {
-        game = api.stats.currentGame;
+        gameInput = api.stats.currentGame;
       }
     }
-    const gameToShow = await getRepository(HowLongToBeatGame).findOne({ where: { game } });
+    const gameToShow = await getRepository(HowLongToBeatGame).findOne({ where: { game: gameInput } });
     if (!gameToShow && !retry) {
       if (!api.stats.currentGame) {
         this.currentGameInfo(opts, true);
@@ -150,7 +150,7 @@ class HowLongToBeat extends System {
       this.currentGameInfo(opts, true);
       return;
     } else if (!gameToShow) {
-      await sendMessage(prepare('systems.howlongtobeat.error', { game }), opts.sender, opts.attr);
+      await sendMessage(prepare('systems.howlongtobeat.error', { game: gameInput }), opts.sender, opts.attr);
       return;
     }
     const timeToBeatMain = gameToShow.timeToBeatMain / constants.HOUR;
@@ -161,7 +161,7 @@ class HowLongToBeat extends System {
     const finishedCompletionist = gameToShow.isFinishedCompletionist;
     await sendMessage(
       prepare('systems.howlongtobeat.game', {
-        game, hltbMain: gameplayMain, hltbCompletionist: gameplayCompletionist, currentMain: timeToBeatMain.toFixed(1), currentCompletionist: timeToBeatCompletionist.toFixed(1),
+        game: gameInput, hltbMain: gameplayMain, hltbCompletionist: gameplayCompletionist, currentMain: timeToBeatMain.toFixed(1), currentCompletionist: timeToBeatCompletionist.toFixed(1),
         percentMain: Number((timeToBeatMain / gameplayMain) * 100).toFixed(2),
         percentCompletionist: Number((timeToBeatCompletionist / gameplayCompletionist) * 100).toFixed(2),
         doneMain: finishedMain ? await prepare('systems.howlongtobeat.done') : '',

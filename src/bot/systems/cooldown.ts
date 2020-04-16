@@ -129,16 +129,16 @@ class Cooldown extends System {
     let data: CooldownInterface[];
     let viewer: CooldownViewerInterface | undefined;
     let timestamp, now;
-    const [command, subcommand] = new Expects(opts.message)
+    const [cmd, subcommand] = new Expects(opts.message)
       .command({ optional: true })
       .string({ optional: true })
       .toArray();
 
-    if (!_.isNil(command)) { // command
-      let name = subcommand ? `${command} ${subcommand}` : command;
+    if (!_.isNil(cmd)) { // command
+      let name = subcommand ? `${cmd} ${subcommand}` : cmd;
       let isFound = false;
 
-      const parsed = await (new Parser().find(subcommand ? `${command} ${subcommand}` : command, null));
+      const parsed = await (new Parser().find(subcommand ? `${cmd} ${subcommand}` : cmd, null));
       if (parsed) {
         debug('cooldown.check', `Command found ${parsed.command}`);
         name = parsed.command;
@@ -146,7 +146,7 @@ class Cooldown extends System {
       } else {
         // search in custom commands as well
         if (customCommands.enabled) {
-          const foundCommands = await customCommands.find(subcommand ? `${command} ${subcommand}` : command);
+          const foundCommands = await customCommands.find(subcommand ? `${cmd} ${subcommand}` : cmd);
           if (foundCommands.length > 0) {
             name = foundCommands[0].command.command;
             isFound = true;
@@ -155,7 +155,7 @@ class Cooldown extends System {
       }
 
       if (!isFound) {
-        debug('cooldown.check', `'${name}' not found, reverting to simple '${command}'`);
+        debug('cooldown.check', `'${name}' not found, reverting to simple '${cmd}'`);
         name = command; // revert to basic command if nothing was found
       }
 
@@ -261,16 +261,16 @@ class Cooldown extends System {
     // TODO: redundant duplicated code (search of cooldown), should be unified for check and cooldownRollback
     let data: CooldownInterface[];
 
-    const [command, subcommand] = new Expects(opts.message)
+    const [cmd, subcommand] = new Expects(opts.message)
       .command({ optional: true })
       .string({ optional: true })
       .toArray();
 
-    if (!_.isNil(command)) { // command
-      let name = subcommand ? `${command} ${subcommand}` : command;
+    if (!_.isNil(cmd)) { // command
+      let name = subcommand ? `${cmd} ${subcommand}` : cmd;
       let isFound = false;
 
-      const parsed = await (new Parser().find(subcommand ? `${command} ${subcommand}` : command));
+      const parsed = await (new Parser().find(subcommand ? `${cmd} ${subcommand}` : cmd));
       if (parsed) {
         debug('cooldown.revert', `Command found ${parsed.command}`);
         name = parsed.command;
@@ -278,7 +278,7 @@ class Cooldown extends System {
       } else {
         // search in custom commands as well
         if (customCommands.enabled) {
-          const foundCommands = await customCommands.find(subcommand ? `${command} ${subcommand}` : command);
+          const foundCommands = await customCommands.find(subcommand ? `${cmd} ${subcommand}` : cmd);
           if (foundCommands.length > 0) {
             name = foundCommands[0].command.command;
             isFound = true;
@@ -287,7 +287,7 @@ class Cooldown extends System {
       }
 
       if (!isFound) {
-        debug('cooldown.revert', `'${name}' not found, reverting to simple '${command}'`);
+        debug('cooldown.revert', `'${name}' not found, reverting to simple '${cmd}'`);
         name = command; // revert to basic command if nothing was found
       }
 

@@ -46,9 +46,9 @@ export const currentStreamTags: {
 }[] = [];
 
 let intervals = 0;
-const isAPIFree = (intervals) => {
-  for (const key of Object.keys(intervals)) {
-    if (intervals[key].inProgress) {
+const isAPIFree = (intervalList) => {
+  for (const key of Object.keys(intervalList)) {
+    if (intervalList[key].inProgress) {
       return false;
     }
   }
@@ -1585,7 +1585,7 @@ class API extends Core {
       let logError;
       try {
         logError = e.response.data.status !== 422;
-      } catch (e) {
+      } catch (e2) {
         logError = true;
       }
 

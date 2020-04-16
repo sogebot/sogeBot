@@ -26,8 +26,8 @@ export const addWidget = (id, name, icon) => {
   widgets.push({ id: id, name: name, icon: icon });
 };
 
-export const setIOServer = (server) => {
-  ioServer = io(server);
+export const setIOServer = (serverArg) => {
+  ioServer = io(serverArg);
 };
 
 export const setApp = (_app) => {

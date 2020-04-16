@@ -346,18 +346,18 @@ class Spotify extends Integration {
     adminEndpoint(this.nsp, 'code', async (token, callback) => {
       const waitForUsername = () => {
         return new Promise((resolve, reject) => {
-          const check = async (resolve) => {
+          const check = async () => {
             this.client.getMe()
               .then((data) => {
                 this.username = data.body.display_name ? data.body.display_name : data.body.id;
                 resolve();
               }, () => {
                 global.setTimeout(() => {
-                  check(resolve);
+                  check();
                 }, 1000);
               });
           };
-          check(resolve);
+          check();
         });
       };
 
@@ -445,8 +445,8 @@ class Spotify extends Integration {
               this.client.setAccessToken(this._accessToken);
               this.client.setRefreshToken(this._refreshToken);
               this.retry.IRefreshToken = 0;
-            }, (err) => {
-              if (err) {
+            }, (authorizationError) => {
+              if (authorizationError) {
                 addUIError({ name: 'SPOTIFY', message: 'Getting of accessToken and refreshToken failed.' });
                 info(chalk.yellow('SPOTIFY: ') + 'Getting of accessToken and refreshToken failed');
               }

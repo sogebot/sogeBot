@@ -50,7 +50,7 @@ const latestAuthorizationPerToken: { [accessToken: string]: number } = new Proxy
 enum Authorized {
   inProgress,
   NotAuthorized,
-  Authorized,
+  isAuthorized,
 }
 
 if (isDebugEnabled('sockets')) {
@@ -74,7 +74,7 @@ setInterval(() => {
 
 const createDashboardIfNeeded = async (userId: number, opts: { haveAdminPrivileges: Authorized; haveModPrivileges: Authorized; haveViewerPrivileges: Authorized }) => {
   // create main admin dashboard if needed;
-  if (opts.haveAdminPrivileges === Authorized.Authorized) {
+  if (opts.haveAdminPrivileges === Authorized.isAuthorized) {
     const mainDashboard = await getRepository(Dashboard).findOne({
       userId, name: 'Main', type: 'admin',
     });
@@ -86,7 +86,7 @@ const createDashboardIfNeeded = async (userId: number, opts: { haveAdminPrivileg
   }
 
   // create main admin dashboard if needed;
-  if (opts.haveModPrivileges === Authorized.Authorized) {
+  if (opts.haveModPrivileges === Authorized.isAuthorized) {
     const mainDashboard = await getRepository(Dashboard).findOne({
       userId, name: 'Main', type: 'mod',
     });
@@ -98,7 +98,7 @@ const createDashboardIfNeeded = async (userId: number, opts: { haveAdminPrivileg
   }
 
   // create main viewer dashboard if needed;
-  if (opts.haveViewerPrivileges === Authorized.Authorized) {
+  if (opts.haveViewerPrivileges === Authorized.isAuthorized) {
     const mainDashboard = await getRepository(Dashboard).findOne({
       userId, name: 'Main', type: 'viewer',
     });
@@ -113,9 +113,9 @@ const createDashboardIfNeeded = async (userId: number, opts: { haveAdminPrivileg
 const getPrivileges = async(type: SocketInterface['type'], userId: number) => {
   const user = await getRepository(User).findOne({ userId });
   return {
-    haveAdminPrivileges: type === 'admin' ? Authorized.Authorized : Authorized.NotAuthorized,
-    haveModPrivileges: isModerator(user) ? Authorized.Authorized : Authorized.NotAuthorized,
-    haveViewerPrivileges: Authorized.Authorized,
+    haveAdminPrivileges: type === 'admin' ? Authorized.isAuthorized : Authorized.NotAuthorized,
+    haveModPrivileges: isModerator(user) ? Authorized.isAuthorized : Authorized.NotAuthorized,
+    haveViewerPrivileges: Authorized.isAuthorized,
   };
 };
 
@@ -178,7 +178,7 @@ class Socket extends Core {
       if (accessToken && (typeof latestAuthorizationPerToken[accessToken] === 'undefined' || Date.now() - latestAuthorizationPerToken[accessToken] > MINUTE)) {
         latestAuthorizationPerToken[accessToken] = Date.now();
         accessToken = null;
-        emitAuthorize(socket);
+        emitAuthorize();
       }
     }, SECOND);
 
@@ -190,19 +190,19 @@ class Socket extends Core {
       }
     });
 
-    const sendAuthorized = (socket, auth: Readonly<SocketInterface>) => {
+    const sendAuthorized = (auth: Readonly<SocketInterface>) => {
       debug('socket', auth);
       socket.emit('authorized', auth);
     };
-    const emitAuthorize = (socket) => {
+    const emitAuthorize = () => {
       socket.emit('authorize', async (cb: { token: string; type: 'socket' | 'access' }) => {
         if (cb.type === 'socket') {
           // check if we have global socket
           if (cb.token === _self.socketToken) {
-            haveAdminPrivileges = Authorized.Authorized;
-            haveModPrivileges = Authorized.Authorized;
-            haveViewerPrivileges = Authorized.Authorized;
-            sendAuthorized(socket, {
+            haveAdminPrivileges = Authorized.isAuthorized;
+            haveModPrivileges = Authorized.isAuthorized;
+            haveViewerPrivileges = Authorized.isAuthorized;
+            sendAuthorized({
               type: 'admin',
               accessToken: _self.socketToken,
               userId: 0,
@@ -236,10 +236,10 @@ class Socket extends Core {
             invalidatedTokens[cb.token] = Date.now();
             delete latestAuthorizationPerToken[cb.token];
 
-            return socket.emit('refreshToken', async (cb: { userId: number; token: string }) => {
-              auth = await getRepository(SocketEntity).findOne({ userId: cb.userId, refreshToken: cb.token });
+            return socket.emit('refreshToken', async (data: { userId: number; token: string }) => {
+              auth = await getRepository(SocketEntity).findOne({ userId: data.userId, refreshToken: data.token });
               if (!auth) {
-                debug('sockets', `Incorrect refresh token for userId - ${cb.token}, ${cb.userId}`);
+                debug('sockets', `Incorrect refresh token for userId - ${data.token}, ${data.userId}`);
                 haveAdminPrivileges = Authorized.NotAuthorized;
                 haveModPrivileges = Authorized.NotAuthorized;
                 haveViewerPrivileges = Authorized.NotAuthorized;
@@ -253,15 +253,15 @@ class Socket extends Core {
                 auth.accessTokenTimestamp = Date.now() + (_self.accessTokenExpirationTime * 1000);
                 auth.refreshTokenTimestamp = Date.now() + (_self.refreshTokenExpirationTime * 1000);
                 await getRepository(SocketEntity).save(auth);
-                debug('sockets', `Login OK by refresh token - ${cb.token}, access token set to ${auth.accessToken}`);
+                debug('sockets', `Login OK by refresh token - ${data.token}, access token set to ${auth.accessToken}`);
 
-                const privileges = await getPrivileges(auth.type, cb.userId);
+                const privileges = await getPrivileges(auth.type, data.userId);
                 haveAdminPrivileges = privileges.haveAdminPrivileges;
                 haveModPrivileges = privileges.haveModPrivileges;
                 haveViewerPrivileges = privileges.haveViewerPrivileges;
-                await createDashboardIfNeeded(cb.userId, { haveAdminPrivileges, haveModPrivileges, haveViewerPrivileges });
+                await createDashboardIfNeeded(data.userId, { haveAdminPrivileges, haveModPrivileges, haveViewerPrivileges });
 
-                sendAuthorized(socket, auth);
+                sendAuthorized(auth);
               }
             });
           } else {
@@ -279,14 +279,14 @@ class Socket extends Core {
             await createDashboardIfNeeded(auth.userId, { haveAdminPrivileges, haveModPrivileges, haveViewerPrivileges });
 
             debug('sockets', `Login OK by access token - ${cb.token}`);
-            sendAuthorized(socket, auth);
+            sendAuthorized(auth);
 
             if (auth.type === 'admin') {
-              haveAdminPrivileges = Authorized.Authorized;
+              haveAdminPrivileges = Authorized.isAuthorized;
             } else {
               haveAdminPrivileges = Authorized.NotAuthorized;
             }
-            haveViewerPrivileges = Authorized.Authorized;
+            haveViewerPrivileges = Authorized.isAuthorized;
           }
         }
       });
@@ -326,14 +326,14 @@ class Socket extends Core {
         userId: Number(userId),
         type: userPermission === permission.CASTERS ? 'admin' : 'viewer',
       };
-      haveViewerPrivileges = Authorized.Authorized;
+      haveViewerPrivileges = Authorized.isAuthorized;
       if (userPermission === permission.CASTERS) {
-        haveAdminPrivileges = Authorized.Authorized;
+        haveAdminPrivileges = Authorized.isAuthorized;
       } else {
         haveAdminPrivileges = Authorized.NotAuthorized;
       }
       await getRepository(SocketEntity).save(auth);
-      sendAuthorized(socket, auth);
+      sendAuthorized(auth);
 
       cb();
     });
@@ -359,7 +359,7 @@ class Socket extends Core {
           waitForAuthorization();
         });
 
-        if (haveAdminPrivileges === Authorized.Authorized) {
+        if (haveAdminPrivileges === Authorized.isAuthorized) {
           endpoint.callback(...args, socket);
         } else {
           // check if we have public endpoint
@@ -393,7 +393,7 @@ class Socket extends Core {
           waitForAuthorization();
         });
 
-        if (haveViewerPrivileges === Authorized.Authorized) {
+        if (haveViewerPrivileges === Authorized.isAuthorized) {
           endpoint.callback(...args, socket);
         } else {
           debug('sockets', `User dont have viewer access to ${socket.nsp.name}`);
@@ -407,7 +407,7 @@ class Socket extends Core {
       });
     }
 
-    emitAuthorize(socket);
+    emitAuthorize();
     next();
   }
 

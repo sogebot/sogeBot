@@ -41,8 +41,8 @@ class CustomVariables extends Core {
       const variable = (await getRepository(Variable).find({
         relations: ['urls'],
       }))
-        .find(variable => {
-          return variable.urls.find(url => url.id === req.params.id);
+        .find(v => {
+          return v.urls.find(url => url.id === req.params.id);
         });
       if (variable) {
         if (variable.urls.find(url => url.id === req.params.id)?.GET) {
@@ -64,8 +64,8 @@ class CustomVariables extends Core {
       const variable = (await getRepository(Variable).find({
         relations: ['urls'],
       }))
-        .find(variable => {
-          return variable.urls.find(url => url.id === req.params.id);
+        .find(v => {
+          return v.urls.find(url => url.id === req.params.id);
         });
       if (variable) {
         if (variable.urls.find(url => url.id === req.params.id)?.POST) {
@@ -107,7 +107,6 @@ class CustomVariables extends Core {
       cb(null, variables);
     });
     adminEndpoint(this.nsp, 'customvariables::runScript', async (id, cb) => {
-      let item;
       try {
         const item = await getRepository(Variable).findOne({ id });
         if (!item) {
@@ -120,9 +119,7 @@ class CustomVariables extends Core {
         }));
       } catch (e) {
         cb(e.stack, null);
-      }
-      cb(null, item)
-      ;
+      };
     });
     adminEndpoint(this.nsp, 'customvariables::testScript', async (opts, cb) => {
       let returnedValue;
@@ -228,27 +225,27 @@ class CustomVariables extends Core {
 
     const toEval = `(async function evaluation () {  ${script} })()`;
     const context = {
-      url: async (url, opts) => {
-        if (typeof opts === 'undefined') {
-          opts = {
+      url: async (url, urlOpts) => {
+        if (typeof urlOpts === 'undefined') {
+          urlOpts = {
             url,
             method: 'GET',
             headers: undefined,
             data: undefined,
           };
         } else {
-          opts.url = url;
+          urlOpts.url = url;
         }
 
-        if (!['GET', 'POST', 'PUT', 'DELETE'].includes(opts.method.toUpperCase())) {
+        if (!['GET', 'POST', 'PUT', 'DELETE'].includes(urlOpts.method.toUpperCase())) {
           throw Error('only GET, POST, PUT, DELETE methods are supported');
         }
 
-        if (opts.url.trim().length === 0) {
+        if (urlOpts.url.trim().length === 0) {
           throw Error('url was not properly specified');
         }
 
-        const request = await axios(opts);
+        const request = await axios(urlOpts);
         return { data: request.data, status: request.status, statusText: request.statusText };
       },
       _: _,

@@ -149,13 +149,13 @@ class Alias extends System {
   @default_permission(permission.CASTERS)
   async edit (opts) {
     try {
-      const [perm, alias, command] = new Expects(opts.parameters)
+      const [perm, alias, cmd] = new Expects(opts.parameters)
         .permission({ optional: true, default: permission.VIEWERS })
         .argument({ name: 'a', type: String, multi: true, delimiter: '' }) // set as multi as alias can contain spaces
         .argument({ name: 'c', type: String, multi: true, delimiter: '' }) // set as multi as command can contain spaces
         .toArray();
 
-      if (!alias.startsWith('!') || !command.startsWith('!')) {
+      if (!alias.startsWith('!') || !cmd.startsWith('!')) {
         throw Error('Alias or Command doesn\'t start with !');
       }
 
@@ -170,9 +170,9 @@ class Alias extends System {
         sendMessage(message, opts.sender, opts.attr);
         return false;
       }
-      await getRepository(AliasEntity).save({...item, command, permission: pItem.id ?? permission.VIEWERS});
+      await getRepository(AliasEntity).save({...item, command: cmd, permission: pItem.id ?? permission.VIEWERS});
 
-      const message = await prepare('alias.alias-was-edited', { alias, command });
+      const message = await prepare('alias.alias-was-edited', { alias, command: cmd });
       sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
       sendMessage(prepare('alias.alias-parse-failed'), opts.sender, opts.attr);
@@ -183,13 +183,13 @@ class Alias extends System {
   @default_permission(permission.CASTERS)
   async add (opts) {
     try {
-      const [perm, alias, command] = new Expects(opts.parameters)
+      const [perm, alias, cmd] = new Expects(opts.parameters)
         .permission({ optional: true, default: permission.VIEWERS })
         .argument({ name: 'a', type: String, multi: true, delimiter: '' }) // set as multi as alias can contain spaces
         .argument({ name: 'c', type: String, multi: true, delimiter: '' }) // set as multi as command can contain spaces
         .toArray();
 
-      if (!alias.startsWith('!') || !command.startsWith('!')) {
+      if (!alias.startsWith('!') || !cmd.startsWith('!')) {
         throw Error('Alias or Command doesn\'t start with !');
       }
 
@@ -201,7 +201,7 @@ class Alias extends System {
       const message = await prepare('alias.alias-was-added',
         await getRepository(AliasEntity).save({
           alias,
-          command,
+          command: cmd,
           enabled: true,
           visible: true,
           permission: pItem.id ?? permission.VIEWERS,
