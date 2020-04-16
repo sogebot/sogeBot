@@ -207,6 +207,8 @@ class TMI extends Core {
   }
 
   loadListeners (type: 'bot' | 'broadcaster') {
+    (this.client[type] as TwitchJs).chat.removeAllListeners();
+
     // common for bot and broadcaster
     (this.client[type] as TwitchJs).chat.on('DISCONNECT', async (message) => {
       info(`TMI: ${type} is disconnected`);
