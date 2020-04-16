@@ -170,7 +170,7 @@ class CustomCommands extends System {
       const cDb = await getRepository(Commands).findOne({
         relations: ['responses'],
         where: {
-          command,
+          command: cmd,
         },
       });
       if (!cDb) {

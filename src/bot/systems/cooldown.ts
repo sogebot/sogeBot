@@ -126,134 +126,138 @@ class Cooldown extends System {
 
   @parser({ priority: constants.HIGH })
   async check (opts: Record<string, any>) {
-    let data: CooldownInterface[];
-    let viewer: CooldownViewerInterface | undefined;
-    let timestamp, now;
-    const [cmd, subcommand] = new Expects(opts.message)
-      .command({ optional: true })
-      .string({ optional: true })
-      .toArray();
+    try {
+      let data: CooldownInterface[];
+      let viewer: CooldownViewerInterface | undefined;
+      let timestamp, now;
+      const [cmd, subcommand] = new Expects(opts.message)
+        .command({ optional: true })
+        .string({ optional: true })
+        .toArray();
 
-    if (!_.isNil(cmd)) { // command
-      let name = subcommand ? `${cmd} ${subcommand}` : cmd;
-      let isFound = false;
+      if (!_.isNil(cmd)) { // command
+        let name: string = subcommand ? `${cmd} ${subcommand}` : cmd;
+        let isFound = false;
 
-      const parsed = await (new Parser().find(subcommand ? `${cmd} ${subcommand}` : cmd, null));
-      if (parsed) {
-        debug('cooldown.check', `Command found ${parsed.command}`);
-        name = parsed.command;
-        isFound = true;
-      } else {
-        // search in custom commands as well
-        if (customCommands.enabled) {
-          const foundCommands = await customCommands.find(subcommand ? `${cmd} ${subcommand}` : cmd);
-          if (foundCommands.length > 0) {
-            name = foundCommands[0].command.command;
-            isFound = true;
+        const parsed = await (new Parser().find(subcommand ? `${cmd} ${subcommand}` : cmd, null));
+        if (parsed) {
+          debug('cooldown.check', `Command found ${parsed.command}`);
+          name = parsed.command;
+          isFound = true;
+        } else {
+          // search in custom commands as well
+          if (customCommands.enabled) {
+            const foundCommands = await customCommands.find(subcommand ? `${cmd} ${subcommand}` : cmd);
+            if (foundCommands.length > 0) {
+              name = foundCommands[0].command.command;
+              isFound = true;
+            }
           }
         }
-      }
 
-      if (!isFound) {
-        debug('cooldown.check', `'${name}' not found, reverting to simple '${cmd}'`);
-        name = command; // revert to basic command if nothing was found
-      }
-
-      const cooldown = await getRepository(CooldownEntity).findOne({ where: { name }, relations: ['viewers'] });
-      if (!cooldown) { // command is not on cooldown -> recheck with text only
-        const replace = new RegExp(`${XRegExp.escape(name)}`, 'ig');
-        opts.message = opts.message.replace(replace, '');
-        if (opts.message.length > 0) {
-          return this.check(opts);
-        } else {
-          return true;
+        if (!isFound) {
+          debug('cooldown.check', `'${name}' not found, reverting to simple '${cmd}'`);
+          name = cmd; // revert to basic command if nothing was found
         }
-      }
-      data = [cooldown];
-    } else { // text
-      let [keywords, cooldowns] = await Promise.all([
-        getRepository(Keyword).find(),
-        getRepository(CooldownEntity).find({ relations: ['viewers'] }),
-      ]);
 
-      keywords = _.filter(keywords, function (o) {
-        return opts.message.toLowerCase().search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword.toLowerCase()) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0;
+        const cooldown = await getRepository(CooldownEntity).findOne({ where: { name }, relations: ['viewers'] });
+        if (!cooldown) { // command is not on cooldown -> recheck with text only
+          const replace = new RegExp(`${XRegExp.escape(name)}`, 'ig');
+          opts.message = opts.message.replace(replace, '');
+          if (opts.message.length > 0) {
+            return this.check(opts);
+          } else {
+            return true;
+          }
+        }
+        data = [cooldown];
+      } else { // text
+        let [keywords, cooldowns] = await Promise.all([
+          getRepository(Keyword).find(),
+          getRepository(CooldownEntity).find({ relations: ['viewers'] }),
+        ]);
+
+        keywords = _.filter(keywords, function (o) {
+          return opts.message.toLowerCase().search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword.toLowerCase()) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0;
+        });
+
+        data = [];
+        _.each(keywords, (keyword) => {
+          const cooldown = _.find(cooldowns, (o) => o.name.toLowerCase() === keyword.keyword.toLowerCase());
+          if (keyword.enabled && cooldown) {
+            data.push(cooldown);
+          }
+        });
+      }
+      if (!_.some(data, { isEnabled: true })) { // parse ok if all cooldowns are disabled
+        return true;
+      }
+
+      const user = await getRepository(User).save({
+        ...(await getRepository(User).findOne({ userId: Number(opts.sender.userId) })),
+        userId: Number(opts.sender.userId),
+        username: opts.sender.username,
+        isSubscriber: typeof opts.sender.badges.subscriber !== 'undefined',
+        isModerator: typeof opts.sender.badges.moderator !== 'undefined',
       });
-
-      data = [];
-      _.each(keywords, (keyword) => {
-        const cooldown = _.find(cooldowns, (o) => o.name.toLowerCase() === keyword.keyword.toLowerCase());
-        if (keyword.enabled && cooldown) {
-          data.push(cooldown);
+      let result = false;
+      for (const cooldown of data) {
+        if ((isOwner(opts.sender) && !cooldown.isOwnerAffected) || (user.isModerator && !cooldown.isModeratorAffected) || (user.isSubscriber && !cooldown.isSubscriberAffected) || (user.isFollower && !cooldown.isFollowerAffected)) {
+          result = true;
+          continue;
         }
-      });
-    }
-    if (!_.some(data, { isEnabled: true })) { // parse ok if all cooldowns are disabled
-      return true;
-    }
 
-    const user = await getRepository(User).save({
-      ...(await getRepository(User).findOne({ userId: Number(opts.sender.userId) })),
-      userId: Number(opts.sender.userId),
-      username: opts.sender.username,
-      isSubscriber: typeof opts.sender.badges.subscriber !== 'undefined',
-      isModerator: typeof opts.sender.badges.moderator !== 'undefined',
-    });
-    let result = false;
-    for (const cooldown of data) {
-      if ((isOwner(opts.sender) && !cooldown.isOwnerAffected) || (user.isModerator && !cooldown.isModeratorAffected) || (user.isSubscriber && !cooldown.isSubscriberAffected) || (user.isFollower && !cooldown.isFollowerAffected)) {
-        result = true;
-        continue;
-      }
-
-      for (const item of cooldown.viewers?.filter(o => o.userId === Number(opts.sender.userId)) ?? []) {
-        if (!viewer || viewer.timestamp < item.timestamp) {
-          viewer = {...item};
-        } else {
-          // remove duplicate
-          cooldown.viewers = cooldown.viewers?.filter(o => o.id !== item.id);
+        for (const item of cooldown.viewers?.filter(o => o.userId === Number(opts.sender.userId)) ?? []) {
+          if (!viewer || viewer.timestamp < item.timestamp) {
+            viewer = {...item};
+          } else {
+            // remove duplicate
+            cooldown.viewers = cooldown.viewers?.filter(o => o.id !== item.id);
+          }
         }
-      }
-      debug('cooldown.db', viewer ?? `${opts.sender.username}#${opts.sender.userId} not found in cooldown list`);
-      if (cooldown.type === 'global') {
-        timestamp = cooldown.timestamp ?? 0;
-      } else {
-        timestamp = viewer?.timestamp ?? 0;
-      }
-      now = Date.now();
-
-      if (now - timestamp >= cooldown.miliseconds) {
+        debug('cooldown.db', viewer ?? `${opts.sender.username}#${opts.sender.userId} not found in cooldown list`);
         if (cooldown.type === 'global') {
-          await getRepository(CooldownEntity).save({
-            ...cooldown,
-            lastTimestamp: timestamp,
-            timestamp: now,
-          });
+          timestamp = cooldown.timestamp ?? 0;
         } else {
-          debug('cooldown.check', `${opts.sender.username}#${opts.sender.userId} added to cooldown list.`);
-          await getRepository(CooldownViewer).insert({
-            cooldown, userId: Number(opts.sender.userId), lastTimestamp: timestamp,  timestamp: now,
-          });
+          timestamp = viewer?.timestamp ?? 0;
         }
-        result = true;
-        continue;
-      } else {
-        if (!cooldown.isErrorMsgQuiet && this.cooldownNotifyAsWhisper) {
-          opts.sender['message-type'] = 'whisper'; // we want to whisp cooldown message
-          const message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
-          await sendMessage(message, opts.sender, opts.attr);
+        now = Date.now();
+
+        if (now - timestamp >= cooldown.miliseconds) {
+          if (cooldown.type === 'global') {
+            await getRepository(CooldownEntity).save({
+              ...cooldown,
+              lastTimestamp: timestamp,
+              timestamp: now,
+            });
+          } else {
+            debug('cooldown.check', `${opts.sender.username}#${opts.sender.userId} added to cooldown list.`);
+            await getRepository(CooldownViewer).insert({
+              cooldown, userId: Number(opts.sender.userId), lastTimestamp: timestamp,  timestamp: now,
+            });
+          }
+          result = true;
+          continue;
+        } else {
+          if (!cooldown.isErrorMsgQuiet && this.cooldownNotifyAsWhisper) {
+            opts.sender['message-type'] = 'whisper'; // we want to whisp cooldown message
+            const message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
+            await sendMessage(message, opts.sender, opts.attr);
+          }
+          if (!cooldown.isErrorMsgQuiet && this.cooldownNotifyAsChat) {
+            opts.sender['message-type'] = 'chat';
+            const message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
+            await sendMessage(message, opts.sender, opts.attr);
+          }
+          debug('cooldown.check', `${opts.sender.username}#${opts.sender.userId} have ${cooldown.name} on cooldown, remaining ${Math.ceil((cooldown.miliseconds - now + timestamp) / 1000)}s`);
+          result = false;
+          break; // disable _.each and updateQueue with false
         }
-        if (!cooldown.isErrorMsgQuiet && this.cooldownNotifyAsChat) {
-          opts.sender['message-type'] = 'chat';
-          const message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
-          await sendMessage(message, opts.sender, opts.attr);
-        }
-        debug('cooldown.check', `${opts.sender.username}#${opts.sender.userId} have ${cooldown.name} on cooldown, remaining ${Math.ceil((cooldown.miliseconds - now + timestamp) / 1000)}s`);
-        result = false;
-        break; // disable _.each and updateQueue with false
       }
+      return result;
+    } catch (e) {
+      return false;
     }
-    return result;
   }
 
   @rollback()

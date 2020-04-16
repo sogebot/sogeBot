@@ -209,7 +209,7 @@ describe('Cooldowns - check()', () => {
 
       gamble.enabled = true;
       gamble.setCommand('!gamble', '!фортуна');
-      const cooldown = await getRepository(Cooldown).save({
+      const c = await getRepository(Cooldown).save({
         name: '!фортуна',
         miliseconds: 200000,
         type: 'user',
@@ -223,7 +223,7 @@ describe('Cooldowns - check()', () => {
         isFollowerAffected: true,
       });
       await getRepository(CooldownViewer).insert({
-        cooldown, userId: testUser.userId, timestamp: 10000, lastTimestamp: 0,
+        ...c, userId: testUser.userId, timestamp: 10000, lastTimestamp: 0,
       });
     });
 
