@@ -128,7 +128,7 @@ class Module {
     const load = () => {
       if (isDbConnected) {
         setTimeout(async () => {
-          const enabled2 = this._name !== 'core' ? true : await this.loadVariableValue('enabled');
+          const enabled2 = this._name === 'core' ? true : await this.loadVariableValue('enabled');
           const onStartup = () => {
             if (loadingInProgress.length > 0) {
               // wait until all settings are loaded
