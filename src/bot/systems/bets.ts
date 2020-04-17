@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { isMainThread } from '../cluster';
 
-import { getOwner, prepare, sendMessage } from '../commons';
+import { announce, getOwner, prepare } from '../commons';
 import { command, default_permission, helper, settings, ui } from '../decorators';
 import Expects from '../expects';
 import { permission } from '../helpers/permissions';
@@ -13,8 +13,6 @@ import { getRepository } from 'typeorm';
 import { Bets as BetsEntity, BetsInterface } from '../database/entity/bets';
 import { User } from '../database/entity/user';
 import { isDbConnected } from '../helpers/database';
-import oauth from '../oauth';
-import { translate } from '../translate';
 import tmi from '../tmi';
 import points from './points';
 
@@ -95,23 +93,9 @@ class Bets extends System {
 
       if (currentBet.endedAt <= Date.now()) {
         if (currentBet.participations.length > 0) {
-          sendMessage(translate('bets.locked'), {
-            username: oauth.botUsername,
-            displayName: oauth.botUsername,
-            userId: Number(oauth.botId),
-            emotes: [],
-            badges: {},
-            'message-type': 'chat',
-          });
+          announce(prepare('bets.locked'));
         } else {
-          sendMessage(translate('bets.removed'), {
-            username: oauth.botUsername,
-            displayName: oauth.botUsername,
-            userId: Number(oauth.botId),
-            emotes: [],
-            badges: {},
-            'message-type': 'chat',
-          });
+          announce(prepare('bets.removed'));
           await getRepository(BetsEntity).save({...currentBet, isLocked: true});
         }
       }
@@ -129,7 +113,7 @@ class Bets extends System {
 
   @command('!bet open')
   @default_permission(permission.MODERATORS)
-  public async open(opts) {
+  public async open(opts: CommandOptions): Promise<CommandResponse[]> {
     const currentBet = await getRepository(BetsEntity).findOne({
       relations: ['participations'],
       order: { createdAt: 'DESC' },
@@ -155,29 +139,30 @@ class Bets extends System {
         options: options,
       });
 
-      sendMessage(prepare('bets.opened', {
-        username: getOwner(),
-        title,
-        maxIndex: options.length,
-        minutes: timeout,
-        options: options.map((v, i) => `${i+1}. '${v}'`).join(', '),
-        command: this.getCommand('!bet'),
-      }), opts.sender);
+      return [{
+        response: prepare('bets.opened', {
+          username: getOwner(),
+          title,
+          maxIndex: options.length,
+          minutes: timeout,
+          options: options.map((v, i) => `${i+1}. '${v}'`).join(', '),
+          command: this.getCommand('!bet'),
+        }), ...opts,
+      }];
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
-          sendMessage(translate('bets.notEnoughOptions'), opts.sender, opts.attr);
-          break;
+          return [{ response: prepare('bets.notEnoughOptions'), ...opts }];
         case ERROR_ALREADY_OPENED:
-          sendMessage(
-            prepare('bets.running', {
+          return [{
+            response: prepare('bets.running', {
               command: this.getCommand('!bet'),
               maxIndex: String((currentBet as BetsInterface).options.length),
               options: (currentBet as BetsInterface).options.map((v, i) => `${i+1}. '${v}'`).join(', '),
-            }), opts.sender);
-          break;
+            }), ...opts,
+          }];
         default:
-          sendMessage([this.getCommand('!bet open'), e.message].join(' '), opts.sender, opts.attr);
+          return [{ response: [this.getCommand('!bet open'), e.message].join(' '), ...opts }];
       }
     }
   }
@@ -188,14 +173,17 @@ class Bets extends System {
       order: { createdAt: 'DESC' },
     });
     if (!currentBet) {
-      sendMessage(translate('bets.notRunning'), opts.sender, opts.attr);
+      return [{ response: prepare('bets.notRunning'), ...opts } ];
     } else {
-      sendMessage(prepare(currentBet.isLocked ? 'bets.lockedInfo' : 'bets.info', {
-        command: opts.command,
-        title: currentBet.title,
-        maxIndex: String(currentBet.options.length),
-        options: currentBet.options.map((v, i) => `${i+1}. '${v}'`).join(', '),
-        minutes: Number((currentBet.endedAt - Date.now()) / 1000 / 60).toFixed(1) }), opts.sender);
+      return [{
+        response: prepare(currentBet.isLocked ? 'bets.lockedInfo' : 'bets.info', {
+          command: opts.command,
+          title: currentBet.title,
+          maxIndex: String(currentBet.options.length),
+          options: currentBet.options.map((v, i) => `${i+1}. '${v}'`).join(', '),
+          minutes: Number((currentBet.endedAt - Date.now()) / 1000 / 60).toFixed(1),
+        }), ...opts,
+      }];
     }
   }
 
@@ -249,30 +237,24 @@ class Bets extends System {
         await points.decrement({ userId: opts.sender.userId }, tickets);
         await getRepository(BetsEntity).save(currentBet);
       } else {
-        this.info(opts);
+        return this.info(opts);
       }
     } catch (e) {
       switch (e.message) {
         case ERROR_ZERO_BET:
-          sendMessage(translate('bets.zeroBet')
-            .replace(/\$pointsName/g, await points.getPointsName(0)), opts.sender);
-          break;
+          return [{ response: prepare('bets.zeroBet').replace(/\$pointsName/g, await points.getPointsName(0)), ...opts }];
         case ERROR_NOT_RUNNING:
-          sendMessage(translate('bets.notRunning'), opts.sender, opts.attr);
-          break;
+          return [{ response: prepare('bets.notRunning'), ...opts } ];
         case ERROR_UNDEFINED_BET:
-          sendMessage(prepare('bets.undefinedBet', { command: opts.command }), opts.sender, opts.attr);
-          break;
+          return [{ response: prepare('bets.undefinedBet', { command: opts.command }), ...opts }];
         case ERROR_IS_LOCKED:
-          sendMessage(translate('bets.timeUpBet'), opts.sender, opts.attr);
-          break;
+          return [{ response: prepare('bets.timeUpBet'), ...opts } ];
         case ERROR_DIFF_BET:
           const result = (currentBet as Required<BetsInterface>).participations.find(o => o.userId === opts.sender.userId);
-          sendMessage(translate('bets.diffBet').replace(/\$option/g, result?.optionIdx), opts.sender, opts.attr);
-          break;
+          return [{ response: prepare('bets.diffBet').replace(/\$option/g, String(result?.optionIdx)), ...opts } ];
         default:
           warning(e.stack);
-          sendMessage((prepare('bets.error', { command: opts.command })).replace(/\$maxIndex/g, String((currentBet as BetsInterface).options.length)), opts.sender, opts.attr);
+          return [{ response: prepare('bets.error', { command: opts.command }).replace(/\$maxIndex/g, String((currentBet as BetsInterface).options.length)), ...opts }];
       }
     }
   }
@@ -291,15 +273,15 @@ class Bets extends System {
       for (const user of currentBet.participations) {
         await getRepository(User).increment({ userId: opts.sender.userId }, 'points', user.points);
       }
-      sendMessage(translate('bets.refund'), opts.sender, opts.attr);
+      return [{ response: prepare('bets.refund'), ...opts } ];
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_RUNNING:
-          sendMessage(translate('bets.notRunning'), opts.sender, opts.attr);
+          return [{ response: prepare('bets.notRunning'), ...opts } ];
           break;
         default:
           warning(e.stack);
-          sendMessage(translate('core.error'), opts.sender, opts.attr);
+          return [{ response: prepare('core.error'), ...opts } ];
       }
     } finally {
       if (currentBet) {
@@ -335,27 +317,30 @@ class Bets extends System {
         }
       }
 
-      sendMessage(translate('bets.closed')
-        .replace(/\$option/g, currentBet.options[index])
-        .replace(/\$amount/g, currentBet.participations.filter((o) => o.optionIdx === index).length)
-        .replace(/\$pointsName/g, await points.getPointsName(total))
-        .replace(/\$points/g, total), opts.sender);
-
       await getRepository(BetsEntity).save({...currentBet, arePointsGiven: true, isLocked: true});
+      return [{
+        response: prepare('bets.closed')
+          .replace(/\$option/g, currentBet.options[index])
+          .replace(/\$amount/g, String(currentBet.participations.filter((o) => o.optionIdx === index).length))
+          .replace(/\$pointsName/g, await points.getPointsName(total))
+          .replace(/\$points/g, String(total)),
+        ...opts,
+      }];
+
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
-          sendMessage(translate('bets.closeNotEnoughOptions'), opts.sender, opts.attr);
+          return [{ response: prepare('bets.closeNotEnoughOptions'), ...opts } ];
           break;
         case ERROR_NOT_RUNNING:
-          sendMessage(translate('bets.notRunning'), opts.sender, opts.attr);
+          return [{ response: prepare('bets.notRunning'), ...opts } ];
           break;
         case ERROR_NOT_OPTION:
-          sendMessage(prepare('bets.notOption', { command: opts.command }), opts.sender, opts.attr);
+          return [{ response: prepare('bets.notOption', { command: opts.command }), ...opts }];
           break;
         default:
           warning(e.stack);
-          sendMessage(translate('core.error'), opts.sender, opts.attr);
+          return [{ response: prepare('core.error'), ...opts } ];
       }
     }
   }
