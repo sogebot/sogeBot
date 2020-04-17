@@ -372,7 +372,7 @@ describe('Permissions - check()', () => {
     }
   });
 
-  describe.only(`Enabled !me command should work`, () => {
+  describe(`Enabled !me command should work`, () => {
     beforeEach(async () => {
       await getRepository(PermissionCommands).clear();
     });
@@ -406,7 +406,7 @@ describe('Permissions - check()', () => {
     }
   });
 
-  describe.only(`Disabled !me command should not work`, () => {
+  describe(`Disabled !me command should not work`, () => {
     beforeEach(async () => {
       await getRepository(PermissionCommands).save({
         name: '!me',
