@@ -1,7 +1,7 @@
 {
   "settings": {
     "enabled": "Status",
-    "jwtToken": {
+    "secretToken": {
       "title": "Secret token",
       "help": "Získej secret token na Qiwi Donate dashboardu settings->click show secret token"
     }
