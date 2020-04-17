@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import { permission } from '../helpers/permissions';
 import { command, default_permission, helper } from '../decorators';
 import System from './_interface';
-import { getOwner, sendMessage } from '../commons';
+import { getOwner } from '../commons';
 import { error } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import oauth from '../oauth';
@@ -44,7 +44,7 @@ class Commercial extends System {
     const parsed = opts.parameters.match(/^([\d]+)? ?(.*)?$/);
 
     if (_.isNil(parsed)) {
-      sendMessage('$sender, something went wrong with !commercial', opts.sender, opts.attr);
+      return [{ response: '$sender, something went wrong with !commercial', ...opts }];
     }
 
     const commercial = {
@@ -53,8 +53,7 @@ class Commercial extends System {
     };
 
     if (_.isNil(commercial.duration)) {
-      sendMessage('Usage: !commercial [duration] [optional-message]', opts.sender, opts.attr);
-      return;
+      return [{ response: 'Usage: !commercial [duration] [optional-message]', ...opts }];
     }
 
     const cid = oauth.channelId;
@@ -81,7 +80,7 @@ class Commercial extends System {
 
         events.fire('commercial', { duration: commercial.duration });
         if (!_.isNil(commercial.message)) {
-          sendMessage(commercial.message, opts.sender, opts.attr);
+          return [{ response: 'commercial.message', ...opts }];
         }
       } catch (e) {
         error(`API: ${url} - ${e.stack}`);
@@ -90,7 +89,7 @@ class Commercial extends System {
         }
       }
     } else {
-      sendMessage('$sender, available commercial duration are: 30, 60, 90, 120, 150 and 180', opts.sender, opts.attr);
+      return [{ response: '$sender, available commercial duration are: 30, 60, 90, 120, 150 and 180', ...opts }];
     }
   }
 }
