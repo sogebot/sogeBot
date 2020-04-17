@@ -26,15 +26,12 @@ _.set(global, 'widgets.custom_variables.io.emit', function () {
 describe('Custom Variable - Command reply should return correct reply', () => {
   before(async () => {
     await db.cleanup();
+    await message.prepare();
   });
 
-  beforeEach(async () => {
-    await message.prepare();
-  })
-
-  it ('Create command `!test` with `Variable set to $_variable`', async () => {
-    customcommands.add({ sender: user.owner, parameters: '-c !test -r Variable set to $_variable' });
-    await message.isSent('customcmds.command-was-added', user.owner, { response: 'Variable set to $_variable', command: '!test', sender: user.owner.username });
+  it ('Create command `!test` with `My awesome variable is set to $_variable`', async () => {
+    const r = await customcommands.add({ sender: user.owner, parameters: '-c !test -r My awesome variable is set to $_variable' });
+    assert.strictEqual(r[0].response, '$sender, command !test was added');
   });
 
   it(`Create initial value 0 of $_variable`, async () => {
@@ -42,16 +39,17 @@ describe('Custom Variable - Command reply should return correct reply', () => {
       variableName: '$_variable',
       readOnly: false,
       currentValue: 0,
-      type: 'number', responseType: 2,
+      type: 'number',
+      responseType: 2,
       permission: permission.VIEWERS,
       evalValue: '',
       usableOptions: [],
     });
   });
 
-  it ('`!test` should return `Variable set to 0`', async () => {
+  it ('`!test` should return `My awesome variable is set to 0`', async () => {
     customcommands.run({ sender: user.owner, message: '!test' });
-    await message.isSentRaw('Variable set to 0', user.owner);
+    await message.isSentRaw('My awesome variable is set to 0', user.owner);
   });
 
   describe('!_test 5', () => {
@@ -60,8 +58,8 @@ describe('Custom Variable - Command reply should return correct reply', () => {
       await parse.process();
     });
 
-    it('Expecting `Variable set to 5`', async () => {
-      await message.isSentRaw(`Variable set to 5`, user.owner, 1000);
+    it('Expecting `My awesome variable is set to 5`', async () => {
+      await message.isSentRaw(`My awesome variable is set to 5`, user.owner, 1000);
     });
   });
 
@@ -71,8 +69,8 @@ describe('Custom Variable - Command reply should return correct reply', () => {
       await parse.process();
     });
 
-    it('Expecting `Variable set to 6`', async () => {
-      await message.isSentRaw(`Variable set to 6`, user.owner, 1000);
+    it('Expecting `My awesome variable is set to 6`', async () => {
+      await message.isSentRaw(`My awesome variable is set to 6`, user.owner, 1000);
     });
   });
 
@@ -82,8 +80,8 @@ describe('Custom Variable - Command reply should return correct reply', () => {
       await parse.process();
     });
 
-    it('Expecting `Variable set to 5`', async () => {
-      await message.isSentRaw(`Variable set to 5`, user.owner, 1000);
+    it('Expecting `My awesome variable is set to 5`', async () => {
+      await message.isSentRaw(`My awesome variable is set to 5`, user.owner, 1000);
     });
   });
 });
