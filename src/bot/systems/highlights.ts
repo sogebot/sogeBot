@@ -4,7 +4,6 @@ import { isNil } from 'lodash';
 import moment from 'moment';
 import 'moment-precise-range-plugin';
 
-import { sendMessage } from '../commons';
 import { command, default_permission, settings, ui } from '../decorators';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
@@ -81,7 +80,7 @@ class Highlights extends System {
 
   @command('!highlight')
   @default_permission(permission.CASTERS)
-  public async main(opts) {
+  public async main(opts): Promise<CommandResponse[]> {
     const token = oauth.botAccessToken;
     const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/videos?user_id=${cid}&type=archive&first=1`;
@@ -114,36 +113,35 @@ class Highlights extends System {
       };
 
       ioServer?.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: request.status, remaining: api.calls.bot.remaining });
-      this.add(highlight, timestamp, opts.sender);
+      return this.add(highlight, timestamp, opts);
     } catch (e) {
       ioServer?.emit('api.stats', { timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: e.stack, remaining: api.calls.bot.remaining });
       switch (e.message) {
         case ERROR_STREAM_NOT_ONLINE:
           error('Cannot highlight - stream offline');
-          sendMessage(translate('highlights.offline'), opts.sender, opts.attr);
-          break;
+          return [{ response: translate('highlights.offline'), ...opts }];
         case ERROR_MISSING_TOKEN:
           error('Cannot highlight - missing token');
           break;
         default:
           error(e.stack);
       }
+      return [];
     }
   }
 
-  public async add(highlight: HighlightInterface, timestamp, sender) {
+  public async add(highlight: HighlightInterface, timestamp, opts): Promise<CommandResponse[]> {
     api.createMarker();
-    sendMessage(translate('highlights.saved')
+    getRepository(Highlight).insert(highlight);
+    return [{ response: translate('highlights.saved')
       .replace(/\$hours/g, (timestamp.hours < 10) ? '0' + timestamp.hours : timestamp.hours)
       .replace(/\$minutes/g, (timestamp.minutes < 10) ? '0' + timestamp.minutes : timestamp.minutes)
-      .replace(/\$seconds/g, (timestamp.seconds < 10) ? '0' + timestamp.seconds : timestamp.seconds), sender);
-
-    getRepository(Highlight).insert(highlight);
+      .replace(/\$seconds/g, (timestamp.seconds < 10) ? '0' + timestamp.seconds : timestamp.seconds), ...opts }];
   }
 
   @command('!highlight list')
   @default_permission(permission.CASTERS)
-  public async list(opts) {
+  public async list(opts): Promise<CommandResponse[]> {
     const sortedHighlights = await getRepository(Highlight).find({
       order: {
         createdAt: 'DESC',
@@ -152,8 +150,7 @@ class Highlights extends System {
     const latestStreamId = sortedHighlights.length > 0 ? sortedHighlights[0].videoId : null;
 
     if (isNil(latestStreamId)) {
-      sendMessage(translate('highlights.list.empty'), opts.sender, opts.attr);
-      return;
+      return [{ response: translate('highlights.list.empty'), ...opts }];
     }
     const list: string[] = [];
 
@@ -162,8 +159,7 @@ class Highlights extends System {
         + highlight.timestamp.minutes + 'm'
         + highlight.timestamp.seconds + 's');
     }
-    sendMessage(translate(list.length > 0 ? 'highlights.list.items' : 'highlights.list.empty')
-      .replace(/\$items/g, list.join(', ')), opts.sender);
+    return [{ response: translate(list.length > 0 ? 'highlights.list.items' : 'highlights.list.empty').replace(/\$items/g, list.join(', ')), ...opts }];
   }
 }
 
