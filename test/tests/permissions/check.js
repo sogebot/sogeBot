@@ -4,7 +4,6 @@ require('../../general.js');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
-const time = require('../../general.js').time;
 const assert = require('assert');
 
 const { permission } = require('../../../dest/helpers/permissions');
@@ -80,7 +79,7 @@ describe('Permissions - check()', () => {
         automation: 'none',
         userIds: [6],
         filters: [],
-      })
+      });
     });
     for (let j = 0; j < users.length; j++) {
       const user = users[j];
@@ -373,20 +372,20 @@ describe('Permissions - check()', () => {
     }
   });
 
-  describe(`Enabled !me command should work`, () => {
+  describe.only(`Enabled !me command should work`, () => {
     beforeEach(async () => {
       await getRepository(PermissionCommands).clear();
     });
     for (let j = 0; j < users.length; j++) {
       it (`--- ${users[j].username} should trigger command !me`, async () => {
         const parse = new Parser({ sender: users[j], message: '!me', skip: false, quiet: false });
-        await parse.process();
+        const r = await parse.process();
 
         let hours = '0.0';
         let points = '0';
         let messages = '0';
         let tips = '0.00';
-        let bits = '0'
+        let bits = '0';
         if (users[j].username === '__viewer_points__') {
           points = '100';
         }
@@ -402,12 +401,12 @@ describe('Permissions - check()', () => {
         if (users[j].username === '__viewer_messages__') {
           messages = '100';
         }
-        await message.isSentRaw(`@${users[j].username} | ${hours}h | ${points} points | ${messages} messages | ${tips}€ | ${bits} bits`, users[j], 1000);
+        assert.strictEqual(r[0].response, `$sender | ${hours}h | ${points} points | ${messages} messages | ${tips}€ | ${bits} bits`);
       });
     }
   });
 
-  describe(`Disabled !me command should not work`, () => {
+  describe.only(`Disabled !me command should not work`, () => {
     beforeEach(async () => {
       await getRepository(PermissionCommands).save({
         name: '!me',
@@ -417,29 +416,8 @@ describe('Permissions - check()', () => {
     for (let j = 0; j < users.length; j++) {
       it (`--- ${users[j].username} should NOT trigger disabled command !me`, async () => {
         const parse = new Parser({ sender: users[j], message: '!me', skip: false, quiet: false });
-        await parse.process();
-
-        let hours = '0.0';
-        let points = '0';
-        let messages = '0';
-        let tips = '0.00';
-        let bits = '0'
-        if (users[j].username === '__viewer_points__') {
-          points = '100';
-        }
-        if (users[j].username === '__viewer_watched__') {
-          hours = '100.0';
-        }
-        if (users[j].username === '__viewer_tips__') {
-          tips = '100.00';
-        }
-        if (users[j].username === '__viewer_bits__') {
-          bits = '100';
-        }
-        if (users[j].username === '__viewer_messages__') {
-          messages = '100';
-        }
-        await message.isNotSentRaw(`@${users[j].username} | ${hours}h | ${points} points | ${messages} messages | ${tips}€ | ${bits} bits`, users[j], 1000);
+        const r = await parse.process();
+        assert.strictEqual(r.length, 0);
       });
     }
   });
