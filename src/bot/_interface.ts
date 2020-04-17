@@ -134,8 +134,11 @@ class Module {
               // wait until all settings are loaded
               return setTimeout(() => onStartup(), 100);
             }
-            this._enabled = typeof state === 'undefined' ? this._enabled : state;
-            await this.status({ state: this._enabled, quiet: !isMainThread });
+            if (this._enabled !== null) {
+              // change only if we can enable/disable
+              this._enabled = typeof state === 'undefined' ? this._enabled : state;
+            }
+            this.status({ state: this._enabled, quiet: !isMainThread });
             if (isMainThread) {
               const path = this._name === 'core' ? this.__moduleName__.toLowerCase() : `${this._name}.${this.__moduleName__.toLowerCase()}`;
               for (const event of getFunctionList('startup', path)) {
@@ -323,8 +326,8 @@ class Module {
         }
         try {
           for (const [key, value] of Object.entries(unflatten(data))) {
-            if (key === 'enabled' && ['core', 'overlays', 'widgets'].includes(this._name)) {
-              // ignore enabled if its core, overlay or widgets (we don't want them to be disabled)
+            if (key === 'enabled' && this._enabled === null) {
+              // ignore enabled if we don't want to enable/disable at will
               continue;
             } else if (key === '_permissions') {
               for (const [command, currentValue] of Object.entries(value as any)) {
@@ -509,6 +512,7 @@ class Module {
 
     // add status info
     promisedSettings.enabled = this._enabled;
+
     return promisedSettings;
   }
 
