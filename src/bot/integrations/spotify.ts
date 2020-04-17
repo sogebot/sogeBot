@@ -26,7 +26,7 @@ import { addUIError } from '../panel';
 let _spotify: any = null;
 
 class Spotify extends Integration {
-  client: any = null;
+  client: null | SpotifyWebApi = null;
   retry: { IRefreshToken: number } = { IRefreshToken: 0 };
   uris: {
     uri: string;
@@ -133,7 +133,7 @@ class Spotify extends Integration {
 
   @command('!spotify skip')
   @default_permission(null)
-  cSkipSong(opts) {
+  cSkipSong() {
     this.skipToNextSong = true;
   }
 
@@ -289,7 +289,13 @@ class Spotify extends Integration {
       if (!this.fetchCurrentSongWhenOffline && !(api.isStreamOnline)) {
         throw Error('Stream is offline');
       }
+      if (this.client === null) {
+        throw Error('Spotify Web Api not connected');
+      }
       const data = await this.client.getMyCurrentPlayingTrack();
+      if (data.body.item === null) {
+        throw Error('No song was received from spotify');
+      }
 
       let currentSong = JSON.parse(this.currentSong);
       if (typeof currentSong.song === 'undefined' || currentSong.song !== data.body.item.name) {
@@ -347,15 +353,19 @@ class Spotify extends Integration {
       const waitForUsername = () => {
         return new Promise((resolve, reject) => {
           const check = async () => {
-            this.client.getMe()
-              .then((data) => {
-                this.username = data.body.display_name ? data.body.display_name : data.body.id;
-                resolve();
-              }, () => {
-                global.setTimeout(() => {
-                  check();
-                }, 1000);
-              });
+            if (this.client) {
+              this.client.getMe()
+                .then((data) => {
+                  this.username = data.body.display_name ? data.body.display_name : data.body.id;
+                  resolve();
+                }, () => {
+                  global.setTimeout(() => {
+                    check();
+                  }, 1000);
+                });
+            } else {
+              resolve();
+            }
           };
           check();
         });
@@ -368,20 +378,27 @@ class Spotify extends Integration {
     });
     adminEndpoint(this.nsp, 'revoke', async (cb) => {
       clearTimeout(this.timeouts.IRefreshToken);
+      try {
+        if (this.client !== null) {
+          this.client.resetAccessToken();
+          this.client.resetRefreshToken();
+        }
 
-      const username = this.username;
-      this.client.resetAccessToken();
-      this.client.resetRefreshToken();
-      this.userId = null;
-      this._accessToken = null;
-      this._refreshToken = null;
-      this.username = '';
-      this.currentSong = JSON.stringify({});
+        const username = this.username;
+        this.userId = null;
+        this._accessToken = null;
+        this._refreshToken = null;
+        this.username = '';
+        this.currentSong = JSON.stringify({});
 
-      info(chalk.yellow('SPOTIFY: ') + `Access to account ${username} is revoked`);
+        info(chalk.yellow('SPOTIFY: ') + `Access to account ${username} is revoked`);
 
-      this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
-      cb(null, { do: 'refresh' });
+        cb(null, { do: 'refresh' });
+      } catch (e) {
+        cb(e.stack);
+      } finally {
+        this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
+      }
     });
     adminEndpoint(this.nsp, 'authorize', async (cb) => {
       if (
@@ -442,8 +459,10 @@ class Spotify extends Integration {
               this._accessToken = data.body.access_token;
               this._refreshToken = data.body.refresh_token;
 
-              this.client.setAccessToken(this._accessToken);
-              this.client.setRefreshToken(this._refreshToken);
+              if (this.client) {
+                this.client.setAccessToken(this._accessToken);
+                this.client.setRefreshToken(this._refreshToken);
+              }
               this.retry.IRefreshToken = 0;
             }, (authorizationError) => {
               if (authorizationError) {

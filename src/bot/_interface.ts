@@ -128,18 +128,18 @@ class Module {
     const load = () => {
       if (isDbConnected) {
         setTimeout(async () => {
-          const enabled2 = this._name === 'core' ? true : await this.loadVariableValue('enabled');
-          const onStartup = () => {
+          const state = this._name === 'core' ? true : await this.loadVariableValue('enabled');
+          const onStartup = async () => {
             if (loadingInProgress.length > 0) {
               // wait until all settings are loaded
               return setTimeout(() => onStartup(), 100);
             }
-            this._enabled = typeof enabled2 === 'undefined' ? this._enabled : enabled2;
-            this.status({ state: this._enabled, quiet: !isMainThread });
+            this._enabled = typeof state === 'undefined' ? this._enabled : state;
+            await this.status({ state: this._enabled, quiet: !isMainThread });
             if (isMainThread) {
               const path = this._name === 'core' ? this.__moduleName__.toLowerCase() : `${this._name}.${this.__moduleName__.toLowerCase()}`;
               for (const event of getFunctionList('startup', path)) {
-                this[event.fName]('enabled', enabled);
+                this[event.fName]('enabled', state);
               }
             };
             this.onStartupTriggered = true;
