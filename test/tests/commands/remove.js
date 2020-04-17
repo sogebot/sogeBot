@@ -1,5 +1,6 @@
 /* global describe it beforeEach */
 require('../../general.js');
+const assert = require('assert');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
@@ -16,52 +17,52 @@ describe('Custom Commands - remove()', () => {
   });
 
   it('', async () => {
-    customcommands.remove({ sender: owner, parameters: '' });
-    await message.isSent('customcmds.commands-parse-failed', owner, { sender: owner.username });
+    const r = await customcommands.remove({ sender: owner, parameters: '' });
+    assert.strictEqual(r[0].response, 'Sorry, $sender, but this command is not correct, use !commands');
   });
 
   it('!alias', async () => {
-    customcommands.remove({ sender: owner, parameters: '!alias' });
-    await message.isSent('customcmds.command-was-not-found', owner, { command: '!alias', sender: owner.username });
+    const r = await customcommands.remove({ sender: owner, parameters: '!alias' });
+    assert.strictEqual(r[0].response, '$sender, command !alias was not found in database');
   });
 
   it('alias', async () => {
-    customcommands.remove({ sender: owner, parameters: 'alias' });
-    await message.isSent('customcmds.commands-parse-failed', owner, { sender: owner.username });
+    const r = await customcommands.remove({ sender: owner, parameters: 'alias' });
+    assert.strictEqual(r[0].response, 'Sorry, $sender, but this command is not correct, use !commands');
   });
 
   it('!a', async () => {
-    customcommands.add({ sender: owner, parameters: '-c !a -r !me' });
-    await message.isSent('customcmds.command-was-added', owner, { command: '!a', response: '!me', sender: owner.username });
+    const r = await customcommands.add({ sender: owner, parameters: '-c !a -r !me' });
+    assert.strictEqual(r[0].response, '$sender, command !a was added');
 
-    customcommands.remove({ sender: owner, parameters: '!a' });
-    await message.isSent('customcmds.command-was-removed', owner, { command: '!a', sender: owner.username });
+    const r2 = await customcommands.remove({ sender: owner, parameters: '!a' });
+    assert.strictEqual(r2[0].response, '$sender, command !a was removed');
   });
 
   it('!한글', async () => {
-    customcommands.add({ sender: owner, parameters: '-c !한글 -r !me' });
-    await message.isSent('customcmds.command-was-added', owner, { command: '!한글', response: '!me', sender: owner.username });
+    const r = await customcommands.add({ sender: owner, parameters: '-c !한글 -r !me' });
+    assert.strictEqual(r[0].response, '$sender, command !한글 was added');
 
-    customcommands.remove({ sender: owner, parameters: '!한글' });
-    await message.isSent('customcmds.command-was-removed', owner, { command: '!한글', sender: owner.username });
+    const r2 = await customcommands.remove({ sender: owner, parameters: '!한글' });
+    assert.strictEqual(r2[0].response, '$sender, command !한글 was removed');
   });
 
   it('!русский', async () => {
-    customcommands.add({ sender: owner, parameters: '-c !русский -r !me' });
-    await message.isSent('customcmds.command-was-added', owner, { command: '!русский', response: '!me', sender: owner.username });
+    const r = await customcommands.add({ sender: owner, parameters: '-c !русский -r !me' });
+    assert.strictEqual(r[0].response, '$sender, command !русский was added');
 
-    customcommands.remove({ sender: owner, parameters: '!русский' });
-    await message.isSent('customcmds.command-was-removed', owner, { command: '!русский', sender: owner.username });
+    const r2 = await customcommands.remove({ sender: owner, parameters: '!русский' });
+    assert.strictEqual(r2[0].response, '$sender, command !русский was removed');
   });
 
   it('2x - !a !me', async () => {
-    customcommands.add({ sender: owner, parameters: '-c !a -r !me' });
-    await message.isSent('customcmds.command-was-added', owner, { command: '!a', response: '!me', sender: owner.username });
+    const r = await customcommands.add({ sender: owner, parameters: '-c !a -r !me' });
+    assert.strictEqual(r[0].response, '$sender, command !a was added');
 
-    customcommands.remove({ sender: owner, parameters: '!a' });
-    await message.isSent('customcmds.command-was-removed', owner, { command: '!a', sender: owner.username });
+    const r2 = await customcommands.remove({ sender: owner, parameters: '!a' });
+    assert.strictEqual(r2[0].response, '$sender, command !a was removed');
 
-    customcommands.remove({ sender: owner, parameters: '!a' });
-    await message.isSent('customcmds.command-was-not-found', owner, { command: '!a', sender: owner.username });
+    const r3 = await customcommands.remove({ sender: owner, parameters: '!a' });
+    assert.strictEqual(r3[0].response, '$sender, command !a was not found in database');
   });
 });

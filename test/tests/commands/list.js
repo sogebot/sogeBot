@@ -4,6 +4,8 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
+const assert = require('assert');
+
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 
 // users
@@ -16,25 +18,25 @@ describe('Custom Commands - list()', () => {
   });
 
   it('empty list', async () => {
-    customcommands.list({ sender: owner, parameters: '' });
-    await message.isSent('customcmds.list-is-empty', owner, { sender: owner.username });
+    const r = await customcommands.list({ sender: owner, parameters: '' });
+    assert.strictEqual(r[0].response, '$sender, list of commands is empty');
   });
 
   it('populated list', async () => {
-    customcommands.add({ sender: owner, parameters: '-p casters -c !a -r me' });
-    await message.isSent('customcmds.command-was-added', owner, { command: '!a', sender: owner.username });
+    const r = await customcommands.add({ sender: owner, parameters: '-p casters -c !a -r me' });
+    assert.strictEqual(r[0].response, '$sender, command !a was added');
 
-    customcommands.add({ sender: owner, parameters: '-p moderators -s true -c !a -r me2' });
-    await message.isSent('customcmds.command-was-added', owner, { command: '!a', sender: owner.username });
+    const r2 = await customcommands.add({ sender: owner, parameters: '-p moderators -s true -c !a -r me2' });
+    assert.strictEqual(r2[0].response, '$sender, command !a was added');
 
-    customcommands.add({ sender: owner, parameters: '-c !b -r me' });
-    await message.isSent('customcmds.command-was-added', owner, { command: '!b', sender: owner.username });
+    const r3 = await customcommands.add({ sender: owner, parameters: '-c !b -r me' });
+    assert.strictEqual(r3[0].response, '$sender, command !b was added');
 
-    customcommands.list({ sender: owner, parameters: '' });
-    await message.isSent('customcmds.list-is-not-empty', owner, { list: '!a, !b', sender: owner.username });
+    const r4 = await customcommands.list({ sender: owner, parameters: '' });
+    assert.strictEqual(r4[0].response, '$sender, list of commands: !a, !b');
 
-    customcommands.list({ sender: owner, parameters: '!a' });
-    await message.isSentRaw('!a#1 (Casters) v| me', owner, {});
-    await message.isSentRaw('!a#2 (Moderators) _| me2', owner, {});
+    const r5 = await customcommands.list({ sender: owner, parameters: '!a' });
+    assert.strictEqual(r5[0].response, '!a#1 (Casters) v| me');
+    assert.strictEqual(r5[1].response, '!a#2 (Moderators) _| me2');
   });
 });

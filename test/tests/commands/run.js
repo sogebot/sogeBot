@@ -33,37 +33,37 @@ describe('Custom Commands - run()', () => {
     it('create \'!test\' command with $_variable', async () => {
       await getRepository(Commands).save({
         id: uuid(), command: '!test', enabled: true, visible: true, responses: [{
-          filter: '', response: '$_variable', permission: permission.VIEWERS, stopIfExecuted: false, order: 0
-        }]
-      })
+          filter: '', response: '$_variable', permission: permission.VIEWERS, stopIfExecuted: false, order: 0,
+        }],
+      });
     });
     it('create \'!test\' command with $param', async () => {
       await getRepository(Commands).save({
         id: uuid(), command: '!test', enabled: true, visible: true, responses: [{
           filter: '', response: '$param by !test command with param', permission: permission.VIEWERS, stopIfExecuted: false, order: 0,
-        }]
-      })
+        }],
+      });
     });
     it('create \'!test\' command without $param', async () => {
       await getRepository(Commands).save({
         id: uuid(), command: '!test', enabled: true, visible: true, responses: [{
           filter: '!$haveParam', response: 'This should not be triggered', permission: permission.VIEWERS, stopIfExecuted: false, order: 0,
-        }]
-      })
+        }],
+      });
     });
     it('create \'!test qwerty\' command without $param', async () => {
       await getRepository(Commands).save({
         id: uuid(), command: '!test qwerty', enabled: true, visible: true, responses: [{
           filter: '', response: 'This should be triggered', permission: permission.VIEWERS, stopIfExecuted: false, order: 0,
-        }]
-      })
+        }],
+      });
     });
     it('create second \'!test qwerty\' command without $param', async () => {
       await getRepository(Commands).save({
         id: uuid(), command: '!test qwerty', enabled: true, visible: true, responses: [{
           filter: '', response: 'This should be triggered as well', permission: permission.VIEWERS, stopIfExecuted: false, order: 0,
-        }]
-      })
+        }],
+      });
     });
 
     it('run command by owner', async () => {
@@ -88,13 +88,13 @@ describe('Custom Commands - run()', () => {
   describe('!cmd with username filter', () => {
     beforeEach(async () => {
       await message.prepare();
-    })
+    });
     it('create command and response with filter', async () => {
       await getRepository(Commands).save({
         id: uuid(), command: '!cmd', enabled: true, visible: true, responses: [{
           filter: '$sender == "user1"', response: 'Lorem Ipsum', permission: permission.VIEWERS, stopIfExecuted: false, order: 0,
-        }]
-      })
+        }],
+      });
     });
 
     it('run command as user not defined in filter', async () => {
@@ -109,35 +109,35 @@ describe('Custom Commands - run()', () => {
   });
 
   it('!a will show Lorem Ipsum', async () => {
-    customcommands.add({ sender: owner, parameters: '-c !a -r Lorem Ipsum' });
-    await message.isSent('customcmds.command-was-added', owner, { command: '!a', response: 'Lorem Ipsum', sender: owner.username });
+    const r = await customcommands.add({ sender: owner, parameters: '-c !a -r Lorem Ipsum' });
+    assert.strictEqual(r[0].response, '$sender, command !a was added');
 
     customcommands.run({ sender: owner, message: '!a', parameters: '' });
     await message.isSentRaw('Lorem Ipsum', owner);
 
-    customcommands.remove({ sender: owner, parameters: '!a' });
-    await message.isSent('customcmds.command-was-removed', owner, { command: '!a', sender: owner.username });
+    const r2 = await customcommands.remove({ sender: owner, parameters: '!a' });
+    assert.strictEqual(r2[0].response, '$sender, command !a was removed');
   });
 
   it('!한글 will show Lorem Ipsum', async () => {
-    customcommands.add({ sender: owner, parameters: '-c !한글 -r Lorem Ipsum' });
-    await message.isSent('customcmds.command-was-added', owner, { command: '!한글', response: 'Lorem Ipsum', sender: owner.username });
+    const r = await customcommands.add({ sender: owner, parameters: '-c !한글 -r Lorem Ipsum' });
+    assert.strictEqual(r[0].response, '$sender, command !한글 was added');
 
     customcommands.run({ sender: owner, message: '!한글', parameters: '' });
     await message.isSentRaw('Lorem Ipsum', owner);
 
-    customcommands.remove({ sender: owner, parameters: '!한글' });
-    await message.isSent('customcmds.command-was-removed', owner, { command: '!한글', sender: owner.username });
+    const r2 = await customcommands.remove({ sender: owner, parameters: '!한글' });
+    assert.strictEqual(r2[0].response, '$sender, command !한글 was removed');
   });
 
   it('!русский will show Lorem Ipsum', async () => {
-    customcommands.add({ sender: owner, parameters: '-c !русский -r Lorem Ipsum' });
-    await message.isSent('customcmds.command-was-added', owner, { command: '!русский', response: 'Lorem Ipsum', sender: owner.username });
+    const r = await customcommands.add({ sender: owner, parameters: '-c !русский -r Lorem Ipsum' });
+    assert.strictEqual(r[0].response, '$sender, command !русский was added');
 
     customcommands.run({ sender: owner, message: '!русский', parameters: '' });
     await message.isSentRaw('Lorem Ipsum', owner);
 
-    customcommands.remove({ sender: owner, parameters: '!русский' });
-    await message.isSent('customcmds.command-was-removed', owner, { command: '!русский', sender: owner.username });
+    const r2 = await customcommands.remove({ sender: owner, parameters: '!русский' });
+    assert.strictEqual(r2[0].response, '$sender, command !русский was removed');
   });
 });

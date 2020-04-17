@@ -163,7 +163,9 @@ interface CommandOptions {
 }
 
 interface ParserOptions {
-  sender: UserStateTags;
+  sender: UserStateTags & { userId: number } & {
+    discord?: { author: DiscordJsUser; channel: DiscordJsTextChannel };
+  };
   parameters: string;
   message: string;
   skip: boolean;

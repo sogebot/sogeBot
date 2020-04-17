@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import * as constants from './constants';
-import { getBotSender, sendMessage } from './commons';
+import { getBotSender } from './commons';
 import { debug, error, warning } from './helpers/log';
 import { incrementCountOfCommandUsage } from './helpers/commands/count';
 import { getRepository } from 'typeorm';
@@ -72,7 +72,7 @@ class Parser {
     return false; // no parser failed
   }
 
-  async process () {
+  async process (): Promise<CommandResponse[]> {
     debug('parser.process', 'PROCESS START of "' + this.message + '"');
 
     const parsers = await this.parsers();
@@ -125,7 +125,7 @@ class Parser {
                 debug('parser.process', 'Rollback skipped for ' + r.name);
               }
             }
-            return false;
+            return [];
           } else {
             this.successfullParserRuns.push({name: parser.name, opts }); // need to save opts for permission rollback
           }
@@ -137,16 +137,9 @@ class Parser {
     }
 
     if (this.isCommand) {
-      this.command(this.sender, this.message.trim()).then(responses => {
-        if (responses) {
-          for (let i = 0; i < responses.length; i++) {
-            setTimeout(() => {
-              sendMessage(responses[i].response, responses[i].sender, responses[i].attr);
-            }, 500 * i);
-          }
-        }
-      });
+      return this.command(this.sender, this.message.trim());
     }
+    return [];
   }
 
   populateList () {

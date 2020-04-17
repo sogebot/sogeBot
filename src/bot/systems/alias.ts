@@ -19,6 +19,7 @@ import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
 import permissions from '../permissions';
 import { translate } from '../translate';
 import tmi from '../tmi';
+import discord from '../integrations/discord';
 
 /*
  * !alias                                              - gets an info about alias usage
@@ -70,7 +71,7 @@ class Alias extends System {
   }
 
   @parser()
-  async run (opts) {
+  async run (opts: ParserOptions): Promise<boolean> {
     const p = new Parser();
     let alias;
 
@@ -125,11 +126,16 @@ class Alias extends System {
             sender: opts.sender,
           });
           debug('alias.process', response);
-          tmi.message({
-            message: {
-              tags: opts.sender,
-              message: response,
-            }, skip: true });
+          if (opts.sender.discord) {
+            discord.message(response, opts.sender.discord.channel, opts.sender.discord.author);
+          } else {
+            tmi.message({
+              message: {
+                tags: opts.sender,
+                message: response,
+              }, skip: true,
+            });
+          }
           incrementCountOfCommandUsage(alias.alias);
         } else {
           return false;

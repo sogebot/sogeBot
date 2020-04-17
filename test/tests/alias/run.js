@@ -29,11 +29,12 @@ describe('Alias - run()', () => {
   it('!a should show correctly command with link (skip is true)', async () => {
     const r = await alias.add({ sender: owner, parameters: '-a !a -c !test http://google.com' });
     const r2 = await customCommands.add({ sender: owner, parameters: '-c !test -r $param' });
-    await alias.run({ sender: user, message: '!a' });
+
+    alias.run({ sender: user, message: '!a' });
+    await message.debug('alias.process', '!test http://google.com');
 
     assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!a', command: '!test http://google.com' }));
     assert.strictEqual(r2[0].response, prepare('customcmds.command-was-added', { response: '$param', command: '!test' }));
-    await message.debug('alias.process', 'http://google.com');
   });
 
   it('!a will show !duel', async () => {

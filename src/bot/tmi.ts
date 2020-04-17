@@ -16,7 +16,7 @@ import { globalIgnoreList } from './data/globalIgnoreList';
 import { ban, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning } from './helpers/log';
 import { triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub } from './helpers/interface/triggers';
 import { isDebugEnabled } from './helpers/log';
-import { getLocalizedName, getOwner, isBot, isIgnored, isOwner, prepare } from './commons';
+import { getLocalizedName, getOwner, isBot, isIgnored, isOwner, prepare, sendMessage } from './commons';
 import { clusteredChatIn, clusteredWhisperIn, isMainThread, manageMessage } from './cluster';
 
 import { getRepository } from 'typeorm';
@@ -799,7 +799,12 @@ class TMI extends Core {
           }
         }
       }
-      await parse.process();
+      const responses = await parse.process();
+      for (let i = 0; i < responses.length; i++) {
+        setTimeout(() => {
+          sendMessage(responses[i].response, responses[i].sender, responses[i].attr);
+        }, 500 * i);
+      }
     }
 
     if (isMainThread) {

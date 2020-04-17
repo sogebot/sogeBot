@@ -393,7 +393,12 @@ class Message {
           .replace(/\$sender/g, (tmi.showWithAt ? '@' : '') + attr.sender.username)
           .replace(/\$param/g, attr.param);
         const parse = new Parser({ sender: attr.sender, message: cmd, skip: true, quiet: true });
-        await parse.process();
+        const responses = await parse.process();
+        for (let i = 0; i < responses.length; i++) {
+          setTimeout(() => {
+            sendMessage(responses[i].response, responses[i].sender, responses[i].attr);
+          }, 500 * i);
+        }
         return '';
       },
       '(!#)': async function (filter) {
@@ -402,7 +407,12 @@ class Message {
           .replace(/\$sender/g, (tmi.showWithAt ? '@' : '') + attr.sender.username)
           .replace(/\$param/g, attr.param);
         const parse = new Parser({ sender: attr.sender, message: cmd, skip: true, quiet: false });
-        await parse.process();
+        const responses = await parse.process();
+        for (let i = 0; i < responses.length; i++) {
+          setTimeout(() => {
+            sendMessage(responses[i].response, responses[i].sender, responses[i].attr);
+          }, 500 * i);
+        }
         return '';
       },
     };

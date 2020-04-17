@@ -282,7 +282,12 @@ class Events extends Core {
         skip: true,
         quiet: _.get(operation, 'isCommandQuiet', false),
       });
-      await parse.process();
+      const responses = await parse.process();
+      for (let i = 0; i < responses.length; i++) {
+        setTimeout(() => {
+          sendMessage(responses[i].response, responses[i].sender, responses[i].attr);
+        }, 500 * i);
+      }
     } else {
       tmi.message({
         message: {

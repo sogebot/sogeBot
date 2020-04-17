@@ -56,11 +56,13 @@ module.exports = {
   },
   debug: async function (category, expected) {
     await until(setError => {
-      const args = log.debug.lastCall.args;
       if (log.debug.calledWith(category, expected)) {
         return true;
       }
-      return setError(`\nExpected args: '${category}', '${expected}'\nActual args:   ${args}`);
+      return setError(
+        '\n+\t"' + expected + '"'
+        + '\n-\t\t"' + log.debug.args.join('\n\t\t\t') + '"'
+      );
     }, 5000);
   },
   isWarned: async function (entry, user, opts) {

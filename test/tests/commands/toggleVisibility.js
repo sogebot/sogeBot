@@ -1,5 +1,6 @@
 /* global describe it beforeEach */
 require('../../general.js');
+const assert = require('assert');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
@@ -16,34 +17,45 @@ describe('Custom Commands - toggleVisibility()', () => {
   });
 
   it('', async () => {
-    customcommands.toggleVisibility({ sender: owner, parameters: '' });
-    await message.isSent('customcmds.commands-parse-failed', owner, { sender: owner.username });
+    const r = await customcommands.toggleVisibility({ sender: owner, parameters: '' });
+    assert.strictEqual(r[0].response, 'Sorry, $sender, but this command is not correct, use !commands');
   });
 
   it('!unknown', async () => {
-    customcommands.toggleVisibility({ sender: owner, parameters: '-c !unknown' });
-    await message.isSent('customcmds.command-was-not-found', owner, { command: '!unknown', sender: owner.username });
+    const r = await customcommands.toggleVisibility({ sender: owner, parameters: '-c !unknown' });
+    assert.strictEqual(r[0].response, '$sender, command !unknown was not found in database');
+  });
+
+  it('!a', async () => {
+    const r = await customcommands.add({ sender: owner, parameters: '-c !a -r !uptime' });
+    assert.strictEqual(r[0].response, '$sender, command !a was added');
+
+    const r2 = await customcommands.toggleVisibility({ sender: owner, parameters: '!a' });
+    assert.strictEqual(r2[0].response, '$sender, command !a was concealed');
+
+    const r3 = await customcommands.toggleVisibility({ sender: owner, parameters: '!a' });
+    assert.strictEqual(r3[0].response, '$sender, command !a was exposed');
   });
 
   it('!한글', async () => {
-    customcommands.add({ sender: owner, parameters: '-c !한글 -r !uptime' });
-    await message.isSent('customcmds.command-was-added', owner, { command: '!한글', sender: owner.username });
+    const r = await customcommands.add({ sender: owner, parameters: '-c !한글 -r !uptime' });
+    assert.strictEqual(r[0].response, '$sender, command !한글 was added');
 
-    customcommands.toggleVisibility({ sender: owner, parameters: '!한글' });
-    await message.isSent('customcmds.command-was-concealed', owner, { command: '!한글', sender: owner.username });
+    const r2 = await customcommands.toggleVisibility({ sender: owner, parameters: '!한글' });
+    assert.strictEqual(r2[0].response, '$sender, command !한글 was concealed');
 
-    customcommands.toggleVisibility({ sender: owner, parameters: '!한글' });
-    await message.isSent('customcmds.command-was-exposed', owner, { command: '!한글', sender: owner.username });
+    const r3 = await customcommands.toggleVisibility({ sender: owner, parameters: '!한글' });
+    assert.strictEqual(r3[0].response, '$sender, command !한글 was exposed');
   });
 
   it('!русский', async () => {
-    customcommands.add({ sender: owner, parameters: '-c !русский -r !uptime' });
-    await message.isSent('customcmds.command-was-added', owner, { command: '!русский', sender: owner.username });
+    const r = await customcommands.add({ sender: owner, parameters: '-c !русский -r !uptime' });
+    assert.strictEqual(r[0].response, '$sender, command !русский was added');
 
-    customcommands.toggleVisibility({ sender: owner, parameters: '!русский' });
-    await message.isSent('customcmds.command-was-concealed', owner, { command: '!русский', sender: owner.username });
+    const r2 = await customcommands.toggleVisibility({ sender: owner, parameters: '!русский' });
+    assert.strictEqual(r2[0].response, '$sender, command !русский was concealed');
 
-    customcommands.toggleVisibility({ sender: owner, parameters: '!русский' });
-    await message.isSent('customcmds.command-was-exposed', owner, { command: '!русский', sender: owner.username });
+    const r3 = await customcommands.toggleVisibility({ sender: owner, parameters: '!русский' });
+    assert.strictEqual(r3[0].response, '$sender, command !русский was exposed');
   });
 });

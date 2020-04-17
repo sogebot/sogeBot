@@ -233,86 +233,97 @@ class Discord extends Integration {
           const channels = this.listenAtChannels.split(',').map(o => o.trim());
           if (msg.channel.type === 'text' && channels.length > 0) {
             if (channels.includes(msg.channel.name) || channels.includes(msg.channel.id)) {
-              chatIn(`#${msg.channel.name}: ${msg.content} [${msg.author.tag}]`);
-              if (msg.content === '!link') {
-                this.removeExpiredLinks();
-                const link = await getRepository(DiscordLink).save({
-                  userId: null,
-                  tag: msg.author.tag,
-                  createdAt: Date.now(),
-                });
-                msg.author.send(`Hello ${msg.author.tag}, to link this Discord account with your Twitch account on ${oauth.broadcasterUsername} channel, go to https://twitch.tv/${oauth.broadcasterUsername}, login to your account and send this command to chat \n\n\t\t\`!link ${link.id}\`\n\nNOTE: This expires in 10 minutes.`);
-                whisperOut(`${msg.author.tag}: Hello ${msg.author.tag}, to link this Discord account with your Twitch account on ${oauth.broadcasterUsername} channel, go to https://twitch.tv/${oauth.broadcasterUsername}, login to your account and send this command to chat \\n\\n\\t\\t\`!link ${link.id}\`\\n\\nNOTE: This expires in 10 minutes.`);
-
-                const reply = await msg.reply('check your DMs for steps to link your account.');
-                chatOut(`#${msg.channel.name}: @${msg.author.tag}, check your DMs for steps to link your account. [${msg.author.tag}]`);
-                if (this.deleteMessagesAfterWhile) {
-                  setTimeout(() => {
-                    msg.delete();
-                    reply.delete();
-                  }, 10000);
-                }
-              } else if (msg.content === '!unlink') {
-                await getRepository(DiscordLink).delete({ tag: msg.author.tag });
-                msg.reply('all links were deleted');
-              } else {
-                try {
-                  // get linked account
-                  const link = await getRepository(DiscordLink).findOneOrFail({ tag: msg.author.tag, userId: Not(IsNull()) });
-                  if (link.userId) {
-                    const user = await getRepository(User).findOneOrFail({ userId: link.userId });
-                    const parser = new Parser();
-                    parser.started_at = msg.createdTimestamp;
-                    parser.command(
-                      {
-                        badges: {}, color: '',  displayName: '', emoteSets: [], emotes: [], userId: link.userId, username: user.username, userType: 'viewer',
-                        mod: 'false', subscriber: 'false', turbo: 'false', discord: { author: msg.author, channel: msg.channel },
-                      },
-                      msg.content,
-                    ).then(responses => {
-                      if (responses) {
-                        for (let i = 0; i < responses.length; i++) {
-                          setTimeout(async () => {
-                            if (msg.channel.type === 'text' && channels.length > 0) {
-                              const messageToSend = await new Message(await responses[i].response).parse({
-                                ...responses[i].attr,
-                                forceWithoutAt: true, // we dont need @
-                                sender: { ...responses[i].sender, username: msg.author },
-                              }) as string;
-                              const reply = await msg.channel.send(messageToSend);
-                              chatOut(`#${msg.channel.name}: ${messageToSend} [${msg.author.tag}]`);
-                              if (this.deleteMessagesAfterWhile) {
-                                setTimeout(() => {
-                                  reply.delete();
-                                }, 10000);
-                              }
-                            };
-                          }, 1000 * i);
-                        };
-                      }
-                      if (this.deleteMessagesAfterWhile) {
-                        setTimeout(() => {
-                          msg.delete();
-                        }, 10000);
-                      }
-                    });
-                  }
-                } catch (e) {
-                  const message = `your account is not linked, use \`!link\``;
-                  const reply = await msg.reply(message);
-                  chatOut(`#${msg.channel.name}: @${msg.author.tag}, ${message} [${msg.author.tag}]`);
-                  if (this.deleteMessagesAfterWhile) {
-                    setTimeout(() => {
-                      msg.delete();
-                      reply.delete();
-                    }, 10000);
-                  }
-                }
-              }
+              this.message(msg.content, msg.channel, msg.author, msg);
             }
           }
         }
       });
+    }
+  }
+
+  async message(content: string, channel: DiscordJsTextChannel, author: DiscordJsUser, msg?: DiscordJs.Message) {
+    const channels = this.listenAtChannels.split(',').map(o => o.trim());
+    chatIn(`#${channel.name}: ${content} [${author.tag}]`);
+    if (msg) {
+      if (content === '!link') {
+        this.removeExpiredLinks();
+        const link = await getRepository(DiscordLink).save({
+          userId: null,
+          tag: author.tag,
+          createdAt: Date.now(),
+        });
+        author.send(`Hello ${msg.author.tag}, to link this Discord account with your Twitch account on ${oauth.broadcasterUsername} channel, go to https://twitch.tv/${oauth.broadcasterUsername}, login to your account and send this command to chat \n\n\t\t\`!link ${link.id}\`\n\nNOTE: This expires in 10 minutes.`);
+        whisperOut(`${author.tag}: Hello ${author.tag}, to link this Discord account with your Twitch account on ${oauth.broadcasterUsername} channel, go to https://twitch.tv/${oauth.broadcasterUsername}, login to your account and send this command to chat \\n\\n\\t\\t\`!link ${link.id}\`\\n\\nNOTE: This expires in 10 minutes.`);
+
+        const reply = await msg.reply('check your DMs for steps to link your account.');
+        chatOut(`#${channel.name}: @${author.tag}, check your DMs for steps to link your account. [${msg.author.tag}]`);
+        if (this.deleteMessagesAfterWhile) {
+          setTimeout(() => {
+            msg.delete();
+            reply.delete();
+          }, 10000);
+        }
+        return;
+      } else if (content === '!unlink') {
+        await getRepository(DiscordLink).delete({ tag: author.tag });
+        msg.reply('all links were deleted');
+        return;
+      }
+    }
+    try {
+      // get linked account
+      const link = await getRepository(DiscordLink).findOneOrFail({ tag: author.tag, userId: Not(IsNull()) });
+      if (link.userId) {
+        const user = await getRepository(User).findOneOrFail({ userId: link.userId });
+        const parser = new Parser();
+        parser.started_at = (msg || { createdTimestamp: Date.now() }).createdTimestamp;
+        parser.sender = {
+          badges: {}, color: '',  displayName: '', emoteSets: [], emotes: [], userId: link.userId, username: user.username, userType: 'viewer',
+          mod: 'false', subscriber: 'false', turbo: 'false', discord: { author, channel },
+        };
+        parser.message = content;
+        parser.process().then(responses => {
+          if (responses) {
+            for (let i = 0; i < responses.length; i++) {
+              setTimeout(async () => {
+                if (channel.type === 'text' && channels.length > 0) {
+                  const messageToSend = await new Message(await responses[i].response).parse({
+                    ...responses[i].attr,
+                    forceWithoutAt: true, // we dont need @
+                    sender: { ...responses[i].sender, username: author },
+                  }) as string;
+                  const reply = await channel.send(messageToSend);
+                  chatOut(`#${channel.name}: ${messageToSend} [${author.tag}]`);
+                  if (this.deleteMessagesAfterWhile) {
+                    setTimeout(() => {
+                      reply.delete();
+                    }, 10000);
+                  }
+                };
+              }, 1000 * i);
+            };
+          }
+          if (this.deleteMessagesAfterWhile) {
+            if (msg) {
+              setTimeout(() => {
+                msg.delete();
+              }, 10000);
+            }
+          }
+        });
+      }
+    } catch (e) {
+      const message = `your account is not linked, use \`!link\``;
+      if (msg) {
+        const reply = await msg.reply(message);
+        chatOut(`#${channel.name}: @${author.tag}, ${message} [${author.tag}]`);
+        if (this.deleteMessagesAfterWhile) {
+          setTimeout(() => {
+            msg.delete();
+            reply.delete();
+          }, 10000);
+        }
+      }
     }
   }
 
