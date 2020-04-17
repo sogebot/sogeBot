@@ -23,7 +23,6 @@ class Parser {
   skip = false;
   quiet = false;
   successfullParserRuns: any[] = [];
-  isCommand = false;
   list: any = [];
 
   constructor (opts: any = {}) {
@@ -33,8 +32,11 @@ class Parser {
     this.quiet = opts.quiet || false;
     this.successfullParserRuns = [];
 
-    this.isCommand = this.message.startsWith('!');
     this.list = this.populateList();
+  }
+
+  get isCommand() {
+    return this.message.startsWith('!');
   }
 
   time () {

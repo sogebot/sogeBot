@@ -22,6 +22,7 @@ import api from '../api';
 import permissions from '../permissions';
 import { translate } from '../translate';
 import ranks from './ranks';
+import { Message } from '../message';
 
 /*
  * !command                                                                 - gets an info about command usage
@@ -270,9 +271,14 @@ class CustomCommands extends System {
 
   sendResponse(responses, opts) {
     for (let i = 0; i < responses.length; i++) {
-      setTimeout(() => {
+      setTimeout(async () => {
         if (opts.sender.discord) {
-          opts.sender.discord.channel.send(responses[i].response);
+          const messageToSend = await new Message(await responses[i].response).parse({
+            ...responses[i].attr,
+            forceWithoutAt: true, // we dont need @
+            sender: { ...responses[i].sender, username: opts.sender.discord.author },
+          }) as string;
+          opts.sender.discord.channel.send(messageToSend);
         } else {
           sendMessage(responses[i].response, opts.sender, {
             param: opts.param,
