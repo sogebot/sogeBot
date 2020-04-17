@@ -17,8 +17,8 @@ import { UserStateTags } from 'twitch-js';
 import Discord from './integrations/discord';
 import { TextChannel } from 'discord.js';
 
-export function announce(message: string) {
-  sendMessage(message, {
+export function announce(messageToAnnounce: string) {
+  sendMessage(messageToAnnounce, {
     username: oauth.botUsername,
     displayName: oauth.botUsername,
     userId: Number(oauth.botId),
@@ -32,7 +32,7 @@ export function announce(message: string) {
     for (const [ id, channel ] of Discord.client.channels.cache) {
       if (channel.type === 'text') {
         if (id === Discord.sendGeneralAnnounceToChannel || (channel as TextChannel).name === Discord.sendGeneralAnnounceToChannel) {
-          const ch = Discord.client.channels.cache.find(ch => ch.id === id);
+          const ch = Discord.client.channels.cache.find(o => o.id === id);
           if (ch) {
             (ch as TextChannel).send(message);
             chatOut(`#${(ch as TextChannel).name}: ${message} [${Discord.client.user?.tag}]`);

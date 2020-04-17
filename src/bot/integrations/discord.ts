@@ -122,13 +122,13 @@ class Discord extends Integration {
 
   @command('!link')
   async linkAccounts(opts: CommandOptions) {
-    enum error { NOT_UUID };
+    enum errors { NOT_UUID };
     this.removeExpiredLinks();
 
     try {
       const [ uuid ] = new Expects(opts.parameters).everything().toArray();
       if (!isUUID(uuid)) {
-        throw new Error(String(error.NOT_UUID));
+        throw new Error(String(errors.NOT_UUID));
       }
 
       const link = await getRepository(DiscordLink).findOneOrFail({ id: uuid });
@@ -138,7 +138,7 @@ class Discord extends Integration {
       });
       return [{ response: `$sender, this account was linked with ${link.tag}.`, ...opts }];
     } catch (e) {
-      if (e.message === String(error.NOT_UUID)) {
+      if (e.message === String(errors.NOT_UUID)) {
         return [{ response: '$sender, invalid token.', ...opts }];
       } else {
         warning(e.stack);
@@ -179,7 +179,7 @@ class Discord extends Integration {
       for (const [ id, channel ] of this.client.channels.cache) {
         if (channel.type === 'text') {
           if (id === this.sendOnlineAnnounceToChannel || (channel as DiscordJs.TextChannel).name === this.sendGeneralAnnounceToChannel) {
-            const ch = this.client.channels.cache.find(ch => ch.id === id);
+            const ch = this.client.channels.cache.find(o => o.id === id);
             if (ch) {
               this.embedStartedAt = moment().tz(timezone).format('LLL');
               const embed = new DiscordJs.MessageEmbed()
