@@ -46,9 +46,27 @@ export const currentStreamTags: {
 }[] = [];
 
 let intervals = 0;
+let lastIsAPIFreeKey = '';
+let lastIsAPIFreeKeyRetry = 0;
+
 const isAPIFree = (intervalList) => {
   for (const key of Object.keys(intervalList)) {
     if (intervalList[key].inProgress) {
+      if (lastIsAPIFreeKey !== key) {
+        lastIsAPIFreeKey = key;
+        lastIsAPIFreeKeyRetry = 0;
+      } else {
+        lastIsAPIFreeKeyRetry++;
+      }
+
+      // unblock if retry is more than 20 (10minutes)
+      if (lastIsAPIFreeKeyRetry > 20) {
+        warning(`API call for ${key} is probably frozen (took more than 10minutes), forcefully unblocking`);
+        intervalList[key].inProgress = false;
+        lastIsAPIFreeKeyRetry = 0;
+        lastIsAPIFreeKey = '';
+        return true;
+      }
       return false;
     }
   }
