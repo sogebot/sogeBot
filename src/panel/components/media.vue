@@ -95,7 +95,7 @@ export default class MediaForm extends Vue {
     this.createdAt = Date.now();
     this.io = getSocket(this.socket);
     this.io.emit('alerts::getOneMedia', this.id, (err, data: AlertMediaInterface[]) => {
-      console.groupCollapsed('alerts::getOneMedia')
+      console.groupCollapsed('alerts::getOneMedia ' + this.id)
       console.log(data)
       console.groupEnd();
       this.b64data = data.sort((a,b) => a.chunkNo - b.chunkNo).map(o => o.b64data).join('');
@@ -125,17 +125,17 @@ export default class MediaForm extends Vue {
   }
 
   fileUpload(chunks) {
-    this.id = uuid();
+    const id = uuid();
     this.isUploading = true;
     const promises: Promise<void>[] = []
     this.$nextTick(async () => {
-      console.log('Uploading new media with id', this.id);
+      console.log('Uploading new media with id', id);
 
       for (let i = 0; i < chunks.length; i++) {
         promises.push(
           new Promise((resolve, reject) => {
             const chunk = {
-              id: this.id,
+              id,
               b64data: chunks[i],
               chunkNo: i
             }
@@ -153,6 +153,7 @@ export default class MediaForm extends Vue {
       };
 
       await Promise.all(promises);
+      this.id = id;
       this.isUploading = false;
     });
   }
@@ -162,6 +163,17 @@ export default class MediaForm extends Vue {
     reader.onload = (async e => {
       const chunks = String(reader.result).match(/.{1,1000000}/g)
       this.fileUpload(chunks);
+
+      await new Promise(res => {
+        const checkIsUploading = () => {
+          if (this.isUploading) {
+            setTimeout(() => checkIsUploading(), 100);
+          } else {
+            res()
+          }
+        };
+        checkIsUploading();
+      })
       console.log('done')
       this.b64data = String(reader.result);
     })
