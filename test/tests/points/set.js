@@ -5,6 +5,7 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const _ = require('lodash');
+const assert = require('assert');
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
@@ -25,52 +26,28 @@ describe('Points - set()', () => {
     });
 
     it('!points get should return 0', async () => {
-      await points.get({ sender: user, parameters: '' });
-      await message.isSent('points.defaults.pointsResponse', { username: user.username }, {
-        order: 1, count: 1,
-        amount: Math.floor(0),
-        username: user.username,
-        pointsName: await points.getPointsName(Math.floor(0)),
-      });
+      const r = await points.get({ sender: user, parameters: '' });
+      assert.strictEqual(r[0].response, `@oneuser has currently 0 points. Your position is 1/1.`);
     });
 
     it('!points set should correctly set value 5', async () => {
-      await points.set({ sender: user, parameters: user.username + ' 5' });
-      await message.isSent('points.success.set', { username: user.username }, {
-        amount: Math.floor(5),
-        username: user.username,
-        pointsName: await points.getPointsName(Math.floor(5)),
-      });
+      const r = await points.set({ sender: user, parameters: user.username + ' 5' });
+      assert.strictEqual(r[0].response, `@oneuser was set to 5 points`);
     });
 
     it('!points get should return 5', async () => {
-      await points.get({ sender: user, parameters: '' });
-      await message.isSent('points.defaults.pointsResponse', { username: user.username }, {
-        order: 1, count: 1,
-        amount: Math.floor(5),
-        username: user.username,
-        pointsName: await points.getPointsName(Math.floor(5)),
-      });
+      const r = await points.get({ sender: user, parameters: '' });
+      assert.strictEqual(r[0].response, `@oneuser has currently 5 points. Your position is 1/1.`);
     });
 
     it('!points set should correctly set value 10', async () => {
-      await points.set({ sender: user, parameters: user.username + ' 10' });
-      await message.isSent('points.success.set', { username: user.username }, {
-        order: 1, count: 1,
-        amount: Math.floor(10),
-        username: user.username,
-        pointsName: await points.getPointsName(Math.floor(10)),
-      });
+      const r = await points.set({ sender: user, parameters: user.username + ' 10' });
+      assert.strictEqual(r[0].response, `@oneuser was set to 10 points`);
     });
 
     it('!points get should return 10', async () => {
-      await points.get({ sender: user, parameters: '' });
-      await message.isSent('points.defaults.pointsResponse', { username: user.username }, {
-        order: 1, count: 1,
-        amount: Math.floor(10),
-        username: user.username,
-        pointsName: await points.getPointsName(Math.floor(10)),
-      });
+      const r = await points.get({ sender: user, parameters: '' });
+      assert.strictEqual(r[0].response, `@oneuser has currently 10 points. Your position is 1/1.`);
     });
   });
 });

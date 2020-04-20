@@ -3,7 +3,7 @@
 import * as _ from 'lodash';
 import * as cronparser from 'cron-parser';
 
-import { isBot, prepare, sendMessage } from '../commons';
+import { isBot, prepare } from '../commons';
 import { command, default_permission, parser, permission_settings, settings, shared, ui } from '../decorators';
 import Expects from '../expects';
 import { permission } from '../helpers/permissions';
@@ -294,23 +294,25 @@ class Points extends System {
       await getRepository(PointsChangelog).delete({ id: undoOperation.id });
       await getRepository(User).update({ userId }, { points: undoOperation.originalValue });
 
-      sendMessage(prepare('points.success.undo', {
-        username,
-        command: undoOperation.command,
-        originalValue: undoOperation.originalValue,
-        originalValuePointsLocale: await this.getPointsName(undoOperation.originalValue),
-        updatedValue: undoOperation.updatedValue,
-        updatedValuePointsLocale: await this.getPointsName(undoOperation.updatedValue),
-      }), opts.sender, opts.attr);
+      return [{
+        response: prepare('points.success.undo', {
+          username,
+          command: undoOperation.command,
+          originalValue: undoOperation.originalValue,
+          originalValuePointsLocale: await this.getPointsName(undoOperation.originalValue),
+          updatedValue: undoOperation.updatedValue,
+          updatedValuePointsLocale: await this.getPointsName(undoOperation.updatedValue),
+        }), ...opts,
+      }];
     } catch (err) {
       error(err);
-      sendMessage(translate('points.failed.undo').replace('$command', opts.command), opts.sender, opts.attr);
+      return [{ response: translate('points.failed.undo').replace('$command', opts.command), ...opts }];
     }
   }
 
   @command('!points set')
   @default_permission(permission.CASTERS)
-  async set (opts: CommandOptions) {
+  async set (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
 
@@ -327,24 +329,24 @@ class Points extends System {
         updatedValue: points,
       });
 
-      const message = prepare('points.success.set', {
+      const response = prepare('points.success.set', {
         amount: points,
         username,
         pointsName: await this.getPointsName(points),
       });
-      sendMessage(message, opts.sender, opts.attr);
+      return [{ response, ...opts }];
     } catch (err) {
       error(err);
-      sendMessage(translate('points.failed.set').replace('$command', opts.command), opts.sender, opts.attr);
+      return [{ response: translate('points.failed.set').replace('$command', opts.command), ...opts }];
     }
   }
 
   @command('!points give')
-  async give (opts: CommandOptions) {
+  async give (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: true }).toArray();
       if (opts.sender.username.toLowerCase() === username.toLowerCase()) {
-        return;
+        return [];
       }
 
       const guser = await getRepository(User).findOne({ username });
@@ -359,44 +361,43 @@ class Points extends System {
           userId: Number(await api.getIdFromTwitch(username)),
           username, points: 0,
         });
-        this.give(opts);
-        return;
+        return this.give(opts);
       }
 
       const availablePoints = sender.points;
 
       if (points !== 'all' && availablePoints < points) {
-        const message = prepare('points.failed.giveNotEnough'.replace('$command', opts.command), {
+        const response = prepare('points.failed.giveNotEnough'.replace('$command', opts.command), {
           amount: points,
           username,
           pointsName: await this.getPointsName(points),
         });
-        sendMessage(message, opts.sender, opts.attr);
+        return [{ response, ...opts }];
       } else if (points === 'all') {
         await getRepository(User).save([
           { ...guser, points: guser.points + availablePoints },
           { ...sender, points: 0 },
         ]);
-        const message = prepare('points.success.give', {
+        const response = prepare('points.success.give', {
           amount: availablePoints,
           username,
           pointsName: await this.getPointsName(availablePoints),
         });
-        sendMessage(message, opts.sender, opts.attr);
+        return [{ response, ...opts }];
       } else {
         await getRepository(User).save([
           { ...guser, points: guser.points + points },
           { ...sender, points: sender.points - points },
         ]);
-        const message = prepare('points.success.give', {
+        const response = prepare('points.success.give', {
           amount: points,
           username,
           pointsName: await this.getPointsName(points),
         });
-        sendMessage(message, opts.sender, opts.attr);
+        return [{ response, ...opts }];
       }
     } catch (err) {
-      sendMessage(translate('points.failed.give').replace('$command', opts.command), opts.sender, opts.attr);
+      return [{ response: translate('points.failed.give').replace('$command', opts.command), ...opts }];
     }
   }
 
@@ -448,7 +449,7 @@ class Points extends System {
 
   @command('!points get')
   @default_permission(permission.CASTERS)
-  async get (opts: CommandOptions) {
+  async get (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
       const user = await getRepository(User).findOne({ username });
@@ -458,8 +459,7 @@ class Points extends System {
           userId: Number(await api.getIdFromTwitch(username)),
           username,
         });
-        this.get(opts);
-        return;
+        return this.get(opts);
       }
 
       const connection = await getConnection();
@@ -483,76 +483,76 @@ class Points extends System {
         order = Number(orderQuery[0].order) + 1;
       }
 
-      const message = prepare('points.defaults.pointsResponse', {
+      const response = prepare('points.defaults.pointsResponse', {
         amount: this.maxSafeInteger(user.points),
         username: username,
         pointsName: await this.getPointsName(this.maxSafeInteger(user.points)),
         order, count,
       });
-      sendMessage(message, opts.sender, opts.attr);
+      return [{ response, ...opts }];
     } catch (err) {
-      sendMessage(translate('points.failed.get').replace('$command', opts.command), opts.sender, opts.attr);
+      return [{ response: translate('points.failed.get').replace('$command', opts.command), ...opts }];
     }
   }
 
   @command('!points online')
   @default_permission(permission.CASTERS)
-  async online (opts: CommandOptions) {
+  async online (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       let points = new Expects(opts.parameters).points({ all: false, negative: true }).toArray()[0];
 
-      let message: string;
+      let response: string;
       if (points >= 0) {
         await getRepository(User).increment({}, 'points', points);
-        message = prepare('points.success.online.positive', {
+        response = prepare('points.success.online.positive', {
           amount: points,
           pointsName: await this.getPointsName(points),
         });
       } else {
         points = Math.abs(points);
         await this.decrement({}, points);
-        message = prepare('points.success.online.negative', {
+        response = prepare('points.success.online.negative', {
           amount: -points,
           pointsName: await this.getPointsName(points),
         });
       };
 
-      sendMessage(message, opts.sender, opts.attr);
+      return [{ response, ...opts }];
     } catch (err) {
-      sendMessage(translate('points.failed.online').replace('$command', opts.command), opts.sender, opts.attr);
+      return [{ response: translate('points.failed.online').replace('$command', opts.command), ...opts }];
     }
   }
 
   @command('!points all')
   @default_permission(permission.CASTERS)
-  async all (opts: CommandOptions) {
+  async all (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       let points: number = new Expects(opts.parameters).points({ all: false, negative: true }).toArray()[0];
-      let message: string;
+      let response: string;
       if (points >= 0) {
         await getRepository(User).increment({}, 'points', points);
-        message = prepare('points.success.all.positive', {
+        response = prepare('points.success.all.positive', {
           amount: points,
           pointsName: await this.getPointsName(points),
         });
       } else {
         points = Math.abs(points);
         await this.decrement({}, points);
-        message = prepare('points.success.all.negative', {
+        response = prepare('points.success.all.negative', {
           amount: -points,
           pointsName: await this.getPointsName(points),
         });
       };
 
-      sendMessage(message, opts.sender, opts.attr);
+      return [{ response, ...opts }];
     } catch (err) {
-      sendMessage(translate('points.failed.all').replace('$command', opts.command), opts.sender, opts.attr);
+      return [{ response: translate('points.failed.all').replace('$command', opts.command), ...opts }];
     }
   }
 
   @command('!makeitrain')
   @default_permission(permission.CASTERS)
-  async rain (opts: CommandOptions) {
+  async rain (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const points = new Expects(opts.parameters).points({ all: false }).toArray()[0];
 
@@ -563,19 +563,19 @@ class Points extends System {
 
         getRepository(User).increment({ userId: user.userId }, 'points', Math.floor(Math.random() * points));
       }
-      const message = prepare('points.success.rain', {
+      const response = prepare('points.success.rain', {
         amount: points,
         pointsName: await this.getPointsName(points),
       });
-      sendMessage(message, opts.sender, opts.attr);
+      return [{ response, ...opts }];
     } catch (err) {
-      sendMessage(translate('points.failed.rain').replace('$command', opts.command), opts.sender, opts.attr);
+      return [{ response: translate('points.failed.rain').replace('$command', opts.command), ...opts }];
     }
   }
 
   @command('!points add')
   @default_permission(permission.CASTERS)
-  async add (opts: CommandOptions) {
+  async add (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
 
@@ -599,20 +599,20 @@ class Points extends System {
         updatedAt: Date.now(),
       });
 
-      const message = prepare('points.success.add', {
+      const response = prepare('points.success.add', {
         amount: points,
         username: username,
         pointsName: await this.getPointsName(points),
       });
-      sendMessage(message, opts.sender, opts.attr);
+      return [{ response, ...opts }];
     } catch (err) {
-      sendMessage(translate('points.failed.add').replace('$command', opts.command), opts.sender, opts.attr);
+      return [{ response: translate('points.failed.add').replace('$command', opts.command), ...opts }];
     }
   }
 
   @command('!points remove')
   @default_permission(permission.CASTERS)
-  async remove (opts: CommandOptions) {
+  async remove (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: true }).toArray();
 
@@ -622,8 +622,7 @@ class Points extends System {
           userId: Number(await api.getIdFromTwitch(username)),
           username, points: 0,
         });
-        this.remove(opts);
-        return;
+        return this.remove(opts);
       }
 
       if (points === 'all') {
@@ -640,21 +639,21 @@ class Points extends System {
         updatedAt: Date.now(),
       });
 
-      const message = prepare('points.success.remove', {
+      const response = prepare('points.success.remove', {
         amount: points,
         username: username,
         pointsName: await this.getPointsName(points === 'all' ? 0 : points),
       });
-      sendMessage(message, opts.sender, opts.attr);
+      return [{ response, ...opts }];
     } catch (err) {
       error(err);
-      sendMessage(translate('points.failed.remove').replace('$command', opts.command), opts.sender, opts.attr);
+      return [{ response: translate('points.failed.remove').replace('$command', opts.command), ...opts }];
     }
   }
 
   @command('!points')
-  main (opts: CommandOptions) {
-    this.get(opts);
+  async main (opts: CommandOptions): Promise<CommandResponse[]> {
+    return this.get(opts);
   }
 
   async decrement(where: FindConditions<Readonly<Required<UserInterface>>>, points: number) {
