@@ -139,6 +139,10 @@ class Spotify extends Integration {
 
   async playNextSongFromRequest() {
     try {
+      if (!this.client) {
+        throw new Error('you are not connected to spotify API, authorize your user.');
+      }
+
       const uri =  this.uris.shift();
       if (typeof uri === 'undefined') {
         throw new Error('URIs are empty');
@@ -148,7 +152,7 @@ class Spotify extends Integration {
         method: 'put',
         url: 'https://api.spotify.com/v1/me/player/play',
         headers: {
-          'Authorization': 'Bearer ' + this._accessToken,
+          'Authorization': 'Bearer ' + this.client.getAccessToken(),
           'Content-Type': 'application/json',
         },
         data: {
@@ -168,13 +172,16 @@ class Spotify extends Integration {
 
   async playNextSongFromPlaylist(retries = 0) {
     try {
+      if (!this.client) {
+        throw new Error('you are not connected to spotify API, authorize your user.');
+      }
       // play from playlist
       const offset = this.originalUri ? { uri: this.originalUri } : undefined;
       await axios({
         method: 'put',
         url: 'https://api.spotify.com/v1/me/player/play',
         headers: {
-          'Authorization': 'Bearer ' + this._accessToken,
+          'Authorization': 'Bearer ' + this.client.getAccessToken(),
           'Content-Type': 'application/json',
         },
         data: {
@@ -187,7 +194,7 @@ class Spotify extends Integration {
         method: 'post',
         url: 'https://api.spotify.com/v1/me/player/next',
         headers: {
-          'Authorization': 'Bearer ' + this._accessToken,
+          'Authorization': 'Bearer ' + this.client.getAccessToken(),
         },
       });
       this.currentUris = null;
@@ -326,7 +333,6 @@ class Spotify extends Integration {
         if (!_.isNil(this.client) && this._refreshToken) {
           const data = await this.client.refreshAccessToken();
           this.client.setAccessToken(data.body.access_token);
-          this._accessToken = data.body.access_token;
           this.retry.IRefreshToken = 0;
         }
       } catch (e) {
@@ -501,10 +507,14 @@ class Spotify extends Integration {
   @command('!spotify')
   @default_permission(null)
   async main (opts: CommandOptions) {
-    if (!(api.isStreamOnline)) {
+    /*if (!(api.isStreamOnline)) {
       return;
-    } // don't do anything on offline stream
+    } // don't do anything on offline stream*/
     if (!this.songRequests) {
+      return;
+    }
+    if (!this.client) {
+      error(`${chalk.bgRed('SPOTIFY')}: you are not connected to spotify API, authorize your user.`);
       return;
     }
 
@@ -530,7 +540,7 @@ class Spotify extends Integration {
           method: 'get',
           url: 'https://api.spotify.com/v1/tracks/' + id,
           headers: {
-            'Authorization': 'Bearer ' + this._accessToken,
+            'Authorization': 'Bearer ' + this.client.getAccessToken(),
           },
         });
         const track = response.data;
@@ -550,7 +560,7 @@ class Spotify extends Integration {
           method: 'get',
           url: 'https://api.spotify.com/v1/search?type=track&limit=1&q=' + encodeURI(spotifyId),
           headers: {
-            'Authorization': 'Bearer ' + this._accessToken,
+            'Authorization': 'Bearer ' + this.client.getAccessToken(),
             'Content-Type': 'application/json',
           },
         });
@@ -568,6 +578,9 @@ class Spotify extends Integration {
         });
       }
     } catch (e) {
+      if (e.response.status === 401) {
+        error(`${chalk.bgRed('SPOTIFY')}: you don't have access to spotify API, try to revoke and authorize again.`);
+      }
       sendMessage(
         prepare('integrations.spotify.song-not-found'), opts.sender);
     }
