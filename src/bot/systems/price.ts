@@ -168,7 +168,7 @@ class Price extends System {
     if (!haveEnoughPoints) {
       const response = prepare('price.user-have-not-enough-points', { amount: removePts, command: `${price.command}`, pointsName: await points.getPointsName(removePts) });
       if (opts.sender.discord) {
-        const messageToSend = await new Message(await response).parse({
+        const messageToSend = await new Message(response).parse({
           forceWithoutAt: true, // we dont need @
           sender: { ...opts.sender, username: opts.sender.discord.author },
         }) as string;
