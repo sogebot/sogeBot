@@ -9,7 +9,7 @@ import * as constants from '../constants';
 import { permission } from '../helpers/permissions';
 import { command, default_permission, rollback } from '../decorators';
 import { parser } from '../decorators';
-import { isOwner, prepare, sendMessage } from '../commons';
+import { isOwner, parserReply, prepare } from '../commons';
 
 import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
@@ -18,7 +18,6 @@ import { adminEndpoint } from '../helpers/socket';
 import { error } from '../helpers/log';
 import { translate } from '../translate';
 import points from './points';
-import { Message } from '../message';
 
 /*
  * !price                     - gets an info about price usage
@@ -167,15 +166,7 @@ class Price extends System {
     const haveEnoughPoints = availablePts >= removePts;
     if (!haveEnoughPoints) {
       const response = prepare('price.user-have-not-enough-points', { amount: removePts, command: `${price.command}`, pointsName: await points.getPointsName(removePts) });
-      if (opts.sender.discord) {
-        const messageToSend = await new Message(response).parse({
-          forceWithoutAt: true, // we dont need @
-          sender: { ...opts.sender, username: opts.sender.discord.author },
-        }) as string;
-        opts.sender.discord.channel.send(messageToSend);
-      } else {
-        sendMessage(response, opts.sender);
-      }
+      parserReply(response, opts);
     } else {
       await points.decrement({ userId: opts.sender.userId }, removePts);
     }

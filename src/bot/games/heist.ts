@@ -129,11 +129,11 @@ class Heist extends Game {
       }
 
       if (users.length === 0) {
-        announce(this.noUser);
         // cleanup
         this.startedAt = null;
         await getRepository(HeistUser).clear();
         this.timeouts.iCheckFinished = global.setTimeout(() => this.iCheckFinished(), 10000);
+        announce(this.noUser);
         return;
       }
 

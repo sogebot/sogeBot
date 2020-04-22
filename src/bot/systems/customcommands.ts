@@ -8,7 +8,7 @@ import System from './_interface';
 import * as constants from '../constants';
 import { parser } from '../decorators';
 import Expects from '../expects';
-import { isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, prepare, sendMessage } from '../commons';
+import { isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, parserReply, prepare } from '../commons';
 import { getAllCountOfCommandUsage, getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage } from '../helpers/commands/count';
 
 import { warning } from '../helpers/log';
@@ -22,7 +22,6 @@ import api from '../api';
 import permissions from '../permissions';
 import { translate } from '../translate';
 import ranks from './ranks';
-import { Message } from '../message';
 
 /*
  * !command                                                                 - gets an info about command usage
@@ -272,19 +271,7 @@ class CustomCommands extends System {
   sendResponse(responses, opts) {
     for (let i = 0; i < responses.length; i++) {
       setTimeout(async () => {
-        if (opts.sender.discord) {
-          const messageToSend = await new Message(await responses[i].response).parse({
-            ...responses[i].attr,
-            forceWithoutAt: true, // we dont need @
-            sender: { ...responses[i].sender, username: opts.sender.discord.author },
-          }) as string;
-          opts.sender.discord.channel.send(messageToSend);
-        } else {
-          sendMessage(responses[i].response, opts.sender, {
-            param: opts.param,
-            cmd: opts.command,
-          });
-        }
+        parserReply(responses[i].response, opts);
       }, i * 500);
     }
   }

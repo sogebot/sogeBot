@@ -4,7 +4,7 @@ import Message from '../message';
 import { command, default_permission, parser } from '../decorators';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
-import { isUUID, prepare, sendMessage } from '../commons';
+import { isUUID, parserReply, prepare } from '../commons';
 import XRegExp from 'xregexp';
 import { debug, error } from '../helpers/log';
 
@@ -281,7 +281,7 @@ class Keywords extends System {
         }) as string;
         opts.sender.discord.channel.send(messageToSend);
       } else {
-        sendMessage(message, opts.sender);
+        parserReply(message, opts);
       }
     }
     return true;

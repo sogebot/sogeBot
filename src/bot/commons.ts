@@ -16,7 +16,41 @@ import tmi from './tmi';
 import { UserStateTags } from 'twitch-js';
 import Discord from './integrations/discord';
 import { TextChannel } from 'discord.js';
+import { Message } from './message';
 
+/**
+ * Use to send message to correct platform in @parser
+ * @param response
+ * @param opts
+ * @param [messageType]
+ *
+ * parserReply('Lorem Ipsum Dolor', { sender });
+ */
+export async function parserReply(response: string, opts: { sender: CommandOptions['sender']; attr?: CommandOptions['attr'] }, messageType: 'chat' | 'whisper' = 'chat') {
+  const senderObject = {
+    ..._.cloneDeep(opts.sender),
+    'message-type': messageType,
+    forceWithoutAt: typeof opts.sender.discord !== 'undefined', // we dont need @
+  };
+  const messageToSend = await new Message(response).parse({ sender: senderObject.discord ? senderObject.discord.author : senderObject.username, ...opts.attr }) as string;
+  if (senderObject.discord) {
+    if (messageType === 'chat') {
+      senderObject.discord.channel.send(messageToSend);
+    } else {
+      senderObject.discord.author.send(messageToSend);
+    }
+  } else {
+    // we skip as we are already parsing message
+    sendMessage(response, senderObject, { skip: true, ...opts.attr });
+  }
+}
+
+/**
+ * Announce in all channels (discord, twitch)
+ * @param messageToAnnounce
+ *
+ * announce('Lorem Ipsum Dolor');
+ */
 export function announce(messageToAnnounce: string) {
   sendMessage(messageToAnnounce, {
     username: oauth.botUsername,
@@ -163,7 +197,6 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
   }
 
   if (!attr.skip) {
-    const Message = (require('./message')).default;
     messageToSend = await new Message(messageToSend).parse(attr) as string;
   }
   if (messageToSend.length === 0) {

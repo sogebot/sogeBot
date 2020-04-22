@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import XRegExp from 'xregexp';
 
-import { isOwner, prepare, sendMessage } from '../commons';
+import { isOwner, parserReply, prepare } from '../commons';
 import * as constants from '../constants';
 import { command, default_permission, parser, rollback, settings } from '../decorators';
 import Expects from '../expects';
@@ -233,21 +233,12 @@ class Cooldown extends System {
           if (!cooldown.isErrorMsgQuiet && this.cooldownNotifyAsWhisper) {
             opts.sender['message-type'] = 'whisper'; // we want to whisp cooldown message
             const response = prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
-            if (opts.sender.discord) {
-              opts.sender.discord.author.send(response);
-            } else {
-              sendMessage(response, opts.sender, {});
-            }
+            parserReply(response, opts);
           }
           if (!cooldown.isErrorMsgQuiet && this.cooldownNotifyAsChat) {
             opts.sender['message-type'] = 'chat';
-            if (opts.sender.discord) {
-              const response = prepare('cooldowns.cooldown-triggered', { sender: opts.sender.discord.author, command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
-              opts.sender.discord.channel.send(response);
-            } else {
-              const response = prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
-              sendMessage(response, opts.sender, {});
-            }
+            const response = prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
+            parserReply(response, opts);
           }
           debug('cooldown.check', `${opts.sender.username}#${opts.sender.userId} have ${cooldown.name} on cooldown, remaining ${Math.ceil((cooldown.miliseconds - now + timestamp) / 1000)}s`);
           result = false;

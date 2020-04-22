@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { isMainThread } from '../cluster';
 
-import { announce, getLocalizedName, isBroadcaster, isModerator, prepare, sendMessage } from '../commons';
+import { announce, getLocalizedName, isBroadcaster, isModerator, prepare } from '../commons';
 import { command, settings, shared } from '../decorators';
 import Game from './_interface';
 import { error } from '../helpers/log';
@@ -186,11 +186,8 @@ class Duel extends Game {
           minutesName: getLocalizedName(5, 'core.minutes'),
           minutes: this.duration,
           command: opts.command });
-        if (opts.sender.discord) {
-          // if we have discord, we want to send notice on twitch channel as well
-          sendMessage(response, opts.sender, opts.attr);
-        }
-        responses.push({ response, ...opts });
+        // if we have discord, we want to send notice on twitch channel as well
+        announce(response);
       }
 
       const tickets = (await getRepository(DuelEntity).findOne({ id: opts.sender.userId }))?.tickets ?? 0;
