@@ -47,7 +47,7 @@ describe('Polls - bits', () => {
     });
   });
 
-  describe.only('Voting full workflow', () => {
+  describe('Voting full workflow', () => {
     let vid = null;
     it('Open new voting', async () => {
       const r = await polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum?" Lorem | Ipsum | Dolor Sit' });
