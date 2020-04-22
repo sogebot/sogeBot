@@ -334,6 +334,7 @@ class Spotify extends Integration {
           const data = await this.client.refreshAccessToken();
           this.client.setAccessToken(data.body.access_token);
           this.retry.IRefreshToken = 0;
+          info(chalk.yellow('SPOTIFY: ') + 'Access token refreshed OK');
         }
       } catch (e) {
         this.retry.IRefreshToken++;
