@@ -34,6 +34,7 @@ describe('Quotes - add()', () => {
   for (const test of tests) {
     describe(test.parameters, async () => {
       let id = null;
+      let response = '';
       before(async () => {
         await db.cleanup();
         await message.prepare();
@@ -41,11 +42,12 @@ describe('Quotes - add()', () => {
 
       it('Run !quote add', async () => {
         const quote = await quotes.add({ sender: test.sender, parameters: test.parameters, command: '!quote add' });
-        id = quote.id;
+        id = quote[0].id;
+        response = quote[0].response;
       });
       if (test.shouldFail) {
         it('Should throw error', async () => {
-          await message.isSent('systems.quotes.add.error', owner, { command: '!quote add' });
+          assert.strictEqual(response, '$sender, !quote add is not correct or missing -quote parameter');
         });
         it('Database should be empty', async () => {
           const items = await getManager()
@@ -57,7 +59,7 @@ describe('Quotes - add()', () => {
         });
       } else {
         it('Should sent success message', async () => {
-          await message.isSent('systems.quotes.add.ok', owner, { tags: test.tags, quote: test.quote, id });
+          assert.strictEqual(response, `$sender, quote ${id} '${test.quote}' was added. (tags: ${test.tags})`);
         });
         it('Database should contain new quote', async () => {
           const items = await getManager()
