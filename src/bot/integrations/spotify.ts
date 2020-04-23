@@ -14,6 +14,7 @@ import { debug, error, info, warning } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import api from '../api';
 import { addUIError } from '../panel';
+import { HOUR } from '../constants';
 
 /*
  * How to integrate:
@@ -345,7 +346,7 @@ class Spotify extends Integration {
     if (this.retry.IRefreshToken >= 5) {
       addUIError({ name: 'SPOTIFY', message: 'Refreshing access token failed.' });
     }
-    this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
+    this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), HOUR);
   }
 
   sockets () {
