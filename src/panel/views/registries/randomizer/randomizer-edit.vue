@@ -94,6 +94,8 @@
           option(value="simple" key="simple") {{translate('registry.randomizer.form.simple')}}
           option(value="wheelOfFortune" key="wheelOfFortune") {{translate('registry.randomizer.form.wheelOfFortune')}}
 
+      tts(:tts.sync="item.tts" :uuid="item.id")
+
       b-card(:header="translate('registry.goals.fontSettings')")
         b-card-text
           b-form-group
@@ -261,6 +263,7 @@ Component.registerHooks([
 
 @Component({
   components: {
+    tts: () => import('../alerts/components/tts.vue'),
     loading: () => import('../../../components/loading.vue'),
   },
   filters: {
@@ -307,6 +310,13 @@ export default class randomizerEdit extends Vue {
     isShown: false,
     type: 'simple',
     widgetOrder: -1,
+    tts: {
+      enabled: false,
+      voice: 'English Female',
+      pitch: 1,
+      volume: 0.5,
+      rate: 1,
+    },
     customizationFont: {
       family: 'PT Sans',
       size: 16,
