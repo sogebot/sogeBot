@@ -15,6 +15,7 @@
           </b-form-group>
 
           <b-form-group
+            v-if="data.minAmountToPlay"
             label-cols-sm="4"
             label-cols-lg="3"
             :label="translate('registry.alerts.minAmountToPlay.name')"
@@ -31,6 +32,7 @@
           </b-form-group>
 
           <b-form-group
+            v-if="data.skipUrls"
             label-cols-sm="4"
             label-cols-lg="3"
             :label-for="'tts-skipUrls' + uuid"
@@ -40,6 +42,7 @@
           </b-form-group>
 
           <b-form-group
+            v-if="data.keepAlertShown"
             label-cols-sm="4"
             label-cols-lg="3"
             :label-for="'tts-keepAlertShown' + uuid"
@@ -67,7 +70,7 @@
               ></b-form-input>
               <b-input-group-text slot="append" class="pr-3 pl-3">
                 <div style="width: 3rem;">
-                  {{ String(data.volume * 100) + '%' }}
+                  {{ Number(data.volume * 100).toFixed(0) + '%' }}
                 </div>
               </b-input-group-text>
             </b-input-group>
@@ -145,10 +148,10 @@ declare global {
   }
 })
 export default class TTS extends Vue {
-  @PropSync('tts') readonly data !: CommonSettingsInterface["tts"];
+  @PropSync('tts') readonly data !: Partial<CommonSettingsInterface["tts"]>;
   @Prop() readonly uuid !: string;
 
-  text = "This is test donation message :)";
+  text = "This message should be said by TTS to test your settings.";
   state: { loaded: number } = { loaded: this.$state.progress }
 
   voices: {text: string; value: string}[] = [];
