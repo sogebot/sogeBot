@@ -19,10 +19,10 @@ jobs:
           else
             exit 1
           fi;
-    - name: install node v13
+    - name: install node v14
       uses: actions/setup-node@v1
       with:
-        node-version: 13
+        node-version: 14
     - name: Install eslint and dependencies
       run: |
         npm install glob;

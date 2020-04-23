@@ -151,11 +151,13 @@ process.on('unhandledRejection', function (reason, p) {
 });
 
 process.on('uncaughtException', (err) => {
+  const date = new Date().toISOString();
+  process.report?.writeReport(`uncaughtException-${date}`, err);
   error(util.inspect(err));
-  error('+------------------------------------------------------------------------------+');
-  error('| BOT HAS UNEXPECTEDLY CRASHED                                                 |');
-  error('| PLEASE CHECK https://github.com/sogehige/SogeBot/wiki/How-to-report-an-issue |');
-  error('| AND ADD logs/sogebot.log file to your report                                 |');
-  error('+------------------------------------------------------------------------------+');
+  error('');
+  error('BOT HAS UNEXPECTEDLY CRASHED');
+  error('PLEASE CHECK https://github.com/sogehige/SogeBot/wiki/How-to-report-an-issue');
+  error(`AND ADD ${process.cwd()}/logs/uncaughtException-${date}.json file to your report`);
+  error('');
   process.exit(1);
 });
