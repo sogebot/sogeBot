@@ -9,7 +9,6 @@ const bundleAnalyze = !!process.env.BUNDLE
 
 const optimization = {
   minimize: process.env.NODE_ENV === 'production',
-  usedExports: false, /* disable for now in webpack 5 */
 };
 
 if (process.env.NODE_ENV === 'production') {
