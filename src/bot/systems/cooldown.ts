@@ -193,13 +193,10 @@ class Cooldown extends System {
         return true;
       }
 
-      const user = await getRepository(User).save({
-        ...(await getRepository(User).findOne({ userId: Number(opts.sender.userId) })),
-        userId: Number(opts.sender.userId),
-        username: opts.sender.username,
-        isSubscriber: typeof opts.sender.badges.subscriber !== 'undefined',
-        isModerator: typeof opts.sender.badges.moderator !== 'undefined',
-      });
+      const user = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
+      if (!user) {
+        return true;
+      }
       let result = false;
       for (const cooldown of data) {
         if ((isOwner(opts.sender) && !cooldown.isOwnerAffected) || (user.isModerator && !cooldown.isModeratorAffected) || (user.isSubscriber && !cooldown.isSubscriberAffected) || (user.isFollower && !cooldown.isFollowerAffected)) {
@@ -329,13 +326,10 @@ class Cooldown extends System {
       return true;
     }
 
-    const user = await getRepository(User).save({
-      ...(await getRepository(User).findOne({ userId: Number(opts.sender.userId) })),
-      userId: Number(opts.sender.userId),
-      username: opts.sender.username,
-      isSubscriber: typeof opts.sender.badges.subscriber !== 'undefined',
-      isModerator: typeof opts.sender.badges.moderator !== 'undefined',
-    });
+    const user = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
+    if (!user) {
+      return true;
+    }
 
     for (const cooldown of data) {
       if ((isOwner(opts.sender) && !cooldown.isOwnerAffected) || (user.isModerator && !cooldown.isModeratorAffected) || (user.isSubscriber && !cooldown.isSubscriberAffected) || (user.isFollower && !cooldown.isFollowerAffected)) {

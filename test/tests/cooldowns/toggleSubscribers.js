@@ -8,6 +8,9 @@ const message = require('../../general.js').message;
 
 const cooldown = (require('../../../dest/systems/cooldown')).default;
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/database/entity/user');
+
 // users
 const owner = { userId: Math.floor(Math.random() * 100000), badges: {}, username: 'soge__' };
 const subscriber = { userId: Math.floor(Math.random() * 100000), badges: { subscriber: 1 }, username: 'sub1'};
@@ -16,6 +19,9 @@ describe('Cooldowns - toggleSubscribers()', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();
+
+    await getRepository(User).save({ username: owner.username, userId: owner.userId });
+    await getRepository(User).save({ username: subscriber.username, userId: subscriber.userId, isSubscriber: true });
   });
 
   it('incorrect toggle', async () => {

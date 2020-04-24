@@ -8,6 +8,9 @@ const message = require('../../general.js').message;
 
 const cooldown = (require('../../../dest/systems/cooldown')).default;
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/database/entity/user');
+
 // users
 const owner = { userId: Math.floor(Math.random() * 100000), badges: {}, username: 'soge__' };
 const mod = { userId: Math.floor(Math.random() * 100000), badges: {}, username: 'mod' };
@@ -16,6 +19,9 @@ describe('Cooldowns - toggleModerators()', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();
+
+    await getRepository(User).save({ username: owner.username, userId: owner.userId });
+    await getRepository(User).save({ username: mod.username, userId: mod.userId, isModerator: true });
   });
 
   it('incorrect toggle', async () => {
