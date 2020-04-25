@@ -22,13 +22,13 @@ describe('Timers - set()', () => {
   });
 
   it('', async () => {
-    timers.set({ sender: owner, parameters: '' });
-    await message.isSent('timers.name-must-be-defined', owner, { name: 'unknown', sender: owner.username });
+    const r = await timers.set({ sender: owner, parameters: '' });
+    assert.strictEqual(r[0].response, '$sender, timer name must be defined.');
   });
 
   it('-name test', async () => {
-    await timers.set({ sender: owner, parameters: '-name test' });
-    await message.isSent('timers.timer-was-set', owner, { name: 'test', messages: 0, seconds: 60, sender: owner.username });
+    const r = await timers.set({ sender: owner, parameters: '-name test' });
+    assert.strictEqual(r[0].response, '$sender, timer test was set with 0 messages and 60 seconds to trigger');
 
     const item = await getRepository(Timer).findOne({
       relations: ['messages'],
@@ -39,8 +39,8 @@ describe('Timers - set()', () => {
   });
 
   it('-name test -seconds 20', async () => {
-    await timers.set({ sender: owner, parameters: '-name test -seconds 20' });
-    await message.isSent('timers.timer-was-set', owner, { name: 'test', messages: 0, seconds: 20, sender: owner.username });
+    const r = await timers.set({ sender: owner, parameters: '-name test -seconds 20' });
+    assert.strictEqual(r[0].response, '$sender, timer test was set with 0 messages and 20 seconds to trigger');
 
     const item = await getRepository(Timer).findOne({
       relations: ['messages'],
@@ -51,8 +51,8 @@ describe('Timers - set()', () => {
   });
 
   it('-name test -seconds 0', async () => {
-    await timers.set({ sender: owner, parameters: '-name test -seconds 0' });
-    await message.isSent('timers.cannot-set-messages-and-seconds-0', owner, { sender: owner.username });
+    const r = await timers.set({ sender: owner, parameters: '-name test -seconds 0' });
+    assert.strictEqual(r[0].response, '$sender, you cannot set both messages and seconds to 0.');
     const item = await getRepository(Timer).findOne({
       relations: ['messages'],
       where: { name: 'test' },
@@ -61,8 +61,8 @@ describe('Timers - set()', () => {
   });
 
   it('-name test -messages 20', async () => {
-    await timers.set({ sender: owner, parameters: '-name test -messages 20' });
-    await message.isSent('timers.timer-was-set', owner, { name: 'test', messages: 20, seconds: 60, sender: owner.username });
+    const r = await timers.set({ sender: owner, parameters: '-name test -messages 20' });
+    assert.strictEqual(r[0].response, '$sender, timer test was set with 20 messages and 60 seconds to trigger');
 
     const item = await getRepository(Timer).findOne({
       relations: ['messages'],
@@ -73,8 +73,8 @@ describe('Timers - set()', () => {
   });
 
   it('-name test -messages 0', async () => {
-    await timers.set({ sender: owner, parameters: '-name test -messages 0' });
-    await message.isSent('timers.timer-was-set', owner, { name: 'test', messages: 0, seconds: 60, sender: owner.username });
+    const r = await timers.set({ sender: owner, parameters: '-name test -messages 0' });
+    assert.strictEqual(r[0].response, '$sender, timer test was set with 0 messages and 60 seconds to trigger');
 
     const item = await getRepository(Timer).findOne({
       relations: ['messages'],
@@ -85,8 +85,8 @@ describe('Timers - set()', () => {
   });
 
   it('-name test -seconds 0 -messages 0', async () => {
-    await timers.set({ sender: owner, parameters: '-name test -seconds 0 -messages 0' });
-    await message.isSent('timers.cannot-set-messages-and-seconds-0', owner, { sender: owner.username });
+    const r = await timers.set({ sender: owner, parameters: '-name test -seconds 0 -messages 0' });
+    assert.strictEqual(r[0].response, '$sender, you cannot set both messages and seconds to 0.');
 
     const item = await getRepository(Timer).findOne({
       relations: ['messages'],
@@ -96,8 +96,8 @@ describe('Timers - set()', () => {
   });
 
   it('-name test -seconds 5 -messages 6', async () => {
-    await timers.set({ sender: owner, parameters: '-name test -seconds 5 -messages 6' });
-    await message.isSent('timers.timer-was-set', owner, { name: 'test', messages: 6, seconds: 5, sender: owner.username });
+    const r = await timers.set({ sender: owner, parameters: '-name test -seconds 5 -messages 6' });
+    assert.strictEqual(r[0].response, '$sender, timer test was set with 6 messages and 5 seconds to trigger');
 
     const item = await getRepository(Timer).findOne({
       relations: ['messages'],

@@ -32,26 +32,26 @@ describe('Timers - add()', () => {
   });
 
   it('', async () => {
-    timers.add({ sender: owner, parameters: '' });
-    await message.isSent('timers.name-must-be-defined', owner, { sender: owner.username });
+    const r = await timers.add({ sender: owner, parameters: '' });
+    assert.strictEqual(r[0].response, '$sender, timer name must be defined.');
   });
 
   it('-name test', async () => {
-    timers.add({ sender: owner, parameters: '-name test' });
-    await message.isSent('timers.response-must-be-defined', owner, { sender: owner.username });
+    const r = await timers.add({ sender: owner, parameters: '-name test' });
+    assert.strictEqual(r[0].response, '$sender, timer response must be defined.');
   });
 
   it('-name unknown -response "Lorem Ipsum"', async () => {
-    timers.add({ sender: owner, parameters: '-name unknown -response "Lorem Ipsum"' });
-    await message.isSent('timers.timer-not-found', owner, { name: 'unknown', sender: owner.username });
+    const r = await timers.add({ sender: owner, parameters: '-name unknown -response "Lorem Ipsum"' });
+    assert.strictEqual(r[0].response, '$sender, timer (name: unknown) was not found in database. Check timers with !timers list');
   });
 
   it('-name test -response "Lorem Ipsum"', async () => {
-    await timers.add({ sender: owner, parameters: '-name test -response "Lorem Ipsum"' });
+    const r = await timers.add({ sender: owner, parameters: '-name test -response "Lorem Ipsum"' });
 
     const item = await getRepository(TimerResponse).findOne({ response: 'Lorem Ipsum' });
     assert(typeof item !== 'undefined');
 
-    await message.isSent('timers.response-was-added', owner, { id: item.id, name: 'test', response: 'Lorem Ipsum', sender: owner.username });
+    assert.strictEqual(r[0].response, `$sender, response (id: ${item.id}) for timer (name: test) was added - 'Lorem Ipsum'`);
   });
 });

@@ -5,7 +5,6 @@ const assert = require('assert');
 require('../../general.js');
 
 const db = require('../../general.js').db;
-const variable = require('../../general.js').variable;
 const message = require('../../general.js').message;
 
 const scrim = (require('../../../dest/systems/scrim')).default;
