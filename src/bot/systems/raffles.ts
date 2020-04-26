@@ -409,7 +409,7 @@ class Raffles extends System {
 
     if (selectedParticipant.isEligible) {
       if (raffle.type === TYPE_TICKETS) {
-        await points.decrement({ userId: opts.sender.userId }, tickets);
+        await points.decrement({ userId: opts.sender.userId }, newTickets - curTickets);
       }
       debug('raffle', '------------------------------------------------------------------------------------------------');
       debug('raffle', `Eligible user ${opts.sender.username}#${opts.sender.userId} for raffle ${raffle.id}`);
