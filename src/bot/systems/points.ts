@@ -10,8 +10,9 @@ import { permission } from '../helpers/permissions';
 import System from './_interface';
 import { debug, error, warning } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
-import { FindConditions, getConnection, getRepository } from 'typeorm';
+import { FindConditions, getConnection, getRepository, LessThanOrEqual } from 'typeorm';
 import { User, UserInterface } from '../database/entity/user';
+import { PointsChangelog } from '../database/entity/points';
 import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
 import { onChange, onLoad } from '../decorators/on';
 import permissions from '../permissions';
@@ -98,6 +99,11 @@ class Points extends System {
       setTimeout(() => this.updatePoints(), 5000);
       return;
     }
+
+    // cleanup all undoes (only 10minutes should be kept)
+    await getRepository(PointsChangelog).delete({
+      updatedAt: LessThanOrEqual(Date.now() - (10 * MINUTE)),
+    });
 
     const [interval, offlineInterval, perInterval, perOfflineInterval, isOnline] = await Promise.all([
       this.getPermissionBasedSettingsValue('interval'),
@@ -267,13 +273,59 @@ class Points extends System {
     }
   }
 
+  @command('!points undo')
+  @default_permission(permission.CASTERS)
+  async undo(opts: CommandOptions) {
+    try {
+      const [username] = new Expects(opts.parameters).username().toArray();
+      const userId = await users.getIdByName(username);
+      if (!userId) {
+        throw new Error(`User ${username} not found in database`);
+      }
+
+      const undoOperation = await getRepository(PointsChangelog).findOne({
+        where: { userId },
+        order: { updatedAt: 'DESC' },
+      });
+      if (!undoOperation) {
+        throw new Error(`No undo operation found for ` + username);
+      }
+
+      await getRepository(PointsChangelog).delete({ id: undoOperation.id });
+      await getRepository(User).update({ userId }, { points: undoOperation.originalValue });
+
+      sendMessage(prepare('points.success.undo', {
+        username,
+        command: undoOperation.command,
+        originalValue: undoOperation.originalValue,
+        originalValuePointsLocale: await this.getPointsName(undoOperation.originalValue),
+        updatedValue: undoOperation.updatedValue,
+        updatedValuePointsLocale: await this.getPointsName(undoOperation.updatedValue),
+      }), opts.sender, opts.attr);
+    } catch (err) {
+      error(err);
+      sendMessage(translate('points.failed.undo').replace('$command', opts.command), opts.sender, opts.attr);
+    }
+  }
+
   @command('!points set')
   @default_permission(permission.CASTERS)
   async set (opts: CommandOptions) {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
 
+      const originalUser = await getRepository(User).findOne({username});
+      if (!originalUser) {
+        throw new Error(`User ${username} not found in database.`);
+      }
       await getRepository(User).update({ username }, { points });
+      await getRepository(PointsChangelog).insert({
+        userId: originalUser.userId,
+        updatedAt: Date.now(),
+        command: 'set',
+        originalValue: originalUser.points,
+        updatedValue: points,
+      });
 
       const message = await prepare('points.success.set', {
         amount: points,
@@ -532,11 +584,20 @@ class Points extends System {
       if (!user) {
         await getRepository(User).save({
           userId: Number(await api.getIdFromTwitch(username)),
-          username, points,
+          username,
         });
+        return this.add(opts);
       } else {
         await getRepository(User).save({ ...user, points: user.points + points });
       }
+
+      await getRepository(PointsChangelog).insert({
+        userId: user.userId,
+        command: 'add',
+        originalValue: user.points,
+        updatedValue: user.points + points,
+        updatedAt: Date.now(),
+      });
 
       const message = await prepare('points.success.add', {
         amount: points,
@@ -571,6 +632,14 @@ class Points extends System {
         await getRepository(User).save({...user, points: Math.max(user.points - points, 0)});
       }
 
+      await getRepository(PointsChangelog).insert({
+        userId: user.userId,
+        command: 'remove',
+        originalValue: user.points,
+        updatedValue: points === 'all' ? 0 : Math.max(user.points - points, 0),
+        updatedAt: Date.now(),
+      });
+
       const message = await prepare('points.success.remove', {
         amount: points,
         username: username,
@@ -578,6 +647,7 @@ class Points extends System {
       });
       sendMessage(message, opts.sender, opts.attr);
     } catch (err) {
+      error(err);
       sendMessage(translate('points.failed.remove').replace('$command', opts.command), opts.sender, opts.attr);
     }
   }

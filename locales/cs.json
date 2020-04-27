@@ -884,6 +884,7 @@
   },
   "points": {
     "success": {
+      "undo": "$sender, příkaz '$command' pro body $username byly vráceny ($updatedValue $updatedValuePointsLocale to $originalValue $originalValuePointsLocale).",
       "set": "$username ma nyni nastaveno $amount $pointsName",
       "give": "$sender prave dal svych $amount $pointsName uzivateli $username",
       "online": {
@@ -899,6 +900,7 @@
       "remove": "A jeje, $amount $pointsName bylo odebrano uzivateli $username!"
     },
     "failed": {
+      "undo": "$sender, uživatel nenalezen v databázi nebo uživatel nemá body k vrácení.",
       "set": "{core.command-parse} $command [username] [amount]",
       "give": "{core.command-parse} $command [username] [amount]",
       "giveNotEnough": "Promin, $sender, ale nemas $amount $pointsName abys je daroval uzivateli $username",
