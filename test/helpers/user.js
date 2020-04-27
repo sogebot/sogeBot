@@ -8,6 +8,13 @@ const viewer = {
   emotes: [],
 };
 
+const viewer2 = {
+  userId: 3,
+  username: '__viewer2__',
+  badges: {},
+  emotes: [],
+};
+
 const owner = {
   userId: 2,
   username: 'soge',
@@ -18,8 +25,10 @@ const owner = {
 module.exports = {
   prepare: async () => {
     await getRepository(User).save(viewer);
+    await getRepository(User).save(viewer2);
     await getRepository(User).save(owner);
   },
   viewer,
+  viewer2,
   owner,
 };
