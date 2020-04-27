@@ -1,4 +1,5 @@
 import { EntitySchema } from 'typeorm';
+import { ColumnNumericTransformer } from './_transformer';
 
 export interface PointsChangelogInterface {
   id: number;
@@ -16,7 +17,7 @@ export const PointsChangelog = new EntitySchema<Readonly<Required<PointsChangelo
     userId: { type: Number },
     originalValue: { type: Number },
     updatedValue: { type: Number },
-    updatedAt: { type: Number },
+    updatedAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
     command: { type: String },
   },
   indices: [
