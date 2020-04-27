@@ -188,7 +188,7 @@ export const VariableWatch = new EntitySchema<Readonly<VariableWatchInterface>>(
       generated: 'rowid',
     },
     variableId: {
-      type: String, nullable: true, name: 'variableId',
+      type: String, nullable: false, name: 'variableId',
     },
     order: {
       type: Number,
