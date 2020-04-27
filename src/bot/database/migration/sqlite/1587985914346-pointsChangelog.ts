@@ -1,10 +1,10 @@
 import {MigrationInterface, QueryRunner} from 'typeorm';
 
-export class pointsChangelog1587976011716 implements MigrationInterface {
-  name = 'pointsChangelog1587976011716';
+export class pointsChangelog1587985914346 implements MigrationInterface {
+  name = 'pointsChangelog1587985914346';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`CREATE TABLE "points_changelog" ("id" integer PRIMARY KEY NOT NULL, "userId" integer NOT NULL, "originalValue" integer NOT NULL, "updatedValue" integer NOT NULL, "updatedAt" integer NOT NULL, "command" varchar NOT NULL)`, undefined);
+    await queryRunner.query(`CREATE TABLE "points_changelog" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "userId" integer NOT NULL, "originalValue" integer NOT NULL, "updatedValue" integer NOT NULL, "updatedAt" integer NOT NULL, "command" varchar NOT NULL)`, undefined);
     await queryRunner.query(`CREATE INDEX "IDX_points_changelog_userId" ON "points_changelog" ("userId") `, undefined);
   }
 
