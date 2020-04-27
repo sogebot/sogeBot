@@ -119,7 +119,7 @@ export const VariableHistory = new EntitySchema<Readonly<VariableHistoryInterfac
       default: 0,
     },
     variableId: {
-      type: String, nullable: true, name: 'variableId',
+      type: String, nullable: true, name: 'variableId', length: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'sqlite') ? 36 : undefined,
     },
   },
   relations: {
@@ -160,7 +160,7 @@ export const VariableURL = new EntitySchema<Readonly<VariableURLInterface>>({
       default: false,
     },
     variableId: {
-      type: String, nullable: true, name: 'variableId',
+      type: String, nullable: true, name: 'variableId', length: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'sqlite') ? 36 : undefined,
     },
   },
   relations: {
