@@ -873,6 +873,7 @@
   },
   "points": {
     "success": {
+      "undo": "$sender, points '$command' for $username was reverted ($updatedValue $updatedValuePointsLocale to $originalValue $originalValuePointsLocale).",
       "set": "$username was set to $amount $pointsName",
       "give": "$sender just gave his $amount $pointsName to $username",
       "online": {
@@ -888,6 +889,7 @@
       "remove": "Ouch, $amount $pointsName was removed from $username!"
     },
     "failed": {
+      "undo": "$sender, username wasn't found in database or user have no undo operations",
       "set": "{core.command-parse} $command [username] [amount]",
       "give": "{core.command-parse} $command [username] [amount]",
       "giveNotEnough": "Sorry, $sender, you don't have $amount $pointsName to give it to $username",
