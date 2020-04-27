@@ -69,7 +69,7 @@ class CustomVariables extends Core {
         });
       if (variable) {
         if (variable.urls.find(url => url.id === req.params.id)?.POST) {
-          const value = await this.setValueOf(variable, req.body.value, { sender: getOwnerAsSender() });
+          const value = await this.setValueOf(variable, req.body.value, { sender: null, readOnlyBypass: true });
           if (value.isOk) {
             if (variable.urls.find(url => url.id === req.params.id)?.showResponse) {
               if (value.updated.responseType === 0) {
