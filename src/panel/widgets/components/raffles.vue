@@ -124,7 +124,7 @@
                     div.input-group
                       div.input-group-prepend
                         span.input-group-text max
-                      input(type="number" v-model.number="ticketsMax" class="form-control" placeholder="100" id="maxTickets" :min="String(ticketsMin)" :disabled="running")
+                      input(type="number" v-model.number="ticketsMax" class="form-control" placeholder="100" id="maxTickets" min="1" :disabled="running")
 
         b-tab(v-if="winner")
           template(v-slot:title)
@@ -304,6 +304,22 @@ export default {
     },
     keyword: function () {
       if (!this.keyword.startsWith('!')) this.keyword = '!' + this.keyword
+    },
+    ticketsMax(val) {
+      if (val < this.ticketsMin) {
+        this.ticketsMin = this.ticketsMax;
+      }
+      if (val < 1) {
+        this.ticketsMax = 1;
+      }
+    },
+    ticketsMin(val) {
+      if (val > this.ticketsMax) {
+        this.ticketsMax = this.ticketsMin;
+      }
+      if (val < 1) {
+        this.ticketsMin = 1;
+      }
     }
   },
   methods: {
@@ -322,6 +338,9 @@ export default {
       await Promise.all([
         new Promise((resolve, reject) => {
           this.socket.emit('raffle:getLatest', (err, raffle) => {
+            console.groupCollapsed('raffle:getLatest')
+            console.log({err, raffle})
+            console.groupEnd();
             if (err) {
               reject(err);
             }
@@ -346,8 +365,8 @@ export default {
               if (this.running) {
                 this.keyword = raffle.keyword
                 this.isTypeKeywords = raffle.type === 0
-                this.ticketsMax = raffle.max
-                this.ticketsMin = raffle.min
+                this.ticketsMax = raffle.maxTickets
+                this.ticketsMin = raffle.minTickets
 
                 // set eligibility
                 if (!raffle.subscribers && !raffle.followers) {
