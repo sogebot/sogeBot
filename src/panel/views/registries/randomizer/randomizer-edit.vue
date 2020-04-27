@@ -500,6 +500,7 @@ export default class randomizerEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
       await new Promise((resolve) => {
+        this.item.isShown = this.isShown;
         console.debug('Saving randomizer', this.item);
         this.socket.emit('randomizer::save', this.item, (err, data) => {
           if (err) {
