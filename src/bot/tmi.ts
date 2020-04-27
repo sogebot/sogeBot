@@ -33,6 +33,11 @@ import eventlist from './overlays/eventlist';
 import { getFunctionList } from './decorators/on';
 import { avgResponse, linesParsedIncrement, setStatus } from './helpers/parser';
 
+
+const userHaveSubscriberBadges = (badges: Readonly<UserStateTags['badges']>) => {
+  return typeof badges.subscriber !== 'undefined' || typeof badges.founder !== 'undefined';
+};
+
 class TMI extends Core {
   @settings('chat')
   sendWithMe = false;
@@ -760,9 +765,9 @@ class TMI extends Core {
             isOnline: true,
             isVIP: typeof sender.badges.vip !== 'undefined',
             isModerator: typeof sender.badges.moderator !== 'undefined',
-            isSubscriber: user.haveSubscriberLock ? user.isSubscriber : typeof sender.badges.subscriber !== 'undefined',
+            isSubscriber: user.haveSubscriberLock ? user.isSubscriber : userHaveSubscriberBadges(sender.badges),
             messages: user.messages ?? 0,
-            subscribeTier: String(typeof sender.badges.subscriber !== 'undefined' ? 0 : user.subscribeTier),
+            subscribeTier: String(userHaveSubscriberBadges(sender.badges) ? 0 : user.subscribeTier),
             subscribeCumulativeMonths: subCumulativeMonths(sender) || user.subscribeCumulativeMonths,
             seenAt: Date.now(),
           });
@@ -774,7 +779,7 @@ class TMI extends Core {
             isOnline: true,
             isVIP: typeof sender.badges.vip !== 'undefined',
             isModerator: typeof sender.badges.moderator !== 'undefined',
-            isSubscriber: typeof sender.badges.subscriber !== 'undefined',
+            isSubscriber: userHaveSubscriberBadges(sender.badges),
             seenAt: Date.now(),
           });
         }
