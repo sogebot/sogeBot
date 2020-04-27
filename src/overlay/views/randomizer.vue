@@ -1,5 +1,8 @@
 <template>
 <div>
+  <div v-if="urlParam('debug')" class="debug">
+    <json-viewer :value="data || {}" boxed copyable :expand-depth="4"></json-viewer>
+  </div>
   <div
     v-show="showSimpleBlink"
     v-if="data && data.type === 'simple'" :style="{
@@ -37,6 +40,7 @@ import { cloneDeep, isEqual } from 'lodash-es';
 
 import { gsap } from 'gsap'
 import Winwheel from 'winwheel'
+import JsonViewer from 'vue-json-viewer'
 
 import { getSocket } from 'src/panel/helpers/socket';
 import { getContrastColor } from 'src/panel/helpers/color';
@@ -57,6 +61,7 @@ declare global {
 
 @Component({
   components: {
+    JsonViewer,
     'font-awesome-icon': FontAwesomeIcon
   }
 })
@@ -130,12 +135,6 @@ export default class RandomizerOverlay extends Vue {
           return;
         }
 
-        let shouldReinitWof = false;
-        if (!isEqual(data, this.data)) {
-          this.showSimpleValueIndex = Math.floor(Math.random() * this.generateItems(data.items).length);
-          shouldReinitWof = true;
-        }
-
         const head = document.getElementsByTagName('head')[0];
         const style = document.createElement('style');
         style.type = 'text/css';
@@ -148,7 +147,13 @@ export default class RandomizerOverlay extends Vue {
           head.appendChild(style);
         }
 
-        this.data = data;
+        let shouldReinitWof = false;
+        if (!isEqual(data, this.data)) {
+          this.showSimpleValueIndex = Math.floor(Math.random() * this.generateItems(data.items).length);
+          shouldReinitWof = true;
+          this.data = data;
+        }
+
         this.$nextTick(() => {
           if (shouldReinitWof && data.type === 'wheelOfFortune') {
             let segments = new Array()
