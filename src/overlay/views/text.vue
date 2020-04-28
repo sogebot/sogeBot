@@ -65,6 +65,9 @@ export default class CarouselOverlay extends Vue {
         if (err) {
           return console.error(err);
         }
+        if (!cb) {
+          return console.warn('No text overlay found with id ' + this.urlParam('id'));
+        }
         if (!this.external) {
           if (cb.external) {
             for (let link of cb.external) {
