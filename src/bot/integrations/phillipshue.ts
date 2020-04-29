@@ -2,7 +2,6 @@ import chalk from 'chalk';
 import _ from 'lodash';
 import { HueApi, lightState } from 'node-hue-api';
 
-import { sendMessage } from '../commons';
 import { command, default_permission, settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import { permission } from '../helpers/permissions';
@@ -118,18 +117,18 @@ class PhillipsHue extends Integration {
 
   @command('!hue list')
   @default_permission(permission.CASTERS)
-  getLights (opts: CommandOptions) {
-    this.api.lights()
-      .then(function (lights) {
-        const output: string[] = [];
-        _.each(lights.lights, function (light) {
-          output.push('id: ' + light.id + ', name: \'' + light.name + '\'');
-        });
-        sendMessage(translate('phillipsHue.list') + output.join(' | '), opts.sender, opts.attr);
-      })
-      .fail(function (err) {
-        error(err);
+  getLights (opts: CommandOptions): CommandResponse[] {
+    try {
+      const lights = this.api.lights();
+      const output: string[] = [];
+      _.each(lights.lights, function (light) {
+        output.push('id: ' + light.id + ', name: \'' + light.name + '\'');
       });
+      return [{ response: translate('phillipsHue.list') + output.join(' | '), ...opts }];
+    } catch (e) {
+      error(e.stack);
+      return [];
+    }
   }
 
 

@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { isMainThread } from '../cluster';
 
-import { getLocalizedName, isBroadcaster, isModerator, prepare, sendMessage } from '../commons';
+import { announce, getLocalizedName, isBroadcaster, isModerator, prepare } from '../commons';
 import { command, settings, shared } from '../decorators';
 import Game from './_interface';
 import { error } from '../helpers/log';
@@ -9,7 +9,6 @@ import { error } from '../helpers/log';
 import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
 import { Duel as DuelEntity, DuelInterface } from '../database/entity/duel';
-import oauth from '../oauth';
 import { translate } from '../translate';
 import points from '../systems/points';
 import { isDbConnected } from '../helpers/database';
@@ -86,7 +85,7 @@ class Duel extends Game {
     if (winnerUser) {
       const probability = winnerUser.tickets / (total / 100);
 
-      const m = await prepare(_.size(users) === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
+      const m = prepare(_.size(users) === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
         pointsName: await points.getPointsName(total),
         points: total,
         probability: _.round(probability, 2),
@@ -94,14 +93,8 @@ class Duel extends Game {
         tickets: winnerUser.tickets,
         winner: winnerUser.username,
       });
-      sendMessage(m, {
-        username: oauth.botUsername,
-        displayName: oauth.botUsername,
-        userId: Number(oauth.botId),
-        emotes: [],
-        badges: {},
-        'message-type': 'chat',
-      }, { force: true });
+
+      announce(m);
 
       // give user his points
       await getRepository(User).increment({ userId: winnerUser.id }, 'points', total);
@@ -119,17 +112,20 @@ class Duel extends Game {
     const users = await getRepository(DuelEntity).find();
     const bank = users.map((o) => o.tickets).reduce((a, b) => a + b, 0);
 
-    sendMessage(
-      prepare('gambling.duel.bank', {
+    return [{
+      response: prepare('gambling.duel.bank', {
         command: this.getCommand('!duel'),
         points: bank,
         pointsName: await points.getPointsName(bank),
-      }), opts.sender);
+      }),
+      ...opts,
+    }];
   }
 
   @command('!duel')
   async main (opts) {
-    let message, bet;
+    const responses: CommandResponse[] = [];
+    let bet;
 
     opts.sender['message-type'] = 'chat'; // force responses to chat
     try {
@@ -174,12 +170,11 @@ class Duel extends Game {
           });
           await points.decrement({ userId: opts.sender.userId }, parseInt(bet, 10));
         } else {
-          message = await prepare('gambling.fightme.cooldown', {
+          const response = prepare('gambling.fightme.cooldown', {
             minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60), 'core.minutes'),
             cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60),
             command: opts.command });
-          sendMessage(message, opts.sender, opts.attr);
-          return true;
+          return [{ response, ...opts }];
         }
       }
 
@@ -187,54 +182,50 @@ class Duel extends Game {
       const isNewDuel = (this._timestamp) === 0;
       if (isNewDuel) {
         this._timestamp = Number(new Date());
-        message = await prepare('gambling.duel.new', {
+        const response = prepare('gambling.duel.new', {
           minutesName: getLocalizedName(5, 'core.minutes'),
           minutes: this.duration,
           command: opts.command });
-        sendMessage(message, opts.sender, opts.attr);
+        // if we have discord, we want to send notice on twitch channel as well
+        announce(response);
       }
 
       const tickets = (await getRepository(DuelEntity).findOne({ id: opts.sender.userId }))?.tickets ?? 0;
-      global.setTimeout(async () => {
-        message = await prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
-          pointsName: await points.getPointsName(tickets),
-          points: tickets,
-        });
-        sendMessage(message, opts.sender, opts.attr);
-      }, isNewDuel ? 500 : 0);
-      return true;
+      const response = prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
+        pointsName: await points.getPointsName(tickets),
+        points: tickets,
+      });
+      responses.push({ response, ...opts });
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
-          sendMessage(translate('gambling.duel.notEnoughOptions'), opts.sender, opts.attr);
+          responses.push({ response: translate('gambling.duel.notEnoughOptions'), ...opts });
           break;
         case ERROR_ZERO_BET:
-          message = await prepare('gambling.duel.zeroBet', {
+          responses.push({ response: prepare('gambling.duel.zeroBet', {
             pointsName: await points.getPointsName(0),
-          });
-          sendMessage(message, opts.sender, opts.attr);
+          }), ...opts });
           break;
         case ERROR_NOT_ENOUGH_POINTS:
-          message = await prepare('gambling.duel.notEnoughPoints', {
+          responses.push({ response: prepare('gambling.duel.notEnoughPoints', {
             pointsName: await points.getPointsName(bet),
             points: bet,
-          });
-          sendMessage(message, opts.sender, opts.attr);
+          }), ...opts });
           break;
         case ERROR_MINIMAL_BET:
           bet = this.minimalBet;
-          message = await prepare('gambling.duel.lowerThanMinimalBet', {
+          responses.push({ response: prepare('gambling.duel.lowerThanMinimalBet', {
             pointsName: await points.getPointsName(bet),
             points: bet,
             command: opts.command,
-          });
-          sendMessage(message, opts.sender, opts.attr);
+          }), ...opts });
           break;
         default:
           error(e.stack);
-          sendMessage(translate('core.error'), opts.sender, opts.attr);
+          responses.push({ response: translate('core.error'), ...opts });
       }
     }
+    return responses;
   }
 }
 

@@ -27,7 +27,7 @@ import spotify from './integrations/spotify';
 import songs from './systems/songs';
 import Parser from './parser';
 import { translate } from './translate';
-import { getLocalizedName, isIgnored, prepare, sendMessage } from './commons';
+import { getLocalizedName, isIgnored, parserReply, prepare } from './commons';
 import currency from './currency';
 import points from './systems/points';
 import permissions from './permissions';
@@ -252,13 +252,13 @@ class Message {
           if (state.updated.responseType === 0) {
             // default
             if (state.isOk && !state.isEval) {
-              const msg = await prepare('filters.setVariable', { value: state.setValue, variable: variable });
-              sendMessage(msg, attr.sender, { skip: true, quiet: _.get(attr, 'quiet', false) });
+              const msg = prepare('filters.setVariable', { value: state.setValue, variable: variable });
+              parserReply(msg, { sender: attr.sender, attr: { skip: true, quiet: _.get(attr, 'quiet', false) } });
             }
             return state.updated.currentValue;
           } else if (state.updated.responseType === 1) {
             // custom
-            sendMessage(state.updated.responseText.replace('$value', state.setValue), attr.sender, { skip: true, quiet: _.get(attr, 'quiet', false) });
+            parserReply(state.updated.responseText.replace('$value', state.setValue), { sender: attr.sender, attr: { skip: true, quiet: _.get(attr, 'quiet', false) }});
             return '';
           } else {
             // command
@@ -381,8 +381,8 @@ class Message {
         return '0';
       },
       '$count': async function (filter) {
-        if (attr.cmd) {
-          return String((await getCountOfCommandUsage(attr.cmd)));
+        if (attr.command) {
+          return String((await getCountOfCommandUsage(attr.command)));
         }
         return '0';
       },
@@ -393,7 +393,12 @@ class Message {
           .replace(/\$sender/g, (tmi.showWithAt ? '@' : '') + attr.sender.username)
           .replace(/\$param/g, attr.param);
         const parse = new Parser({ sender: attr.sender, message: cmd, skip: true, quiet: true });
-        await parse.process();
+        const responses = await parse.process();
+        for (let i = 0; i < responses.length; i++) {
+          setTimeout(async () => {
+            parserReply(await responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
+          }, 500 * i);
+        }
         return '';
       },
       '(!#)': async function (filter) {
@@ -402,7 +407,12 @@ class Message {
           .replace(/\$sender/g, (tmi.showWithAt ? '@' : '') + attr.sender.username)
           .replace(/\$param/g, attr.param);
         const parse = new Parser({ sender: attr.sender, message: cmd, skip: true, quiet: false });
-        await parse.process();
+        const responses = await parse.process();
+        for (let i = 0; i < responses.length; i++) {
+          setTimeout(async () => {
+            parserReply(await responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
+          }, 500 * i);
+        }
         return '';
       },
     };
@@ -722,9 +732,9 @@ class Message {
       for (let [key, value] of Object.entries(attr)) {
         if (_.includes(['sender'], key)) {
           if (typeof value.username !== 'undefined') {
-            value = tmi.showWithAt ? `@${value.username}` : value.username;
+            value = tmi.showWithAt && attr.forceWithoutAt !== true ? `@${value.username}` : value.username;
           } else {
-            value = tmi.showWithAt ? `@${value}` : value;
+            value = tmi.showWithAt && attr.forceWithoutAt !== true ? `@${value}` : value;
           }
         }
         this.message = this.message.replace(new RegExp('[$]' + key, 'g'), value);

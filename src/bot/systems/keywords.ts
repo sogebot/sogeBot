@@ -4,7 +4,7 @@ import Message from '../message';
 import { command, default_permission, parser } from '../decorators';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
-import { isUUID, prepare, sendMessage } from '../commons';
+import { isUUID, parserReply, prepare } from '../commons';
 import XRegExp from 'xregexp';
 import { debug, error } from '../helpers/log';
 
@@ -70,12 +70,12 @@ class Keywords extends System {
 
   @command('!keyword')
   @default_permission(permission.CASTERS)
-  public main(opts) {
+  public main(opts: CommandOptions): CommandResponse[] {
     let url = 'http://sogehige.github.io/sogeBot/#/commands/keywords';
     if ((process.env?.npm_package_version ?? 'x.y.z-SNAPSHOT').includes('SNAPSHOT')) {
       url = 'http://sogehige.github.io/sogeBot/#/_master/commands/keywords';
     }
-    sendMessage(translate('core.usage') + ' => ' + url, opts.sender);
+    return [{ response: translate('core.usage') + ' => ' + url, ...opts }];
   }
 
   /**
@@ -83,11 +83,11 @@ class Keywords extends System {
    *
    * format: !keyword add -k [regexp] -r [response]
    * @param {CommandOptions} opts - options
-   * @return {Promise<Required<KeywordInterface> | null>}
+   * @return {Promise<CommandResponse[]>}
    */
   @command('!keyword add')
   @default_permission(permission.CASTERS)
-  public async add(opts: CommandOptions): Promise<Required<KeywordInterface> | null> {
+  public async add(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [keywordRegex, response]
         = new Expects(opts.parameters)
@@ -101,12 +101,10 @@ class Keywords extends System {
         enabled: true,
       };
       await getRepository(Keyword).save(data);
-      sendMessage(prepare('keywords.keyword-was-added', data), opts.sender);
-      return data;
+      return [{ response: prepare('keywords.keyword-was-added', data), ...opts }];
     } catch (e) {
       error(e.stack);
-      sendMessage(prepare('keywords.keyword-parse-failed'), opts.sender);
-      return null;
+      return [{ response: prepare('keywords.keyword-parse-failed'), ...opts }];
     }
   }
 
@@ -115,11 +113,11 @@ class Keywords extends System {
    *
    * format: !keyword edit -k [uuid|regexp] -r [response]
    * @param {CommandOptions} opts - options
-   * @return {Promise<Required<KeywordInterface> | null>}
+   * @return {Promise<CommandResponse[]>}
    */
   @command('!keyword edit')
   @default_permission(permission.CASTERS)
-  public async edit(opts: CommandOptions): Promise<Required<KeywordInterface> | null> {
+  public async edit(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [keywordRegexOrUUID, response]
         = new Expects(opts.parameters)
@@ -135,21 +133,17 @@ class Keywords extends System {
       }
 
       if (keywords.length === 0) {
-        sendMessage(prepare('keywords.keyword-was-not-found'), opts.sender);
-        return null;
+        return [{ response: prepare('keywords.keyword-was-not-found'), ...opts }];
       } else if (keywords.length > 1) {
-        sendMessage(prepare('keywords.keyword-is-ambiguous'), opts.sender);
-        return null;
+        return [{ response: prepare('keywords.keyword-is-ambiguous'), ...opts }];
       } else {
         keywords[0].response = response;
         await getRepository(Keyword).save(keywords);
-        sendMessage(prepare('keywords.keyword-was-edited', keywords[0]), opts.sender);
-        return keywords[0];
+        return [{ response: prepare('keywords.keyword-was-edited', keywords[0]), ...opts }];
       }
     } catch (e) {
       error(e.stack);
-      sendMessage(prepare('keywords.keyword-parse-failed'), opts.sender);
-      return null;
+      return [{ response: prepare('keywords.keyword-parse-failed'), ...opts }];
     }
   }
 
@@ -157,29 +151,27 @@ class Keywords extends System {
    * Bot responds with list of keywords
    *
    * @param {CommandOptions} opts
-   * @returns {Promise<void>}
+   * @returns {Promise<CommandResponse[]>}
    */
   @command('!keyword list')
   @default_permission(permission.CASTERS)
-  public async list(opts: CommandOptions): Promise<void> {
+  public async list(opts: CommandOptions): Promise<CommandResponse[]> {
     const keywords = await getRepository(Keyword).find({ order: { keyword: 'ASC' } });
     const list = keywords.map((o) => {
       return `${o.enabled ? '🗹' : '☐'} ${o.id} | ${o.keyword} | ${o.response}`;
     });
 
-    let output;
+    const responses: CommandResponse[] = [];
     if (keywords.length === 0) {
-      output = prepare('keywords.list-is-empty');
+      responses.push({ response: prepare('keywords.list-is-empty'), ...opts });
     } else {
-      output = prepare('keywords.list-is-not-empty');
+      responses.push({ response: prepare('keywords.list-is-not-empty'), ...opts });
     }
-    sendMessage(output, opts.sender);
 
     for (let i = 0; i < list.length; i++) {
-      setTimeout(() => {
-        sendMessage(list[i], opts.sender);
-      }, 300 * (i + 1));
+      responses.push({ response: list[i], ...opts });
     }
+    return responses;
   }
 
 
@@ -188,11 +180,11 @@ class Keywords extends System {
    *
    * format: !keyword edit -k [uuid|regexp]
    * @param {CommandOptions} opts - options
-   * @return {Promise<boolean>}
+   * @return {Promise<CommandResponse[]>}
    */
   @command('!keyword remove')
   @default_permission(permission.CASTERS)
-  public async remove(opts: CommandOptions): Promise<boolean> {
+  public async remove(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [keywordRegexOrUUID]
         = new Expects(opts.parameters)
@@ -207,20 +199,16 @@ class Keywords extends System {
       }
 
       if (keywords.length === 0) {
-        sendMessage(prepare('keywords.keyword-was-not-found'), opts.sender);
-        return false;
+        return [{ response: prepare('keywords.keyword-was-not-found'), ...opts }];
       } else if (keywords.length > 1) {
-        sendMessage(prepare('keywords.keyword-is-ambiguous'), opts.sender);
-        return false;
+        return [{ response: prepare('keywords.keyword-is-ambiguous'), ...opts }];
       } else {
         await getRepository(Keyword).remove(keywords);
-        sendMessage(prepare('keywords.keyword-was-removed', keywords[0]), opts.sender);
-        return true;
+        return [{ response: prepare('keywords.keyword-was-removed', keywords[0]), ...opts }];
       }
     } catch (e) {
       error(e.stack);
-      sendMessage(prepare('keywords.keyword-parse-failed'), opts.sender);
-      return false;
+      return [{ response: prepare('keywords.keyword-parse-failed'), ...opts }];
     }
   }
 
@@ -230,11 +218,11 @@ class Keywords extends System {
    *
    * format: !keyword toggle -k [uuid|regexp]
    * @param {CommandOptions} opts - options
-   * @return {Promise<boolean>}
+   * @return {Promise<CommandResponse[]>}
    */
   @command('!keyword toggle')
   @default_permission(permission.CASTERS)
-  public async toggle(opts: CommandOptions): Promise<boolean> {
+  public async toggle(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [keywordRegexOrUUID]
         = new Expects(opts.parameters)
@@ -249,22 +237,17 @@ class Keywords extends System {
       }
 
       if (keywords.length === 0) {
-        sendMessage(prepare('keywords.keyword-was-not-found'), opts.sender);
-        return false;
+        return [{ response: prepare('keywords.keyword-was-not-found'), ...opts }];
       } else if (keywords.length > 1) {
-        sendMessage(prepare('keywords.keyword-is-ambiguous'), opts.sender);
-        return false;
+        return [{ response: prepare('keywords.keyword-is-ambiguous'), ...opts }];
       } else {
         keywords[0].enabled = !keywords[0].enabled;
         await getRepository(Keyword).save(keywords);
-
-        sendMessage(prepare(keywords[0].enabled ? 'keywords.keyword-was-enabled' : 'keywords.keyword-was-disabled', keywords[0]), opts.sender);
-        return true;
+        return [{ response: prepare(keywords[0].enabled ? 'keywords.keyword-was-enabled' : 'keywords.keyword-was-disabled', keywords[0]), ...opts }];
       }
     } catch (e) {
       error(e.stack);
-      sendMessage(prepare('keywords.keyword-parse-failed'), opts.sender);
-      return false;
+      return [{ response: prepare('keywords.keyword-parse-failed'), ...opts }];
     }
   }
 
@@ -291,7 +274,15 @@ class Keywords extends System {
     for (const k of keywords) {
       const message = await (new Message(k.response).parse({ sender: opts.sender }));
       debug('keywords.run', {k, message});
-      sendMessage(message, opts.sender);
+      if (opts.sender.discord) {
+        const messageToSend = await new Message(await message).parse({
+          forceWithoutAt: true, // we dont need @
+          sender: { ...opts.sender, username: opts.sender.discord.author },
+        }) as string;
+        opts.sender.discord.channel.send(messageToSend);
+      } else {
+        parserReply(message, opts);
+      }
     }
     return true;
   }

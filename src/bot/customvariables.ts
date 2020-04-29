@@ -8,7 +8,7 @@ import strip from 'strip-comments';
 import Message from './message';
 import { permission } from './helpers/permissions';
 import { getAllOnlineUsernames } from './helpers/getAllOnlineUsernames';
-import { getOwnerAsSender, getTime, isModerator, prepare, sendMessage } from './commons';
+import { announce, getTime, isModerator, prepare } from './commons';
 
 import { getRepository, IsNull } from 'typeorm';
 import { User, UserInterface } from './database/entity/user';
@@ -73,15 +73,9 @@ class CustomVariables extends Core {
           if (value.isOk) {
             if (variable.urls.find(url => url.id === req.params.id)?.showResponse) {
               if (value.updated.responseType === 0) {
-                sendMessage(
-                  prepare('filters.setVariable', { value: value.updated.currentValue, variable: variable }),
-                  getOwnerAsSender(), { skip: true, quiet: false }
-                );
+                announce(prepare('filters.setVariable', { value: value.updated.currentValue, variable: variable }));
               } else if (value.updated.responseType === 1) {
-                sendMessage(
-                  value.updated.responseText.replace('$value', value.updated.currentValue),
-                  getOwnerAsSender(), { skip: true, quiet: false }
-                );
+                announce(value.updated.responseText.replace('$value', value.updated.currentValue));
               }
             }
             return res.status(200).send({ oldValue: variable.currentValue, value: value.setValue });

@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-import { getOwner, prepare, sendMessage } from '../commons';
+import { getOwner, prepare } from '../commons';
 import { command, default_permission, settings, shared } from '../decorators';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
@@ -80,9 +80,9 @@ class Queue extends System {
             user = await getRepository(QueueEntity).findOne({ username: user });
             users.push(user);
           }
-          cb(null, await this.pickUsers({ sender: getOwner(), users }, data.random));
+          cb(null, (await this.pickUsers({ sender: getOwner(), users }, data.random)).users);
         } else {
-          cb(null, await this.pickUsers({ sender: getOwner(), parameters: String(data.count) }, data.random));
+          cb(null, (await this.pickUsers({ sender: getOwner(), parameters: String(data.count) }, data.random)).users);
         }
       } catch (e) {
         cb(e.stack);
@@ -90,7 +90,7 @@ class Queue extends System {
     });
   }
 
-  async getUsers (opts) {
+  async getUsers (opts): Promise<QueueInterface[]> {
     opts = opts || { amount: 1 };
     let users = await getRepository(QueueEntity).find();
 
@@ -121,26 +121,26 @@ class Queue extends System {
   }
 
   @command('!queue')
-  main (opts) {
-    sendMessage(translate(this.locked ? 'queue.info.closed' : 'queue.info.opened'), opts.sender, opts.attr);
+  main (opts): CommandResponse[] {
+    return [{ response: translate(this.locked ? 'queue.info.closed' : 'queue.info.opened'), ...opts }];
   }
 
   @command('!queue open')
   @default_permission(permission.CASTERS)
-  open (opts) {
+  open (opts): CommandResponse[] {
     this.locked = false;
-    sendMessage(translate('queue.open'), opts.sender, opts.attr);
+    return [{ response: translate('queue.open'), ...opts }];
   }
 
   @command('!queue close')
   @default_permission(permission.CASTERS)
-  close (opts) {
+  close (opts): CommandResponse[] {
     this.locked = true;
-    sendMessage(translate('queue.close'), opts.sender, opts.attr);
+    return [{ response: translate('queue.close'), ...opts }];
   }
 
   @command('!queue join')
-  async join (opts) {
+  async join (opts): Promise<CommandResponse[]> {
     if (!(this.locked)) {
       const user = await getRepository(User).findOne({ userId: opts.sender.userId });
       if (!user) {
@@ -175,35 +175,37 @@ class Queue extends System {
           createdAt: Date.now(),
 
         });
-        sendMessage(translate('queue.join.opened'), opts.sender, opts.attr);
+        return [{ response: translate('queue.join.opened'), ...opts }];
+      } else {
+        return [];
       }
     } else {
-      sendMessage(translate('queue.join.closed'), opts.sender, opts.attr);
+      return [{ response: translate('queue.join.closed'), ...opts }];
     }
   }
 
   @command('!queue clear')
   @default_permission(permission.CASTERS)
-  clear (opts) {
+  clear (opts): CommandResponse[] {
     getRepository(QueueEntity).delete({});
     this.pickedUsers = [];
-    sendMessage(translate('queue.clear'), opts.sender, opts.attr);
+    return [{ response: translate('queue.clear'), ...opts }];
   }
 
   @command('!queue random')
   @default_permission(permission.CASTERS)
-  async random (opts) {
-    this.pickUsers(opts, true);
+  async random (opts): Promise<CommandResponse[]> {
+    return (await this.pickUsers(opts, false)).responses;
   }
 
   @command('!queue pick')
   @default_permission(permission.CASTERS)
-  async pick (opts) {
-    this.pickUsers(opts, false);
+  async pick (opts): Promise<CommandResponse[]> {
+    return (await this.pickUsers(opts, false)).responses;
   }
 
-  async pickUsers (opts, random) {
-    let users;
+  async pickUsers (opts, random): Promise<{ users: QueueInterface[]; responses: CommandResponse[]}> {
+    let users: QueueInterface[];
     if (!opts.users) {
       const input = opts.parameters.match(/^(\d+)?/)[0];
       const amount = (input === '' ? 1 : parseInt(input, 10));
@@ -234,21 +236,22 @@ class Queue extends System {
         msg = translate('queue.picked.multi');
     }
 
-    sendMessage(msg.replace(/\$users/g, users.map(o => atUsername ? `@${o.username}` : o.username).join(', ')), opts.sender, opts.attr);
-    return users;
+    const response = msg.replace(/\$users/g, users.map(o => atUsername ? `@${o.username}` : o.username).join(', '));
+    return {
+      users,
+      responses: [{ response, ...opts }],
+    };
   }
 
   @command('!queue list')
   @default_permission(permission.CASTERS)
-  async list (opts) {
+  async list (opts): Promise<CommandResponse[]> {
     const [atUsername, users] = await Promise.all([
       tmi.showWithAt,
       getRepository(QueueEntity).find(),
     ]);
     const queueList = users.map(o => atUsername ? `@${o.username}` : o).join(', ');
-    sendMessage(
-      await prepare('queue.list', { users: queueList }), opts.sender
-    );
+    return [{ response: prepare('queue.list', { users: queueList }), ...opts }];
   }
 }
 

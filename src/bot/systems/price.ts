@@ -9,7 +9,7 @@ import * as constants from '../constants';
 import { permission } from '../helpers/permissions';
 import { command, default_permission, rollback } from '../decorators';
 import { parser } from '../decorators';
-import { isOwner, prepare, sendMessage } from '../commons';
+import { isOwner, parserReply, prepare } from '../commons';
 
 import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
@@ -71,88 +71,83 @@ class Price extends System {
 
   @command('!price')
   @default_permission(permission.CASTERS)
-  main (opts) {
-    sendMessage(translate('core.usage') + ': !price set <cmd> <price> | !price unset <cmd> | !price list | !price toggle <cmd>', opts.sender, opts.attr);
+  main (opts: CommandOptions): CommandResponse[] {
+    return [{ response: translate('core.usage') + ': !price set <cmd> <price> | !price unset <cmd> | !price list | !price toggle <cmd>', ...opts }];
   }
 
   @command('!price set')
   @default_permission(permission.CASTERS)
-  async set (opts) {
+  async set (opts: CommandOptions): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^(![\S]+) ([0-9]+)$/);
 
     if (_.isNil(parsed)) {
-      const message = await prepare('price.price-parse-failed');
-      sendMessage(message, opts.sender, opts.attr);
-      return false;
+      const response = prepare('price.price-parse-failed');
+      return [{ response, ...opts }];
     }
 
     const [cmd, argPrice] = parsed.slice(1);
     if (parseInt(argPrice, 10) === 0) {
-      this.unset(opts);
-      return false;
+      return this.unset(opts);
     }
 
     const price = await getRepository(PriceEntity).save({
       ...(await getRepository(PriceEntity).findOne({ command: cmd })),
-      command: cmd, price: argPrice,
+      command: cmd, price: parseInt(argPrice, 10),
     });
-    const message = await prepare('price.price-was-set', { command: cmd, amount: parseInt(argPrice, 10), pointsName: await points.getPointsName(price) });
-    sendMessage(message, opts.sender, opts.attr);
+    const response = prepare('price.price-was-set', { command: cmd, amount: parseInt(argPrice, 10), pointsName: await points.getPointsName(price) });
+    return [{ response, ...opts }];
   }
 
   @command('!price unset')
   @default_permission(permission.CASTERS)
-  async unset (opts) {
+  async unset (opts: CommandOptions): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^(![\S]+)$/);
 
     if (_.isNil(parsed)) {
-      const message = await prepare('price.price-parse-failed');
-      sendMessage(message, opts.sender, opts.attr);
-      return false;
+      const response = prepare('price.price-parse-failed');
+      return [{ response, ...opts }];
     }
 
     const cmd = parsed[1];
     await getRepository(PriceEntity).delete({ command: cmd });
-    const message = await prepare('price.price-was-unset', { command: cmd });
-    sendMessage(message, opts.sender, opts.attr);
+    const response = prepare('price.price-was-unset', { command: cmd });
+    return [{ response, ...opts }];
   }
 
   @command('!price toggle')
   @default_permission(permission.CASTERS)
-  async toggle (opts) {
+  async toggle (opts: CommandOptions): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^(![\S]+)$/);
 
     if (_.isNil(parsed)) {
-      const message = await prepare('price.price-parse-failed');
-      sendMessage(message, opts.sender, opts.attr);
-      return false;
+      const response = prepare('price.price-parse-failed');
+      return [{ response, ...opts }];
     }
 
     const cmd = parsed[1];
     const price = await getRepository(PriceEntity).findOne({ command: cmd });
     if (!price) {
-      const message = await prepare('price.price-was-not-found', { command: cmd });
-      sendMessage(message, opts.sender, opts.attr);
-      return false;
+      const response = prepare('price.price-was-not-found', { command: cmd });
+      return [{ response, ...opts }];
     }
 
     await getRepository(PriceEntity).save({...price, enabled: !price.enabled});
-    const message = await prepare(price.enabled ? 'price.price-was-enabled' : 'price.price-was-disabled', { command: cmd });
-    sendMessage(message, opts.sender, opts.attr);
+    const response = prepare(price.enabled ? 'price.price-was-enabled' : 'price.price-was-disabled', { command: cmd });
+    return [{ response, ...opts }];
   }
 
   @command('!price list')
   @default_permission(permission.CASTERS)
-  async list (opts) {
+  async list (opts: CommandOptions): Promise<CommandResponse[]> {
     const prices = await getRepository(PriceEntity).find();
-    const output = (prices.length === 0 ? translate('price.list-is-empty') : translate('price.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(prices, 'command'), (o) => {
+    const response = (prices.length === 0 ? translate('price.list-is-empty') : translate('price.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(prices, 'command'), (o) => {
       return `${o.command} - ${o.price}`;
     })).join(', ')));
-    sendMessage(output, opts.sender, opts.attr);
+    return [{ response, ...opts }];
   }
 
   @parser({ priority: constants.HIGH })
-  async check (opts) {
+  async check (opts: ParserOptions): Promise<boolean> {
     const parsed = opts.message.match(/^(![\S]+)/);
     if (!parsed || isOwner(opts.sender)) {
       return true; // skip if not command or user is owner
@@ -170,8 +165,8 @@ class Price extends System {
     const removePts = price.price;
     const haveEnoughPoints = availablePts >= removePts;
     if (!haveEnoughPoints) {
-      const message = await prepare('price.user-have-not-enough-points', { amount: removePts, command: `${price.command}`, pointsName: await points.getPointsName(removePts) });
-      sendMessage(message, opts.sender, opts.attr);
+      const response = prepare('price.user-have-not-enough-points', { amount: removePts, command: `${price.command}`, pointsName: await points.getPointsName(removePts) });
+      parserReply(response, opts);
     } else {
       await points.decrement({ userId: opts.sender.userId }, removePts);
     }
@@ -179,7 +174,7 @@ class Price extends System {
   }
 
   @rollback()
-  async restorePointsRollback (opts) {
+  async restorePointsRollback (opts: ParserOptions): Promise<boolean> {
     const parsed = opts.message.match(/^(![\S]+)/);
     const helpers = (await (new Parser()).getCommandsList()).filter(o => o.isHelper).map(o => o.command);
     if (
@@ -190,13 +185,11 @@ class Price extends System {
       return true;
     }
     const price = await getRepository(PriceEntity).findOne({ command: parsed[1], enabled: true });
-
-    if (!price) { // no price set
-      return true;
+    if (price) { // no price set
+      const removePts = price.price;
+      await getRepository(User).increment({ userId: opts.sender.userId }, 'points', removePts);
     }
-
-    const removePts = price.price;
-    await getRepository(User).increment({ userId: opts.sender.userId }, 'points', removePts);
+    return true;
   }
 }
 

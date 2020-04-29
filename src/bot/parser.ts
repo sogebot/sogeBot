@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import * as constants from './constants';
-import { sendMessage } from './commons';
+import { getBotSender } from './commons';
 import { debug, error, warning } from './helpers/log';
 import { incrementCountOfCommandUsage } from './helpers/commands/count';
 import { getRepository } from 'typeorm';
@@ -14,17 +14,15 @@ import { translate } from './translate';
 import currency from './currency';
 import general from './general';
 import tmi from './tmi';
-import { UserStateTags } from 'twitch-js';
 import { list } from './helpers/register';
 
 class Parser {
   started_at = Date.now();
   message = '';
-  sender: Partial<UserStateTags> | null = null;
+  sender: CommandOptions['sender'] | null = null;
   skip = false;
   quiet = false;
   successfullParserRuns: any[] = [];
-  isCommand = false;
   list: any = [];
 
   constructor (opts: any = {}) {
@@ -34,8 +32,11 @@ class Parser {
     this.quiet = opts.quiet || false;
     this.successfullParserRuns = [];
 
-    this.isCommand = this.message.startsWith('!');
     this.list = this.populateList();
+  }
+
+  get isCommand() {
+    return this.message.startsWith('!');
   }
 
   time () {
@@ -73,7 +74,7 @@ class Parser {
     return false; // no parser failed
   }
 
-  async process () {
+  async process (): Promise<CommandResponse[]> {
     debug('parser.process', 'PROCESS START of "' + this.message + '"');
 
     const parsers = await this.parsers();
@@ -126,7 +127,7 @@ class Parser {
                 debug('parser.process', 'Rollback skipped for ' + r.name);
               }
             }
-            return false;
+            return [];
           } else {
             this.successfullParserRuns.push({name: parser.name, opts }); // need to save opts for permission rollback
           }
@@ -136,9 +137,11 @@ class Parser {
         debug('parser.process', 'Skipped ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ')');
       }
     }
+
     if (this.isCommand) {
-      this.command(this.sender, this.message.trim());
+      return this.command(this.sender, this.message.trim());
     }
+    return [];
   }
 
   populateList () {
@@ -238,19 +241,19 @@ class Parser {
     return commands;
   }
 
-  async command (sender, message) {
+  async command (sender: CommandOptions['sender'] | null, message: string): Promise<CommandResponse[]> {
     debug('parser.command', { sender, message });
     if (!message.startsWith('!')) {
-      return;
+      return [];
     }; // do nothing, this is not a command or user is ignored
     const command = await this.find(message, null);
     debug('parser.command', { command });
     if (_.isNil(command)) {
-      return;
+      return [];
     }; // command not found, do nothing
     if (command.permission === null) {
       warning(`Command ${command.command} is disabled!`);
-      return;
+      return [];
     }; // command is disabled
 
     if (this.sender) {
@@ -265,10 +268,11 @@ class Parser {
       || getFromViewersCache(this.sender.userId, command.permission)
     ) {
       const text = message.trim().replace(new RegExp('^(' + command.command + ')', 'i'), '').trim();
-      const opts = {
-        sender: sender,
+      const opts: CommandOptions = {
+        sender: sender || getBotSender(),
         command: command.command,
         parameters: text.trim(),
+        createdAt: this.started_at,
         attr: {
           skip: this.skip,
           quiet: this.quiet,
@@ -282,15 +286,12 @@ class Parser {
       if (typeof command.fnc === 'function' && !_.isNil(command.id)) {
         incrementCountOfCommandUsage(command.command);
         debug('parser.command', 'Running ' + command.command);
-        command.fnc.apply(command.this, [opts]);
+        return command.fnc.apply(command.this, [opts]) as CommandResponse[];
       } else {
         error(command.command + ' have wrong undefined function ' + command._fncName + '() registered!');
+        return [];
       };
     } else {
-      // user doesn't have permissions for command
-      sender['message-type'] = 'whisper';
-      sendMessage(translate('permissions.without-permission').replace(/\$command/g, message), sender, {});
-
       // do all rollbacks when permission failed
       const rollbacks = await this.rollbacks();
       for (const r of rollbacks) {
@@ -306,6 +307,13 @@ class Parser {
           debug('parser.process', 'Rollback skipped for ' + r.name);
         }
       }
+
+      // user doesn't have permissions for command
+      if (sender) {
+        sender['message-type'] = 'whisper';
+        return[{ response: translate('permissions.without-permission').replace(/\$command/g, message), sender, attr: {} }];
+      }
+      return [];
     }
   }
 }

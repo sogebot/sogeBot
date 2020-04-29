@@ -28,26 +28,34 @@ describe('Polls - bits', () => {
 
   describe('Close not opened voting', () => {
     it('Close voting should fail', async () => {
-      assert(!(await polls.close({ sender: owner })));
+      const r = await polls.close({ sender: owner });
+      assert.strictEqual(r[0].response, '$sender, there is currently no poll in progress!');
     });
   });
 
   describe('Close opened voting', () => {
     it('Open new voting', async () => {
-      assert(await polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum test?" Lorem | Ipsum | Dolor Sit' }));
+      const r = await polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum test?" Lorem | Ipsum | Dolor Sit' });
+      assert.strictEqual(r[0].response, 'Poll by cheers opened for "Lorem Ipsum test?"! You can vote by adding hashtag #voteX into bit message');
     });
     it('Close voting', async () => {
-      assert(await polls.close({ sender: owner }));
+      const r = await polls.close({ sender: owner });
+      assert.strictEqual(r[0].response, 'Poll "Lorem Ipsum test?" closed, status of voting:');
+      assert.strictEqual(r[1].response, '#vote1 - Lorem - 0 votes, 0.00%');
+      assert.strictEqual(r[2].response, '#vote2 - Ipsum - 0 votes, 0.00%');
+      assert.strictEqual(r[3].response, '#vote3 - Dolor Sit - 0 votes, 0.00%');
     });
   });
 
   describe('Voting full workflow', () => {
     let vid = null;
     it('Open new voting', async () => {
-      assert(await polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum?" Lorem | Ipsum | Dolor Sit' }));
+      const r = await polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum?" Lorem | Ipsum | Dolor Sit' });
+      assert.strictEqual(r[0].response, 'Poll by cheers opened for "Lorem Ipsum?"! You can vote by adding hashtag #voteX into bit message');
     });
-    it('Open another voting should fail', async () => {
-      assert(!(await polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum2?" Lorem2 | Ipsum2 | Dolor Sit2' })));
+    it('Open another voting should fail - will return current poll info', async () => {
+      const r = await polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum test?" Lorem | Ipsum | Dolor Sit' });
+      assert.strictEqual(r[0].response, 'Error! Poll by cheers was already opened for "Lorem Ipsum?"! You can vote by adding hashtag #voteX into bit message');
     });
     it('Voting should be correctly in db', async () => {
       const cVote = await getRepository(Poll).findOne({ isOpened: true });
@@ -60,11 +68,11 @@ describe('Polls - bits', () => {
       await time.waitMs(1000);
       await message.prepare();
 
-      await polls.main({ sender: owner, parameters: ''  });
-      await message.isSent('systems.polls.status', owner, { title: 'Lorem Ipsum?' });
-      await message.isSentRaw(`#vote1 - Lorem - 0 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner);
-      await message.isSentRaw(`#vote2 - Ipsum - 0 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner);
-      await message.isSentRaw(`#vote3 - Dolor Sit - 0 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner);
+      const r = await polls.main({ sender: owner, parameters: ''  });
+      assert.strictEqual(r[0].response, '$sender, current status of poll "Lorem Ipsum?":');
+      assert.strictEqual(r[1].response, `#vote1 - Lorem - 0 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`);
+      assert.strictEqual(r[2].response, `#vote2 - Ipsum - 0 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`);
+      assert.strictEqual(r[3].response, `#vote3 - Dolor Sit - 0 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`);
     });
     for (const o of [0,1,2,3,4]) {
       it(`User ${owner.username} will vote for option ${o} - should fail`, async () => {
@@ -104,30 +112,30 @@ describe('Polls - bits', () => {
       await time.waitMs(1000);
       await message.prepare();
 
-      await polls.main({ sender: owner, parameters: ''  });
-      await message.isSent('systems.polls.status', owner, { title: 'Lorem Ipsum?' });
-      await message.isSentRaw(`#vote1 - Lorem - 100 ${commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner);
-      await message.isSentRaw(`#vote2 - Ipsum - 100 ${commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner);
-      await message.isSentRaw(`#vote3 - Dolor Sit - 0 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner);
+      const r = await polls.main({ sender: owner, parameters: ''  });
+      assert.strictEqual(r[0].response, '$sender, current status of poll "Lorem Ipsum?":');
+      assert.strictEqual(r[1].response, `#vote1 - Lorem - 100 ${commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`);
+      assert.strictEqual(r[2].response, `#vote2 - Ipsum - 100 ${commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`);
+      assert.strictEqual(r[3].response, `#vote3 - Dolor Sit - 0 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`);
     });
 
     it('Close voting', async () => {
       await time.waitMs(1000);
       await message.prepare();
 
-      assert(await polls.close({ sender: owner }));
-      await message.isSent('systems.polls.status_closed', owner, { title: 'Lorem Ipsum?' });
-      await message.isSentRaw(`#vote1 - Lorem - 100 ${commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner);
-      await message.isSentRaw(`#vote2 - Ipsum - 100 ${commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner);
-      await message.isSentRaw(`#vote3 - Dolor Sit - 0 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner);
+      const r = await polls.close({ sender: owner });
+      assert.strictEqual(r[0].response, 'Poll "Lorem Ipsum?" closed, status of voting:');
+      assert.strictEqual(r[1].response, `#vote1 - Lorem - 100 ${commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`);
+      assert.strictEqual(r[2].response, `#vote2 - Ipsum - 100 ${commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`);
+      assert.strictEqual(r[3].response, `#vote3 - Dolor Sit - 0 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`);
     });
 
     it(`!vote should return not in progress info`, async () => {
       await time.waitMs(1000);
       await message.prepare();
 
-      await polls.main({ sender: owner, parameters: ''  });
-      await message.isSent('systems.polls.notInProgress', owner);
+      const r = await polls.main({ sender: owner, parameters: ''  });
+      assert.strictEqual(r[0].response, '$sender, there is currently no poll in progress!');
     });
 
     it(`!vote 1 should return not in progress info`, async () => {
@@ -135,8 +143,8 @@ describe('Polls - bits', () => {
       await message.prepare();
 
       const user = Math.random();
-      await polls.main({ sender: { username: user }, parameters: '1' });
-      await message.isSent('systems.polls.notInProgress', { username: user });
+      const r = await polls.main({ sender: { username: user }, parameters: '1' });
+      assert.strictEqual(r[0].response, '$sender, there is currently no poll in progress!');
     });
   });
 });

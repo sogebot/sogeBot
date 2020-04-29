@@ -27,6 +27,7 @@ const tests = [
 
 describe('Quotes - remove()', () => {
   for (const test of tests) {
+    let responses = [];
     describe(test.parameters, async () => {
       let id = null;
 
@@ -34,18 +35,18 @@ describe('Quotes - remove()', () => {
         await db.cleanup();
         await message.prepare();
         const quote = await quotes.add({ sender: test.sender, parameters: '-tags lorem ipsum -quote Lorem Ipsum', command: '!quote add' });
-        id = quote.id;
+        id = quote[0].id;
         if (test.id === 1) {
           test.id = id;
         }
       });
 
       it('Run !quote remove', async () => {
-        quotes.remove({ sender: test.sender, parameters: test.parameters.replace('$id', id), command: '!quote remove' });
+        responses = await quotes.remove({ sender: test.sender, parameters: test.parameters.replace('$id', id), command: '!quote remove' });
       });
       if (test.shouldFail) {
         it('Should throw error', async () => {
-          await message.isSent('systems.quotes.remove.error', owner, { command: '!quote remove' });
+          assert.strictEqual(responses[0].response, '$sender, quote ID is missing.');
         });
         it('Database should not be empty', async () => {
           const items = await getManager()
@@ -58,7 +59,7 @@ describe('Quotes - remove()', () => {
       } else {
         if (test.exist) {
           it('Should sent success message', async () => {
-            await message.isSent('systems.quotes.remove.ok', owner, { id: test.id });
+            assert.strictEqual(responses[0].response, `$sender, quote ${id} was successfully deleted.`)
           });
           it('Database should be empty', async () => {
             const items = await getManager()
@@ -70,7 +71,7 @@ describe('Quotes - remove()', () => {
           });
         } else {
           it('Should sent not-found message', async () => {
-            await message.isSent('systems.quotes.remove.not-found', owner, { id: test.id });
+            assert.strictEqual(responses[0].response, `$sender, quote ${test.id} was not found.`);
           });
           it('Database should not be empty', async () => {
             const items = await getManager()

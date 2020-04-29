@@ -40,12 +40,8 @@ describe('Points - give()', () => {
     });
 
     it('user1 send 50 points', async () => {
-      await points.give({ sender: user1, parameters: 'user2 50' });
-      await message.isSent('points.success.give', { username: user1.username }, {
-        amount: 50,
-        username: user2.username,
-        pointsName: await points.getPointsName(50),
-      });
+      const r = await points.give({ sender: user1, parameters: 'user2 50' });
+      assert.strictEqual(r[0].response, `$sender just gave his 50 points to @user2`);
     });
 
     it('user1 should have 50 points', async () => {
@@ -80,12 +76,8 @@ describe('Points - give()', () => {
     });
 
     it('user1 send 150 points', async () => {
-      await points.give({ sender: user1, parameters: 'user2 150' });
-      await message.isSent('points.failed.giveNotEnough', { username: user1.username }, {
-        amount: 150,
-        username: user2.username,
-        pointsName: await points.getPointsName(150),
-      });
+      const r = await points.give({ sender: user1, parameters: 'user2 150' });
+      assert.strictEqual(r[0].response, `Sorry, $sender, you don't have 150 points to give it to @user2`);
     });
 
     it('user1 should have 100 points', async () => {
@@ -120,12 +112,8 @@ describe('Points - give()', () => {
     });
 
     it('user1 send all points', async () => {
-      await points.give({ sender: user1, parameters: 'user2 all' });
-      await message.isSent('points.success.give', { username: user1.username }, {
-        amount: 100,
-        username: user2.username,
-        pointsName: await points.getPointsName(100),
-      });
+      const r = await points.give({ sender: user1, parameters: 'user2 all' });
+      assert.strictEqual(r[0].response, `$sender just gave his 100 points to @user2`);
     });
 
     it('user1 should have 0 points', async () => {
@@ -160,10 +148,8 @@ describe('Points - give()', () => {
     });
 
     it('user1 send wrong command', async () => {
-      await points.give({ sender: user1, parameters: 'user2', command: '!points give' });
-      await message.isSent('points.failed.give', { username: user1.username }, {
-        command: '!points give',
-      });
+      const r = await points.give({ sender: user1, parameters: 'user2', command: '!points give' });
+      assert.strictEqual(r[0].response, `Sorry, $sender, but this command is not correct, use !points give [username] [amount]`);
     });
 
     it('user1 should have 100 points', async () => {
@@ -198,10 +184,8 @@ describe('Points - give()', () => {
     });
 
     it('user1 send wrong string points', async () => {
-      await points.give({ sender: user1, parameters: 'user2 something', command: '!points give' });
-      await message.isSent('points.failed.give', { username: user1.username }, {
-        command: '!points give',
-      });
+      const r = await points.give({ sender: user1, parameters: 'user2 something', command: '!points give' });
+      assert.strictEqual(r[0].response, `Sorry, $sender, but this command is not correct, use !points give [username] [amount]`);
     });
 
     it('user1 should have 100 points', async () => {

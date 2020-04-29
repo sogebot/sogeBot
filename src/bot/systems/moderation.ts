@@ -8,7 +8,7 @@ import { permission } from '../helpers/permissions';
 import { command, default_permission, parser, permission_settings, settings } from '../decorators';
 import Message from '../message';
 import System from './_interface';
-import { getLocalizedName, prepare, sendMessage, timeout } from '../commons';
+import { getLocalizedName, parserReply, prepare, timeout } from '../commons';
 import { timeout as timeoutLog } from '../helpers/log';
 import { clusteredClientDelete } from '../cluster';
 import { adminEndpoint } from '../helpers/socket';
@@ -146,7 +146,7 @@ class Moderation extends System {
 
       if (this.cWarningsAnnounceTimeouts && !silent) {
         clusteredClientDelete(sender.id);
-        sendMessage('$sender, ' + warning, sender);
+        parserReply('$sender, ' + warning, { sender });
       }
     }
   }
@@ -207,7 +207,7 @@ class Moderation extends System {
 
   @command('!permit')
   @default_permission(permission.CASTERS)
-  async permitLink (opts) {
+  async permitLink (opts): Promise<CommandResponse[]> {
     try {
       const parsed = opts.parameters.match(/^@?([\S]+) ?(\d+)?$/);
       let count = 1;
@@ -220,10 +220,10 @@ class Moderation extends System {
         await getRepository(ModerationPermit).insert({ userId });
       }
 
-      const m = await prepare('moderation.user-have-link-permit', { username: parsed[1].toLowerCase(), link: getLocalizedName(count, 'core.links'), count: count });
-      sendMessage(m, opts.sender, opts.attr);
+      const response = prepare('moderation.user-have-link-permit', { username: parsed[1].toLowerCase(), link: getLocalizedName(count, 'core.links'), count: count });
+      return [{ response, ...opts }];
     } catch (e) {
-      sendMessage(translate('moderation.permit-parse-failed'), opts.sender, opts.attr);
+      return [{ response: translate('moderation.permit-parse-failed'), ...opts }];
     }
   }
 

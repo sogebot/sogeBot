@@ -3,7 +3,6 @@
 
 const assert = require('assert');
 require('../../general.js');
-const uuid = require('uuid/v4');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
@@ -33,19 +32,19 @@ describe('Timers - unset()', () => {
   });
 
   it('', async () => {
-    timers.unset({ sender: owner, parameters: '' });
-    await message.isSent('timers.name-must-be-defined', owner, { name: 'unknown', sender: owner.username });
+    const r = await timers.unset({ sender: owner, parameters: '' });
+    assert.strictEqual(r[0].response, '$sender, timer name must be defined.');
   });
   it('-name test', async () => {
-    timers.unset({ sender: owner, parameters: '-name test' });
-    await message.isSent('timers.timer-deleted', owner, { name: 'test', sender: owner.username });
+    const r = await timers.unset({ sender: owner, parameters: '-name test' });
+    assert.strictEqual(r[0].response, '$sender, timer test and its responses was deleted.');
 
     const item = await getRepository(Timer).findOne({ name: 'test' });
     assert(typeof item === 'undefined');
   });
   it('-name nonexistent', async () => {
-    timers.unset({ sender: owner, parameters: '-name nonexistent' });
-    await message.isSent('timers.timer-not-found', owner, { name: 'nonexistent', sender: owner.username });
+    const r = await timers.unset({ sender: owner, parameters: '-name nonexistent' });
+    assert.strictEqual(r[0].response, '$sender, timer (name: nonexistent) was not found in database. Check timers with !timers list');
 
     const item = await getRepository(Timer).findOne({ name: 'test' });
     assert.strictEqual(item.triggerEverySecond, 60);

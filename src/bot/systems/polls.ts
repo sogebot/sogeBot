@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { isMainThread } from '../cluster';
 
-import { getLocalizedName, getOwnerAsSender, prepare, sendMessage } from '../commons.js';
+import { announce, getLocalizedName, getOwnerAsSender, prepare } from '../commons.js';
 import { command, default_permission, helper, settings } from '../decorators';
 import { onBit, onMessage, onTip } from '../decorators/on';
 import Expects from '../expects.js';
@@ -13,7 +13,6 @@ import { adminEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
 import { Poll, PollVote } from '../database/entity/poll';
-import oauth from '../oauth';
 import { translate } from '../translate';
 import currency from '../currency';
 
@@ -47,7 +46,6 @@ class Polls extends System {
     super();
 
     if (isMainThread) {
-
       setInterval(() => this.reminder(), 1000);
     }
 
@@ -73,7 +71,9 @@ class Polls extends System {
         this.open({
           command: this.getCommand('!poll open'),
           parameters,
+          createdAt: 0,
           sender: getOwnerAsSender(),
+          attr: { skip: false, quiet: false },
         });
         cb(null, null);
       } catch (e) {
@@ -85,7 +85,9 @@ class Polls extends System {
         this.close({
           command: this.getCommand('!poll close'),
           parameters: '',
+          createdAt: 0,
           sender: getOwnerAsSender(),
+          attr: { skip: false, quiet: false },
         });
         cb(null);
       } catch (e) {
@@ -96,7 +98,8 @@ class Polls extends System {
 
   @command('!poll close')
   @default_permission(permission.MODERATORS)
-  public async close(opts: CommandOptions): Promise<boolean> {
+  public async close(opts: CommandOptions): Promise<CommandResponse[]> {
+    const responses: CommandResponse[] = [];
     const cVote = await getRepository(Poll).findOne({
       relations: ['votes'],
       where: { isOpened: true },
@@ -123,41 +126,41 @@ class Polls extends System {
           _total = _total + cVote.votes[i].votes;
         }
         // get vote status
-        sendMessage(prepare('systems.polls.status_closed', {
-          title: cVote.title,
-        }), opts.sender);
+        responses.push({
+          response: prepare('systems.polls.status_closed', {
+            title: cVote.title,
+          }), ...opts,
+        });
         for (const index of Object.keys(cVote.options)) {
-          setTimeout(() => {
-            const option = cVote.options[index];
-            const votesCount = count[index] || 0;
-            const percentage = Number((100 / _total) * votesCount || 0).toFixed(2);
-            if (cVote.type === 'normal') {
-              sendMessage(this.getCommand('!vote') + ` ${Number(index) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender, opts.attr);
-            } else if (cVote.type === 'tips') {
-              sendMessage(`#vote${Number(index) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender, opts.attr);
-            } else {
-              sendMessage(`#vote${Number(index) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender, opts.attr);
-            }
-          }, 300 * (Number(index) + 1));
+          const option = cVote.options[index];
+          const votesCount = count[index] || 0;
+          const percentage = Number((100 / _total) * votesCount || 0).toFixed(2);
+          if (cVote.type === 'normal') {
+            responses.push({ response: this.getCommand('!vote') + ` ${Number(index) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, ...opts });
+          } else if (cVote.type === 'tips') {
+            responses.push({ response: `#vote${Number(index) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, ...opts });
+          } else {
+            responses.push({ response: `#vote${Number(index) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, ...opts });
+          }
         }
       }
     } catch (e) {
       switch (e.message) {
         case String(ERROR.ALREADY_CLOSED):
-          sendMessage(translate('systems.polls.notInProgress'), opts.sender, opts.attr);
+          responses.push({ response: translate('systems.polls.notInProgress'), ...opts });
           break;
       }
-      return false;
     }
-    return true;
+    return responses;
   }
 
   @command('!poll open')
   @default_permission(permission.MODERATORS)
-  public async open(opts: CommandOptions): Promise<boolean> {
+  public async open(opts: CommandOptions): Promise<CommandResponse[]> {
     const cVote = await getRepository(Poll).findOne({ isOpened: true });
 
     try {
+      const responses: CommandResponse[] = [];
       if (cVote) {
         throw new Error(String(ERROR.ALREADY_OPENED));
       }
@@ -180,57 +183,58 @@ class Polls extends System {
       });
 
       const translations = `systems.polls.opened_${type}`;
-      sendMessage(prepare(translations, {
-        title,
-        command: this.getCommand('!vote'),
-      }), opts.sender);
+      responses.push({
+        response: prepare(translations, {
+          title,
+          command: this.getCommand('!vote'),
+        }), ...opts,
+      });
       for (const index of Object.keys(options)) {
-        setTimeout(() => {
-          if (type === 'normal') {
-            sendMessage(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${options[index]}`, opts.sender);
-          } else {
-            sendMessage(`#vote${(Number(index) + 1)} => ${options[index]}`, opts.sender, opts.attr);
-          }
-        }, 300 * (Number(index) + 1));
+        if (type === 'normal') {
+          responses.push({ response: this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${options[index]}`, ...opts });
+        } else {
+          responses.push({ response: `#vote${(Number(index) + 1)} => ${options[index]}`, ...opts });
+        }
       }
 
       this.lastTimeRemind = Date.now();
-      return true;
+      return responses;
     } catch (e) {
       switch (e.message) {
         case String(ERROR.NOT_ENOUGH_OPTIONS):
-          sendMessage(translate('voting.notEnoughOptions'), opts.sender, opts.attr);
+          return [{ response: translate('voting.notEnoughOptions'), ...opts }];
           break;
         case String(ERROR.ALREADY_OPENED):
           if (!cVote) {
-            return false;
+            return [];
           }
-          const translations = 'systems.polls.opened' + (cVote.type.length > 0 ? `_${cVote.type}` : '');
-          sendMessage(prepare(translations, {
-            title: cVote.title,
-            command: this.getCommand('!vote'),
-          }), opts.sender);
+          const translations = 'systems.polls.alreadyOpened' + (cVote.type.length > 0 ? `_${cVote.type}` : '');
+          const responses: CommandResponse[] = [];
+
+          responses.push({
+            response: prepare(translations, {
+              title: cVote.title,
+              command: this.getCommand('!vote'),
+            }), ...opts,
+          });
           for (const index of Object.keys(cVote.options)) {
-            setTimeout(() => {
-              if (cVote.type === 'normal') {
-                sendMessage(this.getCommand('!poll open') + ` ${index} => ${cVote.options[index]}`, opts.sender);
-              } else {
-                sendMessage(`#vote${(Number(index) + 1)} => ${cVote.options[index]}`, opts.sender, opts.attr);
-              }
-            }, 300 * (Number(index) + 1));
+            if (cVote.type === 'normal') {
+              responses.push({ response: this.getCommand('!poll open') + ` ${index} => ${cVote.options[index]}`, ...opts });
+            } else {
+              responses.push({ response: `#vote${(Number(index) + 1)} => ${cVote.options[index]}`, ...opts });
+            }
           }
-          break;
+          return responses;
         default:
           warning(e.stack);
-          sendMessage(translate('core.error'), opts.sender, opts.attr);
+          return [{ response: translate('core.error'), ...opts }];
       }
-      return false;
     }
   }
 
   @command('!vote')
   @helper()
-  public async main(opts: CommandOptions): Promise<void> {
+  public async main(opts: CommandOptions): Promise<CommandResponse[]> {
     const cVote = await getRepository(Poll).findOne({
       relations: ['votes'],
       where: { isOpened: true },
@@ -238,6 +242,7 @@ class Polls extends System {
     let index: number;
 
     try {
+      const responses: CommandResponse[] = [];
       if (opts.parameters.length === 0 && cVote) {
         const count = {};
         let _total = 0;
@@ -250,24 +255,23 @@ class Polls extends System {
           _total = _total + cVote.votes[i].votes;
         }
         // get vote status
-        sendMessage(prepare('systems.polls.status', {
-          title: cVote.title,
-        }), opts.sender);
+        responses.push({
+          response: prepare('systems.polls.status', {
+            title: cVote.title,
+          }), ...opts,
+        });
         for (const i of Object.keys(cVote.options)) {
-          setTimeout(() => {
-            const option = cVote.options[i];
-            const votesCount = count[i] || 0;
-            const percentage = Number((100 / _total) * votesCount || 0).toFixed(2);
-            if (cVote.type === 'normal') {
-              sendMessage(this.getCommand('!vote') + ` ${Number(i) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender, opts.attr);
-            } else if (cVote.type === 'tips') {
-              sendMessage(`#vote${Number(i) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender, opts.attr);
-            } else {
-              sendMessage(`#vote${Number(i) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender, opts.attr);
-            }
-          }, 100 * (Number(i) + 1));
+          const option = cVote.options[i];
+          const votesCount = count[i] || 0;
+          const percentage = Number((100 / _total) * votesCount || 0).toFixed(2);
+          if (cVote.type === 'normal') {
+            responses.push({ response: this.getCommand('!vote') + ` ${Number(i) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, ...opts });
+          } else if (cVote.type === 'tips') {
+            responses.push({ response: `#vote${Number(i) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, ...opts });
+          } else {
+            responses.push({ response: `#vote${Number(i) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, ...opts });
+          }
         }
-
       } else if (!cVote) {
         throw new Error(String(ERROR.NO_VOTING_IN_PROGRESS));
       } else if (cVote.type === 'normal') {
@@ -295,16 +299,14 @@ class Polls extends System {
       } else {
         throw new Error(String(ERROR.INVALID_VOTE_TYPE));
       }
+      return responses;
     } catch (e) {
       switch (e.message) {
         case String(ERROR.NO_VOTING_IN_PROGRESS):
-          sendMessage(prepare('systems.polls.notInProgress'), opts.sender, opts.attr);
-          break;
-        case String(ERROR.INVALID_VOTE):
-          // pass, we don't want to have error message
-          break;
+          return [{ response: prepare('systems.polls.notInProgress'), ...opts }];
       }
     }
+    return [];
   }
 
   @onBit()
@@ -390,38 +392,16 @@ class Polls extends System {
       this.lastTimeRemind = Date.now();
 
       const translations = `systems.polls.opened_${vote.type}`;
-      sendMessage(prepare(translations, {
+      announce(prepare(translations, {
         title: vote.title,
         command: this.getCommand('!vote'),
-      }), {
-        username: oauth.botUsername,
-        displayName: oauth.botUsername,
-        userId: Number(oauth.botId),
-        emotes: [],
-        badges: {},
-        'message-type': 'chat',
-      });
+      }));
       for (const index of Object.keys(vote.options)) {
         setTimeout(() => {
           if (vote.type === 'normal') {
-            sendMessage(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${vote.options[index]}`, {
-              username: oauth.botUsername,
-              displayName: oauth.botUsername,
-              userId: Number(oauth.botId),
-              emotes: [],
-              badges: {},
-              'message-type': 'chat',
-            });
+            announce(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${vote.options[index]}`);
           } else {
-            sendMessage(`#vote${(Number(index) + 1)} => ${vote.options[index]}`, {
-
-              username: oauth.botUsername,
-              displayName: oauth.botUsername,
-              userId: Number(oauth.botId),
-              emotes: [],
-              badges: {},
-              'message-type': 'chat',
-            });
+            announce(`#vote${(Number(index) + 1)} => ${vote.options[index]}`);
           }
         }, 300 * (Number(index) + 1));
       }

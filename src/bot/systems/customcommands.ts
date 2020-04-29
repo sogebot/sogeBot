@@ -8,10 +8,10 @@ import System from './_interface';
 import * as constants from '../constants';
 import { parser } from '../decorators';
 import Expects from '../expects';
-import { getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, message, prepare, sendMessage } from '../commons';
+import { isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, parserReply, prepare } from '../commons';
 import { getAllCountOfCommandUsage, getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage } from '../helpers/commands/count';
 
-import { chatOut, warning } from '../helpers/log';
+import { warning } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
 import { Commands, CommandsInterface, CommandsResponsesInterface } from '../database/entity/commands';
@@ -21,7 +21,6 @@ import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
 import api from '../api';
 import permissions from '../permissions';
 import { translate } from '../translate';
-import tmi from '../tmi';
 import ranks from './ranks';
 
 /*
@@ -100,7 +99,7 @@ class CustomCommands extends System {
   @default_permission(permission.CASTERS)
   @helper()
   main (opts: CommandOptions) {
-    sendMessage(translate('core.usage') + ': !command add (-p [uuid|name]) (-s=true|false) <!cmd> <response> | !command edit (-p [uuid|name]) (-s=true|false) <!cmd> <number> <response> | !command remove <!command> | !command remove <!command> <number> | !command list | !command list <!command>', opts.sender, opts.attr);
+    return [{ response: translate('core.usage') + ': !command add (-p [uuid|name]) (-s=true|false) <!cmd> <response> | !command edit (-p [uuid|name]) (-s=true|false) <!cmd> <number> <response> | !command remove <!command> | !command remove <!command> <number> | !command list | !command list <!command>', ...opts }];
   }
 
   @command('!command edit')
@@ -126,12 +125,12 @@ class CustomCommands extends System {
         },
       });
       if (!cDb) {
-        return sendMessage(prepare('customcmds.command-was-not-found', { command: cmd }), opts.sender, opts.attr);
+        return [{ response: prepare('customcmds.command-was-not-found', { command: cmd }), ...opts }];
       }
 
       const responseDb = cDb.responses.find(o => o.order === (rId - 1));
       if (!responseDb) {
-        return sendMessage(prepare('customcmds.response-was-not-found', { command: cmd, response: rId }), opts.sender, opts.attr);
+        return [{ response: prepare('customcmds.response-was-not-found', { command: cmd, response: rId }), ...opts }];
       }
 
       const pItem = await permissions.get(userlevel);
@@ -146,9 +145,9 @@ class CustomCommands extends System {
       }
 
       await getRepository(Commands).save(cDb);
-      sendMessage(prepare('customcmds.command-was-edited', { command: cmd, response }), opts.sender, opts.attr);
+      return [{ response: prepare('customcmds.command-was-edited', { command: cmd, response }), ...opts }];
     } catch (e) {
-      sendMessage(prepare('customcmds.commands-parse-failed'), opts.sender, opts.attr);
+      return [{ response: prepare('customcmds.commands-parse-failed'), ...opts }];
     }
   }
 
@@ -195,9 +194,9 @@ class CustomCommands extends System {
           filter: '',
         }],
       });
-      sendMessage(prepare('customcmds.command-was-added', { command: cmd }), opts.sender, opts.attr);
+      return [{ response: prepare('customcmds.command-was-added', { command: cmd }), ...opts }];
     } catch (e) {
-      sendMessage(prepare('customcmds.commands-parse-failed'), opts.sender, opts.attr);
+      return [{ response: prepare('customcmds.commands-parse-failed'), ...opts }];
     }
   }
 
@@ -227,7 +226,7 @@ class CustomCommands extends System {
   }
 
   @parser({ priority: constants.LOW })
-  async run (opts: ParserOptions) {
+  async run (opts: ParserOptions): Promise<boolean> {
     if (!opts.message.startsWith('!')) {
       return true;
     } // do nothing if it is not a command
@@ -248,9 +247,8 @@ class CustomCommands extends System {
       const _responses: CommandsResponsesInterface[] = [];
       // remove found command from message to get param
       const param = opts.message.replace(new RegExp('^(' + cmd.cmdArray.join(' ') + ')', 'i'), '').trim();
-      const count = await incrementCountOfCommandUsage(cmd.command.command);
+      await incrementCountOfCommandUsage(cmd.command.command);
       for (const r of _.orderBy(cmd.command.responses, 'order', 'asc')) {
-
         if (typeof getFromViewersCache(opts.sender.userId, r.permission) === 'undefined') {
           addToViewersCache(opts.sender.userId, r.permission, (await permissions.check(opts.sender.userId, r.permission, false)).access);
         }
@@ -264,19 +262,16 @@ class CustomCommands extends System {
           }
         }
       }
-      this.sendResponse(_.cloneDeep(_responses), { param, sender: opts.sender, command: cmd.command.command, count });
+      this.sendResponse(_.cloneDeep(_responses), { param, sender: opts.sender, command: cmd.command.command });
     }
     return atLeastOnePermissionOk;
   }
 
   sendResponse(responses, opts) {
     for (let i = 0; i < responses.length; i++) {
-      setTimeout(() => {
-        sendMessage(responses[i].response, opts.sender, {
-          param: opts.param,
-          cmd: opts.command,
-        });
-      }, i * 750);
+      setTimeout(async () => {
+        parserReply(responses[i].response, opts);
+      }, i * 500);
     }
   }
 
@@ -290,8 +285,8 @@ class CustomCommands extends System {
       const commands = await getRepository(Commands).find({
         where: { visible: true, enabled: true },
       });
-      const output = (commands.length === 0 ? translate('customcmds.list-is-empty') : translate('customcmds.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(commands, 'command'), 'command').join(', ')));
-      sendMessage(output, opts.sender, opts.attr);
+      const response = (commands.length === 0 ? translate('customcmds.list-is-empty') : translate('customcmds.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(commands, 'command'), 'command').join(', ')));
+      return [{ response, ...opts }];
     } else {
       // print responses
       const command_with_responses
@@ -301,65 +296,58 @@ class CustomCommands extends System {
         });
 
       if (!command_with_responses || command_with_responses.responses.length === 0) {
-        sendMessage(prepare('customcmdustomcmds.list-of-responses-is-empty', { command: cmd }), opts.sender, opts.attr);
-        return;
+        return [{ response: prepare('customcmdustomcmds.list-of-responses-is-empty', { command: cmd }), ...opts }];
       }
-      for (const r of _.orderBy(command_with_responses.responses, 'order', 'asc')) {
+      return Promise.all(_.orderBy(command_with_responses.responses, 'order', 'asc').map(async(r) => {
         const perm = await permissions.get(r.permission);
-        const response = await prepare('customcmds.response', { command: cmd, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: perm?.name ?? 'n/a' });
-        chatOut(`${response} [${opts.sender.username}]`);
-        message(tmi.sendWithMe ? 'me' : 'say', getOwner(), response);
-      }
+        const response = prepare('customcmds.response', { command: cmd, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: perm?.name ?? 'n/a' });
+        return { response, ...opts };
+      }));
     }
   }
 
   @command('!command toggle')
   @default_permission(permission.CASTERS)
-  async toggle (opts: CommandOptions) {
+  async toggle (opts: CommandOptions): Promise<CommandResponse[]> {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP) as unknown as { [x: string]: string } | null;
     if (_.isNil(match)) {
-      const response = await prepare('customcmds.commands-parse-failed');
-      sendMessage(response, opts.sender, opts.attr);
-      return false;
+      const response = prepare('customcmds.commands-parse-failed');
+      return [{ response, ...opts }];
     }
     const cmd = await getRepository(Commands).findOne({
       where: { command: match.command },
     });
     if (!cmd) {
-      const response = await prepare('customcmds.command-was-not-found', { command: match.command });
-      sendMessage(response, opts.sender, opts.attr);
-      return false;
+      const response = prepare('customcmds.command-was-not-found', { command: match.command });
+      return [{ response, ...opts }];
     }
     await getRepository(Commands).save({
       ...cmd,
       enabled: !cmd.enabled,
     });
-
-    sendMessage(await prepare(!cmd.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: cmd.command }), opts.sender, opts.attr);
+    return [{ response: prepare(!cmd.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: cmd.command }), ...opts }];
   }
 
   @command('!command toggle-visibility')
   @default_permission(permission.CASTERS)
-  async toggleVisibility (opts: CommandOptions) {
+  async toggleVisibility (opts: CommandOptions): Promise<CommandResponse[]> {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP) as unknown as { [x: string]: string } | null;
     if (_.isNil(match)) {
-      const response = await prepare('customcmds.commands-parse-failed');
-      sendMessage(response, opts.sender, opts.attr);
-      return false;
+      const response = prepare('customcmds.commands-parse-failed');
+      return [{ response, ...opts }];
     }
 
     const cmd = await getRepository(Commands).findOne({
       where: { command: match.command },
     });
     if (!cmd) {
-      const response = await prepare('customcmds.command-was-not-found', { command: match.command });
-      sendMessage(response, opts.sender, opts.attr);
-      return false;
+      const response = prepare('customcmds.command-was-not-found', { command: match.command });
+      return [{ response, ...opts }];
     }
     await getRepository(Commands).save({...cmd, visible: !cmd.visible});
 
-    const response = await prepare(!cmd.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: cmd.command });
-    sendMessage(response, opts.sender, opts.attr);
+    const response = prepare(!cmd.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: cmd.command });
+    return [{ response, ...opts }];
   }
 
   @command('!command remove')
@@ -372,13 +360,13 @@ class CustomCommands extends System {
         where: { command: cmd },
       });
       if (!command_db) {
-        sendMessage(prepare('customcmds.command-was-not-found', { command: cmd }), opts.sender, opts.attr);
+        return [{ response: prepare('customcmds.command-was-not-found', { command: cmd }), ...opts }];
       } else {
         await getRepository(Commands).remove(command_db);
-        sendMessage(prepare('customcmds.command-was-removed', { command: cmd }), opts.sender, opts.attr);
+        return [{ response: prepare('customcmds.command-was-removed', { command: cmd }), ...opts }];
       }
     } catch (e) {
-      return sendMessage(prepare('customcmds.commands-parse-failed'), opts.sender, opts.attr);
+      return [{ response: prepare('customcmds.commands-parse-failed'), ...opts }];
     }
   }
 

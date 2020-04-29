@@ -2,6 +2,7 @@
 require('../../general.js');
 
 const _ = require('lodash');
+const assert = require('assert');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
@@ -61,8 +62,8 @@ describe('Custom Commands - edit()', () => {
   describe('Expected parsed fail', () => {
     for (const t of parseFailedTests) {
       it(generateCommand(t), async () => {
-        customcommands.edit({ sender: owner, parameters: generateCommand(t) });
-        await message.isSent('customcmds.commands-parse-failed', owner, { sender: owner.username });
+        const r = await customcommands.edit({ sender: owner, parameters: generateCommand(t) });
+        assert.strictEqual(r[0].response, 'Sorry, $sender, but this command is not correct, use !commands');
       });
     }
   });
@@ -70,8 +71,8 @@ describe('Custom Commands - edit()', () => {
   describe('Expected command not found', () => {
     for (const t of unknownCommandTests) {
       it(generateCommand(t), async () => {
-        customcommands.edit({ sender: owner, parameters: generateCommand(t) });
-        await message.isSent('customcmds.command-was-not-found', owner, { command: t.command, sender: owner.username });
+        const r = await customcommands.edit({ sender: owner, parameters: generateCommand(t) });
+        assert.strictEqual(r[0].response, '$sender, command !cmd was not found in database');
       });
     }
   });
@@ -80,11 +81,11 @@ describe('Custom Commands - edit()', () => {
     for (const t of unknownResponseTests) {
       it(generateCommand(t), async () => {
         const add = _.cloneDeep(t); delete add.rid;
-        customcommands.add({ sender: owner, parameters: generateCommand(add) });
-        await message.isSent('customcmds.command-was-added', owner, { command: t.command, response: t.response, sender: owner.username });
+        const r = await customcommands.add({ sender: owner, parameters: generateCommand(t) });
+        assert.strictEqual(r[0].response, '$sender, command ' + t.command + ' was added');
 
-        customcommands.edit({ sender: owner, parameters: generateCommand(t) });
-        await message.isSent('customcmds.response-was-not-found', owner, { command: t.command, response: t.rid, sender: owner.username });
+        const r2 = await customcommands.edit({ sender: owner, parameters: generateCommand(t) });
+        assert.strictEqual(r2[0].response, '$sender, response #2 of command !cmd was not found in database');
       });
     }
   });
@@ -93,30 +94,30 @@ describe('Custom Commands - edit()', () => {
     for (const t of successTests) {
       it(generateCommand(t), async () => {
         const add = _.cloneDeep(t); delete add.rid;
-        customcommands.add({ sender: owner, parameters: generateCommand(add) });
-        await message.isSent('customcmds.command-was-added', owner, { command: t.command, response: t.response, sender: owner.username });
+        const r = await customcommands.add({ sender: owner, parameters: generateCommand(add) });
+        assert.strictEqual(r[0].response, '$sender, command ' + t.command + ' was added');
 
         customcommands.run({ sender: owner, message: t.command });
         await message.isSentRaw(t.response, owner);
 
         const edit = _.cloneDeep(t);
         edit.response = edit.edit;
-        customcommands.edit({ sender: owner, parameters: generateCommand(edit) });
-        await message.isSent('customcmds.command-was-edited', owner, { command: t.command, response: t.edit, sender: owner.username });
+        const r2 = await customcommands.edit({ sender: owner, parameters: generateCommand(edit) });
+        assert.strictEqual(r2[0].response, '$sender, command ' + t.command + ' is changed to \'' + t.edit + '\'');
 
         customcommands.run({ sender: owner, message: t.command });
         await message.isSentRaw(t.edit, owner);
       });
     }
     it('!a Lorem Ipsum -> !a Ipsum Lorem', async () => {
-      customcommands.add({ sender: owner, parameters: '-c !a -r Lorem Ipsum' });
-      await message.isSent('customcmds.command-was-added', owner, { command: '!a', response: 'Lorem Ipsum', sender: owner.username });
+      const r = await customcommands.add({ sender: owner, parameters: '-c !a -r Lorem Ipsum' });
+      assert.strictEqual(r[0].response, '$sender, command !a was added');
 
       customcommands.run({ sender: owner, message: '!a' });
       await message.isSentRaw('Lorem Ipsum', owner);
 
-      customcommands.edit({ sender: owner, parameters: '-c !a -rid 1 -r Ipsum Lorem' });
-      await message.isSent('customcmds.command-was-edited', owner, { command: '!a', response: 'Ipsum Lorem', sender: owner.username });
+      const r2 = await customcommands.edit({ sender: owner, parameters: '-c !a -rid 1 -r Ipsum Lorem' });
+      assert.strictEqual(r2[0].response, `$sender, command !a is changed to 'Ipsum Lorem'`);
 
       customcommands.run({ sender: owner, message: '!a' });
       await message.isSentRaw('Ipsum Lorem', owner);

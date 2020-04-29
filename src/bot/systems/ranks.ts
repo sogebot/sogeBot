@@ -2,7 +2,7 @@
 
 import * as _ from 'lodash';
 
-import { getLocalizedName, prepare, sendMessage } from '../commons';
+import { getLocalizedName, prepare } from '../commons';
 import { command, default_permission } from '../decorators';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
@@ -74,13 +74,12 @@ class Ranks extends System {
 
   @command('!rank add')
   @default_permission(permission.CASTERS)
-  async add (opts, type: RankInterface['type'] = 'viewer') {
+  async add (opts, type: RankInterface['type'] = 'viewer'): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^(\d+) ([\S].+)$/);
 
     if (_.isNil(parsed)) {
-      const message = await prepare('ranks.rank-parse-failed');
-      sendMessage(message, opts.sender, opts.attr);
-      return false;
+      const response = prepare('ranks.rank-parse-failed');
+      return [{ response, ...opts }];
     }
 
 
@@ -92,37 +91,36 @@ class Ranks extends System {
       });
     }
 
-    const message = await prepare(!rank ? 'ranks.rank-was-added' : 'ranks.rank-already-exist',
+    const response = prepare(!rank ? 'ranks.rank-was-added' : 'ranks.rank-already-exist',
       {
         rank: parsed[2],
         hours: value,
         type,
         hlocale: getLocalizedName(value, type === 'viewer' ? 'core.hours' : 'core.months'),
       });
-    sendMessage(message, opts.sender, opts.attr);
+    return [{ response, ...opts }];
   }
 
   @command('!rank add-flw')
   @default_permission(permission.CASTERS)
-  async addflw (opts) {
-    this.add(opts, 'follower');
+  async addflw (opts): Promise<CommandResponse[]> {
+    return this.add(opts, 'follower');
   }
 
   @command('!rank add-sub')
   @default_permission(permission.CASTERS)
-  async addsub (opts) {
-    this.add(opts, 'subscriber');
+  async addsub (opts): Promise<CommandResponse[]> {
+    return this.add(opts, 'subscriber');
   }
 
   @command('!rank edit')
   @default_permission(permission.CASTERS)
-  async edit (opts, type: RankInterface['type'] = 'viewer') {
+  async edit (opts, type: RankInterface['type'] = 'viewer'): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^(\d+) ([\S].+)$/);
 
     if (_.isNil(parsed)) {
-      const message = await prepare('ranks.rank-parse-failed');
-      sendMessage(message, opts.sender, opts.attr);
-      return false;
+      const response = prepare('ranks.rank-parse-failed');
+      return [{ response, ...opts }];
     }
 
     const value = parsed[1];
@@ -130,144 +128,139 @@ class Ranks extends System {
 
     const item = await getRepository(Rank).findOne({ value: parseInt(value, 10), type });
     if (!item) {
-      const message = await prepare('ranks.rank-was-not-found', { value: value });
-      sendMessage(message, opts.sender, opts.attr);
-      return false;
+      const response = prepare('ranks.rank-was-not-found', { value: value });
+      return [{ response, ...opts }];
     }
 
     await getRepository(Rank).save({
       ...item, rank,
     });
-    const message = await prepare('ranks.rank-was-edited',
+    const response = prepare('ranks.rank-was-edited',
       {
         hours: parseInt(value, 10),
         rank,
         type,
         hlocale: getLocalizedName(value, type === 'viewer' ? 'core.hours' : 'core.months'),
       });
-    sendMessage(message, opts.sender, opts.attr);
+    return [{ response, ...opts }];
   }
 
   @command('!rank edit-flw')
   @default_permission(permission.CASTERS)
   async editflw (opts) {
-    this.edit(opts, 'follower');
+    return this.edit(opts, 'follower');
   }
 
   @command('!rank edit-sub')
   @default_permission(permission.CASTERS)
   async editsub (opts) {
-    this.edit(opts, 'subscriber');
+    return this.edit(opts, 'subscriber');
   }
 
   @command('!rank set')
   @default_permission(permission.CASTERS)
-  async set (opts) {
+  async set (opts): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^([\S]+) ([\S ]+)$/);
 
     if (_.isNil(parsed)) {
-      const message = await prepare('ranks.rank-parse-failed');
-      sendMessage(message, opts.sender, opts.attr);
-      return false;
+      const response = prepare('ranks.rank-parse-failed');
+      return [{ response, ...opts }];
     }
 
     await getRepository(User).update({ userId: parsed[1] }, { haveCustomRank: true, rank: parsed[2].trim() });
-    const message = await prepare('ranks.custom-rank-was-set-to-user', { rank: parsed[2].trim(), username: parsed[1] });
-    sendMessage(message, opts.sender, opts.attr);
+    const response = prepare('ranks.custom-rank-was-set-to-user', { rank: parsed[2].trim(), username: parsed[1] });
+    return [{ response, ...opts }];
   }
 
   @command('!rank unset')
   @default_permission(permission.CASTERS)
-  async unset (opts) {
+  async unset (opts): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^([\S]+)$/);
 
     if (_.isNil(parsed)) {
-      const message = await prepare('ranks.rank-parse-failed');
-      sendMessage(message, opts.sender, opts.attr);
-      return false;
+      const response = prepare('ranks.rank-parse-failed');
+      return [{ response, ...opts }];
     }
 
     await getRepository(User).update({ userId: parsed[1] }, { haveCustomRank: false, rank: '' });
-    const message = await prepare('ranks.custom-rank-was-unset-for-user', { username: parsed[1] });
-    sendMessage(message, opts.sender, opts.attr);
+    const response = prepare('ranks.custom-rank-was-unset-for-user', { username: parsed[1] });
+    return [{ response, ...opts }];
   }
 
   @command('!rank help')
   @default_permission(permission.CASTERS)
-  help (opts) {
+  help (opts): CommandResponse[] {
     let url = 'http://sogehige.github.io/sogeBot/#/commands/ranks';
     if ((process.env?.npm_package_version ?? 'x.y.z-SNAPSHOT').includes('SNAPSHOT')) {
       url = 'http://sogehige.github.io/sogeBot/#/_master/commands/ranks';
     }
-    sendMessage(translate('core.usage') + ' => ' + url, opts.sender);
+    return [{ response: translate('core.usage') + ' => ' + url, ...opts }];
   }
 
   @command('!rank list')
   @default_permission(permission.CASTERS)
-  async list (opts, type: RankInterface['type'] = 'viewer') {
+  async list (opts, type: RankInterface['type'] = 'viewer'): Promise<CommandResponse[]> {
     const ranks = await getRepository(Rank).find({ type });
-    const output = await prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', { list: _.map(_.orderBy(ranks, 'value', 'asc'), function (l) {
+    const response = prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', { list: _.map(_.orderBy(ranks, 'value', 'asc'), function (l) {
       return l.value + 'h - ' + l.rank;
     }).join(', ') });
-    sendMessage(output, opts.sender, opts.attr);
+    return [{ response, ...opts }];
   }
 
   @command('!rank list-flw')
   @default_permission(permission.CASTERS)
   async listflw (opts) {
-    this.list(opts, 'follower');
+    return this.list(opts, 'follower');
   }
 
   @command('!rank list-sub')
   @default_permission(permission.CASTERS)
   async listsub (opts) {
-    this.list(opts, 'subscriber');
+    return this.list(opts, 'subscriber');
   }
 
   @command('!rank rm')
   @default_permission(permission.CASTERS)
-  async rm (opts, type: RankInterface['type'] = 'viewer') {
+  async rm (opts, type: RankInterface['type'] = 'viewer'): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^(\d+)$/);
     if (_.isNil(parsed)) {
-      const message = await prepare('ranks.rank-parse-failed');
-      sendMessage(message, opts.sender, opts.attr);
-      return false;
+      const response = prepare('ranks.rank-parse-failed');
+      return [{ response, ...opts }];
     }
 
     const value = parseInt(parsed[1], 10);
     const removed = await getRepository(Rank).delete({ value, type });
 
-    const message = await prepare(removed ? 'ranks.rank-was-removed' : 'ranks.rank-was-not-found',
+    const response = prepare(removed ? 'ranks.rank-was-removed' : 'ranks.rank-was-not-found',
       {
         hours: value,
         type,
         hlocale: getLocalizedName(value, type === 'viewer' ? 'core.hours' : 'core.months'),
       });
-    sendMessage(message, opts.sender, opts.attr);
+    return [{ response, ...opts }];
   }
 
   @command('!rank rm-flw')
   @default_permission(permission.CASTERS)
   async rmflw (opts) {
-    this.rm(opts, 'follower');
+    return this.rm(opts, 'follower');
   }
 
   @command('!rank rm-sub')
   @default_permission(permission.CASTERS)
   async rmsub (opts) {
-    this.rm(opts, 'subscriber');
+    return this.rm(opts, 'subscriber');
   }
 
   @command('!rank')
-  async main (opts) {
+  async main (opts): Promise<CommandResponse[]> {
     const user = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
     const watched = await users.getWatchedOf(opts.sender.userId);
     const rank = await this.get(user);
 
     if (_.isNil(rank.current)) {
-      const message = await prepare('ranks.user-dont-have-rank');
-      sendMessage(message, opts.sender, opts.attr);
-      return true;
+      const response = prepare('ranks.user-dont-have-rank');
+      return [{ response, ...opts }];
     }
 
     if (!_.isNil(rank.next) && typeof rank.current === 'object') {
@@ -276,31 +269,29 @@ class Ranks extends System {
         const toNextRankWatched = watched / 1000 / 60 / 60 - (rank.current.type === 'viewer' ? rank.current.value : 0);
         const toWatch = (toNextRank - toNextRankWatched);
         const percentage = 100 - (((toWatch) / toNextRank) * 100);
-        const message = await prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), 'core.hours')})` });
-        sendMessage(message, opts.sender, opts.attr);
+        const response = prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), 'core.hours')})` });
+        return [{ response, ...opts }];
       }
       if (rank.next.type === 'follower') {
         const toNextRank = rank.next.value - (rank.current.type === 'follower' ? rank.current.value : 0);
         const toNextRankFollow = moment(Date.now()).diff(moment(user?.followedAt || 0), 'months', true);
         const toWatch = (toNextRank - toNextRankFollow);
         const percentage = 100 - (((toWatch) / toNextRank) * 100);
-        const message = await prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), 'core.months')})` });
-        sendMessage(message, opts.sender, opts.attr);
+        const response = prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), 'core.months')})` });
+        return [{ response, ...opts }];
       }
       if (rank.next.type === 'subscriber') {
         const toNextRank = rank.next.value - (rank.current.type === 'subscriber' ? rank.current.value : 0);
         const toNextRankSub = (user?.subscribeCumulativeMonths || 0) - (rank.current.type === 'subscriber' ? rank.current.value : 0);
         const toWatch = (toNextRank - toNextRankSub);
         const percentage = 100 - (((toWatch) / toNextRank) * 100);
-        const message = await prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), 'core.months')})` });
-        sendMessage(message, opts.sender, opts.attr);
+        const response = prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), 'core.months')})` });
+        return [{ response, ...opts }];
       }
-      return true;
     }
 
-    const message = await prepare('ranks.show-rank-without-next-rank', { rank: typeof rank.current === 'string' ? rank.current : rank.current.rank });
-    sendMessage(message, opts.sender, opts.attr);
-    return true;
+    const response = prepare('ranks.show-rank-without-next-rank', { rank: typeof rank.current === 'string' ? rank.current : rank.current.rank });
+    return [{ response, ...opts }];
   }
 
   async get (user: Required<UserInterface> | undefined): Promise<{current: null | string | Required<RankInterface>; next: null | Required<RankInterface>}> {

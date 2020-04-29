@@ -26,27 +26,27 @@ describe('Cooldowns - toggleModerators()', () => {
 
   it('incorrect toggle', async () => {
     const [command, type, seconds, quiet] = ['!me', 'user', '60', true];
-    cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
-    await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
+    const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+    const r2 = await cooldown.toggleModerators({ sender: owner, parameters: command });
 
-    cooldown.toggleModerators({ sender: owner, parameters: command });
-    await message.isSent('cooldowns.cooldown-parse-failed', owner, { sender: owner.username });
+    assert.strictEqual(r[0].response, '$sender, user cooldown for !me was set to 60s');
+    assert.strictEqual(r2[0].response, 'Sorry, $sender, but this command is not correct, use !cooldown [keyword|!command] [global|user] [seconds] [true/false]');
   });
 
   it('correct toggle', async () => {
     const [command, type, seconds, quiet] = ['!me', 'user', '60', true];
-    cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
-    await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
+    const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+    assert.strictEqual(r[0].response, '$sender, user cooldown for !me was set to 60s');
 
-    cooldown.toggleModerators({ sender: owner, parameters: `${command} ${type}` });
-    await message.isSent('cooldowns.cooldown-was-enabled-for-moderators', owner, { command: command, sender: owner.username });
+    const r2 = await cooldown.toggleModerators({ sender: owner, parameters: `${command} ${type}` });
+    assert.strictEqual(r2[0].response, '$sender, cooldown for !me was enabled for moderators');
 
     let isOk = await cooldown.check({ sender: mod, message: '!me' });
     assert(isOk);
     isOk = await cooldown.check({ sender: mod, message: '!me' });
     assert(!isOk);
 
-    cooldown.toggleModerators({ sender: owner, parameters: `${command} ${type}` });
-    await message.isSent('cooldowns.cooldown-was-disabled-for-moderators', owner, { command: command, sender: owner.username });
+    const r3 = await cooldown.toggleModerators({ sender: owner, parameters: `${command} ${type}` });
+    assert.strictEqual(r3[0].response, '$sender, cooldown for !me was disabled for moderators');
   });
 });

@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import XRegExp from 'xregexp';
 
-import { isOwner, prepare, sendMessage } from '../commons';
+import { isOwner, parserReply, prepare } from '../commons';
 import * as constants from '../constants';
 import { command, default_permission, parser, rollback, settings } from '../decorators';
 import Expects from '../expects';
@@ -81,13 +81,11 @@ class Cooldown extends System {
 
   @command('!cooldown')
   @default_permission(permission.CASTERS)
-  async main (opts: Record<string, any>) {
+  async main (opts: CommandOptions) {
     const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP_SET) as unknown as { [x: string]: string } | null;
 
     if (_.isNil(match)) {
-      const message = await prepare('cooldowns.cooldown-parse-failed');
-      sendMessage(message, opts.sender, opts.attr);
-      return false;
+      return [{ response: prepare('cooldowns.cooldown-parse-failed'), ...opts }];
     }
 
     const cooldown = await getRepository(CooldownEntity).findOne({
@@ -100,9 +98,7 @@ class Cooldown extends System {
       if (cooldown) {
         await getRepository(CooldownEntity).remove(cooldown);
       }
-      const message = await prepare('cooldowns.cooldown-was-unset', { type: match.type, command: match.command });
-      sendMessage(message, opts.sender, opts.attr);
-      return;
+      return [{ response: prepare('cooldowns.cooldown-was-unset', { type: match.type, command: match.command }), ...opts }];
     }
 
     await getRepository(CooldownEntity).save({
@@ -119,13 +115,11 @@ class Cooldown extends System {
       isSubscriberAffected: true,
       isFollowerAffected: true,
     });
-
-    const message = await prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command });
-    sendMessage(message, opts.sender, opts.attr);
+    return [{ response: prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command }), ...opts }];
   }
 
   @parser({ priority: constants.HIGH })
-  async check (opts: Record<string, any>) {
+  async check (opts: ParserOptions): Promise<boolean> {
     try {
       let data: CooldownInterface[];
       let viewer: CooldownViewerInterface | undefined;
@@ -238,13 +232,13 @@ class Cooldown extends System {
         } else {
           if (!cooldown.isErrorMsgQuiet && this.cooldownNotifyAsWhisper) {
             opts.sender['message-type'] = 'whisper'; // we want to whisp cooldown message
-            const message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
-            await sendMessage(message, opts.sender, opts.attr);
+            const response = prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
+            parserReply(response, opts);
           }
           if (!cooldown.isErrorMsgQuiet && this.cooldownNotifyAsChat) {
             opts.sender['message-type'] = 'chat';
-            const message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
-            await sendMessage(message, opts.sender, opts.attr);
+            const response = prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
+            parserReply(response, opts);
           }
           debug('cooldown.check', `${opts.sender.username}#${opts.sender.userId} have ${cooldown.name} on cooldown, remaining ${Math.ceil((cooldown.miliseconds - now + timestamp) / 1000)}s`);
           result = false;
@@ -258,7 +252,7 @@ class Cooldown extends System {
   }
 
   @rollback()
-  async cooldownRollback (opts: Record<string, any>) {
+  async cooldownRollback (opts: ParserOptions): Promise<boolean> {
     // TODO: redundant duplicated code (search of cooldown), should be unified for check and cooldownRollback
     let data: CooldownInterface[];
 
@@ -350,15 +344,14 @@ class Cooldown extends System {
       // rollback to lastTimestamp
       await getRepository(CooldownEntity).save(cooldown);
     }
+    return true;
   }
 
-  async toggle (opts: Record<string, any>, type: string) {
+  async toggle (opts: CommandOptions, type: string) {
     const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP) as unknown as { [x: string]: string } | null;
 
     if (_.isNil(match)) {
-      const message = await prepare('cooldowns.cooldown-parse-failed');
-      sendMessage(message, opts.sender, opts.attr);
-      return false;
+      return [{ response: prepare('cooldowns.cooldown-parse-failed'), ...opts }];
     }
 
     const cooldown = await getRepository(CooldownEntity).findOne({
@@ -369,9 +362,7 @@ class Cooldown extends System {
       },
     });
     if (!cooldown) {
-      const message = await prepare('cooldowns.cooldown-not-found', { command: match.command });
-      sendMessage(message, opts.sender, opts.attr);
-      return false;
+      return [{ response: prepare('cooldowns.cooldown-not-found', { command: match.command }), ...opts }];
     }
 
     if (type === 'type') {
@@ -405,45 +396,44 @@ class Cooldown extends System {
       return;
     } // those two are setable only from dashboard
 
-    const message = await prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.name });
-    sendMessage(message, opts.sender, opts.attr);
+    return [{ response: prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.name }), ...opts }];
   }
 
   @command('!cooldown toggle enabled')
   @default_permission(permission.CASTERS)
-  async toggleEnabled (opts: Record<string, any>) {
-    await this.toggle(opts, 'isEnabled');
+  async toggleEnabled (opts: CommandOptions) {
+    return this.toggle(opts, 'isEnabled');
   }
 
   @command('!cooldown toggle moderators')
   @default_permission(permission.CASTERS)
-  async toggleModerators (opts: Record<string, any>) {
-    await this.toggle(opts, 'isModeratorAffected');
+  async toggleModerators (opts: CommandOptions) {
+    return this.toggle(opts, 'isModeratorAffected');
   }
 
   @command('!cooldown toggle owners')
   @default_permission(permission.CASTERS)
-  async toggleOwners (opts: Record<string, any>) {
-    await this.toggle(opts, 'isOwnerAffected');
+  async toggleOwners (opts: CommandOptions) {
+    return this.toggle(opts, 'isOwnerAffected');
   }
 
   @command('!cooldown toggle subscribers')
   @default_permission(permission.CASTERS)
-  async toggleSubscribers (opts: Record<string, any>) {
-    await this.toggle(opts, 'isSubscriberAffected');
+  async toggleSubscribers (opts: CommandOptions) {
+    return this.toggle(opts, 'isSubscriberAffected');
   }
 
   @command('!cooldown toggle followers')
   @default_permission(permission.CASTERS)
-  async toggleFollowers (opts: Record<string, any>) {
-    await this.toggle(opts, 'isFollowerAffected');
+  async toggleFollowers (opts: CommandOptions) {
+    return this.toggle(opts, 'isFollowerAffected');
   }
 
-  async toggleNotify (opts: Record<string, any>) {
-    await this.toggle(opts, 'isErrorMsgQuiet');
+  async toggleNotify (opts: CommandOptions) {
+    return this.toggle(opts, 'isErrorMsgQuiet');
   }
-  async toggleType (opts: Record<string, any>) {
-    await this.toggle(opts, 'type');
+  async toggleType (opts: CommandOptions) {
+    return this.toggle(opts, 'type');
   }
 }
 

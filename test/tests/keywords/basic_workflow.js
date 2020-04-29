@@ -8,6 +8,7 @@ const assert = require('assert');
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
+const { Keyword } = require('../../../dest/database/entity/keyword');
 
 const keywords = (require('../../../dest/systems/keywords')).default;
 
@@ -106,8 +107,8 @@ describe('Keywords - basic worflow (add, run, edit)', () => {
     });
     for (const t of failedTests) {
       it(generateCommand(t), async () => {
-        keywords.add({ sender: owner, parameters: generateCommand(t) });
-        await message.isSent('keywords.keyword-parse-failed', owner, { sender: owner.username });
+        const r = await keywords.add({ sender: owner, parameters: generateCommand(t) });
+        assert.strictEqual(r[0].response, 'Sorry, $sender, but this command is not correct, use !keyword');
       });
     }
   });
@@ -126,31 +127,33 @@ describe('Keywords - basic worflow (add, run, edit)', () => {
           switch (t.type) {
             case 'add':
               it ('add()', async () => {
-                const k = await keywords.add({ sender: owner, parameters: generateCommand(test) });
-                assert.notStrictEqual(k, null, 'Keywords was not correctly created');
-                await message.isSent('keywords.keyword-was-added', owner, { id: k.id, keyword: test.keyword, response: test.response, sender: owner.username });
+                const r = await keywords.add({ sender: owner, parameters: generateCommand(test) });
+                const k = await getRepository(Keyword).findOne({ keyword: test.keyword });
+                assert.strictEqual(r[0].response, `$sender, keyword ${test.keyword} (${k.id}) was added`);
               });
               break;
             case 'toggle':
               it ('toggle()', async () => {
-                const k = await keywords.toggle({ sender: owner, parameters: generateCommand(test) });
-                assert.strictEqual(k, true, 'Keywords was not correctly toggled');
-                await message.isSent(['keywords.keyword-was-disabled', 'keywords.keyword-was-enabled'], owner, { id: k.id, keyword: test.keyword, response: test.response, sender: owner.username });
+                const k = await getRepository(Keyword).findOne({ keyword: test.keyword });
+                const r = await keywords.toggle({ sender: owner, parameters: generateCommand(test) });
+                if (k.enabled) {
+                  assert.strictEqual(r[0].response, `$sender, keyword ${test.keyword} was disabled`);
+                } else {
+                  assert.strictEqual(r[0].response, `$sender, keyword ${test.keyword} was enabled`);
+                }
               });
               break;
             case 'remove':
               it ('remove()', async () => {
-                const k = await keywords.remove({ sender: owner, parameters: generateCommand(test) });
-                assert.strictEqual(k, true, 'Keywords was not correctly removed');
-                await message.isSent(['keywords.keyword-was-removed'], owner, { id: k.id, keyword: test.keyword, response: test.response, sender: owner.username });
+                const r = await keywords.remove({ sender: owner, parameters: generateCommand(test) });
+                assert.strictEqual(r[0].response, `$sender, keyword ${test.keyword} was removed`);
               });
               break;
             case 'edit':
               it (`edit() | ${test.response} => ${test.editResponse}`, async () => {
                 test.response = test.editResponse;
-                const k = await keywords.edit({ sender: owner, parameters: generateCommand({...test, ...t}) });
-                assert.notStrictEqual(k, null, 'Keywords was not correctly edited');
-                await message.isSent('keywords.keyword-was-edited', owner, { id: k.id, keyword: test.keyword, response: test.response, sender: owner.username });
+                const r = await keywords.edit({ sender: owner, parameters: generateCommand({...test, ...t}) });
+                assert.strictEqual(r[0].response, `$sender, keyword ${test.keyword} is changed to '${test.response}'`);
               });
               break;
             case 'run':

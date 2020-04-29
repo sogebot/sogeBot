@@ -1,5 +1,6 @@
 /* global describe it beforeEach */
 require('../../general.js');
+const assert = require('assert');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
@@ -37,39 +38,39 @@ describe('Timers - toggle()', () => {
   });
 
   it('', async () => {
-    timers.toggle({ sender: owner, parameters: '' });
-    await message.isSent('timers.id-or-name-must-be-defined', owner, { sender: owner.username });
+    const r = await timers.toggle({ sender: owner, parameters: '' });
+    assert.strictEqual(r[0].response, '$sender, response id or timer name must be defined.');
   });
 
   it('-id something -name something', async () => {
-    timers.toggle({ sender: owner, parameters: '-id something -name something' });
-    await message.isSent('timers.timer-not-found', owner, { name: 'something', sender: owner.username });
+    const r = await timers.toggle({ sender: owner, parameters: '-id something -name something' });
+    assert.strictEqual(r[0].response, '$sender, timer (name: something) was not found in database. Check timers with !timers list');
   });
 
   it('-id unknown', async () => {
-    timers.toggle({ sender: owner, parameters: '-id unknown' });
-    await message.isSent('timers.id-or-name-must-be-defined', owner, { sender: owner.username });
+    const r = await timers.toggle({ sender: owner, parameters: '-id unknown' });
+    assert.strictEqual(r[0].response, '$sender, response id or timer name must be defined.');
   });
 
   it('-id response_id', async () => {
     const response = await getRepository(TimerResponse).findOne({ response: 'Lorem Ipsum' });
-    timers.toggle({ sender: owner, parameters: '-id ' + response.id });
-    await message.isSent('timers.response-disabled', owner, { id: response.id, sender: owner.username });
+    const r1 = await timers.toggle({ sender: owner, parameters: '-id ' + response.id });
+    assert.strictEqual(r1[0].response, `$sender, response (id: ${response.id}) was disabled`);
 
-    timers.toggle({ sender: owner, parameters: '-id ' + response.id });
-    await message.isSent('timers.response-enabled', owner, { id: response.id, sender: owner.username });
+    const r2 = await timers.toggle({ sender: owner, parameters: '-id ' + response.id });
+    assert.strictEqual(r2[0].response, `$sender, response (id: ${response.id}) was enabled`);
   });
 
   it('-name unknown', async () => {
-    timers.toggle({ sender: owner, parameters: '-name unknown' });
-    await message.isSent('timers.timer-not-found', owner, { name: 'unknown', sender: owner.username });
+    const r = await timers.toggle({ sender: owner, parameters: '-name unknown' });
+    assert.strictEqual(r[0].response, '$sender, timer (name: unknown) was not found in database. Check timers with !timers list');
   });
 
   it('-name test', async () => {
-    timers.toggle({ sender: owner, parameters: '-name test' });
-    await message.isSent('timers.timer-disabled', owner, { name: 'test', sender: owner.username });
+    const r1 = await timers.toggle({ sender: owner, parameters: '-name test' });
+    assert.strictEqual(r1[0].response, '$sender, timer (name: test) was disabled');
 
-    timers.toggle({ sender: owner, parameters: '-name test' });
-    await message.isSent('timers.timer-enabled', owner, { name: 'test', sender: owner.username });
+    const r2 = await timers.toggle({ sender: owner, parameters: '-name test' });
+    assert.strictEqual(r2[0].response, '$sender, timer (name: test) was enabled');
   });
 });

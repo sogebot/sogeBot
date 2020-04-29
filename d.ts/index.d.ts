@@ -1,5 +1,8 @@
 type UserStateTags = import('twitch-js').UserStateTags;
 
+type DiscordJsTextChannel = import('discord.js').TextChannel;
+type DiscordJsUser = import('discord.js').User;
+
 interface Command {
   name: string;
   command?: string;
@@ -139,18 +142,28 @@ interface UIHighlightsUrlGenerator {
   if?: () => boolean;
 }
 
+interface CommandResponse {
+  response: string | Promise<string>;
+  sender: CommandOptions['sender'];
+  attr: CommandOptions['attr'];
+}
+
 interface CommandOptions {
-  sender: UserStateTags;
+  sender: UserStateTags & { userId: number } & {
+    discord?: { author: DiscordJsUser; channel: DiscordJsTextChannel };
+  };
   command: string;
   parameters: string;
-  attr?: {
+  createdAt: number;
+  attr: {
     skip?: boolean;
     quiet?: boolean;
+    [attr: string]: any;
   };
 }
 
 interface ParserOptions {
-  sender: UserStateTags;
+  sender: CommandOptions['sender'];
   parameters: string;
   message: string;
   skip: boolean;

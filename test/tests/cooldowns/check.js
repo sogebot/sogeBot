@@ -84,8 +84,8 @@ describe('Cooldowns - check()', () => {
     });
 
     it('create command', async () => {
-      customcommands.add({ sender: owner, parameters: '-c !cmd -r $param' });
-      await message.isSent('customcmds.command-was-added', owner, { response: '$param', command: '!cmd', sender: owner.username });
+      const r = await customcommands.add({ sender: owner, parameters: '-c !cmd -r $param' });
+      assert.strictEqual(r[0].response, '$sender, command !cmd was added');
     });
 
     it('Add !cmd to cooldown', async () => {
@@ -317,8 +317,8 @@ describe('Cooldowns - check()', () => {
 
     it('create cooldown on !play [user 300]', async () => {
       const [command, type, seconds, quiet] = ['!play', 'user', '300', true];
-      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
-      await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
+      const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      assert.strictEqual(r[0].response, '$sender, user cooldown for !play was set to 300s');
     });
 
     it('check if cooldown is created', async () => {
@@ -385,8 +385,8 @@ describe('Cooldowns - check()', () => {
 
     it('create cooldown on !play [global 300]', async () => {
       const [command, type, seconds, quiet] = ['!play', 'global', '300', true];
-      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
-      await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
+      const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      assert.strictEqual(r[0].response, '$sender, global cooldown for !play was set to 300s');
     });
 
     it('check if cooldown is created', async () => {
@@ -431,8 +431,8 @@ describe('Cooldowns - check()', () => {
 
     it('test', async () => {
       const [command, type, seconds, quiet] = ['!gamble', 'user', '300', true];
-      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
-      await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
+      const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      assert.strictEqual(r[0].response, '$sender, user cooldown for !gamble was set to 300s');
 
       const item = await getRepository(Cooldown).findOne({ where: { name: '!gamble' } });
       assert(item.length !== 0);
@@ -467,8 +467,8 @@ describe('Cooldowns - check()', () => {
 
     it('test', async () => {
       const [command, type, seconds, quiet] = ['!test', 'user', '60', true];
-      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
-      await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
+      const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      assert.strictEqual(r[0].response, '$sender, user cooldown for !test was set to 60s');
 
       const item = await getRepository(Cooldown).findOne({ where: { name: '!test' } });
       assert(item.length !== 0);
@@ -502,8 +502,8 @@ describe('Cooldowns - check()', () => {
 
     it('create cooldown on !test me [user 60]', async () => {
       const [command, type, seconds, quiet] = ['!test me', 'user', '60', true];
-      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
-      await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
+      const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      assert.strictEqual(r[0].response, '$sender, user cooldown for !test me was set to 60s');
     });
 
     it('check if cooldown is created', async () => {
@@ -568,8 +568,8 @@ describe('Cooldowns - check()', () => {
 
     it('create cooldown on !test [user 60]', async () => {
       const [command, type, seconds, quiet] = ['!test', 'user', '60', true];
-      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
-      await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
+      const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      assert.strictEqual(r[0].response, '$sender, user cooldown for !test was set to 60s');
     });
 
     it('check if cooldown is created', async () => {
@@ -614,8 +614,8 @@ describe('Cooldowns - check()', () => {
 
     it('create cooldown on !test [global 60]', async () => {
       const [command, type, seconds, quiet] = ['!test', 'global', '60', true];
-      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
-      await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
+      const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      assert.strictEqual(r[0].response, '$sender, global cooldown for !test was set to 60s');
     });
 
     it('check if cooldown is created', async () => {
@@ -661,8 +661,8 @@ describe('Cooldowns - check()', () => {
       });
 
       const [command, type, seconds, quiet] = ['me', 'user', '60', true];
-      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
-      await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
+      const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      assert.strictEqual(r[0].response, '$sender, user cooldown for me was set to 60s');
 
       const item = await getRepository(Cooldown).findOne({ where: { name: 'me' } });
       assert(typeof item !== 'undefined');
@@ -700,8 +700,8 @@ describe('Cooldowns - check()', () => {
       });
 
       const [command, type, seconds, quiet] = ['me', 'global', '60', true];
-      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
-      await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
+      const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      assert.strictEqual(r[0].response, '$sender, global cooldown for me was set to 60s');
 
       const item = await getRepository(Cooldown).findOne({ where: { name: 'me' } });
       assert(typeof item !== 'undefined');

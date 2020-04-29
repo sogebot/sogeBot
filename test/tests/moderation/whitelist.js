@@ -1,11 +1,8 @@
 /* global describe it before */
 
-
-
 require('../../general.js');
 
 const db = require('../../general.js').db;
-const variable = require('../../general.js').variable;
 const message = require('../../general.js').message;
 const alias = (require('../../../dest/systems/alias')).default;
 const moderation = (require('../../../dest/systems/moderation')).default;
@@ -172,8 +169,8 @@ describe('systems/moderation - whitelist()', () => {
     await db.cleanup();
     await message.prepare();
 
-    alias.add({ sender: owner, parameters: '-a !sr -c !songrequest' });
-    await message.isSent('alias.alias-was-added', owner, { alias: '!sr', command: '!songrequest', sender: owner.username });
+    const r = await alias.add({ sender: owner, parameters: '-a !sr -c !songrequest' });
+    assert.strictEqual(r[0].response, '$sender, alias !sr for !songrequest was added');
   });
 
   for (const [pattern, test] of Object.entries(tests)) {

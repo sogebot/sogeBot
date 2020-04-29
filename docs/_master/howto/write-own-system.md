@@ -88,7 +88,7 @@ For setting helper function (e.g. price check is skipped for this command) use *
 @command('!yourcommand')
 @default_permission(permission.CASTERS)
 @helper()
-public foobar(opts: CommandOptions) {
+public foobar(opts: CommandOptions): CommandResponse[] {
   // ... command logic ...
 }
 ```

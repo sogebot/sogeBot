@@ -84,10 +84,11 @@ class TMI extends Core {
         ]
         )];
       // update ignore list
-      sendMessage(prepare('ignore.user.is.added', { username }), opts.sender);
+      return [{ response: prepare('ignore.user.is.added', { username }), ...opts}];
     } catch (e) {
       error(e.message);
     }
+    return [];
   }
 
   @command('!ignore remove')
@@ -97,10 +98,11 @@ class TMI extends Core {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
       tmi.ignorelist = tmi.ignorelist.filter(o => o !== username);
       // update ignore list
-      sendMessage(prepare('ignore.user.is.removed', { username }), opts.sender);
+      return [{ response: prepare('ignore.user.is.removed', { username }), ...opts}];
     } catch (e) {
       error(e.message);
     }
+    return [];
   }
 
   @command('!ignore check')
@@ -109,9 +111,11 @@ class TMI extends Core {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
       const isUserIgnored = isIgnored({ username });
-      sendMessage(prepare(isUserIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored', { username }), opts.sender);
-      return isUserIgnored;
-    } catch (e) {}
+      return [{ response: prepare(isUserIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored', { username }), ...opts}];
+    } catch (e) {
+      error(e.stack);
+    }
+    return [];
   }
 
   async initClient (type: 'bot' | 'broadcaster') {
@@ -795,7 +799,12 @@ class TMI extends Core {
           }
         }
       }
-      await parse.process();
+      const responses = await parse.process();
+      for (let i = 0; i < responses.length; i++) {
+        setTimeout(() => {
+          sendMessage(responses[i].response, responses[i].sender, responses[i].attr);
+        }, 500 * i);
+      }
     }
 
     if (isMainThread) {
