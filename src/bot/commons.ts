@@ -74,8 +74,8 @@ export function announce(messageToAnnounce: string) {
         if (id === Discord.sendGeneralAnnounceToChannel || (channel as TextChannel).name === Discord.sendGeneralAnnounceToChannel) {
           const ch = Discord.client.channels.cache.find(o => o.id === id);
           if (ch) {
-            (ch as TextChannel).send(message);
-            chatOut(`#${(ch as TextChannel).name}: ${message} [${Discord.client.user?.tag}]`);
+            (ch as TextChannel).send(messageToAnnounce);
+            chatOut(`#${(ch as TextChannel).name}: ${messageToAnnounce} [${Discord.client.user?.tag}]`);
           }
         }
       }
