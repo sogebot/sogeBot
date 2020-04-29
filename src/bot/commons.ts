@@ -41,7 +41,7 @@ export async function parserReply(response: string, opts: { sender: CommandOptio
     }
   } else {
     // we skip as we are already parsing message
-    sendMessage(response, senderObject, { skip: true, ...opts.attr });
+    sendMessage(messageToSend, senderObject, { skip: true, ...opts.attr });
   }
 }
 
