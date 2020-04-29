@@ -1,0 +1,14 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "listenAtChannels": {
+      "title": "Naslouchat v těchto kanálech (#název nebo id)",
+      "help": "Odděleno čárkami (,)"
+    },
+    "sendOnlineAnnounceToChannel": "Posílat online oznámení do tohoto kanálu (#název nebo id)",
+    "sendGeneralAnnounceToChannel": "Posílat obecné oznámení do tohoto kanálu (#název nebo id)",
+    "deleteMessagesAfterWhile": "Po chvíli smazat zprávy",
+    "clientId": "ClientId",
+    "token": "Token"
+  }
+}
