@@ -6,8 +6,6 @@ import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import OAuth from '../oauth';
 
 class Chat extends Widget {
-  testme = 'a';
-
   constructor() {
     super();
     this.addWidget('chat', 'widget-title-chat', 'fas fa-comments');
