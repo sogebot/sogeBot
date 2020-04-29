@@ -39,11 +39,16 @@ export async function parserReply(response: string, opts: { sender: CommandOptio
       return await new Message(response).parse({ ...opts, sender: senderObject.discord ? senderObject.discord.author : senderObject }) as string;
     }
   })();
-  if (senderObject.discord) {
+  if (opts.sender.discord) {
     if (messageType === 'chat') {
-      senderObject.discord.channel.send(messageToSend);
+      const msg = await opts.sender.discord.channel.send(messageToSend);
+      if (Discord.deleteMessagesAfterWhile) {
+        setTimeout(() => {
+          msg.delete();
+        }, 10000);
+      }
     } else {
-      senderObject.discord.author.send(messageToSend);
+      opts.sender.discord.author.send(messageToSend);
     }
   } else {
     // we skip as we are already parsing message
