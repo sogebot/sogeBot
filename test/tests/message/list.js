@@ -81,27 +81,13 @@ describe('Message - list filter', () => {
 
     describe('(list.ranks) should return proper message', () => {
     it('test - 20h', async () => {
-      ranks.add({ sender: owner, parameters: '20 test' });
-      await message.isSent('ranks.rank-was-added', owner,
-        {
-          rank: 'test',
-          hours: 20,
-          sender: owner.username,
-          type: 'viewer',
-          hlocale: 'hours',
-        });
+      const r = await ranks.add({ sender: owner, parameters: '20 test' });
+      assert.strictEqual(r[0].response, '$sender, new rank viewer test(20hours) was added');
     });
 
     it('test2 - 40h', async () => {
-      ranks.add({ sender: owner, parameters: '40 test2' });
-      await message.isSent('ranks.rank-was-added', owner,
-        {
-          rank: 'test2',
-          hours: 40,
-          sender: owner.username,
-          type: 'viewer',
-          hlocale: 'hours',
-        });
+      const r = await ranks.add({ sender: owner, parameters: '40 test2' });
+      assert.strictEqual(r[0].response, '$sender, new rank viewer test2(40hours) was added');
     });
 
     it('(list.ranks) should return created ranks', async () => {

@@ -168,8 +168,8 @@ class Scrim extends System {
       matches[id].push((atUsername ? '@' : '') + d.username);
     }
     const output: string[] = [];
-    for (const id of Object.keys(matches)) {
-      output.push(id + ' - ' + matches[id].join(', '));
+    for (const id of Object.keys(matches).sort()) {
+      output.push(id + ' - ' + matches[id].sort().join(', '));
     }
     return [{
       response: prepare('systems.scrim.currentMatches', {

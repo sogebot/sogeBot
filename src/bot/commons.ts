@@ -32,7 +32,13 @@ export async function parserReply(response: string, opts: { sender: CommandOptio
     'message-type': messageType,
     forceWithoutAt: typeof opts.sender.discord !== 'undefined', // we dont need @
   };
-  const messageToSend = await new Message(response).parse({ sender: senderObject.discord ? senderObject.discord.author : senderObject.username, ...opts.attr }) as string;
+  const messageToSend = await (async () => {
+    if (opts.attr?.skip) {
+      return prepare(response, { ...opts, sender: senderObject.discord ? senderObject.discord.author : senderObject }, false);
+    } else {
+      return await new Message(response).parse({ ...opts, sender: senderObject.discord ? senderObject.discord.author : senderObject }) as string;
+    }
+  })();
   if (senderObject.discord) {
     if (messageType === 'chat') {
       senderObject.discord.channel.send(messageToSend);
@@ -59,7 +65,7 @@ export function announce(messageToAnnounce: string) {
     emotes: [],
     badges: {},
     'message-type': 'chat',
-  }, { force: true });
+  }, { force: true, skip: true });
 
   if (Discord.sendGeneralAnnounceToChannel.length > 0 && Discord.client) {
     // search discord channel by ID
@@ -130,10 +136,17 @@ export function isIgnored(sender: { username: string | null; userId?: number }) 
  * Prepares strings with replacement attributes
  * @param translate Translation key
  * @param attr Attributes to replace { 'replaceKey': 'value' }
+ * @param isTranslation consider if translation key to be translate key or pure message
  */
-export function prepare(toTranslate: string, attr?: {[x: string]: any }): string {
+export function prepare(toTranslate: string, attr?: {[x: string]: any }, isTranslation = true): string {
   attr = attr || {};
-  let msg = translate(toTranslate);
+  let msg = (() => {
+    if (isTranslation) {
+      return translate(toTranslate);
+    } else {
+      return toTranslate;
+    }
+  })();
   for (const key of Object.keys(attr).sort((a, b) => b.length - a.length)) {
     let value = attr[key];
     if (['username', 'who', 'winner', 'sender', 'loser'].includes(key)) {

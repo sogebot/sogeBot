@@ -247,9 +247,8 @@ class CustomCommands extends System {
       const _responses: CommandsResponsesInterface[] = [];
       // remove found command from message to get param
       const param = opts.message.replace(new RegExp('^(' + cmd.cmdArray.join(' ') + ')', 'i'), '').trim();
-      const count = await incrementCountOfCommandUsage(cmd.command.command);
+      await incrementCountOfCommandUsage(cmd.command.command);
       for (const r of _.orderBy(cmd.command.responses, 'order', 'asc')) {
-
         if (typeof getFromViewersCache(opts.sender.userId, r.permission) === 'undefined') {
           addToViewersCache(opts.sender.userId, r.permission, (await permissions.check(opts.sender.userId, r.permission, false)).access);
         }
@@ -263,7 +262,7 @@ class CustomCommands extends System {
           }
         }
       }
-      this.sendResponse(_.cloneDeep(_responses), { param, sender: opts.sender, command: cmd.command.command, count });
+      this.sendResponse(_.cloneDeep(_responses), { param, sender: opts.sender, command: cmd.command.command });
     }
     return atLeastOnePermissionOk;
   }

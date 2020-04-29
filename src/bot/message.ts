@@ -381,8 +381,8 @@ class Message {
         return '0';
       },
       '$count': async function (filter) {
-        if (attr.cmd) {
-          return String((await getCountOfCommandUsage(attr.cmd)));
+        if (attr.command) {
+          return String((await getCountOfCommandUsage(attr.command)));
         }
         return '0';
       },
@@ -747,7 +747,6 @@ class Message {
     await this.parseMessageEach(list);
     await this.parseMessageEach(stream);
     await this.parseMessageApi();
-
 
     return this.message;
   }
