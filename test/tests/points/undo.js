@@ -28,8 +28,8 @@ describe('Points - undo()', () => {
     });
 
     it('!points add 100', async () => {
-      await points.add({ sender: user, parameters: user.username + ' 100' });
-      await message.isSentRaw('@oneuser just received 100 points!', user);
+      const r = await points.add({ sender: user, parameters: user.username + ' 100' });
+      assert.strictEqual(r[0].response, '@oneuser just received 100 points!');
     });
 
     it('User should have correctly added 100 points', async () => {
@@ -45,8 +45,8 @@ describe('Points - undo()', () => {
     });
 
     it('!points undo ' + user.username, async () => {
-      await points.undo({ sender: user, parameters: user.username });
-      await message.isSentRaw('@oneuser, points \'add\' for @oneuser was reverted (250 points to 150 points).', user);
+      const r = await points.undo({ sender: user, parameters: user.username });
+      assert.strictEqual(r[0].response, '$sender, points \'add\' for @oneuser was reverted (250 points to 150 points).');
     });
 
     it('User should have correctly set 150 points', async () => {
@@ -60,8 +60,8 @@ describe('Points - undo()', () => {
     });
 
     it('!points undo ' + user.username, async () => {
-      await points.undo({ sender: user, parameters: user.username });
-      await message.isSentRaw('@oneuser, username wasn\'t found in database or user have no undo operations', user);
+      const r = await points.undo({ sender: user, parameters: user.username });
+      assert.strictEqual(r[0].response, '$sender, username wasn\'t found in database or user have no undo operations');
     });
   });
 
@@ -71,8 +71,8 @@ describe('Points - undo()', () => {
     });
 
     it('!points set 100', async () => {
-      await points.set({ sender: user, parameters: user.username + ' 100' });
-      await message.isSentRaw('@oneuser was set to 100 points', user);
+      const r = await points.set({ sender: user, parameters: user.username + ' 100' });
+      assert.strictEqual(r[0].response, '@oneuser was set to 100 points');
     });
 
     it('User should have correctly set 100 points', async () => {
@@ -88,8 +88,8 @@ describe('Points - undo()', () => {
     });
 
     it('!points undo ' + user.username, async () => {
-      await points.undo({ sender: user, parameters: user.username });
-      await message.isSentRaw('@oneuser, points \'set\' for @oneuser was reverted (100 points to 0 points).', user);
+      const r = await points.undo({ sender: user, parameters: user.username });
+      assert.strictEqual(r[0].response, '$sender, points \'set\' for @oneuser was reverted (100 points to 0 points).');
     });
 
     it('User should have correctly set 0 points', async () => {
@@ -103,8 +103,8 @@ describe('Points - undo()', () => {
     });
 
     it('!points undo ' + user.username, async () => {
-      await points.undo({ sender: user, parameters: user.username });
-      await message.isSentRaw('@oneuser, username wasn\'t found in database or user have no undo operations', user);
+      const r = await points.undo({ sender: user, parameters: user.username });
+      assert.strictEqual(r[0].response, '$sender, username wasn\'t found in database or user have no undo operations');
     });
   });
 
@@ -114,8 +114,8 @@ describe('Points - undo()', () => {
     });
 
     it('!points remove 25', async () => {
-      await points.remove({ sender: user, parameters: user.username + ' 25' });
-      await message.isSentRaw('Ouch, 25 points was removed from @oneuser!', user);
+      const r = await points.remove({ sender: user, parameters: user.username + ' 25' });
+      assert.strictEqual(r[0].response, 'Ouch, 25 points was removed from @oneuser!');
     });
 
     it('User should have 75 points', async () => {
@@ -131,8 +131,8 @@ describe('Points - undo()', () => {
     });
 
     it('!points remove all', async () => {
-      await points.remove({ sender: user, parameters: user.username + ' all' });
-      await message.isSentRaw('Ouch, all points was removed from @oneuser!', user);
+      const r = await points.remove({ sender: user, parameters: user.username + ' all' });
+      assert.strictEqual(r[0].response, 'Ouch, all points was removed from @oneuser!');
     });
 
     it('User should have 0 points', async () => {
@@ -148,8 +148,8 @@ describe('Points - undo()', () => {
     });
 
     it('!points undo ' + user.username, async () => {
-      await points.undo({ sender: user, parameters: user.username });
-      await message.isSentRaw('@oneuser, points \'remove\' for @oneuser was reverted (0 points to 75 points).', user);
+      const r = await points.undo({ sender: user, parameters: user.username });
+      assert.strictEqual(r[0].response, '$sender, points \'remove\' for @oneuser was reverted (0 points to 75 points).');
     });
 
     it('User should have correctly set 75 points', async () => {
@@ -163,8 +163,8 @@ describe('Points - undo()', () => {
     });
 
     it('!points undo ' + user.username, async () => {
-      await points.undo({ sender: user, parameters: user.username });
-      await message.isSentRaw('@oneuser, points \'remove\' for @oneuser was reverted (75 points to 100 points).', user);
+      const r = await points.undo({ sender: user, parameters: user.username });
+      assert.strictEqual(r[0].response, '$sender, points \'remove\' for @oneuser was reverted (75 points to 100 points).');
     });
 
     it('User should have correctly set 100 points', async () => {
@@ -178,8 +178,8 @@ describe('Points - undo()', () => {
     });
 
     it('!points undo ' + user.username, async () => {
-      await points.undo({ sender: user, parameters: user.username });
-      await message.isSentRaw('@oneuser, username wasn\'t found in database or user have no undo operations', user);
+      const r = await points.undo({ sender: user, parameters: user.username });
+      assert.strictEqual(r[0].response, '$sender, username wasn\'t found in database or user have no undo operations');
     });
   });
 });
