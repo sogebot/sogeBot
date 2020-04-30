@@ -391,7 +391,7 @@ export default class customVariablesEdit extends Vue {
 
           if (!this.$route.params.id) {
             if (!this.permission) {
-              this.permission = orderBy(this.permissions, 'order', 'asc').pop().id
+              this.permission = orderBy(this.permissions, 'order', 'asc')[0].id
             }
           }
           resolve()
