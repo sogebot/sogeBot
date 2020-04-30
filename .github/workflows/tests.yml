@@ -38,10 +38,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: install node v13
+    - name: install node v14
       uses: actions/setup-node@v1
       with:
-        node-version: 13
+        node-version: 14
     - name: Install all dependencies and build just a bot
       run: ENV=development make info clean dependencies patch bot
     - name: Set proper db to use
@@ -73,10 +73,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: install node v13
+    - name: install node v14
       uses: actions/setup-node@v1
       with:
-        node-version: 12
+        node-version: 14
     - name: Install all dependencies and build just a bot
       run: ENV=development make info clean dependencies patch bot
     - name: Set proper db to use
@@ -110,10 +110,10 @@ jobs:
         mysql database: 'sogebot' # Optional, default value is "test". The specified database which will be create
         mysql root password: 'Passw0rd' # Required if "mysql user" is empty, default is empty. The root superuser password
     - uses: actions/checkout@master
-    - name: install node v13
+    - name: install node v14
       uses: actions/setup-node@v1
       with:
-        node-version: 12
+        node-version: 14
     - name: Install all dependencies and build just a bot
       run: ENV=development make info clean dependencies patch bot
     - name: Set proper db to use
@@ -136,10 +136,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: install node v13
+    - name: install node v14
       uses: actions/setup-node@v1
       with:
-        node-version: 12
+        node-version: 14
     - name: Install all dependencies and build everything
       run: ENV=development make
   fullbuild2:
