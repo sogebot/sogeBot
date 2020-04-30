@@ -2,7 +2,7 @@ import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
 export interface DiscordLinkInterface {
-  id?: string;
+  id: string | undefined;
   tag: string;
   createdAt: number;
   userId: null | number;
