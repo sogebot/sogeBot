@@ -17,6 +17,7 @@ import { isDbConnected } from '../helpers/database';
 import api from '../api';
 import { MINUTE, SECOND } from '../constants';
 import { announce } from '../commons';
+import { sortBy } from 'lodash';
 
 /*
  * !timers                                                                                                                      - gets an info about timers usage
@@ -310,7 +311,7 @@ class Timers extends System {
     }
     const responses: CommandResponse[] = [];
     responses.push({ response: translate('timers.responses-list').replace(/\$name/g, name), ...opts });
-    for (const response of timer.messages) {
+    for (const response of sortBy(timer.messages, 'response')) {
       responses.push({ response: (response.isEnabled ? '⚫ ' : '⚪ ') + `${response.id} - ${response.response}`, ...opts });
     }
     return responses;
