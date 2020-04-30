@@ -11,7 +11,7 @@ import { chatIn, chatOut, error, info, warning, whisperOut } from '../helpers/lo
 import { adminEndpoint } from '../helpers/socket';
 import { debounce } from '../helpers/debounce';
 
-import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
+import { v5 as uuidv5 } from 'uuid';
 import oauth from '../oauth';
 import Expects from '../expects';
 import { isUUID } from '../commons';
@@ -248,7 +248,6 @@ class Discord extends Integration {
       if (content === '!link') {
         this.removeExpiredLinks();
         const link = await getRepository(DiscordLink).save({
-          id: uuidv4(),
           userId: null,
           tag: author.tag,
           createdAt: Date.now(),
