@@ -1183,14 +1183,14 @@ class API extends Core {
             events.fire('stream-is-running-x-minutes', { reset: true });
             events.fire('number-of-viewers-is-at-least-x', { reset: true });
 
-            for (const event of getFunctionList('streamStart')) {
+            for (const event of getFunctionList('streamEnd')) {
               const type = !event.path.includes('.') ? 'core' : event.path.split('.')[0];
               const module = !event.path.includes('.') ? event.path.split('.')[0] : event.path.split('.')[1];
               const self = find(type, module);
               if (self) {
                 self[event.fName]();
               } else {
-                error(`streamStart: ${event.path} not found`);
+                error(`streamEnd: ${event.path} not found`);
               }
             }
 
