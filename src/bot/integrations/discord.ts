@@ -126,7 +126,7 @@ class Discord extends Integration {
     this.removeExpiredLinks();
 
     try {
-      const [ uuid ] = new Expects(opts.parameters).everything().toArray();
+      const [ uuid ] = new Expects(opts.parameters).everything({ name: 'uuid' }).toArray();
       if (!isUUID(uuid)) {
         throw new Error(String(errors.NOT_UUID));
       }
@@ -139,7 +139,11 @@ class Discord extends Integration {
       return [{ response: `$sender, this account was linked with ${link.tag}.`, ...opts }];
     } catch (e) {
       if (e.message === String(errors.NOT_UUID)) {
-        return [{ response: '$sender, invalid token.', ...opts }];
+        return [{ response: '$sender, invalid or expired token.', ...opts }];
+      } else if (e.message.includes('Expected parameter')) {
+        return [
+          { response: '$sender, to link you account on Discord: 1. Go to Discord server and send !link in bot channel. | 2. Wait for PM from bot | 3. Send command from you Discord PM here in twitch chat.', ...opts },
+        ];
       } else {
         warning(e.stack);
         return [{ response: '$sender, something went wrong.', ...opts }];
