@@ -2,7 +2,7 @@ import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
 export interface DiscordLinkInterface {
-  id?: string;
+  id: string;
   tag: string;
   createdAt: number;
   userId: null | number;
@@ -11,7 +11,7 @@ export interface DiscordLinkInterface {
 export const DiscordLink = new EntitySchema<Readonly<Required<DiscordLinkInterface>>>({
   name: 'discord_link',
   columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    id: { type: 'uuid', primary: true },
     tag: { type: String },
     createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
     userId: { type: Number, nullable: true },

@@ -7,7 +7,7 @@ export class discordLink1586960243972 implements MigrationInterface {
     await queryRunner.createTable(new Table({
       name: 'discord_link',
       columns: [
-        { name: 'id', type: 'varchar', length: '36', isPrimary: true, isGenerated: true},
+        { name: 'id', type: 'varchar', length: '36', isPrimary: true },
         { name: 'tag', type: 'varchar', length: '255' },
         { name: 'createdAt', type: 'bigint' },
         { name: 'userId', type: 'int', isNullable: true },
