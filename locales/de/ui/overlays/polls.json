@@ -1,8 +1,8 @@
 {
   "settings": {
-    "cDisplayTheme": "Theme",
-    "cDisplayHideAfterInactivity": "Hide on inactivity",
-    "cDisplayAlign": "Align",
+    "cDisplayTheme": "Design",
+    "cDisplayHideAfterInactivity": "Bei Inaktivität ausblenden",
+    "cDisplayAlign": "Ausrichten",
     "cDisplayInactivityTime": {
       "title": "Inactivity after",
       "help": "in miliseconds"
