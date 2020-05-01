@@ -1,7 +1,7 @@
 {
+  "new": "Nový časovač",
   "empty": "Žádný časovač nebyl vytvořen.",
   "emptyAfterSearch": "Žádný časovač nebyl nalezen pro tvé hledání <strong>\"$search\"</strong>.",
-  "new": "Nový časovač",
   "add_response": "Přidat odpověď",
   "settings": {
     "enabled": "Status"
