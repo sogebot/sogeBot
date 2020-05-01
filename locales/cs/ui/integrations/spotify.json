@@ -1,26 +1,26 @@
 {
   "settings": {
     "enabled": "Status",
-    "songRequests": "Požadavky na skladbu",
+    "songRequests": "Song Requests",
     "fetchCurrentSongWhenOffline": {
-      "title": "Načíst aktuální skladbu, i když je stream offline",
-      "help": "Doporučuje se, aby byla tato funkce vypnuta, aby nedošlo k dosažení limitů API"
+      "title": "Fetch current song when stream is offline",
+      "help": "It's advised to have this disabled to avoid reach API limits"
     },
     "clientId": "clientId",
     "clientSecret": "clientSecret",
     "redirectURI": "redirectURI",
     "format": {
-      "title": "Formát",
-      "help": "Dostupné proměnné: $song, $artist, $artists"
+      "title": "Format",
+      "help": "Available variables: $song, $artist, $artists"
     },
-    "username": "Autorizovaný uživatel",
-    "revokeBtn": "Zrušit autorizaci uživatele",
-    "authorizeBtn": "Autorizovat uživatele",
+    "username": "Authorized user",
+    "revokeBtn": "Revoke user authorization",
+    "authorizeBtn": "Authorize user",
     "scopes": "Scopes",
     "playlistToPlay": {
-      "title": "Spotify URI hlavního playlistu",
-      "help": "Pokud bude nastaveno, po requestu bude hrát tento playlist"
+      "title": "Spotify URI of main playlist",
+      "help": "If set, after request finished this playlist will continue"
     },
-    "continueOnPlaylistAfterRequest": "Pokračovat v přehrávání playlistu po požadavku na skladbu"
+    "continueOnPlaylistAfterRequest": "Continue on playing of playlist after song request"
   }
 }
