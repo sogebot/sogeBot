@@ -2,8 +2,8 @@
   "settings": {
     "enabled": "Status",
     "timeout": {
-      "title": "Timeout duration",
-      "help": "Seconds"
+      "title": "Dauer der Zeitüberschreitung",
+      "help": "Sekunden"
     }
   }
 }
