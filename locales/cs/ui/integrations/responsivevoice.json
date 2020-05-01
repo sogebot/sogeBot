@@ -1,8 +1,8 @@
 {
   "settings": {
     "key": {
-      "title": "Klíč (key)",
-      "help": "Získej svůj klíč na http://responsivevoice.org"
+      "title": "Key",
+      "help": "Get your key at http://responsivevoice.org"
     }
   }
 }
