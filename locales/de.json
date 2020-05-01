@@ -33,18 +33,18 @@
     "isRegistered": "$sender, Du kannst !$keyword nicht verwenden, da es bereits für eine andere Aktion verwendet wird!"
   },
   "uptime": {
-    "online": "Stream is online for (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)",
-    "offline": "Stream is currently offline for (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
+    "online": "Stream ist online seit (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)",
+    "offline": "Stream ist momentan offline seit (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
   },
   "webpanel": {
-    "this-system-is-disabled": "This system is disabled",
+    "this-system-is-disabled": "Dieses System ist deaktiviert",
     "loading": "Wird geladen",
-    "this-may-take-a-while": "This <strong>may</strong> take a while",
+    "this-may-take-a-while": "Das <strong>könnte</strong> ein wenig dauern",
     "display-as": "Anzeigen als",
     "set-default": "Als Standard festlegen",
     "add": "Hinzufügen",
     "placeholders": {
-      "text-url-generator": "Paste your text or html to generate base64 below and URL above",
+      "text-url-generator": "Füge Deinen Text oder HTML-Code ein, um base64 unten und die URL oben zu generieren",
       "text-decode-base64": "Paste your base64 to generate URL and text above",
       "creditsSpeed": "Set speed of credits rolling, lower = faster"
     },
@@ -69,20 +69,20 @@
         "disabled": "Deaktiviert"
       },
       "errors": {
-        "timer_name_must_be_compliant": "This value can contain only a-zA-Z09_",
-        "this_value_must_be_a_positive_number_or_0": "This value must be a positive number or 0",
-        "value_cannot_be_empty": "Value cannot be empty"
+        "timer_name_must_be_compliant": "Dieser Wert kann nur a-zA-Z09_ enthalten",
+        "this_value_must_be_a_positive_number_or_0": "Dieser Wert muss eine positive Zahl haben oder größer als 0 sein",
+        "value_cannot_be_empty": "Dieser Wert darf nicht leer sein"
       },
       "dialog": {
         "timer": "Timer",
         "name": "Name",
-        "interval": "Interval",
-        "responses": "Responses",
-        "messages": "Trigger every X Messages",
-        "seconds": "Trigger every X Seconds",
+        "interval": "Intervall",
+        "responses": "Antworten",
+        "messages": "Alle X Nachrichten auslösen",
+        "seconds": "Alle X Sekunden auslösen",
         "title": {
-          "new": "New timer",
-          "edit": "Edit timer"
+          "new": "Neuer Timer",
+          "edit": "Timer bearbeiten"
         },
         "placeholders": {
           "name": "Set name of your timer, can contain only these characters a-zA-Z0-9_",
@@ -147,19 +147,19 @@
           "success": "Event was <strong>successfully</strong> saved.",
           "fail": "Something went <strong>wrong</strong>."
         },
-        "close": "Close",
-        "save-changes": "Save changes",
-        "event": "Event",
+        "close": "Schließen",
+        "save-changes": "Änderungen speichern",
+        "event": "Ereignis",
         "name": "Name",
-        "usable-events-variables": "Usable events variables",
-        "settings": "Settings",
-        "filters": "Filters",
-        "operations": "Operations"
+        "usable-events-variables": "Verwendbare Ereignis-Variablen",
+        "settings": "Einstellungen",
+        "filters": "Filter",
+        "operations": "Operationen"
       },
       "definitions": {
         "hashtag": {
-          "label": "Hashtag or Keyword",
-          "placeholder": "#yourHashtagHere or Keyword"
+          "label": "Hashtag oder Schlüsselwort",
+          "placeholder": "#DeinHashtagHier oder Schlüsselwort"
         },
         "fadeOutXCommands": {
           "label": "Fade Out X Commands",
@@ -200,8 +200,8 @@
         },
         "ignoreAutohost": {
           "label": "Ignore Autohost",
-          "true": "Ignore",
-          "false": "Not ignore"
+          "true": "Ignorieren",
+          "false": "Nicht ignorieren"
         },
         "runInterval": {
           "label": "Run Interval (0 = run once per stream)",
@@ -217,10 +217,10 @@
         },
         "messageToSend": {
           "label": "Message To Send",
-          "placeholder": "Set your message"
+          "placeholder": "Nachricht festlegen"
         },
         "commandToRun": {
-          "label": "Command To Run",
+          "label": "Befehl zum Starten",
           "placeholder": "Set your !commandToRun"
         },
         "isCommandQuiet": {
@@ -283,10 +283,10 @@
     "responses": {
       "variable": {
         "sender": "User who initiated",
-        "title": "Current title",
-        "game": "Current game",
-        "language": "Current stream language",
-        "viewers": "Current viewers count",
+        "title": "Aktueller Titel",
+        "game": "Aktuelles Spiel",
+        "language": "Aktuelle Sprache des Stream",
+        "viewers": "Anzahl der aktuellen Zuschauer",
         "views": "Current views count",
         "hosts": "Current hosts count",
         "followers": "Current followers count",
@@ -296,21 +296,21 @@
         "touser": "Username parameter",
         "!param": "Parameter (not required)",
         "alias": "Alias",
-        "command": "Command",
-        "keyword": "Keyword",
-        "response": "Response",
+        "command": "Befehl",
+        "keyword": "Schlüsselwort",
+        "response": "Antwort",
         "list": "Populated list",
-        "type": "Type",
-        "days": "Days",
-        "hours": "Hours",
+        "type": "Typ",
+        "days": "Tage",
+        "hours": "Stunden",
         "minutesName": "Singular or Plural of word minute",
-        "minutes": "Minutes",
-        "seconds": "Seconds",
-        "description": "Description",
+        "minutes": "Minuten",
+        "seconds": "Sekunden",
+        "description": "Beschreibung",
         "quiet": "Quiet (bool)",
         "id": "ID",
         "name": "Name",
-        "messages": "Messages",
+        "messages": "Nachrichten",
         "amount": "Amount",
         "amountInBotCurrency": "Amount in bot currency",
         "currency": "Currency",
