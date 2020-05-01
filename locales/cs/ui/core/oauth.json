@@ -1,13 +1,13 @@
 {
   "settings": {
-    "generalChannel": "Channel",
-    "generalOwners": "Owners",
+    "generalChannel": "Kanál",
+    "generalOwners": "Vlastníci",
     "botAccessToken": "AccessToken",
     "broadcasterAccessToken": "AccessToken",
     "botRefreshToken": "RefreshToken",
     "broadcasterRefreshToken": "RefreshToken",
-    "botUsername": "Username",
-    "broadcasterUsername": "Username",
+    "botUsername": "Uživatelské jméno",
+    "broadcasterUsername": "Uživatelské jméno",
     "botExpectedScopes": "Scopes",
     "broadcasterExpectedScopes": "Scopes"
   }
