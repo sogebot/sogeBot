@@ -1,19 +1,19 @@
 {
-  "new": "New Price",
-  "empty": "No price were created yet.",
-  "emptyAfterSearch": "No price were found by your search for <strong>\"$search\"</strong>.",
+  "new": "Neuer Preis",
+  "empty": "Es wurde noch kein Preis festgelegt.",
+  "emptyAfterSearch": "Bei der Suche nach <strong>\"$search\"</strong> wurde kein Preis gefunden.",
   "command": {
-    "name": "command",
+    "name": "Befehl",
     "placeholder": ""
   },
   "price": {
-    "name": "price",
+    "name": "Preis",
     "placeholder": ""
   },
   "error": {
-    "isEmpty": "This value cannot be empty"
+    "isEmpty": "Dieser Wert darf nicht leer sein"
   },
-  "warning": "This action cannot be reverted!",
+  "warning": "Diese Aktion kann nicht rückgängig gemacht werden!",
   "settings": {
     "enabled": "Status"
   }
