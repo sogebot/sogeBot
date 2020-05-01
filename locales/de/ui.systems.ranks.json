@@ -1,0 +1,20 @@
+{
+  "new": "Neuer Rang",
+  "empty": "Es wurden noch keine Ränge erstellt.",
+  "emptyAfterSearch": "Bei der Suche nach <strong>\"$search\"</strong> wurden keine Ränge gefunden.",
+  "rank": {
+    "name": "Rang",
+    "placeholder": ""
+  },
+  "value": {
+    "name": "Stunden",
+    "placeholder": ""
+  },
+  "error": {
+    "isEmpty": "Dieser Wert darf nicht leer sein"
+  },
+  "warning": "Diese Aktion kann nicht rückgängig gemacht werden!",
+  "settings": {
+    "enabled": "Status"
+  }
+}
