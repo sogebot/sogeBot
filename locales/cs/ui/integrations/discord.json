@@ -2,12 +2,12 @@
   "settings": {
     "enabled": "Status",
     "listenAtChannels": {
-      "title": "Naslouchat v těchto kanálech (#název nebo id)",
-      "help": "Odděleno čárkami (,)"
+      "title": "Listen at these channels (#name or id)",
+      "help": "Separated by comma (,)"
     },
-    "sendOnlineAnnounceToChannel": "Posílat online oznámení do tohoto kanálu (#název nebo id)",
-    "sendGeneralAnnounceToChannel": "Posílat obecné oznámení do tohoto kanálu (#název nebo id)",
-    "deleteMessagesAfterWhile": "Po chvíli smazat zprávy",
+    "sendOnlineAnnounceToChannel": "Send online announcement to this channel (#name or id)",
+    "sendGeneralAnnounceToChannel": "Send general announcement to this channel (#name or id)",
+    "deleteMessagesAfterWhile": "Delete message after while",
     "clientId": "ClientId",
     "token": "Token"
   }
