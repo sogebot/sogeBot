@@ -3,11 +3,11 @@
     "enabled": "Status",
     "cooldown": "Cooldown",
     "timeout": {
-      "title": "Timeout duration",
-      "help": "Seconds"
+      "title": "Dauer der Zeitüberschreitung",
+      "help": "Sekunden"
     },
-    "bypassCooldownByOwnerAndMods": "Bypass cooldown by owner and mods",
-    "winnerWillGet": "How many points will be added on win",
-    "loserWillLose": "How many points will be lost on lose"
+    "bypassCooldownByOwnerAndMods": "Cooldown durch Streamer und Mods umgehen",
+    "winnerWillGet": "Wie viele Punkte bei einem Sieg hinzugefügt werden",
+    "loserWillLose": "Wie viele Punkte bei einer Niederlage verloren gehen"
   }
 }
