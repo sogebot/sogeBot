@@ -1,94 +1,94 @@
 {
-  "addGoalGroup": "Přidat skupinu cílů",
-  "addGoal": "Přidat cíl",
-  "newGoal": "Nový cíl",
-  "newGoalGroup": "Nová skupina cílů",
-  "goals": "Cíle",
-  "general": "Obecné",
-  "display": "Zobrazení",
-  "fontSettings": "Nastavení písma",
-  "barSettings": "Nastavení sloupce",
-  "selectGoalOnLeftSide": "Vyberte nebo přidejte cíl na levé straně",
+  "addGoalGroup": "Add Goal Group",
+  "addGoal": "Add Goal",
+  "newGoal": "new Goal",
+  "newGoalGroup": "new Goal Group",
+  "goals": "Goals",
+  "general": "General",
+  "display": "Display",
+  "fontSettings": "Font Settings",
+  "barSettings": "Bar Settings",
+  "selectGoalOnLeftSide": "Select or add goal on left side",
   "input": {
     "description": {
-      "title": "Popis"
+      "title": "Description"
     },
     "goalAmount": {
-      "title": "Částka cíle"
+      "title": "Goal Amount"
     },
     "countBitsAsTips": {
-      "title": "Počítat Bity s Tipy"
+      "title": "Count Bits as Tips"
     },
     "currentAmount": {
-      "title": "Aktuální částka"
+      "title": "Current Amount"
     },
     "endAfter": {
-      "title": "Konec po"
+      "title": "End After"
     },
     "endAfterIgnore": {
-      "title": "Tento cíl nevyprší"
+      "title": "Goal will not expire"
     },
     "fonts": {
-      "title": "Písmo",
-      "help": "Fonty Google se používají pro písmo. <a href='https://fonts.google.com/' target='_blank'>Zkontrolujte seznam písem.</a>"
+      "title": "Font Family",
+      "help": "Google fonts are used for font families. <a href='https://fonts.google.com/' target='_blank'>Check font list.</a>"
     },
     "fontSize": {
-      "title": "Velikost",
-      "help": "Velikost písma je v pixelech"
+      "title": "Size",
+      "help": "Font size is in pixels"
     },
     "borderPx": {
-      "title": "Ohraničení",
-      "help": "Velikost ohraničení je v pixelech"
+      "title": "Border",
+      "help": "Border size is in pixels"
     },
     "barHeight": {
-      "title": "Výška sloupce",
-      "help": "Výška sloupce je v pixelech"
+      "title": "Bar Height",
+      "help": "Bar height is in pixels"
     },
     "color": {
-      "title": "Barva"
+      "title": "Color"
     },
     "borderColor": {
-      "title": "Barva ohraničení"
+      "title": "Border Color"
     },
     "backgroundColor": {
-      "title": "Barva pozadí"
+      "title": "Background Color"
     },
     "type": {
-      "title": "Typ"
+      "title": "Type"
     },
     "nameGroup": {
-      "title": "Název této skupiny",
-      "placeholder": "Nastavte název této skupiny",
-      "help": "Pokud bude prázdný, jméno bude náhodně generováno."
+      "title": "Name of this goal group",
+      "placeholder": "Set name of this goal group",
+      "help": "If kept empty, name will be randomly generated"
     },
     "name": {
-      "title": "Název tohoto cíle",
-      "placeholder": "Nastavte název tohoto cíle"
+      "title": "Name of this goal",
+      "placeholder": "Set name of this goal"
     },
     "displayAs": {
-      "title": "Zobrazit jako",
-      "help": "Nastaví, jak se má zobrazit cílová skupina"
+      "title": "Display as",
+      "help": "Sets how goal group will be shown"
     },
     "durationMs": {
-      "title": "Doba trvání",
-      "help": "Tato hodnota je v milisekundách",
+      "title": "Duration",
+      "help": "This value is in milliseconds",
       "placeholder": "How long goal should be shown"
     },
     "animationInMs": {
-      "title": "Doba trvání vstupní animace",
-      "help": "Tato hodnota je v milisekundách",
-      "placeholder": "Nastavte dobu trvání vstupní animace"
+      "title": "Animation In duration",
+      "help": "This value is in milliseconds",
+      "placeholder": "Set your animation In duration"
     },
     "animationOutMs": {
-      "title": "Doba trvání výstupní animace",
-      "help": "Tato hodnota je v milisekundách",
-      "placeholder": "Nastavte dobu trvání výstupní animace"
+      "title": "Animation Out duration",
+      "help": "This value is in milliseconds",
+      "placeholder": "Set your animation Out duration"
     },
     "spaceBetweenGoalsInPx": {
-      "title": "Prostor mezi cíly",
-      "help": "Tato hodnota je v pixelech",
-      "placeholder": "Nastavte prostor mezi cíly"
+      "title": "Space between goals",
+      "help": "This value is in pixels",
+      "placeholder": "Set your space between goals"
     }
   },
-  "groupSettings": "Nastavení skupiny"
+  "groupSettings": "Group Settings"
 }
