@@ -1,11 +1,11 @@
 {
   "settings": {
     "enabled": "Status",
-    "formatSeparator": "Format separator",
-    "order": "Format",
+    "formatSeparator": "Oddělovač formátu",
+    "order": "Formát",
     "lastSeenFormat": {
-      "title": "Time format",
-      "help": "Possible formats at https://momentjs.com/docs/#/displaying/format/"
+      "title": "Zobrazení času",
+      "help": "Možné hodnoty naleznete na https://momentjs.com/docs/#/displaying/format/"
     }
   }
 }
