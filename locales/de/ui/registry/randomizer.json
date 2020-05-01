@@ -1,9 +1,9 @@
 {
-  "addRandomizer": "Add Randomizer",
+  "addRandomizer": "Randomizer hinzufügen",
   "form": {
     "name": "Name",
     "command": "Befehl",
-    "permission": "Command permission",
+    "permission": "Befehlsberechtigung",
     "simple": "Einfach",
     "wheelOfFortune": "Glücksrad",
     "type": "Typ",
@@ -12,9 +12,9 @@
     "color": "Farbe",
     "numOfDuplicates": "Anzahl der Duplikate",
     "minimalSpacing": "Minimaler Abstand",
-    "groupUp": "Group Up",
+    "groupUp": "Gruppieren",
     "ungroup": "Gruppierung aufheben",
-    "groupedWithOptionAbove": "Grouped with option above",
+    "groupedWithOptionAbove": "Gruppieren mit vorherigem Element",
     "generatedOptionsPreview": "Vorschau der generierten Optionen",
     "probability": "Wahrscheinlichkeit"
   }
