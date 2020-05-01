@@ -4,24 +4,24 @@
     "enabled": "Status",
     "showMaxUsers": "Max Benutzer bei der Auszahlung anzeigen",
     "copsCooldownInMinutes": {
-      "title": "Cooldown between heists",
+      "title": "Abklingzeit zwischen Heists",
       "help": "Minuten"
     },
     "entryCooldownInSeconds": {
-      "title": "Time to entry heist",
+      "title": "Zeit zum Beitritt",
       "help": "Sekunden"
     },
-    "started": "Heist start message",
+    "started": "Heist Startnachricht",
     "nextLevelMessage": "Nachricht, wenn die nächste Stufe erreicht ist",
     "maxLevelMessage": "Nachricht, wenn die maximale Stufe erreicht ist",
-    "copsOnPatrol": "Response of bot when heist is still on cooldown",
-    "copsCooldown": "Bot announcement when heist can be started",
+    "copsOnPatrol": "Antwort des Bots wenn Heist immer noch Abklingzeit hat",
+    "copsCooldown": "Bot Ankündigung wenn Heist gestartet werden kann",
     "singleUserSuccess": "Erfolgsmeldung für einen Benutzer",
     "singleUserFailed": "Fehlermeldung für einen Benutzer",
     "noUser": "Nachricht, wenn kein Benutzer teilgenommen hat"
   },
   "message": "Nachricht",
-  "winPercentage": "Win percentage",
+  "winPercentage": "Sieges-Prozentsatz",
   "payoutMultiplier": "Auszahlungs-Multiplikator",
   "maxUsers": "Max Benutzer für Stufe",
   "percentage": "Prozentsatz",
