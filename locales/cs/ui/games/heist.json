@@ -2,14 +2,14 @@
   "name": "Loupež",
   "settings": {
     "enabled": "Status",
-    "showMaxUsers": "Maximální počet uživatelů k zobrazení",
+    "showMaxUsers": "Maximální počet uživatelů, kteří se mají zobrazit ve výplatě",
     "copsCooldownInMinutes": {
       "title": "Čas mezi heisty",
       "help": "Minuty"
     },
     "entryCooldownInSeconds": {
-      "title": "Time to entry heist",
-      "help": "Seconds"
+      "title": "Čas na vstup do loupeže",
+      "help": "Vteřiny"
     },
     "started": "Zpráva o startu heistu",
     "nextLevelMessage": "Zpráva při dosažení další úrovně",
