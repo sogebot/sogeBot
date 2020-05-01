@@ -8,7 +8,7 @@
     "minValue": "Nejnižší hodnota tohoto pole je $value."
   },
   "buttons": {
-     "reorder": "Uspořádat",
+    "reorder": "Uspořádat",
     "upload": {
       "idle": "Nahrát",
       "progress": "Nahrávání",
