@@ -1,10 +1,10 @@
 {
-  "new": "New Timer",
-  "empty": "No timers were created yet.",
-  "emptyAfterSearch": "No timers were found by your search for <strong>\"$search\"</strong>.",
-  "add_response": "Add Response",
+  "new": "Nový časovač",
+  "empty": "Žádný časovač nebyl vytvořen.",
+  "emptyAfterSearch": "Žádný časovač nebyl nalezen pro tvé hledání <strong>\"$search\"</strong>.",
+  "add_response": "Přidat odpověď",
   "settings": {
     "enabled": "Status"
   },
-  "warning": "This action cannot be reverted!"
+  "warning": "Tato akce nemůže být vrácena!"
 }
