@@ -131,7 +131,7 @@
   "volume": "Hlasitost",
   "rate": "Tempo",
   "pitch": "Výška",
-  "test": "Test",
+  "test": "Otestovat",
   "tts": {
     "setting": "Nastavení TTS"
   }
