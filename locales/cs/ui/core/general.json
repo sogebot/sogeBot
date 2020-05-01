@@ -1,10 +1,10 @@
 {
   "settings": {
-    "lang": "Jazyk bota",
+    "lang": "Bot language",
     "gracefulExitEachXHours": {
-      "title": "Automatické vypnutí každých X hodin",
-      "help": "0 - vypnuto"
+      "title": "Graceful exit each X hours",
+      "help": "0 - disabled"
     },
-    "shouldGracefulExitHelp": "Zapnutí automatického vypnutí bota je <strong>doporučeno</strong> pokud váš bot běží neomezeně na vašem serveru. Bot by měl být spuštěn přes pm2 (nebo podobnou službu) nebo přes docker, abyste zajistili automatický restart. Bot <strong>se nevypne</strong> při online streamu."
+    "shouldGracefulExitHelp": "Enabling of graceful exit is <strong>recommended</strong> if your bot is running endlessly on server. You should have bot running on pm2 (or similar service) or have it dockerized to ensure automatic bot restart. Bot <strong>won't</strong> gracefully exit when stream is online."
   }
 }
