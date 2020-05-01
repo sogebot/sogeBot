@@ -1,20 +1,20 @@
 {
-  "new": "New Keyword",
-  "empty": "No keywords were created yet.",
-  "emptyAfterSearch": "No keywords were found by your search for <strong>\"$search\"</strong>.",
+  "new": "Nové Klíčové Slovo",
+  "empty": "Žádná klíčová slova nebyla vytvořena.",
+  "emptyAfterSearch": "Žádná klíčová slova nebyla nalezena pro tvé hledání <strong>\"$search\"</strong>.",
   "keyword": {
-    "name": "Keyword / Regular Expression",
-    "placeholder": "Set your keyword or regular expression to trigger keyword.",
-    "help": "You can use regexp (case insensitive) to use keywords, e.g. <strong>hello.*|hi</strong>"
+    "name": "Klíčové slovo / Regulární výraz",
+    "placeholder": "Nastavte klíčové slovo nebo regulární výraz.",
+    "help": "Můžete použít regulární výrazy (bez ohledu na malá a velká písmena), např. <strong>hello.*|hi</strong>"
   },
   "response": {
-    "name": "Response",
-    "placeholder": "Set your response here."
+    "name": "Odpověď",
+    "placeholder": "Nastavte odpověď bota zde."
   },
   "error": {
-    "isEmpty": "This value cannot be empty"
+    "isEmpty": "Tato hodnota nesmí být prázdná"
   },
-  "warning": "This action cannot be reverted!",
+  "warning": "Tato akce nemůže být vrácena!",
   "settings": {
     "enabled": "Status"
   }
