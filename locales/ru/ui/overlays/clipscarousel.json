@@ -1,0 +1,7 @@
+{
+  "settings": {
+    "cClipsCustomPeriodInDays": "Time interval (days)",
+    "cClipsNumOfClips": "Number of clips",
+    "cClipsTimeToNextClip": "Time to next clip (s)"
+  }
+}
