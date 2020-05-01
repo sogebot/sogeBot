@@ -1,5 +1,5 @@
 {
-  "enabled": "Enabled",
+  "enabled": "Aktiviert",
   "empty": "Alerts registry is empty, create new alerts.",
   "emptyAfterSearch": "Alerts registry is empty in searching for \"<strong>$search</strong>\"",
   "revertcode": "Revert code to defaults",
@@ -8,27 +8,27 @@
     "placeholder": "Set name of your alerts"
   },
   "alertDelayInMs": {
-    "name": "Alert delay"
+    "name": "Alarm-Verzögerung"
   },
   "profanityFilterType": {
-    "name": "Profanity filter",
-    "disabled": "Disabled",
-    "replace-with-asterisk": "Replace with asterisk",
-    "replace-with-happy-words": "Replace with happy words",
-    "hide-messages": "Hide messages",
+    "name": "Schimpfwort-Filter",
+    "disabled": "Deaktiviert",
+    "replace-with-asterisk": "Mit Sternchen ersetzen",
+    "replace-with-happy-words": "Mit freundlichen Wörtern ersetzen",
+    "hide-messages": "Nachrichten ausblenden",
     "disable-alerts": "Disable alerts"
   },
-  "loadStandardProfanityList": "Load standard profanity list",
+  "loadStandardProfanityList": "Standardliste für Schimpfwörter laden",
   "customProfanityList": {
-    "name": "Custom profanity list",
-    "help": "Words should be separated with comma."
+    "name": "Benutzerdefinierte Schimpfwort-Liste",
+    "help": "Wörter müssen durch Kommas getrennt werden."
   },
   "event": {
     "follows": "Follows",
     "cheers": "Cheers",
     "subs": "Subs",
-    "resubs": "Resubs",
-    "subgifts": "Subgifts",
+    "resubs": "Re-Subs",
+    "subgifts": "Verschenkte Subs",
     "tips": "Tips",
     "hosts": "Hosts",
     "raids": "Raids"
@@ -41,53 +41,53 @@
     "name": "Variant occurence"
   },
   "speed": {
-    "name": "Speed"
+    "name": "Geschwindigkeit"
   },
   "maxTimeToDecrypt": {
-    "name": "Max time to decrypt"
+    "name": "Maximale Zeit zum Entschlüsseln"
   },
   "characters": {
-    "name": "Characters"
+    "name": "Zeichen"
   },
-  "random": "Random",
-  "exact-amount": "Exact amount",
-  "greater-than-or-equal-to-amount": "Greater than or equal to amount",
-  "very-rarely": "Very rarely",
-  "rarely": "Rarely",
-  "default": "Default",
-  "frequently": "Frequently",
-  "very-frequently": "Very frequently",
+  "random": "Zufällig",
+  "exact-amount": "Genauer Betrag",
+  "greater-than-or-equal-to-amount": "Größer als oder gleich dem Betrag",
+  "very-rarely": "Sehr selten",
+  "rarely": "Selten",
+  "default": "Standard",
+  "frequently": "Häufig",
+  "very-frequently": "Sehr häufig",
   "messageTemplate": {
-    "name": "Message template",
-    "placeholder": "Set your message template",
+    "name": "Nachrichtenvorlage",
+    "placeholder": "Nachrichtenvorlage festlegen",
     "help": "Available variables: {name}, {amount} (cheers, subs, tips), {monthsName} (subs), {currency} (tips)"
   },
   "animationText": {
-    "name": "Animation text"
+    "name": "Animationstext"
   },
   "animationIn": {
-    "name": "Animation in"
+    "name": "Eingehende Animation"
   },
   "animationOut": {
-    "name": "Animation out"
+    "name": "Ausgehende Animation"
   },
   "alertDurationInMs": {
-    "name": "Alert duration"
+    "name": "Dauer des Alarms"
   },
   "alertTextDelayInMs": {
-    "name": "Alert text delay"
+    "name": "Verzögerung des Alarmtextes"
   },
   "layoutPicker": {
     "name": "Layout"
   },
   "image": {
-    "name": "Image"
+    "name": "Bild"
   },
   "sound": {
     "name": "Sound"
   },
   "soundVolume": {
-    "name": "Sound volume"
+    "name": "Sound Lautstärke"
   },
   "enableAdvancedMode": "Enable advanced mode",
   "font": {
