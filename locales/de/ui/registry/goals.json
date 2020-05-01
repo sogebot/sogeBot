@@ -1,17 +1,17 @@
 {
-  "addGoalGroup": "Add Goal Group",
-  "addGoal": "Add Goal",
-  "newGoal": "new Goal",
-  "newGoalGroup": "new Goal Group",
-  "goals": "Goals",
-  "general": "General",
+  "addGoalGroup": "Zielgruppe hinzufügen",
+  "addGoal": "Ziel hinzufügen",
+  "newGoal": "Neues Ziel",
+  "newGoalGroup": "Neue Zielgruppe",
+  "goals": "Ziele",
+  "general": "Allgemein",
   "display": "Display",
-  "fontSettings": "Font Settings",
+  "fontSettings": "Schrifteinstellungen",
   "barSettings": "Bar Settings",
-  "selectGoalOnLeftSide": "Select or add goal on left side",
+  "selectGoalOnLeftSide": "Ziel auf der linken Seite auswählen oder hinzufügen",
   "input": {
     "description": {
-      "title": "Description"
+      "title": "Beschreibung"
     },
     "goalAmount": {
       "title": "Goal Amount"
