@@ -3,17 +3,17 @@
     "enabled": "Status",
     "name": {
       "title": "Name",
-      "help": "<strong>Possible formats:</strong><br> point|points <br> bod|4:body|bodu"
+      "help": "Einzahl/Mehrzahl durch | getrennt. Beispiel: Punkt|Punkte"
     },
     "isPointResetIntervalEnabled": "Automatisches Punkte zurücksetzen",
     "resetIntervalCron": "Cron interval<br><a href='https://crontab.guru/'>CronTab generator</a>",
     "interval": "Intervall in Minuten in denen Zuschauer Punkte erhalten währen der Stream läuft",
     "offlineInterval": "Intervall in Minuten in denen Zuschauer Punkte erhalten währen der Stream nicht läuft",
     "messageInterval": "Alle x Nachrichten erhalten Zuschauer Punkte",
-    "messageOfflineInterval": "How many messages to add points when stream offline",
-    "perInterval": "How many points to add per online interval",
-    "perOfflineInterval": "How many points to add per offline interval",
-    "perMessageInterval": "How many points to add per message interval",
-    "perMessageOfflineInterval": "How many points to add per message offline interval"
+    "messageOfflineInterval": "Alle x Nachrichten erhalten Zuschauer Punkte während der Stream nicht läuft",
+    "perInterval": "Punkte die Zuschauer erhalten inerhalb eines Intervalls",
+    "perOfflineInterval": "Punkte die Zuschauer erhalten inerhalb eines Intervalls (während der Stream nicht läuft)",
+    "perMessageInterval": "Punkteanzahl die Zuschauer erhalten nach x Nachrichten",
+    "perMessageOfflineInterval": "Punkteanzahl die Zuschauer erhalten nach x Nachrichten während der Stream nicht läuft"
   }
 }
