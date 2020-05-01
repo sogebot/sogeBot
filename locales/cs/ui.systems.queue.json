@@ -1,8 +1,8 @@
 {
   "settings": {
     "enabled": "Status",
-    "eligibilityAll": "Všichni",
-    "eligibilityFollowers": "Followeři",
-    "eligibilitySubscribers": "Subscribeři"
+    "eligibilityAll": "All",
+    "eligibilityFollowers": "Followers",
+    "eligibilitySubscribers": "Subscribers"
   }
 }
