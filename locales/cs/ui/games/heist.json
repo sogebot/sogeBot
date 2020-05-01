@@ -1,31 +1,30 @@
 {
-  "name": "Loupež",
+  "name": "Heist",
   "settings": {
     "enabled": "Status",
-    "showMaxUsers": "Maximální počet uživatelů k zobrazení",
+    "showMaxUsers": "Max users to show in payout",
     "copsCooldownInMinutes": {
-      "title": "Čas mezi heisty",
-      "help": "Minuty"
+      "title": "Cooldown between heists",
+      "help": "Minutes"
     },
-    "entryCooldownInSekundy": {
-      "title": "Čas pro vstup do heistu",
-      "help": "Sekundy"
+    "entryCooldownInSeconds": {
+      "title": "Time to entry heist",
+      "help": "Seconds"
     },
-    "started": "Zpráva o startu heistu",
-    "nextLevelMessage": "Zpráva při dosažení další úrovně",
-    "maxLevelMessage": "Zpráva při dosažení maximální úrovně",
-    "copsOnPatrol": "Zpráva, když je heist v cooldownu",
-    "copsCooldown": "Oznámení bota, kdy může být spuštěna loupež",
-    "singleUserSuccess": "Zpráva o úspěchu jednoho uživatele",
-    "singleUserFailed": "Zpráva o neúspěchu jednoho uživatele",
-    "noUser": "Zpráva, když se nikdo nezúčastnil heistu"
+    "started": "Heist start message",
+    "nextLevelMessage": "Message when next level is reached",
+    "maxLevelMessage": "Message when max level is reached",
+    "copsOnPatrol": "Response of bot when heist is still on cooldown",
+    "copsCooldown": "Bot announcement when heist can be started",
+    "singleUserSuccess": "Success message for one user",
+    "singleUserFailed": "Fail message for one user",
+    "noUser": "Message if no user participated"
   },
-  "noResultsFound": "Nebyly nalezeny žádné výsledky. Kliknutím na tlačítko níže přidáte nový výsledek.",
-  "noLevelsFound": "Nebyly nalezeny žádné úrovně. Klepnutím na tlačítko níže přidáte novou úroveň.",
-  "andXMore": "A X dalších",
-  "message": "Zpráva",
-  "winPercentage": "Šance výhry",
-  "payoutMultiplier": "Násobitel výplaty",
-  "maxUsers": "Maximální počet uživatelů pro level",
-  "percentage": "Procento výher"
+  "message": "Message",
+  "winPercentage": "Win percentage",
+  "payoutMultiplier": "Payout multiplier",
+  "maxUsers": "Max users for level",
+  "percentage": "Percentage",
+  "noResultsFound": "No results found. Click button below to add new result.",
+  "noLevelsFound": "No levels found. Click button below to add new level."
 }
