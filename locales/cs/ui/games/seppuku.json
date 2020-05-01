@@ -2,8 +2,8 @@
   "settings": {
     "enabled": "Status",
     "timeout": {
-      "title": "Čas trvání timeoutu",
-      "help": "Sekundy"
+      "title": "Timeout duration",
+      "help": "Seconds"
     }
   }
 }
