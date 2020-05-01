@@ -1,19 +1,19 @@
 {
-  "new": "Nová Cena",
-  "empty": "Žádná cena nebyla vytvořena.",
-  "emptyAfterSearch": "Žádná cena nebyla nalezena pro tvé hledání <strong>\"$search\"</strong>.",
+  "new": "New Price",
+  "empty": "No price were created yet.",
+  "emptyAfterSearch": "No price were found by your search for <strong>\"$search\"</strong>.",
   "command": {
-    "name": "příkaz",
+    "name": "command",
     "placeholder": ""
   },
   "price": {
-    "name": "cena",
+    "name": "price",
     "placeholder": ""
   },
   "error": {
-    "isEmpty": "Tato hodnota nesmí být prázdná"
+    "isEmpty": "This value cannot be empty"
   },
-  "warning": "Tato akce nemůže být vrácena!",
+  "warning": "This action cannot be reverted!",
   "settings": {
     "enabled": "Status"
   }
