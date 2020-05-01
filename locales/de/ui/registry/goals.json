@@ -17,78 +17,78 @@
       "title": "Goal Amount"
     },
     "countBitsAsTips": {
-      "title": "Count Bits as Tips"
+      "title": "Bits als Spenden zählen"
     },
     "currentAmount": {
-      "title": "Current Amount"
+      "title": "Aktueller Betrag"
     },
     "endAfter": {
-      "title": "End After"
+      "title": "Beenden nach"
     },
     "endAfterIgnore": {
-      "title": "Goal will not expire"
+      "title": "Ziel läuft nicht ab"
     },
     "fonts": {
-      "title": "Font Family",
-      "help": "Google fonts are used for font families. <a href='https://fonts.google.com/' target='_blank'>Check font list.</a>"
+      "title": "Font-Familie",
+      "help": "Google-Fonts werden für Font-Familien verwendet. <a href='https://fonts.google.com/' target='_blank'>Schriftartenliste prüfen.</a>"
     },
     "fontSize": {
-      "title": "Size",
-      "help": "Font size is in pixels"
+      "title": "Größe",
+      "help": "Schriftgröße ist in Pixeln"
     },
     "borderPx": {
-      "title": "Border",
-      "help": "Border size is in pixels"
+      "title": "Rahmen",
+      "help": "Rahmengröße ist in Pixeln"
     },
     "barHeight": {
       "title": "Bar Height",
       "help": "Bar height is in pixels"
     },
     "color": {
-      "title": "Color"
+      "title": "Farbe"
     },
     "borderColor": {
-      "title": "Border Color"
+      "title": "Rahmenfarbe"
     },
     "backgroundColor": {
-      "title": "Background Color"
+      "title": "Hintergrundfarbe"
     },
     "type": {
-      "title": "Type"
+      "title": "Typ"
     },
     "nameGroup": {
-      "title": "Name of this goal group",
-      "placeholder": "Set name of this goal group",
-      "help": "If kept empty, name will be randomly generated"
+      "title": "Name dieser Zielgruppe",
+      "placeholder": "Name dieser Zielgruppe festlegen",
+      "help": "Wenn leer, wird der Name zufällig generiert"
     },
     "name": {
-      "title": "Name of this goal",
-      "placeholder": "Set name of this goal"
+      "title": "Name des Ziels",
+      "placeholder": "Name des Ziels festlegen"
     },
     "displayAs": {
-      "title": "Display as",
-      "help": "Sets how goal group will be shown"
+      "title": "Anzeigen als",
+      "help": "Legt fest, wie Zielgruppe angezeigt wird"
     },
     "durationMs": {
-      "title": "Duration",
-      "help": "This value is in milliseconds",
-      "placeholder": "How long goal should be shown"
+      "title": "Dauer",
+      "help": "Dieser Wert ist in Millisekunden",
+      "placeholder": "Wie lange das Ziel angezeigt werden soll"
     },
     "animationInMs": {
-      "title": "Animation In duration",
-      "help": "This value is in milliseconds",
-      "placeholder": "Set your animation In duration"
+      "title": "Dauer der eingehenden Animation",
+      "help": "Dieser Wert ist in Millisekunden",
+      "placeholder": "Eingehende Animationsdauer festlegen"
     },
     "animationOutMs": {
-      "title": "Animation Out duration",
-      "help": "This value is in milliseconds",
-      "placeholder": "Set your animation Out duration"
+      "title": "Dauer der ausgehenden Animation",
+      "help": "Dieser Wert ist in Millisekunden",
+      "placeholder": "Dauer der ausgehenden Animation festlegen"
     },
     "spaceBetweenGoalsInPx": {
-      "title": "Space between goals",
-      "help": "This value is in pixels",
+      "title": "Abstand zwischen Zielen",
+      "help": "Dieser Wert ist in Pixeln",
       "placeholder": "Set your space between goals"
     }
   },
-  "groupSettings": "Group Settings"
+  "groupSettings": "Gruppeneinstellungen"
 }
