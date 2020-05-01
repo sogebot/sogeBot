@@ -1,0 +1,7 @@
+{
+  "settings": {
+    "cClipsVolume": "Volume",
+    "cClipsFilter": "Clip filter",
+    "cClipsLabel": "Show 'clip' label"
+  }
+}
