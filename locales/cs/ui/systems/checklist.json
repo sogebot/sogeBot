@@ -1,7 +1,7 @@
 {
   "settings": {
     "enabled": "Status",
-    "itemsArray": "Seznam"
+    "itemsArray": "List"
   },
   "check": "Checklist"
 }
