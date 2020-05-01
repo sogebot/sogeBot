@@ -89,24 +89,24 @@
   "soundVolume": {
     "name": "Sound Lautstärke"
   },
-  "enableAdvancedMode": "Enable advanced mode",
+  "enableAdvancedMode": "Erweiterten Modus aktivieren",
   "font": {
-    "setting": "Font settings",
-    "name": "Font family",
+    "setting": "Schrifteinstellungen",
+    "name": "Schriftartfamilie",
     "size": {
-      "name": "Font size"
+      "name": "Schriftgröße"
     },
     "weight": {
-      "name": "Font weight"
+      "name": "Schriftdicke"
     },
     "borderPx": {
-      "name": "Font border"
+      "name": "Schriftumrandung"
     },
     "borderColor": {
-      "name": "Font border color"
+      "name": "Farbe Schriftumrandung"
     },
     "color": {
-      "name": "Font color"
+      "name": "Schriftfarbe"
     },
     "highlightcolor": {
       "name": "Font highlight color"
