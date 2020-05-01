@@ -1,138 +1,138 @@
 {
-  "enabled": "Enabled",
-  "empty": "Alerts registry is empty, create new alerts.",
-  "emptyAfterSearch": "Alerts registry is empty in searching for \"<strong>$search</strong>\"",
-  "revertcode": "Revert code to defaults",
+  "enabled": "Status",
+  "empty": "Registr alertů je prázdný, vytvořte nový.",
+  "emptyAfterSearch": "Registr alertů je prázdný při hledání \"<strong>$search</strong>\"",
+  "revertcode": "Vrátit kód do výchozího stavu",
   "name": {
-    "name": "Name",
-    "placeholder": "Set name of your alerts"
+    "name": "Název",
+    "placeholder": "Zadejte název svých alertů"
   },
   "alertDelayInMs": {
-    "name": "Alert delay"
+    "name": "Zpoždění alertů"
   },
   "profanityFilterType": {
-    "name": "Profanity filter",
-    "disabled": "Disabled",
-    "replace-with-asterisk": "Replace with asterisk",
-    "replace-with-happy-words": "Replace with happy words",
-    "hide-messages": "Hide messages",
-    "disable-alerts": "Disable alerts"
+    "name": "Filtr vulgarit",
+    "disabled": "Vypnuto",
+    "replace-with-asterisk": "Zaměnit za hvězdičky",
+    "replace-with-happy-words": "Zaměnit za šťastná slova",
+    "hide-messages": "Schovat zprávu",
+    "disable-alerts": "Vypnout alerty"
   },
-  "loadStandardProfanityList": "Load standard profanity list",
+  "loadStandardProfanityList": "Nahrát standardní seznam vulgarit",
   "customProfanityList": {
-    "name": "Custom profanity list",
-    "help": "Words should be separated with comma."
+    "name": "Vlastní list vulgarit",
+    "help": "Slova musí být oddělena čárkou."
   },
   "event": {
-    "follows": "Follows",
-    "cheers": "Cheers",
-    "subs": "Subs",
-    "resubs": "Resubs",
-    "subgifts": "Subgifts",
-    "tips": "Tips",
-    "hosts": "Hosts",
-    "raids": "Raids"
+    "follows": "Sledující",
+    "cheers": "Bity",
+    "subs": "Předplatitel",
+    "resubs": "Předplatitel (resub)",
+    "subgifts": "Darování subscribe",
+    "tips": "Spropitné",
+    "hosts": "Hostování",
+    "raids": "Raidy"
   },
   "title": {
-    "name": "Variant name",
-    "placeholder": "Set your variant name"
+    "name": "Název varianty",
+    "placeholder": "Zadejte název varianty"
   },
   "variant": {
-    "name": "Variant occurence"
+    "name": "Výskyt varianty"
   },
   "speed": {
-    "name": "Speed"
+    "name": "Rychlost"
   },
   "maxTimeToDecrypt": {
-    "name": "Max time to decrypt"
+    "name": "Maximální čas dešifrování"
   },
   "characters": {
-    "name": "Characters"
+    "name": "Znaky"
   },
-  "random": "Random",
-  "exact-amount": "Exact amount",
-  "greater-than-or-equal-to-amount": "Greater than or equal to amount",
-  "very-rarely": "Very rarely",
-  "rarely": "Rarely",
-  "default": "Default",
-  "frequently": "Frequently",
-  "very-frequently": "Very frequently",
+  "random": "Náhodně",
+  "exact-amount": "Přesný počet",
+  "greater-than-or-equal-to-amount": "Více nebo stejně jako počet",
+  "very-rarely": "Velmi zřídka",
+  "rarely": "Zřídka",
+  "default": "Normálně",
+  "frequently": "Často",
+  "very-frequently": "Velmi často",
   "messageTemplate": {
-    "name": "Message template",
-    "placeholder": "Set your message template",
-    "help": "Available variables: {name}, {amount} (cheers, subs, tips), {monthsName} (subs), {currency} (tips)"
+    "name": "Šablona zprávy",
+    "placeholder": "Zadejte svou šablonu zprávy",
+    "help": "Dostupné proměnné: {name}, {amount} (cheers, subs, tips), {monthsName} (subs), {currency} (tips)"
   },
   "animationText": {
-    "name": "Animation text"
+    "name": "Animace textu"
   },
   "animationIn": {
-    "name": "Animation in"
+    "name": "Vstupní animace"
   },
   "animationOut": {
-    "name": "Animation out"
+    "name": "Výstupní animace"
   },
   "alertDurationInMs": {
-    "name": "Alert duration"
+    "name": "Trvání alertu"
   },
   "alertTextDelayInMs": {
-    "name": "Alert text delay"
+    "name": "Zpoždění textu alertu"
   },
   "layoutPicker": {
-    "name": "Layout"
+    "name": "Rozvržení"
   },
   "image": {
-    "name": "Image"
+    "name": "Obrázek"
   },
   "sound": {
-    "name": "Sound"
+    "name": "Zvuk"
   },
   "soundVolume": {
-    "name": "Sound volume"
+    "name": "Hlasitost zvuku"
   },
-  "enableAdvancedMode": "Enable advanced mode",
+  "enableAdvancedMode": "Zapnout pokročilý mód",
   "font": {
-    "setting": "Font settings",
-    "name": "Font family",
+    "setting": "Nastavení fontu",
+    "name": "Font",
     "size": {
-      "name": "Font size"
+      "name": "Velikost fontu"
     },
     "weight": {
-      "name": "Font weight"
+      "name": "Tloušťka fontu"
     },
     "borderPx": {
-      "name": "Font border"
+      "name": "Ohraničení fontu"
     },
     "borderColor": {
-      "name": "Font border color"
+      "name": "Barva ohraničení fontu"
     },
     "color": {
-      "name": "Font color"
+      "name": "Barva fontu"
     },
     "highlightcolor": {
-      "name": "Font highlight color"
+      "name": "Barva zvýraznění"
     }
   },
   "minAmountToShow": {
-    "name": "Minimal amount to show"
+    "name": "Minimální počet k zobrazení"
   },
   "minAmountToPlay": {
-    "name": "Minimal amount to play"
+    "name": "Minimální počet k přehrání"
   },
   "allowEmotes": {
-    "name": "Allow emotes"
+    "name": "Povolit emotikony"
   },
   "message": {
-    "setting": "Message settings"
+    "setting": "Nastavení zprávy"
   },
-  "showAutoHost": "Show autohost",
-  "voice": "Voice",
-  "keepAlertShown": "Alert keeps visible during TTS",
-  "skipUrls": "Skip URLs during TTS",
-  "volume": "Volume",
-  "rate": "Rate",
-  "pitch": "Pitch",
+  "showAutoHost": "Zobrazit autohost",
+  "voice": "Hlas",
+  "keepAlertShown": "Alert zůstane zobrazen během TTS",
+  "skipUrls": "Přeskočit URL během TTS",
+  "volume": "Hlasitost",
+  "rate": "Tempo",
+  "pitch": "Výška",
   "test": "Test",
   "tts": {
-    "setting": "TTS settings"
+    "setting": "Nastavení TTS"
   }
 }
