@@ -1,10 +1,10 @@
 {
   "settings": {
     "enabled": "Status",
-    "minimalBet": "Minimal bet",
+    "minimalBet": "Minimální sázka",
     "chanceToWin": {
-      "title": "Chance to win",
-      "help": "Percent"
+      "title": "Šance na výhru",
+      "help": "Procenta"
     }
   }
 }
