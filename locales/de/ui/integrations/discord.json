@@ -1,0 +1,14 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "listenAtChannels": {
+      "title": "Listen at these channels (#name or id)",
+      "help": "Separated by comma (,)"
+    },
+    "sendOnlineAnnounceToChannel": "Send online announcement to this channel (#name or id)",
+    "sendGeneralAnnounceToChannel": "Send general announcement to this channel (#name or id)",
+    "deleteMessagesAfterWhile": "Delete message after while",
+    "clientId": "ClientId",
+    "token": "Token"
+  }
+}
