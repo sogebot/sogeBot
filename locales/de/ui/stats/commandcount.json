@@ -1,10 +1,10 @@
 {
-  "usage": "Usage",
-  "command": "Command",
-  "hour": "Hour",
-  "day": "Day",
-  "week": "Week",
-  "month": "Month",
-  "year": "Year",
-  "total": "Total"
+  "usage": "Verwendung",
+  "command": "Befehl",
+  "hour": "Stunde",
+  "day": "Tag",
+  "week": "Woche",
+  "month": "Monat",
+  "year": "Jahr",
+  "total": "Gesamt"
 }
