@@ -6,16 +6,16 @@
     "permission": "Command permission",
     "simple": "Einfach",
     "wheelOfFortune": "Glücksrad",
-    "type": "Type",
-    "options": "Options",
-    "optionsAreEmpty": "Options are empty.",
-    "color": "Color",
-    "numOfDuplicates": "No. of duplicates",
-    "minimalSpacing": "Minimal spacing",
+    "type": "Typ",
+    "options": "Optionen",
+    "optionsAreEmpty": "Optionen sind leer.",
+    "color": "Farbe",
+    "numOfDuplicates": "Anzahl der Duplikate",
+    "minimalSpacing": "Minimaler Abstand",
     "groupUp": "Group Up",
-    "ungroup": "Ungroup",
+    "ungroup": "Gruppierung aufheben",
     "groupedWithOptionAbove": "Grouped with option above",
-    "generatedOptionsPreview": "Preview of generated options",
-    "probability": "Probability"
+    "generatedOptionsPreview": "Vorschau der generierten Optionen",
+    "probability": "Wahrscheinlichkeit"
   }
 }
