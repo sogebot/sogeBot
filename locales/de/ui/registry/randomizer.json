@@ -2,10 +2,10 @@
   "addRandomizer": "Add Randomizer",
   "form": {
     "name": "Name",
-    "command": "Command",
+    "command": "Befehl",
     "permission": "Command permission",
-    "simple": "Simple",
-    "wheelOfFortune": "Wheel of Fortune",
+    "simple": "Einfach",
+    "wheelOfFortune": "Glücksrad",
     "type": "Type",
     "options": "Options",
     "optionsAreEmpty": "Options are empty.",
