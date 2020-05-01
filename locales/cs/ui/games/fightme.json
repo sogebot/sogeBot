@@ -3,11 +3,11 @@
     "enabled": "Status",
     "cooldown": "Cooldown",
     "timeout": {
-      "title": "Čas trvání timeoutu",
-      "help": "Sekundy"
+      "title": "Timeout duration",
+      "help": "Seconds"
     },
-    "bypassCooldownByOwnerAndMods": "Bypass cooldownu majitelem a moderátory",
-    "winnerWillGet": "Kolik bodů bude přidáno při výhře",
-    "loserWillLose": "Kolik bodů bude ztraceno při prohře"
+    "bypassCooldownByOwnerAndMods": "Bypass cooldown by owner and mods",
+    "winnerWillGet": "How many points will be added on win",
+    "loserWillLose": "How many points will be lost on lose"
   }
 }
