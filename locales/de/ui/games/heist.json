@@ -2,29 +2,29 @@
   "name": "Heist",
   "settings": {
     "enabled": "Status",
-    "showMaxUsers": "Max users to show in payout",
+    "showMaxUsers": "Max Benutzer bei der Auszahlung anzeigen",
     "copsCooldownInMinutes": {
       "title": "Cooldown between heists",
-      "help": "Minutes"
+      "help": "Minuten"
     },
     "entryCooldownInSeconds": {
       "title": "Time to entry heist",
-      "help": "Seconds"
+      "help": "Sekunden"
     },
     "started": "Heist start message",
-    "nextLevelMessage": "Message when next level is reached",
-    "maxLevelMessage": "Message when max level is reached",
+    "nextLevelMessage": "Nachricht, wenn die nächste Stufe erreicht ist",
+    "maxLevelMessage": "Nachricht, wenn die maximale Stufe erreicht ist",
     "copsOnPatrol": "Response of bot when heist is still on cooldown",
     "copsCooldown": "Bot announcement when heist can be started",
-    "singleUserSuccess": "Success message for one user",
-    "singleUserFailed": "Fail message for one user",
-    "noUser": "Message if no user participated"
+    "singleUserSuccess": "Erfolgsmeldung für einen Benutzer",
+    "singleUserFailed": "Fehlermeldung für einen Benutzer",
+    "noUser": "Nachricht, wenn kein Benutzer teilgenommen hat"
   },
-  "message": "Message",
+  "message": "Nachricht",
   "winPercentage": "Win percentage",
-  "payoutMultiplier": "Payout multiplier",
-  "maxUsers": "Max users for level",
-  "percentage": "Percentage",
-  "noResultsFound": "No results found. Click button below to add new result.",
-  "noLevelsFound": "No levels found. Click button below to add new level."
+  "payoutMultiplier": "Auszahlungs-Multiplikator",
+  "maxUsers": "Max Benutzer für Stufe",
+  "percentage": "Prozentsatz",
+  "noResultsFound": "Keine Ergebnisse gefunden. Zum Hinzufügen eines neuen Ergebnisses auf die Schaltfläche unten klicken.",
+  "noLevelsFound": "Keine Stufen gefunden. Zum Hinzufügen einer neuen Stufe auf die Schaltfläche unten klicken."
 }
