@@ -1,11 +1,11 @@
 {
   "settings": {
-    "purgeAllConnections": "Zrušit všechna současná připojení (i to tvé)",
-    "accessTokenExpirationTime": "Čas expirace access tokenu (ve vteřinách)",
-    "refreshTokenExpirationTime": "Čas expirace refresh tokenu (ve vteřinách)",
+    "purgeAllConnections": "Purge All Authenticated Connection (yours as well)",
+    "accessTokenExpirationTime": "Access Token Expiration Time (seconds)",
+    "refreshTokenExpirationTime": "Refresh Token Expiration Time (seconds)",
     "socketToken": {
       "title": "Socket token",
-      "help": "Tento token vám dá plný admin přístup přes socket. Nesdílejte!"
+      "help": "This token will give you full admin access through sockets. Don't share!"
     }
   }
 }
