@@ -4,8 +4,8 @@
     "cDisplayHideAfterInactivity": "Bei Inaktivität ausblenden",
     "cDisplayAlign": "Ausrichten",
     "cDisplayInactivityTime": {
-      "title": "Inactivity after",
-      "help": "in miliseconds"
+      "title": "Inaktivität nach",
+      "help": "in Milisekunden"
     }
   }
 }
