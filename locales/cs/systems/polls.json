@@ -1,13 +1,13 @@
 {
-  "opened_normal": "Hlasovani otevreno! Hlasovani na otazku \"$title\" pomoci $command X",
-  "opened_tips": "Hlasovani pomoci tipu otevreno! Hlasovani na otazku \"$title\" pomoci hashtagu #voteX ve zprave tipu",
-  "opened_bits": "Hlasovani pomoci bitu otevreno! Hlasovani na otazku \"$title\" pomoci hashtagu #voteX ve zprave bitu",
-  "alreadyOpened_normal": "Chyba! Hlasovani jiz bylo otevreno! Hlasovani na otazku \"$title\" pomoci $command X",
-  "alreadyOpened_tips": "Chyba! Hlasovani pomoci tipu jiz bylo otevreno! Hlasovani na otazku \"$title\" pomoci hashtagu #voteX ve zprave tipu",
-  "alreadyOpened_bits": "Chyba! Hlasovani pomoci bitu jiz bylo otevreno! Hlasovani na otazku \"$title\" pomoci hashtagu #voteX ve zprave bitu",
-  "notEnoughOptions": "$sender, nove hlasovani musi mit alespon dve moznosti!",
-  "notInProgress": "$sender, neprobiha prave zadne hlasovani!",
-  "status": "$sender, momentalni stav hlasovani \"$title\":",
-  "status_closed": "Hlasovani \"$title\" uzavreno, finalni stav hlasovani:",
-  "votes": "hlas|4:hlasy|hlasu"
+  "opened_normal": "Poll opened for \"$title\"! You can vote by $command X",
+  "opened_tips": "Poll by tips opened for \"$title\"! You can vote by adding hashtag #voteX into tip message",
+  "opened_bits": "Poll by cheers opened for \"$title\"! You can vote by adding hashtag #voteX into bit message",
+  "alreadyOpened_normal": "Error! Poll was already opened for \"$title\"! You can vote by $command X",
+  "alreadyOpened_tips": "Error! Poll by tips was already opened for \"$title\"! You can vote by adding hashtag #voteX into tip message",
+  "alreadyOpened_bits": "Error! Poll by cheers was already opened for \"$title\"! You can vote by adding hashtag #voteX into bit message",
+  "notEnoughOptions": "$sender, new poll must have at least 2 options!",
+  "notInProgress": "$sender, there is currently no poll in progress!",
+  "status": "$sender, current status of poll \"$title\":",
+  "status_closed": "Poll \"$title\" closed, status of voting:",
+  "votes": "vote|votes"
 }
