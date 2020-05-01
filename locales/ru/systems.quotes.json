@@ -1,0 +1,30 @@
+{
+  "add": {
+    "ok": "$sender, quote $id '$quote' was added. (tags: $tags)",
+    "error": "$sender, $command is not correct or missing -quote parameter"
+  },
+  "remove": {
+    "ok": "$sender, quote $id was successfully deleted.",
+    "error": "$sender, quote ID is missing.",
+    "not-found": "$sender, quote $id was not found."
+  },
+  "show": {
+    "ok": "Quote $id by $quotedBy '$quote'",
+    "error": {
+      "no-parameters": "$sender, $command is missing -id or -tag.",
+      "not-found-by-id": "$sender, quote $id was not found.",
+      "not-found-by-tag": "$sender, no quotes with tag $tag was not found."
+    }
+  },
+  "set": {
+    "ok": "$sender, quote $id tags were set. (tags: $tags)",
+    "error": {
+      "no-parameters": "$sender, $command is missing -id or -tag.",
+      "not-found-by-id": "$sender, quote $id was not found."
+    }
+  },
+  "list": {
+    "ok": "$sender, You can find quote list at http://$urlBase/public/#/quotes",
+    "is-localhost": "$sender, quote list url is not properly specified."
+  }
+}
