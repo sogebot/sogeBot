@@ -1,10 +1,10 @@
 {
   "settings": {
-    "ignorelist": "Seznam ignorovaných (ID nebo uživ. jm.)",
-    "globalIgnoreListExclude": "Odebrat z globálního seznamu ignorovaných",
-    "showWithAt": "Zobraz uzivatele s @",
-    "sendWithMe": "Posílat zprávy s /me",
-    "mute": "Bot je ztišen",
-    "whisperListener": "Provádět příkazy pres whisper"
+    "ignorelist": "Ignore list (ID or username)",
+    "globalIgnoreListExclude": "Exclude from global ignore list",
+    "showWithAt": "Show users with @",
+    "sendWithMe": "Send messages with /me",
+    "mute": "Bot is muted",
+    "whisperListener": "Listen on commands on whispers"
   }
 }
