@@ -15,11 +15,11 @@
     },
     "subscribersPercent": {
       "title": "Zusätzliches Glück der Abonnenten",
-      "help": "in percents"
+      "help": "in Prozent"
     },
     "followersPercent": {
-      "title": "Additional followers luck",
-      "help": "in percents"
+      "title": "Zusätzliches Glück der Follower",
+      "help": "in Prozent"
     }
   }
 }
