@@ -1,7 +1,7 @@
 {
   "enabled": "Aktiviert",
   "empty": "Die Alert-Registry ist leer, erstelle einen neuen Alert.",
-  "emptyAfterSearch": "Alert Reistry leer! Bei der Suche nach \"<strong>$search</strong>\" wurden keine Alerts gefunden",
+  "emptyAfterSearch": "Alert Registry leer! Bei der Suche nach \"<strong>$search</strong>\" wurden keine Alerts gefunden",
   "revertcode": "Auf Standard zurücksetzen",
   "name": {
     "name": "Name",
@@ -109,30 +109,30 @@
       "name": "Schriftfarbe"
     },
     "highlightcolor": {
-      "name": "Font highlight color"
+      "name": "Farbe der hervorgehobenen Schrift"
     }
   },
   "minAmountToShow": {
-    "name": "Minimal amount to show"
+    "name": "Minimaler Betrag zum Anzeigen"
   },
   "minAmountToPlay": {
-    "name": "Minimal amount to play"
+    "name": "Minimaler Betrag zum Abspielen"
   },
   "allowEmotes": {
-    "name": "Allow emotes"
+    "name": "Emotes zulassen"
   },
   "message": {
-    "setting": "Message settings"
+    "setting": "Nachrichteneinstellungen"
   },
-  "showAutoHost": "Show autohost",
-  "voice": "Voice",
-  "keepAlertShown": "Alert keeps visible during TTS",
-  "skipUrls": "Skip URLs during TTS",
-  "volume": "Volume",
+  "showAutoHost": "Zeige Auto-Host",
+  "voice": "Stimme",
+  "keepAlertShown": "Alert bleibt während TTS sichtbar",
+  "skipUrls": "URLs in TTS überspringen",
+  "volume": "Lautstärke",
   "rate": "Rate",
-  "pitch": "Pitch",
+  "pitch": "Tonhöhe",
   "test": "Test",
   "tts": {
-    "setting": "TTS settings"
+    "setting": "TTS-Einstellungen"
   }
 }
