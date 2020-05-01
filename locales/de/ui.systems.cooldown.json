@@ -1,10 +1,10 @@
 {
-  "new": "New Cooldown",
-  "empty": "No cooldowns were created yet.",
-  "emptyAfterSearch": "No cooldown were found by your search for <strong>\"$search\"</strong>.",
-  "notify-as-whisper": "Notify as whisper",
+  "new": "Neuer Cooldown",
+  "empty": "Bisher wurde noch kein Cooldown erstellt.",
+  "emptyAfterSearch": "Bei der Suche nach <strong>\"$search\"</strong> wurde kein Cooldown gefunden.",
+  "notify-as-whisper": "Antwort über Privat Nachricht",
   "error": {
-    "isEmpty": "This value cannot be empty"
+    "isEmpty": "Dieser Wert darf nicht leer sein"
   },
   "settings": {
     "enabled": "Status",
