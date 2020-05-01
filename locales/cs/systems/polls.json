@@ -6,8 +6,8 @@
   "alreadyOpened_tips": "Chyba! Anketa pomocí tipů byla již otevřena pro \"$title\"! Můžete hlasovat přidáním hashtag #voteX do zprávy",
   "alreadyOpened_bits": "Chyba! Anketa pomocí bitů byla již otevřena pro \"$title\"! Můžete hlasovat přidáním hashtag #voteX do zprávy",
   "notEnoughOptions": "$sender, nová anketa musí mít alespoň 2 možnosti!",
-  "notInProgress": "$sender, neprobiha prave zadne hlasovani!",
-  "status": "$sender, momentalni stav hlasovani \"$title\":",
+  "notInProgress": "$sender, v současné době neprobíhá žádná anketa!",
+  "status": "$sender, aktuální stav ankety \"$title\":",
   "status_closed": "Anketa \"$title\" uzavřena, stav hlasování:",
   "votes": "hlas|4:hlasy|hlasu"
 }
