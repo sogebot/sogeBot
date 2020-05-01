@@ -5,7 +5,7 @@
     "port": "Port",
     "host": {
       "title": "Host",
-      "help": "je nutné mít PhillipsHue ve stejné síti jako je bot"
+      "help": "its mandatory to have PhillipsHue on same network as a bot"
     },
     "timeout": "Timeout"
   }
