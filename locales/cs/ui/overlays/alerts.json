@@ -1,6 +1,6 @@
 {
   "settings": {
-    "galleryCache": "Cache gallery items",
-    "galleryCacheLimitInMb": "Max size of gallery item (in MB) to cache"
+    "galleryCache": "Udělat cache galerie",
+    "galleryCacheLimitInMb": "Maximální velikost položky (v MB)"
   }
 }
