@@ -1,28 +1,28 @@
 {
   "settings": {
     "enabled": "Status",
-    "volume": "Volume",
-    "calculateVolumeByLoudness": "Dynamic volume by loudness",
+    "volume": "Lautstärke",
+    "calculateVolumeByLoudness": "Dynamische Lautstärke in Abhängigkeit zur Lautheit",
     "duration": {
-      "title": "Max song duration",
-      "help": "In minutes"
+      "title": "Maximale Länge eines Songs",
+      "help": "In Minuten"
     },
-    "shuffle": "Shuffle",
-    "songrequest": "Play from song request",
-    "playlist": "Play from playlist",
-    "onlyMusicCategory": "Allow only category music",
-    "notify": "Send message on song change"
+    "shuffle": "Zufallswiedergabe",
+    "songrequest": "Von Song-Request wiedergeben",
+    "playlist": "Von Wiedergabeliste wiedergeben",
+    "onlyMusicCategory": "Nur Musik aus Kategorien zulassen",
+    "notify": "Nachricht bei Songwechsel senden"
   },
   "error": {
-    "isEmpty": "This value cannot be empty"
+    "isEmpty": "Dieser Wert darf nicht leer sein"
   },
-  "startTime": "Start song at",
-  "endTime": "End song at",
-  "add_song": "Add song",
-  "add_or_import": "Add song or import from playlist",
-  "importing": "Importing",
-  "importing_done": "Importing Done",
-  "seconds": "Seconds",
-  "calculated": "Calculated",
-  "set_manually": "Set manually"
+  "startTime": "Song starten bei",
+  "endTime": "Song beenden bei",
+  "add_song": "Song hinzufügen",
+  "add_or_import": "Song hinzufügen oder aus Wiedergabeliste importieren",
+  "importing": "Importieren",
+  "importing_done": "Importieren abgeschlossen",
+  "seconds": "Sekunden",
+  "calculated": "Berechnet",
+  "set_manually": "Manuell einstellen"
 }
