@@ -1,0 +1,30 @@
+{
+  "name": "Heist",
+  "settings": {
+    "enabled": "Status",
+    "showMaxUsers": "Max users to show in payout",
+    "copsCooldownInMinutes": {
+      "title": "Cooldown between heists",
+      "help": "Minutes"
+    },
+    "entryCooldownInSeconds": {
+      "title": "Time to entry heist",
+      "help": "Seconds"
+    },
+    "started": "Heist start message",
+    "nextLevelMessage": "Message when next level is reached",
+    "maxLevelMessage": "Message when max level is reached",
+    "copsOnPatrol": "Response of bot when heist is still on cooldown",
+    "copsCooldown": "Bot announcement when heist can be started",
+    "singleUserSuccess": "Success message for one user",
+    "singleUserFailed": "Fail message for one user",
+    "noUser": "Message if no user participated"
+  },
+  "message": "Message",
+  "winPercentage": "Win percentage",
+  "payoutMultiplier": "Payout multiplier",
+  "maxUsers": "Max users for level",
+  "percentage": "Percentage",
+  "noResultsFound": "No results found. Click button below to add new result.",
+  "noLevelsFound": "No levels found. Click button below to add new level."
+}
