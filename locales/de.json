@@ -131,9 +131,9 @@
         "example_of_user_object_data": "Example of user object data"
       },
       "errors": {
-        "command_must_start_with_!": "Command must start with !",
-        "this_value_must_be_a_positive_number_or_0": "This value must be a positive number or 0",
-        "value_cannot_be_empty": "Value cannot be empty"
+        "command_must_start_with_!": "Der Befehl muss mit einem ! beginnen",
+        "this_value_must_be_a_positive_number_or_0": "Die Variable muss eine positive Zahle sein über 0",
+        "value_cannot_be_empty": "Variable darf <strong>nicht</strong> leer sein!"
       },
       "dialog": {
         "title": {
