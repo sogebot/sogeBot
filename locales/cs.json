@@ -1,20 +1,20 @@
 {
   "core": {
-    "loaded": "je nacten a",
+    "loaded": "je načten a",
     "enabled": "zapnuto",
     "disabled": "vypnuto",
-    "usage": "Pouziti",
-    "lang-selected": "Bot je nyni prepnuty do cestiny",
-    "command-parse": "Promin, $sender, ale tento prikaz neni spravne, pouzij",
-    "error": "Promin, $sender, ale neco se pokazilo!",
+    "usage": "Použití",
+    "lang-selected": "Jazyk bota je nyní nastaven na češtinu",
+    "command-parse": "Omlouváme se, $sender, ale tento příkaz není správný, použijte",
+    "error": "Omlouváme se, $sender, ale něco se pokazilo!",
     "no-response": "",
     "no-response-bool": {
       "true": "",
       "false": ""
     },
     "api": {
-      "error": "$sender, neco se pokazilo v API!",
-      "not-available": "nedostupne"
+      "error": "$sender, API nereaguje správně!",
+      "not-available": "není k dispozici"
     },
     "percentage": {
       "true": "",
