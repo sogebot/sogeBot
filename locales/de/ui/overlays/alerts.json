@@ -1,6 +1,6 @@
 {
   "settings": {
-    "galleryCache": "Cache gallery items",
-    "galleryCacheLimitInMb": "Max size of gallery item (in MB) to cache"
+    "galleryCache": "Galerie zwischenspeichern",
+    "galleryCacheLimitInMb": "Maximale Größe des zwischenzuspeichernden Galerie-Elements (in MB)"
   }
 }
