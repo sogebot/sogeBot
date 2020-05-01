@@ -1,15 +1,15 @@
 {
   "settings": {
-    "btnRemoveCache": "Delete cache",
-    "btnTestExplosion": "Emote explosion",
+    "btnRemoveCache": "Cache leeren",
+    "btnTestExplosion": "Emote-Explosion",
     "btnTestEmote": "Emote",
-    "btnTestFirework": "Emote firework",
-    "cEmotesSize": "Emotes size",
-    "cEmotesMaxEmotesPerMessage": "Maximum of emotes per messge",
+    "btnTestFirework": "Emote-Feuerwerk",
+    "cEmotesSize": "Größe der Emotes",
+    "cEmotesMaxEmotesPerMessage": "Maximale Anzahl an Emotes pro Nachricht",
     "cEmotesAnimation": "Animation",
-    "cEmotesAnimationTime": "Animation duration",
-    "cExplosionNumOfEmotes": "No. of emotes",
-    "cExplosionNumOfEmotesPerExplosion": "No. of emotes per explosion",
-    "cExplosionNumOfExplosions": "No. of explosions"
+    "cEmotesAnimationTime": "Dauer der Animation",
+    "cExplosionNumOfEmotes": "Anzahl von Emotes",
+    "cExplosionNumOfEmotesPerExplosion": "Anzahl von Emotes pro Explosion",
+    "cExplosionNumOfExplosions": "Anzahl von Explosionen"
   }
 }
