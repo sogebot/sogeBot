@@ -3,7 +3,7 @@
   "higherPermissionHaveAccessToLowerPermissions": "Vyšší opravnění mají přistup k oprávněním nižším.",
   "typeUsernameOrIdToSearch": "Vyhledej uživatelské jméno nebo ID",
   "typeUsernameOrIdToTest": "Otestuj uživatelské jméno nebo ID",
-  "noUsersWereFound": "Nebyl nalezen žádný uživatel.",
+  "noUsersWereFound": "Nebyli nalezeni žádní uživatelé.",
   "noUsersManuallyAddedToPermissionYet": "Žádný uživatel nebyl prozatím manuálně přiřazen k tomuto oprávnění.",
   "done": "Hotovo",
   "previous": "Předchozí",
