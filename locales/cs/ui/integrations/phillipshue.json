@@ -1,7 +1,7 @@
 {
   "settings": {
     "enabled": "Status",
-    "user": "User",
+    "user": "Uživatel",
     "port": "Port",
     "host": {
       "title": "Host",
