@@ -1,10 +1,10 @@
 {
   "settings": {
     "theme": "Default theme",
-    "domain": "Doména",
-    "percentage": "Rozdíl v procentech",
-    "shortennumbers": "Zkrácený formát čísel",
-    "stickystats": "Přilepit statistiky na horní část stránek",
-    "showdiff": "Zobrazit rozdíl"
+    "domain": "Domain",
+    "percentage": "Percentage difference for stats",
+    "shortennumbers": "Short format of numbers",
+    "stickystats": "Stick stats to top",
+    "showdiff": "Show difference"
   }
 }
