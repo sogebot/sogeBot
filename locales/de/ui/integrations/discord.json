@@ -8,7 +8,7 @@
     "sendOnlineAnnounceToChannel": "Send online announcement to this channel (#name or id)",
     "sendGeneralAnnounceToChannel": "Send general announcement to this channel (#name or id)",
     "deleteMessagesAfterWhile": "Nach einiger Zeit, Nachrichten löschen",
-    "clientId": "ClientId",
+    "clientId": "Client ID",
     "token": "Token"
   }
 }
