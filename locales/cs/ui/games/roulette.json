@@ -2,10 +2,10 @@
   "settings": {
     "enabled": "Status",
     "timeout": {
-      "title": "Čas trvání timeoutu",
-      "help": "Sekundy"
+      "title": "Timeout duration",
+      "help": "Seconds"
     },
-    "winnerWillGet": "Kolik bodů bude přidáno při výhře",
-    "loserWillLose": "Kolik bodů bude ztraceno při prohře"
+    "winnerWillGet": "How many points will be added on win",
+    "loserWillLose": "How many points will be lost on lose"
   }
 }
