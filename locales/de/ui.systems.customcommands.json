@@ -1,0 +1,23 @@
+{
+  "new": "Neuer eigener Befehl",
+  "no-responses-set": "Keine Antworten",
+  "empty": "Bisher wurden noch keine benutzerdefinierten Befehle erstellt.",
+  "emptyAfterSearch": "Bei der Suche nach <strong>\"$search\"</strong> wurden keine benutzerdefinierten Befehle gefunden.",
+  "command": {
+    "name": "benutzerdefinierter Befehl",
+    "placeholder": ""
+  },
+  "addResponse": "Antwort hinzufügen",
+  "response": {
+    "name": "Antwort",
+    "placeholder": ""
+  },
+  "filter": {
+    "name": "Filter",
+    "placeholder": "Filter für diese Antwort hinzufügen"
+  },
+  "warning": "Diese Aktion kann nicht rückgängig gemacht werden!",
+  "settings": {
+    "enabled": "Status"
+  }
+}
