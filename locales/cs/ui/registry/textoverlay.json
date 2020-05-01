@@ -1,7 +1,7 @@
 {
-  "new": "Vytvořte nový textový overlay",
-  "title": "textový overlay",
+  "new": "Create new text overlay",
+  "title": "text overlay",
   "name": {
-    "placeholder": "Nastavte název textového overlaye"
+    "placeholder": "Set your text overlay name"
   }
 }
