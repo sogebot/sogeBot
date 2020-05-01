@@ -3,10 +3,10 @@
     "enabled": "Status",
     "listenAtChannels": {
       "title": "Diese Kanäle überwachen (#Name oder ID)",
-      "help": "Separated by comma (,)"
+      "help": "getrennt durch Komma (,)"
     },
-    "sendOnlineAnnounceToChannel": "Send online announcement to this channel (#name or id)",
-    "sendGeneralAnnounceToChannel": "Send general announcement to this channel (#name or id)",
+    "sendOnlineAnnounceToChannel": "Stream online Benachrichtigung in folgendem Channel (#name oder id)",
+    "sendGeneralAnnounceToChannel": "Allgemeine Benachrichtigung in folgendem Channel (#name oder id)",
     "deleteMessagesAfterWhile": "Nach einiger Zeit, Nachrichten löschen",
     "clientId": "Client ID",
     "token": "Token"
