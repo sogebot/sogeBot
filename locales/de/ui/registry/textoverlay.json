@@ -1,7 +1,7 @@
 {
-  "new": "Create new text overlay",
+  "new": "Neues Text-Overlay erstellen",
   "title": "Text-Overlay",
   "name": {
-    "placeholder": "Set your text overlay name"
+    "placeholder": "Name des Text-Overlays festlegen"
   }
 }
