@@ -1,10 +1,10 @@
 {
   "settings": {
     "enabled": "Status",
-    "minimalBet": "Minimal bet",
+    "minimalBet": "Minimaler Einsatz",
     "chanceToWin": {
-      "title": "Chance to win",
-      "help": "Percent"
+      "title": "Chance auf einen Sieg",
+      "help": "Prozent"
     }
   }
 }
