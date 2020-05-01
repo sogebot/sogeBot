@@ -1,10 +1,10 @@
 {
-  "usage": "Použití",
-  "command": "Příkaz",
-  "hour": "Hodina",
-  "day": "Den",
-  "week": "Týden",
-  "month": "Měsíc",
-  "year": "Rok",
-  "total": "Celkově"
+  "usage": "Usage",
+  "command": "Command",
+  "hour": "Hour",
+  "day": "Day",
+  "week": "Week",
+  "month": "Month",
+  "year": "Year",
+  "total": "Total"
 }
