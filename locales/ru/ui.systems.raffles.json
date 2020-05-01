@@ -1,0 +1,25 @@
+{
+  "widget": {
+    "subscribers-luck": "Subscribers luck",
+    "followers-luck": "Followers luck"
+  },
+  "settings": {
+    "enabled": "Status",
+    "allowOverTicketing": {
+      "title": "Allow over ticketing",
+      "help": "Allow user join raffle with over ticket of his points. E.g. user have 10 points but can join with !raffle 100 which will use all of his points."
+    },
+    "raffleAnnounceInterval": {
+      "title": "Announce interval",
+      "help": "in minutes"
+    },
+    "subscribersPercent": {
+      "title": "Additional subscribers luck",
+      "help": "in percents"
+    },
+    "followersPercent": {
+      "title": "Additional followers luck",
+      "help": "in percents"
+    }
+  }
+}
