@@ -3,10 +3,10 @@
     "enabled": "Status",
     "cooldown": "Cooldown",
     "duration": {
-      "title": "Duration",
-      "help": "Minutes"
+      "title": "Čas trvání",
+      "help": "Minuty"
     },
-    "minimalBet": "Minimal bet",
-    "bypassCooldownByOwnerAndMods": "Bypass cooldown by owner and mods"
+    "minimalBet": "Minimální sázka",
+    "bypassCooldownByOwnerAndMods": "Bypass cooldownu majitelem a moderátory"
   }
 }
