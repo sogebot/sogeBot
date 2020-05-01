@@ -1,21 +1,21 @@
 {
   "addRandomizer": "Add Randomizer",
   "form": {
-    "name": "Název",
-    "command": "Příkaz",
-    "permission": "Oprávnění příkazu",
-    "simple": "Jednoduchý výběr",
-    "wheelOfFortune": "Kolo štěstí",
-    "type": "Typ",
-    "options": "Možnosti",
-    "optionsAreEmpty": "Možnosti jsou zatím prázdné.",
-    "color": "Barva",
-    "numOfDuplicates": "Počet duplikátů",
-    "minimalSpacing": "Minimální rozestup",
-    "groupUp": "Seskupit",
-    "ungroup": "Rozdělit",
-    "groupedWithOptionAbove": "Seskupeno s předchozí možností",
-    "generatedOptionsPreview": "Náhled vygenerovaných možností",
-    "probability": "Pravděpodobnost"
+    "name": "Name",
+    "command": "Command",
+    "permission": "Command permission",
+    "simple": "Simple",
+    "wheelOfFortune": "Wheel of Fortune",
+    "type": "Type",
+    "options": "Options",
+    "optionsAreEmpty": "Options are empty.",
+    "color": "Color",
+    "numOfDuplicates": "No. of duplicates",
+    "minimalSpacing": "Minimal spacing",
+    "groupUp": "Group Up",
+    "ungroup": "Ungroup",
+    "groupedWithOptionAbove": "Grouped with option above",
+    "generatedOptionsPreview": "Preview of generated options",
+    "probability": "Probability"
   }
 }
