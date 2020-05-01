@@ -2,37 +2,37 @@
   "settings": {
     "enabled": "Status",
     "everyXMessages": {
-      "title": "Připomenout každých X zpráv",
-      "help": "0 = vypnuto; obě podmínky musí být splněny, aby bot vypsal připomenutí do chatu"
+      "title": "Remind every X messages",
+      "help": "0 = disabled; both remind conditions must be true to bot print remind"
     },
     "everyXSeconds": {
-      "title": "Připomenout každých X vteřin",
-      "help": "0 = vypnuto; obě podmínky musí být splněny, aby bot vypsal připomenutí do chatu"
+      "title": "Remind every X seconds",
+      "help": "0 = disabled; both remind conditions must be true to bot print remind"
     }
   },
   "overlay": {
-    "type": "Napiš",
-    "add": "Přidej",
-    "inChatToVote": "... do chatu pro hlasování",
-    "tips": "tipu",
-    "bits": "cheeru",
-    "toYourMessage": "... do tvé <strong>$type</strong> zprávy"
+    "type": "Type",
+    "add": "Add",
+    "inChatToVote": "... in the chat to vote",
+    "tips": "tip",
+    "bits": "cheer",
+    "toYourMessage": "... in your <strong>$type</strong> message"
   },
-  "title": "Název",
-  "done": "HOTOVO",
-  "running": "PROBÍHÁ",
-  "stop": "Zastavit",
-  "copy": "Kopírovat",
-  "totalVotes": "Celkem hlasů",
-  "cannotCopyIfInProgress": "Nelze kopírovat, pokud již probíhá jiné hlasování",
-  "closedAt": "Uzavřeno v",
-  "activeFor": "Aktivní po",
-  "votingBy": "Hlasování pomocí",
-  "tips": "tipů",
-  "bits": "bitů",
+  "title": "Title",
+  "done": "DONE",
+  "running": "RUNNING",
+  "stop": "Stop",
+  "copy": "Copy",
+  "totalVotes": "Total votes",
+  "cannotCopyIfInProgress": "Cannot copy, if another poll is in progress",
+  "closedAt": "Closed at",
+  "activeFor": "Active for",
+  "votingBy": "Voting by",
+  "tips": "tips",
+  "bits": "bits",
   "command": "!vote",
-  "create": "Klikni k vytvoření hlasování",
-  "cannotCreateIfEmpty": "Nelze vytvořit nové hlasování bez 2 možností",
-  "cannotCreateWithoutTitle": "Nelze vytvořit nové hlasování bez nadpisu",
-  "cannotCreateNewVoteIfInProgress": "Nelze vytvořit nové hlasování, pokud již probíhá jiné hlasování"
+  "create": "Click to create new poll",
+  "cannotCreateIfEmpty": "Cannot create new poll without at least 2 options",
+  "cannotCreateWithoutTitle": "Cannot create new poll without title",
+  "cannotCreateNewVoteIfInProgress": "Cannot create new poll, if another poll in in progress"
 }
