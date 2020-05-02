@@ -1,7 +1,7 @@
 {
-  "countdown": "Snipe match ($type) starting in $time $unit",
-  "go": "Starting now! Go!",
-  "putMatchIdInChat": "Please put your match ID in the chat => $command xxx",
-  "currentMatches": "Current Matches: $matches",
-  "stopped": "Snipe match was cancelled."
+  "countdown": "Снайперский матч ($type), начинается через $time $unit",
+  "go": "Начинаем прямо сейчас!",
+  "putMatchIdInChat": "Пожалуйста, введите ваш ID матча в чат => $command xxx",
+  "currentMatches": "Текущие матчи: $matches",
+  "stopped": "Матч со снайпами отменены."
 }
