@@ -1,12 +1,12 @@
 {
   "settings": {
-    "enabled": "Status",
-    "cooldown": "Cooldown",
+    "enabled": "Статус",
+    "cooldown": "Кулдаун",
     "duration": {
-      "title": "Duration",
-      "help": "Minutes"
+      "title": "Длительность",
+      "help": "Минуты"
     },
-    "minimalBet": "Minimal bet",
-    "bypassCooldownByOwnerAndMods": "Bypass cooldown by owner and mods"
+    "minimalBet": "Минимальная ставка",
+    "bypassCooldownByOwnerAndMods": "Игнорировать кулдаун владельцами и модераторами"
   }
 }
