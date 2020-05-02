@@ -12,8 +12,8 @@
     "value_must_not_be_empty": "Wert darf nicht leer sein"
   },
   "titles": {
-    "waitBefore": "Wait before image show (in ms)",
-    "waitAfter": "Wait after image disappear (in ms)",
+    "waitBefore": "Wartezeit in Millisekunden bevor Bild gezeigt wird",
+    "waitAfter": "Wartezeit nach dem Verschwinden des Bildes (in ms)",
     "duration": "Wie lange das Bild angezeigt werden soll (in ms)",
     "animationIn": "Eingehende Animation",
     "animationOut": "Ausgehende Animation",
