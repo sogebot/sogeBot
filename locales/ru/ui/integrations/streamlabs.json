@@ -1,14 +1,14 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Статус",
     "socketToken": {
-      "title": "Socket token",
-      "help": "Get socket token from streamlabs dashboard API settings->API tokens->Your Socket API Token"
+      "title": "Токен сокета",
+      "help": "Получить токен сокета из streamlabs API настройки->API tokens->Ваш токен API Socket"
     },
     "accessToken": {
       "title": "Access token",
-      "help": "Get your access token at https://www.sogebot.xyz/integrations/#StreamLabs"
+      "help": "Получить ваш доступ по адресу https://www.sogebot.xyz/integrations/#StreamLabs"
     },
-    "accessTokenBtn": "StreamLabs access token generator"
+    "accessTokenBtn": "Генератор токена доступа к StreamLabs"
   }
 }
