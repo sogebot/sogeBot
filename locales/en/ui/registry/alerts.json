@@ -29,6 +29,7 @@
     "subs": "Subs",
     "resubs": "Resubs",
     "subgifts": "Subgifts",
+    "subcommunitygifts": "Subgifts to community",
     "tips": "Tips",
     "hosts": "Hosts",
     "raids": "Raids"
@@ -60,7 +61,7 @@
   "messageTemplate": {
     "name": "Message template",
     "placeholder": "Set your message template",
-    "help": "Available variables: {name}, {amount} (cheers, subs, tips), {monthsName} (subs), {currency} (tips)"
+    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts), {recipient} (sub community gifts), {monthsName} (subs), {currency} (tips)"
   },
   "animationText": {
     "name": "Animation text"
