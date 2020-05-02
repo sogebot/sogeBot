@@ -1,21 +1,21 @@
 {
-  "new": "New Keyword",
-  "empty": "No keywords were created yet.",
-  "emptyAfterSearch": "No keywords were found by your search for <strong>\"$search\"</strong>.",
+  "new": "Новое ключевое слово",
+  "empty": "Ключевых слов еще не создано.",
+  "emptyAfterSearch": "Не найдено ключевых слов по вашему запросу <strong>\"$search\"</strong>.",
   "keyword": {
-    "name": "Keyword / Regular Expression",
-    "placeholder": "Set your keyword or regular expression to trigger keyword.",
-    "help": "You can use regexp (case insensitive) to use keywords, e.g. <strong>hello.*|hi</strong>"
+    "name": "Ключевое слово / регулярное выражение",
+    "placeholder": "Установите ключевое слово или регулярное выражение для вызова ключевого слова.",
+    "help": "Вы можете использовать регулярные выражения (без учета регистра) для использования ключевых слов, например <strong>привет.*|hi</strong>"
   },
   "response": {
-    "name": "Response",
-    "placeholder": "Set your response here."
+    "name": "Ответ",
+    "placeholder": "Введите ответ."
   },
   "error": {
-    "isEmpty": "This value cannot be empty"
+    "isEmpty": "Это поле не может быть пустым"
   },
-  "warning": "This action cannot be reverted!",
+  "warning": "Это действие нельзя будет отменить!",
   "settings": {
-    "enabled": "Status"
+    "enabled": "Статус"
   }
 }
