@@ -1,13 +1,13 @@
 {
   "settings": {
-    "enabled": "Status",
-    "cooldown": "Cooldown",
+    "enabled": "Статус",
+    "cooldown": "Кулдаун",
     "timeout": {
-      "title": "Timeout duration",
-      "help": "Seconds"
+      "title": "Время таймаута",
+      "help": "Секунды"
     },
-    "bypassCooldownByOwnerAndMods": "Bypass cooldown by owner and mods",
-    "winnerWillGet": "How many points will be added on win",
-    "loserWillLose": "How many points will be lost on lose"
+    "bypassCooldownByOwnerAndMods": "Игнорировать кулдаун владельцами и модераторами",
+    "winnerWillGet": "Сколько поинтов будет добавлено при победе",
+    "loserWillLose": "Сколько поинтов будет отнято при поражении"
   }
 }
