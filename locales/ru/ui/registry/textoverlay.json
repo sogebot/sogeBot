@@ -1,7 +1,7 @@
 {
-  "new": "Create new text overlay",
-  "title": "text overlay",
+  "new": "Создать новый текстовый оверлей",
+  "title": "текстовый оверлей",
   "name": {
-    "placeholder": "Set your text overlay name"
+    "placeholder": "Задайте имя вашего текстового оверлея"
   }
 }
