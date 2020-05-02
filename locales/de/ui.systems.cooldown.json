@@ -8,7 +8,7 @@
   },
   "settings": {
     "enabled": "Status",
-    "cooldownNotifyAsWhisper": "Whisper cooldown informations",
-    "cooldownNotifyAsChat": "Chat message cooldown informations"
+    "cooldownNotifyAsWhisper": "Informationen zur Abklingzeit von Whisper-Nachrichten",
+    "cooldownNotifyAsChat": "Informationen zur Abklingzeit von Chat-Nachrichten"
   }
 }
