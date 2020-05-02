@@ -3,7 +3,7 @@
     "enabled": "Status",
     "secretToken": {
       "title": "Geheimer Token",
-      "help": "Get secret token at Qiwi Donate dashboard settings->click show secret token"
+      "help": "Geheimes Token bei Qiwi im Spenden Dashboard-Einstellungen -> Klicke auf Geheimes Token anzeigen"
     }
   }
 }
