@@ -1,38 +1,38 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Статус",
     "everyXMessages": {
-      "title": "Remind every X messages",
-      "help": "0 = disabled; both remind conditions must be true to bot print remind"
+      "title": "Напоминать каждые X сообщений",
+      "help": "0 = выключен; оба условия напоминания должны быть истинными для отображения"
     },
     "everyXSeconds": {
-      "title": "Remind every X seconds",
-      "help": "0 = disabled; both remind conditions must be true to bot print remind"
+      "title": "Напоминанать каждые X секунд",
+      "help": "0 = выключен; оба условия напоминания должны быть истинными для отображения"
     }
   },
   "overlay": {
-    "type": "Type",
-    "add": "Add",
-    "inChatToVote": "... in the chat to vote",
-    "tips": "tip",
-    "bits": "cheer",
-    "toYourMessage": "... in your <strong>$type</strong> message"
+    "type": "Тип",
+    "add": "Добавить",
+    "inChatToVote": "... в чате, чтобы проголосовать",
+    "tips": "донат",
+    "bits": "чирсы",
+    "toYourMessage": "... в вашем <strong>$type</strong> сообщении"
   },
-  "title": "Title",
-  "done": "DONE",
-  "running": "RUNNING",
-  "stop": "Stop",
-  "copy": "Copy",
-  "totalVotes": "Total votes",
-  "cannotCopyIfInProgress": "Cannot copy, if another poll is in progress",
-  "closedAt": "Closed at",
-  "activeFor": "Active for",
-  "votingBy": "Voting by",
-  "tips": "tips",
-  "bits": "bits",
+  "title": "Название",
+  "done": "ГОТОВО",
+  "running": "ЗАПУСК",
+  "stop": "Остановить",
+  "copy": "Копировать",
+  "totalVotes": "Всего голосов",
+  "cannotCopyIfInProgress": "Копирование невозможно, если выполняется другой опрос",
+  "closedAt": "Закрыто",
+  "activeFor": "Активно для",
+  "votingBy": "Голосование от",
+  "tips": "донаты",
+  "bits": "битсы",
   "command": "!vote",
-  "create": "Click to create new poll",
-  "cannotCreateIfEmpty": "Cannot create new poll without at least 2 options",
-  "cannotCreateWithoutTitle": "Cannot create new poll without title",
-  "cannotCreateNewVoteIfInProgress": "Cannot create new poll, if another poll in in progress"
+  "create": "Нажмите, чтобы создать новый опрос",
+  "cannotCreateIfEmpty": "Невозможно создать новый опрос с менее чем 2 вариантами",
+  "cannotCreateWithoutTitle": "Невозможно создать новый опрос без заголовка",
+  "cannotCreateNewVoteIfInProgress": "Не удается создать новый опрос, если в процессе другой опрос"
 }
