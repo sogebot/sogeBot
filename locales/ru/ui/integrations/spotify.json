@@ -1,26 +1,26 @@
 {
   "settings": {
-    "enabled": "Status",
-    "songRequests": "Song Requests",
+    "enabled": "Статус",
+    "songRequests": "Запросы песен",
     "fetchCurrentSongWhenOffline": {
-      "title": "Fetch current song when stream is offline",
-      "help": "It's advised to have this disabled to avoid reach API limits"
+      "title": "Получить текущую песню, когда стрим не в сети",
+      "help": "Рекомендуется отключить это во избежание достижения лимитов API"
     },
     "clientId": "clientId",
     "clientSecret": "clientSecret",
     "redirectURI": "redirectURI",
     "format": {
-      "title": "Format",
-      "help": "Available variables: $song, $artist, $artists"
+      "title": "Формат",
+      "help": "Доступные переменные: $song, $artist, $artists"
     },
-    "username": "Authorized user",
-    "revokeBtn": "Revoke user authorization",
-    "authorizeBtn": "Authorize user",
-    "scopes": "Scopes",
+    "username": "Авторизованный пользователь",
+    "revokeBtn": "Отменить авторизацию пользователя",
+    "authorizeBtn": "Авторизация пользователя",
+    "scopes": "Разрешения",
     "playlistToPlay": {
-      "title": "Spotify URI of main playlist",
-      "help": "If set, after request finished this playlist will continue"
+      "title": "Spotify URI главного плейлиста",
+      "help": "Если установлено, по завершении заказанных песен этот плейлист будет продолжаться"
     },
-    "continueOnPlaylistAfterRequest": "Continue on playing of playlist after song request"
+    "continueOnPlaylistAfterRequest": "Продолжить воспроизведение плейлиста после заказанных песен"
   }
 }
