@@ -7,13 +7,13 @@
     },
     "isPointResetIntervalEnabled": "Automatisches Punkte zurücksetzen",
     "resetIntervalCron": "Cron interval<br><a href='https://crontab.guru/'>CronTab generator</a>",
-    "interval": "Intervall in Minuten in denen Zuschauer Punkte erhalten währen der Stream läuft",
-    "offlineInterval": "Intervall in Minuten in denen Zuschauer Punkte erhalten währen der Stream nicht läuft",
+    "interval": "Intervall in Minuten, in denen Zuschauer Punkte erhalten, während der Stream läuft",
+    "offlineInterval": "Intervall in Minuten, in denen Zuschauer Punkte erhalten, während der Stream nicht läuft",
     "messageInterval": "Alle x Nachrichten erhalten Zuschauer Punkte",
-    "messageOfflineInterval": "Alle x Nachrichten erhalten Zuschauer Punkte während der Stream nicht läuft",
-    "perInterval": "Punkte die Zuschauer erhalten inerhalb eines Intervalls",
-    "perOfflineInterval": "Punkte die Zuschauer erhalten inerhalb eines Intervalls (während der Stream nicht läuft)",
-    "perMessageInterval": "Punkteanzahl die Zuschauer erhalten nach x Nachrichten",
+    "messageOfflineInterval": "Alle x Nachrichten erhalten Zuschauer Punkte, während der Stream nicht läuft",
+    "perInterval": "Punkte, die Zuschauer innerhalb eines Intervalls erhalten",
+    "perOfflineInterval": "Punkte, die Zuschauer innerhalb eines Intervalls, während der Stream nicht läuft, erhalten",
+    "perMessageInterval": "Punkteanzahl, die Zuschauer nach x Nachrichten erhalten",
     "perMessageOfflineInterval": "Punkteanzahl die Zuschauer erhalten nach x Nachrichten während der Stream nicht läuft"
   }
 }
