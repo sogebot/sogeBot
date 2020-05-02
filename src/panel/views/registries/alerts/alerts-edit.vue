@@ -416,7 +416,7 @@ export default class AlertsEdit extends Vue {
         case 'subgifts':
           this.item.subgifts.push({
             ..._default,
-            messageTemplate: '{name} just gifted sub to {recipient}!',
+            messageTemplate: '{name} just gifted sub to {recipient}! {amount} {monthsName}',
           })
           break;
         case 'subs':

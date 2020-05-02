@@ -61,7 +61,7 @@
   "messageTemplate": {
     "name": "Šablona zprávy",
     "placeholder": "Zadejte svou šablonu zprávy",
-    "help": "Dostupné proměnné: {name}, {amount} (cheers, subs, tips, subgifts), {recipient} (sub community gifts), {monthsName} (subs), {currency} (tips)"
+    "help": "Dostupné proměnné: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts), {recipient} (subgifts), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "animationText": {
     "name": "Animace textu"

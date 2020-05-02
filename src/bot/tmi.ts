@@ -628,9 +628,9 @@ class TMI extends Core {
         event: 'subgifts',
         name: username,
         recipient,
-        amount: 0,
+        amount: subCumulativeMonths,
         currency: '',
-        monthsName: '',
+        monthsName: getLocalizedName(subCumulativeMonths, 'core.months'),
         message: '',
         autohost: false,
       });
