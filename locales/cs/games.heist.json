@@ -1,29 +1,29 @@
 {
-  "copsOnPatrol": "$sender, poldove porad hledaji minuly tym! Zkus to az za $cooldown.",
-  "copsCooldownMessage": "Vypada to, ze poldove maji nohy hore. Muzeme planovat dalsi loupez!",
-  "entryMessage": "$sender zacal planovat prepadeni banky! Hledaji se partaci do akce pro vetsi lup. Pridej se i ty! Napis $command <body> aby ses pripojil.",
-  "lateEntryMessage": "$sender, loupez prave probiha!",
-  "entryInstruction": "$sender, napis $command <body> aby ses pripojil.",
-  "levelMessage": "S touhle partou si troufnem na $bank! Sezeneme vice lidi, abychom vyloupili $nextBank?",
-  "maxLevelMessage": "S touhle partou si troufnem na $bank! Lepsi uz to byt nemuze!",
-  "started": "Dobra chlapi, posledni kontrola vybaveni, tohle je to, na co jsme se pripravovali. Toto neni zadne cviceni, jde se na to! Jdem vyloupit $bank!",
-  "noUser": "Nikdo se nepridal k loupezi.",
-  "singleUserSuccess": "$user byl jako ninja. Nikdo si nevsiml chybejicich penez.",
-  "singleUserFailed": "$user se nepodarilo zbavit poldu a chvili si posedi v chladku.",
+  "copsOnPatrol": "$sender, poldové pořád hledají minulý tým! Zkus to až za $cooldown.",
+  "copsCooldownMessage": "Vypadá to, že poldove mají nohy hore. Můžeme plánovat další loupež!",
+  "entryMessage": "$sender začal plánovat přepadení banky! Hledají se parťáci do akce pro větší lup. Přidej se i ty! Napiš $command <body> aby ses připojil.",
+  "lateEntryMessage": "$sender, loupež právě probíhá!",
+  "entryInstruction": "$sender, napiš $command <body> pro vstup.",
+  "levelMessage": "S touhle partou si troufnem na $bank! Seženeme více lidí, abychom vyloupili $nextBank",
+  "maxLevelMessage": "S touhle partou si troufnem na $bank! Lepší už to být nemůže!",
+  "started": "Dobrá chlapi, poslední kontrola vybavení, tohle je to, na co jsme se připravovali. Toto není žádné cvičení, jde se na to! Jdem vyloupit $bank!",
+  "noUser": "Nikdo se nepřidal k loupeži.",
+  "singleUserSuccess": "$user byl jako ninja. Nikdo si nevšiml chybějících peněz.",
+  "singleUserFailed": "$user se nepodařilo zbavit policie a stráví svůj čas ve vězení.",
   "result": {
-    "0": "Nekdo zvanil. Cekal na vas cely SWAT tym a nikomu se nepodarilo utect.",
-    "33": "Ostraha byla tentokrat ostra. Jen 1/3 tymu se dokazala dostat s lupem ven.",
-    "50": "Dlouhe vyjednavani s poldy zajistilo pulce tymu cas na to, aby stihli utect s lupem.",
-    "99": "Vypadalo to jako snadna akce, avsak nekterym z vas se nepodarilo utect s lupem. Ostatni si mnou ruce!",
-    "100": "Je to vubec mozne? Precizne naplanovana akce, precizni provedeni. 100% uspesnost. Takhle se to dela!"
+    "0": "Někdo žvanil. Čekal na vás celý SWAT tým. Byl to masakr a nikomu se nepodařilo utéct.",
+    "33": "Ostraha byla tentokrát ostrá. Jen 1/3 týmu se dokázala dostat s lupem ven.",
+    "50": "Dlouhé vujednávání s poldy zajistilo půlce týmu čas na to, aby stihli utéct s lupem.",
+    "99": "Vypadalo to jako snadná akce, avšak některým z vás se nepodařilo utéct s lupem. Ostatní si mnou ruce!",
+    "100": "Je to vůbec možné? Precizně naplánovaná akce, precizní provedení. 100% úspěšnost. Takhle se to dělá!"
   },
   "levels": {
-    "bankVan": "smenarnu",
-    "cityBank": "postu",
-    "stateBank": "obrnenou dodavku",
-    "nationalReserve": "banku",
-    "federalReserve": "narodni klenoty"
+    "bankVan": "Směnárnu",
+    "cityBank": "Poštu",
+    "stateBank": "Státní banka",
+    "nationalReserve": "Národní rezerva",
+    "federalReserve": "Národní klenoty"
   },
   "results": "Lup si odnesli: $users",
-  "andXMore": "a $count dalsich ..."
+  "andXMore": "a dalších $count..."
 }
