@@ -3,22 +3,22 @@
   "generateurl": "Neue URL generieren",
   "show-examples": "CURL-Beispiele anzeigen",
   "response": {
-    "show": "Show response after POST",
-    "name": "Response after variable set",
+    "show": "Antwort nach POST anzeigen",
+    "name": "Antwort nach Variable gesetzt",
     "default": "Standard",
-    "default-placeholder": "Set your bot response",
-    "default-help": "Use $value to get new variable value",
+    "default-placeholder": "Bot Antwort festlegen",
+    "default-help": "Verwende $value , um neuen Variablenwert zu erhalten",
     "custom": "Benutzerdefiniert",
     "command": "Befehl"
   },
   "useIfInCommand": "Verwende diese Option, wenn eine Variable im Befehl verwendet wird. Gibt nur die aktualisierte Variable ohne Antwort zurück.",
-  "permissionToChange": "Permission to change",
+  "permissionToChange": "Änderungsberechtigung",
   "isReadOnly": "Nur-Lesen in Chat",
   "isNotReadOnly": "kann über den Chat geändert werden",
   "no-variables-found": "Keine Variablen gefunden",
   "additional-info": "Zusätzliche Infos",
   "run-script": "Script ausführen",
-  "last-run": "Last run at",
+  "last-run": "Letzte Ausführung:",
   "variable": {
     "name": "Variablenname",
     "help": "Name der Variable muss eindeutig sein, z.B. $_wins, $_loses, $_top3",
@@ -76,8 +76,8 @@
     "isUsed": "Wenn Variable verwendet wird",
     "seconds": "Sekunden",
     "minutes": "Minuten",
-    "hours": "Hours",
-    "days": "Days"
+    "hours": "Stunden",
+    "days": "Tage"
   }
 }
 
