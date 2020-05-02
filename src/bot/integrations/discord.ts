@@ -77,6 +77,7 @@ class Discord extends Integration {
           { name: 'Total Views', value: api.stats.currentViews, inline: true},
           { name: 'Followers', value: api.stats.currentFollowers, inline: true},
         ]);
+        this.embed.setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${oauth.broadcasterUsername}-1920x1080.jpg?${Date.now()}`);
 
         if (oauth.broadcasterType !== '') {
           this.embed.addField('Subscribers', api.stats.currentSubscribers, true);
@@ -201,6 +202,7 @@ class Discord extends Integration {
                 .setColor(0x00ff00)
                 // Set the main content of the embed
                 .setDescription(`${oauth.broadcasterUsername.charAt(0).toUpperCase() + oauth.broadcasterUsername.slice(1)} started stream! Check it out!`)
+                .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${oauth.broadcasterUsername}-1920x1080.jpg?${Date.now()}`)
                 .setThumbnail(oauth.profileImageUrl)
                 .setFooter('Announced by sogeBot - https://www.sogebot.xyz');
 
