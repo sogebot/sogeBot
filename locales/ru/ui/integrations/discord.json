@@ -1,14 +1,14 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Статус",
     "listenAtChannels": {
-      "title": "Listen at these channels (#name or id)",
-      "help": "Separated by comma (,)"
+      "title": "Слушать на этих каналах (#name или id)",
+      "help": "Разделенные запятой (,)"
     },
-    "sendOnlineAnnounceToChannel": "Send online announcement to this channel (#name or id)",
-    "sendGeneralAnnounceToChannel": "Send general announcement to this channel (#name or id)",
-    "deleteMessagesAfterWhile": "Delete message after while",
+    "sendOnlineAnnounceToChannel": "Отправить онлайн объявление в этот канал (#name или id)",
+    "sendGeneralAnnounceToChannel": "Отправить общее объявление в этот канал (#name или id)",
+    "deleteMessagesAfterWhile": "Удалить сообщение через некоторое время",
     "clientId": "ClientId",
-    "token": "Token"
+    "token": "Токен"
   }
 }
