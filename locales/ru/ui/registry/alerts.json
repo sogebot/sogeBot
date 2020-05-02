@@ -1,93 +1,93 @@
 {
-  "enabled": "Enabled",
-  "empty": "Alerts registry is empty, create new alerts.",
-  "emptyAfterSearch": "Alerts registry is empty in searching for \"<strong>$search</strong>\"",
-  "revertcode": "Revert code to defaults",
+  "enabled": "Включено",
+  "empty": "Список оповещений пуст, создайте новые оповещения.",
+  "emptyAfterSearch": "Реестр оповещений пуст при поиске \"<strong>$search</strong>\"",
+  "revertcode": "Сбросить к заводским настройкам",
   "name": {
-    "name": "Name",
-    "placeholder": "Set name of your alerts"
+    "name": "Название",
+    "placeholder": "Введите название ваших оповещений"
   },
   "alertDelayInMs": {
-    "name": "Alert delay"
+    "name": "Задержка оповещения"
   },
   "profanityFilterType": {
-    "name": "Profanity filter",
-    "disabled": "Disabled",
-    "replace-with-asterisk": "Replace with asterisk",
-    "replace-with-happy-words": "Replace with happy words",
-    "hide-messages": "Hide messages",
-    "disable-alerts": "Disable alerts"
+    "name": "Фильтр ненормативной лексики",
+    "disabled": "Выключено",
+    "replace-with-asterisk": "Заменить звёздочкой",
+    "replace-with-happy-words": "Заменить счастливыми словами",
+    "hide-messages": "Скрыть сообщения",
+    "disable-alerts": "Отключить оповещения"
   },
-  "loadStandardProfanityList": "Load standard profanity list",
+  "loadStandardProfanityList": "Загрузить стандартный список ненормативной лексики",
   "customProfanityList": {
-    "name": "Custom profanity list",
-    "help": "Words should be separated with comma."
+    "name": "Пользовательский список ненормативной лексики",
+    "help": "Слова должны быть разделены запятыми."
   },
   "event": {
-    "follows": "Follows",
-    "cheers": "Cheers",
-    "subs": "Subs",
-    "resubs": "Resubs",
-    "subgifts": "Subgifts",
-    "tips": "Tips",
-    "hosts": "Hosts",
-    "raids": "Raids"
+    "follows": "Подписки",
+    "cheers": "Чирсы",
+    "subs": "Сабы",
+    "resubs": "Ресабы",
+    "subgifts": "Сабгифты",
+    "tips": "Донаты",
+    "hosts": "Хосты",
+    "raids": "Рейды"
   },
   "title": {
-    "name": "Variant name",
-    "placeholder": "Set your variant name"
+    "name": "Название варианта",
+    "placeholder": "Укажите имя вашего варианта"
   },
   "variant": {
-    "name": "Variant occurence"
+    "name": "Вариант применения"
   },
   "speed": {
-    "name": "Speed"
+    "name": "Скорость"
   },
   "maxTimeToDecrypt": {
-    "name": "Max time to decrypt"
+    "name": "Макс. время для расшифровки"
   },
   "characters": {
-    "name": "Characters"
+    "name": "Символы"
   },
-  "random": "Random",
-  "exact-amount": "Exact amount",
-  "greater-than-or-equal-to-amount": "Greater than or equal to amount",
-  "very-rarely": "Very rarely",
-  "rarely": "Rarely",
-  "default": "Default",
-  "frequently": "Frequently",
-  "very-frequently": "Very frequently",
+  "random": "Случайный",
+  "exact-amount": "Точное количество",
+  "greater-than-or-equal-to-amount": "Больший чем или равный",
+  "very-rarely": "Очень редкие",
+  "rarely": "Редко",
+  "default": "По умолчанию",
+  "frequently": "Периодически",
+  "very-frequently": "Очень часто",
   "messageTemplate": {
-    "name": "Message template",
-    "placeholder": "Set your message template",
-    "help": "Available variables: {name}, {amount} (cheers, subs, tips), {monthsName} (subs), {currency} (tips)"
+    "name": "Шаблон сообщения",
+    "placeholder": "Установить шаблон сообщения",
+    "help": "Доступные переменные: {name}, {amount} (чирсы, сабы, донаты), {monthsName} (сабы), {currency} (донаты)"
   },
   "animationText": {
-    "name": "Animation text"
+    "name": "Текст анимации"
   },
   "animationIn": {
-    "name": "Animation in"
+    "name": "Анимация в"
   },
   "animationOut": {
-    "name": "Animation out"
+    "name": "Анимация из"
   },
   "alertDurationInMs": {
-    "name": "Alert duration"
+    "name": "Длительность оповещения"
   },
   "alertTextDelayInMs": {
-    "name": "Alert text delay"
+    "name": "Задержка текста уведомления"
   },
   "layoutPicker": {
-    "name": "Layout"
+    "name": "Размещение"
   },
   "image": {
-    "name": "Image"
+    "name": "Изображение"
   },
   "sound": {
-    "name": "Sound"
+    "name": "Звук"
   },
   "soundVolume": {
-    "name": "Sound volume"
+    "name": "Громкость звука"
   },
   "enableAdvancedMode": "Enable advanced mode",
   "font": {
