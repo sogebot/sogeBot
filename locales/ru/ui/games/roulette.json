@@ -1,11 +1,11 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Статус",
     "timeout": {
-      "title": "Timeout duration",
-      "help": "Seconds"
+      "title": "Время таймаута",
+      "help": "Секунды"
     },
-    "winnerWillGet": "How many points will be added on win",
-    "loserWillLose": "How many points will be lost on lose"
+    "winnerWillGet": "Сколько поинтов будет добавлено при победе",
+    "loserWillLose": "Сколько поинтов будет отнято при поражении"
   }
 }
