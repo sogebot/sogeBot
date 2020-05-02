@@ -1,94 +1,94 @@
 {
-  "addGoalGroup": "Add Goal Group",
-  "addGoal": "Add Goal",
-  "newGoal": "new Goal",
-  "newGoalGroup": "new Goal Group",
-  "goals": "Goals",
-  "general": "General",
-  "display": "Display",
-  "fontSettings": "Font Settings",
-  "barSettings": "Bar Settings",
-  "selectGoalOnLeftSide": "Select or add goal on left side",
+  "addGoalGroup": "Добавить группу целей",
+  "addGoal": "Добавить цель",
+  "newGoal": "новая цель",
+  "newGoalGroup": "новая группа целей",
+  "goals": "Цели",
+  "general": "Общее",
+  "display": "Отображение",
+  "fontSettings": "Параметры шрифта",
+  "barSettings": "Настройки панели",
+  "selectGoalOnLeftSide": "Выберите или добавить цель на левой стороне",
   "input": {
     "description": {
-      "title": "Description"
+      "title": "Описание"
     },
     "goalAmount": {
-      "title": "Goal Amount"
+      "title": "Целевая сумма"
     },
     "countBitsAsTips": {
-      "title": "Count Bits as Tips"
+      "title": "Считать биты как донаты"
     },
     "currentAmount": {
-      "title": "Current Amount"
+      "title": "Текущая сумма"
     },
     "endAfter": {
-      "title": "End After"
+      "title": "Конец после"
     },
     "endAfterIgnore": {
-      "title": "Goal will not expire"
+      "title": "Срок действия цели не истекает"
     },
     "fonts": {
-      "title": "Font Family",
-      "help": "Google fonts are used for font families. <a href='https://fonts.google.com/' target='_blank'>Check font list.</a>"
+      "title": "Семейство шрифта",
+      "help": "Шрифты Google используются для семейств шрифтов. <a href='https://fonts.google.com/' target='_blank'>Проверьте список шрифтов.</a>"
     },
     "fontSize": {
-      "title": "Size",
-      "help": "Font size is in pixels"
+      "title": "Размер",
+      "help": "Размер шрифта в пикселях"
     },
     "borderPx": {
-      "title": "Border",
-      "help": "Border size is in pixels"
+      "title": "Рамка",
+      "help": "Размер границы в пикселях"
     },
     "barHeight": {
-      "title": "Bar Height",
-      "help": "Bar height is in pixels"
+      "title": "Высота панели",
+      "help": "Высота панели в пикселях"
     },
     "color": {
-      "title": "Color"
+      "title": "Цвет"
     },
     "borderColor": {
-      "title": "Border Color"
+      "title": "Цвет рамки"
     },
     "backgroundColor": {
-      "title": "Background Color"
+      "title": "Цвет фона"
     },
     "type": {
-      "title": "Type"
+      "title": "Тип"
     },
     "nameGroup": {
-      "title": "Name of this goal group",
-      "placeholder": "Set name of this goal group",
-      "help": "If kept empty, name will be randomly generated"
+      "title": "Название этой группы целей",
+      "placeholder": "Задать имя этой группы целей",
+      "help": "Если оставить пустым, имя будет сгенерировано случайным образом"
     },
     "name": {
-      "title": "Name of this goal",
-      "placeholder": "Set name of this goal"
+      "title": "Название цели",
+      "placeholder": "Задать имя для этой цели"
     },
     "displayAs": {
-      "title": "Display as",
-      "help": "Sets how goal group will be shown"
+      "title": "Отображать как",
+      "help": "Устанавливает, как будет отображаться группа целей"
     },
     "durationMs": {
-      "title": "Duration",
-      "help": "This value is in milliseconds",
-      "placeholder": "How long goal should be shown"
+      "title": "Длительность",
+      "help": "Значение в миллисекундах",
+      "placeholder": "Сколько времени цель будет отображаться"
     },
     "animationInMs": {
-      "title": "Animation In duration",
-      "help": "This value is in milliseconds",
-      "placeholder": "Set your animation In duration"
+      "title": "Длительность анимации В",
+      "help": "Значение в миллисекундах",
+      "placeholder": "Длительность анимации В"
     },
     "animationOutMs": {
-      "title": "Animation Out duration",
-      "help": "This value is in milliseconds",
-      "placeholder": "Set your animation Out duration"
+      "title": "Длительность анимации ИЗ",
+      "help": "Значение в миллисекундах",
+      "placeholder": "Длительность анимации ИЗ"
     },
     "spaceBetweenGoalsInPx": {
-      "title": "Space between goals",
-      "help": "This value is in pixels",
-      "placeholder": "Set your space between goals"
+      "title": "Пространство между целями",
+      "help": "Это значение в пикселях",
+      "placeholder": "Настройте пространство между целями"
     }
   },
-  "groupSettings": "Group Settings"
+  "groupSettings": "Настройки группы"
 }
