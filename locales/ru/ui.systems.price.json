@@ -1,20 +1,20 @@
 {
-  "new": "New Price",
-  "empty": "No price were created yet.",
-  "emptyAfterSearch": "No price were found by your search for <strong>\"$search\"</strong>.",
+  "new": "Новая Цена",
+  "empty": "Цены еще не созданы.",
+  "emptyAfterSearch": "По вашему запросу не найдено цен <strong>\"$search\"</strong>.",
   "command": {
-    "name": "command",
+    "name": "команда",
     "placeholder": ""
   },
   "price": {
-    "name": "price",
+    "name": "цена",
     "placeholder": ""
   },
   "error": {
-    "isEmpty": "This value cannot be empty"
+    "isEmpty": "Это поле не может быть пустым"
   },
-  "warning": "This action cannot be reverted!",
+  "warning": "Это действие нельзя будет отменить!",
   "settings": {
-    "enabled": "Status"
+    "enabled": "Статус"
   }
 }
