@@ -1142,12 +1142,6 @@
       "lose": "$sender, PROHRÁLS! Aktuálně máš $points $pointsName"
     }
   },
-  "merge": {
-    "from-user-not-found": "$sender, uzivatel $fromUsername neexistuje v databazi",
-    "no-from-user-set": "$sender, musi byt zadan uzivatel, ze ktereho se budou brat data",
-    "no-to-user-set": "$sender, musi byt zadan uzivatel, kteremu se predaji data",
-    "user-merged": "$sender, uživatel $fromUsername byl sloučený s $toUsername"
-  },
   "highlights": {
     "saved": "$sender, highlight byl uložen pro $hoursh$minutesm$secondss",
     "list": {
