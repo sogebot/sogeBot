@@ -13,6 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: All test should be run - tests are not containing describe.only
+      if: ${{ !contains(steps.log.outputs.message, '[skip-tests]')" }}
       run: |
           if ! grep -r -l 'describe.only' ./test/; then
             exit 0
@@ -39,22 +40,22 @@ jobs:
     - uses: actions/checkout@master
     - id: log
       run: echo "::set-output name=message::$(git log --no-merges -1 --pretty=format:%b)"
-    - if: "!contains(steps.log.outputs.message, '[skip-tests]')"
-      name: install node v14
+    - name: install node v14
+      if: ${{ !contains(steps.log.outputs.message, '[skip-tests]')" }}
       uses: actions/setup-node@v1
       with:
         node-version: 14
-    - if: "!contains(steps.log.outputs.message, '[skip-tests]')"
-      name: Install all dependencies and build just a bot
+    - name: Install all dependencies and build just a bot
+      if: ${{ !contains(steps.log.outputs.message, '[skip-tests]')" }}
       run: ENV=development make info clean dependencies patch bot
-    - if: "!contains(steps.log.outputs.message, '[skip-tests]')"
-      name: Set proper db to use
+    - name: Set proper db to use
+      if: ${{ !contains(steps.log.outputs.message, '[skip-tests]')" }}
       run: npm run test:config:sqlite
-    - if: "!contains(steps.log.outputs.message, '[skip-tests]')"
-      name: Run migration test
+    - name: Run migration test
+      if: ${{ !contains(steps.log.outputs.message, '[skip-tests]')" }}
       run: node tools/migrationCheck.js
-    - if: "!contains(steps.log.outputs.message, '[skip-tests]')"
-      name: Run mocha
+    - name: Run mocha
+      if: ${{ !contains(steps.log.outputs.message, '[skip-tests]')" }}
       run: npm test
   postgres:
     name: PostgreSQL tests
@@ -73,22 +74,22 @@ jobs:
     - uses: actions/checkout@master
     - id: log
       run: echo "::set-output name=message::$(git log --no-merges -1 --pretty=format:%b)"
-    - if: "!contains(steps.log.outputs.message, '[skip-tests]')"
-      name: install node v14
+    - name: install node v14
+      if: ${{ !contains(steps.log.outputs.message, '[skip-tests]')" }}
       uses: actions/setup-node@v1
       with:
         node-version: 14
-    - if: "!contains(steps.log.outputs.message, '[skip-tests]')"
-      name: Install all dependencies and build just a bot
+    - name: Install all dependencies and build just a bot
+      if: ${{ !contains(steps.log.outputs.message, '[skip-tests]')" }}
       run: ENV=development make info clean dependencies patch bot
-    - if: "!contains(steps.log.outputs.message, '[skip-tests]')"
-      name: Set proper db to use
+    - name: Set proper db to use
+      if: ${{ !contains(steps.log.outputs.message, '[skip-tests]')" }}
       run: npm run test:config:postgres
-    - if: "!contains(steps.log.outputs.message, '[skip-tests]')"
-      name: Run migration test
+    - name: Run migration test
+      if: ${{ !contains(steps.log.outputs.message, '[skip-tests]')" }}
       run: node tools/migrationCheck.js
-    - if: "!contains(steps.log.outputs.message, '[skip-tests]')"
-      name: Run mocha
+    - name: Run mocha
+      if: ${{ !contains(steps.log.outputs.message, '[skip-tests]')" }}
       run: npm test
   mysql:
     name: MySQL/MariaDB tests
@@ -109,22 +110,22 @@ jobs:
     - uses: actions/checkout@master
     - id: log
       run: echo "::set-output name=message::$(git log --no-merges -1 --pretty=format:%b)"
-    - if: "!contains(steps.log.outputs.message, '[skip-tests]')"
-      name: install node v14
+    - name: install node v14
+      if: ${{ !contains(steps.log.outputs.message, '[skip-tests]')" }}
       uses: actions/setup-node@v1
       with:
         node-version: 14
-    - if: "!contains(steps.log.outputs.message, '[skip-tests]')"
-      name: Install all dependencies and build just a bot
+    - name: Install all dependencies and build just a bot
+      if: ${{ !contains(steps.log.outputs.message, '[skip-tests]')" }}
       run: ENV=development make info clean dependencies patch bot
-    - if: "!contains(steps.log.outputs.message, '[skip-tests]')"
-      name: Set proper db to use
+    - name: Set proper db to use
+      if: ${{ !contains(steps.log.outputs.message, '[skip-tests]')" }}
       run: npm run test:config:mysql
-    - if: "!contains(steps.log.outputs.message, '[skip-tests]')"
-      name: Run migration test
+    - name: Run migration test
+      if: ${{ !contains(steps.log.outputs.message, '[skip-tests]')" }}
       run: node tools/migrationCheck.js
-    - if: "!contains(steps.log.outputs.message, '[skip-tests]')"
-      name: Run mocha
+    - name: Run mocha
+      if: ${{ !contains(steps.log.outputs.message, '[skip-tests]')" }}
       run: npm test
   fullbuild:
     name: Make test
@@ -134,11 +135,11 @@ jobs:
     - uses: actions/checkout@master
     - id: log
       run: echo "::set-output name=message::$(git log --no-merges -1 --pretty=format:%b)"
-    - if: "!contains(steps.log.outputs.message, '[skip-tests]')"
-      name: install node v14
+    - name: install node v14
+      if: ${{ !contains(steps.log.outputs.message, '[skip-tests]')" }}
       uses: actions/setup-node@v1
       with:
         node-version: 14
-    - if: "!contains(steps.log.outputs.message, '[skip-tests]')"
-      name: Install all dependencies and build everything
+    - name: Install all dependencies and build everything
+      if: ${{ !contains(steps.log.outputs.message, '[skip-tests]')" }}
       run: ENV=development make
