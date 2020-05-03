@@ -29,6 +29,7 @@
     "subs": "Сабы",
     "resubs": "Ресабы",
     "subgifts": "Сабгифты",
+    "subcommunitygifts": "Subgifts to community",
     "tips": "Донаты",
     "hosts": "Хосты",
     "raids": "Рейды"
@@ -60,7 +61,7 @@
   "messageTemplate": {
     "name": "Шаблон сообщения",
     "placeholder": "Установить шаблон сообщения",
-    "help": "Доступные переменные: {name}, {amount} (чирсы, сабы, донаты), {monthsName} (сабы), {currency} (донаты)"
+    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts), {recipient} (subgifts), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "animationText": {
     "name": "Текст анимации"
@@ -89,50 +90,50 @@
   "soundVolume": {
     "name": "Громкость звука"
   },
-  "enableAdvancedMode": "Enable advanced mode",
+  "enableAdvancedMode": "Включить расширенный режим",
   "font": {
-    "setting": "Font settings",
-    "name": "Font family",
+    "setting": "Настройки шрифта",
+    "name": "Семейство шрифтов",
     "size": {
-      "name": "Font size"
+      "name": "Размер шрифта"
     },
     "weight": {
-      "name": "Font weight"
+      "name": "Масса шрифта"
     },
     "borderPx": {
-      "name": "Font border"
+      "name": "Границы шрифты"
     },
     "borderColor": {
-      "name": "Font border color"
+      "name": "Цвет границы шрифта"
     },
     "color": {
-      "name": "Font color"
+      "name": "Цвет текста"
     },
     "highlightcolor": {
-      "name": "Font highlight color"
+      "name": "Цвет подсветки шрифта"
     }
   },
   "minAmountToShow": {
-    "name": "Minimal amount to show"
+    "name": "Минимальная сумма для показа"
   },
   "minAmountToPlay": {
-    "name": "Minimal amount to play"
+    "name": "Минимальная сумма для проигрывания"
   },
   "allowEmotes": {
-    "name": "Allow emotes"
+    "name": "Разрешить смайлики"
   },
   "message": {
-    "setting": "Message settings"
+    "setting": "Настройки сообщения"
   },
-  "showAutoHost": "Show autohost",
-  "voice": "Voice",
-  "keepAlertShown": "Alert keeps visible during TTS",
-  "skipUrls": "Skip URLs during TTS",
-  "volume": "Volume",
-  "rate": "Rate",
-  "pitch": "Pitch",
-  "test": "Test",
+  "showAutoHost": "Показывать автохост",
+  "voice": "Голос",
+  "keepAlertShown": "Оповещение сохраняет видимость во время TTS",
+  "skipUrls": "Не озвучивать ссылки в TTS",
+  "volume": "Громкость",
+  "rate": "Темп",
+  "pitch": "Высота",
+  "test": "Тест",
   "tts": {
-    "setting": "TTS settings"
+    "setting": "Настройки TTS"
   }
 }
