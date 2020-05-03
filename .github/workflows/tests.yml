@@ -13,7 +13,6 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: All test should be run - tests are not containing describe.only
-      if: ${{ !contains(steps.log.outputs.message, '[skip-tests]') }}
       run: |
           if ! grep -r -l 'describe.only' ./test/; then
             exit 0
