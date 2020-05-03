@@ -13,9 +13,9 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - id: log
-      run: echo ::set-output name=message::$(git log --no-merges -1 --pretty=format:%b)
+      run: echo "::set-output name=message::$(`git log --no-merges -1 --pretty=format:%b`)"
     - name: All test should be run - tests are not containing describe.only
-      if: contains(steps.log.outputs.message, '/bin/bash')
+      if: contains(steps.log.outputs.message, '[skip-tests]')
       run: |
           if ! grep -r -l 'describe.only' ./test/; then
             exit 0
