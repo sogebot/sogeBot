@@ -1,14 +1,14 @@
 {
-  "new": "New Cooldown",
-  "empty": "No cooldowns were created yet.",
-  "emptyAfterSearch": "No cooldown were found by your search for <strong>\"$search\"</strong>.",
-  "notify-as-whisper": "Notify as whisper",
+  "new": "Новый кулдаун",
+  "empty": "Пока не было создано ни одного кулдауна.",
+  "emptyAfterSearch": "Кулдаун не был найден по вашему запросу <strong>\"$search\"</strong>.",
+  "notify-as-whisper": "Уведомлять в висперсы",
   "error": {
-    "isEmpty": "This value cannot be empty"
+    "isEmpty": "Это поле не может быть пустым"
   },
   "settings": {
-    "enabled": "Status",
-    "cooldownNotifyAsWhisper": "Whisper cooldown informations",
-    "cooldownNotifyAsChat": "Chat message cooldown informations"
+    "enabled": "Статус",
+    "cooldownNotifyAsWhisper": "Информация о кулдауне в висперсы",
+    "cooldownNotifyAsChat": "Информация о кулдауне в чат"
   }
 }
