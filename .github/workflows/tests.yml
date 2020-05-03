@@ -18,7 +18,7 @@ jobs:
       id: log
       run: echo :set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%b)
     - name: All test should be run - tests are not containing describe.only
-      if: contains(github.event.head_commit.message, '[skip-tests]')
+      if: contains(github.event.head_commit.message, 'skip-tests')
       run: |
           if ! grep -r -l 'describe.only' ./test/; then
             exit 0
