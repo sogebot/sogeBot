@@ -16,7 +16,7 @@ jobs:
         ref: ${{ github.event.pull_request.head.sha }}
     - name: Check if tests should be skipped
       id: should_skip
-      run: echo :set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%b)
+      run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%b)
     - name: All test should be run - tests are not containing describe.only
       if: contains(github.event.head_commit.MESSAGE, 'skip-tests')
       run: |
