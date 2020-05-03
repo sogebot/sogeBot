@@ -1,34 +1,34 @@
 {
-  "no-quotes-found": "We're sorry, no quotes were found in database.",
-  "new": "Add new quote",
-  "empty": "List of quotes is empty, create new quote.",
-  "emptyAfterSearch": "List of quotes is empty in searching for \"<strong>$search</strong>\"",
+  "no-quotes-found": "К сожалению, цитаты не найдены в базе данных.",
+  "new": "Добавить новую цитату",
+  "empty": "Список цитат пуст, создайте новую цитату.",
+  "emptyAfterSearch": "Список цитат пуст при поиске \"<strong>$search</strong>\"",
   "quote": {
-    "name": "Quote",
-    "placeholder": "Set your quote here"
+    "name": "Цитата",
+    "placeholder": "Установить цитату здесь"
   },
   "by": {
-    "name": "Quoted by"
+    "name": "Цитата от"
   },
   "tags": {
-    "name": "Tags",
-    "placeholder": "Set your tags here",
-    "help": "Comma-separated tags. Example: tag 1, tag 2, tag 3"
+    "name": "Теги",
+    "placeholder": "Установите тэги здесь",
+    "help": "Теги, разделенные запятыми. Пример: тег 1, тег 2, тег 3"
   },
   "date": {
-    "name": "Date"
+    "name": "Дата"
   },
   "error": {
-    "isEmpty": "This value cannot be empty",
-    "atLeastOneTag": "You need to set at least one tag"
+    "isEmpty": "Это поле не может быть пустым",
+    "atLeastOneTag": "Вы должны добавить по крайней мере одно значение"
   },
-  "tag-filter": "Filtering by tag",
-  "warning": "This action cannot be reverted!",
+  "tag-filter": "Фильтрация по тегам",
+  "warning": "Это действие нельзя будет отменить!",
   "settings": {
-    "enabled": "Status",
+    "enabled": "Статус",
     "urlBase": {
-      "title": "URL base",
-      "help": "You should use public endpoint for quotes, to be accessible by <strong>everyone</strong>"
+      "title": "Базовый URL",
+      "help": "Вы должны использовать публичную ссылку для цитат, чтобы они были доступны <strong>каждому</strong>"
     }
   }
 }
