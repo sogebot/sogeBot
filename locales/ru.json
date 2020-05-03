@@ -1142,12 +1142,6 @@
       "lose": "$sender, вы проиграли! Теперь у вас $points $pointsName"
     }
   },
-  "merge": {
-    "from-user-not-found": "$sender, пользователь $fromUsername не найден в базе данных",
-    "no-from-user-set": "$sender, вы должны указать имя пользователя для слияния",
-    "no-to-user-set": "$sender, вы должны указать, к кому производиться слияние",
-    "user-merged": "$sender, пользователь $fromUsername был объединён с $toUsername"
-  },
   "highlights": {
     "saved": "$sender, яркий момент был сохранён на отметке $hoursч$minutesм$secondsc",
     "list": {
