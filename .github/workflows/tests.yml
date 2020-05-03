@@ -38,7 +38,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - id: log
-      run: echo "::set-output name=message::$(git log --no-merges -1 --oneline)"
+      run: echo "::set-output name=message::$(git log --no-merges -1 --pretty=format:%b)"
     - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
       name: install node v14
       uses: actions/setup-node@v1
@@ -72,7 +72,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - id: log
-      run: echo "::set-output name=message::$(git log --no-merges -1 --oneline)"
+      run: echo "::set-output name=message::$(git log --no-merges -1 --pretty=format:%b)"
     - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
       name: install node v14
       uses: actions/setup-node@v1
@@ -108,7 +108,7 @@ jobs:
         mysql root password: 'Passw0rd' # Required if "mysql user" is empty, default is empty. The root superuser password
     - uses: actions/checkout@master
     - id: log
-      run: echo "::set-output name=message::$(git log --no-merges -1 --oneline)"
+      run: echo "::set-output name=message::$(git log --no-merges -1 --pretty=format:%b)"
     - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
       name: install node v14
       uses: actions/setup-node@v1
@@ -133,7 +133,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - id: log
-      run: echo "::set-output name=message::$(git log --no-merges -1 --oneline)"
+      run: echo "::set-output name=message::$(git log --no-merges -1 --pretty=format:%b)"
     - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
       name: install node v14
       uses: actions/setup-node@v1
