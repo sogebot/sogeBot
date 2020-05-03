@@ -411,9 +411,9 @@
           "owner": "Je příjemce vlastník bota? (bool)"
         },
         "tweet": {
-          "text": "Zpráva na twitteru",
-          "username": "Uživatelské jméno na twitteru",
-          "displayname": "Zobrazené jméno na twitteru",
+          "text": "Text tweetu",
+          "username": "Uživatelské jméno na Twitteru",
+          "displayname": "Zobrazené jméno na Twitteru",
           "url": "Link na tweet"
         }
       }
@@ -429,7 +429,7 @@
           "toggle": {
             "listener": "Poslouchat příkazy šeptem",
             "settings": "Šeptat změny nastavení",
-            "raffle": "Šeptat při zapojení do raffle",
+            "raffle": "Šeptat při zapojení do tomboly",
             "permissions": "Šeptat, když má uživatel nedostatečná oprávnění",
             "cooldowns": "Šeptat při cooldownu (pokud nastaven jako oznámit)"
           }
@@ -500,8 +500,8 @@
     "overlays-eventlist-raid": "raid",
     "requested-by": "Požadoval",
     "description": "Popisek",
-    "raffle-type": "Typ raffle",
-    "raffle-type-keywords": "Pouze keyword",
+    "raffle-type": "Typ tomboly",
+    "raffle-type-keywords": "Pouze klíčové slovo",
     "raffle-type-tickets": "S tickety",
     "raffle-tickets-range": "Rozsah ticketu",
     "video_id": "ID Videa",
@@ -562,7 +562,7 @@
     "custom-title-empty-error": "Vlastní nadpis je zaškrtnut, ale pole je prázdné!",
     "title": "Název",
     "change-title": "Změnit název",
-    "game": "Hra",
+    "game": "hra",
     "tags": "Tagy",
     "change-game": "Změnit hru",
     "click-to-change": "kliknutím změňte",
@@ -582,9 +582,9 @@
     "subCumulativeMonths": "Celkový počet subscribů",
     "tips": "Spropitné",
     "tier": "Tier",
-    "status": "status",
+    "status": "Status",
     "add-widget": "Přidat widget",
-    "remove-dashboard": "Smazat dashboard",
+    "remove-dashboard": "Odstranit nástěnku",
     "remove-widget": "Smazat widget",
     "for": "pro",
     "close-bet-after": "Uzavřít sázku za",
@@ -619,7 +619,7 @@
     "enable": "Zapnout",
     "disable": "Vypnout",
     "slug": "Slug",
-    "stream-title": "Název streamu",
+    "stream-title": "Název vysílání",
     "posted-by": "Vložil",
     "time": "Čas",
     "type": "Typ",
@@ -733,9 +733,9 @@
     "command-send-x-times": "příkaz poslán x-krát",
     "keyword-send-x-times": "klíčové slovo posláno x-krát",
     "number-of-viewers-is-at-least-x": "počet diváků je alespoň x",
-    "stream-started": "stream začal",
-    "stream-stopped": "stream skončil",
-    "stream-is-running-x-minutes": "stream trvá x minut",
+    "stream-started": "vysílání zahájeno",
+    "stream-stopped": "vysílání zastaveno",
+    "stream-is-running-x-minutes": "vysílání běží x minut",
     "every-x-minutes-of-stream": "každých x minut vysílání",
     "game-changed": "hra změněna",
     "cheer": "cheer byl získán",
@@ -755,7 +755,7 @@
     "do-nothing": "--- nedělat nic ---",
     "play-sound": "přehrát zvuk",
     "count": "počet",
-    "timestamp": "timestamp",
+    "timestamp": "časové razítko",
     "message": "zpráva",
     "sound": "zvuk",
     "emote-explosion": "exploze smajlíků",
@@ -766,7 +766,7 @@
     "false": "ne",
     "light": "světlý theme",
     "dark": "tmavý theme",
-    "gambling": "Gambling",
+    "gambling": "Sázení",
     "seppukuTimeout": "Timeout pro !seppuku",
     "rouletteTimeout": "Timeout pro !roulette",
     "fightmeTimeout": "Timeout pro !fightme",
@@ -837,11 +837,11 @@
     "alias-was-disabled": "$sender, alias $alias byl vypnut",
     "alias-was-concealed": "$sender, alias $alias byl skryt",
     "alias-was-exposed": "$sender, alias $alias byl odkryt",
-    "alias-was-removed": "$sender, alias $alias byl smazan"
+    "alias-was-removed": "$sender, alias $alias byl odebrán"
   },
   "customcmds": {
     "commands-parse-failed": "{core.command-parse} !commands",
-    "command-was-not-found": "$sender, prikaz $command nebyl nalezen",
+    "command-was-not-found": "$sender, příkaz $command nebyl nalezen v databázi",
     "response-was-not-found": "$sender, odpoved #$response prikazu $command nebyla nalezena",
     "command-was-edited": "$sender, prikaz $command is changed to '$response'",
     "command-was-added": "$sender, prikaz $command byl pridan",
@@ -860,7 +860,7 @@
     "keyword-parse-failed": "{core.command-parse} !keyword",
     "keyword-is-ambiguous": "$sender, keyword $keyword není jednoznačný, použijte ID klíčového slova",
     "keyword-was-not-found": "$sender, keyword $keyword nebyl nalezen",
-    "keyword-was-edited": "$sender, keyword $keyword is changed to '$response'",
+    "keyword-was-edited": "$sender, klíčové slovo $keyword je změněno na '$response'",
     "keyword-was-added": "$sender, keyword $keyword ($id) byl pridan",
     "list-is-not-empty": "$sender, seznam klíčových slov:",
     "list-is-empty": "$sender, seznam prikazu je prazdny",
@@ -931,7 +931,7 @@
     "price-parse-failed": "{core.command-parse} !price",
     "price-was-set": "$sender, cena za $command byla nastavena na $amount $pointsName",
     "price-was-unset": "$sender, cena za $command byla zrušena",
-    "price-was-not-found": "$sender, price for $command was not found",
+    "price-was-not-found": "$sender, cena za $command nebyla nalezena",
     "price-was-enabled": "$sender, cena za $command byla zapnuta",
     "price-was-disabled": "$sender, cena za $command byla vypnuta",
     "user-have-not-enough-points": "Omlouváme se, $sender, ale nemáš $amount $pointsName k použití $command",
@@ -948,10 +948,10 @@
     "custom-rank-was-set-to-user": "$sender, nastavil jsi hodnost $rank uživateli $username",
     "custom-rank-was-unset-for-user": "$sender, vlastní hodnost pro $username byla zrušena",
     "list-is-empty": "$sender, nebyly nalezeny žádné hodnosti",
-    "list-is-not-empty": "$sender, seznam ranku: $list",
-    "show-rank-without-next-rank": "$sender, tvuj soucasny rank je $rank",
-    "show-rank-with-next-rank": "$sender, tvuj soucasny rank je $rank. Dalsi rank - $nextrank",
-    "user-dont-have-rank": "$sender, jeste nemas prirazeny zadny rank"
+    "list-is-not-empty": "$sender, seznam hodností: $list",
+    "show-rank-without-next-rank": "$sender, tvá současná hodnost je $rank",
+    "show-rank-with-next-rank": "$sender, tvá současná hodnost je $rank. Další hodnost - $nextrank",
+    "user-dont-have-rank": "$sender, zatím nemáte hodnost"
   },
   "followage": {
     "success": {
@@ -986,7 +986,7 @@
   },
   "lastseen": {
     "success": {
-      "never": "$username was never in this channel!",
+      "never": "$username nikdy nebyl na tomto kanálu!",
       "time": "$username byl naposled spatren na tomto kanalu $when"
     },
     "failed": {
@@ -1044,14 +1044,14 @@
     }
   },
   "title": {
-    "current": "$sender, titulek streamu je '$title'.",
+    "current": "$sender, název vysílání je '$title'.",
     "change": {
       "success": "$sender, titulek byl nastaven na: $title",
       "failed": "$sender, neco se pokazilo. Titulek je stale nastaveny na: $title"
     }
   },
   "game": {
-    "current": "$sender, prave se hraje $game.",
+    "current": "$sender, streamer právě hraje $game.",
     "change": {
       "success": "$sender, hra byl nastavena na: $game",
       "failed": "$sender, neco se pokazilo. Hra je stale nastavena na: $game"
@@ -1151,10 +1151,10 @@
   "highlights": {
     "saved": "$sender, highlight byl ulozen pro $hoursh$minutesm$secondss",
     "list": {
-      "items": "$sender, seznam ulozenych highlightu pro posledni stream: $items",
+      "items": "$sender, seznam uložených highlightů pro poslední vysílání: $items",
       "empty": "$sender, zande highlighty nebyly ulozeny"
     },
-    "offline": "$sender, nelze ulozit highlight, stream je offline"
+    "offline": "$sender, nelze uložit highlight, vysílání je offline"
   },
   "whisper": {
     "settings": {
@@ -1171,7 +1171,7 @@
   "phillipsHue": {
     "list": "$sender, Seznam pripojenych Phillips Hue zarovek: "
   },
-  "time": "Aktualni cas streamera v jeho casove zone je $time",
+  "time": "Aktuální čas streamera v jeho časovém pásmu je $time",
   "subs": "$sender, je zde prave $onlineSubCount online subscriberu. Posledni sub/resub byl $lastSubUsername $lastSubAgo",
   "followers": "$sender, je zde prave $onlineFollowersCount online followeru. Posledni follow byl $lastFollowUsername $lastFollowAgo",
   "ignore": {
