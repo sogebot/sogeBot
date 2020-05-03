@@ -43,7 +43,7 @@ jobs:
         ref: ${{ github.event.pull_request.head.sha }}
     - id: log
       name: Load commit message for skip test check
-      run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%b)
+      run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%s%b)
     - name: install node v14
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       uses: actions/setup-node@v1
@@ -80,7 +80,7 @@ jobs:
         ref: ${{ github.event.pull_request.head.sha }}
     - id: log
       name: Load commit message for skip test check
-      run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%b)
+      run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%s%b)
     - name: install node v14
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       uses: actions/setup-node@v1
@@ -119,7 +119,7 @@ jobs:
         ref: ${{ github.event.pull_request.head.sha }}
     - id: log
       name: Load commit message for skip test check
-      run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%b)
+      run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%s%b)
     - name: install node v14
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       uses: actions/setup-node@v1
@@ -147,7 +147,7 @@ jobs:
         ref: ${{ github.event.pull_request.head.sha }}
     - id: log
       name: Load commit message for skip test check
-      run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%b)
+      run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%s%b)
     - name: install node v14
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       uses: actions/setup-node@v1
