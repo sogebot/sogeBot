@@ -1172,21 +1172,21 @@
     "list": "$sender, список подсоединенных огней Phillips Hue: "
   },
   "time": "Текущее время стримера в его часовом поясе $time",
-  "subs": "$sender, there is currently $onlineSubCount online subscribers. Last sub/resub was $lastSubUsername $lastSubAgo",
-  "followers": "$sender, there is currently $onlineFollowersCount online followers. Last follow was $lastFollowUsername $lastFollowAgo",
+  "subs": "$sender, сейчас $onlineSubCount онлайн сабскрайберов. Последний sub/resub был $lastSubUsername $lastSubAgo",
+  "followers": "$sender, сейчас $onlineFollowersCount онлайн фоловеров. Последний фолоу был $lastFollowUsername $lastFollowAgo",
   "ignore": {
     "user": {
       "is": {
         "not": {
-          "ignored": "$sender, user $username is not ignored by bot"
+          "ignored": "$sender, пользователь $username не игнорируется ботом"
         },
-        "added": "$sender, user $username is added to bot ignorelist",
-        "removed": "$sender, user $username is removed from bot ignorelist",
-        "ignored": "$sender, user $username is ignored by bot"
+        "added": "$sender, пользователь $username добавлен в игнорируемый ботом список",
+        "removed": "$sender, пользователь $username убран из из списка игнорируемых",
+        "ignored": "$sender, пользователь $username игнорируется ботом"
       }
     }
   },
   "filters": {
-    "setVariable": "$sender, $variable was set to $value."
+    "setVariable": "$sender, $variable изменено на $value."
   }
 }
