@@ -288,8 +288,8 @@ class TMI extends Core {
           const username = message.username.toLowerCase();
 
           if (typeof duration === 'undefined') {
-            ban(`${username}, reason: ${reason}`);
-            events.fire('ban', { username: username, reason: reason });
+            ban(`${username}`);
+            events.fire('ban', { username: username });
           } else {
             events.fire('timeout', { username, reason, duration });
           }
