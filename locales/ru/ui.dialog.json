@@ -1,46 +1,46 @@
 {
   "title": {
-    "edit": "Edit",
-    "add": "Add"
+    "edit": "Редактировать",
+    "add": "Добавить"
   },
   "errors": {
-    "required": "This input cannot be empty.",
-    "minValue": "Lowest value of this input is $value."
+    "required": "Это поле не может быть пустым.",
+    "minValue": "Наименьшее значение этого поля равно $value."
   },
   "buttons": {
-    "reorder": "Reorder",
+    "reorder": "Изменить порядок",
     "upload": {
-      "idle": "Upload",
-      "progress": "Uploading",
-      "done": "Uploaded"
+      "idle": "Загрузить",
+      "progress": "Загружается",
+      "done": "Загружено"
     },
-    "cancel": "Cancel",
-    "close": "Close",
+    "cancel": "Отменить",
+    "close": "Закрыть",
     "test": {
-      "idle": "Test",
-      "progress": "Testing in progress",
-      "done": "Testing done"
+      "idle": "Тест",
+      "progress": "Тестирование в процессе",
+      "done": "Тестирование завершено"
     },
     "saveChanges": {
-      "idle": "Save changes",
-      "invalid": "Cannot save changes",
-      "progress": "Saving changes",
-      "done": "Changes saved"
+      "idle": "Сохранить изменения",
+      "invalid": "Не удается сохранить изменения",
+      "progress": "Сохранение изменений",
+      "done": "Изменения сохранены"
     },
-    "something-went-wrong": "Something went wrong",
-    "mark-to-delete": "Mark to delete",
-    "disable": "Disable",
-    "enable": "Enable",
-    "disabled": "Disabled",
-    "enabled": "Enabled",
-    "edit": "Edit",
-    "delete": "Delete",
-    "play": "Play",
-    "hold-to-delete": "Hold to delete",
-    "yes": "Yes",
-    "no": "No"
+    "something-went-wrong": "Что-то пошло не так",
+    "mark-to-delete": "Отметить для удаления",
+    "disable": "Выключить",
+    "enable": "Включить",
+    "disabled": "Выключено",
+    "enabled": "Включено",
+    "edit": "Редактировать",
+    "delete": "Удалить",
+    "play": "Прослушать",
+    "hold-to-delete": "Удерживайте, чтобы удалить",
+    "yes": "Да",
+    "no": "Нет"
   },
-  "changesPending": "Your changes was not saved.",
-  "formNotValid": "Form is invalid.",
-  "nothingToShow": "Nothing to show here."
+  "changesPending": "Ваши изменения не были сохранены.",
+  "formNotValid": "Форма неверна.",
+  "nothingToShow": "Нечего показывать"
 }
