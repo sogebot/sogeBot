@@ -1,6 +1,6 @@
 {
   "settings": {
-    "ignorelist": "Seznam ignorovaných (ID nebo uživ. jm.)",
+    "ignorelist": "Seznam ignorovaných (ID nebo uživatelské jméno)",
     "globalIgnoreListExclude": "Odebrat z globálního seznamu ignorovaných",
     "showWithAt": "Zobraz uzivatele s @",
     "sendWithMe": "Posílat zprávy s /me",

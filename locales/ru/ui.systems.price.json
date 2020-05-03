@@ -1,0 +1,20 @@
+{
+  "new": "Новая Цена",
+  "empty": "Цены еще не созданы.",
+  "emptyAfterSearch": "По вашему запросу не найдено цен <strong>\"$search\"</strong>.",
+  "command": {
+    "name": "команда",
+    "placeholder": ""
+  },
+  "price": {
+    "name": "цена",
+    "placeholder": ""
+  },
+  "error": {
+    "isEmpty": "Это поле не может быть пустым"
+  },
+  "warning": "Это действие нельзя будет отменить!",
+  "settings": {
+    "enabled": "Статус"
+  }
+}

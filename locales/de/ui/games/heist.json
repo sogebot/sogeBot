@@ -1,0 +1,30 @@
+{
+  "name": "Heist",
+  "settings": {
+    "enabled": "Status",
+    "showMaxUsers": "Max Benutzer bei der Auszahlung anzeigen",
+    "copsCooldownInMinutes": {
+      "title": "Abklingzeit zwischen Heists",
+      "help": "Minuten"
+    },
+    "entryCooldownInSeconds": {
+      "title": "Zeit zum Beitritt",
+      "help": "Sekunden"
+    },
+    "started": "Heist Startnachricht",
+    "nextLevelMessage": "Nachricht, wenn die nächste Stufe erreicht ist",
+    "maxLevelMessage": "Nachricht, wenn die maximale Stufe erreicht ist",
+    "copsOnPatrol": "Antwort des Bots wenn Heist immer noch Abklingzeit hat",
+    "copsCooldown": "Bot Ankündigung wenn Heist gestartet werden kann",
+    "singleUserSuccess": "Erfolgsmeldung für einen Benutzer",
+    "singleUserFailed": "Fehlermeldung für einen Benutzer",
+    "noUser": "Nachricht, wenn kein Benutzer teilgenommen hat"
+  },
+  "message": "Nachricht",
+  "winPercentage": "Sieges-Prozentsatz",
+  "payoutMultiplier": "Auszahlungs-Multiplikator",
+  "maxUsers": "Max Benutzer für Stufe",
+  "percentage": "Prozentsatz",
+  "noResultsFound": "Keine Ergebnisse gefunden. Zum Hinzufügen eines neuen Ergebnisses auf die Schaltfläche unten klicken.",
+  "noLevelsFound": "Keine Stufen gefunden. Zum Hinzufügen einer neuen Stufe auf die Schaltfläche unten klicken."
+}

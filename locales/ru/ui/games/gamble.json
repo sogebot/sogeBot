@@ -1,0 +1,10 @@
+{
+  "settings": {
+    "enabled": "Статус",
+    "minimalBet": "Минимальная ставка",
+    "chanceToWin": {
+      "title": "Шанс на победу",
+      "help": "Процент"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "copsOnPatrol": "$sender, Bullen suchen noch immer nach dem letzten Überfall-Team. Versuchen Sie es nach $cooldown erneut.",
+  "copsCooldownMessage": "Gut Jungs, sieht so aus, als würden die Polizeikräfte Donuts essen und wir können das süße Geld bekommen!",
+  "entryMessage": "$sender hat damit begonnen, einen Raub zu planen! Suche nach einer größeren Mannschaft für eine größere Punktzahl. Mach mit! Tippe $command <points> um beizutreten.",
+  "lateEntryMessage": "$sender, Raub ist gerade im Gange!",
+  "entryInstruction": "$sender, gib $command <points> ein, um beizutreten.",
+  "levelMessage": "Mit dieser Mannschaft können wir $bank ausrauben! Lass uns sehen, ob wir genug Crewmitglieder bekommen können, um $nextBank auszurauben",
+  "maxLevelMessage": "Mit dieser Mannschaft können wir $bank ausrauben! Es könnte nicht besser sein!",
+  "started": "Also gut Leute, überprüft eure Ausrüstung. Das ist das, wofür wir ausgebildet wurden. Dies ist kein Spiel, das ist das echte Leben. Wir werden das Geld von $bank bekommen!",
+  "noUser": "Niemand schließt sich der Mannschaft an, um einen Raub zu gehen.",
+  "singleUserSuccess": "$user war wie ein Ninja. Niemand hat das fehlende Geld bemerkt.",
+  "singleUserFailed": "$user hat es versäumt, die Polizei loszuwerden und wird seine Zeit im Gefängnis verbringen müssen.",
+  "result": {
+    "0": "Jeder wurde gnadenlos ausgelöscht. Das war eine Schlacht.",
+    "33": "Nur 1/3 der Mannschaft bekommt ihr Geld von Raub.",
+    "50": "Die Hälfte der Mannschaft wurde von der Polizei getötet oder gefangen.",
+    "99": "Einige Verluste der Raubüberfallmannschaft sind nichts im Vergleich zu dem, was die verbleibende Mannschaft in ihren Taschen hat.",
+    "100": "Oh mein Gott, niemand ist tot und jeder hat gewonnen!"
+  },
+  "levels": {
+    "bankVan": "Geldtransporter",
+    "cityBank": "Städtische Bank",
+    "stateBank": "Staatsbank",
+    "nationalReserve": "Nationale Reserve",
+    "federalReserve": "Bundesreserve"
+  },
+  "results": "Die Heist-Auszahlungen sind: $users",
+  "andXMore": "und $count mehr ..."
+}

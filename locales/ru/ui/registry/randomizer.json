@@ -1,0 +1,21 @@
+{
+  "addRandomizer": "Добавить генератор",
+  "form": {
+    "name": "Название",
+    "command": "Команда",
+    "permission": "Разрешение на команду",
+    "simple": "Простой",
+    "wheelOfFortune": "Колесо фортуны",
+    "type": "Тип",
+    "options": "Параметры",
+    "optionsAreEmpty": "Опции не заполнены.",
+    "color": "Цвет",
+    "numOfDuplicates": "Количество дубликатов",
+    "minimalSpacing": "Минимальное расстояние",
+    "groupUp": "Сгруппировать",
+    "ungroup": "Разгруппировать",
+    "groupedWithOptionAbove": "Сгруппировано с параметром выше",
+    "generatedOptionsPreview": "Предварительный просмотр генерируемых параметров",
+    "probability": "Вероятность"
+  }
+}

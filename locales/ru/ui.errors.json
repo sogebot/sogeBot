@@ -1,0 +1,13 @@
+{
+  "this_value_must_be_a_positive_number_and_greater_then_0": "Это значение должно быть положительным числом или больше 0",
+  "command_must_start_with_!": "Команда должна начинаться с !",
+  "this_value_must_be_a_positive_number_or_0": "Значение должно быть положительным числом или 0",
+  "value_cannot_be_empty": "Значение не может быть пустым",
+  "minLength_of_value_is": "Минимальная длина - $value.",
+  "this_currency_is_not_supported": "Эта валюта не поддерживается",
+  "something_went_wrong": "Что-то пошло не так",
+  "permission_must_exist": "Разрешение должно существовать",
+  "minValue_of_value_is": "Минимальное значение — $value",
+  "invalid_format": "Неверный формат значения.",
+  "invalid_regexp_format": "Это неправильное регулярное выражение."
+}

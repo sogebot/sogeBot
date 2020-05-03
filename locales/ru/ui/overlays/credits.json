@@ -1,0 +1,33 @@
+{
+  "settings": {
+    "cCreditsSpeed": "Скорость",
+    "cCreditsAggregated": "Агрегированные кредиты",
+    "cShowFollowers": "Показать подписчиков",
+    "cShowHosts": "Показать хосты",
+    "cShowRaids": "Показать рейды",
+    "cShowSubscribers": "Показать сабскрайберов",
+    "cShowSubgifts": "Показать подаренные сабки",
+    "cShowSubcommunitygifts": "Показать сабки, подаренные сообществу",
+    "cShowResubs": "Показать ресабы",
+    "cShowCheers": "Показать чирсы",
+    "cShowClips": "Показать клипы",
+    "cShowTips": "Показать донаты",
+    "cTextLastMessage": "Последнее сообщение",
+    "cTextLastSubMessage": "Последнее сообщение сабскрайба",
+    "cTextStreamBy": "Стримит от",
+    "cTextFollow": "Подписка от",
+    "cTextHost": "Хост от",
+    "cTextRaid": "Рейд от",
+    "cTextCheer": "Чирсы от",
+    "cTextSub": "Сабскрайб от",
+    "cTextResub": "Ресаб от",
+    "cTextSubgift": "Подареные сабы",
+    "cTextSubcommunitygift": "Сабы, подаренные сообществу",
+    "cTextTip": "Донаты от",
+    "cClipsPeriod": "Промежуток времени",
+    "cClipsCustomPeriodInDays": "Пользовательский интервал времени (дней)",
+    "cClipsNumOfClips": "Число клипов",
+    "cClipsShouldPlay": "Клипы должны воспроизводиться",
+    "cClipsVolume": "Громкость"
+  }
+}

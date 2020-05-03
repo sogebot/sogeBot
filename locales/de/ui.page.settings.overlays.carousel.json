@@ -1,0 +1,24 @@
+{
+  "options": "Optionen",
+  "popover": {
+    "are_you_sure_you_want_to_delete_this_image": "Bist du dir sicher, dass du dieses Bild <strong class='text-danger'>löschen</strong> willst?"
+  },
+  "button": {
+    "update": "Aktualisieren",
+    "fix_your_errors_first": "Behebe alle Fehler vor dem Speichern"
+  },
+  "errors": {
+    "number_greater_or_equal_than_0": "Wert muss eine Zahl >= 0 sein",
+    "value_must_not_be_empty": "Wert darf nicht leer sein"
+  },
+  "titles": {
+    "waitBefore": "Wartezeit in Millisekunden bevor Bild gezeigt wird",
+    "waitAfter": "Wartezeit nach dem Verschwinden des Bildes (in ms)",
+    "duration": "Wie lange das Bild angezeigt werden soll (in ms)",
+    "animationIn": "Eingehende Animation",
+    "animationOut": "Ausgehende Animation",
+    "animationInDuration": "Dauer der eingehenden Animation (in ms)",
+    "animationOutDuration": "Dauer der ausgehenden Animation (in ms)",
+    "showOnlyOncePerStream": "Nur einmal pro Stream anzeigen"
+  }
+}

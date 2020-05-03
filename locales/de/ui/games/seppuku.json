@@ -1,0 +1,9 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "timeout": {
+      "title": "Dauer der Zeitüberschreitung",
+      "help": "Sekunden"
+    }
+  }
+}

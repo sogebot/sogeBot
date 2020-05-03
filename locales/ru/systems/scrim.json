@@ -1,0 +1,7 @@
+{
+  "countdown": "Снайперский матч ($type), начинается через $time $unit",
+  "go": "Начинаем прямо сейчас!",
+  "putMatchIdInChat": "Пожалуйста, введите ваш ID матча в чат => $command xxx",
+  "currentMatches": "Текущие матчи: $matches",
+  "stopped": "Матч со снайпами отменены."
+}

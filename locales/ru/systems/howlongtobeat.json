@@ -1,0 +1,5 @@
+{
+  "error": "$sender, $game не найденf в базе данных или это сетевая игра.",
+  "game": "$sender, $game | Главный сюжет $doneMain: $currentMain/$hltbMainh - $percentMain% | Pfdthityj$doneCompletionist: $currentCompletionist/$hltbCompletionisth - $percentCompletionist%",
+  "done": "(выполнено)"
+}

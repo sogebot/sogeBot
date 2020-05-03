@@ -1,0 +1,20 @@
+{
+  "new": "Neuer Preis",
+  "empty": "Es wurde noch kein Preis festgelegt.",
+  "emptyAfterSearch": "Bei der Suche nach <strong>\"$search\"</strong> wurde kein Preis gefunden.",
+  "command": {
+    "name": "Befehl",
+    "placeholder": ""
+  },
+  "price": {
+    "name": "Preis",
+    "placeholder": ""
+  },
+  "error": {
+    "isEmpty": "Dieser Wert darf nicht leer sein"
+  },
+  "warning": "Diese Aktion kann nicht rückgängig gemacht werden!",
+  "settings": {
+    "enabled": "Status"
+  }
+}

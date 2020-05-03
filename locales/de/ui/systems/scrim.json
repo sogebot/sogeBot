@@ -1,0 +1,9 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "waitForMatchIdsInSeconds": {
+      "title": "Intervall zum Eingeben der Spiel-ID in den Chat",
+      "help": "In Sekunden festlegen"
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "settings": {
+    "cClipsCustomPeriodInDays": "Интервал времени (дни)",
+    "cClipsNumOfClips": "Число клипов",
+    "cClipsTimeToNextClip": "Время до следующего клипа (ов)"
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "enabled": "Aktiviert",
+  "empty": "Die Alert-Registry ist leer, erstelle einen neuen Alert.",
+  "emptyAfterSearch": "Alert Registry leer! Bei der Suche nach \"<strong>$search</strong>\" wurden keine Alerts gefunden",
+  "revertcode": "Auf Standard zurücksetzen",
+  "name": {
+    "name": "Name",
+    "placeholder": "Namen des Alerts festlegen"
+  },
+  "alertDelayInMs": {
+    "name": "Alarm-Verzögerung"
+  },
+  "profanityFilterType": {
+    "name": "Schimpfwort-Filter",
+    "disabled": "Deaktiviert",
+    "replace-with-asterisk": "Mit Sternchen ersetzen",
+    "replace-with-happy-words": "Mit freundlichen Wörtern ersetzen",
+    "hide-messages": "Nachrichten ausblenden",
+    "disable-alerts": "Alerts deaktivieren"
+  },
+  "loadStandardProfanityList": "Standardliste für Schimpfwörter laden",
+  "customProfanityList": {
+    "name": "Benutzerdefinierte Schimpfwort-Liste",
+    "help": "Wörter müssen durch Kommas getrennt werden."
+  },
+  "event": {
+    "follows": "Follows",
+    "cheers": "Cheers",
+    "subs": "Subs",
+    "resubs": "Re-Subs",
+    "subgifts": "Verschenkte Subs",
+    "subcommunitygifts": "Subgifts to community",
+    "tips": "Tips",
+    "hosts": "Hosts",
+    "raids": "Raids"
+  },
+  "title": {
+    "name": "Variantenname",
+    "placeholder": "Variantenname festlegen"
+  },
+  "variant": {
+    "name": "Variantenvorkommen"
+  },
+  "speed": {
+    "name": "Geschwindigkeit"
+  },
+  "maxTimeToDecrypt": {
+    "name": "Maximale Zeit zum Entschlüsseln"
+  },
+  "characters": {
+    "name": "Zeichen"
+  },
+  "random": "Zufällig",
+  "exact-amount": "Genauer Betrag",
+  "greater-than-or-equal-to-amount": "Größer als oder gleich dem Betrag",
+  "very-rarely": "Sehr selten",
+  "rarely": "Selten",
+  "default": "Standard",
+  "frequently": "Häufig",
+  "very-frequently": "Sehr häufig",
+  "messageTemplate": {
+    "name": "Nachrichtenvorlage",
+    "placeholder": "Nachrichtenvorlage festlegen",
+    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts), {recipient} (subgifts), {monthsName} (subs, subgifts), {currency} (tips)"
+  },
+  "animationText": {
+    "name": "Animationstext"
+  },
+  "animationIn": {
+    "name": "Eingehende Animation"
+  },
+  "animationOut": {
+    "name": "Ausgehende Animation"
+  },
+  "alertDurationInMs": {
+    "name": "Dauer des Alarms"
+  },
+  "alertTextDelayInMs": {
+    "name": "Verzögerung des Alarmtextes"
+  },
+  "layoutPicker": {
+    "name": "Layout"
+  },
+  "image": {
+    "name": "Bild"
+  },
+  "sound": {
+    "name": "Sound"
+  },
+  "soundVolume": {
+    "name": "Sound Lautstärke"
+  },
+  "enableAdvancedMode": "Erweiterten Modus aktivieren",
+  "font": {
+    "setting": "Schrifteinstellungen",
+    "name": "Schriftartfamilie",
+    "size": {
+      "name": "Schriftgröße"
+    },
+    "weight": {
+      "name": "Schriftdicke"
+    },
+    "borderPx": {
+      "name": "Schriftumrandung"
+    },
+    "borderColor": {
+      "name": "Farbe Schriftumrandung"
+    },
+    "color": {
+      "name": "Schriftfarbe"
+    },
+    "highlightcolor": {
+      "name": "Farbe der hervorgehobenen Schrift"
+    }
+  },
+  "minAmountToShow": {
+    "name": "Minimaler Betrag zum Anzeigen"
+  },
+  "minAmountToPlay": {
+    "name": "Minimaler Betrag zum Abspielen"
+  },
+  "allowEmotes": {
+    "name": "Emotes zulassen"
+  },
+  "message": {
+    "setting": "Nachrichteneinstellungen"
+  },
+  "showAutoHost": "Zeige Auto-Host",
+  "voice": "Stimme",
+  "keepAlertShown": "Alert bleibt während TTS sichtbar",
+  "skipUrls": "URLs in TTS überspringen",
+  "volume": "Lautstärke",
+  "rate": "Rate",
+  "pitch": "Tonhöhe",
+  "test": "Test",
+  "tts": {
+    "setting": "TTS-Einstellungen"
+  }
+}

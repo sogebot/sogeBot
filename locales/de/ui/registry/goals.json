@@ -1,0 +1,94 @@
+{
+  "addGoalGroup": "Zielgruppe hinzufügen",
+  "addGoal": "Ziel hinzufügen",
+  "newGoal": "Neues Ziel",
+  "newGoalGroup": "Neue Zielgruppe",
+  "goals": "Ziele",
+  "general": "Allgemein",
+  "display": "Anzeige",
+  "fontSettings": "Schrifteinstellungen",
+  "barSettings": "Balkeneinstellungen",
+  "selectGoalOnLeftSide": "Ziel auf der linken Seite auswählen oder hinzufügen",
+  "input": {
+    "description": {
+      "title": "Beschreibung"
+    },
+    "goalAmount": {
+      "title": "Zielmenge"
+    },
+    "countBitsAsTips": {
+      "title": "Bits als Spenden zählen"
+    },
+    "currentAmount": {
+      "title": "Aktueller Betrag"
+    },
+    "endAfter": {
+      "title": "Beenden nach"
+    },
+    "endAfterIgnore": {
+      "title": "Ziel läuft nicht ab"
+    },
+    "fonts": {
+      "title": "Font-Familie",
+      "help": "Google-Fonts werden für Font-Familien verwendet. <a href='https://fonts.google.com/' target='_blank'>Schriftartenliste prüfen.</a>"
+    },
+    "fontSize": {
+      "title": "Größe",
+      "help": "Schriftgröße ist in Pixeln"
+    },
+    "borderPx": {
+      "title": "Rahmen",
+      "help": "Rahmengröße ist in Pixeln"
+    },
+    "barHeight": {
+      "title": "Balkenhöhe",
+      "help": "Balkenhöhe in Pixeln"
+    },
+    "color": {
+      "title": "Farbe"
+    },
+    "borderColor": {
+      "title": "Rahmenfarbe"
+    },
+    "backgroundColor": {
+      "title": "Hintergrundfarbe"
+    },
+    "type": {
+      "title": "Typ"
+    },
+    "nameGroup": {
+      "title": "Name dieser Zielgruppe",
+      "placeholder": "Name dieser Zielgruppe festlegen",
+      "help": "Wenn leer, wird der Name zufällig generiert"
+    },
+    "name": {
+      "title": "Name des Ziels",
+      "placeholder": "Name des Ziels festlegen"
+    },
+    "displayAs": {
+      "title": "Anzeigen als",
+      "help": "Legt fest, wie Zielgruppe angezeigt wird"
+    },
+    "durationMs": {
+      "title": "Dauer",
+      "help": "Dieser Wert ist in Millisekunden",
+      "placeholder": "Wie lange das Ziel angezeigt werden soll"
+    },
+    "animationInMs": {
+      "title": "Dauer der eingehenden Animation",
+      "help": "Dieser Wert ist in Millisekunden",
+      "placeholder": "Eingehende Animationsdauer festlegen"
+    },
+    "animationOutMs": {
+      "title": "Dauer der ausgehenden Animation",
+      "help": "Dieser Wert ist in Millisekunden",
+      "placeholder": "Dauer der ausgehenden Animation festlegen"
+    },
+    "spaceBetweenGoalsInPx": {
+      "title": "Abstand zwischen Zielen",
+      "help": "Dieser Wert ist in Pixeln",
+      "placeholder": "Legen Sie Ihren Raum zwischen den Balken fest"
+    }
+  },
+  "groupSettings": "Gruppeneinstellungen"
+}

@@ -1,0 +1,139 @@
+{
+  "enabled": "Включено",
+  "empty": "Список оповещений пуст, создайте новые оповещения.",
+  "emptyAfterSearch": "Реестр оповещений пуст при поиске \"<strong>$search</strong>\"",
+  "revertcode": "Сбросить к заводским настройкам",
+  "name": {
+    "name": "Название",
+    "placeholder": "Введите название ваших оповещений"
+  },
+  "alertDelayInMs": {
+    "name": "Задержка оповещения"
+  },
+  "profanityFilterType": {
+    "name": "Фильтр ненормативной лексики",
+    "disabled": "Выключено",
+    "replace-with-asterisk": "Заменить звёздочкой",
+    "replace-with-happy-words": "Заменить счастливыми словами",
+    "hide-messages": "Скрыть сообщения",
+    "disable-alerts": "Отключить оповещения"
+  },
+  "loadStandardProfanityList": "Загрузить стандартный список ненормативной лексики",
+  "customProfanityList": {
+    "name": "Пользовательский список ненормативной лексики",
+    "help": "Слова должны быть разделены запятыми."
+  },
+  "event": {
+    "follows": "Подписки",
+    "cheers": "Чирсы",
+    "subs": "Сабы",
+    "resubs": "Ресабы",
+    "subgifts": "Сабгифты",
+    "subcommunitygifts": "Subgifts to community",
+    "tips": "Донаты",
+    "hosts": "Хосты",
+    "raids": "Рейды"
+  },
+  "title": {
+    "name": "Название варианта",
+    "placeholder": "Укажите имя вашего варианта"
+  },
+  "variant": {
+    "name": "Вариант применения"
+  },
+  "speed": {
+    "name": "Скорость"
+  },
+  "maxTimeToDecrypt": {
+    "name": "Макс. время для расшифровки"
+  },
+  "characters": {
+    "name": "Символы"
+  },
+  "random": "Случайный",
+  "exact-amount": "Точное количество",
+  "greater-than-or-equal-to-amount": "Больший чем или равный",
+  "very-rarely": "Очень редкие",
+  "rarely": "Редко",
+  "default": "По умолчанию",
+  "frequently": "Периодически",
+  "very-frequently": "Очень часто",
+  "messageTemplate": {
+    "name": "Шаблон сообщения",
+    "placeholder": "Установить шаблон сообщения",
+    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts), {recipient} (subgifts), {monthsName} (subs, subgifts), {currency} (tips)"
+  },
+  "animationText": {
+    "name": "Текст анимации"
+  },
+  "animationIn": {
+    "name": "Анимация в"
+  },
+  "animationOut": {
+    "name": "Анимация из"
+  },
+  "alertDurationInMs": {
+    "name": "Длительность оповещения"
+  },
+  "alertTextDelayInMs": {
+    "name": "Задержка текста уведомления"
+  },
+  "layoutPicker": {
+    "name": "Размещение"
+  },
+  "image": {
+    "name": "Изображение"
+  },
+  "sound": {
+    "name": "Звук"
+  },
+  "soundVolume": {
+    "name": "Громкость звука"
+  },
+  "enableAdvancedMode": "Включить расширенный режим",
+  "font": {
+    "setting": "Настройки шрифта",
+    "name": "Семейство шрифтов",
+    "size": {
+      "name": "Размер шрифта"
+    },
+    "weight": {
+      "name": "Масса шрифта"
+    },
+    "borderPx": {
+      "name": "Границы шрифты"
+    },
+    "borderColor": {
+      "name": "Цвет границы шрифта"
+    },
+    "color": {
+      "name": "Цвет текста"
+    },
+    "highlightcolor": {
+      "name": "Цвет подсветки шрифта"
+    }
+  },
+  "minAmountToShow": {
+    "name": "Минимальная сумма для показа"
+  },
+  "minAmountToPlay": {
+    "name": "Минимальная сумма для проигрывания"
+  },
+  "allowEmotes": {
+    "name": "Разрешить смайлики"
+  },
+  "message": {
+    "setting": "Настройки сообщения"
+  },
+  "showAutoHost": "Показывать автохост",
+  "voice": "Голос",
+  "keepAlertShown": "Оповещение сохраняет видимость во время TTS",
+  "skipUrls": "Не озвучивать ссылки в TTS",
+  "volume": "Громкость",
+  "rate": "Темп",
+  "pitch": "Высота",
+  "test": "Тест",
+  "tts": {
+    "setting": "Настройки TTS"
+  }
+}

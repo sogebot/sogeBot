@@ -1,0 +1,24 @@
+{
+  "options": "параметры",
+  "popover": {
+    "are_you_sure_you_want_to_delete_this_image": "Вы уверены, что хотите <strong class='text-danger'>удалить</strong> изображение?"
+  },
+  "button": {
+    "update": "Обновить",
+    "fix_your_errors_first": "Исправьте ошибки перед сохранением"
+  },
+  "errors": {
+    "number_greater_or_equal_than_0": "Значение должно быть числом >= 0",
+    "value_must_not_be_empty": "Значение не должно быть пустым"
+  },
+  "titles": {
+    "waitBefore": "Ожидание перед показом изображения (миллисекунды)",
+    "waitAfter": "Ожидание перед исчезанием изображения (миллисекунды)",
+    "duration": "Как долго должно быть показано изображение (в мс)",
+    "animationIn": "Анимация в",
+    "animationOut": "Анимация из",
+    "animationInDuration": "Длительность анимации В (в миллисекундах)",
+    "animationOutDuration": "Длительность анимации ИЗ (в миллисекундах)",
+    "showOnlyOncePerStream": "Показывать только один раз за стрим"
+  }
+}

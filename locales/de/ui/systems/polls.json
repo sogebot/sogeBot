@@ -1,0 +1,38 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "everyXMessages": {
+      "title": "Alle X Nachrichten erinnern",
+      "help": "0 = deaktiviert; beide Erinnerungsbedingungen müssen der Bot-Druck-Erinnerung entsprechen"
+    },
+    "everyXSeconds": {
+      "title": "Alle X Sekunden erinnern",
+      "help": "0 = deaktiviert; beide Erinnerungsbedingungen müssen der Bot-Druck-Erinnerung entsprechen"
+    }
+  },
+  "overlay": {
+    "type": "Typ",
+    "add": "Hinzufügen",
+    "inChatToVote": "... im Chat zur Abstimmung",
+    "tips": "spenden",
+    "bits": "Cheer",
+    "toYourMessage": "... in Ihrer <strong>$type</strong> Nachricht"
+  },
+  "title": "Titel",
+  "done": "Fertig",
+  "running": "LÄUFT",
+  "stop": "Stop",
+  "copy": "Kopieren",
+  "totalVotes": "Stimmen insgesamt",
+  "cannotCopyIfInProgress": "Kann nicht kopiert werden, wenn eine andere Umfrage läuft",
+  "closedAt": "Geschlossen am",
+  "activeFor": "Aktiv für",
+  "votingBy": "Abstimmung von",
+  "tips": "Spenden",
+  "bits": "Bits",
+  "command": "!vote",
+  "create": "Klicken, um ein neue Umfrage zu erstellen",
+  "cannotCreateIfEmpty": "Neue Umfrage kann ohne mindestens 2 Optionen nicht erstellt werden",
+  "cannotCreateWithoutTitle": "Neue Umfrage kann ohne Titel nicht erstellt werden",
+  "cannotCreateNewVoteIfInProgress": "Kann keine neue Umfrage erstellen, solange eine andere Umfrage läuft"
+}

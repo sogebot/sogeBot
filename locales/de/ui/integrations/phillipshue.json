@@ -1,0 +1,12 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "user": "Benutzer",
+    "port": "Port",
+    "host": {
+      "title": "Host",
+      "help": "es ist unerlässlich, PhillipsHue im gleichen Netzwerk wie den Bot zu nutzen."
+    },
+    "timeout": "Zeitüberschreitung"
+  }
+}

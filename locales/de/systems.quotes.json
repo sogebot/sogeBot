@@ -1,0 +1,30 @@
+{
+  "add": {
+    "ok": "$sender, Zitat $id '$quote' wurde hinzugefügt. (Tags: $tags)",
+    "error": "$sender, $command ist nicht korrekt oder fehlendes -quote-Parameter"
+  },
+  "remove": {
+    "ok": "$sender, Zitat $id wurde erfolgreich gelöscht.",
+    "error": "$sender, Zitat-ID fehlt.",
+    "not-found": "$sender, Zitat $id wurde nicht gefunden."
+  },
+  "show": {
+    "ok": "Zitat $id von $quotedBy '$quote'",
+    "error": {
+      "no-parameters": "$sender, $command es fehlt -id oder -tag.",
+      "not-found-by-id": "$sender, Zitat $id wurde nicht gefunden.",
+      "not-found-by-tag": "$sender, es wurden keine Zitate mit dem Tag $tag gefunden."
+    }
+  },
+  "set": {
+    "ok": "$sender, Zitat $id Tags wurden gesetzt. (Tags: $tags)",
+    "error": {
+      "no-parameters": "$sender, $command es fehlt -id oder -tag.",
+      "not-found-by-id": "$sender, Zitat $id wurde nicht gefunden."
+    }
+  },
+  "list": {
+    "ok": "$sender, Du findest die Zitatliste unter http://$urlBase/public/#/quotes",
+    "is-localhost": "$sender, Zitatlisten URL ist nicht korrekt angegeben."
+  }
+}

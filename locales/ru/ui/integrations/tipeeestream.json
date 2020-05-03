@@ -1,0 +1,13 @@
+{
+  "settings": {
+    "enabled": "Статус",
+    "username": {
+      "title": "Имя пользователя",
+      "help": "Ваше имя пользователя на tipeeestream"
+    },
+    "apiKey": {
+      "title": "Ключ API",
+      "help": "Получить токен сокета с панели tipeeestream -> API -> Ваш ключ API"
+    }
+  }
+}

@@ -29,6 +29,7 @@
     "subs": "Předplatitel",
     "resubs": "Předplatitel (resub)",
     "subgifts": "Darování subscribe",
+    "subcommunitygifts": "Subgifts to community",
     "subcommunitygifts": "Darování subscribe komunitě",
     "tips": "Spropitné",
     "hosts": "Hostování",
@@ -132,7 +133,7 @@
   "volume": "Hlasitost",
   "rate": "Tempo",
   "pitch": "Výška",
-  "test": "Test",
+  "test": "Otestovat",
   "tts": {
     "setting": "Nastavení TTS"
   }

@@ -1,0 +1,20 @@
+{
+  "new": "Новый ранг",
+  "empty": "Ранги еще не созданы.",
+  "emptyAfterSearch": "Не найдено рангов по вашему запросу <strong>\"$search\"</strong>.",
+  "rank": {
+    "name": "ранг",
+    "placeholder": ""
+  },
+  "value": {
+    "name": "часы",
+    "placeholder": ""
+  },
+  "error": {
+    "isEmpty": "Это поле не может быть пустым"
+  },
+  "warning": "Это действие нельзя будет отменить!",
+  "settings": {
+    "enabled": "Статус"
+  }
+}

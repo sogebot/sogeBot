@@ -1,0 +1,12 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "cooldown": "Cooldown",
+    "duration": {
+      "title": "Dauer",
+      "help": "Minuten"
+    },
+    "minimalBet": "Minimaler Einsatz",
+    "bypassCooldownByOwnerAndMods": "Cooldown durch Streamer und Mods umgehen"
+  }
+}

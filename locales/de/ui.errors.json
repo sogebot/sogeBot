@@ -1,0 +1,13 @@
+{
+  "this_value_must_be_a_positive_number_and_greater_then_0": "Dieser Wert muss eine positive Zahl haben oder größer als 0 sein",
+  "command_must_start_with_!": "Der Command muss mit einem ! beginnen",
+  "this_value_must_be_a_positive_number_or_0": "Dieser Wert muss positiv oder 0 sein",
+  "value_cannot_be_empty": "Dieser Wert darf nicht leer sein",
+  "minLength_of_value_is": "Minimale länge ist $value.",
+  "this_currency_is_not_supported": "Diese Währung wird nicht unterstützt",
+  "something_went_wrong": "Irgend etwas ist schief gelaufen",
+  "permission_must_exist": "Berechtigung muss vorhanden sein",
+  "minValue_of_value_is": "Minimalster Wert ist $value",
+  "invalid_format": "Ungültiges Werte Format.",
+  "invalid_regexp_format": "Dies ist kein gültiger oder regulärer Ausdruck."
+}

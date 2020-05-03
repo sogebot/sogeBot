@@ -1,0 +1,28 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "volume": "Lautstärke",
+    "calculateVolumeByLoudness": "Dynamische Lautstärke in Abhängigkeit zur Lautheit",
+    "duration": {
+      "title": "Maximale Länge eines Songs",
+      "help": "In Minuten"
+    },
+    "shuffle": "Zufallswiedergabe",
+    "songrequest": "Von Song-Request wiedergeben",
+    "playlist": "Von Wiedergabeliste wiedergeben",
+    "onlyMusicCategory": "Nur Musik aus Kategorien zulassen",
+    "notify": "Nachricht bei Songwechsel senden"
+  },
+  "error": {
+    "isEmpty": "Dieser Wert darf nicht leer sein"
+  },
+  "startTime": "Song starten bei",
+  "endTime": "Song beenden bei",
+  "add_song": "Song hinzufügen",
+  "add_or_import": "Song hinzufügen oder aus Wiedergabeliste importieren",
+  "importing": "Importieren",
+  "importing_done": "Importieren abgeschlossen",
+  "seconds": "Sekunden",
+  "calculated": "Berechnet",
+  "set_manually": "Manuell einstellen"
+}

@@ -1,0 +1,33 @@
+{
+  "settings": {
+    "cCreditsSpeed": "Geschwindigkeit",
+    "cCreditsAggregated": "Zusammengefasste Credits",
+    "cShowFollowers": "Follower anzeigen",
+    "cShowHosts": "Hosts anzeigen",
+    "cShowRaids": "Raids anzeigen",
+    "cShowSubscribers": "Abonnenten anzeigen",
+    "cShowSubgifts": "Verschenkte Subs anzeigen",
+    "cShowSubcommunitygifts": "Verschenkte Community-Subs anzeigen",
+    "cShowResubs": "Re-Subs anzeigen",
+    "cShowCheers": "Cheers anzeigen",
+    "cShowClips": "Clips anzeigen",
+    "cShowTips": "Tips anzeigen",
+    "cTextLastMessage": "Letzte Nachricht",
+    "cTextLastSubMessage": "Letzte Sub-Nachricht",
+    "cTextStreamBy": "Gestreamt von",
+    "cTextFollow": "Gefolgt von",
+    "cTextHost": "Gehostet von",
+    "cTextRaid": "Raided von",
+    "cTextCheer": "Cheer von",
+    "cTextSub": "Abonniert von",
+    "cTextResub": "Re-Sub von",
+    "cTextSubgift": "Verschenkte Subs",
+    "cTextSubcommunitygift": "Verschenkte Community-Subs",
+    "cTextTip": "Tips von",
+    "cClipsPeriod": "Zeitintervall",
+    "cClipsCustomPeriodInDays": "Benutzerdefinierter Zeitintervall (Tage)",
+    "cClipsNumOfClips": "Anzahl an Clips",
+    "cClipsShouldPlay": "Clips sollten abgespielt werden",
+    "cClipsVolume": "Lautstärke"
+  }
+}
