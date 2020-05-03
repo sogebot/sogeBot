@@ -1,20 +1,20 @@
 {
-  "new": "New Rank",
-  "empty": "No ranks were created yet.",
-  "emptyAfterSearch": "No ranks were found by your search for <strong>\"$search\"</strong>.",
+  "new": "Новый ранг",
+  "empty": "Ранги еще не созданы.",
+  "emptyAfterSearch": "Не найдено рангов по вашему запросу <strong>\"$search\"</strong>.",
   "rank": {
-    "name": "rank",
+    "name": "ранг",
     "placeholder": ""
   },
   "value": {
-    "name": "hours",
+    "name": "часы",
     "placeholder": ""
   },
   "error": {
-    "isEmpty": "This value cannot be empty"
+    "isEmpty": "Это поле не может быть пустым"
   },
-  "warning": "This action cannot be reverted!",
+  "warning": "Это действие нельзя будет отменить!",
   "settings": {
-    "enabled": "Status"
+    "enabled": "Статус"
   }
 }
