@@ -817,22 +817,22 @@
     "betPercentGain": "Procentuální zisk na jednu možnost byl nastaven na $value%",
     "betCloseTimer": "Sázky budou automaticky uzavřeny po $valuemin",
     "refund": "Sázky byly uzavřeny bez výhry. Všichni uživatelé jsou vyplaceni!",
-    "notOption": "$sender, tato moznost neexistuje! Sazka nebyla uzavrena, pouzij $command",
-    "closed": "Sazky byly uzavreny a vitezna moznost je $option! Vyplaceno bylo $amount uzivatelu a rozdano $points $pointsName!",
-    "timeUpBet": "Prisel si pozde, $sender, cas na sazeni vyprsel!",
-    "locked": "Vyprsel cas na vsazeni! Dalsi sazky neprijimame",
-    "zeroBet": "Ale ale, $sender, nemuzes vsadit 0 $pointsName",
-    "lockedInfo": "Sazka '$title' je stale otevrena, ale cas na vsazeni jiz vyprsel!",
-    "removed": "Vyprsel cas na vsazeni! Nikdo si nevsadil -> automaticky uzaviram",
-    "error": "Promin, $sender, ale prikaz neni v poradku! Pouzij $command 1-$maxIndex <pocet bodu>. Priklad $command 0 100 vsadi 100 bodu na polozku 0."
+    "notOption": "$sender, tato možnost neexistuje! Sázka není uzavřena, zkontrolujte $command",
+    "closed": "Sázka byl uzavřena a vítězná možnost byla $option! $amount uživatelů celkem vyhrálo $points $pointsName!",
+    "timeUpBet": "Přišel si pozdě, $sender, čas na sázky vypršel!",
+    "locked": "Čas na sázku vypršel! Už žádné sázky.",
+    "zeroBet": "Ale ale, $sender, nelze vsadit 0 $pointsName",
+    "lockedInfo": "Sázka '$title' je stále otevřená, ale čas na sázeni již vypršel!",
+    "removed": "Vypršel čas na sázku! Nikdo si nevsadil -> automaticky uzavírám",
+    "error": "Omlouváme se, $sender, tento příkaz není správný! Použijte $command 1-$maxIndex <amount>. Např. $command 0 100 vsadí 100 bodů na položku 0."
   },
   "alias": {
     "alias-parse-failed": "{core.command-parse} !alias",
-    "alias-was-not-found": "$sender, alias $alias nebyl nalezen",
-    "alias-was-edited": "$sender, alias $alias je nyni pro $command",
-    "alias-was-added": "$sender, alias $alias pro $command byl pridan",
-    "list-is-not-empty": "$sender, seznam aliasu: $list",
-    "list-is-empty": "$sender, seznam aliasu je prazdny",
+    "alias-was-not-found": "$sender, alias $alias nebyl nalezen v databázi",
+    "alias-was-edited": "$sender, alias $alias byl změněn na $command",
+    "alias-was-added": "$sender, alias $alias pro $command byl přidán",
+    "list-is-not-empty": "$sender, seznam aliasů: $list",
+    "list-is-empty": "$sender, seznam aliasů je prázdný",
     "alias-was-enabled": "$sender, alias $alias byl zapnut",
     "alias-was-disabled": "$sender, alias $alias byl vypnut",
     "alias-was-concealed": "$sender, alias $alias byl skryt",
@@ -959,8 +959,8 @@
       "time": "$sender, $username sleduje tento kanál již $diff"
     },
     "successSameUsername": {
-      "never": "$sender, nejsi followerem kanalu",
-      "time": "$sender, sledujes tento kanal jiz $diff"
+      "never": "$sender, nejste sledující tohoto kanálu",
+      "time": "$sender, sledujete tento kanál již $diff"
     }
   },
   "subage": {
@@ -978,16 +978,16 @@
     }
   },
   "age": {
-    "failed": "$sender, nemam zatim data o stari uctu $username",
+    "failed": "$sender, nemám zatím data o staří účtu $username",
     "success": {
-      "withUsername": "$sender, stari uctu $username je $diff",
-      "withoutUsername": "$sender, stari tveho uctu je $diff"
+      "withUsername": "$sender, staří účtu $username je $diff",
+      "withoutUsername": "$sender, staří tvého účtu je $diff"
     }
   },
   "lastseen": {
     "success": {
       "never": "$username nikdy nebyl na tomto kanálu!",
-      "time": "$username byl naposled spatren na tomto kanalu $when"
+      "time": "$username byl naposledy spatřen v $when v tomto kanálu"
     },
     "failed": {
       "parse": "{core.command-parse} !lastseen [username]"
@@ -995,111 +995,111 @@
   },
   "watched": {
     "success": {
-      "time": "$username se dival na tento kanal $time hodin"
+      "time": "$username sledoval tento kanál po dobu $time hodin"
     },
     "failed": {
       "parse": "{core.command-parse} !watched nebo !watched [username]"
     }
   },
   "permissions": {
-    "without-permission": "Nemas dostatecne opravneni pro '$command'"
+    "without-permission": "Nemáte dostatečná oprávnění pro '$command'"
   },
   "moderation": {
-    "user-have-link-permit": "Uzivatel $username muze nyni postnout $count $link do chatu",
+    "user-have-link-permit": "Uživatel $username může odeslat $count $link do chatu",
     "permit-parse-failed": "{core.command-parse} !permit [username]",
-    "user-is-warned-about-links": "Nejsou povoleny linky, pozadej o !permit [zbyva $count varovani]",
-    "user-is-warned-about-symbols": "Prilisne pouzivani symbolu neni povoleno [zbyva $count varovani]",
-    "user-is-warned-about-long-message": "Tva zprava je prilis dlouha [zbyva $count varovani]",
-    "user-is-warned-about-caps": "Prilisne pouzivani velkych pismen neni povoleno [zbyva $count varovani]",
-    "user-is-warned-about-spam": "Spamovani neni povoleno [zbyva $count varovani]",
-    "user-is-warned-about-color": "Pouzivani /me neni povoleno [zbyva $count varovani]",
-    "user-is-warned-about-emotes": "Zadne spamovani smajlikama! [zbyva $count varovani]",
-    "user-is-warned-about-blacklist": "Zadne zakazane slova [zbyva $count varovani]",
-    "user-have-timeout-for-links": "Nejsou povoleny linky, pozadej o !permit",
-    "user-have-timeout-for-symbols": "Prilisne pouzivani symbolu neni povoleno",
-    "user-have-timeout-for-long-message": "Tva zprava je prilis dlouha",
-    "user-have-timeout-for-caps": "Prilisne pouzivani velkych pismen neni povoleno",
-    "user-have-timeout-for-spam": "Spamovani neni povoleno",
-    "user-have-timeout-for-color": "Pouzivani /me neni povoleno",
-    "user-have-timeout-for-emotes": "Zadne spamovani smajlikama!",
-    "user-have-timeout-for-blacklist": "Zadne zakazane slova"
+    "user-is-warned-about-links": "Nejsou povoleny žádné odkazy, požádejte o povolení [$count varování zbývá]",
+    "user-is-warned-about-symbols": "Přílišné používání symbolů není povoleno [$count varování zbývá]",
+    "user-is-warned-about-long-message": "Dlouhé zprávy nejsou povoleny [$count varování zbývá]",
+    "user-is-warned-about-caps": "Přílišné používání velkých písmen není povoleno [$count varování zbývá]",
+    "user-is-warned-about-spam": "Spamování není povoleno [$count varování zbývá]",
+    "user-is-warned-about-color": "Používání /me není povoleno [$count varování zbývá]",
+    "user-is-warned-about-emotes": "Žádné spamování smajlíkama! [$count varování zbývá]",
+    "user-is-warned-about-blacklist": "Žádná zakázaná slova [$count varování zbývá]",
+    "user-have-timeout-for-links": "Nejsou povoleny žádné odkazy, požádejte o povolení",
+    "user-have-timeout-for-symbols": "Přílišné používání symbolů není povoleno",
+    "user-have-timeout-for-long-message": "Dlouhé zprávy nejsou povoleny",
+    "user-have-timeout-for-caps": "Přílišné používání velkých písmen není povoleno",
+    "user-have-timeout-for-spam": "Spamování není povoleno",
+    "user-have-timeout-for-color": "Používání /me není povoleno",
+    "user-have-timeout-for-emotes": "Žádné spamování smajlíkama",
+    "user-have-timeout-for-blacklist": "Žádná zakázaná slova"
   },
   "queue": {
-    "list": "$sender, v queue jsou prihlaseni: $users",
+    "list": "$sender, ve frontě jsou přihlášení: $users",
     "info": {
       "closed": "$sender, {queue.close}",
       "opened": "$sender, {queue.open}"
     },
     "join": {
-      "closed": "Promin $sender, ale queue je uzavrena",
-      "opened": "$sender byl pridan do queue!"
+      "closed": "Omlouváme se $sender, fronta je momentálně uzavřena",
+      "opened": "$sender byl přidán do fronty"
     },
-    "open": "Queue je prave OTEVRENA! Pro pridani do queue zadej !queue join",
-    "close": "Queue je prave zavrena!",
-    "clear": "Queue byla uplne vymazana",
+    "open": "Queue je právě OTEVŘENA! Pro přidání do fronty zadej !queue join",
+    "close": "Fronta je momentálně uzavřena!",
+    "clear": "Fronta byla promazána",
     "picked": {
-      "single": "Tento uzivatel byl vybran z queue: $users",
-      "multi": "Tito uzivatele byli vybrani z queue: $users",
-      "none": "Zadny uzivatel nebyl nalezen v queue"
+      "single": "Tento uživatel byl vybrán z fronty: $users",
+      "multi": "Tito uživatelé byli vybráni z fronty: $users",
+      "none": "Nebyli nalezeni žádní uživatelé ve frontě"
     }
   },
   "title": {
     "current": "$sender, název vysílání je '$title'.",
     "change": {
-      "success": "$sender, titulek byl nastaven na: $title",
-      "failed": "$sender, neco se pokazilo. Titulek je stale nastaveny na: $title"
+      "success": "$sender, název byl nastaven na: $title",
+      "failed": "$sender, něco se pokazilo. Aktuální název je stále nastaven na: $title"
     }
   },
   "game": {
     "current": "$sender, streamer právě hraje $game.",
     "change": {
       "success": "$sender, hra byl nastavena na: $game",
-      "failed": "$sender, neco se pokazilo. Hra je stale nastavena na: $game"
+      "failed": "$sender, něco se pokazilo. Aktuální hra je stále nastavena na: $game"
     }
   },
   "cooldowns": {
     "cooldown-parse-failed": "{core.command-parse} !cooldown [keyword|!command] [global|user] [seconds] [true/false]",
     "cooldown-was-set": "$sender, $type cooldown pro $command byl nastaven na $secondss",
-    "cooldown-was-unset": "$sender, $type cooldown pro $command byl zrusen",
-    "cooldown-triggered": "$sender, jeste nemuzes pouzit $command, zbyva jeste $secondss",
+    "cooldown-was-unset": "$sender, $type cooldown pro $command byl zrušen",
+    "cooldown-triggered": "$sender, nemůžete použít $command, zbývá $secondss",
     "cooldown-not-found": "$sender, cooldown pro $command nebyl nalezen",
     "cooldown-was-enabled": "$sender, cooldown pro $command byl zapnut",
     "cooldown-was-disabled": "$sender, cooldown pro $command byl vypnut",
-    "cooldown-was-enabled-for-moderators": "$sender, cooldown pro $command je nastaven i pro moderatory",
-    "cooldown-was-disabled-for-moderators": "$sender, cooldown pro $command ignoruje moderatory",
-    "cooldown-was-enabled-for-owners": "$sender, cooldown pro $command je nastaven i pro vlastnika",
-    "cooldown-was-disabled-for-owners": "$sender, cooldown pro $command ignoruje vlastnika",
+    "cooldown-was-enabled-for-moderators": "$sender, cooldown pro $command je nastaven i pro moderátory",
+    "cooldown-was-disabled-for-moderators": "$sender, cooldown pro $command ignoruje moderátory",
+    "cooldown-was-enabled-for-owners": "$sender, cooldown pro $command je nastaven i pro vlastníka",
+    "cooldown-was-disabled-for-owners": "$sender, cooldown pro $command ignoruje vlastníka",
     "cooldown-was-enabled-for-subscribers": "$sender, cooldown pro $command je nastaven i pro subscribery",
     "cooldown-was-disabled-for-subscribers": "$sender, cooldown pro $command ignoruje subscribery",
     "cooldown-was-enabled-for-followers": "$sender, cooldown pro $command je nastaven i pro followery",
     "cooldown-was-disabled-for-followers": "$sender, cooldown pro $command ignoruje followery"
   },
   "timers": {
-    "id-must-be-defined": "$sender, id odpovedi musi byt zadano.",
-    "id-or-name-must-be-defined": "$sender, id odpovedi nebo jmeno timeru musi byt zadano.",
-    "name-must-be-defined": "$sender, jmeno timeru musi byt zadano.",
-    "response-must-be-defined": "$sender, odpoved timeru musi byt zadana.",
-    "cannot-set-messages-and-seconds-0": "$sender, nelze mit nastaveny zpravy a vteriny na 0.",
-    "timer-was-set": "$sender, timer $name byl nastaven na spusteni co $messages zprav a $seconds vterin",
-    "timer-not-found": "$sender, timer (name: $name) nebyl nalezen v databazi. Pro list timeru -> !timers list",
-    "timer-deleted": "$sender, timer $name a jeho odpovedi byly smazany.",
-    "timer-enabled": "$sender, timer (name: $name) byl zapnut.",
-    "timer-disabled": "$sender, timer (name: $name) byl vypnut.",
-    "timers-list": "$sender, seznam timeru: $list",
-    "responses-list": "$sender, seznam pro timer (name: $name)",
-    "response-deleted": "$sender, odpoved (id: $id) byla smazana.",
-    "response-was-added": "$sender, odpoved (id: $id) pro timer (name: $name) byla pridana - '$response'",
-    "response-not-found": "$sender, odpoved (id: $id) nebyla nalezena v databazi.",
-    "response-enabled": "$sender, odpoved (id: $id) byla zapnuta.",
-    "response-disabled": "$sender, odpoved (id: $id) byla vypnuta."
+    "id-must-be-defined": "$sender, id odpovědi musí být definováno.",
+    "id-or-name-must-be-defined": "$sender, id odpovědi nebo název časovače musí být definován.",
+    "name-must-be-defined": "$sender, název časovače musí být definován.",
+    "response-must-be-defined": "$sender, odpověď časovače musí být definována.",
+    "cannot-set-messages-and-seconds-0": "$sender, nemůžete nastavit zprávy i sekundy na 0.",
+    "timer-was-set": "$sender, časovač $name byl nastaven na $messages zpráv a $seconds sekund ke spuštění",
+    "timer-not-found": "$sender, časovač (název: $name) nebyl nalezen v databázi. Pro seznam časovačů -> !timers list",
+    "timer-deleted": "$sender, časovač $name a jeho odpovědi byly odstraněny.",
+    "timer-enabled": "$sender, časovač (název: $name) byl povolen",
+    "timer-disabled": "$sender, časovač (jméno: $name) byl deaktivován",
+    "timers-list": "$sender, seznam časovačů: $list",
+    "responses-list": "$sender, seznam pro časovač (name: $name)",
+    "response-deleted": "$sender, odpověď (id: $id) byla smazána.",
+    "response-was-added": "$sender, odpověď (id: $id) na časovač (jméno: $name) byla přidána - '$response'",
+    "response-not-found": "$sender, odpověď (id: $id) nebyla nalezena v databázi",
+    "response-enabled": "$sender, odpověď (id: $id) byla zapnuta",
+    "response-disabled": "$sender, odpověď (id: $id) byla vypnuta"
   },
   "gambling": {
     "duel": {
-      "bank": "$sender, soucasny bank pro $command je $points $pointsName",
-      "lowerThanMinimalBet": "$sender, minimalni sazka pro $command je $points $pointsName",
-      "cooldown": "$sender, nemuzes pouzit $command jeste $cooldown $minutesName.",
-      "joined": "$sender, hodne stesti behem duelu. Vsadil sis na sebe $points $pointsName!",
-      "added": "$sender si mysli, ze je lepsi nez ostatni a zvysuje sazku na $points $pointsName!",
+      "bank": "$sender, současný bank pro $command je $points $pointsName",
+      "lowerThanMinimalBet": "$sender, minimální sázka pro $command je $points $pointsName",
+      "cooldown": "$sender, nemůžete použít $command ještě $cooldown $minutesName.",
+      "joined": "$sender, hodně štěstí během duelu. Vsadil sis na sebe $points $pointsName!",
+      "added": "$sender si myslí, že je lepší než ostatní a zvyšuje sázku na $points $pointsName!",
       "new": "$sender je vas novy vyzyvatel pro duel! Zucastni se take pomoci $command [points], zbyva ti $minutes $minutesName pro ucast.",
       "zeroBet": "$sender, nemuzes na sebe vsadit 0 $pointsName",
       "notEnoughOptions": "$sender, k duelu musis neco vsadit",
@@ -1133,56 +1133,56 @@
     },
     "gamble": {
       "chanceToWin": "$sender, sance na vyhru v !gamble nastavena na $value%",
-      "zeroBet": "$sender, nemuzes hrat o 0 $pointsName",
-      "minimalBet": "$sender, minimalni sazka pro !gamble je nastavena na $value",
-      "lowerThanMinimalBet": "$sender, minimalni sazka pro !gamble je $points $pointsName",
-      "notEnoughOptions": "$sender, musis hrat o nejake body",
-      "notEnoughPoints": "$sender, nemas $points $pointsName abys o ne hral",
-      "win": "$sender, VYHRALS! Aktualne mas $points $pointsName",
-      "lose": "$sender, PROHRALS! Aktualne mas $points $pointsName"
+      "zeroBet": "$sender, nemůžete hrát o 0 $pointsName",
+      "minimalBet": "$sender, minimální sázka pro !gamble je nastavena na $value",
+      "lowerThanMinimalBet": "$sender, minimální sázka pro !gamble je $points $pointsName",
+      "notEnoughOptions": "$sender, musíš hrát o nějaké body",
+      "notEnoughPoints": "$sender, nemáš $points $pointsName abys o ně hrál",
+      "win": "$sender, VYHRÁLS! Aktuálně máš $points $pointsName",
+      "lose": "$sender, PROHRÁLS! Aktuálně máš $points $pointsName"
     }
   },
   "merge": {
     "from-user-not-found": "$sender, uzivatel $fromUsername neexistuje v databazi",
     "no-from-user-set": "$sender, musi byt zadan uzivatel, ze ktereho se budou brat data",
     "no-to-user-set": "$sender, musi byt zadan uzivatel, kteremu se predaji data",
-    "user-merged": "$sender, uzivatel $fromUsername byl nakopirovan uzivateli $toUsername"
+    "user-merged": "$sender, uživatel $fromUsername byl sloučený s $toUsername"
   },
   "highlights": {
-    "saved": "$sender, highlight byl ulozen pro $hoursh$minutesm$secondss",
+    "saved": "$sender, highlight byl uložen pro $hoursh$minutesm$secondss",
     "list": {
       "items": "$sender, seznam uložených highlightů pro poslední vysílání: $items",
-      "empty": "$sender, zande highlighty nebyly ulozeny"
+      "empty": "$sender, žádné highlighty nebyly uloženy"
     },
     "offline": "$sender, nelze uložit highlight, vysílání je offline"
   },
   "whisper": {
     "settings": {
       "disablePermissionWhispers": {
-        "true": "Bot nebude posilat chyby opravneni",
-        "false": "Bot bude posilat chyby opravneni pres whisper"
+        "true": "Bot nebude posílat chyby oprávnění",
+        "false": "Bot bude posílat chyby oprávnění přes whisper"
       },
       "disableCooldownWhispers": {
-        "true": "Bot nebude posilat oznameni o cooldownu",
-        "false": "Bot bude posilat oznameni o cooldownu pres whisper"
+        "true": "Bot nebude posílat oznámení o cooldownu",
+        "false": "Bot bude posílat oznámení o cooldownu přes whisper"
       }
     }
   },
   "phillipsHue": {
-    "list": "$sender, Seznam pripojenych Phillips Hue zarovek: "
+    "list": "$sender, seznam připojených světel Phillips Hue: "
   },
   "time": "Aktuální čas streamera v jeho časovém pásmu je $time",
-  "subs": "$sender, je zde prave $onlineSubCount online subscriberu. Posledni sub/resub byl $lastSubUsername $lastSubAgo",
-  "followers": "$sender, je zde prave $onlineFollowersCount online followeru. Posledni follow byl $lastFollowUsername $lastFollowAgo",
+  "subs": "$sender, je zde právě $onlineSubCount online subscriberů. Poslední sub/resub byl $lastSubUsername $lastSubAgo",
+  "followers": "$sender, je zde právě $onlineFollowersCount online followerů. Poslední follow byl $lastFollowUsername $lastFollowAgo",
   "ignore": {
     "user": {
       "is": {
         "not": {
-          "ignored": "$sender, uzivatel $username neni botem ignorovan"
+          "ignored": "$sender, uživatel $username není botem ignorován"
         },
-        "added": "$sender, uzivatel $username byl pridan do botova ignorelistu",
-        "removed": "$sender, uzivatel $username byl odebran z botova ignorelistu",
-        "ignored": "$sender, uzivatel $username je botem ignorovan"
+        "added": "$sender, uživatel $username byl přidán do botova ignorelistu",
+        "removed": "$sender, uživatel $username je odebrán z botova ignorelistu",
+        "ignored": "$sender, uživatel $username je botem ignorován"
       }
     }
   },
