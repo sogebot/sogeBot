@@ -17,7 +17,7 @@ jobs:
       run: echo :set-output name=MESSAGE::[skip-tests]
     - name: Check if tests should be skipped 2
       id: log2
-      run: echo :set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%b)
+      run: echo :set-output name=MESSAGE::$(git log --no-merges -1 --oneline)
     - name: All test should be run - tests are not containing describe.only
       if: contains(github.event.head_commit.message, '[skip-tests]')
       run: |
