@@ -652,7 +652,7 @@
     "stream-events": "Události vysílání",
     "select-date-from-calendar": "Vyber datum z kalendáře",
     "select-stream-from-calendar-and-events": "Vyber vysílání z kalendáře a eventů",
-    "there-is-no-events-on-selected-date": "Nebyl nalezen žádný event ve vybraném datu",
+    "there-is-no-events-on-selected-date": "Ve zvoleném datu nejsou žádné události",
     "string": "string",
     "points-name": "Název bodů",
     "points-single-multi": "j.č.|mn.č.",
@@ -670,7 +670,7 @@
     "shuffle": "Hrát náhodně",
     "song-requests": "Požadavky na skladbu",
     "song-request": "Požadavek na skladbu",
-    "song-notify": "Notifikace na začátku písně",
+    "song-notify": "Oznámení při zahájení skladby",
     "format": "Formát",
     "available": "Dostupné",
     "links": "Linky",
@@ -759,7 +759,7 @@
     "message": "zpráva",
     "sound": "zvuk",
     "emote-explosion": "exploze smajlíků",
-    "emote-firework": "firework smajlíků",
+    "emote-firework": "ohňostroj emotikonů",
     "quiet": "tichý",
     "noisy": "hlasitý",
     "true": "ano",
@@ -842,54 +842,54 @@
   "customcmds": {
     "commands-parse-failed": "{core.command-parse} !commands",
     "command-was-not-found": "$sender, příkaz $command nebyl nalezen v databázi",
-    "response-was-not-found": "$sender, odpoved #$response prikazu $command nebyla nalezena",
-    "command-was-edited": "$sender, prikaz $command is changed to '$response'",
-    "command-was-added": "$sender, prikaz $command byl pridan",
-    "list-is-not-empty": "$sender, seznam prikazu: $list",
-    "list-is-empty": "$sender, seznam prikazu je prazdny",
-    "command-was-enabled": "$sender, prikaz $command byl zapnut",
-    "command-was-disabled": "$sender, prikaz $command byl vypnut",
-    "command-was-concealed": "$sender, prikaz $command byl skryt",
-    "command-was-exposed": "$sender, prikaz $command byl odkryt",
-    "command-was-removed": "$sender, prikaz $command byl smazan",
-    "response-was-removed": "$sender, odpoved #$response prikazu $command byla smazana",
-    "list-of-responses-is-empty": "$sender, $command nema zadne odpovedi nebo neexistuje",
+    "response-was-not-found": "$sender, odpověď #$response příkazu $command nebyla v databázi nalezena",
+    "command-was-edited": "$sender, příkaz $command je změněn na '$response'",
+    "command-was-added": "$sender, příkaz $command byl přidán",
+    "list-is-not-empty": "$sender, seznam příkazů: $list",
+    "list-is-empty": "$sender, seznam příkazů je prázdný",
+    "command-was-enabled": "$sender, příkaz $command byl aktivován",
+    "command-was-disabled": "$sender, příkaz $command byl deaktivován",
+    "command-was-concealed": "$sender, příkaz $command byl skryt",
+    "command-was-exposed": "$sender, příkaz $command byl odhalen",
+    "command-was-removed": "$sender, příkaz $command byl odebrán",
+    "response-was-removed": "$sender, odpověď #$response z $command byla odebrána",
+    "list-of-responses-is-empty": "$sender, $command nemá žádné odpovědi nebo neexistuje",
     "response": "$command#$index ($permission) $after| $response"
   },
   "keywords": {
     "keyword-parse-failed": "{core.command-parse} !keyword",
-    "keyword-is-ambiguous": "$sender, keyword $keyword není jednoznačný, použijte ID klíčového slova",
-    "keyword-was-not-found": "$sender, keyword $keyword nebyl nalezen",
+    "keyword-is-ambiguous": "$sender, klíčové slovo $keyword je nejednoznačné, použijte ID klíčového slova",
+    "keyword-was-not-found": "$sender, klíčové slovo $keyword nebylo nalezeno v databázi",
     "keyword-was-edited": "$sender, klíčové slovo $keyword je změněno na '$response'",
-    "keyword-was-added": "$sender, keyword $keyword ($id) byl pridan",
-    "list-is-not-empty": "$sender, seznam klíčových slov:",
-    "list-is-empty": "$sender, seznam prikazu je prazdny",
+    "keyword-was-added": "$sender, klíčové slovo $keyword ($id) bylo přidáno",
+    "list-is-not-empty": "$sender, seznam klíčových slov",
+    "list-is-empty": "$sender, seznam klíčových slov je prázdný",
     "keyword-was-enabled": "$sender, keyword $keyword byl zapnut",
     "keyword-was-disabled": "$sender, keyword $keyword byl vypnut",
-    "keyword-was-removed": "$sender, keyword $keyword byl smazan"
+    "keyword-was-removed": "$sender, klíčové slovo $keyword bylo smazáno"
   },
   "points": {
     "success": {
       "undo": "$sender, příkaz '$command' pro body $username byly vráceny ($updatedValue $updatedValuePointsLocale to $originalValue $originalValuePointsLocale).",
-      "set": "$username ma nyni nastaveno $amount $pointsName",
-      "give": "$sender prave dal svych $amount $pointsName uzivateli $username",
+      "set": "$username má nyní nastaveno $amount $pointsName",
+      "give": "$sender právě dal svých $amount $pointsName uživateli $username",
       "online": {
-        "positive": "Vsichni online uzivatele prave ziskali $amount $pointsName!",
-        "negative": "Vsem online uzivatelum prave bylo odebrano $amount $pointsName!"
+        "positive": "Všichni online uživatelé právě obdrželi $amount $pointsName!",
+        "negative": "Všichni online uživatelé právě ztratili $amount $pointsName!"
       },
       "all": {
-        "positive": "Vsichni uzivatele prave ziskali $amount $pointsName!",
-        "negative": "Vsem uzivatelum prave bylo odebrano $amount $pointsName!"
+        "positive": "Všichni uživatelé právě obdrželi $amount $pointsName!",
+        "negative": "Všichni uživatelé právě ztratili $amount $pointsName!"
       },
-      "rain": "Jen at prsi! Vsichni online uzivatele prave ziskali az $amount $pointsName!",
-      "add": "$username ziskal $amount $pointsName!",
-      "remove": "A jeje, $amount $pointsName bylo odebrano uzivateli $username!"
+      "rain": "Jen ať prší! Všichni online uživatelé právě získali až $amount $pointsName!",
+      "add": "$username právě obdržel $amount $pointsName!",
+      "remove": "Jejda, $amount $pointsName bylo odebráno z $username!"
     },
     "failed": {
       "undo": "$sender, uživatel nenalezen v databázi nebo uživatel nemá body k vrácení.",
       "set": "{core.command-parse} $command [username] [amount]",
       "give": "{core.command-parse} $command [username] [amount]",
-      "giveNotEnough": "Promin, $sender, ale nemas $amount $pointsName abys je daroval uzivateli $username",
+      "giveNotEnough": "Omlouváme se, $sender, nemáte $amount $pointsName k darování pro $username",
       "get": "{core.command-parse} $command [username]",
       "online": "{core.command-parse} $command [amount]",
       "all": "{core.command-parse} $command [amount]",
@@ -900,22 +900,22 @@
     "defaults": {
       "pointsName": {
         "single": "bod",
-        "multi": "bodu",
+        "multi": "bodů",
         "xmulti": ""
       },
-      "pointsResponse": "$username ma prave $amount $pointsName. Jsi $order. z $count v poradi."
+      "pointsResponse": "$username má momentálně $amount $pointsName. Vaše pozice je $order/$count."
     }
   },
   "songs": {
-    "playlist-is-empty": "$sender, seznam videi, ktery chcete importovat, je prazdny.",
-    "playlist-imported": "$sender, importovano $imported a preskoceno $skipped ze seznamu videi",
+    "playlist-is-empty": "$sender, seznam skladeb k importu je prázdný",
+    "playlist-imported": "$sender, importováno $imported a vynecháno $skipped ze seznamu skladeb",
     "not-playing": "Nic nehraje",
     "song-was-banned": "Pisen $name byla zabanovana a nebude uz nikdy hrat!",
-    "song-was-banned-timeout-message": "Dostal si timeout za zabanovanou pisen",
-    "song-was-unbanned": "Pisen byla uspesne odbanovana",
-    "song-was-not-banned": "Tato pisen nebyla zabanovana",
-    "no-song-is-currently-playing": "Nic momentalne nehraje",
-    "current-song-from-playlist": "Prave hrajici pisen je $name z playlistu",
+    "song-was-banned-timeout-message": "Dostal si timeout za zabanovanou skladbu",
+    "song-was-unbanned": "Skladba byla úspěšně odbanována",
+    "song-was-not-banned": "Tato skladba nebyla zabanovaná",
+    "no-song-is-currently-playing": "Žádné skladby momentálně nehrají",
+    "current-song-from-playlist": "Aktuální skladba je $name ze seznamu skladeb",
     "current-song-from-songrequest": "Aktuální skladba je $name požadovaná uživatelem $username",
     "song-is-banned": "Omlouváme se, $sender, ale tato skladba je zakázána",
     "song-was-not-found": "Omlouváme se, $sender, ale tato skladba nebyla nalezena",
@@ -955,8 +955,8 @@
   },
   "followage": {
     "success": {
-      "never": "$sender, $username neni followerem kanalu",
-      "time": "$sender, $username sleduje tento kanal jiz $diff"
+      "never": "$sender, $username není followerem kanálu",
+      "time": "$sender, $username sleduje tento kanál již $diff"
     },
     "successSameUsername": {
       "never": "$sender, nejsi followerem kanalu",
