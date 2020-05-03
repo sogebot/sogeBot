@@ -41,7 +41,7 @@
     "loading": "Načítám",
     "this-may-take-a-while": "Může to <strong>chvíli</strong> trvat",
     "display-as": "Zobrazit jako",
-    "set-default": "Výchozí nastavení",
+    "set-default": "Nastavit výchozí",
     "add": "Přidat",
     "placeholders": {
       "text-url-generator": "Vložte text nebo HTML pro vytvoření base64 níže a URL výše",
@@ -51,13 +51,13 @@
     "custom-variables": {
       "set-your-variables-to-watch-here": "Zde nastavte proměnné",
       "type": "typ",
-      "unwatch": "Nesledovat",
+      "unwatch": "Přestat sledovat",
       "watch": "Sledovat",
       "options": "možnosti",
       "number": "číslo",
       "text": "text",
       "options-placeholder": "možnost1, možnost2, možnost3, zde je možnost 4",
-      "no-options-set": "Vaše možnosti jste ještě nenastavili"
+      "no-options-set": "Zatím jste nenastavili své možnosti"
     },
     "timers": {
       "title": "Časovače",
