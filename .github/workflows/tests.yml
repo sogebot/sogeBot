@@ -15,10 +15,10 @@ jobs:
       with:
         ref: ${{ github.event.pull_request.head.sha }}
     - name: Check if tests should be skipped
-      id: log
+      id: should_skip
       run: echo :set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%b)
     - name: All test should be run - tests are not containing describe.only
-      if: contains(github.event.head_commit.message, 'skip-tests')
+      if: contains(github.event.head_commit.MESSAGE, 'skip-tests')
       run: |
           if ! grep -r -l 'describe.only' ./test/; then
             exit 0
@@ -26,20 +26,20 @@ jobs:
             exit 1
           fi;
     - name: install node v14
-      if: contains(steps.log.outputs.MESSAGE, '[skip-tests]')
+      if: contains(steps.should_skip.outputs.MESSAGE, '[skip-tests]')
       uses: actions/setup-node@v1
       with:
         node-version: 14
     - name: Install eslint and dependencies
-      if: contains(steps.log.outputs.MESSAGE, '[skip-tests]')
+      if: contains(steps.should_skip.outputs.MESSAGE, '[skip-tests]')
       run: |
         npm install glob;
         npm install --only=dev typescript eslint jsonlint-mod @typescript-eslint/parser @typescript-eslint/eslint-plugin mkdirp@latest;
     - name: Run eslint
-      if: contains(steps.log.outputs.MESSAGE, '[skip-tests]')
+      if: contains(steps.should_skip.outputs.MESSAGE, '[skip-tests]')
       run: ENV=development make eslint
     - name: Run jsonlint
-      if: contains(steps.log.outputs.MESSAGE, '[skip-tests]')
+      if: contains(steps.should_skip.outputs.MESSAGE, '[skip-tests]')
       run: ENV=development make jsonlint
   sqlite:
     name: SQLite tests
@@ -47,6 +47,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
     - id: log
       run: echo ::set-output name=message::$(git log --no-merges -1 --pretty=format:%b)
     - name: install node v14
@@ -81,6 +83,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
     - id: log
       run: echo ::set-output name=message::$(git log --no-merges -1 --pretty=format:%b)
     - name: install node v14
@@ -117,6 +121,8 @@ jobs:
         mysql database: 'sogebot' # Optional, default value is "test". The specified database which will be create
         mysql root password: 'Passw0rd' # Required if "mysql user" is empty, default is empty. The root superuser password
     - uses: actions/checkout@master
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
     - id: log
       run: echo ::set-output name=message::$(git log --no-merges -1 --pretty=format:%b)
     - name: install node v14
@@ -142,6 +148,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
     - id: log
       run: echo ::set-output name=message::$(git log --no-merges -1 --pretty=format:%b)
     - name: install node v14
