@@ -62,7 +62,8 @@ export async function parserReply(response: string, opts: { sender: CommandOptio
  *
  * announce('Lorem Ipsum Dolor');
  */
-export function announce(messageToAnnounce: string) {
+export async function announce(messageToAnnounce: string) {
+  messageToAnnounce = await new Message(messageToAnnounce).parse({}) as string;
   sendMessage(messageToAnnounce, {
     username: oauth.botUsername,
     displayName: oauth.botUsername,

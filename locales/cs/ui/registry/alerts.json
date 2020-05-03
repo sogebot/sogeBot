@@ -30,6 +30,7 @@
     "resubs": "Předplatitel (resub)",
     "subgifts": "Darování subscribe",
     "subcommunitygifts": "Subgifts to community",
+    "subcommunitygifts": "Darování subscribe komunitě",
     "tips": "Spropitné",
     "hosts": "Hostování",
     "raids": "Raidy"
@@ -61,7 +62,7 @@
   "messageTemplate": {
     "name": "Šablona zprávy",
     "placeholder": "Zadejte svou šablonu zprávy",
-    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts), {recipient} (subgifts), {monthsName} (subs, subgifts), {currency} (tips)"
+    "help": "Dostupné proměnné: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts), {recipient} (subgifts), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "animationText": {
     "name": "Animace textu"

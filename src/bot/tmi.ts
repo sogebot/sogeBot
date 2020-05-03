@@ -555,7 +555,7 @@ class TMI extends Core {
       events.fire('subcommunitygift', { username, count });
       subcommunitygift(`${username}#${userId}, to ${count} viewers`);
       alerts.trigger({
-        event: 'subgifts',
+        event: 'subcommunitygifts',
         name: username,
         amount: Number(count),
         currency: '',
@@ -624,6 +624,16 @@ class TMI extends Core {
         timestamp: Date.now(),
       });
       subgift(`${recipient}#${recipientId}, from: ${username}, months: ${subCumulativeMonths}`);
+      alerts.trigger({
+        event: 'subgifts',
+        name: username,
+        recipient,
+        amount: subCumulativeMonths,
+        currency: '',
+        monthsName: getLocalizedName(subCumulativeMonths, 'core.months'),
+        message: '',
+        autohost: false,
+      });
 
       // also set subgift count to gifter
       if (!(isIgnored({username, userId: user.userId}))) {

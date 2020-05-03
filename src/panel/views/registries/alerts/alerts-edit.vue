@@ -27,7 +27,7 @@
         <b-dropdown id="dropdown-buttons" :text="translate('registry.alerts.test')" class="m-2">
           <b-dropdown-item-button
             @click="socket.emit('test', event)"
-            v-for="event of ['follows', 'cheers', 'tips', 'subs', 'resubs', 'subgifts', 'hosts', 'raids']"
+            v-for="event of supportedEvents"
             v-bind:key="event">
             {{ translate('registry.alerts.event.' + event) }}</b-dropdown-item-button>
         </b-dropdown>
@@ -126,7 +126,7 @@
                   <template v-else>Variant {{ idx + 1 }}</template>
                 </template>
                 <p class="p-3" v-bind:key="event + idx">
-                  <form-follow v-if="event === 'follows' || event === 'subs' || event === 'subgifts'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                  <form-follow v-if="event === 'follows' || event === 'subs' || event === 'subgifts' || event === 'subcommunitygifts'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                   <form-cheers v-else-if="event === 'cheers' || event === 'tips'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                   <form-resubs v-else-if="event === 'resubs'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                   <form-hosts v-else-if="event === 'hosts' || event === 'raids'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
@@ -199,7 +199,7 @@ export default class AlertsEdit extends Vue {
   state: { loaded: number; save: number } = { loaded: this.$state.progress, save: this.$state.idle }
   pending: boolean = false;
 
-  supportedEvents: string[] = ['follows', 'cheers', 'subs', 'resubs', 'subgifts',  'tips', 'hosts', 'raids']
+  supportedEvents: string[] = ['follows', 'cheers', 'subs', 'resubs', 'subcommunitygifts', 'subgifts',  'tips', 'hosts', 'raids']
   selectedTabIndex: number = 0;
 
   item: AlertInterface = {
@@ -223,6 +223,7 @@ export default class AlertsEdit extends Vue {
     tips: [],
     resubs: [],
     subgifts: [],
+    subcommunitygifts: [],
   }
 
   isValid: {
@@ -231,6 +232,7 @@ export default class AlertsEdit extends Vue {
     subs: boolean[];
     resubs: boolean[];
     subgifts: boolean[];
+    subcommunitygifts: boolean[];
     tips: boolean[];
     hosts: boolean[];
     raids: boolean[];
@@ -240,6 +242,7 @@ export default class AlertsEdit extends Vue {
     subs: [],
     resubs: [],
     subgifts: [],
+    subcommunitygifts: [],
     tips: [],
     hosts: [],
     raids: [],
@@ -404,10 +407,16 @@ export default class AlertsEdit extends Vue {
             },
           })
           break;
+        case 'subcommunitygifts':
+          this.item.subcommunitygifts.push({
+            ..._default,
+            messageTemplate: '{name} just gifted {amount} subscribes!',
+          })
+          break;
         case 'subgifts':
           this.item.subgifts.push({
             ..._default,
-            messageTemplate: '{name} just gifted {amount} subscribes!',
+            messageTemplate: '{name} just gifted sub to {recipient}! {amount} {monthsName}',
           })
           break;
         case 'subs':

@@ -5,6 +5,7 @@ import { EntitySchema } from 'typeorm';
 export interface EmitData {
   name: string;
   amount: number;
+  recipient?: string;
   currency: string;
   monthsName: string;
   event: keyof Omit<AlertInterface, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList'>;
@@ -92,6 +93,7 @@ export interface AlertInterface {
   follows: CommonSettingsInterface[];
   subs: CommonSettingsInterface[];
   subgifts: CommonSettingsInterface[];
+  subcommunitygifts: CommonSettingsInterface[];
   hosts: AlertHostInterface[];
   raids: AlertHostInterface[];
   tips: AlertTipInterface[];
@@ -194,6 +196,12 @@ export const Alert = new EntitySchema<Readonly<Required<AlertInterface>>>({
       inverseSide: 'alert',
       cascade: true,
     },
+    subcommunitygifts: {
+      type: 'one-to-many',
+      target: 'alert_subcommunitygift',
+      inverseSide: 'alert',
+      cascade: true,
+    },
     subgifts: {
       type: 'one-to-many',
       target: 'alert_subgift',
@@ -273,6 +281,23 @@ export const AlertSub = new EntitySchema<Readonly<Required<CommonSettingsInterfa
       type: 'many-to-one',
       target: 'alert',
       inverseSide: 'subs',
+      joinColumn: { name: 'alertId' },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  },
+});
+
+export const AlertSubcommunitygift = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
+  name: 'alert_subcommunitygift',
+  columns: {
+    ...CommonSettingsSchema,
+  },
+  relations: {
+    alert: {
+      type: 'many-to-one',
+      target: 'alert',
+      inverseSide: 'subcommunitygifts',
       joinColumn: { name: 'alertId' },
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
