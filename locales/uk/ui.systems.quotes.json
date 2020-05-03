@@ -1,0 +1,34 @@
+{
+  "no-quotes-found": "We're sorry, no quotes were found in database.",
+  "new": "Add new quote",
+  "empty": "List of quotes is empty, create new quote.",
+  "emptyAfterSearch": "List of quotes is empty in searching for \"<strong>$search</strong>\"",
+  "quote": {
+    "name": "Quote",
+    "placeholder": "Set your quote here"
+  },
+  "by": {
+    "name": "Quoted by"
+  },
+  "tags": {
+    "name": "Tags",
+    "placeholder": "Set your tags here",
+    "help": "Comma-separated tags. Example: tag 1, tag 2, tag 3"
+  },
+  "date": {
+    "name": "Date"
+  },
+  "error": {
+    "isEmpty": "This value cannot be empty",
+    "atLeastOneTag": "You need to set at least one tag"
+  },
+  "tag-filter": "Filtering by tag",
+  "warning": "This action cannot be reverted!",
+  "settings": {
+    "enabled": "Status",
+    "urlBase": {
+      "title": "URL base",
+      "help": "You should use public endpoint for quotes, to be accessible by <strong>everyone</strong>"
+    }
+  }
+}
