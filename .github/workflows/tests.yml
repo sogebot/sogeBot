@@ -39,21 +39,21 @@ jobs:
     - uses: actions/checkout@master
     - id: log
       run: echo "::set-output name=message::$(git log --no-merges -1 --pretty=format:%b)"
-    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') && !contains(steps.log.outputs.message, '[skip-tests]')"
       name: install node v14
       uses: actions/setup-node@v1
       with:
         node-version: 14
-    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') && !contains(steps.log.outputs.message, '[skip-tests]')"
       name: Install all dependencies and build just a bot
       run: ENV=development make info clean dependencies patch bot
-    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') && !contains(steps.log.outputs.message, '[skip-tests]')"
       name: Set proper db to use
       run: npm run test:config:sqlite
-    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') && !contains(steps.log.outputs.message, '[skip-tests]')"
       name: Run migration test
       run: node tools/migrationCheck.js
-    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') && !contains(steps.log.outputs.message, '[skip-tests]')"
       name: Run mocha
       run: npm test
   postgres:
@@ -73,21 +73,21 @@ jobs:
     - uses: actions/checkout@master
     - id: log
       run: echo "::set-output name=message::$(git log --no-merges -1 --pretty=format:%b)"
-    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') && !contains(steps.log.outputs.message, '[skip-tests]')"
       name: install node v14
       uses: actions/setup-node@v1
       with:
         node-version: 14
-    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') && !contains(steps.log.outputs.message, '[skip-tests]')"
       name: Install all dependencies and build just a bot
       run: ENV=development make info clean dependencies patch bot
-    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') && !contains(steps.log.outputs.message, '[skip-tests]')"
       name: Set proper db to use
       run: npm run test:config:postgres
-    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') && !contains(steps.log.outputs.message, '[skip-tests]')"
       name: Run migration test
       run: node tools/migrationCheck.js
-    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') && !contains(steps.log.outputs.message, '[skip-tests]')"
       name: Run mocha
       run: npm test
   mysql:
@@ -109,21 +109,21 @@ jobs:
     - uses: actions/checkout@master
     - id: log
       run: echo "::set-output name=message::$(git log --no-merges -1 --pretty=format:%b)"
-    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') && !contains(steps.log.outputs.message, '[skip-tests]')"
       name: install node v14
       uses: actions/setup-node@v1
       with:
         node-version: 14
-    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') && !contains(steps.log.outputs.message, '[skip-tests]')"
       name: Install all dependencies and build just a bot
       run: ENV=development make info clean dependencies patch bot
-    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') && !contains(steps.log.outputs.message, '[skip-tests]')"
       name: Set proper db to use
       run: npm run test:config:mysql
-    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') && !contains(steps.log.outputs.message, '[skip-tests]')"
       name: Run migration test
       run: node tools/migrationCheck.js
-    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') && !contains(steps.log.outputs.message, '[skip-tests]')"
       name: Run mocha
       run: npm test
   fullbuild:
@@ -134,11 +134,11 @@ jobs:
     - uses: actions/checkout@master
     - id: log
       run: echo "::set-output name=message::$(git log --no-merges -1 --pretty=format:%b)"
-    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') && !contains(steps.log.outputs.message, '[skip-tests]')"
       name: install node v14
       uses: actions/setup-node@v1
       with:
         node-version: 14
-    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') && !contains(steps.log.outputs.message, '[skip-tests]')"
       name: Install all dependencies and build everything
       run: ENV=development make
