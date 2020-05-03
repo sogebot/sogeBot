@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
     - name: Check if tests should be skipped
       id: log
       run: echo :set-output name=MESSAGE::[skip-tests]
