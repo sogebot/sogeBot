@@ -13,10 +13,13 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Check if tests should be skipped
-    - id: log
+      id: log
+      run: echo :set-output name=MESSAGE::[skip-tests]
+    - name: Check if tests should be skipped 2
+      id: log2
       run: echo :set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%b)
     - name: All test should be run - tests are not containing describe.only
-      if: contains(steps.log.outputs.MESSAGE, '[skip-tests]')
+      if: contains(steps.log2.outputs.MESSAGE, '[skip-tests]')
       run: |
           if ! grep -r -l 'describe.only' ./test/; then
             exit 0
