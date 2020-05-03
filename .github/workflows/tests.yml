@@ -23,20 +23,20 @@ jobs:
             exit 1
           fi;
     - name: install node v14
-      if: ${{ contains(steps.log.outputs.message, '[skip-tests]') }}
+      if: contains(steps.log.outputs.message, '[skip-tests]')
       uses: actions/setup-node@v1
       with:
         node-version: 14
     - name: Install eslint and dependencies
-      if: ${{ contains(steps.log.outputs.message, '[skip-tests]') }}
+      if: contains(steps.log.outputs.message, '[skip-tests]')
       run: |
         npm install glob;
         npm install --only=dev typescript eslint jsonlint-mod @typescript-eslint/parser @typescript-eslint/eslint-plugin mkdirp@latest;
     - name: Run eslint
-      if: ${{ contains(steps.log.outputs.message, '[skip-tests]') }}
+      if: contains(steps.log.outputs.message, '[skip-tests]')
       run: ENV=development make eslint
     - name: Run jsonlint
-      if: ${{ contains(steps.log.outputs.message, '[skip-tests]') }}
+      if: contains(steps.log.outputs.message, '[skip-tests]')
       run: ENV=development make jsonlint
   sqlite:
     name: SQLite tests
