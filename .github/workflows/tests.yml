@@ -33,33 +33,31 @@ jobs:
       run: ENV=development make jsonlint
   sqlite:
     name: SQLite tests
-    if: contains(github.event.pull_request.body, '[skip-tests]') != true
     needs: eslint
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: install node v14
+    - id: log
+      run: echo "::set-output name=message::$(git log --no-merges -1 --oneline)"
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+      name: install node v14
       uses: actions/setup-node@v1
       with:
         node-version: 14
-    - name: Install all dependencies and build just a bot
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+      name: Install all dependencies and build just a bot
       run: ENV=development make info clean dependencies patch bot
-    - name: Set proper db to use
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+      name: Set proper db to use
       run: npm run test:config:sqlite
-    - name: Run migration test
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+      name: Run migration test
       run: node tools/migrationCheck.js
-    - name: Run mocha
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+      name: Run mocha
       run: npm test
-  sqlite2:
-    name: SQLite tests
-    if: contains(github.event.pull_request.body, '[skip-tests]') == true
-    runs-on: ubuntu-latest
-    steps:
-    - name: Skipped OK
-      run: 'echo "[skip-tests] found"'
   postgres:
     name: PostgreSQL tests
-    if: contains(github.event.pull_request.body, '[skip-tests]') != true
     needs: eslint
     services:
       postgres:
@@ -73,28 +71,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: install node v14
+    - id: log
+      run: echo "::set-output name=message::$(git log --no-merges -1 --oneline)"
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+      name: install node v14
       uses: actions/setup-node@v1
       with:
         node-version: 14
-    - name: Install all dependencies and build just a bot
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+      name: Install all dependencies and build just a bot
       run: ENV=development make info clean dependencies patch bot
-    - name: Set proper db to use
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+      name: Set proper db to use
       run: npm run test:config:postgres
-    - name: Run migration test
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+      name: Run migration test
       run: node tools/migrationCheck.js
-    - name: Run mocha
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+      name: Run mocha
       run: npm test
-  postgres2:
-    name: PostgreSQL tests
-    if: contains(github.event.pull_request.body, '[skip-tests]') == true
-    runs-on: ubuntu-latest
-    steps:
-    - name: Skipped OK
-      run: 'echo "[skip-tests] found"'
   mysql:
     name: MySQL/MariaDB tests
-    if: contains(github.event.pull_request.body, '[skip-tests]') != true
     needs: eslint
     runs-on: ubuntu-latest
     steps:
@@ -110,42 +107,38 @@ jobs:
         mysql database: 'sogebot' # Optional, default value is "test". The specified database which will be create
         mysql root password: 'Passw0rd' # Required if "mysql user" is empty, default is empty. The root superuser password
     - uses: actions/checkout@master
-    - name: install node v14
+    - id: log
+      run: echo "::set-output name=message::$(git log --no-merges -1 --oneline)"
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+      name: install node v14
       uses: actions/setup-node@v1
       with:
         node-version: 14
-    - name: Install all dependencies and build just a bot
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+      name: Install all dependencies and build just a bot
       run: ENV=development make info clean dependencies patch bot
-    - name: Set proper db to use
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+      name: Set proper db to use
       run: npm run test:config:mysql
-    - name: Run migration test
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+      name: Run migration test
       run: node tools/migrationCheck.js
-    - name: Run mocha
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+      name: Run mocha
       run: npm test
-  mysql2:
-    name: MySQL/MariaDB tests
-    if: contains(github.event.pull_request.body, '[skip-tests]') == true
-    runs-on: ubuntu-latest
-    steps:
-    - name: Skipped OK
-      run: 'echo "[skip-tests] found"'
   fullbuild:
     name: Make test
-    if: contains(github.event.pull_request.body, '[skip-tests]') != true
     needs: eslint
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: install node v14
+    - id: log
+      run: echo "::set-output name=message::$(git log --no-merges -1 --oneline)"
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+      name: install node v14
       uses: actions/setup-node@v1
       with:
         node-version: 14
-    - name: Install all dependencies and build everything
+    - if: "!contains(github.event.pull_request.body, '[skip-tests]') || !contains(steps.log.outputs.message, '[skip-tests]')"
+      name: Install all dependencies and build everything
       run: ENV=development make
-  fullbuild2:
-    name: Make test
-    if: contains(github.event.pull_request.body, '[skip-tests]') == true
-    runs-on: ubuntu-latest
-    steps:
-    - name: Skipped OK
-      run: 'echo "[skip-tests] found"'
