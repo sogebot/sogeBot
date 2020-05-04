@@ -61,43 +61,56 @@ class Message {
     const version = _.get(process, 'env.npm_package_version', 'x.y.z');
     this.message = this.message.replace(/\$version/g, version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'));
 
-    const latestFollower = await getRepository(EventList).createQueryBuilder('events')
-      .select('events')
-      .orderBy('events.timestamp', 'DESC')
-      .where('events.event >= :event', { event: 'follow' })
-      .getOne();
-    this.message = this.message.replace(/\$latestFollower/g, !_.isNil(latestFollower) ? latestFollower.username : 'n/a');
+    if (this.message.includes('$latestFollower')) {
+      const latestFollower = await getRepository(EventList).createQueryBuilder('events')
+        .select('events')
+        .orderBy('events.timestamp', 'DESC')
+        .where('events.event = :event', { event: 'follow' })
+        .getOne();
+      this.message = this.message.replace(/\$latestFollower/g, !_.isNil(latestFollower) ? latestFollower.username : 'n/a');
+    }
 
     // latestSubscriber
-    const latestSubscriber = await getRepository(EventList).createQueryBuilder('events')
-      .select('events')
-      .orderBy('events.timestamp', 'DESC')
-      .where('events.event >= :event', { event: 'sub' })
-      .orWhere('events.event >= :event', { event: 'resub' })
-      .orWhere('events.event >= :event', { event: 'subgift' })
-      .getOne();
-    this.message = this.message.replace(/\$latestSubscriber/g, !_.isNil(latestSubscriber) ? latestSubscriber.username : 'n/a');
+    if (this.message.includes('$latestSubscriber')) {
+      const latestSubscriber = await getRepository(EventList).createQueryBuilder('events')
+        .select('events')
+        .orderBy('events.timestamp', 'DESC')
+        .where('events.event = :event1', { event1: 'sub' })
+        .orWhere('events.event = :event2', { event2: 'resub' })
+        .orWhere('events.event = :event3', { event3: 'subgift' })
+        .getOne();
+      this.message = this.message.replace(/\$latestSubscriber/g, !_.isNil(latestSubscriber) ? latestSubscriber.username : 'n/a');
+    }
 
     // latestTip, latestTipAmount, latestTipCurrency, latestTipMessage
-    const latestTip = await getRepository(EventList).createQueryBuilder('events')
-      .select('events')
-      .orderBy('events.timestamp', 'DESC')
-      .where('events.event >= :event', { event: 'tip' })
-      .getOne();
-    this.message = this.message.replace(/\$latestTipAmount/g, !_.isNil(latestTip) ? parseFloat(JSON.parse(latestTip.values_json).amount).toFixed(2) : 'n/a');
-    this.message = this.message.replace(/\$latestTipCurrency/g, !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).currency : 'n/a');
-    this.message = this.message.replace(/\$latestTipMessage/g, !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).message : 'n/a');
-    this.message = this.message.replace(/\$latestTip/g, !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).username : 'n/a');
+    if (this.message.includes('$latestTip')
+      || this.message.includes('$latestTipAmount')
+      || this.message.includes('$latestTipCurrency')
+      || this.message.includes('$latestTipMessage')) {
+      const latestTip = await getRepository(EventList).createQueryBuilder('events')
+        .select('events')
+        .orderBy('events.timestamp', 'DESC')
+        .where('events.event = :event', { event: 'tip' })
+        .getOne();
+      this.message = this.message.replace(/\$latestTipAmount/g, !_.isNil(latestTip) ? parseFloat(JSON.parse(latestTip.values_json).amount).toFixed(2) : 'n/a');
+      this.message = this.message.replace(/\$latestTipCurrency/g, !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).currency : 'n/a');
+      this.message = this.message.replace(/\$latestTipMessage/g, !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).message : 'n/a');
+      this.message = this.message.replace(/\$latestTip/g, !_.isNil(latestTip) ? latestTip.username : 'n/a');
+    }
 
     // latestCheer, latestCheerAmount, latestCheerCurrency, latestCheerMessage
-    const latestCheer = await getRepository(EventList).createQueryBuilder('events')
-      .select('events')
-      .orderBy('events.timestamp', 'DESC')
-      .where('events.event >= :event', { event: 'cheer' })
-      .getOne();
-    this.message = this.message.replace(/\$latestCheerAmount/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).amount : 'n/a');
-    this.message = this.message.replace(/\$latestCheerMessage/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).message : 'n/a');
-    this.message = this.message.replace(/\$latestCheer/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).username : 'n/a');
+    if (this.message.includes('$latestCheerAmount')
+    || this.message.includes('$latestCheerMessage')
+    || this.message.includes('$latestCheer')) {
+      const latestCheer = await getRepository(EventList).createQueryBuilder('events')
+        .select('events')
+        .orderBy('events.timestamp', 'DESC')
+        .where('events.event = :event', { event: 'cheer' })
+        .getOne();
+      this.message = this.message.replace(/\$latestCheerAmount/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).amount : 'n/a');
+      this.message = this.message.replace(/\$latestCheerMessage/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).message : 'n/a');
+      this.message = this.message.replace(/\$latestCheer/g, !_.isNil(latestCheer) ? latestCheer.username : 'n/a');
+    }
 
     const spotifySong = JSON.parse(spotify.currentSong);
     if (!_.isEmpty(spotifySong) && spotifySong.is_playing && spotifySong.is_enabled) {
