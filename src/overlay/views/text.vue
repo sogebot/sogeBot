@@ -61,7 +61,7 @@ export default class CarouselOverlay extends Vue {
 
   refresh () {
     if (this.urlParam('id')) {
-      this.socket.emit('text::getOne', this.urlParam('id'), (err, cb) => {
+      this.socket.emit('text::getOne', this.urlParam('id'), true, (err, cb) => {
         if (err) {
           return console.error(err);
         }

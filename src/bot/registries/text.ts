@@ -43,21 +43,23 @@ class Text extends Registry {
         cb(e.stack, null);
       }
     });
-    publicEndpoint(this.nsp, 'text::getOne', async (id, callback) => {
+    publicEndpoint(this.nsp, 'text::getOne', async (id, parseText = false, callback) => {
       try {
         const item = await getRepository(TextEntity).findOne({ id });
         let text = '';
         if (item) {
           text = item.text;
-          for (const variable of item.text.match(regexp) || []) {
-            const isVariable = await customvariables.isVariableSet(variable);
-            let value = `<strong>$_${variable.replace('$_', '')}</strong>`;
-            if (isVariable) {
-              value = await customvariables.getValueOf(variable) || '';
+          if (parseText) {
+            for (const variable of item.text.match(regexp) || []) {
+              const isVariable = await customvariables.isVariableSet(variable);
+              let value = `<strong>$_${variable.replace('$_', '')}</strong>`;
+              if (isVariable) {
+                value = await customvariables.getValueOf(variable) || '';
+              }
+              text = text.replace(new RegExp(`\\${variable}`, 'g'), value);
             }
-            text = text.replace(new RegExp(`\\${variable}`, 'g'), value);
+            text = await new Message(text).parse();
           }
-          text = await new Message(text).parse();
           callback(null, {...item, text});
         }
         callback(null, null);
