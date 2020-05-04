@@ -9,6 +9,8 @@
     "sendGeneralAnnounceToChannel": "Отправить общее объявление в этот канал (#name или id)",
     "deleteMessagesAfterWhile": "Удалить сообщение через некоторое время",
     "clientId": "ClientId",
-    "token": "Токен"
+    "token": "Токен",
+    "joinToServerBtn": "Click to join bot to your server",
+    "cannotJoinToServerBtn": "Set token and clientId to be able to join bot to your server"
   }
 }
