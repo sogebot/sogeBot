@@ -862,11 +862,11 @@
     "keyword-was-not-found": "$sender, keyword $keyword was not found in database",
     "keyword-was-edited": "$sender, keyword $keyword is changed to '$response'",
     "keyword-was-added": "$sender, keyword $keyword ($id) was added",
-    "list-is-not-empty": "$sender, list of keywords",
-    "list-is-empty": "$sender, list of keywords is empty",
-    "keyword-was-enabled": "$sender, keyword $keyword was enabled",
-    "keyword-was-disabled": "$sender, keyword $keyword was disabled",
-    "keyword-was-removed": "$sender, keyword $keyword was removed"
+    "list-is-not-empty": "$sender, Liste der Schlüsselwörter",
+    "list-is-empty": "$sender, Liste der Schlüsselwörter ist leer",
+    "keyword-was-enabled": "$sender, Stichwort $keyword wurde aktiviert",
+    "keyword-was-disabled": "$sender, Schlüsselwort $keyword wurde deaktiviert",
+    "keyword-was-removed": "$sender, Stichwort $keyword wurde entfernt"
   },
   "points": {
     "success": {
@@ -907,15 +907,15 @@
     }
   },
   "songs": {
-    "playlist-is-empty": "$sender, playlist to import is empty",
+    "playlist-is-empty": "$sender, die zu importierende Playlist ist leer",
     "playlist-imported": "$sender, imported $imported and skipped $skipped from playlist",
     "not-playing": "Not Playing",
     "song-was-banned": "Song $name was banned and will never play again!",
     "song-was-banned-timeout-message": "You've got timeout for posting banned song",
     "song-was-unbanned": "Song was succesfully unbanned",
-    "song-was-not-banned": "This song was not banned",
-    "no-song-is-currently-playing": "No song is currently playing",
-    "current-song-from-playlist": "Current song is $name from playlist",
+    "song-was-not-banned": "Dieser Song wurde nicht gesperrt",
+    "no-song-is-currently-playing": "Derzeit wird kein Lied abgespielt.",
+    "current-song-from-playlist": "Aktueller Song ist $name von der Playlist",
     "current-song-from-songrequest": "Current song is $name requested by $username",
     "song-is-banned": "Sorry, $sender, but this song is banned",
     "song-was-not-found": "Sorry, $sender, but this song was not found",
@@ -1016,9 +1016,9 @@
     "user-is-warned-about-emotes": "No emotes spamming [$count warnings left]",
     "user-is-warned-about-blacklist": "No blacklisted words [$count warnings left]",
     "user-have-timeout-for-links": "No links allowed, ask for !permit",
-    "user-have-timeout-for-symbols": "No excessive symbols usage",
-    "user-have-timeout-for-long-message": "Long message are not allowed",
-    "user-have-timeout-for-caps": "No excessive caps usage",
+    "user-have-timeout-for-symbols": "Keine übermäßige Verwendung von Symbolen",
+    "user-have-timeout-for-long-message": "Lange Nachricht ist nicht erlaubt",
+    "user-have-timeout-for-caps": "Keine übermäßige Verwendung von Caps",
     "user-have-timeout-for-spam": "Spamming is not allowed",
     "user-have-timeout-for-color": "Farben und /me sind nicht erlaubt",
     "user-have-timeout-for-emotes": "Kein Emotes Spamming",
@@ -1031,8 +1031,8 @@
       "opened": "$sender, {queue.open}"
     },
     "join": {
-      "closed": "Sorry $sender, queue is currently closed",
-      "opened": "$sender were added into queue"
+      "closed": "Sorry, $senderist die Warteschlange geschlossen",
+      "opened": "$sender wurde zur Warteschlange hinzugefügt"
     },
     "open": "Queue is currently OPENED! Join to queue with !queue join",
     "close": "Warteschlange ist momentan geschlossen!",
@@ -1040,20 +1040,20 @@
     "picked": {
       "single": "Dieser Benutzer wurde aus der Warteschlange ausgewählt: $users",
       "multi": "These users were picked from queue: $users",
-      "none": "No users were found in queue"
+      "none": "Keine Benutzer in der Warteschlange gefunden"
     }
   },
   "title": {
-    "current": "$sender, title of stream is '$title'.",
+    "current": "$sender, Titel des Stream ist '$title'.",
     "change": {
-      "success": "$sender, title was set to: $title",
-      "failed": "$sender, something went wrong. Current title is still set to: $title"
+      "success": "$sender, der Titel wurde auf $title gesetzt",
+      "failed": "$sender, etwas ist schief gelaufen. Aktueller Titel ist noch auf $title gesetzt"
     }
   },
   "game": {
-    "current": "$sender, streamer is currently playing $game.",
+    "current": "$sender, Streamer spielt derzeit $game.",
     "change": {
-      "success": "$sender, game was set to: $game",
+      "success": "$sender, Spiel wurde auf $game gesetzt",
       "failed": "$sender, something went wrong. Current game is still set to: $game"
     }
   },
@@ -1146,9 +1146,9 @@
     "saved": "$sender, highlight was saved for $hoursh$minutesm$secondss",
     "list": {
       "items": "$sender, list of saved highlights for latest stream: $items",
-      "empty": "$sender, no highlights were saved"
+      "empty": "$sender, es wurden keine Highlights gespeichert"
     },
-    "offline": "$sender, cannot save highlight, stream is offline"
+    "offline": "$sender, kann das Highlight nicht speichern, Stream ist offline"
   },
   "whisper": {
     "settings": {
