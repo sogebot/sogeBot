@@ -1,6 +1,6 @@
 /* global describe it before */
 
-const uuidv4 = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 
 require('../../general.js');
 
