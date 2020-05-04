@@ -49,7 +49,14 @@ class Discord extends Integration {
     if: () => self.clientId.length > 0 && self.token.length > 0,
     emit: 'authorize',
   }, 'general')
-  authorizeBtn = null;
+  joinToServerBtn = null;
+
+  @ui({
+    type: 'btn-emit',
+    class: 'btn btn-primary btn-block mt-1 mb-1',
+    if: () => self.clientId.length === 0 || self.token.length === 0,
+  }, 'general')
+  cannotJoinToServerBtn = null;
 
   @settings('bot')
   listenAtChannels = '';
