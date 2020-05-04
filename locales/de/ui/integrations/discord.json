@@ -10,7 +10,7 @@
     "deleteMessagesAfterWhile": "Nach einiger Zeit, Nachrichten löschen",
     "clientId": "Client ID",
     "token": "Token",
-    "joinToServerBtn": "Click to join bot to your server",
-    "cannotJoinToServerBtn": "Set token and clientId to be able to join bot to your server"
+    "joinToServerBtn": "Hier klicken, um den Bot mit dem Server zu verbinden",
+    "cannotJoinToServerBtn": "Token und Client-Id angeben, damit der Bot sich mit dem Server verbinden kann"
   }
 }

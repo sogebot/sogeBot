@@ -27,7 +27,7 @@
   "cannotCopyIfInProgress": "Kann nicht kopiert werden, wenn eine andere Umfrage läuft",
   "closedAt": "Geschlossen am",
   "activeFor": "Aktiv für",
-  "votingBy": "Abstimmung von",
+  "votingBy": "Abstimmung mit",
   "tips": "Spenden",
   "bits": "Bits",
   "command": "!vote",

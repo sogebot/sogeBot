@@ -61,7 +61,7 @@
   "messageTemplate": {
     "name": "Шаблон сообщения",
     "placeholder": "Установить шаблон сообщения",
-    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts), {recipient} (subgifts), {monthsName} (subs, subgifts), {currency} (tips)"
+    "help": "Доступные переменные: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts), {recipient} (subgifts), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "animationText": {
     "name": "Текст анимации"
