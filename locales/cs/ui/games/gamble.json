@@ -5,6 +5,10 @@
     "chanceToWin": {
       "title": "Šance na výhru",
       "help": "Procenta"
-    }
+    },
+    "enableJackpot": "Povolit jackpot",
+    "chanceToTriggerJackpot": "Šance na výhru jackpotu v %",
+    "maxJackpotValue": "Maximální hodnota jackpotu",
+    "lostPointsAddedToJackpot": "Kolik ztracených bodů by mělo být přidáno do jackpotu v %"
   }
 }
