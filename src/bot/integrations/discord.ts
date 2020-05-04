@@ -165,6 +165,7 @@ class Discord extends Integration {
         { name: 'Total Views', value: api.stats.currentViews, inline: true},
         { name: 'Followers', value: api.stats.currentFollowers, inline: true},
       ]);
+      this.embed.setImage(`https://static-cdn.jtvnw.net/ttv-static/404_preview-1920x1080.jpg?${Date.now()}`);
 
       if (oauth.broadcasterType !== '') {
         this.embed.addField('Subscribers', api.stats.currentSubscribers, true);
