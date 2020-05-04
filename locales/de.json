@@ -287,19 +287,19 @@
         "game": "Aktuelles Spiel",
         "language": "Aktuelle Sprache des Stream",
         "viewers": "Anzahl der aktuellen Zuschauer",
-        "views": "Current views count",
+        "views": "Aktuelle Zuschaueranzahl",
         "hosts": "Current hosts count",
         "followers": "Current followers count",
         "subscribers": "Current subscribers count",
         "arg": "Argument",
         "param": "Parameter (required)",
-        "touser": "Username parameter",
-        "!param": "Parameter (not required)",
+        "touser": "Benutzername Parameter",
+        "!param": "Parameter (nicht erforderlich)",
         "alias": "Alias",
         "command": "Befehl",
         "keyword": "Schlüsselwort",
         "response": "Antwort",
-        "list": "Populated list",
+        "list": "Liste füllen",
         "type": "Typ",
         "days": "Tage",
         "hours": "Stunden",
@@ -1141,12 +1141,6 @@
       "win": "$sender, you WON! You now have $points $pointsName",
       "lose": "$sender, you LOST! You now have $points $pointsName"
     }
-  },
-  "merge": {
-    "from-user-not-found": "$sender, user $fromUsername was not found in db",
-    "no-from-user-set": "$sender, you need to specify from which username to merge",
-    "no-to-user-set": "$sender, you need to specify to which username merge",
-    "user-merged": "$sender, user $fromUsername was merged to $toUsername"
   },
   "highlights": {
     "saved": "$sender, highlight was saved for $hoursh$minutesm$secondss",

@@ -29,7 +29,7 @@
     "subs": "Subs",
     "resubs": "Re-Subs",
     "subgifts": "Verschenkte Subs",
-    "subcommunitygifts": "Subgifts to community",
+    "subcommunitygifts": "SubGifts an Community",
     "tips": "Tips",
     "hosts": "Hosts",
     "raids": "Raids"
@@ -61,7 +61,7 @@
   "messageTemplate": {
     "name": "Nachrichtenvorlage",
     "placeholder": "Nachrichtenvorlage festlegen",
-    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts), {recipient} (subgifts), {monthsName} (subs, subgifts), {currency} (tips)"
+    "help": "Verfügbare Variablen: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts), {recipient} (subgifts), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "animationText": {
     "name": "Animationstext"

@@ -1,6 +1,6 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Статус",
     "songRequests": "Song Requests",
     "fetchCurrentSongWhenOffline": {
       "title": "Fetch current song when stream is offline",
