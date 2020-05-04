@@ -2,6 +2,7 @@ require('../../general.js');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
+const time = require('../../general.js').time;
 
 const api = (require('../../../dest/api')).default;
 const alias = (require('../../../dest/systems/alias')).default;
