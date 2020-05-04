@@ -32,7 +32,7 @@ class Gamble extends Game {
   @settings('jackpot')
   maxJackpotValue = 10000;
   @settings('jackpot')
-  percentageOfLostPointsAddedToJackpot = 20;
+  lostPointsAddedToJackpot = 20;
   @settings('jackpot')
   chanceToTriggerJackpot = 5;
   @shared(true)
@@ -84,7 +84,7 @@ class Gamble extends Game {
       } else {
         if (this.enableJackpot) {
           const currentPointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
-          this.jackpotValue = Math.min(this.jackpotValue + points / this.percentageOfLostPointsAddedToJackpot, this.maxJackpotValue);
+          this.jackpotValue = Math.min(this.jackpotValue + points / this.lostPointsAddedToJackpot, this.maxJackpotValue);
           message = prepare('gambling.gamble.loseWithJackpot', {
             pointsName: await pointsSystem.getPointsName(currentPointsOfUser),
             points: currentPointsOfUser,

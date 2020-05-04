@@ -29,7 +29,7 @@ describe('Gambling - gamble with Jackpot', () => {
       gamble.enableJackpot = true;
       gamble.chanceToTriggerJackpot = 0;
       gamble.chanceToWin = 0;
-      gamble.percentageOfLostPointsAddedToJackpot = 10;
+      gamble.lostPointsAddedToJackpot = 10;
       gamble.jackpotValue = 0;
     });
 
