@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import Game from './_interface';
-import { command, settings } from '../decorators';
+import { command, settings, shared } from '../decorators';
 import { prepare } from '../commons';
 import { error } from '../helpers/log';
 
@@ -26,6 +26,17 @@ class Gamble extends Game {
   minimalBet = 0;
   @settings()
   chanceToWin = 50;
+
+  @settings('jackpot')
+  enableJackpot = false;
+  @settings('jackpot')
+  maxJackpotValue = 10000;
+  @settings('jackpot')
+  lostPointsAddedToJackpot = 20;
+  @settings('jackpot')
+  chanceToTriggerJackpot = 5;
+  @shared(true)
+  jackpotValue = 0;
 
   @command('!gamble')
   async main (opts): Promise<CommandResponse[]> {
@@ -52,21 +63,42 @@ class Gamble extends Game {
       }
 
       await pointsSystem.decrement({ userId: opts.sender.userId }, parseInt(points, 10));
-      if (_.random(0, 100, false) <= this.chanceToWin) {
+      if (this.enableJackpot && _.random(0, 100, false) <= this.chanceToTriggerJackpot) {
+        const incrementPointsWithJackpot = (parseInt(points, 10) * 2) + this.jackpotValue;
+        await getRepository(User).increment({ userId: opts.sender.userId }, 'points', incrementPointsWithJackpot);
+        const currentPointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
+        message = prepare('gambling.gamble.winJackpot', {
+          pointsName: await pointsSystem.getPointsName(currentPointsOfUser),
+          points: currentPointsOfUser,
+          jackpotName: await pointsSystem.getPointsName(this.jackpotValue),
+          jackpot: this.jackpotValue,
+        });
+        this.jackpotValue = 0;
+      } else  if (_.random(0, 100, false) <= this.chanceToWin) {
         await getRepository(User).increment({ userId: opts.sender.userId }, 'points', parseInt(points, 10) * 2);
         const updatedPoints = await pointsSystem.getPointsOf(opts.sender.userId);
         message = prepare('gambling.gamble.win', {
           pointsName: await pointsSystem.getPointsName(updatedPoints),
           points: updatedPoints,
         });
-        return [{ response: message, ...opts }];
       } else {
-        message = prepare('gambling.gamble.lose', {
-          pointsName: await pointsSystem.getPointsName(await pointsSystem.getPointsOf(opts.sender.userId)),
-          points: await pointsSystem.getPointsOf(opts.sender.userId),
-        });
-        return [{ response: message, ...opts }];
+        if (this.enableJackpot) {
+          const currentPointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
+          this.jackpotValue = Math.min(this.jackpotValue + points / this.lostPointsAddedToJackpot, this.maxJackpotValue);
+          message = prepare('gambling.gamble.loseWithJackpot', {
+            pointsName: await pointsSystem.getPointsName(currentPointsOfUser),
+            points: currentPointsOfUser,
+            jackpotName: await pointsSystem.getPointsName(this.jackpotValue),
+            jackpot: this.jackpotValue,
+          });
+        } else {
+          message = prepare('gambling.gamble.lose', {
+            pointsName: await pointsSystem.getPointsName(await pointsSystem.getPointsOf(opts.sender.userId)),
+            points: await pointsSystem.getPointsOf(opts.sender.userId),
+          });
+        }
       }
+      return [{ response: message, ...opts }];
     } catch (e) {
       switch (e.message) {
         case ERROR_ZERO_BET:

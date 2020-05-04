@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* global describe it before */
 
-
-const uuidv4 = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 
 require('../../general.js');
 const log = require('../../../dest/helpers/log');

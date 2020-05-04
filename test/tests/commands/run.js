@@ -2,7 +2,7 @@
 
 
 require('../../general.js');
-const uuid = require('uuid/v4');
+const { v4: uuid } = require('uuid');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
