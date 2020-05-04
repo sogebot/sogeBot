@@ -11,6 +11,6 @@
     "clientId": "ClientId",
     "token": "Token",
     "joinToServerBtn": "Kliknutím připojíte bota na váš server",
-    "cannotJoinToServerBtn": "Set token and clientId to be able to join bot to your server"
+    "cannotJoinToServerBtn": "Nastavte token a clientId, abyste mohli připojit bota na váš server"
   }
 }
