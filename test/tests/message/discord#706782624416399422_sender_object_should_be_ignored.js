@@ -2,6 +2,7 @@ require('../../general.js');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
+const time = require('../../general.js').time;
 
 const api = (require('../../../dest/api')).default;
 const alias = (require('../../../dest/systems/alias')).default;
@@ -15,7 +16,7 @@ const { linesParsed } = require('../../../dest/helpers/parser');
 // users
 const owner = { username: 'soge__' };
 
-describe('Commons - #3620 - announce is not parsing message filters', () => {
+describe('Message - https://discordapp.com/channels/317348946144002050/619437014001123338/706782624416399422 - sender object should be owner on timers with (!#)', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
@@ -30,7 +31,7 @@ describe('Commons - #3620 - announce is not parsing message filters', () => {
       triggeredAtMessage: linesParsed,
     });
     await getRepository(TimerResponse).save({
-      response: 'Prikazy bota: !klip, !me, !heist, (list.!command), (list.!alias)',
+      response: '(!top time)',
       timestamp: Date.now(),
       isEnabled: true,
       timer,
@@ -41,7 +42,7 @@ describe('Commons - #3620 - announce is not parsing message filters', () => {
     }
   });
 
-  it('Timer should trigger announce() with proper response with filters', async () => {
-    await message.isSentRaw('Prikazy bota: !klip, !me, !heist, !testCmd, !testAlias', 'bot', 20000);
+  it('!top time should be properly triggered', async () => {
+    await message.isSentRaw('Top 10 (watch time): no data available', 'bot', 20000);
   });
 });

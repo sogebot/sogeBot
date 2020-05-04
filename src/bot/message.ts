@@ -390,7 +390,6 @@ class Message {
         const cmd = filter
           .replace('!', '') // replace first !
           .replace(/\(|\)/g, '')
-          .replace(/\$sender/g, (tmi.showWithAt ? '@' : '') + attr.sender.username)
           .replace(/\$param/g, attr.param);
         const parse = new Parser({ sender: attr.sender, message: cmd, skip: true, quiet: true });
         const responses = await parse.process();
@@ -404,7 +403,6 @@ class Message {
       '(!#)': async function (filter) {
         const cmd = filter
           .replace(/\(|\)/g, '')
-          .replace(/\$sender/g, (tmi.showWithAt ? '@' : '') + attr.sender.username)
           .replace(/\$param/g, attr.param);
         const parse = new Parser({ sender: attr.sender, message: cmd, skip: true, quiet: false });
         const responses = await parse.process();
