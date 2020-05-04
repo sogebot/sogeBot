@@ -1139,8 +1139,8 @@
       "notEnoughOptions": "$sender, musíš hrát o nějaké body",
       "notEnoughPoints": "$sender, nemáš $points $pointsName abys o ně hrál",
       "win": "$sender, VYHRÁLS! Aktuálně máš $points $pointsName",
-      "winJackpot": "$sender, you hit JACKPOT! You won $jackpot $jackpotName in addition to your bet. You now have $points $pointsName",
-      "loseWithJackpot": "$sender, you LOST! You now have $points $pointsName. Jackpot increased to $jackpot $jackpotName",
+      "winJackpot": "$sender, vyhrál jste JACKPOT! Získal jsi $jackpot $jackpotName navíc ke své sázce. Nyní máte $points $pointsName",
+      "loseWithJackpot": "$sender, PROHRÁLS! Aktuálně máš $points $pointsName. Jackpot se zvýšil na $jackpot $jackpotName",
       "lose": "$sender, PROHRÁLS! Aktuálně máš $points $pointsName"
     }
   },
