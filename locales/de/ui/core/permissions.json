@@ -9,7 +9,7 @@
   "previous": "Zurück",
   "next": "Weiter",
   "loading": "Wird geladen",
-  "userHaveNoAccessToThisPermissionGroup": "Benutzer <strong>$username</strong> hat KEINEN Zugriff auf diese Berechtigungen.",
+  "userHaveNoAccessToThisPermissionGroup": "Benutzer <strong>$username</strong> hat KEINEN Zugriff auf diese Berechtigungsgruppe.",
   "userHaveAccessToThisPermissionGroup": "Benutzer <strong>$username</strong> hat Zugriff auf diese Berechtigungen.",
   "accessDirectlyThrough": "<strong>Direkter</strong> Zugriff über",
   "accessThroughHigherPermission": "Zugriff durch höhere Berechtigung",
