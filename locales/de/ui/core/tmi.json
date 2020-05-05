@@ -1,6 +1,6 @@
 {
   "settings": {
-    "ignorelist": "Ignore Liste (ID oder Benutzername)",
+    "ignorelist": "Ignorierliste (ID oder Benutzername)",
     "globalIgnoreListExclude": "Von der globalen Ignorierliste ausschließen",
     "showWithAt": "Benutzer mit @ anzeigen",
     "sendWithMe": "Nachrichten mit /me senden",
