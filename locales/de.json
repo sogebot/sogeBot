@@ -995,7 +995,7 @@
   },
   "watched": {
     "success": {
-      "time": "$username watched this channel for $time hours"
+      "time": "$username hat den Channel bereits $time Stunden zugeschaut"
     },
     "failed": {
       "parse": "{core.command-parse} !watched or !watched [username]"
