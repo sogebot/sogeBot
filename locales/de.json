@@ -46,7 +46,7 @@
     "placeholders": {
       "text-url-generator": "Füge deinen Text oder HTML-Code ein, um base64 unten und die URL oben zu generieren",
       "text-decode-base64": "Fügen deinen Base64 ein, um URL und Text oben zu generieren",
-      "creditsSpeed": "Set speed of credits rolling, lower = faster"
+      "creditsSpeed": "Setze die Roll-Geschwindigkeit der Credits. niedriger = schneller"
     },
     "custom-variables": {
       "set-your-variables-to-watch-here": "Lege die zu beobachtenden Variablen hier fest",
@@ -87,7 +87,7 @@
         "placeholders": {
           "name": "Name des Timers festlegen, darf nur diese Zeichen a-zA-Z0-9_ enthalten",
           "messages": "Timer alle X Nachrichten auslösen",
-          "seconds": "Auslöser Timer alle X Sekunden"
+          "seconds": "Timer alle X Sekunden auslösen"
         },
         "alerts": {
           "success": "Timer wurde <strong>erfolgreich</strong> gespeichert.",
@@ -162,7 +162,7 @@
           "placeholder": "#DeinHashtagHier oder Schlüsselwort"
         },
         "fadeOutXCommands": {
-          "label": "Fade Out X Commands",
+          "label": "Ausblenden alle X Befehle",
           "placeholder": "Number of commands subtracted every fade out interval"
         },
         "fadeOutXKeywords": {
@@ -205,7 +205,7 @@
         },
         "runInterval": {
           "label": "Ausführungsintervall (0 = einmal pro Stream ausführen)",
-          "placeholder": "Ereignis alle x Sekunden auslösen"
+          "placeholder": "Ereignis alle X Sekunden auslösen"
         },
         "runAfterXMinutes": {
           "label": "Nach X Minuten ausführen",
@@ -213,7 +213,7 @@
         },
         "runEveryXMinutes": {
           "label": "Alle X Minuten ausführen",
-          "placeholder": "Ereignis alle x Minuten auslösen"
+          "placeholder": "Ereignis alle X Minuten auslösen"
         },
         "messageToSend": {
           "label": "Zu sendende Nachricht",
@@ -442,8 +442,8 @@
         "follows": "Follows",
         "subs": "Subs & ReSubs",
         "cheers": "Cheers",
-        "responses": "Bot responses",
-        "whispers": "Whispers",
+        "responses": "Bot Antworten",
+        "whispers": "Whisper",
         "hosts": "Hosts",
         "bans": "Banns",
         "timeouts": "Zeigüberschreitung"
@@ -460,7 +460,7 @@
         "desc": "Absteigend"
       },
       "labels": {
-        "order": "ORDER",
+        "order": "REIHENFOLGE",
         "range": "RANGE",
         "filters": "FILTER"
       }
@@ -470,21 +470,21 @@
       "hide": "Statistiken ausblenden"
     },
     "translations": "Benutzerdefinierte Übersetzungen",
-    "bot-responses": "Bot responses",
+    "bot-responses": "Bot Antworten",
     "duration": "Dauer",
     "viewers-reset-attributes": "Attribute zurücksetzen",
     "viewers-points-of-all-users": "Punkte aller Benutzer",
-    "viewers-watchtime-of-all-users": "Watch time of all users",
+    "viewers-watchtime-of-all-users": "Zugeschaute Zeit aller Benutzer ansehen",
     "viewers-messages-of-all-users": "Nachrichten von allen Benutzern",
     "events-game-after-change": "Spiel nach Änderung",
-    "events-game-before-change": "game before change",
+    "events-game-before-change": "Spiel vor Änderung",
     "events-user-triggered-event": "vom Benutzer ausgelöstes Ereignis",
     "events-method-used-to-subscribe": "method used to subscribe",
     "events-months-of-subscription": "months of subscription",
     "events-monthsName-of-subscription": "word 'month' by number (1 month, 2 months)",
-    "events-user-message": "user message",
-    "events-bits-user-sent": "bits user sent",
-    "events-reason-for-ban-timeout": "reason for ban/timeout",
+    "events-user-message": "Benutzermitteilung",
+    "events-bits-user-sent": "vom Benutzer gesendete Bits",
+    "events-reason-for-ban-timeout": "Grund für Bann/Timeout",
     "events-duration-of-timeout": "Dauer des Timeouts",
     "events-duration-of-commercial": "dauer der Werbung",
     "events-target-of-your-hosting": "Ziel Ihres Hosts",
@@ -500,7 +500,7 @@
     "overlays-eventlist-raid": "Raid",
     "requested-by": "Angefordert von",
     "description": "Beschreibung",
-    "raffle-type": "Raffle type",
+    "raffle-type": "Verlosungs Typ",
     "raffle-type-keywords": "Nur Schlüsselwort",
     "raffle-type-tickets": "Mit Tickets",
     "raffle-tickets-range": "Ticketbereich",
@@ -567,7 +567,7 @@
     "change-game": "Spiel wechseln",
     "click-to-change": "Zum Ändern anklicken",
     "uptime": "Uptime",
-    "not-affiliate-or-partner": "Not affiliate/partner",
+    "not-affiliate-or-partner": "Kein Affiliate/Partner",
     "not-available": "Nicht verfügbar",
     "max-viewers": "Max. Zuschauer",
     "new-chatters": "Neue Chatter",
@@ -578,18 +578,18 @@
     "subscribers": "Abonnenten",
     "bits": "Bits",
     "subgifts": "Verschenkte Subs",
-    "subStreak": "Current sub streak",
-    "subCumulativeMonths": "Cumulative subscribe months",
+    "subStreak": "Aktuelle Sub Reihe",
+    "subCumulativeMonths": "Gesamte abonnierte Monate",
     "tips": "Spenden",
     "tier": "Stufe",
     "status": "Status",
     "add-widget": "Widget hinzufügen",
-    "remove-dashboard": "Remove dashboard",
+    "remove-dashboard": "Dashboard entfernen",
     "remove-widget": "Widget entfernen",
     "for": "für",
     "close-bet-after": "Schließe Wette nach",
-    "gain-every-option": "Gain every option",
-    "reuse-bet": "re-use bet",
+    "gain-every-option": "Jede Option erhalten",
+    "reuse-bet": "Einsatz wiederholen",
     "refund": "Rückerstattung",
     "open-queue": "Warteschlange öffnen",
     "close-queue": "Warteschlange schließen",
@@ -609,7 +609,7 @@
     "roll-a-winner": "Einen Gewinner würfeln",
     "send-message": "Nachricht senden",
     "messages": "Nachrichten",
-    "announce-every": "Announce every",
+    "announce-every": "Ankündigung alle",
     "create": "Erstellen",
     "cooldown": "Cooldown",
     "confirm": "Bestätigen",
@@ -656,17 +656,17 @@
     "string": "Zeichenkette",
     "points-name": "Name der Punkte",
     "points-single-multi": "einzeln|multi",
-    "points-response": "Points Response",
-    "points-interval": "Points Interval",
-    "points-per-interval": "Points per Interval",
-    "points-interval-offline": "Points Interval (offline)",
-    "points-per-interval-offline": "Points per Interval (offline)",
-    "points-per-message": "Points per Message",
-    "points-per-message-interval": "Add points every X message",
+    "points-response": "Punkte Antwort",
+    "points-interval": "Punktintervall",
+    "points-per-interval": "Punkte pro Intervall",
+    "points-interval-offline": "Punktintervall (Offline)",
+    "points-per-interval-offline": "Punkte pro Intervall (Offline)",
+    "points-per-message": "Punkte pro Nachricht",
+    "points-per-message-interval": "Punkte jede X Nachricht hinzufügen",
     "interval": "Intervall",
     "number": "Nummer",
-    "minimal-messages-required": "Minimal Messages Required",
-    "max-duration": "Max duration",
+    "minimal-messages-required": "Minimale Nachrichten erforderlich",
+    "max-duration": "Max. Dauer",
     "shuffle": "Zufallswiedergabe",
     "song-requests": "Song-Requests",
     "song-request": "Song-Request",
@@ -736,7 +736,7 @@
     "stream-started": "Stream gestartet",
     "stream-stopped": "Stream gestoppt",
     "stream-is-running-x-minutes": "Stream läuft seit x Minuten",
-    "every-x-minutes-of-stream": "alle x Minuten des Stream",
+    "every-x-minutes-of-stream": "alle X Minuten des Streams",
     "game-changed": "Spiel geändert",
     "cheer": "Cheer empfangen",
     "clearchat": "Chat wurde geleert",
@@ -769,15 +769,15 @@
     "gambling": "Glücksspiel",
     "seppukuTimeout": "Timeout für !seppuku",
     "rouletteTimeout": "Timeout für !roulette",
-    "fightmeTimeout": "Timeout for !fightme",
-    "duelCooldown": "Cooldown for !duel",
-    "fightmeCooldown": "Cooldown for !fightme",
+    "fightmeTimeout": "Timeout für !fightme",
+    "duelCooldown": "Cooldown für !duel",
+    "fightmeCooldown": "Cooldown für !fightme",
     "gamblingCooldownBypass": "Bypass gambling cooldowns for mods/caster",
-    "click-to-highlight": "highlight",
-    "click-to-toggle-display": "toggle display",
-    "commercial": "commercial started",
-    "start-commercial": "run a commercial",
-    "bot-will-join-channel": "bot will join channel",
+    "click-to-highlight": "Highlight",
+    "click-to-toggle-display": "Anzeige umschalten",
+    "commercial": "Werbung gestartet",
+    "start-commercial": "Werbung abspielen",
+    "bot-will-join-channel": "Bt tritt dem Kanal bei",
     "bot-will-leave-channel": "Bot wird den Kanal verlassen",
     "create-a-clip": "Clip erstellen",
     "create-a-clip-and-play-replay": "einen Clip erstellen und als Wiedergabe abspielen (Overlay/Alers)",
@@ -787,22 +787,22 @@
     "comply": "erfüllen",
     "visible": "Sichtbar",
     "hidden": "versteckt",
-    "gamblingChanceToWin": "Chance to win !gamble",
-    "gamblingMinimalBet": "Minimal bet for !gamble",
-    "duelDuration": "Duration of !duel",
-    "duelMinimalBet": "Minimal bet for !duel"
+    "gamblingChanceToWin": "Chance zu gewinnen !gamble",
+    "gamblingMinimalBet": "Minimaler Einsatz für !gamble",
+    "duelDuration": "Dauer von !duel",
+    "duelMinimalBet": "Minimaler Einsatz für !duel"
   },
   "raffles": {
-    "announceInterval": "Opened raffles will be announced every $value minute",
+    "announceInterval": "Eröffnete Verlosungen werden alle $value Minuten bekannt gegeben",
     "eligibility-followers-item": "Followers",
     "eligibility-subscribers-item": "Abonnenten",
     "eligibility-everyone-item": "Jeder",
-    "announce-raffle": "Raffle is running. To enter type $keyword. Raffle is opened for $eligibility",
+    "announce-raffle": "Verlosung wird ausgeführt. Um mitzumachen, einfach $keyword einzugeben. Verlosung ist offen für $eligibility",
     "announce-ticket-raffle": "Raffle is running. To enter type $keyword <$min-$max>. Raffle is opened for $eligibility",
     "cannot-create-raffle-without-keyword": "Sorry, $sender, but you cannot create raffle without keyword",
     "raffle-is-already-running": "Sorry, $sender, raffle is already running with keyword $keyword",
     "no-raffle-is-currently-running": "$sender, no raffles without winners are currently running",
-    "no-participants-to-pick-winner": "$sender, nobody joined a raffle",
+    "no-participants-to-pick-winner": "$sender, niemand nimmt an der Verlosung teil.",
     "raffle-winner-is": "Winner of raffle $keyword is $username! Win probability was $probability%!"
   },
   "bets": {
@@ -861,7 +861,7 @@
     "keyword-is-ambiguous": "$sender, keyword $keyword is ambiguous, use ID of keyword",
     "keyword-was-not-found": "$sender, keyword $keyword was not found in database",
     "keyword-was-edited": "$sender, keyword $keyword is changed to '$response'",
-    "keyword-was-added": "$sender, keyword $keyword ($id) was added",
+    "keyword-was-added": "$sender, keyword $keyword ($id) wurde hinzugefügt",
     "list-is-not-empty": "$sender, Liste der Schlüsselwörter",
     "list-is-empty": "$sender, Liste der Schlüsselwörter ist leer",
     "keyword-was-enabled": "$sender, Stichwort $keyword wurde aktiviert",
@@ -909,34 +909,34 @@
   "songs": {
     "playlist-is-empty": "$sender, die zu importierende Playlist ist leer",
     "playlist-imported": "$sender, imported $imported and skipped $skipped from playlist",
-    "not-playing": "Not Playing",
+    "not-playing": "Wird nicht gespielt",
     "song-was-banned": "Song $name was banned and will never play again!",
     "song-was-banned-timeout-message": "You've got timeout for posting banned song",
-    "song-was-unbanned": "Song was succesfully unbanned",
+    "song-was-unbanned": "Song wurde erfolgreich entsperrt",
     "song-was-not-banned": "Dieser Song wurde nicht gesperrt",
     "no-song-is-currently-playing": "Derzeit wird kein Lied abgespielt.",
     "current-song-from-playlist": "Aktueller Song ist $name von der Playlist",
-    "current-song-from-songrequest": "Current song is $name requested by $username",
-    "song-is-banned": "Sorry, $sender, but this song is banned",
-    "song-was-not-found": "Sorry, $sender, but this song was not found",
-    "song-is-too-long": "Sorry, $sender, but this song is too long",
-    "incorrect-category": "Sorry, $sender, but this song must be music category",
-    "song-was-added-to-queue": "$sender, song $name was added to queue",
-    "song-was-added-to-playlist": "$sender, song $name was added to playlist",
-    "song-is-already-in-playlist": "$sender, song $name is already in playlist",
-    "song-was-removed-from-playlist": "$sender, song $name was removed from playlist",
-    "song-was-removed-from-queue": "$sender, your song $name was removed from queue"
+    "current-song-from-songrequest": "Aktueller Song ist $name und wurde gewünscht von $username",
+    "song-is-banned": "Sorry, $sender, aber dieser Song ist gesperrt",
+    "song-was-not-found": "Sorry, $sender, aber dieser Song wurde nicht gefunden",
+    "song-is-too-long": "Sorry, $sender, aber dieser Song ist zu lang",
+    "incorrect-category": "Sorry, $sender, aber der Song muss eine Musikkategorie sein",
+    "song-was-added-to-queue": "$sender, Song $name wurde zur Warteschlange hinzugefügt",
+    "song-was-added-to-playlist": "$sender, Song $name wurde zur Wiedergabeliste hinzugefügt",
+    "song-is-already-in-playlist": "$sender, Song $name ist bereits in der Playlist",
+    "song-was-removed-from-playlist": "$sender, Song $name wurde von der Wiedergabeliste entfernt",
+    "song-was-removed-from-queue": "$sender, dein Song $name wurde aus der Warteschlange entfernt"
   },
   "price": {
     "price-parse-failed": "{core.command-parse} !price",
-    "price-was-set": "$sender, price for $command was set to $amount $pointsName",
+    "price-was-set": "$sender, Preis für $command wurde auf $amount $pointsName gesetzt",
     "price-was-unset": "$sender, price for $command was unset",
     "price-was-not-found": "$sender, price for $command was not found",
     "price-was-enabled": "$sender, price for $command was enabled",
-    "price-was-disabled": "$sender, price for $command was disabled",
+    "price-was-disabled": "$sender, der Preis für $command wurde deaktiviert",
     "user-have-not-enough-points": "Sorry, $sender, but you don't have $amount $pointsName to use $command",
-    "list-is-empty": "$sender, list of prices is empty",
-    "list-is-not-empty": "$sender, list of prices: $list"
+    "list-is-empty": "$sender, Liste der Preise ist leer",
+    "list-is-not-empty": "$sender, Liste der Preise: $list"
   },
   "ranks": {
     "rank-parse-failed": "{core.command-parse} !rank help",
@@ -971,7 +971,7 @@
       "time": "$sender, $username is subscriber of channel. In total of $subCumulativeMonths $subCumulativeMonthsName."
     },
     "successSameUsername": {
-      "never": "$sender, you are not a channel subscriber.",
+      "never": "$sender, Du bist kein Kanal-Abonnent.",
       "notNow": "$sender, you are currently not a channel subscriber. In total of $subCumulativeMonths $subCumulativeMonthsName.",
       "timeWithSubStreak": "$sender, you are subscriber of channel. Current sub streak for $diff ($subStreak $subStreakMonthsName) and in total of $subCumulativeMonths $subCumulativeMonthsName.",
       "time": "$sender, you are subscriber of channel. In total of $subCumulativeMonths $subCumulativeMonthsName."
@@ -1015,11 +1015,11 @@
     "user-is-warned-about-color": "Colors and /me is not allowed [$count warnings left]",
     "user-is-warned-about-emotes": "No emotes spamming [$count warnings left]",
     "user-is-warned-about-blacklist": "No blacklisted words [$count warnings left]",
-    "user-have-timeout-for-links": "No links allowed, ask for !permit",
+    "user-have-timeout-for-links": "Keine Links erlaubt. Frage nach !permit",
     "user-have-timeout-for-symbols": "Keine übermäßige Verwendung von Symbolen",
     "user-have-timeout-for-long-message": "Lange Nachricht ist nicht erlaubt",
     "user-have-timeout-for-caps": "Keine übermäßige Verwendung von Caps",
-    "user-have-timeout-for-spam": "Spamming is not allowed",
+    "user-have-timeout-for-spam": "Spammen ist nicht erlaubt",
     "user-have-timeout-for-color": "Farben und /me sind nicht erlaubt",
     "user-have-timeout-for-emotes": "Kein Emotes Spamming",
     "user-have-timeout-for-blacklist": "Keine blockierten Wörter"
@@ -1159,15 +1159,15 @@
         "false": "Bot will send permissions insufficient errors through whispers"
       },
       "disableCooldownWhispers": {
-        "true": "Bot won't send cooldown notifications",
-        "false": "Bot will send cooldown notifications through whispers"
+        "true": "Bot sendet keine Cooldown-Benachrichtigungen",
+        "false": "Bot wird Cooldown-Benachrichtigungen durch Whisper senden"
       }
     }
   },
   "phillipsHue": {
-    "list": "$sender, List of Phillips Hue connected lights: "
+    "list": "$sender, Liste von Phillips Hue verbundenen Lampen: "
   },
-  "time": "Current streamers time in his timezone is $time",
+  "time": "Aktuelle Streamer-Zeit in seiner Zeitzone ist $time",
   "subs": "$sender, there is currently $onlineSubCount online subscribers. Last sub/resub was $lastSubUsername $lastSubAgo",
   "followers": "$sender, there is currently $onlineFollowersCount online followers. Last follow was $lastFollowUsername $lastFollowAgo",
   "ignore": {
