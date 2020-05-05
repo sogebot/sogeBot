@@ -1,0 +1,9 @@
+{
+  "settings": {
+    "responsiveVoiceKeyNotSet": "Nenastavili jste správně <a href='#/settings/integrations/responsivevoice'>ResponiveVoice key</a>",
+    "voice": "Hlas",
+    "volume": "Hlasitost",
+    "rate": "Tempo",
+    "pitch": "Výška"
+  }
+}
