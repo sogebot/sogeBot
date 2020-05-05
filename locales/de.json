@@ -195,8 +195,8 @@
           "false": "Zähler beibehalten"
         },
         "viewersAtLeast": {
-          "label": "Viewers At Least",
-          "placeholder": "How many viewers at least to trigger event"
+          "label": "Mindestens X Zuschauer",
+          "placeholder": "Wie viele Zuschauer mindestens um das Event auszulösen"
         },
         "ignoreAutohost": {
           "label": "Auto-Host ignorieren",
@@ -204,7 +204,7 @@
           "false": "Nicht ignorieren"
         },
         "runInterval": {
-          "label": "Run Interval (0 = run once per stream)",
+          "label": "Ausführungsintervall (0 = einmal pro Stream ausführen)",
           "placeholder": "Ereignis alle x Sekunden auslösen"
         },
         "runAfterXMinutes": {
@@ -224,21 +224,21 @@
           "placeholder": "Setze deinen !commandToRun"
         },
         "isCommandQuiet": {
-          "label": "Should be command quiet",
-          "true": "Command will be quiet",
-          "false": "Command won't be quiet"
+          "label": "Befehl stumm ausführen",
+          "true": "Befehlt ist stumm",
+          "false": "Befehl ist nicht stumm"
         },
         "urlOfSoundFile": {
           "label": "Url der Sounddatei",
           "placeholder": "http://www.pathToYour.url/where/is/file.mp3"
         },
         "emotesToExplode": {
-          "label": "Emotes To Explode",
-          "placeholder": "List of emotes to explode, e.g. Kappa PurpleHeart"
+          "label": "Emotes in Explode Overlay",
+          "placeholder": "Liste der Emotes, z.B. Kappa PurpleHeart"
         },
         "emotesToFirework": {
-          "label": "Emotes To Firework",
-          "placeholder": "List of emotes to firework, e.g. Kappa PurpleHeart"
+          "label": "Emote-Feuerwerk",
+          "placeholder": "Liste der Emotes, z.B. Kappa PurpleHeart"
         },
         "announce": {
           "label": "Im Chat ankündigen",
@@ -251,7 +251,7 @@
           "false": "Wird keine Verzögerung haben"
         },
         "durationOfCommercial": {
-          "label": "Duration Of Commercial",
+          "label": "Dauer der Werbung",
           "placeholder": "Verfügbare Dauer: 30, 60, 90, 120, 150, 180"
         },
         "customVariable": {
@@ -427,9 +427,9 @@
         "whispers": {
           "title": "Flüstern",
           "toggle": {
-            "listener": "Listen commands on whisper",
-            "settings": "Whispers on settings change",
-            "raffle": "Whispers on raffle join",
+            "listener": "Auf Befehle per Flüstern achten",
+            "settings": "Flüsternachricht bei geänderten Einstellungen",
+            "raffle": "Flüsternachricht bei teilnahme",
             "permissions": "Whispers on insufficient permissions",
             "cooldowns": "Whispers on cooldown (if set as notify)"
           }
@@ -485,11 +485,11 @@
     "events-user-message": "user message",
     "events-bits-user-sent": "bits user sent",
     "events-reason-for-ban-timeout": "reason for ban/timeout",
-    "events-duration-of-timeout": "duration of timeout",
-    "events-duration-of-commercial": "duration of commercial",
-    "events-target-of-your-hosting": "target of your hosting",
-    "events-viewers-of-hosting": "viewers of hosting",
-    "overlays-eventlist-resub": "resub",
+    "events-duration-of-timeout": "Dauer des Timeouts",
+    "events-duration-of-commercial": "dauer der Werbung",
+    "events-target-of-your-hosting": "Ziel Ihres Hosts",
+    "events-viewers-of-hosting": "Zuschauer des Host",
+    "overlays-eventlist-resub": "re-Subs",
     "overlays-eventlist-subgift": "verschenkter Sub",
     "overlays-eventlist-subcommunitygift": "subcommunitygift",
     "overlays-eventlist-host": "Host",
@@ -544,7 +544,7 @@
     "alias": "Alias",
     "command": "Befehl",
     "cooldowns": "Cooldowns",
-    "title-template": "Title template",
+    "title-template": "Titel-Vorlage",
     "keyword": "Schlüsselwort",
     "moderation": "Moderation",
     "timer": "Timer",
@@ -635,7 +635,7 @@
     "volume": "Lautstärke",
     "start-time": "Startzeit",
     "end-time": "Endzeit",
-    "watched-time": "Watched time",
+    "watched-time": "Zugeschaute Zeit",
     "currentsong": "Aktueller Titel",
     "group": "Gruppen",
     "followed-since": "Folgt seit",
@@ -683,7 +683,7 @@
     "one-record-per-line": "ein Eintrag pro Zeile",
     "on": "an",
     "off": "aus",
-    "search-by-username": "Suche nach Benutzernamen",
+    "search-by-username": "Nach Benutzernamen suchen",
     "create-and-use-a-new-game": "Neues Spiel erstellen und verwenden",
     "create-and-use-a-new-title": "Neuen Titel erstellen und verwenden",
     "search-tags": "Nach verfügbaren Tags suchen (einige Spiel-Tags fehlen möglicherweise / Twitch-Richtlinie)",
