@@ -310,6 +310,7 @@ class Users extends Core {
           headers: {
             'Accept': 'application/vnd.twitchtv.v5+json',
             'Authorization': 'Bearer ' + token,
+            'Client-ID': oauth.botClientId,
           },
         });
         if (request.data.total === 0) {

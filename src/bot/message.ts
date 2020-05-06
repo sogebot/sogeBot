@@ -661,6 +661,7 @@ class Message {
           request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
             headers: {
               'Authorization': 'Bearer ' + token,
+              'Client-ID': oauth.botClientId,
             },
           });
           return api.getGameFromId(request.data.data[0].game_id);
@@ -688,6 +689,7 @@ class Message {
           request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
             headers: {
               'Authorization': 'Bearer ' + token,
+              'Client-ID': oauth.botClientId,
             },
           });
           // save remaining api calls
@@ -717,6 +719,7 @@ class Message {
           request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
             headers: {
               'Authorization': 'Bearer ' + token,
+              'Client-ID': oauth.botClientId,
             },
           });
           // save remaining api calls
