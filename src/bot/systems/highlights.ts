@@ -97,6 +97,7 @@ class Highlights extends System {
       const request = await axios.get(url, {
         headers: {
           Authorization: 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
       });
       // save remaining api calls

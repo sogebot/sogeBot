@@ -28,6 +28,13 @@ export const getUserFromTwitch = async (username)  => {
     },
   });
 
+  const clientId = await getRepository(Settings).findOne({
+    where: {
+      name: 'botClientId',
+      namespace: '/core/oauth',
+    },
+  });
+
   if (!token) {
     throw Error('Missing oauth token');
   }
@@ -35,6 +42,7 @@ export const getUserFromTwitch = async (username)  => {
   const request = await axios.get(url, {
     headers: {
       'Authorization': 'Bearer ' + JSON.parse(token.value),
+      'Client-ID': clientId,
     },
   });
 

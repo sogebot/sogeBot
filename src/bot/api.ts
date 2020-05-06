@@ -379,6 +379,7 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
         timeout: 20000,
       });
@@ -431,6 +432,7 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
         timeout: 20000,
       });
@@ -520,6 +522,7 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
         timeout: 20000,
       });
@@ -607,6 +610,7 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
         timeout: 20000,
       });
@@ -813,6 +817,7 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
       });
       ioServer?.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
@@ -855,6 +860,7 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
         timeout: 20000,
       });
@@ -917,6 +923,7 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
         timeout: 20000,
       });
@@ -991,6 +998,7 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
         timeout: 20000,
       });
@@ -1045,6 +1053,7 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
         timeout: 20000,
       });
@@ -1095,6 +1104,7 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
         timeout: 20000,
       });
@@ -1330,6 +1340,7 @@ class API extends Core {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Content-Type': 'application/json',
+          'Client-ID': oauth.botClientId,
         },
       });
       await getRepository(TwitchTag).update({ is_auto: false }, { is_current: false });
@@ -1505,6 +1516,7 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
         timeout: 20000,
       });
@@ -1576,6 +1588,7 @@ class API extends Core {
         url,
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
       });
 
@@ -1671,6 +1684,7 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
         timeout: 20000,
       });
@@ -1762,6 +1776,7 @@ class API extends Core {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
         data: {
           user_id: String(cid),
@@ -1798,6 +1813,7 @@ class API extends Core {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
         timeout: 20000,
       });
@@ -1845,6 +1861,7 @@ class API extends Core {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
         timeout: 20000,
       });

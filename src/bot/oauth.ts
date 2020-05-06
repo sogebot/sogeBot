@@ -27,13 +27,15 @@ class OAuth extends Core {
   @shared()
   public bot = '';
   @shared()
-  public clientId = '';
-  @shared()
   public channelId = '';
   @shared()
   public botId = '';
+  @shared(true)
+  public botClientId = '';
   @shared()
   public broadcasterId = '';
+  @shared(true)
+  public broadcasterClientId = '';
 
   @settings('general')
   public generalChannel = '';
@@ -227,11 +229,12 @@ class OAuth extends Core {
         throw new Error(`Error on validate ${type} OAuth token, error: ${errorMessage}`);
       }
 
-      this.clientId = request.data.client_id;
 
       if (type === 'bot') {
+        this.botClientId = request.data.client_id;
         this.botId = request.data.user_id;
       } else {
+        this.broadcasterClientId = request.data.client_id;
         this.broadcasterId = request.data.user_id;
       }
 
