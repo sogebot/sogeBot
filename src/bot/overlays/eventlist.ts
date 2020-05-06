@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import Overlay from './_interface';
 import { isBot } from '../commons';
 import { ui } from '../decorators';
-import { publicEndpoint } from '../helpers/socket';
+import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 
 import { Brackets, getRepository } from 'typeorm';
 import { EventList as EventListEntity } from '../database/entity/eventList';
@@ -21,6 +21,15 @@ class EventList extends Overlay {
   linkBtn = null;
 
   sockets () {
+    adminEndpoint(this.nsp, 'eventlist::getUserEvents', async (username, cb) => {
+      const eventsByUsername = await getRepository(EventListEntity).find({username});
+      // we also need subgifts by giver
+      const eventsByRecipient
+        = (await getRepository(EventListEntity).find({event:'subgift'}))
+          .filter(o => JSON.parse(o.values_json).from === username);
+      cb (_.orderBy([ ...eventsByRecipient, ...eventsByUsername ], 'timestamp', 'desc'));
+
+    });
     publicEndpoint(this.nsp, 'getEvents', async (opts: { ignore: string; limit: number }, cb) => {
       let events = await getRepository(EventListEntity)
         .createQueryBuilder('events')
