@@ -37,7 +37,7 @@ describe('API - getLatest100Followers()', () => {
     });
 
     it('should be two follow events after while', async () => {
-      time.waitMs(5000);
+      await time.waitMs(5000);
       assert(events.fire.callCount === 2);
     });
 
@@ -52,7 +52,7 @@ describe('API - getLatest100Followers()', () => {
     });
 
     it('should be two follow events, expecting no change', async () => {
-      time.waitMs(5000);
+      await time.waitMs(5000);
       assert(events.fire.callCount === 2);
     });
 
