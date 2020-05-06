@@ -20,26 +20,30 @@ async function retest() {
           '-r', 'source-map-support/register',
           '--timeout', '60000',
           '--exit',
-          '--grep="' + suite + '"',
+          '--grep="' + suite.replace('(!#)', '') + '"',
           '--recursive',
           'test/'
         ], {
           shell: true,
         });
 
+        let output = '';
         p.stdout.on('data', (data) => {
           process.stdout.write(data.toString());
+          output += data.toString();
         });
 
         p.stderr.on('data', (data) => {
           process.stderr.write(data.toString());
+          output += data.toString();
         });
 
         p.on('close', (code) => {
           if (status === 0) {
             status = code;
           }
-          if (code !== 0) {
+          if (code !== 0 || output.includes(' 0 passing')) {
+            status = 1; // force status 1
             console.log('------------------------------------------------------------------------------')
             console.log('\t=> Failed ' + suite + ' tests')
             console.log('------------------------------------------------------------------------------')
