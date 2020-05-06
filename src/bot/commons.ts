@@ -26,7 +26,7 @@ import { Message } from './message';
  *
  * parserReply('Lorem Ipsum Dolor', { sender });
  */
-export async function parserReply(response: string, opts: { sender: CommandOptions['sender']; attr?: CommandOptions['attr'] }, messageType: 'chat' | 'whisper' = 'chat') {
+export async function parserReply(response: string | Promise<string>, opts: { sender: CommandOptions['sender']; attr?: CommandOptions['attr'] }, messageType: 'chat' | 'whisper' = 'chat') {
   const senderObject = {
     ..._.cloneDeep(opts.sender),
     'message-type': messageType,
@@ -34,9 +34,9 @@ export async function parserReply(response: string, opts: { sender: CommandOptio
   };
   const messageToSend = await (async () => {
     if (opts.attr?.skip) {
-      return prepare(response, { ...opts, sender: senderObject.discord ? senderObject.discord.author : senderObject }, false);
+      return prepare(await response as string, { ...opts, sender: senderObject.discord ? senderObject.discord.author : senderObject }, false);
     } else {
-      return await new Message(response).parse({ ...opts, sender: senderObject.discord ? senderObject.discord.author : senderObject }) as string;
+      return await new Message(await response as string).parse({ ...opts, sender: senderObject.discord ? senderObject.discord.author : senderObject }) as string;
     }
   })();
   if (opts.sender.discord) {
