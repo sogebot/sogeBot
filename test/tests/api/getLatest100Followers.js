@@ -5,10 +5,8 @@ require('../../general.js');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
-const variable = require('../../general.js').variable;
+const time = require('../../general.js').time;
 
-const sinon = require('sinon');
-const axios = require('axios');
 const assert = require('assert');
 
 const oauth = (require('../../../dest/oauth')).default;
@@ -38,7 +36,8 @@ describe('API - getLatest100Followers()', () => {
       assert(status.state, 'getLatest100Followers() unexpectedly failed');
     });
 
-    it('should be two follow events', async () => {
+    it('should be two follow events after while', async () => {
+      await time.waitMs(5000);
       assert(events.fire.callCount === 2);
     });
 
@@ -53,6 +52,7 @@ describe('API - getLatest100Followers()', () => {
     });
 
     it('should be two follow events, expecting no change', async () => {
+      await time.waitMs(5000);
       assert(events.fire.callCount === 2);
     });
 
