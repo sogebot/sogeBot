@@ -41,7 +41,7 @@ class Alerts extends Overlay {
 
   @command('!alert')
   @default_permission(permission.CASTERS)
-  public async overlay(opts: CommandOptions) {
+  public async overlay(opts: CommandOptions): Promise<CommandResponse[]> {
     opts.parameters = await new Message(opts.parameters).parse();
 
     let send: {[x: string]: string}[] = [];
@@ -77,6 +77,7 @@ class Alerts extends Overlay {
     }
 
     this.emit('alert', send);
+    return [];
   }
 }
 
