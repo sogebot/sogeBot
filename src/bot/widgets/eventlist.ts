@@ -39,6 +39,11 @@ class EventList extends Widget {
   }
 
   public sockets() {
+    adminEndpoint(this.nsp, 'eventlist::removeById', async (id: string | string[], cb) => {
+      const ids = Array.isArray(id) ? [...id] : [id];
+      await getRepository(EventListDB).delete(ids);
+      cb();
+    });
     adminEndpoint(this.nsp, 'get', async () => {
       this.update();
     });

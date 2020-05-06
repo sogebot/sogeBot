@@ -5,6 +5,7 @@ require('../../general.js');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
+const assert = require('assert');
 
 const Parser = require('../../../dest/parser').default;
 
@@ -27,6 +28,7 @@ describe('Parser - case sensitive commands', async () => {
 
   for (const test of tests) {
     describe(`'${test.test}' expect '${test.expected}'`, async () => {
+      let r;
       before(async () => {
         await db.cleanup();
         await message.prepare();
@@ -36,11 +38,11 @@ describe('Parser - case sensitive commands', async () => {
 
       it(`Run command '${test.test}'`, async () => {
         const parse = new Parser({ sender: owner, message: test.test, skip: false, quiet: false });
-        await parse.process();
+        r = await parse.process();
       });
 
       it(`Expect message '${test.expected}`, async () => {
-        await message.isSentRaw(test.expected, owner);
+        assert(r[0].response, test.expected);
       });
     });
   }

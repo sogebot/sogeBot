@@ -4,6 +4,7 @@ require('../../general.js');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
+const assert = require('assert');
 const _ = require('lodash');
 
 const { getRepository } = require('typeorm');
@@ -26,13 +27,8 @@ describe('Points - get()', () => {
     });
 
     it('points should be returned in safe points bounds', async () => {
-      await points.get({ sender: hugePointsUser, parameters: '' });
-      await message.isSent('points.defaults.pointsResponse', { username: hugePointsUser.username }, {
-        amount: Math.floor(Number.MAX_SAFE_INTEGER),
-        username: hugePointsUser.username,
-        pointsName: await points.getPointsName(Math.floor(Number.MAX_SAFE_INTEGER)),
-        count: 1, order: 1,
-      });
+      const r = await points.get({ sender: hugePointsUser, parameters: '' });
+      assert.strictEqual(r[0].response, '@hugeuser has currently 9007199254740991 points. Your position is 1/1.');
     });
   });
 
@@ -42,13 +38,8 @@ describe('Points - get()', () => {
     });
 
     it('points should be returned in safe points bounds', async () => {
-      await points.get({ sender: tinyPointsUser, parameters: '' });
-      await message.isSent('points.defaults.pointsResponse', { username: tinyPointsUser.username }, {
-        amount: 100,
-        username: tinyPointsUser.username,
-        pointsName: await points.getPointsName(100),
-        count: 2, order: 2,
-      });
+      const r = await points.get({ sender: tinyPointsUser, parameters: '' });
+      assert.strictEqual(r[0].response, '@tinyuser has currently 100 points. Your position is 2/2.');
     });
   });
 
@@ -66,13 +57,8 @@ describe('Points - get()', () => {
 
     for (let i = 1; i <= 10; i++) {
       it(`user${i} should have correct order and position`, async () => {
-        await points.get({ sender: { username: `user${i}`, userId: i }, parameters: '' });
-        await message.isSent('points.defaults.pointsResponse', { username: `user${i}` }, {
-          amount: i * 100,
-          username: `user${i}`,
-          pointsName: await points.getPointsName(i * 100),
-          count: 10, order: 10 - (i - 1),
-        });
+        const r = await points.get({ sender: { username: `user${i}`, userId: i }, parameters: '' });
+        assert.strictEqual(r[0].response, `@user${i} has currently ${i*100} points. Your position is ${11-i}/10.`);
       });
     }
   });

@@ -1,6 +1,6 @@
 import { isMainThread } from '../cluster';
 
-import { getBotSender, getLocalizedName, prepare, round5, sendMessage } from '../commons';
+import { announce, getBotSender, getLocalizedName, prepare, round5 } from '../commons';
 import * as constants from '../constants';
 import { debug } from '../helpers/log';
 import { command, default_permission, settings, shared } from '../decorators';
@@ -9,7 +9,6 @@ import { permission } from '../helpers/permissions';
 import System from './_interface';
 import { getRepository } from 'typeorm';
 import { ScrimMatchId } from '../database/entity/scrimMatchId';
-import oauth from '../oauth';
 import { translate } from '../translate';
 import tmi from '../tmi';
 
@@ -50,7 +49,7 @@ class Scrim extends System {
 
   @command('!snipe')
   @default_permission(permission.CASTERS)
-  public async main(opts: CommandOptions): Promise<void> {
+  public async main(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [isCooldownOnly, type, minutes] = new Expects(opts.parameters)
         .toggler({name: 'c'})
@@ -74,27 +73,25 @@ class Scrim extends System {
 
       this.lastRemindAt = now;
       await getRepository(ScrimMatchId).clear();
-
-      sendMessage(
-        prepare('systems.scrim.countdown', {
-          type,
-          time: minutes,
-          unit: getLocalizedName(minutes, 'core.minutes'),
-        }),
-        getBotSender(),
-      );
+      announce(prepare('systems.scrim.countdown', {
+        type,
+        time: minutes,
+        unit: getLocalizedName(minutes, 'core.minutes'),
+      }));
+      return [];
     } catch (e) {
       if (isNaN(Number(e.message))) {
-        sendMessage('$sender, cmd_error [' + opts.command + ']: ' + e.message, opts.sender, opts.attr);
+        return [{ response: '$sender, cmd_error [' + opts.command + ']: ' + e.message, ...opts }];
       }
     }
+    return [];
   }
 
   @command('!snipe match')
-  public async match(opts: CommandOptions): Promise<void> {
+  public async match(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       if (opts.parameters.length === 0) {
-        this.currentMatches();
+        return this.currentMatches(opts);
       } else {
         const [matchId] = new Expects(opts.parameters).everything({name: 'matchId'}).toArray();
         const scrimMatchId = await getRepository(ScrimMatchId).findOne({ username: opts.sender.username});
@@ -106,26 +103,18 @@ class Scrim extends System {
       }
     } catch (e) {
       if (isNaN(Number(e.message))) {
-        sendMessage('$sender, cmd_error [' + opts.command + ']: ' + e.message, opts.sender, opts.attr);
+        return [{ response: '$sender, cmd_error [' + opts.command + ']: ' + e.message, ...opts }];
       }
     }
+    return [];
   }
 
   @command('!scrim stop')
   @default_permission(permission.CASTERS)
-  public async stop(): Promise<void> {
+  public async stop(opts: CommandOptions): Promise<CommandResponse[]> {
     this.closingAt = 0;
     this.lastRemindAt = Date.now();
-    sendMessage(
-      prepare('systems.scrim.stopped'), {
-        username: oauth.botUsername,
-        displayName: oauth.botUsername,
-        userId: Number(oauth.botId),
-        emotes: [],
-        badges: {},
-        'message-type': 'chat',
-      },
-    );
+    return [{ response: prepare('systems.scrim.stopped'), ...opts }];
   }
 
   private reminder() {
@@ -141,25 +130,21 @@ class Scrim extends System {
       if (minutesToGo > 1) {
         // countdown every minute
         if (lastRemindAtDiffMs >= constants.MINUTE) {
-          sendMessage(
-            prepare('systems.scrim.countdown', {
-              type: this.type,
-              time: minutesToGo.toFixed(),
-              unit: getLocalizedName(minutesToGo.toFixed(), 'core.minutes'),
-            }), getBotSender(),
-          );
+          announce(prepare('systems.scrim.countdown', {
+            type: this.type,
+            time: minutesToGo.toFixed(),
+            unit: getLocalizedName(minutesToGo.toFixed(), 'core.minutes'),
+          }));
           this.lastRemindAt = Date.now();
         }
       } else if (secondsToGo <= 60 && secondsToGo > 0) {
         // countdown every 15s
         if (lastRemindAtDiffMs >= 15 * constants.SECOND) {
-          sendMessage(
-            prepare('systems.scrim.countdown', {
-              type: this.type,
-              time: String(secondsToGo === 60 ? 1 : secondsToGo),
-              unit: secondsToGo === 60 ? getLocalizedName(1, 'core.minutes') : getLocalizedName(secondsToGo, 'core.seconds'),
-            }), getBotSender(),
-          );
+          announce(prepare('systems.scrim.countdown', {
+            type: this.type,
+            time: String(secondsToGo === 60 ? 1 : secondsToGo),
+            unit: secondsToGo === 60 ? getLocalizedName(1, 'core.minutes') : getLocalizedName(secondsToGo, 'core.seconds'),
+          }));
           this.lastRemindAt = Date.now();
         }
       } else {
@@ -169,7 +154,7 @@ class Scrim extends System {
     }
   }
 
-  private async currentMatches() {
+  private async currentMatches(opts: CommandOptions): Promise<CommandResponse[]> {
     const atUsername = tmi.showWithAt;
     const matches: {
       [x: string]: string[];
@@ -183,48 +168,46 @@ class Scrim extends System {
       matches[id].push((atUsername ? '@' : '') + d.username);
     }
     const output: string[] = [];
-    for (const id of Object.keys(matches)) {
-      output.push(id + ' - ' + matches[id].join(', '));
+    for (const id of Object.keys(matches).sort()) {
+      output.push(id + ' - ' + matches[id].sort().join(', '));
     }
-    sendMessage(
-      prepare('systems.scrim.currentMatches', {
+    return [{
+      response: prepare('systems.scrim.currentMatches', {
         matches: output.length === 0 ? '<' + translate('core.empty') + '>' : output.join(' | '),
-      }),
-      getBotSender(),
-    );
+      }), ...opts }];
   }
 
   private countdown() {
     for (let i = 0; i < 4; i++) {
       setTimeout(() => {
         if (i < 3) {
-          sendMessage(
+          announce(
             prepare('systems.scrim.countdown', {
               type: this.type,
               time: (3 - i) + '.',
               unit: '',
-            }),
-            getBotSender(),
-          );
+            }));
         } else {
           this.closingAt = 0;
-          sendMessage(prepare('systems.scrim.go'), getBotSender());
+          announce(prepare('systems.scrim.go'));
           if (!this.isCooldownOnly) {
             setTimeout(() => {
               if (this.closingAt !== 0) {
                 return; // user restarted !snipe
               }
-              sendMessage(
+              announce(
                 prepare('systems.scrim.putMatchIdInChat', {
                   command: this.getCommand('!snipe match'),
-                }),
-                getBotSender(),
+                })
               );
               setTimeout(async () => {
                 if (this.closingAt !== 0) {
                   return; // user restarted !snipe
                 }
-                this.currentMatches();
+                const currentMatches = await this.currentMatches({ sender: getBotSender(), parameters: '', createdAt: Date.now(), command: '', attr: {} });
+                for (const r of currentMatches) {
+                  announce(await r.response);
+                }
               }, this.waitForMatchIdsInSeconds * constants.SECOND);
             }, 15 * constants.SECOND);
           }

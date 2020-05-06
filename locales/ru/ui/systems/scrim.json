@@ -1,0 +1,9 @@
+{
+  "settings": {
+    "enabled": "Статус",
+    "waitForMatchIdsInSeconds": {
+      "title": "Интервал для ввода ID матча в чат",
+      "help": "Продолжительность в секундах"
+    }
+  }
+}

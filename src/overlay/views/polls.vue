@@ -1,16 +1,12 @@
 <template>
 <div style="height: 100%; display: flex;">
-      <pre class="debug" :class="[!urlParam('debug') ? 'hide' : '']">
-currentVote: {{ currentVote }}
-votes: {{ votes }}
-settings: {{ settings }}
-shouldShow: {{settings.display.hideAfterInactivity && currentTime - lastUpdatedAt < settings.display.inactivityTime}}
-inactivityTime: {{currentTime - lastUpdatedAt}}
-      </pre>
+  <div v-if="urlParam('debug')">
+    <json-viewer :value="{currentVote, votes, settings, shouldShow: settings.display.hideAfterInactivity && inactivityTime < settings.display.inactivityTime, inactivityTime }" boxed copyable :expand-depth="10"></json-viewer>
+  </div>
   <transition name="fade">
     <div id="box"
-      v-if="typeof currentVote.title !== 'undefined'"
-      v-show="!settings.display.hideAfterInactivity || (settings.display.hideAfterInactivity && currentTime - lastUpdatedAt < settings.display.inactivityTime)"
+      v-if="currentVote !== null"
+      v-show="!settings.display.hideAfterInactivity || (settings.display.hideAfterInactivity && inactivityTime < settings.display.inactivityTime)"
       :class="[getTheme(settings.display.theme)]"
       style="display: inline-block; width: 100%;"
       :style="{ 'align-self': settings.display.align === 'top' ? 'flex-start' : 'flex-end' }">
@@ -52,6 +48,7 @@ import moment from 'moment'
 import VueMoment from 'vue-moment'
 import momentTimezone from 'moment-timezone'
 import { getSocket } from 'src/panel/helpers/socket';
+import JsonViewer from 'vue-json-viewer'
 
 require('moment/locale/cs')
 require('moment/locale/ru')
@@ -60,10 +57,14 @@ Vue.use(VueMoment, {
     moment, momentTimezone
 })
 
-@Component({})
+@Component({
+  components: {
+    JsonViewer,
+  },
+})
 export default class PollsOverlay extends Vue {
   socket = getSocket('/overlays/polls', true);
-  currentVote: any = {};
+  currentVote: any = null;
   votes: any[] = [];
   lastUpdatedAt = 0;
   currentTime = 0;
@@ -93,6 +94,10 @@ export default class PollsOverlay extends Vue {
     this.socket.emit('getVoteCommand', (cmd) => this.voteCommand = cmd)
   }
 
+  get inactivityTime() {
+    return this.currentTime - this.lastUpdatedAt;
+  }
+
   get activeTime () {
     return this.currentTime - (new Date(this.currentVote.openedAt)).getTime()
   }
@@ -106,7 +111,7 @@ export default class PollsOverlay extends Vue {
 
   @Watch('votes')
   votesWatcher (val, old) {
-    if (typeof this.currentVote.options !== 'undefined') {
+    if (this.currentVote && this.currentVote.options !== 'undefined') {
       for (let idx of Object.keys(this.currentVote.options)) {
         let count = 0
         let cachedCount = 0
@@ -135,7 +140,9 @@ export default class PollsOverlay extends Vue {
   refresh () {
     this.socket.emit('data', (cb, votes, settings) => {
       // force show if new vote
-      if (typeof this.currentVote.title === 'undefined') this.lastUpdatedAt = Date.now()
+      if (this.currentVote === null) {
+        this.lastUpdatedAt = Date.now()
+      }
       this.votes = votes
       this.currentVote = cb
       this.settings = settings
@@ -154,14 +161,6 @@ export default class PollsOverlay extends Vue {
 <style scoped>
   @import url('https://fonts.googleapis.com/css?family=Barlow');
   @import url('https://fonts.googleapis.com/css?family=Barlow+Condensed');
-
-  .debug {
-    z-index: 9999;
-    background-color: rgba(0, 0, 0, 0.5);
-    position: absolute;
-    color: white;
-    padding: 1rem;
-  }
 
   .hide {
     display: none;

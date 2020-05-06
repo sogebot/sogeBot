@@ -1,11 +1,10 @@
 /* global describe it before */
 const commons = require('../../../dest/commons');
-
+const assert = require('assert');
 
 require('../../general.js');
 
 const db = require('../../general.js').db;
-const variable = require('../../general.js').variable;
 const message = require('../../general.js').message;
 
 const scrim = (require('../../../dest/systems/scrim')).default;
@@ -101,10 +100,8 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Check match list by command', async () => {
-      scrim.match({ sender: { username: 'test' }, parameters: '' });
-      await message.isSent('systems.scrim.currentMatches', commons.getBot(), {
-        matches: '<' + translate('core.empty') + '>',
-      }, 19000);
+      const r = await scrim.match({ sender: { username: 'test' }, parameters: '' });
+      assert.strictEqual(r[0].response, 'Current Matches: <empty>');
     });
   });
 
@@ -193,10 +190,8 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Check match list by command', async () => {
-      scrim.match({ sender: { username: 'test' }, parameters: '' });
-      await message.isSent('systems.scrim.currentMatches', commons.getBot(), {
-        matches: '<' + translate('core.empty') + '>',
-      }, 19000);
+      const r = await scrim.match({ sender: { username: 'test' }, parameters: '' });
+      assert.strictEqual(r[0].response, 'Current Matches: <empty>');
     });
   });
 
@@ -296,38 +291,13 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting populated message list', async () => {
-      await message.isSent('systems.scrim.currentMatches', commons.getBot(), [
-        { matches: 'ABC - @user1, @user2, @user3 | ABD - @user4' },
-        { matches: 'ABC - @user1, @user3, @user2 | ABD - @user4' },
-        { matches: 'ABC - @user2, @user1, @user3 | ABD - @user4' },
-        { matches: 'ABC - @user3, @user1, @user2 | ABD - @user4' },
-        { matches: 'ABC - @user3, @user2, @user1 | ABD - @user4' },
-        { matches: 'ABC - @user2, @user3, @user1 | ABD - @user4' },
-        { matches: 'ABD - @user4 | ABC - @user1, @user2, @user3' },
-        { matches: 'ABD - @user4 | ABC - @user1, @user3, @user2' },
-        { matches: 'ABD - @user4 | ABC - @user2, @user1, @user3' },
-        { matches: 'ABD - @user4 | ABC - @user3, @user1, @user2' },
-        { matches: 'ABD - @user4 | ABC - @user3, @user2, @user1' },
-        { matches: 'ABD - @user4 | ABC - @user2, @user3, @user1' },
-      ], 19000);
+      await message.isSent('systems.scrim.currentMatches', commons.getBot(),
+        { matches: 'ABC - @user1, @user2, @user3 | ABD - @user4' }, 19000);
     });
 
     it('Check match list by command', async () => {
-      scrim.match({ sender: { username: 'test' }, parameters: '' });
-      await message.isSent('systems.scrim.currentMatches', commons.getBot(), [
-        { matches: 'ABC - @user1, @user2, @user3 | ABD - @user4' },
-        { matches: 'ABC - @user1, @user3, @user2 | ABD - @user4' },
-        { matches: 'ABC - @user2, @user1, @user3 | ABD - @user4' },
-        { matches: 'ABC - @user3, @user1, @user2 | ABD - @user4' },
-        { matches: 'ABC - @user3, @user2, @user1 | ABD - @user4' },
-        { matches: 'ABC - @user2, @user3, @user1 | ABD - @user4' },
-        { matches: 'ABD - @user4 | ABC - @user1, @user2, @user3' },
-        { matches: 'ABD - @user4 | ABC - @user1, @user3, @user2' },
-        { matches: 'ABD - @user4 | ABC - @user2, @user1, @user3' },
-        { matches: 'ABD - @user4 | ABC - @user3, @user1, @user2' },
-        { matches: 'ABD - @user4 | ABC - @user3, @user2, @user1' },
-        { matches: 'ABD - @user4 | ABC - @user2, @user3, @user1' },
-      ], 19000);
+      const r = await scrim.match({ sender: { username: 'test' }, parameters: '' });
+      assert.strictEqual(r[0].response, 'Current Matches: ABC - @user1, @user2, @user3 | ABD - @user4');
     });
   });
 });

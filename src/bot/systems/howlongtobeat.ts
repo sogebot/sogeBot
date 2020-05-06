@@ -6,7 +6,7 @@ import { command, default_permission } from '../decorators';
 import { permission } from '../helpers/permissions';
 import { HowLongToBeatService /*, HowLongToBeatEntry */ } from 'howlongtobeat';
 import Expects from '../expects';
-import { prepare, sendMessage } from '../commons';
+import { prepare } from '../commons';
 
 import { getRepository } from 'typeorm';
 import { HowLongToBeatGame, HowLongToBeatGameInterface } from '../database/entity/howLongToBeatGame';
@@ -107,28 +107,26 @@ class HowLongToBeat extends System {
 
   @command('!hltb')
   @default_permission(permission.CASTERS)
-  async currentGameInfo(opts: CommandOptions, retry = false) {
-    let [game] = new Expects(opts.parameters)
+  async currentGameInfo(opts: CommandOptions, retry = false): Promise<CommandResponse[]> {
+    let [gameInput] = new Expects(opts.parameters)
       .everything({ optional: true })
       .toArray();
 
-    if (!game) {
+    if (!gameInput) {
       if (!api.stats.currentGame) {
-        return; // skip if we don't have game
+        return []; // skip if we don't have game
       } else {
-        game = api.stats.currentGame;
+        gameInput = api.stats.currentGame;
       }
     }
-    const gameToShow = await getRepository(HowLongToBeatGame).findOne({ where: { game } });
+    const gameToShow = await getRepository(HowLongToBeatGame).findOne({ where: { game: gameInput } });
     if (!gameToShow && !retry) {
       if (!api.stats.currentGame) {
-        this.currentGameInfo(opts, true);
-        return; // skip if we don't have game
+        return this.currentGameInfo(opts, true);
       }
 
       if (api.stats.currentGame.trim().length === 0 || api.stats.currentGame.trim() === 'IRL') {
-        this.currentGameInfo(opts, true);
-        return; // skip if we have empty game
+        return this.currentGameInfo(opts, true);
       }
       const gamesFromHltb = await this.hltbService.search(api.stats.currentGame);
       const gameFromHltb = gamesFromHltb.length > 0 ? gamesFromHltb[0] : null;
@@ -147,11 +145,9 @@ class HowLongToBeat extends System {
         // save only if we have numbers from hltb (possible MP game)
         await getRepository(HowLongToBeatGame).save(game);
       }
-      this.currentGameInfo(opts, true);
-      return;
+      return this.currentGameInfo(opts, true);
     } else if (!gameToShow) {
-      await sendMessage(prepare('systems.howlongtobeat.error', { game }), opts.sender, opts.attr);
-      return;
+      return [{ response: prepare('systems.howlongtobeat.error', { game: gameInput }), ...opts }];
     }
     const timeToBeatMain = gameToShow.timeToBeatMain / constants.HOUR;
     const timeToBeatCompletionist = gameToShow.timeToBeatCompletionist / constants.HOUR;
@@ -159,14 +155,15 @@ class HowLongToBeat extends System {
     const gameplayCompletionist = gameToShow.gameplayCompletionist;
     const finishedMain = gameToShow.isFinishedMain;
     const finishedCompletionist = gameToShow.isFinishedCompletionist;
-    await sendMessage(
-      prepare('systems.howlongtobeat.game', {
-        game, hltbMain: gameplayMain, hltbCompletionist: gameplayCompletionist, currentMain: timeToBeatMain.toFixed(1), currentCompletionist: timeToBeatCompletionist.toFixed(1),
+    return [{
+      response: prepare('systems.howlongtobeat.game', {
+        game: gameInput, hltbMain: gameplayMain, hltbCompletionist: gameplayCompletionist, currentMain: timeToBeatMain.toFixed(1), currentCompletionist: timeToBeatCompletionist.toFixed(1),
         percentMain: Number((timeToBeatMain / gameplayMain) * 100).toFixed(2),
         percentCompletionist: Number((timeToBeatCompletionist / gameplayCompletionist) * 100).toFixed(2),
-        doneMain: finishedMain ? await prepare('systems.howlongtobeat.done') : '',
-        doneCompletionist: finishedCompletionist ? await prepare('systems.howlongtobeat.done') : '',
-      }), opts.sender, opts.attr);
+        doneMain: finishedMain ? prepare('systems.howlongtobeat.done') : '',
+        doneCompletionist: finishedCompletionist ? prepare('systems.howlongtobeat.done') : '',
+      }), ...opts,
+    }];
   }
 }
 

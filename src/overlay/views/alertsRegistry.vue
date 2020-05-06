@@ -374,6 +374,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
               const messageTemplate = get(alert, 'messageTemplate', '')
                 .replace(/\{name\}/g, '{name:highlight}')
+                .replace(/\{recipient\}/g, '{recipient:highlight}')
                 .replace(/\{amount\}/g, '{amount:highlight}')
                 .replace(/\{monthsName\}/g, '{monthsName:highlight}')
                 .replace(/\{currency\}/g, '{currency:highlight}')
@@ -382,10 +383,12 @@ export default class AlertsRegistryOverlays extends Vue {
                   .replace(/\{message\}/g, emitData.message)
                   .replace(/\{messageTemplate\}/g, messageTemplate)
                   .replace(/\{name\}/g, emitData.name)
+                  .replace(/\{recipient\}/g, emitData.recipient || '')
                   .replace(/\{amount\}/g, String(emitData.amount))
                   .replace(/\{monthsName\}/g, emitData.monthsName)
                   .replace(/\{currency\}/g, emitData.currency)
                   .replace(/\{name:highlight\}/g, `<v-runtime-template :template="prepareMessageTemplate('{name:highlight}')"></v-runtime-template>`)
+                  .replace(/\{recipient:highlight\}/g, `<v-runtime-template :template="prepareMessageTemplate('{recipient:highlight}')"></v-runtime-template>`)
                   .replace(/\{amount:highlight\}/g, `<v-runtime-template :template="prepareMessageTemplate('{amount:highlight}')"></v-runtime-template>`)
                   .replace(/\{monthsName:highlight\}/g, `<v-runtime-template :template="prepareMessageTemplate('{monthsName:highlight}')"></v-runtime-template>`)
                   .replace(/\{currency:highlight\}/g, `<v-runtime-template :template="prepareMessageTemplate('{currency:highlight}')"></v-runtime-template>`)
@@ -436,6 +439,7 @@ export default class AlertsRegistryOverlays extends Vue {
               // we need to add :highlight to name, amount, monthName, currency by default
               alert.messageTemplate = alert.messageTemplate
                 .replace(/\{name\}/g, '{name:highlight}')
+                .replace(/\{recipient\}/g, '{recipient:highlight}')
                 .replace(/\{amount\}/g, '{amount:highlight}')
                 .replace(/\{monthName\}/g, '{monthName:highlight}')
                 .replace(/\{currency\}/g, '{currency:highlight}');
@@ -594,6 +598,13 @@ export default class AlertsRegistryOverlays extends Vue {
           return char;
         }
       })
+      let recipient: string | string[] = (this.runningAlert.recipient || '').split('').map((char, index) => {
+        if (this.runningAlert !== null) {
+          return `<div class="animated infinite ${this.runningAlert.alert.animationText} ${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font.highlightcolor}; display: inline-block;">${char}</div>`;
+        } else {
+          return char;
+        }
+      })
 
       let amount: string | string[] = String(this.runningAlert.amount).split('').map((char, index) => {
         if (this.runningAlert !== null) {
@@ -628,17 +639,20 @@ export default class AlertsRegistryOverlays extends Vue {
           maxTimeToDecrypt = 0;
         }
         name = `<baffle :text="this.runningAlert.name" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`
+        recipient = `<baffle :text="this.runningAlert.recipient" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`
         amount = `<baffle :text="this.runningAlert.amount" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`
         currency = `<baffle :text="this.runningAlert.currency" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`
         monthsName = `<baffle :text="this.runningAlert.monthsName" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`
       } else {
         name = name.join('');
+        recipient = recipient.join('');
         amount = amount.join('');
         currency = currency.join('');
         monthsName = monthsName.join('');
       }
       msg = msg
         .replace(/\{name:highlight\}/g, name)
+        .replace(/\{recipient:highlight\}/g, recipient)
         .replace(/\{amount:highlight\}/g, amount)
         .replace(/\{currency:highlight\}/g, currency)
         .replace(/\{monthsName:highlight\}/g, monthsName)

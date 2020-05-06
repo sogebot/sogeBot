@@ -36,8 +36,8 @@ describe('Keywords - listing', () => {
     });
 
     it('Expecting empty list', async () => {
-      await keywords.list({ sender: owner, parameters: '' });
-      await message.isSent('keywords.list-is-empty', owner);
+      const r = await keywords.list({ sender: owner, parameters: '' });
+      assert.strictEqual(r[0].response, '$sender, list of keywords is empty');
     });
   });
 
@@ -49,25 +49,34 @@ describe('Keywords - listing', () => {
 
     for(const k of keywordsList) {
       it (`Creating random keyword | ${k.keyword} | ${k.response}`, async () => {
-        const keyword = await keywords.add({ sender: owner, parameters: `-k ${k.keyword} -r ${k.response}` });
-        k.id = keyword.id;
-        assert.notStrictEqual(k, null);
+        const r = await keywords.add({ sender: owner, parameters: `-k ${k.keyword} -r ${k.response}` });
+        const keyword = await getRepository(Keyword).findOne({ keyword: k.keyword });
+        assert.strictEqual(r[0].response, `$sender, keyword ${k.keyword} (${keyword.id}) was added`);
         await getRepository(Keyword).update({ id: keyword.id }, { enabled: k.enabled });
       });
     }
 
-    it('Trigger list command', async () => {
-      await keywords.list({ sender: owner, parameters: '' });
-    })
+    it('Expected populated list', async () => {
+      const r = await keywords.list({ sender: owner, parameters: '' });
+      assert.strictEqual(r[0].response, '$sender, list of keywords');
 
-    it('List not empty', async () => {
-      await message.isSent('keywords.list-is-not-empty', owner);
-    })
+      let i = 0;
+      for(const k of keywordsList.sort((a, b) => {
+        const nameA = a.keyword.toUpperCase(); // ignore upper and lowercase
+        const nameB = b.keyword.toUpperCase(); // ignore upper and lowercase
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
 
-    for(const k of keywordsList) {
-      it(`List populated by ${k.keyword} | ${k.response}`, async () => {
-        await message.isSentRaw(`${k.enabled ? '🗹' : '☐'} ${k.id} | ${k.keyword} | ${k.response}`, owner, 5000);
-      });
-    }
+        // names must be equal
+        return 0;
+      })) {
+        const keyword = await getRepository(Keyword).findOne({ keyword: k.keyword });
+        assert.strictEqual(r[++i].response, `${k.enabled ? '🗹' : '☐'} ${keyword.id} | ${k.keyword} | ${k.response}`, JSON.stringify({k, r, i}, undefined, 2));
+      };
+    });
   });
 });

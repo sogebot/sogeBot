@@ -1,0 +1,7 @@
+{
+  "settings": {
+    "cClipsVolume": "Громкость",
+    "cClipsFilter": "Фильтр клипа",
+    "cClipsLabel": "Показать метку 'clip'"
+  }
+}

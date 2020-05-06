@@ -6,6 +6,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 
+const assert = require('assert');
 const userinfo = (require('../../../dest/systems/userinfo')).default;
 
 describe('Userinfo - stats()', () => {
@@ -22,12 +23,12 @@ describe('Userinfo - stats()', () => {
   const bits = '0';
 
   it('!stats testuser should show testuser data', async () => {
-    await userinfo.showStats({ parameters: user.viewer.username, sender: user.owner });
-    await message.isSentRaw(`@${user.viewer.username} | ${hours}h | ${points} points | ${messages} messages | ${tips}€ | ${bits} bits`, user.owner, 1000);
+    const r = await userinfo.showStats({ parameters: user.viewer.username, sender: user.owner });
+    assert.strictEqual(r[0].response, `$touser | ${hours}h | ${points} points | ${messages} messages | ${tips}€ | ${bits} bits`, user.owner, 1000);
   });
 
   it('!stats should show owner data', async () => {
-    await userinfo.showStats({ parameters: '', sender: user.owner });
-    await message.isSentRaw(`@${user.owner.username} | ${hours}h | ${points} points | ${messages} messages | ${tips}€ | ${bits} bits`, user.owner, 1000);
+    const r = await userinfo.showStats({ parameters: '', sender: user.owner });
+    assert.strictEqual(r[0].response, `$sender | ${hours}h | ${points} points | ${messages} messages | ${tips}€ | ${bits} bits`, user.owner, 1000);
   });
 });

@@ -86,7 +86,7 @@ export const Variable = new EntitySchema<Readonly<Required<VariableInterface>>>(
 });
 
 export interface VariableHistoryInterface {
-  id?: string; variable?: VariableInterface;
+  id?: string; variable?: VariableInterface; variableId: string | null;
   userId: number; username: string;
   currentValue: string; oldValue: any; changedAt: number;
 }
@@ -118,6 +118,9 @@ export const VariableHistory = new EntitySchema<Readonly<VariableHistoryInterfac
       transformer: new ColumnNumericTransformer(),
       default: 0,
     },
+    variableId: {
+      type: String, nullable: true, name: 'variableId', length: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'sqlite') ? 36 : undefined,
+    },
   },
   relations: {
     variable: {
@@ -126,12 +129,14 @@ export const VariableHistory = new EntitySchema<Readonly<VariableHistoryInterfac
       inverseSide: 'history',
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
+      joinColumn: { name: 'variableId' },
+
     },
   },
 });
 
 export interface VariableURLInterface {
-  id: string; GET: boolean; POST: boolean; showResponse: boolean; variable: VariableInterface;
+  id: string; GET: boolean; POST: boolean; showResponse: boolean; variable: VariableInterface; variableId: string | null;
 }
 
 export const VariableURL = new EntitySchema<Readonly<VariableURLInterface>>({
@@ -154,6 +159,9 @@ export const VariableURL = new EntitySchema<Readonly<VariableURLInterface>>({
       type: Boolean,
       default: false,
     },
+    variableId: {
+      type: String, nullable: true, name: 'variableId', length: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'sqlite') ? 36 : undefined,
+    },
   },
   relations: {
     variable: {
@@ -162,6 +170,7 @@ export const VariableURL = new EntitySchema<Readonly<VariableURLInterface>>({
       inverseSide: 'urls',
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
+      joinColumn: { name: 'variableId' },
     },
   },
 });
@@ -179,7 +188,7 @@ export const VariableWatch = new EntitySchema<Readonly<VariableWatchInterface>>(
       generated: 'rowid',
     },
     variableId: {
-      type: String,
+      type: String, nullable: false, name: 'variableId',
     },
     order: {
       type: Number,

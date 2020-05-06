@@ -1,0 +1,11 @@
+{
+  "time": "Топ $amount (время просмотра): ",
+  "tips": "Топ $amount (донат): ",
+  "points": "Топ $amount (поинты): ",
+  "messages": "Топ $amount (сообщения): ",
+  "followage": "Топ $amount (время подписки): ",
+  "subage": "Топ $amount (время сабскрайба): ",
+  "submonths": "Топ $amount (общее время сабскрайба): ",
+  "bits": "Топ $amount (битсы): ",
+  "gifts": "Топ $amount (сабгифты): "
+}

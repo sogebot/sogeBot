@@ -4,7 +4,7 @@ require('../../general.js');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
-const _ = require('lodash');
+const assert = require('assert');
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
@@ -38,109 +38,58 @@ describe('Points - online()', () => {
     });
 
     it('!points get should return 0 for owner', async () => {
-      await points.get({ sender: owner, parameters: '' });
-      await message.isSent('points.defaults.pointsResponse', owner, {
-        order: 2, count: 3,
-        amount: Math.floor(0),
-        username: owner.username,
-        pointsName: await points.getPointsName(Math.floor(0)),
-      });
+      const r = await points.get({ sender: owner, parameters: '' });
+      assert.strictEqual(r[0].response, `@soge__ has currently 0 points. Your position is 2/3.`);
     });
 
     it('!points get should return 100 for user1', async () => {
-      await points.get({ sender: user1, parameters: '' });
-      await message.isSent('points.defaults.pointsResponse', user1, {
-        order: 1, count: 3,
-        amount: Math.floor(100),
-        username: user1.username,
-        pointsName: await points.getPointsName(Math.floor(100)),
-      });
+      const r = await points.get({ sender: user1, parameters: '' });
+      assert.strictEqual(r[0].response, `@user1 has currently 100 points. Your position is 1/3.`);
     });
 
     it('!points get should return 0 for user2', async () => {
-      await points.get({ sender: user2, parameters: '' });
-      await message.isSent('points.defaults.pointsResponse', user2, {
-        order: 2, count: 3,
-        amount: Math.floor(0),
-        username: user2.username,
-        pointsName: await points.getPointsName(Math.floor(0)),
-      });
+      const r = await points.get({ sender: user2, parameters: '' });
+      assert.strictEqual(r[0].response, `@user2 has currently 0 points. Your position is 2/3.`);
     });
 
     it('!points all 100', async () => {
-      await points.all({ sender: owner, parameters: '100' });
-      await message.isSent('points.success.all.positive', { username: owner.username }, {
-        amount: Math.floor(100),
-        pointsName: await points.getPointsName(Math.floor(100)),
-      });
+      const r = await points.all({ sender: owner, parameters: '100' });
+      assert.strictEqual(r[0].response, `All users just received 100 points!`);
     });
 
     it('!points get should return 100 for owner', async () => {
-      await points.get({ sender: owner, parameters: '' });
-      await message.isSent('points.defaults.pointsResponse', owner, {
-        order: 2, count: 3,
-        amount: Math.floor(100),
-        username: owner.username,
-        pointsName: await points.getPointsName(Math.floor(100)),
-      });
+      const r = await points.get({ sender: owner, parameters: '' });
+      assert.strictEqual(r[0].response, `@soge__ has currently 100 points. Your position is 2/3.`);
     });
 
     it('!points get should return 200 for user1', async () => {
-      await points.get({ sender: user1, parameters: '' });
-      await message.isSent('points.defaults.pointsResponse', user1, {
-        order: 1, count: 3,
-        amount: Math.floor(100),
-        username: user1.username,
-        pointsName: await points.getPointsName(Math.floor(100)),
-      });
+      const r = await points.get({ sender: user1, parameters: '' });
+      assert.strictEqual(r[0].response, `@user1 has currently 200 points. Your position is 1/3.`);
     });
 
     it('!points get should return 100 for user2', async () => {
-      await points.get({ sender: user2, parameters: '' });
-      await message.isSent('points.defaults.pointsResponse', user2, {
-        order: 2, count: 3,
-        amount: Math.floor(100),
-        username: user2.username,
-        pointsName: await points.getPointsName(Math.floor(100)),
-      });
+      const r = await points.get({ sender: user2, parameters: '' });
+      assert.strictEqual(r[0].response, `@user2 has currently 100 points. Your position is 2/3.`);
     });
 
     it('!points all -150', async () => {
-      await points.all({ sender: owner, parameters: '-150' });
-      await message.isSent('points.success.all.negative', { username: owner.username }, {
-        amount: Math.floor(-150),
-        pointsName: await points.getPointsName(Math.floor(100)),
-      });
+      const r = await points.all({ sender: owner, parameters: '-150' });
+      assert.strictEqual(r[0].response, `All users just lost -150 points!`);
     });
 
     it('!points get should return 0 for owner', async () => {
-      await points.get({ sender: owner, parameters: '' });
-      await message.isSent('points.defaults.pointsResponse', owner, {
-        order: 2, count: 3,
-        amount: Math.floor(0),
-        username: owner.username,
-        pointsName: await points.getPointsName(Math.floor(0)),
-      });
+      const r = await points.get({ sender: owner, parameters: '' });
+      assert.strictEqual(r[0].response, `@soge__ has currently 0 points. Your position is 2/3.`);
     });
 
     it('!points get should return 50 for user1', async () => {
-      await points.get({ sender: user1, parameters: '' });
-      await message.isSent('points.defaults.pointsResponse', user1, {
-        order: 1, count: 3,
-        amount: Math.floor(50),
-        username: user1.username,
-        pointsName: await points.getPointsName(Math.floor(50)),
-      });
+      const r = await points.get({ sender: user1, parameters: '' });
+      assert.strictEqual(r[0].response, `@user1 has currently 50 points. Your position is 1/3.`);
     });
 
     it('!points get should return 0 for user2', async () => {
-      await points.get({ sender: user2, parameters: '' });
-      await message.isSent('points.defaults.pointsResponse', user2, {
-        order: 2, count: 3,
-        amount: Math.floor(0),
-        username: user2.username,
-        pointsName: await points.getPointsName(Math.floor(0)),
-      });
+      const r = await points.get({ sender: user2, parameters: '' });
+      assert.strictEqual(r[0].response, `@user2 has currently 0 points. Your position is 2/3.`);
     });
   });
 });

@@ -35,24 +35,25 @@ describe('Quotes - set()', () => {
         await db.cleanup();
         await message.prepare();
         const quote = await quotes.add({ sender: test.sender, parameters: '-tags lorem ipsum -quote Lorem Ipsum', command: '!quote add' });
-        id = quote.id;
+        id = quote[0].id;
         if (test.id === 1) {
           test.id = id;
         }
         test.parameters = test.parameters.replace('$id', id);
       });
 
+      let responses = '';
       it('Run !quote set', async () => {
-        quotes.set({ sender: test.sender, parameters: test.parameters, command: '!quote set' });
+        responses = await quotes.set({ sender: test.sender, parameters: test.parameters, command: '!quote set' });
       });
       if (test.shouldFail) {
         it('Should throw error', async () => {
-          await message.isSent('systems.quotes.set.error.no-parameters', owner, { command: '!quote set' });
+          assert.strictEqual(responses[0].response, '$sender, !quote set is missing -id or -tag.');
         });
       } else {
         if (test.exist) {
           it('Should sent success message', async () => {
-            await message.isSent('systems.quotes.set.ok', owner, { id: test.id, tags: test.tags });
+            assert.strictEqual(responses[0].response, `$sender, quote ${id} tags were set. (tags: ${test.tags})`);
           });
           it('Tags should be changed', async () => {
             const item = await getManager()
@@ -65,7 +66,7 @@ describe('Quotes - set()', () => {
           });
         } else {
           it('Should sent not-found message', async () => {
-            await message.isSent('systems.quotes.set.error.not-found-by-id', owner, { id: test.id });
+            assert.strictEqual(responses[0].response, `$sender, quote ${test.id} was not found.`);
           });
           it('Quote should not be created', async () => {
             const item = await getManager()

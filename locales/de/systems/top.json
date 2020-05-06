@@ -1,0 +1,11 @@
+{
+  "time": "Top $amount (watch time): ",
+  "tips": "Top $amount (Spenden): ",
+  "points": "Top $amount (Punkte): ",
+  "messages": "Top $amount (Nachrichten): ",
+  "followage": "Top $amount (followage): ",
+  "subage": "Top $amount (Sub Alter): ",
+  "submonths": "Top $amount (Sub Monate): ",
+  "bits": "Top $amount (Bits): ",
+  "gifts": "Top $amount (SubGifts): "
+}

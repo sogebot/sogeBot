@@ -32,6 +32,8 @@
                     fa(icon="dollar-sign")
               template(v-if="!popout")
                 b-dropdown-divider
+                b-dropdown-item(@click="state.editation = $state.progress")
+                  | Edit events
                 b-dropdown-item(target="_blank" href="/popout/#eventlist")
                   | Popout
                 b-dropdown-divider
@@ -44,37 +46,44 @@
             fa(:icon='["far", "calendar"]' fixed-width)
           b-card-text
             loading(v-if="state.loading === $state.progress")
-            b-list-group(v-else)
-              b-list-group-item(
-                @mouseover="isHovered = event.id"
-                @mouseleave="isHovered = ''"
-                v-for="(event, index) of fEvents"
-                :key="index"
-                style="border-left: 0; border-right: 0; padding: 0.2rem 1.25rem 0.4rem 1.25rem"
-              )
-                i(:title="moment(event.timestamp).format('LLLL')").eventlist-text
-                  | {{moment(event.timestamp).fromNow()}}
-                div(:style="{'font-size': eventlistSize + 'px'}").eventlist-username
-                  div.d-flex
-                    div.w-100
-                      span(:title="event.username" style="z-index: 9") {{event.username}}
-                      span(v-html="prepareMessage(event)").pl-1
-                    div(style="flex-shrink: 15;")
-                      span(v-if="isHovered !== event.id")
-                        fa(v-if="event.event === 'follow'" icon="heart" :class="[`icon-${event.event}`, 'icon']")
-                        fa(v-if="event.event === 'host'" icon="tv" :class="[`icon-${event.event}`, 'icon']")
-                        fa(v-if="event.event === 'raid'" icon="random" :class="[`icon-${event.event}`, 'icon']")
-                        fa(v-if="event.event === 'sub'" icon="star" :class="[`icon-${event.event}`, 'icon']")
-                        fa(v-if="event.event === 'subgift'" icon="gift" :class="[`icon-${event.event}`, 'icon']")
-                        fa(v-if="event.event === 'subcommunitygift'" icon="box-open" :class="[`icon-${event.event}`, 'icon']")
-                        font-awesome-layers(v-if="event.event === 'resub'" :class="[`icon-${event.event}`, 'icon']")
-                          fa(icon="star-half")
-                          fa(icon="long-arrow-alt-right")
-                        fa(v-if="event.event === 'cheer'" icon="gem" :class="[`icon-${event.event}`, 'icon']")
-                        fa(v-if="event.event === 'tip'" icon="dollar-sign" :class="[`icon-${event.event}`, 'icon']")
-                      span(v-else)
-                        fa(icon="redo-alt" :class="['icon']" @click="resendAlert(event.id)").pointer
-
+            template(v-else)
+              div(v-if="state.editation === $state.progress").text-right
+                b-button(variant="danger" @click="removeSelected" :disabled="selected.length === 0")
+                  fa(icon="trash-alt")
+                b-button(variant="primary" @click="editationDone")
+                  | Done
+              b-list-group
+                b-list-group-item(
+                  @mouseover="isHovered = event.id"
+                  @mouseleave="isHovered = ''"
+                  v-for="(event, index) of fEvents"
+                  :key="index"
+                  :active="selected.includes(event.id)"
+                  style="cursor: pointer; border-left: 0; border-right: 0; padding: 0.2rem 1.25rem 0.4rem 1.25rem"
+                  @click="state.editation !== $state.idle ? toggleSelected(event) : null"
+                )
+                  i(:title="moment(event.timestamp).format('LLLL')").eventlist-text
+                    | {{moment(event.timestamp).fromNow()}}
+                  div(:style="{'font-size': eventlistSize + 'px'}").eventlist-username
+                    div.d-flex
+                      div.w-100
+                        span(:title="event.username" style="z-index: 9") {{event.username}}
+                        span(v-html="prepareMessage(event)").pl-1
+                      div(style="flex-shrink: 15;")
+                        span(v-if="isHovered !== event.id || state.editation !== $state.idle")
+                          fa(v-if="event.event === 'follow'" icon="heart" :class="[`icon-${event.event}`, 'icon']")
+                          fa(v-if="event.event === 'host'" icon="tv" :class="[`icon-${event.event}`, 'icon']")
+                          fa(v-if="event.event === 'raid'" icon="random" :class="[`icon-${event.event}`, 'icon']")
+                          fa(v-if="event.event === 'sub'" icon="star" :class="[`icon-${event.event}`, 'icon']")
+                          fa(v-if="event.event === 'subgift'" icon="gift" :class="[`icon-${event.event}`, 'icon']")
+                          fa(v-if="event.event === 'subcommunitygift'" icon="box-open" :class="[`icon-${event.event}`, 'icon']")
+                          font-awesome-layers(v-if="event.event === 'resub'" :class="[`icon-${event.event}`, 'icon']")
+                            fa(icon="star-half")
+                            fa(icon="long-arrow-alt-right")
+                          fa(v-if="event.event === 'cheer'" icon="gem" :class="[`icon-${event.event}`, 'icon']")
+                          fa(v-if="event.event === 'tip'" icon="dollar-sign" :class="[`icon-${event.event}`, 'icon']")
+                        span(v-else)
+                          fa(icon="redo-alt" :class="['icon']" @click="resendAlert(event.id)").pointer
         b-tab
           template(v-slot:title)
             fa(icon="cog" fixed-width)
@@ -137,6 +146,7 @@ export default {
         widgetEventlistTips: true,
       },
       state: {
+        editation: this.$state.idle,
         loading: this.$state.progress,
       },
       update: String(new Date()),
@@ -145,6 +155,7 @@ export default {
       eventlistSize: 0,
       eventlistMessageSize: 0,
       interval: [],
+      selected: [],
     }
   },
   beforeDestroy: function() {
@@ -199,6 +210,9 @@ export default {
     }
   },
   watch: {
+    'state.editation': function (val) {
+      this.selected = []
+    },
     eventlistSize: debounce(function (value, old) {
       if (Number.isNaN(Number(value))) this.eventlistSize = old
       else {
@@ -225,6 +239,22 @@ export default {
     }
   },
   methods: {
+    removeSelected() {
+      this.socket.emit('eventlist::removeById', this.selected, () => {});
+      this.events = this.events.filter(o => !this.selected.includes(o.id))
+      this.selected = [];
+    },
+    editationDone() {
+      this.state.editation = this.$state.idle;
+      this.selected = [];
+    },
+    toggleSelected(item) {
+      if(this.selected.find(o => o === item.id)) {
+        this.selected = this.selected.filter(o => o !== item.id);
+      } else {
+        this.selected.push(item.id);
+      }
+    },
     resendAlert(id) {
       console.log(`resendAlert => ${id}`);
       this.socket.emit('resend', id);

@@ -5,7 +5,7 @@ import _ from 'lodash';
 import SpotifyWebApi from 'spotify-web-api-node';
 import { isMainThread } from '../cluster';
 
-import { prepare, sendMessage } from '../commons';
+import { prepare } from '../commons';
 import { command, default_permission, settings, shared, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import Expects from '../expects';
@@ -14,6 +14,7 @@ import { debug, error, info, warning } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import api from '../api';
 import { addUIError } from '../panel';
+import { HOUR } from '../constants';
 
 import fs from 'fs';
 
@@ -28,7 +29,7 @@ import fs from 'fs';
 let _spotify: any = null;
 
 class Spotify extends Integration {
-  client: any = null;
+  client: null | SpotifyWebApi = null;
   retry: { IRefreshToken: number } = { IRefreshToken: 0 };
   uris: {
     uri: string;
@@ -135,12 +136,16 @@ class Spotify extends Integration {
 
   @command('!spotify skip')
   @default_permission(null)
-  cSkipSong(opts) {
+  cSkipSong() {
     this.skipToNextSong = true;
   }
 
   async playNextSongFromRequest() {
     try {
+      if (!this.client) {
+        throw new Error('you are not connected to spotify API, authorize your user.');
+      }
+
       const uri =  this.uris.shift();
       if (typeof uri === 'undefined') {
         throw new Error('URIs are empty');
@@ -150,7 +155,7 @@ class Spotify extends Integration {
         method: 'put',
         url: 'https://api.spotify.com/v1/me/player/play',
         headers: {
-          'Authorization': 'Bearer ' + this._accessToken,
+          'Authorization': 'Bearer ' + this.client.getAccessToken(),
           'Content-Type': 'application/json',
         },
         data: {
@@ -170,13 +175,16 @@ class Spotify extends Integration {
 
   async playNextSongFromPlaylist(retries = 0) {
     try {
+      if (!this.client) {
+        throw new Error('you are not connected to spotify API, authorize your user.');
+      }
       // play from playlist
       const offset = this.originalUri ? { uri: this.originalUri } : undefined;
       await axios({
         method: 'put',
         url: 'https://api.spotify.com/v1/me/player/play',
         headers: {
-          'Authorization': 'Bearer ' + this._accessToken,
+          'Authorization': 'Bearer ' + this.client.getAccessToken(),
           'Content-Type': 'application/json',
         },
         data: {
@@ -189,7 +197,7 @@ class Spotify extends Integration {
         method: 'post',
         url: 'https://api.spotify.com/v1/me/player/next',
         headers: {
-          'Authorization': 'Bearer ' + this._accessToken,
+          'Authorization': 'Bearer ' + this.client.getAccessToken(),
         },
       });
       this.currentUris = null;
@@ -291,7 +299,13 @@ class Spotify extends Integration {
       if (!this.fetchCurrentSongWhenOffline && !(api.isStreamOnline)) {
         throw Error('Stream is offline');
       }
+      if (this.client === null) {
+        throw Error('Spotify Web Api not connected');
+      }
       const data = await this.client.getMyCurrentPlayingTrack();
+      if (data.body.item === null) {
+        throw Error('No song was received from spotify');
+      }
 
       let currentSong = JSON.parse(this.currentSong);
       if (typeof currentSong.song === 'undefined' || currentSong.song !== data.body.item.name) {
@@ -337,8 +351,8 @@ class Spotify extends Integration {
         if (!_.isNil(this.client) && this._refreshToken) {
           const data = await this.client.refreshAccessToken();
           this.client.setAccessToken(data.body.access_token);
-          this._accessToken = data.body.access_token;
           this.retry.IRefreshToken = 0;
+          info(chalk.yellow('SPOTIFY: ') + 'Access token refreshed OK');
         }
       } catch (e) {
         this.retry.IRefreshToken++;
@@ -349,7 +363,7 @@ class Spotify extends Integration {
     if (this.retry.IRefreshToken >= 5) {
       addUIError({ name: 'SPOTIFY', message: 'Refreshing access token failed.' });
     }
-    this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
+    this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), HOUR);
   }
 
   sockets () {
@@ -363,18 +377,22 @@ class Spotify extends Integration {
     adminEndpoint(this.nsp, 'code', async (token, callback) => {
       const waitForUsername = () => {
         return new Promise((resolve, reject) => {
-          const check = async (resolve) => {
-            this.client.getMe()
-              .then((data) => {
-                this.username = data.body.display_name ? data.body.display_name : data.body.id;
-                resolve();
-              }, () => {
-                global.setTimeout(() => {
-                  check(resolve);
-                }, 1000);
-              });
+          const check = async () => {
+            if (this.client) {
+              this.client.getMe()
+                .then((data) => {
+                  this.username = data.body.display_name ? data.body.display_name : data.body.id;
+                  resolve();
+                }, () => {
+                  global.setTimeout(() => {
+                    check();
+                  }, 1000);
+                });
+            } else {
+              resolve();
+            }
           };
-          check(resolve);
+          check();
         });
       };
 
@@ -385,20 +403,27 @@ class Spotify extends Integration {
     });
     adminEndpoint(this.nsp, 'revoke', async (cb) => {
       clearTimeout(this.timeouts.IRefreshToken);
+      try {
+        if (this.client !== null) {
+          this.client.resetAccessToken();
+          this.client.resetRefreshToken();
+        }
 
-      const username = this.username;
-      this.client.resetAccessToken();
-      this.client.resetRefreshToken();
-      this.userId = null;
-      this._accessToken = null;
-      this._refreshToken = null;
-      this.username = '';
-      this.currentSong = JSON.stringify({});
+        const username = this.username;
+        this.userId = null;
+        this._accessToken = null;
+        this._refreshToken = null;
+        this.username = '';
+        this.currentSong = JSON.stringify({});
 
-      info(chalk.yellow('SPOTIFY: ') + `Access to account ${username} is revoked`);
+        info(chalk.yellow('SPOTIFY: ') + `Access to account ${username} is revoked`);
 
-      this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
-      cb(null, { do: 'refresh' });
+        cb(null, { do: 'refresh' });
+      } catch (e) {
+        cb(e.stack);
+      } finally {
+        this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
+      }
     });
     adminEndpoint(this.nsp, 'authorize', async (cb) => {
       if (
@@ -459,11 +484,13 @@ class Spotify extends Integration {
               this._accessToken = data.body.access_token;
               this._refreshToken = data.body.refresh_token;
 
-              this.client.setAccessToken(this._accessToken);
-              this.client.setRefreshToken(this._refreshToken);
+              if (this.client) {
+                this.client.setAccessToken(this._accessToken);
+                this.client.setRefreshToken(this._refreshToken);
+              }
               this.retry.IRefreshToken = 0;
-            }, (err) => {
-              if (err) {
+            }, (authorizationError) => {
+              if (authorizationError) {
                 addUIError({ name: 'SPOTIFY', message: 'Getting of accessToken and refreshToken failed.' });
                 info(chalk.yellow('SPOTIFY: ') + 'Getting of accessToken and refreshToken failed');
               }
@@ -498,12 +525,17 @@ class Spotify extends Integration {
 
   @command('!spotify')
   @default_permission(null)
-  async main (opts: CommandOptions) {
+  async main (opts: CommandOptions): Promise<CommandResponse[]> {
     if (!(api.isStreamOnline)) {
-      return;
+      error(`${chalk.bgRed('SPOTIFY')}: stream is offline.`);
+      return [];
     } // don't do anything on offline stream
     if (!this.songRequests) {
-      return;
+      return [];
+    }
+    if (!this.client) {
+      error(`${chalk.bgRed('SPOTIFY')}: you are not connected to spotify API, authorize your user.`);
+      return [];
     }
 
     try {
@@ -528,14 +560,10 @@ class Spotify extends Integration {
           method: 'get',
           url: 'https://api.spotify.com/v1/tracks/' + id,
           headers: {
-            'Authorization': 'Bearer ' + this._accessToken,
+            'Authorization': 'Bearer ' + this.client.getAccessToken(),
           },
         });
         const track = response.data;
-        sendMessage(
-          prepare('integrations.spotify.song-requested', {
-            name: track.name, artist: track.artists[0].name, artists: track.artists.map(o => o.name).join(', '),
-          }), opts.sender);
         this.uris.push({
           uri: 'spotify:track:' + id,
           requestBy: opts.sender.username,
@@ -543,20 +571,19 @@ class Spotify extends Integration {
           artist: track.artists[0].name,
           artists: track.artists.map(o => o.name).join(', '),
         });
+        return [{ response: prepare('integrations.spotify.song-requested', {
+          name: track.name, artist: track.artists[0].name, artists: track.artists.map(o => o.name).join(', '),
+        }), ...opts }];
       } else {
         const response = await axios({
           method: 'get',
           url: 'https://api.spotify.com/v1/search?type=track&limit=1&q=' + encodeURI(spotifyId),
           headers: {
-            'Authorization': 'Bearer ' + this._accessToken,
+            'Authorization': 'Bearer ' + this.client.getAccessToken(),
             'Content-Type': 'application/json',
           },
         });
         const track = response.data.tracks.items[0];
-        sendMessage(
-          prepare('integrations.spotify.song-requested', {
-            name: track.name, artist: track.artists[0].name,
-          }), opts.sender);
         this.uris.push({
           uri: track.uri,
           requestBy: opts.sender.username,
@@ -564,10 +591,15 @@ class Spotify extends Integration {
           artist: track.artists[0].name,
           artists: track.artists.map(o => o.name).join(', '),
         });
+        return [{ response: prepare('integrations.spotify.song-requested', {
+          name: track.name, artist: track.artists[0].name,
+        }), ...opts }];
       }
     } catch (e) {
-      sendMessage(
-        prepare('integrations.spotify.song-not-found'), opts.sender);
+      if (e.response.status === 401) {
+        error(`${chalk.bgRed('SPOTIFY')}: you don't have access to spotify API, try to revoke and authorize again.`);
+      }
+      return [{ response: prepare('integrations.spotify.song-not-found'), ...opts }];
     }
   }
 }

@@ -443,7 +443,7 @@ class Expects {
     }
     if (!opts.optional) {
       this.checkText({
-        expects: 'any',
+        expects: opts.name ?? 'any',
         ...opts,
       });
     }

@@ -11,8 +11,10 @@ const constants = require('../../../dest/constants');
 const top = (require('../../../dest/systems/top')).default;
 const tmi = (require('../../../dest/tmi')).default;
 
+const { prepare } = require('../../../dest/commons');
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
+const assert = require('assert');
 
 // users
 const owner = { username: 'soge__' };
@@ -34,17 +36,17 @@ describe('Top - !top time', () => {
   });
 
   it('run !top time and expect correct output', async () => {
-    top.time({ sender: { username: commons.getOwner() } });
-    await message.isSentRaw('Top 10 (watch time): 1. @user9 - 9.0h, 2. @user8 - 8.0h, 3. @user7 - 7.0h, 4. @user6 - 6.0h, 5. @user5 - 5.0h, 6. @user4 - 4.0h, 7. @user3 - 3.0h, 8. @user2 - 2.0h, 9. @user1 - 1.0h, 10. @user0 - 0.0h', owner);
+    const r = await top.time({ sender: { username: commons.getOwner() } });
+    assert.strictEqual(r[0].response, 'Top 10 (watch time): 1. @user9 - 9.0h, 2. @user8 - 8.0h, 3. @user7 - 7.0h, 4. @user6 - 6.0h, 5. @user5 - 5.0h, 6. @user4 - 4.0h, 7. @user3 - 3.0h, 8. @user2 - 2.0h, 9. @user1 - 1.0h, 10. @user0 - 0.0h', owner);
   });
 
-  it('add user1 to ignore list', async () => {
-    tmi.ignoreAdd({ sender: owner, parameters: 'user0' });
-    await message.isSent('ignore.user.is.added', owner, { username: 'user0' });
+  it('add user0 to ignore list', async () => {
+    const r = await tmi.ignoreAdd({ sender: owner, parameters: 'user0' });
+    assert.strictEqual(r[0].response, prepare('ignore.user.is.added' , { username: 'user0' }));
   });
 
   it('run !top time and expect correct output', async () => {
-    top.time({ sender: { username: commons.getOwner() } });
-    await message.isSentRaw('Top 10 (watch time): 1. @user9 - 9.0h, 2. @user8 - 8.0h, 3. @user7 - 7.0h, 4. @user6 - 6.0h, 5. @user5 - 5.0h, 6. @user4 - 4.0h, 7. @user3 - 3.0h, 8. @user2 - 2.0h, 9. @user1 - 1.0h', owner);
+    const r = await top.time({ sender: { username: commons.getOwner() } });
+    assert.strictEqual(r[0].response, 'Top 10 (watch time): 1. @user9 - 9.0h, 2. @user8 - 8.0h, 3. @user7 - 7.0h, 4. @user6 - 6.0h, 5. @user5 - 5.0h, 6. @user4 - 4.0h, 7. @user3 - 3.0h, 8. @user2 - 2.0h, 9. @user1 - 1.0h', owner);
   });
 });

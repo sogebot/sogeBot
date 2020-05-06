@@ -4,6 +4,7 @@ const assert = require('assert');
 require('../../general.js');
 
 const db = require('../../general.js').db;
+const { prepare } = require('../../../dest/commons');
 const message = require('../../general.js').message;
 
 const { getRepository } = require('typeorm');
@@ -64,17 +65,17 @@ describe('TMI - ignore', () => {
     });
 
     it('add testuser to ignore list', async () => {
-      tmi.ignoreAdd({ sender: owner, parameters: 'testuser' });
-      await message.isSent('ignore.user.is.added', owner, testuser);
+      const r = await tmi.ignoreAdd({ sender: owner, parameters: 'testuser' });
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { username: 'testuser' }));
     });
 
     it('add @testuser2 to ignore list', async () => {
-      tmi.ignoreAdd({ sender: owner, parameters: '@testuser2' });
-      await message.isSent('ignore.user.is.added', owner, testuser2);
+      const r = await tmi.ignoreAdd({ sender: owner, parameters: '@testuser2' });
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { username: 'testuser2' }));
     });
 
     it('testuser should be in ignore list', async () => {
-      tmi.ignoreCheck({ sender: owner, parameters: 'testuser' });
+      const r = await tmi.ignoreCheck({ sender: owner, parameters: 'testuser' });
 
       const item = await getRepository(Settings).findOne({
         where: {
@@ -83,14 +84,14 @@ describe('TMI - ignore', () => {
         },
       });
 
-      await message.isSent('ignore.user.is.ignored', owner, testuser);
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.ignored', { username: 'testuser' }));
       assert(await commons.isIgnored(testuser));
       assert(typeof item !== 'undefined');
       assert(item.value.includes('testuser'));
     });
 
     it('@testuser2 should be in ignore list', async () => {
-      tmi.ignoreCheck({ sender: owner, parameters: '@testuser2' });
+      const r = await tmi.ignoreCheck({ sender: owner, parameters: '@testuser2' });
       const item = await getRepository(Settings).findOne({
         where: {
           namespace: '/core/tmi',
@@ -98,14 +99,14 @@ describe('TMI - ignore', () => {
         },
       });
 
-      await message.isSent('ignore.user.is.ignored', owner, testuser2);
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.ignored', { username: 'testuser2' }));
       assert(await commons.isIgnored(testuser2));
       assert(typeof item !== 'undefined');
       assert(item.value.includes('testuser2'));
     });
 
     it('testuser3 should not be in ignore list', async () => {
-      tmi.ignoreCheck({ sender: owner, parameters: 'testuser3' });
+      const r = await tmi.ignoreCheck({ sender: owner, parameters: 'testuser3' });
       const item = await getRepository(Settings).findOne({
         where: {
           namespace: '/core/tmi',
@@ -113,7 +114,7 @@ describe('TMI - ignore', () => {
         },
       });
 
-      await message.isSent('ignore.user.is.not.ignored', owner, testuser3);
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.not.ignored', { username: 'testuser3' }));
       assert(!(await commons.isIgnored(testuser3)));
       assert(typeof item !== 'undefined');
       assert(!item.value.includes('testuser3'));
@@ -121,13 +122,13 @@ describe('TMI - ignore', () => {
     });
 
     it('remove testuser from ignore list', async () => {
-      tmi.ignoreRm({ sender: owner, parameters: 'testuser' });
-      await message.isSent('ignore.user.is.removed', owner, testuser);
+      const r = await tmi.ignoreRm({ sender: owner, parameters: 'testuser' });
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { username: 'testuser' }));
     });
 
     it('testuser should not be in ignore list', async () => {
-      tmi.ignoreCheck({ sender: owner, parameters: 'testuser' });
-      await message.isSent('ignore.user.is.not.ignored', owner, testuser);
+      const r = await tmi.ignoreCheck({ sender: owner, parameters: 'testuser' });
+      assert.strictEqual(r[0].response, prepare('ignore.user.is.not.ignored', { username: 'testuser' }));
       assert(!(await commons.isIgnored(testuser)));
     });
 

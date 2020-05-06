@@ -1,0 +1,26 @@
+{
+  "settings": {
+    "enabled": "Статус",
+    "songRequests": "Запросы песен",
+    "fetchCurrentSongWhenOffline": {
+      "title": "Получить текущую песню, когда стрим не в сети",
+      "help": "Рекомендуется отключить это во избежание достижения лимитов API"
+    },
+    "clientId": "clientId",
+    "clientSecret": "clientSecret",
+    "redirectURI": "redirectURI",
+    "format": {
+      "title": "Формат",
+      "help": "Доступные переменные: $song, $artist, $artists"
+    },
+    "username": "Авторизованный пользователь",
+    "revokeBtn": "Отменить авторизацию пользователя",
+    "authorizeBtn": "Авторизация пользователя",
+    "scopes": "Разрешения",
+    "playlistToPlay": {
+      "title": "Spotify URI главного плейлиста",
+      "help": "Если установлено, по завершении заказанных песен этот плейлист будет продолжаться"
+    },
+    "continueOnPlaylistAfterRequest": "Продолжить воспроизведение плейлиста после заказанных песен"
+  }
+}

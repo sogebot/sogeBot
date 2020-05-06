@@ -1,0 +1,9 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "jwtToken": {
+      "title": "JWT Token",
+      "help": "JWT Token im StreamElements Dashboard -> Einstellungen- > Klicke Geheimnisse anzeigen"
+    }
+  }
+}

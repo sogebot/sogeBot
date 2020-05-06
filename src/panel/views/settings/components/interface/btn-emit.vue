@@ -1,5 +1,5 @@
 <template>
-<button ref="button" @click="emitToBackend" :disabled="state !== 0" :class="this.state === 2 ? 'btn-danger' : ''">
+<button ref="button" @click="emitToBackend" :disabled="state !== 0 || !emit" :class="this.state === 2 ? 'btn-danger' : ''">
     <fa v-if="state === 1" icon="circle-notch" spin/>
     <fa v-if="state === 2" icon="exclamation"/>
     {{translate(this.title)}}

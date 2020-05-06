@@ -5,7 +5,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 const cooldown = (require('../../../dest/systems/cooldown')).default;
-
+const assert = require('assert');
 // users
 const owner = { username: 'soge__' };
 
@@ -16,97 +16,97 @@ describe('Cooldowns - set()', () => {
   });
 
   it('', async () => {
-    cooldown.main({ sender: owner, parameters: '' });
-    await message.isSent('cooldowns.cooldown-parse-failed', owner, { sender: owner.username });
+    const r = await cooldown.main({ sender: owner, parameters: '' });
+    assert.strictEqual(r[0].response, 'Sorry, $sender, but this command is not correct, use !cooldown [keyword|!command] [global|user] [seconds] [true/false]');
   });
 
   it('!alias', async () => {
-    cooldown.main({ sender: owner, parameters: '!alias' });
-    await message.isSent('cooldowns.cooldown-parse-failed', owner, { sender: owner.username });
+    const r = await cooldown.main({ sender: owner, parameters: '!alias' });
+    assert.strictEqual(r[0].response, 'Sorry, $sender, but this command is not correct, use !cooldown [keyword|!command] [global|user] [seconds] [true/false]');
   });
 
   it('alias', async () => {
-    cooldown.main({ sender: owner, parameters: 'alias' });
-    await message.isSent('cooldowns.cooldown-parse-failed', owner, { sender: owner.username });
+    const r = await cooldown.main({ sender: owner, parameters: 'alias' });
+    assert.strictEqual(r[0].response, 'Sorry, $sender, but this command is not correct, use !cooldown [keyword|!command] [global|user] [seconds] [true/false]');
   });
 
   it('test global 20', async () => {
-    cooldown.main({ sender: owner, parameters: 'test global 20' });
-    await message.isSent('cooldowns.cooldown-was-set', owner, { command: 'test', type: 'global', seconds: 20, sender: owner.username });
+    const r = await cooldown.main({ sender: owner, parameters: 'test global 20' });
+    assert.strictEqual(r[0].response, '$sender, global cooldown for test was set to 20s');
   });
 
   it('test user 20', async () => {
-    cooldown.main({ sender: owner, parameters: 'test user 20' });
-    await message.isSent('cooldowns.cooldown-was-set', owner, { command: 'test', type: 'user', seconds: 20, sender: owner.username });
+    const r = await cooldown.main({ sender: owner, parameters: 'test user 20' });
+    assert.strictEqual(r[0].response, '$sender, user cooldown for test was set to 20s');
   });
 
   it('!test global 20', async () => {
-    cooldown.main({ sender: owner, parameters: '!test global 20' });
-    await message.isSent('cooldowns.cooldown-was-set', owner, { command: '!test', type: 'global', seconds: 20, sender: owner.username });
+    const r = await cooldown.main({ sender: owner, parameters: '!test global 20' });
+    assert.strictEqual(r[0].response, '$sender, global cooldown for !test was set to 20s');
   });
 
   it('!test user 20', async () => {
-    cooldown.main({ sender: owner, parameters: '!test user 20' });
-    await message.isSent('cooldowns.cooldown-was-set', owner, { command: '!test', type: 'user', seconds: 20, sender: owner.username });
+    const r = await cooldown.main({ sender: owner, parameters: '!test user 20' });
+    assert.strictEqual(r[0].response, '$sender, user cooldown for !test was set to 20s');
   });
 
   it('test global 20 true', async () => {
-    cooldown.main({ sender: owner, parameters: 'test global 20 true' });
-    await message.isSent('cooldowns.cooldown-was-set', owner, { command: 'test', type: 'global', seconds: 20, sender: owner.username });
+    const r = await cooldown.main({ sender: owner, parameters: 'test global 20 true' });
+    assert.strictEqual(r[0].response, '$sender, global cooldown for test was set to 20s');
   });
 
   it('test user 20 true', async () => {
-    cooldown.main({ sender: owner, parameters: 'test user 20 true' });
-    await message.isSent('cooldowns.cooldown-was-set', owner, { command: 'test', type: 'user', seconds: 20, sender: owner.username });
+    const r = await cooldown.main({ sender: owner, parameters: 'test user 20 true' });
+    assert.strictEqual(r[0].response, '$sender, user cooldown for test was set to 20s');
   });
 
   it('!test global 20 true', async () => {
-    cooldown.main({ sender: owner, parameters: '!test global 20 true' });
-    await message.isSent('cooldowns.cooldown-was-set', owner, { command: '!test', type: 'global', seconds: 20, sender: owner.username });
+    const r = await cooldown.main({ sender: owner, parameters: '!test global 20 true' });
+    assert.strictEqual(r[0].response, '$sender, global cooldown for !test was set to 20s');
   });
 
   it('!test user 20 true', async () => {
-    cooldown.main({ sender: owner, parameters: '!test user 20 true' });
-    await message.isSent('cooldowns.cooldown-was-set', owner, { command: '!test', type: 'user', seconds: 20, sender: owner.username });
+    const r = await cooldown.main({ sender: owner, parameters: '!test user 20 true' });
+    assert.strictEqual(r[0].response, '$sender, user cooldown for !test was set to 20s');
   });
 
   it('!한국어 global 20 true', async () => {
-    cooldown.main({ sender: owner, parameters: '!한국어 global 20 true' });
-    await message.isSent('cooldowns.cooldown-was-set', owner, { command: '!한국어', type: 'global', seconds: 20, sender: owner.username });
+    const r = await cooldown.main({ sender: owner, parameters: '!한국어 global 20 true' });
+    assert.strictEqual(r[0].response, '$sender, global cooldown for !한국어 was set to 20s');
   });
 
   it('!한국어 user 20 true', async () => {
-    cooldown.main({ sender: owner, parameters: '!한국어 user 20 true' });
-    await message.isSent('cooldowns.cooldown-was-set', owner, { command: '!한국어', type: 'user', seconds: 20, sender: owner.username });
+    const r = await cooldown.main({ sender: owner, parameters: '!한국어 user 20 true' });
+    assert.strictEqual(r[0].response, '$sender, user cooldown for !한국어 was set to 20s');
   });
 
   it('한국어 global 20 true', async () => {
-    cooldown.main({ sender: owner, parameters: '한국어 global 20 true' });
-    await message.isSent('cooldowns.cooldown-was-set', owner, { command: '한국어', type: 'global', seconds: 20, sender: owner.username });
+    const r = await cooldown.main({ sender: owner, parameters: '한국어 global 20 true' });
+    assert.strictEqual(r[0].response, '$sender, global cooldown for 한국어 was set to 20s');
   });
 
   it('한국어 user 20 true', async () => {
-    cooldown.main({ sender: owner, parameters: '한국어 user 20 true' });
-    await message.isSent('cooldowns.cooldown-was-set', owner, { command: '한국어', type: 'user', seconds: 20, sender: owner.username });
+    const r = await cooldown.main({ sender: owner, parameters: '한국어 user 20 true' });
+    assert.strictEqual(r[0].response, '$sender, user cooldown for 한국어 was set to 20s');
   });
 
   it('!русский global 20 true', async () => {
-    cooldown.main({ sender: owner, parameters: '!русский global 20 true' });
-    await message.isSent('cooldowns.cooldown-was-set', owner, { command: '!русский', type: 'global', seconds: 20, sender: owner.username });
+    const r = await cooldown.main({ sender: owner, parameters: '!русский global 20 true' });
+    assert.strictEqual(r[0].response, '$sender, global cooldown for !русский was set to 20s');
   });
 
   it('!русский user 20 true', async () => {
-    cooldown.main({ sender: owner, parameters: '!русский user 20 true' });
-    await message.isSent('cooldowns.cooldown-was-set', owner, { command: '!русский', type: 'user', seconds: 20, sender: owner.username });
+    const r = await cooldown.main({ sender: owner, parameters: '!русский user 20 true' });
+    assert.strictEqual(r[0].response, '$sender, user cooldown for !русский was set to 20s');
   });
 
   it('русский global 20 true', async () => {
-    cooldown.main({ sender: owner, parameters: 'русский global 20 true' });
-    await message.isSent('cooldowns.cooldown-was-set', owner, { command: 'русский', type: 'global', seconds: 20, sender: owner.username });
+    const r = await cooldown.main({ sender: owner, parameters: 'русский global 20 true' });
+    assert.strictEqual(r[0].response, '$sender, global cooldown for русский was set to 20s');
   });
 
   it('русский user 20 true', async () => {
-    cooldown.main({ sender: owner, parameters: 'русский user 20 true' });
-    await message.isSent('cooldowns.cooldown-was-set', owner, { command: 'русский', type: 'user', seconds: 20, sender: owner.username });
+    const r = await cooldown.main({ sender: owner, parameters: 'русский user 20 true' });
+    assert.strictEqual(r[0].response, '$sender, user cooldown for русский was set to 20s');
   });
 });

@@ -1,0 +1,10 @@
+--- /home/soge/_WORK/sogeBot/node_modules/twitch-js/types/index.d.ts	2020-04-27 16:29:25.534202173 +0200
++++ patches/index.d.ts	2020-04-27 16:29:10.830258195 +0200
+@@ -537,6 +537,7 @@
+     bits: number;
+     bitsLeader: number;
+     subscriber: number;
++    founder: number;
+ } | {
+     [key: string]: string;
+ };

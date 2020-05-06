@@ -30,11 +30,8 @@ describe('Songs - addSongToQueue()', () => {
     });
 
     it(`Add music song ${videoId}`, async () => {
-      songs.addSongToQueue({ parameters: videoId, sender: user.owner });
-    });
-
-    it(`Song is correctly added to queue`, async () => {
-      await message.isSent('songs.song-was-added-to-queue', user.owner, { name: 'Adele - Someone Like You (Official Music Video)' });
+      const r = await songs.addSongToQueue({ parameters: videoId, sender: user.owner });
+      assert.strictEqual(r[0].response, '$sender, song Adele - Someone Like You (Official Music Video) was added to queue');
     });
 
     it(`Queue contains song`, async () => {
@@ -58,11 +55,8 @@ describe('Songs - addSongToQueue()', () => {
     });
 
     it(`Add music song ${videoUrl}`, async () => {
-      songs.addSongToQueue({ parameters: videoUrl, sender: user.owner });
-    });
-
-    it(`Song is correctly added to queue`, async () => {
-      await message.isSent('songs.song-was-added-to-queue', user.owner, { name: 'Adele - Someone Like You (Official Music Video)' });
+      const r = await songs.addSongToQueue({ parameters: videoUrl, sender: user.owner });
+      assert.strictEqual(r[0].response, '$sender, song Adele - Someone Like You (Official Music Video) was added to queue');
     });
 
     it(`Queue contains song`, async () => {
@@ -86,11 +80,8 @@ describe('Songs - addSongToQueue()', () => {
     });
 
     it(`Add music song ${videoSearch}`, async () => {
-      songs.addSongToQueue({ parameters: videoSearch, sender: user.owner });
-    });
-
-    it(`Song is correctly added to queue`, async () => {
-      await message.isSent('songs.song-was-added-to-queue', user.owner, { name: 'Adele - Someone Like You (Official Music Video)' });
+      const r = await songs.addSongToQueue({ parameters: videoSearch, sender: user.owner });
+      assert.strictEqual(r[0].response, '$sender, song Adele - Someone Like You (Official Music Video) was added to queue');
     });
 
     it(`Queue contains song`, async () => {
@@ -114,11 +105,8 @@ describe('Songs - addSongToQueue()', () => {
     });
 
     it(`Add music song ${videoId}`, async () => {
-      songs.addSongToQueue({ parameters: videoId, sender: user.owner });
-    });
-
-    it(`Song is correctly added to queue`, async () => {
-      await message.isSent('songs.song-was-added-to-queue', user.owner, { name: 'Adele - Someone Like You (Official Music Video)' });
+      const r = await songs.addSongToQueue({ parameters: videoId, sender: user.owner });
+      assert.strictEqual(r[0].response, '$sender, song Adele - Someone Like You (Official Music Video) was added to queue');
     });
 
     it(`Queue contains song`, async () => {
@@ -142,11 +130,8 @@ describe('Songs - addSongToQueue()', () => {
     });
 
     it(`Add music song ${videoUrl}`, async () => {
-      songs.addSongToQueue({ parameters: videoUrl, sender: user.owner });
-    });
-
-    it(`Song is correctly added to queue`, async () => {
-      await message.isSent('songs.song-was-added-to-queue', user.owner, { name: 'Adele - Someone Like You (Official Music Video)' });
+      const r = await songs.addSongToQueue({ parameters: videoUrl, sender: user.owner });
+      assert.strictEqual(r[0].response, '$sender, song Adele - Someone Like You (Official Music Video) was added to queue');
     });
 
     it(`Queue contains song`, async () => {
@@ -170,11 +155,8 @@ describe('Songs - addSongToQueue()', () => {
     });
 
     it(`Add music song ${videoSearch}`, async () => {
-      songs.addSongToQueue({ parameters: videoSearch, sender: user.owner });
-    });
-
-    it(`Song is correctly added to queue`, async () => {
-      await message.isSent('songs.song-was-added-to-queue', user.owner, { name: 'Adele - Someone Like You (Official Music Video)' });
+      const r = await songs.addSongToQueue({ parameters: videoSearch, sender: user.owner });
+      assert.strictEqual(r[0].response, '$sender, song Adele - Someone Like You (Official Music Video) was added to queue');
     });
 
     it(`Queue contains song`, async () => {
@@ -198,11 +180,8 @@ describe('Songs - addSongToQueue()', () => {
     });
 
     it(`Add non-music video ${videoId}`, async () => {
-      songs.addSongToQueue({ parameters: videoId, sender: user.owner });
-    });
-
-    it(`Song is not added to queue (incorrect category)`, async () => {
-      await message.isSent('songs.incorrect-category', user.owner, {}, 10000);
+      const r = await songs.addSongToQueue({ parameters: videoId, sender: user.owner });
+      assert.strictEqual(r[0].response, 'Sorry, $sender, but this song must be music category');
     });
 
     it(`Queue is empty`, async () => {
@@ -226,11 +205,8 @@ describe('Songs - addSongToQueue()', () => {
     });
 
     it(`Add non-music video ${videoUrl}`, async () => {
-      songs.addSongToQueue({ parameters: videoUrl, sender: user.owner });
-    });
-
-    it(`Song is not added to queue (incorrect category)`, async () => {
-      await message.isSent('songs.incorrect-category', user.owner, {}, 10000);
+      const r = await songs.addSongToQueue({ parameters: videoUrl, sender: user.owner });
+      assert.strictEqual(r[0].response, 'Sorry, $sender, but this song must be music category');
     });
 
     it(`Queue is empty`, async () => {
@@ -254,11 +230,8 @@ describe('Songs - addSongToQueue()', () => {
     });
 
     it(`Add non-music video ${videoSearch}`, async () => {
-      songs.addSongToQueue({ parameters: videoSearch, sender: user.owner });
-    });
-
-    it(`Song is not added to queue (incorrect category)`, async () => {
-      await message.isSent('songs.incorrect-category', user.owner, {}, 10000);
+      const r = await songs.addSongToQueue({ parameters: videoSearch, sender: user.owner });
+      assert.strictEqual(r[0].response, 'Sorry, $sender, but this song must be music category');
     });
 
     it(`Queue is empty`, async () => {

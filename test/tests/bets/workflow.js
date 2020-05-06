@@ -11,7 +11,6 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const { Bets } = require('../../../dest/database/entity/bets');
 
-const points = (require('../../../dest/systems/points')).default;
 const bets = (require('../../../dest/systems/bets')).default;
 
 // users
@@ -50,6 +49,10 @@ const tests = {
       ],
       win: 0,
       winTickets: 2,
+      response: {
+        open: `New bet 'Jak se umistim?' is opened! Bet options: 1. 'Vyhra', 2. 'Top 3', 3. 'Top 10'. Use !bet 1-3 <amount> to win! You have only 5min to bet!`,
+        close: `Bets was closed and winning option was Vyhra! 1 users won in total 2 points!`,
+      },
     },
     {
       timeout: 5,
@@ -71,6 +74,10 @@ const tests = {
       ],
       win: 1,
       winTickets: 49,
+      response: {
+        open: `New bet 'Vyhra / Prohra' is opened! Bet options: 1. 'Vyhra', 2. 'Prohra'. Use !bet 1-2 <amount> to win! You have only 5min to bet!`,
+        close: `Bets was closed and winning option was Prohra! 7 users won in total 49 points!`,
+      },
     },
   ],
 };
@@ -87,13 +94,14 @@ describe('Bets - workflow()', () => {
       ];
 
       describe((s ? 'OK' : 'NG') + ' - ' + input.join(' '), () => {
+        let r;
         before(async () => {
           await db.cleanup();
           await message.prepare();
         });
 
         it('Open new bet', async () => {
-          await bets.open({ sender: owner, parameters: input.join(' ') });
+          r = await bets.open({ sender: owner, parameters: input.join(' ') });
         });
 
         if (!s) {
@@ -106,13 +114,7 @@ describe('Bets - workflow()', () => {
           });
         } else {
           it ('!bet open should have correct message', async () => {
-            await message.isSent('bets.opened', owner, {
-              command: '!bet',
-              title: t.title,
-              maxIndex: t.options.length,
-              minutes: t.timeout,
-              options: t.options.map((v, i) => `${i+1}. '${v}'`).join(', '),
-            });
+            assert.strictEqual(r[0].response, t.response.open);
           });
           it ('!bet open should be correctly saved in db', async() => {
             const currentBet = await getRepository(Bets).findOne({
@@ -138,13 +140,8 @@ describe('Bets - workflow()', () => {
           }
 
           it('Bet close should have correct win message', async () => {
-            await bets.close({parameters: `${t.win}`, sender: owner});
-            await message.isSent('bets.closed', owner, {
-              option: t.options[t.win],
-              amount: t.bets.filter(o => o.betOn === t.win).length,
-              pointsName: await points.getPointsName(t.winTickets),
-              points: t.winTickets,
-            });
+            r = await bets.close({parameters: `${t.win}`, sender: owner});
+            assert.strictEqual(r[0].response, t.response.close);
           });
         }
       });
@@ -153,6 +150,7 @@ describe('Bets - workflow()', () => {
 });
 
 describe('Open bet twice should fail', () => {
+  let r;
   before(async () => {
     await db.cleanup();
     await message.prepare();
@@ -164,17 +162,11 @@ describe('Open bet twice should fail', () => {
       `-title "${tests.true[0].title}"`,
       tests.true[0].options.join(' | '),
     ];
-    await bets.open({ sender: owner, parameters: input.join(' ') });
+    r = await bets.open({ sender: owner, parameters: input.join(' ') });
   });
 
   it ('!bet open should have correct message', async () => {
-    await message.isSent('bets.opened', owner, {
-      command: '!bet',
-      title: tests.true[0].title,
-      maxIndex: tests.true[0].options.length,
-      minutes: tests.true[0].timeout,
-      options: tests.true[0].options.map((v, i) => `${i+1}. '${v}'`).join(', '),
-    });
+    assert.strictEqual(r[0].response, `New bet 'Jak se umistim?' is opened! Bet options: 1. 'Vyhra', 2. 'Top 3', 3. 'Top 10'. Use !bet 1-3 <amount> to win! You have only 5min to bet!`);
   });
   it ('!bet open should be correctly saved in db', async() => {
     const currentBet = await getRepository(Bets).findOne({
@@ -194,34 +186,32 @@ describe('Open bet twice should fail', () => {
       `-title "${tests.true[1].title}"`,
       tests.true[1].options.join(' | '),
     ];
-    await bets.open({ sender: owner, parameters: input.join(' ') });
+    r = await bets.open({ sender: owner, parameters: input.join(' ') });
   });
 
   it('Expect bets.running error', async () => {
-    await message.isSent('bets.running', { username: 'soge__' }, {
-      command: '!bet',
-      maxIndex: tests.true[0].options.length,
-      options: tests.true[0].options.map((v, i) => `${i+1}. '${v}'`).join(', '),
-    });
+    assert.strictEqual(r[0].response, `$sender, bet is already opened! Bet options: 1. 'Vyhra', 2. 'Top 3', 3. 'Top 10'. Use !bet close 1-3`);
   });
 });
 
 describe('Bet close should fail if bet is not opened', () => {
+  let r;
   before(async () => {
     await db.cleanup();
     await message.prepare();
   });
 
   it('close bet', async () => {
-    await bets.close({parameters: `0`, sender: owner});
+    r = await bets.close({parameters: `0`, sender: owner});
   });
 
   it('Expect bets.notRunning error', async () => {
-    await message.isSent('bets.notRunning', { username: 'soge__' });
+    assert.strictEqual(r[0].response, 'No bet is currently opened, ask mods to open it!');
   });
 });
 
 describe('Bet close should fail if wrong option is given', () => {
+  let r;
   command = '!bet';
 
   before(async () => {
@@ -235,17 +225,11 @@ describe('Bet close should fail if wrong option is given', () => {
       `-title "${tests.true[0].title}"`,
       tests.true[0].options.join(' | '),
     ];
-    await bets.open({ sender: owner, parameters: input.join(' ') });
+    r = await bets.open({ sender: owner, parameters: input.join(' ') });
   });
 
   it ('!bet open should have correct message', async () => {
-    await message.isSent('bets.opened', owner, {
-      command: '!bet',
-      title: tests.true[0].title,
-      maxIndex: tests.true[0].options.length,
-      minutes: tests.true[0].timeout,
-      options: tests.true[0].options.map((v, i) => `${i+1}. '${v}'`).join(', '),
-    });
+    assert.strictEqual(r[0].response, `New bet 'Jak se umistim?' is opened! Bet options: 1. 'Vyhra', 2. 'Top 3', 3. 'Top 10'. Use !bet 1-3 <amount> to win! You have only 5min to bet!`);
   });
   it ('!bet open should be correctly saved in db', async() => {
     const currentBet = await getRepository(Bets).findOne({
@@ -260,15 +244,16 @@ describe('Bet close should fail if wrong option is given', () => {
   });
 
   it('close bet with incorrect option', async () => {
-    await bets.close({parameters: `10`, sender: owner, command});
+    r = await bets.close({parameters: `10`, sender: owner, command});
   });
 
   it('Expect bets.notRunning error', async () => {
-    await message.isSent('bets.notOption', { username: 'soge__' }, { command });
+    assert.strictEqual(r[0].response, `$sender, this option doesn't exist! Bet is not closed, check !bet`);
   });
 });
 
 describe('Incorrect participate should show info', () => {
+  let r;
   command = '!bet';
 
   before(async () => {
@@ -282,17 +267,11 @@ describe('Incorrect participate should show info', () => {
       `-title "${tests.true[0].title}"`,
       tests.true[0].options.join(' | '),
     ];
-    await bets.open({ sender: owner, parameters: input.join(' ') });
+    r = await bets.open({ sender: owner, parameters: input.join(' ') });
   });
 
   it ('!bet open should have correct message', async () => {
-    await message.isSent('bets.opened', owner, {
-      command: '!bet',
-      title: tests.true[0].title,
-      maxIndex: tests.true[0].options.length,
-      minutes: tests.true[0].timeout,
-      options: tests.true[0].options.map((v, i) => `${i+1}. '${v}'`).join(', '),
-    });
+    assert.strictEqual(r[0].response, `New bet 'Jak se umistim?' is opened! Bet options: 1. 'Vyhra', 2. 'Top 3', 3. 'Top 10'. Use !bet 1-3 <amount> to win! You have only 5min to bet!`);
   });
   it ('!bet open should be correctly saved in db', async() => {
     const currentBet = await getRepository(Bets).findOne({
@@ -307,15 +286,16 @@ describe('Incorrect participate should show info', () => {
   });
 
   it('Incorrect participate should show info', async () => {
-    await bets.participate({parameters: '', sender: owner, command});
+    r = await bets.participate({parameters: '', sender: owner, command});
   });
 
   it('Expect bets.info', async () => {
-    await message.isSentRaw(`Bet 'Jak se umistim?' is still opened! Bet options: 1. 'Vyhra', 2. 'Top 3', 3. 'Top 10'. Use !bet 1-3 <amount> to win! You have only 5.0min to bet!`, owner);
+    assert.strictEqual(r[0].response, `Bet 'Jak se umistim?' is still opened! Bet options: 1. 'Vyhra', 2. 'Top 3', 3. 'Top 10'. Use !bet 1-3 <amount> to win! You have only 5.0min to bet!`, owner);
   });
 });
 
 describe('Bet info should show all correct states', () => {
+  let r;
   command = '!bet';
 
   before(async () => {
@@ -324,11 +304,11 @@ describe('Bet info should show all correct states', () => {
   });
 
   it('Run bet info without bet', async () => {
-    await bets.participate({parameters: '', sender: owner, command});
+    r = await bets.participate({parameters: '', sender: owner, command});
   });
 
   it('Expect bets.notRunning', async () => {
-    await message.isSent(`bets.notRunning`, owner);
+    assert.strictEqual(r[0].response, `No bet is currently opened, ask mods to open it!`);
   });
 
   it('Open bet', async () => {
@@ -337,17 +317,11 @@ describe('Bet info should show all correct states', () => {
       `-title "${tests.true[0].title}"`,
       tests.true[0].options.join(' | '),
     ];
-    await bets.open({ sender: owner, parameters: input.join(' ') });
+    r = await bets.open({ sender: owner, parameters: input.join(' ') });
   });
 
   it ('!bet open should have correct message', async () => {
-    await message.isSent('bets.opened', owner, {
-      command: '!bet',
-      title: tests.true[0].title,
-      maxIndex: tests.true[0].options.length,
-      minutes: tests.true[0].timeout,
-      options: tests.true[0].options.map((v, i) => `${i+1}. '${v}'`).join(', '),
-    });
+    assert.strictEqual(r[0].response, `New bet 'Jak se umistim?' is opened! Bet options: 1. 'Vyhra', 2. 'Top 3', 3. 'Top 10'. Use !bet 1-3 <amount> to win! You have only 5min to bet!`);
   });
   it ('!bet open should be correctly saved in db', async() => {
     const currentBet = await getRepository(Bets).findOne({
@@ -362,22 +336,22 @@ describe('Bet info should show all correct states', () => {
   });
 
   it('Bet info when opened bet', async () => {
-    await bets.participate({parameters: '', sender: owner, command});
+    r = await bets.participate({parameters: '', sender: owner, command});
   });
 
   it('Expect bets.info', async () => {
-    await message.isSentRaw(`Bet 'Jak se umistim?' is still opened! Bet options: 1. 'Vyhra', 2. 'Top 3', 3. 'Top 10'. Use !bet 1-3 <amount> to win! You have only 5.0min to bet!`, owner);
+    assert.strictEqual(r[0].response, `Bet 'Jak se umistim?' is still opened! Bet options: 1. 'Vyhra', 2. 'Top 3', 3. 'Top 10'. Use !bet 1-3 <amount> to win! You have only 5.0min to bet!`);
   });
 
   it('Lock bet', async () => {
     await getRepository(Bets).update({}, { isLocked: true });
-  })
+  });
 
   it('Bet info when locked bet', async () => {
-    await bets.info({parameters: '', sender: owner, command});
+    r = await bets.info({parameters: '', sender: owner, command});
   });
 
   it('Expect bets.lockedInfo', async () => {
-    await message.isSentRaw(`No bet is currently opened, ask mods to open it!`, owner);
+    assert.strictEqual(r[0].response, `Bet 'Jak se umistim?' is still opened, but time for betting is up!`);
   });
 });

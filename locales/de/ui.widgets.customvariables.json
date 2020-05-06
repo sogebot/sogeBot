@@ -1,0 +1,5 @@
+{
+  "no-custom-variable-found": "Keine benutzerdefinierten Variablen gefunden. Füge welche im <a href=\"/#/registry/customVariables/list\">Register für benutzerdefinierte Variablen</a> hinzu",
+  "add-variable-into-watchlist": "Variable zur Watchlist hinzufügen",
+  "watchlist": "Watchlist"
+}

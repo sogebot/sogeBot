@@ -33,6 +33,11 @@ import eventlist from './overlays/eventlist';
 import { getFunctionList } from './decorators/on';
 import { avgResponse, linesParsedIncrement, setStatus } from './helpers/parser';
 
+
+const userHaveSubscriberBadges = (badges: Readonly<UserStateTags['badges']>) => {
+  return typeof badges.subscriber !== 'undefined' || typeof badges.founder !== 'undefined';
+};
+
 class TMI extends Core {
   @settings('chat')
   sendWithMe = false;
@@ -79,10 +84,11 @@ class TMI extends Core {
         ]
         )];
       // update ignore list
-      sendMessage(prepare('ignore.user.is.added', { username }), opts.sender);
+      return [{ response: prepare('ignore.user.is.added', { username }), ...opts}];
     } catch (e) {
       error(e.message);
     }
+    return [];
   }
 
   @command('!ignore remove')
@@ -92,10 +98,11 @@ class TMI extends Core {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
       tmi.ignorelist = tmi.ignorelist.filter(o => o !== username);
       // update ignore list
-      sendMessage(prepare('ignore.user.is.removed', { username }), opts.sender);
+      return [{ response: prepare('ignore.user.is.removed', { username }), ...opts}];
     } catch (e) {
       error(e.message);
     }
+    return [];
   }
 
   @command('!ignore check')
@@ -104,9 +111,11 @@ class TMI extends Core {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
       const isUserIgnored = isIgnored({ username });
-      sendMessage(prepare(isUserIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored', { username }), opts.sender);
-      return isUserIgnored;
-    } catch (e) {}
+      return [{ response: prepare(isUserIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored', { username }), ...opts}];
+    } catch (e) {
+      error(e.stack);
+    }
+    return [];
   }
 
   async initClient (type: 'bot' | 'broadcaster') {
@@ -126,7 +135,7 @@ class TMI extends Core {
         token,
         username,
         log,
-        onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(token => token),
+        onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(refresh_token => refresh_token),
       });
       this.loadListeners(type);
       await (this.client[type] as TwitchJs).chat.connect();
@@ -159,7 +168,7 @@ class TMI extends Core {
         info(`TMI: ${type} is reconnecting`);
 
         await this.client[type]?.chat.part(this.channel);
-        await this.client[type]?.chat.reconnect({ token, username, onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(token => token) });
+        await this.client[type]?.chat.reconnect({ token, username, onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(refresh_token => refresh_token) });
 
         await this.join(type, channel);
       }
@@ -207,6 +216,8 @@ class TMI extends Core {
   }
 
   loadListeners (type: 'bot' | 'broadcaster') {
+    (this.client[type] as TwitchJs).chat.removeAllListeners();
+
     // common for bot and broadcaster
     (this.client[type] as TwitchJs).chat.on('DISCONNECT', async (message) => {
       info(`TMI: ${type} is disconnected`);
@@ -277,8 +288,8 @@ class TMI extends Core {
           const username = message.username.toLowerCase();
 
           if (typeof duration === 'undefined') {
-            ban(`${username}, reason: ${reason}`);
-            events.fire('ban', { username: username, reason: reason });
+            ban(`${username}`);
+            events.fire('ban', { username: username });
           } else {
             events.fire('timeout', { username, reason, duration });
           }
@@ -544,7 +555,7 @@ class TMI extends Core {
       events.fire('subcommunitygift', { username, count });
       subcommunitygift(`${username}#${userId}, to ${count} viewers`);
       alerts.trigger({
-        event: 'subgifts',
+        event: 'subcommunitygifts',
         name: username,
         amount: Number(count),
         currency: '',
@@ -613,6 +624,16 @@ class TMI extends Core {
         timestamp: Date.now(),
       });
       subgift(`${recipient}#${recipientId}, from: ${username}, months: ${subCumulativeMonths}`);
+      alerts.trigger({
+        event: 'subgifts',
+        name: username,
+        recipient,
+        amount: subCumulativeMonths,
+        currency: '',
+        monthsName: getLocalizedName(subCumulativeMonths, 'core.months'),
+        message: '',
+        autohost: false,
+      });
 
       // also set subgift count to gifter
       if (!(isIgnored({username, userId: user.userId}))) {
@@ -758,9 +779,9 @@ class TMI extends Core {
             isOnline: true,
             isVIP: typeof sender.badges.vip !== 'undefined',
             isModerator: typeof sender.badges.moderator !== 'undefined',
-            isSubscriber: user.haveSubscriberLock ? user.isSubscriber : typeof sender.badges.subscriber !== 'undefined',
+            isSubscriber: user.haveSubscriberLock ? user.isSubscriber : userHaveSubscriberBadges(sender.badges),
             messages: user.messages ?? 0,
-            subscribeTier: String(typeof sender.badges.subscriber !== 'undefined' ? 0 : user.subscribeTier),
+            subscribeTier: String(userHaveSubscriberBadges(sender.badges) ? 0 : user.subscribeTier),
             subscribeCumulativeMonths: subCumulativeMonths(sender) || user.subscribeCumulativeMonths,
             seenAt: Date.now(),
           });
@@ -772,7 +793,7 @@ class TMI extends Core {
             isOnline: true,
             isVIP: typeof sender.badges.vip !== 'undefined',
             isModerator: typeof sender.badges.moderator !== 'undefined',
-            isSubscriber: typeof sender.badges.subscriber !== 'undefined',
+            isSubscriber: userHaveSubscriberBadges(sender.badges),
             seenAt: Date.now(),
           });
         }
@@ -788,7 +809,12 @@ class TMI extends Core {
           }
         }
       }
-      await parse.process();
+      const responses = await parse.process();
+      for (let i = 0; i < responses.length; i++) {
+        setTimeout(() => {
+          sendMessage(responses[i].response, responses[i].sender, responses[i].attr);
+        }, 500 * i);
+      }
     }
 
     if (isMainThread) {

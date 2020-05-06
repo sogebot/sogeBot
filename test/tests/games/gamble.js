@@ -11,8 +11,10 @@ const { User } = require('../../../dest/database/entity/user');
 
 const gamble = (require('../../../dest/games/gamble')).default;
 const points = (require('../../../dest/systems/points')).default;
+const { prepare } = require('../../../dest/commons');
 
 const _ = require('lodash');
+const assert = require('assert');
 
 const user1 = { username: 'user1', userId: Number(_.random(999999, false)) };
 const command = '!gamble';
@@ -29,25 +31,20 @@ describe('Gambling - gamble', () => {
     });
 
     it('user should successfully !gamble 1', async () => {
-      await gamble.main({ sender: user1, parameters: '1', command });
+      const r = await gamble.main({ sender: user1, parameters: '1', command });
       const updatedPoints = await points.getPointsOf(user1.userId);
 
-      await message.isSent(['gambling.gamble.win', 'gambling.gamble.lose'], user1, {
-        pointsName: await points.getPointsName(updatedPoints),
-        points: updatedPoints,
-        command,
-      });
+      const msg1 = prepare('gambling.gamble.win', { pointsName: await points.getPointsName(updatedPoints), points: updatedPoints, command });
+      const msg2 = prepare('gambling.gamble.lose', { pointsName: await points.getPointsName(updatedPoints), points: updatedPoints, command });
+      assert(r[0].response === msg1 || r[0].response === msg2, JSON.stringify({r, msg1, msg2}));
     });
 
     it('user should successfully !gamble all', async () => {
-      await gamble.main({ sender: user1, parameters: 'all', command });
+      const r = await gamble.main({ sender: user1, parameters: 'all', command });
       const updatedPoints = await points.getPointsOf(user1.userId);
-
-      await message.isSent(['gambling.gamble.win', 'gambling.gamble.lose'], user1, {
-        pointsName: await points.getPointsName(updatedPoints),
-        points: updatedPoints,
-        command,
-      });
+      const msg1 = prepare('gambling.gamble.win', { pointsName: await points.getPointsName(updatedPoints), points: updatedPoints, command });
+      const msg2 = prepare('gambling.gamble.lose', { pointsName: await points.getPointsName(updatedPoints), points: updatedPoints, command });
+      assert(r[0].response === msg1 || r[0].response === msg2, JSON.stringify({r, msg1, msg2}));
     });
   });
 });

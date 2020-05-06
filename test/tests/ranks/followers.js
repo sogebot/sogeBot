@@ -4,6 +4,7 @@ require('../../general.js');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
+const assert = require('assert');
 
 const { getLocalizedName } = require('../../../dest/commons');
 
@@ -35,37 +36,23 @@ describe('Ranks - followers', () => {
 
   for (const rank of vwrranks) {
     it(`Add rank '${rank.rank}`, async () => {
-      ranks.add({ sender: owner, parameters: `${rank.hours} ${rank.rank}` });
-      await message.isSent('ranks.rank-was-added', owner,
-        {
-          sender: owner.username,
-          rank: rank.rank,
-          hours: rank.hours,
-          type: 'viewer',
-          hlocale: getLocalizedName(rank.hours, 'core.hours'),
-        });
+      const r = await ranks.add({ sender: owner, parameters: `${rank.hours} ${rank.rank}` });
+      assert.strictEqual(r[0].response, `$sender, new rank viewer ${rank.rank}(${rank.hours}hours) was added`);
     });
   }
 
   for (const rank of flwranks) {
     it(`Add follower rank '${rank.rank}`, async () => {
-      ranks.addflw({ sender: owner, parameters: `${rank.months} ${rank.rank}` });
-      await message.isSent('ranks.rank-was-added', owner,
-        {
-          sender: owner.username,
-          rank: rank.rank,
-          hours: rank.months,
-          type: 'follower',
-          hlocale: getLocalizedName(rank.months, 'core.months'),
-        });
+      const r = await ranks.addflw({ sender: owner, parameters: `${rank.months} ${rank.rank}` });
+      assert.strictEqual(r[0].response, `$sender, new rank follower ${rank.rank}(${rank.months}months) was added`);
     });
   }
 
   const users = ['user1', 'user2', 'user3'];
   const expectedMessage = [
-    '@user1, you have Zero rank. Next rank - Eight Follower 0.0% (8.0 months)',
-    '@user2, you have Zero rank. Next rank - Eight Follower 62.5% (3.0 months)',
-    '@user3, you have Eight Follower rank',
+    '$sender, you have Zero rank. Next rank - Eight Follower 0.0% (8.0 months)',
+    '$sender, you have Zero rank. Next rank - Eight Follower 62.5% (3.0 months)',
+    '$sender, you have Eight Follower rank',
   ];
   for (const [id, v] of Object.entries(users)) {
     it('Add user ' + v + ' to db', async () => {
@@ -73,11 +60,8 @@ describe('Ranks - followers', () => {
     });
 
     it('Rank of user should be correct', async () => {
-      await ranks.main({ sender: { userId: Number('100' + id), username: v }});
-    });
-
-    it('Should have expected message', async () => {
-      await message.isSentRaw(expectedMessage[id], { username: v });
+      const r = await ranks.main({ sender: { userId: Number('100' + id), username: v }});
+      assert.strictEqual(r[0].response, expectedMessage[id]);
     });
   }
 });

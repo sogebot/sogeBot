@@ -1,0 +1,5 @@
+{
+  "no-custom-variable-found": "Пользовательские переменные не найдены, добавьте в <a href=\"/#/registry/customVariables/list\">реестре пользовательских переменных</a>",
+  "add-variable-into-watchlist": "Добавить переменную в список наблюдения",
+  "watchlist": "Список Отслеживаемых"
+}

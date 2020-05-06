@@ -2,11 +2,9 @@
 
 
 require('../../general.js');
-const uuid = require('uuid/v4');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
-const time = require('../../general.js').time;
 const assert = require('assert');
 
 const { getRepository } = require('typeorm');
@@ -29,13 +27,13 @@ describe('Custom Commands - count filter', () => {
 
   describe('$count(\'!cmd2\') should be properly parsed', () => {
     it('create command and response with $count variable', async () => {
-      customcommands.add({ sender: owner, parameters: '-c !cmd -r Count of !cmd2 is $count(\'!cmd2\') and count of !second $count(\'!second\')' });
-      await message.isSent('customcmds.command-was-added', owner, { command: '!cmd', sender: owner.username });
+      const r = await customcommands.add({ sender: owner, parameters: '-c !cmd -r Count of !cmd2 is $count(\'!cmd2\') and count of !second $count(\'!second\')' });
+      assert.strictEqual(r[0].response, '$sender, command !cmd was added');
     });
 
     it('create command to increment count', async () => {
-      customcommands.add({ sender: owner, parameters: '-c !cmd2 -r !uptime' });
-      await message.isSent('customcmds.command-was-added', owner, { command: '!cmd2', sender: owner.username });
+      const r = await customcommands.add({ sender: owner, parameters: '-c !cmd2 -r !uptime' });
+      assert.strictEqual(r[0].response, '$sender, command !cmd2 was added');
     });
 
     it('$count should be 0', async () => {
@@ -60,8 +58,8 @@ describe('Custom Commands - count filter', () => {
 
   describe('$count should be properly parsed', () => {
     it('create command and response with $count variable', async () => {
-      customcommands.add({ sender: owner, parameters: '-c !cmd3 -r Command usage count: $count' });
-      await message.isSent('customcmds.command-was-added', owner, { command: '!cmd3', sender: owner.username });
+      const r = await customcommands.add({ sender: owner, parameters: '-c !cmd3 -r Command usage count: $count' });
+      assert.strictEqual(r[0].response, '$sender, command !cmd3 was added');
     });
 
     it('$count should be 1', async () => {

@@ -1,0 +1,8 @@
+{
+  "settings": {
+    "enabled": "Статус",
+    "eligibilityAll": "Все",
+    "eligibilityFollowers": "Фолловеров",
+    "eligibilitySubscribers": "Сабскрайберов"
+  }
+}

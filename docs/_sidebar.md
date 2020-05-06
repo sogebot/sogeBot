@@ -37,6 +37,8 @@
   * [Roulette](/games/roulette.md)
   * [Seppuku](/games/seppuku.md)
   * [Wheel Of Fortune](/games/wheelOfFortune.md)
+* Registries
+  * [Randomizer](/registries/randomizer.md)
 * [Response Filters](/filters/all.md)
 * Overlays
   * [Themes](/overlays/themes.md)

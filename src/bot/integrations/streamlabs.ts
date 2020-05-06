@@ -83,11 +83,11 @@ class Streamlabs extends Integration {
             donationIdSet = true;
           }
 
-          const { name, currency, amount, message, created_at } = item;
+          const { name, currency: currency2, amount, message, created_at } = item;
           this.parse({
             type: 'donation',
             message: [{
-              formatted_amount: `${currency}${amount}`,
+              formatted_amount: `${currency2}${amount}`,
               amount: Number(amount),
               message: decodeURI(message),
               from: name,

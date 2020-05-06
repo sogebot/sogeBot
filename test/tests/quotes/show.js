@@ -5,6 +5,7 @@ require('../../general.js');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
+const assert = require('assert');
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
@@ -35,6 +36,7 @@ const tests = [
 
 describe('Quotes - main()', () => {
   for (const test of tests) {
+    let id, r;
     describe(test.parameters, async () => {
       before(async () => {
         await db.cleanup();
@@ -42,7 +44,7 @@ describe('Quotes - main()', () => {
         await getRepository(User).save({ username: user.username, userId: user.userId });
         await getRepository(User).save({ username: owner.username, userId: owner.userId });
         const quote = await quotes.add({ sender: test.sender, parameters: '-tags lorem ipsum -quote Lorem Ipsum', command: '!quote add' });
-        id = quote.id;
+        id = quote[0].id;
         if (test.id === 1) {
           test.id = id;
         }
@@ -50,20 +52,20 @@ describe('Quotes - main()', () => {
       });
 
       it('Run !quote', async () => {
-        quotes.main({ sender: test.sender, parameters: test.parameters, command: '!quote' });
+        r = await quotes.main({ sender: test.sender, parameters: test.parameters, command: '!quote' });
       });
       if (test.shouldFail) {
         it('Should throw error', async () => {
-          await message.isSent(test.error, owner, { command: '!quote' });
+          assert.strictEqual(r[0].response, `$sender, !quote is missing -id or -tag.`);
         });
       } else {
         if (test.exist) {
           it('Should show quote', async () => {
-            await message.isSent('systems.quotes.show.ok', owner, { id, quotedBy: 'soge__', quote: 'Lorem Ipsum' });
+            assert.strictEqual(r[0].response, `Quote ${id} by soge__ 'Lorem Ipsum'`);
           });
         } else {
           it('Should sent not-found message', async () => {
-            await message.isSent(['systems.quotes.show.error.not-found-by-id', 'systems.quotes.show.error.not-found-by-tag'], owner, { id: test.id, tag: test.tag });
+            assert(r[0].response === `$sender, no quotes with tag general was not found.` || r[0].response === `$sender, quote ${test.id} was not found.`);
           });
         }
       }

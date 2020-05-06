@@ -1,0 +1,7 @@
+{
+  "settings": {
+    "cClipsVolume": "Lautstärke",
+    "cClipsFilter": "Clip-Filter",
+    "cClipsLabel": "'Clip' Label anzeigen"
+  }
+}

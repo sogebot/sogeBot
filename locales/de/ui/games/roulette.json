@@ -1,0 +1,11 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "timeout": {
+      "title": "Dauer der Zeitüberschreitung",
+      "help": "Sekunden"
+    },
+    "winnerWillGet": "Wie viele Punkte bei einem Sieg hinzugefügt werden",
+    "loserWillLose": "Wie viele Punkte bei einer Niederlage verloren gehen"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "settings": {
+    "purgeAllConnections": "Очистить все аутентифицированные соединения (включая ваши)",
+    "accessTokenExpirationTime": "Время жизни AccessToken (секунды)",
+    "refreshTokenExpirationTime": "Время жизни RefreshToken (секунды)",
+    "socketToken": {
+      "title": "Токен сокета",
+      "help": "Этот токен даст вам полный доступ администратора через сокеты. Не распространяйте его!"
+    }
+  }
+}

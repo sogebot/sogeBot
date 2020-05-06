@@ -1,10 +1,13 @@
 {
-  "opened_normal": "Hlasovani otevreno! Hlasovani na otazku \"$title\" pomoci $command X",
-  "opened_tips": "Hlasovani pomoci tipu otevreno! Hlasovani na otazku \"$title\" pomoci hashtagu #voteX ve zprave tipu",
-  "opened_bits": "Hlasovani pomoci bitu otevreno! Hlasovani na otazku \"$title\" pomoci hashtagu #voteX ve zprave bitu",
-  "notEnoughOptions": "$sender, nove hlasovani musi mit alespon dve moznosti!",
-  "notInProgress": "$sender, neprobiha prave zadne hlasovani!",
-  "status": "$sender, momentalni stav hlasovani \"$title\":",
-  "status_closed": "Hlasovani \"$title\" uzavreno, finalni stav hlasovani:",
+  "opened_normal": "Anketa byla otevřena pro \"$title\"! Hlasovat můžete pomocí $command X",
+  "opened_tips": "Anketa pomocí tipů pro \"$title\"! Můžete hlasovat přidáním hashtag #voteX do zprávy",
+  "opened_bits": "Anketa pomocí bitů pro \"$title\"! Můžete hlasovat přidáním hashtag #voteX do zprávy bitů",
+  "alreadyOpened_normal": "Chyba! Anketa byla již otevřena pro \"$title\"! Můžete hlasovat pomocí $command X",
+  "alreadyOpened_tips": "Chyba! Anketa pomocí tipů byla již otevřena pro \"$title\"! Můžete hlasovat přidáním hashtag #voteX do zprávy",
+  "alreadyOpened_bits": "Chyba! Anketa pomocí bitů byla již otevřena pro \"$title\"! Můžete hlasovat přidáním hashtag #voteX do zprávy",
+  "notEnoughOptions": "$sender, nová anketa musí mít alespoň 2 možnosti!",
+  "notInProgress": "$sender, v současné době neprobíhá žádná anketa!",
+  "status": "$sender, aktuální stav ankety \"$title\":",
+  "status_closed": "Anketa \"$title\" uzavřena, stav hlasování:",
   "votes": "hlas|4:hlasy|hlasu"
 }

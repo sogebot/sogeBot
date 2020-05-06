@@ -1,5 +1,6 @@
 import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
+import { CommonSettingsInterface } from './alert';
 
 export interface RandomizerInterface {
   id?: string;
@@ -17,6 +18,7 @@ export interface RandomizerInterface {
     borderColor: string;
     borderPx: number;
   };
+  tts: Omit<CommonSettingsInterface['tts'], 'skipUrls' | 'keepAlertShown' | 'minAmountToPlay'>;
 }
 
 export interface RandomizerItemInterface {
@@ -45,6 +47,7 @@ export const Randomizer = new EntitySchema<Readonly<Required<RandomizerInterface
     permissionId: { type: String },
     name: { type: String },
     widgetOrder: { type: Number },
+    tts: { type: 'simple-json' },
   },
   relations: {
     items: {

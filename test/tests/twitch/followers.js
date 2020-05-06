@@ -7,6 +7,8 @@ const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 
 const moment = require('moment');
+const assert = require('assert');
+const { prepare } = require('../../../dest/commons');
 
 const testuser = { username: 'testuser', id: Math.floor(Math.random() * 1000) };
 const testuser2 = { username: 'testuser2', id: Math.floor(Math.random() * 1000) };
@@ -47,12 +49,12 @@ describe('lib/twitch - followers()', () => {
   });
 
   it('!followers should return testuser2', async () => {
-    twitch.followers({ sender: testuser });
-    await message.isSent('followers', testuser, {
+    const r = await twitch.followers({ sender: testuser });
+    assert.strictEqual(r[0].response, prepare('followers', {
       lastFollowAgo: 'a few seconds ago',
       lastFollowUsername: testuser2.username,
       onlineFollowersCount: 0,
-    });
+    }));
   });
 
   it('add testuser3 to events', async () => {
@@ -64,12 +66,12 @@ describe('lib/twitch - followers()', () => {
   });
 
   it('!followers should return testuser3', async () => {
-    twitch.followers({ sender: testuser });
-    await message.isSent('followers', testuser, {
+    const r = await twitch.followers({ sender: testuser });
+    assert.strictEqual(r[0].response, prepare('followers', {
       lastFollowAgo: 'a few seconds ago',
       lastFollowUsername: testuser3.username,
       onlineFollowersCount: 0,
-    });
+    }));
   });
 
   it('Add testuser, testuser2, testuser3 to online users', async () => {
@@ -77,11 +79,11 @@ describe('lib/twitch - followers()', () => {
   });
 
   it('!followers should return testuser3 and 3 online followers', async () => {
-    twitch.followers({ sender: testuser });
-    await message.isSent('followers', testuser, {
+    const r = await twitch.followers({ sender: testuser });
+    assert.strictEqual(r[0].response, prepare('followers', {
       lastFollowAgo: 'a few seconds ago',
       lastFollowUsername: testuser3.username,
       onlineFollowersCount: 3,
-    });
+    }));
   });
 });

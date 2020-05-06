@@ -40,6 +40,7 @@
                     </a>
                     <component
                       v-else
+                      :fullObject.sync="ui[category][defaultValue]"
                       :is="ui[category][defaultValue].type"
                       :readonly="ui[category][defaultValue].readOnly"
                       :secret="ui[category][defaultValue].secret"
@@ -266,6 +267,7 @@ enum State {
     'text-input': () => import('./components/interface/text-input.vue'),
     'textarea-from-array': () => import('./components/interface/textarea-from-array.vue'),
     'uuid-generator': () => import('./components/interface/uuid-generator.vue'),
+    'voice': () => import('./components/interface/voice.vue'),
     'toggle-enable': () => import('../../components/toggle-enable.vue'),
     }
 })

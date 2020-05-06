@@ -51,8 +51,8 @@ describe('Custom Commands - add()', () => {
   describe('Expected parsed fail', () => {
     for (const t of failedTests) {
       it(generateCommand(t), async () => {
-        customcommands.add({ sender: owner, parameters: generateCommand(t) });
-        await message.isSent('customcmds.commands-parse-failed', owner, { sender: owner.username });
+        const r = await customcommands.add({ sender: owner, parameters: generateCommand(t) });
+        assert.strictEqual(r[0].response, 'Sorry, $sender, but this command is not correct, use !commands');
       });
     }
   });
@@ -60,8 +60,8 @@ describe('Custom Commands - add()', () => {
   describe('Expected to pass', () => {
     for (const t of successTests) {
       it(generateCommand(t), async () => {
-        customcommands.add({ sender: owner, parameters: generateCommand(t) });
-        await message.isSent('customcmds.command-was-added', owner, { response: t.response, command: t.command, sender: owner.username });
+        const r = await customcommands.add({ sender: owner, parameters: generateCommand(t) });
+        assert.strictEqual(r[0].response, '$sender, command ' + t.command + ' was added');
 
         customcommands.run({ sender: owner, message: t.command });
         await message.isSentRaw(t.response, owner);
@@ -69,11 +69,11 @@ describe('Custom Commands - add()', () => {
     }
 
     it('2x - !a Lorem Ipsum', async () => {
-      customcommands.add({ sender: owner, parameters: '-c !a -r Lorem Ipsum' });
-      await message.isSent('customcmds.command-was-added', owner, { response: 'Lorem Ipsum', command: '!a', sender: owner.username });
+      const r = await customcommands.add({ sender: owner, parameters: '-c !a -r Lorem Ipsum' });
+      const r2 = await customcommands.add({ sender: owner, parameters: '-c !a -r Lorem Ipsum' });
 
-      customcommands.add({ sender: owner, parameters: '-c !a -r Lorem Ipsum' });
-      await message.isSent('customcmds.command-was-added', owner, { response: 'Lorem Ipsum', command: '!a', sender: owner.username });
+      assert.strictEqual(r[0].response, '$sender, command !a was added');
+      assert.strictEqual(r2[0].response, '$sender, command !a was added');
     });
   });
 });

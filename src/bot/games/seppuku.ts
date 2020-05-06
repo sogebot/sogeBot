@@ -1,4 +1,4 @@
-import { isBroadcaster, isModerator, sendMessage, timeout } from '../commons';
+import { isBroadcaster, isModerator, timeout } from '../commons';
 import { command, settings } from '../decorators';
 import Game from './_interface';
 import { translate } from '../translate';
@@ -14,18 +14,16 @@ class Seppuku extends Game {
   @command('!seppuku')
   async main (opts) {
     if (isBroadcaster(opts.sender)) {
-      sendMessage(translate('gambling.seppuku.broadcaster'), opts.sender, opts.attr);
-      return;
+      return [{ response: translate('gambling.seppuku.broadcaster'), ... opts }];
     }
 
     const isMod = isModerator(opts.sender);
     if (isMod) {
-      sendMessage(translate('gambling.seppuku.mod'), opts.sender, opts.attr);
-      return;
+      return [{ response: translate('gambling.seppuku.mod'), ... opts }];
     }
 
-    sendMessage(translate('gambling.seppuku.text'), opts.sender, opts.attr);
     timeout(opts.sender.username, translate('gambling.seppuku.text'), this.timeout);
+    return [{ response: translate('gambling.seppuku.text'), ... opts }];
   }
 }
 

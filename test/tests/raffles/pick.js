@@ -39,13 +39,13 @@ describe('Raffles - pick()', () => {
     });
 
     it('pick a winner', async () => {
-      await raffles.pick({ sender: owner });
+      const r = await raffles.pick({ sender: owner });
       const raffle = await getRepository(Raffle).findOne({
         order: {
-          timestamp: 'DESC'
-        }
-      })
-      await message.isSent('raffles.no-participants-to-pick-winner', { username: 'bot' })
+          timestamp: 'DESC',
+        },
+      });
+      assert.strictEqual(r[0].response, '$sender, nobody joined a raffle');
       assert(raffle.isClosed);
       assert(raffle.winner === null);
     });

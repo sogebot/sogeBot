@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 
-import { dateDiff, getLocalizedName, prepare, sendMessage } from '../commons';
+import { dateDiff, getLocalizedName, prepare } from '../commons';
 import { command, default_permission, settings, ui } from '../decorators';
 import System from './_interface';
 import { debug, error } from '../helpers/log';
@@ -50,7 +50,7 @@ class UserInfo extends System {
   lastSeenFormat = 'L LTS';
 
   @command('!followage')
-  protected async followage(opts: CommandOptions) {
+  protected async followage(opts: CommandOptions): Promise<CommandResponse[]> {
     const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
 
     const id = await users.getIdByName(username);
@@ -59,7 +59,7 @@ class UserInfo extends System {
 
     const user = await getRepository(User).findOne({ username });
     if (!user || !user.isFollower || user.followedAt === 0) {
-      sendMessage(prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.never', { username }), opts.sender, opts.attr);
+      return [{ response: prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.never', { username }), ...opts }];
     } else {
       const units: string[] = ['years', 'months', 'days', 'hours', 'minutes'];
       const diff = dateDiff(new Date(user.followedAt).getTime(), Date.now());
@@ -75,15 +75,15 @@ class UserInfo extends System {
         output.push(0 + ' ' + getLocalizedName(0, 'core.minutes'));
       }
 
-      sendMessage(prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.time', {
+      return [{ response: prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.time', {
         username,
         diff: output.join(', '),
-      }), opts.sender);
+      }), ...opts }];
     }
   }
 
   @command('!subage')
-  protected async subage(opts: CommandOptions) {
+  protected async subage(opts: CommandOptions): Promise<CommandResponse[]> {
     const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
 
     const user = await getRepository(User).findOne({ username });
@@ -92,11 +92,11 @@ class UserInfo extends System {
     const localePath = 'subage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.';
 
     if (!user || !user.isSubscriber || user.subscribedAt === 0) {
-      sendMessage(prepare(localePath + (subCumulativeMonths ? 'notNow' : 'never'), {
+      return [{ response: prepare(localePath + (subCumulativeMonths ? 'notNow' : 'never'), {
         username,
         subCumulativeMonths,
         subCumulativeMonthsName: getLocalizedName(subCumulativeMonths || 0, 'core.months'),
-      }), opts.sender);
+      }), ...opts }];
     } else {
       const units: string[] = ['years', 'months', 'days', 'hours', 'minutes'];
       const diff = dateDiff(new Date(user.subscribedAt).getTime(), Date.now());
@@ -111,19 +111,19 @@ class UserInfo extends System {
         output.push(0 + ' ' + getLocalizedName(0, 'core.minutes'));
       }
 
-      sendMessage(prepare(localePath + (subStreak ? 'timeWithSubStreak' : 'time'), {
+      return [{ response: prepare(localePath + (subStreak ? 'timeWithSubStreak' : 'time'), {
         username,
         subCumulativeMonths,
         subCumulativeMonthsName: getLocalizedName(subCumulativeMonths || 0, 'core.months'),
         subStreak,
         subStreakMonthsName: getLocalizedName(subStreak || 0, 'core.months'),
         diff: output.join(', '),
-      }), opts.sender);
+      }), ...opts }];
     }
   }
 
   @command('!age')
-  protected async age(opts: CommandOptions, retry = false) {
+  protected async age(opts: CommandOptions, retry = false): Promise<CommandResponse[]> {
     const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
 
     const user = await getRepository(User).findOne({ username });
@@ -138,7 +138,7 @@ class UserInfo extends System {
         }
         await clusteredFetchAccountAge(Number(userId));
         if (!retry) {
-          this.age(opts, retry = true);
+          return this.age(opts, retry = true);
         } else {
           throw new Error('retry');
         }
@@ -146,7 +146,7 @@ class UserInfo extends System {
         if (e.message !== 'retry') {
           error(e);
         }
-        sendMessage(prepare('age.failed', { username }), opts.sender, opts.attr);
+        return [{ response: prepare('age.failed', { username }), ...opts }];
       }
     } else {
       const units: string[] = ['years', 'months', 'days', 'hours', 'minutes'];
@@ -161,33 +161,33 @@ class UserInfo extends System {
       if (output.length === 0) {
         output.push(0 + ' ' + getLocalizedName(0, 'core.minutes'));
       }
-      sendMessage(prepare('age.success.' + (opts.sender.username === username.toLowerCase() ? 'withoutUsername' : 'withUsername'), {
+      return [{ response: prepare('age.success.' + (opts.sender.username === username.toLowerCase() ? 'withoutUsername' : 'withUsername'), {
         username,
         diff: output.join(', '),
-      }), opts.sender);
+      }), ...opts }];
     }
   }
 
   @command('!lastseen')
-  protected async lastseen(opts: CommandOptions) {
+  protected async lastseen(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [username] = new Expects(opts.parameters).username().toArray();
       const user = await getRepository(User).findOne({ username: username });
       if (!user || user.seenAt === 0) {
-        sendMessage(translate('lastseen.success.never').replace(/\$username/g, username), opts.sender, opts.attr);
+        return [{ response: translate('lastseen.success.never').replace(/\$username/g, username), ...opts }];
       } else {
         moment.locale(translateLib.lang);
-        sendMessage(translate('lastseen.success.time')
+        return [{ response: translate('lastseen.success.time')
           .replace(/\$username/g, username)
-          .replace(/\$when/g, moment(user.seenAt).format(this.lastSeenFormat)), opts.sender);
+          .replace(/\$when/g, moment(user.seenAt).format(this.lastSeenFormat)), ...opts }];
       }
     } catch (e) {
-      sendMessage(translate('lastseen.failed.parse'), opts.sender, opts.attr);
+      return [{ response: translate('lastseen.failed.parse'), ...opts }];
     }
   }
 
   @command('!watched')
-  protected async watched(opts: CommandOptions) {
+  protected async watched(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
 
@@ -198,14 +198,14 @@ class UserInfo extends System {
         id = await users.getIdByName(username);
       }
       const time = id ? Number((await users.getWatchedOf(id) / (60 * 60 * 1000))).toFixed(1) : 0;
-      sendMessage(prepare('watched.success.time', { time: String(time), username }), opts.sender, opts.attr);
+      return [{ response: prepare('watched.success.time', { time: String(time), username }), ...opts }];
     } catch (e) {
-      sendMessage(translate('watched.failed.parse'), opts.sender, opts.attr);
+      return [{ response: translate('watched.failed.parse'), ...opts }];
     }
   }
 
   @command('!me')
-  async showMe(opts: CommandOptions, returnOnly = false): Promise<string> {
+  async showMe(opts: CommandOptions, returnOnly = false): Promise<string | CommandResponse[]> {
     try {
       const message: (string | null)[] = [];
       const user = await getRepository(User).findOne({
@@ -289,18 +289,17 @@ class UserInfo extends System {
       if (returnOnly) {
         return response;
       } else {
-        sendMessage(response, opts.sender, opts.attr);
-        return response;
+        return [{ response, sender: opts.sender, attr: opts.attr }];
       }
     } catch (e) {
       error(e.stack);
-      return '';
+      return [];
     }
   }
 
   @command('!stats')
   @default_permission(null)
-  async showStats(opts: CommandOptions) {
+  async showStats(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
       const user = await getRepository(User).findOne({ where: { username: username.toLowerCase() }});
@@ -316,13 +315,16 @@ class UserInfo extends System {
           username,
           userId: user.userId,
         },
-      }, true);
-      sendMessage(response.replace('$sender', '$touser'), opts.sender, { ...opts.attr, param: username });
+      }, true) as string;
+      return [
+        { response: response.replace('$sender', '$touser'), sender: opts.sender, attr: { ...opts.attr, param: username } },
+      ];
     } catch (e) {
       if (e.message.includes('<username>')) {
-        this.showMe(opts); // fallback to me without param
+        return this.showMe(opts) as Promise<CommandResponse[]>; // fallback to me without param
       } else {
         error(e.stack);
+        return [];
       }
     }
 

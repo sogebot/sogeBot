@@ -11,7 +11,7 @@ import * as constants from './constants';
 import Core from './_interface';
 
 import { debug, error, follow, info, start, stop, unfollow, warning } from './helpers/log';
-import { getBroadcaster, isBot, isBroadcaster, isIgnored, sendMessage } from './commons';
+import { getBroadcaster, isBot, isBroadcaster, isIgnored } from './commons';
 
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import { shared } from './decorators';
@@ -46,12 +46,27 @@ export const currentStreamTags: {
 }[] = [];
 
 let intervals = 0;
-const isAPIFree = (intervals) => {
-  for (const key of Object.keys(intervals)) {
-    if (intervals[key].inProgress) {
+let lastIsAPIFreeKey = '__unset__';
+let lastIsAPIFreeKeyStart = Date.now();
+
+const isAPIFree = (intervalList) => {
+  for (const key of Object.keys(intervalList)) {
+    if (intervalList[key].inProgress) {
+      if (lastIsAPIFreeKey !== key) {
+        lastIsAPIFreeKey = key;
+        lastIsAPIFreeKeyStart = Date.now();
+      }
+
+      if (Date.now() - lastIsAPIFreeKeyStart > 10 * constants.MINUTE) {
+        warning(`API call for ${key} is probably frozen (took more than 10minutes), forcefully unblocking`);
+        intervalList[key].inProgress = false;
+        lastIsAPIFreeKey = '__unset__';
+        return true;
+      }
       return false;
     }
   }
+  lastIsAPIFreeKey = '__unset__';
   return true;
 };
 
@@ -767,6 +782,7 @@ class API extends Core {
       this.calls.bot.limit = request.headers['ratelimit-limit'];
 
       if (request.data.data.length > 0) {
+        oauth.profileImageUrl = request.data.data[0].profile_image_url;
         oauth.broadcasterType = request.data.data[0].broadcaster_type;
         this.stats.currentViews = request.data.data[0].view_count;
       }
@@ -1167,14 +1183,14 @@ class API extends Core {
             events.fire('stream-is-running-x-minutes', { reset: true });
             events.fire('number-of-viewers-is-at-least-x', { reset: true });
 
-            for (const event of getFunctionList('streamStart')) {
+            for (const event of getFunctionList('streamEnd')) {
               const type = !event.path.includes('.') ? 'core' : event.path.split('.')[0];
               const module = !event.path.includes('.') ? event.path.split('.')[0] : event.path.split('.')[1];
               const self = find(type, module);
               if (self) {
                 self[event.fName]();
               } else {
-                error(`streamStart: ${event.path} not found`);
+                error(`streamEnd: ${event.path} not found`);
               }
             }
 
@@ -1303,7 +1319,7 @@ class API extends Core {
 
   }
 
-  async setTitleAndGame (sender, args) {
+  async setTitleAndGame (sender, args): Promise<{ response: string; status: boolean }> {
     if (!isMainThread) {
       throw new Error('API can run only on master');
     }
@@ -1315,8 +1331,7 @@ class API extends Core {
     const token = await oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
     if (needToWait) {
-      setTimeout(() => this.setTitleAndGame(sender, args), 1000);
-      return;
+      return { response: '', status: false };
     }
 
     let request;
@@ -1353,38 +1368,41 @@ class API extends Core {
     } catch (e) {
       error(`API: ${url} - ${e.message}`);
       ioServer?.emit('api.stats', { timestamp: Date.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
-      return false;
+      return { response: '', status: false };
     }
+
+    const responses: { response: string; status: boolean } = { response: '', status: false };
 
     if (request.status === 200 && !isNil(request.data)) {
       const response = request.data;
       if (!isNil(args.game)) {
         response.game = isNil(response.game) ? '' : response.game;
         if (response.game.trim() === args.game.trim()) {
-          sendMessage(translate('game.change.success')
-            .replace(/\$game/g, response.game), sender);
+          responses.response = translate('game.change.success').replace(/\$game/g, response.game);
+          responses.status = true;
           events.fire('game-changed', { oldGame: this.stats.currentGame, game: response.game });
           this.stats.currentGame = response.game;
         } else {
-          sendMessage(translate('game.change.failed')
-            .replace(/\$game/g, this.stats.currentGame), sender);
+          responses.response = translate('game.change.failed').replace(/\$game/g, this.stats.currentGame);
+          responses.status = false;
         }
       }
 
       if (!isNull(args.title)) {
         if (response.status.trim() === status.trim()) {
-          sendMessage(translate('title.change.success')
-            .replace(/\$title/g, response.status), sender);
+          responses.response = translate('title.change.success').replace(/\$title/g, response.status);
+          responses.status = true;
           this.stats.currentTitle = response.status;
         } else {
-          sendMessage(translate('title.change.failed')
-            .replace(/\$title/g, this.stats.currentTitle), sender);
+          responses.response = translate('title.change.failed').replace(/\$title/g, this.stats.currentTitle);
+          responses.status = true;
         }
       }
       this.gameOrTitleChangedManually = true;
       this.retries.getCurrentStreamData = 0;
-      return true;
+      return responses;
     }
+    return { response: '', status: false };
   }
 
   async sendGameFromTwitch (self, socket, game) {
@@ -1585,7 +1603,7 @@ class API extends Core {
       let logError;
       try {
         logError = e.response.data.status !== 422;
-      } catch (e) {
+      } catch (e2) {
         logError = true;
       }
 

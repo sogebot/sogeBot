@@ -8,11 +8,11 @@ import strip from 'strip-comments';
 import Message from './message';
 import { permission } from './helpers/permissions';
 import { getAllOnlineUsernames } from './helpers/getAllOnlineUsernames';
-import { getOwnerAsSender, getTime, isModerator, prepare, sendMessage } from './commons';
+import { announce, getTime, isModerator, prepare } from './commons';
 
-import { getRepository } from 'typeorm';
+import { getRepository, IsNull } from 'typeorm';
 import { User, UserInterface } from './database/entity/user';
-import { Variable, VariableInterface, VariableWatch } from './database/entity/variable';
+import { Variable, VariableHistory, VariableInterface, VariableURL, VariableWatch } from './database/entity/variable';
 import { addToViewersCache, getFromViewersCache } from './helpers/permissions';
 import users from './users';
 import api from './api';
@@ -41,8 +41,8 @@ class CustomVariables extends Core {
       const variable = (await getRepository(Variable).find({
         relations: ['urls'],
       }))
-        .find(variable => {
-          return variable.urls.find(url => url.id === req.params.id);
+        .find(v => {
+          return v.urls.find(url => url.id === req.params.id);
         });
       if (variable) {
         if (variable.urls.find(url => url.id === req.params.id)?.GET) {
@@ -64,28 +64,21 @@ class CustomVariables extends Core {
       const variable = (await getRepository(Variable).find({
         relations: ['urls'],
       }))
-        .find(variable => {
-          return variable.urls.find(url => url.id === req.params.id);
+        .find(v => {
+          return v.urls.find(url => url.id === req.params.id);
         });
       if (variable) {
         if (variable.urls.find(url => url.id === req.params.id)?.POST) {
-          const value = await this.setValueOf(variable.variableName, req.body.value, {});
-
+          const value = await this.setValueOf(variable, req.body.value, { sender: null, readOnlyBypass: true });
           if (value.isOk) {
             if (variable.urls.find(url => url.id === req.params.id)?.showResponse) {
               if (value.updated.responseType === 0) {
-                sendMessage(
-                  prepare('filters.setVariable', { value: value.updated.currentValue, variable: variable }),
-                  getOwnerAsSender(), { skip: true, quiet: false }
-                );
+                announce(prepare('filters.setVariable', { value: value.updated.currentValue, variable: variable }));
               } else if (value.updated.responseType === 1) {
-                sendMessage(
-                  value.updated.responseText.replace('$value', value.updated.currentValue),
-                  getOwnerAsSender(), { skip: true, quiet: false }
-                );
+                announce(value.updated.responseText.replace('$value', value.updated.currentValue));
               }
             }
-            return res.status(200).send({ oldValue: variable.currentValue, value: value.updated.currentValue });
+            return res.status(200).send({ oldValue: variable.currentValue, value: value.setValue });
           } else {
             return res.status(400).send({ error: 'This value is not applicable for this endpoint', code: 400 });
           }
@@ -107,7 +100,6 @@ class CustomVariables extends Core {
       cb(null, variables);
     });
     adminEndpoint(this.nsp, 'customvariables::runScript', async (id, cb) => {
-      let item;
       try {
         const item = await getRepository(Variable).findOne({ id });
         if (!item) {
@@ -120,9 +112,7 @@ class CustomVariables extends Core {
         }));
       } catch (e) {
         cb(e.stack, null);
-      }
-      cb(null, item)
-      ;
+      };
     });
     adminEndpoint(this.nsp, 'customvariables::testScript', async (opts, cb) => {
       let returnedValue;
@@ -154,6 +144,27 @@ class CustomVariables extends Core {
     adminEndpoint(this.nsp, 'save', async (item: VariableInterface, cb) => {
       try {
         await getRepository(Variable).save(item);
+        // somehow this is not populated by save on sqlite
+        if (item.urls) {
+          for (const url of item.urls) {
+            await getRepository(VariableURL).save({
+              ...url,
+              variable: item,
+            });
+          }
+        }
+        // somehow this is not populated by save on sqlite
+        if (item.history) {
+          for (const history of item.history) {
+            await getRepository(VariableHistory).save({
+              ...history,
+              variable: item,
+            });
+          }
+        }
+        await getRepository(VariableHistory).delete({ variableId: IsNull() });
+        await getRepository(VariableURL).delete({ variableId: IsNull() });
+
         this.updateWidgetAndTitle(item.variableName);
         cb(null, item.id);
       } catch (e) {
@@ -228,27 +239,27 @@ class CustomVariables extends Core {
 
     const toEval = `(async function evaluation () {  ${script} })()`;
     const context = {
-      url: async (url, opts) => {
-        if (typeof opts === 'undefined') {
-          opts = {
+      url: async (url, urlOpts) => {
+        if (typeof urlOpts === 'undefined') {
+          urlOpts = {
             url,
             method: 'GET',
             headers: undefined,
             data: undefined,
           };
         } else {
-          opts.url = url;
+          urlOpts.url = url;
         }
 
-        if (!['GET', 'POST', 'PUT', 'DELETE'].includes(opts.method.toUpperCase())) {
+        if (!['GET', 'POST', 'PUT', 'DELETE'].includes(urlOpts.method.toUpperCase())) {
           throw Error('only GET, POST, PUT, DELETE methods are supported');
         }
 
-        if (opts.url.trim().length === 0) {
+        if (urlOpts.url.trim().length === 0) {
           throw Error('url was not properly specified');
         }
 
-        const request = await axios(opts);
+        const request = await axios(urlOpts);
         return { data: request.data, status: request.status, statusText: request.statusText };
       },
       _: _,
@@ -407,7 +418,7 @@ class CustomVariables extends Core {
           itemCurrentValue = await this.getValueOf(item.variableName, opts);
           isEval = true;
         } else if (item.type === 'text') {
-          itemCurrentValue = String(itemCurrentValue);
+          itemCurrentValue = String(currentValue);
           isOk = true;
         }
       }
@@ -446,6 +457,7 @@ class CustomVariables extends Core {
         oldValue: opts.oldValue,
         currentValue: opts.item.currentValue,
         changedAt: Date.now(),
+        variableId: variable.id,
       });
       await getRepository(Variable).save(variable);
     }

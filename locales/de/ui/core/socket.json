@@ -1,0 +1,11 @@
+{
+  "settings": {
+    "purgeAllConnections": "Lösche alle authentifizierte Verbindung (auch Deine)",
+    "accessTokenExpirationTime": "Zugriffstoken Ablaufzeit (Sekunden)",
+    "refreshTokenExpirationTime": "Aktualisierungs-Token Ablaufzeit (Sekunden)",
+    "socketToken": {
+      "title": "Socket-Token",
+      "help": "Dieses Token gibt Dir vollen Admin-Zugriff über Sockets. Nicht teilen!"
+    }
+  }
+}

@@ -18,7 +18,7 @@
         <b-dropdown id="dropdown-buttons" :text="translate('registry.alerts.test')" class="m-2">
           <b-dropdown-item-button
             @click="socket.emit('test', event)"
-            v-for="event of ['follows', 'cheers', 'tips', 'subs', 'resubs', 'subgifts', 'hosts', 'raids']"
+            v-for="event of ['follows', 'cheers', 'tips', 'subs', 'resubs', 'subcommunitygifts', 'subgifts', 'hosts', 'raids']"
             v-bind:key="event">
             {{ translate('registry.alerts.event.' + event) }}</b-dropdown-item-button>
         </b-dropdown>
@@ -49,11 +49,14 @@
         <span :class="{'text-primary': data.item.subs.length > 0, 'text-muted': data.item.subs.length === 0}">
           SUBS<span v-if="data.item.subs.length > 0">({{data.item.subs.length}})</span>
         </span>
-        <span :class="{'text-primary': data.item.subs.length > 0, 'text-muted': data.item.resubs.length === 0}">
+        <span :class="{'text-primary': data.item.resubs.length > 0, 'text-muted': data.item.resubs.length === 0}">
           RESUBS<span v-if="data.item.resubs.length > 0">({{data.item.resubs.length}})</span>
         </span>
-        <span :class="{'text-primary': data.item.subs.length > 0, 'text-muted': data.item.subgifts.length === 0}">
+        <span :class="{'text-primary': data.item.subgifts.length > 0, 'text-muted': data.item.subgifts.length === 0}">
           SUBGIFTS<span v-if="data.item.subgifts.length > 0">({{data.item.subgifts.length}})</span>
+        </span>
+        <span :class="{'text-primary': data.item.subcommunitygifts.length > 0, 'text-muted': data.item.subcommunitygifts.length === 0}">
+          SUBCOMMUNITYGIFTS<span v-if="data.item.subcommunitygifts.length > 0">({{data.item.subcommunitygifts.length}})</span>
         </span>
         <span :class="{'text-primary': data.item.tips.length > 0, 'text-muted': data.item.tips.length === 0}">
           TIPS<span v-if="data.item.tips.length > 0">({{data.item.tips.length}})</span>

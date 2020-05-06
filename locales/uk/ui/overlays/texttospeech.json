@@ -1,0 +1,9 @@
+{
+  "settings": {
+    "responsiveVoiceKeyNotSet": "You haven't properly set <a href='#/settings/integrations/responsivevoice'>ResponsiveVoice key</a>",
+    "voice": "Voice",
+    "volume": "Volume",
+    "rate": "Rate",
+    "pitch": "Pitch"
+  }
+}

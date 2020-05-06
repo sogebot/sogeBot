@@ -1,8 +1,8 @@
 import _ from 'lodash';
 
 import Game from './_interface';
-import { command, settings } from '../decorators';
-import { prepare, sendMessage } from '../commons';
+import { command, settings, shared } from '../decorators';
+import { prepare } from '../commons';
 import { error } from '../helpers/log';
 
 import { getRepository } from 'typeorm';
@@ -27,8 +27,19 @@ class Gamble extends Game {
   @settings()
   chanceToWin = 50;
 
+  @settings('jackpot')
+  enableJackpot = false;
+  @settings('jackpot')
+  maxJackpotValue = 10000;
+  @settings('jackpot')
+  lostPointsAddedToJackpot = 20;
+  @settings('jackpot')
+  chanceToTriggerJackpot = 5;
+  @shared(true)
+  jackpotValue = 0;
+
   @command('!gamble')
-  async main (opts) {
+  async main (opts): Promise<CommandResponse[]> {
     let points, message;
 
     opts.sender['message-type'] = 'chat'; // force responses to chat
@@ -52,50 +63,67 @@ class Gamble extends Game {
       }
 
       await pointsSystem.decrement({ userId: opts.sender.userId }, parseInt(points, 10));
-      if (_.random(0, 100, false) <= this.chanceToWin) {
+      if (this.enableJackpot && _.random(0, 100, false) <= this.chanceToTriggerJackpot) {
+        const incrementPointsWithJackpot = (parseInt(points, 10) * 2) + this.jackpotValue;
+        await getRepository(User).increment({ userId: opts.sender.userId }, 'points', incrementPointsWithJackpot);
+        const currentPointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
+        message = prepare('gambling.gamble.winJackpot', {
+          pointsName: await pointsSystem.getPointsName(currentPointsOfUser),
+          points: currentPointsOfUser,
+          jackpotName: await pointsSystem.getPointsName(this.jackpotValue),
+          jackpot: this.jackpotValue,
+        });
+        this.jackpotValue = 0;
+      } else  if (_.random(0, 100, false) <= this.chanceToWin) {
         await getRepository(User).increment({ userId: opts.sender.userId }, 'points', parseInt(points, 10) * 2);
         const updatedPoints = await pointsSystem.getPointsOf(opts.sender.userId);
-        message = await prepare('gambling.gamble.win', {
+        message = prepare('gambling.gamble.win', {
           pointsName: await pointsSystem.getPointsName(updatedPoints),
           points: updatedPoints,
         });
-        sendMessage(message, opts.sender, opts.attr);
       } else {
-        message = await prepare('gambling.gamble.lose', {
-          pointsName: await pointsSystem.getPointsName(await pointsSystem.getPointsOf(opts.sender.userId)),
-          points: await pointsSystem.getPointsOf(opts.sender.userId),
-        });
-        sendMessage(message, opts.sender, opts.attr);
+        if (this.enableJackpot) {
+          const currentPointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
+          this.jackpotValue = Math.min(this.jackpotValue + points / this.lostPointsAddedToJackpot, this.maxJackpotValue);
+          message = prepare('gambling.gamble.loseWithJackpot', {
+            pointsName: await pointsSystem.getPointsName(currentPointsOfUser),
+            points: currentPointsOfUser,
+            jackpotName: await pointsSystem.getPointsName(this.jackpotValue),
+            jackpot: this.jackpotValue,
+          });
+        } else {
+          message = prepare('gambling.gamble.lose', {
+            pointsName: await pointsSystem.getPointsName(await pointsSystem.getPointsOf(opts.sender.userId)),
+            points: await pointsSystem.getPointsOf(opts.sender.userId),
+          });
+        }
       }
+      return [{ response: message, ...opts }];
     } catch (e) {
       switch (e.message) {
         case ERROR_ZERO_BET:
-          message = await prepare('gambling.gamble.zeroBet', {
+          message = prepare('gambling.gamble.zeroBet', {
             pointsName: await pointsSystem.getPointsName(0),
           });
-          sendMessage(message, opts.sender, opts.attr);
-          break;
+          return [{ response: message, ...opts }];
         case ERROR_NOT_ENOUGH_OPTIONS:
-          sendMessage(translate('gambling.gamble.notEnoughOptions'), opts.sender, opts.attr);
-          break;
+          return [{ response: translate('gambling.gamble.notEnoughOptions'), ...opts }];
         case ERROR_NOT_ENOUGH_POINTS:
-          message = await prepare('gambling.gamble.notEnoughPoints', {
+          message = prepare('gambling.gamble.notEnoughPoints', {
             pointsName: await pointsSystem.getPointsName(points),
             points: points,
           });
-          sendMessage(message, opts.sender, opts.attr);
-          break;
+          return [{ response: message, ...opts }];
         case ERROR_MINIMAL_BET:
           points = this.minimalBet;
-          message = await prepare('gambling.gamble.lowerThanMinimalBet', {
+          message = prepare('gambling.gamble.lowerThanMinimalBet', {
             pointsName: await pointsSystem.getPointsName(points),
             points: points,
           });
-          sendMessage(message, opts.sender, opts.attr);
-          break;
+          return [{ response: message, ...opts }];
         default:
           error(e.stack);
-          sendMessage(translate('core.error'), opts.sender, opts.attr);
+          return [{ response: translate('core.error'), ...opts }];
       }
     }
   }

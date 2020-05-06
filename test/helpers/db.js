@@ -20,11 +20,13 @@ const { Price } = require('../../dest/database/entity/price');
 const { Rank } = require('../../dest/database/entity/rank');
 const { Timer, TimerResponse } = require('../../dest/database/entity/timer');
 const { Poll, PollVote } = require('../../dest/database/entity/poll');
+const { PointsChangelog } = require('../../dest/database/entity/points');
 const { Duel } = require('../../dest/database/entity/duel');
 const { Variable, VariableHistory, VariableURL } = require('../../dest/database/entity/variable');
 const { Event, EventOperation } = require('../../dest/database/entity/event');
 const { PermissionCommands } = require('../../dest/database/entity/permissions');
 const { SongRequest } = require('../../dest/database/entity/song');
+const { EventList } = require('../../dest/database/entity/eventList');
 
 const oauth = (require('../../dest/oauth')).default;
 const tmi = (require('../../dest/tmi')).default;
@@ -35,13 +37,16 @@ module.exports = {
   cleanup: async function () {
     const waitForIt = async (resolve, reject) => {
       if (!getIsBotStarted() || !translation.isLoaded || !getIsDbConnected()) {
+        debug('test', `Bot is not yet started, waiting 1s, bot: ${getIsBotStarted()} | db: ${getIsDbConnected()} | translation: ${translation.isLoaded}`);
         return setTimeout(() => waitForIt(resolve, reject), 1000);
+      } else {
+        debug('test', `Bot is started`);
       }
 
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));
       await waitMs(400); // wait little bit for transactions to be done
 
-      const entities = [SongRequest, RaffleParticipant, Rank, PermissionCommands, Event, EventOperation, Variable, VariableHistory, VariableURL, Raffle, Duel, PollVote, Poll, TimerResponse, Timer, BetsParticipations, UserTip, UserBit, CommandsResponses, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Settings, Cooldown, Keyword, Price];
+      const entities = [EventList, PointsChangelog, SongRequest, RaffleParticipant, Rank, PermissionCommands, Event, EventOperation, Variable, VariableHistory, VariableURL, Raffle, Duel, PollVote, Poll, TimerResponse, Timer, BetsParticipations, UserTip, UserBit, CommandsResponses, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Settings, Cooldown, Keyword, Price];
       if (['postgres', 'mysql'].includes((await getManager()).connection.options.type)) {
         const metadatas = [];
         for (const entity of entities) {

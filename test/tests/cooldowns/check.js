@@ -31,6 +31,13 @@ describe('Cooldowns - check()', () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
+
+      await getRepository(User).save({ username: usermod1.username, userId: usermod1.userId, isModerator: true });
+      await getRepository(User).save({ username: subuser1.username, userId: subuser1.userId, isSubscriber: true });
+      await getRepository(User).save({ username: testUser.username, userId: testUser.userId });
+      await getRepository(User).save({ username: testUser2.username, userId: testUser2.userId });
+      await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
+
     });
 
     it('Command !_debug should pass', async () => {
@@ -68,11 +75,17 @@ describe('Cooldowns - check()', () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
+
+      await getRepository(User).save({ username: usermod1.username, userId: usermod1.userId, isModerator: true });
+      await getRepository(User).save({ username: subuser1.username, userId: subuser1.userId, isSubscriber: true });
+      await getRepository(User).save({ username: testUser.username, userId: testUser.userId });
+      await getRepository(User).save({ username: testUser2.username, userId: testUser2.userId });
+      await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
     });
 
     it('create command', async () => {
-      customcommands.add({ sender: owner, parameters: '-c !cmd -r $param' });
-      await message.isSent('customcmds.command-was-added', owner, { response: '$param', command: '!cmd', sender: owner.username });
+      const r = await customcommands.add({ sender: owner, parameters: '-c !cmd -r $param' });
+      assert.strictEqual(r[0].response, '$sender, command !cmd was added');
     });
 
     it('Add !cmd to cooldown', async () => {
@@ -108,10 +121,12 @@ describe('Cooldowns - check()', () => {
       await message.prepare();
 
       gamble.enabled = true;
-    });
 
-    it('Add usermod1 as moderator', async () => {
-      await getRepository(User).save({ username: 'usermod1', userId: 2, isModerator: true });
+      await getRepository(User).save({ username: usermod1.username, userId: usermod1.userId, isModerator: true });
+      await getRepository(User).save({ username: subuser1.username, userId: subuser1.userId, isSubscriber: true });
+      await getRepository(User).save({ username: testUser.username, userId: testUser.userId });
+      await getRepository(User).save({ username: testUser2.username, userId: testUser2.userId });
+      await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
     });
 
     it('Add global KonCha to cooldown', async () => {
@@ -157,10 +172,12 @@ describe('Cooldowns - check()', () => {
       await message.prepare();
 
       gamble.enabled = true;
-    });
 
-    it('Add usermod1 as moderator', async () => {
-      await getRepository(User).save({ username: 'usermod1', userId: 2, isModerator: true });
+      await getRepository(User).save({ username: usermod1.username, userId: usermod1.userId, isModerator: true });
+      await getRepository(User).save({ username: subuser1.username, userId: subuser1.userId, isSubscriber: true });
+      await getRepository(User).save({ username: testUser.username, userId: testUser.userId });
+      await getRepository(User).save({ username: testUser2.username, userId: testUser2.userId });
+      await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
     });
 
     it('Add global !followage to cooldown', async () => {
@@ -209,7 +226,7 @@ describe('Cooldowns - check()', () => {
 
       gamble.enabled = true;
       gamble.setCommand('!gamble', '!фортуна');
-      const cooldown = await getRepository(Cooldown).save({
+      const c = await getRepository(Cooldown).save({
         name: '!фортуна',
         miliseconds: 200000,
         type: 'user',
@@ -223,8 +240,14 @@ describe('Cooldowns - check()', () => {
         isFollowerAffected: true,
       });
       await getRepository(CooldownViewer).insert({
-        cooldown, userId: testUser.userId, timestamp: 10000, lastTimestamp: 0,
+        ...c, userId: testUser.userId, timestamp: 10000, lastTimestamp: 0,
       });
+
+      await getRepository(User).save({ username: usermod1.username, userId: usermod1.userId, isModerator: true });
+      await getRepository(User).save({ username: subuser1.username, userId: subuser1.userId, isSubscriber: true });
+      await getRepository(User).save({ username: testUser.username, userId: testUser.userId });
+      await getRepository(User).save({ username: testUser2.username, userId: testUser2.userId });
+      await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
     });
 
     after(async () => {
@@ -280,6 +303,12 @@ describe('Cooldowns - check()', () => {
       gamble.enabled = true;
       gamble.setCommand('!gamble', '!play');
       await getRepository(Cooldown).update({}, { isOwnerAffected: false });
+
+      await getRepository(User).save({ username: usermod1.username, userId: usermod1.userId, isModerator: true });
+      await getRepository(User).save({ username: subuser1.username, userId: subuser1.userId, isSubscriber: true });
+      await getRepository(User).save({ username: testUser.username, userId: testUser.userId });
+      await getRepository(User).save({ username: testUser2.username, userId: testUser2.userId });
+      await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
     });
 
     after(async () => {
@@ -288,8 +317,8 @@ describe('Cooldowns - check()', () => {
 
     it('create cooldown on !play [user 300]', async () => {
       const [command, type, seconds, quiet] = ['!play', 'user', '300', true];
-      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
-      await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
+      const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      assert.strictEqual(r[0].response, '$sender, user cooldown for !play was set to 300s');
     });
 
     it('check if cooldown is created', async () => {
@@ -342,6 +371,12 @@ describe('Cooldowns - check()', () => {
       gamble.setCommand('!gamble', '!play');
       // owners should not be persecuted
       await getRepository(Cooldown).update({}, { isOwnerAffected: false });
+
+      await getRepository(User).save({ username: usermod1.username, userId: usermod1.userId, isModerator: true });
+      await getRepository(User).save({ username: subuser1.username, userId: subuser1.userId, isSubscriber: true });
+      await getRepository(User).save({ username: testUser.username, userId: testUser.userId });
+      await getRepository(User).save({ username: testUser2.username, userId: testUser2.userId });
+      await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
     });
 
     after(async () => {
@@ -350,8 +385,8 @@ describe('Cooldowns - check()', () => {
 
     it('create cooldown on !play [global 300]', async () => {
       const [command, type, seconds, quiet] = ['!play', 'global', '300', true];
-      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
-      await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
+      const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      assert.strictEqual(r[0].response, '$sender, global cooldown for !play was set to 300s');
     });
 
     it('check if cooldown is created', async () => {
@@ -386,12 +421,18 @@ describe('Cooldowns - check()', () => {
       await message.prepare();
 
       gamble.enabled = true;
+
+      await getRepository(User).save({ username: usermod1.username, userId: usermod1.userId, isModerator: true });
+      await getRepository(User).save({ username: subuser1.username, userId: subuser1.userId, isSubscriber: true });
+      await getRepository(User).save({ username: testUser.username, userId: testUser.userId });
+      await getRepository(User).save({ username: testUser2.username, userId: testUser2.userId });
+      await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
     });
 
     it('test', async () => {
       const [command, type, seconds, quiet] = ['!gamble', 'user', '300', true];
-      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
-      await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
+      const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      assert.strictEqual(r[0].response, '$sender, user cooldown for !gamble was set to 300s');
 
       const item = await getRepository(Cooldown).findOne({ where: { name: '!gamble' } });
       assert(item.length !== 0);
@@ -416,12 +457,18 @@ describe('Cooldowns - check()', () => {
       await message.prepare();
 
       gamble.enabled = true;
+
+      await getRepository(User).save({ username: usermod1.username, userId: usermod1.userId, isModerator: true });
+      await getRepository(User).save({ username: subuser1.username, userId: subuser1.userId, isSubscriber: true });
+      await getRepository(User).save({ username: testUser.username, userId: testUser.userId });
+      await getRepository(User).save({ username: testUser2.username, userId: testUser2.userId });
+      await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
     });
 
     it('test', async () => {
       const [command, type, seconds, quiet] = ['!test', 'user', '60', true];
-      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
-      await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
+      const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      assert.strictEqual(r[0].response, '$sender, user cooldown for !test was set to 60s');
 
       const item = await getRepository(Cooldown).findOne({ where: { name: '!test' } });
       assert(item.length !== 0);
@@ -441,6 +488,12 @@ describe('Cooldowns - check()', () => {
 
       gamble.enabled = true;
       gamble.setCommand('!gamble', '!test me');
+
+      await getRepository(User).save({ username: usermod1.username, userId: usermod1.userId, isModerator: true });
+      await getRepository(User).save({ username: subuser1.username, userId: subuser1.userId, isSubscriber: true });
+      await getRepository(User).save({ username: testUser.username, userId: testUser.userId });
+      await getRepository(User).save({ username: testUser2.username, userId: testUser2.userId });
+      await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
     });
 
     after(async () => {
@@ -449,8 +502,8 @@ describe('Cooldowns - check()', () => {
 
     it('create cooldown on !test me [user 60]', async () => {
       const [command, type, seconds, quiet] = ['!test me', 'user', '60', true];
-      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
-      await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
+      const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      assert.strictEqual(r[0].response, '$sender, user cooldown for !test me was set to 60s');
     });
 
     it('check if cooldown is created', async () => {
@@ -505,12 +558,18 @@ describe('Cooldowns - check()', () => {
       await message.prepare();
 
       gamble.enabled = true;
+
+      await getRepository(User).save({ username: usermod1.username, userId: usermod1.userId, isModerator: true });
+      await getRepository(User).save({ username: subuser1.username, userId: subuser1.userId, isSubscriber: true });
+      await getRepository(User).save({ username: testUser.username, userId: testUser.userId });
+      await getRepository(User).save({ username: testUser2.username, userId: testUser2.userId });
+      await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
     });
 
     it('create cooldown on !test [user 60]', async () => {
       const [command, type, seconds, quiet] = ['!test', 'user', '60', true];
-      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
-      await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
+      const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      assert.strictEqual(r[0].response, '$sender, user cooldown for !test was set to 60s');
     });
 
     it('check if cooldown is created', async () => {
@@ -545,12 +604,18 @@ describe('Cooldowns - check()', () => {
       await message.prepare();
 
       gamble.enabled = true;
+
+      await getRepository(User).save({ username: usermod1.username, userId: usermod1.userId, isModerator: true });
+      await getRepository(User).save({ username: subuser1.username, userId: subuser1.userId, isSubscriber: true });
+      await getRepository(User).save({ username: testUser.username, userId: testUser.userId });
+      await getRepository(User).save({ username: testUser2.username, userId: testUser2.userId });
+      await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
     });
 
     it('create cooldown on !test [global 60]', async () => {
       const [command, type, seconds, quiet] = ['!test', 'global', '60', true];
-      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
-      await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
+      const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      assert.strictEqual(r[0].response, '$sender, global cooldown for !test was set to 60s');
     });
 
     it('check if cooldown is created', async () => {
@@ -580,6 +645,12 @@ describe('Cooldowns - check()', () => {
       await message.prepare();
 
       gamble.enabled = true;
+
+      await getRepository(User).save({ username: usermod1.username, userId: usermod1.userId, isModerator: true });
+      await getRepository(User).save({ username: subuser1.username, userId: subuser1.userId, isSubscriber: true });
+      await getRepository(User).save({ username: testUser.username, userId: testUser.userId });
+      await getRepository(User).save({ username: testUser2.username, userId: testUser2.userId });
+      await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
     });
 
     it('test', async () => {
@@ -590,8 +661,8 @@ describe('Cooldowns - check()', () => {
       });
 
       const [command, type, seconds, quiet] = ['me', 'user', '60', true];
-      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
-      await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
+      const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      assert.strictEqual(r[0].response, '$sender, user cooldown for me was set to 60s');
 
       const item = await getRepository(Cooldown).findOne({ where: { name: 'me' } });
       assert(typeof item !== 'undefined');
@@ -613,6 +684,12 @@ describe('Cooldowns - check()', () => {
       await message.prepare();
 
       gamble.enabled = true;
+
+      await getRepository(User).save({ username: usermod1.username, userId: usermod1.userId, isModerator: true });
+      await getRepository(User).save({ username: subuser1.username, userId: subuser1.userId, isSubscriber: true });
+      await getRepository(User).save({ username: testUser.username, userId: testUser.userId });
+      await getRepository(User).save({ username: testUser2.username, userId: testUser2.userId });
+      await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
     });
 
     it('test', async () => {
@@ -623,8 +700,8 @@ describe('Cooldowns - check()', () => {
       });
 
       const [command, type, seconds, quiet] = ['me', 'global', '60', true];
-      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
-      await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
+      const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      assert.strictEqual(r[0].response, '$sender, global cooldown for me was set to 60s');
 
       const item = await getRepository(Cooldown).findOne({ where: { name: 'me' } });
       assert(typeof item !== 'undefined');

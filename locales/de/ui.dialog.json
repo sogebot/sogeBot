@@ -1,0 +1,46 @@
+{
+  "title": {
+    "edit": "Bearbeiten",
+    "add": "Hinzufügen"
+  },
+  "errors": {
+    "required": "Diese Eingabe darf nicht leer sein.",
+    "minValue": "Der niedrigste Wert dieser Eingabe ist $value."
+  },
+  "buttons": {
+    "reorder": "Umsortieren",
+    "upload": {
+      "idle": "Hochladen",
+      "progress": "Wird hochgeladen",
+      "done": "Hochgeladen"
+    },
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "test": {
+      "idle": "Test",
+      "progress": "Test läuft",
+      "done": "Test abgeschlossen"
+    },
+    "saveChanges": {
+      "idle": "Änderungen speichern",
+      "invalid": "Änderungen können nicht gespeichert werden",
+      "progress": "Speichere Änderungen…",
+      "done": "Änderungen gespeichert"
+    },
+    "something-went-wrong": "Etwas ist schiefgegangen",
+    "mark-to-delete": "Als „Gelöscht“ markieren",
+    "disable": "Deaktivieren",
+    "enable": "Aktivieren",
+    "disabled": "Deaktiviert",
+    "enabled": "Aktiviert",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "play": "Abspielen",
+    "hold-to-delete": "Halten zum Löschen",
+    "yes": "Ja",
+    "no": "Nein"
+  },
+  "changesPending": "Deine Änderungen wurden nicht gespeichert.",
+  "formNotValid": "Formular ist ungültig.",
+  "nothingToShow": "Hier gibt es nichts zu sehen."
+}

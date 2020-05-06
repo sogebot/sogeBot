@@ -2,7 +2,7 @@
 require('../../general.js');
 
 const db = require('../../general.js').db;
-const uuid = require('uuid/v4');
+const assert = require('assert');
 const message = require('../../general.js').message;
 
 const timers = (require('../../../dest/systems/timers')).default;
@@ -53,27 +53,23 @@ describe('Timers - list()', () => {
   });
 
   it('', async () => {
-    timers.list({ sender: owner, parameters: '' });
-    await message.isSentRaw(`@${owner.username}, timers list: ⚫ test, ⚪ test2`, owner);
+    const r = await timers.list({ sender: owner, parameters: '' });
+    assert.strictEqual(r[0].response, '$sender, timers list: ⚫ test, ⚪ test2');
   });
 
   it('-name unknown', async () => {
-    timers.list({ sender: owner, parameters: '-name unknown' });
-    await message.isSent('timers.timer-not-found', owner, { name: 'unknown', sender: owner.username });
+    const r = await timers.list({ sender: owner, parameters: '-name unknown' });
+    assert.strictEqual(r[0].response, '$sender, timer (name: unknown) was not found in database. Check timers with !timers list');
   });
 
   it('-name test2', async () => {
-    timers.list({ sender: owner, parameters: '-name test2' });
+    const r = await timers.list({ sender: owner, parameters: '-name test2' });
 
     const response1 = await getRepository(TimerResponse).findOne({ response: 'Lorem Ipsum' });
     const response2 = await getRepository(TimerResponse).findOne({ response: 'Lorem Ipsum 2' });
 
-    await message.isSent('timers.responses-list', owner, { name: 'test2', sender: owner.username });
-    await message.isSentRaw([
-      `⚫ ${response1.id} - ${response1.response}`,
-      `⚪ ${response2.id} - ${response2.response}`], owner, { name: 'test2', sender: owner.username });
-    await message.isSentRaw([
-      `⚫ ${response1.id} - ${response1.response}`,
-      `⚪ ${response2.id} - ${response2.response}`], owner, { name: 'test2', sender: owner.username });
+    assert.strictEqual(r[0].response, '$sender, timer (name: test2) list');
+    assert.strictEqual(r[1].response, `⚫ ${response1.id} - Lorem Ipsum`);
+    assert.strictEqual(r[2].response, `⚪ ${response2.id} - Lorem Ipsum 2`);
   });
 });

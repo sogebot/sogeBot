@@ -1,0 +1,9 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "secretToken": {
+      "title": "Geheimer Token",
+      "help": "Geheimes Token bei Qiwi im Spenden Dashboard-Einstellungen -> Klicke auf Geheimes Token anzeigen"
+    }
+  }
+}

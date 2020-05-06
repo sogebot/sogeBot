@@ -1,5 +1,8 @@
 <template>
 <div>
+  <div v-if="urlParam('debug')" class="debug">
+    <json-viewer :value="data || {}" boxed copyable :expand-depth="4"></json-viewer>
+  </div>
   <div
     v-show="showSimpleBlink"
     v-if="data && data.type === 'simple'" :style="{
@@ -37,6 +40,7 @@ import { cloneDeep, isEqual } from 'lodash-es';
 
 import { gsap } from 'gsap'
 import Winwheel from 'winwheel'
+import JsonViewer from 'vue-json-viewer'
 
 import { getSocket } from 'src/panel/helpers/socket';
 import { getContrastColor } from 'src/panel/helpers/color';
@@ -49,8 +53,15 @@ library.add(faSortDown)
 
 let theWheel: any = null;
 
+declare global {
+  interface Window {
+    responsiveVoice: any;
+  }
+}
+
 @Component({
   components: {
+    JsonViewer,
     'font-awesome-icon': FontAwesomeIcon
   }
 })
@@ -58,6 +69,9 @@ export default class RandomizerOverlay extends Vue {
   getContrastColor = getContrastColor;
 
   loadedFonts: string[] = [];
+
+  socketRV = getSocket('/integrations/responsivevoice', true);
+  responsiveAPIKey: string | null = null;
 
   socket = getSocket('/registries/randomizer', true);
   data: Required<RandomizerInterface> | null = null;
@@ -70,7 +84,43 @@ export default class RandomizerOverlay extends Vue {
   theWheel: any = null;
   wheelWin: any = null;
 
+  speak(text, voice, rate, pitch, volume) {
+    window.responsiveVoice.speak(text, voice, { rate, pitch, volume });
+  }
+
+  initResponsiveVoice() {
+    if (typeof window.responsiveVoice === 'undefined') {
+      return setTimeout(() => this.initResponsiveVoice(), 200);
+    }
+    window.responsiveVoice.init();
+    console.debug('= ResponsiveVoice init OK')
+  }
+
+  checkResponsiveVoiceAPIKey() {
+    this.socketRV.emit('get.value', 'key', (err, value) => {
+      if (this.responsiveAPIKey !== value) {
+        // unload if values doesn't match
+        this.$unloadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.responsiveAPIKey)
+          .catch(() => {}); // skip error
+        if (value.trim().length > 0) {
+          this.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + value)
+            .then(() => {
+              this.responsiveAPIKey = value;
+              this.initResponsiveVoice();
+              setTimeout(() => this.checkResponsiveVoiceAPIKey(), 1000);
+            });
+        } else {
+          console.debug('TTS disabled, responsiveVoice key is not set')
+          this.responsiveAPIKey = value;
+          setTimeout(() => this.checkResponsiveVoiceAPIKey(), 1000);
+        }
+      }
+      setTimeout(() => this.checkResponsiveVoiceAPIKey(), 1000);
+    })
+  }
+
   created () {
+    this.checkResponsiveVoiceAPIKey();
     setInterval(() => {
       this.socket.emit('randomizer::getVisible', async (err, data) => {
         if (err) {
@@ -85,12 +135,6 @@ export default class RandomizerOverlay extends Vue {
           return;
         }
 
-        let shouldReinitWof = false;
-        if (!isEqual(data, this.data)) {
-          this.showSimpleValueIndex = Math.floor(Math.random() * this.generateItems(data.items).length);
-          shouldReinitWof = true;
-        }
-
         const head = document.getElementsByTagName('head')[0];
         const style = document.createElement('style');
         style.type = 'text/css';
@@ -103,7 +147,13 @@ export default class RandomizerOverlay extends Vue {
           head.appendChild(style);
         }
 
-        this.data = data;
+        let shouldReinitWof = false;
+        if (!isEqual(data, this.data)) {
+          this.showSimpleValueIndex = Math.floor(Math.random() * this.generateItems(data.items).length);
+          shouldReinitWof = true;
+          this.data = data;
+        }
+
         this.$nextTick(() => {
           if (shouldReinitWof && data.type === 'wheelOfFortune') {
             let segments = new Array()
@@ -144,6 +194,11 @@ export default class RandomizerOverlay extends Vue {
 
   alertPrize() {
     this.wheelWin = this.theWheel.getIndicatedSegment();
+    setTimeout(() => {
+      if (this.data && this.data.tts.enabled && this.wheelWin) {
+        this.speak(this.wheelWin.text, this.data.tts.voice, this.data.tts.rate, this.data.tts.pitch, this.data.tts.volume);
+      }
+    }, 1000);
     setTimeout(() => {
       this.wheelWin = null;
     }, 5000)

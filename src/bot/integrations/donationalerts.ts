@@ -119,24 +119,7 @@ class Donationalerts extends Integration {
         });
 
         if (!data._is_test_alert) {
-          const getUser = async (username, id) => {
-            const userByUsername = await getRepository(User).findOne({ where: { username: username.toLowerCase() }});
-            if (userByUsername) {
-              return userByUsername;
-            }
-
-            const user = await getRepository(User).findOne({ where: { userId: id }});
-            if (user) {
-              return user;
-            } else {
-              return getRepository(User).save({
-                userId: Number(id),
-                username: username.toLowerCase(),
-              });
-            }
-          };
-
-          const user = await getUser(data.username, await users.getIdByName(data.username.toLowerCase()));
+          const user = await users.getUserByUsername(data.username);
           const newTip: UserTipInterface = {
             amount: Number(data.amount),
             currency: data.currency,

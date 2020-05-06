@@ -873,6 +873,7 @@
   },
   "points": {
     "success": {
+      "undo": "$sender, points '$command' for $username was reverted ($updatedValue $updatedValuePointsLocale to $originalValue $originalValuePointsLocale).",
       "set": "$username was set to $amount $pointsName",
       "give": "$sender just gave his $amount $pointsName to $username",
       "online": {
@@ -888,6 +889,7 @@
       "remove": "Ouch, $amount $pointsName was removed from $username!"
     },
     "failed": {
+      "undo": "$sender, username wasn't found in database or user have no undo operations",
       "set": "{core.command-parse} $command [username] [amount]",
       "give": "{core.command-parse} $command [username] [amount]",
       "giveNotEnough": "Sorry, $sender, you don't have $amount $pointsName to give it to $username",
@@ -1140,14 +1142,10 @@
       "notEnoughOptions": "$sender, you need to specify points to gamble",
       "notEnoughPoints": "$sender, you don't have $points $pointsName to gamble",
       "win": "$sender, you WON! You now have $points $pointsName",
+      "winJackpot": "$sender, you hit JACKPOT! You won $jackpot $jackpotName in addition to your bet. You now have $points $pointsName",
+      "loseWithJackpot": "$sender, you LOST! You now have $points $pointsName. Jackpot increased to $jackpot $jackpotName",
       "lose": "$sender, you LOST! You now have $points $pointsName"
     }
-  },
-  "merge": {
-    "from-user-not-found": "$sender, user $fromUsername was not found in db",
-    "no-from-user-set": "$sender, you need to specify from which username to merge",
-    "no-to-user-set": "$sender, you need to specify to which username merge",
-    "user-merged": "$sender, user $fromUsername was merged to $toUsername"
   },
   "highlights": {
     "saved": "$sender, highlight was saved for $hoursh$minutesm$secondss",

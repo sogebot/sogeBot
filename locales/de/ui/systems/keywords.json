@@ -1,0 +1,21 @@
+{
+  "new": "Neues Schlüsselwort",
+  "empty": "Bisher wurden noch keine Schlüsselwörter erstellt.",
+  "emptyAfterSearch": "Bei der Suche nach <strong>\"$search\"</strong> wurden keine Schlüsselwörter gefunden.",
+  "keyword": {
+    "name": "Schlüsselwort / Regulärer Ausdruck",
+    "placeholder": "Setzen Sie Ihr Schlüsselwort oder Ihren regulären Ausdruck als Schlüsselwort ein.",
+    "help": "Sie können regexp (Groß- und Kleinschreibung) verwenden, um Schlüsselwörter zu verwenden, z.B. <strong>Hallo.*|hi</strong>"
+  },
+  "response": {
+    "name": "Reaktion",
+    "placeholder": "Legen Sie hier die Reaktion fest."
+  },
+  "error": {
+    "isEmpty": "Dieser Wert darf nicht leer sein"
+  },
+  "warning": "Diese Aktion kann nicht rückgängig gemacht werden!",
+  "settings": {
+    "enabled": "Status"
+  }
+}

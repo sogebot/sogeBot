@@ -56,11 +56,13 @@ module.exports = {
   },
   debug: async function (category, expected) {
     await until(setError => {
-      const args = log.debug.lastCall.args;
       if (log.debug.calledWith(category, expected)) {
         return true;
       }
-      return setError(`\nExpected args: '${category}', '${expected}'\nActual args:   ${args}`);
+      return setError(
+        '\n+\t"' + expected + '"'
+        + '\n-\t\t"' + log.debug.args.join('\n\t\t\t') + '"'
+      );
     }, 5000);
   },
   isWarned: async function (entry, user, opts) {
@@ -71,11 +73,11 @@ module.exports = {
       if (_.isArray(opts)) {
         for (const o of opts) {
           o.sender = _.isNil(user.username) ? '' : user.username;
-          expected.push(await prepare(entry, o));
+          expected.push(prepare(entry, o));
         }
       } else {
         opts.sender = _.isNil(user.username) ? '' : user.username;
-        expected = [await prepare(entry, opts)];
+        expected = [prepare(entry, opts)];
       }
       try {
         let isCorrectlyCalled = false;
@@ -109,20 +111,20 @@ module.exports = {
           o.sender = _.isNil(user.username) ? '' : user.username;
           if (_.isArray(entry)) {
             for (const e of entry) {
-              expected.push(await prepare(e, o));
+              expected.push(prepare(e, o));
             }
           } else {
-            expected.push(await prepare(entry, o));
+            expected.push(prepare(entry, o));
           }
         }
       } else {
         opts.sender = _.isNil(user.username) ? '' : user.username;
         if (_.isArray(entry)) {
           for (const e of entry) {
-            expected.push(await prepare(e, opts));
+            expected.push(prepare(e, opts));
           }
         } else {
-          expected.push(await prepare(entry, opts));
+          expected.push(prepare(entry, opts));
         }
       }
       try {

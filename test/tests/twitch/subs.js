@@ -7,6 +7,8 @@ const time = require('../../general.js').time;
 const message = require('../../general.js').message;
 
 const moment = require('moment');
+const assert = require('assert');
+const { prepare } = require('../../../dest/commons');
 
 const testuser = { username: 'testuser', id: Math.floor(Math.random() * 1000) };
 const testuser2 = { username: 'testuser2', id: Math.floor(Math.random() * 1000) };
@@ -47,12 +49,12 @@ describe('lib/twitch - subs()', () => {
   });
 
   it('!subs should return testuser2', async () => {
-    twitch.subs({ sender: testuser });
-    await message.isSent('subs', testuser, {
+    const r = await twitch.subs({ sender: testuser });
+    assert.strictEqual(r[0].response, prepare('subs', {
       lastSubAgo: 'a few seconds ago',
       lastSubUsername: testuser2.username,
       onlineSubCount: 0,
-    });
+    }));
   });
 
   it('add testuser3 to events', async () => {
@@ -64,12 +66,12 @@ describe('lib/twitch - subs()', () => {
   });
 
   it('!subs should return testuser3', async () => {
-    twitch.subs({ sender: testuser });
-    await message.isSent('subs', testuser, {
+    const r = await twitch.subs({ sender: testuser });
+    assert.strictEqual(r[0].response, prepare('subs', {
       lastSubAgo: 'a few seconds ago',
       lastSubUsername: testuser3.username,
       onlineSubCount: 0,
-    });
+    }));
   });
 
   it('Add testuser, testuser2, testuser3 to online users', async () => {
@@ -77,11 +79,11 @@ describe('lib/twitch - subs()', () => {
   });
 
   it('!subs should return testuser3 and 3 online subs', async () => {
-    twitch.subs({ sender: testuser });
-    await message.isSent('subs', testuser, {
+    const r = await twitch.subs({ sender: testuser });
+    assert.strictEqual(r[0].response, prepare('subs', {
       lastSubAgo: 'a few seconds ago',
       lastSubUsername: testuser3.username,
       onlineSubCount: 3,
-    });
+    }));
   });
 });

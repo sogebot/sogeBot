@@ -1,0 +1,15 @@
+{
+  "settings": {
+    "btnRemoveCache": "Cache leeren",
+    "btnTestExplosion": "Emote-Explosion",
+    "btnTestEmote": "Emote",
+    "btnTestFirework": "Emote-Feuerwerk",
+    "cEmotesSize": "Größe der Emotes",
+    "cEmotesMaxEmotesPerMessage": "Maximale Anzahl an Emotes pro Nachricht",
+    "cEmotesAnimation": "Animation",
+    "cEmotesAnimationTime": "Dauer der Animation",
+    "cExplosionNumOfEmotes": "Anzahl von Emotes",
+    "cExplosionNumOfEmotesPerExplosion": "Anzahl von Emotes pro Explosion",
+    "cExplosionNumOfExplosions": "Anzahl von Explosionen"
+  }
+}

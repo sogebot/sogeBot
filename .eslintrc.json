@@ -3,6 +3,7 @@
   "plugins": ["@typescript-eslint"],
   "extends": ["plugin:@typescript-eslint/recommended"],
   "rules": {
+      "no-shadow": ["error", { "builtinGlobals": true }],
       "indent": "off",
       "@typescript-eslint/indent": ["error", 2],
       "@typescript-eslint/explicit-member-accessibility": "off",
@@ -15,6 +16,7 @@
       "@typescript-eslint/no-unused-vars": ["error", { "args": "none" }],
       "@typescript-eslint/prefer-interface": 0,
       "interface-over-type-literal": 0,
+      "@typescript-eslint/no-var-requires": 1,
       "@typescript-eslint/no-inferrable-types": 2,
       "semi": "off",
       "@typescript-eslint/semi": ["error"],

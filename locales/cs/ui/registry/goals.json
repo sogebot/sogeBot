@@ -72,7 +72,7 @@
     "durationMs": {
       "title": "Doba trvání",
       "help": "Tato hodnota je v milisekundách",
-      "placeholder": "How long goal should be shown"
+      "placeholder": "Jak dlouho má být cíl zobrazen"
     },
     "animationInMs": {
       "title": "Doba trvání vstupní animace",

@@ -27,6 +27,7 @@ describe('Raffles - user should be able to compete within boundaries of tickets'
   before(async () => {
     await db.cleanup();
     await message.prepare();
+    raffles.allowOverTicketing = false;
   });
 
   it('create ticket raffle', async () => {

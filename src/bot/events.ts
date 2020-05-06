@@ -6,7 +6,7 @@ import { setTimeout } from 'timers'; // tslint workaround
 import { isMainThread } from './cluster';
 import Core from './_interface';
 import { flatten } from './helpers/flatten';
-import { getLocalizedName, getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, prepare, sendMessage } from './commons';
+import { announce, getLocalizedName, getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, parserReply, prepare } from './commons';
 import Message from './message';
 import Parser from './parser';
 import { generateUsername } from './helpers/generateUsername';
@@ -69,7 +69,7 @@ class Events extends Core {
       { id: 'cheer', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'bits', 'message' ] },
       { id: 'clearchat' },
       { id: 'action', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
-      { id: 'ban', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'reason' ] },
+      { id: 'ban', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
       { id: 'hosting', variables: [ 'target', 'viewers' ] },
       { id: 'hosted', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'viewers', 'autohost' ], definitions: { viewersAtLeast: 1, ignoreAutohost: false }, check: this.checkHosted },
       { id: 'raid', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'viewers' ], definitions: { viewersAtLeast: 1 }, check: this.checkRaid },
@@ -152,15 +152,13 @@ class Events extends Core {
       return this.reset(eventId);
     }
 
-    const events = await getRepository(Event).find({
+    for (const event of (await getRepository(Event).find({
       relations: ['operations'],
       where: {
         name: eventId,
         isEnabled: true,
       },
-    });
-
-    for (const event of events) {
+    }))) {
       const [shouldRunByFilter, shouldRunByDefinition] = await Promise.all([
         this.checkFilter(event, attributes),
         this.checkDefinition(_.clone(event), attributes),
@@ -192,15 +190,7 @@ class Events extends Core {
     const cid = await api.createClip({ hasDelay: operation.hasDelay });
     if (cid) { // OK
       if (Boolean(operation.announce) === true) {
-        const message = await prepare('api.clips.created', { link: `https://clips.twitch.tv/${cid}` });
-        sendMessage(message, {
-          username: oauth.botUsername,
-          displayName: oauth.botUsername,
-          userId: Number(oauth.botId),
-          emotes: [],
-          badges: {},
-          'message-type': 'chat',
-        });
+        announce(prepare('api.clips.created', { link: `https://clips.twitch.tv/${cid}` }));
       }
       info('Clip was created successfully');
       return cid;
@@ -284,7 +274,12 @@ class Events extends Core {
         skip: true,
         quiet: _.get(operation, 'isCommandQuiet', false),
       });
-      await parse.process();
+      const responses = await parse.process();
+      for (let i = 0; i < responses.length; i++) {
+        setTimeout(async () => {
+          parserReply(await responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
+        }, 500 * i);
+      }
     } else {
       tmi.message({
         message: {
@@ -328,14 +323,21 @@ class Events extends Core {
       const replace = new RegExp(`\\$${key}`, 'g');
       message = message.replace(replace, val);
     }
-    sendMessage(message, {
-      username,
-      displayName: userObj?.displayname || username,
-      userId: userId,
-      emotes: [],
-      badges: {},
-      'message-type': (whisper ? 'whisper' : 'chat'),
-    });
+    parserReply(message, {
+      sender: {
+        badges: {},
+        emotes: [],
+        userId,
+        username,
+        displayName: userObj?.displayname || username,
+        color: '',
+        emoteSets: [],
+        userType: 'viewer',
+        mod: '0',
+        subscriber: '0',
+        turbo: '0',
+      },
+    }, whisper ? 'whisper' : 'chat');
   }
 
   public async fireSendWhisper(operation, attributes) {
@@ -712,12 +714,11 @@ class Events extends Core {
     }
 
     try {
-      const events = await getRepository(Event)
+      for (const event of (await getRepository(Event)
         .createQueryBuilder('event')
         .where('event.name = :event1', { event1: 'command-send-x-times' })
         .orWhere('event.name = :event2', { event2: 'keyword-send-x-times '})
-        .getMany();
-      for (const event of events) {
+        .getMany())) {
         if (_.isNil(_.get(event, 'triggered.fadeOutInterval', null))) {
           // fadeOutInterval init
           event.triggered.fadeOutInterval = Date.now();

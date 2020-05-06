@@ -1,0 +1,18 @@
+{
+  "additional-settings": "Erweiterte Einstellungen",
+  "never": "nie",
+  "reset": "Zurücksetzen",
+  "moveUp": "Nach oben",
+  "moveDown": "Nach unten",
+  "stop-if-executed": "stoppen, falls ausgeführt",
+  "continue-if-executed": "fortsetzen, wenn ausgeführt",
+  "generate": "Generieren",
+  "thumbnail": "Vorschaubild",
+  "yes": "Ja",
+  "no": "Nein",
+  "show-more": "Mehr...",
+  "show-less": "Weniger anzeigen",
+  "allowed": "Erlaubt",
+  "disallowed": "Nicht erlaubt",
+  "back": "Zurück"
+}

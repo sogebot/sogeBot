@@ -4,7 +4,7 @@ import moment from 'moment';
 import 'moment-precise-range-plugin';
 import { join, normalize } from 'path';
 
-import { debug } from './helpers/log';
+import { chatOut, debug } from './helpers/log';
 import { globalIgnoreList } from './data/globalIgnoreList';
 import { error } from './helpers/log';
 import { clusteredChatOut, clusteredClientChat, clusteredClientTimeout, clusteredWhisperOut } from './cluster';
@@ -14,6 +14,80 @@ import oauth from './oauth';
 import { translate } from './translate';
 import tmi from './tmi';
 import { UserStateTags } from 'twitch-js';
+import Discord from './integrations/discord';
+import { TextChannel } from 'discord.js';
+import { Message } from './message';
+
+/**
+ * Use to send message to correct platform in @parser
+ * @param response
+ * @param opts
+ * @param [messageType]
+ *
+ * parserReply('Lorem Ipsum Dolor', { sender });
+ */
+export async function parserReply(response: string, opts: { sender: CommandOptions['sender']; attr?: CommandOptions['attr'] }, messageType: 'chat' | 'whisper' = 'chat') {
+  const senderObject = {
+    ..._.cloneDeep(opts.sender),
+    'message-type': messageType,
+    forceWithoutAt: typeof opts.sender.discord !== 'undefined', // we dont need @
+  };
+  const messageToSend = await (async () => {
+    if (opts.attr?.skip) {
+      return prepare(response, { ...opts, sender: senderObject.discord ? senderObject.discord.author : senderObject }, false);
+    } else {
+      return await new Message(response).parse({ ...opts, sender: senderObject.discord ? senderObject.discord.author : senderObject }) as string;
+    }
+  })();
+  if (opts.sender.discord) {
+    if (messageType === 'chat') {
+      const msg = await opts.sender.discord.channel.send(messageToSend);
+      if (Discord.deleteMessagesAfterWhile) {
+        setTimeout(() => {
+          msg.delete();
+        }, 10000);
+      }
+    } else {
+      opts.sender.discord.author.send(messageToSend);
+    }
+  } else {
+    // we skip as we are already parsing message
+    sendMessage(messageToSend, senderObject, { skip: true, ...opts.attr });
+  }
+}
+
+/**
+ * Announce in all channels (discord, twitch)
+ * @param messageToAnnounce
+ *
+ * announce('Lorem Ipsum Dolor');
+ */
+export async function announce(messageToAnnounce: string) {
+  messageToAnnounce = await new Message(messageToAnnounce).parse({}) as string;
+  sendMessage(messageToAnnounce, {
+    username: oauth.botUsername,
+    displayName: oauth.botUsername,
+    userId: Number(oauth.botId),
+    emotes: [],
+    badges: {},
+    'message-type': 'chat',
+  }, { force: true, skip: true });
+
+  if (Discord.sendGeneralAnnounceToChannel.length > 0 && Discord.client) {
+    // search discord channel by ID
+    for (const [ id, channel ] of Discord.client.channels.cache) {
+      if (channel.type === 'text') {
+        if (id === Discord.sendGeneralAnnounceToChannel || (channel as TextChannel).name === Discord.sendGeneralAnnounceToChannel) {
+          const ch = Discord.client.channels.cache.find(o => o.id === id);
+          if (ch) {
+            (ch as TextChannel).send(messageToAnnounce);
+            chatOut(`#${(ch as TextChannel).name}: ${messageToAnnounce} [${Discord.client.user?.tag}]`);
+          }
+        }
+      }
+    }
+  }
+}
 
 export async function autoLoad(directory): Promise<{ [x: string]: any }> {
   const directoryListing = readdirSync(directory);
@@ -68,10 +142,17 @@ export function isIgnored(sender: { username: string | null; userId?: number }) 
  * Prepares strings with replacement attributes
  * @param translate Translation key
  * @param attr Attributes to replace { 'replaceKey': 'value' }
+ * @param isTranslation consider if translation key to be translate key or pure message
  */
-export async function prepare(toTranslate: string, attr?: {[x: string]: any }): Promise<string> {
+export function prepare(toTranslate: string, attr?: {[x: string]: any }, isTranslation = true): string {
   attr = attr || {};
-  let msg = translate(toTranslate);
+  let msg = (() => {
+    if (isTranslation) {
+      return translate(toTranslate);
+    } else {
+      return toTranslate;
+    }
+  })();
   for (const key of Object.keys(attr).sort((a, b) => b.length - a.length)) {
     let value = attr[key];
     if (['username', 'who', 'winner', 'sender', 'loser'].includes(key)) {
@@ -135,7 +216,6 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
   }
 
   if (!attr.skip) {
-    const Message = (require('./message')).default;
     messageToSend = await new Message(messageToSend).parse(attr) as string;
   }
   if (messageToSend.length === 0) {
@@ -197,11 +277,10 @@ export async function timeout(username, reason, timeMs) {
   clusteredClientTimeout(username, timeMs, reason);
 }
 
-export function getOwnerAsSender(): Readonly<UserStateTags> {
+export function getOwnerAsSender(): Readonly<UserStateTags & { userId: number }> {
   return {
     username: getOwner(),
     displayName: getOwner(),
-    userId: 0,
     emotes: [],
     badges: {
       subscriber: 1,
@@ -210,6 +289,7 @@ export function getOwnerAsSender(): Readonly<UserStateTags> {
     color: '#000000',
     userType: 'empty',
     emoteSets: [],
+    userId: Number(oauth.channelId),
   };
 }
 
@@ -239,7 +319,7 @@ export function getBotID() {
     return 0;
   }
 }
-export function getBotSender(): Readonly<UserStateTags> {
+export function getBotSender(): Readonly<CommandOptions['sender']> {
   return {
     username: getBot(),
     displayName: getBot(),

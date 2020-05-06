@@ -21,14 +21,14 @@ describe('systems/moderation - permitLink()', () => {
   describe('!permit', function () {
     describe('parsing \'!permit\'', function () {
       it('should send parse error', async function () {
-        moderation.permitLink({ sender: owner, parameters: '' });
-        await message.isSent('moderation.permit-parse-failed', owner);
+        const r = await moderation.permitLink({ sender: owner, parameters: '' });
+        assert.strictEqual(r[0].response, 'Sorry, $sender, but this command is not correct, use !permit [username]');
       });
     });
     describe('parsing \'!permit [username] 100\'', function () {
       it('should send success message', async function () {
-        moderation.permitLink({ sender: owner, parameters: '__viewer__ 100' });
-        await message.isSent('moderation.user-have-link-permit', owner, { username: '__viewer__', count: 100, link: commons.getLocalizedName(100, 'core.links') });
+        const r = await moderation.permitLink({ sender: owner, parameters: '__viewer__ 100' });
+        assert.strictEqual(r[0].response, 'User @__viewer__ can post a 100 links to chat');
       });
       it('should not timeout user 100 messages', async () => {
         for (let i = 0; i < 100; i++) {
@@ -41,8 +41,8 @@ describe('systems/moderation - permitLink()', () => {
     });
     describe('parsing \'!permit [username]\'', function () {
       it('should send success message', async function () {
-        moderation.permitLink({ sender: owner, parameters: '__viewer__' });
-        await message.isSent('moderation.user-have-link-permit', owner, { username: '__viewer__', count: 1, link: 'link' });
+        const r = await moderation.permitLink({ sender: owner, parameters: '__viewer__' });
+        assert.strictEqual(r[0].response, 'User @__viewer__ can post a 1 link to chat');
       });
       it('should not timeout user on first link message', async () => {
         assert(await moderation.containsLink({ sender: user.viewer, message: 'http://www.google.com' }));
@@ -53,8 +53,8 @@ describe('systems/moderation - permitLink()', () => {
     });
     describe('parsing \'!permit [username]\' - case sensitive test', function () {
       it('should send success message', async function () {
-        moderation.permitLink({ sender: owner, parameters: '__VIEWER__' });
-        await message.isSent('moderation.user-have-link-permit', owner, { username: '__viewer__', count: 1, link: 'link' });
+        const r = await moderation.permitLink({ sender: owner, parameters: '__VIEWER__' });
+        assert.strictEqual(r[0].response, 'User @__viewer__ can post a 1 link to chat');
       });
       it('should not timeout user on first link message', async () => {
         assert(await moderation.containsLink({ sender: user.viewer, message: 'http://www.google.com' }));

@@ -21,6 +21,8 @@ class OAuth extends Core {
   @shared()
   public broadcasterType: string | null = null;
   @shared()
+  public profileImageUrl = '';
+  @shared()
   public broadcaster = '';
   @shared()
   public bot = '';

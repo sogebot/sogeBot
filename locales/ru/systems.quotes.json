@@ -1,0 +1,30 @@
+{
+  "add": {
+    "ok": "$sender, цитата $id '$quote' (теги: $tags)",
+    "error": "$sender, $command неправильно или отсутствует -quote параметр"
+  },
+  "remove": {
+    "ok": "$sender, цитата $id была успешно удалена.",
+    "error": "$sender, ID цитаты отсутствует.",
+    "not-found": "$sender, цитата $id не найдена."
+  },
+  "show": {
+    "ok": "Цитата $id от $quotedBy '$quote'",
+    "error": {
+      "no-parameters": "$sender, $command отсутствует -id или -tag.",
+      "not-found-by-id": "$sender, цитата $id не найдена.",
+      "not-found-by-tag": "$sender, цитаты с тегом $tag не найдены."
+    }
+  },
+  "set": {
+    "ok": "$sender, тэги $id были установлены. (тэги: $tags)",
+    "error": {
+      "no-parameters": "$sender, $command отсутствует -id или -tag.",
+      "not-found-by-id": "$sender, цитата $id не найдена."
+    }
+  },
+  "list": {
+    "ok": "$sender, Вы можете найти список цитат по адресу http://$urlBase/public/#/quotes",
+    "is-localhost": "$sender, URL списка цитат указан неправильно."
+  }
+}

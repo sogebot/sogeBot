@@ -132,7 +132,15 @@ class Randomizer extends Registry {
       await getRepository(RandomizerEntity).update({}, { isShown: false });
       await getRepository(RandomizerEntity).update({ id: randomizer.id }, { isShown: !randomizer.isShown });
     } else if (subcommand === 'go') {
-      this.socket.emit('spin');
+      if (!randomizer.isShown) {
+        await getRepository(RandomizerEntity).update({}, { isShown: false });
+        await getRepository(RandomizerEntity).update({ id: randomizer.id }, { isShown: !randomizer.isShown });
+        setTimeout(() => {
+          this.socket.emit('spin');
+        }, 5000);
+      } else {
+        this.socket.emit('spin');
+      }
     }
 
     return true;
