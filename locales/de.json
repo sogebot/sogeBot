@@ -909,7 +909,7 @@
   "songs": {
     "playlist-is-empty": "$sender, die zu importierende Playlist ist leer",
     "playlist-imported": "$sender, imported $imported and skipped $skipped from playlist",
-    "not-playing": "Wird nicht gespielt",
+    "not-playing": "Keiner",
     "song-was-banned": "Song $name was banned and will never play again!",
     "song-was-banned-timeout-message": "You've got timeout for posting banned song",
     "song-was-unbanned": "Song wurde erfolgreich entsperrt",
