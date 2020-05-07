@@ -713,7 +713,7 @@
     "widget-title-ytplayer": "MUSIC-SPIELER",
     "widget-title-latest-followers": "AKTUELLSTE FOLLOWER",
     "widget-title-latest-subscribers": "AKTUELLSTE ABONNENTEN",
-    "widget-title-commercial": "KOMMERZIELL",
+    "widget-title-commercial": "WERBUNG",
     "widget-title-spotify": "SPOTIFY",
     "widget-title-join": "JOIN LISTE",
     "widget-title-part": "PART LISTE",
@@ -909,7 +909,7 @@
   "songs": {
     "playlist-is-empty": "$sender, die zu importierende Playlist ist leer",
     "playlist-imported": "$sender, imported $imported and skipped $skipped from playlist",
-    "not-playing": "Wird nicht gespielt",
+    "not-playing": "Keiner",
     "song-was-banned": "Song $name was banned and will never play again!",
     "song-was-banned-timeout-message": "You've got timeout for posting banned song",
     "song-was-unbanned": "Song wurde erfolgreich entsperrt",

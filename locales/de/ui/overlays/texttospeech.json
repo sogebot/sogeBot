@@ -1,9 +1,9 @@
 {
   "settings": {
-    "responsiveVoiceKeyNotSet": "You haven't properly set <a href='#/settings/integrations/responsivevoice'>ResponsiveVoice key</a>",
+    "responsiveVoiceKeyNotSet": "Du hast den ResponsiveVoice Key unter <a href='#/settings/integrations/responsivevoice'>ResponsiveVoice-Taste nicht gesetzt</a>",
     "voice": "Stimme",
     "volume": "Lautstärke",
-    "rate": "Rate",
+    "rate": "Geschwindigkeit",
     "pitch": "Tonhöhe"
   }
 }

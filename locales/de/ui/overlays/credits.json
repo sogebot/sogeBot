@@ -11,7 +11,7 @@
     "cShowResubs": "Re-Subs anzeigen",
     "cShowCheers": "Cheers anzeigen",
     "cShowClips": "Clips anzeigen",
-    "cShowTips": "Tips anzeigen",
+    "cShowTips": "Spenden anzeigen",
     "cTextLastMessage": "Letzte Nachricht",
     "cTextLastSubMessage": "Letzte Sub-Nachricht",
     "cTextStreamBy": "Gestreamt von",
@@ -23,11 +23,11 @@
     "cTextResub": "Re-Sub von",
     "cTextSubgift": "Verschenkte Subs",
     "cTextSubcommunitygift": "Verschenkte Community-Subs",
-    "cTextTip": "Tips von",
+    "cTextTip": "Spenden von",
     "cClipsPeriod": "Zeitintervall",
     "cClipsCustomPeriodInDays": "Benutzerdefinierter Zeitintervall (Tage)",
-    "cClipsNumOfClips": "Anzahl an Clips",
-    "cClipsShouldPlay": "Clips sollten abgespielt werden",
+    "cClipsNumOfClips": "Anzahl der Clips",
+    "cClipsShouldPlay": "Clips sollen abgespielt werden",
     "cClipsVolume": "Lautstärke"
   }
 }
