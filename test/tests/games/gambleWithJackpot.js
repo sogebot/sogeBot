@@ -27,8 +27,8 @@ describe('Gambling - gamble with Jackpot', () => {
 
       // enable jackpot and set chance to win to 0 so we fill up jackpot bank
       gamble.enableJackpot = true;
-      gamble.chanceToTriggerJackpot = 0;
-      gamble.chanceToWin = 0;
+      gamble.chanceToTriggerJackpot = -1;
+      gamble.chanceToWin = -1;
       gamble.lostPointsAddedToJackpot = 10;
       gamble.jackpotValue = 0;
     });
