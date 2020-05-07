@@ -1,17 +1,12 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 require('../../general.js');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
-const time = require('../../general.js').time;
 
-const api = (require('../../../dest/api')).default;
 const alias = (require('../../../dest/systems/alias')).default;
 const customcommands = (require('../../../dest/systems/customcommands')).default;
-
-const { getRepository } = require('typeorm');
-const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
-
-const { linesParsed } = require('../../../dest/helpers/parser');
+const { announce } = require('../../../dest/commons');
 
 // users
 const owner = { username: 'soge__' };
@@ -22,27 +17,11 @@ describe('Commons - #3620 - announce is not parsing message filters', () => {
     await message.prepare();
     await alias.add({ sender: owner, parameters: '-a !testAlias -c !me' });
     await customcommands.add({ sender: owner, parameters: '-c !testCmd -r Lorem Ipsum' });
-    const timer = await getRepository(Timer).save({
-      name: 'test',
-      triggerEveryMessage: 0,
-      triggerEverySecond: 1,
-      isEnabled: true,
-      triggeredAtTimestamp: Date.now(),
-      triggeredAtMessage: linesParsed,
-    });
-    await getRepository(TimerResponse).save({
-      response: 'Prikazy bota: !klip, !me, !heist, (list.!command), (list.!alias)',
-      timestamp: Date.now(),
-      isEnabled: true,
-      timer,
-    });
-    for (let i = 0; i < 2; i++) {
-      api.isStreamOnline = true;
-      await time.waitMs(1000);
-    }
   });
 
   it('Timer should trigger announce() with proper response with filters', async () => {
+    announce('Prikazy bota: !klip, !me, !heist, (list.!command), (list.!alias)');
     await message.isSentRaw('Prikazy bota: !klip, !me, !heist, !testCmd, !testAlias', 'bot', 20000);
+
   });
 });
