@@ -25,7 +25,6 @@ const checkIfDecoratorsAreLoaded = () => {
   if (loadingInProgress.length === 0) {
     debug('decorators', 'Loading OK (thread: ' + !isMainThread + ')');
     areDecoratorsLoaded = true;
-    clearInterval();
   } else {
     setTimeout(() => {
       checkIfDecoratorsAreLoaded();
