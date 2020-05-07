@@ -10,32 +10,28 @@ export let loadingInProgress: string[] = [];
 export let areDecoratorsLoaded = false;
 export const permissions: { [command: string]: string | null } = {};
 
-let lastLoadingInProgressCount = 1000;
-let lastLoadingRetryCount = 100;
-
 export const commandsToRegister: {
   opts: string | Command;
   m: { type: string; name: string; fnc: string };
 }[] = [];
 
-setTimeout(() => {
-  const interval = setInterval(() => {
-    if(loadingInProgress.length === lastLoadingInProgressCount) {
-      if (loadingInProgress.length > 0) {
-        lastLoadingRetryCount--;
-        if (lastLoadingRetryCount === 0) {
-          error('decorators: Loading FAIL (thread: ' + !isMainThread + `)\n${loadingInProgress.join(', ')}`);
-        }
-      } else {
-        debug('decorators', 'Loading OK (thread: ' + !isMainThread + ')');
-        areDecoratorsLoaded = true;
-        clearInterval(interval);
-      }
-    } else {
-      lastLoadingInProgressCount = loadingInProgress.length;
-    }
-  }, 100);
-}, 10000);
+const checkIfDecoratorsAreLoaded = () => {
+  if (!isDbConnected) {
+    setTimeout(() => {
+      checkIfDecoratorsAreLoaded();
+    }, 2000);
+    return;
+  }
+  if (loadingInProgress.length === 0) {
+    debug('decorators', 'Loading OK (thread: ' + !isMainThread + ')');
+    areDecoratorsLoaded = true;
+  } else {
+    setTimeout(() => {
+      checkIfDecoratorsAreLoaded();
+    }, 2000);
+  }
+};
+checkIfDecoratorsAreLoaded();
 
 function getNameAndTypeFromStackTrace() {
   const _prepareStackTrace = Error.prepareStackTrace;
