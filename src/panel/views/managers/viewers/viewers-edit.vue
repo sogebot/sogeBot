@@ -119,14 +119,32 @@
             </div>
           </div>
 
-          <div class="row">
-            <div class="col-md col-sm-12">
-              <div class="form-row pl-2 pr-2">
-                <div class="col">
-                  <label>{{ translate('bits') }}</label>
-                </div>
+          <div class="form-row pl-2 pr-2 pb-3">
+            <div class="col">
+              <div class="btn-group d-flex" role="group">
+                <button :disabled="viewer.haveFollowerLock" type="button" class="btn btn-block" v-on:click="viewer.isFollower = !viewer.isFollower" v-bind:class="[ viewer.isFollower ? 'btn-success' : 'btn-danger' ]" aria-hidden="true">Follower</button>
+                <button type="button" class="border border-left-0 btn" :class="[viewer.haveFollowerLock ? 'btn-secondary border-0' : 'btn-light']" @click="viewer.haveFollowerLock = !viewer.haveFollowerLock">
+                  <fa :icon="viewer.haveFollowerLock ? 'lock' : 'unlock'"></fa>
+                </button>
               </div>
+            </div>
+            <div class="col">
+                <div class="btn-group d-flex" role="group">
+                  <button :disabled="viewer.haveSubscriberLock" type="button" class="btn btn-block" v-on:click="viewer.isSubscriber = !viewer.isSubscriber" v-bind:class="[ viewer.isSubscriber ? 'btn-success' : 'btn-danger' ]" aria-hidden="true">Subscriber</button>
+                  <button type="button" class="border border-left-0 btn" :class="[viewer.haveSubscriberLock ? 'btn-secondary border-0' : 'btn-light']" @click="viewer.haveSubscriberLock = !viewer.haveSubscriberLock">
+                    <fa :icon="viewer.haveSubscriberLock ? 'lock' : 'unlock'"></fa>
+                  </button>
+                </div>
+            </div>
+            <div class="col">
+                <div class="btn-group d-flex" role="group">
+                  <button type="button" class="btn btn-block" v-on:click="viewer.isVIP = !viewer.isVIP" v-bind:class="[ viewer.isVIP ? 'btn-success' : 'btn-danger' ]" aria-hidden="true">VIP</button>
+                </div>
+            </div>
+          </div>
 
+          <b-tabs content-class="mt-1" pills>
+            <b-tab :title="translate('bits')" active>
               <table class="table table-sm ml-2 mr-2" v-if="viewer.bits.length !== 0">
                 <tr v-for="(bits, index) of viewer.bits" :key="bits.cheeredAt">
                   <td scope="row">
@@ -170,14 +188,8 @@
                 <fa class="pr-1" fixed-width icon="plus"></fa>
                 Add bits
               </button>
-            </div>
-            <div class="col-md col-sm-12">
-              <div class="form-row pl-2 pr-2">
-                <div class="col">
-                  <label>{{ translate('tips') }}</label>
-                </div>
-              </div>
-
+            </b-tab>
+            <b-tab :title="translate('tips')">
               <table class="table table-sm ml-2 mr-2" v-if="viewer.tips.length !== 0">
                 <tr v-for="(tips, index) of viewer.tips" :key="tips.tippedAt">
                   <td scope="row">
@@ -260,32 +272,34 @@
                 <fa class="pr-1" fixed-width icon="plus"></fa>
                 Add tip
               </button>
-            </div>
-          </div>
-
-          <div class="form-row pl-2 pr-2 pb-3">
-            <div class="col">
-              <div class="btn-group d-flex" role="group">
-                <button :disabled="viewer.haveFollowerLock" type="button" class="btn btn-block" v-on:click="viewer.isFollower = !viewer.isFollower" v-bind:class="[ viewer.isFollower ? 'btn-success' : 'btn-danger' ]" aria-hidden="true">Follower</button>
-                <button type="button" class="border border-left-0 btn" :class="[viewer.haveFollowerLock ? 'btn-secondary border-0' : 'btn-light']" @click="viewer.haveFollowerLock = !viewer.haveFollowerLock">
-                  <fa :icon="viewer.haveFollowerLock ? 'lock' : 'unlock'"></fa>
-                </button>
-              </div>
-            </div>
-            <div class="col">
-                <div class="btn-group d-flex" role="group">
-                  <button :disabled="viewer.haveSubscriberLock" type="button" class="btn btn-block" v-on:click="viewer.isSubscriber = !viewer.isSubscriber" v-bind:class="[ viewer.isSubscriber ? 'btn-success' : 'btn-danger' ]" aria-hidden="true">Subscriber</button>
-                  <button type="button" class="border border-left-0 btn" :class="[viewer.haveSubscriberLock ? 'btn-secondary border-0' : 'btn-light']" @click="viewer.haveSubscriberLock = !viewer.haveSubscriberLock">
-                    <fa :icon="viewer.haveSubscriberLock ? 'lock' : 'unlock'"></fa>
-                  </button>
-                </div>
-            </div>
-            <div class="col">
-                <div class="btn-group d-flex" role="group">
-                  <button type="button" class="btn btn-block" v-on:click="viewer.isVIP = !viewer.isVIP" v-bind:class="[ viewer.isVIP ? 'btn-success' : 'btn-danger' ]" aria-hidden="true">VIP</button>
-                </div>
-            </div>
-          </div>
+            </b-tab>
+            <b-tab :title="translate('managers.viewers.eventHistory')">
+              <b-table :items="events" :fields="fields" class="table-p-0" :per-page="historyPerPage" :current-page="historyCurrentPage">
+                <template v-slot:cell(timestamp)="data">
+                  {{ moment(data.item.timestamp).format('LLL') }}
+                </template>
+                <template v-slot:cell(event)="data">
+                  <strong>{{data.item.event}}</strong>
+                </template>
+                <template v-slot:cell(info)="data">
+                  <template v-if="data.item.event === 'raid' || data.item.event === 'host'">
+                    {{ translate('managers.viewers.hostAndRaidViewersCount').replace('$value', JSON.parse(data.item.values_json).viewers) }}
+                  </template>
+                  <template v-else-if="data.item.event === 'subgift'">
+                    <div v-if="data.item.username === viewer.username" v-html="translate('managers.viewers.receivedSubscribeFrom').replace('$value', JSON.parse(data.item.values_json).from)" />
+                    <div v-else v-html="translate('managers.viewers.giftedSubscribeTo').replace('$value', data.item.username)" />
+                  </template>
+                </template>
+              </b-table>
+              <b-pagination
+                v-model="historyCurrentPage"
+                :total-rows="events.length || 0"
+                :per-page="historyPerPage"
+                style="text-align: center; margin: auto; width: fit-content;"
+                class="pb-2"
+              ></b-pagination>
+            </b-tab>
+          </b-tabs>
         </form>
       </div>
     </template>
@@ -302,6 +316,7 @@ import 'flatpickr/dist/flatpickr.css';
 
 import moment from 'moment';
 import { UserInterface } from 'src/bot/database/entity/user';
+import type { EventListInterface } from 'src/bot/database/entity/eventList';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
@@ -327,6 +342,7 @@ export default class viewersEdit extends Vue {
   xor = xor;
 
   socket = getSocket('/core/users');
+  socketEventList = getSocket('/overlays/eventlist');
 
   viewer: UserInterface | null = null;
   watchedTime: any = null;
@@ -345,6 +361,15 @@ export default class viewersEdit extends Vue {
     enableTime: true,
     enableSeconds: true,
   }
+
+  events: Required<EventListInterface>[] = []
+  fields = [
+    { key: 'timestamp', sortable: true },
+    { key: 'event' },
+    { key: 'info', label: '' },
+  ];
+  historyCurrentPage = 0;
+  historyPerPage = 10;
 
   state: {
     loading: number;
@@ -512,20 +537,34 @@ export default class viewersEdit extends Vue {
     }
   }
 
-  created() {
+  async created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('viewers::findOne', this.$route.params.id, (err, data) => {
-      if (err) {
-        return console.error(err);
+    await new Promise((resolve, reject) => {
+      this.socket.emit('viewers::findOne', this.$route.params.id, (err, data) => {
+        if (err) {
+          reject(console.error(err));
+        }
+        data.tips = orderBy(data.tips, 'tippedAt', 'desc');
+        data.bits = orderBy(data.bits, 'cheeredAt', 'desc');
+        console.log('Loaded viewer', data);
+        this.viewer = data
+        this.watchedTime = Number(data.watchedTime / (60 * 60 * 1000)).toFixed(1);
+        resolve();
+      })
+    });
+    await new Promise((resolve, reject) => {
+      if (this.viewer) {
+        this.socketEventList.emit('eventlist::getUserEvents', this.viewer.username, (events: Required<EventListInterface>[]) => {
+          this.events = events;
+          resolve();
+        })
+      } else {
+        resolve();
       }
-      data.tips = orderBy(data.tips, 'tippedAt', 'desc');
-      data.bits = orderBy(data.bits, 'cheeredAt', 'desc');
-      console.log('Loaded viewer', data);
-      this.viewer = data
-      this.watchedTime = Number(data.watchedTime / (60 * 60 * 1000)).toFixed(1);
-      this.state.loading = this.$state.success;
-      this.$nextTick(() => { this.state.pending = false })
-    })
+    });
+
+    this.state.loading = this.$state.success;
+    this.$nextTick(() => { this.state.pending = false })
   }
 
   beforeRouteUpdate(to, from, next) {

@@ -5,7 +5,7 @@ import moment from 'moment';
 require('moment-precise-range-plugin'); // moment.preciseDiff
 import { isMainThread } from './cluster';
 import chalk from 'chalk';
-import { cloneDeep, defaults, filter, get, isNil, isNull, map } from 'lodash';
+import { chunk, cloneDeep, defaults, filter, get, isNil, isNull, map } from 'lodash';
 
 import * as constants from './constants';
 import Core from './_interface';
@@ -37,6 +37,7 @@ import { getFunctionList } from './decorators/on';
 import { linesParsed, setStatus } from './helpers/parser';
 import { isDbConnected } from './helpers/database';
 import { find } from './helpers/register';
+import { SQLVariableLimit } from './helpers/sql';
 
 export const currentStreamTags: {
   is_auto: boolean;
@@ -102,9 +103,11 @@ const limitProxy = {
   },
 };
 
-const processFollowerState = async (user: Required<UserInterface>, f: any, quiet = false) => {
-  if (!user.isFollower) {
-    if (new Date().getTime() - new Date(f.followed_at).getTime() < 2 * constants.HOUR) {
+const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], usersFromAPI: { from_name: string; from_id: number; followed_at: string }[]) => {
+  // handle users currently not following
+  users.filter(user => !user.isFollower).forEach(user => {
+    const apiUser = usersFromAPI.find(userFromAPI => userFromAPI.from_id === user.userId) as typeof usersFromAPI[0];
+    if (new Date().getTime() - new Date(apiUser.followed_at).getTime() < 2 * constants.HOUR) {
       if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60 && !webhooks.existsInCache('follow', user.userId)) {
         webhooks.addIdToCache('follow', user.userId);
         eventlist.add({
@@ -112,7 +115,7 @@ const processFollowerState = async (user: Required<UserInterface>, f: any, quiet
           username: user.username,
           timestamp: Date.now(),
         });
-        if (!quiet && !isBot(user.username)) {
+        if (!isBot(user.username)) {
           follow(user.username);
           events.fire('follow', { username: user.username, userId: user.userId });
           alerts.trigger({
@@ -132,15 +135,48 @@ const processFollowerState = async (user: Required<UserInterface>, f: any, quiet
         }
       }
     }
+  });
+  await getRepository(User).save(
+    users.map(user => {
+      const apiUser = usersFromAPI.find(userFromAPI => userFromAPI.from_id === user.userId) as typeof usersFromAPI[0];
+      return {
+        ...user,
+        followedAt: user.haveFollowedAtLock ? user.followedAt : new Date(apiUser.followed_at).getTime(),
+        isFollower: user.haveFollowerLock? user.isFollower : true,
+        followCheckAt: Date.now(),
+      };
+    }),
+    { chunk: Math.floor(SQLVariableLimit / Object.keys(users[0]).length) },
+  );
+};
+
+const processFollowerState = async (users: { from_name: string; from_id: number; followed_at: string }[]) => {
+  const timer = Date.now();
+  if (users.length === 0) {
+    debug('api.followers', `No followers to process.`);
+    return;
   }
-  try {
-    user.followedAt = user.haveFollowedAtLock ? user.followedAt : new Date(f.followed_at).getTime();
-    user.isFollower = user.haveFollowerLock? user.isFollower : true;
-    user.followCheckAt = Date.now();
-    await getRepository(User).save(user);
-  } catch (e) {
-    error(e.stack);
+  debug('api.followers', `Processing ${users.length} followers`);
+  const usersGotFromDb = (await Promise.all(
+    chunk(users, SQLVariableLimit).map(async (bulk) => {
+      return await getRepository(User).findByIds(bulk.map(user => user.from_id));
+    })
+  )).flat();
+  debug('api.followers', `Found ${usersGotFromDb.length} followers in database`);
+  if (users.length > usersGotFromDb.length) {
+    const usersSavedToDb = await getRepository(User).save(
+      users
+        .filter(user => !usersGotFromDb.find(db => db.userId === user.from_id))
+        .map(user => {
+          return { userId: user.from_id, username: user.from_name };
+        }),
+      { chunk: Math.floor(SQLVariableLimit / Object.keys(users[0]).length) },
+    );
+    await updateFollowerState([...usersSavedToDb, ...usersGotFromDb], users);
+  } else {
+    await updateFollowerState(usersGotFromDb, users);
   }
+  debug('api.followers', `Finished parsing ${users.length} followers in ${Date.now() - timer}ms`);
 };
 
 class API extends Core {
@@ -343,7 +379,9 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
+        timeout: 20000,
       });
 
       // save remaining api calls
@@ -394,7 +432,9 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
+        timeout: 20000,
       });
 
       // save remaining api calls
@@ -482,7 +522,9 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
+        timeout: 20000,
       });
       const tags = request.data.data;
 
@@ -568,7 +610,9 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
+        timeout: 20000,
       });
       const subscribers = request.data.data;
       if (opts.subscribers) {
@@ -677,6 +721,7 @@ class API extends Core {
           'Accept': 'application/vnd.twitchtv.v5+json',
           'Authorization': 'OAuth ' + token,
         },
+        timeout: 20000,
       });
       ioServer?.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: request.status });
 
@@ -772,6 +817,7 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
       });
       ioServer?.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
@@ -798,7 +844,7 @@ class API extends Core {
     return { state: true };
   }
 
-  async getLatest100Followers (quiet) {
+  async getLatest100Followers () {
     const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/users/follows?to_id=${cid}&first=100`;
     const token = await oauth.botAccessToken;
@@ -806,7 +852,7 @@ class API extends Core {
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
 
     if (needToWait || notEnoughAPICalls) {
-      return { state: false, opts: quiet };
+      return { state: false };
     }
 
     let request;
@@ -814,7 +860,9 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
+        timeout: 20000,
       });
 
       // save remaining api calls
@@ -825,37 +873,26 @@ class API extends Core {
       ioServer?.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
 
       if (request.status === 200 && !isNil(request.data.data)) {
-        // check if user id is in db, not in db load username from API
-        for (const f of request.data.data) {
-          await setImmediateAwait(); // throttle down
-
-          f.from_name = String(f.from_name).toLowerCase();
-          f.from_id = Number(f.from_id);
-          const user = await getRepository(User).findOne({ userId: f.from_id });
-          if (!user) {
-            await processFollowerState(await getRepository(User).save({
-              userId: Number(f.from_id),
-              username: f.from_name,
-            }), f, quiet);
-          } else {
-            await processFollowerState(user, f, quiet);
-          }
-        }
+        processFollowerState(request.data.data.map(f => {
+          return {
+            from_name: String(f.from_name).toLowerCase(),
+            from_id: Number(f.from_id),
+            followed_at: f.followed_at,
+          };
+        }));
       }
       this.stats.currentFollowers =  request.data.total;
-      quiet = false;
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
         this.calls.bot.remaining = 0;
         this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
       }
 
-      quiet = e.errno !== 'ECONNREFUSED' && e.errno !== 'ETIMEDOUT';
       error(`${url} - ${e.message}`);
       ioServer?.emit('api.stats', { timestamp: Date.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
-      return { state: false, opts: quiet };
+      return { state: false };
     }
-    return { state: true, opts: quiet };
+    return { state: true };
   }
 
   async getChannelFollowers (opts) {
@@ -886,7 +923,9 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
+        timeout: 20000,
       });
 
       // save remaining api calls
@@ -914,21 +953,13 @@ class API extends Core {
           // move to next page
           return this.getChannelFollowers({ cursor: request.data.pagination.cursor, followers: opts.followers });
         } else {
-          // check if user id is in db, not in db load username from API
-          for (const f of opts.followers) {
-            await setImmediateAwait(); // throttle down
-            f.from_name = String(f.from_name).toLowerCase();
-            f.from_id = Number(f.from_id);
-            const user = await getRepository(User).findOne({ userId: f.from_id });
-            if (!user) {
-              await processFollowerState(await getRepository(User).save({
-                userId: Number(f.from_id),
-                username: f.from_name,
-              }), f);
-            } else {
-              await processFollowerState(user, f);
-            }
-          }
+          processFollowerState(opts.followers.map(f => {
+            return {
+              from_name: String(f.from_name).toLowerCase(),
+              from_id: Number(f.from_id),
+              followed_at: f.followed_at,
+            };
+          }));
         }
       }
     } catch (e) {
@@ -967,7 +998,9 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
+        timeout: 20000,
       });
 
       // save remaining api calls
@@ -1020,7 +1053,9 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
+        timeout: 20000,
       });
 
       // save remaining api calls
@@ -1069,7 +1104,9 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
+        timeout: 20000,
       });
 
       setStatus('API', request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED);
@@ -1303,6 +1340,7 @@ class API extends Core {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Content-Type': 'application/json',
+          'Client-ID': oauth.botClientId,
         },
       });
       await getRepository(TwitchTag).update({ is_auto: false }, { is_current: false });
@@ -1423,6 +1461,7 @@ class API extends Core {
           'Accept': 'application/vnd.twitchtv.v5+json',
           'Authorization': 'OAuth ' + token,
         },
+        timeout: 20000,
       });
       ioServer?.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: request.status });
     } catch (e) {
@@ -1477,7 +1516,9 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
+        timeout: 20000,
       });
 
       // save remaining api calls
@@ -1547,6 +1588,7 @@ class API extends Core {
         url,
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
       });
 
@@ -1593,6 +1635,7 @@ class API extends Core {
           'Accept': 'application/vnd.twitchtv.v5+json',
           'Authorization': 'OAuth ' + token,
         },
+        timeout: 20000,
       });
       ioServer?.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: request.status });
     } catch (e) {
@@ -1641,7 +1684,9 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
+        timeout: 20000,
       });
 
       // save remaining api calls
@@ -1731,6 +1776,7 @@ class API extends Core {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
         data: {
           user_id: String(cid),
@@ -1767,7 +1813,9 @@ class API extends Core {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
+        timeout: 20000,
       });
       ioServer?.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
       return request.data;
@@ -1813,7 +1861,9 @@ class API extends Core {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
+        timeout: 20000,
       });
 
       // save remaining api calls

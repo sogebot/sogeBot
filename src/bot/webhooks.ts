@@ -52,7 +52,7 @@ class Webhooks {
     clearTimeout(this.timeouts[`unsubscribe-${type}`]);
 
     const cid = oauth.channelId;
-    const clientId = await oauth.clientId;
+    const clientId = await oauth.botClientId;
     if (cid === '' || clientId === '') {
       this.timeouts[`unsubscribe-${type}`] = setTimeout(() => this.subscribe(type), 1000);
       return;
@@ -104,7 +104,7 @@ class Webhooks {
     clearTimeout(this.timeouts[`subscribe-${type}`]);
 
     const cid = oauth.channelId;
-    const clientId = await oauth.clientId;
+    const clientId = await oauth.botClientId;
     if (cid === '' || clientId === '') {
       this.timeouts[`subscribe-${type}`] = setTimeout(() => this.subscribe(type), 1000);
       return;

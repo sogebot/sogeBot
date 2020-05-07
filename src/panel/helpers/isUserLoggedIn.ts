@@ -21,9 +21,23 @@ export const isUserLoggedIn = async function (mustBeLogged = true, mustBeAdmin =
     }
   } else {
     try {
+      let clientId = localStorage.getItem('clientId') || '';
+      if (clientId.length === 0) {
+        // we need first get useless clientId
+        const dumbClientIdData = await axios.get(`https://id.twitch.tv/oauth2/validate`, {
+          headers: {
+            'Authorization': 'OAuth ' + code,
+          },
+        });
+        clientId = dumbClientIdData.data.client_id;
+        console.log(clientId);
+        localStorage.setItem('clientId', clientId);
+      }
+
       const axiosData = await axios.get(`https://api.twitch.tv/helix/users`, {
         headers: {
           'Authorization': 'Bearer ' + code,
+          'Client-Id': clientId,
         },
       });
       const data = get(axiosData, 'data.data[0]', null);

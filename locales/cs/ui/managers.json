@@ -1,0 +1,8 @@
+{
+  "viewers": {
+    "eventHistory": "Historie událostí uživatele",
+    "hostAndRaidViewersCount": "Diváků: $value",
+    "receivedSubscribeFrom": "Přijaté předplatné od <strong>$value</strong>",
+    "giftedSubscribeTo": "Darované předplatné <strong>$value</strong>"
+  }
+}

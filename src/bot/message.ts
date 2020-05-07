@@ -404,7 +404,7 @@ class Message {
           .replace('!', '') // replace first !
           .replace(/\(|\)/g, '')
           .replace(/\$param/g, attr.param);
-        const parse = new Parser({ sender: attr.sender, message: cmd, skip: true, quiet: true });
+        const parse = new Parser({ sender: attr.sender, message: cmd, skip: false, quiet: true });
         const responses = await parse.process();
         for (let i = 0; i < responses.length; i++) {
           setTimeout(async () => {
@@ -417,7 +417,7 @@ class Message {
         const cmd = filter
           .replace(/\(|\)/g, '')
           .replace(/\$param/g, attr.param);
-        const parse = new Parser({ sender: attr.sender, message: cmd, skip: true, quiet: false });
+        const parse = new Parser({ sender: attr.sender, message: cmd, skip: false, quiet: false });
         const responses = await parse.process();
         for (let i = 0; i < responses.length; i++) {
           setTimeout(async () => {
@@ -661,6 +661,7 @@ class Message {
           request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
             headers: {
               'Authorization': 'Bearer ' + token,
+              'Client-ID': oauth.botClientId,
             },
           });
           return api.getGameFromId(request.data.data[0].game_id);
@@ -688,6 +689,7 @@ class Message {
           request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
             headers: {
               'Authorization': 'Bearer ' + token,
+              'Client-ID': oauth.botClientId,
             },
           });
           // save remaining api calls
@@ -717,6 +719,7 @@ class Message {
           request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
             headers: {
               'Authorization': 'Bearer ' + token,
+              'Client-ID': oauth.botClientId,
             },
           });
           // save remaining api calls

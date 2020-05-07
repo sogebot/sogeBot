@@ -286,7 +286,7 @@ class Events extends Core {
           tags: { username: oauth.broadcasterUsername , userId: oauth.broadcasterId},
           message: command,
         },
-        skip: true,
+        skip: false,
         quiet: _.get(operation, 'isCommandQuiet', false),
       });
     }

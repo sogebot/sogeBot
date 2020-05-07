@@ -2,7 +2,7 @@
 
 import * as _ from 'lodash';
 
-import { prepare } from '../commons';
+import { parserReply, prepare } from '../commons';
 import { command, default_permission, parser } from '../decorators';
 import Expects from '../expects';
 import Message from '../message';
@@ -18,8 +18,6 @@ import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
 import permissions from '../permissions';
 import { translate } from '../translate';
-import tmi from '../tmi';
-import discord from '../integrations/discord';
 
 /*
  * !alias                                              - gets an info about alias usage
@@ -126,16 +124,12 @@ class Alias extends System {
             sender: opts.sender,
           });
           debug('alias.process', response);
-          if (opts.sender.discord) {
-            discord.message(response, opts.sender.discord.channel, opts.sender.discord.author);
-          } else {
-            tmi.message({
-              message: {
-                tags: opts.sender,
-                message: response,
-              }, skip: true,
-            });
-          }
+          const parse = new Parser({ sender: opts.sender, message: response, skip: false, quiet: false });
+          const responses = await parse.process();
+          debug('alias.process', responses);
+          responses.forEach(r => {
+            parserReply(r.response, { sender: r.sender, attr: r.attr });
+          });
           incrementCountOfCommandUsage(alias.alias);
         } else {
           return false;
