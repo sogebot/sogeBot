@@ -1139,8 +1139,8 @@
       "notEnoughOptions": "$sender, вам нужно указать кол-во поинтов для игры",
       "notEnoughPoints": "$sender, у вас нет $points $pointsName для игры",
       "win": "$sender, вы выиграли! Теперь у вас $points $pointsName",
-      "winJackpot": "$sender, you hit JACKPOT! You won $jackpot $jackpotName in addition to your bet. You now have $points $pointsName",
-      "loseWithJackpot": "$sender, you LOST! You now have $points $pointsName. Jackpot increased to $jackpot $jackpotName",
+      "winJackpot": "$sender, вы получили JACKPOT! Вы выиграли $jackpot $jackpotName помимо вашей ставки. Теперь у вас $points $pointsName",
+      "loseWithJackpot": "$sender, вы ПРОИГРАЛИ! Теперь у вас $points $pointsName. Джекпот увеличился до $jackpot $jackpotName",
       "lose": "$sender, вы проиграли! Теперь у вас $points $pointsName"
     }
   },
