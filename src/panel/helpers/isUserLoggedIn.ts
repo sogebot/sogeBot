@@ -30,7 +30,6 @@ export const isUserLoggedIn = async function (mustBeLogged = true, mustBeAdmin =
           },
         });
         clientId = dumbClientIdData.data.client_id;
-        console.log(clientId);
         localStorage.setItem('clientId', clientId);
       }
 
