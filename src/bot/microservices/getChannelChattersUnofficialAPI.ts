@@ -125,6 +125,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
             await clusteredFetchAccountAge(Number(twitchObj.id));
           } catch (e) {
             process.stderr.write('Something went wrong when getting user data of ' + username + '\n');
+            process.stderr.write(`${e.stack}\n`);
             continue;
           }
         }
