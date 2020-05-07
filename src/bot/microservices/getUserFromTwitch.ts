@@ -39,10 +39,14 @@ export const getUserFromTwitch = async (username)  => {
     throw Error('Missing oauth token');
   }
 
+  if (!clientId) {
+    throw Error('Missing oauth clientId');
+  }
+
   const request = await axios.get(url, {
     headers: {
       'Authorization': 'Bearer ' + JSON.parse(token.value),
-      'Client-ID': clientId,
+      'Client-ID': JSON.parse(clientId.value),
     },
   });
 
