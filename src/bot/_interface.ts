@@ -515,6 +515,18 @@ class Module {
     // add status info
     promisedSettings.enabled = this._enabled;
 
+    // check ui ifs
+    const ui: InterfaceSettings.UI = _.cloneDeep(this._ui);
+    for (const categoryKey of Object.keys(promisedSettings)) {
+      if (ui[categoryKey]) {
+        for (const key of Object.keys(ui[categoryKey])) {
+          if (typeof ui[categoryKey][key].if === 'function' && !ui[categoryKey][key].if()) {
+            delete promisedSettings[categoryKey][key];
+          }
+        }
+      }
+    }
+
     return promisedSettings;
   }
 

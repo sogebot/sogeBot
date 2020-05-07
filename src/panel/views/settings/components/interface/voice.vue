@@ -9,7 +9,11 @@
         </template>
       </span>
     </div>
-    <b-form-select v-model="currentValue" :options="voices" plain></b-form-select>
+    <div class="form-control" v-if="loading === 0">
+      <b-spinner variant="primary" small /> {{ translate('loading') }}
+    </div>
+    <div class="form-control is-invalid alert-danger" v-else-if="loading === 1" v-html="translate('overlays.texttospeech.settings.responsiveVoiceKeyNotSet')" />
+    <b-form-select v-else v-model="currentValue" :options="voices" plain></b-form-select>
   </div>
 </template>
 
@@ -30,16 +34,24 @@ export default class helpbox extends Vue {
   voices: { text: string, value: string}[] = [];
   currentValue = this.value;
 
+  loading = 0;
+
   translatedTitle = this.translate(this.title);
 
   mounted() {
+    this.init();
+  }
+
+  init() {
     if (this.configuration.integrations.ResponsiveVoice.api.key.trim().length > 0) {
       if (typeof window.responsiveVoice === 'undefined') {
         this.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.configuration.integrations.ResponsiveVoice.api.key)
-          .then(() => this.initResponsiveVoice());
+          .then(() => this.initResponsiveVoice(0));
       } else {
         this.loadVoices();
       }
+    } else {
+      this.loading = 1;
     }
   }
 
@@ -47,11 +59,16 @@ export default class helpbox extends Vue {
     this.voices = window.responsiveVoice.getVoices().map(o => {
       return { text: o.name, value: o.name }
     });
+    this.loading = 2;
   }
 
-  initResponsiveVoice() {
+  initResponsiveVoice(retry) {
     if (typeof window.responsiveVoice === 'undefined') {
-      return setTimeout(() => this.initResponsiveVoice(), 200);
+      if (retry === 10) {
+        this.loading = 1;
+        return;
+      }
+      return setTimeout(() => this.initResponsiveVoice(retry+1), 200);
     }
     window.responsiveVoice.init();
     this.loadVoices();
