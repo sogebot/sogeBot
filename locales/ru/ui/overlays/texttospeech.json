@@ -1,7 +1,10 @@
 {
   "settings": {
     "responsiveVoiceKeyNotSet": "Вы не правильно установили <a href='#/settings/integrations/responsivevoice'>ключ ResponsiveVoice</a>",
-    "voice": "Голос",
+    "voice": {
+      "title": "Голос",
+      "help": "If voices are not properly loading after ResponsiveVoice key update, try to refresh browser"
+    },
     "volume": "Громкость",
     "rate": "Темп",
     "pitch": "Высота"
