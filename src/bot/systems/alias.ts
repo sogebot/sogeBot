@@ -118,8 +118,9 @@ class Alias extends System {
           addToViewersCache(opts.sender.userId, alias.permission, (await permissions.check(opts.sender.userId, alias.permission, false)).access);
         }
         if (getFromViewersCache(opts.sender.userId, alias.permission)) {
-          const parse = new Parser({ sender: opts.sender, message: opts.message.replace(replace, `${alias.command}`), skip: false, quiet: false });
-          const responses = await parse.process();
+          const response = opts.message.replace(replace, `${alias.command}`);
+          const responses = await p.command(opts.sender, response, true);
+          debug('alias.process', response);
           debug('alias.process', responses);
           responses.forEach(r => {
             parserReply(r.response, { sender: r.sender, attr: r.attr });
