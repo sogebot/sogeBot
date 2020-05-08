@@ -241,7 +241,7 @@ class Parser {
     return commands;
   }
 
-  async command (sender: CommandOptions['sender'] | null, message: string): Promise<CommandResponse[]> {
+  async command (sender: CommandOptions['sender'] | null, message: string, disablePermissionCheck = false): Promise<CommandResponse[]> {
     debug('parser.command', { sender, message });
     if (!message.startsWith('!')) {
       return [];
@@ -256,7 +256,7 @@ class Parser {
       return [];
     }; // command is disabled
 
-    if (this.sender) {
+    if (this.sender && !disablePermissionCheck) {
       if (typeof getFromViewersCache(this.sender.userId, command.permission) === 'undefined') {
         addToViewersCache(this.sender.userId, command.permission, (await permissions.check(this.sender.userId, command.permission, false)).access);
       }
@@ -264,6 +264,7 @@ class Parser {
 
     if (
       _.isNil(this.sender) // if user is null -> we are running command through a bot
+      || disablePermissionCheck
       || this.skip
       || getFromViewersCache(this.sender.userId, command.permission)
     ) {
