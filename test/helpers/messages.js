@@ -56,8 +56,16 @@ module.exports = {
   },
   debug: async function (category, expected) {
     await until(setError => {
-      if (log.debug.calledWith(category, expected)) {
-        return true;
+      if (Array.isArray(expected)) {
+        for (const ex of expected) {
+          if (log.debug.calledWith(category, ex)) {
+            return true;
+          }
+        }
+      } else {
+        if (log.debug.calledWith(category, expected)) {
+          return true;
+        }
       }
       return setError(
         '\n+\t"' + expected + '"'

@@ -8,6 +8,7 @@ import api from '../api';
 import { publicEndpoint } from '../helpers/socket';
 import { Gallery } from '../database/entity/gallery';
 import { getRepository } from 'typeorm';
+import { debug } from '../helpers/log';
 
 class Alerts extends Overlay {
   @ui({
@@ -76,6 +77,7 @@ class Alerts extends Overlay {
       }
     }
 
+    debug('alerts.emit', opts.parameters);
     this.emit('alert', send);
     return [];
   }

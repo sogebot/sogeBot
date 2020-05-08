@@ -11,6 +11,8 @@ const message = require('../../general.js').message;
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const alias = (require('../../../dest/systems/alias')).default;
+const duel = (require('../../../dest/games/duel')).default;
+const gamble = (require('../../../dest/games/gamble')).default;
 const customCommands = (require('../../../dest/systems/customcommands')).default;
 
 // users
@@ -24,6 +26,9 @@ describe('Alias - run()', () => {
 
     await getRepository(User).save({ username: owner.username, userId: owner.userId });
     await getRepository(User).save({ username: user.username, userId: user.userId });
+
+    duel.status( { state: true, quiet: false });
+    gamble.status( { state: true, quiet: false });
   });
 
   it('!a should show correctly command with link (skip is true)', async () => {
@@ -42,7 +47,7 @@ describe('Alias - run()', () => {
     assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!a', command: '!duel' }));
 
     alias.run({ sender: owner, message: '!a' });
-    await message.debug('alias.process', '!duel');
+    await message.debug('sendMessage.message', '@soge__, you need to specify points to dueling');
 
     const r2 = await alias.remove({ sender: owner, parameters: '!a' });
     assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!a' }));
@@ -55,7 +60,7 @@ describe('Alias - run()', () => {
     assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!a', command: '!duel' }));
 
     alias.run({ sender: owner, message: '!A' });
-    await message.debug('alias.process', '!duel');
+    await message.debug('sendMessage.message', '@soge__, you need to specify points to dueling');
 
     const r2 = await alias.remove({ sender: owner, parameters: '!a' });
     assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!a' }));
@@ -68,7 +73,7 @@ describe('Alias - run()', () => {
     assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!a with spaces', command: '!duel' }));
 
     alias.run({ sender: owner, message: '!a with spaces' });
-    await message.debug('alias.process', '!duel');
+    await message.debug('sendMessage.message', '@soge__, you need to specify points to dueling');
 
     const r2 = await alias.remove({ sender: owner, parameters: '!a with spaces' });
     assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!a with spaces' }));
@@ -81,7 +86,7 @@ describe('Alias - run()', () => {
     assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!한국어', command: '!duel' }));
 
     alias.run({ sender: owner, message: '!한국어' });
-    await message.debug('alias.process', '!duel');
+    await message.debug('sendMessage.message', '@soge__, you need to specify points to dueling');
 
     const r2 = await alias.remove({ sender: owner, parameters: '!한국어' });
     assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!한국어' }));
@@ -94,7 +99,7 @@ describe('Alias - run()', () => {
     assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!русский', command: '!duel' }));
 
     alias.run({ sender: owner, message: '!русский' });
-    await message.debug('alias.process', '!duel');
+    await message.debug('sendMessage.message', '@soge__, you need to specify points to dueling');
 
     const r2 = await alias.remove({ sender: owner, parameters: '!русский' });
     assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!русский' }));
@@ -107,7 +112,7 @@ describe('Alias - run()', () => {
     assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!крутить', command: '!gamble' }));
 
     alias.run({ sender: owner, message: '!крутить 1000' });
-    await message.debug('alias.process', '!gamble 1000');
+    await message.debug('sendMessage.message', '@soge__, you don\'t have 1000 points to gamble');
 
     const r2 = await alias.remove({ sender: owner, parameters: '!крутить' });
     assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!крутить' }));

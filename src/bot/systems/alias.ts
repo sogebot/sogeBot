@@ -5,7 +5,6 @@ import * as _ from 'lodash';
 import { parserReply, prepare } from '../commons';
 import { command, default_permission, parser } from '../decorators';
 import Expects from '../expects';
-import Message from '../message';
 import Parser from '../parser';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
@@ -75,7 +74,6 @@ class Alias extends System {
 
     // is it an command?
     if (!opts.message.startsWith('!')) {
-      debug('alias.process', 'Not a command');
       return true;
     }
 
@@ -89,7 +87,6 @@ class Alias extends System {
       cmdArray.pop(); // remove last array item if not found
     }
     if (_.isEmpty(alias)) {
-      debug('alias.process', 'Alias not found');
       return true;
     } // no alias was found - return
 
@@ -121,12 +118,9 @@ class Alias extends System {
           addToViewersCache(opts.sender.userId, alias.permission, (await permissions.check(opts.sender.userId, alias.permission, false)).access);
         }
         if (getFromViewersCache(opts.sender.userId, alias.permission)) {
-          // parse variables
-          const response = await new Message(opts.message.replace(replace, `${alias.command}`)).parse({
-            sender: opts.sender,
-          });
-          debug('alias.process', response);
+          const response = opts.message.replace(replace, `${alias.command}`);
           const responses = await p.command(opts.sender, response, true);
+          debug('alias.process', response);
           debug('alias.process', responses);
           responses.forEach(r => {
             parserReply(r.response, { sender: r.sender, attr: r.attr });
@@ -136,8 +130,6 @@ class Alias extends System {
           return false;
         }
       }
-    } else {
-      debug('alias.process', 'Trying to bypass');
     }
     return true;
   }

@@ -30,6 +30,7 @@ class Module {
   public on: InterfaceSettings.On;
   public socket: any = null;
   public uuid = uuid();
+  private firstStatusSent = false;
 
   onStartupTriggered = false;
 
@@ -402,15 +403,19 @@ class Module {
     const isMasterAndStatusOnly = isMainThread && _.isNil(opts.state);
     const isStatusChanged = !_.isNil(opts.state);
 
+    if (existsSync('./restart.pid') // force quiet if we have restart.pid
+      || (this.enabled === opts.state && this.firstStatusSent) // force quiet if we actually don't change anything
+    ) {
+      opts.quiet = true;
+    }
+
     if (isStatusChanged) {
       this.enabled = opts.state;
     } else {
       opts.state = this.enabled;
     }
 
-    if (existsSync('./restart.pid')) {
-      opts.quiet = true; // force quiet if we have restart.pid
-    }
+    this.firstStatusSent = true;
 
     if (!this.areDependenciesEnabled || this.isDisabledByEnv) {
       opts.state = false;
