@@ -231,7 +231,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { cloneDeep, get, pickBy, filter, size } from 'lodash-es';
 import { flatten, unflatten } from 'src/bot/helpers/flatten';
 import { getListOf } from 'src/panel/helpers/getListOf';
-import { getSocket } from 'src/panel/helpers/socket';
+import { getConfiguration, getSocket } from 'src/panel/helpers/socket';
 
 import { PermissionsInterface } from 'src/bot/database/entity/permissions';
 
@@ -346,7 +346,7 @@ export default class interfaceSettings extends Vue {
   }
 
   @Watch('$route.params.type')
-  refresh() {
+  async refresh() {
     this.socket.emit(this.$route.params.type, (err, systems: systemFromIO[] ) => {
       if (!systems.map(o => o.name).includes(this.$route.params.id)) {
         this.$router.push({ name: 'InterfaceSettings', params: { type: this.$route.params.type, id: systems[0].name } });
@@ -357,6 +357,7 @@ export default class interfaceSettings extends Vue {
 
       this.list = systems;
     })
+    Vue.prototype.configuration = await getConfiguration(); // force refresh config
   }
 
   getBorderStyle(system) {
