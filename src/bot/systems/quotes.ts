@@ -93,7 +93,7 @@ class Quotes extends System {
       if (opts.parameters.length === 0) {
         throw new Error();
       }
-      const id = new Expects(opts.parameters).argument({ type: 'uuid', name: 'id' }).toArray()[0];
+      const id = new Expects(opts.parameters).argument({ type: Number, name: 'id' }).toArray()[0];
       const item = await getRepository(QuotesEntity).findOne({id});
 
       if (!item) {
@@ -117,7 +117,7 @@ class Quotes extends System {
       if (opts.parameters.length === 0) {
         throw new Error();
       }
-      const [id, tag] = new Expects(opts.parameters).argument({ type: 'uuid', name: 'id' }).argument({ name: 'tag', multi: true, delimiter: '' }).toArray();
+      const [id, tag] = new Expects(opts.parameters).argument({ type: Number, name: 'id' }).argument({ name: 'tag', multi: true, delimiter: '' }).toArray();
 
       const quote = await getRepository(QuotesEntity).findOne({id});
       if (quote) {
@@ -151,7 +151,7 @@ class Quotes extends System {
 
   @command('!quote')
   async main (opts): Promise<CommandResponse[]> {
-    const [id, tag] = new Expects(opts.parameters).argument({ type: 'uuid', name: 'id', optional: true }).argument({ name: 'tag', optional: true, multi: true, delimiter: '' }).toArray();
+    const [id, tag] = new Expects(opts.parameters).argument({ type: Number, name: 'id', optional: true }).argument({ name: 'tag', optional: true, multi: true, delimiter: '' }).toArray();
     if (_.isNil(id) && _.isNil(tag) || id === '-tag') {
       const response = prepare('systems.quotes.show.error.no-parameters', { command: opts.command });
       return [{ response, ...opts }];
