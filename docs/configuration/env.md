@@ -7,6 +7,13 @@ Force system to be disabled. Mainly used for moderation system
 - `DISABLE=moderation`
 - nothing is set *default*
 
+## PORT
+
+Set port for listening of UI.
+
+- `PORT=12345`
+- `PORT=20000` *default*
+
 ## HEAP
 
 Enables HEAP snapshot tracking and saving for a bot. In normal environment,
