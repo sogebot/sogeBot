@@ -7,7 +7,7 @@ import crypto from 'crypto';
 import gitCommitInfo from 'git-commit-info';
 import { AllHtmlEntities as Entities} from 'html-entities';
 
-import { warning } from './helpers/log';
+import { debug, warning } from './helpers/log';
 import { getCountOfCommandUsage } from './helpers/commands/count';
 import { getRepository } from 'typeorm';
 
@@ -404,21 +404,17 @@ class Message {
           .replace('!', '') // replace first !
           .replace(/\(|\)/g, '')
           .replace(/\$param/g, attr.param);
-        const parse = new Parser({ sender: attr.sender, message: cmd, skip: false, quiet: true });
-        const responses = await parse.process();
-        for (let i = 0; i < responses.length; i++) {
-          setTimeout(async () => {
-            parserReply(await responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
-          }, 500 * i);
-        }
+        debug('message.process', cmd);
+        await new Parser().command(attr.sender, cmd, true);
+        // we are not sending back any responses!
         return '';
       },
-      '(!#)': async function (filter) {
+      '(!#)': async (filter) => {
         const cmd = filter
           .replace(/\(|\)/g, '')
           .replace(/\$param/g, attr.param);
-        const parse = new Parser({ sender: attr.sender, message: cmd, skip: false, quiet: false });
-        const responses = await parse.process();
+        debug('message.process', cmd);
+        const responses = await new Parser().command(attr.sender, cmd, true);
         for (let i = 0; i < responses.length; i++) {
           setTimeout(async () => {
             parserReply(await responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
