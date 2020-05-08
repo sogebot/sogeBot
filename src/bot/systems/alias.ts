@@ -75,6 +75,7 @@ class Alias extends System {
 
     // is it an command?
     if (!opts.message.startsWith('!')) {
+      debug('alias.process', 'Not a command');
       return true;
     }
 
@@ -88,6 +89,7 @@ class Alias extends System {
       cmdArray.pop(); // remove last array item if not found
     }
     if (_.isEmpty(alias)) {
+      debug('alias.process', 'Alias not found');
       return true;
     } // no alias was found - return
 
@@ -124,8 +126,7 @@ class Alias extends System {
             sender: opts.sender,
           });
           debug('alias.process', response);
-          const parse = new Parser({ sender: opts.sender, message: response, skip: false, quiet: false });
-          const responses = await parse.process();
+          const responses = await p.command(opts.sender, response, true);
           debug('alias.process', responses);
           responses.forEach(r => {
             parserReply(r.response, { sender: r.sender, attr: r.attr });
@@ -135,6 +136,8 @@ class Alias extends System {
           return false;
         }
       }
+    } else {
+      debug('alias.process', 'Trying to bypass');
     }
     return true;
   }
