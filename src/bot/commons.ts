@@ -180,6 +180,10 @@ export function getTime(time, isChat) {
     hours = now.hours > 0 ? now.hours : '';
     minutes = now.minutes > 0 ? now.minutes : '';
     seconds = now.seconds > 0 ? now.seconds : '';
+
+    if (days === '' && hours === '' && minutes === '' && seconds === '') {
+      seconds = 1; // set seconds to 1 if everything else is missing
+    }
     return { days,
       hours,
       minutes,
@@ -209,6 +213,7 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
     messageToSend = messageToSend.replace(/^(\/me)/gi, '').trim();
   }
 
+  debug('sendMessage.message', messageToSend);
   debug('commons.sendMessage', JSON.stringify({messageToSend, sender, attr}));
 
   if (sender) {
