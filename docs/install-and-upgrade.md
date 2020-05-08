@@ -76,7 +76,7 @@
     `npm start`
 
 - To access webpanel, go to `http://localhost:<port>` where port is configured
-  in config.json (default: 20000)
+  as PORT env variable, e.g. `PORT=20001 npm start`
 
 ### NEDB
 
