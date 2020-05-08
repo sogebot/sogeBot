@@ -12,6 +12,7 @@ cp docs/index.html new-docs/
 sed -i 's/_master//g' new-docs/_sidebar.md
 rm -rf docs
 mv new-docs docs
+git add -A docs
 git commit -am 'chore: update docs
 
 [skip-tests]'

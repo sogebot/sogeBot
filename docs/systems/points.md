@@ -2,6 +2,8 @@
 ### Commands | OWNER
 - !points add [username] [number]
     - add [number] points to specified [username]
+- !points undo [username]
+    - revert last add, remove or set points operation within 10minutess
 - !points remove [username] [number]
     - remove [number] points to specified [username]
 - !points online [number]
