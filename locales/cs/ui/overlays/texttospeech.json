@@ -1,7 +1,10 @@
 {
   "settings": {
     "responsiveVoiceKeyNotSet": "Nenastavili jste správně <a href='#/settings/integrations/responsivevoice'>ResponiveVoice key</a>",
-    "voice": "Hlas",
+    "voice": {
+      "title": "Hlas",
+      "help": "If voices are not properly loading after ResponsiveVoice key update, try to refresh browser"
+    },
     "volume": "Hlasitost",
     "rate": "Tempo",
     "pitch": "Výška"
