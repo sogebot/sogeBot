@@ -24,11 +24,10 @@ const tests = [
   { sender: owner, parameters: '-tag -id', shouldFail: true, error: 'systems.quotes.show.error.no-parameters' },
   { sender: owner, parameters: '-id -tag', shouldFail: true, error: 'systems.quotes.show.error.no-parameters' },
 
-
   { sender: owner, parameters: '-id $id', id: 1, tag: 'general', shouldFail: false, exist: true },
   { sender: owner, parameters: '-id $id -tag', id: 1, tag: 'general', shouldFail: false, exist: true },
-  { sender: owner, parameters: '-id 732ff1bd-711f-457a-bef9-8a83eb8fc4b0', id: '732ff1bd-711f-457a-bef9-8a83eb8fc4b0', tag: 'general', shouldFail: false, exist: false },
-  { sender: owner, parameters: '-id 732ff1bd-711f-457a-bef9-8a83eb8fc4b0 -tag', id: '732ff1bd-711f-457a-bef9-8a83eb8fc4b0', tag: 'general', shouldFail: false, exist: false },
+  { sender: owner, parameters: '-id 99999', id: 99999, tag: 'general', shouldFail: false, exist: false },
+  { sender: owner, parameters: '-id 99999 -tag', id: 99999, tag: 'general', shouldFail: false, exist: false },
 
   { sender: owner, parameters: '-tag lorem ipsum', id: 1, tag: 'lorem ipsum', shouldFail: false, exist: true },
   { sender: owner, parameters: '-tag general', id: 1, tag: 'general', shouldFail: false, exist: false },

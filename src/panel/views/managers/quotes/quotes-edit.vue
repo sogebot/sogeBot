@@ -79,8 +79,6 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { Validations } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators';
 
-import { v4 as uuid } from 'uuid';
-
 import { getUsernameById } from '../../../helpers/userById';
 import { QuotesInterface } from 'src/bot/database/entity/quotes';
 
@@ -111,7 +109,7 @@ export default class QuotesEdit extends Vue {
   pending: boolean = false;
 
   item: QuotesInterface = {
-    id: uuid(),
+    id: undefined,
     createdAt: Date.now(),
     tags: [],
     quotedBy: 0,
