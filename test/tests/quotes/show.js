@@ -26,8 +26,8 @@ const tests = [
 
   { sender: owner, parameters: '-id $id', id: 1, tag: 'general', shouldFail: false, exist: true },
   { sender: owner, parameters: '-id $id -tag', id: 1, tag: 'general', shouldFail: false, exist: true },
-  { sender: owner, parameters: '-id 9999999999999999', id: 9999999999999999, tag: 'general', shouldFail: false, exist: false },
-  { sender: owner, parameters: '-id 9999999999999999 -tag', id: 9999999999999999, tag: 'general', shouldFail: false, exist: false },
+  { sender: owner, parameters: '-id 99999', id: 99999, tag: 'general', shouldFail: false, exist: false },
+  { sender: owner, parameters: '-id 99999 -tag', id: 99999, tag: 'general', shouldFail: false, exist: false },
 
   { sender: owner, parameters: '-tag lorem ipsum', id: 1, tag: 'lorem ipsum', shouldFail: false, exist: true },
   { sender: owner, parameters: '-tag general', id: 1, tag: 'general', shouldFail: false, exist: false },
