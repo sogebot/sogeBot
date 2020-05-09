@@ -86,7 +86,6 @@ import 'prismjs/themes/prism.css'
 @Component({
   components: {
     'loading': () => import('../../../components/loading.vue'),
-    'toggle-enable': () => import('../../../components/toggle-enable.vue'),
     'hold-button': () => import('../../../components/holdButton.vue'),
     'prism': Prism,
   },

@@ -1,6 +1,6 @@
 import Overlay from './_interface';
 
-import { command, default_permission, settings, ui } from '../decorators';
+import { command, default_permission, parser, settings, ui } from '../decorators';
 
 import { default as ResponsiveVoice } from '../integrations/responsivevoice';
 import { permission } from '../helpers/permissions';
@@ -46,6 +46,12 @@ class TextToSpeech extends Overlay {
   })
   @settings('settings')
   pitch = 1.0;
+  @ui({
+    type: 'toggle-enable',
+    if: () => ResponsiveVoice.key.trim().length > 0,
+  })
+  @settings('settings')
+  triggerTTSByHighlightedMessage = false;
 
   @ui({
     type: 'link',
@@ -67,6 +73,19 @@ class TextToSpeech extends Overlay {
       voice: this.voice,
     });
     return [];
+  }
+
+
+  /**
+   * Parsers text to speech
+   * Inspired by: https://discordapp.com/channels/317348946144002050/317349069024395264/707237020342419507
+   * @param opts
+   */
+  @parser({ fireAndForget: true })
+  async checkTriggerTTSByHighlightedMessage(opts: ParserOptions) {
+    if (opts.sender.msgId && opts.sender.msgId === 'highlighted-message' && this.triggerTTSByHighlightedMessage) {
+      this.textToSpeech({ parameters: opts.message, command: '!tts', createdAt: Date.now(), sender: opts.sender, attr: {} });
+    }
   }
 }
 
