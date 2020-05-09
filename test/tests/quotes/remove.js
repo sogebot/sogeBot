@@ -21,7 +21,7 @@ const tests = [
   { sender: owner, parameters: '', shouldFail: true },
   { sender: owner, parameters: '-id', shouldFail: true },
   { sender: owner, parameters: '-id a', id: 'a', shouldFail: true, exist: false },
-  { sender: owner, parameters: '-id 99999999999', id: '99999999999', shouldFail: false, exist: false },
+  { sender: owner, parameters: '-id 99999', id: 99999, shouldFail: false, exist: false },
   { sender: owner, parameters: '-id $id', id: 1, shouldFail: false, exist: true },
 ];
 

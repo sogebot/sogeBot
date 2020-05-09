@@ -24,8 +24,8 @@ const tests = [
 
   { sender: owner, parameters: '-id $id -tag ipsum, dolor', id: 1, tags: 'ipsum, dolor', shouldFail: false, exist: true },
   { sender: owner, parameters: '-tag ipsum, dolor -id $id', id: 1, tags: 'ipsum, dolor', shouldFail: false, exist: true },
-  { sender: owner, parameters: '-id 999999999 -tag ipsum, dolor', id: 999999999, tags: 'ipsum, dolor', shouldFail: false, exist: false },
-  { sender: owner, parameters: '-tag ipsum, dolor -id 999999999', id: 999999999, tags: 'ipsum, dolor', shouldFail: false, exist: false },
+  { sender: owner, parameters: '-id 99999 -tag ipsum, dolor', id: 99999, tags: 'ipsum, dolor', shouldFail: false, exist: false },
+  { sender: owner, parameters: '-tag ipsum, dolor -id 99999', id: 99999, tags: 'ipsum, dolor', shouldFail: false, exist: false },
 ];
 
 describe('Quotes - set()', () => {
