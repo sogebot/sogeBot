@@ -241,6 +241,7 @@ export default {
       participants: [],
 
       cacheInterval: 0,
+      refreshTimeout: 0,
 
       socket: getSocket('/systems/raffles'),
       updated: String(new Date())
@@ -264,6 +265,7 @@ export default {
   },
   destroyed () {
     clearInterval(this.cacheInterval);
+    clearTimeout(this.refreshTimeout);
   },
   created: function () {
     this.getSettings();
@@ -387,7 +389,7 @@ export default {
         console.error(err);
       })
 
-      setTimeout(() => this.refresh(), 1000)
+      this.refreshTimeout = setTimeout(() => this.refresh(), 1000)
     },
     toggleEligibility: function (participant) {
       participant.isEligible = !participant.isEligible;
