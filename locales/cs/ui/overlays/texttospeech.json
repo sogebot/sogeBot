@@ -3,11 +3,11 @@
     "responsiveVoiceKeyNotSet": "Nenastavili jste správně <a href='#/settings/integrations/responsivevoice'>ResponiveVoice key</a>",
     "voice": {
       "title": "Hlas",
-      "help": "If voices are not properly loading after ResponsiveVoice key update, try to refresh browser"
+      "help": "Pokud po aktualizaci klíče ResponsiveVoice nejsou hlasy správně načteny, zkuste obnovit prohlížeč"
     },
     "volume": "Hlasitost",
     "rate": "Tempo",
     "pitch": "Výška",
-    "triggerTTSByHighlightedMessage": "Text to Speech will be triggered by highlighted message"
+    "triggerTTSByHighlightedMessage": "Text na řeč bude spuštěn zvýrazněnou zprávou"
   }
 }
