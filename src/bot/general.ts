@@ -87,7 +87,7 @@ class General extends Core {
 
   @command('!_debug')
   @default_permission(permission.CASTERS)
-  public async debug() {
+  public async debug(opts: CommandOptions): Promise<CommandResponse[]> {
     const widgets = await getRepository(Widget).find();
     const connection = await getConnection();
 
@@ -139,6 +139,7 @@ class General extends Core {
     debug('*', `WIDGETS      | ${map(widgets, 'name').join(', ')}`);
     debug('*', `OAUTH        | BOT ${oauthInfo.bot} | BROADCASTER ${oauthInfo.broadcaster}`);
     debug('*', '======= END OF DEBUG MESSAGE =======');
+    return [];
   }
 
   @command('!ping')
