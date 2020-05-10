@@ -7,6 +7,7 @@
     },
     "volume": "Hlasitost",
     "rate": "Tempo",
-    "pitch": "Výška"
+    "pitch": "Výška",
+    "triggerTTSByHighlightedMessage": "Text to Speech will be triggered by highlighted message"
   }
 }
