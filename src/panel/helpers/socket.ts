@@ -1,9 +1,10 @@
-import io from 'socket.io-client';
+import { Manager } from 'socket.io-client';
 import { setTranslations } from './translate';
 
 import type { SocketInterface } from 'src/bot/database/entity/socket';
 
-const sockets: {[namespace: string]: SocketIOClient.Socket} = {};
+const manager = new Manager(window.location.origin);
+manager.connect();
 
 let authorizeInProgress = false;
 
@@ -62,8 +63,8 @@ export const redirectLogin = () => {
 
 export async function waitForAuthorizationSocket(namespace: string) {
   return new Promise((resolve: (value?: string) => void, reject) => {
-    if (typeof sockets[namespace] === 'undefined') {
-      const socket = io(namespace, { forceNew: true });
+    if (!Object.keys(manager.nsps).includes(namespace)) {
+      const socket = manager.socket(namespace);
       socket.on('authorize', (cb) => authorize(cb, namespace));
       socket.on('refreshToken', refreshToken);
       socket.on('authorized', (cb: Readonly<SocketInterface>) => authorized(cb, namespace, resolve));
@@ -72,14 +73,13 @@ export async function waitForAuthorizationSocket(namespace: string) {
         authorizeInProgress = false;
         resolve('unauthorized');
       });
-      sockets[namespace] = socket;
     }
   });
 };
 
 export function getSocket(namespace: string, continueOnUnauthorized = false) {
-  if (typeof sockets[namespace] === 'undefined') {
-    const socket = io(namespace, { forceNew: true });
+  if (!Object.keys(manager.nsps).includes(namespace)) {
+    const socket = manager.socket(namespace);
     socket.on('authorize', (cb) => authorize(cb, namespace));
     socket.on('refreshToken', refreshToken);
     socket.on('authorized', (cb: Readonly<SocketInterface>) => authorized(cb, namespace));
@@ -94,9 +94,8 @@ export function getSocket(namespace: string, continueOnUnauthorized = false) {
       console.debug('UNAUTHORIZED ACCESS (OK): ' + namespace);
       authorizeInProgress = false;
     });
-    sockets[namespace] = socket;
   }
-  return sockets[namespace];
+  return manager.nsps[namespace];
 }
 
 export const getTranslations = async () => {
