@@ -39,6 +39,8 @@ import { isDbConnected } from './helpers/database';
 import { find } from './helpers/register';
 import { SQLVariableLimit } from './helpers/sql';
 
+let latestFollowedAtTimestamp = 0;
+
 export const currentStreamTags: {
   is_auto: boolean;
   localization_names: {
@@ -873,13 +875,21 @@ class API extends Core {
       ioServer?.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
 
       if (request.status === 200 && !isNil(request.data.data)) {
-        processFollowerState(request.data.data.map(f => {
-          return {
-            from_name: String(f.from_name).toLowerCase(),
-            from_id: Number(f.from_id),
-            followed_at: f.followed_at,
-          };
-        }));
+        // we will go through only new users
+        if (request.data.data.length > 0 && new Date(request.data.data[0].followed_at).getTime() !== latestFollowedAtTimestamp) {
+          processFollowerState(request.data.data
+            .filter(f => latestFollowedAtTimestamp < new Date(f.followed_at).getTime())
+            .map(f => {
+              return {
+                from_name: String(f.from_name).toLowerCase(),
+                from_id: Number(f.from_id),
+                followed_at: f.followed_at,
+              };
+            }));
+          latestFollowedAtTimestamp = new Date(request.data.data[0].followed_at).getTime();
+        } else {
+          debug('api.followers', 'No new followers found.');
+        }
       }
       this.stats.currentFollowers =  request.data.total;
     } catch (e) {
