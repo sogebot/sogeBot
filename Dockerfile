@@ -15,7 +15,6 @@ RUN apk add --no-cache git
 RUN apk add --no-cache python
 RUN apk add --no-cache build-base
 RUN apk add --no-cache zlib zlib-dev
-RUN apk add --no-cache cron
 
 # Copy source code
 COPY . /app
