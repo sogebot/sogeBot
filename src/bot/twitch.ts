@@ -166,6 +166,7 @@ class Twitch extends Core {
       const status = await api.setTitleAndGame(opts.sender, { game: games[0] });
       return [ { response: status.response, ...opts }];
     }
+    return [{ response: translate('game.change.failed').replace(/\$title/g, api.stats.currentGame || 'n/a'), ...opts }];
   }
 }
 
