@@ -12,9 +12,9 @@
     <button
       :disabled="disabled"
       class="btn form-control"
-      v-bind:class="{'btn-success': this.value, 'btn-danger': !this.value}"
+      v-bind:class="{'btn-success': currentValue, 'btn-danger': !currentValue}"
       v-on:click="update()">
-      <template v-if="this.value">{{ translate('enabled') }}</template>
+      <template v-if="currentValue">{{ translate('enabled') }}</template>
       <template v-else>{{ translate('disabled') }}</template>
     </button>
   </div>
@@ -29,8 +29,11 @@ export default class toggleEnable extends Vue {
   @Prop() readonly title: any;
   @Prop() readonly disabled !: boolean;
 
+  currentValue = this.value;
+
   update() {
-    this.$emit('update', !this.value);
+    this.currentValue = !this.currentValue
+    this.$emit('update', { value: this.currentValue });
   }
 }
 </script>

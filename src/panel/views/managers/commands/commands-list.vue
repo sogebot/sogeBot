@@ -109,7 +109,6 @@ import { CommandsInterface } from 'src/bot/database/entity/commands';
 @Component({
   components: {
     loading: () => import('../../../components/loading.vue'),
-    toggle: () => import('../../../components/toggle-enable.vue'),
     'text-with-tags': () => import('../../../components/textWithTags.vue'),
     'hold-button': () => import('../../../components/holdButton.vue'),
   },

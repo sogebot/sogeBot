@@ -1,0 +1,12 @@
+--- node_modules/twitch-js/types/index.d.ts	1985-10-26 10:15:00.000000000 +0200
++++ patches/index.d.ts	2020-05-10 01:22:11.660551000 +0200
+@@ -402,7 +402,8 @@
+     TIMEOUT_SUCCESS = "timeout_success",
+     UNBAN_SUCCESS = "unban_success",
+     UNRAID_SUCCESS = "unraid_success",
+-    UNRECOGNIZED_CMD = "unrecognized_cmd"
++    UNRECOGNIZED_CMD = "unrecognized_cmd",
++    HIGHLIGHTED_MESSAGE = "highlighted-message"
+ }
+ declare const NoticeEvents: DistributeKeys<typeof KnownNoticeMessageIds>;
+ declare type NoticeEvents = keyof typeof NoticeEvents;

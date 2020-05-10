@@ -1,4 +1,5 @@
 type UserStateTags = import('twitch-js').UserStateTags;
+type KnownNoticeMessageIds = import('twitch-js').KnownNoticeMessageIds;
 
 type DiscordJsTextChannel = import('discord.js').TextChannel;
 type DiscordJsUser = import('discord.js').User;
@@ -149,7 +150,7 @@ interface CommandResponse {
 }
 
 interface CommandOptions {
-  sender: UserStateTags & { userId: number } & {
+  sender: UserStateTags & { userId: number; msgId?: KnownNoticeMessageIds } & {
     discord?: { author: DiscordJsUser; channel: DiscordJsTextChannel };
   };
   command: string;
