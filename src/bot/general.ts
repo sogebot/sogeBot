@@ -87,7 +87,7 @@ class General extends Core {
 
   @command('!_debug')
   @default_permission(permission.CASTERS)
-  public async debug(opts: CommandOptions): CommandResponse[] {
+  public async debug(opts: CommandOptions): Promise<CommandResponse[]> {
     const widgets = await getRepository(Widget).find();
     const connection = await getConnection();
 
