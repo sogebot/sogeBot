@@ -189,6 +189,7 @@ class Discord extends Integration {
 
     if (this.client && this.sendOnlineAnnounceToChannel.length > 0) {
       // search discord channel by ID
+      let channelFound = false;
       for (const [ id, channel ] of this.client.channels.cache) {
         if (channel.type === 'text') {
           if (id === this.sendOnlineAnnounceToChannel || (channel as DiscordJs.TextChannel).name === this.sendGeneralAnnounceToChannel) {
@@ -218,12 +219,16 @@ class Discord extends Integration {
                 embed.addField('Subscribers', api.stats.currentSubscribers, true);
               }
               // Send the embed to the same channel as the message
+              channelFound = true;
               this.embedMessage = await (ch as DiscordJs.TextChannel).send(embed);
               chatOut(`#${(ch as DiscordJs.TextChannel).name}: [[online announce embed]] [${this.client.user?.tag}]`);
               this.embed = embed;
             }
           }
         }
+      }
+      if (!channelFound) {
+        warning(`Discord channel ${this.sendOnlineAnnounceToChannel} not found on server.`);
       }
     }
   }
