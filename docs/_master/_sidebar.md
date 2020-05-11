@@ -2,10 +2,8 @@
 * [Install and upgrade](_master/install-and-upgrade.md)
 * [FAQ](_master/faq.md)
 * Configuration
-  * [Color](_master/configuration/color.md)
   * [Database](_master/configuration/database.md)
   * [Environment variables](_master/configuration/env.md)
-  * [Timezone](_master/configuration/timezone.md)
 * Systems
   * [Alias](_master/systems/alias.md)
   * [Commercial](_master/systems/commercial.md)
