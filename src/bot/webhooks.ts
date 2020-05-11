@@ -52,8 +52,9 @@ class Webhooks {
     clearTimeout(this.timeouts[`unsubscribe-${type}`]);
 
     const cid = oauth.channelId;
-    const clientId = await oauth.botClientId;
-    if (cid === '' || clientId === '') {
+    const clientId = oauth.botClientId;
+    const token = oauth.botAccessToken;
+    if (cid === '' || clientId === '' || token === '') {
       this.timeouts[`unsubscribe-${type}`] = setTimeout(() => this.subscribe(type), 1000);
       return;
     }
@@ -72,6 +73,7 @@ class Webhooks {
           method: 'post',
           url: 'https://api.twitch.tv/helix/webhooks/hub',
           headers: {
+            'Authorization': 'Bearer ' + token,
             'Client-ID': clientId,
             'Content-Type': 'application/json',
           },
@@ -87,6 +89,7 @@ class Webhooks {
           method: 'post',
           url: 'https://api.twitch.tv/helix/webhooks/hub',
           headers: {
+            'Authorization': 'Bearer ' + token,
             'Client-ID': clientId,
             'Content-Type': 'application/json',
           },
@@ -104,8 +107,9 @@ class Webhooks {
     clearTimeout(this.timeouts[`subscribe-${type}`]);
 
     const cid = oauth.channelId;
-    const clientId = await oauth.botClientId;
-    if (cid === '' || clientId === '') {
+    const clientId = oauth.botClientId;
+    const token = oauth.botAccessToken;
+    if (cid === '' || clientId === '' || token === '') {
       this.timeouts[`subscribe-${type}`] = setTimeout(() => this.subscribe(type), 1000);
       return;
     }
@@ -126,6 +130,7 @@ class Webhooks {
           method: 'post',
           url: 'https://api.twitch.tv/helix/webhooks/hub',
           headers: {
+            'Authorization': 'Bearer ' + token,
             'Client-ID': clientId,
             'Content-Type': 'application/json',
           },
@@ -147,6 +152,7 @@ class Webhooks {
           method: 'post',
           url: 'https://api.twitch.tv/helix/webhooks/hub',
           headers: {
+            'Authorization': 'Bearer ' + token,
             'Client-ID': clientId,
             'Content-Type': 'application/json',
           },
