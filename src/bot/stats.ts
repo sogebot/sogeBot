@@ -5,6 +5,7 @@ import { isNil } from 'lodash';
 import { getRepository } from 'typeorm';
 import { TwitchStats } from './database/entity/twitch';
 import { error } from 'console';
+import { MINUTE } from './constants';
 
 class Stats {
   latestTimestamp = 0;
@@ -75,8 +76,9 @@ class Stats {
   }
 
   async save(data) {
-    if (data.timestamp - this.latestTimestamp >= 30000) {
-      const statsFromDB = await getRepository(TwitchStats).findOne({'whenOnline': new Date(data.whenOnline).getTime() });
+    if (data.timestamp - this.latestTimestamp >= MINUTE * 15) {
+      const whenOnline = new Date(data.whenOnline).getTime();
+      const statsFromDB = await getRepository(TwitchStats).findOne({'whenOnline': whenOnline});
       await getRepository(TwitchStats).save({
         currentViewers: statsFromDB ? Math.round((data.currentViewers + statsFromDB.currentViewers) / 2) : data.currentViewers,
         currentHosts: statsFromDB ? Math.round((data.currentHosts + statsFromDB.currentHosts) / 2) : data.currentHosts,
