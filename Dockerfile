@@ -24,6 +24,8 @@ RUN npm prune --production
 
 # Expose API port to the outside
 EXPOSE 20000
+# Expose profiler to the outside
+EXPOSE 9229
 
 # Add startup script
 COPY docker.sh /
