@@ -20,8 +20,8 @@
             :class="[selected === 'kraken' ? 'btn-primary' : 'btn-outline-primary']"
             @click="selected = 'kraken'">KRAKEN <small>({{ data.filter(o => o.api === 'kraken').length }})</small></button>
           <button class="btn border-0"
-            :class="[selected === 'tmi' ? 'btn-primary' : 'btn-outline-primary']"
-            @click="selected = 'tmi'">TMI <small>({{ data.filter(o => o.api === 'tmi').length }})</small></button>
+            :class="[selected === 'other' ? 'btn-primary' : 'btn-outline-primary']"
+            @click="selected = 'other'">OTHER <small>({{ data.filter(o => o.api === 'other').length }})</small></button>
           <button class="btn border-0"
             :class="[selected === 'unofficial' ? 'btn-primary' : 'btn-outline-primary']"
             @click="selected = 'unofficial'">UNOFFICIAL <small>({{ data.filter(o => o.api === 'unofficial').length }})</small></button>

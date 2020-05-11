@@ -7,10 +7,11 @@
             "name": "without moderation",
             "runtimeExecutable": "npm",
             "runtimeArgs": [
-                "run-script",
+                "run",
                 "debug"
             ],
-            "console": "integratedTerminal",
+            "console": "internalConsole",
+            "outputCapture": "std",
             "env": {
                 "ENV": "development",
                 "NODE_ENV": "development",
@@ -18,7 +19,6 @@
                 "DEBUG": "tmi"
             },
             "preLaunchTask": "npm: build",
-            "outputCapture": "console",
             "sourceMaps": true,
             "port": 9229
         },
@@ -28,17 +28,17 @@
             "name": "WITH moderation",
             "runtimeExecutable": "npm",
             "runtimeArgs": [
-                "run-script",
+                "run",
                 "debug"
             ],
-            "console": "integratedTerminal",
+            "console": "internalConsole",
+            "outputCapture": "std",
             "env": {
                 "ENV": "development",
                 "NODE_ENV": "development",
                 "DEBUG": "tmi"
             },
             "preLaunchTask": "npm: build",
-            "outputCapture": "console",
             "sourceMaps": true,
             "port": 9229
         }
