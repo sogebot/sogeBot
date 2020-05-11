@@ -792,11 +792,11 @@ class API extends Core {
     const url = `http://tmi.twitch.tv/hosts?include_logins=1&target=${cid}`;
     try {
       request = await axios.get(url);
-      ioServer?.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: request.status });
+      ioServer?.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getChannelHosts', api: 'other', endpoint: url, code: request.status });
       this.stats.currentHosts = request.data.hosts.length;
     } catch (e) {
       error(`${url} - ${e.message}`);
-      ioServer?.emit('api.stats', { timestamp: Date.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
+      ioServer?.emit('api.stats', { timestamp: Date.now(), call: 'getChannelHosts', api: 'other', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
       return { state: e.response?.status === 500 };
     }
 

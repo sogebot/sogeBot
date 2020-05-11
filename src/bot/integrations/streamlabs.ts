@@ -17,6 +17,7 @@ import events from '../events';
 import currency from '../currency';
 import eventlist from '../overlays/eventlist';
 import alerts from '../registries/alerts';
+import { ioServer } from '../helpers/panel';
 
 class Streamlabs extends Integration {
   socketToStreamlabs: SocketIOClient.Socket | null = null;
@@ -71,11 +72,13 @@ class Streamlabs extends Integration {
 
   async restApiInterval () {
     if (this.enabled && this.accessToken.length > 0) {
+      const after = String(this.afterDonationId).length > 0 ? `&after=${this.afterDonationId}` : '';
+      const url = 'https://streamlabs.com/api/v1.0/donations?access_token=' + this.accessToken + after;
       try {
-        const after = String(this.afterDonationId).length > 0 ? `&after=${this.afterDonationId}` : '';
-        const result = (await axios.get('https://streamlabs.com/api/v1.0/donations?access_token=' + this.accessToken + after)).data;
-        debug('streamlabs', 'https://streamlabs.com/api/v1.0/donations?access_token=' + this.accessToken + after);
+        const result = (await axios.get(url)).data;
+        debug('streamlabs', url);
         debug('streamlabs', result);
+        ioServer?.emit('api.stats', { data: result, timestamp: Date.now(), call: 'streamlabs', api: 'other', endpoint: url, code: 200 });
         let donationIdSet = false;
         for (const item of result.data) {
           if (!donationIdSet) {
@@ -97,6 +100,11 @@ class Streamlabs extends Integration {
           });
         }
       } catch (e) {
+        if (e.isAxiosError) {
+          ioServer?.emit('api.stats', { data: e.message, timestamp: Date.now(), call: 'streamlabs', api: 'other', endpoint: url, code: e.response.status });
+        } else {
+          ioServer?.emit('api.stats', { data: e.stack, timestamp: Date.now(), call: 'streamlabs', api: 'other', endpoint: url, code: 0 });
+        }
         error(e.stack);
       }
     }
