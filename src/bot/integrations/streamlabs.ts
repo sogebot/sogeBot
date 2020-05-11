@@ -97,7 +97,7 @@ class Streamlabs extends Integration {
           });
         }
       } catch (e) {
-        error(e);
+        error(e.stack);
       }
     }
   }
