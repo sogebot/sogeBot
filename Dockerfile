@@ -1,20 +1,15 @@
-FROM node:alpine
+FROM node:stretch-slim
 
-ENV LAST_UPDATED 2020-15-02-1837
+ENV LAST_UPDATED 2020-11-05-1440
 
 ENV NODE_ENV production
 ENV ENV production
 
-RUN apk add --no-cache autoconf
-RUN apk add --no-cache automake
-RUN apk add --no-cache nasm
-RUN apk add --no-cache libtool
-RUN apk add --no-cache make
-RUN apk add --no-cache bash
-RUN apk add --no-cache git
-RUN apk add --no-cache python
-RUN apk add --no-cache build-base
-RUN apk add --no-cache zlib zlib-dev
+RUN apt-get update
+RUN apt-get install -y build-essential nasm libtool make bash git python
+
+# cwebp error while loading shared libraries: libGL.so.1: cannot open shared object file: No such file or directory
+RUN apt-get install -y libglu1 libxi6
 
 # Copy source code
 COPY . /app
