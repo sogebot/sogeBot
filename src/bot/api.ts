@@ -370,7 +370,7 @@ class API extends Core {
       }
     */
 
-    const token = await oauth.botAccessToken;
+    const token = oauth.botAccessToken;
     const needToWait = token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
     if ((needToWait || notEnoughAPICalls)) {
@@ -705,7 +705,7 @@ class API extends Core {
     const cid = oauth.channelId;
     const url = `https://api.twitch.tv/kraken/channels/${cid}`;
 
-    const token = await oauth.botAccessToken;
+    const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
     if (needToWait) {
       return { state: false, opts };
@@ -807,7 +807,7 @@ class API extends Core {
     const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/users/?id=${cid}`;
 
-    const token = await oauth.botAccessToken;
+    const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
     if (needToWait || notEnoughAPICalls) {
@@ -849,7 +849,7 @@ class API extends Core {
   async getLatest100Followers () {
     const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/users/follows?to_id=${cid}&first=100`;
-    const token = await oauth.botAccessToken;
+    const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
 
@@ -913,7 +913,7 @@ class API extends Core {
 
     const cid = oauth.channelId;
 
-    const token = await oauth.botAccessToken;
+    const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
 
@@ -1001,7 +1001,7 @@ class API extends Core {
     }
 
     try {
-      const token = await oauth.botAccessToken;
+      const token = oauth.botAccessToken;
       if (token === '') {
         throw new Error('token not available');
       }
@@ -1051,7 +1051,7 @@ class API extends Core {
     const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${cid}`;
 
-    const token = await oauth.botAccessToken;
+    const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
     if (needToWait || notEnoughAPICalls) {
@@ -1102,7 +1102,7 @@ class API extends Core {
     const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/streams?user_id=${cid}`;
 
-    const token = await oauth.botAccessToken;
+    const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
     if (needToWait || notEnoughAPICalls) {
@@ -1320,7 +1320,7 @@ class API extends Core {
     const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${cid}`;
 
-    const token = await oauth.botAccessToken;
+    const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
     if (needToWait) {
       setTimeout(() => this.setTags(sender, tagsArg), 1000);
@@ -1376,7 +1376,7 @@ class API extends Core {
     const cid = oauth.channelId;
     const url = `https://api.twitch.tv/kraken/channels/${cid}`;
 
-    const token = await oauth.botAccessToken;
+    const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
     if (needToWait) {
       return { response: '', status: false };
@@ -1459,7 +1459,7 @@ class API extends Core {
     }
     const url = `https://api.twitch.tv/kraken/search/games?query=${encodeURIComponent(game)}&type=suggest`;
 
-    const token = await oauth.botAccessToken;
+    const token = oauth.botAccessToken;
     if (token === '') {
       return;
     }
@@ -1583,7 +1583,7 @@ class API extends Core {
     const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/clips?broadcaster_id=${cid}`;
 
-    const token = await oauth.botAccessToken;
+    const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
     if (needToWait || notEnoughAPICalls) {
@@ -1633,7 +1633,7 @@ class API extends Core {
     }
     const url = `https://api.twitch.tv/kraken/users/${id}`;
 
-    const token = await oauth.botAccessToken;
+    const token = oauth.botAccessToken;
     if (token === '') {
       return;
     }
@@ -1681,7 +1681,7 @@ class API extends Core {
     const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`;
 
-    const token = await oauth.botAccessToken;
+    const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 40 && this.calls.bot.refresh > Date.now() / 1000;
     if (needToWait || notEnoughAPICalls) {
@@ -1812,7 +1812,7 @@ class API extends Core {
   async getClipById (id) {
     const url = `https://api.twitch.tv/helix/clips/?id=${id}`;
 
-    const token = await oauth.botAccessToken;
+    const token = oauth.botAccessToken;
     if (token === '') {
       return null;
     }
