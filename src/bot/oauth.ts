@@ -257,7 +257,7 @@ class OAuth extends Core {
       this.getChannelId();
     } catch (e) {
       if (!e.message.includes('no access token')) {
-        process.stderr.write(JSON.stringify(e) + '\n');
+        error(e.message);
       }
       status = false;
       if ((this[type + 'RefreshToken']) !== '') {
