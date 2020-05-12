@@ -1,16 +1,14 @@
 {
   "settings": {
     "enabled": "Status",
-    "listenAtChannels": {
-      "title": "Naslouchat v těchto kanálech (#název nebo id)",
-      "help": "Odděleno čárkami (,)"
-    },
-    "sendOnlineAnnounceToChannel": "Posílat online oznámení do tohoto kanálu (#název nebo id)",
-    "sendGeneralAnnounceToChannel": "Posílat obecné oznámení do tohoto kanálu (#název nebo id)",
+    "listenAtChannels": "Poslouchat příkazy na tomto kanálu",
+    "sendOnlineAnnounceToChannel": "Posílat online oznámení do tohoto kanálu",
+    "sendGeneralAnnounceToChannel": "Posílat obecné oznámení do tohoto kanálu",
     "deleteMessagesAfterWhile": "Po chvíli smazat zprávy",
     "clientId": "ClientId",
     "token": "Token",
     "joinToServerBtn": "Kliknutím připojíte bota na váš server",
-    "cannotJoinToServerBtn": "Nastavte token a clientId, abyste mohli připojit bota na váš server"
+    "cannotJoinToServerBtn": "Nastavte token a clientId, abyste mohli připojit bota na váš server",
+    "noChannelSelected": "není vybrán žádný kanál"
   }
 }
