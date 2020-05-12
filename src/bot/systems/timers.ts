@@ -94,9 +94,9 @@ class Timers extends System {
   @command('!timers')
   @default_permission(permission.CASTERS)
   main (opts): CommandResponse[] {
-    let url = 'http://sogehige.github.io/sogeBot/#/commands/timers';
+    let url = 'http://sogehige.github.io/sogeBot/#/systems/timers';
     if ((process.env?.npm_package_version ?? 'x.y.z-SNAPSHOT').includes('SNAPSHOT')) {
-      url = 'http://sogehige.github.io/sogeBot/#/_master/commands/timers';
+      url = 'http://sogehige.github.io/sogeBot/#/_master/systems/timers';
     }
     return [{ response: translate('core.usage') + ' => ' + url, ...opts }];
   }

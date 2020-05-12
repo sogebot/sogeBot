@@ -9,7 +9,7 @@ import Parser from '../parser';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
 import { incrementCountOfCommandUsage } from '../helpers/commands/count';
-import { debug, warning } from '../helpers/log';
+import { debug, error, warning } from '../helpers/log';
 
 import { Alias as AliasEntity, AliasInterface } from '../database/entity/alias';
 import { getRepository } from 'typeorm';
@@ -20,6 +20,10 @@ import { translate } from '../translate';
 
 /*
  * !alias                                              - gets an info about alias usage
+ * !alias group -set [group] -a ![alias]               - add alias to group
+ * !alias group -unset ![alias]                     - unset alias from group
+ * !alias group -list                                  - list alias groups
+ * !alias group -list [group]                          - list alias group by name
  * !alias add (-p [uuid|name]) -a ![alias] -c ![cmd]   - add alias for specified command
  * !alias edit (-p [uuid|name]) -a ![alias] -c ![cmd]  - add alias for specified command
  * !alias remove ![alias]                              - remove specified alias
@@ -136,8 +140,68 @@ class Alias extends System {
 
   @command('!alias')
   @default_permission(permission.CASTERS)
-  main (opts) {
-    return [{ response: translate('core.usage') + ': !alias add -p [uuid|name] <!alias> <!command> | !alias edit -p [uuid|name] <!alias> <!command> | !alias remove <!alias> | !alias list | !alias toggle <!alias> | !alias toggle-visibility <!alias>', ...opts }];
+  main (opts): CommandResponse[] {
+    let url = 'http://sogehige.github.io/sogeBot/#/systems/alias';
+    if ((process.env?.npm_package_version ?? 'x.y.z-SNAPSHOT').includes('SNAPSHOT')) {
+      url = 'http://sogehige.github.io/sogeBot/#/_master/systems/alias';
+    }
+    return [{ response: translate('core.usage') + ' => ' + url, ...opts }];
+  }
+
+  @command('!alias group')
+  @default_permission(permission.CASTERS)
+  async group (opts: CommandOptions): Promise<CommandResponse[]> {
+    try {
+      if (opts.parameters.includes('-set')) {
+        const [alias, group] = new Expects(opts.parameters)
+          .argument({ name: 'a', type: String, multi: true, delimiter: '' }) // set as multi as alias can contain spaces
+          .argument({ name: 'set', type: String, multi: true, delimiter: '' }) // set as multi as group can contain spaces
+          .toArray();
+        const item = await getRepository(AliasEntity).findOne({ alias });
+        if (!item) {
+          const response = prepare('alias.alias-was-not-found', { alias });
+          return [{ response, ...opts }];
+        }
+        await getRepository(AliasEntity).save({...item, group });
+        const response = prepare('alias.alias-group-set', {...item, group });
+        return [{ response, ...opts }];
+      } else if (opts.parameters.includes('-unset')) {
+        const [alias] = new Expects(opts.parameters)
+          .argument({ name: 'unset', type: String, multi: true, delimiter: '' }) // set as multi as alias can contain spaces
+          .toArray();
+        const item = await getRepository(AliasEntity).findOne({ alias });
+        if (!item) {
+          const response = prepare('alias.alias-was-not-found', { alias });
+          return [{ response, ...opts }];
+        }
+        await getRepository(AliasEntity).save({...item, group: null });
+        const response = prepare('alias.alias-group-unset', item);
+        return [{ response, ...opts }];
+      } else if (opts.parameters.includes('-list')) {
+        const [group] = new Expects(opts.parameters)
+          .argument({ name: 'list', type: String, optional: true, multi: true, delimiter: '' }) // set as multi as group can contain spaces
+          .toArray();
+        if (group) {
+          const aliases = await getRepository(AliasEntity).find({ where: { visible: true, enabled: true, group } });
+          const response = prepare('alias.alias-group-list-aliases', {
+            group, list: aliases.length > 0 ? aliases.map(o => o.alias).sort().join(', ') : `<${translate('core.empty')}>`,
+          });
+          return [{ response, ...opts }];
+        } else {
+          const aliases = await getRepository(AliasEntity).find();
+          const groups = [...new Set(aliases.map(o => o.group).filter(o => !!o).sort())];
+          const response = prepare('alias.alias-group-list', {
+            list: groups.length > 0 ? groups.join(', ') : `<${translate('core.empty')}>` });
+          return [{ response, ...opts }];
+        }
+      } else {
+        throw new Error('-set, -unset or -list not found in command.');
+      }
+    } catch (e) {
+      error(e.message);
+      return [{ response: prepare('alias.alias-parse-failed'), ...opts }];
+    }
+
   }
 
   @command('!alias edit')

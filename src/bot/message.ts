@@ -439,9 +439,18 @@ class Message {
     };
     const list = {
       '(list.#)': async function (filter: string) {
-        const [system, permission] = filter.replace('(list.', '').replace(')', '').split('.');
+        const [main, permission] = filter.replace('(list.', '').replace(')', '').split('.');
+        let system = main;
+        let group: null | string | undefined = undefined;
+        if (main.includes('|')) {
+          [system, group] = main.split('|');
+          if (group.trim().length === 0) {
+            group = null;
+          }
+        }
+        console.log({system, group});
         let [alias, commands, cooldowns, ranks, prices] = await Promise.all([
-          getRepository(Alias).find({ where: { visible: true, enabled: true } }),
+          getRepository(Alias).find({ where: typeof group !== 'undefined' ? { visible: true, enabled: true, group } : { visible: true, enabled: true } }),
           getRepository(Commands).find({ relations: ['responses'], where: { visible: true, enabled: true } }),
           getRepository(Cooldown).find({ where: { enabled: true } }),
           getRepository(Rank).find(),

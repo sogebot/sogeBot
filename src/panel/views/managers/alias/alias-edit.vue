@@ -138,6 +138,7 @@ export default class aliasEdit extends Vue {
     enabled: true,
     visible: true,
     permission: permission.VIEWERS,
+    group: null,
   }
 
 

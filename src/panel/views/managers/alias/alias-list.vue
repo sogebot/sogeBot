@@ -28,34 +28,83 @@
     <b-alert show v-else-if="state.loadingAls === $state.success && state.loadingPrm === $state.success && items.length === 0">
       {{translate('systems.alias.empty')}}
     </b-alert>
-    <b-table v-else striped small hover :items="fItems" :fields="fields" @row-clicked="linkTo($event)" >
-      <template v-slot:cell(buttons)="data">
-        <div class="float-right" style="width: max-content !important;">
-          <button-with-icon :class="[ data.item.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.enabled = !data.item.enabled; update(data.item)">
-            {{ translate('dialog.buttons.' + (data.item.enabled? 'enabled' : 'disabled')) }}
-          </button-with-icon>
-          <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/alias/edit/' + data.item.id">
-            {{ translate('dialog.buttons.edit') }}
-          </button-with-icon>
-          <b-dropdown no-caret class="alias-table-btn">
-            <template v-slot:button-content><fa icon="key" fixed-width/></template>
-            <b-dropdown-item
-              v-for="permission of permissions"
-              :key="data.item.id + permission.id"
-              @click="updatePermission(data.item.id, permission.id)">
-              {{ permission.name }}
-            </b-dropdown-item>
-          </b-dropdown>
-          <button-with-icon class="btn-only-icon btn-dark btn-reverse" :icon="['fas', data.item.visible ? 'eye' : 'eye-slash']" @click="data.item.visible = !data.item.visible; update(data.item)">
-            {{ translate('dialog.buttons.edit') }}
-          </button-with-icon>
-          <hold-button @trigger="remove(data.item.id)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
-            <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-            <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
-          </hold-button>
-        </div>
-      </template>
-    </b-table>
+    <b-card v-else no-body v-for="group of groups" v-bind:key="group">
+      <b-card-header header-tag="header" class="p-1" role="tab">
+        <b-button block href="#" v-b-toggle="'alias-accordion-' + group" variant="dark" class="text-left">
+          {{group === null ? 'Unnassigned group' : group }} ({{ fItems.filter(o => o.group === group).length }})
+        </b-button>
+      </b-card-header>
+      <b-collapse :id="'alias-accordion-' + group" accordion="alias-accordion" role="tabpanel" :visible="group === null">
+        <b-card-body>
+          <b-table striped small hover :items="fItems.filter(o => o.group === group)" :fields="fields" @row-clicked="linkTo($event)" >
+            <template v-slot:cell(buttons)="data">
+              <div class="float-right" style="width: max-content !important;">
+                <button-with-icon :class="[ data.item.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.enabled = !data.item.enabled; update(data.item)">
+                  {{ translate('dialog.buttons.' + (data.item.enabled? 'enabled' : 'disabled')) }}
+                </button-with-icon>
+                <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/alias/edit/' + data.item.id">
+                  {{ translate('dialog.buttons.edit') }}
+                </button-with-icon>
+                <b-dropdown no-caret class="alias-table-btn">
+                  <template v-slot:button-content><fa icon="key" fixed-width/></template>
+                  <b-dropdown-item
+                    v-for="permission of permissions"
+                    :key="data.item.id + permission.id"
+                    @click="updatePermission(data.item.id, permission.id)">
+                    {{ permission.name }}
+                  </b-dropdown-item>
+                </b-dropdown>
+                <b-dropdown no-caret class="alias-table-btn">
+                  <template v-slot:button-content><fa icon="object-group" fixed-width/></template>
+                  <b-dropdown-item
+                    v-for="group of groups"
+                    :key="data.item.id + group"
+                    @click="updateGroup(data.item.id, group)">
+                    {{ group === null ? 'Unnassigned group' : group }}
+                  </b-dropdown-item>
+                  <b-dropdown-divider/>
+                  <b-dropdown-item
+                    v-b-modal.create-new-group
+                    @click="newGroupForAliasId = data.item.id"
+                    :key="data.item.id + 'newgroup'">
+                    Add new group
+                  </b-dropdown-item>
+                </b-dropdown>
+                <button-with-icon class="btn-only-icon btn-dark btn-reverse" :icon="['fas', data.item.visible ? 'eye' : 'eye-slash']" @click="data.item.visible = !data.item.visible; update(data.item)">
+                  {{ translate('dialog.buttons.edit') }}
+                </button-with-icon>
+                <hold-button @trigger="remove(data.item.id)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
+                  <template slot="title">{{translate('dialog.buttons.delete')}}</template>
+                  <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+                </hold-button>
+              </div>
+            </template>
+          </b-table>
+        </b-card-body>
+      </b-collapse>
+    </b-card>
+
+    <b-modal id="create-new-group" title="New group name" centered
+      @show="resetModal"
+      @hidden="resetModal"
+      @ok="handleOk">
+      <form ref="form" @submit.stop.prevent="handleSubmit">
+        <b-form-group
+          :state="newGroupNameValidity"
+          label="Name"
+          label-for="name-input"
+          invalid-feedback="Name is required"
+        >
+          <b-form-input
+            id="name-input"
+            v-model="newGroupName"
+            :state="newGroupNameValidity"
+            @keydown="newGroupNameUpdated = true"
+            required
+          ></b-form-input>
+        </b-form-group>
+      </form>
+    </b-modal>
   </b-container>
 </template>
 
@@ -70,8 +119,8 @@ import { orderBy, isNil } from 'lodash-es';
 import { escape } from 'xregexp';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faKey } from '@fortawesome/free-solid-svg-icons';
-library.add(faKey);
+import { faKey, faObjectGroup } from '@fortawesome/free-solid-svg-icons';
+library.add(faKey, faObjectGroup);
 
 @Component({
   components: {
@@ -85,6 +134,11 @@ export default class aliasList extends Vue {
 
   items: AliasInterface[] = [];
   permissions: PermissionsInterface[] = [];
+
+  newGroupForAliasId = '';
+  newGroupName = '';
+  newGroupNameUpdated = false;
+
   search: string = '';
   state: {
     loadingAls: number;
@@ -106,6 +160,42 @@ export default class aliasList extends Vue {
       sortByFormatted: true, },
     { key: 'buttons', label: '' },
   ];
+
+  resetModal() {
+    this.newGroupName = '';
+    this.newGroupNameUpdated = false;
+  }
+
+  handleOk(bvModalEvt) {
+    // Prevent modal from closing
+    bvModalEvt.preventDefault()
+    // Trigger submit handler
+    this.handleSubmit()
+  }
+
+  handleSubmit() {
+    if (!this.newGroupNameValidity) {
+      return;
+    }
+
+    this.updateGroup(this.newGroupForAliasId, this.newGroupName);
+    // Hide the modal manually
+    this.$nextTick(() => {
+      this.$bvModal.hide('create-new-group')
+    })
+  }
+
+  get newGroupNameValidity() {
+    if (this.newGroupNameUpdated) {
+      return this.newGroupName.length > 0;
+    } else {
+      return null;
+    }
+  }
+
+  get groups() {
+    return [null, ...new Set(this.items.filter(o => o.group !== null).map(o => o.group).sort())];
+  }
 
   get fItems() {
     if (this.search.length === 0) return this.items
@@ -143,6 +233,13 @@ export default class aliasList extends Vue {
     } else {
       return null
     }
+  }
+
+  updateGroup (id, group) {
+    let item = this.items.filter((o) => o.id === id)[0]
+    item.group = group
+    this.socket.emit('setById', item.id, item, () => {})
+    this.$forceUpdate();
   }
 
   updatePermission (id, permission) {
