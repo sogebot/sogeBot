@@ -103,14 +103,17 @@ class Raffles extends System {
   }
 
   @parser({ fireAndForget: true })
-  async messages (opts) {
+  async messages (opts: ParserOptions) {
     if (opts.skip) {
       return true;
     }
 
     const raffle = await getRepository(Raffle).findOne({
       where: {
-        isClosed: false,
+        isClosed: true,
+      },
+      order: {
+        timestamp: 'DESC',
       },
     });
     if (!raffle) {
@@ -128,6 +131,7 @@ class Raffles extends System {
           raffle,
         },
       });
+      console.log({winner});
       if (winner) {
         const message: RaffleParticipantMessageInterface = {
           timestamp: Date.now(),
