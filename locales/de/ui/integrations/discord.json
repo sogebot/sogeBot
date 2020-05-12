@@ -1,7 +1,7 @@
 {
   "settings": {
     "enabled": "Status",
-    "listenAtChannels": "Listen for commands on this channel",
+    "listenAtChannels": "Diese Kanäle überwachen",
     "sendOnlineAnnounceToChannel": "Stream online Benachrichtigung in folgendem Channel",
     "sendGeneralAnnounceToChannel": "Allgemeine Benachrichtigung in folgendem Channel",
     "deleteMessagesAfterWhile": "Nach einiger Zeit, Nachrichten löschen",
