@@ -132,6 +132,71 @@
   <strong>bot:</strong> @testuser, alias !uec was exposed
 </blockquote>
 
+## Set an alias to group
+
+`!alias group -set <group> -a <!alias>`
+
+!> Default permission is **OWNER**
+
+### Parameters
+
+- `<group>` - group to be set
+- `<!alias>` - alias to be set into group
+
+### Examples
+
+<blockquote>
+  <strong>testuser:</strong>!alias group -set voice -a !yes <br>
+  <strong>bot:</strong> @testuser, alias !yes was set to group voice
+</blockquote>
+
+## Unset an alias group
+
+`!alias group -unset <!alias>`
+
+!> Default permission is **OWNER**
+
+### Parameters
+
+- `<!alias>` - alias to be unset from group
+
+### Examples
+
+<blockquote>
+  <strong>testuser:</strong>!alias group -unset !yes <br>
+  <strong>bot:</strong> @testuser, alias !yes group was unset
+</blockquote>
+
+## List all alias groups
+
+`!alias group -list`
+
+!> Default permission is **OWNER**
+
+### Examples
+
+<blockquote>
+  <strong>testuser:</strong>!alias group -list <br>
+  <strong>bot:</strong> @testuser, list of aliases groups: voice
+</blockquote>
+
+## List all aliases in group
+
+`!alias group -list <group>`
+
+!> Default permission is **OWNER**
+
+### Parameters
+
+- `<group>` - group to list aliases
+
+### Examples
+
+<blockquote>
+  <strong>testuser:</strong>!alias group -list voice <br>
+  <strong>bot:</strong> @testuser, list of aliases in voice: !yes
+</blockquote>
+
 ## Other settings
 
 ### Enable or disable alias system
