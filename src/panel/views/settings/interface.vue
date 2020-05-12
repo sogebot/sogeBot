@@ -254,6 +254,7 @@ enum State {
     'credits-custom-texts': () => import('./components/interface/credits-custom-texts.vue'),
     'credits-social': () => import('./components/interface/credits-social.vue'),
     'cron': () => import('./components/interface/cron.vue'),
+    'discord-channel': () => import('./components/interface/discord-channel.vue'),
     'global-ignorelist-exclude': () => import('./components/interface/global-ignorelist-exclude.vue'),
     'heist-levels': () => import('./components/interface/heist-levels.vue'),
     'heist-results': () => import('./components/interface/heist-results.vue'),

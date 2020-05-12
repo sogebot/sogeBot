@@ -1,16 +1,14 @@
 {
   "settings": {
     "enabled": "Status",
-    "listenAtChannels": {
-      "title": "Listen at these channels (#name or id)",
-      "help": "Separated by comma (,)"
-    },
-    "sendOnlineAnnounceToChannel": "Send online announcement to this channel (#name or id)",
-    "sendGeneralAnnounceToChannel": "Send general announcement to this channel (#name or id)",
+    "listenAtChannels": "Listen for commands on this channel",
+    "sendOnlineAnnounceToChannel": "Send online announcement to this channel",
+    "sendGeneralAnnounceToChannel": "Send general announcement to this channel",
     "deleteMessagesAfterWhile": "Delete message after while",
     "clientId": "ClientId",
     "token": "Token",
     "joinToServerBtn": "Click to join bot to your server",
-    "cannotJoinToServerBtn": "Set token and clientId to be able to join bot to your server"
+    "cannotJoinToServerBtn": "Set token and clientId to be able to join bot to your server",
+    "noChannelSelected": "no channel selected"
   }
 }
