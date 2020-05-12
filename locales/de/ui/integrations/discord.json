@@ -2,8 +2,8 @@
   "settings": {
     "enabled": "Status",
     "listenAtChannels": "Listen for commands on this channel",
-    "sendOnlineAnnounceToChannel": "Send online announcement to this channel",
-    "sendGeneralAnnounceToChannel": "Send general announcement to this channel",
+    "sendOnlineAnnounceToChannel": "Stream online Benachrichtigung in folgendem Channel",
+    "sendGeneralAnnounceToChannel": "Allgemeine Benachrichtigung in folgendem Channel",
     "deleteMessagesAfterWhile": "Nach einiger Zeit, Nachrichten löschen",
     "clientId": "Client ID",
     "token": "Token",
