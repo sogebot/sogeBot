@@ -837,7 +837,11 @@
     "alias-was-disabled": "$sender, alias $alias byl vypnut",
     "alias-was-concealed": "$sender, alias $alias byl skryt",
     "alias-was-exposed": "$sender, alias $alias byl odkryt",
-    "alias-was-removed": "$sender, alias $alias byl odebrán"
+    "alias-was-removed": "$sender, alias $alias byl odebrán",
+    "alias-group-set": "$sender, alias $alias byl nastaven na skupinu $group",
+    "alias-group-unset": "$sender, skupina aliasu $alias byla zrušena",
+    "alias-group-list": "$sender, seznam skupin aliasů: $list",
+    "alias-group-list-aliases": "$sender, seznam aliasů v $group: $list"
   },
   "customcmds": {
     "commands-parse-failed": "{core.command-parse} !commands",

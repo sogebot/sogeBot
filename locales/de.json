@@ -837,7 +837,11 @@
     "alias-was-disabled": "$sender, Alias $alias wurde deaktiviert",
     "alias-was-concealed": "$sender, Alias $alias wurde versteckt",
     "alias-was-exposed": "$sender, alias $alias was exposed",
-    "alias-was-removed": "$sender, Alias $alias wurde entfernt"
+    "alias-was-removed": "$sender, Alias $alias wurde entfernt",
+    "alias-group-set": "$sender, alias $alias was set to group $group",
+    "alias-group-unset": "$sender, alias $alias group was unset",
+    "alias-group-list": "$sender, list of aliases groups: $list",
+    "alias-group-list-aliases": "$sender, list of aliases in $group: $list"
   },
   "customcmds": {
     "commands-parse-failed": "{core.command-parse} !Befehle",
