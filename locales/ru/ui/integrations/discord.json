@@ -2,11 +2,11 @@
   "settings": {
     "enabled": "Статус",
     "listenAtChannels": {
-      "title": "Слушать на этих каналах (#name или id)",
-      "help": "Разделенные запятой (,)"
+      "title": "",
+      "help": ""
     },
-    "sendOnlineAnnounceToChannel": "Отправить онлайн объявление в этот канал (#name или id)",
-    "sendGeneralAnnounceToChannel": "Отправить общее объявление в этот канал (#name или id)",
+    "sendOnlineAnnounceToChannel": "Send online announcement to this channel",
+    "sendGeneralAnnounceToChannel": "Send general announcement to this channel",
     "deleteMessagesAfterWhile": "Удалить сообщение через некоторое время",
     "clientId": "ClientId",
     "token": "Токен",
