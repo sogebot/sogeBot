@@ -146,7 +146,7 @@ class Price extends System {
     return [{ response, ...opts }];
   }
 
-  @parser({ priority: constants.HIGH })
+  @parser({ priority: constants.MEDIUM })
   async check (opts: ParserOptions): Promise<boolean> {
     const parsed = opts.message.match(/^(![\S]+)/);
     if (!parsed || isOwner(opts.sender)) {
