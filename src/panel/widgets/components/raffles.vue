@@ -256,7 +256,8 @@ export default {
     },
     winnerMessages: function () {
       if (this.winner) {
-        return this.participants.find(o => o.username === this.winner.username).messages
+        const messages = this.participants.find(o => o.username === this.winner.username).messages
+        return messages.slice(Math.max(messages.length - 5, 0))
       } else return []
     },
     countEligibleParticipants () {
