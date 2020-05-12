@@ -1,16 +1,14 @@
 {
   "settings": {
     "enabled": "Статус",
-    "listenAtChannels": {
-      "title": "Слушать на этих каналах (#name или id)",
-      "help": "Разделенные запятой (,)"
-    },
-    "sendOnlineAnnounceToChannel": "Отправить онлайн объявление в этот канал (#name или id)",
-    "sendGeneralAnnounceToChannel": "Отправить общее объявление в этот канал (#name или id)",
+    "listenAtChannels": "Слушать на этих каналах",
+    "sendOnlineAnnounceToChannel": "Отправить онлайн объявление в этот канал",
+    "sendGeneralAnnounceToChannel": "Отправить общее объявление в этот канал",
     "deleteMessagesAfterWhile": "Удалить сообщение через некоторое время",
     "clientId": "ClientId",
     "token": "Токен",
     "joinToServerBtn": "Нажмите, чтобы пригласить бота на ваш сервер",
-    "cannotJoinToServerBtn": "Установите токен и clientId, чтобы иметь возможность пригласить бота на ваш сервер"
+    "cannotJoinToServerBtn": "Установите токен и clientId, чтобы иметь возможность пригласить бота на ваш сервер",
+    "noChannelSelected": "no channel selected"
   }
 }

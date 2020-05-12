@@ -1,16 +1,14 @@
 {
   "settings": {
     "enabled": "Status",
-    "listenAtChannels": {
-      "title": "Diese Kanäle überwachen (#Name oder ID)",
-      "help": "Mit Komma getrennt (,)"
-    },
-    "sendOnlineAnnounceToChannel": "Stream online Benachrichtigung in folgendem Channel (#name oder id)",
-    "sendGeneralAnnounceToChannel": "Allgemeine Benachrichtigung in folgendem Channel (#name oder id)",
+    "listenAtChannels": "Diese Kanäle überwachen",
+    "sendOnlineAnnounceToChannel": "Stream online Benachrichtigung in folgendem Channel",
+    "sendGeneralAnnounceToChannel": "Allgemeine Benachrichtigung in folgendem Channel",
     "deleteMessagesAfterWhile": "Nach einiger Zeit, Nachrichten löschen",
     "clientId": "Client ID",
     "token": "Token",
     "joinToServerBtn": "Hier klicken, um den Bot mit dem Server zu verbinden",
-    "cannotJoinToServerBtn": "Token und Client-Id angeben, damit der Bot sich mit dem Server verbinden kann"
+    "cannotJoinToServerBtn": "Token und Client-Id angeben, damit der Bot sich mit dem Server verbinden kann",
+    "noChannelSelected": "no channel selected"
   }
 }
