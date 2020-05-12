@@ -30,6 +30,7 @@ import { translate } from './translate';
 import { getLocalizedName, isIgnored, parserReply, prepare } from './commons';
 import currency from './currency';
 import points from './systems/points';
+import {default as priceSystem} from './systems/price';
 import permissions from './permissions';
 import users from './users';
 
@@ -451,9 +452,23 @@ class Message {
         let listOutput: any = [];
         switch (system) {
           case 'alias':
-            return _.size(alias) === 0 ? ' ' : (_.map(alias, (o) => o.alias.replace('!', ''))).sort().join(', ');
+            return _.size(alias) === 0 ? ' ' : (_.map(alias, (o) => {
+              const findPrice = prices.find(p => p.command === o.alias);
+              if (findPrice && priceSystem.enabled) {
+                return o.alias.replace('!', '') + `(${findPrice.price} ${points.getPointsName(findPrice.price)})`;
+              } else {
+                return o.alias.replace('!', '');
+              }
+            })).sort().join(', ');
           case '!alias':
-            return _.size(alias) === 0 ? ' ' : (_.map(alias, 'alias')).sort().join(', ');
+            return _.size(alias) === 0 ? ' ' : (_.map(alias, (o) => {
+              const findPrice = prices.find(p => p.command === o.alias);
+              if (findPrice && priceSystem.enabled) {
+                return o.alias + `(${findPrice.price} ${points.getPointsName(findPrice.price)})`;
+              } else {
+                return o.alias;
+              }
+            })).sort().join(', ');
           case 'command':
             if (permission) {
               const responses = commands.map(o => o.responses).flat();
@@ -465,7 +480,14 @@ class Message {
                 commands = [];
               }
             }
-            return _.size(commands) === 0 ? ' ' : (_.map(commands, (o) => o.command.replace('!', ''))).sort().join(', ');
+            return _.size(commands) === 0 ? ' ' : (_.map(commands, (o) => {
+              const findPrice = prices.find(p => p.command === o.command);
+              if (findPrice && priceSystem.enabled) {
+                return o.command.replace('!', '') + `(${findPrice.price} ${points.getPointsName(findPrice.price)})`;
+              } else {
+                return o.command.replace('!', '');
+              }
+            })).sort().join(', ');
           case '!command':
             if (permission) {
               const responses = commands.map(o => o.responses).flat();
@@ -477,7 +499,14 @@ class Message {
                 commands = [];
               }
             }
-            return _.size(commands) === 0 ? ' ' : (_.map(commands, 'command')).sort().join(', ');
+            return _.size(commands) === 0 ? ' ' : (_.map(commands, (o) => {
+              const findPrice = prices.find(p => p.command === o.command);
+              if (findPrice && priceSystem.enabled) {
+                return o.command + `(${findPrice.price} ${points.getPointsName(findPrice.price)})`;
+              } else {
+                return o.command;
+              }
+            })).sort().join(', ');
           case 'cooldown':
             listOutput = _.map(cooldowns, function (o, k) {
               const time = o.miliseconds;

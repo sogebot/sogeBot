@@ -299,9 +299,9 @@ class Points extends System {
           username,
           command: undoOperation.command,
           originalValue: undoOperation.originalValue,
-          originalValuePointsLocale: await this.getPointsName(undoOperation.originalValue),
+          originalValuePointsLocale: this.getPointsName(undoOperation.originalValue),
           updatedValue: undoOperation.updatedValue,
-          updatedValuePointsLocale: await this.getPointsName(undoOperation.updatedValue),
+          updatedValuePointsLocale: this.getPointsName(undoOperation.updatedValue),
         }), ...opts,
       }];
     } catch (err) {
@@ -332,7 +332,7 @@ class Points extends System {
       const response = prepare('points.success.set', {
         amount: points,
         username,
-        pointsName: await this.getPointsName(points),
+        pointsName: this.getPointsName(points),
       });
       return [{ response, ...opts }];
     } catch (err) {
@@ -370,7 +370,7 @@ class Points extends System {
         const response = prepare('points.failed.giveNotEnough'.replace('$command', opts.command), {
           amount: points,
           username,
-          pointsName: await this.getPointsName(points),
+          pointsName: this.getPointsName(points),
         });
         return [{ response, ...opts }];
       } else if (points === 'all') {
@@ -381,7 +381,7 @@ class Points extends System {
         const response = prepare('points.success.give', {
           amount: availablePoints,
           username,
-          pointsName: await this.getPointsName(availablePoints),
+          pointsName: this.getPointsName(availablePoints),
         });
         return [{ response, ...opts }];
       } else {
@@ -392,7 +392,7 @@ class Points extends System {
         const response = prepare('points.success.give', {
           amount: points,
           username,
-          pointsName: await this.getPointsName(points),
+          pointsName: this.getPointsName(points),
         });
         return [{ response, ...opts }];
       }
@@ -401,7 +401,7 @@ class Points extends System {
     }
   }
 
-  async getPointsName (points): Promise<string> {
+  getPointsName (points): string {
     const pointsNames = this.name.split('|').map(Function.prototype.call, String.prototype.trim);
     let single, multi, xmulti;
     // get single|x:multi|multi from pointsName
@@ -486,7 +486,7 @@ class Points extends System {
       const response = prepare('points.defaults.pointsResponse', {
         amount: this.maxSafeInteger(user.points),
         username: username,
-        pointsName: await this.getPointsName(this.maxSafeInteger(user.points)),
+        pointsName: this.getPointsName(this.maxSafeInteger(user.points)),
         order, count,
       });
       return [{ response, ...opts }];
@@ -506,14 +506,14 @@ class Points extends System {
         await getRepository(User).increment({}, 'points', points);
         response = prepare('points.success.online.positive', {
           amount: points,
-          pointsName: await this.getPointsName(points),
+          pointsName: this.getPointsName(points),
         });
       } else {
         points = Math.abs(points);
         await this.decrement({}, points);
         response = prepare('points.success.online.negative', {
           amount: -points,
-          pointsName: await this.getPointsName(points),
+          pointsName: this.getPointsName(points),
         });
       };
 
@@ -533,14 +533,14 @@ class Points extends System {
         await getRepository(User).increment({}, 'points', points);
         response = prepare('points.success.all.positive', {
           amount: points,
-          pointsName: await this.getPointsName(points),
+          pointsName: this.getPointsName(points),
         });
       } else {
         points = Math.abs(points);
         await this.decrement({}, points);
         response = prepare('points.success.all.negative', {
           amount: -points,
-          pointsName: await this.getPointsName(points),
+          pointsName: this.getPointsName(points),
         });
       };
 
@@ -565,7 +565,7 @@ class Points extends System {
       }
       const response = prepare('points.success.rain', {
         amount: points,
-        pointsName: await this.getPointsName(points),
+        pointsName: this.getPointsName(points),
       });
       return [{ response, ...opts }];
     } catch (err) {
@@ -602,7 +602,7 @@ class Points extends System {
       const response = prepare('points.success.add', {
         amount: points,
         username: username,
-        pointsName: await this.getPointsName(points),
+        pointsName: this.getPointsName(points),
       });
       return [{ response, ...opts }];
     } catch (err) {
@@ -642,7 +642,7 @@ class Points extends System {
       const response = prepare('points.success.remove', {
         amount: points,
         username: username,
-        pointsName: await this.getPointsName(points === 'all' ? 0 : points),
+        pointsName: this.getPointsName(points === 'all' ? 0 : points),
       });
       return [{ response, ...opts }];
     } catch (err) {

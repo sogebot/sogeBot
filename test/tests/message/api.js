@@ -5,7 +5,6 @@ const db = require('../../general.js').db;
 const msg = require('../../general.js').message;
 const Message = require('../../../dest/message').default;
 const assert = require('assert');
-const sinon = require('sinon');
 
 describe('Message - api filter', () => {
   beforeEach(async () => {
