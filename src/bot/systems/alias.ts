@@ -216,7 +216,7 @@ class Alias extends System {
         .argument({ name: 'c', type: String, multi: true, delimiter: '' }) // set as multi as command can contain spaces
         .toArray();
 
-      if (!alias.startsWith('!') || (cmd.startsWith('!') || cmd.startsWith('$_'))) {
+      if (!alias.startsWith('!') || !(cmd.startsWith('!') || cmd.startsWith('$_'))) {
         throw Error('Alias/Command doesn\'t start with ! or command is not custom variable');
       }
 
@@ -249,7 +249,7 @@ class Alias extends System {
         .argument({ name: 'c', type: String, multi: true, delimiter: '' }) // set as multi as command can contain spaces
         .toArray();
 
-      if (!alias.startsWith('!') || (cmd.startsWith('!') || cmd.startsWith('$_'))) {
+      if (!alias.startsWith('!') || !(cmd.startsWith('!') || cmd.startsWith('$_'))) {
         throw Error('Alias/Command doesn\'t start with ! or command is not custom variable');
       }
 
