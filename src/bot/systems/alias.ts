@@ -216,8 +216,8 @@ class Alias extends System {
         .argument({ name: 'c', type: String, multi: true, delimiter: '' }) // set as multi as command can contain spaces
         .toArray();
 
-      if (!alias.startsWith('!')) {
-        throw Error('Alias doesn\'t start with !');
+      if (!alias.startsWith('!') || (cmd.startsWith('!') || cmd.startsWith('$_'))) {
+        throw Error('Alias/Command doesn\'t start with ! or command is not custom variable');
       }
 
       const pItem = await permissions.get(perm);
@@ -249,8 +249,8 @@ class Alias extends System {
         .argument({ name: 'c', type: String, multi: true, delimiter: '' }) // set as multi as command can contain spaces
         .toArray();
 
-      if (!alias.startsWith('!')) {
-        throw Error('Alias doesn\'t start with !');
+      if (!alias.startsWith('!') || (cmd.startsWith('!') || cmd.startsWith('$_'))) {
+        throw Error('Alias/Command doesn\'t start with ! or command is not custom variable');
       }
 
       const pItem = await permissions.get(perm);
