@@ -16,6 +16,7 @@
     "ungroup": "Ungroup",
     "groupedWithOptionAbove": "Grouped with option above",
     "generatedOptionsPreview": "Preview of generated options",
-    "probability": "Probability"
+    "probability": "Probability",
+    "tick": "Tick sound during spin"
   }
 }

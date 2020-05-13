@@ -49,6 +49,8 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faSortDown } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
+import * as defaultTick from 'src/panel/views/registries/randomizer/media/click_wheel.mp3';
+
 library.add(faSortDown)
 
 let theWheel: any = null;
@@ -156,6 +158,14 @@ export default class RandomizerOverlay extends Vue {
 
         this.$nextTick(() => {
           if (shouldReinitWof && data.type === 'wheelOfFortune') {
+            function playSound() {
+              if (data.shouldPlayTick) {
+                const audio = new Audio(defaultTick.default);
+                audio.volume = data.tickVolume / 100;
+                audio.play();
+              }
+            }
+
             let segments = new Array()
             for (let option of this.generateItems(data.items)) {
               segments.push({'fillStyle': option.color, 'textFillStyle': getContrastColor(option.color), 'text': option.name})
@@ -180,8 +190,16 @@ export default class RandomizerOverlay extends Vue {
                 'easing'   : 'Back.easeOut.config(4)',
                 'callbackFinished' : this.alertPrize,
                 'callbackAfter' : this.drawTriangle,
-                yoyo: true,
+                'callbackSound'    : playSound,   // Called when the tick sound is to be played.
+                'soundTrigger'     : 'pin',        // Specify pins are to trigger the sound.
+                'yoyo': true,
               },
+                'pins' :                // Turn pins on.
+                {
+                    'number'     : 12,
+                    'fillStyle'  : 'silver',
+                    'outerRadius': 4,
+                }
             });
             theWheel = this.theWheel;
             this.drawTriangle();
