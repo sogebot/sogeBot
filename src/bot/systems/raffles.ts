@@ -131,7 +131,6 @@ class Raffles extends System {
           raffle,
         },
       });
-      console.log({winner});
       if (winner) {
         const message: RaffleParticipantMessageInterface = {
           timestamp: Date.now(),
