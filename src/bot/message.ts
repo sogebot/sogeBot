@@ -449,7 +449,6 @@ class Message {
             group = null;
           }
         }
-        console.log({system, group});
         let [alias, commands, cooldowns, ranks, prices] = await Promise.all([
           getRepository(Alias).find({ where: typeof group !== 'undefined' ? { visible: true, enabled: true, group } : { visible: true, enabled: true } }),
           getRepository(Commands).find({ relations: ['responses'], where: { visible: true, enabled: true } }),
