@@ -16,6 +16,7 @@
     "ungroup": "Разгруппировать",
     "groupedWithOptionAbove": "Сгруппировано с параметром выше",
     "generatedOptionsPreview": "Предварительный просмотр генерируемых параметров",
-    "probability": "Вероятность"
+    "probability": "Вероятность",
+    "tick": "Tick sound during spin"
   }
 }
