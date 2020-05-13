@@ -10,6 +10,8 @@ export interface RandomizerInterface {
   permissionId: string;
   name: string;
   isShown?: boolean;
+  shouldPlayTick: boolean;
+  tickVolume: number;
   widgetOrder: number;
   type: 'simple' | 'wheelOfFortune';
   customizationFont: {
@@ -42,6 +44,8 @@ export const Randomizer = new EntitySchema<Readonly<Required<RandomizerInterface
     createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
     command: { type: String },
     isShown: { type: Boolean, default: false },
+    shouldPlayTick: { type: Boolean },
+    tickVolume: { type: Number },
     type: { type: 'varchar', length: 20, default: 'simple' },
     customizationFont: { type: 'simple-json' },
     permissionId: { type: String },

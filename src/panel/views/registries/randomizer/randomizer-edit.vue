@@ -94,6 +94,29 @@
           option(value="simple" key="simple") {{translate('registry.randomizer.form.simple')}}
           option(value="wheelOfFortune" key="wheelOfFortune") {{translate('registry.randomizer.form.wheelOfFortune')}}
 
+      b-form-group(
+        v-if="item.type === 'wheelOfFortune'"
+        :label="translate('registry.randomizer.form.tick')"
+        :label-for="'volume' + item.id")
+        b-input-group.mb-2.mr-sm-2.mb-sm-0
+          template(slot="prepend").pr-3.pl-3
+            button(
+              type="button"
+              class="btn form-control"
+              v-bind:class="{'btn-success': item.shouldPlayTick, 'btn-danger': !item.shouldPlayTick}"
+              v-on:click="item.shouldPlayTick = !item.shouldPlayTick")
+              template(v-if="item.shouldPlayTick") {{ translate('enabled') }}
+              template(v-else) {{ translate('disabled') }}
+          b-form-input(
+            :id="'volume' + item.id"
+            v-model.number="item.tickVolume"
+            type="range"
+            min="0"
+            max="100"
+            step="1")
+          b-input-group-text(slot="append").pr-3.pl-3
+            div(style="width: 3rem;") {{ item.tickVolume + '%' }}
+
       tts(:tts.sync="item.tts" :uuid="item.id")
 
       b-card(:header="translate('registry.goals.fontSettings')")
@@ -308,6 +331,8 @@ export default class randomizerEdit extends Vue {
     createdAt: Date.now(),
     permissionId: permission.CASTERS,
     isShown: false,
+    shouldPlayTick: false,
+    tickVolume: 1,
     type: 'simple',
     widgetOrder: -1,
     tts: {
