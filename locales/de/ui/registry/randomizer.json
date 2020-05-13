@@ -16,6 +16,7 @@
     "ungroup": "Gruppierung aufheben",
     "groupedWithOptionAbove": "Gruppieren mit vorherigem Element",
     "generatedOptionsPreview": "Vorschau der generierten Optionen",
-    "probability": "Wahrscheinlichkeit"
+    "probability": "Wahrscheinlichkeit",
+    "tick": "Tick sound during spin"
   }
 }
