@@ -253,7 +253,7 @@ class TMI extends Core {
         }
       });
 
-      (this.client[type] as TwitchJs).chat.on('PRIVMSG', async (message: PrivateMessages & { tags: { username?: string | null }}) => {
+      (this.client[type] as TwitchJs).chat.on('PRIVMSG', async (message: PrivateMessages & { tags: { username?: string }}) => {
         message.tags.username = this.getUsernameFromRaw(message._raw) || message.tags.displayName;
 
         if (!isBot(message.tags.username) || !message.isSelf) {
