@@ -17,7 +17,7 @@ import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
 import permissions from '../permissions';
 import { translate } from '../translate';
-import { Message } from '../message';
+import customvariables from '../customvariables';
 
 /*
  * !alias                                              - gets an info about alias usage
@@ -123,7 +123,8 @@ class Alias extends System {
           addToViewersCache(opts.sender.userId, alias.permission, (await permissions.check(opts.sender.userId, alias.permission, false)).access);
         }
         if (getFromViewersCache(opts.sender.userId, alias.permission)) {
-          const response = await (new Message(opts.message.replace(replace, `${alias.command}`)).parse());
+          // process custom variables
+          const response = await customvariables.executeVariablesInText(opts.message.replace(replace, alias.command));
           debug('alias.process', response);
           const responses = await p.command(opts.sender, response, true);
           debug('alias.process', responses);

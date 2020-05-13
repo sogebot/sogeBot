@@ -25,6 +25,8 @@ import { debug, info, warning } from './helpers/log';
 import Core from './_interface';
 import { adminEndpoint } from './helpers/socket';
 
+const customVariableRegex = new RegExp('\\$_[a-zA-Z0-9_]+', 'g');
+
 class CustomVariables extends Core {
   timeouts: {
     [x: string]: NodeJS.Timeout;
@@ -34,6 +36,18 @@ class CustomVariables extends Core {
     super();
     this.addMenu({ category: 'registry', name: 'custom-variables', id: 'registry.customVariables/list' });
     this.checkIfCacheOrRefresh();
+  }
+
+  async executeVariablesInText(text: string): Promise<string> {
+    for (const variable of text.match(customVariableRegex) || []) {
+      const isVariable = await this.isVariableSet(variable);
+      let value = '';
+      if (isVariable) {
+        value = await this.getValueOf(variable) || '';
+      }
+      text = text.replace(new RegExp(`\\${variable}`, 'g'), value);
+    }
+    return text;
   }
 
   async getURL(req, res) {
