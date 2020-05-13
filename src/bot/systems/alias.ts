@@ -17,6 +17,7 @@ import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
 import permissions from '../permissions';
 import { translate } from '../translate';
+import { Message } from '../message';
 
 /*
  * !alias                                              - gets an info about alias usage
@@ -122,9 +123,9 @@ class Alias extends System {
           addToViewersCache(opts.sender.userId, alias.permission, (await permissions.check(opts.sender.userId, alias.permission, false)).access);
         }
         if (getFromViewersCache(opts.sender.userId, alias.permission)) {
-          const response = opts.message.replace(replace, `${alias.command}`);
-          const responses = await p.command(opts.sender, response, true);
+          const response = await (new Message(opts.message.replace(replace, `${alias.command}`)).parse());
           debug('alias.process', response);
+          const responses = await p.command(opts.sender, response, true);
           debug('alias.process', responses);
           responses.forEach(r => {
             parserReply(r.response, { sender: r.sender, attr: r.attr });
@@ -214,8 +215,8 @@ class Alias extends System {
         .argument({ name: 'c', type: String, multi: true, delimiter: '' }) // set as multi as command can contain spaces
         .toArray();
 
-      if (!alias.startsWith('!') || !cmd.startsWith('!')) {
-        throw Error('Alias or Command doesn\'t start with !');
+      if (!alias.startsWith('!')) {
+        throw Error('Alias doesn\'t start with !');
       }
 
       const pItem = await permissions.get(perm);
@@ -247,8 +248,8 @@ class Alias extends System {
         .argument({ name: 'c', type: String, multi: true, delimiter: '' }) // set as multi as command can contain spaces
         .toArray();
 
-      if (!alias.startsWith('!') || !cmd.startsWith('!')) {
-        throw Error('Alias or Command doesn\'t start with !');
+      if (!alias.startsWith('!')) {
+        throw Error('Alias doesn\'t start with !');
       }
 
       const pItem = await permissions.get(perm);
