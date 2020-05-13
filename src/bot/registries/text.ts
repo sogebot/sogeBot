@@ -13,8 +13,6 @@ class Text extends Registry {
   }
 
   sockets () {
-    const regexp = new RegExp('\\$_[a-zA-Z0-9_]+', 'g');
-
     adminEndpoint(this.nsp, 'text::remove', async(item: Required<TextInterface>, cb) => {
       try {
         await getRepository(TextEntity).remove(item);
@@ -50,15 +48,7 @@ class Text extends Registry {
         if (item) {
           text = item.text;
           if (parseText) {
-            for (const variable of item.text.match(regexp) || []) {
-              const isVariable = await customvariables.isVariableSet(variable);
-              let value = `<strong>$_${variable.replace('$_', '')}</strong>`;
-              if (isVariable) {
-                value = await customvariables.getValueOf(variable) || '';
-              }
-              text = text.replace(new RegExp(`\\${variable}`, 'g'), value);
-            }
-            text = await new Message(text).parse();
+            text = await new Message(await customvariables.executeVariablesInText(text)).parse();
           }
           callback(null, {...item, text});
         }

@@ -17,6 +17,7 @@ import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
 import permissions from '../permissions';
 import { translate } from '../translate';
+import customvariables from '../customvariables';
 
 /*
  * !alias                                              - gets an info about alias usage
@@ -122,9 +123,10 @@ class Alias extends System {
           addToViewersCache(opts.sender.userId, alias.permission, (await permissions.check(opts.sender.userId, alias.permission, false)).access);
         }
         if (getFromViewersCache(opts.sender.userId, alias.permission)) {
-          const response = opts.message.replace(replace, `${alias.command}`);
-          const responses = await p.command(opts.sender, response, true);
+          // process custom variables
+          const response = await customvariables.executeVariablesInText(opts.message.replace(replace, alias.command));
           debug('alias.process', response);
+          const responses = await p.command(opts.sender, response, true);
           debug('alias.process', responses);
           responses.forEach(r => {
             parserReply(r.response, { sender: r.sender, attr: r.attr });
@@ -214,8 +216,8 @@ class Alias extends System {
         .argument({ name: 'c', type: String, multi: true, delimiter: '' }) // set as multi as command can contain spaces
         .toArray();
 
-      if (!alias.startsWith('!') || !cmd.startsWith('!')) {
-        throw Error('Alias or Command doesn\'t start with !');
+      if (!alias.startsWith('!') || !(cmd.startsWith('!') || cmd.startsWith('$_'))) {
+        throw Error('Alias/Command doesn\'t start with ! or command is not custom variable');
       }
 
       const pItem = await permissions.get(perm);
@@ -247,8 +249,8 @@ class Alias extends System {
         .argument({ name: 'c', type: String, multi: true, delimiter: '' }) // set as multi as command can contain spaces
         .toArray();
 
-      if (!alias.startsWith('!') || !cmd.startsWith('!')) {
-        throw Error('Alias or Command doesn\'t start with !');
+      if (!alias.startsWith('!') || !(cmd.startsWith('!') || cmd.startsWith('$_'))) {
+        throw Error('Alias/Command doesn\'t start with ! or command is not custom variable');
       }
 
       const pItem = await permissions.get(perm);
