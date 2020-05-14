@@ -383,14 +383,6 @@ class CustomVariables extends Core {
       };
       return this.setValueOf(newItem, currentValue, opts);
     } else {
-      if (typeof item.permission === 'undefined') {
-        // set item permission to owner if missing
-        return this.setValueOf({
-          permission: permission.CASTERS,
-          ...item,
-        }, currentValue, opts);
-      }
-
       if (typeof opts.sender === 'string') {
         opts.sender = {
           username: opts.sender,

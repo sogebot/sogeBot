@@ -42,7 +42,6 @@ const connect = async function () {
 
   if (type === 'mysql' || type === 'mariadb') {
     await createConnection({
-      type,
       logging: ['error'],
       ...connectionOptions,
       synchronize: false,
@@ -51,7 +50,6 @@ const connect = async function () {
     } as MysqlConnectionOptions);
   } else {
     await createConnection({
-      type,
       logging: ['error'],
       ...connectionOptions,
       synchronize: false,
