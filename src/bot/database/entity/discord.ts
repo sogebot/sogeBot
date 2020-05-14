@@ -4,6 +4,7 @@ import { ColumnNumericTransformer } from './_transformer';
 export interface DiscordLinkInterface {
   id: string | undefined;
   tag: string;
+  discordId: string;
   createdAt: number;
   userId: null | number;
 };
@@ -13,6 +14,7 @@ export const DiscordLink = new EntitySchema<Readonly<Required<DiscordLinkInterfa
   columns: {
     id: { type: 'uuid', primary: true, generated: 'uuid' },
     tag: { type: String },
+    discordId: { type: String },
     createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
     userId: { type: Number, nullable: true },
   },
