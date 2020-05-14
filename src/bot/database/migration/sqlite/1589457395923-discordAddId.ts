@@ -1,7 +1,7 @@
 import {MigrationInterface, QueryRunner} from 'typeorm';
 
-export class discordNameToId1589457395923 implements MigrationInterface {
-  name = 'discordNameToId1589457395923';
+export class discordAddId1589457395923 implements MigrationInterface {
+  name = 'discordAddId1589457395923';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`DROP TABLE "discord_link"`, undefined);
