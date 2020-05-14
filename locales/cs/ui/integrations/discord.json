@@ -9,6 +9,7 @@
     "token": "Token",
     "joinToServerBtn": "Kliknutím připojíte bota na váš server",
     "cannotJoinToServerBtn": "Nastavte token a clientId, abyste mohli připojit bota na váš server",
-    "noChannelSelected": "není vybrán žádný kanál"
+    "noChannelSelected": "není vybrán žádný kanál",
+    "noRoleSelected": "není vybrána žádná role"
   }
 }
