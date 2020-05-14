@@ -84,7 +84,7 @@ export default class discordChannel extends Vue {
       }, 10000);
     })
 
-    Promise.race([ getDataFromServer, timeout ])
+    Promise.race([ getDataFromServer, timeout ]).then(() => {});
   }
 
   @Watch('loading')
