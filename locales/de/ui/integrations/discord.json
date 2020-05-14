@@ -9,6 +9,7 @@
     "token": "Token",
     "joinToServerBtn": "Hier klicken, um den Bot mit dem Server zu verbinden",
     "cannotJoinToServerBtn": "Token und Client-Id angeben, damit der Bot sich mit dem Server verbinden kann",
-    "noChannelSelected": "no channel selected"
+    "noChannelSelected": "no channel selected",
+    "noRoleSelected": "no role selected"
   }
 }
