@@ -9,6 +9,7 @@
     "token": "Токен",
     "joinToServerBtn": "Нажмите, чтобы пригласить бота на ваш сервер",
     "cannotJoinToServerBtn": "Установите токен и clientId, чтобы иметь возможность пригласить бота на ваш сервер",
-    "noChannelSelected": "no channel selected"
+    "noChannelSelected": "no channel selected",
+    "noRoleSelected": "no role selected"
   }
 }
