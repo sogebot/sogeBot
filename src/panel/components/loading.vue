@@ -1,5 +1,5 @@
 <template>
-  <div class="text-center">
+  <div class="text-center" style="margin:auto;">
     <b-spinner variant="primary"
     style="width: 5rem; height: 5rem;"
       :style="{

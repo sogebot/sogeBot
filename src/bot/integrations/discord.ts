@@ -7,7 +7,7 @@ import * as DiscordJs from 'discord.js';
 import Integration from './_interface';
 import { command, settings, ui } from '../decorators';
 import { onChange, onStartup, onStreamEnd, onStreamStart } from '../decorators/on';
-import { chatIn, chatOut, error, info, warning, whisperOut } from '../helpers/log';
+import { chatIn, chatOut, debug, error, info, warning, whisperOut } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import { debounce } from '../helpers/debounce';
 
@@ -17,14 +17,17 @@ import Expects from '../expects';
 import { isUUID } from '../commons';
 
 import { getRepository, IsNull, LessThan, Not } from 'typeorm';
+import { Permissions as PermissionsEntity } from '../database/entity/permissions';
 import { DiscordLink } from '../database/entity/discord';
 import { User } from '../database/entity/user';
-import { MINUTE } from '../constants';
+import { HOUR, MINUTE } from '../constants';
 import Parser from '../parser';
 import { Message } from '../message';
 import api from '../api';
 import moment from 'moment';
 import general from '../general';
+import { isDbConnected } from '../helpers/database';
+import permissions from '../permissions';
 
 const timezone = (process.env.TIMEZONE ?? 'system') === 'system' || !process.env.TIMEZONE ? moment.tz.guess() : process.env.TIMEZONE;
 
@@ -76,6 +79,12 @@ class Discord extends Integration {
   })
   sendGeneralAnnounceToChannel = '';
 
+  @settings('mapping')
+  @ui({
+    type: 'discord-mapping',
+  })
+  rolesMapping: { [permissionId: string]: string } = {};
+
   @settings('bot')
   deleteMessagesAfterWhile = false;
 
@@ -101,6 +110,98 @@ class Discord extends Integration {
         this.embedMessage.edit(this.embed);
       }
     }, MINUTE * 10);
+
+    setInterval(() => this.updateRolesOfLinkedUsers(), HOUR);
+  }
+
+  async updateRolesOfLinkedUsers() {
+    if (!isDbConnected || !this.client) {
+      return;
+    }
+
+    // go through mappings and delete zombies
+    for (const mapped of Object.keys(this.rolesMapping)) {
+      const doesPermissionExist = typeof (await permissions.get(mapped)) !== 'undefined';
+      if (!doesPermissionExist || this.rolesMapping[mapped] === '') {
+        // delete permission if doesn't exist anymore
+        delete this.rolesMapping[mapped];
+        continue;
+      }
+    }
+
+    const linkedUsers = await getRepository(DiscordLink).find();
+    for (const user of linkedUsers) {
+      if (!user.userId) {
+        continue;
+      }
+      const guild = this.client.guilds.cache.get(this.client.guilds.cache.firstKey() || '');
+      if (!guild) {
+        return warning('No servers found for discord');
+      }
+      const discordUser = await guild.member(await guild.members.fetch(user.discordId));
+      if (!discordUser) {
+        warning('Discord user not found');
+        continue;
+      }
+      const botPermissionsSortedByPriority = await getRepository(PermissionsEntity).find({
+        relations: ['filters'],
+        order: {
+          order: 'ASC',
+        },
+      });
+
+      const alreadyAssignedRoles: string[] = [];
+      for (const botPermission of botPermissionsSortedByPriority) {
+        if (!this.rolesMapping[botPermission.id]) {
+          debug('discord.roles', `Permission ${botPermission.name}#${botPermission.id} is not mapped.`);
+          // we don't have mapping set for this permission
+          continue;
+        }
+
+        // role was already assigned by higher permission (we don't want to remove it)
+        // e.g. Ee have same role for Subscriber and VIP
+        //      User is subscriber but not VIP -> should have role
+        if (alreadyAssignedRoles.includes(this.rolesMapping[botPermission.id])) {
+          debug('discord.roles', `Role ${this.rolesMapping[botPermission.id]} is already mapped for user ${user.userId}`);
+          continue;
+        }
+
+        const haveUserAnAccess = (await permissions.check(user.userId, botPermission.id, true)).access;
+        const role = await guild.roles.fetch(this.rolesMapping[botPermission.id]);
+        if (!role) {
+          warning(`Role with ID ${this.rolesMapping[botPermission.id]} not found on your Discord Server`);
+          continue;
+        }
+        debug('discord.roles', `User ${user.userId} - permission ${botPermission.id} - role ${role.name} - ${haveUserAnAccess}`);
+
+        if (haveUserAnAccess) {
+          // add role to user
+          alreadyAssignedRoles.push(role.id);
+          if (discordUser.roles.cache.has(role.id)) {
+            debug('discord.roles', `User ${user.userId} already have role ${role.name}`);
+          } else {
+            discordUser.roles.add(role).catch(roleError => {
+              warning('Cannot add role to user, check permission for bot (bot cannot set role above his own)');
+              warning(roleError);
+            }).then(member => {
+              debug('discord.roles', `User ${user.userId} have new role ${role.name}`);
+            });
+          }
+        } else {
+          // remove role from user
+          if (!discordUser.roles.cache.has(role.id)) {
+            debug('discord.roles', `User ${user.userId} already doesn't have role ${role.name}`);
+          } else {
+            discordUser.roles.remove(role).catch(roleError => {
+              warning('Cannot remove role to user, check permission for bot (bot cannot set role above his own)');
+              warning(roleError);
+            }).then(member => {
+              debug('discord.roles', `User ${user.userId} have removed role ${role.name}`);
+            });
+          }
+        }
+      }
+    }
   }
 
   @onStartup()
@@ -281,6 +382,7 @@ class Discord extends Integration {
         const link = await getRepository(DiscordLink).save({
           userId: null,
           tag: author.tag,
+          discordId: author.id,
           createdAt: Date.now(),
         });
         author.send(`Hello ${msg.author.tag}, to link this Discord account with your Twitch account on ${oauth.broadcasterUsername} channel, go to https://twitch.tv/${oauth.broadcasterUsername}, login to your account and send this command to chat \n\n\t\t\`!link ${link.id}\`\n\nNOTE: This expires in 10 minutes.`);
@@ -359,6 +461,33 @@ class Discord extends Integration {
   }
 
   sockets() {
+    adminEndpoint(this.nsp, 'discord::getRoles', async (cb) => {
+      try {
+        if (!this.client) {
+          throw new Error('DiscordJS client not loaded');
+        }
+        for (const [, guild] of this.client.guilds.cache) {
+          return cb(null, guild.roles.cache
+            .sort((a, b) => {
+              const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+              const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+              if (nameA < nameB) {
+                return -1;
+              }
+              if (nameA > nameB) {
+                return 1;
+              }
+              // names must be equal
+              return 0;
+            })
+            .map(o => ({ html: `<strong>${o.name}</strong> &lt;${o.id}&gt;`, value: o.id }))
+          );
+        };
+        cb(null, []);
+      } catch (e) {
+        cb(e.message, []);
+      }
+    });
     adminEndpoint(this.nsp, 'discord::getChannels', async (cb) => {
       try {
         if (this.client) {
