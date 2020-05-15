@@ -240,7 +240,7 @@ class Parser {
         command.permission = permission.permission; // change to custom permission
         debug('parser.command', `Checking permission for ${command.id} - custom ${permission.name}`);
       } else {
-        debug('parser.command', `Checking permission for ${command.id} - original ${command.permission.name}`);
+        debug('parser.command', `Checking permission for ${command.id} - original`);
       }
     }
     return commands;
