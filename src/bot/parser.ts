@@ -1,10 +1,10 @@
 import _ from 'lodash';
 import * as constants from './constants';
 import { getBotSender } from './commons';
-import { debug, error, warning } from './helpers/log';
+import { debug, error, isDebugEnabled, warning } from './helpers/log';
 import { incrementCountOfCommandUsage } from './helpers/commands/count';
 import { getRepository } from 'typeorm';
-import { PermissionCommands } from './database/entity/permissions';
+import { PermissionCommands, PermissionCommandsInterface } from './database/entity/permissions';
 import { addToViewersCache, getFromViewersCache } from './helpers/permissions';
 import permissions from './permissions';
 import events from './events';
@@ -15,6 +15,20 @@ import currency from './currency';
 import general from './general';
 import tmi from './tmi';
 import { list } from './helpers/register';
+
+const cachedCommandsPermissions: PermissionCommandsInterface[] = [];
+export const refreshCachedCommandPermissions = () => {
+  getRepository(PermissionCommands).find().then(values => {
+    while(cachedCommandsPermissions.length){
+      cachedCommandsPermissions.shift();
+    }
+    for (const value of values) {
+      cachedCommandsPermissions.push(value);
+    }
+    debug('parser.command', `Command permission cached ${cachedCommandsPermissions.length}`);
+  });
+};
+refreshCachedCommandPermissions();
 
 class Parser {
   started_at = Date.now();
@@ -233,7 +247,11 @@ class Parser {
     }
     commands = _(await Promise.all(commands)).flatMap().sortBy(o => -o.command.length).value();
     for (const command of commands) {
-      const permission = await getRepository(PermissionCommands).findOne({ name: command.id });
+      if(isDebugEnabled('parser.command')) {
+        debug('parser.command', `Checking permission for ${command.name} ${command.id}`);
+        debug('parser.command', `Call stack ${(new Error()).stack ?? ''}`); // TODO: remove after fixed loop after end of stream
+      }
+      const permission = cachedCommandsPermissions.find(cachedPermission => cachedPermission.id === command.id);
       if (permission) {
         command.permission = permission.permission;
       }; // change to custom permission
