@@ -1,4 +1,4 @@
-export const isMainThread = typeof process.env.CLUSTER === 'undefined';
+export const isMainThread = (process.env.CLUSTER_TYPE ?? 'main') === 'main';
 
 import io from 'socket.io';
 import ioClient from 'socket.io-client';
