@@ -18,6 +18,7 @@ import { isDbConnected } from './helpers/database';
 import { register } from './helpers/register';
 import { addMenu, addMenuPublic, addWidget, ioServer, menuPublic } from './helpers/panel';
 import { v4 as uuid } from 'uuid';
+import { refreshCachedCommandPermissions } from './helpers/commands/pCache';
 
 let socket: import('./socket').Socket | any = null;
 
@@ -347,6 +348,7 @@ class Module {
                   }
                 }
               }
+              refreshCachedCommandPermissions();
             } else if (key === 'enabled') {
               this.status({ state: value });
             } else if (key === 'commands') {

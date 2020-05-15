@@ -1,10 +1,8 @@
 import _ from 'lodash';
 import * as constants from './constants';
 import { getBotSender } from './commons';
-import { debug, error, warning } from './helpers/log';
+import { debug, error, isDebugEnabled, warning } from './helpers/log';
 import { incrementCountOfCommandUsage } from './helpers/commands/count';
-import { getRepository } from 'typeorm';
-import { PermissionCommands } from './database/entity/permissions';
 import { addToViewersCache, getFromViewersCache } from './helpers/permissions';
 import permissions from './permissions';
 import events from './events';
@@ -15,6 +13,7 @@ import currency from './currency';
 import general from './general';
 import tmi from './tmi';
 import { list } from './helpers/register';
+import { cachedCommandsPermissions } from './helpers/commands/pCache';
 
 class Parser {
   started_at = Date.now();
@@ -225,6 +224,9 @@ class Parser {
   }
 
   async getCommandsList () {
+    if(isDebugEnabled('parser.command')) {
+      debug('parser.command', `Call stack ${(new Error()).stack ?? ''}`); // TODO: remove after fixed loop after end of stream
+    }
     let commands: any[] = [];
     for (let i = 0, length = this.list.length; i < length; i++) {
       if (_.isFunction(this.list[i].commands)) {
@@ -233,7 +235,8 @@ class Parser {
     }
     commands = _(await Promise.all(commands)).flatMap().sortBy(o => -o.command.length).value();
     for (const command of commands) {
-      const permission = await getRepository(PermissionCommands).findOne({ name: command.id });
+      debug('parser.command', `Checking permission for ${command.name} ${command.id}`);
+      const permission = cachedCommandsPermissions.find(cachedPermission => cachedPermission.id === command.id);
       if (permission) {
         command.permission = permission.permission;
       }; // change to custom permission
