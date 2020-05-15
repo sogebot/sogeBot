@@ -17,7 +17,7 @@ import tmi from './tmi';
 import { list } from './helpers/register';
 
 const cachedCommandsPermissions: PermissionCommandsInterface[] = [];
-export const refreshCachedCommandPermissions = () => {
+const refreshCachedCommandPermissions = () => {
   getRepository(PermissionCommands).find().then(values => {
     while(cachedCommandsPermissions.length){
       cachedCommandsPermissions.shift();
@@ -338,4 +338,4 @@ class Parser {
 }
 
 export default Parser;
-export { Parser };
+export { Parser, refreshCachedCommandPermissions };
