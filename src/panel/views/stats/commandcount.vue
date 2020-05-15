@@ -119,17 +119,19 @@
       showChartCommands() {
         localStorage.setItem('/stats/commandcount/showChartCommands', JSON.stringify(this.showChartCommands))
       },
-      toDate() {
+      toDate(val) {
         Vue.set(this.dateTimePickerFrom, 'maxDate',
           new Date(this.toDate).getFullYear() + '-' +
           (new Date(this.toDate).getMonth() + 1) + '-' +
           (new Date(this.toDate).getDate() - 1));
+        localStorage.setItem('/stats/commandcount/toDate', val)
       },
-      fromDate() {
+      fromDate(val) {
         Vue.set(this.dateTimePickerTo, 'minDate',
           new Date(this.fromDate).getFullYear() + '-' +
           (new Date(this.fromDate).getMonth() + 1) + '-' +
           (new Date(this.fromDate).getDate() + 1));
+        localStorage.setItem('/stats/commandcount/fromDate', val)
       }
     },
     computed: {
@@ -243,13 +245,33 @@
       }
     },
     mounted() {
-      if (localStorage.getItem('/stats/commandcount/showChartCommands')) {
-        this.showChartCommands = JSON.parse(localStorage.getItem('/stats/commandcount/showChartCommands') || '[]')
-      }
-
       this.socket.emit('commands::count', (err, val) => {
         if (err) {
           return console.error(err);
+        }
+
+        const cacheShowChartCommands = localStorage.getItem('/stats/commandcount/showChartCommands')
+        if (!cacheShowChartCommands) {
+          this.showChartCommands = val.splice(0, 5).map(o => o.command);
+          localStorage.setItem('/stats/commandcount/showChartCommands', JSON.stringify(this.showChartCommands))
+        } else {
+          this.showChartCommands = JSON.parse(cacheShowChartCommands);
+        }
+
+        const cacheFromDate = localStorage.getItem('/stats/commandcount/fromDate')
+        if (!cacheFromDate) {
+          this.fromDate = new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + (new Date().getDate() - 14)
+          localStorage.setItem('/stats/commandcount/fromDate', this.fromDate)
+        } else {
+          this.fromDate = cacheFromDate;
+        }
+
+        const cacheToDate = localStorage.getItem('/stats/commandcount/toDate')
+        if (!cacheToDate) {
+          this.toDate = new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate();
+          localStorage.setItem('/stats/commandcount/toDate', this.toDate)
+        } else {
+          this.toDate = cacheToDate;
         }
         this.commandsUsage = val;
       })
