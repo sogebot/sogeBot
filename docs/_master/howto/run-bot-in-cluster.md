@@ -11,7 +11,6 @@ To setup cluster, set your ENV variables or create `.env` file
 CLUSTER=true
 CLUSTER_TYPE=main
 CLUSTER_ID=<shared-id-between-same-clusters>
-CLUSTER_MAIN_THREAD_URL=<url-to-main-cluster>
 CLUSTER_PORT=20003
 ```
 
