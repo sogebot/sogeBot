@@ -3,8 +3,6 @@ import * as constants from './constants';
 import { getBotSender } from './commons';
 import { debug, error, isDebugEnabled, warning } from './helpers/log';
 import { incrementCountOfCommandUsage } from './helpers/commands/count';
-import { getRepository } from 'typeorm';
-import { PermissionCommands, PermissionCommandsInterface } from './database/entity/permissions';
 import { addToViewersCache, getFromViewersCache } from './helpers/permissions';
 import permissions from './permissions';
 import events from './events';
@@ -15,20 +13,7 @@ import currency from './currency';
 import general from './general';
 import tmi from './tmi';
 import { list } from './helpers/register';
-
-const cachedCommandsPermissions: PermissionCommandsInterface[] = [];
-const refreshCachedCommandPermissions = () => {
-  getRepository(PermissionCommands).find().then(values => {
-    while(cachedCommandsPermissions.length){
-      cachedCommandsPermissions.shift();
-    }
-    for (const value of values) {
-      cachedCommandsPermissions.push(value);
-    }
-    debug('parser.command', `Command permission cached ${cachedCommandsPermissions.length}`);
-  });
-};
-refreshCachedCommandPermissions();
+import { cachedCommandsPermissions } from './helpers/commands/pcache';
 
 class Parser {
   started_at = Date.now();
@@ -338,4 +323,4 @@ class Parser {
 }
 
 export default Parser;
-export { Parser, refreshCachedCommandPermissions };
+export { Parser };

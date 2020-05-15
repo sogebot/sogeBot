@@ -18,7 +18,7 @@ import { isDbConnected } from './helpers/database';
 import { register } from './helpers/register';
 import { addMenu, addMenuPublic, addWidget, ioServer, menuPublic } from './helpers/panel';
 import { v4 as uuid } from 'uuid';
-import { refreshCachedCommandPermissions } from './parser';
+import { refreshCachedCommandPermissions } from './helpers/commands/pcache';
 
 let socket: import('./socket').Socket | any = null;
 
