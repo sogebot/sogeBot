@@ -37,5 +37,5 @@
 - SQLite3(**default**)
 - PostgreSQL 11.5
 - MySQL 5.7
-  - you need to set `character-set-server=utf8`
-    and `collation-server=utf8_general_ci`
+  - you need to set `character-set-server=utf8mb4`
+    and `collation-server=utf8mb4_general_ci`
