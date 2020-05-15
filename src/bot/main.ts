@@ -46,7 +46,7 @@ const connect = async function () {
       ...connectionOptions,
       synchronize: false,
       migrationsRun: true,
-      charset: 'UTF8_GENERAL_CI',
+      charset: 'UTF8MB4_GENERAL_CI',
     } as MysqlConnectionOptions);
   } else {
     await createConnection({
