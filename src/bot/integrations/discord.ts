@@ -68,6 +68,13 @@ class Discord extends Integration {
   })
   guild = '';
 
+  @ui({
+    if: () => self.clientId.length === 0,
+    type: 'helpbox',
+    variant: 'info',
+  }, 'settings')
+  guildNotSet = null;
+
   @settings('bot')
   @ui({
     type: 'discord-channel',
