@@ -122,7 +122,7 @@
                               v-bind:title="translate($route.params.type + '.' + $route.params.id + '.settings.' + defaultValue)"
                               v-else-if="typeof getPermissionSettingsValue(permission.id, currentValue) === 'boolean'"
                               v-bind:value="getPermissionSettingsValue(permission.id, currentValue)"
-                              v-on:update="settings['__permission_based__'][category][defaultValue][permission.id] = $event; triggerDataChange()"
+                              v-on:update="settings['__permission_based__'][category][defaultValue][permission.id] = $event.value; triggerDataChange()"
                               :disabled="currentValue[permission.id] === null"
                             ></toggle-enable>
                             <number-input
@@ -538,7 +538,7 @@ export default class interfaceSettings extends Vue {
     }
 
     // if order is last -> mirror viewers values
-    console.error(`Value for ${permId} not found in ${JSON.stringify(values)}`);
+    console.debug(`Value for ${permId} not found in ${JSON.stringify(values)}`);
     return values['0efd7b1c-e460-4167-8e06-8aaf2c170311' /* viewers */];
   }
 
