@@ -13,7 +13,7 @@ import currency from './currency';
 import general from './general';
 import tmi from './tmi';
 import { list } from './helpers/register';
-import { cachedCommandsPermissions } from './helpers/commands/pcache';
+import { cachedCommandsPermissions } from './helpers/commands/pCache';
 
 class Parser {
   started_at = Date.now();
