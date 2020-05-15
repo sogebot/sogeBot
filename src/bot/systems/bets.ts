@@ -346,7 +346,7 @@ class Bets extends System {
   }
 
   @command('!bet')
-  @default_permission(permission.MODERATORS)
+  @default_permission(permission.VIEWERS)
   @helper()
   public main(opts) {
     if (opts.parameters.length === 0) {

@@ -8,7 +8,6 @@ import { command, default_permission, settings } from './decorators';
 import { permission } from './helpers/permissions';
 import Core from './_interface';
 
-
 import { adminEndpoint } from './helpers/socket';
 
 import { getRepository } from 'typeorm';
