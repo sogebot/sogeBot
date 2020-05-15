@@ -64,34 +64,35 @@ class Discord extends Integration {
   @settings('bot')
   @ui({
     type: 'discord-guild',
+    if: () => self.clientId.length > 0 && self.token.length > 0,
   })
   guild = '';
 
   @settings('bot')
   @ui({
     type: 'discord-channel',
-    if: () => self.guild.length === 0 || self.guild.length === 0,
+    if: () => self.guild.length > 0,
   })
   listenAtChannels = '';
 
   @settings('bot')
   @ui({
     type: 'discord-channel',
-    if: () => self.guild.length === 0 || self.guild.length === 0,
+    if: () => self.guild.length > 0,
   })
   sendOnlineAnnounceToChannel = '';
 
   @settings('bot')
   @ui({
     type: 'discord-channel',
-    if: () => self.guild.length === 0 || self.guild.length === 0,
+    if: () => self.guild.length > 0,
   })
   sendGeneralAnnounceToChannel = '';
 
   @settings('mapping')
   @ui({
     type: 'discord-mapping',
-    if: () => self.guild.length === 0 || self.guild.length === 0,
+    if: () => self.guild.length > 0,
   })
   rolesMapping: { [permissionId: string]: string } = {};
 
