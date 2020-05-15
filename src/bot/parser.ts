@@ -224,6 +224,9 @@ class Parser {
   }
 
   async getCommandsList () {
+    if(isDebugEnabled('parser.command')) {
+      debug('parser.command', `Call stack ${(new Error()).stack ?? ''}`); // TODO: remove after fixed loop after end of stream
+    }
     let commands: any[] = [];
     for (let i = 0, length = this.list.length; i < length; i++) {
       if (_.isFunction(this.list[i].commands)) {
@@ -232,10 +235,7 @@ class Parser {
     }
     commands = _(await Promise.all(commands)).flatMap().sortBy(o => -o.command.length).value();
     for (const command of commands) {
-      if(isDebugEnabled('parser.command')) {
-        debug('parser.command', `Checking permission for ${command.name} ${command.id}`);
-        debug('parser.command', `Call stack ${(new Error()).stack ?? ''}`); // TODO: remove after fixed loop after end of stream
-      }
+      debug('parser.command', `Checking permission for ${command.name} ${command.id}`);
       const permission = cachedCommandsPermissions.find(cachedPermission => cachedPermission.id === command.id);
       if (permission) {
         command.permission = permission.permission;
