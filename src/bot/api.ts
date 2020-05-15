@@ -105,39 +105,42 @@ const limitProxy = {
   },
 };
 
-const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], usersFromAPI: { from_name: string; from_id: number; followed_at: string }[]) => {
-  // handle users currently not following
-  users.filter(user => !user.isFollower).forEach(user => {
-    const apiUser = usersFromAPI.find(userFromAPI => userFromAPI.from_id === user.userId) as typeof usersFromAPI[0];
-    if (new Date().getTime() - new Date(apiUser.followed_at).getTime() < 2 * constants.HOUR) {
-      if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60 && !webhooks.existsInCache('follow', user.userId)) {
-        webhooks.addIdToCache('follow', user.userId);
-        eventlist.add({
-          event: 'follow',
-          username: user.username,
-          timestamp: Date.now(),
-        });
-        if (!isBot(user.username)) {
-          follow(user.username);
-          events.fire('follow', { username: user.username, userId: user.userId });
-          alerts.trigger({
-            event: 'follows',
-            name: user.username,
-            amount: 0,
-            currency: '',
-            monthsName: '',
-            message: '',
-            autohost: false,
-          });
-
-          triggerInterfaceOnFollow({
+const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], usersFromAPI: { from_name: string; from_id: number; followed_at: string }[], fullScale) => {
+  if (!fullScale) {
+    // we are handling only latest followers
+    // handle users currently not following
+    users.filter(user => !user.isFollower).forEach(user => {
+      const apiUser = usersFromAPI.find(userFromAPI => userFromAPI.from_id === user.userId) as typeof usersFromAPI[0];
+      if (new Date().getTime() - new Date(apiUser.followed_at).getTime() < 2 * constants.HOUR) {
+        if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60 && !webhooks.existsInCache('follow', user.userId)) {
+          webhooks.addIdToCache('follow', user.userId);
+          eventlist.add({
+            event: 'follow',
             username: user.username,
-            userId: user.userId,
+            timestamp: Date.now(),
           });
+          if (!isBot(user.username)) {
+            follow(user.username);
+            events.fire('follow', { username: user.username, userId: user.userId });
+            alerts.trigger({
+              event: 'follows',
+              name: user.username,
+              amount: 0,
+              currency: '',
+              monthsName: '',
+              message: '',
+              autohost: false,
+            });
+
+            triggerInterfaceOnFollow({
+              username: user.username,
+              userId: user.userId,
+            });
+          }
         }
       }
-    }
-  });
+    });
+  }
   await getRepository(User).save(
     users.map(user => {
       const apiUser = usersFromAPI.find(userFromAPI => userFromAPI.from_id === user.userId) as typeof usersFromAPI[0];
@@ -152,7 +155,7 @@ const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], us
   );
 };
 
-const processFollowerState = async (users: { from_name: string; from_id: number; followed_at: string }[]) => {
+const processFollowerState = async (users: { from_name: string; from_id: number; followed_at: string }[], fullScale = false) => {
   const timer = Date.now();
   if (users.length === 0) {
     debug('api.followers', `No followers to process.`);
@@ -174,9 +177,9 @@ const processFollowerState = async (users: { from_name: string; from_id: number;
         }),
       { chunk: Math.floor(SQLVariableLimit / Object.keys(users[0]).length) },
     );
-    await updateFollowerState([...usersSavedToDb, ...usersGotFromDb], users);
+    await updateFollowerState([...usersSavedToDb, ...usersGotFromDb], users, fullScale);
   } else {
-    await updateFollowerState(usersGotFromDb, users);
+    await updateFollowerState(usersGotFromDb, users, fullScale);
   }
   debug('api.followers', `Finished parsing ${users.length} followers in ${Date.now() - timer}ms`);
 };
@@ -947,30 +950,28 @@ class API extends Core {
 
       if (request.status === 200 && !isNil(request.data.data)) {
         const followers = request.data.data;
-        if (opts.followers) {
-          opts.followers = [...followers, ...opts.followers];
-        } else {
-          opts.followers = followers;
-        }
-
 
         ioServer?.emit('api.stats', { data: followers, timestamp: Date.now(), call: 'getChannelFollowers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
 
-        debug('api.getChannelFollowers', `Followers loaded: ${opts.followers.length}, cursor: ${request.data.pagination.cursor}`);
+        debug('api.getChannelFollowers', `Followers loaded: ${followers.length}, cursor: ${request.data.pagination.cursor}`);
         debug('api.getChannelFollowers', `Followers list: \n\t${followers.map(o => o.from_name)}`);
 
-        if (followers.length === 100) {
-          // move to next page
-          return this.getChannelFollowers({ cursor: request.data.pagination.cursor, followers: opts.followers });
-        } else {
-          processFollowerState(opts.followers.map(f => {
-            return {
-              from_name: String(f.from_name).toLowerCase(),
-              from_id: Number(f.from_id),
-              followed_at: f.followed_at,
-            };
-          }));
-        }
+        // process each 100 not full scale at once
+        processFollowerState(followers.map(f => {
+          return {
+            from_name: String(f.from_name).toLowerCase(),
+            from_id: Number(f.from_id),
+            followed_at: f.followed_at,
+          };
+        }), true).then(async () => {
+          if (followers.length === 100) {
+            // move to next page
+            // we don't care about return
+            setImmediateAwait().then(() => {
+              this.getChannelFollowers({ cursor: request.data.pagination.cursor });
+            });
+          }
+        });
       }
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
@@ -981,6 +982,7 @@ class API extends Core {
       error(`${url} - ${e.stack}`);
       ioServer?.emit('api.stats', { timestamp: Date.now(), call: 'getChannelFollowers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
     }
+    // return from first page (but we will still go through all pages)
     delete opts.cursor;
     return { state: true, opts };
   }
