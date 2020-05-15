@@ -313,7 +313,7 @@ class Discord extends Integration {
       if (!guild) {
         throw new Error('This discord guiild not found in cache.');
       }
-      
+
       const channel = guild.channels.cache.get(this.sendOnlineAnnounceToChannel);
       if (!channel) {
         throw new Error('That announce channel not found in this guild.');
@@ -488,7 +488,7 @@ class Discord extends Integration {
               return 0;
             })
             .map(o => ({ html: `<strong>${o.name}</strong> &lt;${o.id}&gt;`, value: o.id }))
-        );
+          );
         } else {
           cb(null, []);
         }
