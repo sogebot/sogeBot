@@ -235,11 +235,13 @@ class Parser {
     }
     commands = _(await Promise.all(commands)).flatMap().sortBy(o => -o.command.length).value();
     for (const command of commands) {
-      debug('parser.command', `Checking permission for ${command.name} ${command.id}`);
       const permission = cachedCommandsPermissions.find(cachedPermission => cachedPermission.id === command.id);
       if (permission) {
-        command.permission = permission.permission;
-      }; // change to custom permission
+        command.permission = permission.permission; // change to custom permission
+        debug('parser.command', `Checking permission for ${command.id} - custom ${permission.name}`);
+      } else {
+        debug('parser.command', `Checking permission for ${command.id} - original ${command.permission.name}`);
+      }
     }
     return commands;
   }
