@@ -3,7 +3,7 @@ import { Settings } from '../database/entity/settings';
 import axios from 'axios';
 
 export const getUserFromTwitch = async (username) => {
-  return getUsersFromTwitch([username])[0];
+  return (await getUsersFromTwitch([username]))[0];
 };
 
 
