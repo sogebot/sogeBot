@@ -3,11 +3,11 @@
     "responsiveVoiceKeyNotSet": "Вы не правильно установили <a href='#/settings/integrations/responsivevoice'>ключ ResponsiveVoice</a>",
     "voice": {
       "title": "Голос",
-      "help": "If voices are not properly loading after ResponsiveVoice key update, try to refresh browser"
+      "help": "Если голоса не загружаются после обновления ключа ResponsiveVoice, попробуйте обновить браузер"
     },
     "volume": "Громкость",
     "rate": "Темп",
     "pitch": "Высота",
-    "triggerTTSByHighlightedMessage": "Text to Speech will be triggered by highlighted message"
+    "triggerTTSByHighlightedMessage": "Озвучивать выделенные сообщения"
   }
 }

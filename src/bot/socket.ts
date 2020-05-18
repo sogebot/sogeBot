@@ -182,6 +182,34 @@ class Socket extends Core {
       }
     }, SECOND);
 
+    for (const endpoint of endpoints.filter(o => (o.type === 'viewer') && o.nsp == socket.nsp.name)) {
+      socket.removeAllListeners(endpoint.on);
+      socket.on(endpoint.on, async (...args) => {
+        await new Promise(resolve => {
+          const waitForAuthorization = () => {
+            if (haveViewerPrivileges !== Authorized.inProgress) {
+              resolve();
+            } else {
+              setTimeout(waitForAuthorization, 100);
+            }
+          };
+          waitForAuthorization();
+        });
+
+        if (haveViewerPrivileges === Authorized.isAuthorized) {
+          endpoint.callback(...args, socket);
+        } else {
+          debug('sockets', `User dont have viewer access to ${socket.nsp.name}`);
+          debug('sockets', {haveAdminPrivileges, haveModPrivileges, haveViewerPrivileges});
+          for (const arg of args) {
+            if (typeof arg === 'function') {
+              arg('User doesn\'t have access to this endpoint', null);
+            }
+          }
+        }
+      });
+    }
+
     socket.on('disconnect', () => {
       clearInterval(interval);
       if (accessToken) {
@@ -222,7 +250,7 @@ class Socket extends Core {
 
         let auth;
         if (cb.type === 'access') {
-          if (cb.token === '' || !cb.token) {
+          if (!cb.token) {
             debug('sockets', `Missing access token`);
           } else if (Object.keys(invalidatedTokens).includes(cb.token)) {
             debug('sockets', `Invalidated access token - ${cb.token} used.`);
@@ -239,7 +267,11 @@ class Socket extends Core {
             return socket.emit('refreshToken', async (data: { userId: number; token: string }) => {
               auth = await getRepository(SocketEntity).findOne({ userId: data.userId, refreshToken: data.token });
               if (!auth) {
-                debug('sockets', `Incorrect refresh token for userId - ${data.token}, ${data.userId}`);
+                if (data.token) {
+                  debug('sockets', `Incorrect refresh token for userId - ${data.token}, ${data.userId}`);
+                } else {
+                  debug('sockets', `User doesn't provide refresh token - unauthorized`);
+                }
                 haveAdminPrivileges = Authorized.NotAuthorized;
                 haveModPrivileges = Authorized.NotAuthorized;
                 haveViewerPrivileges = Authorized.NotAuthorized;
@@ -308,6 +340,7 @@ class Socket extends Core {
     });
 
     socket.on('newAuthorization', async (userData, cb) => {
+      debug('socket', `newAuthorization for ${userData}`);
       const userId = Number(userData.userId);
       const username = userData.username;
 
@@ -335,7 +368,7 @@ class Socket extends Core {
       await getRepository(SocketEntity).save(auth);
       sendAuthorized(auth);
 
-      cb();
+      cb({ accessToken: auth.accessToken, refreshToken: auth.refreshToken });
     });
 
     for (const endpoint of endpoints.filter(o => o.type === 'public' && o.nsp === socket.nsp.name)) {
@@ -378,35 +411,6 @@ class Socket extends Core {
         }
       });
     }
-
-    for (const endpoint of endpoints.filter(o => (o.type === 'viewer') && o.nsp == socket.nsp.name)) {
-      socket.removeAllListeners(endpoint.on);
-      socket.on(endpoint.on, async (...args) => {
-        await new Promise(resolve => {
-          const waitForAuthorization = () => {
-            if (haveViewerPrivileges !== Authorized.inProgress) {
-              resolve();
-            } else {
-              setTimeout(waitForAuthorization, 100);
-            }
-          };
-          waitForAuthorization();
-        });
-
-        if (haveViewerPrivileges === Authorized.isAuthorized) {
-          endpoint.callback(...args, socket);
-        } else {
-          debug('sockets', `User dont have viewer access to ${socket.nsp.name}`);
-          debug('sockets', {haveAdminPrivileges, haveModPrivileges, haveViewerPrivileges});
-          for (const arg of args) {
-            if (typeof arg === 'function') {
-              arg('User doesn\'t have access to this endpoint', null);
-            }
-          }
-        }
-      });
-    }
-
     emitAuthorize();
     next();
   }

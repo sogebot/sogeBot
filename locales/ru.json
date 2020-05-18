@@ -838,10 +838,10 @@
     "alias-was-concealed": "$sender, псевдоним $alias был скрыт",
     "alias-was-exposed": "$sender, псевдоним $alias был открыт",
     "alias-was-removed": "$sender, псевдоним $alias был удален",
-    "alias-group-set": "$sender, alias $alias was set to group $group",
-    "alias-group-unset": "$sender, alias $alias group was unset",
-    "alias-group-list": "$sender, list of aliases groups: $list",
-    "alias-group-list-aliases": "$sender, list of aliases in $group: $list"
+    "alias-group-set": "$sender, псевдоним $alias был установлен в группу $group",
+    "alias-group-unset": "$sender, псевдоним $alias удалён из группы",
+    "alias-group-list": "$sender, список групп псевдонимов: $list",
+    "alias-group-list-aliases": "$sender, список псевдонимов в $group: $list"
   },
   "customcmds": {
     "commands-parse-failed": "{core.command-parse} !commands",
