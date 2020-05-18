@@ -28,6 +28,7 @@ export const addWidget = (id, name, icon) => {
 
 export const setIOServer = (serverArg) => {
   ioServer = io(serverArg);
+  ioServer.sockets.setMaxListeners(200);
 };
 
 export const setApp = (_app) => {

@@ -22,7 +22,8 @@
       localStorage.setItem('code', code);
 
       // set it as new authorization
-      localStorage.setItem('newAuthorization', true);
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
 
       window.location.replace(`${state.referrer || state.popoutUrl || state.url}`);
     } catch (error) {
