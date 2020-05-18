@@ -46,13 +46,24 @@ export const isUserLoggedIn = async function (mustBeLogged = true, mustBeAdmin =
       }
       localStorage.setItem('userId', data.id);
 
-      // set new authorization if set
-      const newAuthorization = localStorage.getItem('newAuthorization');
-      if (newAuthorization !== null) {
+      // get new authorization if we are missing access or refresh tokens
+      const accessToken = localStorage.getItem('accessToken') || '';
+      const refreshToken = localStorage.getItem('refreshToken') || '';
+      const isNewAuthorization = accessToken.trim().length === 0 || refreshToken.trim().length === 0;
+      console.log({isNewAuthorization});
+      if (isNewAuthorization) {
         await new Promise((resolve) => {
-          getSocket('/', true).emit('newAuthorization', { userId: Number(data.id), username: data.login }, () => {
-            resolve();
-          });
+          const loop = setInterval(() => {
+            getSocket('/', true).emit('newAuthorization', { userId: Number(data.id), username: data.login }, (tokens) => {
+              clearInterval(loop);
+              console.groupCollapsed('socket::newAuthorization');
+              console.debug(tokens);
+              console.groupEnd();
+              localStorage.setItem('accessToken', tokens.accessToken);
+              localStorage.setItem('refreshToken', tokens.refreshToken);
+              resolve();
+            });
+          }, 2000);
         });
       }
 
@@ -75,8 +86,6 @@ export const isUserLoggedIn = async function (mustBeLogged = true, mustBeAdmin =
           check();
         });
       }
-
-      localStorage.removeItem('newAuthorization');
       return data;
     } catch(e) {
       console.debug(e);
