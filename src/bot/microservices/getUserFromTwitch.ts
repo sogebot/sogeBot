@@ -2,8 +2,13 @@ import { getRepository } from 'typeorm';
 import { Settings } from '../database/entity/settings';
 import axios from 'axios';
 
-export const getUserFromTwitch = async (username)  => {
-  const url = `https://api.twitch.tv/helix/users?login=${username}`;
+export const getUserFromTwitch = async (username) => {
+  return (await getUsersFromTwitch([username]))[0];
+};
+
+
+export const getUsersFromTwitch = async (usernames: string[])  => {
+  const url = `https://api.twitch.tv/helix/users?login=${usernames.join('&login=')}`;
   /*
     {
       "data": [{
@@ -50,7 +55,7 @@ export const getUserFromTwitch = async (username)  => {
     },
   });
 
-  return request.data.data[0] as {
+  return request.data.data as {
     id: string; login: string; display_name: string; profile_image_url: string;
-  };
+  }[];
 };
