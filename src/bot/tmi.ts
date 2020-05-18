@@ -170,6 +170,7 @@ class TMI extends Core {
         await this.client[type]?.chat.part(this.channel);
         await this.client[type]?.chat.reconnect({ token, username, onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(refresh_token => refresh_token) });
 
+        this.loadListeners(type);
         await this.join(type, channel);
       }
     } catch (e) {
@@ -222,6 +223,7 @@ class TMI extends Core {
     (this.client[type] as TwitchJs).chat.on('DISCONNECT', async (message) => {
       info(`TMI: ${type} is disconnected`);
       setStatus('TMI', constants.DISCONNECTED);
+      (this.client[type] as TwitchJs).chat.removeAllListeners();
       for (const event of getFunctionList('partChannel')) {
         this[event.fName]();
       }
@@ -229,6 +231,7 @@ class TMI extends Core {
     (this.client[type] as TwitchJs).chat.on('RECONNECT', async (message) => {
       info(`TMI: ${type} is reconnecting`);
       setStatus('TMI', constants.RECONNECTING);
+      this.loadListeners(type);
       for (const event of getFunctionList('reconnectChannel')) {
         this[event.fName]();
       }
@@ -236,6 +239,7 @@ class TMI extends Core {
     (this.client[type] as TwitchJs).chat.on('CONNECTED', async (message) => {
       info(`TMI: ${type} is connected`);
       setStatus('TMI', constants.CONNECTED);
+      this.loadListeners(type);
       for (const event of getFunctionList('joinChannel')) {
         this[event.fName]();
       }
