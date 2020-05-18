@@ -11,6 +11,7 @@
     "cannotJoinToServerBtn": "Set token and clientId to be able to join bot to your server",
     "noChannelSelected": "no channel selected",
     "noRoleSelected": "no role selected",
-    "guildNotSelected": "Select guild where bot should work and you'll see more settings"
+    "noGuildSelected": "no role selected",
+    "noGuildSelectedBox": "Select guild where bot should work and you'll see more settings"
   }
 }

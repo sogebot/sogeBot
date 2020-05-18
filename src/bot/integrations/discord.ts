@@ -73,7 +73,7 @@ class Discord extends Integration {
     type: 'helpbox',
     variant: 'info',
   }, 'settings')
-  guildNotSelected = null;
+  noGuildSelectedBox = null;
 
   @settings('bot')
   @ui({
