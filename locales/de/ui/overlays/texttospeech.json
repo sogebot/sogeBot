@@ -8,6 +8,6 @@
     "volume": "Lautstärke",
     "rate": "Geschwindigkeit",
     "pitch": "Tonhöhe",
-    "triggerTTSByHighlightedMessage": "Text to Speech will be triggered by highlighted message"
+    "triggerTTSByHighlightedMessage": "TTS wird bei hervorgehobenen Nachrichten ausgelöst"
   }
 }
