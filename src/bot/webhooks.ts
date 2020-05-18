@@ -15,6 +15,8 @@ import ui from './ui';
 import alerts from './registries/alerts';
 import eventlist from './overlays/eventlist';
 import { linesParsed } from './helpers/parser';
+import { getFunctionList } from './decorators/on';
+import { find } from './helpers/register';
 
 class Webhooks {
   enabled = {
@@ -344,6 +346,17 @@ class Webhooks {
         events.fire('command-send-x-times', { reset: true });
         events.fire('keyword-send-x-times', { reset: true });
         events.fire('every-x-minutes-of-stream', { reset: true });
+
+        for (const event of getFunctionList('streamStart')) {
+          const type = !event.path.includes('.') ? 'core' : event.path.split('.')[0];
+          const module = !event.path.includes('.') ? event.path.split('.')[0] : event.path.split('.')[1];
+          const self = find(type, module);
+          if (self) {
+            self[event.fName]();
+          } else {
+            error(`streamStart: ${event.path} not found`);
+          }
+        }
       }
 
       // Always keep this updated
