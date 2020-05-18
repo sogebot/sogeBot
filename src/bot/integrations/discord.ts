@@ -297,49 +297,43 @@ class Discord extends Integration {
   async sendStreamStartAnnounce() {
     moment.locale(general.lang); // set moment locale
 
-    if (this.client && this.sendOnlineAnnounceToChannel.length > 0) {
-      // search discord channel by ID
-      let channelFound = false;
-      for (const [ id, channel ] of this.client.channels.cache) {
-        if (channel.type === 'text') {
-          if (id === this.sendOnlineAnnounceToChannel || (channel as DiscordJs.TextChannel).name === this.sendGeneralAnnounceToChannel) {
-            const ch = this.client.channels.cache.find(o => o.id === id);
-            if (ch) {
-              this.embedStartedAt = moment().tz(timezone).format('LLL');
-              const embed = new DiscordJs.MessageEmbed()
-                .setURL('https://twitch.tv/' + oauth.broadcasterUsername)
-                .addFields([
-                  { name: 'Now Playing', value: api.stats.currentGame},
-                  { name: 'Stream Title', value: api.stats.currentTitle},
-                  { name: 'Started At', value: this.embedStartedAt, inline: true},
-                  { name: 'Total Views', value: api.stats.currentViews, inline: true},
-                  { name: 'Followers', value: api.stats.currentFollowers, inline: true},
-                ])
-                // Set the title of the field
-                .setTitle('https://twitch.tv/' + oauth.broadcasterUsername)
-                // Set the color of the embed
-                .setColor(0x00ff00)
-                // Set the main content of the embed
-                .setDescription(`${oauth.broadcasterUsername.charAt(0).toUpperCase() + oauth.broadcasterUsername.slice(1)} started stream! Check it out!`)
-                .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${oauth.broadcasterUsername}-1920x1080.jpg?${Date.now()}`)
-                .setThumbnail(oauth.profileImageUrl)
-                .setFooter('Announced by sogeBot - https://www.sogebot.xyz');
-
-              if (oauth.broadcasterType !== '') {
-                embed.addField('Subscribers', api.stats.currentSubscribers, true);
-              }
-              // Send the embed to the same channel as the message
-              channelFound = true;
-              this.embedMessage = await (ch as DiscordJs.TextChannel).send(embed);
-              chatOut(`#${(ch as DiscordJs.TextChannel).name}: [[online announce embed]] [${this.client.user?.tag}]`);
-              this.embed = embed;
-            }
-          }
+    try {
+      if (this.client && this.sendOnlineAnnounceToChannel.length > 0) {
+        const channel = await this.client.channels.fetch(this.sendOnlineAnnounceToChannel);
+        if (!channel) {
+          throw new Error(`Channel ${this.sendOnlineAnnounceToChannel} not found on your discord server`);
         }
+
+        this.embedStartedAt = moment().tz(timezone).format('LLL');
+        const embed = new DiscordJs.MessageEmbed()
+          .setURL('https://twitch.tv/' + oauth.broadcasterUsername)
+          .addFields([
+            { name: 'Now Playing', value: api.stats.currentGame},
+            { name: 'Stream Title', value: api.stats.currentTitle},
+            { name: 'Started At', value: this.embedStartedAt, inline: true},
+            { name: 'Total Views', value: api.stats.currentViews, inline: true},
+            { name: 'Followers', value: api.stats.currentFollowers, inline: true},
+          ])
+          // Set the title of the field
+          .setTitle('https://twitch.tv/' + oauth.broadcasterUsername)
+          // Set the color of the embed
+          .setColor(0x00ff00)
+          // Set the main content of the embed
+          .setDescription(`${oauth.broadcasterUsername.charAt(0).toUpperCase() + oauth.broadcasterUsername.slice(1)} started stream! Check it out!`)
+          .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${oauth.broadcasterUsername}-1920x1080.jpg?${Date.now()}`)
+          .setThumbnail(oauth.profileImageUrl)
+          .setFooter('Announced by sogeBot - https://www.sogebot.xyz');
+
+        if (oauth.broadcasterType !== '') {
+          embed.addField('Subscribers', api.stats.currentSubscribers, true);
+        }
+        // Send the embed to the same channel as the message
+        this.embedMessage = await (channel as DiscordJs.TextChannel).send(embed);
+        chatOut(`#${(channel as DiscordJs.TextChannel).name}: [[online announce embed]] [${this.client.user?.tag}]`);
+        this.embed = embed;
       }
-      if (!channelFound) {
-        warning(`Discord channel ${this.sendOnlineAnnounceToChannel} not found on server.`);
-      }
+    } catch (e) {
+      warning(e.stack);
     }
   }
 
