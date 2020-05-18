@@ -4,7 +4,7 @@ import moment from 'moment';
 import 'moment-precise-range-plugin';
 import { join, normalize } from 'path';
 
-import { chatOut, debug } from './helpers/log';
+import { chatOut, debug, warning } from './helpers/log';
 import { globalIgnoreList } from './data/globalIgnoreList';
 import { error } from './helpers/log';
 import { clusteredChatOut, clusteredClientChat, clusteredClientTimeout, clusteredWhisperOut } from './cluster';
@@ -40,15 +40,22 @@ export async function parserReply(response: string | Promise<string>, opts: { se
     }
   })();
   if (opts.sender.discord) {
-    if (messageType === 'chat') {
-      const msg = await opts.sender.discord.channel.send(messageToSend);
-      if (Discord.deleteMessagesAfterWhile) {
-        setTimeout(() => {
-          msg.delete();
-        }, 10000);
+    if (Discord.client) {
+      if (messageType === 'chat') {
+        const msg = await opts.sender.discord.channel.send(messageToSend);
+        chatOut(`#${(opts.sender.discord.channel as TextChannel).name}: ${messageToSend} [${Discord.client.user?.tag}]`);
+        if (Discord.deleteMessagesAfterWhile) {
+          setTimeout(() => {
+            msg.delete().catch(() => {
+              return;
+            });
+          }, 10000);
+        }
+      } else {
+        opts.sender.discord.author.send(messageToSend);
       }
     } else {
-      opts.sender.discord.author.send(messageToSend);
+      warning('Discord client is not connected');
     }
   } else {
     // we skip as we are already parsing message
