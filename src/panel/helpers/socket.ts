@@ -113,7 +113,6 @@ export const getTranslations = async () => {
   console.debug('Getting translations');
   return new Promise((resolve) => {
     const loop = setInterval(() => {
-      console.log(getSocket('/', true));
       getSocket('/', true).emit('translations', (translations) => {
         clearInterval(loop);
         console.debug({translations});
