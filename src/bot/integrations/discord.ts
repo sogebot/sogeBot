@@ -73,7 +73,7 @@ class Discord extends Integration {
     type: 'helpbox',
     variant: 'info',
   }, 'settings')
-  guildNotSet = null;
+  guildNotSelected = null;
 
   @settings('bot')
   @ui({
@@ -316,8 +316,8 @@ class Discord extends Integration {
     moment.locale(general.lang); // set moment locale
 
     try {
-      if (this.client && this.sendOnlineAnnounceToChannel.length > 0) {
-        const channel = await this.client.channels.fetch(this.sendOnlineAnnounceToChannel);
+      if (this.client && this.sendOnlineAnnounceToChannel.length > 0 && this.guild.length > 0) {
+        const channel = this.client.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
         if (!channel) {
           throw new Error(`Channel ${this.sendOnlineAnnounceToChannel} not found on your discord server`);
         }
