@@ -21,9 +21,7 @@ _.set(global, 'widgets.custom_variables.io.emit', function () {
   return;
 });
 
-// https://github.com/sogehige/sogeBot/issues/3379
-// custom variable command reply should return command response with updated variable #3379
-describe('Custom Variable - Command reply should return correct reply', () => {
+describe('Custom Variable - #3379 - Command reply should return correct reply', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

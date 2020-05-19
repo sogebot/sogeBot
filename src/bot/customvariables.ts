@@ -21,7 +21,7 @@ import custom_variables from './widgets/customvariables';
 import currency from './currency';
 import { isDbConnected } from './helpers/database';
 import { linesParsed } from './helpers/parser';
-import { debug, info, warning } from './helpers/log';
+import { debug, error, info, warning } from './helpers/log';
 import Core from './_interface';
 import { adminEndpoint } from './helpers/socket';
 
@@ -119,7 +119,7 @@ class CustomVariables extends Core {
         if (!item) {
           throw new Error('Variable not found');
         }
-        const newCurrentValue = await this.runScript(item.evalValue, { _current: item.currentValue });
+        const newCurrentValue = await this.runScript(item.evalValue, { _current: item.currentValue, isUI: true });
         const runAt = Date.now();
         cb(null, await getRepository(Variable).save({
           ...item, currentValue: newCurrentValue, runAt,
@@ -131,7 +131,7 @@ class CustomVariables extends Core {
     adminEndpoint(this.nsp, 'customvariables::testScript', async (opts, cb) => {
       let returnedValue;
       try {
-        returnedValue = await this.runScript(opts.evalValue, { _current: opts.currentValue, sender: { username: 'testuser', userId: 0 }});
+        returnedValue = await this.runScript(opts.evalValue, { isUI: true, _current: opts.currentValue, sender: { username: 'testuser', userId: 0 }});
       } catch (e) {
         cb(e.stack, null);
       }
@@ -190,6 +190,7 @@ class CustomVariables extends Core {
   async runScript (script, opts) {
     debug('customvariables.eval', opts);
     let sender = !isNil(opts.sender) ? opts.sender : null;
+    const isUI = !isNil(opts.isUI) ? opts.isUI : false;
     const param = !isNil(opts.param) ? opts.param : null;
     if (typeof sender === 'string') {
       sender = {
@@ -251,7 +252,6 @@ class CustomVariables extends Core {
     // update globals and replace theirs values
     script = (await new Message(script).global({ escape: '\'' }));
 
-    const toEval = `(async function evaluation () {  ${script} })()`;
     const context = {
       url: async (url, urlOpts) => {
         if (typeof urlOpts === 'undefined') {
@@ -318,7 +318,26 @@ class CustomVariables extends Core {
       },
       ...customVariables,
     };
-    return (safeEval(toEval, context));
+    // we need to add operation counter function
+    const opCounterFnc = 'let __opCount__ = 0; function __opCounter__() { console.log(__opCount__); if (__opCount__ > 100000) { throw new Error("Running script seems to be in infinite loop."); } else { __opCount__++; }};';
+    // add __opCounter__() after each ;
+    const toEval = `(async function evaluation () { ${opCounterFnc} ${script.split(';').map(line => '__opCounter__();' + line).join(';')} })()`;
+    try {
+      const value = await safeEval(toEval, context);
+      debug('customvariables.eval', value);
+      return value;
+    } catch (e) {
+      debug('customvariables.eval', 'Running script seems to be in infinite loop.');
+      error(`Script is causing error:`);
+      error(`${script}`);
+      error(e.stack);
+      if (isUI) {
+        // if we have UI, rethrow error to show in UI
+        throw(e);
+      } else {
+        return '';
+      }
+    }
   }
 
   async isVariableSet (variableName) {

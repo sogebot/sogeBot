@@ -54,7 +54,7 @@ module.exports = {
       log.debug.resetHistory();
     }
   },
-  debug: async function (category, expected) {
+  debug: async function (category, expected, waitMs = 5000) {
     await until(setError => {
       if (Array.isArray(expected)) {
         for (const ex of expected) {
@@ -71,7 +71,7 @@ module.exports = {
         '\n+\t"' + expected + '"'
         + '\n-\t\t"' + log.debug.args.join('\n\t\t\t') + '"'
       );
-    }, 5000);
+    }, waitMs);
   },
   isWarned: async function (entry, user, opts) {
     user = _.cloneDeep(user);
