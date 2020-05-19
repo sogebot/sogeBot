@@ -1,7 +1,7 @@
 #!/bin/bash
 cd /app
 
-if [ -z "$DEBUG" ]
+if [ -z "$PROFILER" ]
 then
   npm start
 else
