@@ -1,6 +1,7 @@
 {
   "settings": {
     "enabled": "Статус",
+    "guild": "Guild",
     "listenAtChannels": "Слушать на этих каналах",
     "sendOnlineAnnounceToChannel": "Отправить онлайн объявление в этот канал",
     "sendGeneralAnnounceToChannel": "Отправить общее объявление в этот канал",
