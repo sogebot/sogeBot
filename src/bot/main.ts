@@ -152,6 +152,10 @@ process.on('uncaughtException', (err) => {
   const date = new Date().toISOString();
   process.report?.writeReport(`uncaughtException-${date}`, err);
   error(util.inspect(err));
+  if (err.message.includes('[TwitchJS] Parse error encountered [Chat]')) {
+    // workaround for https://github.com/sogehige/sogeBot/issues/3762
+    return;
+  }
   error('');
   error('BOT HAS UNEXPECTEDLY CRASHED');
   error('PLEASE CHECK https://github.com/sogehige/SogeBot/wiki/How-to-report-an-issue');
