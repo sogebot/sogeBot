@@ -1,7 +1,7 @@
 {
   "settings": {
     "enabled": "Status",
-    "guild": "Guild",
+    "guild": "Server",
     "listenAtChannels": "Poslouchat příkazy na tomto kanálu",
     "sendOnlineAnnounceToChannel": "Posílat online oznámení do tohoto kanálu",
     "sendGeneralAnnounceToChannel": "Posílat obecné oznámení do tohoto kanálu",
