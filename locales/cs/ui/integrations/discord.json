@@ -10,6 +10,8 @@
     "joinToServerBtn": "Kliknutím připojíte bota na váš server",
     "cannotJoinToServerBtn": "Nastavte token a clientId, abyste mohli připojit bota na váš server",
     "noChannelSelected": "není vybrán žádný kanál",
-    "noRoleSelected": "není vybrána žádná role"
+    "noRoleSelected": "není vybrána žádná role",
+    "noGuildSelected": "no guild selected",
+    "noGuildSelectedBox": "Select guild where bot should work and you'll see more settings"
   }
 }
