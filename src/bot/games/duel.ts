@@ -25,7 +25,7 @@ const ERROR_MINIMAL_BET = '3';
 class Duel extends Game {
   dependsOn = [ points ];
 
-  @shared()
+  @shared(true)
   _timestamp = 0;
   @shared()
   _cooldown = String(new Date());
@@ -93,7 +93,6 @@ class Duel extends Game {
         tickets: winnerUser.tickets,
         winner: winnerUser.username,
       });
-
       announce(m);
 
       // give user his points
@@ -183,6 +182,7 @@ class Duel extends Game {
       if (isNewDuel) {
         this._timestamp = Number(new Date());
         const response = prepare('gambling.duel.new', {
+          sender: opts.sender,
           minutesName: getLocalizedName(5, 'core.minutes'),
           minutes: this.duration,
           command: opts.command });
