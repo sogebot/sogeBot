@@ -68,7 +68,7 @@
                     ></command-input-with-permission>
                     <toggle-enable
                       class="pt-1 pb-1"
-                      v-bind:title="translate($route.params.type + '.' + $route.params.id + '.settings.' + defaultValue)"
+                      v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
                       v-else-if="typeof currentValue === 'boolean'"
                       v-bind:value="currentValue"
                       v-on:update="value[defaultValue] = !value[defaultValue]; triggerDataChange()"

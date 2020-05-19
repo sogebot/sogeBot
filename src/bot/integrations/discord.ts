@@ -69,10 +69,10 @@ class Discord extends Integration {
   guild = '';
 
   @ui({
-    if: () => self.clientId.length === 0,
+    if: () => self.clientId.length > 0 && self.guild.length === 0,
     type: 'helpbox',
     variant: 'info',
-  }, 'settings')
+  }, 'bot')
   noGuildSelectedBox = null;
 
   @settings('bot')
@@ -104,6 +104,10 @@ class Discord extends Integration {
   rolesMapping: { [permissionId: string]: string } = {};
 
   @settings('bot')
+  @ui({
+    type: 'toggle-enable',
+    if: () => self.guild.length > 0,
+  })
   deleteMessagesAfterWhile = false;
 
   constructor() {
