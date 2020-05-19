@@ -63,25 +63,43 @@ class Discord extends Integration {
 
   @settings('bot')
   @ui({
+    type: 'discord-guild',
+    if: () => self.clientId.length > 0 && self.token.length > 0,
+  })
+  guild = '';
+
+  @ui({
+    if: () => self.clientId.length === 0,
+    type: 'helpbox',
+    variant: 'info',
+  }, 'settings')
+  noGuildSelectedBox = null;
+
+  @settings('bot')
+  @ui({
     type: 'discord-channel',
+    if: () => self.guild.length > 0,
   })
   listenAtChannels = '';
 
   @settings('bot')
   @ui({
     type: 'discord-channel',
+    if: () => self.guild.length > 0,
   })
   sendOnlineAnnounceToChannel = '';
 
   @settings('bot')
   @ui({
     type: 'discord-channel',
+    if: () => self.guild.length > 0,
   })
   sendGeneralAnnounceToChannel = '';
 
   @settings('mapping')
   @ui({
     type: 'discord-mapping',
+    if: () => self.guild.length > 0,
   })
   rolesMapping: { [permissionId: string]: string } = {};
 
@@ -134,11 +152,11 @@ class Discord extends Integration {
       if (!user.userId) {
         continue;
       }
-      const guild = this.client.guilds.cache.get(this.client.guilds.cache.firstKey() || '');
+      const guild = this.client.guilds.cache.get(this.guild);
       if (!guild) {
         return warning('No servers found for discord');
       }
-      const discordUser = await guild.member(await guild.members.fetch(user.discordId));
+      const discordUser = guild.member(await guild.members.fetch(user.discordId));
       if (!discordUser) {
         warning('Discord user not found');
         continue;
@@ -298,8 +316,8 @@ class Discord extends Integration {
     moment.locale(general.lang); // set moment locale
 
     try {
-      if (this.client && this.sendOnlineAnnounceToChannel.length > 0) {
-        const channel = await this.client.channels.fetch(this.sendOnlineAnnounceToChannel);
+      if (this.client && this.sendOnlineAnnounceToChannel.length > 0 && this.guild.length > 0) {
+        const channel = this.client.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
         if (!channel) {
           throw new Error(`Channel ${this.sendOnlineAnnounceToChannel} not found on your discord server`);
         }
@@ -350,9 +368,14 @@ class Discord extends Integration {
       });
 
       this.client.on('message', async (msg) => {
-        if (this.client) {
+        if (this.client && this.guild) {
           if (msg.author.tag === get(this.client, 'user.tag', null)) {
             // don't do anything on self messages;
+            return;
+          }
+
+          // don't listen discord DM messages and other guilds
+          if (msg.channel.type === 'dm' || msg.guild?.id !== this.guild) {
             return;
           }
 
@@ -457,11 +480,8 @@ class Discord extends Integration {
   sockets() {
     adminEndpoint(this.nsp, 'discord::getRoles', async (cb) => {
       try {
-        if (!this.client) {
-          throw new Error('DiscordJS client not loaded');
-        }
-        for (const [, guild] of this.client.guilds.cache) {
-          return cb(null, guild.roles.cache
+        if (this.client && this.guild) {
+          return cb(null, this.client.guilds.cache.get(this.guild)?.roles.cache
             .sort((a, b) => {
               const nameA = a.name.toUpperCase(); // ignore upper and lowercase
               const nameB = b.name.toUpperCase(); // ignore upper and lowercase
@@ -476,16 +496,41 @@ class Discord extends Integration {
             })
             .map(o => ({ html: `<strong>${o.name}</strong> &lt;${o.id}&gt;`, value: o.id }))
           );
-        };
-        cb(null, []);
+        } else {
+          cb(null, []);
+        }
+      } catch (e) {
+        cb(e.message, []);
+      }
+    });
+    adminEndpoint(this.nsp, 'discord::getGuilds', async (cb) => {
+      try {
+        if (this.client) {
+          return cb(null, this.client.guilds.cache
+            .sort((a, b) => {
+              const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+              const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+              if (nameA < nameB) {
+                return -1;
+              }
+              if (nameA > nameB) {
+                return 1;
+              }
+              // names must be equal
+              return 0;
+            })
+            .map(o => ({ html: `<strong>${o.name}</strong> &lt;${o.id}&gt;`, value: o.id })));
+        } else {
+          cb(null, []);
+        }
       } catch (e) {
         cb(e.message, []);
       }
     });
     adminEndpoint(this.nsp, 'discord::getChannels', async (cb) => {
       try {
-        if (this.client) {
-          cb(null, this.client.channels.cache
+        if (this.client && this.guild) {
+          cb(null, this.client.guilds.cache.get(this.guild)?.channels.cache
             .filter(o => o.type === 'text')
             .sort((a, b) => {
               const nameA = (a as DiscordJs.TextChannel).name.toUpperCase(); // ignore upper and lowercase
