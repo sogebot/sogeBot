@@ -50,7 +50,6 @@ export const isUserLoggedIn = async function (mustBeLogged = true, mustBeAdmin =
       const accessToken = localStorage.getItem('accessToken') || '';
       const refreshToken = localStorage.getItem('refreshToken') || '';
       const isNewAuthorization = accessToken.trim().length === 0 || refreshToken.trim().length === 0;
-      console.log({isNewAuthorization});
       if (isNewAuthorization) {
         await new Promise((resolve) => {
           const loop = setInterval(() => {
