@@ -100,11 +100,7 @@ export async function announce(messageToAnnounce: string) {
                 const userId = await users.getIdByName(username);
                 const link = await getRepository(DiscordLink).findOne({ userId });
                 if (link) {
-                  if (messageToAnnounce.includes(`@${username}`)) {
-                    messageToAnnounce = messageToAnnounce.replace(`@${username}`, `<@${link.discordId}>`);
-                  } else {
-                    messageToAnnounce = messageToAnnounce.replace(`${username}`, `<@${link.discordId}>`);
-                  }
+                  messageToAnnounce = messageToAnnounce.replace(`@${username}`, `<@${link.discordId}>`);
                 }
               }
             }
