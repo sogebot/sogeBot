@@ -50,7 +50,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, PropSync, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, PropSync } from 'vue-property-decorator';
 import { v4 as uuid } from 'uuid';
 import { getSocket } from '../helpers/socket';
 
@@ -79,15 +79,13 @@ export default class MediaForm extends Vue {
 
   createdAt = 0;
 
-  @Watch('volume')
-  @Watch('data')
   setVolume() {
-    if (this.type === 'audio' && this.b64data.length === 0) {
-      if (typeof this.$refs[this.id] === 'undefined') {
+    if (this.type === 'audio' && this.b64data.length > 0) {
+      if (typeof this.$refs[this.createdAt + this.id] === 'undefined') {
         console.debug(`Retrying setVolume ${this.id}`);
         return setTimeout(() => this.setVolume(), 100);
       }
-      (this.$refs[this.id] as HTMLAudioElement).volume = this.volume / 100;
+      (this.$refs[this.createdAt + this.id] as HTMLAudioElement).volume = this.volume / 100;
     }
   }
 

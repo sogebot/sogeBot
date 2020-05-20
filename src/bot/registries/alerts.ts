@@ -189,7 +189,7 @@ class Alerts extends Registry {
       monthsName: getLocalizedName(amount, 'core.months'),
       event: opts.event,
       autohost: true,
-      message: ['tips', 'cheers'].includes(opts.event)
+      message: ['tips', 'cheers', 'resubs'].includes(opts.event)
         ? messages[Math.floor(Math.random() * messages.length)]
         : '',
     };

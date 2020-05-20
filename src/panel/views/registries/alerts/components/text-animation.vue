@@ -3,7 +3,7 @@
     <b-row>
       <b-col><b-form-select v-model="animType" :options="options" class="col" plain></b-form-select></b-col>
       <b-col v-if="animType !== 'baffle'">
-        <div class="char d-inline-block animated infinite" :class="[animType, animOptions.speed]" :style="{'animation-delay' : (index * 50) + 'ms'}" v-for="(char, index) of text.split('')" v-bind:key="char + index">{{ char === ' ' ? '&nbsp;' : char }}</div>
+        <div class="char d-inline-block animate__animated animate__infinite" :class="['animate__' + animType, 'animate__' + animOptions.speed]" :style="{'animation-delay' : (index * 50) + 'ms'}" v-for="(char, index) of text.split('')" v-bind:key="char + index">{{ char === ' ' ? '&nbsp;' : char }}</div>
       </b-col>
       <b-col v-else>
         <baffle class="char" text="Sample text" :options="animOptions"/>
@@ -89,7 +89,7 @@ require('animate.css');
 
 @Component({
   components: {
-    'baffle': () => import('../../../../components/baffle'),
+    'baffle': () => import('src/panel/components/baffle.vue'),
   }
 })
 export default class TextAnimation extends Vue {

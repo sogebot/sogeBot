@@ -210,9 +210,9 @@
 
     <b-card no-body>
       <b-card-header header-tag="header" class="p-1" role="tab">
-        <b-button block href="#" v-b-toggle.accordion-1 variant="light" class="text-left">{{translate('registry.alerts.font.setting')}}</b-button>
+        <b-button block v-b-toggle.accordion-form-follow-font variant="light" class="text-left">{{translate('registry.alerts.font.setting')}}</b-button>
       </b-card-header>
-      <b-collapse id="accordion-1" accordion="my-accordion" role="tabpanel">
+      <b-collapse id="accordion-form-follow-font" accordion="my-accordion" role="tabpanel">
         <b-card-body>
           <b-form-group label-cols-sm="4" label-cols-lg="3"
                        :label="translate('registry.alerts.font.name')">

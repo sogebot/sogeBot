@@ -208,7 +208,7 @@
     </div>
     <b-card no-body>
       <b-card-header header-tag="header" class="p-1" role="tab">
-        <b-button block href="#" v-b-toggle.accordion-2 variant="light" class="text-left">{{translate('registry.alerts.message.setting')}}</b-button>
+        <b-button block v-b-toggle.accordion-2 variant="light" class="text-left">{{translate('registry.alerts.message.setting')}}</b-button>
       </b-card-header>
       <b-collapse id="accordion-2" accordion="message-accordion" role="tabpanel">
         <b-card-body>
@@ -315,7 +315,7 @@
 
     <b-card no-body>
       <b-card-header header-tag="header" class="p-1" role="tab">
-        <b-button block href="#" v-b-toggle.accordion-1 variant="light" class="text-left">{{translate('registry.alerts.font.setting')}}</b-button>
+        <b-button block v-b-toggle.accordion-1 variant="light" class="text-left">{{translate('registry.alerts.font.setting')}}</b-button>
       </b-card-header>
       <b-collapse id="accordion-1" accordion="my-accordion" role="tabpanel">
         <b-card-body>
@@ -423,6 +423,8 @@
       </b-collapse>
     </b-card>
 
+    <tts :tts.sync="data.tts" :uuid="data.id"/>
+
     <hold-button @trigger="$emit('delete', data.id)" icon="trash" class="btn-danger btn-block btn-reverse mt-3">
       <template slot="title">{{translate('dialog.buttons.delete')}}</template>
       <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
@@ -442,7 +444,7 @@ import 'codemirror/mode/css/css.js';
 import 'codemirror/theme/base16-dark.css';
 import 'codemirror/theme/base16-light.css';
 import 'codemirror/lib/codemirror.css';
-import text from 'src/bot/data/templates/alerts.txt';
+import text from 'src/bot/data/templates/alerts-with-message.txt';
 import textjs from 'src/bot/data/templates/alerts-js.txt';
 
 import { Validations } from 'vuelidate-property-decorators';
@@ -457,6 +459,7 @@ import { required, minValue } from 'vuelidate/lib/validators'
     'animation-in': () => import('./animation-in.vue'),
     'animation-out': () => import('./animation-out.vue'),
     'variant': () => import('./variant.vue'),
+    'tts': () => import('./tts.vue'),
     'hold-button': () => import('src/panel/components/holdButton.vue'),
   }
 })

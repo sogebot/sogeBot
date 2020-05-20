@@ -11,15 +11,15 @@
         </audio>
         <div v-if="runningAlert.isShowing" class="center" :class="['layout-' + runningAlert.alert.layout]">
           <template v-if="!runningAlert.alert.enableAdvancedMode">
-            <img :src="'/registry/alerts/' + runningAlert.alert.imageId" :class="{ center: runningAlert.alert.layout === '3', [runningAlert.animation]: true }" class="slow animated"/>
+            <img :src="'/registry/alerts/' + runningAlert.alert.imageId" :class="{ center: runningAlert.alert.layout === '3', ['animate__' + runningAlert.animation]: true }" class="animate__slow animate__animated"/>
             <div
               v-if="runningAlert.isShowingText"
               :class="{
                 center: runningAlert.alert.layout === '3',
-                [runningAlert.animationText]: true,
+                ['animate__' + runningAlert.animation]: true,
               }"
               :style="{'text-align': 'center'}"
-              class="slow animated">
+              class="animate__slow animate__animated">
                 <span :style="{
                   'font-family': runningAlert.alert.font.family,
                   'font-size': runningAlert.alert.font.size + 'px',
@@ -275,7 +275,7 @@ export default class AlertsRegistryOverlays extends Vue {
         }
 
         if (waitingForTTS && (this.$refs.audio as HTMLMediaElement).ended) {
-          let message = this.runningAlert.message + ' google.com, youtube.com, seznam.cz';
+          let message = this.runningAlert.message;
           if (this.runningAlert.alert.tts.skipUrls) {
             for (const match of message.match(urlRegex({strict: false})) ?? []) {
               message = message.replace(match, '');
@@ -396,8 +396,8 @@ export default class AlertsRegistryOverlays extends Vue {
                   .replace(/\<div.*class="(.*?)".*ref="text"\>|\<div.*ref="text".*class="(.*?)"\>/gm, '<div ref="text">') // we need to replace ref with class with proper ref
                   .replace('ref="text"', `
                     v-if="runningAlert.isShowingText"
-                    :class="{[runningAlert.animationText]: true}"
-                    class="slow animated ${refTextClass}"
+                    :class="{['animate__' + runningAlert.animation]: true}"
+                    class="animate__slow animate__animated ${refTextClass}"
                     :style="{
                       'font-family': runningAlert.alert.font.family,
                       'font-size': runningAlert.alert.font.size + 'px',
@@ -410,8 +410,8 @@ export default class AlertsRegistryOverlays extends Vue {
                   .replace(/\<div.*class="(.*?)".*ref="image"\>|\<div.*ref="image".*class="(.*?)"\>/gm, '<div ref="image">') // we need to replace ref with class with proper ref
                   .replace('ref="image"', `
                     v-if="runningAlert.isShowingText"
-                    :class="{[runningAlert.animation]: true}"
-                    class="slow animated ${refImageClass}"
+                    :class="{['animate__' + runningAlert.animation]: true}"
+                    class="animate__slow animate__animated ${refImageClass}"
                     :src="'/registry/alerts/' + runningAlert.alert.imageId"
                   `);
 
@@ -593,14 +593,14 @@ export default class AlertsRegistryOverlays extends Vue {
     if (this.runningAlert !== null) {
       let name: string | string[] = this.runningAlert.name.split('').map((char, index) => {
         if (this.runningAlert !== null) {
-          return `<div class="animated infinite ${this.runningAlert.alert.animationText} ${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font.highlightcolor}; display: inline-block;">${char}</div>`;
+          return `<div class="animate__animated animate__infinite animate__${this.runningAlert.alert.animationText} animate__${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font.highlightcolor}; display: inline-block;">${char}</div>`;
         } else {
           return char;
         }
       })
       let recipient: string | string[] = (this.runningAlert.recipient || '').split('').map((char, index) => {
         if (this.runningAlert !== null) {
-          return `<div class="animated infinite ${this.runningAlert.alert.animationText} ${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font.highlightcolor}; display: inline-block;">${char}</div>`;
+          return `<div class="animate__animated animate__infinite animate__${this.runningAlert.alert.animationText} animate__${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font.highlightcolor}; display: inline-block;">${char}</div>`;
         } else {
           return char;
         }
@@ -608,7 +608,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
       let amount: string | string[] = String(this.runningAlert.amount).split('').map((char, index) => {
         if (this.runningAlert !== null) {
-          return `<div class="animated infinite ${this.runningAlert.alert.animationText} ${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font.highlightcolor}; display: inline-block;">${char}</div>`;
+          return `<div class="animate__animated animate__infinite animate__${this.runningAlert.alert.animationText} animate__${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font.highlightcolor}; display: inline-block;">${char}</div>`;
         } else {
           return char;
         }
@@ -616,7 +616,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
       let currency: string | string[] = String(this.runningAlert.currency).split('').map((char, index) => {
         if (this.runningAlert !== null) {
-          return `<div class="animated infinite ${this.runningAlert.alert.animationText} ${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font.highlightcolor}; display: inline-block;">${char}</div>`;
+          return `<div class="animate__animated animate__infinite animate__${this.runningAlert.alert.animationText} animate__${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font.highlightcolor}; display: inline-block;">${char}</div>`;
         } else {
           return char;
         }
@@ -624,7 +624,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
       let monthsName: string | string[] = String(this.runningAlert.monthsName).split('').map((char, index) => {
         if (this.runningAlert !== null) {
-          return `<div class="animated infinite ${this.runningAlert.alert.animationText} ${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font.highlightcolor}; display: inline-block;">${char}</div>`;
+          return `<div class="animate__animated animate__infinite animate__${this.runningAlert.alert.animationText} animate__${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font.highlightcolor}; display: inline-block;">${char}</div>`;
         } else {
           return char;
         }
