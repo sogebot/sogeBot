@@ -8,7 +8,7 @@
         </b-input-group>
       </b-col>
       <b-col>
-        <div class="test animated slow" :class="[computedClass]"></div>
+        <div class="test animate__animated slow" :class="[computedClass]"></div>
       </b-col>
     </b-row>
   </b-container>
@@ -32,7 +32,7 @@ export default class AnimationOut extends Vue {
       }, 100);
       return '';
     } else {
-      return this.animType;
+      return 'animate__' + this.animType;
     }
   }
 
@@ -46,6 +46,12 @@ export default class AnimationOut extends Vue {
     { value: 'fadeOutLeftBig', text: 'fadeOutLeftBig' },
     { value: 'fadeOutRightBig', text: 'fadeOutRightBig' },
     { value: 'fadeOutUpBig', text: 'fadeOutUpBig' },
+    { value: 'flipOutX', text: 'flipOutX' },
+    { value: 'flipOutY', text: 'flipOutY' },
+    { value: 'backOutDown', text: 'backOutDown' },
+    { value: 'backOutLeft', text: 'backOutLeft' },
+    { value: 'backOutRight', text: 'backOutRight' },
+    { value: 'backOutUp', text: 'backOutUp' },
     { value: 'bounceOut', text: 'bounceOut' },
     { value: 'bounceOutDown', text: 'bounceOutDown' },
     { value: 'bounceOutLeft', text: 'bounceOutLeft' },

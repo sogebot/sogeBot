@@ -1,6 +1,6 @@
 <!-- whole alert is wrapped in display: flex -->
 <!-- we are using refs: image, text to ensure animations trigger -->
-<!-- available variables are {messageTemplate}, {name}, {amount}, {monthsName}, {currency}, {recipient} -->
+<!-- available variables are {messageTemplate}, {message}, {name}, {amount}, {monthsName}, {currency}, {recipient} -->
 <!-- available higlighted variables are {name:highlight}, {amount:highlight}, {monthsName:highlight}, {currency:highlight}, {recipient:highlight} -->
 
 <!-- wrap is needed for CSS to not interfere with each other -->

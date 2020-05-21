@@ -1,9 +1,9 @@
 <template>
     <b-card no-body>
       <b-card-header header-tag="header" class="p-1" role="tab">
-        <b-button block href="#" v-b-toggle.tts-accordion variant="light" class="text-left">{{translate('registry.alerts.tts.setting')}}</b-button>
+        <b-button block v-b-toggle.tts-accordion variant="light" class="text-left">{{translate('registry.alerts.tts.setting')}}</b-button>
       </b-card-header>
-      <b-collapse id="tts-accordion" accordion="my-accordion" role="tabpanel">
+      <b-collapse id="tts-accordion" accordion="my-tts-accordion" role="tabpanel">
         <b-card-body v-if="state.loaded === $state.success">
           <b-form-group
             label-cols-sm="4"
@@ -156,12 +156,6 @@ export default class TTS extends Vue {
 
   voices: {text: string; value: string}[] = [];
 
-  beforeDestroy() {
-    if (this.state.loaded === this.$state.success) {
-      this.$unloadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.configuration.integrations.ResponsiveVoice.api.key).catch(() => {});
-    }
-  }
-
   mounted() {
     this.state.loaded = this.$state.progress;
     if (this.configuration.integrations.ResponsiveVoice.api.key.trim().length === 0) {
@@ -172,6 +166,9 @@ export default class TTS extends Vue {
           .then(() => this.initResponsiveVoice());
       } else {
         this.state.loaded = this.$state.success;
+        this.voices = window.responsiveVoice.getVoices().map(o => {
+          return { text: o.name, value: o.name }
+        });
       }
     }
   }
