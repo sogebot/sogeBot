@@ -39,11 +39,20 @@ export default class Menu extends Vue {
       window['DocumentTouch'] = HTMLDocument
     }
 
-    this.socket.emit('menu', (menu) => {
-      this.menu = menu.sort((a, b) => {
-        return this.translate('menu.' + a.name).localeCompare(this.translate('menu.' + b.name))
+    let interval = setInterval(() => {
+      this.socket = getSocket('/');
+      this.socket.emit('menu', (menu) => {
+        clearInterval(interval);
+        console.groupCollapsed('menu::menu');
+        console.log({menu});
+        console.groupEnd();
+        for (const item of menu.sort((a, b) => {
+          return this.translate('menu.' + a.name).localeCompare(this.translate('menu.' + b.name))
+        })) {
+          this.menu.push(item);
+        }
       });
-    });
+    }, 1000)
   }
 }
 </script>
