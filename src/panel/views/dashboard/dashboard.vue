@@ -109,7 +109,6 @@ export default {
   data: function () {
     return {
       sortBy,
-      items: [],
       dashboards: [],
 
       dashboardName: '',
@@ -124,16 +123,27 @@ export default {
   },
   mounted() {
     this.isLoaded = false;
-    this.socket.emit('panel::dashboards', Number(this.$loggedUser.id), 'admin', (err, dashboards) => {
-      if (err) {
-        return console.error(err);
-      }
-      this.mainDashboard = dashboards[0].id
-      this.currentDashboard = dashboards[0].id;
-      this.dashboards = dashboards;
-      this.refreshWidgets();
-      this.isLoaded = true;
-    });
+
+    let interval = setInterval(() => {
+      this.socket = getSocket('/');
+      console.debug('dashboard::panel::dashboards')
+      this.socket.emit('panel::dashboards', Number(this.$loggedUser.id), 'admin', (err, dashboards) => {
+        clearInterval(interval);
+        console.groupCollapsed('dashboard::panel::dashboards');
+        console.log({err, dashboards});
+        console.groupEnd();
+        if (err) {
+          return console.error(err);
+        }
+        this.mainDashboard = dashboards[0].id
+        this.currentDashboard = dashboards[0].id;
+        for (const item of dashboards) {
+          this.dashboards.push(item);
+        }
+        this.refreshWidgets();
+        this.isLoaded = true;
+      });
+    }, 1000);
 
     EventBus.$on('remove-widget', (id) => {
       this.removeWidget(id);
