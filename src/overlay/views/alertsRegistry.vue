@@ -244,8 +244,8 @@ export default class AlertsRegistryOverlays extends Vue {
             console.debug('Cleanin up', { isTTSPlaying, waitingForTTS, hideAt: this.runningAlert.hideAt - Date.now() <= 0 })
             // eval onEnded
             this.$nextTick(() => {
-              if (this.runningAlert) {
-                eval(`${this.runningAlert.alert.advancedMode.js}; onEnded()`);
+              if (this.runningAlert && this.runningAlert.alert.enableAdvancedMode) {
+                eval(`${this.runningAlert.alert.advancedMode.js}; if (typeof onEnded === 'function') { onEnded() } else { console.log('no onEnded() function found');`);
               }
             })
 
@@ -432,8 +432,10 @@ export default class AlertsRegistryOverlays extends Vue {
               this.$nextTick(() => {
                 // eval onStarted
                 this.$nextTick(() => {
-                  eval(`${alert.advancedMode.js}; onStarted()`);
-                })
+                  if (alert.enableAdvancedMode) {
+                    eval(`${alert.advancedMode.js}; if (typeof onStarted === 'function') { onStarted() } else { console.log('no onStarted() function found');`);
+                  }
+                });
               })
             } else {
               // we need to add :highlight to name, amount, monthName, currency by default
