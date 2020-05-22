@@ -96,13 +96,23 @@ const main = async () => {
 
   /* force first authorize */
   try {
-    await waitForAuthorizationSocket('/');
+    console.debug('Checking if user is logged');
+    Vue.prototype.$loggedUser = await isUserLoggedIn();
+    console.debug('Waiting for authorization socket');
+    await new Promise(resolve => {
+      const loop = setInterval(() => {
+        waitForAuthorizationSocket('/').then(() => {
+          clearInterval(loop);
+          resolve();
+        });
+      }, 2000);
+    });
+    console.debug('User authorized, continue');
   } catch (e) {
     console.error(e);
     redirectLogin();
     return;
   }
-  Vue.prototype.$loggedUser = await isUserLoggedIn();
   if (Vue.prototype.$loggedUser !== false) {
     await getTranslations();
     Vue.prototype.configuration = await getConfiguration();
