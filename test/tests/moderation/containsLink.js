@@ -14,6 +14,7 @@ const moderation = (require('../../../dest/systems/moderation')).default;
 const tests = {
   'clips': [
     'clips.twitch.tv/TolerantExquisiteDuckOneHand',
+    'www.twitch.tv/7ssk7/clip/StormyBraveAniseM4xHeh?filter=clips&range=30d&sort=time', // https://discordapp.com/channels/317348946144002050/619437014001123338/713323104574898186
   ],
   'links': [ // tests will test links, http://links, https://links
     'google.me',

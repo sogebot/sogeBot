@@ -182,7 +182,9 @@ class Moderation extends System {
     if (permId) {
       const cLinksIncludeClips = (await this.getPermissionBasedSettingsValue('cLinksIncludeClips'))[permId];
       if (!cLinksIncludeClips) {
-        clipsRegex = /.*(clips.twitch.tv\/)(\w+)/;
+        clipsRegex = /.*(clips.twitch.tv\/)(\w+)/g;
+        text = text.replace(clipsRegex, '');
+        clipsRegex = /.*(www.twitch.tv\/\w+\/clip\/)(\w+)/g;
         text = text.replace(clipsRegex, '');
       }
     }
