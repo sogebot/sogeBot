@@ -368,7 +368,7 @@ class Socket extends Core {
       await getRepository(SocketEntity).save(auth);
       sendAuthorized(auth);
 
-      cb({ accessToken: auth.accessToken, refreshToken: auth.refreshToken });
+      cb({ accessToken: auth.accessToken, refreshToken: auth.refreshToken, userType: auth.type });
     });
 
     for (const endpoint of endpoints.filter(o => o.type === 'public' && o.nsp === socket.nsp.name)) {

@@ -61,6 +61,7 @@ export const isUserLoggedIn = async function (mustBeLogged = true, mustBeAdmin =
               console.groupEnd();
               localStorage.setItem('accessToken', tokens.accessToken);
               localStorage.setItem('refreshToken', tokens.refreshToken);
+              localStorage.setItem('userType', tokens.userType);
               resolve();
             });
           }, 2000);

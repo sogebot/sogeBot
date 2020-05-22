@@ -65,21 +65,22 @@ export const redirectLogin = () => {
 
 export async function waitForAuthorizationSocket(namespace: string) {
   return new Promise((resolve: (value?: string) => void, reject) => {
-    if (!sockets.has(namespace)) {
-      const socket = io(namespace, { forceNew: true });
-      sockets.set(namespace, socket);
-      socket.on('authorize', (cb) => authorize(cb, namespace));
-      socket.on('refreshToken', refreshToken);
-      socket.on('authorized', (cb: Readonly<SocketInterface>) => authorized(cb, namespace, resolve));
-      socket.on('unauthorized', () => {
-        // remove accessToken and refreshToken
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.setItem('userType', 'unauthorized');
-        authorizeInProgress = false;
-        resolve('unauthorized');
-      });
+    if (sockets.has(namespace)) {
+      sockets.delete(namespace); // we need new socket for authorization
     }
+    const socket = io(namespace, { forceNew: true });
+    sockets.set(namespace, socket);
+    socket.on('authorize', (cb) => authorize(cb, namespace));
+    socket.on('refreshToken', refreshToken);
+    socket.on('authorized', (cb: Readonly<SocketInterface>) => authorized(cb, namespace, resolve));
+    socket.on('unauthorized', () => {
+      // remove accessToken and refreshToken
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.setItem('userType', 'unauthorized');
+      authorizeInProgress = false;
+      resolve('unauthorized');
+    });
   });
 };
 
