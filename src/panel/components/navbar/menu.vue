@@ -50,6 +50,7 @@ export default class Menu extends Vue {
           })) {
             this.menu.push(item);
           }
+          resolve(true);
         });
       }),
       new Promise(resolve => {
