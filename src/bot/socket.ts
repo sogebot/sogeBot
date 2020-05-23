@@ -82,9 +82,9 @@ const initEndpoints = async(socket, privileges: Unpacked<ReturnType<typeof getPr
   for (const key of [...new Set(endpoints.filter(o => o.nsp === socket.nsp.name).map(o => o.nsp + '||' + o.on))]) {
     const [nsp, on] = key.split('||');
     const endpointsToInit = endpoints.filter(o => o.nsp === nsp && o.on === on);
+    socket.removeAllListeners(on); // remove all listeners in case we call this twice
 
     socket.on(on, async (...args) => {
-      socket.removeAllListeners(on); // remove all listeners in case we call this twice
       const adminEndpoint = endpointsToInit.find(o => o.type === 'admin');
       const viewerEndpoint = endpointsToInit.find(o => o.type === 'viewer');
       const publicEndpoint = endpointsToInit.find(o => o.type === 'public');
