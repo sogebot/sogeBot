@@ -47,9 +47,12 @@ export function getSocket(namespace: string, continueOnUnauthorized = false) {
         }).catch(() => {
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
+          localStorage.removeItem('code');
+          localStorage.removeItem('clientId');
           localStorage.setItem('userType', 'unauthorized');
-          if (!continueOnUnauthorized) {
-            console.debug(window.location.href);
+          if (continueOnUnauthorized) {
+            location.reload();
+          } else {
             redirectLogin();
           }
         });
