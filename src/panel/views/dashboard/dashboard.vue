@@ -121,29 +121,34 @@ export default {
       socket: getSocket('/')
     }
   },
-  mounted() {
-    this.isLoaded = false;
-
-    let interval = setInterval(() => {
-      this.socket = getSocket('/');
-      console.debug('dashboard::panel::dashboards')
-      this.socket.emit('panel::dashboards', Number(this.$loggedUser.id), 'admin', (err, dashboards) => {
-        clearInterval(interval);
-        console.groupCollapsed('dashboard::panel::dashboards');
-        console.log({err, dashboards});
-        console.groupEnd();
-        if (err) {
-          return console.error(err);
-        }
-        this.mainDashboard = dashboards[0].id
-        this.currentDashboard = dashboards[0].id;
-        for (const item of dashboards) {
-          this.dashboards.push(item);
-        }
-        this.refreshWidgets();
-        this.isLoaded = true;
-      });
-    }, 1000);
+  async mounted() {
+    this.isLoaded = await Promise.race([
+      new Promise(resolve => {
+        this.socket.emit('panel::dashboards', Number(this.$loggedUser.id), 'admin', (err, dashboards) => {
+          clearInterval(interval);
+          console.groupCollapsed('dashboard::panel::dashboards');
+          console.log({err, dashboards});
+          console.groupEnd();
+          if (err) {
+            return console.error(err);
+          }
+          this.mainDashboard = dashboards[0].id
+          this.currentDashboard = dashboards[0].id;
+          for (const item of dashboards) {
+            this.dashboards.push(item);
+          }
+          this.refreshWidgets();
+          resolve(true);
+        });
+      }),
+      new Promise(resolve => {
+        setTimeout(() => resolve(false), 4000);
+      }),
+    ]);
+    if (!this.isLoaded) {
+      console.error('panel::dashboards not loaded, refreshing page')
+      location.reload();
+    }
 
     EventBus.$on('remove-widget', (id) => {
       this.removeWidget(id);
