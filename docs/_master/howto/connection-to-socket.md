@@ -11,19 +11,5 @@ import io from 'socket.io-client';
 const namespace = "/"
 const token = '<your-socket-token-here>';
 
-const socket = io(namespace, { forceNew: true });
-
-// send correct token
-socket.on('authorize', (cb) => {
-  cb({token, type: 'socket'});
-});
-
-socket.on('authorized', (cb) => {
-  console.debug('AUTHORIZED ACCESS: ' + namespace);
-});
-
-socket.on('unauthorized', (cb) => {
-  console.debug('UNAUTHORIZED ACCESS: ' + namespace);
-});
-
+const socket = io(namespace, { forceNew: true, query: { token } });
 ```
