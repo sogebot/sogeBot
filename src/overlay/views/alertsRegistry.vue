@@ -245,7 +245,7 @@ export default class AlertsRegistryOverlays extends Vue {
             // eval onEnded
             this.$nextTick(() => {
               if (this.runningAlert && this.runningAlert.alert.enableAdvancedMode) {
-                eval(`${this.runningAlert.alert.advancedMode.js}; if (typeof onEnded === 'function') { onEnded() } else { console.log('no onEnded() function found');`);
+                eval(`${this.runningAlert.alert.advancedMode.js}; if (typeof onEnded === 'function') { onEnded() } else { console.log('no onEnded() function found'); }`);
               }
             })
 
@@ -433,7 +433,7 @@ export default class AlertsRegistryOverlays extends Vue {
                 // eval onStarted
                 this.$nextTick(() => {
                   if (alert.enableAdvancedMode) {
-                    eval(`${alert.advancedMode.js}; if (typeof onStarted === 'function') { onStarted() } else { console.log('no onStarted() function found');`);
+                    eval(`${alert.advancedMode.js}; if (typeof onStarted === 'function') { onStarted() } else { console.log('no onStarted() function found'); }`);
                   }
                 });
               })
