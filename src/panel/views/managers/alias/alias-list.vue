@@ -30,7 +30,7 @@
     </b-alert>
     <b-card v-else no-body v-for="group of groups" v-bind:key="group">
       <b-card-header header-tag="header" class="p-1" role="tab">
-        <b-button block href="#" v-b-toggle="'alias-accordion-' + group" variant="dark" class="text-left">
+        <b-button block v-b-toggle="'alias-accordion-' + group" variant="dark" class="text-left">
           {{group === null ? 'Unnassigned group' : group }} ({{ fItems.filter(o => o.group === group).length }})
         </b-button>
       </b-card-header>
