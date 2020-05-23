@@ -59,15 +59,18 @@ export function getSocket(namespace: string, continueOnUnauthorized = false) {
     }
   });
   socket.on('forceDisconnect', () => {
-    console.debug('Forced disconnection from bot socket.');
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('code');
-    localStorage.removeItem('clientId');
-    localStorage.setItem('userType', 'unauthorized');
-    if (!continueOnUnauthorized) {
-      console.debug(window.location.href);
-      redirectLogin();
+    if (localStorage.getItem('userType') === 'viewer' || localStorage.getItem('userType') === 'admin') {
+      console.debug('Forced disconnection from bot socket.');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('code');
+      localStorage.removeItem('clientId');
+      localStorage.setItem('userType', 'unauthorized');
+      if (continueOnUnauthorized) {
+        location.reload();
+      } else {
+        redirectLogin();
+      }
     }
   });
   return socket;
