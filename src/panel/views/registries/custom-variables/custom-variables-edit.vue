@@ -386,7 +386,10 @@ export default class customVariablesEdit extends Vue {
     this.state.loaded = false;
     await Promise.all([
       new Promise(resolve => {
-        this.psocket.emit('permissions', (data) => {
+        this.psocket.emit('permissions', (err, data) => {
+  if(err) {
+    return console.error(err);
+  }
           this.permissions = orderBy(data, 'order', 'asc')
 
           if (!this.$route.params.id) {
@@ -399,7 +402,10 @@ export default class customVariablesEdit extends Vue {
       }),
       new Promise(resolve => {
         if (this.$route.params.id) {
-          this.socket.emit('load', this.$route.params.id, (data) => {
+          this.socket.emit('generic::getOne', this.$route.params.id, (err, data) => {
+            if (err) {
+              return console.error(err);
+            }
             this.variableName = data.variableName;
             this.description = data.description;
             this.currentValue = data.currentValue;
@@ -546,7 +552,7 @@ export default class customVariablesEdit extends Vue {
 
   async remove () {
     await new Promise(resolve => {
-      this.socket.emit('delete', this.$route.params.id, () => {
+      this.socket.emit('customvariables::delete', this.$route.params.id, () => {
         resolve();
       })
     })

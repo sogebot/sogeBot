@@ -57,9 +57,13 @@ class CustomVariables extends Widget {
             readOnlyBypass: true,
           });
         }
-        cb(null);
+        if (cb) {
+          cb(null);
+        }
       } catch (e) {
-        cb(e.stack);
+        if (cb) {
+          cb(e.stack);
+        }
       }
     });
   }

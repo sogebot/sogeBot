@@ -579,7 +579,7 @@ class Events extends Core {
   }
 
   public sockets() {
-    adminEndpoint(this.nsp, 'events::getAll', async (cb) => {
+    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         cb(null, await getRepository(Event).find({
           relations: ['operations'],
@@ -588,11 +588,11 @@ class Events extends Core {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'events::getOne', async (eventId: string, cb) => {
+    adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
       try {
         const event = await getRepository(Event).findOne({
           relations: ['operations'],
-          where: { id: eventId },
+          where: { id },
         });
         cb(null, event);
       } catch (e) {
@@ -693,7 +693,7 @@ class Events extends Core {
       }
     });
 
-    adminEndpoint(this.nsp, 'events::save', async (event: EventInterface, cb) => {
+    adminEndpoint(this.nsp, 'events::save', async (event, cb) => {
       try {
         cb(null, await getRepository(Event).save({...event, operations: event.operations.filter(o => o.name !== 'do-nothing')}));
       } catch (e) {
@@ -701,7 +701,7 @@ class Events extends Core {
       }
     });
 
-    adminEndpoint(this.nsp, 'events::remove', async (event: Required<EventInterface>, cb) => {
+    adminEndpoint(this.nsp, 'events::remove', async (event, cb) => {
       await getRepository(Event).remove(event);
       cb(null);
     });

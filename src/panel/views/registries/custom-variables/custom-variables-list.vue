@@ -137,7 +137,10 @@ export default class customVariablesList extends Vue {
     // _.throttle), visit: https://lodash.com/docs#debounce
     this.debouncedRunScript = debounce(this.runScript, 1000)
 
-    this.psocket.emit('permissions', (data) => {
+    this.psocket.emit('permissions', (err, data) => {
+  if(err) {
+    return console.error(err);
+  }
       this.permissions = orderBy(data, 'order', 'asc')
     })
   }

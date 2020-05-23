@@ -117,7 +117,7 @@ export default class cooldownList extends Vue {
 
   created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('cooldown::getAll', (err, items) => {
+    this.socket.emit('generic::getAll', (err, items) => {
       if (err) {
         return console.error(err);
       }
@@ -133,7 +133,7 @@ export default class cooldownList extends Vue {
   }
 
   remove(id) {
-   this.socket.emit('cooldown::deleteById', id, () => {
+   this.socket.emit('generic::deleteById', id, () => {
       this.items = this.items.filter((o) => o.id !== id)
     })
   }

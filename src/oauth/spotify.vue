@@ -15,7 +15,7 @@ export default {
     let state: Ref<boolean | null> = ref(true);
 
     if(window.location.hash || window.location.search) {
-      socket.emit('state', (err, state) => {
+      socket.emit('spotify::skip', (err, state) => {
         let urlState = '';
         let urlCode = '';
         for (let url of window.location.search.split('&')) {

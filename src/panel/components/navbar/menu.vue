@@ -41,7 +41,10 @@ export default class Menu extends Vue {
 
     const isLoaded = await Promise.race([
       new Promise(resolve => {
-        this.socket.emit('menu', (menu) => {
+        this.socket.emit('menu', (err, menu) => {
+          if (err) {
+            return console.error(err);
+          }
           console.groupCollapsed('menu::menu');
           console.log({menu});
           console.groupEnd();

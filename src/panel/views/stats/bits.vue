@@ -142,7 +142,7 @@
       },
     },
     mounted() {
-      this.socket.emit('bits::getAll', (err, val: Required<UserBitInterface>[]) => {
+      this.socket.emit('generic::getAll', (err, val: Required<UserBitInterface>[]) => {
         if (err) {
           return console.error(err);
         }

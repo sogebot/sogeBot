@@ -27,7 +27,10 @@ export default class ClipsOverlay extends Vue {
     this.socket.emit('getEvents', {
       ignore: this.urlParam('ignore') || '',
       limit: Number(this.urlParam('count') || 5)
-    }, (data) => {
+    }, (err, data) => {
+      if (err) {
+        return console.error(err);
+      }
       var order = (this.urlParam('order') as "desc" | "asc") || 'desc'
       var display: string | string[] = this.urlParam('display') || 'username,event'; display = display.split(',')
 

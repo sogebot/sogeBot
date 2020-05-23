@@ -5,18 +5,18 @@ export interface ModerationWarningInterface {
   id?: number;
   userId: number;
   timestamp?: number;
-};
+}
 
 export interface ModerationPermitInterface {
   id?: number;
   userId: number;
-};
+}
 
 export interface ModerationMessageCooldownInterface {
   id?: number;
   name: string;
   timestamp: number;
-};
+}
 
 export const ModerationWarning = new EntitySchema<Readonly<Required<ModerationWarningInterface>>>({
   name: 'moderation_warning',

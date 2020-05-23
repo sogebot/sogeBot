@@ -50,7 +50,7 @@ function getNameAndTypeFromStackTrace() {
 export function ui(opts, category?: string) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
-  return (target: object, key: string) => {
+  return (target: any, key: string) => {
     let path = category ? `${category}.${key}` : key;
 
     const register = async (retries = 0) => {
@@ -87,7 +87,7 @@ export function ui(opts, category?: string) {
 export function settings(category?: string, isReadOnly = false) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
-  return (target: object, key: string) => {
+  return (target: any, key: string) => {
     if (!isReadOnly) {
       loadingInProgress.push(`${type}.${name}.${key}`);
     }
@@ -139,7 +139,7 @@ export function settings(category?: string, isReadOnly = false) {
 export function permission_settings(category?: string) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
-  return (target: object, key: string) => {
+  return (target: any, key: string) => {
     loadingInProgress.push(`${type}.${name}.${key}`);
 
     const register = async () => {
@@ -188,7 +188,7 @@ export function permission_settings(category?: string) {
 export function shared(db = false) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
-  return (target: object, key: string) => {
+  return (target: any, key: string) => {
     if (db) {
       loadingInProgress.push(`${type}.${name}.${key}`);
     }
@@ -234,7 +234,7 @@ export function parser(opts?: {
   opts = opts || {};
   const { name, type } = getNameAndTypeFromStackTrace();
 
-  return (target: object, key: string, descriptor: PropertyDescriptor) => {
+  return (target: any, key: string, descriptor: PropertyDescriptor) => {
     registerParser(opts, { type, name, fnc: key });
     return descriptor;
   };
@@ -243,7 +243,7 @@ export function parser(opts?: {
 export function command(opts: string) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
-  return (target: object, key: string, descriptor: PropertyDescriptor) => {
+  return (target: any, key: string, descriptor: PropertyDescriptor) => {
     commandsToRegister.push({ opts, m: { type, name, fnc: key } });
     return descriptor;
   };
@@ -251,7 +251,7 @@ export function command(opts: string) {
 
 export function default_permission(uuid: string | null) {
   const { name, type } = getNameAndTypeFromStackTrace();
-  return (target: object, key: string | symbol, descriptor: PropertyDescriptor) => {
+  return (target: any, key: string | symbol, descriptor: PropertyDescriptor) => {
     permissions[`${type}.${name.toLowerCase()}.${String(key).toLowerCase()}`] = uuid;
     return descriptor;
   };
@@ -260,7 +260,7 @@ export function default_permission(uuid: string | null) {
 export function helper() {
   const { name, type } = getNameAndTypeFromStackTrace();
 
-  return (target: object, key: string | symbol, descriptor: PropertyDescriptor) => {
+  return (target: any, key: string | symbol, descriptor: PropertyDescriptor) => {
     registerHelper({ type, name, fnc: key });
     return descriptor;
   };
@@ -269,7 +269,7 @@ export function helper() {
 export function rollback() {
   const { name, type } = getNameAndTypeFromStackTrace();
 
-  return (target: object, key: string, descriptor: PropertyDescriptor) => {
+  return (target: any, key: string, descriptor: PropertyDescriptor) => {
     registerRollback({ type, name, fnc: key });
     return descriptor;
   };

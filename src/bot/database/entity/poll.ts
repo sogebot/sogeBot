@@ -10,7 +10,7 @@ export interface PollInterface {
   closedAt?: number;
   options: string[];
   votes?: PollVoteInterface[];
-};
+}
 
 export interface PollVoteInterface {
   id?: string;
@@ -18,7 +18,7 @@ export interface PollVoteInterface {
   option: number;
   votes: number;
   votedBy: string;
-};
+}
 
 export const Poll = new EntitySchema<Readonly<Required<PollInterface>>>({
   name: 'poll',

@@ -5,7 +5,7 @@ export interface KeywordInterface {
   keyword: string;
   response: string;
   enabled: boolean;
-};
+}
 
 export const Keyword = new EntitySchema<Readonly<Required<KeywordInterface>>>({
   name: 'keyword',

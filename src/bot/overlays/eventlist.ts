@@ -27,7 +27,7 @@ class EventList extends Overlay {
       const eventsByRecipient
         = (await getRepository(EventListEntity).find({event:'subgift'}))
           .filter(o => JSON.parse(o.values_json).from === username);
-      cb (_.orderBy([ ...eventsByRecipient, ...eventsByUsername ], 'timestamp', 'desc'));
+      cb(null, _.orderBy([ ...eventsByRecipient, ...eventsByUsername ], 'timestamp', 'desc'));
 
     });
     publicEndpoint(this.nsp, 'getEvents', async (opts: { ignore: string; limit: number }, cb) => {
@@ -48,7 +48,7 @@ class EventList extends Overlay {
           (o.username + (o.event === 'cheer' ? crypto.randomBytes(64).toString('hex') : o.event))
         );
       }
-      cb(events);
+      cb(null, events);
     });
   }
 

@@ -12,7 +12,7 @@ class Checklist extends System {
   itemsArray: any[] = [];
 
   sockets() {
-    adminEndpoint(this.nsp, 'checklist::getAll', async (cb) => {
+    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         const checkedItems = await getRepository(ChecklistEntity).find();
         cb(null, this.itemsArray, checkedItems);
@@ -22,7 +22,9 @@ class Checklist extends System {
     });
     adminEndpoint(this.nsp, 'checklist::save', async (checklistItem, cb) => {
       await getRepository(ChecklistEntity).save(checklistItem);
-      cb();
+      if (cb) {
+        cb(null);
+      }
     });
   }
 

@@ -130,10 +130,13 @@ export default class priceEdit extends Vue {
   async mounted() {
     if (this.$route.params.id) {
       await new Promise((resolve, reject) => {
-        this.socket.emit('price::getOne', this.$route.params.id, (data) => {
-        console.debug({price_data: data})
-        this.item = data;
-        resolve()
+        this.socket.emit('generic::getOne', this.$route.params.id, (err, data) => {
+          if (err) {
+            return console.error(err);
+          }
+          console.debug({price_data: data})
+          this.item = data;
+          resolve()
         })
       })
     }
@@ -144,7 +147,7 @@ export default class priceEdit extends Vue {
   }
 
   del() {
-    this.socket.emit('price::delete', this.$route.params.id, (err) => {
+    this.socket.emit('generic::deleteById', this.$route.params.id, (err) => {
       if (err) {
         return console.error(err);
       }

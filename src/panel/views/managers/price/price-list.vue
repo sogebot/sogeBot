@@ -93,7 +93,10 @@ export default class priceList extends Vue {
 
   refresh() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('price::getAll', (items) => {
+    this.socket.emit('generic::getAll', (err, items) => {
+      if (err) {
+        return console.error(err);
+      }
       this.items = items;
       console.debug({ items })
       this.state.loading = this.$state.success;
@@ -109,7 +112,7 @@ export default class priceList extends Vue {
   }
 
   del(id) {
-    this.socket.emit('price::delete', id, (err) => {
+    this.socket.emit('generic::deleteById', id, (err) => {
       if (err) {
         return console.error(err);
       }

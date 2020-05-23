@@ -49,7 +49,7 @@ class Queue extends System {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'queue::getAll', async(cb) => {
+    adminEndpoint(this.nsp, 'generic::getAll', async(cb) => {
       try {
         cb(
           null,
@@ -80,12 +80,18 @@ class Queue extends System {
             user = await getRepository(QueueEntity).findOne({ username: user });
             users.push(user);
           }
-          cb(null, (await this.pickUsers({ sender: getOwner(), users }, data.random)).users);
+          if (cb) {
+            cb(null, (await this.pickUsers({ sender: getOwner(), users }, data.random)).users);
+          }
         } else {
-          cb(null, (await this.pickUsers({ sender: getOwner(), parameters: String(data.count) }, data.random)).users);
+          if (cb) {
+            cb(null, (await this.pickUsers({ sender: getOwner(), parameters: String(data.count) }, data.random)).users);
+          }
         }
       } catch (e) {
-        cb(e.stack);
+        if (cb) {
+          cb(e.stack);
+        }
       }
     });
   }

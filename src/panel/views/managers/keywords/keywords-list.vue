@@ -101,7 +101,7 @@ export default class keywordsList extends Vue {
 
   refresh() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('keywords::getAll', (err, data: KeywordInterface[]) => {
+    this.socket.emit('generic::getAll', (err, data: KeywordInterface[]) => {
       if (err) {
         return console.error(err);
       }
@@ -111,7 +111,7 @@ export default class keywordsList extends Vue {
   }
 
   del(id) {
-    this.socket.emit('keywords::deleteById', id, () => {
+    this.socket.emit('generic::deleteById', id, () => {
       this.refresh();
     })
   }

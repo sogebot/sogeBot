@@ -3,7 +3,7 @@ import Registry from './_interface';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
-import { Text as TextEntity, TextInterface } from '../database/entity/text';
+import { Text as TextEntity } from '../database/entity/text';
 import customvariables from '../customvariables';
 
 class Text extends Registry {
@@ -13,7 +13,7 @@ class Text extends Registry {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'text::remove', async(item: Required<TextInterface>, cb) => {
+    adminEndpoint(this.nsp, 'text::remove', async(item, cb) => {
       try {
         await getRepository(TextEntity).remove(item);
         cb(null);
@@ -21,7 +21,7 @@ class Text extends Registry {
         cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'text::getAll', async(cb) => {
+    adminEndpoint(this.nsp, 'generic::getAll', async(cb) => {
       try {
         cb(
           null,
@@ -31,7 +31,7 @@ class Text extends Registry {
         cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'text::save', async(item: TextInterface, cb) => {
+    adminEndpoint(this.nsp, 'text::save', async(item, cb) => {
       try {
         cb(
           null,
@@ -41,13 +41,13 @@ class Text extends Registry {
         cb(e.stack, null);
       }
     });
-    publicEndpoint(this.nsp, 'text::getOne', async (id, parseText = false, callback) => {
+    publicEndpoint(this.nsp, 'generic::getOne', async (opts: { id: any; parseText: boolean }, callback) => {
       try {
-        const item = await getRepository(TextEntity).findOne({ id });
+        const item = await getRepository(TextEntity).findOne({ id: opts.id });
         let text = '';
         if (item) {
           text = item.text;
-          if (parseText) {
+          if (opts.parseText) {
             text = await new Message(await customvariables.executeVariablesInText(text)).parse();
           }
           callback(null, {...item, text});

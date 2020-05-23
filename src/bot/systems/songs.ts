@@ -102,7 +102,7 @@ class Songs extends System {
       }
 
       const [playlist, count] = await query.getManyAndCount();
-      cb(await Promise.all(playlist.map(async (pl) => {
+      cb(null, await Promise.all(playlist.map(async (pl) => {
         return {
           ...pl,
           volume: await this.getVolume(pl),
@@ -115,7 +115,9 @@ class Songs extends System {
     });
     adminEndpoint(this.nsp, 'songs::getAllBanned', async (where, cb) => {
       where = where || {};
-      cb(null, await getRepository(SongBan).find(where));
+      if (cb) {
+        cb(null, await getRepository(SongBan).find(where));
+      }
     });
     adminEndpoint(this.nsp, 'songs::removeRequest', async (id: string, cb) => {
       cb(null, await getRepository(SongRequest).delete({id}));
@@ -131,11 +133,15 @@ class Songs extends System {
     });
     adminEndpoint(this.nsp, 'delete.playlist', async (videoId, cb) => {
       await getRepository(SongPlaylist).delete({ videoId });
-      cb();
+      if (cb) {
+        cb(null);
+      }
     });
     adminEndpoint(this.nsp, 'delete.ban', async (videoId, cb) => {
       await getRepository(SongBan).delete({ videoId });
-      cb();
+      if (cb) {
+        cb(null);
+      }
     });
     adminEndpoint(this.nsp, 'stop.import', () => {
       importInProgress = false;
@@ -302,7 +308,7 @@ class Songs extends System {
               getRepository(SongPlaylist).delete({ videoId: opts.parameters }),
               getRepository(SongRequest).delete({ videoId: opts.parameters }),
             ]);
-          };
+          }
           resolve(videoInfo);
         });
       };

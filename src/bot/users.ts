@@ -162,23 +162,33 @@ class Users extends Core {
   sockets () {
     adminEndpoint(this.nsp, 'viewers::resetPointsAll', async (cb) => {
       await getRepository(User).update({}, { points: 0 });
-      cb();
+      if (cb) {
+        cb(null);
+      }
     });
     adminEndpoint(this.nsp, 'viewers::resetMessagesAll', async (cb) => {
       await getRepository(User).update({}, { messages: 0, pointsByMessageGivenAt: 0 });
-      cb();
+      if (cb) {
+        cb(null);
+      }
     });
     adminEndpoint(this.nsp, 'viewers::resetWatchedTimeAll', async (cb) => {
       await getRepository(User).update({}, { watchedTime: 0 });
-      cb();
+      if (cb) {
+        cb(null);
+      }
     });
     adminEndpoint(this.nsp, 'viewers::resetBitsAll', async (cb) => {
       await getRepository(UserBit).clear();
-      cb();
+      if (cb) {
+        cb(null);
+      }
     });
     adminEndpoint(this.nsp, 'viewers::resetTipsAll', async (cb) => {
       await getRepository(UserTip).clear();
-      cb();
+      if (cb) {
+        cb(null);
+      }
     });
     adminEndpoint(this.nsp, 'viewers::save', async (viewer: Required<UserInterface>, cb) => {
       try {
@@ -219,7 +229,7 @@ class Users extends Core {
         cb(e.stack, null);
       }
     });
-    adminEndpoint(this.nsp, 'find.viewers', async (opts: { state?: any; search?: string; filter?: { subscribers: null | boolean; followers: null | boolean; active: null | boolean; vips: null | boolean }; page: number; order?: { orderBy: string; sortOrder: 'ASC' | 'DESC' } }, cb) => {
+    adminEndpoint(this.nsp, 'find.viewers', async (opts, cb) => {
       try {
         const connection = await getConnection();
         opts.page = opts.page ?? 0;

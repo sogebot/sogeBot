@@ -57,9 +57,10 @@ class Alerts extends Registry {
       }
     });
 
-    adminEndpoint(this.nsp, 'alerts::deleteMedia', async (id: string, cb) => {
+    adminEndpoint(this.nsp, 'alerts::deleteMedia', async (id, cb) => {
       cb(
-        await getRepository(AlertMedia).delete({ id })
+        null,
+        await getRepository(AlertMedia).delete({ id: String(id) })
       );
     });
     adminEndpoint(this.nsp, 'alerts::saveMedia', async (items: AlertMediaInterface, cb) => {
@@ -72,18 +73,18 @@ class Alerts extends Registry {
         cb(e.stack, null);
       }
     });
-    adminEndpoint(this.nsp, 'alerts::getOneMedia', async (id: string, cb) => {
+    adminEndpoint(this.nsp, 'alerts::getOneMedia', async (id, cb) => {
       try {
         cb(
           null,
-          await getRepository(AlertMedia).find({ id })
+          await getRepository(AlertMedia).find({ id: String(id) })
         );
 
       } catch (e) {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'alerts::save', async (item: AlertInterface, cb) => {
+    adminEndpoint(this.nsp, 'alerts::save', async (item, cb) => {
       try {
         cb(
           null,
@@ -93,7 +94,7 @@ class Alerts extends Registry {
         cb(e.stack, null);
       }
     });
-    publicEndpoint(this.nsp, 'alerts::getOne', async (id: string, cb) => {
+    publicEndpoint(this.nsp, 'generic::getOne', async (id: string, cb) => {
       try {
         cb(
           null,
@@ -106,7 +107,7 @@ class Alerts extends Registry {
         cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'alerts::getAll', async (cb) => {
+    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         cb(
           null,
@@ -130,7 +131,9 @@ class Alerts extends Registry {
         await getRepository(AlertTip).delete({ alertId: IsNull() });
         await getRepository(AlertCheer).delete({ alertId: IsNull() });
         await getRepository(AlertResub).delete({ alertId: IsNull() });
-        cb();
+        if (cb) {
+          cb(null);
+        }
       } catch (e) {
         cb(e.stack);
       }

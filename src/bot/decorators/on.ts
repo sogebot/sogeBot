@@ -43,7 +43,7 @@ export function getFunctionList(type: keyof onEvents, path = ''): onEvent[] {
 
 export function onChange(variableArg: string) {
   const { name, type } = getNameAndTypeFromStackTrace();
-  return (target: object, fName: string) => {
+  return (target: any, fName: string) => {
     const path = type === 'core' ? name : `${type}.${name.toLowerCase()}`;
     on.change.push({ path: path + '.' + variableArg, fName });
   };
@@ -51,7 +51,7 @@ export function onChange(variableArg: string) {
 
 export function onLoad(variableArg: string) {
   const { name, type } = getNameAndTypeFromStackTrace();
-  return (target: object, fName: string) => {
+  return (target: any, fName: string) => {
     const path = type === 'core' ? name : `${type}.${name.toLowerCase()}`;
     on.load.push({ path: path + '.' + variableArg, fName });
   };
@@ -59,7 +59,7 @@ export function onLoad(variableArg: string) {
 
 export function onStartup() {
   const { name, type } = getNameAndTypeFromStackTrace();
-  return (target: object, fName: string) => {
+  return (target: any, fName: string) => {
     const path = type === 'core' ? name : `${type}.${name.toLowerCase()}`;
     on.startup.push({ path, fName });
   };
@@ -67,7 +67,7 @@ export function onStartup() {
 
 export function onMessage() {
   const { name, type } = getNameAndTypeFromStackTrace();
-  return (target: object, fName: string) => {
+  return (target: any, fName: string) => {
     const path = type === 'core' ? name : `${type}.${name.toLowerCase()}`;
     on.message.push({ path, fName });
   };
@@ -75,7 +75,7 @@ export function onMessage() {
 
 export function onStreamStart() {
   const { name, type } = getNameAndTypeFromStackTrace();
-  return (target: object, fName: string) => {
+  return (target: any, fName: string) => {
     const path = type === 'core' ? name : `${type}.${name.toLowerCase()}`;
     on.streamStart.push({ path, fName });
   };
@@ -83,7 +83,7 @@ export function onStreamStart() {
 
 export function onStreamEnd() {
   const { name, type } = getNameAndTypeFromStackTrace();
-  return (target: object, fName: string) => {
+  return (target: any, fName: string) => {
     const path = type === 'core' ? name : `${type}.${name.toLowerCase()}`;
     on.streamEnd.push({ path, fName });
   };
@@ -91,7 +91,7 @@ export function onStreamEnd() {
 
 export function onJoinChannel() {
   const { name, type } = getNameAndTypeFromStackTrace();
-  return (target: object, fName: string) => {
+  return (target: any, fName: string) => {
     const path = type === 'core' ? name : `${type}.${name.toLowerCase()}`;
     on.joinChannel.push({ path, fName });
   };
@@ -99,7 +99,7 @@ export function onJoinChannel() {
 
 export function onReconnectChannel() {
   const { name, type } = getNameAndTypeFromStackTrace();
-  return (target: object, fName: string) => {
+  return (target: any, fName: string) => {
     const path = type === 'core' ? name : `${type}.${name.toLowerCase()}`;
     on.reconnectChannel.push({ path, fName });
   };
@@ -107,7 +107,7 @@ export function onReconnectChannel() {
 
 export function onPartChannel() {
   const { name, type } = getNameAndTypeFromStackTrace();
-  return (target: object, fName: string) => {
+  return (target: any, fName: string) => {
     const path = type === 'core' ? name : `${type}.${name.toLowerCase()}`;
     on.partChannel.push({ path, fName });
   };
@@ -115,7 +115,7 @@ export function onPartChannel() {
 
 export function onTip() {
   const { name, type } = getNameAndTypeFromStackTrace();
-  return (target: object, fName: string) => {
+  return (target: any, fName: string) => {
     const path = type === 'core' ? name : `${type}.${name.toLowerCase()}`;
     on.tip.push({ path, fName });
   };
@@ -123,7 +123,7 @@ export function onTip() {
 
 export function onFollow() {
   const { name, type } = getNameAndTypeFromStackTrace();
-  return (target: object, fName: string) => {
+  return (target: any, fName: string) => {
     const path = type === 'core' ? name : `${type}.${name.toLowerCase()}`;
     on.follow.push({ path, fName });
   };
@@ -131,7 +131,7 @@ export function onFollow() {
 
 export function onSub() {
   const { name, type } = getNameAndTypeFromStackTrace();
-  return (target: object, fName: string) => {
+  return (target: any, fName: string) => {
     const path = type === 'core' ? name : `${type}.${name.toLowerCase()}`;
     on.sub.push({ path, fName });
   };
@@ -139,7 +139,7 @@ export function onSub() {
 
 export function onBit() {
   const { name, type } = getNameAndTypeFromStackTrace();
-  return (target: object, fName: string) => {
+  return (target: any, fName: string) => {
     const path = type === 'core' ? name : `${type}.${name.toLowerCase()}`;
     on.bit.push({ path, fName });
   };

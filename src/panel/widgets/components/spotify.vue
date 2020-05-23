@@ -95,15 +95,15 @@ export default {
   methods: {
     next(index) {
       this.requests.splice(index, 1);
-      this.socket.emit('skip', () => {});
+      this.socket.emit('spotify::skip', () => {});
     },
     cleanupSongRequestList() {
       this.requests = [];
-      this.socket.emit('set.value', 'uris', this.requests)
+      this.socket.emit('set.value', { variable: 'uris', value: this.requests }, () => {})
     },
     removeSongRequest(index) {
       this.requests.splice(index, 1)
-      this.socket.emit('set.value', 'uris', this.requests)
+      this.socket.emit('set.value', { variable: 'uris', value: this.requests }, () => {})
     },
     fetchCurrentSong() {
       this.socket.emit('get.value', 'currentSong', (err, v) => {

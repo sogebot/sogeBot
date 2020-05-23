@@ -53,7 +53,7 @@ class Gallery extends Overlay {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'gallery::getAll', async (cb) => {
+    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         const items = await getRepository(GalleryEntity).find({
           select: ['id', 'name', 'type'],
@@ -63,9 +63,9 @@ class Gallery extends Overlay {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'gallery::delete', async (id: string, cb) => {
+    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
       try {
-        await getRepository(GalleryEntity).delete({ id });
+        await getRepository(GalleryEntity).delete({ id: String(id) });
         cb(null);
       } catch (e) {
         cb(e.stack);
@@ -81,9 +81,13 @@ class Gallery extends Overlay {
         }
         const type = matches[1];
         const item = await getRepository(GalleryEntity).save({ id: uuid(), type, data: filedata, name: filename });
-        cb(null, { type, id: item.id, name: filename });
+        if (cb) {
+          cb(null, { type, id: item.id, name: filename });
+        }
       } catch (e) {
-        cb(e.stack);
+        if (cb) {
+          cb(e.stack);
+        }
       }
     });
   }

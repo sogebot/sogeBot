@@ -207,7 +207,7 @@ export default class timerssEdit extends Vue {
   async mounted() {
     if (this.$route.params.id) {
       await new Promise((resolve, reject) => {
-        this.socket.emit('timers::getOne', this.$route.params.id, (err, data) => {
+        this.socket.emit('generic::getOne', this.$route.params.id, (err, data) => {
         if (err) {
           reject(err)
         }
@@ -223,7 +223,7 @@ export default class timerssEdit extends Vue {
   }
 
   del() {
-    this.socket.emit('timers::Remove', this.$route.params.id, (err) => {
+    this.socket.emit('generic::deleteById', this.$route.params.id, (err) => {
       if (err) {
         return console.error(err);
       }

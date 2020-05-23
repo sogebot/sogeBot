@@ -140,7 +140,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
           });
         }
       });
-    };
+    }
 
     if (!isMainThread) {
       parentPort?.postMessage({ modStatus, partedUsers, joinedUsers });
@@ -169,7 +169,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
       debug('microservice', 'getChannelChattersUnofficialAPI::kill');
       process.exit(0);
     }
-  };
+  }
 };
 
 if (!isMainThread) {

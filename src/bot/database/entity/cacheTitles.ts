@@ -6,7 +6,7 @@ export interface CacheTitlesInterface {
   game: string;
   title: string;
   timestamp: number;
-};
+}
 
 export const CacheTitles = new EntitySchema<Readonly<Required<CacheTitlesInterface>>>({
   name: 'cache_titles',

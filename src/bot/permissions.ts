@@ -39,36 +39,45 @@ class Permissions extends Core {
     adminEndpoint(this.nsp, 'permission::insert', async (data: Required<PermissionsInterface>, cb) => {
       cleanViewersCache();
       await getRepository(PermissionsEntity).insert(data);
-      cb();
+      if (cb) {
+        cb(null);
+      }
     });
-    adminEndpoint(this.nsp, 'permission::update::order', async (id: string, order: number, cb) => {
+    adminEndpoint(this.nsp, 'permission::update::order', async (opts, cb) => {
       cleanViewersCache();
-      await getRepository(PermissionsEntity).update({ id }, { order });
-      cb();
+      await getRepository(PermissionsEntity).update({ id: opts.id }, { order: opts.order });
+      if (cb) {
+        cb(null);
+      }
     });
     adminEndpoint(this.nsp, 'permission::save', async (data: Required<PermissionsInterface>, cb) => {
       cleanViewersCache();
       await getRepository(PermissionsEntity).save(data);
-      cb();
+      if (cb) {
+        cb(null);
+      }
     });
-    adminEndpoint(this.nsp, 'permission::delete', async (id: string, cb) => {
+    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
       cleanViewersCache();
-      await getRepository(PermissionsEntity).delete({ id });
-      cb();
+      await getRepository(PermissionsEntity).delete({ id: String(id) });
+      if (cb) {
+        cb(null);
+      }
     });
     adminEndpoint(this.nsp, 'permissions', async (cb) => {
       cleanViewersCache();
-      cb(await getRepository(PermissionsEntity).find({
-        relations: ['filters'],
-        order: {
-          order: 'ASC',
-        },
-      }));
+      cb(null,
+        await getRepository(PermissionsEntity).find({
+          relations: ['filters'],
+          order: {
+            order: 'ASC',
+          },
+        }));
     });
-    adminEndpoint(this.nsp, 'permission', async (id, cb) => {
-      cb(await getRepository(PermissionsEntity).findOne({id}, { relations: ['filters'] }));
+    adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
+      cb(null, await getRepository(PermissionsEntity).findOne({id: String(id)}, { relations: ['filters'] }));
     });
-    adminEndpoint(this.nsp, 'permissions.order', async (data, cb) => {
+    adminEndpoint(this.nsp, 'permission::order', async (data, cb) => {
       cleanViewersCache();
       for (const d of data) {
         await getRepository(PermissionsEntity)
@@ -76,25 +85,29 @@ class Permissions extends Core {
           .where('id=:id', {id: d.id}).set({ order: d.order })
           .execute();
       }
-      cb();
+      if (cb) {
+        cb(null);
+      }
     });
     adminEndpoint(this.nsp, 'test.user', async (opts, cb) => {
-      const userByName = await getRepository(User).findOne({ username: opts.value });
-      if (userByName) {
-        const status = await this.check(userByName.userId, opts.pid);
-        const partial = await this.check(userByName.userId, opts.pid, true);
-        cb({
-          status,
-          partial,
-          state: opts.state,
-        });
-        return;
+      if (typeof opts.value === 'string') {
+        const userByName = await getRepository(User).findOne({ username: opts.value });
+        if (userByName) {
+          const status = await this.check(userByName.userId, opts.pid);
+          const partial = await this.check(userByName.userId, opts.pid, true);
+          cb(null, {
+            status,
+            partial,
+            state: opts.state,
+          });
+          return;
+        }
       } else if(isFinite(opts.value)) {
         const userById = await getRepository(User).findOne({ userId: Number(opts.value) });
         if (userById) {
           const status = await this.check(userById.userId, opts.pid);
           const partial = await this.check(userById.userId, opts.pid, true);
-          cb({
+          cb(null, {
             status,
             partial,
             state: opts.state,
@@ -102,13 +115,13 @@ class Permissions extends Core {
           return;
         }
       }
-      cb({
+      cb(null, {
         status: { access: 2 },
         partial: { access: 2 },
         state: opts.state,
       });
     });
-  };
+  }
 
   public async getCommandPermission(commandArg: string): Promise<string | null | undefined> {
     const cItem = await getRepository(PermissionCommands).findOne({ name: commandArg });

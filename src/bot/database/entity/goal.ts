@@ -15,7 +15,7 @@ export interface GoalGroupInterface {
     type: 'multi';
     spaceBetweenGoalsInPx: number;
   };
-};
+}
 
 export interface GoalInterface {
   id?: string;

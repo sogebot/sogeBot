@@ -7,7 +7,7 @@ export interface DiscordLinkInterface {
   discordId: string;
   createdAt: number;
   userId: null | number;
-};
+}
 
 export const DiscordLink = new EntitySchema<Readonly<Required<DiscordLinkInterface>>>({
   name: 'discord_link',

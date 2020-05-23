@@ -166,15 +166,18 @@ export default class aliasEdit extends Vue {
 
   async mounted() {
     await new Promise((resolve) => {
-      this.psocket.emit('permissions', (data) => {
-      this.permissions = orderBy(data, 'order', 'asc');
-      resolve()
+      this.psocket.emit('permissions', (err, data) => {
+        if(err) {
+          return console.error(err);
+        }
+        this.permissions = orderBy(data, 'order', 'asc');
+        resolve()
       })
     })
 
     if (this.$route.params.id) {
       await new Promise((resolve, reject) => {
-        this.socket.emit('getById', this.$route.params.id, (err, data: AliasInterface) => {
+        this.socket.emit('generic::getOne', this.$route.params.id, (err, data: AliasInterface) => {
           if (err) {
             reject(err)
           }
@@ -191,7 +194,7 @@ export default class aliasEdit extends Vue {
   }
 
   del() {
-    this.socket.emit('deleteById', this.$route.params.id, (err) => {
+    this.socket.emit('generic::deleteById', this.$route.params.id, (err) => {
       if (err) {
         return console.error(err);
       }
@@ -221,13 +224,13 @@ export default class aliasEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
 
-      this.socket.emit('setById', this.$route.params.id, this.item, (err, data) => {
+      this.socket.emit('generic::setById', { id: this.$route.params.id, item: this.item }, (err, data) => {
         if (err) {
           this.state.save = this.$state.fail;
           return console.error(err);
         }
 
-        console.groupCollapsed('alias::setById')
+        console.groupCollapsed('generic::setById')
         console.log({data})
         console.groupEnd();
         this.state.save = this.$state.success;

@@ -5,7 +5,7 @@ export interface CacheEmotesInterface {
   code: string;
   type: 'twitch' | 'ffz' | 'bttv';
   urls: { '1': string; '2': string; '3': string };
-};
+}
 
 export const CacheEmotes = new EntitySchema<Readonly<Required<CacheEmotesInterface>>>({
   name: 'cache_emotes',

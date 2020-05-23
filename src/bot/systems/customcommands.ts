@@ -46,10 +46,10 @@ class CustomCommands extends System {
       await resetCountOfCommandUsage(cmd);
       cb(null);
     });
-    adminEndpoint(this.nsp, 'commands::setById', async (id, dataset: CommandsInterface, cb: Function | SocketIOClient.Socket) => {
+    adminEndpoint(this.nsp, 'generic::setById', async (opts, cb) => {
       try {
-        const item = await getRepository(Commands).findOne({ id });
-        await getRepository(Commands).save({ ...item, ...dataset});
+        const item = await getRepository(Commands).findOne({ id: String(opts.id) });
+        await getRepository(Commands).save({ ...item, ...opts.item});
         if (typeof cb === 'function') {
           cb(null, item);
         }
@@ -59,11 +59,13 @@ class CustomCommands extends System {
         }
       }
     });
-    adminEndpoint(this.nsp, 'commands::deleteById', async (id, cb) => {
-      await getRepository(Commands).delete({ id });
-      cb();
+    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
+      await getRepository(Commands).delete({ id: String(id) });
+      if (cb) {
+        cb(null);
+      }
     });
-    adminEndpoint(this.nsp, 'commands::getAll', async (cb) => {
+    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         const commands = await getRepository(Commands).find({
           relations: ['responses'],
@@ -77,7 +79,7 @@ class CustomCommands extends System {
         cb(e.stack, [], null);
       }
     });
-    adminEndpoint(this.nsp, 'commands::getById', async (id, cb) => {
+    adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
       try {
         const cmd = await getRepository(Commands).findOne({
           where: { id },

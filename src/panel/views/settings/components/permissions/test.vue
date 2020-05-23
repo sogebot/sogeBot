@@ -100,7 +100,10 @@
         if (val.trim().length === 0) {
            this.isTesting = false;
         } else {
-          this.socket.emit('test.user', { pid: this.$route.params.id, value: val, state }, (r) => {
+          this.socket.emit('test.user', { pid: this.$route.params.id, value: val, state }, (err, r) => {
+            if (err) {
+              return console.error(err);
+            }
             if (r.state === this.state) {
               // expecting this data
               this.status = r.status;

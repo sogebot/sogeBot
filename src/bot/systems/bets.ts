@@ -66,7 +66,7 @@ class Bets extends System {
       }
     });
 
-    adminEndpoint(this.nsp, 'close', async (option) => {
+    adminEndpoint(this.nsp, 'bets::close', async (option) => {
       const message = '!bet ' + (option === 'refund' ? option : 'close ' + option);
       tmi.message({
         message: {

@@ -209,11 +209,14 @@ export default class aliasList extends Vue {
   created() {
     this.state.loadingAls = this.$state.progress;
     this.state.loadingPrm = this.$state.progress;
-    this.psocket.emit('permissions', (data) => {
+    this.psocket.emit('permissions', (err, data) => {
+  if(err) {
+    return console.error(err);
+  }
       this.permissions = data;
       this.state.loadingPrm = this.$state.success;
     })
-    this.socket.emit('alias:getAll', (err, items) => {
+    this.socket.emit('generic::getAll', (err, items) => {
       this.items = orderBy(items, 'alias', 'asc');
       this.state.loadingAls = this.$state.success;
     })
@@ -238,14 +241,14 @@ export default class aliasList extends Vue {
   updateGroup (id, group) {
     let item = this.items.filter((o) => o.id === id)[0]
     item.group = group
-    this.socket.emit('setById', item.id, item, () => {})
+    this.socket.emit('generic::setById', { id: item.id, item }, () => {})
     this.$forceUpdate();
   }
 
   updatePermission (id, permission) {
     let item = this.items.filter((o) => o.id === id)[0]
     item.permission = permission
-    this.socket.emit('setById', item.id, item, () => {})
+    this.socket.emit('generic::setById', { id: item.id, item }, () => {})
     this.$forceUpdate();
   }
 
@@ -255,13 +258,13 @@ export default class aliasList extends Vue {
   }
 
   remove(id) {
-   this.socket.emit('deleteById', id, () => {
+   this.socket.emit('generic::deleteById', id, () => {
       this.items = this.items.filter((o) => o.id !== id)
     })
   }
 
   update(item) {
-    this.socket.emit('setById', item.id, item, () => {})
+    this.socket.emit('generic::setById', { id: { id: item.id, item } }, () => {})
   }
 }
 </script>

@@ -43,7 +43,7 @@ class Timers extends System {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'timers::getAll', async (callback) => {
+    adminEndpoint(this.nsp, 'generic::getAll', async (callback) => {
       try {
         const timers = await getRepository(Timer).find({
           relations: ['messages'],
@@ -53,7 +53,7 @@ class Timers extends System {
         callback(e, []);
       }
     });
-    adminEndpoint(this.nsp, 'timers::getOne', async (id, callback) => {
+    adminEndpoint(this.nsp, 'generic::getOne', async (id, callback) => {
       try {
         const timer = await getRepository(Timer).findOne({
           relations: ['messages'],
@@ -66,7 +66,7 @@ class Timers extends System {
         callback(e);
       }
     });
-    adminEndpoint(this.nsp, 'timers::remove', async (id, callback) => {
+    adminEndpoint(this.nsp, 'generic::deleteById', async (id, callback) => {
       try {
         const timer = await getRepository(Timer).findOne({
           where: {
@@ -83,8 +83,7 @@ class Timers extends System {
     });
     adminEndpoint(this.nsp, 'timers::save', async (data, callback) => {
       try {
-        data = await getRepository(Timer).save(data);
-        callback(null, data);
+        callback(null, await getRepository(Timer).save(data));
       } catch (e) {
         callback(e);
       }

@@ -40,7 +40,7 @@ class Ranks extends System {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'ranks::getAll', async (cb) => {
+    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         cb(null, await getRepository(Rank).find({
           order: {
@@ -51,7 +51,7 @@ class Ranks extends System {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'ranks::getOne', async (id, cb) => {
+    adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
       try {
         cb(null, await getRepository(Rank).findOne(id));
       } catch(e) {
@@ -60,9 +60,11 @@ class Ranks extends System {
     });
     adminEndpoint(this.nsp, 'ranks::remove', async (id, cb) => {
       await getRepository(Rank).delete(id);
-      cb();
+      if (cb) {
+        cb(null);
+      }
     });
-    adminEndpoint(this.nsp, 'ranks::save', async (item: Required<RankInterface>, cb) => {
+    adminEndpoint(this.nsp, 'ranks::save', async (item, cb) => {
       try {
         await getRepository(Rank).save(item);
         cb(null, item);

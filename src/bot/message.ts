@@ -124,7 +124,7 @@ class Message {
       this.message = this.message.replace(/\$spotifySong/g, format.replace(/\$song/g, spotifySong.song).replace(/\$artist/g, spotifySong.artist));
     } else {
       this.message = this.message.replace(/\$spotifySong/g, translate('songs.not-playing'));
-    };
+    }
 
 
     if (songs.enabled
@@ -137,7 +137,7 @@ class Message {
       this.message = this.message.replace(/\$ytSong/g, currentSong);
     } else {
       this.message = this.message.replace(/\$ytSong/g, translate('songs.not-playing'));
-    };
+    }
 
     return Entities.decode(this.message);
   }
@@ -158,7 +158,7 @@ class Message {
           });
         if (viewers.length === 0) {
           return 'unknown';
-        };
+        }
         return _.sample(viewers.map(o => o.username ));
       },
       '(random.online.follower)': async function () {
@@ -173,7 +173,7 @@ class Message {
         });
         if (followers.length === 0) {
           return 'unknown';
-        };
+        }
         return _.sample(followers.map(o => o.username ));
       },
       '(random.online.subscriber)': async function () {
@@ -188,7 +188,7 @@ class Message {
         });
         if (subscribers.length === 0) {
           return 'unknown';
-        };
+        }
         return _.sample(subscribers.map(o => o.username ));
       },
       '(random.viewer)': async function () {
@@ -201,7 +201,7 @@ class Message {
         });
         if (viewers.length === 0) {
           return 'unknown';
-        };
+        }
         return _.sample(viewers.map(o => o.username ));
       },
       '(random.follower)': async function () {
@@ -215,7 +215,7 @@ class Message {
         });
         if (followers.length === 0) {
           return 'unknown';
-        };
+        }
         return _.sample(followers.map(o => o.username ));
       },
       '(random.subscriber)': async function () {
@@ -229,7 +229,7 @@ class Message {
         });
         if (subscribers.length === 0) {
           return 'unknown';
-        };
+        }
         return _.sample(subscribers.map(o => o.username ));
       },
       '(random.number-#-to-#)': async function (filter) {
@@ -244,7 +244,7 @@ class Message {
               const param = attr.param.split(' ');
               if (_.isNil(param[lastParamUsed])) {
                 return 0;
-              };
+              }
 
               numbers[index] = param[lastParamUsed];
               lastParamUsed++;
@@ -315,13 +315,13 @@ class Message {
       '$param': async function (filter) {
         if (!_.isUndefined(attr.param) && attr.param.length !== 0) {
           return attr.param;
-        };
+        }
         return '';
       },
       '$!param': async function (filter) {
         if (!_.isUndefined(attr.param) && attr.param.length !== 0) {
           return attr.param;
-        };
+        }
         return 'n/a';
       },
     };
@@ -329,7 +329,7 @@ class Message {
       '$querystring': async function (filter) {
         if (!_.isUndefined(attr.param) && attr.param.length !== 0) {
           return querystring.escape(attr.param);
-        };
+        }
         return '';
       },
       '(url|#)': async function (filter) {
@@ -664,10 +664,10 @@ class Message {
           check = check.startsWith('>') || check.startsWith('<') || check.startsWith('=') ? false : check; // force check to false if starts with comparation
           if (_.isNil(ifTrue)) {
             return;
-          };
+          }
           if (safeEval(check)) {
             return ifTrue;
-          };
+          }
           return _.isNil(ifFalse) ? '' : ifFalse;
         } catch (e) {
           return '';
@@ -681,7 +681,7 @@ class Message {
         const token = await oauth.botAccessToken;
         if (token === '') {
           return 'n/a';
-        };
+        }
 
         try {
           let request = await axios.get(`https://api.twitch.tv/kraken/users?login=${channel}`, {
@@ -708,7 +708,7 @@ class Message {
         const token = await oauth.botAccessToken;
         if (token === '') {
           return 'n/a';
-        };
+        }
 
         try {
           let request = await axios.get(`https://api.twitch.tv/kraken/users?login=${channel}`, {
@@ -739,7 +739,7 @@ class Message {
         const token = await oauth.botAccessToken;
         if (token === '') {
           return '0';
-        };
+        }
 
         try {
           let request = await axios.get(`https://api.twitch.tv/kraken/users?login=${channel}`, {
@@ -801,7 +801,7 @@ class Message {
   async parseMessageApi () {
     if (this.message.trim().length === 0) {
       return;
-    };
+    }
 
     const rMessage = this.message.match(/\(api\|(http\S+)\)/i);
     if (!_.isNil(rMessage) && !_.isNil(rMessage[1])) {
@@ -820,11 +820,11 @@ class Message {
           this.message = this.message.replace('(api._response)', JSON.stringify(response.data));
         } else {
           this.message = this.message.replace('(api._response)', response.data.toString().replace(/^"(.*)"/, '$1'));
-        };
+        }
       } else {
         if (_.isBuffer(response.data)) {
           response.data = JSON.parse(response.data.toString());
-        };
+        }
         for (const tag of rData) {
           let path = response.data;
           const ids = tag.replace('(api.', '').replace(')', '').split('.');
@@ -845,11 +845,11 @@ class Message {
   async parseMessageCommand (filters) {
     if (this.message.trim().length === 0) {
       return;
-    };
+    }
     for (const key in filters) {
       if (!filters.hasOwnProperty(key)) {
         continue;
-      };
+      }
 
       const fnc = filters[key];
       let regexp = _.escapeRegExp(key);
@@ -868,11 +868,11 @@ class Message {
   async parseMessageOnline (filters) {
     if (this.message.trim().length === 0) {
       return;
-    };
+    }
     for (const key in filters) {
       if (!filters.hasOwnProperty(key)) {
         continue;
-      };
+      }
 
       const fnc = filters[key];
       let regexp = _.escapeRegExp(key);
@@ -895,11 +895,11 @@ class Message {
   async parseMessageEval (filters) {
     if (this.message.trim().length === 0) {
       return;
-    };
+    }
     for (const key in filters) {
       if (!filters.hasOwnProperty(key)) {
         continue;
-      };
+      }
 
       const fnc = filters[key];
       let regexp = _.escapeRegExp(key);
@@ -912,7 +912,7 @@ class Message {
           const newString = await fnc(rMessage[bkey]);
           if (_.isUndefined(newString) || newString.length === 0) {
             this.message = '';
-          };
+          }
           this.message = this.message.replace(rMessage[bkey], newString).trim();
         }
       }
@@ -922,11 +922,11 @@ class Message {
   async parseMessageVariables (filters, removeWhenEmpty = true) {
     if (this.message.trim().length === 0) {
       return;
-    };
+    }
     for (const key in filters) {
       if (!filters.hasOwnProperty(key)) {
         continue;
-      };
+      }
 
       const fnc = filters[key];
       let regexp = _.escapeRegExp(key);
@@ -938,7 +938,7 @@ class Message {
           const newString = await fnc(rMessage[bkey]);
           if ((_.isNil(newString) || newString.length === 0) && removeWhenEmpty) {
             this.message = '';
-          };
+          }
           this.message = this.message.replace(rMessage[bkey], newString).trim();
         }
       }
@@ -948,11 +948,11 @@ class Message {
   async parseMessageEach (filters, removeWhenEmpty = true) {
     if (this.message.trim().length === 0) {
       return;
-    };
+    }
     for (const key in filters) {
       if (!filters.hasOwnProperty(key)) {
         continue;
-      };
+      }
 
       const fnc = filters[key];
       let regexp = _.escapeRegExp(key);
@@ -968,7 +968,7 @@ class Message {
           const newString = await fnc(rMessage[bkey]);
           if ((_.isNil(newString) || newString.length === 0) && removeWhenEmpty) {
             this.message = '';
-          };
+          }
           this.message = this.message.replace(rMessage[bkey], newString).trim();
         }
       }

@@ -91,7 +91,7 @@ export default class highlightsList extends Vue {
 
   created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('highlights::getAll', (err, items) => {
+    this.socket.emit('generic::getAll', (err, items) => {
       this.items = items
       this.state.loading = this.$state.success;
     })
@@ -110,7 +110,7 @@ export default class highlightsList extends Vue {
   }
 
   deleteItem(id) {
-    this.socket.emit('highlights::deleteById', id, () => {
+    this.socket.emit('generic::deleteById', id, () => {
       this.items = this.items.filter((o) => o.id !== id)
     })
   }

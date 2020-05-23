@@ -9,7 +9,7 @@ import Expects from '../expects';
 import { prepare } from '../commons';
 
 import { getRepository } from 'typeorm';
-import { HowLongToBeatGame, HowLongToBeatGameInterface } from '../database/entity/howLongToBeatGame';
+import { HowLongToBeatGame } from '../database/entity/howLongToBeatGame';
 import { adminEndpoint } from '../helpers/socket';
 import api from '../api';
 import { error, info } from '../helpers/log';
@@ -33,17 +33,16 @@ class HowLongToBeat extends System {
   }
 
   sockets() {
-    adminEndpoint(this.nsp, 'hltb::getAll', async (opts, cb) => {
+    adminEndpoint(this.nsp, 'generic::getAll', async (opts, cb) => {
       try {
         cb(null, await getRepository(HowLongToBeatGame).find({...opts}));
       } catch (e) {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'hltb::save', async (dataset: HowLongToBeatGameInterface, cb) => {
+    adminEndpoint(this.nsp, 'hltb::save', async (item, cb) => {
       try {
-        const item = await getRepository(HowLongToBeatGame).save(dataset);
-        cb(null, item);
+        cb(null, await getRepository(HowLongToBeatGame).save(item));
       } catch (e) {
         cb(e.stack);
       }

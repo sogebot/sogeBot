@@ -149,8 +149,8 @@ export default class QuotesEdit extends Vue {
   async mounted() {
     this.state.loaded = this.$state.progress;
     if (this.$route.params.id) {
-      this.socket.emit('getById', this.$route.params.id, async (err, data: QuotesInterface) => {
-        console.group('Quotes::getById')
+      this.socket.emit('generic::getOne', this.$route.params.id, async (err, data: QuotesInterface) => {
+        console.group('generic::getOne')
         console.log('Loaded', {data});
         console.groupEnd();
         for (const [ key, value ] of Object.entries(data)) {
@@ -205,7 +205,7 @@ export default class QuotesEdit extends Vue {
 
   async remove () {
     await new Promise(resolve => {
-      this.socket.emit('deleteById', this.$route.params.id, () => {
+      this.socket.emit('generic::deleteById', this.$route.params.id, () => {
         resolve();
       })
     })
@@ -217,7 +217,7 @@ export default class QuotesEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
       console.debug('Saving', this.item);
-      this.socket.emit('setById', this.$route.params.id, this.item, (err, data) => {
+      this.socket.emit('generic::setById', { id: this.$route.params.id, item: this.item }, (err, data) => {
         if (err) {
           this.state.save = this.$state.fail;
           return console.error(err);

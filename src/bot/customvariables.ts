@@ -115,7 +115,7 @@ class CustomVariables extends Core {
     });
     adminEndpoint(this.nsp, 'customvariables::runScript', async (id, cb) => {
       try {
-        const item = await getRepository(Variable).findOne({ id });
+        const item = await getRepository(Variable).findOne({ id: String(id) });
         if (!item) {
           throw new Error('Variable not found');
         }
@@ -126,7 +126,7 @@ class CustomVariables extends Core {
         }));
       } catch (e) {
         cb(e.stack, null);
-      };
+      }
     });
     adminEndpoint(this.nsp, 'customvariables::testScript', async (opts, cb) => {
       let returnedValue;
@@ -140,22 +140,24 @@ class CustomVariables extends Core {
     adminEndpoint(this.nsp, 'customvariables::isUnique', async ({ variable, id }, cb) => {
       cb(null, (await getRepository(Variable).find({ variableName: String(variable) })).filter(o => o.id !== id).length === 0);
     });
-    adminEndpoint(this.nsp, 'delete', async (id, cb) => {
-      const item = await getRepository(Variable).findOne({ id });
+    adminEndpoint(this.nsp, 'customvariables::delete', async (id, cb) => {
+      const item = await getRepository(Variable).findOne({ id: String(id) });
       if (item) {
         await getRepository(Variable).remove(item);
-        await getRepository(VariableWatch).delete({ variableId: id });
+        await getRepository(VariableWatch).delete({ variableId: String(id) });
         this.updateWidgetAndTitle();
       }
-      cb();
+      if (cb) {
+        cb(null);
+      }
     });
-    adminEndpoint(this.nsp, 'load', async (id, cb) => {
-      cb(await getRepository(Variable).findOne({
+    adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
+      cb(null, await getRepository(Variable).findOne({
         relations: ['history', 'urls'],
         where: { id },
       }));
     });
-    adminEndpoint(this.nsp, 'save', async (item: VariableInterface, cb) => {
+    adminEndpoint(this.nsp, 'customvariables::save', async (item, cb) => {
       try {
         await getRepository(Variable).save(item);
         // somehow this is not populated by save on sqlite
@@ -351,11 +353,11 @@ class CustomVariables extends Core {
   async getValueOf (variableName, opts?: any) {
     if (!variableName.startsWith('$_')) {
       variableName = `$_${variableName}`;
-    };
+    }
     const item = await getRepository(Variable).findOne({ variableName });
     if (!item) {
       return '';
-    }; // return empty if variable doesn't exist
+    } // return empty if variable doesn't exist
 
     let currentValue = item.currentValue;
     if (item.type === 'eval' && Number(item.runEvery) === 0) {
@@ -455,7 +457,7 @@ class CustomVariables extends Core {
         ...item,
         currentValue: itemCurrentValue,
       });
-    };
+    }
 
     const setValue = itemCurrentValue;
     if (isOk) {
@@ -515,7 +517,7 @@ class CustomVariables extends Core {
   async updateWidgetAndTitle (variable: string | null = null) {
     if (custom_variables.socket) {
       custom_variables.socket.emit('refresh');
-    }; // send update to widget
+    } // send update to widget
 
     if (isNil(variable)) {
       const regexp = new RegExp(`\\${variable}`, 'ig');

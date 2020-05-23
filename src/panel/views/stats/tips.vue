@@ -142,7 +142,7 @@
       },
     },
     mounted() {
-      this.socket.emit('tips::getAll', (err, val) => {
+      this.socket.emit('generic::getAll', (err, val) => {
         if (err) {
           return console.error(err);
         }

@@ -10,7 +10,7 @@ class Tips extends Stats {
   }
 
   sockets() {
-    adminEndpoint(this.nsp, 'tips::getAll', async (cb) => {
+    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         cb(null, await getRepository(UserTip).find({
           relations: ['user'],

@@ -7,7 +7,7 @@ export interface CommandsInterface {
   enabled: boolean;
   visible: boolean;
   responses?: CommandsResponsesInterface[];
-};
+}
 
 export interface CommandsResponsesInterface {
   id?: string;
@@ -17,20 +17,20 @@ export interface CommandsResponsesInterface {
   permission: string;
   filter: string;
   stopIfExecuted: boolean;
-};
+}
 
 export interface CommandsCountInterface {
   id?: number;
   command: string;
   timestamp: number;
-};
+}
 
 export interface CommandsBoardInterface {
   id?: string;
   order: number;
   text: string;
   command: string;
-};
+}
 
 export const Commands = new EntitySchema<Readonly<Required<CommandsInterface>>>({
   name: 'commands',

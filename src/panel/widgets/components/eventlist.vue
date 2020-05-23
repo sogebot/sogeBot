@@ -257,7 +257,7 @@ export default {
     },
     resendAlert(id) {
       console.log(`resendAlert => ${id}`);
-      this.socket.emit('resend', id);
+      this.socket.emit('eventlist::resend', id);
     },
     cleanup: function () {
       console.log('Cleanup => eventlist')

@@ -179,7 +179,7 @@ export default class cooldownEdit extends Vue {
   async mounted() {
     if (this.$route.params.id) {
       await new Promise((resolve, reject) => {
-        this.socket.emit('cooldown::getById', this.$route.params.id, (err, data: CooldownInterface) => {
+        this.socket.emit('generic::getOne', this.$route.params.id, (err, data: CooldownInterface) => {
           if (err) {
             this.$router.push({ name: 'cooldownsManagerList' });
             reject(err)
@@ -197,7 +197,7 @@ export default class cooldownEdit extends Vue {
   }
 
   del() {
-    this.socket.emit('cooldown::deleteById', this.$route.params.id, () => {
+    this.socket.emit('generic::deleteById', this.$route.params.id, () => {
       this.$router.push({ name: 'cooldownsManagerList' })
     })
   }

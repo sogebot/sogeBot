@@ -10,7 +10,7 @@ class Bits extends Stats {
   }
 
   sockets() {
-    adminEndpoint(this.nsp, 'bits::getAll', async (cb) => {
+    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         cb(null, await getRepository(UserBit).find({
           relations: ['user'],

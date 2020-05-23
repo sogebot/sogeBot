@@ -51,7 +51,9 @@ export const init = async () => {
         socket.on('clusteredChatOut', (message) => clusteredChatOut(message));
         socket.on('clusteredFetchAccountAge', async (userId, cb) => {
           await clusteredFetchAccountAge(userId);
-          cb(); // return when done
+          if (cb) {
+            cb(null);
+          } // return when done
         });
 
         socket.on('received:message', (cb) => {
@@ -80,7 +82,7 @@ export const init = async () => {
         clientIO.emit('received:message', await tmi.message(data, true));
       });
     }
-  };
+  }
 };
 
 export const manageMessage = async (data) => {

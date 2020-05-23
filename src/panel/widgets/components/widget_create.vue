@@ -49,7 +49,7 @@ export default {
     },
     load: function () {
       this.state = 1
-      this.socket.emit('panel::availableWidgets', Number(this.$loggedUser.id), 'admin', (err, widgets) => {
+      this.socket.emit('panel::availableWidgets', { userId: Number(this.$loggedUser.id), type: 'admin' }, (err, widgets) => {
         if (err) {
           return console.error(err);
         }

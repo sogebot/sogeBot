@@ -223,7 +223,7 @@
       },
     },
     mounted() {
-      this.socket.emit('events::getAll', (err, data: EventInterface[]) => {
+      this.socket.emit('generic::getAll', (err, data: EventInterface[]) => {
         if (err) {
           return console.error(err);
         }

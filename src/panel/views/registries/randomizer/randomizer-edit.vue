@@ -555,7 +555,7 @@ export default class randomizerEdit extends Vue {
     await Promise.all([
       new Promise(async (done) => {
         if (this.$route.params.id) {
-          this.socket.emit('randomizer::getOne', this.$route.params.id, (err, d: Required<RandomizerInterface>) => {
+          this.socket.emit('generic::getOne', this.$route.params.id, (err, d: Required<RandomizerInterface>) => {
             if (err) {
               console.error(err);
               return;
@@ -594,7 +594,10 @@ export default class randomizerEdit extends Vue {
         done();
       }),
       new Promise(async(done) => {
-        this.psocket.emit('permissions', (data) => {
+        this.psocket.emit('permissions', (err, data) => {
+  if(err) {
+    return console.error(err);
+  }
           this.permissions = data
           done();
         });

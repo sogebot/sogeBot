@@ -108,7 +108,7 @@
 
           // first we need to set last order for viewers
           await new Promise(resolve => {
-            this.socket.emit('permission::update::order', permission.VIEWERS, p.length + 1, () => {
+            this.socket.emit('permission::update::order', { id: permission.VIEWERS, order: p.length + 1 }, () => {
               resolve();
             });
           })

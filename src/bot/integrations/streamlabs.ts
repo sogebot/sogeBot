@@ -49,7 +49,7 @@ class Streamlabs extends Integration {
     setInterval(() => {
       if (this.onStartupTriggered) {
         this.restApiInterval();
-      };
+      }
     }, 30000);
   }
 

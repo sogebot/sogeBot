@@ -14,7 +14,7 @@ class SoundBoard extends Widget {
       try {
         glob('public/dist/soundboard/*.mp3', (err, files) => {
           if (err) {
-            return cb([]);
+            return cb(err.message, []);
           }
 
           const sounds: string[] = [];

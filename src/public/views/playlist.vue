@@ -63,7 +63,10 @@ export default class playlist extends Vue {
   @Watch('currentPage')
   refreshPlaylist() {
     this.state.loading.playlist = this.$state.progress;
-    this.socket.emit('find.playlist', { page: (this.currentPage - 1) }, (items, count) => {
+    this.socket.emit('find.playlist', { page: (this.currentPage - 1) }, (err, items, count) => {
+      if (err) {
+        return console.error(err);
+      }
       this.count = count;
       for (let item of items) {
         item.startTime = item.startTime ? item.startTime : 0

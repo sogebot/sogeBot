@@ -64,7 +64,7 @@ class Raffles extends System {
         cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'raffle::updateParticipant', async (participant: RaffleParticipantInterface, cb) => {
+    adminEndpoint(this.nsp, 'raffle::updateParticipant', async (participant, cb) => {
       try {
         cb(
           null,
@@ -138,7 +138,7 @@ class Raffles extends System {
         };
         winner.messages.push(message);
         await getRepository(RaffleParticipant).save(winner);
-      };
+      }
     }
     return true;
   }

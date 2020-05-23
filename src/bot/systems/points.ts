@@ -515,7 +515,7 @@ class Points extends System {
           amount: -points,
           pointsName: this.getPointsName(points),
         });
-      };
+      }
 
       return [{ response, ...opts }];
     } catch (err) {
@@ -542,7 +542,7 @@ class Points extends System {
           amount: -points,
           pointsName: this.getPointsName(points),
         });
-      };
+      }
 
       return [{ response, ...opts }];
     } catch (err) {

@@ -11,7 +11,7 @@ import System from './_interface';
 import { incrementCountOfCommandUsage } from '../helpers/commands/count';
 import { debug, error, warning } from '../helpers/log';
 
-import { Alias as AliasEntity, AliasInterface } from '../database/entity/alias';
+import { Alias as AliasEntity } from '../database/entity/alias';
 import { getRepository } from 'typeorm';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
@@ -41,7 +41,7 @@ class Alias extends System {
   }
 
   sockets() {
-    publicEndpoint(this.nsp, 'alias:getAll', async (cb) => {
+    publicEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         cb(null, await getRepository(AliasEntity).find());
       } catch (e) {
@@ -49,25 +49,25 @@ class Alias extends System {
       }
     });
 
-    adminEndpoint(this.nsp, 'getById', async (id, cb) => {
+    adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
       try {
-        cb(null, await getRepository(AliasEntity).findOne({ id }));
+        cb(null, await getRepository(AliasEntity).findOne({ id: String(id) }));
       } catch (e) {
         cb(e.stack);
       }
     });
 
-    adminEndpoint(this.nsp, 'setById', async (id, dataset: AliasInterface, cb) => {
+    adminEndpoint(this.nsp, 'generic::setById', async (opts, cb) => {
       try {
-        const item = await getRepository(AliasEntity).save({ ...(await getRepository(AliasEntity).findOne({ id })), ...dataset});
+        const item = await getRepository(AliasEntity).save({ ...(await getRepository(AliasEntity).findOne({ id: String(opts.id) })), ...opts.item});
         cb(null, item);
       } catch (e) {
         cb(e.stack, null);
       }
     });
 
-    adminEndpoint(this.nsp, 'deleteById', async (id, cb) => {
-      await getRepository(AliasEntity).delete({ id });
+    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
+      await getRepository(AliasEntity).delete({ id: String(id) });
       cb(null);
     });
   }

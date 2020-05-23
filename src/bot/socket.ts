@@ -78,45 +78,38 @@ const getPrivileges = async(type: 'admin' | 'viewer' | 'public', userId: number)
   };
 };
 
-const initEndpoints = async(socket, privileges: Unpacked<ReturnType<typeof getPrivileges>>) => {
+const initEndpoints = async(socket: SocketIO.Socket, privileges: Unpacked<ReturnType<typeof getPrivileges>>) => {
   for (const key of [...new Set(endpoints.filter(o => o.nsp === socket.nsp.name).map(o => o.nsp + '||' + o.on))]) {
     const [nsp, on] = key.split('||');
     const endpointsToInit = endpoints.filter(o => o.nsp === nsp && o.on === on);
     socket.removeAllListeners(on); // remove all listeners in case we call this twice
 
-    socket.on(on, async (...args) => {
+    socket.on(on, async (opts: any, cb: (error: Error | string | null, ...response: any) => void) => {
+      socket.removeAllListeners(on); // remove all listeners in case we call this twice
       const adminEndpoint = endpointsToInit.find(o => o.type === 'admin');
       const viewerEndpoint = endpointsToInit.find(o => o.type === 'viewer');
       const publicEndpoint = endpointsToInit.find(o => o.type === 'public');
       if (adminEndpoint && privileges.haveAdminPrivileges) {
-        adminEndpoint.callback(...args, socket);
+        adminEndpoint.callback(opts, cb, socket);
         return;
       } else if (!viewerEndpoint && !publicEndpoint) {
         debug('sockets', `User dont have admin access to ${socket.nsp.name}`);
         debug('sockets', privileges);
-        for (const arg of args) {
-          if (typeof arg === 'function') {
-            arg('User doesn\'t have access to this endpoint', null);
-          }
-        }
+        cb('User doesn\'t have access to this endpoint', null);
         return;
       }
 
       if (viewerEndpoint && privileges.haveViewerPrivileges) {
-        viewerEndpoint.callback(...args, socket);
+        viewerEndpoint.callback(opts, cb, socket);
         return;
       } else if (!publicEndpoint) {
         debug('sockets', `User dont have viewer access to ${socket.nsp.name}`);
         debug('sockets', privileges);
-        for (const arg of args) {
-          if (typeof arg === 'function') {
-            arg('User doesn\'t have access to this endpoint', null);
-          }
-        }
+        cb('User doesn\'t have access to this endpoint', null);
         return;
       }
 
-      publicEndpoint.callback(...args, socket);
+      publicEndpoint.callback(opts, cb, socket);
     });
   }
 };
@@ -235,13 +228,13 @@ class Socket extends Core {
               res.status(400).send('You don\'t have access to this server.');
             }
           });
-        };
+        }
       };
       init();
     }
   }
 
-  async authorize(socket, next) {
+  async authorize(socket: SocketIO.Socket, next) {
     // first check if token is socketToken
     if (socket.handshake.query.token === this.socketToken) {
       initEndpoints(socket, { haveAdminPrivileges: Authorized.isAuthorized, haveModPrivileges: Authorized.isAuthorized, haveViewerPrivileges: Authorized.isAuthorized });

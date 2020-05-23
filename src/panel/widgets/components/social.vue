@@ -82,7 +82,10 @@ export default Vue.extend({
   },
   methods: {
     load() {
-      this.socket.emit('social::getAll', { limit: 50 }, (d) => {
+      this.socket.emit('generic::getAll', { limit: 50 }, (err, d) => {
+        if (err) {
+          return console.error(err);
+        }
         this.items = d;
         this.state.loading = this.$state.success;
       })

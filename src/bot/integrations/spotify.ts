@@ -88,7 +88,7 @@ class Spotify extends Integration {
     type: 'btn-emit',
     class: 'btn btn-primary btn-block mt-1 mb-1',
     if: () => _spotify.username.length === 0,
-    emit: 'authorize',
+    emit: 'spotify::authorize',
   }, 'connection')
   authorizeBtn = null;
 
@@ -96,7 +96,7 @@ class Spotify extends Integration {
     type: 'btn-emit',
     class: 'btn btn-primary btn-block mt-1 mb-1',
     if: () => _spotify.username.length > 0,
-    emit: 'revoke',
+    emit: 'spotify::revoke',
   }, 'connection')
   revokeBtn = null;
 
@@ -350,14 +350,14 @@ class Spotify extends Integration {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'state', async (callback) => {
+    adminEndpoint(this.nsp, 'spotify::skip', async (callback) => {
       callback(null, this.state);
     });
-    adminEndpoint(this.nsp, 'skip', async (callback) => {
+    adminEndpoint(this.nsp, 'spotify::skip', async (callback) => {
       this.skipToNextSong = true;
       callback(null);
     });
-    adminEndpoint(this.nsp, 'code', async (token, callback) => {
+    adminEndpoint(this.nsp, 'spotify::code', async (token, callback) => {
       const waitForUsername = () => {
         return new Promise((resolve, reject) => {
           const check = async () => {
@@ -384,7 +384,7 @@ class Spotify extends Integration {
       await waitForUsername();
       callback(null, true);
     });
-    adminEndpoint(this.nsp, 'revoke', async (cb) => {
+    adminEndpoint(this.nsp, 'spotify::revoke', async (cb) => {
       clearTimeout(this.timeouts.IRefreshToken);
       try {
         if (this.client !== null) {
@@ -408,7 +408,7 @@ class Spotify extends Integration {
         this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
       }
     });
-    adminEndpoint(this.nsp, 'authorize', async (cb) => {
+    adminEndpoint(this.nsp, 'spotify::authorize', async (cb) => {
       if (
         this.clientId === ''
         || this.clientSecret === ''

@@ -3,7 +3,7 @@ import { EntitySchema } from 'typeorm';
 export interface CacheGamesInterface {
   id?: number;
   name: string;
-};
+}
 
 export const CacheGames = new EntitySchema<Readonly<Required<CacheGamesInterface>>>({
   name: 'cache_games',
