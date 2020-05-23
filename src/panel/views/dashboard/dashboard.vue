@@ -125,7 +125,6 @@ export default {
     this.isLoaded = await Promise.race([
       new Promise(resolve => {
         this.socket.emit('panel::dashboards', Number(this.$loggedUser.id), 'admin', (err, dashboards) => {
-          clearInterval(interval);
           console.groupCollapsed('dashboard::panel::dashboards');
           console.log({err, dashboards});
           console.groupEnd();
