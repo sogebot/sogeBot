@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { get } from 'lodash-es';
-import { getSocket } from './socket';
 
 export const isUserLoggedIn = async function (mustBeLogged = true, mustBeAdmin = true) {
   // check if we have auth code
@@ -52,18 +51,20 @@ export const isUserLoggedIn = async function (mustBeLogged = true, mustBeAdmin =
       const isNewAuthorization = accessToken.trim().length === 0 || refreshToken.trim().length === 0;
       if (isNewAuthorization) {
         await new Promise((resolve) => {
-          const loop = setInterval(() => {
-            getSocket('/', true).emit('newAuthorization', { userId: Number(data.id), username: data.login }, (tokens) => {
-              clearInterval(loop);
-              console.groupCollapsed('socket::newAuthorization');
-              console.debug(tokens);
-              console.groupEnd();
-              localStorage.setItem('accessToken', tokens.accessToken);
-              localStorage.setItem('refreshToken', tokens.refreshToken);
-              localStorage.setItem('userType', tokens.userType);
-              resolve();
-            });
-          }, 2000);
+          console.groupCollapsed('isUserLoggedIn::validate');
+          console.groupEnd();
+
+          axios.get(`${window.location.origin}/socket/validate`, {
+            headers: {
+              'x-twitch-token': code,
+              'x-twitch-userid': data.id,
+            },
+          }).then(validation => {
+            localStorage.setItem('accessToken', validation.data.accessToken);
+            localStorage.setItem('refreshToken', validation.data.refreshToken);
+            localStorage.setItem('userType', validation.data.userType);
+            resolve();
+          }).catch(() => resolve());
         });
       }
 
