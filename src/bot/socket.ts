@@ -1,51 +1,23 @@
 import Core from './_interface';
-import { settings, ui } from './decorators';
-import { MINUTE, SECOND } from './constants';
+import { settings, shared, ui } from './decorators';
 import { isMainThread } from './cluster';
 import { v4 as uuid } from 'uuid';
 import { permission } from './helpers/permissions';
-import { adminEndpoint, endpoints } from './helpers/socket';
+import { adminEndpoint as adminEndpointSocket, endpoints } from './helpers/socket';
 import { onLoad } from './decorators/on';
+import axios from 'axios';
+import jwt from 'jsonwebtoken';
 
-import { getRepository, LessThanOrEqual } from 'typeorm';
-import { Socket as SocketEntity, SocketInterface } from './database/entity/socket';
+import { getRepository } from 'typeorm';
 import permissions from './permissions';
-import { debug, isDebugEnabled } from './helpers/log';
-import { isDbConnected } from './helpers/database';
+import { debug } from './helpers/log';
+import { app, ioServer } from './helpers/panel';
 import { Dashboard } from './database/entity/dashboard';
 import { isModerator } from './commons';
 import { User } from './database/entity/user';
+import { DAY } from './constants';
 
 let _self: any = null;
-
-const invalidatedTokens: { [token: string]: number } = {};
-const latestAuthorizationPerToken: { [accessToken: string]: number } = new Proxy({}, {
-  get: function (obj, prop) {
-    if (typeof obj[prop] === 'undefined') {
-      return 0;
-    } else {
-      return obj[prop];
-    }
-  },
-  deleteProperty: function(obj, prop) {
-    if (obj[prop]) {
-      debug('sockets.tokens', 'Deleting property ' + String(prop));
-      delete obj[prop];
-    } else {
-      debug('sockets.tokens', 'Property ' + String(prop) + ' already deleted');
-    }
-    return true;
-  },
-  set: function (obj, prop, value) {
-    if (!Object.keys(invalidatedTokens).includes(String(prop))) {
-      debug('sockets.tokens', 'Setting property ' + String(prop));
-      obj[prop] = value;
-    } else {
-      debug('sockets.tokens', 'Skipping setting invalidated property ' + String(prop));
-    }
-    return true;
-  },
-});
 
 enum Authorized {
   inProgress,
@@ -53,24 +25,11 @@ enum Authorized {
   isAuthorized,
 }
 
-if (isDebugEnabled('sockets')) {
-  setInterval(() => {
-    debug('sockets.tokens', {latestAuthorizationPerToken, invalidatedTokens});
-  }, 10000);
-}
-
-setInterval(() => {
-  for (const [token, timestamp] of Object.entries(invalidatedTokens)) {
-    if (Date.now() - timestamp > 10 * MINUTE) {
-      delete invalidatedTokens[token];
-    }
-  }
-  for (const [token, timestamp] of Object.entries(latestAuthorizationPerToken)) {
-    if (Date.now() - timestamp > 10 * MINUTE) {
-      delete latestAuthorizationPerToken[token];
-    }
-  }
-}, MINUTE);
+type Unpacked<T> =
+  T extends (infer U)[] ? U :
+    T extends (...args: any[]) => infer U ? U :
+      T extends Promise<infer U> ? U :
+        T;
 
 const createDashboardIfNeeded = async (userId: number, opts: { haveAdminPrivileges: Authorized; haveModPrivileges: Authorized; haveViewerPrivileges: Authorized }) => {
   // create main admin dashboard if needed;
@@ -110,7 +69,7 @@ const createDashboardIfNeeded = async (userId: number, opts: { haveAdminPrivileg
   }
 };
 
-const getPrivileges = async(type: SocketInterface['type'], userId: number) => {
+const getPrivileges = async(type: 'admin' | 'viewer' | 'public', userId: number) => {
   const user = await getRepository(User).findOne({ userId });
   return {
     haveAdminPrivileges: type === 'admin' ? Authorized.isAuthorized : Authorized.NotAuthorized,
@@ -119,12 +78,61 @@ const getPrivileges = async(type: SocketInterface['type'], userId: number) => {
   };
 };
 
+const initEndpoints = async(socket, privileges: Unpacked<ReturnType<typeof getPrivileges>>) => {
+  for (const key of [...new Set(endpoints.filter(o => o.nsp === socket.nsp.name).map(o => o.nsp + '||' + o.on))]) {
+    const [nsp, on] = key.split('||');
+    const endpointsToInit = endpoints.filter(o => o.nsp === nsp && o.on === on);
+
+    socket.on(on, async (...args) => {
+      socket.removeAllListeners(on); // remove all listeners in case we call this twice
+      const adminEndpoint = endpointsToInit.find(o => o.type === 'admin');
+      const viewerEndpoint = endpointsToInit.find(o => o.type === 'viewer');
+      const publicEndpoint = endpointsToInit.find(o => o.type === 'public');
+      if (adminEndpoint && privileges.haveAdminPrivileges) {
+        adminEndpoint.callback(...args, socket);
+        return;
+      } else if (!viewerEndpoint && !publicEndpoint) {
+        debug('sockets', `User dont have admin access to ${socket.nsp.name}`);
+        debug('sockets', privileges);
+        for (const arg of args) {
+          if (typeof arg === 'function') {
+            arg('User doesn\'t have access to this endpoint', null);
+          }
+        }
+        return;
+      }
+
+      if (viewerEndpoint && privileges.haveViewerPrivileges) {
+        viewerEndpoint.callback(...args, socket);
+        return;
+      } else if (!publicEndpoint) {
+        debug('sockets', `User dont have viewer access to ${socket.nsp.name}`);
+        debug('sockets', privileges);
+        for (const arg of args) {
+          if (typeof arg === 'function') {
+            arg('User doesn\'t have access to this endpoint', null);
+          }
+        }
+        return;
+      }
+
+      if (publicEndpoint) {
+        publicEndpoint.callback(...args, socket);
+        return;
+      }
+    });
+  }
+};
+
 class Socket extends Core {
+  @shared(true)
+  JWTKey = '';
+
   @settings('connection')
   accessTokenExpirationTime = 120;
 
   @settings('connection')
-  refreshTokenExpirationTime = 604800;
+  refreshTokenExpirationTime = DAY * 31;
 
   @settings('connection')
   @ui({
@@ -138,293 +146,135 @@ class Socket extends Core {
     emit: 'purgeAllConnections',
   }, 'connection')
   purgeAllConnections = null;
-  @ui({
-    type: 'socket-list',
-  }, 'connection')
-  socketsList = null;
+
+  @onLoad('JWTKey')
+  JWTKeyGenerator() {
+    if (this.JWTKey === '') {
+      this.JWTKey = uuid();
+    }
+  }
 
   constructor() {
     super();
 
     if (isMainThread) {
-      setInterval(() => {
-        // remove expired tokens
-        if (isDbConnected) {
-          getRepository(SocketEntity).delete({
-            refreshTokenTimestamp: LessThanOrEqual(Date.now()),
-          });
-        }
-      }, MINUTE);
+      const init = (retry = 0) => {
+        if (retry === 10000) {
+          throw new Error('Socket oauth validate endpoint failed.');
+        } else if (!app) {
+          setTimeout(() => init(retry++), 100);
+        } else {
+          debug('ui', 'Socket oauth validate endpoint OK.');
+          app.get('/socket/validate', async (req, res) => {
+            const accessTokenHeader = req.headers['x-twitch-token'] as string | undefined;
+            const userId = req.headers['x-twitch-userid'] as string | undefined;
 
-      setInterval(() => {
-        // expire access token
-        if (isDbConnected) {
-          getRepository(SocketEntity).update({
-            accessTokenTimestamp: LessThanOrEqual(Date.now()),
-          }, {
-            accessToken: null,
+            try {
+              if (!accessTokenHeader || !userId) {
+                throw new Error('Insufficient data');
+              }
+              const twitchValidation = await axios.get(`https://id.twitch.tv/oauth2/validate`, {
+                headers: {
+                  'Authorization': 'OAuth ' + accessTokenHeader,
+                },
+              });
+              if (userId !== twitchValidation.data.user_id) {
+                throw new Error('Not matching userId');
+              }
+              const username = twitchValidation.data.login;
+              const userPermission = await permissions.getUserHighestPermission(Number(userId));
+              const user = await getRepository(User).findOne({ userId: Number(userId) });
+              await getRepository(User).save({
+                ...user,
+                userId: Number(userId),
+                username,
+              });
+
+              const accessToken = jwt.sign({
+                userId: Number(userId),
+                username,
+                privileges: await getPrivileges(userPermission === permission.CASTERS ? 'admin' : 'viewer', Number(userId)),
+              }, this.JWTKey, { expiresIn: `${this.accessTokenExpirationTime}s` });
+              const refreshToken = jwt.sign({
+                userId: Number(userId),
+                username,
+              }, this.JWTKey, { expiresIn: `${this.refreshTokenExpirationTime}s` });
+              res.status(200).send({accessToken, refreshToken, userType: userPermission === permission.CASTERS ? 'admin' : 'viewer'});
+            } catch(e) {
+              debug('socket', e.stack);
+              res.status(400).send('You don\'t have access to this server.');
+            }
           });
-        }
-      }, 10 * SECOND);
+          app.get('/socket/refresh', async (req, res) => {
+            const refreshTokenHeader = req.headers['x-twitch-token'] as string | undefined;
+
+            try {
+              if (!refreshTokenHeader) {
+                throw new Error('Insufficient data');
+              }
+              const data = jwt.verify(refreshTokenHeader, this.JWTKey) as {
+                userId: number; username: string;
+              };
+              const userPermission = await permissions.getUserHighestPermission(Number(data.userId));
+              const user = await getRepository(User).findOne({ userId: Number(data.userId) });
+              await getRepository(User).save({
+                ...user,
+                userId: Number(data.userId),
+                username: data.username,
+              });
+
+              const accessToken = jwt.sign({
+                userId: Number(data.userId),
+                username: data.username,
+                privileges: await getPrivileges(userPermission === permission.CASTERS ? 'admin' : 'viewer', Number(data.userId)),
+              }, this.JWTKey, { expiresIn: `${this.accessTokenExpirationTime}s` });
+              const refreshToken = jwt.sign({
+                userId: Number(data.userId),
+                username: data.username,
+              }, this.JWTKey, { expiresIn: `${this.refreshTokenExpirationTime}s` });
+              res.status(200).send({accessToken, refreshToken, userType: userPermission === permission.CASTERS ? 'admin' : 'viewer'});
+            } catch(e) {
+              debug('socket', e.stack);
+              res.status(400).send('You don\'t have access to this server.');
+            }
+          });
+        };
+      };
+      init();
     }
   }
 
   async authorize(socket, next) {
-    let haveAdminPrivileges = Authorized.inProgress;
-    let haveModPrivileges = Authorized.inProgress;
-    let haveViewerPrivileges = Authorized.inProgress;
-    let accessToken: null | string = null;
-    const interval = setInterval(() => {
-      if (accessToken && (typeof latestAuthorizationPerToken[accessToken] === 'undefined' || Date.now() - latestAuthorizationPerToken[accessToken] > MINUTE)) {
-        latestAuthorizationPerToken[accessToken] = Date.now();
-        accessToken = null;
-        emitAuthorize();
-      }
-    }, SECOND);
-
-    for (const endpoint of endpoints.filter(o => (o.type === 'viewer') && o.nsp == socket.nsp.name)) {
-      socket.removeAllListeners(endpoint.on);
-      socket.on(endpoint.on, async (...args) => {
-        await new Promise(resolve => {
-          const waitForAuthorization = () => {
-            if (haveViewerPrivileges !== Authorized.inProgress) {
-              resolve();
-            } else {
-              setTimeout(waitForAuthorization, 100);
-            }
+    // first check if token is socketToken
+    if (socket.handshake.query.token === this.socketToken) {
+      initEndpoints(socket, { haveAdminPrivileges: Authorized.isAuthorized, haveModPrivileges: Authorized.isAuthorized, haveViewerPrivileges: Authorized.isAuthorized });
+    } else {
+      if (socket.handshake.query.token !== '' && socket.handshake.query.token !== 'null') {
+        try {
+          const token = jwt.verify(socket.handshake.query.token, _self.JWTKey) as {
+            userId: number; username: string; privileges: Unpacked<ReturnType<typeof getPrivileges>>;
           };
-          waitForAuthorization();
-        });
-
-        if (haveViewerPrivileges === Authorized.isAuthorized) {
-          endpoint.callback(...args, socket);
-        } else {
-          debug('sockets', `User dont have viewer access to ${socket.nsp.name}`);
-          debug('sockets', {haveAdminPrivileges, haveModPrivileges, haveViewerPrivileges});
-          for (const arg of args) {
-            if (typeof arg === 'function') {
-              arg('User doesn\'t have access to this endpoint', null);
-            }
-          }
+          debug('socket', JSON.stringify(token, null, 4));
+          await createDashboardIfNeeded(token.userId, token.privileges);
+          initEndpoints(socket, token.privileges);
+        } catch (e) {
+          next(Error(e));
+          return;
         }
-      });
-    }
-
-    socket.on('disconnect', () => {
-      clearInterval(interval);
-      if (accessToken) {
-        invalidatedTokens[accessToken] = Date.now();
-        delete latestAuthorizationPerToken[accessToken];
-      }
-    });
-
-    const sendAuthorized = (auth: Readonly<SocketInterface>) => {
-      debug('socket', auth);
-      socket.emit('authorized', auth);
-    };
-    const emitAuthorize = () => {
-      socket.emit('authorize', async (cb: { token: string; type: 'socket' | 'access' }) => {
-        if (cb.type === 'socket') {
-          // check if we have global socket
-          if (cb.token === _self.socketToken) {
-            haveAdminPrivileges = Authorized.isAuthorized;
-            haveModPrivileges = Authorized.isAuthorized;
-            haveViewerPrivileges = Authorized.isAuthorized;
-            sendAuthorized({
-              type: 'admin',
-              accessToken: _self.socketToken,
-              userId: 0,
-              refreshToken: '',
-              accessTokenTimestamp: 0,
-              refreshTokenTimestamp: 0,
-            });
-
-            return;
-          }
-
-          haveAdminPrivileges = Authorized.NotAuthorized;
-          haveModPrivileges = Authorized.NotAuthorized;
-          haveViewerPrivileges = Authorized.NotAuthorized;
-          return socket.emit('unauthorized');
-        }
-
-        let auth;
-        if (cb.type === 'access') {
-          if (!cb.token) {
-            debug('sockets', `Missing access token`);
-          } else if (Object.keys(invalidatedTokens).includes(cb.token)) {
-            debug('sockets', `Invalidated access token - ${cb.token} used.`);
-          } else {
-            auth = await getRepository(SocketEntity).findOne({ accessToken: cb.token });
-            if (!auth) {
-              debug('sockets', `Incorrect access token - ${cb.token}, asking for refresh token`);
-            }
-          }
-          if (!auth) {
-            invalidatedTokens[cb.token] = Date.now();
-            delete latestAuthorizationPerToken[cb.token];
-
-            return socket.emit('refreshToken', async (data: { userId: number; token: string }) => {
-              auth = await getRepository(SocketEntity).findOne({ userId: data.userId, refreshToken: data.token });
-              if (!auth) {
-                if (data.token) {
-                  debug('sockets', `Incorrect refresh token for userId - ${data.token}, ${data.userId}`);
-                } else {
-                  debug('sockets', `User doesn't provide refresh token - unauthorized`);
-                }
-                haveAdminPrivileges = Authorized.NotAuthorized;
-                haveModPrivileges = Authorized.NotAuthorized;
-                haveViewerPrivileges = Authorized.NotAuthorized;
-                return socket.emit('unauthorized');
-              } else {
-                auth.accessToken = uuid();
-
-                latestAuthorizationPerToken[auth.accessToken] = Date.now();
-                accessToken = auth.accessToken;
-
-                auth.accessTokenTimestamp = Date.now() + (_self.accessTokenExpirationTime * 1000);
-                auth.refreshTokenTimestamp = Date.now() + (_self.refreshTokenExpirationTime * 1000);
-                await getRepository(SocketEntity).save(auth);
-                debug('sockets', `Login OK by refresh token - ${data.token}, access token set to ${auth.accessToken}`);
-
-                const privileges = await getPrivileges(auth.type, data.userId);
-                haveAdminPrivileges = privileges.haveAdminPrivileges;
-                haveModPrivileges = privileges.haveModPrivileges;
-                haveViewerPrivileges = privileges.haveViewerPrivileges;
-                await createDashboardIfNeeded(data.userId, { haveAdminPrivileges, haveModPrivileges, haveViewerPrivileges });
-
-                sendAuthorized(auth);
-              }
-            });
-          } else {
-            // update refreshToken timestamp to expire only if not used
-            auth.refreshTokenTimestamp = Date.now() + (_self.refreshTokenExpirationTime * 1000);
-
-            latestAuthorizationPerToken[auth.accessToken] = Date.now();
-            accessToken = auth.accessToken;
-
-            await getRepository(SocketEntity).save(auth);
-            const privileges = await getPrivileges(auth.type, auth.userId);
-            haveAdminPrivileges = privileges.haveAdminPrivileges;
-            haveModPrivileges = privileges.haveModPrivileges;
-            haveViewerPrivileges = privileges.haveViewerPrivileges;
-            await createDashboardIfNeeded(auth.userId, { haveAdminPrivileges, haveModPrivileges, haveViewerPrivileges });
-
-            debug('sockets', `Login OK by access token - ${cb.token}`);
-            sendAuthorized(auth);
-
-            if (auth.type === 'admin') {
-              haveAdminPrivileges = Authorized.isAuthorized;
-            } else {
-              haveAdminPrivileges = Authorized.NotAuthorized;
-            }
-            haveViewerPrivileges = Authorized.isAuthorized;
-          }
-        }
-      });
-    };
-
-    socket.on('logout', async(tokens: { accessToken: string | null; refreshToken: string | null}) => {
-      clearInterval(interval);
-      debug('sockets', 'user::logout');
-      debug('sockets', tokens);
-      if (tokens.accessToken) {
-        invalidatedTokens[tokens.accessToken] = Date.now();
-        delete latestAuthorizationPerToken[tokens.accessToken];
-        await getRepository(SocketEntity).delete({ accessToken: tokens.accessToken });
-      }
-
-      if (tokens.refreshToken) {
-        await getRepository(SocketEntity).delete({ refreshToken: tokens.refreshToken });
-      }
-    });
-
-    socket.on('newAuthorization', async (userData, cb) => {
-      debug('socket', `newAuthorization for ${userData}`);
-      const userId = Number(userData.userId);
-      const username = userData.username;
-
-      const userPermission = await permissions.getUserHighestPermission(userId);
-      const user = await getRepository(User).findOne({ userId });
-      await getRepository(User).save({
-        ...user,
-        userId,
-        username,
-      });
-      const auth: Readonly<SocketInterface> = {
-        accessToken: uuid(),
-        refreshToken: uuid(),
-        accessTokenTimestamp: Date.now() + (_self.accessTokenExpirationTime * 1000),
-        refreshTokenTimestamp: Date.now() + (_self.refreshTokenExpirationTime * 1000),
-        userId: Number(userId),
-        type: userPermission === permission.CASTERS ? 'admin' : 'viewer',
-      };
-      haveViewerPrivileges = Authorized.isAuthorized;
-      if (userPermission === permission.CASTERS) {
-        haveAdminPrivileges = Authorized.isAuthorized;
       } else {
-        haveAdminPrivileges = Authorized.NotAuthorized;
+        initEndpoints(socket, { haveAdminPrivileges: Authorized.NotAuthorized, haveModPrivileges: Authorized.NotAuthorized, haveViewerPrivileges: Authorized.NotAuthorized });
+        setTimeout(() => ioServer?.emit('forceDisconnect'), 1000); // force disconnect if we must be logged in
       }
-      await getRepository(SocketEntity).save(auth);
-      sendAuthorized(auth);
-
-      cb({ accessToken: auth.accessToken, refreshToken: auth.refreshToken, userType: auth.type });
-    });
-
-    for (const endpoint of endpoints.filter(o => o.type === 'public' && o.nsp === socket.nsp.name)) {
-      socket.removeAllListeners(endpoint.on);
-      socket.on(endpoint.on, (...args) => {
-        endpoint.callback(...args, socket);
-      });
     }
-
-    for (const endpoint of endpoints.filter(o => (o.type === 'admin') && o.nsp == socket.nsp.name)) {
-      socket.removeAllListeners(endpoint.on);
-      socket.on(endpoint.on, async (...args) => {
-        await new Promise(resolve => {
-          const waitForAuthorization = () => {
-            if (haveAdminPrivileges !== Authorized.inProgress) {
-              resolve();
-            } else {
-              setTimeout(waitForAuthorization, 100);
-            }
-          };
-          waitForAuthorization();
-        });
-
-        if (haveAdminPrivileges === Authorized.isAuthorized) {
-          endpoint.callback(...args, socket);
-        } else {
-          // check if we have public endpoint
-          const publicEndpoint = endpoints.find(o => o.type === 'public' && o.nsp == socket.nsp.name && o.on === endpoint.on);
-          if (publicEndpoint) {
-            publicEndpoint.callback(...args, socket);
-          } else {
-            debug('sockets', `User dont have admin access to ${socket.nsp.name}`);
-            debug('sockets', {haveAdminPrivileges, haveModPrivileges, haveViewerPrivileges});
-            for (const arg of args) {
-              if (typeof arg === 'function') {
-                arg('User doesn\'t have access to this endpoint', null);
-              }
-            }
-          }
-        }
-      });
-    }
-    emitAuthorize();
     next();
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'purgeAllConnections', (cb) => {
-      getRepository(SocketEntity).clear();
+    adminEndpointSocket(this.nsp, 'purgeAllConnections', (cb, socket) => {
+      this.JWTKey = uuid();
+      ioServer?.emit('forceDisconnect');
+      initEndpoints(socket, { haveAdminPrivileges: Authorized.NotAuthorized, haveModPrivileges: Authorized.NotAuthorized, haveViewerPrivileges: Authorized.NotAuthorized });
       cb(null);
-    });
-    adminEndpoint(this.nsp, 'listConnections', async (cb) => {
-      cb(null, await getRepository(SocketEntity).find());
-    });
-    adminEndpoint(this.nsp, 'removeConnection', async (item: Required<SocketInterface>, cb) => {
-      cb(null, await getRepository(SocketEntity).remove(item));
     });
   }
 
