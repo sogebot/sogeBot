@@ -116,10 +116,7 @@ const initEndpoints = async(socket, privileges: Unpacked<ReturnType<typeof getPr
         return;
       }
 
-      if (publicEndpoint) {
-        publicEndpoint.callback(...args, socket);
-        return;
-      }
+      publicEndpoint.callback(...args, socket);
     });
   }
 };
