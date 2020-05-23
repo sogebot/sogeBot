@@ -33,26 +33,34 @@ export default class Menu extends Vue {
   menu: any = [];
   categories = ['manage', 'settings', 'registry', /* 'logs', */ 'stats'];
 
-  mounted() {
+  async mounted() {
     // Workaround for touch screens - https://github.com/mdbootstrap/perfect-scrollbar/issues/867
     if (typeof window['DocumentTouch'] === 'undefined') {
       window['DocumentTouch'] = HTMLDocument
     }
 
-    let interval = setInterval(() => {
-      this.socket = getSocket('/');
-      this.socket.emit('menu', (menu) => {
-        clearInterval(interval);
-        console.groupCollapsed('menu::menu');
-        console.log({menu});
-        console.groupEnd();
-        for (const item of menu.sort((a, b) => {
-          return this.translate('menu.' + a.name).localeCompare(this.translate('menu.' + b.name))
-        })) {
-          this.menu.push(item);
-        }
-      });
-    }, 1000)
+    const isLoaded = await Promise.race([
+      new Promise(resolve => {
+        this.socket.emit('menu', (menu) => {
+          console.groupCollapsed('menu::menu');
+          console.log({menu});
+          console.groupEnd();
+          for (const item of menu.sort((a, b) => {
+            return this.translate('menu.' + a.name).localeCompare(this.translate('menu.' + b.name))
+          })) {
+            this.menu.push(item);
+          }
+        });
+      }),
+      new Promise(resolve => {
+        setTimeout(() => resolve(false), 4000);
+      }),
+    ]);
+
+    if (!isLoaded) {
+      console.error('menu not loaded, refreshing page')
+      location.reload();
+    }
   }
 }
 </script>

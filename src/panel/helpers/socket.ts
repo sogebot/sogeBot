@@ -75,15 +75,9 @@ export function getSocket(namespace: string, continueOnUnauthorized = false) {
 
 export const getTranslations = async () => {
   console.debug('Getting translations');
-  return new Promise((resolve) => {
-    const loop = setInterval(() => {
-      getSocket('/', true).emit('translations', (translations) => {
-        clearInterval(loop);
-        console.debug({translations});
-        setTranslations(translations);
-        resolve(translations);
-      });
-    }, 2000);
+  getSocket('/', true).emit('translations', (translations) => {
+    console.debug({translations});
+    setTranslations(translations);
   });
 };
 
