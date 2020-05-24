@@ -1,3 +1,4 @@
+import {v4 as uuid} from 'uuid';
 import _ from 'lodash';
 import * as constants from './constants';
 import { getBotSender } from './commons';
@@ -16,6 +17,7 @@ import { list } from './helpers/register';
 import { cachedCommandsPermissions } from './helpers/commands/pCache';
 
 class Parser {
+  id = uuid();
   started_at = Date.now();
   message = '';
   sender: CommandOptions['sender'] | null = null;
@@ -100,6 +102,7 @@ class Parser {
         debug('parser.process', 'Processing ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ')');
         const text = this.message.trim().replace(/^(!\w+)/i, '');
         const opts = {
+          id: this.id,
           sender: this.sender,
           message: this.message.trim(),
           parameters: text.trim(),
