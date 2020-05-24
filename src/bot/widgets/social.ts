@@ -11,15 +11,18 @@ class Social extends Widget {
   }
 
   sockets() {
-    publicEndpoint(this.nsp, 'social::getAll', async (opts: { limit?: number }, cb) => {
-      cb(
-        await getRepository(WidgetSocial).find({
-          take: opts.limit,
-          order: {
-            timestamp: 'DESC',
-          },
-        })
-      );
+    publicEndpoint(this.nsp, 'generic::getAll', async (opts: { limit?: number }, cb) => {
+      if (cb) {
+        cb(
+          null,
+          await getRepository(WidgetSocial).find({
+            take: opts.limit,
+            order: {
+              timestamp: 'DESC',
+            },
+          })
+        );
+      }
     });
   }
 }

@@ -10,7 +10,7 @@ export interface HighlightInterface {
     hours: number; minutes: number; seconds: number;
   };
   createdAt: number;
-};
+}
 
 export const Highlight = new EntitySchema<Readonly<Required<HighlightInterface>>>({
   name: 'highlight',

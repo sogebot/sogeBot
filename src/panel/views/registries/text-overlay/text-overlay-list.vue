@@ -115,7 +115,7 @@ export default class textOverlayList extends Vue {
 
     created() {
       this.state.loaded = false;
-      this.socket.emit('text::getAll', (err, items) => {
+      this.socket.emit('generic::getAll', (err, items) => {
         if (err) {
           return console.error(err)
         }

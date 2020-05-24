@@ -509,7 +509,7 @@ export default class AlertsRegistryOverlays extends Vue {
         console.debug('Alert is updating')
         this.updatedAt = updatedAt;
         await new Promise((resolve) => {
-          this.socket.emit('alerts::getOne', this.id, async (err, data: AlertInterface) => {
+          this.socket.emit('generic::getOne', this.id, async (err, data: AlertInterface) => {
             if (err) {
               return console.error(err);
             }

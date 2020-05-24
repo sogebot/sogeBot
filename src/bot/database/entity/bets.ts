@@ -13,7 +13,7 @@ export interface BetsInterface {
   options: string[];
   title: string;
   participations?: BetsParticipationsInterface[];
-};
+}
 
 export interface BetsParticipationsInterface {
   id?: number;
@@ -22,7 +22,7 @@ export interface BetsParticipationsInterface {
   points: number;
   optionIdx: number;
   bet?: BetsInterface;
-};
+}
 
 export const Bets = new EntitySchema<Readonly<Required<BetsInterface>>>({
   name: 'bets',

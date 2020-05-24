@@ -4,7 +4,7 @@ import { v4 as uuid } from 'uuid';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
-import { Carousel as CarouselEntity, CarouselInterface } from '../database/entity/carousel';
+import { Carousel as CarouselEntity } from '../database/entity/carousel';
 
 class Carousel extends Overlay {
   @ui({
@@ -22,14 +22,14 @@ class Carousel extends Overlay {
   }
 
   sockets () {
-    publicEndpoint(this.nsp, 'carousel::getOne', async (id: string, cb) => {
+    publicEndpoint(this.nsp, 'generic::getOne', async (id: string, cb) => {
       try {
         cb(null, await getRepository(CarouselEntity).findOne({ id }));
       } catch (e) {
         cb(e.stack);
       }
     });
-    publicEndpoint(this.nsp, 'carousel::getAll', async (cb) => {
+    publicEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         cb(null, await getRepository(CarouselEntity).find({
           order: {
@@ -40,7 +40,7 @@ class Carousel extends Overlay {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'carousel::save', async (items: CarouselInterface[], cb) => {
+    adminEndpoint(this.nsp, 'carousel::save', async (items, cb) => {
       try {
         cb(null, await getRepository(CarouselEntity).save(items));
       } catch (e) {
@@ -48,9 +48,9 @@ class Carousel extends Overlay {
       }
     });
 
-    adminEndpoint(this.nsp, 'carousel::remove', async (id, cb) => {
+    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
       try {
-        await getRepository(CarouselEntity).delete({ id });
+        await getRepository(CarouselEntity).delete({ id: String(id) });
         // force reorder
         const images = await getRepository(CarouselEntity).find({
           order: {
@@ -72,7 +72,7 @@ class Carousel extends Overlay {
     adminEndpoint(this.nsp, 'carousel::insert', async (data, cb) => {
       try {
         const matches = data.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
-        if (matches.length !== 3) {
+        if (!matches || matches.length !== 3) {
           return false;
         }
 

@@ -28,7 +28,7 @@ class Keywords extends System {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'keywords::save', async (dataset: KeywordInterface, cb) => {
+    adminEndpoint(this.nsp, 'keywords::save', async (dataset, cb) => {
       try {
         const item = await getRepository(Keyword).save(dataset);
         cb(null, item);
@@ -36,11 +36,13 @@ class Keywords extends System {
         cb (e, null);
       }
     });
-    adminEndpoint(this.nsp, 'keywords::deleteById', async (id, cb) => {
-      await getRepository(Keyword).delete({ id });
-      cb();
+    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
+      if (typeof id === 'string') {
+        await getRepository(Keyword).delete({ id });
+      }
+      cb(null);
     });
-    adminEndpoint(this.nsp, 'keywords::getAll', async (cb) => {
+    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         const items = await getRepository(Keyword).find({
           order: {
@@ -52,7 +54,7 @@ class Keywords extends System {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'keywords::getById', async (id, cb) => {
+    adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
       try {
         const item = await getRepository(Keyword).findOne({
           where: { id },

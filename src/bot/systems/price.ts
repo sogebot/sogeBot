@@ -36,16 +36,17 @@ class Price extends System {
   }
 
   sockets() {
-    adminEndpoint(this.nsp, 'price::getAll', async (cb) => {
-      cb(await getRepository(PriceEntity).find({
-        order: {
-          price: 'ASC',
-        },
-      }));
+    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
+      cb(null,
+        await getRepository(PriceEntity).find({
+          order: {
+            price: 'ASC',
+          },
+        }));
     });
 
-    adminEndpoint(this.nsp, 'price::getOne', async (id, cb) => {
-      cb(await getRepository(PriceEntity).findOne({ id }));
+    adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
+      cb(null, await getRepository(PriceEntity).findOne({ id: String(id) }));
     });
 
     adminEndpoint(this.nsp, 'price::save', async (price: PriceInterface, cb) => {
@@ -58,9 +59,9 @@ class Price extends System {
       }
     });
 
-    adminEndpoint(this.nsp, 'price::delete', async (id: string, cb) => {
+    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
       try {
-        await getRepository(PriceEntity).delete({ id });
+        await getRepository(PriceEntity).delete({ id: String(id) });
         cb(null);
       } catch (e) {
         error(e);

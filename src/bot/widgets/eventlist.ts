@@ -39,10 +39,12 @@ class EventList extends Widget {
   }
 
   public sockets() {
-    adminEndpoint(this.nsp, 'eventlist::removeById', async (id: string | string[], cb) => {
+    adminEndpoint(this.nsp, 'eventlist::removeById', async (id, cb) => {
       const ids = Array.isArray(id) ? [...id] : [id];
       await getRepository(EventListDB).delete(ids);
-      cb();
+      if (cb) {
+        cb(null);
+      }
     });
     adminEndpoint(this.nsp, 'get', async () => {
       this.update();
@@ -52,7 +54,11 @@ class EventList extends Widget {
       getRepository(EventListDB).delete({});
     });
 
-    adminEndpoint(this.nsp, 'resend', async (id) => {
+    adminEndpoint(this.nsp, 'eventlist::resend', async (id) => {
+      if (typeof id !== 'string') {
+        return;
+      }
+
       const event = await getRepository(EventListDB).findOne({ id });
       if (event) {
         const values = JSON.parse(event.values_json);

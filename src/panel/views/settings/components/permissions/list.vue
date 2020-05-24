@@ -87,7 +87,7 @@
         })
       },
       dragend() {
-        this.socket.emit('permissions.order', this.currentData, () => {
+        this.socket.emit('permission::order', this.currentData, () => {
           this.$emit('update');
         });
       },

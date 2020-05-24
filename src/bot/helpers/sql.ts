@@ -18,7 +18,7 @@ if (['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'sqlite')) {
     };
     updateSQLVariableLimit();
   });
-};
+}
 if (['postgres'].includes(process.env.TYPEORM_CONNECTION ?? 'sqlite')) {
   SQLVariableLimit = 32767; // per https://stackoverflow.com/a/42251312
-};
+}

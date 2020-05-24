@@ -20,7 +20,7 @@ export default class btnEmit extends Vue {
   emitToBackend() {
     this.state = 1;
     getSocket(`/${this.$route.params.type}/${this.$route.params.id}`)
-      .emit(this.emit, (err, data) => {
+      .emit(this.emit, {}, (err, data) => {
         if (err) {
           this.state = 2;
           this.$emit('error', err);

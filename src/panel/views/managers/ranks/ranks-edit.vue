@@ -143,7 +143,7 @@ export default class ranksEdit extends Vue {
   async mounted() {
     if (this.$route.params.id) {
       await new Promise(resolve => {
-        this.socket.emit('ranks::getOne', this.$route.params.id, (err, data: RankInterface) => {
+        this.socket.emit('generic::getOne', this.$route.params.id, (err, data: RankInterface) => {
           if (err) {
             return console.error(err);
           }

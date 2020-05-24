@@ -53,7 +53,7 @@ class Polls extends System {
   }
 
   public async sockets() {
-    adminEndpoint(this.nsp, 'polls::getAll', async (cb) => {
+    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         cb(null, await getRepository(Poll).find({
           relations: ['votes'],
@@ -65,7 +65,7 @@ class Polls extends System {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'create', async (vote: Poll, cb) => {
+    adminEndpoint(this.nsp, 'polls::save', async (vote, cb) => {
       try {
         const parameters = `-${vote.type} -title "${vote.title}" ${vote.options.filter((o) => o.trim().length > 0).join(' | ')}`;
         this.open({
@@ -80,7 +80,7 @@ class Polls extends System {
         cb(e.stack, null);
       }
     });
-    adminEndpoint(this.nsp, 'close', async (vote: Poll, cb) => {
+    adminEndpoint(this.nsp, 'polls::close', async (vote, cb) => {
       try {
         this.close({
           command: this.getCommand('!poll close'),

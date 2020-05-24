@@ -4,7 +4,7 @@ import Overlay from '../overlays/_interface';
 
 import { onBit, onFollow, onSub, onTip } from '../decorators/on';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
-import { Goal, GoalGroup, GoalGroupInterface } from '../database/entity/goal';
+import { Goal, GoalGroup } from '../database/entity/goal';
 import { getRepository, IsNull } from 'typeorm';
 import api from '../api';
 import currency from '../currency';
@@ -18,7 +18,7 @@ class Goals extends Overlay {
   }
 
   public async sockets() {
-    adminEndpoint(this.nsp, 'goals::remove', async (item: Required<GoalGroupInterface>, cb) => {
+    adminEndpoint(this.nsp, 'goals::remove', async (item, cb) => {
       try {
         await getRepository(GoalGroup).remove(item);
         cb(null);
@@ -26,7 +26,7 @@ class Goals extends Overlay {
         cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'goals::save', async (item: Required<GoalGroupInterface>, cb) => {
+    adminEndpoint(this.nsp, 'goals::save', async (item, cb) => {
       try {
         item = await getRepository(GoalGroup).save(item);
         // we need to delete id NULL as typeorm is not deleting but flagging as NULL
@@ -36,7 +36,7 @@ class Goals extends Overlay {
         cb(e.stack, item);
       }
     });
-    adminEndpoint(this.nsp, 'goals::getAll', async (cb) => {
+    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         const items = await getRepository(GoalGroup).find({
           relations: ['goals'],
@@ -47,7 +47,7 @@ class Goals extends Overlay {
       }
     });
 
-    publicEndpoint(this.nsp, 'goals::getOne', async (id, cb) => {
+    publicEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
       try {
         const item = await getRepository(GoalGroup).findOne({
           relations: ['goals'],

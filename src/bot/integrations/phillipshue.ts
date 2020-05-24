@@ -20,7 +20,7 @@ interface State {
     time: number;
     blocked: boolean;
   };
-};
+}
 
 /*
  * NOTE: For this integration to be working, you need bot running on same network, as your lights

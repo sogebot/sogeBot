@@ -46,14 +46,14 @@ class Parser {
     debug('parser.process', 'ISMODERATED START of "' + this.message + '"');
     if (this.skip) {
       return false;
-    };
+    }
 
     const parsers = await this.parsers();
     for (const parser of parsers) {
       const time = Date.now();
       if (parser.priority !== constants.MODERATION) {
         continue;
-      }; // skip non-moderation parsers
+      } // skip non-moderation parsers
       debug('parser.process', 'Processing ' + parser.name);
       const text = this.message.trim().replace(/^(!\w+)/i, '');
       const opts = {
@@ -80,7 +80,7 @@ class Parser {
     for (const parser of parsers) {
       if (parser.priority === constants.MODERATION) {
         continue;
-      }; // skip moderation parsers
+      } // skip moderation parsers
 
       if (this.sender) {
         const permissionCheckTime = Date.now();
@@ -200,7 +200,7 @@ class Parser {
    * @returns object or null if empty
    */
   async find (message, cmdlist: {
-    this: any; fnc: Function; command: string; id: string; permission: string | null; _fncName: string;
+    this: any; fnc: (opts: CommandOptions) => CommandResponse[]; command: string; id: string; permission: string | null; _fncName: string;
   }[] | null = null) {
     debug('parser.find', JSON.stringify({message, cmdlist}));
     if (cmdlist === null) {
@@ -250,16 +250,16 @@ class Parser {
     debug('parser.command', { sender, message });
     if (!message.startsWith('!')) {
       return [];
-    }; // do nothing, this is not a command or user is ignored
+    } // do nothing, this is not a command or user is ignored
     const command = await this.find(message, null);
     debug('parser.command', { command });
     if (_.isNil(command)) {
       return [];
-    }; // command not found, do nothing
+    } // command not found, do nothing
     if (command.permission === null) {
       warning(`Command ${command.command} is disabled!`);
       return [];
-    }; // command is disabled
+    } // command is disabled
 
     if (this.sender && !disablePermissionCheck) {
       if (typeof getFromViewersCache(this.sender.userId, command.permission) === 'undefined') {
@@ -287,7 +287,7 @@ class Parser {
 
       if (_.isNil(command.id)) {
         throw Error(`command id is missing from ${command.fnc}`);
-      };
+      }
 
       if (typeof command.fnc === 'function' && !_.isNil(command.id)) {
         incrementCountOfCommandUsage(command.command);
@@ -296,7 +296,7 @@ class Parser {
       } else {
         error(command.command + ' have wrong undefined function ' + command._fncName + '() registered!');
         return [];
-      };
+      }
     } else {
       // do all rollbacks when permission failed
       const rollbacks = await this.rollbacks();

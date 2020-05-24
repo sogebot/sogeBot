@@ -96,7 +96,7 @@ class Stats {
       } catch (e) {
         error(e);
         cb(e.stack, {});
-      };
+      }
     });
   }
 

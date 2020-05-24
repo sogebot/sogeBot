@@ -5,7 +5,7 @@ export interface HeistUserInterface {
   userId: number;
   username: string;
   points: number;
-};
+}
 
 export const HeistUser = new EntitySchema<Readonly<Required<HeistUserInterface>>>({
   name: 'heist_user',

@@ -42,7 +42,7 @@ class Module {
     return typeof process.env.DISABLE !== 'undefined'
       && (process.env.DISABLE.toLowerCase().split(',').includes(this.__moduleName__.toLowerCase()) || process.env.DISABLE === '*')
       && !isDisableIgnored;
-  };
+  }
 
   areDependenciesEnabled = false;
   get _areDependenciesEnabled(): Promise<boolean> {
@@ -148,7 +148,7 @@ class Module {
               for (const event of getFunctionList('startup', path)) {
                 this[event.fName]('enabled', state);
               }
-            };
+            }
             this.onStartupTriggered = true;
           };
           onStartup();
@@ -278,9 +278,9 @@ class Module {
           cb(e.stack, null, null);
         }
       });
-      adminEndpoint(this.nsp, 'settings.update', async (data: { [x: string]: any }, cb) => {
+      adminEndpoint(this.nsp, 'settings.update', async (opts, cb) => {
         // flatten and remove category
-        data = flatten(data);
+        const data = flatten(opts);
         const remap: ({ key: string; actual: string; toRemove: string[] } | { key: null; actual: null; toRemove: null })[] = Object.keys(flatten(data)).map(o => {
           // skip commands, enabled and permissions
           if (o.startsWith('commands') || o.startsWith('enabled') || o.startsWith('_permissions')) {
@@ -377,14 +377,16 @@ class Module {
         }
       });
 
-      adminEndpoint(this.nsp, 'set.value', async (variable, value, cb) => {
+      adminEndpoint(this.nsp, 'set.value', async (opts, cb) => {
         try {
-          this[variable] = value;
-          if (typeof cb === 'function') {
-            cb(null, {variable, value});
+          this[opts.variable] = opts.value;
+          if (cb) {
+            cb(null, {variable: opts.variable, value: opts.value});
           }
         } catch (e) {
-          cb(e.stack, null);
+          if (cb) {
+            cb(e.stack, null);
+          }
         }
       });
       publicEndpoint(this.nsp, 'get.value', async (variable, cb) => {

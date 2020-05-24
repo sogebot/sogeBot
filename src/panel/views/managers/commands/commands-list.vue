@@ -175,11 +175,14 @@ export default class commandsList extends Vue {
   created() {
     this.state.loadingCmd = this.$state.progress;
     this.state.loadingPerm = this.$state.progress;
-    this.psocket.emit('permissions', (data) => {
+    this.psocket.emit('permissions', (err, data) => {
+  if(err) {
+    return console.error(err);
+  }
       this.permissions = data;
       this.state.loadingPerm = this.$state.success;
     })
-    this.socket.emit('commands::getAll', ( err, commands, count ) => {
+    this.socket.emit('generic::getAll', ( err, commands, count ) => {
       if (err) {
         return console.error(err);
       }
@@ -210,7 +213,7 @@ export default class commandsList extends Vue {
     let command = this.commands.filter((o) => o.id === cid)[0]
     let response = command.responses.filter((o) => o.id === rid)[0]
     response.permission = permission
-    this.socket.emit('commands::setById', cid, command)
+    this.socket.emit('generic::setById', { id: cid, item: command }, () => {});
     this.$forceUpdate();
   }
 
@@ -218,13 +221,13 @@ export default class commandsList extends Vue {
     let command = this.commands.filter((o) => o.id === cid)[0]
     let response = command.responses.filter((o) => o.id === rid)[0]
     response.stopIfExecuted = stopIfExecuted
-    this.socket.emit('commands::setById', cid, command)
+    this.socket.emit('generic::setById', { id: cid, item: command }, () => {});
     this.$forceUpdate();
   }
 
   async remove(id) {
     await new Promise(resolve => {
-      this.socket.emit('commands::deleteById', id, () => {
+      this.socket.emit('generic::deleteById', id, () => {
         resolve();
       })
     })
@@ -233,7 +236,7 @@ export default class commandsList extends Vue {
   }
 
   sendUpdate (id) {
-    this.socket.emit('commands::setById', id, this.commands.find((o) => o.id === id), (err) => {
+    this.socket.emit('generic::setById', { id, item: this.commands.find((o) => o.id === id) }, (err) => {
       if (err) {
         return console.error(err);
       }

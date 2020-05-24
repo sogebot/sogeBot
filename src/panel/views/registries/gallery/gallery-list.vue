@@ -114,7 +114,7 @@ export default class galleryRegistryEdit extends Vue {
 
   mounted() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('gallery::getAll', (err, items) => {
+    this.socket.emit('generic::getAll', (err, items) => {
       console.debug('Loaded', items);
       this.items = items
       this.state.loading = this.$state.success;
@@ -158,7 +158,7 @@ export default class galleryRegistryEdit extends Vue {
   }
 
   remove(id) {
-    this.socket.emit('gallery::delete', id, (err) => {
+    this.socket.emit('generic::deleteById', id, (err) => {
       if (err) {
         console.error(err);
       } else {

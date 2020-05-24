@@ -124,7 +124,7 @@ export default class keywordsEdit extends Vue {
 
   mounted() {
     if (this.$route.params.id) {
-      this.socket.emit('keywords::getById', this.$route.params.id, (err, data: Required<KeywordInterface>) => {
+      this.socket.emit('generic::getOne', this.$route.params.id, (err, data: Required<KeywordInterface>) => {
         if (err) {
           return console.error(err)
         }
@@ -144,7 +144,7 @@ export default class keywordsEdit extends Vue {
   }
 
   del() {
-    this.socket.emit('keywords::deleteById', this.$route.params.id, () => {
+    this.socket.emit('generic::deleteById', this.$route.params.id, () => {
       this.$router.push({ name: 'KeywordsManagerList' })
     })
   }

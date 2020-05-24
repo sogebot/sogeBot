@@ -238,13 +238,16 @@ export default class CommandsEdit extends Vue {
   }
 
   created() {
-    this.psocket.emit('permissions', (data) => {
+    this.psocket.emit('permissions', (err, data) => {
+  if(err) {
+    return console.error(err);
+  }
       this.permissions = data
       this.state.loadedPerm = this.$state.success;
     });
 
     if (this.$route.params.id) {
-      this.socket.emit('commands::getById', this.$route.params.id, (err, data: Required<CommandsInterface>, count: number) => {
+      this.socket.emit('generic::getOne', this.$route.params.id, (err, data: Required<CommandsInterface>, count: number) => {
         console.debug('Loaded', {data})
         // add empty filter if undefined
         for (let i = 0, length = data.responses.length; i < length; i++) {
@@ -307,7 +310,7 @@ export default class CommandsEdit extends Vue {
   }
 
   async remove() {
-    this.socket.emit('commands::deleteById', this.$route.params.id, () => {
+    this.socket.emit('generic::deleteById', this.$route.params.id, () => {
       this.$router.push({ name: 'CommandsManagerList' });
     });
   }
@@ -318,7 +321,7 @@ export default class CommandsEdit extends Vue {
       this.state.save = this.$state.progress;
       await new Promise((resolve, reject) => {
         console.debug('Saving command', this.item);
-        this.socket.emit('commands::setById', this.item.id, this.item, (err, data) => {
+        this.socket.emit('generic::setById', { id: this.item.id, item: this.item }, (err, data) => {
           if (err) {
             this.state.save = this.$state.fail;
             reject(console.error(err));

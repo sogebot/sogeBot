@@ -35,26 +35,28 @@ class Quotes extends System {
       }
     });
 
-    adminEndpoint(this.nsp, 'getById', async (id, cb) => {
+    adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
       try {
-        const item = await getRepository(QuotesEntity).findOne({ id });
+        const item = await getRepository(QuotesEntity).findOne({ id: Number(id) });
         cb(null, item);
       } catch (e) {
         cb(e.stack);
       }
     });
 
-    adminEndpoint(this.nsp, 'setById', async (id, dataset, cb) => {
+    adminEndpoint(this.nsp, 'generic::setById', async (opts, cb) => {
       try {
-        cb(null, await getRepository(QuotesEntity).save({ ...(await getRepository(QuotesEntity).findOne({ id })), ...dataset }));
+        cb(null, await getRepository(QuotesEntity).save({ ...(await getRepository(QuotesEntity).findOne({ id: Number(opts.id) })), ...opts.item }));
       } catch (e) {
         cb(e.stack);
       }
     });
 
-    adminEndpoint(this.nsp, 'deleteById', async (id, cb) => {
+    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
       try {
-        await getRepository(QuotesEntity).delete({ id });
+        if (typeof id === 'number') {
+          await getRepository(QuotesEntity).delete({ id });
+        }
         cb(null);
       } catch(e) {
         cb(e.stack);

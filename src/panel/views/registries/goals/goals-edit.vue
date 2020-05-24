@@ -504,7 +504,7 @@ export default Vue.extend({
   },
   mounted: async function () {
     if (this.$route.params.id) {
-      this.socket.emit('goals::getOne', this.$route.params.id, (err, d: Required<GoalGroupInterface>) => {
+      this.socket.emit('generic::getOne', this.$route.params.id, (err, d: Required<GoalGroupInterface>) => {
         if (err) {
           console.error(err);
           return;

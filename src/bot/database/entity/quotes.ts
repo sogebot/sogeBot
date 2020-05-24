@@ -7,7 +7,7 @@ export interface QuotesInterface {
   quote: string;
   quotedBy: number;
   createdAt: number;
-};
+}
 
 export const Quotes = new EntitySchema<Readonly<Required<QuotesInterface>>>({
   name: 'quotes',

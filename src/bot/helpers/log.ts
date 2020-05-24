@@ -10,7 +10,7 @@ const timezone = (process.env.TIMEZONE ?? 'system') === 'system' || !process.env
 
 if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir);
-};
+}
 
 const logLevel = process.env.LOGLEVEL ? process.env.LOGLEVEL.toLowerCase().trim() : 'info';
 const logFile = fs.createWriteStream('./logs/sogebot.log', { flags: 'a' });
@@ -69,7 +69,7 @@ const levelFormat = {
 };
 
 
-function format(level: Levels, message: string | object, category?: string) {
+function format(level: Levels, message: any, category?: string) {
   const timestamp = moment().tz(timezone).format('YYYY-MM-DD[T]HH:mm:ss.SSS');
 
   if (typeof message === 'object') {
@@ -89,7 +89,7 @@ export function isDebugEnabled(category: string) {
   return bEnabled;
 }
 
-function log(message: string | object) {
+function log(message: any) {
   const level = getFunctionNameFromStackTrace();
   if (Levels[level] <= Levels[logLevel]) {
     const formattedMessage = format(Levels[level], message);
@@ -99,7 +99,7 @@ function log(message: string | object) {
 }
 
 /* * category will be always shown */
-export function debug(category: string, message: string | object) {
+export function debug(category: string, message: any) {
   const categories = category.split('.');
   if (categories.length > 2 && category !== '*') {
     throw Error('For debug use only <main>.<sub> or *');
@@ -110,66 +110,66 @@ export function debug(category: string, message: string | object) {
     logFile.write(formattedMessage + os.EOL);
   }
 }
-export function error(message: string | object) {
+export function error(message: any) {
   log(message);
 }
-export function chatIn(message: string | object) {
+export function chatIn(message: any) {
   log(message);
 }
-export function chatOut(message: string | object) {
+export function chatOut(message: any) {
   log(message);
 }
-export function whisperIn(message: string | object) {
+export function whisperIn(message: any) {
   log(message);
 }
-export function whisperOut(message: string | object) {
+export function whisperOut(message: any) {
   log(message);
 }
-export function info(message: string | object) {
+export function info(message: any) {
   log(message);
 }
-export function warning(message: string | object) {
+export function warning(message: any) {
   log(message);
 }
-export function timeout(message: string | object) {
+export function timeout(message: any) {
   log(message);
 }
-export function ban(message: string | object) {
+export function ban(message: any) {
   log(message);
 }
-export function follow(message: string | object) {
+export function follow(message: any) {
   log(message);
 }
-export function host(message: string | object) {
+export function host(message: any) {
   log(message);
 }
-export function raid(message: string | object) {
+export function raid(message: any) {
   log(message);
 }
-export function unfollow(message: string | object) {
+export function unfollow(message: any) {
   log(message);
 }
-export function cheer(message: string | object) {
+export function cheer(message: any) {
   log(message);
 }
-export function tip(message: string | object) {
+export function tip(message: any) {
   log(message);
 }
-export function sub(message: string | object) {
+export function sub(message: any) {
   log(message);
 }
-export function subgift(message: string | object) {
+export function subgift(message: any) {
   log(message);
 }
-export function subcommunitygift(message: string | object) {
+export function subcommunitygift(message: any) {
   log(message);
 }
-export function resub(message: string | object) {
+export function resub(message: any) {
   log(message);
 }
-export function start(message: string | object) {
+export function start(message: any) {
   log(message);
 }
-export function stop(message: string | object) {
+export function stop(message: any) {
   log(message);
 }

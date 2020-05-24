@@ -148,7 +148,7 @@
         this.currentTime = Date.now()
       }, 1000)
 
-      this.socket.emit('goals::getAll', (err: Error, items: GoalGroupInterface[]) => {
+      this.socket.emit('generic::getAll', (err: Error, items: GoalGroupInterface[]) => {
         if (err) {
           console.error(err);
         } else {

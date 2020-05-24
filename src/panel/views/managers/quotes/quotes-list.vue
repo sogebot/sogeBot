@@ -172,7 +172,7 @@ export default class quotesList extends Vue {
   }
 
   deleteQuote(id) {
-    this.socket.emit('deleteById', id, () => {
+    this.socket.emit('generic::deleteById', id, () => {
       this.quotesFromDb = this.quotes.filter((o) => o.id !== id)
     })
   }

@@ -18,7 +18,7 @@ export default {
 
   methods: {
     remove: function () {
-      this.socket.emit('panel::dashboards::remove', Number(this.$loggedUser.id), 'admin', this.dashboardId, (err) => {
+      this.socket.emit('panel::dashboards::remove', { userId: Number(this.$loggedUser.id), type: 'admin', id: this.dashboardId }, (err) => {
         if (err) {
           console.error(err);
         }

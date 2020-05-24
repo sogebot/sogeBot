@@ -188,7 +188,7 @@ export default {
     },
     refresh: function () {
       return new Promise((resolve) => {
-        this.socket.emit('randomizer::getAll', (err, data) => {
+        this.socket.emit('generic::getAll', (err, data) => {
           if (err) {
             return console.error(err);
           }

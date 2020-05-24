@@ -8,7 +8,7 @@ export interface DashboardInterface {
   createdAt: number;
   type: 'admin' | 'mod' | 'viewer';
   userId: number;
-};
+}
 
 export interface WidgetInterface {
   id?: string;
@@ -19,7 +19,7 @@ export interface WidgetInterface {
   positionY: number;
   height: number;
   width: number;
-};
+}
 
 export const Dashboard = new EntitySchema<Readonly<Required<DashboardInterface>>>({
   name: 'dashboard',

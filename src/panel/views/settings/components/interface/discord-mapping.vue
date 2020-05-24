@@ -50,7 +50,10 @@ export default class discordChannel extends Vue {
     this.loading = this.$state.progress;
     const getDataFromServer = Promise.all([
       new Promise((resolve) => {
-        this.psocket.emit('permissions', (data) => {
+        this.psocket.emit('permissions', (err, data) => {
+  if(err) {
+    return console.error(err);
+  }
           console.groupCollapsed('permissions')
           console.log({data});
           console.groupEnd();

@@ -107,7 +107,7 @@ export default {
     }
   },
   created: function () {
-      this.socket.emit('cmdboard::getAll', (err, items) => {
+      this.socket.emit('generic::getAll', (err, items) => {
         if (err) {
           return console.error(err);
         }

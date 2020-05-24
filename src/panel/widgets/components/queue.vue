@@ -112,7 +112,7 @@ export default {
       }), 1000)
     );
     this.interval.push(
-      setInterval(() => this.socket.emit('queue::getAll', (err, users) => {
+      setInterval(() => this.socket.emit('generic::getAll', (err, users) => {
         if (err) {
           return console.error(err)
         }
@@ -144,7 +144,7 @@ export default {
         },
       }
       this.socket.emit('settings.update', data, () => {})
-      this.socket.emit('set.value', 'locked', this.locked)
+      this.socket.emit('set.value', { variable: 'locked', value: this.locked }, () => {})
     }, 500)
   },
   computed: {

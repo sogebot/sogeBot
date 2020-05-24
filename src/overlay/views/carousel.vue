@@ -32,7 +32,7 @@ export default class CarouselOverlay extends Vue {
   }
 
   created() {
-    this.socket.emit('carousel::getAll', (err, images) => {
+    this.socket.emit('generic::getAll', (err, images) => {
       if (err) {
         return console.error(err)
       }

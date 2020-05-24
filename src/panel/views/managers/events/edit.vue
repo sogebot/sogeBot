@@ -342,7 +342,7 @@
     },
     mounted() {
       if (this.$route.params.id) {
-        this.socket.emit('events::getOne', this.$route.params.id, (err, event: Required<EventInterface>) => {
+        this.socket.emit('generic::getOne', this.$route.params.id, (err, event: Required<EventInterface>) => {
           if (err) {
             return console.error(err);
           }

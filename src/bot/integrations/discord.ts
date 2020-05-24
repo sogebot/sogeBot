@@ -50,7 +50,7 @@ class Discord extends Integration {
     type: 'btn-emit',
     class: 'btn btn-primary btn-block mt-1 mb-1',
     if: () => self.clientId.length > 0 && self.token.length > 0,
-    emit: 'authorize',
+    emit: 'discord::authorize',
   }, 'general')
   joinToServerBtn = null;
 
@@ -262,7 +262,7 @@ class Discord extends Integration {
 
   @command('!link')
   async linkAccounts(opts: CommandOptions) {
-    enum errors { NOT_UUID };
+    enum errors { NOT_UUID }
     this.removeExpiredLinks();
 
     try {
@@ -453,9 +453,9 @@ class Discord extends Integration {
                       reply.delete();
                     }, 10000);
                   }
-                };
+                }
               }, 1000 * i);
-            };
+            }
           }
           if (this.deleteMessagesAfterWhile) {
             if (msg) {
@@ -557,7 +557,7 @@ class Discord extends Integration {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'authorize', async (cb) => {
+    adminEndpoint(this.nsp, 'discord::authorize', async (cb) => {
       if (this.token === '' || this.clientId === '') {
         cb('Cannot authorize! Missing clientId or token.', null);
       } else {

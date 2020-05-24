@@ -1,7 +1,7 @@
 import { getRepository, IsNull } from 'typeorm';
 
 import { LOW } from '../constants';
-import { Randomizer as RandomizerEntity, RandomizerInterface, RandomizerItem } from '../database/entity/randomizer';
+import { Randomizer as RandomizerEntity, RandomizerItem } from '../database/entity/randomizer';
 import { parser } from '../decorators';
 import { adminEndpoint } from '../helpers/socket';
 import Registry from './_interface';
@@ -16,7 +16,7 @@ class Randomizer extends Registry {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'randomizer::getAll', async (cb) => {
+    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         cb(
           null,
@@ -28,7 +28,7 @@ class Randomizer extends Registry {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'randomizer::remove', async (item: Required<RandomizerInterface>, cb) => {
+    adminEndpoint(this.nsp, 'randomizer::remove', async (item, cb) => {
       const result = await getRepository(RandomizerEntity).remove(item);
       await getRepository(RandomizerItem).delete({ randomizerId: IsNull() });
       try {
@@ -40,7 +40,7 @@ class Randomizer extends Registry {
         cb (e, null);
       }
     });
-    adminEndpoint(this.nsp, 'randomizer::save', async (item: RandomizerInterface & RandomizerInterface[], cb) => {
+    adminEndpoint(this.nsp, 'randomizer::save', async (item, cb) => {
       const result = await getRepository(RandomizerEntity).save(item);
       await getRepository(RandomizerItem).delete({ randomizerId: IsNull() });
       try {
@@ -55,10 +55,10 @@ class Randomizer extends Registry {
     adminEndpoint(this.nsp, 'randomizer::startSpin', async () => {
       this.socket.emit('spin');
     });
-    adminEndpoint(this.nsp, 'randomizer::showById', async (id: string, cb) => {
+    adminEndpoint(this.nsp, 'randomizer::showById', async (id, cb) => {
       try {
         await getRepository(RandomizerEntity).update({}, { isShown: false });
-        await getRepository(RandomizerEntity).update({ id }, { isShown: true });
+        await getRepository(RandomizerEntity).update({ id: String(id) }, { isShown: true });
         cb(null);
       } catch (e) {
         cb (e);
@@ -72,7 +72,7 @@ class Randomizer extends Registry {
         cb (e);
       }
     });
-    adminEndpoint(this.nsp, 'randomizer::getOne', async (id: string, cb) => {
+    adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
       try {
         cb(
           null,
@@ -121,7 +121,7 @@ class Randomizer extends Registry {
         randomizer.permissionId,
         (await permissions.check(opts.sender.userId, randomizer.permissionId, false)).access,
       );
-    };
+    }
 
     // user doesn't have permision to use command
     if (!getFromViewersCache(opts.sender.userId, randomizer.permissionId)) {

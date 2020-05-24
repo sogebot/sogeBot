@@ -11,7 +11,7 @@ import { info } from './helpers/log';
 import { CacheTitles } from './database/entity/cacheTitles';
 import { v4 as uuid} from 'uuid';
 import { getConnection, getManager, getRepository, IsNull } from 'typeorm';
-import { Dashboard, DashboardInterface, Widget } from './database/entity/dashboard';
+import { Dashboard, Widget } from './database/entity/dashboard';
 import { Translation } from './database/entity/translation';
 import { TwitchTag } from './database/entity/twitch';
 import { User } from './database/entity/user';
@@ -342,10 +342,10 @@ export const init = () => {
       cb(null, errorsToShow);
     });
 
-    adminEndpoint('/', 'panel::availableWidgets', async (userId: number, type: DashboardInterface['type'], cb) => {
+    adminEndpoint('/', 'panel::availableWidgets', async (opts, cb) => {
       const dashboards = await getRepository(Dashboard).find({
         where: {
-          userId, type,
+          userId: opts.userId, type: opts.type,
         },
         relations: ['widgets'],
         order: {
@@ -363,24 +363,24 @@ export const init = () => {
       cb(null, sendWidgets);
     });
 
-    adminEndpoint('/', 'panel::dashboards', async (userId: number, type: DashboardInterface['type'], cb) => {
+    adminEndpoint('/', 'panel::dashboards', async (opts, cb) => {
       getRepository(Widget).delete({ dashboardId: IsNull() });
       const dashboards = await getRepository(Dashboard).find({
-        where: { userId, type },
+        where: { userId: opts.userId, type: opts.type },
         relations: ['widgets'],
         order: { createdAt: 'ASC' },
       });
       cb(null, dashboards);
     });
 
-    adminEndpoint('/', 'panel::dashboards::remove', async (userId: number, type: DashboardInterface['type'], id: string, cb) => {
-      await getRepository(Dashboard).delete({ userId, type, id });
+    adminEndpoint('/', 'panel::dashboards::remove', async (opts, cb) => {
+      await getRepository(Dashboard).delete({ userId: opts.userId, type: opts.type, id: opts.id });
       await getRepository(Widget).delete({ dashboardId: IsNull() });
       cb(null);
     });
 
-    adminEndpoint('/', 'panel::dashboards::create', async (userId: number, name: string, cb) => {
-      cb(null, await getRepository(Dashboard).save({ name, createdAt: Date.now(), id: uuid(), userId, type: 'admin' }));
+    adminEndpoint('/', 'panel::dashboards::create', async (opts, cb) => {
+      cb(null, await getRepository(Dashboard).save({ name: opts.name, createdAt: Date.now(), id: uuid(), userId: opts.userId, type: 'admin' }));
     });
 
     socket.on('addWidget', async function (widgetName, id, cb) {
@@ -443,7 +443,7 @@ export const init = () => {
         toEmit.push({
           name: system.toLowerCase(),
         });
-      };
+      }
       cb(null, toEmit);
     });
     socket.on('integrations', async (cb) => {
@@ -505,7 +505,7 @@ export const init = () => {
     });
 
     adminEndpoint('/', 'menu', (cb) => {
-      cb(menu);
+      cb(null, menu);
     });
 
     publicEndpoint('/', 'menu::public', (cb) => {

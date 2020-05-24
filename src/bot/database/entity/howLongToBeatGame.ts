@@ -12,7 +12,7 @@ export interface HowLongToBeatGameInterface {
   gameplayMain?: number;
   gameplayCompletionist?: number;
   imageUrl: string;
-};
+}
 
 export const HowLongToBeatGame = new EntitySchema<Readonly<Required<HowLongToBeatGameInterface>>>({
   name: 'how_long_to_beat_game',

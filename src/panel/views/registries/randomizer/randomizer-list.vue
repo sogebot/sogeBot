@@ -112,17 +112,20 @@ export default class randomizerList extends Vue {
   async refresh() {
     await Promise.all([
       new Promise(async(done) => {
-        this.psocket.emit('permissions', (data) => {
+        this.psocket.emit('permissions', (err, data) => {
+  if(err) {
+    return console.error(err);
+  }
           this.permissions = data
           done();
         });
       }),
       new Promise(async(done) => {
-        this.socket.emit('randomizer::getAll', (err, data) => {
+        this.socket.emit('generic::getAll', (err, data) => {
           if (err) {
             return console.error(err);
           }
-          console.groupCollapsed('randomizer::getAll')
+          console.groupCollapsed('generic::getAll')
           console.debug(data);
           console.groupEnd;
           this.items = data;

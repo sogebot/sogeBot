@@ -231,7 +231,7 @@ export default class carouselOverlayEdit extends Vue {
   }
 
   del() {
-    this.socket.emit('carousel::remove', this.item.id, (err) => {
+    this.socket.emit('generic::deleteById', this.item.id, (err) => {
       if (err) {
         return console.error(err);
       }
@@ -241,7 +241,7 @@ export default class carouselOverlayEdit extends Vue {
 
   created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('carousel::getOne', this.$route.params.id, (err, item) => {
+    this.socket.emit('generic::getOne', this.$route.params.id, (err, item) => {
       if (err) {
         return console.error(err);
       }

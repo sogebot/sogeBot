@@ -13,7 +13,7 @@ export interface RaffleInterface {
   forSubscribers: boolean;
   isClosed?: boolean;
   participants: RaffleParticipantInterface[];
-};
+}
 
 export interface RaffleParticipantInterface {
   id?: number;
@@ -24,14 +24,14 @@ export interface RaffleParticipantInterface {
   isFollower: boolean;
   isSubscriber: boolean;
   messages: RaffleParticipantMessageInterface[];
-};
+}
 
 export interface RaffleParticipantMessageInterface {
   id?: number;
   participant?: RaffleParticipantInterface;
   timestamp: number;
   text: string;
-};
+}
 
 export const Raffle = new EntitySchema<Readonly<Required<RaffleInterface>>>({
   name: 'raffle',

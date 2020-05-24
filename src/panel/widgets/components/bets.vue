@@ -104,7 +104,7 @@ export default {
   },
   methods: {
     close: function (index) {
-      this.socket.emit('close', index)
+      this.socket.emit('bets::close', index)
     },
     getBetsPercentage: function (index) {
       if (this.bets.length === 0) return 0

@@ -47,11 +47,13 @@ class Cooldown extends System {
         cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'cooldown::deleteById', async (id, cb) => {
-      await getRepository(CooldownEntity).delete({ id });
-      cb();
+    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
+      await getRepository(CooldownEntity).delete({ id: String(id) });
+      if (cb) {
+        cb(null);
+      }
     });
-    adminEndpoint(this.nsp, 'cooldown::getAll', async (cb) => {
+    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         const cooldown = await getRepository(CooldownEntity).find({
           order: {
@@ -63,7 +65,7 @@ class Cooldown extends System {
         cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'cooldown::getById', async (id, cb) => {
+    adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
       try {
         const cooldown = await getRepository(CooldownEntity).findOne({
           where: { id },

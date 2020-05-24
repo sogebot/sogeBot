@@ -15,7 +15,7 @@ export interface CooldownInterface {
   isSubscriberAffected: boolean;
   isFollowerAffected: boolean;
   viewers?: CooldownViewerInterface[];
-};
+}
 
 export interface CooldownViewerInterface {
   id?: string;
@@ -23,7 +23,7 @@ export interface CooldownViewerInterface {
   userId: number;
   timestamp: number;
   lastTimestamp: number;
-};
+}
 
 export const Cooldown = new EntitySchema<Readonly<Required<CooldownInterface>>>({
   name: 'cooldown',

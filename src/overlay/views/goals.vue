@@ -261,7 +261,7 @@ export default class GoalsOverlay extends Vue {
         if (err) return console.error(err)
         this.current = current
       })
-      this.socket.emit('goals::getOne', id, (err, cb: Required<GoalGroupInterface> | undefined) => {
+      this.socket.emit('generic::getOne', id, (err, cb: Required<GoalGroupInterface> | undefined) => {
         if (err) return console.error(err)
         this.group = cb || null;
 

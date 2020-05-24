@@ -93,7 +93,7 @@ export default class timersList extends Vue {
 
   created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('timers::getAll', (err, items: TimerInterface[]) => {
+    this.socket.emit('generic::getAll', (err, items: TimerInterface[]) => {
       this.items = items
       this.state.loading = this.$state.success;
     })
@@ -104,7 +104,7 @@ export default class timersList extends Vue {
   }
 
   del(id) {
-    this.socket.emit('timers::remove', id, () => {
+    this.socket.emit('generic::deleteById', id, () => {
       this.items = this.items.filter((o) => o.id !== id)
     })
   }

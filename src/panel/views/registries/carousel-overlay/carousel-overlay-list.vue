@@ -108,7 +108,7 @@ export default class carouselOverlayList extends Vue {
 
   refresh() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('carousel::getAll', (err, items) => {
+    this.socket.emit('generic::getAll', (err, items) => {
       if (err) {
         return console.error(err);
       }
@@ -182,7 +182,7 @@ export default class carouselOverlayList extends Vue {
   }
 
   remove(item) {
-    this.socket.emit('carousel::remove', item.id, (err) => {
+    this.socket.emit('generic::deleteById', item.id, (err) => {
       if (err) {
         return console.error(err);
       }

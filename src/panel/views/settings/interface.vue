@@ -334,7 +334,10 @@ export default class interfaceSettings extends Vue {
       this.heightOfMenuUpdate()
     }, 1000)
 
-    this.psocket.emit('permissions', (data) => {
+    this.psocket.emit('permissions', (err, data) => {
+  if(err) {
+    return console.error(err);
+  }
       this.permissions = data
     })
   }

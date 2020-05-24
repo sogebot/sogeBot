@@ -267,7 +267,7 @@
         return options >= 2
       },
       refresh: function () {
-        this.socket.emit('polls::getAll', (err, data) =>  {
+        this.socket.emit('generic::getAll', (err, data) =>  {
           if (err) {
             return console.error(err);
           }
@@ -280,7 +280,7 @@
         this.newVote.isOpened = true
         delete this.newVote.closedAt
 
-        this.socket.emit('create', this.newVote, (err, data) => {
+        this.socket.emit('polls::save', this.newVote, (err, data) => {
             if (err) return console.error(err)
             else {
               this.refresh();
@@ -313,7 +313,7 @@
         if (typeof vote === 'object') {
           vote.isOpened = false;
           vote.closedAt = Date.now();
-          this.socket.emit('close', vote, (err) => {
+          this.socket.emit('polls::close', vote, (err) => {
             if (err) console.error(err)
           })
         }
