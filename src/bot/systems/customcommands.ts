@@ -35,6 +35,15 @@ import ranks from './ranks';
  * !command list ![cmd]                                                     - get responses of command
  */
 
+let cacheValid = false;
+const findCache: {
+  search: string;
+  commands: {
+    command: CommandsInterface;
+    cmdArray: string[];
+  }[]
+}[] = [];
+
 class CustomCommands extends System {
   constructor () {
     super();
@@ -50,6 +59,7 @@ class CustomCommands extends System {
       try {
         const item = await getRepository(Commands).findOne({ id: String(opts.id) });
         await getRepository(Commands).save({ ...item, ...opts.item});
+        cacheValid = false;
         if (typeof cb === 'function') {
           cb(null, item);
         }
@@ -61,6 +71,7 @@ class CustomCommands extends System {
     });
     adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
       await getRepository(Commands).delete({ id: String(id) });
+      cacheValid = false;
       if (cb) {
         cb(null);
       }
@@ -147,6 +158,7 @@ class CustomCommands extends System {
       }
 
       await getRepository(Commands).save(cDb);
+      cacheValid = false;
       return [{ response: prepare('customcmds.command-was-edited', { command: cmd, response }), ...opts }];
     } catch (e) {
       return [{ response: prepare('customcmds.commands-parse-failed'), ...opts }];
@@ -196,6 +208,7 @@ class CustomCommands extends System {
           filter: '',
         }],
       });
+      cacheValid = false;
       return [{ response: prepare('customcmds.command-was-added', { command: cmd }), ...opts }];
     } catch (e) {
       return [{ response: prepare('customcmds.commands-parse-failed'), ...opts }];
@@ -207,24 +220,38 @@ class CustomCommands extends System {
       command: CommandsInterface;
       cmdArray: string[];
     }[] = [];
-    const cmdArray = search.toLowerCase().split(' ');
-    for (let i = 0, len = search.toLowerCase().split(' ').length; i < len; i++) {
-      const db_commands: CommandsInterface[]
-        = await getRepository(Commands).find({
-          relations: ['responses'],
-          where: {
-            command: cmdArray.join(' '),
-          },
-        });
-      for (const cmd of db_commands) {
-        commands.push({
-          cmdArray: _.cloneDeep(cmdArray),
-          command: cmd,
-        });
+    if (!cacheValid) {
+      // we need to purge findCache and make cacheValid again
+      while(findCache.length > 0) {
+        findCache.shift();
       }
-      cmdArray.pop(); // remove last array item if not found
+      cacheValid = true;
     }
-    return commands;
+
+    const fromCache = findCache.find(o => o.search === search);
+    if (fromCache) {
+      return fromCache.commands;
+    } else {
+      const cmdArray = search.toLowerCase().split(' ');
+      for (let i = 0, len = search.toLowerCase().split(' ').length; i < len; i++) {
+        const db_commands: CommandsInterface[]
+          = await getRepository(Commands).find({
+            relations: ['responses'],
+            where: {
+              command: cmdArray.join(' '),
+            },
+          });
+        for (const cmd of db_commands) {
+          commands.push({
+            cmdArray: _.cloneDeep(cmdArray),
+            command: cmd,
+          });
+        }
+        cmdArray.pop(); // remove last array item if not found
+      }
+      findCache.push({ search, commands });
+      return commands;
+    }
   }
 
   @parser({ priority: constants.LOW })
@@ -327,6 +354,7 @@ class CustomCommands extends System {
       ...cmd,
       enabled: !cmd.enabled,
     });
+    cacheValid = false;
     return [{ response: prepare(!cmd.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: cmd.command }), ...opts }];
   }
 
@@ -349,6 +377,7 @@ class CustomCommands extends System {
     await getRepository(Commands).save({...cmd, visible: !cmd.visible});
 
     const response = prepare(!cmd.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: cmd.command });
+    cacheValid = false;
     return [{ response, ...opts }];
   }
 
@@ -365,6 +394,7 @@ class CustomCommands extends System {
         return [{ response: prepare('customcmds.command-was-not-found', { command: cmd }), ...opts }];
       } else {
         await getRepository(Commands).remove(command_db);
+        cacheValid = false;
         return [{ response: prepare('customcmds.command-was-removed', { command: cmd }), ...opts }];
       }
     } catch (e) {
