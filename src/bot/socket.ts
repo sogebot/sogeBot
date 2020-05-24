@@ -85,7 +85,6 @@ const initEndpoints = async(socket: SocketIO.Socket, privileges: Unpacked<Return
     socket.removeAllListeners(on); // remove all listeners in case we call this twice
 
     socket.on(on, async (opts: any, cb: (error: Error | string | null, ...response: any) => void) => {
-      socket.removeAllListeners(on); // remove all listeners in case we call this twice
       const adminEndpoint = endpointsToInit.find(o => o.type === 'admin');
       const viewerEndpoint = endpointsToInit.find(o => o.type === 'viewer');
       const publicEndpoint = endpointsToInit.find(o => o.type === 'public');
