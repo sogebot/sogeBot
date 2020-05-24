@@ -7,7 +7,6 @@ export interface CooldownInterface {
   miliseconds: number;
   type: 'global' | 'user';
   timestamp?: number;
-  lastTimestamp?: number;
   isErrorMsgQuiet: boolean;
   isEnabled: boolean;
   isOwnerAffected: boolean;
@@ -22,7 +21,6 @@ export interface CooldownViewerInterface {
   cooldown?: CooldownInterface;
   userId: number;
   timestamp: number;
-  lastTimestamp: number;
 }
 
 export const Cooldown = new EntitySchema<Readonly<Required<CooldownInterface>>>({
@@ -33,7 +31,6 @@ export const Cooldown = new EntitySchema<Readonly<Required<CooldownInterface>>>(
     miliseconds: { type: Number },
     type: { type: 'varchar', length: 10 },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-    lastTimestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
     isErrorMsgQuiet: { type: Boolean },
     isEnabled: { type: Boolean },
     isOwnerAffected: { type: Boolean },
@@ -60,7 +57,6 @@ export const CooldownViewer = new EntitySchema<Readonly<Required<CooldownViewerI
     id: { type: 'uuid', primary: true, generated: 'uuid' },
     userId: { type: Number },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer() },
-    lastTimestamp: { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },
   relations: {
     cooldown: {

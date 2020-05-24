@@ -164,6 +164,7 @@ interface CommandOptions {
 }
 
 interface ParserOptions {
+  id: string;
   sender: CommandOptions['sender'];
   parameters: string;
   message: string;

@@ -142,7 +142,6 @@ export default class cooldownEdit extends Vue {
     miliseconds: 600000,
     type: 'global',
     timestamp: 0,
-    lastTimestamp: 0,
     isErrorMsgQuiet: false,
     isEnabled: true,
     isOwnerAffected: true,
