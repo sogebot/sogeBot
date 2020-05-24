@@ -1,7 +1,7 @@
 {
   "settings": {
     "enabled": "Статус",
-    "guild": "Guild",
+    "guild": "Сервер",
     "listenAtChannels": "Слушать на этих каналах",
     "sendOnlineAnnounceToChannel": "Отправить онлайн объявление в этот канал",
     "sendGeneralAnnounceToChannel": "Отправить общее объявление в этот канал",
@@ -12,7 +12,7 @@
     "cannotJoinToServerBtn": "Установите токен и clientId, чтобы иметь возможность пригласить бота на ваш сервер",
     "noChannelSelected": "канал не выбран",
     "noRoleSelected": "роль не выбрана",
-    "noGuildSelected": "no guild selected",
-    "noGuildSelectedBox": "Select guild where bot should work and you'll see more settings"
+    "noGuildSelected": "сервер не выбран",
+    "noGuildSelectedBox": "Выберете сервер на котором должен работать бот, и вы увидите больше настроек"
   }
 }
