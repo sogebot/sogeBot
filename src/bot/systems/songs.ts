@@ -530,7 +530,7 @@ class Songs extends System {
           resolve([{ response: translate('songs.song-was-not-found'), ...opts }]);
         } else if (Number(videoInfo.length_seconds) / 60 > this.duration) {
           resolve([{ response: translate('songs.song-is-too-long'), ...opts }]);
-        } else if (videoInfo.media.category_url !== 'https://www.youtube.com/channel/UC-9-kyTW8ZkZNDHQJ6FgpwQ' && this.onlyMusicCategory) {
+        } else if ((videoInfo.media.category_url !== 'https://www.youtube.com/channel/UC-9-kyTW8ZkZNDHQJ6FgpwQ' && JSON.parse((videoInfo as any).player.args.player_response).microformat.playerMicroformatRenderer.category !== 'Music') && this.onlyMusicCategory) {
           if (Number(opts.retry ?? 0) < 5) {
             // try once more to be sure
             setTimeout(() => {
@@ -538,7 +538,8 @@ class Songs extends System {
             }, 500);
           }
           if (global.mocha) {
-            error(videoInfo.media);
+            error('-- TEST ONLY ERROR --');
+            error({ media: videoInfo.media, category: JSON.parse((videoInfo as any).player.args.player_response).microformat.playerMicroformatRenderer.category });
           }
           resolve([{ response: translate('songs.incorrect-category'), ...opts }]);
         } else {
