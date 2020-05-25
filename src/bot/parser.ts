@@ -1,4 +1,6 @@
 import {v4 as uuid} from 'uuid';
+import crypto from 'crypto';
+
 import _ from 'lodash';
 import * as constants from './constants';
 import { getBotSender } from './commons';
@@ -14,7 +16,7 @@ import currency from './currency';
 import general from './general';
 import tmi from './tmi';
 import { list } from './helpers/register';
-import { cachedCommandsPermissions } from './helpers/commands/pCache';
+import { addToParserFindCache, cachedCommandsPermissions, parserFindCache } from './helpers/cache';
 
 class Parser {
   id = uuid();
@@ -206,24 +208,33 @@ class Parser {
     this: any; fnc: (opts: CommandOptions) => CommandResponse[]; command: string; id: string; permission: string | null; _fncName: string;
   }[] | null = null) {
     debug('parser.find', JSON.stringify({message, cmdlist}));
-    if (cmdlist === null) {
-      cmdlist = await this.getCommandsList();
-    }
-    for (const item of cmdlist) {
-      const onlyParams = message.trim().toLowerCase().replace(item.command, '');
-      const isStartingWith = message.trim().toLowerCase().startsWith(item.command);
 
-      debug('parser.find', JSON.stringify({command: item.command, isStartingWith}));
-
-      if (isStartingWith && (onlyParams.length === 0 || (onlyParams.length > 0 && onlyParams[0] === ' '))) {
-        const customPermission = await permissions.getCommandPermission(item.id);
-        if (typeof customPermission !== 'undefined') {
-          item.permission = customPermission;
-        }
-        return item;
+    const hash = crypto.createHash('sha1').update(JSON.stringify({message, cmdlist})).digest('hex');
+    const cache = parserFindCache.find(o => o.hash === hash);
+    if (cache) {
+      return cache.command;
+    } else {
+      if (cmdlist === null) {
+        cmdlist = await this.getCommandsList();
       }
+      for (const item of cmdlist) {
+        const onlyParams = message.trim().toLowerCase().replace(item.command, '');
+        const isStartingWith = message.trim().toLowerCase().startsWith(item.command);
+
+        debug('parser.find', JSON.stringify({command: item.command, isStartingWith}));
+
+        if (isStartingWith && (onlyParams.length === 0 || (onlyParams.length > 0 && onlyParams[0] === ' '))) {
+          const customPermission = await permissions.getCommandPermission(item.id);
+          if (typeof customPermission !== 'undefined') {
+            item.permission = customPermission;
+          }
+          addToParserFindCache(hash, item);
+          return item;
+        }
+      }
+      addToParserFindCache(hash, null);
+      return null;
     }
-    return null;
   }
 
   async getCommandsList () {
