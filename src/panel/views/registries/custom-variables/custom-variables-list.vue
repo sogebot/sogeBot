@@ -157,7 +157,7 @@ export default class customVariablesList extends Vue {
     })
   }
 
-  getPermissionName(id) {
+  getPermissionName(id: string | null) {
     if (!id) return null
     const permission = this.permissions.find((o) => {
       return o.id === id

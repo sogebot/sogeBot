@@ -99,7 +99,7 @@ export default class sortableList extends Vue {
     }
   }
 
-  getPermissionName(id) {
+  getPermissionName(id: string | null) {
     if (!id) {return 'Disabled';};
     const permission = this.permissionsList.find((o) => {
       return o.id === id;

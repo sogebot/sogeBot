@@ -138,7 +138,7 @@ Component.registerHooks([
 ])
 
 
-const mustBeCompliant = (value) => value.length === 0 || !!value.match(/^[a-zA-Z0-9_]+$/);
+const mustBeCompliant = (value: string) => value.length === 0 || !!value.match(/^[a-zA-Z0-9_]+$/);
 
 @Component({
   components: {

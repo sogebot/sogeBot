@@ -201,7 +201,7 @@ export default class CommandsEdit extends Vue {
     item: {
       command: {
         required,
-        sw: (value) => value.startsWith('!'),
+        sw: (value: string) => value.startsWith('!'),
         minLength: minLength(2),
       },
     }
@@ -266,7 +266,7 @@ export default class CommandsEdit extends Vue {
     }
   }
 
-  getPermissionName(id) {
+  getPermissionName(id: string | null) {
     if (!id) return 'Disabled'
     const permission = this.permissions.find((o) => {
       return o.id === id

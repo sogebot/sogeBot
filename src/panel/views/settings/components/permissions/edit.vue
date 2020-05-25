@@ -140,7 +140,7 @@
     },
     methods: {
       refreshOrder() {
-        this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, p) => {
+        this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, p: PermissionsInterface) => {
           if (err) {
             return console.error(err);
           }
@@ -153,7 +153,7 @@
         this.isLoading.permission = true
         this.isPending = false;
 
-        this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, p) => {
+        this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, p: PermissionsInterface) => {
           if (err) {
             return console.error(err);
           }
@@ -163,7 +163,7 @@
       },
       save() {
         this.isSaving = 1
-        this.socket.emit('permission::save', this.item, (err: string | null, data) => {
+        this.socket.emit('permission::save', this.item, (err: string | null, data: PermissionsInterface) => {
           if (err) {
             this.isSaving = 3
           } else {

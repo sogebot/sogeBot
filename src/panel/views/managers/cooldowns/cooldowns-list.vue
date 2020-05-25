@@ -98,7 +98,7 @@ export default class cooldownList extends Vue {
       label: this.translate('cooldown'),
       sortable: true,
     },
-    { key: 'type', label: this.translate('type'), sortable: true, formatter: (value) => this.translate(value) },
+    { key: 'type', label: this.translate('type'), sortable: true, formatter: (value: string) => this.translate(value) },
     { key: 'isErrorMsgQuiet', label: capitalize(this.translate('quiet')), sortable: true },
     { key: 'isOwnerAffected', label: capitalize(this.translate('core.permissions.casters')), sortable: true },
     { key: 'isModeratorAffected', label: capitalize(this.translate('core.permissions.moderators')), sortable: true },

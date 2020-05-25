@@ -528,7 +528,7 @@ export default class customVariablesEdit extends Vue {
     this.urls = this.urls.filter(o => o.id !== id);
   }
 
-  getPermissionName(id) {
+  getPermissionName(id: string | null) {
     if (!id) return 'Disabled'
     const permission = this.permissions.find((o) => {
       return o.id === id

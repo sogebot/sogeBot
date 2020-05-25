@@ -273,6 +273,7 @@ import { cloneDeep, isEqual } from 'lodash-es';
 
 import { getSocket } from 'src/panel/helpers/socket';
 import type { RandomizerInterface, RandomizerItemInterface } from 'src/bot/database/entity/randomizer';
+import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
 import { v4 as uuid } from 'uuid';
 import { permission } from 'src/bot/helpers/permissions';
 import { getRandomColor, getContrastColor } from 'src/panel/helpers/color';
@@ -361,15 +362,15 @@ export default class randomizerEdit extends Vue {
       },
       command: {
         required,
-        sw: (value) => value.startsWith('!'),
+        sw: (value: string) => value.startsWith('!'),
         minLength: minLength(2),
       },
       permissionId: {
-        mustBeExisting: (value) => !!this.getPermissionName(value),
+        mustBeExisting: (value: string) => !!this.getPermissionName(value),
       },
       customizationFont: {
         borderColor: {
-          isColor: (value) => !!value.match(/^(#{1})([0-9A-F]{8}|[0-9A-F]{6})$/ig),
+          isColor: (value: string) => !!value.match(/^(#{1})([0-9A-F]{8}|[0-9A-F]{6})$/ig),
         },
         size: {
           required,
@@ -389,7 +390,7 @@ export default class randomizerEdit extends Vue {
     items = items.filter(o => o.numOfDuplicates > 0);
 
 
-    const countGroupItems = (item: RandomizerItemInterface, count = 0) => {
+    const countGroupItems = (item: RandomizerItemInterface, count = 0): number => {
       const child = items.find(o => o.groupId === item.id);
       if (child) {
         return countGroupItems(child, count + 1);
@@ -460,7 +461,7 @@ export default class randomizerEdit extends Vue {
     }
   }
 
-  getPermissionName(id) {
+  getPermissionName(id: string | null) {
     if (!id) return null
     const permission = this.permissions.find((o) => {
       return o.id === id
@@ -489,7 +490,7 @@ export default class randomizerEdit extends Vue {
     })
   }
 
-  rmOption(id) {
+  rmOption(id: string) {
     this.item.items = this.item.items.filter(o => o.id !== id);
     for (const item of this.item.items.filter(o => o.groupId !== id)) {
       item.groupId = null;
@@ -530,7 +531,7 @@ export default class randomizerEdit extends Vue {
       await new Promise((resolve) => {
         this.item.isShown = this.isShown;
         console.debug('Saving randomizer', this.item);
-        this.socket.emit('randomizer::save', this.item, (err: string | null, data) => {
+        this.socket.emit('randomizer::save', this.item, (err: Error | null) => {
           if (err) {
             this.state.save = this.$state.fail;
             this.$bvToast.toast(err.message, {
@@ -598,9 +599,9 @@ export default class randomizerEdit extends Vue {
       }),
       new Promise(async(done) => {
         this.psocket.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
-  if(err) {
-    return console.error(err);
-  }
+        if(err) {
+          return console.error(err);
+        }
           this.permissions = data
           done();
         });

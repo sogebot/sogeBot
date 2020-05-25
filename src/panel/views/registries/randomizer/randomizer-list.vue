@@ -160,7 +160,7 @@ export default class randomizerList extends Vue {
     this.$router.push({ name: 'RandomizerRegistryEdit', params: { id: item.id } });
   }
 
-  getPermissionName(id) {
+  getPermissionName(id: string | null) {
     if (!id) return null
     const permission = this.permissions.find((o) => {
       return o.id === id
