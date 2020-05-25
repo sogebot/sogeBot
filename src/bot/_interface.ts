@@ -18,7 +18,7 @@ import { isDbConnected } from './helpers/database';
 import { register } from './helpers/register';
 import { addMenu, addMenuPublic, addWidget, ioServer, menuPublic } from './helpers/panel';
 import { v4 as uuid } from 'uuid';
-import { refreshCachedCommandPermissions } from './helpers/commands/pCache';
+import { invalidateParserCache, refreshCachedCommandPermissions } from './helpers/cache';
 
 let socket: import('./socket').Socket | any = null;
 
@@ -740,6 +740,7 @@ class Module {
    *
    */
   protected async setCommand(command: string, updated: string): Promise<void> {
+    invalidateParserCache();
     const c = this._commands.find((o) => o.name === command);
     if (c) {
       if (c.name === updated) {
