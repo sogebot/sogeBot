@@ -254,7 +254,7 @@ export default class playlist extends Vue {
       item.volume = Number(item.volume)
       item.startTime = Number(item.startTime)
       item.endTime = Number(item.endTime)
-      this.socket.emit('songs::save', item, (err) => {
+      this.socket.emit('songs::save', item, (err: string | null) => {
         if (err) {
           console.error(err)
           return this.state.save = 3

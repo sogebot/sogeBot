@@ -264,6 +264,9 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
 
+import { Route } from 'vue-router'
+import { NextFunction } from 'express';
+
 import { Validations } from 'vuelidate-property-decorators';
 import { required, minLength, minValue } from 'vuelidate/lib/validators';
 import { cloneDeep, isEqual } from 'lodash-es';
@@ -290,7 +293,7 @@ Component.registerHooks([
     loading: () => import('../../../components/loading.vue'),
   },
   filters: {
-    capitalize(value) {
+    capitalize(value: string) {
       if (!value) return ''
       value = value.toString()
       return value.charAt(0).toUpperCase() + value.slice(1)
@@ -431,7 +434,7 @@ export default class randomizerEdit extends Vue {
     }
   }
 
-  beforeRouteUpdate(to, from, next) {
+  beforeRouteUpdate(to: Route, from: Route, next: NextFunction) {
     if (this.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
       if (!isOK) {
@@ -444,7 +447,7 @@ export default class randomizerEdit extends Vue {
     }
   }
 
-  beforeRouteLeave(to, from, next) {
+  beforeRouteLeave(to: Route, from: Route, next: NextFunction) {
     if (this.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
       if (!isOK) {
@@ -494,7 +497,7 @@ export default class randomizerEdit extends Vue {
   }
 
   del() {
-    this.socket.emit('randomizer::remove', this.item, (err) => {
+    this.socket.emit('randomizer::remove', this.item, (err: string | null) => {
       if (err) {
         console.error(err);
       } else {
@@ -527,7 +530,7 @@ export default class randomizerEdit extends Vue {
       await new Promise((resolve) => {
         this.item.isShown = this.isShown;
         console.debug('Saving randomizer', this.item);
-        this.socket.emit('randomizer::save', this.item, (err, data) => {
+        this.socket.emit('randomizer::save', this.item, (err: string | null, data) => {
           if (err) {
             this.state.save = this.$state.fail;
             this.$bvToast.toast(err.message, {
@@ -555,7 +558,7 @@ export default class randomizerEdit extends Vue {
     await Promise.all([
       new Promise(async (done) => {
         if (this.$route.params.id) {
-          this.socket.emit('generic::getOne', this.$route.params.id, (err, d: Required<RandomizerInterface>) => {
+          this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, d: Required<RandomizerInterface>) => {
             if (err) {
               console.error(err);
               return;
@@ -588,13 +591,13 @@ export default class randomizerEdit extends Vue {
 
           request.send();
         })
-        this.fonts = response.items.map((o) => {
+        this.fonts = response.items.map((o: { family: string }) => {
           return { text: o.family, value: o.family }
         })
         done();
       }),
       new Promise(async(done) => {
-        this.psocket.emit('permissions', (err, data) => {
+        this.psocket.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
   if(err) {
     return console.error(err);
   }

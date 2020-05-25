@@ -447,7 +447,7 @@
         }
       })
 
-      this.socket.emit('panel::errors', (err, data) => {
+      this.socket.emit('panel::errors', (err: string | null, data) => {
         if (err) {
           return console.error(err);
         }
@@ -457,7 +457,7 @@
         this.errors = data;
       });
 
-      this.socket.emit('getLatestStats', (err, data) => {
+      this.socket.emit('getLatestStats', (err: string | null, data) => {
         console.groupCollapsed('navbar::getLatestStats')
         if (err) {
           return console.error(err);
@@ -469,7 +469,7 @@
 
       setInterval(() => {
         this.timestamp = Date.now()
-        this.socket.emit('panel.sendStreamData', async (err, data) => {
+        this.socket.emit('panel.sendStreamData', async (err: string | null, data) => {
           console.groupCollapsed('navbar::panel.sendStreamData')
           if (err) {
             return console.error(err);

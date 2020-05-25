@@ -72,6 +72,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { isNil, orderBy } from 'lodash-es';
+// @ts-ignore - we don't have types for vue-prism-component
 import Prism from 'vue-prism-component'
 import { getSocket } from 'src/panel/helpers/socket';
 
@@ -90,7 +91,7 @@ import 'prismjs/themes/prism.css'
     'prism': Prism,
   },
   filters: {
-    capitalize(value) {
+    capitalize(value: string) {
       if (!value) return ''
       value = value.toString()
       return value.charAt(0).toUpperCase() + value.slice(1)
@@ -115,7 +116,7 @@ export default class textOverlayList extends Vue {
 
     created() {
       this.state.loaded = false;
-      this.socket.emit('generic::getAll', (err, items) => {
+      this.socket.emit('generic::getAll', (err: string | null, items) => {
         if (err) {
           return console.error(err)
         }

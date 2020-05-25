@@ -334,7 +334,7 @@ export default class interfaceSettings extends Vue {
       this.heightOfMenuUpdate()
     }, 1000)
 
-    this.psocket.emit('permissions', (err, data) => {
+    this.psocket.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
   if(err) {
     return console.error(err);
   }
@@ -531,7 +531,7 @@ export default class interfaceSettings extends Vue {
     this.isDataChanged = false; this.isDataChanged = true;
   }
 
-  getPermissionSettingsValue(permId, values) {
+  getPermissionSettingsValue(permId: string, values) {
     const startingOrder = get(this.permissions.find(permission => permission.id === permId), 'order', this.permissions.length);
     for (let i = startingOrder; i <= this.permissions.length; i++) {
       const value = values[get(this.permissions.find(permission => permission.order === i), 'id', '0efd7b1c-e460-4167-8e06-8aaf2c170311' /* viewers */)];

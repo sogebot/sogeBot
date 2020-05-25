@@ -159,6 +159,9 @@ import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import type { AlertInterface, CommonSettingsInterface } from 'src/bot/database/entity/alert';
 
+import { Route } from 'vue-router'
+import { NextFunction } from 'express';
+
 import { remove, every } from 'lodash-es';
 
 import defaultImage from '!!base64-loader!./media/cow01.gif';
@@ -275,7 +278,7 @@ export default class AlertsEdit extends Vue {
   async mounted() {
     this.state.loaded = this.$state.progress;
     if (this.$route.params.id) {
-      this.socket.emit('generic::getOne', this.$route.params.id, (err, data: AlertInterface) => {
+      this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, data: AlertInterface) => {
         if (err) {
           return console.error(err);
         }
@@ -291,7 +294,7 @@ export default class AlertsEdit extends Vue {
     }
   }
 
-  beforeRouteUpdate(to, from, next) {
+  beforeRouteUpdate(to: Route, from: Route, next: NextFunction) {
     if (this.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
       if (!isOK) {
@@ -304,7 +307,7 @@ export default class AlertsEdit extends Vue {
     }
   }
 
-  beforeRouteLeave(to, from, next) {
+  beforeRouteLeave(to: Route, from: Route, next: NextFunction) {
     if (this.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
       if (!isOK) {
@@ -503,7 +506,7 @@ export default class AlertsEdit extends Vue {
       this.state.save = this.$state.progress;
       this.item.updatedAt = Date.now(); // save updateAt
       console.debug('Saving', this.item);
-      this.socket.emit('alerts::save', this.item, (err, data) => {
+      this.socket.emit('alerts::save', this.item, (err: string | null, data) => {
         if (err) {
           this.state.save = this.$state.fail;
           return console.error(err);

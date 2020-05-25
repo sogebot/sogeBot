@@ -108,7 +108,7 @@ export default class carouselOverlayList extends Vue {
 
   refresh() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('generic::getAll', (err, items) => {
+    this.socket.emit('generic::getAll', (err: string | null, items) => {
       if (err) {
         return console.error(err);
       }
@@ -133,7 +133,7 @@ export default class carouselOverlayList extends Vue {
       }
       return o
     })
-    this.socket.emit('carousel::save', this.items, (err) => {
+    this.socket.emit('carousel::save', this.items, (err: string | null) => {
       if (err) {
         return console.error(err);
       }
@@ -149,7 +149,7 @@ export default class carouselOverlayList extends Vue {
       }
       return o
     })
-    this.socket.emit('carousel::save', this.items, (err) => {
+    this.socket.emit('carousel::save', this.items, (err: string | null) => {
       if (err) {
         return console.error(err);
       }
@@ -182,7 +182,7 @@ export default class carouselOverlayList extends Vue {
   }
 
   remove(item) {
-    this.socket.emit('generic::deleteById', item.id, (err) => {
+    this.socket.emit('generic::deleteById', item.id, (err: string | null) => {
       if (err) {
         return console.error(err);
       }

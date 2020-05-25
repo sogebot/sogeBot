@@ -90,7 +90,7 @@ import { orderBy, uniq, xor, flatten } from 'lodash-es';
     'loading': () => import('../../../components/loading.vue'),
   },
   filters: {
-    capitalize(value) {
+    capitalize(value: string) {
       if (!value) return ''
       value = value.toString()
       return value.charAt(0).toUpperCase() + value.slice(1)
@@ -130,7 +130,7 @@ export default class quotesList extends Vue {
       this.quotesFromDb = items
       this.state.loading = this.$state.success;
     })
-    this.socket.emit('settings', (err, data) => {
+    this.socket.emit('settings', (err: string | null, data) => {
       this.settings = data;
       this.state.settings = this.$state.success;
     })

@@ -230,7 +230,7 @@
         })
         this.socket.emit('getUserTwitchGames');
 
-        this.socket.emit('panel.sendStreamData', (err, data) => {
+        this.socket.emit('panel.sendStreamData', (err: string | null, data) => {
           if (err) {
             return console.error(err);
           }
@@ -266,7 +266,7 @@
           game: this.currentGame,
           title,
           tags: this.currentTags,
-        }, (err) => {
+        }, (err: string | null) => {
           if (err) {
             this.saveState = -1;
           } else {
@@ -276,7 +276,7 @@
               game: this.currentGame,
               title,
               titles: this.data
-            }, (err, data) => {
+            }, (err: string | null, data) => {
               this.data = data
             })
           }

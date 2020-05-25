@@ -81,7 +81,7 @@ export default class priceList extends Vue {
     })
   }
 
-  capitalize(value) {
+  capitalize(value: string) {
     if (!value) return ''
     value = value.toString()
     return value.charAt(0).toUpperCase() + value.slice(1)
@@ -93,7 +93,7 @@ export default class priceList extends Vue {
 
   refresh() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('generic::getAll', (err, items) => {
+    this.socket.emit('generic::getAll', (err: string | null, items) => {
       if (err) {
         return console.error(err);
       }
@@ -104,7 +104,7 @@ export default class priceList extends Vue {
   }
 
   update(item) {
-    this.socket.emit('price::save', item, (err) => {
+    this.socket.emit('price::save', item, (err: string | null) => {
       if (err) {
         return console.error(err);
       }
@@ -112,7 +112,7 @@ export default class priceList extends Vue {
   }
 
   del(id) {
-    this.socket.emit('generic::deleteById', id, (err) => {
+    this.socket.emit('generic::deleteById', id, (err: string | null) => {
       if (err) {
         return console.error(err);
       }

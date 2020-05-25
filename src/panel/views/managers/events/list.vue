@@ -223,7 +223,7 @@
       },
     },
     mounted() {
-      this.socket.emit('generic::getAll', (err, data: EventInterface[]) => {
+      this.socket.emit('generic::getAll', (err: string | null, data: EventInterface[]) => {
         if (err) {
           return console.error(err);
         }
@@ -255,7 +255,7 @@
         }, delay)
       },
       deleteEvent(event) {
-        this.socket.emit('events::remove', event, (err) => {
+        this.socket.emit('events::remove', event, (err: string | null) => {
           if (err) {
             return console.error(err);
           }
@@ -272,7 +272,7 @@
         });
       },
       sendUpdate(event) {
-        this.socket.emit('events::save', event, (err) => {
+        this.socket.emit('events::save', event, (err: string | null) => {
           if (err) {
             console.error(err);
           }

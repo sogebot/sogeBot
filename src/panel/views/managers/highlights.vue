@@ -91,7 +91,7 @@ export default class highlightsList extends Vue {
 
   created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('generic::getAll', (err, items) => {
+    this.socket.emit('generic::getAll', (err: string | null, items) => {
       this.items = items
       this.state.loading = this.$state.success;
     })

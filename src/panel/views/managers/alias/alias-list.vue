@@ -154,7 +154,7 @@ export default class aliasList extends Vue {
     { key: 'permission',
       label: this.translate('permission'),
       sortable: true,
-      formatter: (value, key, item) => {
+      formatter: (value: string, key: string, item: aliasList['items'][0]) => {
         return this.getPermissionName(value);
       },
       sortByFormatted: true, },
@@ -166,7 +166,7 @@ export default class aliasList extends Vue {
     this.newGroupNameUpdated = false;
   }
 
-  handleOk(bvModalEvt) {
+  handleOk(bvModalEvt: Event) {
     // Prevent modal from closing
     bvModalEvt.preventDefault()
     // Trigger submit handler
@@ -209,20 +209,20 @@ export default class aliasList extends Vue {
   created() {
     this.state.loadingAls = this.$state.progress;
     this.state.loadingPrm = this.$state.progress;
-    this.psocket.emit('permissions', (err, data) => {
+    this.psocket.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
   if(err) {
     return console.error(err);
   }
       this.permissions = data;
       this.state.loadingPrm = this.$state.success;
     })
-    this.socket.emit('generic::getAll', (err, items) => {
+    this.socket.emit('generic::getAll', (err: string | null, items: aliasList['items']) => {
       this.items = orderBy(items, 'alias', 'asc');
       this.state.loadingAls = this.$state.success;
     })
   }
 
-  getPermissionName (id) {
+  getPermissionName (id: string | null) {
     if (!id) return 'Disabled'
     const permission = this.permissions.find((o) => {
       return o.id === id
@@ -238,32 +238,32 @@ export default class aliasList extends Vue {
     }
   }
 
-  updateGroup (id, group) {
+  updateGroup (id: string, group: AliasInterface['group']) {
     let item = this.items.filter((o) => o.id === id)[0]
     item.group = group
     this.socket.emit('generic::setById', { id: item.id, item }, () => {})
     this.$forceUpdate();
   }
 
-  updatePermission (id, permission) {
+  updatePermission (id: string, permission: string) {
     let item = this.items.filter((o) => o.id === id)[0]
     item.permission = permission
     this.socket.emit('generic::setById', { id: item.id, item }, () => {})
     this.$forceUpdate();
   }
 
-  linkTo(item) {
+  linkTo(item: Required<AliasInterface>) {
     console.debug('Clicked', item.id);
     this.$router.push({ name: 'aliasManagerEdit', params: { id: item.id } });
   }
 
-  remove(id) {
+  remove(id: string) {
    this.socket.emit('generic::deleteById', id, () => {
       this.items = this.items.filter((o) => o.id !== id)
     })
   }
 
-  update(item) {
+  update(item: aliasList['items'][0]) {
     this.socket.emit('generic::setById', { id: { id: item.id, item } }, () => {})
   }
 }

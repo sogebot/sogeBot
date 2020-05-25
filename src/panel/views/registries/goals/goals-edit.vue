@@ -307,6 +307,7 @@
 import Vue from 'vue';
 import { get } from 'lodash-es';
 
+// @ts-ignore - we don't have types for vue-codemirror
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/mode/javascript/javascript.js'
 import 'codemirror/mode/htmlmixed/htmlmixed.js'
@@ -315,6 +316,7 @@ import 'codemirror/theme/base16-dark.css'
 import 'codemirror/theme/base16-light.css'
 import 'codemirror/lib/codemirror.css'
 
+// @ts-ignore - we don't have types for vue-flatpickr-component
 import VueFlatPickr from 'vue-flatpickr-component';
 import 'flatpickr/dist/flatpickr.css';
 
@@ -409,7 +411,7 @@ export default Vue.extend({
   },
   methods: {
     del: function () {
-      this.socket.emit('goals::remove', this.group, (err) => {
+      this.socket.emit('goals::remove', this.group, (err: string | null) => {
         if (err) {
           console.error(err);
         } else {
@@ -426,7 +428,7 @@ export default Vue.extend({
         this.group.name = [...Array(10)].map(() => Math.random().toString(36)[3]).join('')
       }
 
-      this.socket.emit('goals::save', this.group, (err) => {
+      this.socket.emit('goals::save', this.group, (err: string | null) => {
         if (err) {
           console.error(err);
         } else {
@@ -504,7 +506,7 @@ export default Vue.extend({
   },
   mounted: async function () {
     if (this.$route.params.id) {
-      this.socket.emit('generic::getOne', this.$route.params.id, (err, d: Required<GoalGroupInterface>) => {
+      this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, d: Required<GoalGroupInterface>) => {
         if (err) {
           console.error(err);
           return;
@@ -535,7 +537,7 @@ export default Vue.extend({
 
       request.send();
     })
-    this.fonts = response.items.map((o) => {
+    this.fonts = response.items.map((o: { family: string }) => {
       return { text: o.family, value: o.family }
     })
   }

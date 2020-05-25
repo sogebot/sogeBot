@@ -135,6 +135,9 @@
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { orderBy } from  'lodash-es'
 
+import { Route } from 'vue-router'
+import { NextFunction } from 'express';
+
 import { Validations } from 'vuelidate-property-decorators';
 import { required, minLength } from 'vuelidate/lib/validators';
 
@@ -159,7 +162,7 @@ Component.registerHooks([
     'textarea-with-tags': () => import('../../../components/textareaWithTags.vue'),
   },
   filters: {
-    capitalize(value) {
+    capitalize(value: string) {
       if (!value) return ''
       value = value.toString()
       return value.charAt(0).toUpperCase() + value.slice(1)
@@ -204,7 +207,7 @@ export default class CommandsEdit extends Vue {
     }
   }
 
-  beforeRouteUpdate(to, from, next) {
+  beforeRouteUpdate(to: Route, from: Route, next: NextFunction) {
     if (this.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
       if (!isOK) {
@@ -217,7 +220,7 @@ export default class CommandsEdit extends Vue {
     }
   }
 
-  beforeRouteLeave(to, from, next) {
+  beforeRouteLeave(to: Route, from: Route, next: NextFunction) {
     if (this.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
       if (!isOK) {
@@ -238,7 +241,7 @@ export default class CommandsEdit extends Vue {
   }
 
   created() {
-    this.psocket.emit('permissions', (err, data) => {
+    this.psocket.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
   if(err) {
     return console.error(err);
   }
@@ -247,7 +250,7 @@ export default class CommandsEdit extends Vue {
     });
 
     if (this.$route.params.id) {
-      this.socket.emit('generic::getOne', this.$route.params.id, (err, data: Required<CommandsInterface>, count: number) => {
+      this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, data: Required<CommandsInterface>, count: number) => {
         console.debug('Loaded', {data})
         // add empty filter if undefined
         for (let i = 0, length = data.responses.length; i < length; i++) {
@@ -321,7 +324,7 @@ export default class CommandsEdit extends Vue {
       this.state.save = this.$state.progress;
       await new Promise((resolve, reject) => {
         console.debug('Saving command', this.item);
-        this.socket.emit('generic::setById', { id: this.item.id, item: this.item }, (err, data) => {
+        this.socket.emit('generic::setById', { id: this.item.id, item: this.item }, (err: string | null, data) => {
           if (err) {
             this.state.save = this.$state.fail;
             reject(console.error(err));
@@ -332,7 +335,7 @@ export default class CommandsEdit extends Vue {
       await new Promise((resolve, reject) => {
         if (this.count === 0) {
           console.debug('Resetting count');
-          this.socket.emit('commands::resetCountByCommand', this.item.command, (err) => {
+          this.socket.emit('commands::resetCountByCommand', this.item.command, (err: string | null) => {
           if (err) {
             this.state.save = this.$state.fail;
             reject(console.error(err));

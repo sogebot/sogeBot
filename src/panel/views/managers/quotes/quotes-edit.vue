@@ -76,6 +76,9 @@
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 
+import { Route } from 'vue-router'
+import { NextFunction } from 'express';
+
 import { Validations } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators';
 
@@ -170,7 +173,7 @@ export default class QuotesEdit extends Vue {
     }
   }
 
-  beforeRouteUpdate(to, from, next) {
+  beforeRouteUpdate(to: Route, from: Route, next: NextFunction) {
     if (this.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
       if (!isOK) {
@@ -183,7 +186,7 @@ export default class QuotesEdit extends Vue {
     }
   }
 
-  beforeRouteLeave(to, from, next) {
+  beforeRouteLeave(to: Route, from: Route, next: NextFunction) {
     if (this.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
       if (!isOK) {
@@ -217,7 +220,7 @@ export default class QuotesEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
       console.debug('Saving', this.item);
-      this.socket.emit('generic::setById', { id: this.$route.params.id, item: this.item }, (err, data) => {
+      this.socket.emit('generic::setById', { id: this.$route.params.id, item: this.item }, (err: string | null, data) => {
         if (err) {
           this.state.save = this.$state.fail;
           return console.error(err);

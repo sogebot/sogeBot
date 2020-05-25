@@ -175,7 +175,7 @@ export default class commandsList extends Vue {
   created() {
     this.state.loadingCmd = this.$state.progress;
     this.state.loadingPerm = this.$state.progress;
-    this.psocket.emit('permissions', (err, data) => {
+    this.psocket.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
   if(err) {
     return console.error(err);
   }
@@ -236,7 +236,7 @@ export default class commandsList extends Vue {
   }
 
   sendUpdate (id) {
-    this.socket.emit('generic::setById', { id, item: this.commands.find((o) => o.id === id) }, (err) => {
+    this.socket.emit('generic::setById', { id, item: this.commands.find((o) => o.id === id) }, (err: string | null) => {
       if (err) {
         return console.error(err);
       }

@@ -137,7 +137,7 @@ export default class customVariablesList extends Vue {
     // _.throttle), visit: https://lodash.com/docs#debounce
     this.debouncedRunScript = debounce(this.runScript, 1000)
 
-    this.psocket.emit('permissions', (err, data) => {
+    this.psocket.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
   if(err) {
     return console.error(err);
   }
@@ -148,7 +148,7 @@ export default class customVariablesList extends Vue {
   mounted() {
     this.state.loaded = false;
     console.log(this.socket);
-    this.socket.emit('customvariables::list', (err, data) => {
+    this.socket.emit('customvariables::list', (err: string | null, data) => {
       if (err) {
         return console.error(err);
       }

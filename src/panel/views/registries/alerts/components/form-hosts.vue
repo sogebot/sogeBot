@@ -339,6 +339,7 @@ import { Vue, Component, Prop, PropSync, Watch } from 'vue-property-decorator';
 import type { AlertHostInterface } from 'src/bot/database/entity/alert';
 import { get } from 'lodash-es';
 
+// @ts-ignore - we don't have types for vue-codemirror
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/mode/javascript/javascript.js';
 import 'codemirror/mode/htmlmixed/htmlmixed.js';
@@ -416,7 +417,7 @@ export default class AlertsEditHostForm extends Vue {
 
       request.send();
     })
-    this.fonts = response.items.map((o) => {
+    this.fonts = response.items.map((o: { family: string }) => {
       return { text: o.family, value: o.family }
     })
     this.emitValidation();

@@ -124,7 +124,7 @@ export default class keywordsEdit extends Vue {
 
   mounted() {
     if (this.$route.params.id) {
-      this.socket.emit('generic::getOne', this.$route.params.id, (err, data: Required<KeywordInterface>) => {
+      this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, data: Required<KeywordInterface>) => {
         if (err) {
           return console.error(err)
         }
@@ -160,7 +160,7 @@ export default class keywordsEdit extends Vue {
       }
       this.state.save = this.$state.progress;
 
-      this.socket.emit('keywords::save', keyword, (err, data) => {
+      this.socket.emit('keywords::save', keyword, (err: string | null, data) => {
         if (err) {
           this.state.save = this.$state.fail;
           return console.error(err);

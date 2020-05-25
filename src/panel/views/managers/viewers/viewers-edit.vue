@@ -311,6 +311,10 @@ import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import { orderBy, remove, xor } from 'lodash';
 
+import { Route } from 'vue-router'
+import { NextFunction } from 'express';
+
+// @ts-ignore - we don't have types for vue-flatpickr-component
 import VueFlatPickr from 'vue-flatpickr-component';
 import 'flatpickr/dist/flatpickr.css';
 
@@ -414,14 +418,14 @@ export default class viewersEdit extends Vue {
   }
 
   del() {
-    this.socket.emit('viewers::remove', this.viewer, (err) => {
+    this.socket.emit('viewers::remove', this.viewer, (err: string | null) => {
       this.$router.push({ name: 'viewersManagerList' })
     })
   }
 
   save() {
     this.state.save = this.$state.progress
-    this.socket.emit('viewers::save', this.viewer, (err, viewer) => {
+    this.socket.emit('viewers::save', this.viewer, (err: string | null, viewer) => {
       if (err) {
         console.error(err)
         return this.state.save = this.$state.fail;
@@ -540,7 +544,7 @@ export default class viewersEdit extends Vue {
   async created() {
     this.state.loading = this.$state.progress;
     await new Promise((resolve, reject) => {
-      this.socket.emit('viewers::findOne', this.$route.params.id, (err, data) => {
+      this.socket.emit('viewers::findOne', this.$route.params.id, (err: string | null, data) => {
         if (err) {
           reject(console.error(err));
         }
@@ -570,7 +574,7 @@ export default class viewersEdit extends Vue {
     this.$nextTick(() => { this.state.pending = false })
   }
 
-  beforeRouteUpdate(to, from, next) {
+  beforeRouteUpdate(to: Route, from: Route, next: NextFunction) {
     if (this.state.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
       if (!isOK) {
@@ -583,7 +587,7 @@ export default class viewersEdit extends Vue {
     }
   }
 
-  beforeRouteLeave(to, from, next) {
+  beforeRouteLeave(to: Route, from: Route, next: NextFunction) {
     if (this.state.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
       if (!isOK) {

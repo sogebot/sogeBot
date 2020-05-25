@@ -148,7 +148,7 @@ process.on('unhandledRejection', function (reason, p) {
   error(`Possibly Unhandled Rejection at: ${util.inspect(p)} reason: ${reason}`);
 });
 
-process.on('uncaughtException', (err) => {
+process.on('uncaughtException', (err: Error) => {
   const date = new Date().toISOString();
   process.report?.writeReport(`uncaughtException-${date}`, err);
   error(util.inspect(err));

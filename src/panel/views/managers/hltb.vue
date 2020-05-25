@@ -121,7 +121,7 @@
       this.interval = window.setInterval(() => {
         this.domWidth = (this.$refs['window'] as HTMLElement).clientWidth
       }, 100)
-      this.socket.emit('generic::getAll', { order: { startedAt: 'DESC' } }, (err, data) => {
+      this.socket.emit('generic::getAll', { order: { startedAt: 'DESC' } }, (err: string | null, data) => {
         if (err) {
           return console.error(err);
         }

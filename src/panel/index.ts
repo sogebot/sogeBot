@@ -7,6 +7,9 @@ import Vue from 'vue';
 import VueMoment from 'vue-moment';
 import VueRouter from 'vue-router';
 import Vuelidate from 'vuelidate';
+
+// eslint-disable-next-line
+// @ts-ignore - we don't have types for vue-plugin-load-script
 import LoadScript from 'vue-plugin-load-script';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -74,9 +77,6 @@ declare module 'vue/types/vue' {
     }[];
     $core: {
       name: string;
-      enabled: boolean;
-      areDependenciesEnabled: boolean;
-      isDisabledByEnv: boolean;
     }[];
     $integrations: {
       name: string;

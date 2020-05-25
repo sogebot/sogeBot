@@ -342,7 +342,7 @@
     },
     mounted() {
       if (this.$route.params.id) {
-        this.socket.emit('generic::getOne', this.$route.params.id, (err, event: Required<EventInterface>) => {
+        this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, event: Required<EventInterface>) => {
           if (err) {
             return console.error(err);
           }
@@ -453,7 +453,7 @@
         return get(this, '$v.event.definitions.' + key, { $invalid: false });
       },
       del: function () {
-        this.socket.emit('events::remove', this.event, (err) => {
+        this.socket.emit('events::remove', this.event, (err: string | null) => {
           if (err) {
             return console.error(err);
           }

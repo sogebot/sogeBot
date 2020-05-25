@@ -164,7 +164,7 @@
       removeGoal: function (group) {
         console.debug(' => Removing', group.id)
 
-        this.socket.emit('goals::remove', group, (err) => {
+        this.socket.emit('goals::remove', group, (err: string | null) => {
           if (err) {
             console.error(err);
           } else {

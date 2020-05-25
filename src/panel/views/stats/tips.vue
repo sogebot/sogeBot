@@ -142,7 +142,7 @@
       },
     },
     mounted() {
-      this.socket.emit('generic::getAll', (err, val) => {
+      this.socket.emit('generic::getAll', (err: string | null, val) => {
         if (err) {
           return console.error(err);
         }

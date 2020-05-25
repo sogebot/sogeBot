@@ -142,7 +142,7 @@ export default class customVariablesList extends Vue {
   }
 
   del(item) {
-    this.socket.emit('alerts::delete', item, (err) => {
+    this.socket.emit('alerts::delete', item, (err: string | null) => {
       if (err) {
         return console.error(err);
       }
@@ -152,7 +152,7 @@ export default class customVariablesList extends Vue {
 
   refresh() {
     this.state.loaded = this.$state.progress;
-    this.socket.emit('generic::getAll', (err, data: AlertInterface[]) => {
+    this.socket.emit('generic::getAll', (err: string | null, data: AlertInterface[]) => {
       if (err) {
         return console.error(err);
       }
