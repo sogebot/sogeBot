@@ -7,6 +7,7 @@ const message = require('../../general.js').message;
 const assert = require('assert');
 
 const { permission } = require('../../../dest/helpers/permissions');
+const { invalidateParserCache } = require('../../../dest/helpers/cache');
 const permissions = (require('../../../dest/permissions')).default;
 const Parser = require('../../../dest/parser').default;
 const currency = require('../../../dest/currency').default;
@@ -375,6 +376,7 @@ describe('Permissions - check()', () => {
   describe(`Enabled !me command should work`, () => {
     beforeEach(async () => {
       await getRepository(PermissionCommands).clear();
+      invalidateParserCache();
     });
     for (let j = 0; j < users.length; j++) {
       it (`--- ${users[j].username} should trigger command !me`, async () => {
@@ -412,6 +414,7 @@ describe('Permissions - check()', () => {
         name: '!me',
         permission: null,
       });
+      invalidateParserCache();
     });
     for (let j = 0; j < users.length; j++) {
       it (`--- ${users[j].username} should NOT trigger disabled command !me`, async () => {
