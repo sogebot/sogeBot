@@ -15,6 +15,7 @@ import { adminEndpoint } from '../helpers/socket';
 import api from '../api';
 import { addUIError } from '../panel';
 import { HOUR } from '../constants';
+import { ioServer } from '../helpers/panel';
 
 /*
  * How to integrate:
@@ -335,10 +336,11 @@ class Spotify extends Integration {
           const data = await this.client.refreshAccessToken();
           this.client.setAccessToken(data.body.access_token);
           this.retry.IRefreshToken = 0;
-          info(chalk.yellow('SPOTIFY: ') + 'Access token refreshed OK');
+          ioServer?.emit('api.stats', { data: data.body, timestamp: Date.now(), call: 'spotify::refreshToken', api: 'other', endpoint: 'n/a', code: 200 });
         }
       } catch (e) {
         this.retry.IRefreshToken++;
+        ioServer?.emit('api.stats', { data: e.message, timestamp: Date.now(), call: 'spotify::refreshToken', api: 'other', endpoint: 'n/a', code: 500 });
         info(chalk.yellow('SPOTIFY: ') + 'Refreshing access token failed ' + (this.retry.IRefreshToken > 0 ? 'retrying #' + this.retry.IRefreshToken : ''));
       }
     }
