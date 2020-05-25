@@ -148,6 +148,8 @@ import { faExclamationTriangle, faPlay, faStop, faKey, faSortUp, faSortDown } fr
 library.add(faExclamationTriangle, faPlay, faKey, faStop, faSortUp, faSortDown);
 
 import { CommandsInterface } from 'src/bot/database/entity/commands';
+import { PermissionsInterface } from 'src/bot/database/entity/permissions';
+
 import { getSocket } from '../../../helpers/socket';
 
 Component.registerHooks([
@@ -282,7 +284,7 @@ export default class CommandsEdit extends Vue {
     }
   }
 
-  moveUpResponse(order) {
+  moveUpResponse(order: number) {
     this.item.responses.filter((o) => o.order === order - 1 || o.order === order).map(o => {
       if (o.order === order - 1) o.order++
       else o.order--
@@ -290,7 +292,7 @@ export default class CommandsEdit extends Vue {
     })
   }
 
-  moveDownResponse(order) {
+  moveDownResponse(order: number) {
     this.item.responses.filter((o) => o.order === order + 1 || o.order === order).map(o => {
       if (o.order === order + 1) o.order--
       else o.order++
@@ -298,7 +300,7 @@ export default class CommandsEdit extends Vue {
     })
   }
 
-  deleteResponse(order) {
+  deleteResponse(order: number) {
     let i = 0
     this.item.responses = this.item.responses.filter(o => o.order !== order)
     orderBy(this.item.responses, 'order', 'asc').map((o) => {
@@ -324,7 +326,7 @@ export default class CommandsEdit extends Vue {
       this.state.save = this.$state.progress;
       await new Promise((resolve, reject) => {
         console.debug('Saving command', this.item);
-        this.socket.emit('generic::setById', { id: this.item.id, item: this.item }, (err: string | null, data) => {
+        this.socket.emit('generic::setById', { id: this.item.id, item: this.item }, (err: string | null) => {
           if (err) {
             this.state.save = this.$state.fail;
             reject(console.error(err));
