@@ -81,7 +81,10 @@
     },
     methods: {
       refresh() {
-        this.socket.emit('permissions', (p) => {
+        this.socket.emit('permissions', (err: string | null, p) => {
+          if (err) {
+            return console.error(err);
+          }
           this.currentData = p;
           this.isLoading = false;
         })

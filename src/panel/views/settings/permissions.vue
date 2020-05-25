@@ -93,7 +93,10 @@
     },
     methods: {
       addNewPermissionGroup() {
-        this.socket.emit('permissions', async (p: PermissionsInterface[]) => {
+        this.socket.emit('permissions', async (err: string | null, p: PermissionsInterface[]) => {
+          if (err) {
+            return console.error(err);
+          }
           const id = uuid();
           const data: PermissionsInterface = {
             id,

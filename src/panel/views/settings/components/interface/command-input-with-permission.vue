@@ -78,7 +78,10 @@ export default class sortableList extends Vue {
   }
 
   mounted() {
-    this.socket.emit('permissions', (data) => {
+    this.socket.emit('permissions', (err: string | null, data) => {
+      if (err) {
+        return console.error(err);
+      }
       this.permissionsList = data;
       this.permissionsLoaded = true;
     });
