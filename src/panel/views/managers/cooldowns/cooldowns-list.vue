@@ -117,7 +117,7 @@ export default class cooldownList extends Vue {
 
   created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('generic::getAll', (err: string | null, items) => {
+    this.socket.emit('generic::getAll', (err: string | null, items: CooldownInterface[]) => {
       if (err) {
         return console.error(err);
       }
@@ -127,18 +127,18 @@ export default class cooldownList extends Vue {
     })
   }
 
-  linkTo(item) {
+  linkTo(item: Required<CooldownInterface>) {
     console.debug('Clicked', item.id);
     this.$router.push({ name: 'cooldownsManagerEdit', params: { id: item.id } });
   }
 
-  remove(id) {
+  remove(id: string) {
    this.socket.emit('generic::deleteById', id, () => {
       this.items = this.items.filter((o) => o.id !== id)
     })
   }
 
-  update(item) {
+  update(item: Required<CooldownInterface>) {
     this.socket.emit('cooldown::save', item , () => {});
   }
 }

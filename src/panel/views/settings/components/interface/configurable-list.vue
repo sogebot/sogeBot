@@ -32,7 +32,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 export default class configurableList extends Vue {
   @Prop() readonly current: any;
   @Prop() readonly value: any;
-  @Prop() readonly title: any;
+  @Prop() readonly title!: string;
 
   show: boolean = true;
   currentValue = this.value;
@@ -43,7 +43,7 @@ export default class configurableList extends Vue {
     this.$emit('update', { value: this.currentValue });
   }
 
-  removeItem(index) {
+  removeItem(index: number) {
     this.currentValue.splice(index, 1);
   }
 }

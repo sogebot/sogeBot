@@ -173,7 +173,7 @@ export default class ranksEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
 
-      this.socket.emit('ranks::save', this.item, (err: string | null, data) => {
+      this.socket.emit('ranks::save', this.item, (err: string | null, data: Required<RankInterface>) => {
         if (err) {
           this.state.save = this.$state.fail;
           console.error(err);

@@ -166,7 +166,7 @@ export default class TTS extends Vue {
           .then(() => this.initResponsiveVoice());
       } else {
         this.state.loaded = this.$state.success;
-        this.voices = window.responsiveVoice.getVoices().map(o => {
+        this.voices = window.responsiveVoice.getVoices().map((o: { name: string }) => {
           return { text: o.name, value: o.name }
         });
       }
@@ -178,7 +178,7 @@ export default class TTS extends Vue {
       return setTimeout(() => this.initResponsiveVoice(), 200);
     }
     window.responsiveVoice.init();
-    this.voices = window.responsiveVoice.getVoices().map(o => {
+    this.voices = window.responsiveVoice.getVoices().map((o: { name: string }) => {
       return { text: o.name, value: o.name }
     });
     this.state.loaded = this.$state.success;

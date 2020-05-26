@@ -17,19 +17,21 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 
+type Guild = { text: string, value: string };
+
 @Component({})
 export default class discordGuild extends Vue {
   @Prop() readonly value: any;
-  @Prop() readonly title: any;
+  @Prop() readonly title!: string;
 
   socket = getSocket('/integrations/discord')
-  guilds: { text: string, value: string }[] = []
+  guilds: Guild[] = []
 
   currentValue = this.value;
   translatedTitle = this.translate(this.title);
 
   mounted() {
-    this.socket.emit('discord::getGuilds', (err, guilds) => {
+    this.socket.emit('discord::getGuilds', (err: string | null, guilds: Guild[]) => {
       console.groupCollapsed('discord::getGuilds')
       console.log({guilds});
       console.groupEnd();

@@ -17,19 +17,21 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 
+type Channel = { text: string, value: string };
+
 @Component({})
 export default class discordChannel extends Vue {
   @Prop() readonly value: any;
-  @Prop() readonly title: any;
+  @Prop() readonly title!: string;
 
   socket = getSocket('/integrations/discord')
-  channels: { text: string, value: string }[] = []
+  channels: Channel[] = []
 
   currentValue = this.value;
   translatedTitle = this.translate(this.title);
 
   mounted() {
-    this.socket.emit('discord::getChannels', (err, channels) => {
+    this.socket.emit('discord::getChannels', (err: string | null, channels: Channel[]) => {
       console.groupCollapsed('discord::getChannels')
       console.log({channels});
       console.groupEnd();

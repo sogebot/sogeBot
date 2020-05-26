@@ -114,12 +114,12 @@ import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
     'hold-button': () => import('../../../components/holdButton.vue'),
   },
   filters: {
-    capitalize (value) {
+    capitalize (value: string) {
       if (!value) return ''
       value = value.toString()
       return value.charAt(0).toUpperCase() + value.slice(1)
     },
-    onlyCommand (val) {
+    onlyCommand (val: string) {
       return val.split(' ')[0]
     },
   }
@@ -156,7 +156,7 @@ export default class commandsList extends Vue {
   psocket = getSocket('/core/permissions');
   socket = getSocket('/systems/customcommands');
 
-  capitalize (value) {
+  capitalize (value: string) {
     if (!value) return ''
     value = value.toString()
     return value.charAt(0).toUpperCase() + value.slice(1)

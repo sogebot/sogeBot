@@ -12,7 +12,6 @@ import Expects from './expects';
 import Core from './_interface';
 import * as constants from './constants';
 import { settings, ui } from './decorators';
-import { globalIgnoreList } from './data/globalIgnoreList';
 import { ban, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning } from './helpers/log';
 import { triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub } from './helpers/interface/triggers';
 import { isDebugEnabled } from './helpers/log';
@@ -46,7 +45,7 @@ class TMI extends Core {
   ignorelist: any[] = [];
 
   @settings('chat')
-  @ui({ type: 'global-ignorelist-exclude', values: globalIgnoreList }, 'chat')
+  @ui({ type: 'global-ignorelist-exclude' }, 'chat')
   globalIgnoreListExclude: any[] = [];
 
   @settings('chat')

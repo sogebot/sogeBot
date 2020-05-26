@@ -123,7 +123,7 @@ export default class apiStats extends Vue {
     }
 
     mounted() {
-      this.socket.off('api.stats').on('api.stats', (c) => {
+      this.socket.off('api.stats').on('api.stats', (c: { code: number, remaining: number | string, data: Object}) => {
         c.code = get(c, 'code', 200) // set default to 200
         c.data = !isNil(c.data) ? JSON.stringify(c.data) : 'n/a'
         c.remaining = !isNil(c.remaining) ? c.remaining : 'n/a'
@@ -132,7 +132,7 @@ export default class apiStats extends Vue {
       })
     }
 
-    parseJSON(data) {
+    parseJSON(data: string) {
       try {
           return JSON.stringify(JSON.parse(data), null, 2)
       } catch (e) {

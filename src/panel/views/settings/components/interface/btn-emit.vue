@@ -13,7 +13,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 @Component({})
 export default class btnEmit extends Vue {
   @Prop() readonly emit: any;
-  @Prop() readonly title: any;
+  @Prop() readonly title!: string;
 
   state: number = 0
 

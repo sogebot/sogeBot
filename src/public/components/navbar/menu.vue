@@ -14,6 +14,8 @@ import { PerfectScrollbar } from 'vue2-perfect-scrollbar'
 import 'vue2-perfect-scrollbar/dist/vue2-perfect-scrollbar.css'
 import { getSocket } from 'src/panel/helpers/socket';
 
+import type { menuPublic } from 'src/bot/helpers/panel';
+
 @Component({
   components: {
     PerfectScrollbar
@@ -21,7 +23,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 })
 export default class Menu extends Vue {
   socket = getSocket('/', true);
-  menu: any = [];
+  menu: typeof menuPublic = [];
 
   mounted() {
     // Workaround for touch screens - https://github.com/mdbootstrap/perfect-scrollbar/issues/867
@@ -29,7 +31,7 @@ export default class Menu extends Vue {
       window['DocumentTouch'] = HTMLDocument
     }
 
-    this.socket.emit('menu::public', (menu) => {
+    this.socket.emit('menu::public', (err: string | null, menu: typeof menuPublic) => {
       this.menu = menu.sort((a, b) => {
         if (a.name === 'dashboard') {
           return -1;

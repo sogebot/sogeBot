@@ -81,7 +81,7 @@
         isFocused: boolean,
         isSearching: boolean,
         stateSearch: string,
-        searchData: {}[],
+        searchData: string[],
         searchPage: number,
       } = {
         chunk: chunk,
@@ -104,7 +104,7 @@
 
       for (const id of this.currentIds) {
         if (!this.currentUsers.find(o => o.id === id)) {
-          this.usersSocket.emit('getNameById', id, (err, username) => {
+          this.usersSocket.emit('getNameById', id, (err: string | null, username: string) => {
             if (err) {
               return console.error(err);
             }
@@ -121,7 +121,7 @@
         this.isSearching = false;
         this.searchPage = 0;
         this.searchData = [];
-        this.testUsername = ''
+        this.testUsername = '';
         this.stateSearch = uuid();
       },
       currentIds: function (val) {
@@ -129,7 +129,7 @@
       }
     },
     methods: {
-      search(val) {
+      search(val: string) {
         this.isSearching = true
         const state = uuid()
         this.stateSearch = state
@@ -141,7 +141,7 @@
         } else {
           this.testUsername = val;
           console.log({val})
-          this.usersSocket.emit('find.viewers', { search: val, state }, (err, r, c, state) => {
+          this.usersSocket.emit('find.viewers', { search: val, state }, (err: string | null, r: string[]) => {
             if (err) {
               return console.error(err);
             }
@@ -154,7 +154,7 @@
           })
         }
       },
-      toggleUser(username, id) {
+      toggleUser(username: string, id: number) {
         this.currentUsers.push({
           username, id
         })

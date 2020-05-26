@@ -16,7 +16,7 @@ export interface Global {
 export default class textWithTags extends Vue {
   @Prop() value !: string;
 
-  filter(val) {
+  filter(val: string) {
     const filtersRegExp = new RegExp('\\$(' + sortBy(keys(flatten(this.translate('responses.variable'))), (o) => -o.length).join('|') + ')', 'g');
     val = val.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     let matches = val.match(filtersRegExp);
