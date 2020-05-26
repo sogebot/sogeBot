@@ -53,6 +53,7 @@ import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 
 import type { RandomizerInterface } from 'src/bot/database/entity/randomizer';
+import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
@@ -91,7 +92,7 @@ export default class randomizerList extends Vue {
     return this.items;
   }
 
-  toggleVisibility(item) {
+  toggleVisibility(item: Required<RandomizerInterface>) {
     item.isShown = !item.isShown;
     if(item.isShown) {
       this.socket.emit('randomizer::showById', item.id, () => {
@@ -113,15 +114,15 @@ export default class randomizerList extends Vue {
     await Promise.all([
       new Promise(async(done) => {
         this.psocket.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
-  if(err) {
-    return console.error(err);
-  }
+          if(err) {
+            return console.error(err);
+          }
           this.permissions = data
           done();
         });
       }),
       new Promise(async(done) => {
-        this.socket.emit('generic::getAll', (err: string | null, data) => {
+        this.socket.emit('generic::getAll', (err: string | null, data: Required<RandomizerInterface>[]) => {
           if (err) {
             return console.error(err);
           }
@@ -145,7 +146,7 @@ export default class randomizerList extends Vue {
     }, 5000);
   }
 
-  remove(item) {
+  remove(item: RandomizerInterface) {
     this.socket.emit('randomizer::remove', item, (err: string | null) => {
       if (err) {
         console.error(err);
@@ -155,7 +156,7 @@ export default class randomizerList extends Vue {
     })
   }
 
-  linkTo(item) {
+  linkTo(item: Required<RandomizerInterface>) {
     console.debug('Clicked', item.id);
     this.$router.push({ name: 'RandomizerRegistryEdit', params: { id: item.id } });
   }

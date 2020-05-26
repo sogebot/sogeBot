@@ -100,23 +100,23 @@ export default class playlist extends Vue {
 
   refreshBanlist() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('songs::getAllBanned', {}, (err, items) => {
+    this.socket.emit('songs::getAllBanned', {}, (err: string | null, items: SongBanInterface[]) => {
       this.items = items
       this.state.loading = this.$state.success;
     })
   }
 
-  generateThumbnail(videoId) {
+  generateThumbnail(videoId: string) {
     return `https://img.youtube.com/vi/${videoId}/1.jpg`
   }
 
-  deleteItem(id) {
+  deleteItem(id: string) {
     this.socket.emit('delete.ban', id, () => {
       this.items = this.items.filter((o) => o.videoId !== id)
     })
   }
 
-  showImportInfo(info) {
+  showImportInfo(info: { banned: number }) {
     this.importInfo = `Banned: ${info.banned}`
     setTimeout(() => {
       this.importInfo = ''
@@ -124,13 +124,13 @@ export default class playlist extends Vue {
     }, 5000)
   }
 
-  addSongOrPlaylist(evt) {
+  addSongOrPlaylist(evt: Event) {
     if (evt) {
       evt.preventDefault()
     }
     if (this.state.import === 0) {
       this.state.import = 1
-      this.socket.emit('import.ban', this.toAdd, (err, info) => {
+      this.socket.emit('import.ban', this.toAdd, (err: string | null, info: { banned: number }) => {
         this.state.import = 2
         this.refreshBanlist()
         this.toAdd = ''
@@ -139,7 +139,7 @@ export default class playlist extends Vue {
     }
   }
 
-  linkTo(item) {
+  linkTo(item: SongBanInterface) {
     console.debug('Clicked', item.videoId);
     window.location.href = `http://youtu.be/${item.videoId}`;
   }

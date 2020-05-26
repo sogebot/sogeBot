@@ -172,6 +172,8 @@ import { required } from 'vuelidate/lib/validators';
 
 import { v4 as uuid } from 'uuid';
 
+const supportedEvents = ['follows', 'cheers', 'subs', 'resubs', 'subcommunitygifts', 'subgifts',  'tips', 'hosts', 'raids'] as const;
+
 Component.registerHooks([
   'beforeRouteEnter',
   'beforeRouteLeave',
@@ -202,7 +204,7 @@ export default class AlertsEdit extends Vue {
   state: { loaded: number; save: number } = { loaded: this.$state.progress, save: this.$state.idle }
   pending: boolean = false;
 
-  supportedEvents: string[] = ['follows', 'cheers', 'subs', 'resubs', 'subcommunitygifts', 'subgifts',  'tips', 'hosts', 'raids']
+  supportedEvents = supportedEvents;
   selectedTabIndex: number = 0;
 
   item: AlertInterface = {
@@ -485,7 +487,7 @@ export default class AlertsEdit extends Vue {
     });
   }
 
-  deleteVariant(event, id) {
+  deleteVariant(event: typeof supportedEvents[number], id: string) {
     console.debug('Removing', event, id);
     remove(this.item[event], (o: CommonSettingsInterface) => o.id === id);
     this.$forceUpdate();

@@ -99,17 +99,17 @@ export default class timersList extends Vue {
     })
   }
 
-  update(item) {
+  update(item: TimerInterface) {
     this.socket.emit('timers::save', item, () => {});
   }
 
-  del(id) {
+  del(id: string) {
     this.socket.emit('generic::deleteById', id, () => {
       this.items = this.items.filter((o) => o.id !== id)
     })
   }
 
-  linkTo(item) {
+  linkTo(item: Required<TimerInterface>) {
     console.debug('Clicked', item.id);
     this.$router.push({ name: 'TimersManagerEdit', params: { id: item.id } });
   }

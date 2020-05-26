@@ -343,13 +343,7 @@ class Users extends Core {
           const aggregatedBits = viewer.bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0);
 
           const permId = await permissions.getUserHighestPermission(userId);
-          let permissionGroup;
-          if (permId) {
-            permissionGroup = await permissions.get(permId);
-          } else {
-            permissionGroup = permission.VIEWERS;
-          }
-
+          const permissionGroup = permId || permission.VIEWERS;
           cb(null, {...viewer, aggregatedBits, aggregatedTips, permission: permissionGroup});
         } else {
           cb(null);

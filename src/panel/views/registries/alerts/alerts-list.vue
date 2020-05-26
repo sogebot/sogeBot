@@ -136,12 +136,12 @@ export default class customVariablesList extends Vue {
       })
   }
 
-  linkTo(item) {
+  linkTo(item: Required<AlertInterface>) {
     console.debug('Clicked', item.id);
     this.$router.push({ name: 'alertsEdit', params: { id: item.id } });
   }
 
-  del(item) {
+  del(item: AlertInterface) {
     this.socket.emit('alerts::delete', item, (err: string | null) => {
       if (err) {
         return console.error(err);

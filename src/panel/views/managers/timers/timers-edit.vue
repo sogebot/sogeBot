@@ -203,14 +203,14 @@ export default class timerssEdit extends Vue {
     this.item.messages.push(response);
   }
 
-  delResponse(index) {
+  delResponse(index: number) {
     this.item.messages.splice(index, 1);
   }
 
   async mounted() {
     if (this.$route.params.id) {
       await new Promise((resolve, reject) => {
-        this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, data) => {
+        this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, data: Required<TimerInterface>) => {
         if (err) {
           reject(err)
         }
@@ -239,7 +239,7 @@ export default class timerssEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
 
-      this.socket.emit('timers::save', this.item, (err: string | null, data) => {
+      this.socket.emit('timers::save', this.item, (err: string | null, data: Required<TimerInterface>) => {
         if (err) {
           this.state.save = this.$state.fail;
           return console.error(err);

@@ -391,7 +391,7 @@ export default class viewersEdit extends Vue {
     if (this.viewer) {
       this.state.pending = true
       this.state.forceCheckFollowedAt = true
-      this.socket.emit('viewers::followedAt', this.viewer.userId, (err, followed_at) => {
+      this.socket.emit('viewers::followedAt', this.viewer.userId, (err: string | null, followed_at: number) => {
         this.state.forceCheckFollowedAt = false
         if (err) return console.error(err)
         else if (this.viewer) {
@@ -401,7 +401,7 @@ export default class viewersEdit extends Vue {
     }
   }
 
-  removeBits(id) {
+  removeBits(id: number) {
     if (this.viewer) {
       remove(this.viewer.bits, (_v, idx) => idx === id);
       this.$forceUpdate();
@@ -409,7 +409,7 @@ export default class viewersEdit extends Vue {
     this.state.pending = true
   }
 
-  removeTips(id) {
+  removeTips(id: number) {
     if (this.viewer) {
       remove(this.viewer.tips, (_v, idx) => idx === id);
       this.$forceUpdate();
@@ -425,7 +425,7 @@ export default class viewersEdit extends Vue {
 
   save() {
     this.state.save = this.$state.progress
-    this.socket.emit('viewers::save', this.viewer, (err: string | null, viewer) => {
+    this.socket.emit('viewers::save', this.viewer, (err: string | null, viewer: UserInterface) => {
       if (err) {
         console.error(err)
         return this.state.save = this.$state.fail;
@@ -438,7 +438,7 @@ export default class viewersEdit extends Vue {
   }
 
   @Watch('watchedTime')
-  _watchedTime(val, old) {
+  _watchedTime(val: number) {
     if (this.viewer) {
       this.viewer.watchedTime = val * 60 * 60 * 1000;
     }
@@ -448,28 +448,27 @@ export default class viewersEdit extends Vue {
   setPending() { this.state.pending = true; }
 
   @Watch('viewer.bits', { deep: true })
-  _watchBits(val, old) {
+  _watchBits(val: UserInterface['bits']) {
     if (this.viewer) {
       this.state.pending = true;
       for (const v of val) {
-        v.cheeredAt = (new Date(v.cheeredAt)).getTime()
+        v.cheeredAt = (new Date(v.cheeredAt || 0)).getTime()
       }
     }
   }
 
   @Watch('viewer.tips', { deep: true })
-  _watchTips(val, old) {
+  _watchTips(val: UserInterface['tips']) {
     if (this.viewer) {
       this.state.pending = true;
       for (const v of val) {
-        console.log({v})
-        v.tippedAt = (new Date(v.tippedAt)).getTime()
+        v.tippedAt = (new Date(v.tippedAt || 0)).getTime()
       }
     }
   }
 
   @Watch('viewer.followedAt')
-  _watchTimeFollow(val, old) {
+  _watchTimeFollow(val: number) {
     if (this.viewer) {
       if (val === null || this.viewer.followedAt === new Date(val).getTime()) {
         return
@@ -480,7 +479,7 @@ export default class viewersEdit extends Vue {
   }
 
   @Watch('viewer.subscribedAt')
-  _watchTimeSub(val, old) {
+  _watchTimeSub(val: number) {
     if (this.viewer) {
       if (val === null || this.viewer.subscribedAt === new Date(val).getTime()) {
         return
@@ -507,7 +506,7 @@ export default class viewersEdit extends Vue {
   }
 
 
-  set followedAt(val) {
+  set followedAt(val: number | '' | undefined) {
     if (this.viewer) {
       this.viewer.followedAt = Number(val);
     }
@@ -522,7 +521,7 @@ export default class viewersEdit extends Vue {
   }
 
 
-  set subscribedAt(val) {
+  set subscribedAt(val: number | '' | undefined) {
     if (this.viewer) {
       this.viewer.subscribedAt = Number(val);
     }
@@ -544,21 +543,23 @@ export default class viewersEdit extends Vue {
   async created() {
     this.state.loading = this.$state.progress;
     await new Promise((resolve, reject) => {
-      this.socket.emit('viewers::findOne', this.$route.params.id, (err: string | null, data) => {
+      this.socket.emit('viewers::findOne', this.$route.params.id, (err: string | null, data: Readonly<Required<UserInterface>> & { aggregatedTips: number; aggregatedBits: number; permission: string }) => {
         if (err) {
           reject(console.error(err));
         }
-        data.tips = orderBy(data.tips, 'tippedAt', 'desc');
-        data.bits = orderBy(data.bits, 'cheeredAt', 'desc');
         console.log('Loaded viewer', data);
-        this.viewer = data
+        this.viewer = {
+          ...data,
+          tips: orderBy(data.tips, 'tippedAt', 'desc'),
+          bits: orderBy(data.bits, 'cheeredAt', 'desc'),
+        }
         this.watchedTime = Number(data.watchedTime / (60 * 60 * 1000)).toFixed(1);
         resolve();
       })
     });
     await new Promise((resolve, reject) => {
       if (this.viewer) {
-        this.socketEventList.emit('eventlist::getUserEvents', this.viewer.username, (err, events: Required<EventListInterface>[]) => {
+        this.socketEventList.emit('eventlist::getUserEvents', this.viewer.username, (err: string | null, events: Required<EventListInterface>[]) => {
           if (err) {
             return console.error(err);
           }

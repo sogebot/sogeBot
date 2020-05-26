@@ -37,8 +37,8 @@ export default class Menu extends Vue {
 
   async mounted() {
     // Workaround for touch screens - https://github.com/mdbootstrap/perfect-scrollbar/issues/867
-    if (typeof window['DocumentTouch'] === 'undefined') {
-      window['DocumentTouch'] = HTMLDocument
+    if (typeof (window as any).DocumentTouch === 'undefined') {
+      (window as any).DocumentTouch = HTMLDocument
     }
 
     const isLoaded = await Promise.race([

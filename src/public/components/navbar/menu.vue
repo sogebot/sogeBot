@@ -27,20 +27,22 @@ export default class Menu extends Vue {
 
   mounted() {
     // Workaround for touch screens - https://github.com/mdbootstrap/perfect-scrollbar/issues/867
-    if (typeof window['DocumentTouch'] === 'undefined') {
-      window['DocumentTouch'] = HTMLDocument
+    if (typeof (window as any).DocumentTouch === 'undefined') {
+      (window as any).DocumentTouch = HTMLDocument
     }
 
-    this.socket.emit('menu::public', (err: string | null, menu: typeof menuPublic) => {
-      this.menu = menu.sort((a, b) => {
-        if (a.name === 'dashboard') {
-          return -1;
-        };
-        if (b.name === 'dashboard') {
-          return 1;
-        };
+    this.socket.emit('menu::public', (err: string | null, data: typeof menuPublic) => {
+      if (err) {
+        return console.error(err);
+      }
+      console.groupCollapsed('menu::menu::public');
+      console.log({data});
+      console.groupEnd();
+      for (const item of data.sort((a, b) => {
         return this.translate('menu.' + a.name).localeCompare(this.translate('menu.' + b.name))
-      });
+      })) {
+        this.menu.push(item);
+      }
     });
   }
 }
