@@ -41,7 +41,7 @@ export default class discordChannel extends Vue {
   socket = getSocket('/integrations/discord')
   psocket = getSocket('/core/permissions')
 
-  roles: { text: string, value: string }[] = []
+  roles: { html: string, value: string }[] = []
   permissions: Required<PermissionsInterface>[] = [];
 
   loading: number = this.$state.progress;
@@ -62,7 +62,7 @@ export default class discordChannel extends Vue {
         })
       }),
       new Promise((resolve, reject) => {
-        this.socket.emit('discord::getRoles', (err, roles) => {
+        this.socket.emit('discord::getRoles', (err: string | null, roles: { html: string; value: string }[]) => {
           console.groupCollapsed('discord::getRoles')
           console.log({roles});
           console.groupEnd();
@@ -70,7 +70,7 @@ export default class discordChannel extends Vue {
             reject();
             return console.error(err);
           }
-          this.roles = [{ value: '', text: `-- ${this.translate('integrations.discord.settings.noRoleSelected')} --` }, ...roles];
+          this.roles = [{ value: '', html: `-- ${this.translate('integrations.discord.settings.noRoleSelected')} --` }, ...roles];
           resolve()
         });
       })
@@ -91,7 +91,7 @@ export default class discordChannel extends Vue {
   }
 
   @Watch('loading')
-  checkEmptyRoles(val) {
+  checkEmptyRoles(val: number) {
     if (val === this.$state.success) {
       for (const permission of this.permissions) {
         if (this.currentValue[permission.id]) {
@@ -103,7 +103,7 @@ export default class discordChannel extends Vue {
     }
   }
 
-  updateMapping(permId, value) {
+  updateMapping(permId: string, value: string) {
     Vue.set(this.currentValue, permId, value);
   }
 

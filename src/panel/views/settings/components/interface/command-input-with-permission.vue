@@ -50,6 +50,8 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 
+import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
+
 library.add(faExclamationTriangle)
 
 @Component({})
@@ -62,7 +64,7 @@ export default class sortableList extends Vue {
   socket: SocketIOClient.Socket = getSocket('/core/permissions');
   currentValue = this.value;
   currentPermissions = this.permissions;
-  permissionsList: any[] = [];
+  permissionsList: PermissionsInterface[] = [];
   permissionsLoaded: boolean = false;
 
   @Watch('currentPermissions')
@@ -78,7 +80,7 @@ export default class sortableList extends Vue {
   }
 
   mounted() {
-    this.socket.emit('permissions', (err: string | null, data) => {
+    this.socket.emit('permissions', (err: string | null, data: PermissionsInterface[]) => {
       if (err) {
         return console.error(err);
       }
@@ -87,7 +89,7 @@ export default class sortableList extends Vue {
     });
   }
 
-  getVariant(currentPermissions) {
+  getVariant(currentPermissions: string | null) {
     if (currentPermissions === null) {
       return 'light';
     }

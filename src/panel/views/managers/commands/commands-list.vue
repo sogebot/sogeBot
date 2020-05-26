@@ -104,7 +104,8 @@ import { faEye, faExclamationTriangle, faEyeSlash, faPlay, faStop, faKey } from 
 library.add(faEye, faEyeSlash, faExclamationTriangle, faPlay, faKey, faStop);
 
 import { getSocket } from '../../../helpers/socket';
-import { CommandsInterface } from 'src/bot/database/entity/commands';
+import type { CommandsInterface } from 'src/bot/database/entity/commands';
+import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
 
 @Component({
   components: {
@@ -182,7 +183,7 @@ export default class commandsList extends Vue {
       this.permissions = data;
       this.state.loadingPerm = this.$state.success;
     })
-    this.socket.emit('generic::getAll', ( err, commands, count ) => {
+    this.socket.emit('generic::getAll', (err: string | null, commands: Required<CommandsInterface>[], count: { command: string; id: number }[] ) => {
       if (err) {
         return console.error(err);
       }
@@ -193,7 +194,7 @@ export default class commandsList extends Vue {
     })
   }
 
-  getPermissionName (id) {
+  getPermissionName (id: string | null) {
     if (!id) return 'Disabled'
     const permission = this.permissions.find((o) => {
       return o.id === id
@@ -209,7 +210,7 @@ export default class commandsList extends Vue {
     }
   }
 
-  updatePermission (cid, rid, permission) {
+  updatePermission (cid: string, rid: string, permission: string) {
     let command = this.commands.filter((o) => o.id === cid)[0]
     let response = command.responses.filter((o) => o.id === rid)[0]
     response.permission = permission
@@ -217,7 +218,7 @@ export default class commandsList extends Vue {
     this.$forceUpdate();
   }
 
-  updateStopIfExecuted (cid, rid, stopIfExecuted) {
+  updateStopIfExecuted (cid: string, rid: string, stopIfExecuted: boolean) {
     let command = this.commands.filter((o) => o.id === cid)[0]
     let response = command.responses.filter((o) => o.id === rid)[0]
     response.stopIfExecuted = stopIfExecuted
@@ -225,7 +226,7 @@ export default class commandsList extends Vue {
     this.$forceUpdate();
   }
 
-  async remove(id) {
+  async remove(id: string) {
     await new Promise(resolve => {
       this.socket.emit('generic::deleteById', id, () => {
         resolve();
@@ -235,7 +236,7 @@ export default class commandsList extends Vue {
     this.$router.push({ name: 'CommandsManagerList' });
   }
 
-  sendUpdate (id) {
+  sendUpdate (id: string) {
     this.socket.emit('generic::setById', { id, item: this.commands.find((o) => o.id === id) }, (err: string | null) => {
       if (err) {
         return console.error(err);

@@ -81,11 +81,11 @@
     },
     methods: {
       refresh() {
-        this.socket.emit('permissions', (err: string | null, p) => {
+        this.socket.emit('permissions', (err: string | null, data: PermissionsInterface[]) => {
           if (err) {
             return console.error(err);
           }
-          this.currentData = p;
+          this.currentData = data;
           this.isLoading = false;
         })
       },
@@ -94,20 +94,20 @@
           this.$emit('update');
         });
       },
-      setPermission(pid) {
+      setPermission(pid: string) {
         this.$router.push({ name: 'PermissionsSettings', params: { id: pid } })
       },
-      dragstart: function(pid, e) {
+      dragstart: function(pid: string, e: DragEvent) {
         if (pid !== '0efd7b1c-e460-4167-8e06-8aaf2c170311') {
           this.setPermission(pid);
           this.draggingPID = pid;
-          e.dataTransfer.setData('text/plain', 'dummy');
+          e.dataTransfer?.setData('text/plain', 'dummy');
         } else {
           this.draggingPID = null;
           e.stopPropagation();
         }
       },
-      dragenter: function(pid, e) {
+      dragenter: function(pid: string, e: DragEvent) {
         if (this.draggingPID === null || pid === '0efd7b1c-e460-4167-8e06-8aaf2c170311') {
           return;
         }
