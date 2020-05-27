@@ -606,7 +606,7 @@ export default class customVariablesEdit extends Vue {
         responseText: this.responseText,
         permission: this.permission
       }
-      this.socket.emit('save', data, (err, id) => {
+      this.socket.emit('customvariables::save', data, (err, id) => {
         if (err) {
           console.error(err)
           return this.state.save = State.ERROR
