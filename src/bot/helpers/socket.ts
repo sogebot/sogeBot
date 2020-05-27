@@ -66,6 +66,7 @@ function adminEndpoint (
   on: 'generic::setById',
   callback: (opts: {id: string | number; item: any}, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 
+// any + cb
 function adminEndpoint (
   nsp: string,
   on: 'generic::getAll::filter',
@@ -108,6 +109,7 @@ function adminEndpoint (nsp: string, on: 'price::save', callback: (item: Readonl
 function adminEndpoint (nsp: string, on: 'panel::availableWidgets' | 'panel::dashboards', callback: (opts: { userId: number; type: DashboardInterface['type'] }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'panel::dashboards::remove', callback: (opts: { userId: number; type: DashboardInterface['type'], id: string }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'panel::dashboards::create', callback: (opts: { userId: number, name: string }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
+function adminEndpoint (nsp: string, on: 'lists.set', callback: (opts: { blacklist: string[]; whitelist: string[] }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 
 // generic functions
 function adminEndpoint (nsp: string, on: string, callback: (opts: { [x: string]: any }, cb?: (error: Error | string | null, ...response: any) => void) => void, socket?: SocketIO.Socket): void;

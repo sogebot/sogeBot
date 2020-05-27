@@ -134,7 +134,7 @@ class Highlights extends System {
     }
   }
 
-  public async add(highlight: HighlightInterface, timestamp, opts: CommandOptions): Promise<CommandResponse[]> {
+  public async add(highlight: HighlightInterface, timestamp: TimestampObject, opts: CommandOptions): Promise<CommandResponse[]> {
     api.createMarker();
     getRepository(Highlight).insert(highlight);
     return [{ response: translate('highlights.saved')

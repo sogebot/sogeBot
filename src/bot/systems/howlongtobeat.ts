@@ -4,7 +4,7 @@ import * as constants from '../constants';
 import System from './_interface';
 import { command, default_permission } from '../decorators';
 import { permission } from '../helpers/permissions';
-import { HowLongToBeatService /*, HowLongToBeatEntry */ } from 'howlongtobeat';
+import { HowLongToBeatService } from 'howlongtobeat';
 import Expects from '../expects';
 import { prepare } from '../commons';
 

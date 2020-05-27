@@ -4,6 +4,10 @@ type KnownNoticeMessageIds = import('twitch-js').KnownNoticeMessageIds;
 type DiscordJsTextChannel = import('discord.js').TextChannel;
 type DiscordJsUser = import('discord.js').User;
 
+type TimestampObject = {
+  hours: number; minutes: number; seconds: number
+};
+
 interface Command {
   name: string;
   command?: string;
