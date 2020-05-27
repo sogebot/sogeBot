@@ -454,7 +454,6 @@ import { Vue, Component, Prop, PropSync, Watch } from 'vue-property-decorator';
 import type { AlertTipInterface } from 'src/bot/database/entity/alert';
 import { get } from 'lodash-es';
 
-// @ts-ignore - we don't have types for vue-codemirror
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/mode/javascript/javascript.js';
 import 'codemirror/mode/htmlmixed/htmlmixed.js';

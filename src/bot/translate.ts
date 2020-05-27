@@ -76,7 +76,7 @@ class Translate {
     }
   }
 
-  translate (text, orig = false) {
+  translate (text: string | { root: string }, orig = false) {
     if (_.isUndefined(translate_class.translations[translate_class.lang]) && !_.isUndefined(text)) {
       return '{missing_translation: ' + translate_class.lang + '.' + String(text) + '}';
     } else if (typeof text === 'object') {
@@ -91,9 +91,9 @@ class Translate {
     return null;
   }
 
-  get (text, orig) {
+  get (text: string, orig: string) {
     try {
-      let translated;
+      let translated = '';
       const customTranslated = _.find(this.custom, function (o) {
         return o.name === text;
       });

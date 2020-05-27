@@ -39,9 +39,7 @@ import { Vue, Component } from 'vue-property-decorator';
 import { cloneDeep, isEqual } from 'lodash-es';
 
 import { gsap } from 'gsap'
-// @ts-ignore
 import Winwheel from 'winwheel'
-// @ts-ignore
 import JsonViewer from 'vue-json-viewer'
 
 import { getSocket } from 'src/panel/helpers/socket';

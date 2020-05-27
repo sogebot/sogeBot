@@ -28,7 +28,6 @@
 import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 
-// @ts-ignore - no types for vue-headful
 import vueHeadful from 'vue-headful';
 Vue.component('vue-headful', vueHeadful);
 

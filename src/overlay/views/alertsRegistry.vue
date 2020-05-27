@@ -75,7 +75,6 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-// @ts-ignore
 import JsonViewer from 'vue-json-viewer'
 import { getSocket } from 'src/panel/helpers/socket';
 import VRuntimeTemplate from 'v-runtime-template';

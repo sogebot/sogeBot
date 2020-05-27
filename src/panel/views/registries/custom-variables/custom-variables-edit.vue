@@ -294,7 +294,6 @@ import { NextFunction } from 'express';
 import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
 import type { VariableInterface } from 'src/bot/database/entity/variable';
 
-// @ts-ignore - we don't have types for vue-codemirror
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/lib/codemirror.css';
 

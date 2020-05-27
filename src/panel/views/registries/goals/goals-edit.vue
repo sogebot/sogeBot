@@ -307,7 +307,6 @@
 import Vue from 'vue';
 import { get } from 'lodash-es';
 
-// @ts-ignore - we don't have types for vue-codemirror
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/mode/javascript/javascript.js'
 import 'codemirror/mode/htmlmixed/htmlmixed.js'
@@ -316,7 +315,6 @@ import 'codemirror/theme/base16-dark.css'
 import 'codemirror/theme/base16-light.css'
 import 'codemirror/lib/codemirror.css'
 
-// @ts-ignore - we don't have types for vue-flatpickr-component
 import VueFlatPickr from 'vue-flatpickr-component';
 import 'flatpickr/dist/flatpickr.css';
 

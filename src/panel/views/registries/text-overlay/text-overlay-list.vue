@@ -72,7 +72,6 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { isNil, orderBy } from 'lodash-es';
-// @ts-ignore - we don't have types for vue-prism-component
 import Prism from 'vue-prism-component'
 import { getSocket } from 'src/panel/helpers/socket';
 

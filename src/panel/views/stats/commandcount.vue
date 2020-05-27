@@ -75,7 +75,6 @@
   library.add(faChartLine)
   Vue.use(Chartkick.use(Chart));
 
-  // @ts-ignore - vue-flatpickr-component
   import VueFlatPickr from 'vue-flatpickr-component';
   import 'flatpickr/dist/flatpickr.css';
 

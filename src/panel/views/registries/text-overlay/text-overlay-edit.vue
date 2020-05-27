@@ -110,7 +110,6 @@
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 
-// @ts-ignore - we don't have types for vue-codemirror
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/lib/codemirror.css';
 

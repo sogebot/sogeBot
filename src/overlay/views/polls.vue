@@ -48,7 +48,6 @@ import moment from 'moment'
 import VueMoment from 'vue-moment'
 import momentTimezone from 'moment-timezone'
 import { getSocket } from 'src/panel/helpers/socket';
-// @ts-ignore
 import JsonViewer from 'vue-json-viewer'
 import { PollInterface } from '../../bot/database/entity/poll';
 

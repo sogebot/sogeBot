@@ -1,6 +1,5 @@
 import axios from 'axios';
 import util from 'util';
-import { get, isNil } from 'lodash';
 import { setTimeout } from 'timers';
 
 import { isBot } from './commons';
@@ -19,6 +18,13 @@ import { getFunctionList } from './decorators/on';
 import { find } from './helpers/register';
 
 type Type = 'follows' | 'streams';
+
+type followEvent = { data: { from_id: string, from_name: string, to_id: string, to_name: string, followed_at: string } };
+type streamEvent = {
+  data: {
+    id: string; user_id: string; game_id: string, community_ids: string[], type: string; title: string; viewer_count: number; started_at: string; language: string, thumbnail_url: string
+  }[]
+};
 
 class Webhooks {
   enabled = {
@@ -107,7 +113,7 @@ class Webhooks {
     }
   }
 
-  async subscribe (type) {
+  async subscribe (type: string) {
     clearTimeout(this.timeouts[`subscribe-${type}`]);
 
     const cid = oauth.channelId;
@@ -181,18 +187,7 @@ class Webhooks {
     this.timeouts[`subscribe-${type}`] = setTimeout(() => this.subscribe(type), leaseSeconds * 1000);
   }
 
-  async event (aEvent, res) {
-    // somehow stream doesn't have a topic
-    if (get(aEvent, 'topic', null) === `https://api.twitch.tv/helix/users/follows?first=1&to_id=${oauth.channelId}`) {
-      this.follower(aEvent);
-    } else if (get(!isNil(aEvent.data[0]) ? aEvent.data[0] : {}, 'type', null) === 'live') {
-      this.stream(aEvent);
-    }
-
-    res.sendStatus(200);
-  }
-
-  async challenge (req, res) {
+  async challenge (req: any, res: any) {
     const cid = oauth.channelId;
     // set webhooks enabled
     switch (req.query['hub.topic']) {
@@ -220,11 +215,10 @@ class Webhooks {
       }
   }
   */
-  async follower (aEvent, skipCacheCheck = false) {
+  async follower (aEvent: followEvent, skipCacheCheck = false) {
     try {
       const cid = oauth.channelId;
       const data = aEvent.data;
-      data.from_id = Number(data.from_id);
 
       if (Object.keys(cid).length === 0) {
         setTimeout(() => this.follower(aEvent), 10);
@@ -247,7 +241,7 @@ class Webhooks {
         this.addIdToCache('follows', data.from_id);
       }
 
-      const user = await getRepository(User).findOne({ userId: data.from_id });
+      const user = await getRepository(User).findOne({ userId: Number(data.from_id) });
       if (!user) {
         await getRepository(User).save({
           userId: Number(data.from_id),
@@ -278,7 +272,7 @@ class Webhooks {
 
           triggerInterfaceOnFollow({
             username: data.from_name,
-            userId: data.from_id,
+            userId: Number(data.from_id),
           });
         }
       }
@@ -313,7 +307,7 @@ class Webhooks {
         }]
     }
   */
-  async stream (aEvent) {
+  async stream (aEvent: streamEvent) {
     const cid = oauth.channelId;
     if (cid === '') {
       setTimeout(() => this.stream(aEvent), 1000);
@@ -354,7 +348,7 @@ class Webhooks {
           const module = !event.path.includes('.') ? event.path.split('.')[0] : event.path.split('.')[1];
           const self = find(type, module);
           if (self) {
-            self[event.fName]();
+            (self as any)[event.fName]();
           } else {
             error(`streamStart: ${event.path} not found`);
           }

@@ -314,7 +314,6 @@ import { orderBy, remove, xor } from 'lodash';
 import { Route } from 'vue-router'
 import { NextFunction } from 'express';
 
-// @ts-ignore - we don't have types for vue-flatpickr-component
 import VueFlatPickr from 'vue-flatpickr-component';
 import 'flatpickr/dist/flatpickr.css';
 

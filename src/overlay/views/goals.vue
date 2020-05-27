@@ -135,7 +135,6 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
-// @ts-ignore
 import safeEval from 'safe-eval';
 import { find } from 'lodash-es';
 

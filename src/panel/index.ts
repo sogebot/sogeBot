@@ -9,7 +9,6 @@ import VueRouter from 'vue-router';
 import Vuelidate from 'vuelidate';
 
 // eslint-disable-next-line
-// @ts-ignore - we don't have types for vue-plugin-load-script
 import LoadScript from 'vue-plugin-load-script';
 
 import { library } from '@fortawesome/fontawesome-svg-core';

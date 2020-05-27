@@ -54,7 +54,6 @@ import { Vue, Component, Prop, PropSync } from 'vue-property-decorator';
 import { v4 as uuid } from 'uuid';
 import { getSocket } from '../helpers/socket';
 
-// @ts-ignore - we don't have types for vue-audio-visual
 import AudioVisual from 'vue-audio-visual'
 import type { AlertMediaInterface } from 'src/bot/database/entity/alert';
 Vue.use(AudioVisual)
