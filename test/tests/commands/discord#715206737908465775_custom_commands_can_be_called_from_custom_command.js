@@ -31,9 +31,12 @@ describe('Custom Commands - https://discordapp.com/channels/317348946144002050/6
       assert.strictEqual(r2[0].response, '$sender, command !test2 was added');
     });
 
-    it('Run custom command !test and expect !test2 response', async () => {
+    it('Run custom command !test', async () => {
       await customcommands.run({ sender: owner, message: '!test' });
-      await time.waitMs(500);
+    });
+
+    it('Expect !test2 response', async() => {
+      await message.isSentRaw('Lorem Ipsum', owner);
     });
   });
 

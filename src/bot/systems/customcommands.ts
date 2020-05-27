@@ -255,12 +255,13 @@ class CustomCommands extends System {
   }
 
   @parser({ priority: constants.LOW })
-  async run (opts: ParserOptions): Promise<boolean> {
+  async run (opts: ParserOptions & { quiet?: boolean }): Promise<boolean> {
     if (!opts.message.startsWith('!')) {
       return true;
     } // do nothing if it is not a command
 
     const commands = await this.find(opts.message);
+    console.dir({commands}, { depth: null });
 
     if (commands.length === 0) {
       return true;
@@ -291,7 +292,9 @@ class CustomCommands extends System {
           }
         }
       }
-      this.sendResponse(_.cloneDeep(_responses), { param, sender: opts.sender, command: cmd.command.command });
+      if (!opts.quiet) {
+        this.sendResponse(_.cloneDeep(_responses), { param, sender: opts.sender, command: cmd.command.command });
+      }
     }
     return atLeastOnePermissionOk;
   }

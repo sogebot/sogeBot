@@ -408,7 +408,9 @@ class Message {
           .replace(/\$param/g, attr.param);
         debug('message.process', cmd);
         // run custom commands
-        await customcommands.run({ sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param });
+        if (customcommands.enabled) {
+          await customcommands.run({ sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, quiet: true, message: cmd, parameters: attr.param });
+        }
         await new Parser().command(attr.sender, cmd, true);
         // we are not sending back any responses!
         return '';
@@ -419,7 +421,9 @@ class Message {
           .replace(/\$param/g, attr.param);
         debug('message.process', cmd);
         // run custom commands
-        await customcommands.run({ sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param });
+        if (customcommands.enabled) {
+          await customcommands.run({ sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param });
+        }
         const responses = await new Parser().command(attr.sender, cmd, true);
         for (let i = 0; i < responses.length; i++) {
           setTimeout(async () => {
