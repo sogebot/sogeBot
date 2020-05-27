@@ -299,7 +299,7 @@ class CustomCommands extends System {
   sendResponse(responses, opts) {
     for (let i = 0; i < responses.length; i++) {
       setTimeout(async () => {
-        parserReply(responses[i].response, opts);
+        parserReply(await responses[i].response, opts);
       }, i * 500);
     }
   }

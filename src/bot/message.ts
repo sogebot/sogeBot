@@ -33,6 +33,7 @@ import points from './systems/points';
 import {default as priceSystem} from './systems/price';
 import permissions from './permissions';
 import users from './users';
+import customcommands from './systems/customcommands';
 
 
 class Message {
@@ -406,15 +407,19 @@ class Message {
           .replace(/\(|\)/g, '')
           .replace(/\$param/g, attr.param);
         debug('message.process', cmd);
+        // run custom commands
+        await customcommands.run({ sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param });
         await new Parser().command(attr.sender, cmd, true);
         // we are not sending back any responses!
         return '';
       },
-      '(!#)': async (filter) => {
+      '(!#)': async (filter: string) => {
         const cmd = filter
           .replace(/\(|\)/g, '')
           .replace(/\$param/g, attr.param);
         debug('message.process', cmd);
+        // run custom commands
+        await customcommands.run({ sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param });
         const responses = await new Parser().command(attr.sender, cmd, true);
         for (let i = 0; i < responses.length; i++) {
           setTimeout(async () => {
