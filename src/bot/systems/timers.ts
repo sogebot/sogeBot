@@ -147,26 +147,6 @@ class Timers extends System {
     this.timeouts.timersCheck = global.setTimeout(() => this.check(), SECOND); // this will run check 1s after full check is correctly done
   }
 
-  async editName (self, socket, data) {
-    if (data.value.length === 0) {
-      await self.unset(self, null, `-name ${data.id}`);
-    } else {
-      const name = data.value.match(/([a-zA-Z0-9_]+)/);
-      if (_.isNil(name)) {
-        return;
-      }
-      await getRepository(Timer).update({ name: data.id }, { name: name[0] });
-    }
-  }
-
-  async editResponse (self, socket, data) {
-    if (data.value.length === 0) {
-      await self.rm(self, null, `-id ${data.id}`);
-    } else {
-      await getRepository(TimerResponse).update({ id: data.id }, { response: data.value });
-    }
-  }
-
   @command('!timers set')
   @default_permission(permission.CASTERS)
   async set (opts: CommandOptions): Promise<CommandResponse[]> {

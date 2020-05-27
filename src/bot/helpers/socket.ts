@@ -29,7 +29,7 @@ function adminEndpoint (
   nsp: string,
   on: 'generic::getAll' | 'purgeAllConnections' | 'list.supported.events' | 'list.supported.operations'
   | 'randomizer::hideAll' | 'randomizer::getVisible' | 'queue::getAllPicked' | 'queue::clear'
-  | 'spotify::revoke' | 'spotify::skip' | 'spotify::state' | 'spotify::code' | 'spotify::authorize'
+  | 'spotify::revoke' | 'spotify::skip' | 'spotify::state' | 'spotify::authorize'
   | 'getSoundBoardSounds'  | 'viewers' | 'viewers::resetPointsAll' | 'viewers::resetMessagesAll'
   | 'viewers::resetWatchedTimeAll' | 'viewers::resetBitsAll' | 'viewers::resetTipsAll'
   | 'list.watch' | 'broadcaster' | 'configuration' | 'raffle:getLatest' | 'lists.get'
@@ -52,7 +52,7 @@ function adminEndpoint (
   nsp: string,
   on: 'chat.message.send' | 'import.ban' | 'import.video' | 'songs::removeRequest' | 'delete.playlist' | 'delete.ban'
   | 'import.playlist' | 'raffle::getWinner' | 'raffle::open' | 'parseCron'
-  | 'commands::resetCountByCommand' | 'bets::close',
+  | 'commands::resetCountByCommand' | 'bets::close' | 'spotify::code',
   callback: (string: string, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 
 // number + cb

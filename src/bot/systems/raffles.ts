@@ -303,7 +303,7 @@ class Raffles extends System {
   }
 
   @parser()
-  async participate (opts: ParserOptions) {
+  async participate (opts: ParserOptions): Promise<boolean> {
     if (_.isNil(opts.sender) || _.isNil(opts.sender.username) || !opts.message.match(/^(![\S]+)/)) {
       return true;
     }

@@ -17,6 +17,10 @@ import { addUIError } from '../panel';
 import { HOUR } from '../constants';
 import { ioServer } from '../helpers/panel';
 
+type SpotifyTrack = {
+  uri: string; name: string; artists: { name: string }[]
+};
+
 /*
  * How to integrate:
  * 1. Create app in https://beta.developer.spotify.com/dashboard/applications
@@ -359,7 +363,7 @@ class Spotify extends Integration {
       this.skipToNextSong = true;
       callback(null);
     });
-    adminEndpoint(this.nsp, 'spotify::code', async (token, callback) => {
+    adminEndpoint(this.nsp, 'spotify::code', async (token, cb) => {
       const waitForUsername = () => {
         return new Promise((resolve, reject) => {
           const check = async () => {
@@ -384,7 +388,7 @@ class Spotify extends Integration {
       this.currentSong = JSON.stringify({});
       this.connect({ token });
       await waitForUsername();
-      callback(null, true);
+      cb(null, true);
     });
     adminEndpoint(this.nsp, 'spotify::revoke', async (cb) => {
       clearTimeout(this.timeouts.IRefreshToken);
@@ -548,7 +552,7 @@ class Spotify extends Integration {
             'Authorization': 'Bearer ' + this.client.getAccessToken(),
           },
         });
-        const track = response.data;
+        const track = response.data as SpotifyTrack;
         this.uris.push({
           uri: 'spotify:track:' + id,
           requestBy: opts.sender.username,
@@ -568,7 +572,7 @@ class Spotify extends Integration {
             'Content-Type': 'application/json',
           },
         });
-        const track = response.data.tracks.items[0];
+        const track = (response.data.tracks.items[0] as SpotifyTrack);
         this.uris.push({
           uri: track.uri,
           requestBy: opts.sender.username,

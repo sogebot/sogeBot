@@ -2,7 +2,6 @@ import Core from './_interface';
 
 import { isMainThread } from './cluster';
 import axios from 'axios';
-import { isNil } from 'lodash';
 import { setTimeout } from 'timers';
 
 import { permission } from './helpers/permissions';
@@ -105,18 +104,25 @@ class Users extends Core {
     }
   }
 
-  async getUsernamesFromIds (IdsList: Array<number>) {
-    const IdsToUsername = {};
-    for (const id of IdsList) {
-      if (!isNil(IdsToUsername[id])) {
-        continue;
-      } // skip if already had map
-      const user = await getRepository(User).findOne({ userId: id });
-      if (user) {
-        IdsToUsername[id] = user.username;
-      }
-    }
-    return IdsToUsername;
+  async getUsernamesFromIds (IdsList: number[]): Promise<{ id: number; username: string }[]> {
+    return Promise.all(
+      [...new Set(IdsList)]
+        .map(async (id) => {
+          const user = await getRepository(User).findOne({ userId: id });
+          if (user) {
+            return { id: id, username: user.username };
+          }
+          return null;
+        })
+        .reduce(async (prev: any, cur) => {
+          const value = await cur;
+          if (value) {
+            return { ...prev, [value.id]: value.username };
+          } else {
+            return prev;
+          }
+        }, {})
+    );
   }
 
   async getNameById (userId: number) {

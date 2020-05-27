@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import TwitchJs, { HostTargetMessage, Message, PrivateMessages, UserStateTags } from 'twitch-js';
+import TwitchJs, { HostTargetMessage, Message, PrivateMessages, UserNoticeMessages, UserStateTags } from 'twitch-js';
 
 import util from 'util';
 import { isNil } from 'lodash';
@@ -119,11 +119,9 @@ class TMI extends Core {
 
   async initClient (type: 'bot' | 'broadcaster') {
     clearTimeout(this.timeouts[`initClient.${type}`]);
-    const [token, username, channel] = await Promise.all([
-      oauth[type + 'AccessToken'],
-      oauth[type + 'Username'],
-      oauth.generalChannel,
-    ]);
+    const token = type === 'bot' ? oauth.botAccessToken : oauth.broadcasterAccessToken;
+    const username = type === 'bot' ? oauth.botUsername : oauth.broadcasterUsername;
+    const channel = oauth.generalChannel;
 
     try {
       if (token === '' || username === '' || channel === '') {
@@ -157,11 +155,9 @@ class TMI extends Core {
       if (typeof this.client[type] === 'undefined') {
         throw Error('TMI: cannot reconnect, connection is not established');
       }
-      const [token, username, channel] = await Promise.all([
-        oauth[type + 'AccessToken'],
-        oauth[type + 'Username'],
-        oauth.generalChannel,
-      ]);
+      const token = type === 'bot' ? oauth.botAccessToken : oauth.broadcasterAccessToken;
+      const username = type === 'bot' ? oauth.botUsername : oauth.broadcasterUsername;
+      const channel = oauth.generalChannel;
 
       if (this.channel !== channel) {
         info(`TMI: ${type} is reconnecting`);
@@ -219,28 +215,28 @@ class TMI extends Core {
     (this.client[type] as TwitchJs).chat.removeAllListeners();
 
     // common for bot and broadcaster
-    (this.client[type] as TwitchJs).chat.on('DISCONNECT', async (message) => {
+    (this.client[type] as TwitchJs).chat.on('DISCONNECT', async () => {
       info(`TMI: ${type} is disconnected`);
       setStatus('TMI', constants.DISCONNECTED);
       (this.client[type] as TwitchJs).chat.removeAllListeners();
       for (const event of getFunctionList('partChannel')) {
-        this[event.fName]();
+        (this as any)[event.fName]();
       }
     });
-    (this.client[type] as TwitchJs).chat.on('RECONNECT', async (message) => {
+    (this.client[type] as TwitchJs).chat.on('RECONNECT', async () => {
       info(`TMI: ${type} is reconnecting`);
       setStatus('TMI', constants.RECONNECTING);
       this.loadListeners(type);
       for (const event of getFunctionList('reconnectChannel')) {
-        this[event.fName]();
+        (this as any)[event.fName]();
       }
     });
-    (this.client[type] as TwitchJs).chat.on('CONNECTED', async (message) => {
+    (this.client[type] as TwitchJs).chat.on('CONNECTED', async () => {
       info(`TMI: ${type} is connected`);
       setStatus('TMI', constants.CONNECTED);
       this.loadListeners(type);
       for (const event of getFunctionList('joinChannel')) {
-        this[event.fName]();
+        (this as any)[event.fName]();
       }
     });
 
@@ -256,7 +252,7 @@ class TMI extends Core {
         }
       });
 
-      (this.client[type] as TwitchJs).chat.on('PRIVMSG', async (message: PrivateMessages & { tags: { username?: string }}) => {
+      (this.client[type] as TwitchJs).chat.on('PRIVMSG', async (message: PrivateMessages & { tags: { username?: string; 'message-type'?: 'action' | 'say'}}) => {
         message.tags.username = this.getUsernameFromRaw(message._raw) || message.tags.displayName;
 
         if (!isBot(message.tags.username) || !message.isSelf) {
@@ -351,7 +347,7 @@ class TMI extends Core {
     }
   }
 
-  usernotice(message) {
+  usernotice(message: UserNoticeMessages) {
     debug('tmi.usernotice', message);
     if (message.event === 'RAID') {
       raid(`${message.parameters.login}, viewers: ${message.parameters.viewerCount}`);
@@ -379,7 +375,7 @@ class TMI extends Core {
       this.subscription(message);
     } else if (message.event === 'RESUBSCRIPTION') {
       this.resub(message);
-    } else if (message.event === 'REWARDGIFT') {
+    } else if ((message.event as any /* REWARDGIFT is not in types */) === 'REWARDGIFT') {
       warning('REWARDGIFT event is being ignored');
     } else if (message.event === 'SUBSCRIPTION_GIFT') {
       this.subgift(message);
@@ -724,12 +720,12 @@ class TMI extends Core {
     this.client[client]?.chat.say(getOwner(), '/delete ' + msgId);
   }
 
-  async message (data, managed = false) {
+  async message (data: { skip?: boolean, quiet?: boolean, message: Pick<Message, 'message' | 'tags'>}, managed = false) {
     if (!managed && !global.mocha) {
       return manageMessage(data);
     }
 
-    const sender = data.message.tags;
+    const sender = data.message.tags as UserStateTags;
     const message = data.message.message;
     const skip = data.skip ?? false;
     const quiet = data.quiet;
@@ -756,7 +752,7 @@ class TMI extends Core {
     const isModerated = await parse.isModerated();
     if (!isModerated && !isIgnored(sender)) {
       if (!skip && !isNil(sender.username)) {
-        const subCumulativeMonths = function(senderObj) {
+        const subCumulativeMonths = function(senderObj: UserStateTags) {
           if (typeof senderObj.badgeInfo === 'string' && senderObj.badgeInfo.includes('subscriber')) {
             const match = senderObj.badgeInfo.match(/subscriber\/(\d+)/);
             if (match) {

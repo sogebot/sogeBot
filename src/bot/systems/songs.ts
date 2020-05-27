@@ -4,6 +4,7 @@ import { setInterval } from 'timers';
 import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
 import ytpl from 'ytpl';
+import io from 'socket.io';
 
 import { announce, getBot, getBotSender, prepare, timeout } from '../commons';
 import { command, default_permission, settings, shared, ui } from '../decorators';
@@ -79,7 +80,8 @@ class Songs extends System {
 
   sockets () {
     if (this.socket === null) {
-      return setTimeout(() => this.sockets(), 100);
+      setTimeout(() => this.sockets(), 100);
+      return;
     }
     publicEndpoint(this.nsp, 'find.playlist', async (opts: { page?: number; search?: string }, cb) => {
       const connection = await getConnection();
@@ -167,19 +169,19 @@ class Songs extends System {
       this.sendNextSongID();
     });
 
-    this.socket.on('connection', (socket) => {
-      socket.on('disconnect', (reason) => {
+    this.socket.on('connection', (socket: io.Socket) => {
+      socket.on('disconnect', () => {
         clearInterval(this.interval[socket.id]);
         delete this.interval[socket.id];
         delete this.isPlaying[socket.id];
       });
       this.interval[socket.id] = setInterval(async () => {
-        socket.emit('isPlaying', (isPlaying) => this.isPlaying[socket.id] = isPlaying);
+        socket.emit('isPlaying', (isPlaying: boolean) => this.isPlaying[socket.id] = isPlaying);
       }, 1000);
     });
   }
 
-  getIdFromURL (url) {
+  getIdFromURL (url: string) {
     const urlRegex = /^.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&?]*).*/;
     const match = url.match(urlRegex);
     const videoID = (match && match[1].length === 11) ? match[1] : url;
@@ -205,7 +207,7 @@ class Songs extends System {
     return loudness / playlist.length;
   }
 
-  async getVolume (item) {
+  async getVolume (item: SongPlaylistInterface) {
     if (!item.forceVolume && this.calculateVolumeByLoudness) {
       item.loudness = !_.isNil(item.loudness) ? item.loudness : -15;
       const volume = this.volume;
@@ -217,7 +219,7 @@ class Songs extends System {
     }
   }
 
-  async getCurrentVolume (socket) {
+  async getCurrentVolume (socket: io.Socket) {
     let volume = 0;
     if (this.calculateVolumeByLoudness) {
       volume = await this.getVolume(JSON.parse(this.currentSong));
@@ -225,13 +227,6 @@ class Songs extends System {
       volume = this.volume;
     }
     socket.emit('newVolume', volume);
-  }
-
-  async setTrim (socket, data) {
-    const song = await getRepository(SongPlaylist).findOne({videoId: data.id});
-    if (song) {
-      await getRepository(SongPlaylist).save({...song, startTime: data.lowValue, endTime: data.highValue});
-    }
   }
 
   @command('!bansong')
@@ -487,7 +482,7 @@ class Songs extends System {
     if (_.isNil(videoID.match(idRegex))) { // not id or url]
       try {
         const search: ytsrResult['items'] = await new Promise((resolve, reject) => {
-          ytsr(opts.parameters, { limit: 1 }, (err, results: ytsrResult) => {
+          ytsr(opts.parameters, { limit: 1 }, (err: Error | null, results: ytsrResult) => {
             if (err) {
               reject(err);
             } else {
@@ -658,7 +653,7 @@ class Songs extends System {
     }
   }
 
-  async getSongsIdsFromPlaylist (playlist) {
+  async getSongsIdsFromPlaylist (playlist: string) {
     const get = function ():  Promise<{ items: any[] }> {
       return new Promise((resolve, reject): any => {
         ytpl(playlist, { limit: Number.MAX_SAFE_INTEGER }, function (err, pl: { items: any[] }) {

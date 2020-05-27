@@ -149,7 +149,7 @@ export default {
       })
     },
     emit: function (item) {
-      this.socket.emit('cmdboard::run', item.command)
+      this.socket.emit('cmdboard::run', item)
     },
     add: function () {
       this.tabIndex = 0;

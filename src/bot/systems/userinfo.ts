@@ -61,7 +61,7 @@ class UserInfo extends System {
     if (!user || !user.isFollower || user.followedAt === 0) {
       return [{ response: prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.never', { username }), ...opts }];
     } else {
-      const units: string[] = ['years', 'months', 'days', 'hours', 'minutes'];
+      const units = ['years', 'months', 'days', 'hours', 'minutes'] as const;
       const diff = dateDiff(new Date(user.followedAt).getTime(), Date.now());
 
       const output: string[] = [];
@@ -98,7 +98,7 @@ class UserInfo extends System {
         subCumulativeMonthsName: getLocalizedName(subCumulativeMonths || 0, 'core.months'),
       }), ...opts }];
     } else {
-      const units: string[] = ['years', 'months', 'days', 'hours', 'minutes'];
+      const units = ['years', 'months', 'days', 'hours', 'minutes'] as const;
       const diff = dateDiff(new Date(user.subscribedAt).getTime(), Date.now());
       const output: string[] = [];
       for (const unit of units) {
@@ -149,7 +149,7 @@ class UserInfo extends System {
         return [{ response: prepare('age.failed', { username }), ...opts }];
       }
     } else {
-      const units: string[] = ['years', 'months', 'days', 'hours', 'minutes'];
+      const units = ['years', 'months', 'days', 'hours', 'minutes'] as const;
       const diff = dateDiff(new Date(user.createdAt).getTime(), Date.now());
       const output: string[] = [];
       for (const unit of units) {
