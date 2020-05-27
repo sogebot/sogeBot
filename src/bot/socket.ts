@@ -3,7 +3,7 @@ import { settings, shared, ui } from './decorators';
 import { isMainThread } from './cluster';
 import { v4 as uuid } from 'uuid';
 import { permission } from './helpers/permissions';
-import { adminEndpoint as adminEndpointSocket, endpoints } from './helpers/socket';
+import { adminEndpoint, endpoints } from './helpers/socket';
 import { onLoad } from './decorators/on';
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
@@ -16,6 +16,7 @@ import { Dashboard } from './database/entity/dashboard';
 import { isModerator } from './commons';
 import { User } from './database/entity/user';
 import { DAY } from './constants';
+import { NextFunction } from 'express';
 
 let _self: any = null;
 
@@ -85,11 +86,11 @@ const initEndpoints = async(socket: SocketIO.Socket, privileges: Unpacked<Return
     socket.removeAllListeners(on); // remove all listeners in case we call this twice
 
     socket.on(on, async (opts: any, cb: (error: Error | string | null, ...response: any) => void) => {
-      const adminEndpoint = endpointsToInit.find(o => o.type === 'admin');
+      const adminEndpointInit = endpointsToInit.find(o => o.type === 'admin');
       const viewerEndpoint = endpointsToInit.find(o => o.type === 'viewer');
       const publicEndpoint = endpointsToInit.find(o => o.type === 'public');
-      if (adminEndpoint && privileges.haveAdminPrivileges) {
-        adminEndpoint.callback(opts, cb, socket);
+      if (adminEndpointInit && privileges.haveAdminPrivileges) {
+        adminEndpointInit.callback(opts, cb, socket);
         return;
       } else if (!viewerEndpoint && !publicEndpoint) {
         debug('sockets', `User dont have admin access to ${socket.nsp.name}`);
@@ -233,7 +234,7 @@ class Socket extends Core {
     }
   }
 
-  async authorize(socket: SocketIO.Socket, next) {
+  async authorize(socket: SocketIO.Socket, next: NextFunction) {
     // first check if token is socketToken
     if (socket.handshake.query.token === this.socketToken) {
       initEndpoints(socket, { haveAdminPrivileges: Authorized.isAuthorized, haveModPrivileges: Authorized.isAuthorized, haveViewerPrivileges: Authorized.isAuthorized });
@@ -259,7 +260,7 @@ class Socket extends Core {
   }
 
   sockets () {
-    adminEndpointSocket(this.nsp, 'purgeAllConnections', (cb, socket) => {
+    adminEndpoint(this.nsp, 'purgeAllConnections', (cb, socket) => {
       this.JWTKey = uuid();
       ioServer?.emit('forceDisconnect');
       initEndpoints(socket, { haveAdminPrivileges: Authorized.NotAuthorized, haveModPrivileges: Authorized.NotAuthorized, haveViewerPrivileges: Authorized.NotAuthorized });

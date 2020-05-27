@@ -127,7 +127,7 @@ class Bets extends System {
         .argument({ name: 'timeout', optional: true, default: 2, type: Number })
         .argument({ name: 'title', optional: false, multi: true })
         .list({ delimiter: '|' })
-        .toArray();
+        .toArray() as [number, string, string[]];
       if (options.length < 2) {
         throw new Error(ERROR_NOT_ENOUGH_OPTIONS);
       }

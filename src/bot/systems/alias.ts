@@ -86,12 +86,12 @@ class Alias extends System {
     const length = opts.message.toLowerCase().split(' ').length;
     for (let i = 0; i < length; i++) {
       alias = await getRepository(AliasEntity).findOne({ alias: cmdArray.join(' '), enabled: true });
-      if (!_.isEmpty(alias)) {
+      if (!alias) {
         break;
       }
       cmdArray.pop(); // remove last array item if not found
     }
-    if (_.isEmpty(alias)) {
+    if (!alias) {
       return true;
     } // no alias was found - return
 
