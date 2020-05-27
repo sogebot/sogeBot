@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { setTimeout } from 'timers';
 import { filter, get, isNil, map, sample } from 'lodash';
 import strip from 'strip-comments';
+import { js as jsBeautify } from 'js-beautify';
 
 import Message from './message';
 import { permission } from './helpers/permissions';
@@ -323,7 +324,7 @@ class CustomVariables extends Core {
     // we need to add operation counter function
     const opCounterFnc = 'let __opCount__ = 0; function __opCounter__() { console.log(__opCount__); if (__opCount__ > 100000) { throw new Error("Running script seems to be in infinite loop."); } else { __opCount__++; }};';
     // add __opCounter__() after each ;
-    const toEval = `(async function evaluation () { ${opCounterFnc} ${script.split(';').map(line => '__opCounter__();' + line).join(';')} })()`;
+    const toEval = `(async function evaluation () { ${opCounterFnc} ${jsBeautify(script).split(';\n').map(line => '__opCounter__();' + line).join(';\n')} })()`;
     try {
       const value = await safeEval(toEval, context);
       debug('customvariables.eval', value);
@@ -331,7 +332,7 @@ class CustomVariables extends Core {
     } catch (e) {
       debug('customvariables.eval', 'Running script seems to be in infinite loop.');
       error(`Script is causing error:`);
-      error(`${script}`);
+      error(`${jsBeautify(script)}`);
       error(e.stack);
       if (isUI) {
         // if we have UI, rethrow error to show in UI
