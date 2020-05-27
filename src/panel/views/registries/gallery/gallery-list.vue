@@ -86,6 +86,8 @@ import { faLink, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons';
 library.add(faLink, faTrash, faCheckSquare, faSquare);
 
+import type { GalleryInterface } from 'src/bot/database/entity/gallery';
+
 @Component({
   components: {
     loading: () => import('../../../components/loading.vue'),
@@ -109,12 +111,12 @@ export default class galleryRegistryEdit extends Vue {
   uploadedFiles = 0;
   isUploadingNum = 0;
 
-  items: any[] = [];
+  items: GalleryInterface[] = [];
   exclude: any[] = [];
 
   mounted() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('generic::getAll', (err: string | null, items) => {
+    this.socket.emit('generic::getAll', (err: string | null, items: GalleryInterface[]) => {
       console.debug('Loaded', items);
       this.items = items
       this.state.loading = this.$state.success;
@@ -145,19 +147,19 @@ export default class galleryRegistryEdit extends Vue {
   }
 
   @Watch('uploadedFiles')
-  _uploadedFiles(val) {
+  _uploadedFiles(val: number) {
     if (this.isUploadingNum === val) {
       this.state.uploading = this.$state.idle;
     }
   }
 
-  toggle(type) {
+  toggle(type: GalleryInterface['type']) {
     if (this.exclude.includes(type)) {
       this.exclude = this.exclude.filter(o => o !== type)
     } else this.exclude.push(type)
   }
 
-  remove(id) {
+  remove(id: string) {
     this.socket.emit('generic::deleteById', id, (err: string | null) => {
       if (err) {
         console.error(err);
@@ -167,7 +169,10 @@ export default class galleryRegistryEdit extends Vue {
     })
   }
 
-  filesChange(files) {
+  filesChange(files: HTMLInputElement['files']) {
+    if (!files) {
+      return;
+    }
     this.state.uploading = this.$state.progress;
     this.isUploadingNum = files.length
     this.uploadedFiles = 0
@@ -175,7 +180,7 @@ export default class galleryRegistryEdit extends Vue {
     for (let i = 0, l = files.length; i < l; i++) {
       const reader = new FileReader()
       reader.onload = ((e: any) => {
-        this.socket.emit('gallery::upload', [files[i].name, e.target.result], (err, item) => {
+        this.socket.emit('gallery::upload', [files[i].name, e.target.result], (err: string | null, item: GalleryInterface) => {
           if (err) {
             return console.error(err);
           }

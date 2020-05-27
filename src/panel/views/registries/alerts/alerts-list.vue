@@ -94,7 +94,7 @@ import type { AlertInterface } from 'src/bot/database/entity/alert';
     'loading': () => import('../../../components/loading.vue'),
   },
   filters: {
-    capitalize: function (value) {
+    capitalize: function (value: string) {
       if (!value) return ''
       value = value.toString()
       return value.charAt(0).toUpperCase() + value.slice(1)

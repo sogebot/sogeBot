@@ -189,7 +189,7 @@ Component.registerHooks([
     'form-hosts': () => import('./components/form-hosts.vue'),
   },
   filters: {
-    capitalize: function (value) {
+    capitalize: function (value: string) {
       if (!value) return ''
       value = value.toString()
       return value.charAt(0).toUpperCase() + value.slice(1)
@@ -255,7 +255,7 @@ export default class AlertsEdit extends Vue {
 
   get isAllValid() {
     for (const key of Object.keys(this.isValid)) {
-      if (!every(this.isValid[key])) {
+      if (!every(this.isValid[key as keyof AlertsEdit['isValid']])) {
         return false;
       }
     }
@@ -508,7 +508,7 @@ export default class AlertsEdit extends Vue {
       this.state.save = this.$state.progress;
       this.item.updatedAt = Date.now(); // save updateAt
       console.debug('Saving', this.item);
-      this.socket.emit('alerts::save', this.item, (err: string | null, data) => {
+      this.socket.emit('alerts::save', this.item, (err: string | null, data: AlertInterface) => {
         if (err) {
           this.state.save = this.$state.fail;
           return console.error(err);
