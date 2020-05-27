@@ -71,11 +71,11 @@ class Quotes extends System {
       if (opts.parameters.length === 0) {
         throw new Error();
       }
-      let [tags, quote] = new Expects(opts.parameters).argument({ name: 'tags', optional: true, default: 'general', multi: true, delimiter: '' }).argument({ name: 'quote', multi: true, delimiter: '' }).toArray();
-      tags = tags.split(',').map((o) => o.trim());
+      const [tags, quote] = new Expects(opts.parameters).argument({ name: 'tags', optional: true, default: 'general', multi: true, delimiter: '' }).argument({ name: 'quote', multi: true, delimiter: '' }).toArray() as [ string, string ];
+      const tagsArray = tags.split(',').map((o) => o.trim());
 
-      const result = await getRepository(QuotesEntity).save({ tags, quote, quotedBy: opts.sender.userId, createdAt: Date.now() });
-      const response = prepare('systems.quotes.add.ok', { id: result.id, quote, tags: tags.join(', ') });
+      const result = await getRepository(QuotesEntity).save({ tags: tagsArray, quote, quotedBy: opts.sender.userId, createdAt: Date.now() });
+      const response = prepare('systems.quotes.add.ok', { id: result.id, quote, tags: tagsArray.join(', ') });
       return [{ response, ...opts, ...result }];
     } catch (e) {
       const response = prepare('systems.quotes.add.error', { command: opts.command });
@@ -114,7 +114,7 @@ class Quotes extends System {
       if (opts.parameters.length === 0) {
         throw new Error();
       }
-      const [id, tag] = new Expects(opts.parameters).argument({ type: Number, name: 'id' }).argument({ name: 'tag', multi: true, delimiter: '' }).toArray();
+      const [id, tag] = new Expects(opts.parameters).argument({ type: Number, name: 'id' }).argument({ name: 'tag', multi: true, delimiter: '' }).toArray() as [ number, string ];
 
       const quote = await getRepository(QuotesEntity).findOne({id});
       if (quote) {

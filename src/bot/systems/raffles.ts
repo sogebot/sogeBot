@@ -207,15 +207,14 @@ class Raffles extends System {
     let maxTickets = 100;
 
     if (type === TYPE_TICKETS) {
-      let match;
-      match = opts.parameters.match(/-min (\d+)/);
-      if (!_.isNil(match)) {
-        minTickets = Math.max(match[1], minTickets);
+      const matchMin = opts.parameters.match(/-min (\d+)/);
+      if (!_.isNil(matchMin)) {
+        minTickets = Math.max(Number(matchMin[1]), minTickets);
       }
 
-      match = opts.parameters.match(/-max (\d+)/);
-      if (!_.isNil(match)) {
-        maxTickets = match[1];
+      const matchMax = opts.parameters.match(/-max (\d+)/);
+      if (!_.isNil(matchMax)) {
+        maxTickets = Number(matchMax[1]);
       }
     }
 

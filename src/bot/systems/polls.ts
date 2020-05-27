@@ -115,16 +115,16 @@ class Polls extends System {
           closedAt: Date.now(),
         });
 
-        const count = {};
         let _total = 0;
-        for (let i = 0, length = cVote.votes.length; i < length; i++) {
-          if (!count[cVote.votes[i].option]) {
-            count[cVote.votes[i].option] = cVote.votes[i].votes;
+        const count = cVote.votes.reduce((prev: { [option: number]: number } | null, cur) => {
+          _total += cur.votes;
+          if (!prev) {
+            return { [cur.option]: cur.votes };
           } else {
-            count[cVote.votes[i].option] = count[cVote.votes[i].option] + cVote.votes[i].votes;
+            return { ...prev, [cur.option]: Number(prev[cur.option] || 0) + cur.votes};
           }
-          _total = _total + cVote.votes[i].votes;
-        }
+        }, null);
+
         // get vote status
         responses.push({
           response: prepare('systems.polls.status_closed', {
@@ -132,8 +132,8 @@ class Polls extends System {
           }), ...opts,
         });
         for (const index of Object.keys(cVote.options)) {
-          const option = cVote.options[index];
-          const votesCount = count[index] || 0;
+          const option = cVote.options[Number(index)];
+          const votesCount = count ? count[Number(index)] || 0 : 0;
           const percentage = Number((100 / _total) * votesCount || 0).toFixed(2);
           if (cVote.type === 'normal') {
             responses.push({ response: this.getCommand('!vote') + ` ${Number(index) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, ...opts });
@@ -219,9 +219,9 @@ class Polls extends System {
           });
           for (const index of Object.keys(cVote.options)) {
             if (cVote.type === 'normal') {
-              responses.push({ response: this.getCommand('!poll open') + ` ${index} => ${cVote.options[index]}`, ...opts });
+              responses.push({ response: this.getCommand('!poll open') + ` ${index} => ${cVote.options[Number(index)]}`, ...opts });
             } else {
-              responses.push({ response: `#vote${(Number(index) + 1)} => ${cVote.options[index]}`, ...opts });
+              responses.push({ response: `#vote${(Number(index) + 1)} => ${cVote.options[Number(index)]}`, ...opts });
             }
           }
           return responses;
@@ -244,16 +244,15 @@ class Polls extends System {
     try {
       const responses: CommandResponse[] = [];
       if (opts.parameters.length === 0 && cVote) {
-        const count = {};
         let _total = 0;
-        for (let i = 0, length = cVote.votes.length; i < length; i++) {
-          if (!count[cVote.votes[i].option]) {
-            count[cVote.votes[i].option] = cVote.votes[i].votes;
+        const count = cVote.votes.reduce((prev: { [option: number]: number } | null, cur) => {
+          _total += cur.votes;
+          if (!prev) {
+            return { [cur.option]: cur.votes };
           } else {
-            count[cVote.votes[i].option] = count[cVote.votes[i].option] + cVote.votes[i].votes;
+            return { ...prev, [cur.option]: Number(prev[cur.option] || 0) + cur.votes};
           }
-          _total = _total + cVote.votes[i].votes;
-        }
+        }, null);
         // get vote status
         responses.push({
           response: prepare('systems.polls.status', {
@@ -261,8 +260,8 @@ class Polls extends System {
           }), ...opts,
         });
         for (const i of Object.keys(cVote.options)) {
-          const option = cVote.options[i];
-          const votesCount = count[i] || 0;
+          const option = cVote.options[Number(i)];
+          const votesCount = count ? count[Number(i)] || 0 : 0;
           const percentage = Number((100 / _total) * votesCount || 0).toFixed(2);
           if (cVote.type === 'normal') {
             responses.push({ response: this.getCommand('!vote') + ` ${Number(i) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, ...opts });
@@ -399,9 +398,9 @@ class Polls extends System {
       for (const index of Object.keys(vote.options)) {
         setTimeout(() => {
           if (vote.type === 'normal') {
-            announce(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${vote.options[index]}`);
+            announce(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${vote.options[Number(index)]}`);
           } else {
-            announce(`#vote${(Number(index) + 1)} => ${vote.options[index]}`);
+            announce(`#vote${(Number(index) + 1)} => ${vote.options[Number(index)]}`);
           }
         }, 300 * (Number(index) + 1));
       }
