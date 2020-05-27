@@ -495,7 +495,7 @@ export default class customVariablesEdit extends Vue {
 
   @Watch('selectedType')
   @Watch('usableOptionsArray')
-  setDefaultValue(value) {
+  setDefaultValue(value: string) {
     if (this.selectedType === 'options') {
       if (!this.usableOptionsArray.includes(this.currentValue)) {
         this.currentValue = this.usableOptionsArray.length > 0 ? this.usableOptionsArray[0] : ''
@@ -524,7 +524,7 @@ export default class customVariablesEdit extends Vue {
     });
   }
 
-  removeURL(id) {
+  removeURL(id: string) {
     this.urls = this.urls.filter(o => o.id !== id);
   }
 
@@ -546,7 +546,7 @@ export default class customVariablesEdit extends Vue {
 
   testScript () {
     this.state.test = State.PROGRESS;
-    this.socket.emit('customvariables::testScript', { evalValue: this.evalValue, currentValue: this.currentValue }, (err, response) => {
+    this.socket.emit('customvariables::testScript', { evalValue: this.evalValue, currentValue: this.currentValue }, (err: string | null, response: string) => {
       if (err) {
         this.evalError = err;
       } else {
@@ -573,7 +573,7 @@ export default class customVariablesEdit extends Vue {
       await Promise.all([
         // check if variable name is unique
         new Promise((resolve, reject) => {
-          this.socket.emit('customvariables::isUnique', { variable: this.variableName, id: this.$route.params.id }, (err, isUnique) => {
+          this.socket.emit('customvariables::isUnique', { variable: this.variableName, id: this.$route.params.id }, (err: string | null, isUnique: boolean) => {
             if (!isUnique) {
               reject(this.translate('registry.customvariables.variable.error.isNotUnique'))
             }
@@ -613,7 +613,7 @@ export default class customVariablesEdit extends Vue {
         responseText: this.responseText,
         permission: this.permission
       }
-      this.socket.emit('customvariables::save', data, (err, id) => {
+      this.socket.emit('customvariables::save', data, (err: string | null, id: string) => {
         if (err) {
           console.error(err)
           return this.state.save = State.ERROR

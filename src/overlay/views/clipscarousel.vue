@@ -52,12 +52,12 @@ export default class ClipsCarouselOverlay extends Vue {
   }
 
   created() {
-    this.socket.emit('clips', (err, data) => {
+    this.socket.emit('clips', (err: string | null, data: { clips: any, settings: any }) => {
       this.timeToNextClip = data.settings.timeToNextClip
       data.clips = data.clips
-        .map((a) => ({sort: Math.random(), value: a}))
-        .sort((a, b) => a.sort - b.sort)
-        .map((a) => a.value)
+        .map((a: any) => ({sort: Math.random(), value: a}))
+        .sort((a: any, b: any) => a.sort - b.sort)
+        .map((a: any) => a.value)
 
       if (this.debug && this.dNumOfClips) {
         data.clips = chunk(data.clips, this.dNumOfClips)[0]
@@ -110,19 +110,19 @@ export default class ClipsCarouselOverlay extends Vue {
 
       if (this.$refs.clips) {
         for (let j = 0; j < 4; j++) {
-          this.$refs.clips[j].style.opacity = this.$refs.clips[j].getAttribute("id") === String(currentClip.index) ? '1' : '0.5'
-          this.$refs.clips[j].style.filter = this.$refs.clips[j].getAttribute("id") === String(currentClip.index) ? 'grayscale(0)' : 'grayscale(1)'
+          (this.$refs.clips as HTMLElement[])[j].style.opacity = (this.$refs.clips as HTMLElement[])[j].getAttribute("id") === String(currentClip.index) ? '1' : String(0.5);
+          (this.$refs.clips as HTMLElement[])[j].style.filter = (this.$refs.clips as HTMLElement[])[j].getAttribute("id") === String(currentClip.index) ? 'grayscale(0)' : 'grayscale(1)';
         }
 
         for (let i = 0, length = (this.$refs.clips as HTMLElement[]).length; i < length; i++) {
-          this.$refs.clips[i].play()
+          (this.$refs.clips as HTMLAudioElement[])[i].play()
         }
       }
     })
     this.clipsSet = clipsSet
   }
 
-  fillToFourClips(clips) {
+  fillToFourClips(clips: any) {
     if (clips.length >= 4 || clips.length === 0) return clips
     else {
       let filledClips = Object(clips)
@@ -144,8 +144,8 @@ export default class ClipsCarouselOverlay extends Vue {
 
     if (this.clips.length === 0 || (this.$refs.clips as HTMLElement[]).length < 4) return console.error('No clips were found')
 
-    if (this.nextOffset === 0 ) this.nextOffset = this.$refs.clips[2].offsetLeft - (window.innerWidth / 4)
-    if (this.offset === 0) this.offset = this.$refs.clips[1].offsetLeft - (window.innerWidth / 4)
+    if (this.nextOffset === 0 ) this.nextOffset = (this.$refs.clips as HTMLElement[])[2].offsetLeft - (window.innerWidth / 4)
+    if (this.offset === 0) this.offset = (this.$refs.clips as HTMLElement[])[1].offsetLeft - (window.innerWidth / 4)
 
     const clips = [...(this.$refs.clips as HTMLElement[])]
     gsap.to(this.$refs.carousel, { duration: 1, left: -this.nextOffset + 'px' })
@@ -153,7 +153,7 @@ export default class ClipsCarouselOverlay extends Vue {
     for (let i = 0; i < 4; i++) {
       let opacity = 0.5;
       let filter = 'grayscale(1)';
-      if (this.$refs.clips[i].getAttribute("id") === String(this.nextClip.index)) {
+      if ((this.$refs.clips as HTMLElement[])[i].getAttribute("id") === String(this.nextClip.index)) {
         opacity = 1;
         filter = 'grayscale(0)';
       }

@@ -25,7 +25,7 @@ class Roulette extends Game {
   loserWillLose = 0;
 
   @command('!roulette')
-  async main (opts): Promise<CommandResponse[]> {
+  async main (opts: CommandOptions): Promise<CommandResponse[]> {
     opts.sender['message-type'] = 'chat'; // force responses to chat
 
     const isAlive = !!_.random(0, 1, false);

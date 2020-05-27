@@ -297,7 +297,7 @@ class CustomCommands extends System {
     return atLeastOnePermissionOk;
   }
 
-  sendResponse(responses, opts) {
+  sendResponse(responses: CommandsResponsesInterface[], opts: { param: string; sender: CommandOptions['sender'], command: string }) {
     for (let i = 0; i < responses.length; i++) {
       setTimeout(async () => {
         parserReply(await responses[i].response, opts);

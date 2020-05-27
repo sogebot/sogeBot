@@ -167,7 +167,7 @@ class Bets extends System {
     }
   }
 
-  public async info(opts) {
+  public async info(opts: CommandOptions) {
     const currentBet = await getRepository(BetsEntity).findOne({
       relations: ['participations'],
       order: { createdAt: 'DESC' },
@@ -187,7 +187,7 @@ class Bets extends System {
     }
   }
 
-  public async participate(opts) {
+  public async participate(opts: CommandOptions) {
     const currentBet = await getRepository(BetsEntity).findOne({
       relations: ['participations'],
       order: { createdAt: 'DESC' },
@@ -261,7 +261,7 @@ class Bets extends System {
 
   @command('!bet refund')
   @default_permission(permission.MODERATORS)
-  public async refund(opts) {
+  public async refund(opts: CommandOptions) {
     const currentBet = await getRepository(BetsEntity).findOne({
       relations: ['participations'],
       order: { createdAt: 'DESC' },
@@ -292,7 +292,7 @@ class Bets extends System {
 
   @command('!bet close')
   @default_permission(permission.MODERATORS)
-  public async close(opts) {
+  public async close(opts: CommandOptions) {
     const currentBet = await getRepository(BetsEntity).findOne({
       relations: ['participations'],
       order: { createdAt: 'DESC' },
@@ -348,7 +348,7 @@ class Bets extends System {
   @command('!bet')
   @default_permission(permission.VIEWERS)
   @helper()
-  public main(opts) {
+  public main(opts: CommandOptions) {
     if (opts.parameters.length === 0) {
       this.info(opts);
     } else {

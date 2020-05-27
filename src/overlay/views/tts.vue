@@ -27,18 +27,21 @@ export default class AlertsRegistryOverlays extends Vue {
 
   speak(data: { text: string; rate: number; volume: number; pitch: number; voice: string; }) {
     if (!this.enabled) {
-      return console.error('ResponsiveVoice is not properly set, skipping');
+      console.error('ResponsiveVoice is not properly set, skipping');
+      return
     }
     if (this.isTTSPlaying()) {
       // wait and try later
-      return setTimeout(() => this.speak(data), 1000);
+      setTimeout(() => this.speak(data), 1000);
+      return;
     }
     window.responsiveVoice.speak(data.text, data.voice, { rate: data.rate, pitch: data.pitch, volume: data.volume / 100 });
   }
 
   initResponsiveVoice() {
     if (typeof window.responsiveVoice === 'undefined') {
-      return setTimeout(() => this.initResponsiveVoice(), 200);
+      setTimeout(() => this.initResponsiveVoice(), 200);
+      return;
     }
     window.responsiveVoice.init();
     console.debug('= ResponsiveVoice init OK')
@@ -46,7 +49,7 @@ export default class AlertsRegistryOverlays extends Vue {
   }
 
   checkResponsiveVoiceAPIKey() {
-    this.socketRV.emit('get.value', 'key', (err, value) => {
+    this.socketRV.emit('get.value', 'key', (err: string | null, value: string) => {
       if (this.responsiveAPIKey !== value) {
         // unload if values doesn't match
         this.$unloadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.responsiveAPIKey)

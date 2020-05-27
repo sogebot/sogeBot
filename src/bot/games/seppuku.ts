@@ -12,7 +12,7 @@ class Seppuku extends Game {
   timeout = 10;
 
   @command('!seppuku')
-  async main (opts) {
+  async main (opts: CommandOptions) {
     if (isBroadcaster(opts.sender)) {
       return [{ response: translate('gambling.seppuku.broadcaster'), ... opts }];
     }

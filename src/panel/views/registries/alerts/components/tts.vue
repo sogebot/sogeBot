@@ -175,7 +175,8 @@ export default class TTS extends Vue {
 
   initResponsiveVoice() {
     if (typeof window.responsiveVoice === 'undefined') {
-      return setTimeout(() => this.initResponsiveVoice(), 200);
+      setTimeout(() => this.initResponsiveVoice(), 200);
+      return;
     }
     window.responsiveVoice.init();
     this.voices = window.responsiveVoice.getVoices().map((o: { name: string }) => {

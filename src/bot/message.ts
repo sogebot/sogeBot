@@ -43,7 +43,7 @@ class Message {
     this.message = Entities.decode(message);
   }
 
-  async global (opts) {
+  async global (opts:any) {
     const variables = {
       game: api.stats.currentGame,
       language: api.stats.language,

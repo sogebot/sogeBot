@@ -148,7 +148,7 @@ class Expects {
     return this.match;
   }
 
-  command (opts?) {
+  command (opts?: any) {
     opts = opts || {};
     defaults(opts, { exec: false, optional: false, spaces: false });
     if (!opts.exec) {
@@ -176,7 +176,7 @@ class Expects {
     return this;
   }
 
-  points (opts?) {
+  points (opts?: any) {
     opts = opts || {};
     defaults(opts, { exec: false, optional: false, all: false, negative: false });
     if (!opts.exec) {
@@ -214,7 +214,7 @@ class Expects {
     return this;
   }
 
-  number (opts?) {
+  number (opts?: any) {
     opts = opts || {};
     defaults(opts, { exec: false, optional: false });
     if (!opts.exec) {
@@ -244,7 +244,7 @@ class Expects {
     return this;
   }
 
-  switch (opts?) {
+  switch (opts?: any) {
     opts = opts || {};
     defaults(opts, { exec: false, optional: false, default: null });
     if (!opts.exec) {
@@ -283,7 +283,7 @@ class Expects {
    *    !command -c => -c is true
    *    !command => -c is false
    */
-  toggler (opts?) {
+  toggler (opts?: any) {
     opts = opts || {};
 
     if (!opts.exec) {
@@ -306,7 +306,9 @@ class Expects {
     return this;
   }
 
-  permission(opts?) {
+  permission(opts?: {
+    exec?: boolean; optional?: boolean; default?: null | string; name?: string
+  }) {
     opts = {
       exec: false,
       optional: false,
@@ -344,7 +346,7 @@ class Expects {
     return this;
   }
 
-  argument (opts?) {
+  argument (opts?: any) {
     opts = opts || {};
     defaults(opts, {
       exec: false,
@@ -408,7 +410,7 @@ class Expects {
     return this;
   }
 
-  username (opts?) {
+  username (opts?: any) {
     opts = opts || {};
     defaults(opts, { exec: false, optional: false, default: null });
     if (!opts.exec) {
@@ -434,7 +436,7 @@ class Expects {
     return this;
   }
 
-  everything (opts?) {
+  everything (opts?: any) {
     opts = opts || {};
     defaults(opts, { exec: false, optional: false });
     if (!opts.exec) {
@@ -463,7 +465,7 @@ class Expects {
     return this;
   }
 
-  string (opts?) {
+  string (opts?: any) {
     opts = opts || {};
     defaults(opts, { exec: false, optional: false });
     if (!opts.exec) {
@@ -492,7 +494,7 @@ class Expects {
     return this;
   }
 
-  list (opts?) {
+  list (opts?: any) {
     defaults(opts, { exec: false, optional: false, delimiter: ' ' });
     if (!opts.exec) {
       this.toExec.push({fnc: 'list', opts});

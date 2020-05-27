@@ -53,7 +53,7 @@ export default class CreditsOverlay extends Vue {
   isEnded = false;
 
   mounted () {
-    this.socket.emit('load', (err, opts) => {
+    this.socket.emit('load', (err: string | null, opts: any) => {
       this.settings = opts.settings
 
       // set speed
@@ -248,7 +248,7 @@ export default class CreditsOverlay extends Vue {
   }
 
   @Watch('isEnded')
-  isEndedWatcher (val) {
+  isEndedWatcher (val: boolean) {
     if (val) {
       if (this.pages[this.currentPage + 1]) {
         (this.$refs.page as HTMLElement).style.top = window.innerHeight + 'px'
@@ -289,7 +289,7 @@ export default class CreditsOverlay extends Vue {
               ease: 'sine.out',
               onComplete: () => {
                 // play clip
-                const video = this.$refs.video[0]
+                const video = (this.$refs.video as HTMLAudioElement[])[0]
                 video.volume = this.settings.clips.volume / 100
 
                 if (this.settings.clips.shouldPlay) {

@@ -142,7 +142,7 @@ class Alias extends System {
 
   @command('!alias')
   @default_permission(permission.CASTERS)
-  main (opts): CommandResponse[] {
+  main (opts: CommandOptions): CommandResponse[] {
     let url = 'http://sogehige.github.io/sogeBot/#/systems/alias';
     if ((process.env?.npm_package_version ?? 'x.y.z-SNAPSHOT').includes('SNAPSHOT')) {
       url = 'http://sogehige.github.io/sogeBot/#/_master/systems/alias';
@@ -208,7 +208,7 @@ class Alias extends System {
 
   @command('!alias edit')
   @default_permission(permission.CASTERS)
-  async edit (opts) {
+  async edit (opts: CommandOptions) {
     try {
       const [perm, alias, cmd] = new Expects(opts.parameters)
         .permission({ optional: true, default: permission.VIEWERS })
@@ -241,7 +241,7 @@ class Alias extends System {
 
   @command('!alias add')
   @default_permission(permission.CASTERS)
-  async add (opts) {
+  async add (opts: CommandOptions) {
     try {
       const [perm, alias, cmd] = new Expects(opts.parameters)
         .permission({ optional: true, default: permission.VIEWERS })
@@ -275,7 +275,7 @@ class Alias extends System {
 
   @command('!alias list')
   @default_permission(permission.CASTERS)
-  async list (opts) {
+  async list (opts: CommandOptions) {
     const alias = await getRepository(AliasEntity).find({ visible: true, enabled: true });
     const response = (alias.length === 0 ? translate('alias.list-is-empty') : translate('alias.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(alias, 'alias'), 'alias')).join(', ')));
     return [{ response, ...opts }];
@@ -283,7 +283,7 @@ class Alias extends System {
 
   @command('!alias toggle')
   @default_permission(permission.CASTERS)
-  async toggle (opts) {
+  async toggle (opts: CommandOptions) {
     try {
       const [alias] = new Expects(opts.parameters)
         .everything()
@@ -309,7 +309,7 @@ class Alias extends System {
 
   @command('!alias toggle-visibility')
   @default_permission(permission.CASTERS)
-  async toggleVisibility (opts) {
+  async toggleVisibility (opts: CommandOptions) {
     try {
       const [alias] = new Expects(opts.parameters)
         .everything()
@@ -335,7 +335,7 @@ class Alias extends System {
 
   @command('!alias remove')
   @default_permission(permission.CASTERS)
-  async remove (opts) {
+  async remove (opts: CommandOptions) {
     try {
       const [alias] = new Expects(opts.parameters)
         .everything()

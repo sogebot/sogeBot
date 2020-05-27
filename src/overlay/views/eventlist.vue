@@ -15,6 +15,7 @@
 import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import { orderBy } from 'lodash-es';
+import { EventListInterface } from '../../bot/database/entity/eventList';
 
 @Component({})
 export default class ClipsOverlay extends Vue {
@@ -27,7 +28,7 @@ export default class ClipsOverlay extends Vue {
     this.socket.emit('getEvents', {
       ignore: this.urlParam('ignore') || '',
       limit: Number(this.urlParam('count') || 5)
-    }, (err, data) => {
+    }, (err: string | null, data: EventListInterface[]) => {
       if (err) {
         return console.error(err);
       }
@@ -35,21 +36,18 @@ export default class ClipsOverlay extends Vue {
       var display: string | string[] = this.urlParam('display') || 'username,event'; display = display.split(',')
 
       console.debug({order, display})
-
-      data = orderBy(data, 'timestamp', order) // re-order as set in order
-      for (let event of data) {
-        const values = JSON.parse(event.values_json);
-        if (event.event === 'resub') {
-          event.summary = values.subCumulativeMonths + 'x ' + this.translate('overlays-eventlist-resub')
-        } else if (event.event === 'cheer') {
-          event.summary = values.bits + ' ' + this.translate('overlays-eventlist-cheer')
-        } else if (event.event === 'tip') {
-          event.summary = values.currency + parseFloat(values.amount).toFixed(2)
+      this.events = orderBy(data, 'timestamp', order).map((o) => {
+        const values = JSON.parse(o.values_json);
+        if (o.event === 'resub') {
+          return { ...o, summary: values.subCumulativeMonths + 'x ' + this.translate('overlays-eventlist-resub') };
+        } else if (o.event === 'cheer') {
+          return { ...o, summary: values.bits + ' ' + this.translate('overlays-eventlist-cheer') };
+        } else if (o.event === 'tip') {
+          return { ...o, summary: values.currency + parseFloat(values.amount).toFixed(2) };
         } else {
-          event.summary = this.translate('overlays-eventlist-' + event.event)
+          return { ...o, summary: this.translate('overlays-eventlist-' + o.event) };
         }
-      }
-      this.events = data
+      })
       setTimeout(() => this.refresh(), 5000);
     })
 }

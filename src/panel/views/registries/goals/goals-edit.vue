@@ -440,7 +440,7 @@ export default Vue.extend({
         }, 1000)
       })
     },
-    removeGoal: function (id) {
+    removeGoal: function (id: string) {
       this.group.goals = this.group.goals.filter((o) => o.id !== id)
     },
     addGoal: function () {

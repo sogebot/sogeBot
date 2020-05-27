@@ -2,7 +2,7 @@ import { at, isNil } from 'lodash-es';
 
 export let translations = {};
 
-export default function(key) {
+export default function(key: string) {
   /* TODO: metrics
   if (!metrics.translations.includes(key)) {
     // we need only first usage on page load to not unnecessary overload socket
@@ -14,6 +14,6 @@ export default function(key) {
   return isNil(at(translations, key)[0]) ? `{${key}}` : at(translations, key)[0];
 }
 
-export const setTranslations = (_translations) => {
+export const setTranslations = (_translations: any) => {
   translations = _translations;
 };

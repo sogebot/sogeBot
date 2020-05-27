@@ -16,7 +16,7 @@ import { flatten, unflatten } from './helpers/flatten';
 import { existsSync } from 'fs';
 import { isDbConnected } from './helpers/database';
 import { register } from './helpers/register';
-import { addMenu, addMenuPublic, addWidget, ioServer, menuPublic } from './helpers/panel';
+import { addMenu, addMenuPublic, addWidget, ioServer, menu, menuPublic } from './helpers/panel';
 import { v4 as uuid } from 'uuid';
 import { invalidateParserCache, refreshCachedCommandPermissions } from './helpers/cache';
 
@@ -450,19 +450,19 @@ class Module {
     return opts.state;
   }
 
-  public addMenu(opts) {
+  public addMenu(opts: typeof menu[number]) {
     if (isMainThread) {
       addMenu(opts);
     }
   }
 
-  public addMenuPublic(opts: typeof menuPublic[0]) {
+  public addMenuPublic(opts: typeof menuPublic[number]) {
     if (isMainThread) {
       addMenuPublic(opts);
     }
   }
 
-  public addWidget(...opts) {
+  public addWidget(...opts: any[]) {
     if (isMainThread) {
       addWidget(opts[0], opts[1], opts[2]);
     }

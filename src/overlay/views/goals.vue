@@ -135,6 +135,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
+// @ts-ignore
 import safeEval from 'safe-eval';
 import { find } from 'lodash-es';
 
@@ -192,11 +193,11 @@ export default class GoalsOverlay extends Vue {
     }, 100));
   }
 
-  beforeEnter (el) {
-    el.style.opacity = 0
+  beforeEnter (el: HTMLElement) {
+    el.style.opacity = '0'
   }
 
-  doEnterAnimation (el, done) {
+  doEnterAnimation (el: HTMLElement, done: () => void) {
     if (this.group === null) return
     if (this.group.display.type === 'fade') {
       gsap.to(el, {
@@ -209,7 +210,7 @@ export default class GoalsOverlay extends Vue {
     }
   }
 
-  doLeaveAnimation (el, done) {
+  doLeaveAnimation (el: HTMLElement, done: () => void) {
     if (this.group === null) return
     if (this.group.display.type === 'fade') {
       gsap.to(el, {
@@ -222,14 +223,14 @@ export default class GoalsOverlay extends Vue {
     }
   }
 
-  isDisabled(idx) {
+  isDisabled(idx: number) {
     if (this.group === null) return false;
 
     const goal = this.group.goals[idx]
     return new Date(goal.endAfter).getTime() <= new Date().getTime() && !goal.endAfterIgnore
   }
 
-  textStrokeGenerator(radius, color) {
+  textStrokeGenerator(radius: number, color: string) {
     if (radius === 0) return ''
 
     // config
@@ -250,18 +251,18 @@ export default class GoalsOverlay extends Vue {
     return cssStr
   }
 
-  getFontFamilyCSS (family) {
+  getFontFamilyCSS (family: string) {
     return `"${family}" !important`;
   }
 
   refresh () {
     const id = window.location.href.split('/')[window.location.href.split('/').length - 1]
     if (id) {
-      this.socket.emit('goals::current', (err, current: { subscribers: number, followers: number }) => {
+      this.socket.emit('goals::current', (err: string | null, current: { subscribers: number, followers: number }) => {
         if (err) return console.error(err)
         this.current = current
       })
-      this.socket.emit('generic::getOne', id, (err, cb: Required<GoalGroupInterface> | undefined) => {
+      this.socket.emit('generic::getOne', id, (err: string | null, cb: Required<GoalGroupInterface> | undefined) => {
         if (err) return console.error(err)
         this.group = cb || null;
 

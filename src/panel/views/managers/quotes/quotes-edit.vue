@@ -96,7 +96,7 @@ Component.registerHooks([
     'loading': () => import('../../../components/loading.vue'),
   },
   filters: {
-    capitalize: function (value) {
+    capitalize: function (value: string) {
       if (!value) return ''
       value = value.toString()
       return value.charAt(0).toUpperCase() + value.slice(1)
@@ -130,18 +130,18 @@ export default class QuotesEdit extends Vue {
   }
 
   @Watch('item.tags')
-  async watchTags(tags) {
+  async watchTags(tags: string[]) {
     this.tagsString = tags.map(o => o.trim()).join(', ');
   }
 
   @Watch('tagsString')
-  async watchTagsString(tags) {
+  async watchTagsString(tags: string) {
     this.item.tags = tags.split(',').map(o => o.trim())
   }
 
 
   @Watch('item.quotedBy')
-  async watchQuotedBy(id) {
+  async watchQuotedBy(id: number) {
     if (id === 0) {
       this.quotedByName = 'n/a';
     } else {
@@ -152,7 +152,7 @@ export default class QuotesEdit extends Vue {
   async mounted() {
     this.state.loaded = this.$state.progress;
     if (this.$route.params.id) {
-      this.socket.emit('generic::getOne', this.$route.params.id, async (err, data: QuotesInterface) => {
+      this.socket.emit('generic::getOne', this.$route.params.id, async (err: string | null, data: QuotesInterface) => {
         console.group('generic::getOne')
         console.log('Loaded', {data});
         console.groupEnd();
@@ -220,7 +220,7 @@ export default class QuotesEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
       console.debug('Saving', this.item);
-      this.socket.emit('generic::setById', { id: this.$route.params.id, item: this.item }, (err: string | null, data) => {
+      this.socket.emit('generic::setById', { id: this.$route.params.id, item: this.item }, (err: string | null, data: QuotesInterface) => {
         if (err) {
           this.state.save = this.$state.fail;
           return console.error(err);

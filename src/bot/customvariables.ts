@@ -120,7 +120,7 @@ class CustomVariables extends Core {
         if (!item) {
           throw new Error('Variable not found');
         }
-        const newCurrentValue = await this.runScript(item.evalValue, { _current: item.currentValue, isUI: true });
+        const newCurrentValue = await this.runScript(item.evalValue, { sender: null,_current: item.currentValue, isUI: true });
         const runAt = Date.now();
         cb(null, await getRepository(Variable).save({
           ...item, currentValue: newCurrentValue, runAt,
@@ -190,7 +190,7 @@ class CustomVariables extends Core {
     });
   }
 
-  async runScript (script, opts) {
+  async runScript (script: string, opts: { sender: { userId: number; username: string } | string | null, isUI: boolean; param?: string | number, _current: any }) {
     debug('customvariables.eval', opts);
     let sender = !isNil(opts.sender) ? opts.sender : null;
     const isUI = !isNil(opts.isUI) ? opts.isUI : false;
@@ -379,7 +379,7 @@ class CustomVariables extends Core {
    * @return object
    * { updated, isOK }
    */
-  async setValueOf (variable: string | Readonly<VariableInterface>, currentValue, opts) {
+  async setValueOf (variable: string | Readonly<VariableInterface>, currentValue: any, opts: any) {
     const item = typeof variable === 'string'
       ? await getRepository(Variable).findOne({ variableName: variable })
       : { ...variable };

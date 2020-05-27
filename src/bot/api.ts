@@ -464,7 +464,7 @@ class API extends Core {
     return null;
   }
 
-  async getChannelChattersUnofficialAPI (opts) {
+  async getChannelChattersUnofficialAPI (opts: any) {
     if (!isMainThread) {
       throw new Error('API can run only on master');
     }
@@ -505,7 +505,7 @@ class API extends Core {
     return { state: true, opts };
   }
 
-  async getAllStreamTags(opts) {
+  async getAllStreamTags(opts: any) {
     if (!isMainThread) {
       throw new Error('API can run only on master');
     }
@@ -578,7 +578,7 @@ class API extends Core {
 
   }
 
-  async getChannelSubscribers (opts) {
+  async getChannelSubscribers (opts: any) {
     if (!isMainThread) {
       throw new Error('API can run only on master');
     }
@@ -700,7 +700,7 @@ class API extends Core {
     }
   }
 
-  async getChannelDataOldAPI (opts) {
+  async getChannelDataOldAPI (opts: any) {
     if (!isMainThread) {
       throw new Error('API can run only on master');
     }
@@ -908,7 +908,7 @@ class API extends Core {
     return { state: true };
   }
 
-  async getChannelFollowers (opts) {
+  async getChannelFollowers (opts: any) {
     if (!isMainThread) {
       throw new Error('API can run only on master');
     }
@@ -1045,7 +1045,7 @@ class API extends Core {
     }
   }
 
-  async getCurrentStreamTags (opts) {
+  async getCurrentStreamTags (opts: any) {
     if (!isMainThread) {
       throw new Error('API can run only on master');
     }
@@ -1096,7 +1096,7 @@ class API extends Core {
     return { state: true, opts };
   }
 
-  async getCurrentStreamData (opts) {
+  async getCurrentStreamData (opts: any) {
     if (!isMainThread) {
       throw new Error('API can run only on master');
     }
@@ -1556,7 +1556,7 @@ class API extends Core {
     return { state: true };
   }
 
-  async createClip (opts) {
+  async createClip (opts: any) {
     if (!isMainThread) {
       throw Error('API can run only on master');
     }
@@ -1838,7 +1838,7 @@ class API extends Core {
     }
   }
 
-  async getTopClips (opts) {
+  async getTopClips (opts: any) {
     let url = 'https://api.twitch.tv/helix/clips?broadcaster_id=' + oauth.channelId;
     const token = oauth.botAccessToken;
     try {

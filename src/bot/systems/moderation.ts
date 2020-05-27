@@ -209,9 +209,12 @@ class Moderation extends System {
 
   @command('!permit')
   @default_permission(permission.CASTERS)
-  async permitLink (opts): Promise<CommandResponse[]> {
+  async permitLink (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const parsed = opts.parameters.match(/^@?([\S]+) ?(\d+)?$/);
+      if (!parsed) {
+        throw new Error('!permit command not parsed');
+      }
       let count = 1;
       if (!_.isNil(parsed[2])) {
         count = parseInt(parsed[2], 10);

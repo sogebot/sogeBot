@@ -232,29 +232,29 @@
       });
     },
     methods: {
-      beforeEnter: function (el) {
-        el.style.opacity = 0
-        el.style.height = 0
+      beforeEnter: function (el: HTMLElement) {
+        el.style.opacity = '0'
+        el.style.height = '0'
       },
-      enter: function (el, done) {
-        var delay = el.dataset.index * 150
+      enter: function (el: HTMLElement, done: () => void) {
+        var delay = Number(el.dataset.index) * 150
         setTimeout(() => {
-          gsap.to(el, { duration: 1, opacity: 1, height: this.heightOfElement[el.dataset.id] || '100%', onComplete: () => {
-            if (!this.heightOfElement[el.dataset.id]) {
-              el.style.height = null; // reset to null if not defined
+          gsap.to(el, { duration: 1, opacity: 1, height: this.heightOfElement[String(el.dataset.id)] || '100%', onComplete: () => {
+            if (!this.heightOfElement[String(el.dataset.id)]) {
+              el.style.height = 'inherit'; // reset to null if not defined
             }
             done()
            } })
         }, delay)
       },
-      leave: function (el, done) {
-        this.heightOfElement[el.dataset.id] = el.getBoundingClientRect().height + 'px'
-        var delay = el.dataset.index * 150
+      leave: function (el: HTMLElement, done: () => void) {
+        this.heightOfElement[String(el.dataset.id)] = el.getBoundingClientRect().height + 'px'
+        var delay = Number(el.dataset.index) * 150
         setTimeout(() => {
           gsap.to(el, { duration: 1, opacity: 0, height: 0, onComplete: done })
         }, delay)
       },
-      deleteEvent(event) {
+      deleteEvent(event: EventInterface) {
         this.socket.emit('events::remove', event, (err: string | null) => {
           if (err) {
             return console.error(err);
@@ -262,7 +262,7 @@
           this.events = this.events.filter((o) => o.id !== event.id)
         })
       },
-      triggerTest(id) {
+      triggerTest(id: string) {
         this.$set(this.testingInProgress, id, 1);
         this.socket.emit('test.event', id, () => {
           this.$set(this.testingInProgress, id, 2);
@@ -271,27 +271,27 @@
           }, 1000)
         });
       },
-      sendUpdate(event) {
+      sendUpdate(event: EventInterface) {
         this.socket.emit('events::save', event, (err: string | null) => {
           if (err) {
             console.error(err);
           }
         })
       },
-      isSettingsShown(id) {
+      isSettingsShown(id: string) {
         return this.showSettingsOfEvent.includes(id)
       },
-      isOperationShown(id) {
+      isOperationShown(id: string) {
         return this.showOperationsOfEvent.includes(id)
       },
-      toggleSettingsShow(id) {
+      toggleSettingsShow(id: string) {
         if (this.showSettingsOfEvent.includes(id)) {
           this.showSettingsOfEvent = this.showSettingsOfEvent.filter((o) => o !== id);
         } else {
           this.showSettingsOfEvent.push(id);
         }
       },
-      toggleOperationShow(id) {
+      toggleOperationShow(id: string) {
         if (this.showOperationsOfEvent.includes(id)) {
           this.showOperationsOfEvent = this.showOperationsOfEvent.filter((o) => o !== id);
         } else {

@@ -76,7 +76,7 @@ class Ranks extends System {
 
   @command('!rank add')
   @default_permission(permission.CASTERS)
-  async add (opts, type: RankInterface['type'] = 'viewer'): Promise<CommandResponse[]> {
+  async add (opts: CommandOptions, type: RankInterface['type'] = 'viewer'): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^(\d+) ([\S].+)$/);
 
     if (_.isNil(parsed)) {
@@ -105,19 +105,19 @@ class Ranks extends System {
 
   @command('!rank add-flw')
   @default_permission(permission.CASTERS)
-  async addflw (opts): Promise<CommandResponse[]> {
+  async addflw (opts: CommandOptions): Promise<CommandResponse[]> {
     return this.add(opts, 'follower');
   }
 
   @command('!rank add-sub')
   @default_permission(permission.CASTERS)
-  async addsub (opts): Promise<CommandResponse[]> {
+  async addsub (opts: CommandOptions): Promise<CommandResponse[]> {
     return this.add(opts, 'subscriber');
   }
 
   @command('!rank edit')
   @default_permission(permission.CASTERS)
-  async edit (opts, type: RankInterface['type'] = 'viewer'): Promise<CommandResponse[]> {
+  async edit (opts: CommandOptions, type: RankInterface['type'] = 'viewer'): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^(\d+) ([\S].+)$/);
 
     if (_.isNil(parsed)) {
@@ -149,19 +149,19 @@ class Ranks extends System {
 
   @command('!rank edit-flw')
   @default_permission(permission.CASTERS)
-  async editflw (opts) {
+  async editflw (opts: CommandOptions) {
     return this.edit(opts, 'follower');
   }
 
   @command('!rank edit-sub')
   @default_permission(permission.CASTERS)
-  async editsub (opts) {
+  async editsub (opts: CommandOptions) {
     return this.edit(opts, 'subscriber');
   }
 
   @command('!rank set')
   @default_permission(permission.CASTERS)
-  async set (opts): Promise<CommandResponse[]> {
+  async set (opts: CommandOptions): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^([\S]+) ([\S ]+)$/);
 
     if (_.isNil(parsed)) {
@@ -169,14 +169,14 @@ class Ranks extends System {
       return [{ response, ...opts }];
     }
 
-    await getRepository(User).update({ userId: parsed[1] }, { haveCustomRank: true, rank: parsed[2].trim() });
+    await getRepository(User).update({ userId: Number(parsed[1]) }, { haveCustomRank: true, rank: parsed[2].trim() });
     const response = prepare('ranks.custom-rank-was-set-to-user', { rank: parsed[2].trim(), username: parsed[1] });
     return [{ response, ...opts }];
   }
 
   @command('!rank unset')
   @default_permission(permission.CASTERS)
-  async unset (opts): Promise<CommandResponse[]> {
+  async unset (opts: CommandOptions): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^([\S]+)$/);
 
     if (_.isNil(parsed)) {
@@ -184,14 +184,14 @@ class Ranks extends System {
       return [{ response, ...opts }];
     }
 
-    await getRepository(User).update({ userId: parsed[1] }, { haveCustomRank: false, rank: '' });
+    await getRepository(User).update({ userId: Number(parsed[1]) }, { haveCustomRank: false, rank: '' });
     const response = prepare('ranks.custom-rank-was-unset-for-user', { username: parsed[1] });
     return [{ response, ...opts }];
   }
 
   @command('!rank help')
   @default_permission(permission.CASTERS)
-  help (opts): CommandResponse[] {
+  help (opts: CommandOptions): CommandResponse[] {
     let url = 'http://sogehige.github.io/sogeBot/#/systems/ranks';
     if ((process.env?.npm_package_version ?? 'x.y.z-SNAPSHOT').includes('SNAPSHOT')) {
       url = 'http://sogehige.github.io/sogeBot/#/_master/systems/ranks';
@@ -201,7 +201,7 @@ class Ranks extends System {
 
   @command('!rank list')
   @default_permission(permission.CASTERS)
-  async list (opts, type: RankInterface['type'] = 'viewer'): Promise<CommandResponse[]> {
+  async list (opts: CommandOptions, type: RankInterface['type'] = 'viewer'): Promise<CommandResponse[]> {
     const ranks = await getRepository(Rank).find({ type });
     const response = prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', { list: _.map(_.orderBy(ranks, 'value', 'asc'), function (l) {
       return l.value + 'h - ' + l.rank;
@@ -211,19 +211,19 @@ class Ranks extends System {
 
   @command('!rank list-flw')
   @default_permission(permission.CASTERS)
-  async listflw (opts) {
+  async listflw (opts: CommandOptions) {
     return this.list(opts, 'follower');
   }
 
   @command('!rank list-sub')
   @default_permission(permission.CASTERS)
-  async listsub (opts) {
+  async listsub (opts: CommandOptions) {
     return this.list(opts, 'subscriber');
   }
 
   @command('!rank rm')
   @default_permission(permission.CASTERS)
-  async rm (opts, type: RankInterface['type'] = 'viewer'): Promise<CommandResponse[]> {
+  async rm (opts: CommandOptions, type: RankInterface['type'] = 'viewer'): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^(\d+)$/);
     if (_.isNil(parsed)) {
       const response = prepare('ranks.rank-parse-failed');
@@ -244,18 +244,18 @@ class Ranks extends System {
 
   @command('!rank rm-flw')
   @default_permission(permission.CASTERS)
-  async rmflw (opts) {
+  async rmflw (opts: CommandOptions) {
     return this.rm(opts, 'follower');
   }
 
   @command('!rank rm-sub')
   @default_permission(permission.CASTERS)
-  async rmsub (opts) {
+  async rmsub (opts: CommandOptions) {
     return this.rm(opts, 'subscriber');
   }
 
   @command('!rank')
-  async main (opts): Promise<CommandResponse[]> {
+  async main (opts: CommandOptions): Promise<CommandResponse[]> {
     const user = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
     const watched = await users.getWatchedOf(opts.sender.userId);
     const rank = await this.get(user);

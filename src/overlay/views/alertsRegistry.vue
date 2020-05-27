@@ -75,6 +75,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
+// @ts-ignore
 import JsonViewer from 'vue-json-viewer'
 import { getSocket } from 'src/panel/helpers/socket';
 import VRuntimeTemplate from 'v-runtime-template';
@@ -148,7 +149,7 @@ export default class AlertsRegistryOverlays extends Vue {
     }
   }
 
-  withEmotes(text) {
+  withEmotes(text: string) {
     // checking emotes
     for (let emote of this.emotes) {
       if (get(this.runningAlert, `message.allowEmotes.${emote.type}`, false)) {
@@ -191,20 +192,21 @@ export default class AlertsRegistryOverlays extends Vue {
     }
   }
 
-  speak(text, voice, rate, pitch, volume) {
+  speak(text: string, voice: string, rate: number, pitch: number, volume: number) {
     window.responsiveVoice.speak(text, voice, { rate, pitch, volume });
   }
 
   initResponsiveVoice() {
     if (typeof window.responsiveVoice === 'undefined') {
-      return setTimeout(() => this.initResponsiveVoice(), 200);
+      setTimeout(() => this.initResponsiveVoice(), 200);
+      return;
     }
     window.responsiveVoice.init();
     console.debug('= ResponsiveVoice init OK')
   }
 
   checkResponsiveVoiceAPIKey() {
-    this.socketRV.emit('get.value', 'key', (err, value) => {
+    this.socketRV.emit('get.value', 'key', (err: string | null, value: string) => {
       if (this.responsiveAPIKey !== value) {
         // unload if values doesn't match
         this.$unloadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.responsiveAPIKey)
@@ -334,7 +336,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
             console.debug({possibleAlertsWithRandomCount, possibleAlertsWithExactAmount, possibleAlertsWithGtEqAmount})
 
-            let alert;
+            let alert: any;
             if (possibleAlertsWithExactAmount.length > 0) {
               alert = possibleAlertsWithExactAmount[Math.floor(Math.random() * possibleAlertsWithExactAmount.length)];
             } else if (possibleAlertsWithGtEqAmount.length > 0) {
@@ -509,7 +511,7 @@ export default class AlertsRegistryOverlays extends Vue {
         console.debug('Alert is updating')
         this.updatedAt = updatedAt;
         await new Promise((resolve) => {
-          this.socket.emit('generic::getOne', this.id, async (err, data: AlertInterface) => {
+          this.socket.emit('generic::getOne', this.id, async (err: string | null, data: AlertInterface) => {
             if (err) {
               return console.error(err);
             }
@@ -564,7 +566,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
                 // load emotes
                 await new Promise((done) => {
-                  this.socketEmotes.emit('getCache', (err, data) => {
+                  this.socketEmotes.emit('getCache', (err: string | null, data: any) => {
                     if (err) {
                       return console.error(err);
                     }
@@ -591,7 +593,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
   }
 
-  prepareMessageTemplate(msg) {
+  prepareMessageTemplate(msg: string) {
     if (this.runningAlert !== null) {
       let name: string | string[] = this.runningAlert.name.split('').map((char, index) => {
         if (this.runningAlert !== null) {
@@ -659,18 +661,14 @@ export default class AlertsRegistryOverlays extends Vue {
         .replace(/\{currency:highlight\}/g, currency)
         .replace(/\{monthsName:highlight\}/g, monthsName)
         .replace(/\{name\}/g, this.runningAlert.name)
-        .replace(/\{amount\}/g, this.runningAlert.amount)
+        .replace(/\{amount\}/g, String(this.runningAlert.amount))
         .replace(/\{currency\}/g, this.runningAlert.currency)
         .replace(/\{monthsName\}/g, this.runningAlert.monthsName);
     }
     return `<span>${msg}</span>`;
   }
 
-  prepareAdvancedMode(html) {
-
-  }
-
-  textStrokeGenerator(radius, color) {
+  textStrokeGenerator(radius: number, color: string) {
     if (radius === 0) return ''
 
     // config

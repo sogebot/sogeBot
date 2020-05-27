@@ -19,6 +19,7 @@ import { Vue, Component } from 'vue-property-decorator';
 import VueScrollTo from 'vue-scrollto';
 
 import { getSocket } from 'src/panel/helpers/socket';
+import { SongRequestInterface } from '../../bot/database/entity/song';
 
 @Component({
   components: {
@@ -28,11 +29,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 export default class songrequest extends Vue {
   socket = getSocket('/systems/songs', true);
 
-  requests: {
-    endTime: number; forceVolume: boolean; lastPlayedAt: number; length_seconds: number;
-    loudness: number; seed: number; startTime: number; title: string; videoID: string;
-    volume: number; _id: string;
-  }[] = [];
+  requests: SongRequestInterface[] = [];
 
   interval: number = 0;
 
@@ -59,7 +56,7 @@ export default class songrequest extends Vue {
   mounted() {
     this.state.loading.requests = this.$state.progress;
     setInterval(() => {
-      this.socket.emit('songs::getAllRequests', {}, (err, items) => {
+      this.socket.emit('songs::getAllRequests', {}, (err: string | null, items: SongRequestInterface[]) => {
         console.debug('Loaded', {requests: items})
         this.requests = items
         this.state.loading.requests = this.$state.success;
@@ -70,11 +67,11 @@ export default class songrequest extends Vue {
     })
   }
 
-  generateThumbnail(videoId) {
+  generateThumbnail(videoId: string) {
     return `https://img.youtube.com/vi/${videoId}/1.jpg`
   }
 
-  linkTo(item) {
+  linkTo(item: SongRequestInterface) {
     console.debug('Clicked', item.videoId);
     window.location.href = `http://youtu.be/${item.videoId}`;
   }

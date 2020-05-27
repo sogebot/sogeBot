@@ -1,4 +1,4 @@
-export default function(key) {
+export default function(key: string) {
   const results = new RegExp('[\\?&]' + key + '=([^&#]*)').exec(window.location.href);
   if (results == null) {
     return null;

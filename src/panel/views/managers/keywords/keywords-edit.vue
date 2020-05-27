@@ -79,7 +79,7 @@ import { required } from 'vuelidate/lib/validators'
 import { v4 as uuid } from 'uuid';
 import { KeywordInterface } from 'src/bot/database/entity/keyword';
 
-const isValidRegex = (val) => {
+const isValidRegex = (val: string) => {
   try {
     new RegExp(val);
     return true;
@@ -160,7 +160,7 @@ export default class keywordsEdit extends Vue {
       }
       this.state.save = this.$state.progress;
 
-      this.socket.emit('keywords::save', keyword, (err: string | null, data) => {
+      this.socket.emit('keywords::save', keyword, (err: string | null, data: KeywordInterface) => {
         if (err) {
           this.state.save = this.$state.fail;
           return console.error(err);

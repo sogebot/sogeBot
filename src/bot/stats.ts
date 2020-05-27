@@ -123,8 +123,8 @@ class Stats {
     }
   }
 
-  parseStat(value) {
-    return parseFloat(isNil(value) || isNaN(parseFloat(value)) ? 0 : value);
+  parseStat(value: null | string | number) {
+    return parseFloat(isNil(value) || isNaN(parseFloat(String(value))) ? String(0) : String(value));
   }
 }
 

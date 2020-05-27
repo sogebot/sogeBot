@@ -39,7 +39,9 @@ import { Vue, Component } from 'vue-property-decorator';
 import { cloneDeep, isEqual } from 'lodash-es';
 
 import { gsap } from 'gsap'
+// @ts-ignore
 import Winwheel from 'winwheel'
+// @ts-ignore
 import JsonViewer from 'vue-json-viewer'
 
 import { getSocket } from 'src/panel/helpers/socket';
@@ -86,20 +88,21 @@ export default class RandomizerOverlay extends Vue {
   theWheel: any = null;
   wheelWin: any = null;
 
-  speak(text, voice, rate, pitch, volume) {
+  speak(text: string, voice: string, rate: number, pitch: number, volume: number) {
     window.responsiveVoice.speak(text, voice, { rate, pitch, volume });
   }
 
   initResponsiveVoice() {
     if (typeof window.responsiveVoice === 'undefined') {
-      return setTimeout(() => this.initResponsiveVoice(), 200);
+      setTimeout(() => this.initResponsiveVoice(), 200);
+      return
     }
     window.responsiveVoice.init();
     console.debug('= ResponsiveVoice init OK')
   }
 
   checkResponsiveVoiceAPIKey() {
-    this.socketRV.emit('get.value', 'key', (err, value) => {
+    this.socketRV.emit('get.value', 'key', (err: string | null, value: string) => {
       if (this.responsiveAPIKey !== value) {
         // unload if values doesn't match
         this.$unloadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.responsiveAPIKey)
@@ -124,7 +127,7 @@ export default class RandomizerOverlay extends Vue {
   created () {
     this.checkResponsiveVoiceAPIKey();
     setInterval(() => {
-      this.socket.emit('randomizer::getVisible', async (err, data) => {
+      this.socket.emit('randomizer::getVisible', async (err: string | null, data: Required<RandomizerInterface>) => {
         if (err) {
           return console.error(err)
         }
@@ -239,7 +242,7 @@ export default class RandomizerOverlay extends Vue {
     ctx.fill();                   // Then fill.
   }
 
-  textStrokeGenerator(radius, color) {
+  textStrokeGenerator(radius: number, color: string) {
     if (radius === 0) return ''
 
     // config
@@ -327,7 +330,7 @@ export default class RandomizerOverlay extends Vue {
     items = items.filter(o => o.numOfDuplicates > 0);
 
 
-    const countGroupItems = (item: RandomizerItemInterface, count = 0) => {
+    const countGroupItems = (item: RandomizerItemInterface, count = 0): number => {
       const child = items.find(o => o.groupId === item.id);
       if (child) {
         return countGroupItems(child, count + 1);

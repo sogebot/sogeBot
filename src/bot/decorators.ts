@@ -47,7 +47,7 @@ function getNameAndTypeFromStackTrace() {
   return { name, type };
 }
 
-export function ui(opts, category?: string) {
+export function ui(opts: any, category?: string) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: any, key: string) => {
@@ -314,7 +314,9 @@ function registerRollback(m) {
   }, 5000);
 }
 
-function registerParser(opts, m) {
+function registerParser(opts: {
+  fnc: string; permission: string; priority: number, dependsOn: Module[]; fireAndForget: boolean;
+}, m) {
   setTimeout(() => {
     try {
       const self = find(m.type, m.name);

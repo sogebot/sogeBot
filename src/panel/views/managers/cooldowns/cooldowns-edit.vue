@@ -209,7 +209,7 @@ export default class cooldownEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
 
-      this.socket.emit('cooldown::save', this.item, (err: string | null, data) => {
+      this.socket.emit('cooldown::save', this.item, (err: string | null, data: CooldownInterface) => {
         if (err) {
           this.state.save = this.$state.fail;
           return console.error(err);

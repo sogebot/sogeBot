@@ -41,7 +41,7 @@ export default class ClipsOverlay extends Vue {
     }
   }
   created () {
-    this.socket.on('clips', data => {
+    this.socket.on('clips', (data: any) => {
       for (let i = 0, len = data.clips.length; i < len; i++) {
         this.settings.push(data.settings)
         this.clips.push(data.clips[i])
@@ -62,7 +62,7 @@ export default class ClipsOverlay extends Vue {
     }, 100));
   }
   @Watch('isPlaying')
-  isPlayingWatcher (val) {
+  isPlayingWatcher (val: boolean) {
     if (val) {
       const video = this.$refs['video'] as HTMLMediaElement
       video.volume = this.getPlayingSettings().volume / 100

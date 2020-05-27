@@ -404,7 +404,7 @@
         this.widthOfMenuUpdate()
       }, 100)
 
-      this.socket.emit('version', async (version) => {
+      this.socket.emit('version', async (version: string) => {
         this.version =  version;
 
         const { response } = await new Promise(resolve => {
@@ -424,14 +424,12 @@
 
           request.send();
         })
-        let botVersion = version.replace('-SNAPSHOT', '').split('.')
-        let gitVersion = response.tag_name.split('.')
+        let botVersion = version.replace('-SNAPSHOT', '').split('.').map(o => Number(o))
+        let gitVersion = (response.tag_name as string).split('.').map(o => Number(o))
         console.debug({botVersion, gitVersion});
 
         let isNewer = false
-        for (let index in botVersion) {
-          botVersion[index] = parseInt(botVersion[index], 10)
-          gitVersion[index] = parseInt(gitVersion[index], 10)
+        for (let index = 0; index < botVersion.length; index++) {
           if (botVersion[index] < gitVersion[index]) {
             isNewer = true
             break
@@ -447,7 +445,7 @@
         }
       })
 
-      this.socket.emit('panel::errors', (err: string | null, data) => {
+      this.socket.emit('panel::errors', (err: string | null, data: { name: string; message: string }[]) => {
         if (err) {
           return console.error(err);
         }
@@ -457,7 +455,7 @@
         this.errors = data;
       });
 
-      this.socket.emit('getLatestStats', (err: string | null, data) => {
+      this.socket.emit('getLatestStats', (err: string | null, data: any) => {
         console.groupCollapsed('navbar::getLatestStats')
         if (err) {
           return console.error(err);
@@ -469,7 +467,7 @@
 
       setInterval(() => {
         this.timestamp = Date.now()
-        this.socket.emit('panel.sendStreamData', async (err: string | null, data) => {
+        this.socket.emit('panel.sendStreamData', async (err: string | null, data: { [x: string]: any, rawStatus: string, status: string, game: string }) => {
           console.groupCollapsed('navbar::panel.sendStreamData')
           if (err) {
             return console.error(err);
@@ -477,6 +475,7 @@
           console.log(data)
           console.groupEnd();
           for (let [key, value] of Object.entries(data)) {
+            // @ts-ignore
             this[key] = value // populate data
           }
           this.isLoaded = true
@@ -499,14 +498,14 @@
       showGameAndTitleDlg: function () {
         EventBus.$emit('show-game_and_title_dlg');
       },
-      loadCustomVariableValue: async function (variable) {
+      loadCustomVariableValue: async function (variable: string) {
         return new Promise((resolve, reject) => {
-          this.socket.emit('custom.variable.value', variable, (err, value) => {
+          this.socket.emit('custom.variable.value', variable, (err: string | null, value: string) => {
             resolve(value)
           })
         })
       },
-      generateTitle: async function (current, raw) {
+      generateTitle: async function (current: string, raw: string) {
         if (raw.length === 0) return current
 
         let variables = raw.match(/(\$_[a-zA-Z0-9_]+)/g)
@@ -523,7 +522,7 @@
         this.cachedTitle = raw
         return raw
       },
-      shortenNumber: function (number, shortify) {
+      shortenNumber: function (number: number, shortify: boolean) {
         if (!shortify || Number(number) <= 10000) return number
         var SI_PREFIXES = ["", "k", "M", "G", "T", "P", "E"];
         // what tier? (determines SI prefix)
@@ -541,7 +540,7 @@
       saveHighlight() {
         this.highlightsSocket.emit('highlight')
       },
-      filterTags (is_auto) {
+      filterTags (is_auto: boolean) {
         return this.tags.filter(o => !!o.is_auto === is_auto).map((o) => {
           const key = Object.keys(o.localization_names).find(key => key.includes(this.configuration.lang))
           return {
@@ -557,7 +556,7 @@
           return 0; //default return value (no sorting)
         });
       },
-      difference: function (number, current, shorten, postfix, toFixed) {
+      difference: function (number: number, current: number, shorten: boolean, postfix: string, toFixed: number) {
         postfix = postfix || ''
         shorten = typeof shorten === 'undefined' ? true : shorten
         number = number || 0

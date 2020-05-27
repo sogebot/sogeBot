@@ -93,7 +93,7 @@ export default class apiStats extends Vue {
       let success = this.data.filter(o => o.api === this.selected && String(o.code).startsWith('2'))
       let errors = this.data.filter(o => o.api === this.selected && !String(o.code).startsWith('2'))
 
-      let successPerMinute = {}
+      let successPerMinute: any = {}
       let _successPerMinute = groupBy(success, o => {
         return (new Date(o.timestamp)).getHours() + ':' + (new Date(o.timestamp)).getMinutes()
       })
@@ -102,7 +102,7 @@ export default class apiStats extends Vue {
         successPerMinute[timestamp] = _successPerMinute[minute].length
       }
 
-      let errorsPerMinute = {}
+      let errorsPerMinute: any = {}
       let _errorsPerMinute = groupBy(errors, o => {
         return (new Date(o.timestamp)).getMinutes()
       })

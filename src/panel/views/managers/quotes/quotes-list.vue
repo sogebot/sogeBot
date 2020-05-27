@@ -126,11 +126,11 @@ export default class quotesList extends Vue {
   socket = getSocket('/systems/quotes');
 
   created() {
-    this.socket.emit('quotes:getAll', {}, async (err, items: QuotesInterface[]) => {
+    this.socket.emit('quotes:getAll', {}, async (err: string | null, items: QuotesInterface[]) => {
       this.quotesFromDb = items
       this.state.loading = this.$state.success;
     })
-    this.socket.emit('settings', (err: string | null, data) => {
+    this.socket.emit('settings', (err: string | null, data: any) => {
       this.settings = data;
       this.state.settings = this.$state.success;
     })
@@ -167,19 +167,19 @@ export default class quotesList extends Vue {
     return orderBy(uniq(flatten(tags)))
   }
 
-  toggleTags(tag) {
+  toggleTags(tag: string) {
     this.filteredTags = xor(this.filteredTags, [tag])
   }
 
-  deleteQuote(id) {
+  deleteQuote(id: number) {
     this.socket.emit('generic::deleteById', id, () => {
       this.quotesFromDb = this.quotes.filter((o) => o.id !== id)
     })
   }
 
-  linkTo(item) {
+  linkTo(item: Required<QuotesInterface>) {
     console.debug('Clicked', item.id);
-    this.$router.push({ name: 'QuotesManagerEdit', params: { id: item.id } });
+    this.$router.push({ name: 'QuotesManagerEdit', params: { id: String(item.id) } });
   }
 }
 </script>

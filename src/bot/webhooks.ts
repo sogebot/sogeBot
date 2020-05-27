@@ -18,13 +18,15 @@ import { linesParsed } from './helpers/parser';
 import { getFunctionList } from './decorators/on';
 import { find } from './helpers/register';
 
+type Type = 'follows' | 'streams';
+
 class Webhooks {
   enabled = {
     follows: false,
     streams: false,
   };
   timeouts: { [x: string]: NodeJS.Timeout} = {};
-  cache: { id: string; type: string; timestamp: number }[] = [];
+  cache: { id: string; type: Type; timestamp: number }[] = [];
 
   subscribeAll() {
     this.unsubscribe('follows').then(() => this.subscribe('follows'));
@@ -32,7 +34,7 @@ class Webhooks {
     this.clearCache();
   }
 
-  addIdToCache (type, id) {
+  addIdToCache (type: Type, id: string) {
     this.cache.push({
       id: id,
       type: type,
@@ -46,11 +48,11 @@ class Webhooks {
     setTimeout(() => this.clearCache, 600000);
   }
 
-  existsInCache (type, id) {
+  existsInCache (type: Type, id: string) {
     return typeof this.cache.find((o) => o.type === type && o.id === id) !== 'undefined';
   }
 
-  async unsubscribe (type) {
+  async unsubscribe (type: Type) {
     clearTimeout(this.timeouts[`unsubscribe-${type}`]);
 
     const cid = oauth.channelId;
@@ -237,12 +239,12 @@ class Webhooks {
 
       // is in webhooks cache
       if (!skipCacheCheck) {
-        if (this.existsInCache('follow', data.from_id)) {
+        if (this.existsInCache('follows', data.from_id)) {
           return;
         }
 
         // add to cache
-        this.addIdToCache('follow', data.from_id);
+        this.addIdToCache('follows', data.from_id);
       }
 
       const user = await getRepository(User).findOne({ userId: data.from_id });

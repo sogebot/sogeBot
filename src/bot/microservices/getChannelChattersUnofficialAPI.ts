@@ -71,7 +71,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
       channel = JSON.parse(channel).toLowerCase();
     }
     if (bot) {
-      bot = JSON.parse(bot).toLowerCase();
+      bot = String(JSON.parse(bot)).toLowerCase();
     }
 
     const url = `https://tmi.twitch.tv/group/user/${channel}/chatters`;
@@ -82,7 +82,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
     }
 
     const chatters: any[] = flatMap(request.data.chatters);
-    const modStatus = request.data.chatters.moderators.map(o => o.toLowerCase()).includes(bot);
+    const modStatus = typeof bot !== 'undefined' && (request.data.chatters.moderators as string[]).map(o => o.toLowerCase()).includes(bot);
 
     const allOnlineUsers = await getAllOnlineUsernames();
 

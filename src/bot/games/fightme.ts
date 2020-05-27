@@ -40,7 +40,7 @@ class FightMe extends Game {
   loserWillLose = 0;
 
   @command('!fightme')
-  async main (opts): Promise<CommandResponse[]> {
+  async main (opts: CommandOptions): Promise<CommandResponse[]> {
     opts.sender['message-type'] = 'chat'; // force responses to chat
     let user, challenger;
 

@@ -133,7 +133,7 @@ export default class priceEdit extends Vue {
   async mounted() {
     if (this.$route.params.id) {
       await new Promise((resolve, reject) => {
-        this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, data) => {
+        this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, data: PriceInterface) => {
           if (err) {
             return console.error(err);
           }

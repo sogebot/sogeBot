@@ -44,7 +44,7 @@ class Twitch extends Core {
   }
 
   @command('!uptime')
-  async uptime (opts) {
+  async uptime (opts: CommandOptions) {
     const time = getTime(api.streamStatusChangeSince, true) as any;
     return [
       {
@@ -59,12 +59,12 @@ class Twitch extends Core {
   }
 
   @command('!time')
-  async time (opts) {
+  async time (opts: CommandOptions) {
     return [ { response: prepare('time', { time: moment().tz(timezone).format('LTS') }), ...opts }];
   }
 
   @command('!followers')
-  async followers (opts) {
+  async followers (opts: CommandOptions) {
     const events = await getRepository(EventList)
       .createQueryBuilder('events')
       .select('events')
@@ -98,7 +98,7 @@ class Twitch extends Core {
   }
 
   @command('!subs')
-  async subs (opts) {
+  async subs (opts: CommandOptions) {
     const events = await getRepository(EventList)
       .createQueryBuilder('events')
       .select('events')
@@ -135,13 +135,13 @@ class Twitch extends Core {
   }
 
   @command('!title')
-  async getTitle (opts) {
+  async getTitle (opts: CommandOptions) {
     return [ { response: translate('title.current').replace(/\$title/g, api.stats.currentTitle || 'n/a'), ...opts }];
   }
 
   @command('!title set')
   @default_permission(permission.CASTERS)
-  async setTitle (opts) {
+  async setTitle (opts: CommandOptions) {
     if (opts.parameters.length === 0) {
       return [ { response: await translate('title.current').replace(/\$title/g, api.stats.currentTitle || 'n/a'), ...opts }];
     }
@@ -150,13 +150,13 @@ class Twitch extends Core {
   }
 
   @command('!game')
-  async getGame (opts) {
+  async getGame (opts: CommandOptions) {
     return [ { response: translate('game.current').replace(/\$title/g, api.stats.currentGame || 'n/a'), ...opts }];
   }
 
   @command('!game set')
   @default_permission(permission.CASTERS)
-  async setGame (opts) {
+  async setGame (opts: CommandOptions) {
     if (opts.parameters.length === 0) {
       return [ { response: translate('game.current').replace(/\$title/g, api.stats.currentGame || 'n/a'), ...opts }];
     }

@@ -68,7 +68,8 @@ export default class helpbox extends Vue {
         this.loading = 1;
         return;
       }
-      return setTimeout(() => this.initResponsiveVoice(retry+1), 200);
+      setTimeout(() => this.initResponsiveVoice(retry+1), 200);
+      return;
     }
     window.responsiveVoice.init();
     this.loadVoices();

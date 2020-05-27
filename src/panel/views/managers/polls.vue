@@ -267,7 +267,7 @@
         return options >= 2
       },
       refresh: function () {
-        this.socket.emit('generic::getAll', (err: string | null, data) =>  {
+        this.socket.emit('generic::getAll', (err: string | null, data: PollInterface[]) =>  {
           if (err) {
             return console.error(err);
           }
@@ -280,7 +280,7 @@
         this.newVote.isOpened = true
         delete this.newVote.closedAt
 
-        this.socket.emit('polls::save', this.newVote, (err: string | null, data) => {
+        this.socket.emit('polls::save', this.newVote, (err: string | null, data: PollInterface[]) => {
             if (err) return console.error(err)
             else {
               this.refresh();
@@ -295,7 +295,7 @@
             }
           })
       },
-      copy: function (vid) {
+      copy: function (vid: string) {
         const vote = this.votes.find(o => typeof o !== 'string' && o.id === vid);
         if (typeof vote === 'object') {
           let newVote = cloneDeep(vote)
@@ -308,7 +308,7 @@
           this.newVote = newVote;
         }
       },
-      stop: function (vid) {
+      stop: function (vid: string) {
         let vote = this.votes.find(o => typeof o !== 'string' && o.id === vid)
         if (typeof vote === 'object') {
           vote.isOpened = false;
@@ -318,7 +318,7 @@
           })
         }
       },
-      totalVotes: function (vid) {
+      totalVotes: function (vid: string) {
         let totalVotes = 0
         const votes = this.votes.find(o => o.id === vid);
         if (votes?.votes) {
@@ -328,7 +328,7 @@
         }
         return totalVotes
       },
-      activeTime: function (vid) {
+      activeTime: function (vid: string) {
         const vote = this.votes.find(o => typeof o !== 'string' && o.id === vid);
         if (typeof vote === 'object') {
           return this.currentTime - (new Date(vote.openedAt || Date.now())).getTime();
@@ -336,7 +336,7 @@
           return 0;
         }
       },
-      getPercentage: function (vid, index, toFixed) {
+      getPercentage: function (vid: string, index: number, toFixed: number) {
         let numOfVotes = 0
         const votes = this.votes.find(o => o.id === vid);
         if (votes?.votes) {

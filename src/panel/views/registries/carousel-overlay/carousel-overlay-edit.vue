@@ -219,7 +219,7 @@ export default class carouselOverlayEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
 
-      this.socket.emit('carousel::save', this.item, (err: string | null, data) => {
+      this.socket.emit('carousel::save', this.item, (err: string | null, data: CarouselInterface) => {
         if (err) {
           return console.error(err);
         }
@@ -244,7 +244,7 @@ export default class carouselOverlayEdit extends Vue {
 
   created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, item) => {
+    this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, item: CarouselInterface) => {
       if (err) {
         return console.error(err);
       }

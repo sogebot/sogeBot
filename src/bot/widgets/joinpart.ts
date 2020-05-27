@@ -7,7 +7,7 @@ class JoinPart extends Widget {
     this.addWidget('part', 'widget-title-part', 'fas fa-sign-out-alt');
   }
 
-  public send(event) {
+  public send(event: { users: string[], type: 'join' | 'part' }) {
     this.emit('joinpart', { users: event.users, type: event.type });
   }
 }

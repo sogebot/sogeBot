@@ -359,6 +359,7 @@ export function getBotSender(): Readonly<CommandOptions['sender']> {
     color: '#000000',
     userType: 'empty',
     emoteSets: [],
+    discord: undefined,
   };
 }
 

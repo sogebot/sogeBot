@@ -78,7 +78,13 @@ export default class Menu extends Vue {
   }
 
   refresh() {
-    this.socket.emit('connection_status', (data) => {
+    this.socket.emit('connection_status', (data: {
+      SOC: boolean;
+      MOD: boolean;
+      RES: number;
+      API: 0 | 1 | 2 | 3;
+      TMI: 0 | 1 | 2 | 3;
+    }) => {
       this.data = data;
       this.data.SOC = true;
       setTimeout(() => this.refresh(), 1000);

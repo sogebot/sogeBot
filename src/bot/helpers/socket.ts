@@ -65,6 +65,11 @@ function adminEndpoint (
   on: 'generic::setById',
   callback: (opts: {id: string | number; item: any}, cb: (error: Error | string | null, ...response: any) => void) => void);
 
+function adminEndpoint (
+  nsp: string,
+  on: 'generic::getAll::filter',
+  callback: (opts: any, cb: (error: Error | string | null, ...response: any) => void) => void);
+
 // non generic
 function adminEndpoint (nsp: string, on: 'eventlist::getUserEvents', callback: (username: string, cb: (error: Error | string | null, ...response: any) => void) => void);
 function adminEndpoint (nsp: string, on: 'customvariables::list', callback: (cb: (error: Error | string | null, ...response: any) => void) => void);

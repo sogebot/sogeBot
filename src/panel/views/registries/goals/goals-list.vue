@@ -161,7 +161,7 @@
       clearInterval(this.interval)
     },
     methods: {
-      removeGoal: function (group) {
+      removeGoal: function (group: GoalGroupInterface) {
         console.debug(' => Removing', group.id)
 
         this.socket.emit('goals::remove', group, (err: string | null) => {

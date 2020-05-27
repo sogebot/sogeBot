@@ -28,6 +28,7 @@
 import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 
+// @ts-ignore - no types for vue-headful
 import vueHeadful from 'vue-headful';
 Vue.component('vue-headful', vueHeadful);
 
@@ -50,7 +51,7 @@ export default class navbar extends Vue {
   version: string = '';
 
   mounted() {
-    this.socket.emit('version', (version) => this.version = version);
+    this.socket.emit('version', (version: string) => this.version = version);
     this.socket.emit('name', (name: string) => this.name = name );
   }
 
