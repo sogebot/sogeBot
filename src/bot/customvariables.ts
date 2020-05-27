@@ -322,7 +322,7 @@ class CustomVariables extends Core {
       ...customVariables,
     };
     // we need to add operation counter function
-    const opCounterFnc = 'let __opCount__ = 0; function __opCounter__() { console.log(__opCount__); if (__opCount__ > 100000) { throw new Error("Running script seems to be in infinite loop."); } else { __opCount__++; }};';
+    const opCounterFnc = 'let __opCount__ = 0; function __opCounter__() { if (__opCount__ > 100000) { throw new Error("Running script seems to be in infinite loop."); } else { __opCount__++; }};';
     // add __opCounter__() after each ;
     const toEval = `(async function evaluation () { ${opCounterFnc} ${jsBeautify(script).split(';\n').map(line => '__opCounter__();' + line).join(';\n')} })()`;
     try {
