@@ -1,6 +1,7 @@
 const path = require('path');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
 
@@ -29,6 +30,11 @@ const webpackConfig = {
   optimization,
   entry: {
     main: './src/panel/index.ts',
+    popout: './src/panel/popout.ts',
+    overlay: './src/overlay/index.ts',
+    login: './src/login/index.ts',
+    public: './src/public/index.ts',
+    spotify: './src/oauth/spotify.ts',
   },
   resolve: {
     extensions: ['.ts', '.js', '.vue', '.json'],
@@ -46,14 +52,34 @@ const webpackConfig = {
     publicPath: '/dist/js/',
   },
   plugins: [
+    new webpack.ProgressPlugin(),
     new webpack.DefinePlugin({
       'process.env.BUILD': JSON.stringify('web'), // we need this until https://github.com/vuelidate/vuelidate/issues/365 is fixed
       'process.env.NODE_DEBUG': process.env.NODE_DEBUG, // 'util' need it
     }),
     new VueLoaderPlugin(),
+    new CleanWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      filename: '../../popout.html', template: 'src/panel/popout.html', chunks: ['popout']
+    }),
     new HtmlWebpackPlugin({
       filename: '../../index.html', template: 'src/panel/index.html', chunks: ['main']
     }),
+    new HtmlWebpackPlugin({
+      filename: '../../public.html', template: 'src/public/index.html', chunks: ['public']
+    }),
+    new HtmlWebpackPlugin({
+      filename: '../../overlays.html', template: 'src/overlay/index.html', chunks: ['overlay']
+    }),
+    new HtmlWebpackPlugin({
+      filename: '../../login.html', template: 'src/login/index.html', chunks: ['login']
+    }),
+    new HtmlWebpackPlugin({
+      filename: '../../oauth.html', template: 'src/oauth/index.html', chunks: []
+    }),
+    new HtmlWebpackPlugin({
+      filename: '../../oauth-spotify.html', template: 'src/oauth/spotify.html', chunks: ['spotify']
+    })
   ],
   module: {
     rules: [
