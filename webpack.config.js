@@ -52,7 +52,6 @@ const webpackConfig = {
     publicPath: '/dist/js/',
   },
   plugins: [
-    new webpack.ProgressPlugin(),
     new webpack.DefinePlugin({
       'process.env.BUILD': JSON.stringify('web'), // we need this until https://github.com/vuelidate/vuelidate/issues/365 is fixed
       'process.env.NODE_DEBUG': process.env.NODE_DEBUG, // 'util' need it
