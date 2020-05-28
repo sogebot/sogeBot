@@ -160,9 +160,10 @@ class Cooldown extends System {
         const cooldown = await getRepository(CooldownEntity).findOne({ where: { name }, relations: ['viewers'] });
         if (!cooldown) { // command is not on cooldown -> recheck with text only
           const replace = new RegExp(`${XRegExp.escape(name)}`, 'ig');
-          opts.message = opts.message.replace(replace, '');
-          if (opts.message.length > 0) {
-            return this.check(opts);
+          const message = opts.message.replace(replace, '').trim();
+          if (message.length > 0 && opts.message !== message) {
+            debug('cooldown.check', `Command ${name} not on cooldown, checking: ${message}`);
+            return this.check({...opts, message});
           } else {
             return true;
           }
