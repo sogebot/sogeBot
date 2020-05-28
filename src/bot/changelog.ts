@@ -14,7 +14,7 @@ import { find } from './helpers/register';
 let lastTimestamp = Date.now();
 const threadId = uuid();
 
-export const change = ((namespace) => {
+export const change = ((namespace: string) => {
   if (!isDbConnected) {
     setTimeout(() => change(namespace), 1000);
   } else {
@@ -24,7 +24,8 @@ export const change = ((namespace) => {
 
 export const changelog = async () => {
   if (!isDbConnected) {
-    return setTimeout(() => changelog(), 1000);
+    setTimeout(() => changelog(), 1000);
+    return;
   }
 
   const changes = await getRepository(Changelog).find({
@@ -52,7 +53,7 @@ export const changelog = async () => {
       if (!self2) {
         throw new Error(`${type}.${name} not found in list`);
       }
-      self[change2.namespace.split('.')[2]] = value;
+      (self as any)[change2.namespace.split('.')[2]] = value;
     }
     lastTimestamp = change2.timestamp;
   }

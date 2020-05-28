@@ -30,7 +30,7 @@ class Expects {
 
   exec() {
     for (const ex of this.toExec) {
-      this[ex.fnc]({...ex.opts, exec: true});
+      (this as any)[ex.fnc]({...ex.opts, exec: true});
     }
     this.isExecuted = true;
     return this;

@@ -29,11 +29,7 @@ class Roulette extends Game {
     opts.sender['message-type'] = 'chat'; // force responses to chat
 
     const isAlive = !!_.random(0, 1, false);
-
-    const [isMod] = await Promise.all([
-      isModerator(opts.sender),
-    ]);
-
+    const isMod = isModerator(opts.sender);
     const responses: CommandResponse[] = [];
 
     responses.push({ response: translate('gambling.roulette.trigger'), ...opts });
@@ -49,7 +45,7 @@ class Roulette extends Game {
 
     setTimeout(async () => {
       if (!isAlive) {
-        timeout(opts.sender.username, null, this.timeout);
+        timeout(opts.sender.username, '', this.timeout);
       }
     }, 2000);
 

@@ -13,7 +13,7 @@ import { isMainThread } from './cluster';
 import { info } from './helpers/log';
 import api from './api';
 
-let _datadir = null;
+let _datadir: string;
 let memMBlast = 0;
 let heapCountdown = 12;
 let csvfilePath = '';
@@ -25,7 +25,7 @@ let heapTotal: number[] = [];
  *
  * @param datadir Folder to save the data to
  */
-module.exports.init = (datadir) => {
+module.exports.init = (datadir: string) => {
   _datadir = datadir;
   csvfilePath = datadir + '/heap'  + Date.now() + '.csv';
   fs.writeFileSync(csvfilePath, 'timestamp\tavgHeapTotal\tavgHeapUsed\tchange\n');
@@ -48,7 +48,7 @@ function tickMemory() {
 }
 
 
-const arrAvg = arr => arr.reduce((a,b) => a + b, 0) / arr.length;
+const arrAvg = (arr: number[]) => arr.reduce((a,b) => a + b, 0) / arr.length;
 
 /**
  * Creates a heap dump if the currently memory threshold is exceeded
@@ -83,7 +83,7 @@ function heapDump() {
  *
  * @param datadir Location to save to
  */
-function saveHeapSnapshot(datadir) {
+function saveHeapSnapshot(datadir: string) {
   const name = datadir + (isMainThread ? 'master' : 'cluster') + '-' + Date.now() + '.heapsnapshot';
   writeHeapSnapshot(name);
   info('Heap snapshot written to ' + name);

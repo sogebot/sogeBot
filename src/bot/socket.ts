@@ -71,12 +71,20 @@ const createDashboardIfNeeded = async (userId: number, opts: { haveAdminPrivileg
 };
 
 const getPrivileges = async(type: 'admin' | 'viewer' | 'public', userId: number) => {
-  const user = await getRepository(User).findOne({ userId });
-  return {
-    haveAdminPrivileges: type === 'admin' ? Authorized.isAuthorized : Authorized.NotAuthorized,
-    haveModPrivileges: isModerator(user) ? Authorized.isAuthorized : Authorized.NotAuthorized,
-    haveViewerPrivileges: Authorized.isAuthorized,
-  };
+  try {
+    const user = await getRepository(User).findOneOrFail({ userId });
+    return {
+      haveAdminPrivileges: type === 'admin' ? Authorized.isAuthorized : Authorized.NotAuthorized,
+      haveModPrivileges: isModerator(user) ? Authorized.isAuthorized : Authorized.NotAuthorized,
+      haveViewerPrivileges: Authorized.isAuthorized,
+    };
+  } catch (e) {
+    return {
+      haveAdminPrivileges: Authorized.NotAuthorized,
+      haveModPrivileges: Authorized.NotAuthorized,
+      haveViewerPrivileges: Authorized.NotAuthorized,
+    };
+  }
 };
 
 const initEndpoints = async(socket: SocketIO.Socket, privileges: Unpacked<ReturnType<typeof getPrivileges>>) => {

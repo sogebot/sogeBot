@@ -313,7 +313,7 @@ class API extends Core {
           this.api_timeouts[fnc].isRunning = true;
           const started_at = Date.now();
           debug('api.interval', chalk.yellow(fnc + '() ') + 'start');
-          const value = await this[fnc](this.api_timeouts[fnc].opts);
+          const value = await (this as any)[fnc](this.api_timeouts[fnc].opts);
           debug('api.interval', chalk.yellow(fnc + '(time: ' + (Date.now() - started_at) + ') ') + JSON.stringify(value));
           this.api_timeouts[fnc].inProgress = false;
           if (value.disable) {
@@ -1173,7 +1173,7 @@ class API extends Core {
               const module = !event.path.includes('.') ? event.path.split('.')[0] : event.path.split('.')[1];
               const self = find(type, module);
               if (self) {
-                self[event.fName]();
+                (self as any)[event.fName]();
               } else {
                 error(`streamStart: ${event.path} not found`);
               }
@@ -1237,7 +1237,7 @@ class API extends Core {
               const module = !event.path.includes('.') ? event.path.split('.')[0] : event.path.split('.')[1];
               const self = find(type, module);
               if (self) {
-                self[event.fName]();
+                (self as any)[event.fName]();
               } else {
                 error(`streamEnd: ${event.path} not found`);
               }

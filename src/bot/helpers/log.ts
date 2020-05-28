@@ -75,7 +75,7 @@ function format(level: Levels, message: any, category?: string) {
   if (typeof message === 'object') {
     message = util.inspect(message);
   }
-  return [timestamp, levelFormat[Levels[level]], category, message].filter(Boolean).join(' ');
+  return [timestamp, levelFormat[Levels[level] as keyof typeof Levels], category, message].filter(Boolean).join(' ');
 }
 
 export function isDebugEnabled(category: string) {
@@ -91,8 +91,8 @@ export function isDebugEnabled(category: string) {
 
 function log(message: any) {
   const level = getFunctionNameFromStackTrace();
-  if (Levels[level] <= Levels[logLevel]) {
-    const formattedMessage = format(Levels[level], message);
+  if (Levels[level as keyof typeof Levels] <= Levels[logLevel as keyof typeof Levels]) {
+    const formattedMessage = format(Levels[level as keyof typeof Levels], message);
     process.stdout.write(formattedMessage + '\n');
     logFile.write(stripAnsi(formattedMessage) + os.EOL);
   }

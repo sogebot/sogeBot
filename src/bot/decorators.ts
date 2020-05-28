@@ -104,7 +104,7 @@ export function settings(category?: string, isReadOnly = false) {
         if (category === key) {
           throw Error(`Category and variable name cannot be same - ${type}.${name}.${key} in category ${category}`);
         }
-        VariableWatcher.add(`${type}.${name}.${key}`, self[key], isReadOnly);
+        VariableWatcher.add(`${type}.${name}.${key}`, (self as any)[key], isReadOnly);
 
         if (!isReadOnly) {
           // load variable from db
@@ -201,7 +201,7 @@ export function shared(db = false) {
         if (!self) {
           throw new Error(`${type}.${name} not found in list`);
         }
-        const defaultValue = self[key];
+        const defaultValue = (self as any)[key];
         VariableWatcher.add(`${type}.${name}.${key}`, defaultValue, false);
         if (db) {
           const loadVariableValue = () => {

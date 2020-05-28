@@ -19,6 +19,21 @@ import eventlist from '../overlays/eventlist.js';
 import currency from '../currency';
 import alerts from '../registries/alerts.js';
 
+type DonationAlertsEvent = {
+  id: string;
+  alert_type: string;
+  additional_data: string;
+  username: string;
+  amount: string;
+  amount_formatted: string;
+  amount_main: string;
+  currency: string;
+  message: string;
+  date_paid: string;
+  emotes: null;
+  _is_test_alert: boolean;
+};
+
 class Donationalerts extends Integration {
   socketToDonationAlerts: SocketIOClient.Socket | null = null;
 
@@ -59,7 +74,7 @@ class Donationalerts extends Integration {
       return;
     }
 
-    this.socketToDonationAlerts = require('socket.io-client').connect('wss://socket.donationalerts.ru:443',
+    this.socketToDonationAlerts = require('socket.io-client').connect('socket.donationalerts.ru:3001',
       {
         reconnection: true,
         reconnectionDelay: 1000,
@@ -83,15 +98,14 @@ class Donationalerts extends Integration {
         this.socketToDonationAlerts = null;
       });
 
-      this.socketToDonationAlerts.off('donation').on('donation', async (data) => {
-        data = JSON.parse(data);
+      this.socketToDonationAlerts.off('donation').on('donation', async (data: DonationAlertsEvent) => {
         if (parseInt(data.alert_type, 10) !== 1) {
           return;
         }
         const additionalData = JSON.parse(data.additional_data);
         eventlist.add({
           event: 'tip',
-          amount: data.amount,
+          amount: parseFloat(data.amount),
           currency: data.currency,
           username: data.username.toLowerCase(),
           message: data.message,
@@ -104,7 +118,7 @@ class Donationalerts extends Integration {
           username: data.username.toLowerCase(),
           amount: parseFloat(data.amount).toFixed(2),
           currency: data.currency,
-          amountInBotCurrency: Number(currency.exchange(data.amount, data.currency, currency.mainCurrency)).toFixed(2),
+          amountInBotCurrency: Number(currency.exchange(Number(data.amount), data.currency, currency.mainCurrency)).toFixed(2),
           currencyInBot: currency.mainCurrency,
           message: data.message,
         });
@@ -134,13 +148,13 @@ class Donationalerts extends Integration {
           tip(`${data.username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
 
           if (api.isStreamOnline) {
-            api.stats.currentTips += Number(currency.exchange(data.amount, data.currency, currency.mainCurrency));
+            api.stats.currentTips += Number(currency.exchange(parseFloat(data.amount), data.currency, currency.mainCurrency));
           }
         }
 
         triggerInterfaceOnTip({
           username: data.username.toLowerCase(),
-          amount: data.amount,
+          amount: parseFloat(data.amount),
           message: data.message,
           currency: data.currency,
           timestamp: _.now(),
