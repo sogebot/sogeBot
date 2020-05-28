@@ -22,7 +22,7 @@ describe('Custom Commands - https://discordapp.com/channels/317348946144002050/6
     await getRepository(User).save({ username: owner.username, userId: owner.userId });
   });
 
-  describe.only('Custom command should correctly run second custom command', () => {
+  describe('Custom command should correctly run second custom command', () => {
     it('Add custom command !test to call !test2', async () => {
       const r = await customcommands.add({ sender: owner, parameters: '-c !test -r (!test2)' });
       const r2 = await customcommands.add({ sender: owner, parameters: '-c !test2 -r Lorem Ipsum' });
@@ -41,18 +41,22 @@ describe('Custom Commands - https://discordapp.com/channels/317348946144002050/6
   });
 
   describe('Custom command should warn if we have infinite loop between commands', () => {
-    it('Add custom command !test3 to call !test4 and !test4 to !test3 - infinite loop', async () => {
+    it('Add custom command infinite loop test3 -> test4 -> test5 -> test3', async () => {
       const r = await customcommands.add({ sender: owner, parameters: '-c !test3 -r (!test4)' });
-      const r2 = await customcommands.add({ sender: owner, parameters: '-c !test4 -r (!test3)' });
+      const r2 = await customcommands.add({ sender: owner, parameters: '-c !test4 -r (!test5)' });
+      const r3 = await customcommands.add({ sender: owner, parameters: '-c !test5 -r (!test3)' });
 
-      assert.strictEqual(r[0].response, '$sender, command !test was added');
-      assert.strictEqual(r2[0].response, '$sender, command !test2 was added');
+      assert.strictEqual(r[0].response, '$sender, command !test3 was added');
+      assert.strictEqual(r2[0].response, '$sender, command !test4 was added');
+      assert.strictEqual(r3[0].response, '$sender, command !test5 was added');
     });
 
-    it('Run custom command !test and expect !test2 response', async () => {
-      await customcommands.run({ sender: owner, message: '!test' });
-      //assert.strictEqual(r[0].response, 'Lorem Ipsum');
-      await time.waitMs(10000);
+    it('Run custom command !test3', async () => {
+      await customcommands.run({ sender: owner, message: '!test3' });
+    });
+
+    it('Expect loop error', async() => {
+      await message.debug('message.error', 'Response (!test3) seems to be in loop! !test3->!test4->!test5');
     });
   });
 });
