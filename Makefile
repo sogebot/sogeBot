@@ -40,7 +40,7 @@ css:
 
 ui:
 	@echo -ne "\n\t ----- Bundling with webpack ($(ENV))\n"
-	@NODE_ENV=$(ENV) npx webpack --progress
+	@NODE_ENV=$(ENV) npx webpack
 
 bot:
 	@echo -ne "\n\t ----- Building bot\n"
