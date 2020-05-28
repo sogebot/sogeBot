@@ -10,7 +10,8 @@ if (['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'sqlite')) {
   new Promise(async () => {
     const updateSQLVariableLimit = async () => {
       if (!isDbConnected) {
-        return setTimeout(() => updateSQLVariableLimit(), 1000);
+        setTimeout(() => updateSQLVariableLimit(), 1000);
+        return;
       }
       const query = await getManager().query(`show variables like 'max_prepared_stmt_count'`);
       SQLVariableLimit = Number(query[0].Value);

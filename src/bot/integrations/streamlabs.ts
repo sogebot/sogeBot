@@ -18,6 +18,33 @@ import currency from '../currency';
 import eventlist from '../overlays/eventlist';
 import alerts from '../registries/alerts';
 import { ioServer } from '../helpers/panel';
+import { getBroadcaster } from '../commons';
+
+namespace StreamlabsEvent {
+  export type Donation = {
+    type: 'donation';
+    message: {
+      id: number;
+      name: string;
+      amount: string;
+      formatted_amount: string;
+      formattedAmount: string;
+      message: string;
+      currency: string;
+      emotes: null;
+      iconClassName: string;
+      to: {
+        name: string;
+      };
+      from: string;
+      from_user_id: null;
+      _id: string;
+      isTest?: boolean; // our own variable
+      created_at: number; // our own variable
+    }[];
+    event_id: string;
+  };
+}
 
 class Streamlabs extends Integration {
   socketToStreamlabs: SocketIOClient.Socket | null = null;
@@ -91,12 +118,23 @@ class Streamlabs extends Integration {
             type: 'donation',
             message: [{
               formatted_amount: `${currency2}${amount}`,
-              amount: Number(amount),
+              formattedAmount: `${currency2}${amount}`,
+              amount: String(amount),
               message: decodeURI(message),
               from: name,
               isTest: false,
               created_at: Number(created_at),
+              // filling up
+              _id: '',
+              currency: currency2,
+              emotes: null,
+              from_user_id: null,
+              iconClassName: 'user',
+              id: 0,
+              name,
+              to: { name: getBroadcaster() },
             }],
+            event_id: '',
           });
         }
       } catch (e) {
@@ -135,12 +173,12 @@ class Streamlabs extends Integration {
       }
     });
 
-    this.socketToStreamlabs.on('event', async (eventData) => {
+    this.socketToStreamlabs.on('event', async (eventData: StreamlabsEvent.Donation) => {
       this.parse(eventData);
     });
   }
 
-  async parse(eventData) {
+  async parse(eventData: StreamlabsEvent.Donation) {
     if (eventData.type === 'donation') {
       for (const event of eventData.message) {
         debug('streamlabs', event);
@@ -176,13 +214,13 @@ class Streamlabs extends Integration {
           getRepository(User).save(user);
 
           if (api.isStreamOnline) {
-            api.stats.currentTips += Number(currency.exchange(event.amount, event.currency, currency.mainCurrency));
+            api.stats.currentTips += Number(currency.exchange(Number(event.amount), event.currency, currency.mainCurrency));
           }
           tip(`${event.from.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(event.amount).toFixed(2)}${event.currency}, message: ${event.message}`);
         }
         eventlist.add({
           event: 'tip',
-          amount: event.amount,
+          amount: Number(event.amount),
           currency: event.currency,
           username: event.from.toLowerCase(),
           message: event.message,
@@ -192,7 +230,7 @@ class Streamlabs extends Integration {
           username: event.from.toLowerCase(),
           amount: parseFloat(event.amount).toFixed(2),
           currency: event.currency,
-          amountInBotCurrency: Number(currency.exchange(event.amount, event.currency, currency.mainCurrency)).toFixed(2),
+          amountInBotCurrency: Number(currency.exchange(Number(event.amount), event.currency, currency.mainCurrency)).toFixed(2),
           currencyInBot: currency.mainCurrency,
           message: event.message,
         });
@@ -208,7 +246,7 @@ class Streamlabs extends Integration {
 
         triggerInterfaceOnTip({
           username: event.from.toLowerCase(),
-          amount: event.amount,
+          amount: Number(event.amount),
           message: event.message,
           currency: event.currency,
           timestamp: _.now(),
