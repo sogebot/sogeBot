@@ -28,7 +28,7 @@ const webpackConfig = {
   performance: { hints: false },
   optimization,
   entry: {
-    main: './src/panel/index.ts',
+    spotify: './src/oauth/spotify.ts',
   },
   resolve: {
     extensions: ['.ts', '.js', '.vue', '.json'],
@@ -52,8 +52,8 @@ const webpackConfig = {
     }),
     new VueLoaderPlugin(),
     new HtmlWebpackPlugin({
-      filename: '../../index.html', template: 'src/panel/index.html', chunks: ['main']
-    }),
+      filename: '../../oauth-spotify.html', template: 'src/oauth/spotify.html', chunks: ['spotify']
+    })
   ],
   module: {
     rules: [

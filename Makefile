@@ -40,7 +40,13 @@ css:
 
 ui:
 	@echo -ne "\n\t ----- Bundling with webpack ($(ENV))\n"
+	@rm -rf public/dist/js/*
 	@NODE_ENV=$(ENV) npx webpack --progress
+	@NODE_ENV=$(ENV) npx webpack --progress --config webpack.login.js
+	@NODE_ENV=$(ENV) npx webpack --progress --config webpack.overlay.js
+	@NODE_ENV=$(ENV) npx webpack --progress --config webpack.popout.js
+	@NODE_ENV=$(ENV) npx webpack --progress --config webpack.public.js
+	@NODE_ENV=$(ENV) npx webpack --progress --config webpack.spotify.js
 
 bot:
 	@echo -ne "\n\t ----- Building bot\n"
