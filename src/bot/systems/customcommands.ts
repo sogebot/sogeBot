@@ -255,13 +255,12 @@ class CustomCommands extends System {
   }
 
   @parser({ priority: constants.LOW })
-  async run (opts: ParserOptions): Promise<boolean> {
+  async run (opts: ParserOptions & { quiet?: boolean, processedCommands?: string[] }): Promise<boolean> {
     if (!opts.message.startsWith('!')) {
       return true;
     } // do nothing if it is not a command
 
     const commands = await this.find(opts.message);
-
     if (commands.length === 0) {
       return true;
     } // no command was found - return
@@ -291,7 +290,9 @@ class CustomCommands extends System {
           }
         }
       }
-      this.sendResponse(_.cloneDeep(_responses), { param, sender: opts.sender, command: cmd.command.command });
+      if (!opts.quiet) {
+        this.sendResponse(_.cloneDeep(_responses), { param, sender: opts.sender, command: cmd.command.command, processedCommands: opts.processedCommands });
+      }
     }
     return atLeastOnePermissionOk;
   }
@@ -299,7 +300,7 @@ class CustomCommands extends System {
   sendResponse(responses, opts) {
     for (let i = 0; i < responses.length; i++) {
       setTimeout(async () => {
-        parserReply(responses[i].response, opts);
+        parserReply(await responses[i].response, opts);
       }, i * 500);
     }
   }

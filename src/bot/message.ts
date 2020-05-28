@@ -7,7 +7,7 @@ import crypto from 'crypto';
 import gitCommitInfo from 'git-commit-info';
 import { AllHtmlEntities as Entities} from 'html-entities';
 
-import { debug, warning } from './helpers/log';
+import { debug, error, warning } from './helpers/log';
 import { getCountOfCommandUsage } from './helpers/commands/count';
 import { getRepository } from 'typeorm';
 
@@ -33,6 +33,7 @@ import points from './systems/points';
 import {default as priceSystem} from './systems/price';
 import permissions from './permissions';
 import users from './users';
+import customcommands from './systems/customcommands';
 
 
 class Message {
@@ -406,15 +407,49 @@ class Message {
           .replace(/\(|\)/g, '')
           .replace(/\$param/g, attr.param);
         debug('message.process', cmd);
+
+        // check if we already checked cmd
+        if (!attr.processedCommands) {
+          attr.processedCommands = [];
+        }
+        if (attr.processedCommands.includes(cmd)) {
+          error(`Response ${filter} seems to be in loop! ${attr.processedCommands.join('->')}->${attr.command}`);
+          debug('message.error', `Response ${filter} seems to be in loop! ${attr.processedCommands.join('->')}->${attr.command}`);
+          return '';
+        } else {
+          attr.processedCommands.push(attr.command);
+        }
+
+        // run custom commands
+        if (customcommands.enabled) {
+          await customcommands.run({ sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, quiet: true, message: cmd, parameters: attr.param });
+        }
         await new Parser().command(attr.sender, cmd, true);
         // we are not sending back any responses!
         return '';
       },
-      '(!#)': async (filter) => {
+      '(!#)': async (filter: string) => {
         const cmd = filter
           .replace(/\(|\)/g, '')
           .replace(/\$param/g, attr.param);
         debug('message.process', cmd);
+
+        // check if we already checked cmd
+        if (!attr.processedCommands) {
+          attr.processedCommands = [];
+        }
+        if (attr.processedCommands.includes(cmd)) {
+          error(`Response ${filter} seems to be in loop! ${attr.processedCommands.join('->')}->${attr.command}`);
+          debug('message.error', `Response ${filter} seems to be in loop! ${attr.processedCommands.join('->')}->${attr.command}`);
+          return '';
+        } else {
+          attr.processedCommands.push(attr.command);
+        }
+
+        // run custom commands
+        if (customcommands.enabled) {
+          await customcommands.run({ sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param, processedCommands: attr.processedCommands });
+        }
         const responses = await new Parser().command(attr.sender, cmd, true);
         for (let i = 0; i < responses.length; i++) {
           setTimeout(async () => {
