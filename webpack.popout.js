@@ -28,7 +28,7 @@ const webpackConfig = {
   performance: { hints: false },
   optimization,
   entry: {
-    main: './src/panel/index.ts',
+    popout: './src/panel/popout.ts',
   },
   resolve: {
     extensions: ['.ts', '.js', '.vue', '.json'],
@@ -52,7 +52,7 @@ const webpackConfig = {
     }),
     new VueLoaderPlugin(),
     new HtmlWebpackPlugin({
-      filename: '../../index.html', template: 'src/panel/index.html', chunks: ['main']
+      filename: '../../popout.html', template: 'src/panel/popout.html', chunks: ['popout']
     }),
   ],
   module: {
