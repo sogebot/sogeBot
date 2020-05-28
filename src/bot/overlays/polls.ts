@@ -29,7 +29,7 @@ class Polls extends Overlay {
 
   public sockets() {
     publicEndpoint(this.nsp, 'getVoteCommand', async (cb) => {
-      cb(this.getCommand['!vote']);
+      cb(this.getCommand('!vote'));
     });
     publicEndpoint(this.nsp, 'data', async (callback) => {
       const currentVote = await getRepository(Poll).findOne({

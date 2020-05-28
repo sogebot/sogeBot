@@ -63,7 +63,7 @@ const connect = async function () {
     postgres: 'PostgreSQL',
   };
   await new Promise( resolve => setTimeout(resolve, 3000) );
-  info(`Initialized ${typeToLog[type]} database (${normalize(String(connectionOptions.database))})`);
+  info(`Initialized ${typeToLog[type as keyof typeof typeToLog]} database (${normalize(String(connectionOptions.database))})`);
 };
 
 async function main () {

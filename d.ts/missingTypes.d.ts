@@ -10,3 +10,4 @@ declare module 'vue-codemirror';
 declare module 'vue-prism-component';
 declare module 'ytsr';
 declare module 'howlongtobeat';
+declare module 'html-entities';

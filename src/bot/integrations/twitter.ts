@@ -21,7 +21,7 @@ class Twitter extends Integration {
     hash: string;
     stream: any;
   }[] = [];
-  public client: any = null;
+  public client: Client | null = null;
 
   @settings('token')
   @ui({ type: 'text-input', secret: true })
@@ -87,7 +87,7 @@ class Twitter extends Integration {
 
   public async enableStreamForHash(hash: string): Promise<void> {
     if (!this.watchedStreams.find((o) => o.hash === hash)) {
-      this.client.stream('statuses/filter', {track: hash}, (stream) => {
+      this.client?.stream('statuses/filter', {track: hash}, (stream) => {
         info(chalk.yellow('TWITTER: ') + 'Stream for ' + hash + ' was started.');
         this.watchedStreams.push({ hash, stream });
         stream.on('data', (tweet) => {
