@@ -43,16 +43,12 @@ class Text extends Registry {
     });
     publicEndpoint(this.nsp, 'generic::getOne', async (opts: { id: any; parseText: boolean }, callback) => {
       try {
-        const item = await getRepository(TextEntity).findOne({ id: opts.id });
-        let text = '';
-        if (item) {
-          text = item.text;
-          if (opts.parseText) {
-            text = await new Message(await customvariables.executeVariablesInText(text)).parse();
-          }
-          callback(null, {...item, text});
+        const item = await getRepository(TextEntity).findOneOrFail({ id: opts.id });
+        let text = item.text;
+        if (opts.parseText) {
+          text = await new Message(await customvariables.executeVariablesInText(text)).parse();
         }
-        callback(null, null);
+        callback(null, {...item, text});
       } catch(e) {
         callback(e, null);
       }
