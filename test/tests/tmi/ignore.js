@@ -15,11 +15,11 @@ const tmi = (require('../../../dest/tmi')).default;
 
 // users
 const owner = { username: 'soge__' };
-const testuser = { username: 'testuser', userId: '1' };
-const testuser2 = { username: 'testuser2', userId: '2' };
-const testuser3 = { username: 'testuser3', userId: '3' };
-const nightbot = { username: 'nightbot', userId: '4' };
-const botwithchangedname = { username: 'asdsadas', userId: '24900234' };
+const testuser = { username: 'testuser', userId: 1 };
+const testuser2 = { username: 'testuser2', userId: 2 };
+const testuser3 = { username: 'testuser3', userId: 3 };
+const nightbot = { username: 'nightbot', userId: 4 };
+const botwithchangedname = { username: 'asdsadas', userId: 24900234 };
 
 const commons = require('../../../dest/commons');
 const { VariableWatcher } = require('../../../dest/watchers');

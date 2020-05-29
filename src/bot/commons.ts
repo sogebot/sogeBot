@@ -62,6 +62,7 @@ export async function parserReply(response: string | Promise<string>, opts: { se
     }
   } else {
     // we skip as we are already parsing message
+    console.log(messageToSend);
     sendMessage(messageToSend, senderObject, { skip: true, ...opts.attr });
   }
 }
@@ -139,7 +140,7 @@ export function getIgnoreList() {
 
 export function getGlobalIgnoreList() {
   return Object.keys(globalIgnoreList)
-    .filter(o => !tmi.globalIgnoreListExclude.includes(o))
+    .filter(o => !tmi.globalIgnoreListExclude.map((ex: number | string) => String(ex)).includes(o))
     .map(o => {
       const id = Number(o);
       return { id, ...globalIgnoreList[id as unknown as keyof typeof globalIgnoreList] };
@@ -152,14 +153,9 @@ export function isIgnored(sender: { username: string | null; userId?: number }) 
   }
 
   const isInIgnoreList = getIgnoreList().includes(sender.username) || getIgnoreList().includes(sender.userId);
-  let isInGlobalIgnoreList = false;
-  for (const [, data] of Object.entries(getGlobalIgnoreList())) {
-    if (data.id === sender.userId || data.known_aliases.includes(sender.username.toLowerCase())) {
-      isInGlobalIgnoreList = true;
-      break;
-    }
-  }
-
+  const isInGlobalIgnoreList = typeof getGlobalIgnoreList().find(data => {
+    return data.id === sender.userId || data.known_aliases.includes((sender.username || '').toLowerCase());
+  }) !== 'undefined';
   return (isInGlobalIgnoreList || isInIgnoreList) && !isBroadcaster(sender);
 }
 

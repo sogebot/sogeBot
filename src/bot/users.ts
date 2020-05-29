@@ -105,7 +105,7 @@ class Users extends Core {
   }
 
   async getUsernamesFromIds (IdsList: number[]): Promise<{ id: number; username: string }[]> {
-    return Promise.all(
+    const uniqueWithUsername = await Promise.all(
       [...new Set(IdsList)]
         .map(async (id) => {
           const user = await getRepository(User).findOne({ userId: id });
@@ -114,15 +114,15 @@ class Users extends Core {
           }
           return null;
         })
-        .reduce(async (prev: any, cur) => {
-          const value = await cur;
-          if (value) {
-            return { ...prev, [value.id]: value.username };
-          } else {
-            return prev;
-          }
-        }, {})
     );
+    return uniqueWithUsername.reduce(async (prev: any, cur) => {
+      const value = await cur;
+      if (value) {
+        return { ...prev, [value.id]: value.username };
+      } else {
+        return prev;
+      }
+    }, {});
   }
 
   async getNameById (userId: number) {
