@@ -200,8 +200,13 @@ export default class textOverlayEdit extends Vue {
     // load up from db
     if (this.$route.params.id) {
       this.id = this.$route.params.id
-      this.socket.emit('generic::getOne', { id: this.urlParam('id'), parseText: false }, (err: string | null, data: TextInterface) => {
+      this.socket.emit('generic::getOne', { id: this.$route.params.id, parseText: false }, (err: null | Error, data: TextInterface) => {
         if (err) {
+          this.$bvToast.toast(err.message, {
+            title: `Error`,
+            variant: 'danger',
+            solid: true,
+          });
           return console.error(err);
         }
         this.name = data.name
