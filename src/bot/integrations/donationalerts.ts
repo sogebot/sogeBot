@@ -33,7 +33,6 @@ type DonationAlertsEvent = {
 
 class Donationalerts extends Integration {
   socketToDonationAlerts: Centrifuge | null = null;
-  donationChannel: Centrifuge.Subscription | null = null;
 
   @ui({
     type: 'link',
@@ -89,8 +88,7 @@ class Donationalerts extends Integration {
 
     const channel = this.socketToDonationAlerts?.subscribe(`$alerts:donation_${connectionOptions.id}`);
     channel?.on('join', () => {
-      this.donationChannel = channel;
-      info(chalk.yellow('DONATIONALERTS.RU:') + ' Successfully joined in donations channel');
+      info(chalk.yellow('DONATIONALERTS.RU:') + ' Successfully joined in donations channel.');
     });
     channel?.on('leaved', (reason: unknown) => {
       info(chalk.yellow('DONATIONALERTS.RU:') + ' Leaved from donations channel, reason: ' + reason);
@@ -134,11 +132,16 @@ class Donationalerts extends Integration {
 
   private socketConnect() {
     this.socketToDonationAlerts?.connect();
-    return new Promise((resolve) => {
-      this.socketToDonationAlerts?.on('connect', async () => {
-        info(chalk.yellow('DONATIONALERTS.RU:') + ' Successfully connected socket to service');
+    return new Promise((resolve, reject) => {
+      this.socketToDonationAlerts?.on('connect', () => {
+        info(chalk.yellow('DONATIONALERTS.RU:') + ' Successfully connected socket to service.');
         resolve();
       });
+      setTimeout(() => {
+        if (!this.socketToDonationAlerts?.isConnected()) {
+          reject('Can\'t connect to DonationAlerts socket.');
+        }
+      }, 5 * 1000);
     });
   }
 
@@ -160,7 +163,7 @@ class Donationalerts extends Integration {
       currencyInBot: currency.mainCurrency,
       message: data.message,
     });
-    
+
     alerts.trigger({
       event: 'tips',
       name: data.username.toLowerCase(),
