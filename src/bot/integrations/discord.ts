@@ -14,7 +14,7 @@ import { debounce } from '../helpers/debounce';
 import { v5 as uuidv5 } from 'uuid';
 import oauth from '../oauth';
 import Expects from '../expects';
-import { isUUID } from '../commons';
+import { isUUID, prepare } from '../commons';
 
 import { getRepository, IsNull, LessThan, Not } from 'typeorm';
 import { Permissions as PermissionsEntity } from '../database/entity/permissions';
@@ -257,7 +257,7 @@ class Discord extends Integration {
   async unlinkAccounts(opts: CommandOptions) {
     this.removeExpiredLinks();
     await getRepository(DiscordLink).delete({ userId: Number(opts.sender.userId) });
-    return [{ response: '$sender, all links were deleted', ...opts }];
+    return [{ response: prepare('integrations.discord.all-your-links-were-deleted', { sender: opts.sender }), ...opts }];
   }
 
   @command('!link')
@@ -276,17 +276,17 @@ class Discord extends Integration {
       await getRepository(DiscordLink).save({
         ...link, userId: opts.sender.userId,
       });
-      return [{ response: `$sender, this account was linked with ${link.tag}.`, ...opts }];
+      return [{ response: prepare('integrations.discord.all-your-links-were-deleted', { sender: opts.sender, discordTag: link.tag}), ...opts }];
     } catch (e) {
-      if (e.message === String(errors.NOT_UUID)) {
-        return [{ response: '$sender, invalid or expired token.', ...opts }];
-      } else if (e.message.includes('Expected parameter')) {
+      if (e.message.includes('Expected parameter')) {
         return [
-          { response: '$sender, to link you account on Discord: 1. Go to Discord server and send !link in bot channel. | 2. Wait for PM from bot | 3. Send command from you Discord PM here in twitch chat.', ...opts },
+          { response: prepare('integrations.discord.help-message', { sender: opts.sender }), ...opts },
         ];
       } else {
-        warning(e.stack);
-        return [{ response: '$sender, something went wrong.', ...opts }];
+        if (e.message !== String(errors.NOT_UUID)) {
+          warning(e.stack);
+        }
+        return [{ response: prepare('integrations.discord.invalid-or-expired-token', { sender: opts.sender }), ...opts }];
       }
     }
   }

@@ -1,0 +1,6 @@
+{
+  "all-your-links-were-deleted": "$sender, all your links were deleted",
+  "this-account-was-linked-with": "$sender, this account was linked with $discordTag.",
+  "invalid-or-expired-token": "$sender, invalid or expired token.",
+  "help-message": "$sender, to link you account on Discord: 1. Go to Discord server and send !link in bot channel. | 2. Wait for PM from bot | 3. Send command from you Discord PM here in twitch chat."
+}
