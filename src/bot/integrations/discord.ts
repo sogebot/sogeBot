@@ -415,7 +415,7 @@ class Discord extends Integration {
         author.send(message);
         whisperOut(`${author.tag}: ${message}`);
 
-        const reply = await msg.reply(prepare('integrations.check-your-dm'));
+        const reply = await msg.reply(prepare('integrations.discord.check-your-dm'));
         chatOut(`#${channel.name}: @${author.tag}, ${prepare('integrations.discord.link-whisper')} [${msg.author.tag}]`);
         if (this.deleteMessagesAfterWhile) {
           setTimeout(() => {
