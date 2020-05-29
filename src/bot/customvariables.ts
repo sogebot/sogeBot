@@ -254,7 +254,7 @@ class CustomVariables extends Core {
     };
 
     // get custom variables
-    const customVariables = this.getAll();
+    const customVariables = await this.getAll();
 
     // update globals and replace theirs values
     script = (await new Message(script).global({ escape: '\'' }));
@@ -315,7 +315,7 @@ class CustomVariables extends Core {
             username,
             id: await users.getIdByName(username),
             is: {
-              online: _user?.isOnline ?? false,
+              online: _user.isOnline ?? false,
               follower: get(_user, 'is.follower', false),
               vip: get(_user, 'is.vip', false),
               subscriber: get(_user, 'is.subscriber', false),

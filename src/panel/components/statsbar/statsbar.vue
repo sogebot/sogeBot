@@ -296,6 +296,8 @@
   } from '@fortawesome/free-solid-svg-icons';
   library.add(faCaretDown, faCaretUp);
 
+  let interval: number = 0;
+
   export default Vue.extend({
     data: function () {
       const object: {
@@ -391,6 +393,7 @@
 
     destroyed() {
       clearInterval(this.widthOfMenuInterval)
+      clearInterval(interval)
     },
 
     mounted() {
@@ -465,7 +468,7 @@
         this.averageStats = data
       });
 
-      setInterval(() => {
+      interval = window.setInterval(() => {
         this.timestamp = Date.now()
         this.socket.emit('panel.sendStreamData', async (err: string | null, data: { [x: string]: any, rawStatus: string, status: string, game: string }) => {
           console.groupCollapsed('navbar::panel.sendStreamData')

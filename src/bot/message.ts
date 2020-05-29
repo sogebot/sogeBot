@@ -240,14 +240,14 @@ class Message {
 
         try {
           let lastParamUsed = 0;
-          for (const index in numbers) {
-            if (!_.isFinite(parseInt(numbers[index], 10))) {
+          for (const index of numbers) {
+            if (!_.isFinite(parseInt(numbers[Number(index)], 10))) {
               const param = attr.param.split(' ');
               if (_.isNil(param[lastParamUsed])) {
                 return 0;
               }
 
-              numbers[index] = param[lastParamUsed];
+              numbers[Number(index)] = param[lastParamUsed];
               lastParamUsed++;
             }
           }
