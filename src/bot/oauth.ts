@@ -312,7 +312,7 @@ class OAuth extends Core {
     warning('Refreshing access token of ' + type);
     const url = 'https://twitchtokengenerator.com/api/refresh/';
     try {
-      if ((type === 'bot' ? this.botRefreshToken : this.broadcasterRefreshToken)) {
+      if ((type === 'bot' ? this.botRefreshToken : this.broadcasterRefreshToken) === '') {
         throw new Error('no refresh token for ' + type);
       }
 

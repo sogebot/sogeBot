@@ -120,7 +120,8 @@ class Discord extends Integration {
         this.embed.addFields([
           { name: prepare('webpanel.responses.variable.game'), value: api.stats.currentGame},
           { name: prepare('webpanel.responses.variable.title'), value: api.stats.currentTitle},
-          { name: prepare('integrations.discord.started_at'), value: this.embedStartedAt, inline: true},
+          { name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true},
+          { name: prepare('webpanel.viewers'), value: api.stats.currentViewers, inline: true},
           { name: prepare('webpanel.views'), value: api.stats.currentViews, inline: true},
           { name: prepare('webpanel.followers'), value: api.stats.currentFollowers, inline: true},
         ]);
@@ -332,7 +333,7 @@ class Discord extends Integration {
           .addFields([
             { name: prepare('webpanel.responses.variable.game'), value: api.stats.currentGame},
             { name: prepare('webpanel.responses.variable.title'), value: api.stats.currentTitle},
-            { name: prepare('integrations.discord.started_at'), value: this.embedStartedAt, inline: true},
+            { name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true},
             { name: prepare('webpanel.views'), value: api.stats.currentViews, inline: true},
             { name: prepare('webpanel.followers'), value: api.stats.currentFollowers, inline: true},
           ])
