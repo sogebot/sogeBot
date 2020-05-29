@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import querystring from 'querystring';
 import { setTimeout } from 'timers';
 import moment from 'moment';
@@ -41,6 +41,18 @@ import { SQLVariableLimit } from './helpers/sql';
 
 let latestFollowedAtTimestamp = 0;
 
+type APITimeouts = {
+  [fnc: string]: {
+    isRunning: boolean;
+    inProgress: boolean;
+    opts: any;
+  };
+};
+
+type SubscribersEndpoint = { data: { broadcaster_id: string; broadcaster_name: string; is_gift: boolean; tier: string; plan_name: string; user_id: string; user_name: string; }[], pagination: { cursor: string } };
+type FollowsEndpoint = { total: number; data: { from_id: string; from_name: string; to_id: string; toname: string; followed_at: string; }[], pagination: { cursor: string } };
+export type StreamEndpoint = { data: { id: string; user_id: string, user_name: string, game_id: string, type: 'live' | '', title: string , viewer_count: number, started_at: string, language: string; thumbnail_url: string; tag_ids: string[] }[], pagination: { cursor: string } };
+
 export const currentStreamTags: {
   is_auto: boolean;
   localization_names: {
@@ -52,7 +64,7 @@ let intervals = 0;
 let lastIsAPIFreeKey = '__unset__';
 let lastIsAPIFreeKeyStart = Date.now();
 
-const isAPIFree = (intervalList) => {
+const isAPIFree = (intervalList: APITimeouts) => {
   for (const key of Object.keys(intervalList)) {
     if (intervalList[key].inProgress) {
       if (lastIsAPIFreeKey !== key) {
@@ -80,7 +92,7 @@ const setImmediateAwait = () => {
 };
 
 const limitProxy = {
-  get: function (obj, prop) {
+  get: function (obj: { limit: number; remaining: number; refresh: number }, prop: 'limit' | 'remaining' | 'refresh') {
     if (typeof obj[prop] === 'undefined') {
       if (prop === 'limit') {
         return 120;
@@ -95,7 +107,7 @@ const limitProxy = {
       return obj[prop];
     }
   },
-  set: function (obj, prop, value) {
+  set: function (obj: { limit: number; remaining: number; refresh: number }, prop: 'limit' | 'remaining' | 'refresh', value: number) {
     if (Number(value) === Number(obj[prop])) {
       return true;
     }
@@ -105,15 +117,15 @@ const limitProxy = {
   },
 };
 
-const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], usersFromAPI: { from_name: string; from_id: number; followed_at: string }[], fullScale) => {
+const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], usersFromAPI: { from_name: string; from_id: number; followed_at: string }[], fullScale: boolean) => {
   if (!fullScale) {
     // we are handling only latest followers
     // handle users currently not following
     users.filter(user => !user.isFollower).forEach(user => {
       const apiUser = usersFromAPI.find(userFromAPI => userFromAPI.from_id === user.userId) as typeof usersFromAPI[0];
       if (new Date().getTime() - new Date(apiUser.followed_at).getTime() < 2 * constants.HOUR) {
-        if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60 && !webhooks.existsInCache('follow', user.userId)) {
-          webhooks.addIdToCache('follow', user.userId);
+        if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60 && !webhooks.existsInCache('follows', user.userId)) {
+          webhooks.addIdToCache('follows', user.userId);
           eventlist.add({
             event: 'follow',
             username: user.username,
@@ -228,8 +240,8 @@ class API extends Core {
   gameCache = '';
 
   calls = {
-    bot: new Proxy({}, limitProxy),
-    broadcaster: new Proxy({}, limitProxy),
+    bot: new Proxy({ limit: 120, remaining: 800, refresh: (Date.now() / 1000) + 90 }, limitProxy),
+    broadcaster: new Proxy({ limit: 120, remaining: 800, refresh: (Date.now() / 1000) + 90 }, limitProxy),
   };
   chatMessagesAtStart = linesParsed;
   maxRetries = 3;
@@ -244,13 +256,7 @@ class API extends Core {
     getChannelSubscribers: 0,
   };
 
-  api_timeouts: {
-    [fnc: string]: {
-      isRunning: boolean;
-      inProgress: boolean;
-      opts: any;
-    };
-  } = {};
+  api_timeouts: APITimeouts = {};
 
   constructor () {
     super();
@@ -294,13 +300,13 @@ class API extends Core {
     }
   }
 
-  async setRateLimit (type, limit, remaining, reset) {
+  async setRateLimit (type: 'bot' | 'broadcaster', limit: number, remaining: number, refresh: number) {
     this.calls[type].limit = limit;
     this.calls[type].remaining = remaining;
-    this.calls[type].reset = reset;
+    this.calls[type].refresh = refresh;
   }
 
-  async interval (fnc, interval) {
+  async interval (fnc: string, interval: number) {
     intervals++;
     setTimeout(() => {
       setInterval(async () => {
@@ -353,7 +359,7 @@ class API extends Core {
     }
   }
 
-  async getUsernameFromTwitch (id) {
+  async getUsernameFromTwitch (id: number) {
     const url = `https://api.twitch.tv/helix/users?id=${id}`;
     let request;
     /*
@@ -406,7 +412,7 @@ class API extends Core {
     return null;
   }
 
-  async getIdFromTwitch (username, isChannelId = false) {
+  async getIdFromTwitch (username: string, isChannelId = false) {
     const url = `https://api.twitch.tv/helix/users?login=${username}`;
     let request;
     /*
@@ -505,7 +511,7 @@ class API extends Core {
     return { state: true, opts };
   }
 
-  async getAllStreamTags(opts: any) {
+  async getAllStreamTags(opts: { cursor?: string }): Promise<{ state: boolean, opts: { cursor?: string} }> {
     if (!isMainThread) {
       throw new Error('API can run only on master');
     }
@@ -578,7 +584,7 @@ class API extends Core {
 
   }
 
-  async getChannelSubscribers (opts: any) {
+  async getChannelSubscribers<T extends { cursor?: string; count?: number; noAffiliateOrPartnerWarningSent?: boolean; notCorrectOauthWarningSent?: boolean; subscribers?: SubscribersEndpoint['data'] }> (opts: T): Promise<{ state: boolean; opts: T }> {
     if (!isMainThread) {
       throw new Error('API can run only on master');
     }
@@ -618,7 +624,7 @@ class API extends Core {
           'Client-ID': oauth.botClientId,
         },
         timeout: 20000,
-      });
+      }) as AxiosResponse<SubscribersEndpoint>;
       const subscribers = request.data.data;
       if (opts.subscribers) {
         opts.subscribers = [...subscribers, ...opts.subscribers];
@@ -635,7 +641,7 @@ class API extends Core {
 
       if (subscribers.length === 100) {
         // move to next page
-        return this.getChannelSubscribers({ cursor: request.data.pagination.cursor, count: opts.subscribers.length + opts.count, subscribers: opts.subscribers });
+        return this.getChannelSubscribers({ ...opts, cursor: request.data.pagination.cursor, count: opts.subscribers.length + opts.count, subscribers: opts.subscribers });
       } else {
         this.stats.currentSubscribers = subscribers.length + opts.count;
         this.setSubscribers(opts.subscribers.filter(o => !isBroadcaster(o.user_name) && !isBot(o.user_name)));
@@ -661,7 +667,7 @@ class API extends Core {
     return { state: true, opts };
   }
 
-  async setSubscribers (subscribers) {
+  async setSubscribers (subscribers: SubscribersEndpoint['data']) {
     const currentSubscribers = await getRepository(User).find({
       where: {
         isSubscriber: true,
@@ -686,15 +692,15 @@ class API extends Core {
     for (const user of subscribers) {
       const current = currentSubscribers.find(o => Number(o.userId) === Number(user.user_id));
       const isNotCurrentSubscriber = !current;
-      const valuesNotMatch = current && (current.subscribeTier !== String(user.tier / 1000) || current.isSubscriber === false);
+      const valuesNotMatch = current && (current.subscribeTier !== String(Number(user.tier) / 1000) || current.isSubscriber === false);
       if (isNotCurrentSubscriber || valuesNotMatch) {
         await getRepository(User).update({
-          userId: user.user_id,
+          userId: Number(user.user_id),
         },
         {
           username: user.user_name.toLowerCase(),
           isSubscriber: true,
-          subscribeTier: String(user.tier / 1000),
+          subscribeTier: String(Number(user.tier) / 1000),
         });
       }
     }
@@ -747,7 +753,7 @@ class API extends Core {
             if (twitch.isTitleForced) {
               const game = this.gameCache;
               info(`Title/game force enabled => ${game} | ${rawStatus}`);
-              this.setTitleAndGame(null, { });
+              this.setTitleAndGame({});
               return { state: true, opts };
             } else {
               info(`Title/game changed outside of a bot => ${request.data.game} | ${request.data.status}`);
@@ -868,7 +874,7 @@ class API extends Core {
           'Client-ID': oauth.botClientId,
         },
         timeout: 20000,
-      });
+      }) as AxiosResponse<FollowsEndpoint>;
 
       // save remaining api calls
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
@@ -931,15 +937,14 @@ class API extends Core {
       debug('api.getChannelFollowers', 'started');
     }
 
-    let request;
     try {
-      request = await axios.get(url, {
+      const request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Client-ID': oauth.botClientId,
         },
         timeout: 20000,
-      });
+      }) as AxiosResponse<FollowsEndpoint>;
 
       // save remaining api calls
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
@@ -987,11 +992,11 @@ class API extends Core {
     return { state: true, opts };
   }
 
-  async getGameFromId (id) {
+  async getGameFromId (id: number) {
     let request;
     const url = `https://api.twitch.tv/helix/games?id=${id}`;
 
-    if (id.toString().trim().length === 0 || parseInt(id, 10) === 0) {
+    if (id.toString().trim().length === 0 || id === 0) {
       return '';
     } // return empty game if gid is empty
 
@@ -1119,7 +1124,7 @@ class API extends Core {
           'Client-ID': oauth.botClientId,
         },
         timeout: 20000,
-      });
+      }) as AxiosResponse<StreamEndpoint>;
 
       setStatus('API', request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED);
 
@@ -1134,7 +1139,7 @@ class API extends Core {
 
       debug('api.stream', 'API: ' + JSON.stringify(request.data));
 
-      if (request.status === 200 && !isNil(request.data.data[0])) {
+      if (request.status === 200 && request.data.data[0]) {
         // correct status and we've got a data - stream online
         const stream = request.data.data[0];
 
@@ -1147,7 +1152,7 @@ class API extends Core {
           if (!webhooks.enabled.streams && Number(this.streamId) !== Number(stream.id)) {
             debug('api.stream', 'API: ' + JSON.stringify(stream));
             start(
-              `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await this.getGameFromId(stream.game_id)} | type: ${stream.type} | channel ID: ${cid}`
+              `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await this.getGameFromId(Number(stream.game_id))} | type: ${stream.type} | channel ID: ${cid}`
             );
 
             // reset quick stats on stream start
@@ -1195,7 +1200,7 @@ class API extends Core {
         if (!this.gameOrTitleChangedManually) {
           let rawStatus = this.rawStatus;
           const status = await this.parseTitle(null);
-          const game = await this.getGameFromId(stream.game_id);
+          const game = await this.getGameFromId(Number(stream.game_id));
 
           this.stats.currentTitle = stream.title;
           this.stats.currentGame = game;
@@ -1260,7 +1265,7 @@ class API extends Core {
     return { state: true, opts };
   }
 
-  saveStreamData (stream) {
+  saveStreamData (stream: StreamEndpoint['data'][number]) {
     if (!isMainThread) {
       throw new Error('API can run only on master');
     }
@@ -1272,7 +1277,7 @@ class API extends Core {
 
     stats.save({
       timestamp: new Date().getTime(),
-      whenOnline: this.isStreamOnline ? this.streamStatusChangeSince : null,
+      whenOnline: this.isStreamOnline ? this.streamStatusChangeSince : Date.now(),
       currentViewers: this.stats.currentViewers,
       currentSubscribers: this.stats.currentSubscribers,
       currentFollowers: this.stats.currentFollowers,
@@ -1284,16 +1289,10 @@ class API extends Core {
       newChatters: this.stats.newChatters,
       currentHosts: this.stats.currentHosts,
       currentWatched: this.stats.currentWatchedTime,
-      game_id: stream.game_id,
-      user_id: stream.user_id,
-      type: stream.type,
-      language: stream.language,
-      title: stream.title,
-      thumbnail_url: stream.thumbnail_url,
     });
   }
 
-  async parseTitle (title) {
+  async parseTitle (title: string | null) {
     if (isNil(title)) {
       title = this.rawStatus;
     }
@@ -1302,7 +1301,7 @@ class API extends Core {
     const match = title.match(regexp);
 
     if (!isNil(match)) {
-      for (const variable of title.match(regexp)) {
+      for (const variable of match) {
         let value;
         if (await customvariables.isVariableSet(variable)) {
           value = await customvariables.getValueOf(variable);
@@ -1315,7 +1314,7 @@ class API extends Core {
     return title;
   }
 
-  async setTags (sender, tagsArg) {
+  async setTags (tagsArg: string[]) {
     if (!isMainThread) {
       throw new Error('API can run only on master');
     }
@@ -1325,7 +1324,7 @@ class API extends Core {
     const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
     if (needToWait) {
-      setTimeout(() => this.setTags(sender, tagsArg), 1000);
+      setTimeout(() => this.setTags(tagsArg), 1000);
       return;
     }
 
@@ -1369,7 +1368,7 @@ class API extends Core {
 
   }
 
-  async setTitleAndGame (sender, args): Promise<{ response: string; status: boolean }> {
+  async setTitleAndGame (args: { title?: string | null; game?: string | null }): Promise<{ response: string; status: boolean }> {
     if (!isMainThread) {
       throw new Error('API can run only on master');
     }
@@ -1455,7 +1454,7 @@ class API extends Core {
     return { response: '', status: false };
   }
 
-  async sendGameFromTwitch (self, socket, game) {
+  async sendGameFromTwitch (socket: SocketIO.Socket | null, game: string) {
     if (!isMainThread) {
       throw new Error('API can run only on master');
     }
@@ -1565,19 +1564,21 @@ class API extends Core {
       return;
     } // do nothing if stream is offline
 
-    const isClipChecked = async function (id) {
-      const check = async (resolve, reject) => {
-        const clip = await getRepository(TwitchClips).findOne({ clipId: id });
-        if (!clip) {
-          resolve(false);
-        } else if (clip.isChecked) {
-          resolve(true);
-        } else {
-          // not checked yet
-          setTimeout(() => check(resolve, reject), 100);
-        }
-      };
-      return new Promise(async (resolve, reject) => check(resolve, reject));
+    const isClipChecked = async function (id: string) {
+      return new Promise((resolve: (value: boolean) => void) => {
+        const check = async () => {
+          const clip = await getRepository(TwitchClips).findOne({ clipId: id });
+          if (!clip) {
+            resolve(false);
+          } else if (clip.isChecked) {
+            resolve(true);
+          } else {
+            // not checked yet
+            setTimeout(() => check(), 100);
+          }
+        };
+        check();
+      });
     };
 
     defaults(opts, { hasDelay: true });
@@ -1625,7 +1626,7 @@ class API extends Core {
     return (await isClipChecked(clipId)) ? clipId : null;
   }
 
-  async fetchAccountAge (id) {
+  async fetchAccountAge (id?: number | null) {
     if (id === 0 || id === null || typeof id === 'undefined') {
       return;
     }
@@ -1804,14 +1805,15 @@ class API extends Core {
       ioServer?.emit('api.stats', { timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining, data: request.data });
     } catch (e) {
       if (e.errno === 'ECONNRESET' || e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT') {
-        return this.createMarker();
+        setTimeout(() => this.createMarker(), 1000);
+        return;
       }
       error(`API: Marker was not created - ${e.message}`);
       ioServer?.emit('api.stats', { timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
     }
   }
 
-  async getClipById (id) {
+  async getClipById (id: string) {
     const url = `https://api.twitch.tv/helix/clips/?id=${id}`;
 
     const token = oauth.botAccessToken;

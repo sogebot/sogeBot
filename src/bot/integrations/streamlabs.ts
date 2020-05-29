@@ -30,7 +30,7 @@ namespace StreamlabsEvent {
       formatted_amount: string;
       formattedAmount: string;
       message: string;
-      currency: string;
+      currency: currency;
       emotes: null;
       iconClassName: string;
       to: {
@@ -189,7 +189,7 @@ class Streamlabs extends Integration {
           // incorrect currency on event rerun
           const parsedCurrency = (event.formatted_amount as string).match(/(?<currency>[A-Z\$]{3}|\$)/);
           if (parsedCurrency && parsedCurrency.groups) {
-            event.currency = parsedCurrency.groups.currency === '$' ? 'USD' : parsedCurrency.groups.currency;
+            event.currency = (parsedCurrency.groups.currency === '$' ? 'USD' : parsedCurrency.groups.currency) as currency;
           }
 
           const created_at = (event.created_at * 1000) || Date.now();

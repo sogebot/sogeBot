@@ -6,8 +6,7 @@ import { MINUTE } from '../constants';
 import { getLocalizedName, isBroadcaster, isModerator, prepare, timeout } from '../commons';
 
 import { getRepository } from 'typeorm';
-import { User } from '../database/entity/user';
-import users from '../users';
+import { User, UserInterface } from '../database/entity/user';
 import { translate } from '../translate';
 import points from '../systems/points';
 
@@ -42,32 +41,17 @@ class FightMe extends Game {
   @command('!fightme')
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
     opts.sender['message-type'] = 'chat'; // force responses to chat
-    let user, challenger;
+    let user: Readonly<Required<UserInterface>>;
+    let challenger;
 
     try {
-      const username = opts.parameters.trim().match(/^@?([\S]+)$/)[1].toLowerCase();
-
-      user = await getRepository(User).findOne({ where: { username: username.toLowerCase() }});
-      if (!user) {
-        const id = await users.getIdByName(username.toLowerCase());
-        user = await getRepository(User).findOne({ where: { userId: id }});
-        if (!user && id) {
-          // if we still doesn't have user, we create new
-          await getRepository(User).save({
-            userId: Number(id), usenrame: username.toLowerCase(),
-          });
-        }
-        return this.main(opts);
+      const match = opts.parameters.trim().match(/^@?([\S]+)$/);
+      if (!match) {
+        throw new Error('Parameter match failed.');
       }
-
-      challenger = await getRepository(User).findOne({ where: { userId: opts.sender.userId }});
-      if (!challenger) {
-        // if we still doesn't have user, we create new
-        await getRepository(User).save({
-          userId: opts.sender.userId, usenrame: opts.sender.username.toLowerCase(),
-        });
-        return this.main(opts);
-      }
+      const username = match[1].toLowerCase();
+      user = await getRepository(User).findOneOrFail({ where: { username: username.toLowerCase() }});
+      challenger = await getRepository(User).findOneOrFail({ where: { userId: opts.sender.userId }});
     } catch (e) {
       return [{ response: translate('gambling.fightme.notEnoughOptions'), ...opts }];
     }
@@ -92,7 +76,7 @@ class FightMe extends Game {
       if (isBroadcaster(opts.sender) || isBroadcaster(user.username)) {
         const isBroadcasterModCheck = isBroadcaster(opts.sender) ? isMod.user : isMod.sender;
         if (!isBroadcasterModCheck) {
-          timeout(isBroadcaster(opts.sender) ? user.username : opts.sender.username, null, this.timeout);
+          timeout(isBroadcaster(opts.sender) ? user.username : opts.sender.username, '!fightme result', this.timeout);
         }
         fightMeChallenges = fightMeChallenges.filter(ch => {
           return !(ch.opponent === opts.sender.username
@@ -115,7 +99,7 @@ class FightMe extends Game {
 
       // vs mod
       if (isMod.user || isMod.sender) {
-        timeout(isMod.sender ? user.username : opts.sender.username, null, this.timeout);
+        timeout(isMod.sender ? user.username : opts.sender.username, '!fightme result', this.timeout);
         fightMeChallenges = fightMeChallenges.filter(ch => {
           return !(ch.opponent === opts.sender.username
             && ch.challenger === user.username);
@@ -130,7 +114,7 @@ class FightMe extends Game {
       await getRepository(User).increment({ userId: winner ? opts.sender.userId : user.userId }, 'points', Math.abs(Number(winnerWillGet)));
       await points.decrement({ userId: !winner ? opts.sender.userId : user.userId }, Math.abs(Number(loserWillLose)));
 
-      timeout(winner ? opts.sender.username : user.username, null, this.timeout);
+      timeout(winner ? opts.sender.username : user.username, '!fightme result', this.timeout);
       fightMeChallenges = fightMeChallenges.filter(ch => {
         return !(ch.opponent === opts.sender.username
           && ch.challenger === user.username);

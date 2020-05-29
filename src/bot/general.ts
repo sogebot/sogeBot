@@ -113,13 +113,13 @@ class General extends Core {
         const isDisabledByEnv = !isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.__moduleName__.toLowerCase()) || process.env.DISABLE === '*');
 
         if (!enabled) {
-          enabledSystems[category].push('-' + system.__moduleName__);
+          enabledSystems[category as 'systems' | 'games' | 'integrations'].push('-' + system.__moduleName__);
         } else if (!areDependenciesEnabled) {
-          enabledSystems[category].push('-dep-' + system.__moduleName__);
+          enabledSystems[category as 'systems' | 'games' | 'integrations'].push('-dep-' + system.__moduleName__);
         } else if (isDisabledByEnv) {
-          enabledSystems[category].push('-env-' + system.__moduleName__);
+          enabledSystems[category as 'systems' | 'games' | 'integrations'].push('-env-' + system.__moduleName__);
         } else {
-          enabledSystems[category].push(system.__moduleName__);
+          enabledSystems[category as 'systems' | 'games' | 'integrations'].push(system.__moduleName__);
         }
       }
     }

@@ -27,7 +27,7 @@ type StreamElementsEvent = {
     tipId: string;
     username: string;
     amount: number;
-    currency: string;
+    currency: currency;
     message: string;
     items: any[];
     avatar: string;

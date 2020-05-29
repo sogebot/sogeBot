@@ -25,21 +25,21 @@ class Roulette extends Game {
   loserWillLose = 0;
 
   @command('!roulette')
-  async main (opts: CommandOptions): Promise<CommandResponse[]> {
+  async main (opts: CommandOptions): Promise<(CommandResponse & { isAlive?: boolean })[]> {
     opts.sender['message-type'] = 'chat'; // force responses to chat
 
     const isAlive = !!_.random(0, 1, false);
     const isMod = isModerator(opts.sender);
-    const responses: CommandResponse[] = [];
+    const responses: (CommandResponse & { isAlive?: boolean })[] = [];
 
     responses.push({ response: translate('gambling.roulette.trigger'), ...opts });
     if (isBroadcaster(opts.sender)) {
-      responses.push({ response: translate('gambling.roulette.broadcaster'), ...opts });
+      responses.push({ response: translate('gambling.roulette.broadcaster'), ...opts, isAlive: true });
       return responses;
     }
 
     if (isMod) {
-      responses.push({ response: translate('gambling.roulette.mod'), ...opts });
+      responses.push({ response: translate('gambling.roulette.mod'), ...opts, isAlive: true });
       return responses;
     }
 

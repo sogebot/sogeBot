@@ -369,7 +369,7 @@ class Events extends Core {
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = api.rawStatus;
     if (title.match(regexp)) {
-      api.setTitleAndGame(null, {});
+      api.setTitleAndGame({});
     }
   }
 
@@ -393,7 +393,7 @@ class Events extends Core {
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = api.rawStatus;
     if (title.match(regexp)) {
-      api.setTitleAndGame(null, {});
+      api.setTitleAndGame({});
     }
   }
 

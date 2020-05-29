@@ -140,7 +140,7 @@ class TipeeeStream extends Integration {
     try {
       const { amount, message } = data.event.parameters;
       const username = data.event.parameters.username.toLowerCase();
-      const donationCurrency = data.event.parameters.currency;
+      const donationCurrency = data.event.parameters.currency as currency;
 
       eventlist.add({
         event: 'tip',

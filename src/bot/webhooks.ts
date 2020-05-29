@@ -7,7 +7,7 @@ import { debug, error, follow, info, start } from './helpers/log';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import { getRepository } from 'typeorm';
 import { User } from './database/entity/user';
-import api from './api';
+import api, { StreamEndpoint } from './api';
 import events from './events';
 import oauth from './oauth';
 import ui from './ui';
@@ -20,11 +20,6 @@ import { find } from './helpers/register';
 type Type = 'follows' | 'streams';
 
 type followEvent = { data: { from_id: string, from_name: string, to_id: string, to_name: string, followed_at: string } };
-type streamEvent = {
-  data: {
-    id: string; user_id: string; game_id: string, community_ids: string[], type: string; title: string; viewer_count: number; started_at: string; language: string, thumbnail_url: string
-  }[]
-};
 
 class Webhooks {
   enabled = {
@@ -40,9 +35,9 @@ class Webhooks {
     this.clearCache();
   }
 
-  addIdToCache (type: Type, id: string) {
+  addIdToCache (type: Type, id: string | number) {
     this.cache.push({
-      id: id,
+      id: String(id),
       type: type,
       timestamp: Date.now(),
     });
@@ -54,8 +49,8 @@ class Webhooks {
     setTimeout(() => this.clearCache, 600000);
   }
 
-  existsInCache (type: Type, id: string) {
-    return typeof this.cache.find((o) => o.type === type && o.id === id) !== 'undefined';
+  existsInCache (type: Type, id: string | number) {
+    return typeof this.cache.find((o) => o.type === type && o.id === String(id)) !== 'undefined';
   }
 
   async unsubscribe (type: Type) {
@@ -289,25 +284,7 @@ class Webhooks {
     }
   }
 
-  /*
-    Example aEvent payload
-    {
-      "data":
-        [{
-          "id":"0123456789",
-          "user_id":"5678",
-          "game_id":"21779",
-          "community_ids":[],
-          "type":"live",
-          "title":"Best Stream Ever",
-          "viewer_count":417,
-          "started_at":"2017-12-01T10:09:45Z",
-          "language":"en",
-          "thumbnail_url":"https://link/to/thumbnail.jpg"
-        }]
-    }
-  */
-  async stream (aEvent: streamEvent) {
+  async stream (aEvent: StreamEndpoint) {
     const cid = oauth.channelId;
     if (cid === '') {
       setTimeout(() => this.stream(aEvent), 1000);
@@ -324,7 +301,7 @@ class Webhooks {
       if (Number(api.streamId) !== Number(stream.id)) {
         debug('webhooks.stream', 'WEBHOOKS: ' + JSON.stringify(aEvent));
         start(
-          `id: ${stream.id} | webhooks | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await api.getGameFromId(stream.game_id)} | type: ${stream.type} | channel ID: ${cid}`
+          `id: ${stream.id} | webhooks | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await api.getGameFromId(Number(stream.game_id))} | type: ${stream.type} | channel ID: ${cid}`
         );
 
         // reset quick stats on stream start
@@ -361,7 +338,7 @@ class Webhooks {
       api.streamType = stream.type;
 
       api.stats.currentTitle = stream.title;
-      api.stats.currentGame = await api.getGameFromId(stream.game_id);
+      api.stats.currentGame = await api.getGameFromId(Number(stream.game_id));
 
       api.curRetries = 0;
       api.saveStreamData(stream);

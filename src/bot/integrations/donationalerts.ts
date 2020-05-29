@@ -27,7 +27,7 @@ type DonationAlertsEvent = {
   amount: string;
   amount_formatted: string;
   amount_main: string;
-  currency: string;
+  currency: currency;
   message: string;
   date_paid: string;
   emotes: null;

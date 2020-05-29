@@ -330,7 +330,7 @@ class Polls extends System {
   }
 
   @onTip()
-  protected async parseTip(opts: { username: string; amount: number; message: string; currency: string }): Promise<void> {
+  protected async parseTip(opts: { username: string; amount: number; message: string; currency: currency }): Promise<void> {
     const cVote = await getRepository(Poll).findOne({ isOpened: true });
 
     if (cVote && cVote.type === 'tips') {

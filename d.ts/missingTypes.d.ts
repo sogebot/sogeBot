@@ -11,3 +11,12 @@ declare module 'vue-prism-component';
 declare module 'ytsr';
 declare module 'howlongtobeat';
 declare module 'html-entities';
+declare module 'strip-comments';
+
+declare module 'js-beautify' {
+  export function js(code: string): string;
+}
+
+declare module 'currency-symbol-map' {
+  export function getSymbolFromCurrency(code: string): string;
+}

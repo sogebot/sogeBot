@@ -167,7 +167,7 @@ export const init = () => {
     });
     // twitch game and title change
     socket.on('getGameFromTwitch', function (game) {
-      api.sendGameFromTwitch(api, socket, game);
+      api.sendGameFromTwitch(socket, game);
     });
     socket.on('getUserTwitchGames', async () => {
       const titles = await getRepository(CacheTitles).find();
@@ -246,8 +246,8 @@ export const init = () => {
       cb(null, allTitles);
     });
     socket.on('updateGameAndTitle', async (data, cb) => {
-      const status = await api.setTitleAndGame(null, data);
-      await api.setTags(null, data.tags);
+      const status = await api.setTitleAndGame(data);
+      await api.setTags(data.tags);
 
       if (!status) { // twitch refused update
         cb(true);

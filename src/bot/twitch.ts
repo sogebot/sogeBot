@@ -145,7 +145,7 @@ class Twitch extends Core {
     if (opts.parameters.length === 0) {
       return [ { response: await translate('title.current').replace(/\$title/g, api.stats.currentTitle || 'n/a'), ...opts }];
     }
-    const status = await api.setTitleAndGame(opts.sender, { title: opts.parameters });
+    const status = await api.setTitleAndGame({ title: opts.parameters });
     return [ { response: status.response, ...opts }];
   }
 
@@ -160,9 +160,9 @@ class Twitch extends Core {
     if (opts.parameters.length === 0) {
       return [ { response: translate('game.current').replace(/\$title/g, api.stats.currentGame || 'n/a'), ...opts }];
     }
-    const games = await api.sendGameFromTwitch (api, null, opts.parameters);
+    const games = await api.sendGameFromTwitch(null, opts.parameters);
     if (Array.isArray(games) && games.length > 0) {
-      const status = await api.setTitleAndGame(opts.sender, { game: games[0] });
+      const status = await api.setTitleAndGame({ game: games[0] });
       return [ { response: status.response, ...opts }];
     }
     return [{ response: translate('game.change.failed').replace(/\$title/g, api.stats.currentGame || 'n/a'), ...opts }];
