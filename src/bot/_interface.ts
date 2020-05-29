@@ -793,7 +793,7 @@ class Module {
           // set value of permission before if anything else (to have proper waterfall inheriting)
           // we should have correct values as we are desc ordering
           const value = _.get(this, `__permission_based__${key}.${p.id}`, null);
-          if (!value) {
+          if (value === null) {
             permId = p.id;
             return { ...prev, [p.id]: _.get(prev, permId, (this as any)[key]) };
           } else {
