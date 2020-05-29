@@ -1,5 +1,9 @@
 import _ from 'lodash';
+import axios from 'axios';
 import chalk from 'chalk';
+import Centrifuge from 'centrifuge';
+import WebSocket from 'ws';
+
 import * as constants from '../constants.js';
 import { isMainThread } from '../cluster';
 
@@ -35,11 +39,12 @@ type DonationAlertsEvent = {
 };
 
 class Donationalerts extends Integration {
-  socketToDonationAlerts: SocketIOClient.Socket | null = null;
+  socketToDonationAlerts: Centrifuge | null = null;
+  donationChannel: Centrifuge.Subscription | null = null;
 
   @settings()
   @ui({ type: 'text-input', secret: true })
-  secretToken = '';
+  access_token = '';
 
   constructor () {
     super();
@@ -59,7 +64,7 @@ class Donationalerts extends Integration {
     }
   }
 
-  async disconnect () {
+  /* async disconnect () {
     if (this.socketToDonationAlerts !== null) {
       this.socketToDonationAlerts.removeAllListeners();
       this.socketToDonationAlerts.disconnect();
@@ -163,6 +168,89 @@ class Donationalerts extends Integration {
         });
       });
     }
+  } */
+
+  @onChange('secretToken')
+  async connect () {
+    this.disconnect();
+
+    if (this.access_token.trim() === '' || !this.enabled) {
+      return;
+    }
+
+    this.socketToDonationAlerts = new Centrifuge('wss://centrifugo.donationalerts.com/connection/websocket', {
+      websocket: WebSocket,
+      onPrivateSubscribe: async ({ data }, cb) => {
+        const request = await axios.post('https://www.donationalerts.com/api/v1/centrifuge/subscribe', data, {
+          headers: { 'Authorization': `Bearer ${this.access_token.trim()}` },
+        });
+        cb({ status: 200, data: { channels: request.data.channels } });
+      },
+    });
+
+    const connectionOptions = await this.getOpts();
+
+    this.socketToDonationAlerts.setToken(connectionOptions.token);
+
+    await this.socketConnect();
+
+    const channel = this.socketToDonationAlerts?.subscribe(`$alerts:donation_${connectionOptions.id}`);
+    channel?.on('join', () => {
+      this.donationChannel = channel;
+      info(chalk.yellow('DONATIONALERTS.RU:') + ' Successfully joined in donations channel');
+    });
+    channel?.on('leaved', (reason: unknown) => {
+      info(chalk.yellow('DONATIONALERTS.RU:') + ' Leaved from donations channel, reason: ' + reason);
+      this.connect();
+    });
+    channel?.on('error', (reason: unknown) => {
+      info(chalk.yellow('DONATIONALERTS.RU:') + ' Some error occured: ' + reason);
+      this.connect();
+    });
+    channel?.on('unsubscribe', (reason: unknown) => {
+      info(chalk.yellow('DONATIONALERTS.RU:') + ' Unsubscribed, trying to resubscribe. Reason: ' + reason);
+      this.connect();
+    });
+    channel?.on('publish', ({ data }: { data: DonationAlertsEvent }) => {
+      this.parseDonation(data);
+    });
+  }
+
+  async disconnect () {
+    if (this.socketToDonationAlerts !== null) {
+      this.socketToDonationAlerts.removeAllListeners();
+      this.socketToDonationAlerts.disconnect();
+      this.socketToDonationAlerts = null;
+    }
+  }
+
+  private async getOpts() {
+    if (this.access_token.trim() === '') {
+      throw new Error('Access token is empty.');
+    }
+
+    const request = await axios.get('https://www.donationalerts.com/api/v1/user/oauth', {
+      headers: { 'Authorization': `Bearer ${this.access_token}` },
+    });
+
+    return {
+      token: request.data.data.socket_connection_token,
+      id: request.data.data.id,
+    };
+  }
+
+  private socketConnect() {
+    this.socketToDonationAlerts?.connect();
+    return new Promise((resolve) => {
+      this.socketToDonationAlerts?.on('connect', async () => {
+        info(chalk.yellow('DONATIONALERTS.RU:') + ' Successfully connected socket to service');
+        resolve();
+      });
+    });
+  }
+
+  async parseDonation(data: DonationAlertsEvent) {
+    return true;
   }
 }
 
