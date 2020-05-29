@@ -74,7 +74,7 @@ class Donationalerts extends Integration {
       return;
     }
 
-    this.socketToDonationAlerts = require('socket.io-client').connect('socket.donationalerts.ru:3001',
+    this.socketToDonationAlerts = require('socket.io-client').connect('wss://socket3.donationalerts.ru:443',
       {
         reconnection: true,
         reconnectionDelay: 1000,
