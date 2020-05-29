@@ -98,7 +98,9 @@ class Donationalerts extends Integration {
         this.socketToDonationAlerts = null;
       });
 
-      this.socketToDonationAlerts.off('donation').on('donation', async (data: DonationAlertsEvent) => {
+      this.socketToDonationAlerts.off('donation').on('donation', async (donationData: string) => {
+        const data: DonationAlertsEvent = JSON.parse(donationData);
+
         if (parseInt(data.alert_type, 10) !== 1) {
           return;
         }
