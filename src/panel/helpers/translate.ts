@@ -2,16 +2,23 @@ import { at, isNil } from 'lodash-es';
 
 export let translations = {};
 
-export default function(key: string) {
-  /* TODO: metrics
-  if (!metrics.translations.includes(key)) {
-    // we need only first usage on page load to not unnecessary overload socket
-    metrics.translations.push(key)
-    socket.emit('metrics.translations', key)
+
+function castObject (key: string, value: string | { [x: string]: any }) {
+  if (typeof value === 'string') {
+    return {[key]: value};
+  } else {
+    return value;
   }
-  */
-  // return translation of a key
-  return isNil(at(translations, key)[0]) ? `{${key}}` : at(translations, key)[0];
+}
+
+export default function(key: string, asObject?: false): string;
+export default function(key: string, asObject: true): { [x: string]: any };
+export default function(key: string, asObject = false): string | { [x: string]: any } {
+  return isNil(at(translations, key)[0])
+    ? `{${key}}`
+    : asObject
+      ? castObject(key, at(translations, key)[0] as string | { [x: string]: any })
+      : String(at(translations, key)[0]);
 }
 
 export const setTranslations = (_translations: any) => {

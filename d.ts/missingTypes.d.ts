@@ -18,5 +18,5 @@ declare module 'js-beautify' {
 }
 
 declare module 'currency-symbol-map' {
-  export function getSymbolFromCurrency(code: string): string;
+  export default function (code:string): string;
 }

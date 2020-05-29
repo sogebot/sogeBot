@@ -7,6 +7,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { sortBy, keys, isNil } from 'lodash-es';
 
 import { flatten } from 'src/bot/helpers/flatten';
+import translate from '../helpers/translate';
 
 export interface Global {
   translations: any;
@@ -17,7 +18,7 @@ export default class textWithTags extends Vue {
   @Prop() value !: string;
 
   filter(val: string) {
-    const filtersRegExp = new RegExp('\\$(' + sortBy(keys(flatten(this.translate('responses.variable'))), (o) => -o.length).join('|') + ')', 'g');
+    const filtersRegExp = new RegExp('\\$(' + sortBy(keys(flatten(translate('responses.variable', true))), (o) => -o.length).join('|') + ')', 'g');
     val = val.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     let matches = val.match(filtersRegExp);
     let output = val;

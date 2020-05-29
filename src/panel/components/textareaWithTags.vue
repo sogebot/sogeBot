@@ -71,7 +71,7 @@ import translate from '../helpers/translate';
 @Component({
   filters: {
     filterize: function (val: string) {
-      const filtersRegExp = new RegExp('\\$(' + sortBy(keys(flatten(translate('responses.variable'))), (o) => -o.length).join('|') + ')', 'g')
+      const filtersRegExp = new RegExp('\\$(' + sortBy(keys(flatten(translate('responses.variable', true))), (o) => -o.length).join('|') + ')', 'g')
       val = val.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
       let matches = val.match(filtersRegExp)
       let output = val

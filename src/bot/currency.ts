@@ -4,7 +4,7 @@ import Core from './_interface';
 import axios from 'axios';
 import https from 'https';
 import chalk from 'chalk';
-import * as currencySymbolMap from 'currency-symbol-map';
+import getSymbolFromCurrency from 'currency-symbol-map';
 import _ from 'lodash';
 import { isMainThread } from './cluster';
 
@@ -49,7 +49,7 @@ class Currency extends Core {
   }
 
   public symbol(code: string): currency {
-    return currencySymbolMap.getSymbolFromCurrency(code) as currency;
+    return getSymbolFromCurrency(code) as currency;
   }
 
   public exchange(value: number, from: currency, to: currency, rates?: { [key in currency]: number }): number {

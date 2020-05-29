@@ -39,8 +39,8 @@ declare module 'vue/types/vue' {
 }
 
 const init = async () => {
-  Vue.prototype.translate = (v) => translate(v);
-  Vue.prototype.urlParam = (v) => urlParam(v);
+  Vue.prototype.translate = (v: string) => translate(v);
+  Vue.prototype.urlParam = (v: string) => urlParam(v);
   Vue.prototype.$state = ButtonStates;
 
   const router = new VueRouter({
