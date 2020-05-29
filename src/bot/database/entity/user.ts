@@ -1,8 +1,6 @@
 import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer, SafeNumberTransformer } from './_transformer';
 
-import type { currency } from '../../currency';
-
 export interface UserInterface {
   id?: string; userId: number; username: string; displayname?: string; profileImageUrl?: string;
   isOnline?: boolean; isVIP?: boolean; isFollower?: boolean; isModerator?: boolean; isSubscriber?: boolean;
@@ -15,7 +13,7 @@ export interface UserInterface {
 }
 
 export interface UserTipInterface {
-  id?: string; user?: UserInterface; amount: number; currency: string; message: string; tippedAt?: number; sortAmount: number;
+  id?: string; user?: UserInterface; amount: number; currency: currency; message: string; tippedAt?: number; sortAmount: number;
   exchangeRates: { [key in currency]: number }; userId?: number;
 }
 

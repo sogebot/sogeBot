@@ -79,7 +79,7 @@ export default class AlertsOverlay extends Vue {
   }
 
   mounted () {
-    this.socket.emit('cache', async (err, data) => {
+    this.socket.emit('cache', async (err: string | null, data: any) => {
       if (err) {
         return console.error(err);
       }
@@ -90,7 +90,7 @@ export default class AlertsOverlay extends Vue {
         console.log('/gallery/' + galleryItem + ' loaded.')
       }
     })
-    this.socket.on('alert', data => {
+    this.socket.on('alert', (data: any) => {
       for (let d of data) {
         d.run = false
         d.isLoaded = false
@@ -260,7 +260,7 @@ export default class AlertsOverlay extends Vue {
 
   get finishedCount () {
     if (this.getCurrentAlertList()) {
-      return this.getCurrentAlertList().filter(o => o.finished).length
+      return this.getCurrentAlertList().filter((o: any) => o.finished).length
     } else return 0
   }
 
@@ -272,7 +272,7 @@ export default class AlertsOverlay extends Vue {
   }
 
   @Watch('isFinished')
-  isFinishedWatch (val) {
+  isFinishedWatch (val: boolean) {
     if (val) {
       this.isPlaying = false,
       this.alerts.shift()
@@ -284,9 +284,9 @@ export default class AlertsOverlay extends Vue {
     }
   }
 
-  doEnterAnimation (el, done) {
+  doEnterAnimation (el: HTMLElement, done: () => void) {
     gsap.to(el, {
-      duration: (this.getCurrentAlertList()[el.dataset.index].duration || 1000) / 1000,
+      duration: (this.getCurrentAlertList()[el.dataset.index || 0].duration || 1000) / 1000,
       opacity: 1,
       onComplete: () => {
         done()
@@ -294,9 +294,9 @@ export default class AlertsOverlay extends Vue {
     })
   }
 
-  doLeaveAnimation (el, done) {
+  doLeaveAnimation (el: HTMLElement, done: () => void) {
     gsap.to(el, {
-      duration: (this.getCurrentAlertList()[el.dataset.index].duration || 1000) / 1000,
+      duration: (this.getCurrentAlertList()[el.dataset.index || 0].duration || 1000) / 1000,
       opacity: 0,
       onComplete: () => {
         done()

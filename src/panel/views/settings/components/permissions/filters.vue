@@ -62,7 +62,7 @@
       return data;
     },
     methods: {
-      remove(index) {
+      remove(index: number) {
         this.cFilters.splice(index, 1);
       },
       add() {

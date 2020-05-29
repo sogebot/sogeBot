@@ -159,6 +159,9 @@ import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import type { AlertInterface, CommonSettingsInterface } from 'src/bot/database/entity/alert';
 
+import { Route } from 'vue-router'
+import { NextFunction } from 'express';
+
 import { remove, every } from 'lodash-es';
 
 import defaultImage from '!!base64-loader!./media/cow01.gif';
@@ -168,6 +171,8 @@ import { Validations } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators';
 
 import { v4 as uuid } from 'uuid';
+
+const supportedEvents = ['follows', 'cheers', 'subs', 'resubs', 'subcommunitygifts', 'subgifts',  'tips', 'hosts', 'raids'] as const;
 
 Component.registerHooks([
   'beforeRouteEnter',
@@ -184,7 +189,7 @@ Component.registerHooks([
     'form-hosts': () => import('./components/form-hosts.vue'),
   },
   filters: {
-    capitalize: function (value) {
+    capitalize: function (value: string) {
       if (!value) return ''
       value = value.toString()
       return value.charAt(0).toUpperCase() + value.slice(1)
@@ -199,7 +204,7 @@ export default class AlertsEdit extends Vue {
   state: { loaded: number; save: number } = { loaded: this.$state.progress, save: this.$state.idle }
   pending: boolean = false;
 
-  supportedEvents: string[] = ['follows', 'cheers', 'subs', 'resubs', 'subcommunitygifts', 'subgifts',  'tips', 'hosts', 'raids']
+  supportedEvents = supportedEvents;
   selectedTabIndex: number = 0;
 
   item: AlertInterface = {
@@ -250,7 +255,7 @@ export default class AlertsEdit extends Vue {
 
   get isAllValid() {
     for (const key of Object.keys(this.isValid)) {
-      if (!every(this.isValid[key])) {
+      if (!every(this.isValid[key as keyof AlertsEdit['isValid']])) {
         return false;
       }
     }
@@ -275,7 +280,7 @@ export default class AlertsEdit extends Vue {
   async mounted() {
     this.state.loaded = this.$state.progress;
     if (this.$route.params.id) {
-      this.socket.emit('generic::getOne', this.$route.params.id, (err, data: AlertInterface) => {
+      this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, data: AlertInterface) => {
         if (err) {
           return console.error(err);
         }
@@ -291,7 +296,7 @@ export default class AlertsEdit extends Vue {
     }
   }
 
-  beforeRouteUpdate(to, from, next) {
+  beforeRouteUpdate(to: Route, from: Route, next: NextFunction) {
     if (this.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
       if (!isOK) {
@@ -304,7 +309,7 @@ export default class AlertsEdit extends Vue {
     }
   }
 
-  beforeRouteLeave(to, from, next) {
+  beforeRouteLeave(to: Route, from: Route, next: NextFunction) {
     if (this.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
       if (!isOK) {
@@ -482,7 +487,7 @@ export default class AlertsEdit extends Vue {
     });
   }
 
-  deleteVariant(event, id) {
+  deleteVariant(event: typeof supportedEvents[number], id: string) {
     console.debug('Removing', event, id);
     remove(this.item[event], (o: CommonSettingsInterface) => o.id === id);
     this.$forceUpdate();
@@ -503,7 +508,7 @@ export default class AlertsEdit extends Vue {
       this.state.save = this.$state.progress;
       this.item.updatedAt = Date.now(); // save updateAt
       console.debug('Saving', this.item);
-      this.socket.emit('alerts::save', this.item, (err, data) => {
+      this.socket.emit('alerts::save', this.item, (err: string | null, data: AlertInterface) => {
         if (err) {
           this.state.save = this.$state.fail;
           return console.error(err);

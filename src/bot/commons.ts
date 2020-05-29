@@ -9,7 +9,6 @@ import { globalIgnoreList } from './data/globalIgnoreList';
 import { error } from './helpers/log';
 import { clusteredChatOut, clusteredClientChat, clusteredClientTimeout, clusteredWhisperOut } from './cluster';
 
-import { UserInterface } from './database/entity/user';
 import oauth from './oauth';
 import users from './users';
 import { translate } from './translate';
@@ -20,6 +19,7 @@ import { TextChannel } from 'discord.js';
 import { Message } from './message';
 import { getRepository } from 'typeorm';
 import { DiscordLink } from './database/entity/discord';
+import { UserInterface } from './database/entity/user';
 
 /**
  * Use to send message to correct platform in @parser
@@ -113,9 +113,9 @@ export async function announce(messageToAnnounce: string) {
   }
 }
 
-export async function autoLoad(directory): Promise<{ [x: string]: any }> {
+export async function autoLoad(directory: string): Promise<{ [x: string]: any }> {
   const directoryListing = readdirSync(directory);
-  const loaded = {};
+  const loaded: { [x: string]: any } = {};
   for (const file of directoryListing) {
     if (file.startsWith('_')) {
       continue;
@@ -139,9 +139,10 @@ export function getIgnoreList() {
 
 export function getGlobalIgnoreList() {
   return Object.keys(globalIgnoreList)
-    .filter(o => !tmi.globalIgnoreListExclude.includes(o))
+    .filter(o => !tmi.globalIgnoreListExclude.map((ex: number | string) => String(ex)).includes(o))
     .map(o => {
-      return { id: o, ...globalIgnoreList[o] };
+      const id = Number(o);
+      return { id, ...globalIgnoreList[id as unknown as keyof typeof globalIgnoreList] };
     });
 }
 
@@ -151,14 +152,9 @@ export function isIgnored(sender: { username: string | null; userId?: number }) 
   }
 
   const isInIgnoreList = getIgnoreList().includes(sender.username) || getIgnoreList().includes(sender.userId);
-  let isInGlobalIgnoreList = false;
-  for (const [, data] of Object.entries(getGlobalIgnoreList())) {
-    if (data.id === sender.userId || data.known_aliases.includes(sender.username.toLowerCase())) {
-      isInGlobalIgnoreList = true;
-      break;
-    }
-  }
-
+  const isInGlobalIgnoreList = typeof getGlobalIgnoreList().find(data => {
+    return data.id === sender.userId || data.known_aliases.includes((sender.username || '').toLowerCase());
+  }) !== 'undefined';
   return (isInGlobalIgnoreList || isInIgnoreList) && !isBroadcaster(sender);
 }
 
@@ -191,7 +187,7 @@ export function prepare(toTranslate: string, attr?: {[x: string]: any }, isTrans
   return msg;
 }
 
-export function getTime(time, isChat) {
+export function getTime(time: null | number, isChat: boolean) {
   let days: string | number = 0;
   let hours: string | number = 0;
   let minutes: string | number = 0;
@@ -279,9 +275,9 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
 }
 
 /* TODO: move to tmi */
-export async function message(type, username, messageToSend, retry = true) {
+export async function message(type: 'say' | 'whisper' | 'me', username: string | undefined | null, messageToSend: string, retry = true) {
   try {
-    if (username === null) {
+    if (username === null || typeof username === 'undefined') {
       username = await oauth.generalChannel;
     }
     if (username === '') {
@@ -299,7 +295,7 @@ export async function message(type, username, messageToSend, retry = true) {
 }
 
 /* TODO: move to tmi */
-export async function timeout(username, reason, timeMs) {
+export async function timeout(username: string, reason: string, timeMs: number) {
   if (reason) {
     reason = reason.replace(/\$sender/g, username);
   }
@@ -359,6 +355,7 @@ export function getBotSender(): Readonly<CommandOptions['sender']> {
     color: '#000000',
     userType: 'empty',
     emoteSets: [],
+    discord: undefined,
   };
 }
 
@@ -378,40 +375,37 @@ export function getBroadcaster() {
   }
 }
 
-export function isBroadcaster(user) {
+export function isBroadcaster(user: string | CommandOptions['sender'] | { username: string | null; userId?: number } | UserStateTags) {
   try {
-    if (_.isString(user)) {
-      user = { username: user };
-    }
-    return oauth.broadcasterUsername.toLowerCase().trim() === user.username.toLowerCase().trim();
+    return oauth.broadcasterUsername.toLowerCase().trim() === (_.isString(user) ? user : user.username?.toLowerCase().trim());
   } catch (e) {
     return false;
   }
 }
 
-export function isModerator(user: UserInterface | undefined): boolean {
-  return user?.isModerator ?? false;
+export function isModerator(user: UserInterface | UserStateTags): boolean {
+  if ('mod' in user) {
+    return user.mod === '1';
+  }
+  return user.isModerator ?? false;
 }
 
-export function isVIP(user: UserInterface | undefined): boolean {
-  return user?.isVIP ?? false;
+export function isVIP(user: UserInterface): boolean {
+  return user.isVIP ?? false;
 }
 
-export function isFollower(user: UserInterface | undefined): boolean {
-  return user?.isFollower ?? false;
+export function isFollower(user: UserInterface): boolean {
+  return user.isFollower ?? false;
 }
 
-export function isSubscriber(user: UserInterface | undefined): boolean {
-  return user?.isSubscriber ?? false;
+export function isSubscriber(user: UserInterface): boolean {
+  return user.isSubscriber ?? false;
 }
 
-export function isBot(user) {
+export function isBot(user: string | CommandOptions['sender'] | UserInterface | UserStateTags) {
   try {
-    if (_.isString(user)) {
-      user = { username: user };
-    }
     if (oauth.botUsername) {
-      return oauth.botUsername.toLowerCase().trim() === user.username.toLowerCase().trim();
+      return oauth.botUsername.toLowerCase().trim() === (_.isString(user) ? user : user.username.toLowerCase().trim());
     } else {
       return false;
     }
@@ -420,16 +414,13 @@ export function isBot(user) {
   }
 }
 
-export function isOwner(user) {
+export function isOwner(user: string | CommandOptions['sender'] | UserInterface | UserStateTags) {
   try {
-    if (_.isString(user)) {
-      user = { username: user };
-    }
     if (oauth.generalOwners) {
       const owners = _.map(_.filter(oauth.generalOwners, _.isString), (owner) => {
         return _.trim(owner.toLowerCase());
       });
-      return _.includes(owners, user.username.toLowerCase().trim());
+      return _.includes(owners, (_.isString(user) ? user : user.username.toLowerCase().trim()));
     } else {
       return false;
     }
@@ -438,23 +429,21 @@ export function isOwner(user) {
   }
 }
 
-export function getLocalizedName(number, translation): string {
+export function getLocalizedName(number: number | string, translation: string): string {
   let single;
   let multi;
-  let xmulti;
+  let xmulti: { [x: string]: number } | null = null;
   let name;
   const names = translate(translation).split('|').map(Function.prototype.call, String.prototype.trim);
-  number = parseInt(number, 10);
+  number = _.isString(number) ? parseInt(number, 10) : number;
 
   switch (names.length) {
     case 1:
-      xmulti = null;
       single = multi = names[0];
       break;
     case 2:
       single = names[0];
       multi = names[1];
-      xmulti = null;
       break;
     default:
       const len = names.length;

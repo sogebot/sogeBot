@@ -106,13 +106,13 @@ class Moderation extends System {
         whitelist: this.cListsWhitelist,
       });
     });
-    adminEndpoint(this.nsp, 'lists.set', async (data) => {
+    adminEndpoint(this.nsp, 'lists.set', (data) => {
       this.cListsBlacklist = data.blacklist.filter(entry => entry.trim() !== '');
       this.cListsWhitelist = data.whitelist.filter(entry => entry.trim() !== '');
     });
   }
 
-  async timeoutUser (sender, text, warning, msg, time, type) {
+  async timeoutUser (sender: CommandOptions['sender'], text: string, warning: string, msg: string, time: number, type: string) {
     // cleanup warnings
     await getRepository(ModerationWarning).delete({
       timestamp: LessThan(1000 * 60 * 60),
@@ -123,7 +123,7 @@ class Moderation extends System {
     text = text.trim();
 
     if (this.cWarningsAllowedCount === 0) {
-      msg = await new Message(msg.replace(/\$count/g, -1)).parse();
+      msg = await new Message(msg.replace(/\$count/g, String(-1))).parse();
       timeoutLog(`${sender.username} [${type}] ${time}s timeout | ${text}`);
       timeout(sender.username, msg, time);
       return;
@@ -131,14 +131,14 @@ class Moderation extends System {
 
     const isWarningCountAboveThreshold = warnings.length >= this.cWarningsAllowedCount;
     if (isWarningCountAboveThreshold) {
-      msg = await new Message(warning.replace(/\$count/g, this.cWarningsAllowedCount - warnings.length)).parse();
+      msg = await new Message(warning.replace(/\$count/g, String(this.cWarningsAllowedCount - warnings.length))).parse();
       timeoutLog(`${sender.username} [${type}] ${time}s timeout | ${text}`);
       timeout(sender.username, msg, time);
       await getRepository(ModerationWarning).delete({ userId: Number(sender.userId) });
     } else {
       await getRepository(ModerationWarning).insert({ userId: Number(sender.userId), timestamp: Date.now() });
       const warningsLeft = this.cWarningsAllowedCount - warnings.length;
-      warning = await new Message(warning.replace(/\$count/g, warningsLeft < 0 ? 0 : warningsLeft)).parse();
+      warning = await new Message(warning.replace(/\$count/g, String(warningsLeft < 0 ? 0 : warningsLeft))).parse();
       if (this.cWarningsShouldClearChat) {
         timeoutLog(`${sender.username} [${type}] 1s timeout, warnings left ${warningsLeft < 0 ? 0 : warningsLeft} | ${text}`);
         timeout(sender.username, warning, 1);
@@ -151,7 +151,7 @@ class Moderation extends System {
     }
   }
 
-  async whitelist (text, permId: string | null) {
+  async whitelist (text: string, permId: string | null) {
     let ytRegex, clipsRegex, spotifyRegex;
 
     // check if spotify -or- alias of spotify contain open.spotify.com link
@@ -209,9 +209,12 @@ class Moderation extends System {
 
   @command('!permit')
   @default_permission(permission.CASTERS)
-  async permitLink (opts): Promise<CommandResponse[]> {
+  async permitLink (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const parsed = opts.parameters.match(/^@?([\S]+) ?(\d+)?$/);
+      if (!parsed) {
+        throw new Error('!permit command not parsed');
+      }
       let count = 1;
       if (!_.isNil(parsed[2])) {
         count = parseInt(parsed[2], 10);
@@ -286,7 +289,7 @@ class Moderation extends System {
     const out = whitelisted.match(/([^\s\u0500-\u052F\u0400-\u04FF\w]+)/g);
     for (const item in out) {
       if (out.hasOwnProperty(item)) {
-        const symbols = out[item];
+        const symbols = out[Number(item)];
         if (symbols.length >= cSymbolsMaxSymbolsConsecutively[permId]) {
           this.timeoutUser(opts.sender, opts.message,
             translate('moderation.user-is-warned-about-symbols'),
@@ -361,7 +364,7 @@ class Moderation extends System {
     for (let i = 0; i < whitelisted.length; i++) {
       // if is emote or symbol - continue
       if (_.includes(emotesCharList, i) || !_.isNull(whitelisted.charAt(i).match(regexp))) {
-        msgLength = parseInt(msgLength, 10) - 1;
+        msgLength--;
         continue;
       } else if (!_.isFinite(parseInt(whitelisted.charAt(i), 10)) && whitelisted.charAt(i).toUpperCase() === whitelisted.charAt(i) && whitelisted.charAt(i) !== ' ') {
         capsLength += 1;
@@ -401,7 +404,7 @@ class Moderation extends System {
     }
     const out = whitelisted.match(/(.+)(\1+)/g);
     for (const item in out) {
-      if (out.hasOwnProperty(item) && out[item].length >= cSpamMaxLength[permId]) {
+      if (out.hasOwnProperty(item) && out[Number(item)].length >= cSpamMaxLength[permId]) {
         this.timeoutUser(opts.sender, opts.message,
           translate('moderation.user-have-timeout-for-spam'),
           translate('moderation.user-is-warned-about-spam'),
@@ -496,7 +499,7 @@ class Moderation extends System {
     return isOK;
   }
 
-  async isSilent (name) {
+  async isSilent (name: string) {
     const item = await getRepository(ModerationMessageCooldown).findOne({ name });
     if (!item || (Date.now() - item.timestamp) >= 60000) {
       await getRepository(ModerationMessageCooldown).save({

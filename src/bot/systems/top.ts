@@ -15,15 +15,15 @@ import tmi from '../tmi';
 import currency from '../currency';
 
 enum TYPE {
-  TIME,
-  TIPS,
-  POINTS,
-  MESSAGES,
-  FOLLOWAGE,
-  SUBAGE,
-  BITS,
-  GIFTS,
-  SUBMONTHS,
+  TIME = '0',
+  TIPS = '1',
+  POINTS = '2',
+  MESSAGES = '3',
+  FOLLOWAGE = '4',
+  SUBAGE = '5',
+  BITS = '6',
+  GIFTS = '7',
+  SUBMONTHS = '8',
 }
 
 /*
@@ -41,68 +41,68 @@ enum TYPE {
 class Top extends System {
   @command('!top time')
   @default_permission(permission.CASTERS)
-  async time(opts) {
+  async time(opts: CommandOptions) {
     opts.parameters = TYPE.TIME;
     return this.showTop(opts);
   }
 
   @command('!top tips')
   @default_permission(permission.CASTERS)
-  async tips(opts) {
+  async tips(opts: CommandOptions) {
     opts.parameters = TYPE.TIPS;
     return this.showTop(opts);
   }
 
   @command('!top points')
   @default_permission(permission.CASTERS)
-  async points(opts) {
+  async points(opts: CommandOptions) {
     opts.parameters = TYPE.POINTS;
     return this.showTop(opts);
   }
 
   @command('!top messages')
   @default_permission(permission.CASTERS)
-  async messages(opts) {
+  async messages(opts: CommandOptions) {
     opts.parameters = TYPE.MESSAGES;
     return this.showTop(opts);
   }
 
   @command('!top followage')
   @default_permission(permission.CASTERS)
-  async followage(opts) {
+  async followage(opts: CommandOptions) {
     opts.parameters = TYPE.FOLLOWAGE;
     return this.showTop(opts);
   }
 
   @command('!top subage')
   @default_permission(permission.CASTERS)
-  async subage(opts) {
+  async subage(opts: CommandOptions) {
     opts.parameters = TYPE.SUBAGE;
     return this.showTop(opts);
   }
 
   @command('!top submonths')
   @default_permission(permission.CASTERS)
-  async submonths(opts) {
+  async submonths(opts: CommandOptions) {
     opts.parameters = TYPE.SUBMONTHS;
     return this.showTop(opts);
   }
 
   @command('!top bits')
   @default_permission(permission.CASTERS)
-  async bits(opts) {
+  async bits(opts: CommandOptions) {
     opts.parameters = TYPE.BITS;
     return this.showTop(opts);
   }
 
   @command('!top gifts')
   @default_permission(permission.CASTERS)
-  async gifts(opts) {
+  async gifts(opts: CommandOptions) {
     opts.parameters = TYPE.GIFTS;
     return this.showTop(opts);
   }
 
-  private async showTop(opts): Promise<CommandResponse[]> {
+  private async showTop(opts: CommandOptions): Promise<CommandResponse[]> {
     let sorted: {username: string; value: number}[] = [];
     let message;
     let i = 0;

@@ -6,7 +6,7 @@ const exchangeRates = {
 
 let tips: any[] = [];
 
-const mainCurrency = (result) => {
+const mainCurrency = (result: any) => {
   return result.length > 0 ? JSON.parse(result[0].value) : 'EUR';
 };
 
@@ -16,9 +16,9 @@ const exchange = (value: number, from: string, to: string): number => {
   }
 
   if (to.toLowerCase().trim() !== 'czk') {
-    return (value * exchangeRates[from]) / exchangeRates[to];
+    return (value * (exchangeRates as any)[from]) / (exchangeRates as any)[to];
   } else {
-    return value * exchangeRates[from];
+    return value * (exchangeRates as any)[from];
   }
 };
 

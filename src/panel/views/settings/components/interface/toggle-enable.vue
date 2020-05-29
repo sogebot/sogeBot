@@ -26,7 +26,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 @Component({})
 export default class toggleEnable extends Vue {
   @Prop() readonly value: any;
-  @Prop() readonly title: any;
+  @Prop() readonly title!: string;
   @Prop() readonly disabled !: boolean;
 
   currentValue = this.value;

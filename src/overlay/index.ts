@@ -40,8 +40,8 @@ const overlays = async () => {
   await getTranslations();
   Vue.prototype.configuration = await getConfiguration();
 
-  Vue.prototype.translate = (v) => translate(v);
-  Vue.prototype.urlParam = (v) => urlParam(v);
+  Vue.prototype.translate = (v: string) => translate(v);
+  Vue.prototype.urlParam = (v: string) => urlParam(v);
   Vue.prototype.$state = ButtonStates;
 
   const router = new VueRouter({

@@ -93,7 +93,7 @@ export default class apiStats extends Vue {
       let success = this.data.filter(o => o.api === this.selected && String(o.code).startsWith('2'))
       let errors = this.data.filter(o => o.api === this.selected && !String(o.code).startsWith('2'))
 
-      let successPerMinute = {}
+      let successPerMinute: any = {}
       let _successPerMinute = groupBy(success, o => {
         return (new Date(o.timestamp)).getHours() + ':' + (new Date(o.timestamp)).getMinutes()
       })
@@ -102,7 +102,7 @@ export default class apiStats extends Vue {
         successPerMinute[timestamp] = _successPerMinute[minute].length
       }
 
-      let errorsPerMinute = {}
+      let errorsPerMinute: any = {}
       let _errorsPerMinute = groupBy(errors, o => {
         return (new Date(o.timestamp)).getMinutes()
       })
@@ -123,7 +123,7 @@ export default class apiStats extends Vue {
     }
 
     mounted() {
-      this.socket.off('api.stats').on('api.stats', (c) => {
+      this.socket.off('api.stats').on('api.stats', (c: { code: number, remaining: number | string, data: Object}) => {
         c.code = get(c, 'code', 200) // set default to 200
         c.data = !isNil(c.data) ? JSON.stringify(c.data) : 'n/a'
         c.remaining = !isNil(c.remaining) ? c.remaining : 'n/a'
@@ -132,7 +132,7 @@ export default class apiStats extends Vue {
       })
     }
 
-    parseJSON(data) {
+    parseJSON(data: string) {
       try {
           return JSON.stringify(JSON.parse(data), null, 2)
       } catch (e) {

@@ -4,12 +4,12 @@ import * as constants from '../constants';
 import System from './_interface';
 import { command, default_permission } from '../decorators';
 import { permission } from '../helpers/permissions';
-import { HowLongToBeatService /*, HowLongToBeatEntry */ } from 'howlongtobeat';
+import { HowLongToBeatService } from 'howlongtobeat';
 import Expects from '../expects';
 import { prepare } from '../commons';
 
 import { getRepository } from 'typeorm';
-import { HowLongToBeatGame } from '../database/entity/howLongToBeatGame';
+import { HowLongToBeatGame, HowLongToBeatGameInterface } from '../database/entity/howLongToBeatGame';
 import { adminEndpoint } from '../helpers/socket';
 import api from '../api';
 import { error, info } from '../helpers/log';
@@ -33,7 +33,7 @@ class HowLongToBeat extends System {
   }
 
   sockets() {
-    adminEndpoint(this.nsp, 'generic::getAll', async (opts, cb) => {
+    adminEndpoint(this.nsp, 'generic::getAll::filter', async (opts: HowLongToBeatGameInterface, cb) => {
       try {
         cb(null, await getRepository(HowLongToBeatGame).find({...opts}));
       } catch (e) {

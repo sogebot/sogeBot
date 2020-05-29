@@ -101,7 +101,7 @@ export default class keywordsList extends Vue {
 
   refresh() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('generic::getAll', (err, data: KeywordInterface[]) => {
+    this.socket.emit('generic::getAll', (err: string | null, data: KeywordInterface[]) => {
       if (err) {
         return console.error(err);
       }
@@ -110,7 +110,7 @@ export default class keywordsList extends Vue {
     })
   }
 
-  del(id) {
+  del(id: string) {
     this.socket.emit('generic::deleteById', id, () => {
       this.refresh();
     })
@@ -120,7 +120,7 @@ export default class keywordsList extends Vue {
     this.socket.emit('keywords::save', keyword, () => {});
   }
 
-  linkTo(item) {
+  linkTo(item: Required<KeywordInterface>) {
     console.debug('Clicked', item.id);
     this.$router.push({ name: 'KeywordsManagerEdit', params: { id: item.id } });
   }

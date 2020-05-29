@@ -27,7 +27,7 @@ export default class CarouselOverlay extends Vue {
   }
 
   @Watch('css')
-  cssWatch (css) {
+  cssWatch (css: string) {
     const head = document.getElementsByTagName('head')[0]
     const style = (document.createElement('style') as any)
     style.type = 'text/css';
@@ -42,7 +42,7 @@ export default class CarouselOverlay extends Vue {
   }
 
   @Watch('text')
-  textWatch (val, old) {
+  textWatch (val: string, old: string) {
     if (this.js) {
       console.group('onChange()')
       console.log(this.js)
@@ -52,7 +52,7 @@ export default class CarouselOverlay extends Vue {
   }
 
   @Watch('js')
-  jsWatch (val) {
+  jsWatch (val: string) {
     console.group('onLoad()')
     console.log(val)
     console.groupEnd()
@@ -61,7 +61,7 @@ export default class CarouselOverlay extends Vue {
 
   refresh () {
     if (this.urlParam('id')) {
-      this.socket.emit('generic::getOne', { id: this.urlParam('id'), parseText: true }, (err, cb) => {
+      this.socket.emit('generic::getOne', { id: this.urlParam('id'), parseText: true }, (err: string | null, cb: { external: string, text: string, js: string, css: string }) => {
         if (err) {
           return console.error(err);
         }

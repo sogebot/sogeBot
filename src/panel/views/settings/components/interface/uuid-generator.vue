@@ -27,7 +27,7 @@ import { v4 as uuid } from 'uuid'
 @Component({})
 export default class uuidGenerator extends Vue {
   @Prop() readonly value: any;
-  @Prop() readonly title: any;
+  @Prop() readonly title!: string;
 
   show: boolean = false;
   currentValue = this.value;

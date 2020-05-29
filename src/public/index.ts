@@ -47,7 +47,6 @@ declare module 'vue/types/vue' {
     $unloadScript: (script: string) => Promise<void>;
     $state: states;
     urlParam(key: string): string | null;
-    translate(id: string): string;
     $loggedUser: any | null;
   }
 }
@@ -56,7 +55,7 @@ Vue.use(VueRouter);
 
 const main = async () => {
   // init prototypes
-  Vue.prototype.translate = (v) => translate(v);
+  Vue.prototype.translate = (v: string) => translate(v);
   Vue.prototype.$loggedUser = await isUserLoggedIn(false, false);
   await getTranslations();
   Vue.prototype.configuration = await getConfiguration();

@@ -4,10 +4,10 @@ const cache: { [id: string]: string } = {};
 const socket = getSocket('/core/users');
 
 
-export const getUsernameById = async function (id: string) {
+export const getUsernameById = async function (id: number) {
   if (typeof cache[id] === 'undefined') {
     const username = await new Promise((resolve: (value: string | null) => void, reject) => {
-      socket.emit('getNameById', id, (err, value: string | null) => {
+      socket.emit('getNameById', id, (err: string | null, value: string | null) => {
         if (err) {
           reject(err);
         }

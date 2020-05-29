@@ -2,7 +2,7 @@ import { EntitySchema } from 'typeorm';
 
 export interface EventInterface {
   id?: string;
-  operations: EventOperationInterface[];
+  operations: Omit<EventOperationInterface, 'event'>[];
   name: string;
   givenName: string;
   isEnabled: boolean;

@@ -409,7 +409,7 @@ export default Vue.extend({
   },
   methods: {
     del: function () {
-      this.socket.emit('goals::remove', this.group, (err) => {
+      this.socket.emit('goals::remove', this.group, (err: string | null) => {
         if (err) {
           console.error(err);
         } else {
@@ -426,7 +426,7 @@ export default Vue.extend({
         this.group.name = [...Array(10)].map(() => Math.random().toString(36)[3]).join('')
       }
 
-      this.socket.emit('goals::save', this.group, (err) => {
+      this.socket.emit('goals::save', this.group, (err: string | null) => {
         if (err) {
           console.error(err);
         } else {
@@ -438,7 +438,7 @@ export default Vue.extend({
         }, 1000)
       })
     },
-    removeGoal: function (id) {
+    removeGoal: function (id: string) {
       this.group.goals = this.group.goals.filter((o) => o.id !== id)
     },
     addGoal: function () {
@@ -504,7 +504,7 @@ export default Vue.extend({
   },
   mounted: async function () {
     if (this.$route.params.id) {
-      this.socket.emit('generic::getOne', this.$route.params.id, (err, d: Required<GoalGroupInterface>) => {
+      this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, d: Required<GoalGroupInterface>) => {
         if (err) {
           console.error(err);
           return;
@@ -535,7 +535,7 @@ export default Vue.extend({
 
       request.send();
     })
-    this.fonts = response.items.map((o) => {
+    this.fonts = response.items.map((o: { family: string }) => {
       return { text: o.family, value: o.family }
     })
   }

@@ -5,7 +5,7 @@
     "module": "commonjs",
     "incremental": true,
     "removeComments": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "esModuleInterop": true,

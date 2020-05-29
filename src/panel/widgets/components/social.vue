@@ -82,7 +82,7 @@ export default Vue.extend({
   },
   methods: {
     load() {
-      this.socket.emit('generic::getAll', { limit: 50 }, (err, d) => {
+      this.socket.emit('generic::getAll', { limit: 50 }, (err: string | null, d: Array<{}>) => {
         if (err) {
           return console.error(err);
         }

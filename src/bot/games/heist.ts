@@ -14,6 +14,9 @@ import { translate } from '../translate';
 import tmi from '../tmi';
 import { default as pointsSystem } from '../systems/points';
 
+export type Level = { name: string; winPercentage: number; payoutMultiplier: number; maxUsers: number };
+export type Result = { percentage: number; message: string };
+
 class Heist extends Game {
   dependsOn = [ pointsSystem ];
 
@@ -56,7 +59,7 @@ class Heist extends Game {
   noUser: string = translate('games.heist.noUser');
   @settings('results')
   @ui({ type: 'heist-results' }, 'results')
-  resultsValues: { percentage: number; message: string} [] = [
+  resultsValues: Result[] = [
     { percentage: 0, message: translate('games.heist.result.0') },
     { percentage: 33, message: translate('games.heist.result.33') },
     { percentage: 50, message: translate('games.heist.result.50') },
@@ -66,7 +69,7 @@ class Heist extends Game {
 
   @settings('levels')
   @ui({ type: 'heist-levels' }, 'levels')
-  levelsValues: { name: string; winPercentage: number; payoutMultiplier: number; maxUsers: number }[] = [
+  levelsValues: Level[] = [
     {
       'name': translate('games.heist.levels.bankVan'),
       'winPercentage': 60,
@@ -202,7 +205,7 @@ class Heist extends Game {
   }
 
   @command('!bankheist')
-  async main (opts): Promise<CommandResponse[]> {
+  async main (opts: CommandOptions): Promise<CommandResponse[]> {
     const [entryCooldown, lastHeistTimestamp, copsCooldown] = await Promise.all([
       this.entryCooldownInSeconds,
       this.lastHeistTimestamp,

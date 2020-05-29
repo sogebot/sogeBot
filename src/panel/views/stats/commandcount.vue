@@ -185,7 +185,7 @@
       }
     },
     methods: {
-      toggleCommandChart(command) {
+      toggleCommandChart(command: string) {
         if (this.showChartCommands.includes(command)) {
           this.showChartCommands = this.showChartCommands.filter((o) => o !== command);
         } else {
@@ -222,7 +222,7 @@
               countByTimestamps[t] = 0;
             }
           }
-          const countByTimestampsOrdered = {}
+          const countByTimestampsOrdered: any = {}
           for (const k of Object.keys(countByTimestamps).sort()) {
             countByTimestampsOrdered[new Date(Number(k)).toLocaleString()] = countByTimestamps[k];
           }
@@ -245,7 +245,7 @@
       }
     },
     mounted() {
-      this.socket.emit('commands::count', (err, val) => {
+      this.socket.emit('commands::count', (err: string | null, val: { command: string, timestamp: number, _id: string }[]) => {
         if (err) {
           return console.error(err);
         }

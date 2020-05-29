@@ -23,6 +23,8 @@ import { PerfectScrollbar } from 'vue2-perfect-scrollbar'
 import 'vue2-perfect-scrollbar/dist/vue2-perfect-scrollbar.css'
 import { getSocket } from 'src/panel/helpers/socket';
 
+import type { menu } from 'src/bot/helpers/panel';
+
 @Component({
   components: {
     PerfectScrollbar
@@ -30,25 +32,25 @@ import { getSocket } from 'src/panel/helpers/socket';
 })
 export default class Menu extends Vue {
   socket = getSocket('/');
-  menu: any = [];
+  menu: typeof menu = [];
   categories = ['manage', 'settings', 'registry', /* 'logs', */ 'stats'];
 
   async mounted() {
     // Workaround for touch screens - https://github.com/mdbootstrap/perfect-scrollbar/issues/867
-    if (typeof window['DocumentTouch'] === 'undefined') {
-      window['DocumentTouch'] = HTMLDocument
+    if (typeof (window as any).DocumentTouch === 'undefined') {
+      (window as any).DocumentTouch = HTMLDocument
     }
 
     const isLoaded = await Promise.race([
       new Promise(resolve => {
-        this.socket.emit('menu', (err, menu) => {
+        this.socket.emit('menu', (err: string | null, data: typeof menu) => {
           if (err) {
             return console.error(err);
           }
           console.groupCollapsed('menu::menu');
-          console.log({menu});
+          console.log({data});
           console.groupEnd();
-          for (const item of menu.sort((a, b) => {
+          for (const item of data.sort((a, b) => {
             return this.translate('menu.' + a.name).localeCompare(this.translate('menu.' + b.name))
           })) {
             this.menu.push(item);

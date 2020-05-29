@@ -25,12 +25,13 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import type { Result } from 'src/bot/games/heist';
 
 @Component({})
 export default class heistResults extends Vue {
-  @Prop() readonly value: any;
+  @Prop() readonly value!: Result[];
 
-  w_results: any = this.value.sort((a, b) => {
+  w_results = this.value.sort((a, b) => {
     return a.percentage - b.percentage;
   })
 
@@ -46,7 +47,7 @@ export default class heistResults extends Vue {
     });
   }
 
-  removeResult(index) {
+  removeResult(index: number) {
     this.w_results.splice(index, 1);
   }
 }

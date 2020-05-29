@@ -530,7 +530,7 @@ export default class AlertsEditCheersForm extends Vue {
 
       request.send();
     })
-    this.fonts = response.items.map((o) => {
+    this.fonts = response.items.map((o: { family: string }) => {
       return { text: o.family, value: o.family }
     })
 

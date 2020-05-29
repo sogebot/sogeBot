@@ -11,7 +11,7 @@ class CustomVariables extends Widget {
     super();
     this.addWidget('customvariables', 'widget-title-customvariables', 'fas fa-dollar-sign');
 
-    require('cluster').on('message', (worker, message) => {
+    require('cluster').on('message', (_worker: Worker, message: { type: string, emit: string }) => {
       if (message.type !== 'widget_custom_variables') {
         return;
       }

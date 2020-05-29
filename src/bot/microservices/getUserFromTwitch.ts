@@ -2,7 +2,7 @@ import { getRepository } from 'typeorm';
 import { Settings } from '../database/entity/settings';
 import axios from 'axios';
 
-export const getUserFromTwitch = async (username) => {
+export const getUserFromTwitch = async (username: string) => {
   return (await getUsersFromTwitch([username]))[0];
 };
 

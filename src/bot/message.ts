@@ -39,11 +39,11 @@ import customcommands from './systems/customcommands';
 class Message {
   message = '';
 
-  constructor (message) {
+  constructor (message: string) {
     this.message = Entities.decode(message);
   }
 
-  async global (opts) {
+  async global (opts:any) {
     const variables = {
       game: api.stats.currentGame,
       language: api.stats.language,
@@ -57,7 +57,7 @@ class Message {
     };
     for (const variable of Object.keys(variables)) {
       const regexp = new RegExp(`\\$${variable}`, 'g');
-      this.message = this.message.replace(regexp, variables[variable]);
+      this.message = this.message.replace(regexp, String(variables[variable as keyof typeof variables] || ''));
     }
 
     const version = _.get(process, 'env.npm_package_version', 'x.y.z');
@@ -233,25 +233,25 @@ class Message {
         }
         return _.sample(subscribers.map(o => o.username ));
       },
-      '(random.number-#-to-#)': async function (filter) {
+      '(random.number-#-to-#)': async function (filter: string) {
         const numbers = filter.replace('(random.number-', '')
           .replace(')', '')
           .split('-to-');
 
         try {
           let lastParamUsed = 0;
-          for (const index in numbers) {
-            if (!_.isFinite(parseInt(numbers[index], 10))) {
+          for (const index of numbers) {
+            if (!_.isFinite(parseInt(numbers[Number(index)], 10))) {
               const param = attr.param.split(' ');
               if (_.isNil(param[lastParamUsed])) {
                 return 0;
               }
 
-              numbers[index] = param[lastParamUsed];
+              numbers[Number(index)] = param[lastParamUsed];
               lastParamUsed++;
             }
           }
-          return _.random(numbers[0], numbers[1]);
+          return _.random(Number(numbers[0]), Number(numbers[1]));
         } catch (e) {
           return 0;
         }
@@ -261,7 +261,7 @@ class Message {
       },
     };
     const custom = {
-      '$_#': async (variable) => {
+      '$_#': async (variable: string) => {
         if (!_.isNil(attr.param) && attr.param.length !== 0) {
           const state = await customvariables.setValueOf(variable, attr.param, { sender: attr.sender });
           if (state.updated.responseType === 0) {
@@ -273,7 +273,9 @@ class Message {
             return state.updated.currentValue;
           } else if (state.updated.responseType === 1) {
             // custom
-            parserReply(state.updated.responseText.replace('$value', state.setValue), { sender: attr.sender, attr: { skip: true, quiet: _.get(attr, 'quiet', false) }});
+            if (state.updated.responseText) {
+              parserReply(state.updated.responseText.replace('$value', state.setValue), { sender: attr.sender, attr: { skip: true, quiet: _.get(attr, 'quiet', false) }});
+            }
             return '';
           } else {
             // command
@@ -283,7 +285,7 @@ class Message {
         return customvariables.getValueOf(variable, { sender: attr.sender, param: attr.param });
       },
       // force quiet variable set
-      '$!_#': async (variable) => {
+      '$!_#': async (variable: string) => {
         variable = variable.replace('$!_', '$_');
         if (!_.isNil(attr.param) && attr.param.length !== 0) {
           const state = await customvariables.setValueOf(variable, attr.param, { sender: attr.sender });
@@ -292,7 +294,7 @@ class Message {
         return customvariables.getValueOf(variable, { sender: attr.sender, param: attr.param });
       },
       // force full quiet variable
-      '$!!_#': async (variable) => {
+      '$!!_#': async (variable: string) => {
         variable = variable.replace('$!!_', '$_');
         if (!_.isNil(attr.param) && attr.param.length !== 0) {
           await customvariables.setValueOf(variable, attr.param, { sender: attr.sender });
@@ -301,7 +303,7 @@ class Message {
       },
     };
     const param = {
-      '$touser': async function (filter) {
+      '$touser': async function () {
         if (typeof attr.param !== 'undefined') {
           attr.param = attr.param.replace('@', '');
           if (attr.param.length > 0) {
@@ -313,13 +315,13 @@ class Message {
         }
         return (tmi.showWithAt ? '@' : '') + attr.sender.username;
       },
-      '$param': async function (filter) {
+      '$param': async function () {
         if (!_.isUndefined(attr.param) && attr.param.length !== 0) {
           return attr.param;
         }
         return '';
       },
-      '$!param': async function (filter) {
+      '$!param': async function () {
         if (!_.isUndefined(attr.param) && attr.param.length !== 0) {
           return attr.param;
         }
@@ -327,13 +329,13 @@ class Message {
       },
     };
     const qs = {
-      '$querystring': async function (filter) {
+      '$querystring': async function () {
         if (!_.isUndefined(attr.param) && attr.param.length !== 0) {
           return querystring.escape(attr.param);
         }
         return '';
       },
-      '(url|#)': async function (filter) {
+      '(url|#)': async function () {
         try {
           return encodeURI(attr.param);
         } catch (e) {
@@ -342,7 +344,7 @@ class Message {
       },
     };
     const info = {
-      '$toptip.#.#': async function (filter) {
+      '$toptip.#.#': async function (filter: string) {
         const match = filter.match(/\$toptip\.(?<type>overall|stream)\.(?<value>username|amount|message|currency)/);
         if (!match) {
           return '';
@@ -361,7 +363,8 @@ class Message {
             return bTip - aTip;
           });
 
-        if (match.groups.type === 'stream') {
+        const type = match.groups?.type;
+        if (type === 'stream') {
           const whenOnline = api.isStreamOnline ? api.streamStatusChangeSince : null;
           if (whenOnline) {
             tips = tips.filter((o) => o.timestamp >= (new Date(whenOnline)).getTime());
@@ -371,23 +374,29 @@ class Message {
         }
 
         if (tips.length > 0) {
-          if (match.groups.value === 'amount') {
-            return Number(tips[0][match.groups.value]).toFixed(2);
-          } else {
-            return tips[0][match.groups.value];
+          const value = match.groups?.value;
+          switch(value) {
+            case 'amount':
+              return Number(JSON.parse(tips[0].values_json).amount).toFixed(2);
+            case 'currency':
+              return Number(JSON.parse(tips[0].values_json).currency);
+            case 'message':
+              return Number(JSON.parse(tips[0].values_json).message);
+            case 'username':
+              return tips[0].username;
           }
         }
         return '';
       },
-      '(game)': async function (filter) {
+      '(game)': async function () {
         return api.stats.currentGame || 'n/a';
       },
-      '(status)': async function (filter) {
+      '(status)': async function () {
         return api.stats.currentTitle || 'n/a';
       },
     };
     const command = {
-      '$count(\'#\')': async function (filter) {
+      '$count(\'#\')': async function (filter: string) {
         const countRegex = new RegExp('\\$count\\(\\\'(?<command>\\!\\S*)\\\'\\)', 'gm');
         const match = countRegex.exec(filter);
         if (match && match.groups) {
@@ -395,13 +404,13 @@ class Message {
         }
         return '0';
       },
-      '$count': async function (filter) {
+      '$count': async function () {
         if (attr.command) {
           return String((await getCountOfCommandUsage(attr.command)));
         }
         return '0';
       },
-      '(!!#)': async function (filter) {
+      '(!!#)': async function (filter: string) {
         const cmd = filter
           .replace('!', '') // replace first !
           .replace(/\(|\)/g, '')
@@ -460,16 +469,16 @@ class Message {
       },
     };
     const price = {
-      '(price)': async function (filter) {
+      '(price)': async function () {
         const cmd = await getRepository(Price).findOne({ command: attr.cmd, enabled: true });
         return [price, await points.getPointsName(cmd?.price ?? 0)].join(' ');
       },
     };
     const online = {
-      '(onlineonly)': async function (filter) {
+      '(onlineonly)': async function () {
         return api.isStreamOnline;
       },
-      '(offlineonly)': async function (filter) {
+      '(offlineonly)': async function () {
         return !(api.isStreamOnline);
       },
     };
@@ -585,7 +594,7 @@ class Message {
       },
     };
     const math = {
-      '(math.#)': async function (filter) {
+      '(math.#)': async function (filter: any) {
         let toEvaluate = filter.replace(/\(math./g, '').replace(/\)/g, '');
 
         // check if custom variables are here
@@ -604,7 +613,7 @@ class Message {
       },
     };
     const evaluate = {
-      '(eval#)': async function (filter) {
+      '(eval#)': async function (filter: any) {
         let toEvaluate = filter.replace('(eval ', '').slice(0, -1);
 
         const containUsers = !_.isNil(toEvaluate.match(/users/g));
@@ -625,7 +634,7 @@ class Message {
               response = response.data.toString();
             }
             urls.push({ id, response });
-            toEvaluate = toEvaluate.replace(match, id);
+            toEvaluate = toEvaluate.replace(match, `url.${id}`);
           }
         }
 
@@ -668,19 +677,30 @@ class Message {
         };
 
         const toEval = `(function evaluation () {  ${toEvaluate} })()`;
-        const context = {
+        const context: {
+          _: typeof _;
+          users: typeof allUsers;
+          is: typeof is;
+          random: typeof randomVar;
+          sender: string;
+          param: string | null;
+          url: {
+            [urlId: string]: AxiosResponse<any>
+          };
+        } = {
           _: _,
           users: allUsers,
           is: is,
           random: randomVar,
           sender: tmi.showWithAt ? `@${attr.sender.username}` : `${attr.sender.username}`,
           param: _.isNil(attr.param) ? null : attr.param,
+          url: {},
         };
 
         if (containUrl) {
           // add urls to context
           for (const url of urls) {
-            context[url.id] = url.response;
+            context.url[url.id] = url.response;
           }
         }
 
@@ -688,7 +708,7 @@ class Message {
       },
     };
     const ifp = {
-      '(if#)': async function (filter) {
+      '(if#)': async function (filter: any) {
         // (if $days>2|More than 2 days|Less than 2 days)
         try {
           const toEvaluate = filter
@@ -710,7 +730,7 @@ class Message {
       },
     };
     const stream = {
-      '(stream|#|game)': async function (filter) {
+      '(stream|#|game)': async function (filter: any) {
         const channel = filter.replace('(stream|', '').replace('|game)', '');
 
         const token = await oauth.botAccessToken;
@@ -737,7 +757,7 @@ class Message {
           return 'n/a';
         } // return nothing on error
       },
-      '(stream|#|title)': async function (filter) {
+      '(stream|#|title)': async function (filter: any) {
         const channel = filter.replace('(stream|', '').replace('|title)', '');
 
         const token = await oauth.botAccessToken;
@@ -768,7 +788,7 @@ class Message {
           return 'n/a';
         } // return nothing on error
       },
-      '(stream|#|viewers)': async function (filter) {
+      '(stream|#|viewers)': async function (filter: any) {
         const channel = filter.replace('(stream|', '').replace('|viewers)', '');
 
         const token = await oauth.botAccessToken;
@@ -877,7 +897,7 @@ class Message {
     }
   }
 
-  async parseMessageCommand (filters) {
+  async parseMessageCommand (filters: { [filter: string]: (filter: any) => Promise<any> }) {
     if (this.message.trim().length === 0) {
       return;
     }
@@ -900,7 +920,7 @@ class Message {
     }
   }
 
-  async parseMessageOnline (filters) {
+  async parseMessageOnline (filters: { [filter: string]: (filter: any) => Promise<any> }) {
     if (this.message.trim().length === 0) {
       return;
     }
@@ -927,7 +947,7 @@ class Message {
     }
   }
 
-  async parseMessageEval (filters) {
+  async parseMessageEval (filters: { [filter: string]: (filter: any) => Promise<any> }) {
     if (this.message.trim().length === 0) {
       return;
     }
@@ -954,7 +974,7 @@ class Message {
     }
   }
 
-  async parseMessageVariables (filters, removeWhenEmpty = true) {
+  async parseMessageVariables (filters: { [filter: string]: (filter: any) => Promise<any> }, removeWhenEmpty = true) {
     if (this.message.trim().length === 0) {
       return;
     }
@@ -980,7 +1000,7 @@ class Message {
     }
   }
 
-  async parseMessageEach (filters, removeWhenEmpty = true) {
+  async parseMessageEach (filters: { [filter: string]: (filter: any) => Promise<any> }, removeWhenEmpty = true) {
     if (this.message.trim().length === 0) {
       return;
     }

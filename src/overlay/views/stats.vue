@@ -64,7 +64,7 @@ export default class StatsOverlay extends Vue {
   }
 
   refresh () {
-    this.socket.emit('get', (cb) => {
+    this.socket.emit('get', (cb: any) => {
       this.stats = cb
     })
   }

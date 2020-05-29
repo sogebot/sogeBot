@@ -15,7 +15,6 @@ import { adminEndpoint } from './helpers/socket';
 
 import { getRepository } from 'typeorm';
 import { User } from './database/entity/user';
-import { Variable } from './database/entity/variable';
 import { Event, EventInterface } from './database/entity/event';
 import api from './api';
 import oauth from './oauth';
@@ -102,10 +101,10 @@ class Events extends Core {
     }
   }
 
-  public async fire(eventId, attributes) {
+  public async fire(eventId: string, attributes: Events.Attributes): Promise<void> {
     attributes = _.clone(attributes) || {};
 
-    if (!_.isNil(_.get(attributes, 'username', null))) {
+    if (attributes.username !== null && typeof attributes.username !== 'undefined') {
       const user = attributes.userId
         ? await getRepository(User).findOne({ userId: attributes.userId })
         : await getRepository(User).findOne({ username: attributes.username });
@@ -135,7 +134,8 @@ class Events extends Core {
           userId: Number(await api.getIdFromTwitch(attributes.recipient)),
           username: attributes.recipient,
         });
-        return this.fire(eventId, attributes);
+        this.fire(eventId, attributes);
+        return;
       }
 
       // add is object
@@ -149,7 +149,8 @@ class Events extends Core {
       };
     }
     if (_.get(attributes, 'reset', false)) {
-      return this.reset(eventId);
+      this.reset(eventId);
+      return;
     }
 
     for (const event of (await getRepository(Event).find({
@@ -180,13 +181,13 @@ class Events extends Core {
   }
 
   // set triggered attribute to empty object
-  public async reset(eventId) {
+  public async reset(eventId: string) {
     for (const event of await getRepository(Event).find({ name: eventId })) {
       await getRepository(Event).save({...event, triggered: {}});
     }
   }
 
-  public async fireCreateAClip(operation, attributes) {
+  public async fireCreateAClip(operation: Events.OperationDefinitions) {
     const cid = await api.createClip({ hasDelay: operation.hasDelay });
     if (cid) { // OK
       if (Boolean(operation.announce) === true) {
@@ -200,24 +201,24 @@ class Events extends Core {
     }
   }
 
-  public async fireCreateAClipAndPlayReplay(operation, attributes) {
-    const cid = await events.fireCreateAClip(operation, attributes);
+  public async fireCreateAClipAndPlayReplay(operation: Events.OperationDefinitions, attributes: Events.Attributes) {
+    const cid = await events.fireCreateAClip(operation);
     if (cid) { // clip created ok
       clips.showClip(cid);
     }
   }
 
-  public async fireBotWillJoinChannel(operation, attributes) {
+  public async fireBotWillJoinChannel() {
     tmi.client.bot?.chat.join('#' + oauth.broadcasterUsername);
   }
 
-  public async fireBotWillLeaveChannel(operation, attributes) {
+  public async fireBotWillLeaveChannel() {
     tmi.part('bot');
     // force all users offline
     await getRepository(User).update({}, { isOnline: false });
   }
 
-  public async fireStartCommercial(operation, attributes) {
+  public async fireStartCommercial(operation: Events.OperationDefinitions) {
     const cid = oauth.channelId;
     const url = `https://api.twitch.tv/kraken/channels/${cid}/commercial`;
 
@@ -238,25 +239,25 @@ class Events extends Core {
     });
   }
 
-  public async fireEmoteExplosion(operation, attributes) {
-    emotes.explode(operation.emotesToExplode.split(' '));
+  public async fireEmoteExplosion(operation: Events.OperationDefinitions) {
+    emotes.explode(String(operation.emotesToExplode).split(' '));
   }
 
-  public async fireEmoteFirework(operation, attributes) {
-    emotes.firework(operation.emotesToFirework.split(' '));
+  public async fireEmoteFirework(operation: Events.OperationDefinitions) {
+    emotes.firework(String(operation.emotesToFirework).split(' '));
   }
 
-  public async firePlaySound(operation, attributes) {
+  public async firePlaySound(operation: Events.OperationDefinitions) {
     // attr.sound can be filename or url
-    let sound = operation.urlOfSoundFile;
+    let sound = String(operation.urlOfSoundFile);
     if (!_.includes(sound, 'http')) {
       sound = 'dist/soundboard/' + sound + '.mp3';
     }
     ioServer?.emit('play-sound', sound);
   }
 
-  public async fireRunCommand(operation, attributes) {
-    let command = operation.commandToRun;
+  public async fireRunCommand(operation: Events.OperationDefinitions, attributes: Events.Attributes) {
+    let command = String(operation.commandToRun);
     for (const key of Object.keys(attributes).sort((a, b) => a.length - b.length)) {
       const val = attributes[key];
       if (_.isObject(val) && _.size(val) === 0) {
@@ -287,12 +288,12 @@ class Events extends Core {
           message: command,
         },
         skip: false,
-        quiet: _.get(operation, 'isCommandQuiet', false),
+        quiet: !!_.get(operation, 'isCommandQuiet', false),
       });
     }
   }
 
-  public async fireSendChatMessageOrWhisper(operation, attributes, whisper) {
+  public async fireSendChatMessageOrWhisper(operation: Events.OperationDefinitions, attributes: Events.Attributes, whisper: boolean): Promise<void> {
     const username = _.isNil(attributes.username) ? getOwner() : attributes.username;
     let userId = attributes.userId;
     const userObj = await getRepository(User).findOne({ username });
@@ -308,12 +309,12 @@ class Events extends Core {
       return;
     }
 
-    let message = operation.messageToSend;
+    let message = String(operation.messageToSend);
     const atUsername = tmi.showWithAt;
 
-    attributes = flatten(attributes);
-    for (const key of Object.keys(attributes).sort((a, b) => a.length - b.length)) {
-      let val = attributes[key];
+    const flattenAttributes = flatten(attributes);
+    for (const key of Object.keys(flattenAttributes).sort((a, b) => a.length - b.length)) {
+      let val = flattenAttributes[key];
       if (_.isObject(val) && _.size(val) === 0) {
         continue;
       } // skip empty object
@@ -327,7 +328,7 @@ class Events extends Core {
       sender: {
         badges: {},
         emotes: [],
-        userId,
+        userId: Number(userId),
         username,
         displayName: userObj?.displayname || username,
         color: '',
@@ -340,26 +341,26 @@ class Events extends Core {
     }, whisper ? 'whisper' : 'chat');
   }
 
-  public async fireSendWhisper(operation, attributes) {
+  public async fireSendWhisper(operation: Events.OperationDefinitions, attributes: Events.Attributes) {
     events.fireSendChatMessageOrWhisper(operation, attributes, true);
   }
 
-  public async fireSendChatMessage(operation, attributes) {
+  public async fireSendChatMessage(operation: Events.OperationDefinitions, attributes: Events.Attributes) {
     events.fireSendChatMessageOrWhisper(operation, attributes, false);
   }
 
-  public async fireIncrementCustomVariable(operation, attributes) {
+  public async fireIncrementCustomVariable(operation: Events.OperationDefinitions) {
     const customVariableName = operation.customVariable;
-    const numberToIncrement = operation.numberToIncrement;
+    const numberToIncrement = Number(operation.numberToIncrement);
 
     // check if value is number
-    let currentValue = await customvariables.getValueOf('$_' + customVariableName);
+    let currentValue: string | number = await customvariables.getValueOf('$_' + customVariableName);
     if (!_.isFinite(parseInt(currentValue, 10))) {
-      currentValue = numberToIncrement;
+      currentValue = String(numberToIncrement);
     } else {
-      currentValue = String(parseInt(currentValue, 10) - parseInt(numberToIncrement, 10));
+      currentValue = String(parseInt(currentValue, 10) - numberToIncrement);
     }
-    await customvariables.setValueOf(customVariableName, currentValue, {});
+    await customvariables.setValueOf(String(customVariableName), currentValue, {});
 
     // Update widgets and titles
     if (custom_variables.socket) {
@@ -369,20 +370,20 @@ class Events extends Core {
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = api.rawStatus;
     if (title.match(regexp)) {
-      api.setTitleAndGame(null, {});
+      api.setTitleAndGame({});
     }
   }
 
-  public async fireDecrementCustomVariable(operation, attributes) {
-    const customVariableName = operation.customVariable;
-    const numberToDecrement = operation.numberToDecrement;
+  public async fireDecrementCustomVariable(operation: Events.OperationDefinitions) {
+    const customVariableName = String(operation.customVariable);
+    const numberToDecrement = Number(operation.numberToDecrement);
 
     // check if value is number
     let currentValue = await customvariables.getValueOf('$_' + customVariableName);
     if (!_.isFinite(parseInt(currentValue, 10))) {
       currentValue = String(numberToDecrement * -1);
     } else {
-      currentValue = String(parseInt(currentValue, 10) - parseInt(numberToDecrement, 10));
+      currentValue = String(parseInt(currentValue, 10) - numberToDecrement);
     }
     await customvariables.setValueOf(customVariableName, currentValue, {});
 
@@ -393,11 +394,11 @@ class Events extends Core {
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = api.rawStatus;
     if (title.match(regexp)) {
-      api.setTitleAndGame(null, {});
+      api.setTitleAndGame({});
     }
   }
 
-  public async everyXMinutesOfStream(event: EventInterface, attributes) {
+  public async everyXMinutesOfStream(event: EventInterface) {
     // set to Date.now() because 0 will trigger event immediatelly after stream start
     const shouldSave = _.get(event, 'triggered.runEveryXMinutes', 0) === 0 || typeof _.get(event, 'triggered.runEveryXMinutes', 0) !== 'number';
     event.triggered.runEveryXMinutes = _.get(event, 'triggered.runEveryXMinutes', Date.now());
@@ -410,20 +411,20 @@ class Events extends Core {
     return shouldTrigger;
   }
 
-  public async checkRaid(event: EventInterface, attributes) {
+  public async checkRaid(event: EventInterface, attributes: Events.Attributes) {
     event.definitions.viewersAtLeast = Number(event.definitions.viewersAtLeast); // force Integer
     const shouldTrigger = (attributes.viewers >= event.definitions.viewersAtLeast);
     return shouldTrigger;
   }
 
-  public async checkHosted(event: EventInterface, attributes) {
+  public async checkHosted(event: EventInterface, attributes: Events.Attributes) {
     event.definitions.viewersAtLeast = Number(event.definitions.viewersAtLeast); // force Integer
     const shouldTrigger = (attributes.viewers >= event.definitions.viewersAtLeast)
                         && ((!attributes.autohost && event.definitions.ignoreAutohost as boolean) || !(event.definitions.ignoreAutohost as boolean));
     return shouldTrigger;
   }
 
-  public async checkStreamIsRunningXMinutes(event: EventInterface, attributes) {
+  public async checkStreamIsRunningXMinutes(event: EventInterface) {
     if (!api.isStreamOnline) {
       return false;
     }
@@ -437,7 +438,7 @@ class Events extends Core {
     return shouldTrigger;
   }
 
-  public async checkNumberOfViewersIsAtLeast(event: EventInterface, attributes) {
+  public async checkNumberOfViewersIsAtLeast(event: EventInterface) {
     event.triggered.runInterval = _.get(event, 'triggered.runInterval', 0);
 
     event.definitions.runInterval = Number(event.definitions.runInterval); // force Integer
@@ -455,7 +456,7 @@ class Events extends Core {
     return shouldTrigger;
   }
 
-  public async checkCommandSendXTimes(event: EventInterface, attributes) {
+  public async checkCommandSendXTimes(event: EventInterface, attributes: Events.Attributes) {
     const regexp = new RegExp(`^${event.definitions.commandToWatch}\\s`, 'i');
 
     let shouldTrigger = false;
@@ -481,7 +482,7 @@ class Events extends Core {
     return shouldTrigger;
   }
 
-  public async checkKeywordSendXTimes(event: EventInterface, attributes) {
+  public async checkKeywordSendXTimes(event: EventInterface, attributes: Events.Attributes) {
     const regexp = new RegExp(`${event.definitions.keywordToWatch}`, 'gi');
 
     let shouldTrigger = false;
@@ -514,7 +515,7 @@ class Events extends Core {
     return shouldTrigger;
   }
 
-  public async checkDefinition(event: EventInterface, attributes) {
+  public async checkDefinition(event: EventInterface, attributes: Events.Attributes) {
     const foundEvent = this.supportedEventsList.find((o) => o.id === event.name);
     if (!foundEvent || !foundEvent.check) {
       return true;
@@ -522,18 +523,12 @@ class Events extends Core {
     return foundEvent.check(event, attributes);
   }
 
-  public async checkFilter(event: EventInterface, attributes) {
+  public async checkFilter(event: EventInterface, attributes: Events.Attributes) {
     if (event.filter.trim().length === 0) {
       return true;
     }
 
-    // get custom variables
-    const customVariablesDb = await getRepository(Variable).find();
-    const customVariables = {};
-    for (const cvar of customVariablesDb) {
-      customVariables[cvar.variableName] = cvar.currentValue;
-    }
-
+    const customVariables = customvariables.getAll();
     const toEval = `(function evaluation () { return ${event.filter} })()`;
     const context = {
       _,

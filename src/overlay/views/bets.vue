@@ -47,7 +47,7 @@ export default class BetsOverlay extends Vue {
     this.refresh();
   }
 
-  getPercentage(index) {
+  getPercentage(index: number) {
     if (this.currentBet && this.currentBet.participations.length > 0) {
       return this.currentBet.participations
         .filter(o => Number(o.optionIdx) === Number(index)).length / (this.currentBet.participations.length / 100);
@@ -56,7 +56,7 @@ export default class BetsOverlay extends Vue {
     }
   }
 
-  getColor(index) {
+  getColor(index: number): string {
     if (typeof this.colors[index] === 'undefined') {
       return this.getColor(index - this.colors.length);
     } else {
@@ -65,7 +65,7 @@ export default class BetsOverlay extends Vue {
   }
 
   refresh() {
-    this.socket.emit('data', (currentBet) => {
+    this.socket.emit('data', (currentBet: Required<BetsInterface>) => {
       this.currentBet = currentBet ?? null;
       console.log({currentBet});
       setTimeout(() => this.refresh(), 5000)

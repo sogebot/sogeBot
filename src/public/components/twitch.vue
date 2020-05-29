@@ -36,7 +36,7 @@ export default class navbar extends Vue {
   theme = 'light';
 
   mounted() {
-    this.socket.emit('room', (err, room) => {
+    this.socket.emit('room', (err: string | null, room: string) => {
       this.room = room;
     })
 

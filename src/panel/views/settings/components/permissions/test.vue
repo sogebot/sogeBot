@@ -81,7 +81,7 @@
       return data;
     },
     watch: {
-      inputUsername(val) {
+      inputUsername(val: string) {
         // on change reset status
         this.status = {}
         this.partialStatus = {}
@@ -89,7 +89,7 @@
       }
     },
     methods: {
-      testUser(val) {
+      testUser(val: string) {
         this.isTesting = true
         const state = uuid()
         this.state = state
@@ -100,7 +100,7 @@
         if (val.trim().length === 0) {
            this.isTesting = false;
         } else {
-          this.socket.emit('test.user', { pid: this.$route.params.id, value: val, state }, (err, r) => {
+          this.socket.emit('test.user', { pid: this.$route.params.id, value: val, state }, (err: string | null, r: { state: string; partial: boolean; status: { access: boolean } }) => {
             if (err) {
               return console.error(err);
             }
@@ -116,6 +116,3 @@
     }
   })
 </script>
-
-<style scoped>
-</style>

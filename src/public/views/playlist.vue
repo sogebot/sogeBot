@@ -25,6 +25,7 @@ import { Vue, Component, Watch } from 'vue-property-decorator';
 import VueScrollTo from 'vue-scrollto';
 
 import { getSocket } from 'src/panel/helpers/socket';
+import { SongPlaylistInterface } from '../../bot/database/entity/song';
 
 @Component({
   components: {
@@ -34,11 +35,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 export default class playlist extends Vue {
   socket = getSocket('/systems/songs', true);
 
-  playlist: {
-    endTime: number; forceVolume: boolean; lastPlayedAt: number; length_seconds: number;
-    loudness: number; seed: number; startTime: number; title: string; videoId: string;
-    volume: number; _id: string;
-  }[] = [];
+  playlist: SongPlaylistInterface[] = [];
 
   currentPage = 1;
   perPage = 25;
@@ -63,7 +60,7 @@ export default class playlist extends Vue {
   @Watch('currentPage')
   refreshPlaylist() {
     this.state.loading.playlist = this.$state.progress;
-    this.socket.emit('find.playlist', { page: (this.currentPage - 1) }, (err, items, count) => {
+    this.socket.emit('find.playlist', { page: (this.currentPage - 1) }, (err: string | null, items: SongPlaylistInterface[], count: number) => {
       if (err) {
         return console.error(err);
       }
@@ -84,11 +81,11 @@ export default class playlist extends Vue {
     })
   }
 
-  generateThumbnail(videoId) {
+  generateThumbnail(videoId: string) {
     return `https://img.youtube.com/vi/${videoId}/1.jpg`
   }
 
-  linkTo(item) {
+  linkTo(item: SongPlaylistInterface) {
     console.debug('Clicked', item.videoId);
     window.location.href = `http://youtu.be/${item.videoId}`;
   }

@@ -134,6 +134,9 @@ import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import { CarouselInterface } from 'src/bot/database/entity/carousel';
 
+import { Route } from 'vue-router'
+import { NextFunction } from 'express';
+
 import { Validations } from 'vuelidate-property-decorators';
 import { required, minValue } from 'vuelidate/lib/validators'
 
@@ -216,7 +219,7 @@ export default class carouselOverlayEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
 
-      this.socket.emit('carousel::save', this.item, (err, data) => {
+      this.socket.emit('carousel::save', this.item, (err: string | null, data: CarouselInterface) => {
         if (err) {
           return console.error(err);
         }
@@ -231,7 +234,7 @@ export default class carouselOverlayEdit extends Vue {
   }
 
   del() {
-    this.socket.emit('generic::deleteById', this.item.id, (err) => {
+    this.socket.emit('generic::deleteById', this.item.id, (err: string | null) => {
       if (err) {
         return console.error(err);
       }
@@ -241,7 +244,7 @@ export default class carouselOverlayEdit extends Vue {
 
   created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('generic::getOne', this.$route.params.id, (err, item) => {
+    this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, item: CarouselInterface) => {
       if (err) {
         return console.error(err);
       }
@@ -252,7 +255,7 @@ export default class carouselOverlayEdit extends Vue {
     })
   }
 
-  beforeRouteUpdate(to, from, next) {
+  beforeRouteUpdate(to: Route, from: Route, next: NextFunction) {
     if (this.state.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
       if (!isOK) {
@@ -265,7 +268,7 @@ export default class carouselOverlayEdit extends Vue {
     }
   }
 
-  beforeRouteLeave(to, from, next) {
+  beforeRouteLeave(to: Route, from: Route, next: NextFunction) {
     if (this.state.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
       if (!isOK) {

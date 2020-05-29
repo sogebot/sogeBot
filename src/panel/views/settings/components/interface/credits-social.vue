@@ -23,7 +23,9 @@ import { orderBy } from 'lodash-es';
 
 @Component({})
 export default class configurableList extends Vue {
-  @Prop() readonly value: any;
+  @Prop() readonly value!: {
+    order: number; text: string;
+  }[];
 
   orderBy = orderBy;
 
@@ -58,7 +60,7 @@ export default class configurableList extends Vue {
     this.$emit('update', { value: this.currentValues })
   }
 
-  remove(order) {
+  remove(order: number) {
     this.currentValues = this.currentValues.filter(o => o.order !== order)
   }
 

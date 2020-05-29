@@ -41,7 +41,7 @@ export default class App extends Vue {
 
   mounted() {
     this.$emit('mounted')
-    this.socket.on('joinpart', (data) => {
+    this.socket.on('joinpart', (data: { users: string[], type: 'join' | 'part' }) => {
       if (data.type === 'join') {
         for (const [ index, username ] of Object.entries(data.users)) {
           if (!this.list.find(o => o.username === username)) {

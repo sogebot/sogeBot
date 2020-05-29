@@ -49,6 +49,7 @@ import VueMoment from 'vue-moment'
 import momentTimezone from 'moment-timezone'
 import { getSocket } from 'src/panel/helpers/socket';
 import JsonViewer from 'vue-json-viewer'
+import { PollInterface } from '../../bot/database/entity/poll';
 
 require('moment/locale/cs')
 require('moment/locale/ru')
@@ -91,7 +92,7 @@ export default class PollsOverlay extends Vue {
   created () {
     this.refresh()
     this.interval.push(setInterval(() => this.currentTime = Date.now(), 100));
-    this.socket.emit('getVoteCommand', (cmd) => this.voteCommand = cmd)
+    this.socket.emit('getVoteCommand', (cmd: string) => this.voteCommand = cmd)
   }
 
   get inactivityTime() {
@@ -110,7 +111,7 @@ export default class PollsOverlay extends Vue {
   }
 
   @Watch('votes')
-  votesWatcher (val, old) {
+  votesWatcher (val: any[], old: any[]) {
     if (this.currentVote && this.currentVote.options !== 'undefined') {
       for (let idx of Object.keys(this.currentVote.options)) {
         let count = 0
@@ -125,11 +126,11 @@ export default class PollsOverlay extends Vue {
     }
   }
 
-  getTheme (theme) {
+  getTheme (theme: string) {
     return theme.replace(/ /g, '_').toLowerCase().replace(/\W/g, '')
   }
 
-  getPercentage (index, toFixed) {
+  getPercentage (index: number, toFixed: number) {
     let votes = 0
     for (let i = 0, length = this.votes.length; i < length; i++) {
       if (this.votes[i].option === index) votes += this.votes[i].votes
@@ -138,7 +139,7 @@ export default class PollsOverlay extends Vue {
   }
 
   refresh () {
-    this.socket.emit('data', (cb, votes, settings) => {
+    this.socket.emit('data', (cb: PollInterface, votes: any[], settings: { display: string, hideAfterInactivity: boolean, inativityTime: number, align: string }) => {
       // force show if new vote
       if (this.currentVote === null) {
         this.lastUpdatedAt = Date.now()

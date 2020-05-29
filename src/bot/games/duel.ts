@@ -107,7 +107,7 @@ class Duel extends Game {
   }
 
   @command('!duel bank')
-  async bank (opts) {
+  async bank (opts: CommandOptions) {
     const users = await getRepository(DuelEntity).find();
     const bank = users.map((o) => o.tickets).reduce((a, b) => a + b, 0);
 
@@ -122,7 +122,7 @@ class Duel extends Game {
   }
 
   @command('!duel')
-  async main (opts) {
+  async main (opts: CommandOptions) {
     const responses: CommandResponse[] = [];
     let bet;
 
@@ -134,7 +134,7 @@ class Duel extends Game {
       }
 
       const pointsOfUser = await points.getPointsOf(opts.sender.userId);
-      bet = parsed[1] === 'all' ? pointsOfUser : parsed[1];
+      bet = parsed[1] === 'all' ? pointsOfUser : Number(parsed[1]);
 
       if (pointsOfUser === 0) {
         throw Error(ERROR_ZERO_BET);
@@ -151,7 +151,7 @@ class Duel extends Game {
       const isNewDuelist = !userFromDB;
       if (userFromDB) {
         await getRepository(DuelEntity).save({...userFromDB, tickets: Number(userFromDB.tickets) + Number(bet) });
-        await points.decrement({ userId: opts.sender.userId }, parseInt(bet, 10));
+        await points.decrement({ userId: opts.sender.userId }, bet);
       } else {
         // check if under gambling cooldown
         const cooldown = this.cooldown;
@@ -167,7 +167,7 @@ class Duel extends Game {
             username: opts.sender.username,
             tickets: Number(bet),
           });
-          await points.decrement({ userId: opts.sender.userId }, parseInt(bet, 10));
+          await points.decrement({ userId: opts.sender.userId }, bet);
         } else {
           const response = prepare('gambling.fightme.cooldown', {
             minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60), 'core.minutes'),
@@ -208,7 +208,7 @@ class Duel extends Game {
           break;
         case ERROR_NOT_ENOUGH_POINTS:
           responses.push({ response: prepare('gambling.duel.notEnoughPoints', {
-            pointsName: await points.getPointsName(bet),
+            pointsName: await points.getPointsName(bet || 0),
             points: bet,
           }), ...opts });
           break;

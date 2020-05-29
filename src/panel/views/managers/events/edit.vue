@@ -159,7 +159,7 @@
         eventId: string,
         socket: any,
         event: EventInterface,
-        operationsClone: EventOperationInterface[], // used as oldVal to check what actually ichanged
+        operationsClone: Omit<EventOperationInterface, 'event'>[], // used as oldVal to check what actually ichanged
         watchOperationChange: boolean,
         watchEventChange: boolean,
 
@@ -275,7 +275,7 @@
     },
     watch: {
       'event.operations': {
-        handler: function (val) {
+        handler: function (val: Omit<EventOperationInterface, 'event'>[]) {
           for (const v of val) {
             console.log('event', v)
           }
@@ -299,11 +299,8 @@
             const defaultOperation = this.supported.operations.find((o) => o.id === val[i].name)
             if (defaultOperation) {
               if (Object.keys(defaultOperation.definitions).length > 0) {
-                val[i].definitions = cloneDeep(defaultOperation.definitions);
-                for (const key of Object.keys(val[i].definitions)) {
-                  if (Array.isArray(val[i].definitions[key])) {
-                    val[i].definitions[key] = val[i].definitions[key][0] // select first option by default
-                  }
+                for (const [key, value] of Object.entries(defaultOperation.definitions)) {
+                  val[i].definitions[key] = Array.isArray(value) ? value[0] : value; // select first option by default
                 }
                 this.$forceUpdate()
               }
@@ -342,7 +339,7 @@
     },
     mounted() {
       if (this.$route.params.id) {
-        this.socket.emit('generic::getOne', this.$route.params.id, (err, event: Required<EventInterface>) => {
+        this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, event: Required<EventInterface>) => {
           if (err) {
             return console.error(err);
           }
@@ -352,8 +349,7 @@
             event.operations.push({
               id: uuid(),
               name: 'do-nothing',
-              definitions: {},
-              event,
+              definitions: {}
             });
           }
 
@@ -373,7 +369,7 @@
         });
       }
 
-      this.socket.emit('list.supported.operations', (err, data: Events.SupportedOperation[]) => {
+      this.socket.emit('list.supported.operations', (err: string | null, data: Events.SupportedOperation[]) => {
         if (err) return console.error(err);
         data.push({ // add do nothing - its basicaly delete of operation
           id: 'do-nothing',
@@ -402,13 +398,12 @@
             id: uuid(),
             name: 'do-nothing',
             definitions: {},
-            event: this.event,
           });
         }
 
       })
 
-      this.socket.emit('list.supported.events', (err, data: Events.SupportedEvent[]) => {
+      this.socket.emit('list.supported.events', (err: string | null, data: Events.SupportedEvent[]) => {
         if (err) return console.error(err);
 
         for (const d of data) {
@@ -449,11 +444,11 @@
       })
     },
     methods: {
-      getDefinitionValidation(key) {
+      getDefinitionValidation(key: string) {
         return get(this, '$v.event.definitions.' + key, { $invalid: false });
       },
       del: function () {
-        this.socket.emit('events::remove', this.event, (err) => {
+        this.socket.emit('events::remove', this.event, (err: string | null) => {
           if (err) {
             return console.error(err);
           }
@@ -462,7 +457,7 @@
       },
       save() {
         this.state.save = 1;
-        this.socket.emit('events::save', this.event, (err, eventId) => {
+        this.socket.emit('events::save', this.event, (err: string | null, eventId: string) => {
           if (err) {
             this.state.save = 3
           } else {

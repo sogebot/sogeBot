@@ -53,7 +53,7 @@ class Randomizer extends Registry {
       }
     });
     adminEndpoint(this.nsp, 'randomizer::startSpin', async () => {
-      this.socket.emit('spin');
+      this.socket?.emit('spin');
     });
     adminEndpoint(this.nsp, 'randomizer::showById', async (id, cb) => {
       try {
@@ -136,10 +136,10 @@ class Randomizer extends Registry {
         await getRepository(RandomizerEntity).update({}, { isShown: false });
         await getRepository(RandomizerEntity).update({ id: randomizer.id }, { isShown: !randomizer.isShown });
         setTimeout(() => {
-          this.socket.emit('spin');
+          this.socket?.emit('spin');
         }, 5000);
       } else {
-        this.socket.emit('spin');
+        this.socket?.emit('spin');
       }
     }
 

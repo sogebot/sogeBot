@@ -1,8 +1,15 @@
+
 type UserStateTags = import('twitch-js').UserStateTags;
 type KnownNoticeMessageIds = import('twitch-js').KnownNoticeMessageIds;
 
 type DiscordJsTextChannel = import('discord.js').TextChannel;
 type DiscordJsUser = import('discord.js').User;
+
+type currency = 'USD' | 'AUD' | 'BGN' | 'BRL' | 'CAD' | 'CHF' | 'CNY' | 'CZK' | 'DKK' | 'EUR' | 'GBP' | 'HKD' | 'HRK' | 'HUF' | 'IDR' | 'ILS' | 'INR' | 'ISK' | 'JPY' | 'KRW' | 'MXN' | 'MYR' | 'NOK' | 'NZD' | 'PHP' | 'PLN' | 'RON' | 'RUB' | 'SEK' | 'SGD' | 'THB' | 'TRY' | 'ZAR';
+
+type TimestampObject = {
+  hours: number; minutes: number; seconds: number
+};
 
 interface Command {
   name: string;
@@ -37,7 +44,7 @@ type onEventTip = {
   username: string;
   amount: number;
   message: string;
-  currency: string;
+  currency: currency;
   timestamp: number;
 };
 

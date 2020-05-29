@@ -39,7 +39,7 @@ class Gamble extends Game {
   jackpotValue = 0;
 
   @command('!gamble')
-  async main (opts): Promise<CommandResponse[]> {
+  async main (opts: CommandOptions): Promise<CommandResponse[]> {
     let points, message;
 
     opts.sender['message-type'] = 'chat'; // force responses to chat
@@ -50,9 +50,9 @@ class Gamble extends Game {
       }
 
       const pointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
-      points = parsed[1] === 'all' ? pointsOfUser : parsed[1];
+      points = parsed[1] === 'all' ? pointsOfUser : Number(parsed[1]);
 
-      if (parseInt(points, 10) === 0) {
+      if (points === 0) {
         throw Error(ERROR_ZERO_BET);
       }
       if (pointsOfUser < points) {
@@ -62,9 +62,9 @@ class Gamble extends Game {
         throw Error(ERROR_MINIMAL_BET);
       }
 
-      await pointsSystem.decrement({ userId: opts.sender.userId }, parseInt(points, 10));
+      await pointsSystem.decrement({ userId: opts.sender.userId }, points);
       if (this.enableJackpot && _.random(0, 100, false) <= this.chanceToTriggerJackpot) {
-        const incrementPointsWithJackpot = (parseInt(points, 10) * 2) + this.jackpotValue;
+        const incrementPointsWithJackpot = (points * 2) + this.jackpotValue;
         await getRepository(User).increment({ userId: opts.sender.userId }, 'points', incrementPointsWithJackpot);
         const currentPointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
         message = prepare('gambling.gamble.winJackpot', {
@@ -75,7 +75,7 @@ class Gamble extends Game {
         });
         this.jackpotValue = 0;
       } else  if (_.random(0, 100, false) <= this.chanceToWin) {
-        await getRepository(User).increment({ userId: opts.sender.userId }, 'points', parseInt(points, 10) * 2);
+        await getRepository(User).increment({ userId: opts.sender.userId }, 'points', points * 2);
         const updatedPoints = await pointsSystem.getPointsOf(opts.sender.userId);
         message = prepare('gambling.gamble.win', {
           pointsName: await pointsSystem.getPointsName(updatedPoints),
@@ -110,7 +110,7 @@ class Gamble extends Game {
           return [{ response: translate('gambling.gamble.notEnoughOptions'), ...opts }];
         case ERROR_NOT_ENOUGH_POINTS:
           message = prepare('gambling.gamble.notEnoughPoints', {
-            pointsName: await pointsSystem.getPointsName(points),
+            pointsName: await pointsSystem.getPointsName(points ? Number(points) : 0),
             points: points,
           });
           return [{ response: message, ...opts }];

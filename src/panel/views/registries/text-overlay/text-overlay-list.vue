@@ -82,6 +82,7 @@ library.add(faPencilAlt, faHtml5, faEllipsisH, faEllipsisV);
 
 import 'prismjs'
 import 'prismjs/themes/prism.css'
+import { TextInterface } from '../../../../bot/database/entity/text';
 
 @Component({
   components: {
@@ -90,7 +91,7 @@ import 'prismjs/themes/prism.css'
     'prism': Prism,
   },
   filters: {
-    capitalize(value) {
+    capitalize(value: string) {
       if (!value) return ''
       value = value.toString()
       return value.charAt(0).toUpperCase() + value.slice(1)
@@ -115,7 +116,7 @@ export default class textOverlayList extends Vue {
 
     created() {
       this.state.loaded = false;
-      this.socket.emit('generic::getAll', (err, items) => {
+      this.socket.emit('generic::getAll', (err: string | null, items: TextInterface) => {
         if (err) {
           return console.error(err)
         }
@@ -125,7 +126,7 @@ export default class textOverlayList extends Vue {
       })
     }
 
-    less(value, type) {
+    less(value: string, type: 'js' | 'html' | 'css') {
       const comments = {
         'js': { start: '/*', end: '*/' },
         'css': { start: '/*', end: '*/' },
@@ -140,7 +141,7 @@ export default class textOverlayList extends Vue {
       return value
     }
 
-    toggleShowMore(_id) {
+    toggleShowMore(_id: string) {
       let idx = this.showMore.indexOf(_id)
       if(idx !== -1) {
         this.showMore.splice(idx, 1)
@@ -149,13 +150,13 @@ export default class textOverlayList extends Vue {
       }
     }
 
-    remove(item) {
+    remove(item: TextInterface) {
       this.socket.emit('text::remove', item, () => {
         this.items = this.items.filter(o => o.id != item.id)
       })
     }
 
-    goTo(id) {
+    goTo(id: string) {
       this.$router.push({ name: 'TextOverlayEdit', params: { id } })
     }
 }

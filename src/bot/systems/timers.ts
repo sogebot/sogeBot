@@ -92,7 +92,7 @@ class Timers extends System {
 
   @command('!timers')
   @default_permission(permission.CASTERS)
-  main (opts): CommandResponse[] {
+  main (opts: CommandOptions): CommandResponse[] {
     let url = 'http://sogehige.github.io/sogeBot/#/systems/timers';
     if ((process.env?.npm_package_version ?? 'x.y.z-SNAPSHOT').includes('SNAPSHOT')) {
       url = 'http://sogehige.github.io/sogeBot/#/_master/systems/timers';
@@ -145,26 +145,6 @@ class Timers extends System {
       await getRepository(Timer).save({ ...timer, triggeredAtMessages: linesParsed, triggeredAtTimestamp: Date.now() });
     }
     this.timeouts.timersCheck = global.setTimeout(() => this.check(), SECOND); // this will run check 1s after full check is correctly done
-  }
-
-  async editName (self, socket, data) {
-    if (data.value.length === 0) {
-      await self.unset(self, null, `-name ${data.id}`);
-    } else {
-      const name = data.value.match(/([a-zA-Z0-9_]+)/);
-      if (_.isNil(name)) {
-        return;
-      }
-      await getRepository(Timer).update({ name: data.id }, { name: name[0] });
-    }
-  }
-
-  async editResponse (self, socket, data) {
-    if (data.value.length === 0) {
-      await self.rm(self, null, `-id ${data.id}`);
-    } else {
-      await getRepository(TimerResponse).update({ id: data.id }, { response: data.value });
-    }
   }
 
   @command('!timers set')

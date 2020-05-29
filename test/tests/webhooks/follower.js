@@ -53,7 +53,7 @@ describe('libs/webhooks - follower()', () => {
   });
 
   it('testuser should be in webhooks cache', async () => {
-    assert(webhooks.existsInCache('follow', id));
+    assert(webhooks.existsInCache('follows', id));
   });
 
   it('follow event should be fired only once', async () => {
@@ -74,6 +74,6 @@ describe('libs/webhooks - follower()', () => {
   });
 
   it('testuser should not be in webhooks cache', async () => {
-    assert(!webhooks.existsInCache('follow', 3));
+    assert(!webhooks.existsInCache('follows', 3));
   });
 });

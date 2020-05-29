@@ -29,7 +29,7 @@ declare global {
 @Component({})
 export default class helpbox extends Vue {
   @Prop() readonly value: any;
-  @Prop() readonly title: any;
+  @Prop() readonly title!: string;
 
   voices: { text: string, value: string}[] = [];
   currentValue = this.value;
@@ -56,19 +56,20 @@ export default class helpbox extends Vue {
   }
 
   loadVoices() {
-    this.voices = window.responsiveVoice.getVoices().map(o => {
+    this.voices = window.responsiveVoice.getVoices().map((o: { name: string }) => {
       return { text: o.name, value: o.name }
     });
     this.loading = 2;
   }
 
-  initResponsiveVoice(retry) {
+  initResponsiveVoice(retry = 0) {
     if (typeof window.responsiveVoice === 'undefined') {
       if (retry === 10) {
         this.loading = 1;
         return;
       }
-      return setTimeout(() => this.initResponsiveVoice(retry+1), 200);
+      setTimeout(() => this.initResponsiveVoice(retry+1), 200);
+      return;
     }
     window.responsiveVoice.init();
     this.loadVoices();

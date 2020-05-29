@@ -117,6 +117,7 @@ import { Validate } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators'
 
 import { v4 as uuid } from 'uuid';
+import { TextInterface } from '../../../../bot/database/entity/text';
 
 @Component({
   components: {
@@ -124,7 +125,7 @@ import { v4 as uuid } from 'uuid';
     codemirror,
   },
   filters: {
-    capitalize(value) {
+    capitalize(value: string) {
       if (!value) return ''
       value = value.toString()
       return value.charAt(0).toUpperCase() + value.slice(1)
@@ -191,7 +192,7 @@ export default class textOverlayEdit extends Vue {
     save: 0,
   };
 
-  removeExternalJS(js) {
+  removeExternalJS(js: string) {
     this.external.splice(this.external.indexOf(js), 1)
   }
 
@@ -199,7 +200,7 @@ export default class textOverlayEdit extends Vue {
     // load up from db
     if (this.$route.params.id) {
       this.id = this.$route.params.id
-      this.socket.emit('generic::getOne', { id: this.urlParam('id'), parseText: false }, (err, data) => {
+      this.socket.emit('generic::getOne', { id: this.urlParam('id'), parseText: false }, (err: string | null, data: TextInterface) => {
         if (err) {
           return console.error(err);
         }
@@ -223,7 +224,7 @@ export default class textOverlayEdit extends Vue {
         js: this.js,
         css: this.css,
         external: this.external
-      }, (err) => {
+      }, (err: string | null) => {
         if (err) {
           return console.error(err);
         }
@@ -245,7 +246,7 @@ export default class textOverlayEdit extends Vue {
         css: this.css,
         external: this.external
       }
-      this.socket.emit('text::save', data, (err, data) => {
+      this.socket.emit('text::save', data, (err: string | null, data: TextInterface) => {
         if (err) {
           console.error(err)
           return this.state.save = 3

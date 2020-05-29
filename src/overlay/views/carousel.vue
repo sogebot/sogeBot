@@ -32,7 +32,7 @@ export default class CarouselOverlay extends Vue {
   }
 
   created() {
-    this.socket.emit('generic::getAll', (err, images) => {
+    this.socket.emit('generic::getAll', (err: string | null, images: any[]) => {
       if (err) {
         return console.error(err)
       }
@@ -43,50 +43,50 @@ export default class CarouselOverlay extends Vue {
     }, 100));
   }
 
-  wait (type) {
+  wait (type: string) {
     return new Promise((resolve, reject) => {
       setTimeout(() => resolve(), this.images[this.currentImage][type])
     })
   }
 
   doEnterAnimation() {
-    let animation: any = { opacity: 1 }
+    let animation: any = { opacity: 1 };
 
     // force refresh of styles
-    this.$refs[this.images[this.currentImage].id][0].style.filter = 'blur(0px)'
-    this.$refs[this.images[this.currentImage].id][0].style.top = 0
-    this.$refs[this.images[this.currentImage].id][0].style.left = 0
-    this.$refs[this.images[this.currentImage].id][0].style.opacity = 0
+    (this.$refs[this.images[this.currentImage].id] as HTMLElement[])[0].style.filter = 'blur(0px)';
+    (this.$refs[this.images[this.currentImage].id] as HTMLElement[])[0].style.top = '0';
+    (this.$refs[this.images[this.currentImage].id] as HTMLElement[])[0].style.left = '0';
+    (this.$refs[this.images[this.currentImage].id] as HTMLElement[])[0].style.opacity = '0';
 
     switch (this.images[this.currentImage].animationIn) {
       case 'blurIn':
-        this.$refs[this.images[this.currentImage].id][0].style.filter = 'blur(50px)'
+        (this.$refs[this.images[this.currentImage].id] as HTMLElement[])[0].style.filter = 'blur(50px)';
         animation = { filter: 'blur(0px)', opacity: 1 }
         break
       case 'slideUp':
-        this.$refs[this.images[this.currentImage].id][0].style.opacity = 1
-        this.$refs[this.images[this.currentImage].id][0].style.top = window.innerHeight + 'px'
+        (this.$refs[this.images[this.currentImage].id] as HTMLElement[])[0].style.opacity = '1';
+        (this.$refs[this.images[this.currentImage].id] as HTMLElement[])[0].style.top = window.innerHeight + 'px';
         animation = { top: 0 }
         break
       case 'slideDown':
-        this.$refs[this.images[this.currentImage].id][0].style.opacity = 1
-        this.$refs[this.images[this.currentImage].id][0].style.top = -this.$refs[this.images[this.currentImage].id][0].clientHeight + 'px'
+        (this.$refs[this.images[this.currentImage].id] as HTMLElement[])[0].style.opacity = '1';
+        (this.$refs[this.images[this.currentImage].id] as HTMLElement[])[0].style.top = -(this.$refs[this.images[this.currentImage].id] as HTMLElement[])[0].clientHeight + 'px';
         animation = { top: 0 }
         break
       case 'slideLeft':
-        this.$refs[this.images[this.currentImage].id][0].style.opacity = 1
-        this.$refs[this.images[this.currentImage].id][0].style.left = window.innerWidth + 'px'
+        (this.$refs[this.images[this.currentImage].id] as HTMLElement[])[0].style.opacity = '1';
+        (this.$refs[this.images[this.currentImage].id] as HTMLElement[])[0].style.left = window.innerWidth + 'px';
         animation = { left: 0 }
         break
       case 'slideRight':
-        this.$refs[this.images[this.currentImage].id][0].style.opacity = 1
-        this.$refs[this.images[this.currentImage].id][0].style.left = -this.$refs[this.images[this.currentImage].id][0].clientWidth + 'px'
+        (this.$refs[this.images[this.currentImage].id] as HTMLElement[])[0].style.opacity = '1';
+        (this.$refs[this.images[this.currentImage].id] as HTMLElement[])[0].style.left = -(this.$refs[this.images[this.currentImage].id] as HTMLElement[])[0].clientWidth + 'px';
         animation = { left: 0 }
         break
     }
 
     return new Promise((resolve, reject) => {
-      gsap.to(this.$refs[this.images[this.currentImage].id], {
+      gsap.to((this.$refs[this.images[this.currentImage].id] as HTMLElement[]), {
         duration: this.images[this.currentImage].animationInDuration / 1000,
         ...animation,
         onComplete: () => {
@@ -104,13 +104,13 @@ export default class CarouselOverlay extends Vue {
         animation = { filter: 'blur(50px)', opacity: 0 }
         break
       case 'slideUp':
-        animation = { top: -this.$refs[this.images[this.currentImage].id][0].clientHeight + 'px' }
+        animation = { top: -(this.$refs[this.images[this.currentImage].id] as HTMLElement[])[0].clientHeight + 'px' }
         break
       case 'slideDown':
         animation = { top: window.innerHeight + 'px' }
         break
       case 'slideLeft':
-        animation = { left: -this.$refs[this.images[this.currentImage].id][0].clientWidth + 'px' }
+        animation = { left: -(this.$refs[this.images[this.currentImage].id] as HTMLElement[])[0].clientWidth + 'px' }
         break
       case 'slideRight':
         animation = { left: window.innerWidth + 'px' }
@@ -118,7 +118,7 @@ export default class CarouselOverlay extends Vue {
     }
 
     return new Promise((resolve, reject) => {
-      gsap.to(this.$refs[this.images[this.currentImage].id], {
+      gsap.to((this.$refs[this.images[this.currentImage].id] as HTMLElement[]), {
         duration: this.images[this.currentImage].animationOutDuration / 1000,
         ...animation,
         onComplete: () => {

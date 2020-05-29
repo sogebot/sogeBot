@@ -39,7 +39,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 @Component({})
 export default class configurableList extends Vue {
   @Prop() readonly values: any;
-  @Prop() readonly title: any;
+  @Prop() readonly title!: string;
 
   currentValues = this.values;
   translatedTitle = this.translate(this.title);
@@ -53,7 +53,7 @@ export default class configurableList extends Vue {
     this.$emit('update', this.currentValues);
   }
 
-  removeItem(index) {
+  removeItem(index: number) {
     this.currentValues.splice(index, 1);
   }
 

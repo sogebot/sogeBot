@@ -7,6 +7,8 @@ import Vue from 'vue';
 import VueMoment from 'vue-moment';
 import VueRouter from 'vue-router';
 import Vuelidate from 'vuelidate';
+
+// eslint-disable-next-line
 import LoadScript from 'vue-plugin-load-script';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -74,9 +76,6 @@ declare module 'vue/types/vue' {
     }[];
     $core: {
       name: string;
-      enabled: boolean;
-      areDependenciesEnabled: boolean;
-      isDisabledByEnv: boolean;
     }[];
     $integrations: {
       name: string;
@@ -91,8 +90,8 @@ Vue.use(VueRouter);
 
 const main = async () => {
   // init prototypes
-  Vue.prototype.translate = (v) => translate(v);
-  Vue.prototype.urlParam = (v) => urlParam(v);
+  Vue.prototype.translate = (v: string) => translate(v);
+  Vue.prototype.urlParam = (v: string) => urlParam(v);
   Vue.prototype.$loggedUser = await isUserLoggedIn();
 
   if (Vue.prototype.$loggedUser !== false) {
@@ -193,11 +192,11 @@ const main = async () => {
         return object;
       },
       created() {
-        this.$root.$on('bv::dropdown::show', bvEvent => {
+        this.$root.$on('bv::dropdown::show', (bvEvent: Bootstrap.DropdownsEventHandler<HTMLElement>) => {
           this.dropdownShow(bvEvent);
         });
 
-        this.$root.$on('bv::dropdown::hidden', bvEvent => {
+        this.$root.$on('bv::dropdown::hidden', (bvEvent: Bootstrap.DropdownsEventHandler<HTMLElement>) => {
           this.dropdownHide();
 
           // force unfocus
@@ -210,10 +209,12 @@ const main = async () => {
         this.$moment.locale(get(Vue, 'prototype.configuration.lang', 'en'));
       },
       methods: {
-        clickEvent(event) {
-          if ((typeof event.target.className !== 'string' || !event.target.className.includes('dropdown')) && !this.isDropdownHidden) {
-            console.debug('Clicked outside dropdown', event.target);
-            this.dropdownHide();
+        clickEvent(event: MouseEvent) {
+          if (event.target) {
+            if ((typeof (event.target as HTMLElement).className !== 'string' || !(event.target as HTMLElement).className.includes('dropdown')) && !this.isDropdownHidden) {
+              console.debug('Clicked outside dropdown', event.target);
+              this.dropdownHide();
+            }
           }
         },
         dropdownHide() {
@@ -223,7 +224,7 @@ const main = async () => {
             this.isDropdownHidden = true;
           }
         },
-        dropdownShow(bvEvent, retry = 0) {
+        dropdownShow(bvEvent: Bootstrap.DropdownsEventHandler<HTMLElement>) {
           if (!this.isDropdownHidden) {
             this.dropdownHide();
           }
@@ -231,11 +232,11 @@ const main = async () => {
           this.isDropdownHidden = false;
           const child = bvEvent.target;
           child.style.position = 'absolute';
-          child.style['z-index'] = 99999999;
+          child.style.zIndex = '99999999';
           child.remove();
           document.getElementsByTagName('BODY')[0].appendChild(child);
           this.dropdown = child;
-          this.dropdownVue = bvEvent.vueTarget;
+          this.dropdownVue = (bvEvent as any).vueTarget;
           this.dropdownVue.show();
         },
       },

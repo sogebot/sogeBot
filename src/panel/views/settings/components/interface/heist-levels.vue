@@ -35,12 +35,13 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import type { Level } from 'src/bot/games/heist';
 
 @Component({})
-export default class heistResults extends Vue {
-  @Prop() readonly value: any;
+export default class heistLevels extends Vue {
+  @Prop() readonly value!: Level[];
 
-  w_levels: any = this.value.sort((a, b) => {
+  w_levels = this.value.sort((a, b) => {
     return a.maxUsers - b.maxUsers;
   })
 
@@ -58,7 +59,7 @@ export default class heistResults extends Vue {
     });
   }
 
-  removeLevel(index) {
+  removeLevel(index: number) {
     this.w_levels.splice(index, 1);
   }
 }

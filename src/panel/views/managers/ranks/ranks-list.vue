@@ -174,7 +174,7 @@ export default class ranksList extends Vue {
 
   created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('generic::getAll', (err, items) => {
+    this.socket.emit('generic::getAll', (err: string | null, items: RankInterface[]) => {
       if (err) {
         return console.error(err);
       }
@@ -184,18 +184,18 @@ export default class ranksList extends Vue {
     })
   }
 
-  linkTo(item) {
+  linkTo(item: Required<RankInterface>) {
     console.debug('Clicked', item.id);
     this.$router.push({ name: 'ranksManagerEdit', params: { id: item.id } });
   }
 
-  remove(id) {
+  remove(id: string) {
    this.socket.emit('ranks::remove', id, () => {
       this.items = this.items.filter((o) => o.id !== id);
     })
   }
 
-  update(item) {
+  update(item: RankInterface) {
     this.socket.emit('ranks::save', item, () => {});
   }
 }

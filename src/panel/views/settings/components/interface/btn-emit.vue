@@ -13,14 +13,14 @@ import { getSocket } from 'src/panel/helpers/socket';
 @Component({})
 export default class btnEmit extends Vue {
   @Prop() readonly emit: any;
-  @Prop() readonly title: any;
+  @Prop() readonly title!: string;
 
   state: number = 0
 
   emitToBackend() {
     this.state = 1;
     getSocket(`/${this.$route.params.type}/${this.$route.params.id}`)
-      .emit(this.emit, (err, data) => {
+      .emit(this.emit, (err: string | null, data: { do: 'redirect' | 'refresh', opts: string[] }) => {
         if (err) {
           this.state = 2;
           this.$emit('error', err);
@@ -31,7 +31,7 @@ export default class btnEmit extends Vue {
           if (data) {
             // to do eval data
             if (data.do === 'redirect') {
-              window.location = data.opts[0];
+              window.location.assign(data.opts[0]);
             } else if (data.do === 'refresh') {
               window.location.reload();
             }

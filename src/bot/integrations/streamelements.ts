@@ -15,6 +15,30 @@ import eventlist from '../overlays/eventlist';
 import api from '../api.js';
 import users from '../users';
 
+type StreamElementsEvent = {
+  _id: string;
+  channel: string;
+  type: 'cheer' | 'follow' | 'host' | 'raid' | 'subscriber' | 'tip';
+  provider: 'twitch' | 'facebook' | 'youtube';
+  flagged: boolean;
+  createdAt: string;
+  updatedAt: string;
+  data: {
+    tipId: string;
+    username: string;
+    amount: number;
+    currency: currency;
+    message: string;
+    items: any[];
+    avatar: string;
+    providerId: string;
+    displayName: string;
+    streak: number;
+    tier: '1000' | '2000' | '3000' | 'prime';
+    quantity: number
+  }
+};
+
 /* example payload (eventData)
 {
   _id: '5d967959cd89a10ce12818ad',
@@ -95,12 +119,12 @@ class StreamElements extends Integration {
       }
     });
 
-    this.socketToStreamElements.on('event', async (eventData) => {
+    this.socketToStreamElements.on('event', async (eventData: StreamElementsEvent) => {
       this.parse(eventData);
     });
   }
 
-  async parse(eventData) {
+  async parse(eventData: StreamElementsEvent) {
     if (eventData.type !== 'tip') {
       return;
     }
@@ -136,7 +160,7 @@ class StreamElements extends Integration {
     });
     events.fire('tip', {
       username: username.toLowerCase(),
-      amount: parseFloat(amount).toFixed(2),
+      amount: Number(amount).toFixed(2),
       currency: DONATION_CURRENCY,
       amountInBotCurrency: Number(currency.exchange(amount, DONATION_CURRENCY, currency.mainCurrency)).toFixed(2),
       currencyInBot: currency.mainCurrency,
@@ -145,7 +169,7 @@ class StreamElements extends Integration {
     alerts.trigger({
       event: 'tips',
       name: username.toLowerCase(),
-      amount: Number(parseFloat(eventData.data.amount).toFixed(2)),
+      amount: Number(Number(eventData.data.amount).toFixed(2)),
       currency: DONATION_CURRENCY,
       monthsName: '',
       message,
