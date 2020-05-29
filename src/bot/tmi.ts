@@ -162,6 +162,7 @@ class TMI extends Core {
       if (this.channel !== channel) {
         info(`TMI: ${type} is reconnecting`);
 
+        (this.client[type] as TwitchJs).chat.removeAllListeners();
         await this.client[type]?.chat.part(this.channel);
         await this.client[type]?.chat.reconnect({ token, username, onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(refresh_token => refresh_token) });
 
