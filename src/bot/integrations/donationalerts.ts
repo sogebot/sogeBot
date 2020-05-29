@@ -4,9 +4,6 @@ import chalk from 'chalk';
 import Centrifuge from 'centrifuge';
 import WebSocket from 'ws';
 
-import * as constants from '../constants.js';
-import { isMainThread } from '../cluster';
-
 import Integration from './_interface';
 import { onChange, onStartup } from '../decorators/on.js';
 import { settings } from '../decorators';
@@ -25,38 +22,35 @@ import alerts from '../registries/alerts.js';
 
 type DonationAlertsEvent = {
   id: string;
-  alert_type: string;
-  additional_data: string;
+  name: string;
   username: string;
-  amount: string;
-  amount_formatted: string;
-  amount_main: string;
-  currency: currency;
   message: string;
-  date_paid: string;
-  emotes: null;
-  _is_test_alert: boolean;
+  message_type: string;
+  amount: number;
+  currency: currency;
+  billing_system: string;
 };
 
 class Donationalerts extends Integration {
   socketToDonationAlerts: Centrifuge | null = null;
   donationChannel: Centrifuge.Subscription | null = null;
 
+  @ui({
+    type: 'link',
+    href: 'https://www.sogebot.xyz/integrations/#DonationAlerts',
+    class: 'btn btn-primary btn-block',
+    target: '_blank',
+    text: 'integrations.donationalerts.settings.accessTokenBtn',
+  })
+  accessTokenBtn = null;
+
   @settings()
   @ui({ type: 'text-input', secret: true })
   access_token = '';
 
-  constructor () {
-    super();
-
-    if (isMainThread) {
-      setInterval(() => this.connect(), constants.HOUR); // restart socket each hour
-    }
-  }
-
   @onStartup()
   @onChange('enabled')
-  onStateChange (key: string, val: boolean) {
+  onStateChange(key: string, val: boolean) {
     if (val) {
       this.connect();
     } else {
@@ -64,113 +58,7 @@ class Donationalerts extends Integration {
     }
   }
 
-  /* async disconnect () {
-    if (this.socketToDonationAlerts !== null) {
-      this.socketToDonationAlerts.removeAllListeners();
-      this.socketToDonationAlerts.disconnect();
-    }
-  }
-
-  @onChange('secretToken')
-  async connect () {
-    this.disconnect();
-
-    if (this.secretToken.trim() === '' || !this.enabled) {
-      return;
-    }
-
-    this.socketToDonationAlerts = require('socket.io-client').connect('wss://socket3.donationalerts.ru:443',
-      {
-        reconnection: true,
-        reconnectionDelay: 1000,
-        reconnectionDelayMax: 5000,
-        reconnectionAttempts: Infinity,
-      });
-
-    if (this.socketToDonationAlerts !== null) {
-      this.socketToDonationAlerts.on('connect', () => {
-        if (this.socketToDonationAlerts !== null) {
-          this.socketToDonationAlerts.emit('add-user', { token: this.secretToken, type: 'minor' });
-        }
-        info(chalk.yellow('DONATIONALERTS.RU:') + ' Successfully connected socket to service');
-      });
-      this.socketToDonationAlerts.on('reconnect_attempt', () => {
-        info(chalk.yellow('DONATIONALERTS.RU:') + ' Trying to reconnect to service');
-      });
-      this.socketToDonationAlerts.on('disconnect', () => {
-        info(chalk.yellow('DONATIONALERTS.RU:') + ' Socket disconnected from service');
-        this.disconnect();
-        this.socketToDonationAlerts = null;
-      });
-
-      this.socketToDonationAlerts.off('donation').on('donation', async (donationData: string) => {
-        const data: DonationAlertsEvent = JSON.parse(donationData);
-
-        if (parseInt(data.alert_type, 10) !== 1) {
-          return;
-        }
-        const additionalData = JSON.parse(data.additional_data);
-        eventlist.add({
-          event: 'tip',
-          amount: parseFloat(data.amount),
-          currency: data.currency,
-          username: data.username.toLowerCase(),
-          message: data.message,
-          song_title: _.get(additionalData, 'media_data.title', undefined),
-          song_url: _.get(additionalData, 'media_data.url', undefined),
-          timestamp: Date.now(),
-        });
-
-        events.fire('tip', {
-          username: data.username.toLowerCase(),
-          amount: parseFloat(data.amount).toFixed(2),
-          currency: data.currency,
-          amountInBotCurrency: Number(currency.exchange(Number(data.amount), data.currency, currency.mainCurrency)).toFixed(2),
-          currencyInBot: currency.mainCurrency,
-          message: data.message,
-        });
-        alerts.trigger({
-          event: 'tips',
-          name: data.username.toLowerCase(),
-          amount: Number(parseFloat(data.amount).toFixed(2)),
-          currency: data.currency,
-          monthsName: '',
-          message: data.message,
-          autohost: false,
-        });
-
-        if (!data._is_test_alert) {
-          const user = await users.getUserByUsername(data.username);
-          const newTip: UserTipInterface = {
-            amount: Number(data.amount),
-            currency: data.currency,
-            sortAmount: currency.exchange(Number(data.amount), data.currency, currency.mainCurrency),
-            message: data.message,
-            tippedAt: Date.now(),
-            exchangeRates: currency.rates,
-          };
-          user.tips.push(newTip);
-          getRepository(User).save(user);
-
-          tip(`${data.username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
-
-          if (api.isStreamOnline) {
-            api.stats.currentTips += Number(currency.exchange(parseFloat(data.amount), data.currency, currency.mainCurrency));
-          }
-        }
-
-        triggerInterfaceOnTip({
-          username: data.username.toLowerCase(),
-          amount: parseFloat(data.amount),
-          message: data.message,
-          currency: data.currency,
-          timestamp: _.now(),
-        });
-      });
-    }
-  } */
-
-  @onChange('secretToken')
+  @onChange('access_token')
   async connect () {
     this.disconnect();
 
@@ -193,6 +81,11 @@ class Donationalerts extends Integration {
     this.socketToDonationAlerts.setToken(connectionOptions.token);
 
     await this.socketConnect();
+
+    this.socketToDonationAlerts.on('disconnect', (reason: unknown) => {
+      info(chalk.yellow('DONATIONALERTS.RU:') + ' Disconnected from socket: ' + reason);
+      this.connect();
+    });
 
     const channel = this.socketToDonationAlerts?.subscribe(`$alerts:donation_${connectionOptions.id}`);
     channel?.on('join', () => {
@@ -250,7 +143,61 @@ class Donationalerts extends Integration {
   }
 
   async parseDonation(data: DonationAlertsEvent) {
-    return true;
+    eventlist.add({
+      event: 'tip',
+      amount: data.amount,
+      currency: data.currency,
+      username: data.username.toLowerCase(),
+      message: data.message,
+      timestamp: Date.now(),
+    });
+
+    events.fire('tip', {
+      username: data.username.toLowerCase(),
+      amount: data.amount.toFixed(2),
+      currency: data.currency,
+      amountInBotCurrency: Number(currency.exchange(Number(data.amount), data.currency, currency.mainCurrency)).toFixed(2),
+      currencyInBot: currency.mainCurrency,
+      message: data.message,
+    });
+    
+    alerts.trigger({
+      event: 'tips',
+      name: data.username.toLowerCase(),
+      amount: Number(data.amount.toFixed(2)),
+      currency: data.currency,
+      monthsName: '',
+      message: data.message,
+      autohost: false,
+    });
+
+    if (data.billing_system !== 'fake') {
+      const user = await users.getUserByUsername(data.username);
+      const newTip: UserTipInterface = {
+        amount: Number(data.amount),
+        currency: data.currency,
+        sortAmount: currency.exchange(Number(data.amount), data.currency, currency.mainCurrency),
+        message: data.message,
+        tippedAt: Date.now(),
+        exchangeRates: currency.rates,
+      };
+      user.tips.push(newTip);
+      getRepository(User).save(user);
+
+      tip(`${data.username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
+
+      if (api.isStreamOnline) {
+        api.stats.currentTips += Number(currency.exchange(data.amount, data.currency, currency.mainCurrency));
+      }
+    }
+
+    triggerInterfaceOnTip({
+      username: data.username.toLowerCase(),
+      amount: data.amount,
+      message: data.message,
+      currency: data.currency,
+      timestamp: _.now(),
+    });
   }
 }
 
