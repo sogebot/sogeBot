@@ -16,12 +16,12 @@ import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
 import { Commands, CommandsInterface, CommandsResponsesInterface } from '../database/entity/commands';
 import { User } from '../database/entity/user';
-import { Variable } from '../database/entity/variable';
 import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
 import api from '../api';
 import permissions from '../permissions';
 import { translate } from '../translate';
 import ranks from './ranks';
+import customvariables from '../customvariables';
 
 /*
  * !command                                                                 - gets an info about command usage
@@ -432,12 +432,7 @@ class CustomCommands extends System {
       owner: isOwner(opts.sender.username),
     };
 
-    // get custom variables
-    const customVariablesDb = await getRepository(Variable).find();
-    const customVariables = customVariablesDb.reduce((prev, cur) => {
-      return {...prev, [cur.variableName]: cur.currentValue};
-    }, {});
-
+    const customVariables = customvariables.getAll();
     const context = {
       _: _,
       $sender: opts.sender.username,

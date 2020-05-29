@@ -273,7 +273,9 @@ class Message {
             return state.updated.currentValue;
           } else if (state.updated.responseType === 1) {
             // custom
-            parserReply(state.updated.responseText.replace('$value', state.setValue), { sender: attr.sender, attr: { skip: true, quiet: _.get(attr, 'quiet', false) }});
+            if (state.updated.responseText) {
+              parserReply(state.updated.responseText.replace('$value', state.setValue), { sender: attr.sender, attr: { skip: true, quiet: _.get(attr, 'quiet', false) }});
+            }
             return '';
           } else {
             // command

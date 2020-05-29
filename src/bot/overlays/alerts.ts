@@ -69,7 +69,7 @@ class Alerts extends Overlay {
         if (!isNil(object.id)) {
           clip = await api.getClipById(object.id);
         } else if (!isNil(object.url)) {
-          clip = await api.getClipById(object.url.split('/').pop());
+          clip = await api.getClipById(object.url.split('/').pop() as string);
         }
         for (const c of clip.data) {
           object.url = c.thumbnail_url.replace('-preview-480x272.jpg', '.mp4');

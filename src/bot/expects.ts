@@ -506,7 +506,7 @@ class Expects {
     const match = XRegExp.exec(this.text, regexp);
 
     if (!isNil(match)) {
-      this.match.push(match.list.split(opts.delimiter).map((o) => o.trim()));
+      this.match.push((match.list as string).split(opts.delimiter).map((o) => o.trim()));
       this.text = this.text.replace(match.list, ''); // remove from text matched pattern
     } else {
       if (!opts.optional) {

@@ -39,6 +39,12 @@ class CustomVariables extends Core {
     this.checkIfCacheOrRefresh();
   }
 
+  async getAll() {
+    return (await getRepository(Variable).find()).reduce((prev: { [x: string]: any }, cur) => {
+      return { ...prev, [cur.variableName]: cur.currentValue };
+    }, {});
+  }
+
   async executeVariablesInText(text: string): Promise<string> {
     for (const variable of text.match(customVariableRegex) || []) {
       const isVariable = await this.isVariableSet(variable);
@@ -90,7 +96,9 @@ class CustomVariables extends Core {
               if (value.updated.responseType === 0) {
                 announce(prepare('filters.setVariable', { value: value.updated.currentValue, variable: variable }));
               } else if (value.updated.responseType === 1) {
-                announce(value.updated.responseText.replace('$value', value.updated.currentValue));
+                if (value.updated.responseText) {
+                  announce(value.updated.responseText.replace('$value', value.updated.currentValue));
+                }
               }
             }
             return res.status(200).send({ oldValue: variable.currentValue, value: value.setValue });
@@ -246,10 +254,7 @@ class CustomVariables extends Core {
     };
 
     // get custom variables
-    const customVariablesDb = await getRepository(Variable).find();
-    const customVariables = customVariablesDb.reduce((prev: { [x: string]: any }, cur) => {
-      return { ...prev, [cur.variableName]: cur.currentValue };
-    }, {});
+    const customVariables = this.getAll();
 
     // update globals and replace theirs values
     script = (await new Message(script).global({ escape: '\'' }));

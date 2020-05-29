@@ -36,7 +36,9 @@ declare namespace Events {
   };
 
   type Attributes = {
-    username: string,
+    userId?: number,
+    username?: string,
+    reset?: boolean,
     [x: string]: any,
   };
 }
