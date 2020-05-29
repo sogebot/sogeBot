@@ -14,7 +14,7 @@ import { debounce } from '../helpers/debounce';
 import { v5 as uuidv5 } from 'uuid';
 import oauth from '../oauth';
 import Expects from '../expects';
-import { isUUID } from '../commons';
+import { isUUID, prepare } from '../commons';
 
 import { getRepository, IsNull, LessThan, Not } from 'typeorm';
 import { Permissions as PermissionsEntity } from '../database/entity/permissions';
@@ -118,16 +118,16 @@ class Discord extends Integration {
       if (this.embed && this.embedMessage && api.isStreamOnline) {
         this.embed.spliceFields(0, this.embed.fields.length);
         this.embed.addFields([
-          { name: 'Now Playing', value: api.stats.currentGame},
-          { name: 'Stream Title', value: api.stats.currentTitle},
-          { name: 'Started At', value: this.embedStartedAt, inline: true},
-          { name: 'Total Views', value: api.stats.currentViews, inline: true},
-          { name: 'Followers', value: api.stats.currentFollowers, inline: true},
+          { name: prepare('webpanel.responses.variable.game'), value: api.stats.currentGame},
+          { name: prepare('webpanel.responses.variable.title'), value: api.stats.currentTitle},
+          { name: prepare('integrations.discord.started_at'), value: this.embedStartedAt, inline: true},
+          { name: prepare('webpanel.views'), value: api.stats.currentViews, inline: true},
+          { name: prepare('webpanel.followers'), value: api.stats.currentFollowers, inline: true},
         ]);
         this.embed.setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${oauth.broadcasterUsername}-1920x1080.jpg?${Date.now()}`);
 
         if (oauth.broadcasterType !== '') {
-          this.embed.addField('Subscribers', api.stats.currentSubscribers, true);
+          this.embed.addField(prepare('webpanel.subscribers'), api.stats.currentSubscribers, true);
         }
         this.embedMessage.edit(this.embed);
       }
@@ -257,7 +257,7 @@ class Discord extends Integration {
   async unlinkAccounts(opts: CommandOptions) {
     this.removeExpiredLinks();
     await getRepository(DiscordLink).delete({ userId: Number(opts.sender.userId) });
-    return [{ response: '$sender, all links were deleted', ...opts }];
+    return [{ response: prepare('integrations.discord.all-your-links-were-deleted', { sender: opts.sender }), ...opts }];
   }
 
   @command('!link')
@@ -276,17 +276,17 @@ class Discord extends Integration {
       await getRepository(DiscordLink).save({
         ...link, userId: opts.sender.userId,
       });
-      return [{ response: `$sender, this account was linked with ${link.tag}.`, ...opts }];
+      return [{ response: prepare('integrations.discord.this-account-was-linked-with', { sender: opts.sender, discordTag: link.tag}), ...opts }];
     } catch (e) {
-      if (e.message === String(errors.NOT_UUID)) {
-        return [{ response: '$sender, invalid or expired token.', ...opts }];
-      } else if (e.message.includes('Expected parameter')) {
+      if (e.message.includes('Expected parameter')) {
         return [
-          { response: '$sender, to link you account on Discord: 1. Go to Discord server and send !link in bot channel. | 2. Wait for PM from bot | 3. Send command from you Discord PM here in twitch chat.', ...opts },
+          { response: prepare('integrations.discord.help-message', { sender: opts.sender }), ...opts },
         ];
       } else {
-        warning(e.stack);
-        return [{ response: '$sender, something went wrong.', ...opts }];
+        if (e.message !== String(errors.NOT_UUID)) {
+          warning(e.stack);
+        }
+        return [{ response: prepare('integrations.discord.invalid-or-expired-token', { sender: opts.sender }), ...opts }];
       }
     }
   }
@@ -298,16 +298,16 @@ class Discord extends Integration {
       this.embed.setDescription(`${oauth.broadcasterUsername.charAt(0).toUpperCase() + oauth.broadcasterUsername.slice(1)} is not streaming anymore! Check it next time!`);
       this.embed.spliceFields(0, this.embed.fields.length);
       this.embed.addFields([
-        { name: 'Now Playing', value: api.stats.currentGame},
-        { name: 'Stream Title', value: api.stats.currentTitle},
-        { name: 'Streamed At', value: `${this.embedStartedAt} - ${moment().tz(timezone).format('LLL')}`, inline: true},
-        { name: 'Total Views', value: api.stats.currentViews, inline: true},
-        { name: 'Followers', value: api.stats.currentFollowers, inline: true},
+        { name: prepare('webpanel.responses.variable.game'), value: api.stats.currentGame},
+        { name: prepare('webpanel.responses.variable.title'), value: api.stats.currentTitle},
+        { name: prepare('integrations.discord.streamed-at'), value: `${this.embedStartedAt} - ${moment().tz(timezone).format('LLL')}`, inline: true},
+        { name: prepare('webpanel.views'), value: api.stats.currentViews, inline: true},
+        { name: prepare('webpanel.followers'), value: api.stats.currentFollowers, inline: true},
       ]);
       this.embed.setImage(`https://static-cdn.jtvnw.net/ttv-static/404_preview-1920x1080.jpg?${Date.now()}`);
 
       if (oauth.broadcasterType !== '') {
-        this.embed.addField('Subscribers', api.stats.currentSubscribers, true);
+        this.embed.addField(prepare('webpanel.subscribers'), api.stats.currentSubscribers, true);
       }
       this.embedMessage.edit(this.embed);
     }
@@ -330,11 +330,11 @@ class Discord extends Integration {
         const embed = new DiscordJs.MessageEmbed()
           .setURL('https://twitch.tv/' + oauth.broadcasterUsername)
           .addFields([
-            { name: 'Now Playing', value: api.stats.currentGame},
-            { name: 'Stream Title', value: api.stats.currentTitle},
-            { name: 'Started At', value: this.embedStartedAt, inline: true},
-            { name: 'Total Views', value: api.stats.currentViews, inline: true},
-            { name: 'Followers', value: api.stats.currentFollowers, inline: true},
+            { name: prepare('webpanel.responses.variable.game'), value: api.stats.currentGame},
+            { name: prepare('webpanel.responses.variable.title'), value: api.stats.currentTitle},
+            { name: prepare('integrations.discord.started_at'), value: this.embedStartedAt, inline: true},
+            { name: prepare('webpanel.views'), value: api.stats.currentViews, inline: true},
+            { name: prepare('webpanel.followers'), value: api.stats.currentFollowers, inline: true},
           ])
           // Set the title of the field
           .setTitle('https://twitch.tv/' + oauth.broadcasterUsername)
@@ -347,7 +347,7 @@ class Discord extends Integration {
           .setFooter('Announced by sogeBot - https://www.sogebot.xyz');
 
         if (oauth.broadcasterType !== '') {
-          embed.addField('Subscribers', api.stats.currentSubscribers, true);
+          embed.addField(prepare('webpanel.subscribers'), api.stats.currentSubscribers, true);
         }
         // Send the embed to the same channel as the message
         this.embedMessage = await (channel as DiscordJs.TextChannel).send(embed);
@@ -406,11 +406,16 @@ class Discord extends Integration {
           discordId: author.id,
           createdAt: Date.now(),
         });
-        author.send(`Hello ${msg.author.tag}, to link this Discord account with your Twitch account on ${oauth.broadcasterUsername} channel, go to https://twitch.tv/${oauth.broadcasterUsername}, login to your account and send this command to chat \n\n\t\t\`!link ${link.id}\`\n\nNOTE: This expires in 10 minutes.`);
-        whisperOut(`${author.tag}: Hello ${author.tag}, to link this Discord account with your Twitch account on ${oauth.broadcasterUsername} channel, go to https://twitch.tv/${oauth.broadcasterUsername}, login to your account and send this command to chat \\n\\n\\t\\t\`!link ${link.id}\`\\n\\nNOTE: This expires in 10 minutes.`);
+        const message = prepare('integrations.discord.link-whisper', {
+          tag: msg.author.tag,
+          broadcaster: oauth.broadcasterUsername,
+          id: link.id,
+        });
+        author.send(message);
+        whisperOut(`${author.tag}: ${message}`);
 
-        const reply = await msg.reply('check your DMs for steps to link your account.');
-        chatOut(`#${channel.name}: @${author.tag}, check your DMs for steps to link your account. [${msg.author.tag}]`);
+        const reply = await msg.reply(prepare('integrations.check-your-dm'));
+        chatOut(`#${channel.name}: @${author.tag}, ${prepare('integrations.discord.link-whisper')} [${msg.author.tag}]`);
         if (this.deleteMessagesAfterWhile) {
           setTimeout(() => {
             msg.delete();
@@ -420,7 +425,7 @@ class Discord extends Integration {
         return;
       } else if (content === '!unlink') {
         await getRepository(DiscordLink).delete({ tag: author.tag });
-        msg.reply('all links were deleted');
+        msg.reply(prepare('integrations.discord.all-your-links-were-deleted'));
         return;
       }
     }
