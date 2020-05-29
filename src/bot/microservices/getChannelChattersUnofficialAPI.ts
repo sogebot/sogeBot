@@ -119,8 +119,6 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
       }
     }
 
-    usersToFetch.push('esl_csgo', 'mazarin1k');
-
     for (const usernameBatch of chunk(usersToFetch, 100)) {
       getUsersFromTwitch(usernameBatch).then(users => {
         if (users) {

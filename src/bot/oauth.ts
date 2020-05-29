@@ -177,11 +177,21 @@ class OAuth extends Core {
   @onChange('broadcasterAccessToken')
   public async onChangeAccessToken(key: string, value: any) {
     switch (key) {
-      case 'broadcaster.accessToken':
+      case 'broadcasterAccessToken':
         this.validateOAuth('broadcaster');
+        if (value === '') {
+          this.cache.broadcaster = 'force_reconnect';
+          this.broadcasterUsername = '';
+          tmi.part('broadcaster');
+        }
         break;
-      case 'bot.accessToken':
+      case 'botAccessToken':
         this.validateOAuth('bot');
+        if (value === '') {
+          this.cache.bot = 'force_reconnect';
+          this.botUsername = '';
+          tmi.part('bot');
+        }
         break;
     }
   }
