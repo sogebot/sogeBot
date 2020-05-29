@@ -62,7 +62,6 @@ export async function parserReply(response: string | Promise<string>, opts: { se
     }
   } else {
     // we skip as we are already parsing message
-    console.log(messageToSend);
     sendMessage(messageToSend, senderObject, { skip: true, ...opts.attr });
   }
 }
