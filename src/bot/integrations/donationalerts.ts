@@ -86,7 +86,7 @@ class Donationalerts extends Integration {
       this.connect();
     });
 
-    const channel = this.socketToDonationAlerts?.subscribe(`$alerts:donation_${connectionOptions.id}`);
+    const channel = this.socketToDonationAlerts.subscribe(`$alerts:donation_${connectionOptions.id}`);
     channel?.on('join', () => {
       info(chalk.yellow('DONATIONALERTS.RU:') + ' Successfully joined in donations channel.');
     });
