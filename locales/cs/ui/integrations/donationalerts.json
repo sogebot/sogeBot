@@ -5,6 +5,6 @@
       "title": "Access Token",
       "help": "Získej svůj access token na https://www.sogebot.xyz/integrations/#DonationAlerts"
     },
-    "accessTokenBtn": "DonationAlerts access token generator"
+    "accessTokenBtn": "Generátor access tokenu pro DonationAlerts"
   }
 }
