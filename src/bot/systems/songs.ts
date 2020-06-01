@@ -6,7 +6,7 @@ import ytsr from 'ytsr';
 import ytpl from 'ytpl';
 import io from 'socket.io';
 
-import { announce, getBot, getBotSender, prepare, timeout } from '../commons';
+import { announce, getBot, getBotSender, isModerator, prepare, timeout } from '../commons';
 import { command, default_permission, settings, shared, ui } from '../decorators';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
@@ -249,7 +249,7 @@ class Songs extends System {
       request.push(currentSong.username);
     }
     for (const user of request) {
-      timeout(user, translate('songs.song-was-banned-timeout-message'), 300);
+      timeout(user, translate('songs.song-was-banned-timeout-message'), 300, isModerator(opts.sender));
     }
 
     await Promise.all([
@@ -295,7 +295,7 @@ class Songs extends System {
               request.push(currentSong.username);
             }
             for (const user of request) {
-              timeout(user, translate('songs.bannedSongTimeout'), 300);
+              timeout(user, translate('songs.bannedSongTimeout'), 300, isModerator(opts.sender));
             }
 
             await Promise.all([

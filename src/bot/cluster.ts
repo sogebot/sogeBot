@@ -44,7 +44,7 @@ export const init = async () => {
 
       socketIO.on('connection', (socket) => {
         socket.on('clusteredClientChat', (type, username, messageToSend) => clusteredClientChat(type, username, messageToSend));
-        socket.on('clusteredClientTimeout', (username, timeMs, reason) => clusteredClientTimeout(username, timeMs, reason));
+        socket.on('clusteredClientTimeout', (username, timeMs, reason, isMod) => clusteredClientTimeout(username, timeMs, reason, isMod));
         socket.on('clusteredClientDelete', (senderId) => clusteredClientDelete(senderId));
         socket.on('clusteredWhisperIn', (message) => clusteredWhisperIn(message));
         socket.on('clusteredChatIn', (message) => clusteredChatIn(message));
@@ -128,9 +128,9 @@ export const clusteredClientDelete = (senderId: string) => {
   }
 };
 
-export const clusteredClientTimeout = (username: string, timeMs: number, reason: string, isModerator: boolean) => {
+export const clusteredClientTimeout = (username: string, timeMs: number, reason: string, isMod: boolean) => {
   if (isMainThread) {
-    if (isModerator) {
+    if (isMod) {
       if (tmi.client.broadcaster) {
         tmi.client.broadcaster.chat.timeout(oauth.generalChannel, username, timeMs, reason);
       } else {
