@@ -8,16 +8,35 @@ const webpack = require('webpack');
 const bundleAnalyze = !!process.env.BUNDLE
 
 const optimization = {
+  removeAvailableModules: false,
+  removeEmptyChunks: false,
+  splitChunks: false,
   minimize: process.env.NODE_ENV === 'production',
+  runtimeChunk: 'single',
+  moduleIds: 'deterministic',
+  splitChunks: {
+    cacheGroups: {
+      vendor: {
+        test: /[\\/]node_modules[\\/]/,
+        name: 'vendors',
+        chunks: 'all',
+      },
+    },
+  },
 };
 
 if (process.env.NODE_ENV === 'production') {
-  optimization.minimizer = [new TerserPlugin()]
+  optimization.minimizer = [new TerserPlugin()];
 }
-
 const webpackConfig = {
+  infrastructureLogging: {
+    level: 'verbose'
+  },
   cache: {
+    version: process.env.VERSION,
     type: 'filesystem',
+    store: 'pack',
+    name: 'AppBuildCache',
     buildDependencies: {
       config: [ __filename ] // you may omit this when your CLI automatically adds it
     }
@@ -50,6 +69,7 @@ const webpackConfig = {
     filename: '[name].[contenthash].js',
     chunkFilename: '[name].[contenthash].js',
     publicPath: '/dist/js/',
+    pathinfo: false,
   },
   plugins: [
     new webpack.DefinePlugin({
