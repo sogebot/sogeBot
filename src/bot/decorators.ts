@@ -143,7 +143,7 @@ export function settings(category?: string, isReadOnly = false) {
 }
 
 
-export function permission_settings(category?: string) {
+export function permission_settings(category?: string, exclude: string[] = []) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: any, key: string) => {
@@ -174,6 +174,9 @@ export function permission_settings(category?: string) {
           }
           self.loadVariableValue('__permission_based__' + key).then((value: { [permissionId: string]: string }) => {
             if (typeof value !== 'undefined') {
+              for (const exKey of exclude) {
+                value[exKey] = '%%%%___ignored___%%%%';
+              }
               VariableWatcher.add(`${type}.${name}.__permission_based__${key}`, value, false);
               _.set(self, '__permission_based__' + key, value);
             }

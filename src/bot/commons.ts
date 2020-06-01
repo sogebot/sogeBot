@@ -295,11 +295,11 @@ export async function message(type: 'say' | 'whisper' | 'me', username: string |
 }
 
 /* TODO: move to tmi */
-export async function timeout(username: string, reason: string, timeMs: number) {
+export async function timeout(username: string, reason: string, timeMs: number, isMod: boolean) {
   if (reason) {
     reason = reason.replace(/\$sender/g, username);
   }
-  clusteredClientTimeout(username, timeMs, reason);
+  clusteredClientTimeout(username, timeMs, reason, isMod);
 }
 
 export function getOwnerAsSender(): Readonly<UserStateTags & { userId: number }> {
