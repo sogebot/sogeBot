@@ -4,7 +4,7 @@ import io from 'socket.io';
 import ioClient from 'socket.io-client';
 import http from 'http';
 
-import { chatIn, chatOut, isDebugEnabled as debugIsEnabled, info, whisperIn, whisperOut } from './helpers/log.js';
+import { chatIn, chatOut, isDebugEnabled as debugIsEnabled, error, info, whisperIn, whisperOut } from './helpers/log.js';
 import oauth from './oauth.js';
 import api from './api.js';
 import tmi from './tmi.js';
@@ -44,7 +44,7 @@ export const init = async () => {
 
       socketIO.on('connection', (socket) => {
         socket.on('clusteredClientChat', (type, username, messageToSend) => clusteredClientChat(type, username, messageToSend));
-        socket.on('clusteredClientTimeout', (username, timeMs, reason) => clusteredClientTimeout(username, timeMs, reason));
+        socket.on('clusteredClientTimeout', (username, timeMs, reason, isMod) => clusteredClientTimeout(username, timeMs, reason, isMod));
         socket.on('clusteredClientDelete', (senderId) => clusteredClientDelete(senderId));
         socket.on('clusteredWhisperIn', (message) => clusteredWhisperIn(message));
         socket.on('clusteredChatIn', (message) => clusteredChatIn(message));
@@ -128,9 +128,17 @@ export const clusteredClientDelete = (senderId: string) => {
   }
 };
 
-export const clusteredClientTimeout = (username: string, timeMs: number, reason: string) => {
+export const clusteredClientTimeout = (username: string, timeMs: number, reason: string, isMod: boolean) => {
   if (isMainThread) {
-    tmi.client.bot?.chat.timeout(oauth.generalChannel, username, timeMs, reason);
+    if (isMod) {
+      if (tmi.client.broadcaster) {
+        tmi.client.broadcaster.chat.timeout(oauth.generalChannel, username, timeMs, reason);
+      } else {
+        error('Cannot timeout mod user, as you don\'t have set broadcaster in chat');
+      }
+    } else {
+      tmi.client.bot?.chat.timeout(oauth.generalChannel, username, timeMs, reason);
+    }
   } else {
     clientIO.emit('clusteredClientTimeout', username, timeMs, reason);
   }

@@ -106,7 +106,7 @@
             <div :key="category + '__permission_based__#1'">
               <b-card no-body>
                 <b-tabs pills card vertical>
-                  <b-tab v-for="permission of permissions" :title="permission.name" :key="permission.id">
+                  <b-tab v-for="permission of getNotIgnoredPermissions(permissions, settings['__permission_based__'][category])" :key="permission.id" :title="permission.name">
                     <b-card-text>
                       <template v-for="(currentValue, defaultValue) of settings['__permission_based__'][category]">
                         <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " :key="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue + String(currentValue[permission.id] === null)">
@@ -291,6 +291,20 @@ export default class interfaceSettings extends Vue {
   heightOfMenuInterval: number = 0;
 
   permissions: PermissionsInterface[] = [];
+
+  isPermissionCategoryIgnored(permission: { [x: string]: any }, permId: string) {
+    const keys = Object.keys(permission);
+    if (keys.length > 0) {
+      return permission[keys[0]][permId] === '%%%%___ignored___%%%%';
+    };
+    return false;
+  }
+
+  getNotIgnoredPermissions(permissions: Required<PermissionsInterface>[], data: { [x: string]: any }) {
+    return permissions.filter(o => {
+      return !this.isPermissionCategoryIgnored(data, o.id);
+    })
+  }
 
   get settingsWithoutPermissions() {
     let withoutPermissions: any = {};

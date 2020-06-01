@@ -22,7 +22,7 @@ class Seppuku extends Game {
       return [{ response: translate('gambling.seppuku.mod'), ... opts }];
     }
 
-    timeout(opts.sender.username, translate('gambling.seppuku.text'), this.timeout);
+    timeout(opts.sender.username, translate('gambling.seppuku.text'), this.timeout, isModerator(opts.sender));
     return [{ response: translate('gambling.seppuku.text'), ... opts }];
   }
 }
