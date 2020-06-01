@@ -1,6 +1,10 @@
 {
   "settings": {
     "enabled": "Status",
-    "secretToken": "Secret token"
+    "access_token": {
+      "title": "Access Token",
+      "help": "Získej svůj access token na https://www.sogebot.xyz/integrations/#DonationAlerts"
+    },
+    "accessTokenBtn": "Generátor access tokenu pro DonationAlerts"
   }
 }
