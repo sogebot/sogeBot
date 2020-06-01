@@ -16,12 +16,12 @@ import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
 import { Commands, CommandsInterface, CommandsResponsesInterface } from '../database/entity/commands';
 import { User } from '../database/entity/user';
-import { Variable } from '../database/entity/variable';
 import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
 import api from '../api';
 import permissions from '../permissions';
 import { translate } from '../translate';
 import ranks from './ranks';
+import customvariables from '../customvariables';
 
 /*
  * !command                                                                 - gets an info about command usage
@@ -167,7 +167,7 @@ class CustomCommands extends System {
 
   @command('!command add')
   @default_permission(permission.CASTERS)
-  async add (opts: CommandOptions) {
+  async add (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [userlevel, stopIfExecuted, cmd, response] = new Expects(opts.parameters)
         .permission({ optional: true, default: permission.VIEWERS })
@@ -297,7 +297,7 @@ class CustomCommands extends System {
     return atLeastOnePermissionOk;
   }
 
-  sendResponse(responses, opts) {
+  sendResponse(responses: (CommandsResponsesInterface)[], opts: { param: string; sender: CommandOptions['sender'], command: string, processedCommands?: string[] }) {
     for (let i = 0; i < responses.length; i++) {
       setTimeout(async () => {
         parserReply(await responses[i].response, opts);
@@ -403,7 +403,7 @@ class CustomCommands extends System {
     }
   }
 
-  async checkFilter (opts: CommandOptions | ParserOptions, filter: string) {
+  async checkFilter (opts: CommandOptions | ParserOptions, filter: string): Promise<boolean> {
     if (typeof filter === 'undefined' || filter.trim().length === 0) {
       return true;
     }
@@ -432,13 +432,7 @@ class CustomCommands extends System {
       owner: isOwner(opts.sender.username),
     };
 
-    // get custom variables
-    const customVariablesDb = await getRepository(Variable).find();
-    const customVariables = {};
-    for (const cvar of customVariablesDb) {
-      customVariables[cvar.variableName] = cvar.currentValue;
-    }
-
+    const customVariables = customvariables.getAll();
     const context = {
       _: _,
       $sender: opts.sender.username,

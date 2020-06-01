@@ -20,7 +20,7 @@ import { isFinite } from 'lodash-es';
 @Component({})
 export default class textInput extends Vue {
   @Prop() readonly value: any;
-  @Prop() readonly title: any;
+  @Prop() readonly title!: string;
   @Prop() readonly type: any;
   @Prop() readonly readonly: any;
   @Prop() readonly secret: any;

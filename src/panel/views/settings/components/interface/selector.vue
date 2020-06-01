@@ -22,7 +22,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 export default class btnEmit extends Vue {
   @Prop() readonly readonly: any;
   @Prop() readonly value: any;
-  @Prop() readonly title: any;
+  @Prop() readonly title!: string;
   @Prop() readonly current: any;
   @Prop() readonly values: any;
 

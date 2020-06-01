@@ -29,7 +29,7 @@ class Alerts extends Overlay {
   sockets() {
     publicEndpoint(this.nsp, 'cache', async (cb: (err: string | null, ids: string[]) => void) => {
       if (this.galleryCache) {
-        const items = await getRepository(Gallery).createQueryBuilder('gallery').select('id').addSelect('data').execute();
+        const items = await getRepository(Gallery).find();
         cb(null, items
           .filter(o => Buffer.from(o.data.split(',')[1], 'base64').length <= this.galleryCacheLimitInMb * 1024 * 1024)
           .map(o => o.id)
@@ -47,7 +47,7 @@ class Alerts extends Overlay {
 
     let send: {[x: string]: string}[] = [];
     for (const string of opts.parameters.trim().split(' | ')) {
-      const object = {};
+      const object: {[x: string] : string} = {};
       for (const setting of string.match(/([\w-]+)=([\w-:/.%?=$_|@&]+|'[\S ]+')/g) || []) {
         const data = { key: setting.split(/=(.+)/)[0], value: setting.split(/=(.+)/)[1] };
         if (data.key === 'text') {
@@ -69,7 +69,7 @@ class Alerts extends Overlay {
         if (!isNil(object.id)) {
           clip = await api.getClipById(object.id);
         } else if (!isNil(object.url)) {
-          clip = await api.getClipById(object.url.split('/').pop());
+          clip = await api.getClipById(object.url.split('/').pop() as string);
         }
         for (const c of clip.data) {
           object.url = c.thumbnail_url.replace('-preview-480x272.jpg', '.mp4');

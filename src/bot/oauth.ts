@@ -139,7 +139,8 @@ class OAuth extends Core {
       return;
     }
     if (!areDecoratorsLoaded) {
-      return setTimeout(() => this.getChannelId(), 1000);
+      setTimeout(() => this.getChannelId(), 1000);
+      return;
     }
     clearTimeout(this.timeouts.getChannelId);
 
@@ -176,11 +177,21 @@ class OAuth extends Core {
   @onChange('broadcasterAccessToken')
   public async onChangeAccessToken(key: string, value: any) {
     switch (key) {
-      case 'broadcaster.accessToken':
+      case 'broadcasterAccessToken':
         this.validateOAuth('broadcaster');
+        if (value === '') {
+          this.cache.broadcaster = 'force_reconnect';
+          this.broadcasterUsername = '';
+          tmi.part('broadcaster');
+        }
         break;
-      case 'bot.accessToken':
+      case 'botAccessToken':
         this.validateOAuth('bot');
+        if (value === '') {
+          this.cache.bot = 'force_reconnect';
+          this.botUsername = '';
+          tmi.part('bot');
+        }
         break;
     }
   }
@@ -211,7 +222,7 @@ class OAuth extends Core {
     const url = 'https://id.twitch.tv/oauth2/validate';
     let status = true;
     try {
-      if (['bot', 'broadcaster'].includes(type) && (this[type + 'AccessToken']) === '') {
+      if ((type === 'bot' ? this.botAccessToken : this.broadcasterAccessToken) === '') {
         throw new Error('no access token for ' + type);
       } else if (!['bot', 'broadcaster'].includes(type)) {
         throw new Error(`Type ${type} is not supported`);
@@ -221,7 +232,7 @@ class OAuth extends Core {
       try {
         request = await axios.get(url, {
           headers: {
-            Authorization: 'OAuth ' + this[type + 'AccessToken'],
+            Authorization: 'OAuth ' + (type === 'bot' ? this.botAccessToken : this.broadcasterAccessToken),
           },
         });
       } catch (e) {
@@ -242,8 +253,13 @@ class OAuth extends Core {
         warning('You shouldn\'t use same account for bot and broadcaster!');
       }
 
-      this[type + 'CurrentScopes'] = request.data.scopes;
-      this[type + 'Username'] = request.data.login;
+      if (type === 'bot') {
+        this.botUsername = request.data.login;
+        this.botCurrentScopes = request.data.scopes;
+      } else {
+        this.broadcasterUsername = request.data.login;
+        this.broadcasterCurrentScopes = request.data.scopes;
+      }
 
       const cache = this.cache[type];
       if (cache !== '' && cache !== request.data.login + request.data.scopes.join(',')) {
@@ -260,16 +276,17 @@ class OAuth extends Core {
         error(e.message);
       }
       status = false;
-      if ((this[type + 'RefreshToken']) !== '') {
+      if ((type === 'bot' ? this.botRefreshToken : this.broadcasterRefreshToken) !== '') {
         this.refreshAccessToken(type);
       } else {
-        this[type + 'Username'] = '';
-        this[type + 'CurrentScopes'] = [];
-
         if (type === 'bot') {
           this.botId = '';
+          this.botUsername = '';
+          this.botCurrentScopes = [];
         } else {
           this.broadcasterId = '';
+          this.broadcasterUsername = '';
+          this.broadcasterCurrentScopes = [];
         }
       }
     }
@@ -295,13 +312,11 @@ class OAuth extends Core {
     warning('Refreshing access token of ' + type);
     const url = 'https://twitchtokengenerator.com/api/refresh/';
     try {
-      if (['bot', 'broadcaster'].includes(type) && (this[type + 'RefreshToken']) === '') {
+      if ((type === 'bot' ? this.botRefreshToken : this.broadcasterRefreshToken) === '') {
         throw new Error('no refresh token for ' + type);
-      } else if (!['bot', 'broadcaster'].includes(type)) {
-        throw new Error(`Type ${type} is not supported`);
       }
 
-      const request = await axios.post(url + encodeURIComponent(this[type + 'RefreshToken']));
+      const request = await axios.post(url + encodeURIComponent(type === 'bot' ? this.botRefreshToken : this.broadcasterRefreshToken));
       if (!request.data.success) {
         throw new Error(`Token refresh for ${type}: ${request.data.message}`);
       }
@@ -311,8 +326,13 @@ class OAuth extends Core {
       if (typeof request.data.refresh !== 'string') {
         throw new Error(`Refresh token for ${type} was not correctly fetched (not a string)`);
       }
-      this[type + 'AccessToken'] = request.data.token;
-      this[type + 'RefreshToken'] = request.data.refresh;
+      if (type === 'bot') {
+        this.botAccessToken = request.data.token;
+        this.botRefreshToken = request.data.refresh;
+      } else {
+        this.broadcasterAccessToken = request.data.token;
+        this.broadcasterRefreshToken = request.data.refresh;
+      }
 
       warning('Access token of ' + type + ' was refreshed.');
       warning('New access token of ' + type + ': ' + request.data.token.replace(/(.{25})/, '*'.repeat(25)));
@@ -321,13 +341,14 @@ class OAuth extends Core {
 
       return request.data.token;
     } catch (e) {
-      this[type + 'Username'] = '';
-      this[type + 'CurrentScopes'] = [];
-
       if (type === 'bot') {
         this.botId = '';
+        this.botUsername = '';
+        this.botCurrentScopes = [];
       } else {
         this.broadcasterId = '';
+        this.broadcasterUsername = '';
+        this.broadcasterCurrentScopes = [];
       }
 
       error('Access token of ' + type + ' was not refreshed.');

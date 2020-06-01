@@ -94,7 +94,7 @@ import type { AlertInterface } from 'src/bot/database/entity/alert';
     'loading': () => import('../../../components/loading.vue'),
   },
   filters: {
-    capitalize: function (value) {
+    capitalize: function (value: string) {
       if (!value) return ''
       value = value.toString()
       return value.charAt(0).toUpperCase() + value.slice(1)
@@ -136,13 +136,13 @@ export default class customVariablesList extends Vue {
       })
   }
 
-  linkTo(item) {
+  linkTo(item: Required<AlertInterface>) {
     console.debug('Clicked', item.id);
     this.$router.push({ name: 'alertsEdit', params: { id: item.id } });
   }
 
-  del(item) {
-    this.socket.emit('alerts::delete', item, (err) => {
+  del(item: AlertInterface) {
+    this.socket.emit('alerts::delete', item, (err: string | null) => {
       if (err) {
         return console.error(err);
       }
@@ -152,7 +152,7 @@ export default class customVariablesList extends Vue {
 
   refresh() {
     this.state.loaded = this.$state.progress;
-    this.socket.emit('generic::getAll', (err, data: AlertInterface[]) => {
+    this.socket.emit('generic::getAll', (err: string | null, data: AlertInterface[]) => {
       if (err) {
         return console.error(err);
       }

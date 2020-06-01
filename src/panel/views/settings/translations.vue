@@ -24,7 +24,7 @@
 
     <loading v-if="state.loading === $state.progress || state.settings === $state.progress" />
     <b-table show-empty v-else striped :fields="fields" :items="fItems" small style="cursor: pointer;" :per-page="perPage" :current-page="currentPage">
-      <template v-slot:empty="scope">
+      <template v-slot:empty>
         <b-alert show class="m-0">
           {{translate('dialog.nothingToShow')}}
         </b-alert>
@@ -94,13 +94,13 @@ export default class translations extends Vue {
     return this.fItems.length;
   }
 
-  revertTranslation(name) {
-    this.socket.emit('responses.revert', { name }, (orig) => {
+  revertTranslation(name: string) {
+    this.socket.emit('responses.revert', { name }, (orig: string) => {
       console.log('Reverted', name, orig)
     })
   }
 
-  updateTranslation(name, value, defaultValue) {
+  updateTranslation(name: string, value: string, defaultValue: string) {
     if (value === defaultValue) {
       this.revertTranslation(name);
     } else {
@@ -110,7 +110,7 @@ export default class translations extends Vue {
 
   created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('responses.get', null, (data) => {
+    this.socket.emit('responses.get', null, (data: { default: string; current: string }) => {
       console.groupCollapsed('translations::responses.get')
       console.log(data);
       console.groupEnd();

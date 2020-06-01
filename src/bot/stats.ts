@@ -3,7 +3,7 @@
 import { adminEndpoint } from './helpers/socket';
 import { cloneDeep, isNil } from 'lodash';
 import { getRepository, LessThan } from 'typeorm';
-import { TwitchStats } from './database/entity/twitch';
+import { TwitchStats, TwitchStatsInterface } from './database/entity/twitch';
 import { error } from 'console';
 import { DAY, MINUTE } from './constants';
 
@@ -100,7 +100,7 @@ class Stats {
     });
   }
 
-  async save(data) {
+  async save(data: Required<TwitchStatsInterface> & { timestamp: number }) {
     if (data.timestamp - this.latestTimestamp >= MINUTE * 15) {
       const whenOnline = new Date(data.whenOnline).getTime();
       const statsFromDB = await getRepository(TwitchStats).findOne({'whenOnline': whenOnline});
@@ -123,8 +123,8 @@ class Stats {
     }
   }
 
-  parseStat(value) {
-    return parseFloat(isNil(value) || isNaN(parseFloat(value)) ? 0 : value);
+  parseStat(value: null | string | number) {
+    return parseFloat(isNil(value) || isNaN(parseFloat(String(value))) ? String(0) : String(value));
   }
 }
 

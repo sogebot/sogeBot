@@ -204,7 +204,7 @@ class Parser {
    * @param {string[] | null} cmdlist - Set of commands to check, if null all registered commands are checked
    * @returns object or null if empty
    */
-  async find (message, cmdlist: {
+  async find (message: string, cmdlist: {
     this: any; fnc: (opts: CommandOptions) => CommandResponse[]; command: string; id: string; permission: string | null; _fncName: string;
   }[] | null = null) {
     debug('parser.find', JSON.stringify({message, cmdlist}));

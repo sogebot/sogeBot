@@ -137,7 +137,7 @@ library.add(faStepBackward, faStepForward);
     'hold-button': () => import('../../../components/holdButton.vue'),
   },
   filters: {
-    formatTime(seconds) {
+    formatTime(seconds: number) {
       const h = Math.floor(seconds / 3600);
       const m = Math.floor((seconds % 3600) / 60);
       const s = seconds % 60;
@@ -188,7 +188,7 @@ export default class playlist extends Vue {
   @Watch('search')
   refreshPlaylist() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('find.playlist', { page: (this.currentPage - 1), search: this.search }, (err, items, count) => {
+    this.socket.emit('find.playlist', { page: (this.currentPage - 1), search: this.search }, (err: string | null, items: SongPlaylistInterface[], count: number) => {
       if (err) {
         return console.error(err);
       }
@@ -202,7 +202,7 @@ export default class playlist extends Vue {
     })
   }
 
-  generateThumbnail(videoId) {
+  generateThumbnail(videoId: string) {
     return `https://img.youtube.com/vi/${videoId}/1.jpg`
   }
 
@@ -215,13 +215,13 @@ export default class playlist extends Vue {
     }
   }
 
-  addSongOrPlaylist(evt) {
+  addSongOrPlaylist(evt: Event) {
     if (evt) {
       evt.preventDefault()
     }
     if (this.state.import === 0) {
       this.state.import = 1
-      this.socket.emit(this.toAdd.includes('playlist') ? 'import.playlist' : 'import.video', this.toAdd, (err, info) => {
+      this.socket.emit(this.toAdd.includes('playlist') ? 'import.playlist' : 'import.video', this.toAdd, (err: string | null, info: { imported: number; skipped: number }) => {
         if (err) {
           this.state.import = 3
           setTimeout(() => {
@@ -238,7 +238,7 @@ export default class playlist extends Vue {
     }
   }
 
-  showImportInfo(info) {
+  showImportInfo(info: { imported: number; skipped: number }) {
     this.importInfo = `Imported: ${info.imported}, Skipped: ${info.skipped}`
     setTimeout(() => {
       this.importInfo = ''
@@ -246,7 +246,7 @@ export default class playlist extends Vue {
     }, 2000)
   }
 
-  updateItem(videoId) {
+  updateItem(videoId: string) {
     this.state.save = 1
 
     let item = this.items.find((o) => o.videoId === videoId)
@@ -254,7 +254,7 @@ export default class playlist extends Vue {
       item.volume = Number(item.volume)
       item.startTime = Number(item.startTime)
       item.endTime = Number(item.endTime)
-      this.socket.emit('songs::save', item, (err) => {
+      this.socket.emit('songs::save', item, (err: string | null) => {
         if (err) {
           console.error(err)
           return this.state.save = 3
@@ -267,7 +267,7 @@ export default class playlist extends Vue {
     }
   }
 
-  deleteItem(id) {
+  deleteItem(id: string) {
     this.socket.emit('delete.playlist', id, () => {
       this.items = this.items.filter((o) => o.videoId !== id)
     })

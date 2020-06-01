@@ -51,6 +51,7 @@
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
 import { isNil } from 'lodash-es';
 import { getSocket } from 'src/panel/helpers/socket';
+import { PriceInterface } from '../../../../bot/database/entity/price';
 
 @Component({
   components: {
@@ -81,7 +82,7 @@ export default class priceList extends Vue {
     })
   }
 
-  capitalize(value) {
+  capitalize(value: string) {
     if (!value) return ''
     value = value.toString()
     return value.charAt(0).toUpperCase() + value.slice(1)
@@ -93,7 +94,7 @@ export default class priceList extends Vue {
 
   refresh() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('generic::getAll', (err, items) => {
+    this.socket.emit('generic::getAll', (err: string | null, items: PriceInterface[]) => {
       if (err) {
         return console.error(err);
       }
@@ -103,23 +104,23 @@ export default class priceList extends Vue {
     })
   }
 
-  update(item) {
-    this.socket.emit('price::save', item, (err) => {
+  update(item: PriceInterface) {
+    this.socket.emit('price::save', item, (err: string | null) => {
       if (err) {
         return console.error(err);
       }
     });
   }
 
-  del(id) {
-    this.socket.emit('generic::deleteById', id, (err) => {
+  del(id: string) {
+    this.socket.emit('generic::deleteById', id, (err: string | null) => {
       if (err) {
         return console.error(err);
       }
       this.refresh();
     })
   }
-  linkTo(item) {
+  linkTo(item: Required<PriceInterface>) {
     console.debug('Clicked', item.id);
     this.$router.push({ name: 'PriceManagerEdit', params: { id: item.id } });
   }

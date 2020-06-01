@@ -84,6 +84,9 @@ import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import { permission } from 'src/bot/helpers/permissions'
 
+import { Route } from 'vue-router'
+import { NextFunction } from 'express';
+
 import { AliasInterface } from 'src/bot/database/entity/alias';
 import { PermissionsInterface } from 'src/bot/database/entity/permissions';
 
@@ -108,7 +111,7 @@ Component.registerHooks([
     'loading': () => import('../../../components/loading.vue'),
   },
   filters: {
-    capitalize(value) {
+    capitalize(value: string) {
       if (!value) return ''
       value = value.toString()
       return value.charAt(0).toUpperCase() + value.slice(1)
@@ -158,7 +161,7 @@ export default class aliasEdit extends Vue {
   }
 
   @Watch('item.alias')
-  checkAliasFormat(val) {
+  checkAliasFormat(val: string) {
     if (!val.startsWith('!')) {
       Vue.set(this.item, 'alias', '!' + val);
     }
@@ -166,7 +169,7 @@ export default class aliasEdit extends Vue {
 
   async mounted() {
     await new Promise((resolve) => {
-      this.psocket.emit('permissions', (err, data) => {
+      this.psocket.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
         if(err) {
           return console.error(err);
         }
@@ -177,7 +180,7 @@ export default class aliasEdit extends Vue {
 
     if (this.$route.params.id) {
       await new Promise((resolve, reject) => {
-        this.socket.emit('generic::getOne', this.$route.params.id, (err, data: AliasInterface) => {
+        this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, data: AliasInterface) => {
           if (err) {
             reject(err)
           }
@@ -194,7 +197,7 @@ export default class aliasEdit extends Vue {
   }
 
   del() {
-    this.socket.emit('generic::deleteById', this.$route.params.id, (err) => {
+    this.socket.emit('generic::deleteById', this.$route.params.id, (err: string | null) => {
       if (err) {
         return console.error(err);
       }
@@ -202,7 +205,7 @@ export default class aliasEdit extends Vue {
     })
   }
 
-  getPermissionName (id) {
+  getPermissionName (id: string | null) {
     if (!id) return 'Disabled'
     const permission = this.permissions.find((o) => {
       return o.id === id
@@ -224,7 +227,7 @@ export default class aliasEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
 
-      this.socket.emit('generic::setById', { id: this.$route.params.id, item: this.item }, (err, data) => {
+      this.socket.emit('generic::setById', { id: this.$route.params.id, item: this.item }, (err: string | null, data: aliasEdit['item']) => {
         if (err) {
           this.state.save = this.$state.fail;
           return console.error(err);
@@ -243,7 +246,7 @@ export default class aliasEdit extends Vue {
     }
   }
 
-  beforeRouteUpdate(to, from, next) {
+  beforeRouteUpdate(to: Route, from: Route, next: NextFunction) {
     if (this.state.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
       if (!isOK) {
@@ -256,7 +259,7 @@ export default class aliasEdit extends Vue {
     }
   }
 
-  beforeRouteLeave(to, from, next) {
+  beforeRouteLeave(to: Route, from: Route, next: NextFunction) {
     if (this.state.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
       if (!isOK) {

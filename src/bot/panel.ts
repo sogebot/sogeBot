@@ -167,7 +167,7 @@ export const init = () => {
     });
     // twitch game and title change
     socket.on('getGameFromTwitch', function (game) {
-      api.sendGameFromTwitch(api, socket, game);
+      api.sendGameFromTwitch(socket, game);
     });
     socket.on('getUserTwitchGames', async () => {
       const titles = await getRepository(CacheTitles).find();
@@ -183,7 +183,7 @@ export const init = () => {
       const titles = await getRepository(CacheTitles).find();
       socket.emit('sendUserTwitchGamesAndTitles', titles);
     });
-    socket.on('cleanupGameAndTitle', async (data, cb) => {
+    socket.on('cleanupGameAndTitle', async (data: { titles: { title: string, game: string; id: string }[], game: string, title: string }, cb) => {
       // remove empty titles
       await getManager()
         .createQueryBuilder()
@@ -246,8 +246,8 @@ export const init = () => {
       cb(null, allTitles);
     });
     socket.on('updateGameAndTitle', async (data, cb) => {
-      const status = await api.setTitleAndGame(null, data);
-      await api.setTags(null, data.tags);
+      const status = await api.setTitleAndGame(data);
+      await api.setTags(data.tags);
 
       if (!status) { // twitch refused update
         cb(true);
@@ -547,7 +547,7 @@ export const expose = function () {
   });
 };
 
-const sendStreamData = async function (cb) {
+const sendStreamData = async function (cb: (error: Error | string | null, data: any) => void) {
   try {
     const ytCurrentSong = Object.values(songs.isPlaying).find(o => o) ? _.get(JSON.parse(songs.currentSong), 'title', null) : null;
     let spotifyCurrentSong: null | string = _.get(JSON.parse(spotify.currentSong), 'song', '') + ' - ' + _.get(JSON.parse(spotify.currentSong), 'artist', '');

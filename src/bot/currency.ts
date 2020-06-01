@@ -15,7 +15,6 @@ import { onChange, onLoad } from './decorators/on';
 import { getRepository } from 'typeorm';
 import { UserTip } from './database/entity/user';
 
-export type currency = 'USD' | 'AUD' | 'BGN' | 'BRL' | 'CAD' | 'CHF' | 'CNY' | 'CZK' | 'DKK' | 'EUR' | 'GBP' | 'HKD' | 'HRK' | 'HUF' | 'IDR' | 'ILS' | 'INR' | 'ISK' | 'JPY' | 'KRW' | 'MXN' | 'MYR' | 'NOK' | 'NZD' | 'PHP' | 'PLN' | 'RON' | 'RUB' | 'SEK' | 'SGD' | 'THB' | 'TRY' | 'ZAR';
 
 class Currency extends Core {
   mainCurrencyLoaded = false;
@@ -45,15 +44,15 @@ class Currency extends Core {
     }
   }
 
-  public isCodeSupported(code: string) {
+  public isCodeSupported(code: currency) {
     return code === this.base || !_.isNil(this.rates[code]);
   }
 
-  public symbol(code: string) {
-    return getSymbolFromCurrency(code);
+  public symbol(code: string): currency {
+    return getSymbolFromCurrency(code) as currency;
   }
 
-  public exchange(value: number, from: string, to: string, rates?: { [key in currency]: number }): number {
+  public exchange(value: number, from: currency, to: currency, rates?: { [key in currency]: number }): number {
     if (!rates) {
       rates = _.cloneDeep(this.rates);
     }
@@ -92,7 +91,7 @@ class Currency extends Core {
     for (const tip of result) {
       await getRepository(UserTip).save({
         ...tip,
-        sortAmount: this.exchange(tip.amount, tip.currency, this.mainCurrency, tip.exchangeRates),
+        sortAmount: this.exchange(tip.amount, tip.currency as currency, this.mainCurrency, tip.exchangeRates),
       });
     }
     info(chalk.yellow('CURRENCY:') + ' Recalculating tips (completed).');
@@ -119,7 +118,7 @@ class Currency extends Core {
           continue;
         }
         const [,, count, code, rate] = line.split('|');
-        this.rates[code] = Number((Number(rate.replace(',', '.')) / Number(count)).toFixed(3));
+        this.rates[code as currency] = Number((Number(rate.replace(',', '.')) / Number(count)).toFixed(3));
       }
       info(chalk.yellow('CURRENCY:') + ' fetched rates');
     } catch (e) {

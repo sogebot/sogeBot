@@ -9,7 +9,7 @@ import { js as jsBeautify } from 'js-beautify';
 import Message from './message';
 import { permission } from './helpers/permissions';
 import { getAllOnlineUsernames } from './helpers/getAllOnlineUsernames';
-import { announce, getTime, isModerator, prepare } from './commons';
+import { announce, getBot, getTime, isModerator, prepare } from './commons';
 
 import { getRepository, IsNull } from 'typeorm';
 import { User, UserInterface } from './database/entity/user';
@@ -39,6 +39,12 @@ class CustomVariables extends Core {
     this.checkIfCacheOrRefresh();
   }
 
+  async getAll() {
+    return (await getRepository(Variable).find()).reduce((prev: { [x: string]: any }, cur) => {
+      return { ...prev, [cur.variableName]: cur.currentValue };
+    }, {});
+  }
+
   async executeVariablesInText(text: string): Promise<string> {
     for (const variable of text.match(customVariableRegex) || []) {
       const isVariable = await this.isVariableSet(variable);
@@ -51,7 +57,7 @@ class CustomVariables extends Core {
     return text;
   }
 
-  async getURL(req, res) {
+  async getURL(req: any, res: any) {
     try {
       const variable = (await getRepository(Variable).find({
         relations: ['urls'],
@@ -74,7 +80,7 @@ class CustomVariables extends Core {
     }
   }
 
-  async postURL(req, res) {
+  async postURL(req: any, res: any) {
     try {
       const variable = (await getRepository(Variable).find({
         relations: ['urls'],
@@ -90,7 +96,9 @@ class CustomVariables extends Core {
               if (value.updated.responseType === 0) {
                 announce(prepare('filters.setVariable', { value: value.updated.currentValue, variable: variable }));
               } else if (value.updated.responseType === 1) {
-                announce(value.updated.responseText.replace('$value', value.updated.currentValue));
+                if (value.updated.responseText) {
+                  announce(value.updated.responseText.replace('$value', value.updated.currentValue));
+                }
               }
             }
             return res.status(200).send({ oldValue: variable.currentValue, value: value.setValue });
@@ -120,7 +128,7 @@ class CustomVariables extends Core {
         if (!item) {
           throw new Error('Variable not found');
         }
-        const newCurrentValue = await this.runScript(item.evalValue, { _current: item.currentValue, isUI: true });
+        const newCurrentValue = await this.runScript(item.evalValue, { sender: null,_current: item.currentValue, isUI: true });
         const runAt = Date.now();
         cb(null, await getRepository(Variable).save({
           ...item, currentValue: newCurrentValue, runAt,
@@ -190,7 +198,7 @@ class CustomVariables extends Core {
     });
   }
 
-  async runScript (script, opts) {
+  async runScript (script: string, opts: { sender: { userId: number; username: string } | string | null, isUI: boolean; param?: string | number, _current: any }) {
     debug('customvariables.eval', opts);
     let sender = !isNil(opts.sender) ? opts.sender : null;
     const isUI = !isNil(opts.isUI) ? opts.isUI : false;
@@ -246,17 +254,13 @@ class CustomVariables extends Core {
     };
 
     // get custom variables
-    const customVariablesDb = await getRepository(Variable).find();
-    const customVariables = {};
-    for (const cvar of customVariablesDb) {
-      customVariables[cvar.variableName] = cvar.currentValue;
-    }
+    const customVariables = await this.getAll();
 
     // update globals and replace theirs values
     script = (await new Message(script).global({ escape: '\'' }));
 
     const context = {
-      url: async (url, urlOpts) => {
+      url: async (url: string, urlOpts?: { url: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', headers: undefined, data: undefined }) => {
         if (typeof urlOpts === 'undefined') {
           urlOpts = {
             url,
@@ -304,20 +308,24 @@ class CustomVariables extends Core {
       warning: warning,
       param: param,
       _current: opts._current,
-      user: async (username) => {
+      user: async (username: string) => {
         const _user = await getRepository(User).findOne({ username });
-        const userObj = {
-          username,
-          id: await users.getIdByName(username),
-          is: {
-            online: _user?.isOnline ?? false,
-            follower: get(_user, 'is.follower', false),
-            vip: get(_user, 'is.vip', false),
-            subscriber: get(_user, 'is.subscriber', false),
-            mod: isModerator(username),
-          },
-        };
-        return userObj;
+        if (_user) {
+          const userObj = {
+            username,
+            id: await users.getIdByName(username),
+            is: {
+              online: _user.isOnline ?? false,
+              follower: get(_user, 'is.follower', false),
+              vip: get(_user, 'is.vip', false),
+              subscriber: get(_user, 'is.subscriber', false),
+              mod: isModerator(_user),
+            },
+          };
+          return userObj;
+        } else {
+          return null;
+        }
       },
       ...customVariables,
     };
@@ -343,15 +351,15 @@ class CustomVariables extends Core {
     }
   }
 
-  async isVariableSet (variableName) {
-    return await getRepository(Variable).findOne({ variableName });
+  async isVariableSet (variableName: string) {
+    return getRepository(Variable).findOne({ variableName });
   }
 
-  async isVariableSetById (id) {
-    return await getRepository(Variable).findOne({ id });
+  async isVariableSetById (id: string) {
+    return getRepository(Variable).findOne({ id });
   }
 
-  async getValueOf (variableName, opts?: any) {
+  async getValueOf (variableName: string, opts?: any) {
     if (!variableName.startsWith('$_')) {
       variableName = `$_${variableName}`;
     }
@@ -374,12 +382,7 @@ class CustomVariables extends Core {
     return currentValue;
   }
 
-  /* Sets value of variable with proper checks
-   *
-   * @return object
-   * { updated, isOK }
-   */
-  async setValueOf (variable: string | Readonly<VariableInterface>, currentValue, opts) {
+  async setValueOf (variable: string | Readonly<VariableInterface>, currentValue: any, opts: any): Promise<{ updated: Readonly<VariableInterface>; isOk: boolean; setValue: string; isEval: boolean }> {
     const item = typeof variable === 'string'
       ? await getRepository(Variable).findOne({ variableName: variable })
       : { ...variable };
@@ -460,7 +463,7 @@ class CustomVariables extends Core {
       });
     }
 
-    const setValue = itemCurrentValue;
+    const setValue = itemCurrentValue ?? '';
     if (isOk) {
       this.updateWidgetAndTitle(item.variableName);
       if (!isEval) {
@@ -493,7 +496,8 @@ class CustomVariables extends Core {
 
   async checkIfCacheOrRefresh () {
     if (!isDbConnected) {
-      return setTimeout(() => this.checkIfCacheOrRefresh(), 1000);
+      setTimeout(() => this.checkIfCacheOrRefresh(), 1000);
+      return;
     }
 
     clearTimeout(this.timeouts[`${this.constructor.name}.checkIfCacheOrRefresh`]);
@@ -504,7 +508,7 @@ class CustomVariables extends Core {
         item.runAt = isNil(item.runAt) ? 0 : item.runAt;
         const shouldRun = item.runEvery > 0 && Date.now() - new Date(item.runAt).getTime() >= item.runEvery;
         if (shouldRun) {
-          const newValue = await this.runScript(item.evalValue, { _current: item.currentValue });
+          const newValue = await this.runScript(item.evalValue, { _current: item.currentValue, sender: getBot(), isUI: false });
           item.runAt = Date.now();
           item.currentValue = newValue;
           await getRepository(Variable).save(item);
@@ -524,7 +528,7 @@ class CustomVariables extends Core {
       const regexp = new RegExp(`\\${variable}`, 'ig');
 
       if (api.rawStatus.match(regexp)) {
-        api.setTitleAndGame(null, null);
+        api.setTitleAndGame({});
       }
     }
   }

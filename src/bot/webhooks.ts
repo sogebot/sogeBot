@@ -1,6 +1,5 @@
 import axios from 'axios';
 import util from 'util';
-import { get, isNil } from 'lodash';
 import { setTimeout } from 'timers';
 
 import { isBot } from './commons';
@@ -8,7 +7,7 @@ import { debug, error, follow, info, start } from './helpers/log';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import { getRepository } from 'typeorm';
 import { User } from './database/entity/user';
-import api from './api';
+import api, { StreamEndpoint } from './api';
 import events from './events';
 import oauth from './oauth';
 import ui from './ui';
@@ -18,13 +17,17 @@ import { linesParsed } from './helpers/parser';
 import { getFunctionList } from './decorators/on';
 import { find } from './helpers/register';
 
+type Type = 'follows' | 'streams';
+
+type followEvent = { data: { from_id: string, from_name: string, to_id: string, to_name: string, followed_at: string } };
+
 class Webhooks {
   enabled = {
     follows: false,
     streams: false,
   };
   timeouts: { [x: string]: NodeJS.Timeout} = {};
-  cache: { id: string; type: string; timestamp: number }[] = [];
+  cache: { id: string; type: Type; timestamp: number }[] = [];
 
   subscribeAll() {
     this.unsubscribe('follows').then(() => this.subscribe('follows'));
@@ -32,9 +35,9 @@ class Webhooks {
     this.clearCache();
   }
 
-  addIdToCache (type, id) {
+  addIdToCache (type: Type, id: string | number) {
     this.cache.push({
-      id: id,
+      id: String(id),
       type: type,
       timestamp: Date.now(),
     });
@@ -46,11 +49,11 @@ class Webhooks {
     setTimeout(() => this.clearCache, 600000);
   }
 
-  existsInCache (type, id) {
-    return typeof this.cache.find((o) => o.type === type && o.id === id) !== 'undefined';
+  existsInCache (type: Type, id: string | number) {
+    return typeof this.cache.find((o) => o.type === type && o.id === String(id)) !== 'undefined';
   }
 
-  async unsubscribe (type) {
+  async unsubscribe (type: Type) {
     clearTimeout(this.timeouts[`unsubscribe-${type}`]);
 
     const cid = oauth.channelId;
@@ -105,7 +108,7 @@ class Webhooks {
     }
   }
 
-  async subscribe (type) {
+  async subscribe (type: string) {
     clearTimeout(this.timeouts[`subscribe-${type}`]);
 
     const cid = oauth.channelId;
@@ -179,18 +182,7 @@ class Webhooks {
     this.timeouts[`subscribe-${type}`] = setTimeout(() => this.subscribe(type), leaseSeconds * 1000);
   }
 
-  async event (aEvent, res) {
-    // somehow stream doesn't have a topic
-    if (get(aEvent, 'topic', null) === `https://api.twitch.tv/helix/users/follows?first=1&to_id=${oauth.channelId}`) {
-      this.follower(aEvent);
-    } else if (get(!isNil(aEvent.data[0]) ? aEvent.data[0] : {}, 'type', null) === 'live') {
-      this.stream(aEvent);
-    }
-
-    res.sendStatus(200);
-  }
-
-  async challenge (req, res) {
+  async challenge (req: any, res: any) {
     const cid = oauth.channelId;
     // set webhooks enabled
     switch (req.query['hub.topic']) {
@@ -218,11 +210,10 @@ class Webhooks {
       }
   }
   */
-  async follower (aEvent, skipCacheCheck = false) {
+  async follower (aEvent: followEvent, skipCacheCheck = false) {
     try {
       const cid = oauth.channelId;
       const data = aEvent.data;
-      data.from_id = Number(data.from_id);
 
       if (Object.keys(cid).length === 0) {
         setTimeout(() => this.follower(aEvent), 10);
@@ -237,15 +228,15 @@ class Webhooks {
 
       // is in webhooks cache
       if (!skipCacheCheck) {
-        if (this.existsInCache('follow', data.from_id)) {
+        if (this.existsInCache('follows', data.from_id)) {
           return;
         }
 
         // add to cache
-        this.addIdToCache('follow', data.from_id);
+        this.addIdToCache('follows', data.from_id);
       }
 
-      const user = await getRepository(User).findOne({ userId: data.from_id });
+      const user = await getRepository(User).findOne({ userId: Number(data.from_id) });
       if (!user) {
         await getRepository(User).save({
           userId: Number(data.from_id),
@@ -263,7 +254,7 @@ class Webhooks {
             timestamp: Date.now(),
           });
           follow(data.from_name);
-          events.fire('follow', { username: data.from_name, userId: data.from_id, webhooks: true });
+          events.fire('follow', { username: data.from_name, userId: Number(data.from_id), webhooks: true });
           alerts.trigger({
             event: 'follows',
             name: data.from_name,
@@ -276,7 +267,7 @@ class Webhooks {
 
           triggerInterfaceOnFollow({
             username: data.from_name,
-            userId: data.from_id,
+            userId: Number(data.from_id),
           });
         }
       }
@@ -293,25 +284,7 @@ class Webhooks {
     }
   }
 
-  /*
-    Example aEvent payload
-    {
-      "data":
-        [{
-          "id":"0123456789",
-          "user_id":"5678",
-          "game_id":"21779",
-          "community_ids":[],
-          "type":"live",
-          "title":"Best Stream Ever",
-          "viewer_count":417,
-          "started_at":"2017-12-01T10:09:45Z",
-          "language":"en",
-          "thumbnail_url":"https://link/to/thumbnail.jpg"
-        }]
-    }
-  */
-  async stream (aEvent) {
+  async stream (aEvent: StreamEndpoint) {
     const cid = oauth.channelId;
     if (cid === '') {
       setTimeout(() => this.stream(aEvent), 1000);
@@ -328,7 +301,7 @@ class Webhooks {
       if (Number(api.streamId) !== Number(stream.id)) {
         debug('webhooks.stream', 'WEBHOOKS: ' + JSON.stringify(aEvent));
         start(
-          `id: ${stream.id} | webhooks | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await api.getGameFromId(stream.game_id)} | type: ${stream.type} | channel ID: ${cid}`
+          `id: ${stream.id} | webhooks | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await api.getGameFromId(Number(stream.game_id))} | type: ${stream.type} | channel ID: ${cid}`
         );
 
         // reset quick stats on stream start
@@ -352,7 +325,7 @@ class Webhooks {
           const module = !event.path.includes('.') ? event.path.split('.')[0] : event.path.split('.')[1];
           const self = find(type, module);
           if (self) {
-            self[event.fName]();
+            (self as any)[event.fName]();
           } else {
             error(`streamStart: ${event.path} not found`);
           }
@@ -365,7 +338,7 @@ class Webhooks {
       api.streamType = stream.type;
 
       api.stats.currentTitle = stream.title;
-      api.stats.currentGame = await api.getGameFromId(stream.game_id);
+      api.stats.currentGame = await api.getGameFromId(Number(stream.game_id));
 
       api.curRetries = 0;
       api.saveStreamData(stream);

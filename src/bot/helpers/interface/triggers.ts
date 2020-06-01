@@ -34,9 +34,9 @@ function trigger(opts: onEventMessage | onEventSub | onEventBit | onEventTip | o
       throw new Error(`${type}.${name} not found in list`);
     }
 
-    if (typeof self[event.fName] === 'function') {
+    if (typeof (self as any)[event.fName] === 'function') {
       debug('trigger', `event ${on_trigger} => ${self.__moduleName__}`);
-      self[event.fName](opts);
+      (self as any)[event.fName](opts);
     }
   }
 }

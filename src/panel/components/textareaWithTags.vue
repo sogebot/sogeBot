@@ -70,8 +70,8 @@ import translate from '../helpers/translate';
 
 @Component({
   filters: {
-    filterize: function (val) {
-      const filtersRegExp = new RegExp('\\$(' + sortBy(keys(flatten(translate('responses.variable'))), (o) => -o.length).join('|') + ')', 'g')
+    filterize: function (val: string) {
+      const filtersRegExp = new RegExp('\\$(' + sortBy(keys(flatten(translate('responses.variable', true))), (o) => -o.length).join('|') + ')', 'g')
       val = val.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
       let matches = val.match(filtersRegExp)
       let output = val
@@ -103,15 +103,15 @@ export default class textareaWithTags extends Vue {
     return `height: ${this.height + 2}px`
   }
 
-  onEnter (e) {
+  onEnter (e: Event) {
     // don't add newline
     e.stopPropagation()
     e.preventDefault()
     e.returnValue = false
-    this._value = e.target.value
+    this._value = (e.target as any).value
   }
 
-  addVariable(variable) {
+  addVariable(variable: string) {
     this._value = this._value + ' $' + variable;
     this.editation = true;
     Vue.nextTick(() => {
@@ -122,7 +122,7 @@ export default class textareaWithTags extends Vue {
   }
 
   @Watch('editation')
-  onEditationChanged(val, old) {
+  onEditationChanged(val: string, old: string) {
     if (val) {
       // focus textarea and set height
       if (this._value.trim().length === 0) {

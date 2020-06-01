@@ -83,7 +83,8 @@ export default class MediaForm extends Vue {
     if (this.type === 'audio' && this.b64data.length > 0) {
       if (typeof this.$refs[this.createdAt + this.id] === 'undefined') {
         console.debug(`Retrying setVolume ${this.id}`);
-        return setTimeout(() => this.setVolume(), 100);
+        setTimeout(() => this.setVolume(), 100);
+        return;
       }
       (this.$refs[this.createdAt + this.id] as HTMLAudioElement).volume = this.volume / 100;
     }
@@ -92,7 +93,10 @@ export default class MediaForm extends Vue {
   created() {
     this.createdAt = Date.now();
     this.io = getSocket(this.socket);
-    this.io.emit('alerts::getOneMedia', this.id, (err, data: AlertMediaInterface[]) => {
+    this.io.emit('alerts::getOneMedia', this.id, (err: string| null, data: AlertMediaInterface[]) => {
+      if (err) {
+        return console.error(err);
+      }
       console.groupCollapsed('alerts::getOneMedia ' + this.id)
       console.log(data)
       console.groupEnd();
@@ -122,7 +126,10 @@ export default class MediaForm extends Vue {
     clearInterval(this.interval)
   }
 
-  fileUpload(chunks) {
+  fileUpload(chunks: RegExpMatchArray | null) {
+    if (!chunks) {
+      return;
+    }
     const id = uuid();
     this.isUploading = true;
     const promises: Promise<void>[] = []
@@ -138,7 +145,7 @@ export default class MediaForm extends Vue {
               chunkNo: i
             }
             console.log('Uploading chunk#' + i, chunk)
-            this.io.emit('alerts::saveMedia', [chunk], (err, data) => {
+            this.io.emit('alerts::saveMedia', [chunk], (err: string | null) => {
               if (err) {
                 console.error(err)
                 reject();
@@ -156,7 +163,11 @@ export default class MediaForm extends Vue {
     });
   }
 
-  filesChange(file) {
+  filesChange(file: HTMLInputElement['files']) {
+    if (!file) {
+      return;
+    }
+
     const reader = new FileReader()
     reader.onload = (async e => {
       const chunks = String(reader.result).match(/.{1,1000000}/g)

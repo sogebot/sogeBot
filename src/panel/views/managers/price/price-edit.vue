@@ -76,6 +76,9 @@
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 
+import { Route } from 'vue-router'
+import { NextFunction } from 'express';
+
 import { Validations } from 'vuelidate-property-decorators';
 import { required, minValue } from 'vuelidate/lib/validators';
 
@@ -130,7 +133,7 @@ export default class priceEdit extends Vue {
   async mounted() {
     if (this.$route.params.id) {
       await new Promise((resolve, reject) => {
-        this.socket.emit('generic::getOne', this.$route.params.id, (err, data) => {
+        this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, data: PriceInterface) => {
           if (err) {
             return console.error(err);
           }
@@ -147,7 +150,7 @@ export default class priceEdit extends Vue {
   }
 
   del() {
-    this.socket.emit('generic::deleteById', this.$route.params.id, (err) => {
+    this.socket.emit('generic::deleteById', this.$route.params.id, (err: string | null) => {
       if (err) {
         return console.error(err);
       }
@@ -160,7 +163,7 @@ export default class priceEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
 
-      this.socket.emit('price::save', this.item, (err) => {
+      this.socket.emit('price::save', this.item, (err: string | null) => {
         if (err) {
           this.state.save = this.$state.fail;
           return console.error(err);
@@ -178,7 +181,7 @@ export default class priceEdit extends Vue {
     }
   }
 
-  beforeRouteUpdate(to, from, next) {
+  beforeRouteUpdate(to: Route, from: Route, next: NextFunction) {
     if (this.state.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
       if (!isOK) {
@@ -191,7 +194,7 @@ export default class priceEdit extends Vue {
     }
   }
 
-  beforeRouteLeave(to, from, next) {
+  beforeRouteLeave(to: Route, from: Route, next: NextFunction) {
     if (this.state.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
       if (!isOK) {

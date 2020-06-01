@@ -7,7 +7,7 @@ export const getRandomColor = () => {
   return color.toLowerCase();
 };
 
-export const getContrastColor = (hex) => {
+export const getContrastColor = (hex: string) => {
   const r = parseInt(hex.substr(1, 2), 16),
     g = parseInt(hex.substr(3, 2), 16),
     b = parseInt(hex.substr(5, 2), 16),

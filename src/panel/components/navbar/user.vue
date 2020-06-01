@@ -52,12 +52,12 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
-import { PermissionsInterface } from 'src/bot/database/entity/permissions'
 
 import { permission } from 'src/bot/helpers/permissions'
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons'
+import { UserInterface } from '../../../bot/database/entity/user';
 library.add(faUserCircle);
 
 @Component({
@@ -73,38 +73,7 @@ export default class User extends Vue {
   permission = permission;
 
   isViewerLoaded: boolean = false;
-  viewer: {
-    id: number; points: number;
-    permission: PermissionsInterface | null;
-    stats: {
-      aggregatedTips: number; aggregatedBits: number; messages: number;
-    };
-    time: {
-      watched: number;
-    };
-    is: {
-      follower: boolean; subscriber: boolean; vip: boolean;
-    };
-    custom: {
-      currency: string;
-    };
-  } = {
-    id: 0,
-    points: 0,
-    permission: null,
-    stats: {
-      aggregatedTips: 0, aggregatedBits: 0, messages: 0
-    },
-    time: {
-      watched: 0,
-    },
-    is: {
-      follower: false, subscriber: false, vip: false
-    },
-    custom: {
-      currency: 'EUR',
-    },
-  }
+  viewer: (Required<UserInterface> & { aggregatedTips: number; aggregatedBits: number; permission: string }) | null = null;
 
   beforeDestroy() {
     clearInterval(this.interval);
@@ -112,11 +81,12 @@ export default class User extends Vue {
 
   get viewerIs(): string[] {
     let status: string[] = [];
-    for (const key of ['isFollower', 'isSubscriber', 'isVIP']) {
-      if (this.viewer && this.viewer[key]) {
-        status.push(key.replace('is', ''));
+    const isArray = ['isFollower', 'isSubscriber', 'isVIP'] as const;
+    isArray.forEach((item: typeof isArray[number]) => {
+      if (this.viewer && this.viewer[item]) {
+        status.push(item.replace('is', ''));
       }
-    }
+    })
     return status;
   }
 
@@ -151,7 +121,7 @@ export default class User extends Vue {
     if (typeof this.$loggedUser === 'undefined'|| this.$loggedUser === null) {
       return;
     }
-    this.socket.emit('viewers::findOne', this.$loggedUser.id, (err, viewer) => {
+    this.socket.emit('viewers::findOne', this.$loggedUser.id, (err: string| number, viewer: Readonly<Required<UserInterface>> & { aggregatedTips: number; aggregatedBits: number; permission: string }) => {
       if (err) {
         return console.error(err);
       }

@@ -33,7 +33,9 @@ import { orderBy } from 'lodash-es';
 
 @Component({})
 export default class configurableList extends Vue {
-  @Prop() readonly value: any;
+  @Prop() readonly value!: {
+    order: number; left: string; middle: string; right: string;
+  }[];
 
   orderBy = orderBy;
 
@@ -51,25 +53,33 @@ export default class configurableList extends Vue {
     this.$emit('update', { value: this.currentValues })
   }
 
-  moveUp(order) {
+  moveUp(order: number) {
     const val = Object.assign({}, this.currentValues.find(o => o.order === order))
     const val2 = Object.assign({}, this.currentValues.find(o => o.order === order - 1))
 
-    this.currentValues.find(o => o.order === order).order = val2.order
-    this.currentValues.find(o => o.order === order - 1).order = val.order
+    const findVal = this.currentValues.find(o => o.order === order)
+    const findVal2 = this.currentValues.find(o => o.order === order - 1);
+    if (findVal && findVal2) {
+      findVal.order = val2.order
+      findVal2.order = val.order
+    }
     this.onChange()
   }
 
-  moveDn(order) {
+  moveDn(order: number) {
     const val = Object.assign({}, this.currentValues.find(o => o.order === order))
     const val2 = Object.assign({}, this.currentValues.find(o => o.order === order + 1))
 
-    this.currentValues.find(o => o.order === order).order = val2.order
-    this.currentValues.find(o => o.order === order + 1).order = val.order
+    const findVal = this.currentValues.find(o => o.order === order)
+    const findVal2 = this.currentValues.find(o => o.order === order + 1);
+    if (findVal && findVal2) {
+      findVal.order = val2.order
+      findVal2.order = val.order
+    }
     this.onChange()
   }
 
-  remove(order) {
+  remove(order: number) {
     this.currentValues = this.currentValues.filter(o => o.order !== order)
   }
 

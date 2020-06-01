@@ -16,24 +16,24 @@ import oauth from '../oauth';
 import { ioServer } from '../helpers/panel';
 
 
-class Emotes extends Overlay {
-  simpleEmotes = {
-    ':)': 'https://static-cdn.jtvnw.net/emoticons/v1/1/',
-    ':(': 'https://static-cdn.jtvnw.net/emoticons/v1/2/',
-    ':o': 'https://static-cdn.jtvnw.net/emoticons/v1/8/',
-    ':z': 'https://static-cdn.jtvnw.net/emoticons/v1/5/',
-    'B)': 'https://static-cdn.jtvnw.net/emoticons/v1/7/',
-    ':\\': 'https://static-cdn.jtvnw.net/emoticons/v1/10/',
-    ';)': 'https://static-cdn.jtvnw.net/emoticons/v1/11/',
-    ';p': 'https://static-cdn.jtvnw.net/emoticons/v1/13/',
-    ':p': 'https://static-cdn.jtvnw.net/emoticons/v1/12/',
-    'R)': 'https://static-cdn.jtvnw.net/emoticons/v1/14/',
-    'o_O': 'https://static-cdn.jtvnw.net/emoticons/v1/6/',
-    ':D': 'https://static-cdn.jtvnw.net/emoticons/v1/3/',
-    '>(': 'https://static-cdn.jtvnw.net/emoticons/v1/4/',
-    '<3': 'https://static-cdn.jtvnw.net/emoticons/v1/9/',
-  };
+const simpleEmotes = {
+  ':)': 'https://static-cdn.jtvnw.net/emoticons/v1/1/',
+  ':(': 'https://static-cdn.jtvnw.net/emoticons/v1/2/',
+  ':o': 'https://static-cdn.jtvnw.net/emoticons/v1/8/',
+  ':z': 'https://static-cdn.jtvnw.net/emoticons/v1/5/',
+  'B)': 'https://static-cdn.jtvnw.net/emoticons/v1/7/',
+  ':\\': 'https://static-cdn.jtvnw.net/emoticons/v1/10/',
+  ';)': 'https://static-cdn.jtvnw.net/emoticons/v1/11/',
+  ';p': 'https://static-cdn.jtvnw.net/emoticons/v1/13/',
+  ':p': 'https://static-cdn.jtvnw.net/emoticons/v1/12/',
+  'R)': 'https://static-cdn.jtvnw.net/emoticons/v1/14/',
+  'o_O': 'https://static-cdn.jtvnw.net/emoticons/v1/6/',
+  ':D': 'https://static-cdn.jtvnw.net/emoticons/v1/3/',
+  '>(': 'https://static-cdn.jtvnw.net/emoticons/v1/4/',
+  '<3': 'https://static-cdn.jtvnw.net/emoticons/v1/9/',
+};
 
+class Emotes extends Overlay {
   fetch = {
     global: false,
     channel: false,
@@ -49,7 +49,7 @@ class Emotes extends Overlay {
 
   @settings('emotes')
   @ui({ type: 'selector', values: ['1', '2', '3'] })
-  cEmotesSize = 1;
+  cEmotesSize: 1 | 2 | 3 = 1;
   @settings('emotes')
   cEmotesMaxEmotesPerMessage = 5;
   @settings('emotes')
@@ -362,20 +362,20 @@ class Emotes extends Overlay {
     }
 
     const parsed: string[] = [];
-    const usedEmotes = {};
+    const usedEmotes: { [code: string]: Readonly<Required<CacheEmotesInterface>>} = {};
 
     const cache = await getRepository(CacheEmotes).find();
 
     // add simple emotes
-    for (const code of Object.keys(this.simpleEmotes)) {
+    for (const code of Object.keys(simpleEmotes)) {
       cache.push({
         id: uuid(),
         type: 'twitch',
         code,
         urls: {
-          '1': this.simpleEmotes[code] + '1.0',
-          '2': this.simpleEmotes[code] + '2.0',
-          '3': this.simpleEmotes[code] + '3.0',
+          '1': simpleEmotes[code as keyof typeof simpleEmotes] + '1.0',
+          '2': simpleEmotes[code as keyof typeof simpleEmotes] + '2.0',
+          '3': simpleEmotes[code as keyof typeof simpleEmotes] + '3.0',
         },
       });
     }
@@ -421,7 +421,7 @@ class Emotes extends Overlay {
     const emotes = _.shuffle(parsed);
     for (let i = 0; i < this.cEmotesMaxEmotesPerMessage && i < emotes.length; i++) {
       ioServer?.of('/overlays/emotes').emit('emote', {
-        url: usedEmotes[emotes[i]].urls[String(this.cEmotesSize)],
+        url: usedEmotes[emotes[i]].urls[this.cEmotesSize],
         settings: {
           emotes: {
             animation: this.cEmotesAnimation,
@@ -438,8 +438,8 @@ class Emotes extends Overlay {
     const emotesArray: string[] = [];
 
     for (let i = 0, length = emotes.length; i < length; i++) {
-      if (_.includes(Object.keys(this.simpleEmotes), emotes[i])) {
-        emotesArray.push(this.simpleEmotes[emotes[i]] + this.cEmotesSize + '.0');
+      if (_.includes(Object.keys(simpleEmotes), emotes[i])) {
+        emotesArray.push((simpleEmotes[emotes[i] as keyof typeof simpleEmotes]) + this.cEmotesSize + '.0');
       } else {
         try {
           const items = await getRepository(CacheEmotes).find({ code: emotes[i] });

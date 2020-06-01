@@ -22,6 +22,7 @@ import { Vue, Component } from 'vue-property-decorator';
 import VueScrollTo from 'vue-scrollto';
 
 import { getSocket } from 'src/panel/helpers/socket';
+import { QuotesInterface } from '../../bot/database/entity/quotes';
 
 @Component({
   components: {
@@ -50,7 +51,7 @@ export default class playlist extends Vue {
 
   mounted() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('quotes:getAll', {}, (err, items) => {
+    this.socket.emit('quotes:getAll', {}, (err: string | null, items: QuotesInterface[]) => {
       console.debug('Loaded', {items})
       this.items = items
       this.state.loading = this.$state.success;

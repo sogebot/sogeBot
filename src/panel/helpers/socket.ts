@@ -17,7 +17,7 @@ export function getSocket(namespace: string, continueOnUnauthorized = false) {
       token: localStorage.getItem('accessToken'),
     },
   });
-  socket.on('error', (error) => {
+  socket.on('error', (error: string) => {
     if (error === 'TokenExpiredError: jwt expired') {
       console.debug('Using refresh token to obtain new access token');
       const refreshToken = localStorage.getItem('refreshToken');
@@ -81,7 +81,7 @@ export function getSocket(namespace: string, continueOnUnauthorized = false) {
 
 export const getTranslations = async () => {
   console.debug('Getting translations');
-  getSocket('/', true).emit('translations', (translations) => {
+  getSocket('/', true).emit('translations', (translations: any) => {
     console.debug({translations});
     setTranslations(translations);
   });
@@ -90,7 +90,7 @@ export const getTranslations = async () => {
 export const getConfiguration = async () => {
   console.debug('Getting configuration');
   return new Promise((resolve) => {
-    getSocket('/core/ui', true).emit('configuration', (err, configuration) => {
+    getSocket('/core/ui', true).emit('configuration', (err: string | null, configuration: any) => {
       if (err) {
         return console.error(err);
       }

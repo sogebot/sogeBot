@@ -102,7 +102,7 @@ class Credits extends Overlay {
       const when = api.isStreamOnline ? api.streamStatusChangeSince : _.now() - 50000000000;
       const timestamp = new Date(when).getTime();
       const events: (EventListInterface & { values?: {
-        currency: string; amount: number;
+        currency: currency; amount: number;
       };})[] = await getRepository(EventList).find({
         order: {
           timestamp: 'DESC',

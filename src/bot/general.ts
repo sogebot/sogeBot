@@ -113,13 +113,13 @@ class General extends Core {
         const isDisabledByEnv = !isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.__moduleName__.toLowerCase()) || process.env.DISABLE === '*');
 
         if (!enabled) {
-          enabledSystems[category].push('-' + system.__moduleName__);
+          enabledSystems[category as 'systems' | 'games' | 'integrations'].push('-' + system.__moduleName__);
         } else if (!areDependenciesEnabled) {
-          enabledSystems[category].push('-dep-' + system.__moduleName__);
+          enabledSystems[category as 'systems' | 'games' | 'integrations'].push('-dep-' + system.__moduleName__);
         } else if (isDisabledByEnv) {
-          enabledSystems[category].push('-env-' + system.__moduleName__);
+          enabledSystems[category as 'systems' | 'games' | 'integrations'].push('-env-' + system.__moduleName__);
         } else {
-          enabledSystems[category].push(system.__moduleName__);
+          enabledSystems[category as 'systems' | 'games' | 'integrations'].push(system.__moduleName__);
         }
       }
     }
@@ -170,25 +170,25 @@ class General extends Core {
       throw new Error(`${type}.${name} not found in list`);
     }
 
-    const currentValue = self[pointer.split('.')[2]];
+    const currentValue = (self as any)[pointer.split('.')[2]];
     if (typeof currentValue !== 'undefined') {
       if (isBoolean(currentValue)) {
         newValue = newValue.toLowerCase().trim();
         if (['true', 'false'].includes(newValue)) {
-          self[pointer.split('.')[2]] = newValue === 'true';
+          (self as any)[pointer.split('.')[2]] = newValue === 'true';
           return [{ response: `$sender, ${pointer} set to ${newValue}`, ...opts }];
         } else {
           return [{ response: `$sender, !set error: bool is expected`, ...opts }];
         }
       } else if (isNumber(currentValue)) {
         if (isFinite(Number(newValue))) {
-          self[pointer.split('.')[2]] = Number(newValue);
+          (self as any)[pointer.split('.')[2]] = Number(newValue);
           return [{ response: `$sender, ${pointer} set to ${newValue}`, ...opts }];
         } else {
           return [{ response: `$sender, !set error: number is expected`, ...opts }];
         }
       } else if (isString(currentValue)) {
-        self[pointer.split('.')[2]] = newValue;
+        (self as any)[pointer.split('.')[2]] = newValue;
         return [{ response: `$sender, ${pointer} set to '${newValue}'`, ...opts }];
       } else {
         return [{ response: `$sender, ${pointer} is not supported settings to change`, ...opts }];

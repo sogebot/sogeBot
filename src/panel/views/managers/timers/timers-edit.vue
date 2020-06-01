@@ -121,6 +121,9 @@
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 
+import { Route } from 'vue-router'
+import { NextFunction } from 'express';
+
 import { Validations } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators';
 
@@ -135,7 +138,7 @@ Component.registerHooks([
 ])
 
 
-const mustBeCompliant = (value) => value.length === 0 || !!value.match(/^[a-zA-Z0-9_]+$/);
+const mustBeCompliant = (value: string) => value.length === 0 || !!value.match(/^[a-zA-Z0-9_]+$/);
 
 @Component({
   components: {
@@ -144,7 +147,7 @@ const mustBeCompliant = (value) => value.length === 0 || !!value.match(/^[a-zA-Z
     'textarea-with-tags': () => import('../../../components/textareaWithTags.vue'),
   },
   filters: {
-    capitalize(value) {
+    capitalize(value: string) {
       if (!value) return ''
       value = value.toString()
       return value.charAt(0).toUpperCase() + value.slice(1)
@@ -200,14 +203,14 @@ export default class timerssEdit extends Vue {
     this.item.messages.push(response);
   }
 
-  delResponse(index) {
+  delResponse(index: number) {
     this.item.messages.splice(index, 1);
   }
 
   async mounted() {
     if (this.$route.params.id) {
       await new Promise((resolve, reject) => {
-        this.socket.emit('generic::getOne', this.$route.params.id, (err, data) => {
+        this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, data: Required<TimerInterface>) => {
         if (err) {
           reject(err)
         }
@@ -223,7 +226,7 @@ export default class timerssEdit extends Vue {
   }
 
   del() {
-    this.socket.emit('generic::deleteById', this.$route.params.id, (err) => {
+    this.socket.emit('generic::deleteById', this.$route.params.id, (err: string | null) => {
       if (err) {
         return console.error(err);
       }
@@ -236,7 +239,7 @@ export default class timerssEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
 
-      this.socket.emit('timers::save', this.item, (err, data) => {
+      this.socket.emit('timers::save', this.item, (err: string | null, data: Required<TimerInterface>) => {
         if (err) {
           this.state.save = this.$state.fail;
           return console.error(err);
@@ -255,7 +258,7 @@ export default class timerssEdit extends Vue {
     }
   }
 
-  beforeRouteUpdate(to, from, next) {
+  beforeRouteUpdate(to: Route, from: Route, next: NextFunction) {
     if (this.state.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
       if (!isOK) {
@@ -268,7 +271,7 @@ export default class timerssEdit extends Vue {
     }
   }
 
-  beforeRouteLeave(to, from, next) {
+  beforeRouteLeave(to: Route, from: Route, next: NextFunction) {
     if (this.state.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
       if (!isOK) {

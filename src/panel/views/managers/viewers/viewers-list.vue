@@ -232,6 +232,7 @@ import moment from 'moment';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faSortDown, faSortUp, faSortAlphaUp, faSortAlphaDown } from '@fortawesome/free-solid-svg-icons'
+import { UserInterface } from '../../../../bot/database/entity/user';
 
 library.add(faSortDown, faSortUp, faSortAlphaUp, faSortAlphaDown)
 
@@ -247,7 +248,7 @@ export default class viewersList extends Vue {
 
   socket = getSocket('/core/users');
 
-  items: any[] = []
+  items: Required<UserInterface>[] = []
   count: number = 0;
   search: string = '';
 
@@ -294,7 +295,7 @@ export default class viewersList extends Vue {
     this.state.loading = this.$state.progress;
     this.socket.emit('find.viewers', { page: (this.currentPage - 1), order: {
       orderBy: this.sort, sortOrder: this.sortDesc ? 'DESC' : 'ASC'
-    }, filter: this.filter, search: this.search.length > 0 ? this.search : undefined }, (err, items, count) => {
+    }, filter: this.filter, search: this.search.length > 0 ? this.search : undefined }, (err: string | null, items: Required<UserInterface>[], count: number) => {
       if (err) {
         return console.error(err);
       }
@@ -308,7 +309,7 @@ export default class viewersList extends Vue {
   created() {
     console.time('find.viewers');
     this.state.loading = this.$state.progress;
-    this.socket.emit('find.viewers', { page: 0 }, (err, items, count) => {
+    this.socket.emit('find.viewers', { page: 0 }, (err: string | null, items: Required<UserInterface>[], count: number) => {
       if (err) {
         return console.error(err);
       }
@@ -349,9 +350,9 @@ export default class viewersList extends Vue {
     })
   }
 
-  linkTo(item) {
+  linkTo(item: Required<UserInterface>) {
     console.debug('Clicked', item.userId);
-    this.$router.push({ name: 'viewersManagerEdit', params: { id: item.userId } });
+    this.$router.push({ name: 'viewersManagerEdit', params: { id: String(item.userId) } });
   }
 }
 </script>

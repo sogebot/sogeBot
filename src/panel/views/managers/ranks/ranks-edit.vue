@@ -80,6 +80,9 @@
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 
+import { Route } from 'vue-router'
+import { NextFunction } from 'express';
+
 import { Validations } from 'vuelidate-property-decorators';
 import { required, minValue } from 'vuelidate/lib/validators'
 
@@ -97,7 +100,7 @@ Component.registerHooks([
     'loading': () => import('../../../components/loading.vue'),
   },
   filters: {
-    capitalize(value) {
+    capitalize(value: string) {
       if (!value) return ''
       value = value.toString()
       return value.charAt(0).toUpperCase() + value.slice(1)
@@ -143,7 +146,7 @@ export default class ranksEdit extends Vue {
   async mounted() {
     if (this.$route.params.id) {
       await new Promise(resolve => {
-        this.socket.emit('generic::getOne', this.$route.params.id, (err, data: RankInterface) => {
+        this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, data: RankInterface) => {
           if (err) {
             return console.error(err);
           }
@@ -170,7 +173,7 @@ export default class ranksEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
 
-      this.socket.emit('ranks::save', this.item, (err, data) => {
+      this.socket.emit('ranks::save', this.item, (err: string | null, data: Required<RankInterface>) => {
         if (err) {
           this.state.save = this.$state.fail;
           console.error(err);
@@ -186,7 +189,7 @@ export default class ranksEdit extends Vue {
     }
   }
 
-  beforeRouteUpdate(to, from, next) {
+  beforeRouteUpdate(to: Route, from: Route, next: NextFunction) {
     if (this.state.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
       if (!isOK) {
@@ -199,7 +202,7 @@ export default class ranksEdit extends Vue {
     }
   }
 
-  beforeRouteLeave(to, from, next) {
+  beforeRouteLeave(to: Route, from: Route, next: NextFunction) {
     if (this.state.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
       if (!isOK) {

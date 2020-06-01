@@ -7,7 +7,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 
 @Component({})
 export default class helpbox extends Vue {
-  @Prop() readonly title: any;
+  @Prop() readonly title!: string;
   @Prop() readonly fullObject: any;
   translatedTitle = this.translate(this.title);
 }

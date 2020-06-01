@@ -67,7 +67,7 @@ class EventList extends Overlay {
           .reduce((obj, key) => {
             return {
               ...obj,
-              [key]: data[key],
+              [key]: (data as any)[key],
             };
           }, {}),
       ),

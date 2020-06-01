@@ -214,7 +214,7 @@
       _resizeListener() {
         this.windowWidth = window.innerWidth;
       },
-      deleteTitle(id) {
+      deleteTitle(id: string) {
         this.data = this.data.filter(o => o.id !== id);
         this.selectedTitle = 'current';
       },
@@ -225,12 +225,17 @@
         this.selectedTitle = 'current';
         this.newTitle = '';
         this.carouselPage = 0;
-        this.socket.emit('getCachedTags', (data) => {
+        this.socket.emit('getCachedTags', (data: {
+          tag_id: string;
+          locale: string;
+          value: string;
+          is_auto: boolean;
+        }[]) => {
           this.cachedTags = data.filter(o => !o.is_auto);
         })
         this.socket.emit('getUserTwitchGames');
 
-        this.socket.emit('panel.sendStreamData', (err, data) => {
+        this.socket.emit('panel.sendStreamData', (err: string | null, data: any) => {
           if (err) {
             return console.error(err);
           }
@@ -240,7 +245,7 @@
           if (!this.currentGame) {
             this.currentGame = data.game;
             this.currentTitle = data.status;
-            this.currentTags = data.tags.filter(o => !o.is_auto).map(o => {
+            this.currentTags = data.tags.filter((o: any) => !o.is_auto).map((o: any) => {
               const key = Object.keys(o.localization_names).find(key => key.includes(this.configuration.lang))
               return o.localization_names[key || 'en-us'];
             })
@@ -248,7 +253,7 @@
         });
       },
       handleOk() {
-        let title
+        let title = '';
         if (this.selectedTitle === 'current') {
           title = this.currentTitle
         } else if (this.selectedTitle === 'new') {
@@ -266,7 +271,7 @@
           game: this.currentGame,
           title,
           tags: this.currentTags,
-        }, (err) => {
+        }, (err: string | null) => {
           if (err) {
             this.saveState = -1;
           } else {
@@ -276,7 +281,7 @@
               game: this.currentGame,
               title,
               titles: this.data
-            }, (err, data) => {
+            }, (err: string | null, data: any) => {
               this.data = data
             })
           }
@@ -285,7 +290,7 @@
           }, 1000);
         })
       },
-      dragstart(game) {
+      dragstart(game: string) {
         this.draggingEnter = 0;
         this.draggingGame = game;
       },
@@ -305,14 +310,14 @@
           this.draggingGame = null;
         })
       },
-      searchForGame(value) {
+      searchForGame(value: string) {
         if (value.trim().length !== 0) {
           this.socket.emit('getGameFromTwitch', value);
         } else {
           this.searchForGameOpts = [];
         }
       },
-      searchForTags(value) {
+      searchForTags(value: string) {
         this.searchForTagsOpts = Array.from(new Set(this.cachedTags
           .map(o => o.value)
           .filter(o => {
@@ -334,7 +339,7 @@
         // first title is always current, last must be empty as new
         return [
           { game: (this as any).currentGame, title: (this as any).currentTitle },
-          ...(this as any).data.filter(o => o.game === (this as any).currentGame),
+          ...(this as any).data.filter((o: any) => o.game === (this as any).currentGame),
           { game: (this as any).currentGame, title: '', id: 'new' }
           ]
       },
@@ -345,7 +350,7 @@
           (this as any).cachedGamesOrder = [
             ...new Set([
               (this as any).currentGame,
-              ...(this as any).data.sort((a,b) => {
+              ...(this as any).data.sort((a: any,b: any) => {
                 if (typeof a.timestamp === 'undefined') { a.timestamp = 0; }
                 if (typeof b.timestamp === 'undefined') { b.timestamp = 0; }
                 if (a.timestamp > b.timestamp) {
@@ -355,11 +360,11 @@
                 } else {
                   return 0;
                 }
-              }).map(o => o.game)
+              }).map((o: any) => o.game)
             ]
           )];
         } else {
-          (this as any).cachedGamesOrder = [...new Set((this as any).data.sort((a,b) => {
+          (this as any).cachedGamesOrder = [...new Set((this as any).data.sort((a: any,b: any) => {
             if (typeof a.timestamp === 'undefined') { a.timestamp = 0; }
             if (typeof b.timestamp === 'undefined') { b.timestamp = 0; }
             if (a.timestamp > b.timestamp) {
@@ -369,7 +374,7 @@
             } else {
               return 0;
             }
-          }).map(o => o.game))];
+          }).map((o: any) => o.game))];
         }
         return (this as any).cachedGamesOrder;
       }
@@ -382,8 +387,8 @@
       window.addEventListener('resize', this._resizeListener);
 
       this.init();
-      this.socket.on('sendGameFromTwitch', (data) => this.searchForGameOpts = data);
-      this.socket.on('sendUserTwitchGamesAndTitles', (data) => { this.data = data });
+      this.socket.on('sendGameFromTwitch', (data: any) => this.searchForGameOpts = data);
+      this.socket.on('sendUserTwitchGamesAndTitles', (data: any) => { this.data = data });
 
       EventBus.$on('show-game_and_title_dlg', () => {
         this.init();

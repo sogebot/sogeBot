@@ -108,7 +108,7 @@ export default class carouselOverlayList extends Vue {
 
   refresh() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('generic::getAll', (err, items) => {
+    this.socket.emit('generic::getAll', (err: string | null, items: CarouselInterface[]) => {
       if (err) {
         return console.error(err);
       }
@@ -118,13 +118,13 @@ export default class carouselOverlayList extends Vue {
   }
 
   @Watch('uploadedFiles')
-  _uploadedFiles(val) {
+  _uploadedFiles(val: number) {
     if (this.isUploadingNum === val) {
       this.state.uploading = this.$state.idle;
     }
   }
 
-  moveUp(order) {
+  moveUp(order: number) {
   this.items.filter((o) => o.order === order - 1 || o.order === order).map(o => {
       if (o.order === order - 1) {
         o.order++
@@ -133,14 +133,14 @@ export default class carouselOverlayList extends Vue {
       }
       return o
     })
-    this.socket.emit('carousel::save', this.items, (err) => {
+    this.socket.emit('carousel::save', this.items, (err: string | null) => {
       if (err) {
         return console.error(err);
       }
     });
   }
 
-  moveDown(order) {
+  moveDown(order: number) {
   this.items.filter((o) => o.order === order + 1 || o.order === order).map(o => {
       if (o.order === order + 1) {
         o.order--
@@ -149,14 +149,17 @@ export default class carouselOverlayList extends Vue {
       }
       return o
     })
-    this.socket.emit('carousel::save', this.items, (err) => {
+    this.socket.emit('carousel::save', this.items, (err: string | null) => {
       if (err) {
         return console.error(err);
       }
     });
   }
 
-  filesChange(files) {
+  filesChange(files: HTMLInputElement['files']) {
+    if (!files) {
+      return;
+    }
     this.state.uploading = this.$state.progress;
     this.isUploadingNum = files.length
     this.uploadedFiles = 0
@@ -164,7 +167,7 @@ export default class carouselOverlayList extends Vue {
     for (let i = 0, l = files.length; i < l; i++) {
       const reader = new FileReader()
       reader.onload = ((e: any )=> {
-        this.socket.emit('carousel::insert', e.target.result, (err, image) => {
+        this.socket.emit('carousel::insert', e.target.result, (err: string | null, image: CarouselInterface) => {
           if (err) {
             return console.error(err);
           }
@@ -176,13 +179,13 @@ export default class carouselOverlayList extends Vue {
     }
   }
 
-  linkTo(item) {
+  linkTo(item: Required<CarouselInterface>) {
     console.debug('Clicked', item.id);
     this.$router.push({ name: 'carouselRegistryEdit', params: { id: item.id } });
   }
 
-  remove(item) {
-    this.socket.emit('generic::deleteById', item.id, (err) => {
+  remove(item: CarouselInterface) {
+    this.socket.emit('generic::deleteById', item.id, (err: string | null) => {
       if (err) {
         return console.error(err);
       }

@@ -50,7 +50,7 @@ export default class navbar extends Vue {
   version: string = '';
 
   mounted() {
-    this.socket.emit('version', (version) => this.version = version);
+    this.socket.emit('version', (version: string) => this.version = version);
     this.socket.emit('name', (name: string) => this.name = name );
   }
 

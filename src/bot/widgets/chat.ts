@@ -23,7 +23,7 @@ class Chat extends Widget {
       }, { force: true });
     });
 
-    publicEndpoint(this.nsp, 'room', async (cb) => {
+    publicEndpoint(this.nsp, 'room', async (cb: (error: null, data: string) => void) => {
       cb(null, OAuth.generalChannel.toLowerCase());
     });
 
@@ -33,7 +33,7 @@ class Chat extends Widget {
         const response = await axios.get(url);
 
         if (response.status === 200) {
-          const chatters = response.data.chatters;
+          const chatters = response.data.chatters as { viewers: string[] };
           chatters.viewers = chatters.viewers.filter((o) => !getIgnoreList().includes(o));
           cb(null, {chatters});
         }

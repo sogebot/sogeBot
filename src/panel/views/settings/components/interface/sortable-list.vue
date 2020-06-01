@@ -41,7 +41,7 @@ export default class sortableList extends Vue {
   @Prop() readonly toggle: any;
   @Prop() readonly toggleonicon: any;
   @Prop() readonly toggleofficon: any;
-  @Prop() readonly title: any;
+  @Prop() readonly title!: string;
 
   currentValues = this.values;
   currentToggle = this.toggle;
@@ -53,37 +53,37 @@ export default class sortableList extends Vue {
     this.$emit('update', { value: this.currentValues, toggle: this.currentToggle })
   }
 
-  toggleItem(idx) {
+  toggleItem(idx: number) {
     this.currentToggle = xor(this.currentToggle, [this.currentValues[idx]]);
     this.$forceUpdate()
     this.onChange()
   }
-  isToggled (idx) {
+  isToggled (idx: number) {
     const value = this.currentValues[idx]
     return this.currentToggle.indexOf(value) !== -1
   }
-  dragstart(item, e) {
+  dragstart(item: number, e: DragEvent) {
     this.draggingItem = item;
-    this.$refs['list_' + item][0].style.opacity = 0.5;
-    e.dataTransfer.setData('text/plain', 'dummy');
+    (this.$refs['list_' + item] as HTMLElement[])[0].style.opacity = '0.5';
+    e.dataTransfer?.setData('text/plain', 'dummy');
   }
-  dragenter(newIndex, e) {
+  dragenter(newIndex: number, e: DragEvent) {
     const value = this.currentValues[this.draggingItem]
     this.currentValues.splice(this.draggingItem, 1);
     this.currentValues.splice(newIndex, 0, value);
     this.draggingItem = newIndex;
 
     for (let i = 0, length = this.currentValues.length; i < length; i++) {
-      this.$refs['list_' + i][0].style.opacity = 1;
+      (this.$refs['list_' + i] as HTMLElement[])[0].style.opacity = '1';
     }
-    this.$refs['list_' + newIndex][0].style.opacity = 0.5;
+    (this.$refs['list_' + newIndex] as HTMLElement[])[0].style.opacity = '0.5';
 
     this.$forceUpdate()
     this.onChange()
   }
-  dragend(item, e) {
+  dragend(item: number, e: DragEvent) {
     for (let i = 0, length = this.currentValues.length; i < length; i++) {
-      this.$refs['list_' + i][0].style.opacity = 1;
+      (this.$refs['list_' + i] as HTMLElement[])[0].style.opacity = '1';
     }
   }
 }

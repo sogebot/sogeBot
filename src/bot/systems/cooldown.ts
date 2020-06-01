@@ -288,7 +288,7 @@ class Cooldown extends System {
     return true;
   }
 
-  async toggle (opts: CommandOptions, type: string) {
+  async toggle (opts: CommandOptions, type: 'isEnabled' | 'isModeratorAffected' | 'isOwnerAffected' | 'isSubscriberAffected' | 'isFollowerAffected' | 'isErrorMsgQuiet' | 'type') {
     const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP) as unknown as { [x: string]: string } | null;
 
     if (_.isNil(match)) {

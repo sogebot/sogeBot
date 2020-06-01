@@ -66,31 +66,26 @@ class Quotes extends System {
 
   @command('!quote add')
   @default_permission(permission.CASTERS)
-  async add (opts): Promise<CommandResponse[]> {
+  async add (opts: CommandOptions): Promise<(CommandResponse & QuotesInterface)[]> {
     try {
       if (opts.parameters.length === 0) {
         throw new Error();
       }
-      let [tags, quote] = new Expects(opts.parameters).argument({ name: 'tags', optional: true, default: 'general', multi: true, delimiter: '' }).argument({ name: 'quote', multi: true, delimiter: '' }).toArray();
-      tags = tags.split(',').map((o) => o.trim());
+      const [tags, quote] = new Expects(opts.parameters).argument({ name: 'tags', optional: true, default: 'general', multi: true, delimiter: '' }).argument({ name: 'quote', multi: true, delimiter: '' }).toArray() as [ string, string ];
+      const tagsArray = tags.split(',').map((o) => o.trim());
 
-      const result = await getManager()
-        .createQueryBuilder()
-        .insert()
-        .into(QuotesEntity)
-        .values({ tags, quote, quotedBy: opts.sender.userId, createdAt: Date.now() })
-        .execute();
-      const response = prepare('systems.quotes.add.ok', { id: result.identifiers[0].id, quote, tags: tags.join(', ') });
-      return [{ response, ...opts, id: result.identifiers[0].id, quote, tags }];
+      const result = await getRepository(QuotesEntity).save({ tags: tagsArray, quote, quotedBy: opts.sender.userId, createdAt: Date.now() });
+      const response = prepare('systems.quotes.add.ok', { id: result.id, quote, tags: tagsArray.join(', ') });
+      return [{ response, ...opts, ...result }];
     } catch (e) {
       const response = prepare('systems.quotes.add.error', { command: opts.command });
-      return [{ response, ...opts }];
+      return [{ response, ...opts, createdAt: 0, attr: {}, quote: '', quotedBy: 0, tags: [] }];
     }
   }
 
   @command('!quote remove')
   @default_permission(permission.CASTERS)
-  async remove (opts): Promise<CommandResponse[]> {
+  async remove (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       if (opts.parameters.length === 0) {
         throw new Error();
@@ -114,12 +109,12 @@ class Quotes extends System {
 
   @command('!quote set')
   @default_permission(permission.CASTERS)
-  async set (opts): Promise<CommandResponse[]> {
+  async set (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       if (opts.parameters.length === 0) {
         throw new Error();
       }
-      const [id, tag] = new Expects(opts.parameters).argument({ type: Number, name: 'id' }).argument({ name: 'tag', multi: true, delimiter: '' }).toArray();
+      const [id, tag] = new Expects(opts.parameters).argument({ type: Number, name: 'id' }).argument({ name: 'tag', multi: true, delimiter: '' }).toArray() as [ number, string ];
 
       const quote = await getRepository(QuotesEntity).findOne({id});
       if (quote) {
@@ -143,7 +138,7 @@ class Quotes extends System {
   }
 
   @command('!quote list')
-  async list (opts): Promise<CommandResponse[]> {
+  async list (opts: CommandOptions): Promise<CommandResponse[]> {
     const urlBase = ui.domain;
     const response = prepare(
       (['localhost', '127.0.0.1'].includes(urlBase) ? 'systems.quotes.list.is-localhost' : 'systems.quotes.list.ok'),
@@ -152,7 +147,7 @@ class Quotes extends System {
   }
 
   @command('!quote')
-  async main (opts): Promise<CommandResponse[]> {
+  async main (opts: CommandOptions): Promise<CommandResponse[]> {
     const [id, tag] = new Expects(opts.parameters).argument({ type: Number, name: 'id', optional: true }).argument({ name: 'tag', optional: true, multi: true, delimiter: '' }).toArray();
     if (_.isNil(id) && _.isNil(tag) || id === '-tag') {
       const response = prepare('systems.quotes.show.error.no-parameters', { command: opts.command });

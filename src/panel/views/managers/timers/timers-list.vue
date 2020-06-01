@@ -85,7 +85,7 @@ export default class timersList extends Vue {
     })
   }
 
-  capitalize(value) {
+  capitalize(value: string) {
     if (!value) return ''
     value = value.toString()
     return value.charAt(0).toUpperCase() + value.slice(1)
@@ -93,23 +93,23 @@ export default class timersList extends Vue {
 
   created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('generic::getAll', (err, items: TimerInterface[]) => {
+    this.socket.emit('generic::getAll', (err: string | null, items: TimerInterface[]) => {
       this.items = items
       this.state.loading = this.$state.success;
     })
   }
 
-  update(item) {
+  update(item: TimerInterface) {
     this.socket.emit('timers::save', item, () => {});
   }
 
-  del(id) {
+  del(id: string) {
     this.socket.emit('generic::deleteById', id, () => {
       this.items = this.items.filter((o) => o.id !== id)
     })
   }
 
-  linkTo(item) {
+  linkTo(item: Required<TimerInterface>) {
     console.debug('Clicked', item.id);
     this.$router.push({ name: 'TimersManagerEdit', params: { id: item.id } });
   }

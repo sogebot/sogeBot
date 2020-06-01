@@ -2,9 +2,9 @@
  * Flatten object keys
  * { a: { b: 'c' }} => { 'a.b': 'c' }
  */
-export function flatten(data): { [x: string]: any } {
-  const result = {};
-  function recurse(cur, prop): void {
+export function flatten(data: {[x: string]: any}): { [x: string]: any } {
+  const result: {[x: string]: any} = {};
+  function recurse(cur: {[x: string]: any}, prop: string): void {
     if (Object(cur) !== cur || Array.isArray(cur)) {
       result[prop] = cur;
     } else {
@@ -26,8 +26,8 @@ export function flatten(data): { [x: string]: any } {
  * Unflatten object keys
  * { 'a.b': 'c' } => { a: { b: 'c' }}
  */
-export function unflatten(data) {
-  let result;
+export function unflatten(data: {[x: string]: any}): {[x: string]: any} {
+  let result: {[x: string]: any};
   if (Array.isArray(data)) {
     result = [];
     // create unflatten each item

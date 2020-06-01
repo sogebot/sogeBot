@@ -249,13 +249,13 @@ class Points extends System {
     });
   }
 
-  maxSafeInteger(number) {
+  maxSafeInteger(number: number) {
     return number <= Number.MAX_SAFE_INTEGER
       ? number
       : Number.MAX_SAFE_INTEGER;
   }
 
-  async getPointsOf (id) {
+  async getPointsOf(id: number) {
     const user = await getRepository(User).findOne({ where: { userId: id }});
 
     if (user) {
@@ -401,36 +401,30 @@ class Points extends System {
     }
   }
 
-  getPointsName (points): string {
+  getPointsName (points: number): string {
     const pointsNames = this.name.split('|').map(Function.prototype.call, String.prototype.trim);
-    let single, multi, xmulti;
+    let single, multi;
+    let xmulti: null | { [points: string]: string } = null;
     // get single|x:multi|multi from pointsName
     if (this.name.length === 0) {
       return '';
     } else {
       switch (pointsNames.length) {
         case 1:
-          xmulti = null;
           single = multi = pointsNames[0];
           break;
         case 2:
           single = pointsNames[0];
           multi = pointsNames[1];
-          xmulti = null;
           break;
         default:
           const len = pointsNames.length;
           single = pointsNames[0];
           multi = pointsNames[len - 1];
-          xmulti = {};
-
-          for (const pattern in pointsNames) {
-            if (pointsNames.hasOwnProperty(pattern)) {
-              const maxPts = pointsNames[pattern].split(':')[0];
-              const name = pointsNames[pattern].split(':')[1];
-              xmulti[maxPts] = name;
-            }
-          }
+          xmulti = pointsNames.reduce((prev: { [points: string]: string }, cur: string) => {
+            const [maxPts, name] = cur.split(':');
+            return { ...prev, [String(maxPts)]: name };
+          }, {});
           break;
       }
     }
@@ -463,7 +457,7 @@ class Points extends System {
       }
 
       const connection = await getConnection();
-      const query = (type) => {
+      const query = (type: typeof connection.options.type) => {
         switch(type) {
           case 'postgres':
           case 'sqlite':

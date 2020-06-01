@@ -39,11 +39,11 @@ class Cmdboard extends Widget {
         cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'cmdboard::run', (command) => {
+    adminEndpoint(this.nsp, 'cmdboard::run', (item) => {
       tmi.message({
         message: {
           tags: { username: getOwner() },
-          message: command,
+          message: item.command,
         },
         skip: true,
       });

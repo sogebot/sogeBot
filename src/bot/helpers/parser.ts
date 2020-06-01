@@ -28,6 +28,10 @@ export const status = {
   MOD: false,
   RES: 0,
 };
-export const setStatus = (key: string, value: any) => {
-  status[key] = value;
-};
+
+export function setStatus(key: 'TMI' | 'API', value: 0 | 1 | 2 | 3): void;
+export function setStatus(key: 'MOD', value: boolean): void;
+export function setStatus(key: 'RES', value: number): void;
+export function setStatus(key: any, value: any): void {
+  (status as any)[key] = value;
+}

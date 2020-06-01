@@ -41,9 +41,9 @@ export default class EmotesOverlay extends Vue {
   }
 
   created () {
-    this.socket.on('emote.explode', (opts) => this.explode(opts))
-    this.socket.on('emote.firework', (opts) => this.firework(opts))
-    this.socket.on('emote', (opts) => this.addEmote(opts))
+    this.socket.on('emote.explode', (opts: any) => this.explode(opts))
+    this.socket.on('emote.firework', (opts: any) => this.firework(opts))
+    this.socket.on('emote', (opts: any) => this.addEmote(opts))
 
     this.interval.push(setInterval(() => {
       this.triggerAnimation()
@@ -54,7 +54,7 @@ export default class EmotesOverlay extends Vue {
   cleanEmotes () {
     if (every(this.emotes, o => o.animation.finished)) this.emotes = []
   }
-  doAnimation (el, done) {
+  doAnimation (el: HTMLElement, done: () => void) {
     const id = el.id
     const emote = this.emotes.find(o => o.id === id)
 
@@ -112,19 +112,19 @@ export default class EmotesOverlay extends Vue {
     }
   }
 
-  setLeft (type) {
+  setLeft (type: string) {
     if (type === 'fadeup' || type === 'fadezoom') return random(window.innerWidth - 200) + 100
     else if (type === 'facebook') return random(200) + window.innerWidth - 250
     else return window.innerWidth / 2
   }
 
-  setTop (type) {
+  setTop (type: string) {
     if (type === 'fadeup' || type === 'fadezoom') return random(window.innerHeight - 200) + 100
     else if (type === 'facebook') return window.innerHeight - 20
     else return window.innerHeight / 2
   }
 
-  addEmote (opts) {
+  addEmote (opts: any) {
     this.emotes.push({
       id: Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9),
       trigger: Date.now() + random(500),
@@ -143,7 +143,7 @@ export default class EmotesOverlay extends Vue {
     })
   }
 
-  explode (opts) {
+  explode (opts: any) {
     for (var i = 0; i < opts.settings.explosion.numOfEmotes; i++) {
       this.emotes.push({
         id: Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9),
@@ -164,7 +164,7 @@ export default class EmotesOverlay extends Vue {
     }
   }
 
-  firework (opts) {
+  firework (opts: any) {
     for (let i = 0; i < opts.settings.fireworks.numOfExplosions; i++) {
       const commonTop = random(200, window.innerHeight - 200)
       const commonLeft = random(200, window.innerWidth - 200)

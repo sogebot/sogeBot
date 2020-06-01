@@ -29,7 +29,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 @Component({})
 export default class cronInput extends Vue {
   @Prop() readonly emit: any;
-  @Prop() readonly title: any;
+  @Prop() readonly title!: string;
   @Prop() readonly value: any;
 
   data: number[] = [];
@@ -42,7 +42,7 @@ export default class cronInput extends Vue {
 
   update() {
     getSocket(`/${this.$route.params.type}/${this.$route.params.id}`)
-      .emit(this.emit, this.currentValue, (err, data: number[]) => {
+      .emit(this.emit, this.currentValue, (err: string | null, data: number[]) => {
         if (err) {
           console.error(err)
         } else {

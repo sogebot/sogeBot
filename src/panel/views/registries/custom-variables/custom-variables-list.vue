@@ -80,8 +80,11 @@ import { Vue, Component } from 'vue-property-decorator';
 import { debounce, orderBy } from 'lodash-es';
 import { getSocket } from 'src/panel/helpers/socket';
 
+import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
+
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { VariableInterface } from '../../../../bot/database/entity/variable';
 library.add(faExclamationTriangle)
 
 @Component({
@@ -89,7 +92,7 @@ library.add(faExclamationTriangle)
     'loading': () => import('../../../components/loading.vue'),
   },
   filters: {
-    capitalize: function (value) {
+    capitalize: function (value: string) {
       if (!value) return ''
       value = value.toString()
       return value.charAt(0).toUpperCase() + value.slice(1)
@@ -110,7 +113,7 @@ export default class customVariablesList extends Vue {
     { key: 'buttons', label: '' },
   ];
 
-  variables: {id: string;currentValue: string;runAt: string;variableName: string}[] = [];
+  variables: VariableInterface[] = [];
   permissions: {id: string; name: string;}[] = [];
   debouncedRunScript: ((id: any) => void) | null = null;
   search: string = '';
@@ -137,7 +140,7 @@ export default class customVariablesList extends Vue {
     // _.throttle), visit: https://lodash.com/docs#debounce
     this.debouncedRunScript = debounce(this.runScript, 1000)
 
-    this.psocket.emit('permissions', (err, data) => {
+    this.psocket.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
   if(err) {
     return console.error(err);
   }
@@ -148,7 +151,7 @@ export default class customVariablesList extends Vue {
   mounted() {
     this.state.loaded = false;
     console.log(this.socket);
-    this.socket.emit('customvariables::list', (err, data) => {
+    this.socket.emit('customvariables::list', (err: string | null, data: VariableInterface[]) => {
       if (err) {
         return console.error(err);
       }
@@ -157,7 +160,7 @@ export default class customVariablesList extends Vue {
     })
   }
 
-  getPermissionName(id) {
+  getPermissionName(id: string | null) {
     if (!id) return null
     const permission = this.permissions.find((o) => {
       return o.id === id
@@ -173,8 +176,8 @@ export default class customVariablesList extends Vue {
     }
   }
 
-  runScript(id) {
-    this.socket.emit('customvariables::runScript', id, (err, item) => {
+  runScript(id: string) {
+    this.socket.emit('customvariables::runScript', id, (err: string | null, item: Required<VariableInterface>) => {
       // update variable data
       let variable = this.variables.filter((o) => o.id === id)[0]
       variable.currentValue = item.currentValue

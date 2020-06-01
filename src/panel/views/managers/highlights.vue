@@ -53,6 +53,7 @@ import { isNil } from 'lodash-es';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faGamepad } from '@fortawesome/free-solid-svg-icons';
 import { faCalendarAlt } from '@fortawesome/free-regular-svg-icons';
+import { HighlightInterface } from '../../../bot/database/entity/highlight';
 library.add(faGamepad, faCalendarAlt);
 
 @Component({
@@ -62,7 +63,7 @@ library.add(faGamepad, faCalendarAlt);
 })
 export default class highlightsList extends Vue {
   socket = getSocket('/systems/highlights');
-  items: any[] = [];
+  items: HighlightInterface[] = [];
   search: string = '';
 
   fields = [
@@ -91,25 +92,25 @@ export default class highlightsList extends Vue {
 
   created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('generic::getAll', (err, items) => {
+    this.socket.emit('generic::getAll', (err: string | null, items: HighlightInterface[]) => {
       this.items = items
       this.state.loading = this.$state.success;
     })
   }
 
-  timestampToString(value) {
+  timestampToString(value: { hours: number; minutes: number; seconds: number }) {
     const string = (value.hours ? `${value.hours}h` : '') +
       (value.minutes ? `${value.minutes}m` : '') +
       (value.seconds ? `${value.seconds}s` : '')
     return string
   }
 
-  generateThumbnail(game) {
+  generateThumbnail(game: string) {
     const template = 'https://static-cdn.jtvnw.net/ttv-boxart/./%{game}-60x80.jpg'
     return template.replace('%{game}', encodeURI(game))
   }
 
-  deleteItem(id) {
+  deleteItem(id: number) {
     this.socket.emit('generic::deleteById', id, () => {
       this.items = this.items.filter((o) => o.id !== id)
     })

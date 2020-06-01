@@ -19,6 +19,38 @@ import eventlist from '../overlays/eventlist.js';
 import currency from '../currency';
 import alerts from '../registries/alerts.js';
 
+type TipeeestreamEvent = {
+  appKey: string;
+  event: {
+    type: 'donation'; // is there more?
+    user: {
+      avatar: string;
+      country: string;
+      username: string;
+      providers: {
+        connectedAt: string; code: 'twitch'; id: string; username: string;
+      }[];
+      created_at: string;
+      session_at: string;
+    };
+    ref: string;
+    inserted_at: string;
+    deleted_at: string;
+    created_at: string;
+    parameters: {
+      formattedMessage: string;
+      message: string;
+      username: string;
+      currency: string;
+      amount: number;
+      resub: number;
+      viewers: number;
+    };
+    formattedAmount: string;
+    'parameters.amount': number;
+  }
+};
+
 class TipeeeStream extends Integration {
   socketToTipeeestream: SocketIOClient.Socket | null = null;
 
@@ -74,7 +106,7 @@ class TipeeeStream extends Integration {
         });
 
       if (this.socketToTipeeestream !== null) {
-        this.socketToTipeeestream.on('connect_error', (e) => {
+        this.socketToTipeeestream.on('connect_error', (e: Error) => {
           error(chalk.red('TIPEEESTREAM.COM:') + ' error while connecting, ' + e);
         });
         this.socketToTipeeestream.on('connect', () => {
@@ -92,7 +124,7 @@ class TipeeeStream extends Integration {
           this.socketToTipeeestream = null;
         });
 
-        this.socketToTipeeestream.on('new-event', async (data) => {
+        this.socketToTipeeestream.on('new-event', async (data: TipeeestreamEvent) => {
           this.parse(data);
         });
       }
@@ -101,14 +133,14 @@ class TipeeeStream extends Integration {
     }
   }
 
-  async parse(data) {
+  async parse(data: TipeeestreamEvent) {
     if (data.event.type !== 'donation') {
       return;
     }
     try {
       const { amount, message } = data.event.parameters;
       const username = data.event.parameters.username.toLowerCase();
-      const donationCurrency = data.event.parameters.currency;
+      const donationCurrency = data.event.parameters.currency as currency;
 
       eventlist.add({
         event: 'tip',
@@ -121,7 +153,7 @@ class TipeeeStream extends Integration {
 
       events.fire('tip', {
         username,
-        amount: parseFloat(amount).toFixed(2),
+        amount: Number(amount).toFixed(2),
         currency: donationCurrency,
         amountInBotCurrency: Number(currency.exchange(amount, donationCurrency, currency.mainCurrency)).toFixed(2),
         currencyInBot: currency.mainCurrency,
@@ -131,7 +163,7 @@ class TipeeeStream extends Integration {
       alerts.trigger({
         event: 'tips',
         name: username,
-        amount: Number(parseFloat(amount).toFixed(2)),
+        amount: Number(Number(amount).toFixed(2)),
         currency: donationCurrency,
         monthsName: '',
         message,

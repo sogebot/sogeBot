@@ -16,7 +16,7 @@ import { flatten, unflatten } from './helpers/flatten';
 import { existsSync } from 'fs';
 import { isDbConnected } from './helpers/database';
 import { register } from './helpers/register';
-import { addMenu, addMenuPublic, addWidget, ioServer, menuPublic } from './helpers/panel';
+import { addMenu, addMenuPublic, addWidget, ioServer, menu, menuPublic } from './helpers/panel';
 import { v4 as uuid } from 'uuid';
 import { invalidateParserCache, refreshCachedCommandPermissions } from './helpers/cache';
 
@@ -29,7 +29,7 @@ class Module {
   public settingsList: { category?: string; key: string }[] = [];
   public settingsPermList: { category?: string; key: string }[] = [];
   public on: InterfaceSettings.On;
-  public socket: any = null;
+  public socket: SocketIO.Namespace | null = null;
   public uuid = uuid();
   private firstStatusSent = false;
 
@@ -47,7 +47,7 @@ class Module {
   areDependenciesEnabled = false;
   get _areDependenciesEnabled(): Promise<boolean> {
     return new Promise((resolve) => {
-      const check = async (retry) => {
+      const check = async (retry: number) => {
         const status: any[] = [];
         for (const dependency of this.dependsOn) {
           if (!dependency || !_.isFunction(dependency.status)) {
@@ -136,7 +136,8 @@ class Module {
           const onStartup = async () => {
             if (loadingInProgress.length > 0) {
               // wait until all settings are loaded
-              return setTimeout(() => onStartup(), 100);
+              setTimeout(() => onStartup(), 100);
+              return;
             }
             if (this._enabled !== null) {
               // change only if we can enable/disable
@@ -146,7 +147,7 @@ class Module {
             if (isMainThread) {
               const path = this._name === 'core' ? this.__moduleName__.toLowerCase() : `${this._name}.${this.__moduleName__.toLowerCase()}`;
               for (const event of getFunctionList('startup', path)) {
-                this[event.fName]('enabled', state);
+                (this as any)[event.fName]('enabled', state);
               }
             }
             this.onStartupTriggered = true;
@@ -179,7 +180,7 @@ class Module {
     }
   }
 
-  public async loadVariableValue(key) {
+  public async loadVariableValue(key: string) {
     const variable = await getRepository(Settings)
       .createQueryBuilder('settings')
       .select('settings')
@@ -189,7 +190,7 @@ class Module {
 
     const path = this._name === 'core' ? this.__moduleName__.toLowerCase() : `${this._name}.${this.__moduleName__.toLowerCase()}`;
     for (const event of getFunctionList('load', `${path}.${key}` )) {
-      this[event.fName]();
+      (this as any)[event.fName]();
     }
 
     try {
@@ -359,10 +360,10 @@ class Module {
               }
             } else if (key === '__permission_based__') {
               for (const vKey of Object.keys(value as any)) {
-                this['__permission_based__' + vKey] = (value as any)[vKey];
+                (this as any)['__permission_based__' + vKey] = (value as any)[vKey];
               }
             } else {
-              this[key] = value;
+              (this as any)[key] = value;
             }
           }
         } catch (e) {
@@ -379,7 +380,7 @@ class Module {
 
       adminEndpoint(this.nsp, 'set.value', async (opts, cb) => {
         try {
-          this[opts.variable] = opts.value;
+          (this as any)[opts.variable] = opts.value;
           if (cb) {
             cb(null, {variable: opts.variable, value: opts.value});
           }
@@ -391,7 +392,7 @@ class Module {
       });
       publicEndpoint(this.nsp, 'get.value', async (variable, cb) => {
         try {
-          cb(null, await this[variable]);
+          cb(null, await (this as any)[variable]);
         } catch (e) {
           cb(e.stack, undefined);
         }
@@ -429,8 +430,8 @@ class Module {
     if (isMainThread && isStatusChanged && this.onStartupTriggered) {
       const path = this._name === 'core' ? this.__moduleName__.toLowerCase() : `${this._name}.${this.__moduleName__.toLowerCase()}`;
       for (const event of getFunctionList('change', path + '.enabled')) {
-        if (typeof this[event.fName] === 'function') {
-          this[event.fName]('enabled', opts.state);
+        if (typeof (this as any)[event.fName] === 'function') {
+          (this as any)[event.fName]('enabled', opts.state);
         } else {
           error(`${event.fName}() is not function in ${this._name}/${this.__moduleName__.toLowerCase()}`);
         }
@@ -450,19 +451,19 @@ class Module {
     return opts.state;
   }
 
-  public addMenu(opts) {
+  public addMenu(opts: typeof menu[number]) {
     if (isMainThread) {
       addMenu(opts);
     }
   }
 
-  public addMenuPublic(opts: typeof menuPublic[0]) {
+  public addMenuPublic(opts: typeof menuPublic[number]) {
     if (isMainThread) {
       addMenuPublic(opts);
     }
   }
 
-  public addWidget(...opts) {
+  public addWidget(...opts: any[]) {
     if (isMainThread) {
       addWidget(opts[0], opts[1], opts[2]);
     }
@@ -483,10 +484,10 @@ class Module {
         if (category === 'commands') {
           _.set(promisedSettings, `${category}.${key}`, this.getCommand(key));
         } else {
-          _.set(promisedSettings, `${category}.${key}`, this[key]);
+          _.set(promisedSettings, `${category}.${key}`, (this as any)[key]);
         }
       } else {
-        _.set(promisedSettings, key, this[key]);
+        _.set(promisedSettings, key, (this as any)[key]);
       }
     }
 
@@ -529,7 +530,7 @@ class Module {
     for (const categoryKey of Object.keys(promisedSettings)) {
       if (ui[categoryKey]) {
         for (const key of Object.keys(ui[categoryKey])) {
-          if (typeof ui[categoryKey][key].if === 'function' && !ui[categoryKey][key].if()) {
+          if (typeof (ui as any)[categoryKey][key].if === 'function' && !(ui as any)[categoryKey][key].if()) {
             delete promisedSettings[categoryKey][key];
           }
         }
@@ -572,7 +573,7 @@ class Module {
       parsers.push({
         this: this,
         name: `${this.__moduleName__}.${parser.name}`,
-        fnc: this[parser.name],
+        fnc: (this as any)[parser.name],
         permission: parser.permission,
         priority: parser.priority,
         fireAndForget: parser.fireAndForget ? parser.fireAndForget : false,
@@ -599,7 +600,7 @@ class Module {
       rollbacks.push({
         this: this,
         name: `${this.__moduleName__}.${rollback.name}`,
-        fnc: this[rollback.name],
+        fnc: (this as any)[rollback.name],
       });
     }
     return rollbacks;
@@ -652,7 +653,7 @@ class Module {
           this: this,
           id: command.name,
           command: command.command,
-          fnc: this[command.fnc],
+          fnc: (this as any)[command.fnc],
           _fncName: command.fnc,
           permission: command.permission,
           isHelper: command.isHelper ? command.isHelper : false,
@@ -688,7 +689,7 @@ class Module {
             if (typeof v2 !== 'undefined') {
               if (typeof v2.if === 'function') {
                 if (!v2.if()) {
-                  delete ui[k][k2];
+                  delete (ui as any)[k][k2];
                 }
               }
               if (typeof v2.values === 'function') {
@@ -772,7 +773,6 @@ class Module {
 
   protected async getPermissionBasedSettingsValue(key: string, set_default_values = true): Promise<{[permissionId: string]: any}> {
     // current permission settings by user
-    const permSet = {};
     let permId = permission.VIEWERS;
 
     // get current full list of permissions
@@ -782,26 +782,29 @@ class Module {
         order: 'DESC',
       },
     });
-    for (const p of permissions) {
+    return permissions.reduce((prev, p) => {
       // set proper value for permId or default value
       if (set_default_values || p.id === permission.VIEWERS) {
         if (p.id === permission.VIEWERS) {
           // set default value if viewers
-          permSet[p.id] = _.get(this, `__permission_based__${key}.${p.id}`, this[key]);
+          permId = p.id;
+          return { ...prev, [p.id]: _.get(this, `__permission_based__${key}.${p.id}`, (this as any)[key]) };
         } else {
           // set value of permission before if anything else (to have proper waterfall inheriting)
           // we should have correct values as we are desc ordering
           const value = _.get(this, `__permission_based__${key}.${p.id}`, null);
-          permSet[p.id] = value === null
-            ? _.get(permSet, permId, this[key])
-            : value;
+          if (value === null) {
+            permId = p.id;
+            return { ...prev, [p.id]: _.get(prev, permId, (this as any)[key]) };
+          } else {
+            permId = p.id;
+            return { ...prev, [p.id]: _.get(this, `__permission_based__${key}.${p.id}`, value) };
+          }
         }
-        permId = p.id;
       } else {
-        permSet[p.id] = _.get(this, `__permission_based__${key}.${p.id}`, null);
+        return { ...prev, [p.id]: _.get(this, `__permission_based__${key}.${p.id}`, null) };
       }
-    }
-    return permSet;
+    }, {});
   }
 }
 

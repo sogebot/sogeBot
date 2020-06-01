@@ -2,7 +2,6 @@ import Core from './_interface';
 
 import { isMainThread } from './cluster';
 import axios from 'axios';
-import { isNil } from 'lodash';
 import { setTimeout } from 'timers';
 
 import { permission } from './helpers/permissions';
@@ -105,18 +104,25 @@ class Users extends Core {
     }
   }
 
-  async getUsernamesFromIds (IdsList: Array<number>) {
-    const IdsToUsername = {};
-    for (const id of IdsList) {
-      if (!isNil(IdsToUsername[id])) {
-        continue;
-      } // skip if already had map
-      const user = await getRepository(User).findOne({ userId: id });
-      if (user) {
-        IdsToUsername[id] = user.username;
+  async getUsernamesFromIds (IdsList: number[]): Promise<{ id: number; username: string }[]> {
+    const uniqueWithUsername = await Promise.all(
+      [...new Set(IdsList)]
+        .map(async (id) => {
+          const user = await getRepository(User).findOne({ userId: id });
+          if (user) {
+            return { id: id, username: user.username };
+          }
+          return null;
+        })
+    );
+    return uniqueWithUsername.reduce(async (prev: any, cur) => {
+      const value = await cur;
+      if (value) {
+        return { ...prev, [value.id]: value.username };
+      } else {
+        return prev;
       }
-    }
-    return IdsToUsername;
+    }, {});
   }
 
   async getNameById (userId: number) {
@@ -343,13 +349,7 @@ class Users extends Core {
           const aggregatedBits = viewer.bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0);
 
           const permId = await permissions.getUserHighestPermission(userId);
-          let permissionGroup;
-          if (permId) {
-            permissionGroup = await permissions.get(permId);
-          } else {
-            permissionGroup = permission.VIEWERS;
-          }
-
+          const permissionGroup = permId || permission.VIEWERS;
           cb(null, {...viewer, aggregatedBits, aggregatedTips, permission: permissionGroup});
         } else {
           cb(null);
