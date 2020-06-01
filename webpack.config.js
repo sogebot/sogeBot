@@ -13,16 +13,7 @@ const optimization = {
   splitChunks: false,
   minimize: process.env.NODE_ENV === 'production',
   runtimeChunk: 'single',
-  moduleIds: 'deterministic',
-  splitChunks: {
-    cacheGroups: {
-      vendor: {
-        test: /[\\/]node_modules[\\/]/,
-        name: 'vendors',
-        chunks: 'all',
-      },
-    },
-  },
+  moduleIds: 'deterministic'
 };
 
 if (process.env.NODE_ENV === 'production') {
