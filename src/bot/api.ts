@@ -3,7 +3,7 @@ import querystring from 'querystring';
 import { setTimeout } from 'timers';
 import moment from 'moment';
 require('moment-precise-range-plugin'); // moment.preciseDiff
-import { isMainThread } from './cluster';
+import { clusteredAPI, isMainThread } from './cluster';
 import chalk from 'chalk';
 import { chunk, cloneDeep, defaults, filter, get, isNil, isNull, map } from 'lodash';
 
@@ -345,7 +345,8 @@ class API extends Core {
 
   async followerUpdatePreCheck (username: string) {
     if (!isMainThread) {
-      throw new Error('API can run only on master');
+      clusteredAPI('followerUpdatePreCheck', [ username ]);
+      return;
     }
 
     const user = await getRepository(User).findOne({ username });
@@ -1368,9 +1369,10 @@ class API extends Core {
 
   }
 
-  async setTitleAndGame (args: { title?: string | null; game?: string | null }): Promise<{ response: string; status: boolean }> {
+  async setTitleAndGame (args: { title?: string | null; game?: string | null }): Promise<{ response: string; status: boolean } | null> {
     if (!isMainThread) {
-      throw new Error('API can run only on master');
+      clusteredAPI('setTitleAndGame', [ args ]);
+      return null;
     }
 
     args = defaults(args, { title: null }, { game: null });
@@ -1557,7 +1559,8 @@ class API extends Core {
 
   async createClip (opts: any) {
     if (!isMainThread) {
-      throw Error('API can run only on master');
+      clusteredAPI('createClip', [ opts ]);
+      return;
     }
 
     if (!(this.isStreamOnline)) {
@@ -1632,7 +1635,8 @@ class API extends Core {
     }
 
     if (!isMainThread) {
-      throw new Error('API can run only on master');
+      clusteredAPI('fetchAccountAge', [ id ]);
+      return;
     }
     const url = `https://api.twitch.tv/kraken/users/${id}`;
 

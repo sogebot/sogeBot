@@ -146,7 +146,7 @@ class Twitch extends Core {
       return [ { response: await translate('title.current').replace(/\$title/g, api.stats.currentTitle || 'n/a'), ...opts }];
     }
     const status = await api.setTitleAndGame({ title: opts.parameters });
-    return [ { response: status.response, ...opts }];
+    return status ? [ { response: status.response, ...opts } ] : [];
   }
 
   @command('!game')
@@ -163,7 +163,7 @@ class Twitch extends Core {
     const games = await api.sendGameFromTwitch(null, opts.parameters);
     if (Array.isArray(games) && games.length > 0) {
       const status = await api.setTitleAndGame({ game: games[0] });
-      return [ { response: status.response, ...opts }];
+      return status ? [ { response: status.response, ...opts } ] : [];
     }
     return [{ response: translate('game.change.failed').replace(/\$title/g, api.stats.currentGame || 'n/a'), ...opts }];
   }

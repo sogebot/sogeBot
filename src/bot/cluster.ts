@@ -50,6 +50,9 @@ export const init = async () => {
         socket.on('clusteredChatIn', (message) => clusteredChatIn(message));
         socket.on('clusteredWhisperOut', (message) => clusteredWhisperOut(message));
         socket.on('clusteredChatOut', (message) => clusteredChatOut(message));
+        socket.on('clusteredAPI', (fName: string, args: any[]) => {
+          (api as any)[fName].apply(api, args);
+        });
         socket.on('clusteredFetchAccountAge', async (userId, cb) => {
           await clusteredFetchAccountAge(userId);
           if (cb) {
@@ -141,6 +144,12 @@ export const clusteredClientTimeout = (username: string, timeMs: number, reason:
     }
   } else {
     clientIO.emit('clusteredClientTimeout', username, timeMs, reason);
+  }
+};
+
+export const clusteredAPI = (fName: string, args: any[]) => {
+  if (!isMainThread) {
+    clientIO.emit('clusteredAPI', fName, args);
   }
 };
 
