@@ -2,7 +2,6 @@ import { at, isNil } from 'lodash-es';
 
 export let translations = {};
 
-
 function castObject (key: string, value: string | { [x: string]: any }) {
   if (typeof value === 'string') {
     return {[key]: value};
@@ -18,7 +17,7 @@ export default function(key: string, asObject = false): string | { [x: string]: 
     ? `{${key}}`
     : asObject
       ? castObject(key, at(translations, key)[0] as string | { [x: string]: any })
-      : String(at(translations, key)[0]);
+      : at(translations, key)[0] as string | { [x: string]: any };
 }
 
 export const setTranslations = (_translations: any) => {
