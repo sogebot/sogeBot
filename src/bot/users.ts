@@ -56,7 +56,6 @@ class Users extends Core {
       // set all users offline on start
       await getRepository(User).update({}, { isOnline: false });
     } else {
-
       // get new users
       const newChatters = await getRepository(User).find({ isOnline: true, watchedTime: 0 });
       api.stats.newChatters += newChatters.length;
@@ -72,6 +71,8 @@ class Users extends Core {
         } else {
           api.stats.currentWatchedTime += incrementedUsers.affected * interval;
         }
+
+        permissions.recacheOnlineUsersPermission();
       } else {
         await getRepository(User).increment({ isOnline: true }, 'chatTimeOffline', interval);
       }

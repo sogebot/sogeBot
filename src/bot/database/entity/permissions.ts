@@ -16,7 +16,7 @@ export interface PermissionFiltersInterface {
   id?: string;
   permission: PermissionsInterface;
   comparator: '<' | '>' | '==' | '<=' | '>=';
-  type: 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths';
+  type: 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths' | 'followtime';
   value: number;
 }
 

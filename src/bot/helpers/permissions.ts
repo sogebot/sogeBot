@@ -17,10 +17,16 @@ let cachedHighestPermission: {
   [userId: number]: string | undefined;
 } = {};
 
-export const cleanViewersCache = () => {
-  cachedViewers = {};
-  cachedHighestPermission = {};
-};
+
+export function cleanViewersCache (userId?: number): void {
+  if (typeof userId === 'number') {
+    delete cachedViewers[userId];
+    delete cachedHighestPermission[userId];
+  } else {
+    cachedViewers = {};
+    cachedHighestPermission = {};
+  }
+}
 
 export const getFromCachedHighestPermission = (userId: number | string) => {
   userId = Number(userId);
