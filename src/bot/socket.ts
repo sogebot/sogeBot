@@ -261,7 +261,7 @@ class Socket extends Core {
         }
       } else {
         initEndpoints(socket, { haveAdminPrivileges: Authorized.NotAuthorized, haveModPrivileges: Authorized.NotAuthorized, haveViewerPrivileges: Authorized.NotAuthorized });
-        setTimeout(() => ioServer?.emit('forceDisconnect'), 1000); // force disconnect if we must be logged in
+        setTimeout(() => socket.emit('forceDisconnect'), 1000); // force disconnect if we must be logged in
       }
     }
     next();
