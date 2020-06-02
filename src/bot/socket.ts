@@ -180,7 +180,7 @@ class Socket extends Core {
                 throw new Error('Not matching userId');
               }
               const username = twitchValidation.data.login;
-              const userPermission = await permissions.getUserHighestPermission(Number(userId));
+              const haveCasterPermission = (await permissions.check(Number(userId), permission.CASTERS, true)).access;
               const user = await getRepository(User).findOne({ userId: Number(userId) });
               await getRepository(User).save({
                 ...user,
@@ -191,13 +191,13 @@ class Socket extends Core {
               const accessToken = jwt.sign({
                 userId: Number(userId),
                 username,
-                privileges: await getPrivileges(userPermission === permission.CASTERS ? 'admin' : 'viewer', Number(userId)),
+                privileges: await getPrivileges(haveCasterPermission ? 'admin' : 'viewer', Number(userId)),
               }, this.JWTKey, { expiresIn: `${this.accessTokenExpirationTime}s` });
               const refreshToken = jwt.sign({
                 userId: Number(userId),
                 username,
               }, this.JWTKey, { expiresIn: `${this.refreshTokenExpirationTime}s` });
-              res.status(200).send({accessToken, refreshToken, userType: userPermission === permission.CASTERS ? 'admin' : 'viewer'});
+              res.status(200).send({accessToken, refreshToken, userType: haveCasterPermission ? 'admin' : 'viewer'});
             } catch(e) {
               debug('socket', e.stack);
               res.status(400).send('You don\'t have access to this server.');
