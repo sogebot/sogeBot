@@ -20,6 +20,7 @@
   "type": "Тип",
   "value": "Значення",
   "watchedTime": "За часом перегляду в годинах",
+  "followTime": "Follow time in months",
   "points": "Бали",
   "tips": "Чайові",
   "bits": "Бітc",
