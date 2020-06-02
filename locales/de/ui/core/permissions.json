@@ -20,6 +20,7 @@
   "type": "Typ",
   "value": "Wert",
   "watchedTime": "Watchtime in Stunden",
+  "followTime": "Follow time in months",
   "points": "Punkte",
   "tips": "Spenden",
   "bits": "Bits",
