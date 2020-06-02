@@ -70,7 +70,7 @@ class Parser {
 
       debug('parser.time', 'Processed ' + parser.name + ' took ' + ((Date.now() - time) / 1000));
       if (!isOk) {
-        debug('parser.process', 'Moderation failed ' + JSON.stringify(parser.fnc));
+        debug('parser.process', 'Moderation failed ' + parser.name);
         return true;
       }
     }

@@ -794,8 +794,9 @@ class Module {
           // we should have correct values as we are desc ordering
           const value = _.get(this, `__permission_based__${key}.${p.id}`, null);
           if (value === null) {
+            const prevId = permId;
             permId = p.id;
-            return { ...prev, [p.id]: _.get(prev, permId, (this as any)[key]) };
+            return { ...prev, [p.id]: _.get(prev, prevId, _.get(this, `__permission_based__${key}.${p.id}`, (this as any)[key])) };
           } else {
             permId = p.id;
             return { ...prev, [p.id]: _.get(this, `__permission_based__${key}.${p.id}`, value) };
