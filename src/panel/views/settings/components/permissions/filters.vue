@@ -17,6 +17,7 @@
           <select v-model="filter.type" class="form-control">
             <option value="points">{{ translate('core.permissions.points') }}</option>
             <option value="watched">{{ translate('core.permissions.watchedTime') }}</option>
+            <option value="followtime">{{ translate('core.permissions.followTime') }}</option>
             <option value="tips">{{ translate('core.permissions.tips') }}</option>
             <option value="bits">{{ translate('core.permissions.bits') }}</option>
             <option value="messages">{{ translate('core.permissions.messages') }}</option>

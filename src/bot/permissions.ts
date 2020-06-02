@@ -144,6 +144,15 @@ class Permissions extends Core {
     }
   }
 
+  recacheOnlineUsersPermission() {
+    getRepository(User).find({ isOnline: true }).then(users => {
+      for (const user of users) {
+        cleanViewersCache(user.userId);
+        this.getUserHighestPermission(user.userId);
+      }
+    });
+  }
+
   public async getUserHighestPermission(userId: number): Promise<null | string> {
     const cachedPermission = getFromCachedHighestPermission(userId);
     if (!cachedPermission) {
@@ -285,6 +294,9 @@ class Permissions extends Core {
           break;
         case 'tips':
           amount = user.tips.reduce((a, b) => (a + currency.exchange(b.amount, b.currency, currency.mainCurrency)), 0);
+          break;
+        case 'followtime':
+          amount = (Date.now() - user.followedAt) / (31 * 24 * 60 * 60 * 1000 /*months*/);
           break;
         case 'watched':
           amount = user.watchedTime / (60 * 60 * 1000 /*hours*/);
