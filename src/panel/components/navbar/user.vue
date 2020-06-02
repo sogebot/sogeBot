@@ -58,6 +58,7 @@ import { permission } from 'src/bot/helpers/permissions'
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons'
 import { UserInterface } from '../../../bot/database/entity/user';
+import { PermissionsInterface } from '../../../bot/database/entity/permissions';
 library.add(faUserCircle);
 
 @Component({
@@ -73,7 +74,7 @@ export default class User extends Vue {
   permission = permission;
 
   isViewerLoaded: boolean = false;
-  viewer: (Required<UserInterface> & { aggregatedTips: number; aggregatedBits: number; permission: string }) | null = null;
+  viewer: (Required<UserInterface> & { aggregatedTips: number; aggregatedBits: number; permission: PermissionsInterface }) | null = null;
 
   beforeDestroy() {
     clearInterval(this.interval);
@@ -121,7 +122,7 @@ export default class User extends Vue {
     if (typeof this.$loggedUser === 'undefined'|| this.$loggedUser === null) {
       return;
     }
-    this.socket.emit('viewers::findOne', this.$loggedUser.id, (err: string| number, viewer: Readonly<Required<UserInterface>> & { aggregatedTips: number; aggregatedBits: number; permission: string }) => {
+    this.socket.emit('viewers::findOne', this.$loggedUser.id, (err: string| number, viewer: Readonly<Required<UserInterface>> & { aggregatedTips: number; aggregatedBits: number; permission: PermissionsInterface }) => {
       if (err) {
         return console.error(err);
       }

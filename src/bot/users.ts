@@ -13,6 +13,7 @@ import permissions from './permissions';
 import oauth from './oauth';
 import api from './api';
 import currency from './currency';
+import { Permissions } from './database/entity/permissions';
 
 class Users extends Core {
   uiSortCache: string | null = null;
@@ -350,7 +351,9 @@ class Users extends Core {
           const aggregatedBits = viewer.bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0);
 
           const permId = await permissions.getUserHighestPermission(userId);
-          const permissionGroup = permId || permission.VIEWERS;
+          const permissionGroup = (await getRepository(Permissions).findOneOrFail({
+            where: { id: permId || permission.VIEWERS },
+          }));
           cb(null, {...viewer, aggregatedBits, aggregatedTips, permission: permissionGroup});
         } else {
           cb(null);
