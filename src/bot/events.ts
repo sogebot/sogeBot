@@ -96,7 +96,7 @@ class Events extends Core {
     ];
 
     if (isMainThread) {
-      this.addMenu({ category: 'manage', name: 'event-listeners', id: 'manage/events/list' });
+      this.addMenu({ category: 'manage', name: 'event-listeners', id: 'manage/events/list', this: null });
       this.fadeOut();
     }
   }

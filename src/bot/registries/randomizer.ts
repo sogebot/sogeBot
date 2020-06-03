@@ -11,7 +11,7 @@ import permissions from '../permissions';
 class Randomizer extends Registry {
   constructor() {
     super();
-    this.addMenu({ category: 'registry', name: 'randomizer', id: 'registry/randomizer/list' });
+    this.addMenu({ category: 'registry', name: 'randomizer', id: 'registry/randomizer/list', this: null });
     this.addWidget('randomizer', 'widget-title-randomizer', 'fas fa-dice');
   }
 

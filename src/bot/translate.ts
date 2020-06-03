@@ -22,7 +22,7 @@ class Translate {
   isLoaded = false;
 
   constructor () {
-    addMenu({ category: 'settings', name: 'translations', id: 'settings/translations' });
+    addMenu({ category: 'settings', name: 'translations', id: 'settings/translations', this: null });
   }
 
   async _load () {

@@ -13,7 +13,7 @@ class Gallery extends Overlay {
 
   constructor () {
     super();
-    this.addMenu({ category: 'registry', name: 'gallery', id: 'registry.gallery/list' });
+    this.addMenu({ category: 'registry', name: 'gallery', id: 'registry.gallery/list', this: null });
 
     if (isMainThread) {
       const init = (retry = 0) => {

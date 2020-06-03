@@ -9,7 +9,7 @@ import customvariables from '../customvariables';
 class Text extends Registry {
   constructor () {
     super();
-    this.addMenu({ category: 'registry', name: 'textoverlay', id: 'registry.textoverlay/list' });
+    this.addMenu({ category: 'registry', name: 'textoverlay', id: 'registry.textoverlay/list', this: null });
   }
 
   sockets () {

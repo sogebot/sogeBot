@@ -24,7 +24,7 @@ import { translate } from '../translate';
 class Keywords extends System {
   constructor() {
     super();
-    this.addMenu({ category: 'manage', name: 'keywords', id: 'manage/keywords/list' });
+    this.addMenu({ category: 'manage', name: 'keywords', id: 'manage/keywords/list', this: this });
   }
 
   sockets () {

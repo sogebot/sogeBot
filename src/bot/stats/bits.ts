@@ -6,7 +6,7 @@ import { UserBit } from '../database/entity/user';
 class Bits extends Stats {
   constructor() {
     super();
-    this.addMenu({ category: 'stats', name: 'bits', id: 'stats/bits' });
+    this.addMenu({ category: 'stats', name: 'bits', id: 'stats/bits', this: null });
   }
 
   sockets() {

@@ -35,7 +35,7 @@ class CustomVariables extends Core {
 
   constructor () {
     super();
-    this.addMenu({ category: 'registry', name: 'custom-variables', id: 'registry.customVariables/list' });
+    this.addMenu({ category: 'registry', name: 'custom-variables', id: 'registry.customVariables/list', this: null });
     this.checkIfCacheOrRefresh();
   }
 

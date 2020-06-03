@@ -16,7 +16,7 @@ class Quotes extends System {
   constructor () {
     super();
 
-    this.addMenu({ category: 'manage', name: 'quotes', id: 'manage/quotes/list' });
+    this.addMenu({ category: 'manage', name: 'quotes', id: 'manage/quotes/list', this: this });
     this.addMenuPublic({ id: 'quotes', name: 'quotes'});
   }
 

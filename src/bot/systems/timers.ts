@@ -35,7 +35,7 @@ class Timers extends System {
   constructor () {
     super();
 
-    this.addMenu({ category: 'manage', name: 'timers', id: 'manage/timers/list' });
+    this.addMenu({ category: 'manage', name: 'timers', id: 'manage/timers/list', this: this });
     if (isMainThread) {
 
       this.init();

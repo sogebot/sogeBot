@@ -14,7 +14,7 @@ class Goals extends Overlay {
 
   constructor() {
     super();
-    this.addMenu({ category: 'registry', name: 'goals', id: 'registry/goals/list' });
+    this.addMenu({ category: 'registry', name: 'goals', id: 'registry/goals/list', this: null });
   }
 
   public async sockets() {

@@ -22,7 +22,7 @@ class Users extends Core {
   constructor () {
     super();
 
-    this.addMenu({ category: 'manage', name: 'viewers', id: 'manage/viewers/list' });
+    this.addMenu({ category: 'manage', name: 'viewers', id: 'manage/viewers/list', this: null });
 
     if (isMainThread) {
       setTimeout(() => {

@@ -33,7 +33,7 @@ class Highlights extends System {
 
   constructor() {
     super();
-    this.addMenu({ category: 'manage', name: 'highlights', id: 'manage/highlights' });
+    this.addMenu({ category: 'manage', name: 'highlights', id: 'manage/highlights', this: this });
   }
 
   public sockets() {

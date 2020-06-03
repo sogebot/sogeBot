@@ -13,7 +13,7 @@ import { debug } from '../helpers/log';
 class Alerts extends Registry {
   constructor() {
     super();
-    this.addMenu({ category: 'registry', name: 'alerts', id: 'registry/alerts/list' });
+    this.addMenu({ category: 'registry', name: 'alerts', id: 'registry/alerts/list', this: null });
     if (isMainThread) {
       const init = (retry = 0) => {
         if (retry === 10000) {
