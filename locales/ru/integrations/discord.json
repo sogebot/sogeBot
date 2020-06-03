@@ -6,6 +6,6 @@
   "help-message": "$sender, для привязки вашей учётной записи в Discord: 1. Перейдите на сервер Discord и отправьте !link в канале бота | 2. Дождитесь PM от бота | 3. Отправьте сгенерированную ботом команду в twitch чат.",
   "started-at": "Запущен в",
   "streamed-at": "Стрим шёл",
-  "link-whisper": "Hello $tag, to link this Discord account with your Twitch account on $broadcaster channel, go to https://twitch.tv/$broadcaster, login to your account and send this command to chat \n\n\t\t`!link $id`\n\nNOTE: This expires in 10 minutes.",
+  "link-whisper": "Здравствуйте, $tag, чтобы связать эту учётную запись Discord с Вашей учётной записью в Twitch на канале $broadcaster, перейдите на https://twitch.tv/$broadcaster, отправьте эту команду в чат \n\n\t\t`!link $id`\n\nПРИМЕЧАНИЕ: Срок действия токена истечёт через 10 минут.",
   "check-your-dm": "проверьте свои ЛС для того, чтобы привязать ваш аккаунт."
 }

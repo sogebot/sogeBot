@@ -3,8 +3,8 @@
     "enabled": "Статус",
     "access_token": {
       "title": "Access token",
-      "help": "Get your access token at https://www.sogebot.xyz/integrations/#DonationAlerts"
+      "help": "Получить access token по адресу https://www.sogebot.xyz/integrations/#DonationAlerts"
     },
-    "accessTokenBtn": "DonationAlerts access token generator"
+    "accessTokenBtn": "Acess token генератор для DonationAlerts"
   }
 }
