@@ -275,37 +275,36 @@ class Songs extends System {
 
   async banSongById (opts: CommandOptions, retry = 0): Promise<CommandResponse[]> {
     const bannedSong = await new Promise((resolve: (value: ytdl.videoInfo | null) => any) => {
-      const ban = () => {
-        ytdl.getInfo('https://www.youtube.com/watch?v=' + opts.parameters, async (err, videoInfo) => {
-          if (err) {
-            if (Number(retry ?? 0) < 5) {
-              // try once more to be sure
-              setTimeout(() => {
-                this.banSongById(opts, (retry ?? 0) + 1 );
-              }, 500);
-            } else {
-              error(err);
-              resolve(null);
-            }
-          } else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title)) {
-            // send timeouts to all users who requested song
-            const request = (await getRepository(SongRequest).find({ videoId: opts.parameters })).map(o => o.username);
-            const currentSong = JSON.parse(this.currentSong);
-            if (currentSong.videoID === opts.parameters) {
-              request.push(currentSong.username);
-            }
-            for (const user of request) {
-              timeout(user, translate('songs.bannedSongTimeout'), 300, isModerator(opts.sender));
-            }
-
-            await Promise.all([
-              getRepository(SongBan).save({ videoId: opts.parameters, title: videoInfo.title }),
-              getRepository(SongPlaylist).delete({ videoId: opts.parameters }),
-              getRepository(SongRequest).delete({ videoId: opts.parameters }),
-            ]);
+      const ban = async () => {
+        try {
+          const videoInfo = await ytdl.getInfo('https://www.youtube.com/watch?v=' + opts.parameters);
+          // send timeouts to all users who requested song
+          const request = (await getRepository(SongRequest).find({ videoId: opts.parameters })).map(o => o.username);
+          const currentSong = JSON.parse(this.currentSong);
+          if (currentSong.videoID === opts.parameters) {
+            request.push(currentSong.username);
           }
+          for (const user of request) {
+            timeout(user, translate('songs.bannedSongTimeout'), 300, isModerator(opts.sender));
+          }
+
+          await Promise.all([
+            getRepository(SongBan).save({ videoId: opts.parameters, title: videoInfo.title }),
+            getRepository(SongPlaylist).delete({ videoId: opts.parameters }),
+            getRepository(SongRequest).delete({ videoId: opts.parameters }),
+          ]);
           resolve(videoInfo);
-        });
+        } catch (e) {
+          if (Number(retry ?? 0) < 5) {
+            // try once more to be sure
+            setTimeout(() => {
+              this.banSongById(opts, (retry ?? 0) + 1 );
+            }, 500);
+          } else {
+            error(e);
+            resolve(null);
+          }
+        }
       };
       ban();
     });
@@ -509,21 +508,10 @@ class Songs extends System {
       return [{ response: translate('songs.song-is-banned'), ...opts }];
     }
 
-    return new Promise(resolve => {
-      ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, async (err, videoInfo) => {
-        if (err) {
-          if (Number(retry ?? 0) < 5) {
-            // try once more to be sure
-            setTimeout(() => {
-              resolve(this.addSongToQueue(opts, (retry ?? 0) + 1 ));
-            }, 500);
-          }
-          error(err);
-          resolve([]);
-        }
-        if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
-          resolve([{ response: translate('songs.song-was-not-found'), ...opts }]);
-        } else if (Number(videoInfo.length_seconds) / 60 > this.duration) {
+    return new Promise(async (resolve) => {
+      try {
+        const videoInfo = await ytdl.getInfo('https://www.youtube.com/watch?v=' + opts.parameters);
+        if (Number(videoInfo.length_seconds) / 60 > this.duration) {
           resolve([{ response: translate('songs.song-is-too-long'), ...opts }]);
         } else if ((videoInfo.media.category_url !== 'https://www.youtube.com/channel/UC-9-kyTW8ZkZNDHQJ6FgpwQ' && JSON.parse((videoInfo as any).player.args.player_response).microformat.playerMicroformatRenderer.category !== 'Music') && this.onlyMusicCategory) {
           if (Number(retry ?? 0) < 5) {
@@ -550,7 +538,17 @@ class Songs extends System {
           const response = prepare('songs.song-was-added-to-queue', { name: videoInfo.title });
           resolve([{ response, ...opts }]);
         }
-      });
+      } catch (e) {
+        if (Number(retry ?? 0) < 5) {
+          // try once more to be sure
+          setTimeout(() => {
+            resolve(this.addSongToQueue(opts, (retry ?? 0) + 1 ));
+          }, 500);
+        } else {
+          error(e);
+          resolve([{ response: translate('songs.song-was-not-found'), ...opts }]);
+        }
+      }
     });
   }
 
@@ -593,26 +591,25 @@ class Songs extends System {
       info(`=> Skipped ${id} - Song is banned`);
       done++;
     } else {
-      ytdl.getInfo('https://www.youtube.com/watch?v=' + id, async (err, videoInfo) => {
+      try {
         done++;
-        if (err) {
-          return error(`=> Skipped ${id} - ${err.message}`);
-        } else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title)) {
-          info(`=> Imported ${id} - ${videoInfo.title}`);
-          getRepository(SongPlaylist).save({
-            videoId: id,
-            title: videoInfo.title,
-            loudness: Number(videoInfo.loudness ?? -15),
-            length: Number(videoInfo.length_seconds),
-            lastPlayedAt: Date.now(),
-            seed: 1,
-            volume: 20,
-            startTime: 0,
-            endTime: Number(videoInfo.length_seconds),
-          });
-          imported++;
-        }
-      });
+        const videoInfo = await ytdl.getInfo('https://www.youtube.com/watch?v=' + id);
+        info(`=> Imported ${id} - ${videoInfo.title}`);
+        getRepository(SongPlaylist).save({
+          videoId: id,
+          title: videoInfo.title,
+          loudness: Number(videoInfo.loudness ?? -15),
+          length: Number(videoInfo.length_seconds),
+          lastPlayedAt: Date.now(),
+          seed: 1,
+          volume: 20,
+          startTime: 0,
+          endTime: Number(videoInfo.length_seconds),
+        });
+        imported++;
+      } catch (e) {
+        error(`=> Skipped ${id} - ${e.message}`);
+      }
     }
 
     const waitForImport = function () {
@@ -696,30 +693,25 @@ class Songs extends System {
           info(`=> Skipped ${id} - Song is banned`);
           done++;
         } else {
-          await new Promise(resolve => {
-            ytdl.getInfo('https://www.youtube.com/watch?v=' + id, async (err, videoInfo) => {
-              done++;
-              if (err) {
-                error(`=> Skipped ${id} - ${err.message}`);
-                resolve();
-              } else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title)) {
-                info(`=> Imported ${id} - ${videoInfo.title}`);
-                await getRepository(SongPlaylist).save({
-                  videoId: id,
-                  title: videoInfo.title,
-                  loudness: Number(videoInfo.loudness ?? - 15),
-                  length: Number(videoInfo.length_seconds),
-                  lastPlayedAt: Date.now(),
-                  seed: 1,
-                  volume: 20,
-                  startTime: 0,
-                  endTime: Number(videoInfo.length_seconds),
-                });
-                imported++;
-                resolve();
-              }
+          try {
+            done++;
+            const videoInfo = await ytdl.getInfo('https://www.youtube.com/watch?v=' + id);
+            info(`=> Imported ${id} - ${videoInfo.title}`);
+            await getRepository(SongPlaylist).save({
+              videoId: id,
+              title: videoInfo.title,
+              loudness: Number(videoInfo.loudness ?? - 15),
+              length: Number(videoInfo.length_seconds),
+              lastPlayedAt: Date.now(),
+              seed: 1,
+              volume: 20,
+              startTime: 0,
+              endTime: Number(videoInfo.length_seconds),
             });
-          });
+            imported++;
+          } catch (e) {
+            error(`=> Skipped ${id} - ${e.message}`);
+          }
         }
       }
 
