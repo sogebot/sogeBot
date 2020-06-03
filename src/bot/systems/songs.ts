@@ -289,7 +289,7 @@ class Songs extends System {
           }
 
           await Promise.all([
-            getRepository(SongBan).save({ videoId: opts.parameters, title: videoInfo.title }),
+            getRepository(SongBan).save({ videoId: opts.parameters, title: videoInfo.videoDetails.title }),
             getRepository(SongPlaylist).delete({ videoId: opts.parameters }),
             getRepository(SongRequest).delete({ videoId: opts.parameters }),
           ]);
@@ -510,10 +510,10 @@ class Songs extends System {
 
     return new Promise(async (resolve) => {
       try {
-        const videoInfo = await ytdl.getInfo('https://www.youtube.com/watch?v=' + opts.parameters);
-        if (Number(videoInfo.length_seconds) / 60 > this.duration) {
+        const videoInfo = await ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID);
+        if (Number(videoInfo.videoDetails.lengthSeconds) / 60 > this.duration) {
           resolve([{ response: translate('songs.song-is-too-long'), ...opts }]);
-        } else if ((videoInfo.media.category_url !== 'https://www.youtube.com/channel/UC-9-kyTW8ZkZNDHQJ6FgpwQ' && JSON.parse((videoInfo as any).player.args.player_response).microformat.playerMicroformatRenderer.category !== 'Music') && this.onlyMusicCategory) {
+        } else if (videoInfo.videoDetails.category !== 'Music' && this.onlyMusicCategory) {
           if (Number(retry ?? 0) < 5) {
             // try once more to be sure
             setTimeout(() => {
@@ -522,20 +522,20 @@ class Songs extends System {
           }
           if (global.mocha) {
             error('-- TEST ONLY ERROR --');
-            error({ media: videoInfo.media, category: JSON.parse((videoInfo as any).player.args.player_response).microformat.playerMicroformatRenderer.category });
+            error({ category: videoInfo.videoDetails.category });
           }
           resolve([{ response: translate('songs.incorrect-category'), ...opts }]);
         } else {
           await getRepository(SongRequest).save({
             videoId: videoID,
-            title: videoInfo.title,
+            title: videoInfo.videoDetails.title,
             addedAt: Date.now(),
             loudness: Number(videoInfo.loudness ?? -15),
-            length: Number(videoInfo.length_seconds),
+            length: Number(videoInfo.videoDetails.lengthSeconds),
             username: opts.sender.username,
           });
           this.getMeanLoudness();
-          const response = prepare('songs.song-was-added-to-queue', { name: videoInfo.title });
+          const response = prepare('songs.song-was-added-to-queue', { name: videoInfo.videoDetails.title });
           resolve([{ response, ...opts }]);
         }
       } catch (e) {
@@ -594,10 +594,10 @@ class Songs extends System {
       try {
         done++;
         const videoInfo = await ytdl.getInfo('https://www.youtube.com/watch?v=' + id);
-        info(`=> Imported ${id} - ${videoInfo.title}`);
+        info(`=> Imported ${id} - ${videoInfo.videoDetails.title}`);
         getRepository(SongPlaylist).save({
           videoId: id,
-          title: videoInfo.title,
+          title: videoInfo.videoDetails.title,
           loudness: Number(videoInfo.loudness ?? -15),
           length: Number(videoInfo.length_seconds),
           lastPlayedAt: Date.now(),
@@ -696,10 +696,10 @@ class Songs extends System {
           try {
             done++;
             const videoInfo = await ytdl.getInfo('https://www.youtube.com/watch?v=' + id);
-            info(`=> Imported ${id} - ${videoInfo.title}`);
+            info(`=> Imported ${id} - ${videoInfo.videoDetails.title}`);
             await getRepository(SongPlaylist).save({
               videoId: id,
-              title: videoInfo.title,
+              title: videoInfo.videoDetails.title,
               loudness: Number(videoInfo.loudness ?? - 15),
               length: Number(videoInfo.length_seconds),
               lastPlayedAt: Date.now(),
