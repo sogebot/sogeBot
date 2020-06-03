@@ -120,7 +120,7 @@ export const init = () => {
     res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
   });
 
-  menu.push({ category: 'main', name: 'dashboard', id: 'dashboard' });
+  menu.push({ category: 'main', name: 'dashboard', id: 'dashboard', this: null });
 
   setTimeout(() => {
     adminEndpoint('/', 'panel.sendStreamData', sendStreamData);
@@ -505,7 +505,7 @@ export const init = () => {
     });
 
     adminEndpoint('/', 'menu', (cb) => {
-      cb(null, menu);
+      cb(null, menu.map((o) => ({ category: o.category, name: o.name, id: o.id, enabled: o.this ? o.this.enabled : true })));
     });
 
     publicEndpoint('/', 'menu::public', (cb) => {

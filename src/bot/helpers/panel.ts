@@ -3,8 +3,9 @@ import http, { Server } from 'http';
 import express from 'express';
 
 import type { IconName } from '@fortawesome/free-solid-svg-icons';
+import Module from '../_interface';
 
-export const menu: { category: string; name: string; id: string }[] = [];
+export const menu: { category: string; name: string; id: string; this: Module | null }[] = [];
 export const menuPublic: { name: string; id: string }[] = [];
 export const widgets: { id: string; name: string; icon: string }[] = [];
 

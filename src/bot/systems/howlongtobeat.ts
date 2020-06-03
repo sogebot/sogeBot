@@ -20,7 +20,7 @@ class HowLongToBeat extends System {
 
   constructor() {
     super();
-    this.addMenu({ category: 'manage', name: 'howlongtobeat', id: 'manage/hltb' });
+    this.addMenu({ category: 'manage', name: 'howlongtobeat', id: 'manage/hltb', this: this });
 
     if (isMainThread) {
       this.refreshImageThumbnail();

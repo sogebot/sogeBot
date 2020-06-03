@@ -18,7 +18,7 @@ class Carousel extends Overlay {
 
   constructor () {
     super();
-    this.addMenu({ category: 'registry', name: 'carouseloverlay', id: 'registry.carousel/list' });
+    this.addMenu({ category: 'registry', name: 'carouseloverlay', id: 'registry.carousel/list', this: null });
   }
 
   sockets () {

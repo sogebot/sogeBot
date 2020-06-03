@@ -68,8 +68,8 @@ class Songs extends System {
       setTimeout(() => {
         this.getMeanLoudness();
 
-        this.addMenu({ category: 'manage', name: 'playlist', id: 'manage/songs/playlist' });
-        this.addMenu({ category: 'manage', name: 'bannedsongs', id: 'manage/songs/bannedsongs' });
+        this.addMenu({ category: 'manage', name: 'playlist', id: 'manage/songs/playlist', this: this });
+        this.addMenu({ category: 'manage', name: 'bannedsongs', id: 'manage/songs/bannedsongs', this: this });
         this.addMenuPublic({ id: 'songrequests', name: 'songs'});
         this.addMenuPublic({ id: 'playlist', name: 'playlist'});
         this.addWidget('ytplayer', 'widget-title-ytplayer', 'fas fa-headphones');

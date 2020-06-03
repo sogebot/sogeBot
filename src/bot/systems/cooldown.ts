@@ -37,7 +37,7 @@ class Cooldown extends System {
 
   constructor () {
     super();
-    this.addMenu({ category: 'manage', name: 'cooldown', id: 'manage/cooldowns/list' });
+    this.addMenu({ category: 'manage', name: 'cooldown', id: 'manage/cooldowns/list', this: this });
   }
 
   sockets () {

@@ -37,7 +37,7 @@ class Alias extends System {
   constructor () {
     super();
 
-    this.addMenu({ category: 'manage', name: 'alias', id: 'manage/alias' });
+    this.addMenu({ category: 'manage', name: 'alias', id: 'manage/alias', this: this });
   }
 
   sockets() {
