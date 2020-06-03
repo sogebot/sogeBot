@@ -52,7 +52,6 @@ describe('Quotes - main()', () => {
 
       it('Run !quote', async () => {
         r = await quotes.main({ sender: test.sender, parameters: test.parameters, command: '!quote' });
-        console.log({r});
       });
       if (test.shouldFail) {
         it('Should throw error', async () => {
