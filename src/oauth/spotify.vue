@@ -15,7 +15,7 @@ export default {
     let state: Ref<boolean | null> = ref(true);
 
     if(window.location.hash || window.location.search) {
-      socket.emit('spotify::skip', (err: string | null, state: any) => {
+      socket.emit('spotify::state', (err: string | null, state: any) => {
         let urlState = '';
         let urlCode = '';
         for (let url of window.location.search.split('&')) {
@@ -29,9 +29,11 @@ export default {
 
         if (urlState === state) {
           state = false;
-          socket.emit('code', urlCode, (err: string | null) => {
+          socket.emit('spotify::code', urlCode, (err: string | null) => {
             window.location.href = window.location.origin + "/#/settings/integrations/spotify"
           })
+        } else {
+          console.error('State is not matching!')
         }
       })
     }
