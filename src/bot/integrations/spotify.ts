@@ -356,7 +356,7 @@ class Spotify extends Integration {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'spotify::skip', async (callback) => {
+    adminEndpoint(this.nsp, 'spotify::state', async (callback) => {
       callback(null, this.state);
     });
     adminEndpoint(this.nsp, 'spotify::skip', async (callback) => {
