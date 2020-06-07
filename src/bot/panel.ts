@@ -509,7 +509,7 @@ export const init = () => {
     });
 
     publicEndpoint('/', 'menu::public', (cb) => {
-      cb(menuPublic);
+      cb(null, menuPublic);
     });
 
     socket.on('translations', (cb) => {
