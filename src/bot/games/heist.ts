@@ -178,7 +178,7 @@ class Heist extends Game {
           global.setTimeout(async () => {
             const chunk: string[][] = _.chunk(winners, this.showMaxUsers);
             const winnersList = chunk.shift() || [];
-            const andXMore = _.flatten(winners).length;
+            const andXMore = _.flatten(winners).length - this.showMaxUsers;
 
             let message = await translate('games.heist.results');
             message = message.replace('$users', winnersList.map((o) => (tmi.showWithAt ? '@' : '') + o).join(', '));
