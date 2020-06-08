@@ -197,16 +197,22 @@
               )
             template(v-slot:cell(color)="data")
               b-row.m-0
-                b-input(
-                  class="col-10"
-                  v-model.trim="data.item.color"
-                  type="text"
-                )
-                b-input(
-                  class="col-2"
-                  v-model.trim="data.item.color"
-                  type="color"
-                )
+                b-input-group.col-12
+                  b-input-group-prepend
+                    b-button(
+                      variant="append"
+                      @click="data.item.color = getRandomColor()"
+                    )
+                      fa(icon="dice")
+                  b-input(
+                    v-model.trim="data.item.color"
+                    type="text"
+                  ).border-left-0
+                  b-input-group-append(style="min-width: 40px;")
+                    b-input(
+                      v-model.trim="data.item.color"
+                      type="color"
+                    )
             template(v-slot:cell(numOfDuplicates)="data")
               b-input(
                 v-if="!data.item.groupId"
@@ -302,6 +308,7 @@ Component.registerHooks([
   }
 })
 export default class randomizerEdit extends Vue {
+  getRandomColor = getRandomColor;
   getContrastColor = getContrastColor;
   psocket: SocketIOClient.Socket = getSocket('/core/permissions');
   socket: SocketIOClient.Socket =  getSocket('/registries/randomizer');
