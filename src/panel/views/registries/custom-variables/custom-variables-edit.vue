@@ -131,6 +131,7 @@
           <b-form-group
             :label="translate('registry.customvariables.response.name')"
             label-for="response"
+            v-if="selectedType !== 'eval'"
           >
             <button :class="[responseType === 0 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 0; responseText = ''">{{ translate('registry.customvariables.response.default') }}</button>
             <button :class="[responseType === 1 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 1; responseText = ''">{{ translate('registry.customvariables.response.custom') }}</button>
