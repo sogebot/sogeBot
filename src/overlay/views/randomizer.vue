@@ -314,7 +314,16 @@ export default class RandomizerOverlay extends Vue {
           if (this.showSimpleLoop > 0) {
             setTimeout(next, this.showSimpleSpeed)
           } else {
-            setTimeout(Math.random() > 0.3 ? blink : next, this.showSimpleSpeed) // move one a bit if lucky or not
+            setTimeout(() => {
+              if (Math.random() > 0.3) {
+                blink()
+                if (this.data && this.data.tts.enabled) {
+                  this.speak(this.generateItems(this.data.items)[this.showSimpleValueIndex].name, this.data.tts.voice, this.data.tts.rate, this.data.tts.pitch, this.data.tts.volume);
+                }
+               } else {
+                 next();
+               }
+            }, this.showSimpleSpeed); // move one a bit if lucky or not
           }
         }
         next();
