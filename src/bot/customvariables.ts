@@ -373,7 +373,6 @@ class CustomVariables extends Core {
       // recheck permission as this may go outside of setValueOf
       if (opts.sender) {
         if (typeof getFromViewersCache(opts.sender.userId, item.permission) === 'undefined') {
-          console.log((await permissions.check(opts.sender.userId, item.permission, false)));
           addToViewersCache(opts.sender.userId, item.permission, (await permissions.check(opts.sender.userId, item.permission, false)).access);
         }
       }
