@@ -51,10 +51,10 @@
 
     loading(v-if="state.loading !== $state.success")
     b-form(v-else)
-      b-form-group(
-        :label="translate('registry.randomizer.form.name')"
-        label-for="name"
-      _)
+      b-form-group
+        label(for="name")
+          | {{ translate('registry.randomizer.form.name') }}
+          span.text-warning  *
         b-input-group
           b-form-input(
             id="name"
@@ -268,7 +268,7 @@ import { Route } from 'vue-router'
 import { NextFunction } from 'express';
 
 import { Validations } from 'vuelidate-property-decorators';
-import { required, minLength, minValue } from 'vuelidate/lib/validators';
+import { required, minValue } from 'vuelidate/lib/validators';
 import { cloneDeep, isEqual } from 'lodash-es';
 
 import { getSocket } from 'src/panel/helpers/socket';
@@ -361,9 +361,7 @@ export default class randomizerEdit extends Vue {
         required,
       },
       command: {
-        required,
-        sw: (value: string) => value.startsWith('!'),
-        minLength: minLength(2),
+        ifExistsMustBe: (value: string) => value.length === 0 || (value.startsWith('!') && value.length > 2),
       },
       permissionId: {
         mustBeExisting: (value: string) => !!this.getPermissionName(value),
