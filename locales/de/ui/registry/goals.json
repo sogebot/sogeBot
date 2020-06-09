@@ -28,14 +28,6 @@
     "endAfterIgnore": {
       "title": "Ziel läuft nicht ab"
     },
-    "fonts": {
-      "title": "Font-Familie",
-      "help": "Google-Fonts werden für Font-Familien verwendet. <a href='https://fonts.google.com/' target='_blank'>Schriftartenliste prüfen.</a>"
-    },
-    "fontSize": {
-      "title": "Größe",
-      "help": "Schriftgröße ist in Pixeln"
-    },
     "borderPx": {
       "title": "Rahmen",
       "help": "Rahmengröße ist in Pixeln"
