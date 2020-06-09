@@ -41,6 +41,7 @@ export interface GoalInterface {
     family: string;
     color: string;
     size: number;
+    weight: number;
     borderColor: string;
     borderPx: number;
   };

@@ -8,6 +8,7 @@
     v-if="data && data.type === 'simple'" :style="{
     color: generateItems(data.items)[showSimpleValueIndex].color,
     'font-size': data.customizationFont.size + 'px',
+    'font-weight': data.customizationFont.weight,
     'font-family': data.customizationFont.family,
     'text-align': 'center',
     'text-shadow': textStrokeGenerator(data.customizationFont.borderPx, data.customizationFont.borderColor)
@@ -22,6 +23,7 @@
     </canvas>
     <div v-if="wheelWin" id="winbox" :style="{
       color: getContrastColor(wheelWin.fillStyle),
+      'font-weight': data.customizationFont.weight,
       'font-size': (data.customizationFont.size + 15)+ 'px',
       'font-family': data.customizationFont.family,
       'text-align': 'center',

@@ -118,68 +118,7 @@
             div(style="width: 3rem;") {{ item.tickVolume + '%' }}
 
       tts(:tts.sync="item.tts" :uuid="item.id")
-
-      b-card(:header="translate('registry.goals.fontSettings')")
-        b-card-text
-          b-form-group
-            label(for="font_selector") {{ translate('registry.goals.input.fonts.title') }}
-            b-form-select(v-model="item.customizationFont.family" id="font_selector")
-              option(v-for="font of fonts" :value="font.text" :key="font.text") {{font.text}}
-            small(v-html="translate('registry.goals.input.fonts.help')").form-text.text-muted
-
-          b-row.py-3
-            b-col(cols="3")
-              b-form-group
-                label(for="fonts_size_input") {{ translate('registry.goals.input.fontSize.title') }}
-                b-input(
-                  v-model.number="item.customizationFont.size"
-                  type="number" :min="1" id="fonts_size_input"
-                  @input="$v.item.customizationFont.size.$touch()"
-                  :state="$v.item.customizationFont.size.$invalid && $v.item.customizationFont.size.$dirty ? false : null"
-                )
-                small.form-text.text-muted {{ translate('registry.goals.input.fontSize.help') }}
-                b-form-invalid-feedback(:state="!($v.item.customizationFont.size.$invalid && $v.item.customizationFont.size.$dirty)")
-                  template(v-if="!$v.item.customizationFont.size.minValue")
-                    | {{ translate('errors.minValue_of_value_is').replace('$value', 1) }}
-                  template(v-else)
-                    | {{ translate('dialog.errors.required') }}
-
-            b-col(cols="3")
-              b-form-group
-                label(for="fonts_borderPx_input") {{ translate('registry.goals.input.borderPx.title') }}
-                b-input(
-                  v-model.number="item.customizationFont.borderPx"
-                  type="number" :min="0" id="fonts_borderPx_input"
-                  @input="$v.item.customizationFont.borderPx.$touch()"
-                  :state="$v.item.customizationFont.borderPx.$invalid && $v.item.customizationFont.borderPx.$dirty ? false : null"
-                )
-                small.form-text.text-muted {{ translate('registry.goals.input.borderPx.help') }}
-                b-form-invalid-feedback(:state="!($v.item.customizationFont.borderPx.$invalid && $v.item.customizationFont.borderPx.$dirty)")
-                  template(v-if="!$v.item.customizationFont.borderPx.minValue")
-                    | {{ translate('errors.minValue_of_value_is').replace('$value', 0) }}
-                  template(v-else)
-                    | {{ translate('dialog.errors.required') }}
-
-            b-col(cols="6")
-              b-form-group
-                b-row.px-3
-                  label(for="fonts_border_color_input").w-100 {{ translate('registry.goals.input.borderColor.title') }}
-                  b-input(
-                    class="col-10"
-                    v-model.trim="item.customizationFont.borderColor"
-                    type="text"
-                    @input="$v.item.customizationFont.borderColor.$touch()"
-                    :state="$v.item.customizationFont.borderColor.$invalid && $v.item.customizationFont.borderColor.$dirty ? false : null"
-                  )
-                  b-input(
-                    class="col-2"
-                    v-model.trim="item.customizationFont.borderColor"
-                    type="color" id="fonts_border_color_input"
-                    @input="$v.item.customizationFont.borderColor.$touch()"
-                    :state="$v.item.customizationFont.borderColor.$invalid && $v.item.customizationFont.borderColor.$dirty ? false : null"
-                  )
-                  b-form-invalid-feedback( :state="!($v.item.customizationFont.borderColor.$invalid && $v.item.customizationFont.borderColor.$dirty)")
-                    | {{ translate('errors.invalid_format') }}
+      font(:data.sync="item.customizationFont" key="randomizer-font")
 
       b-card(no-body).mt-2
         b-card-header
@@ -297,6 +236,7 @@ Component.registerHooks([
 @Component({
   components: {
     tts: () => import('../alerts/components/tts.vue'),
+    font: () => import('src/panel/components/font.vue'),
     loading: () => import('../../../components/loading.vue'),
   },
   filters: {
@@ -355,6 +295,7 @@ export default class randomizerEdit extends Vue {
     },
     customizationFont: {
       family: 'PT Sans',
+      weight: 500,
       size: 16,
       borderColor: '#000000',
       borderPx: 1,
@@ -570,6 +511,10 @@ export default class randomizerEdit extends Vue {
               return;
             }
             if (Object.keys(d).length === 0) this.$router.push({ name: 'RandomizerRegistryList' })
+
+            // workaround for missing weight after https://github.com/sogehige/sogeBot/issues/3871
+            d.customizationFont.weight = d.customizationFont.weight ?? 500;
+
             this.item = d;
             this.isShown = d.isShown;
             this.$route.params.id = d.id;
@@ -616,6 +561,3 @@ export default class randomizerEdit extends Vue {
   };
 }
 </script>
-
-<style scoped>
-</style>

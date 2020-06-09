@@ -19,6 +19,7 @@ export interface RandomizerInterface {
     size: number;
     borderColor: string;
     borderPx: number;
+    weight: number;
   };
   tts: Omit<CommonSettingsInterface['tts'], 'skipUrls' | 'keepAlertShown' | 'minAmountToPlay'>;
 }
