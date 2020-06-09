@@ -183,6 +183,8 @@ export default class RandomizerOverlay extends Vue {
               'centerX'      : 960,                 // Used to position on the background correctly.
               'centerY'      : 540,
               'textFontSize' : data.customizationFont.size,                  // Font size.
+              'textFontWeight' : data.customizationFont.weight,                  // Font weight.
+              'textFontFamily' : data.customizationFont.family,                  // Font family.
               'segments'     : segments,
               'responsive'   : true,  // This wheel is responsive!
               'animation'    :                      // Definition of the animation
