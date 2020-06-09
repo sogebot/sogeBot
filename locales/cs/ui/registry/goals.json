@@ -28,14 +28,6 @@
     "endAfterIgnore": {
       "title": "Tento cíl nevyprší"
     },
-    "fonts": {
-      "title": "Písmo",
-      "help": "Fonty Google se používají pro písmo. <a href='https://fonts.google.com/' target='_blank'>Zkontrolujte seznam písem.</a>"
-    },
-    "fontSize": {
-      "title": "Velikost",
-      "help": "Velikost písma je v pixelech"
-    },
     "borderPx": {
       "title": "Ohraničení",
       "help": "Velikost ohraničení je v pixelech"
