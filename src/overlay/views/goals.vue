@@ -32,6 +32,7 @@
             'line-height': (goal.customizationBar.height - (goal.customizationBar.borderPx * 2)) + 'px',
             'width': '100%',
             'color': goal.customizationFont.color,
+            'font-weight': goal.customizationFont.weight,
             'font-size': goal.customizationFont.size + 'px',
             'text-shadow': textStrokeGenerator(goal.customizationFont.borderPx, goal.customizationFont.borderColor)
           }">
