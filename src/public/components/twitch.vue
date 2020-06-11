@@ -3,7 +3,7 @@
     <b-row no-gutters style="height: 100%">
       <b-col cols="12" md="9" lg="9" xl="10">
         <iframe
-          :src="'https://player.twitch.tv/?channel=' + room"
+          :src="videoUrl"
           height="100%"
           width="100%"
           frameborder="0"
@@ -45,12 +45,17 @@ export default class navbar extends Vue {
     }, 100)
   }
 
-  get chatUrl() {
-    return window.location.protocol
-      + '//twitch.tv/embed/'
-      + this.room
-      + '/chat'
-      + (this.theme === 'dark' ? '?darkpopout' : '')
+  get videoUrl() {
+    return `${window.location.protocol}//player.twitch.tv/?channel=${this.room}&autoplay=true&parent=${window.location.hostname}`
   }
+
+  get chatUrl() {
+      return window.location.protocol
+        + '//twitch.tv/embed/'
+        + this.room
+        + '/chat'
+        + (this.theme === 'dark' ? '?darkpopout' : '')
+        + (this.theme === 'dark' ? '&parent=' + window.location.hostname : '?parent=' + window.location.hostname)
+    }
 }
 </script>
