@@ -59,7 +59,7 @@ export default {
   },
   computed: {
     videoUrl() {
-      return `https://player.twitch.tv/?channel=${this.room}&autoplay=true&muted=true`
+      return `https://player.twitch.tv/?channel=${this.room}&autoplay=true&muted=true&parent=${window.location.hostname}`
     }
   },
   methods: {
