@@ -121,7 +121,6 @@
           }">
           The quick brown fox jumps over the lazy dog
         </div>
-        </template>
       </b-card-body>
     </b-collapse>
   </b-card>
