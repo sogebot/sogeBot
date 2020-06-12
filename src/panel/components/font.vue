@@ -110,28 +110,17 @@
 
         <template v-if="typeof dataValues.color === 'undefined'">
           <b-form-input type="color" v-model="exampleColor" class="float-right border-0 p-0" style="width: 25px"/>
-          <div :style="{
-            color: exampleColor,
-            'font-size': dataValues.size + 'px',
-            'font-weight': dataValues.weight,
-            'font-family': dataValues.family,
-            'text-align': 'center',
-            'text-shadow': textStrokeGenerator(dataValues.borderPx, dataValues.borderColor)
-            }">
-            The quick brown fox jumps over the lazy dog
-          </div>
         </template>
-        <template v-else>
-          <div :style="{
-            color: dataValues.color,
-            'font-size': dataValues.size + 'px',
-            'font-weight': dataValues.weight,
-            'font-family': dataValues.family,
-            'text-align': 'center',
-            'text-shadow': textStrokeGenerator(dataValues.borderPx, dataValues.borderColor)
-            }">
-            The quick brown fox jumps over the lazy dog
-          </div>
+        <div :style="{
+          color: typeof dataValues.color === 'undefined' ? exampleColor : dataValues.color,
+          'font-size': dataValues.size + 'px',
+          'font-weight': dataValues.weight,
+          'font-family': dataValues.family,
+          'text-align': 'center',
+          'text-shadow': textStrokeGenerator(dataValues.borderPx, dataValues.borderColor)
+          }">
+          The quick brown fox jumps over the lazy dog
+        </div>
         </template>
       </b-card-body>
     </b-collapse>
