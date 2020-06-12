@@ -21,12 +21,15 @@
           template(v-slot:title)
             fa(:icon="['fab', 'twitch']")
           b-card-text.h-100
-            iframe(
-              v-if="show"
-              style="width: 100%; height: 100%"
-              :src="videoUrl"
-              frameborder="0"
-            )
+            div.h-100
+              b-alert(variant="danger" v-if="!isHttps" show)
+                | You need to run bot on HTTPS with valid certificate for this embed to be working
+              iframe(
+                v-else-if="show"
+                style="width: 100%; height: 100%"
+                :src="videoUrl"
+                frameborder="0"
+              )
 
         template(v-slot:tabs-end)
           b-nav-item(href="#" @click="refresh")
@@ -58,6 +61,9 @@ export default {
     })
   },
   computed: {
+    isHttps() {
+      return window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    },
     videoUrl() {
       return `${window.location.protocol}//player.twitch.tv/?channel=${this.room}&autoplay=true&muted=true&parent=${window.location.hostname}`
     }

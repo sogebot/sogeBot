@@ -2,7 +2,11 @@
   <b-container fluid class="w-100 p-0" style="height: calc(100vh - 40px) !important">
     <b-row no-gutters style="height: 100%">
       <b-col cols="12" md="9" lg="9" xl="10">
+        <b-alert variant="danger" v-if="!isHttps" show>
+          You need to run this page on HTTPS with valid certificate for this embed to be working. Ask your streamer to run on HTTPS.
+        </b-alert>
         <iframe
+          v-else
           :src="videoUrl"
           height="100%"
           width="100%"
@@ -43,6 +47,10 @@ export default class navbar extends Vue {
     setInterval(() => {
       this.theme = (localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light'));
     }, 100)
+  }
+
+  get isHttps() {
+    return window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   }
 
   get videoUrl() {
