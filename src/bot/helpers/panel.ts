@@ -1,11 +1,11 @@
 import io from 'socket.io';
-import http, { Server } from 'https';
+import https from 'https';
+import http, { Server } from 'http';
 import express from 'express';
-import fs from 'fs';
+import pem from 'pem';
 
 import type { IconName } from '@fortawesome/free-solid-svg-icons';
 import Module from '../_interface';
-import { join, normalize } from 'path';
 
 export const menu: { category: string; name: string; id: string; this: Module | null }[] = [];
 export const menuPublic: { name: string; id: string }[] = [];
@@ -14,6 +14,7 @@ export const widgets: { id: string; name: string; icon: string }[] = [];
 export let ioServer: io.Server | null = null;
 export let app: express.Application | null = null;
 export let server: Server;
+export let serverSecure: Server;
 
 export const addMenu = (menuArg: typeof menu[number]) => {
   if (!menu.find(o => o.id === menuArg.id)) {
@@ -31,21 +32,27 @@ export const addWidget = (id: string, name: string, icon: IconName) => {
   widgets.push({ id: id, name: name, icon: icon });
 };
 
-export const setIOServer = (serverArg: Server) => {
-  ioServer = io(serverArg);
-  ioServer.sockets.setMaxListeners(200);
-};
-
 export const setApp = (_app: express.Application) => {
   app = _app;
 };
 
 export const setServer = () => {
   if (app) {
-    server = http.createServer({
-      key: fs.readFileSync(normalize(join(process.cwd(), 'dest', 'data', 'server.key'))),
-      cert: fs.readFileSync(normalize(join(process.cwd(), 'dest', 'data', 'server.cert'))),
-    }, app);
+    server = http.createServer(app);
+    ioServer = io(server);
+    ioServer.sockets.setMaxListeners(200);
+
+    pem.createCertificate({ days: 99999, selfSigned: true }, function (err, keys) {
+      if (err) {
+        throw err;
+      }
+      if (app) {
+        serverSecure = https.createServer({ key: keys.serviceKey, cert: keys.certificate }, app);
+        if (ioServer) {
+          ioServer.attach(serverSecure);
+        }
+      }
+    });
   }
 };
 

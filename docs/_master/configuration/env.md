@@ -14,6 +14,13 @@ Set port for listening of UI.
 - `PORT=12345`
 - `PORT=20000` *default*
 
+## SECUREPORT
+
+Set port for listening of UI.
+
+- `SECUREPORT=12345`
+- `SECUREPORT=20443` *default*
+
 ## HEAP
 
 Enables HEAP snapshot tracking and saving for a bot. In normal environment,
