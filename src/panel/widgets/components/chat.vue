@@ -22,8 +22,10 @@
             fa(icon='comment-alt' fixed-width)
           b-card-text.h-100
             div.h-100
+              b-alert(variant="danger" v-if="!isHttps" show)
+                | You need to run bot on HTTPS with valid certificate for this embed to be working
               iframe(
-                v-if="show"
+                v-else-if="show"
                 frameborder="0"
                 scrolling="no"
                 :src="chatUrl"
@@ -79,9 +81,12 @@ export default {
     }
   },
   computed: {
+    isHttps() {
+      return window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    },
+
     chatUrl() {
-      return window.location.protocol
-        + '//twitch.tv/embed/'
+      return 'https://twitch.tv/embed/'
         + this.room
         + '/chat'
         + (this.theme === 'dark' ? '?darkpopout' : '')
