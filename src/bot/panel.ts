@@ -33,9 +33,10 @@ import customvariables from './customvariables';
 import highlights from './systems/highlights';
 import _ from 'lodash';
 import { getOwnerAsSender, getTime } from './commons';
-import { app, ioServer, menu, menuPublic, server, setApp, setIOServer, setServer, widgets } from './helpers/panel';
+import { app, ioServer, menu, menuPublic, server, serverSecure, setApp, setServer, widgets } from './helpers/panel';
 
 const port = process.env.PORT ?? '20000';
+const secureport = process.env.SECUREPORT ?? '20443';
 
 export let socketsConnected = 0;
 
@@ -52,7 +53,6 @@ export const init = () => {
   app?.use(bodyParser.json());
   app?.use(bodyParser.urlencoded({ extended: true }));
   setServer();
-  setIOServer(server);
 
   // webhooks integration
   app?.post('/webhooks/hub/follows', (req, res) => {
@@ -544,6 +544,9 @@ export const getApp = function () {
 export const expose = function () {
   server.listen(port, () => {
     info(`WebPanel is available at http://localhost:${port}`);
+  });
+  serverSecure.listen(secureport, () => {
+    info(`WebPanel is available at https://localhost:${secureport}`);
   });
 };
 

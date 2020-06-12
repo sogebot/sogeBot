@@ -14,6 +14,20 @@ Set port for listening of UI.
 - `PORT=12345`
 - `PORT=20000` *default*
 
+## SECUREPORT
+
+Set port for listening of UI.
+
+- `SECUREPORT=12345`
+- `SECUREPORT=20443` *default*
+
+## CA_KEY, CA_CERT
+
+Sets your certificate and certificate key by **full path**
+
+- `CA_KEY=/path/to/your/cert.key`
+- `CA_CERT=/path/to/your/cert.cert`
+
 ## HEAP
 
 Enables HEAP snapshot tracking and saving for a bot. In normal environment,
