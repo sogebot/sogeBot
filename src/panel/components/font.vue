@@ -107,17 +107,31 @@
             ></b-form-input>
           </b-input-group>
         </b-form-group>
+
+        <template v-if="typeof dataValues.color === 'undefined'">
+          <b-form-input type="color" v-model="exampleColor" class="float-right border-0 p-0" style="width: 25px"/>
+        </template>
+        <div :style="{
+          color: typeof dataValues.color === 'undefined' ? exampleColor : dataValues.color,
+          'font-size': dataValues.size + 'px',
+          'font-weight': dataValues.weight,
+          'font-family': dataValues.family,
+          'text-align': 'center',
+          'text-shadow': textStrokeGenerator(dataValues.borderPx, dataValues.borderColor)
+          }">
+          The quick brown fox jumps over the lazy dog
+        </div>
       </b-card-body>
     </b-collapse>
   </b-card>
 </template>
 
 <script lang="ts">
-import { Vue, Component, PropSync } from 'vue-property-decorator';
+import { Vue, Component, PropSync, Watch } from 'vue-property-decorator';
 
 
 @Component({})
-export default class baffleText extends Vue {
+export default class fontCustomizer extends Vue {
   @PropSync('data') dataValues!: {
     family: string;
     size: number;
@@ -127,6 +141,8 @@ export default class baffleText extends Vue {
     color?: string;
     highlightcolor?: string;
   }
+
+  exampleColor = '#000000';
 
   fonts: {text: string; value: string}[] = [];
 
@@ -151,6 +167,41 @@ export default class baffleText extends Vue {
     this.fonts = response.items.map((o: { family: string }) => {
       return { text: o.family, value: o.family }
     })
+
+    this.loadFont(this.dataValues.family)
+  }
+
+  @Watch('dataValues.family')
+  loadFont(value: string) {
+    const head = document.getElementsByTagName('head')[0];
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    console.debug('Loading font', value)
+    const font = value.replace(/ /g, '+')
+    const css = "@import url('https://fonts.googleapis.com/css?family=" + font + "');"
+    style.appendChild(document.createTextNode(css));
+    head.appendChild(style);
+  }
+
+  textStrokeGenerator(radius: number, color: string) {
+    if (radius === 0) return ''
+
+    // config
+    const steps = 30;
+    const blur = 2;
+    // generate text shadows, spread evenly around a circle
+    const radianStep = steps / (Math.PI * 2);
+    let cssStr = '';
+    for (let r=1; r <= radius; r++) {
+      for(let i=0; i < steps; i++) {
+        const curRads = radianStep * i;
+        const xOffset = (r * Math.sin(curRads)).toFixed(1);
+        const yOffset = (r * Math.cos(curRads)).toFixed(1);
+        if(i > 0 || r > 1) cssStr += ", ";
+        cssStr += xOffset + "px " + yOffset + "px " + blur + "px " + color;
+      }
+    }
+    return cssStr
   }
 }
 </script>
