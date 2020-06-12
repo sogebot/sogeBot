@@ -1,9 +1,11 @@
 import io from 'socket.io';
-import http, { Server } from 'http';
+import http, { Server } from 'https';
 import express from 'express';
+import fs from 'fs';
 
 import type { IconName } from '@fortawesome/free-solid-svg-icons';
 import Module from '../_interface';
+import { join, normalize } from 'path';
 
 export const menu: { category: string; name: string; id: string; this: Module | null }[] = [];
 export const menuPublic: { name: string; id: string }[] = [];
@@ -40,7 +42,10 @@ export const setApp = (_app: express.Application) => {
 
 export const setServer = () => {
   if (app) {
-    server = http.createServer(app);
+    server = http.createServer({
+      key: fs.readFileSync(normalize(join(process.cwd(), 'dest', 'data', 'server.key'))),
+      cert: fs.readFileSync(normalize(join(process.cwd(), 'dest', 'data', 'server.cert'))),
+    }, app);
   }
 };
 

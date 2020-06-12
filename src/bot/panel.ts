@@ -543,7 +543,7 @@ export const getApp = function () {
 
 export const expose = function () {
   server.listen(port, () => {
-    info(`WebPanel is available at http://localhost:${port}`);
+    info(`WebPanel is available at https://localhost:${port}`);
   });
 };
 

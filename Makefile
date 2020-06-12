@@ -45,6 +45,8 @@ ui:
 bot:
 	@echo -ne "\n\t ----- Building bot\n"
 	@npx tsc -p src/bot
+	@cp ./src/bot/data/server.cert ./dest/data/
+	@cp ./src/bot/data/server.key ./dest/data/
 
 pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"
