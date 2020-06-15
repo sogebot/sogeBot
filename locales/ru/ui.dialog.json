@@ -3,6 +3,13 @@
     "edit": "Редактировать",
     "add": "Добавить"
   },
+  "font": {
+    "shadowShiftRight": "Shift Right",
+    "shadowShiftDown": "Shift Down",
+    "shadowBlur": "Blur",
+    "shadowOpacity": "Opacity",
+    "color": "Color"
+  },
   "errors": {
     "required": "Это поле не может быть пустым.",
     "minValue": "Наименьшее значение этого поля равно $value."
