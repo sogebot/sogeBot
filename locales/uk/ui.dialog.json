@@ -3,6 +3,13 @@
     "edit": "Edit",
     "add": "Add"
   },
+  "font": {
+    "shadowShiftRight": "Shift Right",
+    "shadowShiftDown": "Shift Down",
+    "shadowBlur": "Blur",
+    "shadowOpacity": "Opacity",
+    "color": "Color"
+  },
   "errors": {
     "required": "This input cannot be empty.",
     "minValue": "Lowest value of this input is $value."
