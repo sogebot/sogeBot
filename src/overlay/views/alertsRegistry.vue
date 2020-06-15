@@ -25,7 +25,7 @@
                   'font-size': runningAlert.alert.font.size + 'px',
                   'font-weight': runningAlert.alert.font.weight,
                   'color': runningAlert.alert.font.color,
-                  'text-shadow': textStrokeGenerator(runningAlert.alert.font.borderPx, runningAlert.alert.font.borderColor)
+                  'text-shadow': [textStrokeGenerator(runningAlert.alert.font.borderPx, runningAlert.alert.font.borderColor), shadowGenerator(runningAlert.alert.font.shadow)].filter(Boolean).join(', ')
                   }">
                   <v-runtime-template :template="prepareMessageTemplate(runningAlert.alert.messageTemplate)"></v-runtime-template>
                 </span>
@@ -56,7 +56,7 @@
                 'font-size': runningAlert.alert.font.size + 'px',
                 'font-weight': runningAlert.alert.font.weight,
                 'color': runningAlert.alert.font.color,
-                'text-shadow': textStrokeGenerator(runningAlert.alert.font.borderPx, runningAlert.alert.font.borderColor)
+                'text-shadow': [textStrokeGenerator(runningAlert.alert.font.borderPx, runningAlert.alert.font.borderColor), shadowGenerator(runningAlert.alert.font.shadow)].filter(Boolean).join(', ')
               }">
               {{runningAlert.alert.messageTemplate}}
               <div>{{ runningAlert.message }}</div>
@@ -83,6 +83,7 @@ import urlRegex from 'url-regex';
 
 import { CacheEmotesInterface } from 'src/bot/database/entity/cacheEmotes';
 import { EmitData, AlertInterface, CommonSettingsInterface, AlertHostInterface, AlertTipInterface, AlertResubInterface } from 'src/bot/database/entity/alert';
+import Color from 'color';
 
 require('../../../scss/letter-animations.css');
 require('animate.css');
@@ -405,7 +406,7 @@ export default class AlertsRegistryOverlays extends Vue {
                       'font-weight': runningAlert.alert.font.weight,
                       'color': runningAlert.alert.font.color,
                       'text-align': 'center',
-                      'text-shadow': textStrokeGenerator(runningAlert.alert.font.borderPx, runningAlert.alert.font.borderColor)
+                      'text-shadow': [textStrokeGenerator(runningAlert.alert.font.borderPx, runningAlert.alert.font.borderColor), shadowGenerator(runningAlert.alert.font.shadow)].filter(Boolean).join(', ')
                     }"
                   `)
                   .replace(/\<div.*class="(.*?)".*ref="image"\>|\<div.*ref="image".*class="(.*?)"\>/gm, '<div ref="image">') // we need to replace ref with class with proper ref
@@ -665,6 +666,20 @@ export default class AlertsRegistryOverlays extends Vue {
         .replace(/\{monthsName\}/g, this.runningAlert.monthsName);
     }
     return `<span>${msg}</span>`;
+  }
+
+  shadowGenerator(shadow: {
+    shiftRight: number;
+    shiftDown: number;
+    blur: number;
+    opacity: number;
+    color: string;
+  }[]) {
+    const output = [];
+    for (const s of shadow) {
+      output.push(`${s.shiftRight}px ${s.shiftDown}px ${s.blur}px ${Color(s.color).alpha(s.opacity / 100)}`)
+    }
+    return output.join(', ');
   }
 
   textStrokeGenerator(radius: number, color: string) {

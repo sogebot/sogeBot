@@ -20,6 +20,13 @@ export interface RandomizerInterface {
     borderColor: string;
     borderPx: number;
     weight: number;
+    shadow: {
+      shiftRight: number;
+      shiftDown: number;
+      blur: number;
+      opacity: number;
+      color: string;
+    }[];
   };
   tts: Omit<CommonSettingsInterface['tts'], 'skipUrls' | 'keepAlertShown' | 'minAmountToPlay'>;
 }

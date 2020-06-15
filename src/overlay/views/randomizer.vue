@@ -11,7 +11,7 @@
     'font-weight': data.customizationFont.weight,
     'font-family': data.customizationFont.family,
     'text-align': 'center',
-    'text-shadow': textStrokeGenerator(data.customizationFont.borderPx, data.customizationFont.borderColor)
+    'text-shadow': [textStrokeGenerator(data.customizationFont.borderPx, data.customizationFont.borderColor), shadowGenerator(data.customizationFont.shadow)].filter(Boolean).join(', ')
     }">
     {{ generateItems(data.items)[showSimpleValueIndex].name }}
   </div>
@@ -28,7 +28,7 @@
       'font-family': data.customizationFont.family,
       'text-align': 'center',
       'background-color': wheelWin.fillStyle, // add alpha
-      'text-shadow': textStrokeGenerator(data.customizationFont.borderPx, data.customizationFont.borderColor)
+      'text-shadow': [textStrokeGenerator(data.customizationFont.borderPx, data.customizationFont.borderColor), shadowGenerator(data.customizationFont.shadow)].filter(Boolean).join(', ')
     }">{{wheelWin.text}}</div>
   </div>
 </div>
@@ -43,6 +43,7 @@ import { cloneDeep, isEqual } from 'lodash-es';
 import { gsap } from 'gsap'
 import Winwheel from 'winwheel'
 import JsonViewer from 'vue-json-viewer'
+import Color from 'color';
 
 import { getSocket } from 'src/panel/helpers/socket';
 import { getContrastColor } from 'src/panel/helpers/color';
@@ -242,6 +243,20 @@ export default class RandomizerOverlay extends Vue {
     ctx.lineTo(positionX + 1, positionY);
     ctx.stroke();                 // Complete the path by stroking (draw lines).
     ctx.fill();                   // Then fill.
+  }
+
+  shadowGenerator(shadow: {
+    shiftRight: number;
+    shiftDown: number;
+    blur: number;
+    opacity: number;
+    color: string;
+  }[]) {
+    const output = [];
+    for (const s of shadow) {
+      output.push(`${s.shiftRight}px ${s.shiftDown}px ${s.blur}px ${Color(s.color).alpha(s.opacity / 100)}`)
+    }
+    return output.join(', ');
   }
 
   textStrokeGenerator(radius: number, color: string) {

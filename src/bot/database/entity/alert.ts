@@ -74,6 +74,13 @@ export interface CommonSettingsInterface {
     weight: number;
     color: string;
     highlightcolor: string;
+    shadow: {
+      shiftRight: number;
+      shiftDown: number;
+      blur: number;
+      opacity: number;
+      color: string;
+    }[];
   };
   alert?: AlertInterface;
 }
@@ -127,6 +134,13 @@ export interface AlertTipInterface extends CommonSettingsInterface {
       borderColor: string;
       weight: number;
       color: string;
+      shadow: {
+        shiftRight: number;
+        shiftDown: number;
+        blur: number;
+        opacity: number;
+        color: string;
+      }[];
     };
   };
 }
@@ -144,6 +158,13 @@ export interface AlertResubInterface extends CommonSettingsInterface {
       borderColor: string;
       weight: number;
       color: string;
+      shadow: {
+        shiftRight: number;
+        shiftDown: number;
+        blur: number;
+        opacity: number;
+        color: string;
+      }[];
     };
   };
 }
