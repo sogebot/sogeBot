@@ -34,7 +34,7 @@
             'color': goal.customizationFont.color,
             'font-weight': goal.customizationFont.weight,
             'font-size': goal.customizationFont.size + 'px',
-            'text-shadow': textStrokeGenerator(goal.customizationFont.borderPx, goal.customizationFont.borderColor)
+            'text-shadow': [textStrokeGenerator(goal.customizationFont.borderPx, goal.customizationFont.borderColor), shadowGenerator(goal.customizationFont.shadow)].filter(Boolean).join(', ')
           }">
           <div class="col-4 text-left text-nowrap pl-2 pr-2">{{ goal.name }}</div>
           <div class="col-4 text-nowrap text-center">
@@ -61,7 +61,7 @@
           :style="{
             'color': goal.customizationFont.color,
             'font-size': goal.customizationFont.size + 'px',
-            'text-shadow': textStrokeGenerator(goal.customizationFont.borderPx, goal.customizationFont.borderColor)
+            'text-shadow': [textStrokeGenerator(goal.customizationFont.borderPx, goal.customizationFont.borderColor), shadowGenerator(goal.customizationFont.shadow)].filter(Boolean).join(', ')
           }">
           <div class="col text-center text-truncate pl-2 pr-2">{{ goal.name }}</div>
         </div>
@@ -89,7 +89,7 @@
               'width': '100%',
               'color': goal.customizationFont.color,
               'font-size': goal.customizationFont.size + 'px',
-              'text-shadow': textStrokeGenerator(goal.customizationFont.borderPx, goal.customizationFont.borderColor)
+              'text-shadow': [textStrokeGenerator(goal.customizationFont.borderPx, goal.customizationFont.borderColor), shadowGenerator(goal.customizationFont.shadow)].filter(Boolean).join(', ')
             }">
             <div class="col text-center">
               <template v-if="goal.type === 'tips'">
@@ -104,7 +104,7 @@
             'width': '100%',
             'color': goal.customizationFont.color,
             'font-size': goal.customizationFont.size + 'px',
-            'text-shadow': textStrokeGenerator(goal.customizationFont.borderPx, goal.customizationFont.borderColor)
+            'text-shadow': [textStrokeGenerator(goal.customizationFont.borderPx, goal.customizationFont.borderColor), shadowGenerator(goal.customizationFont.shadow)].filter(Boolean).join(', ')
           }">
           <div class="col text-left pl-2">
             <template v-if="goal.type === 'tips'">
@@ -138,6 +138,7 @@ import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import safeEval from 'safe-eval';
 import { find } from 'lodash-es';
+import Color from 'color';
 
 import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
@@ -228,6 +229,20 @@ export default class GoalsOverlay extends Vue {
 
     const goal = this.group.goals[idx]
     return new Date(goal.endAfter).getTime() <= new Date().getTime() && !goal.endAfterIgnore
+  }
+
+  shadowGenerator(shadow: {
+    shiftRight: number;
+    shiftDown: number;
+    blur: number;
+    opacity: number;
+    color: string;
+  }[]) {
+    const output = [];
+    for (const s of shadow) {
+      output.push(`${s.shiftRight}px ${s.shiftDown}px ${s.blur}px ${Color(s.color).alpha(s.opacity / 100)}`)
+    }
+    return output.join(', ');
   }
 
   textStrokeGenerator(radius: number, color: string) {

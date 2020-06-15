@@ -285,6 +285,40 @@ export default class AlertsEdit extends Vue {
           return console.error(err);
         }
         console.debug('Loaded', {data});
+        // workaround for missing weight after https://github.com/sogehige/sogeBot/issues/3871
+        // workaround for missing shadow settings after https://github.com/sogehige/sogeBot/issues/3875
+        for (const alert of data.follows) {
+          alert.font.weight = alert.font.weight ?? 500;
+          alert.font.shadow = alert.font.shadow ?? [];
+        }
+        for (const alert of data.subs) {
+          alert.font.weight = alert.font.weight ?? 500;
+          alert.font.shadow = alert.font.shadow ?? [];
+        }
+        for (const alert of data.subcommunitygifts) {
+          alert.font.weight = alert.font.weight ?? 500;
+          alert.font.shadow = alert.font.shadow ?? [];
+        }
+        for (const alert of data.hosts) {
+          alert.font.weight = alert.font.weight ?? 500;
+          alert.font.shadow = alert.font.shadow ?? [];
+        }
+        for (const alert of data.raids) {
+          alert.font.weight = alert.font.weight ?? 500;
+          alert.font.shadow = alert.font.shadow ?? [];
+        }
+        for (const alert of data.tips) {
+          alert.font.weight = alert.font.weight ?? 500;
+          alert.font.shadow = alert.font.shadow ?? [];
+        }
+        for (const alert of data.cheers) {
+          alert.font.weight = alert.font.weight ?? 500;
+          alert.font.shadow = alert.font.shadow ?? [];
+        }
+        for (const alert of data.resubs) {
+          alert.font.weight = alert.font.weight ?? 500;
+          alert.font.shadow = alert.font.shadow ?? [];
+        }
         this.item = data;
         this.state.loaded = this.$state.success;
         this.$nextTick(() => {
@@ -376,6 +410,7 @@ export default class AlertsEdit extends Vue {
         weight: 800,
         color: '#ffffff',
         highlightcolor: '#00ff00',
+        shadow: []
       }
     }
 
@@ -408,6 +443,7 @@ export default class AlertsEdit extends Vue {
                 borderColor: '#000000',
                 weight: 500,
                 color: '#ffffff',
+                shadow: [],
               },
             },
           })
@@ -445,6 +481,7 @@ export default class AlertsEdit extends Vue {
                 borderColor: '#000000',
                 weight: 500,
                 color: '#ffffff',
+                shadow: [],
               },
             },
           })
@@ -465,6 +502,7 @@ export default class AlertsEdit extends Vue {
                 borderColor: '#000000',
                 weight: 500,
                 color: '#ffffff',
+                shadow: [],
               },
             },
           })

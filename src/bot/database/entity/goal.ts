@@ -44,6 +44,13 @@ export interface GoalInterface {
     weight: number;
     borderColor: string;
     borderPx: number;
+    shadow: {
+      shiftRight: number;
+      shiftDown: number;
+      blur: number;
+      opacity: number;
+      color: string;
+    }[];
   };
   customizationHtml: string;
   customizationJs: string;

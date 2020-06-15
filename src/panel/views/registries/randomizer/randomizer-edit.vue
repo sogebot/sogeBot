@@ -299,6 +299,7 @@ export default class randomizerEdit extends Vue {
       size: 16,
       borderColor: '#000000',
       borderPx: 1,
+      shadow: [],
     }
   };
 
@@ -514,6 +515,9 @@ export default class randomizerEdit extends Vue {
 
             // workaround for missing weight after https://github.com/sogehige/sogeBot/issues/3871
             d.customizationFont.weight = d.customizationFont.weight ?? 500;
+
+            // workaround for missing shadow settings after https://github.com/sogehige/sogeBot/issues/3875
+            d.customizationFont.shadow = d.customizationFont.shadow ?? [];
 
             this.item = d;
             this.isShown = d.isShown;

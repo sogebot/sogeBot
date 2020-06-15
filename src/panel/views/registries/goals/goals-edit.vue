@@ -423,7 +423,8 @@ export default Vue.extend({
           color: '#ffffff',
           size: 20,
           borderColor: '#000000',
-          borderPx: 1
+          borderPx: 1,
+          shadow: [],
         },
         customizationHtml: '\n\t<!-- ' +
                 '\n\t\tAll html objects will be wrapped in the #wrap div' +
@@ -474,8 +475,10 @@ export default Vue.extend({
         this.groupId = String(d.id)
 
         // workaround for missing weight after https://github.com/sogehige/sogeBot/issues/3871
+        // workaround for missing shadow settings after https://github.com/sogehige/sogeBot/issues/3875
         for (const goal of d.goals) {
           goal.customizationFont.weight = goal.customizationFont.weight ?? 500;
+          goal.customizationFont.shadow = goal.customizationFont.shadow ?? [];
         }
 
         this.group = d
