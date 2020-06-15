@@ -4,11 +4,11 @@
     "add": "Přidat"
   },
   "font": {
-    "shadowShiftRight": "Shift Right",
-    "shadowShiftDown": "Shift Down",
-    "shadowBlur": "Blur",
-    "shadowOpacity": "Opacity",
-    "color": "Color"
+    "shadowShiftRight": "Posunout doprava",
+    "shadowShiftDown": "Posunout dolů",
+    "shadowBlur": "Rozostření",
+    "shadowOpacity": "Průhlednost",
+    "color": "Barva"
   },
   "errors": {
     "required": "Toto pole nesmí být prázdné.",
