@@ -3,6 +3,13 @@
     "edit": "Upravit",
     "add": "Přidat"
   },
+  "font": {
+    "shadowShiftRight": "Shift Right",
+    "shadowShiftDown": "Shift Down",
+    "shadowBlur": "Blur",
+    "shadowOpacity": "Opacity",
+    "color": "Color"
+  },
   "errors": {
     "required": "Toto pole nesmí být prázdné.",
     "minValue": "Nejnižší hodnota tohoto pole je $value."
