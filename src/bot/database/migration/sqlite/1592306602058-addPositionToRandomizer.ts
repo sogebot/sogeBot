@@ -13,7 +13,7 @@ export class addPositionToRandomizer1592306602058 implements MigrationInterface 
 
     await queryRunner.query(`DROP INDEX "idx_randomizer_cmdunique"`, undefined);
     await queryRunner.query(`DROP TABLE "randomizer"`, undefined);
-    await queryRunner.query(`CREATE TABLE "randomizer" ("id" varchar PRIMARY KEY NOT NULL, "widgetOrder" integer NOT NULL, "createdAt" bigint NOT NULL DEFAULT (0), "command" varchar NOT NULL, "isShown" boolean NOT NULL DEFAULT (0), "type" varchar(20) NOT NULL DEFAULT ('simple'), "customizationFont" text NOT NULL, "permissionId" varchar NOT NULL, "name" varchar NOT NULL, "tts" text NOT NULL, "shouldPlayTick" boolean NOT NULL, "tickVolume" integer NOT NULL, "position" text NOT NULL)`, undefined);
+    await queryRunner.query(`CREATE TABLE "randomizer" ("id" varchar PRIMARY KEY NOT NULL, "widgetOrder" integer NOT NULL, "createdAt" bigint NOT NULL DEFAULT (0), "command" varchar NOT NULL, "isShown" boolean NOT NULL DEFAULT (0), "type" varchar(20) NOT NULL DEFAULT ('simple'), "customizationFont" text NOT NULL, "permissionId" varchar NOT NULL, "name" varchar NOT NULL, "tts" text NOT NULL, "shouldPlayTick" boolean NOT NULL, "tickVolume" integer NOT NULL, "position" text not null)`, undefined);
     await queryRunner.clearTable('randomizer_item');
 
     for (const randomizer of randomizers) {
