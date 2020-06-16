@@ -3,6 +3,13 @@
     "edit": "Bearbeiten",
     "add": "Hinzufügen"
   },
+  "font": {
+    "shadowShiftRight": "Shift Right",
+    "shadowShiftDown": "Shift Down",
+    "shadowBlur": "Blur",
+    "shadowOpacity": "Opacity",
+    "color": "Color"
+  },
   "errors": {
     "required": "Diese Eingabe darf nicht leer sein.",
     "minValue": "Der niedrigste Wert dieser Eingabe ist $value."
