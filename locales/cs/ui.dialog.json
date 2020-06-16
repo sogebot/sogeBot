@@ -3,6 +3,18 @@
     "edit": "Upravit",
     "add": "Přidat"
   },
+  "position": {
+    "settings": "Nastavení pozice",
+    "anchorX": "Pozice ukotvení X",
+    "anchorY": "Pozice ukotvení Y",
+    "left": "Vlevo",
+    "right": "Vpravo",
+    "middle": "Střed",
+    "top": "Nahoře",
+    "bottom": "Dole",
+    "x": "X",
+    "y": "Y"
+  },
   "font": {
     "shadowShiftRight": "Posunout doprava",
     "shadowShiftDown": "Posunout dolů",
