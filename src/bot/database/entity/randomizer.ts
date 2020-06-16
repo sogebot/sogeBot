@@ -14,6 +14,9 @@ export interface RandomizerInterface {
   tickVolume: number;
   widgetOrder: number;
   type: 'simple' | 'wheelOfFortune';
+  position: {
+    x: number; y: number; anchorX: 'left' | 'middle' | 'right'; anchorY: 'top' | 'middle' | 'bottom';
+  };
   customizationFont: {
     family: string;
     size: number;
@@ -55,6 +58,7 @@ export const Randomizer = new EntitySchema<Readonly<Required<RandomizerInterface
     shouldPlayTick: { type: Boolean },
     tickVolume: { type: Number },
     type: { type: 'varchar', length: 20, default: 'simple' },
+    position: { type: 'simple-json' },
     customizationFont: { type: 'simple-json' },
     permissionId: { type: String },
     name: { type: String },

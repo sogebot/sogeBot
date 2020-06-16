@@ -3,17 +3,22 @@
   <div v-if="urlParam('debug')" class="debug">
     <json-viewer :value="data || {}" boxed copyable :expand-depth="4"></json-viewer>
   </div>
-  <div
-    v-show="showSimpleBlink"
-    v-if="data && data.type === 'simple'" :style="{
-    color: generateItems(data.items)[showSimpleValueIndex].color,
-    'font-size': data.customizationFont.size + 'px',
-    'font-weight': data.customizationFont.weight,
-    'font-family': data.customizationFont.family,
-    'text-align': 'center',
-    'text-shadow': [textStrokeGenerator(data.customizationFont.borderPx, data.customizationFont.borderColor), shadowGenerator(data.customizationFont.shadow)].filter(Boolean).join(', ')
-    }">
-    {{ generateItems(data.items)[showSimpleValueIndex].name }}
+  <div id="simpleRandomizer">
+    <div v-if="data && data.type === 'simple'">
+      <div
+        style="position: absolute"
+        v-for="(item, index) in generateItems(data.items)" :key="'simple-' + index"
+        :style="{
+          visibility: showSimpleBlink && index === showSimpleValueIndex ? 'visible' : 'hidden',
+          color: item.color,
+          'font-size': data.customizationFont.size + 'px',
+          'font-weight': data.customizationFont.weight,
+          'font-family': data.customizationFont.family,
+          'text-shadow': [textStrokeGenerator(data.customizationFont.borderPx, data.customizationFont.borderColor), shadowGenerator(data.customizationFont.shadow)].filter(Boolean).join(', '),
+          'transform': position[index] ? position[index] : '',
+        }"
+      > {{ item.name }} </div>
+    </div>
   </div>
   <div v-if="data && data.type === 'wheelOfFortune'">
     <canvas id='canvas' ref="canvas" width="1920" height="1080" style="width: 100%; height: 100%" data-responsiveMinWidth="180"
@@ -89,6 +94,8 @@ export default class RandomizerOverlay extends Vue {
   theWheel: any = null;
   wheelWin: any = null;
 
+  position: string[] = [];
+
   speak(text: string, voice: string, rate: number, pitch: number, volume: number) {
     window.responsiveVoice.speak(text, voice, { rate, pitch, volume });
   }
@@ -144,6 +151,7 @@ export default class RandomizerOverlay extends Vue {
         const head = document.getElementsByTagName('head')[0];
         const style = document.createElement('style');
         style.type = 'text/css';
+
         if (!this.loadedFonts.includes(data.customizationFont.family)) {
           console.debug('Loading font', data.customizationFont.family)
           this.loadedFonts.push(data.customizationFont.family)
@@ -161,6 +169,9 @@ export default class RandomizerOverlay extends Vue {
         }
 
         this.$nextTick(() => {
+          if (data.type === 'simple') {
+            this.positionGenerator();
+          }
           if (shouldReinitWof && data.type === 'wheelOfFortune') {
             function playSound() {
               if (data.shouldPlayTick) {
@@ -346,6 +357,38 @@ export default class RandomizerOverlay extends Vue {
           }
         }
         next();
+      }
+    }
+  }
+
+  positionGenerator() {
+    this.position = [];
+    const el = document.getElementById('simpleRandomizer');
+    if (el) {
+      const child = el.children[0].children;
+      for (let i = 0; i < child.length; i++) {
+        if (child[i] && this.data) {
+          const widthPxPerCent = window.innerWidth / 100;
+          const heightPxPerCent = window.innerHeight / 100;
+
+          let top = 0;
+          if (this.data.position.anchorY === 'middle') {
+            top = Number(window.getComputedStyle(child[i]).getPropertyValue('height').replace('px', '')) / 2;
+          } else if (this.data.position.anchorY === 'bottom') {
+            top = Number(window.getComputedStyle(child[i]).getPropertyValue('height').replace('px', ''));
+          }
+
+          let left = 0;
+          if (this.data.position.anchorX === 'middle') {
+            left = Number(window.getComputedStyle(child[i]).getPropertyValue('width').replace('px', '')) / 2;
+          } else if (this.data.position.anchorX === 'right') {
+            left = Number(window.getComputedStyle(child[i]).getPropertyValue('width').replace('px', ''));
+          }
+
+          this.position[i] = `translate(${(this.data.position.x * widthPxPerCent) - left}px, ${(this.data.position.y * heightPxPerCent) - top}px)`;
+        } else {
+          this.position[i] = `translate(0, 0)`;
+        }
       }
     }
   }
