@@ -254,6 +254,10 @@ e.g. `(api|https://httpbin.org/get?test=a\\nb) Lorem (api.args.test)`
 
 `(list.!command.<permissionName>)` - will return list of your visible custom !commands for permission
 
+`(list.core.<permissionName>)` - will return list of your visible custom core commands for permission
+
+`(list.!core.<permissionName>)` - will return list of your visible custom core !commands for permission
+
 `(list.cooldown)` - will return list of your cooldowns (keywords and !commands)
 
 `(list.ranks)` - list of your ranks

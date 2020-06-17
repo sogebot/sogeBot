@@ -34,12 +34,12 @@ describe('Message - list filter', () => {
     it('(list.alias) should return created aliases', async () => {
       const r = await new Message('(list.alias)').parse({});
       assert.strictEqual(r, 'a, b, c');
-    })
+    });
 
     it('(list.!alias) should return created aliases', async () => {
       const r = await new Message('(list.!alias)').parse({});
       assert.strictEqual(r, '!a, !b, !c');
-    })
+    });
   });
 
   describe('(list.command) should return proper message', () => {
@@ -53,12 +53,12 @@ describe('Message - list filter', () => {
     it('(list.command) should return created commands', async () => {
       const r = await new Message('(list.command)').parse({});
       assert.strictEqual(r, 'a, b, c');
-    })
+    });
 
     it('(list.!command) should return created commands', async () => {
       const r = await new Message('(list.!command)').parse({});
       assert.strictEqual(r, '!a, !b, !c');
-    })
+    });
   });
 
   describe('(list.cooldown) should return proper message', () => {
@@ -76,10 +76,10 @@ describe('Message - list filter', () => {
     it('(list.cooldown) should return created cooldowns', async () => {
       const r = await new Message('(list.cooldown)').parse({});
       assert.strictEqual(r, '!test: 20s, test: 20s');
-    })
+    });
   });
 
-    describe('(list.ranks) should return proper message', () => {
+  describe('(list.ranks) should return proper message', () => {
     it('test - 20h', async () => {
       const r = await ranks.add({ sender: owner, parameters: '20 test' });
       assert.strictEqual(r[0].response, '$sender, new rank viewer test(20hours) was added');
@@ -93,6 +93,23 @@ describe('Message - list filter', () => {
     it('(list.ranks) should return created ranks', async () => {
       const r = await new Message('(list.ranks)').parse({});
       assert.strictEqual(r, 'test (20h), test2 (40h)');
-    })
+    });
+  });
+
+  describe('(list.core.<permissionName>) should return proper message', () => {
+    it('(list.core.CASTERS) should return core commands', async () => {
+      const r = await new Message('(list.core.CASTERS)').parse({});
+      assert.strictEqual(r, '_debug, alert, alias, alias add, alias edit, alias group, alias list, alias remove, alias toggle, alias toggle-visibility, bansong, command, command add, command edit, command list, command remove, command toggle, command toggle-visibility, commercial, cooldown, cooldown toggle enabled, cooldown toggle followers, cooldown toggle moderators, cooldown toggle owners, cooldown toggle subscribers, disable, enable, game set, highlight, highlight list, hltb, ignore add, ignore check, ignore remove, keyword, keyword add, keyword edit, keyword list, keyword remove, keyword toggle, makeitrain, permission list, permit, playlist, playlist add, playlist import, playlist remove, playlist steal, points add, points all, points get, points online, points remove, points set, points undo, price, price list, price set, price toggle, price unset, queue clear, queue close, queue list, queue open, queue pick, queue random, quote add, quote remove, quote set, raffle open, raffle pick, raffle remove, rank add, rank add-flw, rank add-sub, rank edit, rank edit-flw, rank edit-sub, rank help, rank list, rank list-flw, rank list-sub, rank rm, rank rm-flw, rank rm-sub, rank set, rank unset, scrim stop, set, skipsong, snipe, timers, timers add, timers list, timers rm, timers set, timers toggle, timers unset, title set, top bits, top followage, top gifts, top messages, top points, top subage, top submonths, top time, top tips, unbansong');
+    });
+
+    it('(list.core.VIEWERS) should return core commands', async () => {
+      const r = await new Message('(list.core.VIEWERS)').parse({});
+      assert.strictEqual(r, 'age, bet, currentsong, followage, followers, game, lastseen, me, ping, points, points give, queue, queue join, quote, quote list, raffle, rank, snipe match, songrequest, subage, subs, time, title, uptime, vote, watched, wrongsong');
+    });
+
+    it('(list.!core.VIEWERS) should return core commands', async () => {
+      const r = await new Message('(list.!core.VIEWERS)').parse({});
+      assert.strictEqual(r, '!age, !bet, !currentsong, !followage, !followers, !game, !lastseen, !me, !ping, !points, !points give, !queue, !queue join, !quote, !quote list, !raffle, !rank, !snipe match, !songrequest, !subage, !subs, !time, !title, !uptime, !vote, !watched, !wrongsong');
+    });
   });
 });
