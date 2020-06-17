@@ -521,6 +521,27 @@ class Message {
                 return o.alias;
               }
             })).sort().join(', ');
+          case 'core':
+          case '!core':
+            if (permission) {
+              const _permission = await permissions.get(permission);
+              if (_permission) {
+                const coreCommands = (await Promise.all((await new Parser().getCommandsList()).map(async (item) => {
+                  const customPermission = await permissions.getCommandPermission(item.id);
+                  return { ...item, permission: typeof customPermission !== 'undefined' ? customPermission : item.permission };
+                })))
+                  .filter(item => item.permission === _permission.id);
+                return coreCommands.length === 0
+                  ? ' '
+                  : coreCommands.map(item => system === '!core' ? item.command : item.command.replace('!', '')).sort().join(', ');
+              } else {
+                error(`Permission for (list.core.${permission}) not found.`);
+                return '';
+              }
+            } else {
+              error('Missing permission for (list.core.<missing>).');
+              return '';
+            }
           case 'command':
             if (permission) {
               const responses = commands.map(o => o.responses).flat();
