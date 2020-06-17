@@ -48,9 +48,9 @@ import { cloneDeep, isEqual } from 'lodash-es';
 import { gsap } from 'gsap'
 import Winwheel from 'winwheel'
 import JsonViewer from 'vue-json-viewer'
-import Color from 'color';
 
 import { getSocket } from 'src/panel/helpers/socket';
+import { textStrokeGenerator, shadowGenerator } from 'src/panel/helpers/text';
 import { getContrastColor } from 'src/panel/helpers/color';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -77,6 +77,8 @@ declare global {
 })
 export default class RandomizerOverlay extends Vue {
   getContrastColor = getContrastColor;
+  textStrokeGenerator = textStrokeGenerator;
+  shadowGenerator = shadowGenerator;
 
   loadedFonts: string[] = [];
 
@@ -254,41 +256,6 @@ export default class RandomizerOverlay extends Vue {
     ctx.lineTo(positionX + 1, positionY);
     ctx.stroke();                 // Complete the path by stroking (draw lines).
     ctx.fill();                   // Then fill.
-  }
-
-  shadowGenerator(shadow: {
-    shiftRight: number;
-    shiftDown: number;
-    blur: number;
-    opacity: number;
-    color: string;
-  }[]) {
-    const output = [];
-    for (const s of shadow) {
-      output.push(`${s.shiftRight}px ${s.shiftDown}px ${s.blur}px ${Color(s.color).alpha(s.opacity / 100)}`)
-    }
-    return output.join(', ');
-  }
-
-  textStrokeGenerator(radius: number, color: string) {
-    if (radius === 0) return ''
-
-    // config
-    const steps = 30;
-    const blur = 2;
-    // generate text shadows, spread evenly around a circle
-    const radianStep = steps / (Math.PI * 2);
-    let cssStr = '';
-    for (let r=1; r <= radius; r++) {
-      for(let i=0; i < steps; i++) {
-        const curRads = radianStep * i;
-        const xOffset = (r * Math.sin(curRads)).toFixed(1);
-        const yOffset = (r * Math.cos(curRads)).toFixed(1);
-        if(i > 0 || r > 1) cssStr += ", ";
-        cssStr += xOffset + "px " + yOffset + "px " + blur + "px " + color;
-      }
-    }
-    return cssStr
   }
 
   spin() {

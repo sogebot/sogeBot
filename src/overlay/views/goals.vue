@@ -135,10 +135,11 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { getSocket } from 'src/panel/helpers/socket';
 import safeEval from 'safe-eval';
 import { find } from 'lodash-es';
-import Color from 'color';
+
+import { getSocket } from 'src/panel/helpers/socket';
+import { textStrokeGenerator, shadowGenerator } from 'src/panel/helpers/text';
 
 import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
@@ -159,6 +160,9 @@ import { GoalInterface, GoalGroupInterface } from 'src/bot/database/entity/goal'
 
 @Component({})
 export default class GoalsOverlay extends Vue {
+  textStrokeGenerator = textStrokeGenerator;
+  shadowGenerator = shadowGenerator;
+
   show: number = -1;
   group: GoalGroupInterface | null = null;
   loadedFonts: string[] = [];
@@ -229,41 +233,6 @@ export default class GoalsOverlay extends Vue {
 
     const goal = this.group.goals[idx]
     return new Date(goal.endAfter).getTime() <= new Date().getTime() && !goal.endAfterIgnore
-  }
-
-  shadowGenerator(shadow: {
-    shiftRight: number;
-    shiftDown: number;
-    blur: number;
-    opacity: number;
-    color: string;
-  }[]) {
-    const output = [];
-    for (const s of shadow) {
-      output.push(`${s.shiftRight}px ${s.shiftDown}px ${s.blur}px ${Color(s.color).alpha(s.opacity / 100)}`)
-    }
-    return output.join(', ');
-  }
-
-  textStrokeGenerator(radius: number, color: string) {
-    if (radius === 0) return ''
-
-    // config
-    const steps = 30;
-    const blur = 2;
-    // generate text shadows, spread evenly around a circle
-    const radianStep = steps / (Math.PI * 2);
-    let cssStr = '';
-    for (let r=1; r <= radius; r++) {
-      for(let i=0; i < steps; i++) {
-        const curRads = radianStep * i;
-        const xOffset = (r * Math.sin(curRads)).toFixed(1);
-        const yOffset = (r * Math.cos(curRads)).toFixed(1);
-        if(i > 0 || r > 1) cssStr += ", ";
-        cssStr += xOffset + "px " + yOffset + "px " + blur + "px " + color;
-      }
-    }
-    return cssStr
   }
 
   getFontFamilyCSS (family: string) {

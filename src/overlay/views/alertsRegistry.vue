@@ -76,14 +76,15 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import JsonViewer from 'vue-json-viewer'
-import { getSocket } from 'src/panel/helpers/socket';
 import VRuntimeTemplate from 'v-runtime-template';
 import { isEqual, get } from 'lodash-es';
 import urlRegex from 'url-regex';
 
 import { CacheEmotesInterface } from 'src/bot/database/entity/cacheEmotes';
 import { EmitData, AlertInterface, CommonSettingsInterface, AlertHostInterface, AlertTipInterface, AlertResubInterface } from 'src/bot/database/entity/alert';
-import Color from 'color';
+
+import { getSocket } from 'src/panel/helpers/socket';
+import { textStrokeGenerator, shadowGenerator } from 'src/panel/helpers/text';
 
 require('../../../scss/letter-animations.css');
 require('animate.css');
@@ -108,6 +109,9 @@ let alerts: EmitData[] = [];
   }
 })
 export default class AlertsRegistryOverlays extends Vue {
+  textStrokeGenerator = textStrokeGenerator;
+  shadowGenerator = shadowGenerator;
+
   socket = getSocket('/registries/alerts', true);
   socketEmotes = getSocket('/overlays/emotes', true);
   socketRV = getSocket('/integrations/responsivevoice', true);
@@ -666,41 +670,6 @@ export default class AlertsRegistryOverlays extends Vue {
         .replace(/\{monthsName\}/g, this.runningAlert.monthsName);
     }
     return `<span>${msg}</span>`;
-  }
-
-  shadowGenerator(shadow: {
-    shiftRight: number;
-    shiftDown: number;
-    blur: number;
-    opacity: number;
-    color: string;
-  }[]) {
-    const output = [];
-    for (const s of shadow) {
-      output.push(`${s.shiftRight}px ${s.shiftDown}px ${s.blur}px ${Color(s.color).alpha(s.opacity / 100)}`)
-    }
-    return output.join(', ');
-  }
-
-  textStrokeGenerator(radius: number, color: string) {
-    if (radius === 0) return ''
-
-    // config
-    const steps = 30;
-    const blur = 2;
-    // generate text shadows, spread evenly around a circle
-    const radianStep = steps / (Math.PI * 2);
-    let cssStr = '';
-    for (let r=1; r <= radius; r++) {
-      for(let i=0; i < steps; i++) {
-        const curRads = radianStep * i;
-        const xOffset = (r * Math.sin(curRads)).toFixed(1);
-        const yOffset = (r * Math.cos(curRads)).toFixed(1);
-        if(i > 0 || r > 1) cssStr += ", ";
-        cssStr += xOffset + "px " + yOffset + "px " + blur + "px " + color;
-      }
-    }
-    return cssStr
   }
 }
 </script>
