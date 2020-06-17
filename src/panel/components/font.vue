@@ -239,7 +239,7 @@
 
 <script lang="ts">
 import { Vue, Component, PropSync, Watch } from 'vue-property-decorator';
-import Color from 'color';
+import { textStrokeGenerator, shadowGenerator } from 'src/panel/helpers/text';
 
 @Component({})
 export default class fontCustomizer extends Vue {
@@ -260,8 +260,10 @@ export default class fontCustomizer extends Vue {
     highlightcolor?: string;
   }
 
-  exampleColor = '#000000';
+  textStrokeGenerator = textStrokeGenerator;
+  shadowGenerator = shadowGenerator;
 
+  exampleColor = '#000000';
   fonts: {text: string; value: string}[] = [];
 
   async mounted() {
@@ -310,41 +312,6 @@ export default class fontCustomizer extends Vue {
     const css = "@import url('https://fonts.googleapis.com/css?family=" + font + "');"
     style.appendChild(document.createTextNode(css));
     head.appendChild(style);
-  }
-
-  shadowGenerator(shadow: {
-    shiftRight: number;
-    shiftDown: number;
-    blur: number;
-    opacity: number;
-    color: string;
-  }[]) {
-    const output = [];
-    for (const s of shadow) {
-      output.push(`${s.shiftRight}px ${s.shiftDown}px ${s.blur}px ${Color(s.color).alpha(s.opacity / 100)}`)
-    }
-    return output.join(', ');
-  }
-
-  textStrokeGenerator(radius: number, color: string) {
-    if (radius === 0) return ''
-
-    // config
-    const steps = 30;
-    const blur = 2;
-    // generate text shadows, spread evenly around a circle
-    const radianStep = steps / (Math.PI * 2);
-    let cssStr = '';
-    for (let r=1; r <= radius; r++) {
-      for(let i=0; i < steps; i++) {
-        const curRads = radianStep * i;
-        const xOffset = (r * Math.sin(curRads)).toFixed(1);
-        const yOffset = (r * Math.cos(curRads)).toFixed(1);
-        if(i > 0 || r > 1) cssStr += ", ";
-        cssStr += xOffset + "px " + yOffset + "px " + blur + "px " + color;
-      }
-    }
-    return cssStr
   }
 }
 </script>
