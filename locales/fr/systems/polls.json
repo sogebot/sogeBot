@@ -1,13 +1,13 @@
 {
-  "opened_normal": "Poll opened for \"$title\"! You can vote by $command X",
-  "opened_tips": "Poll by tips opened for \"$title\"! You can vote by adding hashtag #voteX into tip message",
-  "opened_bits": "Poll by cheers opened for \"$title\"! You can vote by adding hashtag #voteX into bit message",
-  "alreadyOpened_normal": "Error! Poll was already opened for \"$title\"! You can vote by $command X",
-  "alreadyOpened_tips": "Error! Poll by tips was already opened for \"$title\"! You can vote by adding hashtag #voteX into tip message",
-  "alreadyOpened_bits": "Error! Poll by cheers was already opened for \"$title\"! You can vote by adding hashtag #voteX into bit message",
-  "notEnoughOptions": "$sender, new poll must have at least 2 options!",
-  "notInProgress": "$sender, there is currently no poll in progress!",
-  "status": "$sender, current status of poll \"$title\":",
-  "status_closed": "Poll \"$title\" closed, status of voting:",
+  "opened_normal": "Sondage ouvert pour \"$title\" ! Vous pouvez voter avec la commande $command X",
+  "opened_tips": "Sondage avec conseils ouverts pour \"$title\"! Vous pouvez voter en ajoutant le hashtag #voteX dans le message d'astuce",
+  "opened_bits": "Sondage avec Cheers ouvert pour \"$title\"! Vous pouvez voter en ajoutant le hashtag #voteX dans le message de votre bit",
+  "alreadyOpened_normal": "Erreur! Le sondage a déjà été ouvert pour \"$title\" ! Vous pouvez voter avec la commande $command X",
+  "alreadyOpened_tips": "Erreur! Le sondage par tips a déjà été ouvert pour \"$title\"! Vous pouvez voter en ajoutant le hashtag #voteX dans le message de tips",
+  "alreadyOpened_bits": "Erreur! Le sondage par Cheers a déjà été ouvert pour \"$title\"! Vous pouvez voter en ajoutant le hashtag #voteX dans le message de votre bit",
+  "notEnoughOptions": "$sender, le nouveau sondage doit avoir au moins 2 options !",
+  "notInProgress": "$sender, il n'y a actuellement aucun sondage en cours !",
+  "status": "$sender, statut actuel du sondage \"$title \" :",
+  "status_closed": "Le sondage \"$title\" a été fermé, statut du vote :",
   "votes": "vote|votes"
 }
