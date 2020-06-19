@@ -55,11 +55,7 @@ class EventList extends Widget {
     });
 
     adminEndpoint(this.nsp, 'eventlist::resend', async (id) => {
-      if (typeof id !== 'string') {
-        return;
-      }
-
-      const event = await getRepository(EventListDB).findOne({ id });
+      const event = await getRepository(EventListDB).findOne({ id: String(id) });
       if (event) {
         const values = JSON.parse(event.values_json);
         const eventType = event.event + 's';
