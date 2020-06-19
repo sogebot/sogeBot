@@ -1,19 +1,19 @@
 {
   "core": {
-    "loaded": "is loaded and",
-    "enabled": "enabled",
-    "disabled": "disabled",
-    "usage": "Usage",
-    "lang-selected": "Bot language is currently set to english",
-    "command-parse": "Sorry, $sender, but this command is not correct, use",
-    "error": "Sorry, $sender, but something went wrong!",
+    "loaded": "est chargé et",
+    "enabled": "activé",
+    "disabled": "désactivé",
+    "usage": "Utilisation",
+    "lang-selected": "La langue du bot est actuellement définie en français",
+    "command-parse": "Désolé, $sender, mais cette commande n'est pas correcte, utilisez",
+    "error": "Désolé, $sender, mais une erreur s'est produite !",
     "no-response": "",
     "no-response-bool": {
       "true": "",
       "false": ""
     },
     "api": {
-      "error": "$sender, API is not responding correctly!",
+      "error": "$sender, l'API ne répond pas correctement !",
       "not-available": "not available"
     },
     "percentage": {
