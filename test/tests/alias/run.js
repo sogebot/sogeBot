@@ -1,4 +1,4 @@
-/* global describe it beforeEach */
+/* global describe it beforeEach afterEach */
 
 
 const assert = require('assert');
@@ -27,8 +27,13 @@ describe('Alias - run()', () => {
     await getRepository(User).save({ username: owner.username, userId: owner.userId });
     await getRepository(User).save({ username: user.username, userId: user.userId });
 
-    duel.status( { state: true, quiet: false });
-    gamble.status( { state: true, quiet: false });
+    duel.enabled = true;
+    gamble.enabled = true;
+  });
+
+  afterEach(() => {
+    duel.enabled = false;
+    gamble.enabled = false;
   });
 
   it('!a should show correctly command with link (skip is true)', async () => {
