@@ -38,6 +38,7 @@ import { linesParsed, setStatus } from './helpers/parser';
 import { isDbConnected } from './helpers/database';
 import { find } from './helpers/register';
 import { SQLVariableLimit } from './helpers/sql';
+import { addUIError } from './panel';
 
 let latestFollowedAtTimestamp = 0;
 
@@ -1427,8 +1428,14 @@ class API extends Core {
 
     const token = oauth.broadcasterAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
+    if (!oauth.broadcasterCurrentScopes.includes('user:edit:broadcast')) {
+      warning('Missing Broadcaster oAuth scope user:edit:broadcast to change game or title');
+      addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope user:edit:broadcast to change game or title' });
+      return { response: '', status: false };
+    }
     if (needToWait) {
       warning('Missing Broadcaster oAuth to change game or title');
+      addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth to change game or title' });
       return { response: '', status: false };
     }
 

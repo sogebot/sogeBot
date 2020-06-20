@@ -296,7 +296,8 @@
   } from '@fortawesome/free-solid-svg-icons';
   library.add(faCaretDown, faCaretUp);
 
-  let interval: number = 0;
+  let interval = 0;
+  let UIErrorInterval = 0;
 
   export default Vue.extend({
     data: function () {
@@ -394,6 +395,7 @@
     destroyed() {
       clearInterval(this.widthOfMenuInterval)
       clearInterval(interval)
+      clearInterval(UIErrorInterval)
     },
 
     mounted() {
@@ -448,15 +450,17 @@
         }
       })
 
-      this.socket.emit('panel::errors', (err: string | null, data: { name: string; message: string }[]) => {
-        if (err) {
-          return console.error(err);
-        }
-        for (const error of data) {
-          console.error(`UIError: ${error.name} ¦ ${error.message}`);
-        }
-        this.errors = data;
-      });
+      UIErrorInterval = window.setInterval(() => {
+        this.socket.emit('panel::errors', (err: string | null, data: { name: string; message: string }[]) => {
+          if (err) {
+            return console.error(err);
+          }
+          for (const error of data) {
+            console.error(`UIError: ${error.name} ¦ ${error.message}`);
+          }
+          this.errors = data;
+        });
+      }, 5000);
 
       this.socket.emit('getLatestStats', (err: string | null, data: any) => {
         console.groupCollapsed('navbar::getLatestStats')
