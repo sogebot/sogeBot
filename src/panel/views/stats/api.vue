@@ -17,9 +17,6 @@
             :class="[selected === 'helix' ? 'btn-primary' : 'btn-outline-primary']"
             @click="selected = 'helix'">HELIX <small>({{ data.filter(o => o.api === 'helix').length }})</small></button>
           <button class="btn border-0"
-            :class="[selected === 'kraken' ? 'btn-primary' : 'btn-outline-primary']"
-            @click="selected = 'kraken'">KRAKEN <small>({{ data.filter(o => o.api === 'kraken').length }})</small></button>
-          <button class="btn border-0"
             :class="[selected === 'other' ? 'btn-primary' : 'btn-outline-primary']"
             @click="selected = 'other'">OTHER <small>({{ data.filter(o => o.api === 'other').length }})</small></button>
           <button class="btn border-0"
