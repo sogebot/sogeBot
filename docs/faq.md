@@ -30,8 +30,6 @@
     -H 'Client-ID: 1wjn1i3792t71tl90fmyvd0zl6ri2vg' \
     -X GET https://api.twitch.tv/kraken/users?login=<yourbotusername>
 
-
-
 ***
 
 **Question:** Bot on docker have issues with connection to twitch or streamlabs (Error: getaddrinfo EAI_AGAIN)?
