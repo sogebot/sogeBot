@@ -62,6 +62,8 @@ class OAuth extends Core {
     'chat:edit',
     'channel:moderate',
     'channel:read:subscriptions',
+    'user:edit:broadcast',
+    'user:read:broadcast',
   ];
 
   @settings('broadcaster')
@@ -70,7 +72,7 @@ class OAuth extends Core {
 
   @ui({
     type: 'link',
-    href: 'https://twitchtokengenerator.com/quick/RkshHUnw16',
+    href: 'https://twitchtokengenerator.com/quick/OK5pC01dOP',
     class: 'btn btn-primary btn-block',
     text: 'commons.generate',
     target: '_blank',

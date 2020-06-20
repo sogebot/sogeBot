@@ -38,6 +38,7 @@ import { linesParsed, setStatus } from './helpers/parser';
 import { isDbConnected } from './helpers/database';
 import { find } from './helpers/register';
 import { SQLVariableLimit } from './helpers/sql';
+import { addUIError } from './panel';
 
 let latestFollowedAtTimestamp = 0;
 
@@ -252,7 +253,7 @@ class API extends Core {
 
   retries = {
     getCurrentStreamData: 0,
-    getChannelDataOldAPI: 0,
+    getChannelInformation: 0,
     getChannelSubscribers: 0,
   };
 
@@ -271,7 +272,7 @@ class API extends Core {
       this.interval('getChannelHosts', 10 * constants.MINUTE);
       this.interval('getChannelSubscribers', 2 * constants.MINUTE);
       this.interval('getChannelChattersUnofficialAPI', 10 * constants.MINUTE);
-      this.interval('getChannelDataOldAPI', constants.MINUTE);
+      this.interval('getChannelInformation', constants.MINUTE);
       this.interval('checkClips', constants.MINUTE);
       this.interval('getAllStreamTags', constants.DAY);
 
@@ -707,48 +708,44 @@ class API extends Core {
     }
   }
 
-  async getChannelDataOldAPI (opts: any) {
+  async getChannelInformation (opts: any) {
     if (!isMainThread) {
       throw new Error('API can run only on master');
     }
 
     const cid = oauth.channelId;
-    const url = `https://api.twitch.tv/kraken/channels/${cid}`;
+    const url = `https://api.twitch.tv/helix/channels?broadcaster_id=${cid}`;
+
 
     const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
     if (needToWait) {
       return { state: false, opts };
     }
-    // getChannelDatraOldAPI only if stream is offline
-    if (this.isStreamOnline) {
-      this.retries.getChannelDataOldAPI = 0;
-      return { state: true, opts };
-    }
 
     let request;
     try {
       request = await axios.get(url, {
         headers: {
-          'Accept': 'application/vnd.twitchtv.v5+json',
-          'Authorization': 'OAuth ' + token,
+          'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
         timeout: 20000,
       });
-      ioServer?.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: request.status });
+      ioServer?.emit('api.stats', { data: request.data.data, timestamp: Date.now(), call: 'getChannelInformation', api: 'helix', endpoint: url, code: request.status });
 
       if (!this.gameOrTitleChangedManually) {
         // Just polling update
         let rawStatus = this.rawStatus;
-        const status = await this.parseTitle(null);
+        const title = await this.parseTitle(null);
 
-        if (request.data.status !== status && this.retries.getChannelDataOldAPI === -1) {
+        if (request.data.data[0].title !== title && this.retries.getChannelInformation === -1) {
           return { state: true, opts };
-        } else if (request.data.status !== status && !opts.forceUpdate) {
-          // check if status is same as updated status
+        } else if (request.data.data[0].title !== title && !opts.forceUpdate) {
+          // check if title is same as updated title
           const numOfRetries = twitch.isTitleForced ? 1 : 15;
-          if (this.retries.getChannelDataOldAPI >= numOfRetries) {
-            this.retries.getChannelDataOldAPI = 0;
+          if (this.retries.getChannelInformation >= numOfRetries) {
+            this.retries.getChannelInformation = 0;
 
             // if we want title to be forced
             if (twitch.isTitleForced) {
@@ -757,33 +754,33 @@ class API extends Core {
               this.setTitleAndGame({});
               return { state: true, opts };
             } else {
-              info(`Title/game changed outside of a bot => ${request.data.game} | ${request.data.status}`);
-              this.retries.getChannelDataOldAPI = -1;
-              rawStatus = request.data.status;
+              info(`Title/game changed outside of a bot => ${request.data.data[0].game_name} | ${request.data.data[0].title}`);
+              this.retries.getChannelInformation = -1;
+              rawStatus = request.data.data[0].title;
             }
           } else {
-            this.retries.getChannelDataOldAPI++;
+            this.retries.getChannelInformation++;
             return { state: false, opts };
           }
         } else {
-          this.retries.getChannelDataOldAPI = 0;
+          this.retries.getChannelInformation = 0;
         }
 
-        this.stats.language = request.data.language;
-        this.stats.currentGame = request.data.game;
-        this.stats.currentTitle = request.data.status;
-        this.gameCache = request.data.game;
+        this.stats.language = request.data.data[0].broadcaster_language;
+        this.stats.currentGame = request.data.data[0].game_name;
+        this.stats.currentTitle = request.data.data[0].title;
+        this.gameCache = request.data.data[0].game_name;
         this.rawStatus = rawStatus;
       } else {
         this.gameOrTitleChangedManually = false;
       }
     } catch (e) {
       error(`${url} - ${e.message}`);
-      ioServer?.emit('api.stats', { timestamp: Date.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
+      ioServer?.emit('api.stats', { timestamp: Date.now(), call: 'getChannelInformation', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
       return { state: false, opts };
     }
 
-    this.retries.getChannelDataOldAPI = 0;
+    this.retries.getChannelInformation = 0;
     return { state: true, opts };
   }
 
@@ -993,7 +990,7 @@ class API extends Core {
     return { state: true, opts };
   }
 
-  async getGameFromId (id: number) {
+  async getGameNameFromId (id: number) {
     let request;
     const url = `https://api.twitch.tv/helix/games?id=${id}`;
 
@@ -1027,8 +1024,7 @@ class API extends Core {
       this.calls.bot.limit = request.headers['ratelimit-limit'];
 
       if (isMainThread) {
-
-        ioServer?.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+        ioServer?.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
       }
 
       // add id->game to cache
@@ -1044,10 +1040,61 @@ class API extends Core {
       warning(`Couldn't find name of game for gid ${id} - fallback to ${this.stats.currentGame}`);
       error(`API: ${url} - ${e.stack}`);
       if (isMainThread) {
-
-        ioServer?.emit('api.stats', { timestamp: Date.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
+        ioServer?.emit('api.stats', { timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
       }
       return this.stats.currentGame;
+    }
+  }
+
+  async getGameIdFromName (name: string): Promise<number | null> {
+    let request;
+    const url = `https://api.twitch.tv/helix/games?name=${name}`;
+
+    const gameFromDb = await getRepository(CacheGames).findOne({ name });
+
+    // check if name is cached
+    if (gameFromDb) {
+      return gameFromDb.id;
+    }
+
+    try {
+      const token = oauth.botAccessToken;
+      if (token === '') {
+        throw new Error('token not available');
+      }
+      request = await axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
+        },
+        timeout: 20000,
+      });
+
+      // save remaining api calls
+      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
+      this.calls.bot.refresh = request.headers['ratelimit-reset'];
+      this.calls.bot.limit = request.headers['ratelimit-limit'];
+
+      if (isMainThread) {
+        ioServer?.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      }
+
+      // add id->game to cache
+      const id = Number(request.data.data[0].id);
+      await getRepository(CacheGames).save({ id, name });
+      return id;
+    } catch (e) {
+      if (typeof e.response !== 'undefined' && e.response.status === 429) {
+        this.calls.bot.remaining = 0;
+        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
+      }
+
+      warning(`Couldn't find name of game for name ${name} - fallback to ${this.stats.currentGame}`);
+      error(`API: ${url} - ${e.stack}`);
+      if (isMainThread) {
+        ioServer?.emit('api.stats', { timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
+      }
+      return null;
     }
   }
 
@@ -1153,7 +1200,7 @@ class API extends Core {
           if (!webhooks.enabled.streams && Number(this.streamId) !== Number(stream.id)) {
             debug('api.stream', 'API: ' + JSON.stringify(stream));
             start(
-              `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await this.getGameFromId(Number(stream.game_id))} | type: ${stream.type} | channel ID: ${cid}`
+              `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await this.getGameNameFromId(Number(stream.game_id))} | type: ${stream.type} | channel ID: ${cid}`
             );
 
             // reset quick stats on stream start
@@ -1201,7 +1248,7 @@ class API extends Core {
         if (!this.gameOrTitleChangedManually) {
           let rawStatus = this.rawStatus;
           const status = await this.parseTitle(null);
-          const game = await this.getGameFromId(Number(stream.game_id));
+          const game = await this.getGameNameFromId(Number(stream.game_id));
 
           this.stats.currentTitle = stream.title;
           this.stats.currentGame = game;
@@ -1377,22 +1424,29 @@ class API extends Core {
 
     args = defaults(args, { title: null }, { game: null });
     const cid = oauth.channelId;
-    const url = `https://api.twitch.tv/kraken/channels/${cid}`;
+    const url = `https://api.twitch.tv/helix/channels?broadcaster_id=${cid}`;
 
-    const token = oauth.botAccessToken;
+    const token = oauth.broadcasterAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
+    if (!oauth.broadcasterCurrentScopes.includes('user:edit:broadcast')) {
+      warning('Missing Broadcaster oAuth scope user:edit:broadcast to change game or title');
+      addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope user:edit:broadcast to change game or title' });
+      return { response: '', status: false };
+    }
     if (needToWait) {
+      warning('Missing Broadcaster oAuth to change game or title');
+      addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth to change game or title' });
       return { response: '', status: false };
     }
 
     let request;
-    let status;
+    let title;
     let game;
     try {
       if (!isNil(args.title)) {
         this.rawStatus = args.title; // save raw status to cache, if changing title
       }
-      status = await this.parseTitle(this.rawStatus);
+      title = await this.parseTitle(this.rawStatus);
 
       if (!isNil(args.game)) {
         game = args.game;
@@ -1402,23 +1456,21 @@ class API extends Core {
       } // we are not setting game -> load last game
 
       request = await axios({
-        method: 'put',
+        method: 'patch',
         url,
-        data: {
-          channel: {
-            game: game,
-            status: status,
-          },
-        },
+        data: JSON.stringify({
+          game_id: await this.getGameIdFromName(game), title,
+        }),
         headers: {
-          'Accept': 'application/vnd.twitchtv.v5+json',
-          'Authorization': 'OAuth ' + token,
+          'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.broadcasterClientId,
+          'Content-Type': 'application/json',
         },
       });
-      ioServer?.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: request.status });
+      ioServer?.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'setTitleAndGame', api: 'helix', endpoint: url, code: request.status });
     } catch (e) {
       error(`API: ${url} - ${e.message}`);
-      ioServer?.emit('api.stats', { timestamp: Date.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
+      ioServer?.emit('api.stats', { timestamp: Date.now(), call: 'setTitleAndGame', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
       return { response: '', status: false };
     }
 
@@ -1893,7 +1945,7 @@ class API extends Core {
       // get mp4 from thumbnail
       for (const c of request.data.data) {
         c.mp4 = c.thumbnail_url.replace('-preview-480x272.jpg', '.mp4');
-        c.game = await this.getGameFromId(c.game_id);
+        c.game = await this.getGameNameFromId(c.game_id);
       }
       return request.data.data;
     } catch (e) {
