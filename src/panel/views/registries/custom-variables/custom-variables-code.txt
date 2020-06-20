@@ -8,6 +8,7 @@
   sender?: { // (only in custom commands, keyword)
     username: string,
     userId: number,
+    source: 'twitch' | 'discord'
   }
   random: {
     online: {

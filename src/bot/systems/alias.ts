@@ -124,7 +124,14 @@ class Alias extends System {
         }
         if (getFromViewersCache(opts.sender.userId, alias.permission)) {
           // process custom variables
-          const response = await customvariables.executeVariablesInText(opts.message.replace(replace, alias.command));
+          const response = await customvariables.executeVariablesInText(
+            opts.message.replace(replace, alias.command), {
+              sender: {
+                userId: opts.sender.userId,
+                username: opts.sender.username,
+                source: typeof opts.sender.discord === 'undefined' ? 'twitch' : 'discord',
+              },
+            });
           debug('alias.process', response);
           const responses = await p.command(opts.sender, response, true);
           debug('alias.process', responses);

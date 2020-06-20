@@ -37,9 +37,9 @@ export async function parserReply(response: string | Promise<string>, opts: { se
   };
   const messageToSend = await (async () => {
     if (opts.attr?.skip) {
-      return prepare(await response as string, { ...opts, sender: senderObject.discord ? senderObject.discord.author : senderObject }, false);
+      return prepare(await response as string, { ...opts, sender: senderObject.discord ? { ...senderObject, discord: senderObject.discord.author } : senderObject }, false);
     } else {
-      return await new Message(await response as string).parse({ ...opts, sender: senderObject.discord ? senderObject.discord.author : senderObject }) as string;
+      return await new Message(await response as string).parse({ ...opts, sender: senderObject.discord ? { ...senderObject, discord: senderObject.discord.author } : senderObject }) as string;
     }
   })();
   if (opts.sender.discord) {

@@ -282,7 +282,10 @@ class Message {
             return state.isOk && !state.isEval ? state.setValue : state.updated.currentValue;
           }
         }
-        return customvariables.getValueOf(variable, { sender: attr.sender, param: attr.param });
+        return customvariables.getValueOf(variable, {
+          sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' },
+          param: attr.param,
+        });
       },
       // force quiet variable set
       '$!_#': async (variable: string) => {
@@ -291,7 +294,10 @@ class Message {
           const state = await customvariables.setValueOf(variable, attr.param, { sender: attr.sender });
           return state.updated.currentValue;
         }
-        return customvariables.getValueOf(variable, { sender: attr.sender, param: attr.param });
+        return customvariables.getValueOf(variable, {
+          sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' },
+          param: attr.param,
+        });
       },
       // force full quiet variable
       '$!!_#': async (variable: string) => {

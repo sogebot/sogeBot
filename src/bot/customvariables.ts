@@ -45,12 +45,12 @@ class CustomVariables extends Core {
     }, {});
   }
 
-  async executeVariablesInText(text: string): Promise<string> {
+  async executeVariablesInText(text: string, attr: { sender: { userId: number; username: string; source: 'twitch' | 'discord' }} | null): Promise<string> {
     for (const variable of text.match(customVariableRegex) || []) {
       const isVariable = await this.isVariableSet(variable);
       let value = '';
       if (isVariable) {
-        value = await this.getValueOf(variable) || '';
+        value = await this.getValueOf(variable, attr) || '';
       }
       text = text.replace(new RegExp(`\\${variable}`, 'g'), value);
     }
@@ -128,7 +128,7 @@ class CustomVariables extends Core {
         if (!item) {
           throw new Error('Variable not found');
         }
-        const newCurrentValue = await this.runScript(item.evalValue, { sender: null,_current: item.currentValue, isUI: true });
+        const newCurrentValue = await this.runScript(item.evalValue, { sender: null, _current: item.currentValue, isUI: true });
         const runAt = Date.now();
         cb(null, await getRepository(Variable).save({
           ...item, currentValue: newCurrentValue, runAt,
@@ -140,7 +140,7 @@ class CustomVariables extends Core {
     adminEndpoint(this.nsp, 'customvariables::testScript', async (opts, cb) => {
       let returnedValue;
       try {
-        returnedValue = await this.runScript(opts.evalValue, { isUI: true, _current: opts.currentValue, sender: { username: 'testuser', userId: 0 }});
+        returnedValue = await this.runScript(opts.evalValue, { isUI: true, _current: opts.currentValue, sender: { username: 'testuser', userId: 0, source: 'twitch' }});
       } catch (e) {
         cb(e.stack, null);
       }
@@ -198,7 +198,7 @@ class CustomVariables extends Core {
     });
   }
 
-  async runScript (script: string, opts: { sender: { userId: number; username: string } | string | null, isUI: boolean; param?: string | number, _current: any }) {
+  async runScript (script: string, opts: { sender: { userId: number; username: string; source: 'twitch' | 'discord' } | string | null, isUI: boolean; param?: string | number, _current: any }) {
     debug('customvariables.eval', opts);
     let sender = !isNil(opts.sender) ? opts.sender : null;
     const isUI = !isNil(opts.isUI) ? opts.isUI : false;
@@ -207,6 +207,7 @@ class CustomVariables extends Core {
       sender = {
         username: sender,
         userId: await users.getIdByName(sender),
+        source: 'twitch',
       };
     }
 
