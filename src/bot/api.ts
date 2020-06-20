@@ -1428,6 +1428,7 @@ class API extends Core {
     const token = oauth.broadcasterAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
     if (needToWait) {
+      warning('Missing Broadcaster oAuth to change game or title');
       return { response: '', status: false };
     }
 
@@ -1455,12 +1456,10 @@ class API extends Core {
         }),
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
+          'Client-ID': oauth.broadcasterClientId,
           'Content-Type': 'application/json',
         },
       });
-      console.log(request);
-
       ioServer?.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'setTitleAndGame', api: 'helix', endpoint: url, code: request.status });
     } catch (e) {
       error(`API: ${url} - ${e.message}`);
