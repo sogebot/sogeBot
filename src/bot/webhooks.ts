@@ -301,7 +301,7 @@ class Webhooks {
       if (Number(api.streamId) !== Number(stream.id)) {
         debug('webhooks.stream', 'WEBHOOKS: ' + JSON.stringify(aEvent));
         start(
-          `id: ${stream.id} | webhooks | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await api.getGameFromId(Number(stream.game_id))} | type: ${stream.type} | channel ID: ${cid}`
+          `id: ${stream.id} | webhooks | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await api.getGameNameFromId(Number(stream.game_id))} | type: ${stream.type} | channel ID: ${cid}`
         );
 
         // reset quick stats on stream start
@@ -338,7 +338,7 @@ class Webhooks {
       api.streamType = stream.type;
 
       api.stats.currentTitle = stream.title;
-      api.stats.currentGame = await api.getGameFromId(Number(stream.game_id));
+      api.stats.currentGame = await api.getGameNameFromId(Number(stream.game_id));
 
       api.curRetries = 0;
       api.saveStreamData(stream);

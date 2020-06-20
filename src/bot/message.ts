@@ -766,14 +766,14 @@ class Message {
               'Client-ID': oauth.botClientId,
             },
           });
-          const channelId = request.data.data[0].id;
-          request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
+          const channelId = request.data.users[0]._id;
+          request = await axios.get(`https://api.twitch.tv/helix/channels?broadcaster_id=${channelId}`, {
             headers: {
               'Authorization': 'Bearer ' + token,
               'Client-ID': oauth.botClientId,
             },
           });
-          return api.getGameFromId(request.data.data[0].game_id);
+          return request.data.data[0].game_name;
         } catch (e) {
           return 'n/a';
         } // return nothing on error
@@ -793,8 +793,9 @@ class Message {
               'Client-ID': oauth.botClientId,
             },
           });
-          const channelId = request.data.data[0].id;
-          request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
+
+          const channelId = request.data.users[0]._id;
+          request = await axios.get(`https://api.twitch.tv/helix/channels?broadcaster_id=${channelId}`, {
             headers: {
               'Authorization': 'Bearer ' + token,
               'Client-ID': oauth.botClientId,

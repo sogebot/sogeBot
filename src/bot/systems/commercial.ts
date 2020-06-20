@@ -59,7 +59,7 @@ class Commercial extends System {
     const cid = oauth.channelId;
     // check if duration is correct (30, 60, 90, 120, 150, 180)
     if (_.includes([30, 60, 90, 120, 150, 180], commercial.duration)) {
-      const url = `https://api.twitch.tv/kraken/channels/${cid}/commercial`;
+      const url = `https://api.twitch.tv/helix/channels/commercial`;
 
       const token = await oauth.botAccessToken;
       if (token === '') {
@@ -70,10 +70,10 @@ class Commercial extends System {
         await axios({
           method: 'post',
           url,
-          data: { length: commercial.duration },
+          data: { broadcaster_id: String(cid), length: commercial.duration },
           headers: {
-            'Authorization': 'OAuth ' + token,
-            'Accept': 'application/vnd.twitchtv.v5+json',
+            'Authorization': 'Bearer ' + token,
+            'Client-ID': oauth.botClientId,
             'Content-Type': 'application/json',
           },
         });

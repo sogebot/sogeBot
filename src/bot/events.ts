@@ -220,7 +220,7 @@ class Events extends Core {
 
   public async fireStartCommercial(operation: Events.OperationDefinitions) {
     const cid = oauth.channelId;
-    const url = `https://api.twitch.tv/kraken/channels/${cid}/commercial`;
+    const url = `https://api.twitch.tv/helix/channels/commercial`;
 
     const token = await oauth.botAccessToken;
     if (token === '') {
@@ -230,10 +230,10 @@ class Events extends Core {
     await axios({
       method: 'post',
       url,
-      data: { length: operation.durationOfCommercial },
+      data: { broadcaster_id: String(cid), length: operation.durationOfCommercial },
       headers: {
-        'Authorization': 'OAuth ' + token,
-        'Accept': 'application/vnd.twitchtv.v5+json',
+        'Authorization': 'Bearer ' + token,
+        'Client-ID': oauth.botClientId,
         'Content-Type': 'application/json',
       },
     });
