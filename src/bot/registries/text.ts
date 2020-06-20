@@ -46,7 +46,7 @@ class Text extends Registry {
         const item = await getRepository(TextEntity).findOneOrFail({ id: opts.id });
         let text = item.text;
         if (opts.parseText) {
-          text = await new Message(await customvariables.executeVariablesInText(text)).parse();
+          text = await new Message(await customvariables.executeVariablesInText(text, null)).parse();
         }
         callback(null, {...item, text});
       } catch(e) {
