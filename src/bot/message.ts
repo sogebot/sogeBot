@@ -760,13 +760,13 @@ class Message {
         }
 
         try {
-          let request = await axios.get(`https://api.twitch.tv/kraken/users?login=${channel}`, {
+          let request = await axios.get(`https://api.twitch.tv/helix/search/channels?query=${channel}`, {
             headers: {
-              'Accept': 'application/vnd.twitchtv.v5+json',
-              'Authorization': 'OAuth ' + token,
+              'Authorization': 'Bearer ' + token,
+              'Client-ID': oauth.botClientId,
             },
           });
-          const channelId = request.data.users[0]._id;
+          const channelId = request.data.data[0].id;
           request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
             headers: {
               'Authorization': 'Bearer ' + token,
@@ -787,14 +787,13 @@ class Message {
         }
 
         try {
-          let request = await axios.get(`https://api.twitch.tv/kraken/users?login=${channel}`, {
+          let request = await axios.get(`https://api.twitch.tv/helix/search/channels?query=${channel}`, {
             headers: {
-              'Accept': 'application/vnd.twitchtv.v5+json',
-              'Authorization': 'OAuth ' + token,
+              'Authorization': 'Bearer ' + token,
+              'Client-ID': oauth.botClientId,
             },
           });
-
-          const channelId = request.data.users[0]._id;
+          const channelId = request.data.data[0].id;
           request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
             headers: {
               'Authorization': 'Bearer ' + token,
@@ -818,13 +817,13 @@ class Message {
         }
 
         try {
-          let request = await axios.get(`https://api.twitch.tv/kraken/users?login=${channel}`, {
+          let request = await axios.get(`https://api.twitch.tv/helix/search/channels?query=${channel}`, {
             headers: {
-              'Accept': 'application/vnd.twitchtv.v5+json',
-              'Authorization': 'OAuth ' + token,
+              'Authorization': 'Bearer ' + token,
+              'Client-ID': oauth.botClientId,
             },
           });
-          const channelId = request.data.users[0]._id;
+          const channelId = request.data.data[0].id;
           request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
             headers: {
               'Authorization': 'Bearer ' + token,
