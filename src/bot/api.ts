@@ -1460,7 +1460,7 @@ class API extends Core {
     if (!isMainThread) {
       throw new Error('API can run only on master');
     }
-    const url = `https://api.twitch.tv/kraken/search/games?query=${encodeURIComponent(game)}&type=suggest`;
+    const url = `https://api.twitch.tv/helix/search/categories?query=${encodeURIComponent(game)}`;
 
     const token = oauth.botAccessToken;
     if (token === '') {
@@ -1471,8 +1471,8 @@ class API extends Core {
     try {
       request = await axios.get(url, {
         headers: {
-          'Accept': 'application/vnd.twitchtv.v5+json',
-          'Authorization': 'OAuth ' + token,
+          'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.botClientId,
         },
         timeout: 20000,
       });
@@ -1483,16 +1483,16 @@ class API extends Core {
       return;
     }
 
-    if (isNull(request.data.games)) {
+    if (isNull(request.data.data)) {
       if (socket) {
         socket.emit('sendGameFromTwitch', []);
       }
       return false;
     } else {
       if (socket) {
-        socket.emit('sendGameFromTwitch', map(request.data.games, 'name'));
+        socket.emit('sendGameFromTwitch', map(request.data.data, 'name'));
       }
-      return map(request.data.games, 'name');
+      return map(request.data.data, 'name');
     }
   }
 
