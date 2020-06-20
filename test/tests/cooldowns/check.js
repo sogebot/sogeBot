@@ -129,6 +129,10 @@ describe('Cooldowns - check()', () => {
       await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
     });
 
+    after(() => {
+      gamble.enabled = false;
+    });
+
     it('Add global KonCha to cooldown', async () => {
       await getRepository(Cooldown).save({
         name: 'KonCha',
@@ -178,6 +182,10 @@ describe('Cooldowns - check()', () => {
       await getRepository(User).save({ username: testUser.username, userId: testUser.userId });
       await getRepository(User).save({ username: testUser2.username, userId: testUser2.userId });
       await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
+    });
+
+    after(() => {
+      gamble.enabled = false;
     });
 
     it('Add global !followage to cooldown', async () => {
@@ -252,6 +260,7 @@ describe('Cooldowns - check()', () => {
 
     after(async () => {
       gamble.setCommand('!gamble', '!gamble');
+      gamble.enabled = false;
     });
 
     it('testuser should not be affected by cooldown', async () => {
@@ -313,6 +322,7 @@ describe('Cooldowns - check()', () => {
 
     after(async () => {
       gamble.setCommand('!gamble', '!gamble');
+      gamble.enabled = false;
     });
 
     it('create cooldown on !play [user 300]', async () => {
@@ -381,6 +391,7 @@ describe('Cooldowns - check()', () => {
 
     after(async () => {
       gamble.setCommand('!gamble', '!gamble');
+      gamble.enabled = false;
     });
 
     it('create cooldown on !play [global 300]', async () => {
@@ -429,6 +440,10 @@ describe('Cooldowns - check()', () => {
       await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
     });
 
+    after(() => {
+      gamble.enabled = false;
+    });
+
     it('test', async () => {
       const [command, type, seconds, quiet] = ['!gamble', 'user', '300', true];
       const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
@@ -465,6 +480,10 @@ describe('Cooldowns - check()', () => {
       await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
     });
 
+    after(() => {
+      gamble.enabled = false;
+    });
+
     it('test', async () => {
       const [command, type, seconds, quiet] = ['!test', 'user', '60', true];
       const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
@@ -498,6 +517,7 @@ describe('Cooldowns - check()', () => {
 
     after(async () => {
       gamble.setCommand('!gamble', '!gamble');
+      gamble.enabled = false;
     });
 
     it('create cooldown on !test me [user 60]', async () => {
@@ -566,6 +586,10 @@ describe('Cooldowns - check()', () => {
       await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
     });
 
+    after(() => {
+      gamble.enabled = false;
+    });
+
     it('create cooldown on !test [user 60]', async () => {
       const [command, type, seconds, quiet] = ['!test', 'user', '60', true];
       const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
@@ -612,6 +636,10 @@ describe('Cooldowns - check()', () => {
       await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
     });
 
+    after(() => {
+      gamble.enabled = false;
+    });
+
     it('create cooldown on !test [global 60]', async () => {
       const [command, type, seconds, quiet] = ['!test', 'global', '60', true];
       const r = await cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
@@ -653,6 +681,10 @@ describe('Cooldowns - check()', () => {
       await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
     });
 
+    after(() => {
+      gamble.enabled = false;
+    });
+
     it('test', async () => {
       await getRepository(Keyword).save({
         keyword: 'me',
@@ -690,6 +722,10 @@ describe('Cooldowns - check()', () => {
       await getRepository(User).save({ username: testUser.username, userId: testUser.userId });
       await getRepository(User).save({ username: testUser2.username, userId: testUser2.userId });
       await getRepository(User).save({ username: owner.username, userId: owner.userId, isSubscriber: true });
+    });
+
+    after(() => {
+      gamble.enabled = false;
     });
 
     it('test', async () => {
