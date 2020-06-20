@@ -716,6 +716,11 @@ class API extends Core {
     const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/channels?broadcaster_id=${cid}`;
 
+    // getChannelInformation only if stream is offline - we are using getCurrentStreamData for online stream title/game
+    if (this.isStreamOnline) {
+      this.retries.getChannelInformation = 0;
+      return { state: true, opts };
+    }
 
     const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
