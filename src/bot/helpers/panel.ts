@@ -7,7 +7,7 @@ import fs from 'fs';
 
 import type { IconName } from '@fortawesome/free-solid-svg-icons';
 import Module from '../_interface';
-import { info } from './log';
+import { info, warning } from './log';
 import { normalize } from 'path';
 
 export const menu: { category: string; name: string; id: string; this: Module | null }[] = [];
@@ -55,15 +55,16 @@ export const setServer = () => {
         ioServer.attach(serverSecure);
       }
     } else {
-      info('Generating self-signed certificate for HTTPS');
       pem.createCertificate({ days: 99999, selfSigned: true }, function (err, keys) {
         if (err) {
-          throw err;
-        }
-        if (app) {
-          serverSecure = https.createServer({ key: keys.serviceKey, cert: keys.certificate }, app);
-          if (ioServer) {
-            ioServer.attach(serverSecure);
+          warning('Cannot generate self-signed certificate. HTTPS is disabled. ' + err);
+        } else {
+          if (app) {
+            info('Generated self-signed certificate for HTTPS');
+            serverSecure = https.createServer({ key: keys.serviceKey, cert: keys.certificate }, app);
+            if (ioServer) {
+              ioServer.attach(serverSecure);
+            }
           }
         }
       });
