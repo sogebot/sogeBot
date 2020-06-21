@@ -545,7 +545,7 @@ export const expose = function () {
   server.listen(port, () => {
     info(`WebPanel is available at http://localhost:${port}`);
   });
-  serverSecure.listen(secureport, () => {
+  serverSecure?.listen(secureport, () => {
     info(`WebPanel is available at https://localhost:${secureport}`);
   });
 };
