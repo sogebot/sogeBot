@@ -5,8 +5,6 @@ require('../../general.js');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
-const variable = require('../../general.js').variable;
-const { getLocalizedName } = require('../../../dest/commons');
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
@@ -18,7 +16,6 @@ const points = (require('../../../dest/systems/points')).default;
 const _ = require('lodash');
 const assert = require('assert');
 
-const owner = { username: 'soge__', userId: Number(_.random(999999, false)) };
 const user1 = { username: 'user1', userId: Number(_.random(999999, false)) };
 const user2 = { username: 'user2', userId: Number(_.random(999999, false)) };
 const command = '!duel';
@@ -71,7 +68,7 @@ describe('Gambling - duel', () => {
       assert(responses.length > 0);
       assert(responses[0].response === '$sender, good luck with your dueling skills. You bet on yourself 100 points!', JSON.stringify({responses}));
       // this is announced
-      message.isSentRaw('@user1 is your new duel challenger! To participate use !duel [points], you have 5 minutes left to join.', user1)
+      message.isSentRaw('@user1 is your new duel challenger! To participate use !duel [points], you have 5 minutes left to join.', user1);
     });
 
     it('user 2 is added to duel', async () => {
