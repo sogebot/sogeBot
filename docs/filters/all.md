@@ -234,7 +234,15 @@ e.g. `(api|https://httpbin.org/get?test=a\\nb) Lorem (api.args.test)`
 ## List filters
 `(list.alias)` - will return list of your visible aliases
 
+`(list.alias|<group>)` - will return list of your visible aliases for group
+
+`(list.alias|)` - will return list of your visible aliases without any group
+
 `(list.!alias)` - will return list of your visible !aliases
+
+`(list.!alias|<group>)` - will return list of your visible !aliases for group
+
+`(list.!alias|<group>)` - will return list of your visible !aliases without any group
 
 `(list.price)` - will return list of your set prices
 
@@ -245,6 +253,10 @@ e.g. `(api|https://httpbin.org/get?test=a\\nb) Lorem (api.args.test)`
 `(list.!command)` - will return list of your visible custom !commands
 
 `(list.!command.<permissionName>)` - will return list of your visible custom !commands for permission
+
+`(list.core.<permissionName>)` - will return list of your visible custom core commands for permission
+
+`(list.!core.<permissionName>)` - will return list of your visible custom core !commands for permission
 
 `(list.cooldown)` - will return list of your cooldowns (keywords and !commands)
 
