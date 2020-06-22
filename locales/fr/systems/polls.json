@@ -1,0 +1,13 @@
+{
+  "opened_normal": "Sondage ouvert pour \"$title\" ! Vous pouvez voter avec la commande $command X",
+  "opened_tips": "Sondage avec conseils ouverts pour \"$title\"! Vous pouvez voter en ajoutant le hashtag #voteX dans le message d'astuce",
+  "opened_bits": "Sondage avec Cheers ouvert pour \"$title\"! Vous pouvez voter en ajoutant le hashtag #voteX dans le message de votre bit",
+  "alreadyOpened_normal": "Erreur! Le sondage a déjà été ouvert pour \"$title\" ! Vous pouvez voter avec la commande $command X",
+  "alreadyOpened_tips": "Erreur! Le sondage par tips a déjà été ouvert pour \"$title\"! Vous pouvez voter en ajoutant le hashtag #voteX dans le message de tips",
+  "alreadyOpened_bits": "Erreur! Le sondage par Cheers a déjà été ouvert pour \"$title\"! Vous pouvez voter en ajoutant le hashtag #voteX dans le message de votre bit",
+  "notEnoughOptions": "$sender, le nouveau sondage doit avoir au moins 2 options !",
+  "notInProgress": "$sender, il n'y a actuellement aucun sondage en cours !",
+  "status": "$sender, statut actuel du sondage \"$title \" :",
+  "status_closed": "Le sondage \"$title\" a été fermé, statut du vote :",
+  "votes": "vote|votes"
+}

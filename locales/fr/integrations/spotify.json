@@ -1,0 +1,4 @@
+{
+  "song-not-found": "Désolé, $sender, la musique n'a pas été trouvée sur Spotify",
+  "song-requested": "$sender, vous avez demandé la musique $name de $artist"
+}

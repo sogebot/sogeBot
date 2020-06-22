@@ -1,0 +1,11 @@
+{
+  "all-your-links-were-deleted": "tous vos liens ont été supprimés",
+  "all-your-links-were-deleted-with-sender": "$sender, {integrations.discord.all-your-links-were-deleted-discord}",
+  "this-account-was-linked-with": "$sender, ce compte a été associé à $discordTag.",
+  "invalid-or-expired-token": "$sender, jeton invalide ou expiré.",
+  "help-message": "$sender, pour lier votre compte sur Discord : 1. Allez sur le serveur Discord et écrivez !link dans le canal du bot. | 2. Attendez le message privé du bot | 3. Envoyez la commande donnée par le bot dans le chat twitch.",
+  "started-at": "Démarré à",
+  "streamed-at": "Diffusé à",
+  "link-whisper": "Bonjour $tag, pour lier ce compte Discord à votre compte Twitch sur la chaîne de $broadcaster , allez sur https://twitch.tv/$broadcaster, connectez-vous à votre compte et envoyez cette commande dans le chat \n\n\t\t`!link $id`\n\nNOTE: Ceci expire dans 10 minutes.",
+  "check-your-dm": "vérifiez vos DMs pour les étapes à suivre afin de lier votre compte."
+}

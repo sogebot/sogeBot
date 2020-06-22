@@ -1,0 +1,139 @@
+{
+  "enabled": "Enabled",
+  "empty": "Alerts registry is empty, create new alerts.",
+  "emptyAfterSearch": "Alerts registry is empty in searching for \"<strong>$search</strong>\"",
+  "revertcode": "Revert code to defaults",
+  "name": {
+    "name": "Name",
+    "placeholder": "Set name of your alerts"
+  },
+  "alertDelayInMs": {
+    "name": "Alert delay"
+  },
+  "profanityFilterType": {
+    "name": "Profanity filter",
+    "disabled": "Disabled",
+    "replace-with-asterisk": "Replace with asterisk",
+    "replace-with-happy-words": "Replace with happy words",
+    "hide-messages": "Hide messages",
+    "disable-alerts": "Disable alerts"
+  },
+  "loadStandardProfanityList": "Load standard profanity list",
+  "customProfanityList": {
+    "name": "Custom profanity list",
+    "help": "Words should be separated with comma."
+  },
+  "event": {
+    "follows": "Follows",
+    "cheers": "Cheers",
+    "subs": "Subs",
+    "resubs": "Resubs",
+    "subgifts": "Subgifts",
+    "subcommunitygifts": "Subgifts to community",
+    "tips": "Tips",
+    "hosts": "Hosts",
+    "raids": "Raids"
+  },
+  "title": {
+    "name": "Variant name",
+    "placeholder": "Set your variant name"
+  },
+  "variant": {
+    "name": "Variant occurence"
+  },
+  "speed": {
+    "name": "Speed"
+  },
+  "maxTimeToDecrypt": {
+    "name": "Max time to decrypt"
+  },
+  "characters": {
+    "name": "Characters"
+  },
+  "random": "Random",
+  "exact-amount": "Exact amount",
+  "greater-than-or-equal-to-amount": "Greater than or equal to amount",
+  "very-rarely": "Very rarely",
+  "rarely": "Rarely",
+  "default": "Default",
+  "frequently": "Frequently",
+  "very-frequently": "Very frequently",
+  "messageTemplate": {
+    "name": "Message template",
+    "placeholder": "Set your message template",
+    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts), {recipient} (subgifts), {monthsName} (subs, subgifts), {currency} (tips)"
+  },
+  "animationText": {
+    "name": "Animation text"
+  },
+  "animationIn": {
+    "name": "Animation in"
+  },
+  "animationOut": {
+    "name": "Animation out"
+  },
+  "alertDurationInMs": {
+    "name": "Alert duration"
+  },
+  "alertTextDelayInMs": {
+    "name": "Alert text delay"
+  },
+  "layoutPicker": {
+    "name": "Layout"
+  },
+  "image": {
+    "name": "Image"
+  },
+  "sound": {
+    "name": "Sound"
+  },
+  "soundVolume": {
+    "name": "Sound volume"
+  },
+  "enableAdvancedMode": "Enable advanced mode",
+  "font": {
+    "setting": "Font settings",
+    "name": "Font family",
+    "size": {
+      "name": "Font size"
+    },
+    "weight": {
+      "name": "Font weight"
+    },
+    "borderPx": {
+      "name": "Font border"
+    },
+    "borderColor": {
+      "name": "Font border color"
+    },
+    "color": {
+      "name": "Font color"
+    },
+    "highlightcolor": {
+      "name": "Font highlight color"
+    }
+  },
+  "minAmountToShow": {
+    "name": "Minimal amount to show"
+  },
+  "minAmountToPlay": {
+    "name": "Minimal amount to play"
+  },
+  "allowEmotes": {
+    "name": "Allow emotes"
+  },
+  "message": {
+    "setting": "Message settings"
+  },
+  "showAutoHost": "Show autohost",
+  "voice": "Voice",
+  "keepAlertShown": "Alert keeps visible during TTS",
+  "skipUrls": "Skip URLs during TTS",
+  "volume": "Volume",
+  "rate": "Rate",
+  "pitch": "Pitch",
+  "test": "Test",
+  "tts": {
+    "setting": "TTS settings"
+  }
+}

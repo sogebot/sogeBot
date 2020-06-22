@@ -1,0 +1,5 @@
+{
+  "error": "$sender, $game est introuvable dans la base de données ou dans la partie multijoueur.",
+  "game": "$sender, $game | Main$doneMain: $currentMain/$hltbMainh - $percentMain% | Completionist$doneCompletionist: $currentCompletionist/$hltbCompletionisth - $percentCompletionist%",
+  "done": "(done)"
+}
