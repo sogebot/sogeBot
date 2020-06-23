@@ -19,15 +19,6 @@ import { translate } from '../translate';
 
 let importInProgress = false;
 
-type ytsrResult = {
-  query: string;
-  items: {
-    type: string; title: string; link: string; thumbnail: string;
-    author: { name: string; ref: string; verified: boolean };
-    description: string; views: number; duration: string; uploaded_at: string;
-  }[];
-};
-
 class Songs extends System {
   interval: { [id: string]: NodeJS.Timeout } = {};
 
@@ -480,12 +471,12 @@ class Songs extends System {
 
     if (_.isNil(videoID.match(idRegex))) { // not id or url]
       try {
-        const search: ytsrResult['items'] = await new Promise((resolve, reject) => {
-          ytsr(opts.parameters, { limit: 1 }, (err: Error | null, results: ytsrResult) => {
+        const search: ytsr.result['items'] = await new Promise((resolve, reject) => {
+          ytsr(opts.parameters, { limit: 1 }, (err, result) => {
             if (err) {
               reject(err);
             } else {
-              resolve(results.items);
+              resolve(result.items);
             }
           });
         });
