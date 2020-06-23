@@ -115,7 +115,7 @@ const main = async () => {
       mode: 'hash',
       base: __dirname,
       routes: [
-        { path: '/', name: 'Dashboard', component: () => import('./views/dashboard/dashboard.vue') },
+        { path: '/', name: 'Dashboard', component: () => import('./views/dashboard/empty.vue') },
         { path: '/stats/api', name: 'APIStats', component: () => import('./views/stats/api.vue') },
         { path: '/stats/commandcount', name: 'CommandCountStats', component: () => import('./views/stats/commandcount.vue') },
         { path: '/stats/tips', name: 'TipsStats', component: () => import('./views/stats/tips.vue') },
@@ -174,6 +174,7 @@ const main = async () => {
     new Vue({
       router,
       components: {
+        dashboard: () => import('./views/dashboard/dashboard.vue'),
         navbar: () => import('./components/navbar/navbar.vue'),
         statsbar: () => import('./components/statsbar/statsbar.vue'),
         changegamedialog: () => import('./components/dialog/changegamedialog.vue'),
@@ -245,7 +246,20 @@ const main = async () => {
           <navbar/>
           <statsbar/>
           <changegamedialog/>
-          <router-view class="view pt-1"></router-view>
+          <dashboard
+            class="view pt-1"
+            :style="{
+              visibility: $route.path === '/' ? 'visible' : 'hidden',
+              position: $route.path === '/' ? 'inherit' : 'absolute'
+            }"
+          />
+          <router-view
+            class="view pt-1"
+            :style="{
+              visibility: $route.path !== '/' ? 'visible' : 'hidden',
+              position: $route.path !== '/' ? 'inherit' : 'absolute'
+            }"
+          />
           <footerbar/>
         </div>
       `,
