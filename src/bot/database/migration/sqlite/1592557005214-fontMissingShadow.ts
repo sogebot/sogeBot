@@ -1,10 +1,14 @@
 import {MigrationInterface, QueryRunner} from 'typeorm';
 import { Randomizer } from '../../entity/randomizer';
 import { AlertCheer, AlertFollow, AlertHost, AlertRaid, AlertResub, AlertSub, AlertSubcommunitygift, AlertSubgift, AlertTip } from '../../entity/alert';
+import { Goal } from '../../entity/goal';
 
-export class fontMissingShadow1592557005213 implements MigrationInterface {
+export class fontMissingShadow1592557005214 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
+    // remove old migration
+    await queryRunner.query(`DELETE FROM "migrations" WHERE "name"="fontMissingShadow1592557005213"`);
+
     const data = await queryRunner.manager.getRepository(Randomizer).find();
     for (const item of data) {
       if (typeof item.customizationFont.shadow === 'undefined') {
@@ -20,6 +24,14 @@ export class fontMissingShadow1592557005213 implements MigrationInterface {
           await queryRunner.manager.getRepository(table)
             .update({ id: item.id }, { font: {...item.font, shadow: []} });
         }
+      }
+    }
+
+    const data3 = await queryRunner.manager.getRepository(Goal).find();
+    for (const item of data3) {
+      if (typeof item.customizationFont.shadow === 'undefined') {
+        await queryRunner.manager.getRepository(Randomizer)
+          .update({ id: item.id }, { customizationFont: {...item.customizationFont, shadow: []} });
       }
     }
   }
@@ -46,6 +58,15 @@ export class fontMissingShadow1592557005213 implements MigrationInterface {
           await queryRunner.manager.getRepository(table)
             .update({ id: item.id }, { font: item.font });
         }
+      }
+    }
+
+    const data3 = await queryRunner.manager.getRepository(Goal).find();
+    for (const item of data3) {
+      if (typeof item.customizationFont.shadow !== 'undefined') {
+        delete item.customizationFont.shadow;
+        await queryRunner.manager.getRepository(Goal)
+          .update({ id: item.id }, { customizationFont: item.customizationFont });
       }
     }
   }
