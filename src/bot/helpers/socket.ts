@@ -78,11 +78,8 @@ function adminEndpoint (nsp: string, on: 'customvariables::list', callback: (cb:
 function adminEndpoint (nsp: string, on: 'customvariables::testScript', callback: (opts: { currentValue: any; evalValue: any }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'customvariables::isUnique', callback: (opts: { variable: any; id: any }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'customvariables::save', callback: (item: Readonly<Required<VariableInterface>>, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'permission::insert', callback: (data: Readonly<Required<PermissionsInterface>>, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'permission::update::order', callback: (opts: { id: string; order: number }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'permission::save', callback: (data: Readonly<Required<PermissionsInterface>>, cb: (error: Error | string | null, ...response: any) => void) => void): void;
+function adminEndpoint (nsp: string, on: 'permission::save', callback: (data: Readonly<Required<PermissionsInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'permissions', callback: (cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'permission::order', callback: (data: { id: string; order: number}[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'test.user', callback: (opts: { value: string | number; pid: string; state: any }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'text::remove' | 'text::save', callback: (item: Readonly<Required<TextInterface>>, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'events::remove' | 'events::save', callback: (item: Readonly<Required<EventInterface>>, cb: (error: Error | string | null, ...response: any) => void) => void): void;

@@ -18,6 +18,11 @@
         :placeholder="translate('core.permissions.typeUsernameOrIdToTest')"/>
     </div>
 
+    <div class="p-3 alert-danger" v-if="error.length > 0">
+      <fa icon='exclamation' fixed-width/>
+      {{ translate('core.permissions.' + error) }}
+    </div>
+
     <div class="p-3"
          :class="{ 'alert-danger': Number(status.access) === 0 && Number(partialStatus.access) === 0, 'alert-success': Number(status.access) === 1 || Number(partialStatus.access) === 1, 'alert-warning': Number(status.access) === 2 || Number(partialStatus.access) === 2 }"
          v-if="typeof status.access !== 'undefined'
@@ -66,6 +71,7 @@
         isFocused: boolean,
         isTesting: boolean,
         state: string,
+        error: string,
         status: {},
         partialStatus: {},
       } = {
@@ -75,6 +81,7 @@
         isFocused: false,
         isTesting: false,
         state: '',
+        error: '',
         status: {},
         partialStatus: {},
       }
@@ -102,8 +109,11 @@
         } else {
           this.socket.emit('test.user', { pid: this.$route.params.id, value: val, state }, (err: string | null, r: { state: string; partial: boolean; status: { access: boolean } }) => {
             if (err) {
-              return console.error(err);
+              this.error = err;
+              this.isTesting = false;
+              return console.error(this.translate('core.permissions.' + err));
             }
+            this.error = '';
             if (r.state === this.state) {
               // expecting this data
               this.status = r.status;
