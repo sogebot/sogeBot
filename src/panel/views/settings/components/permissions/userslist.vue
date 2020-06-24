@@ -61,7 +61,7 @@
 <script lang="ts">
   import Vue from 'vue'
   import { v4 as uuid } from 'uuid';
-  import { chunk } from 'lodash-es';
+  import { chunk, isEqual } from 'lodash-es';
   import { getSocket } from 'src/panel/helpers/socket';
 
   export default Vue.extend({
@@ -125,7 +125,9 @@
         this.stateSearch = uuid();
       },
       currentIds: function (val) {
-        this.$emit('update', val)
+        if (!isEqual(val, this.ids)) {
+          this.$emit('update', val)
+        }
       }
     },
     methods: {
@@ -140,7 +142,6 @@
            this.searchData = [];
         } else {
           this.testUsername = val;
-          console.log({val})
           this.usersSocket.emit('find.viewers', { search: val, state }, (err: string | null, r: string[]) => {
             if (err) {
               return console.error(err);

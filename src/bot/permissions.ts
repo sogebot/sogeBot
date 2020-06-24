@@ -36,22 +36,16 @@ class Permissions extends Core {
   }
 
   public sockets() {
-    adminEndpoint(this.nsp, 'permission::insert', async (data: Required<PermissionsInterface>, cb) => {
+    adminEndpoint(this.nsp, 'permission::save', async (data: Required<PermissionsInterface>[], cb) => {
       cleanViewersCache();
-      await getRepository(PermissionsEntity).insert(data);
-      if (cb) {
-        cb(null);
+      // we need to remove missing permissions
+      const permissionsFromDB = await getRepository(PermissionsEntity).find();
+      for (const permissionFromDB of permissionsFromDB) {
+        if (!data.find(o => o.id === permissionFromDB.id)) {
+          await getRepository(PermissionsEntity).remove(permissionFromDB);
+        }
       }
-    });
-    adminEndpoint(this.nsp, 'permission::update::order', async (opts, cb) => {
-      cleanViewersCache();
-      await getRepository(PermissionsEntity).update({ id: opts.id }, { order: opts.order });
-      if (cb) {
-        cb(null);
-      }
-    });
-    adminEndpoint(this.nsp, 'permission::save', async (data: Required<PermissionsInterface>, cb) => {
-      cleanViewersCache();
+      // then save new data
       await getRepository(PermissionsEntity).save(data);
       if (cb) {
         cb(null);
@@ -77,19 +71,11 @@ class Permissions extends Core {
     adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
       cb(null, await getRepository(PermissionsEntity).findOne({id: String(id)}, { relations: ['filters'] }));
     });
-    adminEndpoint(this.nsp, 'permission::order', async (data, cb) => {
-      cleanViewersCache();
-      for (const d of data) {
-        await getRepository(PermissionsEntity)
-          .createQueryBuilder().update()
-          .where('id=:id', {id: d.id}).set({ order: d.order })
-          .execute();
-      }
-      if (cb) {
-        cb(null);
-      }
-    });
     adminEndpoint(this.nsp, 'test.user', async (opts, cb) => {
+      if (!(await getRepository(PermissionsEntity).findOne({id: String(opts.pid)}))) {
+        cb('permissionNotFoundInDatabase');
+        return;
+      }
       if (typeof opts.value === 'string') {
         const userByName = await getRepository(User).findOne({ username: opts.value });
         if (userByName) {
