@@ -422,6 +422,7 @@ class CustomVariables extends Core {
         opts.sender = {
           username: opts.sender,
           userId: await users.getIdByName(opts.sender),
+          source: 'twitch',
         };
       }
 

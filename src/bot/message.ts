@@ -263,7 +263,7 @@ class Message {
     const custom = {
       '$_#': async (variable: string) => {
         if (!_.isNil(attr.param) && attr.param.length !== 0) {
-          const state = await customvariables.setValueOf(variable, attr.param, { sender: attr.sender });
+          const state = await customvariables.setValueOf(variable, attr.param, { sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' } });
           if (state.updated.responseType === 0) {
             // default
             if (state.isOk && !state.isEval) {
@@ -291,7 +291,7 @@ class Message {
       '$!_#': async (variable: string) => {
         variable = variable.replace('$!_', '$_');
         if (!_.isNil(attr.param) && attr.param.length !== 0) {
-          const state = await customvariables.setValueOf(variable, attr.param, { sender: attr.sender });
+          const state = await customvariables.setValueOf(variable, attr.param, { sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' } });
           return state.updated.currentValue;
         }
         return customvariables.getValueOf(variable, {
@@ -303,7 +303,7 @@ class Message {
       '$!!_#': async (variable: string) => {
         variable = variable.replace('$!!_', '$_');
         if (!_.isNil(attr.param) && attr.param.length !== 0) {
-          await customvariables.setValueOf(variable, attr.param, { sender: attr.sender });
+          await customvariables.setValueOf(variable, attr.param, { sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' } });
         }
         return '';
       },
