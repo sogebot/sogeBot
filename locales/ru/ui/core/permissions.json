@@ -10,7 +10,7 @@
   "next": "Следующий",
   "loading": "загрузка",
   "permissionNotFoundInDatabase": "Permission not found in database, please save before testing user.",
-  "userHaveNoAccessToThisPermissionGroup": "User <strong>$username</strong> DOESN'T have access to this permission group.",
+  "userHaveNoAccessToThisPermissionGroup": "Пользователь <strong>$username</strong> НЕ ИМЕЕТ доступ к этому разрешению.",
   "userHaveAccessToThisPermissionGroup": "Пользователь <strong>$username</strong> ИМЕЕТ доступ к этому разрешению.",
   "accessDirectlyThrough": "<strong>Прямой</strong> доступ через",
   "accessThroughHigherPermission": "Доступ через более высокое разрешение",
