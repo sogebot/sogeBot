@@ -1050,15 +1050,13 @@
   "title": {
     "current": "$sender, název vysílání je '$title'.",
     "change": {
-      "success": "$sender, název byl nastaven na: $title",
-      "failed": "$sender, něco se pokazilo. Aktuální název je stále nastaven na: $title"
+      "success": "$sender, název byl nastaven na: $title"
     }
   },
   "game": {
     "current": "$sender, streamer právě hraje $game.",
     "change": {
-      "success": "$sender, hra byl nastavena na: $game",
-      "failed": "$sender, něco se pokazilo. Aktuální hra je stále nastavena na: $game"
+      "success": "$sender, hra byl nastavena na: $game"
     }
   },
   "cooldowns": {
