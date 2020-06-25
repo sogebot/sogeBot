@@ -1050,15 +1050,13 @@
   "title": {
     "current": "$sender, название стрима '$title'.",
     "change": {
-      "success": "$sender, название установлено на: $title",
-      "failed": "$sender, что-то пошло не так. Текущее название по-прежнему: $title"
+      "success": "$sender, название установлено на: $title"
     }
   },
   "game": {
     "current": "$sender, стример сейчас играет в $game.",
     "change": {
-      "success": "$sender, игра установлена на: $game",
-      "failed": "$sender, что-то пошло не так. Текущая игра все еще: $game"
+      "success": "$sender, игра установлена на: $game"
     }
   },
   "cooldowns": {
