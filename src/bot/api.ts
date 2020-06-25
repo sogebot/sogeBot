@@ -1481,30 +1481,18 @@ class API extends Core {
 
     const responses: { response: string; status: boolean } = { response: '', status: false };
 
-    if (request.status === 200 && !isNil(request.data)) {
-      const response = request.data;
+    if (request.status === 204) {
       if (!isNil(args.game)) {
-        response.game = isNil(response.game) ? '' : response.game;
-        if (response.game.trim() === args.game.trim()) {
-          responses.response = translate('game.change.success').replace(/\$game/g, response.game);
-          responses.status = true;
-          events.fire('game-changed', { oldGame: this.stats.currentGame, game: response.game });
-          this.stats.currentGame = response.game;
-        } else {
-          responses.response = translate('game.change.failed').replace(/\$game/g, this.stats.currentGame);
-          responses.status = false;
-        }
+        responses.response = translate('game.change.success').replace(/\$game/g, args.game);
+        responses.status = true;
+        events.fire('game-changed', { oldGame: this.stats.currentGame, game: args.game });
+        this.stats.currentGame = args.game;
       }
 
-      if (!isNull(args.title)) {
-        if (response.status.trim() === status.trim()) {
-          responses.response = translate('title.change.success').replace(/\$title/g, response.status);
-          responses.status = true;
-          this.stats.currentTitle = response.status;
-        } else {
-          responses.response = translate('title.change.failed').replace(/\$title/g, this.stats.currentTitle);
-          responses.status = true;
-        }
+      if (!isNil(args.title)) {
+        responses.response = translate('title.change.success').replace(/\$title/g, args.title);
+        responses.status = true;
+        this.stats.currentTitle = args.title;
       }
       this.gameOrTitleChangedManually = true;
       this.retries.getCurrentStreamData = 0;
