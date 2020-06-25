@@ -1050,15 +1050,13 @@
   "title": {
     "current": "$sender, title of stream is '$title'.",
     "change": {
-      "success": "$sender, title was set to: $title",
-      "failed": "$sender, something went wrong. Current title is still set to: $title"
+      "success": "$sender, title was set to: $title"
     }
   },
   "game": {
     "current": "$sender, streamer is currently playing $game.",
     "change": {
-      "success": "$sender, game was set to: $game",
-      "failed": "$sender, something went wrong. Current game is still set to: $game"
+      "success": "$sender, game was set to: $game"
     }
   },
   "cooldowns": {
