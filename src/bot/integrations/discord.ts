@@ -426,7 +426,14 @@ class Discord extends Integration {
         return;
       } else if (content === '!unlink') {
         await getRepository(DiscordLink).delete({ tag: author.tag });
-        msg.reply(prepare('integrations.discord.all-your-links-were-deleted'));
+        const reply = await msg.reply(prepare('integrations.discord.all-your-links-were-deleted'));
+        chatOut(`#${channel.name}: @${author.tag}, ${prepare('integrations.discord.all-your-links-were-deleted')} [${msg.author.tag}]`);
+        if (this.deleteMessagesAfterWhile) {
+          setTimeout(() => {
+            msg.delete();
+            reply.delete();
+          }, 10000);
+        }
         return;
       }
     }
