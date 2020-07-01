@@ -60,9 +60,12 @@
                   :key="index"
                   :active="selected.includes(event.id)"
                   style="cursor: pointer; border-left: 0; border-right: 0; padding: 0.2rem 1.25rem 0.4rem 1.25rem"
+                  :style="{opacity: event.isTest ? 0.75 : 1}"
                   @click="state.editation !== $state.idle ? toggleSelected(event) : null"
                 )
                   i(:title="moment(event.timestamp).format('LLLL')").eventlist-text
+                    span(v-if="event.isTest").text-danger TEST
+                    |
                     | {{moment(event.timestamp).fromNow()}}
                   div(:style="{'font-size': eventlistSize + 'px'}").eventlist-username
                     div.d-flex

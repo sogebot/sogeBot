@@ -6,6 +6,7 @@ export interface EventListInterface {
   event: string;
   username: string;
   timestamp: number;
+  isTest: boolean;
   values_json: string;
 }
 
@@ -16,6 +17,7 @@ export const EventList = new EntitySchema<Readonly<Required<EventListInterface>>
     event: { type: String },
     username: { type: String },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer() },
+    isTest: { type: 'boolean' },
     values_json: { type: 'text' },
   },
   indices: [
