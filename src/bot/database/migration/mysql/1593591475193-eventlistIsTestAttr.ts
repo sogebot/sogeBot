@@ -7,7 +7,7 @@ export class eventlistIsTestAttr1593591475193 implements MigrationInterface {
     const events = await queryRunner.query(`SELECT * from event_list`);
 
     await queryRunner.query('DELETE FROM \`event_list\` WHERE 1=1');
-    await queryRunner.query(`ALTER TABLE \`event_list\` ADD \`isTest\` boolean NOT NULL`, undefined);
+    await queryRunner.query(`ALTER TABLE \`event_list\` ADD \`isTest\` tinyint NOT NULL`, undefined);
 
     for (const event of events) {
       await queryRunner.query(
