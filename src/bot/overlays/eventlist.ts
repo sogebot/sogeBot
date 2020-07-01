@@ -61,9 +61,10 @@ class EventList extends Overlay {
       event: data.event,
       username: data.username,
       timestamp: Date.now(),
+      isTest: data.isTest ?? false,
       values_json: JSON.stringify(
         Object.keys(data)
-          .filter(key => !['event', 'username', 'timestamp'].includes(key))
+          .filter(key => !['event', 'username', 'timestamp', 'isTest'].includes(key))
           .reduce((obj, key) => {
             return {
               ...obj,

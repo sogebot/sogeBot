@@ -3,6 +3,7 @@ declare namespace EventList {
     event: string;
     timestamp: number;
     username: string;
+    isTest?: boolean;
     autohost?: boolean;
     message?: string;
     amount?: number;

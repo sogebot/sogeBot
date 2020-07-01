@@ -93,6 +93,7 @@ class Message {
         .select('events')
         .orderBy('events.timestamp', 'DESC')
         .where('events.event = :event', { event: 'tip' })
+        .andWhere('NOT events.isTest')
         .getOne();
       this.message = this.message.replace(/\$latestTipAmount/g, !_.isNil(latestTip) ? parseFloat(JSON.parse(latestTip.values_json).amount).toFixed(2) : 'n/a');
       this.message = this.message.replace(/\$latestTipCurrency/g, !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).currency : 'n/a');
@@ -360,6 +361,7 @@ class Message {
           .select('events')
           .orderBy('events.timestamp', 'DESC')
           .where('events.event >= :event', { event: 'tip' })
+          .andWhere('NOT events.isTest')
           .getMany())
           .sort((a, b) => {
             const aValue = JSON.parse(a.values_json);

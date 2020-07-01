@@ -225,6 +225,7 @@ class Streamlabs extends Integration {
           username: event.from.toLowerCase(),
           message: event.message,
           timestamp: Date.now(),
+          isTest: event.isTest,
         });
         events.fire('tip', {
           username: event.from.toLowerCase(),
