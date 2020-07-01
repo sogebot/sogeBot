@@ -3,7 +3,7 @@
   "all-your-links-were-deleted-with-sender": "$sender привязанные аккаунты были удалены",
   "this-account-was-linked-with": "$sender, к вашему аккаунту привязан $discordTag.",
   "invalid-or-expired-token": "$sender, неверный или устаревший токен.",
-  "help-message": "$sender, to link your account on Discord: 1. Go to Discord server and send !link in bot channel. | 2. Wait for PM from bot | 3. Send command from your Discord PM here in twitch chat.",
+  "help-message": "$sender, для привязки вашей учётной записи в Discord: 1. Перейдите на сервер Discord и отправьте !link в канале бота | 2. Дождитесь PM от бота | 3. Отправьте сгенерированную ботом команду в twitch чат.",
   "started-at": "Запущен в",
   "streamed-at": "Стрим шёл",
   "link-whisper": "Здравствуйте, $tag, чтобы связать эту учётную запись Discord с Вашей учётной записью в Twitch на канале $broadcaster, перейдите на https://twitch.tv/$broadcaster, отправьте эту команду в чат \n\n\t\t`!link $id`\n\nПРИМЕЧАНИЕ: Срок действия токена истечёт через 10 минут.",
