@@ -22,6 +22,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
   it ('Add 10 follow events', async () => {
     for (let i = 0; i < 10; i++) {
       await getRepository(EventList).save({
+        isTest: false,
         event: 'follow',
         timestamp: 1000 * i,
         username: `user${i}`,
@@ -33,6 +34,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
   it ('Add 10 sub/resub/subgift events', async () => {
     for (let i = 10; i < 20; i++) {
       await getRepository(EventList).save({
+        isTest: false,
         event: ['sub', 'resub', 'subgift'][Math.floor(Math.random() * 3)],
         timestamp: 2000 * i,
         username: `user${i}`,
@@ -44,6 +46,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
   it ('Add 10 tips events', async () => {
     for (let i = 20; i < 30; i++) {
       await getRepository(EventList).save({
+        isTest: false,
         event: 'tip',
         timestamp: 3000 * i,
         username: `user${i}`,
@@ -59,6 +62,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
   it ('Add 10 cheer events', async () => {
     for (let i = 30; i < 40; i++) {
       await getRepository(EventList).save({
+        isTest: false,
         event: 'cheer',
         timestamp: 4000 * i,
         username: `user${i}`,
