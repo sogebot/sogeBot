@@ -40,7 +40,7 @@ css:
 
 ui:
 	@echo -ne "\n\t ----- Bundling with webpack ($(ENV))\n"
-	@VERSION=${VERSION} NODE_ENV=$(ENV) npx webpack --progress
+	@VERSION=${VERSION} NODE_ENV=$(ENV) node --max_old_space_size=4096 ./node_modules/webpack/bin/webpack.js --progress
 
 bot:
 	@echo -ne "\n\t ----- Building bot\n"
