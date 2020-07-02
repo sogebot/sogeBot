@@ -817,7 +817,7 @@ class TMI extends Core {
         events.fire('keyword-send-x-times', { username: sender.username, message: message });
         if (message.startsWith('!')) {
           events.fire('command-send-x-times', { username: sender.username, message: message });
-        } else if (!message.startsWith('!')) {
+        } else if (!message.startsWith('!') && api.isStreamOnline) {
           getRepository(User).increment({ userId: sender.userId }, 'messages', 1);
         }
       }
