@@ -814,13 +814,11 @@ class TMI extends Core {
 
         api.followerUpdatePreCheck(sender.username);
 
-        if (api.isStreamOnline) {
-          events.fire('keyword-send-x-times', { username: sender.username, message: message });
-          if (message.startsWith('!')) {
-            events.fire('command-send-x-times', { username: sender.username, message: message });
-          } else if (!message.startsWith('!')) {
-            getRepository(User).increment({ userId: sender.userId }, 'messages', 1);
-          }
+        events.fire('keyword-send-x-times', { username: sender.username, message: message });
+        if (message.startsWith('!')) {
+          events.fire('command-send-x-times', { username: sender.username, message: message });
+        } else if (!message.startsWith('!') && api.isStreamOnline) {
+          getRepository(User).increment({ userId: sender.userId }, 'messages', 1);
         }
       }
       const responses = await parse.process();
