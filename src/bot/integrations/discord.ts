@@ -5,7 +5,7 @@ import * as DiscordJs from 'discord.js';
 
 // bot libraries
 import Integration from './_interface';
-import { command, settings, ui } from '../decorators';
+import { command, settings, shared, ui } from '../decorators';
 import { onChange, onStartup, onStreamEnd, onStreamStart } from '../decorators/on';
 import { chatIn, chatOut, debug, error, info, warning, whisperOut } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
@@ -34,9 +34,10 @@ const timezone = (process.env.TIMEZONE ?? 'system') === 'system' || !process.env
 class Discord extends Integration {
   client: DiscordJs.Client | null = null;
 
-  embed: DiscordJs.MessageEmbed | null = null;
-  embedMessage: DiscordJs.Message | null = null;
+  @shared(true)
   embedStartedAt = '';
+  @shared(true)
+  embedMessageId = '';
 
   @settings('general')
   @ui({ type: 'text-input', secret: true })
@@ -114,23 +115,30 @@ class Discord extends Integration {
     super();
 
     // embed updater
-    setInterval(() => {
-      if (this.embed && this.embedMessage && api.isStreamOnline) {
-        this.embed.spliceFields(0, this.embed.fields.length);
-        this.embed.addFields([
-          { name: prepare('webpanel.responses.variable.game'), value: api.stats.currentGame},
-          { name: prepare('webpanel.responses.variable.title'), value: api.stats.currentTitle},
-          { name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true},
-          { name: prepare('webpanel.viewers'), value: api.stats.currentViewers, inline: true},
-          { name: prepare('webpanel.views'), value: api.stats.currentViews, inline: true},
-          { name: prepare('webpanel.followers'), value: api.stats.currentFollowers, inline: true},
-        ]);
-        this.embed.setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${oauth.broadcasterUsername}-1920x1080.jpg?${Date.now()}`);
+    setInterval(async () => {
+      if (api.isStreamOnline && this.client && this.embedMessageId.length > 0) {
+        const channel = this.client.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
+        if (channel) {
+          const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
+          const embed = message?.embeds[0];
+          if (message && embed) {
+            embed.spliceFields(0, embed.fields.length);
+            embed.addFields([
+              { name: prepare('webpanel.responses.variable.game'), value: api.stats.currentGame},
+              { name: prepare('webpanel.responses.variable.title'), value: api.stats.currentTitle},
+              { name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true},
+              { name: prepare('webpanel.viewers'), value: api.stats.currentViewers, inline: true},
+              { name: prepare('webpanel.views'), value: api.stats.currentViews, inline: true},
+              { name: prepare('webpanel.followers'), value: api.stats.currentFollowers, inline: true},
+            ]);
+            embed.setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${oauth.generalChannel}-1920x1080.jpg?${Date.now()}`);
 
-        if (oauth.broadcasterType !== '') {
-          this.embed.addField(prepare('webpanel.subscribers'), api.stats.currentSubscribers, true);
+            if (oauth.broadcasterType !== '') {
+              embed.addField(prepare('webpanel.subscribers'), api.stats.currentSubscribers, true);
+            }
+            message.edit(embed);
+          }
         }
-        this.embedMessage.edit(this.embed);
       }
     }, MINUTE * 10);
 
@@ -293,27 +301,31 @@ class Discord extends Integration {
   }
 
   @onStreamEnd()
-  updateStreamStartAnnounce() {
-    if (this.embed && this.embedMessage) {
-      this.embed.setColor(0xff0000);
-      this.embed.setDescription(`${oauth.broadcasterUsername.charAt(0).toUpperCase() + oauth.broadcasterUsername.slice(1)} is not streaming anymore! Check it next time!`);
-      this.embed.spliceFields(0, this.embed.fields.length);
-      this.embed.addFields([
-        { name: prepare('webpanel.responses.variable.game'), value: api.stats.currentGame},
-        { name: prepare('webpanel.responses.variable.title'), value: api.stats.currentTitle},
-        { name: prepare('integrations.discord.streamed-at'), value: `${this.embedStartedAt} - ${moment().tz(timezone).format('LLL')}`, inline: true},
-        { name: prepare('webpanel.views'), value: api.stats.currentViews, inline: true},
-        { name: prepare('webpanel.followers'), value: api.stats.currentFollowers, inline: true},
-      ]);
-      this.embed.setImage(`https://static-cdn.jtvnw.net/ttv-static/404_preview-1920x1080.jpg?${Date.now()}`);
+  async updateStreamStartAnnounce() {
+    const channel = this.client?.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
+    if (channel) {
+      const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
+      const embed = message?.embeds[0];
+      if (message && embed) {
+        embed.setColor(0xff0000);
+        embed.setDescription(`${oauth.generalChannel.charAt(0).toUpperCase() + oauth.generalChannel.slice(1)} is not streaming anymore! Check it next time!`);
+        embed.spliceFields(0, embed.fields.length);
+        embed.addFields([
+          { name: prepare('webpanel.responses.variable.game'), value: api.stats.currentGame},
+          { name: prepare('webpanel.responses.variable.title'), value: api.stats.currentTitle},
+          { name: prepare('integrations.discord.streamed-at'), value: `${this.embedStartedAt} - ${moment().tz(timezone).format('LLL')}`, inline: true},
+          { name: prepare('webpanel.views'), value: api.stats.currentViews, inline: true},
+          { name: prepare('webpanel.followers'), value: api.stats.currentFollowers, inline: true},
+        ]);
+        embed.setImage(`https://static-cdn.jtvnw.net/ttv-static/404_preview-1920x1080.jpg?${Date.now()}`);
 
-      if (oauth.broadcasterType !== '') {
-        this.embed.addField(prepare('webpanel.subscribers'), api.stats.currentSubscribers, true);
+        if (oauth.broadcasterType !== '') {
+          embed.addField(prepare('webpanel.subscribers'), api.stats.currentSubscribers, true);
+        }
+        message.edit(embed);
       }
-      this.embedMessage.edit(this.embed);
     }
-    this.embed = null;
-    this.embedMessage = null;
+    this.embedMessageId = '';
   }
 
   @onStreamStart()
@@ -329,7 +341,7 @@ class Discord extends Integration {
 
         this.embedStartedAt = moment().tz(timezone).format('LLL');
         const embed = new DiscordJs.MessageEmbed()
-          .setURL('https://twitch.tv/' + oauth.broadcasterUsername)
+          .setURL('https://twitch.tv/' + oauth.generalChannel)
           .addFields([
             { name: prepare('webpanel.responses.variable.game'), value: api.stats.currentGame},
             { name: prepare('webpanel.responses.variable.title'), value: api.stats.currentTitle},
@@ -338,12 +350,12 @@ class Discord extends Integration {
             { name: prepare('webpanel.followers'), value: api.stats.currentFollowers, inline: true},
           ])
           // Set the title of the field
-          .setTitle('https://twitch.tv/' + oauth.broadcasterUsername)
+          .setTitle('https://twitch.tv/' + oauth.generalChannel)
           // Set the color of the embed
           .setColor(0x00ff00)
           // Set the main content of the embed
-          .setDescription(`${oauth.broadcasterUsername.charAt(0).toUpperCase() + oauth.broadcasterUsername.slice(1)} started stream! Check it out!`)
-          .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${oauth.broadcasterUsername}-1920x1080.jpg?${Date.now()}`)
+          .setDescription(`${oauth.generalChannel.charAt(0).toUpperCase() + oauth.generalChannel.slice(1)} started stream! Check it out!`)
+          .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${oauth.generalChannel}-1920x1080.jpg?${Date.now()}`)
           .setThumbnail(oauth.profileImageUrl)
           .setFooter('Announced by sogeBot - https://www.sogebot.xyz');
 
@@ -351,9 +363,9 @@ class Discord extends Integration {
           embed.addField(prepare('webpanel.subscribers'), api.stats.currentSubscribers, true);
         }
         // Send the embed to the same channel as the message
-        this.embedMessage = await (channel as DiscordJs.TextChannel).send(embed);
+        const message = await (channel as DiscordJs.TextChannel).send(embed);
+        this.embedMessageId = message.id;
         chatOut(`#${(channel as DiscordJs.TextChannel).name}: [[online announce embed]] [${this.client.user?.tag}]`);
-        this.embed = embed;
       }
     } catch (e) {
       warning(e.stack);
@@ -409,7 +421,7 @@ class Discord extends Integration {
         });
         const message = prepare('integrations.discord.link-whisper', {
           tag: msg.author.tag,
-          broadcaster: oauth.broadcasterUsername,
+          broadcaster: oauth.generalChannel,
           id: link.id,
         });
         author.send(message);
