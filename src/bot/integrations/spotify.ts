@@ -10,7 +10,7 @@ import { command, default_permission, settings, shared, ui } from '../decorators
 import { onChange, onStartup } from '../decorators/on';
 import Expects from '../expects';
 import Integration from './_interface';
-import { debug, error, info, warning } from '../helpers/log';
+import { error, info } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import api from '../api';
 import { addUIError } from '../panel';
@@ -34,15 +34,6 @@ let _spotify: any = null;
 class Spotify extends Integration {
   client: null | SpotifyWebApi = null;
   retry: { IRefreshToken: number } = { IRefreshToken: 0 };
-  uris: {
-    uri: string;
-    requestBy: string;
-    artist: string;
-    artists: string;
-    song: string;
-  }[] = [];
-  currentUris: string | null = null;
-  originalUri: string | null = null;
   skipToNextSong = false;
   state: any = null;
   @shared()
@@ -61,10 +52,6 @@ class Spotify extends Integration {
 
   @settings('output')
   format = '$song - $artist';
-  @settings('output')
-  playlistToPlay = '';
-  @settings('output')
-  continueOnPlaylistAfterRequest = true;
 
   @settings('connection')
   @ui({ type: 'text-input', secret: true })
@@ -114,7 +101,6 @@ class Spotify extends Integration {
       this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
       this.timeouts.ICurrentSong = global.setTimeout(() => this.ICurrentSong(), 10000);
       this.timeouts.getMe = global.setTimeout(() => this.getMe(), 10000);
-      setInterval(() => this.sendSongs(), 500);
     }
   }
 
@@ -141,138 +127,6 @@ class Spotify extends Integration {
   @default_permission(null)
   cSkipSong() {
     this.skipToNextSong = true;
-  }
-
-  async playNextSongFromRequest() {
-    try {
-      if (!this.client) {
-        throw new Error('you are not connected to spotify API, authorize your user.');
-      }
-
-      const uri =  this.uris.shift();
-      if (typeof uri === 'undefined') {
-        throw new Error('URIs are empty');
-      }
-      this.currentUris = uri.uri; // FIFO
-      await axios({
-        method: 'put',
-        url: 'https://api.spotify.com/v1/me/player/play',
-        headers: {
-          'Authorization': 'Bearer ' + this.client.getAccessToken(),
-          'Content-Type': 'application/json',
-        },
-        data: {
-          uris: [this.currentUris],
-        },
-      });
-
-      // force is_playing and uri just to not skip until track refresh
-      const song = JSON.parse(this.currentSong);
-      song.uri = this.currentUris;
-      song.is_playing = true;
-      this.currentSong = JSON.stringify(song);
-    } catch (e) {
-      error(e.stack);
-    }
-  }
-
-  async playNextSongFromPlaylist(retries = 0) {
-    try {
-      if (!this.client) {
-        throw new Error('you are not connected to spotify API, authorize your user.');
-      }
-      // play from playlist
-      const offset = this.originalUri ? { uri: this.originalUri } : undefined;
-      await axios({
-        method: 'put',
-        url: 'https://api.spotify.com/v1/me/player/play',
-        headers: {
-          'Authorization': 'Bearer ' + this.client.getAccessToken(),
-          'Content-Type': 'application/json',
-        },
-        data: {
-          context_uri: this.playlistToPlay,
-          offset,
-        },
-      });
-      // skip to next song in playlist
-      await axios({
-        method: 'post',
-        url: 'https://api.spotify.com/v1/me/player/next',
-        headers: {
-          'Authorization': 'Bearer ' + this.client.getAccessToken(),
-        },
-      });
-      this.currentUris = null;
-    } catch (e) {
-      if (this.originalUri) {
-        warning('Cannot continue playlist from ' + String(this.originalUri));
-        warning('Playlist will continue from random track');
-      } else {
-        if (retries < 5) {
-          warning(`Cannot continue playlist from random song. Retry ${retries + 1} of 5 in 5 seconds.`);
-          setTimeout(() => {
-            this.playNextSongFromPlaylist(retries++);
-          }, 5000);
-        } else {
-          warning(`Cannot continue playlist from random song. Retries limit reached.`);
-          error(e.stack);
-        }
-      }
-      this.originalUri = null;
-    }
-  }
-
-  async sendSongs () {
-    if (!this.userId || !(this.enabled)) {
-      return;
-    }
-
-    const song = JSON.parse(this.currentSong);
-
-    debug('spotify.request', {
-      song,
-      originalUri: this.originalUri,
-      cachedRequests: this.currentUris,
-      requests: this.uris,
-    });
-
-    // if song is not part of currentUris => save context
-    if (typeof song.uri !== 'undefined' && this.currentUris !== song.uri && this.uris.length === 0) {
-      this.originalUri = song.uri;
-    }
-
-    if (!(api.isStreamOnline)) {
-      return; // don't do anything on offline stream
-    }
-
-    if (this.skipToNextSong) {
-      if (song.is_playing) {
-        if (this.uris.length > 0) {
-          this.playNextSongFromRequest();
-        } else {
-          this.playNextSongFromPlaylist();
-        }
-      }
-      this.skipToNextSong = false; // reset skip
-      return;
-    }
-
-    // if song is part of currentUris and is playing, do nothing
-    if (typeof song.uri !== 'undefined' && this.currentUris === song.uri && song.is_playing) {
-      return;
-    }
-
-    // if song is part of currentUris and is not playing (finished playing), continue from playlist if set
-    if (typeof song.uri !== 'undefined' && this.currentUris === song.uri && (!song.is_playing || song.force_skip) && this.uris.length === 0) {
-      if (this.playlistToPlay.length > 0 && this.continueOnPlaylistAfterRequest) {
-        this.playNextSongFromPlaylist();
-      }
-    } else if (this.uris.length > 0) { // or we have requests
-      if (Date.now() - song.finished_at <= 0 || this.originalUri !== song.uri || this.originalUri === null || (!song.is_playing || song.force_skip)) { // song should be finished
-        this.playNextSongFromRequest();
-      }
-    }
   }
 
   async getMe () {
@@ -515,10 +369,10 @@ class Spotify extends Integration {
   @command('!spotify')
   @default_permission(null)
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
-    if (!(api.isStreamOnline)) {
+    /*if (!(api.isStreamOnline)) {
       error(`${chalk.bgRed('SPOTIFY')}: stream is offline.`);
       return [];
-    } // don't do anything on offline stream
+    } // don't do anything on offline stream*/
     if (!this.songRequests) {
       return [];
     }
@@ -553,12 +407,12 @@ class Spotify extends Integration {
           },
         });
         const track = response.data as SpotifyTrack;
-        this.uris.push({
-          uri: 'spotify:track:' + id,
-          requestBy: opts.sender.username,
-          song: track.name,
-          artist: track.artists[0].name,
-          artists: track.artists.map(o => o.name).join(', '),
+        await axios({
+          method: 'post',
+          url: 'https://api.spotify.com/v1/me/player/queue?uri=' + track.uri,
+          headers: {
+            'Authorization': 'Bearer ' + this.client.getAccessToken(),
+          },
         });
         return [{ response: prepare('integrations.spotify.song-requested', {
           name: track.name, artist: track.artists[0].name, artists: track.artists.map(o => o.name).join(', '),
@@ -573,13 +427,6 @@ class Spotify extends Integration {
           },
         });
         const track = (response.data.tracks.items[0] as SpotifyTrack);
-        this.uris.push({
-          uri: track.uri,
-          requestBy: opts.sender.username,
-          song: track.name,
-          artist: track.artists[0].name,
-          artists: track.artists.map(o => o.name).join(', '),
-        });
         return [{ response: prepare('integrations.spotify.song-requested', {
           name: track.name, artist: track.artists[0].name,
         }), ...opts }];
@@ -587,6 +434,8 @@ class Spotify extends Integration {
     } catch (e) {
       if (e.response.status === 401) {
         error(`${chalk.bgRed('SPOTIFY')}: you don't have access to spotify API, try to revoke and authorize again.`);
+      } else if (e.response.status === 403) {
+        error(`${chalk.bgRed('SPOTIFY')}: you don't seem to have spotify PREMIUM.`);
       }
       return [{ response: prepare('integrations.spotify.song-not-found'), ...opts }];
     }
