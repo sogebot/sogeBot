@@ -590,12 +590,12 @@ class Songs extends System {
           videoId: id,
           title: videoInfo.videoDetails.title,
           loudness: Number(videoInfo.loudness ?? -15),
-          length: Number(videoInfo.length_seconds),
+          length: Number(videoInfo.videoDetails.lengthSeconds),
           lastPlayedAt: Date.now(),
           seed: 1,
           volume: 20,
           startTime: 0,
-          endTime: Number(videoInfo.length_seconds),
+          endTime: Number(videoInfo.videoDetails.lengthSeconds),
         });
         imported++;
       } catch (e) {
@@ -692,12 +692,12 @@ class Songs extends System {
               videoId: id,
               title: videoInfo.videoDetails.title,
               loudness: Number(videoInfo.loudness ?? - 15),
-              length: Number(videoInfo.length_seconds),
+              length: Number(videoInfo.videoDetails.lengthSeconds),
               lastPlayedAt: Date.now(),
               seed: 1,
               volume: 20,
               startTime: 0,
-              endTime: Number(videoInfo.length_seconds),
+              endTime: Number(videoInfo.videoDetails.lengthSeconds),
             });
             imported++;
           } catch (e) {
