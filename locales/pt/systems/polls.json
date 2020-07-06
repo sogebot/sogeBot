@@ -1,13 +1,13 @@
 {
   "opened_normal": "Enquete aberta para \"$title\"! Você pode votar usando $command X",
-  "opened_tips": "Votação por doações aberta para \"$title\"! Você pode votar adicionando a hashtag #voteX na mensagem de doação",
-  "opened_bits": "Poll by cheers opened for \"$title\"! You can vote by adding hashtag #voteX into bit message",
-  "alreadyOpened_normal": "Error! Poll was already opened for \"$title\"! You can vote by $command X",
-  "alreadyOpened_tips": "Error! Poll by tips was already opened for \"$title\"! You can vote by adding hashtag #voteX into tip message",
-  "alreadyOpened_bits": "Error! Poll by cheers was already opened for \"$title\"! You can vote by adding hashtag #voteX into bit message",
-  "notEnoughOptions": "$sender, new poll must have at least 2 options!",
-  "notInProgress": "$sender, there is currently no poll in progress!",
-  "status": "$sender, current status of poll \"$title\":",
-  "status_closed": "Poll \"$title\" closed, status of voting:",
-  "votes": "vote|votes"
+  "opened_tips": "Enquete por doações aberta para \"$title\"! Você pode votar adicionando a hashtag #voteX na mensagem de doação",
+  "opened_bits": "Enquete por bits aberta para \"$title\"! Você pode votar adicionando a hashtag #voteX na mensagem",
+  "alreadyOpened_normal": "Erro! A enquete já foi aberta para “$title”! Você pode votar por $command X",
+  "alreadyOpened_tips": "Erro! Enquete por doação já foi aberta para \"$title\"! Você pode votar adicionando a hashtag #voteX na mensagem",
+  "alreadyOpened_bits": "Erro! Enquete via bits já foi aberta para \"$title\"! Você pode votar adicionando a hashtag #voteX na mensagem",
+  "notEnoughOptions": "$sender, nova enquete deve ter pelo menos 2 opções!",
+  "notInProgress": "$sender, no momento não há nenhuma enquete em andamento!",
+  "status": "$sender, situação atual da enquete \"$title\":",
+  "status_closed": "Enquete \"$title\" encerrada, estado da votação:",
+  "votes": "votar|votos"
 }
