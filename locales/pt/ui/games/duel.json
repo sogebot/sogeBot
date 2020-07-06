@@ -7,6 +7,6 @@
       "help": "Minutos"
     },
     "minimalBet": "Aposta mínima",
-    "bypassCooldownByOwnerAndMods": "Bypass cooldown by owner and mods"
+    "bypassCooldownByOwnerAndMods": "Ignorar intervalo dos proprietários e moderadores"
   }
 }
