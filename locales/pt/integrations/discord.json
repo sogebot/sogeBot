@@ -1,11 +1,11 @@
 {
-  "all-your-links-were-deleted": "todos os seus links foram deletados",
-  "all-your-links-were-deleted-with-sender": "$sender, {integrations.discord.all-your-links-were-deleted-discord}",
-  "this-account-was-linked-with": "$sender, this account was linked with $discordTag.",
-  "invalid-or-expired-token": "$sender, invalid or expired token.",
-  "help-message": "$sender, to link your account on Discord: 1. Go to Discord server and send !link in bot channel. | 2. Wait for PM from bot | 3. Send command from your Discord PM here in twitch chat.",
-  "started-at": "Started At",
-  "streamed-at": "Streamed At",
-  "link-whisper": "Hello $tag, to link this Discord account with your Twitch account on $broadcaster channel, go to https://twitch.tv/$broadcaster, login to your account and send this command to chat \n\n\t\t`!link $id`\n\nNOTE: This expires in 10 minutes.",
-  "check-your-dm": "check your DMs for steps to link your account."
+  "all-your-links-were-deleted": "todas as suas contas foram desvinculadas",
+  "all-your-links-were-deleted-with-sender": "$sender, conta desvinculada",
+  "this-account-was-linked-with": "$sender, esta conta foi vinculada com $discordTag.",
+  "invalid-or-expired-token": "$sender, token inválido ou expirado.",
+  "help-message": "$sender, para vincular sua conta no Discord: 1. Vá até o Discord e envie '!link' no canal bot. | 2. Aguarde a resposta do bot | 3. Vá ate o chat da twitch, e envie o comando que você recebeu no privado do bot.",
+  "started-at": "Iniciou em",
+  "streamed-at": "Transmitido em",
+  "link-whisper": "Olá $tag, para vincular essa conta do Discord com sua conta do Twitch no canal $broadcaster, acesse https://twitch.tv/$broadcaster, faça o login na sua conta e envie este comando no chat \n\n\t\t`!vincular $id`\n\nOBS: expira em 10 minutos.",
+  "check-your-dm": "verifique seu privado para vincular sua conta."
 }
