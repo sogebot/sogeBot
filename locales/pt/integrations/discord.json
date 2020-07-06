@@ -1,5 +1,5 @@
 {
-  "all-your-links-were-deleted": "all your links were deleted",
+  "all-your-links-were-deleted": "todos os seus links foram deletados",
   "all-your-links-were-deleted-with-sender": "$sender, {integrations.discord.all-your-links-were-deleted-discord}",
   "this-account-was-linked-with": "$sender, this account was linked with $discordTag.",
   "invalid-or-expired-token": "$sender, invalid or expired token.",
