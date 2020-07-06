@@ -1,10 +1,10 @@
 {
   "settings": {
-    "theme": "Default theme",
-    "domain": "Domain",
-    "percentage": "Percentage difference for stats",
-    "shortennumbers": "Short format of numbers",
-    "stickystats": "Stick stats to top",
-    "showdiff": "Show difference"
+    "theme": "Tema padrão",
+    "domain": "Domínio",
+    "percentage": "Diferença de porcentagem para estatísticas",
+    "shortennumbers": "Formato curto dos números",
+    "stickystats": "Grudar estatísticas no topo",
+    "showdiff": "Mostrar diferenças"
   }
 }
