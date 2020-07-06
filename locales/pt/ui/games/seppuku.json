@@ -1,9 +1,9 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Estado",
     "timeout": {
-      "title": "Timeout duration",
-      "help": "Seconds"
+      "title": "Duração de intervalo",
+      "help": "Segundos"
     }
   }
 }
