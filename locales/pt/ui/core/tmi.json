@@ -1,10 +1,10 @@
 {
   "settings": {
-    "ignorelist": "Ignore list (ID or username)",
-    "globalIgnoreListExclude": "Exclude from global ignore list",
-    "showWithAt": "Show users with @",
-    "sendWithMe": "Send messages with /me",
-    "mute": "Bot is muted",
-    "whisperListener": "Listen on commands on whispers"
+    "ignorelist": "Lista de ignorados (ID ou usuário)",
+    "globalIgnoreListExclude": "Excluir da lista global de ignorados",
+    "showWithAt": "Mostrar usuários com @",
+    "sendWithMe": "Enviar mensagens com /me",
+    "mute": "Bot mutado",
+    "whisperListener": "Aceitar comandos no privado"
   }
 }
