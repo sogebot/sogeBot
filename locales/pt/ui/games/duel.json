@@ -1,12 +1,12 @@
 {
   "settings": {
-    "enabled": "Status",
-    "cooldown": "Cooldown",
+    "enabled": "Estado",
+    "cooldown": "Intervalo",
     "duration": {
-      "title": "Duration",
-      "help": "Minutes"
+      "title": "Duração",
+      "help": "Minutos"
     },
-    "minimalBet": "Minimal bet",
+    "minimalBet": "Aposta mínima",
     "bypassCooldownByOwnerAndMods": "Bypass cooldown by owner and mods"
   }
 }
