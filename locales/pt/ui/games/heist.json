@@ -1,30 +1,30 @@
 {
-  "name": "Heist",
+  "name": "Assalto",
   "settings": {
-    "enabled": "Status",
-    "showMaxUsers": "Max users to show in payout",
+    "enabled": "Estado",
+    "showMaxUsers": "Máximo de usuários a exibir no pagamento",
     "copsCooldownInMinutes": {
-      "title": "Cooldown between heists",
-      "help": "Minutes"
+      "title": "Intervalo entre assaltos",
+      "help": "Minutos"
     },
     "entryCooldownInSeconds": {
-      "title": "Time to entry heist",
-      "help": "Seconds"
+      "title": "Tempo para entrar em assalto",
+      "help": "Segundos"
     },
-    "started": "Heist start message",
-    "nextLevelMessage": "Message when next level is reached",
-    "maxLevelMessage": "Message when max level is reached",
-    "copsOnPatrol": "Response of bot when heist is still on cooldown",
-    "copsCooldown": "Bot announcement when heist can be started",
-    "singleUserSuccess": "Success message for one user",
-    "singleUserFailed": "Fail message for one user",
-    "noUser": "Message if no user participated"
+    "started": "Mensagem de inicio do assalto",
+    "nextLevelMessage": "Mensagem quando o próximo nível for atingido",
+    "maxLevelMessage": "Mensagem quando o nível máximo for atingido",
+    "copsOnPatrol": "Resposta do bot quando o assalto está no intervalo",
+    "copsCooldown": "Anúncio do bot quando o assalto pode ser iniciado",
+    "singleUserSuccess": "Mensagem de sucesso para um usuário",
+    "singleUserFailed": "Mensagem de falha para um usuário",
+    "noUser": "Mensagem se nenhum usuário participou"
   },
-  "message": "Message",
-  "winPercentage": "Win percentage",
-  "payoutMultiplier": "Payout multiplier",
-  "maxUsers": "Max users for level",
-  "percentage": "Percentage",
-  "noResultsFound": "No results found. Click button below to add new result.",
-  "noLevelsFound": "No levels found. Click button below to add new level."
+  "message": "Mensagem",
+  "winPercentage": "Porcentagem de Vitória",
+  "payoutMultiplier": "Multiplicador de pagamento",
+  "maxUsers": "Máximo de usuários por level",
+  "percentage": "Porcentagem",
+  "noResultsFound": "Nenhum resultado foi encontrado. Clique no botão abaixo para adicionar um novo resultado.",
+  "noLevelsFound": "Nenhum level encontrado. Clique no botão abaixo para adicionar um novo level."
 }
