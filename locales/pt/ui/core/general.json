@@ -5,6 +5,6 @@
       "title": "Saída inteligente a cada X horas",
       "help": "0 - desativado"
     },
-    "shouldGracefulExitHelp": "Enabling of graceful exit is <strong>recommended</strong> if your bot is running endlessly on server. You should have bot running on pm2 (or similar service) or have it dockerized to ensure automatic bot restart. Bot <strong>won't</strong> gracefully exit when stream is online."
+    "shouldGracefulExitHelp": "Ativar a saída inteligente é <strong>recomendado</strong> se o seu bot estiver rodando sem parar no servidor. Você deve ter o bot rodando em 'pm2' (ou serviço similar), ou garantir que o bot seja reiniciado automaticamente quando fechado. o Bot <strong>não</strong> irá fechar quando a stream estiver online."
   }
 }
