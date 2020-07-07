@@ -6,6 +6,11 @@
   font-weight: bold;
   text-indent: 1rem;
   letter-spacing: 1px;
+  vertical-align: top !important;
+}
+
+.table thead.thead-dark th {
+  color: $white !important;
 }
 
 .pointer {
@@ -532,10 +537,6 @@ table tr:hover > .tableMenu button { visibility: visible; }
 }
 .streamEvents li {
   list-style-type: none
-}
-
-table td {
-  vertical-align: middle !important;
 }
 
 /* QUEUE-WIDGET */
