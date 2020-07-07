@@ -348,7 +348,7 @@
         highlightsSocket: getSocket('/systems/highlights'),
         averageStats: {},
 
-        hideStats: false,
+        hideStats: localStorage.getItem('hideStats') === 'true',
         b_shortenNumber: true,
         b_showAvgDiff: false,
         b_percentage: false,
@@ -593,6 +593,7 @@
       },
       toggleViewerShow: function () {
         this.hideStats = !this.hideStats
+        localStorage.setItem('hideStats', String(this.hideStats))
       }
     },
   })
