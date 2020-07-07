@@ -194,11 +194,11 @@ class Spotify extends Integration {
           const data = await this.client.refreshAccessToken();
           this.client.setAccessToken(data.body.access_token);
           this.retry.IRefreshToken = 0;
-          ioServer?.emit('api.stats', { data: data.body, timestamp: Date.now(), call: 'spotify::refreshToken', api: 'other', endpoint: 'n/a', code: 200 });
+          ioServer?.emit('api.stats', { method: 'GET', data: data.body, timestamp: Date.now(), call: 'spotify::refreshToken', api: 'other', endpoint: 'n/a', code: 200 });
         }
       } catch (e) {
         this.retry.IRefreshToken++;
-        ioServer?.emit('api.stats', { data: e.message, timestamp: Date.now(), call: 'spotify::refreshToken', api: 'other', endpoint: 'n/a', code: 500 });
+        ioServer?.emit('api.stats', { method: 'GET', data: e.message, timestamp: Date.now(), call: 'spotify::refreshToken', api: 'other', endpoint: 'n/a', code: 500 });
         info(chalk.yellow('SPOTIFY: ') + 'Refreshing access token failed ' + (this.retry.IRefreshToken > 0 ? 'retrying #' + this.retry.IRefreshToken : ''));
       }
     }

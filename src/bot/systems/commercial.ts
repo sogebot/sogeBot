@@ -85,7 +85,7 @@ class Commercial extends System {
       } catch (e) {
         error(`API: ${url} - ${e.stack}`);
         if (ioServer) {
-          ioServer.emit('api.stats', { timestamp: Date.now(), call: 'commercial', api: 'kraken', endpoint: url, code: e.response.status, data: e.stack });
+          ioServer.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'kraken', endpoint: url, code: e.response.status, data: e.stack });
         }
       }
     } else {

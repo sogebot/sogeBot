@@ -33,11 +33,9 @@
       <thead class="thead-dark">
           <tr>
             <th scope="col">time</th>
-            <th scope="col">call</th>
-            <th scope="col">endpoint</th>
-            <th scope="col">status</th>
+            <th scope="col">name</th>
+            <th scope="col"></th>
             <th scope="col">remaining API calls</th>
-            <th scope="col">data</th>
           </tr>
         </thead>
         <tbody>
@@ -45,14 +43,15 @@
               :class="{'bg-danger': !String(item.code).startsWith('2'), 'text-light': !String(item.code).startsWith('2') }">
             <th scope="row">{{ moment(item.timestamp).format('LTS') }}</th>
             <td>{{ item.call }}</td>
-            <td><div style="word-wrap: break-word; font-family: Monospace; width: 200px;">{{ item.endpoint }}</div></td>
-            <td>{{ item.code }}</td>
-            <td>{{ item.remaining }}</td>
             <td>
-              <div style="word-wrap: break-word; font-family: Monospace; width: 100%;">
-                {{ parseJSON(item.data) }}
+              <div style="word-wrap: break-word; font-family: Monospace; overflow-y: auto; overflow-x: hidden; max-height:200px;">
+                <strong>{{ item.method }}</strong> {{ item.endpoint }} {{ item.code }}
               </div>
+
+              <pre v-if="item.request" class="pt-1" style="word-wrap: break-word; font-family: Monospace;overflow-y: auto; overflow-x: hidden; max-height:200px; width:100%;">{{ parseJSON(item.request) }}</pre>
+              <pre class="pt-3" style="word-wrap: break-word; font-family: Monospace;overflow-y: auto; overflow-x: hidden; max-height:200px; width:100%;">{{ parseJSON(item.data) }}</pre>
             </td>
+            <td><pre>{{ parseJSON(item.remaining) }}</pre></td>
           </tr>
         </tbody>
       </table>
@@ -131,7 +130,7 @@ export default class apiStats extends Vue {
 
     parseJSON(data: string) {
       try {
-          return JSON.stringify(JSON.parse(data), null, 2)
+        return JSON.stringify(JSON.parse(data), null, 2)
       } catch (e) {
         return data
       }

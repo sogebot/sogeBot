@@ -116,10 +116,10 @@ class Highlights extends System {
         createdAt: Date.now(),
       };
 
-      ioServer?.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: request.status, remaining: api.calls.bot.remaining });
+      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: request.status, remaining: api.calls.bot.remaining });
       return this.add(highlight, timestamp, opts);
     } catch (e) {
-      ioServer?.emit('api.stats', { timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: e.stack, remaining: api.calls.bot.remaining });
+      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: e.stack, remaining: api.calls.bot.remaining });
       switch (e.message) {
         case ERROR_STREAM_NOT_ONLINE:
           error('Cannot highlight - stream offline');

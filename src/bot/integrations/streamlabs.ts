@@ -105,7 +105,7 @@ class Streamlabs extends Integration {
         const result = (await axios.get(url)).data;
         debug('streamlabs', url);
         debug('streamlabs', result);
-        ioServer?.emit('api.stats', { data: result, timestamp: Date.now(), call: 'streamlabs', api: 'other', endpoint: url, code: 200 });
+        ioServer?.emit('api.stats', { method: 'GET', data: result, timestamp: Date.now(), call: 'streamlabs', api: 'other', endpoint: url, code: 200 });
         let donationIdSet = false;
         for (const item of result.data) {
           if (!donationIdSet) {
@@ -139,9 +139,9 @@ class Streamlabs extends Integration {
         }
       } catch (e) {
         if (e.isAxiosError) {
-          ioServer?.emit('api.stats', { data: e.message, timestamp: Date.now(), call: 'streamlabs', api: 'other', endpoint: url, code: e.response.status });
+          ioServer?.emit('api.stats', { method: 'GET', data: e.message, timestamp: Date.now(), call: 'streamlabs', api: 'other', endpoint: url, code: e.response.status });
         } else {
-          ioServer?.emit('api.stats', { data: e.stack, timestamp: Date.now(), call: 'streamlabs', api: 'other', endpoint: url, code: 0 });
+          ioServer?.emit('api.stats', { method: 'GET', data: e.stack, timestamp: Date.now(), call: 'streamlabs', api: 'other', endpoint: url, code: 0 });
         }
         error(e.stack);
       }
