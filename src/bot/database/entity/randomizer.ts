@@ -46,6 +46,7 @@ export interface RandomizerItemInterface {
   color: string;
   numOfDuplicates?: number; // number of duplicates
   minimalSpacing?: number; // minimal space between duplicates
+  order: number;
 }
 
 export const Randomizer = new EntitySchema<Readonly<Required<RandomizerInterface>>>({
@@ -88,6 +89,7 @@ export const RandomizerItem = new EntitySchema<Readonly<Required<RandomizerItemI
     color: { type: 'varchar', length: 9, nullable: true },
     numOfDuplicates: { type: 'int', default: 1 },
     minimalSpacing: { type: 'int', default: 1 },
+    order: { type: 'int' },
   },
   relations: {
     randomizer: {

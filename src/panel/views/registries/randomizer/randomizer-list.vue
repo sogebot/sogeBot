@@ -27,9 +27,10 @@
         span(v-else class="text-danger")
           fa(icon="exclamation-triangle") Permission not found
       template(v-slot:cell(options)="data")
-        | {{ Array.from(new Set(data.item.items.map(o => o.name))).join(', ') }}
+        | {{ Array.from(new Set(orderBy(data.item.items, 'order').map(o => o.name))).join(', ') }}
       template(v-slot:cell(buttons)="data")
         div(style="width: max-content !important;").float-right
+          button-with-icon(icon="clone" @click="clone(data.item)").btn-only-icon.btn-secondary.btn-reverse
           button-with-icon(
             @click="toggleVisibility(data.item)"
             :class="{ 'btn-success': data.item.isShown, 'btn-danger': !data.item.isShown }"
@@ -51,13 +52,15 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
+import { v4 as uuid } from 'uuid';
+import { orderBy } from 'lodash-es';
 
 import type { RandomizerInterface } from 'src/bot/database/entity/randomizer';
 import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-library.add(faExclamationTriangle)
+import { faExclamationTriangle, faClone } from '@fortawesome/free-solid-svg-icons';
+library.add(faExclamationTriangle, faClone)
 
 @Component({
   components: {
@@ -65,6 +68,7 @@ library.add(faExclamationTriangle)
   },
 })
 export default class randomizerList extends Vue {
+  orderBy = orderBy;
   psocket: SocketIOClient.Socket = getSocket('/core/permissions');
   socket: SocketIOClient.Socket =  getSocket('/registries/randomizer');
 
@@ -90,6 +94,32 @@ export default class randomizerList extends Vue {
 
   get filteredItems() {
     return this.items;
+  }
+
+  clone(item: Required<RandomizerInterface>) {
+    const clonedItemId = uuid();
+
+    const clonedItemsRemapId = new Map();
+    // remap items ids
+    const clonedItems = item.items.map(o => {
+      clonedItemsRemapId.set(o.id, uuid())
+      return { ...o, id: clonedItemsRemapId.get(o.id) }
+    })
+
+    const clonedItem = {
+      ...item,
+      id: clonedItemId,
+      name: item.name + ' (clone)',
+      command: `!${Math.random().toString(36).substr(2, 5)}`,
+      // we need to do another .map as we need to find groupId
+      items: clonedItems.map(o => ({ ...o, groupId: o.groupId === null ? o.groupId : clonedItemsRemapId.get(o.groupId) })),
+    }
+    this.socket.emit('randomizer::save', clonedItem, (err: Error | null) => {
+      if (err) {
+        console.error(err);
+      }
+      this.refresh();
+    })
   }
 
   toggleVisibility(item: Required<RandomizerInterface>) {
