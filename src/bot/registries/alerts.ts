@@ -63,6 +63,19 @@ class Alerts extends Registry {
         await getRepository(AlertMedia).delete({ id: String(id) })
       );
     });
+    adminEndpoint(this.nsp, 'alerts::cloneMedia', async (toClone: [string, string], cb) => {
+      try {
+        const { primaryId, ...item } = await getRepository(AlertMedia).findOneOrFail({ id: toClone[0] });
+        cb(
+          null,
+          await getRepository(AlertMedia).save({
+            ...item,
+            id: toClone[1] })
+        );
+      } catch (e) {
+        cb(e.stack, null);
+      }
+    });
     adminEndpoint(this.nsp, 'alerts::saveMedia', async (items: AlertMediaInterface, cb) => {
       try {
         cb(
