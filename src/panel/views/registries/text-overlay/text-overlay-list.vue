@@ -55,13 +55,14 @@
           <button class="btn btn-outline-dark p-3 border-0" @click="toggleShowMore(item.id)">
             <fa class="mr-1" :icon="!showMore.includes(item.id) ? 'ellipsis-h' : 'ellipsis-v'"></fa> {{ !showMore.includes(item.id) ? translate('commons.show-more') : translate('commons.show-less') }}</button>
           <a v-bind:href="'/overlays/text?id='+ item.id" class="btn btn-outline-dark p-3 border-0" target="_blank"><fa icon="link"></fa> /overlays/text?id={{ item.id }}</a>
-          <button @click="goTo(item.id)" class="btn btn-outline-dark p-3 border-0">
-            <fa icon="pencil-alt" class="mr-1"></fa>
-            {{ translate('dialog.buttons.edit') }}</button>
-          <hold-button class="btn-outline-dark border-0 btn-reverse"
+          <button @click="clone(item)" class="btn btn-outline-dark border-0">
+            <fa icon="clone" fixed-width></fa></button>
+          <button @click="goTo(item.id)" class="btn btn-outline-dark border-0">
+            <fa icon="pencil-alt" fixed-width></fa></button>
+          <hold-button class="btn-outline-dark border-0 btn-reverse p-1"
             @trigger="remove(item)">
-            <template slot="title"><fa icon="trash" fixed-width/> {{translate('dialog.buttons.delete')}}</template>
-            <template slot="onHoldTitle"><fa icon="trash" fixed-width/> {{translate('dialog.buttons.hold-to-delete')}}</template>
+            <template slot="title"><fa icon="trash" fixed-width/></template>
+            <template slot="onHoldTitle"><fa icon="trash" fixed-width/></template>
           </hold-button>
         </div>
       </div>
@@ -74,11 +75,12 @@ import { Vue, Component } from 'vue-property-decorator';
 import { isNil, orderBy } from 'lodash-es';
 import Prism from 'vue-prism-component'
 import { getSocket } from 'src/panel/helpers/socket';
+import { v4 as uuid } from 'uuid';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faPencilAlt, faEllipsisH, faEllipsisV } from '@fortawesome/free-solid-svg-icons';
+import { faPencilAlt, faEllipsisH, faEllipsisV, faClone } from '@fortawesome/free-solid-svg-icons';
 import { faHtml5 } from '@fortawesome/free-brands-svg-icons';
-library.add(faPencilAlt, faHtml5, faEllipsisH, faEllipsisV);
+library.add(faPencilAlt, faHtml5, faEllipsisH, faEllipsisV, faClone);
 
 import 'prismjs'
 import 'prismjs/themes/prism.css'
@@ -116,6 +118,10 @@ export default class textOverlayList extends Vue {
 
     created() {
       this.state.loaded = false;
+      this.refresh();
+    }
+
+    refresh() {
       this.socket.emit('generic::getAll', (err: string | null, items: TextInterface) => {
         if (err) {
           return console.error(err)
@@ -148,6 +154,15 @@ export default class textOverlayList extends Vue {
       } else {
         this.showMore.push(_id)
       }
+    }
+
+    clone(item: TextInterface) {
+      this.socket.emit('text::save', { ...item, id: uuid(), name: item.name + ' (clone)' }, (err: string | null, data: TextInterface) => {
+        if (err) {
+          console.error(err)
+        }
+        this.refresh();
+      });
     }
 
     remove(item: TextInterface) {
