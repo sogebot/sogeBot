@@ -57,6 +57,7 @@
           </ul>
         </div>
         <div class="card-footer text-right">
+          <button-with-icon class="btn-only-icon btn-secondary btn-reverse" icon="clone" @click="clone(group)"/>
           <hold-button class="btn-danger btn-only-icon" @trigger="removeGoal(group)" icon="trash">
             <template slot="title">{{translate('dialog.buttons.delete')}}</template>
             <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
@@ -88,9 +89,14 @@
 <script lang="ts">
   import Vue from 'vue'
   import { chunk, filter, orderBy } from 'lodash-es';
+  import { v4 as uuid } from 'uuid';
 
   import { getSocket } from 'src/panel/helpers/socket';
   import { GoalGroupInterface } from 'src/bot/database/entity/goal';
+
+  import { library } from '@fortawesome/fontawesome-svg-core';
+  import { faClone } from '@fortawesome/free-solid-svg-icons';
+  library.add(faClone);
 
   export default Vue.extend({
     components: {
@@ -148,19 +154,37 @@
         this.currentTime = Date.now()
       }, 1000)
 
-      this.socket.emit('generic::getAll', (err: Error, items: GoalGroupInterface[]) => {
-        if (err) {
-          console.error(err);
-        } else {
-          console.debug('Loaded', items);
-          this.groups = items;
-        }
-      })
+      this.refresh();
     },
     beforeDestroy: function () {
       clearInterval(this.interval)
     },
     methods: {
+      refresh() {
+        this.socket.emit('generic::getAll', (err: Error, items: GoalGroupInterface[]) => {
+          if (err) {
+            console.error(err);
+          } else {
+            console.debug('Loaded', items);
+            this.groups = items;
+          }
+        })
+      },
+      clone(group: GoalGroupInterface) {
+        const clonedGroupId = uuid();
+        const clonedGroup = {
+          ...group,
+          id: clonedGroupId,
+          name: group.name + ' (clone)',
+          goals: group.goals.map(goal => ({ ...goal, id: uuid(), groupId: clonedGroupId }))
+        }
+        this.socket.emit('goals::save', clonedGroup, (err: string | null) => {
+          if (err) {
+            console.error(err)
+          }
+          this.refresh();
+        });
+      },
       removeGoal: function (group: GoalGroupInterface) {
         console.debug(' => Removing', group.id)
 
