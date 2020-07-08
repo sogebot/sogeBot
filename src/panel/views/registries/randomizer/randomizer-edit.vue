@@ -127,7 +127,7 @@
           b-button(variant="success" style="position: absolute; right: 0; top: 0; height: 3rem;" @click="addOption")
             fa(icon="plus" fixed-width)
         b-card-text
-          b-table(striped small hover :items="item.items" :fields="fields" show-empty).m-0
+          b-table(striped small hover :items="orderBy(item.items, 'order')" :fields="fields" show-empty).m-0
             template(v-slot:empty="scope")
               b-alert(show).h-100.m-0.text-center {{translate('registry.randomizer.form.optionsAreEmpty')}}
             template(v-slot:cell(name)="data")
@@ -215,7 +215,7 @@ import { NextFunction } from 'express';
 
 import { Validations } from 'vuelidate-property-decorators';
 import { required, minValue } from 'vuelidate/lib/validators';
-import { cloneDeep, isEqual } from 'lodash-es';
+import { cloneDeep, isEqual, orderBy } from 'lodash-es';
 
 import { getSocket } from 'src/panel/helpers/socket';
 import type { RandomizerInterface, RandomizerItemInterface } from 'src/bot/database/entity/randomizer';
@@ -250,6 +250,7 @@ Component.registerHooks([
   }
 })
 export default class randomizerEdit extends Vue {
+  orderBy = orderBy;
   getRandomColor = getRandomColor;
   getContrastColor = getContrastColor;
   psocket: SocketIOClient.Socket = getSocket('/core/permissions');
@@ -340,10 +341,9 @@ export default class randomizerEdit extends Vue {
   }
 
   generateItems(items: Required<RandomizerItemInterface>[], generatedItems: Required<RandomizerItemInterface>[] = []) {
-    const beforeItems = cloneDeep(items);
-    items = cloneDeep(items);
+    const beforeItems = cloneDeep(orderBy(items, 'order'));
+    items = cloneDeep(orderBy(items, 'order'));
     items = items.filter(o => o.numOfDuplicates > 0);
-
 
     const countGroupItems = (item: RandomizerItemInterface, count = 0): number => {
       const child = items.find(o => o.groupId === item.id);
@@ -442,13 +442,18 @@ export default class randomizerEdit extends Vue {
       groupId: null,
       randomizer: undefined,
       randomizerId: undefined,
+      order: this.item.items.length,
     })
   }
 
   rmOption(id: string) {
-    this.item.items = this.item.items.filter(o => o.id !== id);
+    this.item.items = orderBy(this.item.items.filter(o => o.id !== id), 'order');
     for (const item of this.item.items.filter(o => o.groupId !== id)) {
       item.groupId = null;
+    }
+    // reorder
+    for (let i = 0; i < this.item.items.length; i++) {
+      this.item.items[i].order = i;
     }
   }
 

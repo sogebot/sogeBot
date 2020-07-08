@@ -43,7 +43,7 @@
 import type { RandomizerItemInterface, RandomizerInterface } from 'src/bot/database/entity/randomizer';
 
 import { Vue, Component } from 'vue-property-decorator';
-import { cloneDeep, isEqual } from 'lodash-es';
+import { cloneDeep, isEqual, orderBy } from 'lodash-es';
 
 import { gsap } from 'gsap'
 import Winwheel from 'winwheel'
@@ -364,8 +364,8 @@ export default class RandomizerOverlay extends Vue {
   }
 
   generateItems(items: Required<RandomizerItemInterface>[], generatedItems: Required<RandomizerItemInterface>[] = []) {
-    const beforeItems = cloneDeep(items);
-    items = cloneDeep(items);
+    const beforeItems = cloneDeep(orderBy(items, 'order'));
+    items = cloneDeep(orderBy(items, 'order'));
     items = items.filter(o => o.numOfDuplicates > 0);
 
 
