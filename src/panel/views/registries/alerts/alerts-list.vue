@@ -64,6 +64,7 @@
       </template>
       <template v-slot:cell(buttons)="data">
         <div class="text-right">
+          <button-with-icon class="btn-only-icon btn-secondary btn-reverse" icon="clone" @click="clone(data.item)"/>
           <button-with-icon
             :text="'/overlays/alerts/' + data.item.id"
             :href="'/overlays/alerts/' + data.item.id"
@@ -86,8 +87,14 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
+import { v4 as uuid } from 'uuid';
+
 import { getSocket } from 'src/panel/helpers/socket';
 import type { AlertInterface } from 'src/bot/database/entity/alert';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faClone } from '@fortawesome/free-solid-svg-icons';
+library.add(faClone);
 
 @Component({
   components: {
@@ -134,6 +141,77 @@ export default class customVariablesList extends Vue {
       }
       return 0; //default return value (no sorting)
       })
+  }
+
+  clone(item: Required<AlertInterface>) {
+    const mediaMap = new Map() as Map<string, string>;
+    this.socket.emit('alerts::save', {
+      ...item,
+      id: uuid(),
+      updatedAt: Date.now(),
+      name: item.name + ' (clone)',
+      follows: item.follows.map(o => {
+        mediaMap.set(o.soundId, uuid());
+        mediaMap.set(o.imageId, uuid());
+        return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }
+      }),
+      subs: item.subs.map(o => {
+        mediaMap.set(o.soundId, uuid());
+        mediaMap.set(o.imageId, uuid());
+        return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }
+      }),
+      subgifts: item.subgifts.map(o => {
+        mediaMap.set(o.soundId, uuid());
+        mediaMap.set(o.imageId, uuid());
+        return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }
+      }),
+      subcommunitygifts: item.subcommunitygifts.map(o => {
+        mediaMap.set(o.soundId, uuid());
+        mediaMap.set(o.imageId, uuid());
+        return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }
+      }),
+      hosts: item.hosts.map(o => {
+        mediaMap.set(o.soundId, uuid());
+        mediaMap.set(o.imageId, uuid());
+        return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }
+      }),
+      raids: item.raids.map(o => {
+        mediaMap.set(o.soundId, uuid());
+        mediaMap.set(o.imageId, uuid());
+        return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }
+      }),
+      tips: item.tips.map(o => {
+        mediaMap.set(o.soundId, uuid());
+        mediaMap.set(o.imageId, uuid());
+        return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }
+      }),
+      cheers: item.cheers.map(o => {
+        mediaMap.set(o.soundId, uuid());
+        mediaMap.set(o.imageId, uuid());
+        return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }
+      }),
+      resubs: item.resubs.map(o => {
+        mediaMap.set(o.soundId, uuid());
+        mediaMap.set(o.imageId, uuid());
+        return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }
+      }),
+      } as AlertInterface, async (err: string | null, data: AlertInterface) => {
+      if (err) {
+        return console.error(err);
+      }
+
+      for (const mediaId of mediaMap.keys()) {
+        await new Promise(resolve => {
+          this.socket.emit('alerts::cloneMedia', [mediaId, mediaMap.get(mediaId)], (err: string | null) => {
+            if (err) {
+              console.error(err)
+            }
+            resolve();
+          })
+        })
+      }
+      this.refresh();
+    });
   }
 
   linkTo(item: Required<AlertInterface>) {
