@@ -68,8 +68,11 @@
         </div>
       </template>
       <template v-slot:cell(buttons)="data">
-        <a v-bind:href="'#/registry/customVariables/edit/' + data.item.id" class="btn btn-primary btn-block"><fa icon="edit"/> {{ translate('dialog.buttons.edit') }}</a>
-        <button v-if="data.item.type === 'eval'" v-on:click="debouncedRunScript(data.item.id)" class="btn btn-secondary btn-block"><fa icon="cog"/> {{ translate('registry.customvariables.run-script') }}</button>
+        <button-with-icon class="btn-only-icon btn-secondary btn-reverse" icon="clone" @click="clone(data.item)"/>
+        <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/registry/customVariables/edit/' + data.item.id">
+          {{ translate('dialog.buttons.edit') }}
+        </button-with-icon>
+        <button-with-icon v-if="data.item.type === 'eval'" class="btn-only-icon btn-secondary btn-reverse" icon="cog" @click="debouncedRunScript(data.item.id)"/>
       </template>
     </b-table>
   </div>
@@ -79,6 +82,7 @@
 import { Vue, Component } from 'vue-property-decorator';
 import { debounce, orderBy } from 'lodash-es';
 import { getSocket } from 'src/panel/helpers/socket';
+import { v4 as uuid } from 'uuid';
 
 import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
 
@@ -150,7 +154,10 @@ export default class customVariablesList extends Vue {
 
   mounted() {
     this.state.loaded = false;
-    console.log(this.socket);
+    this.refresh();
+  }
+
+  refresh() {
     this.socket.emit('customvariables::list', (err: string | null, data: VariableInterface[]) => {
       if (err) {
         return console.error(err);
@@ -174,6 +181,15 @@ export default class customVariablesList extends Vue {
     } else {
       return null
     }
+  }
+
+  clone(item: VariableInterface) {
+    this.socket.emit('customvariables::save', { ...item, history: [], urls: [], id: uuid(), description: '(clone) of ' + item.variableName, variableName: `$_${Math.random().toString(36).substr(2, 5)}` }, (err: string | null, data: VariableInterface) => {
+      if (err) {
+        console.error(err)
+      }
+      this.refresh();
+    });
   }
 
   runScript(id: string) {
