@@ -89,7 +89,6 @@ export async function announce(messageToAnnounce: string) {
       if (channel.type === 'text') {
         if (id === Discord.sendGeneralAnnounceToChannel || (channel as TextChannel).name === Discord.sendGeneralAnnounceToChannel) {
           const ch = Discord.client.channels.cache.find(o => o.id === id);
-          messageToAnnounce = 'Test message with @soge and @esl_csgo';
           if (ch) {
             // search linked users and change to @<id>
             let match;
