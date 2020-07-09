@@ -1,0 +1,83 @@
+{
+  "urls": "URLs",
+  "generateurl": "Generate new URL",
+  "show-examples": "show CURL examples",
+  "response": {
+    "show": "Show response after POST",
+    "name": "Response after variable set",
+    "default": "Default",
+    "default-placeholder": "Set your bot response",
+    "default-help": "Use $value to get new variable value",
+    "custom": "Custom",
+    "command": "Command"
+  },
+  "useIfInCommand": "Use if you use variable in command. Will return only updated variable without response.",
+  "permissionToChange": "Permission to change",
+  "isReadOnly": "read-only in chat",
+  "isNotReadOnly": "can be changed through chat",
+  "no-variables-found": "No variables found",
+  "additional-info": "Additional info",
+  "run-script": "Run script",
+  "last-run": "Last run at",
+  "variable": {
+    "name": "Variable name",
+    "help": "Variable name must be unique, e.g. $_wins, $_loses, $_top3",
+    "placeholder": "Enter your unique variable name",
+    "error": {
+      "isNotUnique": "Variable must have <strong>unique</strong> name.",
+      "isEmpty": "Variable name must not be empty."
+    }
+  },
+  "description": {
+    "name": "Description",
+    "help": "Optional description",
+    "placeholder": "Enter your optional description"
+  },
+  "type": {
+    "name": "Type",
+    "error": {
+      "isNotSelected": "Please choose a variable type."
+    }
+  },
+  "currentValue": {
+    "name": "Current value",
+    "help": "If type is set to <strong>Evaluated script</strong>, value cannot be manually changed"
+  },
+  "usableOptions": {
+    "name": "Usable options",
+    "placeholder": "Enter, your, options, here",
+    "help": "Options, which can be used with this variable, example: <strong>SOLO, DUO, 3-SQ, SQUAD</strong>",
+    "error": {
+      "atLeastOneValue": "You need to set at least 1 value."
+    }
+  },
+  "scriptToEvaluate": "Script to evaluate",
+  "runScript": {
+    "name": "Run script",
+    "error": {
+      "isNotSelected": "Please choose an option."
+    }
+  },
+  "testCurrentScript": {
+    "name": "Test current script",
+    "help": "Click <strong>Test current script</strong> to see value in <strong>Current value</strong> input"
+  },
+  "history": "History",
+  "historyIsEmpty": "History for this variable is empty!",
+  "warning": "<strong>Warning:</strong> All data of this variable will be discarded!",
+  "choose": "Choose...",
+  "types": {
+    "number": "Number",
+    "text": "Text",
+    "options": "Options",
+    "eval": "Script"
+  },
+  "runEvery": {
+    "isUsed": "When variable is used",
+    "seconds": "Seconds",
+    "minutes": "Minutes",
+    "hours": "Hours",
+    "days": "Days"
+  }
+}
+

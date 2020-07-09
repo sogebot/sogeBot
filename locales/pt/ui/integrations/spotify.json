@@ -1,0 +1,26 @@
+{
+  "settings": {
+    "enabled": "Estado",
+    "songRequests": "Pedidos de músicas",
+    "fetchCurrentSongWhenOffline": {
+      "title": "Buscar a música atual quando a stream estiver offline",
+      "help": "Recomenda-se que isso seja desativado para evitar que atinja os limites da API"
+    },
+    "clientId": "clientId",
+    "clientSecret": "clientSecret",
+    "redirectURI": "redirectURI",
+    "format": {
+      "title": "Formato",
+      "help": "Variáveis disponíveis: $song, $artist, $artists"
+    },
+    "username": "Usuário autorizado",
+    "revokeBtn": "Revogar autorização",
+    "authorizeBtn": "Autorizar usuário",
+    "scopes": "Escopos",
+    "playlistToPlay": {
+      "title": "Endereço da playlist principal do Spotify",
+      "help": "Se definido, após a solicitação concluída, esta playlist continuará"
+    },
+    "continueOnPlaylistAfterRequest": "Continuar tocando na playlist após solicitação de música"
+  }
+}

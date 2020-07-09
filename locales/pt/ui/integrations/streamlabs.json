@@ -1,0 +1,14 @@
+{
+  "settings": {
+    "enabled": "Estado",
+    "socketToken": {
+      "title": "Token Secreto",
+      "help": "Obtenha seu token secreto em: streamlabs dashboard API settings->API tokens->Your Socket API Token"
+    },
+    "accessToken": {
+      "title": "Token de acesso",
+      "help": "Obtenha seu token de acesso em https://www.sogebot.xyz/integrations/#StreamLabs"
+    },
+    "accessTokenBtn": "Gerador de token de acesso StreamLabs"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "name": "Assalto",
+  "settings": {
+    "enabled": "Estado",
+    "showMaxUsers": "Máximo de usuários a exibir no pagamento",
+    "copsCooldownInMinutes": {
+      "title": "Intervalo entre assaltos",
+      "help": "Minutos"
+    },
+    "entryCooldownInSeconds": {
+      "title": "Tempo para entrar em assalto",
+      "help": "Segundos"
+    },
+    "started": "Mensagem de inicio do assalto",
+    "nextLevelMessage": "Mensagem quando o próximo nível for atingido",
+    "maxLevelMessage": "Mensagem quando o nível máximo for atingido",
+    "copsOnPatrol": "Resposta do bot quando o assalto está no intervalo",
+    "copsCooldown": "Anúncio do bot quando o assalto pode ser iniciado",
+    "singleUserSuccess": "Mensagem de sucesso para um usuário",
+    "singleUserFailed": "Mensagem de falha para um usuário",
+    "noUser": "Mensagem se nenhum usuário participou"
+  },
+  "message": "Mensagem",
+  "winPercentage": "Porcentagem de Vitória",
+  "payoutMultiplier": "Multiplicador de pagamento",
+  "maxUsers": "Máximo de usuários por level",
+  "percentage": "Porcentagem",
+  "noResultsFound": "Nenhum resultado foi encontrado. Clique no botão abaixo para adicionar um novo resultado.",
+  "noLevelsFound": "Nenhum level encontrado. Clique no botão abaixo para adicionar um novo level."
+}

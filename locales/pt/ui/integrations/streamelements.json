@@ -1,0 +1,9 @@
+{
+  "settings": {
+    "enabled": "Estado",
+    "jwtToken": {
+      "title": "Token JWT",
+      "help": "Obtenha o token JWT em: StreamElements dashboard settings->show secrets"
+    }
+  }
+}

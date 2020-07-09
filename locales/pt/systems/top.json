@@ -1,0 +1,11 @@
+{
+  "time": "Top $amount (tempo assistido): ",
+  "tips": "Top $amount (doações): ",
+  "points": "Top $amount (pontos): ",
+  "messages": "Top $amount (mensagens): ",
+  "followage": "Top $amount (seguidores antigos): ",
+  "subage": "Top $amount (subscribers antigos): ",
+  "submonths": "Top $amount (tempo de sub): ",
+  "bits": "Top $amount (bits): ",
+  "gifts": "Top $amount (doadores de sub): "
+}

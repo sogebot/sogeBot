@@ -1,0 +1,13 @@
+{
+  "settings": {
+    "enabled": "Estado",
+    "cooldown": "Intervalo",
+    "timeout": {
+      "title": "Duração de intervalo",
+      "help": "Segundos"
+    },
+    "bypassCooldownByOwnerAndMods": "Ignorar intervalo dos proprietários e moderadores",
+    "winnerWillGet": "Quantos pontos serão adicionados na vitória",
+    "loserWillLose": "Quantos pontos serão removidos na derrota"
+  }
+}

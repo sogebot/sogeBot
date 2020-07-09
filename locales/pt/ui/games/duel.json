@@ -1,0 +1,12 @@
+{
+  "settings": {
+    "enabled": "Estado",
+    "cooldown": "Intervalo",
+    "duration": {
+      "title": "Duração",
+      "help": "Minutos"
+    },
+    "minimalBet": "Aposta mínima",
+    "bypassCooldownByOwnerAndMods": "Ignorar intervalo dos proprietários e moderadores"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "settings": {
+    "enabled": "Estado",
+    "guild": "Servidor",
+    "listenAtChannels": "Escutar comandos neste canal",
+    "sendOnlineAnnounceToChannel": "Enviar anúncio online para este canal",
+    "sendGeneralAnnounceToChannel": "Enviar anúncios gerais para este canal",
+    "deleteMessagesAfterWhile": "Excluir mensagem após um tempo",
+    "clientId": "ClientId",
+    "token": "Token",
+    "joinToServerBtn": "Clique para adicionar o bot no seu servidor",
+    "cannotJoinToServerBtn": "Defina o token, e o clientId para poder adicionar o bot no seu servidor",
+    "noChannelSelected": "nenhum canal selecionado",
+    "noRoleSelected": "nenhuma função selecionada",
+    "noGuildSelected": "nenhum servidor selecionado",
+    "noGuildSelectedBox": "Selecione o servidor que o bot irá funcionar, e você conseguirá ver mais opções"
+  }
+}

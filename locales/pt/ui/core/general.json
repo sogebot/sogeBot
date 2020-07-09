@@ -1,0 +1,10 @@
+{
+  "settings": {
+    "lang": "Idioma do bot",
+    "gracefulExitEachXHours": {
+      "title": "Saída inteligente a cada X horas",
+      "help": "0 - desativado"
+    },
+    "shouldGracefulExitHelp": "Ativar a saída inteligente é <strong>recomendado</strong> se o seu bot estiver rodando sem parar no servidor. Você deve ter o bot rodando em 'pm2' (ou serviço similar), ou garantir que o bot seja reiniciado automaticamente quando fechado. o Bot <strong>não</strong> irá fechar quando a stream estiver online."
+  }
+}

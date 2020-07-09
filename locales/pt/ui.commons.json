@@ -1,0 +1,18 @@
+{
+  "additional-settings": "Additional settings",
+  "never": "never",
+  "reset": "reset",
+  "moveUp": "move up",
+  "moveDown": "move down",
+  "stop-if-executed": "stop, if executed",
+  "continue-if-executed": "continue, if executed",
+  "generate": "Generate",
+  "thumbnail": "Thumbnail",
+  "yes": "Yes",
+  "no": "No",
+  "show-more": "Show more",
+  "show-less": "Show less",
+  "allowed": "Allowed",
+  "disallowed": "Disallowed",
+  "back": "Back"
+}

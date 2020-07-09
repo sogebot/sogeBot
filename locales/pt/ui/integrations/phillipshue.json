@@ -1,0 +1,12 @@
+{
+  "settings": {
+    "enabled": "Estado",
+    "user": "Usuário",
+    "port": "Porta",
+    "host": {
+      "title": "Servidor",
+      "help": "é obrigatório ter PhillipsHue na mesma rede que o seu bot"
+    },
+    "timeout": "Intervalo"
+  }
+}

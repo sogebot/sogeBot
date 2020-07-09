@@ -1,0 +1,5 @@
+{
+  "error": "$sender, $game não encontrado no banco de dados ou é um jogo multijogador.",
+  "game": "$sender, $game | Principal$doneMain: $currentMain/$hltbMainh - $percentMain% | Completo$doneCompletionist: $currentCompletionist/$hltbCompletionisth - $percentCompletionist%",
+  "done": "(concluído)"
+}

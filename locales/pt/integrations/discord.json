@@ -1,0 +1,11 @@
+{
+  "all-your-links-were-deleted": "todas as suas contas foram desvinculadas",
+  "all-your-links-were-deleted-with-sender": "$sender, conta desvinculada",
+  "this-account-was-linked-with": "$sender, esta conta foi vinculada com $discordTag.",
+  "invalid-or-expired-token": "$sender, token inválido ou expirado.",
+  "help-message": "$sender, para vincular sua conta no Discord: 1. Vá até o Discord e envie '!link' no canal bot. | 2. Aguarde a resposta do bot | 3. Vá ate o chat da twitch, e envie o comando que você recebeu no privado do bot.",
+  "started-at": "Iniciou em",
+  "streamed-at": "Transmitido em",
+  "link-whisper": "Olá $tag, para vincular essa conta do Discord com sua conta do Twitch no canal $broadcaster, acesse https://twitch.tv/$broadcaster, faça o login na sua conta e envie este comando no chat \n\n\t\t`!link $id`\n\nOBS: expira em 10 minutos.",
+  "check-your-dm": "verifique seu privado para vincular sua conta."
+}

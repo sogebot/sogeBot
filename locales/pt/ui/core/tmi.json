@@ -1,0 +1,10 @@
+{
+  "settings": {
+    "ignorelist": "Lista de ignorados (ID ou usuário)",
+    "globalIgnoreListExclude": "Excluir da lista global de ignorados",
+    "showWithAt": "Mostrar usuários com @",
+    "sendWithMe": "Enviar mensagens com /me",
+    "mute": "Bot mutado",
+    "whisperListener": "Aceitar comandos no privado"
+  }
+}
