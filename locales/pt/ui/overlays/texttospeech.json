@@ -7,7 +7,7 @@
     },
     "volume": "Volume",
     "rate": "Rate",
-    "pitch": "Pitch",
-    "triggerTTSByHighlightedMessage": "Text to Speech will be triggered by highlighted message"
+    "pitch": "Tom",
+    "triggerTTSByHighlightedMessage": "Texto para fala será acionado pela mensagem destacada"
   }
 }
