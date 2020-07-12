@@ -18,6 +18,7 @@ import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
 import permissions from '../permissions';
 import { translate } from '../translate';
 import customvariables from '../customvariables';
+import customcommands from './customcommands';
 
 /*
  * !alias                                              - gets an info about alias usage
@@ -138,6 +139,10 @@ class Alias extends System {
           responses.forEach(r => {
             parserReply(r.response, { sender: r.sender, attr: r.attr });
           });
+
+          // go through custom commands
+          await customcommands.run({ ...opts, message: response });
+
           incrementCountOfCommandUsage(alias.alias);
         } else {
           return false;
