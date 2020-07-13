@@ -2,7 +2,7 @@
   <div class="input-group">
     <div v-if="title" class="input-group-prepend">
       <span class="input-group-text">
-        <template v-if="typeof title === 'string'">{{ title }}</template>
+        <template v-if="typeof title === 'string'">{{ translatedTitle }}</template>
         <template v-else>
           {{ title.title }}
           <small class="text-info pl-1" data-toggle="tooltip" data-html="true" :title="title.help">[?]</small>
@@ -30,6 +30,10 @@ export default class toggleEnable extends Vue {
   @Prop() readonly disabled !: boolean;
 
   currentValue = this.value;
+
+  get translatedTitle() {
+    return this.title.includes('.settings.') ? this.translate(this.title) : this.title
+  }
 
   update() {
     this.currentValue = !this.currentValue
