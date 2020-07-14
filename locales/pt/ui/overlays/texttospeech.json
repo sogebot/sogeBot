@@ -1,13 +1,13 @@
 {
   "settings": {
-    "responsiveVoiceKeyNotSet": "You haven't properly set <a href='#/settings/integrations/responsivevoice'>ResponsiveVoice key</a>",
+    "responsiveVoiceKeyNotSet": "Você não configurou corretamente a <a href='#/settings/integrations/responsivevoice'>chave ResponsiveVoice</a>",
     "voice": {
-      "title": "Voice",
-      "help": "If voices are not properly loading after ResponsiveVoice key update, try to refresh browser"
+      "title": "Voz",
+      "help": "Se as vozes não estiverem carregando corretamente após a atualização da chave ResponsiveVoice, tente atualizar o navegador"
     },
     "volume": "Volume",
     "rate": "Rate",
-    "pitch": "Pitch",
-    "triggerTTSByHighlightedMessage": "Text to Speech will be triggered by highlighted message"
+    "pitch": "Tom",
+    "triggerTTSByHighlightedMessage": "Texto para fala será acionado pela mensagem destacada"
   }
 }
