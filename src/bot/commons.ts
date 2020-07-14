@@ -103,7 +103,7 @@ export async function announce(messageToAnnounce: string) {
                 }
               }
             }
-            //(ch as TextChannel).send(messageToAnnounce);
+            (ch as TextChannel).send(messageToAnnounce);
             chatOut(`#${(ch as TextChannel).name}: ${messageToAnnounce} [${Discord.client.user?.tag}]`);
           }
         }
