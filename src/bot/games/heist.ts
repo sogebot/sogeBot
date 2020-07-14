@@ -4,7 +4,7 @@ import { isMainThread } from '../cluster';
 import Expects from '../expects.js';
 import Game from './_interface';
 import { command, settings, shared, ui } from '../decorators';
-import { announce, getLocalizedName } from '../commons.js';
+import { announce, getLocalizedName, prepare } from '../commons.js';
 import { warning } from '../helpers/log.js';
 
 import { getRepository } from 'typeorm';
@@ -229,7 +229,7 @@ class Heist extends Game {
       this.startedAt = Date.now(); // set startedAt
       if (Date.now() - (this.lastAnnouncedStart) >= 60000) {
         this.lastAnnouncedStart = Date.now();
-        announce(translate('games.heist.entryMessage').replace('$command', opts.command));
+        announce(prepare('games.heist.entryMessage', { command: opts.command, sender: opts.sender }));
       }
     }
 
@@ -277,12 +277,14 @@ class Heist extends Game {
       if (this.lastAnnouncedLevel !== level.name) {
         this.lastAnnouncedLevel = level.name;
         if (nextLevel) {
-          return [{ response: this.nextLevelMessage
+          announce(this.nextLevelMessage
             .replace('$bank', level.name)
-            .replace('$nextBank', nextLevel.name), ...opts }];
+            .replace('$nextBank', nextLevel.name));
+          return [];
         } else {
-          return [{ response: this.maxLevelMessage
-            .replace('$bank', level.name), ...opts }];
+          announce(this.maxLevelMessage
+            .replace('$bank', level.name));
+          return [];
         }
       }
     }
