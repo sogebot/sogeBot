@@ -37,7 +37,7 @@
     "jquery-migrate": "3.3.1",
     "js-beautify": "1.11.0",
     "jsonwebtoken": "8.5.1",
-    "lodash": "4.17.15",
+    "lodash": "4.17.19",
     "mathjs": "7.0.2",
     "mkdir": "0.0.2",
     "moment": "2.27.0",
