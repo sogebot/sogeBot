@@ -287,7 +287,7 @@ class TMI extends Core {
             });
 
             if (message.tags['message-type'] === 'action') {
-              events.fire('action', { username: message.tags.username?.toLowerCase() });
+              events.fire('action', { username: message.tags.username?.toLowerCase(), source: 'twitch' });
             }
           }
         } else {
@@ -814,9 +814,9 @@ class TMI extends Core {
 
         api.followerUpdatePreCheck(sender.username);
 
-        events.fire('keyword-send-x-times', { username: sender.username, message: message });
+        events.fire('keyword-send-x-times', { username: sender.username, message: message, source: 'twitch' });
         if (message.startsWith('!')) {
-          events.fire('command-send-x-times', { username: sender.username, message: message });
+          events.fire('command-send-x-times', { username: sender.username, message: message, source: 'twitch' });
         } else if (!message.startsWith('!') && api.isStreamOnline) {
           getRepository(User).increment({ userId: sender.userId }, 'messages', 1);
         }
