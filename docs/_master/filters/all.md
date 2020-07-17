@@ -4,6 +4,9 @@
 
 `$sender` - returns username of viewer, who triggered this message
 
+`$source` - returns source of this message (twitch or discord), if comes from
+bot it is twitch by default
+
 `$price` - returns command price
 
 `$game` - return current game

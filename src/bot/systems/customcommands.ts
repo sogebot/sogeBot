@@ -435,6 +435,7 @@ class CustomCommands extends System {
     const customVariables = customvariables.getAll();
     const context = {
       _: _,
+      $source: typeof opts.sender.discord === 'undefined' ? 'twitch' : 'discord',
       $sender: opts.sender.username,
       $is,
       $rank,
