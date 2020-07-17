@@ -28,6 +28,7 @@ import moment from 'moment';
 import general from '../general';
 import { isDbConnected } from '../helpers/database';
 import permissions from '../permissions';
+import events from '../events';
 
 const timezone = (process.env.TIMEZONE ?? 'system') === 'system' || !process.env.TIMEZONE ? moment.tz.guess() : process.env.TIMEZONE;
 
@@ -460,6 +461,12 @@ class Discord extends Integration {
           badges: {}, color: '',  displayName: '', emoteSets: [], emotes: [], userId: link.userId, username: user.username, userType: 'viewer',
           mod: 'false', subscriber: 'false', turbo: 'false', discord: { author, channel },
         };
+
+        events.fire('keyword-send-x-times', { username: user.username, message: content, source: 'discord' });
+        if (content.startsWith('!')) {
+          events.fire('command-send-x-times', { username: user.username, message: content, source: 'discord' });
+        }
+
         parser.message = content;
         parser.process().then(responses => {
           if (responses) {
