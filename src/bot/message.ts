@@ -43,7 +43,7 @@ class Message {
     this.message = Entities.decode(message);
   }
 
-  async global (opts:any) {
+  async global (opts: { escape?: string, sender?: CommandOptions['sender'] }) {
     const variables = {
       game: api.stats.currentGame,
       language: api.stats.language,
@@ -54,6 +54,7 @@ class Message {
       subscribers: api.stats.currentSubscribers,
       bits: api.stats.currentBits,
       title: api.stats.currentTitle,
+      source: opts.sender && typeof opts.sender.discord !== 'undefined' ? 'discord' : 'twitch',
     };
     for (const variable of Object.keys(variables)) {
       const regexp = new RegExp(`\\$${variable}`, 'g');
@@ -849,7 +850,7 @@ class Message {
       },
     };
 
-    await this.global({});
+    await this.global({ sender: attr.sender });
 
     await this.parseMessageEach(price);
     await this.parseMessageEach(info);
