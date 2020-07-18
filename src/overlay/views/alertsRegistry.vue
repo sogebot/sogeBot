@@ -11,7 +11,11 @@
         </audio>
         <div v-if="runningAlert.isShowing" class="center" :class="['layout-' + runningAlert.alert.layout]">
           <template v-if="!runningAlert.alert.enableAdvancedMode">
-            <img :src="'/registry/alerts/' + runningAlert.alert.imageId" :class="{ center: runningAlert.alert.layout === '3', ['animate__' + runningAlert.animation]: true }" class="animate__slow animate__animated"/>
+            <video ref="video" v-if="typeOfMedia.get(runningAlert.alert.imageId) === 'video'" style="max-width:500px;" :class="{ center: runningAlert.alert.layout === '3', ['animate__' + runningAlert.animation]: true }" class="animate__slow animate__animated w-100 pb-3">
+              <source :src="'/registry/alerts/' + runningAlert.alert.imageId" type="video/webm">
+              Your browser does not support the video tag.
+            </video>
+            <img v-else :src="'/registry/alerts/' + runningAlert.alert.imageId" :class="{ center: runningAlert.alert.layout === '3', ['animate__' + runningAlert.animation]: true }" class="animate__slow animate__animated"/>
             <div
               v-if="runningAlert.isShowingText"
               :class="{
@@ -121,6 +125,7 @@ export default class AlertsRegistryOverlays extends Vue {
   responsiveAPIKey: string | null = null;
 
   preparedAdvancedHTML: string = '';
+  typeOfMedia: Map<string, 'image' | 'video'> = new Map();
 
   state: {
     loaded: number,
@@ -269,6 +274,13 @@ export default class AlertsRegistryOverlays extends Vue {
         if (this.runningAlert.showAt <= Date.now() && !this.runningAlert.isShowing) {
           console.debug('showing image');
           this.runningAlert.isShowing = true;
+          this.$nextTick(() => {
+            console.log(this.$refs.video);
+            if (this.$refs.video && this.runningAlert) {
+              (this.$refs.video as HTMLMediaElement).volume = this.runningAlert.alert.soundVolume / 100;
+              (this.$refs.video as HTMLMediaElement).play();
+            }
+          })
         }
 
         if (this.runningAlert.showTextAt <= Date.now() && !this.runningAlert.isShowingText) {
@@ -525,6 +537,33 @@ export default class AlertsRegistryOverlays extends Vue {
               }
               if (!isEqual(data, this.data)) {
                 this.data = data;
+
+                // determinate if image is image or video
+                for (const event of [
+                  ...this.data.subcommunitygifts,
+                  ...this.data.hosts,
+                  ...this.data.raids,
+                  ...this.data.tips,
+                  ...this.data.cheers,
+                  ...this.data.resubs,
+                  ...this.data.subs,
+                  ...this.data.follows,
+                  ...this.data.subgifts
+                ]) {
+                  fetch('/registry/alerts/' + event.imageId)
+                    .then(response => {
+                      if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                      }
+                      return response.blob();
+                    })
+                    .then(myBlob => {
+                      this.typeOfMedia.set(event.imageId, myBlob.type.startsWith('video') ? 'video' : 'image');
+                    })
+                    .catch(error => {
+                      console.error('There has been a problem with your fetch operation:', error);
+                    });
+                }
 
                 for (const [lang, isEnabled] of Object.entries(this.data.loadStandardProfanityList)) {
                   if (isEnabled) {
