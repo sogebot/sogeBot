@@ -392,7 +392,7 @@
         "latestCheer": "Poslední Cheer (uživatel)",
         "version": "Verze bota",
         "haveParam": "Příkaz má parametr? (bool)",
-        "source": "Current source (twitch or discord)",
+        "source": "Aktuální zdroj (twitch nebo discord)",
         "is": {
           "moderator": "Je uživatel mod? (bool)",
           "subscriber": "Je uživatel sub? (bool)",
@@ -750,7 +750,7 @@
     "timeout": "uživatel dostal timeout",
     "create-a-new-event-listener": "Vytvoř nový event listener",
     "send-twitter-message": "poslat zprávu na twitter",
-    "send-chat-message": "send a twitch chat message",
+    "send-chat-message": "odeslat zprávu na twitch chat",
     "send-whisper": "poslat whisper",
     "run-command": "spusť příkaz",
     "do-nothing": "--- nedělat nic ---",
