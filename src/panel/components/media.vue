@@ -1,7 +1,34 @@
 <template>
   <div :key="createdAt + id">
     <b-card
-      v-if="type === 'image'"
+      v-if="type === 'image' && b64data.startsWith('data:video')"
+      :style="{ height: isUploading ? '150px' : 'inherit'}"
+    >
+      <loading no-margin slow v-if="isUploading"/>
+      <video :ref="createdAt + id" class="w-100 pb-3" style="max-width:500px;">
+        <source :src="b64data" type="video/webm">
+        Your browser does not support the video tag.
+      </video>
+      <b-card-text class="absolute">
+        <b-button squared variant="outline-danger" class="border-0" @click="removeMedia()" v-if="b64data.length > 0">
+          <fa icon="times" class="mr-1"/> {{ translate('dialog.buttons.delete') }}
+        </b-button>
+        <b-button squared variant="outline-primary" class="border-0" v-if="b64data.length > 0" @click="$refs[createdAt + id].play()">
+          <fa icon="play" class="mr-1"/> {{ translate('dialog.buttons.play') }} ({{duration}}s)
+        </b-button>
+        <b-button squared variant="outline-dark" class="border-0" @click="$refs.uploadImage.click()">
+          <fa icon="upload" class="mr-1"/> {{ translate('dialog.buttons.upload.idle') }}
+        </b-button>
+        <input
+          class="d-none"
+          type="file"
+          ref="uploadImage"
+          @change="filesChange($event.target.files)"
+          accept="image/*, video/webm"/>
+      </b-card-text>
+    </b-card>
+    <b-card
+      v-else-if="type === 'image'"
       overlay
       :img-src="!isUploading ? b64data : ''"
       :style="{ height: isUploading ? '150px' : 'inherit'}"
@@ -19,7 +46,7 @@
           type="file"
           ref="uploadImage"
           @change="filesChange($event.target.files)"
-          accept="image/*"/>
+          accept="image/*, video/webm"/>
       </b-card-text>
     </b-card>
     <b-card v-else-if="type === 'audio'">
@@ -80,7 +107,7 @@ export default class MediaForm extends Vue {
   createdAt = 0;
 
   setVolume() {
-    if (this.type === 'audio' && this.b64data.length > 0) {
+    if ((this.type === 'audio' || (this.type === 'image' && this.b64data.startsWith('data:video/webm'))) && this.b64data.length > 0) {
       if (typeof this.$refs[this.createdAt + this.id] === 'undefined') {
         console.debug(`Retrying setVolume ${this.id}`);
         setTimeout(() => this.setVolume(), 100);
@@ -101,25 +128,24 @@ export default class MediaForm extends Vue {
       console.log(data)
       console.groupEnd();
       this.b64data = data.sort((a,b) => a.chunkNo - b.chunkNo).map(o => o.b64data).join('');
+      this.startInterval();
     });
   }
 
-  mounted() {
-    if (this.type === 'audio') {
-      this.interval = window.setInterval(() => {
-        if (this.b64data.length === 0) {
-          this.duration = 0;
-          return;
-        }
-        this.setVolume();
-        this.duration = (this.$refs[this.createdAt + '' + this.id] as HTMLAudioElement).duration;
-        if (isNaN(this.duration)) {
-          this.duration = 0;
-        } else {
-          this.duration = Math.floor(this.duration * 10) / 10;
-        }
-      }, 500)
-    };
+  startInterval() {
+    this.interval = window.setInterval(() => {
+      if (this.b64data.length === 0) {
+        this.duration = 0;
+        return;
+      }
+      this.setVolume();
+      this.duration = (this.$refs[this.createdAt + '' + this.id] as HTMLAudioElement).duration;
+      if (isNaN(this.duration)) {
+        this.duration = 0;
+      } else {
+        this.duration = Math.floor(this.duration * 10) / 10;
+      }
+    }, 500)
   }
 
   beforeDestroy() {
