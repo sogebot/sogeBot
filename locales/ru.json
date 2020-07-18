@@ -392,6 +392,7 @@
         "latestCheer": "Последний Cheer (имя пользователя)",
         "version": "Версия бота",
         "haveParam": "Есть параметр команды? (bool)",
+        "source": "Current source (twitch or discord)",
         "is": {
           "moderator": "Пользователь модератор? (bool)",
           "subscriber": "Пользователь сабскрайбер? (bool)",
@@ -749,7 +750,7 @@
     "timeout": "пользователь получил таймаут",
     "create-a-new-event-listener": "Создать новый обработчик событий",
     "send-twitter-message": "запостить сообщение в твиттер",
-    "send-chat-message": "отправить сообщение в чат",
+    "send-chat-message": "send a twitch chat message",
     "send-whisper": "отправить сообщение в висперсы",
     "run-command": "запустить команду",
     "do-nothing": "--- ничего не делать ----",

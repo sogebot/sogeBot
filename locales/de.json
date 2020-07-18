@@ -392,6 +392,7 @@
         "latestCheer": "Neuester Cheer (Benutzername)",
         "version": "Bot Version",
         "haveParam": "Have command parameter? (bool)",
+        "source": "Current source (twitch or discord)",
         "is": {
           "moderator": "Ist Benutzer Mod? (Bool)",
           "subscriber": "Ist Benutzer Sub? (Bool)",
@@ -749,7 +750,7 @@
     "timeout": "der Benutzer hatte einen Timeout",
     "create-a-new-event-listener": "Neuen Ereignis-Listener erstellen",
     "send-twitter-message": "Eine Twitter-Nachricht veröffentlichen",
-    "send-chat-message": "Chat-Nachricht senden",
+    "send-chat-message": "send a twitch chat message",
     "send-whisper": "einen Whisper senden",
     "run-command": "Einen Befehl ausführen",
     "do-nothing": "--- nichts tun ---",
