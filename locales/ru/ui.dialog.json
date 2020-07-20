@@ -18,7 +18,7 @@
   "font": {
     "shadowShiftRight": "Сдвиг вправо",
     "shadowShiftDown": "Сдвиг вниз",
-    "shadowBlur": "Blur",
+    "shadowBlur": "Размытие",
     "shadowOpacity": "Прозрачность",
     "color": "Цвет"
   },
