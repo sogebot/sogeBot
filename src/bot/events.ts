@@ -102,7 +102,7 @@ class Events extends Core {
   }
 
   public async fire(eventId: string, attributes: Events.Attributes): Promise<void> {
-    attributes = _.clone(attributes) || {};
+    attributes = _.cloneDeep(attributes) || {};
 
     if (attributes.username !== null && typeof attributes.username !== 'undefined') {
       const user = attributes.userId
@@ -161,8 +161,8 @@ class Events extends Core {
       },
     }))) {
       const [shouldRunByFilter, shouldRunByDefinition] = await Promise.all([
-        this.checkFilter(event, attributes),
-        this.checkDefinition(_.clone(event), attributes),
+        this.checkFilter(event, _.cloneDeep(attributes)),
+        this.checkDefinition(_.clone(event), _.cloneDeep(attributes)),
       ]);
       if ((!shouldRunByFilter || !shouldRunByDefinition)) {
         continue;
@@ -173,7 +173,7 @@ class Events extends Core {
         if (isOperationSupported) {
           const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.name);
           if (foundOp) {
-            foundOp.fire(operation.definitions, attributes);
+            foundOp.fire(operation.definitions, _.cloneDeep(attributes));
           }
         }
       }
