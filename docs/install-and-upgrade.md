@@ -41,7 +41,7 @@
 
 - Download latest release from [GitHub sogeBot release page](https://github.com/sogehige/sogeBot/releases)
 - Set your [database environment](configuration/database)
-- if you want to use `!title` and `!game` you need to add bot as channel editor
+- Add bot as channel editor
   in [Permissions settings](http://twitch.tv/dashboard/permissions) on Twitch
 - before starting a bot, you need to install npm dependencies
 
