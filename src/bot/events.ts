@@ -27,6 +27,7 @@ import emotes from './overlays/emotes';
 import custom_variables from './widgets/customvariables';
 import currency from './currency';
 import { isDbConnected } from './helpers/database';
+import { addUIError } from './panel';
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
@@ -222,21 +223,45 @@ class Events extends Core {
     const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/channels/commercial`;
 
-    const token = await oauth.botAccessToken;
+    const token = await oauth.broadcasterAccessToken;
+    if (!oauth.broadcasterCurrentScopes.includes('channel:edit:commercial')) {
+      warning('Missing Broadcaster oAuth scope channel:edit:commercial to change game or title');
+      addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope channel:edit:commercial to change game or title' });
+      return;
+    }
     if (token === '') {
+      warning('Missing Broadcaster oAuth to change game or title');
+      addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth to change game or title' });
       return;
     }
 
-    await axios({
-      method: 'post',
-      url,
-      data: { broadcaster_id: String(cid), length: operation.durationOfCommercial },
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Client-ID': oauth.botClientId,
-        'Content-Type': 'application/json',
-      },
-    });
+    try {
+      const request = await axios({
+        method: 'post',
+        url,
+        data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) },
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.broadcasterClientId,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      // save remaining api calls
+      api.calls.broadcaster.remaining = request.headers['ratelimit-remaining'];
+      api.calls.broadcaster.refresh = request.headers['ratelimit-reset'];
+      api.calls.broadcaster.limit = request.headers['ratelimit-limit'];
+
+      ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: api.calls.broadcaster });
+      events.fire('commercial', { duration: Number(operation.durationOfCommercial) });
+    } catch (e) {
+      error(`API: ${url} - ${e.stack}`);
+      if (e.isAxiosError) {
+        ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response.status, data: e.response.data });
+      } else {
+        ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response.status, data: e.stack });
+      }
+    }
   }
 
   public async fireEmoteExplosion(operation: Events.OperationDefinitions) {
