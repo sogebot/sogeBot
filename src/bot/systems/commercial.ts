@@ -7,12 +7,14 @@ import { permission } from '../helpers/permissions';
 import { command, default_permission, helper } from '../decorators';
 import System from './_interface';
 import { getOwner } from '../commons';
-import { error } from '../helpers/log';
+import { error, warning } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import oauth from '../oauth';
 import events from '../events';
 import { ioServer } from '../helpers/panel';
 import tmi from '../tmi';
+import { addUIError } from '../panel';
+import api from '../api';
 
 /*
  * !commercial                        - gets an info about alias usage
@@ -61,33 +63,49 @@ class Commercial extends System {
     if (_.includes([30, 60, 90, 120, 150, 180], commercial.duration)) {
       const url = `https://api.twitch.tv/helix/channels/commercial`;
 
-      const token = await oauth.botAccessToken;
+      const token = oauth.broadcasterAccessToken;
+      if (!oauth.broadcasterCurrentScopes.includes('channel:edit:commercial')) {
+        warning('Missing Broadcaster oAuth scope channel:edit:commercial to change game or title');
+        addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope channel:edit:commercial to change game or title' });
+        return;
+      }
       if (token === '') {
+        warning('Missing Broadcaster oAuth to change game or title');
+        addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth to change game or title' });
         return;
       }
 
       try {
-        await axios({
+        const request = await axios({
           method: 'post',
           url,
           data: { broadcaster_id: String(cid), length: commercial.duration },
           headers: {
             'Authorization': 'Bearer ' + token,
-            'Client-ID': oauth.botClientId,
+            'Client-ID': oauth.broadcasterClientId,
             'Content-Type': 'application/json',
           },
         });
 
+        // save remaining api calls
+        api.calls.broadcaster.remaining = request.headers['ratelimit-remaining'];
+        api.calls.broadcaster.refresh = request.headers['ratelimit-reset'];
+        api.calls.broadcaster.limit = request.headers['ratelimit-limit'];
+
+        ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: api.calls.broadcaster });
         events.fire('commercial', { duration: commercial.duration });
         if (!_.isNil(commercial.message)) {
           return [{ response: 'commercial.message', ...opts }];
         }
       } catch (e) {
         error(`API: ${url} - ${e.stack}`);
-        if (ioServer) {
-          ioServer.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'kraken', endpoint: url, code: e.response.status, data: e.stack });
+        if (e.isAxiosError) {
+          ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response.status, data: e.response.data, remaining: api.calls.broadcaster });
+        } else {
+          ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: api.calls.broadcaster });
         }
       }
+      return [];
     } else {
       return [{ response: '$sender, available commercial duration are: 30, 60, 90, 120, 150 and 180', ...opts }];
     }

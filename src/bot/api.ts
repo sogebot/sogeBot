@@ -1051,7 +1051,11 @@ class API extends Core {
       warning(`Couldn't find name of game for gid ${id} - fallback to ${this.stats.currentGame}`);
       error(`API: ${url} - ${e.stack}`);
       if (isMainThread) {
-        ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+        if (e.isAxiosError) {
+          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+        } else {
+          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+        }
       }
       return this.stats.currentGame;
     }
@@ -1103,7 +1107,11 @@ class API extends Core {
       warning(`Couldn't find name of game for name ${name} - fallback to ${this.stats.currentGame}`);
       error(`API: ${url} - ${e.stack}`);
       if (isMainThread) {
-        ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+        if (e.isAxiosError) {
+          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+        } else {
+          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+        }
       }
       return null;
     }
@@ -1545,10 +1553,16 @@ class API extends Core {
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: request.status, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
     } catch (e) {
       error(`API: ${url} - ${e.stack}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+      if (isMainThread) {
+        if (e.isAxiosError) {
+          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'helix', endpoint: url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+        } else {
+          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+        }
+      }
       return;
     }
 
@@ -1621,7 +1635,13 @@ class API extends Core {
       }
 
       error(`API: ${url} - ${e.stack}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
+      if (isMainThread) {
+        if (e.isAxiosError) {
+          ioServer?.emit('api.stats', { method: 'POST', timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: url, code: e.response.status ?? 'n/a', data: e.response.data });
+        } else {
+          ioServer?.emit('api.stats', { method: 'POST', timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
+        }
+      }
     }
     return { state: true };
   }
@@ -1690,7 +1710,13 @@ class API extends Core {
       }
 
       error(`API: ${url} - ${e.stack}`);
-      ioServer?.emit('api.stats', { method: 'POST', timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
+      if (isMainThread) {
+        if (e.isAxiosError) {
+          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: url, code: e.response.status ?? 'n/a', data: e.response.data });
+        } else {
+          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
+        }
+      }
       return;
     }
     const clipId = request.data.data[0].id;
@@ -1728,7 +1754,7 @@ class API extends Core {
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: request.status, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
     } catch (e) {
       if (e.errno === 'ECONNRESET' || e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT') {
         return;
@@ -1743,8 +1769,13 @@ class API extends Core {
 
       if (logError) {
         error(`API: ${url} - ${e.stack}`);
-
-        ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
+        if (isMainThread) {
+          if (e.isAxiosError) {
+            ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: url, code: e.response.status ?? 'n/a', data: e.response.data });
+          } else {
+            ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
+          }
+        }
       }
       return;
     }
@@ -1793,7 +1824,13 @@ class API extends Core {
       }
 
       error(`API: ${url} - ${e.stack}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+      if (isMainThread) {
+        if (e.isAxiosError) {
+          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+        } else {
+          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+        }
+      }
       return null;
     }
 
@@ -1914,11 +1951,11 @@ class API extends Core {
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: request.status, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
       return request.data;
     } catch (e) {
       error(`${url} - ${e.message}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: `${e.status} ${get(e, 'body.message', e.statusText)}`, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: url, code: `${e.status} ${get(e, 'body.message', e.statusText)}`, remaining: this.calls.bot });
       return null;
     }
   }
@@ -1968,7 +2005,7 @@ class API extends Core {
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: request.status, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
       // get mp4 from thumbnail
       for (const c of request.data.data) {
         c.mp4 = c.thumbnail_url.replace('-preview-480x272.jpg', '.mp4');
@@ -1977,7 +2014,13 @@ class API extends Core {
       return request.data.data;
     } catch (e) {
       error(`API: ${url} - ${e.stack}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getTopClips', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+      if (isMainThread) {
+        if (e.isAxiosError) {
+          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getTopClips', api: 'helix', endpoint: url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+        } else {
+          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getTopClips', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+        }
+      }
     }
   }
 }
