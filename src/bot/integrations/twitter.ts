@@ -10,7 +10,7 @@ import Message from '../message';
 import Integration from './_interface';
 import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import { info } from '../helpers/log';
+import { error, info } from '../helpers/log';
 import { getRepository } from 'typeorm';
 import { Event } from '../database/entity/event';
 import { WidgetSocial } from '../database/entity/widget';
@@ -78,9 +78,9 @@ class Twitter extends Integration {
     if (this.client === null) {
       throw new Error('Twitter integration is not connected');
     }
-    this.client.post('statuses/update', { status: text }, (error, tweet, response) => {
-      if (error) {
-        error(error, 'Twitch#send');
+    this.client.post('statuses/update', { status: text }, (postError, tweet, response) => {
+      if (postError) {
+        error(postError);
       }
     });
   }
@@ -105,8 +105,8 @@ class Twitter extends Integration {
           events.fire('tweet-post-with-hashtag', { tweet: data });
         });
 
-        stream.on('error', (error) => {
-          error(chalk.yellow('TWITTER: ') + error);
+        stream.on('error', (onError) => {
+          error(chalk.yellow('TWITTER: ') + onError);
         });
       });
     }
@@ -168,21 +168,21 @@ class Twitter extends Integration {
 
   private connect() {
     try {
-      const error: string[] = [];
+      const errors: string[] = [];
       if (this.consumerKey.trim().length === 0) {
-        error.push('consumerKey');
+        errors.push('consumerKey');
       }
       if (this.consumerSecret.trim().length === 0) {
-        error.push('consumerSecret');
+        errors.push('consumerSecret');
       }
       if (this.accessToken.trim().length === 0) {
-        error.push('accessToken');
+        errors.push('accessToken');
       }
       if (this.secretToken.trim().length === 0) {
-        error.push('secretToken');
+        errors.push('secretToken');
       }
-      if (error.length > 0) {
-        throw new Error(error.join(', ') + 'missing');
+      if (errors.length > 0) {
+        throw new Error(errors.join(', ') + 'missing');
       }
 
       this.client = new Client({
