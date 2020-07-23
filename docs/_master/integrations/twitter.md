@@ -1,6 +1,6 @@
 ## Create your own twitter application
 
-- go to ![Twitter Dev Dashboard](https://apps.twitter.com/)
+- go to [Twitter Dev Dashboard](https://apps.twitter.com/)
 - create new app
 ![create-new-app](https://raw.githubusercontent.com/sogehige/sogeBot/master/docs/_images/twitter/create-new-app.png)
 - name your App and push complete button
