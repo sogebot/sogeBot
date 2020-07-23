@@ -1,14 +1,17 @@
 ## Create your own twitter application
-- go to: https://apps.twitter.com/
-- click on create a new app
-![](https://drive.google.com/uc?id=0B-_RLmmL4nXnR2dHTGhyNDZwMWs)
-- set your information in a bot and don't forget to check Developer Agreement
-![](https://drive.google.com/uc?id=0B-_RLmmL4nXnZkxTeWVfN3dTeFE)
-- click on _Create your Twitter application_ button
-- go to _Keys and Access Tokens_ tab
-- generate your access tokens
-![](https://drive.google.com/uc?id=0B-_RLmmL4nXnSUp2bDNOdHZRRk0)
-- save consumer key, consumer secret, access token and access token secret
 
-![](https://drive.google.com/uc?id=0B-_RLmmL4nXnLTdiblBQeU9DNWM)
-![](https://drive.google.com/uc?id=0B-_RLmmL4nXnRTRYNnA3Rnhjek0)
+- go to ![Twitter Dev Dashboard](https://apps.twitter.com/)
+- create new app
+![create-new-app](https://raw.githubusercontent.com/sogehige/sogeBot/master/docs/_images/twitter/create-new-app.png)
+- name your App and push complete button
+![create-an-application](https://raw.githubusercontent.com/sogehige/sogeBot/master/docs/_images/twitter/create-an-application.png)
+- edit your app permission
+![edit-app-permission](https://raw.githubusercontent.com/sogehige/sogeBot/master/docs/_images/twitter/edit-app-permission.png)
+- select **Read / Write / Direct Messages permission** and save
+![app-permission](https://raw.githubusercontent.com/sogehige/sogeBot/master/docs/_images/twitter/app-permission.png)
+- go to **Keys and tokens** tab
+![keys-and-token](https://raw.githubusercontent.com/sogehige/sogeBot/master/docs/_images/twitter/keys-and-token.png)
+- generate **Access Token & Secret**
+![generate-access-token](https://raw.githubusercontent.com/sogehige/sogeBot/master/docs/_images/twitter/generate-access-token.png)
+- copy your tokens to a bot
+![copy-access-token](https://raw.githubusercontent.com/sogehige/sogeBot/master/docs/_images/twitter/copy-access-token.png)
