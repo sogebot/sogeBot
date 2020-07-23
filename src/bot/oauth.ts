@@ -64,6 +64,7 @@ class OAuth extends Core {
     'channel:read:subscriptions',
     'user:edit:broadcast',
     'user:read:broadcast',
+    'channel:edit:commercial',
   ];
 
   @settings('broadcaster')
@@ -72,7 +73,7 @@ class OAuth extends Core {
 
   @ui({
     type: 'link',
-    href: 'https://twitchtokengenerator.com/quick/OK5pC01dOP',
+    href: 'https://twitchtokengenerator.com/quick/0chUhxhGM4',
     class: 'btn btn-primary btn-block',
     text: 'commons.generate',
     target: '_blank',
