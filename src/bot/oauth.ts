@@ -94,16 +94,15 @@ class OAuth extends Core {
   @settings('bot', true)
   @ui({ type: 'checklist', current: 'botCurrentScopes' })
   public botExpectedScopes: string[] = [
-    'channel:moderate',
-    'chat:edit',
-    'chat:read',
-    'whispers:read',
-    'whispers:edit',
-    'channel_editor',
-    'channel_commercial',
     'clips:edit',
     'user:edit:broadcast',
     'user:read:broadcast',
+    'chat:read',
+    'chat:edit',
+    'channel:moderate',
+    'whispers:read',
+    'whispers:edit',
+    'channel:edit:commercial',
   ];
 
   @settings('bot')
@@ -112,7 +111,7 @@ class OAuth extends Core {
 
   @ui({
     type: 'link',
-    href: 'https://twitchtokengenerator.com/quick/UQ6SHl81nt',
+    href: 'https://twitchtokengenerator.com/quick/jLbq7v1pzF',
     class: 'btn btn-primary btn-block',
     text: 'commons.generate',
     target: '_blank',
