@@ -4,23 +4,23 @@
     "add": "Добавить"
   },
   "position": {
-    "settings": "Position settings",
-    "anchorX": "Anchor X position",
-    "anchorY": "Anchor Y position",
-    "left": "Left",
-    "right": "Right",
-    "middle": "Middle",
-    "top": "Top",
-    "bottom": "Bottom",
-    "x": "X",
+    "settings": "Дополнительные параметры",
+    "anchorX": "Позиция X курсора",
+    "anchorY": "Позиция Y курсора",
+    "left": "Слева",
+    "right": "Справа",
+    "middle": "Средний",
+    "top": "Вверх",
+    "bottom": "Внизу",
+    "x": "Х",
     "y": "Y"
   },
   "font": {
-    "shadowShiftRight": "Shift Right",
-    "shadowShiftDown": "Shift Down",
-    "shadowBlur": "Blur",
-    "shadowOpacity": "Opacity",
-    "color": "Color"
+    "shadowShiftRight": "Сдвиг вправо",
+    "shadowShiftDown": "Сдвиг вниз",
+    "shadowBlur": "Размытие",
+    "shadowOpacity": "Прозрачность",
+    "color": "Цвет"
   },
   "errors": {
     "required": "Это поле не может быть пустым.",
