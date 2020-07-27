@@ -6,6 +6,10 @@
       "title": "Aktuellen Song abrufen, wenn der Stream offline ist",
       "help": "Es wird empfohlen, dies deaktiviert zu lassen, um API-Limitierungen zu vermeiden."
     },
+    "queueWhenOffline": {
+      "title": "Queue songs when stream is offline",
+      "help": "It's advised to have this disabled to avoid queueing when you are just listening music"
+    },
     "clientId": "clientId",
     "clientSecret": "clientSecret",
     "redirectURI": "redirectURI",
