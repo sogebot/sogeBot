@@ -34,6 +34,9 @@ class Twitter extends Integration {
   @settings('token')
   @ui({ type: 'text-input', secret: true })
   accessToken = '';
+  @settings('token')
+  @ui({ type: 'text-input', secret: true })
+  secretToken = '';
 
   constructor() {
     super();
