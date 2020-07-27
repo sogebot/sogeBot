@@ -6,6 +6,10 @@
       "title": "Получить текущую песню, когда стрим не в сети",
       "help": "Рекомендуется отключить это во избежание достижения лимитов API"
     },
+    "queueWhenOffline": {
+      "title": "Queue songs when stream is offline",
+      "help": "It's advised to have this disabled to avoid queueing when you are just listening music"
+    },
     "clientId": "clientId",
     "clientSecret": "clientSecret",
     "redirectURI": "redirectURI",
