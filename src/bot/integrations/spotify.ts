@@ -34,7 +34,6 @@ let _spotify: any = null;
 class Spotify extends Integration {
   client: null | SpotifyWebApi = null;
   retry: { IRefreshToken: number } = { IRefreshToken: 0 };
-  skipToNextSong = false;
   state: any = null;
   @shared()
   userId: string | null = null;
@@ -127,8 +126,18 @@ class Spotify extends Integration {
 
   @command('!spotify skip')
   @default_permission(null)
-  cSkipSong() {
-    this.skipToNextSong = true;
+  async cSkipSong() {
+    if (this.client) {
+      const skipResponse = await axios({
+        method: 'post',
+        url: 'https://api.spotify.com/v1/me/player/next',
+        headers: {
+          'Authorization': 'Bearer ' + this.client.getAccessToken(),
+        },
+      });
+      ioServer?.emit('api.stats', { method: 'POST', data: skipResponse.data, timestamp: Date.now(), call: 'spotify::skip', api: 'other', endpoint: 'https://api.spotify.com/v1/me/player/next', code: skipResponse.status });
+    }
+    return [];
   }
 
   async getMe () {
@@ -216,7 +225,7 @@ class Spotify extends Integration {
       callback(null, this.state);
     });
     adminEndpoint(this.nsp, 'spotify::skip', async (callback) => {
-      this.skipToNextSong = true;
+      this.cSkipSong();
       callback(null);
     });
     adminEndpoint(this.nsp, 'spotify::code', async (token, cb) => {
@@ -410,13 +419,14 @@ class Spotify extends Integration {
           },
         });
         const track = response.data as SpotifyTrack;
-        await axios({
+        const queueResponse = await axios({
           method: 'post',
           url: 'https://api.spotify.com/v1/me/player/queue?uri=' + track.uri,
           headers: {
             'Authorization': 'Bearer ' + this.client.getAccessToken(),
           },
         });
+        ioServer?.emit('api.stats', { method: 'POST', data: queueResponse.data, timestamp: Date.now(), call: 'spotify::queue', api: 'other', endpoint: 'https://api.spotify.com/v1/me/player/queue?uri=' + track.uri, code: queueResponse.status });
         return [{ response: prepare('integrations.spotify.song-requested', {
           name: track.name, artist: track.artists[0].name, artists: track.artists.map(o => o.name).join(', '),
         }), ...opts }];
