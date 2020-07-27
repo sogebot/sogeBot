@@ -419,14 +419,7 @@ class Spotify extends Integration {
           },
         });
         const track = response.data as SpotifyTrack;
-        const queueResponse = await axios({
-          method: 'post',
-          url: 'https://api.spotify.com/v1/me/player/queue?uri=' + track.uri,
-          headers: {
-            'Authorization': 'Bearer ' + this.client.getAccessToken(),
-          },
-        });
-        ioServer?.emit('api.stats', { method: 'POST', data: queueResponse.data, timestamp: Date.now(), call: 'spotify::queue', api: 'other', endpoint: 'https://api.spotify.com/v1/me/player/queue?uri=' + track.uri, code: queueResponse.status });
+        await this.requestSongByAPI(track.uri);
         return [{ response: prepare('integrations.spotify.song-requested', {
           name: track.name, artist: track.artists[0].name, artists: track.artists.map(o => o.name).join(', '),
         }), ...opts }];
@@ -440,6 +433,7 @@ class Spotify extends Integration {
           },
         });
         const track = (response.data.tracks.items[0] as SpotifyTrack);
+        await this.requestSongByAPI(track.uri);
         return [{ response: prepare('integrations.spotify.song-requested', {
           name: track.name, artist: track.artists[0].name,
         }), ...opts }];
@@ -451,6 +445,19 @@ class Spotify extends Integration {
         error(`${chalk.bgRed('SPOTIFY')}: you don't seem to have spotify PREMIUM.`);
       }
       return [{ response: prepare('integrations.spotify.song-not-found'), ...opts }];
+    }
+  }
+
+  async requestSongByAPI(uri: string) {
+    if (this.client) {
+      const queueResponse = await axios({
+        method: 'post',
+        url: 'https://api.spotify.com/v1/me/player/queue?uri=' + uri,
+        headers: {
+          'Authorization': 'Bearer ' + this.client.getAccessToken(),
+        },
+      });
+      ioServer?.emit('api.stats', { method: 'POST', data: queueResponse.data, timestamp: Date.now(), call: 'spotify::queue', api: 'other', endpoint: 'https://api.spotify.com/v1/me/player/queue?uri=' + uri, code: queueResponse.status });
     }
   }
 }
