@@ -6,6 +6,10 @@
       "title": "Načíst aktuální skladbu, i když je stream offline",
       "help": "Doporučuje se, aby byla tato funkce vypnuta, aby nedošlo k dosažení limitů API"
     },
+    "queueWhenOffline": {
+      "title": "Queue songs when stream is offline",
+      "help": "It's advised to have this disabled to avoid queueing when you are just listening music"
+    },
     "clientId": "clientId",
     "clientSecret": "clientSecret",
     "redirectURI": "redirectURI",
