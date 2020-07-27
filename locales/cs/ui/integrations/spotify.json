@@ -8,7 +8,7 @@
     },
     "queueWhenOffline": {
       "title": "Zařadit skladbu do fronty, i když je stream offline",
-      "help": "It's advised to have this disabled to avoid queueing when you are just listening music"
+      "help": "Doporučujeme mít toto vypnuto, abyste se vyhnuli přidáváním skladeb do fronty jen při poslechu hudby"
     },
     "clientId": "clientId",
     "clientSecret": "clientSecret",
