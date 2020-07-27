@@ -6,6 +6,10 @@
       "title": "Fetch current song when stream is offline",
       "help": "It's advised to have this disabled to avoid reach API limits"
     },
+    "queueWhenOffline": {
+      "title": "Queue songs when stream is offline",
+      "help": "It's advised to have this disabled to avoid queueing when you are just listening music"
+    },
     "clientId": "clientId",
     "clientSecret": "clientSecret",
     "redirectURI": "redirectURI",
