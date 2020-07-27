@@ -5,8 +5,10 @@
     :key="event._id"
     class="event"
     :class="[event.type]">
-    <strong class="username">{{ event.username }}</strong>
-    <span class="event">{{ event.summary }}</span>
+    <template v-for="type of display">
+      <strong v-if="type === 'username'" class="username" :key="type">{{ event.username }}</strong>
+      <span v-else class="event" :key="type">{{ event.summary }}</span>
+    </template>
   </li>
 </ul>
 </template>
@@ -21,6 +23,8 @@ import { EventListInterface } from '../../bot/database/entity/eventList';
 export default class ClipsOverlay extends Vue {
   socket = getSocket('/overlays/eventlist', true);
   events: any[] = [];
+  display = ['username', 'event'];
+
   created () {
     setTimeout(() => this.refresh(), 1000);
   }
@@ -33,9 +37,9 @@ export default class ClipsOverlay extends Vue {
         return console.error(err);
       }
       var order = (this.urlParam('order') as "desc" | "asc") || 'desc'
-      var display: string | string[] = this.urlParam('display') || 'username,event'; display = display.split(',')
+      this.display = this.urlParam('display')?.split(',') || 'username,event'.split(',');
 
-      console.debug({order, display})
+      console.debug({order, display: this.display})
       this.events = orderBy(data, 'timestamp', order).map((o) => {
         const values = JSON.parse(o.values_json);
         if (o.event === 'resub') {
@@ -103,5 +107,13 @@ export default class ClipsOverlay extends Vue {
 
   ul li:nth-child(5) {
     opacity: 0.2;
+  }
+
+  .event {
+    padding: 0 .2rem;
+  }
+
+  .username {
+    padding: 0 .2rem;
   }
 </style>
