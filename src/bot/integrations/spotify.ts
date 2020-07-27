@@ -49,6 +49,8 @@ class Spotify extends Integration {
   songRequests = true;
   @settings()
   fetchCurrentSongWhenOffline = false;
+  @settings()
+  queueWhenOffline = false;
 
   @settings('output')
   format = '$song - $artist';
@@ -369,11 +371,12 @@ class Spotify extends Integration {
   @command('!spotify')
   @default_permission(null)
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
-    /*if (!(api.isStreamOnline)) {
-      error(`${chalk.bgRed('SPOTIFY')}: stream is offline.`);
+    if (!api.isStreamOnline && !this.queueWhenOffline) {
+      error(`${chalk.bgRed('SPOTIFY')}: stream is offline and you have disabled queue when offline.`);
       return [];
     } // don't do anything on offline stream*/
     if (!this.songRequests) {
+      error(`${chalk.bgRed('SPOTIFY')}: song requests are disabled.`);
       return [];
     }
     if (!this.client) {

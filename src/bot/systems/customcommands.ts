@@ -269,6 +269,7 @@ class CustomCommands extends System {
     let atLeastOnePermissionOk = false;
     for (const cmd of commands) {
       if (!cmd.command.enabled) {
+        atLeastOnePermissionOk = true; // continue if command is disabled
         warning(`Custom command ${cmd.command.command} (${cmd.command.id}) is disabled!`);
         continue;
       }
