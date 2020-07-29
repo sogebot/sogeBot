@@ -16,6 +16,8 @@ import api from '../api';
 import { addUIError } from '../panel';
 import { HOUR } from '../constants';
 import { ioServer } from '../helpers/panel';
+import { getRepository } from 'typeorm';
+import { SpotifySongBan } from '../database/entity/spotify';
 
 type SpotifyTrack = {
   uri: string; name: string; artists: { name: string }[]
@@ -97,6 +99,7 @@ class Spotify extends Integration {
     super();
 
     this.addWidget('spotify', 'widget-title-spotify', 'fab fa-spotify');
+    this.addMenu({ category: 'manage', name: 'spotifybannedsongs', id: 'manage/spotify/bannedsongs', this: this });
 
     if (isMainThread) {
       this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
@@ -227,6 +230,57 @@ class Spotify extends Integration {
     adminEndpoint(this.nsp, 'spotify::skip', async (callback) => {
       this.cSkipSong();
       callback(null);
+    });
+    adminEndpoint(this.nsp, 'spotify::addBan', async (spotifyUri, cb) => {
+      try {
+        if (!this.client) {
+          addUIError({ name: 'Spotify Ban Import', message: 'You are not connected to spotify API, authorize your user' });
+          throw Error('client');
+        }
+        let id = '';
+        if (spotifyUri.startsWith('spotify:')) {
+          id = spotifyUri.replace('spotify:track:', '');
+        } else {
+          const regex = new RegExp('\\S+open\\.spotify\\.com\\/track\\/(\\w+)(.*)?', 'gi');
+          const exec = regex.exec(spotifyUri as unknown as string);
+          if (exec) {
+            id = exec[1];
+          } else {
+            throw Error('ID was not found in ' + spotifyUri);
+          }
+        }
+
+        const response = await axios({
+          method: 'get',
+          url: 'https://api.spotify.com/v1/tracks/' + id,
+          headers: {
+            'Authorization': 'Bearer ' + this.client.getAccessToken(),
+          },
+        });
+        const track = response.data as SpotifyTrack;
+        await getRepository(SpotifySongBan).save({
+          artists: track.artists.map(o => o.name), spotifyUri: track.uri, title: track.name,
+        });
+      } catch (e) {
+        if (e.message !== 'client') {
+          addUIError({ name: 'Spotify Ban Import', message: 'Something went wrong with banning song. Check your spotifyURI.' });
+        }
+      }
+      if (cb) {
+        cb(null, null);
+      }
+    });
+    adminEndpoint(this.nsp, 'spotify::deleteBan', async (where, cb) => {
+      where = where || {};
+      if (cb) {
+        cb(null, await getRepository(SpotifySongBan).delete(where));
+      }
+    });
+    adminEndpoint(this.nsp, 'spotify::getAllBanned', async (where, cb) => {
+      where = where || {};
+      if (cb) {
+        cb(null, await getRepository(SpotifySongBan).find(where));
+      }
     });
     adminEndpoint(this.nsp, 'spotify::code', async (token, cb) => {
       const waitForUsername = () => {
@@ -377,6 +431,45 @@ class Spotify extends Integration {
     return this.client.createAuthorizeURL(this.scopes, state) + '&show_dialog=true';
   }
 
+  @command('!spotify unban')
+  @default_permission(null)
+  async unban (opts: CommandOptions): Promise<CommandResponse[]> {
+    try {
+      const songToUnban = await getRepository(SpotifySongBan).findOneOrFail({ where: { spotifyUri: opts.parameters }});
+      await getRepository(SpotifySongBan).delete({ spotifyUri: opts.parameters });
+      return [{ response: prepare('integrations.spotify.song-unbanned', {
+        artist: songToUnban.artists[0], uri: songToUnban.spotifyUri, name: songToUnban.title,
+      }), ...opts }];
+    } catch (e) {
+      return [{ response: prepare('integrations.spotify.song-not-found-in-banlist', {
+        uri: opts.parameters,
+      }), ...opts }];
+    }
+  }
+
+  @command('!spotify ban')
+  @default_permission(null)
+  async ban (opts: CommandOptions): Promise<CommandResponse[]> {
+    if (!this.client) {
+      error(`${chalk.bgRed('SPOTIFY')}: you are not connected to spotify API, authorize your user.`);
+      return [];
+    }
+
+    // ban current playing song only
+    const currentSong: any = JSON.parse(this.currentSong);
+    if (Object.keys(currentSong).length === 0) {
+      return [{ response: prepare('integrations.spotify.not-banned-song-not-playing'), ...opts }];
+    } else {
+      await getRepository(SpotifySongBan).save({
+        artists: currentSong.artists.split(', '), spotifyUri: currentSong.uri, title: currentSong.song,
+      });
+      this.cSkipSong();
+      return [{ response: prepare('integrations.spotify.song-banned', {
+        artists: currentSong.artists, artist: currentSong.artist, uri: currentSong.uri, name: currentSong.song,
+      }), ...opts }];
+    }
+  }
+
   @command('!spotify')
   @default_permission(null)
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
@@ -419,10 +512,15 @@ class Spotify extends Integration {
           },
         });
         const track = response.data as SpotifyTrack;
-        await this.requestSongByAPI(track.uri);
-        return [{ response: prepare('integrations.spotify.song-requested', {
-          name: track.name, artist: track.artists[0].name, artists: track.artists.map(o => o.name).join(', '),
-        }), ...opts }];
+        if(await this.requestSongByAPI(track.uri)) {
+          return [{ response: prepare('integrations.spotify.song-requested', {
+            name: track.name, artist: track.artists[0].name, artists: track.artists.map(o => o.name).join(', '),
+          }), ...opts }];
+        } else {
+          return [{ response: prepare('integrations.spotify.cannot-request-song-is-banned', {
+            name: track.name, artist: track.artists[0].name, artists: track.artists.map(o => o.name).join(', '),
+          }), ...opts }];
+        }
       } else {
         const response = await axios({
           method: 'get',
@@ -433,10 +531,15 @@ class Spotify extends Integration {
           },
         });
         const track = (response.data.tracks.items[0] as SpotifyTrack);
-        await this.requestSongByAPI(track.uri);
-        return [{ response: prepare('integrations.spotify.song-requested', {
-          name: track.name, artist: track.artists[0].name,
-        }), ...opts }];
+        if(await this.requestSongByAPI(track.uri)) {
+          return [{ response: prepare('integrations.spotify.song-requested', {
+            name: track.name, artist: track.artists[0].name,
+          }), ...opts }];
+        } else {
+          return [{ response: prepare('integrations.spotify.song-is-banned', {
+            name: track.name, artist: track.artists[0].name,
+          }), ...opts }];
+        }
       }
     } catch (e) {
       if (e.response.status === 401) {
@@ -450,14 +553,29 @@ class Spotify extends Integration {
 
   async requestSongByAPI(uri: string) {
     if (this.client) {
-      const queueResponse = await axios({
-        method: 'post',
-        url: 'https://api.spotify.com/v1/me/player/queue?uri=' + uri,
-        headers: {
-          'Authorization': 'Bearer ' + this.client.getAccessToken(),
-        },
-      });
-      ioServer?.emit('api.stats', { method: 'POST', data: queueResponse.data, timestamp: Date.now(), call: 'spotify::queue', api: 'other', endpoint: 'https://api.spotify.com/v1/me/player/queue?uri=' + uri, code: queueResponse.status });
+      try {
+        const isSongBanned = (await getRepository(SpotifySongBan).count({ where: { spotifyUri: uri }})) > 0;
+        if (isSongBanned) {
+          throw new Error('Song is banned');
+        }
+
+        const queueResponse = await axios({
+          method: 'post',
+          url: 'https://api.spotify.com/v1/me/player/queue?uri=' + uri,
+          headers: {
+            'Authorization': 'Bearer ' + this.client.getAccessToken(),
+          },
+        });
+        ioServer?.emit('api.stats', { method: 'POST', data: queueResponse.data, timestamp: Date.now(), call: 'spotify::queue', api: 'other', endpoint: 'https://api.spotify.com/v1/me/player/queue?uri=' + uri, code: queueResponse.status });
+        return true;
+      } catch (e) {
+        if (!e.isAxiosError) {
+          return false;
+        } else {
+          // rethrow error
+          throw(e);
+        }
+      }
     }
   }
 }
