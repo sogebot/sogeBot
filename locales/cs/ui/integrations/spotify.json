@@ -6,6 +6,10 @@
       "title": "Načíst aktuální skladbu, i když je stream offline",
       "help": "Doporučuje se, aby byla tato funkce vypnuta, aby nedošlo k dosažení limitů API"
     },
+    "queueWhenOffline": {
+      "title": "Zařadit skladbu do fronty, i když je stream offline",
+      "help": "Doporučujeme mít toto vypnuto, abyste se vyhnuli přidáváním skladeb do fronty jen při poslechu hudby"
+    },
     "clientId": "clientId",
     "clientSecret": "clientSecret",
     "redirectURI": "redirectURI",
