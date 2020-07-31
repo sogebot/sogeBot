@@ -57,3 +57,37 @@ Current integration is enabling `$spotifySong` and song requests(PREMIUM) from S
   <strong>bot:</strong> @testuser, you requested song
   Circle of Life - 『ライオン・キング』より from Carmen Twillie
 </blockquote>
+
+### Ban current song through !spotify ban command
+
+`!spotify ban`
+
+!> Default permission is **DISABLED**
+
+#### Examples
+
+<blockquote>
+  <strong>testuser:</strong> !spotify ban<br>
+  <strong>bot:</strong> @testuser, song
+  Circle of Life - 『ライオン・キング』より from Carmen Twillie was banned.
+</blockquote>
+
+### Unban song through !spotify unban command
+
+`!spotify unban <spotifyURI>` or `!spotify unban <song link>`
+
+!> Default permission is **DISABLED**
+
+#### Parameters
+
+- `<spotifyURI>` -  spotify URI of a song you want to unban, e.g. `spotify:track:14Vp3NpYyRP3cTu8XkubfS`
+- `<song link>` - song link, e.g.
+  `https://open.spotify.com/track/14Vp3NpYyRP3cTu8XkubfS?si=7vJWxZJdRu2VsBdvcVdAuA`
+
+#### Examples
+
+<blockquote>
+  <strong>testuser:</strong> !spotify unban spotify:track:0GrhBz0am9KFJ20MN9o6Lp<br>
+  <strong>bot:</strong> @testuser, song
+  Circle of Life - 『ライオン・キング』より from Carmen Twillie was unbanned.
+</blockquote>
