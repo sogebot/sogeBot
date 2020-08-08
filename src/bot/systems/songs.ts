@@ -471,8 +471,8 @@ class Songs extends System {
 
     if (_.isNil(videoID.match(idRegex))) { // not id or url]
       try {
-        const search: ytsr.result['items'] = await new Promise((resolve, reject) => {
-          ytsr(opts.parameters, { limit: 1 }, (err, result) => {
+        const search: ytsr.Result['items'] = await new Promise((resolve, reject) => {
+          ytsr(opts.parameters, { limit: 1 }, (err: Error, result: any) => {
             if (err) {
               reject(err);
             } else {
@@ -480,7 +480,7 @@ class Songs extends System {
             }
           });
         });
-        if (search.length > 0) {
+        if (search.length > 0 && search[0].type === 'video') {
           const videoId = /^\S+(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)(?<videoId>[^#&?]*).*/gi.exec(search[0].link)?.groups?.videoId;
           if (!videoId) {
             throw new Error('VideoID not parsed from ' + search[0].link);
