@@ -189,12 +189,16 @@ class Module {
       .getOne();
 
     const path = this._name === 'core' ? this.__moduleName__.toLowerCase() : `${this._name}.${this.__moduleName__.toLowerCase()}`;
-    for (const event of getFunctionList('load', `${path}.${key}` )) {
-      (this as any)[event.fName]();
-    }
+
+    setTimeout(() => {
+      for (const event of getFunctionList('load', `${path}.${key}` )) {
+        (this as any)[event.fName]();
+      }
+    }, 1000);
 
     try {
       if (typeof variable !== 'undefined') {
+        console.log( JSON.parse(variable.value));
         return JSON.parse(variable.value);
       } else {
         return undefined;

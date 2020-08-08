@@ -471,8 +471,8 @@ class Songs extends System {
 
     if (_.isNil(videoID.match(idRegex))) { // not id or url]
       try {
-        const search: ytsr.result['items'] = await new Promise((resolve, reject) => {
-          ytsr(opts.parameters, { limit: 1 }, (err, result) => {
+        const search: { link: string }[] = await new Promise((resolve, reject) => {
+          ytsr(opts.parameters, { limit: 1 }, (err: Error, result: any) => {
             if (err) {
               reject(err);
             } else {
