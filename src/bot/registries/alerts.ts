@@ -26,7 +26,7 @@ class Alerts extends Registry {
             const media = await getRepository(AlertMedia).find({ id: req.params.mediaid });
             const b64data = media.sort((a,b) => a.chunkNo - b.chunkNo).map(o => o.b64data).join('');
             if (b64data.trim().length === 0) {
-              res.send(404);
+              res.sendStatus(404);
             } else {
               const match = (b64data.match(/^data:\w+\/\w+;base64,/) || [ 'data:image/gif;base64,' ])[0];
               const data = Buffer.from(b64data.replace(/^data:\w+\/\w+;base64,/, ''), 'base64');
