@@ -198,7 +198,6 @@ class Module {
 
     try {
       if (typeof variable !== 'undefined') {
-        console.log( JSON.parse(variable.value));
         return JSON.parse(variable.value);
       } else {
         return undefined;
