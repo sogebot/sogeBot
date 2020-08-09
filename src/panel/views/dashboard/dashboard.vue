@@ -118,6 +118,7 @@ export default {
       show: true,
       isLoaded: false,
       layout: {'null': []},
+      isLayoutInitialized: false,
       socket: getSocket('/')
     }
   },
@@ -163,12 +164,15 @@ export default {
         let i = 0;
         for(const widget of dashboard.widgets) {
           layout[dashboard.id].push({
-            i, x: Number(widget.positionX), y: Number(widget.positionY), w: Number(widget.width), h: Number(widget.height), name: widget.name
+            i, x: Number(widget.positionX), y: Number(widget.positionY), w: Number(widget.width), h: Number(widget.height), name: widget.name, id: widget.id,
           });
           i++;
         }
       }
       this.layout = layout;
+      window.setTimeout(() => {
+        this.isLayoutInitialized = true;
+      }, 1000);
     },
     removeWidget(name) {
       for (const dashboard of this.dashboards) {
@@ -178,18 +182,25 @@ export default {
       this.refreshWidgets();
     },
     updateLayout(layout) {
-      for (const dashboard of this.dashboards) {
-        dashboard.widgets = this.layout[dashboard.id].map(o => {
-          return {
-            positionX: o.x,
-            positionY: o.y,
-            width: o.w,
-            height: o.h,
-            name: o.name,
-          };
-        });
-      };
-      this.socket.emit('panel::dashboards::save', this.dashboards)
+      if (this.isLayoutInitialized) {
+        console.debug('Layout is initialized, we are executing updateLayout()');
+        for (const dashboard of this.dashboards) {
+          dashboard.widgets = this.layout[dashboard.id].map(o => {
+            return {
+              id: o.id,
+              positionX: o.x,
+              positionY: o.y,
+              width: o.w,
+              height: o.h,
+              name: o.name,
+              dashboardId: dashboard.id,
+            };
+          });
+        };
+        this.socket.emit('panel::dashboards::save', this.dashboards)
+      } else {
+        console.debug('Layout is not initialized yet, we are skipping updateLayout()');
+      }
     },
     removeDashboard: function (dashboardId) {
       this.dashboards = this.dashboards.filter(o => String(o.id) !== dashboardId)
