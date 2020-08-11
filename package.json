@@ -73,7 +73,7 @@
     "ws": "7.3.1",
     "xregexp": "4.3.0",
     "yargs": "15.4.1",
-    "ytdl-core": "3.2.0",
+    "ytdl-core": "3.2.1",
     "ytpl": "0.2.4",
     "ytsr": "0.1.21"
   },
@@ -155,7 +155,7 @@
     "bootstrap-vue": "2.16.0",
     "chart.js": "2.9.3",
     "clean-webpack-plugin": "3.0.0",
-    "css-loader": "4.2.1",
+    "css-loader": "3.6.0",
     "docsify": "4.11.4",
     "docsify-cli": "4.4.1",
     "empty": "0.10.1",
@@ -212,7 +212,7 @@
     "vue2-perfect-scrollbar": "1.5.0",
     "vuelidate": "0.7.5",
     "vuelidate-property-decorators": "1.0.28",
-    "webpack": "5.0.0-beta.24",
+    "webpack": "5.0.0-beta.25",
     "webpack-bundle-analyzer": "3.8.0",
     "webpack-cli": "3.3.12",
     "winwheel": "git+https://github.com/sogehige/javascript-winwheel.git"
