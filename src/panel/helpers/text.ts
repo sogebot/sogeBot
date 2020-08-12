@@ -31,10 +31,12 @@ export function shadowGenerator(shadow: {
   blur: number;
   opacity: number;
   color: string;
-}[]) {
+}[] | undefined) {
   const output = [];
-  for (const s of shadow) {
-    output.push(`${s.shiftRight}px ${s.shiftDown}px ${s.blur}px ${Color(s.color).alpha(s.opacity / 100)}`);
+  if (shadow) {
+    for (const s of shadow) {
+      output.push(`${s.shiftRight}px ${s.shiftDown}px ${s.blur}px ${Color(s.color).alpha(s.opacity / 100)}`);
+    }
   }
   return output.join(', ');
 }
