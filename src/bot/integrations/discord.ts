@@ -98,6 +98,10 @@ class Discord extends Integration {
   })
   sendGeneralAnnounceToChannel = '';
 
+  @settings('bot')
+  @ui({ type: 'selector', values: ['online', 'invisible', 'dnd'] })
+  onlinePresence: 'online' | 'invisible' | 'dnd' = 'online';
+
   @settings('mapping')
   @ui({
     type: 'discord-mapping',
@@ -303,30 +307,41 @@ class Discord extends Integration {
 
   @onStreamEnd()
   async updateStreamStartAnnounce() {
-    const channel = this.client?.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
-    if (channel) {
-      const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
-      const embed = message?.embeds[0];
-      if (message && embed) {
-        embed.setColor(0xff0000);
-        embed.setDescription(`${oauth.generalChannel.charAt(0).toUpperCase() + oauth.generalChannel.slice(1)} is not streaming anymore! Check it next time!`);
-        embed.spliceFields(0, embed.fields.length);
-        embed.addFields([
-          { name: prepare('webpanel.responses.variable.game'), value: api.stats.currentGame},
-          { name: prepare('webpanel.responses.variable.title'), value: api.stats.currentTitle},
-          { name: prepare('integrations.discord.streamed-at'), value: `${this.embedStartedAt} - ${moment().tz(timezone).format('LLL')}`, inline: true},
-          { name: prepare('webpanel.views'), value: api.stats.currentViews, inline: true},
-          { name: prepare('webpanel.followers'), value: api.stats.currentFollowers, inline: true},
-        ]);
-        embed.setImage(`https://static-cdn.jtvnw.net/ttv-static/404_preview-1920x1080.jpg?${Date.now()}`);
-
-        if (oauth.broadcasterType !== '') {
-          embed.addField(prepare('webpanel.subscribers'), api.stats.currentSubscribers, true);
+    try{
+      const channel = this.client?.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
+      if (channel) {
+        const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
+        const embed = message?.embeds[0];
+        if (message && embed) {
+          embed.setColor(0xff0000);
+          embed.setDescription(`${oauth.generalChannel.charAt(0).toUpperCase() + oauth.generalChannel.slice(1)} is not streaming anymore! Check it next time!`);
+          embed.spliceFields(0, embed.fields.length);
+          embed.addFields([
+            { name: prepare('webpanel.responses.variable.game'), value: api.stats.currentGame},
+            { name: prepare('webpanel.responses.variable.title'), value: api.stats.currentTitle},
+            { name: prepare('integrations.discord.streamed-at'), value: `${this.embedStartedAt} - ${moment().tz(timezone).format('LLL')}`, inline: true},
+            { name: prepare('webpanel.views'), value: api.stats.currentViews, inline: true},
+            { name: prepare('webpanel.followers'), value: api.stats.currentFollowers, inline: true},
+          ]);
+          embed.setImage(`https://static-cdn.jtvnw.net/ttv-static/404_preview-1920x1080.jpg?${Date.now()}`);
+  
+          if (oauth.broadcasterType !== '') {
+            embed.addField(prepare('webpanel.subscribers'), api.stats.currentSubscribers, true);
+          }
+          message.edit(embed);
         }
-        message.edit(embed);
       }
+      this.changeClientOnlinePresence();
+      this.embedMessageId = '';
+    }catch (e){
+      warning(e.stack);
     }
-    this.embedMessageId = '';
+
+    try{
+      this.changeClientOnlinePresence();
+    }catch (e){
+      warning(e.stack);
+    }
   }
 
   @onStreamStart()
@@ -371,6 +386,51 @@ class Discord extends Integration {
     } catch (e) {
       warning(e.stack);
     }
+
+    try{
+      this.changeClientOnlinePresence();
+    }catch (e){
+      warning(e.stack);
+    }
+  }
+
+  @onChange('onlinePresence')
+  async changeClientOnlinePresence() {
+    try{
+      if (api.isStreamOnline) {
+        this.client?.user?.setStatus('online')
+          .then( (inf)=>{
+            info(chalk.yellow('DISCORD STATUS: ') + inf.status);
+          })
+          .catch( (err)=>{
+            error(chalk.yellow('DISCORD STATUS: ') + err);
+          });
+        this.client?.user?.setPresence( { status: 'online', activity: {name: `${api.stats.currentTitle}`, type: 'STREAMING', url: `https://twitch.tv/${oauth.generalChannel}`} } )
+          .then( (inf)=>{
+            info(chalk.yellow('DISCORD PRESENCE: ') + inf.activities);
+          })
+          .catch( (err)=>{
+            error(chalk.yellow('DISCORD PRESENCE: ') + err);
+          });
+      }else{
+        this.client?.user?.setPresence( {status: this.onlinePresence, activity:{name:'',type:undefined,url:''}} )
+          .then( (inf)=>{
+            info(chalk.yellow('DISCORD PRESENCE: ') + inf.activities);
+          })
+          .catch( (err)=>{
+            error(chalk.yellow('DISCORD PRESENCE: ') + err);
+          });
+          this.client?.user?.setStatus(this.onlinePresence)
+          .then( (inf)=>{
+            info(chalk.yellow('DISCORD STATUS: ') + inf.status);
+          })
+          .catch( (err)=>{
+            error(chalk.yellow('DISCORD STATUS: ') + err);
+          });
+      }
+    }catch (e){
+      warning(e.stack);
+    }
   }
 
   initClient() {
@@ -382,6 +442,7 @@ class Discord extends Integration {
       this.client.on('ready', () => {
         if (this.client) {
           info(chalk.yellow('DISCORD: ') + `Logged in as ${get(this.client, 'user.tag', 'unknown')}!`);
+          this.client.user?.setStatus(this.onlinePresence);
         }
       });
 
