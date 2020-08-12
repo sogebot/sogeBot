@@ -123,6 +123,7 @@ const webpackConfig = {
           options: {
             experimentalFileCaching: true,
             appendTsSuffixTo: [/\.vue$/],
+            configFile: path.resolve('./tsconfig.json'),
           }
         }]
       },

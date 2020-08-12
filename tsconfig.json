@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es6",
     "strict": true,
-    "module": "commonjs",
+    "module": "esnext",
     "incremental": true,
     "removeComments": true,
     "noImplicitAny": true,
