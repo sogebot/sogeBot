@@ -307,7 +307,7 @@ class Discord extends Integration {
 
   @onStreamEnd()
   async updateStreamStartAnnounce() {
-    try{
+    try {
       const channel = this.client?.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
       if (channel) {
         const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
@@ -331,15 +331,14 @@ class Discord extends Integration {
           message.edit(embed);
         }
       }
-      this.changeClientOnlinePresence();
       this.embedMessageId = '';
-    }catch (e){
+    } catch (e) {
       warning(e.stack);
     }
 
-    try{
+    try {
       this.changeClientOnlinePresence();
-    }catch (e){
+    }  catch (e) {
       warning(e.stack);
     }
   }
@@ -387,48 +386,24 @@ class Discord extends Integration {
       warning(e.stack);
     }
 
-    try{
+    try {
       this.changeClientOnlinePresence();
-    }catch (e){
+    } catch (e){
       warning(e.stack);
     }
   }
 
   @onChange('onlinePresence')
   async changeClientOnlinePresence() {
-    try{
+    try {
       if (api.isStreamOnline) {
-        this.client?.user?.setStatus('online')
-          .then( (inf)=>{
-            info(chalk.yellow('DISCORD STATUS: ') + inf.status);
-          })
-          .catch( (err)=>{
-            error(chalk.yellow('DISCORD STATUS: ') + err);
-          });
-        this.client?.user?.setPresence( { status: 'online', activity: {name: `${api.stats.currentTitle}`, type: 'STREAMING', url: `https://twitch.tv/${oauth.generalChannel}`} } )
-          .then( (inf)=>{
-            info(chalk.yellow('DISCORD PRESENCE: ') + inf.activities);
-          })
-          .catch( (err)=>{
-            error(chalk.yellow('DISCORD PRESENCE: ') + err);
-          });
-      }else{
-        this.client?.user?.setPresence( {status: this.onlinePresence, activity:{name:'',type:undefined,url:''}} )
-          .then( (inf)=>{
-            info(chalk.yellow('DISCORD PRESENCE: ') + inf.activities);
-          })
-          .catch( (err)=>{
-            error(chalk.yellow('DISCORD PRESENCE: ') + err);
-          });
-          this.client?.user?.setStatus(this.onlinePresence)
-          .then( (inf)=>{
-            info(chalk.yellow('DISCORD STATUS: ') + inf.status);
-          })
-          .catch( (err)=>{
-            error(chalk.yellow('DISCORD STATUS: ') + err);
-          });
+        this.client?.user?.setStatus('online');
+        this.client?.user?.setPresence( { status: 'online', activity: {name: `${api.stats.currentTitle}`, type: 'STREAMING', url: `https://twitch.tv/${oauth.generalChannel}`} } );
+      } else {
+        this.client?.user?.setPresence( {status: this.onlinePresence, activity:{name:'',type:undefined,url:''}} );
+        this.client?.user?.setStatus(this.onlinePresence);
       }
-    }catch (e){
+    } catch (e) {
       warning(e.stack);
     }
   }
