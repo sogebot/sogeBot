@@ -24,6 +24,11 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 
+import { ButtonPlugin } from 'bootstrap-vue/esm/components/button'
+import { LayoutPlugin } from 'bootstrap-vue/esm/components/layout'
+Vue.use(LayoutPlugin)
+Vue.use(ButtonPlugin)
+
 @Component({})
 export default class Login extends Vue {
   error: null | string = null;

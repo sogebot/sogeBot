@@ -18,7 +18,7 @@ import { gsap } from 'gsap'
 import { getSocket } from 'src/panel/helpers/socket';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCircle } from '@fortawesome/free-solid-svg-icons'
+import { faCircle } from '@fortawesome/free-solid-svg-icons/faCircle'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(faCircle)

@@ -3,7 +3,6 @@ import Vue from 'vue';
 import translate from '../panel/helpers/translate';
 import LoadScript from 'vue-plugin-load-script';
 import VueRouter from 'vue-router';
-import BootstrapVue from 'bootstrap-vue';
 
 import { ButtonStates, states } from '../panel/helpers/buttonStates';
 
@@ -18,8 +17,6 @@ Vue.use(VueMoment, {
 });
 Vue.use(VueRouter);
 Vue.use(LoadScript);
-Vue.use(BootstrapVue);
-
 
 export interface Global {
   translations: any;

@@ -8,11 +8,13 @@ const webpack = require('webpack');
 const bundleAnalyze = !!process.env.BUNDLE
 
 const optimization = {
-  removeAvailableModules: false,
-  removeEmptyChunks: false,
-  splitChunks: false,
+  removeAvailableModules: true,
+  removeEmptyChunks: true,
   minimize: process.env.NODE_ENV === 'production',
-  runtimeChunk: 'single',
+  runtimeChunk: true,
+  providedExports: true,
+  sideEffects: true,
+  usedExports: true,
   moduleIds: 'deterministic'
 };
 
@@ -36,7 +38,7 @@ const webpackConfig = {
     ignored: ['/node_modules/*'],
   },
   mode: process.env.NODE_ENV,
-  performance: { hints: false },
+  performance: { hints: process.env.NODE_ENV === 'production' ? false : 'warning' },
   optimization,
   entry: {
     main: './src/panel/index.ts',
@@ -121,6 +123,7 @@ const webpackConfig = {
           options: {
             experimentalFileCaching: true,
             appendTsSuffixTo: [/\.vue$/],
+            configFile: path.resolve('./tsconfig.json'),
           }
         }]
       },

@@ -32,7 +32,29 @@ import { groupBy } from 'lodash-es';
 import { getSocket } from 'src/panel/helpers/socket';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faDeviantart, faDiscord, faFacebook, faGithub, faGoogle, faInstagram, faLinkedin, faPaypal, faPinterest, faPlaystation, faReddit, faSkype, faSnapchat, faSpotify, faSteam, faStrava, faTelegram, faTwitter, faVk, faWindows, faXbox, faYoutube } from '@fortawesome/free-brands-svg-icons'
+import { faDeviantart } from '@fortawesome/free-brands-svg-icons/faDeviantart'
+import { faDiscord } from '@fortawesome/free-brands-svg-icons/faDiscord'
+import { faFacebook } from '@fortawesome/free-brands-svg-icons/faFacebook'
+import { faGithub } from '@fortawesome/free-brands-svg-icons/faGithub'
+import { faGoogle } from '@fortawesome/free-brands-svg-icons/faGoogle'
+import { faInstagram } from '@fortawesome/free-brands-svg-icons/faInstagram'
+import { faLinkedin } from '@fortawesome/free-brands-svg-icons/faLinkedin'
+import { faPaypal } from '@fortawesome/free-brands-svg-icons/faPaypal'
+import { faPinterest } from '@fortawesome/free-brands-svg-icons/faPinterest'
+import { faPlaystation } from '@fortawesome/free-brands-svg-icons/faPlaystation'
+import { faReddit } from '@fortawesome/free-brands-svg-icons/faReddit'
+import { faSkype } from '@fortawesome/free-brands-svg-icons/faSkype'
+import { faSnapchat } from '@fortawesome/free-brands-svg-icons/faSnapchat'
+import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify'
+import { faSteam } from '@fortawesome/free-brands-svg-icons/faSteam'
+import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava'
+import { faTelegram } from '@fortawesome/free-brands-svg-icons/faTelegram'
+import { faTwitter } from '@fortawesome/free-brands-svg-icons/faTwitter'
+import { faVk } from '@fortawesome/free-brands-svg-icons/faVk'
+import { faWindows } from '@fortawesome/free-brands-svg-icons/faWindows'
+import { faXbox } from '@fortawesome/free-brands-svg-icons/faXbox'
+import { faYoutube } from '@fortawesome/free-brands-svg-icons/faYoutube'
+
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(faDeviantart, faDiscord, faFacebook, faGithub, faGoogle, faInstagram, faLinkedin, faPaypal, faPinterest, faPlaystation, faReddit, faSkype, faSnapchat, faSpotify, faSteam, faStrava, faTelegram, faTwitter, faVk, faWindows, faXbox, faYoutube)
