@@ -54,7 +54,7 @@ import { textStrokeGenerator, shadowGenerator } from 'src/panel/helpers/text';
 import { getContrastColor } from 'src/panel/helpers/color';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faSortDown } from '@fortawesome/free-solid-svg-icons'
+import { faSortDown } from '@fortawesome/free-solid-svg-icons/faSortDown'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 import * as defaultTick from 'src/panel/views/registries/randomizer/media/click_wheel.mp3';

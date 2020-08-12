@@ -141,10 +141,10 @@ import { find } from 'lodash-es';
 import { getSocket } from 'src/panel/helpers/socket';
 import { textStrokeGenerator, shadowGenerator } from 'src/panel/helpers/text';
 
-import BootstrapVue from 'bootstrap-vue'
+import { ProgressPlugin} from 'bootstrap-vue/esm/components/progress'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
-Vue.use(BootstrapVue);
+Vue.use(ProgressPlugin);
 
 import moment from 'moment'
 import VueMoment from 'vue-moment'

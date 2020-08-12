@@ -35,12 +35,19 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faStar, faGem, faUsers, faClock, faEye } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { getSocket } from 'src/panel/helpers/socket';
+import { library } from '@fortawesome/fontawesome-svg-core'
+
+import { faStar } from '@fortawesome/free-solid-svg-icons/faStar'
+import { faGem } from '@fortawesome/free-solid-svg-icons/faGem'
+import { faUsers } from '@fortawesome/free-solid-svg-icons/faUsers'
+import { faClock } from '@fortawesome/free-solid-svg-icons/faClock'
+import { faEye } from '@fortawesome/free-solid-svg-icons/faEye'
 
 library.add(faStar, faGem, faUsers, faClock, faEye)
+
+import { getSocket } from 'src/panel/helpers/socket';
+
 
 @Component({
   components: {
