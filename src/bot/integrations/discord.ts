@@ -100,17 +100,25 @@ class Discord extends Integration {
 
   @settings('bot')
   @ui({
-    type: 'selector', values: ['online', 'invisible', 'dnd'],
+    type: 'selector', values: ['online', 'idle', 'invisible', 'dnd'],
     if: () => self.guild.length > 0,
   })
   onlinePresence: 'online' | 'idle' | 'invisible' | 'dnd' = 'online';
 
+  /*
   @settings('bot')
   @ui({
     type: 'toggle-enable',
     if: () => self.guild.length > 0,
   })
   togglePresenceOnStream = true;
+ */
+  @settings('bot')
+  @ui({
+    type: 'selector', values: ['streaming', 'online', 'idle', 'invisible', 'dnd'],
+    if: () => self.guild.length > 0,
+  })
+  togglePresenceOnStream: 'streaming' | 'online' | 'idle' | 'invisible' | 'dnd' = 'online';
 
   @settings('mapping')
   @ui({
@@ -393,9 +401,14 @@ class Discord extends Integration {
   @onChange('onlinePresence')
   async changeClientOnlinePresence() {
     try {
-      if (api.isStreamOnline && this.togglePresenceOnStream) {
-        this.client?.user?.setStatus('online');
-        this.client?.user?.setPresence({ status: 'online', activity: { name: `${api.stats.currentTitle}`, type: 'STREAMING', url: `https://twitch.tv/${oauth.generalChannel}`} });
+      if (api.isStreamOnline) {
+        if (this.togglePresenceOnStream === 'streaming') {
+          this.client?.user?.setStatus('online');
+          this.client?.user?.setPresence({ status: 'online', activity: { name: `${api.stats.currentTitle}`, type: 'STREAMING', url: `https://twitch.tv/${oauth.generalChannel}`} });
+        } else {
+          this.client?.user?.setStatus(this.togglePresenceOnStream);
+          this.client?.user?.setPresence({ status: this.togglePresenceOnStream, activity: { name: '', type: undefined, url: '' } });
+        }
       } else {
         this.client?.user?.setPresence({ status: this.onlinePresence, activity: { name: '', type: undefined, url: '' } });
         this.client?.user?.setStatus(this.onlinePresence);
