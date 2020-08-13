@@ -98,6 +98,20 @@ class Discord extends Integration {
   })
   sendGeneralAnnounceToChannel = '';
 
+  @settings('bot')
+  @ui({
+    type: 'selector', values: ['online', 'invisible', 'dnd'],
+    if: () => self.guild.length > 0,
+  })
+  onlinePresence: 'online' | 'idle' | 'invisible' | 'dnd' = 'online';
+
+  @settings('bot')
+  @ui({
+    type: 'toggle-enable',
+    if: () => self.guild.length > 0,
+  })
+  togglePresenceOnStream = true;
+
   @settings('mapping')
   @ui({
     type: 'discord-mapping',
@@ -303,6 +317,7 @@ class Discord extends Integration {
 
   @onStreamEnd()
   async updateStreamStartAnnounce() {
+    this.changeClientOnlinePresence();
     const channel = this.client?.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
     if (channel) {
       const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
@@ -371,6 +386,23 @@ class Discord extends Integration {
     } catch (e) {
       warning(e.stack);
     }
+
+    this.changeClientOnlinePresence();
+  }
+
+  @onChange('onlinePresence')
+  async changeClientOnlinePresence() {
+    try {
+      if (api.isStreamOnline && this.togglePresenceOnStream) {
+        this.client?.user?.setStatus('online');
+        this.client?.user?.setPresence({ status: 'online', activity: { name: `${api.stats.currentTitle}`, type: 'STREAMING', url: `https://twitch.tv/${oauth.generalChannel}`} });
+      } else {
+        this.client?.user?.setPresence({ status: this.onlinePresence, activity: { name: '', type: undefined, url: '' } });
+        this.client?.user?.setStatus(this.onlinePresence);
+      }
+    } catch (e) {
+      warning(e.stack);
+    }
   }
 
   initClient() {
@@ -382,6 +414,7 @@ class Discord extends Integration {
       this.client.on('ready', () => {
         if (this.client) {
           info(chalk.yellow('DISCORD: ') + `Logged in as ${get(this.client, 'user.tag', 'unknown')}!`);
+          this.changeClientOnlinePresence();
         }
       });
 
