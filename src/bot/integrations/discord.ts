@@ -148,6 +148,7 @@ class Discord extends Integration {
     // embed updater
     setInterval(async () => {
       if (api.isStreamOnline && this.client && this.embedMessageId.length > 0) {
+        this.changeClientOnlinePresence();
         const channel = this.client.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
         if (channel) {
           const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
@@ -362,8 +363,8 @@ class Discord extends Integration {
 
   @onStreamStart()
   async sendStreamStartAnnounce() {
+    this.changeClientOnlinePresence();
     moment.locale(general.lang); // set moment locale
-
     try {
       if (this.client && this.sendOnlineAnnounceToChannel.length > 0 && this.guild.length > 0) {
         const channel = this.client.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
@@ -402,8 +403,6 @@ class Discord extends Integration {
     } catch (e) {
       warning(e.stack);
     }
-
-    this.changeClientOnlinePresence();
   }
 
   @onChange('onlinePresenceStatusOnStreamName')
