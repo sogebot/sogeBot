@@ -15,6 +15,9 @@
     "noGuildSelected": "no guild selected",
     "noGuildSelectedBox": "Select guild where bot should work and you'll see more settings",
     "onlinePresence": "Bot Default Status",
-    "togglePresenceOnStream": "Bot Status Streaming"
+    "onlinePresenceStatusDefault": "Default Status",
+    "onlinePresenceStatusDefaultName": "Default Status Message",
+    "onlinePresenceStatusOnStream": "Status when Streaming",
+    "onlinePresenceStatusOnStreamName": "Status Message when Streaming"
   }
 }

@@ -98,27 +98,35 @@ class Discord extends Integration {
   })
   sendGeneralAnnounceToChannel = '';
 
-  @settings('bot')
+  @settings('status')
   @ui({
     type: 'selector', values: ['online', 'idle', 'invisible', 'dnd'],
     if: () => self.guild.length > 0,
   })
-  onlinePresence: 'online' | 'idle' | 'invisible' | 'dnd' = 'online';
-
-  /*
-  @settings('bot')
+  onlinePresenceStatusDefault: 'online' | 'idle' | 'invisible' | 'dnd' = 'online';
+  
+  @settings('status')
   @ui({
-    type: 'toggle-enable',
+    type: 'text-input',
+    secret: false,
     if: () => self.guild.length > 0,
   })
-  togglePresenceOnStream = true;
- */
-  @settings('bot')
+  onlinePresenceStatusDefaultName = '';
+
+  @settings('status')
   @ui({
     type: 'selector', values: ['streaming', 'online', 'idle', 'invisible', 'dnd'],
     if: () => self.guild.length > 0,
   })
-  togglePresenceOnStream: 'streaming' | 'online' | 'idle' | 'invisible' | 'dnd' = 'online';
+  onlinePresenceStatusOnStream: 'streaming' | 'online' | 'idle' | 'invisible' | 'dnd' = 'online';
+
+  @settings('status')
+  @ui({
+    type: 'text-input',
+    secret: false,
+    if: () => self.guild.length > 0,
+  })
+  onlinePresenceStatusOnStreamName = '$title';
 
   @settings('mapping')
   @ui({
@@ -398,20 +406,34 @@ class Discord extends Integration {
     this.changeClientOnlinePresence();
   }
 
-  @onChange('onlinePresence')
+  @onChange('onlinePresenceStatusOnStreamName')
+  @onChange('onlinePresenceStatusDefaultName')
+  @onChange('onlinePresenceStatusOnStream')
+  @onChange('onlinePresenceStatusDefault')
   async changeClientOnlinePresence() {
     try {
       if (api.isStreamOnline) {
-        if (this.togglePresenceOnStream === 'streaming') {
+        const activityString = await new Message(this.onlinePresenceStatusOnStreamName).parse({});
+        if (this.onlinePresenceStatusOnStream === 'streaming') {
           this.client?.user?.setStatus('online');
-          this.client?.user?.setPresence({ status: 'online', activity: { name: `${api.stats.currentTitle}`, type: 'STREAMING', url: `https://twitch.tv/${oauth.generalChannel}`} });
+          this.client?.user?.setPresence({ status: 'online', activity: { name: activityString, type: 'STREAMING', url: `https://twitch.tv/${oauth.generalChannel}`} });
         } else {
-          this.client?.user?.setStatus(this.togglePresenceOnStream);
-          this.client?.user?.setPresence({ status: this.togglePresenceOnStream, activity: { name: '', type: undefined, url: '' } });
+          this.client?.user?.setStatus(this.onlinePresenceStatusOnStream);
+          if (activityString !== '') {
+            this.client?.user?.setActivity('');
+          } else {
+            this.client?.user?.setPresence({ status: this.onlinePresenceStatusOnStream, activity: { name: activityString } });
+          }
         }
       } else {
-        this.client?.user?.setPresence({ status: this.onlinePresence, activity: { name: '', type: undefined, url: '' } });
-        this.client?.user?.setStatus(this.onlinePresence);
+        const activityString = await new Message(this.onlinePresenceStatusDefaultName).parse({});
+        if (activityString !== ''){
+          this.client?.user?.setStatus(this.onlinePresenceStatusDefault);
+          this.client?.user?.setPresence({ status: this.onlinePresenceStatusDefault, activity: { name: activityString } });
+        } else {
+          this.client?.user?.setActivity('');
+          this.client?.user?.setStatus(this.onlinePresenceStatusDefault);
+        }
       }
     } catch (e) {
       warning(e.stack);
