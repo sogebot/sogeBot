@@ -14,7 +14,6 @@
     "noRoleSelected": "no role selected",
     "noGuildSelected": "no guild selected",
     "noGuildSelectedBox": "Select guild where bot should work and you'll see more settings",
-    "onlinePresence": "Bot Default Status",
     "onlinePresenceStatusDefault": "Default Status",
     "onlinePresenceStatusDefaultName": "Default Status Message",
     "onlinePresenceStatusOnStream": "Status when Streaming",
