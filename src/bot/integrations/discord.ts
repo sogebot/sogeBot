@@ -2,6 +2,7 @@
 import chalk from 'chalk';
 import { get } from 'lodash';
 import * as DiscordJs from 'discord.js';
+import { isMainThread } from '../cluster';
 
 // bot libraries
 import Integration from './_interface';
@@ -144,6 +145,10 @@ class Discord extends Integration {
 
   constructor() {
     super();
+
+    if (isMainThread) {
+      this.addEvent();
+    }
 
     // embed updater
     setInterval(async () => {
@@ -437,6 +442,33 @@ class Discord extends Integration {
     } catch (e) {
       warning(e.stack);
     }
+  }
+
+  public async sendDM(text: string, dMchannel: string): Promise<any> {
+    try {
+      if (this.client === null) {
+        throw new Error('Discord integration is not connected');
+      }
+      const messageContent = await new Message(text).parse({});
+      const channel = await this.client.guilds.cache.get(this.guild)?.channels.cache.get(dMchannel);
+      await (channel as DiscordJs.TextChannel).send(messageContent);
+    } catch (e) {
+      warning(e.stack);
+    }
+  }
+
+  public addEvent(){
+    if (typeof events === 'undefined') {
+      setTimeout(() => this.addEvent(), 1000);
+    } else {
+      events.supportedOperationsList.push(
+        { id: 'send-discord-message', definitions: { channel: '', messageToSend: '' }, fire: this.fireSendDiscordMessage },
+      );
+    }
+  }
+
+  public async fireSendDiscordMessage(operation: Events.OperationDefinitions, attributes: Events.Attributes): Promise<void> {
+    self.sendDM(String(operation.messageToSend), String(operation.channel));
   }
 
   initClient() {
