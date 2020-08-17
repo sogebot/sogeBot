@@ -219,6 +219,10 @@
           "label": "Сообщение для отправки",
           "placeholder": "Установите ваше сообщение"
         },
+        "channel": {
+          "label": "Channel",
+          "placeholder": "Channelname or ID"
+        },
         "commandToRun": {
           "label": "Команда для запуска",
           "placeholder": "Установите вашу !commandToRun"
@@ -755,6 +759,7 @@
     "timeout": "пользователь получил таймаут",
     "create-a-new-event-listener": "Создать новый обработчик событий",
     "send-twitter-message": "запостить сообщение в твиттер",
+    "send-discord-message": "send a discord message",
     "send-chat-message": "send a twitch chat message",
     "send-whisper": "отправить сообщение в висперсы",
     "run-command": "запустить команду",
