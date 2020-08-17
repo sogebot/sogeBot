@@ -265,6 +265,10 @@
         "numberToDecrement": {
           "label": "Number to decrement",
           "placeholder": ""
+        },
+        "titleOfReward": {
+          "label": "Title of redeemed reward",
+          "placeholder": ""
         }
       }
     },
@@ -735,6 +739,7 @@
     "keyword-send-x-times": "keyword was send x times",
     "number-of-viewers-is-at-least-x": "number of viewers is at least x",
     "stream-started": "stream started",
+    "reward-redeemed": "reward redeemed",
     "stream-stopped": "stream stopped",
     "stream-is-running-x-minutes": "stream is running x minutes",
     "every-x-minutes-of-stream": "every x minutes of stream",
