@@ -7,7 +7,7 @@
       "help": "Es wird empfohlen, dies deaktiviert zu lassen, um API-Limitierungen zu vermeiden."
     },
     "queueWhenOffline": {
-      "title": "Queue songs when stream is offline",
+      "title": "Stellt Songs in die Warteschlange, wenn der Stream offline ist.",
       "help": "It's advised to have this disabled to avoid queueing when you are just listening music"
     },
     "clientId": "clientId",
