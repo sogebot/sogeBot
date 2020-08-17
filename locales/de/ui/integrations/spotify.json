@@ -8,7 +8,7 @@
     },
     "queueWhenOffline": {
       "title": "Stellt Songs in die Warteschlange, wenn der Stream offline ist.",
-      "help": "It's advised to have this disabled to avoid queueing when you are just listening music"
+      "help": "Es wird empfohlen, diese Option zu deaktivieren, um Warteschlangen zu vermeiden, wenn Sie nur Musik hören."
     },
     "clientId": "clientId",
     "clientSecret": "clientSecret",
