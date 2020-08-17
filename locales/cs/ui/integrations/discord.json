@@ -13,6 +13,10 @@
     "noChannelSelected": "není vybrán žádný kanál",
     "noRoleSelected": "není vybrána žádná role",
     "noGuildSelected": "nebyl vybrán žádný server",
-    "noGuildSelectedBox": "Vyberte server, který bot bude používat a zobrazí se vám další nastavení"
+    "noGuildSelectedBox": "Vyberte server, který bot bude používat a zobrazí se vám další nastavení",
+    "onlinePresenceStatusDefault": "Default Status",
+    "onlinePresenceStatusDefaultName": "Default Status Message",
+    "onlinePresenceStatusOnStream": "Status when Streaming",
+    "onlinePresenceStatusOnStreamName": "Status Message when Streaming"
   }
 }
