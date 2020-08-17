@@ -265,6 +265,10 @@
         "numberToDecrement": {
           "label": "Число для уменьшения",
           "placeholder": ""
+        },
+        "titleOfReward": {
+          "label": "Title of redeemed reward",
+          "placeholder": ""
         }
       }
     },
@@ -735,6 +739,7 @@
     "keyword-send-x-times": "ключевое слово было отправлено X раз",
     "number-of-viewers-is-at-least-x": "количество зрителей минимум х",
     "stream-started": "стрим запущен",
+    "reward-redeemed": "reward redeemed",
     "stream-stopped": "стрим выключен",
     "stream-is-running-x-minutes": "стрим идёт Х минут",
     "every-x-minutes-of-stream": "каждую Х минуту стрима",
