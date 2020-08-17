@@ -219,6 +219,10 @@
           "label": "Zu sendende Nachricht",
           "placeholder": "Nachricht festlegen"
         },
+        "channel": {
+          "label": "Channel",
+          "placeholder": "Channelname or ID"
+        },
         "commandToRun": {
           "label": "Befehl zum Starten",
           "placeholder": "Setze deinen !commandToRun"
@@ -755,6 +759,7 @@
     "timeout": "der Benutzer hatte einen Timeout",
     "create-a-new-event-listener": "Neuen Ereignis-Listener erstellen",
     "send-twitter-message": "Eine Twitter-Nachricht veröffentlichen",
+    "send-discord-message": "send a discord message",
     "send-chat-message": "send a twitch chat message",
     "send-whisper": "einen Whisper senden",
     "run-command": "Einen Befehl ausführen",
