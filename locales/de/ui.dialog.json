@@ -4,23 +4,23 @@
     "add": "Hinzufügen"
   },
   "position": {
-    "settings": "Position settings",
-    "anchorX": "Anchor X position",
-    "anchorY": "Anchor Y position",
-    "left": "Left",
-    "right": "Right",
-    "middle": "Middle",
-    "top": "Top",
-    "bottom": "Bottom",
+    "settings": "Positionseinstellungen",
+    "anchorX": "Cursor X-Position",
+    "anchorY": "Cursor Y-Position",
+    "left": "Links",
+    "right": "Rechts",
+    "middle": "Mitten",
+    "top": "Oben",
+    "bottom": "Unten",
     "x": "X",
     "y": "Y"
   },
   "font": {
-    "shadowShiftRight": "Shift Right",
-    "shadowShiftDown": "Shift Down",
-    "shadowBlur": "Blur",
-    "shadowOpacity": "Opacity",
-    "color": "Color"
+    "shadowShiftRight": "Nach rechts verschieben",
+    "shadowShiftDown": "Nach unten verschieben",
+    "shadowBlur": "Weichzeichnen",
+    "shadowOpacity": "Deckkraft",
+    "color": "Farbe"
   },
   "errors": {
     "required": "Diese Eingabe darf nicht leer sein.",
