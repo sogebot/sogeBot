@@ -444,7 +444,7 @@ class Discord extends Integration {
     }
   }
 
-  public async sendDM(text: string, dMchannel: string): Promise<any> {
+  public async sendDM(text: string, dMchannel: string): Promise<void> {
     try {
       if (this.client === null) {
         throw new Error('Discord integration is not connected');
