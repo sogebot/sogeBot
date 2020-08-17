@@ -2,6 +2,7 @@
 import chalk from 'chalk';
 import { get } from 'lodash';
 import * as DiscordJs from 'discord.js';
+import { isMainThread } from '../cluster';
 
 // bot libraries
 import Integration from './_interface';
@@ -98,6 +99,36 @@ class Discord extends Integration {
   })
   sendGeneralAnnounceToChannel = '';
 
+  @settings('status')
+  @ui({
+    type: 'selector', values: ['online', 'idle', 'invisible', 'dnd'],
+    if: () => self.guild.length > 0,
+  })
+  onlinePresenceStatusDefault: 'online' | 'idle' | 'invisible' | 'dnd' = 'online';
+  
+  @settings('status')
+  @ui({
+    type: 'text-input',
+    secret: false,
+    if: () => self.guild.length > 0,
+  })
+  onlinePresenceStatusDefaultName = '';
+
+  @settings('status')
+  @ui({
+    type: 'selector', values: ['streaming', 'online', 'idle', 'invisible', 'dnd'],
+    if: () => self.guild.length > 0,
+  })
+  onlinePresenceStatusOnStream: 'streaming' | 'online' | 'idle' | 'invisible' | 'dnd' = 'online';
+
+  @settings('status')
+  @ui({
+    type: 'text-input',
+    secret: false,
+    if: () => self.guild.length > 0,
+  })
+  onlinePresenceStatusOnStreamName = '$title';
+
   @settings('mapping')
   @ui({
     type: 'discord-mapping',
@@ -115,9 +146,14 @@ class Discord extends Integration {
   constructor() {
     super();
 
+    if (isMainThread) {
+      this.addEvent();
+    }
+
     // embed updater
     setInterval(async () => {
       if (api.isStreamOnline && this.client && this.embedMessageId.length > 0) {
+        this.changeClientOnlinePresence();
         const channel = this.client.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
         if (channel) {
           const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
@@ -303,6 +339,7 @@ class Discord extends Integration {
 
   @onStreamEnd()
   async updateStreamStartAnnounce() {
+    this.changeClientOnlinePresence();
     const channel = this.client?.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
     if (channel) {
       const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
@@ -331,8 +368,8 @@ class Discord extends Integration {
 
   @onStreamStart()
   async sendStreamStartAnnounce() {
+    this.changeClientOnlinePresence();
     moment.locale(general.lang); // set moment locale
-
     try {
       if (this.client && this.sendOnlineAnnounceToChannel.length > 0 && this.guild.length > 0) {
         const channel = this.client.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
@@ -373,6 +410,67 @@ class Discord extends Integration {
     }
   }
 
+  @onChange('onlinePresenceStatusOnStreamName')
+  @onChange('onlinePresenceStatusDefaultName')
+  @onChange('onlinePresenceStatusOnStream')
+  @onChange('onlinePresenceStatusDefault')
+  async changeClientOnlinePresence() {
+    try {
+      if (api.isStreamOnline) {
+        const activityString = await new Message(this.onlinePresenceStatusOnStreamName).parse({});
+        if (this.onlinePresenceStatusOnStream === 'streaming') {
+          this.client?.user?.setStatus('online');
+          this.client?.user?.setPresence({ status: 'online', activity: { name: activityString, type: 'STREAMING', url: `https://twitch.tv/${oauth.generalChannel}`} });
+        } else {
+          this.client?.user?.setStatus(this.onlinePresenceStatusOnStream);
+          if (activityString !== '') {
+            this.client?.user?.setActivity('');
+          } else {
+            this.client?.user?.setPresence({ status: this.onlinePresenceStatusOnStream, activity: { name: activityString } });
+          }
+        }
+      } else {
+        const activityString = await new Message(this.onlinePresenceStatusDefaultName).parse({});
+        if (activityString !== ''){
+          this.client?.user?.setStatus(this.onlinePresenceStatusDefault);
+          this.client?.user?.setPresence({ status: this.onlinePresenceStatusDefault, activity: { name: activityString } });
+        } else {
+          this.client?.user?.setActivity('');
+          this.client?.user?.setStatus(this.onlinePresenceStatusDefault);
+        }
+      }
+    } catch (e) {
+      warning(e.stack);
+    }
+  }
+
+  public async sendDM(text: string, dMchannel: string): Promise<void> {
+    try {
+      if (this.client === null) {
+        throw new Error('Discord integration is not connected');
+      }
+      const messageContent = await new Message(text).parse({});
+      const channel = await this.client.guilds.cache.get(this.guild)?.channels.cache.get(dMchannel);
+      await (channel as DiscordJs.TextChannel).send(messageContent);
+    } catch (e) {
+      warning(e.stack);
+    }
+  }
+
+  public addEvent(){
+    if (typeof events === 'undefined') {
+      setTimeout(() => this.addEvent(), 1000);
+    } else {
+      events.supportedOperationsList.push(
+        { id: 'send-discord-message', definitions: { channel: '', messageToSend: '' }, fire: this.fireSendDiscordMessage },
+      );
+    }
+  }
+
+  public async fireSendDiscordMessage(operation: Events.OperationDefinitions, attributes: Events.Attributes): Promise<void> {
+    self.sendDM(String(operation.messageToSend), String(operation.channel));
+  }
+
   initClient() {
     if (!this.client) {
       this.client = new DiscordJs.Client({
@@ -382,6 +480,7 @@ class Discord extends Integration {
       this.client.on('ready', () => {
         if (this.client) {
           info(chalk.yellow('DISCORD: ') + `Logged in as ${get(this.client, 'user.tag', 'unknown')}!`);
+          this.changeClientOnlinePresence();
         }
       });
 

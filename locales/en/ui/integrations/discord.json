@@ -13,6 +13,10 @@
     "noChannelSelected": "no channel selected",
     "noRoleSelected": "no role selected",
     "noGuildSelected": "no guild selected",
-    "noGuildSelectedBox": "Select guild where bot should work and you'll see more settings"
+    "noGuildSelectedBox": "Select guild where bot should work and you'll see more settings",
+    "onlinePresenceStatusDefault": "Default Status",
+    "onlinePresenceStatusDefaultName": "Default Status Message",
+    "onlinePresenceStatusOnStream": "Status when Streaming",
+    "onlinePresenceStatusOnStreamName": "Status Message when Streaming"
   }
 }
