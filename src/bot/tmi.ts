@@ -32,7 +32,6 @@ import eventlist from './overlays/eventlist';
 import { getFunctionList } from './decorators/on';
 import { avgResponse, linesParsedIncrement, setStatus } from './helpers/parser';
 
-
 const userHaveSubscriberBadges = (badges: Readonly<UserStateTags['badges']>) => {
   return typeof badges.subscriber !== 'undefined' || typeof badges.founder !== 'undefined';
 };
