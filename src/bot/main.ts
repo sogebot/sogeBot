@@ -106,6 +106,7 @@ async function main () {
       require('./oauth');
       require('./webhooks');
       require('./api');
+      require('./pubsub');
       translate.default._load().then(async () => {
         await autoLoad('./dest/stats/');
         await autoLoad('./dest/registries/');

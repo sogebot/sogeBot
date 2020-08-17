@@ -78,6 +78,7 @@ class Events extends Core {
       { id: 'timeout', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'reason', 'duration' ] },
       { id: 'every-x-minutes-of-stream', definitions: { runEveryXMinutes: 100 }, check: this.everyXMinutesOfStream },
       { id: 'game-changed', variables: [ 'oldGame', 'game' ] },
+      { id: 'reward-redeemed', definitions: { titleOfReward: '' }, variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ], check: this.isCorrectReward },
     ];
 
     this.supportedOperationsList = [
@@ -435,6 +436,12 @@ class Events extends Core {
     }
     return shouldTrigger;
   }
+
+  public async isCorrectReward(event: EventInterface, attributes: Events.Attributes) {
+    const shouldTrigger = (attributes.titleOfReward >= event.definitions.titleOfReward);
+    return shouldTrigger;
+  }
+
 
   public async checkRaid(event: EventInterface, attributes: Events.Attributes) {
     event.definitions.viewersAtLeast = Number(event.definitions.viewersAtLeast); // force Integer
