@@ -265,6 +265,10 @@
         "numberToDecrement": {
           "label": "Kolik odečíst",
           "placeholder": ""
+        },
+        "titleOfReward": {
+          "label": "Title of redeemed reward",
+          "placeholder": ""
         }
       }
     },
@@ -735,6 +739,7 @@
     "keyword-send-x-times": "klíčové slovo posláno x-krát",
     "number-of-viewers-is-at-least-x": "počet diváků je alespoň x",
     "stream-started": "vysílání zahájeno",
+    "reward-redeemed": "reward redeemed",
     "stream-stopped": "vysílání zastaveno",
     "stream-is-running-x-minutes": "vysílání běží x minut",
     "every-x-minutes-of-stream": "každých x minut vysílání",
