@@ -13,6 +13,10 @@
     "noChannelSelected": "канал не выбран",
     "noRoleSelected": "роль не выбрана",
     "noGuildSelected": "сервер не выбран",
-    "noGuildSelectedBox": "Выберете сервер на котором должен работать бот, и вы увидите больше настроек"
+    "noGuildSelectedBox": "Выберете сервер на котором должен работать бот, и вы увидите больше настроек",
+    "onlinePresenceStatusDefault": "Default Status",
+    "onlinePresenceStatusDefaultName": "Default Status Message",
+    "onlinePresenceStatusOnStream": "Status when Streaming",
+    "onlinePresenceStatusOnStreamName": "Status Message when Streaming"
   }
 }
