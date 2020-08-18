@@ -957,12 +957,12 @@
     "rank-parse-failed": "{core.command-parse} !rank help",
     "rank-was-added": "$sender, neuer Rang $type $rank ($hours$hlocale) wurde hinzugefügt",
     "rank-was-edited": "$sender, Rang für $type $hours$hlocale wurde geändert zu $rank",
-    "rank-was-removed": "$sender, rank for $type $hours$hlocale was removed",
-    "rank-already-exist": "$sender, there is already a rank for $type $hours$hlocale",
-    "rank-was-not-found": "$sender, rank for $type $hours$hlocale was not found",
-    "custom-rank-was-set-to-user": "$sender, you set $rank to $username",
-    "custom-rank-was-unset-for-user": "$sender, custom rank for $username was unset",
-    "list-is-empty": "$sender, no ranks was found",
+    "rank-was-removed": "$sender, Rang für $type $hours$hlocale wurde entfernt",
+    "rank-already-exist": "$sender, Es gibt bereits einen Rang für $type $hours$hlocale",
+    "rank-was-not-found": "$sender, Rang für $type $hours$hlocale wurde nicht gefunden",
+    "custom-rank-was-set-to-user": "$sender, du setzt $rank für $username",
+    "custom-rank-was-unset-for-user": "$sender, benutzerdefinierter Rang für $username wurde nicht gesetzt",
+    "list-is-empty": "$sender, kein Rang wurde gefunden",
     "list-is-not-empty": "$sender, Rangliste: $list",
     "show-rank-without-next-rank": "$sender, du hast den Rank: $rank",
     "show-rank-with-next-rank": "$sender, du hast den Rang: $rank. Nächster Rang ist - $nextrank",
@@ -971,24 +971,24 @@
   "followage": {
     "success": {
       "never": "$sender, $username ist kein Follower",
-      "time": "$sender, $username is following channel $diff"
+      "time": "$sender, $username folgt dem Kanal $diff"
     },
     "successSameUsername": {
-      "never": "$sender, you are not follower of this channel",
-      "time": "$sender, you are following this channel for $diff"
+      "never": "$sender, sie sind kein Anhänger dieses Kanals",
+      "time": "$sender, sie folgen diesem Kanal seit $diff"
     }
   },
   "subage": {
     "success": {
-      "never": "$sender, $username is not a channel subscriber.",
-      "notNow": "$sender, $username is currently not a channel subscriber. In total of $subCumulativeMonths $subCumulativeMonthsName.",
-      "timeWithSubStreak": "$sender, $username is subscriber of channel. Current sub streak for $diff ($subStreak $subStreakMonthsName) and in total of $subCumulativeMonths $subCumulativeMonthsName.",
-      "time": "$sender, $username is subscriber of channel. In total of $subCumulativeMonths $subCumulativeMonthsName."
+      "never": "$sender, $username ist kein Kanal subscriber.",
+      "notNow": "$sender, $username ist derzeit kein Kanal subscriber. Insgesamt $subCumulativeMonths $subCumulativeMonthsName.",
+      "timeWithSubStreak": "$sender, $username ist subscriber auf dem Kanal. Aktuelle Teilsträhne für $diff ($subStreak $subStreakMonthsName) und insgesamt von $subCumulativeMonths $subCumulativeMonthsName.",
+      "time": "$sender, $username ist Abonnent des Kanals. Insgesamt $subCumulativeMonths $subCumulativeMonthsName."
     },
     "successSameUsername": {
       "never": "$sender, Du bist kein Kanal-Abonnent.",
-      "notNow": "$sender, you are currently not a channel subscriber. In total of $subCumulativeMonths $subCumulativeMonthsName.",
-      "timeWithSubStreak": "$sender, you are subscriber of channel. Current sub streak for $diff ($subStreak $subStreakMonthsName) and in total of $subCumulativeMonths $subCumulativeMonthsName.",
+      "notNow": "$sender, Sie sind derzeit kein Kanal Abonnent. Insgesamt $subCumulativeMonths $subCumulativeMonthsName.",
+      "timeWithSubStreak": "$sender, Sie sind Abonnent des Kanals. Aktuelle Abostähne für $diff ($subStreak $subStreakMonthsName) und insgesamt $subCumulativeMonths $subCumulativeMonthsName.",
       "time": "$sender, you are subscriber of channel. In total of $subCumulativeMonths $subCumulativeMonthsName."
     }
   },
