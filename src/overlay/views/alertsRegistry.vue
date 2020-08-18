@@ -196,7 +196,7 @@ export default class AlertsRegistryOverlays extends Vue {
         && (!isTTSPlaying || !this.runningAlert.alert.tts.keepAlertShown)
         && !waitingForTTS
         ? this.runningAlert.alert.animationOutDuration
-        : this.runningAlert.alert.animationOutDuration;
+        : this.runningAlert.alert.animationInDuration;
     } else {
       return 1000;
     }
