@@ -27,6 +27,7 @@ import currency from './currency';
 import oauth from './oauth';
 import songs from './systems/songs';
 import spotify from './integrations/spotify';
+import lastfm from './integrations/lastfm';
 import { linesParsed, status as statusObj } from './helpers/parser';
 import { list, systems } from './helpers/register';
 import customvariables from './customvariables';
@@ -574,7 +575,7 @@ const sendStreamData = async function (cb: (error: Error | string | null, data: 
       game: api.stats.currentGame,
       status: api.stats.currentTitle,
       rawStatus: api.rawStatus,
-      currentSong: ytCurrentSong || spotifyCurrentSong || translate('songs.not-playing'),
+      currentSong: lastfm.currentSong || ytCurrentSong || spotifyCurrentSong || translate('songs.not-playing'),
       currentHosts: api.stats.currentHosts,
       currentWatched: api.stats.currentWatchedTime,
       tags: currentStreamTags,

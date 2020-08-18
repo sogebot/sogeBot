@@ -23,6 +23,7 @@ import oauth from './oauth';
 import api from './api';
 import tmi from './tmi';
 import customvariables from './customvariables';
+import lastfm from './integrations/lastfm';
 import spotify from './integrations/spotify';
 import songs from './systems/songs';
 import Parser from './parser';
@@ -129,6 +130,7 @@ class Message {
       this.message = this.message.replace(/\$spotifySong/g, translate('songs.not-playing'));
     }
 
+    this.message = this.message.replace(/\$lastfmSong/g, lastfm.currentSong ? lastfm.currentSong : translate('songs.not-playing'));
 
     if (songs.enabled
         && this.message.includes('$ytSong')
