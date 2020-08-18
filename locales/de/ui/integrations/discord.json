@@ -14,9 +14,9 @@
     "noRoleSelected": "Keine Rolle ausgewählt",
     "noGuildSelected": "kein Server ausgewählt",
     "noGuildSelectedBox": "Wähle Server aus, wo der Bot beitreten soll und du wirst mehr Einstellungen sehen",
-    "onlinePresenceStatusDefault": "Default Status",
-    "onlinePresenceStatusDefaultName": "Default Status Message",
-    "onlinePresenceStatusOnStream": "Status when Streaming",
+    "onlinePresenceStatusDefault": "Standard Status",
+    "onlinePresenceStatusDefaultName": "Standard Status Nachricht",
+    "onlinePresenceStatusOnStream": "Status beim Streamen",
     "onlinePresenceStatusOnStreamName": "Status Message when Streaming"
   }
 }
