@@ -163,15 +163,15 @@
         },
         "fadeOutXCommands": {
           "label": "Ausblenden alle X Befehle",
-          "placeholder": "Number of commands subtracted every fade out interval"
+          "placeholder": "Anzahl der Befehle, die in jedem Ausblendintervall abgezogen wurden"
         },
         "fadeOutXKeywords": {
-          "label": "Fade Out X Keywords",
-          "placeholder": "Number of keywords subtracted every fade out interval"
+          "label": "X Schlüsselwörter ausblenden",
+          "placeholder": "Anzahl der Schlüsselwörter, die in jedem Ausblendintervall abgezogen wurden"
         },
         "fadeOutInterval": {
-          "label": "Fade Out Interval (seconds)",
-          "placeholder": "Fade out interval subtracting"
+          "label": "Ausblenden Intervall (Sekunden)",
+          "placeholder": "Ausblendenintervall subtrahieren"
         },
         "runEveryXCommands": {
           "label": "Alle X Befehle ausführen",
@@ -221,7 +221,7 @@
         },
         "channel": {
           "label": "Channel",
-          "placeholder": "Channelname or ID"
+          "placeholder": "Channelname oder ID"
         },
         "commandToRun": {
           "label": "Befehl zum Starten",
@@ -250,7 +250,7 @@
           "false": "Wird nicht angekündigt"
         },
         "hasDelay": {
-          "label": "Clip should have slight delay (to be closer what viewer see)",
+          "label": "Clip sollte eine leichte Verzögerung haben (um näher zu sein, was der Betrachter sieht)",
           "true": "Wird Verzögerung haben",
           "false": "Wird keine Verzögerung haben"
         },
@@ -263,7 +263,7 @@
           "placeholder": "Zu aktualisierende, benutzerdefinierte Variable"
         },
         "numberToIncrement": {
-          "label": "Number to increment",
+          "label": "Zu erreichende Zahl",
           "placeholder": ""
         },
         "numberToDecrement": {
@@ -271,7 +271,7 @@
           "placeholder": ""
         },
         "titleOfReward": {
-          "label": "Title of redeemed reward",
+          "label": "Titel der eingelösten Belohnung",
           "placeholder": ""
         }
       }
@@ -280,9 +280,9 @@
       "follow": "<strong>folgt</strong> Dir",
       "host": "<strong>hosted</strong> dich jetzt mit $viewers Zuschauern",
       "raid": "<strong>raided</strong> dich mit $viewers Zuschauern",
-      "sub": "<strong>subbed</strong> you | $tier",
-      "subgift": "have <strong>gifted</strong> sub from $username",
-      "subcommunitygift": "have <strong>gifted</strong> subs for $count viewers",
+      "sub": "<strong>subd</strong> dir | $tier",
+      "subgift": "<strong>verschenkte</strong> sub von $username",
+      "subcommunitygift": "<strong>verschenkte</strong> subs für $count Zuschauer",
       "resub": "<strong>resubbed</strong> you for $subStreak $subStreakName | $tier",
       "resubWithoutStreak": "<strong>resubbed</strong> | $tier | in total of $subCumulativeMonths $subCumulativeMonthsName",
       "cheer": "<strong>cheered</strong> you for $bits bits",
