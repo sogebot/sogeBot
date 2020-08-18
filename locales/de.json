@@ -1078,7 +1078,7 @@
     "cooldown-not-found": "$sender, Abklingzeit für $command wurde nicht gefunden",
     "cooldown-was-enabled": "$sender, Abklingzeit für $command wurde aktiviert",
     "cooldown-was-disabled": "$sender, Abklingzeit für $command wurde deaktiviert",
-    "cooldown-was-enabled-for-moderators": "$sender, cooldown for $command was enabled for moderators",
+    "cooldown-was-enabled-for-moderators": "$sender, Abklingzeit für $command ist für Moderatoren aktiviert",
     "cooldown-was-disabled-for-moderators": "$sender, die Abklingzeit für $command wurde für Moderatoren deaktiviert",
     "cooldown-was-enabled-for-owners": "$sender, Abklingzeit für $command wurde für Besitzer aktiviert",
     "cooldown-was-disabled-for-owners": "$sender, Abklingzeit für $command wurde für Besitzer deaktiviert",
@@ -1116,9 +1116,9 @@
       "new": "$sender ist dein neuer Duell-Herausforderer! Zur Teilnahme verwenden $command [points], du hast $minutes $minutesName übrig zum beitreten.",
       "zeroBet": "$sender, du kannst dich nicht mit 0 $pointsName duellieren",
       "notEnoughOptions": "$sender, Sie müssen Punkte für das Duell angeben",
-      "notEnoughPoints": "$sender, you don't have $points $pointsName to duel!",
-      "noContestant": "Only $winner have courage to join duel! Your bet of $points $pointsName are returned to you.",
-      "winner": "Congratulations to $winner! He is last man standing and he won $points $pointsName ($probability% with bet of $tickets $ticketsName)!"
+      "notEnoughPoints": "$sender, Sie haben nicht $points $pointsName für ein duell!",
+      "noContestant": "Nur $winner haben den Mut, dem Duell beizutreten! Ihre Wette von $points $pointsName wird Ihnen zurückgeschickt.",
+      "winner": "Herzlichen Glückwunsch an $winner! Er ist der letzte Mann und er hat gewonnen $points $pointsName ($probability% mit einem Einsatz von $tickets $ticketsName)!"
     },
     "roulette": {
       "trigger": "$sender is trying his luck and pulled a trigger",
