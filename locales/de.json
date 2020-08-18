@@ -439,8 +439,8 @@
             "listener": "Auf Befehle per Flüstern achten",
             "settings": "Flüsternachricht bei geänderten Einstellungen",
             "raffle": "Flüsternachricht bei teilnahme",
-            "permissions": "Unzureichende Berechtigungen zum Whispern",
-            "cooldowns": "Whispers on cooldown (if set as notify)"
+            "permissions": "Unzureichende Berechtigungen zum Flüstern",
+            "cooldowns": "Flüster bei Abklingzeit (wenn als Benachrichtigung gesetzt)"
           }
         }
       }
@@ -470,7 +470,7 @@
       },
       "labels": {
         "order": "REIHENFOLGE",
-        "range": "RANGE",
+        "range": "Bereich",
         "filters": "FILTER"
       }
     },
@@ -488,9 +488,9 @@
     "events-game-after-change": "Spiel nach Änderung",
     "events-game-before-change": "Spiel vor Änderung",
     "events-user-triggered-event": "vom Benutzer ausgelöstes Ereignis",
-    "events-method-used-to-subscribe": "method used to subscribe",
-    "events-months-of-subscription": "months of subscription",
-    "events-monthsName-of-subscription": "word 'month' by number (1 month, 2 months)",
+    "events-method-used-to-subscribe": "zum Abonnieren verwendete Methode",
+    "events-months-of-subscription": "Monate des Abonnements",
+    "events-monthsName-of-subscription": "Wort 'Monat' nach Nummer (1 Monat, 2 Monate)",
     "events-user-message": "Benutzermitteilung",
     "events-bits-user-sent": "vom Benutzer gesendete Bits",
     "events-reason-for-ban-timeout": "Grund für Bann/Timeout",
@@ -500,7 +500,7 @@
     "events-viewers-of-hosting": "Zuschauer des Host",
     "overlays-eventlist-resub": "re-Subs",
     "overlays-eventlist-subgift": "verschenkter Sub",
-    "overlays-eventlist-subcommunitygift": "subcommunitygift",
+    "overlays-eventlist-subcommunitygift": "subcommunitygeschenk",
     "overlays-eventlist-host": "Host",
     "overlays-eventlist-sub": "Sub",
     "overlays-eventlist-follow": "Folgen",
@@ -568,7 +568,7 @@
     "deleting": "Lösche...",
     "done": "Fertig",
     "error": "Fehler",
-    "custom-title-empty-error": "Custom title is checked, but is empty!",
+    "custom-title-empty-error": "Benutzerdefinierter Titel ist ausgewählt, aber leer!",
     "title": "Titel",
     "change-title": "Titel ändern",
     "game": "Spiel",
@@ -743,7 +743,7 @@
     "keyword-send-x-times": "Schlüsselwort wurde x mal gesendet",
     "number-of-viewers-is-at-least-x": "Anzahl der Zuschauer ist mindestens x",
     "stream-started": "Stream gestartet",
-    "reward-redeemed": "reward redeemed",
+    "reward-redeemed": "Belohnung eingelöst",
     "stream-stopped": "Stream gestoppt",
     "stream-is-running-x-minutes": "Stream läuft seit x Minuten",
     "every-x-minutes-of-stream": "alle X Minuten des Streams",
@@ -759,8 +759,8 @@
     "timeout": "der Benutzer hatte einen Timeout",
     "create-a-new-event-listener": "Neuen Ereignis-Listener erstellen",
     "send-twitter-message": "Eine Twitter-Nachricht veröffentlichen",
-    "send-discord-message": "send a discord message",
-    "send-chat-message": "send a twitch chat message",
+    "send-discord-message": "sende eine Discord Nachricht",
+    "send-chat-message": "sende eine Twitch Chat Nachricht",
     "send-whisper": "einen Whisper senden",
     "run-command": "Einen Befehl ausführen",
     "do-nothing": "--- nichts tun ---",
@@ -783,7 +783,7 @@
     "fightmeTimeout": "Timeout für !fightme",
     "duelCooldown": "Cooldown für !duel",
     "fightmeCooldown": "Cooldown für !fightme",
-    "gamblingCooldownBypass": "Bypass gambling cooldowns for mods/caster",
+    "gamblingCooldownBypass": "Abklingzeiten für Glücksspiele umgehen für Mods/Streamer",
     "click-to-highlight": "Highlight",
     "click-to-toggle-display": "Anzeige umschalten",
     "commercial": "Werbung gestartet",
@@ -792,8 +792,8 @@
     "bot-will-leave-channel": "Bot wird den Kanal verlassen",
     "create-a-clip": "Clip erstellen",
     "create-a-clip-and-play-replay": "einen Clip erstellen und als Wiedergabe abspielen (Overlay/Alers)",
-    "increment-custom-variable": "increment a custom variable",
-    "decrement-custom-variable": "decrement a custom variable",
+    "increment-custom-variable": "Erhöhen Sie eine benutzerdefinierte Variable",
+    "decrement-custom-variable": "Verringern Sie eine benutzerdefinierte Variable",
     "omit": "weglassen",
     "comply": "erfüllen",
     "visible": "Sichtbar",
@@ -809,12 +809,12 @@
     "eligibility-subscribers-item": "Abonnenten",
     "eligibility-everyone-item": "Jeder",
     "announce-raffle": "Verlosung wird ausgeführt. Um mitzumachen, einfach $keyword einzugeben. Verlosung ist offen für $eligibility",
-    "announce-ticket-raffle": "Raffle is running. To enter type $keyword <$min-$max>. Raffle is opened for $eligibility",
-    "cannot-create-raffle-without-keyword": "Sorry, $sender, but you cannot create raffle without keyword",
-    "raffle-is-already-running": "Sorry, $sender, raffle is already running with keyword $keyword",
-    "no-raffle-is-currently-running": "$sender, no raffles without winners are currently running",
+    "announce-ticket-raffle": "Verlosung wird ausgeführt. Um mitzumachen, einfach $keyword <$min-$max>. Verlosung ist offen für $eligibility",
+    "cannot-create-raffle-without-keyword": "Entschuldigung, $sender, aber du kannst keine Verlosung ohne Schlüsselwort erstellen",
+    "raffle-is-already-running": "Sorry, $sender, die Verlosung läuft bereits mit dem Schlüsselwort $keyword",
+    "no-raffle-is-currently-running": "$sender, es laufen derzeit keine Verlosungen ohne Gewinner",
     "no-participants-to-pick-winner": "$sender, niemand nimmt an der Verlosung teil.",
-    "raffle-winner-is": "Winner of raffle $keyword is $username! Win probability was $probability%!"
+    "raffle-winner-is": "Gewinner der Verlosung $keyword ist $username! Gewinnerwahrscheinlichkeit war $probability%!"
   },
   "bets": {
     "running": "$sender, bet is already opened! Bet options: $options. Use $command close 1-$maxIndex",
