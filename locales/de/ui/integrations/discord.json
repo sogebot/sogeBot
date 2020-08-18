@@ -17,6 +17,6 @@
     "onlinePresenceStatusDefault": "Standard Status",
     "onlinePresenceStatusDefaultName": "Standard Status Nachricht",
     "onlinePresenceStatusOnStream": "Status beim Streamen",
-    "onlinePresenceStatusOnStreamName": "Status Message when Streaming"
+    "onlinePresenceStatusOnStreamName": "Statusnachricht beim Streaming"
   }
 }
