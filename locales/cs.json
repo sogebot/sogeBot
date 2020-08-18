@@ -220,8 +220,8 @@
           "placeholder": "Nastav svou zprávu"
         },
         "channel": {
-          "label": "Channel",
-          "placeholder": "Channelname or ID"
+          "label": "Kanál",
+          "placeholder": "Název kanálu nebo ID"
         },
         "commandToRun": {
           "label": "Příkaz ke spuštění",
@@ -759,7 +759,7 @@
     "timeout": "uživatel dostal timeout",
     "create-a-new-event-listener": "Vytvoř nový event listener",
     "send-twitter-message": "poslat zprávu na twitter",
-    "send-discord-message": "send a discord message",
+    "send-discord-message": "odeslat Discord zprávu",
     "send-chat-message": "odeslat zprávu na twitch chat",
     "send-whisper": "poslat whisper",
     "run-command": "spusť příkaz",
