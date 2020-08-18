@@ -56,14 +56,6 @@ class Gamble extends Game {
         jackpotName: await pointsSystem.getPointsName(this.jackpotValue),
         jackpot: Math.ceil(this.jackpotValue),
       });
-
-      /*message = prepare('gambling.gamble.winJackpot', {
-        pointsName: await pointsSystem.getPointsName(currentPointsOfUser),
-        points: currentPointsOfUser,
-        jackpotName: await pointsSystem.getPointsName(this.jackpotValue),
-        jackpot: Math.ceil(this.jackpotValue),
-      });
-      */
       return [{ response: message, ...opts }];
     } else {
       return [{ response: 'Jackpot is Disbabled!', ...opts }];
