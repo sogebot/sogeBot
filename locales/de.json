@@ -817,10 +817,10 @@
     "raffle-winner-is": "Gewinner der Verlosung $keyword ist $username! Gewinnerwahrscheinlichkeit war $probability%!"
   },
   "bets": {
-    "running": "$sender, bet is already opened! Bet options: $options. Use $command close 1-$maxIndex",
-    "notRunning": "No bet is currently opened, ask mods to open it!",
-    "opened": "New bet '$title' is opened! Bet options: $options. Use $command 1-$maxIndex <amount> to win! You have only $minutesmin to bet!",
-    "closeNotEnoughOptions": "$sender, you need to select winning option for bet close.",
+    "running": "$sender, Wette ist bereits geöffnet! Wett-Optionen: $options. Verwenden Sie $command einsatz-$maxIndex",
+    "notRunning": "Derzeit ist keine Wette geöffnet, fragen Sie Mods, um sie zu öffnen!",
+    "opened": "Neue Wette '$title' ist geöffnet! Wett-Optionen: $options. Verwenden Sie $command 1-$maxIndex <amount> , um zu gewinnen! Sie haben nur $minutesmin um zu setzen!",
+    "closeNotEnoughOptions": "$sender, Sie müssen die Gewinnoption auswählen, um den Einsatz zu schließen.",
     "notEnoughOptions": "$sender, new bets needs at least 2 options!",
     "info": "Bet '$title' is still opened! Bet options: $options. Use $command 1-$maxIndex <amount> to win! You have only $minutesmin to bet!",
     "diffBet": "$sender, you already made a bet on $option and you cannot bet to different option!",
