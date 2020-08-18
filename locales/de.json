@@ -1013,23 +1013,23 @@
       "time": "$username hat den Channel bereits $time Stunden zugeschaut"
     },
     "failed": {
-      "parse": "{core.command-parse} !watched or !watched [username]"
+      "parse": "{core.command-parse} !watched oder !watched [username]"
     }
   },
   "permissions": {
-    "without-permission": "You don't have enough permissions for '$command'"
+    "without-permission": "Du hast nicht genügend Berechtigungen für '$command'"
   },
   "moderation": {
-    "user-have-link-permit": "User $username can post a $count $link to chat",
+    "user-have-link-permit": "Benutzer $username kann $count $link im Chat schreiben",
     "permit-parse-failed": "{core.command-parse} !permit [username]",
-    "user-is-warned-about-links": "No links allowed, ask for !permit [$count warnings left]",
-    "user-is-warned-about-symbols": "No excessive symbols usage [$count warnings left]",
-    "user-is-warned-about-long-message": "Long messages are not allowed [$count warnings left]",
-    "user-is-warned-about-caps": "No excessive caps usage [$count warnings left]",
-    "user-is-warned-about-spam": "Spamming is not allowed [$count warnings left]",
-    "user-is-warned-about-color": "Colors and /me is not allowed [$count warnings left]",
-    "user-is-warned-about-emotes": "No emotes spamming [$count warnings left]",
-    "user-is-warned-about-blacklist": "No blacklisted words [$count warnings left]",
+    "user-is-warned-about-links": "Keine Links erlaubt, frage nach !permit [$count warnungen übrig]",
+    "user-is-warned-about-symbols": "Keine übermäßige Verwendung von Symbolen [$count Warnungen übrig]",
+    "user-is-warned-about-long-message": "Lange Nachrichten sind nicht erlaubt [$count warnungen übrig]",
+    "user-is-warned-about-caps": "Keine übermäßige Verwendung von Caps [$count Warnungen übrig]",
+    "user-is-warned-about-spam": "Spamming ist nicht erlaubt [$count Warnungen übrig]",
+    "user-is-warned-about-color": "Farben und /me sind nicht erlaubt [$count Warnungen übrig]",
+    "user-is-warned-about-emotes": "Keine Emotes Spamming [$count Warnungen übrig]",
+    "user-is-warned-about-blacklist": "Keine Wörter auf der Sperrliste erlaubt [$count Warnungen übrig]",
     "user-have-timeout-for-links": "Keine Links erlaubt. Frage nach !permit",
     "user-have-timeout-for-symbols": "Keine übermäßige Verwendung von Symbolen",
     "user-have-timeout-for-long-message": "Lange Nachricht ist nicht erlaubt",
@@ -1040,7 +1040,7 @@
     "user-have-timeout-for-blacklist": "Keine blockierten Wörter"
   },
   "queue": {
-    "list": "$sender, current queue pool: $users",
+    "list": "$sender, aktueller Warteschlangen pool: $users",
     "info": {
       "closed": "$sender, {queue.close}",
       "opened": "$sender, {queue.open}"
@@ -1049,12 +1049,12 @@
       "closed": "Sorry, $senderist die Warteschlange geschlossen",
       "opened": "$sender wurde zur Warteschlange hinzugefügt"
     },
-    "open": "Queue is currently OPENED! Join to queue with !queue join",
+    "open": "Warteschlange ist zur Zeit geöffnet! Schließe dich der Warteschlange mit !queue join an",
     "close": "Warteschlange ist momentan geschlossen!",
     "clear": "Warteschlange wurde vollständig gelöscht",
     "picked": {
       "single": "Dieser Benutzer wurde aus der Warteschlange ausgewählt: $users",
-      "multi": "These users were picked from queue: $users",
+      "multi": "Diese Benutzer wurden aus der Warteschlange ausgewählt: $users",
       "none": "Keine Benutzer in der Warteschlange gefunden"
     }
   },
@@ -1071,13 +1071,13 @@
     }
   },
   "cooldowns": {
-    "cooldown-parse-failed": "{core.command-parse} !cooldown [keyword|!command] [global|user] [seconds] [true/false]",
-    "cooldown-was-set": "$sender, $type cooldown for $command was set to $secondss",
-    "cooldown-was-unset": "$sender, $type cooldown for $command was unset",
-    "cooldown-triggered": "$sender, you cannot use $command, remaining $secondss",
-    "cooldown-not-found": "$sender, cooldown for $command was not found",
-    "cooldown-was-enabled": "$sender, cooldown for $command was enabled",
-    "cooldown-was-disabled": "$sender, cooldown for $command was disabled",
+    "cooldown-parse-failed": "{core.command-parse} !cooldown [keyword|!command] [global|Benutzer] [seconds] [true/false]",
+    "cooldown-was-set": "$sender, $type Abklingzeit für $command wurde auf $secondss gesetzt",
+    "cooldown-was-unset": "$sender, $type Abklingzeit für $command wurde entfernt",
+    "cooldown-triggered": "$sender, Sie können nicht $command verwenden, verbleibende Zeit $secondss",
+    "cooldown-not-found": "$sender, Abklingzeit für $command wurde nicht gefunden",
+    "cooldown-was-enabled": "$sender, Abklingzeit für $command wurde aktiviert",
+    "cooldown-was-disabled": "$sender, Abklingzeit für $command wurde deaktiviert",
     "cooldown-was-enabled-for-moderators": "$sender, cooldown for $command was enabled for moderators",
     "cooldown-was-disabled-for-moderators": "$sender, die Abklingzeit für $command wurde für Moderatoren deaktiviert",
     "cooldown-was-enabled-for-owners": "$sender, Abklingzeit für $command wurde für Besitzer aktiviert",
