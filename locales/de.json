@@ -824,18 +824,18 @@
     "notEnoughOptions": "$sender, neue Wetten benötigen mindestens 2 Optionen!",
     "info": "Wetten '$title' ist noch geöffnet! Wetten-Optionen: $options. Verwenden Sie $command 1-$maxIndex <amount> , um zu gewinnen! Sie haben nur $minutesmin zum Wetten!",
     "diffBet": "$sender, Sie haben bereits auf $option gesetzt und können nicht auf eine andere Option setzen!",
-    "undefinedBet": "Sorry, $sender, aber diese Wette Option existiert nicht, benutze $command , um die Nutzung zu überprüfen",
+    "undefinedBet": "Entschuldigung, $sender, aber diese Wette Option existiert nicht, benutze $command , um die Nutzung zu überprüfen",
     "betPercentGain": "Prozentualer Gewinn pro Option wurde auf $value % gesetzt",
     "betCloseTimer": "Wetten werden nach $valuemin automatisch geschlossen",
     "refund": "Wetten wurden ohne Gewinn geschlossen, alle Benutzer werden erstattet!",
     "notOption": "$sender, diese Option existiert nicht! Wetten ist nicht geschlossen, überprüfen Sie $command",
-    "closed": "Bets was closed and winning option was $option! $amount users won in total $points $pointsName!",
-    "timeUpBet": "I guess you are too late, $sender, your time for betting is up!",
-    "locked": "Betting time is up! No more bets.",
-    "zeroBet": "Oh boy, $sender, you cannot bet 0 $pointsName",
-    "lockedInfo": "Bet '$title' is still opened, but time for betting is up!",
-    "removed": "Betting time is up! No bets were sent -> automatically closing",
-    "error": "Sorry, $sender, this command is not correct! Use $command 1-$maxIndex <amount>. E.g. $command 0 100 will bet 100 points to item 0."
+    "closed": "Wetten wurden geschlossen und gewonnene Option war $option! $amount Nutzer haben insgesamt $points $pointsName gewonnen!",
+    "timeUpBet": "Ich vermute, Sie sind zu spät, $sender, Ihre Zeit zum Wetten ist abgelaufen!",
+    "locked": "Die Wettzeiten ist abgelaufen! Keine Wetten mehr.",
+    "zeroBet": "Oh Junge, $sender du kannst nicht 0 $pointsName setzten",
+    "lockedInfo": "Wetten '$title' ist noch geöffnet, aber die Zeit für Wetten ist abgelaufen!",
+    "removed": "Wettzeit ist abgelaufen! Keine Wetten wurden gesetzt -> automatisch geschlossen",
+    "error": "Entschuldigung, $sender, dieser Befehl ist nicht korrekt! Verwenden Sie $command 1-$maxIndex <amount>. Z.B. $command 0 100 setzt 100 Punkte auf Geganstand 0."
   },
   "alias": {
     "alias-parse-failed": "{core.command-parse} !alias",
@@ -847,19 +847,19 @@
     "alias-was-enabled": "$sender, Alias $alias wurde aktiviert",
     "alias-was-disabled": "$sender, Alias $alias wurde deaktiviert",
     "alias-was-concealed": "$sender, Alias $alias wurde versteckt",
-    "alias-was-exposed": "$sender, alias $alias was exposed",
+    "alias-was-exposed": "$sender, Alias $alias wurde ausgesetzt",
     "alias-was-removed": "$sender, Alias $alias wurde entfernt",
-    "alias-group-set": "$sender, alias $alias was set to group $group",
-    "alias-group-unset": "$sender, alias $alias group was unset",
-    "alias-group-list": "$sender, list of aliases groups: $list",
-    "alias-group-list-aliases": "$sender, list of aliases in $group: $list"
+    "alias-group-set": "$sender, Alias $alias wurde für Gruppe $group gesetzt",
+    "alias-group-unset": "$sender, Alias $alias Gruppe wurde entfernt",
+    "alias-group-list": "$sender, Liste der Aliasgruppen: $list",
+    "alias-group-list-aliases": "$sender, Liste der Aliase in $group: $list"
   },
   "customcmds": {
     "commands-parse-failed": "{core.command-parse} !Befehle",
-    "command-was-not-found": "$sender, command $command was not found in database",
-    "response-was-not-found": "$sender, response #$response of command $command was not found in database",
-    "command-was-edited": "$sender, command $command is changed to '$response'",
-    "command-was-added": "$sender, command $command was added",
+    "command-was-not-found": "$sender, Befehl $command wurde nicht in der Datenbank gefunden",
+    "response-was-not-found": "$sender, Antwort #$response des Befehls $command wurde nicht in der Datenbank gefunden",
+    "command-was-edited": "$sender, Befehl $command wurde zu '$response ' geändert",
+    "command-was-added": "$sender, Befehl $command wurde hinzugefügt",
     "list-is-not-empty": "$sender, Liste der Befehle: $list",
     "list-is-empty": "$sender, Liste der Befehle ist leer",
     "command-was-enabled": "$sender, Befehl $command wurde aktiviert",
@@ -867,15 +867,15 @@
     "command-was-concealed": "$sender, Befehl $command wurde verborgen",
     "command-was-exposed": "$sender, Befehl $command wurde freigegeben",
     "command-was-removed": "$sender, Befehl $command wurde entfernt",
-    "response-was-removed": "$sender, response #$response of $command was removed",
-    "list-of-responses-is-empty": "$sender, $command have no responses or doesn't exists",
+    "response-was-removed": "$sender, Antwort #$response von $command wurde entfernt",
+    "list-of-responses-is-empty": "$sender, $command haben keine Antworten oder existiert nicht",
     "response": "$command#$index ($permission) $after| $response"
   },
   "keywords": {
     "keyword-parse-failed": "{core.command-parse} !keyword",
-    "keyword-is-ambiguous": "$sender, keyword $keyword is ambiguous, use ID of keyword",
-    "keyword-was-not-found": "$sender, keyword $keyword was not found in database",
-    "keyword-was-edited": "$sender, keyword $keyword is changed to '$response'",
+    "keyword-is-ambiguous": "$sender, Stichwort $keyword ist zweideutig, benutze ID des Schlüsselworts",
+    "keyword-was-not-found": "$sender, Schlüsselwort $keyword wurde in der Datenbank nicht gefunden",
+    "keyword-was-edited": "$sender, Stichwort $keyword wurde in '$response ' geändert",
     "keyword-was-added": "$sender, keyword $keyword ($id) wurde hinzugefügt",
     "list-is-not-empty": "$sender, Liste der Schlüsselwörter",
     "list-is-empty": "$sender, Liste der Schlüsselwörter ist leer",
@@ -885,26 +885,26 @@
   },
   "points": {
     "success": {
-      "undo": "$sender, points '$command' for $username was reverted ($updatedValue $updatedValuePointsLocale to $originalValue $originalValuePointsLocale).",
-      "set": "$username was set to $amount $pointsName",
-      "give": "$sender just gave his $amount $pointsName to $username",
+      "undo": "$sender, Punkte '$command' für $username wurden zurückgesetzt ($updatedValue $updatedValuePointsLocale zu $originalValue $originalValuePointsLocale).",
+      "set": "$username wurde auf $amount $pointsName gesetzt",
+      "give": "$sender hat seinen $amount $pointsName an $username gegeben",
       "online": {
-        "positive": "All online users just received $amount $pointsName!",
-        "negative": "All online users just lost $amount $pointsName!"
+        "positive": "Alle Online-Nutzer haben soeben $amount $pointsName erhalten!",
+        "negative": "Alle Online-Benutzer haben $amount $pointsName verloren!"
       },
       "all": {
-        "positive": "All users just received $amount $pointsName!",
-        "negative": "All users just lost $amount $pointsName!"
+        "positive": "Alle Benutzer haben $amount $pointsName erhalten!",
+        "negative": "Alle Benutzer haben $amount $pointsName verloren!"
       },
-      "rain": "Make it rain! All online users just received up to $amount $pointsName!",
-      "add": "$username just received $amount $pointsName!",
-      "remove": "Ouch, $amount $pointsName was removed from $username!"
+      "rain": "Lass es regen! Alle Online-Nutzer erhalten bis zu $amount $pointsName!",
+      "add": "$username hat $amount $pointsName erhalten!",
+      "remove": "Autsch, $amount $pointsName wurden von $username entfernt!"
     },
     "failed": {
-      "undo": "$sender, username wasn't found in database or user have no undo operations",
+      "undo": "$sender, Benutzername wurde nicht in der Datenbank gefunden oder Benutzer haben keine Rückgängig Operationen",
       "set": "{core.command-parse} $command [username] [amount]",
       "give": "{core.command-parse} $command [username] [amount]",
-      "giveNotEnough": "Sorry, $sender, you don't have $amount $pointsName to give it to $username",
+      "giveNotEnough": "Entschuldigung, $sender, Sie haben nicht genug  $amount $pointsName um sie an $username zu geben",
       "get": "{core.command-parse} $command [username]",
       "online": "{core.command-parse} $command [amount]",
       "all": "{core.command-parse} $command [amount]",
@@ -918,7 +918,7 @@
         "multi": "Punkte",
         "xmulti": ""
       },
-      "pointsResponse": "$username has currently $amount $pointsName. Your position is $order/$count."
+      "pointsResponse": "$username hat derzeit $amount $pointsName. Ihre Position ist $order/$count."
     }
   },
   "songs": {
