@@ -1,5 +1,4 @@
 // 3rdparty libraries
-import _ from 'lodash';
 import { isMainThread } from '../cluster';
 
 // bot libraries
