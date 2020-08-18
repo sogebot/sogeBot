@@ -22,6 +22,7 @@ export interface CommonSettingsInterface {
   variantAmount: number;
   messageTemplate: string;
   layout: '1' | '2' | '3' | '4' | '5';
+  animationInDuration: number;
   animationIn: 'fadeIn' | 'fadeInDown' | 'fadeInLeft' | 'fadeInRight'
   | 'fadeInUp' | 'fadeInDownBig' | 'fadeInLeftBig' | 'fadeInRightBig'
   | 'fadeInUpBig' | 'bounceIn' | 'bounceInDown' | 'bounceInLeft'
@@ -30,6 +31,7 @@ export interface CommonSettingsInterface {
   | 'rotateInUpRight' | 'slideInDown' | 'slideInLeft' | 'slideInRight'
   | 'slideInUp' | 'zoomIn' | 'zoomInDown' | 'zoomInLeft' | 'zoomInRight'
   | 'zoomInUp' | 'rollIn' | 'jackInTheBox';
+  animationOutDuration: number;
   animationOut: 'fadeOut' | 'fadeOutDown' | 'fadeOutLeft' | 'fadeOutRight' | 'fadeOutUp'
   | 'fadeOutDownBig' | 'fadeOutLeftBig' | 'fadeOutRightBig' | 'fadeOutUpBig'
   | 'bounceOut' | 'bounceOutDown' | 'bounceOutLeft' | 'bounceOutRight'
@@ -179,7 +181,9 @@ export const CommonSettingsSchema = {
   messageTemplate: { type: String } as EntitySchemaColumnOptions,
   layout: { type: 'varchar' } as EntitySchemaColumnOptions,
   animationIn: { type: 'varchar' } as EntitySchemaColumnOptions,
+  animationInDuration: { type: Number, default: 2000 } as EntitySchemaColumnOptions,
   animationOut: { type: 'varchar' } as EntitySchemaColumnOptions,
+  animationOutDuration: { type: Number, default: 2000 } as EntitySchemaColumnOptions,
   animationText: { type: 'varchar' } as EntitySchemaColumnOptions,
   animationTextOptions: { type: 'simple-json' } as EntitySchemaColumnOptions,
   imageId: { type: String } as EntitySchemaColumnOptions,

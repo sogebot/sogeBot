@@ -2,13 +2,18 @@
   <b-container class="p-0">
     <b-row>
       <b-col>
-        <b-input-group>
-          <b-button @click="test = true" variant="info" slot="prepend">Test</b-button>
-          <b-form-select v-model="animType" :options="options" class="col" plain></b-form-select>
-        </b-input-group>
+        <b-form-group>
+          <b-input-group>
+            <b-button @click="test = true" variant="info" slot="prepend">Test</b-button>
+            <b-form-select v-model="animType" :options="options" class="col" plain></b-form-select>
+          </b-input-group>
+          <b-input-group append="ms">
+            <b-form-input type="number" min="100" v-model.number="animDuration"></b-form-input>
+          </b-input-group>
+        </b-form-group>
       </b-col>
       <b-col>
-        <div class="test slow animate__animated" :class="[computedClass]"></div>
+        <div class="test animate__animated" :class="[computedClass]" :style="{ 'animation-duration': animDuration + 'ms' }"></div>
       </b-col>
     </b-row>
   </b-container>
@@ -23,6 +28,7 @@ require('animate.css');
 @Component({})
 export default class AnimationIn extends Vue {
   @PropSync('animation') animType !: string
+  @PropSync('animationDuration') animDuration !: number
   test: boolean = false
 
   get computedClass() {

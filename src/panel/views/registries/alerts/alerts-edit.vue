@@ -373,6 +373,8 @@ export default class AlertsEdit extends Vue {
       variantAmount: 2,
       enabled: true,
       layout: '1',
+      animationInDuration: 1000,
+      animationOutDuration: 1000,
       animationIn: 'fadeIn',
       animationOut: 'fadeOut',
       animationText: 'wiggle',
