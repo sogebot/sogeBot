@@ -31,6 +31,8 @@ bot it is twitch by default
 
 `$spotifySong` - return current song playing in Spotify
 
+`$lastfmSong` - return current song playing in Last.fm
+
 `$latestFollower` - Latest Follower
 
 `$latestSubscriber` - Latest Subscriber
