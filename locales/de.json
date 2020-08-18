@@ -989,20 +989,20 @@
       "never": "$sender, Du bist kein Kanal-Abonnent.",
       "notNow": "$sender, Sie sind derzeit kein Kanal Abonnent. Insgesamt $subCumulativeMonths $subCumulativeMonthsName.",
       "timeWithSubStreak": "$sender, Sie sind Abonnent des Kanals. Aktuelle Abostähne für $diff ($subStreak $subStreakMonthsName) und insgesamt $subCumulativeMonths $subCumulativeMonthsName.",
-      "time": "$sender, you are subscriber of channel. In total of $subCumulativeMonths $subCumulativeMonthsName."
+      "time": "$sender, Sie sind Abonnent des Kanals. Insgesamt seit $subCumulativeMonths $subCumulativeMonthsName."
     }
   },
   "age": {
-    "failed": "$sender, I don't have data for $username account age",
+    "failed": "$sender, Ich habe keine Daten für das Konto $username",
     "success": {
-      "withUsername": "$sender, account age for $username is $diff",
-      "withoutUsername": "$sender, your account age is $diff"
+      "withUsername": "$sender, Kontoalter für $username ist $diff",
+      "withoutUsername": "$sender, Ihr Kontoalter ist $diff"
     }
   },
   "lastseen": {
     "success": {
-      "never": "$username was never in this channel!",
-      "time": "$username was last seen at $when in this channel"
+      "never": "$username war nie in diesem Kanal!",
+      "time": "$username wurde das letzte mal gesehe am $when auf deisem Kanal"
     },
     "failed": {
       "parse": "{core.command-parse} !lastseen [username]"
