@@ -11,19 +11,19 @@
         </audio>
         <div v-if="runningAlert.isShowing" class="center" :class="['layout-' + runningAlert.alert.layout]">
           <template v-if="!runningAlert.alert.enableAdvancedMode">
-            <video ref="video" v-if="typeOfMedia.get(runningAlert.alert.imageId) === 'video'" style="max-width:500px;" :class="{ center: runningAlert.alert.layout === '3', ['animate__' + runningAlert.animation]: true }" class="animate__slow animate__animated w-100 pb-3">
+            <video ref="video" v-if="typeOfMedia.get(runningAlert.alert.imageId) === 'video'" style="max-width:500px;" :class="{ center: runningAlert.alert.layout === '3', ['animate__' + runningAlert.animation]: true }" class="animate__animated w-100 pb-3" :style="{'animation-duration': runningAlert.animationSpeed + 'ms'}">
               <source :src="'/registry/alerts/' + runningAlert.alert.imageId" type="video/webm">
               Your browser does not support the video tag.
             </video>
-            <img v-else :src="'/registry/alerts/' + runningAlert.alert.imageId" :class="{ center: runningAlert.alert.layout === '3', ['animate__' + runningAlert.animation]: true }" class="animate__slow animate__animated"/>
+            <img v-else :src="'/registry/alerts/' + runningAlert.alert.imageId" :class="{ center: runningAlert.alert.layout === '3', ['animate__' + runningAlert.animation]: true }" class="animate__animated" :style="{'animation-duration': runningAlert.animationSpeed + 'ms'}"/>
             <div
               v-if="runningAlert.isShowingText"
               :class="{
                 center: runningAlert.alert.layout === '3',
                 ['animate__' + runningAlert.animation]: true,
               }"
-              :style="{'text-align': 'center'}"
-              class="animate__slow animate__animated">
+              :style="{'text-align': 'center', 'animation-duration': runningAlert.animationSpeed + 'ms'}"
+              class="animate__animated">
                 <span :style="{
                   'font-family': runningAlert.alert.font.family,
                   'font-size': runningAlert.alert.font.size + 'px',
@@ -142,6 +142,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
   runningAlert: EmitData & {
     animation: string;
+    animationSpeed: number;
     animationText: string;
     isShowingText: boolean;
     isShowing: boolean;
@@ -186,6 +187,18 @@ export default class AlertsRegistryOverlays extends Vue {
         : this.runningAlert.alert.animationIn;
     } else {
       return 'none';
+    }
+  }
+
+  animationSpeed() {
+    if (this.runningAlert) {
+      return this.runningAlert.hideAt - Date.now() <= 0
+        && (!isTTSPlaying || !this.runningAlert.alert.tts.keepAlertShown)
+        && !waitingForTTS
+        ? this.runningAlert.alert.animationOutDuration
+        : this.runningAlert.alert.animationInDuration;
+    } else {
+      return 1000;
     }
   }
 
@@ -245,6 +258,7 @@ export default class AlertsRegistryOverlays extends Vue {
         const isTTSPlaying = this.isTTSPlayingFnc();
 
         this.runningAlert.animation = this.animationClass();
+        this.runningAlert.animationSpeed = this.animationSpeed();
         this.runningAlert.animationText = this.animationTextClass();
 
         // cleanup alert after 5s and if responsiveVoice is done
@@ -264,7 +278,7 @@ export default class AlertsRegistryOverlays extends Vue {
             setTimeout(() => {
               this.runningAlert = null;
               cleanupAlert = false;
-            }, 5000)
+            }, this.runningAlert.alert.animationOutDuration + 1000)
           }
           return;
         } else {
@@ -414,9 +428,10 @@ export default class AlertsRegistryOverlays extends Vue {
                   .replace(/\<div.*class="(.*?)".*ref="text"\>|\<div.*ref="text".*class="(.*?)"\>/gm, '<div ref="text">') // we need to replace ref with class with proper ref
                   .replace('ref="text"', `
                     v-if="runningAlert.isShowingText"
-                    :class="{['animate__' + runningAlert.animation]: true}"
-                    class="animate__slow animate__animated ${refTextClass}"
+                    :class="{['animate__' + runningAlert.animation]: true }"
+                    class=" animate__animated ${refTextClass}"
                     :style="{
+                      'animation-duration': runningAlert.animationSpeed + 'ms',
                       'font-family': runningAlert.alert.font.family,
                       'font-size': runningAlert.alert.font.size + 'px',
                       'font-weight': runningAlert.alert.font.weight,
@@ -429,7 +444,10 @@ export default class AlertsRegistryOverlays extends Vue {
                   .replace('ref="image"', `
                     v-if="runningAlert.isShowingText"
                     :class="{['animate__' + runningAlert.animation]: true}"
-                    class="animate__slow animate__animated ${refImageClass}"
+                    :style="{
+                      'animation-duration': runningAlert.animationSpeed + 'ms'
+                    }
+                    class="animate__animated ${refImageClass}"
                     :src="'/registry/alerts/' + runningAlert.alert.imageId"
                   `);
 
@@ -470,11 +488,12 @@ export default class AlertsRegistryOverlays extends Vue {
               ...emitData,
               animation: "none",
               animationText: "none",
+              animationSpeed: 1000,
               soundPlayed: false,
               isShowing: false,
               isShowingText: false,
               showAt: this.data.alertDelayInMs + Date.now(),
-              hideAt: this.data.alertDelayInMs + Date.now() + alert.alertDurationInMs,
+              hideAt: this.data.alertDelayInMs + Date.now() + alert.alertDurationInMs + alert.animationInDuration,
               showTextAt: this.data.alertDelayInMs + Date.now() + alert.alertTextDelayInMs,
               alert,
             };

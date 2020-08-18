@@ -76,6 +76,7 @@
       <animation-in
         id="animationIn"
         :animation.sync="data.animationIn"
+        :animationDuration.sync="data.animationInDuration"
       ></animation-in>
     </b-form-group>
 
@@ -88,6 +89,7 @@
       <animation-out
         id="animationOut"
         :animation.sync="data.animationOut"
+        :animationDuration.sync="data.animationOutDuration"
       ></animation-out>
     </b-form-group>
 
