@@ -1125,7 +1125,7 @@
       "alive": "$sender ist am Leben! Nichts ist passiert.",
       "dead": "Das Gehirn von $sender wurde auf der Wand verteilt!",
       "mod": "$sender ist inkompetent und hat seinen Kopf völlig verfehlt!",
-      "broadcaster": "$sender benutzt Leerzeichen, Boo!",
+      "broadcaster": "$sender benutzt eine leere Waffe, Boo!",
       "timeout": "Roulette Timeout auf $values gesetzt"
     },
     "seppuku": {
