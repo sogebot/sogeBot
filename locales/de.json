@@ -283,14 +283,14 @@
       "sub": "<strong>subd</strong> dir | $tier",
       "subgift": "<strong>verschenkte</strong> sub von $username",
       "subcommunitygift": "<strong>verschenkte</strong> subs für $count Zuschauer",
-      "resub": "<strong>resubbed</strong> you for $subStreak $subStreakName | $tier",
-      "resubWithoutStreak": "<strong>resubbed</strong> | $tier | in total of $subCumulativeMonths $subCumulativeMonthsName",
-      "cheer": "<strong>cheered</strong> you for $bits bits",
-      "tip": "<strong>tipped</strong> you for $formatted_amount"
+      "resub": "<strong>resubbed</strong> für $subStreak $subStreakName | $tier eingereicht",
+      "resubWithoutStreak": "<strong>resubbed</strong> | $tier | insgesamt $subCumulativeMonths $subCumulativeMonthsName",
+      "cheer": "<strong>cheered</strong> dir $bits bits",
+      "tip": "<strong>spendet</strong> dir $formatted_amount"
     },
     "responses": {
       "variable": {
-        "sender": "User who initiated",
+        "sender": "Benutzer der initiiert hat",
         "title": "Aktueller Titel",
         "game": "Aktuelles Spiel",
         "language": "Aktuelle Sprache des Stream",
@@ -311,7 +311,7 @@
         "type": "Typ",
         "days": "Tage",
         "hours": "Stunden",
-        "minutesName": "Singular or Plural of word minute",
+        "minutesName": "Singular oder Plurale des Wortes Minuten",
         "minutes": "Minuten",
         "seconds": "Sekunden",
         "description": "Beschreibung",
@@ -356,11 +356,11 @@
         "items": "Artikel",
         "bits": "Bits",
         "subgifts": "Verschenkte Subs",
-        "subStreakShareEnabled": "Is substreak share enabled (true/false)",
+        "subStreakShareEnabled": "Ist die Teilstrichfreigabe aktiviert (true/false)",
         "subStreak": "Aktuelle Sub Reihe",
-        "subStreakName": "localized name of month (1 month, 2 months) for current sub strek",
-        "subCumulativeMonths": "Cumulative subscribe months",
-        "subCumulativeMonthsName": "localized name of month (1 month, 2 months) for cumulative subscribe months",
+        "subStreakName": "lokalisierter Name des Monats (1 Monat, 2 Monate) für die aktuelle Substrek",
+        "subCumulativeMonths": "Gesamte abonnierte Monate",
+        "subCumulativeMonthsName": "Lokalisierter Name des Monats (1 Monat, 2 Monate) für kumulative Abonnements Monate",
         "message": "Nachricht",
         "reason": "Grund",
         "target": "Ziel",
@@ -369,9 +369,9 @@
         "method": "Methode",
         "tier": "Stufe",
         "months": "Monate",
-        "monthsName": "localized name of month (1 month, 2 months)",
+        "monthsName": "Lokalisierter Name des Monats (1 Monat, 2 Monate)",
         "oldGame": "Spiel vor Änderung",
-        "recipientObject": "Full recipient object",
+        "recipientObject": "Vollständiges Empfängerobjekt",
         "recipient": "Empfänger",
         "ytSong": "Aktueller Song auf YouTube",
         "spotifySong": "Aktueller Song auf Spotify",
@@ -399,8 +399,8 @@
         "latestCheerMessage": "Neuester Cheer (Nachricht)",
         "latestCheer": "Neuester Cheer (Benutzername)",
         "version": "Bot Version",
-        "haveParam": "Have command parameter? (bool)",
-        "source": "Current source (twitch or discord)",
+        "haveParam": "Haben Sie Befehlsparameter? (bool)",
+        "source": "Aktuelle Quelle (twitch oder discord)",
         "is": {
           "moderator": "Ist Benutzer Mod? (Bool)",
           "subscriber": "Ist Benutzer Sub? (Bool)",
@@ -415,14 +415,14 @@
           "subscriber": "Ist Teilnehmer ein Abonennt? (Bool)",
           "vip": "Ist Teilnehmer ein VIP? (Bool)",
           "follower": "Ist Teilnehmer ein Follower? (Bool)",
-          "broadcaster": "Is recipient broadcaster? (bool)",
+          "broadcaster": "Ist Empfänger Broadcaster? (Bool)",
           "bot": "Ist Teilnehmer ein Bot? (Bool)",
           "owner": "Ist Teilnehmer der Bot-Besitzer? (Bool)"
         },
         "tweet": {
           "text": "Text des Tweets",
           "username": "Benutzername auf Twitter",
-          "displayname": "Screen name on twitter",
+          "displayname": "Name auf Twitter",
           "url": "Tweet Link"
         }
       }
@@ -439,7 +439,7 @@
             "listener": "Auf Befehle per Flüstern achten",
             "settings": "Flüsternachricht bei geänderten Einstellungen",
             "raffle": "Flüsternachricht bei teilnahme",
-            "permissions": "Whispers on insufficient permissions",
+            "permissions": "Unzureichende Berechtigungen zum Whispern",
             "cooldowns": "Whispers on cooldown (if set as notify)"
           }
         }
