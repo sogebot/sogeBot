@@ -1129,10 +1129,10 @@
       "timeout": "Roulette Timeout auf $values gesetzt"
     },
     "seppuku": {
-      "text": "$sender hat Harakiri begangen.",
-      "mod": "$sender hat versucht Harakiri zu begehen, brach aber sein Schwert.",
-      "broadcaster": "$sender hat versucht Harakiri zu begehen, verlor aber sein Schwert.",
-      "timeout": "Harakiri Timeout auf $values gesetzt"
+      "text": "$sender hat Seppuku begangen.",
+      "mod": "$sender hat versucht Seppuku zu begehen, brach aber sein Schwert.",
+      "broadcaster": "$sender hat versucht Seppuku zu begehen, verlor aber sein Schwert.",
+      "timeout": "Seppuku Timeout auf $values gesetzt"
     },
     "fightme": {
       "cannotFightWithYourself": "$sender, du kannst nicht mit dir selbst kämpfen!",
