@@ -41,14 +41,23 @@ describe('Gambling - gamble with Jackpot', () => {
       await getRepository(User).save({ userId: user1.userId, username: user1.username, points: 1000 });
     });
 
-    it('user should lose !gamble 100', async () => {
-      const r = await gamble.main({ sender: user1, parameters: '100', command });
-      assert.strictEqual(r[0].response, '$sender, you LOST! You now have 900 points. Jackpot increased to 10 points');
+    it('user should lose !gamble 125', async () => {
+      const r = await gamble.main({ sender: user1, parameters: '125', command });
+      assert.strictEqual(r[0].response, '$sender, you LOST! You now have 875 points. Jackpot increased to 13 points');
     });
 
     it('user should lose again !gamble 100', async () => {
       const r = await gamble.main({ sender: user1, parameters: '200', command });
-      assert.strictEqual(r[0].response, '$sender, you LOST! You now have 700 points. Jackpot increased to 30 points');
+      assert.strictEqual(r[0].response, '$sender, you LOST! You now have 675 points. Jackpot increased to 33 points');
+    });
+
+    it('set lostPointsAddedToJackpot to 100%', () => {
+      gamble.lostPointsAddedToJackpot = 100;
+    });
+
+    it('user should lose again !gamble 100', async () => {
+      const r = await gamble.main({ sender: user1, parameters: '100', command });
+      assert.strictEqual(r[0].response, '$sender, you LOST! You now have 575 points. Jackpot increased to 133 points');
     });
 
     it('set chance for jackpot to 100%', () => {
@@ -57,7 +66,7 @@ describe('Gambling - gamble with Jackpot', () => {
 
     it('user should win jackpot !gamble 100', async () => {
       const r = await gamble.main({ sender: user1, parameters: '100', command });
-      assert.strictEqual(r[0].response, '$sender, you hit JACKPOT! You won 30 points in addition to your bet. You now have 830 points');
+      assert.strictEqual(r[0].response, '$sender, you hit JACKPOT! You won 133 points in addition to your bet. You now have 808 points');
     });
   });
 });
