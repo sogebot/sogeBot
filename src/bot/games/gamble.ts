@@ -84,7 +84,7 @@ class Gamble extends Game {
       } else {
         if (this.enableJackpot) {
           const currentPointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
-          this.jackpotValue = Math.min(Math.ceil(this.jackpotValue + (points / this.lostPointsAddedToJackpot)), this.maxJackpotValue);
+          this.jackpotValue = Math.min(Math.ceil(this.jackpotValue + (points * (this.lostPointsAddedToJackpot / 100))), this.maxJackpotValue);
           message = prepare('gambling.gamble.loseWithJackpot', {
             pointsName: await pointsSystem.getPointsName(currentPointsOfUser),
             points: currentPointsOfUser,
