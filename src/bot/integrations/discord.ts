@@ -99,13 +99,16 @@ class Discord extends Integration {
   })
   sendGeneralAnnounceToChannel = '';
 
+  @settings('bot')
+  ignorelist: string[] = [];
+
   @settings('status')
   @ui({
     type: 'selector', values: ['online', 'idle', 'invisible', 'dnd'],
     if: () => self.guild.length > 0,
   })
   onlinePresenceStatusDefault: 'online' | 'idle' | 'invisible' | 'dnd' = 'online';
-  
+
   @settings('status')
   @ui({
     type: 'text-input',
@@ -486,15 +489,18 @@ class Discord extends Integration {
 
       this.client.on('message', async (msg) => {
         if (this.client && this.guild) {
-          if (msg.author.tag === get(this.client, 'user.tag', null)) {
-            // don't do anything on self messages;
+
+          const isSelf = msg.author.tag === get(this.client, 'user.tag', null);
+          const isDM = msg.channel.type === 'dm';
+          const isDifferentGuild = msg.guild?.id !== this.guild;
+          const isInIgnoreList
+             = this.ignorelist.includes(msg.author.tag)
+            || this.ignorelist.includes(msg.author.id)
+            || this.ignorelist.includes(msg.author.username);
+          if (isSelf || isDM || isDifferentGuild || isInIgnoreList) {
             return;
           }
 
-          // don't listen discord DM messages and other guilds
-          if (msg.channel.type === 'dm' || msg.guild?.id !== this.guild) {
-            return;
-          }
 
           const channels = this.listenAtChannels.split(',').map(o => o.trim());
           if (msg.channel.type === 'text' && channels.length > 0) {
