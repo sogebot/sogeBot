@@ -60,6 +60,7 @@ class Twitch extends Core {
 
   @command('!time')
   async time (opts: CommandOptions) {
+    moment.locale(general.lang);
     return [ { response: prepare('time', { time: moment().tz(timezone).format('LTS') }), ...opts }];
   }
 
