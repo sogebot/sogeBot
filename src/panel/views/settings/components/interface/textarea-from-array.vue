@@ -1,11 +1,13 @@
 <template>
   <div class="input-group">
     <div class="input-group-prepend">
-      <span class="input-group-text text-left">
-        <span class="d-block">
-          {{ title }}
-          <small class="d-block">{{ translate('one-record-per-line') }}</small>
-        </span>
+      <span class="input-group-text text-left d-block">
+        <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
+        <template v-else-if="typeof translatedTitle === 'object'">
+          {{ translatedTitle.title }}
+          <small style="cursor: help;" class="text-info ml-1" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
+        </template>
+        <small class="d-block">{{ translate('one-record-per-line') }}</small>
       </span>
     </div>
     <textarea v-on:keyup="update" v-model="currentValue" class="form-control" type="text" :readonly="readonly"></textarea>
@@ -22,6 +24,7 @@ export default class textAreaFromArray extends Vue {
   @Prop() readonly readonly: any;
 
   currentValue = this.value.join('\n');
+  translatedTitle = this.translate(this.title);
 
   update() {
     this.$emit('update', this.currentValue.split('\n'));

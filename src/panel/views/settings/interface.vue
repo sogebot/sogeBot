@@ -77,7 +77,7 @@
                       class="pt-1 pb-1"
                       v-else-if="currentValue.constructor === Array"
                       v-bind:value="currentValue"
-                      v-bind:title="translate($route.params.type + '.' + $route.params.id + '.settings.' + defaultValue)"
+                      v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
                       v-on:update="value[defaultValue] = $event; triggerDataChange()"
                     ></textarea-from-array>
                     <number-input
@@ -114,7 +114,7 @@
                             <textarea-from-array
                               v-if="currentValue.constructor === Array"
                               v-bind:value="getPermissionSettingsValue(permission.id, currentValue)"
-                              v-bind:title="translate($route.params.type + '.' + $route.params.id + '.settings.' + defaultValue)"
+                              v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
                               v-on:update="settings['__permission_based__'][category][defaultValue][permission.id] = $event; triggerDataChange()"
                               :readonly="currentValue[permission.id] === null"
                             ></textarea-from-array>
