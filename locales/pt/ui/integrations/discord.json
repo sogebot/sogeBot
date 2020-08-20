@@ -17,6 +17,10 @@
     "onlinePresenceStatusDefault": "Default Status",
     "onlinePresenceStatusDefaultName": "Default Status Message",
     "onlinePresenceStatusOnStream": "Status when Streaming",
-    "onlinePresenceStatusOnStreamName": "Status Message when Streaming"
+    "onlinePresenceStatusOnStreamName": "Status Message when Streaming",
+    "ignorelist": {
+      "title": "Ignore list",
+      "help": "username, username#0000 or userID"
+    }
   }
 }
