@@ -19,8 +19,8 @@
     "onlinePresenceStatusOnStream": "Status beim Streamen",
     "onlinePresenceStatusOnStreamName": "Statusnachricht beim Streaming",
     "ignorelist": {
-      "title": "Ignore list",
-      "help": "username, username#0000 or userID"
+      "title": "Liste ignorieren",
+      "help": "username, username#0000 oder userID"
     }
   }
 }
