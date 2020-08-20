@@ -219,6 +219,10 @@
           "label": "Message To Send",
           "placeholder": "Set your message"
         },
+        "channel": {
+          "label": "Channel",
+          "placeholder": "Channelname or ID"
+        },
         "commandToRun": {
           "label": "Command To Run",
           "placeholder": "Set your !commandToRun"
@@ -264,6 +268,10 @@
         },
         "numberToDecrement": {
           "label": "Number to decrement",
+          "placeholder": ""
+        },
+        "titleOfReward": {
+          "label": "Title of redeemed reward",
           "placeholder": ""
         }
       }
@@ -735,6 +743,7 @@
     "keyword-send-x-times": "keyword was send x times",
     "number-of-viewers-is-at-least-x": "number of viewers is at least x",
     "stream-started": "stream started",
+    "reward-redeemed": "reward redeemed",
     "stream-stopped": "stream stopped",
     "stream-is-running-x-minutes": "stream is running x minutes",
     "every-x-minutes-of-stream": "every x minutes of stream",
@@ -750,6 +759,7 @@
     "timeout": "user was timeouted",
     "create-a-new-event-listener": "Create a new event listener",
     "send-twitter-message": "post a twitter message",
+    "send-discord-message": "send a discord message",
     "send-chat-message": "send a twitch chat message",
     "send-whisper": "send a whisper",
     "run-command": "run a command",

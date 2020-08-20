@@ -219,6 +219,10 @@
           "label": "Сообщение для отправки",
           "placeholder": "Установите ваше сообщение"
         },
+        "channel": {
+          "label": "Channel",
+          "placeholder": "Channelname or ID"
+        },
         "commandToRun": {
           "label": "Команда для запуска",
           "placeholder": "Установите вашу !commandToRun"
@@ -264,6 +268,10 @@
         },
         "numberToDecrement": {
           "label": "Число для уменьшения",
+          "placeholder": ""
+        },
+        "titleOfReward": {
+          "label": "Title of redeemed reward",
           "placeholder": ""
         }
       }
@@ -735,6 +743,7 @@
     "keyword-send-x-times": "ключевое слово было отправлено X раз",
     "number-of-viewers-is-at-least-x": "количество зрителей минимум х",
     "stream-started": "стрим запущен",
+    "reward-redeemed": "reward redeemed",
     "stream-stopped": "стрим выключен",
     "stream-is-running-x-minutes": "стрим идёт Х минут",
     "every-x-minutes-of-stream": "каждую Х минуту стрима",
@@ -750,6 +759,7 @@
     "timeout": "пользователь получил таймаут",
     "create-a-new-event-listener": "Создать новый обработчик событий",
     "send-twitter-message": "запостить сообщение в твиттер",
+    "send-discord-message": "send a discord message",
     "send-chat-message": "send a twitch chat message",
     "send-whisper": "отправить сообщение в висперсы",
     "run-command": "запустить команду",

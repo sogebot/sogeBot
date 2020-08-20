@@ -219,6 +219,10 @@
           "label": "Poslat zprávu",
           "placeholder": "Nastav svou zprávu"
         },
+        "channel": {
+          "label": "Kanál",
+          "placeholder": "Název kanálu nebo ID"
+        },
         "commandToRun": {
           "label": "Příkaz ke spuštění",
           "placeholder": "Nastav si !prikazKeSpusteni"
@@ -264,6 +268,10 @@
         },
         "numberToDecrement": {
           "label": "Kolik odečíst",
+          "placeholder": ""
+        },
+        "titleOfReward": {
+          "label": "Název vyplacené odměny",
           "placeholder": ""
         }
       }
@@ -735,6 +743,7 @@
     "keyword-send-x-times": "klíčové slovo posláno x-krát",
     "number-of-viewers-is-at-least-x": "počet diváků je alespoň x",
     "stream-started": "vysílání zahájeno",
+    "reward-redeemed": "odměna vyplacena",
     "stream-stopped": "vysílání zastaveno",
     "stream-is-running-x-minutes": "vysílání běží x minut",
     "every-x-minutes-of-stream": "každých x minut vysílání",
@@ -750,6 +759,7 @@
     "timeout": "uživatel dostal timeout",
     "create-a-new-event-listener": "Vytvoř nový event listener",
     "send-twitter-message": "poslat zprávu na twitter",
+    "send-discord-message": "odeslat Discord zprávu",
     "send-chat-message": "odeslat zprávu na twitch chat",
     "send-whisper": "poslat whisper",
     "run-command": "spusť příkaz",

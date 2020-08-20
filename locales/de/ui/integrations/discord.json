@@ -13,6 +13,14 @@
     "noChannelSelected": "Keine Channel ausgewählt",
     "noRoleSelected": "Keine Rolle ausgewählt",
     "noGuildSelected": "kein Server ausgewählt",
-    "noGuildSelectedBox": "Wähle Server aus, wo der Bot beitreten soll und du wirst mehr Einstellungen sehen"
+    "noGuildSelectedBox": "Wähle Server aus, wo der Bot beitreten soll und du wirst mehr Einstellungen sehen",
+    "onlinePresenceStatusDefault": "Standard Status",
+    "onlinePresenceStatusDefaultName": "Standard Status Nachricht",
+    "onlinePresenceStatusOnStream": "Status beim Streamen",
+    "onlinePresenceStatusOnStreamName": "Statusnachricht beim Streaming",
+    "ignorelist": {
+      "title": "Ignore list",
+      "help": "username, username#0000 or userID"
+    }
   }
 }

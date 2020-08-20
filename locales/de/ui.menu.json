@@ -38,7 +38,7 @@
   "queue": "Warteschlange",
   "playlist": "Playlist",
   "bannedsongs": "Song Blacklist",
-  "spotifybannedsongs": "Spotify banned songs",
+  "spotifybannedsongs": "Spotify gebannte Songs",
   "duel": "Duell",
   "fightme": "FightMe",
   "seppuku": "Seppuku",
@@ -82,5 +82,6 @@
   "tips": "Spenden",
   "bits": "Bits",
   "discord": "Discord",
-  "texttospeech": "Text zu Sprache"
+  "texttospeech": "Text zu Sprache",
+  "lastfm": "Last.fm"
 }

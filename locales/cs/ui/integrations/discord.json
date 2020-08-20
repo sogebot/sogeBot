@@ -13,6 +13,14 @@
     "noChannelSelected": "není vybrán žádný kanál",
     "noRoleSelected": "není vybrána žádná role",
     "noGuildSelected": "nebyl vybrán žádný server",
-    "noGuildSelectedBox": "Vyberte server, který bot bude používat a zobrazí se vám další nastavení"
+    "noGuildSelectedBox": "Vyberte server, který bot bude používat a zobrazí se vám další nastavení",
+    "onlinePresenceStatusDefault": "Výchozí stav",
+    "onlinePresenceStatusDefaultName": "Výchozí stavová zpráva",
+    "onlinePresenceStatusOnStream": "Stav při vysílání",
+    "onlinePresenceStatusOnStreamName": "Stavová zpráva při vysílání",
+    "ignorelist": {
+      "title": "Seznam ignorovaných",
+      "help": "jméno, jméno#0000 nebo ID"
+    }
   }
 }
