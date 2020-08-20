@@ -17,6 +17,10 @@
     "onlinePresenceStatusDefault": "Výchozí stav",
     "onlinePresenceStatusDefaultName": "Výchozí stavová zpráva",
     "onlinePresenceStatusOnStream": "Stav při vysílání",
-    "onlinePresenceStatusOnStreamName": "Stavová zpráva při vysílání"
+    "onlinePresenceStatusOnStreamName": "Stavová zpráva při vysílání",
+    "ignorelist": {
+      "title": "Ignore list",
+      "help": "username, username#0000 or userID"
+    }
   }
 }
