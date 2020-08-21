@@ -614,8 +614,9 @@ class Message {
             })).sort().join(', ');
           case 'cooldown':
             listOutput = _.map(cooldowns, function (o, k) {
-              const time = o.miliseconds;
-              return o.name + ': ' + (time / 1000) + 's';
+              // const time = o.miliseconds;
+              // return o.name + ': ' + (time / 1000) + 's';
+              return '';
             }).sort().join(', ');
             return listOutput.length > 0 ? listOutput : ' ';
           case 'price':
