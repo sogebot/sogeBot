@@ -119,7 +119,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { toBoolean } from 'src/bot/helpers/toBoolean';
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
-import { chunk, debounce, get, isNil } from 'lodash-es';
+import { chunk, debounce, get } from 'lodash-es';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faRedoAlt } from '@fortawesome/free-solid-svg-icons';
