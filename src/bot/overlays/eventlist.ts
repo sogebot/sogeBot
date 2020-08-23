@@ -73,7 +73,7 @@ class EventList extends Overlay {
           }, {}),
       ),
     });
-    eventlist.update();
+    eventlist.askForGet();
   }
 }
 

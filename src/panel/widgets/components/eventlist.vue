@@ -117,6 +117,7 @@
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
 import { EventBus } from 'src/panel/helpers/event-bus';
+import { toBoolean } from 'src/bot/helpers/toBoolean';
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 import { chunk, debounce, get, isNil } from 'lodash-es';
 
@@ -152,7 +153,6 @@ export default {
         editation: this.$state.idle,
         loading: this.$state.progress,
       },
-      update: String(new Date()),
       events: [],
       eventlistShow: 0,
       eventlistSize: 0,
@@ -168,34 +168,33 @@ export default {
   },
   created: function () {
     this.state.loading = this.$state.progress
-    this.socket.emit('settings', (e, data) => {
-      this.settings = {
-        widgetEventlistFollows: isNil(data.widgetEventlistFollows) ? true : data.widgetEventlistFollows,
-        widgetEventlistHosts: isNil(data.widgetEventlistHosts) ? true : data.widgetEventlistHosts,
-        widgetEventlistRaids: isNil(data.widgetEventlistRaids) ? true : data.widgetEventlistRaids,
-        widgetEventlistCheers: isNil(data.widgetEventlistCheers) ? true : data.widgetEventlistCheers,
-        widgetEventlistSubs: isNil(data.widgetEventlistSubs) ? true : data.widgetEventlistSubs,
-        widgetEventlistSubgifts: isNil(data.widgetEventlistSubgifts) ? true : data.widgetEventlistSubgifts,
-        widgetEventlistSubcommunitygifts: isNil(data.widgetEventlistSubcommunitygifts) ? true : data.widgetEventlistSubcommunitygifts,
-        widgetEventlistResubs: isNil(data.widgetEventlistResubs) ? true : data.widgetEventlistResubs,
-        widgetEventlistTips: isNil(data.widgetEventlistTips) ? true : data.widgetEventlistTips
-      }
+    this.settings = {
+      widgetEventlistFollows: toBoolean(localStorage.getItem('widgetEventlistFollows') ?? true),
+      widgetEventlistHosts: toBoolean(localStorage.getItem('widgetEventlistHosts') ?? true),
+      widgetEventlistRaids: toBoolean(localStorage.getItem('widgetEventlistRaids') ?? true),
+      widgetEventlistCheers: toBoolean(localStorage.getItem('widgetEventlistCheers') ?? true),
+      widgetEventlistSubs: toBoolean(localStorage.getItem('widgetEventlistSubs') ?? true),
+      widgetEventlistSubgifts: toBoolean(localStorage.getItem('widgetEventlistSubgifts') ?? true),
+      widgetEventlistSubcommunitygifts: toBoolean(localStorage.getItem('widgetEventlistSubcommunitygifts') ?? true),
+      widgetEventlistResubs: toBoolean(localStorage.getItem('widgetEventlistResubs') ?? true),
+      widgetEventlistTips: toBoolean(localStorage.getItem('widgetEventlistTips') ?? true),
+    }
 
-      this.eventlistShow = data.widgetEventlistShow
-      this.eventlistSize = data.widgetEventlistSize,
-      this.eventlistMessageSize = data.widgetEventlistMessageSize
-      console.group('Eventlist widgets settings')
-      console.debug(this.settings)
-      console.groupEnd()
-    })
-    this.socket.emit('get') // get initial widget state
+    this.eventlistShow = Number(localStorage.getItem('widgetEventlistShow') ?? 5),
+    this.eventlistSize = Number(localStorage.getItem('widgetEventlistSize') ?? 20),
+    this.eventlistMessageSize = Number(localStorage.getItem('widgetEventlistMessageSize') ?? 15),
+    console.group('Eventlist widgets settings')
+    console.debug(this.settings)
+    console.groupEnd()
+    this.socket.emit('eventlist::get', this.eventlistShow) // get initial widget state
+    this.socket.on('askForGet', () => this.socket.emit('eventlist::get', this.eventlistShow));
     this.socket.on('update', events => {
       this.state.loading = this.$state.success
       this.events = events
     })
 
     // refresh timestamps
-    this.interval.push(setInterval(() => this.socket.emit('get'), 60000))
+    this.interval.push(setInterval(() => this.socket.emit('eventlist::get', this.eventlistShow), 60000))
   },
   computed: {
     fEvents: function () {
@@ -219,27 +218,25 @@ export default {
     eventlistSize: debounce(function (value, old) {
       if (Number.isNaN(Number(value))) this.eventlistSize = old
       else {
-        this.settings.widgetEventlistSize = value
-        this.update = String(new Date())
+        this.eventlistSize = value
+        localStorage.setItem('widgetEventlistSize', value)
       }
     }, 500),
     eventlistShow: debounce(function (value, old) {
       if (Number.isNaN(Number(value))) this.eventlistShow = old
       else {
-        this.settings.widgetEventlistShow = value
-        this.update = String(new Date())
+        this.eventlistShow = value
+        localStorage.setItem('widgetEventlistShow', value)
+        this.socket.emit('eventlist::get', this.eventlistShow) // get initial widget state
       }
     }, 500),
     eventlistMessageSize: debounce(function (value, old) {
       if (Number.isNaN(Number(value))) this.eventlistMessageSize = old
       else {
-        this.settings.widgetEventlistMessageSize = value
-        this.update = String(new Date())
+        this.eventlistMessageSize = value
+        localStorage.setItem('widgetEventlistMessageSize', value)
       }
     }, 500),
-    update: function () {
-      this.socket.emit('settings.update', this.settings)
-    }
   },
   methods: {
     removeSelected() {
@@ -297,8 +294,8 @@ export default {
       return moment(args) // expose moment function
     },
     toggle: function (id) {
-      this.settings[id] = !this.settings[id]
-      this.update = String(new Date())
+      this.settings[id] = !this.settings[id];
+      localStorage.setItem(id, this.settings[id]);
     }
   }
 }
