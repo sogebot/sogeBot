@@ -3,6 +3,8 @@
     "target": "es6",
     "strict": true,
     "module": "esnext",
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": true,
     "incremental": true,
     "removeComments": true,
     "noImplicitAny": true,

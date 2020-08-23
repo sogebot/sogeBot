@@ -169,20 +169,20 @@ export default {
   created: function () {
     this.state.loading = this.$state.progress
     this.settings = {
-      widgetEventlistFollows: toBoolean(localStorage.getItem('widgetEventlistFollows') ?? true),
-      widgetEventlistHosts: toBoolean(localStorage.getItem('widgetEventlistHosts') ?? true),
-      widgetEventlistRaids: toBoolean(localStorage.getItem('widgetEventlistRaids') ?? true),
-      widgetEventlistCheers: toBoolean(localStorage.getItem('widgetEventlistCheers') ?? true),
-      widgetEventlistSubs: toBoolean(localStorage.getItem('widgetEventlistSubs') ?? true),
-      widgetEventlistSubgifts: toBoolean(localStorage.getItem('widgetEventlistSubgifts') ?? true),
-      widgetEventlistSubcommunitygifts: toBoolean(localStorage.getItem('widgetEventlistSubcommunitygifts') ?? true),
-      widgetEventlistResubs: toBoolean(localStorage.getItem('widgetEventlistResubs') ?? true),
-      widgetEventlistTips: toBoolean(localStorage.getItem('widgetEventlistTips') ?? true),
+      widgetEventlistFollows: toBoolean(localStorage.getItem('widgetEventlistFollows') ? localStorage.getItem('widgetEventlistFollows') : true),
+      widgetEventlistHosts: toBoolean(localStorage.getItem('widgetEventlistHosts') ? localStorage.getItem('widgetEventlistHosts') : true),
+      widgetEventlistRaids: toBoolean(localStorage.getItem('widgetEventlistRaids') ? localStorage.getItem('widgetEventlistRaids') : true),
+      widgetEventlistCheers: toBoolean(localStorage.getItem('widgetEventlistCheers') ? localStorage.getItem('widgetEventlistCheers') : true),
+      widgetEventlistSubs: toBoolean(localStorage.getItem('widgetEventlistSubs') ? localStorage.getItem('widgetEventlistSubs') : true),
+      widgetEventlistSubgifts: toBoolean(localStorage.getItem('widgetEventlistSubgifts') ? localStorage.getItem('widgetEventlistSubgifts') : true),
+      widgetEventlistSubcommunitygifts: toBoolean(localStorage.getItem('widgetEventlistSubcommunitygifts') ? localStorage.getItem('widgetEventlistSubcommunitygifts') : true),
+      widgetEventlistResubs: toBoolean(localStorage.getItem('widgetEventlistResubs') ? localStorage.getItem('widgetEventlistResubs') : true),
+      widgetEventlistTips: toBoolean(localStorage.getItem('widgetEventlistTips') ? localStorage.getItem('widgetEventlistTips') : true),
     }
 
-    this.eventlistShow = Number(localStorage.getItem('widgetEventlistShow') ?? 5),
-    this.eventlistSize = Number(localStorage.getItem('widgetEventlistSize') ?? 20),
-    this.eventlistMessageSize = Number(localStorage.getItem('widgetEventlistMessageSize') ?? 15),
+    this.eventlistShow = Number(localStorage.getItem('widgetEventlistShow') ? localStorage.getItem('widgetEventlistShow') : 5),
+    this.eventlistSize = Number(localStorage.getItem('widgetEventlistSize') ? localStorage.getItem('widgetEventlistSize') : 20),
+    this.eventlistMessageSize = Number(localStorage.getItem('widgetEventlistMessageSize') ? localStorage.getItem('widgetEventlistMessageSize') : 15),
     console.group('Eventlist widgets settings')
     console.debug(this.settings)
     console.groupEnd()
