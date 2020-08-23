@@ -56,10 +56,10 @@ library.add(faExclamationTriangle)
 
 @Component({})
 export default class sortableList extends Vue {
-  @Prop() readonly value: any;
+  @Prop() readonly value!: any;
   @Prop() readonly command: any;
   @Prop() readonly type: any;
-  @Prop() readonly permissions: any;
+  @Prop() readonly permissions!: any;
 
   socket: SocketIOClient.Socket = getSocket('/core/permissions');
   currentValue = this.value;

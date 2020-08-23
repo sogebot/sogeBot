@@ -21,7 +21,7 @@ type Channel = { text: string, value: string };
 
 @Component({})
 export default class discordChannel extends Vue {
-  @Prop() readonly value: any;
+  @Prop() readonly value!: any;
   @Prop() readonly title!: string;
 
   socket = getSocket('/integrations/discord')

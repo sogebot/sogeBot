@@ -31,7 +31,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 @Component({})
 export default class configurableList extends Vue {
   @Prop() readonly current: any;
-  @Prop() readonly value: any;
+  @Prop() readonly value!: any;
   @Prop() readonly title!: string;
 
   show: boolean = true;

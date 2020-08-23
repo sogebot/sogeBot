@@ -21,7 +21,7 @@ type Guild = { text: string, value: string };
 
 @Component({})
 export default class discordGuild extends Vue {
-  @Prop() readonly value: any;
+  @Prop() readonly value!: any;
   @Prop() readonly title!: string;
 
   socket = getSocket('/integrations/discord')

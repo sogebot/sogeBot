@@ -30,7 +30,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 export default class cronInput extends Vue {
   @Prop() readonly emit: any;
   @Prop() readonly title!: string;
-  @Prop() readonly value: any;
+  @Prop() readonly value!: any;
 
   data: number[] = [];
   currentValue = this.value;

@@ -20,7 +20,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 
 @Component({})
 export default class btnEmit extends Vue {
-  @Prop() readonly value: any;
+  @Prop() readonly value!: any;
   @Prop() readonly current: any;
   @Prop() readonly title!: string;
 
