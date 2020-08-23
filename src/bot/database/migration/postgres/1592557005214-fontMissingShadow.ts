@@ -43,10 +43,10 @@ export class fontMissingShadow1592557005214 implements MigrationInterface {
       .getMany();
     for (const item of data) {
       if (typeof item.customizationFont.shadow !== 'undefined') {
-        delete item.customizationFont.shadow;
+        const { shadow, ...customizationFont } = item.customizationFont;
         await queryRunner.manager
           .getRepository(Randomizer)
-          .update({ id: item.id }, { customizationFont: item.customizationFont });
+          .update({ id: item.id }, { customizationFont });
       }
     }
 
@@ -54,9 +54,9 @@ export class fontMissingShadow1592557005214 implements MigrationInterface {
       const data2 = await queryRunner.manager.getRepository(table).find();
       for (const item of data2) {
         if (typeof item.font.shadow !== 'undefined') {
-          delete item.font.shadow;
+          const { shadow, ...font } = item.font;
           await queryRunner.manager.getRepository(table)
-            .update({ id: item.id }, { font: item.font });
+            .update({ id: item.id }, { font });
         }
       }
     }
@@ -64,9 +64,9 @@ export class fontMissingShadow1592557005214 implements MigrationInterface {
     const data3 = await queryRunner.manager.getRepository(Goal).find();
     for (const item of data3) {
       if (typeof item.customizationFont.shadow !== 'undefined') {
-        delete item.customizationFont.shadow;
+        const { shadow, ...customizationFont } = item.customizationFont;
         await queryRunner.manager.getRepository(Goal)
-          .update({ id: item.id }, { customizationFont: item.customizationFont });
+          .update({ id: item.id }, { customizationFont });
       }
     }
   }

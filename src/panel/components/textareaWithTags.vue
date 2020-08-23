@@ -91,7 +91,7 @@ export default class textareaWithTags extends Vue {
   @PropSync('value') _value !: string;
   @Prop() filters !: any[];
   @Prop() error: boolean | undefined;
-  @Prop() placeholder: string | undefined;
+  @Prop() placeholder!: string | undefined;
 
   height = 0;
   editation = false;

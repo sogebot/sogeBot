@@ -18,7 +18,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 
 @Component({})
 export default class numberInput extends Vue {
-  @Prop() readonly value: any;
+  @Prop() readonly value!: any;
   @Prop() readonly title!: string;
   @Prop() readonly readonly: any;
   @Prop() readonly min: any;

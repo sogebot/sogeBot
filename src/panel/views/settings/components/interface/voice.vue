@@ -28,7 +28,7 @@ declare global {
 
 @Component({})
 export default class helpbox extends Vue {
-  @Prop() readonly value: any;
+  @Prop() readonly value!: any;
   @Prop() readonly title!: string;
 
   voices: { text: string, value: string}[] = [];

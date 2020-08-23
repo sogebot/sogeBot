@@ -37,8 +37,8 @@ import { xor } from 'lodash-es';
 
 @Component({})
 export default class sortableList extends Vue {
-  @Prop() readonly values: any;
-  @Prop() readonly toggle: any;
+  @Prop() readonly values!: any;
+  @Prop() readonly toggle!: any;
   @Prop() readonly toggleonicon: any;
   @Prop() readonly toggleofficon: any;
   @Prop() readonly title!: string;
