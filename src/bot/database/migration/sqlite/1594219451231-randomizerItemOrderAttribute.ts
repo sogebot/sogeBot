@@ -33,8 +33,8 @@ export class randomizerItemOrderAttribute1594219451231 implements MigrationInter
     await queryRunner.query(`CREATE TABLE "randomizer_item" ("id" varchar PRIMARY KEY NOT NULL, "randomizerId" varchar, "groupId" varchar, "name" varchar NOT NULL, "color" varchar(9), "numOfDuplicates" integer NOT NULL DEFAULT (1), "minimalSpacing" integer NOT NULL DEFAULT (1))`, undefined);
 
     for (const item of items) {
-      delete item.order;
-      await queryRunner.manager.getRepository('randomizer_item').insert(item);
+      const { order, ...itemWithoutOrder } = item;
+      await queryRunner.manager.getRepository('randomizer_item').insert(itemWithoutOrder);
     }
   }
 }

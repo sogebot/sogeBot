@@ -563,7 +563,6 @@ class Events extends Core {
     const customVariables = customvariables.getAll();
     const toEval = `(function evaluation () { return ${event.filter} })()`;
     const context = {
-      _,
       $username: _.get(attributes, 'username', null),
       $source: _.get(attributes, 'source', null),
       $is: {
@@ -598,11 +597,10 @@ class Events extends Core {
     };
     let result = false;
     try {
-      result = safeEval(toEval, context);
+      result = safeEval(toEval, { ...context, _ });
     } catch (e) {
       // do nothing
     }
-    delete context._;
     return !!result; // force boolean
   }
 
