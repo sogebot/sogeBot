@@ -75,6 +75,7 @@ function adminEndpoint (
 // non generic
 function adminEndpoint (nsp: string, on: 'panel::dashboards::save', callback: (dashboards: Readonly<Required<DashboardInterface>>[]) => void): void;
 function adminEndpoint (nsp: string, on: 'eventlist::getUserEvents', callback: (username: string, cb: (error: Error | string | null, ...response: any) => void) => void): void;
+function adminEndpoint (nsp: string, on: 'eventlist::get', callback: (count: number, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'customvariables::list', callback: (cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'customvariables::testScript', callback: (opts: { currentValue: any; evalValue: any }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'customvariables::isUnique', callback: (opts: { variable: any; id: any }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
