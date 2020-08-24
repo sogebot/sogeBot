@@ -20,6 +20,7 @@ import api from '../api';
 import users from '../users';
 import { translate } from '../translate';
 import { MINUTE } from '../constants';
+import oauth from '../oauth';
 
 class Points extends System {
   cronTask: any = null;
@@ -461,11 +462,11 @@ class Points extends System {
         switch(type) {
           case 'postgres':
           case 'sqlite':
-            return `SELECT COUNT(*) as "order" FROM "user" WHERE "points" > (SELECT "points" FROM "user" WHERE "username"='${user.username}')`;
+            return `SELECT COUNT(*) as "order" FROM "user" WHERE "points" > (SELECT "points" FROM "user" WHERE "username"='${user.username}') AND "username"!='${oauth.broadcasterUsername}'`;
           case 'mysql':
           case 'mariadb':
           default:
-            return `SELECT COUNT(*) as \`order\` FROM \`user\` WHERE \`points\` > (SELECT \`points\` FROM \`user\` WHERE \`username\`="${user.username}")`;
+            return `SELECT COUNT(*) as \`order\` FROM \`user\` WHERE \`points\` > (SELECT \`points\` FROM \`user\` WHERE \`username\`="${user.username}") AND "username"!='${oauth.broadcasterUsername}'`;
         }
       };
 
@@ -475,6 +476,10 @@ class Points extends System {
       let order: number | string = '?';
       if (orderQuery.length > 0) {
         order = Number(orderQuery[0].order) + 1;
+      }
+
+      if (user.username === oauth.broadcasterUsername) {
+        order = '?'; // broadcaster is removed from ordering
       }
 
       const response = prepare('points.defaults.pointsResponse', {
