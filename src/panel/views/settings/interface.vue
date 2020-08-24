@@ -106,8 +106,8 @@
             <div :key="category + '__permission_based__#1'">
               <b-card no-body>
                 <b-tabs pills card vertical>
-                  <b-tab v-for="permission of getNotIgnoredPermissions(permissions, settings['__permission_based__'][category])" :key="permission.id" :title="permission.name">
-                    <b-card-text>
+                  <b-tab v-for="permission of orderBy(getNotIgnoredPermissions(permissions, settings['__permission_based__'][category]), 'order', 'desc')" :key="permission.id" :title="permission.name">
+                    <b-card-text :key="update">
                       <template v-for="(currentValue, defaultValue) of settings['__permission_based__'][category]">
                         <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " :key="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue + String(currentValue[permission.id] === null)">
                           <div class="d-flex pt-1 pb-1">
@@ -228,7 +228,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { cloneDeep, get, pickBy, filter, size } from 'lodash-es';
+import { cloneDeep, get, pickBy, filter, size, orderBy } from 'lodash-es';
 import { flatten, unflatten } from 'src/bot/helpers/flatten';
 import { getListOf } from 'src/panel/helpers/getListOf';
 import { getConfiguration, getSocket } from 'src/panel/helpers/socket';
@@ -276,6 +276,8 @@ enum State {
 export default class interfaceSettings extends Vue {
   @Prop() readonly commons: any;
 
+  orderBy = orderBy;
+
   socket: SocketIOClient.Socket = getSocket('/');
   psocket: SocketIOClient.Socket = getSocket('/core/permissions');
   list: systemFromIO[] = [];
@@ -283,6 +285,7 @@ export default class interfaceSettings extends Vue {
   settings: any = {};
   ui: any = {};
   isDataChanged: boolean = false;
+  update = Date.now();
   error: string | null = null;
   showError: boolean = false;
 
@@ -542,6 +545,7 @@ export default class interfaceSettings extends Vue {
     setTimeout(() => this.showError = false, 2000);
   }
   triggerDataChange() {
+    this.update = Date.now();
     this.isDataChanged = false; this.isDataChanged = true;
   }
 
