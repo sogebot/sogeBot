@@ -85,7 +85,6 @@ class Events extends Core {
       { id: 'send-chat-message', definitions: { messageToSend: '' }, fire: this.fireSendChatMessage },
       { id: 'send-whisper', definitions: { messageToSend: '' }, fire: this.fireSendWhisper },
       { id: 'run-command', definitions: { commandToRun: '', isCommandQuiet: false }, fire: this.fireRunCommand },
-      { id: 'play-sound', definitions: { urlOfSoundFile: '' }, fire: this.firePlaySound },
       { id: 'emote-explosion', definitions: { emotesToExplode: '' }, fire: this.fireEmoteExplosion },
       { id: 'emote-firework', definitions: { emotesToFirework: '' }, fire: this.fireEmoteFirework },
       { id: 'start-commercial', definitions: { durationOfCommercial: [30, 60, 90, 120, 150, 180] }, fire: this.fireStartCommercial },
@@ -271,15 +270,6 @@ class Events extends Core {
 
   public async fireEmoteFirework(operation: Events.OperationDefinitions) {
     emotes.firework(String(operation.emotesToFirework).split(' '));
-  }
-
-  public async firePlaySound(operation: Events.OperationDefinitions) {
-    // attr.sound can be filename or url
-    let sound = String(operation.urlOfSoundFile);
-    if (!_.includes(sound, 'http')) {
-      sound = 'dist/soundboard/' + sound + '.mp3';
-    }
-    ioServer?.emit('play-sound', sound);
   }
 
   public async fireRunCommand(operation: Events.OperationDefinitions, attributes: Events.Attributes) {
