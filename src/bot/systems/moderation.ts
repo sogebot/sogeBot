@@ -10,7 +10,7 @@ import { command, default_permission, parser, permission_settings, settings } fr
 import Message from '../message';
 import System from './_interface';
 import { getLocalizedName, isModerator, parserReply, prepare, timeout } from '../commons';
-import { timeout as timeoutLog } from '../helpers/log';
+import { timeout as timeoutLog, warning as warningLog } from '../helpers/log';
 import { clusteredClientDelete } from '../cluster';
 import { adminEndpoint } from '../helpers/socket';
 import { Alias } from '../database/entity/alias';
@@ -145,9 +145,13 @@ class Moderation extends System {
         timeout(sender.username, warning, 1, isModerator(sender));
       }
 
-      if (this.cWarningsAnnounceTimeouts && !silent) {
+      if (this.cWarningsAnnounceTimeouts) {
         clusteredClientDelete(sender.id);
-        parserReply('$sender, ' + warning, { sender });
+        if (!silent) {
+          parserReply('$sender, ' + warning, { sender });
+        } else {
+          warningLog(`Moderation announce was not sent (another ${type} warning already sent in 60s): ${sender.username}, ${warning}`);
+        }
       }
     }
   }
