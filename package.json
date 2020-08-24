@@ -61,6 +61,7 @@
     "strip-ansi": "6.0.0",
     "strip-comments": "2.0.1",
     "terminal-kit": "1.42.0",
+    "tlds": "1.209.0",
     "twitch-js": "2.0.0-beta.33",
     "twitter": "1.7.1",
     "typeorm": "0.2.25",
