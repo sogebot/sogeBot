@@ -50,4 +50,5 @@
   * [Write own system](/howto/write-own-system.md)
 * Integrations
   * [Twitter](/integrations/twitter.md)
+  * [Last.fm](/integrations/lastfm.md)
   * [Spotify](/integrations/spotify.md)
