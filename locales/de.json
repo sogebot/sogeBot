@@ -1120,7 +1120,7 @@
       "winner": "Herzlichen Glückwunsch an $winner! Er ist der letzte Mann und er hat gewonnen $points $pointsName ($probability% mit einem Einsatz von $tickets $ticketsName)!"
     },
     "roulette": {
-      "trigger": "$sender versucht sein Glück und drückte einen Abzug",
+      "trigger": "$sender versucht sein Glück und drückte den Abzug",
       "alive": "$sender ist am Leben! Nichts ist passiert.",
       "dead": "Das Gehirn von $sender wurde auf der Wand verteilt!",
       "mod": "$sender ist inkompetent und hat seinen Kopf völlig verfehlt!",
