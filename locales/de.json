@@ -538,7 +538,7 @@
     "fade-out-zoom": "verblasst Zoom",
     "global": "Global",
     "user": "Benutzer",
-    "alerts": "Alarme",
+    "alerts": "Alert",
     "eventlist": "Event-Liste",
     "dashboard": "Dashboard",
     "carousel": "BilderKarussell",
@@ -757,7 +757,7 @@
     "raid": "Dein Kanal wird geraided",
     "mod": "Benutzer ist ein neuer Mod",
     "timeout": "der Benutzer hatte einen Timeout",
-    "create-a-new-event-listener": "Neuen Ereignis-Listener erstellen",
+    "create-a-new-event-listener": "Neuen Event Listener erstellen",
     "send-twitter-message": "Eine Twitter-Nachricht veröffentlichen",
     "send-discord-message": "sende eine Discord Nachricht",
     "send-chat-message": "sende eine Twitch Chat Nachricht",
@@ -1120,7 +1120,7 @@
       "winner": "Herzlichen Glückwunsch an $winner! Er ist der letzte Mann und er hat gewonnen $points $pointsName ($probability% mit einem Einsatz von $tickets $ticketsName)!"
     },
     "roulette": {
-      "trigger": "$sender versucht sein Glück und drückte einen Abzug",
+      "trigger": "$sender versucht sein Glück und drückte den Abzug",
       "alive": "$sender ist am Leben! Nichts ist passiert.",
       "dead": "Das Gehirn von $sender wurde auf der Wand verteilt!",
       "mod": "$sender ist inkompetent und hat seinen Kopf völlig verfehlt!",
