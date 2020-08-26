@@ -3,6 +3,7 @@ import WebSocket from 'ws';
 import { debug, error, info, warning } from './helpers/log';
 import { SECOND } from './constants';
 import events from './events';
+import { addUIError } from './panel';
 
 const pubsubEndpoint: Readonly<string> = 'wss://pubsub-edge.twitch.tv';
 const heartbeatInterval: Readonly<number> = 60 * SECOND;
@@ -13,6 +14,8 @@ let ws: WebSocket | null = null;
 let heartbeatHandle: NodeJS.Timeout | undefined;
 let connectionHash = '';
 
+let ERR_BADAUTH = false;
+
 setInterval(() => {
   try {
     if (oauth.broadcasterAccessToken.length > 0 && oauth.broadcasterClientId.length > 0 && oauth.broadcasterId.length > 0) {
@@ -20,7 +23,7 @@ setInterval(() => {
         ws?.close();
         ws = null;
       }
-      if (!ws) {
+      if (!ws && !ERR_BADAUTH) {
         connectionHash = oauth.broadcasterClientId.concat(oauth.broadcasterAccessToken, oauth.broadcasterId);
         connect();
       }
@@ -66,6 +69,14 @@ const connect = () => {
     } else if (message.type === 'RECONNECT') {
       info('PUBSUB: Socket Reconnecting');
       setTimeout(connect, reconnectInterval);
+    } else if (message.type === 'RESPONSE') {
+      if (message.error === 'ERR_BADAUTH') {
+        warning('PUBSUB: Invalid auth or missing scope. Please re-do your broadcaster auth credentials.');
+        addUIError({ name: 'PUBSUB', message: 'Invalid auth or missing scope. Please re-do your broadcaster auth credentials.' });
+        ERR_BADAUTH = true;
+        ws?.close();
+        ws = null;
+      }
     }
   };
 
@@ -74,8 +85,10 @@ const connect = () => {
     if (heartbeatHandle) {
       clearInterval(heartbeatHandle);
     }
-    info('PUBSUB: Socket Reconnecting');
-    setTimeout(connect, reconnectInterval);
+    if (!ERR_BADAUTH) {
+      info('PUBSUB: Socket Reconnecting');
+      setTimeout(connect, reconnectInterval);
+    }
   };
 };
 
