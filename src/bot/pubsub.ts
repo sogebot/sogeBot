@@ -22,6 +22,7 @@ setInterval(() => {
       if (connectionHash !== oauth.broadcasterClientId.concat(oauth.broadcasterAccessToken, oauth.broadcasterId)) {
         ws?.close();
         ws = null;
+        ERR_BADAUTH = false;
       }
       if (!ws && !ERR_BADAUTH) {
         connectionHash = oauth.broadcasterClientId.concat(oauth.broadcasterAccessToken, oauth.broadcasterId);
