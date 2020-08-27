@@ -37,10 +37,14 @@
     "offline": "Stream je momentálně offline (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
   },
   "webpanel": {
-    "this-system-is-disabled": "Tento systém je vypnutý",
-    "loading": "Načítám",
-    "this-may-take-a-while": "Může to <strong>chvíli</strong> trvat",
-    "display-as": "Zobrazit jako",
+    "go-to-admin": "Go to Admin",
+    "go-to-public": "Go to Public",
+    "logout": "Logout",
+    "popout": "Popout",
+    "not-logged-in": "Not logged in",
+    "remove-widget": "Remove <strong>$name</strong> widget",
+    "join-channel": "Join bot to channel",
+    "leave-channel": "Leave bot from channel",
     "set-default": "Nastavit výchozí",
     "add": "Přidat",
     "placeholders": {
@@ -594,7 +598,6 @@
     "status": "Status",
     "add-widget": "Přidat widget",
     "remove-dashboard": "Odstranit nástěnku",
-    "remove-widget": "Smazat widget",
     "for": "pro",
     "close-bet-after": "Uzavřít sázku za",
     "gain-every-option": "Zisk s každou položkou",
