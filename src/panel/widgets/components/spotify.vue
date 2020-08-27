@@ -9,8 +9,8 @@
             li.nav-item
               b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-spotify')" variant="outline-primary" toggle-class="border-0")
                 b-dropdown-item
-                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'spotify'))" class="text-danger")
-                    | Remove <strong>{{translate('widget-title-spotify')}}</strong> widget
+                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'spotify'))" class="text-danger"
+                    v-html="translate('remove-widget').replace('$name', translate('widget-title-spotify'))")
           template(v-else)
             b-button(variant="outline-primary" :disabled="true").border-0 {{ translate('widget-title-spotify') }}
           li.nav-item

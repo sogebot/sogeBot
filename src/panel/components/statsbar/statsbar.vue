@@ -3,12 +3,8 @@
     <b-toast :title="error.name" visible variant="danger" v-for="error of errors" :key="error.name + error.message">
       {{ error.message }}
     </b-toast>
-    <b-toast title="Owner and broadcaster oauth is not set" no-auto-hide visible variant="danger" solid v-if="!configuration.isCastersSet">
-      Please set your <a href="#/settings/core/oauth">broadcaster oauth or owners</a>, or all users <strong>will have access</strong> to this dashboard and will be considered as <strong>casters</strong>.
-    </b-toast>
-    <b-toast title="New update available" visible variant="info" solid v-if="update.version">
-      New bot version {{ update.version }} available at <a :href="'https://github.com/sogehige/sogeBot/releases/tag/' + update.version">GitHub</a>.
-    </b-toast>
+    <b-toast :title="translate('errors.owner_and_broadcaster_oauth_is_not_set')" no-auto-hide visible variant="danger" solid v-if="!configuration.isCastersSet" v-html="translate('errors.please_set_your_broadcaster_oauth_or_owners')"/>
+    <b-toast :title="translate('errors.new_update_available')" visible variant="info" solid v-if="update.version" v-html="translate('errors.new_bot_version_available_at').replace(/\$version/gmi, update.version)"/>
     <template v-if="!isLoaded">
       <div class="mx-auto text-center p-3 pt-4">
         <div class="spinner-grow" role="status"></div>

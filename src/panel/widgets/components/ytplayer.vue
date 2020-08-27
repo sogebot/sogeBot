@@ -13,8 +13,8 @@
               template(v-if="!popout")
                 b-dropdown-divider
                 b-dropdown-item
-                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'ytplayer'))" class="text-danger")
-                    | Remove <strong>{{translate('widget-title-ytplayer')}}</strong> widget
+                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'ytplayer'))" class="text-danger"
+                    v-html="translate('remove-widget').replace('$name', translate('widget-title-ytplayer'))")
 
         b-tab(title-item-class="shrink")
           template(v-slot:title)

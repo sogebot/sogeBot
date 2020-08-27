@@ -17,10 +17,10 @@
               fa(icon="bars")
             b-dropdown-item(@click="joinBot()" variant="success")
               fa(icon="sign-in-alt").mr-2
-              | join channel
+              | {{ translate('join-channel') }}
             b-dropdown-item(@click="leaveBot()" variant="danger")
               fa(icon="sign-out-alt").mr-2
-              | leave from channel
+              | {{ translate('leave-channel') }}
     navmenu
 </template>
 

@@ -9,11 +9,11 @@
             li.nav-item
               b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-twitch')" variant="outline-primary" toggle-class="border-0")
                 b-dropdown-item(target="_blank" href="/popout/#twitch")
-                  | Popout
+                  | {{ translate('popout') }}
                 b-dropdown-divider
                 b-dropdown-item
-                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'twitch'))" class="text-danger")
-                    | Remove <strong>{{translate('widget-title-twitch')}}</strong> widget
+                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'twitch'))" class="text-danger"
+                    v-html="translate('remove-widget').replace('$name', translate('widget-title-twitch'))")
           template(v-else)
             b-button(variant="outline-primary" :disabled="true").border-0 {{ translate('widget-title-twitch') }}
 

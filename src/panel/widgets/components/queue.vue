@@ -19,12 +19,11 @@
               template(v-if="!popout")
                 b-dropdown-divider
                 b-dropdown-item(target="_blank" href="/popout/#queue")
-                  | Popout
+                  | {{ translate('popout') }}
                 b-dropdown-divider
                 b-dropdown-item
-                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'queue'))").text-danger
-                    | Remove <strong>{{translate('widget-title-queue')}}</strong> widget
-
+                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'queue'))" class="text-danger"
+                    v-html="translate('remove-widget').replace('$name', translate('widget-title-queue'))")
         b-tab
           template(v-slot:title)
             fa(icon='hand-pointer' fixed-width)

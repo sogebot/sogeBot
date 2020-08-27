@@ -12,11 +12,11 @@
                 | Edit variables
               template(v-if="!popout")
                 b-dropdown-item(target="_blank" href="/popout/#customvariables")
-                  | Popout
+                  | {{ translate('popout') }}
                 b-dropdown-divider
                 b-dropdown-item
-                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'customvariables'))").text-danger
-                    | Remove <strong>{{translate('widget-title-customvariables')}}</strong> widget
+                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'customvariables'))" class="text-danger"
+                    v-html="translate('remove-widget').replace('$name', translate('widget-title-customvariables'))")
         b-tab
           template(v-slot:title)
             fa(icon="dollar-sign" fixed-width)

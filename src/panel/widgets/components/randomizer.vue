@@ -12,11 +12,11 @@
                 | Edit items
               template(v-if="!popout")
                 b-dropdown-item(target="_blank" href="/popout/#randomizer")
-                  | Popout
+                  | {{ translate('popout') }}
                 b-dropdown-divider
                 b-dropdown-item
-                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'randomizer'))").text-danger
-                    | Remove <strong>{{translate('widget-title-randomizer')}}</strong> widget
+                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'randomizer'))" class="text-danger"
+                    v-html="translate('remove-widget').replace('$name', translate('widget-title-randomizer'))")
         b-tab
           template(v-slot:title)
             fa(icon="dollar-sign" fixed-width)

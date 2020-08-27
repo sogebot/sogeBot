@@ -12,11 +12,11 @@
                 | Edit actions
               template(v-if="!popout")
                 b-dropdown-item(target="_blank" href="/popout/#cmdboard")
-                  | Popout
+                  | {{ translate('popout') }}
                 b-dropdown-divider
                 b-dropdown-item
-                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'cmdboard'))").text-danger
-                    | Remove <strong>{{translate('widget-title-cmdboard')}}</strong> widget
+                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'cmdboard'))" class="text-danger"
+                    v-html="translate('remove-widget').replace('$name', translate('widget-title-cmdboard'))")
         b-tab
           template(v-slot:title)
             fa(icon='terminal' fixed-width)

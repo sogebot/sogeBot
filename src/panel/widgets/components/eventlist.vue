@@ -35,11 +35,11 @@
                 b-dropdown-item(@click="state.editation = $state.progress")
                   | Edit events
                 b-dropdown-item(target="_blank" href="/popout/#eventlist")
-                  | Popout
+                  | {{ translate('popout') }}
                 b-dropdown-divider
                 b-dropdown-item
-                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'eventlist'))").text-danger
-                    | Remove <strong>{{translate('widget-title-eventlist')}}</strong> widget
+                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'eventlist'))" class="text-danger"
+                    v-html="translate('remove-widget').replace('$name', translate('widget-title-eventlist'))")
 
         b-tab(active)
           template(v-slot:title)
