@@ -9,8 +9,8 @@
             li.nav-item
               b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-part')" variant="outline-primary" toggle-class="border-0")
                 b-dropdown-item
-                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'part'))" class="text-danger")
-                    | Remove <strong>{{translate('widget-title-part')}}</strong> widget
+                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'part'))" class="text-danger"
+                    v-html="translate('remove-widget').replace('$name', translate('widget-title-part'))")
           template(v-else)
             b-button(variant="outline-primary" :disabled="true").border-0 {{ translate('widget-title-join') }}
         b-tab(active)

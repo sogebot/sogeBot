@@ -9,11 +9,11 @@
             li.nav-item
               b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-raffles')" variant="outline-primary" toggle-class="border-0")
                 b-dropdown-item(target="_blank" href="/popout/#raffles")
-                  | Popout
+                  | {{ translate('popout') }}
                 b-dropdown-divider
                 b-dropdown-item
-                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'raffles'))").text-danger
-                    | Remove <strong>{{translate('widget-title-raffles')}}</strong> widget
+                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'raffles'))" class="text-danger"
+                    v-html="translate('remove-widget').replace('$name', translate('widget-title-raffles'))")
           template(v-else)
             b-button(variant="outline-primary" :disabled="true").border-0 {{ translate('widget-title-raffles') }}
 

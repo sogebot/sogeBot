@@ -25,13 +25,13 @@
         </div>
         <b-button-group class="pt-2 w-100">
           <b-button variant="dark" v-if="isPublicPage() && viewer.permission.id === permission.CASTERS" href="/">
-            Go to Admin
+            {{ translate('go-to-admin') }}
           </b-button>
           <b-button variant="dark" v-if="!isPublicPage()" href="/public/">
-            Go to Public
+            {{ translate('go-to-public') }}
           </b-button>
           <b-button variant="danger" class="float-right" @click="logout">
-            <fa icon="sign-out-alt" fixed-width /> Logout
+            <fa icon="sign-out-alt" fixed-width /> {{ translate('logout') }}
           </b-button>
         </b-button-group>
       </b-dropdown-text>
@@ -42,7 +42,7 @@
     <template v-else>
       <b-button @click="login" class="border-0 ml-1 p-1 pl-2 pr-2 btn-sm" variant="light">
         <fa icon="user-circle" fixed-width/>
-        Not logged in
+        {{ translate('not-logged-in') }}
       </b-button>
     </template>
   </div>
