@@ -32,7 +32,14 @@
         <font-awesome-icon icon="caret-right"></font-awesome-icon>
       </button>
     </div>
-    <v-select :placeholder="translate('create-and-use-a-new-game')" class="form-control mt-2 mb-4" :options="searchForGameOpts" @search="searchForGame($event);" :searchable="true" @input="currentGame = $event"></v-select>
+
+    <search
+      class="mt-2 mb-4"
+      :placeholder="translate('create-and-use-a-new-game')"
+      :options="searchForGameOpts"
+      :value="currentGame"
+      @search="searchForGame($event);"
+      @input="currentGame = $event"></search>
 
     <h5 class="modal-title">
       {{ translate('change-title') }} <small>{{ translate('for') }} {{ currentGame }}</small>
@@ -53,7 +60,7 @@
     <h5 class="modal-title mt-4">
       {{ translate('tags')}}
     </h5>
-    <v-select :placeholder="translate('search-tags')" class="form-control mt-2 mb-4" :options="searchForTagsOpts" @search="searchForTags($event);" :searchable="true" @input="currentTags = $event; searchForTags('');" multiple :value="currentTags"></v-select>
+    <!--v-select :placeholder="translate('search-tags')" class="form-control mt-2 mb-4" :options="searchForTagsOpts" @search="searchForTags($event);" :searchable="true" @input="currentTags = $event; searchForTags('');" multiple :value="currentTags"></v-select-->
 
     <div slot="modal-footer" class="w-100">
       <b-button
@@ -74,7 +81,7 @@
         class="float-right"
       ><fa icon="spinner" spin/> {{ translate('dialog.buttons.saveChanges.progress')}}</b-button>
       <b-button
-        v-else-if="saveState === 0"
+        v-else-if="saveState === 2"
         variant="success"
         class="float-right"
       >{{ translate('dialog.buttons.saveChanges.done')}}</b-button>
@@ -96,13 +103,12 @@
   import { getSocket } from 'src/panel/helpers/socket';
 
   import { ModalPlugin } from 'bootstrap-vue';
-  import vSelect from 'vue-select'
-  import 'vue-select/dist/vue-select.css';
-
   Vue.use(ModalPlugin);
-  Vue.component('v-select', vSelect)
 
   export default Vue.extend({
+    components: {
+      search: () => import('../searchDropdown.vue'),
+    },
     data: function () {
       const object: {
         chunk: any;
