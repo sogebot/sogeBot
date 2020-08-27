@@ -37,10 +37,14 @@
     "offline": "Stream ist momentan offline seit (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
   },
   "webpanel": {
-    "this-system-is-disabled": "Dieses System ist deaktiviert",
-    "loading": "Wird geladen",
-    "this-may-take-a-while": "Das <strong>könnte</strong> ein wenig dauern",
-    "display-as": "Anzeigen als",
+    "go-to-admin": "Go to Admin",
+    "go-to-public": "Go to Public",
+    "logout": "Logout",
+    "popout": "Popout",
+    "not-logged-in": "Not logged in",
+    "remove-widget": "Remove <strong>$name</strong> widget",
+    "join-channel": "Join bot to channel",
+    "leave-channel": "Leave bot from channel",
     "set-default": "Als Standard festlegen",
     "add": "Hinzufügen",
     "placeholders": {
@@ -594,7 +598,6 @@
     "status": "Status",
     "add-widget": "Widget hinzufügen",
     "remove-dashboard": "Dashboard entfernen",
-    "remove-widget": "Widget entfernen",
     "for": "für",
     "close-bet-after": "Schließe Wette nach",
     "gain-every-option": "Jede Option erhalten",
