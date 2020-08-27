@@ -263,8 +263,8 @@ export default class aliasList extends Vue {
     })
   }
 
-  update(item: aliasList['items'][0]) {
-    this.socket.emit('generic::setById', { id: { id: item.id, item } }, () => {})
+  update(item: aliasList['items'][number]) {
+    this.socket.emit('generic::setById', { id: item.id, item }, () => {})
   }
 }
 </script>
