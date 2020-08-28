@@ -1,21 +1,26 @@
 <template>
   <div id="app">
+    <div v-if="state === null">Please wait, token is being processed</div>
     <div v-if="state === false">Unexpected error, please try to authenticate again</div>
     <div v-if="state === true">Saving token to a bot, refreshing back to a bot.</div>
   </div>
 </template>
 
 <script lang="ts">
-import { ref, Ref } from "@vue/composition-api";
-import { getSocket } from '../panel/helpers/socket';
+import { ref, Ref, defineComponent } from "@vue/composition-api";
 
-export default {
+export default defineComponent({
   setup() {
-    const socket = getSocket('/integrations/spotify');
-    let state: Ref<boolean | null> = ref(true);
+    const socket = io('/integrations/spotify', {
+      forceNew: true,
+      query: {
+        token: localStorage.getItem('accessToken'),
+      },
+    });
+    let state: Ref<boolean | null> = ref(null);
 
     if(window.location.hash || window.location.search) {
-      socket.emit('spotify::state', (err: string | null, state: any) => {
+      socket.emit('spotify::state', (err: string | null, spotifyState: any) => {
         let urlState = '';
         let urlCode = '';
         for (let url of window.location.search.split('&')) {
@@ -27,21 +32,21 @@ export default {
           }
         }
 
-        if (urlState === state) {
-          state = false;
+        if (urlState === spotifyState) {
           socket.emit('spotify::code', urlCode, (err: string | null) => {
+            state.value = true;
             window.location.href = window.location.origin + "/#/settings/integrations/spotify"
           })
         } else {
+          state.value = false;
           console.error('State is not matching!')
         }
       })
     }
 
     return {
-      socket,
       state,
     };
   }
-};
+});
 </script>
