@@ -8,14 +8,7 @@ const webpack = require('webpack');
 const bundleAnalyze = !!process.env.BUNDLE
 
 const optimization = {
-  removeAvailableModules: true,
-  removeEmptyChunks: true,
   minimize: process.env.NODE_ENV === 'production',
-  runtimeChunk: true,
-  providedExports: true,
-  sideEffects: true,
-  usedExports: true,
-  moduleIds: 'deterministic'
 };
 
 if (process.env.NODE_ENV === 'production') {

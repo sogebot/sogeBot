@@ -115,6 +115,18 @@ class Spotify extends Integration {
     }
   }
 
+  @onChange('redirectURI')
+  @onChange('clientId')
+  @onChange('clientSecret')
+  onConnectionVariablesChange () {
+    this.currentSong = JSON.stringify({});
+    this.disconnect();
+    if (this.enabled) {
+      this.connect();
+      this.getMe();
+    }
+  }
+
   @onStartup()
   @onChange('enabled')
   onStateChange (key: string, value: boolean) {
