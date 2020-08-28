@@ -51,7 +51,7 @@ jobs:
         node-version: 14
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      run: ENV=development make info clean dependencies patch bot
+      run: ENV=development make info clean dependencies bot
     - name: Set proper db to use
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: npm run test:config:sqlite
@@ -88,7 +88,7 @@ jobs:
         node-version: 14
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      run: ENV=development make info clean dependencies patch bot
+      run: ENV=development make info clean dependencies bot
     - name: Set proper db to use
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: npm run test:config:postgres
@@ -127,7 +127,7 @@ jobs:
         node-version: 14
     - name: Install all dependencies and build just a bot
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      run: ENV=development make info clean dependencies patch bot
+      run: ENV=development make info clean dependencies bot
     - name: Set proper db to use
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: npm run test:config:mysql
