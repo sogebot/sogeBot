@@ -37,10 +37,10 @@
     "offline": "Le stream est actuellement hors ligne pour (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
   },
   "webpanel": {
-    "this-system-is-disabled": "This system is disabled",
-    "loading": "Loading",
-    "this-may-take-a-while": "This <strong>may</strong> take a while",
-    "display-as": "Display as",
+    "this-system-is-disabled": "Ce système est désactivé",
+    "loading": "Chargement",
+    "this-may-take-a-while": "Ceci <strong>peut</strong> prendre un certain temps",
+    "display-as": "Afficher en tant que",
     "go-to-admin": "Go to Admin",
     "go-to-public": "Go to Public",
     "logout": "Logout",
