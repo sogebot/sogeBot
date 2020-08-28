@@ -37,10 +37,10 @@
     "offline": "Stream ist momentan offline seit (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
   },
   "webpanel": {
-    "this-system-is-disabled": "This system is disabled",
-    "loading": "Loading",
-    "this-may-take-a-while": "This <strong>may</strong> take a while",
-    "display-as": "Display as",
+    "this-system-is-disabled": "Dieses System ist deaktiviert",
+    "loading": "Wird geladen",
+    "this-may-take-a-while": "Das <strong>könnte</strong> ein wenig dauern",
+    "display-as": "Anzeigen als",
     "go-to-admin": "Go to Admin",
     "go-to-public": "Go to Public",
     "logout": "Logout",
