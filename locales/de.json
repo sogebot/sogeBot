@@ -47,8 +47,8 @@
     "popout": "Popout",
     "not-logged-in": "Nicht angemeldet",
     "remove-widget": "Entferne <strong>$name</strong> Widget",
-    "join-channel": "Join bot to channel",
-    "leave-channel": "Leave bot from channel",
+    "join-channel": "Verbinde den Bot zum Kanal",
+    "leave-channel": "Entferne den Bot vom Kanal",
     "set-default": "Als Standard festlegen",
     "add": "Hinzufügen",
     "placeholders": {
