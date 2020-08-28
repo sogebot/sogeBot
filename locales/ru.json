@@ -37,10 +37,10 @@
     "offline": "Стрим оффлайн (if $days>0|$daysд )(if $hours>0|$hoursч )(if $minutes>0|$minutesм )(if $seconds>0|$secondsс)"
   },
   "webpanel": {
-    "this-system-is-disabled": "This system is disabled",
-    "loading": "Loading",
-    "this-may-take-a-while": "This <strong>may</strong> take a while",
-    "display-as": "Display as",
+    "this-system-is-disabled": "Эта система отключена",
+    "loading": "Загрузка",
+    "this-may-take-a-while": "Это <strong>может</strong> занять некоторое время",
+    "display-as": "Отображать как",
     "go-to-admin": "Go to Admin",
     "go-to-public": "Go to Public",
     "logout": "Logout",
