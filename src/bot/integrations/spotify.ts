@@ -548,7 +548,7 @@ class Spotify extends Integration {
             name: track.name, artist: track.artists[0].name,
           }), ...opts }];
         } else {
-          return [{ response: prepare('integrations.spotify.song-is-banned', {
+          return [{ response: prepare('integrations.spotify.cannot-request-song-is-banned', {
             name: track.name, artist: track.artists[0].name,
           }), ...opts }];
         }
