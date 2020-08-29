@@ -15,7 +15,7 @@ import { debounce } from '../helpers/debounce';
 import { v5 as uuidv5 } from 'uuid';
 import oauth from '../oauth';
 import Expects from '../expects';
-import { isUUID, prepare } from '../commons';
+import { getOwner, isUUID, prepare } from '../commons';
 
 import { getRepository, IsNull, LessThan, Not } from 'typeorm';
 import { Permissions as PermissionsEntity } from '../database/entity/permissions';
@@ -30,6 +30,9 @@ import general from '../general';
 import { isDbConnected } from '../helpers/database';
 import permissions from '../permissions';
 import events from '../events';
+import tmi from '../tmi';
+import { flatten } from '../helpers/flatten';
+import users from '../users';
 
 const timezone = (process.env.TIMEZONE ?? 'system') === 'system' || !process.env.TIMEZONE ? moment.tz.guess() : process.env.TIMEZONE;
 
@@ -447,19 +450,6 @@ class Discord extends Integration {
     }
   }
 
-  public async sendDM(text: string, dMchannel: string): Promise<void> {
-    try {
-      if (this.client === null) {
-        throw new Error('Discord integration is not connected');
-      }
-      const messageContent = await new Message(text).parse({});
-      const channel = await this.client.guilds.cache.get(this.guild)?.channels.cache.get(dMchannel);
-      await (channel as DiscordJs.TextChannel).send(messageContent);
-    } catch (e) {
-      warning(e.stack);
-    }
-  }
-
   public addEvent(){
     if (typeof events === 'undefined') {
       setTimeout(() => this.addEvent(), 1000);
@@ -470,8 +460,68 @@ class Discord extends Integration {
     }
   }
 
+  /* note: as we are using event, we need to use self as pointer to discord class */
   public async fireSendDiscordMessage(operation: Events.OperationDefinitions, attributes: Events.Attributes): Promise<void> {
-    self.sendDM(String(operation.messageToSend), String(operation.channel));
+    const dMchannel = String(operation.channel);
+    try {
+      if (self.client === null) {
+        throw new Error('Discord integration is not connected');
+      }
+      const username = attributes.username === null || typeof attributes.username === 'undefined' ? getOwner() : attributes.username;
+      let userId = attributes.userId;
+      const userObj = await getRepository(User).findOne({ username });
+      if (!userObj && !attributes.test) {
+        await getRepository(User).save({
+          userId: await api.getIdFromTwitch(username),
+          username,
+        });
+        return self.fireSendDiscordMessage(operation, {...attributes, userId, username });
+      } else if (attributes.test) {
+        userId = attributes.userId;
+      } else if (!userObj) {
+        return;
+      }
+
+      let message = String(operation.messageToSend);
+      const atUsername = tmi.showWithAt;
+
+      const flattenAttributes = flatten(attributes);
+      for (const key of Object.keys(flattenAttributes).sort((a, b) => a.length - b.length)) {
+        let val = flattenAttributes[key];
+        if (typeof val === 'object' && Object.keys(val).length === 0) {
+          continue;
+        } // skip empty object
+        if (key.includes('username') || key.includes('recipient')) {
+          val = atUsername ? `@${val}` : val;
+        }
+        const replace = new RegExp(`\\$${key}`, 'g');
+        message = message.replace(replace, val);
+      }
+
+      const messageContent = await self.replaceLinkedUsernameInMessage(await new Message(message).parse({}));
+      const channel = await self.client.guilds.cache.get(self.guild)?.channels.cache.get(dMchannel);
+      await (channel as DiscordJs.TextChannel).send(messageContent);
+      chatOut(`#${(channel as DiscordJs.TextChannel).name}: ${messageContent} [${self.client.user?.tag}]`);
+    } catch (e) {
+      warning(e.stack);
+    }
+  }
+
+  async replaceLinkedUsernameInMessage(message: string) {
+    // search linked users and change to @<id>
+    let match;
+    const usernameRegexp = /@(?<username>[A-Za-z0-9_]{3,15})/g;
+    while ((match = usernameRegexp.exec(message)) !== null) {
+      if (match) {
+        const username = match.groups?.username as string;
+        const userId = await users.getIdByName(username);
+        const link = await getRepository(DiscordLink).findOne({ userId });
+        if (link) {
+          message = message.replace(`@${username}`, `<@${link.discordId}>`);
+        }
+      }
+    }
+    return message;
   }
 
   initClient() {

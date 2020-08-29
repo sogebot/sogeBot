@@ -10,15 +10,12 @@ import { error } from './helpers/log';
 import { clusteredChatOut, clusteredClientChat, clusteredClientTimeout, clusteredWhisperOut } from './cluster';
 
 import oauth from './oauth';
-import users from './users';
 import { translate } from './translate';
 import tmi from './tmi';
 import { UserStateTags } from 'twitch-js';
 import Discord from './integrations/discord';
 import { TextChannel } from 'discord.js';
 import { Message } from './message';
-import { getRepository } from 'typeorm';
-import { DiscordLink } from './database/entity/discord';
 import { UserInterface } from './database/entity/user';
 
 /**
@@ -90,20 +87,7 @@ export async function announce(messageToAnnounce: string) {
         if (id === Discord.sendGeneralAnnounceToChannel || (channel as TextChannel).name === Discord.sendGeneralAnnounceToChannel) {
           const ch = Discord.client.channels.cache.find(o => o.id === id);
           if (ch) {
-            // search linked users and change to @<id>
-            let match;
-            const usernameRegexp = /@(?<username>[A-Za-z0-9_]{3,15})/g;
-            while ((match = usernameRegexp.exec(messageToAnnounce)) !== null) {
-              if (match) {
-                const username = match.groups?.username as string;
-                const userId = await users.getIdByName(username);
-                const link = await getRepository(DiscordLink).findOne({ userId });
-                if (link) {
-                  messageToAnnounce = messageToAnnounce.replace(`@${username}`, `<@${link.discordId}>`);
-                }
-              }
-            }
-            (ch as TextChannel).send(messageToAnnounce);
+            (ch as TextChannel).send(await Discord.replaceLinkedUsernameInMessage(messageToAnnounce));
             chatOut(`#${(ch as TextChannel).name}: ${messageToAnnounce} [${Discord.client.user?.tag}]`);
           }
         }
