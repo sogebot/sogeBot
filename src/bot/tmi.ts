@@ -12,7 +12,7 @@ import Expects from './expects';
 import Core from './_interface';
 import * as constants from './constants';
 import { settings, ui } from './decorators';
-import { ban, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning } from './helpers/log';
+import { cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning } from './helpers/log';
 import { triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub } from './helpers/interface/triggers';
 import { isDebugEnabled } from './helpers/log';
 import { getLocalizedName, getOwner, isBot, isIgnored, isOwner, prepare, sendMessage } from './commons';
@@ -295,18 +295,7 @@ class TMI extends Core {
       });
 
       client.chat.on('CLEARCHAT', message => {
-        if (message.event === 'USER_BANNED') {
-          const duration = message.tags.banDuration;
-          const reason = message.tags.banReason;
-          const username = message.username.toLowerCase();
-
-          if (typeof duration === 'undefined') {
-            ban(`${username}`);
-            events.fire('ban', { username: username });
-          } else {
-            events.fire('timeout', { username, reason, duration });
-          }
-        } else {
+        if (message.event !== 'USER_BANNED') {
           events.fire('clearchat', {});
         }
       });

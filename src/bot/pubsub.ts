@@ -1,6 +1,6 @@
 import oauth from './oauth';
 import WebSocket from 'ws';
-import { debug, error, info, warning } from './helpers/log';
+import { ban, debug, error, info, timeout, unban, warning } from './helpers/log';
 import { SECOND } from './constants';
 import events from './events';
 import { addUIError } from './panel';
@@ -48,6 +48,7 @@ const connect = () => {
 
     // listen to points redemption
     listen('channel-points-channel-v1.' + oauth.broadcasterId);
+    listen('chat_moderator_actions.' + oauth.broadcasterId);
     heartbeatHandle = setInterval(heartbeat, heartbeatInterval);
   };
 
@@ -66,6 +67,18 @@ const connect = () => {
           username: dataMessage.data.redemption.user.login,
           titleOfReward: dataMessage.data.redemption.reward.title,
         });
+      } else if (dataMessage.type === 'moderation_action') {
+        const [ username, reason ] = dataMessage.data.args;
+        const createdBy = dataMessage.data.from_automod ? 'TwitchAutoMod' : `${dataMessage.data.created_by}#${dataMessage.data.created_by_user_id}`;
+        if (dataMessage.data.moderation_action === 'ban') {
+          ban(`${username}#${dataMessage.data.target_user_id} by ${createdBy}: ${reason ? reason : '<no reason>'}`);
+          events.fire('ban', { username, reason: reason ? reason : '<no reason>' });
+        } else if (dataMessage.data.moderation_action === 'unban') {
+          unban(`${username}#${dataMessage.data.target_user_id} by ${createdBy}`);
+        } else if (dataMessage.data.moderation_action === 'timeout') {
+          timeout(`${username}#${dataMessage.data.target_user_id} by ${createdBy} for ${reason} seconds`);
+          events.fire('timeout', { username, duration: reason });
+        }
       }
     } else if (message.type === 'RECONNECT') {
       info('PUBSUB: Socket Reconnecting');

@@ -36,6 +36,7 @@ enum Levels {
   resub,
   timeout,
   ban,
+  unban,
   warning,
   start,
   stop,
@@ -54,6 +55,7 @@ const levelFormat = {
   warning: '|!',
   timeout: '+timeout',
   ban: '+ban',
+  unban: '-ban',
   follow: '+follow',
   host: '+host',
   raid: '+raid',
@@ -135,6 +137,9 @@ export function timeout(message: any) {
   log(message);
 }
 export function ban(message: any) {
+  log(message);
+}
+export function unban(message: any) {
   log(message);
 }
 export function follow(message: any) {
