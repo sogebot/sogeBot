@@ -468,16 +468,13 @@ class Discord extends Integration {
         throw new Error('Discord integration is not connected');
       }
       const username = attributes.username === null || typeof attributes.username === 'undefined' ? getOwner() : attributes.username;
-      let userId = attributes.userId;
       const userObj = await getRepository(User).findOne({ username });
       if (!userObj && !attributes.test) {
         await getRepository(User).save({
           userId: await api.getIdFromTwitch(username),
           username,
         });
-        return self.fireSendDiscordMessage(operation, {...attributes, userId, username });
-      } else if (attributes.test) {
-        userId = attributes.userId;
+        return self.fireSendDiscordMessage(operation, {...attributes, username });
       } else if (!userObj) {
         return;
       }
