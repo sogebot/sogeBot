@@ -60,7 +60,15 @@
     <h5 class="modal-title mt-4">
       {{ translate('tags')}}
     </h5>
-    <!--v-select :placeholder="translate('search-tags')" class="form-control mt-2 mb-4" :options="searchForTagsOpts" @search="searchForTags($event);" :searchable="true" @input="currentTags = $event; searchForTags('');" multiple :value="currentTags"></v-select-->
+
+    <search
+      class="mt-2 mb-4"
+      :placeholder="translate('search-tags')"
+      :options="searchForTagsOpts"
+      :value="currentTags"
+      @search="searchForTags($event);"
+      @input="currentTags = $event"
+      multiple></search>
 
     <div slot="modal-footer" class="w-100">
       <b-button
