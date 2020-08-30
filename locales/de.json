@@ -703,6 +703,7 @@
     "create-and-use-a-new-game": "Neues Spiel erstellen und verwenden",
     "create-and-use-a-new-title": "Neuen Titel erstellen und verwenden",
     "search-tags": "Nach verfügbaren Tags suchen (einige Spiel-Tags fehlen möglicherweise / Twitch-Richtlinie)",
+    "no-options-found-for-this-search": "No options found for this search.",
     "followers-show-number": "Anzeigen",
     "followers-show": "Followers",
     "eventlist-overflow-height": "Max. Widget-Höhe",
