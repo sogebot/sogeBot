@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, Mounted } from '@vue/composition-api'
+import { defineComponent } from '@vue/composition-api'
 import { BSpinner } from 'bootstrap-vue'
 
 export default defineComponent({
