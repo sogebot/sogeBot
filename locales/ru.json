@@ -703,6 +703,7 @@
     "create-and-use-a-new-game": "Создать и использовать новую игру",
     "create-and-use-a-new-title": "Создать и использовать новый заголовок",
     "search-tags": "Поиск доступных тегов (некоторые теги игры могут отсутствовать / твитч политика)",
+    "no-options-found-for-this-search": "No options found for this search.",
     "followers-show-number": "Показать",
     "followers-show": "подписчики",
     "eventlist-overflow-height": "Макс. высота виджета",
