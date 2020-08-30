@@ -702,6 +702,7 @@
     "create-and-use-a-new-game": "Create and use a new game",
     "create-and-use-a-new-title": "Create and use a new title",
     "search-tags": "Search for available tags (some game tags might missing / twitch policy)",
+    "no-options-found-for-this-search": "No options found for this search.",
     "followers-show-number": "Show",
     "followers-show": "followers",
     "eventlist-overflow-height": "Max widget height",
