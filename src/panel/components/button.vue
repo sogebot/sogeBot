@@ -29,11 +29,19 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue'
+  import { defineComponent } from '@vue/composition-api'
 
-  export default Vue.extend({
-    props: ['text', 'href', 'icon', 'target', 'spin', 'disabled', 'event'],
-  })
+export default defineComponent({
+  props: {
+    text: String,
+    href: String,
+    icon: [String, Array],
+    target: String,
+    spin: Boolean,
+    disabled: Boolean,
+    event: String
+  }
+})
 </script>
 
 <style scoped>
