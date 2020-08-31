@@ -16,14 +16,18 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from '@vue/composition-api'
 import { BSpinner } from 'bootstrap-vue'
 
-@Component({
-  components: { 'b-spinner': BSpinner }
+export default defineComponent({
+  props: {
+    noMargin: Boolean,
+    slow: Boolean,
+  },
+  setup(props) {
+    return {
+      ...BSpinner
+    };
+  }
 })
-export default class loading extends Vue {
-  @Prop(Boolean) readonly slow: boolean | undefined;
-  @Prop(Boolean) readonly noMargin: boolean | undefined;
-};
 </script>

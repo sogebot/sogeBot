@@ -7,6 +7,7 @@ import Vue from 'vue';
 import VueMoment from 'vue-moment';
 import VueRouter from 'vue-router';
 import Vuelidate from 'vuelidate';
+import VueCompositionAPI from '@vue/composition-api';
 
 // eslint-disable-next-line
 import LoadScript from 'vue-plugin-load-script';
@@ -51,6 +52,7 @@ Vue.use(VueMoment, {
 Vue.use(BootstrapVue);
 Vue.use(Vuelidate);
 Vue.use(LoadScript);
+Vue.use(VueCompositionAPI);
 
 /* import widely used components */
 Vue.component('panel', () => import('./components/panel.vue'));
