@@ -289,7 +289,6 @@ export default class AlertsRegistryOverlays extends Vue {
           console.debug('showing image');
           this.runningAlert.isShowing = true;
           this.$nextTick(() => {
-            console.log(this.$refs.video);
             if (this.$refs.video && this.runningAlert) {
               (this.$refs.video as HTMLMediaElement).volume = this.runningAlert.alert.soundVolume / 100;
               (this.$refs.video as HTMLMediaElement).play();
