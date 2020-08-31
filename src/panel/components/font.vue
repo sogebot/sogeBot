@@ -7,7 +7,7 @@
       <b-card-body>
         <b-form-group label-cols-sm="4" label-cols-lg="3"
                       :label="translate('registry.alerts.font.name')">
-          <b-form-select v-model="dataValues.family" :options="fonts" plain></b-form-select>
+          <b-form-select v-model="data.family" :options="fonts" plain></b-form-select>
         </b-form-group>
 
         <b-form-group label-cols-sm="4" label-cols-lg="3"
@@ -16,7 +16,7 @@
           <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
             <b-form-input
               id="font.size"
-              v-model="dataValues.size"
+              v-model="data.size"
               type="range"
               min="1"
               max="200"
@@ -24,7 +24,7 @@
             ></b-form-input>
             <b-input-group-text slot="append" class="pr-3 pl-3">
               <div style="width: 3rem;">
-                {{dataValues.size}}px
+                {{data.size}}px
               </div>
             </b-input-group-text>
           </b-input-group>
@@ -36,7 +36,7 @@
           <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
             <b-form-input
               id="font.weight"
-              v-model="dataValues.weight"
+              v-model="data.weight"
               type="range"
               min="100"
               max="900"
@@ -44,7 +44,7 @@
             ></b-form-input>
             <b-input-group-text slot="append" class="pr-3 pl-3">
               <div style="width: 3rem;">
-                {{ dataValues.weight}}
+                {{ data.weight}}
               </div>
             </b-input-group-text>
           </b-input-group>
@@ -56,7 +56,7 @@
           <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
             <b-form-input
               id="font.borderPx"
-              v-model="dataValues.borderPx"
+              v-model="data.borderPx"
               type="range"
               min="0"
               max="100"
@@ -64,7 +64,7 @@
             ></b-form-input>
             <b-input-group-text slot="append" class="pr-3 pl-3">
               <div style="width: 3rem;">
-                {{ dataValues.borderPx}}px
+                {{ data.borderPx}}px
               </div>
             </b-input-group-text>
           </b-input-group>
@@ -76,7 +76,7 @@
           <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
             <b-form-input
               id="font.borderColor"
-              v-model="dataValues.borderColor"
+              v-model="data.borderColor"
               type="color"
             ></b-form-input>
           </b-input-group>
@@ -85,11 +85,11 @@
         <b-form-group label-cols-sm="4" label-cols-lg="3"
                 :label="translate('registry.alerts.font.color.name')"
                 label-for="font.color"
-                v-if="dataValues.color">
+                v-if="data.color">
           <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
             <b-form-input
               id="font.color"
-              v-model="dataValues.color"
+              v-model="data.color"
               type="color"
             ></b-form-input>
           </b-input-group>
@@ -98,11 +98,11 @@
         <b-form-group label-cols-sm="4" label-cols-lg="3"
                 :label="translate('registry.alerts.font.highlightcolor.name')"
                 label-for="font.highlightcolor"
-                v-if="dataValues.highlightcolor">
+                v-if="data.highlightcolor">
           <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
             <b-form-input
               id="font.highlightcolor"
-              v-model="dataValues.highlightcolor"
+              v-model="data.highlightcolor"
               type="color"
             ></b-form-input>
           </b-input-group>
@@ -119,14 +119,14 @@
             <template v-slot:tabs-end>
               <b-nav-item role="presentation" @click.prevent="addShadow" href="#"><b>+</b></b-nav-item>
             </template>
-            <b-tab v-for="i of Object.keys(dataValues.shadow)" :key="'dyn-tab-' + i" :title="'Shadow ' + i">
+            <b-tab v-for="i of Object.keys(data.shadow)" :key="'dyn-tab-' + i" :title="'Shadow ' + i">
               <b-form-group label-cols-sm="4" label-cols-lg="3"
                       :label="translate('dialog.font.shadowShiftRight')"
                       label-for="font.shadowShiftRight">
                 <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
                   <b-form-input
                     id="font.shadowShiftRight"
-                    v-model="dataValues.shadow[i].shiftRight"
+                    v-model="data.shadow[i].shiftRight"
                     type="range"
                     min="-50"
                     max="50"
@@ -134,7 +134,7 @@
                   ></b-form-input>
                   <b-input-group-text slot="append" class="pr-3 pl-3">
                     <div style="width: 3rem;">
-                      {{ dataValues.shadow[i].shiftRight}}px
+                      {{ data.shadow[i].shiftRight}}px
                     </div>
                   </b-input-group-text>
                 </b-input-group>
@@ -146,7 +146,7 @@
                 <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
                   <b-form-input
                     id="font.shadowShiftDown"
-                    v-model="dataValues.shadow[i].shiftDown"
+                    v-model="data.shadow[i].shiftDown"
                     type="range"
                     min="-50"
                     max="50"
@@ -154,7 +154,7 @@
                   ></b-form-input>
                   <b-input-group-text slot="append" class="pr-3 pl-3">
                     <div style="width: 3rem;">
-                      {{ dataValues.shadow[i].shiftDown}}px
+                      {{ data.shadow[i].shiftDown}}px
                     </div>
                   </b-input-group-text>
                 </b-input-group>
@@ -166,7 +166,7 @@
                 <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
                   <b-form-input
                     id="font.shadowBlur"
-                    v-model="dataValues.shadow[i].blur"
+                    v-model="data.shadow[i].blur"
                     type="range"
                     min="0"
                     max="50"
@@ -174,7 +174,7 @@
                   ></b-form-input>
                   <b-input-group-text slot="append" class="pr-3 pl-3">
                     <div style="width: 3rem;">
-                      {{ dataValues.shadow[i].blur}}px
+                      {{ data.shadow[i].blur}}px
                     </div>
                   </b-input-group-text>
                 </b-input-group>
@@ -186,7 +186,7 @@
                 <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
                   <b-form-input
                     id="font.shadowOpacity"
-                    v-model="dataValues.shadow[i].opacity"
+                    v-model="data.shadow[i].opacity"
                     type="range"
                     min="0"
                     max="100"
@@ -194,7 +194,7 @@
                   ></b-form-input>
                   <b-input-group-text slot="append" class="pr-3 pl-3">
                     <div style="width: 3rem;">
-                      {{ dataValues.shadow[i].opacity}}%
+                      {{ data.shadow[i].opacity}}%
                     </div>
                   </b-input-group-text>
                 </b-input-group>
@@ -206,12 +206,12 @@
                 <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
                   <b-form-input
                     id="font.shadowColor"
-                    v-model="dataValues.shadow[i].color"
+                    v-model="data.shadow[i].color"
                     type="color"
                   ></b-form-input>
                 </b-input-group>
               </b-form-group>
-              <hold-button v-if="$route.params.id || null" @trigger="removeShadow(i)" icon="trash" class="btn-danger">
+              <hold-button @trigger="removeShadow(i)" icon="trash" class="btn-danger">
                 <template slot="title">{{translate('dialog.buttons.delete')}}</template>
                 <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
               </hold-button>
@@ -219,17 +219,18 @@
           </b-tabs>
         </b-card>
 
-        <template v-if="typeof dataValues.color === 'undefined'">
+        <template v-if="typeof data.color === 'undefined'">
           <b-form-input type="color" v-model="exampleColor" class="float-right border-0 p-0" style="width: 25px"/>
         </template>
         <div :style="{
-          color: typeof dataValues.color === 'undefined' ? exampleColor : dataValues.color,
-          'font-size': dataValues.size + 'px',
-          'font-weight': dataValues.weight,
-          'font-family': dataValues.family,
+          color: typeof data.color === 'undefined' ? exampleColor : data.color,
+          'font-size': data.size + 'px',
+          'font-weight': data.weight,
+          'font-family': data.family,
           'text-align': 'center',
-          'text-shadow': [textStrokeGenerator(dataValues.borderPx, dataValues.borderColor), shadowGenerator(dataValues.shadow)].filter(Boolean).join(', ')
-          }">
+          'text-shadow': [textStrokeGenerator(data.borderPx, data.borderColor), shadowGenerator(data.shadow)].filter(Boolean).join(', ')
+          }"
+          class="pt-2">
           The quick brown fox jumps over the lazy dog
         </div>
       </b-card-body>
@@ -238,12 +239,22 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, PropSync, Watch } from 'vue-property-decorator';
+import { defineComponent, ref, reactive, onBeforeMount, watch } from '@vue/composition-api'
 import { textStrokeGenerator, shadowGenerator } from 'src/panel/helpers/text';
 
-@Component({})
-export default class fontCustomizer extends Vue {
-  @PropSync('data') dataValues!: {
+function loadFont(value: string) {
+  const head = document.getElementsByTagName('head')[0];
+  const style = document.createElement('style');
+  style.type = 'text/css';
+  console.debug('Loading font', value)
+  const font = value.replace(/ /g, '+')
+  const css = "@import url('https://fonts.googleapis.com/css?family=" + font + "');"
+  style.appendChild(document.createTextNode(css));
+  head.appendChild(style);
+}
+
+interface Props {
+  data: {
     family: string;
     size: number;
     borderPx: number;
@@ -259,59 +270,58 @@ export default class fontCustomizer extends Vue {
     color?: string;
     highlightcolor?: string;
   }
-
-  textStrokeGenerator = textStrokeGenerator;
-  shadowGenerator = shadowGenerator;
-
-  exampleColor = '#000000';
-  fonts: {text: string; value: string}[] = [];
-
-  async mounted() {
-    const { response } = await new Promise(resolve => {
-      const request = new XMLHttpRequest();
-      request.open('GET', '/fonts', true);
-
-      request.onload = function() {
-        if (!(this.status >= 200 && this.status < 400)) {
-          console.error('Something went wrong getting font', this.status, this.response)
-        }
-        resolve({ response: JSON.parse(this.response)})
-      }
-      request.onerror = function() {
-        console.error('Connection error to sogebot')
-        resolve( { response: {} });
-      };
-
-      request.send();
-    })
-    this.fonts = response.items.map((o: { family: string }) => {
-      return { text: o.family, value: o.family }
-    })
-
-    this.loadFont(this.dataValues.family)
-  }
-
-  addShadow() {
-    this.dataValues.shadow.push({
-      shiftRight: 1, shiftDown: 1,
-      blur: 5, opacity: 100, color: "#ffffff",
-    });
-  }
-
-  removeShadow(index: number) {
-    this.dataValues.shadow.splice(index, 1);
-  }
-
-  @Watch('dataValues.family')
-  loadFont(value: string) {
-    const head = document.getElementsByTagName('head')[0];
-    const style = document.createElement('style');
-    style.type = 'text/css';
-    console.debug('Loading font', value)
-    const font = value.replace(/ /g, '+')
-    const css = "@import url('https://fonts.googleapis.com/css?family=" + font + "');"
-    style.appendChild(document.createTextNode(css));
-    head.appendChild(style);
-  }
 }
+export default defineComponent({
+  props: {
+    data: Object,
+  },
+  setup(props: Props) {
+    const exampleColor = ref('#000000');
+    const fonts: {text: string; value: string}[] = reactive([]);
+
+    const addShadow = () => {
+      props.data.shadow.push({
+        shiftRight: 1, shiftDown: 1,
+        blur: 5, opacity: 100, color: "#ffffff",
+      });
+    }
+
+    const removeShadow = (index: number)  => {
+      props.data.shadow.splice(index, 1);
+    }
+
+    onBeforeMount(async () => {
+      const { response } = await new Promise(resolve => {
+        const request = new XMLHttpRequest();
+        request.open('GET', '/fonts', true);
+
+        request.onload = function() {
+          if (!(this.status >= 200 && this.status < 400)) {
+            console.error('Something went wrong getting font', this.status, this.response)
+          }
+          resolve({ response: JSON.parse(this.response)})
+        }
+        request.onerror = function() {
+          console.error('Connection error to sogebot')
+          resolve( { response: {} });
+        };
+
+        request.send();
+      })
+      for (const font of response.items.map((o: { family: string }) => {
+        return { text: o.family, value: o.family }
+      })) {
+        fonts.push(font);
+      }
+
+      loadFont(props.data.family)
+    })
+
+    watch(() => props.data.family, (val) => loadFont(val))
+
+    return {
+      textStrokeGenerator, shadowGenerator, exampleColor, fonts, addShadow, removeShadow
+    }
+  }
+});
 </script>
