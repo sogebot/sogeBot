@@ -3,6 +3,7 @@ import Vue from 'vue';
 import translate from '../panel/helpers/translate';
 import LoadScript from 'vue-plugin-load-script';
 import VueRouter from 'vue-router';
+import VueCompositionAPI from '@vue/composition-api';
 
 import { ButtonStates, states } from '../panel/helpers/buttonStates';
 
@@ -17,6 +18,7 @@ Vue.use(VueMoment, {
 });
 Vue.use(VueRouter);
 Vue.use(LoadScript);
+Vue.use(VueCompositionAPI);
 
 export interface Global {
   translations: any;

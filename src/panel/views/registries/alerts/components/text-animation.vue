@@ -33,7 +33,7 @@
           >
             <b-form-input
               id="speed"
-              v-model="animOptions.speed"
+              v-model.number="animOptions.speed"
               type="number"
               min="0"
               :label="translate('registry.alerts.speed.name')"
@@ -52,7 +52,7 @@
           >
             <b-form-input
               id="maxTimeToDecrypt"
-              v-model="animOptions.maxTimeToDecrypt"
+              v-model.number="animOptions.maxTimeToDecrypt"
               type="number"
               min="0"
               :label="translate('registry.alerts.maxTimeToDecrypt.name')"
@@ -96,7 +96,7 @@ export default class TextAnimation extends Vue {
   @PropSync('animation') readonly animType !: string
   @PropSync('animationOptions') readonly animOptions !: any;
 
-  text: string = 'Sample text'
+  text= 'Sample text'
 
   speedOptions: { value: string, text: string }[] = [
     { value: 'slower', text: 'slower' },
