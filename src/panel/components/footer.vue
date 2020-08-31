@@ -12,83 +12,87 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { defineComponent, reactive, onMounted } from '@vue/composition-api'
 import { getSocket } from '../helpers/socket';
 
-@Component({})
-export default class Menu extends Vue {
-  socket = getSocket('/');
+const socket = getSocket('/');
 
-  data: {
-    SOC: boolean;
-    MOD: boolean;
-    RES: number;
-    API: 0 | 1 | 2 | 3;
-    TMI: 0 | 1 | 2 | 3;
-  } = {
-    SOC: false,
-    MOD: false,
-    RES: 0,
-    API: 0,
-    TMI: 0
+function classNameMod(is: boolean) {
+  return is ? 'alert-success' : 'alert-danger';
+}
+
+function classNameResponse(ms: number) {
+  if (ms >= 1500) {
+    return 'alert-danger'
+  } else if (ms < 1500 && ms >= 800) {
+    return 'alert-warning'
+  } else {
+    return 'alert-success'
   }
+}
 
-  classNameMod(is: boolean) {
-    return is ? 'alert-success' : 'alert-danger';
+function className (status: 0 | 1 | 2 | 3) {
+  switch (status) {
+    case 0:
+      return 'alert-danger';
+    case 1:
+      return 'alert-warning';
+    case 2:
+      return 'alert-warning';
+    case 3:
+      return 'alert-success';
   }
+}
 
-  classNameResponse(ms: number) {
-    if (ms >= 1500) {
-      return 'alert-danger'
-    } else if (ms < 1500 && ms >= 800) {
-      return 'alert-warning'
-    } else {
-      return 'alert-success'
-    }
+function title(status: 0 | 1 | 2 | 3) {
+  switch (status) {
+    case 0:
+      return 'disconnected';
+    case 1:
+      return 'connecting';
+    case 2:
+      return 'reconnecting';
+    case 3:
+      return 'connected';
   }
+}
 
-  className (status: 0 | 1 | 2 | 3) {
-    switch (status) {
-      case 0:
-        return 'alert-danger';
-      case 1:
-        return 'alert-warning';
-      case 2:
-        return 'alert-warning';
-      case 3:
-        return 'alert-success';
-    }
-  }
-
-  title(status: 0 | 1 | 2 | 3) {
-    switch (status) {
-      case 0:
-        return 'disconnected';
-      case 1:
-        return 'connecting';
-      case 2:
-        return 'reconnecting';
-      case 3:
-        return 'connected';
-    }
-  }
-
-  mounted() {
-    this.refresh();
-  }
-
-  refresh() {
-    this.socket.emit('connection_status', (data: {
+export default defineComponent({
+  setup() {
+    const data: {
       SOC: boolean;
       MOD: boolean;
       RES: number;
       API: 0 | 1 | 2 | 3;
       TMI: 0 | 1 | 2 | 3;
-    }) => {
-      this.data = data;
-      this.data.SOC = true;
-      setTimeout(() => this.refresh(), 1000);
-    })
+    } = reactive({
+      SOC: false,
+      MOD: false,
+      RES: 0,
+      API: 0,
+      TMI: 0
+    });
+
+    const refresh = () => {
+      socket.emit('connection_status', (dataFromSocket: {
+        SOC: boolean;
+        MOD: boolean;
+        RES: number;
+        API: 0 | 1 | 2 | 3;
+        TMI: 0 | 1 | 2 | 3;
+      }) => {
+        data.SOC = true;
+        data.MOD = dataFromSocket.MOD;
+        data.RES = dataFromSocket.RES;
+        data.API = dataFromSocket.API;
+        data.TMI = dataFromSocket.TMI;
+        setTimeout(() => refresh(), 1000);
+      })
+    }
+
+    onMounted(() => refresh());
+
+    return { data, classNameMod, classNameResponse, className, title }
   }
-}
+});
 </script>
