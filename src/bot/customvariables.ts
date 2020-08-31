@@ -372,12 +372,12 @@ class CustomVariables extends Core {
     let currentValue = item.currentValue;
     if (item.type === 'eval' && item.runEveryType === 'isUsed' ) {
       // recheck permission as this may go outside of setValueOf
-      if (opts.sender) {
+      if (opts?.sender) {
         if (typeof getFromViewersCache(opts.sender.userId, item.permission) === 'undefined') {
           addToViewersCache(opts.sender.userId, item.permission, (await permissions.check(opts.sender.userId, item.permission, false)).access);
         }
       }
-      const permissionsAreValid = isNil(opts.sender) || getFromViewersCache(opts.sender.userId, item.permission);
+      const permissionsAreValid = isNil(opts?.sender) || getFromViewersCache(opts.sender.userId, item.permission);
       if (permissionsAreValid) {
         currentValue = await this.runScript(item.evalValue, {
           _current: item.currentValue,
