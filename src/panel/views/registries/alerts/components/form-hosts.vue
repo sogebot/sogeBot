@@ -166,7 +166,7 @@
       <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
         <b-form-input
           id="soundVolume"
-          v-model="data.soundVolume"
+          v-model.number="data.soundVolume"
           type="range"
           min="0"
           max="100"
