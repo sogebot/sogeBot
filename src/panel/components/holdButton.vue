@@ -25,12 +25,14 @@ interface Props {
   ttc: number;
   icon: string;
   disabled?: boolean;
+  small?: boolean
 }
 export default defineComponent({
   props: {
     ttc: Number,
     icon: String,
     disabled: Boolean,
+    small: Boolean,
   },
   setup(props: Props, context) {
     const intervals: number[] = [];
