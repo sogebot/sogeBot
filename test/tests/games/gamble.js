@@ -24,6 +24,7 @@ describe('Gambling - gamble', () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
+      gamble.enableJackpot = false;
     });
 
     it('add points for user', async () => {
@@ -37,6 +38,11 @@ describe('Gambling - gamble', () => {
       const msg1 = prepare('gambling.gamble.win', { pointsName: await points.getPointsName(updatedPoints), points: updatedPoints, command });
       const msg2 = prepare('gambling.gamble.lose', { pointsName: await points.getPointsName(updatedPoints), points: updatedPoints, command });
       assert(r[0].response === msg1 || r[0].response === msg2, JSON.stringify({r, msg1, msg2}));
+    });
+
+    it('!gamble jackpot should show disabled jackpot', async () => {
+      const r = await gamble.jackpot({ sender: user1, command });
+      assert.strictEqual(r[0].response, '$sender, jackpot is disabled for !gamble.');
     });
 
     it('user should successfully !gamble all', async () => {
