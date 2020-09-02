@@ -1,31 +1,40 @@
 
 <template>
   <b-modal size="w-90" :title="translate('change-game')" no-fade v-model="show" ref="modalWindow">
-    <div class="d-flex text-center" v-if="games.length > 0" @dragleave="dragleave" @dragenter="dragenter">
+    <div class="d-flex text-center" v-if="games.length > 0">
       <button class="btn btn-lg btn-block btn-outline-dark border-0 p-3" style="width: fit-content;flex: max-content;" @click="carouselPage--;" :disabled="carouselPage === 0">
         <font-awesome-icon icon="caret-left"></font-awesome-icon>
       </button>
 
-      <div class="w-100 d-flex" style="flex-wrap: wrap;justify-content: center;">
-        <img v-for="game of chunk(this.games, thumbnailsPerPage)[carouselPage]"
-            draggable="true"
-            style="margin-top: 0.55rem !important;"
-            :style="{
-              width: (90 / thumbnailsPerPage) + '%',
-              'border-bottom': '0.3rem solid',
-              'border-color': game !== currentGame ? 'transparent !important' : undefined
-            }"
-            @dragstart="dragstart(game)"
-            @dragend="dragend(game)"
-            class="m-1 border-warning"
-            :key="game"
-            :src="'https://static-cdn.jtvnw.net/ttv-boxart/' + encodeURIComponent(game) + '-100x140.jpg'"
-            :title="game"
-            @click="manuallySelected = true; currentGame = game"/>
-        <div @dragleave="dragleave"
-             class="m-1"
-             style="width: 15%; height: 1px;pointer-events: none"
-             v-for="index in (thumbnailsPerPage - chunk(this.games, thumbnailsPerPage)[carouselPage].length)" :key="index"></div>
+      <div class="w-100 d-flex" style="flex-wrap: wrap;justify-content: center;"
+        :style="{
+          height: '154px',
+          overflow: 'hidden',
+        }">
+        <div
+          v-for="game of chunk(games, thumbnailsPerPage)[carouselPage]"
+          class="d-flex onHover m-1"
+          style="flex-direction: column; margin-top: 0.55rem !important;"
+          :style="{
+            width: (90 / thumbnailsPerPage) + '%',
+          }"
+          :key="game">
+          <div class="buttonToShow">
+            <hold-button @trigger="deleteGame(game)" class="btn-danger w-100" small>
+              <template slot="title">{{translate('dialog.buttons.delete')}}</template>
+              <template slot="onHoldTitle">{{translate('dialog.buttons.delete')}}</template>
+            </hold-button>
+          </div>
+          <img
+              :style="{
+                'border-bottom': '0.3rem solid',
+                'border-color': game !== currentGame ? 'transparent !important' : undefined
+              }"
+              class="border-warning"
+              :src="'https://static-cdn.jtvnw.net/ttv-boxart/' + encodeURIComponent(game) + '-100x140.jpg'"
+              :title="game"
+              @click="manuallySelected = true; currentGame = game"/>
+        </div>
       </div>
 
       <button class="btn btn-lg  btn-block btn-outline-dark border-0 p-3" style="width: fit-content;flex: max-content;" @click="carouselPage++;" :disabled="(carouselPage + 1) === chunk(this.games, 6).length">
@@ -105,313 +114,270 @@
 
 <script lang="ts">
   import Vue from 'vue'
+  import { ModalPlugin } from 'bootstrap-vue';
+  Vue.use(ModalPlugin);
+  import { defineComponent, ref, onUnmounted, onMounted, watch, computed } from '@vue/composition-api'
+  import type { Ref } from '@vue/composition-api'
   import { chunk, debounce } from 'lodash-es'
 
   import { EventBus } from 'src/panel/helpers/event-bus';
-  import { getSocket } from 'src/panel/helpers/socket';
+  import { getSocket, getConfiguration } from 'src/panel/helpers/socket';
 
-  import { ModalPlugin } from 'bootstrap-vue';
-  Vue.use(ModalPlugin);
+type Tag = {
+    tag_id: string;
+    locale: string;
+    value: string;
+    is_auto: boolean;
+  }
 
-  export default Vue.extend({
-    components: {
-      search: () => import('../searchDropdown.vue'),
-    },
-    data: function () {
-      const object: {
-        chunk: any;
+export default defineComponent({
+  components: {
+    search: () => import('../searchDropdown.vue'),
+  },
+  setup(props, context) {
+    const data: Ref<{ id: string, game: string, title: string }[]> = ref([]);
+    const currentGame: Ref<string | null> = ref(null);
+    const currentTitle = ref('');
+    const carouselPage = ref(0);
+    const manuallySelected = ref(false);
+    const cachedGamesOrder: Ref<string[]> = ref([]);
+    const searchForGameOpts: Ref<string[]> = ref([]);
+    const searchForTagsOpts: Ref<string[]> = ref([]);
+    const selectedTitle = ref('current');
+    const newTitle = ref('');
+    const currentTags: Ref<string[]> = ref([]);
+    const cachedTags: Ref<Tag[]> = ref([]);
 
-        data: {
-          game: string,
-          title: string,
-          id: string,
-        }[],
-        currentGame: null | string,
-        currentTitle: string,
-        carouselPage: number,
-        manuallySelected: boolean
-        cachedGamesOrder: string[],
-        searchForGameOpts: string[],
-        searchForTagsOpts: string[],
-        selectedTitle: any,
-        newTitle: string,
-        draggingGame: string | null,
-        draggingEnter: number,
-        draggingTimestamp: number,
-        currentTags: string[],
-        cachedTags: {
-          tag_id: string;
-          locale: string;
-          value: string;
-        }[],
+    const saveState = ref(0);
+    const show = ref(false);
 
-        saveState: -1 | 0 | 1 | 2;
-        show: boolean;
+    const windowWidth = ref(0);
+    const thumbnailsPerPage = ref(6);
 
-        windowWidth: number;
-        thumbnailsPerPage: number;
-
-        socket: SocketIOClient.Socket;
-      } = {
-        chunk: chunk,
-        data: [],
-        currentGame: null,
-        currentTitle: '',
-        carouselPage: 0,
-        manuallySelected: false,
-        cachedGamesOrder: [],
-        searchForGameOpts: [],
-        searchForTagsOpts: [],
-        selectedTitle: 'current',
-        newTitle: '',
-        draggingGame: null,
-        draggingEnter: 0,
-        draggingTimestamp: Date.now(),
-        currentTags: [],
-        cachedTags: [],
-
-        saveState: 0,
-        show: false,
-
-        windowWidth: 0,
-        thumbnailsPerPage: 6,
-
-        socket: getSocket('/'),
-      }
-      return object
-    },
-    watch: {
-      windowWidth(width) {
-        let thumbnailsPerPage;
-        if (width < 304) {
-          thumbnailsPerPage = 1;
-        } else if (width < 393) {
-          thumbnailsPerPage = 2;
-        } else if (width < 481) {
-          thumbnailsPerPage = 3;
-        } else if (width < 570) {
-          thumbnailsPerPage = 4;
-        } else if (width < 700) {
-          thumbnailsPerPage = 5;
-        } else if (width < 800) {
-          thumbnailsPerPage = 6;
-        } else if (width < 900) {
-          thumbnailsPerPage = 7;
-        } else if (width < 1000) {
-          thumbnailsPerPage = 8;
-        } else if (width < 1100) {
-          thumbnailsPerPage = 9;
-        } else if (width < 1200) {
-          thumbnailsPerPage = 10;
-        } else if (width < 1300) {
-          thumbnailsPerPage = 11;
-        } else if (width < 1400) {
-          thumbnailsPerPage = 12;
-        } else if (width < 1500) {
-          thumbnailsPerPage = 13;
-        } else {
-          thumbnailsPerPage = 14;
-        }
-        this.thumbnailsPerPage = thumbnailsPerPage;
-      },
-      show() {
-        this.init()
-      },
-      currentGame() {
-        this.selectedTitle = 'current';
-      }
-    },
-    beforeDestroy() {
-     window.removeEventListener('resize', this._resizeListener)
-    },
-    methods: {
-      _resizeListener() {
-        this.windowWidth = window.innerWidth;
-      },
-      deleteTitle(id: string) {
-        this.data = this.data.filter(o => o.id !== id);
-        this.selectedTitle = 'current';
-      },
-      init() {
-        this.currentGame = null;
-        this.manuallySelected = false;
-        this.searchForTags(''); // buildup opts
-        this.selectedTitle = 'current';
-        this.newTitle = '';
-        this.carouselPage = 0;
-        this.socket.emit('getCachedTags', (data: {
-          tag_id: string;
-          locale: string;
-          value: string;
-          is_auto: boolean;
-        }[]) => {
-          this.cachedTags = data.filter(o => !o.is_auto);
-        })
-        this.socket.emit('getUserTwitchGames');
-
-        this.socket.emit('panel.sendStreamData', (err: string | null, data: any) => {
-          if (err) {
-            return console.error(err);
-          }
-          console.groupCollapsed('changegamedialog::panel.sendStreamData')
-          console.log(data)
-          console.groupEnd();
-          if (!this.currentGame) {
-            this.currentGame = data.game;
-            this.currentTitle = data.status;
-            this.currentTags = data.tags.filter((o: any) => !o.is_auto).map((o: any) => {
-              const key = Object.keys(o.localization_names).find(key => key.includes(this.configuration.lang))
-              return o.localization_names[key || 'en-us'];
-            })
-          }
-        });
-      },
-      handleOk() {
-        let title = '';
-        if (this.selectedTitle === 'current') {
-          title = this.currentTitle
-        } else if (this.selectedTitle === 'new') {
-          title = this.newTitle
-        } else {
-          title = (this.data.find(o => o.id === this.selectedTitle) || { title: '' }).title
-        }
-        console.debug('EMIT [updateGameAndTitle]', {
-          game: this.currentGame,
-          title,
-          tags: this.currentTags,
-        })
-        this.saveState = 1
-        this.socket.emit('updateGameAndTitle', {
-          game: this.currentGame,
-          title,
-          tags: this.currentTags,
-        }, (err: string | null) => {
-          if (err) {
-            this.saveState = -1;
-          } else {
-            this.saveState = 2;
-            this.show = false;
-            this.socket.emit('cleanupGameAndTitle', {
-              game: this.currentGame,
-              title,
-              titles: this.data
-            }, (err: string | null, data: any) => {
-              this.data = data
-            })
-          }
-          setTimeout(() => {
-            this.saveState = 0;
-          }, 1000);
-        })
-      },
-      dragstart(game: string) {
-        this.draggingEnter = 0;
-        this.draggingGame = game;
-      },
-      dragleave() {
-        this.draggingEnter--;
-        this.draggingTimestamp = Date.now();
-      },
-      dragenter() {
-        this.draggingEnter++;
-      },
-      dragend() {
-        const timestamp = Date.now()
-        this.$nextTick(() => {
-          if (this.draggingEnter === 0 && this.draggingTimestamp - timestamp < -5) {
-            this.data = this.data.filter(o => o.game !== this.draggingGame)
-          }
-          this.draggingGame = null;
-        })
-      },
-      searchForGame(value: string) {
-        if (value.trim().length !== 0) {
-          this.socket.emit('getGameFromTwitch', value);
-        } else {
-          this.searchForGameOpts = [];
-        }
-      },
-      searchForTags(value: string) {
-        this.searchForTagsOpts = Array.from(new Set(this.cachedTags
-          .map(o => o.value)
-          .filter(o => {
-            return o && o.toLowerCase().includes(value) && !this.currentTags.includes(o)
-          }).sort((a, b) => {
-            if (a < b)  { //sort string ascending
-              return -1;
-            }
-            if (a > b) {
-              return 1;
-            }
-            return 0; //default return value (no sorting)
-          })
-        ));
-      }
-    },
-    computed: {
-      titles() {
-        // first title is always current, last must be empty as new
-        return [
-          { game: (this as any).currentGame, title: (this as any).currentTitle },
-          ...(this as any).data.filter((o: any) => o.game === (this as any).currentGame),
-          { game: (this as any).currentGame, title: '', id: 'new' }
+    const titles = computed(() => {
+      // first title is always current, last must be empty as new
+      return [
+        { game: currentGame.value, title: currentTitle.value },
+        ...data.value.filter((o: any) => o.game === currentGame.value),
+        { game: currentGame.value, title: '', id: 'new' }
+        ]
+    });
+    const games = computed(() => {
+      if (manuallySelected.value) {
+        return cachedGamesOrder.value;
+      } else if (currentGame.value) {
+        cachedGamesOrder.value = [
+          ...new Set([
+            currentGame.value,
+            ...data.value.sort((a: any,b: any) => {
+              if (typeof a.timestamp === 'undefined') { a.timestamp = 0; }
+              if (typeof b.timestamp === 'undefined') { b.timestamp = 0; }
+              if (a.timestamp > b.timestamp) {
+                return -1;
+              } else if (a.timestamp < b.timestamp) {
+                return 1;
+              } else {
+                return 0;
+              }
+            }).map((o: any) => o.game)
           ]
-      },
-      games() {
-        if (this.manuallySelected) {
-          return (this as any).cachedGamesOrder;
-        } else if (this.currentGame) {
-          (this as any).cachedGamesOrder = [
-            ...new Set([
-              (this as any).currentGame,
-              ...(this as any).data.sort((a: any,b: any) => {
-                if (typeof a.timestamp === 'undefined') { a.timestamp = 0; }
-                if (typeof b.timestamp === 'undefined') { b.timestamp = 0; }
-                if (a.timestamp > b.timestamp) {
-                  return -1;
-                } else if (a.timestamp < b.timestamp) {
-                  return 1;
-                } else {
-                  return 0;
-                }
-              }).map((o: any) => o.game)
-            ]
-          )];
-        } else {
-          (this as any).cachedGamesOrder = [...new Set((this as any).data.sort((a: any,b: any) => {
-            if (typeof a.timestamp === 'undefined') { a.timestamp = 0; }
-            if (typeof b.timestamp === 'undefined') { b.timestamp = 0; }
-            if (a.timestamp > b.timestamp) {
-              return -1;
-            } else if (a.timestamp < b.timestamp) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }).map((o: any) => o.game))];
-        }
-        return (this as any).cachedGamesOrder;
+        )];
+      } else {
+        cachedGamesOrder.value = [...new Set(data.value.sort((a: any,b: any) => {
+          if (typeof a.timestamp === 'undefined') { a.timestamp = 0; }
+          if (typeof b.timestamp === 'undefined') { b.timestamp = 0; }
+          if (a.timestamp > b.timestamp) {
+            return -1;
+          } else if (a.timestamp < b.timestamp) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }).map((o: any) => o.game))];
       }
-    },
-    created() {
-      this.searchForGame = debounce(this.searchForGame, 500);
-    },
-    mounted() {
-      this.windowWidth = window.innerWidth;
-      window.addEventListener('resize', this._resizeListener);
+      return cachedGamesOrder.value;
+    });
 
-      this.init();
-      this.socket.on('sendGameFromTwitch', (data: any) => this.searchForGameOpts = data);
-      this.socket.on('sendUserTwitchGamesAndTitles', (data: any) => { this.data = data });
+    const socket = getSocket('/');
+
+    const _resizeListener = () => windowWidth.value = window.innerWidth;
+    const deleteGame = (game: string) => {
+      data.value = data.value.filter(o => o.game !== game);
+      // remove from order cache
+      cachedGamesOrder.value.splice(cachedGamesOrder.value.findIndex(o => o === game), 1);
+      currentGame.value = cachedGamesOrder.value[0];
+    }
+    const deleteTitle = (id: string) => {
+      data.value.splice(data.value.findIndex(o => o.id === id), 1);
+      selectedTitle.value = 'current';
+    };
+    const init = () => {
+      currentGame.value = null;
+      manuallySelected.value = false;
+      searchForTags(''); // buildup opts
+      selectedTitle.value = 'current';
+      newTitle.value = '';
+      carouselPage.value = 0;
+      socket.emit('getCachedTags', (socketCachedTags: Tag[]) => {
+        cachedTags.value = socketCachedTags.filter(o => !o.is_auto);
+      })
+      socket.emit('getUserTwitchGames');
+
+      socket.emit('panel.sendStreamData', async (err: string | null, data: any) => {
+        if (err) {
+          return console.error(err);
+        }
+        const configuration = await getConfiguration();
+        console.groupCollapsed('changegamedialog::panel.sendStreamData')
+        console.log(data)
+        console.groupEnd();
+        if (!currentGame.value) {
+          currentGame.value = data.game;
+          currentTitle.value = data.status;
+          currentTags.value = data.tags.filter((o: any) => !o.is_auto).map((o: any) => {
+            const key = Object.keys(o.localization_names).find(key => key.includes(configuration.lang as string))
+            return o.localization_names[key || 'en-us'];
+          })
+        }
+      });
+    };
+    const searchForGame = debounce((value: string)  => {
+      if (value.trim().length !== 0) {
+        socket.emit('getGameFromTwitch', value);
+      } else {
+        searchForGameOpts.value = [];
+      }
+    }, 500);
+    const searchForTags = (value: string) => {
+      while(searchForTagsOpts.value.length > 0) {
+        searchForTagsOpts.value.shift();
+      }
+      const arraySet = Array.from(new Set(cachedTags.value
+        .map(o => o.value)
+        .filter(o => {
+          return o && o.toLowerCase().includes(value) && !currentTags.value.includes(o)
+        }).sort((a, b) => {
+          if (a < b)  { //sort string ascending
+            return -1;
+          }
+          if (a > b) {
+            return 1;
+          }
+          return 0; //default return value (no sorting)
+        })
+      ));
+      for (const val of arraySet) {
+        searchForTagsOpts.value.push(val);
+      }
+    }
+    const handleOk = () => {
+      let title = '';
+      if (selectedTitle.value === 'current') {
+        title = currentTitle.value
+      } else if (selectedTitle.value === 'new') {
+        title = newTitle.value
+      } else {
+        title = (data.value.find(o => o.id === selectedTitle.value) || { title: '' }).title
+      }
+      console.debug('EMIT [updateGameAndTitle]', {
+        game: currentGame.value,
+        title,
+        tags: currentTags.value,
+      })
+      saveState.value = 1
+      socket.emit('updateGameAndTitle', {
+        game: currentGame.value,
+        title,
+        tags: currentTags.value,
+      }, (err: string | null) => {
+        if (err) {
+          saveState.value = -1;
+        } else {
+          saveState.value = 2;
+          show.value = false;
+          socket.emit('cleanupGameAndTitle', {
+            game: currentGame.value,
+            title,
+            titles: data
+          }, (err: string | null, dataSocket: any) => {
+            data.value = dataSocket
+          })
+        }
+        setTimeout(() => {
+          saveState.value = 0;
+        }, 1000);
+      })
+    }
+
+    watch(windowWidth, (width) => {
+      if (width < 304) {
+        thumbnailsPerPage.value = 1;
+      } else if (width < 393) {
+        thumbnailsPerPage.value = 2;
+      } else if (width < 481) {
+        thumbnailsPerPage.value = 3;
+      } else if (width < 570) {
+        thumbnailsPerPage.value = 4;
+      } else if (width < 700) {
+        thumbnailsPerPage.value = 5;
+      } else if (width < 800) {
+        thumbnailsPerPage.value = 6;
+      } else if (width < 900) {
+        thumbnailsPerPage.value = 7;
+      } else if (width < 1000) {
+        thumbnailsPerPage.value = 8;
+      } else if (width < 1100) {
+        thumbnailsPerPage.value = 9;
+      } else if (width < 1200) {
+        thumbnailsPerPage.value = 10;
+      } else if (width < 1300) {
+        thumbnailsPerPage.value = 11;
+      } else if (width < 1400) {
+        thumbnailsPerPage.value = 12;
+      } else if (width < 1500) {
+        thumbnailsPerPage.value = 13;
+      } else {
+        thumbnailsPerPage.value = 14;
+      }
+    });
+    watch(show, () => init());
+    watch(currentGame, () => selectedTitle.value = 'current');
+
+    onMounted(() => {
+      windowWidth.value = window.innerWidth;
+      window.addEventListener('resize', _resizeListener);
+
+      init();
+      socket.on('sendGameFromTwitch', (data: string[]) => searchForGameOpts.value = data);
+      socket.on('sendUserTwitchGamesAndTitles', (data2: typeof data.value) => {
+        while (data.value.length > 0) {
+          data.value.shift();
+        }
+        data2.forEach(val => data.value.push(val));
+      });
 
       EventBus.$on('show-game_and_title_dlg', () => {
-        this.init();
-        this.show = true;
-        this.socket.emit('getUserTwitchGames');
+        init();
+        show.value = true;
+        socket.emit('getUserTwitchGames');
       });
-    }
-  })
+    })
+    onUnmounted(() => window.removeEventListener('resize', _resizeListener))
+
+    return { manuallySelected, carouselPage, show, newTitle, searchForTagsOpts, currentTags, handleOk, selectedTitle, currentGame, games, titles, saveState, chunk, thumbnailsPerPage, deleteGame, deleteTitle, searchForTags, searchForGame, searchForGameOpts }
+  }
+});
 </script>
 
-<style scoped>
+<style>
+.onHover {
+  transform: translateY(-44px);
+}
+.onHover > .buttonToShow {
+  opacity: 0.9;
+}
+.onHover:hover > .buttonToShow {
+  transition: all 2s;
+  transform: translateY(35px);
+}
 </style>
