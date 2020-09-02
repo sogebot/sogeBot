@@ -60,6 +60,11 @@ describe('Gambling - gamble with Jackpot', () => {
       assert.strictEqual(r[0].response, '$sender, you LOST! You now have 575 points. Jackpot increased to 133 points');
     });
 
+    it('!gamble jackpot should show correct jackpot', async () => {
+      const r = await gamble.jackpot({ sender: user1, command });
+      assert.strictEqual(r[0].response, '$sender, current jackpot for !gamble is 133 points');
+    });
+
     it('set chance for jackpot to 100%', () => {
       gamble.chanceToTriggerJackpot = 100;
     });

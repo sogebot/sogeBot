@@ -127,6 +127,23 @@ class Gamble extends Game {
       }
     }
   }
+
+  @command('!gamble jackpot')
+  async jackpot (opts: CommandOptions): Promise<CommandResponse[]> {
+    let message: string;
+    if (this.enableJackpot) {
+      message = prepare('gambling.gamble.currentJackpot', {
+        command: this.getCommand('!gamble'),
+        pointsName: await pointsSystem.getPointsName(this.jackpotValue),
+        points: this.jackpotValue,
+      });
+    } else {
+      message = prepare('gambling.gamble.jackpotIsDisabled', {
+        command: this.getCommand('!gamble'),
+      });
+    }
+    return [{ response: message, ...opts }];
+  }
 }
 
 export default new Gamble();
