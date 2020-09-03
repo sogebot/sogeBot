@@ -39,7 +39,8 @@ import { setMainLoaded } from './helpers/isAvailableVariable';
 import { isUserLoggedIn } from './helpers/isUserLoggedIn';
 import translate from './helpers/translate';
 import urlParam from './helpers/urlParam';
-import { getListOf } from './helpers/getListOf';
+import { getListOf, populateListOf } from './helpers/getListOf';
+import type { getListOfReturn } from './helpers/getListOf';
 import { getConfiguration, getTranslations } from './helpers/socket';
 
 library.add(faRedoAlt, faDice, faVolumeOff, faGripVertical, faImage, faUpload, faCircle2, faCaretRight, faTasks, faCaretDown, faSlash, faFilter, faToggleOn, faToggleOff, faBell, faShareSquare, faExclamationCircle, faQuestion, faVial, faEquals, faGreaterThanEqual, faLongArrowAltLeft, faBan, faPlusSquare, faMusic, faList, faPlay, faPause, faForward, faSpotify, faMoneyBillAlt, faPlus, faSpinner, faGift, faHeadphones, faTh, faDollarSign, faSignInAlt, faSignOutAlt, faUsers, faMusic, faCalendar, faTwitter, faCheck, faMusic, faMusic, faVolumeUp, faVolumeDown, faUsers, faGift, faTrophy, faCog, faExternalLinkAlt, faTrash, faPlus, faSync, faComments, faTwitch, faCircle, faCheckCircle, faLock, faUsers, faUser, faCheck, faTimes, faHeart, faStar, faLockOpen, faHandPointer, faRandom, faEyeSlash, faSignOutAlt, faSignInAlt, faBoxOpen, faEye, faCog, faExternalLinkAlt, faHeart, faTv, faRandom, faGem, faStar, faGift, faDollarSign, faStarHalf, faLongArrowAltRight, faCircleNotch, faCalendar, faDollarSign, faCog, faCode, faAngleUp, faTrashAlt, faAngleDown, faFont, faPlus, faMinus, faDownload, faDollarSign, faTerminal, faCog, faCommentAlt, faUsers, faExternalLinkAlt, faSyncAlt, faClock, faCog, faInfinity, faTrophy, faClone, faGem, faCoins, faExclamation, faStop, faBan, faSpinner, faCheck, faAngleRight, faPlus, faEdit, faEraser, faLink, faTrash, faPlus, faCaretLeft, faExternalLinkAlt, faLink, faSave, faThLarge, faThList, faSearch, faCircleNotch, faCheck, faEllipsisH, faEllipsisV, faPowerOff);
@@ -70,12 +71,7 @@ declare module 'vue/types/vue' {
     urlParam(key: string): string | null;
     translate(id: string): string;
     $loggedUser: any | null;
-    $systems: {
-      name: string;
-      enabled: boolean;
-      areDependenciesEnabled: boolean;
-      isDisabledByEnv: boolean;
-    }[];
+    $systems: getListOfReturn['systems'];
     $core: {
       name: string;
     }[];
@@ -101,7 +97,9 @@ const main = async () => {
     Vue.prototype.configuration = await getConfiguration();
 
     Vue.prototype.$core = await getListOf('core');
-    Vue.prototype.$systems = await getListOf('systems');
+
+    await populateListOf('systems');
+    Vue.prototype.$systems = getListOf('systems');
     Vue.prototype.$integrations = await getListOf('integrations');
 
     console.debug({

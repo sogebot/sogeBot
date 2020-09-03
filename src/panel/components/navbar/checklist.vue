@@ -23,73 +23,82 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { getSocket } from 'src/panel/helpers/socket';
+import type { ChecklistInterface } from 'src/bot/database/entity/checklist'
+import { getListOf } from 'src/panel/helpers/getListOf';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons';
 library.add(faCheckSquare, faSquare);
 
-export default {
-  data: function () {
-    return {
-      bDisplay: false,
-      total: 0,
-      items: [],
-      checkedItems: [],
-      socket: getSocket('/systems/checklist'),
-    }
-  },
-  computed: {
-    btnClass: function () {
-      if (this.bDisplay) return 'btn-'
+import { defineComponent, ref, onMounted, computed } from '@vue/composition-api'
+import type { Ref } from '@vue/composition-api'
+
+const socket = getSocket('/systems/checklist');
+
+type CheckedItem = { isCompleted: boolean; value: string; };
+
+export default defineComponent({
+  setup() {
+    const bDisplay = ref(false);
+    const items: Ref<ChecklistInterface[]> = ref([]);
+    const checkedItems: Ref<CheckedItem[]> = ref([]);
+
+    const btnClass = computed(() => {
+      if (bDisplay.value) return 'btn-'
       else return 'btn-outline-'
-    },
-    isSystemEnabled: function () {
-      return this.$systems.find(o => o.name === 'checklist').enabled
-    },
-    completed: function () {
-      return this.checkedItems.filter(o => o.isCompleted).length
-    }
-  },
-  methods: {
-    toggle: function (item) {
-      let checkedItem = this.checkedItems.find(o => o.value === item);
+    });
+    const isSystemEnabled = computed(() => {
+      return getListOf('systems').find(o => o.name === 'checklist')?.enabled ?? false
+    });
+    const completed = computed(() => {
+      return checkedItems.value.filter(o => o.isCompleted).length
+    })
+
+    const toggle = (item: string) => {
+      let checkedItem = checkedItems.value.find(o => o.value === item);
       if (!checkedItem) {
-        checkedItem = {};
-        checkedItem.isCompleted = true;
-        checkedItem.value = item;
-        this.checkedItems.push(checkedItem);
+        checkedItem = {
+          isCompleted: true,
+          value: item,
+        };
+        checkedItems.value.push(checkedItem);
       } else {
         checkedItem.isCompleted = !checkedItem.isCompleted;
       }
-      this.socket.emit('checklist::save', checkedItem, () => {});
-    },
-    toggleDisplay: function () {
-      this.bDisplay = !this.bDisplay
-    },
-    update: function () {
-      this.socket.emit('generic::getAll', (err, items, checkedItems) => {
+      socket.emit('checklist::save', checkedItem, () => {});
+    };
+    const toggleDisplay = () => {
+      bDisplay.value = !bDisplay.value
+    };
+    const update = () => {
+      socket.emit('generic::getAll', (err: Error | null, itemsFromSocket: ChecklistInterface[], checkedItemsFromSocket: CheckedItem[]) => {
         if (err) {
           return console.error(err);
         }
-        this.checkedItems = checkedItems;
-        this.items = items;
+        checkedItems.value = checkedItemsFromSocket;
+        items.value = itemsFromSocket;
       })
-    },
-    isItemCompleted(item) {
-      const checkedItem = this.checkedItems.find(o => o.value === item);
+    };
+    const isItemCompleted = (item: string) => {
+      const checkedItem = checkedItems.value.find(o => o.value === item);
       if (!checkedItem) {
         return false;
       } else {
         return checkedItem.isCompleted;
       }
     }
-  },
-  mounted: function () {
-    if (this.isSystemEnabled) {
-      this.update()
+
+    onMounted(() => {
+      if (isSystemEnabled.value) {
+        update()
+      }
+    })
+
+    return {
+      isItemCompleted, toggleDisplay, completed, items, toggle, btnClass, isSystemEnabled, bDisplay,
     }
   }
-}
+});
 </script>
