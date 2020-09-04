@@ -282,139 +282,173 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue'
-  import { isNil } from 'lodash-es'
+import { isNil } from 'lodash-es'
 
-  import { EventBus } from 'src/panel/helpers/event-bus';
-  import { getSocket } from 'src/panel/helpers/socket';
+import { EventBus } from 'src/panel/helpers/event-bus';
+import { getSocket } from 'src/panel/helpers/socket';
 
-  import type { UIError } from 'src/bot/panel';
+import type { UIError } from 'src/bot/panel';
 
-  import { library } from '@fortawesome/fontawesome-svg-core';
-  import {
-    faCaretDown, faCaretUp
-  } from '@fortawesome/free-solid-svg-icons';
-  library.add(faCaretDown, faCaretUp);
+import { library } from '@fortawesome/fontawesome-svg-core';
+import {
+  faCaretDown, faCaretUp
+} from '@fortawesome/free-solid-svg-icons';
+library.add(faCaretDown, faCaretUp);
 
-  let interval = 0;
-  let UIErrorInterval = 0;
+let interval = 0;
+let UIErrorInterval = 0;
+let widthOfMenuInterval = 0;
 
-  export default Vue.extend({
-    data: function () {
-      const object: {
-        errors: UIError[],
-        highlightsSocket: any,
+import { defineComponent, ref, onMounted, onUnmounted, computed, reactive, ComputedRef } from '@vue/composition-api'
+import type { Ref } from '@vue/composition-api'
 
-        averageStats: any,
-        hideStats: boolean,
-        timestamp: null | number,
-        uptime: string,
-        currentViewers: number,
-        maxViewers: number,
-        chatMessages: number,
-        newChatters: number,
-        currentHosts: number,
-        currentViews: number,
-        currentBits: number,
-        currentSong: null | string,
-        currentWatched: number,
-        currentSubscribers: number,
-        currentFollowers: number,
-        currentTips: number,
-        currency: string,
-        broadcasterType: string,
-        tags: any[],
-        isLoaded: boolean,
+const highlightsSocket = getSocket('/systems/highlights');
+const socket = getSocket('/');
 
-        version: string;
-        update: {
-          version: null | string
-        },
+export default defineComponent({
+  setup(props, context) {
+    const errors: Ref<UIError[]> = ref([]);
+    const averageStats: any = reactive({});
+    const hideStats = ref(localStorage.getItem('hideStats') === 'true');
+    const timestamp: Ref<null | number> = ref(null);
+    const uptime = ref('--:--:--');
+    const currentViewers = ref(0);
+    const maxViewers = ref(0);
+    const chatMessages = ref(0);
+    const newChatters = ref(0);
+    const currentHosts = ref(0);
+    const currentViews = ref(0);
+    const currentBits = ref(0);
+    const currentWatched = ref(0);
+    const currentSubscribers = ref(0);
+    const currentFollowers = ref(0);
+    const currentTips = ref(0);
+    const currentSong = ref(null);
+    const currency = ref('n/a');
+    const broadcasterType = ref('');
+    const tags: Ref<{ is_auto: boolean; localization_names: { [x:string]: string } }[]> = ref([]);
+    const version = ref('');
+    const update: {
+      version: null | string;
+    } = reactive({
+      version: null,
+    });
+    const title: Ref<null | string> = ref(null);
+    const game: Ref<null | string> = ref(null);
+    const rawStatus = ref('');
+    const cachedTitle = ref('');
+    const isLoaded = ref(false);
+    const top = ref('50');
 
-        title: string | null,
-        game: string | null,
-        rawStatus: string,
-        cachedTitle: string,
+    const isStreamOnline = computed(() => uptime.value !== '00:00:00');
+    const b_percentage = computed(() => context.root.$store.state.configuration.core.ui.percentage);
+    const b_showAvgDiff = computed(() => context.root.$store.state.configuration.core.ui.showdiff);
+    const b_shortenNumber: ComputedRef<boolean> = computed(() => context.root.$store.state.configuration.core.ui.shortennumbers);
+    const b_sticky = computed(() => context.root.$store.state.configuration.core.ui.stickystats);
 
-        top: string,
-        widthOfMenuInterval: number,
-        socket: SocketIOClient.Socket
-      } = {
-        errors: [],
-        highlightsSocket: getSocket('/systems/highlights'),
-        averageStats: {},
+    // $refs
+    const quickwindow = ref(null);
 
-        hideStats: localStorage.getItem('hideStats') === 'true',
+    const widthOfMenuUpdate = () => {
+      top.value = (quickwindow.value as unknown as HTMLElement).getBoundingClientRect().right < 900 ? '80' : '50';
+    }
+    const showGameAndTitleDlg = () => EventBus.$emit('show-game_and_title_dlg');
+    const loadCustomVariableValue = async (variable: string) => {
+      return new Promise((resolve, reject) => {
+        socket.emit('custom.variable.value', variable, (err: string | null, value: string) => {
+          resolve(value)
+        })
+      })
+    };
+    const generateTitle = async (current: string, raw: string) => {
+      if (raw.length === 0) return current
 
-        timestamp: null,
-        uptime: '--:--:--',
-        currentViewers: 0,
-        maxViewers: 0,
-        chatMessages: 0,
-        newChatters: 0,
-        currentHosts: 0,
-        currentViews: 0,
-        currentBits: 0,
-        currentWatched: 0,
-        currentSubscribers: 0,
-        currentFollowers: 0,
-        currentTips: 0,
-        currentSong: null,
-        currency: 'n/a',
-        broadcasterType: '',
-        tags: [],
-
-        version: '',
-        update: {
-          version: null,
-        },
-
-        title: null,
-        game: null,
-        rawStatus: '',
-        cachedTitle: '',
-
-        isLoaded: false,
-
-        top: '50',
-        widthOfMenuInterval: 0,
-
-        socket: getSocket('/'),
+      let variables = raw.match(/(\$_[a-zA-Z0-9_]+)/g)
+      if (cachedTitle.value === current && isNil(variables)) {
+        return cachedTitle.value
       }
-      return object
-    },
 
-    destroyed() {
-      clearInterval(this.widthOfMenuInterval)
-      clearInterval(interval)
-      clearInterval(UIErrorInterval)
-    },
+      if (!isNil(variables)) {
+        for (let variable of variables) {
+          let value = await loadCustomVariableValue(variable)
+          raw = raw.replace(variable, `<strong style="border-bottom: 1px dotted gray" data-toggle="tooltip" data-placement="bottom" title="${variable}">${value}</strong>`)
+        }
+      }
+      cachedTitle.value = raw
+      return raw
+    };
+    const shortenNumber = (number: number, shortify: boolean)  => {
+      if (!shortify || Number(number) <= 10000) return number
+      var SI_PREFIXES = ["", "k", "M", "G", "T", "P", "E"];
+      // what tier? (determines SI prefix)
+      var tier = Math.log10(number) / 3 | 0;
+      // if zero, we don't need a prefix
+      if(tier == 0) return number;
+      // get prefix and determine scale
+      var prefix = SI_PREFIXES[tier];
+      var scale = Math.pow(10, tier * 3);
+      // scale the number
+      var scaled = number / scale;
+      // format number and add prefix as suffix
+      return scaled.toFixed(1) + prefix;
+    };
+    const saveHighlight = () => highlightsSocket.emit('highlight');
+    const filterTags = (is_auto: boolean) => {
+        return tags.value.filter(o => !!o.is_auto === is_auto).map((o) => {
+        const key = Object.keys(o.localization_names).find(key => key.includes(context.root.$store.state.configuration.lang))
+        return {
+          name: o.localization_names[key || 'en-us'], is_auto: !!o.is_auto
+        }
+      }).sort((a, b) => {
+        if ((a || { name: ''}).name < (b || { name: ''}).name)  { //sort string ascending
+          return -1;
+        }
+        if ((a || { name: ''}).name > (b || { name: ''}).name) {
+          return 1;
+        }
+        return 0; //default return value (no sorting)
+      });
+    };
+    const difference = (number: number, current: number, shorten: boolean, postfix: string, toFixed: number)  => {
+      postfix = postfix || ''
+      shorten = typeof shorten === 'undefined' ? true : shorten
+      number = number || 0
+      if (Number.isNaN(Number(current)) || !isStreamOnline.value || !b_showAvgDiff.value) return '' // return nothing if current is not number (hidden, etc)
+      else if (number === 0) return ''
+      else {
+        let f_difference: number | string = Math.abs(b_percentage.value ? (Math.round((current - number) / number * 1000) / 10) : current - number)
+        if (b_percentage.value) {
+          if (!isFinite(f_difference)) {
+            return '';
+          }
+          f_difference = Number(f_difference).toFixed(1)
+          f_difference = `${f_difference}%`
+        } else {
+          if (shorten) {
+            f_difference = shortenNumber(f_difference, b_shortenNumber.value)
+          } else {
+            f_difference = Number(f_difference).toFixed(1)
+          }
+          if (toFixed) {
+            f_difference = Number(f_difference).toFixed(toFixed)
+          }
+          f_difference = f_difference + postfix
+        }
+        return f_difference;
+      }
+    };
+    const toggleViewerShow = () => {
+      hideStats.value = !hideStats.value
+      localStorage.setItem('hideStats', String(hideStats.value))
+    };
 
-    computed: {
-      isStreamOnline() {
-        return (this as any).uptime !== '00:00:00';
-      },
-      b_percentage () {
-        return this.$store.state.configuration.core.ui.percentage;
-      },
-      b_showAvgDiff () {
-        return this.$store.state.configuration.core.ui.showdiff;
-      },
-      b_shortenNumber () {
-        return this.$store.state.configuration.core.ui.shortennumbers;
-      },
-      b_sticky () {
-        return this.$store.state.configuration.core.ui.stickystats;
-      },
-    },
-
-    mounted() {
-      this.widthOfMenuInterval = window.setInterval(() => {
-        this.widthOfMenuUpdate()
+    onMounted(() => {
+      widthOfMenuInterval = window.setInterval(() => {
+        widthOfMenuUpdate()
       }, 100)
 
-      this.socket.emit('version', async (version: string) => {
-        this.version =  version;
+      socket.emit('version', async (recvVersion: string) => {
+        version.value = recvVersion;
 
         const { response } = await new Promise(resolve => {
           const request = new XMLHttpRequest();
@@ -433,7 +467,7 @@
 
           request.send();
         })
-        let botVersion = version.replace('-SNAPSHOT', '').split('.').map(o => Number(o))
+        let botVersion = recvVersion.replace('-SNAPSHOT', '').split('.').map(o => Number(o))
         let gitVersion = (response.tag_name as string).split('.').map(o => Number(o))
         console.debug({botVersion, gitVersion});
 
@@ -450,152 +484,119 @@
         }
 
         if (isNewer) {
-          this.update.version = gitVersion.join('.');
+          update.version = gitVersion.join('.');
         }
       })
 
       UIErrorInterval = window.setInterval(() => {
-        this.socket.emit('panel::errors', (err: string | null, data: { name: string; message: string }[]) => {
+        socket.emit('panel::errors', (err: string | null, data: { name: string; message: string }[]) => {
           if (err) {
             return console.error(err);
           }
           for (const error of data) {
             console.error(`UIError: ${error.name} ¦ ${error.message}`);
           }
-          this.errors = data;
+          errors.value = data;
         });
       }, 5000);
 
-      this.socket.emit('getLatestStats', (err: string | null, data: any) => {
+      socket.emit('getLatestStats', (err: string | null, data: any) => {
         console.groupCollapsed('navbar::getLatestStats')
         if (err) {
           return console.error(err);
         }
         console.log(data);
         console.groupEnd();
-        this.averageStats = data
+        for (const key of Object.keys(data)) {
+          averageStats[key] = data[key];
+        }
       });
 
       interval = window.setInterval(() => {
-        this.timestamp = Date.now()
-        this.socket.emit('panel.sendStreamData', async (err: string | null, data: { [x: string]: any, rawStatus: string, status: string, game: string }) => {
+        timestamp.value = Date.now()
+        socket.emit('panel.sendStreamData', async (err: string | null, data: { [x: string]: any, rawStatus: string, status: string, game: string }) => {
           console.groupCollapsed('navbar::panel.sendStreamData')
           if (err) {
             return console.error(err);
           }
           console.log(data)
           console.groupEnd();
-          for (let [key, value] of Object.entries(data)) {
-            // @ts-ignore
-            this[key] = value // populate data
-          }
-          this.isLoaded = true
 
-          this.title = await this.generateTitle(data.status, data.rawStatus);
-          this.rawStatus = data.rawStatus;
-          this.game = data.game;
+          broadcasterType.value = data.broadcasterType;
+          uptime.value = data.uptime;
+          currentViewers.value = data.currentViewers;
+          currentSubscribers.value = data.currentSubscribers;
+          currentBits.value = data.currentBits;
+          currentTips.value = data.currentTips;
+          currency.value = data.currency;
+          chatMessages.value = data.chatMessages;
+          currentFollowers.value = data.currentFollowers;
+          currentViews.value = data.currentViews;
+          maxViewers.value = data.maxViewers;
+          game.value = data.game;
+          newChatters.value = data.newChatters;
+          rawStatus.value = data.rawStatus;
+          currentSong.value = data.currentSong;
+          currentHosts.value = data.currentHosts;
+          currentWatched.value = data.currentWatched;
+          tags.value = data.tags;
+          isLoaded.value = true
+          title.value = await generateTitle(data.status, data.rawStatus);
+          rawStatus.value = data.rawStatus;
+          game.value = data.game;
         });
       }, 1000);
-    },
-    methods: {
-      widthOfMenuUpdate() {
-        this.top = (<HTMLElement>this.$refs.quickwindow).getBoundingClientRect().right < 900 ? '80' : '50';
-      },
-      showGameAndTitleDlg: function () {
-        EventBus.$emit('show-game_and_title_dlg');
-      },
-      loadCustomVariableValue: async function (variable: string) {
-        return new Promise((resolve, reject) => {
-          this.socket.emit('custom.variable.value', variable, (err: string | null, value: string) => {
-            resolve(value)
-          })
-        })
-      },
-      generateTitle: async function (current: string, raw: string) {
-        if (raw.length === 0) return current
+    });
+    onUnmounted(() => {
+      clearInterval(widthOfMenuInterval)
+      clearInterval(interval)
+      clearInterval(UIErrorInterval)
+    })
 
-        let variables = raw.match(/(\$_[a-zA-Z0-9_]+)/g)
-        if (this.cachedTitle === current && isNil(variables)) {
-          return this.cachedTitle
-        }
-
-        if (!isNil(variables)) {
-          for (let variable of variables) {
-            let value = await this.loadCustomVariableValue(variable)
-            raw = raw.replace(variable, `<strong style="border-bottom: 1px dotted gray" data-toggle="tooltip" data-placement="bottom" title="${variable}">${value}</strong>`)
-          }
-        }
-        this.cachedTitle = raw
-        return raw
-      },
-      shortenNumber: function (number: number, shortify: boolean) {
-        if (!shortify || Number(number) <= 10000) return number
-        var SI_PREFIXES = ["", "k", "M", "G", "T", "P", "E"];
-        // what tier? (determines SI prefix)
-        var tier = Math.log10(number) / 3 | 0;
-        // if zero, we don't need a prefix
-        if(tier == 0) return number;
-        // get prefix and determine scale
-        var prefix = SI_PREFIXES[tier];
-        var scale = Math.pow(10, tier * 3);
-        // scale the number
-        var scaled = number / scale;
-        // format number and add prefix as suffix
-        return scaled.toFixed(1) + prefix;
-      },
-      saveHighlight() {
-        this.highlightsSocket.emit('highlight')
-      },
-      filterTags (is_auto: boolean) {
-        return this.tags.filter(o => !!o.is_auto === is_auto).map((o) => {
-          const key = Object.keys(o.localization_names).find(key => key.includes(this.$store.state.configuration.lang))
-          return {
-            name: o.localization_names[key || 'en-us'], is_auto: !!o.is_auto
-          }
-        }).sort((a, b) => {
-          if ((a || { name: ''}).name < (b || { name: ''}).name)  { //sort string ascending
-            return -1;
-          }
-          if ((a || { name: ''}).name > (b || { name: ''}).name) {
-            return 1;
-          }
-          return 0; //default return value (no sorting)
-        });
-      },
-      difference: function (number: number, current: number, shorten: boolean, postfix: string, toFixed: number) {
-        postfix = postfix || ''
-        shorten = typeof shorten === 'undefined' ? true : shorten
-        number = number || 0
-        if (Number.isNaN(Number(current)) || !this.isStreamOnline || !this.b_showAvgDiff) return '' // return nothing if current is not number (hidden, etc)
-        else if (number === 0) return ''
-        else {
-          let f_difference: number | string = Math.abs(this.b_percentage ? (Math.round((current - number) / number * 1000) / 10) : current - number)
-          if (this.b_percentage) {
-            if (!isFinite(f_difference)) {
-              return '';
-            }
-            f_difference = Number(f_difference).toFixed(1)
-            f_difference = `${f_difference}%`
-          } else {
-            if (shorten) {
-              f_difference = this.shortenNumber(f_difference, this.b_shortenNumber)
-            } else {
-              f_difference = Number(f_difference).toFixed(1)
-            }
-            if (toFixed) {
-              f_difference = Number(f_difference).toFixed(toFixed)
-            }
-            f_difference = f_difference + postfix
-          }
-         return f_difference;
-        }
-      },
-      toggleViewerShow: function () {
-        this.hideStats = !this.hideStats
-        localStorage.setItem('hideStats', String(this.hideStats))
-      }
-    },
-  })
+    return {
+      errors,
+      averageStats,
+      hideStats,
+      timestamp,
+      uptime,
+      currentViewers,
+      maxViewers,
+      chatMessages,
+      newChatters,
+      currentHosts,
+      currentViews,
+      currentBits,
+      currentWatched,
+      currentSubscribers,
+      currentFollowers,
+      currentTips,
+      currentSong,
+      currency,
+      broadcasterType,
+      tags,
+      version,
+      update,
+      title,
+      game,
+      rawStatus,
+      cachedTitle,
+      isLoaded,
+      top,
+      isStreamOnline,
+      b_percentage,
+      b_showAvgDiff,
+      b_shortenNumber,
+      b_sticky,
+      showGameAndTitleDlg,
+      shortenNumber,
+      saveHighlight,
+      filterTags,
+      difference,
+      toggleViewerShow,
+      quickwindow
+    }
+  }
+});
 </script>
 
 <style scoped>
