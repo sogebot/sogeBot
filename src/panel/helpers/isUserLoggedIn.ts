@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { get } from 'lodash-es';
 
-export const isUserLoggedIn = async function (mustBeLogged = true, mustBeAdmin = true) {
+export const isUserLoggedIn = async function (mustBeLogged = true, mustBeAdmin = true): Promise<any | boolean | null> {
   // check if we have auth code
   const code = localStorage.getItem('code') || '';
   if (code.trim().length === 0) {

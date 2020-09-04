@@ -8,21 +8,23 @@ import VueRouter from 'vue-router';
 import moment from 'moment';
 import momentTimezone from 'moment-timezone';
 import VueMoment from 'vue-moment';
+import VueCompositionAPI from '@vue/composition-api';
 
 import translate from 'src/panel/helpers/translate';
 import { ButtonStates, states } from 'src/panel/helpers/buttonStates';
 import { setMainLoaded } from 'src/panel/helpers/isAvailableVariable';
 import { getConfiguration, getTranslations } from 'src/panel/helpers/socket';
+import { store } from 'src/panel/helpers/store';
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 Vue.component('fa', FontAwesomeIcon);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 Vue.use(BootstrapVue);
-
 Vue.use(VueMoment, {
   moment, momentTimezone,
 });
+Vue.use(VueCompositionAPI);
 
 /* import widely used components */
 Vue.component('panel', () => import('src/panel/components/panel.vue'));
@@ -47,7 +49,6 @@ declare module 'vue/types/vue' {
     $unloadScript: (script: string) => Promise<void>;
     $state: states;
     urlParam(key: string): string | null;
-    $loggedUser: any | null;
   }
 }
 
@@ -56,10 +57,9 @@ Vue.use(VueRouter);
 const main = async () => {
   // init prototypes
   Vue.prototype.translate = (v: string) => translate(v);
-  Vue.prototype.$loggedUser = await isUserLoggedIn(false, false);
+  store.commit('setLoggedUser', await isUserLoggedIn());
   await getTranslations();
   Vue.prototype.configuration = await getConfiguration();
-  console.log(Vue.prototype.configuration);
 
   Vue.prototype.$state = ButtonStates;
 
@@ -77,6 +77,7 @@ const main = async () => {
   });
 
   new Vue({
+    store,
     router,
     components: {
       navbar: () => import('./components/navbar/navbar.vue'),
