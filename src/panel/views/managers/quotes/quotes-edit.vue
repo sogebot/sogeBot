@@ -165,7 +165,7 @@ export default class QuotesEdit extends Vue {
         });
       })
     } else {
-      this.item.quotedBy = this.$loggedUser.id;
+      this.item.quotedBy = this.$store.state.loggedUser.id;
       this.state.loaded = this.$state.success;
       this.$nextTick(() => {
         this.pending = false;

@@ -41,6 +41,7 @@ import translate from './helpers/translate';
 import urlParam from './helpers/urlParam';
 import { getListOf, populateListOf } from './helpers/getListOf';
 import type { getListOfReturn } from './helpers/getListOf';
+import { store } from './helpers/store';
 import { getConfiguration, getTranslations } from './helpers/socket';
 
 library.add(faRedoAlt, faDice, faVolumeOff, faGripVertical, faImage, faUpload, faCircle2, faCaretRight, faTasks, faCaretDown, faSlash, faFilter, faToggleOn, faToggleOff, faBell, faShareSquare, faExclamationCircle, faQuestion, faVial, faEquals, faGreaterThanEqual, faLongArrowAltLeft, faBan, faPlusSquare, faMusic, faList, faPlay, faPause, faForward, faSpotify, faMoneyBillAlt, faPlus, faSpinner, faGift, faHeadphones, faTh, faDollarSign, faSignInAlt, faSignOutAlt, faUsers, faMusic, faCalendar, faTwitter, faCheck, faMusic, faMusic, faVolumeUp, faVolumeDown, faUsers, faGift, faTrophy, faCog, faExternalLinkAlt, faTrash, faPlus, faSync, faComments, faTwitch, faCircle, faCheckCircle, faLock, faUsers, faUser, faCheck, faTimes, faHeart, faStar, faLockOpen, faHandPointer, faRandom, faEyeSlash, faSignOutAlt, faSignInAlt, faBoxOpen, faEye, faCog, faExternalLinkAlt, faHeart, faTv, faRandom, faGem, faStar, faGift, faDollarSign, faStarHalf, faLongArrowAltRight, faCircleNotch, faCalendar, faDollarSign, faCog, faCode, faAngleUp, faTrashAlt, faAngleDown, faFont, faPlus, faMinus, faDownload, faDollarSign, faTerminal, faCog, faCommentAlt, faUsers, faExternalLinkAlt, faSyncAlt, faClock, faCog, faInfinity, faTrophy, faClone, faGem, faCoins, faExclamation, faStop, faBan, faSpinner, faCheck, faAngleRight, faPlus, faEdit, faEraser, faLink, faTrash, faPlus, faCaretLeft, faExternalLinkAlt, faLink, faSave, faThLarge, faThList, faSearch, faCircleNotch, faCheck, faEllipsisH, faEllipsisV, faPowerOff);
@@ -70,17 +71,9 @@ declare module 'vue/types/vue' {
     $state: states;
     urlParam(key: string): string | null;
     translate(id: string): string;
-    $loggedUser: any | null;
     $systems: getListOfReturn['systems'];
-    $core: {
-      name: string;
-    }[];
-    $integrations: {
-      name: string;
-      enabled: boolean;
-      areDependenciesEnabled: boolean;
-      isDisabledByEnv: boolean;
-    }[];
+    $core: getListOfReturn['core'];
+    $integrations: getListOfReturn['integrations'];
   }
 }
 
@@ -90,15 +83,17 @@ const main = async () => {
   // init prototypes
   Vue.prototype.translate = (v: string) => translate(v);
   Vue.prototype.urlParam = (v: string) => urlParam(v);
-  Vue.prototype.$loggedUser = await isUserLoggedIn();
+  store.commit('setLoggedUser', await isUserLoggedIn());
 
-  if (Vue.prototype.$loggedUser !== false) {
+  if (store.state.loggedUser !== false) {
     await getTranslations();
     Vue.prototype.configuration = await getConfiguration();
 
-    Vue.prototype.$core = await getListOf('core');
-
+    await populateListOf('core');
     await populateListOf('systems');
+    await populateListOf('integrations');
+
+    Vue.prototype.$core = await getListOf('core');
     Vue.prototype.$systems = getListOf('systems');
     Vue.prototype.$integrations = await getListOf('integrations');
 
@@ -173,6 +168,7 @@ const main = async () => {
     });
 
     new Vue({
+      store,
       router,
       components: {
         dashboard: () => import('./views/dashboard/dashboard.vue'),

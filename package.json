@@ -70,6 +70,7 @@
     "velocity-animate": "1.5.2",
     "vue": "2.6.12",
     "vue-scrollto": "2.18.2",
+    "vuex": "3.5.1",
     "ws": "7.3.1",
     "xregexp": "4.3.0",
     "yargs": "15.4.1",

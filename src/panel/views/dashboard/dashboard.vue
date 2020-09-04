@@ -125,7 +125,7 @@ export default {
   async mounted() {
     this.isLoaded = await Promise.race([
       new Promise(resolve => {
-        this.socket.emit('panel::dashboards', { userId: Number(this.$loggedUser.id), type: 'admin' }, (err, dashboards) => {
+        this.socket.emit('panel::dashboards', { userId: Number(this.$store.state.loggedUser.id), type: 'admin' }, (err, dashboards) => {
           console.groupCollapsed('dashboard::panel::dashboards');
           console.log({err, dashboards});
           console.groupEnd();
@@ -209,7 +209,7 @@ export default {
       this.refreshWidgets();
     },
     addWidget: function () {
-      this.socket.emit('panel::dashboards', { userId: Number(this.$loggedUser.id), type: 'admin' }, (err, dashboards) => {
+      this.socket.emit('panel::dashboards', { userId: Number(this.$store.state.loggedUser.id), type: 'admin' }, (err, dashboards) => {
         if (err) {
           return console.error(err);
         }
@@ -219,7 +219,7 @@ export default {
       });
     },
     createDashboard: function () {
-      this.socket.emit('panel::dashboards::create', { userId: Number(this.$loggedUser.id), name: this.dashboardName }, (err, created) => {
+      this.socket.emit('panel::dashboards::create', { userId: Number(this.$store.state.loggedUser.id), name: this.dashboardName }, (err, created) => {
         if (err) {
           return console.error(err);
         }
