@@ -63,7 +63,6 @@ Vue.component('textarea-with-tags', () => import('./components/textareaWithTags.
 
 declare module 'vue/types/vue' {
   interface Vue {
-    configuration: any;
     $loadScript: (script: string) => Promise<void>;
     $unloadScript: (script: string) => Promise<void>;
     $state: states;
@@ -84,7 +83,7 @@ const main = async () => {
 
   if (store.state.loggedUser !== false) {
     await getTranslations();
-    Vue.prototype.configuration = await getConfiguration();
+    store.commit('setConfiguration', await getConfiguration());
     await populateListOf('core');
     await populateListOf('systems');
     await populateListOf('integrations');
@@ -107,14 +106,14 @@ const main = async () => {
       router,
       created() {
         // set proper moment locale
-        this.$moment.locale(get(Vue, 'prototype.configuration.lang', 'en'));
+        this.$moment.locale(get(this.$store.state, 'configuration.lang', 'en'));
 
         // theme load
         const theme = localStorage.getItem('theme');
         const head = document.getElementsByTagName('head')[0];
         const link = (document.createElement('link') as any);
         link.setAttribute('rel', 'stylesheet');
-        link.setAttribute('href',`/dist/css/${theme || get(Vue, 'prototype.configuration.core.ui.theme', 'light')}.css`);
+        link.setAttribute('href',`/dist/css/${theme || get(store.state, 'configuration.core.ui.theme', 'light')}.css`);
         head.appendChild(link);
       },
       template: `

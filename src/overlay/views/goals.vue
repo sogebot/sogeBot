@@ -180,7 +180,7 @@ export default class GoalsOverlay extends Vue {
   }
 
   mounted() {
-    this.$moment.locale(this.configuration.lang)
+    this.$moment.locale(this.$store.state.configuration.lang)
     this.refresh()
     this.interval.push(window.setInterval(() => this.refresh(), 5000));
     this.interval.push(window.setInterval(() => {

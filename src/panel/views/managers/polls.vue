@@ -216,7 +216,7 @@
       clearInterval(this.interval)
     },
     mounted: function () {
-      this.$moment.locale(this.configuration.lang)
+      this.$moment.locale(this.$store.state.configuration.lang)
       this.currentTime = Date.now()
       this.domWidth = (this.$refs['window'] as HTMLElement).clientWidth
       this.refresh();

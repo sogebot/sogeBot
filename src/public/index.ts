@@ -44,7 +44,6 @@ export interface Global {
 
 declare module 'vue/types/vue' {
   interface Vue {
-    configuration: any;
     $loadScript: (script: string) => Promise<void>;
     $unloadScript: (script: string) => Promise<void>;
     $state: states;
@@ -57,9 +56,9 @@ Vue.use(VueRouter);
 const main = async () => {
   // init prototypes
   Vue.prototype.translate = (v: string) => translate(v);
-  store.commit('setLoggedUser', await isUserLoggedIn());
   await getTranslations();
-  Vue.prototype.configuration = await getConfiguration();
+  store.commit('setLoggedUser', await isUserLoggedIn());
+  store.commit('setConfiguration', await getConfiguration());
 
   Vue.prototype.$state = ButtonStates;
 
@@ -84,7 +83,7 @@ const main = async () => {
       twitch: () => import('./components/twitch.vue'),
     },
     created() {
-      this.$moment.locale(Vue.prototype.configuration.lang); // set proper moment locale
+      this.$moment.locale(this.$store.state.configuration.lang); // set proper moment locale
     },
     template: `
       <div id="app">

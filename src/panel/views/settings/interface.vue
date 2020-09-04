@@ -164,14 +164,14 @@
         <div
           ref="menu"
           :class="{
-            'sticky-top': configuration.core.ui.stickystats,
-            'pr-2': configuration.core.ui.stickystats,
+            'sticky-top': $store.state.configuration.core.ui.stickystats,
+            'pr-2': $store.state.configuration.core.ui.stickystats,
           }"
           class="pt-3"
           :style="{
-            top: configuration.core.ui.stickystats ? topOfMenu + 'px' : '',
-            height: configuration.core.ui.stickystats ? heightOfMenu : 'auto',
-            overflow: configuration.core.ui.stickystats ? 'scroll' : 'inherit',
+            top: $store.state.configuration.core.ui.stickystats ? topOfMenu + 'px' : '',
+            height: $store.state.configuration.core.ui.stickystats ? heightOfMenu : 'auto',
+            overflow: $store.state.configuration.core.ui.stickystats ? 'scroll' : 'inherit',
             'overflow-x': 'hidden',
             'z-index': 0
             }">
@@ -379,7 +379,7 @@ export default class interfaceSettings extends Vue {
 
       this.list = systems;
     })
-    Vue.prototype.configuration = await getConfiguration(); // force refresh config
+    this.$store.commit('setConfiguration', await getConfiguration()); // force refresh config
   }
 
   getBorderStyle(system: string) {

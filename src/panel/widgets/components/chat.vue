@@ -128,7 +128,7 @@ export default {
     })
 
     this.interval.push(setInterval(() => {
-      this.theme = (localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light'));
+      this.theme = (localStorage.getItem('theme') || get(this.$store.state, 'configuration.core.ui.theme', 'light'));
     }, 100));
   }
 }

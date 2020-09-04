@@ -43,9 +43,9 @@ export default class helpbox extends Vue {
   }
 
   init() {
-    if (this.configuration.integrations.ResponsiveVoice.api.key.trim().length > 0) {
+    if (this.$store.state.configuration.integrations.ResponsiveVoice.api.key.trim().length > 0) {
       if (typeof window.responsiveVoice === 'undefined') {
-        this.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.configuration.integrations.ResponsiveVoice.api.key)
+        this.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.$store.state.configuration.integrations.ResponsiveVoice.api.key)
           .then(() => this.initResponsiveVoice(0));
       } else {
         this.loadVoices();

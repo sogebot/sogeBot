@@ -86,7 +86,7 @@ export default class PollsOverlay extends Vue {
   }
 
   mounted () {
-    this.$moment.locale(this.configuration.lang)
+    this.$moment.locale(this.$store.state.configuration.lang)
   }
 
   created () {
