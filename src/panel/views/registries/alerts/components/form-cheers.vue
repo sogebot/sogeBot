@@ -378,7 +378,7 @@ export default class AlertsEditCheersForm extends Vue {
   @PropSync('alert') readonly data !: AlertTipInterface
   @Prop() readonly index !: number
 
-  theme = localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light');
+  theme = localStorage.getItem('theme') || get(this.$store.state, 'configuration.core.ui.theme', 'light');
 
   customShow: 'html' | 'css' | 'js' = 'html';
   fonts: {text: string; value: string}[] = [];

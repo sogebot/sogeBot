@@ -6,6 +6,7 @@ import VueRouter from 'vue-router';
 import VueCompositionAPI from '@vue/composition-api';
 
 import { ButtonStates, states } from '../panel/helpers/buttonStates';
+import { store } from 'src/panel/helpers/store';
 
 import moment from 'moment';
 import momentTimezone from 'moment-timezone';
@@ -29,7 +30,6 @@ export interface Global {
 
 declare module 'vue/types/vue' {
   interface Vue {
-    configuration: any;
     urlParam(key: string): string | null;
     $state: states;
   }
@@ -37,7 +37,7 @@ declare module 'vue/types/vue' {
 
 const overlays = async () => {
   await getTranslations();
-  Vue.prototype.configuration = await getConfiguration();
+  store.commit('setConfiguration', await getConfiguration());
 
   Vue.prototype.translate = (v: string) => translate(v);
   Vue.prototype.urlParam = (v: string) => urlParam(v);
@@ -66,9 +66,10 @@ const overlays = async () => {
   });
 
   new Vue({
+    store,
     router,
     created() {
-      this.$moment.locale(this.configuration.lang); // set proper moment locale
+      this.$moment.locale(this.$store.state.configuration.lang); // set proper moment locale
     },
     template: `
       <div id="app">

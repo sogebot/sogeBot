@@ -87,23 +87,17 @@ export const getTranslations = async () => {
   });
 };
 
-let configuration: null | Configuration = null;
 type Configuration = {
   [x:string]: Configuration | string;
 };
 export const getConfiguration = async (): Promise<Configuration> => {
   console.debug('Getting configuration');
   return new Promise((resolve) => {
-    if (configuration) {
+    getSocket('/core/ui', true).emit('configuration', (err: string | null, configuration: Configuration) => {
+      if (err) {
+        return console.error(err);
+      }
       resolve(configuration);
-    } else {
-      getSocket('/core/ui', true).emit('configuration', (err: string | null, socketConfiguration: Configuration) => {
-        if (err) {
-          return console.error(err);
-        }
-        configuration = socketConfiguration;
-        resolve(configuration);
-      });
-    }
+    });
   });
 };

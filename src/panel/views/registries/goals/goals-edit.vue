@@ -328,7 +328,7 @@ export default Vue.extend({
       typeOpts: ['followers', 'currentFollowers', 'currentSubscribers', 'subscribers', 'tips', 'bits'],
       displayOpts: ['simple', 'full', 'custom'],
       groupDisplayOpts: ['fade', 'multi'],
-      theme: localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light'),
+      theme: localStorage.getItem('theme') || get(this.$store.state, 'configuration.core.ui.theme', 'light'),
 
       customShow: 'html',
       state: {

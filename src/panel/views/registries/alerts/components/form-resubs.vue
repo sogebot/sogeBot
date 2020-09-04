@@ -362,7 +362,7 @@ export default class AlertsEditFollowForm extends Vue {
   @PropSync('alert') readonly data !: AlertResubInterface
   @Prop() readonly index !: number
 
-  theme = localStorage.getItem('theme') || get(Vue, 'prototype.configuration.core.ui.theme', 'light');
+  theme = localStorage.getItem('theme') || get(this.$store.state, 'configuration.core.ui.theme', 'light');
 
   customShow: 'html' | 'css' | 'js' = 'html';
   fonts: {text: string; value: string}[] = [];

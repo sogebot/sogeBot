@@ -3,7 +3,7 @@
     <b-toast :title="error.name" visible variant="danger" v-for="error of errors" :key="error.name + error.message">
       {{ error.message }}
     </b-toast>
-    <b-toast :title="translate('errors.owner_and_broadcaster_oauth_is_not_set')" no-auto-hide visible variant="danger" solid v-if="!configuration.isCastersSet">
+    <b-toast :title="translate('errors.owner_and_broadcaster_oauth_is_not_set')" no-auto-hide visible variant="danger" solid v-if="!$store.state.configuration.isCastersSet">
       <div v-html="translate('errors.please_set_your_broadcaster_oauth_or_owners')"/>
     </b-toast>
     <b-toast :title="translate('errors.new_update_available')" no-auto-hide visible variant="info" solid v-if="update.version">
@@ -307,10 +307,6 @@
 
         averageStats: any,
         hideStats: boolean,
-        b_shortenNumber: boolean,
-        b_showAvgDiff: boolean,
-        b_percentage: boolean,
-        b_sticky: boolean,
         timestamp: null | number,
         uptime: string,
         currentViewers: number,
@@ -349,10 +345,6 @@
         averageStats: {},
 
         hideStats: localStorage.getItem('hideStats') === 'true',
-        b_shortenNumber: true,
-        b_showAvgDiff: false,
-        b_percentage: false,
-        b_sticky: false,
 
         timestamp: null,
         uptime: '--:--:--',
@@ -398,13 +390,25 @@
       clearInterval(UIErrorInterval)
     },
 
+    computed: {
+      isStreamOnline() {
+        return (this as any).uptime !== '00:00:00';
+      },
+      b_percentage () {
+        return this.$store.state.configuration.core.ui.percentage;
+      },
+      b_showAvgDiff () {
+        return this.$store.state.configuration.core.ui.showdiff;
+      },
+      b_shortenNumber () {
+        return this.$store.state.configuration.core.ui.shortennumbers;
+      },
+      b_sticky () {
+        return this.$store.state.configuration.core.ui.stickystats;
+      },
+    },
+
     mounted() {
-      this.b_percentage = this.configuration.core.ui.percentage
-      this.b_showAvgDiff = this.configuration.core.ui.showdiff
-      this.b_shortenNumber = this.configuration.core.ui.shortennumbers
-      this.b_sticky = this.configuration.core.ui.stickystats
-
-
       this.widthOfMenuInterval = window.setInterval(() => {
         this.widthOfMenuUpdate()
       }, 100)
@@ -493,11 +497,6 @@
         });
       }, 1000);
     },
-    computed: {
-      isStreamOnline() {
-        return (this as any).uptime !== '00:00:00';
-      }
-    },
     methods: {
       widthOfMenuUpdate() {
         this.top = (<HTMLElement>this.$refs.quickwindow).getBoundingClientRect().right < 900 ? '80' : '50';
@@ -549,7 +548,7 @@
       },
       filterTags (is_auto: boolean) {
         return this.tags.filter(o => !!o.is_auto === is_auto).map((o) => {
-          const key = Object.keys(o.localization_names).find(key => key.includes(this.configuration.lang))
+          const key = Object.keys(o.localization_names).find(key => key.includes(this.$store.state.configuration.lang))
           return {
             name: o.localization_names[key || 'en-us'], is_auto: !!o.is_auto
           }

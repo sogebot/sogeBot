@@ -5,10 +5,14 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
   state: {
     loggedUser: null,
+    configuration: null,
   },
   mutations: {
     setLoggedUser (state, user) {
-      state.loggedUser = user;
+      Vue.set(state, 'loggedUser', user);
+    },
+    setConfiguration (state, configuration) {
+      Vue.set(state, 'configuration', configuration);
     },
   },
 });
