@@ -25,9 +25,10 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { defineComponent, ref, onMounted } from '@vue/composition-api'
 import { getSocket } from 'src/panel/helpers/socket';
 
+import Vue from 'vue';
 import vueHeadful from 'vue-headful';
 Vue.component('vue-headful', vueHeadful);
 
@@ -35,31 +36,28 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faBars, faSignInAlt, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 library.add(faBars, faSignInAlt, faSignOutAlt);
 
-@Component({
+const socket = getSocket('/');
+
+export default defineComponent({
   components: {
     checklist: () => import('./checklist.vue'),
     user: () => import('./user.vue'),
     navmenu: () => import('./menu.vue'),
     theme: () => import('./theme.vue'),
   },
-})
-export default class navbar extends Vue {
-  socket = getSocket('/');
+  setup() {
+    const name = ref('');
+    const version = ref('');
 
-  name: string = '';
-  version: string = '';
+    onMounted(() => {
+      socket.emit('version', (recvVersion: string) => version.value = recvVersion);
+      socket.emit('name', (recvName: string) => name.value = recvName );
+    })
 
-  mounted() {
-    this.socket.emit('version', (version: string) => this.version = version);
-    this.socket.emit('name', (name: string) => this.name = name );
+    const joinBot = () => socket.emit('joinBot');
+    const leaveBot = () => socket.emit('leaveBot');
+
+    return { name, version, joinBot, leaveBot }
   }
-
-  joinBot() {
-    this.socket.emit('joinBot');
-  }
-
-  leaveBot() {
-    this.socket.emit('leaveBot');
-  }
-}
+});
 </script>
