@@ -36,60 +36,70 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { defineComponent, ref, onMounted } from '@vue/composition-api'
+import type { Ref } from '@vue/composition-api'
+
+import translate from 'src/panel/helpers/translate';
+import { getSocket } from 'src/panel/helpers/socket';
+import type { menu } from 'src/bot/helpers/panel';
+
 import { PerfectScrollbar } from 'vue2-perfect-scrollbar'
 import 'vue2-perfect-scrollbar/dist/vue2-perfect-scrollbar.css'
-import { getSocket } from 'src/panel/helpers/socket';
 
-import type { menu } from 'src/bot/helpers/panel';
 
 type menuWithEnabled = Omit<typeof menu[number], 'this'> & { enabled: boolean };
 
-@Component({
+const socket = getSocket('/');
+
+export default defineComponent({
   components: {
     PerfectScrollbar
-  }
-})
-export default class Menu extends Vue {
-  socket = getSocket('/');
-  menu: menuWithEnabled[] = [];
-  categories = ['manage', 'settings', 'registry', /* 'logs', */ 'stats'];
-  isDisabledHidden = true;
+  },
+  setup() {
+    const menu: Ref<menuWithEnabled[]> = ref([]);
+    const categories = ['manage', 'settings', 'registry', /* 'logs', */ 'stats'];
+    const isDisabledHidden = ref(true);
 
-  async mounted() {
-    // Workaround for touch screens - https://github.com/mdbootstrap/perfect-scrollbar/issues/867
-    if (typeof (window as any).DocumentTouch === 'undefined') {
-      (window as any).DocumentTouch = HTMLDocument
+    onMounted(async () => {
+      // Workaround for touch screens - https://github.com/mdbootstrap/perfect-scrollbar/issues/867
+      if (typeof (window as any).DocumentTouch === 'undefined') {
+        (window as any).DocumentTouch = HTMLDocument
+      }
+
+      const isLoaded = await Promise.race([
+        new Promise(resolve => {
+          socket.emit('menu', (err: string | null, data: menuWithEnabled[]) => {
+            if (err) {
+              return console.error(err);
+            }
+            console.groupCollapsed('menu::menu');
+            console.log({data});
+            console.groupEnd();
+            for (const item of data.sort((a, b) => {
+              return translate('menu.' + a.name).localeCompare(translate('menu.' + b.name))
+            })) {
+              menu.value.push(item);
+            }
+            resolve(true);
+          });
+        }),
+        new Promise(resolve => {
+          setTimeout(() => resolve(false), 4000);
+        }),
+      ]);
+
+      if (!isLoaded) {
+        console.error('menu not loaded, refreshing page')
+        location.reload();
+      }
+    });
+
+    return {
+      menu, categories, isDisabledHidden
     }
-
-    const isLoaded = await Promise.race([
-      new Promise(resolve => {
-        this.socket.emit('menu', (err: string | null, data: menuWithEnabled[]) => {
-          if (err) {
-            return console.error(err);
-          }
-          console.groupCollapsed('menu::menu');
-          console.log({data});
-          console.groupEnd();
-          for (const item of data.sort((a, b) => {
-            return this.translate('menu.' + a.name).localeCompare(this.translate('menu.' + b.name))
-          })) {
-            this.menu.push(item);
-          }
-          resolve(true);
-        });
-      }),
-      new Promise(resolve => {
-        setTimeout(() => resolve(false), 4000);
-      }),
-    ]);
-
-    if (!isLoaded) {
-      console.error('menu not loaded, refreshing page')
-      location.reload();
-    }
   }
-}
+});
+
 </script>
 <style>
 .ps__rail-x {
