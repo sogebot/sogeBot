@@ -44,42 +44,53 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue'
-  import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
+import { defineComponent, onMounted, ref, watch } from '@vue/composition-api'
+import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 
-  export default Vue.extend({
-    props: ['cards', 'table', 'search'],
-    components: {
-      'font-awesome-layers': FontAwesomeLayers,
-      holdButton: () => import('./holdButton.vue'),
-    },
-    data: function () {
-      return {
-        searchString: '',
-        showAs: 'cards',
-        isFocused: false,
-        isSearching: false,
-      }
-    },
-    watch: {
-      showAs: function (value) {
-        this.$emit('showAs', value)
-      }
-    },
-    mounted: function () {
-      // set showAs if cards are hidden
-      if (!!this.cards) this.showAs = 'table'
-    },
-    methods: {
-      resetSearch() {
-        if (this.isSearching) {
-          this.searchString = ''
-          this.isSearching = false
-          this.$emit('search', '')
-        }
+interface Props {
+  cards?: boolean; table?: boolean; search?: boolean;
+}
+export default defineComponent({
+  components: {
+    'font-awesome-layers': FontAwesomeLayers,
+    holdButton: () => import('./holdButton.vue'),
+  },
+  props: {
+    cards: Boolean,
+    table: Boolean,
+    search: Boolean,
+  },
+  setup(props: Props, context) {
+    const searchString = ref('');
+    const showAs = ref('cards');
+    const isFocused = ref(false);
+    const isSearching = ref(false);
+
+    const resetSearch = () => {
+      if (isSearching.value) {
+        searchString.value = ''
+        isSearching.value = false
+        context.emit('search', '')
       }
     }
-  })
+
+    watch(showAs, (value) => {
+      context.emit('showAs', value)
+    })
+
+    onMounted(() => {
+      if (!!props.cards) showAs.value = 'table'
+    })
+
+    return {
+      searchString,
+      showAs,
+      isFocused,
+      isSearching,
+      resetSearch,
+    }
+  }
+});
 </script>
 
 <style scoped>
