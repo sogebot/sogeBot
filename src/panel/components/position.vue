@@ -77,7 +77,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, PropSync, } from 'vue-property-decorator';
+import { defineComponent, onMounted, onUnmounted, reactive, ref, toRefs, watch } from '@vue/composition-api'
+import type { Ref } from '@vue/composition-api'
 
 import type { RandomizerInterface } from 'src/bot/database/entity/randomizer';
 
@@ -85,49 +86,76 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSquare } from '@fortawesome/free-solid-svg-icons';
 library.add(faSquare)
 
-@Component({})
-export default class fontCustomizer extends Vue {
-  @PropSync('position') pos!: RandomizerInterface['position']
+interface Props {
+  position: RandomizerInterface['position'];
+}
 
-  timestamp = 0;
-  interval = 0;
+let interval = 0;
+export default defineComponent({
+  props: {
+    position: Object,
+  },
+  setup(props: Props, context) {
+    const timestamp = ref(0);
+    const pos = reactive(props.position);
 
-  mounted() {
-    this.interval = window.setInterval(() => this.timestamp = Date.now(), 200);
-  }
+    // refs
+    const HTMLRef: {
+      anchor: HTMLElement | null,
+      text: HTMLElement | null,
+    } = reactive({
+      anchor: null,
+      text: null,
+    });
+    const example: Ref<HTMLElement | null> = ref(null);
 
-  destroyed() {
-    window.clearInterval(this.interval);
-  }
+    const positionGenerator = (ref: 'anchor' | 'text'): { transform: string } => {
+      if (example.value) {
+        if (HTMLRef[ref]) {
+          const el = HTMLRef[ref] as HTMLElement;
+          const widthPxPerCent = example.value.getBoundingClientRect().width / 100;
+          const heightPxPerCent = example.value.getBoundingClientRect().height / 100;
 
-  positionGenerator(ref:string): { transform: string } {
-    if (this.$refs.example && this.$refs[ref]) {
-      const el = this.$refs[ref] as HTMLElement;
-      const widthPxPerCent = (this.$refs.example as HTMLElement).getBoundingClientRect().width / 100;
-      const heightPxPerCent = (this.$refs.example as HTMLElement).getBoundingClientRect().height / 100;
+          let top = 0;
+          if (pos.anchorY === 'middle') {
+            top = el.getBoundingClientRect().height / 2;
+          } else if (pos.anchorY === 'bottom') {
+            top = el.getBoundingClientRect().height;
+          }
 
-      let top = 0;
-      if (this.pos.anchorY === 'middle') {
-        top = el.getBoundingClientRect().height / 2;
-      } else if (this.pos.anchorY === 'bottom') {
-        top = el.getBoundingClientRect().height;
+          let left = 0;
+          if (pos.anchorX === 'middle') {
+            left = el.getBoundingClientRect().width / 2;
+          } else if (pos.anchorX === 'right') {
+            left = el.getBoundingClientRect().width;
+          }
+
+          return {
+            transform: `translate(${(pos.x * widthPxPerCent) - left}px, ${(pos.y * heightPxPerCent) - top}px)`,
+          };
+        } else {
+          return {
+            transform: `translate(0, 0)`,
+          };
+        }
       }
 
-      let left = 0;
-      if (this.pos.anchorX === 'middle') {
-        left = el.getBoundingClientRect().width / 2;
-      } else if (this.pos.anchorX === 'right') {
-        left = el.getBoundingClientRect().width;
-      }
-
-      return {
-        transform: `translate(${(this.pos.x * widthPxPerCent) - left}px, ${(this.pos.y * heightPxPerCent) - top}px)`,
-      };
-    } else {
       return {
         transform: `translate(0, 0)`,
       };
     }
+
+    watch(pos, (value) => {
+      context.emit('update:position', value);
+    })
+
+    onMounted(() => interval = window.setInterval(() => timestamp.value = Date.now(), 200));
+    onUnmounted(() => window.clearInterval(interval));
+
+    return {
+      timestamp, positionGenerator, pos,
+      example, ...toRefs(HTMLRef),
+    }
   }
-}
+});
 </script>
