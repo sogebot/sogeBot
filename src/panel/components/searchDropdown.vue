@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-input-group>
-      <template v-slot:prepend v-if="typeof multiple === 'string'">
+      <template v-slot:prepend v-if="multiple">
         <ul v-if="currentValue.length > 0" class="list-inline d-inline-block m-0 border border-right-0 px-1"
           :class="{
             'focus-border': (isFocused || isHovered),
@@ -28,7 +28,7 @@
         :placeholder="placeholder"
         :class="{
           'border-right-0': isSearching,
-          'border-left-0': typeof multiple === 'string' && currentValue.length > 0,
+          'border-left-0': multiple && currentValue.length > 0,
           'border-bottom-0': !isSearching && isDirty && (isFocused || isHovered),
         }"/>
       <template v-slot:append v-if="isSearching">
@@ -63,89 +63,108 @@
         style="padding-top:0.2rem; padding-bottom:0.2rem"
         v-for="option of options"
         v-html="option.replace(regexp, '<strong class=\'text-primary\'>' + addToCurrentValue + '</strong>')"
-        @click="addToCurrentValue = option; isDirty = false; isHovered = false; emitUpdate()"
+        @click="addToCurrentValue = option; isDirty = showAllOptions; isHovered = false; emitUpdate()"
         :key="option"/>
     </b-list-group>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent, ref, watch } from '@vue/composition-api';
+import type { Ref } from '@vue/composition-api';
+import { isEqual } from 'lodash';
 
-export default Vue.extend({
-  props: ['value', 'placeholder', 'options', 'multiple'],
-  data: function () {
-    const data: {
-      currentValue: string | string[],
-      addToCurrentValue: string,
-      isDirty: boolean,
-      isSearching: boolean,
-      isFocused: boolean,
-      isHovered: boolean,
-      regexp: RegExp,
-    } = {
-      currentValue: '',
-      addToCurrentValue: '',
-      isDirty: false,
-      isSearching: false,
-      isFocused: false,
-      isHovered: false,
-      regexp: new RegExp('', 'gmi'),
-    }
-    return data
+interface Props {
+  value: string[];
+  multiple?: boolean;
+  showAllOptions?: boolean;
+  options: string[];
+  placeholder: string;
+}
+
+export default defineComponent({
+  props: {
+    value: Array,
+    multiple: Boolean,
+    options: Array,
+    placeholder: String,
+    showAllOptions: Boolean,
   },
-  watch: {
-    addToCurrentValue: function(val) {
-      this.regexp = new RegExp(this.addToCurrentValue, 'gmi');
-    },
-    value: function (val) {
-      if (val) {
-        this.currentValue = val;
-        if (typeof this.multiple === 'undefined') {
-          this.addToCurrentValue = val;
-        }
-        this.isDirty = false;
-      }
-    },
-    options: function(val) {
-      this.isSearching = false;
-      // check if current value have game -> emit inout
-      const lowerCasedOptions: string[] = this.options.map((o: string) => o.toLowerCase());
-      if (lowerCasedOptions.includes(this.addToCurrentValue.toLowerCase())) {
-        const i = lowerCasedOptions.findIndex(option => option === this.addToCurrentValue.toLowerCase());
-        if (i >= 0) {
-          this.currentValue = this.options[i];
-          this.addToCurrentValue = this.options[i];
-          this.emitUpdate();
-        }
-      }
-    }
-  },
-  methods: {
-    emitSearch: function () {
-      this.isDirty = true;
-      this.isSearching = true;
-      console.log('emitSearch: ' + this.addToCurrentValue);
-      this.$emit('search', this.addToCurrentValue);
-    },
-    removeTag: function(tag?: string) {
-      if (Array.isArray(this.currentValue) && typeof this.multiple !== 'undefined') {
+  setup(props: Props, context) {
+    const currentValue: Ref<string | string[]> = ref(props.multiple ? [] : '');
+    const addToCurrentValue = ref('');
+    const isDirty = ref(props.showAllOptions);
+    const isSearching = ref(false);
+    const isFocused = ref(false);
+    const isHovered = ref(false);
+    const regexp = ref(new RegExp('', 'gmi'));
+
+    const emitSearch = () => {
+      isDirty.value = true;
+      isSearching.value = true;
+      console.log('emitSearch: ' + addToCurrentValue.value);
+      context.emit('search', addToCurrentValue.value);
+    };
+    const removeTag = (tag?: string) => {
+      if (Array.isArray(currentValue.value) && props.multiple) {
         if (tag) {
-          this.currentValue.splice(this.currentValue.indexOf(tag), 1);
-        } else if (this.addToCurrentValue.length === 0) {
-          this.currentValue.pop();
+          currentValue.value.splice(currentValue.value.indexOf(tag), 1);
+        } else if (addToCurrentValue.value.length === 0) {
+          currentValue.value.pop();
         }
       }
-    },
-    emitUpdate: function () {
-      if (typeof this.multiple === 'string' && Array.isArray(this.currentValue)) {
-        this.currentValue.push(this.addToCurrentValue);
-        this.addToCurrentValue = ''
+    };
+    const emitUpdate = () => {
+      if (props.multiple && Array.isArray(currentValue.value)) {
+        currentValue.value.push(addToCurrentValue.value);
+        addToCurrentValue.value = ''
       } else {
-        this.currentValue = this.addToCurrentValue;
+        currentValue.value = addToCurrentValue.value;
       }
-      console.log('emitUpdate: ' + this.currentValue);
-      this.$emit('input', this.currentValue);
+      console.log('emitUpdate: ' + currentValue.value);
+      context.emit('input', currentValue.value);
+    };
+
+    watch(addToCurrentValue, (val) => {
+      regexp.value = new RegExp(addToCurrentValue.value, 'gmi');
+    });
+    watch(() => props.value, (val, oldVal) => {
+      if (!isEqual(val, oldVal)) {
+        currentValue.value = val;
+        if (!props.multiple) {
+          addToCurrentValue.value = val[0];
+        }
+        isDirty.value = props.showAllOptions;
+        if (props.showAllOptions) {
+          emitSearch();
+        }
+      }
+    });
+    watch(() => props.options, (val) => {
+      isSearching.value = false;
+      // check if current value have game -> emit input
+      const lowerCasedOptions: string[] = props.options.map((o: string) => o.toLowerCase());
+      if (lowerCasedOptions.includes(addToCurrentValue.value.toLowerCase())) {
+        const i = lowerCasedOptions.findIndex(option => option === addToCurrentValue.value.toLowerCase());
+        if (i >= 0) {
+          currentValue.value = props.options[i];
+          addToCurrentValue.value = props.options[i];
+          emitUpdate();
+        }
+      }
+    });
+
+    return {
+      currentValue,
+      addToCurrentValue,
+      isDirty,
+      isSearching,
+      isFocused,
+      isHovered,
+      regexp,
+      emitUpdate,
+      removeTag,
+      emitSearch,
     }
   }
 });

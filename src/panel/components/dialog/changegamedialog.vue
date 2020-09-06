@@ -46,7 +46,7 @@
       class="mt-2 mb-4"
       :placeholder="translate('create-and-use-a-new-game')"
       :options="searchForGameOpts"
-      :value="currentGame"
+      :value="[currentGame]"
       @search="searchForGame($event);"
       @input="currentGame = $event"></search>
 
@@ -69,7 +69,6 @@
     <h5 class="modal-title mt-4">
       {{ translate('tags')}}
     </h5>
-
     <search
       class="mt-2 mb-4"
       :placeholder="translate('search-tags')"
@@ -77,7 +76,9 @@
       :value="currentTags"
       @search="searchForTags($event);"
       @input="currentTags = $event"
-      multiple></search>
+      multiple
+      showAllOptions
+      ></search>
 
     <div slot="modal-footer" class="w-100">
       <b-button
@@ -342,6 +343,7 @@ export default defineComponent({
     });
     watch(show, () => init());
     watch(currentGame, () => selectedTitle.value = 'current');
+    watch(currentTags, () => searchForTags(''));
 
     onMounted(() => {
       windowWidth.value = window.innerWidth;
