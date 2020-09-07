@@ -1,7 +1,7 @@
 <template>
   <buttonWithIcon icon="exclamation"
                   :class="'btn-danger'"
-                  disabled="true"
+                  disabled
                   :text="translate('dialog.buttons.' + this.text + '.invalid')"
                   v-if="invalid"/>
   <buttonWithIcon :icon="icon || 'save'"
@@ -13,35 +13,44 @@
   <buttonWithIcon icon="spinner"
                   spin="true"
                   :class="cl || 'btn-primary'"
-                  disabled="true"
+                  disabled
                   :text="translate('dialog.buttons.' + this.text + '.progress')"
                   v-else-if="state === 1"/>
   <buttonWithIcon icon="check"
                   class="btn-success"
                   :class="{ 'btn-shrink': (cl || '').includes('shrink') }"
-                  disabled="true"
+                  disabled
                   :text="translate('dialog.buttons.' + this.text + '.done')"
                   v-else-if="state === 2"/>
   <buttonWithIcon icon="times"
                   class="btn-danger"
                   :class="{ 'btn-shrink': (cl || '').includes('shrink') }"
-                  disabled="true"
+                  disabled
                   :text="translate('dialog.buttons.something-went-wrong')"
                   v-else-if="state === 3"/>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-export default Vue.extend({
-  props: ['state', 'text', 'icon', 'cl', 'shrink', 'invalid'],
+import { defineComponent } from '@vue/composition-api'
+
+
+export default defineComponent({
   components: {
     buttonWithIcon: () => import('./button.vue'),
   },
-  methods: {
-    save() {
-      this.$emit('click');
+  props: {
+    state: Number,
+    text: String,
+    icon: String,
+    cl: String,
+    invalid: Boolean,
+  },
+  setup(props, context) {
+    const save = () => {
+      context.emit('click');
     }
+    return { save };
   }
-})
+});
 </script>
 
