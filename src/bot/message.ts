@@ -777,7 +777,7 @@ class Message {
               'Client-ID': oauth.botClientId,
             },
           });
-          const channelId = request.data.users[0]._id;
+          const channelId = request.data.data[0].id;
           request = await axios.get(`https://api.twitch.tv/helix/channels?broadcaster_id=${channelId}`, {
             headers: {
               'Authorization': 'Bearer ' + token,
@@ -805,7 +805,7 @@ class Message {
             },
           });
 
-          const channelId = request.data.users[0]._id;
+          const channelId = request.data.data[0].id;
           request = await axios.get(`https://api.twitch.tv/helix/channels?broadcaster_id=${channelId}`, {
             headers: {
               'Authorization': 'Bearer ' + token,
