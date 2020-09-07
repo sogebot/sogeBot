@@ -345,7 +345,7 @@
           }
           this.watchEventChange = false;
 
-          if (event.operations[event.operations.length - 1].name !== 'do-nothing') {
+          if (event.operations.length === 0 || event.operations[event.operations.length - 1].name !== 'do-nothing') {
             event.operations.push({
               id: uuid(),
               name: 'do-nothing',
