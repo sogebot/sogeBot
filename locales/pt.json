@@ -703,6 +703,7 @@
     "create-and-use-a-new-game": "Create and use a new game",
     "create-and-use-a-new-title": "Create and use a new title",
     "search-tags": "Search for available tags (some game tags might missing / twitch policy)",
+    "no-options-found-for-this-search": "No options found for this search.",
     "followers-show-number": "Show",
     "followers-show": "followers",
     "eventlist-overflow-height": "Max widget height",
@@ -1160,7 +1161,9 @@
       "win": "$sender, you WON! You now have $points $pointsName",
       "winJackpot": "$sender, you hit JACKPOT! You won $jackpot $jackpotName in addition to your bet. You now have $points $pointsName",
       "loseWithJackpot": "$sender, you LOST! You now have $points $pointsName. Jackpot increased to $jackpot $jackpotName",
-      "lose": "$sender, you LOST! You now have $points $pointsName"
+      "lose": "$sender, you LOST! You now have $points $pointsName",
+      "currentJackpot": "$sender, current jackpot for $command is $points $pointsName",
+      "jackpotIsDisabled": "$sender, jackpot is disabled for $command."
     }
   },
   "highlights": {
