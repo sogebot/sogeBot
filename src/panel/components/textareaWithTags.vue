@@ -63,12 +63,20 @@
   </div>
 </template>
 <script lang="ts">
-import { Vue, Component, Watch, Prop, PropSync } from 'vue-property-decorator';
+import { computed, defineComponent, Ref, ref, watch } from '@vue/composition-api'
+
 import { flatten } from '../../bot/helpers/flatten';
 import { sortBy, keys, isNil } from 'lodash-es';
 import translate from '../helpers/translate';
 
-@Component({
+interface Props {
+  value: string;
+  filters: any[];
+  error?: boolean;
+  placeholder?: string;
+}
+
+export default defineComponent({
   filters: {
     filterize: function (val: string) {
       const filtersRegExp = new RegExp('\\$(' + sortBy(keys(flatten(translate('responses.variable', true))), (o) => -o.length).join('|') + ')', 'g')
@@ -84,59 +92,82 @@ import translate from '../helpers/translate';
         }
       }
       return output
+    },
+  },
+  props: {
+    value: String,
+    filters: Array,
+    error: Boolean,
+    placeholder: String,
+  },
+  setup(props: Props, context) {
+    const height = ref(0);
+    const editation = ref(false);
+    const d_placeholder = !props.placeholder || props.placeholder.trim().length === 0 ? '&nbsp;' : props.placeholder
+    const _value = ref(props.value);
+
+    // refs
+    const textarea: Ref<HTMLElement | null> = ref(null);
+    const placeholder: Ref<HTMLElement | null> = ref(null);
+    const div: Ref<HTMLElement | null> = ref(null);
+
+    const heightStyle = computed(() => {
+      if (height.value === 0) return 'height: auto'
+      return `height: ${height.value + 2}px`
+    });
+
+    watch(_value, (val) => context.emit('update:value', val));
+    watch(editation, (val, old) => {
+      if (textarea.value && placeholder.value && div.value) {
+        if (val) {
+          // focus textarea and set height
+          if (_value.value.trim().length === 0) {
+            height.value = placeholder.value.clientHeight
+          } else height.value = div.value.clientHeight
+          context.root.$nextTick(() => {
+            textarea.value?.focus()
+          })
+        } else {
+          // texteare unfocused, set height of div
+          height.value = textarea.value.clientHeight
+        }
+      }
+    });
+
+    const onEnter = (e: Event) => {
+      // don't add newline
+      e.stopPropagation()
+      e.preventDefault()
+      e.returnValue = false
+      _value.value = (e.target as any).value
     }
-  }
-})
-export default class textareaWithTags extends Vue {
-  @PropSync('value') _value !: string;
-  @Prop() filters !: any[];
-  @Prop() error: boolean | undefined;
-  @Prop() placeholder!: string | undefined;
 
-  height = 0;
-  editation = false;
-  isMounted = false;
-  d_placeholder = !this.placeholder || this.placeholder.trim().length === 0 ? '&nbsp;' : this.placeholder
-
-  get heightStyle() {
-    if (this.height === 0) return 'height: auto'
-    return `height: ${this.height + 2}px`
-  }
-
-  onEnter (e: Event) {
-    // don't add newline
-    e.stopPropagation()
-    e.preventDefault()
-    e.returnValue = false
-    this._value = (e.target as any).value
-  }
-
-  addVariable(variable: string) {
-    this._value = this._value + ' $' + variable;
-    this.editation = true;
-    Vue.nextTick(() => {
-      window.setTimeout(() => {
-        (<HTMLElement>this.$refs.textarea).focus()
-      }, 10)
-    })
-  }
-
-  @Watch('editation')
-  onEditationChanged(val: string, old: string) {
-    if (val) {
-      // focus textarea and set height
-      if (this._value.trim().length === 0) {
-        this.height = (<HTMLElement>this.$refs.placeholder).clientHeight
-      } else this.height = (<HTMLElement>this.$refs.div).clientHeight
-      Vue.nextTick(() => {
-        (<HTMLElement>this.$refs.textarea).focus()
+    const addVariable = (variable: string) => {
+      _value.value = _value.value + ' $' + variable;
+      editation.value = true;
+      context.root.$nextTick(() => {
+        window.setTimeout(() => {
+          if (textarea.value) {
+            textarea.value.focus();
+          }
+        }, 10)
       })
-    } else {
-      // texteare unfocused, set height of div
-      this.height = (<HTMLElement>this.$refs.textarea).clientHeight
+    }
+
+    return {
+      height,
+      editation,
+      d_placeholder,
+      heightStyle,
+      _value,
+      onEnter,
+      addVariable,
+      textarea,
+      placeholder,
+      div,
     }
   }
-}
+});
 </script>
 
 <style>
