@@ -57,7 +57,6 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { sortedUniq, flatten } from 'lodash-es';
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { get } from 'lodash-es';
-import Vue from 'vue';
 
 export default {
   props: ['popout', 'nodrag'],
