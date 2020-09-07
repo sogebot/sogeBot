@@ -30,9 +30,8 @@ import general from '../general';
 import { isDbConnected } from '../helpers/database';
 import permissions from '../permissions';
 import events from '../events';
-import tmi from '../tmi';
-import { flatten } from '../helpers/flatten';
 import users from '../users';
+import { attributesReplace } from '../helpers/attributesReplace';
 
 const timezone = (process.env.TIMEZONE ?? 'system') === 'system' || !process.env.TIMEZONE ? moment.tz.guess() : process.env.TIMEZONE;
 
@@ -479,22 +478,7 @@ class Discord extends Integration {
         return;
       }
 
-      let message = String(operation.messageToSend);
-      const atUsername = tmi.showWithAt;
-
-      const flattenAttributes = flatten(attributes);
-      for (const key of Object.keys(flattenAttributes).sort((a, b) => a.length - b.length)) {
-        let val = flattenAttributes[key];
-        if (typeof val === 'object' && Object.keys(val).length === 0) {
-          continue;
-        } // skip empty object
-        if (key.includes('username') || key.includes('recipient')) {
-          val = atUsername ? `@${val}` : val;
-        }
-        const replace = new RegExp(`\\$${key}`, 'g');
-        message = message.replace(replace, val);
-      }
-
+      const message = attributesReplace(attributes, String(operation.messageToSend));
       const messageContent = await self.replaceLinkedUsernameInMessage(await new Message(message).parse({}));
       const channel = await self.client.guilds.cache.get(self.guild)?.channels.cache.get(dMchannel);
       await (channel as DiscordJs.TextChannel).send(messageContent);

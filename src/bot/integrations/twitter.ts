@@ -15,8 +15,7 @@ import { getRepository } from 'typeorm';
 import { Event } from '../database/entity/event';
 import { WidgetSocial } from '../database/entity/widget';
 import events from '../events';
-import { flatten } from '../helpers/flatten';
-import tmi from '../tmi';
+import { attributesReplace } from '../helpers/attributesReplace';
 
 class Twitter extends Integration {
   public watchedStreams: {
@@ -64,21 +63,8 @@ class Twitter extends Integration {
 
   public async fireSendTwitterMessage(operation: Events.OperationDefinitions, attributes: Events.Attributes): Promise<void> {
     attributes.username = _.get(attributes, 'username', getOwner());
-    let message = String(operation.messageToSend);
-    const flattenAttributes = flatten(attributes);
-    for (const key of Object.keys(flattenAttributes).sort((a, b) => a.length - b.length)) {
-      let val = flattenAttributes[key];
-      if (_.isObject(val) && _.size(val) === 0) {
-        continue;
-      } // skip empty object
-      if (key.includes('username') || key.includes('recipient')) {
-        val = tmi.showWithAt ? `@${val}` : val;
-      }
-      const replace = new RegExp(`\\$${key}`, 'g');
-      message = message.replace(replace, val);
-    }
-    message = await new Message(message).parse();
-    self.send(message);
+    const message = attributesReplace(attributes, String(operation.messageToSend));
+    self.send(await new Message(message).parse());
   }
 
   public send(text: string): void {
