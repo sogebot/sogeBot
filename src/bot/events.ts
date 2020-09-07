@@ -6,6 +6,7 @@ import { setTimeout } from 'timers'; // tslint workaround
 import { isMainThread } from './cluster';
 import Core from './_interface';
 import { flatten } from './helpers/flatten';
+import { attributesReplace } from './helpers/attributesReplace';
 import { announce, getLocalizedName, getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, parserReply, prepare } from './commons';
 import Message from './message';
 import Parser from './parser';
@@ -325,21 +326,7 @@ class Events extends Core {
       return;
     }
 
-    let message = String(operation.messageToSend);
-    const atUsername = tmi.showWithAt;
-
-    const flattenAttributes = flatten(attributes);
-    for (const key of Object.keys(flattenAttributes).sort((a, b) => a.length - b.length)) {
-      let val = flattenAttributes[key];
-      if (_.isObject(val) && _.size(val) === 0) {
-        continue;
-      } // skip empty object
-      if (key.includes('username') || key.includes('recipient')) {
-        val = atUsername ? `@${val}` : val;
-      }
-      const replace = new RegExp(`\\$${key}`, 'g');
-      message = message.replace(replace, val);
-    }
+    const message = attributesReplace(attributes, String(operation.messageToSend));
     parserReply(message, {
       sender: {
         badges: {},
