@@ -91,3 +91,30 @@ Current integration is enabling `$spotifySong` and song requests(PREMIUM) from S
   <strong>bot:</strong> @testuser, song
   Circle of Life - 『ライオン・キング』より from Carmen Twillie was unbanned.
 </blockquote>
+
+### Song history with !spotify history command
+
+`!spotify history` or `!spotify history <numOfSongs>`
+
+!> Default permission is **VIEWERS**
+
+#### Parameters
+
+- `<numOfSongs>` - how many of songs should be returned in history command, if
+  omitted, it will show only last song, maximum 10.
+
+#### Examples
+
+<blockquote>
+  <strong>testuser:</strong> !spotify history<br>
+  <strong>bot:</strong> @testuser, previous song was
+  Circle of Life - 『ライオン・キング』より from Carmen Twillie.
+</blockquote>
+
+
+<blockquote>
+  <strong>testuser:</strong> !spotify history 2<br>
+  <strong>bot:</strong> @testuser, 2 previous songs were:
+  <strong>bot:</strong> 1 - Circle of Life - 『ライオン・キング』より from Carmen Twillie
+  <strong>bot:</strong> 2 - The Wolven Storm (Priscilla's Song) from Alina Gingertail.
+</blockquote>
