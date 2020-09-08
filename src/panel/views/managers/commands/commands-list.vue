@@ -29,9 +29,6 @@
       {{translate('systems.customcommands.empty')}}
     </b-alert>
     <b-table v-else striped small :items="commandsFiltered" :fields="fields" responsive >
-      <template v-slot:cell(count)="data">
-        {{ (count.find(o => o.command === data.item.command) || { count: 0 }).count }}
-      </template>
       <template v-slot:cell(response)="data">
         <span v-if="data.item.responses.length === 0" class="text-muted">{{ translate('systems.customcommands.no-responses-set') }}</span>
         <template v-for="(r, i) of orderBy(data.item.responses, 'order', 'asc')">
@@ -107,6 +104,10 @@ import { getSocket } from '../../../helpers/socket';
 import type { CommandsInterface } from 'src/bot/database/entity/commands';
 import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
 
+let count: {
+  command: string; count: number;
+}[] = [];
+
 @Component({
   components: {
     loading: () => import('../../../components/loading.vue'),
@@ -130,9 +131,6 @@ export default class commandsList extends Vue {
   search = '';
 
   commands: Required<CommandsInterface>[] = [];
-  count: {
-    command: string; id: number;
-  }[] = []
   permissions: any[] = [];
 
   changed: any[] = [];
@@ -148,7 +146,16 @@ export default class commandsList extends Vue {
 
   fields = [
     { key: 'command', label: this.translate('command'), sortable: true },
-    { key: 'count', label: this.capitalize(this.translate('count')), sortable: true },
+    {
+      key: 'count',
+      label: this.capitalize(this.translate('count')),
+      sortable: true,
+      sortByFormatted: true,
+      sortDirection: 'desc',
+      formatter: (value: null, key: undefined, item: Required<CommandsInterface>) => {
+        return (count.find(o => o.command === item.command) || { count: 0 }).count
+      },
+    },
     { key: 'response', label: this.translate('response') },
     { key: 'buttons', label: '' },
   ];
@@ -183,12 +190,12 @@ export default class commandsList extends Vue {
       this.permissions = data;
       this.state.loadingPerm = this.$state.success;
     })
-    this.socket.emit('generic::getAll', (err: string | null, commands: Required<CommandsInterface>[], count: { command: string; id: number }[] ) => {
+    this.socket.emit('generic::getAll', (err: string | null, commands: Required<CommandsInterface>[], countArg: { command: string; count: number }[] ) => {
       if (err) {
         return console.error(err);
       }
       console.debug({ commands, count })
-      this.count = count;
+      count = countArg;
       this.commands = commands;
       this.state.loadingCmd = this.$state.success;
     })
