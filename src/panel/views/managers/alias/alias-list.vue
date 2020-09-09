@@ -30,9 +30,21 @@
     </b-alert>
     <b-card v-else no-body v-for="group of groups" v-bind:key="group">
       <b-card-header header-tag="header" class="p-1" role="tab">
-        <b-button block v-b-toggle="'alias-accordion-' + group" variant="dark" class="text-left">
-          {{group === null ? 'Unnassigned group' : group }} ({{ fItems.filter(o => o.group === group).length }})
-        </b-button>
+        <div class="d-flex">
+          <b-button block v-b-toggle="'alias-accordion-' + group" variant="dark" class="text-left">
+            {{group === null ? 'Unnassigned group' : group }} ({{ fItems.filter(o => o.group === group).length }})
+          </b-button>
+            <hold-button @trigger="removeGroup(group)" icon="trash" class="btn-danger btn-reverse btn-only-icon" v-if="group !== null">
+              <template slot="icon">
+                <font-awesome-layers>
+                  <fa icon="slash" transform="down-1" :mask="['fas', 'object-group']" />
+                  <fa icon="slash" transform="up-1 left-1"/>
+                </font-awesome-layers>
+              </template>
+              <template slot="title">{{translate('dialog.buttons.delete')}}</template>
+              <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+            </hold-button>
+        </div>
       </b-card-header>
       <b-collapse :id="'alias-accordion-' + group" accordion="alias-accordion" role="tabpanel" :visible="group === null">
         <b-card-body>
@@ -117,6 +129,7 @@ import { PermissionsInterface } from 'src/bot/database/entity/permissions';
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
 import { orderBy, isNil } from 'lodash-es';
 import { escape } from 'xregexp';
+import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faKey, faObjectGroup } from '@fortawesome/free-solid-svg-icons';
@@ -125,6 +138,7 @@ library.add(faKey, faObjectGroup);
 @Component({
   components: {
     loading: () => import('../../../components/loading.vue'),
+    'font-awesome-layers': FontAwesomeLayers,
     'hold-button': () => import('../../../components/holdButton.vue'),
   },
 })
@@ -238,11 +252,28 @@ export default class aliasList extends Vue {
     }
   }
 
-  updateGroup (id: string, group: AliasInterface['group']) {
-    let item = this.items.filter((o) => o.id === id)[0]
-    item.group = group
-    this.socket.emit('generic::setById', { id: item.id, item }, () => {})
+  async removeGroup (group: AliasInterface['group']) {
+    const items = this.items.filter((o) => o.group === group);
+    let promises: Promise<void>[] = [];
+    for (const item of items) {
+      item.group = null;
+      promises.push(new Promise(resolve => {
+        this.socket.emit('generic::setById', { id: item.id, item }, () => {
+          resolve();
+        })
+      }))
+    }
+    await Promise.all(promises);
     this.$forceUpdate();
+  }
+
+  updateGroup (id: string, group: AliasInterface['group']) {
+    let item = this.items.find((o) => o.id === id)
+    if (item) {
+      item.group = group
+      this.socket.emit('generic::setById', { id: item.id, item }, () => {})
+      this.$forceUpdate();
+    }
   }
 
   updatePermission (id: string, permission: string) {
