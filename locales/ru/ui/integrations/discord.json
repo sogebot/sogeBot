@@ -4,7 +4,7 @@
     "guild": "Сервер",
     "listenAtChannels": "Слушать на этих каналах",
     "sendOnlineAnnounceToChannel": "Отправить онлайн объявление в этот канал",
-    "sendGeneralAnnounceToChannel": "Отправить общее объявление в этот канал",
+    "sendAnnouncesToChannel": "Setup sending of announcements to channels",
     "deleteMessagesAfterWhile": "Удалить сообщение через некоторое время",
     "clientId": "ClientId",
     "token": "Токен",
