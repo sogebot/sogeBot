@@ -193,7 +193,7 @@ class Events extends Core {
     const cid = await api.createClip({ hasDelay: operation.hasDelay });
     if (cid) { // OK
       if (Boolean(operation.announce) === true) {
-        announce(prepare('api.clips.created', { link: `https://clips.twitch.tv/${cid}` }));
+        announce(prepare('api.clips.created', { link: `https://clips.twitch.tv/${cid}` }), 'general');
       }
       info('Clip was created successfully');
       return cid;

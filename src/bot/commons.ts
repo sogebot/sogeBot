@@ -69,7 +69,8 @@ export async function parserReply(response: string | Promise<string>, opts: { se
  *
  * announce('Lorem Ipsum Dolor');
  */
-export async function announce(messageToAnnounce: string) {
+export const announceTypes = ['bets', 'duel', 'heist', 'timers', 'songs', 'scrim', 'raffles', 'polls', 'general'] as const;
+export async function announce(messageToAnnounce: string, type: typeof announceTypes[number]) {
   messageToAnnounce = await new Message(messageToAnnounce).parse({}) as string;
   sendMessage(messageToAnnounce, {
     username: oauth.botUsername,
@@ -80,11 +81,11 @@ export async function announce(messageToAnnounce: string) {
     'message-type': 'chat',
   }, { force: true, skip: true });
 
-  if (Discord.sendGeneralAnnounceToChannel.length > 0 && Discord.client) {
+  if (Discord.sendAnnouncesToChannel[type].length > 0 && Discord.client) {
     // search discord channel by ID
     for (const [ id, channel ] of Discord.client.channels.cache) {
       if (channel.type === 'text') {
-        if (id === Discord.sendGeneralAnnounceToChannel || (channel as TextChannel).name === Discord.sendGeneralAnnounceToChannel) {
+        if (id === Discord.sendAnnouncesToChannel[type] || (channel as TextChannel).name === Discord.sendAnnouncesToChannel[type]) {
           const ch = Discord.client.channels.cache.find(o => o.id === id);
           if (ch) {
             (ch as TextChannel).send(await Discord.replaceLinkedUsernameInMessage(messageToAnnounce));

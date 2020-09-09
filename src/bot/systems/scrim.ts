@@ -77,7 +77,7 @@ class Scrim extends System {
         type,
         time: minutes,
         unit: getLocalizedName(minutes, 'core.minutes'),
-      }));
+      }), 'scrim');
       return [];
     } catch (e) {
       if (isNaN(Number(e.message))) {
@@ -134,7 +134,7 @@ class Scrim extends System {
             type: this.type,
             time: minutesToGo.toFixed(),
             unit: getLocalizedName(minutesToGo.toFixed(), 'core.minutes'),
-          }));
+          }), 'scrim');
           this.lastRemindAt = Date.now();
         }
       } else if (secondsToGo <= 60 && secondsToGo > 0) {
@@ -144,7 +144,7 @@ class Scrim extends System {
             type: this.type,
             time: String(secondsToGo === 60 ? 1 : secondsToGo),
             unit: secondsToGo === 60 ? getLocalizedName(1, 'core.minutes') : getLocalizedName(secondsToGo, 'core.seconds'),
-          }));
+          }), 'scrim');
           this.lastRemindAt = Date.now();
         }
       } else {
@@ -186,10 +186,10 @@ class Scrim extends System {
               type: this.type,
               time: (3 - i) + '.',
               unit: '',
-            }));
+            }), 'scrim');
         } else {
           this.closingAt = 0;
-          announce(prepare('systems.scrim.go'));
+          announce(prepare('systems.scrim.go'), 'scrim');
           if (!this.isCooldownOnly) {
             setTimeout(() => {
               if (this.closingAt !== 0) {
@@ -198,7 +198,7 @@ class Scrim extends System {
               announce(
                 prepare('systems.scrim.putMatchIdInChat', {
                   command: this.getCommand('!snipe match'),
-                })
+                }), 'scrim'
               );
               setTimeout(async () => {
                 if (this.closingAt !== 0) {
@@ -206,7 +206,7 @@ class Scrim extends System {
                 }
                 const currentMatches = await this.currentMatches({ sender: getBotSender(), parameters: '', createdAt: Date.now(), command: '', attr: {} });
                 for (const r of currentMatches) {
-                  announce(await r.response);
+                  announce(await r.response, 'scrim');
                 }
               }, this.waitForMatchIdsInSeconds * constants.SECOND);
             }, 15 * constants.SECOND);

@@ -94,10 +94,10 @@ class CustomVariables extends Core {
           if (value.isOk) {
             if (variable.urls.find(url => url.id === req.params.id)?.showResponse) {
               if (value.updated.responseType === 0) {
-                announce(prepare('filters.setVariable', { value: value.updated.currentValue, variable: variable }));
+                announce(prepare('filters.setVariable', { value: value.updated.currentValue, variable: variable }), 'general');
               } else if (value.updated.responseType === 1) {
                 if (value.updated.responseText) {
-                  announce(value.updated.responseText.replace('$value', value.updated.currentValue));
+                  announce(value.updated.responseText.replace('$value', value.updated.currentValue), 'general');
                 }
               }
             }

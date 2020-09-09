@@ -93,9 +93,9 @@ class Bets extends System {
 
       if (currentBet.endedAt <= Date.now()) {
         if (currentBet.participations.length > 0) {
-          announce(prepare('bets.locked'));
+          announce(prepare('bets.locked'), 'bets');
         } else {
-          announce(prepare('bets.removed'));
+          announce(prepare('bets.removed'), 'bets');
           await getRepository(BetsEntity).save({...currentBet, isLocked: true});
         }
       }
