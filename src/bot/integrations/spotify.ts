@@ -7,14 +7,15 @@ import { isMainThread } from '../cluster';
 
 import { prepare } from '../commons';
 import { command, default_permission, settings, shared, ui } from '../decorators';
-import { onChange, onStartup } from '../decorators/on';
+import { onChange, onLoad, onStartup } from '../decorators/on';
 import Expects from '../expects';
 import Integration from './_interface';
 import { error, info } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
+import { CommandError } from '../helpers/commandError';
 import api from '../api';
 import { addUIError } from '../panel';
-import { HOUR } from '../constants';
+import { HOUR, SECOND } from '../constants';
 import { ioServer } from '../helpers/panel';
 import { getRepository } from 'typeorm';
 import { SpotifySongBan } from '../database/entity/spotify';
@@ -37,6 +38,9 @@ class Spotify extends Integration {
   client: null | SpotifyWebApi = null;
   retry: { IRefreshToken: number } = { IRefreshToken: 0 };
   state: any = null;
+
+  @shared(true)
+  songsHistory: string[] = [];
   @shared()
   userId: string | null = null;
   @shared()
@@ -108,6 +112,30 @@ class Spotify extends Integration {
     }
   }
 
+  @onLoad('songsHistory')
+  onSongsHistoryLoad() {
+    setInterval(() => {
+      if (this.currentSong !== '{}') {
+        // we need to exclude is_playing and is_enabled from currentSong
+        const currentSong = JSON.parse(this.currentSong);
+        const currentSongWithoutAttributes = JSON.stringify({
+          started_at: currentSong.started_at,
+          song: currentSong.song,
+          artist: currentSong.artist,
+          artists: currentSong.artists,
+          uri: currentSong.uri,
+        });
+        if (!this.songsHistory.includes(currentSongWithoutAttributes)) {
+          this.songsHistory.push(currentSongWithoutAttributes);
+        }
+        // keep only 10 latest songs + 1 current
+        if (this.songsHistory.length > 11) {
+          this.songsHistory.splice(0, 1);
+        }
+      }
+    }, 5 * SECOND);
+  }
+
   @onChange('connection.username')
   onUsernameChange (key: string, value: string) {
     if (value.length > 0) {
@@ -137,6 +165,53 @@ class Spotify extends Integration {
     } else {
       this.disconnect();
     }
+  }
+
+  @command('!spotify history')
+  async cHistory(opts: CommandOptions): Promise<CommandResponse[]> {
+    try {
+      if (this.songsHistory.length <= 1) {
+        // we are expecting more than 1 song (current)
+        throw new CommandError('no-songs-found-in-history');
+      }
+      const numOfSongs = new Expects(opts.parameters).number({ optional: true }).toArray()[0];
+      if (!numOfSongs || numOfSongs <= 1) {
+        const latestSong: any = JSON.parse(this.songsHistory[this.songsHistory.length - 2]);
+        return [{ response: prepare('integrations.spotify.return-one-song-from-history', {
+          artists: latestSong.artists, artist: latestSong.artist, uri: latestSong.uri, name: latestSong.song,
+        }), ...opts }];
+      } else {
+        // return songs in desc order (excl. current song)
+        const actualNumOfSongs = Math.min(this.songsHistory.length - 1, numOfSongs, 10);
+        const responses = [
+          { response: prepare('integrations.spotify.return-multiple-song-from-history', { count: actualNumOfSongs }), ...opts },
+        ];
+        const lowestIndex = Math.max(0, this.songsHistory.length - actualNumOfSongs);
+        for (let index = this.songsHistory.length - 1; index >= lowestIndex ; index--) {
+          if (index - 1 < 0) {
+            break;
+          }
+
+          const song: any = JSON.parse(this.songsHistory[index - 1]);
+          responses.push({
+            response: prepare('integrations.spotify.return-multiple-song-from-history-item', {
+              index: responses.length,
+              artists: song.artists, artist: song.artist, uri: song.uri, name: song.song,
+            }), ...opts,
+          });
+        }
+        return responses;
+      }
+    } catch (e) {
+      if (e instanceof CommandError) {
+        return [{
+          response: prepare('integrations.spotify.' + e.message), ...opts,
+        }];
+      } else {
+        error(e.stack);
+      }
+    }
+    return [];
   }
 
   @command('!spotify skip')
@@ -193,7 +268,7 @@ class Spotify extends Integration {
       let currentSong = JSON.parse(this.currentSong);
       if (typeof currentSong.song === 'undefined' || currentSong.song !== data.body.item.name) {
         currentSong = {
-          finished_at: Date.now() - data.body.item.duration_ms, // may be off ~10s, but its important for requests
+          started_at: Date.now(), // important for song history
           song: data.body.item.name,
           artist: data.body.item.artists[0].name,
           artists: data.body.item.artists.map(o => o.name).join(', '),
