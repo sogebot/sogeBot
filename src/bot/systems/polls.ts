@@ -394,13 +394,13 @@ class Polls extends System {
       announce(prepare(translations, {
         title: vote.title,
         command: this.getCommand('!vote'),
-      }));
+      }), 'polls');
       for (const index of Object.keys(vote.options)) {
         setTimeout(() => {
           if (vote.type === 'normal') {
-            announce(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${vote.options[Number(index)]}`);
+            announce(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${vote.options[Number(index)]}`, 'polls');
           } else {
-            announce(`#vote${(Number(index) + 1)} => ${vote.options[Number(index)]}`);
+            announce(`#vote${(Number(index) + 1)} => ${vote.options[Number(index)]}`, 'polls');
           }
         }, 300 * (Number(index) + 1));
       }

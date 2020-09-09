@@ -138,7 +138,7 @@ class Timers extends System {
       const response = _.orderBy(timer.messages, 'timestamp', 'asc')[0];
 
       if (response) {
-        announce(response.response);
+        announce(response.response, 'timers');
         response.timestamp = Date.now();
         await getRepository(TimerResponse).save(response);
       }

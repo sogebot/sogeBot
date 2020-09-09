@@ -1,3 +1,4 @@
+type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 
 type UserStateTags = import('twitch-js').UserStateTags;
 type KnownNoticeMessageIds = import('twitch-js').KnownNoticeMessageIds;

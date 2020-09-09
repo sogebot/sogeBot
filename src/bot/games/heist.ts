@@ -136,11 +136,11 @@ class Heist extends Game {
         this.startedAt = null;
         await getRepository(HeistUser).clear();
         this.timeouts.iCheckFinished = global.setTimeout(() => this.iCheckFinished(), 10000);
-        announce(this.noUser);
+        announce(this.noUser, 'heist');
         return;
       }
 
-      announce(started.replace('$bank', level.name));
+      announce(started.replace('$bank', level.name), 'heist');
 
       if (users.length === 1) {
         // only one user
@@ -148,7 +148,7 @@ class Heist extends Game {
         const user = users[0];
         const outcome = isSurvivor ? this.singleUserSuccess : this.singleUserFailed;
         global.setTimeout(async () => {
-          announce(outcome.replace('$user', (tmi.showWithAt ? '@' : '') + user.username));
+          announce(outcome.replace('$user', (tmi.showWithAt ? '@' : '') + user.username), 'heist');
         }, 5000);
 
         if (isSurvivor) {
@@ -171,7 +171,7 @@ class Heist extends Game {
         const result = _.find(ordered, (o) => o.percentage >= percentage);
         global.setTimeout(async () => {
           if (!_.isNil(result)) {
-            announce(result.message);
+            announce(result.message, 'heist');
           }
         }, 5000);
         if (winners.length > 0) {
@@ -185,7 +185,7 @@ class Heist extends Game {
             if (andXMore > 0) {
               message = message + ' ' + (await translate('games.heist.andXMore')).replace('$count', andXMore);
             }
-            announce(message);
+            announce(message, 'heist');
           }, 5500);
         }
       }
@@ -199,7 +199,7 @@ class Heist extends Game {
     // check if cops done patrolling
     if (lastHeistTimestamp !== 0 && Date.now() - lastHeistTimestamp >= copsCooldown * 60000) {
       this.lastHeistTimestamp = 0;
-      announce(this.copsCooldown);
+      announce(this.copsCooldown, 'heist');
     }
     this.timeouts.iCheckFinished = global.setTimeout(() => this.iCheckFinished(), 10000);
   }
@@ -229,7 +229,7 @@ class Heist extends Game {
       this.startedAt = Date.now(); // set startedAt
       if (Date.now() - (this.lastAnnouncedStart) >= 60000) {
         this.lastAnnouncedStart = Date.now();
-        announce(prepare('games.heist.entryMessage', { command: opts.command, sender: opts.sender }));
+        announce(prepare('games.heist.entryMessage', { command: opts.command, sender: opts.sender }), 'heist');
       }
     }
 
@@ -279,11 +279,11 @@ class Heist extends Game {
         if (nextLevel) {
           announce(this.nextLevelMessage
             .replace('$bank', level.name)
-            .replace('$nextBank', nextLevel.name));
+            .replace('$nextBank', nextLevel.name), 'heist');
           return [];
         } else {
           announce(this.maxLevelMessage
-            .replace('$bank', level.name));
+            .replace('$bank', level.name), 'heist');
           return [];
         }
       }

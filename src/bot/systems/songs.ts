@@ -427,7 +427,7 @@ class Songs extends System {
       return;
     }
     const message = prepare(translation, { name: currentSong.title, username: currentSong.username });
-    announce(message);
+    announce(message, 'songs');
   }
 
   @command('!playlist steal')

@@ -15,7 +15,7 @@ import { debounce } from '../helpers/debounce';
 import { v5 as uuidv5 } from 'uuid';
 import oauth from '../oauth';
 import Expects from '../expects';
-import { getOwner, isUUID, prepare } from '../commons';
+import { announceTypes, getOwner, isUUID, prepare } from '../commons';
 
 import { getRepository, IsNull, LessThan, Not } from 'typeorm';
 import { Permissions as PermissionsEntity } from '../database/entity/permissions';
@@ -99,7 +99,17 @@ class Discord extends Integration {
     type: 'discord-channel',
     if: () => self.guild.length > 0,
   })
-  sendGeneralAnnounceToChannel = '';
+  sendAnnouncesToChannel: { [key in typeof announceTypes[number]]: string } = {
+    bets: '',
+    duel: '',
+    general: '',
+    heist: '',
+    polls: '',
+    raffles: '',
+    scrim: '',
+    songs: '',
+    timers: '',
+  };
 
   @settings('bot')
   ignorelist: string[] = [];

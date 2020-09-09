@@ -93,7 +93,7 @@ class Duel extends Game {
         tickets: winnerUser.tickets,
         winner: winnerUser.username,
       });
-      announce(m);
+      announce(m, 'duel');
 
       // give user his points
       await getRepository(User).increment({ userId: winnerUser.id }, 'points', total);
@@ -187,7 +187,7 @@ class Duel extends Game {
           minutes: this.duration,
           command: opts.command });
         // if we have discord, we want to send notice on twitch channel as well
-        announce(response);
+        announce(response, 'duel');
       }
 
       const tickets = (await getRepository(DuelEntity).findOne({ id: opts.sender.userId }))?.tickets ?? 0;

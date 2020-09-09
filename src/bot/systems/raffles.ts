@@ -180,7 +180,7 @@ class Raffles extends System {
       max: raffle.maxTickets,
       eligibility: eligibility.join(', '),
     });
-    announce(message);
+    announce(message, 'raffles');
     this.timeouts.raffleAnnounce = global.setTimeout(() => this.announce(), 60000);
   }
 
@@ -263,7 +263,7 @@ class Raffles extends System {
     });
 
     this.lastAnnounce = _.now();
-    announce(response); // we are announcing raffle so it is send to all relevant channels
+    announce(response, 'raffles'); // we are announcing raffle so it is send to all relevant channels
     return [];
   }
 
@@ -475,7 +475,7 @@ class Raffles extends System {
         keyword: raffle.keyword,
         probability: _.round(probability, 2),
       });
-      announce(response);
+      announce(response, 'raffles');
     } else {
       // close raffle on pick
       await getRepository(Raffle).save({...raffle, isClosed: true, timestamp: Date.now()}),
