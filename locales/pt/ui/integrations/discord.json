@@ -4,7 +4,7 @@
     "guild": "Servidor",
     "listenAtChannels": "Escutar comandos neste canal",
     "sendOnlineAnnounceToChannel": "Enviar anúncio online para este canal",
-    "sendGeneralAnnounceToChannel": "Enviar anúncios gerais para este canal",
+    "sendAnnouncesToChannel": "Setup sending of announcements to channels",
     "deleteMessagesAfterWhile": "Excluir mensagem após um tempo",
     "clientId": "ClientId",
     "token": "Token",
