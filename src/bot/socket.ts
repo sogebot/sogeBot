@@ -28,8 +28,8 @@ enum Authorized {
 
 type Unpacked<T> =
   T extends (infer U)[] ? U :
-    T extends (...args: any[]) => infer U ? U :
-      T extends Promise<infer U> ? U :
+    T extends (...args: any[]) => infer R ? R :
+      T extends Promise<infer E> ? E :
         T;
 
 const createDashboardIfNeeded = async (userId: number, opts: { haveAdminPrivileges: Authorized; haveModPrivileges: Authorized; haveViewerPrivileges: Authorized }) => {
