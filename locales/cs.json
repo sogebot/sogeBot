@@ -1162,8 +1162,8 @@
       "winJackpot": "$sender, vyhrál jste JACKPOT! Získal jsi $jackpot $jackpotName navíc ke své sázce. Nyní máte $points $pointsName",
       "loseWithJackpot": "$sender, PROHRÁLS! Aktuálně máš $points $pointsName. Jackpot se zvýšil na $jackpot $jackpotName",
       "lose": "$sender, PROHRÁLS! Aktuálně máš $points $pointsName",
-      "currentJackpot": "$sender, current jackpot for $command is $points $pointsName",
-      "jackpotIsDisabled": "$sender, jackpot is disabled for $command."
+      "currentJackpot": "$sender, současný jackpot pro $command je $points $pointsName",
+      "jackpotIsDisabled": "$sender, jackpot je vypnutý pro $command."
     }
   },
   "highlights": {
