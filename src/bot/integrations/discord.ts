@@ -341,7 +341,7 @@ class Discord extends Integration {
     } catch (e) {
       if (e.message.includes('Expected parameter')) {
         return [
-          { response: prepare('integrations.discord.help-message', { sender: opts.sender }), ...opts },
+          { response: prepare('integrations.discord.help-message', { sender: opts.sender, command: this.getCommand('!link') }), ...opts },
         ];
       } else {
         if (e.message !== String(errors.NOT_UUID)) {
@@ -558,7 +558,7 @@ class Discord extends Integration {
     const channels = this.listenAtChannels.split(',').map(o => o.trim());
     chatIn(`#${channel.name}: ${content} [${author.tag}]`);
     if (msg) {
-      if (content === '!link') {
+      if (content === this.getCommand('!link')) {
         this.removeExpiredLinks();
         const link = await getRepository(DiscordLink).save({
           userId: null,
@@ -570,6 +570,7 @@ class Discord extends Integration {
           tag: msg.author.tag,
           broadcaster: oauth.generalChannel,
           id: link.id,
+          command: this.getCommand('!link'),
         });
         author.send(message);
         whisperOut(`${author.tag}: ${message}`);
@@ -583,7 +584,7 @@ class Discord extends Integration {
           }, 10000);
         }
         return;
-      } else if (content === '!unlink') {
+      } else if (content === this.getCommand('!unlink')) {
         await getRepository(DiscordLink).delete({ tag: author.tag });
         const reply = await msg.reply(prepare('integrations.discord.all-your-links-were-deleted'));
         chatOut(`#${channel.name}: @${author.tag}, ${prepare('integrations.discord.all-your-links-were-deleted')} [${msg.author.tag}]`);
@@ -645,7 +646,7 @@ class Discord extends Integration {
         });
       }
     } catch (e) {
-      const message = `your account is not linked, use \`!link\``;
+      const message = prepare('integrations.discord.your-account-is-not-linked', { command: this.getCommand('!link')});
       if (msg) {
         const reply = await msg.reply(message);
         chatOut(`#${channel.name}: @${author.tag}, ${message} [${author.tag}]`);
