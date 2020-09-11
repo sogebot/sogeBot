@@ -8,7 +8,6 @@ declare module 'vue-headful';
 declare module 'vue-flatpickr-component';
 declare module 'vue-codemirror';
 declare module 'vue-prism-component';
-declare module 'ytsr';
 declare module 'howlongtobeat';
 declare module 'html-entities';
 declare module 'strip-comments';

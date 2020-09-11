@@ -16,6 +16,7 @@ let connectionHash = '';
 
 let ERR_BADAUTH = false;
 
+
 setInterval(() => {
   try {
     if (oauth.broadcasterAccessToken.length > 0 && oauth.broadcasterClientId.length > 0 && oauth.broadcasterId.length > 0) {

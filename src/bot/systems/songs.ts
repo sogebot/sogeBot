@@ -471,19 +471,11 @@ class Songs extends System {
 
     if (_.isNil(videoID.match(idRegex))) { // not id or url]
       try {
-        const search: ytsr.Result['items'] = await new Promise((resolve, reject) => {
-          ytsr(opts.parameters, { limit: 1 }, (err: Error, result: any) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(result.items);
-            }
-          });
-        });
-        if (search.length > 0 && search[0].type === 'video') {
-          const videoId = /^\S+(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)(?<videoId>[^#&?]*).*/gi.exec(search[0].link)?.groups?.videoId;
+        const search = await ytsr(opts.parameters, { limit: 1 });
+        if (search.items.length > 0 && search.items[0].type === 'video') {
+          const videoId = /^\S+(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)(?<videoId>[^#&?]*).*/gi.exec(search.items[0].link)?.groups?.videoId;
           if (!videoId) {
-            throw new Error('VideoID not parsed from ' + search[0].link);
+            throw new Error('VideoID not parsed from ' + search.items[0].link);
           }
           opts.parameters = videoId;
           return this.addSongToQueue(opts);
@@ -642,18 +634,12 @@ class Songs extends System {
   }
 
   async getSongsIdsFromPlaylist (playlist: string) {
-    const get = function ():  Promise<{ items: any[] }> {
-      return new Promise((resolve, reject): any => {
-        ytpl(playlist, { limit: Number.MAX_SAFE_INTEGER }, function (err, pl: { items: any[] }) {
-          if (err) {
-            reject(err);
-          }
-          resolve(pl);
-        });
-      });
-    };
-    const data = await get();
-    return data.items.map(o => o.id);
+    try {
+      const data = await ytpl(playlist, { limit: Number.MAX_SAFE_INTEGER });
+      return data.items.map(o => o.id);
+    } catch (e) {
+      error(e);
+    }
   }
 
   @command('!playlist import')
@@ -664,7 +650,7 @@ class Songs extends System {
     }
     const ids = await this.getSongsIdsFromPlaylist(opts.parameters);
 
-    if (ids.length === 0) {
+    if (!ids || ids.length === 0) {
       return [{ response: prepare('songs.playlist-is-empty'), ...opts, imported: 0, skipped: 0 }];
     } else {
       let imported = 0;
