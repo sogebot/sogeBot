@@ -1099,11 +1099,6 @@ class API extends Core {
       await getRepository(CacheGames).save({ id, name });
       return id;
     } catch (e) {
-      if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        this.calls.bot.remaining = 0;
-        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
-      }
-
       warning(`Couldn't find name of game for name ${name} - fallback to ${this.stats.currentGame}`);
       error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response.status}\n${JSON.stringify(e.response.data, null, 4)}\n\n${e.stack}`);
       if (isMainThread) {
