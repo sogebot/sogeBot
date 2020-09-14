@@ -30,6 +30,9 @@ export const Dashboard = new EntitySchema<Readonly<Required<DashboardInterface>>
     userId: { type: Number },
     createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },
+  indices: [
+    { name: 'IDX_dashboard_userId_createdAt_type', columns: ['userId', 'createdAt', 'type'], unique: true },
+  ],
   relations: {
     widgets: {
       type: 'one-to-many',
