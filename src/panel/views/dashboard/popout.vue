@@ -1,9 +1,11 @@
 <template>
-  <component :is="widget" nodrag :popout="true"></component>
+  <component :is="$route.params.widget" nodrag :popout="true"></component>
 </template>
 
 <script>
-export default {
+import { defineComponent } from '@vue/composition-api'
+
+export default defineComponent({
   components: {
     bets: () => import('src/panel/widgets/components/bets.vue'),
     chat: () => import('src/panel/widgets/components/chat.vue'),
@@ -22,14 +24,6 @@ export default {
     widgetCreate: () => import('src/panel/widgets/components/widget_create.vue'),
     ytplayer: () => import('src/panel/widgets/components/ytplayer.vue'),
     social: () => import('src/panel/widgets/components/social.vue'),
-  },
-  data: function () {
-    return {
-      widget: null
-    }
-  },
-  created() {
-    this.widget = this.$route.params.widget;
   }
-}
+});
 </script>
