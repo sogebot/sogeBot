@@ -1063,7 +1063,7 @@ class API extends Core {
 
   async getGameIdFromName (name: string): Promise<number | null> {
     let request;
-    const url = `https://api.twitch.tv/helix/games?name=${name}`;
+    const url = `https://api.twitch.tv/helix/games?name=${encodeURIComponent(name)}`;
 
     const gameFromDb = await getRepository(CacheGames).findOne({ name });
 
@@ -1091,7 +1091,7 @@ class API extends Core {
       this.calls.bot.limit = request.headers['ratelimit-limit'];
 
       if (isMainThread) {
-        ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
+        ioServer?.emit('api.stats', { method: request.config.method?.toUpperCase(), data: request.data, timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: request.config.url, code: request.status, remaining: this.calls.bot });
       }
 
       // add id->game to cache
@@ -1099,18 +1099,13 @@ class API extends Core {
       await getRepository(CacheGames).save({ id, name });
       return id;
     } catch (e) {
-      if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        this.calls.bot.remaining = 0;
-        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
-      }
-
       warning(`Couldn't find name of game for name ${name} - fallback to ${this.stats.currentGame}`);
-      error(`API: ${url} - ${e.stack}`);
+      error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response.status}\n${JSON.stringify(e.response.data, null, 4)}\n\n${e.stack}`);
       if (isMainThread) {
         if (e.isAxiosError) {
-          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+          ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: e.config.url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
         } else {
-          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+          ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
         }
       }
       return null;
