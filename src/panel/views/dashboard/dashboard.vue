@@ -82,7 +82,11 @@ import { sortBy } from 'lodash-es';
 import VueGridLayout from 'vue-grid-layout';
 import { vueWindowSizeMixin } from 'vue-window-size';
 
-export default {
+import { defineComponent, ref, onMounted } from '@vue/composition-api'
+
+const socket = getSocket('/');
+
+export default defineComponent({
   mixins: [ vueWindowSizeMixin ],
   components: {
     bets: () => import('src/panel/widgets/components/bets.vue'),
@@ -106,86 +110,48 @@ export default {
     GridLayout: VueGridLayout.GridLayout,
     GridItem: VueGridLayout.GridItem,
   },
-  data: function () {
-    return {
-      sortBy,
-      dashboards: [],
+  setup(props, context) {
+    const dashboards = ref([]);
+    const dashboardName = ref('');
+    const addDashboard =  ref(false);
+    const currentDashboard =  ref('');
+    const mainDashboard =  ref('');
+    const show =  ref(true);
+    const isLoaded =  ref(false);
+    const layout =  ref({'null': []});
+    const isLayoutInitialized =  ref(false);
 
-      dashboardName: '',
-      addDashboard: false,
-      currentDashboard: '',
-      mainDashboard: '',
-      show: true,
-      isLoaded: false,
-      layout: {'null': []},
-      isLayoutInitialized: false,
-      socket: getSocket('/')
-    }
-  },
-  async mounted() {
-    this.isLoaded = await Promise.race([
-      new Promise(resolve => {
-        this.socket.emit('panel::dashboards', { userId: Number(this.$store.state.loggedUser.id), type: 'admin' }, (err, dashboards) => {
-          console.groupCollapsed('dashboard::panel::dashboards');
-          console.log({err, dashboards});
-          console.groupEnd();
-          if (err) {
-            return console.error(err);
-          }
-          this.mainDashboard = dashboards[0].id
-          this.currentDashboard = dashboards[0].id;
-          for (const item of dashboards) {
-            this.dashboards.push(item);
-          }
-          this.refreshWidgets();
-          resolve(true);
-        });
-      }),
-      new Promise(resolve => {
-        setTimeout(() => resolve(false), 4000);
-      }),
-    ]);
-    if (!this.isLoaded) {
-      console.error('panel::dashboards not loaded, refreshing page')
-      location.reload();
-    }
-
-    EventBus.$on('remove-widget', (id) => {
-      this.removeWidget(id);
-    });
-  },
-  methods: {
-    refreshWidgets() {
-      const layout = {};
-      for (const dashboard of this.dashboards) {
-        if (typeof layout[dashboard.id] === 'undefined') {
-          layout[dashboard.id] = [];
+    const refreshWidgets = () => {
+      const _layout = {};
+      for (const dashboard of dashboards.value) {
+        if (typeof _layout[dashboard.id] === 'undefined') {
+          _layout[dashboard.id] = [];
         }
         let i = 0;
         for(const widget of dashboard.widgets) {
-          layout[dashboard.id].push({
+          _layout[dashboard.id].push({
             i, x: Number(widget.positionX), y: Number(widget.positionY), w: Number(widget.width), h: Number(widget.height), name: widget.name, id: widget.id,
           });
           i++;
         }
       }
-      this.layout = layout;
+      layout.value = _layout;
       window.setTimeout(() => {
-        this.isLayoutInitialized = true;
+        isLayoutInitialized.value = true;
       }, 1000);
-    },
-    removeWidget(name) {
-      for (const dashboard of this.dashboards) {
+    };
+    const removeWidget = (name) => {
+      for (const dashboard of dashboards.value) {
         dashboard.widgets = dashboard.widgets.filter(o => o.name !== name);
       }
-      this.socket.emit('panel::dashboards::save', this.dashboards)
-      this.refreshWidgets();
-    },
-    updateLayout(layout) {
-      if (this.isLayoutInitialized) {
+      socket.emit('panel::dashboards::save', dashboards.value)
+      refreshWidgets();
+    };
+    const updateLayout = () => {
+      if (isLayoutInitialized.value) {
         console.debug('Layout is initialized, we are executing updateLayout()');
-        for (const dashboard of this.dashboards) {
-          dashboard.widgets = this.layout[dashboard.id].map(o => {
+        for (const dashboard of dashboards.value) {
+          dashboard.widgets = layout.value[dashboard.id].map(o => {
             return {
               id: o.id,
               positionX: o.x,
@@ -197,38 +163,90 @@ export default {
             };
           });
         };
-        this.socket.emit('panel::dashboards::save', this.dashboards)
+        socket.emit('panel::dashboards::save', dashboards.value)
       } else {
         console.debug('Layout is not initialized yet, we are skipping updateLayout()');
       }
-    },
-    removeDashboard: function (dashboardId) {
-      this.dashboards = this.dashboards.filter(o => String(o.id) !== dashboardId)
-      this.currentDashboard = this.dashboards[0].id
-      this.socket.emit('panel::dashboards::save', this.dashboards)
-      this.refreshWidgets();
-    },
-    addWidget: function () {
-      this.socket.emit('panel::dashboards', { userId: Number(this.$store.state.loggedUser.id), type: 'admin' }, (err, dashboards) => {
+    };
+    const removeDashboard = (dashboardId) => {
+      dashboards.value = dashboards.value.filter(o => String(o.id) !== dashboardId)
+      currentDashboard.value = dashboards.value[0].id
+      socket.emit('panel::dashboards::save', dashboards.value)
+      refreshWidgets();
+    };
+    const addWidget = () => {
+      socket.emit('panel::dashboards', { userId: Number(context.root.$store.state.loggedUser.id), type: 'admin' }, (err, dashboards2) => {
         if (err) {
           return console.error(err);
         }
-        this.dashboards = dashboards;
-        this.refreshWidgets();
-        this.isLoaded = true;
+        dashboards.value = dashboards2;
+        refreshWidgets();
+        isLoaded.value = true;
       });
-    },
-    createDashboard: function () {
-      this.socket.emit('panel::dashboards::create', { userId: Number(this.$store.state.loggedUser.id), name: this.dashboardName }, (err, created) => {
+    };
+    const createDashboard = () => {
+      socket.emit('panel::dashboards::create', { userId: Number(context.root.$store.state.loggedUser.id), name: dashboardName.value }, (err, created) => {
         if (err) {
           return console.error(err);
         }
-        this.dashboards.push(created)
+        dashboards.value.push(created)
       })
-      this.dashboardName = ''
-      this.addDashboard = false
-      this.refreshWidgets();
-    },
+      dashboardName.value = ''
+      addDashboard.value = false
+      refreshWidgets();
+    }
+
+    onMounted(async () => {
+      isLoaded.value = await Promise.race([
+        new Promise(resolve => {
+          socket.emit('panel::dashboards', { userId: Number(context.root.$store.state.loggedUser.id), type: 'admin' }, (err, dashboardsFromSocket) => {
+            console.groupCollapsed('dashboard::panel::dashboards');
+            console.log({err, dashboards: dashboardsFromSocket});
+            console.groupEnd();
+            if (err) {
+              return console.error(err);
+            }
+            mainDashboard.value = dashboardsFromSocket[0].id
+            currentDashboard.value = dashboardsFromSocket[0].id;
+            for (const item of dashboardsFromSocket) {
+              dashboards.value.push(item);
+            }
+            refreshWidgets();
+            resolve(true);
+          });
+        }),
+        new Promise(resolve => {
+          setTimeout(() => resolve(false), 4000);
+        }),
+      ]);
+      if (!isLoaded.value) {
+        console.error('panel::dashboards not loaded, refreshing page')
+        location.reload();
+      }
+
+      EventBus.$on('remove-widget', (id) => {
+        removeWidget(id);
+      });
+    })
+
+    return {
+      sortBy,
+      dashboards,
+      dashboardName,
+      addDashboard,
+      currentDashboard,
+      mainDashboard,
+      show,
+      isLoaded,
+      layout,
+      isLayoutInitialized,
+      refreshWidgets,
+      removeWidget,
+      updateLayout,
+      removeDashboard,
+      addWidget,
+      createDashboard,
+    }
   }
-}
+})
 </script>
