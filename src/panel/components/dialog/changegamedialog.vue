@@ -280,27 +280,27 @@ export default defineComponent({
       } else {
         title = (data.value.find(o => o.id === selectedTitle.value) || { title: '' }).title
       }
-      console.debug('EMIT [updateGameAndTitle]', {
+
+      const emit = {
         game: currentGame.value,
         title,
         tags: currentTags.value,
-      })
+      };
+      console.debug('EMIT [updateGameAndTitle]', emit)
       saveState.value = 1
-      socket.emit('updateGameAndTitle', {
-        game: currentGame.value,
-        title,
-        tags: currentTags.value,
-      }, (err: string | null) => {
+      socket.emit('updateGameAndTitle', emit, (err: string | null) => {
         if (err) {
           saveState.value = -1;
         } else {
           saveState.value = 2;
           show.value = false;
-          socket.emit('cleanupGameAndTitle', {
+          const emit = {
             game: currentGame.value,
             title,
-            titles: data
-          }, (err: string | null, dataSocket: any) => {
+            titles: data.value,
+          };
+          console.debug('EMIT [cleanupGameAndTitle]', emit)
+          socket.emit('cleanupGameAndTitle', emit, (err: string | null, dataSocket: any) => {
             data.value = dataSocket
           })
         }
