@@ -601,7 +601,7 @@ class Spotify extends Integration {
             'Authorization': 'Bearer ' + this.client.getAccessToken(),
           },
         });
-        ioServer?.emit('api.stats', { method: 'GET', data: response.data, timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: response.headers.url, code: response.status });
+        ioServer?.emit('api.stats', { method: response.config.method?.toUpperCase(), data: response.data, timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: response.config.url, code: response.status });
 
         const track = response.data as SpotifyTrack;
         if(await this.requestSongByAPI(track.uri)) {
@@ -622,7 +622,7 @@ class Spotify extends Integration {
             'Content-Type': 'application/json',
           },
         });
-        ioServer?.emit('api.stats', { method: 'GET', data: response.data, timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: response.headers.url, code: response.status });
+        ioServer?.emit('api.stats', { method: response.config.method?.toUpperCase(), data: response.data, timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: response.config.url, code: response.status });
 
         const track = (response.data.tracks.items[0] as SpotifyTrack);
         if(await this.requestSongByAPI(track.uri)) {
@@ -641,7 +641,7 @@ class Spotify extends Integration {
       } else if (e.response.status === 403) {
         error(`${chalk.bgRed('SPOTIFY')}: you don't seem to have spotify PREMIUM.`);
       }
-      ioServer?.emit('api.stats', { method: 'GET', data: e.message, timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: e.response.headers.url, code: e.response.status });
+      ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: e.config.url, code: e.response.status ?? 'n/a', data: e.response.data });
 
       return [{ response: prepare('integrations.spotify.song-not-found'), ...opts }];
     }
