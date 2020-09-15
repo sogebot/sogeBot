@@ -11,7 +11,7 @@
                   :text="translate('dialog.buttons.' + this.text + '.idle')"
                   v-else-if="state === 0"/>
   <buttonWithIcon icon="spinner"
-                  spin="true"
+                  spin
                   :class="cl || 'btn-primary'"
                   disabled
                   :text="translate('dialog.buttons.' + this.text + '.progress')"

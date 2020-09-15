@@ -121,183 +121,204 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, ref, onMounted, getCurrentInstance, computed } from '@vue/composition-api'
+import type { Ref } from '@vue/composition-api'
+
 import { getSocket } from 'src/panel/helpers/socket';
 
 import { AliasInterface } from 'src/bot/database/entity/alias';
 import { PermissionsInterface } from 'src/bot/database/entity/permissions';
 
-import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
 import { orderBy, isNil } from 'lodash-es';
 import { escape } from 'xregexp';
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faKey, faObjectGroup } from '@fortawesome/free-solid-svg-icons';
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import translate from 'src/panel/helpers/translate';
 library.add(faKey, faObjectGroup);
 
-@Component({
+const socket = {
+  permission: getSocket('/core/permissions'),
+  alias: getSocket('/systems/alias'),
+} as const;
+
+export default defineComponent({
   components: {
     loading: () => import('../../../components/loading.vue'),
     'font-awesome-layers': FontAwesomeLayers,
     'hold-button': () => import('../../../components/holdButton.vue'),
   },
-})
-export default class aliasList extends Vue {
-  socket = getSocket('/systems/alias');
-  psocket = getSocket('/core/permissions')
+  setup(props, context) {
+    const instance = getCurrentInstance();
 
-  items: AliasInterface[] = [];
-  permissions: PermissionsInterface[] = [];
+    const items: Ref<AliasInterface[]> = ref([]);
+    const permissions: Ref<PermissionsInterface[]> = ref([]);
 
-  newGroupForAliasId = '';
-  newGroupName = '';
-  newGroupNameUpdated = false;
+    const newGroupForAliasId = ref('');
+    const newGroupName = ref('');
+    const newGroupNameUpdated = ref(false);
 
-  search: string = '';
-  state: {
-    loadingAls: number;
-    loadingPrm: number;
-  } = {
-    loadingAls: this.$state.progress,
-    loadingPrm: this.$state.progress,
-  }
+    const search = ref('');
+    const state: Ref<{
+      loadingAls: number;
+      loadingPrm: number;
+    }> = ref({
+      loadingAls: ButtonStates.progress,
+      loadingPrm: ButtonStates.idle,
+    });
 
-  fields = [
-    { key: 'alias', label: this.translate('alias'), sortable: true },
-    { key: 'command', label: this.translate('command'), sortable: true },
-    { key: 'permission',
-      label: this.translate('permission'),
-      sortable: true,
-      formatter: (value: string, key: string, item: aliasList['items'][0]) => {
-        return this.getPermissionName(value);
-      },
-      sortByFormatted: true, },
-    { key: 'buttons', label: '' },
-  ];
-
-  resetModal() {
-    this.newGroupName = '';
-    this.newGroupNameUpdated = false;
-  }
-
-  handleOk(bvModalEvt: Event) {
-    // Prevent modal from closing
-    bvModalEvt.preventDefault()
-    // Trigger submit handler
-    this.handleSubmit()
-  }
-
-  handleSubmit() {
-    if (!this.newGroupNameValidity) {
-      return;
-    }
-
-    this.updateGroup(this.newGroupForAliasId, this.newGroupName);
-    // Hide the modal manually
-    this.$nextTick(() => {
-      this.$bvModal.hide('create-new-group')
-    })
-  }
-
-  get newGroupNameValidity() {
-    if (this.newGroupNameUpdated) {
-      return this.newGroupName.length > 0;
-    } else {
-      return null;
-    }
-  }
-
-  get groups() {
-    return [null, ...new Set(this.items.filter(o => o.group !== null).map(o => o.group).sort())];
-  }
-
-  get fItems() {
-    if (this.search.length === 0) return this.items
-    return this.items.filter((o) => {
-      const isSearchInAlias = !isNil(o.alias.match(new RegExp(escape(this.search), 'ig')))
-      const isSearchInCommand = !isNil(o.command.match(new RegExp(escape(this.search), 'ig')))
-      return isSearchInAlias || isSearchInCommand
-    })
-  }
-
-  created() {
-    this.state.loadingAls = this.$state.progress;
-    this.state.loadingPrm = this.$state.progress;
-    this.psocket.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
-  if(err) {
-    return console.error(err);
-  }
-      this.permissions = data;
-      this.state.loadingPrm = this.$state.success;
-    })
-    this.socket.emit('generic::getAll', (err: string | null, items: aliasList['items']) => {
-      this.items = orderBy(items, 'alias', 'asc');
-      this.state.loadingAls = this.$state.success;
-    })
-  }
-
-  getPermissionName (id: string | null) {
-    if (!id) return 'Disabled'
-    const permission = this.permissions.find((o) => {
-      return o.id === id
-    })
-    if (typeof permission !== 'undefined') {
-      if (permission.name.trim() === '') {
-        return permission.id
+    const newGroupNameValidity = computed(() => {
+      if (newGroupNameUpdated.value) {
+        return newGroupName.value.length > 0;
       } else {
-        return permission.name
+        return null;
       }
-    } else {
-      return null
-    }
-  }
+    });
+    const groups = computed(() => {
+      return [null, ...new Set(items.value.filter(o => o.group !== null).map(o => o.group).sort())];
+    });
+    const fItems = computed(() => {
+      if (search.value.length === 0) return items.value
+      return items.value.filter((o) => {
+        const isSearchInAlias = !isNil(o.alias.match(new RegExp(escape(search.value), 'ig')))
+        const isSearchInCommand = !isNil(o.command.match(new RegExp(escape(search.value), 'ig')))
+        return isSearchInAlias || isSearchInCommand
+      })
+    });
 
-  async removeGroup (group: AliasInterface['group']) {
-    const items = this.items.filter((o) => o.group === group);
-    let promises: Promise<void>[] = [];
-    for (const item of items) {
-      item.group = null;
-      promises.push(new Promise(resolve => {
-        this.socket.emit('generic::setById', { id: item.id, item }, () => {
-          resolve();
-        })
-      }))
-    }
-    await Promise.all(promises);
-    this.$forceUpdate();
-  }
+    const fields = [
+      { key: 'alias', label: translate('alias'), sortable: true },
+      { key: 'command', label: translate('command'), sortable: true },
+      {
+        key: 'permission',
+        label: translate('permission'),
+        sortable: true,
+        formatter: (value: string, key: string, item: typeof items.value[number]) => {
+          return getPermissionName(value);
+        },
+        sortByFormatted: true,
+      },
+      { key: 'buttons', label: '' },
+    ];
 
-  updateGroup (id: string, group: AliasInterface['group']) {
-    let item = this.items.find((o) => o.id === id)
-    if (item) {
-      item.group = group
-      this.socket.emit('generic::setById', { id: item.id, item }, () => {})
-      this.$forceUpdate();
-    }
-  }
-
-  updatePermission (id: string, permission: string) {
-    let item = this.items.filter((o) => o.id === id)[0]
-    item.permission = permission
-    this.socket.emit('generic::setById', { id: item.id, item }, () => {})
-    this.$forceUpdate();
-  }
-
-  linkTo(item: Required<AliasInterface>) {
-    console.debug('Clicked', item.id);
-    this.$router.push({ name: 'aliasManagerEdit', params: { id: item.id } });
-  }
-
-  remove(id: string) {
-   this.socket.emit('generic::deleteById', id, () => {
-      this.items = this.items.filter((o) => o.id !== id)
+    onMounted(() => {
+      state.value.loadingAls = ButtonStates.progress;
+      state.value.loadingPrm = ButtonStates.progress;
+      socket.permission.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
+        if(err) {
+          return console.error(err);
+        }
+        permissions.value = data;
+        state.value.loadingPrm = ButtonStates.success;
+      })
+      socket.alias.emit('generic::getAll', (err: string | null, itemsGetAll: typeof items.value) => {
+        items.value = orderBy(itemsGetAll, 'alias', 'asc');
+        state.value.loadingAls = ButtonStates.success;
+      })
     })
-  }
 
-  update(item: aliasList['items'][number]) {
-    this.socket.emit('generic::setById', { id: item.id, item }, () => {})
+    const getPermissionName = (id: string | null) => {
+      if (!id) return 'Disabled'
+      const permission = permissions.value.find((o) => {
+        return o.id === id
+      })
+      if (typeof permission !== 'undefined') {
+        if (permission.name.trim() === '') {
+          return permission.id
+        } else {
+          return permission.name
+        }
+      } else {
+        return null
+      }
+    };
+    const removeGroup = async (group: AliasInterface['group']) => {
+      let promises: Promise<void>[] = [];
+      for (const item of items.value.filter((o) => o.group === group)) {
+        item.group = null;
+        promises.push(new Promise(resolve => {
+          socket.alias.emit('generic::setById', { id: item.id, item }, () => {
+            resolve();
+          })
+        }))
+      }
+      await Promise.all(promises);
+      context.root.$forceUpdate();
+    }
+    const updateGroup = (id: string, group: AliasInterface['group']) => {
+      let item = items.value.find((o) => o.id === id)
+      if (item) {
+        item.group = group
+        socket.alias.emit('generic::setById', { id: item.id, item }, () => {})
+        context.root.$forceUpdate();
+      }
+    }
+    const updatePermission = (id: string, permission: string) => {
+      let item = items.value.filter((o) => o.id === id)[0]
+      item.permission = permission
+      socket.alias.emit('generic::setById', { id: item.id, item }, () => {})
+      context.root.$forceUpdate();
+    }
+    const linkTo = (item: Required<AliasInterface>) => {
+      console.debug('Clicked', item.id);
+      context.root.$router.push({ name: 'aliasManagerEdit', params: { id: item.id } }).catch(() => {});
+    }
+    const remove = (id: string) => {
+      socket.alias.emit('generic::deleteById', id, () => {
+        items.value = items.value.filter((o) => o.id !== id)
+      })
+    }
+    const update = (item: typeof items.value[number]) => {
+      socket.alias.emit('generic::setById', { id: item.id, item }, () => {})
+    }
+    const resetModal = () => {
+      newGroupName.value = '';
+      newGroupNameUpdated.value = false;
+    }
+    const handleOk = (bvModalEvt: Event) => {
+      // Prevent modal from closing
+      bvModalEvt.preventDefault()
+      // Trigger submit handler
+      handleSubmit()
+    }
+    const handleSubmit = () => {
+      if (!newGroupNameValidity.value) {
+        return;
+      }
+
+      updateGroup(newGroupForAliasId.value, newGroupName.value);
+      // Hide the modal manually
+      context.root.$nextTick(() => {
+        instance?.$bvModal.hide('create-new-group')
+      })
+    }
+
+    return {
+      items,
+      permissions,
+      newGroupForAliasId,
+      newGroupName,
+      newGroupNameUpdated,
+      search,
+      state,
+      fields,
+      newGroupNameValidity,
+      groups,
+      fItems,
+      removeGroup,
+      updateGroup,
+      updatePermission,
+      linkTo,
+      remove,
+      update,
+      resetModal,
+      handleOk,
+      handleSubmit,
+    }
   }
-}
+})
 </script>
 
 <style>
