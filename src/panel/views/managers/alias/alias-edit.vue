@@ -71,18 +71,24 @@
       <b-form-group>
         <label>{{ translate('systems.alias.command.name') }}</label>
         <textarea-with-tags
+          @input="$v.item.command.$touch()"
           :value.sync="item.command"
-          v-bind:placeholder="translate('systems.alias.command.placeholder')"
+          :placeholder="translate('systems.alias.command.placeholder')"
           v-bind:filters="['global', 'sender', 'param', '!param', 'touser']"
+          :state="$v.item.command.$invalid && $v.item.command.$dirty ? false : null"
           v-on:update="item.command = $event"></textarea-with-tags>
+        <b-form-invalid-feedback :state="!($v.item.command.$invalid && $v.item.command.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
       </b-form-group>
     </b-form>
   </b-container>
 </template>
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator';
+import { defineComponent, ref, onMounted, watch, getCurrentInstance } from '@vue/composition-api'
+import type { Ref } from '@vue/composition-api'
+
 import { getSocket } from 'src/panel/helpers/socket';
 import { permission } from 'src/bot/helpers/permissions'
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
 
 import { Route } from 'vue-router'
 import { NextFunction } from 'express';
@@ -90,7 +96,7 @@ import { NextFunction } from 'express';
 import { AliasInterface } from 'src/bot/database/entity/alias';
 import { PermissionsInterface } from 'src/bot/database/entity/permissions';
 
-import { Validations } from 'vuelidate-property-decorators';
+import { validationMixin } from 'vuelidate'
 import { required } from 'vuelidate/lib/validators'
 import { orderBy } from 'lodash-es'
 
@@ -100,13 +106,13 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faKey } from '@fortawesome/free-solid-svg-icons';
 library.add(faKey);
 
-Component.registerHooks([
-  'beforeRouteEnter',
-  'beforeRouteLeave',
-  'beforeRouteUpdate' // for vue-router 2.2+
-])
+const socket = {
+  permission: getSocket('/core/permissions'),
+  alias: getSocket('/systems/alias'),
+} as const;
 
-@Component({
+export default defineComponent({
+  mixins: [ validationMixin ],
   components: {
     'loading': () => import('../../../components/loading.vue'),
   },
@@ -116,136 +122,13 @@ Component.registerHooks([
       value = value.toString()
       return value.charAt(0).toUpperCase() + value.slice(1)
     }
-  }
-})
-export default class aliasEdit extends Vue {
-  psocket = getSocket('/core/permissions')
-  socket = getSocket('/systems/alias');
-
-  state: {
-    loading: number;
-    save: number;
-    pending: boolean;
-  } = {
-    loading: this.$state.progress,
-    save: this.$state.idle,
-    pending: false,
-  }
-
-  permissions: PermissionsInterface[] = [];
-
-  item: AliasInterface = {
-    id: uuid(),
-    alias: '',
-    command: '',
-    enabled: true,
-    visible: true,
-    permission: permission.VIEWERS,
-    group: null,
-  }
-
-
-  @Validations()
-  validations = {
+  },
+  validations: {
     item: {
       alias: {required},
       command: {required},
     }
-  }
-
-  @Watch('item', { deep: true })
-  pending() {
-    if (this.state.loading === this.$state.success) {
-      this.state.pending = true;
-    }
-  }
-
-  @Watch('item.alias')
-  checkAliasFormat(val: string) {
-    if (!val.startsWith('!')) {
-      Vue.set(this.item, 'alias', '!' + val);
-    }
-  }
-
-  async mounted() {
-    await new Promise((resolve) => {
-      this.psocket.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
-        if(err) {
-          return console.error(err);
-        }
-        this.permissions = orderBy(data, 'order', 'asc');
-        resolve()
-      })
-    })
-
-    if (this.$route.params.id) {
-      await new Promise((resolve, reject) => {
-        this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, data: AliasInterface) => {
-          if (err) {
-            reject(err)
-          }
-
-          this.item = data
-          resolve();
-        })
-      })
-    }
-
-    this.$nextTick(() => {
-      this.state.loading = this.$state.success;
-    })
-  }
-
-  del() {
-    this.socket.emit('generic::deleteById', this.$route.params.id, (err: string | null) => {
-      if (err) {
-        return console.error(err);
-      }
-      this.$router.push({ name: 'aliasManagerList' })
-    })
-  }
-
-  getPermissionName (id: string | null) {
-    if (!id) return 'Disabled'
-    const permission = this.permissions.find((o) => {
-      return o.id === id
-    })
-    if (typeof permission !== 'undefined') {
-      if (permission.name.trim() === '') {
-        return permission.id
-      } else {
-        return permission.name
-      }
-    } else {
-      return null
-    }
-  }
-
-
-  save() {
-    this.$v.$touch();
-    if (!this.$v.$invalid) {
-      this.state.save = this.$state.progress;
-
-      this.socket.emit('generic::setById', { id: this.$route.params.id, item: this.item }, (err: string | null, data: aliasEdit['item']) => {
-        if (err) {
-          this.state.save = this.$state.fail;
-          return console.error(err);
-        }
-
-        console.groupCollapsed('generic::setById')
-        console.log({data})
-        console.groupEnd();
-        this.state.save = this.$state.success;
-        this.state.pending = false;
-        this.$router.push({ name: 'aliasManagerEdit', params: { id: String(data.id) } })
-        setTimeout(() => {
-          this.state.save = this.$state.idle;
-        }, 1000)
-      });
-    }
-  }
-
+  },
   beforeRouteUpdate(to: Route, from: Route, next: NextFunction) {
     if (this.state.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
@@ -257,8 +140,7 @@ export default class aliasEdit extends Vue {
     } else {
       next();
     }
-  }
-
+  },
   beforeRouteLeave(to: Route, from: Route, next: NextFunction) {
     if (this.state.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
@@ -270,8 +152,130 @@ export default class aliasEdit extends Vue {
     } else {
       next();
     }
+  },
+  setup(props, context) {
+    const instance = getCurrentInstance();
+    const state: Ref<{
+      loading: number;
+      save: number;
+      pending: boolean;
+    }> = ref({
+      loading: ButtonStates.progress,
+      save: ButtonStates.idle,
+      pending: false,
+    });
+    const permissions: Ref<PermissionsInterface[]> = ref([]);
+    const item: Ref<AliasInterface> = ref({
+      id: uuid(),
+      alias: '',
+      command: '',
+      enabled: true,
+      visible: true,
+      permission: permission.VIEWERS,
+      group: null,
+    });
+
+    watch(item, () => {
+      if (state.value.loading === ButtonStates.success) {
+        state.value.pending = true;
+      }
+    }, { deep: true });
+    watch(() => item.value.alias, (value) => {
+      if (value.length > 0) {
+        if (!value.startsWith('!')) {
+          item.value.alias = '!' + value;
+        }
+      }
+    });
+
+    onMounted(async () => {
+      await new Promise((resolve) => {
+        socket.permission.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
+          if(err) {
+            return console.error(err);
+          }
+          permissions.value = orderBy(data, 'order', 'asc');
+          resolve()
+        })
+      })
+
+      if (context.root.$route.params.id) {
+        await new Promise((resolve, reject) => {
+          socket.alias.emit('generic::getOne', context.root.$route.params.id, (err: string | null, data: AliasInterface) => {
+            if (err) {
+              reject(err)
+            }
+
+            item.value = data
+            resolve();
+          })
+        })
+      }
+
+      context.root.$nextTick(() => {
+        state.value.loading = ButtonStates.success;
+      })
+    });
+
+    const del = () => {
+      socket.alias.emit('generic::deleteById', context.root.$route.params.id, (err: string | null) => {
+        if (err) {
+          return console.error(err);
+        }
+        context.root.$router.push({ name: 'aliasManagerList' })
+      });
+    }
+    const getPermissionName = (id: string | null) => {
+      if (!id) return 'Disabled'
+      const permission = permissions.value.find((o) => {
+        return o.id === id
+      })
+      if (typeof permission !== 'undefined') {
+        if (permission.name.trim() === '') {
+          return permission.id
+        } else {
+          return permission.name
+        }
+      } else {
+        return null
+      }
+    }
+    const save = () =>  {
+      const $v = instance?.$v;
+      console.log({instance, $v})
+      $v?.$touch();
+      if (!$v?.$invalid) {
+        state.value.save = ButtonStates.progress;
+
+        socket.alias.emit('generic::setById', { id: context.root.$route.params.id, item: item.value }, (err: string | null, data: typeof item.value) => {
+          if (err) {
+            state.value.save = ButtonStates.fail;
+            return console.error(err);
+          }
+
+          console.groupCollapsed('generic::setById')
+          console.log({data})
+          console.groupEnd();
+          state.value.save = ButtonStates.success;
+          state.value.pending = false;
+          context.root.$router.push({ name: 'aliasManagerEdit', params: { id: String(data.id) } }).catch(() => {});
+          setTimeout(() => {
+            state.value.save = ButtonStates.idle;
+          }, 1000)
+        });
+      }
   }
-}
+
+    return {
+      state,
+      permissions,
+      item,
+      del,
+      getPermissionName,
+      save,
+    }
+  }
+});
 </script>
 
 <style>

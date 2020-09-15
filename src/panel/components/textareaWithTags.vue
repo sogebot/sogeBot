@@ -1,19 +1,18 @@
 <template>
   <div style="flex: 1 1 auto; height: fit-content; height: -moz-fit-content;"
     class="border-0 p-0 m-0 d-flex"
-    v-bind:class="{ 'is-invalid': error }">
-
+    v-bind:class="{ 'is-invalid': error || state === false }">
     <textarea style="min-height: 6em;" v-show="editation" v-on:keydown.enter="onEnter" v-on:blur="editation = false" ref="textarea" v-model="_value" v-bind:placeholder="placeholder" class="form-control" v-bind:style="heightStyle"></textarea>
 
-    <div class="form-control" ref="placeholder" style="cursor: text; overflow: auto; resize: vertical; min-height: 6em;"
-      v-bind:class="{ 'is-invalid': error }"
+    <div class="form-control" ref="placeholderRef" style="cursor: text; overflow: auto; resize: vertical; min-height: 6em;"
+      v-bind:class="{ 'is-invalid': error || state === false }"
       v-show="!editation && _value.trim().length === 0"
       v-bind:style="heightStyle"
       v-on:click="editation=true"><span class="text-muted" v-html="d_placeholder"></span>
     </div>
 
     <div class="form-control" ref="div" style="word-break: break-all; cursor: text; overflow: auto; resize: vertical; min-height: 6em;"
-      v-bind:class="{ 'is-invalid': error }"
+      v-bind:class="{ 'is-invalid': error || state === false }"
       v-show="!editation && _value.trim().length > 0"
       v-on:click="editation=true"
       v-bind:style="heightStyle"
@@ -74,6 +73,7 @@ interface Props {
   filters: any[];
   error?: boolean;
   placeholder?: string;
+  state: boolean | null;
 }
 
 export default defineComponent({
@@ -99,6 +99,7 @@ export default defineComponent({
     filters: Array,
     error: Boolean,
     placeholder: String,
+    state: [Boolean, Object],
   },
   setup(props: Props, context) {
     const height = ref(0);
@@ -108,7 +109,7 @@ export default defineComponent({
 
     // refs
     const textarea: Ref<HTMLElement | null> = ref(null);
-    const placeholder: Ref<HTMLElement | null> = ref(null);
+    const placeholderRef: Ref<HTMLElement | null> = ref(null);
     const div: Ref<HTMLElement | null> = ref(null);
 
     const heightStyle = computed(() => {
@@ -116,13 +117,16 @@ export default defineComponent({
       return `height: ${height.value + 2}px`
     });
 
-    watch(_value, (val) => context.emit('update:value', val));
+    watch(_value, (val) => {
+      context.emit('update:value', val)
+      context.emit('input')
+    });
     watch(editation, (val, old) => {
-      if (textarea.value && placeholder.value && div.value) {
+      if (textarea.value && placeholderRef.value && div.value) {
         if (val) {
           // focus textarea and set height
           if (_value.value.trim().length === 0) {
-            height.value = placeholder.value.clientHeight
+            height.value = placeholderRef.value.clientHeight
           } else height.value = div.value.clientHeight
           context.root.$nextTick(() => {
             textarea.value?.focus()
@@ -163,7 +167,7 @@ export default defineComponent({
       onEnter,
       addVariable,
       textarea,
-      placeholder,
+      placeholderRef,
       div,
     }
   }
