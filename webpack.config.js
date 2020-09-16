@@ -1,5 +1,6 @@
 const path = require('path');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
@@ -61,8 +62,11 @@ const webpackConfig = {
     new webpack.DefinePlugin({
       'process.env.BUILD': JSON.stringify('web'), // we need this until https://github.com/vuelidate/vuelidate/issues/365 is fixed
       'process.env.NODE_DEBUG': process.env.NODE_DEBUG, // 'util' need it
+      __VUE_OPTIONS_API__: true,
+      __VUE_PROD_DEVTOOLS__: false,
     }),
     new VueLoaderPlugin(),
+    new MiniCssExtractPlugin(),
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       filename: '../../popout.html', template: 'src/panel/popout.html', chunks: ['popout']
@@ -139,31 +143,8 @@ const webpackConfig = {
         ]
       },
       {
-        test: /\.css$/,
-        oneOf: [
-          // this applies to <style module>
-          {
-            resourceQuery: /module/,
-            use: [
-              'vue-style-loader',
-              {
-                loader: 'css-loader',
-                options: {
-                  modules: true,
-                  cacheDirectory: true,
-                  localIdentName: '[local]_[hash:base64:8]'
-                }
-              }
-            ]
-          },
-          // this applies to <style> or <style scoped>
-          {
-            use: [
-              'vue-style-loader',
-              'css-loader'
-            ]
-          }
-        ]
+        test: /\.css$/i,
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
       }
     ]
   }
