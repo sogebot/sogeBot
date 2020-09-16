@@ -33,7 +33,7 @@
             <span class="dropdown-icon">
               <fa icon="key" fixed-width/>
             </span>
-            {{ getPermissionName(item.permission) }}
+            {{ getPermissionName(item.permission, permissions) }}
           </template>
           <b-dropdown-item
             v-for="permission of permissions"
@@ -87,6 +87,7 @@ import { defineComponent, ref, onMounted, watch, getCurrentInstance } from '@vue
 import type { Ref } from '@vue/composition-api'
 
 import { getSocket } from 'src/panel/helpers/socket';
+import { getPermissionName } from 'src/panel/helpers/getPermissionName';
 import { permission } from 'src/bot/helpers/permissions'
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 
@@ -225,24 +226,8 @@ export default defineComponent({
         context.root.$router.push({ name: 'aliasManagerList' })
       });
     }
-    const getPermissionName = (id: string | null) => {
-      if (!id) return 'Disabled'
-      const permission = permissions.value.find((o) => {
-        return o.id === id
-      })
-      if (typeof permission !== 'undefined') {
-        if (permission.name.trim() === '') {
-          return permission.id
-        } else {
-          return permission.name
-        }
-      } else {
-        return null
-      }
-    }
     const save = () =>  {
       const $v = instance?.$v;
-      console.log({instance, $v})
       $v?.$touch();
       if (!$v?.$invalid) {
         state.value.save = ButtonStates.progress;

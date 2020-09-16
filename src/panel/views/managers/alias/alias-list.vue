@@ -125,6 +125,7 @@ import { defineComponent, ref, onMounted, getCurrentInstance, computed } from '@
 import type { Ref } from '@vue/composition-api'
 
 import { getSocket } from 'src/panel/helpers/socket';
+import { getPermissionName } from 'src/panel/helpers/getPermissionName';
 
 import { AliasInterface } from 'src/bot/database/entity/alias';
 import { PermissionsInterface } from 'src/bot/database/entity/permissions';
@@ -196,7 +197,7 @@ export default defineComponent({
         label: translate('permission'),
         sortable: true,
         formatter: (value: string, key: string, item: typeof items.value[number]) => {
-          return getPermissionName(value);
+          return getPermissionName(value, permissions.value);
         },
         sortByFormatted: true,
       },
@@ -218,22 +219,6 @@ export default defineComponent({
         state.value.loadingAls = ButtonStates.success;
       })
     })
-
-    const getPermissionName = (id: string | null) => {
-      if (!id) return 'Disabled'
-      const permission = permissions.value.find((o) => {
-        return o.id === id
-      })
-      if (typeof permission !== 'undefined') {
-        if (permission.name.trim() === '') {
-          return permission.id
-        } else {
-          return permission.name
-        }
-      } else {
-        return null
-      }
-    };
     const removeGroup = async (group: AliasInterface['group']) => {
       let promises: Promise<void>[] = [];
       for (const item of items.value.filter((o) => o.group === group)) {
