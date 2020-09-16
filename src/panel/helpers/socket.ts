@@ -58,6 +58,9 @@ export function getSocket(namespace: string, continueOnUnauthorized = false) {
         });
       }
     } else {
+      if (error === 'Invalid namespace') {
+        throw new Error(error + ' ' + namespace);
+      }
       redirectLogin();
     }
   });

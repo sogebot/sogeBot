@@ -14,6 +14,9 @@ interface Props {
 }
 
 export default defineComponent({
+  props: {
+    value: String,
+  },
   setup(props: Props, context) {
     const filter = (val: string) => {
       const filtersRegExp = new RegExp('\\$(' + sortBy(keys(flatten(translate('responses.variable', true))), (o) => -o.length).join('|') + ')', 'g');

@@ -21,11 +21,11 @@
       </template>
     </panel>
 
-    <loading v-if="state.loadingCmd === 1 || state.loadingPerm === 1"/>
-    <b-alert show variant="danger" v-else-if="state.loadingCmd === 2 && state.loadingPerm === 2 && commandsFiltered.length === 0 && search.length > 0">
+    <loading v-if="state.loadedCmd === 1 || state.loadedPerm === 1"/>
+    <b-alert show variant="danger" v-else-if="state.loadedCmd === 2 && state.loadedPerm === 2 && commandsFiltered.length === 0 && search.length > 0">
       <fa icon="search"/> <span v-html="translate('systems.customcommands.emptyAfterSearch').replace('$search', search)"/>
     </b-alert>
-    <b-alert show v-else-if="state.loadingCmd === 2 && state.loadingPerm === 2 && commands.length === 0">
+    <b-alert show v-else-if="state.loadedCmd === 2 && state.loadedPerm === 2 && commands.length === 0">
       {{translate('systems.customcommands.empty')}}
     </b-alert>
     <b-table v-else striped small :items="commandsFiltered" :fields="fields" responsive >
@@ -41,13 +41,13 @@
               <b-dropdown variant="outline-dark" toggle-class="border-0" size="sm">
                 <template v-slot:button-content>
                   <fa class="mr-1" icon="key"/>
-                  <span v-if="getPermissionName(r.permission)">{{ getPermissionName(r.permission) }}</span>
+                  <span v-if="getPermissionName(r.permission, permissions)">{{ getPermissionName(r.permission, permissions) }}</span>
                   <span v-else class="text-danger"><fa icon="exclamation-triangle"/> Permission not found</span>
                 </template>
                 <b-dropdown-item v-for="p of permissions"
                                 :key="p.id"
                                 @click="updatePermission(data.item.id, r.id, p.id)">
-                  {{ getPermissionName(p.id) | capitalize }}
+                  {{ getPermissionName(p.id, permissions) | capitalize }}
                 </b-dropdown-item>
               </b-dropdown>
             </span>
@@ -67,8 +67,8 @@
               </b-dropdown>
             </span>
           </div>
-          <text-with-tags :key="10 + i" v-if='r.filter' v-bind:value='r.filter' style="font-size: .8rem;border: 1px dashed #eee; display: inline-block;padding: 0.1rem; padding-left: 0.3rem; padding-right: 0.3rem;"></text-with-tags>
-          <text-with-tags :key="100 + i" v-bind:value='r.response' style="display: inline-block"></text-with-tags>
+          <text-with-tags :key="10 + i" v-if='r.filter' :value='r.filter' style="font-size: .8rem;border: 1px dashed #eee; display: inline-block;padding: 0.1rem; padding-left: 0.3rem; padding-right: 0.3rem;"></text-with-tags>
+          <text-with-tags :key="100 + i" :value='r.response' style="display: inline-block"></text-with-tags>
         </template>
       </template>
       <template v-slot:cell(buttons)="data">
@@ -93,22 +93,31 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
-import { isNil, orderBy } from 'lodash-es';
+import { defineComponent, ref, onMounted, computed } from '@vue/composition-api'
+import type { Ref } from '@vue/composition-api'
+
+import { capitalize, isNil, orderBy } from 'lodash-es';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faEye, faExclamationTriangle, faEyeSlash, faPlay, faStop, faKey } from '@fortawesome/free-solid-svg-icons';
 library.add(faEye, faEyeSlash, faExclamationTriangle, faPlay, faKey, faStop);
 
 import { getSocket } from '../../../helpers/socket';
+import { getPermissionName } from '../../../helpers/getPermissionName';
 import type { CommandsInterface } from 'src/bot/database/entity/commands';
 import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
+import translate from 'src/panel/helpers/translate';
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
 
 let count: {
   command: string; count: number;
 }[] = [];
+const socket = {
+  permission: getSocket('/core/permissions'),
+  command: getSocket('/systems/customcommands'),
+} as const;
 
-@Component({
+export default defineComponent({
   components: {
     loading: () => import('../../../components/loading.vue'),
     'text-with-tags': () => import('../../../components/textWithTags.vue'),
@@ -123,132 +132,115 @@ let count: {
     onlyCommand (val: string) {
       return val.split(' ')[0]
     },
-  }
-})
-export default class commandsList extends Vue {
-  orderBy = orderBy;
+  },
+  setup(props, context) {
+    const search = ref('');
+    const commands: Ref<Required<CommandsInterface>[]> = ref([]);
+    const permissions: Ref<Required<PermissionsInterface>[]> = ref([]);
+    const changed: Ref<any[]> = ref([]);
+    const isDataChanged = ref(false);
+    const state: Ref<{
+      loadedPerm: number;
+      loadedCmd: number;
+    }> = ref({
+      loadedPerm: ButtonStates.progress,
+      loadedCmd: ButtonStates.progress,
+    });
 
-  search = '';
-
-  commands: Required<CommandsInterface>[] = [];
-  permissions: any[] = [];
-
-  changed: any[] = [];
-  isDataChanged = false;
-
-  state: {
-    loadingCmd: number;
-    loadingPerm: number;
-  } = {
-    loadingCmd: this.$state.progress,
-    loadingPerm: this.$state.progress,
-  };
-
-  fields = [
-    { key: 'command', label: this.translate('command'), sortable: true },
-    {
-      key: 'count',
-      label: this.capitalize(this.translate('count')),
-      sortable: true,
-      sortByFormatted: true,
-      sortDirection: 'desc',
-      formatter: (value: null, key: undefined, item: Required<CommandsInterface>) => {
-        return (count.find(o => o.command === item.command) || { count: 0 }).count
-      },
-    },
-    { key: 'response', label: this.translate('response') },
-    { key: 'buttons', label: '' },
-  ];
-
-  psocket = getSocket('/core/permissions');
-  socket = getSocket('/systems/customcommands');
-
-  capitalize (value: string) {
-    if (!value) return ''
-    value = value.toString()
-    return value.charAt(0).toUpperCase() + value.slice(1)
-  }
-
-  get commandsFiltered() {
-    if (this.search.length === 0) return this.commands
-    return this.commands.filter((o) => {
-      const isSearchInCommand = !isNil(o.command.match(new RegExp(this.search, 'ig')))
-      const isSearchInResponse = o.responses.filter(o => {
-        return !isNil(o.response.match(new RegExp(this.search, 'ig')))
-      }).length > 0
-      return isSearchInCommand || isSearchInResponse
-    })
-  };
-
-  created() {
-    this.state.loadingCmd = this.$state.progress;
-    this.state.loadingPerm = this.$state.progress;
-    this.psocket.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
-  if(err) {
-    return console.error(err);
-  }
-      this.permissions = data;
-      this.state.loadingPerm = this.$state.success;
-    })
-    this.socket.emit('generic::getAll', (err: string | null, commands: Required<CommandsInterface>[], countArg: { command: string; count: number }[] ) => {
-      if (err) {
-        return console.error(err);
-      }
-      console.debug({ commands, count })
-      count = countArg;
-      this.commands = commands;
-      this.state.loadingCmd = this.$state.success;
-    })
-  }
-
-  getPermissionName (id: string | null) {
-    if (!id) return 'Disabled'
-    const permission = this.permissions.find((o) => {
-      return o.id === id
-    })
-    if (typeof permission !== 'undefined') {
-      if (permission.name.trim() === '') {
-        return permission.id
-      } else {
-        return permission.name
-      }
-    } else {
-      return null
-    }
-  }
-
-  updatePermission (cid: string, rid: string, permission: string) {
-    let command = this.commands.filter((o) => o.id === cid)[0]
-    let response = command.responses.filter((o) => o.id === rid)[0]
-    response.permission = permission
-    this.socket.emit('generic::setById', { id: cid, item: command }, () => {});
-    this.$forceUpdate();
-  }
-
-  updateStopIfExecuted (cid: string, rid: string, stopIfExecuted: boolean) {
-    let command = this.commands.filter((o) => o.id === cid)[0]
-    let response = command.responses.filter((o) => o.id === rid)[0]
-    response.stopIfExecuted = stopIfExecuted
-    this.socket.emit('generic::setById', { id: cid, item: command }, () => {});
-    this.$forceUpdate();
-  }
-
-  async remove(id: string) {
-    await new Promise(resolve => {
-      this.socket.emit('generic::deleteById', id, () => {
-        resolve();
+    const commandsFiltered = computed(() => {
+      if (search.value.length === 0) return commands.value
+      return commands.value.filter((o) => {
+        const isSearchInCommand = !isNil(o.command.match(new RegExp(search.value, 'ig')))
+        const isSearchInResponse = o.responses.filter(o => {
+          return !isNil(o.response.match(new RegExp(search.value, 'ig')))
+        }).length > 0
+        return isSearchInCommand || isSearchInResponse
       })
     })
-    this.commands = this.commands.filter((o) => o.id !== id)
-    this.$router.push({ name: 'CommandsManagerList' });
-  }
 
-  sendUpdate (id: string) {
-    this.socket.emit('generic::setById', { id, item: this.commands.find((o) => o.id === id) }, (err: string | null) => {
-      if (err) {
-        return console.error(err);
-      }
-    });
-  }
-}
+    const fields = [
+      { key: 'command', label: translate('command'), sortable: true },
+      {
+        key: 'count',
+        label: capitalize(translate('count')),
+        sortable: true,
+        sortByFormatted: true,
+        sortDirection: 'desc',
+        formatter: (value: null, key: undefined, item: Required<CommandsInterface>) => {
+          return (count.find(o => o.command === item.command) || { count: 0 }).count
+        },
+      },
+      { key: 'response', label: translate('response') },
+      { key: 'buttons', label: '' },
+    ];
+
+    onMounted(() => {
+      state.value.loadedCmd = ButtonStates.progress;
+      state.value.loadedPerm = ButtonStates.progress;
+      socket.permission.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
+        if(err) {
+          return console.error(err);
+        }
+        permissions.value = data;
+        state.value.loadedPerm = ButtonStates.success;
+      })
+      socket.command.emit('generic::getAll', (err: string | null, commandsGetAll: Required<CommandsInterface>[], countArg: { command: string; count: number }[] ) => {
+        if (err) {
+          return console.error(err);
+        }
+        console.debug({ commands, count })
+        count = countArg;
+        commands.value = commandsGetAll;
+        state.value.loadedCmd = ButtonStates.success;
+      })
+    })
+
+    const updatePermission = (cid: string, rid: string, permission: string) => {
+      let command = commands.value.filter((o) => o.id === cid)[0]
+      let response = command.responses.filter((o) => o.id === rid)[0]
+      response.permission = permission
+      socket.command.emit('generic::setById', { id: cid, item: command }, () => {});
+      context.root.$forceUpdate();
+    }
+    const updateStopIfExecuted = (cid: string, rid: string, stopIfExecuted: boolean) => {
+      let command = commands.value.filter((o) => o.id === cid)[0]
+      let response = command.responses.filter((o) => o.id === rid)[0]
+      response.stopIfExecuted = stopIfExecuted
+      socket.command.emit('generic::setById', { id: cid, item: command }, () => {});
+      context.root.$forceUpdate();
+    }
+    const remove = async (id: string) => {
+      await new Promise(resolve => {
+        socket.command.emit('generic::deleteById', id, () => {
+          resolve();
+        })
+      })
+      commands.value = commands.value.filter((o) => o.id !== id)
+    }
+    const sendUpdate = (id: string) => {
+      socket.command.emit('generic::setById', { id, item: commands.value.find((o) => o.id === id) }, (err: string | null) => {
+        if (err) {
+          return console.error(err);
+        }
+      });
+    }
+
+    return {
+      orderBy,
+      search,
+      commands,
+      state,
+      isDataChanged,
+      permissions,
+      changed,
+      commandsFiltered,
+      fields,
+      remove,
+      sendUpdate,
+      updatePermission,
+      updateStopIfExecuted,
+      getPermissionName,
+    }
+  },
+});
 </script>
