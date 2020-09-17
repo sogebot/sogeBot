@@ -108,6 +108,7 @@ import type { CommandsInterface } from 'src/bot/database/entity/commands';
 import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
 import translate from 'src/panel/helpers/translate';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import { error } from 'src/panel/helpers/error';
 
 let count: {
   command: string; count: number;
@@ -179,14 +180,14 @@ export default defineComponent({
       state.value.loadedPerm = ButtonStates.progress;
       socket.permission.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
         if(err) {
-          return console.error(err);
+          return error(err);
         }
         permissions.value = data;
         state.value.loadedPerm = ButtonStates.success;
       })
       socket.command.emit('generic::getAll', (err: string | null, commandsGetAll: Required<CommandsInterface>[], countArg: { command: string; count: number }[] ) => {
         if (err) {
-          return console.error(err);
+          return error(err);
         }
         console.debug({ commands, count })
         count = countArg;
@@ -220,7 +221,7 @@ export default defineComponent({
     const sendUpdate = (id: string) => {
       socket.command.emit('generic::setById', { id, item: commands.value.find((o) => o.id === id) }, (err: string | null) => {
         if (err) {
-          return console.error(err);
+          return error(err);
         }
       });
     }

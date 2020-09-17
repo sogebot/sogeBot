@@ -1,6 +1,6 @@
 <template>
   <div class="stream-info-container container-fluid" :class="{ 'sticky-top': b_sticky }" :style="{ 'top': b_sticky ? top + 'px' : undefined }" ref="quickwindow">
-    <b-toast :title="error.name" visible variant="danger" v-for="error of errors" :key="error.name + error.message">
+    <b-toast :title="error.name" visible variant="danger" v-for="error of errors" :key="error.name + error.message + error.date">
       {{ error.message }}
     </b-toast>
     <b-toast :title="translate('errors.owner_and_broadcaster_oauth_is_not_set')" no-auto-hide visible variant="danger" solid v-if="!$store.state.configuration.isCastersSet">
@@ -307,7 +307,7 @@ const socket = getSocket('/');
 
 export default defineComponent({
   setup(props, context) {
-    const errors: Ref<UIError[]> = ref([]);
+    const errors: Ref<(UIError & { date: number })[]> = ref([]);
     const averageStats: any = reactive({});
     const hideStats = ref(localStorage.getItem('hideStats') === 'true');
     const timestamp: Ref<null | number> = ref(null);
@@ -495,10 +495,13 @@ export default defineComponent({
           }
           for (const error of data) {
             console.error(`UIError: ${error.name} ¦ ${error.message}`);
+          errors.value.push({ ...error, date: Date.now() });
           }
-          errors.value = data;
         });
       }, 5000);
+      EventBus.$on('error', (err: UIError) => {
+        errors.value.push({ ...err, date: Date.now() });
+      })
 
       socket.emit('getLatestStats', (err: string | null, data: any) => {
         console.groupCollapsed('navbar::getLatestStats')

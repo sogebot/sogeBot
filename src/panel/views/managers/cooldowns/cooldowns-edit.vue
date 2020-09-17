@@ -92,13 +92,15 @@
   </b-container>
 </template>
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator';
+import { defineComponent, ref, onMounted, watch, getCurrentInstance, computed } from '@vue/composition-api'
+import type { Ref } from '@vue/composition-api'
+
 import { getSocket } from 'src/panel/helpers/socket';
 
 import { Route } from 'vue-router'
 import { NextFunction } from 'express';
 
-import { Validations } from 'vuelidate-property-decorators';
+import { validationMixin } from 'vuelidate'
 import { required, minValue } from 'vuelidate/lib/validators'
 
 import { v4 as uuid } from 'uuid';
@@ -108,123 +110,28 @@ import { faCheck, faTimes, faVolumeUp, faVolumeOff } from '@fortawesome/free-sol
 import { CooldownInterface } from 'src/bot/database/entity/cooldown';
 library.add(faVolumeUp, faVolumeOff, faCheck, faTimes);
 
-Component.registerHooks([
-  'beforeRouteEnter',
-  'beforeRouteLeave',
-  'beforeRouteUpdate' // for vue-router 2.2+
-])
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import { error } from 'src/panel/helpers/error';
+const socket = getSocket('/systems/cooldown');
 
-@Component({
+export default defineComponent({
+  mixins: [ validationMixin ],
   components: {
     'loading': () => import('../../../components/loading.vue'),
-  },
+    'textarea-with-tags': () => import('../../../components/textareaWithTags.vue'),  },
   filters: {
     capitalize(value: string) {
       if (!value) return ''
       value = value.toString()
       return value.charAt(0).toUpperCase() + value.slice(1)
     }
-  }
-})
-export default class cooldownEdit extends Vue {
-  socket = getSocket('/systems/cooldown');
-
-  state: {
-    loading: number;
-    save: number;
-    pending: boolean;
-  } = {
-    loading: this.$state.progress,
-    save: this.$state.idle,
-    pending: false,
-  }
-
-  item: CooldownInterface = {
-    id: uuid(),
-    name: '',
-    miliseconds: 600000,
-    type: 'global',
-    timestamp: 0,
-    isErrorMsgQuiet: false,
-    isEnabled: true,
-    isOwnerAffected: true,
-    isModeratorAffected: true,
-    isSubscriberAffected: true,
-    isFollowerAffected: true,
-    viewers: [],
-  }
-
-  get seconds() {
-    return this.item.miliseconds / 1000;
-  }
-
-  set seconds(value: number) {
-    this.item.miliseconds = value * 1000;
-  }
-
-
-  @Validations()
-  validations = {
+  },
+  validations: {
     item: {
       name: {required},
       miliseconds: { required, minValue: minValue(10000) }
     }
-  }
-
-  @Watch('item', { deep: true })
-  pending() {
-    if (this.state.loading === this.$state.success) {
-      this.state.pending = true;
-    }
-  }
-
-  async mounted() {
-    if (this.$route.params.id) {
-      await new Promise((resolve, reject) => {
-        this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, data: CooldownInterface) => {
-          if (err) {
-            this.$router.push({ name: 'cooldownsManagerList' });
-            reject(err)
-          }
-          console.debug('Loaded', data);
-          this.item = data
-          resolve();
-        })
-      })
-    }
-
-    this.$nextTick(() => {
-      this.state.loading = this.$state.success;
-    })
-  }
-
-  del() {
-    this.socket.emit('generic::deleteById', this.$route.params.id, () => {
-      this.$router.push({ name: 'cooldownsManagerList' })
-    })
-  }
-
-  save() {
-    this.$v.$touch();
-    if (!this.$v.$invalid) {
-      this.state.save = this.$state.progress;
-
-      this.socket.emit('cooldown::save', this.item, (err: string | null, data: CooldownInterface) => {
-        if (err) {
-          this.state.save = this.$state.fail;
-          return console.error(err);
-        }
-
-        this.state.save = this.$state.success;
-        this.state.pending = false;
-        this.$router.push({ name: 'cooldownsManagerEdit', params: { id: String(data.id) } })
-        setTimeout(() => {
-          this.state.save = this.$state.idle;
-        }, 1000)
-      });
-    }
-  }
-
+  },
   beforeRouteUpdate(to: Route, from: Route, next: NextFunction) {
     if (this.state.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
@@ -236,8 +143,7 @@ export default class cooldownEdit extends Vue {
     } else {
       next();
     }
-  }
-
+  },
   beforeRouteLeave(to: Route, from: Route, next: NextFunction) {
     if (this.state.pending) {
       const isOK = confirm('You will lose your pending changes. Do you want to continue?')
@@ -249,6 +155,99 @@ export default class cooldownEdit extends Vue {
     } else {
       next();
     }
+  },
+  setup(props, context) {
+    const instance = getCurrentInstance();
+    const state: Ref<{
+      loading: number;
+      save: number;
+      pending: boolean;
+    }> = ref({
+      loading: ButtonStates.progress,
+      save: ButtonStates.idle,
+      pending: false,
+    });
+    const item = ref({
+      id: uuid(),
+      name: '',
+      miliseconds: 600000,
+      type: 'global',
+      timestamp: 0,
+      isErrorMsgQuiet: false,
+      isEnabled: true,
+      isOwnerAffected: true,
+      isModeratorAffected: true,
+      isSubscriberAffected: true,
+      isFollowerAffected: true,
+      viewers: [],
+    } as CooldownInterface);
+
+    const seconds = computed({
+      get: () => item.value.miliseconds / 1000,
+      set: (value: number) => item.value.miliseconds = value * 1000,
+    });
+
+    watch(item, () => {
+      if (state.value.loading === ButtonStates.success) {
+        state.value.pending = true;
+      }
+    }, { deep: true });
+
+    onMounted(async () => {
+      if (context.root.$route.params.id) {
+        await new Promise((resolve, reject) => {
+          socket.emit('generic::getOne', context.root.$route.params.id, (err: string | null, data: Required<CooldownInterface>) => {
+            if (err) {
+              context.root.$router.push({ name: 'cooldownsManagerList' }).catch(() => {});
+              reject(err)
+            }
+            console.debug('Loaded', data);
+            item.value = data;
+            resolve();
+          })
+        })
+      }
+
+      context.root.$nextTick(() => {
+        state.value.loading = ButtonStates.success;
+      })
+    });
+
+    const del = () => {
+      socket.emit('generic::deleteById', context.root.$route.params.id, () => {
+        context.root.$router.push({ name: 'cooldownsManagerList' }).catch(() => {});
+      })
+    };
+
+    const save = () => {
+      const $v = instance?.$v;
+      $v?.$touch();
+      if (!$v?.$invalid) {
+        state.value.save = ButtonStates.progress;
+
+        socket.emit('cooldown::save', item.value, (err: string | null, data: CooldownInterface) => {
+          if (err) {
+            state.value.save = ButtonStates.fail;
+            error(err);
+          } else {
+            state.value.save = ButtonStates.success;
+            state.value.pending = false;
+            context.root.$router.push({ name: 'cooldownsManagerEdit', params: { id: String(data.id) } }).catch(() => {});
+          }
+          setTimeout(() => {
+            state.value.save = ButtonStates.idle;
+          }, 1000)
+        });
+      }
+    }
+
+    return {
+      item,
+      seconds,
+      state,
+      del,
+      save,
+    }
   }
-}
+});
 </script>
