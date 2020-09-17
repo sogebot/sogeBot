@@ -90,6 +90,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { getPermissionName } from 'src/panel/helpers/getPermissionName';
 import { permission } from 'src/bot/helpers/permissions'
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import { error } from 'src/panel/helpers/error';
 
 import { Route } from 'vue-router'
 import { NextFunction } from 'express';
@@ -193,7 +194,7 @@ export default defineComponent({
       await new Promise((resolve) => {
         socket.permission.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
           if(err) {
-            return console.error(err);
+            return error(err);
           }
           permissions.value = orderBy(data, 'order', 'asc');
           resolve()
@@ -221,9 +222,9 @@ export default defineComponent({
     const del = () => {
       socket.alias.emit('generic::deleteById', context.root.$route.params.id, (err: string | null) => {
         if (err) {
-          return console.error(err);
+          return error(err);
         }
-        context.root.$router.push({ name: 'aliasManagerList' })
+        context.root.$router.push({ name: 'aliasManagerList' }).catch(() => {});
       });
     }
     const save = () =>  {
@@ -235,15 +236,15 @@ export default defineComponent({
         socket.alias.emit('generic::setById', { id: context.root.$route.params.id, item: item.value }, (err: string | null, data: typeof item.value) => {
           if (err) {
             state.value.save = ButtonStates.fail;
-            return console.error(err);
+            return error(err);
+          } else {
+            console.groupCollapsed('generic::setById')
+            console.log({data})
+            console.groupEnd();
+            state.value.save = ButtonStates.success;
+            state.value.pending = false;
+            context.root.$router.push({ name: 'aliasManagerEdit', params: { id: String(data.id) } }).catch(() => {});
           }
-
-          console.groupCollapsed('generic::setById')
-          console.log({data})
-          console.groupEnd();
-          state.value.save = ButtonStates.success;
-          state.value.pending = false;
-          context.root.$router.push({ name: 'aliasManagerEdit', params: { id: String(data.id) } }).catch(() => {});
           setTimeout(() => {
             state.value.save = ButtonStates.idle;
           }, 1000)

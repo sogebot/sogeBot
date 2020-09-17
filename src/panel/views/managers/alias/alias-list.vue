@@ -137,6 +137,7 @@ import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faKey, faObjectGroup } from '@fortawesome/free-solid-svg-icons';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import { error } from 'src/panel/helpers/error';
 import translate from 'src/panel/helpers/translate';
 library.add(faKey, faObjectGroup);
 
@@ -209,7 +210,7 @@ export default defineComponent({
       state.value.loadingPrm = ButtonStates.progress;
       socket.permission.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
         if(err) {
-          return console.error(err);
+          return error(err);
         }
         permissions.value = data;
         state.value.loadingPrm = ButtonStates.success;

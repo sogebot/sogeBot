@@ -230,6 +230,7 @@ import { PermissionsInterface } from 'src/bot/database/entity/permissions';
 import { getSocket } from '../../../helpers/socket';
 import { getPermissionName } from '../../../helpers/getPermissionName';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import { error } from 'src/panel/helpers/error';
 
 const socket = {
   permission: getSocket('/core/permissions'),
@@ -315,7 +316,7 @@ export default defineComponent({
     onMounted(() => {
       socket.permission.emit('permissions', (err: string | null, data: Required<PermissionsInterface>[]) => {
         if(err) {
-          return console.error(err);
+          return error(err);
         }
         permissions.value = data
         state.value.loadedPerm = ButtonStates.success;
@@ -366,7 +367,7 @@ export default defineComponent({
     }
     const remove = async () => {
       socket.command.emit('generic::deleteById', context.root.$route.params.id, () => {
-        context.root.$router.push({ name: 'CommandsManagerList' });
+        context.root.$router.push({ name: 'CommandsManagerList' }).catch(() => {});;
       });
     }
     const save = async () => {
@@ -379,7 +380,7 @@ export default defineComponent({
           socket.command.emit('generic::setById', { id: item.value.id, item: item.value }, (err: string | null) => {
             if (err) {
               state.value.save = ButtonStates.fail;
-              reject(console.error(err));
+              reject(error(err));
             }
             resolve()
           });
@@ -390,7 +391,7 @@ export default defineComponent({
             socket.command.emit('commands::resetCountByCommand', item.value.command, (err: string | null) => {
             if (err) {
               state.value.save = ButtonStates.fail;
-              reject(console.error(err));
+              reject(error(err));
             }
             resolve()
           });

@@ -69,77 +69,89 @@
 import { getSocket } from 'src/panel/helpers/socket';
 import { capitalize } from 'src/panel/helpers/capitalize';
 
-import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
+import { defineComponent, ref, onMounted, computed } from '@vue/composition-api'
 import { isNil } from 'lodash-es';
 import { escape } from 'xregexp';
 import { CooldownInterface } from 'src/bot/database/entity/cooldown';
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import translate from 'src/panel/helpers/translate';
+import { error } from 'src/panel/helpers/error';
 
-@Component({
+const socket = getSocket('/systems/cooldown');
+
+export default defineComponent({
   components: {
     loading: () => import('../../../components/loading.vue'),
     'hold-button': () => import('../../../components/holdButton.vue'),
   },
-})
-export default class cooldownList extends Vue {
-  socket = getSocket('/systems/cooldown');
-
-  items: CooldownInterface[] = [];
-  search: string = '';
-  state: {
-    loading: number;
-  } = {
-    loading: this.$state.progress,
-  }
-
-  fields = [
-    { key: 'name', label: '!' + this.translate('command') + ' ' + this.translate('or') + ' ' + this.translate('keyword'), sortable: true },
-    {
-      key: 'miliseconds',
-      label: this.translate('cooldown'),
-      sortable: true,
-    },
-    { key: 'type', label: this.translate('type'), sortable: true, formatter: (value: string) => this.translate(value) },
-    { key: 'isErrorMsgQuiet', label: capitalize(this.translate('quiet')), sortable: true },
-    { key: 'isOwnerAffected', label: capitalize(this.translate('core.permissions.casters')), sortable: true },
-    { key: 'isModeratorAffected', label: capitalize(this.translate('core.permissions.moderators')), sortable: true },
-    { key: 'isSubscriberAffected', label: capitalize(this.translate('core.permissions.subscribers')), sortable: true },
-    { key: 'isFollowerAffected', label: capitalize(this.translate('core.permissions.followers')), sortable: true },
-    { key: 'buttons', label: '' },
-  ];
-
-  get fItems() {
-    if (this.search.length === 0) return this.items
-    return this.items.filter((o) => {
-      const isSearchInKey = !isNil(o.name.match(new RegExp(escape(this.search), 'ig')))
-      return isSearchInKey
+  setup(props, context) {
+    const items = ref([] as CooldownInterface[]);
+    const search = ref('');
+    const state = ref({
+      loading: ButtonStates.progress,
+    } as {
+      loading: number;
     })
-  }
 
-  created() {
-    this.state.loading = this.$state.progress;
-    this.socket.emit('generic::getAll', (err: string | null, items: CooldownInterface[]) => {
-      if (err) {
-        return console.error(err);
-      }
-      console.debug('Loaded', items)
-      this.items = items;
-      this.state.loading = this.$state.success;
+    const fields = [
+      { key: 'name', label: '!' + translate('command') + ' ' + translate('or') + ' ' + translate('keyword'), sortable: true },
+      {
+        key: 'miliseconds',
+        label: translate('cooldown'),
+        sortable: true,
+      },
+      { key: 'type', label: translate('type'), sortable: true, formatter: (value: string) => translate(value) },
+      { key: 'isErrorMsgQuiet', label: capitalize(translate('quiet')), sortable: true },
+      { key: 'isOwnerAffected', label: capitalize(translate('core.permissions.casters')), sortable: true },
+      { key: 'isModeratorAffected', label: capitalize(translate('core.permissions.moderators')), sortable: true },
+      { key: 'isSubscriberAffected', label: capitalize(translate('core.permissions.subscribers')), sortable: true },
+      { key: 'isFollowerAffected', label: capitalize(translate('core.permissions.followers')), sortable: true },
+      { key: 'buttons', label: '' },
+    ];
+
+    const fItems = computed(() => {
+      if (search.value.length === 0) return items.value
+      return items.value.filter((o) => {
+        const isSearchInKey = !isNil(o.name.match(new RegExp(escape(search.value), 'ig')))
+        return isSearchInKey
+      })
     })
-  }
 
-  linkTo(item: Required<CooldownInterface>) {
-    console.debug('Clicked', item.id);
-    this.$router.push({ name: 'cooldownsManagerEdit', params: { id: item.id } });
-  }
+    onMounted(() => {
+      state.value.loading = ButtonStates.progress;
+      socket.emit('generic::getAll', (err: string | null, itemsGetAll: CooldownInterface[]) => {
+        if (err) {
+          return error(err);
+        }
+        console.debug('Loaded', items)
+        items.value = itemsGetAll;
+        state.value.loading = ButtonStates.success;
+      })
+    });
 
-  remove(id: string) {
-   this.socket.emit('generic::deleteById', id, () => {
-      this.items = this.items.filter((o) => o.id !== id)
-    })
-  }
+    const linkTo = (item: Required<CooldownInterface>) => {
+      console.debug('Clicked', item.id);
+      context.root.$router.push({ name: 'cooldownsManagerEdit', params: { id: item.id } }).catch(() => {});
+    }
+    const remove = (id: string) => {
+      socket.emit('generic::deleteById', id, () => {
+        items.value = items.value.filter((o) => o.id !== id)
+      })
+    }
+    const update = (item: Required<CooldownInterface>) => {
+      socket.emit('cooldown::save', item , () => {});
+    }
 
-  update(item: Required<CooldownInterface>) {
-    this.socket.emit('cooldown::save', item , () => {});
+    return {
+      items,
+      search,
+      state,
+      fields,
+      linkTo,
+      remove,
+      update,
+      fItems
+    }
   }
-}
+});
 </script>
