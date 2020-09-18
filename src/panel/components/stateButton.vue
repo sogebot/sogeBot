@@ -41,7 +41,7 @@ export default defineComponent({
   props: {
     state: Number,
     text: String,
-    icon: String,
+    icon: [String, Array],
     cl: String,
     invalid: Boolean,
   },

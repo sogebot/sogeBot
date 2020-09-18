@@ -161,145 +161,153 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue'
-  import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
-  import { gsap } from 'gsap'
+import { defineComponent, ref, onMounted, computed } from '@vue/composition-api'
+import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
+import { gsap } from 'gsap'
 
-  import { getSocket } from '../../../helpers/socket';
+import { getSocket } from '../../../helpers/socket';
 
-  import { EventInterface } from 'src/bot/database/entity/event';
+import { EventInterface } from 'src/bot/database/entity/event';
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import { error } from 'src/panel/helpers/error';
 
-  export default Vue.extend({
-    components: {
-      'font-awesome-layers': FontAwesomeLayers,
-    },
-    data: function () {
-      const object: {
-        socket: any,
-        events: EventInterface[],
-        search: string,
-        showOperationsOfEvent: string[],
-        showSettingsOfEvent: string[],
-        testingInProgress: {[x:string]: number},
-        deletionInProgress: {[x:string]: number},
-        heightOfElement: {[x:string]: any},
-        state: {
-          loading: number,
-        }
-      } = {
-        socket: getSocket('/core/events'),
-        events: [],
-        search: '',
-        showOperationsOfEvent: [],
-        showSettingsOfEvent: [],
-        heightOfElement: [],
-        testingInProgress: {},
-        deletionInProgress: {},
-        state: {
-          loading: this.$state.progress
-        }
+const socket = getSocket('/core/events');
+
+export default defineComponent({
+  components: {
+    'font-awesome-layers': FontAwesomeLayers,
+  },
+  setup(props, ctx) {
+    const events = ref([] as EventInterface[]);
+    const search = ref('');
+
+    const showOperationsOfEvent = ref([] as string[]);
+    const showSettingsOfEvent = ref([] as string[]);
+    const testingInProgress = ref({} as {[x:string]: number});
+    const deletionInProgress = ref({} as {[x:string]: number});
+    const heightOfElement = ref({} as {[x:string]: any});
+    const state = ref({ loading: ButtonStates.progress } as { loading: number });
+
+    const filteredEvents = computed(() => {
+      let _events = events.value
+      if (search.value.trim() !== '') {
+        _events = events.value.filter((o) => {
+          return o.name.trim().toLowerCase().includes(search.value.trim().toLowerCase())
+        })
       }
-      return object
-    },
-    computed: {
-      filteredEvents(): EventInterface[] {
-        let events = this.events
-        if (this.search.trim() !== '') {
-          events = this.events.filter((o) => {
-            return o.name.trim().toLowerCase().includes(this.search.trim().toLowerCase())
-          })
+      return _events.sort((a, b) => {
+        const A = a.name.toLowerCase();
+        const B = b.name.toLowerCase();
+        if (A < B)  { //sort string ascending
+          return -1;
         }
-        return events.sort((a, b) => {
-          const A = a.name.toLowerCase();
-          const B = b.name.toLowerCase();
-          if (A < B)  { //sort string ascending
-            return -1;
-          }
-          if (A > B) {
-            return 1;
-          }
-          return 0; //default return value (no sorting)
-          })
-      },
-    },
-    mounted() {
-      this.socket.emit('generic::getAll', (err: string | null, data: EventInterface[]) => {
+        if (A > B) {
+          return 1;
+        }
+        return 0; //default return value (no sorting)
+        })
+    });
+
+    onMounted(() => {
+      socket.emit('generic::getAll', (err: string | null, data: EventInterface[]) => {
         if (err) {
-          return console.error(err);
+          return error(err);
         }
-        this.events = data;
-        this.state.loading = this.$state.idle;
+        events.value = data;
+        state.value.loading = ButtonStates.idle;
       });
-    },
-    methods: {
-      beforeEnter: function (el: HTMLElement) {
-        el.style.opacity = '0'
-        el.style.height = '0'
-      },
-      enter: function (el: HTMLElement, done: () => void) {
-        var delay = Number(el.dataset.index) * 150
-        setTimeout(() => {
-          gsap.to(el, { duration: 1, opacity: 1, height: this.heightOfElement[String(el.dataset.id)] || '100%', onComplete: () => {
-            if (!this.heightOfElement[String(el.dataset.id)]) {
-              el.style.height = 'inherit'; // reset to null if not defined
-            }
-            done()
-           } })
-        }, delay)
-      },
-      leave: function (el: HTMLElement, done: () => void) {
-        this.heightOfElement[String(el.dataset.id)] = el.getBoundingClientRect().height + 'px'
-        var delay = Number(el.dataset.index) * 150
-        setTimeout(() => {
-          gsap.to(el, { duration: 1, opacity: 0, height: 0, onComplete: done })
-        }, delay)
-      },
-      deleteEvent(event: EventInterface) {
-        this.socket.emit('events::remove', event, (err: string | null) => {
-          if (err) {
-            return console.error(err);
+    });
+
+    const beforeEnter = (el: HTMLElement) => {
+      el.style.opacity = '0'
+      el.style.height = '0'
+    };
+    const enter = (el: HTMLElement, done: () => void) => {
+      var delay = Number(el.dataset.index) * 150
+      setTimeout(() => {
+        gsap.to(el, { duration: 1, opacity: 1, height: heightOfElement.value[String(el.dataset.id)] || '100%', onComplete: () => {
+          if (!heightOfElement.value[String(el.dataset.id)]) {
+            el.style.height = 'inherit'; // reset to null if not defined
           }
-          this.events = this.events.filter((o) => o.id !== event.id)
-        })
-      },
-      triggerTest(id: string) {
-        this.$set(this.testingInProgress, id, 1);
-        this.socket.emit('test.event', id, () => {
-          this.$set(this.testingInProgress, id, 2);
-          setTimeout(() => {
-            this.$set(this.testingInProgress, id, 0);
-          }, 1000)
-        });
-      },
-      sendUpdate(event: EventInterface) {
-        this.socket.emit('events::save', event, (err: string | null) => {
-          if (err) {
-            console.error(err);
-          }
-        })
-      },
-      isSettingsShown(id: string) {
-        return this.showSettingsOfEvent.includes(id)
-      },
-      isOperationShown(id: string) {
-        return this.showOperationsOfEvent.includes(id)
-      },
-      toggleSettingsShow(id: string) {
-        if (this.showSettingsOfEvent.includes(id)) {
-          this.showSettingsOfEvent = this.showSettingsOfEvent.filter((o) => o !== id);
-        } else {
-          this.showSettingsOfEvent.push(id);
+          done()
+          } })
+      }, delay)
+    };
+    const leave = (el: HTMLElement, done: () => void) => {
+      heightOfElement.value[String(el.dataset.id)] = el.getBoundingClientRect().height + 'px'
+      var delay = Number(el.dataset.index) * 150
+      setTimeout(() => {
+        gsap.to(el, { duration: 1, opacity: 0, height: 0, onComplete: done })
+      }, delay)
+    };
+    const deleteEvent = (event: EventInterface) => {
+      socket.emit('events::remove', event, (err: string | null) => {
+        if (err) {
+          return error(err);
         }
-      },
-      toggleOperationShow(id: string) {
-        if (this.showOperationsOfEvent.includes(id)) {
-          this.showOperationsOfEvent = this.showOperationsOfEvent.filter((o) => o !== id);
-        } else {
-          this.showOperationsOfEvent.push(id);
+        events.value = events.value.filter((o) => o.id !== event.id)
+      })
+    };
+    const triggerTest = (id: string) => {
+      testingInProgress.value[id] = 1;
+      socket.emit('test.event', id, () => {
+        testingInProgress.value[id] = 2;
+        setTimeout(() => {
+          testingInProgress.value[id] = 0;
+        }, 1000)
+      });
+    };
+    const sendUpdate = (event: EventInterface) => {
+      socket.emit('events::save', event, (err: string | null) => {
+        if (err) {
+          error(err);
         }
+      })
+    };
+    const isSettingsShown = (id: string) => {
+      return showSettingsOfEvent.value.includes(id)
+    };
+    const isOperationShown = (id: string) => {
+      return showOperationsOfEvent.value.includes(id)
+    };
+    const toggleSettingsShow = (id: string) => {
+      if (showSettingsOfEvent.value.includes(id)) {
+        showSettingsOfEvent.value = showSettingsOfEvent.value.filter((o) => o !== id);
+      } else {
+        showSettingsOfEvent.value.push(id);
       }
+    };
+    const toggleOperationShow = (id: string) => {
+      if (showOperationsOfEvent.value.includes(id)) {
+        showOperationsOfEvent.value = showOperationsOfEvent.value.filter((o) => o !== id);
+      } else {
+        showOperationsOfEvent.value.push(id);
+      }
+    };
+
+    return {
+      events,
+      search,
+      showOperationsOfEvent,
+      showSettingsOfEvent,
+      testingInProgress,
+      deletionInProgress,
+      heightOfElement,
+      state,
+      filteredEvents,
+      beforeEnter,
+      enter,
+      leave,
+      deleteEvent,
+      triggerTest,
+      sendUpdate,
+      isSettingsShown,
+      isOperationShown,
+      toggleSettingsShow,
+      toggleOperationShow,
     }
-  })
+  }
+})
 </script>
 
 <style scoped>
