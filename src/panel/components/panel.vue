@@ -3,24 +3,24 @@
     <div class="slot-left col-auto mr-auto d-flex" v-if="!!this.$slots.left" style="height: max-content;">
       <slot name="left"></slot>
     </div>
-    <div class="slot-right col-auto ml-auto text-right form-inline" v-if="!!this.$slots.right || typeof cards === 'string' || typeof table === 'string' || typeof search === 'string'">
+    <div class="slot-right col-auto ml-auto text-right form-inline" v-if="!!this.$slots.right || cards || table || search">
       <slot name="right"></slot>
 
-      <div class="ml-2 d-inline-block" v-if="typeof cards === 'string'" >
+      <div class="ml-2 d-inline-block" v-if="cards" >
         <button class="btn btn-shrink btn-with-icon p-0" style="flex-direction: row;" v-on:click="showAs='cards'" v-bind:class="[ showAs === 'cards' ? 'btn-dark' : 'btn-outline-dark' ]">
           <div class="btn-icon">
             <fa icon="th-large" fixed-width></fa>
           </div>
         </button>
       </div>
-      <div class="ml-2 d-inline-block" v-if="typeof table === 'string'" >
+      <div class="ml-2 d-inline-block" v-if="table" >
         <button class="btn btn-shrink btn-with-icon p-0" style="flex-direction: row;" v-on:click="showAs='table'" v-bind:class="[ showAs === 'table' ? 'btn-dark' : 'btn-outline-dark' ]">
           <div class="btn-icon">
             <fa icon="th-list" fixed-width></fa>
           </div>
         </button>
       </div>
-      <div class="ml-2 d-inline-block" v-if="typeof search === 'string'">
+      <div class="ml-2 d-inline-block" v-if="search">
         <div class="input-group border w-100"
             :class="{'focus-border': isFocused }">
           <div class="input-group-prepend" @click="resetSearch()">

@@ -26,12 +26,20 @@
           {{ translate('dialog.buttons.' + (event.isEnabled? 'enabled' : 'disabled')) }}
         </button-with-icon>
       </template>
-      <template v-slot:right>
-        <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$invalid"/>
+      <template v-slot:right v-if="state.load === $state.success">
+        <b-alert
+          show
+          variant="info"
+          v-if="state.pending"
+          v-html="translate('dialog.changesPending')"
+          class="mr-2 p-2 mb-0"
+        ></b-alert>
+        <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$error"/>
       </template>
     </panel>
 
-    <div class="pt-3">
+    <loading v-if="state.load !== $state.success" />
+    <div class="pt-3" v-else>
       <h3>{{translate('events.dialog.event')}}</h3>
       <form>
         <div class="form-group col-md-12">
@@ -113,7 +121,7 @@
                       v-if="['messageToSend', 'commandToRun'].includes(defKey)"
                       :value.sync="operation.definitions[defKey]"
                       :placeholder="translate('events.definitions.' + defKey + '.placeholder')"
-                      :error="false"
+                      :error="null"
                       :filters="['global', ...(supported.events.find((o) => o.id === event.name) || { variables: []}).variables]"
                       @update="operation.definitions[defKey] = $event"
                     />
@@ -138,278 +146,307 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue'
-  import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
-  import { v4 as uuid } from 'uuid';
-  import { cloneDeep, get } from 'lodash-es';
-  import { required, requiredIf, minValue } from "vuelidate/lib/validators";
+import { defineComponent, ref, onMounted, watch, getCurrentInstance } from '@vue/composition-api'
+import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
+import { v4 as uuid } from 'uuid';
+import { cloneDeep, get } from 'lodash-es';
+import { validationMixin } from 'vuelidate'
+import { required, requiredIf, minValue } from "vuelidate/lib/validators";
 
-  import { getSocket } from '../../../helpers/socket';
+import { Route } from 'vue-router'
+import { NextFunction } from 'express';
 
-  import { EventInterface, EventOperationInterface } from 'src/bot/database/entity/event';
+import { getSocket } from '../../../helpers/socket';
 
-  export default Vue.extend({
-    components: {
-      'font-awesome-layers': FontAwesomeLayers,
-    },
-    data: function () {
-      const eventId = uuid();
-      const object: {
-        get: any,
-        eventId: string,
-        socket: any,
-        event: EventInterface,
-        operationsClone: Omit<EventOperationInterface, 'event'>[], // used as oldVal to check what actually ichanged
-        watchOperationChange: boolean,
-        watchEventChange: boolean,
+import { EventInterface, EventOperationInterface } from 'src/bot/database/entity/event';
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import translate from 'src/panel/helpers/translate';
+import { error } from 'src/panel/helpers/error';
 
-        supported: {
-          operations: Events.SupportedOperation[],
-          events: Events.SupportedEvent[]
+const socket = getSocket('/core/events');
+
+export default defineComponent({
+  mixins: [ validationMixin ],
+  components: {
+    'loading': () => import('../../../components/loading.vue'),
+    'font-awesome-layers': FontAwesomeLayers,
+  },
+  beforeRouteUpdate(to: Route, from: Route, next: NextFunction) {
+    if (this.state.pending) {
+      const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+      if (!isOK) {
+        next(false);
+      } else {
+        next();
+      }
+    } else {
+      next();
+    }
+  },
+  beforeRouteLeave(to: Route, from: Route, next: NextFunction) {
+    if (this.state.pending) {
+      const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+      if (!isOK) {
+        next(false);
+      } else {
+        next();
+      }
+    } else {
+      next();
+    }
+  },
+  validations: {
+    event: {
+      givenName: {
+        required,
+      },
+      definitions: {
+        fadeOutXCommands: {
+          required: requiredIf(function (model) {
+            return typeof model.fadeOutXCommands !== 'undefined'
+          }),
+          minValue: minValue(0)
         },
-
-        state: {
-          save: number
-        }
-      } = {
-        get: get,
-        eventId: this.$route.params.id || eventId,
-        socket: getSocket('/core/events'),
-        event: {
-          id: eventId,
-          name: '',
-          givenName: '',
-          isEnabled: true,
-          triggered: {},
-          definitions: {},
-          operations: [],
-          filter: '',
+        fadeOutInterval: {
+          required: requiredIf(function (model) {
+            return typeof model.fadeOutInterval !== 'undefined'
+          }),
+          minValue: minValue(0)
         },
-        operationsClone: [],
-        watchOperationChange: true,
-        watchEventChange: true,
-
-        supported: {
-          operations: [],
-          events: [],
+        runEveryXCommands: {
+          required: requiredIf(function (model) {
+            return typeof model.runEveryXCommands !== 'undefined'
+          }),
+          minValue: minValue(0)
         },
-
-        state: {
-          save: 0
+        runEveryXKeywords: {
+          required: requiredIf(function (model) {
+            return typeof model.runEveryXKeywords !== 'undefined'
+          }),
+          minValue: minValue(0)
+        },
+        fadeOutXKeywords: {
+          required: requiredIf(function (model) {
+            return typeof model.fadeOutXKeywords !== 'undefined'
+          }),
+          minValue: minValue(0)
+        },
+        runInterval: {
+          required: requiredIf(function (model) {
+            return typeof model.runInterval !== 'undefined'
+          }),
+          minValue: minValue(0)
+        },
+        commandToWatch: {
+          required: requiredIf(function (model) {
+            return typeof model.commandToWatch !== 'undefined'
+          }),
+        },
+        keywordToWatch: {
+          required: requiredIf(function (model) {
+            return typeof model.keywordToWatch !== 'undefined'
+          }),
+        },
+        runAfterXMinutes: {
+          required: requiredIf(function (model) {
+            return typeof model.runAfterXMinutes !== 'undefined'
+          }),
+          minValue: minValue(1)
+        },
+        runEveryXMinutes: {
+          required: requiredIf(function (model) {
+            return typeof model.runEveryXMinutes !== 'undefined'
+          }),
+          minValue: minValue(1)
+        },
+        viewersAtLeast: {
+          required: requiredIf(function (model) {
+            return typeof model.viewersAtLeast !== 'undefined'
+          }),
+          minValue: minValue(0)
         }
       }
-      return object
     },
-    validations: {
-      event: {
-        givenName: {
-          required,
-        },
-        definitions: {
-          fadeOutXCommands: {
-            required: requiredIf(function (model) {
-              return typeof model.fadeOutXCommands !== 'undefined'
-            }),
-            minValue: minValue(0)
-          },
-          fadeOutInterval: {
-            required: requiredIf(function (model) {
-              return typeof model.fadeOutInterval !== 'undefined'
-            }),
-            minValue: minValue(0)
-          },
-          runEveryXCommands: {
-            required: requiredIf(function (model) {
-              return typeof model.runEveryXCommands !== 'undefined'
-            }),
-            minValue: minValue(0)
-          },
-          runEveryXKeywords: {
-            required: requiredIf(function (model) {
-              return typeof model.runEveryXKeywords !== 'undefined'
-            }),
-            minValue: minValue(0)
-          },
-          fadeOutXKeywords: {
-            required: requiredIf(function (model) {
-              return typeof model.fadeOutXKeywords !== 'undefined'
-            }),
-            minValue: minValue(0)
-          },
-          runInterval: {
-            required: requiredIf(function (model) {
-              return typeof model.runInterval !== 'undefined'
-            }),
-            minValue: minValue(0)
-          },
-          commandToWatch: {
-            required: requiredIf(function (model) {
-              return typeof model.commandToWatch !== 'undefined'
-            }),
-          },
-          keywordToWatch: {
-            required: requiredIf(function (model) {
-              return typeof model.keywordToWatch !== 'undefined'
-            }),
-          },
-          runAfterXMinutes: {
-            required: requiredIf(function (model) {
-              return typeof model.runAfterXMinutes !== 'undefined'
-            }),
-            minValue: minValue(1)
-          },
-          runEveryXMinutes: {
-            required: requiredIf(function (model) {
-              return typeof model.runEveryXMinutes !== 'undefined'
-            }),
-            minValue: minValue(1)
-          },
-          viewersAtLeast: {
-            required: requiredIf(function (model) {
-              return typeof model.viewersAtLeast !== 'undefined'
-            }),
-            minValue: minValue(0)
+  },
+  setup(props, context) {
+    const instance = getCurrentInstance();
+    const eventId = context.root.$route.params.id || uuid();
+    const event = ref({
+      id: eventId,
+      name: '',
+      givenName: '',
+      isEnabled: true,
+      triggered: {},
+      definitions: {},
+      operations: [],
+      filter: '',
+    } as EventInterface);
+    const operationsClone = ref([] as Omit<EventOperationInterface, 'event'>[]);
+    const watchOperationChange = ref(true);
+    const watchEventChange = ref(true);
+    const supported = ref({ operations: [], events: [] } as {
+        operations: Events.SupportedOperation[],
+        events: Events.SupportedEvent[]
+    });
+    const state = ref({
+      load: ButtonStates.progress,
+      save: ButtonStates.idle,
+      pending: false } as { load: number, save: number, pending: boolean })
+
+
+    watch(event, () => {
+      if (state.value.load === ButtonStates.success) {
+        state.value.pending = true;
+      }
+    }, { deep: true })
+    watch(() => event.value.operations, (val: Omit<EventOperationInterface, 'event'>[]) => {
+      if (state.value.load !== ButtonStates.success) {
+        return;
+      }
+      for (const v of val) {
+        console.log('event', v)
+      }
+      if (!watchOperationChange.value) return true;
+      watchOperationChange.value = false // remove watch
+
+      // remove all do-nothing
+      val = val.filter((o) => o.name !== 'do-nothing');
+
+      // add do-nothing at the end
+      val.push({
+        id: uuid(),
+        name: 'do-nothing',
+        definitions: {}
+      });
+
+      for (let i = 0; i < val.length; i++) {
+        if (typeof operationsClone.value[i] !== 'undefined' && val[i].name === operationsClone.value[i].name) continue
+
+        val[i].definitions = {}
+        const defaultOperation = supported.value.operations.find((o) => o.id === val[i].name)
+        if (defaultOperation) {
+          if (Object.keys(defaultOperation.definitions).length > 0) {
+            for (const [key, value] of Object.entries(defaultOperation.definitions)) {
+              val[i].definitions[key] = Array.isArray(value) ? value[0] : value; // select first option by default
+            }
+            context.root.$forceUpdate()
           }
         }
-      },
-    },
-    watch: {
-      'event.operations': {
-        handler: function (val: Omit<EventOperationInterface, 'event'>[]) {
-          for (const v of val) {
-            console.log('event', v)
-          }
-          if (!this.watchOperationChange) return true;
-          this.watchOperationChange = false // remove watch
-
-          // remove all do-nothing
-          val = val.filter((o) => o.name !== 'do-nothing');
-
-          // add do-nothing at the end
-          val.push({
-            id: uuid(),
-            name: 'do-nothing',
-            definitions: {}
-          });
-
-          for (let i = 0; i < val.length; i++) {
-            if (typeof this.operationsClone[i] !== 'undefined' && val[i].name === this.operationsClone[i].name) continue
-
-            val[i].definitions = {}
-            const defaultOperation = this.supported.operations.find((o) => o.id === val[i].name)
-            if (defaultOperation) {
-              if (Object.keys(defaultOperation.definitions).length > 0) {
-                for (const [key, value] of Object.entries(defaultOperation.definitions)) {
-                  val[i].definitions[key] = Array.isArray(value) ? value[0] : value; // select first option by default
-                }
-                this.$forceUpdate()
-              }
-            }
-          }
-
-          // update clone
-          this.event.operations = cloneDeep(val)
-          this.$nextTick(() => (this.watchOperationChange = true)) // re-enable watch
-          this.operationsClone = cloneDeep(val)
-        },
-        deep: true
-      },
-      'event.name': {
-        handler: function (val, oldVal) {
-          if (!this.watchEventChange) return;
-
-          this.watchEventChange = false;
-
-          if (val !== oldVal) {
-            this.$set(this.event, 'definitions', {}) // reload definitions
-
-            const defaultEvent = this.supported.events.find((o) => o.id === val)
-            if (defaultEvent) {
-              if (defaultEvent.definitions) {
-                this.$set(this.event, 'definitions', defaultEvent.definitions)
-              }
-            }
-          }
-          this.$nextTick(() => {
-            this.watchEventChange = true;
-          })
-        },
-        deep: true,
       }
-    },
-    mounted() {
-      if (this.$route.params.id) {
-        this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, event: Required<EventInterface>) => {
-          if (err) {
-            return console.error(err);
-          }
-          this.watchEventChange = false;
 
-          if (event.operations.length === 0 || event.operations[event.operations.length - 1].name !== 'do-nothing') {
-            event.operations.push({
-              id: uuid(),
-              name: 'do-nothing',
-              definitions: {}
+      // update clone
+      event.value.operations = cloneDeep(val)
+      context.root.$nextTick(() => (watchOperationChange.value = true)) // re-enable watch
+      operationsClone.value = cloneDeep(val)
+    }, { deep: true });
+    watch(() => event.value.name, (val, oldVal) => {
+      if (!watchEventChange.value) return;
+      watchEventChange.value = false;
+
+      if (val !== oldVal) {
+        event.value.definitions = {}; // reload definitions
+
+        const defaultEvent = supported.value.events.find((o) => o.id === val)
+        if (defaultEvent) {
+          if (defaultEvent.definitions) {
+            event.value.definitions = defaultEvent.definitions;
+          }
+        }
+      }
+      context.root.$nextTick(() => {
+        watchEventChange.value = true;
+      })
+    }, { deep: true });
+
+    onMounted(async () => {
+      await Promise.all([
+        new Promise((resolve, reject) => {
+          if (context.root.$route.params.id) {
+            socket.emit('generic::getOne', context.root.$route.params.id, (err: string | null, eventGetAll: Required<EventInterface>) => {
+              if (err) {
+                reject(error(err));
+              }
+              watchEventChange.value = false;
+
+              if (eventGetAll.operations.length === 0 || eventGetAll.operations[eventGetAll.operations.length - 1].name !== 'do-nothing') {
+                eventGetAll.operations.push({
+                  id: uuid(),
+                  name: 'do-nothing',
+                  definitions: {}
+                });
+              }
+
+              event.value.id = eventGetAll.id;
+              operationsClone.value = cloneDeep(eventGetAll.operations);
+              event.value.operations = eventGetAll.operations;
+              event.value.name = eventGetAll.name;
+              event.value.givenName = eventGetAll.givenName;
+              event.value.isEnabled = eventGetAll.isEnabled;
+              event.value.triggered = { ...eventGetAll.triggered };
+              event.value.definitions = { ...eventGetAll.definitions };
+              event.value.filter = eventGetAll.filter;
+
+              console.debug('Loaded', eventGetAll);
+              context.root.$nextTick(() => (watchEventChange.value = true));
+              resolve();
             });
           }
+          resolve();
+        }),
+        new Promise((resolve, reject) => {
+          socket.emit('list.supported.operations', (err: string | null, data: Events.SupportedOperation[]) => {
+            if (err) reject(error(err));
+            data.push({ // add do nothing - its basicaly delete of operation
+              id: 'do-nothing',
+              definitions: {},
+              fire: () => {},
+            })
+            supported.value.operations = data.sort((a, b) => {
+              const A = translate(a.id).toLowerCase();
+              const B = translate(b.id).toLowerCase();
+              if (A < B || a.id === 'do-nothing')  { //sort string ascending
+                return -1;
+              }
+              if (A > B || b.id === 'do-nothing') {
+                return 1;
+              }
+              return 0; //default return value (no sorting)
+            });
 
-          this.event.id = event.id;
-          this.operationsClone = cloneDeep(event.operations);
-          this.event.operations = event.operations;
-          this.event.name = event.name;
-          this.event.givenName = event.givenName;
-          this.event.isEnabled = event.isEnabled;
-          this.event.triggered = { ...event.triggered };
-          this.event.definitions = { ...event.definitions };
-          this.event.filter = event.filter;
-
-          console.debug('Loaded', this.event);
-
-          this.$nextTick(() => (this.watchEventChange = true));
-        });
-      }
-
-      this.socket.emit('list.supported.operations', (err: string | null, data: Events.SupportedOperation[]) => {
-        if (err) return console.error(err);
-        data.push({ // add do nothing - its basicaly delete of operation
-          id: 'do-nothing',
-          definitions: {},
-          fire: () => {},
-        })
-        this.$set(
-          this.supported,
-          'operations',
-          data.sort((a, b) => {
-            const A = this.translate(a.id).toLowerCase();
-            const B = this.translate(b.id).toLowerCase();
-            if (A < B || a.id === 'do-nothing')  { //sort string ascending
-              return -1;
+            if (!context.root.$route.params.id) {
+              // set first operation if we are in create mode
+              event.value.operations.push({
+                id: uuid(),
+                name: 'do-nothing',
+                definitions: {},
+              });
             }
-            if (A > B || b.id === 'do-nothing') {
-              return 1;
-            }
-            return 0; //default return value (no sorting)
+            resolve();
           })
-        );
+        }),
+        new Promise((resolve, reject) => {
+          socket.emit('list.supported.events', (err: string | null, data: Events.SupportedEvent[]) => {
+            if (err) reject(error(err));
 
-        if (!this.$route.params.id) {
-          // set first operation if we are in create mode
-          this.event.operations.push({
-            id: uuid(),
-            name: 'do-nothing',
-            definitions: {},
-          });
-        }
-
-      })
-
-      this.socket.emit('list.supported.events', (err: string | null, data: Events.SupportedEvent[]) => {
-        if (err) return console.error(err);
-
-        for (const d of data) {
-          // sort variables
-          if (d.variables) {
-            d.variables = d.variables.sort((A, B) => {
+            for (const d of data) {
+              // sort variables
+              if (d.variables) {
+                d.variables = d.variables.sort((A, B) => {
+                  if (A < B)  { //sort string ascending
+                    return -1;
+                  }
+                  if (A > B) {
+                    return 1;
+                  }
+                  return 0; //default return value (no sorting)
+                });
+              } else {
+                d.variables = []
+              }
+            }
+            supported.value.events = data.sort((a, b) => {
+              const A = translate(a.id).toLowerCase();
+              const B = translate(b.id).toLowerCase();
               if (A < B)  { //sort string ascending
                 return -1;
               }
@@ -418,57 +455,62 @@
               }
               return 0; //default return value (no sorting)
             });
-          } else {
-            d.variables = []
-          }
-        }
-        this.$set(
-          this.supported,
-          'events',
-          data.sort((a, b) => {
-            const A = this.translate(a.id).toLowerCase();
-            const B = this.translate(b.id).toLowerCase();
-            if (A < B)  { //sort string ascending
-              return -1;
+            if (!context.root.$route.params.id) {
+              // set first event if we are in create mode
+              event.value.name = supported.value.events[0].id
             }
-            if (A > B) {
-              return 1;
-            }
-            return 0; //default return value (no sorting)
+            resolve();
           })
-        );
-        if (!this.$route.params.id) {
-          // set first event if we are in create mode
-          this.event.name = this.supported.events[0].id
+        }),
+      ]);
+      state.value.load = ButtonStates.success;
+    });
+
+    const getDefinitionValidation = (key: string) => {
+      const $v = instance?.$v;
+      return get($v, 'event.definitions.' + key, { $invalid: false });
+    };
+    const del = () => {
+      socket.emit('events::remove', event.value, (err: string | null) => {
+        if (err) {
+          return error(err);
         }
+        context.root.$router.push({ name: 'EventsManagerList' }).catch(() => {});
       })
-    },
-    methods: {
-      getDefinitionValidation(key: string) {
-        return get(this, '$v.event.definitions.' + key, { $invalid: false });
-      },
-      del: function () {
-        this.socket.emit('events::remove', this.event, (err: string | null) => {
+    };
+    const save = () => {
+      const $v = instance?.$v;
+      $v?.$touch();
+      if (!$v?.$invalid) {
+        state.value.save = ButtonStates.progress;
+        socket.emit('events::save', event.value, (err: string | null, eventId: string) => {
           if (err) {
-            return console.error(err);
-          }
-          this.$router.push({ name: 'EventsManagerList' })
-        })
-      },
-      save() {
-        this.state.save = 1;
-        this.socket.emit('events::save', this.event, (err: string | null, eventId: string) => {
-          if (err) {
-            this.state.save = 3
+            state.value.save = ButtonStates.fail;
+            error(err)
           } else {
-            this.state.save = 2
-            this.$router.push({ name: 'EventsManagerEdit', params: { id: this.event.id || '' } })
+            state.value.save = ButtonStates.success;
+            context.root.$router.push({ name: 'EventsManagerEdit', params: { id: event.value.id || '' } }).catch(() => {})
           }
+          state.value.pending = false;
           setTimeout(() => {
-            this.state.save = 0
+            state.value.save = ButtonStates.idle;
           }, 1000)
         })
       }
     }
-  })
+
+    return {
+      get,
+      event,
+      operationsClone,
+      watchOperationChange,
+      watchEventChange,
+      state,
+      supported,
+      getDefinitionValidation,
+      del,
+      save,
+    }
+  }
+})
 </script>
