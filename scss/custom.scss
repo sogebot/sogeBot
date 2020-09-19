@@ -678,12 +678,9 @@ span.queue-list-group-item {
 
 label, legend {
   font-size: 1rem !important;
-  color:$gray-800;
-  font-variant: small-caps;
-  text-transform: lowercase;
+  text-transform: capitalize;
   font-weight: bold;
-  text-indent: 1rem;
-  letter-spacing: 1px;
+  margin-bottom: 0.1rem;
 }
 
 /* VOLUME SLIDER */
