@@ -55,18 +55,7 @@ class Keywords extends System {
       }
     });
     adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
-      try {
-        const item = await getRepository(Keyword).findOne({
-          where: { id },
-        });
-        if (!item) {
-          cb('Item not found');
-        } else {
-          cb(null, item);
-        }
-      } catch (e) {
-        cb(e.stack);
-      }
+      cb(null, await getRepository(Keyword).findOne({ id: String(id) }));
     });
   }
 
