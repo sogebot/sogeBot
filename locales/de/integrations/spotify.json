@@ -6,8 +6,8 @@
   "song-unbanned": "$sender, song $name von $artist ist entbannt.",
   "song-not-found-in-banlist": "$sender, song über spotifyURI $uri wurde in der ban Liste nicht gefunden.",
   "cannot-request-song-is-banned": "$sender, kann nicht den gebannten Song $name von $artist anfordern.",
-  "no-songs-found-in-history": "$sender, there is currently no song in history list.",
-  "return-one-song-from-history": "$sender, previous song was $name from $artist.",
-  "return-multiple-song-from-history": "$sender, $count previous songs were:",
-  "return-multiple-song-from-history-item": "$index - $name from $artist"
+  "no-songs-found-in-history": "$sender, es gibt derzeit kein Lied in der Verlaufsliste.",
+  "return-one-song-from-history": "$sender, vorheriger Song war $name von $artist.",
+  "return-multiple-song-from-history": "$sender, $count vorherige Lieder waren:",
+  "return-multiple-song-from-history-item": "$index - $name von $artist"
 }
