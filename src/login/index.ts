@@ -1,16 +1,8 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import { library } from '@fortawesome/fontawesome-svg-core';
-
-import { faCheckCircle } from '@fortawesome/free-solid-svg-icons/faCheckCircle';
-import { faSkullCrossbones } from '@fortawesome/free-solid-svg-icons/faSkullCrossbones';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-
-library.add(faCheckCircle, faSkullCrossbones);
-
-Vue.component('fa', FontAwesomeIcon);
-Vue.component('font-awesome-icon', FontAwesomeIcon);
+import VueCompositionAPI from '@vue/composition-api';
 Vue.use(VueRouter);
+Vue.use(VueCompositionAPI);
 
 const init = async () => {
   const router = new VueRouter({
