@@ -226,7 +226,7 @@ export default class playlist extends Vue {
     }
     if (this.state.import === 0) {
       this.state.import = 1
-      this.socket.emit(this.toAdd.includes('playlist') ? 'import.playlist' : 'import.video', this.toAdd, (err: string | null, info: { imported: number; skipped: number }) => {
+      this.socket.emit(this.toAdd.includes('playlist') ? 'import.playlist' : 'import.video', this.toAdd, (err: string | null, info: (CommandResponse & { imported: number; skipped: number })[]) => {
         if (err) {
           this.state.import = 3
           setTimeout(() => {
@@ -237,7 +237,7 @@ export default class playlist extends Vue {
           this.state.import = 2
           this.refreshPlaylist()
           this.toAdd = ''
-          this.showImportInfo(info)
+          this.showImportInfo(info[0])
         }
       })
     }
