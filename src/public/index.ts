@@ -57,7 +57,7 @@ const main = async () => {
   // init prototypes
   Vue.prototype.translate = (v: string) => translate(v);
   await getTranslations();
-  store.commit('setLoggedUser', await isUserLoggedIn());
+  store.commit('setLoggedUser', await isUserLoggedIn(false, false));
   store.commit('setConfiguration', await getConfiguration());
 
   Vue.prototype.$state = ButtonStates;
