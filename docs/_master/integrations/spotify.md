@@ -23,20 +23,13 @@ Current integration is enabling `$spotifySong` and song requests(PREMIUM) from S
    ![Authorize User](https://drive.google.com/uc?id=1c7O85ZxLfCMdFuUYyn7LzYKtVeA6S_av)
 8. Done, user is authorized
 
-## Song requests - PREMIUM users only
-
-1. Enable song requests by enabling `!spotify` command for viewers
-2. If you want to continue playback, you need to set your `main playlist` in
-   spotify integration config
-3. Song requests works only on online stream
-
-### Request song through !spotify command
+## Request song through !spotify command - PREMIUM users only
 
 `!spotify <spotifyURI>` or `!spotify <string>` or `!spotify <song link>`
 
 !> Default permission is **DISABLED**
 
-#### Parameters
+### Parameters
 
 - `<spotifyURI>` -  spotify URI of a song you want to play, e.g. `spotify:track:14Vp3NpYyRP3cTu8XkubfS`
 - `<string>` - song to search on spotify (will pick first found item), e.g.
@@ -44,7 +37,7 @@ Current integration is enabling `$spotifySong` and song requests(PREMIUM) from S
 - `<song link>` - song link, e.g.
   `https://open.spotify.com/track/14Vp3NpYyRP3cTu8XkubfS?si=7vJWxZJdRu2VsBdvcVdAuA`
 
-#### Examples
+### Examples
 
 <blockquote>
   <strong>testuser:</strong> !spotify spotify:track:0GrhBz0am9KFJ20MN9o6Lp <br>
@@ -58,13 +51,13 @@ Current integration is enabling `$spotifySong` and song requests(PREMIUM) from S
   Circle of Life - 『ライオン・キング』より from Carmen Twillie
 </blockquote>
 
-### Ban current song through !spotify ban command
+## Ban current song through !spotify ban command
 
 `!spotify ban`
 
 !> Default permission is **DISABLED**
 
-#### Examples
+### Examples
 
 <blockquote>
   <strong>testuser:</strong> !spotify ban<br>
@@ -72,19 +65,19 @@ Current integration is enabling `$spotifySong` and song requests(PREMIUM) from S
   Circle of Life - 『ライオン・キング』より from Carmen Twillie was banned.
 </blockquote>
 
-### Unban song through !spotify unban command
+## Unban song through !spotify unban command
 
 `!spotify unban <spotifyURI>` or `!spotify unban <song link>`
 
 !> Default permission is **DISABLED**
 
-#### Parameters
+### Parameters
 
 - `<spotifyURI>` -  spotify URI of a song you want to unban, e.g. `spotify:track:14Vp3NpYyRP3cTu8XkubfS`
 - `<song link>` - song link, e.g.
   `https://open.spotify.com/track/14Vp3NpYyRP3cTu8XkubfS?si=7vJWxZJdRu2VsBdvcVdAuA`
 
-#### Examples
+### Examples
 
 <blockquote>
   <strong>testuser:</strong> !spotify unban spotify:track:0GrhBz0am9KFJ20MN9o6Lp<br>
@@ -92,18 +85,18 @@ Current integration is enabling `$spotifySong` and song requests(PREMIUM) from S
   Circle of Life - 『ライオン・キング』より from Carmen Twillie was unbanned.
 </blockquote>
 
-### Song history with !spotify history command
+## Song history with !spotify history command
 
 `!spotify history` or `!spotify history <numOfSongs>`
 
 !> Default permission is **VIEWERS**
 
-#### Parameters
+### Parameters
 
 - `<numOfSongs>` - how many of songs should be returned in history command, if
   omitted, it will show only last song, maximum 10.
 
-#### Examples
+### Examples
 
 <blockquote>
   <strong>testuser:</strong> !spotify history<br>
@@ -114,7 +107,7 @@ Current integration is enabling `$spotifySong` and song requests(PREMIUM) from S
 
 <blockquote>
   <strong>testuser:</strong> !spotify history 2<br>
-  <strong>bot:</strong> @testuser, 2 previous songs were:
-  <strong>bot:</strong> 1 - Circle of Life - 『ライオン・キング』より from Carmen Twillie
+  <strong>bot:</strong> @testuser, 2 previous songs were:<br>
+  <strong>bot:</strong> 1 - Circle of Life - 『ライオン・キング』より from Carmen Twillie<br>
   <strong>bot:</strong> 2 - The Wolven Storm (Priscilla's Song) from Alina Gingertail.
 </blockquote>
