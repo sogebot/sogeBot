@@ -24,6 +24,11 @@ import songs from './songs';
 import aliasSystem from './alias';
 import users from '../users';
 
+const urlRegex = [
+  new RegExp(`(www)? ??\\.? ?[a-zA-Z0-9]+([a-zA-Z0-9-]+) ??\\. ?(${tlds.join('|')})(?=\\P{L}|$)`, 'igu'),
+  new RegExp(`[a-zA-Z0-9]+([a-zA-Z0-9-]+)?\\.(${tlds.join('|')})(?=\\P{L}|$)`, 'igu'),
+];
+
 class Moderation extends System {
   @settings('lists')
   cListsWhitelist: string[] = [];
@@ -249,11 +254,7 @@ class Moderation extends System {
     }
 
     const whitelisted = await this.whitelist(opts.message, permId);
-    const urlRegex = cLinksIncludeSpaces[permId]
-      ? new RegExp(`(www)? ??\\.? ?[a-zA-Z0-9]+([a-zA-Z0-9-]+) ??\\. ?(${tlds.join('|')})\\b`, 'ig')
-      : new RegExp(`[a-zA-Z0-9]+([a-zA-Z0-9-]+)?\\.(${tlds.join('|')})\\b`, 'ig');
-
-    if (whitelisted.search(urlRegex) >= 0) {
+    if (whitelisted.search(urlRegex[cLinksIncludeSpaces[permId] ? 0 : 1]) >= 0) {
       const permit = await getRepository(ModerationPermit).findOne({ userId: Number(opts.sender.userId) });
       if (permit) {
         await getRepository(ModerationPermit).remove(permit);

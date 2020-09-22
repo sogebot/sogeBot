@@ -58,6 +58,7 @@ const tests = {
     '#42 - proc hrajes tohle auto je dost na nic ....',
     '#44 - 1.2.3.4',
     '#47 - vypadá že máš problémy nad touto počítačovou hrou....doporučuji tvrdý alkohol',
+    'community/t/links-detection/183 - die Zellen sind nur dafür da um deine Maschinen zu überlasten bzw. stärker und schneller zu machen',
   ],
 };
 
