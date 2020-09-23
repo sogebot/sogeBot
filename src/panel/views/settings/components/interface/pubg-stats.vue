@@ -19,6 +19,7 @@
     </div>
     <h4>Player stats <span v-if="title.toLowerCase().includes('ranked')">(ranked)</span></h4>
     <json-viewer :value="fetchedPlayerStats"></json-viewer>
+    <small class="text-muted">Stats are automatically refreshed every 10 minutes.</small>
   </div>
 </template>
 <script lang="ts">
@@ -40,7 +41,6 @@ export default defineComponent({
     settings: Object,
     value: Object,
     title: [String, Object],
-
   },
   setup(props, ctx) {
     const fetchedPlayerStats = ref(props.value);

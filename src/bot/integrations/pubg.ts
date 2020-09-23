@@ -1,11 +1,15 @@
 // bot libraries
 import Integration from './_interface';
-import { settings, shared, ui } from '../decorators';
+import { command, settings, shared, ui } from '../decorators';
 import Axios from 'axios';
 import { adminEndpoint } from '../helpers/socket';
 import { HOUR, MINUTE } from '../constants';
 import { onChange, onStartup } from '../decorators/on';
-import { info } from '../helpers/log';
+import { error, info } from '../helpers/log';
+import Message from '../message';
+import Expects from '../expects';
+import { flatten } from '../helpers/flatten';
+import { escapeRegExp } from 'lodash';
 
 class PUBG extends Integration {
   @settings()
@@ -26,15 +30,22 @@ class PUBG extends Integration {
   @shared(true)
   _lastSeasonIdFetch = 0;
 
+  @settings('customization')
+  @ui({ type: 'pubg-customization' }, 'customization')
+  rankedGameModeStatsCustomization = 'Rank: $currentTier.tier $currentTier.subTier ($currentRankPoint) | Wins: $wins ((toPercent|1|$winRatio)%) | Top 10: (toPercent|1|$top10Ratio)% | Avg. Rank: (toFloat|1|$avgRank) | KDA: (toFloat|1|$kda)';
+  @settings('customization')
+  @ui({ type: 'pubg-customization' }, 'customization')
+  gameModeStatsCustomization = 'Wins: $wins | Top 10: $top10s';
+
   @settings('stats')
   @ui({ type: 'pubg-stats' }, 'stats')
-  rankedGameModeStats = {};
+  rankedGameModeStats: { [x: string]: any } = {};
   @shared(true)
   _lastRankedGameModeStats = 0;
 
   @settings('stats')
   @ui({ type: 'pubg-stats' }, 'stats')
-  gameModeStats = {};
+  gameModeStats: { [x: string]: any } = {};
   @shared(true)
   _lastGameModeStats = 0;
 
@@ -164,6 +175,66 @@ class PUBG extends Integration {
         cb(e.message, null);
       }
     });
+    adminEndpoint(this.nsp, 'pubg::exampleParse', async ({ text }, cb) => {
+      try {
+        const messageToSend = await new Message(text).parse({}) as string;
+        cb(null, messageToSend);
+      } catch (e) {
+        cb(e.message, null);
+      }
+    });
+  }
+
+  @command('!pubg normal')
+  async showGameModeStats(opts: CommandOptions): Promise<CommandResponse[]> {
+    try {
+      const gameType = new Expects(opts.parameters).everything().toArray()[0] as string;
+      if (typeof this.gameModeStats[gameType] === 'undefined') {
+        throw new Error('Expected parameter');
+      }
+      let text = this.gameModeStatsCustomization;
+      for (const key of Object.keys(flatten(this.gameModeStats[gameType]))) {
+        text = text.replace(new RegExp(escapeRegExp(`$${key}`), 'gi'), flatten(this.gameModeStats[gameType])[key]);
+      }
+      return [{
+        response: await new Message(`$sender, ${text}`).parse({}), ...opts,
+      }];
+    } catch (e) {
+      if (e.message.includes('Expected parameter')) {
+        return [{
+          response: `$sender, expected one of these parameters: ${Object.keys(this.gameModeStats).join(', ')}`, ...opts,
+        }];
+      } else {
+        error(e.stack);
+        return [];
+      }
+    }
+  }
+
+  @command('!pubg ranked')
+  async showRankedGameModeStats(opts: CommandOptions): Promise<CommandResponse[]> {
+    try {
+      const gameType = new Expects(opts.parameters).everything().toArray()[0] as string;
+      if (typeof this.rankedGameModeStats[gameType] === 'undefined') {
+        throw new Error('Expected parameter');
+      }
+      let text = this.rankedGameModeStatsCustomization;
+      for (const key of Object.keys(flatten(this.rankedGameModeStats[gameType]))) {
+        text = text.replace(new RegExp(escapeRegExp(`$${key}`), 'gi'), flatten(this.rankedGameModeStats[gameType])[key]);
+      }
+      return [{
+        response: await new Message(`$sender, ${text}`).parse({}), ...opts,
+      }];
+    } catch (e) {
+      if (e.message.includes('Expected parameter')) {
+        return [{
+          response: `$sender, expected one of these parameters: ${Object.keys(this.rankedGameModeStats).join(', ')}`, ...opts,
+        }];
+      } else {
+        error(e.stack);
+        return [];
+      }
+    }
   }
 }
 

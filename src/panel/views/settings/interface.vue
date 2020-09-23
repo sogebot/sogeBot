@@ -275,6 +275,7 @@ enum State {
     'pubg-player-id': () => import('./components/interface/pubg-player-id.vue'),
     'pubg-season-id': () => import('./components/interface/pubg-season-id.vue'),
     'pubg-stats': () => import('./components/interface/pubg-stats.vue'),
+    'pubg-customization': () => import('./components/interface/pubg-customization.vue'),
     }
 })
 export default class interfaceSettings extends Vue {
