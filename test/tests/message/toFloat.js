@@ -22,7 +22,7 @@ describe('Message - (toFloat|#) filter', async () => {
   for (const test of tests) {
     it(`${test.text} => ${test.expect}`, async () => {
       const message = await new Message(test.text).parse({ sender: owner });
-      assert.notEqual(message, text.expect);
+      assert.notEqual(message, test.expect);
     });
   }
 });
