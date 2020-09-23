@@ -13,14 +13,14 @@
     <b-input v-else v-model="fetchedPlayerId" class="form-control" :readonly="true"/>
     <div class="input-group-append" v-if="!(settings.player.playerName.length === 0 || settings.settings.apiKey.length === 0)">
       <b-button @click="getPlayerId" :variant="getVariantByState(state.fetching)">
-        <template v-if="state.fetching === ButtonStates.idle">Click to fetch playerId</template>
+        <template v-if="state.fetching === ButtonStates.idle">{{ translate('integrations.pubg.click_to_fetch') }}</template>
         <template v-else-if="state.fetching === ButtonStates.progress"><b-spinner small></b-spinner></template>
-        <template v-else-if="state.fetching === ButtonStates.fail">Something went wrong!
+        <template v-else-if="state.fetching === ButtonStates.fail">{{ translate('integrations.pubg.something_went_wrong') }}
           <svg width="1.3em" height="1.3em" viewBox="0 0 16 16" class="bi bi-exclamation" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
             <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
           </svg>
         </template>
-        <template v-else-if="state.fetching === ButtonStates.success">OK!
+        <template v-else-if="state.fetching === ButtonStates.success">{{ translate('integrations.pubg.ok') }}
           <svg width="1.3em" height="1.3em" viewBox="0 0 16 16" class="bi bi-check2-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L8 9.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
             <path fill-rule="evenodd" d="M8 2.5A5.5 5.5 0 1 0 13.5 8a.5.5 0 0 1 1 0 6.5 6.5 0 1 1-3.25-5.63.5.5 0 1 1-.5.865A5.472 5.472 0 0 0 8 2.5z"/>
