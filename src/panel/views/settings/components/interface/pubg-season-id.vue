@@ -11,7 +11,7 @@
     </div>
     <b-input v-if="settings.settings.apiKey.length === 0" class="form-control" :readonly="true" value="Fill apiKey to fetch seasonId" variant="danger"/>
     <b-input v-else v-model="fetchedSeasonId" class="form-control" :readonly="true"/>
-    <div class="input-group-append" v-if="!(settings.settings.apiKey.length === 0)">
+    <div class="input-group-append" v-if="settings.settings.apiKey.length !== 0">
       <b-button @click="getSeasonId" :variant="getVariantByState(state.fetching)">
         <template v-if="state.fetching === ButtonStates.idle">Click to fetch current seasonId</template>
         <template v-else-if="state.fetching === ButtonStates.progress"><b-spinner small></b-spinner></template>

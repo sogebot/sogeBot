@@ -43,8 +43,8 @@ export default defineComponent({
     const translatedTitle = translate(props.title);
     const computedExample = ref(null as null | string);
 
-    const exampleOptions = computed(() => Object.keys(props.settings?.stats[statsType]));
-    const selectedExampleOption = ref(Object.keys(props.settings?.stats[statsType])[0] || null);
+    const exampleOptions = computed(() => Object.keys(props.settings?.stats[statsType]) || {});
+    const selectedExampleOption = ref(Object.keys(props.settings?.stats[statsType] || {})[0] || null);
 
     const updateExample = () => {
       if (props.settings) {
