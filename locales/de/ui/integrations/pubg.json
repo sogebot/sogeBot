@@ -1,0 +1,24 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "apiKey": {
+      "title": "API Key",
+      "help": "Get your API Key at https://developer.pubg.com/"
+    },
+    "platform": "Platform",
+    "playerName": "Player Name",
+    "playerId": "Player ID",
+    "seasonId": {
+      "title": "Season ID",
+      "help": "Current season ID is being fetch every hour."
+    },
+    "rankedGameModeStatsCustomization": "Customized message for ranked stats",
+    "gameModeStatsCustomization": "Customized message for normal stats"
+  },
+  "click_to_fetch": "Click to fetch",
+  "something_went_wrong": "Something went wrong!",
+  "ok": "OK!",
+  "stats_are_automatically_refreshed_every_10_minutes": "Stats are automatically refreshed every 10 minutes.",
+  "player_stats_ranked": "Player stats (ranked)",
+  "player_stats": "Player stats"
+}

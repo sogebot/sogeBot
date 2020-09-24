@@ -1,0 +1,24 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "apiKey": {
+      "title": "API klíč",
+      "help": "Získej svůj klíč na https://developer.pubg.com/"
+    },
+    "platform": "Platforma",
+    "playerName": "Jméno hráče",
+    "playerId": "ID hráče",
+    "seasonId": {
+      "title": "ID sezóny",
+      "help": "ID aktuální sezóny se načítá každou hodinu."
+    },
+    "rankedGameModeStatsCustomization": "Přizpůsobená zpráva pro hodnocené statistiky",
+    "gameModeStatsCustomization": "Přizpůsobená zpráva pro normální statistiky"
+  },
+  "click_to_fetch": "Klikněte pro načtení",
+  "something_went_wrong": "Něco se pokazilo!",
+  "ok": "OK!",
+  "stats_are_automatically_refreshed_every_10_minutes": "Statistiky se automaticky aktualizují každých 10 minut.",
+  "player_stats_ranked": "Statistiky hráče (hodnocené)",
+  "player_stats": "Statistiky hráče"
+}
