@@ -687,7 +687,7 @@ class Message {
             );
           }
         }
-        return Number(toEvaluate).toFixed(2);
+        return Number(toEvaluate).toFixed(toFixed);
       },
     };
     const evaluate = {
