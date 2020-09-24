@@ -84,11 +84,24 @@ bot it is twitch by default
 
 `(offlineonly)` - will enable command only if stream is offline
 
-## Math filter
-`(math.#)` - solve a math problem
+## Math filters
+
+- `(math.#)` - solve a math problem
   - **example:**
     - `(math.5+6)`
     - `(math.$bits*2)` - usable with variables in events
+- `(toPercent.#)` - change float number to percent
+  - **example:**
+    - `(toPercent|2|0.5)` => 50.00
+    - `(toPercent|0.5)` => 50
+    - `(toPercent|0.4321)` => 43
+    - `(toPercent|2|0.43211123)` => 43.21
+- `(toFloat.#)` - formats a number using fixed-point notation.
+  - **example:**
+    - `(toFloat|2|0.5)` => 0.50
+    - `(toFloat|0.5)` => 1
+    - `(toFloat|2|0.43211123)` => 0.43
+    - `(toFloat|0.4321)` => 0
 
 ## Random filters
 `(random.online.viewer)` - returns random online viewer
