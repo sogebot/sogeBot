@@ -10,6 +10,7 @@ import Message from '../message';
 import Expects from '../expects';
 import { flatten } from '../helpers/flatten';
 import { escapeRegExp } from 'lodash';
+import { prepare } from '../commons';
 
 class PUBG extends Integration {
   @settings()
@@ -202,7 +203,7 @@ class PUBG extends Integration {
     } catch (e) {
       if (e.message.includes('Expected parameter')) {
         return [{
-          response: `$sender, expected one of these parameters: ${Object.keys(this.gameModeStats).join(', ')}`, ...opts,
+          response: prepare('integrations.pubg.expected_one_of_these_parameters', { list: Object.keys(this.gameModeStats).join(', ') }), ...opts,
         }];
       } else {
         error(e.stack);
@@ -228,7 +229,7 @@ class PUBG extends Integration {
     } catch (e) {
       if (e.message.includes('Expected parameter')) {
         return [{
-          response: `$sender, expected one of these parameters: ${Object.keys(this.rankedGameModeStats).join(', ')}`, ...opts,
+          response: prepare('integrations.pubg.expected_one_of_these_parameters', { list: Object.keys(this.rankedGameModeStats).join(', ') }), ...opts,
         }];
       } else {
         error(e.stack);
