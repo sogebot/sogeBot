@@ -239,7 +239,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, onBeforeMount, watch } from '@vue/composition-api'
+import { defineComponent, ref, onBeforeMount, watch } from '@vue/composition-api'
 import { textStrokeGenerator, shadowGenerator } from 'src/panel/helpers/text';
 
 function loadFont(value: string) {
@@ -277,7 +277,7 @@ export default defineComponent({
   },
   setup(props: Props) {
     const exampleColor = ref('#000000');
-    const fonts: {text: string; value: string}[] = reactive([]);
+    const fonts = ref([] as {text: string; value: string}[]);
 
     const addShadow = () => {
       props.data.shadow.push({
@@ -308,12 +308,12 @@ export default defineComponent({
 
         request.send();
       })
+      console.log({items: response.items});
       for (const font of response.items.map((o: { family: string }) => {
         return { text: o.family, value: o.family }
       })) {
-        fonts.push(font);
+        fonts.value.push(font);
       }
-
       loadFont(props.data.family)
     })
 
