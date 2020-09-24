@@ -68,7 +68,6 @@
             >
               <template v-if="editationItem">
                 <b-form-textarea
-                  v-if="editationItem"
                   id="response"
                   v-model="editationItem.response"
                   :placeholder="translate('systems.keywords.response.placeholder')"
