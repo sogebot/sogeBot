@@ -2,23 +2,23 @@
   "settings": {
     "enabled": "Status",
     "apiKey": {
-      "title": "API Key",
-      "help": "Get your API Key at https://developer.pubg.com/"
+      "title": "API klíč",
+      "help": "Získej svůj klíč na https://developer.pubg.com/"
     },
-    "platform": "Platform",
-    "playerName": "Player Name",
-    "playerId": "Player ID",
+    "platform": "Platforma",
+    "playerName": "Jméno hráče",
+    "playerId": "ID hráče",
     "seasonId": {
-      "title": "Season ID",
-      "help": "Current season ID is being fetch every hour."
+      "title": "ID sezóny",
+      "help": "ID aktuální sezóny se načítá každou hodinu."
     },
-    "rankedGameModeStatsCustomization": "Customized message for ranked stats",
-    "gameModeStatsCustomization": "Customized message for normal stats"
+    "rankedGameModeStatsCustomization": "Přizpůsobená zpráva pro hodnocené statistiky",
+    "gameModeStatsCustomization": "Přizpůsobená zpráva pro normální statistiky"
   },
-  "click_to_fetch": "Click to fetch",
-  "something_went_wrong": "Something went wrong!",
+  "click_to_fetch": "Klikněte pro načtení",
+  "something_went_wrong": "Něco se pokazilo!",
   "ok": "OK!",
-  "stats_are_automatically_refreshed_every_10_minutes": "Stats are automatically refreshed every 10 minutes.",
-  "player_stats_ranked": "Player stats (ranked)",
-  "player_stats": "Player stats"
+  "stats_are_automatically_refreshed_every_10_minutes": "Statistiky se automaticky aktualizují každých 10 minut.",
+  "player_stats_ranked": "Statistiky hráče (hodnocené)",
+  "player_stats": "Statistiky hráče"
 }
