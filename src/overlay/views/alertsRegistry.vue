@@ -445,7 +445,7 @@ export default class AlertsRegistryOverlays extends Vue {
                     :class="{['animate__' + runningAlert.animation]: true}"
                     :style="{
                       'animation-duration': runningAlert.animationSpeed + 'ms'
-                    }
+                    }"
                     class="animate__animated ${refImageClass}"
                     :src="'/registry/alerts/' + runningAlert.alert.imageId"
                   `);
