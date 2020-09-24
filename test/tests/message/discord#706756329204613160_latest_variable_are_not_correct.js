@@ -75,47 +75,47 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
   });
 
   it ('$latestFollower should have correct user9', async () => {
-    const parsed = await new Message('$latestFollower').parse({ sender: owner});
+    const parsed = await new Message('$latestFollower').parse({ sender: owner });
     assert.strictEqual(parsed, 'user9');
   });
 
   it ('$latestSubscriber should have correct user19', async () => {
-    const parsed = await new Message('$latestSubscriber').parse({ sender: owner});
+    const parsed = await new Message('$latestSubscriber').parse({ sender: owner });
     assert.strictEqual(parsed, 'user19');
   });
 
   it ('$latestTip should have correct user29', async () => {
-    const parsed = await new Message('$latestTip').parse({ sender: owner});
+    const parsed = await new Message('$latestTip').parse({ sender: owner });
     assert.strictEqual(parsed, 'user29');
   });
 
   it ('$latestTipAmount should have correct 29', async () => {
-    const parsed = await new Message('$latestTipAmount').parse({ sender: owner});
+    const parsed = await new Message('$latestTipAmount').parse({ sender: owner });
     assert.strictEqual(parsed, '29.00');
   });
 
   it ('$latestTipCurrency should have correct j', async () => {
-    const parsed = await new Message('$latestTipCurrency').parse({ sender: owner});
+    const parsed = await new Message('$latestTipCurrency').parse({ sender: owner });
     assert.strictEqual(parsed, 'j');
   });
 
   it ('$latestTipMessage should have correct message9', async () => {
-    const parsed = await new Message('$latestTipMessage').parse({ sender: owner});
+    const parsed = await new Message('$latestTipMessage').parse({ sender: owner });
     assert.strictEqual(parsed, 'message9');
   });
 
   it ('$latestCheer should have correct user39', async () => {
-    const parsed = await new Message('$latestCheer').parse({ sender: owner});
+    const parsed = await new Message('$latestCheer').parse({ sender: owner });
     assert.strictEqual(parsed, 'user39');
   });
 
   it ('$latestCheerAmount should have correct 39', async () => {
-    const parsed = await new Message('$latestCheerAmount').parse({ sender: owner});
+    const parsed = await new Message('$latestCheerAmount').parse({ sender: owner });
     assert.strictEqual(parsed, '39');
   });
 
   it ('$latestCheerMessage should have correct message9', async () => {
-    const parsed = await new Message('$latestCheerMessage').parse({ sender: owner});
+    const parsed = await new Message('$latestCheerMessage').parse({ sender: owner });
     assert.strictEqual(parsed, 'message9');
   });
 });

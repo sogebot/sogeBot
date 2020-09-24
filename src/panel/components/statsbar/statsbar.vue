@@ -1,7 +1,7 @@
 <template>
   <div class="stream-info-container container-fluid" :class="{ 'sticky-top': b_sticky }" :style="{ 'top': b_sticky ? top + 'px' : undefined }" ref="quickwindow">
     <b-toast :title="error.name" visible variant="danger" v-for="error of errors" :key="error.name + error.message + error.date">
-      {{ error.message }}
+      <div v-html="error.message"/>
     </b-toast>
     <b-toast :title="translate('errors.owner_and_broadcaster_oauth_is_not_set')" no-auto-hide visible variant="danger" solid v-if="!$store.state.configuration.isCastersSet">
       <div v-html="translate('errors.please_set_your_broadcaster_oauth_or_owners')"/>

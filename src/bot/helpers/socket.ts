@@ -16,6 +16,7 @@ import type { SongPlaylistInterface } from '../database/entity/song';
 import type { RaffleParticipantInterface } from '../database/entity/raffle';
 import type { PriceInterface } from '../database/entity/price';
 import type { DashboardInterface } from '../database/entity/dashboard';
+import type PUBG from '../integrations/pubg';
 
 const endpoints: {
   type: 'admin' | 'viewer' | 'public';
@@ -111,6 +112,10 @@ function adminEndpoint (nsp: string, on: 'panel::dashboards::remove', callback: 
 function adminEndpoint (nsp: string, on: 'panel::dashboards::create', callback: (opts: { userId: number, name: string }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'lists.set', callback: (opts: { blacklist: string[]; whitelist: string[] }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'purgeAllConnections', callback: (cb: (error: Error | string | null) => void, socket: SocketIO.Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'pubg::searchForPlayerId', callback: (opts: { apiKey: string, platform: typeof PUBG.platform, playerName: string }, cb: (error: Error | string | null, data: any) => void, socket: SocketIO.Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'pubg::searchForseasonId', callback: (opts: { apiKey: string, platform: typeof PUBG.platform, playerName: string }, cb: (error: Error | string | null, data: any) => void, socket: SocketIO.Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'pubg::getUserStats', callback: (opts: { apiKey: string, platform: typeof PUBG.platform, playerId: string, seasonId: string, ranked: boolean }, cb: (error: Error | string | null, data: any) => void, socket: SocketIO.Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'pubg::exampleParse', callback: (opts: { text: string }, cb: (error: Error | string | null, data: any) => void, socket: SocketIO.Socket) => void): void;
 
 // generic functions
 function adminEndpoint (nsp: string, on: string, callback: (opts: { [x: string]: any }, cb?: (error: Error | string | null, ...response: any) => void) => void, socket?: SocketIO.Socket): void;

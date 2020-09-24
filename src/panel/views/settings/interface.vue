@@ -49,6 +49,7 @@
                       :max="ui[category][defaultValue].max"
                       :class="ui[category][defaultValue].class"
                       :emit="ui[category][defaultValue].emit"
+                      :settings="settingsWithoutPermissions"
                       :value="currentValue"
                       :values="ui[category][defaultValue].values"
                       @update="value[defaultValue] = $event.value; triggerDataChange()"
@@ -271,6 +272,10 @@ enum State {
     'uuid-generator': () => import('./components/interface/uuid-generator.vue'),
     'voice': () => import('./components/interface/voice.vue'),
     'toggle-enable': () => import('./components/interface/toggle-enable.vue'),
+    'pubg-player-id': () => import('./components/interface/pubg-player-id.vue'),
+    'pubg-season-id': () => import('./components/interface/pubg-season-id.vue'),
+    'pubg-stats': () => import('./components/interface/pubg-stats.vue'),
+    'pubg-customization': () => import('./components/interface/pubg-customization.vue'),
     }
 })
 export default class interfaceSettings extends Vue {
