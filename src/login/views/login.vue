@@ -63,7 +63,7 @@ export default defineComponent({
     })
     const url = computed(() => window.location.origin);
     const login = () => {
-      window.location.replace('http://oauth.sogebot.xyz/?state=' + encodeURIComponent(window.btoa(
+      window.location.assign('http://oauth.sogebot.xyz/?state=' + encodeURIComponent(window.btoa(
         JSON.stringify({
           popoutUrl: popoutUrl.value,
           url: url.value,

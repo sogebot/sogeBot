@@ -101,9 +101,9 @@ export default defineComponent({
       localStorage.setItem('accessToken', '');
       localStorage.setItem('refreshToken', '');
       localStorage.setItem('userType', 'unauthorized');
-      window.location.replace(window.location.origin + '/login#error=logged+out');
+      window.location.assign(window.location.origin + '/login#error=logged+out');
     }
-    const login = () => window.location.replace(window.location.origin + '/login');
+    const login = () => window.location.assign(window.location.origin + '/login');
     const refreshViewer = () => {
       if (typeof context.root.$store.state.loggedUser === 'undefined'|| context.root.$store.state.loggedUser === null) {
         return;
