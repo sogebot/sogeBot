@@ -365,7 +365,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
             console.debug({possibleAlertsWithRandomCount, possibleAlertsWithExactAmount, possibleAlertsWithGtEqAmount})
 
-            let alert: any;
+            let alert: CommonSettingsInterface | AlertHostInterface | AlertTipInterface | AlertResubInterface | undefined;
             if (possibleAlertsWithExactAmount.length > 0) {
               alert = possibleAlertsWithExactAmount[Math.floor(Math.random() * possibleAlertsWithExactAmount.length)];
             } else if (possibleAlertsWithGtEqAmount.length > 0) {
@@ -373,11 +373,15 @@ export default class AlertsRegistryOverlays extends Vue {
             } else {
               alert = possibleAlertsWithRandomCount[Math.floor(Math.random() * possibleAlertsWithRandomCount.length)];
             }
+            if (!alert || !alert.id) {
+              console.log('No alert found or all are disabled');
+              return;
+            }
 
             // advancedMode
             if (alert.enableAdvancedMode) {
               // prepare HTML
-              this.preparedAdvancedHTML = alert.advancedMode.html;
+              this.preparedAdvancedHTML = alert.advancedMode.html || '';
 
               // load ref="text" class
               const refTextClassMatch = /\<div.*class="(.*?)".*ref="text"\>|\<div.*ref="text".*class="(.*?)"\>/gm.exec(this.preparedAdvancedHTML);
@@ -423,7 +427,7 @@ export default class AlertsRegistryOverlays extends Vue {
                   .replace(/\{amount:highlight\}/g, `<v-runtime-template :template="prepareMessageTemplate('{amount:highlight}')"></v-runtime-template>`)
                   .replace(/\{monthsName:highlight\}/g, `<v-runtime-template :template="prepareMessageTemplate('{monthsName:highlight}')"></v-runtime-template>`)
                   .replace(/\{currency:highlight\}/g, `<v-runtime-template :template="prepareMessageTemplate('{currency:highlight}')"></v-runtime-template>`)
-                  .replace('"wrap"', '"wrap-' + alert.uuid +'"')
+                  .replace('"wrap"', '"wrap-' + alert.id +'"')
                   .replace(/\<div.*class="(.*?)".*ref="text"\>|\<div.*ref="text".*class="(.*?)"\>/gm, '<div ref="text">') // we need to replace ref with class with proper ref
                   .replace('ref="text"', `
                     v-if="runningAlert.isShowingText"
@@ -451,14 +455,14 @@ export default class AlertsRegistryOverlays extends Vue {
                   `);
 
               // load CSS
-              if (!this.loadedCSS.includes(alert.uuid)) {
-                console.debug('loaded custom CSS for ' + alert.uuid);
-                this.loadedCSS.push(alert.uuid);
+              if (!this.loadedCSS.includes(alert.id)) {
+                console.debug('loaded custom CSS for ' + alert.id);
+                this.loadedCSS.push(alert.id);
                 const head = document.getElementsByTagName('head')[0]
                 const style = document.createElement('style')
                 style.type = 'text/css';
                 const css = alert.advancedMode.css
-                  .replace(/\#wrap/g, '#wrap-' + alert.uuid) // replace .wrap with only this goal wrap
+                  .replace(/\#wrap/g, '#wrap-' + alert.id) // replace .wrap with only this goal wrap
                 style.appendChild(document.createTextNode(css));
                 head.appendChild(style);
               }
@@ -467,7 +471,7 @@ export default class AlertsRegistryOverlays extends Vue {
               this.$nextTick(() => {
                 // eval onStarted
                 this.$nextTick(() => {
-                  if (alert.enableAdvancedMode) {
+                  if (alert && alert.enableAdvancedMode) {
                     eval(`${alert.advancedMode.js}; if (typeof onStarted === 'function') { onStarted() } else { console.log('no onStarted() function found'); }`);
                   }
                 });
