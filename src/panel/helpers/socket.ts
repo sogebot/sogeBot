@@ -4,9 +4,9 @@ import axios from 'axios';
 
 export const redirectLogin = () => {
   if (window.location.href.includes('popout')) {
-    window.location.replace(window.location.origin + '/login#error=popout+must+be+logged');
+    window.location.assign(window.location.origin + '/login#error=popout+must+be+logged');
   } else {
-    window.location.replace(window.location.origin + '/login');
+    window.location.assign(window.location.origin + '/login');
   }
 };
 
