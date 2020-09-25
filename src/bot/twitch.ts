@@ -163,7 +163,8 @@ class Twitch extends Core {
     }
     const games = await api.sendGameFromTwitch(null, opts.parameters);
     if (Array.isArray(games) && games.length > 0) {
-      const status = await api.setTitleAndGame({ game: games[0] });
+      const exactMatchIdx = games.findIndex(name => name.toLowerCase() === opts.parameters.toLowerCase());
+      const status = await api.setTitleAndGame({ game: games[exactMatchIdx !== -1 ? exactMatchIdx : 0] });
       return status ? [ { response: status.response, ...opts } ] : [];
     }
     return [{ response: translate('game.change.failed').replace(/\$title/g, api.stats.currentGame || 'n/a'), ...opts }];
