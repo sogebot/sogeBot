@@ -13,6 +13,10 @@
       "title": "Intervall ankündigen",
       "help": "in Minuten"
     },
+    "raffleAnnounceMessageInterval": {
+      "title": "Announce message interval",
+      "help": "How many messages must be sent to chat until announce can be posted."
+    },
     "subscribersPercent": {
       "title": "Zusätzliches Glück der Abonnenten",
       "help": "in Prozent"
