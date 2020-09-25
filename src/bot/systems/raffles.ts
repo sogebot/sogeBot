@@ -16,6 +16,7 @@ import { debug, warning } from '../helpers/log';
 import api from '../api';
 import points from './points';
 import { isDbConnected } from '../helpers/database';
+import { linesParsed } from '../helpers/parser';
 
 const TYPE_NORMAL = 0;
 const TYPE_TICKETS = 1;
@@ -32,7 +33,8 @@ const TYPE_TICKETS = 1;
  */
 
 class Raffles extends System {
-  lastAnnounce: number = _.now();
+  lastAnnounce = Date.now();
+  lastAnnounceMessageCount = 0;
 
   @settings('luck')
   subscribersPercent = 150;
@@ -41,6 +43,8 @@ class Raffles extends System {
 
   @settings()
   raffleAnnounceInterval = 10;
+  @settings()
+  raffleAnnounceMessageInterval = 20;
   @settings()
   allowOverTicketing = false;
 
@@ -121,7 +125,7 @@ class Raffles extends System {
     }
 
     const isWinner = !_.isNil(raffle.winner) && raffle.winner === opts.sender.username;
-    const isInFiveMinutesTreshold = _.now() - raffle.timestamp <= 1000 * 60 * 5;
+    const isInFiveMinutesTreshold = Date.now() - raffle.timestamp <= 1000 * 60 * 5;
 
     if (isWinner && isInFiveMinutesTreshold) {
       const winner = await getRepository(RaffleParticipant).findOne({
@@ -151,12 +155,15 @@ class Raffles extends System {
     }
 
     const raffle = await getRepository(Raffle).findOne({ winner: null, isClosed: false });
-    if (!(api.isStreamOnline) || !raffle || new Date().getTime() - new Date(this.lastAnnounce).getTime() < (this.raffleAnnounceInterval * 60 * 1000)) {
+    const isTimeToAnnounce = new Date().getTime() - new Date(this.lastAnnounce).getTime() >= (this.raffleAnnounceInterval * 60 * 1000);
+    const isMessageCountToAnnounce = linesParsed - this.lastAnnounceMessageCount >= this.lastAnnounceMessageCount;
+    if (!(api.isStreamOnline) || !raffle || !isTimeToAnnounce || !isMessageCountToAnnounce) {
       this.timeouts.raffleAnnounce = global.setTimeout(() => this.announce(), 60000);
       return;
     }
 
-    this.lastAnnounce = _.now();
+    this.lastAnnounce = Date.now();
+    this.lastAnnounceMessageCount = linesParsed;
 
     let locale = 'raffles.announce-raffle';
     if (raffle.type === TYPE_TICKETS) {
@@ -262,7 +269,7 @@ class Raffles extends System {
       max: maxTickets,
     });
 
-    this.lastAnnounce = _.now();
+    this.lastAnnounce = Date.now();
     announce(response, 'raffles'); // we are announcing raffle so it is send to all relevant channels
     return [];
   }
