@@ -13,6 +13,10 @@
       "title": "Интервал объявления",
       "help": "в минутах"
     },
+    "raffleAnnounceMessageInterval": {
+      "title": "Announce message interval",
+      "help": "How many messages must be sent to chat until announce can be posted."
+    },
     "subscribersPercent": {
       "title": "Дополнительная удача для сабскрайберов",
       "help": "в процентах"
