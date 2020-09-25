@@ -217,9 +217,9 @@ class OAuth extends Core {
         "user_id": "<authorized user ID>"
       }
     */
-  public async validateOAuth(type: 'bot' | 'broadcaster') {
+  public async validateOAuth(type: 'bot' | 'broadcaster', retry = 0): Promise<boolean> {
     if (!isMainThread || global.mocha) {
-      return;
+      return true;
     }
     clearTimeout(this.timeouts[`validateOAuth-${type}`]);
 
@@ -240,10 +240,19 @@ class OAuth extends Core {
           },
         });
       } catch (e) {
-        const errorMessage: string = e.data?.data ? `${e.data.data.status} — ${e.data.data.message}` : `${e.response.status} — ${e.response.statusText}`;
-        throw new Error(`Error on validate ${type} OAuth token, error: ${errorMessage}`);
+        if (e.isAxiosError) {
+          if (e.response.status !== 401 && retry < 5) {
+            // retry validation if error is different than 401 Invalid Access Token
+            await new Promise((resolve) => {
+              setTimeout(() => resolve(), 1000 + (retry ** 2));
+            });
+            return this.validateOAuth(type, retry++);
+          }
+          throw new Error(`Error on validate ${type} OAuth token, error: ${e.response.status} - ${e.response.statusText} - ${e.response.data.message}`);
+        } else {
+          throw new Error(e);
+        }
       }
-
 
       if (type === 'bot') {
         this.botClientId = request.data.client_id;
