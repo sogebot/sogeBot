@@ -58,6 +58,7 @@ class OAuth extends Core {
   @settings('broadcaster', true)
   @ui({ type: 'checklist', current: 'broadcasterCurrentScopes' })
   public broadcasterExpectedScopes: string[] = [
+    'channel_editor',
     'chat:read',
     'chat:edit',
     'channel:moderate',
@@ -74,7 +75,7 @@ class OAuth extends Core {
 
   @ui({
     type: 'link',
-    href: 'https://twitchtokengenerator.com/quick/3hr2uOHy5B',
+    href: 'https://twitchtokengenerator.com/quick/XH6B7JteDO',
     class: 'btn btn-primary btn-block',
     text: 'commons.generate',
     target: '_blank',
