@@ -9,6 +9,8 @@
   "settings": {
     "enabled": "Status",
     "cooldownNotifyAsWhisper": "Informationen zur Abklingzeit von Whisper-Nachrichten",
-    "cooldownNotifyAsChat": "Informationen zur Abklingzeit von Chat-Nachrichten"
+    "cooldownNotifyAsChat": "Informationen zur Abklingzeit von Chat-Nachrichten",
+    "defaultCooldownOfCommandsInSeconds": "Default cooldown for commands (in seconds)",
+    "defaultCooldownOfKeywordsInSeconds": "Default cooldown for keywords (in seconds)"
   }
 }
