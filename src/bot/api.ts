@@ -1447,6 +1447,11 @@ class API extends Core {
 
     const token = oauth.broadcasterAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
+
+    if (!oauth.broadcasterCurrentScopes.includes('channel_editor')) {
+      warning('Missing Broadcaster oAuth scope channel_editor to change game or title. This mean you can have inconsistent game set across Twitch: https://github.com/twitchdev/issues/issues/224');
+      addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope channel_editor to change game or title. This mean you can have inconsistent game set across Twitch: <a href="https://github.com/twitchdev/issues/issues/224">Twitch Issue # 224</a>' });
+    }
     if (!oauth.broadcasterCurrentScopes.includes('user:edit:broadcast')) {
       warning('Missing Broadcaster oAuth scope user:edit:broadcast to change game or title');
       addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope user:edit:broadcast to change game or title' });
@@ -1479,6 +1484,29 @@ class API extends Core {
       requestData = JSON.stringify({
         game_id: await this.getGameIdFromName(game), title,
       });
+
+      /* workaround for https://github.com/twitchdev/issues/issues/224
+       * Modify Channel Information is not propagated correctly on twitch #224
+       */
+      try {
+        await axios({
+          method: 'put',
+          url: `https://api.twitch.tv/kraken/channels/${cid}`,
+          data: {
+            channel: {
+              game: game,
+              status: title,
+            },
+          },
+          headers: {
+            'Accept': 'application/vnd.twitchtv.v5+json',
+            'Authorization': 'OAuth ' + oauth.broadcasterAccessToken,
+          },
+        });
+      } catch (e) {
+        error(`API: https://api.twitch.tv/kraken/channels/${cid} - ${e.message}`);
+      }
+
       request = await axios({
         method: 'patch',
         url,
