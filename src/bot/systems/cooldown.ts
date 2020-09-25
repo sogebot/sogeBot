@@ -3,7 +3,7 @@ import XRegExp from 'xregexp';
 
 import { isOwner, parserReply, prepare } from '../commons';
 import * as constants from '../constants';
-import { command, default_permission, parser, rollback, settings } from '../decorators';
+import { command, default_permission, parser, permission_settings, rollback, settings } from '../decorators';
 import Expects from '../expects';
 import Parser from '../parser';
 import { permission } from '../helpers/permissions';
@@ -16,8 +16,10 @@ import { adminEndpoint } from '../helpers/socket';
 import { Keyword } from '../database/entity/keyword';
 import customCommands from './customcommands';
 import { debug } from '../helpers/log';
+import permissions from '../permissions';
 
 const cache: { id: string; cooldowns: CooldownInterface[] }[] = [];
+const defaultCooldowns: { name: string; lastRunAt: number, permId: string }[] = [];
 
 /*
  * !cooldown [keyword|!command] [global|user] [seconds] [true/false] - set cooldown for keyword or !command - 0 for disable, true/false set quiet mode
@@ -29,6 +31,11 @@ const cache: { id: string; cooldowns: CooldownInterface[] }[] = [];
  */
 
 class Cooldown extends System {
+  @permission_settings('default', [ permission.CASTERS ])
+  defaultCooldownOfCommandsInSeconds = 0;
+  @permission_settings('default', [ permission.CASTERS ])
+  defaultCooldownOfKeywordsInSeconds = 0;
+
   @settings()
   cooldownNotifyAsWhisper = false;
 
@@ -124,7 +131,7 @@ class Cooldown extends System {
   @parser({ priority: constants.HIGH })
   async check (opts: ParserOptions): Promise<boolean> {
     try {
-      let data: CooldownInterface[];
+      let data: (CooldownInterface | { type: 'default'; canBeRunAt: number; isEnabled: true; name: string; permId: string })[] = [];
       let viewer: CooldownViewerInterface | undefined;
       let timestamp, now;
       const [cmd, subcommand] = new Expects(opts.message)
@@ -158,17 +165,41 @@ class Cooldown extends System {
         }
 
         const cooldown = await getRepository(CooldownEntity).findOne({ where: { name }, relations: ['viewers'] });
-        if (!cooldown) { // command is not on cooldown -> recheck with text only
-          const replace = new RegExp(`${XRegExp.escape(name)}`, 'ig');
-          const message = opts.message.replace(replace, '').trim();
-          if (message.length > 0 && opts.message !== message) {
-            debug('cooldown.check', `Command ${name} not on cooldown, checking: ${message}`);
-            return this.check({...opts, message});
-          } else {
-            return true;
+        if (!cooldown) {
+          const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfCommandsInSeconds');
+          const permId = await permissions.getUserHighestPermission(opts.sender.userId);
+          if (permId === null) {
+            // do nothing if user doesn't have permission
+            return false;
           }
+
+          // user group have some default cooldown
+          if (defaultValue[permId] > 0) {
+            const canBeRunAt = (defaultCooldowns.find(o =>
+              o.permId === permId
+              && o.name === cmd
+            )?.lastRunAt ?? 0) + defaultValue[permId] * 1000;
+            data.push({
+              isEnabled: true,
+              name: cmd,
+              type: 'default',
+              canBeRunAt,
+              permId,
+            });
+          } else {
+            // command is not on cooldown or default cooldown -> recheck with text only
+            const replace = new RegExp(`${XRegExp.escape(name)}`, 'ig');
+            const message = opts.message.replace(replace, '').trim();
+            if (message.length > 0 && opts.message !== message) {
+              debug('cooldown.check', `Command ${name} not on cooldown, checking: ${message}`);
+              return this.check({...opts, message});
+            } else {
+              return true;
+            }
+          }
+        } else {
+          data = [cooldown];
         }
-        data = [cooldown];
       } else { // text
         let [keywords, cooldowns] = await Promise.all([
           getRepository(Keyword).find(),
@@ -180,12 +211,36 @@ class Cooldown extends System {
         });
 
         data = [];
-        _.each(keywords, (keyword) => {
+        for (const keyword of keywords) {
           const cooldown = _.find(cooldowns, (o) => o.name.toLowerCase() === keyword.keyword.toLowerCase());
-          if (keyword.enabled && cooldown) {
-            data.push(cooldown);
+          if (keyword.enabled) {
+            if (cooldown) {
+              data.push(cooldown);
+            } else {
+              const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfKeywordsInSeconds');
+              const permId = await permissions.getUserHighestPermission(opts.sender.userId);
+              if (permId === null) {
+                // do nothing if user doesn't have permission
+                return false;
+              }
+
+              // user group have some default cooldown
+              if (defaultValue[permId] > 0) {
+                const canBeRunAt = (defaultCooldowns.find(o =>
+                  o.permId === permId
+                  && o.name === keyword.keyword
+                )?.lastRunAt ?? 0) + defaultValue[permId] * 1000;
+                data.push({
+                  isEnabled: true,
+                  name: keyword.keyword,
+                  type: 'default',
+                  permId,
+                  canBeRunAt,
+                });
+              }
+            }
           }
-        });
+        }
       }
       if (!_.some(data, { isEnabled: true })) { // parse ok if all cooldowns are disabled
         return true;
@@ -199,6 +254,29 @@ class Cooldown extends System {
 
       const affectedCooldowns: CooldownInterface[] = [];
       for (const cooldown of data) {
+        if (cooldown.type === 'default') {
+          debug('cooldown.check', `Checking default cooldown ${cooldown.name}`);
+          if (cooldown.canBeRunAt >= Date.now()) {
+            debug('cooldown.check', `${opts.sender.username}#${opts.sender.userId} have ${cooldown.name} on global default cooldown, remaining ${Math.ceil((cooldown.canBeRunAt - Date.now()) / 1000)}s`);
+            result = false;
+          } else {
+            const savedCooldown = defaultCooldowns.find(o =>
+              o.permId === cooldown.permId
+              && o.name === cooldown.name
+            );
+            if (savedCooldown) {
+              savedCooldown.lastRunAt = Date.now();
+            } else {
+              defaultCooldowns.push({
+                lastRunAt: Date.now(),
+                name: cooldown.name,
+                permId: cooldown.permId,
+              });
+            }
+            result = true;
+          }
+          continue;
+        }
         if ((isOwner(opts.sender) && !cooldown.isOwnerAffected) || (user.isModerator && !cooldown.isModeratorAffected) || (user.isSubscriber && !cooldown.isSubscriberAffected) || (user.isFollower && !cooldown.isFollowerAffected)) {
           result = true;
           continue;
