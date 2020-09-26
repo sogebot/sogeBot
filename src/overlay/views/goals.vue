@@ -39,13 +39,13 @@
           <div class="col-4 text-left text-nowrap pl-2 pr-2">{{ goal.name }}</div>
           <div class="col-4 text-nowrap text-center">
             <template v-if="goal.type === 'tips'">
-              {{ Number(goal.currentAmount).toFixed(2) }}{{ configuration.currencySymbol }}
+              {{ Number(goal.currentAmount).toFixed(2) }}{{ $store.state.configuration.currencySymbol }}
             </template>
             <template v-else>{{ goal.currentAmount }}</template>
           </div>
           <div class="col-4 text-nowrap text-right pr-2">
             <template v-if="goal.type === 'tips'">
-              {{ Number(goal.goalAmount).toFixed(2) }}{{ configuration.currencySymbol }}
+              {{ Number(goal.goalAmount).toFixed(2) }}{{ $store.state.configuration.currencySymbol }}
             </template>
             <template v-else>{{ goal.goalAmount }}</template></div>
         </div>
@@ -93,7 +93,7 @@
             }">
             <div class="col text-center">
               <template v-if="goal.type === 'tips'">
-                {{ Number(goal.currentAmount).toFixed(2) }}{{ configuration.currencySymbol }} ({{ Number((100 / goal.goalAmount) * goal.currentAmount).toFixed() }}%)
+                {{ Number(goal.currentAmount).toFixed(2) }}{{ $store.state.configuration.currencySymbol }} ({{ Number((100 / goal.goalAmount) * goal.currentAmount).toFixed() }}%)
               </template>
               <template v-else>{{ goal.currentAmount }} ({{ Number((100 / goal.goalAmount) * goal.currentAmount).toFixed() }}%)</template>
             </div>
@@ -108,7 +108,7 @@
           }">
           <div class="col text-left pl-2">
             <template v-if="goal.type === 'tips'">
-              0.00{{ configuration.currencySymbol }}
+              0.00{{ $store.state.configuration.currencySymbol }}
             </template>
             <template v-else>0</template>
           </div>
@@ -117,7 +117,7 @@
           </div>
           <div class="col text-right pr-2">
             <template v-if="goal.type === 'tips'">
-              {{ Number(goal.goalAmount).toFixed(2) }}{{ configuration.currencySymbol }}
+              {{ Number(goal.goalAmount).toFixed(2) }}{{ $store.state.configuration.currencySymbol }}
             </template>
             <template v-else>{{ goal.goalAmount }}</template>
           </div>
