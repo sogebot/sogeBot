@@ -184,7 +184,7 @@
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             {{ translate('tips') }}:
           </strong>
-          {{ Number(data.item.sumTips).toFixed(2) }}{{ configuration.currency }}
+          {{ Number(data.item.sumTips).toFixed(2) }}{{ $store.state.configuration.currency }}
         </div>
       </template>
       <template v-slot:cell(stats2)="data">
