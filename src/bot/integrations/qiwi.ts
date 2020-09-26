@@ -92,7 +92,7 @@ class Qiwi extends Integration {
         event: 'tip',
         amount,
         currency: DONATION_CURRENCY,
-        username: username || 'Anonymous',
+        userId: String(await users.getIdByName(username.toLowerCase()) ?? '0'),
         message,
         timestamp: Date.now(),
       });

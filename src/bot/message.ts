@@ -71,7 +71,7 @@ class Message {
         .orderBy('events.timestamp', 'DESC')
         .where('events.event = :event', { event: 'follow' })
         .getOne();
-      this.message = this.message.replace(/\$latestFollower/g, !_.isNil(latestFollower) ? latestFollower.username : 'n/a');
+      this.message = this.message.replace(/\$latestFollower/g, !_.isNil(latestFollower) ? await users.getNameById(latestFollower.userId) : 'n/a');
     }
 
     // latestSubscriber
@@ -83,7 +83,7 @@ class Message {
         .orWhere('events.event = :event2', { event2: 'resub' })
         .orWhere('events.event = :event3', { event3: 'subgift' })
         .getOne();
-      this.message = this.message.replace(/\$latestSubscriber/g, !_.isNil(latestSubscriber) ? latestSubscriber.username : 'n/a');
+      this.message = this.message.replace(/\$latestSubscriber/g, !_.isNil(latestSubscriber) ? await users.getNameById(latestSubscriber.userId) : 'n/a');
     }
 
     // latestTip, latestTipAmount, latestTipCurrency, latestTipMessage
@@ -100,7 +100,7 @@ class Message {
       this.message = this.message.replace(/\$latestTipAmount/g, !_.isNil(latestTip) ? parseFloat(JSON.parse(latestTip.values_json).amount).toFixed(2) : 'n/a');
       this.message = this.message.replace(/\$latestTipCurrency/g, !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).currency : 'n/a');
       this.message = this.message.replace(/\$latestTipMessage/g, !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).message : 'n/a');
-      this.message = this.message.replace(/\$latestTip/g, !_.isNil(latestTip) ? latestTip.username : 'n/a');
+      this.message = this.message.replace(/\$latestTip/g, !_.isNil(latestTip) ? await users.getNameById(latestTip.userId) : 'n/a');
     }
 
     // latestCheer, latestCheerAmount, latestCheerCurrency, latestCheerMessage
@@ -114,7 +114,7 @@ class Message {
         .getOne();
       this.message = this.message.replace(/\$latestCheerAmount/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).amount : 'n/a');
       this.message = this.message.replace(/\$latestCheerMessage/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).message : 'n/a');
-      this.message = this.message.replace(/\$latestCheer/g, !_.isNil(latestCheer) ? latestCheer.username : 'n/a');
+      this.message = this.message.replace(/\$latestCheer/g, !_.isNil(latestCheer) ? await users.getNameById(latestCheer.userId) : 'n/a');
     }
 
     const spotifySong = JSON.parse(spotify.currentSong);
@@ -394,7 +394,7 @@ class Message {
             case 'message':
               return Number(JSON.parse(tips[0].values_json).message);
             case 'username':
-              return tips[0].username;
+              return users.getNameById(tips[0].userId);
           }
         }
         return '';

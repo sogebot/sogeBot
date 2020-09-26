@@ -129,7 +129,7 @@ const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], us
           webhooks.addIdToCache('follows', user.userId);
           eventlist.add({
             event: 'follow',
-            username: user.username,
+            userId: String(user.userId),
             timestamp: Date.now(),
           });
           if (!isBot(user.username)) {
@@ -1877,7 +1877,7 @@ class API extends Core {
       if (!user.isFollower && new Date().getTime() - new Date(request.data.data[0].followed_at).getTime() < 60000 * 60) {
         eventlist.add({
           event: 'follow',
-          username: user.username,
+          userId: String(id),
           timestamp: Date.now(),
         });
         follow(user.username);

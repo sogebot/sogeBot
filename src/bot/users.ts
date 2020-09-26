@@ -127,7 +127,8 @@ class Users extends Core {
     }, {});
   }
 
-  async getNameById (userId: number) {
+  async getNameById (userId: number | string) {
+    userId = Number(userId);
     const user = await getRepository(User).findOne({ userId });
     if (!user) {
       const savedUser = await getRepository(User).save({

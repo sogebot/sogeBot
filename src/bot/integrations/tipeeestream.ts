@@ -146,7 +146,7 @@ class TipeeeStream extends Integration {
         event: 'tip',
         amount,
         currency: donationCurrency,
-        username,
+        userId: String(await users.getIdByName(username)),
         message,
         timestamp: Date.now(),
       });

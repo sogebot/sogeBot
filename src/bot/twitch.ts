@@ -18,6 +18,7 @@ import api from './api';
 import oauth from './oauth';
 import { translate } from './translate';
 import general from './general';
+import users from './users';
 
 const timezone = (process.env.TIMEZONE ?? 'system') === 'system' || !process.env.TIMEZONE ? moment.tz.guess() : process.env.TIMEZONE;
 
@@ -86,7 +87,7 @@ class Twitch extends Core {
     let lastFollowAgo = '';
     let lastFollowUsername = 'n/a';
     if (events.length > 0) {
-      lastFollowUsername = events[0].username;
+      lastFollowUsername = await users.getNameById(events[0].userId);
       lastFollowAgo = moment(events[0].timestamp).fromNow();
     }
 
@@ -123,7 +124,7 @@ class Twitch extends Core {
     let lastSubAgo = '';
     let lastSubUsername = 'n/a';
     if (events.length > 0) {
-      lastSubUsername = events[0].username;
+      lastSubUsername = await users.getNameById(events[0].userId);
       lastSubAgo = moment(events[0].timestamp).fromNow();
     }
 

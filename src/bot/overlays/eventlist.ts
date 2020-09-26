@@ -9,6 +9,7 @@ import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { Brackets, getRepository } from 'typeorm';
 import { EventList as EventListEntity } from '../database/entity/eventList';
 import eventlist from '../widgets/eventlist';
+import users from '../users';
 
 class EventList extends Overlay {
   @ui({
@@ -21,14 +22,37 @@ class EventList extends Overlay {
   linkBtn = null;
 
   sockets () {
-    adminEndpoint(this.nsp, 'eventlist::getUserEvents', async (username, cb) => {
-      const eventsByUsername = await getRepository(EventListEntity).find({username});
+    adminEndpoint(this.nsp, 'eventlist::getUserEvents', async (userId, cb) => {
+      const eventsByUserId = await getRepository(EventListEntity).find({userId});
       // we also need subgifts by giver
-      const eventsByRecipient
+      const eventsByRecipientId
         = (await getRepository(EventListEntity).find({event:'subgift'}))
-          .filter(o => JSON.parse(o.values_json).from === username);
-      cb(null, _.orderBy([ ...eventsByRecipient, ...eventsByUsername ], 'timestamp', 'desc'));
-
+          .filter(o => JSON.parse(o.values_json).from === String(userId));
+      const events =  _.orderBy([ ...eventsByRecipientId, ...eventsByUserId ], 'timestamp', 'desc');
+      // we need to change userId => username and from => from username for eventlist compatibility
+      const mapping = new Map() as Map<string, string>;
+      for (const event of events) {
+        const values = JSON.parse(event.values_json);
+        if (values.from && values.from != '0') {
+          if (!mapping.has(values.from)) {
+            mapping.set(values.from, await users.getNameById(values.from));
+          }
+        }
+        if (!mapping.has(event.userId)) {
+          mapping.set(event.userId, await users.getNameById(event.userId));
+        }
+      }
+      cb(null, events.map(event => {
+        const values = JSON.parse(event.values_json);
+        if (values.from && values.from != '0') {
+          values.from = mapping.get(values.from);
+        }
+        return {
+          ...event,
+          username: mapping.get(event.userId),
+          values_json: JSON.stringify(values),
+        };
+      }));
     });
     publicEndpoint(this.nsp, 'getEvents', async (opts: { ignore: string; limit: number }, cb) => {
       let events = await getRepository(EventListEntity)
@@ -45,21 +69,46 @@ class EventList extends Overlay {
         .getMany();
       if (events) {
         events = _.uniqBy(events, o =>
-          (o.username + (o.event === 'cheer' ? crypto.randomBytes(64).toString('hex') : o.event))
+          (o.userId + (o.event === 'cheer' ? crypto.randomBytes(64).toString('hex') : o.event))
         );
       }
-      cb(null, events);
+
+      // we need to change userId => username and from => from username for eventlist compatibility
+      const mapping = new Map() as Map<string, string>;
+      for (const event of events) {
+        const values = JSON.parse(event.values_json);
+        if (values.from && values.from != '0') {
+          if (!mapping.has(values.from)) {
+            mapping.set(values.from, await users.getNameById(values.from));
+          }
+        }
+        if (!mapping.has(event.userId)) {
+          mapping.set(event.userId, await users.getNameById(event.userId));
+        }
+      }
+
+      cb(null, events.map(event => {
+        const values = JSON.parse(event.values_json);
+        if (values.from && values.from != '0') {
+          values.from = mapping.get(values.from);
+        }
+        return {
+          ...event,
+          username: mapping.get(event.userId),
+          values_json: JSON.stringify(values),
+        };
+      }));
     });
   }
 
   async add (data: EventList.Event) {
-    if (isBot(data.username)) {
+    if (isBot(await users.getNameById(data.userId))) {
       return;
     } // don't save event from a bot
 
     await getRepository(EventListEntity).save({
       event: data.event,
-      username: data.username,
+      userId: data.userId,
       timestamp: Date.now(),
       isTest: data.isTest ?? false,
       values_json: JSON.stringify(
