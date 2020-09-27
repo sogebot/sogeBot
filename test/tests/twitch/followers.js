@@ -36,7 +36,7 @@ describe('lib/twitch - followers()', () => {
     await time.waitMs(100);
     await eventlist.add({
       event: 'follow',
-      username: 'testuser',
+      userId: testuser.id,
     });
   });
 
@@ -44,7 +44,7 @@ describe('lib/twitch - followers()', () => {
     await time.waitMs(100);
     await eventlist.add({
       event: 'follow',
-      username: 'testuser2',
+      userId: testuser2.id,
     });
   });
 
@@ -61,7 +61,7 @@ describe('lib/twitch - followers()', () => {
     await time.waitMs(100);
     await eventlist.add({
       event: 'follow',
-      username: 'testuser3',
+      userId: testuser3.id,
     });
   });
 
