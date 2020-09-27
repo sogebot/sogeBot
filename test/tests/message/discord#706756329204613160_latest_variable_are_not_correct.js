@@ -9,6 +9,7 @@ const assert = require('assert');
 
 const { getRepository } = require('typeorm');
 const { EventList } = require('../../../dest/database/entity/eventList');
+const { User } = require('../../../dest/database/entity/user');
 
 // users
 const owner = { username: 'soge__' };
@@ -17,7 +18,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
   before(async () => {
     await db.cleanup();
     await message.prepare();
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 40; i++) {
       await getRepository(User).save({ username: `user${i}`, userId: i });
     }
 

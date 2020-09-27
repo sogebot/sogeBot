@@ -127,15 +127,20 @@ class Users extends Core {
     }, {});
   }
 
-  async getNameById (userId: number | string) {
+  async getNameById (userId: number | string): Promise<string> {
     userId = Number(userId);
     const user = await getRepository(User).findOne({ userId });
     if (!user) {
-      const savedUser = await getRepository(User).save({
-        userId,
-        username: await api.getUsernameFromTwitch(userId),
-      });
-      return savedUser.username;
+      const username = await api.getUsernameFromTwitch(userId);
+      if (username) {
+        const savedUser = await getRepository(User).save({
+          userId,
+          username,
+        });
+        return savedUser.username;
+      } else {
+        throw new Error('Cannot get username for userId ' + userId);
+      }
     }
     return user.username;
   }
