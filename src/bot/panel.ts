@@ -32,8 +32,8 @@ import { linesParsed, status as statusObj } from './helpers/parser';
 import { list, systems } from './helpers/register';
 import customvariables from './customvariables';
 import highlights from './systems/highlights';
-import _ from 'lodash';
-import { getOwnerAsSender, getTime } from './commons';
+import _, { isEqual } from 'lodash';
+import { getOwnerAsSender } from './commons';
 import { app, ioServer, menu, menuPublic, server, serverSecure, setApp, setServer, widgets } from './helpers/panel';
 
 const port = process.env.PORT ?? '20000';
@@ -124,7 +124,7 @@ export const init = () => {
   menu.push({ category: 'main', name: 'dashboard', id: 'dashboard', this: null });
 
   setTimeout(() => {
-    adminEndpoint('/', 'panel.sendStreamData', sendStreamData);
+    adminEndpoint('/', 'panel::resetStatsState', () => lastDataSent = null);
   }, 5000);
 
   ioServer?.use(socketSystem.authorize);
@@ -551,7 +551,8 @@ export const expose = function () {
   });
 };
 
-const sendStreamData = async function (cb: (error: Error | string | null, data: any) => void) {
+let lastDataSent: null | Record<string, unknown> = null;
+const sendStreamData = async () => {
   try {
     const ytCurrentSong = Object.values(songs.isPlaying).find(o => o) ? _.get(JSON.parse(songs.currentSong), 'title', null) : null;
     let spotifyCurrentSong: null | string = _.get(JSON.parse(spotify.currentSong), 'song', '') + ' - ' + _.get(JSON.parse(spotify.currentSong), 'artist', '');
@@ -561,7 +562,7 @@ const sendStreamData = async function (cb: (error: Error | string | null, data: 
 
     const data = {
       broadcasterType: oauth.broadcasterType,
-      uptime: getTime(api.isStreamOnline ? api.streamStatusChangeSince : null, false),
+      uptime: api.isStreamOnline ? api.streamStatusChangeSince : null,
       currentViewers: api.stats.currentViewers,
       currentSubscribers: api.stats.currentSubscribers,
       currentBits: api.stats.currentBits,
@@ -580,8 +581,12 @@ const sendStreamData = async function (cb: (error: Error | string | null, data: 
       currentWatched: api.stats.currentWatchedTime,
       tags: currentStreamTags,
     };
-    cb(null, data);
-  } catch (e) {
-    cb(e.stack, undefined);
-  }
+    if (!isEqual(data, lastDataSent)) {
+      ioServer?.emit('panel::stats', data);
+    }
+    lastDataSent = data;
+  } catch (e) {}
+  setTimeout(async () => await sendStreamData(), 5000);
 };
+
+sendStreamData();

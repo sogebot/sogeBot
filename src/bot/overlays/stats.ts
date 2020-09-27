@@ -1,4 +1,4 @@
-import { getTime } from '../commons';
+import { getTime } from '../helpers/getTime';
 import { ui } from '../decorators';
 import Overlay from './_interface';
 import { publicEndpoint } from '../helpers/socket';

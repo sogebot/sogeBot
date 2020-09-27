@@ -6,6 +6,9 @@ const store = new Vuex.Store({
   state: {
     loggedUser: null,
     configuration: null,
+    currentGame: '',
+    currentTitle: '',
+    currentTags: [],
   },
   mutations: {
     setLoggedUser (state, user) {
@@ -13,6 +16,15 @@ const store = new Vuex.Store({
     },
     setConfiguration (state, configuration) {
       Vue.set(state, 'configuration', configuration);
+    },
+    setCurrentGame (state, currentGame) {
+      Vue.set(state, 'currentGame', currentGame);
+    },
+    setCurrentTitle (state, currentTitle) {
+      Vue.set(state, 'currentTitle', currentTitle);
+    },
+    setCurrentTags (state, currentTags) {
+      Vue.set(state, 'currentTags', currentTags);
     },
   },
 });

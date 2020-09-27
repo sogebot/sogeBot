@@ -3,12 +3,13 @@ require('moment-precise-range-plugin');
 
 import { isMainThread } from './cluster';
 
-import { getTime, isIgnored, prepare } from './commons';
+import { isIgnored, prepare } from './commons';
 import { command, default_permission, settings } from './decorators';
 import { permission } from './helpers/permissions';
 import Core from './_interface';
 
 import { adminEndpoint } from './helpers/socket';
+import { getTime } from './helpers/getTime';
 
 import { getRepository } from 'typeorm';
 import { EventList } from './database/entity/eventList';

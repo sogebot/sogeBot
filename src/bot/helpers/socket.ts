@@ -36,8 +36,7 @@ function adminEndpoint (
   | 'list.watch' | 'broadcaster' | 'configuration' | 'raffle:getLatest' | 'lists.get'
   | 'bets::getCurrentBet' | 'commands::count' | 'getLatestStats' | 'menu' | 'panel::errors'
   | 'removeCache' | 'testExplosion' | 'testFireworks' | 'test' | 'discord::authorize'
-  | 'discord::getChannels' | 'discord::getRoles' | 'discord::getGuilds' | 'settings'
-  | 'panel.sendStreamData',
+  | 'discord::getChannels' | 'discord::getRoles' | 'discord::getGuilds' | 'settings',
   callback: (cb: (error: Error | string | null, ...response: any) => void) => void | Promise<void>): void;
 
 // id + cb
