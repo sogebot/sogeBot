@@ -9,6 +9,7 @@ const assert = require('assert');
 
 const { getRepository } = require('typeorm');
 const { EventList } = require('../../../dest/database/entity/eventList');
+const { User } = require('../../../dest/database/entity/user');
 
 // users
 const owner = { username: 'soge__' };
@@ -17,6 +18,10 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
   before(async () => {
     await db.cleanup();
     await message.prepare();
+    for (let i = 0; i < 40; i++) {
+      await getRepository(User).save({ username: `user${i}`, userId: i });
+    }
+
   });
 
   it ('Add 10 follow events', async () => {
@@ -25,7 +30,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
         isTest: false,
         event: 'follow',
         timestamp: 1000 * i,
-        username: `user${i}`,
+        userId: `${i}`,
         values_json: '{}',
       });
     }
@@ -37,7 +42,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
         isTest: false,
         event: ['sub', 'resub', 'subgift'][Math.floor(Math.random() * 3)],
         timestamp: 2000 * i,
-        username: `user${i}`,
+        userId: `${i}`,
         values_json: '{}',
       });
     }
@@ -49,7 +54,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
         isTest: false,
         event: 'tip',
         timestamp: 3000 * i,
-        username: `user${i}`,
+        userId: `${i}`,
         values_json: JSON.stringify({
           amount: i,
           currency: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'][i-20],
@@ -65,7 +70,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
         isTest: false,
         event: 'cheer',
         timestamp: 4000 * i,
-        username: `user${i}`,
+        userId: `${i}`,
         values_json: JSON.stringify({
           amount: i,
           message: `message${i-30}`,

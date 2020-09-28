@@ -250,7 +250,7 @@ class Webhooks {
         if (!isBot(data.from_name)) {
           eventlist.add({
             event: 'follow',
-            username: data.from_name,
+            userId: data.from_id,
             timestamp: Date.now(),
           });
           follow(data.from_name);

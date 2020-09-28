@@ -558,7 +558,7 @@ export default class viewersEdit extends Vue {
     });
     await new Promise((resolve, reject) => {
       if (this.viewer) {
-        this.socketEventList.emit('eventlist::getUserEvents', this.viewer.username, (err: string | null, events: Required<EventListInterface>[]) => {
+        this.socketEventList.emit('eventlist::getUserEvents', this.viewer.userId, (err: string | null, events: Required<EventListInterface>[]) => {
           if (err) {
             return console.error(err);
           }

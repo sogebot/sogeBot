@@ -333,7 +333,13 @@ class TMI extends Core {
           timestamp: Date.now(),
         };
 
-        eventlist.add(data);
+        eventlist.add({
+          userId: String(await users.getIdByName(username) ?? '0'),
+          viewers: viewers,
+          autohost: autohost,
+          event: 'host',
+          timestamp: Date.now(),
+        });
         events.fire('hosted', data);
         alerts.trigger({
           event: 'hosts',
@@ -350,7 +356,7 @@ class TMI extends Core {
     }
   }
 
-  usernotice(message: UserNoticeMessages) {
+  async usernotice(message: UserNoticeMessages) {
     debug('tmi.usernotice', message);
     if (message.event === 'RAID') {
       raid(`${message.parameters.login}, viewers: ${message.parameters.viewerCount}`);
@@ -362,7 +368,12 @@ class TMI extends Core {
         timestamp: Date.now(),
       };
 
-      eventlist.add(data);
+      eventlist.add({
+        userId: String(await users.getIdByName(message.parameters.login) ?? '0'),
+        viewers: message.parameters.viewerCount,
+        event: 'raid',
+        timestamp: Date.now(),
+      });
       events.fire('raid', data);
       alerts.trigger({
         event: 'raids',
@@ -434,7 +445,7 @@ class TMI extends Core {
       eventlist.add({
         event: 'sub',
         tier: String(tier),
-        username,
+        userId: String(userstate.userId),
         method: (isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' ,
         timestamp: Date.now(),
       });
@@ -498,7 +509,7 @@ class TMI extends Core {
       eventlist.add({
         event: 'resub',
         tier: String(tier),
-        username,
+        userId: String(userstate.userId),
         subStreakShareEnabled,
         subStreak,
         subStreakName: getLocalizedName(subStreak, 'core.months'),
@@ -550,7 +561,7 @@ class TMI extends Core {
 
       eventlist.add({
         event: 'subcommunitygift',
-        username,
+        userId: String(userId),
         count,
         timestamp: Date.now(),
       });
@@ -619,8 +630,8 @@ class TMI extends Core {
 
       eventlist.add({
         event: 'subgift',
-        username: recipient,
-        from: username,
+        userId: recipientId,
+        fromId: String(await users.getIdByName(username) ?? '0') ,
         monthsName: getLocalizedName(subCumulativeMonths, 'core.months'),
         months: subCumulativeMonths,
         timestamp: Date.now(),
@@ -670,7 +681,7 @@ class TMI extends Core {
 
       eventlist.add({
         event: 'cheer',
-        username,
+        userId: String(userId),
         bits: userstate.bits,
         message: messageFromUser,
         timestamp: Date.now(),

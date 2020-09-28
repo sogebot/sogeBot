@@ -2,7 +2,8 @@ declare namespace EventList {
   export interface Event {
     event: string;
     timestamp: number;
-    username: string;
+    userId: string;
+    fromId?: string;
     isTest?: boolean;
     autohost?: boolean;
     message?: string;
@@ -11,7 +12,6 @@ declare namespace EventList {
     months?: number;
     bits?: number;
     viewers?: number;
-    from?: number;
     tier?: string;
     song_title?: string;
     song_url?: string;

@@ -154,7 +154,7 @@ class StreamElements extends Integration {
       event: 'tip',
       amount,
       currency: DONATION_CURRENCY,
-      username: username.toLowerCase(),
+      userId: String(await users.getIdByName(username.toLowerCase())),
       message,
       timestamp: Date.now(),
     });

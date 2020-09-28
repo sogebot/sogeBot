@@ -63,7 +63,7 @@ class Qiwi extends Integration {
     }
     for (const event of data.events) {
       const { DONATION_SENDER, DONATION_AMOUNT, DONATION_CURRENCY, DONATION_MESSAGE } = event.attributes;
-      const username = DONATION_SENDER ? DONATION_SENDER.toLowerCase() : null;
+      const username: string | null = DONATION_SENDER ? DONATION_SENDER.toLowerCase() : null;
       const message = DONATION_MESSAGE ? DONATION_MESSAGE : '';
       const amount = Number(DONATION_AMOUNT);
 
@@ -92,7 +92,7 @@ class Qiwi extends Integration {
         event: 'tip',
         amount,
         currency: DONATION_CURRENCY,
-        username: username || 'Anonymous',
+        userId: String(username ? await users.getIdByName(username.toLowerCase()) ?? '0' : '0'),
         message,
         timestamp: Date.now(),
       });

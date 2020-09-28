@@ -150,7 +150,7 @@ class Donationalerts extends Integration {
       event: 'tip',
       amount: data.amount,
       currency: data.currency,
-      username: data.username.toLowerCase(),
+      userId: String(await users.getIdByName(data.username.toLowerCase()) ?? '0'),
       message: data.message,
       timestamp: Date.now(),
     });

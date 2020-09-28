@@ -222,7 +222,7 @@ class Streamlabs extends Integration {
           event: 'tip',
           amount: Number(event.amount),
           currency: event.currency,
-          username: event.from.toLowerCase(),
+          userId: String(await users.getIdByName(event.from.toLowerCase())),
           message: event.message,
           timestamp: Date.now(),
           isTest: event.isTest,
