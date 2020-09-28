@@ -212,7 +212,7 @@ export default defineComponent({
       data.value.splice(data.value.findIndex(o => o.id === id), 1);
       selectedTitle.value = 'current';
     };
-    const init = () => {
+    const init = async () => {
       currentGame.value = null;
       manuallySelected.value = false;
       searchForTags(''); // buildup opts
@@ -224,23 +224,15 @@ export default defineComponent({
       })
       socket.emit('getUserTwitchGames');
 
-      socket.emit('panel.sendStreamData', async (err: string | null, data: any) => {
-        if (err) {
-          return console.error(err);
-        }
+      if (!currentGame.value) {
         const configuration = await getConfiguration();
-        console.groupCollapsed('changegamedialog::panel.sendStreamData')
-        console.log(data)
-        console.groupEnd();
-        if (!currentGame.value) {
-          currentGame.value = data.game;
-          currentTitle.value = data.status;
-          currentTags.value = data.tags.filter((o: any) => !o.is_auto).map((o: any) => {
-            const key = Object.keys(o.localization_names).find(key => key.includes(configuration.lang as string))
-            return o.localization_names[key || 'en-us'];
-          })
-        }
-      });
+        currentGame.value = context.root.$store.state.currentGame;
+        currentTitle.value = context.root.$store.state.currentTitle;
+        currentTags.value = context.root.$store.state.currentTags.filter((o: any) => !o.is_auto).map((o: any) => {
+          const key = Object.keys(o.localization_names).find(key => key.includes(configuration.lang as string))
+          return o.localization_names[key || 'en-us'];
+        })
+      }
     };
     const searchForGame = debounce((value: string)  => {
       if (value.trim().length !== 0) {
@@ -286,6 +278,11 @@ export default defineComponent({
         title,
         tags: currentTags.value,
       };
+
+      context.root.$store.commit('setCurrentGame', emit.game);
+      context.root.$store.commit('setCurrentTitle', emit.title);
+      context.root.$store.commit('setCurrentTags', emit.tags);
+
       console.debug('EMIT [updateGameAndTitle]', emit)
       saveState.value = 1
       socket.emit('updateGameAndTitle', emit, (err: string | null) => {

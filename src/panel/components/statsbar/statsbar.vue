@@ -17,7 +17,7 @@
     <template v-else>
       <div class="row">
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info" @click="saveHighlight">
-          <span class="data" id="uptime">{{ uptime }}</span>
+          <span class="data" id="uptime" :key="timestamp">{{ getTime(uptime, false) }}</span>
           <span class="stats">&nbsp;</span>
           <h2>
             <span>{{ translate('uptime') }}</span>
@@ -301,6 +301,7 @@ let widthOfMenuInterval = 0;
 
 import { defineComponent, ref, onMounted, onUnmounted, computed, reactive, ComputedRef } from '@vue/composition-api'
 import type { Ref } from '@vue/composition-api'
+import { getTime } from 'src/bot/helpers/getTime';
 
 const highlightsSocket = getSocket('/systems/highlights');
 const socket = getSocket('/');
@@ -311,7 +312,7 @@ export default defineComponent({
     const averageStats: any = reactive({});
     const hideStats = ref(localStorage.getItem('hideStats') === 'true');
     const timestamp: Ref<null | number> = ref(null);
-    const uptime = ref('--:--:--');
+    const uptime = ref(null);
     const currentViewers = ref(0);
     const maxViewers = ref(0);
     const chatMessages = ref(0);
@@ -515,39 +516,41 @@ export default defineComponent({
         }
       });
 
+      socket.emit('panel::resetStatsState');
+      socket.on('panel::stats', async (data: Record<string, any>) => {
+        console.groupCollapsed('panel::stats')
+        console.log(data)
+        console.groupEnd();
+
+        broadcasterType.value = data.broadcasterType;
+        uptime.value = data.uptime;
+        currentViewers.value = data.currentViewers;
+        currentSubscribers.value = data.currentSubscribers;
+        currentBits.value = data.currentBits;
+        currentTips.value = data.currentTips;
+        currency.value = data.currency;
+        chatMessages.value = data.chatMessages;
+        currentFollowers.value = data.currentFollowers;
+        currentViews.value = data.currentViews;
+        maxViewers.value = data.maxViewers;
+        game.value = data.game;
+        newChatters.value = data.newChatters;
+        rawStatus.value = data.rawStatus;
+        currentSong.value = data.currentSong;
+        currentHosts.value = data.currentHosts;
+        currentWatched.value = data.currentWatched;
+        tags.value = data.tags;
+        isLoaded.value = true
+        title.value = await generateTitle(data.status, data.rawStatus);
+        rawStatus.value = data.rawStatus;
+
+        context.root.$store.commit('setCurrentGame', game.value);
+        context.root.$store.commit('setCurrentTitle', title.value);
+        context.root.$store.commit('setCurrentTags', tags.value);
+      });
+
       interval = window.setInterval(() => {
         timestamp.value = Date.now()
-        socket.emit('panel.sendStreamData', async (err: string | null, data: { [x: string]: any, rawStatus: string, status: string, game: string }) => {
-          console.groupCollapsed('navbar::panel.sendStreamData')
-          if (err) {
-            return console.error(err);
-          }
-          console.log(data)
-          console.groupEnd();
-
-          broadcasterType.value = data.broadcasterType;
-          uptime.value = data.uptime;
-          currentViewers.value = data.currentViewers;
-          currentSubscribers.value = data.currentSubscribers;
-          currentBits.value = data.currentBits;
-          currentTips.value = data.currentTips;
-          currency.value = data.currency;
-          chatMessages.value = data.chatMessages;
-          currentFollowers.value = data.currentFollowers;
-          currentViews.value = data.currentViews;
-          maxViewers.value = data.maxViewers;
-          game.value = data.game;
-          newChatters.value = data.newChatters;
-          rawStatus.value = data.rawStatus;
-          currentSong.value = data.currentSong;
-          currentHosts.value = data.currentHosts;
-          currentWatched.value = data.currentWatched;
-          tags.value = data.tags;
-          isLoaded.value = true
-          title.value = await generateTitle(data.status, data.rawStatus);
-          rawStatus.value = data.rawStatus;
-          game.value = data.game;
-        });
       }, 1000);
     });
     onUnmounted(() => {
@@ -596,7 +599,8 @@ export default defineComponent({
       filterTags,
       difference,
       toggleViewerShow,
-      quickwindow
+      quickwindow,
+      getTime,
     }
   }
 });

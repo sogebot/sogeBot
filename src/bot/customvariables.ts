@@ -9,7 +9,8 @@ import { js as jsBeautify } from 'js-beautify';
 import Message from './message';
 import { permission } from './helpers/permissions';
 import { getAllOnlineUsernames } from './helpers/getAllOnlineUsernames';
-import { announce, getBot, getTime, isModerator, prepare } from './commons';
+import { getTime } from './helpers/getTime';
+import { announce, getBot, isModerator, prepare } from './commons';
 
 import { getRepository, IsNull } from 'typeorm';
 import { User, UserInterface } from './database/entity/user';
