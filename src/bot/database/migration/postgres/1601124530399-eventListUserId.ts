@@ -53,6 +53,9 @@ export class eventListUserId1601124530399 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE "event_list"`);
     await queryRunner.query(`ALTER TABLE "temporary_event_list" RENAME TO "event_list"`);
     await queryRunner.query(`CREATE INDEX "IDX_8a80a3cf6b2d815920a390968a" ON "event_list" ("userId") `);
+    await queryRunner.query(`ALTER TABLE "event_list" ALTER COLUMN "id" DROP DEFAULT`);
+    await queryRunner.query(`CREATE SEQUENCE "event_list_id_seq" OWNED BY "event_list"."id"`);
+    await queryRunner.query(`ALTER TABLE "event_list" ALTER COLUMN "id" SET DEFAULT nextval('event_list_id_seq')`);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
