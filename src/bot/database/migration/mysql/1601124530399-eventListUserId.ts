@@ -43,7 +43,7 @@ export class eventListUserId1601124530399 implements MigrationInterface {
       }
       return { ...o, userId: mapping.get(username), values_json: JSON.stringify(values) };
     });
-    await queryRunner.query('CREATE TABLE `temporary_event_list` (`id` int NOT NULL AUTO_INCREMENT, `event` varchar(255) NOT NULL, `userId` varchar(255) NOT NULL, `timestamp` bigint NOT NULL, `values_json` varchar(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB', undefined);
+    await queryRunner.query('CREATE TABLE `temporary_event_list` (`id` int NOT NULL AUTO_INCREMENT, `event` varchar(255) NOT NULL, `userId` varchar(255) NOT NULL, `timestamp` bigint NOT NULL, `values_json` text NOT NULL, `isTest` tinyint NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB', undefined);
     for (const event of migratedEvents) {
       await queryRunner.query(
         `INSERT INTO \`temporary_event_list\`(${Object.keys(event).map(o=>`\`${o}\``).join(', ')}) values(${Object.keys(event).map((o: any) => '?')})`, [ ...Object.keys(event).map(key => `'${event[key]}'`) ]
