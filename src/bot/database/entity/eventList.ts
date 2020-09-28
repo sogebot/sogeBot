@@ -7,6 +7,7 @@ export interface EventListInterface {
   userId: string;
   timestamp: number;
   isTest: boolean;
+  isHidden?: boolean;
   values_json: string;
 }
 
@@ -18,6 +19,7 @@ export const EventList = new EntitySchema<Readonly<Required<EventListInterface>>
     userId: { type: String },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer() },
     isTest: { type: 'boolean' },
+    isHidden: { type: 'boolean', default: false },
     values_json: { type: 'text' },
   },
   indices: [
