@@ -88,7 +88,7 @@ const isAPIFree = (intervalList: APITimeouts) => {
 
 const setImmediateAwait = () => {
   return new Promise(resolve => {
-    setTimeout(() => resolve(), 10);
+    setTimeout(() => resolve(true), 10);
   });
 };
 
@@ -1049,13 +1049,12 @@ class API extends Core {
       }
 
       warning(`Couldn't find name of game for gid ${id} - fallback to ${this.stats.currentGame}`);
-      error(`API: ${url} - ${e.stack}`);
-      if (isMainThread) {
-        if (e.isAxiosError) {
-          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
-        } else {
-          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
-        }
+      if (e.isAxiosError) {
+        error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response.status}\n${JSON.stringify(e.response.data, null, 4)}\n\n${e.stack}`);
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: e.config.url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+      } else {
+        error(e.stack);
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
       }
       return this.stats.currentGame;
     }
@@ -1079,7 +1078,7 @@ class API extends Core {
       }
       request = await axios.get(url, {
         headers: {
-          'Authorization': 'Bearer ' + token,
+          'Authorization': 'Bearer a' + token,
           'Client-ID': oauth.botClientId,
         },
         timeout: 20000,
@@ -1100,13 +1099,12 @@ class API extends Core {
       return id;
     } catch (e) {
       warning(`Couldn't find name of game for name ${name} - fallback to ${this.stats.currentGame}`);
-      error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response.status}\n${JSON.stringify(e.response.data, null, 4)}\n\n${e.stack}`);
-      if (isMainThread) {
-        if (e.isAxiosError) {
-          ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: e.config.url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
-        } else {
-          ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
-        }
+      if (e.isAxiosError) {
+        error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response.status}\n${JSON.stringify(e.response.data, null, 4)}\n\n${e.stack}`);
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: e.config.url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+      } else {
+        error(e.stack);
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
       }
       return null;
     }
@@ -1427,8 +1425,13 @@ class API extends Core {
       }
       ioServer?.emit('api.stats', { method: 'PUT', request: { data: { tag_ids } }, timestamp: Date.now(), call: 'setTags', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: this.calls.bot });
     } catch (e) {
-      error(`API: ${url} - ${e.message}`);
-      ioServer?.emit('api.stats', { method: 'PUT', request: { data: { tag_ids } }, timestamp: Date.now(), call: 'setTags', api: 'helix', endpoint: url, code: get(e, 'response.status', '500'), data: e.stack, remaining: this.calls.bot });
+      if (e.isAxiosError) {
+        error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response.status}\n${JSON.stringify(e.response.data, null, 4)}\n\n${e.stack}`);
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'setTags', api: 'helix', endpoint: e.config.url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+      } else {
+        error(e.stack);
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'setTags', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+      }
       return false;
     }
 
@@ -1524,8 +1527,13 @@ class API extends Core {
 
       ioServer?.emit('api.stats', { method: 'PATCH', request: requestData, timestamp: Date.now(), call: 'setTitleAndGame', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
     } catch (e) {
-      error(`API: ${url} - ${e.message}`);
-      ioServer?.emit('api.stats', { method: 'PATCH', request: requestData, timestamp: Date.now(), call: 'setTitleAndGame', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+      if (e.isAxiosError) {
+        error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response.status}\n${JSON.stringify(e.response.data, null, 4)}\n\n${e.stack}`);
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'setTitleAndGame', api: 'helix', endpoint: e.config.url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+      } else {
+        error(e.stack);
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'setTitleAndGame', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+      }
       return { response: '', status: false };
     }
 
@@ -1578,13 +1586,12 @@ class API extends Core {
 
       ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
     } catch (e) {
-      error(`API: ${url} - ${e.stack}`);
-      if (isMainThread) {
-        if (e.isAxiosError) {
-          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'helix', endpoint: url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
-        } else {
-          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
-        }
+      if (e.isAxiosError) {
+        error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response.status}\n${JSON.stringify(e.response.data, null, 4)}\n\n${e.stack}`);
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'helix', endpoint: e.config.url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+      } else {
+        error(e.stack);
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
       }
       return;
     }
@@ -1656,14 +1663,12 @@ class API extends Core {
         this.calls.bot.remaining = 0;
         this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
       }
-
-      error(`API: ${url} - ${e.stack}`);
-      if (isMainThread) {
-        if (e.isAxiosError) {
-          ioServer?.emit('api.stats', { method: 'POST', timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: url, code: e.response.status ?? 'n/a', data: e.response.data });
-        } else {
-          ioServer?.emit('api.stats', { method: 'POST', timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
-        }
+      if (e.isAxiosError) {
+        error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response.status}\n${JSON.stringify(e.response.data, null, 4)}\n\n${e.stack}`);
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: e.config.url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+      } else {
+        error(e.stack);
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
       }
     }
     return { state: true };
@@ -1732,13 +1737,12 @@ class API extends Core {
         this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
       }
 
-      error(`API: ${url} - ${e.stack}`);
-      if (isMainThread) {
-        if (e.isAxiosError) {
-          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: url, code: e.response.status ?? 'n/a', data: e.response.data });
-        } else {
-          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
-        }
+      if (e.isAxiosError) {
+        error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response.status}\n${JSON.stringify(e.response.data, null, 4)}\n\n${e.stack}`);
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: e.config.url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+      } else {
+        error(e.stack);
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
       }
       return;
     }
@@ -1791,13 +1795,12 @@ class API extends Core {
       }
 
       if (logError) {
-        error(`API: ${url} - ${e.stack}`);
-        if (isMainThread) {
-          if (e.isAxiosError) {
-            ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: url, code: e.response.status ?? 'n/a', data: e.response.data });
-          } else {
-            ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
-          }
+        if (e.isAxiosError) {
+          error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response.status}\n${JSON.stringify(e.response.data, null, 4)}\n\n${e.stack}`);
+          ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: e.config.url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+        } else {
+          error(e.stack);
+          ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
         }
       }
       return;
@@ -1845,14 +1848,12 @@ class API extends Core {
         this.calls.bot.remaining = 0;
         this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
       }
-
-      error(`API: ${url} - ${e.stack}`);
-      if (isMainThread) {
-        if (e.isAxiosError) {
-          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
-        } else {
-          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
-        }
+      if (e.isAxiosError) {
+        error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response.status}\n${JSON.stringify(e.response.data, null, 4)}\n\n${e.stack}`);
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: e.config.url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+      } else {
+        error(e.stack);
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
       }
       return null;
     }
@@ -1946,7 +1947,13 @@ class API extends Core {
         setTimeout(() => this.createMarker(), 1000);
         return;
       }
-      error(`API: Marker was not created - ${e.message}`);
+      if (e.isAxiosError) {
+        error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response.status}\n${JSON.stringify(e.response.data, null, 4)}\n\n${e.stack}`);
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: e.config.url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+      } else {
+        error(e.stack);
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+      }
       ioServer?.emit('api.stats', { method: 'POST', request: { data: { user_id: String(cid), description: 'Marked from sogeBot' } }, timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
     }
   }
@@ -2036,13 +2043,12 @@ class API extends Core {
       }
       return request.data.data;
     } catch (e) {
-      error(`API: ${url} - ${e.stack}`);
-      if (isMainThread) {
-        if (e.isAxiosError) {
-          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getTopClips', api: 'helix', endpoint: url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
-        } else {
-          ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getTopClips', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
-        }
+      if (e.isAxiosError) {
+        error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response.status}\n${JSON.stringify(e.response.data, null, 4)}\n\n${e.stack}`);
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: e.config.url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+      } else {
+        error(e.stack);
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
       }
     }
   }
