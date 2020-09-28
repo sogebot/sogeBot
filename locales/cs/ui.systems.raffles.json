@@ -13,6 +13,10 @@
       "title": "Interval oznámení",
       "help": "v minutách"
     },
+    "raffleAnnounceMessageInterval": {
+      "title": "Interval oznámení - zprávy",
+      "help": "Kolik zpráv musí být odesláno do chatu, dokud nebude možné odeslat oznámení."
+    },
     "subscribersPercent": {
       "title": "Dodatečné štěstí subscribera",
       "help": "v procentech"
