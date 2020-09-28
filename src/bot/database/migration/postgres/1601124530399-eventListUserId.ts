@@ -8,6 +8,7 @@ export class eventListUserId1601124530399 implements MigrationInterface {
   name = 'eventListUserId1601124530399';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
+
     const accessToken = (await queryRunner.query(`SELECT * from settings `)).find((o: any) => {
       return o.namespace === '/core/oauth' && (o.name === 'broadcasterAccessToken' || o.name === 'botAccessToken') ;
     })?.value;
@@ -15,7 +16,7 @@ export class eventListUserId1601124530399 implements MigrationInterface {
       return o.namespace === '/core/oauth' && (o.name === 'broadcasterClientId' || o.name === 'botClientId') ;
     })?.value;
 
-    const events = await queryRunner.query(`SELECT * from event_list`);
+    const events = await queryRunner.query(`SELECT * from "event_list"`);
     if ((!accessToken || !clientId) && events.length > 0) {
       throw new Error('Missing accessToken for bot or broadcaster, please set it up before bot upgrade.');
     }
@@ -43,7 +44,7 @@ export class eventListUserId1601124530399 implements MigrationInterface {
       }
       return { ...o, userId: mapping.get(username), values_json: JSON.stringify(values) };
     });
-    await queryRunner.query(`CREATE TABLE "temporary_event_list" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "event" varchar NOT NULL, "userId" varchar NOT NULL, "timestamp" bigint NOT NULL, "values_json" text NOT NULL, "isTest" boolean NOT NULL)`);
+    await queryRunner.query(`CREATE TABLE "temporary_event_list" ("id" SERIAL NOT NULL, "event" character varying NOT NULL, "userId" character varying NOT NULL, "timestamp" bigint NOT NULL, "values_json" character varying NOT NULL, CONSTRAINT "PK_1cc2e9353e9ae8acf95d976cf6f" PRIMARY KEY ("id"))`, undefined);
     for (const event of migratedEvents) {
       await queryRunner.query(
         `INSERT INTO temporary_event_list(${Object.keys(event).join(', ')}) values(${Object.keys(event).map((o: any) => '?')})`, [ ...Object.keys(event).map(key => event[key]) ]
@@ -57,5 +58,4 @@ export class eventListUserId1601124530399 implements MigrationInterface {
   public async down(queryRunner: QueryRunner): Promise<void> {
     console.log('Please revert you db from backup.');
   }
-
 }
