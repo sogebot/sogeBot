@@ -17,7 +17,7 @@
 
     <panel search @search="search = $event">
       <template v-slot:left>
-        <button-with-icon class="btn-primary btn-reverse" icon="plus" href="#/manage/alias/edit">{{translate('systems.alias.new')}}</button-with-icon>
+        <button-with-icon class="btn-primary btn-reverse" icon="plus" @click="newItem">{{translate('systems.alias.new')}}</button-with-icon>
       </template>
     </panel>
 
@@ -179,6 +179,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, getCurrentInstance, computed, watch } from '@vue/composition-api'
 import type { Ref } from '@vue/composition-api'
+import { v4 as uuid } from 'uuid';
 
 import { getSocket } from 'src/panel/helpers/socket';
 import { getPermissionName } from 'src/panel/helpers/getPermissionName';
@@ -346,6 +347,9 @@ export default defineComponent({
       console.debug('Clicked', item.id);
       context.root.$router.push({ name: 'aliasManagerEdit', params: { id: item.id } }).catch(() => {});
     }
+    const newItem = () => {
+      context.root.$router.push({ name: 'aliasManagerEdit', params: { id: uuid() } }).catch(() => {});
+    };
     const remove = (id: string) => {
       socket.alias.emit('generic::deleteById', id, () => {
         items.value = items.value.filter((o) => o.id !== id)
@@ -481,6 +485,7 @@ export default defineComponent({
       isSidebarVisibleChange,
       isSidebarVisible,
       save,
+      newItem
     }
   }
 })
