@@ -156,7 +156,7 @@ class Raffles extends System {
 
     const raffle = await getRepository(Raffle).findOne({ winner: null, isClosed: false });
     const isTimeToAnnounce = new Date().getTime() - new Date(this.lastAnnounce).getTime() >= (this.raffleAnnounceInterval * 60 * 1000);
-    const isMessageCountToAnnounce = linesParsed - this.lastAnnounceMessageCount >= this.lastAnnounceMessageCount;
+    const isMessageCountToAnnounce = linesParsed - this.lastAnnounceMessageCount >= this.raffleAnnounceMessageInterval;
     if (!(api.isStreamOnline) || !raffle || !isTimeToAnnounce || !isMessageCountToAnnounce) {
       this.timeouts.raffleAnnounce = global.setTimeout(() => this.announce(), 60000);
       return;
