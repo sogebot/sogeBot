@@ -14,9 +14,13 @@ class EventList extends Widget {
   }
 
   public sockets() {
-    adminEndpoint(this.nsp, 'eventlist::removeById', async (id, cb) => {
-      const ids = Array.isArray(id) ? [...id] : [id];
-      await getRepository(EventListDB).delete(ids);
+    adminEndpoint(this.nsp, 'eventlist::removeById', async (idList, cb) => {
+      const ids = Array.isArray(idList) ? [...idList] : [idList];
+      for (const id of ids) {
+        await getRepository(EventListDB).update(id, {
+          isHidden: true,
+        });
+      }
       if (cb) {
         cb(null);
       }
@@ -26,7 +30,7 @@ class EventList extends Widget {
     });
 
     adminEndpoint(this.nsp, 'cleanup', () => {
-      getRepository(EventListDB).delete({});
+      getRepository(EventListDB).update({ isHidden: false }, { isHidden: true });
     });
 
     adminEndpoint(this.nsp, 'eventlist::resend', async (id) => {
@@ -120,6 +124,9 @@ class EventList extends Widget {
   public async update(count: number) {
     try {
       const events = await getRepository(EventListDB).find({
+        where: {
+          isHidden: false,
+        },
         order: { timestamp: 'DESC' },
         take: count,
       });
