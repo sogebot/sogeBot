@@ -341,7 +341,7 @@ export default defineComponent({
     const isLoaded = ref(false);
     const top = ref('50');
 
-    const isStreamOnline = computed(() => uptime.value !== '00:00:00');
+    const isStreamOnline = computed(() => uptime.value !== null);
     const b_percentage = computed(() => context.root.$store.state.configuration.core.ui.percentage);
     const b_showAvgDiff = computed(() => context.root.$store.state.configuration.core.ui.showdiff);
     const b_shortenNumber: ComputedRef<boolean> = computed(() => context.root.$store.state.configuration.core.ui.shortennumbers);
