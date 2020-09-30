@@ -97,7 +97,7 @@ class CustomCommands extends System {
           relations: ['responses'],
         });
         if (!cmd) {
-          cb('Command not found');
+          cb(null, null, 0);
         } else {
           const count = await getCountOfCommandUsage(cmd.command);
           cb(null, cmd, count);

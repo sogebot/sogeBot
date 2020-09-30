@@ -20,9 +20,13 @@
       <div class="text">
         <slot>{{text}}</slot>
       </div>
-      <div class="btn-icon" v-if="icon">
-        <fa :icon="icon" fixed-width v-if="spin" spin></fa>
-        <fa :icon="icon" fixed-width v-else></fa>
+
+      <div v-if="icon || !!this.$slots.icon" class="btn-icon">
+        <slot v-if="!!this.$slots.icon" name="icon"></slot>
+        <template v-else>
+          <fa :icon="icon" fixed-width v-if="spin" spin></fa>
+          <fa :icon="icon" fixed-width v-else></fa>
+        </template>
       </div>
     </div>
   </button>
@@ -35,7 +39,7 @@ export default defineComponent({
   props: {
     text: String,
     href: String,
-    icon: [String, Array],
+    icon: [String, Array, Boolean],
     target: String,
     spin: Boolean,
     disabled: Boolean,
