@@ -90,7 +90,7 @@
             <b-button block v-b-toggle="'alias-accordion-' + group" variant="dark" class="text-left">
               {{group === null ? 'Unnassigned group' : group }} ({{ fItems.filter(o => o.group === group).length }})
             </b-button>
-              <hold-button @trigger="removeGroup(group)" icon="trash" class="btn-danger btn-reverse btn-only-icon" v-if="group !== null">
+              <button-with-icon @click="removeGroup(group)" class="btn-danger btn-reverse btn-only-icon" v-if="group !== null">
                 <template slot="icon">
                   <font-awesome-layers>
                     <fa icon="slash" transform="down-1" :mask="['fas', 'object-group']" />
@@ -99,7 +99,7 @@
                 </template>
                 <template slot="title">{{translate('dialog.buttons.delete')}}</template>
                 <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
-              </hold-button>
+              </button-with-icon>
           </div>
         </b-card-header>
         <b-collapse :id="'alias-accordion-' + group" accordion="alias-accordion" role="tabpanel" :visible="group === null">
@@ -141,10 +141,9 @@
                   <button-with-icon class="btn-only-icon btn-dark btn-reverse" :icon="['fas', data.item.visible ? 'eye' : 'eye-slash']" @click="data.item.visible = !data.item.visible; update(data.item)">
                     {{ translate('dialog.buttons.edit') }}
                   </button-with-icon>
-                  <hold-button @trigger="remove(data.item.id)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
-                    <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-                    <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
-                  </hold-button>
+                <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="del(data.item.id)">
+                  {{ translate('dialog.buttons.delete') }}
+                </button-with-icon>
                 </div>
               </template>
             </b-table>
@@ -212,7 +211,6 @@ export default defineComponent({
   components: {
     'loading': () => import('src/panel/components/loading.vue'),
     'font-awesome-layers': FontAwesomeLayers,
-    'hold-button': () => import('src/panel/components/holdButton.vue'),
   },
   validations: {
     editationItem: {
@@ -317,17 +315,19 @@ export default defineComponent({
       })
     };
     const removeGroup = async (group: AliasInterface['group']) => {
-      let promises: Promise<void>[] = [];
-      for (const item of items.value.filter((o) => o.group === group)) {
-        item.group = null;
-        promises.push(new Promise(resolve => {
-          socket.alias.emit('generic::setById', { id: item.id, item }, () => {
-            resolve();
-          })
-        }))
+      if (confirm('Do you want to delete group ' + group + '?')) {
+        let promises: Promise<void>[] = [];
+        for (const item of items.value.filter((o) => o.group === group)) {
+          item.group = null;
+          promises.push(new Promise(resolve => {
+            socket.alias.emit('generic::setById', { id: item.id, item }, () => {
+              resolve();
+            })
+          }))
+        }
+        await Promise.all(promises);
+        context.root.$forceUpdate();
       }
-      await Promise.all(promises);
-      context.root.$forceUpdate();
     }
     const updateGroup = (id: string, group: AliasInterface['group']) => {
       let item = items.value.find((o) => o.id === id)
@@ -350,11 +350,6 @@ export default defineComponent({
     const newItem = () => {
       context.root.$router.push({ name: 'aliasManagerEdit', params: { id: uuid() } }).catch(() => {});
     };
-    const remove = (id: string) => {
-      socket.alias.emit('generic::deleteById', id, () => {
-        items.value = items.value.filter((o) => o.id !== id)
-      })
-    }
     const update = (item: typeof items.value[number]) => {
       socket.alias.emit('generic::setById', { id: item.id, item }, () => {})
     }
@@ -456,7 +451,17 @@ export default defineComponent({
           }, 1000)
         });
       }
-  }
+    }
+    const del = (id: string) => {
+      if (confirm('Do you want to delete alias ' + items.value.find(o => o.id === id)?.alias + '?')) {
+        socket.alias.emit('generic::deleteById', id, (err: string | null) => {
+          if (err) {
+            return error(err);
+          }
+          refresh();
+        })
+      }
+    }
 
 
     return {
@@ -475,7 +480,6 @@ export default defineComponent({
       updateGroup,
       updatePermission,
       linkTo,
-      remove,
       update,
       resetModal,
       handleOk,
@@ -485,7 +489,8 @@ export default defineComponent({
       isSidebarVisibleChange,
       isSidebarVisible,
       save,
-      newItem
+      newItem,
+      del,
     }
   }
 })
