@@ -2,6 +2,7 @@
   "new": "Nová Cena",
   "empty": "Žádná cena nebyla vytvořena.",
   "emptyAfterSearch": "Žádná cena nebyla nalezena pro tvé hledání <strong>\"$search\"</strong>.",
+  "emitRedeemEvent": "Emit redeem event if bits are used",
   "command": {
     "name": "příkaz",
     "placeholder": ""
