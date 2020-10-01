@@ -30,7 +30,7 @@ export function getLocalizedName(number: number | string, translation: string): 
   }
 
   name = (number === 1 ? single : multi);
-  if (xmulti !== null && typeof xmulti === 'object' && number > 1 && number <= 10) {
+  if (xmulti !== null && number > 1 && number <= 10) {
     for (let i = number; i <= 10; i++) {
       if (typeof xmulti[i] === 'string') {
         name = xmulti[i];
