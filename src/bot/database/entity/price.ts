@@ -5,6 +5,7 @@ export interface PriceInterface {
   command: string;
   enabled?: boolean;
   price: number;
+  priceBits: number;
 }
 
 export const Price = new EntitySchema<Readonly<Required<PriceInterface>>>({
@@ -14,6 +15,7 @@ export const Price = new EntitySchema<Readonly<Required<PriceInterface>>>({
     command: { type: String },
     enabled: { type: Boolean, default: true },
     price: { type: Number },
+    priceBits: { type: Number, default: 0 },
   },
   indices: [
     { name: 'IDX_d12db23d28020784096bcb41a3', unique: true, columns: ['command'] },

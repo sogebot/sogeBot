@@ -2,7 +2,8 @@
 
 import * as _ from 'lodash';
 
-import { getLocalizedName, prepare } from '../commons';
+import { prepare } from '../commons';
+import { getLocalizedName } from '../helpers/getLocalized';
 import { command, default_permission } from '../decorators';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
@@ -98,7 +99,7 @@ class Ranks extends System {
         rank: parsed[2],
         hours: value,
         type,
-        hlocale: getLocalizedName(value, type === 'viewer' ? 'core.hours' : 'core.months'),
+        hlocale: getLocalizedName(value, translate(type === 'viewer' ? 'core.hours' : 'core.months')),
       });
     return [{ response, ...opts }];
   }
@@ -142,7 +143,7 @@ class Ranks extends System {
         hours: parseInt(value, 10),
         rank,
         type,
-        hlocale: getLocalizedName(value, type === 'viewer' ? 'core.hours' : 'core.months'),
+        hlocale: getLocalizedName(value, translate(type === 'viewer' ? 'core.hours' : 'core.months')),
       });
     return [{ response, ...opts }];
   }
@@ -237,7 +238,7 @@ class Ranks extends System {
       {
         hours: value,
         type,
-        hlocale: getLocalizedName(value, type === 'viewer' ? 'core.hours' : 'core.months'),
+        hlocale: getLocalizedName(value, translate(type === 'viewer' ? 'core.hours' : 'core.months')),
       });
     return [{ response, ...opts }];
   }
@@ -271,7 +272,7 @@ class Ranks extends System {
         const toNextRankWatched = watched / 1000 / 60 / 60 - (rank.current.type === 'viewer' ? rank.current.value : 0);
         const toWatch = (toNextRank - toNextRankWatched);
         const percentage = 100 - (((toWatch) / toNextRank) * 100);
-        const response = prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), 'core.hours')})` });
+        const response = prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), translate('core.hours'))})` });
         return [{ response, ...opts }];
       }
       if (rank.next.type === 'follower') {
@@ -279,7 +280,7 @@ class Ranks extends System {
         const toNextRankFollow = moment(Date.now()).diff(moment(user?.followedAt || 0), 'months', true);
         const toWatch = (toNextRank - toNextRankFollow);
         const percentage = 100 - (((toWatch) / toNextRank) * 100);
-        const response = prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), 'core.months')})` });
+        const response = prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), translate('core.months'))})` });
         return [{ response, ...opts }];
       }
       if (rank.next.type === 'subscriber') {
@@ -287,7 +288,7 @@ class Ranks extends System {
         const toNextRankSub = (user?.subscribeCumulativeMonths || 0) - (rank.current.type === 'subscriber' ? rank.current.value : 0);
         const toWatch = (toNextRank - toNextRankSub);
         const percentage = 100 - (((toWatch) / toNextRank) * 100);
-        const response = prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), 'core.months')})` });
+        const response = prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), translate('core.months'))})` });
         return [{ response, ...opts }];
       }
     }

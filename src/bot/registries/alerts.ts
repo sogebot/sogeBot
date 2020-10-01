@@ -1,7 +1,7 @@
 import Registry from './_interface';
 import { isMainThread } from '../cluster';
 import { generateUsername } from '../helpers/generateUsername';
-import { getLocalizedName } from '../commons';
+import { getLocalizedName } from '../helpers/getLocalized';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 
 import { getRepository, In, IsNull, Not } from 'typeorm';
@@ -9,6 +9,7 @@ import { Alert, AlertCheer, AlertFollow, AlertHost, AlertInterface, AlertMedia, 
 import { app, ioServer } from '../helpers/panel';
 import currency from '../currency';
 import { debug } from '../helpers/log';
+import { translate } from '../translate';
 
 class Alerts extends Registry {
   constructor() {
@@ -202,7 +203,7 @@ class Alerts extends Registry {
       amount,
       recipient: generateUsername(),
       currency: currency.mainCurrency,
-      monthsName: getLocalizedName(amount, 'core.months'),
+      monthsName: getLocalizedName(amount, translate('core.months')),
       event: opts.event,
       autohost: true,
       message: ['tips', 'cheers', 'resubs'].includes(opts.event)

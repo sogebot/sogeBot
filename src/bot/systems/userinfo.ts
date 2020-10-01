@@ -1,7 +1,8 @@
 import _ from 'lodash';
 import moment from 'moment';
 
-import { dateDiff, getLocalizedName, prepare } from '../commons';
+import { dateDiff, prepare } from '../commons';
+import { getLocalizedName } from '../helpers/getLocalized';
 import { command, default_permission, settings, ui } from '../decorators';
 import System from './_interface';
 import { debug, error } from '../helpers/log';
@@ -68,11 +69,11 @@ class UserInfo extends System {
       for (const unit of units) {
         if (diff[unit]) {
           const v = Number(diff[unit]).toFixed();
-          output.push(v + ' ' + getLocalizedName(v, 'core.' + unit));
+          output.push(v + ' ' + getLocalizedName(v, translate('core.' + unit)));
         }
       }
       if (output.length === 0) {
-        output.push(0 + ' ' + getLocalizedName(0, 'core.minutes'));
+        output.push(0 + ' ' + getLocalizedName(0, translate('core.minutes')));
       }
 
       return [{ response: prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.time', {
@@ -95,7 +96,7 @@ class UserInfo extends System {
       return [{ response: prepare(localePath + (subCumulativeMonths ? 'notNow' : 'never'), {
         username,
         subCumulativeMonths,
-        subCumulativeMonthsName: getLocalizedName(subCumulativeMonths || 0, 'core.months'),
+        subCumulativeMonthsName: getLocalizedName(subCumulativeMonths || 0, translate('core.months')),
       }), ...opts }];
     } else {
       const units = ['years', 'months', 'days', 'hours', 'minutes'] as const;
@@ -104,19 +105,19 @@ class UserInfo extends System {
       for (const unit of units) {
         if (diff[unit]) {
           const v = Number(diff[unit]).toFixed();
-          output.push(v + ' ' + getLocalizedName(v, 'core.' + unit));
+          output.push(v + ' ' + getLocalizedName(v, translate('core.' + unit)));
         }
       }
       if (output.length === 0) {
-        output.push(0 + ' ' + getLocalizedName(0, 'core.minutes'));
+        output.push(0 + ' ' + getLocalizedName(0, translate('core.minutes')));
       }
 
       return [{ response: prepare(localePath + (subStreak ? 'timeWithSubStreak' : 'time'), {
         username,
         subCumulativeMonths,
-        subCumulativeMonthsName: getLocalizedName(subCumulativeMonths || 0, 'core.months'),
+        subCumulativeMonthsName: getLocalizedName(subCumulativeMonths || 0, translate('core.months')),
         subStreak,
-        subStreakMonthsName: getLocalizedName(subStreak || 0, 'core.months'),
+        subStreakMonthsName: getLocalizedName(subStreak || 0, translate('core.months')),
         diff: output.join(', '),
       }), ...opts }];
     }
@@ -155,11 +156,11 @@ class UserInfo extends System {
       for (const unit of units) {
         if (diff[unit]) {
           const v = Number(diff[unit]).toFixed();
-          output.push(v + ' ' + getLocalizedName(v, 'core.' + unit));
+          output.push(v + ' ' + getLocalizedName(v, translate('core.' + unit)));
         }
       }
       if (output.length === 0) {
-        output.push(0 + ' ' + getLocalizedName(0, 'core.minutes'));
+        output.push(0 + ' ' + getLocalizedName(0, translate('core.minutes')));
       }
       return [{ response: prepare('age.success.' + (opts.sender.username === username.toLowerCase() ? 'withoutUsername' : 'withUsername'), {
         username,
@@ -253,7 +254,7 @@ class UserInfo extends System {
 
       if (message.includes('$messages')) {
         const idx = message.indexOf('$messages');
-        message[idx] = user.messages + ' ' + getLocalizedName(user.messages, 'core.messages');
+        message[idx] = user.messages + ' ' + getLocalizedName(user.messages, translate('core.messages'));
       }
 
       if (message.includes('$tips')) {
@@ -270,7 +271,7 @@ class UserInfo extends System {
         const idx = message.indexOf('$bits');
         const bits = user.bits;
         const bitAmount = bits.map(o => Number(o.amount)).reduce((a, b) => a + b, 0);
-        message[idx] = `${bitAmount} ${getLocalizedName(bitAmount, 'core.bits')}`;
+        message[idx] = `${bitAmount} ${getLocalizedName(bitAmount, translate('core.bits'))}`;
       }
 
       if (message.includes('$role')) {

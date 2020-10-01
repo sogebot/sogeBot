@@ -3,7 +3,8 @@ import _ from 'lodash';
 import { command, settings, shared } from '../decorators';
 import Game from './_interface';
 import { MINUTE } from '../constants';
-import { getLocalizedName, isBroadcaster, isModerator, prepare, timeout } from '../commons';
+import { isBroadcaster, isModerator, prepare, timeout } from '../commons';
+import { getLocalizedName } from '../helpers/getLocalized';
 
 import { getRepository } from 'typeorm';
 import { User, UserInterface } from '../database/entity/user';
@@ -133,7 +134,7 @@ class FightMe extends Game {
         return [{ response: prepare('gambling.fightme.cooldown', {
           command: opts.command,
           cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60),
-          minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60), 'core.minutes'),
+          minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60), translate('core.minutes')),
         }), ...opts }];
       }
 

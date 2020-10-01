@@ -15,7 +15,8 @@ import { settings, ui } from './decorators';
 import { cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning } from './helpers/log';
 import { triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub } from './helpers/interface/triggers';
 import { isDebugEnabled } from './helpers/log';
-import { getLocalizedName, getOwner, isBot, isIgnored, isOwner, prepare, sendMessage } from './commons';
+import { getOwner, isBot, isIgnored, isOwner, prepare, sendMessage } from './commons';
+import { getLocalizedName } from './helpers/getLocalized';
 import { clusteredChatIn, clusteredWhisperIn, isMainThread, manageMessage } from './cluster';
 
 import { getRepository } from 'typeorm';
@@ -31,6 +32,7 @@ import alerts from './registries/alerts';
 import eventlist from './overlays/eventlist';
 import { getFunctionList } from './decorators/on';
 import { avgResponse, linesParsedIncrement, setStatus } from './helpers/parser';
+import { translate } from './translate';
 
 const userHaveSubscriberBadges = (badges: Readonly<UserStateTags['badges']>) => {
   return typeof badges.subscriber !== 'undefined' || typeof badges.founder !== 'undefined';
@@ -512,9 +514,9 @@ class TMI extends Core {
         userId: String(userstate.userId),
         subStreakShareEnabled,
         subStreak,
-        subStreakName: getLocalizedName(subStreak, 'core.months'),
+        subStreakName: getLocalizedName(subStreak, translate('core.months')),
         subCumulativeMonths,
-        subCumulativeMonthsName: getLocalizedName(subCumulativeMonths, 'core.months'),
+        subCumulativeMonthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
         message: messageFromUser,
         timestamp: Date.now(),
       });
@@ -524,9 +526,9 @@ class TMI extends Core {
         tier,
         subStreakShareEnabled,
         subStreak,
-        subStreakName: getLocalizedName(subStreak, 'core.months'),
+        subStreakName: getLocalizedName(subStreak, translate('core.months')),
         subCumulativeMonths,
-        subCumulativeMonthsName: getLocalizedName(subCumulativeMonths, 'core.months'),
+        subCumulativeMonthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
         message: messageFromUser,
       });
       alerts.trigger({
@@ -534,7 +536,7 @@ class TMI extends Core {
         name: username,
         amount: Number(subCumulativeMonths),
         currency: '',
-        monthsName: getLocalizedName(subCumulativeMonths, 'core.months'),
+        monthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
         message: messageFromUser,
         autohost: false,
       });
@@ -632,7 +634,7 @@ class TMI extends Core {
         event: 'subgift',
         userId: recipientId,
         fromId: String(await users.getIdByName(username) ?? '0') ,
-        monthsName: getLocalizedName(subCumulativeMonths, 'core.months'),
+        monthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
         months: subCumulativeMonths,
         timestamp: Date.now(),
       });
@@ -643,7 +645,7 @@ class TMI extends Core {
         recipient,
         amount: subCumulativeMonths,
         currency: '',
-        monthsName: getLocalizedName(subCumulativeMonths, 'core.months'),
+        monthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
         message: '',
         autohost: false,
       });

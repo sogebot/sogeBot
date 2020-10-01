@@ -9,7 +9,8 @@ import { permission } from '../helpers/permissions';
 import { command, default_permission, parser, permission_settings, settings } from '../decorators';
 import Message from '../message';
 import System from './_interface';
-import { getLocalizedName, isModerator, parserReply, prepare, timeout } from '../commons';
+import { isModerator, parserReply, prepare, timeout } from '../commons';
+import { getLocalizedName } from '../helpers/getLocalized';
 import { timeout as timeoutLog, warning as warningLog } from '../helpers/log';
 import { clusteredClientDelete } from '../cluster';
 import { adminEndpoint } from '../helpers/socket';
@@ -235,7 +236,7 @@ class Moderation extends System {
         await getRepository(ModerationPermit).insert({ userId });
       }
 
-      const response = prepare('moderation.user-have-link-permit', { username: parsed[1].toLowerCase(), link: getLocalizedName(count, 'core.links'), count: count });
+      const response = prepare('moderation.user-have-link-permit', { username: parsed[1].toLowerCase(), link: getLocalizedName(count, translate('core.links')), count: count });
       return [{ response, ...opts }];
     } catch (e) {
       return [{ response: translate('moderation.permit-parse-failed'), ...opts }];

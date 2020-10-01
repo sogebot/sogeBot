@@ -4,8 +4,9 @@ import { getRepository } from 'typeorm';
 import { EventList as EventListDB } from '../database/entity/eventList';
 import { error } from '../helpers/log';
 import alerts from '../registries/alerts';
-import { getLocalizedName } from '../commons';
+import { getLocalizedName } from '../helpers/getLocalized';
 import users from '../users';
+import { translate } from '../translate';
 
 class EventList extends Widget {
   constructor() {
@@ -69,7 +70,7 @@ class EventList extends Widget {
               name: await users.getNameById(event.userId),
               amount: Number(values.subCumulativeMonths),
               currency: '',
-              monthsName: getLocalizedName(values.subCumulativeMonths, 'core.months'),
+              monthsName: getLocalizedName(values.subCumulativeMonths, translate('core.months')),
               message: values.message,
               autohost: false,
             });

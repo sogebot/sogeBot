@@ -28,7 +28,8 @@ import spotify from './integrations/spotify';
 import songs from './systems/songs';
 import Parser from './parser';
 import { translate } from './translate';
-import { getLocalizedName, isIgnored, parserReply, prepare } from './commons';
+import { isIgnored, parserReply, prepare } from './commons';
+import { getLocalizedName } from './helpers/getLocalized';
 import currency from './currency';
 import points from './systems/points';
 import {default as priceSystem} from './systems/price';
@@ -611,12 +612,12 @@ class Message {
             return listOutput.length > 0 ? listOutput : ' ';
           case 'ranks.follow':
             listOutput = _.map(_.orderBy(ranks.filter(o => o.type === 'follower'), 'value', 'asc'), (o) => {
-              return `${o.rank} (${o.value} ${getLocalizedName(o.value, 'core.months')})`;
+              return `${o.rank} (${o.value} ${getLocalizedName(o.value, translate('core.months'))})`;
             }).join(', ');
             return listOutput.length > 0 ? listOutput : ' ';
           case 'ranks.sub':
             listOutput = _.map(_.orderBy(ranks.filter(o => o.type === 'subscriber'), 'value', 'asc'), (o) => {
-              return `${o.rank} (${o.value} ${getLocalizedName(o.value, 'core.months')})`;
+              return `${o.rank} (${o.value} ${getLocalizedName(o.value, translate('core.months'))})`;
             }).join(', ');
             return listOutput.length > 0 ? listOutput : ' ';
           default:
