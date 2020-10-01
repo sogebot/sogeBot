@@ -1,6 +1,7 @@
 import { isMainThread } from '../cluster';
 
-import { announce, getBotSender, getLocalizedName, prepare, round5 } from '../commons';
+import { announce, getBotSender, prepare, round5 } from '../commons';
+import { getLocalizedName } from '../helpers/getLocalized';
 import * as constants from '../constants';
 import { debug } from '../helpers/log';
 import { command, default_permission, settings, shared } from '../decorators';
@@ -76,7 +77,7 @@ class Scrim extends System {
       announce(prepare('systems.scrim.countdown', {
         type,
         time: minutes,
-        unit: getLocalizedName(minutes, 'core.minutes'),
+        unit: getLocalizedName(minutes, translate('core.minutes')),
       }), 'scrim');
       return [];
     } catch (e) {
@@ -133,7 +134,7 @@ class Scrim extends System {
           announce(prepare('systems.scrim.countdown', {
             type: this.type,
             time: minutesToGo.toFixed(),
-            unit: getLocalizedName(minutesToGo.toFixed(), 'core.minutes'),
+            unit: getLocalizedName(minutesToGo.toFixed(), translate('core.minutes')),
           }), 'scrim');
           this.lastRemindAt = Date.now();
         }
@@ -143,7 +144,7 @@ class Scrim extends System {
           announce(prepare('systems.scrim.countdown', {
             type: this.type,
             time: String(secondsToGo === 60 ? 1 : secondsToGo),
-            unit: secondsToGo === 60 ? getLocalizedName(1, 'core.minutes') : getLocalizedName(secondsToGo, 'core.seconds'),
+            unit: secondsToGo === 60 ? getLocalizedName(1, translate('core.minutes')) : getLocalizedName(secondsToGo, translate('core.seconds')),
           }), 'scrim');
           this.lastRemindAt = Date.now();
         }

@@ -518,7 +518,8 @@ export const init = () => {
       _.merge(
         lang,
         translate({ root: 'webpanel' }),
-        translate({ root: 'ui' }) // add ui root -> slowly refactoring to new name
+        translate({ root: 'ui' }), // add ui root -> slowly refactoring to new name
+        { bot: translate({ root: 'core' }) },
       );
       cb(lang);
     });
@@ -528,7 +529,8 @@ export const init = () => {
     _.merge(
       lang,
       translate({ root: 'webpanel' }),
-      translate({ root: 'ui' }) // add ui root -> slowly refactoring to new name
+      translate({ root: 'ui' }), // add ui root -> slowly refactoring to new name,
+      { bot: translate({ root: 'core' }) },
     );
     socket.emit('lang', lang);
   });

@@ -15,7 +15,8 @@ import { settings, ui } from './decorators';
 import { cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning } from './helpers/log';
 import { triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub } from './helpers/interface/triggers';
 import { isDebugEnabled } from './helpers/log';
-import { getLocalizedName, getOwner, isBot, isIgnored, isOwner, prepare, sendMessage } from './commons';
+import { getBotSender, getOwner, isBot, isIgnored, isOwner, prepare, sendMessage } from './commons';
+import { getLocalizedName } from './helpers/getLocalized';
 import { clusteredChatIn, clusteredWhisperIn, isMainThread, manageMessage } from './cluster';
 
 import { getRepository } from 'typeorm';
@@ -31,6 +32,9 @@ import alerts from './registries/alerts';
 import eventlist from './overlays/eventlist';
 import { getFunctionList } from './decorators/on';
 import { avgResponse, linesParsedIncrement, setStatus } from './helpers/parser';
+import { translate } from './translate';
+import { Price } from './database/entity/price';
+import customcommands from './systems/customcommands';
 
 const userHaveSubscriberBadges = (badges: Readonly<UserStateTags['badges']>) => {
   return typeof badges.subscriber !== 'undefined' || typeof badges.founder !== 'undefined';
@@ -512,9 +516,9 @@ class TMI extends Core {
         userId: String(userstate.userId),
         subStreakShareEnabled,
         subStreak,
-        subStreakName: getLocalizedName(subStreak, 'core.months'),
+        subStreakName: getLocalizedName(subStreak, translate('core.months')),
         subCumulativeMonths,
-        subCumulativeMonthsName: getLocalizedName(subCumulativeMonths, 'core.months'),
+        subCumulativeMonthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
         message: messageFromUser,
         timestamp: Date.now(),
       });
@@ -524,9 +528,9 @@ class TMI extends Core {
         tier,
         subStreakShareEnabled,
         subStreak,
-        subStreakName: getLocalizedName(subStreak, 'core.months'),
+        subStreakName: getLocalizedName(subStreak, translate('core.months')),
         subCumulativeMonths,
-        subCumulativeMonthsName: getLocalizedName(subCumulativeMonths, 'core.months'),
+        subCumulativeMonthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
         message: messageFromUser,
       });
       alerts.trigger({
@@ -534,7 +538,7 @@ class TMI extends Core {
         name: username,
         amount: Number(subCumulativeMonths),
         currency: '',
-        monthsName: getLocalizedName(subCumulativeMonths, 'core.months'),
+        monthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
         message: messageFromUser,
         autohost: false,
       });
@@ -632,7 +636,7 @@ class TMI extends Core {
         event: 'subgift',
         userId: recipientId,
         fromId: String(await users.getIdByName(username) ?? '0') ,
-        monthsName: getLocalizedName(subCumulativeMonths, 'core.months'),
+        monthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
         months: subCumulativeMonths,
         timestamp: Date.now(),
       });
@@ -643,7 +647,7 @@ class TMI extends Core {
         recipient,
         amount: subCumulativeMonths,
         currency: '',
-        monthsName: getLocalizedName(subCumulativeMonths, 'core.months'),
+        monthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
         message: '',
         autohost: false,
       });
@@ -664,8 +668,8 @@ class TMI extends Core {
       const username = message.tags.username;
       const userId = Number(message.tags.userId);
       const userstate = message.tags;
-      // remove <string>X or <string>X from message, but exclude from remove #<string>X
-      const messageFromUser = message.message.replace(/(?<!#)(\b\w+[\d]+\b)/g, '').trim();
+      // remove <string>X or <string>X from message, but exclude from remove #<string>X or !someCommand2
+      const messageFromUser = message.message.replace(/(?<![#!])(\b\w+[\d]+\b)/g, '').trim();
 
       if (isIgnored({username, userId})) {
         return;
@@ -697,15 +701,7 @@ class TMI extends Core {
       getRepository(User).save(user);
 
       events.fire('cheer', { username, bits: userstate.bits, message: messageFromUser });
-      alerts.trigger({
-        event: 'cheers',
-        name: username,
-        amount: Number(userstate.bits),
-        currency: '',
-        monthsName: '',
-        message: messageFromUser,
-        autohost: false,
-      });
+
       if (api.isStreamOnline) {
         api.stats.currentBits += parseInt(userstate.bits, 10);
       }
@@ -716,6 +712,46 @@ class TMI extends Core {
         message: messageFromUser,
         timestamp: Date.now(),
       });
+
+      let redeemTriggered = false;
+      if (messageFromUser.trim().startsWith('!')) {
+        try {
+          const price = await getRepository(Price).findOneOrFail({ where: { command: messageFromUser.trim().toLowerCase(), enabled: true }});
+          if (price.priceBits <= Number(userstate.bits)) {
+            if (customcommands.enabled) {
+              await customcommands.run({ sender: getBotSender(), id: 'null', skip: false, quiet: false, message: messageFromUser.trim().toLowerCase(), parameters: '' });
+            }
+            new Parser().command(null, messageFromUser, true);
+            if (price.emitRedeemEvent) {
+              redeemTriggered = true;
+              debug('tmi.cmdredeems', messageFromUser);
+              alerts.trigger({
+                event: 'cmdredeems',
+                recipient: username,
+                name: price.command,
+                amount: Number(userstate.bits),
+                currency: '',
+                monthsName: '',
+                message: '',
+                autohost: false,
+              });
+            }
+          }
+        } catch (e) {
+          debug('tmi.cheer', e.stack);
+        }
+      }
+      if (!redeemTriggered) {
+        alerts.trigger({
+          event: 'cheers',
+          name: username,
+          amount: Number(userstate.bits),
+          currency: '',
+          monthsName: '',
+          message: messageFromUser,
+          autohost: false,
+        });
+      }
     } catch (e) {
       error('Error parsing cheer event');
       error(util.inspect(message));

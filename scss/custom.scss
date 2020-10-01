@@ -9,6 +9,11 @@
   vertical-align: top !important;
 }
 
+.custom-control-label {
+  font-weight: normal !important;
+  text-transform: initial !important;
+}
+
 .table thead.thead-dark th {
   color: $white !important;
 }

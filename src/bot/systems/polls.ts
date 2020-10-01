@@ -1,7 +1,8 @@
 import _ from 'lodash';
 import { isMainThread } from '../cluster';
 
-import { announce, getLocalizedName, getOwnerAsSender, prepare } from '../commons.js';
+import { announce, getOwnerAsSender, prepare } from '../commons.js';
+import { getLocalizedName } from '../helpers/getLocalized';
 import { command, default_permission, helper, settings } from '../decorators';
 import { onBit, onMessage, onTip } from '../decorators/on';
 import Expects from '../expects.js';
@@ -136,11 +137,11 @@ class Polls extends System {
           const votesCount = count ? count[Number(index)] || 0 : 0;
           const percentage = Number((100 / _total) * votesCount || 0).toFixed(2);
           if (cVote.type === 'normal') {
-            responses.push({ response: this.getCommand('!vote') + ` ${Number(index) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, ...opts });
+            responses.push({ response: this.getCommand('!vote') + ` ${Number(index) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, translate('systems.polls.votes'))}, ${percentage}%`, ...opts });
           } else if (cVote.type === 'tips') {
-            responses.push({ response: `#vote${Number(index) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, ...opts });
+            responses.push({ response: `#vote${Number(index) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${getLocalizedName(votesCount, translate('systems.polls.votes'))}, ${percentage}%`, ...opts });
           } else {
-            responses.push({ response: `#vote${Number(index) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, ...opts });
+            responses.push({ response: `#vote${Number(index) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, translate('systems.polls.votes'))}, ${percentage}%`, ...opts });
           }
         }
       }
@@ -264,11 +265,11 @@ class Polls extends System {
           const votesCount = count ? count[Number(i)] || 0 : 0;
           const percentage = Number((100 / _total) * votesCount || 0).toFixed(2);
           if (cVote.type === 'normal') {
-            responses.push({ response: this.getCommand('!vote') + ` ${Number(i) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, ...opts });
+            responses.push({ response: this.getCommand('!vote') + ` ${Number(i) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, translate('systems.polls.votes'))}, ${percentage}%`, ...opts });
           } else if (cVote.type === 'tips') {
-            responses.push({ response: `#vote${Number(i) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, ...opts });
+            responses.push({ response: `#vote${Number(i) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${getLocalizedName(votesCount, translate('systems.polls.votes'))}, ${percentage}%`, ...opts });
           } else {
-            responses.push({ response: `#vote${Number(i) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, ...opts });
+            responses.push({ response: `#vote${Number(i) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, translate('systems.polls.votes'))}, ${percentage}%`, ...opts });
           }
         }
       } else if (!cVote) {

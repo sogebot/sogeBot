@@ -4,7 +4,8 @@ import { isMainThread } from '../cluster';
 import Expects from '../expects.js';
 import Game from './_interface';
 import { command, settings, shared, ui } from '../decorators';
-import { announce, getLocalizedName, prepare } from '../commons.js';
+import { announce, prepare } from '../commons.js';
+import { getLocalizedName } from '../helpers/getLocalized';
 import { warning } from '../helpers/log.js';
 
 import { getRepository } from 'typeorm';
@@ -218,7 +219,7 @@ class Heist extends Game {
       const minutesLeft = Number(copsCooldown - (Date.now() - lastHeistTimestamp) / 60000).toFixed(1);
       if (Date.now() - (this.lastAnnouncedCops) >= 60000) {
         this.lastAnnouncedCops = Date.now();
-        return [{ response: this.copsOnPatrol.replace('$cooldown', minutesLeft + ' ' + getLocalizedName(minutesLeft, 'core.minutes')), ...opts }];
+        return [{ response: this.copsOnPatrol.replace('$cooldown', minutesLeft + ' ' + getLocalizedName(minutesLeft, translate('core.minutes'))), ...opts }];
       }
       return [];
     }

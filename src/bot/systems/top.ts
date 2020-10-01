@@ -1,7 +1,8 @@
 import _ from 'lodash';
 import moment from 'moment-timezone';
 
-import { getIgnoreList, getLocalizedName, isIgnored } from '../commons';
+import { getIgnoreList, isIgnored } from '../commons';
+import { getLocalizedName } from '../helpers/getLocalized';
 import { command, default_permission } from '../decorators';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
@@ -261,7 +262,7 @@ class Top extends System {
             message += (user.value / 1000 / 60 / 60).toFixed(1) + 'h';
             break;
           case TYPE.SUBMONTHS:
-            message += [user.value, getLocalizedName(user.value, 'core.months')].join(' ');
+            message += [user.value, getLocalizedName(user.value, translate('core.months'))].join(' ');
             break;
           case TYPE.TIPS:
             message += Number(user.value).toFixed(2) + currency.symbol(currency.mainCurrency);

@@ -7,7 +7,8 @@ import { isMainThread } from './cluster';
 import Core from './_interface';
 import { flatten } from './helpers/flatten';
 import { attributesReplace } from './helpers/attributesReplace';
-import { announce, getLocalizedName, getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, parserReply, prepare } from './commons';
+import { announce, getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, parserReply, prepare } from './commons';
+import { getLocalizedName } from './helpers/getLocalized';
 import Message from './message';
 import Parser from './parser';
 import { generateUsername } from './helpers/generateUsername';
@@ -29,6 +30,7 @@ import custom_variables from './widgets/customvariables';
 import currency from './currency';
 import { isDbConnected } from './helpers/database';
 import { addUIError } from './panel';
+import { translate } from './translate';
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
@@ -648,7 +650,7 @@ class Events extends Core {
           subCumulativeMonthsName: getLocalizedName(_.random(10, 99, false), 'core.months'),
           months,
           tier: _.random(0, 3, false),
-          monthsName: getLocalizedName(months, 'core.months'),
+          monthsName: getLocalizedName(months, translate('core.months')),
           message: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
           viewers: _.random(0, 9999, false),
           autohost: _.random(0, 1, false) === 0,

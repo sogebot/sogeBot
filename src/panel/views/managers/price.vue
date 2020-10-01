@@ -64,19 +64,55 @@
               label-for="price"
             >
               <b-input-group>
+                <b-input-group-text slot="append" class="pr-3 pl-3">
+                  {{ getLocalizedName(editationItem ? editationItem.price : 0, $store.state.configuration.systems.Points.points.name)}}
+                </b-input-group-text>
                 <b-form-input
                   v-if="editationItem"
                   id="price"
                   v-model.number="editationItem.price"
                   type="number"
-                  min="1"
+                  min="0"
                   :placeholder="translate('systems.price.price.placeholder')"
                   @input="$v.editationItem.price.$touch()"
                   :state="$v.editationItem.price.$invalid && $v.editationItem.price.$dirty ? false : null"
                 ></b-form-input>
                 <b-skeleton v-else type="input" class="w-100"></b-skeleton>
               </b-input-group>
-              <b-form-invalid-feedback :state="!($v.editationItem.price.$invalid && $v.editationItem.price.$dirty)">{{ translate('dialog.errors.minValue').replace('$value', '1') }}</b-form-invalid-feedback>
+              <b-form-invalid-feedback :state="!($v.editationItem.price.$invalid && $v.editationItem.price.$dirty)">
+                <template v-if="$v.editationItem.priceBits.oneValueIsAboveZero">
+                  {{ translate('dialog.errors.minValue').replace('$value', '1') }}
+                </template>
+              </b-form-invalid-feedback>
+              <div class="text-muted text-center">{{translate('or')}}</div>
+              <b-input-group>
+                <b-input-group-text slot="append" class="pr-3 pl-3">
+                  {{ getLocalizedName(editationItem ? editationItem.priceBits : 0, translate('bot.bits'))}}
+                </b-input-group-text>
+                <b-form-input
+                  v-if="editationItem"
+                  id="priceBits"
+                  v-model.number="editationItem.priceBits"
+                  type="number"
+                  min="0"
+                  :placeholder="translate('systems.price.priceBits.placeholder')"
+                  @input="$v.editationItem.priceBits.$touch()"
+                  :state="$v.editationItem.priceBits.$invalid && $v.editationItem.priceBits.$dirty ? false : null"
+                ></b-form-input>
+                <b-skeleton v-else type="input" class="w-100"></b-skeleton>
+              </b-input-group>
+              <b-form-checkbox
+                v-if="editationItem && editationItem.priceBits > 0"
+                id="emitRedeemEvent"
+                v-model="editationItem.emitRedeemEvent"
+                name="emitRedeemEvent"
+              >
+                {{ translate('systems.price.emitRedeemEvent') }}
+              </b-form-checkbox>
+              <b-form-invalid-feedback :state="!($v.editationItem.priceBits.$invalid && $v.editationItem.priceBits.$dirty)">
+                <template v-if="!$v.editationItem.priceBits.oneValueIsAboveZero">{{ translate('errors.one_of_inputs_must_be_set') }}</template>
+                <template v-else>{{ translate('dialog.errors.minValue').replace('$value', '0') }}</template>
+              </b-form-invalid-feedback>
             </b-form-group>
           </b-form>
         </div>
@@ -87,7 +123,19 @@
       <b-alert show v-else-if="items.length === 0">
         {{translate('systems.price.empty')}}
       </b-alert>
-      <b-table hover v-else striped small :items="fItems" :fields="fields" @row-clicked="linkTo($event)">
+      <b-table hover v-else striped small :items="fItems" :fields="fields" @row-clicked="linkTo($event)" sort-by="command">
+        <template v-slot:cell(price)="data">
+          <div v-html="priceFormatter(data.item)"/>
+        </template>
+        <template v-slot:cell(emitRedeemEvent)="data">
+          <div v-if="data.item.emitRedeemEvent && data.item.priceBits > 0">
+            <fa icon="check" fixed-width /> {{ translate('systems.price.emitRedeemEvent') }}
+          </div>
+          <div v-else-if="data.item.priceBits > 0" class="text-muted">
+            <fa icon="times" fixed-width /> {{ translate('systems.price.emitRedeemEvent') }}
+          </div>
+        </template>
+
         <template v-slot:cell(buttons)="data">
           <div class="text-right">
             <button-with-icon :class="[ data.item.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.enabled = !data.item.enabled; update(data.item)">
@@ -112,6 +160,7 @@ import { capitalize, isNil } from 'lodash-es';
 import { getSocket } from 'src/panel/helpers/socket';
 import type { PriceInterface } from 'src/bot/database/entity/price';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import { getLocalizedName } from 'src/bot/helpers/getLocalized';
 import translate from 'src/panel/helpers/translate';
 
 import { validationMixin } from 'vuelidate';
@@ -129,7 +178,20 @@ export default defineComponent({
   validations: {
     editationItem: {
       command: { required },
-      price: { minValue: minValue(1), required },
+      price: {
+        minValue: minValue(0),
+        required,
+        oneValueIsAboveZero: (value, vm) => {
+          return vm ? value + vm.priceBits > 0 : true;
+        }
+      },
+      priceBits: {
+        minValue: minValue(0),
+        required,
+        oneValueIsAboveZero: (value, vm) => {
+          return vm ? value + vm.price > 0 : true;
+        }
+      },
     }
   },
   setup(props, context) {
@@ -150,9 +212,20 @@ export default defineComponent({
     })
     const fields = [
       { key: 'command', label: capitalize(translate('systems.price.command.name')), sortable: true },
-      { key: 'price', label: capitalize(translate('systems.price.price.name')), sortable: true, tdClass: 'font-weight-bold text-primary font-bigger' },
+      { key: 'price', label: capitalize(translate('systems.price.price.name')) },
+      { key: 'emitRedeemEvent', label: '' },
       { key: 'buttons', label: '' },
     ];
+    const priceFormatter = (item: PriceInterface) => {
+        const output = [];
+        if (item.price !== 0) {
+          output.push(`${item.price} ${getLocalizedName(item.price, context.root.$store.state.configuration.systems.Points.points.name)}`)
+        }
+        if (item.priceBits !== 0) {
+          output.push(`${item.priceBits} ${getLocalizedName(item.priceBits, translate('bot.bits'))}`)
+        }
+        return output.join(` <small class="text-muted text-center">${translate('or')}</small> `);
+      }
     const fItems = computed(() => {
       if (search.value.length === 0) return items.value
       return items.value.filter((o) => {
@@ -232,8 +305,10 @@ export default defineComponent({
             editationItem.value = {
               command: '',
               price: 10,
+              priceBits: 0,
               id: context.root.$route.params.id,
               enabled: true,
+              emitRedeemEvent: false,
             }
           } else {
             editationItem.value = data;
@@ -307,6 +382,8 @@ export default defineComponent({
       save,
       sidebarSlideEnabled,
       newItem,
+      getLocalizedName,
+      priceFormatter
     }
   }
 });

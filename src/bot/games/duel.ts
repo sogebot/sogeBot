@@ -1,7 +1,8 @@
 import _ from 'lodash';
 import { isMainThread } from '../cluster';
 
-import { announce, getLocalizedName, isBroadcaster, isModerator, prepare } from '../commons';
+import { announce, isBroadcaster, isModerator, prepare } from '../commons';
+import { getLocalizedName } from '../helpers/getLocalized';
 import { command, settings, shared } from '../decorators';
 import Game from './_interface';
 import { error } from '../helpers/log';
@@ -170,7 +171,7 @@ class Duel extends Game {
           await points.decrement({ userId: opts.sender.userId }, bet);
         } else {
           const response = prepare('gambling.fightme.cooldown', {
-            minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60), 'core.minutes'),
+            minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60), translate('core.minutes')),
             cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60),
             command: opts.command });
           return [{ response, ...opts }];
@@ -183,7 +184,7 @@ class Duel extends Game {
         this._timestamp = Number(new Date());
         const response = prepare('gambling.duel.new', {
           sender: opts.sender,
-          minutesName: getLocalizedName(5, 'core.minutes'),
+          minutesName: getLocalizedName(5, translate('core.minutes')),
           minutes: this.duration,
           command: opts.command });
         // if we have discord, we want to send notice on twitch channel as well

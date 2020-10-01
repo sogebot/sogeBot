@@ -5,9 +5,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, onUnmounted, onMounted, watch, computed } from '@vue/composition-api'
+import { defineComponent, reactive, onUnmounted, onMounted, watch, computed, ref } from '@vue/composition-api'
 
-let interval = 0
 
 const getTimeToReveal = (text: string, maxTimeToDecrypt: number) => {
   const baffledTimeToReveal = [];
@@ -31,6 +30,7 @@ export default defineComponent({
     options: Object,
   },
   setup(props: Props) {
+    let interval = ref(0)
     const options = reactive({
       startTime: 0,
       changeTime: 0,
@@ -41,14 +41,14 @@ export default defineComponent({
     const baffledText = computed(() => options.baffledArray.join(''));
 
     const start = () => {
-      console.debug('== baffle', { interval, text: props.text, options: props.options});
-      clearInterval(interval);
       const timeToReveal = getTimeToReveal(props.text, props.options.maxTimeToDecrypt)
+      console.debug('== baffle', { interval: interval.value, text: props.text, options: props.options, timeToReveal});
+      clearInterval(interval.value);
       while(baffledTimeToReveal.length > 0) { baffledTimeToReveal.shift() };
       while(baffledTimeToReveal.length !== timeToReveal.length) { baffledTimeToReveal.push(timeToReveal[baffledTimeToReveal.length]) }
 
       options.startTime = Date.now();
-      interval = window.setInterval(() => {
+      interval.value = window.setInterval(() => {
         if (Date.now() - options.changeTime > props.options.speed) {
           options.changeTime = Date.now();
           const length = options.baffledArray.length;
@@ -67,7 +67,7 @@ export default defineComponent({
     onMounted(() => {
       start()
     });
-    onUnmounted(() => clearInterval(interval))
+    onUnmounted(() => clearInterval(interval.value))
 
     watch(() => props, () => start(), { deep: true });
     return { baffledText }
