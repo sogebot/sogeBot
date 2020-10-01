@@ -238,6 +238,7 @@ import { PermissionsInterface } from 'src/bot/database/entity/permissions';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import translate from 'src/panel/helpers/translate';
 
 library.add(faExclamationTriangle)
 
@@ -345,7 +346,6 @@ export default class interfaceSettings extends Vue {
         commands,
       }
     }
-    console.log({ordered})
     return ordered
   }
 
@@ -375,14 +375,16 @@ export default class interfaceSettings extends Vue {
   @Watch('$route.params.type')
   async refresh() {
     this.socket.emit(this.$route.params.type, (err: string | null, systems: systemFromIO[] ) => {
-      if (!systems.map(o => o.name).includes(this.$route.params.id)) {
-        this.$router.push({ name: 'InterfaceSettings', params: { type: this.$route.params.type, id: systems[0].name } });
-        this.loadSettings(systems[0].name);
+      const sortedSystems = systems.sort((a, b) => {
+        return translate('menu.' + a.name).localeCompare(translate('menu.' + b.name))
+      });
+      if (!sortedSystems.map(o => o.name).includes(this.$route.params.id)) {
+        this.$router.push({ name: 'InterfaceSettings', params: { type: this.$route.params.type, id: sortedSystems[0].name } });
+        this.loadSettings(sortedSystems[0].name);
       } else if (this.$route.params.id) {
         this.loadSettings(this.$route.params.id);
       }
-
-      this.list = systems;
+      this.list = sortedSystems;
     })
     this.$store.commit('setConfiguration', await getConfiguration()); // force refresh config
   }
