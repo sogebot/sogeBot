@@ -33,7 +33,7 @@
     "tips": "Spropitné",
     "hosts": "Hostování",
     "raids": "Raidy",
-    "cmdredeems": "Command Redeems"
+    "cmdredeems": "Koupené příkazy"
   },
   "title": {
     "name": "Název varianty",
@@ -62,7 +62,7 @@
   "messageTemplate": {
     "name": "Šablona zprávy",
     "placeholder": "Zadejte svou šablonu zprávy",
-    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
+    "help": "Dostupné proměnné: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "animationText": {
     "name": "Animace textu"
