@@ -32,7 +32,8 @@
     "subcommunitygifts": "Сабподарки для сообщества",
     "tips": "Донаты",
     "hosts": "Хосты",
-    "raids": "Рейды"
+    "raids": "Рейды",
+    "cmdredeems": "Command Redeems"
   },
   "title": {
     "name": "Название варианта",
@@ -61,7 +62,7 @@
   "messageTemplate": {
     "name": "Шаблон сообщения",
     "placeholder": "Установить шаблон сообщения",
-    "help": "Доступные переменные: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts), {recipient} (subgifts), {monthsName} (subs, subgifts), {currency} (tips)"
+    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "animationText": {
     "name": "Текст анимации"
