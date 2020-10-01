@@ -27,7 +27,7 @@ async function test() {
 
   let output = '';
   const expectedOutput = 'No changes in database schema were found - cannot generate a migration. To create a new empty migration use "typeorm migration:create" command\n';
-  await new Promise((resolve) => {
+  await new Promise(async (resolve) => {
     const p = child_process.spawn('npx', [
       'typeorm',
       'migration:generate',
@@ -49,6 +49,22 @@ async function test() {
       resolve();
     });
   });
+  if (output !== expectedOutput) {
+    await new Promise((resolve2) => {
+      const cat = child_process.spawn('cat', [
+        './src/bot/database/migration/*/*test*',
+      ], {
+        shell: true,
+      });
+      console.log('\n =================================== generated migration file  =================================== \n')
+      cat.stdout.on('data', (data) => {
+        process.stdout.write(data.toString());
+      });
+      cat.on('close', () => {
+        resolve2();
+      });
+    })
+  };
   process.exit(output === expectedOutput ? 0 : 1);
 }
 
