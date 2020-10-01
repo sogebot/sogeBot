@@ -519,19 +519,29 @@ class Message {
             return _.size(alias) === 0 ? ' ' : (_.map(alias, (o) => {
               const findPrice = prices.find(p => p.command === o.alias);
               if (findPrice && priceSystem.enabled) {
-                return o.alias.replace('!', '') + `(${findPrice.price} ${points.getPointsName(findPrice.price)})`;
-              } else {
-                return o.alias.replace('!', '');
+                if (findPrice.price > 0 && findPrice.priceBits === 0) {
+                  return o.alias.replace('!', '') + `(${findPrice.price} ${points.getPointsName(findPrice.price)})`;
+                } else if (findPrice.priceBits > 0 && findPrice.price === 0) {
+                  return o.alias.replace('!', '') + `(${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
+                } else {
+                  return o.alias.replace('!', '') + `(${findPrice.price} ${points.getPointsName(findPrice.price)} or ${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
+                }
               }
+              return o.alias.replace('!', '');
             })).sort().join(', ');
           case '!alias':
             return _.size(alias) === 0 ? ' ' : (_.map(alias, (o) => {
               const findPrice = prices.find(p => p.command === o.alias);
               if (findPrice && priceSystem.enabled) {
-                return o.alias + `(${findPrice.price} ${points.getPointsName(findPrice.price)})`;
-              } else {
-                return o.alias;
+                if (findPrice.price > 0 && findPrice.priceBits === 0) {
+                  return o.alias + `(${findPrice.price} ${points.getPointsName(findPrice.price)})`;
+                } else if (findPrice.priceBits > 0 && findPrice.price === 0) {
+                  return o.alias + `(${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
+                } else {
+                  return o.alias + `(${findPrice.price} ${points.getPointsName(findPrice.price)} or ${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
+                }
               }
+              return o.alias;
             })).sort().join(', ');
           case 'core':
           case '!core':
@@ -568,10 +578,15 @@ class Message {
             return _.size(commands) === 0 ? ' ' : (_.map(commands, (o) => {
               const findPrice = prices.find(p => p.command === o.command);
               if (findPrice && priceSystem.enabled) {
-                return o.command.replace('!', '') + `(${findPrice.price} ${points.getPointsName(findPrice.price)})`;
-              } else {
-                return o.command.replace('!', '');
+                if (findPrice.price > 0 && findPrice.priceBits === 0) {
+                  return o.command.replace('!', '') + `(${findPrice.price} ${points.getPointsName(findPrice.price)})`;
+                } else if (findPrice.priceBits > 0 && findPrice.price === 0) {
+                  return o.command.replace('!', '') + `(${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
+                } else {
+                  return o.command.replace('!', '') + `(${findPrice.price} ${points.getPointsName(findPrice.price)} or ${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
+                }
               }
+              return o.command.replace('!', '');
             })).sort().join(', ');
           case '!command':
             if (permission) {
@@ -587,10 +602,15 @@ class Message {
             return _.size(commands) === 0 ? ' ' : (_.map(commands, (o) => {
               const findPrice = prices.find(p => p.command === o.command);
               if (findPrice && priceSystem.enabled) {
-                return o.command + `(${findPrice.price} ${points.getPointsName(findPrice.price)})`;
-              } else {
-                return o.command;
+                if (findPrice.price > 0 && findPrice.priceBits === 0) {
+                  return o.command + `(${findPrice.price} ${points.getPointsName(findPrice.price)})`;
+                } else if (findPrice.priceBits > 0 && findPrice.price === 0) {
+                  return o.command + `(${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
+                } else {
+                  return o.command + `(${findPrice.price} ${points.getPointsName(findPrice.price)} or ${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
+                }
               }
+              return o.command;
             })).sort().join(', ');
           case 'cooldown':
             listOutput = _.map(cooldowns, function (o, k) {

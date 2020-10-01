@@ -5,7 +5,7 @@ import { getLocalizedName } from '../helpers/getLocalized';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 
 import { getRepository, In, IsNull, Not } from 'typeorm';
-import { Alert, AlertCheer, AlertFollow, AlertHost, AlertInterface, AlertMedia, AlertMediaInterface, AlertRaid, AlertResub, AlertSub, AlertSubcommunitygift, AlertSubgift, AlertTip, EmitData } from '../database/entity/alert';
+import { Alert, AlertCheer, AlertCommandRedeem, AlertFollow, AlertHost, AlertInterface, AlertMedia, AlertMediaInterface, AlertRaid, AlertResub, AlertSub, AlertSubcommunitygift, AlertSubgift, AlertTip, EmitData } from '../database/entity/alert';
 import { app, ioServer } from '../helpers/panel';
 import currency from '../currency';
 import { debug } from '../helpers/log';
@@ -114,7 +114,7 @@ class Alerts extends Registry {
           null,
           await getRepository(Alert).findOne({
             where: { id },
-            relations: ['cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'],
+            relations: ['cmdredeems', 'cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'],
           })
         );
       } catch (e) {
@@ -126,7 +126,7 @@ class Alerts extends Registry {
         cb(
           null,
           await getRepository(Alert).find({
-            relations: ['cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'],
+            relations: ['cmdredeems', 'cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'],
           })
         );
       } catch (e) {
@@ -145,6 +145,7 @@ class Alerts extends Registry {
         await getRepository(AlertTip).delete({ alertId: IsNull() });
         await getRepository(AlertCheer).delete({ alertId: IsNull() });
         await getRepository(AlertResub).delete({ alertId: IsNull() });
+        await getRepository(AlertCommandRedeem).delete({ alertId: IsNull() });
         if (cb) {
           cb(null);
         }
@@ -154,7 +155,7 @@ class Alerts extends Registry {
     });
     adminEndpoint(this.nsp, 'clear-media', async () => {
       const alerts = await getRepository(Alert).find({
-        relations: ['cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'],
+        relations: ['cmdredeems', 'cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'],
       });
       const mediaIds: string[] = [];
       for (const alert of alerts) {
@@ -168,6 +169,7 @@ class Alerts extends Registry {
           ...alert.subcommunitygifts,
           ...alert.subs,
           ...alert.tips,
+          ...alert.cmdredeems,
         ]) {
           mediaIds.push(event.imageId);
           mediaIds.push(event.soundId);
@@ -199,7 +201,7 @@ class Alerts extends Registry {
       '',
     ];
     const data: EmitData = {
-      name: generateUsername(),
+      name: opts.event === 'cmdredeems' ? '!' + generateUsername() : generateUsername(),
       amount,
       recipient: generateUsername(),
       currency: currency.mainCurrency,

@@ -108,6 +108,7 @@ export interface AlertInterface {
   tips: AlertTipInterface[];
   cheers: AlertTipInterface[];
   resubs: AlertResubInterface[];
+  cmdredeems: CommonSettingsInterface[];
 }
 
 export interface AlertMediaInterface {
@@ -260,6 +261,12 @@ export const Alert = new EntitySchema<Readonly<Required<AlertInterface>>>({
     resubs: {
       type: 'one-to-many',
       target: 'alert_resub',
+      inverseSide: 'alert',
+      cascade: true,
+    },
+    cmdredeems: {
+      type: 'one-to-many',
+      target: 'alert_command_redeem',
       inverseSide: 'alert',
       cascade: true,
     },
@@ -430,6 +437,23 @@ export const AlertResub = new EntitySchema<Readonly<Required<AlertResubInterface
       type: 'many-to-one',
       target: 'alert',
       inverseSide: 'resubs',
+      joinColumn: { name: 'alertId' },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  },
+});
+
+export const AlertCommandRedeem = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
+  name: 'alert_command_redeem',
+  columns: {
+    ...CommonSettingsSchema,
+  },
+  relations: {
+    alert: {
+      type: 'many-to-one',
+      target: 'alert',
+      inverseSide: 'command_redeems',
       joinColumn: { name: 'alertId' },
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',

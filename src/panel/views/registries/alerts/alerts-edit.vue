@@ -126,7 +126,7 @@
                   <template v-else>Variant {{ idx + 1 }}</template>
                 </template>
                 <p class="p-3" v-bind:key="event + idx">
-                  <form-follow v-if="event === 'follows' || event === 'subs' || event === 'subgifts' || event === 'subcommunitygifts'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                  <form-follow v-if="event === 'cmdredeems' || event === 'follows' || event === 'subs' || event === 'subgifts' || event === 'subcommunitygifts'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                   <form-cheers v-else-if="event === 'cheers' || event === 'tips'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                   <form-resubs v-else-if="event === 'resubs'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                   <form-hosts v-else-if="event === 'hosts' || event === 'raids'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
@@ -172,7 +172,7 @@ import { required } from 'vuelidate/lib/validators';
 
 import { v4 as uuid } from 'uuid';
 
-const supportedEvents = ['follows', 'cheers', 'subs', 'resubs', 'subcommunitygifts', 'subgifts',  'tips', 'hosts', 'raids'] as const;
+const supportedEvents = ['follows', 'cheers', 'subs', 'resubs', 'subcommunitygifts', 'subgifts',  'tips', 'hosts', 'raids', 'cmdredeems'] as const;
 
 Component.registerHooks([
   'beforeRouteEnter',
@@ -229,6 +229,7 @@ export default class AlertsEdit extends Vue {
     resubs: [],
     subgifts: [],
     subcommunitygifts: [],
+    cmdredeems: [],
   }
 
   isValid: {
@@ -241,6 +242,7 @@ export default class AlertsEdit extends Vue {
     tips: boolean[];
     hosts: boolean[];
     raids: boolean[];
+    cmdredeems: boolean[];
   } = {
     follows: [],
     cheers: [],
@@ -251,6 +253,7 @@ export default class AlertsEdit extends Vue {
     tips: [],
     hosts: [],
     raids: [],
+    cmdredeems: [],
   };
 
   get isAllValid() {
@@ -460,6 +463,12 @@ export default class AlertsEdit extends Vue {
           this.item.subgifts.push({
             ..._default,
             messageTemplate: '{name} just gifted sub to {recipient}! {amount} {monthsName}',
+          })
+          break;
+        case 'cmdredeems':
+          this.item.cmdredeems.push({
+            ..._default,
+            messageTemplate: '{name} was redeemed by {recipient} for x${amount}!',
           })
           break;
         case 'subs':
