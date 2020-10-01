@@ -5,7 +5,7 @@ export class priceBits1601537943813 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`DROP INDEX "IDX_d12db23d28020784096bcb41a3"`);
-    await queryRunner.query(`CREATE TABLE "temporary_price" ("id" varchar PRIMARY KEY NOT NULL, "command" varchar NOT NULL, "enabled" boolean NOT NULL DEFAULT (1), "price" integer NOT NULL, "priceBits" integer NOT NULL DEFAULT (0))`);
+    await queryRunner.query(`CREATE TABLE "temporary_price" ("id" varchar PRIMARY KEY NOT NULL, "command" varchar NOT NULL, "enabled" boolean NOT NULL DEFAULT (1), "price" integer NOT NULL, "emitRedeemEvent" boolean NOT NULL DEFAULT (0), "priceBits" integer NOT NULL DEFAULT (0))`);
     await queryRunner.query(`INSERT INTO "temporary_price"("id", "command", "enabled", "price") SELECT "id", "command", "enabled", "price" FROM "price"`);
     await queryRunner.query(`DROP TABLE "price"`);
     await queryRunner.query(`ALTER TABLE "temporary_price" RENAME TO "price"`);
