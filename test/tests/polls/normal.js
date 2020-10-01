@@ -13,6 +13,7 @@ const { getRepository } = require('typeorm');
 const { Poll, PollVote } = require('../../../dest/database/entity/poll');
 const { User } = require('../../../dest/database/entity/user');
 const { getLocalizedName } = require('../../../dest/helpers/getLocalized');
+const translate = require('../../../dest/translate').translate;
 
 const polls = (require('../../../dest/systems/polls')).default;
 
@@ -71,9 +72,9 @@ describe('Polls - normal', () => {
 
       const r = await polls.main({ sender: owner, parameters: ''  });
       assert.strictEqual(r[0].response, '$sender, current status of poll "Lorem Ipsum?":');
-      assert.strictEqual(r[1].response, `!vote 1 - Lorem - 0 ${getLocalizedName(0, 'systems.polls.votes')}, 0.00%`);
-      assert.strictEqual(r[2].response, `!vote 2 - Ipsum - 0 ${getLocalizedName(0, 'systems.polls.votes')}, 0.00%`);
-      assert.strictEqual(r[3].response, `!vote 3 - Dolor Sit - 0 ${getLocalizedName(0, 'systems.polls.votes')}, 0.00%`);
+      assert.strictEqual(r[1].response, `!vote 1 - Lorem - 0 ${getLocalizedName(0, translate('systems.polls.votes'))}, 0.00%`);
+      assert.strictEqual(r[2].response, `!vote 2 - Ipsum - 0 ${getLocalizedName(0, translate('systems.polls.votes'))}, 0.00%`);
+      assert.strictEqual(r[3].response, `!vote 3 - Dolor Sit - 0 ${getLocalizedName(0, translate('systems.polls.votes'))}, 0.00%`);
     });
     it(`User ${owner.username} will vote for option 0 - should fail`, async () => {
       await polls.main({ sender: owner, parameters: '0' });
