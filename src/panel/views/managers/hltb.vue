@@ -15,139 +15,151 @@
       </b-col>
     </b-row>
 
-    <panel cards></panel>
-
-    <template v-for="(chunkGames, index) of chunk(games, itemsPerLine)">
-      <div class="card-deck" v-bind:key="index">
-        <template v-for="game of chunkGames">
-          <div class="card mb-3 p-0 border" v-bind:key="String(game.game)">
-            <div class="col p-0 text-center" style="{ max-height: 250px; background-color: black; }">
-              <img class="max" :src="game.imageUrl" v-bind:key="String(game.game)"/>
-              <h5 class="centered" style="text-transform: inherit;">{{ game.game }}</h5>
-              <div class="btn-group w-100" role="group" aria-label="Basic example">
-                <button @click="game.isFinishedMain = !game.isFinishedMain; update(game);" class="btn btn-sm" :class="{ 'btn-success': game.isFinishedMain, 'btn-danger': !game.isFinishedMain }">
-                  <fa icon="check" fixed-width v-if="game.isFinishedMain"/>
-                  <fa icon="ban" fixed-width v-else/>
-                  Main
-                  <small v-if="game.isFinishedMain">(done)</small>
-                </button>
-
-                <button @click="game.isFinishedCompletionist = !game.isFinishedCompletionist; update(game);"  class="btn btn-sm" :class="{ 'btn-success': game.isFinishedCompletionist, 'btn-danger': !game.isFinishedCompletionist }">
-                  <fa icon="check" fixed-width v-if="game.isFinishedCompletionist"/>
-                  <fa icon="ban" fixed-width v-else/>
-                  Completionist
-                  <small v-if="game.isFinishedCompletionist">(done)</small>
-                </button>
-              </div>
-            </div>
-            <div class="card-body col">
-              <dl class="row">
-                <dt class="col-6">Main</dt>
-                <dd class="col-6">
-                  <fa icon="spinner" spin v-if="!game.isFinishedMain" class="text-info" fixed-width/>
-                  <fa icon="check" class="text-success" v-else fixed-width/>
-                  {{ getHours(game.timeToBeatMain).toFixed(1) }}<small class="small">h</small> / {{ game.gameplayMain }}<small class="small">h</small>
-                  <span class="percent">
-                    {{ ((getHours(game.timeToBeatMain) / game.gameplayMain) * 100).toFixed(2) }}<small class="small">%</small>
-                  </span>
-                </dd>
-                <dt class="col-6" v-if="game.gameplayCompletionist !== 0">Completionist</dt>
-                <dd class="col-6" v-if="game.gameplayCompletionist !== 0">
-                  <fa icon="spinner" spin v-if="!game.isFinishedCompletionist" class="text-info"/>
-                  <fa icon="check" class="text-success" v-else/>
-                  {{ getHours(game.timeToBeatCompletionist).toFixed(1) }}<small class="small">h</small> / {{ game.gameplayCompletionist }}<small class="small">h</small>
-                  <span class="percent">
-                    {{ ((getHours(game.timeToBeatCompletionist) / game.gameplayCompletionist) * 100).toFixed(2) }}<small class="small">%</small>
-                  </span>
-                </dd>
-              </dl>
-            </div>
-          </div>
+    <panel search @search="search = $event"/>
+    <loading v-if="state.loading !== $state.success"/>
+    <template v-else>
+      <b-alert show variant="danger" v-if="fItems.length === 0 && search.length > 0">
+        <fa icon="search"/> <span v-html="translate('systems.hltb.emptyAfterSearch').replace('$search', search)"/>
+      </b-alert>
+      <b-alert show v-else-if="items.length === 0">
+        {{translate('systems.hltb.empty')}}
+      </b-alert>
+      <b-table v-else striped small :items="fItems" :fields="fields">
+        <template v-slot:cell(show_details)="row">
+          <b-button pill size="sm" @click="row.toggleDetails" class="mr-2" :variant="row.detailsShowing ? 'primary' : 'outline-primary'">
+            {{ row.detailsShowing ? 'Hide' : 'Show'}} History (10)
+          </b-button>
         </template>
-
-        <!-- add empty cards -->
-        <template v-if="chunkGames.length !== itemsPerLine">
-          <div class="card" style="visibility: hidden" v-for="i in itemsPerLine - (chunkGames.length % itemsPerLine)" v-bind:key="i"></div>
+        <template v-slot:row-details="row">
+          <b-card>
+            <b-row>
+              <b-col><b>When</b></b-col>
+              <b-col><b>Time</b></b-col>
+              <b-col></b-col>
+            </b-row>
+            <b-row>
+              <b-col>{{ (new Date()).toLocaleString() }}</b-col>
+              <b-col>1h 25m</b-col>
+              <b-col>
+                <b-button pill :pressed.sync="myToggleTest" variant="outline-success" size="sm">Main</b-button>
+                <b-button pill :pressed.sync="myToggleTest2" variant="outline-success" size="sm">Completionist</b-button>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col>{{ (new Date()).toLocaleString() }}</b-col>
+              <b-col>1h 25m</b-col>
+              <b-col>
+                <b-button pill :pressed.sync="myToggleTest" variant="outline-success" size="sm">Main</b-button>
+                <b-button pill :pressed.sync="myToggleTest2" variant="outline-success" size="sm">Completionist</b-button>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col>{{ (new Date()).toLocaleString() }}</b-col>
+              <b-col>1h 25m</b-col>
+              <b-col>
+                <b-button pill :pressed.sync="myToggleTest" variant="outline-success" size="sm">Main</b-button>
+                <b-button pill :pressed.sync="myToggleTest2" variant="outline-success" size="sm">Completionist</b-button>
+              </b-col>
+            </b-row>
+          </b-card>
         </template>
-      </div>
+        <template v-slot:cell(thumbnail)="data">
+          <b-img thumbnail width="50" height="50" :src="data.item.imageUrl" :alt="data.item.game + ' thumbnail'"></b-img>
+        </template>
+        <template v-slot:cell(main)="data">
+          {{ getHours(data.item.timeToBeatMain).toFixed(1) }}<small class="small">h</small> / {{ data.item.gameplayMain.toFixed(1) }}<small class="small">h</small>
+        </template>
+        <template v-slot:cell(completionist)="data">
+          {{ getHours(data.item.timeToBeatCompletionist).toFixed(1) }}<small class="small">h</small> / {{ data.item.gameplayCompletionist.toFixed(1) }}<small class="small">h</small>
+        </template>
+      </b-table>
     </template>
   </div>
 </template>
 
 <script lang="ts">
-  import Vue from 'vue'
-  import { chunk } from 'lodash-es';
+import { defineComponent, ref, onMounted, computed } from '@vue/composition-api'
 
-  import moment from 'moment'
-  import VueMoment from 'vue-moment'
-  import momentTimezone from 'moment-timezone'
+import { getSocket } from '../../helpers/socket';
+import { HowLongToBeatGameInterface } from 'src/bot/database/entity/howLongToBeatGame';
+import { error } from 'src/panel/helpers/error';
+import translate from 'src/panel/helpers/translate';
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
 
-  require('moment/locale/cs')
-  require('moment/locale/ru')
+const socket = getSocket('/systems/howlongtobeat');
 
-  import { getSocket } from '../../helpers/socket';
-  import { HowLongToBeatGameInterface } from 'src/bot/database/entity/howLongToBeatGame';
+export default defineComponent({
+  components: {
+    'loading': () => import('src/panel/components/loading.vue'),
+    panel: () => import('../../components/panel.vue'),
+  },
+  setup(props, context) {
+    const items = ref([] as HowLongToBeatGameInterface[]);
+    const state = ref({
+      loading: ButtonStates.progress,
+    } as {
+      loading: number;
+    });
+    const search = ref('');
 
-  Vue.use(VueMoment, {
-      moment, momentTimezone
-  })
-
-  export default Vue.extend({
-    components: {
-      panel: () => import('../../components/panel.vue'),
-    },
-    data: function () {
-      const object: {
-        chunk: any,
-        socket: any,
-        itemsPerLine: number,
-        interval: number,
-        games: HowLongToBeatGameInterface[],
-        domWidth: number,
-      } = {
-        chunk: chunk,
-        socket: getSocket('/systems/howlongtobeat'),
-        games: [],
-        itemsPerLine: 2,
-        interval: 0,
-        domWidth: 1080,
-      }
-      return object
-    },
-    beforeDestroy() {
-      window.clearInterval(this.interval);
-    },
-    created() {
-      this.interval = window.setInterval(() => {
-        this.domWidth = (this.$refs['window'] as HTMLElement).clientWidth
-      }, 100)
-      this.socket.emit('generic::getAll::filter', { order: { startedAt: 'DESC' } }, (err: string | null, data: HowLongToBeatGameInterface[]) => {
-        if (err) {
-          return console.error(err);
-        }
-        this.games = data;
-      })
-    },
-    watch: {
-      domWidth(val) {
-        if (val < 800) {
-          this.itemsPerLine = 1
-        } else if (val < 1200) {
-          this.itemsPerLine = 2
-        } else {
-          this.itemsPerLine = 3
-        }
-      }
-    },
-    methods: {
-      update(game: HowLongToBeatGameInterface) {
-        this.socket.emit('hltb::save', game, () => {});
-      },
-      getHours(time: number): number {
-        return Number(time / 1000 / 60 / 60)
-      }
+    const getHours = (time: number): number => {
+      return Number(time / 1000 / 60 / 60)
     }
-  })
+
+    const fItems = computed(() => {
+      return items.value
+        .filter((o) => {
+          if (search.value.trim() === '') {
+            return true;
+          }
+          return o.game.trim().toLowerCase().includes(search.value.trim().toLowerCase())
+        })
+        .sort((a, b) => {
+          const A = a.game.toLowerCase();
+          const B = b.game.toLowerCase();
+          if (A < B)  { //sort string ascending
+            return -1;
+          }
+          if (A > B) {
+            return 1;
+          }
+          return 0; //default return value (no sorting)
+        })
+    });
+
+    const fields = [
+      { key: 'thumbnail', label: '', },
+      { key: 'game', label: translate('systems.hltb.game.name'), sortable: true },
+      { key: 'main', label: translate('systems.hltb.main.name')},
+      { key: 'completionist', label: translate('systems.hltb.completionis.name') },
+      { key: 'show_details', label: '', },
+    ];
+
+    onMounted(() => {
+      socket.emit('generic::getAll::filter', { order: { startedAt: 'DESC' } }, (err: string | null, data: HowLongToBeatGameInterface[]) => {
+        if (err) {
+          return error(err);
+        }
+        items.value = data;
+        state.value.loading = ButtonStates.success;
+      })
+    })
+
+    const myToggleTest = ref(true);
+    const myToggleTest2 = ref(false);
+
+    return {
+      items,
+      getHours,
+      fields,
+      state,
+      search,
+      fItems,
+      myToggleTest,
+      myToggleTest2,
+    }
+  },
+})
 </script>
 
 <style scoped>
