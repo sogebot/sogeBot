@@ -17,6 +17,7 @@ import api from '../api';
 import points from './points';
 import { isDbConnected } from '../helpers/database';
 import { linesParsed } from '../helpers/parser';
+import { getLocalizedName } from '../helpers/getLocalized';
 
 const TYPE_NORMAL = 0;
 const TYPE_TICKETS = 1;
@@ -154,7 +155,7 @@ class Raffles extends System {
       return;
     }
 
-    const raffle = await getRepository(Raffle).findOne({ winner: null, isClosed: false });
+    const raffle = await getRepository(Raffle).findOne({ where: { winner: null, isClosed: false }, relations: ['participants'] });
     const isTimeToAnnounce = new Date().getTime() - new Date(this.lastAnnounce).getTime() >= (this.raffleAnnounceInterval * 60 * 1000);
     const isMessageCountToAnnounce = linesParsed - this.lastAnnounceMessageCount >= this.raffleAnnounceMessageInterval;
     if (!(api.isStreamOnline) || !raffle || !isTimeToAnnounce || !isMessageCountToAnnounce) {
@@ -182,6 +183,8 @@ class Raffles extends System {
     }
 
     const message = prepare(locale, {
+      l10n_entries: getLocalizedName(raffle.participants.length, 'entries'),
+      count: raffle.participants.length,
       keyword: raffle.keyword,
       min: raffle.minTickets,
       max: raffle.maxTickets,
@@ -263,6 +266,8 @@ class Raffles extends System {
     }
 
     const response = prepare(type === TYPE_NORMAL ? 'raffles.announce-raffle' : 'raffles.announce-ticket-raffle', {
+      l10n_entries: getLocalizedName(0, 'entries'),
+      count: 0,
       keyword: keyword,
       eligibility: eligibility.join(', '),
       min: minTickets,
@@ -276,7 +281,7 @@ class Raffles extends System {
 
   @command('!raffle')
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
-    const raffle = await getRepository(Raffle).findOne({ winner: null, isClosed: false });
+    const raffle = await getRepository(Raffle).findOne({ where: { winner: null, isClosed: false }, relations: ['participants'] });
 
     if (!raffle) {
       const response = prepare('raffles.no-raffle-is-currently-running');
@@ -300,6 +305,8 @@ class Raffles extends System {
     }
 
     const response = prepare(locale, {
+      l10n_entries: getLocalizedName(raffle.participants.length, 'entries'),
+      count: raffle.participants.length,
       keyword: raffle.keyword,
       min: raffle.minTickets,
       max: raffle.maxTickets,

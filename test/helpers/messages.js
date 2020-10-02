@@ -1,6 +1,7 @@
 const assert = require('assert');
 const until = require('test-until');
 const chalk = require('chalk');
+const util = require('util');
 const sinon = require('sinon');
 const _ = require('lodash');
 const { prepare } = require('../../dest/commons');
@@ -104,7 +105,7 @@ module.exports = {
       }
     }, 5000);
   },
-  isSent: async function (entry, user, opts, wait) {
+  isSent: util.deprecate(async function (entry, user, opts, wait) {
     if (typeof user === 'string') {
       user = {
         username: user,
@@ -163,7 +164,7 @@ module.exports = {
         );
       }
     }, wait || 5000);
-  },
+  }, 'We should not use isSent as it may cause false positive tests'),
   isSentRaw: async function (expected, user, wait) {
     if (!Array.isArray(expected)) {
       expected = [expected];

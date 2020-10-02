@@ -133,14 +133,6 @@ class Expects {
     this.text = this.text.replace(/\s\s+/g, ' ').trim();
   }
 
-  check (text: string) {
-    process.stdout.write('Calling deprecated function check(), set in constructor directly\n');
-    process.stdout.write(new Error().stack + '\n');
-    this.originalText = text;
-    this.text = text;
-    return this;
-  }
-
   toArray () {
     if (!this.isExecuted) {
       this.exec();
