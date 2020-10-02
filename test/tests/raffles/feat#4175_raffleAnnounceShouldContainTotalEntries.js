@@ -13,10 +13,11 @@ const { User } = require('../../../dest/database/entity/user');
 const { Raffle } = require('../../../dest/database/entity/raffle');
 
 const raffles = (require('../../../dest/systems/raffles')).default;
+const api = (require('../../../dest/api')).default;
 
 const assert = require('assert');
 
-describe('Raffles - user will lose points when join raffle with number and all #3587', () => {
+describe('Raffles - announce should contain total entries #4175', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
@@ -24,9 +25,14 @@ describe('Raffles - user will lose points when join raffle with number and all #
     raffles.allowOverTicketing = true;
   });
 
+  after(async () => {
+    raffles.raffleAnnounceMessageInterval = 20;
+    api.isStreamOnline = false;
+  })
+
   it('create ticket raffle', async () => {
     raffles.open({ sender: user.owner, parameters: '!winme -min 0 -max 100' });
-    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-100>". Raffle is opened for everyone', { username: 'bot' });
+    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-100>". Raffle is opened for everyone', { username: 'bot' })
   });
 
   it('Update viewer and viewer2 to have 200 points', async () => {
@@ -54,51 +60,12 @@ describe('Raffles - user will lose points when join raffle with number and all #
     assert.strictEqual(raffle.participants[1].tickets, 50);
   });
 
-  it('expecting viewer to have 100 points', async () => {
-    const userFromDb = await getRepository(User).findOne({
-      where: { username: user.viewer.username },
-    });
-    assert.strictEqual(userFromDb.points, 100);
-  });
-
-  it('expecting viewer2 to have 150 points', async () => {
-    const userFromDb = await getRepository(User).findOne({
-      where: { username: user.viewer2.username },
-    });
-    assert.strictEqual(userFromDb.points, 150);
-  });
-
-  it('Viewer bets max points again with all', async () => {
-    const a = await raffles.participate({ sender: user.viewer, message: '!winme all' });
-    assert(a);
-  });
-
-  it('Viewer2 bets max points with all', async () => {
-    const a = await raffles.participate({ sender: user.viewer2, message: '!winme all' });
-    assert(a);
-  });
-
-  it('expecting 2 participants to have bet of 100', async () => {
-    const raffle = await getRepository(Raffle).findOne({
-      relations: ['participants'],
-      where: { winner: null, isClosed: false },
-    });
-    assert.strictEqual(raffle.participants.length, 2);
-    assert.strictEqual(raffle.participants[0].tickets, 100);
-    assert.strictEqual(raffle.participants[1].tickets, 100);
-  });
-
-  it('expecting viewer to still have 100 points', async () => {
-    const userFromDb = await getRepository(User).findOne({
-      where: { username: user.viewer.username },
-    });
-    assert.strictEqual(userFromDb.points, 100);
-  });
-
-  it('expecting viewer2 to have 100 points', async () => {
-    const userFromDb = await getRepository(User).findOne({
-      where: { username: user.viewer2.username },
-    });
-    assert.strictEqual(userFromDb.points, 100);
+  it('expecting 2 entries in announce message', async () => {
+    api.isStreamOnline = true
+    raffles.lastAnnounceMessageCount = 0;
+    raffles.lastAnnounce = 0;
+    raffles.raffleAnnounceMessageInterval = 0;
+    await raffles.announce();
+    await message.isSentRaw('Raffle is running (2 entries). To enter type "!winme <1-100>". Raffle is opened for everyone', { username: 'bot' })
   });
 });

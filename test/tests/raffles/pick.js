@@ -30,12 +30,7 @@ describe('Raffles - pick()', () => {
   describe('Empty raffle with pick should be closed', () => {
     it('create ticket raffle', async () => {
       raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-      await message.isSent('raffles.announce-ticket-raffle', { username: 'bot' }, {
-        keyword: '!winme',
-        eligibility: await commons.prepare('raffles.eligibility-everyone-item'),
-        min: 1,
-        max: max,
-      });
+      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-' + max + '>". Raffle is opened for everyone', { username: 'bot' });
     });
 
     it('pick a winner', async () => {
@@ -58,10 +53,7 @@ describe('Raffles - pick()', () => {
 
     it('Create subscribers raffle', async () => {
       raffles.open({ sender: owner, parameters: '!winme -for subscribers' });
-      await message.isSent('raffles.announce-raffle', { username: 'bot' }, {
-        keyword: '!winme',
-        eligibility: await commons.prepare('raffles.eligibility-subscribers-item'),
-      });
+      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme". Raffle is opened for subscribers', { username: 'bot' });
     });
 
     const subs = ['sub1', 'sub2', 'sub3', 'sub4'];
@@ -78,36 +70,19 @@ describe('Raffles - pick()', () => {
 
     it('pick a winner', async () => {
       await raffles.pick({ sender: owner });
-
-      await message.isSent('raffles.raffle-winner-is', { username: 'bot' }, [{
-        username: 'sub1',
-        keyword: '!winme',
-        probability: 25,
-      }, {
-        username: 'sub2',
-        keyword: '!winme',
-        probability: 25,
-      }, {
-        username: 'sub3',
-        keyword: '!winme',
-        probability: 25,
-      }, {
-        username: 'sub4',
-        keyword: '!winme',
-        probability: 25,
-      }]);
+      await message.isSentRaw([
+        'Winner of raffle !winme is @sub1! Win probability was 25%!',
+        'Winner of raffle !winme is @sub2! Win probability was 25%!',
+        'Winner of raffle !winme is @sub3! Win probability was 25%!',
+        'Winner of raffle !winme is @sub4! Win probability was 25%!',
+      ], { username: 'bot' });
     });
   });
 
   describe('Raffle should return winner', () => {
     it('create ticket raffle', async () => {
       raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-      await message.isSent('raffles.announce-ticket-raffle', { username: 'bot' }, {
-        keyword: '!winme',
-        eligibility: await commons.prepare('raffles.eligibility-everyone-item'),
-        min: 1,
-        max: max,
-      });
+      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone', { username: 'bot' });
     });
 
 
@@ -130,16 +105,10 @@ describe('Raffles - pick()', () => {
 
     it('pick a winner', async () => {
       await raffles.pick({ sender: owner });
-
-      await message.isSent('raffles.raffle-winner-is', { username: 'bot' }, [{
-        username: testuser.username,
-        keyword: '!winme',
-        probability: 66.67,
-      }, {
-        username: testuser2.username,
-        keyword: '!winme',
-        probability: 33.33,
-      }]);
+      await message.isSentRaw([
+        'Winner of raffle !winme is @' + testuser.username + '! Win probability was 66.67%!',
+        'Winner of raffle !winme is @' + testuser2.username + '! Win probability was 33.33%!',
+      ], { username: 'bot' });
     });
   });
 
@@ -148,12 +117,7 @@ describe('Raffles - pick()', () => {
 
     it('create ticket raffle', async () => {
       raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-      await message.isSent('raffles.announce-ticket-raffle', { username: 'bot' }, {
-        keyword: '!winme',
-        eligibility: await commons.prepare('raffles.eligibility-everyone-item'),
-        min: 1,
-        max: max,
-      });
+      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone', { username: 'bot' });
     });
 
     it('Create testuser/testuser2 with max points', async () => {
@@ -175,28 +139,17 @@ describe('Raffles - pick()', () => {
 
     it('pick a winner', async () => {
       await raffles.pick({ sender: owner });
-
-      await message.isSent('raffles.raffle-winner-is', { username: 'bot' }, [{
-        username: testuser.username,
-        keyword: '!winme',
-        probability: 54.55,
-      }, {
-        username: testuser2.username,
-        keyword: '!winme',
-        probability: 45.45,
-      }]);
+      await message.isSentRaw([
+        'Winner of raffle !winme is @' + testuser.username + '! Win probability was 54.55%!',
+        'Winner of raffle !winme is @' + testuser2.username + '! Win probability was 45.45%!',
+      ], { username: 'bot' });
     });
   });
 
   describe('Raffle with subscriber should return winner', () => {
     it('create ticket raffle', async () => {
       raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-      await message.isSent('raffles.announce-ticket-raffle', { username: 'bot' }, {
-        keyword: '!winme',
-        eligibility: await commons.prepare('raffles.eligibility-everyone-item'),
-        min: 1,
-        max: max,
-      });
+      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone', { username: 'bot' });
     });
 
     it('Create testuser/testuser2 with max points', async () => {
@@ -218,28 +171,17 @@ describe('Raffles - pick()', () => {
 
     it('pick a winner', async () => {
       await raffles.pick({ sender: owner });
-
-      await message.isSent('raffles.raffle-winner-is', { username: 'bot' }, [{
-        username: testuser.username,
-        keyword: '!winme',
-        probability: 60,
-      }, {
-        username: testuser2.username,
-        keyword: '!winme',
-        probability: 40,
-      }]);
+      await message.isSentRaw([
+        'Winner of raffle !winme is @' + testuser.username + '! Win probability was 60%!',
+        'Winner of raffle !winme is @' + testuser2.username + '! Win probability was 40%!',
+      ], { username: 'bot' });
     });
   });
 
   describe('Raffle with subscriber and follower should return winner', () => {
     it('create ticket raffle', async () => {
       raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-      await message.isSent('raffles.announce-ticket-raffle', { username: 'bot' }, {
-        keyword: '!winme',
-        eligibility: await commons.prepare('raffles.eligibility-everyone-item'),
-        min: 1,
-        max: max,
-      });
+      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone', { username: 'bot' });
     });
 
     it('Create testuser/testuser2 with max points', async () => {
@@ -261,16 +203,10 @@ describe('Raffles - pick()', () => {
 
     it('pick a winner', async () => {
       await raffles.pick({ sender: owner });
-
-      await message.isSent('raffles.raffle-winner-is', { username: 'bot' }, [{
-        username: testuser.username,
-        keyword: '!winme',
-        probability: 55.56,
-      }, {
-        username: testuser2.username,
-        keyword: '!winme',
-        probability: 44.44,
-      }]);
+      await message.isSentRaw([
+        'Winner of raffle !winme is @' + testuser.username + '! Win probability was 55.56%!',
+        'Winner of raffle !winme is @' + testuser2.username + '! Win probability was 44.44%!',
+      ], { username: 'bot' });
     });
   });
 });
