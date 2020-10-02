@@ -30,7 +30,7 @@ describe('Raffles - pick()', () => {
   describe('Empty raffle with pick should be closed', () => {
     it('create ticket raffle', async () => {
       raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-' + max + '>". Raffle is opened for everyone', { username: 'bot' });
+      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-' + max + '>". Raffle is opened for everyone.', { username: 'bot' });
     });
 
     it('pick a winner', async () => {
@@ -52,8 +52,8 @@ describe('Raffles - pick()', () => {
     });
 
     it('Create subscribers raffle', async () => {
-      raffles.open({ sender: owner, parameters: '!winme -for subscribers' });
-      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme". Raffle is opened for subscribers', { username: 'bot' });
+      raffles.open({ sender: owner, parameters: '!winme -for subscribers.' });
+      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme". Raffle is opened for subscribers.', { username: 'bot' });
     });
 
     const subs = ['sub1', 'sub2', 'sub3', 'sub4'];
@@ -82,7 +82,7 @@ describe('Raffles - pick()', () => {
   describe('Raffle should return winner', () => {
     it('create ticket raffle', async () => {
       raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone', { username: 'bot' });
+      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone.', { username: 'bot' });
     });
 
 
@@ -117,7 +117,7 @@ describe('Raffles - pick()', () => {
 
     it('create ticket raffle', async () => {
       raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone', { username: 'bot' });
+      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone.', { username: 'bot' });
     });
 
     it('Create testuser/testuser2 with max points', async () => {
@@ -149,7 +149,7 @@ describe('Raffles - pick()', () => {
   describe('Raffle with subscriber should return winner', () => {
     it('create ticket raffle', async () => {
       raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone', { username: 'bot' });
+      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone.', { username: 'bot' });
     });
 
     it('Create testuser/testuser2 with max points', async () => {
@@ -181,7 +181,7 @@ describe('Raffles - pick()', () => {
   describe('Raffle with subscriber and follower should return winner', () => {
     it('create ticket raffle', async () => {
       raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone', { username: 'bot' });
+      await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone.', { username: 'bot' });
     });
 
     it('Create testuser/testuser2 with max points', async () => {

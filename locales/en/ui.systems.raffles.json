@@ -5,6 +5,10 @@
   },
   "settings": {
     "enabled": "Status",
+    "deleteRaffleJoinCommands": {
+      "title": "Delete user raffle join command",
+      "help": "This will delete user message if they use !yourraffle command. Should keep chat cleaner."
+    },
     "allowOverTicketing": {
       "title": "Allow over ticketing",
       "help": "Allow user join raffle with over ticket of his points. E.g. user have 10 points but can join with !raffle 100 which will use all of his points."

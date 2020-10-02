@@ -170,31 +170,6 @@
                       td {{message.text}}
                       td.text-right
                         small.text-muted {{ new Date(message.timestamp).toLocaleTimeString()}}
-
-        b-tab
-          template(v-slot:title)
-            fa(icon="cog" fixed-width)
-          b-card-text
-            div.input-group
-              div.input-group-prepend
-                span.input-group-text {{translate('announce-every')}}
-              input(type="number" class="form-control" v-model.number="raffleAnnounceInterval")
-              div.input-group-append
-                span.input-group-text {{translate('minutes')}}
-
-            div.input-group.mt-2
-              div.input-group-prepend
-                span.input-group-text {{translate('systems.raffles.widget.subscribers-luck')}}
-              input(type="number" class="form-control" v-model.number="luck.subscribersPercent")
-              div.input-group-append
-                span.input-group-text %
-
-            div.input-group.mt-2
-              div.input-group-prepend
-                span.input-group-text {{translate('systems.raffles.widget.followers-luck')}}
-              input(type="number" class="form-control" v-model.number="luck.followersPercent")
-              div.input-group-append
-                span.input-group-text %
 </template>
 
 <script>
@@ -216,11 +191,6 @@ export default {
     return {
       EventBus,
       orderBy: orderBy,
-      raffleAnnounceInterval: 0,
-      luck: {
-        subscribersPercent: 0,
-        followersPercent: 0
-      },
 
       waitingForNewWinner: false,
 
@@ -269,8 +239,6 @@ export default {
     clearTimeout(this.refreshTimeout);
   },
   created: function () {
-    this.getSettings();
-
     const cache = localStorage.getItem('/widget/raffles/');
     if (cache) {
       for (const [key, value] of Object.entries(JSON.parse(cache)))
@@ -296,15 +264,6 @@ export default {
     this.refresh()
   },
   watch: {
-    raffleAnnounceInterval: function (val) {
-      this.socket.emit('settings.update', { raffleAnnounceInterval: val }, () => {})
-    },
-    'luck.followersPercent': function () {
-      this.socket.emit('settings.update', { luck: this.luck }, () => {})
-    },
-    'luck.subscribersPercent': function () {
-      this.socket.emit('settings.update', { luck: this.luck }, () => {})
-    },
     keyword: function () {
       if (!this.keyword.startsWith('!')) this.keyword = '!' + this.keyword
     },
@@ -326,17 +285,6 @@ export default {
     }
   },
   methods: {
-    getSettings() {
-      this.socket.emit('settings', (err, data) => {
-        try {
-          this.raffleAnnounceInterval = data.raffleAnnounceInterval;
-          this.luck.subscribersPercent = data.luck.subscribersPercent;
-          this.luck.followersPercent = data.luck.followersPercent;
-        } catch (e) {
-          this.getSettings();
-        }
-      })
-    },
     refresh: async function () {
       await Promise.all([
         new Promise((resolve, reject) => {
