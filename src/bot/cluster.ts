@@ -122,9 +122,6 @@ export const clusteredClientChat = (type: 'say' | 'whisper' | 'me', username: st
 
 export const clusteredClientDelete = (senderId: string) => {
   if (isMainThread) {
-    if (debugIsEnabled('tmi')) {
-      return;
-    }
     tmi.delete('bot', senderId);
   } else {
     clientIO.emit('clusteredClientDelete', senderId);

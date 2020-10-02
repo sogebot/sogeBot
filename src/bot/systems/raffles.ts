@@ -1,7 +1,7 @@
 'use strict';
 
 import * as _ from 'lodash';
-import { isMainThread } from '../cluster';
+import { clusteredClientDelete, isMainThread } from '../cluster';
 
 import { announce, getOwnerAsSender, prepare } from '../commons';
 import { command, default_permission, parser, settings } from '../decorators';
@@ -48,6 +48,8 @@ class Raffles extends System {
   raffleAnnounceMessageInterval = 20;
   @settings()
   allowOverTicketing = false;
+  @settings()
+  deleteRaffleJoinCommands = false;
 
   constructor () {
     super();
@@ -182,7 +184,7 @@ class Raffles extends System {
       eligibility.push(prepare('raffles.eligibility-everyone-item'));
     }
 
-    const message = prepare(locale, {
+    let message = prepare(locale, {
       l10n_entries: getLocalizedName(raffle.participants.length, 'entries'),
       count: raffle.participants.length,
       keyword: raffle.keyword,
@@ -190,6 +192,9 @@ class Raffles extends System {
       max: raffle.maxTickets,
       eligibility: eligibility.join(', '),
     });
+    if (this.deleteRaffleJoinCommands) {
+      message += ' ' + prepare('raffles.join-messages-will-be-deleted');
+    }
     announce(message, 'raffles');
     this.timeouts.raffleAnnounce = global.setTimeout(() => this.announce(), 60000);
   }
@@ -265,7 +270,7 @@ class Raffles extends System {
       eligibility.push(prepare('raffles.eligibility-everyone-item'));
     }
 
-    const response = prepare(type === TYPE_NORMAL ? 'raffles.announce-raffle' : 'raffles.announce-ticket-raffle', {
+    let response = prepare(type === TYPE_NORMAL ? 'raffles.announce-raffle' : 'raffles.announce-ticket-raffle', {
       l10n_entries: getLocalizedName(0, 'entries'),
       count: 0,
       keyword: keyword,
@@ -275,6 +280,9 @@ class Raffles extends System {
     });
 
     this.lastAnnounce = Date.now();
+    if (this.deleteRaffleJoinCommands) {
+      response += ' ' + prepare('raffles.join-messages-will-be-deleted');
+    }
     announce(response, 'raffles'); // we are announcing raffle so it is send to all relevant channels
     return [];
   }
@@ -304,7 +312,7 @@ class Raffles extends System {
       eligibility.push(prepare('raffles.eligibility-everyone-item'));
     }
 
-    const response = prepare(locale, {
+    let response = prepare(locale, {
       l10n_entries: getLocalizedName(raffle.participants.length, 'entries'),
       count: raffle.participants.length,
       keyword: raffle.keyword,
@@ -312,6 +320,9 @@ class Raffles extends System {
       max: raffle.maxTickets,
       eligibility: eligibility.join(', '),
     });
+    if (this.deleteRaffleJoinCommands) {
+      response += ' ' + prepare('raffles.join-messages-will-be-deleted');
+    }
     return [{ response, ...opts }];
   }
 
@@ -339,9 +350,15 @@ class Raffles extends System {
       return this.participate(opts);
     }
 
-    const isStartingWithRaffleKeyword = opts.message.toLowerCase().startsWith(raffle.keyword.toLowerCase());
+    const isStartingWithRaffleKeyword
+      = raffle.type === TYPE_TICKETS
+        ? opts.message.toLowerCase().startsWith(raffle.keyword.toLowerCase() + ' ')
+        : opts.message.toLowerCase().trim() === raffle.keyword.toLowerCase();
     if (!isStartingWithRaffleKeyword) {
       return true;
+    }
+    if (this.deleteRaffleJoinCommands) {
+      clusteredClientDelete(opts.sender.id);
     }
 
     opts.message = opts.message.toString().replace(raffle.keyword, '');

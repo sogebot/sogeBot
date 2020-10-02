@@ -17,22 +17,23 @@ const api = (require('../../../dest/api')).default;
 
 const assert = require('assert');
 
-describe('Raffles - announce should contain total entries #4175', () => {
+describe('Raffles - announce should contain delete info #4176', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
     await user.prepare();
-    raffles.allowOverTicketing = true;
+    raffles.deleteRaffleJoinCommands = true;
   });
 
   after(async () => {
     raffles.raffleAnnounceMessageInterval = 20;
     api.isStreamOnline = false;
+    raffles.deleteRaffleJoinCommands = false;
   })
 
   it('create ticket raffle', async () => {
     raffles.open({ sender: user.owner, parameters: '!winme -min 0 -max 100' });
-    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-100>". Raffle is opened for everyone.', { username: 'bot' })
+    await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-100>". Raffle is opened for everyone. Your raffle messages will be deleted on join.', { username: 'bot' })
   });
 
   it('Update viewer and viewer2 to have 200 points', async () => {
@@ -66,6 +67,6 @@ describe('Raffles - announce should contain total entries #4175', () => {
     raffles.lastAnnounce = 0;
     raffles.raffleAnnounceMessageInterval = 0;
     await raffles.announce();
-    await message.isSentRaw('Raffle is running (2 entries). To enter type "!winme <1-100>". Raffle is opened for everyone.', { username: 'bot' })
+    await message.isSentRaw('Raffle is running (2 entries). To enter type "!winme <1-100>". Raffle is opened for everyone. Your raffle messages will be deleted on join.', { username: 'bot' })
   });
 });
