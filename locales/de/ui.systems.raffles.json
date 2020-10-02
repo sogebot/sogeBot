@@ -5,6 +5,10 @@
   },
   "settings": {
     "enabled": "Status",
+    "deleteRaffleJoinCommands": {
+      "title": "Delete user raffle join command",
+      "help": "This will delete user message if they use !yourraffle command. Should keep chat cleaner."
+    },
     "allowOverTicketing": {
       "title": "Überschreitung der maximalen Tickets erlauben",
       "help": "Erlaube dem Benutzer, mit mehr Tickets an der Verlosung teilzunehmen. Ein Benutzer hat z.B. 10 Tickets, kann aber mit !raffle 100 teilnehmen, wobei alle seine Tickets verwendet werden."
