@@ -5,6 +5,14 @@
   },
   "settings": {
     "enabled": "Status",
+    "announceNewEntries": {
+      "title": "Announce new entries",
+      "help": "If users joins raffle, announce message will be send to chat after while."
+    },
+    "announceNewEntriesBatchTime": {
+      "title": "How long to wait before announce new entries (in seconds)",
+      "help": "Longer time will keep chat cleaner, entries will be aggregated together."
+    },
     "deleteRaffleJoinCommands": {
       "title": "Delete user raffle join command",
       "help": "This will delete user message if they use !yourraffle command. Should keep chat cleaner."
