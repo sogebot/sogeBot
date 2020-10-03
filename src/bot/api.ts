@@ -1078,7 +1078,7 @@ class API extends Core {
       }
       request = await axios.get(url, {
         headers: {
-          'Authorization': 'Bearer a' + token,
+          'Authorization': 'Bearer ' + token,
           'Client-ID': oauth.botClientId,
         },
         timeout: 20000,
