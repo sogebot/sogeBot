@@ -67,6 +67,6 @@ describe('Raffles - announce should contain delete info #4176', () => {
     raffles.lastAnnounce = 0;
     raffles.raffleAnnounceMessageInterval = 0;
     await raffles.announce();
-    await message.isSentRaw('Raffle is running (2 entries). To enter type "!winme <1-100>". Raffle is opened for everyone. Your raffle messages will be deleted on join.', { username: 'bot' })
+    await message.isSentRaw('Raffle is running (150 entries). To enter type "!winme <1-100>". Raffle is opened for everyone. Your raffle messages will be deleted on join.', { username: 'bot' })
   });
 });

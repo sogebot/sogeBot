@@ -33,6 +33,9 @@ const TYPE_TICKETS = 1;
  * ![raffle-keyword]                     - join a raffle
  */
 
+let announceNewEntriesTime = 0;
+let announceNewEntriesCount = 0;
+
 class Raffles extends System {
   lastAnnounce = Date.now();
   lastAnnounceMessageCount = 0;
@@ -48,8 +51,13 @@ class Raffles extends System {
   raffleAnnounceMessageInterval = 20;
   @settings()
   allowOverTicketing = false;
-  @settings()
+
+  @settings('join')
   deleteRaffleJoinCommands = false;
+  @settings('join')
+  announceNewEntries = true;
+  @settings('join')
+  announceNewEntriesBatchTime = 15;
 
   constructor () {
     super();
@@ -57,6 +65,11 @@ class Raffles extends System {
 
     if (isMainThread) {
       this.announce();
+      setInterval(() => {
+        if (this.announceNewEntries && announceNewEntriesTime >= Date.now()) {
+          this.announceEntries();
+        }
+      }, 1000);
     }
   }
 
@@ -150,6 +163,41 @@ class Raffles extends System {
     return true;
   }
 
+  async announceEntries() {
+    try {
+      const raffle = await getRepository(Raffle).findOneOrFail({ where: { winner: null, isClosed: false }, relations: ['participants'] });
+      const eligibility: string[] = [];
+      if (raffle.forFollowers === true) {
+        eligibility.push(prepare('raffles.eligibility-followers-item'));
+      }
+      if (raffle.forSubscribers === true) {
+        eligibility.push(prepare('raffles.eligibility-subscribers-item'));
+      }
+      if (_.isEmpty(eligibility)) {
+        eligibility.push(prepare('raffles.eligibility-everyone-item'));
+      }
+
+      const message = prepare(raffle.type === TYPE_NORMAL ? 'raffles.added-entries' : 'raffles.added-ticket-entries', {
+        l10n_entries: getLocalizedName(announceNewEntriesCount, 'entries'),
+        count: announceNewEntriesCount,
+        countTotal: raffle.participants.reduce((a, b) => {
+          a += b.tickets;
+          return a;
+        }, 0),
+        keyword: raffle.keyword,
+        min: raffle.minTickets,
+        max: raffle.maxTickets,
+        eligibility: eligibility.join(', '),
+      });
+
+      announce(message, 'raffles');
+    } catch (e) {
+      warning('No active raffle found to announce added entries.');
+    }
+    announceNewEntriesTime = 0;
+    announceNewEntriesCount = 0;
+  }
+
   async announce () {
     clearTimeout(this.timeouts.raffleAnnounce);
     if (!isDbConnected) {
@@ -186,7 +234,10 @@ class Raffles extends System {
 
     let message = prepare(locale, {
       l10n_entries: getLocalizedName(raffle.participants.length, 'entries'),
-      count: raffle.participants.length,
+      count: raffle.participants.reduce((a, b) => {
+        a += b.tickets;
+        return a;
+      }, 0),
       keyword: raffle.keyword,
       min: raffle.minTickets,
       max: raffle.maxTickets,
@@ -259,6 +310,9 @@ class Raffles extends System {
       timestamp: Date.now(),
     });
 
+    announceNewEntriesCount = 0;
+    announceNewEntriesTime = 0;
+
     const eligibility: string[] = [];
     if (followers) {
       eligibility.push(prepare('raffles.eligibility-followers-item'));
@@ -314,7 +368,10 @@ class Raffles extends System {
 
     let response = prepare(locale, {
       l10n_entries: getLocalizedName(raffle.participants.length, 'entries'),
-      count: raffle.participants.length,
+      count: raffle.participants.reduce((a, b) => {
+        a += b.tickets;
+        return a;
+      }, 0),
       keyword: raffle.keyword,
       min: raffle.minTickets,
       max: raffle.maxTickets,
@@ -414,9 +471,20 @@ class Raffles extends System {
     }
 
     if (selectedParticipant.isEligible) {
-      if (raffle.type === TYPE_TICKETS) {
-        await points.decrement({ userId: opts.sender.userId }, newTickets - curTickets);
+      if (announceNewEntriesTime === 0) {
+        announceNewEntriesTime = Date.now() + this.announceNewEntriesBatchTime * 1000;
       }
+      if (raffle.type === TYPE_TICKETS) {
+        announceNewEntriesCount += newTickets - curTickets;
+        await points.decrement({ userId: opts.sender.userId }, newTickets - curTickets);
+      } else {
+        announceNewEntriesCount += 1;
+      }
+      if (!this.announceNewEntries) {
+        announceNewEntriesCount = 0;
+        announceNewEntriesTime = 0;
+      }
+
       debug('raffle', '------------------------------------------------------------------------------------------------');
       debug('raffle', `Eligible user ${opts.sender.username}#${opts.sender.userId} for raffle ${raffle.id}`);
       debug('raffle', opts.sender);
