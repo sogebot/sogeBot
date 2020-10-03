@@ -36,9 +36,13 @@ setInterval(() => {
 }, 1000);
 
 const heartbeat = () => {
-  ws?.send(JSON.stringify({
-    type: 'PING',
-  }));
+  try {
+    ws?.send(JSON.stringify({
+      type: 'PING',
+    }));
+  } catch (e) {
+    warning('PUBSUB: Ping failed, socket is probably reconnecting');
+  }
 };
 
 const connect = () => {
