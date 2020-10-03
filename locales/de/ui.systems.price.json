@@ -2,6 +2,7 @@
   "new": "Neuer Preis",
   "empty": "Es wurde noch kein Preis festgelegt.",
   "emptyAfterSearch": "Bei der Suche nach <strong>\"$search\"</strong> wurde kein Preis gefunden.",
+  "emitRedeemEvent": "Emit redeem event if bits are used",
   "command": {
     "name": "Befehl",
     "placeholder": ""

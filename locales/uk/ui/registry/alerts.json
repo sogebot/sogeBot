@@ -32,7 +32,8 @@
     "subcommunitygifts": "Subgifts to community",
     "tips": "Tips",
     "hosts": "Hosts",
-    "raids": "Raids"
+    "raids": "Raids",
+    "cmdredeems": "Command Redeems"
   },
   "title": {
     "name": "Variant name",
@@ -61,7 +62,7 @@
   "messageTemplate": {
     "name": "Message template",
     "placeholder": "Set your message template",
-    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts), {recipient} (subgifts), {monthsName} (subs, subgifts), {currency} (tips)"
+    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "animationText": {
     "name": "Animation text"
