@@ -6,16 +6,16 @@
   "settings": {
     "enabled": "Status",
     "announceNewEntries": {
-      "title": "Announce new entries",
-      "help": "If users joins raffle, announce message will be send to chat after while."
+      "title": "Oznamovat nové vstupy",
+      "help": "Pokud se uživatelé připojí k tombole, oznámení bude po chvíli odesláno do chatu."
     },
     "announceNewEntriesBatchTime": {
-      "title": "How long to wait before announce new entries (in seconds)",
-      "help": "Longer time will keep chat cleaner, entries will be aggregated together."
+      "title": "Jak dlouho čekat před oznámením nových vstupů (v sekundách)",
+      "help": "Delší doba zachová čistší chat, vstupy budou sloučeny."
     },
     "deleteRaffleJoinCommands": {
-      "title": "Delete user raffle join command",
-      "help": "This will delete user message if they use !yourraffle command. Should keep chat cleaner."
+      "title": "Odstranit příkaz pro připojení uživatele do tomboly",
+      "help": "Tímto odstraníte zprávu uživatele při použití příkazu !yourraffle. Toto pomůže mít čistší chat."
     },
     "allowOverTicketing": {
       "title": "Povolit vstup do raffle při použití více bodů",
