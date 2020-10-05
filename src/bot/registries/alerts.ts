@@ -10,8 +10,12 @@ import { app, ioServer } from '../helpers/panel';
 import currency from '../currency';
 import { debug } from '../helpers/log';
 import { translate } from '../translate';
+import { shared } from '../decorators';
 
 class Alerts extends Registry {
+  @shared(true)
+  areAlertsMuted = false;
+
   constructor() {
     super();
     this.addMenu({ category: 'registry', name: 'alerts', id: 'registry/alerts/list', this: null });
@@ -58,6 +62,12 @@ class Alerts extends Registry {
       }
     });
 
+    adminEndpoint(this.nsp, 'alerts::areAlertsMuted', (areAlertsMuted: boolean | null, cb) => {
+      if (areAlertsMuted !== null) {
+        this.areAlertsMuted = areAlertsMuted;
+      }
+      cb(null, this.areAlertsMuted);
+    });
     adminEndpoint(this.nsp, 'alerts::deleteMedia', async (id, cb) => {
       cb(
         null,
@@ -187,7 +197,9 @@ class Alerts extends Registry {
   }
 
   trigger(opts: EmitData) {
-    ioServer?.of('/registries/alerts').emit('alert', opts);
+    if (!this.areAlertsMuted) {
+      ioServer?.of('/registries/alerts').emit('alert', opts);
+    }
   }
 
   test(opts: { event: keyof Omit<AlertInterface, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList'> }) {

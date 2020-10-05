@@ -115,6 +115,7 @@ function adminEndpoint (nsp: string, on: 'pubg::searchForPlayerId', callback: (o
 function adminEndpoint (nsp: string, on: 'pubg::searchForseasonId', callback: (opts: { apiKey: string, platform: typeof PUBG.platform, playerName: string }, cb: (error: Error | string | null, data: any) => void, socket: SocketIO.Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'pubg::getUserStats', callback: (opts: { apiKey: string, platform: typeof PUBG.platform, playerId: string, seasonId: string, ranked: boolean }, cb: (error: Error | string | null, data: any) => void, socket: SocketIO.Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'pubg::exampleParse', callback: (opts: { text: string }, cb: (error: Error | string | null, data: any) => void, socket: SocketIO.Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'alerts::areAlertsMuted', callback: (areAlertsMuted: boolean, cb: (error: Error | string | null, data: any) => void, socket: SocketIO.Socket) => void): void;
 
 // generic functions
 function adminEndpoint (nsp: string, on: string, callback: (opts: { [x: string]: any }, cb?: (error: Error | string | null, ...response: any) => void) => void, socket?: SocketIO.Socket): void;

@@ -15,6 +15,11 @@
         <button-with-icon class="btn-primary btn-reverse" icon="plus" href="#/registry/alerts/edit">{{translate('dialog.title.add')}}</button-with-icon>
       </template>
       <template v-slot:right>
+        <b-button @click="areAlertsMuted = !areAlertsMuted" class="border-0" :variant="areAlertsMuted ? 'secondary' : 'dark'" id="registryAlertsToggleButton">
+          <fa icon="bell" fixed-width v-if="!areAlertsMuted" />
+          <fa icon="bell-slash" fixed-width v-else />
+        </b-button>
+        <b-tooltip target="registryAlertsToggleButton" :title="areAlertsMuted ? 'Alerts are disabled.' : 'Alerts are enabled!'"></b-tooltip>
         <b-dropdown id="dropdown-buttons" :text="translate('registry.alerts.test')" class="m-2">
           <b-dropdown-item-button
             @click="socket.emit('test', event)"
@@ -89,15 +94,15 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { Vue, Component, Watch } from 'vue-property-decorator';
 import { v4 as uuid } from 'uuid';
 
 import { getSocket } from 'src/panel/helpers/socket';
 import type { AlertInterface } from 'src/bot/database/entity/alert';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faClone } from '@fortawesome/free-solid-svg-icons';
-library.add(faClone);
+import { faClone, faBell, faBellSlash } from '@fortawesome/free-solid-svg-icons';
+library.add(faClone, faBell, faBellSlash);
 
 @Component({
   components: {
@@ -113,6 +118,7 @@ library.add(faClone);
 })
 export default class customVariablesList extends Vue {
   socket: SocketIOClient.Socket =  getSocket('/registries/alerts');
+  areAlertsMuted = false;
 
   fields = [
     { key: 'name', label: this.translate('registry.alerts.name.name'), sortable: true },
@@ -250,6 +256,18 @@ export default class customVariablesList extends Vue {
 
   mounted() {
     this.refresh();
+    this.onRouteChange();
+  }
+
+  @Watch('$route')
+  onRouteChange() {
+    this.socket.emit('alerts::areAlertsMuted', null, (err: Error | null, val: boolean) => {
+      this.areAlertsMuted = val;
+    })
+  }
+  @Watch('areAlertsMuted')
+  areAlertsMutedWatch(val: boolean) {
+    this.socket.emit('alerts::areAlertsMuted', val, () => {});
   }
 }
 </script>

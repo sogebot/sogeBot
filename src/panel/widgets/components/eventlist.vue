@@ -1,117 +1,137 @@
-<template lang="pug">
-  div.widget
-    b-card(no-body).border-0.h-100
-      b-tabs(pills card style="overflow:hidden").h-100
-        template(v-slot:tabs-start)
-          template(v-if="!popout")
-            li(v-if="typeof nodrag === 'undefined'").nav-item.px-2.grip.text-secondary.align-self-center
-              fa(icon="grip-vertical" fixed-width)
-          li.nav-item
-            b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-eventlist')" variant="outline-primary" toggle-class="border-0")
-              b-dropdown-group(header="Events filtering")
-                b-dropdown-form
-                  b-button(@click="toggle('widgetEventlistFollows')" :variant="settings.widgetEventlistFollows ? 'success' : 'danger'")
-                    fa(icon="heart")
-                  b-button(@click="toggle('widgetEventlistHosts')" :variant="settings.widgetEventlistHosts ? 'success' : 'danger'")
-                    fa(icon="tv")
-                  b-button(@click="toggle('widgetEventlistRaids')" :variant="settings.widgetEventlistRaids ? 'success' : 'danger'")
-                    fa(icon="random")
-                  b-button(@click="toggle('widgetEventlistCheers')" :variant="settings.widgetEventlistCheers ? 'success' : 'danger'")
-                    fa(icon="gem")
-                  b-button(@click="toggle('widgetEventlistSubs')" :variant="settings.widgetEventlistSubs ? 'success' : 'danger'")
-                    fa(icon="star")
-                  b-button(@click="toggle('widgetEventlistSubgifts')" :variant="settings.widgetEventlistSubgifts ? 'success' : 'danger'")
-                    fa(icon="gift")
-                  b-button(@click="toggle('widgetEventlistSubcommunitygifts')" :variant="settings.widgetEventlistSubcommunitygifts ? 'success' : 'danger'")
-                    fa(icon="box-open")
-                  b-button(@click="toggle('widgetEventlistResubs')" :variant="settings.widgetEventlistResubs ? 'success' : 'danger'")
-                    font-awesome-layers
-                      fa(icon="star-half")
-                      fa(icon="long-arrow-alt-right")
-                  b-button(@click="toggle('widgetEventlistTips')" :variant="settings.widgetEventlistTips ? 'success' : 'danger'")
-                    fa(icon="dollar-sign")
-              template(v-if="!popout")
-                b-dropdown-divider
-                b-dropdown-item(@click="state.editation = $state.progress")
-                  | Edit events
-                b-dropdown-item(target="_blank" href="/popout/#eventlist")
-                  | {{ translate('popout') }}
-                b-dropdown-divider
-                b-dropdown-item
-                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'eventlist'))" class="text-danger"
-                    v-html="translate('remove-widget').replace('$name', translate('widget-title-eventlist'))")
-
-        b-tab(active)
-          template(v-slot:title)
-            fa(:icon='["far", "calendar"]' fixed-width)
-          b-card-text
-            loading(v-if="state.loading === $state.progress")
-            template(v-else)
-              div(v-if="state.editation === $state.progress").text-right
-                b-button(variant="danger" @click="removeSelected" :disabled="selected.length === 0")
-                  fa(icon="trash-alt")
-                b-button(variant="primary" @click="editationDone")
-                  | Done
-              b-list-group
-                b-list-group-item(
-                  @mouseover="isHovered = event.id"
-                  @mouseleave="isHovered = ''"
-                  v-for="(event, index) of fEvents"
-                  :key="index"
-                  :active="selected.includes(event.id)"
-                  style="cursor: pointer; border-left: 0; border-right: 0; padding: 0.2rem 1.25rem 0.4rem 1.25rem"
-                  :style="{opacity: event.isTest ? 0.75 : 1}"
-                  @click="state.editation !== $state.idle ? toggleSelected(event) : null"
-                )
-                  i(:title="moment(event.timestamp).format('LLLL')").eventlist-text
-                    span(v-if="event.isTest").text-danger TEST
-                    |
-                    | {{moment(event.timestamp).fromNow()}}
-                  div(:style="{'font-size': eventlistSize + 'px'}").eventlist-username
-                    div.d-flex
-                      div.w-100
-                        span(:title="event.username" style="z-index: 9") {{event.username}}
-                        span(v-html="prepareMessage(event)").pl-1
-                      div(style="flex-shrink: 15;")
-                        span(v-if="isHovered !== event.id || state.editation !== $state.idle")
-                          fa(v-if="event.event === 'follow'" icon="heart" :class="[`icon-${event.event}`, 'icon']")
-                          fa(v-if="event.event === 'host'" icon="tv" :class="[`icon-${event.event}`, 'icon']")
-                          fa(v-if="event.event === 'raid'" icon="random" :class="[`icon-${event.event}`, 'icon']")
-                          fa(v-if="event.event === 'sub'" icon="star" :class="[`icon-${event.event}`, 'icon']")
-                          fa(v-if="event.event === 'subgift'" icon="gift" :class="[`icon-${event.event}`, 'icon']")
-                          fa(v-if="event.event === 'subcommunitygift'" icon="box-open" :class="[`icon-${event.event}`, 'icon']")
-                          font-awesome-layers(v-if="event.event === 'resub'" :class="[`icon-${event.event}`, 'icon']")
-                            fa(icon="star-half")
-                            fa(icon="long-arrow-alt-right")
-                          fa(v-if="event.event === 'cheer'" icon="gem" :class="[`icon-${event.event}`, 'icon']")
-                          fa(v-if="event.event === 'tip'" icon="dollar-sign" :class="[`icon-${event.event}`, 'icon']")
-                        span(v-else)
-                          fa(icon="redo-alt" :class="['icon']" @click="resendAlert(event.id)").pointer
-        b-tab
-          template(v-slot:title)
-            fa(icon="cog" fixed-width)
-          b-card-text
-            div.input-group
-              div.input-group-prepend
-                span.input-group-text {{translate('eventlist-show-number')}}
-              input(type="text" v-model="eventlistShow").form-control
-              div.input-group-append
-                span.input-group-text {{translate('eventlist-show')}}
-            div.input-group
-              div.input-group-prepend
-                span.input-group-text {{translate('followers-size')}}
-              input(type="text" v-model="eventlistSize").form-control
-              div.input-group-append
-                span.input-group-text px
-            div.input-group
-              div.input-group-prepend
-                span.input-group-text {{translate('followers-message-size')}}
-              input(type="text" v-model="eventlistMessageSize").form-control
-              div.input-group-append
-                span.input-group-text px
-            hold-button(icon="eraser" @trigger="cleanup()").mt-2.btn.btn-danger.w-100
-              template(slot="title") Cleanup
-              template(slot="onHoldTitle") Hold to cleanup
+<template>
+<div class="widget">
+  <b-card class="border-0 h-100" no-body="no-body">
+    <b-tabs class="h-100" pills="pills" card="card" style="overflow:hidden">
+      <template v-slot:tabs-start>
+        <template v-if="!popout">
+          <li class="nav-item px-2 grip text-secondary align-self-center" v-if="typeof nodrag === 'undefined'">
+            <fa icon="grip-vertical" fixed-width="fixed-width"></fa>
+          </li>
+        </template>
+        <li class="nav-item">
+          <b-dropdown ref="dropdown" boundary="window" no-caret="no-caret" :text="translate('widget-title-eventlist')" variant="outline-primary" toggle-class="border-0">
+            <b-dropdown-group header="Events filtering">
+              <b-dropdown-form>
+                <b-button @click="toggle('widgetEventlistFollows')" :variant="settings.widgetEventlistFollows ? 'success' : 'danger'">
+                  <fa icon="heart"></fa>
+                </b-button>
+                <b-button @click="toggle('widgetEventlistHosts')" :variant="settings.widgetEventlistHosts ? 'success' : 'danger'">
+                  <fa icon="tv"></fa>
+                </b-button>
+                <b-button @click="toggle('widgetEventlistRaids')" :variant="settings.widgetEventlistRaids ? 'success' : 'danger'">
+                  <fa icon="random"></fa>
+                </b-button>
+                <b-button @click="toggle('widgetEventlistCheers')" :variant="settings.widgetEventlistCheers ? 'success' : 'danger'">
+                  <fa icon="gem"></fa>
+                </b-button>
+                <b-button @click="toggle('widgetEventlistSubs')" :variant="settings.widgetEventlistSubs ? 'success' : 'danger'">
+                  <fa icon="star"></fa>
+                </b-button>
+                <b-button @click="toggle('widgetEventlistSubgifts')" :variant="settings.widgetEventlistSubgifts ? 'success' : 'danger'">
+                  <fa icon="gift"></fa>
+                </b-button>
+                <b-button @click="toggle('widgetEventlistSubcommunitygifts')" :variant="settings.widgetEventlistSubcommunitygifts ? 'success' : 'danger'">
+                  <fa icon="box-open"></fa>
+                </b-button>
+                <b-button @click="toggle('widgetEventlistResubs')" :variant="settings.widgetEventlistResubs ? 'success' : 'danger'">
+                  <font-awesome-layers>
+                    <fa icon="star-half"></fa>
+                    <fa icon="long-arrow-alt-right"></fa>
+                  </font-awesome-layers>
+                </b-button>
+                <b-button @click="toggle('widgetEventlistTips')" :variant="settings.widgetEventlistTips ? 'success' : 'danger'">
+                  <fa icon="dollar-sign"></fa>
+                </b-button>
+              </b-dropdown-form>
+            </b-dropdown-group>
+            <template v-if="!popout">
+              <b-dropdown-divider></b-dropdown-divider>
+              <b-dropdown-item @click="state.editation = $state.progress">Edit events</b-dropdown-item>
+              <b-dropdown-item target="_blank" href="/popout/#eventlist">{{ translate('popout') }}</b-dropdown-item>
+              <b-dropdown-divider></b-dropdown-divider>
+              <b-dropdown-item><a class="text-danger" href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() =&gt; EventBus.$emit('remove-widget', 'eventlist'))" v-html="translate('remove-widget').replace('$name', translate('widget-title-eventlist'))"></a></b-dropdown-item>
+            </template>
+          </b-dropdown>
+        </li>
+      </template>
+      <b-tab active="active">
+        <template v-slot:title>
+          <fa :icon="['far', 'calendar']" fixed-width="fixed-width"></fa>
+        </template>
+        <b-card-text>
+          <loading v-if="state.loading === $state.progress"></loading>
+          <template v-else>
+            <div class="text-right" v-if="state.editation === $state.progress">
+              <b-button variant="danger" @click="removeSelected" :disabled="selected.length === 0">
+                <fa icon="trash-alt"></fa>
+              </b-button>
+              <b-button variant="primary" @click="editationDone">Done</b-button>
+            </div>
+            <b-list-group>
+              <b-list-group-item @mouseover="isHovered = event.id" @mouseleave="isHovered = ''" v-for="(event, index) of fEvents" :key="index" :active="selected.includes(event.id)" style="cursor: pointer; border-left: 0; border-right: 0; padding: 0.2rem 1.25rem 0.4rem 1.25rem" :style="{opacity: event.isTest ? 0.75 : 1}" @click="state.editation !== $state.idle ? toggleSelected(event) : null"><i class="eventlist-text" :title="moment(event.timestamp).format('LLLL')"><span class="text-danger" v-if="event.isTest">TEST</span>
+                  {{moment(event.timestamp).fromNow()}}</i>
+                <div class="eventlist-username" :style="{'font-size': eventlistSize + 'px'}">
+                  <div class="d-flex">
+                    <div class="w-100"><span :title="event.username" style="z-index: 9">{{event.username}}</span><span class="pl-1" v-html="prepareMessage(event)"></span></div>
+                    <div style="flex-shrink: 15;"><span v-if="isHovered !== event.id || state.editation !== $state.idle">
+                        <fa v-if="event.event === 'follow'" icon="heart" :class="[`icon-${event.event}`, 'icon']"></fa>
+                        <fa v-if="event.event === 'host'" icon="tv" :class="[`icon-${event.event}`, 'icon']"></fa>
+                        <fa v-if="event.event === 'raid'" icon="random" :class="[`icon-${event.event}`, 'icon']"></fa>
+                        <fa v-if="event.event === 'sub'" icon="star" :class="[`icon-${event.event}`, 'icon']"></fa>
+                        <fa v-if="event.event === 'subgift'" icon="gift" :class="[`icon-${event.event}`, 'icon']"></fa>
+                        <fa v-if="event.event === 'subcommunitygift'" icon="box-open" :class="[`icon-${event.event}`, 'icon']"></fa>
+                        <font-awesome-layers v-if="event.event === 'resub'" :class="[`icon-${event.event}`, 'icon']">
+                          <fa icon="star-half"></fa>
+                          <fa icon="long-arrow-alt-right"></fa>
+                        </font-awesome-layers>
+                        <fa v-if="event.event === 'cheer'" icon="gem" :class="[`icon-${event.event}`, 'icon']"></fa>
+                        <fa v-if="event.event === 'tip'" icon="dollar-sign" :class="[`icon-${event.event}`, 'icon']"></fa></span><span v-else>
+                        <fa class="pointer" icon="redo-alt" :class="['icon']" @click="resendAlert(event.id)"></fa></span></div>
+                  </div>
+                </div>
+              </b-list-group-item>
+            </b-list-group>
+          </template>
+        </b-card-text>
+      </b-tab>
+      <b-tab>
+        <template v-slot:title>
+          <fa icon="cog" fixed-width="fixed-width"></fa>
+        </template>
+        <b-card-text>
+          <div class="input-group">
+            <div class="input-group-prepend"><span class="input-group-text">{{translate('eventlist-show-number')}}</span></div>
+            <input class="form-control" type="text" v-model="eventlistShow"/>
+            <div class="input-group-append"><span class="input-group-text">{{translate('eventlist-show')}}</span></div>
+          </div>
+          <div class="input-group">
+            <div class="input-group-prepend"><span class="input-group-text">{{translate('followers-size')}}</span></div>
+            <input class="form-control" type="text" v-model="eventlistSize"/>
+            <div class="input-group-append"><span class="input-group-text">px</span></div>
+          </div>
+          <div class="input-group">
+            <div class="input-group-prepend"><span class="input-group-text">{{translate('followers-message-size')}}</span></div>
+            <input class="form-control" type="text" v-model="eventlistMessageSize"/>
+            <div class="input-group-append"><span class="input-group-text">px</span></div>
+          </div>
+          <hold-button class="mt-2 btn btn-danger w-100" icon="eraser" @trigger="cleanup()">
+            <template slot="title">Cleanup</template>
+            <template slot="onHoldTitle">Hold to cleanup</template>
+          </hold-button>
+        </b-card-text>
+      </b-tab>
+      <template v-slot:tabs-end>
+        <li class="nav-item text-right" style="flex-grow: 1;">
+          <b-button @click="areAlertsMuted = !areAlertsMuted" class="border-0" :variant="areAlertsMuted ? 'outline-secondary' : 'outline-dark'" id="eventlistAlertsToggleButton">
+            <fa icon="bell" fixed-width v-if="!areAlertsMuted" />
+            <fa icon="bell-slash" fixed-width v-else />
+          </b-button>
+           <b-tooltip target="eventlistAlertsToggleButton" :title="areAlertsMuted ? 'Alerts are disabled.' : 'Alerts are enabled!'"></b-tooltip>
+        </li>
+      </template>
+    </b-tabs>
+  </b-card>
+</div>
 </template>
 
 <script>
@@ -122,8 +142,8 @@ import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 import { chunk, debounce, get } from 'lodash-es';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faRedoAlt } from '@fortawesome/free-solid-svg-icons';
-library.add(faRedoAlt);
+import { faRedoAlt, faBell, faBellSlash } from '@fortawesome/free-solid-svg-icons';
+library.add(faRedoAlt, faBell, faBellSlash);
 
 import moment from 'moment';
 export default {
@@ -138,6 +158,7 @@ export default {
       EventBus,
       isHovered: '',
       socket: getSocket('/widgets/eventlist'),
+      socketAlerts: getSocket('/registries/alerts'),
       settings: {
         widgetEventlistFollows: true,
         widgetEventlistHosts: true,
@@ -159,6 +180,7 @@ export default {
       eventlistMessageSize: 0,
       interval: [],
       selected: [],
+      areAlertsMuted: false,
     }
   },
   beforeDestroy: function() {
@@ -192,6 +214,9 @@ export default {
       this.state.loading = this.$state.success
       this.events = events
     })
+    this.socketAlerts.emit('alerts::areAlertsMuted', null, (err, val) => {
+      this.areAlertsMuted = val;
+    })
 
     // refresh timestamps
     this.interval.push(setInterval(() => this.socket.emit('eventlist::get', this.eventlistShow), 60000))
@@ -212,6 +237,14 @@ export default {
     }
   },
   watch: {
+    '$route': function(val) {
+      this.socketAlerts.emit('alerts::areAlertsMuted', null, (err, value) => {
+        this.areAlertsMuted = value;
+      })
+    },
+    'areAlertsMuted': function(val) {
+      this.socketAlerts.emit('alerts::areAlertsMuted', this.areAlertsMuted, () => {})
+    },
     'state.editation': function (val) {
       this.selected = []
     },
