@@ -18,6 +18,7 @@ import points from './points';
 import { isDbConnected } from '../helpers/database';
 import { linesParsed } from '../helpers/parser';
 import { getLocalizedName } from '../helpers/getLocalized';
+import { translate } from '../translate';
 
 const TYPE_NORMAL = 0;
 const TYPE_TICKETS = 1;
@@ -178,7 +179,7 @@ class Raffles extends System {
       }
 
       const message = prepare(raffle.type === TYPE_NORMAL ? 'raffles.added-entries' : 'raffles.added-ticket-entries', {
-        l10n_entries: getLocalizedName(announceNewEntriesCount, 'entries'),
+        l10n_entries: getLocalizedName(announceNewEntriesCount, translate('core.entries')),
         count: announceNewEntriesCount,
         countTotal: raffle.participants.reduce((a, b) => {
           a += b.tickets;
@@ -233,7 +234,7 @@ class Raffles extends System {
     }
 
     let message = prepare(locale, {
-      l10n_entries: getLocalizedName(raffle.participants.length, 'entries'),
+      l10n_entries: getLocalizedName(raffle.participants.length, translate('core.entries')),
       count: raffle.participants.reduce((a, b) => {
         a += b.tickets;
         return a;
@@ -325,7 +326,7 @@ class Raffles extends System {
     }
 
     let response = prepare(type === TYPE_NORMAL ? 'raffles.announce-raffle' : 'raffles.announce-ticket-raffle', {
-      l10n_entries: getLocalizedName(0, 'entries'),
+      l10n_entries: getLocalizedName(0, translate('core.entries')),
       count: 0,
       keyword: keyword,
       eligibility: eligibility.join(', '),
@@ -367,7 +368,7 @@ class Raffles extends System {
     }
 
     let response = prepare(locale, {
-      l10n_entries: getLocalizedName(raffle.participants.length, 'entries'),
+      l10n_entries: getLocalizedName(raffle.participants.length, translate('core.entries')),
       count: raffle.participants.reduce((a, b) => {
         a += b.tickets;
         return a;
