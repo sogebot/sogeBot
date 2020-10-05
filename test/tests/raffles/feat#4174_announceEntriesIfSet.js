@@ -115,7 +115,7 @@ describe('Raffles - announce entries if set #4174', () => {
 
     it('expecting 1 new entry and 3 total in announce message', async () => {
       await raffles.announceEntries();
-      await message.isSentRaw('Added 1 entries to raffle (3 total). To enter type "!winme". Raffle is opened for everyone.', { username: 'bot' });
+      await message.isSentRaw('Added 1 entry to raffle (3 total). To enter type "!winme". Raffle is opened for everyone.', { username: 'bot' });
     });
   });
 });
