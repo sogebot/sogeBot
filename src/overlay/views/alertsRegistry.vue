@@ -417,7 +417,15 @@ export default class AlertsRegistryOverlays extends Vue {
                 .replace(/\{currency\}/g, '{currency:highlight}')
               this.preparedAdvancedHTML =
                 this.preparedAdvancedHTML
-                  .replace(/\{message\}/g, emitData.message)
+                  .replace(/\{message\}/g, `
+                    <span :style="{
+                      'font-family': runningAlert.alert.message.font.family + ' !important',
+                      'font-size': runningAlert.alert.message.font.size + 'px !important',
+                      'font-weight': runningAlert.alert.message.font.weight + ' !important',
+                      'color': runningAlert.alert.message.font.color + ' !important',
+                      'text-shadow': [textStrokeGenerator(runningAlert.alert.message.font.borderPx, runningAlert.alert.message.font.borderColor), shadowGenerator(runningAlert.alert.message.font.shadow)].filter(Boolean).join(', ') + ' !important'
+                    }"
+                    v-html="withEmotes(runningAlert.message)"></span>`)
                   .replace(/\{messageTemplate\}/g, messageTemplate)
                   .replace(/\{name\}/g, emitData.name)
                   .replace(/\{recipient\}/g, emitData.recipient || '')
