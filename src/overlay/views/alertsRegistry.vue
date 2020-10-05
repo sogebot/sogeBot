@@ -15,7 +15,7 @@
               <source :src="'/registry/alerts/' + runningAlert.alert.imageId" type="video/webm">
               Your browser does not support the video tag.
             </video>
-            <img v-else :src="'/registry/alerts/' + runningAlert.alert.imageId" :class="{ center: runningAlert.alert.layout === '3', ['animate__' + runningAlert.animation]: true }" class="animate__animated" :style="{'animation-duration': runningAlert.animationSpeed + 'ms'}"/>
+            <img v-else-if="showImage" @error="showImage=false"  :src="'/registry/alerts/' + runningAlert.alert.imageId" :class="{ center: runningAlert.alert.layout === '3', ['animate__' + runningAlert.animation]: true }" class="animate__animated" :style="{'animation-duration': runningAlert.animationSpeed + 'ms'}"/>
             <div
               v-if="runningAlert.isShowingText"
               :class="{
@@ -139,6 +139,7 @@ export default class AlertsRegistryOverlays extends Vue {
   defaultProfanityList: string[] = [];
   listHappyWords: string[] = [];
   emotes: CacheEmotesInterface[] = [];
+  showImage = true;
 
   runningAlert: EmitData & {
     animation: string;
@@ -325,6 +326,7 @@ export default class AlertsRegistryOverlays extends Vue {
       }
 
       if (this.runningAlert === null && alerts.length > 0) {
+        this.showImage = true;
         const emitData = alerts.shift()
         if (emitData && this.data) {
           let possibleAlerts = this.data[emitData.event];
@@ -445,7 +447,8 @@ export default class AlertsRegistryOverlays extends Vue {
                   `)
                   .replace(/\<div.*class="(.*?)".*ref="image"\>|\<div.*ref="image".*class="(.*?)"\>/gm, '<div ref="image">') // we need to replace ref with class with proper ref
                   .replace('ref="image"', `
-                    v-if="runningAlert.isShowingText"
+                    v-if="runningAlert.isShowingText && showImage"
+                    @error="showImage=false"
                     :class="{['animate__' + runningAlert.animation]: true}"
                     :style="{
                       'animation-duration': runningAlert.animationSpeed + 'ms'
