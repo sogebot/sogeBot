@@ -14,9 +14,9 @@
     "type": "Napiš",
     "add": "Přidej",
     "inChatToVote": "... do chatu pro hlasování",
-    "tips": "tipu",
+    "tips": "spropitného",
     "bits": "cheeru",
-    "toYourMessage": "... do tvé <strong>$type</strong> zprávy"
+    "toYourMessage": "... do tvé zprávy <strong>$type</strong>"
   },
   "title": "Název",
   "done": "HOTOVO",
