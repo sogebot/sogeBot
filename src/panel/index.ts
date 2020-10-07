@@ -22,13 +22,13 @@ import {
   faCheck, faCircle as faCircle2, faCircleNotch, faClone, faCode, faCog, faCoins, faCommentAlt,
   faComments, faDice, faDollarSign, faDownload, faEdit, faEllipsisH, faEllipsisV, faEquals, faEraser,
   faExclamation, faExclamationCircle, faExternalLinkAlt, faEye, faEyeSlash, faFilter, faFont,
-  faForward, faGem, faGift, faGreaterThanEqual, faGripVertical, faHandPointer, faHeadphones, faHeart, faHistory,
-  faImage, faInfinity, faLink, faList, faLock, faLockOpen, faLongArrowAltLeft, faLongArrowAltRight,
-  faMinus, faMusic, faPause, faPlay, faPlus, faPlusSquare, faPowerOff, faQuestion, faRandom, faRedoAlt,
-  faSave, faSearch, faShareSquare, faSignInAlt, faSignOutAlt, faSlash, faSortDown, faSortUp,
-  faSpinner, faStar, faStarHalf, faStop, faSync, faSyncAlt, faTasks, faTerminal, faTh,
-  faThLarge, faThList, faTimes, faToggleOff, faToggleOn, faTrash, faTrashAlt, faTrophy, faTv,
-  faUpload, faUser, faUsers, faVial,  faVolumeDown, faVolumeOff, faVolumeUp,
+  faForward, faGem, faGift, faGlobeEurope, faGreaterThanEqual, faGripVertical, faHandPointer, faHeadphones, faHeart,
+  faHistory, faImage, faInfinity, faLink, faList, faLock, faLockOpen, faLongArrowAltLeft,
+  faLongArrowAltRight, faMinus, faMusic, faPause, faPlay, faPlus, faPlusSquare, faPowerOff, faQuestion, faRandom,
+  faRedoAlt, faSave, faSearch, faShareSquare, faSignInAlt, faSignOutAlt, faSlash, faSortDown,
+  faSortUp, faSpinner, faStar, faStarHalf, faStop, faSync, faSyncAlt, faTasks, faTerminal,
+  faTh, faThLarge, faThList, faTimes, faToggleOff, faToggleOn, faTrash, faTrashAlt, faTrophy,
+  faTv, faUpload, faUser, faUsers,  faVial, faVolumeDown, faVolumeOff, faVolumeUp,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
@@ -44,7 +44,7 @@ import type { getListOfReturn } from './helpers/getListOf';
 import { store } from './helpers/store';
 import { getConfiguration, getTranslations } from './helpers/socket';
 
-library.add(faHistory,faSortUp, faSortDown, faRedoAlt, faDice, faVolumeOff, faGripVertical, faImage, faUpload, faCircle2, faCaretRight, faTasks, faCaretDown, faSlash, faFilter, faToggleOn, faToggleOff, faBell, faShareSquare, faExclamationCircle, faQuestion, faVial, faEquals, faGreaterThanEqual, faLongArrowAltLeft, faBan, faPlusSquare, faMusic, faList, faPlay, faPause, faForward, faSpotify, faMoneyBillAlt, faPlus, faSpinner, faGift, faHeadphones, faTh, faDollarSign, faSignInAlt, faSignOutAlt, faUsers, faMusic, faCalendar, faTwitter, faCheck, faMusic, faMusic, faVolumeUp, faVolumeDown, faUsers, faGift, faTrophy, faCog, faExternalLinkAlt, faTrash, faPlus, faSync, faComments, faTwitch, faCircle, faCheckCircle, faLock, faUsers, faUser, faCheck, faTimes, faHeart, faStar, faLockOpen, faHandPointer, faRandom, faEyeSlash, faSignOutAlt, faSignInAlt, faBoxOpen, faEye, faCog, faExternalLinkAlt, faHeart, faTv, faRandom, faGem, faStar, faGift, faDollarSign, faStarHalf, faLongArrowAltRight, faCircleNotch, faCalendar, faDollarSign, faCog, faCode, faAngleUp, faTrashAlt, faAngleDown, faFont, faPlus, faMinus, faDownload, faDollarSign, faTerminal, faCog, faCommentAlt, faUsers, faExternalLinkAlt, faSyncAlt, faClock, faCog, faInfinity, faTrophy, faClone, faGem, faCoins, faExclamation, faStop, faBan, faSpinner, faCheck, faAngleRight, faPlus, faEdit, faEraser, faLink, faTrash, faPlus, faCaretLeft, faExternalLinkAlt, faLink, faSave, faThLarge, faThList, faSearch, faCircleNotch, faCheck, faEllipsisH, faEllipsisV, faPowerOff);
+library.add(faGlobeEurope, faHistory,faSortUp, faSortDown, faRedoAlt, faDice, faVolumeOff, faGripVertical, faImage, faUpload, faCircle2, faCaretRight, faTasks, faCaretDown, faSlash, faFilter, faToggleOn, faToggleOff, faBell, faShareSquare, faExclamationCircle, faQuestion, faVial, faEquals, faGreaterThanEqual, faLongArrowAltLeft, faBan, faPlusSquare, faMusic, faList, faPlay, faPause, faForward, faSpotify, faMoneyBillAlt, faPlus, faSpinner, faGift, faHeadphones, faTh, faDollarSign, faSignInAlt, faSignOutAlt, faUsers, faMusic, faCalendar, faTwitter, faCheck, faMusic, faMusic, faVolumeUp, faVolumeDown, faUsers, faGift, faTrophy, faCog, faExternalLinkAlt, faTrash, faPlus, faSync, faComments, faTwitch, faCircle, faCheckCircle, faLock, faUsers, faUser, faCheck, faTimes, faHeart, faStar, faLockOpen, faHandPointer, faRandom, faEyeSlash, faSignOutAlt, faSignInAlt, faBoxOpen, faEye, faCog, faExternalLinkAlt, faHeart, faTv, faRandom, faGem, faStar, faGift, faDollarSign, faStarHalf, faLongArrowAltRight, faCircleNotch, faCalendar, faDollarSign, faCog, faCode, faAngleUp, faTrashAlt, faAngleDown, faFont, faPlus, faMinus, faDownload, faDollarSign, faTerminal, faCog, faCommentAlt, faUsers, faExternalLinkAlt, faSyncAlt, faClock, faCog, faInfinity, faTrophy, faClone, faGem, faCoins, faExclamation, faStop, faBan, faSpinner, faCheck, faAngleRight, faPlus, faEdit, faEraser, faLink, faTrash, faPlus, faCaretLeft, faExternalLinkAlt, faLink, faSave, faThLarge, faThList, faSearch, faCircleNotch, faCheck, faEllipsisH, faEllipsisV, faPowerOff);
 Vue.component('fa', FontAwesomeIcon);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
@@ -120,8 +120,9 @@ const main = async () => {
         { path: '/manage/commands/', redirect: '/manage/commands/list' },
         { path: '/manage/commands/list', name: 'CommandsManagerList', component: () => import('./views/managers/commands.vue') },
         { path: '/manage/commands/edit/:id?', name: 'CommandsManagerEdit', component: () => import('./views/managers/commands.vue') },
-        { path: '/manage/cooldowns/list', name: 'cooldownsManagerList', component: () => import('./views/managers/cooldowns/cooldowns-list.vue') },
-        { path: '/manage/cooldowns/edit/:id?', name: 'cooldownsManagerEdit', component: () => import('./views/managers/cooldowns/cooldowns-edit.vue') },
+        { path: '/manage/cooldowns/', redirect: '/manage/cooldowns/list' },
+        { path: '/manage/cooldowns/list', name: 'cooldownsManager', component: () => import('./views/managers/cooldowns.vue') },
+        { path: '/manage/cooldowns/edit/:id?', name: 'cooldownsManagerEdit', component: () => import('./views/managers/cooldowns.vue') },
         { path: '/manage/highlights', name: 'HighlightsManager', component: () => import('./views/managers/highlights.vue') },
         { path: '/manage/hltb', name: 'HLTBManager', component: () => import('./views/managers/hltb.vue') },
         { path: '/manage/polls', name: 'PollsManager', component: () => import('./views/managers/polls.vue') },
