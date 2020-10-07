@@ -29,6 +29,7 @@
   "activeFor": "Active for",
   "votingBy": "Voting by",
   "tips": "tips",
+  "numbers": "numbers",
   "bits": "bits",
   "command": "!vote",
   "create": "Click to create new poll",
