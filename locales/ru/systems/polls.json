@@ -1,8 +1,10 @@
 {
   "opened_normal": "Опрос открыт для \"$title\"! Вы можете проголосовать $command X",
+  "opened_numbers": "Poll by numbers opened for \"$title\"! You can vote by typing number into chat.",
   "opened_tips": "Опрос по донатам открыт для $title\"! Вы можете проголосовать, добавив в сообщение хэштег #voteX",
   "opened_bits": "Опрос по битсам открыт для $title\"! Вы можете проголосовать, добавив в сообщение хэштег #voteX",
   "alreadyOpened_normal": "Ошибка! Опрос уже открыт для \"$title\"! Вы можете проголосовать $command X",
+  "alreadyOpened_numbers": "Error! Poll was already opened for \"$title\"! You can vote by typing number into chat.",
   "alreadyOpened_tips": "Ошибка! Опрос донатами уже открыт для \"$title\"! Вы можете проголосовать, добавив хэштег #voteX в сообщение чата",
   "alreadyOpened_bits": "Ошибка! Опрос битсами уже открыт для \"$title\"! Вы можете проголосовать, добавив хэштег #voteX в битное сообщение",
   "notEnoughOptions": "$sender, новый опрос должен иметь как минимум 2 варианта!",
