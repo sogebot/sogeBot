@@ -39,6 +39,9 @@ export const Poll = new EntitySchema<Readonly<Required<PollInterface>>>({
       cascade: true,
     },
   },
+  indices: [
+    { name: 'IDX_poll_isOpened', columns: ['isOpened'] },
+  ],
 });
 
 export const PollVote = new EntitySchema<Readonly<Required<PollVoteInterface>>>({
