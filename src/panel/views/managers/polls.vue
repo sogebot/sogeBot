@@ -34,6 +34,9 @@
                   <template v-if="newVote.type === 'normal'">
                     <fa icon='exclamation'></fa> {{ translate('systems.polls.votingBy') }}
                   </template>
+                  <template v-if="newVote.type === 'numbers'">
+                    1-5 {{ translate('systems.polls.votingBy') }}
+                  </template>
                   <template v-if="newVote.type === 'tips'">
                     <fa icon='coins'></fa> {{ translate('systems.polls.votingBy') }}
                   </template>
@@ -42,6 +45,7 @@
                   </template>
                   <select v-model="newVote.type" class="text-muted border-left-0 border-right-0 border-top-0" style="background-color: transparent;font-size: .9rem; text-transform: uppercase; font-weight: bold;">
                     <option value="normal">{{ translate('systems.polls.command') }}</option>
+                    <option value="numbers">{{ translate('systems.polls.numbers') }}</option>
                     <option value="tips">{{ translate('systems.polls.tips') }}</option>
                     <option value="bits">{{ translate('systems.polls.bits') }}</option>
                   </select>
@@ -91,6 +95,9 @@
                 </template>
                 <template v-if="vote.type === 'tips'">
                   <fa icon='coins'></fa> {{ translate('systems.polls.votingBy') }} {{ translate('systems.polls.tips') }}
+                </template>
+                <template v-if="vote.type === 'numbers'">
+                  1-5 {{ translate('systems.polls.votingBy') }} {{ translate('systems.polls.numbers') }}
                 </template>
                 <template v-if="vote.type === 'bits'">
                   <fa icon='gem'></fa> {{ translate('systems.polls.votingBy') }} {{ translate('systems.polls.bits') }}

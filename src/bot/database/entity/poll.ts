@@ -3,7 +3,7 @@ import { ColumnNumericTransformer } from './_transformer';
 
 export interface PollInterface {
   id?: string;
-  type: 'tips' | 'bits' | 'normal';
+  type: 'tips' | 'bits' | 'normal' | 'numbers';
   title: string;
   isOpened: boolean;
   openedAt?: number;
