@@ -3,9 +3,6 @@
   "empty": "Пока не было создано ни одного кулдауна.",
   "emptyAfterSearch": "Кулдаун не был найден по вашему запросу <strong>\"$search\"</strong>.",
   "notify-as-whisper": "Уведомлять в висперсы",
-  "error": {
-    "isEmpty": "Это поле не может быть пустым"
-  },
   "settings": {
     "enabled": "Статус",
     "cooldownNotifyAsWhisper": "Информация о кулдауне в висперсы",
