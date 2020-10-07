@@ -1,5 +1,6 @@
 <template>
-  <div class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row">
+  <div class="border-bottom row py-2 m-0"
+    :class="sidebar ? [ 'py-2', 'border-top-0', 'border-gray', 'bg-opaque' ] : ['border-top', 'mb-3']">
     <div class="slot-left col-auto mr-auto d-flex" v-if="!!this.$slots.left" style="height: max-content;">
       <slot name="left"></slot>
     </div>
@@ -48,7 +49,7 @@ import { defineComponent, onMounted, ref, watch } from '@vue/composition-api'
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 
 interface Props {
-  cards?: boolean; table?: boolean; search?: boolean;
+  cards?: boolean; table?: boolean; search?: boolean; sidebar: boolean;
 }
 export default defineComponent({
   components: {
@@ -59,6 +60,7 @@ export default defineComponent({
     cards: Boolean,
     table: Boolean,
     search: Boolean,
+    sidebar: Boolean,
   },
   setup(props: Props, context) {
     const searchString = ref('');
