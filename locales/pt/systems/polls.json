@@ -1,8 +1,10 @@
 {
   "opened_normal": "Enquete aberta para \"$title\"! Você pode votar usando $command X",
+  "opened_numbers": "Poll by numbers opened for \"$title\"! You can vote by typing number into chat.",
   "opened_tips": "Enquete por doações aberta para \"$title\"! Você pode votar adicionando a hashtag #voteX na mensagem de doação",
   "opened_bits": "Enquete por bits aberta para \"$title\"! Você pode votar adicionando a hashtag #voteX na mensagem",
   "alreadyOpened_normal": "Erro! A enquete já foi aberta para “$title”! Você pode votar por $command X",
+  "alreadyOpened_numbers": "Error! Poll was already opened for \"$title\"! You can vote by typing number into chat.",
   "alreadyOpened_tips": "Erro! Enquete por doação já foi aberta para \"$title\"! Você pode votar adicionando a hashtag #voteX na mensagem",
   "alreadyOpened_bits": "Erro! Enquete via bits já foi aberta para \"$title\"! Você pode votar adicionando a hashtag #voteX na mensagem",
   "notEnoughOptions": "$sender, nova enquete deve ter pelo menos 2 opções!",
