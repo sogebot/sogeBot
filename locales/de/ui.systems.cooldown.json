@@ -3,9 +3,6 @@
   "empty": "Bisher wurde noch kein Cooldown erstellt.",
   "emptyAfterSearch": "Bei der Suche nach <strong>\"$search\"</strong> wurde kein Cooldown gefunden.",
   "notify-as-whisper": "Antwort über Privat Nachricht",
-  "error": {
-    "isEmpty": "Dieser Wert darf nicht leer sein"
-  },
   "settings": {
     "enabled": "Status",
     "cooldownNotifyAsWhisper": "Informationen zur Abklingzeit von Whisper-Nachrichten",
