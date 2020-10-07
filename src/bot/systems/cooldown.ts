@@ -79,11 +79,7 @@ class Cooldown extends System {
         const cooldown = await getRepository(CooldownEntity).findOne({
           where: { id },
         });
-        if (!cooldown) {
-          cb('Cooldown not found');
-        } else {
-          cb(null, cooldown);
-        }
+        cb(null, cooldown);
       } catch (e) {
         cb(e.stack);
       }
