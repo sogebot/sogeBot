@@ -16,6 +16,7 @@ import { getRepository } from 'typeorm';
 import { Poll, PollVote } from '../database/entity/poll';
 import { translate } from '../translate';
 import currency from '../currency';
+import api from '../api';
 
 enum ERROR {
   NOT_ENOUGH_OPTIONS,
@@ -47,7 +48,11 @@ class Polls extends System {
     super();
 
     if (isMainThread) {
-      setInterval(() => this.reminder(), 1000);
+      setInterval(() => {
+        if (api.isStreamOnline) {
+          this.reminder();
+        }
+      }, 1000);
     }
 
     this.addMenu({ category: 'manage', name: 'polls', id: 'manage/polls', this: this });
