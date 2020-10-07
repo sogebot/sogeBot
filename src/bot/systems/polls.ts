@@ -3,7 +3,7 @@ import { isMainThread } from '../cluster';
 
 import { announce, getOwnerAsSender, prepare } from '../commons.js';
 import { getLocalizedName } from '../helpers/getLocalized';
-import { command, default_permission, helper, settings } from '../decorators';
+import { command, default_permission, helper, parser, settings } from '../decorators';
 import { onBit, onMessage, onTip } from '../decorators/on';
 import Expects from '../expects.js';
 import { permission } from '../helpers/permissions';
@@ -16,6 +16,7 @@ import { getRepository } from 'typeorm';
 import { Poll, PollVote } from '../database/entity/poll';
 import { translate } from '../translate';
 import currency from '../currency';
+import api from '../api';
 
 enum ERROR {
   NOT_ENOUGH_OPTIONS,
@@ -47,7 +48,11 @@ class Polls extends System {
     super();
 
     if (isMainThread) {
-      setInterval(() => this.reminder(), 1000);
+      setInterval(() => {
+        if (api.isStreamOnline) {
+          this.reminder();
+        }
+      }, 1000);
     }
 
     this.addMenu({ category: 'manage', name: 'polls', id: 'manage/polls', this: this });
@@ -138,6 +143,8 @@ class Polls extends System {
           const percentage = Number((100 / _total) * votesCount || 0).toFixed(2);
           if (cVote.type === 'normal') {
             responses.push({ response: this.getCommand('!vote') + ` ${Number(index) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, translate('systems.polls.votes'))}, ${percentage}%`, ...opts });
+          } else if (cVote.type === 'numbers') {
+            responses.push({ response: `${Number(index) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, translate('systems.polls.votes'))}, ${percentage}%`, ...opts });
           } else if (cVote.type === 'tips') {
             responses.push({ response: `#vote${Number(index) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${getLocalizedName(votesCount, translate('systems.polls.votes'))}, ${percentage}%`, ...opts });
           } else {
@@ -167,7 +174,7 @@ class Polls extends System {
       }
 
       const [type, title, options] = new Expects(opts.parameters)
-        .switch({ name: 'type', values: ['tips', 'bits', 'normal'], optional: true, default: 'normal' })
+        .switch({ name: 'type', values: ['tips', 'bits', 'normal', 'numbers'], optional: true, default: 'normal' })
         .argument({ name: 'title', optional: false, multi: true })
         .list({ delimiter: '|' })
         .toArray();
@@ -221,6 +228,8 @@ class Polls extends System {
           for (const index of Object.keys(cVote.options)) {
             if (cVote.type === 'normal') {
               responses.push({ response: this.getCommand('!poll open') + ` ${index} => ${cVote.options[Number(index)]}`, ...opts });
+            } else if (cVote.type === 'numbers') {
+              responses.push({ response: `${index} => ${cVote.options[Number(index)]}`, ...opts });
             } else {
               responses.push({ response: `#vote${(Number(index) + 1)} => ${cVote.options[Number(index)]}`, ...opts });
             }
@@ -268,6 +277,8 @@ class Polls extends System {
             responses.push({ response: this.getCommand('!vote') + ` ${Number(i) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, translate('systems.polls.votes'))}, ${percentage}%`, ...opts });
           } else if (cVote.type === 'tips') {
             responses.push({ response: `#vote${Number(i) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${getLocalizedName(votesCount, translate('systems.polls.votes'))}, ${percentage}%`, ...opts });
+          } else if (cVote.type === 'numbers') {
+            responses.push({ response: `${Number(i) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, translate('systems.polls.votes'))}, ${percentage}%`, ...opts });
           } else {
             responses.push({ response: `#vote${Number(i) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, translate('systems.polls.votes'))}, ${percentage}%`, ...opts });
           }
@@ -307,6 +318,34 @@ class Polls extends System {
       }
     }
     return [];
+  }
+
+  @parser()
+  async participateByNumber(opts: ParserOptions) {
+    try {
+      if (opts.message.match(/^(\d+)$/)) {
+        const cVote = await getRepository(Poll).findOneOrFail({ isOpened: true, type: 'numbers' });
+        const vote = await getRepository(PollVote).findOne({ poll: cVote, votedBy: opts.sender.username });
+        if (Number(opts.message) > 0 && Number(opts.message) <= cVote.options.length) {
+          if (vote) {
+            await getRepository(PollVote).save({
+              ...vote,
+              option: Number(opts.message) - 1,
+            });
+          } else {
+            await getRepository(PollVote).save({
+              poll: cVote,
+              option: Number(opts.message) - 1,
+              votes: 1,
+              votedBy: opts.sender.username,
+            });
+          }
+        }
+      }
+    } catch (e) {
+      warning(e.stack);
+    }
+    return true;
   }
 
   @onBit()
@@ -398,7 +437,9 @@ class Polls extends System {
       }), 'polls');
       for (const index of Object.keys(vote.options)) {
         setTimeout(() => {
-          if (vote.type === 'normal') {
+          if (vote.type === 'numbers') {
+            announce(`${(Number(index) + 1)} => ${vote.options[Number(index)]}`, 'polls');
+          } else if (vote.type === 'normal') {
             announce(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${vote.options[Number(index)]}`, 'polls');
           } else {
             announce(`#vote${(Number(index) + 1)} => ${vote.options[Number(index)]}`, 'polls');

@@ -12,8 +12,9 @@
       :style="{ 'align-self': settings.display.align === 'top' ? 'flex-start' : 'flex-end' }">
       <strong class="title">{{currentVote.title}}</strong>
       <div class="helper" v-if="currentVote.type === 'normal'">{{ translate('systems.polls.overlay.type') }} <kbd>{{ voteCommand }} 1</kbd>, <kbd>{{ voteCommand }} 2</kbd>, {{ translate('systems.polls.overlay.inChatToVote') }}</div>
-      <div class="helper" v-else-if="currentVote.type === 'tips'">{{ translate('systems.polls.overlay.add') }} <kbd>#vote1</kbd>, <kbd>#vote2</kbd>, <template v-html="translate('systems.polls.overlay.toYourMessage').replace('$type', translate('systems.polls.overlay.tips'))"></template></div>
-      <div class="helper" v-else>{{ translate('systems.polls.overlay.add') }} <kbd>#vote1</kbd>, <kbd>#vote2</kbd>, <template v-html="translate('systems.polls.overlay.toYourMessage').replace('$type', translate('systems.polls.overlay.bits'))"></template></div>
+      <div class="helper" v-else-if="currentVote.type === 'numbers'">{{ translate('systems.polls.overlay.type') }} <kbd>1</kbd>, <kbd>2</kbd>,  {{ translate('systems.polls.overlay.inChatToVote') }}</div>
+      <div class="helper" v-else-if="currentVote.type === 'tips'">{{ translate('systems.polls.overlay.add') }} <kbd>#vote1</kbd>, <kbd>#vote2</kbd>, <span v-html="translate('systems.polls.overlay.toYourMessage').replace('$type', translate('systems.polls.overlay.tips'))"></span></div>
+      <div class="helper" v-else>{{ translate('systems.polls.overlay.add') }} <kbd>#vote1</kbd>, <kbd>#vote2</kbd>, <span v-html="translate('systems.polls.overlay.toYourMessage').replace('$type', translate('systems.polls.overlay.bits'))"></span></div>
       <div class="options"
         v-for="(option, index) in currentVote.options"
         :key="option"

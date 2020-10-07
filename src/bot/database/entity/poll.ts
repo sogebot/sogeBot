@@ -3,7 +3,7 @@ import { ColumnNumericTransformer } from './_transformer';
 
 export interface PollInterface {
   id?: string;
-  type: 'tips' | 'bits' | 'normal';
+  type: 'tips' | 'bits' | 'normal' | 'numbers';
   title: string;
   isOpened: boolean;
   openedAt?: number;
@@ -24,7 +24,7 @@ export const Poll = new EntitySchema<Readonly<Required<PollInterface>>>({
   name: 'poll',
   columns: {
     id: { type: 'uuid', primary: true, generated: 'uuid' },
-    type: { type: 'varchar', length: 6 },
+    type: { type: 'varchar', length: 7 },
     isOpened: { type: Boolean },
     openedAt: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
     closedAt: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
