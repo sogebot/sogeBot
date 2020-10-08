@@ -13,7 +13,6 @@ import type { TimerInterface } from '../database/entity/timer';
 import type { CommandsBoardInterface } from '../database/entity/commands';
 import type { UserInterface } from '../database/entity/user';
 import type { SongPlaylistInterface } from '../database/entity/song';
-import type { RaffleParticipantInterface } from '../database/entity/raffle';
 import type { PriceInterface } from '../database/entity/price';
 import type { DashboardInterface } from '../database/entity/dashboard';
 import type PUBG from '../integrations/pubg';
@@ -104,7 +103,7 @@ function adminEndpoint (nsp: string, on: 'viewers::save' | 'viewers::remove', ca
 function adminEndpoint (nsp: string, on: 'find.viewers', callback: (opts:  { state?: any; search?: string; filter?: { subscribers: null | boolean; followers: null | boolean; active: null | boolean; vips: null | boolean }; page: number; order?: { orderBy: string; sortOrder: 'ASC' | 'DESC' } }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'watched::save', callback: (item: Readonly<Required<VariableWatchInterface>> & Readonly<Required<VariableWatchInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'songs::save', callback: (item: Readonly<Required<SongPlaylistInterface>> & Readonly<Required<SongPlaylistInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'raffle::updateParticipant', callback: (item: Readonly<Required<RaffleParticipantInterface>> & Readonly<Required<RaffleParticipantInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
+function adminEndpoint (nsp: string, on: 'raffle::setEligibility', callback: (opts: {id: number, isEligible: boolean}, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'price::save', callback: (item: Readonly<Required<PriceInterface>> & Readonly<Required<PriceInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'panel::availableWidgets' | 'panel::dashboards', callback: (opts: { userId: number; type: DashboardInterface['type'] }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'panel::dashboards::remove', callback: (opts: { userId: number; type: DashboardInterface['type'], id: string }, cb: (error: Error | string | null, ...response: any) => void) => void): void;

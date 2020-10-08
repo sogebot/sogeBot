@@ -85,11 +85,11 @@ class Raffles extends System {
         cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'raffle::updateParticipant', async (participant, cb) => {
+    adminEndpoint(this.nsp, 'raffle::setEligibility', async ({id, isEligible}, cb) => {
       try {
         cb(
           null,
-          await getRepository(RaffleParticipant).save(participant),
+          await getRepository(RaffleParticipant).update({ id }, { isEligible }),
         );
       } catch (e) {
         cb(e.stack);
@@ -213,7 +213,6 @@ class Raffles extends System {
       this.timeouts.raffleAnnounce = global.setTimeout(() => this.announce(), 60000);
       return;
     }
-
     this.lastAnnounce = Date.now();
     this.lastAnnounceMessageCount = linesParsed;
 
@@ -233,12 +232,13 @@ class Raffles extends System {
       eligibility.push(prepare('raffles.eligibility-everyone-item'));
     }
 
+    const count = raffle.participants.reduce((a, b) => {
+      a += b.tickets;
+      return a;
+    }, 0);
     let message = prepare(locale, {
-      l10n_entries: getLocalizedName(raffle.participants.length, translate('core.entries')),
-      count: raffle.participants.reduce((a, b) => {
-        a += b.tickets;
-        return a;
-      }, 0),
+      l10n_entries: getLocalizedName(count, translate('core.entries')),
+      count,
       keyword: raffle.keyword,
       min: raffle.minTickets,
       max: raffle.maxTickets,
@@ -367,12 +367,13 @@ class Raffles extends System {
       eligibility.push(prepare('raffles.eligibility-everyone-item'));
     }
 
+    const count = raffle.participants.reduce((a, b) => {
+      a += b.tickets;
+      return a;
+    }, 0);
     let response = prepare(locale, {
-      l10n_entries: getLocalizedName(raffle.participants.length, translate('core.entries')),
-      count: raffle.participants.reduce((a, b) => {
-        a += b.tickets;
-        return a;
-      }, 0),
+      l10n_entries: getLocalizedName(count, translate('core.entries')),
+      count,
       keyword: raffle.keyword,
       min: raffle.minTickets,
       max: raffle.maxTickets,
@@ -451,6 +452,10 @@ class Raffles extends System {
         return false;
       }
     } // user doesn't have enough points
+
+    if (newTickets === 0) {
+      throw new Error('User want to join with 0 tickets');
+    }
 
     const selectedParticipant = {
       ...participant,
