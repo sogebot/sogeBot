@@ -67,7 +67,7 @@ class Raffles extends System {
     if (isMainThread) {
       this.announce();
       setInterval(() => {
-        if (this.announceNewEntries && announceNewEntriesTime >= Date.now()) {
+        if (this.announceNewEntries && announceNewEntriesTime !== 0 && announceNewEntriesTime <= Date.now()) {
           this.announceEntries();
         }
       }, 1000);
