@@ -46,7 +46,11 @@ class Quotes extends System {
 
     adminEndpoint(this.nsp, 'generic::setById', async (opts, cb) => {
       try {
-        cb(null, await getRepository(QuotesEntity).save({ ...(await getRepository(QuotesEntity).findOne({ id: Number(opts.id) })), ...opts.item }));
+        if (opts.id === '0') {
+          cb(null, await getRepository(QuotesEntity).save(opts.item));
+        } else {
+          cb(null, await getRepository(QuotesEntity).save({ ...(await getRepository(QuotesEntity).findOne({ id: Number(opts.id) })), ...opts.item }));
+        }
       } catch (e) {
         cb(e.stack);
       }
