@@ -342,7 +342,7 @@ export default {
     },
     toggleEligibility: function (participant) {
       participant.isEligible = !participant.isEligible;
-      this.socket.emit('raffle::updateParticipant', participant, (err) => {
+      this.socket.emit('raffle::setEligibility', { id: participant.id, isEligible: participant.isEligible }, (err) => {
         if (err) {
           return console.error(err);
         }
