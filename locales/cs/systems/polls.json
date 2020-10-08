@@ -1,8 +1,10 @@
 {
   "opened_normal": "Anketa byla otevřena pro \"$title\"! Hlasovat můžete pomocí $command X",
+  "opened_numbers": "Anketa pomocí čísel byla otevřena pro \"$title\"! Můžete hlasovat napsáním čísla do chatu.",
   "opened_tips": "Anketa pomocí tipů pro \"$title\"! Můžete hlasovat přidáním hashtag #voteX do zprávy",
   "opened_bits": "Anketa pomocí bitů pro \"$title\"! Můžete hlasovat přidáním hashtag #voteX do zprávy bitů",
   "alreadyOpened_normal": "Chyba! Anketa byla již otevřena pro \"$title\"! Můžete hlasovat pomocí $command X",
+  "alreadyOpened_numbers": "Chyba! Anketa byla již otevřena pro \"$title\"! Můžete hlasovat pomocí napsání čísel do chatu.",
   "alreadyOpened_tips": "Chyba! Anketa pomocí tipů byla již otevřena pro \"$title\"! Můžete hlasovat přidáním hashtag #voteX do zprávy",
   "alreadyOpened_bits": "Chyba! Anketa pomocí bitů byla již otevřena pro \"$title\"! Můžete hlasovat přidáním hashtag #voteX do zprávy",
   "notEnoughOptions": "$sender, nová anketa musí mít alespoň 2 možnosti!",

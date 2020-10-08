@@ -1,8 +1,10 @@
 {
   "opened_normal": "Umfrage eröffnet für \"$title\"! Du kannst mit $command X abstimmen.",
+  "opened_numbers": "Poll by numbers opened for \"$title\"! You can vote by typing number into chat.",
   "opened_tips": "Umfrage mit Spenden gestartet. Du kannst für \"$title\" abstimmen, indem du Hashtag #voteX in der Spendennachricht angibst",
   "opened_bits": "Umfrage mit Bits gestartet. Du kannst für \"$title\" abstimmen, indem du Hashtag #voteX in der Bit Nachricht mit angibst",
   "alreadyOpened_normal": "Fehler! Umfrage \"$title\" läuft bereits! Du kannst mit $command X abstimmen.",
+  "alreadyOpened_numbers": "Error! Poll was already opened for \"$title\"! You can vote by typing number into chat.",
   "alreadyOpened_tips": "Fehler! Eine Umfrage mit Spenden \"$title\" läuft bereits! Du kannst abstimmen, indem du Hashtag #voteX in der Spendennachricht angibst",
   "alreadyOpened_bits": "Fehler! Umfrage mit Bits \"$title\" läuft bereits! Du kannst abstimmen, indem du Hashtag #voteX in der Bit Nachricht mit angibst",
   "notEnoughOptions": "$sender, eine neue Umfrage muss mindestens 2 Optionen haben!",

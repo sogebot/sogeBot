@@ -1,8 +1,10 @@
 {
   "opened_normal": "Sondage ouvert pour \"$title\" ! Vous pouvez voter avec la commande $command X",
+  "opened_numbers": "Poll by numbers opened for \"$title\"! You can vote by typing number into chat.",
   "opened_tips": "Sondage avec conseils ouverts pour \"$title\"! Vous pouvez voter en ajoutant le hashtag #voteX dans le message d'astuce",
   "opened_bits": "Sondage avec Cheers ouvert pour \"$title\"! Vous pouvez voter en ajoutant le hashtag #voteX dans le message de votre bit",
   "alreadyOpened_normal": "Erreur! Le sondage a déjà été ouvert pour \"$title\" ! Vous pouvez voter avec la commande $command X",
+  "alreadyOpened_numbers": "Error! Poll was already opened for \"$title\"! You can vote by typing number into chat.",
   "alreadyOpened_tips": "Erreur! Le sondage par tips a déjà été ouvert pour \"$title\"! Vous pouvez voter en ajoutant le hashtag #voteX dans le message de tips",
   "alreadyOpened_bits": "Erreur! Le sondage par Cheers a déjà été ouvert pour \"$title\"! Vous pouvez voter en ajoutant le hashtag #voteX dans le message de votre bit",
   "notEnoughOptions": "$sender, le nouveau sondage doit avoir au moins 2 options !",

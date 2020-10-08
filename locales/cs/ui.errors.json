@@ -3,7 +3,7 @@
   "command_must_start_with_!": "Příkaz musí začít !",
   "this_value_must_be_a_positive_number_or_0": "Tato hodnota musí být kladné číslo nebo 0",
   "value_cannot_be_empty": "Hodnota nemůže být prázdná",
-  "minLength_of_value_is": "Minimální dělka je $value.",
+  "minLength_of_value_is": "Minimální délka je $value.",
   "this_currency_is_not_supported": "Tato měna není podporována",
   "something_went_wrong": "Něco se pokazilo",
   "permission_must_exist": "Oprávnění musí existovat",
