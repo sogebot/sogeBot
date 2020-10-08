@@ -230,7 +230,6 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed, watch, getCurrentInstance } from '@vue/composition-api'
-import type { Ref } from '@vue/composition-api'
 import { v4 as uuid } from 'uuid';
 
 import { capitalize, isNil, orderBy } from 'lodash-es';
@@ -283,27 +282,26 @@ export default defineComponent({
       },
     }
   },
-  setup(props, context) {
+  setup(props, ctx) {
     const instance = getCurrentInstance();
     const isSidebarVisible = ref(false);
     const sidebarSlideEnabled = ref(true);
 
     const search = ref('');
-    const commands: Ref<Required<CommandsInterface>[]> = ref([]);
-    const permissions: Ref<Required<PermissionsInterface>[]> = ref([]);
+    const commands = ref([] as Required<CommandsInterface>[]);
+    const permissions = ref([] as Required<PermissionsInterface>[]);
     const editationItem = ref(null as CommandsInterface | null);
-    const changed: Ref<any[]> = ref([]);
     const isDataChanged = ref(false);
-    const state: Ref<{
-      loadedPerm: number;
-      loadedCmd: number;
-      save: number;
-      pending: boolean;
-    }> = ref({
+    const state = ref({
       loadedPerm: ButtonStates.progress,
       loadedCmd: ButtonStates.progress,
       save: ButtonStates.idle,
       pending: false,
+    } as {
+      loadedPerm: number;
+      loadedCmd: number;
+      save: number;
+      pending: boolean;
     });
 
     const commandsFiltered = computed(() => {
@@ -333,7 +331,7 @@ export default defineComponent({
       { key: 'buttons', label: '' },
     ];
 
-    watch(() => context.root.$route.params.id, (val) => {
+    watch(() => ctx.root.$route.params.id, (val) => {
       const $v = instance?.$v;
       $v?.$reset();
       if (val) {
@@ -370,7 +368,7 @@ export default defineComponent({
     onMounted(() => {
       refresh();
       loadEditationItem();
-      if (context.root.$route.params.id) {
+      if (ctx.root.$route.params.id) {
         isSidebarVisible.value = true;
       }
     });
@@ -380,17 +378,17 @@ export default defineComponent({
       let response = command.responses.filter((o) => o.id === rid)[0]
       response.permission = permission
       socket.command.emit('generic::setById', { id: cid, item: command }, () => {});
-      context.root.$forceUpdate();
+      ctx.root.$forceUpdate();
     }
     const updateStopIfExecuted = (cid: string, rid: string, stopIfExecuted: boolean) => {
       let command = commands.value.filter((o) => o.id === cid)[0]
       let response = command.responses.filter((o) => o.id === rid)[0]
       response.stopIfExecuted = stopIfExecuted
       socket.command.emit('generic::setById', { id: cid, item: command }, () => {});
-      context.root.$forceUpdate();
+      ctx.root.$forceUpdate();
     }
     const newItem = () => {
-      context.root.$router.push({ name: 'CommandsManagerEdit', params: { id: uuid() } }).catch(() => {});
+      ctx.root.$router.push({ name: 'CommandsManagerEdit', params: { id: uuid() } }).catch(() => {});
     };
     const sendUpdate = (id: string) => {
       socket.command.emit('generic::setById', { id, item: commands.value.find((o) => o.id === id) }, (err: string | null) => {
@@ -406,7 +404,7 @@ export default defineComponent({
           if (!isOK) {
             sidebarSlideEnabled.value = false;
             isSidebarVisible.value = false;
-            context.root.$nextTick(() => {
+            ctx.root.$nextTick(() => {
               isSidebarVisible.value = true;
               setTimeout(() => {
                 sidebarSlideEnabled.value = true;
@@ -416,7 +414,7 @@ export default defineComponent({
           }
         }
         isSidebarVisible.value = isVisible;
-        context.root.$router.push({ name: 'CommandsManagerList' }).catch(() => {});
+        ctx.root.$router.push({ name: 'CommandsManagerList' }).catch(() => {});
       } else {
         if (sidebarSlideEnabled.value) {
           editationItem.value = null
@@ -425,8 +423,8 @@ export default defineComponent({
       }
     }
     const loadEditationItem = () => {
-      if (context.root.$route.params.id) {
-        socket.command.emit('generic::getOne', context.root.$route.params.id, (err: string | null, data: CommandsInterface) => {
+      if (ctx.root.$route.params.id) {
+        socket.command.emit('generic::getOne', ctx.root.$route.params.id, (err: string | null, data: CommandsInterface) => {
           if (err) {
             return error(err);
           }
@@ -434,7 +432,7 @@ export default defineComponent({
           if (data === null) {
             // we are creating new item
             editationItem.value = {
-              id: context.root.$route.params.id,
+              id: ctx.root.$route.params.id,
               command: '',
               enabled: true,
               visible: true,
@@ -465,10 +463,10 @@ export default defineComponent({
         });
 
         state.value.save = ButtonStates.success;
-        context.root.$nextTick(() => {
+        ctx.root.$nextTick(() => {
           refresh();
           state.value.pending = false;
-          context.root.$router.push({ name: 'CommandsManagerEdit', params: { id: editationItem.value?.id || '' } }).catch(err => {})
+          ctx.root.$router.push({ name: 'CommandsManagerEdit', params: { id: editationItem.value?.id || '' } }).catch(err => {})
         });
       }
       setTimeout(() => {
@@ -516,7 +514,6 @@ export default defineComponent({
       state,
       isDataChanged,
       permissions,
-      changed,
       commandsFiltered,
       fields,
       sendUpdate,

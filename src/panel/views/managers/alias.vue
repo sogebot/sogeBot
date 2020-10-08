@@ -141,9 +141,9 @@
                   <button-with-icon class="btn-only-icon btn-dark btn-reverse" :icon="['fas', data.item.visible ? 'eye' : 'eye-slash']" @click="data.item.visible = !data.item.visible; update(data.item)">
                     {{ translate('dialog.buttons.edit') }}
                   </button-with-icon>
-                <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="del(data.item.id)">
-                  {{ translate('dialog.buttons.delete') }}
-                </button-with-icon>
+                  <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="del(data.item.id)">
+                    {{ translate('dialog.buttons.delete') }}
+                  </button-with-icon>
                 </div>
               </template>
             </b-table>
@@ -177,7 +177,6 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, getCurrentInstance, computed, watch } from '@vue/composition-api'
-import type { Ref } from '@vue/composition-api'
 import { v4 as uuid } from 'uuid';
 
 import { getSocket } from 'src/panel/helpers/socket';
@@ -218,33 +217,33 @@ export default defineComponent({
       command: {required},
     }
   },
-  setup(props, context) {
+  setup(props, ctx) {
     const instance = getCurrentInstance();
     const isSidebarVisible = ref(false);
     const sidebarSlideEnabled = ref(true);
 
-    const items: Ref<AliasInterface[]> = ref([]);
+    const items = ref([] as AliasInterface[]);
     const editationItem = ref(null as AliasInterface | null);
-    const permissions: Ref<PermissionsInterface[]> = ref([]);
+    const permissions = ref([] as PermissionsInterface[]);
 
     const newGroupForAliasId = ref('');
     const newGroupName = ref('');
     const newGroupNameUpdated = ref(false);
 
     const search = ref('');
-    const state: Ref<{
-      loadingAls: number;
-      loadingPrm: number;
-      save: number;
-      pending: boolean;
-    }> = ref({
+    const state = ref({
       loadingAls: ButtonStates.progress,
       loadingPrm: ButtonStates.idle,
       save: ButtonStates.idle,
       pending: false,
+    } as {
+      loadingAls: number;
+      loadingPrm: number;
+      save: number;
+      pending: boolean;
     });
 
-    watch(() => context.root.$route.params.id, (val) => {
+    watch(() => ctx.root.$route.params.id, (val) => {
       const $v = instance?.$v;
       $v?.$reset();
       if (val) {
@@ -262,7 +261,7 @@ export default defineComponent({
     onMounted(() => {
       refresh();
       loadEditationItem();
-      if (context.root.$route.params.id) {
+      if (ctx.root.$route.params.id) {
         isSidebarVisible.value = true;
       }
     });
@@ -326,7 +325,7 @@ export default defineComponent({
           }))
         }
         await Promise.all(promises);
-        context.root.$forceUpdate();
+        ctx.root.$forceUpdate();
       }
     }
     const updateGroup = (id: string, group: AliasInterface['group']) => {
@@ -334,21 +333,21 @@ export default defineComponent({
       if (item) {
         item.group = group
         socket.alias.emit('generic::setById', { id: item.id, item }, () => {})
-        context.root.$forceUpdate();
+        ctx.root.$forceUpdate();
       }
     }
     const updatePermission = (id: string, permission: string) => {
       let item = items.value.filter((o) => o.id === id)[0]
       item.permission = permission
       socket.alias.emit('generic::setById', { id: item.id, item }, () => {})
-      context.root.$forceUpdate();
+      ctx.root.$forceUpdate();
     }
     const linkTo = (item: Required<AliasInterface>) => {
       console.debug('Clicked', item.id);
-      context.root.$router.push({ name: 'aliasManagerEdit', params: { id: item.id } }).catch(() => {});
+      ctx.root.$router.push({ name: 'aliasManagerEdit', params: { id: item.id } }).catch(() => {});
     }
     const newItem = () => {
-      context.root.$router.push({ name: 'aliasManagerEdit', params: { id: uuid() } }).catch(() => {});
+      ctx.root.$router.push({ name: 'aliasManagerEdit', params: { id: uuid() } }).catch(() => {});
     };
     const update = (item: typeof items.value[number]) => {
       socket.alias.emit('generic::setById', { id: item.id, item }, () => {})
@@ -370,7 +369,7 @@ export default defineComponent({
 
       updateGroup(newGroupForAliasId.value, newGroupName.value);
       // Hide the modal manually
-      context.root.$nextTick(() => {
+      ctx.root.$nextTick(() => {
         instance?.$bvModal.hide('create-new-group')
       })
     }
@@ -381,7 +380,7 @@ export default defineComponent({
           if (!isOK) {
             sidebarSlideEnabled.value = false;
             isSidebarVisible.value = false;
-            context.root.$nextTick(() => {
+            ctx.root.$nextTick(() => {
               isSidebarVisible.value = true;
               setTimeout(() => {
                 sidebarSlideEnabled.value = true;
@@ -391,7 +390,7 @@ export default defineComponent({
           }
         }
         isSidebarVisible.value = isVisible;
-        context.root.$router.push({ name: 'aliasManager' }).catch(() => {});
+        ctx.root.$router.push({ name: 'aliasManager' }).catch(() => {});
       } else {
         if (sidebarSlideEnabled.value) {
           editationItem.value = null
@@ -400,8 +399,8 @@ export default defineComponent({
       }
     }
     const loadEditationItem = () => {
-      if (context.root.$route.params.id) {
-        socket.alias.emit('generic::getOne', context.root.$route.params.id, (err: string | null, data: AliasInterface) => {
+      if (ctx.root.$route.params.id) {
+        socket.alias.emit('generic::getOne', ctx.root.$route.params.id, (err: string | null, data: AliasInterface) => {
           if (err) {
             return error(err);
           }
@@ -409,7 +408,7 @@ export default defineComponent({
           if (data === null) {
             // we are creating new item
             editationItem.value = {
-              id: context.root.$route.params.id,
+              id: ctx.root.$route.params.id,
               alias: '',
               command: '',
               permission: permission.VIEWERS,
@@ -431,7 +430,7 @@ export default defineComponent({
       if (!$v?.$invalid) {
         state.value.save = ButtonStates.progress;
 
-        socket.alias.emit('generic::setById', { id: context.root.$route.params.id, item: editationItem.value }, (err: string | null, data: AliasInterface) => {
+        socket.alias.emit('generic::setById', { id: ctx.root.$route.params.id, item: editationItem.value }, (err: string | null, data: AliasInterface) => {
           if (err) {
             state.value.save = ButtonStates.fail;
             return error(err);
@@ -440,10 +439,10 @@ export default defineComponent({
             console.log({data})
             console.groupEnd();
             state.value.save = ButtonStates.success;
-            context.root.$nextTick(() => {
+            ctx.root.$nextTick(() => {
               refresh();
               state.value.pending = false;
-              context.root.$router.push({ name: 'aliasManagerEdit', params: { id: String(data.id) } }).catch(() => {});
+              ctx.root.$router.push({ name: 'aliasManagerEdit', params: { id: String(data.id) } }).catch(() => {});
             });
           }
           setTimeout(() => {

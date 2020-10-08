@@ -60,9 +60,11 @@ class Ranks extends System {
       }
     });
     adminEndpoint(this.nsp, 'ranks::remove', async (id, cb) => {
-      await getRepository(Rank).delete(id);
-      if (cb) {
-        cb(null);
+      try {
+        await getRepository(Rank).delete(id);
+        cb ? cb(null) : null;
+      } catch (e) {
+        cb ? cb(e.stack) : null;
       }
     });
     adminEndpoint(this.nsp, 'ranks::save', async (item, cb) => {

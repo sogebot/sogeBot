@@ -110,7 +110,7 @@ export default defineComponent({
     GridLayout: VueGridLayout.GridLayout,
     GridItem: VueGridLayout.GridItem,
   },
-  setup(props, context) {
+  setup(props, ctx) {
     const dashboards = ref([]);
     const dashboardName = ref('');
     const addDashboard =  ref(false);
@@ -175,7 +175,7 @@ export default defineComponent({
       refreshWidgets();
     };
     const addWidget = () => {
-      socket.emit('panel::dashboards', { userId: Number(context.root.$store.state.loggedUser.id), type: 'admin' }, (err, dashboards2) => {
+      socket.emit('panel::dashboards', { userId: Number(ctx.root.$store.state.loggedUser.id), type: 'admin' }, (err, dashboards2) => {
         if (err) {
           return console.error(err);
         }
@@ -185,7 +185,7 @@ export default defineComponent({
       });
     };
     const createDashboard = () => {
-      socket.emit('panel::dashboards::create', { userId: Number(context.root.$store.state.loggedUser.id), name: dashboardName.value }, (err, created) => {
+      socket.emit('panel::dashboards::create', { userId: Number(ctx.root.$store.state.loggedUser.id), name: dashboardName.value }, (err, created) => {
         if (err) {
           return console.error(err);
         }
@@ -199,7 +199,7 @@ export default defineComponent({
     onMounted(async () => {
       isLoaded.value = await Promise.race([
         new Promise(resolve => {
-          socket.emit('panel::dashboards', { userId: Number(context.root.$store.state.loggedUser.id), type: 'admin' }, (err, dashboardsFromSocket) => {
+          socket.emit('panel::dashboards', { userId: Number(ctx.root.$store.state.loggedUser.id), type: 'admin' }, (err, dashboardsFromSocket) => {
             console.groupCollapsed('dashboard::panel::dashboards');
             console.log({err, dashboards: dashboardsFromSocket});
             console.groupEnd();
