@@ -182,7 +182,7 @@ export default defineComponent({
       miliseconds: { required, minValue: minValue(10000) }
     }
   },
-  setup(props, context) {
+  setup(props, ctx) {
     const instance = getCurrentInstance();
     const isSidebarVisible = ref(false);
     const sidebarSlideEnabled = ref(true);
@@ -227,13 +227,13 @@ export default defineComponent({
     onMounted(() => {
       refresh();
       loadEditationItem();
-      if (context.root.$route.params.id) {
+      if (ctx.root.$route.params.id) {
         isSidebarVisible.value = true;
       }
     });
 
     const newItem = () => {
-      context.root.$router.push({ name: 'cooldownsManagerEdit', params: { id: uuid() } }).catch(() => {});
+      ctx.root.$router.push({ name: 'cooldownsManagerEdit', params: { id: uuid() } }).catch(() => {});
     };
 
     const refresh = () => {
@@ -251,7 +251,7 @@ export default defineComponent({
       val.forEach((item) => update(item as Required<CooldownInterface>));
     }, { deep: true })
 
-    watch(() => context.root.$route.params.id, (val) => {
+    watch(() => ctx.root.$route.params.id, (val) => {
       const $v = instance?.$v;
       $v?.$reset();
       if (val) {
@@ -268,7 +268,7 @@ export default defineComponent({
 
     const linkTo = (item: Required<CooldownInterface>) => {
       console.debug('Clicked', item.id);
-      context.root.$router.push({ name: 'cooldownsManagerEdit', params: { id: item.id } }).catch(() => {});
+      ctx.root.$router.push({ name: 'cooldownsManagerEdit', params: { id: item.id } }).catch(() => {});
     }
     const remove = (id: string) => {
       socket.emit('generic::deleteById', id, () => {
@@ -285,7 +285,7 @@ export default defineComponent({
           if (!isOK) {
             sidebarSlideEnabled.value = false;
             isSidebarVisible.value = false;
-            context.root.$nextTick(() => {
+            ctx.root.$nextTick(() => {
               isSidebarVisible.value = true;
               setTimeout(() => {
                 sidebarSlideEnabled.value = true;
@@ -295,7 +295,7 @@ export default defineComponent({
           }
         }
         isSidebarVisible.value = isVisible;
-        context.root.$router.push({ name: 'cooldownsManager' }).catch(() => {});
+        ctx.root.$router.push({ name: 'cooldownsManager' }).catch(() => {});
       } else {
         if (sidebarSlideEnabled.value) {
           editationItem.value = null
@@ -304,8 +304,8 @@ export default defineComponent({
       }
     }
     const loadEditationItem = () => {
-      if (context.root.$route.params.id) {
-        socket.emit('generic::getOne', context.root.$route.params.id, (err: string | null, data: CooldownInterface) => {
+      if (ctx.root.$route.params.id) {
+        socket.emit('generic::getOne', ctx.root.$route.params.id, (err: string | null, data: CooldownInterface) => {
           if (err) {
             return error(err);
           }
@@ -313,7 +313,7 @@ export default defineComponent({
           if (data === null) {
             // we are creating new item
             editationItem.value = {
-              id: context.root.$route.params.id,
+              id: ctx.root.$route.params.id,
               name: '',
               miliseconds: 600000,
               type: 'global',
@@ -358,10 +358,10 @@ export default defineComponent({
         });
 
         state.value.save = ButtonStates.success;
-        context.root.$nextTick(() => {
+        ctx.root.$nextTick(() => {
           refresh();
           state.value.pending = false;
-          context.root.$router.push({ name: 'cooldownsManagerEdit', params: { id: editationItem.value?.id || '' } }).catch(err => {})
+          ctx.root.$router.push({ name: 'cooldownsManagerEdit', params: { id: editationItem.value?.id || '' } }).catch(err => {})
         });
       }
       setTimeout(() => {

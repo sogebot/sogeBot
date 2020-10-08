@@ -141,7 +141,7 @@ export default defineComponent({
       response: { required },
     }
   },
-  setup(props, context) {
+  setup(props, ctx) {
     const instance = getCurrentInstance();
     const isSidebarVisible = ref(false);
     const sidebarSlideEnabled = ref(true);
@@ -185,7 +185,7 @@ export default defineComponent({
         })
     });
 
-    watch(() => context.root.$route.params.id, (val) => {
+    watch(() => ctx.root.$route.params.id, (val) => {
       const $v = instance?.$v;
       $v?.$reset();
       if (val) {
@@ -203,7 +203,7 @@ export default defineComponent({
     onMounted(() => {
       refresh();
       loadEditationItem();
-      if (context.root.$route.params.id) {
+      if (ctx.root.$route.params.id) {
         isSidebarVisible.value = true;
       }
     });
@@ -232,10 +232,10 @@ export default defineComponent({
     }
     const linkTo = (item: Required<KeywordInterface>) => {
       console.debug('Clicked', item.id);
-      context.root.$router.push({ name: 'KeywordsManagerEdit', params: { id: item.id } }).catch(() => {});
+      ctx.root.$router.push({ name: 'KeywordsManagerEdit', params: { id: item.id } }).catch(() => {});
     }
     const newItem = () => {
-      context.root.$router.push({ name: 'KeywordsManagerEdit', params: { id: uuid() } }).catch(() => {});
+      ctx.root.$router.push({ name: 'KeywordsManagerEdit', params: { id: uuid() } }).catch(() => {});
     };
     const save = () => {
       const $v = instance?.$v;
@@ -249,10 +249,10 @@ export default defineComponent({
           }
 
           state.value.save = ButtonStates.success;
-          context.root.$nextTick(() => {
+          ctx.root.$nextTick(() => {
             refresh();
             state.value.pending = false;
-            context.root.$router.push({ name: 'KeywordsManagerEdit', params: { id: String(data.id) } }).catch(() => {});
+            ctx.root.$router.push({ name: 'KeywordsManagerEdit', params: { id: String(data.id) } }).catch(() => {});
           });
           setTimeout(() => {
             state.value.save = ButtonStates.idle;
@@ -267,7 +267,7 @@ export default defineComponent({
           if (!isOK) {
             sidebarSlideEnabled.value = false;
             isSidebarVisible.value = false;
-            context.root.$nextTick(() => {
+            ctx.root.$nextTick(() => {
               isSidebarVisible.value = true;
               setTimeout(() => {
                 sidebarSlideEnabled.value = true;
@@ -277,7 +277,7 @@ export default defineComponent({
           }
         }
         isSidebarVisible.value = isVisible;
-        context.root.$router.push({ name: 'KeywordsManager' }).catch(() => {});
+        ctx.root.$router.push({ name: 'KeywordsManager' }).catch(() => {});
       } else {
         if (sidebarSlideEnabled.value) {
           editationItem.value = null
@@ -286,8 +286,8 @@ export default defineComponent({
       }
     }
     const loadEditationItem = () => {
-      if (context.root.$route.params.id) {
-        socket.emit('generic::getOne', context.root.$route.params.id, (err: string | null, data: KeywordInterface) => {
+      if (ctx.root.$route.params.id) {
+        socket.emit('generic::getOne', ctx.root.$route.params.id, (err: string | null, data: KeywordInterface) => {
           if (err) {
             return error(err);
           }
@@ -295,7 +295,7 @@ export default defineComponent({
           if (data === null) {
             // we are creating new item
             editationItem.value = {
-              id: context.root.$route.params.id,
+              id: ctx.root.$route.params.id,
               keyword: '',
               response: '',
               enabled: true,

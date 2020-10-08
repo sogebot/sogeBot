@@ -268,9 +268,9 @@ export default defineComponent({
       }
     },
   },
-  setup(props, context) {
+  setup(props, ctx) {
     const instance = getCurrentInstance();
-    const eventId = context.root.$route.params.id || uuid();
+    const eventId = ctx.root.$route.params.id || uuid();
     const event = ref({
       id: eventId,
       name: '',
@@ -329,14 +329,14 @@ export default defineComponent({
             for (const [key, value] of Object.entries(defaultOperation.definitions)) {
               val[i].definitions[key] = Array.isArray(value) ? value[0] : value; // select first option by default
             }
-            context.root.$forceUpdate()
+            ctx.root.$forceUpdate()
           }
         }
       }
 
       // update clone
       event.value.operations = cloneDeep(val)
-      context.root.$nextTick(() => (watchOperationChange.value = true)) // re-enable watch
+      ctx.root.$nextTick(() => (watchOperationChange.value = true)) // re-enable watch
       operationsClone.value = cloneDeep(val)
     }, { deep: true });
     watch(() => event.value.name, (val, oldVal) => {
@@ -353,7 +353,7 @@ export default defineComponent({
           }
         }
       }
-      context.root.$nextTick(() => {
+      ctx.root.$nextTick(() => {
         watchEventChange.value = true;
       })
     }, { deep: true });
@@ -361,8 +361,8 @@ export default defineComponent({
     onMounted(async () => {
       await Promise.all([
         new Promise((resolve, reject) => {
-          if (context.root.$route.params.id) {
-            socket.emit('generic::getOne', context.root.$route.params.id, (err: string | null, eventGetAll: Required<EventInterface>) => {
+          if (ctx.root.$route.params.id) {
+            socket.emit('generic::getOne', ctx.root.$route.params.id, (err: string | null, eventGetAll: Required<EventInterface>) => {
               if (err) {
                 reject(error(err));
               }
@@ -387,7 +387,7 @@ export default defineComponent({
               event.value.filter = eventGetAll.filter;
 
               console.debug('Loaded', eventGetAll);
-              context.root.$nextTick(() => (watchEventChange.value = true));
+              ctx.root.$nextTick(() => (watchEventChange.value = true));
               resolve();
             });
           }
@@ -413,7 +413,7 @@ export default defineComponent({
               return 0; //default return value (no sorting)
             });
 
-            if (!context.root.$route.params.id) {
+            if (!ctx.root.$route.params.id) {
               // set first operation if we are in create mode
               event.value.operations.push({
                 id: uuid(),
@@ -455,7 +455,7 @@ export default defineComponent({
               }
               return 0; //default return value (no sorting)
             });
-            if (!context.root.$route.params.id) {
+            if (!ctx.root.$route.params.id) {
               // set first event if we are in create mode
               event.value.name = supported.value.events[0].id
             }
@@ -475,7 +475,7 @@ export default defineComponent({
         if (err) {
           return error(err);
         }
-        context.root.$router.push({ name: 'EventsManagerList' }).catch(() => {});
+        ctx.root.$router.push({ name: 'EventsManagerList' }).catch(() => {});
       })
     };
     const save = () => {
@@ -489,7 +489,7 @@ export default defineComponent({
             error(err)
           } else {
             state.value.save = ButtonStates.success;
-            context.root.$router.push({ name: 'EventsManagerEdit', params: { id: event.value.id || '' } }).catch(() => {})
+            ctx.root.$router.push({ name: 'EventsManagerEdit', params: { id: event.value.id || '' } }).catch(() => {})
           }
           state.value.pending = false;
           setTimeout(() => {
