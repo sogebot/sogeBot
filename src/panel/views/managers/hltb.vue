@@ -27,50 +27,50 @@
       <b-table v-else striped small :items="fItems" :fields="fields">
         <template v-slot:cell(show_details)="row">
           <b-button pill size="sm" @click="row.toggleDetails" class="mr-2" :variant="row.detailsShowing ? 'primary' : 'outline-primary'">
-            {{ row.detailsShowing ? 'Hide' : 'Show'}} History (10)
+            {{ row.detailsShowing ? 'Hide' : 'Show'}} History ({{ streams.filter(o => o.hltb_id === row.item.id).length }})
           </b-button>
         </template>
-        <template v-slot:row-details="row">
+        <template v-slot:row-details="data">
           <b-card>
-            <b-row>
-              <b-col><b>When</b></b-col>
-              <b-col><b>Time</b></b-col>
-              <b-col></b-col>
-            </b-row>
-            <b-row>
-              <b-col>{{ (new Date()).toLocaleString() }}</b-col>
-              <b-col>1h 25m</b-col>
-              <b-col>
-                <b-button pill :pressed.sync="myToggleTest" variant="outline-success" size="sm">Main</b-button>
-                <b-button pill :pressed.sync="myToggleTest2" variant="outline-success" size="sm">Completionist</b-button>
-              </b-col>
-            </b-row>
-            <b-row>
-              <b-col>{{ (new Date()).toLocaleString() }}</b-col>
-              <b-col>1h 25m</b-col>
-              <b-col>
-                <b-button pill :pressed.sync="myToggleTest" variant="outline-success" size="sm">Main</b-button>
-                <b-button pill :pressed.sync="myToggleTest2" variant="outline-success" size="sm">Completionist</b-button>
-              </b-col>
-            </b-row>
-            <b-row>
-              <b-col>{{ (new Date()).toLocaleString() }}</b-col>
-              <b-col>1h 25m</b-col>
-              <b-col>
-                <b-button pill :pressed.sync="myToggleTest" variant="outline-success" size="sm">Main</b-button>
-                <b-button pill :pressed.sync="myToggleTest2" variant="outline-success" size="sm">Completionist</b-button>
-              </b-col>
-            </b-row>
+            <template v-for="stream of streams.filter(o => o.hltb_id === data.item.id)">
+              <b-row :key="stream.id + '1'">
+                <b-col><b>{{ translate('systems.hltb.when.name') }}</b></b-col>
+                <b-col><b>{{ translate('systems.hltb.time.name') }}</b></b-col>
+                <b-col></b-col>
+                <b-col>{{ translate('systems.hltb.offset.name') }}</b-col>
+              </b-row>
+              <b-row :key="stream.id + '2'">
+                <b-col>{{ (new Date(stream.createdAt)).toLocaleString() }}</b-col>
+                <b-col>{{ timeToReadable(timestampToObject(stream.timestamp)) }}</b-col>
+                <b-col>
+                  <b-button pill :pressed.sync="stream.isMainCounted" variant="outline-success" size="sm">{{ translate('systems.hltb.main.name') }}</b-button>
+                  <b-button pill :pressed.sync="stream.isExtraCounted" variant="outline-success" size="sm">{{ translate('systems.hltb.extra.name') }}</b-button>
+                  <b-button pill :pressed.sync="stream.isCompletionistCounted" variant="outline-success" size="sm">{{ translate('systems.hltb.completionist.name') }}</b-button>
+                </b-col>
+                <b-col>
+                  <b-input-group>
+                    <b-form-spinbutton v-model="stream.offset" inline step="10000" :formatter-fn="minutesFormatter" :min="-stream.timestamp" :max="Number.MAX_SAFE_INTEGER" repeat-step-multiplier="50"></b-form-spinbutton>
+                    <b-button @click="stream.offset = 0" variant="dark"><fa icon="redo" fixed-width/></b-button>
+                  </b-input-group>
+                </b-col>
+              </b-row>
+            </template>
           </b-card>
         </template>
         <template v-slot:cell(thumbnail)="data">
-          <b-img thumbnail width="50" height="50" :src="data.item.imageUrl" :alt="data.item.game + ' thumbnail'"></b-img>
+          <b-img thumbnail width="70" height="70" :src="data.item.imageUrl" :alt="data.item.game + ' thumbnail'"></b-img>
+        </template>
+        <template v-slot:cell(startedAt)="data">
+          {{ (new Date(data.item.startedAt)).toLocaleString() }}
         </template>
         <template v-slot:cell(main)="data">
-          {{ getHours(data.item.timeToBeatMain).toFixed(1) }}<small class="small">h</small> / {{ data.item.gameplayMain.toFixed(1) }}<small class="small">h</small>
+          {{ timeToReadable(timestampToObject(getStreamsTimestamp(data.item.id, 'main') + getStreamsOffset(data.item.id, 'main'))) }} / {{ timeToReadable(timestampToObject(data.item.gameplayMain * 3600000)) }}
+        </template>
+        <template v-slot:cell(extra)="data">
+          {{ timeToReadable(timestampToObject(getStreamsTimestamp(data.item.id, 'extra') + getStreamsOffset(data.item.id, 'extra'))) }} / {{ timeToReadable(timestampToObject(data.item.gameplayMainExtra * 3600000)) }}
         </template>
         <template v-slot:cell(completionist)="data">
-          {{ getHours(data.item.timeToBeatCompletionist).toFixed(1) }}<small class="small">h</small> / {{ data.item.gameplayCompletionist.toFixed(1) }}<small class="small">h</small>
+          {{ timeToReadable(timestampToObject(getStreamsTimestamp(data.item.id, 'completionist') + getStreamsOffset(data.item.id, 'completionist'))) }} / {{ timeToReadable(timestampToObject(data.item.gameplayCompletionist * 3600000)) }}
         </template>
       </b-table>
     </template>
@@ -81,10 +81,14 @@
 import { defineComponent, ref, onMounted, computed } from '@vue/composition-api'
 
 import { getSocket } from '../../helpers/socket';
-import { HowLongToBeatGameInterface } from 'src/bot/database/entity/howLongToBeatGame';
+import { HowLongToBeatGameInterface, HowLongToBeatGameItemInterface } from 'src/bot/database/entity/howLongToBeatGame';
 import { error } from 'src/panel/helpers/error';
+import { getTime, timestampToObject } from 'src/bot/helpers/getTime';
 import translate from 'src/panel/helpers/translate';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import { faRedo } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(faRedo);
 
 const socket = getSocket('/systems/howlongtobeat');
 
@@ -95,6 +99,7 @@ export default defineComponent({
   },
   setup(props, context) {
     const items = ref([] as HowLongToBeatGameInterface[]);
+    const streams = ref([] as HowLongToBeatGameItemInterface[]);
     const state = ref({
       loading: ButtonStates.progress,
     } as {
@@ -102,8 +107,16 @@ export default defineComponent({
     });
     const search = ref('');
 
-    const getHours = (time: number): number => {
-      return Number(time / 1000 / 60 / 60)
+    const getStreamsOffset = (hltb_id: string, type: 'extra' | 'main' | 'completionist') => {
+      return streams.value
+        .filter(o => o.hltb_id === hltb_id && ((type === 'main' && o.isMainCounted) || (type === 'completionist' && o.isCompletionistCounted) || (type === 'extra' && o.isExtraCounted)))
+        .reduce((a,b) => a + b.offset, 0);
+    }
+
+    const getStreamsTimestamp = (hltb_id: string, type: 'extra' | 'main' | 'completionist') => {
+      return streams.value
+        .filter(o => o.hltb_id === hltb_id && ((type === 'main' && o.isMainCounted) || (type === 'completionist' && o.isCompletionistCounted) || (type === 'extra' && o.isExtraCounted)))
+        .reduce((a,b) => a + b.timestamp, 0);
     }
 
     const fItems = computed(() => {
@@ -130,33 +143,57 @@ export default defineComponent({
     const fields = [
       { key: 'thumbnail', label: '', },
       { key: 'game', label: translate('systems.hltb.game.name'), sortable: true },
+      { key: 'startedAt', label: translate('systems.hltb.startedAt.name'), sortable: true },
       { key: 'main', label: translate('systems.hltb.main.name')},
-      { key: 'completionist', label: translate('systems.hltb.completionis.name') },
+      { key: 'extra', label: translate('systems.hltb.extra.name')},
+      { key: 'completionist', label: translate('systems.hltb.completionist.name') },
       { key: 'show_details', label: '', },
     ];
 
     onMounted(() => {
-      socket.emit('generic::getAll::filter', { order: { startedAt: 'DESC' } }, (err: string | null, data: HowLongToBeatGameInterface[]) => {
+      socket.emit('generic::getAll', (err: string | null, _games: HowLongToBeatGameInterface[], _streams: HowLongToBeatGameItemInterface[]) => {
         if (err) {
           return error(err);
         }
-        items.value = data;
+        items.value = _games;
+        streams.value = _streams;
         state.value.loading = ButtonStates.success;
       })
     })
 
-    const myToggleTest = ref(true);
-    const myToggleTest2 = ref(false);
+    const timeToReadable = (data: { days: number; hours: number; minutes: number; seconds: number}) => {
+      const output = [];
+      if (data.days) {
+        output.push(`${data.days}d`)
+      }
+      if (data.hours) {
+        output.push(`${data.hours}h`)
+      }
+      if (data.minutes) {
+        output.push(`${data.minutes}m`)
+      }
+      if (data.seconds || output.length === 0) {
+        output.push(`${data.seconds}s`)
+      }
+      return output.join(' ');
+    }
+    const minutesFormatter = (value: number) => {
+      return (value < 0 ? '- ' : '+ ') + timeToReadable(timestampToObject(Math.abs(value)));
+    }
 
     return {
       items,
-      getHours,
+      streams,
       fields,
       state,
       search,
       fItems,
-      myToggleTest,
-      myToggleTest2,
+      getTime,
+      getStreamsTimestamp,
+      getStreamsOffset,
+      timeToReadable,
+      timestampToObject,
+      minutesFormatter
     }
   },
 })
