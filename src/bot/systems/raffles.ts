@@ -19,7 +19,6 @@ import { isDbConnected } from '../helpers/database';
 import { linesParsed } from '../helpers/parser';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { translate } from '../translate';
-
 const TYPE_NORMAL = 0;
 const TYPE_TICKETS = 1;
 
@@ -426,9 +425,6 @@ class Raffles extends System {
     if ((!_.isFinite(tickets) || tickets <= 0 || tickets < raffle.minTickets) && raffle.type === TYPE_TICKETS) {
       return false;
     }
-    if (tickets > raffle.maxTickets && raffle.type === TYPE_TICKETS) {
-      tickets = raffle.maxTickets;
-    }
     if (!_.isFinite(tickets)) {
       tickets = 0;
     }
@@ -440,10 +436,6 @@ class Raffles extends System {
     }
     let newTickets = curTickets + tickets;
 
-    if (newTickets > raffle.maxTickets) {
-      newTickets = raffle.maxTickets;
-    }
-
     const userPoints = await points.getPointsOf(opts.sender.userId);
     if (raffle.type === TYPE_TICKETS && userPoints < tickets) {
       if (this.allowOverTicketing) {
@@ -453,8 +445,8 @@ class Raffles extends System {
       }
     } // user doesn't have enough points
 
-    if (newTickets === 0) {
-      throw new Error('User want to join with 0 tickets');
+    if (newTickets > raffle.maxTickets && raffle.type === TYPE_TICKETS) {
+      newTickets = raffle.maxTickets;
     }
 
     const selectedParticipant = {
@@ -476,7 +468,7 @@ class Raffles extends System {
       selectedParticipant.isEligible = user.isSubscriber;
     }
 
-    if (selectedParticipant.isEligible) {
+    if (selectedParticipant.isEligible && selectedParticipant.tickets > 0) {
       if (announceNewEntriesTime === 0) {
         announceNewEntriesTime = Date.now() + this.announceNewEntriesBatchTime * 1000;
       }

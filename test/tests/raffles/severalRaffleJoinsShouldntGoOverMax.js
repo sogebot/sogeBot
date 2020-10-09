@@ -16,7 +16,7 @@ const raffles = (require('../../../dest/systems/raffles')).default;
 
 const assert = require('assert');
 
-describe('Raffles - user will lose points when join raffle with number and all #3587', () => {
+describe('Raffles - several raffle joins shouldnt go over max', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
@@ -44,6 +44,11 @@ describe('Raffles - user will lose points when join raffle with number and all #
     assert(a);
   });
 
+  it('Viewer bets max allowed points - again', async () => {
+    const a = await raffles.participate({ sender: user.viewer, message: '!winme 100' });
+    assert(a);
+  });
+
   it('expecting 2 participants to have bet of 100 and 50', async () => {
     const raffle = await getRepository(Raffle).findOne({
       relations: ['participants'],
@@ -66,39 +71,5 @@ describe('Raffles - user will lose points when join raffle with number and all #
       where: { username: user.viewer2.username },
     });
     assert.strictEqual(userFromDb.points, 150);
-  });
-
-  it('Viewer bets max points again with all', async () => {
-    const a = await raffles.participate({ sender: user.viewer, message: '!winme all' });
-    assert(a);
-  });
-
-  it('Viewer2 bets max points with all', async () => {
-    const a = await raffles.participate({ sender: user.viewer2, message: '!winme all' });
-    assert(a);
-  });
-
-  it('expecting 2 participants to have bet of 100', async () => {
-    const raffle = await getRepository(Raffle).findOne({
-      relations: ['participants'],
-      where: { winner: null, isClosed: false },
-    });
-    assert.strictEqual(raffle.participants.length, 2);
-    assert.strictEqual(raffle.participants[0].tickets, 100);
-    assert.strictEqual(raffle.participants[1].tickets, 100);
-  });
-
-  it('expecting viewer to still have 100 points', async () => {
-    const userFromDb = await getRepository(User).findOne({
-      where: { username: user.viewer.username },
-    });
-    assert.strictEqual(userFromDb.points, 100);
-  });
-
-  it('expecting viewer2 to have 100 points', async () => {
-    const userFromDb = await getRepository(User).findOne({
-      where: { username: user.viewer2.username },
-    });
-    assert.strictEqual(userFromDb.points, 100);
   });
 });
