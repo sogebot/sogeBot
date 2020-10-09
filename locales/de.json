@@ -929,11 +929,6 @@
       "remove": "{core.command-parse} $command [username] [amount]"
     },
     "defaults": {
-      "pointsName": {
-        "single": "Punkt",
-        "multi": "Punkte",
-        "xmulti": ""
-      },
       "pointsResponse": "$username hat derzeit $amount $pointsName. Ihre Position ist $order/$count."
     }
   },
