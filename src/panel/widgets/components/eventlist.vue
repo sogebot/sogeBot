@@ -202,7 +202,7 @@ export default {
       widgetEventlistTips: toBoolean(localStorage.getItem('widgetEventlistTips') ? localStorage.getItem('widgetEventlistTips') : true),
     }
 
-    this.eventlistShow = Number(localStorage.getItem('widgetEventlistShow') ? localStorage.getItem('widgetEventlistShow') : 5),
+    this.eventlistShow = Number(localStorage.getItem('widgetEventlistShow') ? localStorage.getItem('widgetEventlistShow') : 100),
     this.eventlistSize = Number(localStorage.getItem('widgetEventlistSize') ? localStorage.getItem('widgetEventlistSize') : 20),
     this.eventlistMessageSize = Number(localStorage.getItem('widgetEventlistMessageSize') ? localStorage.getItem('widgetEventlistMessageSize') : 15),
     console.group('Eventlist widgets settings')
