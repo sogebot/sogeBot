@@ -14,7 +14,7 @@ export class keywordMultipleResponses1602413333619 implements MigrationInterface
 
     for (const keyword of keywords) {
       await queryRunner.query(
-        'INSERT INTO `keyword_responses`(`id`, `order`, `response`, `stopIfExecuted`, `permission`, `filter`, `keywordId`) values(\'${uuid()}\', 0, \'' + keyword.response + '\', 0, \'0efd7b1c-e460-4167-8e06-8aaf2c170311\', \'\', \'' + keyword.id + '\')');
+        'INSERT INTO `keyword_responses`(`id`, `order`, `response`, `stopIfExecuted`, `permission`, `filter`, `keywordId`) values(\'' + uuid() + '\', 0, \'' + keyword.response + '\', 0, \'0efd7b1c-e460-4167-8e06-8aaf2c170311\', \'\', \'' + keyword.id + '\')');
     }
   }
 
