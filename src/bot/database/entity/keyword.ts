@@ -19,7 +19,7 @@ export interface KeywordsResponsesInterface {
 export const Keyword = new EntitySchema<Readonly<Required<KeywordInterface>>>({
   name: 'keyword',
   columns: {
-    id: { type: String, primary: true, generated: 'uuid' },
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
     keyword: { type: String },
     enabled: { type: Boolean },
   },
