@@ -130,7 +130,7 @@ const main = async () => {
         { path: '/manage/events/list', name: 'EventsManagerList', component: () => import('./views/managers/events/list.vue') },
         { path: '/manage/events/edit/:id?', name: 'EventsManagerEdit', component: () => import('./views/managers/events/edit.vue') },
         { path: '/manage/keywords/', redirect: '/manage/keywords/list' },
-        { path: '/manage/keywords/list', name: 'KeywordsManager', component: () => import('./views/managers/keyword.vue') },
+        { path: '/manage/keywords/list', name: 'KeywordsManagerList', component: () => import('./views/managers/keyword.vue') },
         { path: '/manage/keywords/edit/:id?', name: 'KeywordsManagerEdit', component: () => import('./views/managers/keyword.vue') },
         { path: '/manage/price/', redirect: '/manage/price/list' },
         { path: '/manage/price/list', name: 'PriceManager', component: () => import('./views/managers/price.vue') },

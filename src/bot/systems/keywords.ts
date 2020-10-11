@@ -1,26 +1,19 @@
-import { v4 as uuidv4 } from 'uuid';
 import Expects from '../expects';
-import Message from '../message';
-import { command, default_permission, parser } from '../decorators';
-import { permission } from '../helpers/permissions';
+import { command, default_permission, helper, parser } from '../decorators';
+import { addToViewersCache, getFromViewersCache, permission } from '../helpers/permissions';
 import System from './_interface';
 import { isUUID, parserReply, prepare } from '../commons';
 import XRegExp from 'xregexp';
-import { debug, error } from '../helpers/log';
+import { debug, error, warning } from '../helpers/log';
 
-import { Keyword, KeywordInterface } from '../database/entity/keyword';
+import { Keyword, KeywordInterface, KeywordsResponsesInterface } from '../database/entity/keyword';
 import { getRepository } from 'typeorm';
 import { adminEndpoint } from '../helpers/socket';
 import { translate } from '../translate';
+import permissions from '../permissions';
+import _ from 'lodash';
+import { checkFilter } from '../helpers/checkFilter';
 
-/*
- * !keyword                                     - gets an info about keyword usage
- * !keyword add -k [regexp] -r [response]       - add keyword with specified response
- * !keyword edit -k [uuid|regexp] -r [response] - edit keyword with specified response
- * !keyword remove -k [uuid|regexp]             - remove specified keyword
- * !keyword toggle -k [uuid|regexp]             - enable/disable specified keyword
- * !keyword list                                - get keywords list
- */
 class Keywords extends System {
   constructor() {
     super();
@@ -28,12 +21,17 @@ class Keywords extends System {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'keywords::save', async (dataset, cb) => {
+    adminEndpoint(this.nsp, 'generic::setById', async (opts, cb) => {
       try {
-        const item = await getRepository(Keyword).save(dataset);
-        cb(null, item);
+        const item = await getRepository(Keyword).findOne({ id: String(opts.id) });
+        await getRepository(Keyword).save({ ...item, ...opts.item});
+        if (typeof cb === 'function') {
+          cb(null, item);
+        }
       } catch (e) {
-        cb (e, null);
+        if (typeof cb === 'function') {
+          cb(e.stack);
+        }
       }
     });
     adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
@@ -45,6 +43,7 @@ class Keywords extends System {
     adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         const items = await getRepository(Keyword).find({
+          relations: ['responses'],
           order: {
             keyword: 'ASC',
           },
@@ -55,12 +54,13 @@ class Keywords extends System {
       }
     });
     adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
-      cb(null, await getRepository(Keyword).findOne({ id: String(id) }));
+      cb(null, await getRepository(Keyword).findOne({ where: { id: String(id) }, relations: ['responses'] }));
     });
   }
 
   @command('!keyword')
   @default_permission(permission.CASTERS)
+  @helper()
   public main(opts: CommandOptions): CommandResponse[] {
     let url = 'http://sogehige.github.io/sogeBot/#/systems/keywords';
     if ((process.env?.npm_package_version ?? 'x.y.z-SNAPSHOT').includes('SNAPSHOT')) {
@@ -80,19 +80,41 @@ class Keywords extends System {
   @default_permission(permission.CASTERS)
   public async add(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
-      const [keywordRegex, response]
-        = new Expects(opts.parameters)
-          .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
-          .argument({ name: 'r', optional: false, multi: true, delimiter: '' })
-          .toArray();
-      const data: Required<KeywordInterface> = {
-        id: uuidv4(),
-        keyword: keywordRegex,
-        response,
-        enabled: true,
-      };
-      await getRepository(Keyword).save(data);
-      return [{ response: prepare('keywords.keyword-was-added', data), ...opts }];
+      const [userlevel, stopIfExecuted, keywordRegex, response] = new Expects(opts.parameters)
+        .permission({ optional: true, default: permission.VIEWERS })
+        .argument({ optional: true, name: 's', default: false, type: Boolean })
+        .argument({ name: 'k', type: String, multi: true, delimiter: '' })
+        .argument({ name: 'r', type: String, multi: true, delimiter: '' })
+        .toArray();
+
+      const kDb = await getRepository(Keyword).findOne({
+        relations: ['responses'],
+        where: {
+          keyword: keywordRegex,
+        },
+      });
+      if (!kDb) {
+        await getRepository(Keyword).save({ keyword: keywordRegex, enabled: true });
+        return this.add(opts);
+      }
+
+      const pItem = await permissions.get(userlevel);
+      if (!pItem) {
+        throw Error('Permission ' + userlevel + ' not found.');
+      }
+
+      await getRepository(Keyword).save({
+        ...kDb,
+        responses: [...kDb.responses, {
+          order: kDb.responses.length,
+          permission: pItem.id ?? permission.VIEWERS,
+          stopIfExecuted: stopIfExecuted,
+          response: response,
+          filter: '',
+        }],
+      });
+
+      return [{ response: prepare('keywords.keyword-was-added', kDb), ...opts }];
     } catch (e) {
       error(e.stack);
       return [{ response: prepare('keywords.keyword-parse-failed'), ...opts }];
@@ -110,17 +132,19 @@ class Keywords extends System {
   @default_permission(permission.CASTERS)
   public async edit(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
-      const [keywordRegexOrUUID, response]
-        = new Expects(opts.parameters)
-          .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
-          .argument({ name: 'r', optional: false, multi: true, delimiter: '' })
-          .toArray();
+      const [userlevel, stopIfExecuted, keywordRegexOrUUID, rId, response] = new Expects(opts.parameters)
+        .permission({ optional: true, default: permission.VIEWERS })
+        .argument({ optional: true, name: 's', default: null, type: Boolean })
+        .argument({ name: 'k', type: String, multi: true, delimiter: '' })
+        .argument({ name: 'rid', type: Number })
+        .argument({ name: 'r', type: String, multi: true, delimiter: '' })
+        .toArray();
 
       let keywords: Required<KeywordInterface>[] = [];
       if (isUUID(keywordRegexOrUUID)) {
-        keywords = await getRepository(Keyword).find({ where: { id: keywordRegexOrUUID } });
+        keywords = await getRepository(Keyword).find({ where: { id: keywordRegexOrUUID }, relations: ['responses'] });
       } else {
-        keywords = await getRepository(Keyword).find({ where: { keyword: keywordRegexOrUUID } });
+        keywords = await getRepository(Keyword).find({ where: { keyword: keywordRegexOrUUID }, relations: ['responses'] });
       }
 
       if (keywords.length === 0) {
@@ -128,9 +152,24 @@ class Keywords extends System {
       } else if (keywords.length > 1) {
         return [{ response: prepare('keywords.keyword-is-ambiguous'), ...opts }];
       } else {
-        keywords[0].response = response;
-        await getRepository(Keyword).save(keywords);
-        return [{ response: prepare('keywords.keyword-was-edited', keywords[0]), ...opts }];
+        const keyword = keywords[0];
+        const responseDb = keyword.responses.find(o => o.order === (rId - 1));
+        if (!responseDb) {
+          return [{ response: prepare('keywords.response-was-not-found', { keyword: keyword.keyword, response: rId }), ...opts }];
+        }
+
+        const pItem = await permissions.get(userlevel);
+        if (!pItem) {
+          throw Error('Permission ' + userlevel + ' not found.');
+        }
+
+        responseDb.response = response;
+        responseDb.permission = pItem.id ?? permission.VIEWERS;
+        if (stopIfExecuted) {
+          responseDb.stopIfExecuted = stopIfExecuted;
+        }
+        await getRepository(Keyword).save(keyword);
+        return [{ response: prepare('keywords.keyword-was-edited', { keyword, response }), ...opts }];
       }
     } catch (e) {
       error(e.stack);
@@ -147,24 +186,32 @@ class Keywords extends System {
   @command('!keyword list')
   @default_permission(permission.CASTERS)
   public async list(opts: CommandOptions): Promise<CommandResponse[]> {
-    const keywords = await getRepository(Keyword).find({ order: { keyword: 'ASC' } });
-    const list = keywords.map((o) => {
-      return `${o.enabled ? '🗹' : '☐'} ${o.id} | ${o.keyword} | ${o.response}`;
-    });
-
-    const responses: CommandResponse[] = [];
-    if (keywords.length === 0) {
-      responses.push({ response: prepare('keywords.list-is-empty'), ...opts });
+    const keyword = new Expects(opts.parameters).everything({ optional: true }).toArray()[0];
+    if (!keyword) {
+      // print keywords
+      const keywords = await getRepository(Keyword).find({
+        where: { visible: true, enabled: true },
+      });
+      const response = (keywords.length === 0 ? translate('keywords.list-is-empty') : translate('customcmds.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(keywords, 'keyword'), 'keyword').join(', ')));
+      return [{ response, ...opts }];
     } else {
-      responses.push({ response: prepare('keywords.list-is-not-empty'), ...opts });
-    }
+      // print responses
+      const keyword_with_responses
+        = await getRepository(Keyword).findOne({
+          relations: ['responses'],
+          where: isUUID(keyword) ? { id: keyword } : { keyword },
+        });
 
-    for (let i = 0; i < list.length; i++) {
-      responses.push({ response: list[i], ...opts });
+      if (!keyword_with_responses || keyword_with_responses.responses.length === 0) {
+        return [{ response: prepare('keywords.list-of-responses-is-empty', { keyword: keyword_with_responses?.keyword || keyword }), ...opts }];
+      }
+      return Promise.all(_.orderBy(keyword_with_responses.responses, 'order', 'asc').map(async(r) => {
+        const perm = await permissions.get(r.permission);
+        const response = prepare('keywords.response', { command: keyword_with_responses.keyword, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: perm?.name ?? 'n/a' });
+        return { response, ...opts };
+      }));
     }
-    return responses;
   }
-
 
   /**
    * Remove keyword
@@ -177,9 +224,10 @@ class Keywords extends System {
   @default_permission(permission.CASTERS)
   public async remove(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
-      const [keywordRegexOrUUID]
+      const [keywordRegexOrUUID, rId]
         = new Expects(opts.parameters)
           .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
+          .argument({ name: 'rid', optional: true, type: Number })
           .toArray();
 
       let keywords: Required<KeywordInterface>[] = [];
@@ -194,8 +242,28 @@ class Keywords extends System {
       } else if (keywords.length > 1) {
         return [{ response: prepare('keywords.keyword-is-ambiguous'), ...opts }];
       } else {
-        await getRepository(Keyword).remove(keywords);
-        return [{ response: prepare('keywords.keyword-was-removed', keywords[0]), ...opts }];
+        const keyword = keywords[0];
+        if (rId) {
+          const responseDb = keyword.responses.find(o => o.order === (rId - 1));
+          if (!responseDb) {
+            return [{ response: prepare('keywords.response-was-not-found'), ...opts }];
+          }
+          // remove and reorder
+          const responses = [];
+          for (let i = 0; i < keyword.responses.length; i++) {
+            if (responseDb.id !== _.orderBy(keyword.responses, 'order', 'asc')[i].id) {
+              responses.push({
+                ..._.orderBy(keyword.responses, 'order', 'asc')[i],
+                order: responses.length,
+              });
+            }
+          }
+          await getRepository(Keyword).save({ ...keyword, responses });
+          return [{ response: prepare('keywords.response-was-removed', keyword), ...opts }];
+        } else {
+          await getRepository(Keyword).remove(keyword);
+          return [{ response: prepare('keywords.keyword-was-removed', keyword), ...opts }];
+        }
       }
     } catch (e) {
       error(e.stack);
@@ -254,28 +322,47 @@ class Keywords extends System {
       return true;
     }
 
-    const keywords = (await getRepository(Keyword).find()).filter((o) => {
+    const keywords = (await getRepository(Keyword).find({ relations: ['responses']})).filter((o) => {
       const regexp = `([!"#$%&'()*+,-.\\/:;<=>?\\b\\s]${o.keyword}[!"#$%&'()*+,-.\\/:;<=>?\\b\\s])|(^${o.keyword}[!"#$%&'()*+,-.\\/:;<=>?\\b\\s])|([!"#$%&'()*+,-.\\/:;<=>?\\b\\s]${o.keyword}$)|(^${o.keyword}$)`;
       const isFoundInMessage = XRegExp(regexp, 'giu').test(opts.message);
       const isEnabled = o.enabled;
       debug('keywords.run', `\n\t<\t${opts.message}\n\t?\t${o.keyword}\n\t-\tisFoundInMessage: ${isFoundInMessage}, isEnabled: ${isEnabled}\n\t-\t${regexp}`);
+      if (isFoundInMessage && !isEnabled) {
+        warning(`Keyword ${o.keyword} (${o.id}) is disabled!`);
+      }
       return isFoundInMessage && isEnabled;
     });
 
+    let atLeastOnePermissionOk = false;
     for (const k of keywords) {
-      const message = await (new Message(k.response).parse({ sender: opts.sender }));
-      debug('keywords.run', {k, message});
-      if (opts.sender.discord) {
-        const messageToSend = await new Message(await message).parse({
-          forceWithoutAt: true, // we dont need @
-          sender: { ...opts.sender, username: opts.sender.discord.author },
-        }) as string;
-        opts.sender.discord.channel.send(messageToSend);
-      } else {
-        parserReply(message, opts);
+      const _responses: KeywordsResponsesInterface[] = [];
+      for (const r of _.orderBy(k.responses, 'order', 'asc')) {
+        if (typeof getFromViewersCache(opts.sender.userId, r.permission) === 'undefined') {
+          addToViewersCache(opts.sender.userId, r.permission, (await permissions.check(opts.sender.userId, r.permission, false)).access);
+        }
+
+        if (getFromViewersCache(opts.sender.userId, r.permission)
+            && await checkFilter(opts, r.filter)) {
+          _responses.push(r);
+          atLeastOnePermissionOk = true;
+          if (r.stopIfExecuted) {
+            break;
+          }
+        }
       }
+
+      this.sendResponse(_.cloneDeep(_responses), { sender: opts.sender });
     }
-    return true;
+
+    return atLeastOnePermissionOk;
+  }
+
+  sendResponse(responses: (KeywordsResponsesInterface)[], opts: { sender: CommandOptions['sender'] }) {
+    for (let i = 0; i < responses.length; i++) {
+      setTimeout(async () => {
+        parserReply(await responses[i].response, opts);
+      }, i * 500);
+    }
   }
 }
 

@@ -261,16 +261,12 @@ export default defineComponent({
   components: {
     loading: () => import('../../components/loading.vue'),
     'text-with-tags': () => import('../../components/textWithTags.vue'),
-    'hold-button': () => import('../../components/holdButton.vue'),
   },
   filters: {
     capitalize (value: string) {
       if (!value) return ''
       value = value.toString()
       return value.charAt(0).toUpperCase() + value.slice(1)
-    },
-    onlyCommand (val: string) {
-      return val.split(' ')[0]
     },
   },
   validations: {
@@ -506,6 +502,20 @@ export default defineComponent({
         })
       }
     }
+    const moveUpResponse = (order: number) => {
+      editationItem.value?.responses?.filter((o) => o.order === order - 1 || o.order === order).map(o => {
+        if (o.order === order - 1) o.order++
+        else o.order--
+        return o
+      })
+    };
+    const moveDownResponse = (order: number) => {
+      editationItem.value?.responses?.filter((o) => o.order === order + 1 || o.order === order).map(o => {
+        if (o.order === order + 1) o.order--
+        else o.order++
+        return o
+      })
+    }
 
     return {
       orderBy,
@@ -528,7 +538,9 @@ export default defineComponent({
       newItem,
       del,
       deleteResponse,
-      resetCount
+      resetCount,
+      moveUpResponse,
+      moveDownResponse,
     }
   },
 });
