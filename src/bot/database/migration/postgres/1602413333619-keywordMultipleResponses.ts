@@ -9,7 +9,10 @@ export class keywordMultipleResponses1602413333619 implements MigrationInterface
     const keywords = await queryRunner.query(`SELECT * from "keyword"`);
 
     await queryRunner.query(`ALTER TABLE "keyword" DROP COLUMN "response"`);
-    await queryRunner.query(`CREATE TABLE "keyword_responses" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "order" integer NOT NULL, "response" character varying NOT NULL, "stopIfExecuted" boolean NOT NULL, "permission" character varying NOT NULL, "filter" character varying NOT NULL, "keywordId" uuid, CONSTRAINT "PK_3049091cd170cc88ad38bcca63f" PRIMARY KEY ("id"))`, undefined);
+    await queryRunner.query(`CREATE TABLE "keyword_responses" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "order" integer NOT NULL, "response" text, "stopIfExecuted" boolean NOT NULL, "permission" character varying NOT NULL, "filter" character varying NOT NULL, "keywordId" character varying, CONSTRAINT "PK_3049091cd170cc88ad38bcca63f" PRIMARY KEY ("id"))`, undefined);
+    await queryRunner.query(`ALTER TABLE "keyword_responses" DROP CONSTRAINT "FK_d12716a3805d58dd75ab09c8c67"`);
+    await queryRunner.query(`ALTER TABLE "keyword_responses" ADD CONSTRAINT "FK_d12716a3805d58dd75ab09c8c67" FOREIGN KEY ("keywordId") REFERENCES "keyword"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
+
     await queryRunner.query(`ALTER TABLE "keyword_responses" ADD CONSTRAINT "FK_d12716a3805d58dd75ab09c8c67" FOREIGN KEY ("keywordId") REFERENCES "keyword"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
     for (const keyword of keywords) {
       await queryRunner.query(
