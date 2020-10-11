@@ -21,7 +21,8 @@ function randomString() {
 function generateCommand(opts) {
   const k = opts.keyword ? '-k ' + opts.keyword : null;
   const r = opts.response ? '-r ' + opts.response : null;
-  return [k, r].join(' ').trim();
+  const rid = typeof opts.rid !== 'undefined' ? '-rId ' + opts.rid : null;
+  return [k, r, rid].join(' ').trim();
 }
 
 const failedTests = [
@@ -152,7 +153,7 @@ describe('Keywords - basic worflow (add, run, edit)', () => {
             case 'edit':
               it (`edit() | ${test.response} => ${test.editResponse}`, async () => {
                 test.response = test.editResponse;
-                const r = await keywords.edit({ sender: owner, parameters: generateCommand({...test, ...t}) });
+                const r = await keywords.edit({ sender: owner, parameters: generateCommand({...test, ...t, rid: 1}) });
                 assert.strictEqual(r[0].response, `$sender, keyword ${test.keyword} is changed to '${test.response}'`);
               });
               break;

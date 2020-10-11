@@ -214,25 +214,7 @@ engine.
 
 ### Available filters
 
-| Filter variable      | Description                           |
-| ---------------------|:--------------------------------------|
-| `$sender`            | username of user triggered command    |
-| `$source`            | source of command (twitch or discord) |
-| `$is.moderator`      | is current user moderator             |
-| `$is.subscriber`     | is current user subscriber            |
-| `$is.vip`            | is current user vip                   |
-| `$is.follower`       | is current user follower              |
-| `$is.broadcaster`    | is current user broadcaster           |
-| `$is.bot`            | is current user bot                   |
-| `$is.owner`          | is current user owner                 |
-| `$rank`              | current rank of user                  |
-| `$game`              | current game                          |
-| `$title`             | current title                         |
-| `$views`             | current views count                   |
-| `$followers`         | current followers count               |
-| `$hosts`             | current hosts count                   |
-| `$subscribers`       | current subscribers count             |
-| `$_<customVariable>` | custom variable                       |
+Available filters can be found in UI.
 
 #### Examples
 

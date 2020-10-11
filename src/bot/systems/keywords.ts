@@ -78,7 +78,7 @@ class Keywords extends System {
    */
   @command('!keyword add')
   @default_permission(permission.CASTERS)
-  public async add(opts: CommandOptions): Promise<CommandResponse[]> {
+  public async add(opts: CommandOptions): Promise<(CommandResponse & { id: string | null })[]> {
     try {
       const [userlevel, stopIfExecuted, keywordRegex, response] = new Expects(opts.parameters)
         .permission({ optional: true, default: permission.VIEWERS })
@@ -89,9 +89,7 @@ class Keywords extends System {
 
       const kDb = await getRepository(Keyword).findOne({
         relations: ['responses'],
-        where: {
-          keyword: keywordRegex,
-        },
+        where: { keyword: keywordRegex },
       });
       if (!kDb) {
         await getRepository(Keyword).save({ keyword: keywordRegex, enabled: true });
@@ -113,11 +111,10 @@ class Keywords extends System {
           filter: '',
         }],
       });
-
-      return [{ response: prepare('keywords.keyword-was-added', kDb), ...opts }];
+      return [{ response: prepare('keywords.keyword-was-added', kDb), ...opts, id: kDb.id }];
     } catch (e) {
       error(e.stack);
-      return [{ response: prepare('keywords.keyword-parse-failed'), ...opts }];
+      return [{ response: prepare('keywords.keyword-parse-failed'), ...opts, id: null }];
     }
   }
 
@@ -169,7 +166,7 @@ class Keywords extends System {
           responseDb.stopIfExecuted = stopIfExecuted;
         }
         await getRepository(Keyword).save(keyword);
-        return [{ response: prepare('keywords.keyword-was-edited', { keyword, response }), ...opts }];
+        return [{ response: prepare('keywords.keyword-was-edited', { keyword: keyword.keyword, response }), ...opts }];
       }
     } catch (e) {
       error(e.stack);
@@ -190,9 +187,9 @@ class Keywords extends System {
     if (!keyword) {
       // print keywords
       const keywords = await getRepository(Keyword).find({
-        where: { visible: true, enabled: true },
+        where: { enabled: true },
       });
-      const response = (keywords.length === 0 ? translate('keywords.list-is-empty') : translate('customcmds.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(keywords, 'keyword'), 'keyword').join(', ')));
+      const response = (keywords.length === 0 ? translate('keywords.list-is-empty') : translate('keywords.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(keywords, 'keyword'), 'keyword').join(', ')));
       return [{ response, ...opts }];
     } else {
       // print responses
@@ -207,7 +204,7 @@ class Keywords extends System {
       }
       return Promise.all(_.orderBy(keyword_with_responses.responses, 'order', 'asc').map(async(r) => {
         const perm = await permissions.get(r.permission);
-        const response = prepare('keywords.response', { command: keyword_with_responses.keyword, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: perm?.name ?? 'n/a' });
+        const response = prepare('keywords.response', { keyword: keyword_with_responses.keyword, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: perm?.name ?? 'n/a' });
         return { response, ...opts };
       }));
     }

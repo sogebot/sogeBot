@@ -14,69 +14,35 @@ const { User } = require('../../../dest/database/entity/user');
 // users
 const owner = { username: 'soge__', userId: Math.floor(Math.random() * 100000) };
 
-const keywordsList = [
-  { keyword: 'slqca', response: 'hptqm', enabled: Math.random() >= 0.5 },
-  { keyword: 'urfiu', response: 'mtcjt', enabled: Math.random() >= 0.5 },
-  { keyword: 'frqzw', response: 'lordw', enabled: Math.random() >= 0.5 },
-  { keyword: 'awpgh', response: 'powyc', enabled: Math.random() >= 0.5 },
-  { keyword: 'tanhq', response: 'tlygw', enabled: Math.random() >= 0.5 },
-  { keyword: 'nvgqy', response: 'vjkvb', enabled: Math.random() >= 0.5 },
-  { keyword: 'yulym', response: 'cvhis', enabled: Math.random() >= 0.5 },
-  { keyword: 'xgbxs', response: 'fdezi', enabled: Math.random() >= 0.5 },
-  { keyword: 'grgju', response: 'lgexv', enabled: Math.random() >= 0.5 },
-  { keyword: 'mwhpv', response: 'pmuex', enabled: Math.random() >= 0.5 },
-];
-
-describe('Keywords - listing', () => {
-  describe('Listing without any keywords', () => {
-    before(async () => {
-      await db.cleanup();
-      await message.prepare();
-      await getRepository(User).save({ username: owner.username, userId: owner.userId });
-    });
-
-    it('Expecting empty list', async () => {
-      const r = await keywords.list({ sender: owner, parameters: '' });
-      assert.strictEqual(r[0].response, '$sender, list of keywords is empty');
-    });
+describe('Keywords - list()', () => {
+  beforeEach(async () => {
+    await db.cleanup();
+    await message.prepare();
   });
 
-  describe('Listing with keywords', () => {
-    before(async () => {
-      await db.cleanup();
-      await message.prepare();
-    });
+  it('empty list', async () => {
+    const r = await keywords.list({ sender: owner, parameters: '' });
+    assert.strictEqual(r[0].response, '$sender, list of keywords is empty');
+  });
 
-    for(const k of keywordsList) {
-      it (`Creating random keyword | ${k.keyword} | ${k.response}`, async () => {
-        const r = await keywords.add({ sender: owner, parameters: `-k ${k.keyword} -r ${k.response}` });
-        const keyword = await getRepository(Keyword).findOne({ keyword: k.keyword });
-        assert.strictEqual(r[0].response, `$sender, keyword ${k.keyword} (${keyword.id}) was added`);
-        await getRepository(Keyword).update({ id: keyword.id }, { enabled: k.enabled });
-      });
-    }
+  it('populated list', async () => {
+    const r = await keywords.add({ sender: owner, parameters: '-p casters -k a -r me' });
+    assert.strictEqual(r[0].response, `$sender, keyword a (${r[0].id}) was added`);
 
-    it('Expected populated list', async () => {
-      const r = await keywords.list({ sender: owner, parameters: '' });
-      assert.strictEqual(r[0].response, '$sender, list of keywords');
+    const r2 = await keywords.add({ sender: owner, parameters: '-p moderators -s true -k a -r me2' });
+    assert.strictEqual(r2[0].response, `$sender, keyword a (${r2[0].id}) was added`);
 
-      let i = 0;
-      for(const k of keywordsList.sort((a, b) => {
-        const nameA = a.keyword.toUpperCase(); // ignore upper and lowercase
-        const nameB = b.keyword.toUpperCase(); // ignore upper and lowercase
-        if (nameA < nameB) {
-          return -1;
-        }
-        if (nameA > nameB) {
-          return 1;
-        }
+    const r3 = await keywords.add({ sender: owner, parameters: '-k b -r me' });
+    assert.strictEqual(r3[0].response, `$sender, keyword b (${r3[0].id}) was added`);
 
-        // names must be equal
-        return 0;
-      })) {
-        const keyword = await getRepository(Keyword).findOne({ keyword: k.keyword });
-        assert.strictEqual(r[++i].response, `${k.enabled ? '🗹' : '☐'} ${keyword.id} | ${k.keyword} | ${k.response}`, JSON.stringify({k, r, i}, undefined, 2));
-      };
-    });
+    const r4 = await keywords.list({ sender: owner, parameters: '' });
+    assert.strictEqual(r4[0].response, '$sender, list of keywords: a, b');
+
+    const r5 = await keywords.list({ sender: owner, parameters: 'a' });
+    assert.strictEqual(r5[0].response, 'a#1 (Casters) v| me');
+    assert.strictEqual(r5[1].response, 'a#2 (Moderators) _| me2');
+
+    const r6 = await keywords.list({ sender: owner, parameters: 'asdsad' });
+    assert.strictEqual(r6[0].response, '$sender, asdsad have no responses or doesn\'t exists');
   });
 });
