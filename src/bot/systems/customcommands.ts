@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import XRegExp from 'xregexp';
-import safeEval from 'safe-eval';
 
 import { command, default_permission, helper } from '../decorators';
 import { permission } from '../helpers/permissions';
@@ -8,31 +7,28 @@ import System from './_interface';
 import * as constants from '../constants';
 import { parser } from '../decorators';
 import Expects from '../expects';
-import { isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, parserReply, prepare } from '../commons';
+import { parserReply, prepare } from '../commons';
 import { getAllCountOfCommandUsage, getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage } from '../helpers/commands/count';
 
 import { warning } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
 import { Commands, CommandsInterface, CommandsResponsesInterface } from '../database/entity/commands';
-import { User } from '../database/entity/user';
 import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
-import api from '../api';
 import permissions from '../permissions';
 import { translate } from '../translate';
-import ranks from './ranks';
-import customvariables from '../customvariables';
+import { checkFilter } from '../helpers/checkFilter';
 
 /*
- * !command                                                                 - gets an info about command usage
- * !command add (-p [uuid|name]) ?-s true|false ![cmd] [response]           - add command with specified response
- * !command edit (-p [uuid|name]) ?-s true|false ![cmd] [number] [response] - edit command with specified response
- * !command remove ![cmd]                                                   - remove specified command
- * !command remove ![cmd] [number]                                          - remove specified response of command
- * !command toggle ![cmd]                                                   - enable/disable specified command
- * !command toggle-visibility ![cmd]                                        - enable/disable specified command
- * !command list                                                            - get commands list
- * !command list ![cmd]                                                     - get responses of command
+ * !command                                                                            - gets an info about command usage
+ * !command add (-p [uuid|name]) ?-s true|false -c ![cmd] -r [response]                - add command with specified response
+ * !command edit (-p [uuid|name]) ?-s true|false -c ![cmd] -rid [number] -r [response] - edit command with specified response
+ * !command remove -c ![cmd]                                                           - remove specified command
+ * !command remove -c ![cmd] -rid [number]                                             - remove specified response of command
+ * !command toggle ![cmd]                                                              - enable/disable specified command
+ * !command toggle-visibility ![cmd]                                                   - enable/disable specified command
+ * !command list                                                                       - get commands list
+ * !command list ![cmd]                                                                - get responses of command
  */
 
 let cacheValid = false;
@@ -112,7 +108,11 @@ class CustomCommands extends System {
   @default_permission(permission.CASTERS)
   @helper()
   main (opts: CommandOptions) {
-    return [{ response: translate('core.usage') + ': !command add (-p [uuid|name]) (-s=true|false) <!cmd> <response> | !command edit (-p [uuid|name]) (-s=true|false) <!cmd> <number> <response> | !command remove <!command> | !command remove <!command> <number> | !command list | !command list <!command>', ...opts }];
+    let url = 'http://sogehige.github.io/sogeBot/#/systems/custom-commands';
+    if ((process.env?.npm_package_version ?? 'x.y.z-SNAPSHOT').includes('SNAPSHOT')) {
+      url = 'http://sogehige.github.io/sogeBot/#/_master/systems/custom-commands';
+    }
+    return [{ response: translate('core.usage') + ' => ' + url, ...opts }];
   }
 
   @command('!command edit')
@@ -283,7 +283,7 @@ class CustomCommands extends System {
         }
 
         if (getFromViewersCache(opts.sender.userId, r.permission)
-            && await this.checkFilter(opts, r.filter)) {
+            && await checkFilter(opts, r.filter)) {
           _responses.push(r);
           atLeastOnePermissionOk = true;
           if (r.stopIfExecuted) {
@@ -328,7 +328,7 @@ class CustomCommands extends System {
         });
 
       if (!command_with_responses || command_with_responses.responses.length === 0) {
-        return [{ response: prepare('customcmdustomcmds.list-of-responses-is-empty', { command: cmd }), ...opts }];
+        return [{ response: prepare('customcmds.list-of-responses-is-empty', { command: cmd }), ...opts }];
       }
       return Promise.all(_.orderBy(command_with_responses.responses, 'order', 'asc').map(async(r) => {
         const perm = await permissions.get(r.permission);
@@ -403,61 +403,6 @@ class CustomCommands extends System {
     } catch (e) {
       return [{ response: prepare('customcmds.commands-parse-failed'), ...opts }];
     }
-  }
-
-  async checkFilter (opts: CommandOptions | ParserOptions, filter: string): Promise<boolean> {
-    if (typeof filter === 'undefined' || filter.trim().length === 0) {
-      return true;
-    }
-    const toEval = `(function evaluation () { return ${filter} })()`;
-
-    const $userObject = await getRepository(User).findOne({ userId: opts.sender.userId });
-    if (!$userObject) {
-      await getRepository(User).save({
-        userId: opts.sender.userId,
-        username: opts.sender.username,
-      });
-      return this.checkFilter(opts, filter);
-    }
-    let $rank: string | null = null;
-    if (ranks.enabled) {
-      const rank = await ranks.get($userObject);
-      $rank = typeof rank.current === 'string' || rank.current === null ? rank.current : rank.current.rank;
-    }
-
-    const $is = {
-      moderator: isModerator($userObject),
-      subscriber: isSubscriber($userObject),
-      vip: isVIP($userObject),
-      broadcaster: isBroadcaster(opts.sender.username),
-      bot: isBot(opts.sender.username),
-      owner: isOwner(opts.sender.username),
-    };
-
-    const customVariables = customvariables.getAll();
-    const context = {
-      $source: typeof opts.sender.discord === 'undefined' ? 'twitch' : 'discord',
-      $sender: opts.sender.username,
-      $is,
-      $rank,
-      $haveParam: opts.parameters.length > 0,
-      // add global variables
-      $game: api.stats.currentGame || 'n/a',
-      $language: api.stats.language || 'en',
-      $title: api.stats.currentTitle || 'n/a',
-      $views: api.stats.currentViews,
-      $followers: api.stats.currentFollowers,
-      $hosts: api.stats.currentHosts,
-      $subscribers: api.stats.currentSubscribers,
-      ...customVariables,
-    };
-    let result = false;
-    try {
-      result = safeEval(toEval, {...context, _});
-    } catch (e) {
-      // do nothing
-    }
-    return !!result; // force boolean
   }
 }
 
