@@ -891,15 +891,15 @@
     "keyword-parse-failed": "{core.command-parse} !keyword",
     "keyword-is-ambiguous": "$sender, klíčové slovo $keyword je nejednoznačné, použijte ID klíčového slova",
     "keyword-was-not-found": "$sender, klíčové slovo $keyword nebylo nalezeno v databázi",
-    "response-was-not-found": "$sender, response #$response of keyword $keyword was not found in database",
+    "response-was-not-found": "$sender, odpověď #$response klíčového slova $keyword nebyla nalezena",
     "keyword-was-edited": "$sender, klíčové slovo $keyword je změněno na '$response'",
     "keyword-was-added": "$sender, klíčové slovo $keyword ($id) bylo přidáno",
-    "list-is-not-empty": "$sender, list of keywords: $list",
+    "list-is-not-empty": "$sender, seznam klíčových slov: $list",
     "list-is-empty": "$sender, seznam klíčových slov je prázdný",
     "keyword-was-enabled": "$sender, keyword $keyword byl zapnut",
     "keyword-was-disabled": "$sender, keyword $keyword byl vypnut",
     "keyword-was-removed": "$sender, klíčové slovo $keyword bylo smazáno",
-    "list-of-responses-is-empty": "$sender, $keyword have no responses or doesn't exists",
+    "list-of-responses-is-empty": "$sender, $keyword nemá žádné odpovědi nebo neexistuje",
     "response": "$keyword#$index ($permission) $after| $response"
   },
   "points": {
