@@ -18,7 +18,7 @@ export const change = ((namespace: string) => {
   if (!isDbConnected) {
     setTimeout(() => change(namespace), 1000);
   } else {
-    getRepository(Changelog).save({ namespace, timestamp: Date.now(), threadId });
+    getRepository(Changelog).insert({ namespace, timestamp: Date.now(), threadId });
   }
 });
 

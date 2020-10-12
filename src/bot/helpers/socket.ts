@@ -44,7 +44,7 @@ function adminEndpoint (
   on: 'generic::getOne' | 'generic::deleteById' | 'customvariables::runScript' | 'customvariables::delete'
   | 'test.event' | 'alerts::deleteMedia' | 'alerts::getOneMedia' | 'randomizer::showById'
   | 'eventlist::resend' | 'viewers::followedAt',
-  callback: (id: string | number, cb: (error: Error | string | null, ...response: any) => void) => void): void;
+  callback: (id: string, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 
 // string + cb
 function adminEndpoint (
@@ -103,7 +103,7 @@ function adminEndpoint (nsp: string, on: 'viewers::save' | 'viewers::remove', ca
 function adminEndpoint (nsp: string, on: 'find.viewers', callback: (opts:  { state?: any; search?: string; filter?: { subscribers: null | boolean; followers: null | boolean; active: null | boolean; vips: null | boolean }; page: number; order?: { orderBy: string; sortOrder: 'ASC' | 'DESC' } }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'watched::save', callback: (item: Readonly<Required<VariableWatchInterface>> & Readonly<Required<VariableWatchInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'songs::save', callback: (item: Readonly<Required<SongPlaylistInterface>> & Readonly<Required<SongPlaylistInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'raffle::setEligibility', callback: (opts: {id: number, isEligible: boolean}, cb: (error: Error | string | null, ...response: any) => void) => void): void;
+function adminEndpoint (nsp: string, on: 'raffle::setEligibility', callback: (opts: {id: string, isEligible: boolean}, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'price::save', callback: (item: Readonly<Required<PriceInterface>> & Readonly<Required<PriceInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'panel::availableWidgets' | 'panel::dashboards', callback: (opts: { userId: number; type: DashboardInterface['type'] }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'panel::dashboards::remove', callback: (opts: { userId: number; type: DashboardInterface['type'], id: string }, cb: (error: Error | string | null, ...response: any) => void) => void): void;

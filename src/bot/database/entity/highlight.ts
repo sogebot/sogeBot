@@ -2,7 +2,7 @@ import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
 export interface HighlightInterface {
-  id?: number;
+  id?: string;
   videoId: string;
   game: string;
   title: string;
@@ -15,7 +15,7 @@ export interface HighlightInterface {
 export const Highlight = new EntitySchema<Readonly<Required<HighlightInterface>>>({
   name: 'highlight',
   columns: {
-    id: { type: Number, primary: true, generated: 'rowid' },
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
     videoId: { type: String },
     game: { type: String },
     title: { type: String },

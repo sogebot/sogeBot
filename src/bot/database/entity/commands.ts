@@ -20,7 +20,7 @@ export interface CommandsResponsesInterface {
 }
 
 export interface CommandsCountInterface {
-  id?: number;
+  id?: string;
   command: string;
   timestamp: number;
 }
@@ -77,7 +77,7 @@ export const CommandsResponses = new EntitySchema<Readonly<Required<CommandsResp
 export const CommandsCount = new EntitySchema<Readonly<Required<CommandsCountInterface>>>({
   name: 'commands_count',
   columns: {
-    id: { type: Number, primary: true, generated: 'rowid' },
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
     command: { type: String },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },

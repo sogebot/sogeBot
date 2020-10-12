@@ -2,7 +2,7 @@ import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
 export interface HowLongToBeatGameInterface {
-  id?: number;
+  id?: string;
   game: string;
   startedAt?: number;
   isFinishedMain: boolean;
@@ -17,7 +17,7 @@ export interface HowLongToBeatGameInterface {
 export const HowLongToBeatGame = new EntitySchema<Readonly<Required<HowLongToBeatGameInterface>>>({
   name: 'how_long_to_beat_game',
   columns: {
-    id: { type: Number, primary: true, generated: 'rowid' },
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
     game: { type: String },
     imageUrl: { type: String },
     isFinishedMain: { type: Boolean },

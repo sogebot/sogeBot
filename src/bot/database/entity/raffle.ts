@@ -16,7 +16,7 @@ export interface RaffleInterface {
 }
 
 export interface RaffleParticipantInterface {
-  id?: number;
+  id?: string;
   raffle: RaffleInterface;
   username: string;
   tickets: number;
@@ -27,7 +27,7 @@ export interface RaffleParticipantInterface {
 }
 
 export interface RaffleParticipantMessageInterface {
-  id?: number;
+  id?: string;
   participant?: RaffleParticipantInterface;
   timestamp: number;
   text: string;
@@ -63,7 +63,7 @@ export const Raffle = new EntitySchema<Readonly<Required<RaffleInterface>>>({
 export const RaffleParticipant = new EntitySchema<Readonly<Required<RaffleParticipantInterface>>>({
   name: 'raffle_participant',
   columns: {
-    id: { type: Number, primary: true, generated: 'rowid' },
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
     username: { type: String },
     tickets: { type: Number },
     isEligible: { type: Boolean },
@@ -90,7 +90,7 @@ export const RaffleParticipant = new EntitySchema<Readonly<Required<RafflePartic
 export const RaffleParticipantMessage = new EntitySchema<Readonly<Required<RaffleParticipantMessageInterface>>>({
   name: 'raffle_participant_message',
   columns: {
-    id: { type: Number, primary: true, generated: 'rowid' },
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
     text: { type: 'text' },
   },

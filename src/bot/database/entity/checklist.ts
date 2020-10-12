@@ -1,13 +1,13 @@
 import { EntitySchema } from 'typeorm';
 
 export interface ChecklistInterface {
-  id: number; isCompleted: boolean; value: string;
+  id: string; isCompleted: boolean; value: string;
 }
 
 export const Checklist = new EntitySchema<Readonly<Required<ChecklistInterface>>>({
   name: 'checklist',
   columns: {
-    id: { type: Number, primary: true, generated: 'rowid' },
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
     isCompleted: { type: Boolean },
     value: { type: String },
   },
