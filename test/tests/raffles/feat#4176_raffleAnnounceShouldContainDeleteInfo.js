@@ -57,8 +57,13 @@ describe('Raffles - announce should contain delete info #4176', () => {
       where: { winner: null, isClosed: false },
     });
     assert.strictEqual(raffle.participants.length, 2);
-    assert.strictEqual(raffle.participants[0].tickets, 100);
-    assert.strictEqual(raffle.participants[1].tickets, 50);
+    try {
+      assert.strictEqual(raffle.participants[0].tickets, 100);
+      assert.strictEqual(raffle.participants[1].tickets, 50);
+    } catch (e) {
+      assert.strictEqual(raffle.participants[0].tickets, 50);
+      assert.strictEqual(raffle.participants[1].tickets, 100);
+    }
   });
 
   it('expecting 2 entries in announce message', async () => {
