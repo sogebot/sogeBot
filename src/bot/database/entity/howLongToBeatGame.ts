@@ -41,7 +41,7 @@ export const HowLongToBeatGame = new EntitySchema<Readonly<Required<HowLongToBea
 export const HowLongToBeatGameItem = new EntitySchema<Readonly<Required<HowLongToBeatGameItemInterface>>>({
   name: 'how_long_to_beat_game_item',
   columns: {
-    id: { type: String, primary: true, generated: 'uuid' },
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
     hltb_id: { type: Number },
     createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },

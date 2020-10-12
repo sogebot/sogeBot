@@ -19,10 +19,10 @@
     <loading v-if="state.loading !== $state.success"/>
     <template v-else>
       <b-alert show variant="danger" v-if="fItems.length === 0 && search.length > 0">
-        <fa icon="search"/> <span v-html="translate('systems.hltb.emptyAfterSearch').replace('$search', search)"/>
+        <fa icon="search"/> <span v-html="translate('systems.howlongtobeat.emptyAfterSearch').replace('$search', search)"/>
       </b-alert>
       <b-alert show v-else-if="items.length === 0">
-        {{translate('systems.hltb.empty')}}
+        {{translate('systems.howlongtobeat.empty')}}
       </b-alert>
       <b-table v-else striped small :items="fItems" :fields="fields">
         <template v-slot:cell(show_details)="row">
@@ -34,18 +34,18 @@
           <b-card>
             <template v-for="stream of streams.filter(o => o.hltb_id === data.item.id)">
               <b-row :key="stream.id + '1'">
-                <b-col><b>{{ translate('systems.hltb.when.name') }}</b></b-col>
-                <b-col><b>{{ translate('systems.hltb.time.name') }}</b></b-col>
+                <b-col><b>{{ translate('systems.howlongtobeat.when') }}</b></b-col>
+                <b-col><b>{{ translate('systems.howlongtobeat.time') }}</b></b-col>
                 <b-col></b-col>
-                <b-col>{{ translate('systems.hltb.offset.name') }}</b-col>
+                <b-col><b>{{ translate('systems.howlongtobeat.offset') }}</b></b-col>
               </b-row>
               <b-row :key="stream.id + '2'">
                 <b-col>{{ (new Date(stream.createdAt)).toLocaleString() }}</b-col>
                 <b-col>{{ timeToReadable(timestampToObject(stream.timestamp)) }}</b-col>
                 <b-col>
-                  <b-button pill :pressed.sync="stream.isMainCounted" variant="outline-success" size="sm">{{ translate('systems.hltb.main.name') }}</b-button>
-                  <b-button pill :pressed.sync="stream.isExtraCounted" variant="outline-success" size="sm">{{ translate('systems.hltb.extra.name') }}</b-button>
-                  <b-button pill :pressed.sync="stream.isCompletionistCounted" variant="outline-success" size="sm">{{ translate('systems.hltb.completionist.name') }}</b-button>
+                  <b-button pill :pressed.sync="stream.isMainCounted" variant="outline-success" size="sm">{{ translate('systems.howlongtobeat.main') }}</b-button>
+                  <b-button pill :pressed.sync="stream.isExtraCounted" variant="outline-success" size="sm">{{ translate('systems.howlongtobeat.extra') }}</b-button>
+                  <b-button pill :pressed.sync="stream.isCompletionistCounted" variant="outline-success" size="sm">{{ translate('systems.howlongtobeat.completionist') }}</b-button>
                 </b-col>
                 <b-col>
                   <b-input-group>
@@ -64,13 +64,13 @@
           {{ (new Date(data.item.startedAt)).toLocaleString() }}
         </template>
         <template v-slot:cell(main)="data">
-          {{ timeToReadable(timestampToObject(getStreamsTimestamp(data.item.id, 'main') + getStreamsOffset(data.item.id, 'main'))) }} / {{ timeToReadable(timestampToObject(data.item.gameplayMain * 3600000)) }}
+          {{ timeToReadable(timestampToObject(getStreamsTimestamp(data.item.id, 'main') + getStreamsOffset(data.item.id, 'main'))) }} <span v-if="data.item.gameplayMain">/ {{ timeToReadable(timestampToObject(data.item.gameplayMain * 3600000)) }}</span>
         </template>
         <template v-slot:cell(extra)="data">
-          {{ timeToReadable(timestampToObject(getStreamsTimestamp(data.item.id, 'extra') + getStreamsOffset(data.item.id, 'extra'))) }} / {{ timeToReadable(timestampToObject(data.item.gameplayMainExtra * 3600000)) }}
+          {{ timeToReadable(timestampToObject(getStreamsTimestamp(data.item.id, 'extra') + getStreamsOffset(data.item.id, 'extra'))) }} <span v-if="data.item.gameplayMain">/ {{ timeToReadable(timestampToObject(data.item.gameplayMainExtra * 3600000)) }}</span>
         </template>
         <template v-slot:cell(completionist)="data">
-          {{ timeToReadable(timestampToObject(getStreamsTimestamp(data.item.id, 'completionist') + getStreamsOffset(data.item.id, 'completionist'))) }} / {{ timeToReadable(timestampToObject(data.item.gameplayCompletionist * 3600000)) }}
+          {{ timeToReadable(timestampToObject(getStreamsTimestamp(data.item.id, 'completionist') + getStreamsOffset(data.item.id, 'completionist'))) }} <span v-if="data.item.gameplayMain">/ {{ timeToReadable(timestampToObject(data.item.gameplayCompletionist * 3600000)) }}</span>
         </template>
       </b-table>
     </template>
@@ -78,7 +78,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed } from '@vue/composition-api'
+import { defineComponent, ref, onMounted, computed, watch } from '@vue/composition-api'
 
 import { getSocket } from '../../helpers/socket';
 import { HowLongToBeatGameInterface, HowLongToBeatGameItemInterface } from 'src/bot/database/entity/howLongToBeatGame';
@@ -88,6 +88,7 @@ import translate from 'src/panel/helpers/translate';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { faRedo } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
+import { cloneDeep } from 'lodash-es';
 library.add(faRedo);
 
 const socket = getSocket('/systems/howlongtobeat');
@@ -97,9 +98,10 @@ export default defineComponent({
     'loading': () => import('src/panel/components/loading.vue'),
     panel: () => import('../../components/panel.vue'),
   },
-  setup(props, context) {
+  setup(props, ctx) {
     const items = ref([] as HowLongToBeatGameInterface[]);
     const streams = ref([] as HowLongToBeatGameItemInterface[]);
+    const oldStreams = ref([] as HowLongToBeatGameItemInterface[]);
     const state = ref({
       loading: ButtonStates.progress,
     } as {
@@ -142,11 +144,11 @@ export default defineComponent({
 
     const fields = [
       { key: 'thumbnail', label: '', },
-      { key: 'game', label: translate('systems.hltb.game.name'), sortable: true },
-      { key: 'startedAt', label: translate('systems.hltb.startedAt.name'), sortable: true },
-      { key: 'main', label: translate('systems.hltb.main.name')},
-      { key: 'extra', label: translate('systems.hltb.extra.name')},
-      { key: 'completionist', label: translate('systems.hltb.completionist.name') },
+      { key: 'game', label: translate('systems.howlongtobeat.game'), sortable: true },
+      { key: 'startedAt', label: translate('systems.howlongtobeat.startedAt'), sortable: true },
+      { key: 'main', label: translate('systems.howlongtobeat.main')},
+      { key: 'extra', label: translate('systems.howlongtobeat.extra')},
+      { key: 'completionist', label: translate('systems.howlongtobeat.completionist') },
       { key: 'show_details', label: '', },
     ];
 
@@ -156,7 +158,8 @@ export default defineComponent({
           return error(err);
         }
         items.value = _games;
-        streams.value = _streams;
+        streams.value = cloneDeep(_streams);
+        oldStreams.value = cloneDeep(_streams);
         state.value.loading = ButtonStates.success;
       })
     })
@@ -180,6 +183,25 @@ export default defineComponent({
     const minutesFormatter = (value: number) => {
       return (value < 0 ? '- ' : '+ ') + timeToReadable(timestampToObject(Math.abs(value)));
     }
+
+    watch(streams, (val) => {
+      for (const stream of val) {
+        // find stream and check if changed
+        const oldStream = oldStreams.value.find(o => o.id === stream.id);
+        if (oldStream
+          && (oldStream.isMainCounted !== stream.isMainCounted
+            || oldStream.isCompletionistCounted !== stream.isCompletionistCounted
+            || oldStream.isExtraCounted !== stream.isExtraCounted
+            || oldStream.offset !== stream.offset)) {
+              socket.emit('hltb::saveStreamChange', stream, (err: string | null) => {
+                if (err) {
+                  error(err);
+                }
+              })
+            }
+      }
+      oldStreams.value = cloneDeep(streams.value);
+    }, { deep: true })
 
     return {
       items,

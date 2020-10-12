@@ -6,7 +6,7 @@ import type { GoalGroupInterface } from '../database/entity/goal';
 import type { AlertInterface, AlertMediaInterface } from '../database/entity/alert';
 import type { RandomizerInterface } from '../database/entity/randomizer';
 import type { CooldownInterface } from '../database/entity/cooldown';
-import type { HowLongToBeatGameInterface } from '../database/entity/howLongToBeatGame';
+import type { HowLongToBeatGameInterface, HowLongToBeatGameItemInterface } from '../database/entity/howLongToBeatGame';
 import type { KeywordInterface } from '../database/entity/keyword';
 import type { RankInterface } from '../database/entity/rank';
 import type { TimerInterface } from '../database/entity/timer';
@@ -93,6 +93,7 @@ function adminEndpoint (nsp: string, on: 'alerts::save' | 'alerts::delete', call
 function adminEndpoint (nsp: string, on: 'randomizer::save' | 'randomizer::remove', callback: (item: Readonly<Required<RandomizerInterface>> & Readonly<Required<RandomizerInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'cooldown::save', callback: (item: Readonly<Required<CooldownInterface>> & Readonly<Required<RandomizerInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'hltb::save', callback: (item: Readonly<Required<HowLongToBeatGameInterface>> & Readonly<Required<RandomizerInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
+function adminEndpoint (nsp: string, on: 'hltb::saveStreamChange', callback: (stream: Readonly<Required<HowLongToBeatGameItemInterface>> & Readonly<Required<RandomizerInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'keywords::save', callback: (item: Readonly<Required<KeywordInterface>> & Readonly<Required<RandomizerInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'polls::save' | 'polls::close', callback: (item: Readonly<Required<Poll>> & Readonly<Required<RandomizerInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'ranks::save', callback: (item: Readonly<Required<RankInterface>> & Readonly<Required<RandomizerInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;

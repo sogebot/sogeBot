@@ -1,7 +1,7 @@
 import {MigrationInterface, QueryRunner} from 'typeorm';
 
-export class hltbRefactor1602246011176 implements MigrationInterface {
-  name = 'hltbRefactor1602246011176';
+export class hltbRefactor1602499070262 implements MigrationInterface {
+  name = 'hltbRefactor1602499070262';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`CREATE TABLE "how_long_to_beat_game_item" ("id" varchar PRIMARY KEY NOT NULL, "hltb_id" integer NOT NULL, "createdAt" bigint NOT NULL, "timestamp" bigint NOT NULL DEFAULT (0), "offset" bigint NOT NULL DEFAULT (0), "isMainCounted" boolean NOT NULL DEFAULT (0), "isExtraCounted" boolean NOT NULL DEFAULT (0), "isCompletionistCounted" boolean NOT NULL DEFAULT (0))`);

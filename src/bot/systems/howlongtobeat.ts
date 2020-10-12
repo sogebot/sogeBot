@@ -25,9 +25,9 @@ class HowLongToBeat extends System {
     if (isMainThread) {
       this.refreshImageThumbnail();
       setInterval(async () => {
-        //if (api.isStreamOnline) {
-        this.addToGameTimestamp();
-        //}
+        if (api.isStreamOnline) {
+          this.addToGameTimestamp();
+        }
       }, this.interval);
     }
   }
@@ -43,6 +43,13 @@ class HowLongToBeat extends System {
     adminEndpoint(this.nsp, 'hltb::save', async (item, cb) => {
       try {
         cb(null, await getRepository(HowLongToBeatGame).save(item));
+      } catch (e) {
+        cb(e.stack);
+      }
+    });
+    adminEndpoint(this.nsp, 'hltb::saveStreamChange', async (stream, cb) => {
+      try {
+        cb(null, await getRepository(HowLongToBeatGameItem).save(stream));
       } catch (e) {
         cb(e.stack);
       }
@@ -133,44 +140,44 @@ class HowLongToBeat extends System {
       if (api.stats.currentGame.trim().length === 0 || api.stats.currentGame.trim() === 'IRL') {
         return this.currentGameInfo(opts, true);
       }
-      const gamesFromHltb = await this.hltbService.search(api.stats.currentGame);
-      const gameFromHltb = gamesFromHltb.length > 0 ? gamesFromHltb[0] : null;
-      const game = {
-        game: api.stats.currentGame,
-        gameplayMain: (gameFromHltb || { gameplayMain: 0 }).gameplayMain,
-        gameplayCompletionist: (gameFromHltb || { gameplayMain: 0 }).gameplayCompletionist,
-        isFinishedMain: false,
-        isFinishedCompletionist: false,
-        timeToBeatMain: 0,
-        timeToBeatCompletionist: 0,
-        imageUrl: (gameFromHltb || { imageUrl: '' }).imageUrl,
-        startedAt: Date.now(),
-      };
-      if (game.gameplayMain > 0) {
-        // save only if we have numbers from hltb (possible MP game)
-        await getRepository(HowLongToBeatGame).save(game);
-      }
       return this.currentGameInfo(opts, true);
     } else if (!gameToShow) {
       return [{ response: prepare('systems.howlongtobeat.error', { game: gameInput }), ...opts }];
     }
-    return [];
-    /*const timeToBeatMain = gameToShow.timeToBeatMain / constants.HOUR;
-    const timeToBeatCompletionist = gameToShow.timeToBeatCompletionist / constants.HOUR;
+    const timestamps = await getRepository(HowLongToBeatGameItem).find({ where: { hltb_id: gameToShow.id } });
+    const timeToBeatMain = timestamps.filter(o => o.isMainCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0);
+    const timeToBeatMainExtra = timestamps.filter(o => o.isExtraCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0);
+    const timeToBeatCompletionist = timestamps.filter(o => o.isCompletionistCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0);
+
     const gameplayMain = gameToShow.gameplayMain;
+    const gameplayMainExtra = gameToShow.gameplayMainExtra;
     const gameplayCompletionist = gameToShow.gameplayCompletionist;
-    const finishedMain = gameToShow.isFinishedMain;
-    const finishedCompletionist = gameToShow.isFinishedCompletionist;
+
+    if (gameplayMain === 0) {
+      return [{
+        response: prepare('systems.howlongtobeat.multiplayer-game', {
+          game: gameInput,
+          currentMain: timeToBeatMain.toFixed(1),
+          currentMainExtra: timeToBeatMainExtra.toFixed(1),
+          currentCompletionist: timeToBeatCompletionist.toFixed(1),
+        }), ...opts,
+      }];
+    }
+
     return [{
       response: prepare('systems.howlongtobeat.game', {
-        game: gameInput, hltbMain: gameplayMain, hltbCompletionist: gameplayCompletionist, currentMain: timeToBeatMain.toFixed(1), currentCompletionist: timeToBeatCompletionist.toFixed(1),
+        game: gameInput,
+        hltbMain: gameplayMain,
+        hltbCompletionist: gameplayCompletionist,
+        hltbMainExtra: gameplayMainExtra,
+        currentMain: timeToBeatMain.toFixed(1),
+        currentMainExtra: timeToBeatMainExtra.toFixed(1),
+        currentCompletionist: timeToBeatCompletionist.toFixed(1),
         percentMain: Number((timeToBeatMain / gameplayMain) * 100).toFixed(2),
+        percentMainExtra: Number((timeToBeatMainExtra / gameplayMainExtra) * 100).toFixed(2),
         percentCompletionist: Number((timeToBeatCompletionist / gameplayCompletionist) * 100).toFixed(2),
-        doneMain: finishedMain ? prepare('systems.howlongtobeat.done') : '',
-        doneCompletionist: finishedCompletionist ? prepare('systems.howlongtobeat.done') : '',
       }), ...opts,
     }];
-    */
   }
 }
 

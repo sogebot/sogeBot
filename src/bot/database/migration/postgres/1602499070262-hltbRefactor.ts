@@ -1,7 +1,7 @@
 import {MigrationInterface, QueryRunner} from 'typeorm';
 
-export class hltbRefactor1602246011176 implements MigrationInterface {
-  name = 'hltbRefactor1602246011176';
+export class hltbRefactor1602499070262 implements MigrationInterface {
+  name = 'hltbRefactor1602499070262';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`DROP TABLE "how_long_to_beat_game"`, undefined);
