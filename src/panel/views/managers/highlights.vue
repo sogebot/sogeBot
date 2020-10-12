@@ -110,7 +110,7 @@ export default class highlightsList extends Vue {
     return template.replace('%{game}', encodeURI(game))
   }
 
-  deleteItem(id: number) {
+  deleteItem(id: string) {
     this.socket.emit('generic::deleteById', id, () => {
       this.items = this.items.filter((o) => o.id !== id)
     })

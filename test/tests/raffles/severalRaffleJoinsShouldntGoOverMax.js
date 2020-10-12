@@ -55,8 +55,13 @@ describe('Raffles - several raffle joins shouldnt go over max', () => {
       where: { winner: null, isClosed: false },
     });
     assert.strictEqual(raffle.participants.length, 2);
-    assert.strictEqual(raffle.participants[0].tickets, 100);
-    assert.strictEqual(raffle.participants[1].tickets, 50);
+    try {
+      assert.strictEqual(raffle.participants[0].tickets, 100);
+      assert.strictEqual(raffle.participants[1].tickets, 50);
+    } catch (e) {
+      assert.strictEqual(raffle.participants[0].tickets, 50);
+      assert.strictEqual(raffle.participants[1].tickets, 100);
+    }
   });
 
   it('expecting viewer to have 100 points', async () => {

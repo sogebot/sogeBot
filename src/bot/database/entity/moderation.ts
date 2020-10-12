@@ -2,18 +2,18 @@ import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
 export interface ModerationWarningInterface {
-  id?: number;
+  id?: string;
   userId: number;
   timestamp?: number;
 }
 
 export interface ModerationPermitInterface {
-  id?: number;
+  id?: string;
   userId: number;
 }
 
 export interface ModerationMessageCooldownInterface {
-  id?: number;
+  id?: string;
   name: string;
   timestamp: number;
 }
@@ -21,7 +21,7 @@ export interface ModerationMessageCooldownInterface {
 export const ModerationWarning = new EntitySchema<Readonly<Required<ModerationWarningInterface>>>({
   name: 'moderation_warning',
   columns: {
-    id: { type: Number, primary: true, generated: 'rowid' },
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
     userId: { type: Number },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
   },
@@ -33,7 +33,7 @@ export const ModerationWarning = new EntitySchema<Readonly<Required<ModerationWa
 export const ModerationPermit = new EntitySchema<Readonly<Required<ModerationPermitInterface>>>({
   name: 'moderation_permit',
   columns: {
-    id: { type: Number, primary: true, generated: 'rowid' },
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
     userId: { type: Number },
   },
   indices: [
@@ -44,7 +44,7 @@ export const ModerationPermit = new EntitySchema<Readonly<Required<ModerationPer
 export const ModerationMessageCooldown = new EntitySchema<Readonly<Required<ModerationMessageCooldownInterface>>>({
   name: 'moderation_message_cooldown',
   columns: {
-    id: { type: Number, primary: true, generated: 'rowid' },
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
     name: { type: String },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
   },

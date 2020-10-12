@@ -1,13 +1,13 @@
 import { EntitySchema } from 'typeorm';
 
 export interface ThreadEventInterface {
-  id?: number; event: string;
+  id?: string; event: string;
 }
 
 export const ThreadEvent = new EntitySchema<Readonly<Required<ThreadEventInterface>>>({
   name: 'thread_event',
   columns: {
-    id: { type: String, primary: true, generated: 'rowid' },
+    id: { type: 'uuid', primary: true, generated: 'uuid'},
     event: { type: String },
   },
   indices: [

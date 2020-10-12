@@ -69,7 +69,7 @@ export const PermissionFilters = new EntitySchema<Readonly<Required<PermissionFi
 export const PermissionCommands = new EntitySchema<Readonly<Required<PermissionCommandsInterface>>>({
   name: 'permission_commands',
   columns: {
-    id: { type: Number, primary: true, generated: 'rowid' },
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
     name: { type: String },
     permission: { type: 'varchar', nullable: true, length: 36 },
   },

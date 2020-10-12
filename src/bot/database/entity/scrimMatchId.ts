@@ -10,7 +10,7 @@ export interface ScrimMatchIdInterface {
 export const ScrimMatchId = new EntitySchema<Readonly<Required<ScrimMatchIdInterface>>>({
   name: 'scrim_match_id',
   columns: {
-    id: { type: String, primary: true, generated: 'rowid' },
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
     username: { type: String },
     matchId: { type: String },
   },

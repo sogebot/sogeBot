@@ -97,7 +97,7 @@ export const VariableHistory = new EntitySchema<Readonly<VariableHistoryInterfac
     id: {
       type: Number,
       primary: true,
-      generated: 'rowid',
+      generated: 'increment',
     },
     userId: {
       type: Number,
@@ -185,7 +185,7 @@ export const VariableWatch = new EntitySchema<Readonly<VariableWatchInterface>>(
     id: {
       type: Number,
       primary: true,
-      generated: 'rowid',
+      generated: 'increment',
     },
     variableId: {
       type: String, nullable: false, name: 'variableId',

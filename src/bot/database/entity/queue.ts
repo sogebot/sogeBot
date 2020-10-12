@@ -13,7 +13,7 @@ export interface QueueInterface {
 export const Queue = new EntitySchema<Readonly<Required<QueueInterface>>>({
   name: 'queue',
   columns: {
-    id: { type: Number, primary: true, generated: 'rowid' },
+    id: { type: Number, primary: true, generated: 'increment'},
     createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
     username: { type: String },
     isModerator: { type: Boolean },
