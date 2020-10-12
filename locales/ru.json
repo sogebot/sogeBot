@@ -891,13 +891,16 @@
     "keyword-parse-failed": "{core.command-parse} !keyword",
     "keyword-is-ambiguous": "$sender, ключевое слово $keyword неоднозначно, используйте ID ключевого слова",
     "keyword-was-not-found": "$sender, ключевое слово $keyword не найдено в базе данных",
+    "response-was-not-found": "$sender, response #$response of keyword $keyword was not found in database",
     "keyword-was-edited": "$sender, ключевое слово $keyword изменено на '$response'",
     "keyword-was-added": "$sender, ключевое слово $keyword ($id) было добавлено",
-    "list-is-not-empty": "$sender, список ключевых слов",
+    "list-is-not-empty": "$sender, list of keywords: $list",
     "list-is-empty": "$sender, список ключевых слов пуст",
     "keyword-was-enabled": "$sender, ключевое слово $keyword было включено",
     "keyword-was-disabled": "$sender, ключевое слово $keyword отключено",
-    "keyword-was-removed": "$sender, ключевое слово $keyword удалено"
+    "keyword-was-removed": "$sender, ключевое слово $keyword удалено",
+    "list-of-responses-is-empty": "$sender, $keyword have no responses or doesn't exists",
+    "response": "$keyword#$index ($permission) $after| $response"
   },
   "points": {
     "success": {
