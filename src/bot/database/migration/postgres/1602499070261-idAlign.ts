@@ -12,7 +12,6 @@ export class idAlign1602499070261 implements MigrationInterface {
     await queryRunner.query(`ALTER TABLE "commands_count" DROP COLUMN "id"`);
     await queryRunner.query(`ALTER TABLE "commands_count" ADD "id" uuid NOT NULL DEFAULT uuid_generate_v4()`);
     await queryRunner.query(`ALTER TABLE "commands_count" ADD CONSTRAINT "PK_80e221b846abb1a84ab81281a7a" PRIMARY KEY ("id")`);
-    await queryRunner.query(`ALTER TABLE "event_list" DROP CONSTRAINT "PK_1cc2e9353e9ae8acf95d976cf6f"`);
     await queryRunner.query(`ALTER TABLE "event_list" DROP COLUMN "id"`);
     await queryRunner.query(`ALTER TABLE "event_list" ADD "id" uuid NOT NULL DEFAULT uuid_generate_v4()`);
     await queryRunner.query(`ALTER TABLE "event_list" ADD CONSTRAINT "PK_1cc2e9353e9ae8acf95d976cf6f" PRIMARY KEY ("id")`);
