@@ -9,8 +9,8 @@
   },
   "addResponse": "Nová odpověď",
   "response": {
-    "name": "odpověď",
-    "placeholder": ""
+    "name": "Odpověď",
+    "placeholder": "Nastavte odpověď bota zde."
   },
   "filter": {
     "name": "filtr",

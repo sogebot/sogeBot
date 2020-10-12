@@ -9,8 +9,8 @@
   },
   "addResponse": "Add response",
   "response": {
-    "name": "response",
-    "placeholder": ""
+    "name": "Response",
+    "placeholder": "Set your response here."
   },
   "filter": {
     "name": "filter",

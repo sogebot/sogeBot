@@ -9,8 +9,8 @@
   },
   "addResponse": "Добавить ответ",
   "response": {
-    "name": "ответ",
-    "placeholder": ""
+    "name": "Response",
+    "placeholder": "Set your response here."
   },
   "filter": {
     "name": "фильтр",

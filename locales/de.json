@@ -891,13 +891,16 @@
     "keyword-parse-failed": "{core.command-parse} !keyword",
     "keyword-is-ambiguous": "$sender, Stichwort $keyword ist zweideutig, benutze ID des Schlüsselworts",
     "keyword-was-not-found": "$sender, Schlüsselwort $keyword wurde in der Datenbank nicht gefunden",
+    "response-was-not-found": "$sender, response #$response of keyword $keyword was not found in database",
     "keyword-was-edited": "$sender, Stichwort $keyword wurde in '$response ' geändert",
     "keyword-was-added": "$sender, keyword $keyword ($id) wurde hinzugefügt",
-    "list-is-not-empty": "$sender, Liste der Schlüsselwörter",
+    "list-is-not-empty": "$sender, list of keywords: $list",
     "list-is-empty": "$sender, Liste der Schlüsselwörter ist leer",
     "keyword-was-enabled": "$sender, Stichwort $keyword wurde aktiviert",
     "keyword-was-disabled": "$sender, Schlüsselwort $keyword wurde deaktiviert",
-    "keyword-was-removed": "$sender, Stichwort $keyword wurde entfernt"
+    "keyword-was-removed": "$sender, Stichwort $keyword wurde entfernt",
+    "list-of-responses-is-empty": "$sender, $keyword have no responses or doesn't exists",
+    "response": "$keyword#$index ($permission) $after| $response"
   },
   "points": {
     "success": {
