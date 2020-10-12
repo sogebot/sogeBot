@@ -117,7 +117,7 @@ export const UserTip = new EntitySchema<Readonly<Required<UserTipInterface>>>({
     id: {
       type: Number,
       primary: true,
-      generated: 'rowid',
+      generated: 'increment',
     },
     amount: { type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined  },
     sortAmount: { type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined  },
@@ -145,7 +145,7 @@ export const UserBit = new EntitySchema<Readonly<Required<UserBitInterface>>>({
     id: {
       type: Number,
       primary: true,
-      generated: 'rowid',
+      generated: 'increment',
     },
     amount: { type: 'bigint', transformer: new ColumnNumericTransformer() },
     message: { type: 'text' },
