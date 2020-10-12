@@ -14,11 +14,11 @@
   "error": {
     "isEmpty": "Tato hodnota nesmí být prázdná"
   },
-  "no-responses-set": "No responses",
-  "addResponse": "Add response",
+  "no-responses-set": "Bez odpovědí",
+  "addResponse": "Nová odpověď",
   "filter": {
-    "name": "filter",
-    "placeholder": "Add filter for this response"
+    "name": "filtr",
+    "placeholder": "Přidat filtr k této odpovědi"
   },
   "warning": "Tato akce nemůže být vrácena!",
   "settings": {
