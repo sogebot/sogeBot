@@ -14,6 +14,12 @@
   "error": {
     "isEmpty": "Dieser Wert darf nicht leer sein"
   },
+  "no-responses-set": "No responses",
+  "addResponse": "Add response",
+  "filter": {
+    "name": "filter",
+    "placeholder": "Add filter for this response"
+  },
   "warning": "Diese Aktion kann nicht rückgängig gemacht werden!",
   "settings": {
     "enabled": "Status"
