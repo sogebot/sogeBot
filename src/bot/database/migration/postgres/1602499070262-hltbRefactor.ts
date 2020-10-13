@@ -11,6 +11,7 @@ export class hltbRefactor1602499070262 implements MigrationInterface {
     await queryRunner.query(`CREATE INDEX "IDX_hltb_id" ON "how_long_to_beat_game_item" ("hltb_id") `);
     await queryRunner.query(`ALTER TABLE "how_long_to_beat_game" ADD "gameplayMainExtra" double precision NOT NULL DEFAULT 0`);
     await queryRunner.query(`ALTER TABLE "how_long_to_beat_game_item" ADD "isExtraCounted" boolean NOT NULL DEFAULT false`);
+    await queryRunner.query(`ALTER TABLE "how_long_to_beat_game" ADD "offset" bigint NOT NULL DEFAULT 0`);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
