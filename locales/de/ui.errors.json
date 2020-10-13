@@ -14,5 +14,5 @@
   "please_set_your_broadcaster_oauth_or_owners": "Bitte stellen Sie Ihre <a href=\"#/settings/core/oauth\">Streamer oauth oder Eigentümer ein</a>, oder alle Nutzer <strong>werden Zugriff haben</strong> zu diesem Dashboard und wird als betrachtet als <strong>Brodecaster</strong>.",
   "new_update_available": "Neue Aktualisierung verfügbar",
   "new_bot_version_available_at": "Neue Bot Version $version verfügbar unter <a href=\"https://github.com/sogehige/sogeBot/releases/tag/$version\">GitHub</a>.",
-  "one_of_inputs_must_be_set": "One of inputs must be set"
+  "one_of_inputs_must_be_set": "Eine der Eingaben muss gesetzt werden"
 }
