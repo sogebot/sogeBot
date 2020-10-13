@@ -2,14 +2,14 @@
   "settings": {
     "enabled": "Status",
     "apiKey": {
-      "title": "API Key",
-      "help": "Get your API Key at https://developer.pubg.com/"
+      "title": "API Schlüssel",
+      "help": "Erhalte deinen Schlüssel unter https://developer.pubg.com/"
     },
-    "platform": "Platform",
-    "playerName": "Player Name",
-    "playerId": "Player ID",
+    "platform": "Plattform",
+    "playerName": "Spielername",
+    "playerId": "Spieler ID",
     "seasonId": {
-      "title": "Season ID",
+      "title": "Sitzungs ID",
       "help": "Current season ID is being fetch every hour."
     },
     "rankedGameModeStatsCustomization": "Customized message for ranked stats",
