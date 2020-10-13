@@ -30,3 +30,33 @@ export function getTime(time: null | number, isChat: boolean) {
     return days + hours + minutes + seconds;
   }
 }
+
+export function timestampToObject(timestamp: null | number) {
+  let days: string | number = 0;
+  let hours: string | number = 0;
+  let minutes: string | number = 0;
+  let seconds: string | number = 0;
+
+  if (timestamp) {
+    days = Math.floor(timestamp / 86400000);
+    if (days >= 1) {
+      timestamp -= days * 86400000;
+    }
+
+    hours = Math.floor(timestamp / 3600000);
+    if (hours >= 1) {
+      timestamp -= hours * 3600000;
+    }
+
+    minutes = Math.floor(timestamp / 60000);
+    if (minutes >= 1) {
+      timestamp -= minutes * 60000;
+    }
+
+    seconds = Math.floor(timestamp / 1000);
+  }
+
+  return {
+    days: Math.floor(days), hours: Math.floor(hours), minutes: Math.floor(minutes), seconds: Math.floor(seconds),
+  };
+}

@@ -5,13 +5,22 @@ export interface HowLongToBeatGameInterface {
   id?: string;
   game: string;
   startedAt?: number;
-  isFinishedMain: boolean;
-  isFinishedCompletionist: boolean;
-  timeToBeatMain?: number;
-  timeToBeatCompletionist?: number;
-  gameplayMain?: number;
-  gameplayCompletionist?: number;
   imageUrl: string;
+  gameplayMain: number;
+  gameplayMainExtra: number;
+  gameplayCompletionist: number;
+  offset: number;
+}
+
+export interface HowLongToBeatGameItemInterface {
+  id?: string;
+  hltb_id: string;
+  createdAt: number;
+  timestamp: number;
+  offset: number;
+  isMainCounted: boolean;
+  isCompletionistCounted: boolean;
+  isExtraCounted: boolean;
 }
 
 export const HowLongToBeatGame = new EntitySchema<Readonly<Required<HowLongToBeatGameInterface>>>({
@@ -20,15 +29,30 @@ export const HowLongToBeatGame = new EntitySchema<Readonly<Required<HowLongToBea
     id: { type: 'uuid', primary: true, generated: 'uuid' },
     game: { type: String },
     imageUrl: { type: String },
-    isFinishedMain: { type: Boolean },
-    isFinishedCompletionist: { type: Boolean },
-    startedAt: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-    timeToBeatMain: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-    timeToBeatCompletionist: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
+    startedAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
+    offset: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
     gameplayMain: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined  },
+    gameplayMainExtra: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined  },
     gameplayCompletionist: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined  },
   },
   indices: [
     { name: 'IDX_301758e0e3108fc902d5436527', columns: ['game'], unique: true },
+  ],
+});
+
+export const HowLongToBeatGameItem = new EntitySchema<Readonly<Required<HowLongToBeatGameItemInterface>>>({
+  name: 'how_long_to_beat_game_item',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    hltb_id: { type: Number },
+    createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
+    timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
+    offset: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
+    isMainCounted: { type: Boolean, default: false },
+    isCompletionistCounted: { type: Boolean, default: false },
+    isExtraCounted: { type: Boolean, default: false },
+  },
+  indices: [
+    { name: 'IDX_hltb_id', columns: ['hltb_id'] },
   ],
 });

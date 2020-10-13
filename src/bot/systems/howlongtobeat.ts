@@ -9,10 +9,10 @@ import Expects from '../expects';
 import { prepare } from '../commons';
 
 import { getRepository } from 'typeorm';
-import { HowLongToBeatGame, HowLongToBeatGameInterface } from '../database/entity/howLongToBeatGame';
+import { HowLongToBeatGame, HowLongToBeatGameItem } from '../database/entity/howLongToBeatGame';
 import { adminEndpoint } from '../helpers/socket';
 import api from '../api';
-import { error, info } from '../helpers/log';
+import { error, info, warning } from '../helpers/log';
 
 class HowLongToBeat extends System {
   interval: number = constants.SECOND * 15;
@@ -25,7 +25,7 @@ class HowLongToBeat extends System {
     if (isMainThread) {
       this.refreshImageThumbnail();
       setInterval(async () => {
-        if (api.isStreamOnline) {
+        if (api.isStreamOnline && this.enabled) {
           this.addToGameTimestamp();
         }
       }, this.interval);
@@ -33,9 +33,9 @@ class HowLongToBeat extends System {
   }
 
   sockets() {
-    adminEndpoint(this.nsp, 'generic::getAll::filter', async (opts: HowLongToBeatGameInterface, cb) => {
+    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
-        cb(null, await getRepository(HowLongToBeatGame).find({...opts}));
+        cb(null, await getRepository(HowLongToBeatGame).find(), await getRepository(HowLongToBeatGameItem).find());
       } catch (e) {
         cb(e.stack, []);
       }
@@ -43,6 +43,54 @@ class HowLongToBeat extends System {
     adminEndpoint(this.nsp, 'hltb::save', async (item, cb) => {
       try {
         cb(null, await getRepository(HowLongToBeatGame).save(item));
+      } catch (e) {
+        cb(e.stack);
+      }
+    });
+    adminEndpoint(this.nsp, 'hltb::addNewGame', async (game, cb) => {
+      try {
+        const gameFromHltb = (await this.hltbService.search(game))[0];
+        if (gameFromHltb) {
+          await getRepository(HowLongToBeatGame).save({
+            game: game,
+            imageUrl: gameFromHltb.imageUrl,
+            startedAt: Date.now(),
+            gameplayMain: gameFromHltb.gameplayMain,
+            gameplayMainExtra: gameFromHltb.gameplayMainExtra,
+            gameplayCompletionist: gameFromHltb.gameplayCompletionist,
+          });
+        } else {
+          throw new Error(`Game ${game} not found on HLTB service`);
+        }
+        cb(null);
+      } catch (e) {
+        cb(e.stack);
+      }
+    });
+    adminEndpoint(this.nsp, 'hltb::getGamesFromHLTB', async (game, cb) => {
+      try {
+        const search = await this.hltbService.search(game);
+        const games = await getRepository(HowLongToBeatGame).find();
+        cb(null, search
+          .filter((o: any) => {
+            // we need to filter already added gaems
+            return !games.map(a => a.game.toLowerCase()).includes(o.name.toLowerCase());
+          })
+          .map((o: any) => o.name));
+      } catch (e) {
+        cb(e.stack, []);
+      }
+    });
+    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
+      await getRepository(HowLongToBeatGame).delete({ id: String(id) });
+      await getRepository(HowLongToBeatGameItem).delete({ hltb_id: String(id) });
+      if (cb) {
+        cb(null);
+      }
+    });
+    adminEndpoint(this.nsp, 'hltb::saveStreamChange', async (stream, cb) => {
+      try {
+        cb(null, await getRepository(HowLongToBeatGameItem).save(stream));
       } catch (e) {
         cb(e.stack);
       }
@@ -75,31 +123,37 @@ class HowLongToBeat extends System {
       return; // skip if we have empty game
     }
 
-    const gameToInc = await getRepository(HowLongToBeatGame).findOne({ where: { game: api.stats.currentGame } });
-    if (gameToInc) {
-      const timeToBeatMain = gameToInc.isFinishedMain ? gameToInc.timeToBeatMain + this.interval : gameToInc.timeToBeatMain;
-      const timeToBeatCompletionist = gameToInc.isFinishedCompletionist ? gameToInc.timeToBeatCompletionist + this.interval : gameToInc.timeToBeatCompletionist;
-      if (gameToInc.gameplayMain > 0) {
-        // save only if we have numbers from hltb (possible MP game)
-        await getRepository(HowLongToBeatGame).save({...gameToInc, timeToBeatCompletionist, timeToBeatMain});
+    try {
+      const game = await getRepository(HowLongToBeatGame).findOneOrFail({ where: { game: api.stats.currentGame } });
+      const stream = await getRepository(HowLongToBeatGameItem).findOne({ where: { hltb_id: game.id, createdAt: api.streamStatusChangeSince } });
+      if (stream) {
+        await getRepository(HowLongToBeatGameItem).increment({ id: stream.id }, 'timestamp', this.interval);
+      } else {
+        await getRepository(HowLongToBeatGameItem).save({
+          createdAt: api.streamStatusChangeSince,
+          hltb_id: game.id,
+          timestamp: this.interval,
+        });
       }
-    } else {
-      const gamesFromHltb = await this.hltbService.search(api.stats.currentGame);
-      const gameFromHltb = gamesFromHltb.length > 0 ? gamesFromHltb[0] : null;
-      const game = {
-        game: api.stats.currentGame,
-        gameplayMain: (gameFromHltb || { gameplayMain: 0 }).gameplayMain,
-        gameplayCompletionist: (gameFromHltb || { gameplayMain: 0 }).gameplayCompletionist,
-        isFinishedMain: false,
-        isFinishedCompletionist: false,
-        timeToBeatMain: this.interval,
-        timeToBeatCompletionist: this.interval,
-        imageUrl: (gameFromHltb || { imageUrl: '' }).imageUrl,
-        startedAt: Date.now(),
-      };
-      if (game.gameplayMain > 0) {
-        // save only if we have numbers from hltb (possible MP game)
-        await getRepository(HowLongToBeatGame).save(game);
+    } catch (e) {
+      if (e.name === 'EntityNotFound') {
+        const gameFromHltb = (await this.hltbService.search(api.stats.currentGame))[0];
+        if (gameFromHltb) {
+          // we don't care if MP game or not (user might want to track his gameplay time)
+          await getRepository(HowLongToBeatGame).save({
+            game: api.stats.currentGame,
+            imageUrl: gameFromHltb.imageUrl,
+            startedAt: Date.now(),
+            gameplayMain: gameFromHltb.gameplayMain,
+            gameplayMainExtra: gameFromHltb.gameplayMainExtra,
+            gameplayCompletionist: gameFromHltb.gameplayCompletionist,
+          });
+        } else {
+          warning(`HLTB: game '${api.stats.currentGame}' was not found on HLTB service`);
+        }
+        this.addToGameTimestamp();
+      } else {
+        error(e.stack);
       }
     }
   }
@@ -127,40 +181,42 @@ class HowLongToBeat extends System {
       if (api.stats.currentGame.trim().length === 0 || api.stats.currentGame.trim() === 'IRL') {
         return this.currentGameInfo(opts, true);
       }
-      const gamesFromHltb = await this.hltbService.search(api.stats.currentGame);
-      const gameFromHltb = gamesFromHltb.length > 0 ? gamesFromHltb[0] : null;
-      const game = {
-        game: api.stats.currentGame,
-        gameplayMain: (gameFromHltb || { gameplayMain: 0 }).gameplayMain,
-        gameplayCompletionist: (gameFromHltb || { gameplayMain: 0 }).gameplayCompletionist,
-        isFinishedMain: false,
-        isFinishedCompletionist: false,
-        timeToBeatMain: 0,
-        timeToBeatCompletionist: 0,
-        imageUrl: (gameFromHltb || { imageUrl: '' }).imageUrl,
-        startedAt: Date.now(),
-      };
-      if (game.gameplayMain > 0) {
-        // save only if we have numbers from hltb (possible MP game)
-        await getRepository(HowLongToBeatGame).save(game);
-      }
       return this.currentGameInfo(opts, true);
     } else if (!gameToShow) {
       return [{ response: prepare('systems.howlongtobeat.error', { game: gameInput }), ...opts }];
     }
-    const timeToBeatMain = gameToShow.timeToBeatMain / constants.HOUR;
-    const timeToBeatCompletionist = gameToShow.timeToBeatCompletionist / constants.HOUR;
+    const timestamps = await getRepository(HowLongToBeatGameItem).find({ where: { hltb_id: gameToShow.id } });
+    const timeToBeatMain = timestamps.filter(o => o.isMainCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset , 0) + gameToShow.offset;
+    const timeToBeatMainExtra = timestamps.filter(o => o.isExtraCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0) + gameToShow.offset;
+    const timeToBeatCompletionist = timestamps.filter(o => o.isCompletionistCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0) + gameToShow.offset;
+
     const gameplayMain = gameToShow.gameplayMain;
+    const gameplayMainExtra = gameToShow.gameplayMainExtra;
     const gameplayCompletionist = gameToShow.gameplayCompletionist;
-    const finishedMain = gameToShow.isFinishedMain;
-    const finishedCompletionist = gameToShow.isFinishedCompletionist;
+
+    if (gameplayMain === 0) {
+      return [{
+        response: prepare('systems.howlongtobeat.multiplayer-game', {
+          game: gameInput,
+          currentMain: timeToBeatMain.toFixed(1),
+          currentMainExtra: timeToBeatMainExtra.toFixed(1),
+          currentCompletionist: timeToBeatCompletionist.toFixed(1),
+        }), ...opts,
+      }];
+    }
+
     return [{
       response: prepare('systems.howlongtobeat.game', {
-        game: gameInput, hltbMain: gameplayMain, hltbCompletionist: gameplayCompletionist, currentMain: timeToBeatMain.toFixed(1), currentCompletionist: timeToBeatCompletionist.toFixed(1),
+        game: gameInput,
+        hltbMain: gameplayMain,
+        hltbCompletionist: gameplayCompletionist,
+        hltbMainExtra: gameplayMainExtra,
+        currentMain: timeToBeatMain.toFixed(1),
+        currentMainExtra: timeToBeatMainExtra.toFixed(1),
+        currentCompletionist: timeToBeatCompletionist.toFixed(1),
         percentMain: Number((timeToBeatMain / gameplayMain) * 100).toFixed(2),
+        percentMainExtra: Number((timeToBeatMainExtra / gameplayMainExtra) * 100).toFixed(2),
         percentCompletionist: Number((timeToBeatCompletionist / gameplayCompletionist) * 100).toFixed(2),
-        doneMain: finishedMain ? prepare('systems.howlongtobeat.done') : '',
-        doneCompletionist: finishedCompletionist ? prepare('systems.howlongtobeat.done') : '',
       }), ...opts,
     }];
   }
