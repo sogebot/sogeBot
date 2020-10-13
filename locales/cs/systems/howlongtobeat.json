@@ -1,5 +1,5 @@
 {
-  "error": "$sender, $game nebyla nalezena v databázi nebo je to hra více hráčů.",
-  "game": "$sender, $game | Main$doneMain: $currentMain/$hltbMainh - $percentMain% | Completionist$doneCompletionist: $currentCompletionist/$hltbCompletionisth - $percentCompletionist%",
-  "done": "(hotovo)"
+  "error": "$sender, hra $game nebyla nalezena v databázi.",
+  "game": "$sender, $game | Hlavní příběh: $currentMain/$hltbMainh - $percentMain% | Hlavní příběh+Extra: $currentMainExtra/$hltbMainExtrah - $percentMainExtra% | Kompletně vše: $currentCompletionist/$hltbCompletionisth - $percentCompletionist%",
+  "multiplayer-game": "$sender, $game | Hlavní příběh: $currentMainh | Hlavní příběh+Extra: $currentMainExtrah | Kompletně vše: $currentCompletionisth"
 }

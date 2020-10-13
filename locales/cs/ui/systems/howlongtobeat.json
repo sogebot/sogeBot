@@ -1,5 +1,18 @@
 {
   "settings": {
     "enabled": "Status"
-  }
+  },
+  "empty": "Zatím nebyly sledovány žádné hry.",
+  "emptyAfterSearch": "Žádné sledované hry nebyly nalezeny pro tvé hledání <strong>\"$search\"</strong>.",
+  "when": "Vysíláno v",
+  "time": "Zaznamenaný čas",
+  "offset": "Kompenzace sledovaného času",
+  "main": "Hlavní příběh",
+  "extra": "Hlavní příběh+Extra",
+  "completionist": "Kompletně vše",
+  "game": "Sledovaná hra",
+  "startedAt": "Sledování zahájeno v",
+  "showHistory": "Zobrazit historii ($count)",
+  "hideHistory": "Skrýt historii ($count)",
+  "searchToAddNewGame": "Hledat pro přidání nové hry ke sledování"
 }
