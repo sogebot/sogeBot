@@ -1,5 +1,5 @@
 {
-  "error": "$sender, $game не знайдено в базі або в мережевій грі.",
-  "game": "$sender, $game | Головний сюжет $doneMain: $currentMain/$hltbMainh - $percentMain% | Завершив $doneCompletionist: $currentCompletionist/$hltbCompletionisth - $percentCompletionist%",
-  "done": "(виконано)"
+  "error": "$sender, $game not found in db.",
+  "game": "$sender, $game | Main: $currentMain/$hltbMainh - $percentMain% | Main+Extra: $currentMainExtra/$hltbMainExtrah - $percentMainExtra% | Completionist: $currentCompletionist/$hltbCompletionisth - $percentCompletionist%",
+  "multiplayer-game": "$sender, $game | Main: $currentMainh | Main+Extra: $currentMainExtrah | Completionist: $currentCompletionisth"
 }
