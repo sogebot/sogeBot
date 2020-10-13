@@ -8,7 +8,7 @@ export class hltbRefactor1602499070262 implements MigrationInterface {
     await queryRunner.query(`CREATE INDEX "IDX_hltb_id" ON "how_long_to_beat_game_item" ("hltb_id") `);
     await queryRunner.query(`DROP INDEX "IDX_301758e0e3108fc902d5436527"`);
     await queryRunner.query(`DROP TABLE "how_long_to_beat_game"`);
-    await queryRunner.query(`CREATE TABLE "how_long_to_beat_game" ("id" varchar PRIMARY KEY NOT NULL, "game" varchar NOT NULL, "startedAt" bigint NOT NULL, "gameplayMain" float NOT NULL DEFAULT (0), "gameplayCompletionist" float NOT NULL DEFAULT (0), "gameplayMainExtra" float NOT NULL DEFAULT (0), "imageUrl" varchar NOT NULL)`);
+    await queryRunner.query(`CREATE TABLE "how_long_to_beat_game" ("id" varchar PRIMARY KEY NOT NULL, "game" varchar NOT NULL, "startedAt" bigint NOT NULL, "gameplayMain" float NOT NULL DEFAULT (0), "gameplayCompletionist" float NOT NULL DEFAULT (0), "gameplayMainExtra" float NOT NULL DEFAULT (0), "imageUrl" varchar NOT NULL, "offset" bigint NOT NULL DEFAULT (0))`);
     await queryRunner.query(`CREATE UNIQUE INDEX "IDX_301758e0e3108fc902d5436527" ON "how_long_to_beat_game" ("game") `);
   }
 

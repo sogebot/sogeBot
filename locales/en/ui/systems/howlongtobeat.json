@@ -11,5 +11,8 @@
   "extra": "Main+Extra",
   "completionist": "Completionist",
   "game": "Tracked game",
-  "startedAt": "Tracking started at"
+  "startedAt": "Tracking started at",
+  "showHistory": "Show history ($count)",
+  "hideHistory": "Hide history ($count)",
+  "searchToAddNewGame": "Search to add new game to track"
 }

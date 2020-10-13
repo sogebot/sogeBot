@@ -32,40 +32,40 @@
           'border-bottom-0': !isSearching && isDirty && (isFocused || isHovered),
         }"/>
       <template v-slot:append v-if="isSearching">
-        <div class="border border-left-0" :class="{'focus-border': (isFocused || isHovered), 'border-input': !(isFocused || isHovered) }">
-          <b-spinner variant="primary" label="Spinning" small class="m-2"></b-spinner>
+        <div class="border border-left-0 input-bg" :class="{'focus-border': (isFocused || isHovered), 'border-input': !(isFocused || isHovered) }">
+          <b-spinner style="position: relative; top: 2px;" variant="primary" label="Spinning" small class="m-2"></b-spinner>
         </div>
       </template>
+      <b-list-group v-if="isDirty && !isSearching && (isFocused || isHovered)"
+        @mouseenter="isHovered = true;"
+        @mouseleave="isHovered = false;"
+        class="focus-border"
+        :style="{
+          position: 'absolute',
+          left: 0,
+          'z-index': '99',
+          width: 'calc(100%)',
+          transform: 'translate3d(0rem, 37px, 0px)',
+          'max-height': '14rem',
+          overflow: 'auto',
+          border: '1px solid',
+          'border-top': '0',
+        }">
+        <b-list-group-item
+          v-if="options.length === 0"
+          class="btn text-left px-2"
+          style="padding-top:0.2rem; padding-bottom:0.2rem"
+        >{{ translate('no-options-found-for-this-search') }}
+        </b-list-group-item>
+        <b-list-group-item
+          class="btn text-left px-2"
+          style="padding-top:0.2rem; padding-bottom:0.2rem"
+          v-for="option of options"
+          v-html="option.replace(regexp, '<strong class=\'text-primary\'>' + addToCurrentValue + '</strong>')"
+          @click="addToCurrentValue = option; isDirty = showAllOptions; isHovered = false; emitUpdate()"
+          :key="option"/>
+      </b-list-group>
     </b-input-group>
-    <b-list-group v-if="isDirty && !isSearching && (isFocused || isHovered)"
-      @mouseenter="isHovered = true;"
-      @mouseleave="isHovered = false;"
-      class="focus-border"
-      :style="{
-        position: 'absolute',
-        left: 0,
-        'z-index': '99',
-        width: 'calc(100% - 2rem)',
-        transform: 'translate3d(1rem, 0px, 0px)',
-        'max-height': '14rem',
-        overflow: 'auto',
-        border: '1px solid',
-        'border-top': '0',
-      }">
-      <b-list-group-item
-        v-if="options.length === 0"
-        class="btn text-left px-2"
-        style="padding-top:0.2rem; padding-bottom:0.2rem"
-      >{{ translate('no-options-found-for-this-search') }}
-      </b-list-group-item>
-      <b-list-group-item
-        class="btn text-left px-2"
-        style="padding-top:0.2rem; padding-bottom:0.2rem"
-        v-for="option of options"
-        v-html="option.replace(regexp, '<strong class=\'text-primary\'>' + addToCurrentValue + '</strong>')"
-        @click="addToCurrentValue = option; isDirty = showAllOptions; isHovered = false; emitUpdate()"
-        :key="option"/>
-    </b-list-group>
   </div>
 </template>
 

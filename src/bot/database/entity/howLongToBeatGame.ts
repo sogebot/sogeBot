@@ -9,6 +9,7 @@ export interface HowLongToBeatGameInterface {
   gameplayMain: number;
   gameplayMainExtra: number;
   gameplayCompletionist: number;
+  offset: number;
 }
 
 export interface HowLongToBeatGameItemInterface {
@@ -29,6 +30,7 @@ export const HowLongToBeatGame = new EntitySchema<Readonly<Required<HowLongToBea
     game: { type: String },
     imageUrl: { type: String },
     startedAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
+    offset: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
     gameplayMain: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined  },
     gameplayMainExtra: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined  },
     gameplayCompletionist: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined  },

@@ -25,7 +25,7 @@ class HowLongToBeat extends System {
     if (isMainThread) {
       this.refreshImageThumbnail();
       setInterval(async () => {
-        if (api.isStreamOnline) {
+        if (api.isStreamOnline && this.enabled) {
           this.addToGameTimestamp();
         }
       }, this.interval);
@@ -45,6 +45,47 @@ class HowLongToBeat extends System {
         cb(null, await getRepository(HowLongToBeatGame).save(item));
       } catch (e) {
         cb(e.stack);
+      }
+    });
+    adminEndpoint(this.nsp, 'hltb::addNewGame', async (game, cb) => {
+      try {
+        const gameFromHltb = (await this.hltbService.search(game))[0];
+        if (gameFromHltb) {
+          await getRepository(HowLongToBeatGame).save({
+            game: game,
+            imageUrl: gameFromHltb.imageUrl,
+            startedAt: Date.now(),
+            gameplayMain: gameFromHltb.gameplayMain,
+            gameplayMainExtra: gameFromHltb.gameplayMainExtra,
+            gameplayCompletionist: gameFromHltb.gameplayCompletionist,
+          });
+        } else {
+          throw new Error(`Game ${game} not found on HLTB service`);
+        }
+        cb(null);
+      } catch (e) {
+        cb(e.stack);
+      }
+    });
+    adminEndpoint(this.nsp, 'hltb::getGamesFromHLTB', async (game, cb) => {
+      try {
+        const search = await this.hltbService.search(game);
+        const games = await getRepository(HowLongToBeatGame).find();
+        cb(null, search
+          .filter((o: any) => {
+            // we need to filter already added gaems
+            return !games.map(a => a.game.toLowerCase()).includes(o.name.toLowerCase());
+          })
+          .map((o: any) => o.name));
+      } catch (e) {
+        cb(e.stack, []);
+      }
+    });
+    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
+      await getRepository(HowLongToBeatGame).delete({ id: String(id) });
+      await getRepository(HowLongToBeatGameItem).delete({ hltb_id: String(id) });
+      if (cb) {
+        cb(null);
       }
     });
     adminEndpoint(this.nsp, 'hltb::saveStreamChange', async (stream, cb) => {
@@ -145,9 +186,9 @@ class HowLongToBeat extends System {
       return [{ response: prepare('systems.howlongtobeat.error', { game: gameInput }), ...opts }];
     }
     const timestamps = await getRepository(HowLongToBeatGameItem).find({ where: { hltb_id: gameToShow.id } });
-    const timeToBeatMain = timestamps.filter(o => o.isMainCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0);
-    const timeToBeatMainExtra = timestamps.filter(o => o.isExtraCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0);
-    const timeToBeatCompletionist = timestamps.filter(o => o.isCompletionistCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0);
+    const timeToBeatMain = timestamps.filter(o => o.isMainCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset , 0) + gameToShow.offset;
+    const timeToBeatMainExtra = timestamps.filter(o => o.isExtraCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0) + gameToShow.offset;
+    const timeToBeatCompletionist = timestamps.filter(o => o.isCompletionistCounted).reduce((prev, cur) => prev += cur.timestamp + cur.offset, 0) + gameToShow.offset;
 
     const gameplayMain = gameToShow.gameplayMain;
     const gameplayMainExtra = gameToShow.gameplayMainExtra;
