@@ -2,17 +2,17 @@
   "settings": {
     "enabled": "Status"
   },
-  "empty": "No games were tracked yet.",
-  "emptyAfterSearch": "No tracked games were found by your search for <strong>\"$search\"</strong>.",
-  "when": "When streamed",
-  "time": "Tracked time",
-  "offset": "Offset of tracked time",
+  "empty": "Es wurden noch keine Spiele verfolgt.",
+  "emptyAfterSearch": "Ihre Suche nach <strong>\"$search\"</strong> hat keine getrackten Spiele gefunden.",
+  "when": "Beim Streamen",
+  "time": "Getrackte Zeit",
+  "offset": "Versatz der getrackten Zeit",
   "main": "Main",
   "extra": "Main+Extra",
-  "completionist": "Completionist",
-  "game": "Tracked game",
-  "startedAt": "Tracking started at",
-  "showHistory": "Show history ($count)",
-  "hideHistory": "Hide history ($count)",
-  "searchToAddNewGame": "Search to add new game to track"
+  "completionist": "Vervollständiger",
+  "game": "Getrackten Spiel",
+  "startedAt": "Tracking gestartet um",
+  "showHistory": "Verlauf anzeigen ($count)",
+  "hideHistory": "Verlauf ausblenden ($count)",
+  "searchToAddNewGame": "Suche um ein neues Spiel zum Tracking hinzuzufügen"
 }

@@ -33,7 +33,7 @@
     "tips": "Tips",
     "hosts": "Hosts",
     "raids": "Raids",
-    "cmdredeems": "Command Redeems"
+    "cmdredeems": "Befehl wird eingelöst"
   },
   "title": {
     "name": "Variantenname",
@@ -62,7 +62,7 @@
   "messageTemplate": {
     "name": "Nachrichtenvorlage",
     "placeholder": "Nachrichtenvorlage festlegen",
-    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
+    "help": "Verfügbare Variablen: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "animationText": {
     "name": "Animationstext"

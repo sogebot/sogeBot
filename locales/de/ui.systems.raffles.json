@@ -6,16 +6,16 @@
   "settings": {
     "enabled": "Status",
     "announceNewEntries": {
-      "title": "Announce new entries",
-      "help": "If users joins raffle, announce message will be send to chat after while."
+      "title": "Neue Eintrag bekannt geben",
+      "help": "Wenn Benutzer an der Tombola teilnehmen, wird die Nachricht nach einer Weile an den Chat geschickt."
     },
     "announceNewEntriesBatchTime": {
-      "title": "How long to wait before announce new entries (in seconds)",
-      "help": "Longer time will keep chat cleaner, entries will be aggregated together."
+      "title": "Dauer bis zur Bekanntgabe neuer Einträge (in Sekunden)",
+      "help": "Längere Zeit sorgt dafür, dass der Chat sauberer bleibt, die Einträge werden zusammengefasst."
     },
     "deleteRaffleJoinCommands": {
-      "title": "Delete user raffle join command",
-      "help": "This will delete user message if they use !yourraffle command. Should keep chat cleaner."
+      "title": "Lösche Benutzer Tombolen join Befehl",
+      "help": "Dies wird Benutzernachricht löschen, wenn sie !yourraffle Befehl verwenden. Soll den Chat sauberer halten."
     },
     "allowOverTicketing": {
       "title": "Überschreitung der maximalen Tickets erlauben",
@@ -26,8 +26,8 @@
       "help": "in Minuten"
     },
     "raffleAnnounceMessageInterval": {
-      "title": "Announce message interval",
-      "help": "How many messages must be sent to chat until announce can be posted."
+      "title": "Nachrichtenintervall ankündigen",
+      "help": "Wie viele Nachrichten in den Chat geschickt werden müssen, bis die Ankündigungen veröffentlicht werden."
     },
     "subscribersPercent": {
       "title": "Zusätzliches Glück der Abonnenten",
