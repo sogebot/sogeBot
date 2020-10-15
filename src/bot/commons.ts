@@ -70,7 +70,7 @@ export async function parserReply(response: string | Promise<string>, opts: { se
  */
 export const announceTypes = ['bets', 'duel', 'heist', 'timers', 'songs', 'scrim', 'raffles', 'polls', 'general'] as const;
 export async function announce(messageToAnnounce: string, type: typeof announceTypes[number]) {
-  messageToAnnounce = await new Message(messageToAnnounce).parse({}) as string;
+  messageToAnnounce = await new Message(messageToAnnounce).parse({ sender: getBotSender() }) as string;
   sendMessage(messageToAnnounce, {
     username: oauth.botUsername,
     displayName: oauth.botUsername,
