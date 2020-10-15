@@ -6,7 +6,7 @@
 
 ### Parameters
 
-- `<type>` -  possible values: normal, bits, tips, *default: normal*
+- `<type>` -  possible values: normal, bits, tips, numbers, *default: normal*
 - Options are splitted with **|**
 
 ### Examples
@@ -47,18 +47,33 @@
 #### Examples
 
 <blockquote>
+  <strong>owner:</strong> !poll open -title "What is better, Star Citizen
+  or Elite: Dangerous?" Star Citizen | Elite: Dangerous <br />
+  <strong>bot:</strong> Poll opened for "What is better, Star Citizen
+  or Elite: Dangerous?"! You can vote by by !vote X
+  <br />
+  <strong>bot:</strong> !vote 1 => Star Citizen <br />
+  <strong>bot:</strong> !vote 2 => Elite: Dangerous <br />
   <strong>viewer: </strong> !vote 1 <br />
   <strong>viewer2: </strong> !vote 2 <br />
 </blockquote>
 
+### Number (simple) voting
+
+`<voteNum>`
+
+#### Examples
+
 <blockquote>
-  <strong>owner:</strong> !poll open -tips -title "What is better, Star Citizen
+  <strong>owner:</strong> !poll open -numbers -title "What is better, Star Citizen
   or Elite: Dangerous?" Star Citizen | Elite: Dangerous <br />
-  <strong>bot:</strong> Poll by tips opened for "What is better, Star Citizen
-  or Elite: Dangerous?"! You can vote by adding hashtag #voteX into tip message
+  <strong>bot:</strong> Poll by numbers opened for "What is better, Star Citizen
+  or Elite: Dangerous?"! You can vote by typing number into chat.
   <br />
-  <strong>bot:</strong> #vote1 => Star Citizen <br />
-  <strong>bot:</strong> #vote2 => Elite: Dangerous <br />
+  <strong>bot:</strong> 1 => Star Citizen <br />
+  <strong>bot:</strong> 2 => Elite: Dangerous <br />
+  <strong>viewer: </strong> 1 <br />
+  <strong>viewer2: </strong> 2 <br />
 </blockquote>
 
 ### Tips voting
@@ -69,6 +84,16 @@ Voting is achieved by adding `#vote<voteNum>` into tip message
 is taking into consideration)
 
 #### Examples
+
+<blockquote>
+  <strong>owner:</strong> !poll open -tips -title "What is better, Star Citizen
+  or Elite: Dangerous?" Star Citizen | Elite: Dangerous <br />
+  <strong>bot:</strong> Poll by tips opened for "What is better, Star Citizen
+  or Elite: Dangerous?"! You can vote by adding hashtag #voteX into tip message
+  <br />
+  <strong>bot:</strong> #vote1 => Star Citizen <br />
+  <strong>bot:</strong> #vote2 => Elite: Dangerous <br />
+</blockquote>
 
 <blockquote>
   <i>+tip, 10USD, message: Lorem Ipsum #vote1</i> < user
@@ -87,6 +112,13 @@ is taking into consideration)
 #### Examples
 
 <blockquote>
+  <strong>owner:</strong> !poll open -bits -title "What is better, Star Citizen
+  or Elite: Dangerous?" Star Citizen | Elite: Dangerous <br />
+  <strong>bot:</strong> Poll by cheers opened for "What is better, Star Citizen
+  or Elite: Dangerous?"! You can vote by adding hashtag #voteX into bit message
+  <br />
+  <strong>bot:</strong> #vote1 => Star Citizen <br />
+  <strong>bot:</strong> #vote2 => Elite: Dangerous <br />
   <strong>viewer:</strong> Cheer10 Cheer10 #vote1 <br />
   <strong>viewer:</strong> Cheer10 Cheer10 I am voting for #vote2
 </blockquote>
