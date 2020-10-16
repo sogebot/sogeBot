@@ -16,9 +16,6 @@ import currency from './currency';
 import { Permissions } from './database/entity/permissions';
 
 class Users extends Core {
-  uiSortCache: string | null = null;
-  uiSortCacheViewers: Array<any> = [];
-
   constructor () {
     super();
 
@@ -146,6 +143,9 @@ class Users extends Core {
   }
 
   async getIdByName (username: string) {
+    if (username.startsWith('@')) {
+      username = username.substring(1);
+    }
     const user = await getRepository(User).findOne({ username });
     if (!user) {
       const savedUser = await getRepository(User).save({

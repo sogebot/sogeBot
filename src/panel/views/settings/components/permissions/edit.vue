@@ -50,6 +50,11 @@
           </div>
 
           <div class="form-group col-md-12" v-if="!item.isCorePermission">
+            <label>{{ translate('core.permissions.manuallyExcludedUsers') }}</label>
+            <userslist :ids="item.excludeUserIds" @update="item.excludeUserIds = $event;" :key="'exclude-userslist' + item.id"></userslist>
+          </div>
+
+          <div class="form-group col-md-12" v-if="!item.isCorePermission">
             <label>{{ translate('core.permissions.filters') }}</label>
             <filters :filters="item.filters" @update="item.filters = $event; "></filters>
           </div>

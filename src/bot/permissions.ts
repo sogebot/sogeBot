@@ -6,7 +6,7 @@ import {
 } from './commons';
 import { debug, warning } from './helpers/log';
 import { addToCachedHighestPermission, cleanViewersCache, getFromCachedHighestPermission, permission } from './helpers/permissions';
-import { areDecoratorsLoaded, command, default_permission, settings } from './decorators';
+import { areDecoratorsLoaded, command, default_permission } from './decorators';
 import { isMainThread } from './cluster';
 import { error } from './helpers/log';
 import { adminEndpoint } from './helpers/socket';
@@ -16,16 +16,12 @@ import { getRepository, LessThan } from 'typeorm';
 import { User, UserInterface } from './database/entity/user';
 import oauth from './oauth';
 import currency from './currency';
+import Expects from './expects';
+import users from './users';
 
 let isWarnedAboutCasters = false;
 
 class Permissions extends Core {
-  @settings('warnings')
-  public sendWarning = false;
-
-  @settings('warnings')
-  public sendByWhisper = false;
-
   constructor() {
     super();
     this.addMenu({ category: 'settings', name: 'permissions', id: 'settings/permissions', this: null });
@@ -131,8 +127,8 @@ class Permissions extends Core {
   }
 
   recacheOnlineUsersPermission() {
-    getRepository(User).find({ isOnline: true }).then(users => {
-      for (const user of users) {
+    getRepository(User).find({ isOnline: true }).then(users2 => {
+      for (const user of users2) {
         cleanViewersCache(user.userId);
         this.getUserHighestPermission(user.userId);
       }
@@ -195,6 +191,11 @@ class Permissions extends Core {
       }
       if (!pItem) {
         throw Error(`Permissions ${permId} doesn't exist`);
+      }
+
+      // if userId is part of excludeUserIds => fakse
+      if (pItem.excludeUserIds.includes(String(userId))) {
+        return { access: false, permission: pItem };
       }
 
       // if userId is part of userIds => true
@@ -319,6 +320,88 @@ class Permissions extends Core {
     return true;
   }
 
+  /**
+   * !permission exclude-add -p SongRequest -u soge
+   */
+  @command('!permission exclude-add')
+  @default_permission(permission.CASTERS)
+  async excludeAdd(opts: CommandOptions): Promise<CommandResponse[]> {
+    try  {
+      const [userlevel, username] = new Expects(opts.parameters)
+        .permission()
+        .argument({ name: 'u', type: 'username' })
+        .toArray();
+
+      const userId = await users.getIdByName(username);
+      if (!userId) {
+        throw new Error(prepare('permissions.userNotFound', { username }));
+      }
+
+      const pItem = await this.get(userlevel);
+      if (!pItem) {
+        throw Error(prepare('permissions.permissionNotFound', { userlevel }));
+      }
+      if (pItem.isCorePermission) {
+        throw Error(prepare('permissions.cannotIgnoreForCorePermission', { userlevel: pItem.name }));
+      }
+
+      await getRepository(PermissionsEntity).save({
+        ...pItem, excludeUserIds: [ String(userId), ...pItem.excludeUserIds ],
+      });
+      cleanViewersCache();
+
+      return [{
+        response: prepare('permissions.excludeAddSuccessful', {
+          username,
+          permissionName: pItem.name,
+        }),
+        ...opts,
+      }];
+    } catch (e) {
+      console.error(e);
+      return [{ response: e.message, ...opts }];
+    }
+  }
+
+  /**
+   * !permission exclude-rm -p SongRequest -u soge
+   */
+  @command('!permission exclude-rm')
+  @default_permission(permission.CASTERS)
+  async excludeRm(opts: CommandOptions): Promise<CommandResponse[]> {
+    try  {
+      const [userlevel, username] = new Expects(opts.parameters)
+        .permission()
+        .argument({ name: 'u', type: 'username' })
+        .toArray();
+
+      const userId = await users.getIdByName(username);
+      if (!userId) {
+        throw new Error(prepare('permissions.userNotFound', { username }));
+      }
+
+      const pItem = await this.get(userlevel);
+      if (!pItem) {
+        throw Error(prepare('permissions.permissionNotFound', { userlevel }));
+      }
+
+      await getRepository(PermissionsEntity).save({
+        ...pItem, excludeUserIds: [ ...pItem.excludeUserIds.filter(id => id !== String(userId)) ],
+      });
+      cleanViewersCache();
+
+      return [{
+        response: prepare('permissions.excludeRmSuccessful', {
+          username,
+          permissionName: pItem.name,
+        }),
+        ...opts,
+      }];
+    } catch (e) {
+      return [{ response: e.message, ...opts }];
+    }
+  }
+
   @command('!permission list')
   @default_permission(permission.CASTERS)
   protected async list(opts: CommandOptions): Promise<CommandResponse[]> {
@@ -355,6 +438,7 @@ class Permissions extends Core {
         isWaterfallAllowed: true,
         order: p.length + addedCount,
         userIds: [],
+        excludeUserIds: [],
         filters: [],
       });
       addedCount++;
@@ -369,6 +453,7 @@ class Permissions extends Core {
         isWaterfallAllowed: true,
         order: p.length + addedCount,
         userIds: [],
+        excludeUserIds: [],
         filters: [],
       });
       addedCount++;
@@ -383,6 +468,7 @@ class Permissions extends Core {
         isWaterfallAllowed: true,
         order: p.length + addedCount,
         userIds: [],
+        excludeUserIds: [],
         filters: [],
       });
       addedCount++;
@@ -397,6 +483,7 @@ class Permissions extends Core {
         isWaterfallAllowed: true,
         order: p.length + addedCount,
         userIds: [],
+        excludeUserIds: [],
         filters: [],
       });
       addedCount++;
@@ -411,6 +498,7 @@ class Permissions extends Core {
         isWaterfallAllowed: true,
         order: p.length + addedCount,
         userIds: [],
+        excludeUserIds: [],
         filters: [],
       });
       addedCount++;
@@ -425,6 +513,7 @@ class Permissions extends Core {
         isWaterfallAllowed: true,
         order: p.length + addedCount,
         userIds: [],
+        excludeUserIds: [],
         filters: [],
       });
       addedCount++;

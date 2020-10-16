@@ -440,7 +440,7 @@ export const init = () => {
     });
     socket.on('core', async (cb) => {
       const toEmit: { name: string }[] = [];
-      for (const system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch', 'socket']) {
+      for (const system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch', 'socket', 'permissions']) {
         toEmit.push({
           name: system.toLowerCase(),
         });

@@ -9,6 +9,7 @@ export interface PermissionsInterface {
   isWaterfallAllowed: boolean;
   automation: 'none' | 'casters' | 'moderators' | 'subscribers' | 'viewers' | 'followers' | 'vip';
   userIds: string[];
+  excludeUserIds: string[];
   filters: PermissionFiltersInterface[];
 }
 
@@ -36,6 +37,7 @@ export const Permissions = new EntitySchema<Readonly<Required<PermissionsInterfa
     isWaterfallAllowed: { type: Boolean },
     automation: { type: 'varchar', length: 12 },
     userIds: { type: 'simple-array' },
+    excludeUserIds: { type: 'simple-array' },
   },
   relations: {
     filters: {
