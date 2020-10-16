@@ -15,24 +15,6 @@ import { v4 as uuid} from 'uuid';
 import oauth from '../oauth';
 import { ioServer } from '../helpers/panel';
 
-
-const simpleEmotes = {
-  ':)': 'https://static-cdn.jtvnw.net/emoticons/v1/1/',
-  ':(': 'https://static-cdn.jtvnw.net/emoticons/v1/2/',
-  ':o': 'https://static-cdn.jtvnw.net/emoticons/v1/8/',
-  ':z': 'https://static-cdn.jtvnw.net/emoticons/v1/5/',
-  'B)': 'https://static-cdn.jtvnw.net/emoticons/v1/7/',
-  ':\\': 'https://static-cdn.jtvnw.net/emoticons/v1/10/',
-  ';)': 'https://static-cdn.jtvnw.net/emoticons/v1/11/',
-  ';p': 'https://static-cdn.jtvnw.net/emoticons/v1/13/',
-  ':p': 'https://static-cdn.jtvnw.net/emoticons/v1/12/',
-  'R)': 'https://static-cdn.jtvnw.net/emoticons/v1/14/',
-  'o_O': 'https://static-cdn.jtvnw.net/emoticons/v1/6/',
-  ':D': 'https://static-cdn.jtvnw.net/emoticons/v1/3/',
-  '>(': 'https://static-cdn.jtvnw.net/emoticons/v1/4/',
-  '<3': 'https://static-cdn.jtvnw.net/emoticons/v1/9/',
-};
-
 class Emotes extends Overlay {
   fetch = {
     global: false,
@@ -200,9 +182,6 @@ class Emotes extends Overlay {
         const request = await axios.get('https://api.twitchemotes.com/api/v4/channels/0');
         const emotes = request.data.emotes;
         for (let i = 0, length = emotes.length; i < length; i++) {
-          if (emotes[i].id < 15) {
-            continue;
-          } // skip simple emotes
           const cachedEmote = (await getRepository(CacheEmotes).findOne({ code: emotes[i].code, type: 'twitch' }));
           await getRepository(CacheEmotes).save({
             ...cachedEmote,
@@ -366,28 +345,11 @@ class Emotes extends Overlay {
 
     const cache = await getRepository(CacheEmotes).find();
 
-    // add simple emotes
-    for (const code of Object.keys(simpleEmotes)) {
-      cache.push({
-        id: uuid(),
-        type: 'twitch',
-        code,
-        urls: {
-          '1': simpleEmotes[code as keyof typeof simpleEmotes] + '1.0',
-          '2': simpleEmotes[code as keyof typeof simpleEmotes] + '2.0',
-          '3': simpleEmotes[code as keyof typeof simpleEmotes] + '3.0',
-        },
-      });
-    }
-
     // add emotes from twitch which are not maybe in cache (other partner emotes etc)
     for (const emote of opts.sender.emotes) {
-      // don't include simple emoted (id 1-14)
-      if (Number(emote.id) < 15) {
-        continue;
-      }
       // if emote is already in cache, continue
-      if (cache.find((o) => o.code === opts.message.slice(emote.start, emote.end+1))) {
+      const emoteCode = opts.message.slice(emote.start, emote.end+1);
+      if (cache.find((o) => o.code === emoteCode)) {
         continue;
       }
       const data: Required<CacheEmotesInterface> = {
@@ -412,7 +374,7 @@ class Emotes extends Overlay {
       if (parsed.includes(emote.code)) {
         continue;
       } // this emote was already parsed
-      for (let i = 0, length = (opts.message.match(new RegExp('\\b' + XRegExp.escape(emote.code) + '\\b', 'g')) || []).length; i < length; i++) {
+      for (let i = 0, length = (` ${opts.message} `.match(new RegExp('\\s*' + XRegExp.escape(emote.code) + '(\\s|\\b)', 'g')) || []).length; i < length; i++) {
         usedEmotes[emote.code] = emote;
         parsed.push(emote.code);
       }
@@ -438,17 +400,13 @@ class Emotes extends Overlay {
     const emotesArray: string[] = [];
 
     for (let i = 0, length = emotes.length; i < length; i++) {
-      if (_.includes(Object.keys(simpleEmotes), emotes[i])) {
-        emotesArray.push((simpleEmotes[emotes[i] as keyof typeof simpleEmotes]) + this.cEmotesSize + '.0');
-      } else {
-        try {
-          const items = await getRepository(CacheEmotes).find({ code: emotes[i] });
-          if (!_.isEmpty(items)) {
-            emotesArray.push(items[0].urls[this.cEmotesSize]);
-          }
-        } catch (e) {
-          continue;
+      try {
+        const items = await getRepository(CacheEmotes).find({ code: emotes[i] });
+        if (!_.isEmpty(items)) {
+          emotesArray.push(items[0].urls[this.cEmotesSize]);
         }
+      } catch (e) {
+        continue;
       }
     }
     return emotesArray;
