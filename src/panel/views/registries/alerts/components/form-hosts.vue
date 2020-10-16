@@ -38,6 +38,7 @@
     </b-form-group>
 
     <b-form-group
+      v-if="alertType === 'hosts'"
       label-cols-sm="4"
       label-cols-lg="3"
       label-for="showAutoHost"
@@ -260,6 +261,7 @@ import { required, minValue } from 'vuelidate/lib/validators'
 })
 export default class AlertsEditHostForm extends Vue {
   @PropSync('alert') readonly data !: AlertHostInterface
+  @PropSync('type') readonly alertType !: ['hosts', 'raids']
   @Prop() readonly index !: number
 
   theme = localStorage.getItem('theme') || get(this.$store.state, 'configuration.core.ui.theme', 'light');

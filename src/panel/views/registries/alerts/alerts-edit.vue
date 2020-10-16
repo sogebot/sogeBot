@@ -126,10 +126,10 @@
                   <template v-else>Variant {{ idx + 1 }}</template>
                 </template>
                 <p class="p-3" v-bind:key="event + idx">
-                  <form-follow v-if="event === 'cmdredeems' || event === 'follows' || event === 'subs' || event === 'subgifts' || event === 'subcommunitygifts'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
-                  <form-cheers v-else-if="event === 'cheers' || event === 'tips'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
-                  <form-resubs v-else-if="event === 'resubs'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
-                  <form-hosts v-else-if="event === 'hosts' || event === 'raids'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                  <form-follow v-if="event === 'cmdredeems' || event === 'follows' || event === 'subs' || event === 'subgifts' || event === 'subcommunitygifts'" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                  <form-cheers v-else-if="event === 'cheers' || event === 'tips'" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                  <form-resubs v-else-if="event === 'resubs'" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                  <form-hosts v-else-if="event === 'hosts' || event === 'raids'" :type="event" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                 </p>
               </b-tab>
 
