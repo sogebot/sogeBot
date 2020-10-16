@@ -39,6 +39,7 @@
   "name": "Nome",
   "baseUsersSet": "Conjunto base de usuários",
   "manuallyAddedUsers": "Usuários adicionados manualmente",
+  "manuallyExcludedUsers": "Manually excluded users",
   "filters": "Filtros",
   "testUser": "Usuário de teste",
   "none": "- nenhum -",
