@@ -39,7 +39,7 @@
   "name": "Název",
   "baseUsersSet": "Zákládní set uživatelů",
   "manuallyAddedUsers": "Manuálně přidaní uživatelé",
-  "manuallyExcludedUsers": "Manually excluded users",
+  "manuallyExcludedUsers": "Ručně vyloučení uživatelé",
   "filters": "Filtry",
   "testUser": "Otestovat uživatele",
   "none": "- žádné -",
