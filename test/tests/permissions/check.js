@@ -79,6 +79,7 @@ describe('Permissions - check()', () => {
         isWaterfallAllowed: false,
         automation: 'none',
         userIds: [6],
+        excludeUserIds: [],
         filters: [],
       });
     });
@@ -111,6 +112,7 @@ describe('Permissions - check()', () => {
         isWaterfallAllowed: false,
         automation: 'viewers',
         userIds: [],
+        excludeUserIds: [],
         filters: [{
           comparator: '==', type: 'points', value: 100,
         }],
@@ -145,6 +147,7 @@ describe('Permissions - check()', () => {
         isWaterfallAllowed: false,
         automation: 'viewers',
         userIds: [],
+        excludeUserIds: [],
         filters: [{
           comparator: '==', type: 'watched', value: 100,
         }],
@@ -179,6 +182,7 @@ describe('Permissions - check()', () => {
         isWaterfallAllowed: false,
         automation: 'viewers',
         userIds: [],
+        excludeUserIds: [],
         filters: [{
           comparator: '>=', type: 'tips', value: 100,
         }],
@@ -213,6 +217,7 @@ describe('Permissions - check()', () => {
         isWaterfallAllowed: false,
         automation: 'viewers',
         userIds: [],
+        excludeUserIds: [],
         filters: [{
           comparator: '>=', type: 'bits', value: 100,
         }],
@@ -247,6 +252,7 @@ describe('Permissions - check()', () => {
         isWaterfallAllowed: false,
         automation: 'viewers',
         userIds: [],
+        excludeUserIds: [],
         filters: [{
           comparator: '>=', type: 'messages', value: 100,
         }],
@@ -281,6 +287,7 @@ describe('Permissions - check()', () => {
         isWaterfallAllowed: false,
         automation: 'viewers',
         userIds: [],
+        excludeUserIds: [],
         filters: [{
           comparator: '>=', type: 'subtier', value: 2,
         }],
@@ -315,6 +322,7 @@ describe('Permissions - check()', () => {
         isWaterfallAllowed: false,
         automation: 'viewers',
         userIds: [],
+        excludeUserIds: [],
         filters: [{
           comparator: '>=', type: 'subcumulativemonths', value: 2,
         }],
@@ -349,6 +357,7 @@ describe('Permissions - check()', () => {
         isWaterfallAllowed: false,
         automation: 'viewers',
         userIds: [],
+        excludeUserIds: [],
         filters: [{
           comparator: '>=', type: 'substreakmonths', value: 2,
         }],

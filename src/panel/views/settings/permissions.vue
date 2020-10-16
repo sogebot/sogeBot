@@ -172,6 +172,7 @@
           automation: 'none',
           order: this.permissions.length - 1,
           userIds: [],
+          excludeUserIds: [],
           filters: [],
         };
         this.permissions.push(data);

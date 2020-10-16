@@ -372,6 +372,8 @@ class Expects {
       pattern = '[0-9]*';
     } else if (opts.type.name === 'Boolean') {
       pattern = 'true|false';
+    } else if (opts.type === 'username') {
+      pattern = '@?[A-Za-z0-9_]+';
     } else if (!opts.multi) {
       pattern = '\\S+';
     } else {
@@ -386,7 +388,7 @@ class Expects {
     if (!isNil(match) && match[opts.name].trim().length !== 0) {
       if (opts.type.name === 'Boolean') {
         this.match.push(opts.type(match[opts.name].trim().toLowerCase() === 'true'));
-      } else if (opts.type === 'uuid') {
+      } else if (['uuid', 'username'].includes(opts.type)) {
         this.match.push(match[opts.name].trim());
       } else {
         this.match.push(opts.type(match[opts.name].trim()));
