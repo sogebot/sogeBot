@@ -236,17 +236,23 @@ class Spotify extends Integration {
     try {
       if ((this.enabled) && !_.isNil(this.client)) {
         const data = await this.client.getMe();
-        this.userId = data.body.id;
         this.username = data.body.display_name ? data.body.display_name : data.body.id;
+        if (this.userId !== data.body.id) {
+          info(chalk.yellow('SPOTIFY: ') + `Logged in as ${this.username}#${data.body.id}`);
+        }
+        this.userId = data.body.id;
       }
     } catch (e) {
-      if (e.message !== 'Unauthorized') {
+      if (e.message.includes('The access token expired.')) {
+        await this.IRefreshToken();
+        info(chalk.yellow('SPOTIFY: ') + 'Get of user failed, incorrect access token. Refreshing token and retrying.');
+        this.getMe();
+      } else  if (e.message !== 'Unauthorized') {
         info(chalk.yellow('SPOTIFY: ') + 'Get of user failed, check your credentials');
       }
       this.username = '';
       this.userId = null;
     }
-
     this.timeouts.getMe = global.setTimeout(() => this.getMe(), 30000);
   }
 
