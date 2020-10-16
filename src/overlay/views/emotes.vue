@@ -70,7 +70,7 @@ export default class EmotesOverlay extends Vue {
     } else if (emote.animation.type === 'facebook') {
       animation = {
         top: emote.position.top - random(window.innerHeight / 4, window.innerHeight / 1.2),
-        left: random(emote.position.left - 60, emote.position.left + 60),
+        left: random(emote.position.left - 100, Math.min(emote.position.left + 100, window.innerWidth - 100)),
         opacity: 0
       }
     } else if (emote.animation.type === 'fadezoom') {
@@ -114,7 +114,7 @@ export default class EmotesOverlay extends Vue {
 
   setLeft (type: string) {
     if (type === 'fadeup' || type === 'fadezoom') return random(window.innerWidth - 200) + 100
-    else if (type === 'facebook') return random(200) + window.innerWidth - 250
+    else if (type === 'facebook') return random(200) + window.innerWidth - 350
     else return window.innerWidth / 2
   }
 
