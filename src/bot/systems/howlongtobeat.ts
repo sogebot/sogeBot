@@ -13,6 +13,9 @@ import { HowLongToBeatGame, HowLongToBeatGameItem } from '../database/entity/how
 import { adminEndpoint } from '../helpers/socket';
 import api from '../api';
 import { error, info, warning } from '../helpers/log';
+import { onStreamStart } from '../decorators/on';
+
+const notFoundGames = [] as string[];
 
 class HowLongToBeat extends System {
   interval: number = constants.SECOND * 15;
@@ -30,6 +33,11 @@ class HowLongToBeat extends System {
         }
       }, this.interval);
     }
+  }
+
+  @onStreamStart()
+  resetNotFoundGames() {
+    notFoundGames.length = 0;
   }
 
   sockets() {
@@ -149,9 +157,17 @@ class HowLongToBeat extends System {
             gameplayCompletionist: gameFromHltb.gameplayCompletionist,
           });
         } else {
-          warning(`HLTB: game '${api.stats.currentGame}' was not found on HLTB service`);
+          if (notFoundGames.includes(api.stats.currentGame)) {
+            warning(`HLTB: game '${api.stats.currentGame}' was not found on HLTB service`);
+          }
         }
-        this.addToGameTimestamp();
+        if (!notFoundGames.includes(api.stats.currentGame)) {
+          notFoundGames.push(api.stats.currentGame);
+          // do one retry
+          setTimeout(() => {
+            this.addToGameTimestamp();
+          }, constants.MINUTE);
+        }
       } else {
         error(e.stack);
       }
