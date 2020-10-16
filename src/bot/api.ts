@@ -1543,7 +1543,9 @@ class API extends Core {
       if (!isNil(args.game)) {
         responses.response = translate('game.change.success').replace(/\$game/g, args.game);
         responses.status = true;
-        events.fire('game-changed', { oldGame: this.stats.currentGame, game: args.game });
+        if (this.stats.currentGame !== args.game) {
+          events.fire('game-changed', { oldGame: this.stats.currentGame, game: args.game });
+        }
         this.stats.currentGame = args.game;
       }
 
