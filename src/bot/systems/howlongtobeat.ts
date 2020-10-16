@@ -28,7 +28,8 @@ class HowLongToBeat extends System {
     if (isMainThread) {
       this.refreshImageThumbnail();
       setInterval(async () => {
-        if (api.isStreamOnline && this.enabled) {
+        const isGameInNotFoundList = api.stats.currentGame && notFoundGames.includes(api.stats.currentGame);
+        if (api.isStreamOnline && this.enabled && !isGameInNotFoundList) {
           this.addToGameTimestamp();
         }
       }, this.interval);
@@ -156,9 +157,12 @@ class HowLongToBeat extends System {
             gameplayMainExtra: gameFromHltb.gameplayMainExtra,
             gameplayCompletionist: gameFromHltb.gameplayCompletionist,
           });
+          notFoundGames.splice(notFoundGames.indexOf(api.stats.currentGame), 1);
         } else {
-          if (notFoundGames.includes(api.stats.currentGame)) {
-            warning(`HLTB: game '${api.stats.currentGame}' was not found on HLTB service`);
+          if (!notFoundGames.includes(api.stats.currentGame)) {
+            warning(`HLTB: game '${api.stats.currentGame}' was not found on HLTB service ... retrying in a while`);
+          } else {
+            warning(`HLTB: game '${api.stats.currentGame}' was not found on HLTB service ... skipping tracking this stream`);
           }
         }
         if (!notFoundGames.includes(api.stats.currentGame)) {
