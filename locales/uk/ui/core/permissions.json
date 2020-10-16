@@ -39,6 +39,7 @@
   "name": "Ім’я",
   "baseUsersSet": "Основний набір користувачів",
   "manuallyAddedUsers": "Вручну додати користувачів",
+  "manuallyExcludedUsers": "Manually excluded users",
   "filters": "Фільтри",
   "testUser": "Тестовий користувач",
   "none": "- нічого -",
