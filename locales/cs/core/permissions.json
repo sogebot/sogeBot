@@ -1,8 +1,8 @@
 {
   "list": "Seznam vašich oprávnění:",
-  "excludeAddSuccessful": "$sender, you added $username to exclude list for permission $permissionName",
-  "excludeRmSuccessful": "$sender, you removed $username from exclude list for permission $permissionName",
-  "userNotFound": "$sender, user $username was not found in database.",
-  "permissionNotFound": "$sender, permission $userlevel was not found in database.",
-  "cannotIgnoreForCorePermission": "$sender, you cannot manually exclude user for core permission $userlevel"
+  "excludeAddSuccessful": "$sender, přidal si $username do seznamu vyloučených pro oprávnění $permissionName",
+  "excludeRmSuccessful": "$sender, odebral si $username ze seznamu vyloučených pro oprávnění $permissionName",
+  "userNotFound": "$sender, uživatel $username nebyl nalezen v databázi.",
+  "permissionNotFound": "$sender, oprávnění $userlevel nebylo nalezeno v databázi.",
+  "cannotIgnoreForCorePermission": "$sender, uživatele nelze vyloučit ručně ze základního oprávnění $userlevel"
 }
