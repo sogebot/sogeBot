@@ -41,13 +41,12 @@ export default class CarouselOverlay extends Vue {
     head.appendChild(style);
   }
 
-  @Watch('text')
-  textWatch (val: string, old: string) {
+  onChange() {
     if (this.js) {
       console.group('onChange()')
       console.log(this.js)
       console.groupEnd()
-      eval(val + ';if (typeof onChange === "function") { onChange(); }')
+      eval(this.js + ';if (typeof onChange === "function") { onChange(); }')
     }
   }
 
@@ -80,10 +79,14 @@ export default class CarouselOverlay extends Vue {
         }
 
         setTimeout(() => {
+          const isChanged = this.text !== '' && this.text !== cb.text;
           this.text = cb.text
           this.$nextTick(() => {
             if (!this.js && cb.js) this.js = cb.js
             if (!this.css && cb.css) this.css = cb.css
+            if (isChanged) {
+              this.onChange();
+            }
           })
         }, 100)
       })
