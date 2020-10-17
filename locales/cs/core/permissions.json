@@ -1,3 +1,8 @@
 {
-  "list": "Seznam vašich oprávnění:"
+  "list": "Seznam vašich oprávnění:",
+  "excludeAddSuccessful": "$sender, přidal si $username do seznamu vyloučených pro oprávnění $permissionName",
+  "excludeRmSuccessful": "$sender, odebral si $username ze seznamu vyloučených pro oprávnění $permissionName",
+  "userNotFound": "$sender, uživatel $username nebyl nalezen v databázi.",
+  "permissionNotFound": "$sender, oprávnění $userlevel nebylo nalezeno v databázi.",
+  "cannotIgnoreForCorePermission": "$sender, uživatele nelze vyloučit ručně ze základního oprávnění $userlevel"
 }

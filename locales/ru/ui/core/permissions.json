@@ -39,6 +39,7 @@
   "name": "Название",
   "baseUsersSet": "Базовый набор пользователей",
   "manuallyAddedUsers": "Вручную добавленные пользователи",
+  "manuallyExcludedUsers": "Manually excluded users",
   "filters": "Фильтры",
   "testUser": "Тестовый пользователь",
   "none": "- нет -",
