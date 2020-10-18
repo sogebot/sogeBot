@@ -15,7 +15,6 @@ import { onChange, onLoad } from './decorators/on';
 import { getRepository } from 'typeorm';
 import { UserTip } from './database/entity/user';
 
-
 class Currency extends Core {
   mainCurrencyLoaded = false;
 

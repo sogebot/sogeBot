@@ -12,9 +12,6 @@ import general from './general';
 import { areDecoratorsLoaded } from './decorators';
 import { addMenu } from './helpers/panel';
 
-let translate_class: any = null;
-let translate: any = null;
-
 class Translate {
   custom: any[] = [];
   translations: any = {};
@@ -46,6 +43,12 @@ class Translate {
             const withoutLocales = f.replace('./locales/', '').replace('.json', '');
             _.set(this.translations, withoutLocales.split('/').join('.'), JSON.parse(fs.readFileSync(f, 'utf8')));
           }
+
+          // dayjs locale include
+          for(const key of Object.keys(this.translations)) {
+            require('dayjs/locale/' + key);
+          }
+
           if (_.isNil(this.translations[this.lang])) {
             warning(`Language ${this.lang} not found - fallback to en`);
             this.lang = 'en';
@@ -91,7 +94,7 @@ class Translate {
     return null;
   }
 
-  get (text: string, orig: string) {
+  get (text: string, orig: string | boolean) {
     try {
       let translated = '';
       const customTranslated = _.find(this.custom, function (o) {
@@ -112,8 +115,8 @@ class Translate {
   }
 }
 
-translate_class = new Translate();
-translate = translate_class.translate;
+const translate_class = new Translate();
+const translate = translate_class.translate;
 export default translate_class;
 export { translate };
 

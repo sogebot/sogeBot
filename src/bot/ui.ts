@@ -3,7 +3,6 @@ import { settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import { filter, isString, set } from 'lodash';
-import moment from 'moment';
 import { getBroadcaster } from './commons';
 import { isMainThread } from './cluster';
 import oauth from './oauth';
@@ -13,7 +12,7 @@ import webhooks from './webhooks';
 import { find, list } from './helpers/register';
 import { default as uiModule } from './ui';
 
-const timezone = (process.env.TIMEZONE ?? 'system') === 'system' || !process.env.TIMEZONE ? moment.tz.guess() : process.env.TIMEZONE;
+import { timezone } from './helpers/dayjs';
 
 class UI extends Core {
   @settings()

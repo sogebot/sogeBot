@@ -1,12 +1,14 @@
 import fs from 'fs';
-import moment from 'moment-timezone';
 import os from 'os';
 import util from 'util';
 import stripAnsi from 'strip-ansi';
 import { getFunctionNameFromStackTrace } from './stacktrace';
 
+import dayjs from 'dayjs';
+import { timezone } from './dayjs';
+import { isDbConnected } from './database';
+
 const logDir = './logs';
-const timezone = (process.env.TIMEZONE ?? 'system') === 'system' || !process.env.TIMEZONE ? moment.tz.guess() : process.env.TIMEZONE;
 
 if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir);
@@ -72,7 +74,7 @@ const levelFormat = {
 
 
 function format(level: Levels, message: any, category?: string) {
-  const timestamp = moment().tz(timezone).format('YYYY-MM-DD[T]HH:mm:ss.SSS');
+  const timestamp = dayjs().tz(timezone).format('YYYY-MM-DD[T]HH:mm:ss.SSS');
 
   if (typeof message === 'object') {
     message = util.inspect(message);
@@ -178,3 +180,12 @@ export function start(message: any) {
 export function stop(message: any) {
   log(message);
 }
+
+const logTimezone = async () => {
+  if (!isDbConnected) {
+    setTimeout(() => logTimezone(), 10);
+  } else {
+    info(`Bot timezone set to ${timezone}`);
+  }
+};
+logTimezone();

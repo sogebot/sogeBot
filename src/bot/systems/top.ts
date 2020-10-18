@@ -1,5 +1,10 @@
 import _ from 'lodash';
-import moment from 'moment-timezone';
+
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import relativeTime from 'dayjs/plugin/relativeTime';
+dayjs.extend(utc);
+dayjs.extend(relativeTime);
 
 import { getIgnoreList, isIgnored } from '../commons';
 import { getLocalizedName } from '../helpers/getLocalized';
@@ -111,9 +116,6 @@ class Top extends System {
 
     // count ignored users
     const _total = 10 + getIgnoreList().length;
-
-    moment.locale(translateLib.lang);
-
     const connection = await getConnection();
     switch (type) {
       case TYPE.TIME:
@@ -277,7 +279,7 @@ class Top extends System {
             break;
           case TYPE.FOLLOWAGE:
           case TYPE.SUBAGE:
-            message += `${moment.utc(user.value).format('L')} (${moment.utc(user.value).fromNow()})`;
+            message += `${dayjs.utc(user.value).locale(translateLib.lang).format('L')} (${dayjs.utc(user.value).locale(translateLib.lang).fromNow()})`;
             break;
         }
         if (i + 1 < 10 && !_.isNil(sorted[i + 1])) {
