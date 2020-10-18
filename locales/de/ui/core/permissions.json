@@ -39,7 +39,7 @@
   "name": "Name",
   "baseUsersSet": "Rechte ausgehend von Gruppe",
   "manuallyAddedUsers": "Selbst hinzugefügte Benutzer",
-  "manuallyExcludedUsers": "Manually excluded users",
+  "manuallyExcludedUsers": "Manuell ausgeschlossene Benutzer",
   "filters": "Filter",
   "testUser": "Benutzer testen",
   "none": "-Keine-",
