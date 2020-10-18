@@ -1,5 +1,3 @@
-import moment from 'moment';
-
 import TwitchJs, { HostTargetMessage, Message, PrivateMessages, UserNoticeMessages, UserStateTags } from 'twitch-js';
 
 import util from 'util';
@@ -35,6 +33,7 @@ import { avgResponse, linesParsedIncrement, setStatus } from './helpers/parser';
 import { translate } from './translate';
 import { Price } from './database/entity/price';
 import customcommands from './systems/customcommands';
+import dayjs from 'dayjs';
 
 const userHaveSubscriberBadges = (badges: Readonly<UserStateTags['badges']>) => {
   return typeof badges.subscriber !== 'undefined' || typeof badges.founder !== 'undefined';
@@ -504,7 +503,7 @@ class TMI extends Core {
       await getRepository(User).save({
         ...user,
         isSubscriber: true,
-        subscribedAt:  Number(moment().subtract(streakMonths, 'months').format('X')) * 1000,
+        subscribedAt:  Number(dayjs().subtract(streakMonths, 'month').format('X')) * 1000,
         subscribeTier: tier,
         subscribeCumulativeMonths: subCumulativeMonths,
         subscribeStreak: subStreak,
