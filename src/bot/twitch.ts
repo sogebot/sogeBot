@@ -1,6 +1,3 @@
-import moment from 'moment-timezone';
-require('moment-precise-range-plugin');
-
 import { isMainThread } from './cluster';
 
 import { isIgnored, prepare } from './commons';
@@ -21,7 +18,8 @@ import { translate } from './translate';
 import general from './general';
 import users from './users';
 
-const timezone = (process.env.TIMEZONE ?? 'system') === 'system' || !process.env.TIMEZONE ? moment.tz.guess() : process.env.TIMEZONE;
+import dayjs from 'dayjs';
+import { timezone } from './helpers/dayjs';
 
 class Twitch extends Core {
   @settings('general')
@@ -62,8 +60,7 @@ class Twitch extends Core {
 
   @command('!time')
   async time (opts: CommandOptions) {
-    moment.locale(general.lang);
-    return [ { response: prepare('time', { time: moment().tz(timezone).format('LTS') }), ...opts }];
+    return [ { response: prepare('time', { time: dayjs().locale(general.lang).tz(timezone).format('LTS') }), ...opts }];
   }
 
   @command('!followers')
@@ -83,13 +80,12 @@ class Twitch extends Core {
       .filter(o => {
         return !isIgnored({ username: o.username, userId: o.userId });
       });
-    moment.locale(general.lang);
 
     let lastFollowAgo = '';
     let lastFollowUsername = 'n/a';
     if (events.length > 0) {
       lastFollowUsername = await users.getNameById(events[0].userId);
-      lastFollowAgo = moment(events[0].timestamp).fromNow();
+      lastFollowAgo = dayjs(events[0].timestamp).locale(general.lang).fromNow();
     }
 
     const response = prepare('followers', {
@@ -120,13 +116,11 @@ class Twitch extends Core {
       return !isIgnored({ username: o.username, userId: o.userId });
     });
 
-    moment.locale(general.lang);
-
     let lastSubAgo = '';
     let lastSubUsername = 'n/a';
     if (events.length > 0) {
       lastSubUsername = await users.getNameById(events[0].userId);
-      lastSubAgo = moment(events[0].timestamp).fromNow();
+      lastSubAgo = dayjs(events[0].timestamp).locale(general.lang).fromNow();
     }
 
     const response = prepare('subs', {

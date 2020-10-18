@@ -25,7 +25,6 @@ import { HOUR, MINUTE } from '../constants';
 import Parser from '../parser';
 import { Message } from '../message';
 import api from '../api';
-import moment from 'moment';
 import general from '../general';
 import { isDbConnected } from '../helpers/database';
 import permissions from '../permissions';
@@ -33,7 +32,8 @@ import events from '../events';
 import users from '../users';
 import { attributesReplace } from '../helpers/attributesReplace';
 
-const timezone = (process.env.TIMEZONE ?? 'system') === 'system' || !process.env.TIMEZONE ? moment.tz.guess() : process.env.TIMEZONE;
+import dayjs from 'dayjs';
+import { timezone } from '../helpers/dayjs';
 
 class Discord extends Integration {
   client: DiscordJs.Client | null = null;
@@ -366,7 +366,7 @@ class Discord extends Integration {
         embed.addFields([
           { name: prepare('webpanel.responses.variable.game'), value: api.stats.currentGame},
           { name: prepare('webpanel.responses.variable.title'), value: api.stats.currentTitle},
-          { name: prepare('integrations.discord.streamed-at'), value: `${this.embedStartedAt} - ${moment().tz(timezone).format('LLL')}`, inline: true},
+          { name: prepare('integrations.discord.streamed-at'), value: `${this.embedStartedAt} - ${dayjs().locale(general.lang).tz(timezone).format('LLL')}`, inline: true},
           { name: prepare('webpanel.views'), value: api.stats.currentViews, inline: true},
           { name: prepare('webpanel.followers'), value: api.stats.currentFollowers, inline: true},
         ]);
@@ -384,7 +384,6 @@ class Discord extends Integration {
   @onStreamStart()
   async sendStreamStartAnnounce() {
     this.changeClientOnlinePresence();
-    moment.locale(general.lang); // set moment locale
     try {
       if (this.client && this.sendOnlineAnnounceToChannel.length > 0 && this.guild.length > 0) {
         const channel = this.client.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
@@ -392,7 +391,7 @@ class Discord extends Integration {
           throw new Error(`Channel ${this.sendOnlineAnnounceToChannel} not found on your discord server`);
         }
 
-        this.embedStartedAt = moment().tz(timezone).format('LLL');
+        this.embedStartedAt = dayjs().locale(general.lang).tz(timezone).format('LLL');
         const embed = new DiscordJs.MessageEmbed()
           .setURL('https://twitch.tv/' + oauth.generalChannel)
           .addFields([
