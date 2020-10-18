@@ -15,7 +15,6 @@ import { User } from './database/entity/user';
 import api from './api';
 import oauth from './oauth';
 import { translate } from './translate';
-import general from './general';
 import users from './users';
 
 import dayjs from 'dayjs';

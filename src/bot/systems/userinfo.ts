@@ -11,7 +11,6 @@ import permissions from '../permissions';
 import users from '../users';
 import api from '../api';
 import { translate } from '../translate';
-import translateLib from '../translate';
 import currency from '../currency';
 import ranks from './ranks';
 import points from './points';

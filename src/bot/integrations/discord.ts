@@ -25,7 +25,6 @@ import { HOUR, MINUTE } from '../constants';
 import Parser from '../parser';
 import { Message } from '../message';
 import api from '../api';
-import general from '../general';
 import { isDbConnected } from '../helpers/database';
 import permissions from '../permissions';
 import events from '../events';

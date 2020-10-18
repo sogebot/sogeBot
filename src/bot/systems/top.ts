@@ -14,7 +14,7 @@ import System from './_interface';
 import { debug } from '../helpers/log';
 import { getConnection, getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
-import translateLib, { translate } from '../translate';
+import { translate } from '../translate';
 import oauth from '../oauth';
 import points from './points';
 import tmi from '../tmi';
