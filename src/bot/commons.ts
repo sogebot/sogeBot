@@ -1,6 +1,5 @@
 import { readdirSync } from 'fs';
 import _ from 'lodash';
-import 'moment-precise-range-plugin';
 import { join, normalize } from 'path';
 
 import { chatOut, debug, warning } from './helpers/log';

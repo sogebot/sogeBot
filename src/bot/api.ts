@@ -1,8 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import querystring from 'querystring';
 import { setTimeout } from 'timers';
-import moment from 'moment';
-require('moment-precise-range-plugin'); // moment.preciseDiff
 import { clusteredAPI, isMainThread } from './cluster';
 import chalk from 'chalk';
 import { chunk, cloneDeep, defaults, filter, get, isNil, isNull, map } from 'lodash';
@@ -39,6 +37,7 @@ import { isDbConnected } from './helpers/database';
 import { find } from './helpers/register';
 import { SQLVariableLimit } from './helpers/sql';
 import { addUIError } from './panel';
+import dayjs from 'dayjs';
 
 let latestFollowedAtTimestamp = 0;
 
@@ -1203,7 +1202,7 @@ class API extends Core {
         // correct status and we've got a data - stream online
         const stream = request.data.data[0];
 
-        if (!moment.preciseDiff(moment(stream.started_at), moment(this.streamStatusChangeSince), true).firstDateWasLater) {
+        if (dayjs(stream.started_at).unix() >=  dayjs(this.streamStatusChangeSince).unix()) {
           this.streamStatusChangeSince = (new Date(stream.started_at)).getTime();
         }
         if (!this.isStreamOnline || this.streamType !== stream.type) {
@@ -1903,7 +1902,7 @@ class API extends Core {
 
       await getRepository(User).update({ userId: user.userId },
         {
-          followedAt: user.haveFollowedAtLock ? user.followedAt : Number(moment(request.data.data[0].followed_at).format('x')),
+          followedAt: user.haveFollowedAtLock ? user.followedAt : Number(dayjs(request.data.data[0].followed_at).format('x')),
           isFollower: user.haveFollowerLock? user.isFollower : true,
           followCheckAt: Date.now(),
         });

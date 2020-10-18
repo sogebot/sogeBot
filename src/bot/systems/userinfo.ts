@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import moment from 'moment';
 
 import { dateDiff, prepare } from '../commons';
 import { getLocalizedName } from '../helpers/getLocalized';
@@ -19,6 +18,7 @@ import points from './points';
 import Expects from '../expects';
 import { getUserFromTwitch } from '../microservices/getUserFromTwitch';
 import { clusteredFetchAccountAge } from '../cluster';
+import dayjs from 'dayjs';
 
 /*
  * !me
@@ -177,10 +177,9 @@ class UserInfo extends System {
       if (!user || user.seenAt === 0) {
         return [{ response: translate('lastseen.success.never').replace(/\$username/g, username), ...opts }];
       } else {
-        moment.locale(translateLib.lang);
         return [{ response: translate('lastseen.success.time')
           .replace(/\$username/g, username)
-          .replace(/\$when/g, moment(user.seenAt).format(this.lastSeenFormat)), ...opts }];
+          .replace(/\$when/g, dayjs(user.seenAt).locale(translateLib.lang).format(this.lastSeenFormat)), ...opts }];
       }
     } catch (e) {
       return [{ response: translate('lastseen.failed.parse'), ...opts }];

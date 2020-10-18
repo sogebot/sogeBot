@@ -14,7 +14,7 @@ import { Rank, RankInterface } from '../database/entity/rank';
 import { adminEndpoint } from '../helpers/socket';
 import users from '../users';
 import { translate } from '../translate';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 /*
  * !rank                          - show user rank
@@ -279,7 +279,7 @@ class Ranks extends System {
       }
       if (rank.next.type === 'follower') {
         const toNextRank = rank.next.value - (rank.current.type === 'follower' ? rank.current.value : 0);
-        const toNextRankFollow = moment(Date.now()).diff(moment(user?.followedAt || 0), 'months', true);
+        const toNextRankFollow = dayjs(Date.now()).diff(dayjs(user?.followedAt || 0), 'month', true);
         const toWatch = (toNextRank - toNextRankFollow);
         const percentage = 100 - (((toWatch) / toNextRank) * 100);
         const response = prepare('ranks.show-rank-with-next-rank', { rank: rank.current.rank, nextrank: `${rank.next.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)} ${getLocalizedName(toWatch.toFixed(1), translate('core.months'))})` });
@@ -340,7 +340,7 @@ class Ranks extends System {
       // search for follower rank
       const flwRank = ranks.filter(o => o.type === 'follower');
       for (const rank of flwRank) {
-        const followedAtDiff = moment(Date.now()).diff(moment(user.followedAt), 'months', true);
+        const followedAtDiff = dayjs(Date.now()).diff(dayjs(user.followedAt), 'month', true);
         if (followedAtDiff >= rank.value) {
           rankToReturn = rank;
           break;

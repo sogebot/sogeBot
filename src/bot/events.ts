@@ -1,6 +1,5 @@
 import axios from 'axios';
 import _ from 'lodash';
-import moment from 'moment';
 import safeEval from 'safe-eval';
 import { setTimeout } from 'timers'; // tslint workaround
 import { isMainThread } from './cluster';
@@ -31,6 +30,7 @@ import currency from './currency';
 import { isDbConnected } from './helpers/database';
 import { addUIError } from './panel';
 import { translate } from './translate';
+import dayjs from 'dayjs';
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
@@ -441,7 +441,7 @@ class Events extends Core {
     }
     event.triggered.runAfterXMinutes = _.get(event, 'triggered.runAfterXMinutes', 0);
     const shouldTrigger = event.triggered.runAfterXMinutes === 0
-                          && Number(moment.utc().format('X')) - Number(moment.utc(api.streamStatusChangeSince).format('X')) > Number(event.definitions.runAfterXMinutes) * 60;
+                          && Number(dayjs.utc().format('X')) - Number(dayjs.utc(api.streamStatusChangeSince).format('X')) > Number(event.definitions.runAfterXMinutes) * 60;
     if (shouldTrigger) {
       event.triggered.runAfterXMinutes = event.definitions.runAfterXMinutes;
       await getRepository(Event).save(event);
