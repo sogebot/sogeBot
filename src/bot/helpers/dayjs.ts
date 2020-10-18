@@ -1,13 +1,13 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import LocalizedFormat from 'dayjs/plugin/LocalizedFormat';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { default as tz } from 'dayjs/plugin/timezone';
 import glob from 'glob';
 dayjs.extend(utc);
 dayjs.extend(tz);
 dayjs.extend(relativeTime);
-dayjs.extend(LocalizedFormat);
+dayjs.extend(localizedFormat);
 
 // load locales
 const loadLocales = () => {
