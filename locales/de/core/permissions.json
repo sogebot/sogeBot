@@ -4,5 +4,5 @@
   "excludeRmSuccessful": "$sender, du hast $username von der Ausschlussliste für Berechtigung $permissionName entfernt",
   "userNotFound": "$sender, Benutzer $username wurde in der Datenbank nicht gefunden.",
   "permissionNotFound": "$sender, Berechtigung $userlevel wurde in der Datenbank nicht gefunden.",
-  "cannotIgnoreForCorePermission": "$sender, you cannot manually exclude user for core permission $userlevel"
+  "cannotIgnoreForCorePermission": "$sender, Sie können Benutzer für Kernberechtigungen nicht manuell ausschließen $userlevel"
 }
