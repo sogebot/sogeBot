@@ -60,7 +60,7 @@ class Twitch extends Core {
 
   @command('!time')
   async time (opts: CommandOptions) {
-    return [ { response: prepare('time', { time: dayjs().locale(general.lang).tz(timezone).format('LTS') }), ...opts }];
+    return [ { response: prepare('time', { time: dayjs().tz(timezone).format('LTS') }), ...opts }];
   }
 
   @command('!followers')
@@ -85,7 +85,7 @@ class Twitch extends Core {
     let lastFollowUsername = 'n/a';
     if (events.length > 0) {
       lastFollowUsername = await users.getNameById(events[0].userId);
-      lastFollowAgo = dayjs(events[0].timestamp).locale(general.lang).fromNow();
+      lastFollowAgo = dayjs(events[0].timestamp).fromNow();
     }
 
     const response = prepare('followers', {
@@ -120,7 +120,7 @@ class Twitch extends Core {
     let lastSubUsername = 'n/a';
     if (events.length > 0) {
       lastSubUsername = await users.getNameById(events[0].userId);
-      lastSubAgo = dayjs(events[0].timestamp).locale(general.lang).fromNow();
+      lastSubAgo = dayjs(events[0].timestamp).fromNow();
     }
 
     const response = prepare('subs', {

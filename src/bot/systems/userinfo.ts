@@ -179,7 +179,7 @@ class UserInfo extends System {
       } else {
         return [{ response: translate('lastseen.success.time')
           .replace(/\$username/g, username)
-          .replace(/\$when/g, dayjs(user.seenAt).locale(translateLib.lang).format(this.lastSeenFormat)), ...opts }];
+          .replace(/\$when/g, dayjs(user.seenAt).format(this.lastSeenFormat)), ...opts }];
       }
     } catch (e) {
       return [{ response: translate('lastseen.failed.parse'), ...opts }];
