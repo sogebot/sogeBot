@@ -15,7 +15,7 @@ import oauth from '../oauth';
 import { translate } from '../translate';
 import { ioServer } from '../helpers/panel';
 import { getBotSender } from '../commons';
-import dayjs from 'dayjs';
+import { dayjs } from '../helpers/dayjs';
 import { timestampToObject } from '../helpers/getTime';
 
 const ERROR_STREAM_NOT_ONLINE = '1';

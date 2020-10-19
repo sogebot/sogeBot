@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import { dayjs } from './dayjs';
 
 export function getTime(time: null | number, isChat: boolean) {
   let days: string | number = 0;

@@ -14,7 +14,7 @@ import { Rank, RankInterface } from '../database/entity/rank';
 import { adminEndpoint } from '../helpers/socket';
 import users from '../users';
 import { translate } from '../translate';
-import dayjs from 'dayjs';
+import { dayjs } from '../helpers/dayjs';
 
 /*
  * !rank                          - show user rank

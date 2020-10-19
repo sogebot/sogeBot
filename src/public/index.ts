@@ -1,16 +1,11 @@
-import 'moment/min/locales.min';
-
 import BootstrapVue from 'bootstrap-vue';
 
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-
-import moment from 'moment';
-import momentTimezone from 'moment-timezone';
-import VueMoment from 'vue-moment';
 import VueCompositionAPI from '@vue/composition-api';
 
 import translate from 'src/panel/helpers/translate';
+import { setLocale } from 'src/bot/helpers/dayjs';
 import { ButtonStates, states } from 'src/panel/helpers/buttonStates';
 import { setMainLoaded } from 'src/panel/helpers/isAvailableVariable';
 import { getConfiguration, getTranslations } from 'src/panel/helpers/socket';
@@ -21,9 +16,6 @@ Vue.component('fa', FontAwesomeIcon);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 Vue.use(BootstrapVue);
-Vue.use(VueMoment, {
-  moment, momentTimezone,
-});
 Vue.use(VueCompositionAPI);
 
 /* import widely used components */
@@ -83,7 +75,7 @@ const main = async () => {
       twitch: () => import('./components/twitch.vue'),
     },
     created() {
-      this.$moment.locale(this.$store.state.configuration.lang); // set proper moment locale
+      setLocale(this.$store.state.configuration.lang);
     },
     template: `
       <div id="app">

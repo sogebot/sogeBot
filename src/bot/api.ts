@@ -37,7 +37,7 @@ import { isDbConnected } from './helpers/database';
 import { find } from './helpers/register';
 import { SQLVariableLimit } from './helpers/sql';
 import { addUIError } from './panel';
-import dayjs from 'dayjs';
+import { dayjs } from './helpers/dayjs';
 
 let latestFollowedAtTimestamp = 0;
 

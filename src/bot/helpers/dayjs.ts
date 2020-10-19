@@ -8,12 +8,21 @@ dayjs.extend(tz);
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
 
-import 'dayjs/locale/cs';
-import 'dayjs/locale/de';
-import 'dayjs/locale/en';
-import 'dayjs/locale/fr';
-import 'dayjs/locale/pt';
-import 'dayjs/locale/ru';
-import 'dayjs/locale/uk';
+require('dayjs/locale/cs');
+require('dayjs/locale/de');
+require('dayjs/locale/en');
+require('dayjs/locale/fr');
+require('dayjs/locale/pt');
+require('dayjs/locale/ru');
+require('dayjs/locale/uk');
 
-export const timezone = (process.env.TIMEZONE ?? 'system') === 'system' || !process.env.TIMEZONE ? dayjs.tz.guess() : process.env.TIMEZONE;
+let timezone: string;
+if (typeof process !== 'undefined') {
+  timezone = (process.env.TIMEZONE ?? 'system') === 'system' || !process.env.TIMEZONE ? dayjs.tz.guess() : process.env.TIMEZONE;
+} else {
+  timezone = dayjs.tz.guess();
+}
+export const setLocale = (locale: string) => {
+  dayjs.locale(locale);
+};
+export { dayjs, timezone };

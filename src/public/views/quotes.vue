@@ -10,7 +10,7 @@
 
     loading(v-if="state.loading !== $state.success")
     b-table(v-else striped small :items="items" :fields="fields").table-p-0
-      template(v-slot:cell(createdAt)="data") {{ data.item.createdAt | moment('LL')}} {{ data.item.createdAt | moment('LTS') }}
+      template(v-slot:cell(createdAt)="data") {{ dayjs(data.item.createdAt).format('LL')}} {{ dayjs(data.item.createdAt).format('LTS') }}
       template(v-slot:cell(quote)="data")
         span(style="word-break: break-word;") {{ data.item.quote }}
       template(v-slot:cell(tags)="data")
@@ -23,6 +23,8 @@ import VueScrollTo from 'vue-scrollto';
 
 import { getSocket } from 'src/panel/helpers/socket';
 import { QuotesInterface } from '../../bot/database/entity/quotes';
+import { dayjs } from 'src/bot/helpers/dayjs';
+
 
 @Component({
   components: {
@@ -30,6 +32,7 @@ import { QuotesInterface } from '../../bot/database/entity/quotes';
   }
 })
 export default class playlist extends Vue {
+  dayjs = dayjs;
   socket = getSocket('/systems/quotes', true);
 
   items: any[] = []

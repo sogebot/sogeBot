@@ -4,8 +4,7 @@ import util from 'util';
 import stripAnsi from 'strip-ansi';
 import { getFunctionNameFromStackTrace } from './stacktrace';
 
-import dayjs from 'dayjs';
-import { timezone } from './dayjs';
+import { dayjs, timezone } from './dayjs';
 import { isDbConnected } from './database';
 
 const logDir = './logs';

@@ -45,19 +45,9 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
-import moment from 'moment'
-import VueMoment from 'vue-moment'
-import momentTimezone from 'moment-timezone'
 import { getSocket } from 'src/panel/helpers/socket';
 import JsonViewer from 'vue-json-viewer'
 import { PollInterface } from '../../bot/database/entity/poll';
-
-require('moment/locale/cs')
-require('moment/locale/ru')
-
-Vue.use(VueMoment, {
-    moment, momentTimezone
-})
 
 @Component({
   components: {
@@ -84,10 +74,6 @@ export default class PollsOverlay extends Vue {
     for(const interval of this.interval) {
       clearInterval(interval);
     }
-  }
-
-  mounted () {
-    this.$moment.locale(this.$store.state.configuration.lang)
   }
 
   created () {

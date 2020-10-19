@@ -113,7 +113,7 @@
             <template v-else>0</template>
           </div>
           <div class="col-auto text-truncate text-center text-uppercase pl-2 pr-2" v-if="!goal.endAfterIgnore">
-            {{ $moment().to(goal.endAfter) }}
+            {{ dayjs().to(goal.endAfter) }}
           </div>
           <div class="col text-right pr-2">
             <template v-if="goal.type === 'tips'">
@@ -146,22 +146,15 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 Vue.use(ProgressPlugin);
 
-import moment from 'moment'
-import VueMoment from 'vue-moment'
-import momentTimezone from 'moment-timezone'
-require('moment/locale/cs')
-require('moment/locale/ru')
-Vue.use(VueMoment, {
-    moment, momentTimezone
-})
-
 import { gsap } from 'gsap'
 import { GoalInterface, GoalGroupInterface } from 'src/bot/database/entity/goal';
-
+import { dayjs } from 'src/bot/helpers/dayjs';
+console.log(dayjs());
 @Component({})
 export default class GoalsOverlay extends Vue {
   textStrokeGenerator = textStrokeGenerator;
   shadowGenerator = shadowGenerator;
+  dayjs = dayjs;
 
   show: number = -1;
   group: GoalGroupInterface | null = null;
@@ -180,7 +173,6 @@ export default class GoalsOverlay extends Vue {
   }
 
   mounted() {
-    this.$moment.locale(this.$store.state.configuration.lang)
     this.refresh()
     this.interval.push(window.setInterval(() => this.refresh(), 5000));
     this.interval.push(window.setInterval(() => {

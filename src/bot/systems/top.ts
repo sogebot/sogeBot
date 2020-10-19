@@ -1,10 +1,6 @@
 import _ from 'lodash';
 
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import relativeTime from 'dayjs/plugin/relativeTime';
-dayjs.extend(utc);
-dayjs.extend(relativeTime);
+import { dayjs } from '../helpers/dayjs';
 
 import { getIgnoreList, isIgnored } from '../commons';
 import { getLocalizedName } from '../helpers/getLocalized';
