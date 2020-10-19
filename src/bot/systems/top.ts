@@ -14,7 +14,7 @@ import System from './_interface';
 import { debug } from '../helpers/log';
 import { getConnection, getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
-import translateLib, { translate } from '../translate';
+import { translate } from '../translate';
 import oauth from '../oauth';
 import points from './points';
 import tmi from '../tmi';
@@ -279,7 +279,7 @@ class Top extends System {
             break;
           case TYPE.FOLLOWAGE:
           case TYPE.SUBAGE:
-            message += `${dayjs.utc(user.value).locale(translateLib.lang).format('L')} (${dayjs.utc(user.value).locale(translateLib.lang).fromNow()})`;
+            message += `${dayjs.utc(user.value).format('L')} (${dayjs.utc(user.value).fromNow()})`;
             break;
         }
         if (i + 1 < 10 && !_.isNil(sorted[i + 1])) {

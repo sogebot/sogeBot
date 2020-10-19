@@ -25,7 +25,6 @@ import { HOUR, MINUTE } from '../constants';
 import Parser from '../parser';
 import { Message } from '../message';
 import api from '../api';
-import general from '../general';
 import { isDbConnected } from '../helpers/database';
 import permissions from '../permissions';
 import events from '../events';
@@ -366,7 +365,7 @@ class Discord extends Integration {
         embed.addFields([
           { name: prepare('webpanel.responses.variable.game'), value: api.stats.currentGame},
           { name: prepare('webpanel.responses.variable.title'), value: api.stats.currentTitle},
-          { name: prepare('integrations.discord.streamed-at'), value: `${this.embedStartedAt} - ${dayjs().locale(general.lang).tz(timezone).format('LLL')}`, inline: true},
+          { name: prepare('integrations.discord.streamed-at'), value: `${this.embedStartedAt} - ${dayjs().tz(timezone).format('LLL')}`, inline: true},
           { name: prepare('webpanel.views'), value: api.stats.currentViews, inline: true},
           { name: prepare('webpanel.followers'), value: api.stats.currentFollowers, inline: true},
         ]);
@@ -391,7 +390,7 @@ class Discord extends Integration {
           throw new Error(`Channel ${this.sendOnlineAnnounceToChannel} not found on your discord server`);
         }
 
-        this.embedStartedAt = dayjs().locale(general.lang).tz(timezone).format('LLL');
+        this.embedStartedAt = dayjs().tz(timezone).format('LLL');
         const embed = new DiscordJs.MessageEmbed()
           .setURL('https://twitch.tv/' + oauth.generalChannel)
           .addFields([
