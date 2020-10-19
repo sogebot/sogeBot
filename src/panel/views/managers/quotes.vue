@@ -378,6 +378,7 @@ export default defineComponent({
       tagsString,
       tags,
       toggleTags,
+      filteredTags,
       linkTo,
       editationItem,
       sidebarSlideEnabled,
