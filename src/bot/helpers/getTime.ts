@@ -1,5 +1,4 @@
-import moment from 'moment';
-require('moment-precise-range-plugin'); // moment.preciseDiff
+import { dayjs } from './dayjs';
 
 export function getTime(time: null | number, isChat: boolean) {
   let days: string | number = 0;
@@ -8,7 +7,7 @@ export function getTime(time: null | number, isChat: boolean) {
   let seconds: string | number = 0;
   const now = time === null || !time
     ? { days: 0, hours: 0, minutes: 0, seconds: 0 }
-    : moment.preciseDiff(moment.utc(), moment.utc(time), true);
+    : timestampToObject(dayjs().valueOf() - dayjs(time).valueOf());
   if (isChat) {
     days = now.days > 0 ? now.days : '';
     hours = now.hours > 0 ? now.hours : '';

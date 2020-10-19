@@ -8,15 +8,11 @@ import VueCompositionAPI from '@vue/composition-api';
 import { ButtonStates, states } from '../panel/helpers/buttonStates';
 import { store } from 'src/panel/helpers/store';
 
-import moment from 'moment';
-import momentTimezone from 'moment-timezone';
-import VueMoment from 'vue-moment';
 import urlParam from '../panel/helpers/urlParam';
 import { getConfiguration, getTranslations } from 'src/panel/helpers/socket';
 
-Vue.use(VueMoment, {
-  moment, momentTimezone,
-});
+import { setLocale } from 'src/bot/helpers/dayjs';
+
 Vue.use(VueRouter);
 Vue.use(LoadScript);
 Vue.use(VueCompositionAPI);
@@ -69,7 +65,7 @@ const overlays = async () => {
     store,
     router,
     created() {
-      this.$moment.locale(this.$store.state.configuration.lang); // set proper moment locale
+      setLocale(this.$store.state.configuration.lang);
     },
     template: `
       <div id="app">

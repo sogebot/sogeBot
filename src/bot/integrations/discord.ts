@@ -30,9 +30,8 @@ import permissions from '../permissions';
 import events from '../events';
 import users from '../users';
 import { attributesReplace } from '../helpers/attributesReplace';
+import { dayjs, timezone } from '../helpers/dayjs';
 
-import dayjs from 'dayjs';
-import { timezone } from '../helpers/dayjs';
 
 class Discord extends Integration {
   client: DiscordJs.Client | null = null;

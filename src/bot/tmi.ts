@@ -33,7 +33,7 @@ import { avgResponse, linesParsedIncrement, setStatus } from './helpers/parser';
 import { translate } from './translate';
 import { Price } from './database/entity/price';
 import customcommands from './systems/customcommands';
-import dayjs from 'dayjs';
+import { dayjs } from './helpers/dayjs';
 
 const userHaveSubscriberBadges = (badges: Readonly<UserStateTags['badges']>) => {
   return typeof badges.subscriber !== 'undefined' || typeof badges.founder !== 'undefined';

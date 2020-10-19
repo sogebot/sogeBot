@@ -269,7 +269,7 @@
       >
         <b-table class="hide-headers" :fields="['time', 'sender', 'newValue']" :items="history" borderless small>
           <template v-slot:cell(time)="data">
-            {{data.item.changedAt | moment('LL')}} {{ data.item.changedAt | moment('LTS') }}
+            {{ dayjs(data.item.changedAt).format('LL')}} {{ dayjs(data.item.changedAt).format('LTS') }}
           </template>
           <template v-slot:cell(sender)="data">
             {{ data.item.username !== 'n/a' ? data.item.username : 'Dashboard'}}
@@ -288,6 +288,7 @@ import { Vue, Component, Watch } from 'vue-property-decorator';
 import { chunk, orderBy, get } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 import { getSocket } from 'src/panel/helpers/socket';
+import { dayjs } from 'src/bot/helpers/dayjs';
 
 import { Route } from 'vue-router'
 import { NextFunction } from 'express';
@@ -323,6 +324,7 @@ const State: State = { IDLE: 0, PROGRESS: 1, DONE: 2, ERROR: 3 }
   }
 })
 export default class customVariablesEdit extends Vue {
+  dayjs = dayjs;
   socket = getSocket('/core/customvariables');
   psocket = getSocket('/core/permissions');
 

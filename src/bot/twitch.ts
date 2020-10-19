@@ -17,8 +17,8 @@ import oauth from './oauth';
 import { translate } from './translate';
 import users from './users';
 
-import dayjs from 'dayjs';
-import { timezone } from './helpers/dayjs';
+import { dayjs, timezone } from './helpers/dayjs';
+
 
 class Twitch extends Core {
   @settings('general')

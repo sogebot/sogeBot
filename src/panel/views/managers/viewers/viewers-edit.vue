@@ -154,7 +154,7 @@
                       :config="dateTimePickerConfigBitsTips"
                       class="form-control w-auto"/>
                     <template v-else>
-                      {{ moment(bits.cheeredAt).format('LLL') }}
+                      {{ dayjs(bits.cheeredAt).format('LLL') }}
                     </template>
                   </td>
                   <td>
@@ -199,7 +199,7 @@
                       :config="dateTimePickerConfigBitsTips"
                       class="form-control w-auto"/>
                     <template v-else>
-                      {{ moment(tips.tippedAt).format('LLL') }}
+                      {{ dayjs(tips.tippedAt).format('LLL') }}
                     </template>
                   </td>
                   <td>
@@ -276,7 +276,7 @@
             <b-tab :title="translate('managers.viewers.eventHistory')">
               <b-table :items="events" :fields="fields" class="table-p-0" :per-page="historyPerPage" :current-page="historyCurrentPage">
                 <template v-slot:cell(timestamp)="data">
-                  {{ moment(data.item.timestamp).format('LLL') }}
+                  {{ dayjs(data.item.timestamp).format('LLL') }}
                 </template>
                 <template v-slot:cell(event)="data">
                   <strong>{{data.item.event}}</strong>
@@ -317,7 +317,7 @@ import { NextFunction } from 'express';
 import VueFlatPickr from 'vue-flatpickr-component';
 import 'flatpickr/dist/flatpickr.css';
 
-import moment from 'moment';
+import { dayjs } from 'src/bot/helpers/dayjs';
 import { UserInterface } from 'src/bot/database/entity/user';
 import type { EventListInterface } from 'src/bot/database/entity/eventList';
 
@@ -340,7 +340,7 @@ Component.registerHooks([
   }
 })
 export default class viewersEdit extends Vue {
-  moment = moment;
+  dayjs = dayjs;
   orderBy = orderBy;
   xor = xor;
 
@@ -492,7 +492,7 @@ export default class viewersEdit extends Vue {
     if (!this.viewer || this.viewer.seenAt === 0) {
       return '';
     } else {
-      return moment(this.viewer.seenAt).format('HH:mm:ss, YYYY-MM-DD');
+      return dayjs(this.viewer.seenAt).format('HH:mm:ss, YYYY-MM-DD');
     }
   }
 

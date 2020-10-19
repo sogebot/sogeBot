@@ -17,7 +17,7 @@ import points from './points';
 import Expects from '../expects';
 import { getUserFromTwitch } from '../microservices/getUserFromTwitch';
 import { clusteredFetchAccountAge } from '../cluster';
-import dayjs from 'dayjs';
+import { dayjs } from '../helpers/dayjs';
 
 /*
  * !me

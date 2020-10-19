@@ -30,7 +30,7 @@ import currency from './currency';
 import { isDbConnected } from './helpers/database';
 import { addUIError } from './panel';
 import { translate } from './translate';
-import dayjs from 'dayjs';
+import { dayjs } from './helpers/dayjs';
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};

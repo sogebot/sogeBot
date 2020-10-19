@@ -68,8 +68,8 @@
               <b-button variant="primary" @click="editationDone">Done</b-button>
             </div>
             <b-list-group>
-              <b-list-group-item @mouseover="isHovered = event.id" @mouseleave="isHovered = ''" v-for="(event, index) of fEvents" :key="index" :active="selected.includes(event.id)" style="cursor: pointer; border-left: 0; border-right: 0; padding: 0.2rem 1.25rem 0.4rem 1.25rem" :style="{opacity: event.isTest ? 0.75 : 1}" @click="state.editation !== $state.idle ? toggleSelected(event) : null"><i class="eventlist-text" :title="moment(event.timestamp).format('LLLL')"><span class="text-danger" v-if="event.isTest">TEST</span>
-                  {{moment(event.timestamp).fromNow()}}</i>
+              <b-list-group-item @mouseover="isHovered = event.id" @mouseleave="isHovered = ''" v-for="(event, index) of fEvents" :key="index" :active="selected.includes(event.id)" style="cursor: pointer; border-left: 0; border-right: 0; padding: 0.2rem 1.25rem 0.4rem 1.25rem" :style="{opacity: event.isTest ? 0.75 : 1}" @click="state.editation !== $state.idle ? toggleSelected(event) : null"><i class="eventlist-text" :title="dayjs(event.timestamp).format('LLLL')"><span class="text-danger" v-if="event.isTest">TEST</span>
+                  {{dayjs(event.timestamp).fromNow()}}</i>
                 <div class="eventlist-username" :style="{'font-size': eventlistSize + 'px'}">
                   <div class="d-flex">
                     <div class="w-100"><span :title="event.username" style="z-index: 9">{{event.username}}</span><span class="pl-1" v-html="prepareMessage(event)"></span></div>
@@ -138,6 +138,7 @@
 import { getSocket } from 'src/panel/helpers/socket';
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { toBoolean } from 'src/bot/helpers/toBoolean';
+import { dayjs } from 'src/bot/helpers/dayjs';
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 import { chunk, debounce, get } from 'lodash-es';
 
@@ -145,7 +146,6 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faRedoAlt, faBell, faBellSlash } from '@fortawesome/free-solid-svg-icons';
 library.add(faRedoAlt, faBell, faBellSlash);
 
-import moment from 'moment';
 export default {
   props: ['popout', 'nodrag'],
   components: {
@@ -155,6 +155,7 @@ export default {
   },
   data: function () {
     return {
+      dayjs,
       EventBus,
       isHovered: '',
       socket: getSocket('/widgets/eventlist'),
@@ -322,9 +323,6 @@ export default {
       if (values.message) output += `<div class="eventlist-blockquote" style="font-size: ${this.eventlistMessageSize}px">${values.message.replace(/(\w{10})/g, '$1<wbr>')}</div>` // will force new line for long texts
 
       return output
-    },
-    moment: function (args) {
-      return moment(args) // expose moment function
     },
     toggle: function (id) {
       this.settings[id] = !this.settings[id];

@@ -32,7 +32,7 @@
               p.mb-0 {{ item.text }}
               a(:href="item.url").d-block.text-right
                 fa(:icon="['fab', 'twitter']" v-if="item.type === 'twitter'")
-                | {{ item.timestamp | moment('LLL') }}
+                | {{ dayjs(item.timestamp).format('LLL') }}
 
         b-tab
           template(v-slot:title)

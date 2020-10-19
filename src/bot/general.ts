@@ -16,7 +16,7 @@ import { HOUR, MINUTE } from './constants';
 import api from './api';
 import { socketsConnected } from './panel';
 import { find, list } from './helpers/register';
-import dayjs from 'dayjs';
+import { setLocale } from './helpers/dayjs';
 
 let threadStartTimestamp = Date.now();
 const gracefulExit = () => {
@@ -79,7 +79,7 @@ class General extends Core {
     await translateLib._load();
     if (isMainThread) {
       warning(translate('core.lang-selected'));
-      dayjs.locale(this.lang);
+      setLocale(this.lang);
     }
   }
 

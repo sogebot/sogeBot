@@ -27,7 +27,7 @@
       :sort-by.sync="sortBy"
       :sort-desc.sync="sortDesc">
       <template v-slot:cell(cheeredAt)='data'>
-        {{ moment(Number(data.item.cheeredAt)).format('LLL') }}
+        {{ dayjs(Number(data.item.cheeredAt)).format('LLL') }}
       </template>
       <template v-slot:cell(sortAmount)='data'>
         {{ data.item.amount }}
@@ -45,7 +45,7 @@
   import Vue from 'vue';
   import Chartkick from 'vue-chartkick';
   import Chart from 'chart.js';
-  import moment from 'moment';
+  import { dayjs } from 'src/bot/helpers/dayjs';
 
   import { library } from '@fortawesome/fontawesome-svg-core'
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -65,7 +65,7 @@
     },
     data: function () {
       const object: {
-        moment: any;
+        dayjs: any;
 
         socket: any;
         bits: Required<UserBitInterface>[];
@@ -75,7 +75,7 @@
         sortBy: string;
         sortDesc: boolean;
       } = {
-        moment: moment,
+        dayjs: dayjs,
 
         bits: [],
         socket: getSocket('/stats/bits'),
@@ -129,7 +129,7 @@
         const data: [ string, number ][] = [];
 
         for (const [month, bits] of Object.entries(this.tipsByMonth)) {
-          const monthFullName = moment().month(month).format("MMMM");
+          const monthFullName = dayjs().month(Number(month)).format("MMMM");
 
           data.push([
             monthFullName,

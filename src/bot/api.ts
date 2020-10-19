@@ -37,7 +37,7 @@ import { isDbConnected } from './helpers/database';
 import { find } from './helpers/register';
 import { SQLVariableLimit } from './helpers/sql';
 import { addUIError } from './panel';
-import dayjs from 'dayjs';
+import { dayjs } from './helpers/dayjs';
 
 let latestFollowedAtTimestamp = 0;
 
@@ -1202,7 +1202,7 @@ class API extends Core {
         // correct status and we've got a data - stream online
         const stream = request.data.data[0];
 
-        if (dayjs(stream.started_at).unix() >=  dayjs(this.streamStatusChangeSince).unix()) {
+        if (dayjs(stream.started_at).valueOf() >=  dayjs(this.streamStatusChangeSince).valueOf()) {
           this.streamStatusChangeSince = (new Date(stream.started_at)).getTime();
         }
         if (!this.isStreamOnline || this.streamType !== stream.type) {
