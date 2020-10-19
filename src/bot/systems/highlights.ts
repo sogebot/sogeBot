@@ -1,8 +1,6 @@
 import axios from 'axios';
 import { Request, Response } from 'express';
 import { isNil } from 'lodash';
-import moment from 'moment';
-import 'moment-precise-range-plugin';
 
 import { command, default_permission, settings, ui } from '../decorators';
 import { permission } from '../helpers/permissions';
@@ -17,6 +15,8 @@ import oauth from '../oauth';
 import { translate } from '../translate';
 import { ioServer } from '../helpers/panel';
 import { getBotSender } from '../commons';
+import dayjs from 'dayjs';
+import { timestampToObject } from '../helpers/getTime';
 
 const ERROR_STREAM_NOT_ONLINE = '1';
 const ERROR_MISSING_TOKEN = '2';
@@ -107,7 +107,7 @@ class Highlights extends System {
       api.calls.bot.remaining = request.headers['ratelimit-remaining'];
       api.calls.bot.refresh = request.headers['ratelimit-reset'];
 
-      const timestamp = moment.preciseDiff(moment.utc(), moment.utc(api.streamStatusChangeSince), true);
+      const timestamp = timestampToObject(dayjs().valueOf() - dayjs(api.streamStatusChangeSince).valueOf());
       const highlight = {
         videoId: request.data.data[0].id,
         timestamp: { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds },
