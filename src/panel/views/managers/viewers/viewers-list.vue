@@ -146,19 +146,19 @@
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             {{ translate('last-seen') }}:
           </strong>
-          {{ moment(Number(data.item.seenAt)).format('LLL') }}</div>
+          {{ dayjs(Number(data.item.seenAt)).format('LLL') }}</div>
         <div v-if="data.item.isFollower && Number(data.item.followedAt) !== 0">
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             <fa v-if="data.item.haveFollowedAtLock" :icon="['fas', 'fa-lock']"></fa>
             {{ translate('followed-since') }}:
           </strong>
-          {{ moment(Number(data.item.followedAt)).format('LLL') }}</div>
+          {{ dayjs(Number(data.item.followedAt)).format('LLL') }}</div>
         <div v-if="data.item.isSubscriber && Number(data.item.subscribedAt) !== 0">
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             <fa v-if="data.item.haveSubscribedAtLock" :icon="['fas', 'fa-lock']"></fa>
             {{ translate('subscribed-since') }}:
           </strong>
-          {{ moment(Number(data.item.subscribedAt)).format('LLL') }}
+          {{ dayjs(Number(data.item.subscribedAt)).format('LLL') }}
         </div>
       </template>
       <template v-slot:cell(stats)="data">
@@ -228,7 +228,7 @@ import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import { get } from 'lodash-es';
 import { capitalize } from 'src/panel/helpers/capitalize';
-import moment from 'moment';
+import { dayjs } from 'src/bot/helpers/dayjs';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faSortDown, faSortUp, faSortAlphaUp, faSortAlphaDown } from '@fortawesome/free-solid-svg-icons'
@@ -244,7 +244,7 @@ library.add(faSortDown, faSortUp, faSortAlphaUp, faSortAlphaDown)
 export default class viewersList extends Vue {
   capitalize = capitalize;
   get = get;
-  moment = moment;
+  dayjs = dayjs;
 
   socket = getSocket('/core/users');
 

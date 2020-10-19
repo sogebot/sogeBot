@@ -133,7 +133,7 @@
                   <strong v-else>{{ Number(totalVotes(vote.id)).toFixed(1) }}</strong>
                 </div>
                 <div style="width: 100%" v-if="vote.isOpened">{{ translate('systems.polls.activeFor') }} <strong>{{ activeTime(vote.id) | duration('humanize') }}</strong></div>
-                <div style="width: 100%" v-else>{{ translate('systems.polls.closedAt') }} <strong>{{ vote.closedAt | moment('LLL') }}</strong></div>
+                <div style="width: 100%" v-else>{{ translate('systems.polls.closedAt') }} <strong>{{ dayjs(vote.closedAt).format('LLL') }}</strong></div>
               </div>
             </div>
             <div class="card-footer">
@@ -165,22 +165,12 @@
 <script lang="ts">
   import Vue from 'vue'
   import { chunk, cloneDeep, isNil } from 'lodash-es'
-
-  import moment from 'moment'
-  import VueMoment from 'vue-moment'
-  import momentTimezone from 'moment-timezone'
-
-  require('moment/locale/cs')
-  require('moment/locale/ru')
+  import { dayjs } from 'src/bot/helpers/dayjs';
 
   import { getSocket } from 'src/panel/helpers/socket';
   import { PollInterface } from 'src/bot/database/entity/poll';
 
   import { v4 as uuid } from 'uuid'
-
-  Vue.use(VueMoment, {
-      moment, momentTimezone
-  })
 
   export default Vue.extend({
     components: {
@@ -188,6 +178,7 @@
     },
     data: function () {
       const object: {
+        dayjs: any,
         chunk: any,
         socket: any,
         votes: PollInterface[],
@@ -198,6 +189,7 @@
         interval: number,
         search: string,
       } = {
+        dayjs: dayjs,
         chunk: chunk,
         socket: getSocket('/systems/polls'),
         votes: [],
@@ -223,7 +215,6 @@
       clearInterval(this.interval)
     },
     mounted: function () {
-      this.$moment.locale(this.$store.state.configuration.lang)
       this.currentTime = Date.now()
       this.domWidth = (this.$refs['window'] as HTMLElement).clientWidth
       this.refresh();

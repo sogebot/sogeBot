@@ -27,7 +27,7 @@
       :sort-by.sync="sortBy"
       :sort-desc.sync="sortDesc">
       <template v-slot:cell(tippedAt)='data'>
-        {{ moment(Number(data.item.tippedAt)).format('LLL') }}
+        {{ dayjs(Number(data.item.tippedAt)).format('LLL') }}
       </template>
       <template v-slot:cell(sortAmount)='data'>
         {{ Number(data.item.amount).toFixed(2) }} {{data.item.currency}}
@@ -45,7 +45,7 @@
   import Vue from 'vue';
   import Chartkick from 'vue-chartkick';
   import Chart from 'chart.js';
-  import moment from 'moment';
+  import { dayjs } from 'src/bot/helpers/dayjs';
 
   import { library } from '@fortawesome/fontawesome-svg-core'
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -65,7 +65,7 @@
     },
     data: function () {
       const object: {
-        moment: any;
+        dayjs: any;
 
         socket: any;
         tips: Required<UserTipInterface>[];
@@ -75,7 +75,7 @@
         sortBy: string;
         sortDesc: boolean;
       } = {
-        moment: moment,
+        dayjs: dayjs,
 
         tips: [],
         socket: getSocket('/stats/tips'),
@@ -129,7 +129,7 @@
         const data: [ string, number ][] = [];
 
         for (const [month, tips] of Object.entries(this.tipsByMonth)) {
-          const monthFullName = moment().month(month).format("MMMM");
+          const monthFullName = dayjs().month(Number(month)).format("MMMM");
 
           data.push([
             monthFullName,

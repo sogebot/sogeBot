@@ -41,7 +41,7 @@
         <tbody>
           <tr v-for="(item, index) of selectedData" :key="index"
               :class="{'bg-danger': !String(item.code).startsWith('2'), 'text-light': !String(item.code).startsWith('2') }">
-            <th scope="row">{{ moment(item.timestamp).format('LTS') }}</th>
+            <th scope="row">{{ dayjs(item.timestamp).format('LTS') }}</th>
             <td>{{ item.call }}</td>
             <td>
               <div style="word-wrap: break-word; font-family: Monospace; overflow-y: auto; overflow-x: hidden; max-height:200px;">
@@ -63,7 +63,7 @@
 import { Vue, Component } from 'vue-property-decorator';
 import Chartkick from 'vue-chartkick';
 import Chart from 'chart.js';
-import moment from 'moment';
+import { dayjs } from 'src/bot/helpers/dayjs';
 import { get, isNil, groupBy } from 'lodash-es'
 
 Vue.use(Chartkick.use(Chart))
@@ -77,7 +77,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 })
 export default class apiStats extends Vue {
   socket = getSocket('/');
-  moment = moment;
+  dayjs = dayjs;
   selected: string = 'helix';
   data: any[] = [];
 

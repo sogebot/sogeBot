@@ -109,7 +109,7 @@
       </b-alert>
       <b-table v-else :fields="fields" :items="quotes" hover small style="cursor: pointer;" @row-clicked="linkTo($event)">
         <template v-slot:cell(createdAt)="data">
-          {{ data.item.createdAt | moment('LL')}} {{ data.item.createdAt | moment('LTS') }}
+          {{ dayjs(data.item.createdAt).format('LL')}} {{ dayjs(data.item.createdAt).format('LTS') }}
         </template>
 
         <template v-slot:cell(quotes)="data">
@@ -152,6 +152,7 @@ import translate from 'src/panel/helpers/translate';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { error } from 'src/panel/helpers/error';
 import { getUsernameById } from 'src/panel/helpers/userById';
+import { dayjs } from 'src/bot/helpers/dayjs';
 
 const socket = getSocket('/systems/quotes');
 
@@ -386,6 +387,7 @@ export default defineComponent({
       save,
       newItem,
       del,
+      dayjs,
     }
   }
 });
