@@ -26,15 +26,6 @@
                     b-progress-bar(:value="getBetsPercentage(index)")
                       span(
                         style="font-size: 1rem; text-shadow: 0px 0px 1px black, 0px 0px 2px black, 0px 0px 3px black, 0px 0px 4px black, 0px 0px 5px black, 0px 0px 6px black; position: absolute").ml-1.mr-1 {{ option }} ({{ getBets(index) }})
-
-                //div(style="height: 35px; cursor: pointer;" @click="close(index)").progress
-                  span.ml-1.mr-1.text-left {{ option }} ({{ getBets(index) }})
-                  div(
-                    class="progress-bar progress-bar-striped progress-bar-animated"
-                    role="progressbar"
-                    :style="{width: getBetsPercentage(index)}"
-                    style = "font-size: 1rem; text-shadow: 0px 0px 1px black, 0px 0px 2px black, 0px 0px 3px black, 0px 0px 4px black, 0px 0px 5px black, 0px 0px 6px black"
-                  )
               div.pb-2
                 button(@click="close('refund')").btn.btn-block.btn-danger.p-1.text-left
                   | {{ capitalize(translate('refund')) }}
