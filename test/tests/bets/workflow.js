@@ -37,21 +37,21 @@ const tests = {
         'Top 10',
       ],
       bets: [
-        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 1, betOn: 0 },
-        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 2, betOn: 1 },
-        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 3, betOn: 1 },
-        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 4, betOn: 1 },
-        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 5, betOn: 1 },
-        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 6, betOn: 1 },
-        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 7, betOn: 1 },
-        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 8, betOn: 1 },
-        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 9, betOn: 2 },
+        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 10, betOn: 0 },
+        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 20, betOn: 1 },
+        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 30, betOn: 1 },
+        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 40, betOn: 1 },
+        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 50, betOn: 1 },
+        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 60, betOn: 1 },
+        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 70, betOn: 1 },
+        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 80, betOn: 1 },
+        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 90, betOn: 2 },
       ],
       win: 0,
-      winTickets: 2,
+      winTickets: 16,
       response: {
         open: `New bet 'Jak se umistim?' is opened! Bet options: 1. 'Vyhra', 2. 'Top 3', 3. 'Top 10'. Use !bet 1-3 <amount> to win! You have only 5min to bet!`,
-        close: `Bets was closed and winning option was Vyhra! 1 users won in total 2 points!`,
+        close: `Bets was closed and winning option was Vyhra! 1 users won in total 16 points!`,
       },
     },
     {
@@ -62,21 +62,21 @@ const tests = {
         'Prohra',
       ],
       bets: [
-        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 1, betOn: 0 },
-        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 2, betOn: 1 },
-        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 3, betOn: 1 },
-        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 4, betOn: 1 },
-        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 5, betOn: 1 },
-        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 6, betOn: 1 },
-        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 7, betOn: 1 },
-        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 8, betOn: 1 },
-        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 9, betOn: 0 },
+        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 10, betOn: 0 },
+        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 20, betOn: 1 },
+        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 30, betOn: 1 },
+        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 40, betOn: 1 },
+        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 50, betOn: 1 },
+        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 60, betOn: 1 },
+        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 70, betOn: 1 },
+        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 80, betOn: 1 },
+        { username: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), userId: Math.floor(Math.random() * 100000), tickets: 90, betOn: 0 },
       ],
       win: 1,
-      winTickets: 49,
+      winTickets: 490,
       response: {
         open: `New bet 'Vyhra / Prohra' is opened! Bet options: 1. 'Vyhra', 2. 'Prohra'. Use !bet 1-2 <amount> to win! You have only 5min to bet!`,
-        close: `Bets was closed and winning option was Prohra! 7 users won in total 49 points!`,
+        close: `Bets was closed and winning option was Prohra! 7 users won in total 490 points!`,
       },
     },
   ],
@@ -130,7 +130,7 @@ describe('Bets - workflow()', () => {
 
           for (const bet of t.bets) {
             it(`user ${bet.username} will bet on ${bet.betOn + 1} ${bet.tickets} tickets`, async () => {
-              await getRepository(User).save({ username: bet.username , userId: bet.userId, points: bet.tickets + 10 });
+              await getRepository(User).save({ username: bet.username , userId: bet.userId, points: 100 });
               await bets.participate({
                 parameters: `${bet.betOn + 1} ${bet.tickets}`,
                 sender: { username: bet.username, userId: bet.userId },
@@ -143,6 +143,22 @@ describe('Bets - workflow()', () => {
             r = await bets.close({parameters: `${t.win}`, sender: owner});
             assert.strictEqual(r[0].response, t.response.close);
           });
+
+          for (const bet of t.bets) {
+            if (t.win !== bet.betOn) {
+              it(`LOST: user ${bet.username} should have ${100 - bet.tickets} tickets`, async () => {
+                const user = await getRepository(User).findOne({ username: bet.username , userId: bet.userId});
+                assert.strictEqual(user.points, 100 - bet.tickets);
+              });
+            } else {
+              const percentGain = (t.options.length * 20) / 100;
+              const expected = 100 + Math.round(bet.tickets * percentGain);
+              it(`WIN: user ${bet.username} should have ${expected} tickets`, async () => {
+                const user = await getRepository(User).findOne({ username: bet.username , userId: bet.userId});
+                assert.strictEqual(user.points, expected);
+              });
+            }
+          }
         }
       });
     }
