@@ -336,7 +336,7 @@ class Bets extends System {
       for (const user of currentBet.participations) {
         if (user.optionIdx === index) {
           total += user.points + Math.round((user.points * percentGain));
-          await getRepository(User).increment({ userId: Number(opts.sender.userId) }, 'points', user.points + Math.round((user.points * percentGain)));
+          await getRepository(User).increment({ userId: Number(user.userId) }, 'points', user.points + Math.round((user.points * percentGain)));
         }
       }
 
@@ -354,13 +354,10 @@ class Bets extends System {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
           return [{ response: prepare('bets.closeNotEnoughOptions'), ...opts } ];
-          break;
         case ERROR_NOT_RUNNING:
           return [{ response: prepare('bets.notRunning'), ...opts } ];
-          break;
         case ERROR_NOT_OPTION:
           return [{ response: prepare('bets.notOption', { command: opts.command }), ...opts }];
-          break;
         default:
           warning(e.stack);
           return [{ response: prepare('core.error'), ...opts } ];
