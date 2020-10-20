@@ -31,10 +31,12 @@ export async function parserReply(response: string | Promise<string>, opts: { se
     forceWithoutAt: typeof opts.sender.discord !== 'undefined', // we dont need @
   };
   const messageToSend = await (async () => {
+    const sender = senderObject.discord
+      ? { ...senderObject, discord: { author: senderObject.discord.author, channel: senderObject.discord.channel } } : senderObject;
     if (opts.attr?.skip) {
-      return prepare(await response as string, { ...opts, sender: senderObject.discord ? { ...senderObject, discord: senderObject.discord.author } : senderObject }, false);
+      return prepare(await response as string, { ...opts, sender }, false);
     } else {
-      return await new Message(await response as string).parse({ ...opts, sender: senderObject.discord ? { ...senderObject, discord: senderObject.discord.author } : senderObject }) as string;
+      return await new Message(await response as string).parse({ ...opts, sender }) as string;
     }
   })();
   if (opts.sender.discord) {
@@ -128,7 +130,10 @@ export function getGlobalIgnoreList() {
     });
 }
 
-export function isIgnored(sender: { username: string | null; userId?: number }) {
+export function isIgnored(sender: { username: string | null; userId?: string | number }) {
+  if (typeof sender.userId === 'string') {
+    sender.userId = Number(sender.userId);
+  }
   if (sender.username === null) {
     return false; // null can be bot from dashboard or event
   }
@@ -169,8 +174,8 @@ export function prepare(toTranslate: string, attr?: {[x: string]: any }, isTrans
   return msg;
 }
 
-export async function sendMessage(messageToSend: string | Promise<string>, sender: Partial<UserStateTags> | null, attr?: {
-  sender?: Partial<UserStateTags>;
+export async function sendMessage(messageToSend: string | Promise<string>, sender: Partial<UserStateTagsWithId> | null, attr?: {
+  sender?: Partial<UserStateTagsWithId>;
   quiet?: boolean;
   skip?: boolean;
   force?: boolean;
@@ -193,7 +198,7 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
   }
 
   if (!attr.skip) {
-    messageToSend = await new Message(messageToSend).parse(attr) as string;
+    messageToSend = await new Message(messageToSend).parse({...attr, sender: attr.sender ? attr.sender as UserStateTagsWithId : getBotSender()  }) as string;
   }
   if (messageToSend.length === 0) {
     return false;
@@ -302,7 +307,9 @@ export function getBotSender(): Readonly<CommandOptions['sender']> {
     displayName: getBot(),
     userId: getBotID(),
     emotes: [],
-    badges: {},
+    badges: {
+      admin: false,
+    },
     'message-type': 'chat',
     color: '#000000',
     userType: 'empty',
@@ -327,7 +334,7 @@ export function getBroadcaster() {
   }
 }
 
-export function isBroadcaster(user: string | CommandOptions['sender'] | { username: string | null; userId?: number } | UserStateTags) {
+export function isBroadcaster(user: string | CommandOptions['sender'] | { username: string | null; userId?: number | string } | UserStateTags) {
   try {
     return oauth.broadcasterUsername.toLowerCase().trim() === (_.isString(user) ? user : user.username?.toLowerCase().trim());
   } catch (e) {

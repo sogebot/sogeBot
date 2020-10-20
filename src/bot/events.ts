@@ -6,7 +6,7 @@ import { isMainThread } from './cluster';
 import Core from './_interface';
 import { flatten } from './helpers/flatten';
 import { attributesReplace } from './helpers/attributesReplace';
-import { announce, getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, parserReply, prepare } from './commons';
+import { announce, getBotSender, getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, parserReply, prepare } from './commons';
 import { getLocalizedName } from './helpers/getLocalized';
 import Message from './message';
 import Parser from './parser';
@@ -285,7 +285,7 @@ class Events extends Core {
       const replace = new RegExp(`\\$${key}`, 'g');
       command = command.replace(replace, val);
     }
-    command = await new Message(command).parse({ username: oauth.broadcasterUsername });
+    command = await new Message(command).parse({ username: oauth.broadcasterUsername, sender: getBotSender() });
 
     if (global.mocha) {
       const parse = new Parser({

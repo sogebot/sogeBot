@@ -12,6 +12,8 @@ type TimestampObject = {
   hours: number; minutes: number; seconds: number
 };
 
+type UserStateTagsWithId = UserStateTags & { userId: string };
+
 interface Command {
   name: string;
   command?: string;

@@ -28,7 +28,7 @@ import spotify from './integrations/spotify';
 import songs from './systems/songs';
 import Parser from './parser';
 import { translate } from './translate';
-import { isIgnored, parserReply, prepare } from './commons';
+import { getBotSender, isIgnored, parserReply, prepare } from './commons';
 import { getLocalizedName } from './helpers/getLocalized';
 import currency from './currency';
 import points from './systems/points';
@@ -148,7 +148,7 @@ class Message {
     return Entities.decode(this.message);
   }
 
-  async parse (attr: { [name: string]: any } = {}) {
+  async parse (attr: { [name: string]: any, sender: CommandOptions['sender'], 'message-type'?: string, forceWithoutAt?: boolean } = { sender: getBotSender() }) {
     this.message = await this.message; // if is promise
 
     const random = {
