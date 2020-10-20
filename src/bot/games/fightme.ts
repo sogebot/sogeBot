@@ -52,7 +52,7 @@ class FightMe extends Game {
       }
       const username = match[1].toLowerCase();
       user = await getRepository(User).findOneOrFail({ where: { username: username.toLowerCase() }});
-      challenger = await getRepository(User).findOneOrFail({ where: { userId: opts.sender.userId }});
+      challenger = await getRepository(User).findOneOrFail({ where: { userId: Number(opts.sender.userId) }});
     } catch (e) {
       return [{ response: translate('gambling.fightme.notEnoughOptions'), ...opts }];
     }
@@ -112,8 +112,8 @@ class FightMe extends Game {
       }
 
       const [winnerWillGet, loserWillLose] = await Promise.all([this.winnerWillGet, this.loserWillLose]);
-      await getRepository(User).increment({ userId: winner ? opts.sender.userId : user.userId }, 'points', Math.abs(Number(winnerWillGet)));
-      await points.decrement({ userId: !winner ? opts.sender.userId : user.userId }, Math.abs(Number(loserWillLose)));
+      await getRepository(User).increment({ userId: Number(winner ? opts.sender.userId : user.userId) }, 'points', Math.abs(Number(winnerWillGet)));
+      await points.decrement({ userId: Number(!winner ? opts.sender.userId : user.userId) }, Math.abs(Number(loserWillLose)));
 
       timeout(winner ? opts.sender.username : user.username, '!fightme result', this.timeout, false);
       fightMeChallenges = fightMeChallenges.filter(ch => {

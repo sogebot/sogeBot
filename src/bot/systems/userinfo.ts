@@ -196,7 +196,7 @@ class UserInfo extends System {
       } else {
         id = await users.getIdByName(username);
       }
-      const time = id ? Number((await users.getWatchedOf(id) / (60 * 60 * 1000))).toFixed(1) : 0;
+      const time = id ? Number((await users.getWatchedOf(Number(id)) / (60 * 60 * 1000))).toFixed(1) : 0;
       return [{ response: prepare('watched.success.time', { time: String(time), username }), ...opts }];
     } catch (e) {
       return [{ response: translate('watched.failed.parse'), ...opts }];
@@ -209,7 +209,7 @@ class UserInfo extends System {
       const message: (string | null)[] = [];
       const user = await getRepository(User).findOne({
         where: {
-          userId: opts.sender.userId,
+          userId: Number(opts.sender.userId),
         },
         cache: true,
       });
@@ -228,7 +228,7 @@ class UserInfo extends System {
 
       if (message.includes('$rank')) {
         const idx = message.indexOf('$rank');
-        const rank = await ranks.get(await getRepository(User).findOne({ userId: opts.sender.userId }));
+        const rank = await ranks.get(await getRepository(User).findOne({ userId: Number(opts.sender.userId) }));
         if (ranks.enabled && !_.isNull(rank.current)) {
           message[idx] = typeof rank.current === 'string' ? rank.current : rank.current.rank;
         } else {
@@ -275,7 +275,7 @@ class UserInfo extends System {
       if (message.includes('$role')) {
         const idx = message.indexOf('$role');
         message[idx] = null;
-        const permId = await permissions.getUserHighestPermission(opts.sender.userId);
+        const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
         if (permId) {
           const pItem = await permissions.get(permId);
           if (pItem) {
@@ -312,7 +312,7 @@ class UserInfo extends System {
         sender: {
           ...opts.sender,
           username,
-          userId: user.userId,
+          userId: String(user.userId),
         },
       }, true) as string;
       return [

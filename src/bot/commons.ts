@@ -73,7 +73,7 @@ export async function announce(messageToAnnounce: string, type: typeof announceT
   sendMessage(messageToAnnounce, {
     username: oauth.botUsername,
     displayName: oauth.botUsername,
-    userId: Number(oauth.botId),
+    userId: oauth.botId,
     emotes: [],
     badges: {},
     'message-type': 'chat',
@@ -254,7 +254,7 @@ export async function timeout(username: string, reason: string, timeMs: number, 
   clusteredClientTimeout(username, timeMs, reason, isMod);
 }
 
-export function getOwnerAsSender(): Readonly<UserStateTags & { userId: number }> {
+export function getOwnerAsSender(): Readonly<UserStateTags & { userId: string }> {
   return {
     username: getOwner(),
     displayName: getOwner(),
@@ -266,7 +266,7 @@ export function getOwnerAsSender(): Readonly<UserStateTags & { userId: number }>
     color: '#000000',
     userType: 'empty',
     emoteSets: [],
-    userId: Number(oauth.channelId),
+    userId: oauth.channelId,
   };
 }
 
@@ -291,9 +291,9 @@ export function getBot() {
 
 export function getBotID() {
   try {
-    return Number(oauth.botId);
+    return oauth.botId;
   } catch (e) {
-    return 0;
+    return '0';
   }
 }
 export function getBotSender(): Readonly<CommandOptions['sender']> {

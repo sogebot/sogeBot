@@ -148,7 +148,7 @@ class Queue extends System {
   @command('!queue join')
   async join (opts: CommandOptions): Promise<CommandResponse[]> {
     if (!(this.locked)) {
-      const user = await getRepository(User).findOne({ userId: opts.sender.userId });
+      const user = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
       if (!user) {
         await getRepository(User).save({
           userId: Number(opts.sender.userId),

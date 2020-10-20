@@ -169,7 +169,7 @@ class Price extends System {
       const response = prepare('price.user-have-not-enough-points', { amount: removePts, command: `${price.command}`, pointsName: await points.getPointsName(removePts) });
       parserReply(response, opts);
     } else {
-      await points.decrement({ userId: opts.sender.userId }, removePts);
+      await points.decrement({ userId: Number(opts.sender.userId) }, removePts);
     }
     return haveEnoughPoints;
   }
@@ -188,7 +188,7 @@ class Price extends System {
     const price = await getRepository(PriceEntity).findOne({ command: parsed[1], enabled: true });
     if (price) { // no price set
       const removePts = price.price;
-      await getRepository(User).increment({ userId: opts.sender.userId }, 'points', removePts);
+      await getRepository(User).increment({ userId: Number(opts.sender.userId) }, 'points', removePts);
     }
     return true;
   }

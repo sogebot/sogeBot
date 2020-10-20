@@ -163,7 +163,7 @@ class Cooldown extends System {
         const cooldown = await getRepository(CooldownEntity).findOne({ where: { name }, relations: ['viewers'] });
         if (!cooldown) {
           const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfCommandsInSeconds');
-          const permId = await permissions.getUserHighestPermission(opts.sender.userId);
+          const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
           if (permId === null) {
             // do nothing if user doesn't have permission
             return false;
@@ -214,7 +214,7 @@ class Cooldown extends System {
               data.push(cooldown);
             } else {
               const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfKeywordsInSeconds');
-              const permId = await permissions.getUserHighestPermission(opts.sender.userId);
+              const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
               if (permId === null) {
                 // do nothing if user doesn't have permission
                 return false;

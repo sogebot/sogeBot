@@ -203,7 +203,7 @@ class Points extends System {
     ]);
 
     // get user max permission
-    const permId = await permissions.getUserHighestPermission(opts.sender.userId);
+    const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
     if (!permId) {
       return true; // skip without permission
     }
@@ -215,7 +215,7 @@ class Points extends System {
       return;
     }
 
-    const user = await getRepository(User).findOne({ userId: opts.sender.userId });
+    const user = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
     if (!user) {
       return true;
     }
@@ -256,8 +256,8 @@ class Points extends System {
       : Number.MAX_SAFE_INTEGER;
   }
 
-  async getPointsOf(id: number) {
-    const user = await getRepository(User).findOne({ where: { userId: id }});
+  async getPointsOf(id: number | string) {
+    const user = await getRepository(User).findOne({ where: { userId: Number(id) }});
 
     if (user) {
       if (user.points < 0) {
@@ -351,7 +351,7 @@ class Points extends System {
       }
 
       const guser = await getRepository(User).findOne({ username });
-      const sender = await getRepository(User).findOne({ userId: opts.sender.userId });
+      const sender = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
 
       if (!sender) {
         throw new Error('Sender was not found in DB!');

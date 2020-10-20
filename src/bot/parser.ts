@@ -90,7 +90,7 @@ class Parser {
         const permissionCheckTime = Date.now();
         if (typeof getFromViewersCache(this.sender.userId, parser.permission) === 'undefined') {
           debug('parser.permission', `Permission not cached for ${this.sender.username}#${this.sender.userId} | ${parser.permission}`);
-          addToViewersCache(this.sender.userId, parser.permission, (await permissions.check(this.sender.userId, parser.permission, false)).access);
+          addToViewersCache(this.sender.userId, parser.permission, (await permissions.check(Number(this.sender.userId), parser.permission, false)).access);
           debug('parser.time', `Permission check for ${this.sender.username}#${this.sender.userId} | ${parser.permission} took ${(Date.now() - permissionCheckTime) / 1000}`);
         } else {
           debug('parser.permission', `Permission cached for ${this.sender.username}#${this.sender.userId} | ${parser.permission}`);
@@ -277,7 +277,7 @@ class Parser {
 
     if (this.sender && !disablePermissionCheck) {
       if (typeof getFromViewersCache(this.sender.userId, command.permission) === 'undefined') {
-        addToViewersCache(this.sender.userId, command.permission, (await permissions.check(this.sender.userId, command.permission, false)).access);
+        addToViewersCache(this.sender.userId, command.permission, (await permissions.check(Number(this.sender.userId), command.permission, false)).access);
       }
     }
 

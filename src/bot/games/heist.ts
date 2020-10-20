@@ -259,8 +259,8 @@ class Heist extends Game {
     } // send entryInstruction if command is not ok
 
     await Promise.all([
-      pointsSystem.decrement({ userId: opts.sender.userId }, Number(points)),
-      getRepository(HeistUser).save({ userId: opts.sender.userId, username: opts.sender.username, points: Number(points)}), // add user to heist list
+      pointsSystem.decrement({ userId: Number(opts.sender.userId) }, Number(points)),
+      getRepository(HeistUser).save({ userId: Number(opts.sender.userId), username: opts.sender.username, points: Number(points)}), // add user to heist list
     ]);
 
     // check how many users are in heist

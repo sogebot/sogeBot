@@ -50,9 +50,9 @@ class Roulette extends Game {
     }, 2000);
 
     if (isAlive) {
-      await getRepository(User).increment({ userId: opts.sender.userId }, 'points', Number(this.winnerWillGet));
+      await getRepository(User).increment({ userId: Number(opts.sender.userId) }, 'points', Number(this.winnerWillGet));
     } else {
-      await points.decrement({ userId: opts.sender.userId }, Number(this.loserWillLose));
+      await points.decrement({ userId: Number(opts.sender.userId) }, Number(this.loserWillLose));
     }
     responses.push({ response: isAlive ? translate('gambling.roulette.alive') : translate('gambling.roulette.dead'), ...opts, isAlive });
     return responses;

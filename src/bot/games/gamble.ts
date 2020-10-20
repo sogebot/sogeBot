@@ -62,10 +62,10 @@ class Gamble extends Game {
         throw Error(ERROR_MINIMAL_BET);
       }
 
-      await pointsSystem.decrement({ userId: opts.sender.userId }, points);
+      await pointsSystem.decrement({ userId: Number(opts.sender.userId) }, points);
       if (this.enableJackpot && _.random(0, 100, false) <= this.chanceToTriggerJackpot) {
         const incrementPointsWithJackpot = (points * 2) + this.jackpotValue;
-        await getRepository(User).increment({ userId: opts.sender.userId }, 'points', incrementPointsWithJackpot);
+        await getRepository(User).increment({ userId: Number(opts.sender.userId) }, 'points', incrementPointsWithJackpot);
         const currentPointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
         message = prepare('gambling.gamble.winJackpot', {
           pointsName: await pointsSystem.getPointsName(currentPointsOfUser),
@@ -75,7 +75,7 @@ class Gamble extends Game {
         });
         this.jackpotValue = 0;
       } else  if (_.random(0, 100, false) <= this.chanceToWin) {
-        await getRepository(User).increment({ userId: opts.sender.userId }, 'points', points * 2);
+        await getRepository(User).increment({ userId: Number(opts.sender.userId) }, 'points', points * 2);
         const updatedPoints = await pointsSystem.getPointsOf(opts.sender.userId);
         message = prepare('gambling.gamble.win', {
           pointsName: await pointsSystem.getPointsName(updatedPoints),
