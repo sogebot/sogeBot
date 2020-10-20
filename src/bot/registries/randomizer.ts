@@ -119,7 +119,7 @@ class Randomizer extends Registry {
       addToViewersCache(
         opts.sender.userId,
         randomizer.permissionId,
-        (await permissions.check(opts.sender.userId, randomizer.permissionId, false)).access,
+        (await permissions.check(Number(opts.sender.userId), randomizer.permissionId, false)).access,
       );
     }
 

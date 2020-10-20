@@ -78,7 +78,7 @@ class Quotes extends System {
       const [tags, quote] = new Expects(opts.parameters).argument({ name: 'tags', optional: true, default: 'general', multi: true, delimiter: '' }).argument({ name: 'quote', multi: true, delimiter: '' }).toArray() as [ string, string ];
       const tagsArray = tags.split(',').map((o) => o.trim());
 
-      const result = await getRepository(QuotesEntity).save({ tags: tagsArray, quote, quotedBy: opts.sender.userId, createdAt: Date.now() });
+      const result = await getRepository(QuotesEntity).save({ tags: tagsArray, quote, quotedBy: Number(opts.sender.userId), createdAt: Date.now() });
       const response = prepare('systems.quotes.add.ok', { id: result.id, quote, tags: tagsArray.join(', ') });
       return [{ response, ...opts, ...result }];
     } catch (e) {

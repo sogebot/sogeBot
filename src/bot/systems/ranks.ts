@@ -260,7 +260,7 @@ class Ranks extends System {
   @command('!rank')
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
     const user = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
-    const watched = await users.getWatchedOf(opts.sender.userId);
+    const watched = await users.getWatchedOf(Number(opts.sender.userId));
     const rank = await this.get(user);
 
     if (_.isNil(rank.current)) {

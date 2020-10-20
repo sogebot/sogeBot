@@ -333,7 +333,7 @@ class Events extends Core {
       sender: {
         badges: {},
         emotes: [],
-        userId: Number(userId),
+        userId: String(userId),
         username,
         displayName: userObj?.displayname || username,
         color: '',

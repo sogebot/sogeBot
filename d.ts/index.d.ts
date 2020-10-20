@@ -158,7 +158,7 @@ interface CommandResponse {
 }
 
 interface CommandOptions {
-  sender: UserStateTags & { userId: number; msgId?: KnownNoticeMessageIds } & {
+  sender: UserStateTags & { userId: string; msgId?: KnownNoticeMessageIds } & {
     discord?: { author: DiscordJsUser; channel: DiscordJsTextChannel };
   };
   command: string;

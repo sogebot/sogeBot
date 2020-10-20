@@ -333,7 +333,7 @@ class Discord extends Integration {
       const link = await getRepository(DiscordLink).findOneOrFail({ id: uuid });
       // link user
       await getRepository(DiscordLink).save({
-        ...link, userId: opts.sender.userId,
+        ...link, userId: Number(opts.sender.userId),
       });
       return [{ response: prepare('integrations.discord.this-account-was-linked-with', { sender: opts.sender, discordTag: link.tag}), ...opts }];
     } catch (e) {
@@ -602,7 +602,7 @@ class Discord extends Integration {
         const parser = new Parser();
         parser.started_at = (msg || { createdTimestamp: Date.now() }).createdTimestamp;
         parser.sender = {
-          badges: {}, color: '',  displayName: '', emoteSets: [], emotes: [], userId: link.userId, username: user.username, userType: 'viewer',
+          badges: {}, color: '',  displayName: '', emoteSets: [], emotes: [], userId: String(link.userId), username: user.username, userType: 'viewer',
           mod: 'false', subscriber: 'false', turbo: 'false', discord: { author, channel },
         };
 

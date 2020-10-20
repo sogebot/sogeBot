@@ -399,7 +399,7 @@ class Raffles extends System {
       return true;
     }
 
-    const user = await getRepository(User).findOne({ userId: opts.sender.userId });
+    const user = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
     if (!user) {
       await getRepository(User).save({
         userId: Number(opts.sender.userId),
@@ -474,7 +474,7 @@ class Raffles extends System {
       }
       if (raffle.type === TYPE_TICKETS) {
         announceNewEntriesCount += newTickets - curTickets;
-        await points.decrement({ userId: opts.sender.userId }, newTickets - curTickets);
+        await points.decrement({ userId: Number(opts.sender.userId) }, newTickets - curTickets);
       } else {
         announceNewEntriesCount += 1;
       }
