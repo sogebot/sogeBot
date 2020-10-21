@@ -68,7 +68,7 @@ describe('Gambling - duel', () => {
       assert(responses.length > 0);
       assert(responses[0].response === '$sender, good luck with your dueling skills. You bet on yourself 100 points!', JSON.stringify({responses}));
       // this is announced
-      await message.isSentRaw('@user1 is your new duel challenger! To participate use !duel [points], you have 5 minutes left to join.', user1);
+      await message.isSentRaw('@user1 is your new duel challenger! To participate use !duel [points], you have 5 minutes left to join.');
     });
 
     it('user 2 is added to duel', async () => {
