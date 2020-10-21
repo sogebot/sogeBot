@@ -19,8 +19,8 @@ describe('Commons - #3620 - announce is not parsing message filters', () => {
     await customcommands.add({ sender: owner, parameters: '-c !testCmd -r Lorem Ipsum' });
   });
 
-  it('Timer should trigger announce() with proper response with filters', async () => {
-    announce('Prikazy bota: !klip, !me, !heist, (list.!command), (list.!alias)');
+  it('Announce() should have propery parsed filters', async () => {
+    announce('Prikazy bota: !klip, !me, !heist, (list.!command), (list.!alias)', 'general');
     await message.isSentRaw('Prikazy bota: !klip, !me, !heist, !testCmd, !testAlias', 'bot', 20000);
 
   });

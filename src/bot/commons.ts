@@ -67,7 +67,7 @@ export async function parserReply(response: string | Promise<string>, opts: { se
  * Announce in all channels (discord, twitch)
  * @param messageToAnnounce
  *
- * announce('Lorem Ipsum Dolor');
+ * announce('Lorem Ipsum Dolor', 'timers);
  */
 export const announceTypes = ['bets', 'duel', 'heist', 'timers', 'songs', 'scrim', 'raffles', 'polls', 'general'] as const;
 export async function announce(messageToAnnounce: string, type: typeof announceTypes[number]) {
