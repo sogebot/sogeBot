@@ -31,6 +31,7 @@ module.exports = {
           on: function () {},
           connect: function () {},
           join: function () {},
+          part: function () {},
         },
       },
       broadcaster: {
@@ -41,6 +42,7 @@ module.exports = {
           on: function () {},
           connect: function () {},
           join: function () {},
+          part: function () {},
         },
       },
     };
@@ -173,6 +175,9 @@ module.exports = {
       user = {
         username: user,
       };
+    }
+    if (!user) {
+      user = { username: 'bot' };
     }
     user = _.cloneDeep(user);
     return until(setError => {

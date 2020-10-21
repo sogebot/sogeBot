@@ -36,6 +36,11 @@ import translate from 'src/panel/helpers/translate';
 import JsonViewer from 'vue-json-viewer'
 
 const socket = getSocket('/integrations/pubg');
+
+type Props = {
+  value: string; title: string, settings: { [x: string]: any }
+}
+
 export default defineComponent({
   components: {
     JsonViewer,
@@ -43,9 +48,9 @@ export default defineComponent({
   props: {
     settings: Object,
     value: Object,
-    title: [String, Object],
+    title: String,
   },
-  setup(props, ctx) {
+  setup(props: Props, ctx) {
     const fetchedPlayerStats = ref(props.value);
     const state = ref({
       fetching: ButtonStates.idle

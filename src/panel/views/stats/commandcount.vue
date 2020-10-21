@@ -13,8 +13,8 @@
     <panel cards>
       <template slot="right">
         <div class="form-group">
-          <datetime v-model="fromDate" :config="dateTimePickerFrom" class="form-control"></datetime>
-          <datetime v-model="toDate" :config="dateTimePickerTo" class="form-control"></datetime>
+          <b-form-datepicker v-model="fromDate" :max="maxFrom" value-as-date></b-form-datepicker>
+          <b-form-datepicker v-model="toDate" :min="minTo" :max="maxTo" value-as-date></b-form-datepicker>
         </div>
       </template>
     </panel>
@@ -75,16 +75,12 @@
   library.add(faChartLine)
   Vue.use(Chartkick.use(Chart));
 
-  import VueFlatPickr from 'vue-flatpickr-component';
-  import 'flatpickr/dist/flatpickr.css';
-
   import { getSocket } from '../../helpers/socket';
 
   export default Vue.extend({
     components: {
       panel: () => import('../../components/panel.vue'),
       'font-awesome-icon': FontAwesomeIcon,
-      datetime: VueFlatPickr,
     },
     data: function () {
       const object: {
@@ -95,23 +91,20 @@
           timestamp: number,
         }[],
         showChartCommands: string[],
-        dateTimePickerFrom: any,
-        dateTimePickerTo: any,
-        fromDate: string,
-        toDate: string,
+        maxFrom: Date,
+        minTo: Date,
+        maxTo: Date,
+        fromDate: Date,
+        toDate: Date,
       } = {
         socket: getSocket('/stats/commandcount'),
         commandsUsage: [],
         showChartCommands: [],
-        dateTimePickerFrom: {
-          maxDate: new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + (new Date().getDate() - 1),
-        },
-        dateTimePickerTo: {
-          maxDate: new Date(),
-          minDate: new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + (new Date().getDate() - 13),
-        },
-        fromDate: new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + (new Date().getDate() - 14),
-        toDate: new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate(),
+        maxFrom: new Date(new Date().getFullYear(), (new Date().getMonth() + 1), (new Date().getDate() - 1)),
+        maxTo: new Date(),
+        minTo: new Date(new Date().getFullYear(), (new Date().getMonth() + 1), (new Date().getDate() - 13)),
+        fromDate: new Date(new Date().getFullYear(), (new Date().getMonth() + 1), (new Date().getDate() - 14)),
+        toDate: new Date(new Date().getFullYear(), (new Date().getMonth() + 1), new Date().getDate()),
       }
       return object
     },
@@ -120,17 +113,16 @@
         localStorage.setItem('/stats/commandcount/showChartCommands', JSON.stringify(this.showChartCommands))
       },
       toDate(val) {
-        Vue.set(this.dateTimePickerFrom, 'maxDate',
-          new Date(this.toDate).getFullYear() + '-' +
-          (new Date(this.toDate).getMonth() + 1) + '-' +
-          (new Date(this.toDate).getDate() - 1));
+        this.maxFrom = new Date(val);
+        this.maxFrom.setDate(new Date(this.maxFrom).getDate() - 1)
         localStorage.setItem('/stats/commandcount/toDate', val)
       },
       fromDate(val) {
-        Vue.set(this.dateTimePickerTo, 'minDate',
-          new Date(this.fromDate).getFullYear() + '-' +
-          (new Date(this.fromDate).getMonth() + 1) + '-' +
-          (new Date(this.fromDate).getDate() + 1));
+        this.minTo = new Date(val);
+        this.minTo.setDate(new Date(this.minTo).getDate() + 1)
+        if (this.toDate.getTime() < this.minTo.getTime()) {
+          this.toDate.setDate(new Date(this.minTo).getDate() + 1)
+        }
         localStorage.setItem('/stats/commandcount/fromDate', val)
       }
     },
@@ -214,7 +206,15 @@
               return isCommand && isHigherThanFromDate && isLowerThanToDate;
             })
             .map(o => {
-              return Number(Number(o.timestamp / (this.timestampSmooth)).toFixed()) * this.timestampSmooth;
+              // find smooth timestamp
+              let timestamp = from;
+              while(timestamp <= o.timestamp) {
+                timestamp += this.timestampSmooth;
+              }
+              if (timestamp > to) {
+                timestamp = to;
+              }
+              return timestamp;
             })
           const countByTimestamps = countBy(timestamps)
           for (const t of this.timestampList) {
@@ -260,18 +260,18 @@
 
         const cacheFromDate = localStorage.getItem('/stats/commandcount/fromDate')
         if (!cacheFromDate) {
-          this.fromDate = new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + (new Date().getDate() - 14)
-          localStorage.setItem('/stats/commandcount/fromDate', this.fromDate)
+          this.fromDate = new Date(new Date().getFullYear(), (new Date().getMonth() + 1), (new Date().getDate() - 14));
+          localStorage.setItem('/stats/commandcount/fromDate', String(this.fromDate))
         } else {
-          this.fromDate = cacheFromDate;
+          this.fromDate = new Date(cacheFromDate);
         }
 
         const cacheToDate = localStorage.getItem('/stats/commandcount/toDate')
         if (!cacheToDate) {
-          this.toDate = new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate();
-          localStorage.setItem('/stats/commandcount/toDate', this.toDate)
+          this.toDate = new Date(new Date().getFullYear(), (new Date().getMonth() + 1), new Date().getDate());
+          localStorage.setItem('/stats/commandcount/toDate', String(this.toDate))
         } else {
-          this.toDate = cacheToDate;
+          this.toDate = new Date(cacheToDate);
         }
         this.commandsUsage = val;
       })

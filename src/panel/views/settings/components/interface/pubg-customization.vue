@@ -31,13 +31,17 @@ import { escapeRegExp } from 'lodash';
 
 const socket = getSocket('/integrations/pubg');
 
+type Props = {
+  value: string; title: string, settings: { [x: string]: any }
+}
+
 export default defineComponent({
   props: {
     settings: Object,
     value: String,
-    title: [String, Object],
+    title: String,
   },
-  setup(props, ctx) {
+  setup(props: Props, ctx) {
     const statsType = props.title.toLowerCase().includes('ranked') ? 'rankedGameModeStats' : 'gameModeStats'
     const _value = ref(props.value);
     const translatedTitle = translate(props.title);
