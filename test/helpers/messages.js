@@ -31,6 +31,7 @@ module.exports = {
           on: function () {},
           connect: function () {},
           join: function () {},
+          part: function () {},
         },
       },
       broadcaster: {
@@ -41,6 +42,7 @@ module.exports = {
           on: function () {},
           connect: function () {},
           join: function () {},
+          part: function () {},
         },
       },
     };

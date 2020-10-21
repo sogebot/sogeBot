@@ -510,7 +510,7 @@ class Moderation extends System {
     const item = await getRepository(ModerationMessageCooldown).findOne({ name });
     if (!item || (Date.now() - item.timestamp) >= 60000) {
       await getRepository(ModerationMessageCooldown).save({
-        ...item, name, timestamp: Date.now(),
+        name, timestamp: Date.now(),
       });
       return false;
     }
