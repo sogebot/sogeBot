@@ -178,7 +178,7 @@ class PUBG extends Integration {
     });
     adminEndpoint(this.nsp, 'pubg::exampleParse', async ({ text }, cb) => {
       try {
-        const messageToSend = await new Message(text).parse({}) as string;
+        const messageToSend = await new Message(text).parse() as string;
         cb(null, messageToSend);
       } catch (e) {
         cb(e.message, null);
@@ -198,7 +198,7 @@ class PUBG extends Integration {
         text = text.replace(new RegExp(escapeRegExp(`$${key}`), 'gi'), flatten(this.gameModeStats[gameType])[key]);
       }
       return [{
-        response: await new Message(`$sender, ${text}`).parse({}), ...opts,
+        response: await new Message(`$sender, ${text}`).parse(), ...opts,
       }];
     } catch (e) {
       if (e.message.includes('Expected parameter')) {
@@ -224,7 +224,7 @@ class PUBG extends Integration {
         text = text.replace(new RegExp(escapeRegExp(`$${key}`), 'gi'), flatten(this.rankedGameModeStats[gameType])[key]);
       }
       return [{
-        response: await new Message(`$sender, ${text}`).parse({}), ...opts,
+        response: await new Message(`$sender, ${text}`).parse(), ...opts,
       }];
     } catch (e) {
       if (e.message.includes('Expected parameter')) {

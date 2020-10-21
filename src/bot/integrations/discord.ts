@@ -429,7 +429,7 @@ class Discord extends Integration {
   async changeClientOnlinePresence() {
     try {
       if (api.isStreamOnline) {
-        const activityString = await new Message(this.onlinePresenceStatusOnStreamName).parse({});
+        const activityString = await new Message(this.onlinePresenceStatusOnStreamName).parse();
         if (this.onlinePresenceStatusOnStream === 'streaming') {
           this.client?.user?.setStatus('online');
           this.client?.user?.setPresence({ status: 'online', activity: { name: activityString, type: 'STREAMING', url: `https://twitch.tv/${oauth.generalChannel}`} });
@@ -442,7 +442,7 @@ class Discord extends Integration {
           }
         }
       } else {
-        const activityString = await new Message(this.onlinePresenceStatusDefaultName).parse({});
+        const activityString = await new Message(this.onlinePresenceStatusDefaultName).parse();
         if (activityString !== ''){
           this.client?.user?.setStatus(this.onlinePresenceStatusDefault);
           this.client?.user?.setPresence({ status: this.onlinePresenceStatusDefault, activity: { name: activityString } });
@@ -486,7 +486,7 @@ class Discord extends Integration {
       }
 
       const message = attributesReplace(attributes, String(operation.messageToSend));
-      const messageContent = await self.replaceLinkedUsernameInMessage(await new Message(message).parse({}));
+      const messageContent = await self.replaceLinkedUsernameInMessage(await new Message(message).parse());
       const channel = await self.client.guilds.cache.get(self.guild)?.channels.cache.get(dMchannel);
       await (channel as DiscordJs.TextChannel).send(messageContent);
       chatOut(`#${(channel as DiscordJs.TextChannel).name}: ${messageContent} [${self.client.user?.tag}]`);
@@ -620,7 +620,7 @@ class Discord extends Integration {
                   const messageToSend = await new Message(await responses[i].response).parse({
                     ...responses[i].attr,
                     forceWithoutAt: true, // we dont need @
-                    sender: { ...responses[i].sender, username: author },
+                    sender: { ...responses[i].sender, discord: { author, channel } },
                   }) as string;
                   const reply = await channel.send(messageToSend);
                   chatOut(`#${channel.name}: ${messageToSend} [${author.tag}]`);

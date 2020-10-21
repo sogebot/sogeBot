@@ -774,14 +774,14 @@ class TMI extends Core {
       return manageMessage(data);
     }
 
-    const sender = data.message.tags as UserStateTags;
+    const sender = data.message.tags as UserStateTagsWithId;
     const message = data.message.message;
     const skip = data.skip ?? false;
     const quiet = data.quiet;
 
     if (!sender.userId && sender.username) {
       // this can happen if we are sending commands from dashboards etc.
-      sender.userId = await users.getIdByName(sender.username);
+      sender.userId = String(await users.getIdByName(sender.username));
     }
 
     if (typeof sender.badges === 'undefined') {
@@ -852,7 +852,7 @@ class TMI extends Core {
         if (message.startsWith('!')) {
           events.fire('command-send-x-times', { username: sender.username, message: message, source: 'twitch' });
         } else if (!message.startsWith('!') && api.isStreamOnline) {
-          getRepository(User).increment({ userId: sender.userId }, 'messages', 1);
+          getRepository(User).increment({ userId: Number(sender.userId) }, 'messages', 1);
         }
       }
       const responses = await parse.process();
