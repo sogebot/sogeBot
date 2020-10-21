@@ -1,6 +1,6 @@
 import {MigrationInterface, QueryRunner} from 'typeorm';
 
-export class removeModerationMessageCooldown implements MigrationInterface {
+export class removeModerationMessageCooldown1603283025647 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`DROP TABLE "moderation_message_cooldown"`);
