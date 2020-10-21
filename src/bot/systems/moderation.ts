@@ -17,7 +17,7 @@ import { adminEndpoint } from '../helpers/socket';
 import { Alias } from '../database/entity/alias';
 
 import { getRepository, LessThan } from 'typeorm';
-import { ModerationMessageCooldown, ModerationPermit, ModerationWarning } from '../database/entity/moderation';
+import { ModerationPermit, ModerationWarning } from '../database/entity/moderation';
 import permissions from '../permissions';
 import { translate } from '../translate';
 import spotify from '../integrations/spotify';
@@ -29,6 +29,9 @@ const urlRegex = [
   new RegExp(`(www)? ??\\.? ?[a-zA-Z0-9]+([a-zA-Z0-9-]+) ??\\. ?(${tlds.join('|')})(?=\\P{L}|$)`, 'igu'),
   new RegExp(`[a-zA-Z0-9]+([a-zA-Z0-9-]+)?\\.(${tlds.join('|')})(?=\\P{L}|$)`, 'igu'),
 ];
+
+type timeoutType = 'links' | 'symbols' | 'caps' | 'longmessage' | 'spam' | 'color' | 'emotes' | 'blacklist';
+const ModerationMessageCooldown = new Map<timeoutType, number>();
 
 class Moderation extends System {
   @settings('lists')
@@ -119,7 +122,7 @@ class Moderation extends System {
     });
   }
 
-  async timeoutUser (sender: CommandOptions['sender'], text: string, warning: string, msg: string, time: number, type: string) {
+  async timeoutUser (sender: CommandOptions['sender'], text: string, warning: string, msg: string, time: number, type: timeoutType ) {
     // cleanup warnings
     await getRepository(ModerationWarning).delete({
       timestamp: LessThan(Date.now() - 1000 * 60 * 60),
@@ -506,12 +509,10 @@ class Moderation extends System {
     return isOK;
   }
 
-  async isSilent (name: string) {
-    const item = await getRepository(ModerationMessageCooldown).findOne({ name });
-    if (!item || (Date.now() - item.timestamp) >= 60000) {
-      await getRepository(ModerationMessageCooldown).save({
-        name, timestamp: Date.now(),
-      });
+  async isSilent (name: timeoutType) {
+    const cooldown = ModerationMessageCooldown.get(name);
+    if (!cooldown || (Date.now() - cooldown) >= 60000) {
+      ModerationMessageCooldown.set(name, Date.now());
       return false;
     }
     return true;

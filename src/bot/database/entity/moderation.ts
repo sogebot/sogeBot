@@ -40,11 +40,3 @@ export const ModerationPermit = new EntitySchema<Readonly<Required<ModerationPer
     { name: 'IDX_69499e78c9ee1602baee77b97d', columns: ['userId'] },
   ],
 });
-
-export const ModerationMessageCooldown = new EntitySchema<Readonly<Required<ModerationMessageCooldownInterface>>>({
-  name: 'moderation_message_cooldown',
-  columns: {
-    name: { type: String, primary: true },
-    timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-  },
-});
