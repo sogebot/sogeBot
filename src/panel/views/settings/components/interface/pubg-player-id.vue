@@ -41,13 +41,18 @@ import { getVariantByState } from 'src/panel/helpers/variant';
 import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/integrations/pubg');
+
+type Props = {
+  value: string; title: string, settings: { [x: string]: any }
+}
+
 export default defineComponent({
   props: {
     settings: Object,
     value: String,
-    title: [String, Object]
+    title: String
   },
-  setup(props, ctx) {
+  setup(props: Props, ctx) {
     const fetchedPlayerId = ref(props.value);
     const state = ref({
       fetching: ButtonStates.idle
