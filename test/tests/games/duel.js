@@ -68,7 +68,7 @@ describe('Gambling - duel', () => {
       assert(responses.length > 0);
       assert(responses[0].response === '$sender, good luck with your dueling skills. You bet on yourself 100 points!', JSON.stringify({responses}));
       // this is announced
-      message.isSentRaw('@user1 is your new duel challenger! To participate use !duel [points], you have 5 minutes left to join.', user1);
+      await message.isSentRaw('@user1 is your new duel challenger! To participate use !duel [points], you have 5 minutes left to join.', user1);
     });
 
     it('user 2 is added to duel', async () => {
@@ -87,21 +87,10 @@ describe('Gambling - duel', () => {
     });
 
     it('winner should be announced', async () => {
-      await message.isSent('gambling.duel.winner', { username: 'bot'}, [{
-        pointsName: await points.getPointsName(200),
-        points: 200,
-        probability: _.round(50, 2),
-        ticketsName: await points.getPointsName(100),
-        tickets: 100,
-        winner: user1.username,
-      }, {
-        pointsName: await points.getPointsName(200),
-        points: 200,
-        probability: _.round(50, 2),
-        ticketsName: await points.getPointsName(100),
-        tickets: 100,
-        winner: user2.username,
-      }]);
+      await message.isSentRaw([
+        'Congratulations to @user1! He is last man standing and he won 200 points (50% with bet of 100 points)!',
+        'Congratulations to @user2! He is last man standing and he won 200 points (50% with bet of 100 points)!'
+      ], { username: 'bot'});
     });
   });
 
