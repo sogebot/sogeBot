@@ -324,7 +324,10 @@ class Polls extends System {
   async participateByNumber(opts: ParserOptions) {
     try {
       if (opts.message.match(/^(\d+)$/)) {
-        const cVote = await getRepository(Poll).findOneOrFail({ isOpened: true, type: 'numbers' });
+        const cVote = await getRepository(Poll).findOne({ isOpened: true, type: 'numbers' });
+        if (!cVote) {
+          return true; // do nothing if no vote in progress
+        }
         const vote = await getRepository(PollVote).findOne({ poll: cVote, votedBy: opts.sender.username });
         if (Number(opts.message) > 0 && Number(opts.message) <= cVote.options.length) {
           if (vote) {
