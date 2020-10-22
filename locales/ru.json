@@ -410,6 +410,7 @@
         "version": "Версия бота",
         "haveParam": "Есть параметр команды? (bool)",
         "source": "Current source (twitch or discord)",
+        "userInput": "User input during reward redeem",
         "is": {
           "moderator": "Пользователь модератор? (bool)",
           "subscriber": "Пользователь сабскрайбер? (bool)",
