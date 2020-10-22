@@ -81,7 +81,7 @@ class Events extends Core {
       { id: 'timeout', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'duration' ] },
       { id: 'every-x-minutes-of-stream', definitions: { runEveryXMinutes: 100 }, check: this.everyXMinutesOfStream },
       { id: 'game-changed', variables: [ 'oldGame', 'game' ] },
-      { id: 'reward-redeemed', definitions: { titleOfReward: '' }, variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ], check: this.isCorrectReward },
+      { id: 'reward-redeemed', definitions: { titleOfReward: '' }, variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'userInput' ], check: this.isCorrectReward },
     ];
 
     this.supportedOperationsList = [

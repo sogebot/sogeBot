@@ -409,6 +409,7 @@
         "version": "Bot version",
         "haveParam": "Have command parameter? (bool)",
         "source": "Current source (twitch or discord)",
+        "userInput": "User input during reward redeem",
         "is": {
           "moderator": "Is user mod? (bool)",
           "subscriber": "Is user sub? (bool)",
