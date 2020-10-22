@@ -410,6 +410,7 @@
         "version": "Bot Version",
         "haveParam": "Haben Sie Befehlsparameter? (bool)",
         "source": "Aktuelle Quelle (twitch oder discord)",
+        "userInput": "User input during reward redeem",
         "is": {
           "moderator": "Ist Benutzer Mod? (Bool)",
           "subscriber": "Ist Benutzer Sub? (Bool)",
