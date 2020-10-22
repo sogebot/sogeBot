@@ -417,7 +417,7 @@ class Events extends Core {
   }
 
   public async isCorrectReward(event: EventInterface, attributes: Events.Attributes) {
-    const shouldTrigger = (attributes.titleOfReward >= event.definitions.titleOfReward);
+    const shouldTrigger = (attributes.titleOfReward === event.definitions.titleOfReward);
     return shouldTrigger;
   }
 
