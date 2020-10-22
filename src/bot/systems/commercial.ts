@@ -65,8 +65,8 @@ class Commercial extends System {
 
       const token = oauth.broadcasterAccessToken;
       if (!oauth.broadcasterCurrentScopes.includes('channel:edit:commercial')) {
-        warning('Missing Broadcaster oAuth scope channel:edit:commercial to change game or title');
-        addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope channel:edit:commercial to change game or title' });
+        warning('Missing Broadcaster oAuth scope channel:edit:commercial to start commercial');
+        addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope channel:edit:commercial to start commercial' });
         return;
       }
       if (token === '') {
