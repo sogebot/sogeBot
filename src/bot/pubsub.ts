@@ -71,6 +71,7 @@ const connect = () => {
         events.fire('reward-redeemed', {
           username: dataMessage.data.redemption.user.login,
           titleOfReward: dataMessage.data.redemption.reward.title,
+          userInput: dataMessage.data.redemption.user_input,
         });
       } else if (dataMessage.type === 'moderation_action') {
         const [ username, reason ] = dataMessage.data.args;
