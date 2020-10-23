@@ -948,6 +948,7 @@
     "current-song-from-playlist": "Aktueller Song ist $name von der Playlist",
     "current-song-from-songrequest": "Aktueller Song ist $name und wurde gewünscht von $username",
     "song-is-banned": "Sorry, $sender, aber dieser Song ist gesperrt",
+    "youtube-is-not-responding-correctly": "Sorry, $sender, but YouTube is sending unexpected responses, please try again later.",
     "song-was-not-found": "Sorry, $sender, aber dieser Song wurde nicht gefunden",
     "song-is-too-long": "Sorry, $sender, aber dieser Song ist zu lang",
     "incorrect-category": "Sorry, $sender, aber der Song muss eine Musikkategorie sein",
