@@ -494,7 +494,6 @@ class Songs extends System {
 
     return new Promise(async (resolve) => {
       try {
-        console.log(`Getting video by id ${videoID}`);
         const videoInfo = await ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID);
         if (Number(videoInfo.videoDetails.lengthSeconds) / 60 > this.duration) {
           resolve([{ response: translate('songs.song-is-too-long'), ...opts }]);
