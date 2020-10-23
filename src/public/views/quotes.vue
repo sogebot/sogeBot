@@ -1,5 +1,5 @@
 <template lang="pug">
-  b-container(ref="quotes" style="min-height: calc(100vh - 49px);").fluid.pt-2
+  b-container(ref="quotesRef" style="min-height: calc(100vh - 49px);").fluid.pt-2
     b-row
       b-col
         span.title.text-default.mb-2 {{ translate('menu.quotes') }}
@@ -18,50 +18,74 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { defineComponent, ref, onMounted } from '@vue/composition-api'
 import VueScrollTo from 'vue-scrollto';
 
 import { getSocket } from 'src/panel/helpers/socket';
-import { QuotesInterface } from '../../bot/database/entity/quotes';
+import { QuotesInterface } from 'src/bot/database/entity/quotes';
 import { dayjs } from 'src/bot/helpers/dayjs';
+import translate from 'src/panel/helpers/translate';
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
 
 
-@Component({
+const socket = getSocket('/systems/quotes', true);
+export default defineComponent({
   components: {
-    'loading': () => import('src/panel/components/loading.vue'),
-  }
-})
-export default class playlist extends Vue {
-  dayjs = dayjs;
-  socket = getSocket('/systems/quotes', true);
+    loading: () => import('src/panel/components/loading.vue'),
+  },
+  setup(props, ctx) {
+    const items = ref([] as QuotesInterface[]);
+    const quotesRef = ref(null as Element | null);
 
-  items: any[] = []
-
-  state: {
-    loading: number;
-   } = {
-    loading: this.$state.progress
-  };
-
-  fields = [
-    { key: 'createdAt', label: this.translate('systems.quotes.date.name'), sortable: true },
-    { key: 'quote', label: this.translate('systems.quotes.quote.name'), sortable: true },
-    { key: 'tags', label: this.translate('systems.quotes.tags.name') },
-    { key: 'quotedByName', label: this.translate('systems.quotes.by.name'), sortable: true },
-    // virtual attributes
-    { key: 'buttons', label: '' },
-  ]
-
-  mounted() {
-    this.state.loading = this.$state.progress;
-    this.socket.emit('quotes:getAll', {}, (err: string | null, items: QuotesInterface[]) => {
-      console.debug('Loaded', {items})
-      this.items = items
-      this.state.loading = this.$state.success;
+    const state = ref({
+      loading: ButtonStates.progress,
+    } as {
+      loading: number;
     })
-    this.$nextTick(() => {
-      VueScrollTo.scrollTo(this.$refs.quotes as Element, 500, { container: 'body', force: true, cancelable: true, offset: -49 })
+
+    const fields = [
+      { key: 'createdAt', label: translate('systems.quotes.date.name'), sortable: true },
+      { key: 'quote', label: translate('systems.quotes.quote.name'), sortable: true },
+      { key: 'tags', label: translate('systems.quotes.tags.name') },
+      { key: 'quotedByName', label: translate('systems.quotes.by.name'), sortable: true },
+      // virtual attributes
+      { key: 'buttons', label: '' },
+    ]
+
+    const moveTo = () => {
+      VueScrollTo.scrollTo(quotesRef.value as Element, 500, {
+        container: 'body',
+        force: true,
+        offset: -49,
+        onDone: function() {
+          const scrollPos = window.scrollY || document.getElementsByTagName("html")[0].scrollTop;
+          if (scrollPos === 0) {
+            setTimeout(() => moveTo(), 100);
+          }
+        }
+      })
+    }
+
+    onMounted(() => {
+      state.value.loading = ButtonStates.progress;
+      socket.emit('quotes:getAll', {}, (err: string | null, itemsGetAll: QuotesInterface[]) => {
+        console.debug('Loaded', {items})
+        items.value = itemsGetAll
+        state.value.loading = ButtonStates.success;
+      })
+      ctx.root.$nextTick(() => {
+        moveTo();
+      });
     })
+
+    return {
+      dayjs,
+      fields,
+      items,
+      state,
+      translate,
+      quotesRef,
+    }
   }
-}
+});
 </script>

@@ -37,7 +37,6 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from '@vue/composition-api'
-import type { Ref } from '@vue/composition-api'
 
 import translate from 'src/panel/helpers/translate';
 import { getSocket } from 'src/panel/helpers/socket';
@@ -56,7 +55,7 @@ export default defineComponent({
     PerfectScrollbar
   },
   setup() {
-    const menu: Ref<menuWithEnabled[]> = ref([]);
+    const menu = ref([] as menuWithEnabled[]);
     const categories = ['manage', 'settings', 'registry', /* 'logs', */ 'stats'];
     const isDisabledHidden = ref(true);
 
@@ -95,7 +94,7 @@ export default defineComponent({
     });
 
     return {
-      menu, categories, isDisabledHidden
+      menu, categories, isDisabledHidden, translate
     }
   }
 });

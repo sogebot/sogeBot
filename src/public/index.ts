@@ -4,9 +4,8 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import VueCompositionAPI from '@vue/composition-api';
 
-import translate from 'src/panel/helpers/translate';
 import { setLocale } from 'src/bot/helpers/dayjs';
-import { ButtonStates, states } from 'src/panel/helpers/buttonStates';
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { setMainLoaded } from 'src/panel/helpers/isAvailableVariable';
 import { getConfiguration, getTranslations } from 'src/panel/helpers/socket';
 import { store } from 'src/panel/helpers/store';
@@ -34,20 +33,9 @@ export interface Global {
   isMainLoaded?: boolean;
 }
 
-declare module 'vue/types/vue' {
-  interface Vue {
-    $loadScript: (script: string) => Promise<void>;
-    $unloadScript: (script: string) => Promise<void>;
-    $state: states;
-    urlParam(key: string): string | null;
-  }
-}
-
 Vue.use(VueRouter);
 
 const main = async () => {
-  // init prototypes
-  Vue.prototype.translate = (v: string) => translate(v);
   await getTranslations();
   store.commit('setLoggedUser', await isUserLoggedIn(false, false));
   store.commit('setConfiguration', await getConfiguration());

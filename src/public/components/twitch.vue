@@ -28,42 +28,47 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { defineComponent, ref, onMounted, computed } from '@vue/composition-api'
 import { getSocket } from 'src/panel/helpers/socket';
 import { get } from 'lodash-es';
 
-@Component({})
-export default class navbar extends Vue {
-  socket = getSocket('/widgets/chat', true);
-  room = '';
-  refresh = false;
-  theme = 'light';
+const socket = getSocket('/widgets/chat', true);
 
-  mounted() {
-    this.socket.emit('room', (err: string | null, room: string) => {
-      this.room = room;
+export default defineComponent({
+  setup(props, ctx) {
+    const room = ref('');
+    const theme = ref('light');
+
+    onMounted(() => {
+      socket.emit('room', (err: string | null, _room: string) => {
+        room.value = _room;
+      })
+
+      setInterval(() => {
+        theme.value = (localStorage.getItem('theme') || get(ctx.root.$store.state, 'configuration.core.ui.theme', 'light'));
+      }, 100)
+    });
+
+    const isHttps = computed(() => {
+      return window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     })
 
-    setInterval(() => {
-      this.theme = (localStorage.getItem('theme') || get(this.$store.state, 'configuration.core.ui.theme', 'light'));
-    }, 100)
-  }
+    const videoUrl = computed(() => {
+      return `${window.location.protocol}//player.twitch.tv/?channel=${room.value}&autoplay=true&parent=${window.location.hostname}`
+    })
 
-  get isHttps() {
-    return window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  }
-
-  get videoUrl() {
-    return `${window.location.protocol}//player.twitch.tv/?channel=${this.room}&autoplay=true&parent=${window.location.hostname}`
-  }
-
-  get chatUrl() {
+    const chatUrl = computed(() => {
       return window.location.protocol
         + '//twitch.tv/embed/'
-        + this.room
+        + room.value
         + '/chat'
-        + (this.theme === 'dark' ? '?darkpopout' : '')
-        + (this.theme === 'dark' ? '&parent=' + window.location.hostname : '?parent=' + window.location.hostname)
+        + (theme.value === 'dark' ? '?darkpopout' : '')
+        + (theme.value === 'dark' ? '&parent=' + window.location.hostname : '?parent=' + window.location.hostname)
+    });
+
+    return {
+      isHttps, videoUrl, chatUrl,
     }
-}
+  }
+});
 </script>
