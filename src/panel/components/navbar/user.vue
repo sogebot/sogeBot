@@ -57,6 +57,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { permission } from 'src/bot/helpers/permissions'
 import { UserInterface } from '../../../bot/database/entity/user';
 import { PermissionsInterface } from '../../../bot/database/entity/permissions';
+import translate from 'src/panel/helpers/translate';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons'
@@ -121,7 +122,7 @@ export default defineComponent({
         }
       })
     }
-    return { permission, isViewerLoaded, viewer, viewerIs, isPublicPage, logout, login };
+    return { permission, isViewerLoaded, viewer, viewerIs, isPublicPage, logout, login, translate };
   }
 })
 </script>

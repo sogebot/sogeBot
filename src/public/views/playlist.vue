@@ -1,5 +1,5 @@
 <template lang="pug">
-  b-container(ref="playlist" style="min-height: calc(100vh - 49px);").fluid.pt-2
+  b-container(ref="playlistRef" style="min-height: calc(100vh - 49px);").fluid.pt-2
     b-row
       b-col
         span.title.text-default.mb-2 {{ translate('menu.playlist') }}
@@ -14,82 +14,109 @@
           :per-page="perPage"
           ).m-0
 
-    loading(v-if="state.loading.playlist !== $state.success")
+    loading(v-if="state.loading !== $state.success")
     b-table(v-else striped small :items="playlist" :fields="fields" @row-clicked="linkTo($event)").table-p-0
       template(v-slot:cell(thumbnail)="data")
         img(v-bind:src="generateThumbnail(data.item.videoId)").float-left.pr-3
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator';
+import { defineComponent, ref, onMounted, watch } from '@vue/composition-api'
 import VueScrollTo from 'vue-scrollto';
 
 import { getSocket } from 'src/panel/helpers/socket';
-import { SongPlaylistInterface } from '../../bot/database/entity/song';
+import { SongPlaylistInterface } from 'src/bot/database/entity/song';
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import translate from 'src/panel/helpers/translate';
 
-@Component({
+const socket = getSocket('/systems/songs', true);
+
+export default defineComponent({
   components: {
-    'loading': () => import('src/panel/components/loading.vue'),
-  }
-})
-export default class playlist extends Vue {
-  socket = getSocket('/systems/songs', true);
+    loading: () => import('src/panel/components/loading.vue'),
+  },
+  setup(props, ctx) {
+    const playlist = ref([] as SongPlaylistInterface[]);
 
-  playlist: SongPlaylistInterface[] = [];
+    const currentPage = ref(1);
+    const perPage = ref(25);
+    const count = ref(0);
 
-  currentPage = 1;
-  perPage = 25;
-  count: number = 0;
+    const playlistRef = ref(null as Element | null);
 
-  state: {
-    loading: {
-      playlist: number
+    const state = ref({
+      loading: ButtonStates.progress,
+    } as {
+      loading: number;
+    })
+
+    const fields = [
+      { key: 'thumbnail', label: '', tdClass: 'fitThumbnail' },
+      { key: 'title', label: '' },
+      { key: 'buttons', label: '' },
+    ];
+    const refreshPlaylist = () => {
+      state.value.loading = ButtonStates.progress;
+      socket.emit('find.playlist', { page: (currentPage.value - 1) }, (err: string | null, items: SongPlaylistInterface[], countOfItems: number) => {
+        if (err) {
+          return console.error(err);
+        }
+        count.value = countOfItems;
+        for (let item of items) {
+          item.startTime = item.startTime ? item.startTime : 0
+          item.endTime = item.endTime ? item.endTime : item.length
+        }
+        playlist.value = items
+        state.value.loading = ButtonStates.success;
+      })
     }
-   } = {
-     loading: {
-       playlist: this.$state.progress
-     }
-  };
 
-  fields = [
-    { key: 'thumbnail', label: '', tdClass: 'fitThumbnail' },
-    { key: 'title', label: '' },
-    { key: 'buttons', label: '' },
-  ];
+    const moveTo = () => {
+      VueScrollTo.scrollTo(playlistRef.value as Element, 500, {
+        container: 'body',
+        force: true,
+        offset: -49,
+        onDone: function() {
+          const scrollPos = window.scrollY || document.getElementsByTagName("html")[0].scrollTop;
+          if (scrollPos === 0) {
+            setTimeout(() => moveTo(), 100);
+          }
+        }
+      })
+    }
 
-  @Watch('currentPage')
-  refreshPlaylist() {
-    this.state.loading.playlist = this.$state.progress;
-    this.socket.emit('find.playlist', { page: (this.currentPage - 1) }, (err: string | null, items: SongPlaylistInterface[], count: number) => {
-      if (err) {
-        return console.error(err);
-      }
-      this.count = count;
-      for (let item of items) {
-        item.startTime = item.startTime ? item.startTime : 0
-        item.endTime = item.endTime ? item.endTime : item.length
-      }
-      this.playlist = items
-      this.state.loading.playlist = this.$state.success;
-    })
+    watch(currentPage, () => refreshPlaylist());
+
+    onMounted(() => {
+      refreshPlaylist();
+      ctx.root.$nextTick(() => {
+        moveTo();
+      });
+    });
+
+    const generateThumbnail = (videoId: string) => {
+      return `https://img.youtube.com/vi/${videoId}/1.jpg`
+    }
+
+    const linkTo = (item: SongPlaylistInterface) => {
+      console.debug('Clicked', item.videoId);
+      window.location.href = `http://youtu.be/${item.videoId}`;
+    }
+
+    return {
+      linkTo,
+      generateThumbnail,
+      fields,
+      perPage,
+      count,
+      currentPage,
+      playlistRef,
+      state,
+      translate,
+      playlist,
+    }
   }
-
-  mounted() {
-    this.refreshPlaylist();
-    this.$nextTick(() => {
-      VueScrollTo.scrollTo(this.$refs.playlist as Element, 500, { container: 'body', force: true, cancelable: true, offset: -49 })
-    })
-  }
-
-  generateThumbnail(videoId: string) {
-    return `https://img.youtube.com/vi/${videoId}/1.jpg`
-  }
-
-  linkTo(item: SongPlaylistInterface) {
-    console.debug('Clicked', item.videoId);
-    window.location.href = `http://youtu.be/${item.videoId}`;
-  }
-}
+});
   </script>
 
 <style>

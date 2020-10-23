@@ -1,5 +1,5 @@
 <template lang="pug">
-  b-container(ref="songrequests" style="min-height: calc(100vh - 49px);").fluid.pt-2
+  b-container(ref="songrequestsRef" style="min-height: calc(100vh - 49px);").fluid.pt-2
     b-row
       b-col
         span.title.text-default.mb-2 {{ translate('song-requests') }}
@@ -8,75 +8,92 @@
       template(v-slot:left)
         button-with-icon(icon="caret-left" href="#/").btn-secondary.btn-reverse {{translate('commons.back')}}
 
-    loading(v-if="state.loading.requests !== $state.success")
+    loading(v-if="state.loading !== $state.success")
     b-table(v-else striped small :items="requests" :fields="fields" @row-clicked="linkTo($event)").table-p-0
       template(v-slot:cell(thumbnail)="data")
         img(v-bind:src="generateThumbnail(data.item.videoId)").float-left.pr-3
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { defineComponent, ref, onMounted } from '@vue/composition-api'
 import VueScrollTo from 'vue-scrollto';
 
 import { getSocket } from 'src/panel/helpers/socket';
-import { SongRequestInterface } from '../../bot/database/entity/song';
+import { SongRequestInterface } from 'src/bot/database/entity/song';
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import translate from 'src/panel/helpers/translate';
 
-@Component({
+const socket = getSocket('/systems/songs', true);
+
+export default defineComponent({
   components: {
-    'loading': () => import('src/panel/components/loading.vue'),
-  }
-})
-export default class songrequest extends Vue {
-  socket = getSocket('/systems/songs', true);
+    loading: () => import('src/panel/components/loading.vue'),
+  },
+  setup(props, ctx) {
+    const requests = ref([] as SongRequestInterface[]);
+    const songrequestsRef = ref(null as Element | null);
 
-  requests: SongRequestInterface[] = [];
+    const state = ref({
+      loading: ButtonStates.progress,
+    } as {
+      loading: number;
+    });
 
-  interval: number = 0;
+    const fields = [
+      { key: 'thumbnail', label: '', tdClass: 'fitThumbnail' },
+      { key: 'title', label: '' },
+      { key: 'username', label: '' },
+    ];
 
-  state: {
-    loading: {
-      requests: number
-    }
-   } = {
-     loading: {
-       requests: this.$state.progress
-     }
-  };
-
-  fields = [
-    { key: 'thumbnail', label: '', tdClass: 'fitThumbnail' },
-    { key: 'title', label: '' },
-    { key: 'username', label: '' },
-  ];
-
-  destroy() {
-    clearInterval(this.interval);
-  }
-
-  mounted() {
-    this.state.loading.requests = this.$state.progress;
-    setInterval(() => {
-      this.socket.emit('songs::getAllRequests', {}, (err: string | null, items: SongRequestInterface[]) => {
-        console.debug('Loaded', {requests: items})
-        this.requests = items
-        this.state.loading.requests = this.$state.success;
+    const moveTo = () => {
+      VueScrollTo.scrollTo(songrequestsRef.value as Element, 500, {
+        container: 'body',
+        force: true,
+        offset: -49,
+        onDone: function() {
+          const scrollPos = window.scrollY || document.getElementsByTagName("html")[0].scrollTop;
+          if (scrollPos === 0) {
+            setTimeout(() => moveTo(), 100);
+          }
+        }
       })
-    }, 2000)
-    this.$nextTick(() => {
-      VueScrollTo.scrollTo(this.$refs.songrequests as Element, 500, { container: 'body', force: true, cancelable: true, offset: -49 })
-    })
-  }
+    }
 
-  generateThumbnail(videoId: string) {
-    return `https://img.youtube.com/vi/${videoId}/1.jpg`
-  }
+    onMounted(() => {
+      state.value.loading = ButtonStates.progress;
+      setInterval(() => {
+        socket.emit('songs::getAllRequests', {}, (err: string | null, items: SongRequestInterface[]) => {
+          console.debug('Loaded', {requests: items})
+          requests.value = items
+          state.value.loading = ButtonStates.success;
+        })
+      }, 2000)
+      ctx.root.$nextTick(() => {
+        moveTo();
+      });
+    });
 
-  linkTo(item: SongRequestInterface) {
-    console.debug('Clicked', item.videoId);
-    window.location.href = `http://youtu.be/${item.videoId}`;
+    const generateThumbnail = (videoId: string) => {
+      return `https://img.youtube.com/vi/${videoId}/1.jpg`
+    }
+
+    const linkTo = (item: SongRequestInterface) => {
+      console.debug('Clicked', item.videoId);
+      window.location.href = `http://youtu.be/${item.videoId}`;
+    }
+
+    return {
+      generateThumbnail,
+      linkTo,
+      fields,
+      requests,
+      songrequestsRef,
+      state,
+      translate,
+    }
   }
-}
-  </script>
+});
+</script>
 
 <style>
 .table-p-0 td {
