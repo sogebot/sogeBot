@@ -482,6 +482,7 @@ class Songs extends System {
         }
       } catch (e) {
         error(`SONGS: ${e.message}`);
+        return [{ response: translate('songs.youtube-is-not-responding-correctly'), ...opts }];
       }
     }
 
