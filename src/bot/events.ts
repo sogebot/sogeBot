@@ -441,7 +441,7 @@ class Events extends Core {
     }
     event.triggered.runAfterXMinutes = _.get(event, 'triggered.runAfterXMinutes', 0);
     const shouldTrigger = event.triggered.runAfterXMinutes === 0
-                          && Number(dayjs.utc().format('X')) - Number(dayjs.utc(api.streamStatusChangeSince).format('X')) > Number(event.definitions.runAfterXMinutes) * 60;
+                          && Number(dayjs.utc().unix()) - Number(dayjs.utc(api.streamStatusChangeSince).unix()) > Number(event.definitions.runAfterXMinutes) * 60;
     if (shouldTrigger) {
       event.triggered.runAfterXMinutes = event.definitions.runAfterXMinutes;
       await getRepository(Event).save(event);

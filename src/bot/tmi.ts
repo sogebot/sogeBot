@@ -503,7 +503,7 @@ class TMI extends Core {
       await getRepository(User).save({
         ...user,
         isSubscriber: true,
-        subscribedAt:  Number(dayjs().subtract(streakMonths, 'month').format('X')) * 1000,
+        subscribedAt:  Number(dayjs().subtract(streakMonths, 'month').unix()) * 1000,
         subscribeTier: tier,
         subscribeCumulativeMonths: subCumulativeMonths,
         subscribeStreak: subStreak,

@@ -1902,7 +1902,7 @@ class API extends Core {
 
       await getRepository(User).update({ userId: user.userId },
         {
-          followedAt: user.haveFollowedAtLock ? user.followedAt : Number(dayjs(request.data.data[0].followed_at).format('x')),
+          followedAt: user.haveFollowedAtLock ? user.followedAt : dayjs(request.data.data[0].followed_at).valueOf(),
           isFollower: user.haveFollowerLock? user.isFollower : true,
           followCheckAt: Date.now(),
         });
