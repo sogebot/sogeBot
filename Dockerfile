@@ -1,4 +1,4 @@
-FROM node:stretch-slim
+FROM node:14-stretch-slim
 
 ENV LAST_UPDATED 2020-11-05-1440
 
