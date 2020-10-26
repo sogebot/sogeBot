@@ -67,7 +67,16 @@
               </div>
               <div class="form-group col-md-12" v-for="defKey of Object.keys(event.definitions)" :key="defKey">
                 <label for="type_selector">{{ translate("events.definitions." + defKey + ".label") }}</label>
-                <template v-if="typeof event.definitions[defKey] === 'boolean'">
+                <template v-if="defKey === 'titleOfReward'">
+                  <b-input-group>
+                    <b-form-select v-model="event.definitions[defKey]" :options="redeemRewardsWithForcedSelected(event.definitions[defKey])"></b-form-select>
+                    <b-input-group-append>
+                      <b-button text="Refresh" variant="secondary" @click="refreshRedeemedRewards()"><fa icon="sync" :spin="state.redeemRewards === ButtonStates.progress"/></b-button>
+                    </b-input-group-append>
+                  </b-input-group>
+                  <small><strong>{{ translate("events.myRewardIsNotListed") }}</strong> {{ translate("events.redeemAndClickRefreshToSeeReward") }}</small>
+                </template>
+                <template v-else-if="typeof event.definitions[defKey] === 'boolean'">
                   <button type="button" class="btn btn-success" v-if="event.definitions[defKey]" @click="event.definitions[defKey] = false">{{translate("dialog.buttons.yes")}}</button>
                   <button type="button" class="btn btn-danger" v-else @click="event.definitions[defKey] = true">{{translate("dialog.buttons.no")}}</button>
                 </template>
@@ -270,6 +279,7 @@ export default defineComponent({
   },
   setup(props, ctx) {
     const instance = getCurrentInstance();
+    const redeemRewards = ref([] as string[]);
     const eventId = ctx.root.$route.params.id || uuid();
     const event = ref({
       id: eventId,
@@ -291,7 +301,8 @@ export default defineComponent({
     const state = ref({
       load: ButtonStates.progress,
       save: ButtonStates.idle,
-      pending: false } as { load: number, save: number, pending: boolean })
+      redeemRewards: ButtonStates.progress,
+      pending: false } as { load: number, save: number, pending: boolean, redeemRewards: number })
 
 
     watch(event, () => {
@@ -302,9 +313,6 @@ export default defineComponent({
     watch(() => event.value.operations, (val: Omit<EventOperationInterface, 'event'>[]) => {
       if (state.value.load !== ButtonStates.success) {
         return;
-      }
-      for (const v of val) {
-        console.log('event', v)
       }
       if (!watchOperationChange.value) return true;
       watchOperationChange.value = false // remove watch
@@ -358,8 +366,23 @@ export default defineComponent({
       })
     }, { deep: true });
 
+    const refreshRedeemedRewards = async () => {
+      state.value.redeemRewards = ButtonStates.progress;
+      return new Promise(resolve => {
+        socket.emit('events::getRedeemedRewards', (err: string | null, redeems: string[]) => {
+          if (err) {
+            return error(err);
+          }
+          redeemRewards.value = redeems;
+          setTimeout(() => state.value.redeemRewards = ButtonStates.idle, 1000);
+          resolve();
+        })
+      })
+    };
+
     onMounted(async () => {
       await Promise.all([
+        refreshRedeemedRewards(),
         new Promise((resolve, reject) => {
           if (ctx.root.$route.params.id) {
             socket.emit('generic::getOne', ctx.root.$route.params.id, (err: string | null, eventGetAll: Required<EventInterface>) => {
@@ -499,6 +522,11 @@ export default defineComponent({
       }
     }
 
+    const redeemRewardsWithForcedSelected = (selected: string) => {
+      socket.emit('events::setRedeemedRewards', selected);
+      return Array.from(new Set([selected, ...redeemRewards.value]));
+    }
+
     return {
       get,
       event,
@@ -510,6 +538,10 @@ export default defineComponent({
       getDefinitionValidation,
       del,
       save,
+      redeemRewards,
+      ButtonStates,
+      refreshRedeemedRewards,
+      redeemRewardsWithForcedSelected,
     }
   }
 })
