@@ -1,6 +1,6 @@
 import oauth from './oauth';
 import WebSocket from 'ws';
-import { ban, debug, error, info, timeout, unban, warning } from './helpers/log';
+import { ban, debug, error, info, redeem, timeout, unban, warning } from './helpers/log';
 import { SECOND } from './constants';
 import events from './events';
 import { addUIError } from './panel';
@@ -71,6 +71,11 @@ const connect = () => {
       if (dataMessage.type === 'reward-redeemed') {
         redeemedRewards.add(dataMessage.data.redemption.reward.title);
         // trigger reward-redeemed event
+        if (dataMessage.data.redemption.user_input) {
+          redeem(`${dataMessage.data.redemption.user.login}#${dataMessage.data.redemption.user.id} redeemed ${dataMessage.data.redemption.reward.title}: ${dataMessage.data.redemption.user_input}`);
+        } else {
+          redeem(`${dataMessage.data.redemption.user.login}#${dataMessage.data.redemption.user.id} redeemed ${dataMessage.data.redemption.reward.title}`);
+        }
         events.fire('reward-redeemed', {
           username: dataMessage.data.redemption.user.login,
           titleOfReward: dataMessage.data.redemption.reward.title,
