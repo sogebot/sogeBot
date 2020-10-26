@@ -31,6 +31,7 @@ import { isDbConnected } from './helpers/database';
 import { addUIError } from './panel';
 import { translate } from './translate';
 import { dayjs } from './helpers/dayjs';
+import { redeemedRewards } from './pubsub';
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
@@ -584,6 +585,16 @@ class Events extends Core {
   }
 
   public sockets() {
+    adminEndpoint(this.nsp, 'events::setRedeemedRewards', async (reward) => {
+      redeemedRewards.add(reward);
+    });
+    adminEndpoint(this.nsp, 'events::getRedeemedRewards', async (cb) => {
+      try {
+        cb(null, [...redeemedRewards]);
+      } catch (e) {
+        cb(e.stack, []);
+      }
+    });
     adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         cb(null, await getRepository(Event).find({

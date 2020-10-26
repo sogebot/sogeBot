@@ -4,6 +4,7 @@ import { ban, debug, error, info, timeout, unban, warning } from './helpers/log'
 import { SECOND } from './constants';
 import events from './events';
 import { addUIError } from './panel';
+import { setInterval } from 'timers';
 
 const pubsubEndpoint: Readonly<string> = 'wss://pubsub-edge.twitch.tv';
 const heartbeatInterval: Readonly<number> = 60 * SECOND;
@@ -16,6 +17,7 @@ let connectionHash = '';
 
 let ERR_BADAUTH = false;
 
+export const redeemedRewards = new Set<string>();
 
 setInterval(() => {
   try {
@@ -67,6 +69,7 @@ const connect = () => {
     if (message.type === 'MESSAGE') {
       const dataMessage = JSON.parse(message.data.message);
       if (dataMessage.type === 'reward-redeemed') {
+        redeemedRewards.add(dataMessage.data.redemption.reward.title);
         // trigger reward-redeemed event
         events.fire('reward-redeemed', {
           username: dataMessage.data.redemption.user.login,
