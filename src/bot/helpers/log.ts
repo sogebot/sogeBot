@@ -35,6 +35,7 @@ enum Levels {
   subgift,
   subcommunitygift,
   resub,
+  redeem,
   timeout,
   ban,
   unban,
@@ -60,6 +61,7 @@ const levelFormat = {
   follow: '+follow',
   host: '+host',
   raid: '+raid',
+  redeem: '+++ redeem:',
   unfollow: '-follow',
   cheer: '+cheer',
   tip: '+tip',
@@ -177,6 +179,9 @@ export function start(message: any) {
   log(message);
 }
 export function stop(message: any) {
+  log(message);
+}
+export function redeem(message: any) {
   log(message);
 }
 
