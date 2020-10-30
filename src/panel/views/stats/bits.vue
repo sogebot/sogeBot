@@ -46,6 +46,7 @@
   import Chartkick from 'vue-chartkick';
   import Chart from 'chart.js';
   import { dayjs } from 'src/bot/helpers/dayjs';
+  import translate from 'src/panel/helpers/translate';
 
   import { library } from '@fortawesome/fontawesome-svg-core'
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -66,6 +67,7 @@
     data: function () {
       const object: {
         dayjs: any;
+        translate: any;
 
         socket: any;
         bits: Required<UserBitInterface>[];
@@ -76,6 +78,7 @@
         sortDesc: boolean;
       } = {
         dayjs: dayjs,
+        translate: translate,
 
         bits: [],
         socket: getSocket('/stats/bits'),

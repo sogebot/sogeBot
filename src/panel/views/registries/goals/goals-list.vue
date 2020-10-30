@@ -93,6 +93,7 @@
 
   import { getSocket } from 'src/panel/helpers/socket';
   import { GoalGroupInterface } from 'src/bot/database/entity/goal';
+  import translate from 'src/panel/helpers/translate';
 
   import { library } from '@fortawesome/fontawesome-svg-core';
   import { faClone } from '@fortawesome/free-solid-svg-icons';
@@ -106,6 +107,7 @@
     },
     data: function () {
       const object: {
+        translate: typeof translate,
         groups: GoalGroupInterface[],
         socket: any,
         search: string,
@@ -117,6 +119,7 @@
         filter: any,
         orderBy: any,
       } = {
+        translate: translate,
         socket: getSocket('/overlays/goals'),
         search: '',
         groups: [],

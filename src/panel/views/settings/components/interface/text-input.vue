@@ -16,6 +16,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { isFinite } from 'lodash-es';
+import translate from 'src/panel/helpers/translate';
 
 @Component({})
 export default class textInput extends Vue {
@@ -27,7 +28,7 @@ export default class textInput extends Vue {
 
   show: boolean = false;
   currentValue = this.value;
-  translatedTitle = this.translate(this.title);
+  translatedTitle = translate(this.title);
 
   update() {
     if (this.type === 'number') {

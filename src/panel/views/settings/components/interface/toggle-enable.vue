@@ -22,6 +22,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import translate from 'src/panel/helpers/translate';
 
 @Component({})
 export default class toggleEnable extends Vue {
@@ -30,9 +31,10 @@ export default class toggleEnable extends Vue {
   @Prop() readonly disabled !: boolean;
 
   currentValue = this.value;
+  translate = translate;
 
   get translatedTitle() {
-    return this.title.includes('.settings.') ? this.translate(this.title) : this.title
+    return this.title.includes('.settings.') ?translate(this.title) : this.title
   }
 
   update() {

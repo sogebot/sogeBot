@@ -27,6 +27,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from '@vue/composition-api'
 import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 import Vue from 'vue';
 import vueHeadful from 'vue-headful';
@@ -57,7 +58,7 @@ export default defineComponent({
     const joinBot = () => socket.emit('joinBot');
     const leaveBot = () => socket.emit('leaveBot');
 
-    return { name, version, joinBot, leaveBot }
+    return { name, version, joinBot, leaveBot, translate, }
   }
 });
 </script>

@@ -54,6 +54,7 @@ import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import { v4 as uuid } from 'uuid';
 import { orderBy } from 'lodash-es';
+import translate from 'src/panel/helpers/translate';
 
 import type { RandomizerInterface } from 'src/bot/database/entity/randomizer';
 import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
@@ -68,16 +69,17 @@ library.add(faExclamationTriangle, faClone)
   },
 })
 export default class randomizerList extends Vue {
+  translate = translate;
   orderBy = orderBy;
   psocket: SocketIOClient.Socket = getSocket('/core/permissions');
   socket: SocketIOClient.Socket =  getSocket('/registries/randomizer');
 
   fields = [
-    { key: 'name', label: this.translate('registry.randomizer.form.name'), sortable: true },
-    { key: 'command', label: this.translate('registry.randomizer.form.command'), sortable: true },
-    { key: 'permissionId', label: this.translate('registry.randomizer.form.permission') },
+    { key: 'name', label: translate('registry.randomizer.form.name'), sortable: true },
+    { key: 'command', label: translate('registry.randomizer.form.command'), sortable: true },
+    { key: 'permissionId', label: translate('registry.randomizer.form.permission') },
     // virtual attributes
-    { key: 'options', label: this.translate('registry.randomizer.form.options') },
+    { key: 'options', label: translate('registry.randomizer.form.options') },
     { key: 'buttons', label: '' },
   ];
 

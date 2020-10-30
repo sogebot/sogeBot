@@ -54,6 +54,7 @@
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import { isNil } from 'lodash-es';
+import translate from 'src/panel/helpers/translate';
 
 @Component({
   components: {
@@ -70,11 +71,11 @@ export default class translations extends Vue {
   fields = [
     {
       key: 'name',
-      label: this.translate('integrations.responsivevoice.settings.key.title'),
+      label: translate('integrations.responsivevoice.settings.key.title'),
       sortable: true,
       thStyle: "width: 375px",
     },
-    { key: 'current', label: this.translate('core.permissions.value') },
+    { key: 'current', label: translate('core.permissions.value') },
   ]
 
   state: {

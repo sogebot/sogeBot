@@ -233,12 +233,12 @@ import { cloneDeep, get, pickBy, filter, size, orderBy } from 'lodash-es';
 import { flatten, unflatten } from 'src/bot/helpers/flatten';
 import { getListOf } from 'src/panel/helpers/getListOf';
 import { getConfiguration, getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 import { PermissionsInterface } from 'src/bot/database/entity/permissions';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import translate from 'src/panel/helpers/translate';
 
 library.add(faExclamationTriangle)
 
@@ -283,6 +283,7 @@ export default class interfaceSettings extends Vue {
   @Prop() readonly commons: any;
 
   orderBy = orderBy;
+  translate = translate;
 
   socket: SocketIOClient.Socket = getSocket('/');
   psocket: SocketIOClient.Socket = getSocket('/core/permissions');

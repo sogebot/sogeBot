@@ -158,6 +158,7 @@
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import type { AlertInterface, CommonSettingsInterface } from 'src/bot/database/entity/alert';
+import translate from 'src/panel/helpers/translate';
 
 import { Route } from 'vue-router'
 import { NextFunction } from 'express';
@@ -197,6 +198,7 @@ Component.registerHooks([
   }
 })
 export default class AlertsEdit extends Vue {
+  translate = translate;
   socket = getSocket('/registries/alerts');
 
   error: any = null;
@@ -266,11 +268,11 @@ export default class AlertsEdit extends Vue {
   }
 
   profanityFilterTypeOptions: { value: string; text: string }[] = [
-    { value: 'disabled', text: this.translate('registry.alerts.profanityFilterType.disabled') },
-    { value: 'replace-with-asterisk', text: this.translate('registry.alerts.profanityFilterType.replace-with-asterisk') },
-    { value: 'replace-with-happy-words', text: this.translate('registry.alerts.profanityFilterType.replace-with-happy-words') },
-    { value: 'hide-messages', text: this.translate('registry.alerts.profanityFilterType.hide-messages') },
-    { value: 'disable-alerts', text: this.translate('registry.alerts.profanityFilterType.disable-alerts') },
+    { value: 'disabled', text: translate('registry.alerts.profanityFilterType.disabled') },
+    { value: 'replace-with-asterisk', text: translate('registry.alerts.profanityFilterType.replace-with-asterisk') },
+    { value: 'replace-with-happy-words', text: translate('registry.alerts.profanityFilterType.replace-with-happy-words') },
+    { value: 'hide-messages', text: translate('registry.alerts.profanityFilterType.hide-messages') },
+    { value: 'disable-alerts', text: translate('registry.alerts.profanityFilterType.disable-alerts') },
   ]
 
   @Validations()

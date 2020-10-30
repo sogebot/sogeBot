@@ -9,11 +9,14 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 @Component({})
 export default class btnEmit extends Vue {
   @Prop() readonly emit: any;
   @Prop() readonly title!: string;
+
+  translate = translate;
 
   state: number = 0
 

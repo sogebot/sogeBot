@@ -83,6 +83,7 @@ import { Vue, Component } from 'vue-property-decorator';
 import { debounce, orderBy } from 'lodash-es';
 import { getSocket } from 'src/panel/helpers/socket';
 import { v4 as uuid } from 'uuid';
+import translate from 'src/panel/helpers/translate';
 
 import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
 
@@ -106,14 +107,15 @@ library.add(faExclamationTriangle)
 export default class customVariablesList extends Vue {
   psocket: SocketIOClient.Socket = getSocket('/core/permissions');
   socket: SocketIOClient.Socket =  getSocket('/core/customvariables');
+  translate = translate;
 
   fields = [
     { key: 'variableName', label: '$_', sortable: true },
-    { key: 'description', label: this.translate('registry.customvariables.description.name') },
-    { key: 'type', sortable: true, label: this.translate('registry.customvariables.type.name') },
-    { key: 'currentValue', label: this.translate('registry.customvariables.currentValue.name') },
+    { key: 'description', label: translate('registry.customvariables.description.name') },
+    { key: 'type', sortable: true, label: translate('registry.customvariables.type.name') },
+    { key: 'currentValue', label: translate('registry.customvariables.currentValue.name') },
     // virtual attributes
-    { key: 'additional-info', label: this.translate('registry.customvariables.additional-info') },
+    { key: 'additional-info', label: translate('registry.customvariables.additional-info') },
     { key: 'buttons', label: '' },
   ];
 

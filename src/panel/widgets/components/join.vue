@@ -27,6 +27,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { EventBus } from 'src/panel/helpers/event-bus';
 
 import { chunk } from 'lodash-es';
+import translate from 'src/panel/helpers/translate';
 
 @Component({
   props: {
@@ -36,6 +37,7 @@ import { chunk } from 'lodash-es';
 })
 export default class App extends Vue {
   EventBus = EventBus;
+  translate = translate;
   socket = getSocket('/widgets/joinpart');
   list: any[] = [];
 

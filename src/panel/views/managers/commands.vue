@@ -541,6 +541,7 @@ export default defineComponent({
       resetCount,
       moveUpResponse,
       moveDownResponse,
+      translate,
     }
   },
 });

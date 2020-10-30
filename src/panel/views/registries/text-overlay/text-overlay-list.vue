@@ -76,6 +76,7 @@ import { isNil, orderBy } from 'lodash-es';
 import Prism from 'vue-prism-component'
 import { getSocket } from 'src/panel/helpers/socket';
 import { v4 as uuid } from 'uuid';
+import translate from 'src/panel/helpers/translate';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faPencilAlt, faEllipsisH, faEllipsisV, faClone } from '@fortawesome/free-solid-svg-icons';
@@ -101,6 +102,7 @@ import { TextInterface } from '../../../../bot/database/entity/text';
   }
 })
 export default class textOverlayList extends Vue {
+    translate = translate;
     search: string = '';
     state: { loaded: boolean; } = { loaded: false }
     showMore: string[] = [];

@@ -389,6 +389,7 @@ export default defineComponent({
       newItem,
       del,
       dayjs,
+      translate,
     }
   }
 });

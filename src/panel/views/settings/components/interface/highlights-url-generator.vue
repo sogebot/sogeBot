@@ -35,6 +35,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import translate from 'src/panel/helpers/translate';
 
 @Component({})
 export default class configurableList extends Vue {
@@ -42,7 +43,7 @@ export default class configurableList extends Vue {
   @Prop() readonly title!: string;
 
   currentValues = this.values;
-  translatedTitle = this.translate(this.title);
+  translatedTitle = translate(this.title);
 
   get origin() {
     return window.location.origin;

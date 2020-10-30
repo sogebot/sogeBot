@@ -96,6 +96,7 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { v4 as uuid } from 'uuid';
+import translate from 'src/panel/helpers/translate';
 
 import { getSocket } from 'src/panel/helpers/socket';
 import type { AlertInterface } from 'src/bot/database/entity/alert';
@@ -117,13 +118,14 @@ library.add(faClone, faBell, faBellSlash);
   }
 })
 export default class customVariablesList extends Vue {
+  translate = translate;
   socket: SocketIOClient.Socket =  getSocket('/registries/alerts');
   areAlertsMuted = false;
 
   fields = [
-    { key: 'name', label: this.translate('registry.alerts.name.name'), sortable: true },
+    { key: 'name', label: translate('registry.alerts.name.name'), sortable: true },
     // virtual attributes
-    { key: 'additional-info', label: this.translate('registry.customvariables.additional-info') },
+    { key: 'additional-info', label: translate('registry.customvariables.additional-info') },
     { key: 'buttons', label: '' },
   ];
 

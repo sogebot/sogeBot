@@ -32,7 +32,7 @@
 
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api'
-
+import translate from 'src/panel/helpers/translate';
 
 export default defineComponent({
   components: {
@@ -49,7 +49,7 @@ export default defineComponent({
     const save = () => {
       context.emit('click');
     }
-    return { save };
+    return { save, translate, };
   }
 });
 </script>

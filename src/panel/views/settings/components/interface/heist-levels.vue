@@ -36,9 +36,12 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import type { Level } from 'src/bot/games/heist';
+import translate from 'src/panel/helpers/translate';
 
 @Component({})
 export default class heistLevels extends Vue {
+  translate = translate;
+  
   @Prop() readonly value!: Level[];
 
   w_levels = this.value.sort((a, b) => {

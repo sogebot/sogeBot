@@ -265,6 +265,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { get } from 'lodash-es';
+import translate from 'src/panel/helpers/translate';
 
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/mode/javascript/javascript.js'
@@ -292,6 +293,7 @@ export default Vue.extend({
   data: function () {
     const object: {
       get: typeof get,
+      translate: typeof translate,
       socket: any,
       search: string,
       groupId: string,
@@ -310,6 +312,7 @@ export default Vue.extend({
       dateTimePicker: any,
     } = {
       get: get,
+      translate: translate,
       socket: getSocket('/overlays/goals'),
       search: '',
       groupId: uuid(),

@@ -65,6 +65,7 @@ import Chartkick from 'vue-chartkick';
 import Chart from 'chart.js';
 import { dayjs } from 'src/bot/helpers/dayjs';
 import { get, isNil, groupBy } from 'lodash-es'
+import translate from 'src/panel/helpers/translate';
 
 Vue.use(Chartkick.use(Chart))
 
@@ -78,6 +79,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 export default class apiStats extends Vue {
   socket = getSocket('/');
   dayjs = dayjs;
+  translate = translate;
   selected: string = 'helix';
   data: any[] = [];
 

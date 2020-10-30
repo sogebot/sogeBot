@@ -398,6 +398,7 @@ export default defineComponent({
       fViewerItems,
       fFollowerItems,
       fSubscriberItems,
+      translate,
     }
   }
 })

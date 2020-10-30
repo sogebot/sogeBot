@@ -29,6 +29,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import { announceTypes } from 'src/bot/commons';
+import translate from 'src/panel/helpers/translate';
 
 type Channel = { text: string, value: string };
 
@@ -41,7 +42,7 @@ export default class discordChannel extends Vue {
   channels: Channel[] = []
 
   currentValue = this.value;
-  translatedTitle = this.translate(this.title);
+  translatedTitle = translate(this.title);
 
   mounted() {
     this.socket.emit('discord::getChannels', (err: string | null, channels: Channel[]) => {
@@ -66,7 +67,7 @@ export default class discordChannel extends Vue {
           }
         }
       }
-      this.channels = [{ value: '', text: `-- ${this.translate('integrations.discord.settings.noChannelSelected')} --` }, ...channels];
+      this.channels = [{ value: '', text: `-- ${translate('integrations.discord.settings.noChannelSelected')} --` }, ...channels];
     });
   }
 

@@ -71,6 +71,7 @@
 import { getSocket } from 'src/panel/helpers/socket';
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { orderBy } from 'lodash-es';
+import translate from 'src/panel/helpers/translate';
 
 export default {
   props: ['popout', 'nodrag'],
@@ -79,6 +80,7 @@ export default {
   },
   data: function () {
     return {
+      translate,
       EventBus,
       orderBy,
       tabIndex: 0,

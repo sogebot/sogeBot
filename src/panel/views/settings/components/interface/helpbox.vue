@@ -4,11 +4,12 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import translate from 'src/panel/helpers/translate';
 
 @Component({})
 export default class helpbox extends Vue {
   @Prop() readonly title!: string;
   @Prop() readonly fullObject: any;
-  translatedTitle = this.translate(this.title);
+  translatedTitle = translate(this.title);
 }
 </script>

@@ -86,7 +86,7 @@
               </b-form-invalid-feedback>
             </b-form-group>
             <b-form-group
-              :label="translate('cooldown') + ' (' + this.translate('in-seconds') + ')'"
+              :label="translate('cooldown') + ' (' + translate('in-seconds') + ')'"
               label-for="name"
             >
               <b-input-group>
@@ -396,6 +396,7 @@ export default defineComponent({
       newItem,
       seconds,
       del,
+      translate,
     }
   }
 });

@@ -32,7 +32,6 @@ import { get } from 'lodash-es';
 import { ButtonStates, states } from './helpers/buttonStates';
 import { setMainLoaded } from './helpers/isAvailableVariable';
 import { isUserLoggedIn } from './helpers/isUserLoggedIn';
-import translate from './helpers/translate';
 import urlParam from './helpers/urlParam';
 import { getListOf, populateListOf } from './helpers/getListOf';
 import type { getListOfReturn } from './helpers/getListOf';
@@ -62,7 +61,6 @@ declare module 'vue/types/vue' {
     $unloadScript: (script: string) => Promise<void>;
     $state: states;
     urlParam(key: string): string | null;
-    translate(id: string): string;
     $systems: getListOfReturn['systems'];
     $core: getListOfReturn['core'];
     $integrations: getListOfReturn['integrations'];
@@ -73,7 +71,6 @@ Vue.use(VueRouter);
 
 const main = async () => {
   // init prototypes
-  Vue.prototype.translate = (v: string) => translate(v);
   Vue.prototype.urlParam = (v: string) => urlParam(v);
   store.commit('setLoggedUser', await isUserLoggedIn());
 

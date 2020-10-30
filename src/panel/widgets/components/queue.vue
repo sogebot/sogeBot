@@ -94,6 +94,8 @@
 import { getSocket } from 'src/panel/helpers/socket';
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { debounce } from 'lodash-es';
+import translate from 'src/panel/helpers/translate';
+
 export default {
   props: ['popout', 'nodrag'],
   beforeDestroy: function() {
@@ -161,6 +163,7 @@ export default {
   data: function () {
     return {
       EventBus,
+      translate,
       eligibilityAll: true,
       eligibilityFollowers: false,
       eligibilitySubscribers: false,

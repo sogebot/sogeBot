@@ -63,11 +63,13 @@
   import { v4 as uuid } from 'uuid';
   import { chunk, isEqual } from 'lodash-es';
   import { getSocket } from 'src/panel/helpers/socket';
+  import translate from 'src/panel/helpers/translate';
 
   export default Vue.extend({
     props: ['ids'],
     data() {
       const data: {
+        translate: any,
         chunk: any,
         usersSocket: any,
         currentIds: number[],
@@ -84,6 +86,7 @@
         searchData: string[],
         searchPage: number,
       } = {
+        translate: translate,
         chunk: chunk,
         usersSocket: getSocket('/core/users'),
         currentIds: this.ids,

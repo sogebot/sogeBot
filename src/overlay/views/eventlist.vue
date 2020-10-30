@@ -18,12 +18,14 @@ import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import { orderBy } from 'lodash-es';
 import { EventListInterface } from '../../bot/database/entity/eventList';
+import translate from 'src/panel/helpers/translate';
 
 @Component({})
 export default class ClipsOverlay extends Vue {
   socket = getSocket('/overlays/eventlist', true);
   events: any[] = [];
   display = ['username', 'event'];
+  translate = translate;
 
   created () {
     setTimeout(() => this.refresh(), 1000);
@@ -43,13 +45,13 @@ export default class ClipsOverlay extends Vue {
       this.events = orderBy(data, 'timestamp', order).map((o) => {
         const values = JSON.parse(o.values_json);
         if (o.event === 'resub') {
-          return { ...o, summary: values.subCumulativeMonths + 'x ' + this.translate('overlays-eventlist-resub') };
+          return { ...o, summary: values.subCumulativeMonths + 'x ' + translate('overlays-eventlist-resub') };
         } else if (o.event === 'cheer') {
-          return { ...o, summary: values.bits + ' ' + this.translate('overlays-eventlist-cheer') };
+          return { ...o, summary: values.bits + ' ' + translate('overlays-eventlist-cheer') };
         } else if (o.event === 'tip') {
           return { ...o, summary: values.currency + parseFloat(values.amount).toFixed(2) };
         } else {
-          return { ...o, summary: this.translate('overlays-eventlist-' + o.event) };
+          return { ...o, summary: translate('overlays-eventlist-' + o.event) };
         }
       })
       setTimeout(() => this.refresh(), 5000);

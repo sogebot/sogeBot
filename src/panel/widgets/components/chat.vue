@@ -57,11 +57,13 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { sortedUniq, flatten } from 'lodash-es';
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { get } from 'lodash-es';
+import translate from 'src/panel/helpers/translate';
 
 export default {
   props: ['popout', 'nodrag'],
   data: function () {
     return {
+      translate,
       theme: 'light',
       socket: getSocket('/widgets/chat'),
       chatMessage: '',

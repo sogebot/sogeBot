@@ -177,6 +177,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { orderBy } from 'lodash-es';
 import Vue from 'vue';
+import translate from 'src/panel/helpers/translate';
 
 import loading from 'src/panel/components/loading.vue';
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
@@ -191,6 +192,7 @@ export default {
     return {
       EventBus,
       orderBy: orderBy,
+      translate,
 
       waitingForNewWinner: false,
 

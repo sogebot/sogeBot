@@ -73,6 +73,7 @@
 import { defineComponent, ref, watch } from '@vue/composition-api';
 import type { Ref } from '@vue/composition-api';
 import { isEqual } from 'lodash';
+import translate from 'src/panel/helpers/translate';
 
 interface Props {
   value: string[];
@@ -165,6 +166,7 @@ export default defineComponent({
       emitUpdate,
       removeTag,
       emitSearch,
+      translate,
     }
   }
 });

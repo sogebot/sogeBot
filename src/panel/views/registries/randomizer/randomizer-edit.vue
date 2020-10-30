@@ -223,6 +223,7 @@ import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
 import { v4 as uuid } from 'uuid';
 import { permission } from 'src/bot/helpers/permissions';
 import { getRandomColor, getContrastColor } from 'src/panel/helpers/color';
+import translate from 'src/panel/helpers/translate';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
@@ -251,16 +252,17 @@ Component.registerHooks([
 })
 export default class randomizerEdit extends Vue {
   orderBy = orderBy;
+  translate = translate;
   getRandomColor = getRandomColor;
   getContrastColor = getContrastColor;
   psocket: SocketIOClient.Socket = getSocket('/core/permissions');
   socket: SocketIOClient.Socket =  getSocket('/registries/randomizer');
 
   fields = [
-    { key: 'name', label: this.translate('registry.randomizer.form.name') },
-    { key: 'color', label: this.translate('registry.randomizer.form.color') },
-    { key: 'numOfDuplicates', label: this.translate('registry.randomizer.form.numOfDuplicates') },
-    { key: 'minimalSpacing', label: this.translate('registry.randomizer.form.minimalSpacing') },
+    { key: 'name', label: translate('registry.randomizer.form.name') },
+    { key: 'color', label: translate('registry.randomizer.form.color') },
+    { key: 'numOfDuplicates', label: translate('registry.randomizer.form.numOfDuplicates') },
+    { key: 'minimalSpacing', label: translate('registry.randomizer.form.minimalSpacing') },
     { key: 'buttons', label: '' },
   ];
 
