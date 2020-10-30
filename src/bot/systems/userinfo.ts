@@ -18,6 +18,7 @@ import Expects from '../expects';
 import { getUserFromTwitch } from '../microservices/getUserFromTwitch';
 import { clusteredFetchAccountAge } from '../cluster';
 import { dayjs } from '../helpers/dayjs';
+import general from '../general';
 
 /*
  * !me
@@ -262,7 +263,7 @@ class UserInfo extends System {
         for (const t of tips) {
           tipAmount += currency.exchange(Number(t.amount), t.currency, currency.mainCurrency);
         }
-        message[idx] = `${Number(tipAmount).toFixed(2)}${currency.symbol(currency.mainCurrency)}`;
+        message[idx] = Intl.NumberFormat(general.lang, { style: 'currency', currency: currency.mainCurrency }).format(tipAmount);
       }
 
       if (message.includes('$bits')) {

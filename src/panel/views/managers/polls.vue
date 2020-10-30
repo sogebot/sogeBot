@@ -119,7 +119,7 @@
                         vote.isOpened ? 'progress-bar-animated' : ''
                       ]"
                       :style="{
-                        'width': getPercentage(vote.id, index, 1) === 0 ? '5px' : getPercentage(vote.id, index, 1) + '%'
+                        'width': getPercentage(vote.id, index, 1) === '0' ? '5px' : getPercentage(vote.id, index, 1) + '%'
                       }"></div>
                   </div>
                 </div>
@@ -337,7 +337,7 @@
           return 0;
         }
       },
-      getPercentage: function (vid: string, index: number, toFixed: number) {
+      getPercentage: function (vid: string, index: number, toFixed: number): string {
         let numOfVotes = 0
         const votes = this.votes.find(o => o.id === vid);
         if (votes?.votes) {

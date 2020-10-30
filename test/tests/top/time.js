@@ -37,7 +37,7 @@ describe('Top - !top time', () => {
 
   it('run !top time and expect correct output', async () => {
     const r = await top.time({ sender: { username: commons.getOwner() } });
-    assert.strictEqual(r[0].response, 'Top 10 (watch time): 1. @user9 - 9.0h, 2. @user8 - 8.0h, 3. @user7 - 7.0h, 4. @user6 - 6.0h, 5. @user5 - 5.0h, 6. @user4 - 4.0h, 7. @user3 - 3.0h, 8. @user2 - 2.0h, 9. @user1 - 1.0h, 10. @user0 - 0.0h', owner);
+    assert.strictEqual(r[0].response, 'Top 10 (watch time): 1. @user9 - 9.0 hr, 2. @user8 - 8.0 hr, 3. @user7 - 7.0 hr, 4. @user6 - 6.0 hr, 5. @user5 - 5.0 hr, 6. @user4 - 4.0 hr, 7. @user3 - 3.0 hr, 8. @user2 - 2.0 hr, 9. @user1 - 1.0 hr, 10. @user0 - 0.0 hr', owner);
   });
 
   it('add user0 to ignore list', async () => {
@@ -47,6 +47,6 @@ describe('Top - !top time', () => {
 
   it('run !top time and expect correct output', async () => {
     const r = await top.time({ sender: { username: commons.getOwner() } });
-    assert.strictEqual(r[0].response, 'Top 10 (watch time): 1. @user9 - 9.0h, 2. @user8 - 8.0h, 3. @user7 - 7.0h, 4. @user6 - 6.0h, 5. @user5 - 5.0h, 6. @user4 - 4.0h, 7. @user3 - 3.0h, 8. @user2 - 2.0h, 9. @user1 - 1.0h', owner);
+    assert.strictEqual(r[0].response, 'Top 10 (watch time): 1. @user9 - 9.0 hr, 2. @user8 - 8.0 hr, 3. @user7 - 7.0 hr, 4. @user6 - 6.0 hr, 5. @user5 - 5.0 hr, 6. @user4 - 4.0 hr, 7. @user3 - 3.0 hr, 8. @user2 - 2.0 hr, 9. @user1 - 1.0 hr', owner);
   });
 });

@@ -49,7 +49,7 @@ export default class ClipsOverlay extends Vue {
         } else if (o.event === 'cheer') {
           return { ...o, summary: values.bits + ' ' + translate('overlays-eventlist-cheer') };
         } else if (o.event === 'tip') {
-          return { ...o, summary: values.currency + parseFloat(values.amount).toFixed(2) };
+          return { ...o, summary: Intl.NumberFormat(this.$store.state.configuration.lang, { style: 'currency', currency: values.currency }).format(values.amount) };
         } else {
           return { ...o, summary: translate('overlays-eventlist-' + o.event) };
         }

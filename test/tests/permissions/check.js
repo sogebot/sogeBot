@@ -412,7 +412,7 @@ describe('Permissions - check()', () => {
         if (users[j].username === '__viewer_messages__') {
           messages = '100';
         }
-        assert.strictEqual(r[0].response, `$sender | ${hours}h | ${points} points | ${messages} messages | ${tips}€ | ${bits} bits`);
+        assert.strictEqual(r[0].response, `$sender | ${hours}h | ${points} points | ${messages} messages | €${tips} | ${bits} bits`);
       });
     }
   });

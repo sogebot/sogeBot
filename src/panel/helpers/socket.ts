@@ -83,9 +83,12 @@ export function getSocket(namespace: string, continueOnUnauthorized = false) {
 }
 
 export const getTranslations = async () => {
-  console.debug('Getting translations');
   getSocket('/', true).emit('translations', (translations: any) => {
-    console.debug({translations});
+    if (process.env.IS_DEV) {
+      console.groupCollapsed('GET=>Translations');
+      console.debug({translations});
+      console.groupEnd();
+    }
     setTranslations(translations);
   });
 };
@@ -94,11 +97,15 @@ type Configuration = {
   [x:string]: Configuration | string;
 };
 export const getConfiguration = async (): Promise<Configuration> => {
-  console.debug('Getting configuration');
   return new Promise((resolve) => {
     getSocket('/core/ui', true).emit('configuration', (err: string | null, configuration: Configuration) => {
       if (err) {
         return console.error(err);
+      }
+      if (process.env.IS_DEV) {
+        console.groupCollapsed('GET=>Configuration');
+        console.debug({configuration});
+        console.groupEnd();
       }
       resolve(configuration);
     });

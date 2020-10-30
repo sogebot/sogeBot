@@ -16,11 +16,26 @@
               <span v-for="k of viewerIs" :key="k"> {{k}} </span>
             </div>
             <div v-if="viewer.permission"><strong style="font-size: 0.9rem" class="text-muted">{{translate('group')}}:</strong>  {{viewer.permission.name}}</div>
-            <div><strong style="font-size: 0.9rem" class="text-muted">{{translate('points')}}:</strong>  {{viewer.points}}</div>
-            <div><strong style="font-size: 0.9rem" class="text-muted">{{translate('messages')}}:</strong>  {{viewer.messages}}</div>
-            <div><strong style="font-size: 0.9rem" class="text-muted">{{translate('watched-time')}}:</strong>  {{Math.floor(viewer.watchedTime / 1000 / 60 / 60).toFixed(1)}}h</div>
-            <div><strong style="font-size: 0.9rem" class="text-muted">{{translate('bits')}}:</strong>  {{viewer.aggregatedBits}}</div>
-            <div><strong style="font-size: 0.9rem" class="text-muted">{{translate('tips')}}:</strong>  {{viewer.aggregatedTips}} {{$store.state.configuration.currency}}</div>
+            <div>
+              <strong style="font-size: 0.9rem" class="text-muted">{{translate('points')}}:</strong>
+              {{ Intl.NumberFormat($store.state.configuration.lang).format(viewer.points) }}
+            </div>
+            <div>
+              <strong style="font-size: 0.9rem" class="text-muted">{{translate('messages')}}:</strong>
+              {{ Intl.NumberFormat($store.state.configuration.lang).format(viewer.messages) }}
+            </div>
+            <div>
+              <strong style="font-size: 0.9rem" class="text-muted">{{translate('watched-time')}}:</strong>
+              {{ Intl.NumberFormat($store.state.configuration.lang, { style:'unit', unit: 'hour', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(viewer.watchedTime / 1000 / 60 / 60) }}
+            </div>
+            <div>
+              <strong style="font-size: 0.9rem" class="text-muted">{{translate('bits')}}:</strong>
+              {{ Intl.NumberFormat($store.state.configuration.lang).format(viewer.aggregatedBits) }}
+            </div>
+            <div>
+              <strong style="font-size: 0.9rem" class="text-muted">{{translate('tips')}}:</strong>
+              {{ Intl.NumberFormat($store.state.configuration.lang, { style: 'currency', currency: $store.state.configuration.currency }).format(viewer.aggregatedTips) }}
+            </div>
           </div>
         </div>
         <b-button-group class="pt-2 w-100">

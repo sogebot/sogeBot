@@ -15,6 +15,7 @@ import oauth from '../oauth';
 import points from './points';
 import tmi from '../tmi';
 import currency from '../currency';
+import general from '../general';
 
 enum TYPE {
   TIME = '0',
@@ -257,13 +258,13 @@ class Top extends System {
         message += (i + 1) + '. ' + (tmi.showWithAt ? '@' : '') + (user.username || 'unknown') + ' - ';
         switch (type) {
           case TYPE.TIME:
-            message += (user.value / 1000 / 60 / 60).toFixed(1) + 'h';
+            message += Intl.NumberFormat(general.lang, { style: 'unit', unit: 'hour', minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(user.value / 1000 / 60 / 60);
             break;
           case TYPE.SUBMONTHS:
             message += [user.value, getLocalizedName(user.value, translate('core.months'))].join(' ');
             break;
           case TYPE.TIPS:
-            message += Number(user.value).toFixed(2) + currency.symbol(currency.mainCurrency);
+            message += Intl.NumberFormat(general.lang, { style: 'currency', currency: currency.mainCurrency }).format(user.value);
             break;
           case TYPE.POINTS:
             message += user.value + ' ' + await points.getPointsName(user.value);
