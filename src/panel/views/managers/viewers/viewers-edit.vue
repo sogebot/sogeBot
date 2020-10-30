@@ -242,7 +242,9 @@
                           <option value="ZAR">ZAR</option>
                         </select>
                       </template>
-                      <strong v-else>{{ Number(tips.amount).toFixed(2) }}{{ tips.currency }}</strong>
+                      <strong v-else>
+                        {{ Intl.NumberFormat($store.state.configuration.lang, { style: 'currency', currency: tips.currentcy }).format(tips.amount) }}
+                      </strong>
                     </div>
                   <td>
                     <template v-if="editingTipsIds.includes(index)">

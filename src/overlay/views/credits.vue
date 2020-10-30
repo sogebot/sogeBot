@@ -145,7 +145,7 @@ export default class CreditsOverlay extends Vue {
           } else if (['resub'].includes(key)) {
             html = `<strong style="font-size:65%">${o[0].values.subCumulativeMonths} months</strong> <br> ${username}`
           } else if (['tip'].includes(key)) {
-            html = `<strong style="font-size:65%">${Number(o.reduce((a, b) => ({ amount: Number(a.amount) + Number(b.values.amount) })).amount).toFixed(2)} ${o[0].currency}</strong> <br> ${username}`
+            html = `<strong style="font-size:65%">${Intl.NumberFormat(this.$store.state.configuration.lang, { style: 'currency', currency: o[0].currency }).format(Number(o.reduce((a, b) => ({ amount: Number(a.amount) + Number(b.values.amount) })).amount))}</strong> <br> ${username}`
           }
           page.push({
             text: html,

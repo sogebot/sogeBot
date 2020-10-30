@@ -23,7 +23,6 @@ import general from './general';
 import translateLib, { translate } from './translate';
 import api, { currentStreamTags } from './api';
 import tmi from './tmi';
-import currency from './currency';
 import oauth from './oauth';
 import songs from './systems/songs';
 import spotify from './integrations/spotify';
@@ -569,7 +568,6 @@ const sendStreamData = async () => {
       currentSubscribers: api.stats.currentSubscribers,
       currentBits: api.stats.currentBits,
       currentTips: api.stats.currentTips,
-      currency: currency.symbol(currency.mainCurrency),
       chatMessages: api.isStreamOnline ? linesParsed - api.chatMessagesAtStart : 0,
       currentFollowers: api.stats.currentFollowers,
       currentViews: api.stats.currentViews,

@@ -307,7 +307,9 @@ export default {
       }
 
       const values = JSON.parse(event.values_json)
-      t = t.replace('$formatted_amount', '<strong style="font-size: 1rem">' + get(values, 'currency', '$') + parseFloat(get(values, 'amount', '0')).toFixed(2) + '</strong>')
+      console.log({values})
+      const formatted_amount = Intl.NumberFormat(this.$store.state.configuration.lang, { style: 'currency', currency: get(values, 'currency', 'USD') }).format(get(values, 'amount', '0'));
+      t = t.replace('$formatted_amount', '<strong style="font-size: 1rem">' + formatted_amount + '</strong>')
       t = t.replace('$viewers', '<strong style="font-size: 1rem">' + get(values, 'viewers', '0') + '</strong>')
       t = t.replace('$tier', `${this.translate('tier')} <strong style="font-size: 1rem">${get(values, 'tier', 'n/a')}</strong>`)
       t = t.replace('$username', get(values, 'from', 'n/a'))

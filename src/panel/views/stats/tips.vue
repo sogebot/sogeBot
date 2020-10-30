@@ -30,7 +30,7 @@
         {{ dayjs(Number(data.item.tippedAt)).format('LLL') }}
       </template>
       <template v-slot:cell(sortAmount)='data'>
-        {{ Number(data.item.amount).toFixed(2) }} {{data.item.currency}}
+        {{ Intl.NumberFormat($store.state.configuration.lang, { style: 'currency', currency: data.item.currency }).format(data.item.amount) }}
       </template>
       <template v-slot:cell(user)='data'>
         <router-link :to="{ name: 'viewersManagerEdit', params: { id: data.item.user.userId }}">

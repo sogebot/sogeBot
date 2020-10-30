@@ -39,13 +39,13 @@
           <div class="col-4 text-left text-nowrap pl-2 pr-2">{{ goal.name }}</div>
           <div class="col-4 text-nowrap text-center">
             <template v-if="goal.type === 'tips'">
-              {{ Number(goal.currentAmount).toFixed(2) }}{{ $store.state.configuration.currencySymbol }}
+              {{ Intl.NumberFormat($store.state.configuration.lang, { style: 'currency', currency: $store.state.configuration.currency }).format(goal.currentAmount) }}
             </template>
             <template v-else>{{ goal.currentAmount }}</template>
           </div>
           <div class="col-4 text-nowrap text-right pr-2">
             <template v-if="goal.type === 'tips'">
-              {{ Number(goal.goalAmount).toFixed(2) }}{{ $store.state.configuration.currencySymbol }}
+              {{ Intl.NumberFormat($store.state.configuration.lang, { style: 'currency', currency: $store.state.configuration.currency }).format(goal.goalAmount) }}
             </template>
             <template v-else>{{ goal.goalAmount }}</template></div>
         </div>
@@ -93,9 +93,10 @@
             }">
             <div class="col text-center">
               <template v-if="goal.type === 'tips'">
-                {{ Number(goal.currentAmount).toFixed(2) }}{{ $store.state.configuration.currencySymbol }} ({{ Number((100 / goal.goalAmount) * goal.currentAmount).toFixed() }}%)
+                {{ Intl.NumberFormat($store.state.configuration.lang, { style: 'currency', currency: $store.state.configuration.currency }).format(goal.currentAmount) }}
+                ({{ Intl.NumberFormat($store.state.configuration.lang, { style: 'percent' }).format(goal.currentAmount / goal.goalAmount) }})
               </template>
-              <template v-else>{{ goal.currentAmount }} ({{ Number((100 / goal.goalAmount) * goal.currentAmount).toFixed() }}%)</template>
+              <template v-else>{{ goal.currentAmount }} ({{ Intl.NumberFormat($store.state.configuration.lang, { style: 'percent' }).format(goal.currentAmount / goal.goalAmount) }})</template>
             </div>
           </div>
         </b-progress>
@@ -108,7 +109,7 @@
           }">
           <div class="col text-left pl-2">
             <template v-if="goal.type === 'tips'">
-              0.00{{ $store.state.configuration.currencySymbol }}
+              {{ Intl.NumberFormat($store.state.configuration.lang, { style: 'currency', currency: $store.state.configuration.currency }).format(0) }}
             </template>
             <template v-else>0</template>
           </div>
@@ -117,7 +118,7 @@
           </div>
           <div class="col text-right pr-2">
             <template v-if="goal.type === 'tips'">
-              {{ Number(goal.goalAmount).toFixed(2) }}{{ $store.state.configuration.currencySymbol }}
+                {{ Intl.NumberFormat($store.state.configuration.lang, { style: 'currency', currency: $store.state.configuration.currency }).format(goal.goalAmount) }}
             </template>
             <template v-else>{{ goal.goalAmount }}</template>
           </div>

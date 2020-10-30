@@ -62,6 +62,7 @@ const webpackConfig = {
     new webpack.DefinePlugin({
       'process.env.BUILD': JSON.stringify('web'), // we need this until https://github.com/vuelidate/vuelidate/issues/365 is fixed
       'process.env.NODE_DEBUG': process.env.NODE_DEBUG, // 'util' need it
+      'process.env.IS_DEV': process.env.NODE_ENV === 'development',
       __VUE_OPTIONS_API__: true,
       __VUE_PROD_DEVTOOLS__: false,
     }),

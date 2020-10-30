@@ -166,25 +166,25 @@
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             {{ translate('messages') }}:
           </strong>
-          {{ data.item.messages }}
+          {{ Intl.NumberFormat($store.state.configuration.lang).format(data.item.messages) }}
         </div>
         <div>
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             {{ translate('points') }}:
           </strong>
-          {{ data.item.points }}
+          {{ Intl.NumberFormat($store.state.configuration.lang).format(data.item.points) }}
         </div>
         <div>
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             {{ translate('watched-time') }}:
           </strong>
-          {{ (data.item.watchedTime / 1000 / 60 / 60).toFixed(1) }}h
+          {{ Intl.NumberFormat($store.state.configuration.lang, { style:'unit', unit: 'hour', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(data.item.watchedTime / 1000 / 60 / 60) }}
         </div>
         <div>
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             {{ translate('tips') }}:
           </strong>
-          {{ Number(data.item.sumTips).toFixed(2) }}{{ $store.state.configuration.currency }}
+          {{ Intl.NumberFormat($store.state.configuration.lang, { style: 'currency', currency: $store.state.configuration.currency }).format(data.item.sumTips) }}
         </div>
       </template>
       <template v-slot:cell(stats2)="data">
@@ -192,7 +192,7 @@
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             {{ translate('bits') }}:
           </strong>
-          {{ data.item.sumBits }}
+          {{ Intl.NumberFormat($store.state.configuration.lang).format(data.item.sumBits) }}
         </div>
         <div v-if="data.item.isSubscriber">
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
@@ -204,19 +204,19 @@
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             {{ translate('subgifts') }}:
           </strong>
-          {{ data.item.giftedSubscribes }}
+          {{ Intl.NumberFormat($store.state.configuration.lang).format(data.item.giftedSubscribes) }}
         </div>
         <div>
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             {{ translate('subStreak') }}:
           </strong>
-          {{ data.item.subscribeStreak }}
+          {{ Intl.NumberFormat($store.state.configuration.lang).format(data.item.subscribeStreak) }}
         </div>
         <div>
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             {{ translate('subCumulativeMonths') }}:
           </strong>
-          {{ data.item.subscribeCumulativeMonths }}
+          {{ Intl.NumberFormat($store.state.configuration.lang).format(data.item.subscribeCumulativeMonths) }}
         </div>
       </template>
     </b-table>
