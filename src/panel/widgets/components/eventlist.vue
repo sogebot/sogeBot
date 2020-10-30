@@ -141,6 +141,7 @@ import { toBoolean } from 'src/bot/helpers/toBoolean';
 import { dayjs } from 'src/bot/helpers/dayjs';
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 import { chunk, debounce, get } from 'lodash-es';
+import translate from 'src/panel/helpers/translate';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faRedoAlt, faBell, faBellSlash } from '@fortawesome/free-solid-svg-icons';
@@ -155,6 +156,7 @@ export default {
   },
   data: function () {
     return {
+      translate,
       dayjs,
       EventBus,
       isHovered: '',
@@ -299,17 +301,17 @@ export default {
       this.events = []
     },
     prepareMessage: function (event) {
-      let t = this.translate(`eventlist-events.${event.event}`)
+      let t = translate(`eventlist-events.${event.event}`)
 
       // change resub translate if not shared substreak
       if (event.event === 'resub' && !event.subStreakShareEnabled) {
-        t = this.translate(`eventlist-events.resubWithoutStreak`);
+        t = translate(`eventlist-events.resubWithoutStreak`);
       }
 
       const values = JSON.parse(event.values_json)
       t = t.replace('$formatted_amount', '<strong style="font-size: 1rem">' + get(values, 'currency', '$') + parseFloat(get(values, 'amount', '0')).toFixed(2) + '</strong>')
       t = t.replace('$viewers', '<strong style="font-size: 1rem">' + get(values, 'viewers', '0') + '</strong>')
-      t = t.replace('$tier', `${this.translate('tier')} <strong style="font-size: 1rem">${get(values, 'tier', 'n/a')}</strong>`)
+      t = t.replace('$tier', `${translate('tier')} <strong style="font-size: 1rem">${get(values, 'tier', 'n/a')}</strong>`)
       t = t.replace('$username', get(values, 'from', 'n/a'))
       t = t.replace('$subCumulativeMonthsName', get(values, 'subCumulativeMonthsName', 'months'))
       t = t.replace('$subCumulativeMonths', '<strong style="font-size: 1rem">' + get(values, 'subCumulativeMonths', '0') + '</strong>')
@@ -319,7 +321,7 @@ export default {
       t = t.replace('$count', '<strong style="font-size: 1rem">' + get(values, 'count', '0') + '</strong>')
 
       let output = `<span style="font-size:0.7rem; font-weight: normal">${t}</span>`
-      if (values.song_url && values.song_title) output += `<div style="font-size: 0.7rem"><strong>${this.translate('song-request')}:</strong> <a href="${values.song_url}">${values.song_title}</a></div>`
+      if (values.song_url && values.song_title) output += `<div style="font-size: 0.7rem"><strong>${translate('song-request')}:</strong> <a href="${values.song_url}">${values.song_title}</a></div>`
       if (values.message) output += `<div class="eventlist-blockquote" style="font-size: ${this.eventlistMessageSize}px">${values.message.replace(/(\w{10})/g, '$1<wbr>')}</div>` // will force new line for long texts
 
       return output

@@ -23,6 +23,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import Clipboard from 'v-clipboard'
 Vue.use(Clipboard)
 import { v4 as uuid } from 'uuid'
+import translate from 'src/panel/helpers/translate';
 
 @Component({})
 export default class uuidGenerator extends Vue {
@@ -31,7 +32,7 @@ export default class uuidGenerator extends Vue {
 
   show: boolean = false;
   currentValue = this.value;
-  translatedTitle = this.translate(this.title);
+  translatedTitle = translate(this.title);
 
   copied = false;
 

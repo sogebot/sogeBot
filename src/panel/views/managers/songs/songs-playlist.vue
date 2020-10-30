@@ -128,6 +128,7 @@
 
 <script lang="ts">
 import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { SongPlaylistInterface } from 'src/bot/database/entity/song';
@@ -155,6 +156,7 @@ library.add(faStepBackward, faStepForward);
   }
 })
 export default class playlist extends Vue {
+  translate = translate;
   socket = getSocket('/systems/songs');
 
   items: SongPlaylistInterface[] = [];

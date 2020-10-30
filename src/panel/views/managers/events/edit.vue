@@ -542,6 +542,7 @@ export default defineComponent({
       ButtonStates,
       refreshRedeemedRewards,
       redeemRewardsWithForcedSelected,
+      translate,
     }
   }
 })

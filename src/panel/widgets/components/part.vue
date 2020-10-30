@@ -24,6 +24,7 @@
 import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import { EventBus } from 'src/panel/helpers/event-bus';
+import translate from 'src/panel/helpers/translate';
 
 import { chunk } from 'lodash-es';
 
@@ -35,6 +36,7 @@ import { chunk } from 'lodash-es';
 })
 export default class App extends Vue {
   EventBus = EventBus;
+  translate = translate;
   socket = getSocket('/widgets/joinpart');
   list: any[] = [];
 

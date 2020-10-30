@@ -308,6 +308,7 @@ export default defineComponent({
       searchForGame,
       searchForGameOpts,
       gameToAdd,
+      translate,
     }
   },
 })

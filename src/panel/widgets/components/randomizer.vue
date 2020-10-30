@@ -83,6 +83,7 @@
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { getSocket } from 'src/panel/helpers/socket';
 import { isNil, size, orderBy } from 'lodash-es';
+import translate from 'src/panel/helpers/translate';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faDice, faDiceOne, faDiceTwo, faDiceThree, faDiceFour, faDiceFive, faDiceSix } from '@fortawesome/free-solid-svg-icons';
@@ -96,6 +97,7 @@ export default {
   data: function () {
     return {
       EventBus,
+      translate,
       items: [],
       tabIndex: 0,
       state: {

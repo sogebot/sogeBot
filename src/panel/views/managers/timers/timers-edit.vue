@@ -120,6 +120,7 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 import { Route } from 'vue-router'
 import { NextFunction } from 'express';
@@ -155,6 +156,7 @@ const mustBeCompliant = (value: string) => value.length === 0 || !!value.match(/
   }
 })
 export default class timerssEdit extends Vue {
+  translate = translate;
   socket = getSocket('/systems/timers');
 
   state: {

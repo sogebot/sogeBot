@@ -66,7 +66,7 @@ import { computed, defineComponent, Ref, ref, watch } from '@vue/composition-api
 
 import { flatten } from '../../bot/helpers/flatten';
 import { sortBy, keys, isNil } from 'lodash-es';
-import translate from '../helpers/translate';
+import translate from 'src/panel/helpers/translate';
 
 interface Props {
   value: string;
@@ -169,6 +169,7 @@ export default defineComponent({
       textarea,
       placeholderRef,
       div,
+      translate,
     }
   }
 });

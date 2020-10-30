@@ -109,6 +109,7 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/lib/codemirror.css';
@@ -135,6 +136,7 @@ import { TextInterface } from '../../../../bot/database/entity/text';
 export default class textOverlayEdit extends Vue {
   error: any = null;
   pending: boolean = false;
+  translate = translate;
 
   id: string = uuid();
   @Validate({ required })

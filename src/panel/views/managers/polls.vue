@@ -166,6 +166,7 @@
   import Vue from 'vue'
   import { chunk, cloneDeep, isNil } from 'lodash-es'
   import { dayjs } from 'src/bot/helpers/dayjs';
+  import translate from 'src/panel/helpers/translate';
 
   import { getSocket } from 'src/panel/helpers/socket';
   import { PollInterface } from 'src/bot/database/entity/poll';
@@ -178,6 +179,7 @@
     },
     data: function () {
       const object: {
+        translate: any,
         dayjs: any,
         chunk: any,
         socket: any,
@@ -189,6 +191,7 @@
         interval: number,
         search: string,
       } = {
+        translate: translate,
         dayjs: dayjs,
         chunk: chunk,
         socket: getSocket('/systems/polls'),

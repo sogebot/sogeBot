@@ -75,6 +75,7 @@ library.add(faCircleNotch, faUpload, faLongArrowAltUp, faLongArrowAltDown);
 
 import { getSocket } from 'src/panel/helpers/socket';
 import { CarouselInterface } from 'src/bot/database/entity/carousel';
+import translate from 'src/panel/helpers/translate';
 
 @Component({
   components: {
@@ -82,6 +83,7 @@ import { CarouselInterface } from 'src/bot/database/entity/carousel';
   },
 })
 export default class carouselOverlayList extends Vue {
+  translate = translate;
   socket = getSocket('/overlays/carousel');
 
   fields = [

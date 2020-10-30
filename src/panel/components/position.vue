@@ -81,6 +81,7 @@ import { defineComponent, onMounted, onUnmounted, reactive, ref, toRefs, watch }
 import type { Ref } from '@vue/composition-api'
 
 import type { RandomizerInterface } from 'src/bot/database/entity/randomizer';
+import translate from 'src/panel/helpers/translate';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSquare } from '@fortawesome/free-solid-svg-icons';
@@ -154,7 +155,7 @@ export default defineComponent({
 
     return {
       timestamp, positionGenerator, pos,
-      example, ...toRefs(HTMLRef),
+      example, ...toRefs(HTMLRef), translate,
     }
   }
 });

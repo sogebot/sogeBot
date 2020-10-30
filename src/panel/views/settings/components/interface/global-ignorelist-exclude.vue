@@ -32,6 +32,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { chunk } from 'lodash-es';
+import translate from 'src/panel/helpers/translate';
 
 import { globalIgnoreList } from 'src/bot/data/globalIgnoreList';
 
@@ -48,7 +49,7 @@ export default class btnEmit extends Vue {
   chunk = chunk;
 
   currentValue = this.value;
-  translatedTitle = this.translate(this.title);
+  translatedTitle = translate(this.title);
   search = '';
 
   @Watch('currentValue')

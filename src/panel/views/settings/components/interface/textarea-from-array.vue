@@ -16,6 +16,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import translate from 'src/panel/helpers/translate';
 
 @Component({})
 export default class textAreaFromArray extends Vue {
@@ -24,7 +25,7 @@ export default class textAreaFromArray extends Vue {
   @Prop() readonly readonly: any;
 
   currentValue = this.value.join('\n');
-  translatedTitle = this.translate(this.title);
+  translatedTitle = translate(this.title);
 
   update() {
     this.$emit('update', this.currentValue.split('\n'));

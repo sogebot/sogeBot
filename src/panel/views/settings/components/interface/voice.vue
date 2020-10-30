@@ -19,6 +19,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import translate from 'src/panel/helpers/translate';
 
 declare global {
   interface Window {
@@ -36,7 +37,7 @@ export default class helpbox extends Vue {
 
   loading = 0;
 
-  translatedTitle = this.translate(this.title);
+  translatedTitle = translate(this.title);
 
   mounted() {
     this.init();

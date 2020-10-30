@@ -51,14 +51,17 @@
 
 <script lang="ts">
   import Vue from 'vue'
+  import translate from 'src/panel/helpers/translate';
 
   export default Vue.extend({
     props: ['filters'],
     data() {
       const data: {
         cFilters: any[],
+        translate: typeof translate,
       } = {
         cFilters: this.filters,
+        translate: translate,
       }
       return data;
     },

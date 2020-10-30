@@ -43,6 +43,7 @@
   import Vue from 'vue'
   import { getSocket } from 'src/panel/helpers/socket';
   import { orderBy, isEqual } from 'lodash-es';
+  import translate from 'src/panel/helpers/translate';
 
   import { PermissionsInterface } from 'src/bot/database/entity/permissions'
 
@@ -50,11 +51,13 @@
     props: ['permissions'],
     data() {
       const data: {
+        translate: typeof translate,
         orderBy: any;
         draggingPID: null | string,
         currentData: PermissionsInterface[],
         socket: any,
       } = {
+        translate: translate,
         orderBy: orderBy,
         draggingPID: null,
         currentData: this.permissions,

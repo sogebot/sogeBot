@@ -40,12 +40,14 @@
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
 import { EventBus } from 'src/panel/helpers/event-bus';
+import translate from 'src/panel/helpers/translate';
 
 export default {
   props: ['popout', 'nodrag'],
   data: function () {
     return {
       EventBus,
+      translate,
       socket: getSocket('/core/twitch'),
       room: '',
       show: true,

@@ -16,6 +16,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 type Guild = { text: string, value: string };
 
@@ -28,7 +29,7 @@ export default class discordGuild extends Vue {
   guilds: Guild[] = []
 
   currentValue = this.value;
-  translatedTitle = this.translate(this.title);
+  translatedTitle = translate(this.title);
 
   mounted() {
     this.socket.emit('discord::getGuilds', (err: string | null, guilds: Guild[]) => {
@@ -42,7 +43,7 @@ export default class discordGuild extends Vue {
       if (!guilds.find(o => String(o.value) === String(this.currentValue))) {
         this.currentValue = '';
       }
-      this.guilds = [{ value: '', text: `-- ${this.translate('integrations.discord.settings.noGuildSelected')} --` }, ...guilds];
+      this.guilds = [{ value: '', text: `-- ${translate('integrations.discord.settings.noGuildSelected')} --` }, ...guilds];
     });
   }
 

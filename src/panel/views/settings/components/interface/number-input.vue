@@ -15,6 +15,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import translate from 'src/panel/helpers/translate';
 
 @Component({})
 export default class numberInput extends Vue {
@@ -27,7 +28,7 @@ export default class numberInput extends Vue {
 
   show: boolean = false;
   currentValue = this.value;
-  translatedTitle = this.translate(this.title);
+  translatedTitle = translate(this.title);
 
   update() {
     let step = String(this.step || 0);

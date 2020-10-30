@@ -49,6 +49,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { error } from 'src/panel/helpers/error';
 import { capitalize } from 'src/panel/helpers/capitalize';
+import translate from 'src/panel/helpers/translate';
 
 import type { BetsInterface, BetsParticipationsInterface } from 'src/bot/database/entity/bets';
 
@@ -153,6 +154,7 @@ export default defineComponent({
       getBets,
       capitalize,
       EventBus,
+      translate,
     }
   },
 });

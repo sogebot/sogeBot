@@ -383,7 +383,8 @@ export default defineComponent({
       sidebarSlideEnabled,
       newItem,
       getLocalizedName,
-      priceFormatter
+      priceFormatter,
+      translate,
     }
   }
 });

@@ -53,6 +53,7 @@
 
   import { PermissionsInterface } from 'src/bot/database/entity/permissions'
   import { permission } from 'src/bot/helpers/permissions';
+  import translate from 'src/panel/helpers/translate';
 
   export default Vue.extend({
     components: {
@@ -63,6 +64,7 @@
     },
     data: function () {
       const object: {
+        translate: typeof translate;
         socket: any,
         pending: boolean,
         state: {
@@ -72,6 +74,7 @@
         },
         permissions: PermissionsInterface[],
       } = {
+        translate: translate,
         socket: getSocket('/core/permissions'),
         pending: false,
         state: {

@@ -47,6 +47,8 @@
 import { EventBus } from 'src/panel/helpers/event-bus';
 import Vue from 'vue'
 import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
+
 export default Vue.extend({
   props: ['popout', 'nodrag'],
   components: {
@@ -59,7 +61,9 @@ export default Vue.extend({
       socket: any,
       state: { loading: number },
       interval: number,
+      translate: any,
     } = {
+      translate,
       EventBus,
       socket: getSocket('/widgets/social'),
       items: [],

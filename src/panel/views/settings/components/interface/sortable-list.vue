@@ -32,6 +32,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import translate from 'src/panel/helpers/translate';
 
 import { xor } from 'lodash-es';
 
@@ -45,7 +46,7 @@ export default class sortableList extends Vue {
 
   currentValues = this.values;
   currentToggle = this.toggle;
-  translatedTitle = this.translate(this.title);
+  translatedTitle = translate(this.title);
   draggingItem: any = null;
 
   @Watch('currentValue')
