@@ -90,7 +90,6 @@
     props: ['permissions'],
     components: {
       holdButton: () => import('../../../../components/holdButton.vue'),
-      stateButton: () => import('../../../../components/stateButton.vue'),
       userslist: () => import('./userslist.vue'),
       filters: () => import('./filters.vue'),
       test: () => import('./test.vue'),

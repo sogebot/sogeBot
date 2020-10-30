@@ -47,13 +47,8 @@
   import Chart from 'chart.js';
   import { dayjs } from 'src/bot/helpers/dayjs';
 
-  import { library } from '@fortawesome/fontawesome-svg-core'
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-  import { faChartLine } from '@fortawesome/free-solid-svg-icons';
-
   import type { UserBitInterface } from 'src/bot/database/entity/user';
 
-  library.add(faChartLine)
   Vue.use(Chartkick.use(Chart));
 
   import { getSocket } from '../../helpers/socket';
@@ -61,7 +56,6 @@
   export default Vue.extend({
     components: {
       panel: () => import('../../components/panel.vue'),
-      'font-awesome-icon': FontAwesomeIcon,
     },
     data: function () {
       const object: {
