@@ -270,7 +270,7 @@
                   </td>
                 </tr>
               </table>
-              <button type="button" class="btn btn-outline-dark border-0 ml-1 mb-3 small-spaced" @click="pending = true; viewer.tips.push({ tippedAt: Date.now(), amount: 0, currency: configuration.currency, message: ''})">
+              <button type="button" class="btn btn-outline-dark border-0 ml-1 mb-3 small-spaced" @click="pending = true; viewer.tips.push({ tippedAt: Date.now(), amount: 0, currency: $store.state.configuration.currency, message: ''})">
                 <fa class="pr-1" fixed-width icon="plus"></fa>
                 Add tip
               </button>
@@ -312,6 +312,7 @@
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import { orderBy, remove, xor } from 'lodash';
+import translate from 'src/panel/helpers/translate';
 
 import { Route } from 'vue-router'
 import { NextFunction } from 'express';
@@ -342,6 +343,7 @@ Component.registerHooks([
   }
 })
 export default class viewersEdit extends Vue {
+  translate = translate;
   dayjs = dayjs;
   orderBy = orderBy;
   xor = xor;

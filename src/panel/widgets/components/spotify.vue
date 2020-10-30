@@ -59,6 +59,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { debounce } from 'lodash-es';
+import translate from 'src/panel/helpers/translate';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faList, faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -72,6 +73,7 @@ export default {
   },
   data: function () {
     return {
+      translate,
       EventBus,
       widgetWidth: 200,
       interval: 0,

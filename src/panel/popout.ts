@@ -30,7 +30,6 @@ import { get } from 'lodash-es';
 import { ButtonStates, states } from 'src/panel/helpers/buttonStates';
 import { setMainLoaded } from 'src/panel/helpers/isAvailableVariable';
 import { isUserLoggedIn } from 'src/panel/helpers/isUserLoggedIn';
-import translate from 'src/panel/helpers/translate';
 import urlParam from 'src/panel/helpers/urlParam';
 import { getListOf, populateListOf } from 'src/panel/helpers/getListOf';
 import type { getListOfReturn } from 'src/panel/helpers/getListOf';
@@ -70,7 +69,6 @@ Vue.use(VueRouter);
 
 const main = async () => {
   // init prototypes
-  Vue.prototype.translate = (v: string) => translate(v);
   Vue.prototype.urlParam = (v: string) => urlParam(v);
   store.commit('setLoggedUser', await isUserLoggedIn());
 

@@ -515,6 +515,7 @@ export default defineComponent({
       deleteResponse,
       moveUpResponse,
       moveDownResponse,
+      translate,
     }
   },
 });

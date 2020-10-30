@@ -164,6 +164,7 @@
 import { defineComponent, ref, onMounted, computed } from '@vue/composition-api'
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 import { gsap } from 'gsap'
+import translate from 'src/panel/helpers/translate';
 
 import { getSocket } from '../../../helpers/socket';
 
@@ -305,6 +306,7 @@ export default defineComponent({
       isOperationShown,
       toggleSettingsShow,
       toggleOperationShow,
+      translate,
     }
   }
 })

@@ -54,6 +54,7 @@
 import { Vue, Component } from 'vue-property-decorator';
 import { isNil } from 'lodash-es';
 import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 import { TimerInterface } from 'src/bot/database/entity/timer';
 
@@ -63,17 +64,18 @@ import { TimerInterface } from 'src/bot/database/entity/timer';
   },
 })
 export default class timersList extends Vue {
+  translate = translate;
   socket = getSocket('/systems/timers')
   search: string = '';
   items: TimerInterface[] = [];
   state: { loading: number; } = { loading: this.$state.progress }
 
   fields = [
-    { key: 'name', label: this.translate('timers.dialog.name'), sortable: true },
+    { key: 'name', label: translate('timers.dialog.name'), sortable: true },
     // virtual attributes
-    { key: 'triggerEveryMessage', label: this.translate('messages'), sortable: true, tdClass: 'font-weight-bold text-primary font-bigger' },
-    { key: 'triggerEverySecond', label: this.capitalize(this.translate('seconds')), sortable: true, tdClass: 'font-weight-bold text-primary font-bigger' },
-    { key: 'responses', label: this.translate('timers.dialog.responses') },
+    { key: 'triggerEveryMessage', label: translate('messages'), sortable: true, tdClass: 'font-weight-bold text-primary font-bigger' },
+    { key: 'triggerEverySecond', label: this.capitalize(translate('seconds')), sortable: true, tdClass: 'font-weight-bold text-primary font-bigger' },
+    { key: 'responses', label: translate('timers.dialog.responses') },
     { key: 'buttons', label: '' },
   ];
 

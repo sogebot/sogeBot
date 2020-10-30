@@ -80,6 +80,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 
 import { Vue, Component, Watch  } from 'vue-property-decorator';
 import { chunk } from 'lodash-es';
+import translate from 'src/panel/helpers/translate';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faLink, faTrash } from '@fortawesome/free-solid-svg-icons';
@@ -96,6 +97,7 @@ import type { GalleryInterface } from 'src/bot/database/entity/gallery';
 })
 export default class galleryRegistryEdit extends Vue {
   chunk = chunk;
+  translate = translate;
 
   socket = getSocket('/overlays/gallery');
   domWidth = 0;

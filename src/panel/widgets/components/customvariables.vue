@@ -93,6 +93,8 @@
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { getSocket } from 'src/panel/helpers/socket';
 import { isNil, size, orderBy } from 'lodash-es';
+import translate from 'src/panel/helpers/translate';
+
 var numberOrTextComponent = {
   props: ['id', 'value', 'type'],
   watch: {
@@ -120,6 +122,7 @@ var numberOrTextComponent = {
   },
   data: function () {
     return {
+      translate,
       showSaveButton: false,
       currentValue: this.value
     }

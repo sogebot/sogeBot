@@ -14,6 +14,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, PropSync, Watch } from 'vue-property-decorator';
+import translate from 'src/panel/helpers/translate';
 
 @Component({})
 export default class Variant extends Vue {
@@ -21,6 +22,8 @@ export default class Variant extends Vue {
   @Prop() state !: boolean
   @PropSync('condition') _condition !: string
   @PropSync('amount') _amount !: number
+
+  translate = translate;
 
   @Watch('_condition')
   setAmountToZero() {
@@ -39,17 +42,17 @@ export default class Variant extends Vue {
   }
 
   options: { value: string, text: string }[] = [
-    { value: 'random', text: this.translate('registry.alerts.random') },
-    { value: 'exact', text: this.translate('registry.alerts.exact-amount') },
-    { value: 'gt-eq', text: this.translate('registry.alerts.greater-than-or-equal-to-amount') },
+    { value: 'random', text: translate('registry.alerts.random') },
+    { value: 'exact', text: translate('registry.alerts.exact-amount') },
+    { value: 'gt-eq', text: translate('registry.alerts.greater-than-or-equal-to-amount') },
   ]
 
   randomOptions: { value: number, text: string }[] = [
-    { value: 0, text: this.translate('registry.alerts.very-rarely') },
-    { value: 1, text: this.translate('registry.alerts.rarely') },
-    { value: 2, text: this.translate('registry.alerts.default') },
-    { value: 3, text: this.translate('registry.alerts.frequently') },
-    { value: 4, text: this.translate('registry.alerts.very-frequently') },
+    { value: 0, text: translate('registry.alerts.very-rarely') },
+    { value: 1, text: translate('registry.alerts.rarely') },
+    { value: 2, text: translate('registry.alerts.default') },
+    { value: 3, text: translate('registry.alerts.frequently') },
+    { value: 4, text: translate('registry.alerts.very-frequently') },
   ]
 }
 </script>

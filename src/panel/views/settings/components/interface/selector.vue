@@ -17,6 +17,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import translate from 'src/panel/helpers/translate';
 
 @Component({})
 export default class btnEmit extends Vue {
@@ -27,7 +28,7 @@ export default class btnEmit extends Vue {
   @Prop() readonly values: any;
 
   currentValue = this.value;
-  translatedTitle = this.translate(this.title);
+  translatedTitle = translate(this.title);
 
   @Watch('currentValue')
   onChange() {

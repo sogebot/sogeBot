@@ -114,15 +114,16 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue'
-  import { ModalPlugin } from 'bootstrap-vue';
-  Vue.use(ModalPlugin);
-  import { defineComponent, ref, onUnmounted, onMounted, watch, computed } from '@vue/composition-api'
-  import type { Ref } from '@vue/composition-api'
-  import { chunk, debounce } from 'lodash-es'
+import Vue from 'vue'
+import { ModalPlugin } from 'bootstrap-vue';
+Vue.use(ModalPlugin);
+import { defineComponent, ref, onUnmounted, onMounted, watch, computed } from '@vue/composition-api'
+import type { Ref } from '@vue/composition-api'
+import { chunk, debounce } from 'lodash-es'
 
-  import { EventBus } from 'src/panel/helpers/event-bus';
-  import { getSocket, getConfiguration } from 'src/panel/helpers/socket';
+import { EventBus } from 'src/panel/helpers/event-bus';
+import { getSocket, getConfiguration } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 type Tag = {
     tag_id: string;
@@ -363,7 +364,7 @@ export default defineComponent({
     })
     onUnmounted(() => window.removeEventListener('resize', _resizeListener))
 
-    return { manuallySelected, carouselPage, show, newTitle, searchForTagsOpts, currentTags, handleOk, selectedTitle, currentGame, games, titles, saveState, chunk, thumbnailsPerPage, deleteGame, deleteTitle, searchForTags, searchForGame, searchForGameOpts }
+    return { manuallySelected, carouselPage, show, newTitle, searchForTagsOpts, currentTags, handleOk, selectedTitle, currentGame, games, titles, saveState, chunk, thumbnailsPerPage, deleteGame, deleteTitle, searchForTags, searchForGame, searchForGameOpts, translate }
   }
 });
 </script>

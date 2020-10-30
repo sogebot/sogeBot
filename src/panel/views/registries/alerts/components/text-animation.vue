@@ -83,6 +83,7 @@
 
 <script lang="ts">
 import { Vue, Component, PropSync, Watch } from 'vue-property-decorator';
+import translate from 'src/panel/helpers/translate';
 
 require('../../../../../../scss/letter-animations.css');
 require('animate.css');
@@ -97,6 +98,7 @@ export default class TextAnimation extends Vue {
   @PropSync('animationOptions') readonly animOptions !: any;
 
   text= 'Sample text'
+  translate = translate;
 
   speedOptions: { value: string, text: string }[] = [
     { value: 'slower', text: 'slower' },

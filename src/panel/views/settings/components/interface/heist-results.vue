@@ -26,10 +26,13 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import type { Result } from 'src/bot/games/heist';
+import translate from 'src/panel/helpers/translate';
 
 @Component({})
 export default class heistResults extends Vue {
   @Prop() readonly value!: Result[];
+
+  translate = translate;
 
   w_results = this.value.sort((a, b) => {
     return a.percentage - b.percentage;

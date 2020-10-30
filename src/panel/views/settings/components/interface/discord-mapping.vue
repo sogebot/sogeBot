@@ -24,6 +24,7 @@
 import { Vue, Component, PropSync, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import { orderBy } from 'lodash-es';
+import translate from 'src/panel/helpers/translate';
 
 import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
 
@@ -70,7 +71,7 @@ export default class discordChannel extends Vue {
             reject();
             return console.error(err);
           }
-          this.roles = [{ value: '', html: `-- ${this.translate('integrations.discord.settings.noRoleSelected')} --` }, ...roles];
+          this.roles = [{ value: '', html: `-- ${translate('integrations.discord.settings.noRoleSelected')} --` }, ...roles];
           resolve()
         });
       })

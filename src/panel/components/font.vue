@@ -241,6 +241,7 @@
 <script lang="ts">
 import { defineComponent, ref, onBeforeMount, watch } from '@vue/composition-api'
 import { textStrokeGenerator, shadowGenerator } from 'src/panel/helpers/text';
+import translate from 'src/panel/helpers/translate';
 
 function loadFont(value: string) {
   const head = document.getElementsByTagName('head')[0];
@@ -320,7 +321,7 @@ export default defineComponent({
     watch(() => props.data.family, (val) => loadFont(val))
 
     return {
-      textStrokeGenerator, shadowGenerator, exampleColor, fonts, addShadow, removeShadow
+      textStrokeGenerator, shadowGenerator, exampleColor, fonts, addShadow, removeShadow, translate,
     }
   }
 });

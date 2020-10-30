@@ -7,7 +7,7 @@ import { defineComponent } from '@vue/composition-api'
 import { sortBy, keys, isNil } from 'lodash-es';
 
 import { flatten } from 'src/bot/helpers/flatten';
-import translate from '../helpers/translate';
+import translate from 'src/panel/helpers/translate';
 
 interface Props {
   value: string;

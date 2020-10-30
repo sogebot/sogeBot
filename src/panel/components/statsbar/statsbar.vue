@@ -409,6 +409,7 @@ import { isNil } from 'lodash-es'
 
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 import type { UIError } from 'src/bot/panel';
 
@@ -685,6 +686,7 @@ export default defineComponent({
       toggleViewerShow,
       quickwindow,
       getTime,
+      translate,
       numberReducer,
     }
   }

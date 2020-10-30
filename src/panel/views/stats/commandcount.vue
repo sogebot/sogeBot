@@ -67,6 +67,7 @@
   import Chartkick from 'vue-chartkick';
   import Chart from 'chart.js';
   import { countBy } from 'lodash-es';
+  import translate from 'src/panel/helpers/translate';
 
   import { library } from '@fortawesome/fontawesome-svg-core'
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -85,6 +86,7 @@
     data: function () {
       const object: {
         socket: any,
+        translate: any,
         commandsUsage: {
           _id: string,
           command: string,
@@ -97,6 +99,7 @@
         fromDate: Date,
         toDate: Date,
       } = {
+        translate: translate,
         socket: getSocket('/stats/commandcount'),
         commandsUsage: [],
         showChartCommands: [],

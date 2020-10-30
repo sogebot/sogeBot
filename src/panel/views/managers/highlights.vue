@@ -49,6 +49,7 @@
 import { getSocket } from 'src/panel/helpers/socket';
 import { Vue, Component } from 'vue-property-decorator';
 import { isNil } from 'lodash-es';
+import translate from 'src/panel/helpers/translate';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faGamepad } from '@fortawesome/free-solid-svg-icons';
@@ -62,6 +63,7 @@ library.add(faGamepad, faCalendarAlt);
   },
 })
 export default class highlightsList extends Vue {
+  translate = translate;
   socket = getSocket('/systems/highlights');
   items: HighlightInterface[] = [];
   search: string = '';

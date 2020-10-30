@@ -136,6 +136,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, PropSync } from 'vue-property-decorator';
 import type { CommonSettingsInterface } from 'src/bot/database/entity/alert';
+import translate from 'src/panel/helpers/translate';
 
 declare global {
   interface Window {
@@ -150,6 +151,8 @@ declare global {
 export default class TTS extends Vue {
   @PropSync('tts') readonly data !: Partial<CommonSettingsInterface["tts"]>;
   @Prop() readonly uuid !: string;
+
+  translate = translate;
 
   text = "This message should be said by TTS to test your settings.";
   state: { loaded: number } = { loaded: this.$state.progress }

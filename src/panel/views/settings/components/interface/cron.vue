@@ -25,6 +25,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 @Component({})
 export default class cronInput extends Vue {
@@ -34,7 +35,7 @@ export default class cronInput extends Vue {
 
   data: number[] = [];
   currentValue = this.value;
-  translatedTitle = this.translate(this.title);
+  translatedTitle = translate(this.title);
 
   mounted() {
     this.update();

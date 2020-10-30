@@ -289,6 +289,7 @@ import { chunk, orderBy, get } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 import { getSocket } from 'src/panel/helpers/socket';
 import { dayjs } from 'src/bot/helpers/dayjs';
+import translate from 'src/panel/helpers/translate';
 
 import { Route } from 'vue-router'
 import { NextFunction } from 'express';
@@ -325,6 +326,7 @@ const State: State = { IDLE: 0, PROGRESS: 1, DONE: 2, ERROR: 3 }
 })
 export default class customVariablesEdit extends Vue {
   dayjs = dayjs;
+  translate = translate
   socket = getSocket('/core/customvariables');
   psocket = getSocket('/core/permissions');
 
@@ -336,19 +338,19 @@ export default class customVariablesEdit extends Vue {
 
   types = [{
       value: 'number',
-      text: this.translate('registry.customvariables.types.number')
+      text: translate('registry.customvariables.types.number')
     },
     {
       value: 'text',
-      text: this.translate('registry.customvariables.types.text')
+      text: translate('registry.customvariables.types.text')
     },
     {
       value: 'options',
-      text: this.translate('registry.customvariables.types.options')
+      text: translate('registry.customvariables.types.options')
     },
     {
       value: 'eval',
-      text: this.translate('registry.customvariables.types.eval')
+      text: translate('registry.customvariables.types.eval')
     }];
   runEveryOptions = [
     { value: 0, type: 'isUsed' },
@@ -577,7 +579,7 @@ export default class customVariablesEdit extends Vue {
         new Promise((resolve, reject) => {
           this.socket.emit('customvariables::isUnique', { variable: this.variableName, id: this.$route.params.id }, (err: string | null, isUnique: boolean) => {
             if (!isUnique) {
-              reject(this.translate('registry.customvariables.variable.error.isNotUnique'))
+              reject(translate('registry.customvariables.variable.error.isNotUnique'))
             }
             resolve()
           })
@@ -585,12 +587,12 @@ export default class customVariablesEdit extends Vue {
         new Promise((resolve, reject) => {
           this.variableName.replace(/\$_/g, '').trim().length > 0
             ? resolve()
-            : reject(this.translate('registry.customvariables.variable.error.isEmpty'))
+            : reject(translate('registry.customvariables.variable.error.isEmpty'))
         }),
         new Promise((resolve, reject) => {
           this.selectedType !== 'options' || (this.usableOptionsArray.length > 0 && this.selectedType === 'options')
             ? resolve()
-            : reject(this.translate('registry.customvariables.usableOptions.error.atLeastOneValue'))
+            : reject(translate('registry.customvariables.usableOptions.error.atLeastOneValue'))
         })
       ])
 

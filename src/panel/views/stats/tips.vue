@@ -18,7 +18,7 @@
       </template>
     </panel>
 
-    <column-chart :data="generateChartData()" :ytitle="configuration.currency"></column-chart>
+    <column-chart :data="generateChartData()" :ytitle="$store.state.configuration.currency"></column-chart>
 
     <b-table striped small
       class="mt-3"
@@ -46,6 +46,7 @@
   import Chartkick from 'vue-chartkick';
   import Chart from 'chart.js';
   import { dayjs } from 'src/bot/helpers/dayjs';
+  import translate from 'src/panel/helpers/translate';
 
   import type { UserTipInterface } from 'src/bot/database/entity/user';
 
@@ -60,6 +61,7 @@
     data: function () {
       const object: {
         dayjs: any;
+        translate: any;
 
         socket: any;
         tips: Required<UserTipInterface>[];
@@ -70,6 +72,7 @@
         sortDesc: boolean;
       } = {
         dayjs: dayjs,
+        translate: translate,
 
         tips: [],
         socket: getSocket('/stats/tips'),

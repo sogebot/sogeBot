@@ -41,10 +41,13 @@
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { getSocket } from 'src/panel/helpers/socket';
 import { isNil } from 'lodash-es';
+import translate from 'src/panel/helpers/translate';
+
 export default {
   props: ['popout', 'nodrag'],
   data: function () {
     return {
+      translate,
       EventBus,
       socket: getSocket('/widgets/soundboard'),
       volume: 50,

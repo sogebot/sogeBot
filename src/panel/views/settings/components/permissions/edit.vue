@@ -83,6 +83,7 @@
   import Vue from 'vue'
   import { getSocket } from 'src/panel/helpers/socket';
   import { some } from 'lodash-es';
+  import translate from 'src/panel/helpers/translate';
 
   import { PermissionsInterface } from 'src/bot/database/entity/permissions'
 
@@ -96,11 +97,13 @@
     },
     data() {
       const data: {
+        translate: typeof translate;
         some: any;
         item: PermissionsInterface | undefined,
         isRouteChange: boolean,
         socket: any,
       } = {
+        translate: translate,
         some: some,
         item: this.permissions.find((o: PermissionsInterface) => o.id === this.$route.params.id),
         socket: getSocket('/core/permissions'),

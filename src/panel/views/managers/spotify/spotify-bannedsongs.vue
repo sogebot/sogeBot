@@ -57,6 +57,7 @@
 
 <script lang="ts">
 import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
 import { isNil } from 'lodash-es';
@@ -70,6 +71,7 @@ import { SpotifySongBanInterface } from 'src/bot/database/entity/spotify';
   }
 })
 export default class playlist extends Vue {
+  translate = translate;
   socket = getSocket('/integrations/spotify');
 
   items: SpotifySongBanInterface[] = [];

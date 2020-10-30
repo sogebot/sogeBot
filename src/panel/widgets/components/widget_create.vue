@@ -31,10 +31,13 @@
 
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
+
 export default {
   props: ['dashboardId'],
   data: function () {
     return {
+      translate,
       socket: getSocket('/'),
       widgets: [],
       state: 0

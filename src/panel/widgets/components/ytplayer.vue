@@ -62,6 +62,7 @@ import { EventBus } from 'src/panel/helpers/event-bus';
 import { isEqual } from 'lodash-es'
 import { getSocket } from 'src/panel/helpers/socket';
 Vue.use(VuePlyr)
+import translate from 'src/panel/helpers/translate';
 
 export default {
   props: ['popout', 'nodrag'],
@@ -70,6 +71,7 @@ export default {
   },
   data: function () {
     return {
+      translate,
       EventBus,
       autoplay: false,
       waitingForNext: false,

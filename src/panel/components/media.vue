@@ -85,6 +85,7 @@ Vue.use(AudioVisual);
 import { defineComponent, onMounted, onUnmounted, ref } from '@vue/composition-api'
 import type  { Ref } from '@vue/composition-api'
 import { v4 as uuid } from 'uuid';
+import translate from 'src/panel/helpers/translate';
 
 import { getSocket } from '../helpers/socket';
 import type { AlertMediaInterface } from 'src/bot/database/entity/alert';
@@ -239,7 +240,7 @@ export default defineComponent({
 
     return {
       b64data, duration, isUploading, createdAt, audio, video,
-      removeMedia, play, filesChange
+      removeMedia, play, filesChange, translate,
     }
   }
 })

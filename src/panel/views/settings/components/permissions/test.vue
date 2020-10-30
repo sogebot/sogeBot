@@ -60,11 +60,13 @@
   import Vue from 'vue'
   import { getSocket } from 'src/panel/helpers/socket';
   import { v4 as uuid } from 'uuid';
+  import translate from 'src/panel/helpers/translate';
 
   export default Vue.extend({
     props: ['ids'],
     data() {
       const data: {
+        translate: typeof translate,
         socket: any,
         inputUsername: string,
         testUsername: string,
@@ -75,6 +77,7 @@
         status: {},
         partialStatus: {},
       } = {
+        translate: translate,
         socket: getSocket('/core/permissions'),
         inputUsername: '',
         testUsername: '',
@@ -111,7 +114,7 @@
             if (err) {
               this.error = err;
               this.isTesting = false;
-              return console.error(this.translate('core.permissions.' + err));
+              return console.error(translate('core.permissions.' + err));
             }
             this.error = '';
             if (r.state === this.state) {

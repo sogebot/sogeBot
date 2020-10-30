@@ -229,6 +229,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { get } from 'lodash-es';
 import { capitalize } from 'src/panel/helpers/capitalize';
 import { dayjs } from 'src/bot/helpers/dayjs';
+import translate from 'src/panel/helpers/translate';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faSortDown, faSortUp, faSortAlphaUp, faSortAlphaDown } from '@fortawesome/free-solid-svg-icons'
@@ -245,6 +246,7 @@ export default class viewersList extends Vue {
   capitalize = capitalize;
   get = get;
   dayjs = dayjs;
+  translate = translate;
 
   socket = getSocket('/core/users');
 

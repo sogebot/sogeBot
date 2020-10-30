@@ -490,6 +490,7 @@ export default defineComponent({
       save,
       newItem,
       del,
+      translate,
     }
   }
 })

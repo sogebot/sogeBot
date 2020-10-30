@@ -232,6 +232,7 @@
 import { Vue, Component, Prop, PropSync, Watch } from 'vue-property-decorator';
 import type { AlertHostInterface } from 'src/bot/database/entity/alert';
 import { get } from 'lodash-es';
+import translate from 'src/panel/helpers/translate';
 
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/mode/javascript/javascript.js';
@@ -269,6 +270,7 @@ export default class AlertsEditHostForm extends Vue {
   customShow: 'html' | 'css' | 'js' = 'html';
   fonts: {text: string; value: string}[] = [];
   get = get;
+  translate = translate;
 
   @Watch('$v', { deep: true })
   emitValidation() {
