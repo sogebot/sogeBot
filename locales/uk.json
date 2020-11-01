@@ -122,6 +122,8 @@
       "noEvents": "No events found in database.",
       "noEventsAfterSearch": "No events found for this search.",
       "whatsthis": "what's this?",
+      "myRewardIsNotListed": "My reward is not listed!",
+      "redeemAndClickRefreshToSeeReward": "If you are missing your created reward in a list, please redeem it and refresh by clicking on refresh icon.",
       "badges": {
         "enabled": "Enabled",
         "disabled": "Disabled"
@@ -279,6 +281,7 @@
           "label": "Number to decrement",
           "placeholder": ""
         },
+        "": "",
         "titleOfReward": {
           "label": "Title of redeemed reward",
           "placeholder": ""
@@ -948,6 +951,7 @@
     "current-song-from-playlist": "Current song is $name from playlist",
     "current-song-from-songrequest": "Current song is $name requested by $username",
     "song-is-banned": "Sorry, $sender, but this song is banned",
+    "youtube-is-not-responding-correctly": "Sorry, $sender, but YouTube is sending unexpected responses, please try again later.",
     "song-was-not-found": "Sorry, $sender, but this song was not found",
     "song-is-too-long": "Sorry, $sender, but this song is too long",
     "incorrect-category": "Sorry, $sender, but this song must be music category",

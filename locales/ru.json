@@ -122,6 +122,8 @@
       "noEvents": "События не найдены в базе данных.",
       "noEventsAfterSearch": "По запросу ничего не найдено.",
       "whatsthis": "что это?",
+      "myRewardIsNotListed": "My reward is not listed!",
+      "redeemAndClickRefreshToSeeReward": "If you are missing your created reward in a list, please redeem it and refresh by clicking on refresh icon.",
       "badges": {
         "enabled": "Включено",
         "disabled": "Выключено"
@@ -279,6 +281,7 @@
           "label": "Число для уменьшения",
           "placeholder": ""
         },
+        "": "",
         "titleOfReward": {
           "label": "Title of redeemed reward",
           "placeholder": ""
@@ -948,6 +951,7 @@
     "current-song-from-playlist": "Текущая песня $name из плейлиста",
     "current-song-from-songrequest": "Текущая песня $name заказана $username",
     "song-is-banned": "Извините, $sender, но эта песня забанена",
+    "youtube-is-not-responding-correctly": "Sorry, $sender, but YouTube is sending unexpected responses, please try again later.",
     "song-was-not-found": "Извините, $sender, но эта песня не найдена",
     "song-is-too-long": "Извините, $sender, но эта песня слишком длинная",
     "incorrect-category": "Извините, $sender, но эта песня должна быть в категории музыка",
