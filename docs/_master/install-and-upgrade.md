@@ -15,7 +15,7 @@
 
 - **Docker**, Any of the [supported repositories](http://sogehige.github.io/sogeBot/#/configuration/database)
 
-### Instalation
+### Installation
 
 !> If you want to use **SQLite**, be sure to use `./shared/sogebot.db` path to
    your db file, so you have an access outside of docker.
