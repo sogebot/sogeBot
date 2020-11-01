@@ -6,7 +6,7 @@
     </div>
     <template v-if="state.loaded === $state.success">
       <div v-if="runningAlert">
-        <audio ref="audio">
+        <audio ref="audio" v-if="typeOfMedia.get(runningAlert.alert.soundId) === 'audio'">
           <source :src="'/registry/alerts/' + runningAlert.alert.soundId">
         </audio>
         <div v-if="runningAlert.isShowing" class="center" :class="['layout-' + runningAlert.alert.layout]">
@@ -15,7 +15,7 @@
               <source :src="'/registry/alerts/' + runningAlert.alert.imageId" type="video/webm">
               Your browser does not support the video tag.
             </video>
-            <img v-else-if="showImage" @error="showImage=false"  :src="'/registry/alerts/' + runningAlert.alert.imageId" :class="{ center: runningAlert.alert.layout === '3', ['animate__' + runningAlert.animation]: true }" class="animate__animated" :style="{'animation-duration': runningAlert.animationSpeed + 'ms'}"/>
+            <img v-else-if="showImage" @error="showImage=false" :src="'/registry/alerts/' + runningAlert.alert.imageId" :class="{ center: runningAlert.alert.layout === '3', ['animate__' + runningAlert.animation]: true }" class="animate__animated" :style="{'animation-duration': runningAlert.animationSpeed + 'ms'}"/>
             <div
               v-if="runningAlert.isShowingText"
               :class="{
@@ -85,7 +85,7 @@ import { isEqual, get } from 'lodash-es';
 import urlRegex from 'url-regex';
 
 import { CacheEmotesInterface } from 'src/bot/database/entity/cacheEmotes';
-import { EmitData, AlertInterface, CommonSettingsInterface, AlertHostInterface, AlertTipInterface, AlertResubInterface } from 'src/bot/database/entity/alert';
+import { EmitData, AlertInterface, CommonSettingsInterface, AlertHostInterface, AlertTipInterface, AlertResubInterface, AlertRewardRedeemInterface } from 'src/bot/database/entity/alert';
 
 import { getSocket } from 'src/panel/helpers/socket';
 import { textStrokeGenerator, shadowGenerator } from 'src/panel/helpers/text';
@@ -98,8 +98,6 @@ declare global {
     responsiveVoice: any;
   }
 }
-
-let waitingForTTS = false;
 let isTTSPlaying = false;
 let cleanupAlert = false;
 
@@ -125,7 +123,7 @@ export default class AlertsRegistryOverlays extends Vue {
   responsiveAPIKey: string | null = null;
 
   preparedAdvancedHTML: string = '';
-  typeOfMedia: Map<string, 'image' | 'video'> = new Map();
+  typeOfMedia: Map<string, 'audio' | 'image' | 'video' | null> = new Map();
 
   state: {
     loaded: number,
@@ -151,6 +149,7 @@ export default class AlertsRegistryOverlays extends Vue {
     hideAt: number;
     showTextAt: number;
     showAt: number;
+    waitingForTTS: boolean;
     alert: CommonSettingsInterface | AlertHostInterface | AlertTipInterface | AlertResubInterface;
   } | null = null;
 
@@ -183,7 +182,7 @@ export default class AlertsRegistryOverlays extends Vue {
     if (this.runningAlert && this.runningAlert.showTextAt <= Date.now()) {
       return this.runningAlert.hideAt - Date.now() <= 0
         && (!isTTSPlaying || !this.runningAlert.alert.tts.keepAlertShown)
-        && !waitingForTTS
+        && !this.runningAlert.waitingForTTS
         ? this.runningAlert.alert.animationOut
         : this.runningAlert.alert.animationIn;
     } else {
@@ -195,7 +194,7 @@ export default class AlertsRegistryOverlays extends Vue {
     if (this.runningAlert) {
       return this.runningAlert.hideAt - Date.now() <= 0
         && (!isTTSPlaying || !this.runningAlert.alert.tts.keepAlertShown)
-        && !waitingForTTS
+        && !this.runningAlert.waitingForTTS
         ? this.runningAlert.alert.animationOutDuration
         : this.runningAlert.alert.animationInDuration;
     } else {
@@ -207,7 +206,7 @@ export default class AlertsRegistryOverlays extends Vue {
     if (this.runningAlert) {
       return this.runningAlert.hideAt - Date.now() <= 0
         && (!isTTSPlaying || !this.runningAlert.alert.tts.keepAlertShown)
-        && !waitingForTTS
+        && !this.runningAlert.waitingForTTS
         ? this.runningAlert.alert.animationOut
         : this.runningAlert.alert.animationIn;
     } else {
@@ -265,9 +264,9 @@ export default class AlertsRegistryOverlays extends Vue {
         // cleanup alert after 5s and if responsiveVoice is done
         if (this.runningAlert.hideAt - Date.now() <= 0
           && !isTTSPlaying
-          && !waitingForTTS) {
+          && !this.runningAlert.waitingForTTS) {
             if (!cleanupAlert) {
-            console.debug('Cleanin up', { isTTSPlaying, waitingForTTS, hideAt: this.runningAlert.hideAt - Date.now() <= 0 })
+            console.debug('Cleanin up', { isTTSPlaying, waitingForTTS: this.runningAlert.waitingForTTS, hideAt: this.runningAlert.hideAt - Date.now() <= 0 })
             // eval onEnded
             this.$nextTick(() => {
               if (this.runningAlert && this.runningAlert.alert.enableAdvancedMode) {
@@ -289,6 +288,7 @@ export default class AlertsRegistryOverlays extends Vue {
         if (this.runningAlert.showAt <= Date.now() && !this.runningAlert.isShowing) {
           console.debug('showing image');
           this.runningAlert.isShowing = true;
+
           this.$nextTick(() => {
             if (this.$refs.video && this.runningAlert) {
               (this.$refs.video as HTMLMediaElement).volume = this.runningAlert.alert.soundVolume / 100;
@@ -300,13 +300,9 @@ export default class AlertsRegistryOverlays extends Vue {
         if (this.runningAlert.showTextAt <= Date.now() && !this.runningAlert.isShowingText) {
           console.debug('showing text');
           this.runningAlert.isShowingText = true;
-          const isAmountForTTSInRange = this.runningAlert.alert.tts.minAmountToPlay <= this.runningAlert.amount;
-          if (this.runningAlert.alert.tts.enabled && isAmountForTTSInRange && typeof window.responsiveVoice !== 'undefined') {
-            waitingForTTS = true;
-          }
         }
 
-        if (waitingForTTS && (this.$refs.audio as HTMLMediaElement).ended) {
+        if (this.runningAlert.waitingForTTS && (this.typeOfMedia.get(this.runningAlert.alert.soundId) === null || (this.$refs.audio as HTMLMediaElement).ended)) {
           let message = this.runningAlert.message;
           if (this.runningAlert.alert.tts.skipUrls) {
             for (const match of message.match(urlRegex({strict: false})) ?? []) {
@@ -314,13 +310,15 @@ export default class AlertsRegistryOverlays extends Vue {
             }
           }
           this.speak(message, this.runningAlert.alert.tts.voice, this.runningAlert.alert.tts.rate, this.runningAlert.alert.tts.pitch, this.runningAlert.alert.tts.volume)
-          waitingForTTS = false;
+          this.runningAlert.waitingForTTS = false;
         }
 
         if (this.runningAlert.showAt <= Date.now() && !this.runningAlert.soundPlayed) {
           console.debug('playing audio');
-          (this.$refs.audio as HTMLMediaElement).volume = this.runningAlert.alert.soundVolume / 100;
-          (this.$refs.audio as HTMLMediaElement).play();
+          if (this.typeOfMedia.get(this.runningAlert.alert.soundId) !== null) {
+            (this.$refs.audio as HTMLMediaElement).volume = this.runningAlert.alert.soundVolume / 100;
+            (this.$refs.audio as HTMLMediaElement).play();
+          }
           this.runningAlert.soundPlayed = true;
         }
       }
@@ -334,6 +332,10 @@ export default class AlertsRegistryOverlays extends Vue {
           // remove if autohost and autohosts are disabled for alert
           if (emitData.event === 'hosts' && emitData.autohost) {
             possibleAlerts = (possibleAlerts as AlertHostInterface[]).filter(o => o.showAutoHost)
+          }
+          // select only correct triggered events
+          if (emitData.event === 'rewardredeems') {
+            possibleAlerts = (possibleAlerts as AlertRewardRedeemInterface[]).filter(o => o.rewardId === emitData.name)
           }
 
           if (possibleAlerts.length > 0) {
@@ -497,7 +499,7 @@ export default class AlertsRegistryOverlays extends Vue {
                 .replace(/\{currency\}/g, '{currency:highlight}');
             }
 
-            waitingForTTS = false;
+            const isAmountForTTSInRange = alert.tts.minAmountToPlay <= emitData.amount;
             this.runningAlert = {
               ...emitData,
               animation: "none",
@@ -509,6 +511,7 @@ export default class AlertsRegistryOverlays extends Vue {
               showAt: this.data.alertDelayInMs + Date.now(),
               hideAt: this.data.alertDelayInMs + Date.now() + alert.alertDurationInMs + alert.animationInDuration,
               showTextAt: this.data.alertDelayInMs + Date.now() + alert.alertTextDelayInMs,
+              waitingForTTS: alert.tts.enabled && isAmountForTTSInRange && typeof window.responsiveVoice !== 'undefined',
               alert,
             };
           } else {
@@ -583,7 +586,23 @@ export default class AlertsRegistryOverlays extends Vue {
                   ...this.data.follows,
                   ...this.data.subgifts,
                   ...this.data.cmdredeems,
+                  ...this.data.rewardredeems,
                 ]) {
+                  fetch('/registry/alerts/' + event.soundId)
+                    .then(response => {
+                      if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                      }
+                      return response.blob();
+                    })
+                    .then(myBlob => {
+                      console.log(`Audio ${event.soundId} was found on server.`);
+                      this.typeOfMedia.set(event.soundId, 'audio');
+                    })
+                    .catch(error => {
+                      this.typeOfMedia.set(event.soundId, null);
+                      console.error(`Audio ${event.soundId} was not found on server.`);
+                    });
                   fetch('/registry/alerts/' + event.imageId)
                     .then(response => {
                       if (!response.ok) {
@@ -592,10 +611,12 @@ export default class AlertsRegistryOverlays extends Vue {
                       return response.blob();
                     })
                     .then(myBlob => {
+                      console.log(`${myBlob.type.startsWith('video') ? 'Video' : 'Image'} ${event.imageId} was found on server.`);
                       this.typeOfMedia.set(event.imageId, myBlob.type.startsWith('video') ? 'video' : 'image');
                     })
                     .catch(error => {
-                      console.error('There has been a problem with your fetch operation:', error);
+                      this.typeOfMedia.set(event.imageId, null);
+                      console.error(`Image/Video ${event.imageId} was not found on server.`);
                     });
                 }
 
@@ -716,7 +737,7 @@ export default class AlertsRegistryOverlays extends Vue {
         // set maxTimeToDecrypt 0 if fading out to not reset decryption
         if (this.runningAlert.hideAt - Date.now() <= 0
           && !isTTSPlaying
-          && !waitingForTTS) {
+          && !this.runningAlert.waitingForTTS) {
           maxTimeToDecrypt = 0;
         }
         name = `<baffle :key="'name-' + this.runningAlert.name" :text="this.runningAlert.name" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`

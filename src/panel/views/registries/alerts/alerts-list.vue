@@ -23,7 +23,7 @@
         <b-dropdown id="dropdown-buttons" :text="translate('registry.alerts.test')" class="m-2">
           <b-dropdown-item-button
             @click="socket.emit('test', event)"
-            v-for="event of ['follows', 'cheers', 'tips', 'subs', 'resubs', 'subcommunitygifts', 'subgifts', 'hosts', 'raids', 'cmdredeems']"
+            v-for="event of ['follows', 'cheers', 'tips', 'subs', 'resubs', 'subcommunitygifts', 'subgifts', 'hosts', 'raids', 'cmdredeems', 'rewardredeems']"
             v-bind:key="event">
             {{ translate('registry.alerts.event.' + event) }}</b-dropdown-item-button>
         </b-dropdown>
@@ -68,6 +68,9 @@
         </span>
         <span :class="{'text-primary': data.item.cmdredeems.length > 0, 'text-muted': data.item.cmdredeems.length === 0}">
           CMDREDEEMS<span v-if="data.item.cmdredeems.length > 0">({{data.item.cmdredeems.length}})</span>
+        </span>
+        <span :class="{'text-primary': data.item.rewardredeems.length > 0, 'text-muted': data.item.rewardredeems.length === 0}">
+          RWDREDEEMS<span v-if="data.item.rewardredeems.length > 0">({{data.item.rewardredeems.length}})</span>
         </span>
       </template>
       <template v-slot:cell(buttons)="data">
@@ -207,6 +210,11 @@ export default class customVariablesList extends Vue {
         return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }
       }),
       cmdredeems: item.cmdredeems.map(o => {
+        mediaMap.set(o.soundId, uuid());
+        mediaMap.set(o.imageId, uuid());
+        return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }
+      }),
+      rewardredeems: item.rewardredeems.map(o => {
         mediaMap.set(o.soundId, uuid());
         mediaMap.set(o.imageId, uuid());
         return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }

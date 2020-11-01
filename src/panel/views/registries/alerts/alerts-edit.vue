@@ -130,6 +130,7 @@
                   <form-cheers v-else-if="event === 'cheers' || event === 'tips'" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                   <form-resubs v-else-if="event === 'resubs'" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                   <form-hosts v-else-if="event === 'hosts' || event === 'raids'" :type="event" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                  <form-reward v-else-if="event === 'rewardredeems'" :type="event" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                 </p>
               </b-tab>
 
@@ -173,7 +174,7 @@ import { required } from 'vuelidate/lib/validators';
 
 import { v4 as uuid } from 'uuid';
 
-const supportedEvents = ['follows', 'cheers', 'subs', 'resubs', 'subcommunitygifts', 'subgifts',  'tips', 'hosts', 'raids', 'cmdredeems'] as const;
+const supportedEvents = ['follows', 'cheers', 'subs', 'resubs', 'subcommunitygifts', 'subgifts',  'tips', 'hosts', 'raids', 'cmdredeems', 'rewardredeems'] as const;
 
 Component.registerHooks([
   'beforeRouteEnter',
@@ -188,6 +189,7 @@ Component.registerHooks([
     'form-cheers': () => import('./components/form-cheers.vue'),
     'form-resubs': () => import('./components/form-resubs.vue'),
     'form-hosts': () => import('./components/form-hosts.vue'),
+    'form-reward': () => import('./components/form-reward.vue'),
   },
   filters: {
     capitalize: function (value: string) {
@@ -232,6 +234,7 @@ export default class AlertsEdit extends Vue {
     subgifts: [],
     subcommunitygifts: [],
     cmdredeems: [],
+    rewardredeems: [],
   }
 
   isValid: {
@@ -245,6 +248,7 @@ export default class AlertsEdit extends Vue {
     hosts: boolean[];
     raids: boolean[];
     cmdredeems: boolean[];
+    rewardredeems: boolean[];
   } = {
     follows: [],
     cheers: [],
@@ -256,6 +260,7 @@ export default class AlertsEdit extends Vue {
     hosts: [],
     raids: [],
     cmdredeems: [],
+    rewardredeems: [],
   };
 
   get isAllValid() {
@@ -465,6 +470,28 @@ export default class AlertsEdit extends Vue {
           this.item.subgifts.push({
             ..._default,
             messageTemplate: '{name} just gifted sub to {recipient}! {amount} {monthsName}',
+          })
+          break;
+        case 'rewardredeems':
+          this.item.rewardredeems.push({
+            ..._default,
+            message: {
+              minAmountToShow: 0,
+              allowEmotes: {
+                twitch: true, ffz: true, bttv: true
+              },
+              font: {
+                family: 'PT Sans',
+                size: 16,
+                borderPx: 1,
+                borderColor: '#000000',
+                weight: 500,
+                color: '#ffffff',
+                shadow: [],
+              },
+            },
+            messageTemplate: '{name} was redeemed by {recipient}!',
+            rewardId: '',
           })
           break;
         case 'cmdredeems':
