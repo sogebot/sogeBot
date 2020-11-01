@@ -109,6 +109,7 @@ export interface AlertInterface {
   cheers: AlertTipInterface[];
   resubs: AlertResubInterface[];
   cmdredeems: CommonSettingsInterface[];
+  rewardredeems: AlertRewardRedeemInterface[];
 }
 
 export interface AlertMediaInterface {
@@ -120,6 +121,10 @@ export interface AlertMediaInterface {
 
 export interface AlertHostInterface extends CommonSettingsInterface {
   showAutoHost: boolean;
+}
+
+export interface AlertRewardRedeemInterface extends AlertTipInterface {
+  rewardId: string;
 }
 
 export interface AlertTipInterface extends CommonSettingsInterface {
@@ -267,6 +272,12 @@ export const Alert = new EntitySchema<Readonly<Required<AlertInterface>>>({
     cmdredeems: {
       type: 'one-to-many',
       target: 'alert_command_redeem',
+      inverseSide: 'alert',
+      cascade: true,
+    },
+    rewardredeems: {
+      type: 'one-to-many',
+      target: 'alert_reward_redeem',
       inverseSide: 'alert',
       cascade: true,
     },
@@ -454,6 +465,25 @@ export const AlertCommandRedeem = new EntitySchema<Readonly<Required<CommonSetti
       type: 'many-to-one',
       target: 'alert',
       inverseSide: 'command_redeems',
+      joinColumn: { name: 'alertId' },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  },
+});
+
+export const AlertRewardRedeem = new EntitySchema<Readonly<Required<AlertRewardRedeemInterface>>>({
+  name: 'alert_reward_redeem',
+  columns: {
+    ...CommonSettingsSchema,
+    message: { type: 'simple-json' },
+    rewardId: { type: String },
+  },
+  relations: {
+    alert: {
+      type: 'many-to-one',
+      target: 'alert',
+      inverseSide: 'reward_redeems',
       joinColumn: { name: 'alertId' },
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',

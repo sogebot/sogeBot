@@ -333,7 +333,7 @@
                 unit: 'hour',
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
-              }).formatToParts(currentWatched / 1000 / 60 / 60).reduce(numberReducer, '')
+              }).formatToParts((isStreamOnline ? currentWatched : 0) / 1000 / 60 / 60).reduce(numberReducer, '')
           "/>
           <span class="stats">
             <small v-if="b_showAvgDiff && isStreamOnline && currentWatched - averageStats.currentWatched !== 0"

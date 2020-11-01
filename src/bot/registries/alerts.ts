@@ -124,7 +124,7 @@ class Alerts extends Registry {
           null,
           await getRepository(Alert).findOne({
             where: { id },
-            relations: ['cmdredeems', 'cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'],
+            relations: ['rewardredeems', 'cmdredeems', 'cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'],
           })
         );
       } catch (e) {
@@ -136,7 +136,7 @@ class Alerts extends Registry {
         cb(
           null,
           await getRepository(Alert).find({
-            relations: ['cmdredeems', 'cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'],
+            relations: ['rewardredeems', 'cmdredeems', 'cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'],
           })
         );
       } catch (e) {
@@ -165,7 +165,7 @@ class Alerts extends Registry {
     });
     adminEndpoint(this.nsp, 'clear-media', async () => {
       const alerts = await getRepository(Alert).find({
-        relations: ['cmdredeems', 'cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'],
+        relations: ['rewardredeems', 'cmdredeems', 'cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'],
       });
       const mediaIds: string[] = [];
       for (const alert of alerts) {
@@ -180,6 +180,7 @@ class Alerts extends Registry {
           ...alert.subs,
           ...alert.tips,
           ...alert.cmdredeems,
+          ...alert.rewardredeems,
         ]) {
           mediaIds.push(event.imageId);
           mediaIds.push(event.soundId);
@@ -220,7 +221,7 @@ class Alerts extends Registry {
       monthsName: getLocalizedName(amount, translate('core.months')),
       event: opts.event,
       autohost: true,
-      message: ['tips', 'cheers', 'resubs'].includes(opts.event)
+      message: ['tips', 'cheers', 'resubs', 'rewardredeems'].includes(opts.event)
         ? messages[Math.floor(Math.random() * messages.length)]
         : '',
     };

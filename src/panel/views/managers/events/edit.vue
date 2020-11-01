@@ -68,13 +68,7 @@
               <div class="form-group col-md-12" v-for="defKey of Object.keys(event.definitions)" :key="defKey">
                 <label for="type_selector">{{ translate("events.definitions." + defKey + ".label") }}</label>
                 <template v-if="defKey === 'titleOfReward'">
-                  <b-input-group>
-                    <b-form-select v-model="event.definitions[defKey]" :options="redeemRewardsWithForcedSelected(event.definitions[defKey])"></b-form-select>
-                    <b-input-group-append>
-                      <b-button text="Refresh" variant="secondary" @click="refreshRedeemedRewards()"><fa icon="sync" :spin="state.redeemRewards === ButtonStates.progress"/></b-button>
-                    </b-input-group-append>
-                  </b-input-group>
-                  <small><strong>{{ translate("events.myRewardIsNotListed") }}</strong> {{ translate("events.redeemAndClickRefreshToSeeReward") }}</small>
+                  <rewards :value.sync="event.definitions[defKey]"/>
                 </template>
                 <template v-else-if="typeof event.definitions[defKey] === 'boolean'">
                   <button type="button" class="btn btn-success" v-if="event.definitions[defKey]" @click="event.definitions[defKey] = false">{{translate("dialog.buttons.yes")}}</button>
@@ -165,7 +159,7 @@ import { required, requiredIf, minValue } from "vuelidate/lib/validators";
 import { Route } from 'vue-router'
 import { NextFunction } from 'express';
 
-import { getSocket } from '../../../helpers/socket';
+import { getSocket } from 'src/panel/helpers/socket';
 
 import { EventInterface, EventOperationInterface } from 'src/bot/database/entity/event';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
@@ -177,8 +171,9 @@ const socket = getSocket('/core/events');
 export default defineComponent({
   mixins: [ validationMixin ],
   components: {
-    'loading': () => import('../../../components/loading.vue'),
+    'loading': () => import('src/panel/components/loading.vue'),
     'font-awesome-layers': FontAwesomeLayers,
+    'rewards': () => import('src/panel/components/rewardDropdown.vue')
   },
   beforeRouteUpdate(to: Route, from: Route, next: NextFunction) {
     if (this.state.pending) {
@@ -301,8 +296,7 @@ export default defineComponent({
     const state = ref({
       load: ButtonStates.progress,
       save: ButtonStates.idle,
-      redeemRewards: ButtonStates.progress,
-      pending: false } as { load: number, save: number, pending: boolean, redeemRewards: number })
+      pending: false } as { load: number, save: number, pending: boolean })
 
 
     watch(event, () => {
@@ -366,23 +360,8 @@ export default defineComponent({
       })
     }, { deep: true });
 
-    const refreshRedeemedRewards = async () => {
-      state.value.redeemRewards = ButtonStates.progress;
-      return new Promise(resolve => {
-        socket.emit('events::getRedeemedRewards', (err: string | null, redeems: string[]) => {
-          if (err) {
-            return error(err);
-          }
-          redeemRewards.value = redeems;
-          setTimeout(() => state.value.redeemRewards = ButtonStates.idle, 1000);
-          resolve();
-        })
-      })
-    };
-
     onMounted(async () => {
       await Promise.all([
-        refreshRedeemedRewards(),
         new Promise((resolve, reject) => {
           if (ctx.root.$route.params.id) {
             socket.emit('generic::getOne', ctx.root.$route.params.id, (err: string | null, eventGetAll: Required<EventInterface>) => {
@@ -522,11 +501,6 @@ export default defineComponent({
       }
     }
 
-    const redeemRewardsWithForcedSelected = (selected: string) => {
-      socket.emit('events::setRedeemedRewards', selected);
-      return Array.from(new Set([selected, ...redeemRewards.value]));
-    }
-
     return {
       get,
       event,
@@ -540,8 +514,6 @@ export default defineComponent({
       save,
       redeemRewards,
       ButtonStates,
-      refreshRedeemedRewards,
-      redeemRewardsWithForcedSelected,
       translate,
     }
   }

@@ -309,7 +309,6 @@ export default {
       }
 
       const values = JSON.parse(event.values_json)
-      console.log({values})
       const formatted_amount = Intl.NumberFormat(this.$store.state.configuration.lang, { style: 'currency', currency: get(values, 'currency', 'USD') }).format(get(values, 'amount', '0'));
       t = t.replace('$formatted_amount', '<strong style="font-size: 1rem">' + formatted_amount + '</strong>')
       t = t.replace('$viewers', '<strong style="font-size: 1rem">' + get(values, 'viewers', '0') + '</strong>')
