@@ -951,7 +951,7 @@
     "current-song-from-playlist": "Aktuální skladba je $name ze seznamu skladeb",
     "current-song-from-songrequest": "Aktuální skladba je $name požadovaná uživatelem $username",
     "song-is-banned": "Omlouváme se, $sender, ale tato skladba je zakázána",
-    "youtube-is-not-responding-correctly": "Sorry, $sender, but YouTube is sending unexpected responses, please try again later.",
+    "youtube-is-not-responding-correctly": "Omlouváme se, $sender, ale YouTube odesílá neočekávané odpovědi, zkuste to prosím později.",
     "song-was-not-found": "Omlouváme se, $sender, ale tato skladba nebyla nalezena",
     "song-is-too-long": "Omlouváme se, $sender, ale tato skladba je příliš dlouhá",
     "incorrect-category": "Omlouváme se, $sender, ale tato skladba musí být kategorie hudby",
