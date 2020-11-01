@@ -72,7 +72,7 @@
                   {{
                     Intl.NumberFormat($store.state.configuration.lang, {  
                       style: b_percentage ? 'percent' : 'decimal'
-                    }).format(b_percentage ? averageStats.maxViewers / maxViewers : maxViewers - averageStats.maxViewers)
+                    }).format(b_percentage ? Math.abs(maxViewers - averageStats.maxViewers) / (averageStats.maxViewers || 1) : maxViewers - averageStats.maxViewers)
 
                   }}
                 </span>
@@ -92,6 +92,7 @@
               <span v-bind:title="newChatters" v-html="
                 Intl.NumberFormat($store.state.configuration.lang, {  
                   notation: b_shortenNumber ? 'compact' : 'standard',
+                  maximumFractionDigits: b_shortenNumber ? 1 : 0,
                 }).formatToParts(isStreamOnline ? newChatters : 0).reduce(numberReducer, '')
               "/>
             </template>
@@ -112,7 +113,8 @@
                     Intl.NumberFormat($store.state.configuration.lang, {  
                       style: b_percentage ? 'percent' : 'decimal',
                       notation: b_shortenNumber ? 'compact' : 'standard',
-                    }).format(b_percentage ? averageStats.newChatters / newChatters : newChatters - averageStats.newChatters)
+                      maximumFractionDigits: b_shortenNumber && !b_percentage ? 1 : 0,
+                    }).format(b_percentage ? Math.abs(newChatters - averageStats.newChatters) / (averageStats.newChatters || 1) : newChatters - averageStats.newChatters)
                   }}
                 </span>
               </template>
@@ -129,6 +131,7 @@
           <span class="data" v-bind:title="chatMessages" v-html="
             Intl.NumberFormat($store.state.configuration.lang, {  
               notation: b_shortenNumber ? 'compact' : 'standard',
+              maximumFractionDigits: b_shortenNumber ? 1 : 0,
             }).formatToParts(isStreamOnline ? chatMessages : 0).reduce(numberReducer, '')
           "/>
           <span class="stats">
@@ -146,7 +149,8 @@
                     Intl.NumberFormat($store.state.configuration.lang, {  
                       style: b_percentage ? 'percent' : 'decimal',
                       notation: b_shortenNumber ? 'compact' : 'standard',
-                    }).format(b_percentage ? averageStats.chatMessages / chatMessages : chatMessages - averageStats.chatMessages)
+                      maximumFractionDigits: b_shortenNumber && !b_percentage ? 1 : 0,
+                    }).format(b_percentage ? Math.abs(chatMessages - averageStats.chatMessages) / (averageStats.chatMessages || 1) : chatMessages - averageStats.chatMessages)
                   }}
                 </span>
               </template>
@@ -159,6 +163,7 @@
           <span class="data" v-bind:title="currentViews" v-html="
             Intl.NumberFormat($store.state.configuration.lang, {  
               notation: b_shortenNumber ? 'compact' : 'standard',
+              maximumFractionDigits: b_shortenNumber ? 1 : 0,
             }).formatToParts(isStreamOnline ? currentViews : 0).reduce(numberReducer, '')
           "/>
           <span class="stats">
@@ -176,7 +181,8 @@
                     Intl.NumberFormat($store.state.configuration.lang, {  
                       style: b_percentage ? 'percent' : 'decimal',
                       notation: b_shortenNumber ? 'compact' : 'standard',
-                    }).format(b_percentage ? averageStats.currentViews / currentViews : currentViews - averageStats.currentViews)
+                      maximumFractionDigits: b_shortenNumber && !b_percentage ? 1 : 0,
+                    }).format(b_percentage ? Math.abs(currentViews - averageStats.currentViews) / (averageStats.currentViews || 1) : currentViews - averageStats.currentViews)
                   }}
                 </span>
               </template>
@@ -189,6 +195,7 @@
           <span class="data" v-bind:title="currentHosts" v-html="
             Intl.NumberFormat($store.state.configuration.lang, {  
               notation: b_shortenNumber ? 'compact' : 'standard',
+              maximumFractionDigits: b_shortenNumber ? 1 : 0,
             }).formatToParts(isStreamOnline ? currentHosts : 0).reduce(numberReducer, '')
           "/>
           <span class="stats">&nbsp;</span>
@@ -199,6 +206,7 @@
           <span class="data" v-bind:title="currentFollowers" v-html="
             Intl.NumberFormat($store.state.configuration.lang, {  
               notation: b_shortenNumber ? 'compact' : 'standard',
+              maximumFractionDigits: b_shortenNumber ? 1 : 0,
             }).formatToParts(isStreamOnline ? currentFollowers : 0).reduce(numberReducer, '')
           "/>
           <span class="stats">
@@ -216,7 +224,8 @@
                     Intl.NumberFormat($store.state.configuration.lang, {  
                       style: b_percentage ? 'percent' : 'decimal',
                       notation: b_shortenNumber ? 'compact' : 'standard',
-                    }).format(b_percentage ? averageStats.currentFollowers / currentFollowers : currentFollowers - averageStats.currentFollowers)
+                      maximumFractionDigits: b_shortenNumber && !b_percentage ? 1 : 0,
+                    }).format(b_percentage ? Math.abs(currentFollowers - averageStats.currentFollowers) / (averageStats.currentFollowers || 1) : currentFollowers - averageStats.currentFollowers)
                   }}
                 </span>
               </template>
@@ -230,6 +239,7 @@
             <span class="data" v-bind:title="currentSubscribers" v-html="
               Intl.NumberFormat($store.state.configuration.lang, {  
                 notation: b_shortenNumber ? 'compact' : 'standard',
+                maximumFractionDigits: b_shortenNumber ? 1 : 0,
               }).formatToParts(isStreamOnline ? currentSubscribers : 0).reduce(numberReducer, '')
             "/>
             <span class="stats">
@@ -247,7 +257,8 @@
                       Intl.NumberFormat($store.state.configuration.lang, {  
                         style: b_percentage ? 'percent' : 'decimal',
                         notation: b_shortenNumber ? 'compact' : 'standard',
-                      }).format(b_percentage ? averageStats.currentSubscribers / currentSubscribers : currentSubscribers - averageStats.currentSubscribers)
+                        maximumFractionDigits: b_shortenNumber && !b_percentage ? 1 : 0,
+                      }).format(b_percentage ? Math.abs(currentSubscribers - averageStats.currentSubscribers) / (averageStats.currentSubscribers || 1) : currentSubscribers - averageStats.currentSubscribers)
                     }}
                   </span>
                 </template>
@@ -265,6 +276,7 @@
             <span class="data" v-bind:title="currentBits" v-html="
               Intl.NumberFormat($store.state.configuration.lang, {  
                 notation: b_shortenNumber ? 'compact' : 'standard',
+                maximumFractionDigits: b_shortenNumber ? 1 : 0,
               }).formatToParts(isStreamOnline ? currentBits : 0).reduce(numberReducer, '')
             "/>
             <span class="stats">
@@ -282,7 +294,8 @@
                       Intl.NumberFormat($store.state.configuration.lang, {  
                         style: b_percentage ? 'percent' : 'decimal',
                         notation: b_shortenNumber ? 'compact' : 'standard',
-                      }).format(b_percentage ? averageStats.currentBits / currentBits : currentBits - averageStats.currentBits)
+                       maximumFractionDigits: b_shortenNumber && !b_percentage ? 1 : 0,
+                      }).format(b_percentage ? Math.abs(currentBits - averageStats.currentBits) / (averageStats.currentBits || 1) : currentBits - averageStats.currentBits)
                     }}
                   </span>
                 </template>
@@ -317,7 +330,7 @@
                       Intl.NumberFormat($store.state.configuration.lang, {  
                         style: b_percentage ? 'percent' : 'currency',
                         currency: $store.state.configuration.currency,
-                      }).format(b_percentage ? averageStats.currentTips / currentTips : currentTips - averageStats.currentTips)
+                      }).format(b_percentage ? Math.abs(currentTips - averageStats.currentTips) / (averageStats.currentTips || 1) : currentTips - averageStats.currentTips)
                     }}
                   </span>
                 </template>
@@ -347,23 +360,21 @@
                   }">
               <template v-if="currentWatched - averageStats.currentWatched !== 0">
                 <fa :icon="currentWatched - averageStats.currentWatched > 0 ? 'caret-up' : 'caret-down'"/>
-                <span class="data" v-if="b_percentage" v-html="
+                <span v-if="b_percentage" v-html="
                   [
                     ...Intl.NumberFormat($store.state.configuration.lang, {  
                       style: 'percent',
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
                     }).formatToParts(averageStats.currentWatched / currentWatched),
                   ].reduce(numberReducer, '')
                 "/>
-                <span class="data" v-else v-html="
+                <span v-else v-html="
                   [
                     ...Intl.NumberFormat($store.state.configuration.lang, {  
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     }).formatToParts((currentWatched - averageStats.currentWatched) / 1000 / 60 / 60),
                     { type:'', value: ' '},
-                    { type:'currency', value: 'h'}
+                    { type:'', value: 'h'}
                   ].reduce(numberReducer, '')
                 "/>
               </template>
