@@ -328,12 +328,14 @@
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
           <span class="data" v-html="
-            Intl.NumberFormat($store.state.configuration.lang, {  
-                style: 'unit',
-                unit: 'hour',
+            [
+              ...Intl.NumberFormat($store.state.configuration.lang, {  
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
-              }).formatToParts((isStreamOnline ? currentWatched : 0) / 1000 / 60 / 60).reduce(numberReducer, '')
+              }).formatToParts((isStreamOnline ? currentWatched : 0) / 1000 / 60 / 60),
+              { type:'', value: ' '},
+              { type:'currency', value: 'h'}
+            ].reduce(numberReducer, '')
           "/>
           <span class="stats">
             <small v-if="b_showAvgDiff && isStreamOnline && currentWatched - averageStats.currentWatched !== 0"
@@ -345,16 +347,25 @@
                   }">
               <template v-if="currentWatched - averageStats.currentWatched !== 0">
                 <fa :icon="currentWatched - averageStats.currentWatched > 0 ? 'caret-up' : 'caret-down'"/>
-                <span>
-                  {{
-                    Intl.NumberFormat($store.state.configuration.lang, {  
-                      style: b_percentage ? 'percent' : 'unit',
-                      unit: 'hour',
+                <span class="data" v-if="b_percentage" v-html="
+                  [
+                    ...Intl.NumberFormat($store.state.configuration.lang, {  
+                      style: 'percent',
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
-                    }).format(b_percentage ? averageStats.currentWatched / currentWatched : (currentWatched - averageStats.currentWatched) / 1000 / 60 / 60)
-                  }}
-                </span>
+                    }).formatToParts(averageStats.currentWatched / currentWatched),
+                  ].reduce(numberReducer, '')
+                "/>
+                <span class="data" v-else v-html="
+                  [
+                    ...Intl.NumberFormat($store.state.configuration.lang, {  
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).formatToParts((currentWatched - averageStats.currentWatched) / 1000 / 60 / 60),
+                    { type:'', value: ' '},
+                    { type:'currency', value: 'h'}
+                  ].reduce(numberReducer, '')
+                "/>
               </template>
             </small>
           </span>

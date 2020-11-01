@@ -26,7 +26,7 @@
             </div>
             <div>
               <strong style="font-size: 0.9rem" class="text-muted">{{translate('watched-time')}}:</strong>
-              {{ Intl.NumberFormat($store.state.configuration.lang, { style:'unit', unit: 'hour', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(viewer.watchedTime / 1000 / 60 / 60) }}
+              {{ Intl.NumberFormat($store.state.configuration.lang, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(viewer.watchedTime / 1000 / 60 / 60) }} h
             </div>
             <div>
               <strong style="font-size: 0.9rem" class="text-muted">{{translate('bits')}}:</strong>

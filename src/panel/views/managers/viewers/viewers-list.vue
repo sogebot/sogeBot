@@ -178,7 +178,7 @@
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             {{ translate('watched-time') }}:
           </strong>
-          {{ Intl.NumberFormat($store.state.configuration.lang, { style:'unit', unit: 'hour', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(data.item.watchedTime / 1000 / 60 / 60) }}
+          {{ Intl.NumberFormat($store.state.configuration.lang, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(data.item.watchedTime / 1000 / 60 / 60) }} h
         </div>
         <div>
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
