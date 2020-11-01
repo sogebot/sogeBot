@@ -122,7 +122,6 @@ var numberOrTextComponent = {
   },
   data: function () {
     return {
-      translate,
       showSaveButton: false,
       currentValue: this.value
     }
@@ -153,6 +152,7 @@ export default {
   },
   data: function () {
     return {
+      translate,
       EventBus,
       variables: [],
       watched: [],
