@@ -33,7 +33,8 @@
     "tips": "Tips",
     "hosts": "Hosts",
     "raids": "Raids",
-    "cmdredeems": "Befehl wird eingelöst"
+    "cmdredeems": "Befehl wird eingelöst",
+    "rewardredeems": "Reward Redeems"
   },
   "title": {
     "name": "Variantenname",
