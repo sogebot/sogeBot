@@ -122,8 +122,8 @@
       "noEvents": "Žádné události nebyly nalezeny v databázi.",
       "noEventsAfterSearch": "Žádné události pro toto hledání nebyly nalezeny v databázi.",
       "whatsthis": "co je to?",
-      "myRewardIsNotListed": "My reward is not listed!",
-      "redeemAndClickRefreshToSeeReward": "If you are missing your created reward in a list, please redeem it and refresh by clicking on refresh icon.",
+      "myRewardIsNotListed": "Moje odměna není zobrazena!",
+      "redeemAndClickRefreshToSeeReward": "Pokud Vám chybí vytvořená odměna v seznamu, kupte ji na Twitchi a obnovte kliknutím na ikonu obnovení.",
       "badges": {
         "enabled": "Zapnuto",
         "disabled": "Vypnuto"
