@@ -164,7 +164,7 @@
             Intl.NumberFormat($store.state.configuration.lang, {  
               notation: b_shortenNumber ? 'compact' : 'standard',
               maximumFractionDigits: b_shortenNumber ? 1 : 0,
-            }).formatToParts(isStreamOnline ? currentViews : 0).reduce(numberReducer, '')
+            }).formatToParts(currentViews).reduce(numberReducer, '')
           "/>
           <span class="stats">
             <small v-if="b_showAvgDiff && isStreamOnline && currentViews - averageStats.currentViews !== 0"
@@ -207,7 +207,7 @@
             Intl.NumberFormat($store.state.configuration.lang, {  
               notation: b_shortenNumber ? 'compact' : 'standard',
               maximumFractionDigits: b_shortenNumber ? 1 : 0,
-            }).formatToParts(isStreamOnline ? currentFollowers : 0).reduce(numberReducer, '')
+            }).formatToParts(currentFollowers).reduce(numberReducer, '')
           "/>
           <span class="stats">
             <small v-if="b_showAvgDiff && isStreamOnline && currentFollowers - averageStats.currentFollowers !== 0"
@@ -240,7 +240,7 @@
               Intl.NumberFormat($store.state.configuration.lang, {  
                 notation: b_shortenNumber ? 'compact' : 'standard',
                 maximumFractionDigits: b_shortenNumber ? 1 : 0,
-              }).formatToParts(isStreamOnline ? currentSubscribers : 0).reduce(numberReducer, '')
+              }).formatToParts(currentSubscribers).reduce(numberReducer, '')
             "/>
             <span class="stats">
               <small v-if="b_showAvgDiff && isStreamOnline && currentSubscribers - averageStats.currentSubscribers !== 0"
