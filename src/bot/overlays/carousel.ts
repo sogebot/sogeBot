@@ -1,5 +1,4 @@
 import Overlay from './_interface';
-import { ui } from '../decorators';
 import { v4 as uuid } from 'uuid';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 
@@ -7,14 +6,7 @@ import { getRepository } from 'typeorm';
 import { Carousel as CarouselEntity } from '../database/entity/carousel';
 
 class Carousel extends Overlay {
-  @ui({
-    type: 'link',
-    href: '/overlays/carousel',
-    class: 'btn btn-primary btn-block',
-    rawText: '/overlays/carousel',
-    target: '_blank',
-  }, 'links')
-  linkBtn = null;
+  showInUI = false;
 
   constructor () {
     super();

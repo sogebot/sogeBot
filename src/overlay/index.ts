@@ -43,21 +43,10 @@ const overlays = async () => {
     mode: 'history',
     base: __dirname,
     routes: [
-      { path: '/overlays/alerts', name: 'alertsOverlay', component: () => import('./views/alerts.vue') },
       { path: '/overlays/alerts/:id', name: 'alertsRegistryOverlay', component: () => import('./views/alertsRegistry.vue') },
-      { path: '/overlays/bets', name: 'betsOverlay', component: () => import('./views/bets.vue') },
-      { path: '/overlays/carousel', name: 'carouselOverlay', component: () => import('./views/carousel.vue') },
-      { path: '/overlays/clips', name: 'clipsOverlay', component: () => import('./views/clips.vue') },
-      { path: '/overlays/clipscarousel', name: 'clipsCarouselOverlay', component: () => import('./views/clipscarousel.vue') },
-      { path: '/overlays/credits', name: 'creditsOverlay', component: () => import('./views/credits.vue') },
-      { path: '/overlays/emotes', name: 'emotesOverlay', component: () => import('./views/emotes.vue') },
-      { path: '/overlays/eventlist', name: 'eventlistOverlay', component: () => import('./views/eventlist.vue') },
       { path: '/overlays/goals/:id', name: 'goalsOverlay', component: () => import('./views/goals.vue') },
-      { path: '/overlays/polls', name: 'pollsOverlay', component: () => import('./views/polls.vue') },
-      { path: '/overlays/randomizer', name: 'randomizerOverlay', component: () => import('./views/randomizer.vue') },
-      { path: '/overlays/stats', name: 'statsOverlay', component: () => import('./views/stats.vue') },
-      { path: '/overlays/text', name: 'textOverlay', component: () => import('./views/text.vue') },
-      { path: '/overlays/tts', name: 'ttsOverlay', component: () => import('./views/tts.vue') },
+      { path: '/overlays/text/:id', name: 'textOverlay', component: () => import('./views/text.vue') },
+      { path: '/overlays/:id', name: '_mapper', component: () => import('./views/_mapper.vue') },
     ],
   });
 

@@ -87,16 +87,7 @@ class Credits extends Overlay {
   @settings('clips')
   @ui({ type: 'number-input', step: '1', min: '0', max: '100' })
   cClipsVolume = 20;
-
-  @ui({
-    type: 'link',
-    href: '/overlays/credits',
-    class: 'btn btn-primary btn-block',
-    rawText: '/overlays/credits (1920x1080)',
-    target: '_blank',
-  }, 'links')
-  btnLink = null;
-
+  
   sockets () {
     publicEndpoint(this.nsp, 'load', async (cb) => {
       const when = api.isStreamOnline ? api.streamStatusChangeSince : _.now() - 50000000000;

@@ -38,14 +38,6 @@
           class="btn-secondary ml-0 mr-0"
           icon="circle-notch" spin disabled="disabled"
         ).btn-only-icon
-        button-with-icon(
-          v-if="$route.params.id && state.loading === $state.success"
-          text="/overlays/randomizer"
-          href="/overlays/randomizer"
-          class="btn-dark mr-2 ml-0"
-          icon="link"
-          target="_blank"
-        )
         b-alert(show variant="info" v-if="pending" v-html="translate('dialog.changesPending')").mr-2.p-2.mb-0
         state-button(@click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$invalid && !!$v.$dirty").btn-shrink
 

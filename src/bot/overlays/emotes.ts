@@ -57,8 +57,6 @@ class Emotes extends Overlay {
   btnTestEmote = null;
   @ui({ type: 'btn-emit', class: 'btn btn-secondary btn-block mt-1 mb-1', emit: 'testFireworks' }, 'test')
   btnTestFirework = null;
-  @ui({ type: 'link', href: '/overlays/emotes', class: 'btn btn-primary btn-block', rawText: '/overlays/emotes (1920x1080)', target: '_blank' }, 'links')
-  btnLink = null;
   @ui({ type: 'btn-emit', class: 'btn btn-danger btn-block mt-1 mb-1', emit: 'removeCache' }, 'emotes')
   btnRemoveCache = null;
 
