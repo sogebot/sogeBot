@@ -24,9 +24,7 @@
       <div v-for="(item, index) in items" v-bind:key="item.id">
         <b-list-group horizontal style="margin: auto; width: fit-content;">
           <b-list-group-item :class="{'border-bottom-0': index !== items.length - 1}">
-            <a :href="'/overlays/' + item.id" target="_blank">
-              <pre class="m-0" style="display: inline-block; padding: 0.5rem 0 0 0;"><fa icon="external-link-alt" fixed-width/> {{item.id}}</pre>
-            </a>
+            <pre class="m-0" style="display: inline-block; padding: 0.5rem 0 0 0;">{{item.id}}</pre>
           </b-list-group-item>
           <b-list-group-item :class="{'border-bottom-0': index !== items.length - 1}">
             <div style="display: inline-block; padding: 0.375rem 0.4rem;"><fa icon="chevron-right" fixed-width/></div>
@@ -35,6 +33,14 @@
             <b-form-select v-model="item.value" :options="options"></b-form-select>
           </b-list-group-item>
           <b-list-group-item :class="{'border-bottom-0': index !== items.length - 1}">
+            <button-with-icon
+              :text="'/overlays/' + item.id"
+              :href="'/overlays/' + item.id"
+              class="btn-dark btn-only-icon"
+              icon="link"
+              target="_blank"
+              />
+            <button-with-icon  v-b-tooltip.focus="'Copied!'" class="btn-only-icon btn-primary btn-reverse" :icon="item.id === copied ? 'check' : 'clone'" :disabled="copied===item.id" @click="copied=item.id"/>
             <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="del(item.id)">
               {{ translate('dialog.buttons.delete') }}
             </button-with-icon>
@@ -46,7 +52,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch } from '@vue/composition-api'
+import { defineComponent, ref, onMounted, watch, } from '@vue/composition-api'
 import { v4 as uuid } from 'uuid';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -66,6 +72,7 @@ export default defineComponent({
   },
   setup(props, ctx) {
     const items = ref([] as OverlayMapperInterface[]);
+    const copied = ref('');
     const options = [
       { value: null, text: 'Please select an option' },
       { value: 'alerts', text: 'alerts' },
@@ -111,6 +118,15 @@ export default defineComponent({
         })
       }
     }, { deep: true })
+    watch(copied, (val) => {
+      if (val.length > 0) {
+        navigator.clipboard.writeText(`https://${document.location.host}/overlays/${val}`);
+        setTimeout(() => {
+          copied.value = '';
+          ctx.root.$emit('bv::hide::tooltip')
+        }, 1000);
+      }
+    })
 
     const newItem = () => {
       items.value.push({ id: uuid(), value: null })
@@ -131,6 +147,7 @@ export default defineComponent({
       items,
       state,
       options,
+      copied,
 
       newItem,
       del,
