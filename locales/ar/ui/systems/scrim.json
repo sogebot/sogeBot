@@ -1,0 +1,9 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "waitForMatchIdsInSeconds": {
+      "title": "Interval for putting match ID into chat",
+      "help": "Set in seconds"
+    }
+  }
+}
