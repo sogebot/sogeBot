@@ -6,27 +6,37 @@ import { getRepository, LessThan } from 'typeorm';
 import { TwitchStats, TwitchStatsInterface } from './database/entity/twitch';
 import { error } from 'console';
 import { DAY, MINUTE } from './constants';
+import { onStreamStart } from './decorators/on';
+import api from './api';
 
 let validStatsUntil = Date.now();
 let cachedStats = {
   currentViewers: 0,
-  currentSubscribers: 0,
   currentBits: 0,
   currentTips: 0,
   chatMessages: 0,
-  currentFollowers: 0,
-  currentViews: 0,
   maxViewers: 0,
   currentHosts: 0,
   newChatters: 0,
   currentWatched: 0,
 };
 
+let currentFollowers = 0;
+let currentViews = 0;
+let currentSubscribers = 0;
+
 class Stats {
   latestTimestamp = 0;
 
   constructor() {
     this.sockets();
+  }
+
+  @onStreamStart()
+  async setInitialValues() {
+    currentFollowers = api.stats.currentFollowers;
+    currentViews = api.stats.currentViews;
+    currentSubscribers = api.stats.currentSubscribers;
   }
 
   sockets() {
@@ -59,7 +69,6 @@ class Stats {
             currentWatched: 0,
           };
           if (statsFromDb.length > 0) {
-            let i = 0;
             for (const stat of statsFromDb) {
               stats.currentViewers += _self.parseStat(stat.currentViewers);
               stats.currentBits += _self.parseStat(stat.currentBits);
@@ -69,13 +78,6 @@ class Stats {
               stats.newChatters += _self.parseStat(stat.newChatters);
               stats.currentHosts += _self.parseStat(stat.currentHosts);
               stats.currentWatched += _self.parseStat(stat.currentWatched);
-              if (i === 0) {
-                // get only latest
-                stats.currentFollowers = stat.currentFollowers;
-                stats.currentViews = stat.currentViews;
-                stats.currentSubscribers = stat.currentSubscribers;
-              }
-              i++;
             }
             stats.currentViewers = Number(Number(stats.currentViewers / statsFromDb.length).toFixed(0));
             stats.currentBits = Number(Number(stats.currentBits / statsFromDb.length).toFixed(0));
@@ -86,12 +88,12 @@ class Stats {
             stats.currentHosts = Number(Number(stats.currentHosts / statsFromDb.length).toFixed(0));
             stats.currentWatched = Number(Number(stats.currentWatched / statsFromDb.length).toFixed(0));
             cachedStats = cloneDeep(stats);
-            cb(null, stats);
+            cb(null, {...stats, currentFollowers, currentViews, currentSubscribers});
           } else {
             cb(null, {});
           }
         } else {
-          cb(null, cachedStats);
+          cb(null, {...cachedStats, currentFollowers, currentViews, currentSubscribers});
         }
       } catch (e) {
         error(e);
