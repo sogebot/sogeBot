@@ -1,0 +1,9 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "timeout": {
+      "title": "Timeout duration",
+      "help": "Seconds"
+    }
+  }
+}
