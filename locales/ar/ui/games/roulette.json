@@ -1,0 +1,11 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "timeout": {
+      "title": "Timeout duration",
+      "help": "Seconds"
+    },
+    "winnerWillGet": "How many points will be added on win",
+    "loserWillLose": "How many points will be lost on lose"
+  }
+}
