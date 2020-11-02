@@ -1,0 +1,23 @@
+{
+  "new": "New Custom Command",
+  "no-responses-set": "No responses",
+  "empty": "No custom commands were created yet.",
+  "emptyAfterSearch": "No custom commands were found by your search for <strong>\"$search\"</strong>.",
+  "command": {
+    "name": "custom command",
+    "placeholder": ""
+  },
+  "addResponse": "Add response",
+  "response": {
+    "name": "Response",
+    "placeholder": "Set your response here."
+  },
+  "filter": {
+    "name": "filter",
+    "placeholder": "Add filter for this response"
+  },
+  "warning": "This action cannot be reverted!",
+  "settings": {
+    "enabled": "Status"
+  }
+}
