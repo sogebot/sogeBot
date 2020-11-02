@@ -54,7 +54,7 @@
         <div class="btn-group" role="group">
           <button class="btn btn-outline-dark p-3 border-0" @click="toggleShowMore(item.id)">
             <fa class="mr-1" :icon="!showMore.includes(item.id) ? 'ellipsis-h' : 'ellipsis-v'"></fa> {{ !showMore.includes(item.id) ? translate('commons.show-more') : translate('commons.show-less') }}</button>
-          <a v-bind:href="'/overlays/text?id='+ item.id" class="btn btn-outline-dark p-3 border-0" target="_blank"><fa icon="link"></fa> /overlays/text?id={{ item.id }}</a>
+          <a v-bind:href="'/overlays/text/'+ item.id" class="btn btn-outline-dark p-3 border-0" target="_blank"><fa icon="link"></fa> /overlays/text/{{ item.id }}</a>
           <button @click="clone(item)" class="btn btn-outline-dark border-0">
             <fa icon="clone" fixed-width></fa></button>
           <button @click="goTo(item.id)" class="btn btn-outline-dark border-0">

@@ -4,15 +4,6 @@ import api from '../api';
 import { ioServer } from '../helpers/panel';
 
 class Clips extends Overlay {
-  @ui({
-    type: 'link',
-    href: '/overlays/clips',
-    class: 'btn btn-primary btn-block',
-    rawText: '/overlays/clips (640x360)',
-    target: '_blank',
-  }, 'links')
-  linkBtn = null;
-
   @settings('clips')
   @ui({ type: 'number-input', step: '1', min: '0', max: '100' })
   cClipsVolume = 0;

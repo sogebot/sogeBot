@@ -18,15 +18,6 @@ class Polls extends Overlay {
   @ui({ type: 'selector', values: ['top', 'bottom'] })
   cDisplayAlign: 'top' | 'bottom' = 'top';
 
-  @ui({
-    type: 'link',
-    href: '/overlays/polls',
-    class: 'btn btn-primary btn-block',
-    rawText: '/overlays/polls',
-    target: '_blank',
-  }, 'links')
-  linkBtn = null;
-
   public sockets() {
     publicEndpoint(this.nsp, 'getVoteCommand', async (cb) => {
       cb(this.getCommand('!vote'));

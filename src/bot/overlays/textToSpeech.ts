@@ -53,15 +53,6 @@ class TextToSpeech extends Overlay {
   @settings('settings')
   triggerTTSByHighlightedMessage = false;
 
-  @ui({
-    type: 'link',
-    href: '/overlays/tts',
-    class: 'btn btn-primary btn-block',
-    rawText: '/overlays/tts',
-    target: '_blank',
-  }, 'links')
-  linkBtn = null;
-
   @command('!tts')
   @default_permission(permission.CASTERS)
   textToSpeech(opts: CommandOptions): CommandResponse[] {

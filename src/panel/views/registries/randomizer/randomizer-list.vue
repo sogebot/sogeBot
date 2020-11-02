@@ -11,14 +11,6 @@
     panel
       template(v-slot:left)
         button-with-icon(icon="plus" href="#/registry/randomizer/edit").btn-primary.btn-reverse {{ translate('registry.randomizer.addRandomizer') }}
-      template(v-slot:right)
-        button-with-icon(
-          text="/overlays/randomizer"
-          href="/overlays/randomizer"
-          class="btn-dark mr-2 ml-0"
-          icon="link"
-          target="_blank"
-        )
 
     loading(v-if="state.loading !== $state.success")
     b-table(v-else :fields="fields" :items="filteredItems" hover striped small @row-clicked="linkTo($event)")

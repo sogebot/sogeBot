@@ -1,18 +1,10 @@
 import { getTime } from '../helpers/getTime';
-import { ui } from '../decorators';
 import Overlay from './_interface';
 import { publicEndpoint } from '../helpers/socket';
 import api from '../api';
 
 class Stats extends Overlay {
-  @ui({
-    type: 'link',
-    href: '/overlays/stats',
-    class: 'btn btn-primary btn-block',
-    rawText: '/overlays/stats (500x55)',
-    target: '_blank',
-  }, 'links')
-  linkBtn = null;
+  showInUI = false;
 
   sockets () {
     publicEndpoint(this.nsp, 'get', async (cb) => {

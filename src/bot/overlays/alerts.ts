@@ -11,15 +11,6 @@ import { getRepository } from 'typeorm';
 import { debug } from '../helpers/log';
 
 class Alerts extends Overlay {
-  @ui({
-    type: 'link',
-    href: '/overlays/alerts',
-    class: 'btn btn-primary btn-block',
-    rawText: '/overlays/alerts',
-    target: '_blank',
-  }, 'links')
-  linkBtn = null;
-
   @settings()
   galleryCache = false;
   @settings()

@@ -3,7 +3,6 @@ import crypto from 'crypto';
 
 import Overlay from './_interface';
 import { isBot } from '../commons';
-import { ui } from '../decorators';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 
 import { Brackets, getRepository } from 'typeorm';
@@ -12,14 +11,7 @@ import eventlist from '../widgets/eventlist';
 import users from '../users';
 
 class EventList extends Overlay {
-  @ui({
-    type: 'link',
-    href: '/overlays/eventlist',
-    class: 'btn btn-primary btn-block',
-    rawText: '/overlays/eventlist (350x220)',
-    target: '_blank',
-  }, 'links')
-  linkBtn = null;
+  showInUI = false;
 
   sockets () {
     adminEndpoint(this.nsp, 'eventlist::getUserEvents', async (userId, cb) => {

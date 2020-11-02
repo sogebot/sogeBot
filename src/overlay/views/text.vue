@@ -59,13 +59,13 @@ export default class CarouselOverlay extends Vue {
   }
 
   refresh () {
-    if (this.urlParam('id')) {
-      this.socket.emit('generic::getOne', { id: this.urlParam('id'), parseText: true }, (err: string | null, cb: { external: string, text: string, js: string, css: string }) => {
+    if (this.$route.params.id) {
+      this.socket.emit('generic::getOne', { id: this.$route.params.id, parseText: true }, (err: string | null, cb: { external: string, text: string, js: string, css: string }) => {
         if (err) {
           return console.error(err);
         }
         if (!cb) {
-          return console.warn('No text overlay found with id ' + this.urlParam('id'));
+          return console.warn('No text overlay found with id ' + this.$route.params.id);
         }
         if (!this.external) {
           if (cb.external) {

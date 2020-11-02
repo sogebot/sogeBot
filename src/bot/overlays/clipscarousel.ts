@@ -14,15 +14,6 @@ class ClipsCarousel extends Overlay {
   @ui({ type: 'number-input', step: '1', min: '1' })
   cClipsTimeToNextClip = 45;
 
-  @ui({
-    type: 'link',
-    href: '/overlays/clipscarousel',
-    class: 'btn btn-primary btn-block',
-    rawText: '/overlays/clipscarousel (1920x1080)',
-    target: '_blank',
-  }, 'links')
-  btnLink = null;
-
   sockets () {
     publicEndpoint(this.nsp, 'clips', async (cb) => {
       const clips = await api.getTopClips({ period: 'custom', days: this.cClipsCustomPeriodInDays, first: this.cClipsNumOfClips });
