@@ -57,17 +57,22 @@ export default defineComponent({
     ];
     const refreshPlaylist = () => {
       state.value.loading = ButtonStates.progress;
-      socket.emit('find.playlist', { page: (currentPage.value - 1) }, (err: string | null, items: SongPlaylistInterface[], countOfItems: number) => {
-        if (err) {
-          return console.error(err);
+      socket.emit('current.playlist.tag', (err1: string | null, tag: string) => {
+        if (err1) {
+          return console.error(err1);
         }
-        count.value = countOfItems;
-        for (let item of items) {
-          item.startTime = item.startTime ? item.startTime : 0
-          item.endTime = item.endTime ? item.endTime : item.length
-        }
-        playlist.value = items
-        state.value.loading = ButtonStates.success;
+        socket.emit('find.playlist', { page: (currentPage.value - 1), tag }, (err: string | null, items: SongPlaylistInterface[], countOfItems: number) => {
+          if (err) {
+            return console.error(err);
+          }
+          count.value = countOfItems;
+          for (let item of items) {
+            item.startTime = item.startTime ? item.startTime : 0
+            item.endTime = item.endTime ? item.endTime : item.length
+          }
+          playlist.value = items
+          state.value.loading = ButtonStates.success;
+        })
       })
     }
 

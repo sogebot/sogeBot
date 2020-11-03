@@ -96,7 +96,7 @@ class Songs extends System {
     publicEndpoint(this.nsp, 'current.playlist.tag', async (cb) => {
       cb(null, this.currentTag);
     });
-    publicEndpoint(this.nsp, 'get.playlist.tags', async (cb) => {
+    adminEndpoint(this.nsp, 'get.playlist.tags', async (cb) => {
       try {
         cb(null, await this.getTags());
       } catch (e) {
