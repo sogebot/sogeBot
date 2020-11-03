@@ -8,6 +8,7 @@ import { error } from 'console';
 import { DAY, MINUTE } from './constants';
 import { onStreamStart } from './decorators/on';
 import api from './api';
+import Core from './_interface';
 
 let validStatsUntil = Date.now();
 let cachedStats = {
@@ -25,12 +26,9 @@ let currentFollowers = 0;
 let currentViews = 0;
 let currentSubscribers = 0;
 
-class Stats {
+class Stats extends Core {
+  showInUI = false;
   latestTimestamp = 0;
-
-  constructor() {
-    this.sockets();
-  }
 
   @onStreamStart()
   async setInitialValues() {
