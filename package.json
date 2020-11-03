@@ -182,7 +182,6 @@
     "typescript": "4.0.3",
     "url-regex": "5.0.0",
     "util": "0.12.3",
-    "v-clipboard": "2.2.3",
     "v-runtime-template": "1.10.0",
     "vm-browserify": "1.1.2",
     "vue-audio-visual": "2.2.0",
