@@ -36,7 +36,7 @@ describe('Custom Variable - #3379 - Command reply should return correct reply', 
     await getRepository(Variable).save({
       variableName: '$_variable',
       readOnly: false,
-      currentValue: 0,
+      currentValue: '0',
       type: 'number',
       responseType: 2,
       permission: permission.VIEWERS,

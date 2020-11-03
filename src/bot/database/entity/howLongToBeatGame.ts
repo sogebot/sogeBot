@@ -31,9 +31,9 @@ export const HowLongToBeatGame = new EntitySchema<Readonly<Required<HowLongToBea
     imageUrl: { type: String },
     startedAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
     offset: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-    gameplayMain: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined  },
-    gameplayMainExtra: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined  },
-    gameplayCompletionist: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'sqlite') === 'mysql' ? 12 : undefined  },
+    gameplayMain: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined  },
+    gameplayMainExtra: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined  },
+    gameplayCompletionist: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined  },
   },
   indices: [
     { name: 'IDX_301758e0e3108fc902d5436527', columns: ['game'], unique: true },

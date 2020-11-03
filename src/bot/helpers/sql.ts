@@ -4,7 +4,7 @@ import { debug } from './log';
 
 // TODO: dynamic way to determinate limit of SQL variables
 export let SQLVariableLimit = 999; // sqlite have default limit of 999
-if (['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'sqlite')) {
+if (['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'better-sqlite3')) {
   // set default and then check current value
   SQLVariableLimit = 16382; // per https://mariadb.com/kb/en/server-system-variables/#max_prepared_stmt_count
   new Promise(async () => {
@@ -20,6 +20,6 @@ if (['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'sqlite')) {
     updateSQLVariableLimit();
   });
 }
-if (['postgres'].includes(process.env.TYPEORM_CONNECTION ?? 'sqlite')) {
+if (['postgres'].includes(process.env.TYPEORM_CONNECTION ?? 'better-sqlite3')) {
   SQLVariableLimit = 32767; // per https://stackoverflow.com/a/42251312
 }

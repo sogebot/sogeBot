@@ -35,7 +35,7 @@ describe('Custom Variable - #4083 - Get url on eval should return correct value'
     const variable = await getRepository(Variable).save({
       variableName: '$_variable',
       readOnly: false,
-      currentValue: 0,
+      currentValue: '0',
       type: 'eval',
       responseType: 2,
       permission: permission.MODERATORS,
