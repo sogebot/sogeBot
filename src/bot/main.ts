@@ -57,7 +57,7 @@ const connect = async function () {
     });
   }
   const typeToLog = {
-    sqlite: 'SQLite3',
+    'better-sqlite3': 'SQLite3',
     mariadb: 'MySQL/MariaDB',
     mysql: 'MySQL/MariaDB',
     postgres: 'PostgreSQL',

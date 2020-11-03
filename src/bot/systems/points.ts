@@ -461,7 +461,7 @@ class Points extends System {
       const query = (type: typeof connection.options.type) => {
         switch(type) {
           case 'postgres':
-          case 'sqlite':
+          case 'better-sqlite3':
             return `SELECT COUNT(*) as "order" FROM "user" WHERE "points" > (SELECT "points" FROM "user" WHERE "username"='${user.username}') AND "username"!='${oauth.broadcasterUsername}'`;
           case 'mysql':
           case 'mariadb':

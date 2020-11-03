@@ -289,7 +289,7 @@ export const AlertMedia = new EntitySchema<Readonly<Required<AlertMediaInterface
   columns: {
     primaryId: { type: Number, primary: true, generated: true },
     id: { type: String },
-    b64data: { type: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'sqlite') ? 'longtext' : 'text' },
+    b64data: { type: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') ? 'longtext' : 'text' },
     chunkNo: { type: Number },
   },
   indices: [

@@ -52,7 +52,7 @@ export const Widget = new EntitySchema<Readonly<Required<WidgetInterface>>>({
     positionY: { type: Number },
     height: { type: Number },
     width: { type: Number },
-    dashboardId: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'sqlite') ? { type: 'varchar', length: '36', nullable: true } : { type: 'uuid', nullable: true },
+    dashboardId: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') ? { type: 'varchar', length: '36', nullable: true } : { type: 'uuid', nullable: true },
   },
   relations: {
     dashboard: {

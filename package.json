@@ -13,6 +13,7 @@
   "dependencies": {
     "axios": "0.20.0",
     "basic-auth": "2.0.1",
+    "better-sqlite3": "7.1.1",
     "bootstrap": "4.5.3",
     "bootstrap-slider": "11.0.2",
     "bootstrap-toggle": "2.2.2",
@@ -54,7 +55,6 @@
     "socket.io-client": "2.3.1",
     "source-map-support": "0.5.19",
     "spotify-web-api-node": "5.0.0",
-    "sqlite3": "5.0.0",
     "strip-ansi": "6.0.0",
     "strip-comments": "2.0.1",
     "terminal-kit": "1.44.0",
