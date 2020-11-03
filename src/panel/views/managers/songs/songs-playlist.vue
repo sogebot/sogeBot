@@ -17,6 +17,14 @@
 
     <panel search @search="search = $event">
       <template v-slot:right>
+        <b-select v-model="showTag" class="mr-2">
+          <b-form-select-option :value="null">All playlists</b-form-select-option>
+          <b-form-select-option :value="tag" v-for="tag of tags" v-bind:key="tag">
+            {{tag}}
+            <template v-if="currentTag === tag">(current)</template>
+          </b-form-select-option>
+        </b-select>
+
         <b-pagination
           class="m-0"
           v-model="currentPage"
@@ -55,7 +63,10 @@
         <img class="float-left pr-3" v-bind:src="generateThumbnail(data.item.videoId)">
       </template>
       <template v-slot:cell(title)="data">
-        {{ data.item.title }}
+        <div>
+          {{ data.item.title }}
+          <b-badge class="mr-1" :variant="getVariant(tag)" v-for="tag of data.item.tags" v-bind:key="tag"> {{ tag }}</b-badge>
+        </div>
         <small class="d-block">
           <fa :icon="[ 'far', 'clock' ]"></fa> {{ data.item.length | formatTime }}
           <fa class="ml-3" :icon="['fas', 'volume-up']"></fa> {{ Number(data.item.volume).toFixed(1) }}%
@@ -72,46 +83,57 @@
           <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" @click="data.toggleDetails">
             {{ translate('dialog.buttons.edit') }}
           </button-with-icon>
-          <hold-button @trigger="deleteItem(data.item.videoId)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
-            <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-            <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
-          </hold-button>
+          <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="deleteItem(data.item.videoId)">
+            {{ translate('dialog.buttons.delete') }}
+          </button-with-icon>
         </div>
       </template>
       <template v-slot:row-details="data">
         <b-card>
-          <div class="form-group col-md-12">
-            <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ translate('systems.songs.settings.volume') }}</label>
-            <div class="input-group">
-              <button class="btn" @click="data.item.forceVolume = false" :class="[!data.item.forceVolume ? ' btn-success' : 'btn-secondary']">{{translate('systems.songs.calculated')}}</button>
-              <button class="btn" @click="data.item.forceVolume = true" :class="[data.item.forceVolume ? ' btn-success' : 'btn-secondary']">{{translate('systems.songs.set_manually')}}</button>
-              <input v-model="data.item.volume" type="number" class="form-control" min=1 max=100 :disabled="!data.item.forceVolume">
-              <div class="input-group-append">
-                <div class="input-group-text">%</div>
+          <b-row class="form-group">
+            <b-col cols="12">
+              <label>{{ translate('systems.songs.settings.volume') }}</label>
+              <div class="input-group">
+                <button class="btn" @click="data.item.forceVolume = false" :class="[!data.item.forceVolume ? ' btn-success' : 'btn-secondary']">{{translate('systems.songs.calculated')}}</button>
+                <button class="btn" @click="data.item.forceVolume = true" :class="[data.item.forceVolume ? ' btn-success' : 'btn-secondary']">{{translate('systems.songs.set_manually')}}</button>
+                <input v-model="data.item.volume" type="number" class="form-control" min=1 max=100 :disabled="!data.item.forceVolume">
+                <div class="input-group-append">
+                  <div class="input-group-text">%</div>
+                </div>
+                <div class="invalid-feedback">{{ translate('systems.songs.error.isEmpty') }}</div>
               </div>
-              <div class="invalid-feedback">{{ translate('systems.songs.error.isEmpty') }}</div>
-            </div>
-          </div>
-          <div class="form-group col-md-6">
-            <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ translate('systems.songs.startTime') }}</label>
-            <div class="input-group">
-              <input v-model="data.item.startTime" type="number" class="form-control" min=1 :max="Number(data.item.endTime) - 1">
-              <div class="input-group-append">
-                <div class="input-group-text">{{translate('systems.songs.seconds')}}</div>
+            </b-col>
+          </b-row>
+          <b-row class="form-group">
+            <b-col cols="6">
+              <label>{{ translate('systems.songs.startTime') }}</label>
+              <div class="input-group">
+                <input v-model="data.item.startTime" type="number" class="form-control" min=1 :max="Number(data.item.endTime) - 1">
+                <div class="input-group-append">
+                  <div class="input-group-text">{{translate('systems.songs.seconds')}}</div>
+                </div>
+                <div class="invalid-feedback">{{ translate('systems.songs.error.isEmpty') }}</div>
               </div>
-              <div class="invalid-feedback">{{ translate('systems.songs.error.isEmpty') }}</div>
-            </div>
-          </div>
-          <div class="form-group col-md-6">
-            <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ translate('systems.songs.endTime') }}</label>
-            <div class="input-group">
-              <input v-model="data.item.endTime" type="number" class="form-control" :min="Number(data.item.startTime) + 1" :max="data.item.length">
-              <div class="input-group-append">
-                <div class="input-group-text">{{translate('systems.songs.seconds')}}</div>
+            </b-col>
+            <b-col cols="6">
+              <label>{{ translate('systems.songs.endTime') }}</label>
+              <div class="input-group">
+                <input v-model="data.item.endTime" type="number" class="form-control" :min="Number(data.item.startTime) + 1" :max="data.item.length">
+                <div class="input-group-append">
+                  <div class="input-group-text">{{translate('systems.songs.seconds')}}</div>
+                </div>
+                <div class="invalid-feedback">{{ translate('systems.songs.error.isEmpty') }}</div>
               </div>
-              <div class="invalid-feedback">{{ translate('systems.songs.error.isEmpty') }}</div>
-            </div>
-          </div>
+            </b-col>
+          </b-row>
+          <b-row class="form-group">
+            <b-col cols="12">
+              <label>{{ translate('systems.songs.tags') }}</label>
+              <div class="input-group">
+                <tags v-model="data.item.tags" ifEmptyTag="general" class="w-100"/>
+              </div>
+            </b-col>
+          </b-row>
           <div class="form-group text-right col-md-12">
             <button type="button" class="btn btn-secondary" @click="data.toggleDetails">{{translate('events.dialog.close')}}</button>
 
@@ -135,12 +157,16 @@ import { SongPlaylistInterface } from 'src/bot/database/entity/song';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faStepBackward, faStepForward } from '@fortawesome/free-solid-svg-icons';
+import { error } from 'src/panel/helpers/error';
 library.add(faStepBackward, faStepForward);
+
+let lastVariant = -1;
+let labelToVariant = new Map<string, string>();
 
 @Component({
   components: {
     loading: () => import('../../../components/loading.vue'),
-    'hold-button': () => import('../../../components/holdButton.vue'),
+    tags: () => import('../../../components/tags.vue'),
   },
   filters: {
     formatTime(seconds: number) {
@@ -172,6 +198,9 @@ export default class playlist extends Vue {
     save: this.$state.idle,
     import: this.$state.idle,
   }
+  showTag: string | null = null; // null === all
+  currentTag: string = 'general';
+  tags: string[] = []
 
   fields = [
     { key: 'thumbnail', label: '', tdClass: 'fitThumbnail' },
@@ -184,8 +213,14 @@ export default class playlist extends Vue {
   count: number = 0;
 
   get fItems() {
-    return this.items
+    return this.items;
   }
+
+  @Watch('showTag')
+  goToFirstPage = () => {
+    this.currentPage = 1;
+    this.refreshPlaylist()
+  };
 
   created() {
     this.refreshPlaylist()
@@ -193,20 +228,49 @@ export default class playlist extends Vue {
 
   @Watch('currentPage')
   @Watch('search')
-  refreshPlaylist() {
-    this.state.loading = this.$state.progress;
-    this.socket.emit('find.playlist', { page: (this.currentPage - 1), search: this.search }, (err: string | null, items: SongPlaylistInterface[], count: number) => {
-      if (err) {
-        return console.error(err);
-      }
-      this.count = count;
-      for (let item of items) {
-        item.startTime = item.startTime ? item.startTime : 0
-        item.endTime = item.endTime ? item.endTime : item.length
-      }
-      this.items = items
-      this.state.loading = this.$state.success;
-    })
+  async refreshPlaylist() {
+    await Promise.all([
+      new Promise((resolve, reject) => {
+        this.socket.emit('current.playlist.tag', (err: string | null, tag: string) => {
+          if (err) {
+            error(err)
+            reject(err);
+          }
+          this.currentTag = tag;
+          resolve();
+        })
+      }),
+      new Promise((resolve, reject) => {
+        this.socket.emit('get.playlist.tags', (err: string | null, tags: string[]) => {
+          if (err) {
+            error(err)
+            reject(err);
+          }
+          console.log([...tags]);
+          this.tags = [...tags];
+          resolve();
+        })
+      }),
+      new Promise((resolve, reject) => {
+        this.socket.emit('find.playlist', { page: (this.currentPage - 1), search: this.search, tag: this.showTag }, (err: string | null, items: SongPlaylistInterface[], count: number) => {
+          if (err) {
+            error(err)
+            reject(err);
+          }
+          for (let item of items) {
+            item.startTime = item.startTime ? item.startTime : 0
+            item.endTime = item.endTime ? item.endTime : item.length
+          }
+          this.count = count;
+          this.items = items;
+          resolve();
+        })
+      }),
+    ]);
+    this.state.loading = this.$state.success;
+    if (this.showTag && !this.tags.includes(this.showTag)) {
+      this.showTag = null;
+    }
   }
 
   generateThumbnail(videoId: string) {
@@ -253,6 +317,20 @@ export default class playlist extends Vue {
     }, 2000)
   }
 
+  getVariant(type: string) {
+    const variants = [ "primary", "secondary", "success", "danger", "warning", "info", "light", "dark" ]
+    if (labelToVariant.has(type)) {
+      return labelToVariant.get(type);
+    } else {
+      if (lastVariant === -1 || lastVariant === variants.length - 1) {
+        lastVariant = 0;
+      }
+      labelToVariant.set(type, variants[lastVariant]);
+      lastVariant++
+      return labelToVariant.get(type);
+    }
+  }
+
   updateItem(videoId: string) {
     this.state.save = 1
 
@@ -267,6 +345,7 @@ export default class playlist extends Vue {
           return this.state.save = 3
         }
         this.state.save = 2
+        this.refreshPlaylist();
         setTimeout(() => {
           this.state.save = 0
         }, 1000)
@@ -275,9 +354,11 @@ export default class playlist extends Vue {
   }
 
   deleteItem(id: string) {
-    this.socket.emit('delete.playlist', id, () => {
-      this.items = this.items.filter((o) => o.videoId !== id)
-    })
+    if (confirm('Do you want to delete song ' + this.items.find(o => o.videoId === id)?.title + '?')) {
+      this.socket.emit('delete.ban', id, () => {
+        this.items = this.items.filter((o) => o.videoId !== id)
+      })
+    }
   }
 }
 </script>
