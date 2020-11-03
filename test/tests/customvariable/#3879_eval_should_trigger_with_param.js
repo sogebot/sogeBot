@@ -37,7 +37,7 @@ describe('Custom Variable - #3879 - Eval should trigger with param with proper p
     await getRepository(Variable).save({
       variableName: '$_variable',
       readOnly: false,
-      currentValue: 0,
+      currentValue: '0',
       type: 'eval',
       responseType: 2,
       permission: permission.MODERATORS,

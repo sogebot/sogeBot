@@ -165,7 +165,7 @@ describe('Message - cvars filter', async () => {
                 await getRepository(Variable).save({
                   variableName: test.variable,
                   readOnly: false,
-                  currentValue: test.initialValue,
+                  currentValue: String(test.initialValue),
                   type: test.type, responseType: typeof test.responseType === 'undefined' ? 0 : test.responseType,
                   permission: permission[p],
                   evalValue: '',
@@ -254,7 +254,7 @@ describe('Message - cvars filter', async () => {
                 await getRepository(Variable).save({
                   variableName: test.variable,
                   readOnly: true,
-                  currentValue: test.initialValue,
+                  currentValue: String(test.initialValue),
                   type: test.type,
                   responseType: 0,
                   permission: permission[p],
