@@ -1,12 +1,12 @@
 {
   "core": {
     "loaded": "is loaded and",
-    "enabled": "enabled",
-    "disabled": "disabled",
-    "usage": "Usage",
-    "lang-selected": "Bot language is currently set to english",
-    "command-parse": "Sorry, $sender, but this command is not correct, use",
-    "error": "Sorry, $sender, but something went wrong!",
+    "enabled": "مفعّل",
+    "disabled": "معطّل",
+    "usage": "الإستخدام",
+    "lang-selected": "تم تعيين لغة البوت حاليا إلى اللغة العربية",
+    "command-parse": "عذراً، $sender، ولكن هذا الأمر غير صحيح، استخدم",
+    "error": "عذراً، $sender، لكن حدث خطأ ما!",
     "no-response": "",
     "no-response-bool": {
       "true": "",
