@@ -1,8 +1,8 @@
 {
-  "list": "List of your permissions:",
-  "excludeAddSuccessful": "$sender, you added $username to exclude list for permission $permissionName",
-  "excludeRmSuccessful": "$sender, you removed $username from exclude list for permission $permissionName",
-  "userNotFound": "$sender, user $username was not found in database.",
-  "permissionNotFound": "$sender, permission $userlevel was not found in database.",
-  "cannotIgnoreForCorePermission": "$sender, you cannot manually exclude user for core permission $userlevel"
+  "list": "قائمة الصلاحيات:",
+  "excludeAddSuccessful": "$sender، لقد أضفت $username لقائمة استبعاد الصلاحيات $permissionName",
+  "excludeRmSuccessful": "$sender، لقد قمت بإزالة $username من قائمة استبعاد الصلاحيات $permissionName",
+  "userNotFound": "$sender، المستخدم $username لم يتم العثور على قاعدة البيانات.",
+  "permissionNotFound": "$sender، لم يتم العثور على إذن $userlevel في قاعدة البيانات.",
+  "cannotIgnoreForCorePermission": "$sender، لا يمكنك إستبعاد المستخدم يدوياً للإذن الأساسي $userlevel"
 }
