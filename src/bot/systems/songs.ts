@@ -18,6 +18,8 @@ import { SongBan, SongPlaylist, SongPlaylistInterface, SongRequest } from '../da
 import { translate } from '../translate';
 
 let importInProgress = false;
+const cachedTags = new Set<string>();
+let isCachedTagsValid = false;
 
 class Songs extends System {
   interval: { [id: string]: NodeJS.Timeout } = {};
@@ -71,6 +73,21 @@ class Songs extends System {
     }
   }
 
+  async getTags() {
+    if (isCachedTagsValid) {
+      return [...cachedTags];
+    } else {
+      cachedTags.clear();
+      isCachedTagsValid = true;
+      for (const item of await getRepository(SongPlaylist).find()) {
+        for (const tag of item.tags) {
+          cachedTags.add(tag);
+        }
+      }
+      return [...cachedTags];
+    }
+  }
+
   sockets () {
     if (this.socket === null) {
       setTimeout(() => this.sockets(), 100);
@@ -81,13 +98,7 @@ class Songs extends System {
     });
     publicEndpoint(this.nsp, 'get.playlist.tags', async (cb) => {
       try {
-        const tags = new Set();
-        for (const item of await getRepository(SongPlaylist).find()) {
-          for (const tag of item.tags) {
-            tags.add(tag);
-          }
-        }
-        cb(null, [...tags]);
+        cb(null, await this.getTags());
       } catch (e) {
         cb(e, []);
       }
@@ -131,6 +142,7 @@ class Songs extends System {
       })), count);
     });
     adminEndpoint(this.nsp, 'songs::save', async (item: SongPlaylistInterface, cb) => {
+      isCachedTagsValid = false;
       cb(null, await getRepository(SongPlaylist).save(item));
     });
     adminEndpoint(this.nsp, 'songs::getAllBanned', async (where, cb) => {
@@ -152,6 +164,7 @@ class Songs extends System {
       }));
     });
     adminEndpoint(this.nsp, 'delete.playlist', async (videoId, cb) => {
+      isCachedTagsValid = false;
       await getRepository(SongPlaylist).delete({ videoId });
       if (cb) {
         cb(null);
@@ -173,16 +186,17 @@ class Songs extends System {
         cb(e.stack, []);
       }
     });
-    adminEndpoint(this.nsp, 'import.playlist', async (playlist, cb) => {
+    adminEndpoint(this.nsp, 'import.playlist', async ({playlist, forcedTag}, cb) => {
       try {
-        cb(null, await this.importPlaylist({ parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: {} }));
+        isCachedTagsValid = false;
+        cb(null, await this.importPlaylist({ parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag } }));
       } catch (e) {
         cb(e.stack, null);
       }
     });
-    adminEndpoint(this.nsp, 'import.video', async (url, cb) => {
+    adminEndpoint(this.nsp, 'import.video', async ({playlist, forcedTag}, cb) => {
       try {
-        cb(null, await this.addSongToPlaylist({ parameters: url, sender: getBotSender(), command: '', createdAt: Date.now(), attr: {} }));
+        cb(null, await this.addSongToPlaylist({ parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag } }));
       } catch (e) {
         cb(e.stack, null);
       }
@@ -356,6 +370,10 @@ class Songs extends System {
 
     // get song from playlist
     if (this.playlist) {
+      if (!(await this.getTags()).includes(this.currentTag)) {
+        // tag is not in db
+        return [];
+      }
       const order: any = this.shuffle ? { seed: 'ASC' } : { lastPlayedAt: 'ASC' };
       const pl = await getRepository(SongPlaylist).findOne({ order });
       if (!pl) {
@@ -458,8 +476,31 @@ class Songs extends System {
 
   @command('!playlist')
   @default_permission(permission.CASTERS)
-  async help (opts: CommandOptions): Promise<CommandResponse[]> {
-    return [{ response: translate('core.usage') + ': !playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal', ...opts }];
+  async playlistCurrent (opts: CommandOptions): Promise<CommandResponse[]> {
+    return [{ response: prepare('songs.playlist-current', { playlist: this.currentTag }), ...opts }];
+  }
+
+  @command('!playlist list')
+  @default_permission(permission.CASTERS)
+  async playlistList (opts: CommandOptions): Promise<CommandResponse[]> {
+    return [{ response: prepare('songs.playlist-list', { list: (await this.getTags()).join(', ') }), ...opts }];
+  }
+
+  @command('!playlist set')
+  @default_permission(permission.CASTERS)
+  async playlistSet (opts: CommandOptions): Promise<CommandResponse[]> {
+    try {
+      const tags = await this.getTags();
+      if (!tags.includes(opts.parameters)) {
+        throw new Error(prepare('songs.playlist-not-exist', { playlist: opts.parameters }));
+      }
+
+      this.currentTag = opts.parameters;
+      return [{ response: prepare('songs.playlist-set', { playlist: opts.parameters }), ...opts }];
+    } catch (e) {
+      return [{ response: e.message, ...opts }];
+
+    }
   }
 
   @command('!songrequest')
@@ -596,6 +637,7 @@ class Songs extends System {
           seed: 1,
           volume: 20,
           startTime: 0,
+          tags: [ opts.attr.forcedTag ? opts.attr.forcedTag : this.currentTag ],
           endTime: Number(videoInfo.videoDetails.lengthSeconds),
         });
         imported++;
@@ -692,6 +734,7 @@ class Songs extends System {
               seed: 1,
               volume: 20,
               startTime: 0,
+              tags: [ opts.attr.forcedTag ? opts.attr.forcedTag : this.currentTag ],
               endTime: Number(videoInfo.videoDetails.lengthSeconds),
             });
             imported++;

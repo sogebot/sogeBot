@@ -964,7 +964,11 @@
     "song-was-added-to-playlist": "$sender, song $name was added to playlist",
     "song-is-already-in-playlist": "$sender, song $name is already in playlist",
     "song-was-removed-from-playlist": "$sender, song $name was removed from playlist",
-    "song-was-removed-from-queue": "$sender, your song $name was removed from queue"
+    "song-was-removed-from-queue": "$sender, your song $name was removed from queue",
+    "playlist-current": "$sender, current playlist is $playlist.",
+    "playlist-list": "$sender, available playlists: $list.",
+    "playlist-not-exist": "$sender, your requested playlist $playlist doesn't exist.",
+    "playlist-set": "$sender, you changed playlist to $playlist."
   },
   "price": {
     "price-parse-failed": "{core.command-parse} !price",

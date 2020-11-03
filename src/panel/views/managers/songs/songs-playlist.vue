@@ -292,7 +292,7 @@ export default class playlist extends Vue {
     }
     if (this.state.import === 0) {
       this.state.import = 1
-      this.socket.emit(this.toAdd.includes('playlist') ? 'import.playlist' : 'import.video', this.toAdd, (err: string | null, info: (CommandResponse & { imported: number; skipped: number })[]) => {
+      this.socket.emit(this.toAdd.includes('playlist') ? 'import.playlist' : 'import.video', { playlist: this.toAdd, forcedTag: this.showTag }, (err: string | null, info: (CommandResponse & { imported: number; skipped: number })[]) => {
         if (err) {
           this.state.import = 3
           setTimeout(() => {
