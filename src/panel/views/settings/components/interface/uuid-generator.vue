@@ -12,7 +12,7 @@
     <input v-model="currentValue" class="form-control" :type="!show ? 'password' : 'text'" :readonly="true" />
     <div class="input-group-append">
       <b-button variant="secondary" @mousedown="show = true" @mouseup="show=false">Show</b-button>
-      <b-button variant="primary" v-clipboard="() => currentValue" :disabled="copied" @click="copy">{{ copied ? 'Copied!': 'Copy to clipboard' }}</b-button>
+      <b-button variant="primary" :disabled="copied" @click="copy">{{ copied ? 'Copied!': 'Copy to clipboard' }}</b-button>
       <b-button variant="danger" @click="generate">Regenerate</b-button>
     </div>
   </div>
@@ -20,8 +20,6 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import Clipboard from 'v-clipboard'
-Vue.use(Clipboard)
 import { v4 as uuid } from 'uuid'
 import translate from 'src/panel/helpers/translate';
 
@@ -37,6 +35,7 @@ export default class uuidGenerator extends Vue {
   copied = false;
 
   copy() {
+    navigator.clipboard.writeText(this.currentValue);
     this.copied = true;
     setTimeout(() => {
       this.copied = false;
