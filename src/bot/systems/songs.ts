@@ -307,7 +307,7 @@ class Songs extends System {
       if (currentSong.videoID === opts.parameters) {
         this.sendNextSongID(); // skip song if its currently playing
       }
-      return [{ response: translate('songs.bannedSong').replace(/\$title/g, bannedSong.title), ...opts }];
+      return [{ response: translate('songs.bannedSong').replace(/\$title/g, bannedSong.videoDetails.title), ...opts }];
     } else {
       return [];
     }

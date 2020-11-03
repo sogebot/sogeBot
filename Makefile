@@ -23,8 +23,6 @@ dependencies:
 	patch --forward node_modules/twitch-js/types/index.d.ts < patches/twitch-js-types.patch
 	patch --forward node_modules/twitch-js/types/index.d.ts < patches/twitch-js-types-2.patch
 	patch --forward node_modules/twitch-js/types/index.d.ts < patches/twitch-js-add-highlight-msgId.patch
-	@echo -ne "\n\t ----- Removing node_modules/@types/mini-css-extract-plugin until updated\n"
-	rm -rf node_modules/@types/mini-css-extract-plugin/
 
 eslint:
 	@echo -ne "\n\t ----- Checking eslint\n"
