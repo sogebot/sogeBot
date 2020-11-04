@@ -9,6 +9,7 @@ import { DAY, MINUTE } from './constants';
 import { onStreamStart } from './decorators/on';
 import api from './api';
 import Core from './_interface';
+import { debug } from './helpers/log';
 
 let validStatsUntil = Date.now();
 let cachedStats = {
@@ -35,6 +36,7 @@ class Stats extends Core {
     currentFollowers = api.stats.currentFollowers;
     currentViews = api.stats.currentViews;
     currentSubscribers = api.stats.currentSubscribers;
+    debug('stats', JSON.stringify({ currentFollowers, currentViews, currentSubscribers}));
   }
 
   sockets() {
