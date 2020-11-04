@@ -30,7 +30,7 @@ class Songs extends System {
   currentSong: string = JSON.stringify({ videoID: null });
   @shared()
   isPlaying: {[socketId: string]: boolean } = {};
-  @shared()
+  @shared(true)
   currentTag = 'general';
 
   @settings()
