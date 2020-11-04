@@ -7,7 +7,11 @@
             li(v-if="typeof nodrag === 'undefined'").nav-item.px-2.grip.text-secondary.align-self-center.shrink
               fa(icon="grip-vertical" fixed-width)
           li.nav-item.shrink
-            b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-ytplayer')" variant="outline-primary" toggle-class="border-0")
+            b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-ytplayer') + ' - ' + currentTag" variant="outline-primary" toggle-class="border-0")
+              b-dropdown-form.form
+                label Playlist
+                b-select(v-model="currentTag")
+                  b-form-select-option(v-for="tag of availableTags" v-bind:key="tag" :value="tag") {{tag}}
               b-dropdown-item(@click="nextAndRemoveFromPlaylist")
                 | skip &amp; remove from playlist
               template(v-if="!popout")
@@ -71,6 +75,9 @@ export default {
   },
   data: function () {
     return {
+      currentTag: 'general',
+      availableTags: [],
+
       translate,
       EventBus,
       autoplay: false,
@@ -95,7 +102,20 @@ export default {
       clearInterval(interval);
     }
   },
+  watch: {
+    currentTag: function (val) {
+      this.socket.emit('set.playlist.tag', val);
+    }
+  },
   methods: {
+    refreshPlaylist() {
+      this.socket.emit('current.playlist.tag', (err, tag) => {
+        this.currentTag = tag;
+      })
+      this.socket.emit('get.playlist.tags', (err, tags) => {
+        this.availableTags = tags;
+      })
+    },
     removeSongRequest(id) {
       console.log('Removing => ' + id)
       this.requests = this.requests.filter((o) => String(o.id) !== id)
@@ -171,6 +191,8 @@ export default {
     }
   },
   created: function () {
+    this.refreshPlaylist();
+
     this.socket.on('videoID', item => {
       this.player = null; // reset player
       this.playThisSong(item)
@@ -194,6 +216,10 @@ export default {
         this.requests = items
       })
     }, 1000));
+
+    this.interval.push(setInterval(() => {
+      this.refreshPlaylist();
+    }, 10000));
   },
   filters: {
     formatTime: function (seconds) {
@@ -218,6 +244,10 @@ export default {
     position: relative;
     top: 50%;
     transform: translate(0, -50%);
+  }
+
+  .form .b-dropdown-form {
+    padding:0 1rem 1rem;
   }
 </style>
 <style>

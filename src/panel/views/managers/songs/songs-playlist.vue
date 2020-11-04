@@ -128,7 +128,7 @@
           </b-row>
           <b-row class="form-group">
             <b-col cols="12">
-              <label>{{ translate('systems.songs.tags') }}</label>
+              <label>{{ translate('tags') }}</label>
               <div class="input-group">
                 <tags v-model="data.item.tags" ifEmptyTag="general" class="w-100"/>
               </div>

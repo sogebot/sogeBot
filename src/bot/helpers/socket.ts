@@ -123,6 +123,7 @@ function adminEndpoint (nsp: string, on: 'alerts::areAlertsMuted', callback: (ar
 function adminEndpoint (nsp: string, on: 'import.playlist', callback: (otps: {playlist: string, forcedTag: string}, cb: (error: Error | string | null, data: any) => void, socket: SocketIO.Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'import.video', callback: (opts: {playlist: string, forcedTag: string}, cb: (error: Error | string | null, data: any) => void, socket: SocketIO.Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'get.playlist.tags', callback: (cb: (error: Error | string | null, data: string[]) => void, socket: SocketIO.Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'set.playlist.tag', callback: (tag:string, socket: SocketIO.Socket) => void): void;
 
 // generic functions
 function adminEndpoint (nsp: string, on: string, callback: (opts: { [x: string]: any }, cb?: (error: Error | string | null, ...response: any) => void) => void, socket?: SocketIO.Socket): void;

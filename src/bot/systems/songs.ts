@@ -93,6 +93,12 @@ class Songs extends System {
       setTimeout(() => this.sockets(), 100);
       return;
     }
+    adminEndpoint(this.nsp, 'set.playlist.tag', async (tag) => {
+      if (this.currentTag !== tag) {
+        info(`SONGS: Playlist changed to ${tag}`);
+      }
+      this.currentTag = tag;
+    });
     publicEndpoint(this.nsp, 'current.playlist.tag', async (cb) => {
       cb(null, this.currentTag);
     });
