@@ -941,7 +941,7 @@
   },
   "songs": {
     "playlist-is-empty": "$sender, список воспроизведения для импорта пуст",
-    "playlist-imported": "$sender, импортировано $imported и пропущено $skipped из плейлиста",
+    "playlist-imported": "$sender, imported $imported and skipped $skipped to playlist",
     "not-playing": "Не играет",
     "song-was-banned": "Песня $name была забанена и никогда не будет играть снова!",
     "song-was-banned-timeout-message": "Вы получили тайм-аут за размещение забаненной песни",
@@ -950,6 +950,7 @@
     "no-song-is-currently-playing": "Сейчас ничего не проигрывается",
     "current-song-from-playlist": "Текущая песня $name из плейлиста",
     "current-song-from-songrequest": "Текущая песня $name заказана $username",
+    "songrequest-disabled": "Sorry, $sender, song requests are disabled",
     "song-is-banned": "Извините, $sender, но эта песня забанена",
     "youtube-is-not-responding-correctly": "Sorry, $sender, but YouTube is sending unexpected responses, please try again later.",
     "song-was-not-found": "Извините, $sender, но эта песня не найдена",
@@ -959,7 +960,11 @@
     "song-was-added-to-playlist": "$sender, песня $name добавлена в плейлист",
     "song-is-already-in-playlist": "$sender, песня $name уже в плейлисте",
     "song-was-removed-from-playlist": "$sender, песня $name удалена из плейлиста",
-    "song-was-removed-from-queue": "$sender, ваша песня $name была удалена из очереди"
+    "song-was-removed-from-queue": "$sender, ваша песня $name была удалена из очереди",
+    "playlist-current": "$sender, current playlist is $playlist.",
+    "playlist-list": "$sender, available playlists: $list.",
+    "playlist-not-exist": "$sender, your requested playlist $playlist doesn't exist.",
+    "playlist-set": "$sender, you changed playlist to $playlist."
   },
   "price": {
     "price-parse-failed": "{core.command-parse} !price",
