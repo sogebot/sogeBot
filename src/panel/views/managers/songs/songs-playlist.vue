@@ -57,7 +57,7 @@
       </template>
     </panel>
 
-    <loading v-if="state.loading !== $state.success"/>
+    <loading v-if="state.loading !== ButtonStates.success"/>
     <b-table v-else striped small :items="fItems" :fields="fields" class="table-p-0">
       <template v-slot:cell(thumbnail)="data">
         <img class="float-left pr-3" v-bind:src="generateThumbnail(data.item.videoId)">
@@ -152,18 +152,20 @@
 import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
-import { Vue, Component, Watch } from 'vue-property-decorator';
+import { defineComponent, ref, onMounted, computed, watch } from '@vue/composition-api'
 import { SongPlaylistInterface } from 'src/bot/database/entity/song';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faStepBackward, faStepForward } from '@fortawesome/free-solid-svg-icons';
 import { error } from 'src/panel/helpers/error';
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
 library.add(faStepBackward, faStepForward);
 
 let lastVariant = -1;
 let labelToVariant = new Map<string, string>();
+const socket = getSocket('/systems/songs');
 
-@Component({
+export default defineComponent({
   components: {
     loading: () => import('../../../components/loading.vue'),
     tags: () => import('../../../components/tags.vue'),
@@ -179,188 +181,210 @@ let labelToVariant = new Map<string, string>();
         s > 9 ? s : '0' + s,
       ].filter(a => a).join(':');
     }
-  }
-})
-export default class playlist extends Vue {
-  translate = translate;
-  socket = getSocket('/systems/songs');
+  },
+  setup() {
+    const items = ref([] as SongPlaylistInterface[]);
+    const search = ref('');
+    const toAdd = ref('');
+    const importInfo = ref('');
 
-  items: SongPlaylistInterface[] = [];
-  search: string = '';
-  toAdd: string = '';
-  importInfo: string = '';
-  state: {
-    loading: number;
-    save: number;
-    import: number;
-  } = {
-    loading: this.$state.progress,
-    save: this.$state.idle,
-    import: this.$state.idle,
-  }
-  showTag: string | null = null; // null === all
-  currentTag: string = 'general';
-  tags: string[] = []
+    const state = ref({
+      loading: ButtonStates.progress,
+      import: ButtonStates.idle,
+      save: ButtonStates.idle,
+    } as {
+      loading: number;
+      import: number;
+      save: number;
+    })
+    const showTag = ref(null as string | null); // null === all
+    const currentTag = ref('general');
+    const tags = ref([] as string[])
 
-  fields = [
-    { key: 'thumbnail', label: '', tdClass: 'fitThumbnail' },
-    { key: 'title', label: '' },
-    { key: 'buttons', label: '' },
-  ];
+    const fields = [
+      { key: 'thumbnail', label: '', tdClass: 'fitThumbnail' },
+      { key: 'title', label: '' },
+      { key: 'buttons', label: '' },
+    ];
 
-  currentPage = 1;
-  perPage = 25;
-  count: number = 0;
+    const currentPage = ref(1);
+    const perPage = ref(25);
+    const count = ref(0);
 
-  get fItems() {
-    return this.items;
-  }
+    const fItems = computed(() => items.value);
 
-  @Watch('showTag')
-  goToFirstPage = () => {
-    this.currentPage = 1;
-    this.refreshPlaylist()
-  };
+    onMounted(() => {
+      refreshPlaylist();
+    })
 
-  created() {
-    this.refreshPlaylist()
-  }
+    watch(showTag, () => {
+      currentPage.value = 1;
+      refreshPlaylist()
+    })
 
-  @Watch('currentPage')
-  @Watch('search')
-  async refreshPlaylist() {
-    await Promise.all([
-      new Promise((resolve, reject) => {
-        this.socket.emit('current.playlist.tag', (err: string | null, tag: string) => {
-          if (err) {
-            error(err)
-            reject(err);
-          }
-          this.currentTag = tag;
-          resolve();
-        })
-      }),
-      new Promise((resolve, reject) => {
-        this.socket.emit('get.playlist.tags', (err: string | null, tags: string[]) => {
-          if (err) {
-            error(err)
-            reject(err);
-          }
-          console.log([...tags]);
-          this.tags = [...tags];
-          resolve();
-        })
-      }),
-      new Promise((resolve, reject) => {
-        this.socket.emit('find.playlist', { page: (this.currentPage - 1), search: this.search, tag: this.showTag }, (err: string | null, items: SongPlaylistInterface[], count: number) => {
-          if (err) {
-            error(err)
-            reject(err);
-          }
-          for (let item of items) {
-            item.startTime = item.startTime ? item.startTime : 0
-            item.endTime = item.endTime ? item.endTime : item.length
-          }
-          this.count = count;
-          this.items = items;
-          resolve();
-        })
-      }),
-    ]);
-    this.state.loading = this.$state.success;
-    if (this.showTag && !this.tags.includes(this.showTag)) {
-      this.showTag = null;
-    }
-  }
+    watch([currentPage, search], () => {
+      refreshPlaylist()
+    })
 
-  generateThumbnail(videoId: string) {
-    return `https://img.youtube.com/vi/${videoId}/1.jpg`
-  }
-
-  stopImport() {
-    if (this.state.import === 1) {
-      this.state.import = 0
-      this.socket.emit('stop.import', () => {
-        this.refreshPlaylist()
-      })
-    }
-  }
-
-  addSongOrPlaylist(evt: Event) {
-    if (evt) {
-      evt.preventDefault()
-    }
-    if (this.state.import === 0) {
-      this.state.import = 1
-      this.socket.emit(this.toAdd.includes('playlist') ? 'import.playlist' : 'import.video', { playlist: this.toAdd, forcedTag: this.showTag }, (err: string | null, info: (CommandResponse & { imported: number; skipped: number })[]) => {
-        if (err) {
-          this.state.import = 3
-          setTimeout(() => {
-            this.importInfo = ''
-            this.state.import = 0
-          }, 2000)
-        } else {
-          this.state.import = 2
-          this.refreshPlaylist()
-          this.toAdd = ''
-          this.showImportInfo(info[0])
-        }
-      })
-    }
-  }
-
-  showImportInfo(info: { imported: number; skipped: number }) {
-    this.importInfo = `Imported: ${info.imported}, Skipped: ${info.skipped}`
-    setTimeout(() => {
-      this.importInfo = ''
-      this.state.import = 0
-    }, 2000)
-  }
-
-  getVariant(type: string) {
-    const variants = [ "primary", "secondary", "success", "danger", "warning", "info", "light", "dark" ]
-    if (labelToVariant.has(type)) {
-      return labelToVariant.get(type);
-    } else {
-      if (lastVariant === -1 || lastVariant === variants.length - 1) {
-        lastVariant = 0;
+    const refreshPlaylist = async () => {
+      await Promise.all([
+        new Promise((resolve, reject) => {
+          socket.emit('current.playlist.tag', (err: string | null, tag: string) => {
+            if (err) {
+              error(err)
+              reject(err);
+            }
+            currentTag.value = tag;
+            resolve();
+          })
+        }),
+        new Promise((resolve, reject) => {
+          socket.emit('get.playlist.tags', (err: string | null, _tags: string[]) => {
+            if (err) {
+              error(err)
+              reject(err);
+            }
+            tags.value = [..._tags];
+            resolve();
+          })
+        }),
+        new Promise((resolve, reject) => {
+          socket.emit('find.playlist', { page: (currentPage.value - 1), search: search.value, tag: showTag.value }, (err: string | null, _items: SongPlaylistInterface[], _count: number) => {
+            if (err) {
+              error(err)
+              reject(err);
+            }
+            for (let item of _items) {
+              item.startTime = item.startTime ? item.startTime : 0
+              item.endTime = item.endTime ? item.endTime : item.length
+            }
+            count.value = _count;
+            items.value = _items;
+            resolve();
+          })
+        }),
+      ]);
+      state.value.loading = ButtonStates.success;
+      if (showTag.value && !tags.value.includes(showTag.value)) {
+        showTag.value = null;
       }
-      labelToVariant.set(type, variants[lastVariant]);
-      lastVariant++
-      return labelToVariant.get(type);
     }
-  }
 
-  updateItem(videoId: string) {
-    this.state.save = 1
+    const generateThumbnail = (videoId: string) => {
+      return `https://img.youtube.com/vi/${videoId}/1.jpg`
+    }
 
-    let item = this.items.find((o) => o.videoId === videoId)
-    if (item) {
-      item.volume = Number(item.volume)
-      item.startTime = Number(item.startTime)
-      item.endTime = Number(item.endTime)
-      this.socket.emit('songs::save', item, (err: string | null) => {
-        if (err) {
-          console.error(err)
-          return this.state.save = 3
+    const stopImport = () => {
+      if (state.value.import === 1) {
+        state.value.import = 0
+        socket.emit('stop.import', () => {
+          refreshPlaylist()
+        })
+      }
+    }
+
+    const addSongOrPlaylist = (evt: Event) => {
+      if (evt) {
+        evt.preventDefault()
+      }
+      if (state.value.import === 0) {
+        state.value.import = 1
+        socket.emit(toAdd.value.includes('playlist') ? 'import.playlist' : 'import.video', { playlist: toAdd.value, forcedTag: showTag.value }, (err: string | null, info: (CommandResponse & { imported: number; skipped: number })[]) => {
+          if (err) {
+            state.value.import = 3
+            setTimeout(() => {
+              importInfo.value = ''
+              state.value.import = 0
+            }, 2000)
+          } else {
+            state.value.import = 2
+            refreshPlaylist()
+            toAdd.value = ''
+            showImportInfo(info[0])
+          }
+        })
+      }
+    }
+
+    const showImportInfo = (info: { imported: number; skipped: number }) => {
+      importInfo.value = `Imported: ${info.imported}, Skipped: ${info.skipped}`
+      setTimeout(() => {
+        importInfo.value = ''
+        state.value.import = 0
+      }, 2000)
+    }
+
+    const getVariant = (type: string) => {
+      const variants = [ "primary", "secondary", "success", "danger", "warning", "info", "light", "dark" ]
+      if (labelToVariant.has(type)) {
+        return labelToVariant.get(type);
+      } else {
+        if (lastVariant === -1 || lastVariant === variants.length - 1) {
+          lastVariant = 0;
         }
-        this.state.save = 2
-        this.refreshPlaylist();
-        setTimeout(() => {
-          this.state.save = 0
-        }, 1000)
-      })
+        labelToVariant.set(type, variants[lastVariant]);
+        lastVariant++
+        return labelToVariant.get(type);
+      }
     }
-  }
 
-  deleteItem(id: string) {
-    if (confirm('Do you want to delete song ' + this.items.find(o => o.videoId === id)?.title + '?')) {
-      this.socket.emit('delete.ban', id, () => {
-        this.items = this.items.filter((o) => o.videoId !== id)
-      })
+    const updateItem = (videoId: string) => {
+      state.value.save = 1
+
+      let item = items.value.find((o) => o.videoId === videoId)
+      if (item) {
+        item.volume = Number(item.volume)
+        item.startTime = Number(item.startTime)
+        item.endTime = Number(item.endTime)
+        socket.emit('songs::save', item, (err: string | null) => {
+          if (err) {
+            console.error(err)
+            return state.value.save = 3
+          }
+          state.value.save = 2
+          refreshPlaylist();
+          setTimeout(() => {
+            state.value.save = 0
+          }, 1000)
+        })
+      }
+    }
+
+    const deleteItem = (id: string) => {
+      if (confirm('Do you want to delete song ' + items.value.find(o => o.videoId === id)?.title + '?')) {
+        socket.emit('delete.ban', id, () => {
+          items.value = items.value.filter((o) => o.videoId !== id)
+        })
+      }
+    }
+
+    return {
+      items,
+      fItems,
+      search,
+      toAdd,
+      importInfo,
+      state,
+      showTag,
+      currentTag,
+      tags,
+      fields,
+      currentPage,
+      perPage,
+      count,
+
+      generateThumbnail,
+      stopImport,
+      addSongOrPlaylist,
+      getVariant,
+      updateItem,
+      deleteItem,
+
+      ButtonStates,
+      translate,
     }
   }
-}
+});
 </script>
 
 <style>
