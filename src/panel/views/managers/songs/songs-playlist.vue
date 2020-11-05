@@ -289,7 +289,7 @@ export default defineComponent({
       }
       if (state.value.import === 0) {
         state.value.import = 1
-        socket.emit(toAdd.value.includes('playlist') ? 'import.playlist' : 'import.video', { playlist: toAdd.value, forcedTag: showTag.value }, (err: string | null, info: (CommandResponse & { imported: number; skipped: number })[]) => {
+        socket.emit(toAdd.value.includes('playlist') ? 'import.playlist' : 'import.video', { playlist: toAdd.value, forcedTag: showTag.value }, (err: string | null, info: (CommandResponse)[]) => {
           if (err) {
             state.value.import = 3
             setTimeout(() => {
@@ -306,8 +306,8 @@ export default defineComponent({
       }
     }
 
-    const showImportInfo = (info: { imported: number; skipped: number }) => {
-      importInfo.value = `Imported: ${info.imported}, Skipped: ${info.skipped}`
+    const showImportInfo = async (info: CommandResponse) => {
+      importInfo.value = 'OK';
       setTimeout(() => {
         importInfo.value = ''
         state.value.import = 0

@@ -946,7 +946,7 @@
   },
   "songs": {
     "playlist-is-empty": "$sender, playlist to import is empty",
-    "playlist-imported": "$sender, imported $imported and skipped $skipped from playlist",
+    "playlist-imported": "$sender, imported $imported and skipped $skipped to playlist",
     "not-playing": "Not Playing",
     "song-was-banned": "Song $name was banned and will never play again!",
     "song-was-banned-timeout-message": "You've got timeout for posting banned song",
@@ -955,6 +955,7 @@
     "no-song-is-currently-playing": "No song is currently playing",
     "current-song-from-playlist": "Current song is $name from playlist",
     "current-song-from-songrequest": "Current song is $name requested by $username",
+    "songrequest-disabled": "Sorry, $sender, song requests are disabled",
     "song-is-banned": "Sorry, $sender, but this song is banned",
     "youtube-is-not-responding-correctly": "Sorry, $sender, but YouTube is sending unexpected responses, please try again later.",
     "song-was-not-found": "Sorry, $sender, but this song was not found",

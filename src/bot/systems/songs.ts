@@ -469,7 +469,7 @@ class Songs extends System {
       const currentSong = JSON.parse(this.currentSong);
       return this.addSongToPlaylist({ sender: getBotSender(), parameters: currentSong.videoID, attr: {}, createdAt: Date.now(), command: '' });
     } catch (err) {
-      return [{ response: translate('songs.noCurrentSong'), ...opts }];
+      return [{ response: translate('songs.no-song-is-currently-playing'), ...opts }];
     }
   }
 
@@ -515,7 +515,7 @@ class Songs extends System {
       if (this.songrequest) {
         return [{ response: translate('core.usage') + ': !songrequest <video-id|video-url|search-string>', ...opts }];
       } else {
-        return [{ response: '$sender, ' + translate('core.settings.songs.songrequest.false'), ...opts }];
+        return [{ response: '$sender, ' + translate('songs.songrequest-disabled'), ...opts }];
       }
     }
 
@@ -608,7 +608,7 @@ class Songs extends System {
 
   @command('!playlist add')
   @default_permission(permission.CASTERS)
-  async addSongToPlaylist (opts: CommandOptions): Promise<(CommandResponse & { imported: number; skipped: number })[]> {
+  async addSongToPlaylist (opts: CommandOptions): Promise<CommandResponse[]> {
     if (_.isNil(opts.parameters)) {
       return [];
     }
@@ -617,22 +617,26 @@ class Songs extends System {
     const match = opts.parameters.match(urlRegex);
     const id = (match && match[1].length === 11) ? match[1] : opts.parameters;
 
-    let imported = 0;
-    let done = 0;
-
     const idsFromDB = (await getRepository(SongPlaylist).find()).map(o => o.videoId);
     const banFromDb = (await getRepository(SongBan).find()).map(o => o.videoId);
 
     if (idsFromDB.includes(id)) {
       info(`=> Skipped ${id} - Already in playlist`);
-      done++;
+      return [{
+        response: prepare('songs.song-is-already-in-playlist', { 
+          name: (await getRepository(SongPlaylist).findOneOrFail({videoId: id})).title,
+        }), ...opts,
+      }];
     } else if (banFromDb.includes(id)) {
       info(`=> Skipped ${id} - Song is banned`);
-      done++;
+      return [{
+        response: prepare('songs.song-is-banned', { 
+          name: (await getRepository(SongPlaylist).findOneOrFail({videoId: id})).title,
+        }), ...opts,
+      }];
     } else {
-      try {
-        done++;
-        const videoInfo = await ytdl.getInfo('https://www.youtube.com/watch?v=' + id);
+      const videoInfo = await ytdl.getInfo('https://www.youtube.com/watch?v=' + id);
+      if (videoInfo) {
         info(`=> Imported ${id} - ${videoInfo.videoDetails.title}`);
         getRepository(SongPlaylist).save({
           videoId: id,
@@ -646,30 +650,13 @@ class Songs extends System {
           tags: [ opts.attr.forcedTag ? opts.attr.forcedTag : this.currentTag ],
           endTime: Number(videoInfo.videoDetails.lengthSeconds),
         });
-        imported++;
-      } catch (e) {
-        error(`=> Skipped ${id} - ${e.message}`);
+        this.refreshPlaylistVolume();
+        this.getMeanLoudness();
+        return [{ response: prepare('songs.song-was-added-to-playlist', { name: videoInfo.videoDetails.title }), ...opts }];
+      } else {
+        return [{ response: translate('songs.youtube-is-not-responding-correctly'), ...opts }];
       }
     }
-
-    const waitForImport = function () {
-      return new Promise((resolve) => {
-        const check = () => {
-          if (done === 1) {
-            resolve();
-          } else {
-            setTimeout(() => check(), 500);
-          }
-        };
-        check();
-      });
-    };
-
-    await waitForImport();
-
-    this.refreshPlaylistVolume();
-    this.getMeanLoudness();
-    return [{ response: prepare('songs.playlist-imported', { imported, skipped: done - imported }), imported, skipped: done - imported, ...opts }];
   }
 
   @command('!playlist remove')

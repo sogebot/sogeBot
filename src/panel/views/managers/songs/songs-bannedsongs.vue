@@ -124,7 +124,7 @@ export default defineComponent({
     }
 
     const showImportInfo = async (info: CommandResponse[]) => {
-      importInfo.value = await info[0].response;
+      importInfo.value = 'BANNED!';
       setTimeout(() => {
         importInfo.value = ''
         state.value.import = 0
