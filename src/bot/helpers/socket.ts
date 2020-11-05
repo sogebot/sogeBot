@@ -49,8 +49,8 @@ function adminEndpoint (
 // string + cb
 function adminEndpoint (
   nsp: string,
-  on: 'chat.message.send' | 'import.ban' | 'import.video' | 'songs::removeRequest' | 'delete.playlist' | 'delete.ban'
-  | 'import.playlist' | 'raffle::getWinner' | 'raffle::open' | 'parseCron'
+  on: 'chat.message.send' | 'import.ban' | 'songs::removeRequest' | 'delete.playlist' | 'delete.ban'
+  | 'raffle::getWinner' | 'raffle::open' | 'parseCron'
   | 'commands::resetCountByCommand' | 'bets::close' | 'spotify::code',
   callback: (string: string, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 
@@ -120,6 +120,10 @@ function adminEndpoint (nsp: string, on: 'pubg::searchForseasonId', callback: (o
 function adminEndpoint (nsp: string, on: 'pubg::getUserStats', callback: (opts: { apiKey: string, platform: typeof PUBG.platform, playerId: string, seasonId: string, ranked: boolean }, cb: (error: Error | string | null, data: any) => void, socket: SocketIO.Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'pubg::exampleParse', callback: (opts: { text: string }, cb: (error: Error | string | null, data: any) => void, socket: SocketIO.Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'alerts::areAlertsMuted', callback: (areAlertsMuted: boolean, cb: (error: Error | string | null, data: any) => void, socket: SocketIO.Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'import.playlist', callback: (otps: {playlist: string, forcedTag: string}, cb: (error: Error | string | null, data: any) => void, socket: SocketIO.Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'import.video', callback: (opts: {playlist: string, forcedTag: string}, cb: (error: Error | string | null, data: any) => void, socket: SocketIO.Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'get.playlist.tags', callback: (cb: (error: Error | string | null, data: string[]) => void, socket: SocketIO.Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'set.playlist.tag', callback: (tag:string, socket: SocketIO.Socket) => void): void;
 
 // generic functions
 function adminEndpoint (nsp: string, on: string, callback: (opts: { [x: string]: any }, cb?: (error: Error | string | null, ...response: any) => void) => void, socket?: SocketIO.Socket): void;

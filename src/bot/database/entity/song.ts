@@ -6,6 +6,7 @@ export interface SongPlaylistInterface {
   lastPlayedAt?: number;
   seed: number;
   title: string;
+  tags: string[];
   loudness: number;
   length: number;
   forceVolume?: boolean;
@@ -35,6 +36,7 @@ export const SongPlaylist = new EntitySchema<Readonly<Required<SongPlaylistInter
     lastPlayedAt: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
     seed: { type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined  },
     title: { type: String },
+    tags: { type: 'simple-array' },
     loudness: { type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined  },
     length: { type: Number },
     volume: { type: Number },

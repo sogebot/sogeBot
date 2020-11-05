@@ -17,11 +17,11 @@
 
     <panel search @search="search = $event">
       <template v-slot:left>
-        <b-form inline @submit="addSongOrPlaylist">
+        <b-form inline @submit="addSong">
           <b-input-group>
-            <b-input input type="text" class="form-control w-auto col-6" v-model="toAdd" placeholder="Paste your youtube link, id or playlist link" />
+            <b-input input type="text" class="form-control w-auto col-6" v-model="toAdd" placeholder="Paste your youtube link, id" />
             <b-input-group-append>
-              <b-button type="submit" v-if="state.import == 0" variant="primary" class="btn mr-2" v-on:click="addSongOrPlaylist()">
+              <b-button type="submit" v-if="state.import == 0" variant="primary" class="btn mr-2" v-on:click="addSong()">
                 <fa icon="plus"></fa> {{ translate('systems.songs.add_song') }}</b-button>
               <b-button v-else-if="state.import == 1" class="btn mr-2" variant="info" disabled="disabled">
                 <fa icon="circle-notch" spin></fa> {{ translate('systems.songs.importing') }}</b-button>
@@ -34,7 +34,7 @@
       </template>
     </panel>
 
-    <loading v-if="state.loading !== $state.success"/>
+    <loading v-if="state.loading !== ButtonStates.success"/>
     <b-table v-else striped small :items="fItems" :fields="fields" class="table-p-0">
       <template v-slot:cell(thumbnail)="data">
         <img class="float-left pr-3" v-bind:src="generateThumbnail(data.item.videoId)">
@@ -46,10 +46,9 @@
         <div class="float-right pr-2" style="width: max-content !important;">
           <button-with-icon class="btn-only-icon btn-secondary btn-reverse" icon="link" :href="'http://youtu.be/' + data.item.videoId">
           </button-with-icon>
-          <hold-button @trigger="deleteItem(data.item.videoId)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
-            <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-            <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
-          </hold-button>
+          <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="deleteItem(data.item.videoId)">
+            {{ translate('dialog.buttons.delete') }}
+          </button-with-icon>
         </div>
       </template>
     </b-table>
@@ -59,96 +58,124 @@
 <script lang="ts">
 import { getSocket } from 'src/panel/helpers/socket';
 
-import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
+import { defineComponent, ref, onMounted, computed } from '@vue/composition-api'
 import { isNil } from 'lodash-es';
 import { escape } from 'xregexp';
 import { SongBanInterface } from 'src/bot/database/entity/song';
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import translate from 'src/panel/helpers/translate';
+import { error } from 'src/panel/helpers/error';
 
-@Component({
+const socket = getSocket('/systems/songs');
+
+export default defineComponent({
   components: {
-    loading: () => import('../../../components/loading.vue'),
-    'hold-button': () => import('../../../components/holdButton.vue'),
-  }
-})
-export default class playlist extends Vue {
-  socket = getSocket('/systems/songs');
+    'loading': () => import('src/panel/components/loading.vue'),
+  },
+  setup() {
+    const items = ref([] as SongBanInterface[]);
+    const search = ref('');
+    const toAdd = ref('');
+    const importInfo = ref('');
 
-  items: SongBanInterface[] = [];
-  search: string = '';
-  toAdd: string = '';
-  importInfo: string = '';
-  state: {
-    loading: number;
-    import: number;
-  } = {
-    loading: this.$state.progress,
-    import: this.$state.idle,
-  }
-
-  fields = [
-    { key: 'thumbnail', label: '', tdClass: 'fitThumbnail' },
-    { key: 'title', label: '' },
-    { key: 'buttons', label: '' },
-  ];
-
-  get fItems() {
-    if (this.search.length === 0) return this.items
-    return this.items.filter((o) => {
-      const isSearchInTitle = !isNil(o.title.match(new RegExp(escape(this.search), 'ig')))
-      return isSearchInTitle
+    const state = ref({
+      loading: ButtonStates.progress,
+      import: ButtonStates.idle,
+    } as {
+      loading: number;
+      import: number;
     })
-  }
 
-  created() {
-    this.refreshBanlist()
-  }
+    const fields = [
+      { key: 'thumbnail', label: '', tdClass: 'fitThumbnail' },
+      { key: 'title', label: '' },
+      { key: 'buttons', label: '' },
+    ];
 
-  refreshBanlist() {
-    this.state.loading = this.$state.progress;
-    this.socket.emit('songs::getAllBanned', {}, (err: string | null, items: SongBanInterface[]) => {
-      this.items = items
-      this.state.loading = this.$state.success;
-    })
-  }
+    const fItems = computed(() => {
+      if (search.value.length === 0) return items.value
+      return items.value.filter((o) => {
+        const isSearchInTitle = !isNil(o.title.match(new RegExp(escape(search.value), 'ig')))
+        return isSearchInTitle
+      })
+    });
 
-  generateThumbnail(videoId: string) {
-    return `https://img.youtube.com/vi/${videoId}/1.jpg`
-  }
+    onMounted(() => {
+      refreshBanlist()
+    });
 
-  deleteItem(id: string) {
-    this.socket.emit('delete.ban', id, () => {
-      this.items = this.items.filter((o) => o.videoId !== id)
-    })
-  }
-
-  showImportInfo(info: { banned: number }) {
-    this.importInfo = `Banned: ${info.banned}`
-    setTimeout(() => {
-      this.importInfo = ''
-      this.state.import = 0
-    }, 5000)
-  }
-
-  addSongOrPlaylist(evt: Event) {
-    if (evt) {
-      evt.preventDefault()
-    }
-    if (this.state.import === 0) {
-      this.state.import = 1
-      this.socket.emit('import.ban', this.toAdd, (err: string | null, info: { banned: number }) => {
-        this.state.import = 2
-        this.refreshBanlist()
-        this.toAdd = ''
-        this.showImportInfo(info)
+    const refreshBanlist = () => {
+      socket.emit('songs::getAllBanned', {}, (err: string | null, getAllBanned: SongBanInterface[]) => {
+        items.value = getAllBanned;
+        state.value.loading = ButtonStates.success;
       })
     }
-  }
 
-  linkTo(item: SongBanInterface) {
-    console.debug('Clicked', item.videoId);
-    window.location.href = `http://youtu.be/${item.videoId}`;
+    const generateThumbnail = (videoId: string) => {
+      return `https://img.youtube.com/vi/${videoId}/1.jpg`
+    }
+
+    const deleteItem = (id: string) => {
+      if (confirm('Do you want to delete banned song ' + items.value.find(o => o.videoId === id)?.title + '?')) {
+        socket.emit('delete.ban', id, () => {
+          items.value = items.value.filter((o) => o.videoId !== id)
+        })
+      }
+    }
+
+    const showImportInfo = async () => {
+      importInfo.value = 'BANNED!';
+      setTimeout(() => {
+        importInfo.value = ''
+        state.value.import = 0
+      }, 5000)
+    }
+
+    const addSong = (evt: Event) => {
+      if (evt) {
+        evt.preventDefault()
+      }
+      if (state.value.import === 0) {
+        state.value.import = 1
+        socket.emit('import.ban', toAdd.value, (err: string | null, info: CommandResponse[]) => {
+          if (err) {
+            toAdd.value = ''
+            importInfo.value = ''
+            state.value.import = 0
+            return error(err);
+          }
+          state.value.import = 2
+          refreshBanlist()
+          toAdd.value = ''
+          showImportInfo()
+        })
+      }
+    }
+
+    const linkTo = (item: SongBanInterface) => {
+      console.debug('Clicked', item.videoId);
+      window.location.href = `http://youtu.be/${item.videoId}`;
+    }
+
+    return {
+      fItems,
+      fields,
+      state,
+      search,
+      importInfo,
+      toAdd,
+
+      generateThumbnail,
+      deleteItem,
+      showImportInfo,
+      addSong,
+      linkTo,
+
+      translate,
+      ButtonStates,
+    }
   }
-}
+});
 </script>
 
 <style>
