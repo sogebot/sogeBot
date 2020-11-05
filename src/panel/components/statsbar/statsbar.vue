@@ -445,7 +445,7 @@ let interval = 0;
 let UIErrorInterval = 0;
 let widthOfMenuInterval = 0;
 
-import { defineComponent, ref, onMounted, onUnmounted, computed, reactive, ComputedRef } from '@vue/composition-api'
+import { defineComponent, ref, onMounted, onUnmounted, computed, reactive, ComputedRef, watch } from '@vue/composition-api'
 import type { Ref } from '@vue/composition-api'
 import { getTime } from 'src/bot/helpers/getTime';
 
@@ -504,6 +504,10 @@ export default defineComponent({
     // $refs
     const quickwindow = ref(null);
 
+    watch(isStreamOnline, () => {
+      getLatestStats();
+    })
+
     const widthOfMenuUpdate = () => {
       top.value = (quickwindow.value as unknown as HTMLElement).getBoundingClientRect().right < 900 ? '80' : '50';
     }
@@ -553,6 +557,19 @@ export default defineComponent({
       hideStats.value = !hideStats.value
       localStorage.setItem('hideStats', String(hideStats.value))
     };
+    const getLatestStats = () => {
+      socket.emit('getLatestStats', (err: string | null, data: any) => {
+        console.groupCollapsed('navbar::getLatestStats')
+        if (err) {
+          return console.error(err);
+        }
+        console.log(data);
+        console.groupEnd();
+        for (const key of Object.keys(data)) {
+          averageStats[key] = data[key];
+        }
+      });
+    }
 
     onMounted(() => {
       widthOfMenuInterval = window.setInterval(() => {
@@ -615,17 +632,7 @@ export default defineComponent({
         errors.value.push({ ...err, date: Date.now() });
       })
 
-      socket.emit('getLatestStats', (err: string | null, data: any) => {
-        console.groupCollapsed('navbar::getLatestStats')
-        if (err) {
-          return console.error(err);
-        }
-        console.log(data);
-        console.groupEnd();
-        for (const key of Object.keys(data)) {
-          averageStats[key] = data[key];
-        }
-      });
+      getLatestStats();
 
       socket.emit('panel::resetStatsState');
       socket.on('panel::stats', async (data: Record<string, any>) => {
