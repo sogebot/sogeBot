@@ -941,7 +941,7 @@
   },
   "songs": {
     "playlist-is-empty": "$sender, seznam skladeb k importu je prázdný",
-    "playlist-imported": "$sender, imported $imported and skipped $skipped to playlist",
+    "playlist-imported": "$sender, importováno $imported a přeskočeno $skipped do seznamu skladeb",
     "not-playing": "Nic nehraje",
     "song-was-banned": "Pisen $name byla zabanovana a nebude uz nikdy hrat!",
     "song-was-banned-timeout-message": "Dostal si timeout za zabanovanou skladbu",
@@ -950,7 +950,7 @@
     "no-song-is-currently-playing": "Žádné skladby momentálně nehrají",
     "current-song-from-playlist": "Aktuální skladba je $name ze seznamu skladeb",
     "current-song-from-songrequest": "Aktuální skladba je $name požadovaná uživatelem $username",
-    "songrequest-disabled": "Sorry, $sender, song requests are disabled",
+    "songrequest-disabled": "Omlouváme se, $sender, požadavky na skladbu jsou vypnuty.",
     "song-is-banned": "Omlouváme se, $sender, ale tato skladba je zakázána",
     "youtube-is-not-responding-correctly": "Omlouváme se, $sender, ale YouTube odesílá neočekávané odpovědi, zkuste to prosím později.",
     "song-was-not-found": "Omlouváme se, $sender, ale tato skladba nebyla nalezena",
@@ -961,10 +961,10 @@
     "song-is-already-in-playlist": "$sender, skladba $name je již v seznamu skladeb",
     "song-was-removed-from-playlist": "$sender, skladba $name byla odebrána ze seznamu skladeb",
     "song-was-removed-from-queue": "$sender, vaše skladba $name byla odebrána z fronty",
-    "playlist-current": "$sender, current playlist is $playlist.",
-    "playlist-list": "$sender, available playlists: $list.",
-    "playlist-not-exist": "$sender, your requested playlist $playlist doesn't exist.",
-    "playlist-set": "$sender, you changed playlist to $playlist."
+    "playlist-current": "$sender, aktuální seznam skladeb je $playlist.",
+    "playlist-list": "$sender, dostupné seznamy skladeb: $list.",
+    "playlist-not-exist": "$sender, Váš požadovaný seznam skladeb $playlist neexistuje.",
+    "playlist-set": "$sender, změnili jste seznam skladeb na $playlist."
   },
   "price": {
     "price-parse-failed": "{core.command-parse} !price",
