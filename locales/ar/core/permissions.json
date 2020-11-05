@@ -1,0 +1,8 @@
+{
+  "list": "قائمة الصلاحيات:",
+  "excludeAddSuccessful": "$sender، لقد أضفت $username لقائمة استبعاد الصلاحيات $permissionName",
+  "excludeRmSuccessful": "$sender، لقد قمت بإزالة $username من قائمة استبعاد الصلاحيات $permissionName",
+  "userNotFound": "$sender، المستخدم $username لم يتم العثور على قاعدة البيانات.",
+  "permissionNotFound": "$sender، لم يتم العثور على إذن $userlevel في قاعدة البيانات.",
+  "cannotIgnoreForCorePermission": "$sender، لا يمكنك إستبعاد المستخدم يدوياً للإذن الأساسي $userlevel"
+}

@@ -1,0 +1,5 @@
+{
+  "error": "$sender, $game not found in db.",
+  "game": "$sender, $game | Main: $currentMain/$hltbMainh - $percentMain% | Main+Extra: $currentMainExtra/$hltbMainExtrah - $percentMainExtra% | Completionist: $currentCompletionist/$hltbCompletionisth - $percentCompletionist%",
+  "multiplayer-game": "$sender, $game | Main: $currentMainh | Main+Extra: $currentMainExtrah | Completionist: $currentCompletionisth"
+}

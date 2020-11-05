@@ -1,0 +1,10 @@
+{
+  "usage": "Usage",
+  "command": "Command",
+  "hour": "Hour",
+  "day": "Day",
+  "week": "Week",
+  "month": "Month",
+  "year": "Year",
+  "total": "Total"
+}

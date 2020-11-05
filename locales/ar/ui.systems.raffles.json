@@ -1,0 +1,41 @@
+{
+  "widget": {
+    "subscribers-luck": "Subscribers luck",
+    "followers-luck": "Followers luck"
+  },
+  "settings": {
+    "enabled": "Status",
+    "announceNewEntries": {
+      "title": "Announce new entries",
+      "help": "If users joins raffle, announce message will be send to chat after while."
+    },
+    "announceNewEntriesBatchTime": {
+      "title": "How long to wait before announce new entries (in seconds)",
+      "help": "Longer time will keep chat cleaner, entries will be aggregated together."
+    },
+    "deleteRaffleJoinCommands": {
+      "title": "Delete user raffle join command",
+      "help": "This will delete user message if they use !yourraffle command. Should keep chat cleaner."
+    },
+    "allowOverTicketing": {
+      "title": "Allow over ticketing",
+      "help": "Allow user join raffle with over ticket of his points. E.g. user have 10 points but can join with !raffle 100 which will use all of his points."
+    },
+    "raffleAnnounceInterval": {
+      "title": "Announce interval",
+      "help": "in minutes"
+    },
+    "raffleAnnounceMessageInterval": {
+      "title": "Announce message interval",
+      "help": "How many messages must be sent to chat until announce can be posted."
+    },
+    "subscribersPercent": {
+      "title": "Additional subscribers luck",
+      "help": "in percents"
+    },
+    "followersPercent": {
+      "title": "Additional followers luck",
+      "help": "in percents"
+    }
+  }
+}

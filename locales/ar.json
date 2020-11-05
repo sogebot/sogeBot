@@ -1,47 +1,47 @@
 {
   "core": {
-    "loaded": "est chargé et",
-    "enabled": "activé",
-    "disabled": "désactivé",
-    "usage": "Utilisation",
-    "lang-selected": "La langue du bot est actuellement définie en français",
-    "command-parse": "Désolé, $sender, mais cette commande n'est pas correcte, utilisez",
-    "error": "Désolé, $sender, mais une erreur s'est produite !",
+    "loaded": "is loaded and",
+    "enabled": "مفعّل",
+    "disabled": "معطّل",
+    "usage": "الإستخدام",
+    "lang-selected": "تم تعيين لغة البوت حاليا إلى اللغة العربية",
+    "command-parse": "عذراً، $sender، ولكن هذا الأمر غير صحيح، استخدم",
+    "error": "عذراً، $sender، لكن حدث خطأ ما!",
     "no-response": "",
     "no-response-bool": {
       "true": "",
       "false": ""
     },
     "api": {
-      "error": "$sender, l'API ne répond pas correctement !",
-      "not-available": "indisponible"
+      "error": "$sender, API is not responding correctly!",
+      "not-available": "not available"
     },
     "percentage": {
       "true": "",
       "false": ""
     },
-    "years": "année|années",
-    "months": "mois|mois",
-    "days": "jour|jours",
-    "hours": "heure|heures",
+    "years": "year|years",
+    "months": "month|months",
+    "days": "day|days",
+    "hours": "hour|hours",
     "minutes": "minute|minutes",
-    "seconds": "seconde|secondes",
+    "seconds": "second|seconds",
     "messages": "message|messages",
     "bits": "bit|bits",
-    "links": "lien|liens",
+    "links": "link|links",
     "entries": "entry|entries",
-    "empty": "vide",
-    "isRegistered": "$sender, vous ne pouvez pas utiliser !$keyword, car il est déjà utilisé pour une autre action !"
+    "empty": "empty",
+    "isRegistered": "$sender, you cannot use !$keyword, because is already in use for another action!"
   },
   "uptime": {
-    "online": "Le stream est en ligne pour (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)",
-    "offline": "Le stream est actuellement hors ligne pour (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
+    "online": "Stream is online for (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)",
+    "offline": "Stream is currently offline for (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
   },
   "webpanel": {
-    "this-system-is-disabled": "Ce système est désactivé",
-    "loading": "Chargement",
-    "this-may-take-a-while": "Ceci <strong>peut</strong> prendre un certain temps",
-    "display-as": "Afficher en tant que",
+    "this-system-is-disabled": "This system is disabled",
+    "loading": "Loading",
+    "this-may-take-a-while": "This <strong>may</strong> take a while",
+    "display-as": "Display as",
     "go-to-admin": "Go to Admin",
     "go-to-public": "Go to Public",
     "logout": "Logout",
@@ -50,36 +50,36 @@
     "remove-widget": "Remove <strong>$name</strong> widget",
     "join-channel": "Join bot to channel",
     "leave-channel": "Leave bot from channel",
-    "set-default": "Définir par défaut",
-    "add": "Ajouter",
+    "set-default": "Set default",
+    "add": "Add",
     "placeholders": {
-      "text-url-generator": "Collez votre texte ou html pour générer base64 ci-dessous et URL au-dessus",
-      "text-decode-base64": "Collez votre base64 pour générer l'URL et le texte ci-dessus",
-      "creditsSpeed": "Définir la vitesse de roulement des crédits, inférieur = plus rapide"
+      "text-url-generator": "Paste your text or html to generate base64 below and URL above",
+      "text-decode-base64": "Paste your base64 to generate URL and text above",
+      "creditsSpeed": "Set speed of credits rolling, lower = faster"
     },
     "custom-variables": {
-      "set-your-variables-to-watch-here": "Définissez vos variables à regarder ici",
+      "set-your-variables-to-watch-here": "Set your variables to watch here",
       "type": "type",
-      "unwatch": "Ne plus suivre",
-      "watch": "Voir",
+      "unwatch": "Unwatch",
+      "watch": "Watch",
       "options": "options",
-      "number": "numéro",
-      "text": "texte",
-      "options-placeholder": "option1, option2, option3, voici l'option 4",
-      "no-options-set": "Vous n'avez pas encore défini vos options"
+      "number": "number",
+      "text": "text",
+      "options-placeholder": "option1, option2, option3, here is option 4",
+      "no-options-set": "You didn't set your options yet"
     },
     "timers": {
       "title": "Timers",
       "timer": "Timer",
       "messages": "messages",
-      "seconds": "secondes",
+      "seconds": "seconds",
       "badges": {
-        "enabled": "Activé",
-        "disabled": "Désactivé"
+        "enabled": "Enabled",
+        "disabled": "Disabled"
       },
       "errors": {
-        "timer_name_must_be_compliant": "Cette valeur ne peut contenir que a-zA-Z09_",
-        "this_value_must_be_a_positive_number_or_0": "Cette valeur doit être un nombre positif ou 0",
+        "timer_name_must_be_compliant": "This value can contain only a-zA-Z09_",
+        "this_value_must_be_a_positive_number_or_0": "This value must be a positive number or 0",
         "value_cannot_be_empty": "Value cannot be empty"
       },
       "dialog": {
