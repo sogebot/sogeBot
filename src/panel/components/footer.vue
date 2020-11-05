@@ -22,9 +22,9 @@ function classNameMod(is: boolean) {
 }
 
 function classNameResponse(ms: number) {
-  if (ms >= 1500) {
+  if (ms >= 10000) {
     return 'alert-danger'
-  } else if (ms < 1500 && ms >= 800) {
+  } else if (ms < 10000 && ms >= 6000) {
     return 'alert-warning'
   } else {
     return 'alert-success'
