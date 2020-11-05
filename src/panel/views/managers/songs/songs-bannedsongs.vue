@@ -123,7 +123,7 @@ export default defineComponent({
       }
     }
 
-    const showImportInfo = async (info: CommandResponse[]) => {
+    const showImportInfo = async () => {
       importInfo.value = 'BANNED!';
       setTimeout(() => {
         importInfo.value = ''
@@ -147,7 +147,7 @@ export default defineComponent({
           state.value.import = 2
           refreshBanlist()
           toAdd.value = ''
-          showImportInfo(info)
+          showImportInfo()
         })
       }
     }

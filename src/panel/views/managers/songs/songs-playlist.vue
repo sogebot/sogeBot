@@ -300,13 +300,13 @@ export default defineComponent({
             state.value.import = 2
             refreshPlaylist()
             toAdd.value = ''
-            showImportInfo(info[0])
+            showImportInfo()
           }
         })
       }
     }
 
-    const showImportInfo = async (info: CommandResponse) => {
+    const showImportInfo = async () => {
       importInfo.value = 'OK';
       setTimeout(() => {
         importInfo.value = ''
