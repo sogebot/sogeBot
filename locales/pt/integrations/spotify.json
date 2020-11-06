@@ -9,5 +9,6 @@
   "no-songs-found-in-history": "$sender, there is currently no song in history list.",
   "return-one-song-from-history": "$sender, previous song was $name from $artist.",
   "return-multiple-song-from-history": "$sender, $count previous songs were:",
-  "return-multiple-song-from-history-item": "$index - $name from $artist"
+  "return-multiple-song-from-history-item": "$index - $name from $artist",
+  "song-notify": "Current playing song is $name by $artist."
 }
