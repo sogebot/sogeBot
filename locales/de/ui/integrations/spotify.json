@@ -25,6 +25,7 @@
       "title": "URI der Hauptwiedergabeliste von Spotify",
       "help": "Falls festgelegt, wird diese Playlist nach Abschluss des Song-Requests fortgesetzt"
     },
-    "continueOnPlaylistAfterRequest": "Wiedergabe der Playlist nach Song-Request fortsetzen"
+    "continueOnPlaylistAfterRequest": "Wiedergabe der Playlist nach Song-Request fortsetzen",
+    "notify": "Send message on song change"
   }
 }
