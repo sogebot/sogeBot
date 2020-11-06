@@ -5,7 +5,7 @@ import _ from 'lodash';
 import SpotifyWebApi from 'spotify-web-api-node';
 import { isMainThread } from '../cluster';
 
-import { prepare } from '../commons';
+import { announce, prepare } from '../commons';
 import { command, default_permission, settings, shared, ui } from '../decorators';
 import { onChange, onLoad, onStartup } from '../decorators/on';
 import Expects from '../expects';
@@ -33,6 +33,7 @@ type SpotifyTrack = {
  */
 
 let _spotify: any = null;
+let currentSongHash = '';
 
 class Spotify extends Integration {
   client: null | SpotifyWebApi = null;
@@ -56,6 +57,8 @@ class Spotify extends Integration {
   fetchCurrentSongWhenOffline = false;
   @settings()
   queueWhenOffline = false;
+  @settings()
+  notify = false;
 
   @settings('output')
   format = '$song - $artist';
@@ -125,6 +128,15 @@ class Spotify extends Integration {
           artists: currentSong.artists,
           uri: currentSong.uri,
         });
+
+        if (currentSongHash !== currentSongWithoutAttributes) {
+          currentSongHash = currentSongWithoutAttributes;
+          if (this.notify) {
+            const message = prepare('integrations.spotify.song-notify', { name: currentSong.song, artist: currentSong.artist });
+            announce(message, 'songs');
+          }
+        }
+
         if (!this.songsHistory.includes(currentSongWithoutAttributes)) {
           this.songsHistory.push(currentSongWithoutAttributes);
         }
@@ -132,6 +144,8 @@ class Spotify extends Integration {
         if (this.songsHistory.length > 11) {
           this.songsHistory.splice(0, 1);
         }
+      } else {
+        currentSongHash = '';
       }
     }, 5 * SECOND);
   }

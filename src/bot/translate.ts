@@ -5,7 +5,7 @@ import fs from 'fs';
 import _  from 'lodash';
 import { flatten } from './helpers/flatten';
 
-import { warning } from './helpers/log';
+import { error, warning } from './helpers/log';
 import { getRepository } from 'typeorm';
 import { Translation } from './database/entity/translation';
 import general from './general';
@@ -41,7 +41,12 @@ class Translate {
               continue;
             }
             const withoutLocales = f.replace('./locales/', '').replace('.json', '');
-            _.set(this.translations, withoutLocales.split('/').join('.'), JSON.parse(fs.readFileSync(f, 'utf8')));
+            try {
+              _.set(this.translations, withoutLocales.split('/').join('.'), JSON.parse(fs.readFileSync(f, 'utf8')));
+            } catch (e) {
+              error('Incorrect JSON file: ' + f);
+              error(e.stack);
+            }
           }
 
           // dayjs locale include
