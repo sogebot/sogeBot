@@ -25,6 +25,7 @@
       "title": "Spotify URI hlavního playlistu",
       "help": "Pokud bude nastaveno, po requestu bude hrát tento playlist"
     },
-    "continueOnPlaylistAfterRequest": "Pokračovat v přehrávání playlistu po požadavku na skladbu"
+    "continueOnPlaylistAfterRequest": "Pokračovat v přehrávání playlistu po požadavku na skladbu",
+    "notify": "Odeslat zprávu při změně skladby"
   }
 }

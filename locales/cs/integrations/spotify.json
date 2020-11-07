@@ -9,5 +9,6 @@
   "no-songs-found-in-history": "$sender, momentálně není žádná skladba v seznamu historie.",
   "return-one-song-from-history": "$sender, předchozí skladba byla $name od $artist.",
   "return-multiple-song-from-history": "$sender, $count předchozích skladeb bylo:",
-  "return-multiple-song-from-history-item": "$index - $name od $artist"
+  "return-multiple-song-from-history-item": "$index - $name od $artist",
+  "song-notify": "Aktuální přehrávaná skladba je $name od $artist."
 }

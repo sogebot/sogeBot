@@ -25,6 +25,7 @@
       "title": "Spotify URI главного плейлиста",
       "help": "Если установлено, по завершении заказанных песен этот плейлист будет продолжаться"
     },
-    "continueOnPlaylistAfterRequest": "Продолжить воспроизведение плейлиста после заказанных песен"
+    "continueOnPlaylistAfterRequest": "Продолжить воспроизведение плейлиста после заказанных песен",
+    "notify": "Send message on song change"
   }
 }

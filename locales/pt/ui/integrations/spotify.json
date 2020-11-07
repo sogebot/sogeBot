@@ -25,6 +25,7 @@
       "title": "Endereço da playlist principal do Spotify",
       "help": "Se definido, após a solicitação concluída, esta playlist continuará"
     },
-    "continueOnPlaylistAfterRequest": "Continuar tocando na playlist após solicitação de música"
+    "continueOnPlaylistAfterRequest": "Continuar tocando na playlist após solicitação de música",
+    "notify": "Send message on song change"
   }
 }
