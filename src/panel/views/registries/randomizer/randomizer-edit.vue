@@ -122,6 +122,16 @@
           b-table(striped small hover :items="orderBy(item.items, 'order')" :fields="fields" show-empty).m-0
             template(v-slot:empty="scope")
               b-alert(show).h-100.m-0.text-center {{translate('registry.randomizer.form.optionsAreEmpty')}}
+            template(v-slot:cell(drag)="data")
+              div(
+                v-if="!data.item.groupId"
+                style="cursor: grab"
+                @dragstart="dragstart(data.item.order, $event)"
+                @dragend="dragend(data.item.order, $event)"
+                @dragenter="dragenter(data.item.order, $event)"
+                draggable="true"
+              ).text-secondary
+                fa(icon="grip-vertical" fixed-width)
             template(v-slot:cell(name)="data")
               b-input(
                 v-model.trim="data.item.name"
@@ -166,7 +176,7 @@
             template(v-slot:cell(buttons)="data")
               div(style="width: max-content !important;").float-right
                 template(v-if="data.index > 0")
-                  b-button(variant="dark" v-if="!data.item.groupId" @click="data.item.groupId = item.items[data.index - 1].id")
+                  b-button(variant="dark" v-if="!data.item.groupId" @click="data.item.groupId = item.items.find(o=>o.order === data.item.order - 1).id")
                     | {{ translate('registry.randomizer.form.groupUp') }}
                   b-button(variant="light" v-else @click="data.item.groupId = null")
                     | {{ translate('registry.randomizer.form.ungroup') }}
@@ -250,7 +260,11 @@ export default class randomizerEdit extends Vue {
   psocket: SocketIOClient.Socket = getSocket('/core/permissions');
   socket: SocketIOClient.Socket =  getSocket('/registries/randomizer');
 
+  draggingItem: null | number = null;
+  alreadyCalculatedOrder = -1;
+
   fields = [
+    { key: 'drag', label: '' },
     { key: 'name', label: translate('registry.randomizer.form.name') },
     { key: 'color', label: translate('registry.randomizer.form.color') },
     { key: 'numOfDuplicates', label: translate('registry.randomizer.form.numOfDuplicates') },
@@ -506,6 +520,110 @@ export default class randomizerEdit extends Vue {
     setTimeout(() => {
       this.state.save = this.$state.idle;
     }, 1000)
+  }
+
+  isPartOfGroup(parentId: string, childId: string | null): boolean {
+    if (!childId) {
+      // not a part of any group or main parent
+      return false
+    }
+
+    const child = this.item.items.find(o => o.id === childId)
+    if (!child) {
+      // child not found
+      return false;
+    }
+
+    if (parentId === childId) {
+      return true;
+    } else {
+      // if is child of anotherr parent, check next
+      return this.isPartOfGroup(parentId, child.groupId);
+    }
+  }
+
+  getAllChildren(parentId: string): Required<RandomizerItemInterface>[] {
+    const children: Required<RandomizerItemInterface>[] = [];
+
+    let child: Required<RandomizerItemInterface> | undefined;
+    do {
+      child = this.item.items.find(o => o.groupId === parentId);
+      if (child) {
+        children.push(child);
+        parentId = child.id;
+      }
+    } while (typeof child !== 'undefined');
+
+    return children;
+  }
+
+  dragstart(order: number, e: DragEvent) {
+    this.draggingItem = order;
+    //this.$refs['item_' + order][0].style.opacity = 0.5;
+    e.dataTransfer?.setData('text/plain', 'dummy');
+  }
+  dragenter(newOrder: number, e: DragEvent) {
+    if (this.draggingItem !== null && this.alreadyCalculatedOrder !== newOrder && newOrder !== this.draggingItem) {
+      this.alreadyCalculatedOrder = newOrder
+      const value = this.item.items.find(o => o.order === this.draggingItem)
+      const entered = this.item.items.find(o => o.order === newOrder)
+      if (entered && value) {
+        // we want to jump only with parents
+        if (!this.isPartOfGroup(value.id, entered.groupId)) {
+          const draggingChildren = this.getAllChildren(value.id)
+          let dragOffset = draggingChildren.length;
+          const initialOrder = value.order;
+          if (initialOrder < newOrder) {
+            console.debug('move-item-down');
+            let offset = 0;
+            const itemsToUpdate: Required<RandomizerItemInterface>[] = [
+              value, ...this.getAllChildren(value.id)
+            ];
+            for (const item of this.item.items.filter(o => o.order <= newOrder && o.order >= initialOrder)) {
+              if (!itemsToUpdate.find(o => o.id === item.id)) {
+                if (!item.groupId) {
+                  console.debug('dragging-item-up - ' + item.name, item.order, item.order - itemsToUpdate.length);
+                  item.order = item.order - itemsToUpdate.length
+                  offset++;
+                  // we need to get children
+                  for (const child of this.getAllChildren(item.id)) {
+                    console.debug('dragging-item-up - ' + item.name, child.order, child.order - itemsToUpdate.length);
+                    child.order = child.order - itemsToUpdate.length;
+                    offset++;
+                  }
+                }
+              }
+            }
+            // we need to move down by offset
+            for(const item of itemsToUpdate) {
+              console.debug('dragging-item-down - ' + item.name, item.order, item.order + offset);
+              item.order = item.order + offset
+            }
+            console.debug('dragging-item-' + itemsToUpdate[0].order);
+            this.draggingItem = itemsToUpdate[0].order;
+          } else if (initialOrder > newOrder) {
+            console.debug('move-item-up');
+            // we are moving every parent after initialOrder + dragOffset up
+            const moveBy = initialOrder - newOrder;
+            for (const item of this.item.items.filter(o => o.order >= newOrder && o.order <= initialOrder + dragOffset)) {
+              if (item.order >= initialOrder) {
+                console.debug('dragging-item-up - ' + item.name, item.order, item.order - moveBy);
+                item.order = item.order - moveBy
+              } else {
+                // + 1 because at least parent is moving
+                console.debug('dragging-item-down - ' + item.name, item.order, item.order + dragOffset + 1);
+                item.order = item.order + dragOffset + 1
+              }
+            }
+            this.draggingItem = newOrder;
+          }
+        }
+      }
+      this.$forceUpdate()
+    }
+  }
+  dragend(order: number, e: DragEvent) {
+    this.alreadyCalculatedOrder = -1;
   }
 
   async created() {
