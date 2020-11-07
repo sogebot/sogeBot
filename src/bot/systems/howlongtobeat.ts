@@ -175,17 +175,16 @@ class HowLongToBeat extends System {
         } else {
           if (!notFoundGames.includes(api.stats.currentGame)) {
             warning(`HLTB: game '${api.stats.currentGame}' was not found on HLTB service ... retrying in a while`);
+            debug('hltb', `Adding game '${api.stats.currentGame}' to not found games.`);
+            notFoundGames.push(api.stats.currentGame);
+            // do one retry in a minute (we need to call it manually as game is already in notFoundGames)
+            setTimeout(() => {
+              this.addToGameTimestamp();
+            }, constants.MINUTE);
           } else {
+            // already retried
             warning(`HLTB: game '${api.stats.currentGame}' was not found on HLTB service ... skipping tracking this stream`);
           }
-        }
-        if (!notFoundGames.includes(api.stats.currentGame)) {
-          debug('hltb', `Adding game '${api.stats.currentGame}' to not found games.`);
-          notFoundGames.push(api.stats.currentGame);
-          // do one retry
-          setTimeout(() => {
-            this.addToGameTimestamp();
-          }, constants.MINUTE);
         }
       } else {
         error(e.stack);
