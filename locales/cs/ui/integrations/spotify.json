@@ -26,6 +26,6 @@
       "help": "Pokud bude nastaveno, po requestu bude hrát tento playlist"
     },
     "continueOnPlaylistAfterRequest": "Pokračovat v přehrávání playlistu po požadavku na skladbu",
-    "notify": "Send message on song change"
+    "notify": "Odeslat zprávu při změně skladby"
   }
 }
