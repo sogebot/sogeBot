@@ -20,6 +20,8 @@ import translate from 'src/panel/helpers/translate';
 
 @Component({})
 export default class textAreaFromArray extends Vue {
+  translate = translate;
+  
   @Prop() readonly value!: any;
   @Prop() readonly title!: string;
   @Prop() readonly readonly: any;
