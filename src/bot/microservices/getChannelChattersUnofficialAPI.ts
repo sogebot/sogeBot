@@ -21,7 +21,7 @@ import api from '../api';
 
 const isThreadingEnabled = process.env.THREAD !== '0';
 
-export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: boolean; partedUsers: string[]; joinedUsers: string[] }> => {
+export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: string[]; joinedUsers: string[] }> => {
   debug('microservice', 'getChannelChattersUnofficialAPI::isThreadingEnabled ' + isThreadingEnabled);
   debug('microservice', 'getChannelChattersUnofficialAPI::start');
   if (!isMainThread && isThreadingEnabled) {
@@ -49,7 +49,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
         }
       });
     });
-    return value as unknown as { modStatus: boolean; partedUsers: string[]; joinedUsers: string[] };
+    return value as unknown as { partedUsers: string[]; joinedUsers: string[] };
   }
   try {
     // lock thread
@@ -82,8 +82,6 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
     }
 
     const chatters: any[] = flatMap(request.data.chatters);
-    const modStatus = typeof bot !== 'undefined' && (request.data.chatters.moderators as string[]).map(o => o.toLowerCase()).includes(bot);
-
     const allOnlineUsers = await getAllOnlineUsernames();
 
     const partedUsers: string[] = [];
@@ -141,20 +139,20 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
     }
 
     if (!isMainThread) {
-      parentPort?.postMessage({ modStatus, partedUsers, joinedUsers });
+      parentPort?.postMessage({ partedUsers, joinedUsers });
     }
     debug('microservice', 'return::getChannelChattersUnofficialAPI');
-    debug('microservice', { modStatus, partedUsers, joinedUsers });
-    return { modStatus, partedUsers, joinedUsers };
+    debug('microservice', { partedUsers, joinedUsers });
+    return { partedUsers, joinedUsers };
   } catch (e) {
     warning('Microservice getChannelChattersUnofficialAPI ended with error');
     warning(e);
     if (!isMainThread) {
-      parentPort?.postMessage({ modStatus: false, partedUsers: [], joinedUsers: [] });
+      parentPort?.postMessage({ partedUsers: [], joinedUsers: [] });
     }
     debug('microservice', 'getChannelChattersUnofficialAPI::return');
-    debug('microservice', { modStatus: false, partedUsers: [], joinedUsers: [] });
-    return { modStatus: false, partedUsers: [], joinedUsers: [] };
+    debug('microservice', { partedUsers: [], joinedUsers: [] });
+    return {partedUsers: [], joinedUsers: [] };
   } finally {
     // free event
     await getManager()

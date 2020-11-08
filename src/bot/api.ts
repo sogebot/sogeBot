@@ -15,7 +15,7 @@ import { persistent } from './decorators';
 import { getChannelChattersUnofficialAPI } from './microservices/getChannelChattersUnofficialAPI';
 import { ThreadEvent } from './database/entity/threadEvent';
 
-import { getManager, getRepository, IsNull, Not } from 'typeorm';
+import { getManager, getRepository, In, IsNull, Not } from 'typeorm';
 import { User, UserInterface } from './database/entity/user';
 import { TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from './database/entity/twitch';
 import { CacheGames } from './database/entity/cacheGames';
@@ -272,6 +272,7 @@ class API extends Core {
     this.interval('getChannelInformation', constants.MINUTE);
     this.interval('checkClips', constants.MINUTE);
     this.interval('getAllStreamTags', constants.DAY);
+    this.interval('getModerators', 10 * constants.MINUTE);
 
     setTimeout(() => {
       // free thread_event
@@ -325,6 +326,53 @@ class API extends Core {
         }
       }, 30000);
     }, intervals * 1000);
+  }
+
+  async getModerators() {
+    const token = oauth.broadcasterAccessToken;
+    const needToWait = token === '';
+    const notEnoughAPICalls = this.calls.broadcaster.remaining <= 30 && this.calls.broadcaster.refresh > Date.now() / 1000;
+    const missingBroadcasterId = oauth.broadcasterId.length === 0;
+
+    if ((needToWait || notEnoughAPICalls || missingBroadcasterId)) {
+      return { state: false };
+    }
+    const url = `https://api.twitch.tv/helix/moderation/moderators?broadcaster_id=${oauth.broadcasterId}`;
+    try {
+      const request = await axios.request<{ pagination: any, data: { user_id: string; user_name: string }[] }>({
+        method: 'get',
+        url,
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Client-ID': oauth.broadcasterClientId,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      // save remaining api calls
+      this.calls.broadcaster.remaining = request.headers['ratelimit-remaining'];
+      this.calls.broadcaster.refresh = request.headers['ratelimit-reset'];
+      this.calls.broadcaster.limit = request.headers['ratelimit-limit'];
+
+      const data = request.data.data;
+      await getRepository(User).update({
+        userId: Not(In(data.map(o => Number(o.user_id)))),
+      }, { isModerator: false });
+      await getRepository(User).update({
+        userId: In(data.map(o => Number(o.user_id))),
+      }, { isModerator: true });
+
+      setStatus('MOD', data.map(o => o.user_id).includes(oauth.botId));
+    } catch (e) {
+      if (e.isAxiosError) {
+        error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getModerators', api: 'helix', endpoint: e.config.url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: this.calls.broadcaster });
+      } else {
+        error(e.stack);
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getModerators', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.broadcaster });
+      }
+    }
+    return { state: true };
   }
 
   async followerUpdatePreCheck (username: string) {
@@ -461,7 +509,7 @@ class API extends Core {
 
     const event = await getRepository(ThreadEvent).findOne({ event: 'getChannelChattersUnofficialAPI' });
     if (typeof event === 'undefined') {
-      const { modStatus, partedUsers, joinedUsers } = await getChannelChattersUnofficialAPI();
+      const { partedUsers, joinedUsers } = await getChannelChattersUnofficialAPI();
 
       joinpart.send({ users: partedUsers, type: 'part' });
       for (const username of partedUsers) {
@@ -481,8 +529,6 @@ class API extends Core {
           events.fire('user-joined-channel', { username });
         }
       }
-
-      setStatus('MOD', modStatus);
     }
     return { state: true, opts };
   }
