@@ -5,7 +5,6 @@ import querystring from 'querystring';
 import _ from 'lodash';
 import crypto from 'crypto';
 import gitCommitInfo from 'git-commit-info';
-import { AllHtmlEntities as Entities} from 'html-entities';
 
 import { debug, error, warning } from './helpers/log';
 import { getCountOfCommandUsage } from './helpers/commands/count';
@@ -42,7 +41,7 @@ class Message {
   message = '';
 
   constructor (message: string) {
-    this.message = Entities.decode(message);
+    this.message = message;
   }
 
   async global (opts: { escape?: string, sender?: CommandOptions['sender'] }) {
@@ -145,7 +144,7 @@ class Message {
       this.message = this.message.replace(/\$ytSong/g, translate('songs.not-playing'));
     }
 
-    return Entities.decode(this.message);
+    return this.message;
   }
 
   async parse (attr: { [name: string]: any, sender: CommandOptions['sender'], 'message-type'?: string, forceWithoutAt?: boolean } = { sender: getBotSender() }) {
