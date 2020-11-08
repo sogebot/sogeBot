@@ -36,7 +36,7 @@ you **should not** enable this environment variable.
 - `HEAP=true`
 - `HEAP=false` *default*
 
-Heaps are saved in `./heap/main` and `./heap/cluster` folders
+Heaps are saved in `./heap/` folder
 
 ## LOGLEVEL
 

@@ -2,7 +2,6 @@
 import chalk from 'chalk';
 import _ from 'lodash';
 import Client from 'twitter';
-import { isMainThread } from '../cluster';
 
 // bot libraries
 import { getOwner } from '../commons';
@@ -40,12 +39,10 @@ class Twitter extends Integration {
   constructor() {
     super();
 
-    if (isMainThread) {
-      this.addEvent();
-      setInterval(() => {
-        this.updateStreams();
-      }, 10000);
-    }
+    this.addEvent();
+    setInterval(() => {
+      this.updateStreams();
+    }, 10000);
   }
 
   public addEvent() {

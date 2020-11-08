@@ -5,7 +5,6 @@ import Core from './_interface';
 import { command, default_permission, settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
 import { permission } from './helpers/permissions';
-import { isMainThread } from './cluster';
 import { debug, error, warning } from './helpers/log';
 import { getConnection, getRepository } from 'typeorm';
 import { Widget } from './database/entity/dashboard';
@@ -77,10 +76,8 @@ class General extends Core {
   @onLoad('lang')
   public async onLangUpdate() {
     await translateLib._load();
-    if (isMainThread) {
-      warning(translate('core.lang-selected'));
-      setLocale(this.lang);
-    }
+    warning(translate('core.lang-selected'));
+    setLocale(this.lang);
   }
 
   public async onLangLoad() {

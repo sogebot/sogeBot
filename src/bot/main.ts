@@ -17,7 +17,6 @@ import figlet from 'figlet';
 import util from 'util';
 import _ from 'lodash';
 import gitCommitInfo from 'git-commit-info';
-import { init as clusterInit, isMainThread } from './cluster';
 
 import { changelog } from './changelog';
 import { autoLoad } from './commons';
@@ -89,7 +88,6 @@ async function main () {
   try {
     // Initialize all core singletons
     setTimeout(() => {
-      clusterInit();
       changelog();
       panelInit();
       require('./general');
@@ -116,9 +114,7 @@ async function main () {
         await autoLoad('./dest/games/');
         await autoLoad('./dest/integrations/');
 
-        if (isMainThread) {
-          panelExpose();
-        }
+        panelExpose();
 
         if (process.env.HEAP) {
           warning(chalk.bgRed.bold('HEAP debugging is ENABLED'));

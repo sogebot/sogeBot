@@ -1,7 +1,6 @@
 'use strict';
 
 import * as _ from 'lodash';
-import { clusteredClientDelete, isMainThread } from '../cluster';
 
 import { announce, getOwnerAsSender, prepare } from '../commons';
 import { command, default_permission, parser, settings } from '../decorators';
@@ -19,6 +18,7 @@ import { isDbConnected } from '../helpers/database';
 import { linesParsed } from '../helpers/parser';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { translate } from '../translate';
+import tmi from '../tmi';
 const TYPE_NORMAL = 0;
 const TYPE_TICKETS = 1;
 
@@ -63,14 +63,12 @@ class Raffles extends System {
     super();
     this.addWidget('raffles', 'widget-title-raffles', 'fas fa-gift');
 
-    if (isMainThread) {
-      this.announce();
-      setInterval(() => {
-        if (this.announceNewEntries && announceNewEntriesTime !== 0 && announceNewEntriesTime <= Date.now()) {
-          this.announceEntries();
-        }
-      }, 1000);
-    }
+    this.announce();
+    setInterval(() => {
+      if (this.announceNewEntries && announceNewEntriesTime !== 0 && announceNewEntriesTime <= Date.now()) {
+        this.announceEntries();
+      }
+    }, 1000);
   }
 
   sockets () {
@@ -416,7 +414,7 @@ class Raffles extends System {
       return true;
     }
     if (this.deleteRaffleJoinCommands) {
-      clusteredClientDelete(opts.sender.id);
+      tmi.delete('bot', opts.sender.id);
     }
 
     opts.message = opts.message.toString().replace(raffle.keyword, '');

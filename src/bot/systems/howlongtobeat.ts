@@ -1,4 +1,3 @@
-import { isMainThread } from '../cluster';
 
 import * as constants from '../constants';
 import System from './_interface';
@@ -19,28 +18,26 @@ const notFoundGames = [] as string[];
 
 class HowLongToBeat extends System {
   interval: number = constants.SECOND * 15;
-  hltbService = isMainThread ? new HowLongToBeatService() : null;
+  hltbService = new HowLongToBeatService();
 
   constructor() {
     super();
     this.addMenu({ category: 'manage', name: 'howlongtobeat', id: 'manage/hltb', this: this });
 
-    if (isMainThread) {
-      this.refreshImageThumbnail();
+    this.refreshImageThumbnail();
 
-      let lastDbgMessage = '';
-      setInterval(async () => {
-        const isGameInNotFoundList = api.stats.currentGame && notFoundGames.includes(api.stats.currentGame);
-        const dbgMessage = `streamOnline: ${api.isStreamOnline}, enabled: ${this.enabled}, currentGame: ${ api.stats.currentGame}, isGameInNotFoundList: ${isGameInNotFoundList}`;
-        if (lastDbgMessage !== dbgMessage) {
-          lastDbgMessage = dbgMessage;
-          debug('hltb', dbgMessage);
-        }
-        if (api.isStreamOnline && this.enabled && !isGameInNotFoundList) {
-          this.addToGameTimestamp();
-        }
-      }, this.interval);
-    }
+    let lastDbgMessage = '';
+    setInterval(async () => {
+      const isGameInNotFoundList = api.stats.currentGame && notFoundGames.includes(api.stats.currentGame);
+      const dbgMessage = `streamOnline: ${api.isStreamOnline}, enabled: ${this.enabled}, currentGame: ${ api.stats.currentGame}, isGameInNotFoundList: ${isGameInNotFoundList}`;
+      if (lastDbgMessage !== dbgMessage) {
+        lastDbgMessage = dbgMessage;
+        debug('hltb', dbgMessage);
+      }
+      if (api.isStreamOnline && this.enabled && !isGameInNotFoundList) {
+        this.addToGameTimestamp();
+      }
+    }, this.interval);
   }
 
   @onStreamStart()

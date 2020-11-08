@@ -1,9 +1,8 @@
 import axios from 'axios';
-import { isMainThread } from './cluster';
 
 import Core from './_interface';
 import * as constants from './constants';
-import { areDecoratorsLoaded, settings, shared, ui } from './decorators';
+import { areDecoratorsLoaded, persistent, settings, ui } from './decorators';
 import { onChange } from './decorators/on';
 import { error, info, warning } from './helpers/log';
 import api from './api';
@@ -14,27 +13,18 @@ import { cleanViewersCache } from './helpers/permissions';
 class OAuth extends Core {
   private toWait = 10;
 
-  @shared()
   public cache: { bot: string; broadcaster: string } = { bot: '', broadcaster: '' };
-  @shared()
   public currentChannel = '';
-  @shared()
   public broadcasterType: string | null = null;
-  @shared()
   public profileImageUrl = '';
-  @shared()
   public broadcaster = '';
-  @shared()
   public bot = '';
-  @shared()
   public channelId = '';
-  @shared()
   public botId = '';
-  @shared(true)
+  @persistent()
   public botClientId = '';
-  @shared()
   public broadcasterId = '';
-  @shared(true)
+  @persistent()
   public broadcasterClientId = '';
 
   @settings('general')
@@ -139,7 +129,7 @@ class OAuth extends Core {
   }
 
   public async getChannelId() {
-    if (!isMainThread || global.mocha) {
+    if (global.mocha) {
       return;
     }
     if (!areDecoratorsLoaded) {
@@ -218,7 +208,7 @@ class OAuth extends Core {
       }
     */
   public async validateOAuth(type: 'bot' | 'broadcaster', retry = 0): Promise<boolean> {
-    if (!isMainThread || global.mocha) {
+    if (global.mocha) {
       return true;
     }
     clearTimeout(this.timeouts[`validateOAuth-${type}`]);
@@ -319,9 +309,6 @@ class OAuth extends Core {
       }
     */
   public async refreshAccessToken(type: 'bot' | 'broadcaster') {
-    if (!isMainThread) {
-      return;
-    }
     warning('Refreshing access token of ' + type);
     const url = 'https://twitchtokengenerator.com/api/refresh/';
     try {

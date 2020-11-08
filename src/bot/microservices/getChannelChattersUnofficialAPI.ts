@@ -15,9 +15,9 @@ import { ThreadEvent } from '../database/entity/threadEvent';
 import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
 import { Settings } from '../database/entity/settings';
 import { getUsersFromTwitch } from './getUserFromTwitch';
-import { clusteredFetchAccountAge } from '../cluster';
 import { debug, warning } from '../helpers/log';
 import { SQLVariableLimit } from '../helpers/sql';
+import api from '../api';
 
 const isThreadingEnabled = process.env.THREAD !== '0';
 
@@ -111,7 +111,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
           await getRepository(User).save({...user, isOnline: true});
           if (user.createdAt === 0) {
             // run this after we save new user
-            await clusteredFetchAccountAge(user.userId);
+            await api.fetchAccountAge(user.userId);
           }
         } else {
           usersToFetch.push(username);

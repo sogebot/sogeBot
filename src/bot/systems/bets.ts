@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import { isMainThread } from '../cluster';
 
 import { announce, getBotSender, getOwner, parserReply, prepare } from '../commons';
 import { command, default_permission, helper, settings, ui } from '../decorators';
@@ -46,11 +45,7 @@ class Bets extends System {
 
   constructor() {
     super();
-
-    if (isMainThread) {
-      this.checkIfBetExpired();
-    }
-
+    this.checkIfBetExpired();
     this.addWidget('bets', 'widget-title-bets', 'far fa-money-bill-alt');
   }
 

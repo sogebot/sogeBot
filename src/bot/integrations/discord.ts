@@ -2,11 +2,10 @@
 import chalk from 'chalk';
 import { get } from 'lodash';
 import * as DiscordJs from 'discord.js';
-import { isMainThread } from '../cluster';
 
 // bot libraries
 import Integration from './_interface';
-import { command, settings, shared, ui } from '../decorators';
+import { command, persistent, settings, ui } from '../decorators';
 import { onChange, onStartup, onStreamEnd, onStreamStart } from '../decorators/on';
 import { chatIn, chatOut, debug, error, info, warning, whisperOut } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
@@ -36,9 +35,9 @@ import { dayjs, timezone } from '../helpers/dayjs';
 class Discord extends Integration {
   client: DiscordJs.Client | null = null;
 
-  @shared(true)
+  @persistent()
   embedStartedAt = '';
-  @shared(true)
+  @persistent()
   embedMessageId = '';
 
   @settings('general')
@@ -159,9 +158,7 @@ class Discord extends Integration {
   constructor() {
     super();
 
-    if (isMainThread) {
-      this.addEvent();
-    }
+    this.addEvent();
 
     // embed updater
     setInterval(async () => {

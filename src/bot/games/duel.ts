@@ -1,9 +1,8 @@
 import _ from 'lodash';
-import { isMainThread } from '../cluster';
 
 import { announce, isBroadcaster, isModerator, prepare } from '../commons';
 import { getLocalizedName } from '../helpers/getLocalized';
-import { command, settings, shared } from '../decorators';
+import { command, persistent, settings } from '../decorators';
 import Game from './_interface';
 import { error } from '../helpers/log';
 
@@ -26,9 +25,8 @@ const ERROR_MINIMAL_BET = '3';
 class Duel extends Game {
   dependsOn = [ points ];
 
-  @shared(true)
+  @persistent()
   _timestamp = 0;
-  @shared()
   _cooldown = String(new Date());
 
   @settings()
@@ -42,9 +40,7 @@ class Duel extends Game {
 
   constructor () {
     super();
-    if (isMainThread) {
-      this.pickDuelWinner();
-    }
+    this.pickDuelWinner();
   }
 
   async pickDuelWinner () {

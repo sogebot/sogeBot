@@ -1,6 +1,5 @@
 import Core from './_interface';
 
-import { isMainThread } from './cluster';
 import axios from 'axios';
 import { setTimeout } from 'timers';
 
@@ -21,11 +20,9 @@ class Users extends Core {
 
     this.addMenu({ category: 'manage', name: 'viewers', id: 'manage/viewers/list', this: null });
 
-    if (isMainThread) {
-      setTimeout(() => {
-        this.updateWatchTime(true);
-      }, 30000);
-    }
+    setTimeout(() => {
+      this.updateWatchTime(true);
+    }, 30000);
   }
 
   async getChatOf (id: number, online: boolean): Promise<number> {

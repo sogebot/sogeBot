@@ -1,9 +1,8 @@
 import _ from 'lodash';
-import { isMainThread } from '../cluster';
 
 import Expects from '../expects.js';
 import Game from './_interface';
-import { command, settings, shared, ui } from '../decorators';
+import { command, settings, ui } from '../decorators';
 import { announce, prepare } from '../commons.js';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { warning } from '../helpers/log.js';
@@ -21,17 +20,11 @@ export type Result = { percentage: number; message: string };
 class Heist extends Game {
   dependsOn = [ pointsSystem ];
 
-  @shared()
   startedAt: null | number = null;
-  @shared()
   lastAnnouncedLevel = '';
-  @shared()
   lastHeistTimestamp = 0;
-  @shared()
   lastAnnouncedCops = 0;
-  @shared()
   lastAnnouncedHeistInProgress = 0;
-  @shared()
   lastAnnouncedStart = 0;
 
   @settings('options')
@@ -106,9 +99,8 @@ class Heist extends Game {
   constructor () {
     super();
 
-    if (isMainThread) {
-      this.timeouts.iCheckFinished = global.setTimeout(() => this.iCheckFinished(), 10000);
-    } // wait for proper config startup
+    // wait for proper config startup
+    this.timeouts.iCheckFinished = global.setTimeout(() => this.iCheckFinished(), 10000);
   }
 
   async iCheckFinished () {

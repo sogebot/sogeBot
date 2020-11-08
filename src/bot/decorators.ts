@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 import { parse, sep as separator } from 'path';
 import { VariableWatcher } from './watchers';
 import { debug, error } from './helpers/log';
-import { isMainThread } from './cluster';
 import { isDbConnected } from './helpers/database';
 import { find } from './helpers/register';
 import { permission as permissionType } from './helpers/permissions';
@@ -26,7 +25,7 @@ const checkIfDecoratorsAreLoaded = () => {
     return;
   }
   if (loadingInProgress.length === 0) {
-    debug('decorators', 'Loading OK (thread: ' + !isMainThread + ')');
+    debug('decorators', 'Loading OK');
     areDecoratorsLoaded = true;
   } else {
     setTimeout(() => {
@@ -197,13 +196,11 @@ export function permission_settings(category?: string, exclude: string[] = []) {
   };
 }
 
-export function shared(db = false) {
+export function persistent() {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: any, key: string) => {
-    if (db) {
-      loadingInProgress.push(`${type}.${name}.${key}`);
-    }
+    loadingInProgress.push(`${type}.${name}.${key}`);
     const register = async () => {
       if (!isDbConnected) {
         setTimeout(() => register(), 1000);
@@ -216,18 +213,16 @@ export function shared(db = false) {
         }
         const defaultValue = (self as any)[key];
         VariableWatcher.add(`${type}.${name}.${key}`, defaultValue, false);
-        if (db) {
-          const loadVariableValue = () => {
-            self.loadVariableValue(key).then((value) => {
-              if (typeof value !== 'undefined') {
-                VariableWatcher.add(`${type}.${name}.${key}`, value, false); // rewrite value on var load
-                _.set(self, key, value);
-              }
-              loadingInProgress = loadingInProgress.filter(o => o !== `${type}.${name}.${key}`);
-            });
-          };
-          setTimeout(() => loadVariableValue(), 5000);
-        }
+        const loadVariableValue = () => {
+          self.loadVariableValue(key).then((value) => {
+            if (typeof value !== 'undefined') {
+              VariableWatcher.add(`${type}.${name}.${key}`, value, false); // rewrite value on var load
+              _.set(self, key, value);
+            }
+            loadingInProgress = loadingInProgress.filter(o => o !== `${type}.${name}.${key}`);
+          });
+        };
+        setTimeout(() => loadVariableValue(), 5000);
       } catch (e) {
         process.stderr.write(JSON.stringify(e) + '\n');
       }

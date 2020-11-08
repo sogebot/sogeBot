@@ -1,10 +1,8 @@
-import { isMainThread } from '../cluster';
-
 import { announce, getBotSender, prepare, round5 } from '../commons';
 import { getLocalizedName } from '../helpers/getLocalized';
 import * as constants from '../constants';
 import { debug } from '../helpers/log';
-import { command, default_permission, settings, shared } from '../decorators';
+import { command, default_permission, settings } from '../decorators';
 import Expects from '../expects.js';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
@@ -27,13 +25,9 @@ enum ERROR {
 class Scrim extends System {
   private cleanedUpOnStart = false;
 
-  @shared()
   closingAt = 0;
-  @shared()
   type = '';
-  @shared()
   lastRemindAt: number = Date.now();
-  @shared()
   isCooldownOnly = false;
 
   @settings('time')
@@ -42,10 +36,8 @@ class Scrim extends System {
   constructor() {
     super();
 
-    if (isMainThread) {
-      this.reminder();
-      setInterval(() => this.reminder(), 1000);
-    }
+    this.reminder();
+    setInterval(() => this.reminder(), 1000);
   }
 
   @command('!snipe')

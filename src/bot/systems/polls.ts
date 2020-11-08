@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import { isMainThread } from '../cluster';
 
 import { announce, getOwnerAsSender, prepare } from '../commons.js';
 import { getLocalizedName } from '../helpers/getLocalized';
@@ -47,13 +46,11 @@ class Polls extends System {
   constructor() {
     super();
 
-    if (isMainThread) {
-      setInterval(() => {
-        if (api.isStreamOnline) {
-          this.reminder();
-        }
-      }, 1000);
-    }
+    setInterval(() => {
+      if (api.isStreamOnline) {
+        this.reminder();
+      }
+    }, 1000);
 
     this.addMenu({ category: 'manage', name: 'polls', id: 'manage/polls', this: this });
   }

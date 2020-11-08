@@ -4,7 +4,6 @@ import { onChange, onLoad } from './decorators/on';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import { filter, isString, set } from 'lodash';
 import { getBroadcaster } from './commons';
-import { isMainThread } from './cluster';
 import oauth from './oauth';
 import general from './general';
 import currency from './currency';
@@ -40,12 +39,10 @@ class UI extends Core {
   @onChange('domain')
   @onLoad('domain')
   subscribeWebhook() {
-    if (isMainThread) {
-      if (typeof webhooks === 'undefined') {
-        setTimeout(() => this.subscribeWebhook(), 1000);
-      } else {
-        webhooks.subscribeAll();
-      }
+    if (typeof webhooks === 'undefined') {
+      setTimeout(() => this.subscribeWebhook(), 1000);
+    } else {
+      webhooks.subscribeAll();
     }
   }
 

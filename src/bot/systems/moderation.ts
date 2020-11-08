@@ -12,7 +12,6 @@ import System from './_interface';
 import { isModerator, parserReply, prepare, timeout } from '../commons';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { timeout as timeoutLog, warning as warningLog } from '../helpers/log';
-import { clusteredClientDelete } from '../cluster';
 import { adminEndpoint } from '../helpers/socket';
 import { Alias } from '../database/entity/alias';
 
@@ -24,6 +23,7 @@ import spotify from '../integrations/spotify';
 import songs from './songs';
 import aliasSystem from './alias';
 import users from '../users';
+import tmi from '../tmi';
 
 const urlRegex = [
   new RegExp(`(www)? ??\\.? ?[a-zA-Z0-9]+([a-zA-Z0-9-]+) ??\\. ?(${tlds.join('|')})(?=\\P{L}|$)`, 'igu'),
@@ -155,7 +155,7 @@ class Moderation extends System {
       }
 
       if (this.cWarningsAnnounceTimeouts) {
-        clusteredClientDelete(sender.id);
+        tmi.delete('bot', sender.id);
         if (!silent) {
           parserReply('$sender, ' + warning, { sender });
         } else {
