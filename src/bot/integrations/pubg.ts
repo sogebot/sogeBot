@@ -1,6 +1,6 @@
 // bot libraries
 import Integration from './_interface';
-import { command, settings, shared, ui } from '../decorators';
+import { command, persistent, settings, ui } from '../decorators';
 import Axios from 'axios';
 import { adminEndpoint } from '../helpers/socket';
 import { HOUR, MINUTE } from '../constants';
@@ -28,7 +28,7 @@ class PUBG extends Integration {
   @settings('player')
   @ui({ type: 'pubg-season-id' }, 'player')
   seasonId = '';
-  @shared(true)
+  @persistent()
   _lastSeasonIdFetch = 0;
 
   @settings('customization')
@@ -41,13 +41,13 @@ class PUBG extends Integration {
   @settings('stats')
   @ui({ type: 'pubg-stats' }, 'stats')
   rankedGameModeStats: { [x: string]: any } = {};
-  @shared(true)
+  @persistent()
   _lastRankedGameModeStats = 0;
 
   @settings('stats')
   @ui({ type: 'pubg-stats' }, 'stats')
   gameModeStats: { [x: string]: any } = {};
-  @shared(true)
+  @persistent()
   _lastGameModeStats = 0;
 
   constructor() {

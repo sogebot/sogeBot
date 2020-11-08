@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import axios from 'axios';
 
 import Integration from './_interface';
-import { settings, shared, ui } from '../decorators';
+import { persistent, settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import { debug, error, info, tip } from '../helpers/log';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
@@ -50,7 +50,7 @@ class Streamlabs extends Integration {
   socketToStreamlabs: SocketIOClient.Socket | null = null;
 
   // save last donationId which rest api had
-  @shared(true)
+  @persistent()
   afterDonationId = '';
 
   @settings()

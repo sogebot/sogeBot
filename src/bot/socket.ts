@@ -1,6 +1,5 @@
 import Core from './_interface';
-import { settings, shared, ui } from './decorators';
-import { isMainThread } from './cluster';
+import { persistent, settings, ui } from './decorators';
 import { v4 as uuid } from 'uuid';
 import { permission } from './helpers/permissions';
 import { adminEndpoint, endpoints } from './helpers/socket';
@@ -123,7 +122,7 @@ const initEndpoints = async(socket: SocketIO.Socket, privileges: Unpacked<Return
 };
 
 class Socket extends Core {
-  @shared(true)
+  @persistent()
   JWTKey = '';
 
   @settings('connection')
@@ -155,91 +154,89 @@ class Socket extends Core {
   constructor() {
     super();
 
-    if (isMainThread) {
-      const init = (retry = 0) => {
-        if (retry === 10000) {
-          throw new Error('Socket oauth validate endpoint failed.');
-        } else if (!app) {
-          setTimeout(() => init(retry++), 100);
-        } else {
-          debug('ui', 'Socket oauth validate endpoint OK.');
-          app.get('/socket/validate', async (req, res) => {
-            const accessTokenHeader = req.headers['x-twitch-token'] as string | undefined;
-            const userId = req.headers['x-twitch-userid'] as string | undefined;
+    const init = (retry = 0) => {
+      if (retry === 10000) {
+        throw new Error('Socket oauth validate endpoint failed.');
+      } else if (!app) {
+        setTimeout(() => init(retry++), 100);
+      } else {
+        debug('ui', 'Socket oauth validate endpoint OK.');
+        app.get('/socket/validate', async (req, res) => {
+          const accessTokenHeader = req.headers['x-twitch-token'] as string | undefined;
+          const userId = req.headers['x-twitch-userid'] as string | undefined;
 
-            try {
-              if (!accessTokenHeader || !userId) {
-                throw new Error('Insufficient data');
-              }
-              const twitchValidation = await axios.get(`https://id.twitch.tv/oauth2/validate`, {
-                headers: {
-                  'Authorization': 'OAuth ' + accessTokenHeader,
-                },
-              });
-              if (userId !== twitchValidation.data.user_id) {
-                throw new Error('Not matching userId');
-              }
-              const username = twitchValidation.data.login;
-              const haveCasterPermission = (await permissions.check(Number(userId), permission.CASTERS, true)).access;
-              const user = await getRepository(User).findOne({ userId: Number(userId) });
-              await getRepository(User).save({
-                ...user,
-                userId: Number(userId),
-                username,
-              });
-
-              const accessToken = jwt.sign({
-                userId: Number(userId),
-                username,
-                privileges: await getPrivileges(haveCasterPermission ? 'admin' : 'viewer', Number(userId)),
-              }, this.JWTKey, { expiresIn: `${this.accessTokenExpirationTime}s` });
-              const refreshToken = jwt.sign({
-                userId: Number(userId),
-                username,
-              }, this.JWTKey, { expiresIn: `${this.refreshTokenExpirationTime}s` });
-              res.status(200).send({accessToken, refreshToken, userType: haveCasterPermission ? 'admin' : 'viewer'});
-            } catch(e) {
-              debug('socket', e.stack);
-              res.status(400).send('You don\'t have access to this server.');
+          try {
+            if (!accessTokenHeader || !userId) {
+              throw new Error('Insufficient data');
             }
-          });
-          app.get('/socket/refresh', async (req, res) => {
-            const refreshTokenHeader = req.headers['x-twitch-token'] as string | undefined;
-
-            try {
-              if (!refreshTokenHeader) {
-                throw new Error('Insufficient data');
-              }
-              const data = jwt.verify(refreshTokenHeader, this.JWTKey) as {
-                userId: number; username: string;
-              };
-              const userPermission = await permissions.getUserHighestPermission(Number(data.userId));
-              const user = await getRepository(User).findOne({ userId: Number(data.userId) });
-              await getRepository(User).save({
-                ...user,
-                userId: Number(data.userId),
-                username: data.username,
-              });
-
-              const accessToken = jwt.sign({
-                userId: Number(data.userId),
-                username: data.username,
-                privileges: await getPrivileges(userPermission === permission.CASTERS ? 'admin' : 'viewer', Number(data.userId)),
-              }, this.JWTKey, { expiresIn: `${this.accessTokenExpirationTime}s` });
-              const refreshToken = jwt.sign({
-                userId: Number(data.userId),
-                username: data.username,
-              }, this.JWTKey, { expiresIn: `${this.refreshTokenExpirationTime}s` });
-              res.status(200).send({accessToken, refreshToken, userType: userPermission === permission.CASTERS ? 'admin' : 'viewer'});
-            } catch(e) {
-              debug('socket', e.stack);
-              res.status(400).send('You don\'t have access to this server.');
+            const twitchValidation = await axios.get(`https://id.twitch.tv/oauth2/validate`, {
+              headers: {
+                'Authorization': 'OAuth ' + accessTokenHeader,
+              },
+            });
+            if (userId !== twitchValidation.data.user_id) {
+              throw new Error('Not matching userId');
             }
-          });
-        }
-      };
-      init();
-    }
+            const username = twitchValidation.data.login;
+            const haveCasterPermission = (await permissions.check(Number(userId), permission.CASTERS, true)).access;
+            const user = await getRepository(User).findOne({ userId: Number(userId) });
+            await getRepository(User).save({
+              ...user,
+              userId: Number(userId),
+              username,
+            });
+
+            const accessToken = jwt.sign({
+              userId: Number(userId),
+              username,
+              privileges: await getPrivileges(haveCasterPermission ? 'admin' : 'viewer', Number(userId)),
+            }, this.JWTKey, { expiresIn: `${this.accessTokenExpirationTime}s` });
+            const refreshToken = jwt.sign({
+              userId: Number(userId),
+              username,
+            }, this.JWTKey, { expiresIn: `${this.refreshTokenExpirationTime}s` });
+            res.status(200).send({accessToken, refreshToken, userType: haveCasterPermission ? 'admin' : 'viewer'});
+          } catch(e) {
+            debug('socket', e.stack);
+            res.status(400).send('You don\'t have access to this server.');
+          }
+        });
+        app.get('/socket/refresh', async (req, res) => {
+          const refreshTokenHeader = req.headers['x-twitch-token'] as string | undefined;
+
+          try {
+            if (!refreshTokenHeader) {
+              throw new Error('Insufficient data');
+            }
+            const data = jwt.verify(refreshTokenHeader, this.JWTKey) as {
+              userId: number; username: string;
+            };
+            const userPermission = await permissions.getUserHighestPermission(Number(data.userId));
+            const user = await getRepository(User).findOne({ userId: Number(data.userId) });
+            await getRepository(User).save({
+              ...user,
+              userId: Number(data.userId),
+              username: data.username,
+            });
+
+            const accessToken = jwt.sign({
+              userId: Number(data.userId),
+              username: data.username,
+              privileges: await getPrivileges(userPermission === permission.CASTERS ? 'admin' : 'viewer', Number(data.userId)),
+            }, this.JWTKey, { expiresIn: `${this.accessTokenExpirationTime}s` });
+            const refreshToken = jwt.sign({
+              userId: Number(data.userId),
+              username: data.username,
+            }, this.JWTKey, { expiresIn: `${this.refreshTokenExpirationTime}s` });
+            res.status(200).send({accessToken, refreshToken, userType: userPermission === permission.CASTERS ? 'admin' : 'viewer'});
+          } catch(e) {
+            debug('socket', e.stack);
+            res.status(400).send('You don\'t have access to this server.');
+          }
+        });
+      }
+    };
+    init();
   }
 
   async authorize(socket: SocketIO.Socket, next: NextFunction) {

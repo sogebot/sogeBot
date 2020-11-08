@@ -9,7 +9,6 @@
 import chalk from 'chalk';
 import fs from 'fs';
 import { writeHeapSnapshot } from 'v8';
-import { isMainThread } from './cluster';
 import { info } from './helpers/log';
 import api from './api';
 
@@ -84,7 +83,7 @@ function heapDump() {
  * @param datadir Location to save to
  */
 function saveHeapSnapshot(datadir: string) {
-  const name = datadir + (isMainThread ? 'master' : 'cluster') + '-' + Date.now() + '.heapsnapshot';
+  const name = datadir + 'master-' + Date.now() + '.heapsnapshot';
   writeHeapSnapshot(name);
   info('Heap snapshot written to ' + name);
 }

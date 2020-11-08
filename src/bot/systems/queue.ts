@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 
 import { getBotSender, prepare } from '../commons';
-import { command, default_permission, settings, shared } from '../decorators';
+import { command, default_permission, settings } from '../decorators';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
 import { adminEndpoint } from '../helpers/socket';
@@ -23,7 +23,6 @@ import tmi from '../tmi';
  * !queue list                       - current list of queue
  */
 class Queue extends System {
-  @shared()
   locked = false;
 
   @settings('eligibility')

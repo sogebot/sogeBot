@@ -1,5 +1,4 @@
 import { cloneDeep, get, isEqual, set } from 'lodash';
-import { isMainThread } from './cluster';
 import { debug, error } from './helpers/log';
 import { change } from './changelog';
 import { getRepository } from 'typeorm';
@@ -46,27 +45,25 @@ export const VariableWatcher = {
       }
       if (!isEqual(value, variables[k])) {
         variables[k] = value;
-        if (isMainThread) {
-          const savedSetting = await getRepository(Settings).findOne({
-            where: {
-              name: variable,
-              namespace: checkedModule.nsp,
-            },
-          });
-          await getRepository(Settings).save({
-            ...savedSetting,
+        const savedSetting = await getRepository(Settings).findOne({
+          where: {
             name: variable,
             namespace: checkedModule.nsp,
-            value: JSON.stringify(value),
-          });
+          },
+        });
+        await getRepository(Settings).save({
+          ...savedSetting,
+          name: variable,
+          namespace: checkedModule.nsp,
+          value: JSON.stringify(value),
+        });
 
-          change(`${type}.${name}.${variable}`);
-          for (const event of getFunctionList('change', type === 'core' ? `${name}.${variable}` : `${type}.${name}.${variable}`)) {
-            if (typeof (checkedModule as any)[event.fName] === 'function') {
-              (checkedModule as any)[event.fName](variable, cloneDeep(value));
-            } else {
-              error(`${event.fName}() is not function in ${checkedModule._name}/${checkedModule.__moduleName__.toLowerCase()}`);
-            }
+        change(`${type}.${name}.${variable}`);
+        for (const event of getFunctionList('change', type === 'core' ? `${name}.${variable}` : `${type}.${name}.${variable}`)) {
+          if (typeof (checkedModule as any)[event.fName] === 'function') {
+            (checkedModule as any)[event.fName](variable, cloneDeep(value));
+          } else {
+            error(`${event.fName}() is not function in ${checkedModule._name}/${checkedModule.__moduleName__.toLowerCase()}`);
           }
         }
       }

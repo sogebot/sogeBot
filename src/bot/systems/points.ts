@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import * as cronparser from 'cron-parser';
 
 import { isBot, prepare } from '../commons';
-import { command, default_permission, parser, permission_settings, settings, shared, ui } from '../decorators';
+import { command, default_permission, parser, permission_settings, persistent, settings, ui } from '../decorators';
 import Expects from '../expects';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
@@ -34,7 +34,7 @@ class Points extends System {
     'emit': 'parseCron',
   })
   resetIntervalCron = '@monthly';
-  @shared(true)
+  @persistent()
   lastCronRun = 0;
 
   @settings('points')

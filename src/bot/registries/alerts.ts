@@ -1,5 +1,4 @@
 import Registry from './_interface';
-import { isMainThread } from '../cluster';
 import { generateUsername } from '../helpers/generateUsername';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
@@ -10,42 +9,40 @@ import { app, ioServer } from '../helpers/panel';
 import currency from '../currency';
 import { debug } from '../helpers/log';
 import { translate } from '../translate';
-import { shared } from '../decorators';
+import { persistent } from '../decorators';
 
 class Alerts extends Registry {
-  @shared(true)
+  @persistent()
   areAlertsMuted = false;
 
   constructor() {
     super();
     this.addMenu({ category: 'registry', name: 'alerts', id: 'registry/alerts/list', this: null });
-    if (isMainThread) {
-      const init = (retry = 0) => {
-        if (retry === 10000) {
-          throw new Error('Registry alert media endpoint failed.');
-        } else if (!app) {
-          setTimeout(() => init(retry++), 100);
-        } else {
-          debug('ui', 'Registry alert media endpoint OK.');
-          app.get('/registry/alerts/:mediaid', async (req, res) => {
-            const media = await getRepository(AlertMedia).find({ id: req.params.mediaid });
-            const b64data = media.sort((a,b) => a.chunkNo - b.chunkNo).map(o => o.b64data).join('');
-            if (b64data.trim().length === 0) {
-              res.sendStatus(404);
-            } else {
-              const match = (b64data.match(/^data:\w+\/\w+;base64,/) || [ 'data:image/gif;base64,' ])[0];
-              const data = Buffer.from(b64data.replace(/^data:\w+\/\w+;base64,/, ''), 'base64');
-              res.writeHead(200, {
-                'Content-Type': match.replace('data:', '').replace(';base64,', ''),
-                'Content-Length': data.length,
-              });
-              res.end(data);
-            }
-          });
-        }
-      };
-      init();
-    }
+    const init = (retry = 0) => {
+      if (retry === 10000) {
+        throw new Error('Registry alert media endpoint failed.');
+      } else if (!app) {
+        setTimeout(() => init(retry++), 100);
+      } else {
+        debug('ui', 'Registry alert media endpoint OK.');
+        app.get('/registry/alerts/:mediaid', async (req, res) => {
+          const media = await getRepository(AlertMedia).find({ id: req.params.mediaid });
+          const b64data = media.sort((a,b) => a.chunkNo - b.chunkNo).map(o => o.b64data).join('');
+          if (b64data.trim().length === 0) {
+            res.sendStatus(404);
+          } else {
+            const match = (b64data.match(/^data:\w+\/\w+;base64,/) || [ 'data:image/gif;base64,' ])[0];
+            const data = Buffer.from(b64data.replace(/^data:\w+\/\w+;base64,/, ''), 'base64');
+            res.writeHead(200, {
+              'Content-Type': match.replace('data:', '').replace(';base64,', ''),
+              'Content-Length': data.length,
+            });
+            res.end(data);
+          }
+        });
+      }
+    };
+    init();
   }
 
   sockets () {

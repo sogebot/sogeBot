@@ -2,10 +2,9 @@ import { readdirSync } from 'fs';
 import _ from 'lodash';
 import { join, normalize } from 'path';
 
-import { chatOut, debug, warning } from './helpers/log';
+import { chatOut, debug, isDebugEnabled, warning, whisperOut } from './helpers/log';
 import { globalIgnoreList } from './data/globalIgnoreList';
 import { error } from './helpers/log';
-import { clusteredChatOut, clusteredClientChat, clusteredClientTimeout, clusteredWhisperOut } from './cluster';
 
 import oauth from './oauth';
 import { translate } from './translate';
@@ -216,10 +215,10 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
         return true;
       }
       if (sender['message-type'] === 'whisper') {
-        clusteredWhisperOut(`${messageToSend} [${sender.username}]`);
+        whisperOut(`${messageToSend} [${sender.username}]`);
         message('whisper', sender.username, messageToSend);
       } else {
-        clusteredChatOut(`${messageToSend} [${sender.username}]`);
+        chatOut(`${messageToSend} [${sender.username}]`);
         if (tmi.sendWithMe && !messageToSend.startsWith('/')) {
           message('me', null, messageToSend);
         } else {
@@ -240,7 +239,14 @@ export async function message(type: 'say' | 'whisper' | 'me', username: string |
     if (username === '') {
       error('TMI: channel is not defined, message cannot be sent');
     } else {
-      clusteredClientChat(type, username, messageToSend);
+      if (isDebugEnabled('tmi')) {
+        return;
+      }
+      if (type === 'me') {
+        tmi.client.bot?.chat.say(username, `/me ${messageToSend}`);
+      } else {
+        tmi.client.bot?.chat[type](username, messageToSend);
+      }
     }
   } catch (e) {
     if (retry) {
@@ -256,7 +262,15 @@ export async function timeout(username: string, reason: string, timeMs: number, 
   if (reason) {
     reason = reason.replace(/\$sender/g, username);
   }
-  clusteredClientTimeout(username, timeMs, reason, isMod);
+  if (isMod) {
+    if (tmi.client.broadcaster) {
+      tmi.client.broadcaster.chat.timeout(oauth.generalChannel, username, timeMs, reason);
+    } else {
+      error('Cannot timeout mod user, as you don\'t have set broadcaster in chat');
+    }
+  } else {
+    tmi.client.bot?.chat.timeout(oauth.generalChannel, username, timeMs, reason);
+  }
 }
 
 export function getOwnerAsSender(): Readonly<UserStateTags & { userId: string }> {

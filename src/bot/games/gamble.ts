@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import Game from './_interface';
-import { command, settings, shared } from '../decorators';
+import { command, persistent, settings } from '../decorators';
 import { prepare } from '../commons';
 import { error } from '../helpers/log';
 
@@ -35,7 +35,7 @@ class Gamble extends Game {
   lostPointsAddedToJackpot = 20;
   @settings('jackpot')
   chanceToTriggerJackpot = 5;
-  @shared(true)
+  @persistent()
   jackpotValue = 0;
 
   @command('!gamble')

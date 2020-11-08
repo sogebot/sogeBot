@@ -6,10 +6,9 @@ import https from 'https';
 import chalk from 'chalk';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import _ from 'lodash';
-import { isMainThread } from './cluster';
 
 import * as constants from './constants';
-import { settings, shared, ui } from './decorators';
+import { settings, ui } from './decorators';
 import { error, info, warning } from './helpers/log';
 import { onChange, onLoad } from './decorators/on';
 import { getRepository } from 'typeorm';
@@ -25,7 +24,6 @@ class Currency extends Core {
   })
   public mainCurrency: currency = 'EUR';
 
-  @shared()
   public rates: { [key in currency]: number } = {
     AUD: 0, BGN: 0, BRL: 0, CAD: 0, CHF: 0, CNY: 0, CZK: 1 /* CZK:CZK 1:1 */,
     DKK: 0, EUR: 0, GBP: 0, HKD: 0, HRK: 0, HUF: 0, IDR: 0, ILS: 0, INR: 0,
@@ -38,9 +36,7 @@ class Currency extends Core {
 
   constructor() {
     super();
-    if (isMainThread) {
-      setTimeout(() => this.updateRates(), 5 * constants.SECOND);
-    }
+    setTimeout(() => this.updateRates(), 5 * constants.SECOND);
   }
 
   public isCodeSupported(code: currency) {

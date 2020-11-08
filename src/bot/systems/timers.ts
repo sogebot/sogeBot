@@ -1,7 +1,6 @@
 'use strict';
 
 import * as _ from 'lodash';
-import { isMainThread } from '../cluster';
 
 import { command, default_permission } from '../decorators';
 import { permission } from '../helpers/permissions';
@@ -36,9 +35,7 @@ class Timers extends System {
     super();
 
     this.addMenu({ category: 'manage', name: 'timers', id: 'manage/timers/list', this: this });
-    if (isMainThread) {
-      this.init();
-    }
+    this.init();
   }
 
   sockets () {

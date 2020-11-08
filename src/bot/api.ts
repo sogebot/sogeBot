@@ -1,7 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import querystring from 'querystring';
 import { setTimeout } from 'timers';
-import { clusteredAPI, isMainThread } from './cluster';
 import chalk from 'chalk';
 import { chunk, cloneDeep, defaults, filter, get, isNil, isNull, map } from 'lodash';
 
@@ -12,7 +11,7 @@ import { debug, error, follow, info, start, stop, unfollow, warning } from './he
 import { getBroadcaster, isBot, isBroadcaster, isIgnored } from './commons';
 
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
-import { shared } from './decorators';
+import { persistent } from './decorators';
 import { getChannelChattersUnofficialAPI } from './microservices/getChannelChattersUnofficialAPI';
 import { ThreadEvent } from './database/entity/threadEvent';
 
@@ -197,7 +196,7 @@ const processFollowerState = async (users: { from_name: string; from_id: number;
 };
 
 class API extends Core {
-  @shared(true)
+  @persistent()
   stats: {
     language: string;
     currentWatchedTime: number;
@@ -228,15 +227,15 @@ class API extends Core {
     newChatters: 0,
   };
 
-  @shared(true)
+  @persistent()
   isStreamOnline = false;
-  @shared(true)
+  @persistent()
   streamStatusChangeSince: number =  Date.now();
 
-  @shared(true)
+  @persistent()
   rawStatus = '';
 
-  @shared(true)
+  @persistent()
   gameCache = '';
 
   calls = {
@@ -262,42 +261,27 @@ class API extends Core {
     super();
     this.addMenu({ category: 'stats', name: 'api', id: 'stats/api', this: null });
 
-    if (isMainThread) {
-      this.interval('getCurrentStreamData', constants.MINUTE);
-      this.interval('getCurrentStreamTags', constants.MINUTE);
-      this.interval('updateChannelViewsAndBroadcasterType', constants.HOUR);
-      this.interval('getLatest100Followers', constants.MINUTE);
-      this.interval('getChannelFollowers', constants.DAY);
-      this.interval('getChannelHosts', 10 * constants.MINUTE);
-      this.interval('getChannelSubscribers', 2 * constants.MINUTE);
-      this.interval('getChannelChattersUnofficialAPI', 10 * constants.MINUTE);
-      this.interval('getChannelInformation', constants.MINUTE);
-      this.interval('checkClips', constants.MINUTE);
-      this.interval('getAllStreamTags', constants.DAY);
+    this.interval('getCurrentStreamData', constants.MINUTE);
+    this.interval('getCurrentStreamTags', constants.MINUTE);
+    this.interval('updateChannelViewsAndBroadcasterType', constants.HOUR);
+    this.interval('getLatest100Followers', constants.MINUTE);
+    this.interval('getChannelFollowers', constants.DAY);
+    this.interval('getChannelHosts', 10 * constants.MINUTE);
+    this.interval('getChannelSubscribers', 2 * constants.MINUTE);
+    this.interval('getChannelChattersUnofficialAPI', 10 * constants.MINUTE);
+    this.interval('getChannelInformation', constants.MINUTE);
+    this.interval('checkClips', constants.MINUTE);
+    this.interval('getAllStreamTags', constants.DAY);
 
-      setTimeout(() => {
-        // free thread_event
-        getManager()
-          .createQueryBuilder()
-          .delete()
-          .from(ThreadEvent)
-          .where('event = :event', { event: 'getChannelChattersUnofficialAPI' })
-          .execute();
-      }, 30000);
-    } else {
-      this.calls = {
-        bot: {
-          limit: 0,
-          remaining: 0,
-          refresh: 0,
-        },
-        broadcaster: {
-          limit: 0,
-          remaining: 0,
-          refresh: 0,
-        },
-      };
-    }
+    setTimeout(() => {
+      // free thread_event
+      getManager()
+        .createQueryBuilder()
+        .delete()
+        .from(ThreadEvent)
+        .where('event = :event', { event: 'getChannelChattersUnofficialAPI' })
+        .execute();
+    }, 30000);
   }
 
   async setRateLimit (type: 'bot' | 'broadcaster', limit: number, remaining: number, refresh: number) {
@@ -344,11 +328,6 @@ class API extends Core {
   }
 
   async followerUpdatePreCheck (username: string) {
-    if (!isMainThread) {
-      clusteredAPI('followerUpdatePreCheck', [ username ]);
-      return;
-    }
-
     const user = await getRepository(User).findOne({ username });
     if (user) {
       const isSkipped = user.username === getBroadcaster() || user.username === oauth.botUsername;
@@ -472,10 +451,6 @@ class API extends Core {
   }
 
   async getChannelChattersUnofficialAPI (opts: any) {
-    if (!isMainThread) {
-      throw new Error('API can run only on master');
-    }
-
     const oAuthIsSet = oauth.botUsername.length > 0
       && oauth.channelId.length > 0
       && oauth.currentChannel.length > 0;
@@ -513,9 +488,6 @@ class API extends Core {
   }
 
   async getAllStreamTags(opts: { cursor?: string }): Promise<{ state: boolean, opts: { cursor?: string} }> {
-    if (!isMainThread) {
-      throw new Error('API can run only on master');
-    }
     let url = `https://api.twitch.tv/helix/tags/streams?first=100`;
     if (opts.cursor) {
       url += '&after=' + opts.cursor;
@@ -586,9 +558,6 @@ class API extends Core {
   }
 
   async getChannelSubscribers<T extends { cursor?: string; count?: number; noAffiliateOrPartnerWarningSent?: boolean; notCorrectOauthWarningSent?: boolean; subscribers?: SubscribersEndpoint['data'] }> (opts: T): Promise<{ state: boolean; opts: T }> {
-    if (!isMainThread) {
-      throw new Error('API can run only on master');
-    }
     opts = opts || {};
 
     const cid = oauth.channelId;
@@ -708,10 +677,6 @@ class API extends Core {
   }
 
   async getChannelInformation (opts: any) {
-    if (!isMainThread) {
-      throw new Error('API can run only on master');
-    }
-
     const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/channels?broadcaster_id=${cid}`;
 
@@ -794,10 +759,6 @@ class API extends Core {
   }
 
   async getChannelHosts () {
-    if (!isMainThread) {
-      throw new Error('API can run only on master');
-    }
-
     const cid = oauth.channelId;
 
     if (isNil(cid) || cid === '') {
@@ -923,9 +884,6 @@ class API extends Core {
   }
 
   async getChannelFollowers (opts: any) {
-    if (!isMainThread) {
-      throw new Error('API can run only on master');
-    }
     opts = opts || {};
 
     const cid = oauth.channelId;
@@ -1032,10 +990,7 @@ class API extends Core {
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
-
-      if (isMainThread) {
-        ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
-      }
+      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
 
       // add id->game to cache
       const name = request.data.data[0].name;
@@ -1087,10 +1042,7 @@ class API extends Core {
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
-
-      if (isMainThread) {
-        ioServer?.emit('api.stats', { method: request.config.method?.toUpperCase(), data: request.data, timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: request.config.url, code: request.status, remaining: this.calls.bot });
-      }
+      ioServer?.emit('api.stats', { method: request.config.method?.toUpperCase(), data: request.data, timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: request.config.url, code: request.status, remaining: this.calls.bot });
 
       // add id->game to cache
       const id = Number(request.data.data[0].id);
@@ -1110,10 +1062,6 @@ class API extends Core {
   }
 
   async getCurrentStreamTags (opts: any) {
-    if (!isMainThread) {
-      throw new Error('API can run only on master');
-    }
-
     const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${cid}`;
 
@@ -1161,10 +1109,6 @@ class API extends Core {
   }
 
   async getCurrentStreamData (opts: any) {
-    if (!isMainThread) {
-      throw new Error('API can run only on master');
-    }
-
     const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/streams?user_id=${cid}`;
 
@@ -1325,9 +1269,6 @@ class API extends Core {
   }
 
   saveStreamData (stream: StreamEndpoint['data'][number]) {
-    if (!isMainThread) {
-      throw new Error('API can run only on master');
-    }
     this.stats.currentViewers = stream.viewer_count;
 
     if (this.stats.maxViewers < stream.viewer_count) {
@@ -1374,9 +1315,6 @@ class API extends Core {
   }
 
   async setTags (tagsArg: string[]) {
-    if (!isMainThread) {
-      throw new Error('API can run only on master');
-    }
     const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${cid}`;
 
@@ -1438,11 +1376,6 @@ class API extends Core {
   }
 
   async setTitleAndGame (args: { title?: string | null; game?: string | null }): Promise<{ response: string; status: boolean } | null> {
-    if (!isMainThread) {
-      clusteredAPI('setTitleAndGame', [ args ]);
-      return null;
-    }
-
     args = defaults(args, { title: null }, { game: null });
     const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/channels?broadcaster_id=${cid}`;
@@ -1561,9 +1494,6 @@ class API extends Core {
   }
 
   async sendGameFromTwitch (socket: SocketIO.Socket | null, game: string) {
-    if (!isMainThread) {
-      throw new Error('API can run only on master');
-    }
     const url = `https://api.twitch.tv/helix/search/categories?query=${encodeURIComponent(game)}`;
 
     const token = oauth.botAccessToken;
@@ -1611,10 +1541,6 @@ class API extends Core {
   }
 
   async checkClips () {
-    if (!isMainThread) {
-      throw new Error('API can run only on master');
-    }
-
     const token = oauth.botAccessToken;
     if (token === '') {
       return { state: false };
@@ -1676,11 +1602,6 @@ class API extends Core {
   }
 
   async createClip (opts: any) {
-    if (!isMainThread) {
-      clusteredAPI('createClip', [ opts ]);
-      return;
-    }
-
     if (!(this.isStreamOnline)) {
       return;
     } // do nothing if stream is offline
@@ -1757,10 +1678,6 @@ class API extends Core {
       return;
     }
 
-    if (!isMainThread) {
-      clusteredAPI('fetchAccountAge', [ id ]);
-      return;
-    }
     const url = `https://api.twitch.tv/kraken/users/${id}`;
 
     const token = oauth.botAccessToken;

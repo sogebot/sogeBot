@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { command, settings, shared } from '../decorators';
+import { command, settings } from '../decorators';
 import Game from './_interface';
 import { MINUTE } from '../constants';
 import { isBroadcaster, isModerator, prepare, timeout } from '../commons';
@@ -24,7 +24,6 @@ setInterval(() => {
 }, MINUTE / 2);
 
 class FightMe extends Game {
-  @shared()
   _cooldown = String(new Date());
 
   @settings()

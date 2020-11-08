@@ -2,7 +2,6 @@ import axios from 'axios';
 import _ from 'lodash';
 import safeEval from 'safe-eval';
 import { setTimeout } from 'timers'; // tslint workaround
-import { isMainThread } from './cluster';
 import Core from './_interface';
 import { flatten } from './helpers/flatten';
 import { attributesReplace } from './helpers/attributesReplace';
@@ -100,10 +99,8 @@ class Events extends Core {
       { id: 'decrement-custom-variable', definitions: { customVariable: '', numberToDecrement: '1' }, fire: this.fireDecrementCustomVariable },
     ];
 
-    if (isMainThread) {
-      this.addMenu({ category: 'manage', name: 'event-listeners', id: 'manage/events/list', this: null });
-      this.fadeOut();
-    }
+    this.addMenu({ category: 'manage', name: 'event-listeners', id: 'manage/events/list', this: null });
+    this.fadeOut();
   }
 
   public async fire(eventId: string, attributes: Events.Attributes): Promise<void> {

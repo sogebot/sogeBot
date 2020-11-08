@@ -1,5 +1,4 @@
 import * as _ from 'lodash';
-import { isMainThread } from '../cluster';
 import { setInterval } from 'timers';
 import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
@@ -7,7 +6,7 @@ import ytpl from 'ytpl';
 import io from 'socket.io';
 
 import { announce, getBot, getBotSender, isModerator, prepare, timeout } from '../commons';
-import { command, default_permission, settings, shared, ui } from '../decorators';
+import { command, default_permission, persistent, settings, ui } from '../decorators';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
 import { onChange } from '../decorators/on';
@@ -24,13 +23,10 @@ let isCachedTagsValid = false;
 class Songs extends System {
   interval: { [id: string]: NodeJS.Timeout } = {};
 
-  @shared()
   meanLoudness = -15;
-  @shared()
   currentSong: string = JSON.stringify({ videoID: null });
-  @shared()
   isPlaying: {[socketId: string]: boolean } = {};
-  @shared(true)
+  @persistent()
   currentTag = 'general';
 
   @settings()
@@ -59,18 +55,16 @@ class Songs extends System {
   constructor () {
     super();
 
-    if (isMainThread) {
-      setTimeout(() => {
-        this.getMeanLoudness();
+    setTimeout(() => {
+      this.getMeanLoudness();
 
-        this.addMenu({ category: 'manage', name: 'playlist', id: 'manage/songs/playlist', this: this });
-        this.addMenu({ category: 'manage', name: 'bannedsongs', id: 'manage/songs/bannedsongs', this: this });
-        this.addMenuPublic({ id: 'songrequests', name: 'songs'});
-        this.addMenuPublic({ id: 'playlist', name: 'playlist'});
-        this.addWidget('ytplayer', 'widget-title-ytplayer', 'fas fa-headphones');
+      this.addMenu({ category: 'manage', name: 'playlist', id: 'manage/songs/playlist', this: this });
+      this.addMenu({ category: 'manage', name: 'bannedsongs', id: 'manage/songs/bannedsongs', this: this });
+      this.addMenuPublic({ id: 'songrequests', name: 'songs'});
+      this.addMenuPublic({ id: 'playlist', name: 'playlist'});
+      this.addWidget('ytplayer', 'widget-title-ytplayer', 'fas fa-headphones');
 
-      }, 10000);
-    }
+    }, 10000);
   }
 
   async getTags() {

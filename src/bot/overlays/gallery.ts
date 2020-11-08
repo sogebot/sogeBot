@@ -1,6 +1,5 @@
 import Overlay from './_interface';
 import { v4 as uuid } from 'uuid';
-import { isMainThread } from '../cluster';
 import { adminEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
@@ -15,41 +14,39 @@ class Gallery extends Overlay {
     super();
     this.addMenu({ category: 'registry', name: 'gallery', id: 'registry.gallery/list', this: null });
 
-    if (isMainThread) {
-      const init = (retry = 0) => {
-        if (retry === 10000) {
-          throw new Error('Gallery endpoint failed.');
-        } else if (!app) {
-          setTimeout(() => init(retry++), 100);
-        } else {
-          debug('ui', 'Gallery endpoint OK.');
-          app.get('/gallery/:id', async (req, res) => {
-            const request = await getRepository(GalleryEntity).createQueryBuilder('gallery').select('sum(length(data))', 'size').where('id=:id', { id: req.params.id }).getRawOne();
-            if (!request) {
-              res.sendStatus(404);
-              return;
-            }
-            if (req.headers['if-none-match'] === req.params.id + '-' + request.size) {
-              res.sendStatus(304);
-              return;
-            }
+    const init = (retry = 0) => {
+      if (retry === 10000) {
+        throw new Error('Gallery endpoint failed.');
+      } else if (!app) {
+        setTimeout(() => init(retry++), 100);
+      } else {
+        debug('ui', 'Gallery endpoint OK.');
+        app.get('/gallery/:id', async (req, res) => {
+          const request = await getRepository(GalleryEntity).createQueryBuilder('gallery').select('sum(length(data))', 'size').where('id=:id', { id: req.params.id }).getRawOne();
+          if (!request) {
+            res.sendStatus(404);
+            return;
+          }
+          if (req.headers['if-none-match'] === req.params.id + '-' + request.size) {
+            res.sendStatus(304);
+            return;
+          }
 
-            const file = await getRepository(GalleryEntity).findOne({ id: req.params.id });
-            if (file) {
-              const data = Buffer.from(file.data.split(',')[1], 'base64');
-              res.writeHead(200, {
-                'Content-Type': file.type,
-                'Content-Length': data.length,
-                'Cache-Control': 'public, max-age=31536000',
-                'ETag': req.params.id + '-' + request.size,
-              });
-              res.end(data);
-            }
-          });
-        }
-      };
-      init();
-    }
+          const file = await getRepository(GalleryEntity).findOne({ id: req.params.id });
+          if (file) {
+            const data = Buffer.from(file.data.split(',')[1], 'base64');
+            res.writeHead(200, {
+              'Content-Type': file.type,
+              'Content-Length': data.length,
+              'Cache-Control': 'public, max-age=31536000',
+              'ETag': req.params.id + '-' + request.size,
+            });
+            res.end(data);
+          }
+        });
+      }
+    };
+    init();
   }
 
   sockets () {

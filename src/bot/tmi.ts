@@ -10,12 +10,11 @@ import Expects from './expects';
 import Core from './_interface';
 import * as constants from './constants';
 import { settings, ui } from './decorators';
-import { cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning } from './helpers/log';
+import { chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning, whisperIn } from './helpers/log';
 import { triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub } from './helpers/interface/triggers';
 import { isDebugEnabled } from './helpers/log';
 import { getBotSender, getOwner, isBot, isIgnored, isOwner, prepare, sendMessage } from './commons';
 import { getLocalizedName } from './helpers/getLocalized';
-import { clusteredChatIn, clusteredWhisperIn, isMainThread, manageMessage } from './cluster';
 
 import { getRepository } from 'typeorm';
 import { User, UserBitInterface } from './database/entity/user';
@@ -769,11 +768,7 @@ class TMI extends Core {
     this.client[client]?.chat.say(getOwner(), '/delete ' + msgId);
   }
 
-  async message (data: { skip?: boolean, quiet?: boolean, message: Pick<Message, 'message' | 'tags'>}, managed = false) {
-    if (!managed && !global.mocha) {
-      return manageMessage(data);
-    }
-
+  async message (data: { skip?: boolean, quiet?: boolean, message: Pick<Message, 'message' | 'tags'>}) {
     const sender = data.message.tags as UserStateTagsWithId;
     const message = data.message.message;
     const skip = data.skip ?? false;
@@ -793,9 +788,9 @@ class TMI extends Core {
     if (!skip
         && sender['message-type'] === 'whisper'
         && (tmi.whisperListener || isOwner(sender))) {
-      clusteredWhisperIn(`${message} [${sender.username}]`);
+      whisperIn(`${message} [${sender.username}]`);
     } else if (!skip && !isBot(sender.username)) {
-      clusteredChatIn(`${message} [${sender.username}]`);
+      chatIn(`${message} [${sender.username}]`);
     }
 
     const isModerated = await parse.isModerated();
@@ -863,11 +858,7 @@ class TMI extends Core {
       }
     }
 
-    if (isMainThread) {
-      avgResponse({ value: parse.time(), message });
-    } else {
-      return { value: parse.time(), message };
-    }
+    avgResponse({ value: parse.time(), message });
   }
 }
 

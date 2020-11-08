@@ -3,10 +3,9 @@ import chalk from 'chalk';
 import crypto from 'crypto';
 import _ from 'lodash';
 import SpotifyWebApi from 'spotify-web-api-node';
-import { isMainThread } from '../cluster';
 
 import { announce, prepare } from '../commons';
-import { command, default_permission, settings, shared, ui } from '../decorators';
+import { command, default_permission, persistent, settings, ui } from '../decorators';
 import { onChange, onLoad, onStartup } from '../decorators/on';
 import Expects from '../expects';
 import Integration from './_interface';
@@ -40,11 +39,9 @@ class Spotify extends Integration {
   retry: { IRefreshToken: number } = { IRefreshToken: 0 };
   state: any = null;
 
-  @shared(true)
+  @persistent()
   songsHistory: string[] = [];
-  @shared()
   userId: string | null = null;
-  @shared()
   currentSong: string = JSON.stringify({});
 
   @settings()
@@ -108,11 +105,9 @@ class Spotify extends Integration {
     this.addWidget('spotify', 'widget-title-spotify', 'fab fa-spotify');
     this.addMenu({ category: 'manage', name: 'spotifybannedsongs', id: 'manage/spotify/bannedsongs', this: this });
 
-    if (isMainThread) {
-      this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
-      this.timeouts.ICurrentSong = global.setTimeout(() => this.ICurrentSong(), 10000);
-      this.timeouts.getMe = global.setTimeout(() => this.getMe(), 10000);
-    }
+    this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
+    this.timeouts.ICurrentSong = global.setTimeout(() => this.ICurrentSong(), 10000);
+    this.timeouts.getMe = global.setTimeout(() => this.getMe(), 10000);
   }
 
   @onLoad('songsHistory')

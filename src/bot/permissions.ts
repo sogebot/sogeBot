@@ -7,7 +7,6 @@ import {
 import { debug, warning } from './helpers/log';
 import { addToCachedHighestPermission, cleanViewersCache, getFromCachedHighestPermission, permission } from './helpers/permissions';
 import { areDecoratorsLoaded, command, default_permission } from './decorators';
-import { isMainThread } from './cluster';
 import { error } from './helpers/log';
 import { adminEndpoint } from './helpers/socket';
 
@@ -26,9 +25,7 @@ class Permissions extends Core {
     super();
     this.addMenu({ category: 'settings', name: 'permissions', id: 'settings/permissions', this: null });
 
-    if (isMainThread) {
-      this.ensurePreservedPermissionsInDb();
-    }
+    this.ensurePreservedPermissionsInDb();
   }
 
   public sockets() {

@@ -1,6 +1,3 @@
-// 3rdparty libraries
-import { isMainThread } from '../cluster';
-
 // bot libraries
 import Integration from './_interface';
 import { settings, ui } from '../decorators';
@@ -23,11 +20,9 @@ class LastFM extends Integration {
   constructor() {
     super();
 
-    if (isMainThread) {
-      setInterval(() => {
-        this.fetchData();
-      }, 5000);
-    }
+    setInterval(() => {
+      this.fetchData();
+    }, 5000);
   }
 
   @onChange('username')

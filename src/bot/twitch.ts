@@ -1,5 +1,3 @@
-import { isMainThread } from './cluster';
-
 import { isIgnored, prepare } from './commons';
 import { command, default_permission, settings } from './decorators';
 import { permission } from './helpers/permissions';
@@ -27,9 +25,7 @@ class Twitch extends Core {
   constructor () {
     super();
 
-    if (isMainThread) {
-      this.addWidget('twitch', 'widget-title-twitch', 'fab fa-twitch');
-    }
+    this.addWidget('twitch', 'widget-title-twitch', 'fab fa-twitch');
   }
 
   sockets() {

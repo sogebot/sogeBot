@@ -16,7 +16,6 @@ import ranks from './ranks';
 import points from './points';
 import Expects from '../expects';
 import { getUserFromTwitch } from '../microservices/getUserFromTwitch';
-import { clusteredFetchAccountAge } from '../cluster';
 import { dayjs } from '../helpers/dayjs';
 import general from '../general';
 
@@ -136,7 +135,7 @@ class UserInfo extends System {
             username: username,
           });
         }
-        await clusteredFetchAccountAge(Number(userId));
+        await api.fetchAccountAge(Number(userId));
         if (!retry) {
           return this.age(opts, retry = true);
         } else {

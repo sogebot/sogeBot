@@ -1,6 +1,5 @@
 import * as _ from 'lodash';
 import * as constants from '../constants';
-import { isMainThread } from '../cluster';
 import axios from 'axios';
 import XRegExp from 'xregexp';
 
@@ -62,22 +61,20 @@ class Emotes extends Overlay {
 
   constructor () {
     super();
-    if (isMainThread) {
-      setTimeout(() => {
-        if (!this.fetch.global) {
-          this.fetchEmotesGlobal();
-        }
-        if (!this.fetch.channel) {
-          this.fetchEmotesChannel();
-        }
-        if (!this.fetch.ffz) {
-          this.fetchEmotesFFZ();
-        }
-        if (!this.fetch.bttv) {
-          this.fetchEmotesBTTV();
-        }
-      }, 10000);
-    }
+    setTimeout(() => {
+      if (!this.fetch.global) {
+        this.fetchEmotesGlobal();
+      }
+      if (!this.fetch.channel) {
+        this.fetchEmotesChannel();
+      }
+      if (!this.fetch.ffz) {
+        this.fetchEmotesFFZ();
+      }
+      if (!this.fetch.bttv) {
+        this.fetchEmotesBTTV();
+      }
+    }, 10000);
   }
 
   sockets () {

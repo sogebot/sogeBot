@@ -1,7 +1,6 @@
 import chalk from 'chalk';
 import _ from 'lodash';
 import { setTimeout } from 'timers';
-import { isMainThread } from './cluster';
 
 import { commandsToRegister, loadingInProgress, permissions as permissionsList } from './decorators';
 import { getFunctionList } from './decorators/on';
@@ -143,12 +142,10 @@ class Module {
               // change only if we can enable/disable
               this._enabled = typeof state === 'undefined' ? this._enabled : state;
             }
-            this.status({ state: this._enabled, quiet: !isMainThread });
-            if (isMainThread) {
-              const path = this._name === 'core' ? this.__moduleName__.toLowerCase() : `${this._name}.${this.__moduleName__.toLowerCase()}`;
-              for (const event of getFunctionList('startup', path)) {
-                (this as any)[event.fName]('enabled', state);
-              }
+            this.status({ state: this._enabled });
+            const path = this._name === 'core' ? this.__moduleName__.toLowerCase() : `${this._name}.${this.__moduleName__.toLowerCase()}`;
+            for (const event of getFunctionList('startup', path)) {
+              (this as any)[event.fName]('enabled', state);
             }
             this.onStartupTriggered = true;
           };
@@ -417,7 +414,7 @@ class Module {
       return true;
     }
 
-    const isMasterAndStatusOnly = isMainThread && _.isNil(opts.state);
+    const isMasterAndStatusOnly = _.isNil(opts.state);
     const isStatusChanged = !_.isNil(opts.state);
 
     if (existsSync('./restart.pid') // force quiet if we have restart.pid
@@ -439,7 +436,7 @@ class Module {
     } // force disable if dependencies are disabled or disabled by env
 
     // on.change handler on enabled
-    if (isMainThread && isStatusChanged && this.onStartupTriggered) {
+    if (isStatusChanged && this.onStartupTriggered) {
       const path = this._name === 'core' ? this.__moduleName__.toLowerCase() : `${this._name}.${this.__moduleName__.toLowerCase()}`;
       for (const event of getFunctionList('change', path + '.enabled')) {
         if (typeof (this as any)[event.fName] === 'function') {
@@ -464,21 +461,15 @@ class Module {
   }
 
   public addMenu(opts: typeof menu[number]) {
-    if (isMainThread) {
-      addMenu(opts);
-    }
+    addMenu(opts);
   }
 
   public addMenuPublic(opts: typeof menuPublic[number]) {
-    if (isMainThread) {
-      addMenuPublic(opts);
-    }
+    addMenuPublic(opts);
   }
 
   public addWidget(...opts: any[]) {
-    if (isMainThread) {
-      addWidget(opts[0], opts[1], opts[2]);
-    }
+    addWidget(opts[0], opts[1], opts[2]);
   }
 
   public async getAllSettings() {
