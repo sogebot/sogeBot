@@ -44,7 +44,6 @@
       </template>
       <template v-slot:cell(buttons)="data">
         <div class="float-right pr-2" style="width: max-content !important;">
-          </button-with-icon>
           <hold-button @trigger="deleteItem(data.item.spotifyUri)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
             <template slot="title">{{translate('dialog.buttons.delete')}}</template>
             <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
@@ -60,8 +59,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
-import { isNil } from 'lodash-es';
-import { escape } from 'xregexp';
+import { isNil, escapeRegExp } from 'lodash-es';
 import { SpotifySongBanInterface } from 'src/bot/database/entity/spotify';
 
 @Component({
@@ -94,7 +92,7 @@ export default class playlist extends Vue {
   get fItems() {
     if (this.search.length === 0) return this.items
     return this.items.filter((o) => {
-      const isSearchInTitle = !isNil(o.title.match(new RegExp(escape(this.search), 'ig')))
+      const isSearchInTitle = !isNil(o.title.match(new RegExp(escapeRegExp(this.search), 'ig')))
       return isSearchInTitle
     })
   }

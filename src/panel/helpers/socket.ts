@@ -1,4 +1,4 @@
-import io from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { setTranslations } from './translate';
 import axios from 'axios';
 
@@ -10,13 +10,14 @@ export const redirectLogin = () => {
   }
 };
 
-export function getSocket(namespace: string, continueOnUnauthorized = false) {
+export function getSocket(namespace: string, continueOnUnauthorized = false): Socket {
   const socket = io(namespace, {
     forceNew: true,
-    query: {
+    auth: {
       token: localStorage.getItem('accessToken'),
     },
   });
+  socket.connect();
   socket.on('error', (error: string) => {
     if (error === 'TokenExpiredError: jwt expired') {
       console.debug('Using refresh token to obtain new access token');

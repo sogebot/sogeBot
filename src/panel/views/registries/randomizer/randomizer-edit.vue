@@ -257,8 +257,8 @@ export default class randomizerEdit extends Vue {
   translate = translate;
   getRandomColor = getRandomColor;
   getContrastColor = getContrastColor;
-  psocket: SocketIOClient.Socket = getSocket('/core/permissions');
-  socket: SocketIOClient.Socket =  getSocket('/registries/randomizer');
+  psocket = getSocket('/core/permissions');
+  socket = getSocket('/registries/randomizer');
 
   draggingItem: null | number = null;
   alreadyCalculatedOrder = -1;

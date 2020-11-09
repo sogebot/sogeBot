@@ -63,8 +63,8 @@ library.add(faExclamationTriangle, faClone)
 export default class randomizerList extends Vue {
   translate = translate;
   orderBy = orderBy;
-  psocket: SocketIOClient.Socket = getSocket('/core/permissions');
-  socket: SocketIOClient.Socket =  getSocket('/registries/randomizer');
+  psocket = getSocket('/core/permissions');
+  socket = getSocket('/registries/randomizer');
 
   fields = [
     { key: 'name', label: translate('registry.randomizer.form.name'), sortable: true },

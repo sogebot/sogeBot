@@ -59,8 +59,7 @@
 import { getSocket } from 'src/panel/helpers/socket';
 
 import { defineComponent, ref, onMounted, computed } from '@vue/composition-api'
-import { isNil } from 'lodash-es';
-import { escape } from 'xregexp';
+import { isNil, escapeRegExp } from 'lodash-es';
 import { SongBanInterface } from 'src/bot/database/entity/song';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import translate from 'src/panel/helpers/translate';
@@ -95,7 +94,7 @@ export default defineComponent({
     const fItems = computed(() => {
       if (search.value.length === 0) return items.value
       return items.value.filter((o) => {
-        const isSearchInTitle = !isNil(o.title.match(new RegExp(escape(search.value), 'ig')))
+        const isSearchInTitle = !isNil(o.title.match(new RegExp(escapeRegExp(search.value), 'ig')))
         return isSearchInTitle
       })
     });

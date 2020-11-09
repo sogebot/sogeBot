@@ -19,6 +19,8 @@ import { addMenu, addMenuPublic, addWidget, ioServer, menu, menuPublic } from '.
 import { v4 as uuid } from 'uuid';
 import { invalidateParserCache, refreshCachedCommandPermissions } from './helpers/cache';
 
+import type { Namespace } from 'socket.io/dist/namespace';
+
 let socket: import('./socket').Socket | any = null;
 
 class Module {
@@ -28,7 +30,7 @@ class Module {
   public settingsList: { category?: string; key: string }[] = [];
   public settingsPermList: { category?: string; key: string }[] = [];
   public on: InterfaceSettings.On;
-  public socket: SocketIO.Namespace | null = null;
+  public socket: Namespace | null = null;
   public uuid = uuid();
   private firstStatusSent = false;
 

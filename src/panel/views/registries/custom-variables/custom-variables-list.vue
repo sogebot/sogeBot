@@ -105,8 +105,8 @@ library.add(faExclamationTriangle)
   }
 })
 export default class customVariablesList extends Vue {
-  psocket: SocketIOClient.Socket = getSocket('/core/permissions');
-  socket: SocketIOClient.Socket =  getSocket('/core/customvariables');
+  psocket = getSocket('/core/permissions');
+  socket = getSocket('/core/customvariables');
   translate = translate;
 
   fields = [

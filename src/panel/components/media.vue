@@ -89,6 +89,7 @@ import translate from 'src/panel/helpers/translate';
 
 import { getSocket } from '../helpers/socket';
 import type { AlertMediaInterface } from 'src/bot/database/entity/alert';
+import { Socket } from 'socket.io-client';
 
 interface Props {
   media: string; default?: string; socket: string; type: 'image' | 'audio'; volume: number;
@@ -106,7 +107,7 @@ export default defineComponent({
     volume: Number,
   },
   setup(props: Props, context) {
-    let io: null | SocketIOClient.Socket = null;
+    let io: null | Socket = null;
     let interval = 0
 
     const b64data = ref('');

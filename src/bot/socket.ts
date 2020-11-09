@@ -6,6 +6,7 @@ import { adminEndpoint, endpoints } from './helpers/socket';
 import { onLoad } from './decorators/on';
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
+import { Socket as SocketIO } from 'socket.io';
 
 import { getRepository } from 'typeorm';
 import permissions from './permissions';
@@ -86,11 +87,11 @@ const getPrivileges = async(type: 'admin' | 'viewer' | 'public', userId: number)
   }
 };
 
-const initEndpoints = async(socket: SocketIO.Socket, privileges: Unpacked<ReturnType<typeof getPrivileges>>) => {
+const initEndpoints = async(socket: SocketIO, privileges: Unpacked<ReturnType<typeof getPrivileges>>) => {
   for (const key of [...new Set(endpoints.filter(o => o.nsp === socket.nsp.name).map(o => o.nsp + '||' + o.on))]) {
     const [nsp, on] = key.split('||');
     const endpointsToInit = endpoints.filter(o => o.nsp === nsp && o.on === on);
-    socket.removeAllListeners(on); // remove all listeners in case we call this twice
+    socket.offAny(); // remove all listeners in case we call this twice
 
     socket.on(on, async (opts: any, cb: (error: Error | string | null, ...response: any) => void) => {
       const adminEndpointInit = endpointsToInit.find(o => o.type === 'admin');
@@ -239,14 +240,15 @@ class Socket extends Core {
     init();
   }
 
-  async authorize(socket: SocketIO.Socket, next: NextFunction) {
+  async authorize(socket: SocketIO, next: NextFunction) {
+    const authToken = (socket.handshake.auth as any).token;
     // first check if token is socketToken
-    if (socket.handshake.query.token === this.socketToken) {
+    if (authToken === this.socketToken) {
       initEndpoints(socket, { haveAdminPrivileges: Authorized.isAuthorized, haveModPrivileges: Authorized.isAuthorized, haveViewerPrivileges: Authorized.isAuthorized });
     } else {
-      if (socket.handshake.query.token !== '' && socket.handshake.query.token !== 'null') {
+      if (authToken !== '' && authToken !== 'null') {
         try {
-          const token = jwt.verify(socket.handshake.query.token, _self.JWTKey) as {
+          const token = jwt.verify(authToken, _self.JWTKey) as {
             userId: number; username: string; privileges: Unpacked<ReturnType<typeof getPrivileges>>;
           };
           debug('socket', JSON.stringify(token, null, 4));
@@ -261,6 +263,7 @@ class Socket extends Core {
         setTimeout(() => socket.emit('forceDisconnect'), 1000); // force disconnect if we must be logged in
       }
     }
+    console.log(authToken);
     next();
   }
 

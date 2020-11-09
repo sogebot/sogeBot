@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import io from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import chalk from 'chalk';
 import axios from 'axios';
 
@@ -47,7 +47,7 @@ namespace StreamlabsEvent {
 }
 
 class Streamlabs extends Integration {
-  socketToStreamlabs: SocketIOClient.Socket | null = null;
+  socketToStreamlabs: Socket | null = null;
 
   // save last donationId which rest api had
   @persistent()
@@ -92,7 +92,7 @@ class Streamlabs extends Integration {
 
   async disconnect () {
     if (this.socketToStreamlabs !== null) {
-      this.socketToStreamlabs.removeAllListeners();
+      this.socketToStreamlabs.offAny();
       this.socketToStreamlabs.disconnect();
     }
   }
@@ -156,7 +156,7 @@ class Streamlabs extends Integration {
       return;
     }
 
-    this.socketToStreamlabs = io.connect('https://sockets.streamlabs.com?token=' + this.socketToken);
+    this.socketToStreamlabs = io('https://sockets.streamlabs.com?token=' + this.socketToken);
 
     this.socketToStreamlabs.on('reconnect_attempt', () => {
       info(chalk.yellow('STREAMLABS:') + ' Trying to reconnect to service');

@@ -185,8 +185,7 @@ import { getPermissionName } from 'src/panel/helpers/getPermissionName';
 import { AliasInterface } from 'src/bot/database/entity/alias';
 import { PermissionsInterface } from 'src/bot/database/entity/permissions';
 
-import { orderBy, isNil } from 'lodash-es';
-import { escape } from 'xregexp';
+import { orderBy, isNil, escapeRegExp } from 'lodash-es';
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -279,8 +278,8 @@ export default defineComponent({
     const fItems = computed(() => {
       if (search.value.length === 0) return items.value
       return items.value.filter((o) => {
-        const isSearchInAlias = !isNil(o.alias.match(new RegExp(escape(search.value), 'ig')))
-        const isSearchInCommand = !isNil(o.command.match(new RegExp(escape(search.value), 'ig')))
+        const isSearchInAlias = !isNil(o.alias.match(new RegExp(escapeRegExp(search.value), 'ig')))
+        const isSearchInCommand = !isNil(o.command.match(new RegExp(escapeRegExp(search.value), 'ig')))
         return isSearchInAlias || isSearchInCommand
       })
     });

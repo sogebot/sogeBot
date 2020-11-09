@@ -16,6 +16,7 @@ import type { SongPlaylistInterface } from '../database/entity/song';
 import type { PriceInterface } from '../database/entity/price';
 import type { DashboardInterface } from '../database/entity/dashboard';
 import type PUBG from '../integrations/pubg';
+import { Socket } from 'socket.io';
 
 const endpoints: {
   type: 'admin' | 'viewer' | 'public';
@@ -114,28 +115,28 @@ function adminEndpoint (nsp: string, on: 'panel::availableWidgets' | 'panel::das
 function adminEndpoint (nsp: string, on: 'panel::dashboards::remove', callback: (opts: { userId: number; type: DashboardInterface['type'], id: string }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'panel::dashboards::create', callback: (opts: { userId: number, name: string }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'lists.set', callback: (opts: { blacklist: string[]; whitelist: string[] }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'purgeAllConnections', callback: (cb: (error: Error | string | null) => void, socket: SocketIO.Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'pubg::searchForPlayerId', callback: (opts: { apiKey: string, platform: typeof PUBG.platform, playerName: string }, cb: (error: Error | string | null, data: any) => void, socket: SocketIO.Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'pubg::searchForseasonId', callback: (opts: { apiKey: string, platform: typeof PUBG.platform, playerName: string }, cb: (error: Error | string | null, data: any) => void, socket: SocketIO.Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'pubg::getUserStats', callback: (opts: { apiKey: string, platform: typeof PUBG.platform, playerId: string, seasonId: string, ranked: boolean }, cb: (error: Error | string | null, data: any) => void, socket: SocketIO.Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'pubg::exampleParse', callback: (opts: { text: string }, cb: (error: Error | string | null, data: any) => void, socket: SocketIO.Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'alerts::areAlertsMuted', callback: (areAlertsMuted: boolean, cb: (error: Error | string | null, data: any) => void, socket: SocketIO.Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'import.playlist', callback: (otps: {playlist: string, forcedTag: string}, cb: (error: Error | string | null, data: any) => void, socket: SocketIO.Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'import.video', callback: (opts: {playlist: string, forcedTag: string}, cb: (error: Error | string | null, data: any) => void, socket: SocketIO.Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'get.playlist.tags', callback: (cb: (error: Error | string | null, data: string[]) => void, socket: SocketIO.Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'set.playlist.tag', callback: (tag:string, socket: SocketIO.Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'purgeAllConnections', callback: (cb: (error: Error | string | null) => void, socket: Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'pubg::searchForPlayerId', callback: (opts: { apiKey: string, platform: typeof PUBG.platform, playerName: string }, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'pubg::searchForseasonId', callback: (opts: { apiKey: string, platform: typeof PUBG.platform, playerName: string }, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'pubg::getUserStats', callback: (opts: { apiKey: string, platform: typeof PUBG.platform, playerId: string, seasonId: string, ranked: boolean }, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'pubg::exampleParse', callback: (opts: { text: string }, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'alerts::areAlertsMuted', callback: (areAlertsMuted: boolean, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'import.playlist', callback: (otps: {playlist: string, forcedTag: string}, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'import.video', callback: (opts: {playlist: string, forcedTag: string}, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'get.playlist.tags', callback: (cb: (error: Error | string | null, data: string[]) => void, socket: Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'set.playlist.tag', callback: (tag:string, socket: Socket) => void): void;
 
 // generic functions
-function adminEndpoint (nsp: string, on: string, callback: (opts: { [x: string]: any }, cb?: (error: Error | string | null, ...response: any) => void) => void, socket?: SocketIO.Socket): void;
-function adminEndpoint (nsp: string, on: string, callback: (cb?: (error: Error | string | null, ...response: any) => void) => void, socket?: SocketIO.Socket): void;
+function adminEndpoint (nsp: string, on: string, callback: (opts: { [x: string]: any }, cb?: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket): void;
+function adminEndpoint (nsp: string, on: string, callback: (cb?: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket): void;
 function adminEndpoint (nsp: any, on: any, callback: any): void{
   endpoints.push({ nsp, on, callback, type: 'admin' });
 }
 
-const viewerEndpoint = (nsp: string, on: string, callback: (opts: any, cb: (error: Error | string | null, ...response: any) => void) => void, socket?: SocketIO.Socket) => {
+const viewerEndpoint = (nsp: string, on: string, callback: (opts: any, cb: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket) => {
   endpoints.push({ nsp, on, callback, type: 'viewer' });
 };
-const publicEndpoint = (nsp: string, on: string, callback: (opts: any, cb: (error: Error | string | null, ...response: any) => void) => void, socket?: SocketIO.Socket) => {
+const publicEndpoint = (nsp: string, on: string, callback: (opts: any, cb: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket) => {
   endpoints.push({ nsp, on, callback, type: 'public' });
 };
 

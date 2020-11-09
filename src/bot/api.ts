@@ -37,6 +37,7 @@ import { find } from './helpers/register';
 import { SQLVariableLimit } from './helpers/sql';
 import { addUIError } from './panel';
 import { dayjs } from './helpers/dayjs';
+import { Socket } from 'socket.io';
 
 let latestFollowedAtTimestamp = 0;
 
@@ -1539,7 +1540,7 @@ class API extends Core {
     return { response: '', status: false };
   }
 
-  async sendGameFromTwitch (socket: SocketIO.Socket | null, game: string) {
+  async sendGameFromTwitch (socket: Socket | null, game: string) {
     const url = `https://api.twitch.tv/helix/search/categories?query=${encodeURIComponent(game)}`;
 
     const token = oauth.botAccessToken;
