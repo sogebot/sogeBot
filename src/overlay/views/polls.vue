@@ -36,7 +36,7 @@
           <strong v-if="currentVote.type !== 'tips'">{{ totalVotes }}</strong>
           <strong v-else>{{ Number(totalVotes).toFixed(1) }}</strong>
         </div>
-        <div style="width: 100%">{{translate('systems.polls.activeFor')}} <strong>{{ activeTime | duration('humanize') }}</strong></div>
+        <div style="width: 100%">{{translate('systems.polls.activeFor')}} <strong>{{ dayjs().from(dayjs(activeTime), true) }}</strong></div>
       </div>
     </div>
   </transition>
@@ -48,6 +48,7 @@ import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import JsonViewer from 'vue-json-viewer'
 import { PollInterface } from '../../bot/database/entity/poll';
+import { dayjs } from 'src/bot/helpers/dayjs';
 
 @Component({
   components: {
@@ -55,6 +56,7 @@ import { PollInterface } from '../../bot/database/entity/poll';
   },
 })
 export default class PollsOverlay extends Vue {
+  dayjs = dayjs
   socket = getSocket('/overlays/polls', true);
   currentVote: any = null;
   votes: any[] = [];
@@ -87,7 +89,7 @@ export default class PollsOverlay extends Vue {
   }
 
   get activeTime () {
-    return this.currentTime - (new Date(this.currentVote.openedAt)).getTime()
+    return new Date(this.currentVote.openedAt).getTime()
   }
   get totalVotes () {
     let votes = 0

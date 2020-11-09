@@ -132,7 +132,7 @@
                   <strong v-if="vote.type !== 'tips'">{{ totalVotes(vote.id) }}</strong>
                   <strong v-else>{{ Number(totalVotes(vote.id)).toFixed(1) }}</strong>
                 </div>
-                <div style="width: 100%" v-if="vote.isOpened">{{ translate('systems.polls.activeFor') }} <strong>{{ activeTime(vote.id) | duration('humanize') }}</strong></div>
+                <div style="width: 100%" v-if="vote.isOpened">{{ translate('systems.polls.activeFor') }} <strong>{{ dayjs().from(dayjs(activeTime(vote.id)), true) }}</strong></div>
                 <div style="width: 100%" v-else>{{ translate('systems.polls.closedAt') }} <strong>{{ dayjs(vote.closedAt).format('LLL') }}</strong></div>
               </div>
             </div>
@@ -332,7 +332,7 @@
       activeTime: function (vid: string) {
         const vote = this.votes.find(o => typeof o !== 'string' && o.id === vid);
         if (typeof vote === 'object') {
-          return this.currentTime - (new Date(vote.openedAt || Date.now())).getTime();
+          return new Date(vote.openedAt || Date.now()).getTime();
         } else {
           return 0;
         }
