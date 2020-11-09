@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { announce, getOwnerAsSender, prepare } from '../commons.js';
+import { announce, getOwnerAsSender, parserReply, prepare } from '../commons.js';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { command, default_permission, helper, parser, settings } from '../decorators';
 import { onBit, onMessage, onTip } from '../decorators/on';
@@ -55,6 +55,15 @@ class Polls extends System {
     this.addMenu({ category: 'manage', name: 'polls', id: 'manage/polls', this: this });
   }
 
+
+  sendResponse(responses: CommandResponse[]) {
+    for (let i = 0; i < responses.length; i++) {
+      setTimeout(async () => {
+        parserReply(await responses[i].response, { sender: responses[i].sender });
+      }, i * 500);
+    }
+  }
+
   public async sockets() {
     adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
@@ -71,13 +80,14 @@ class Polls extends System {
     adminEndpoint(this.nsp, 'polls::save', async (vote, cb) => {
       try {
         const parameters = `-${vote.type} -title "${vote.title}" ${vote.options.filter((o) => o.trim().length > 0).join(' | ')}`;
-        this.open({
+        const response = await this.open({
           command: this.getCommand('!poll open'),
           parameters,
           createdAt: 0,
           sender: getOwnerAsSender(),
           attr: { skip: false, quiet: false },
         });
+        this.sendResponse(response);
         cb(null, null);
       } catch (e) {
         cb(e.stack, null);
@@ -85,13 +95,14 @@ class Polls extends System {
     });
     adminEndpoint(this.nsp, 'polls::close', async (vote, cb) => {
       try {
-        this.close({
+        const response = await this.close({
           command: this.getCommand('!poll close'),
           parameters: '',
           createdAt: 0,
           sender: getOwnerAsSender(),
           attr: { skip: false, quiet: false },
         });
+        this.sendResponse(response);
         cb(null);
       } catch (e) {
         cb(e.stack);
