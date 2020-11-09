@@ -263,7 +263,6 @@ class Socket extends Core {
         setTimeout(() => socket.emit('forceDisconnect'), 1000); // force disconnect if we must be logged in
       }
     }
-    console.log(authToken);
     next();
   }
 

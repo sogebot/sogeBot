@@ -129,7 +129,6 @@ export const init = () => {
   ioServer?.use(socketSystem.authorize);
 
   ioServer?.on('connect', async (socket) => {
-    console.log({socket});
     socket.on('disconnect', () => {
       socketsConnected--;
     });

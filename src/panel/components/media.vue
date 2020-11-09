@@ -226,7 +226,7 @@ export default defineComponent({
     onMounted(() => {
       createdAt.value = Date.now();
       io = getSocket(props.socket);
-      io.emit('alerts::getOneMedia', props.media, (err: string| null, data: AlertMediaInterface[]) => {
+      io?.emit('alerts::getOneMedia', props.media, (err: string| null, data: AlertMediaInterface[]) => {
         if (err) {
           return console.error(err);
         }
