@@ -1,5 +1,5 @@
 <template>
-  <footer class="footer">
+  <footer class="footer" @dblclick="setDebug()">
     <span class="alert" :class="[className(data.API)]" style="padding:0;" :title="'API ' + title(data.API)">API</span>
     <span class="alert" :class="[className(data.TMI)]" style="padding:0;" :title="'TMI ' + title(data.TMI)">TMI</span>
     <span class="alert" :class="[classNameMod(data.SOC)]" style="padding:0;" :title="'SOC ' + (data.SOC ? 'connected' : 'disconnected')">SOC</span>
@@ -57,6 +57,15 @@ function title(status: 0 | 1 | 2 | 3) {
   }
 }
 
+const setDebug = () => {
+  socket.emit('debug::get', (err: null, debugEnv: string) => {
+    const debug = prompt("Set debug", debugEnv);
+    if (debug !== null) {
+      socket.emit('debug::set', debug);
+    }
+  })
+}
+
 export default defineComponent({
   setup() {
     const data: {
@@ -92,7 +101,7 @@ export default defineComponent({
 
     onMounted(() => refresh());
 
-    return { data, classNameMod, classNameResponse, className, title }
+    return { data, classNameMod, classNameResponse, className, title, setDebug }
   }
 });
 </script>
