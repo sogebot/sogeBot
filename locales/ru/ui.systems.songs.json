@@ -24,5 +24,9 @@
   "importing_done": "Импорт выполнен",
   "seconds": "Секунды",
   "calculated": "Рассчитано",
-  "set_manually": "Настроить вручную"
+  "set_manually": "Настроить вручную",
+  "bannedSongsEmptyAfterSearch": "No banned songs were found by your search for <strong>\"$search\"</strong>.",
+  "emptyAfterSearch": "No songs were found by your search for <strong>\"$search\"</strong>.",
+  "empty": "No songs were added yet.",
+  "bannedSongsEmpty": "No songs were added to banlist yet."
 }
