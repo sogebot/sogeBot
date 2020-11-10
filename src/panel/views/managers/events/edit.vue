@@ -8,7 +8,6 @@
           {{ translate('menu.event-listeners') }}
           <template v-if="$route.params.id">
             <small><fa icon="angle-right"/></small>
-            {{event.givenName}}
             <small class="text-muted text-monospace" style="font-size:0.7rem">{{$route.params.id}}</small>
           </template>
         </span>
@@ -42,14 +41,6 @@
     <div class="pt-3" v-else>
       <h3>{{translate('events.dialog.event')}}</h3>
       <form>
-        <div class="form-group col-md-12">
-          <label for="name_input">{{ translate('events.dialog.name') }}</label>
-          <input v-model="event.givenName" type="text" class="form-control" :class="{ 'is-invalid': $v.event.givenName.$invalid }" id="name_input">
-          <div class="invalid-feedback">
-            {{translate('dialog.errors.required')}}
-          </div>
-        </div>
-
         <div class="row no-gutters pl-3 pr-3">
           <div class="card mb-3 p-0"
                :class="{
@@ -154,7 +145,7 @@ import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 import { v4 as uuid } from 'uuid';
 import { cloneDeep, get } from 'lodash-es';
 import { validationMixin } from 'vuelidate'
-import { required, requiredIf, minValue } from "vuelidate/lib/validators";
+import { requiredIf, minValue } from "vuelidate/lib/validators";
 
 import { Route } from 'vue-router'
 import { NextFunction } from 'express';
@@ -201,9 +192,6 @@ export default defineComponent({
   },
   validations: {
     event: {
-      givenName: {
-        required,
-      },
       definitions: {
         fadeOutXCommands: {
           required: requiredIf(function (model) {
@@ -279,7 +267,6 @@ export default defineComponent({
     const event = ref({
       id: eventId,
       name: '',
-      givenName: '',
       isEnabled: true,
       triggered: {},
       definitions: {},
@@ -382,7 +369,6 @@ export default defineComponent({
               operationsClone.value = cloneDeep(eventGetAll.operations);
               event.value.operations = eventGetAll.operations;
               event.value.name = eventGetAll.name;
-              event.value.givenName = eventGetAll.givenName;
               event.value.isEnabled = eventGetAll.isEnabled;
               event.value.triggered = { ...eventGetAll.triggered };
               event.value.definitions = { ...eventGetAll.definitions };

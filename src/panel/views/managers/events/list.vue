@@ -6,118 +6,52 @@
           {{ translate('menu.manage') }}
           <small><fa icon="angle-right"/></small>
           {{ translate('menu.event-listeners') }}
-          <template v-if="search.length > 0">
-            <small>
-              <fa icon="search"/>
-            </small>
-            {{ search }}
-          </template>
         </span>
       </b-col>
     </b-row>
 
-    <panel cards search @search="search = $event">
+    <panel cards>
       <template v-slot:left>
         <button-with-icon class="btn-primary btn-reverse" icon="plus" href="#/manage/events/edit">{{translate('events.dialog.title.new')}}</button-with-icon>
       </template>
     </panel>
 
-    <div class="text-center" v-if="state.loading === 1">
-      <fa icon="circle-notch" spin class="text-primary" size="3x" />
-    </div>
+    <loading v-if="state.loading === ButtonStates.progress" />
     <div class="alert alert-info" v-else-if="state.loading === 0 && events.length === 0">
       {{translate('events.noEvents')}}
     </div>
-    <div class="alert alert-danger" v-else-if="state.loading === 0 && filteredEvents.length === 0 && search.length > 0">
-      <fa icon="search" />
-      {{translate('events.noEventsAfterSearch')}}
-    </div>
     <div v-else>
-      <transition-group
-          name="staggered-fade"
-          tag="span"
-          v-bind:css="false"
-          v-on:before-enter="beforeEnter"
-          v-on:enter="enter"
-          v-on:leave="leave">
-        <div v-for="(event, i) of filteredEvents"
+      <div v-for="(type, idx) of eventTypes" v-bind:key="type + idx">
+        <span class="title text-default mb-2" style="font-size: 20px !important;">{{capitalize(translate(type))}}</span>
+        <div v-for="(event, i) of filteredEvents.filter(o => o.name === type)"
             v-bind:data-id="event.id"
             v-bind:data-index="i"
-            class="card"
-            :class="{
-              'mt-3': i > 0,
-            }"
+            class="card mb-3"
             :key="event.id">
-          <div class="card-body pt-0 ">
-            <small class="text-muted text-monospace" style="text-transform: initial; font-size: 0.5rem;">{{ event.id }}</small>
-            <h5 class="card-title">{{ event.givenName }} <small class="text-muted" style="text-transform: initial;">{{ event.key }}</small></h5>
-
-            <div class="btn btn-secondary btn-with-icon btn-shrink btn-reverse" :title="event.filter">
-              <div style="display: flex">
-                <div class="text" v-if="event.filter.length > 0">
-                  {{ event.filter }}
-                </div>
-                <div class="btn-icon">
-                  <font-awesome-layers v-if="event.filter.length === 0">
-                    <fa icon="slash" :mask="['fas', 'filter']" />
-                    <fa icon="slash" transform="down-2 left-2"/>
-                  </font-awesome-layers>
-                  <fa icon="filter" v-else/>
-                </div>
-              </div>
-            </div>
-
-            <template v-if="Object.keys(event.definitions).length > 0">
-              <button-with-icon
-                v-if="isSettingsShown(event.id)"
-                :text="translate('events.dialog.settings')"
-                @click="toggleSettingsShow(event.id)"
-                class="btn-dark btn-shrink btn-reverse"
-                icon="cog"/>
-              <button-with-icon
-                v-else
-                :text="translate('events.dialog.settings')"
-                @click="toggleSettingsShow(event.id)"
-                class="btn-light btn-shrink btn-reverse"
-                icon="cog"/>
-            </template>
-
-            <button-with-icon
-              v-if="isOperationShown(event.id)"
-              :text="translate('events.dialog.operations') + ' (' + event.operations.length + ')'"
-              @click="toggleOperationShow(event.id)"
-              class="btn-dark btn-shrink btn-reverse"
-              icon="tasks"
-              />
-            <button-with-icon
-              v-else
-              :text="translate('events.dialog.operations') + ' (' + event.operations.length + ')'"
-              @click="toggleOperationShow(event.id)"
-              class="btn-light btn-shrink btn-reverse"
-              icon="tasks"
-              />
-
-            <div v-if="isSettingsShown(event.id)" class="pt-2">
-              <h6 class="text-muted">{{translate('events.dialog.settings')}}</h6>
-              <dl class="row" style="font-size:0.8rem;">
+          <div class="card-body d-inline-flex">
+            <div v-if="Object.keys(event.definitions).length > 0 || event.filter.length > 0"  class="p-2 bg-light border-input mr-4" style="border: 1px solid; width: 40%;">
+              <dl>
+                <template v-if="event.filter.length > 0">
+                  <dd :key="event.id + event.filter + '0'">{{translate('events.definitions.filter.label')}}: <span class="variable ml-2">{{event.filter}}</span></dd>
+                </template>
                 <template v-for="key of Object.keys(event.definitions)">
-                  <dt class="col-sm-6" :key="event.id + key + '0'">{{translate('events.definitions.' + key + '.label')}}</dt>
-                  <dd class="col-sm-6" :key="event.id + key + '1'">{{event.definitions[key]}}</dd>
+                  <dd :key="event.id + key + '0'">{{translate('events.definitions.' + key + '.label')}}: <span class="variable">{{event.definitions[key]}}</span></dd>
                 </template>
               </dl>
             </div>
-
-            <div v-if="isOperationShown(event.id)">
-              <h6 class="text-muted">{{translate('events.dialog.operations')}}</h6>
-              <template v-for="operation of event.operations">
-                <strong :key="event.id + operation.name + '4'" class="text-uppercase text-narrow">{{translate(operation.name)}}</strong>
-                <dl class="row" :key="event.id + operation.name + '5'" style="font-size:0.8rem;">
-                <template v-for="key of Object.keys(operation.definitions)">
-                  <dt class="col-sm-6" :key="event.id + key + '2'">{{translate('events.definitions.' + key + '.label')}}</dt>
-                  <dd class="col-sm-6" :key="event.id + key + '3'">{{operation.definitions[key]}}</dd>
-                </template>
-                </dl>
-              </template>
+            <div class="w-100">
+              <div v-for="(operation, idx) of event.operations" :key="event.id + operation.name" :class="{ 'pt-2': idx !== 0}">
+                <div class="d-inline-flex border-input mr-4 w-100" style="border: 1px dotted" >
+                  <div class="bg-light p-2" style="width: fit-content;">
+                    <strong :key="event.id + operation.name + '4'"  style="font-size: 18px;">{{capitalize(translate(operation.name))}}</strong>
+                  </div>
+                  <dl :key="event.id + operation.name + '5'" class="w-100 p-2">
+                  <template v-for="key of Object.keys(operation.definitions)">
+                    <dd :key="event.id + key + '2'">{{translate('events.definitions.' + key + '.label')}}: <span class="variable ml-2">{{operation.definitions[key]}}</span></dd>
+                  </template>
+                  </dl>
+                </div>
+              </div>
             </div>
           </div>
           <div class="card-footer text-right">
@@ -149,13 +83,12 @@
               icon="edit"
               />
 
-            <hold-button class="btn-danger btn-shrink" @trigger="deleteEvent(event)" icon="trash">
-              <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-              <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
-            </hold-button>
+            <button-with-icon class="btn-danger btn-reverse" icon="trash" @click="deleteEvent(event)">
+              {{ translate('dialog.buttons.delete') }}
+            </button-with-icon>
           </div>
         </div>
-      </transition-group>
+      </div>
     </div>
   </div>
 </template>
@@ -163,39 +96,36 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed } from '@vue/composition-api'
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
-import { gsap } from 'gsap'
 import translate from 'src/panel/helpers/translate';
 
-import { getSocket } from '../../../helpers/socket';
+import { getSocket } from 'src/panel/helpers/socket';
 
 import { EventInterface } from 'src/bot/database/entity/event';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { error } from 'src/panel/helpers/error';
+import { capitalize } from 'src/panel/helpers/capitalize';
 
 const socket = getSocket('/core/events');
 
 export default defineComponent({
   components: {
+    loading: () => import('src/panel/components/loading.vue'),
     'font-awesome-layers': FontAwesomeLayers,
   },
   setup(props, ctx) {
     const events = ref([] as EventInterface[]);
-    const search = ref('');
 
-    const showOperationsOfEvent = ref([] as string[]);
-    const showSettingsOfEvent = ref([] as string[]);
     const testingInProgress = ref({} as {[x:string]: number});
     const deletionInProgress = ref({} as {[x:string]: number});
     const heightOfElement = ref({} as {[x:string]: any});
     const state = ref({ loading: ButtonStates.progress } as { loading: number });
 
+    const eventTypes = computed(() => {
+      return [...new Set(events.value.map(o => o.name))];
+    })
+
     const filteredEvents = computed(() => {
       let _events = events.value
-      if (search.value.trim() !== '') {
-        _events = events.value.filter((o) => {
-          return o.name.trim().toLowerCase().includes(search.value.trim().toLowerCase())
-        })
-      }
       return _events.sort((a, b) => {
         const A = a.name.toLowerCase();
         const B = b.name.toLowerCase();
@@ -218,36 +148,15 @@ export default defineComponent({
         state.value.loading = ButtonStates.idle;
       });
     });
-
-    const beforeEnter = (el: HTMLElement) => {
-      el.style.opacity = '0'
-      el.style.height = '0'
-    };
-    const enter = (el: HTMLElement, done: () => void) => {
-      var delay = Number(el.dataset.index) * 150
-      setTimeout(() => {
-        gsap.to(el, { duration: 1, opacity: 1, height: heightOfElement.value[String(el.dataset.id)] || '100%', onComplete: () => {
-          if (!heightOfElement.value[String(el.dataset.id)]) {
-            el.style.height = 'inherit'; // reset to null if not defined
-          }
-          done()
-          } })
-      }, delay)
-    };
-    const leave = (el: HTMLElement, done: () => void) => {
-      heightOfElement.value[String(el.dataset.id)] = el.getBoundingClientRect().height + 'px'
-      var delay = Number(el.dataset.index) * 150
-      setTimeout(() => {
-        gsap.to(el, { duration: 1, opacity: 0, height: 0, onComplete: done })
-      }, delay)
-    };
     const deleteEvent = (event: EventInterface) => {
-      socket.emit('events::remove', event, (err: string | null) => {
-        if (err) {
-          return error(err);
-        }
-        events.value = events.value.filter((o) => o.id !== event.id)
-      })
+      if (confirm(`Do you want to delete event for ${event.name} with ${event.operations.length} operation(s)?`)) {
+        socket.emit('events::remove', event, (err: string | null) => {
+          if (err) {
+            return error(err);
+          }
+          events.value = events.value.filter((o) => o.id !== event.id)
+        })
+      }
     };
     const triggerTest = (id: string) => {
       testingInProgress.value[id] = 1;
@@ -265,48 +174,22 @@ export default defineComponent({
         }
       })
     };
-    const isSettingsShown = (id: string) => {
-      return showSettingsOfEvent.value.includes(id)
-    };
-    const isOperationShown = (id: string) => {
-      return showOperationsOfEvent.value.includes(id)
-    };
-    const toggleSettingsShow = (id: string) => {
-      if (showSettingsOfEvent.value.includes(id)) {
-        showSettingsOfEvent.value = showSettingsOfEvent.value.filter((o) => o !== id);
-      } else {
-        showSettingsOfEvent.value.push(id);
-      }
-    };
-    const toggleOperationShow = (id: string) => {
-      if (showOperationsOfEvent.value.includes(id)) {
-        showOperationsOfEvent.value = showOperationsOfEvent.value.filter((o) => o !== id);
-      } else {
-        showOperationsOfEvent.value.push(id);
-      }
-    };
 
     return {
       events,
-      search,
-      showOperationsOfEvent,
-      showSettingsOfEvent,
+      eventTypes,
       testingInProgress,
       deletionInProgress,
       heightOfElement,
       state,
       filteredEvents,
-      beforeEnter,
-      enter,
-      leave,
       deleteEvent,
       triggerTest,
       sendUpdate,
-      isSettingsShown,
-      isOperationShown,
-      toggleSettingsShow,
-      toggleOperationShow,
+
       translate,
+      capitalize,
+      ButtonStates,
     }
   }
 })
