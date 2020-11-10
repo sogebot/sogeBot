@@ -62,6 +62,9 @@ export default defineComponent({
       return null;
     })
     const url = computed(() => window.location.origin);
+    const publicPage = () => {
+      window.location.assign(url.value + '/public/');
+    };
     const login = () => {
       window.location.assign('http://oauth.sogebot.xyz/?state=' + encodeURIComponent(window.btoa(
         JSON.stringify({
@@ -78,7 +81,7 @@ export default defineComponent({
         login();
       }
     });
-    return { error, popoutUrl, url, login }
+    return { error, popoutUrl, url, login, publicPage }
   }
 });
 </script>
