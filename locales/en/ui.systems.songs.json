@@ -24,5 +24,9 @@
   "importing_done": "Importing Done",
   "seconds": "Seconds",
   "calculated": "Calculated",
-  "set_manually": "Set manually"
+  "set_manually": "Set manually",
+  "bannedSongsEmptyAfterSearch": "No banned songs were found by your search for <strong>\"$search\"</strong>.",
+  "emptyAfterSearch": "No songs were found by your search for <strong>\"$search\"</strong>.",
+  "empty": "No songs were added yet.",
+  "bannedSongsEmpty": "No songs were added to banlist yet."
 }

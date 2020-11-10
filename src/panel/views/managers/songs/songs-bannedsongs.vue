@@ -35,23 +35,31 @@
     </panel>
 
     <loading v-if="state.loading !== ButtonStates.success"/>
-    <b-table v-else striped small :items="fItems" :fields="fields" class="table-p-0">
-      <template v-slot:cell(thumbnail)="data">
-        <img class="float-left pr-3" v-bind:src="generateThumbnail(data.item.videoId)">
-      </template>
-      <template v-slot:cell(title)="data">
-        {{ data.item.title }}
-      </template>
-      <template v-slot:cell(buttons)="data">
-        <div class="float-right pr-2" style="width: max-content !important;">
-          <button-with-icon class="btn-only-icon btn-secondary btn-reverse" icon="link" :href="'http://youtu.be/' + data.item.videoId">
-          </button-with-icon>
-          <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="deleteItem(data.item.videoId)">
-            {{ translate('dialog.buttons.delete') }}
-          </button-with-icon>
-        </div>
-      </template>
-    </b-table>
+    <template v-else>
+      <b-alert show variant="danger" v-if="fItems.length === 0 && search.length > 0">
+        <fa icon="search"/> <span v-html="translate('systems.songs.bannedSongsEmptyAfterSearch').replace('$search', search)"/>
+      </b-alert>
+      <b-alert show v-else-if="items.length === 0">
+        {{translate('systems.songs.bannedSongsEmpty')}}
+      </b-alert>
+      <b-table v-else striped small :items="fItems" :fields="fields" class="table-p-0">
+        <template v-slot:cell(thumbnail)="data">
+          <img class="float-left pr-3" v-bind:src="generateThumbnail(data.item.videoId)">
+        </template>
+        <template v-slot:cell(title)="data">
+          {{ data.item.title }}
+        </template>
+        <template v-slot:cell(buttons)="data">
+          <div class="float-right pr-2" style="width: max-content !important;">
+            <button-with-icon class="btn-only-icon btn-secondary btn-reverse" icon="link" :href="'http://youtu.be/' + data.item.videoId">
+            </button-with-icon>
+            <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="deleteItem(data.item.videoId)">
+              {{ translate('dialog.buttons.delete') }}
+            </button-with-icon>
+          </div>
+        </template>
+      </b-table>
+    </template>
   </b-container>
 </template>
 
@@ -157,6 +165,7 @@ export default defineComponent({
     }
 
     return {
+      items,
       fItems,
       fields,
       state,
