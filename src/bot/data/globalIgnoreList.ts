@@ -365,4 +365,10 @@ export const globalIgnoreList = {
       'apex_pro_community',
     ],
   },
+  '150255693': {
+    'reason': 'bot account',
+    'known_aliases': [
+      'letsdothis_hostraffle',
+    ],
+  },
 };
