@@ -9,7 +9,7 @@
           {{ translate('menu.bannedsongs') }}
         </span>
       </b-col>
-      <b-col v-if="!$systems.find(o => o.name === 'songs').enabled" style=" text-align: right;">
+      <b-col v-if="!$integrations.find(o => o.name === 'spotify').enabled" style=" text-align: right;">
         <b-alert show variant="danger" style="padding: .5rem; margin: 0; display: inline-block;">
           <fa icon="exclamation-circle" fixed-width/> {{ translate('this-system-is-disabled') }}
         </b-alert>
@@ -35,22 +35,29 @@
     </panel>
 
     <loading v-if="state.loading !== $state.success"/>
-    <b-table v-else striped small :items="fItems" :fields="fields" class="table-p-0">
-      <template v-slot:cell(title)="data">
-        {{ data.item.title }}
-      </template>
-      <template v-slot:cell(artists)="data">
-        {{ data.item.artists.join(', ') }}
-      </template>
-      <template v-slot:cell(buttons)="data">
-        <div class="float-right pr-2" style="width: max-content !important;">
-          <hold-button @trigger="deleteItem(data.item.spotifyUri)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
-            <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-            <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
-          </hold-button>
-        </div>
-      </template>
-    </b-table>
+    <template v-else>
+      <b-alert show variant="danger" v-if="fItems.length === 0 && search.length > 0">
+        <fa icon="search"/> <span v-html="translate('systems.songs.bannedSongsEmptyAfterSearch').replace('$search', search)"/>
+      </b-alert>
+      <b-alert show v-else-if="items.length === 0">
+        {{translate('systems.songs.bannedSongsEmpty')}}
+      </b-alert>
+      <b-table v-else striped small :items="fItems" :fields="fields" class="table-p-0">
+        <template v-slot:cell(title)="data">
+          {{ data.item.title }}
+        </template>
+        <template v-slot:cell(artists)="data">
+          {{ data.item.artists.join(', ') }}
+        </template>
+        <template v-slot:cell(buttons)="data">
+          <div class="float-right pr-2" style="width: max-content !important;">
+            <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="deleteItem(data.item.spotifyUri)">
+              {{ translate('dialog.buttons.delete') }}
+            </button-with-icon>
+          </div>
+        </template>
+      </b-table>
+    </template>
   </b-container>
 </template>
 
@@ -58,79 +65,94 @@
 import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
-import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
+import { defineComponent, ref, onMounted, computed } from '@vue/composition-api'
 import { isNil, escapeRegExp } from 'lodash-es';
 import { SpotifySongBanInterface } from 'src/bot/database/entity/spotify';
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
 
-@Component({
+const socket = getSocket('/integrations/spotify');
+
+export default defineComponent({
   components: {
     loading: () => import('../../../components/loading.vue'),
-    'hold-button': () => import('../../../components/holdButton.vue'),
-  }
-})
-export default class playlist extends Vue {
-  translate = translate;
-  socket = getSocket('/integrations/spotify');
+  },
+  setup() {
+    const items = ref([] as SpotifySongBanInterface[]);
 
-  items: SpotifySongBanInterface[] = [];
-  search: string = '';
-  toAdd: string = '';
-  state: {
-    loading: number;
-    import: number;
-  } = {
-    loading: this.$state.progress,
-    import: this.$state.idle,
-  }
+    const search = ref('');
+    const toAdd = ref('');
+    const state = ref({
+      loading: ButtonStates.progress,
+      import: ButtonStates.idle,
+    } as {
+      loading: number;
+      import: number;
+    });
 
-  fields = [
-    { key: 'title', label: '' },
-    { key: 'artists', label: '' },
-    { key: 'buttons', label: '' },
-  ];
+    const fields = [
+      { key: 'title', label: '' },
+      { key: 'artists', label: '' },
+      { key: 'buttons', label: '' },
+    ];
 
-  get fItems() {
-    if (this.search.length === 0) return this.items
-    return this.items.filter((o) => {
-      const isSearchInTitle = !isNil(o.title.match(new RegExp(escapeRegExp(this.search), 'ig')))
-      return isSearchInTitle
+    const fItems = computed (() => {
+      if (search.value.length === 0) return items.value
+      return items.value.filter((o) => {
+        const isSearchInTitle = !isNil(o.title.match(new RegExp(escapeRegExp(search.value), 'ig')))
+        return isSearchInTitle
+      })
     })
-  }
 
-  created() {
-    this.refreshBanlist()
-  }
-
-  refreshBanlist() {
-    this.state.loading = this.$state.progress;
-    this.socket.emit('spotify::getAllBanned', {}, (err: string | null, items: SpotifySongBanInterface[]) => {
-      this.items = items
-      this.state.loading = this.$state.success;
+    onMounted(() => {
+      refreshBanlist();
     })
-  }
 
-  deleteItem(id: string) {
-    this.socket.emit('spotify::deleteBan', { spotifyUri: id }, () => {
-      this.items = this.items.filter((o) => o.spotifyUri !== id)
-    })
-  }
-
-  addSongOrPlaylist(evt: Event) {
-    if (evt) {
-      evt.preventDefault()
-    }
-    if (this.state.import === 0) {
-      this.state.import = 1
-      this.socket.emit('spotify::addBan', this.toAdd, (err: string | null, info: { banned: number }) => {
-        this.state.import = 2
-        this.refreshBanlist()
-        setTimeout(() => {
-          this.state.import = 0
-        }, 5000)
+    const refreshBanlist = () => {
+      state.value.loading = ButtonStates.progress;
+      socket.emit('spotify::getAllBanned', {}, (err: string | null, _items: SpotifySongBanInterface[]) => {
+        items.value = _items
+        state.value.loading = ButtonStates.success;
       })
     }
+
+    const deleteItem = (id: string)  => {
+      if (confirm('Do you want to delete ' + items.value.find((o) => o.spotifyUri === id)?.title + '?')) {
+        socket.emit('spotify::deleteBan', { spotifyUri: id }, () => {
+          items.value = items.value.filter((o) => o.spotifyUri !== id)
+        })
+      }
+    }
+
+    const addSongOrPlaylist = (evt: Event) => {
+      if (evt) {
+        evt.preventDefault()
+      }
+      if (state.value.import === 0) {
+        state.value.import = 1
+        socket.emit('spotify::addBan', toAdd.value, (err: string | null, info: { banned: number }) => {
+          state.value.import = 2
+          refreshBanlist()
+          setTimeout(() => {
+            state.value.import = 0
+          }, 5000)
+        })
+      }
+    }
+
+    return {
+      items,
+      search,
+      toAdd,
+      state,
+      fields,
+      fItems,
+      deleteItem,
+      addSongOrPlaylist,
+
+      translate,
+    }
   }
-}
+})
 </script>
 
 <style>
