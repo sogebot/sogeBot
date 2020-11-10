@@ -27,8 +27,6 @@ export const COOLDOWN_REGEXP = XRegExp(`(?<command> !?[\\pL0-9 ]* ) # command
            \\s                         # empty space
            (?<type> global|user      ) # type`, 'ix');
 
-export const KEYWORD_REGEXP = XRegExp('(?<keyword> !?[\\pL0-9]*)\\s(?<response> .*)', 'ix');
-
 export const COOLDOWN_REGEXP_SET = XRegExp(`(?<command> !?[\\pL0-9 ]* ) # command
            \\s                      # empty space
            (?<type> global|user   ) # type

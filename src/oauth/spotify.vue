@@ -8,15 +8,11 @@
 
 <script lang="ts">
 import { ref, Ref, defineComponent } from "@vue/composition-api";
+import { getSocket } from 'src/panel/helpers/socket';
 
 export default defineComponent({
   setup() {
-    const socket = io('/integrations/spotify', {
-      forceNew: true,
-      query: {
-        token: localStorage.getItem('accessToken'),
-      },
-    });
+    const socket = getSocket('/integrations/spotify');
     let state: Ref<boolean | null> = ref(null);
 
     if(window.location.hash || window.location.search) {

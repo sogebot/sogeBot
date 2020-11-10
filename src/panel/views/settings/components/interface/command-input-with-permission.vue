@@ -61,7 +61,7 @@ export default class sortableList extends Vue {
   @Prop() readonly type: any;
   @Prop() readonly permissions!: any;
 
-  socket: SocketIOClient.Socket = getSocket('/core/permissions');
+  socket = getSocket('/core/permissions');
   currentValue = this.value;
   currentPermissions = this.permissions;
   permissionsList: PermissionsInterface[] = [];

@@ -1,4 +1,4 @@
-import io from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import chalk from 'chalk';
 
 import Integration from './_interface';
@@ -58,7 +58,7 @@ type StreamElementsEvent = {
   updatedAt: '2019-10-03T22:42:33.023Z'
 } */
 class StreamElements extends Integration {
-  socketToStreamElements: SocketIOClient.Socket | null = null;
+  socketToStreamElements: Socket | null = null;
 
   @settings()
   @ui({ type: 'text-input', secret: true })
@@ -76,7 +76,7 @@ class StreamElements extends Integration {
 
   async disconnect () {
     if (this.socketToStreamElements !== null) {
-      this.socketToStreamElements.removeAllListeners();
+      this.socketToStreamElements.offAny();
       this.socketToStreamElements.disconnect();
     }
   }
@@ -89,7 +89,7 @@ class StreamElements extends Integration {
       return;
     }
 
-    this.socketToStreamElements = io.connect('https://realtime.streamelements.com', {
+    this.socketToStreamElements = io('https://realtime.streamelements.com', {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,

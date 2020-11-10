@@ -1,4 +1,4 @@
-import io from 'socket.io';
+import {Server as io} from 'socket.io';
 import https from 'https';
 import http, { Server } from 'http';
 import express from 'express';
@@ -13,7 +13,7 @@ export const menu: { category: string; name: string; id: string; this: Module | 
 export const menuPublic: { name: string; id: string }[] = [];
 export const widgets: { id: string; name: string; icon: string }[] = [];
 
-export let ioServer: io.Server | null = null;
+export let ioServer: io | null = null;
 export let app: express.Application | null = null;
 export let server: Server;
 export let serverSecure: Server;
@@ -41,7 +41,7 @@ export const setApp = (_app: express.Application) => {
 export const setServer = () => {
   if (app) {
     server = http.createServer(app);
-    ioServer = io(server);
+    ioServer = new io(server);
     ioServer.sockets.setMaxListeners(200);
 
     if (process.env.CA_CERT && process.env.CA_KEY) {

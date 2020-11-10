@@ -8,12 +8,12 @@ import gitCommitInfo from 'git-commit-info';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 
 import { info } from './helpers/log';
-import { CacheTitles } from './database/entity/cacheTitles';
+import { CacheTitles, CacheTitlesInterface } from './database/entity/cacheTitles';
 import { v4 as uuid} from 'uuid';
 import { getConnection, getManager, getRepository, IsNull } from 'typeorm';
-import { Dashboard, Widget } from './database/entity/dashboard';
+import { Dashboard, DashboardInterface, Widget } from './database/entity/dashboard';
 import { Translation } from './database/entity/translation';
-import { TwitchTag } from './database/entity/twitch';
+import { TwitchTag, TwitchTagInterface } from './database/entity/twitch';
 import { User } from './database/entity/user';
 
 import { default as socketSystem } from './socket';
@@ -128,13 +128,13 @@ export const init = () => {
 
   ioServer?.use(socketSystem.authorize);
 
-  ioServer?.on('connection', async (socket) => {
+  ioServer?.on('connect', async (socket) => {
     socket.on('disconnect', () => {
       socketsConnected--;
     });
     socketsConnected++;
 
-    socket.on('getCachedTags', async (cb) => {
+    socket.on('getCachedTags', async (cb: (results: TwitchTagInterface[]) => void) => {
       const connection = await getConnection();
       const joinQuery = connection.options.type === 'postgres' ? '"names"."tagId" = "tag_id" AND "names"."locale"' : 'names.tagId = tag_id AND names.locale';
       let query = getRepository(TwitchTag)
@@ -166,14 +166,14 @@ export const init = () => {
       cb(results);
     });
     // twitch game and title change
-    socket.on('getGameFromTwitch', function (game) {
+    socket.on('getGameFromTwitch', function (game: string) {
       api.sendGameFromTwitch(socket, game);
     });
     socket.on('getUserTwitchGames', async () => {
       const titles = await getRepository(CacheTitles).find();
       socket.emit('sendUserTwitchGamesAndTitles', titles) ;
     });
-    socket.on('deleteUserTwitchGame', async (game) => {
+    socket.on('deleteUserTwitchGame', async (game: string) => {
       await getManager()
         .createQueryBuilder()
         .delete()
@@ -183,7 +183,7 @@ export const init = () => {
       const titles = await getRepository(CacheTitles).find();
       socket.emit('sendUserTwitchGamesAndTitles', titles);
     });
-    socket.on('cleanupGameAndTitle', async (data: { titles: { title: string, game: string; id: string }[], game: string, title: string }, cb) => {
+    socket.on('cleanupGameAndTitle', async (data: { titles: { title: string, game: string; id: string }[], game: string, title: string }, cb: (err: string|null, titles: Readonly<Required<CacheTitlesInterface>>[]) => void) => {
       // remove empty titles
       await getManager()
         .createQueryBuilder()
@@ -245,7 +245,7 @@ export const init = () => {
       }
       cb(null, allTitles);
     });
-    socket.on('updateGameAndTitle', async (data, cb) => {
+    socket.on('updateGameAndTitle', async (data: { game: string, title: string, tags: string[] }, cb: (status: boolean | null) => void) => {
       const status = await api.setTitleAndGame(data);
       await api.setTags(data.tags);
 
@@ -283,7 +283,7 @@ export const init = () => {
     });
 
     // custom var
-    socket.on('custom.variable.value', async (variable, cb) => {
+    socket.on('custom.variable.value', async (variable: string, cb: (error: string | null, value: string) => void) => {
       let value = translate('webpanel.not-available');
       const isVariableSet = await customvariables.isVariableSet(variable);
       if (isVariableSet) {
@@ -292,7 +292,7 @@ export const init = () => {
       cb(null, value);
     });
 
-    socket.on('responses.get', async function (at, callback) {
+    socket.on('responses.get', async function (at: string | null, callback: (responses: Record<string, string>) => void) {
       const responses = flatten(!_.isNil(at) ? translateLib.translations[general.lang][at] : translateLib.translations[general.lang]);
       _.each(responses, function (value, key) {
         const _at = !_.isNil(at) ? at + '.' + key : key;
@@ -302,7 +302,7 @@ export const init = () => {
       });
       callback(responses);
     });
-    socket.on('responses.set', function (data) {
+    socket.on('responses.set', function (data: { key: string }) {
       _.remove(translateLib.custom, function (o: any) {
         return o.key === data.key;
       });
@@ -317,7 +317,7 @@ export const init = () => {
       );
       socket.emit('lang', lang);
     });
-    socket.on('responses.revert', async function (data, callback) {
+    socket.on('responses.revert', async function (data: { name: string }, callback: (translation: string) => void) {
       _.remove(translateLib.custom, function (o: any) {
         return o.name === data.name;
       });
@@ -383,7 +383,7 @@ export const init = () => {
       cb(null, await getRepository(Dashboard).save({ name: opts.name, createdAt: Date.now(), id: uuid(), userId: opts.userId, type: 'admin' }));
     });
 
-    socket.on('addWidget', async function (widgetName, id, cb) {
+    socket.on('addWidget', async function (widgetName: string, id: string, cb: (dashboard?: DashboardInterface) => void) {
       // add widget to bottom left
       const dashboard = await getRepository(Dashboard).findOne({
         relations: ['widgets'],
@@ -412,10 +412,10 @@ export const init = () => {
       await getRepository(Widget).delete({ dashboardId: IsNull() });
     });
 
-    socket.on('connection_status', cb => {
+    socket.on('connection_status', (cb: (status: typeof statusObj) => void) => {
       cb(statusObj);
     });
-    socket.on('saveConfiguration', function (data) {
+    socket.on('saveConfiguration', function (data: any) {
       _.each(data, async function (index, value) {
         if (value.startsWith('_')) {
           return true;
@@ -424,9 +424,10 @@ export const init = () => {
       });
     });
 
+    type toEmit = { name: string; enabled: boolean; areDependenciesEnabled: boolean; isDisabledByEnv: boolean }[];
     // send enabled systems
-    socket.on('systems', async (cb) => {
-      const toEmit: { name: string; enabled: boolean; areDependenciesEnabled: boolean; isDisabledByEnv: boolean }[] = [];
+    socket.on('systems', async (cb: (err: string | null, toEmit: toEmit) => void) => {
+      const toEmit: toEmit = [];
       for (const system of systems) {
         toEmit.push({
           name: system.__moduleName__.toLowerCase(),
@@ -437,7 +438,7 @@ export const init = () => {
       }
       cb(null, toEmit);
     });
-    socket.on('core', async (cb) => {
+    socket.on('core', async (cb: (err: string | null, toEmit: { name: string }[]) => void) => {
       const toEmit: { name: string }[] = [];
       for (const system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch', 'socket', 'permissions']) {
         toEmit.push({
@@ -446,8 +447,8 @@ export const init = () => {
       }
       cb(null, toEmit);
     });
-    socket.on('integrations', async (cb) => {
-      const toEmit: { name: string; enabled: boolean; areDependenciesEnabled: boolean; isDisabledByEnv: boolean }[] = [];
+    socket.on('integrations', async (cb: (err: string | null, toEmit: toEmit) => void) => {
+      const toEmit: toEmit = [];
       for (const system of list('integrations')) {
         if (!system.showInUI) {
           continue;
@@ -461,8 +462,8 @@ export const init = () => {
       }
       cb(null, toEmit);
     });
-    socket.on('overlays', async (cb) => {
-      const toEmit: { name: string; enabled: boolean; areDependenciesEnabled: boolean; isDisabledByEnv: boolean }[] = [];
+    socket.on('overlays', async (cb: (err: string | null, toEmit: toEmit) => void) => {
+      const toEmit: toEmit = [];
       for (const system of list('overlays')) {
         if (!system.showInUI) {
           continue;
@@ -476,8 +477,8 @@ export const init = () => {
       }
       cb(null, toEmit);
     });
-    socket.on('games', async (cb) => {
-      const toEmit: { name: string; enabled: boolean; areDependenciesEnabled: boolean; isDisabledByEnv: boolean }[] = [];
+    socket.on('games', async (cb: (err: string | null, toEmit: toEmit) => void) => {
+      const toEmit: toEmit = [];
       for (const system of list('games')) {
         if (!system.showInUI) {
           continue;
@@ -492,15 +493,15 @@ export const init = () => {
       cb(null, toEmit);
     });
 
-    socket.on('name', function (cb) {
+    socket.on('name', function (cb: (botUsername: string) => void) {
       cb(oauth.botUsername);
     });
-    socket.on('version', function (cb) {
+    socket.on('version', function (cb: (version: string) => void) {
       const version = _.get(process, 'env.npm_package_version', 'x.y.z');
       cb(version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'));
     });
 
-    socket.on('parser.isRegistered', function (data) {
+    socket.on('parser.isRegistered', function (data: { emit: string, command: string }) {
       socket.emit(data.emit, { isRegistered: new Parser().find(data.command) });
     });
 
@@ -512,7 +513,7 @@ export const init = () => {
       cb(null, menuPublic);
     });
 
-    socket.on('translations', (cb) => {
+    socket.on('translations', (cb: (lang: Record<string, any>) => void) => {
       const lang = {};
       _.merge(
         lang,

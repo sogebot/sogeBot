@@ -122,7 +122,7 @@ library.add(faClone, faBell, faBellSlash);
 })
 export default class customVariablesList extends Vue {
   translate = translate;
-  socket: SocketIOClient.Socket =  getSocket('/registries/alerts');
+  socket = getSocket('/registries/alerts');
   areAlertsMuted = false;
 
   fields = [

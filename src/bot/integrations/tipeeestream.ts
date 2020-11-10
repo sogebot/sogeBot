@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import chalk from 'chalk';
 import axios from 'axios';
-import io from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 
 import Integration from './_interface';
 import { onChange, onStartup } from '../decorators/on.js';
@@ -52,7 +52,7 @@ type TipeeestreamEvent = {
 };
 
 class TipeeeStream extends Integration {
-  socketToTipeeestream: SocketIOClient.Socket | null = null;
+  socketToTipeeestream: Socket | null = null;
 
   @settings()
   @ui({ type: 'text-input', secret: false })
@@ -74,7 +74,7 @@ class TipeeeStream extends Integration {
 
   async disconnect () {
     if (this.socketToTipeeestream !== null) {
-      this.socketToTipeeestream.removeAllListeners();
+      this.socketToTipeeestream.offAny();
       this.socketToTipeeestream.disconnect();
       this.socketToTipeeestream = null;
     }
@@ -94,7 +94,7 @@ class TipeeeStream extends Integration {
       // example response: { "code": 200, "message": "success", "datas": { "port": "443", "host": "https://sso-cf.tipeeestream.com" } }
       const { data: { datas: { host, port }}} = await axios.get('https://api.tipeeestream.com/v2.0/site/socket');
 
-      this.socketToTipeeestream = io.connect(`${host}:${port}`,
+      this.socketToTipeeestream = io(`${host}:${port}`,
         {
           reconnection: true,
           reconnectionDelay: 1000,

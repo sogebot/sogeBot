@@ -167,8 +167,7 @@ import { capitalize } from 'src/panel/helpers/capitalize';
 import { validationMixin } from 'vuelidate'
 import { v4 as uuid } from 'uuid';
 
-import { isNil } from 'lodash-es';
-import { escape } from 'xregexp';
+import { isNil, escapeRegExp } from 'lodash-es';
 import { RankInterface } from 'src/bot/database/entity/rank';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import translate from 'src/panel/helpers/translate';
@@ -225,8 +224,8 @@ export default defineComponent({
       }
       return items.value.filter((o) => {
         const isViewer = o.type === 'viewer';
-        const isSearchInHours = !isNil(String(o.value).match(new RegExp(escape(search.value), 'ig')))
-        const isSearchInValue = !isNil(o.rank.match(new RegExp(escape(search.value), 'ig')))
+        const isSearchInHours = !isNil(String(o.value).match(new RegExp(escapeRegExp(search.value), 'ig')))
+        const isSearchInValue = !isNil(o.rank.match(new RegExp(escapeRegExp(search.value), 'ig')))
         return isViewer && (isSearchInHours || isSearchInValue);
       })
     });
@@ -236,8 +235,8 @@ export default defineComponent({
       }
       return items.value.filter((o) => {
         const isFollower = o.type === 'follower';
-        const isSearchInHours = !isNil(String(o.value).match(new RegExp(escape(search.value), 'ig')))
-        const isSearchInValue = !isNil(o.rank.match(new RegExp(escape(search.value), 'ig')))
+        const isSearchInHours = !isNil(String(o.value).match(new RegExp(escapeRegExp(search.value), 'ig')))
+        const isSearchInValue = !isNil(o.rank.match(new RegExp(escapeRegExp(search.value), 'ig')))
         return isFollower && (isSearchInHours || isSearchInValue);
       })
     })
@@ -247,8 +246,8 @@ export default defineComponent({
       }
       return items.value.filter((o) => {
         const isSubscriber = o.type === 'subscriber';
-        const isSearchInHours = !isNil(String(o.value).match(new RegExp(escape(search.value), 'ig')))
-        const isSearchInValue = !isNil(o.rank.match(new RegExp(escape(search.value), 'ig')))
+        const isSearchInHours = !isNil(String(o.value).match(new RegExp(escapeRegExp(search.value), 'ig')))
+        const isSearchInValue = !isNil(o.rank.match(new RegExp(escapeRegExp(search.value), 'ig')))
         return isSubscriber && (isSearchInHours || isSearchInValue);
       })
     })

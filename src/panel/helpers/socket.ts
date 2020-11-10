@@ -1,4 +1,5 @@
-import io from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
+
 import { setTranslations } from './translate';
 import axios from 'axios';
 
@@ -10,15 +11,18 @@ export const redirectLogin = () => {
   }
 };
 
-export function getSocket(namespace: string, continueOnUnauthorized = false) {
-  const socket = io(namespace, {
+export function getSocket(namespace: string, continueOnUnauthorized = false): Socket {
+  const socket = (window as any).io(namespace, {
     forceNew: true,
-    query: {
-      token: localStorage.getItem('accessToken'),
+    auth: (cb: (data: { token: string | null}) => void) => {
+      cb({
+        token: localStorage.getItem('accessToken'),
+      });
     },
-  });
-  socket.on('error', (error: string) => {
-    if (error === 'TokenExpiredError: jwt expired') {
+  }) as Socket;
+  socket.connect();
+  socket.on('connect_error', (error: Error) => {
+    if (error.message.includes('jwt expired')) {
       console.debug('Using refresh token to obtain new access token');
       const refreshToken = localStorage.getItem('refreshToken');
       if (refreshToken === '' || refreshToken === null) {
@@ -39,9 +43,6 @@ export function getSocket(namespace: string, continueOnUnauthorized = false) {
           localStorage.setItem('userType', validation.data.userType);
           // reconnect
           socket.disconnect();
-          socket.io.opts.query = {
-            token: localStorage.getItem('accessToken'),
-          }; // replace with another authorization query
           console.debug('Reconnecting with new token');
           socket.connect();
         }).catch(() => {
@@ -58,8 +59,8 @@ export function getSocket(namespace: string, continueOnUnauthorized = false) {
         });
       }
     } else {
-      if (error === 'Invalid namespace') {
-        throw new Error(error + ' ' + namespace);
+      if (error.message.includes('Invalid namespace')) {
+        throw new Error(error.message + ' ' + namespace);
       }
       redirectLogin();
     }

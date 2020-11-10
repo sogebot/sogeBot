@@ -285,8 +285,8 @@ export default class interfaceSettings extends Vue {
   orderBy = orderBy;
   translate = translate;
 
-  socket: SocketIOClient.Socket = getSocket('/');
-  psocket: SocketIOClient.Socket = getSocket('/core/permissions');
+  socket = getSocket('/');
+  psocket = getSocket('/core/permissions');
   list: systemFromIO[] = [];
   state: { loaded: State; settings: State } = { loaded: State.NONE, settings: State.NONE };
   settings: any = {};
