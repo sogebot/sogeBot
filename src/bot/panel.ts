@@ -7,7 +7,7 @@ import { flatten } from './helpers/flatten';
 import gitCommitInfo from 'git-commit-info';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 
-import { info } from './helpers/log';
+import { getDEBUG, info, setDEBUG } from './helpers/log';
 import { CacheTitles, CacheTitlesInterface } from './database/entity/cacheTitles';
 import { v4 as uuid} from 'uuid';
 import { getConnection, getManager, getRepository, IsNull } from 'typeorm';
@@ -323,6 +323,15 @@ export const init = () => {
       });
       await getRepository(Translation).delete({ name: data.name });
       callback(translate(data.name));
+    });
+
+    adminEndpoint('/', 'debug::get', (cb) => {
+      cb(null, getDEBUG());
+    });
+
+    adminEndpoint('/', 'debug::set', (data, cb) => {
+      setDEBUG(data);
+      cb?.(null, '');
     });
 
     adminEndpoint('/', 'panel::errors', (cb) => {

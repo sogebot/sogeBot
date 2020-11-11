@@ -9,7 +9,7 @@ if (Number(process.versions.node.split('.')[0]) < 11) {
 
 import 'reflect-metadata';
 
-import { debug, error, info, warning } from './helpers/log';
+import { debug, error, info, setDEBUG, warning } from './helpers/log';
 
 import { createConnection, getConnectionOptions } from 'typeorm';
 
@@ -76,6 +76,9 @@ async function main () {
       }));
       process.stdout.write('\n\n\n');
       info('Bot is starting up');
+      if (process.env.DEBUG) {
+        setDEBUG(process.env.DEBUG);
+      }
     }
     await connect();
   } catch (e) {

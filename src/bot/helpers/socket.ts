@@ -36,7 +36,8 @@ function adminEndpoint (
   | 'list.watch' | 'broadcaster' | 'configuration' | 'raffle:getLatest' | 'lists.get'
   | 'bets::getCurrentBet' | 'commands::count' | 'getLatestStats' | 'menu' | 'panel::errors'
   | 'removeCache' | 'testExplosion' | 'testFireworks' | 'test' | 'discord::authorize'
-  | 'discord::getChannels' | 'discord::getRoles' | 'discord::getGuilds' | 'settings',
+  | 'discord::getChannels' | 'discord::getRoles' | 'discord::getGuilds' | 'settings'
+  | 'debug::get',
   callback: (cb: (error: Error | string | null, ...response: any) => void) => void | Promise<void>): void;
 
 // id + cb
@@ -51,7 +52,7 @@ function adminEndpoint (
 function adminEndpoint (
   nsp: string,
   on: 'chat.message.send' | 'import.ban' | 'songs::removeRequest' | 'delete.playlist' | 'delete.ban'
-  | 'raffle::getWinner' | 'raffle::open' | 'parseCron'
+  | 'raffle::getWinner' | 'raffle::open' | 'parseCron' | 'debug::set'
   | 'commands::resetCountByCommand' | 'bets::close' | 'spotify::code',
   callback: (string: string, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 

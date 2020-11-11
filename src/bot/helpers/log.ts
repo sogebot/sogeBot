@@ -83,16 +83,25 @@ function format(level: Levels, message: any, category?: string) {
   return [timestamp, levelFormat[Levels[level] as keyof typeof Levels], category, message].filter(Boolean).join(' ');
 }
 
+let debugEnv = '';
 export function isDebugEnabled(category: string) {
-  if (!process.env.DEBUG) {
+  if (debugEnv.trim().length === 0) {
     return false;
   }
   const categories = category.split('.');
   let bEnabled = false;
-  bEnabled = process.env.DEBUG.includes(category) || process.env.DEBUG.includes(categories[0] + '.*');
-  bEnabled = process.env.DEBUG === '*' || bEnabled;
+  bEnabled = debugEnv.includes(category) || debugEnv.includes(categories[0] + '.*');
+  bEnabled = debugEnv === '*' || bEnabled;
   return bEnabled;
 }
+
+export const setDEBUG = (newDebugEnv: string) => {
+  warning('DEBUG set to: ' + newDebugEnv);
+  debugEnv = newDebugEnv;
+};
+export const getDEBUG = () => {
+  return debugEnv;
+};
 
 function log(message: any) {
   const level = getFunctionNameFromStackTrace();
