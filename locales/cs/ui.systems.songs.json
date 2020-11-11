@@ -24,5 +24,9 @@
   "importing_done": "Importování Hotovo",
   "seconds": "Vteřiny",
   "calculated": "Vypočítáno",
-  "set_manually": "Nastavit ručně"
+  "set_manually": "Nastavit ručně",
+  "bannedSongsEmptyAfterSearch": "Nebyly nalezeny žádné zabanované skladby pro tvé hledání <strong>\"$search\"</strong>.",
+  "emptyAfterSearch": "Nebyly nalezeny žádné skladby pro tvé hledání <strong>\"$search\"</strong>.",
+  "empty": "Zatím nebyly přidány žádné skladby.",
+  "bannedSongsEmpty": "Zatím nebyly přidány žádné skladby do seznamu zakázaných."
 }
