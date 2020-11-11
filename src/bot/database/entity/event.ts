@@ -4,7 +4,6 @@ export interface EventInterface {
   id?: string;
   operations: Omit<EventOperationInterface, 'event'>[];
   name: string;
-  givenName: string;
   isEnabled: boolean;
   triggered: any;
   definitions: Events.OperationDefinitions;
@@ -23,7 +22,6 @@ export const Event = new EntitySchema<Readonly<Required<EventInterface>>>({
   columns: {
     id: { type: 'uuid', primary: true, generated: 'uuid' },
     name: { type: String },
-    givenName: { type: String },
     isEnabled: { type: Boolean },
     triggered: { type: 'simple-json' },
     definitions: { type: 'simple-json' },

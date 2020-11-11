@@ -884,6 +884,16 @@ li a.active .deleteTab {
   font-size: 1rem !important;
 }
 
+.variable {
+  user-select: none;
+  display: inline-block;
+  color: $bot-variable-text-color;
+  border: 1px solid $bot-variable-border-color;
+  padding: 0 4px;
+  font-size: 1.1em;
+  background-color: $bot-variable-bg-color;
+}
+
 .editable-variable {
   user-select: none;
   display: inline-block;

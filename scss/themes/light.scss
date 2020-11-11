@@ -46,6 +46,10 @@ $bot-response-text-color: $red !default;
 $bot-response-bg-color: $gray-200 !default;
 $bot-response-border-color: $gray-400 !default;
 
+$bot-variable-text-color: choose-contrast-color(lighten($red, 30%)) !default;
+$bot-variable-bg-color: lighten($red, 30%) !default;
+$bot-variable-border-color: lighten($red, 10%) !default;
+
 $bot-version: $blue !default;
 
 $theme-colors: (
