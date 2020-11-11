@@ -38,7 +38,6 @@ import { SQLVariableLimit } from './helpers/sql';
 import { addUIError } from './panel';
 import { dayjs } from './helpers/dayjs';
 import { Socket } from 'socket.io';
-import tmi from './tmi';
 
 let latestFollowedAtTimestamp = 0;
 
