@@ -1,9 +1,9 @@
 <template>
   <span>
     <b-input-group>
-      <b-form-select v-model="selectedReward" :options="redeemRewardsWithForcedSelected(selectedReward)"></b-form-select>
+      <b-form-select v-model="selectedReward" :options="redeemRewardsWithForcedSelected(selectedReward)" :state="state"></b-form-select>
       <b-input-group-append>
-        <b-button text="Refresh" variant="secondary" @click="refreshRedeemedRewards()"><fa icon="sync" :spin="state.redeemRewards === ButtonStates.progress"/></b-button>
+        <b-button text="Refresh" variant="secondary" @click="refreshRedeemedRewards()"><fa icon="sync" :spin="progress.redeemRewards === ButtonStates.progress"/></b-button>
       </b-input-group-append>
     </b-input-group>
     <small><strong>{{ translate("events.myRewardIsNotListed") }}</strong> {{ translate("events.redeemAndClickRefreshToSeeReward") }}</small>
@@ -21,16 +21,18 @@ const socket = getSocket('/core/events');
 
 interface Props {
   value: string;
+  state: boolean | null;
 }
 
 export default defineComponent({
   props: {
     value: String,
+    state: [Boolean, Object],
   },
   setup(props: Props, ctx) {
     const redeemRewards = ref([] as string[]);
     const selectedReward = ref(props.value);
-    const state = ref({
+    const progress = ref({
       redeemRewards: ButtonStates.progress
     } as { redeemRewards: number })
 
@@ -39,14 +41,14 @@ export default defineComponent({
       return Array.from(new Set([selected, ...redeemRewards.value]));
     }
     const refreshRedeemedRewards = async () => {
-      state.value.redeemRewards = ButtonStates.progress;
+      progress.value.redeemRewards = ButtonStates.progress;
       return new Promise(resolve => {
         socket.emit('events::getRedeemedRewards', (err: string | null, redeems: string[]) => {
           if (err) {
             return error(err);
           }
           redeemRewards.value = redeems;
-          setTimeout(() => state.value.redeemRewards = ButtonStates.idle, 1000);
+          setTimeout(() => progress.value.redeemRewards = ButtonStates.idle, 1000);
           resolve();
         })
       })
@@ -61,7 +63,7 @@ export default defineComponent({
     })
 
     return {
-      state,
+      progress,
       selectedReward,
 
       redeemRewardsWithForcedSelected,
