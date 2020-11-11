@@ -511,6 +511,7 @@ class API extends Core {
     const event = await getRepository(ThreadEvent).findOne({ event: 'getChannelChattersUnofficialAPI' });
     if (typeof event === 'undefined') {
       const { partedUsers, joinedUsers } = await getChannelChattersUnofficialAPI();
+      ioServer?.emit('api.stats', { method: 'GET', data: { partedUsers, joinedUsers }, timestamp: Date.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: `https://tmi.twitch.tv/group/user/${oauth.broadcasterUsername}/chatters`, code: 200, remaining: 'n/a' });
 
       joinpart.send({ users: partedUsers, type: 'part' });
       for (const username of partedUsers) {
