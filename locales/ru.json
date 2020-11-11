@@ -120,7 +120,6 @@
     "events": {
       "event": "Событие",
       "noEvents": "События не найдены в базе данных.",
-      "noEventsAfterSearch": "По запросу ничего не найдено.",
       "whatsthis": "что это?",
       "myRewardIsNotListed": "My reward is not listed!",
       "redeemAndClickRefreshToSeeReward": "If you are missing your created reward in a list, please redeem it and refresh by clicking on refresh icon.",
@@ -168,6 +167,9 @@
         "operations": "Операции"
       },
       "definitions": {
+        "filter": {
+          "label": "Filter"
+        },
         "hashtag": {
           "label": "Хэштег или Ключевое слово",
           "placeholder": "#yourHashtagHere или Ключевое слово"
