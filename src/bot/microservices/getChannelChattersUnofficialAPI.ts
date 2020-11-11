@@ -18,6 +18,7 @@ import { getUsersFromTwitch } from './getUserFromTwitch';
 import { debug, warning } from '../helpers/log';
 import { SQLVariableLimit } from '../helpers/sql';
 import api from '../api';
+import { isIgnored } from '../commons';
 
 const isThreadingEnabled = process.env.THREAD !== '0';
 
@@ -81,8 +82,15 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: 
       throw Error('chatters undefined');
     }
 
-    const chatters: any[] = flatMap(request.data.chatters);
+    const chatters: string[] = flatMap<string>(request.data.chatters).filter(username => {
+      // exclude global ignore list
+      const shouldExclude = isIgnored({ username });
+      debug('microservice', `${username} - shouldExclude: ${shouldExclude}`);
+      return !shouldExclude;
+    });
     const allOnlineUsers = await getAllOnlineUsernames();
+
+
 
     const partedUsers: string[] = [];
     for (const username of allOnlineUsers) {
