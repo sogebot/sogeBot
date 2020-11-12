@@ -27,7 +27,7 @@ import joinpart from './widgets/joinpart';
 import tmi from './tmi';
 import alerts from './registries/alerts';
 import eventlist from './overlays/eventlist';
-import { getFunctionList } from './decorators/on';
+import { getFunctionList, onLoad } from './decorators/on';
 import { avgResponse, linesParsedIncrement, setStatus } from './helpers/parser';
 import { translate } from './translate';
 import { Price } from './database/entity/price';
@@ -71,6 +71,60 @@ class TMI extends Core {
   broadcasterWarning = false;
 
   ignoreGiftsFromUser: { [x: string]: { count: number; time: Date }} = {};
+
+  @onLoad('sendWithMe')
+  test() {
+    this.resub({
+      _raw: '@badge-info=;badges=premium/1;color=;display-name=testuser;emotes=;flags=;id=48a39073-9281-46ad-b139-257f5d6669d3;login=testuser;mod=0;msg-id=resub;msg-param-cumulative-months=8;msg-param-months=0;msg-param-multimonth-duration=0;msg-param-multimonth-tenure=0;msg-param-should-share-streak=0;msg-param-sub-plan-name=Mamadísimo\\s(Tier\\s1);msg-param-sub-plan=Prime;msg-param-was-gifted=false;room-id=459331509;subscriber=1;system-msg=testuser\\ssubscribed\\swith\\sPrime.\\sThey\'ve\\ssubscribed\\sfor\\s8\\smonths!;tmi-sent-ts=1605196542491;user-id=123456789;user-type= :tmi.twitch.tv USERNOTICE #testchannel :Felicidades atrasadas bb. Tqm',
+      timestamp: '2020-11-12T15:55:42.491Z',
+      command: 'USERNOTICE',
+      event: 'RESUBSCRIPTION',
+      channel: '#testchannel',
+      username: 'testuser',
+      isSelf: false,
+      tags: {
+        badgeInfo: '',
+        badges: { premium: '1' },
+        color: '',
+        displayName: 'testuser',
+        emotes: [],
+        flags: '',
+        id: '48a39073-9281-46ad-b139-257f5d6669d3',
+        login: 'testuser',
+        mod: '0',
+        msgId: 'resub',
+        msgParamCumulativeMonths: '8',
+        msgParamMonths: '0',
+        msgParamMultimonthDuration: '0',
+        msgParamMultimonthTenure: '0',
+        msgParamShouldShareStreak: '0',
+        msgParamSubPlanName: 'Mamadísimo (Tier 1)',
+        msgParamSubPlan: 'Prime',
+        msgParamWasGifted: 'false',
+        roomId: '459331509',
+        subscriber: '1',
+        systemMsg: 'testuser subscribed with Prime. They\'ve subscribed for 8 months!',
+        tmiSentTs: '1605196542491',
+        userId: '123456789',
+        userType: '',
+        bits: undefined,
+        emoteSets: [],
+        username: 'testuser',
+      },
+      message: 'Felicidades atrasadas bb. Tqm',
+      parameters: {
+        cumulativeMonths: '8',
+        months: 0,
+        multimonthDuration: '0',
+        multimonthTenure: '0',
+        shouldShareStreak: '0',
+        subPlanName: 'Mamadísimo (Tier 1)',
+        subPlan: 'Prime',
+        wasGifted: 'false',
+      },
+      systemMessage: 'testuser subscribed with Prime. They\'ve subscribed for 8 months!',
+    });
+  }
 
   @command('!ignore add')
   @default_permission(permission.CASTERS)
@@ -481,7 +535,7 @@ class TMI extends Core {
       const method = this.getMethod(message);
       const subCumulativeMonths = Number(message.parameters.cumulativeMonths);
       const subStreakShareEnabled = Number(message.parameters.shouldShareStreak) !== 0;
-      const streakMonths = Number(message.parameters.streakMonths);
+      const streakMonths = Number(message.parameters.multimonthTenure);
       const userstate = message.tags;
       const messageFromUser: string = message.message ?? '';
       const tier = method.prime ? 'Prime' : String(method.plan / 1000);
