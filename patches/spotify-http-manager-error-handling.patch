@@ -1,0 +1,39 @@
+--- node_modules/spotify-web-api-node/src/http-manager.js	1985-10-26 09:15:00.000000000 +0100
++++ patches/http-manager.js	2020-11-12 17:23:06.979442442 +0100
+@@ -1,11 +1,11 @@
+ 'use strict';
+ 
+ var superagent = require('superagent'),
+-  { TimeoutError, 
+-    WebapiError, 
+-    WebapiRegularError, 
++  { TimeoutError,
++    WebapiError,
++    WebapiRegularError,
+     WebapiAuthenticationError,
+-    WebapiPlayerError 
++    WebapiPlayerError
+   } =  require('./response-error');
+ 
+ var HttpManager = {};
+@@ -42,7 +42,7 @@
+   if (typeof response.body === 'object' && response.body.error && typeof response.body.error === 'string') {
+     return new WebapiAuthenticationError(response.body, response.headers, response.statusCode);
+   }
+-  
++
+   /* Other type of error, or unhandled Web API error format */
+   return new WebapiError(response.body, response.headers, response.statusCode, response.body);
+ };
+@@ -67,8 +67,10 @@
+     if (err) {
+       if (err.timeout) {
+         return callback(new TimeoutError());
+-      } else {
++      } else if (err.response) {
+         return callback(_toError(err.response));
++      } else {
++        return callback(err);
+       }
+     }
+ 
