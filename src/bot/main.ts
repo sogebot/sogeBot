@@ -140,7 +140,7 @@ async function main () {
             blocked((time: any, stack: any) => {
               error(`EVENTLOOP BLOCK !!! Blocked for ${time}ms, operation started here:`);
               error(stack);
-            }, {resourcesCap: 100, threshold: 1000});
+            }, {threshold: 1000});
           }
         }, 30000);
       });
