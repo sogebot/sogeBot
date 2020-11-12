@@ -17,6 +17,7 @@ import oauth from './oauth';
 import currency from './currency';
 import Expects from './expects';
 import users from './users';
+import { promisify } from 'util';
 
 let isWarnedAboutCasters = false;
 
@@ -124,12 +125,13 @@ class Permissions extends Core {
   }
 
   recacheOnlineUsersPermission() {
-    getRepository(User).find({ isOnline: true }).then(users2 => {
+    const setImmediatePromise = promisify(setImmediate);
+    getRepository(User).find({ isOnline: true }).then(async (users2) => {
       for (const user of users2) {
-        setImmediate(() => {
-          cleanViewersCache(user.userId);
-          this.getUserHighestPermission(user.userId);
-        });
+        debug('permissions.recache', `Recaching ${user.username}#${user.userId}`);
+        cleanViewersCache(user.userId);
+        await this.getUserHighestPermission(user.userId);
+        await setImmediatePromise();
       }
     });
   }

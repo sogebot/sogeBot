@@ -29,7 +29,6 @@ import { startWatcher } from './watchers';
 
 import { expose as panelExpose, init as panelInit } from './panel';
 import { setIsBotStarted } from './helpers/database';
-import { MINUTE } from './constants';
 
 const connect = async function () {
   const connectionOptions = await getConnectionOptions();
