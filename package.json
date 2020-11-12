@@ -160,6 +160,7 @@
     "html-webpack-plugin": "4.5.0",
     "husky": "4.3.0",
     "image-webpack-loader": "7.0.1",
+    "blocked-at": "1.2.0",
     "jsonlint-mod": "1.7.6",
     "lint-staged": "10.5.1",
     "locate-path": "6.0.0",

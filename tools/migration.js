@@ -20,6 +20,7 @@ async function runMigration() {
     logFile.write(stderr + os.EOL);
 
     if(error) {
+      logFile.write(error + os.EOL);
       console.error('\n!!! Migration FAILED, please check your logs/migration.log for additional information !!! \n');
       process.exit(1);
     } else {

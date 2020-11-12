@@ -126,8 +126,10 @@ class Permissions extends Core {
   recacheOnlineUsersPermission() {
     getRepository(User).find({ isOnline: true }).then(users2 => {
       for (const user of users2) {
-        cleanViewersCache(user.userId);
-        this.getUserHighestPermission(user.userId);
+        setImmediate(() => {
+          cleanViewersCache(user.userId);
+          this.getUserHighestPermission(user.userId);
+        });
       }
     });
   }

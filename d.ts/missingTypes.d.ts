@@ -12,6 +12,7 @@ declare module 'howlongtobeat';
 declare module 'html-entities';
 declare module 'strip-comments';
 declare module 'vue-plyr';
+declare module 'blocked-at';
 
 declare module 'js-beautify' {
   export function js(code: string): string;

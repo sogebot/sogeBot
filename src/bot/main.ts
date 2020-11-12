@@ -8,8 +8,9 @@ if (Number(process.versions.node.split('.')[0]) < 11) {
 }
 
 import 'reflect-metadata';
+import blocked from 'blocked-at';
 
-import { debug, error, info, setDEBUG, warning } from './helpers/log';
+import { debug, error, info, isDebugEnabled, setDEBUG, warning } from './helpers/log';
 
 import { createConnection, getConnectionOptions } from 'typeorm';
 
@@ -133,6 +134,15 @@ async function main () {
           }
           startWatcher();
           setIsBotStarted();
+
+          blocked((time: any, stack: any) => {
+            if (isDebugEnabled('eventloop')) {
+              if (time > 1000) {
+                error(`EVENTLOOP BLOCK !!! Blocked for ${time}ms, operation started here:`);
+                error(stack);
+              }
+            }
+          });
         }, 30000);
       });
     }, 5000);
