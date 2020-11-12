@@ -369,7 +369,7 @@ class Spotify extends Integration {
         if (e.message !== 'client') {
           addUIError({ name: 'Spotify Ban Import', message: 'Something went wrong with banning song. Check your spotifyURI.' });
         }
-        ioServer?.emit('api.stats', { method: 'GET', data: e.response, timestamp: Date.now(), call: 'spotify::addBan', api: 'other', endpoint: e.response.headers.url, code: e.response.status });
+        ioServer?.emit('api.stats', { method: 'GET', data: e.response, timestamp: Date.now(), call: 'spotify::addBan', api: 'other', endpoint: e.response.headers.url, code: e.response?.status ?? 'n/a' });
       }
       if (cb) {
         cb(null, null);
@@ -656,7 +656,7 @@ class Spotify extends Integration {
       } else if (e.response.status === 403) {
         error(`${chalk.bgRed('SPOTIFY')}: you don't seem to have spotify PREMIUM.`);
       }
-      ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: e.config.url, code: e.response.status ?? 'n/a', data: e.response.data });
+      ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data });
 
       return [{ response: prepare('integrations.spotify.song-not-found'), ...opts }];
     }

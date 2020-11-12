@@ -139,7 +139,7 @@ class Streamlabs extends Integration {
         }
       } catch (e) {
         if (e.isAxiosError) {
-          ioServer?.emit('api.stats', { method: 'GET', data: e.message, timestamp: Date.now(), call: 'streamlabs', api: 'other', endpoint: url, code: e.response.status });
+          ioServer?.emit('api.stats', { method: 'GET', data: e.message, timestamp: Date.now(), call: 'streamlabs', api: 'other', endpoint: url, code: e.response?.status ?? 'n/a' });
         } else {
           ioServer?.emit('api.stats', { method: 'GET', data: e.stack, timestamp: Date.now(), call: 'streamlabs', api: 'other', endpoint: url, code: 0 });
         }
