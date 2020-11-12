@@ -23,6 +23,7 @@ dependencies:
 	patch --forward node_modules/twitch-js/types/index.d.ts < patches/twitch-js-types.patch
 	patch --forward node_modules/twitch-js/types/index.d.ts < patches/twitch-js-types-2.patch
 	patch --forward node_modules/twitch-js/types/index.d.ts < patches/twitch-js-add-highlight-msgId.patch
+	patch --forward node_modules/spotify-web-api-node/src/http-manager.js < patches/spotify-http-manager-error-handling.patch
 
 eslint:
 	@echo -ne "\n\t ----- Checking eslint\n"
