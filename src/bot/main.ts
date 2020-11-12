@@ -29,6 +29,7 @@ import { startWatcher } from './watchers';
 
 import { expose as panelExpose, init as panelInit } from './panel';
 import { setIsBotStarted } from './helpers/database';
+import { MINUTE } from './constants';
 
 const connect = async function () {
   const connectionOptions = await getConnectionOptions();
@@ -135,14 +136,13 @@ async function main () {
           startWatcher();
           setIsBotStarted();
 
-          blocked((time: any, stack: any) => {
-            if (isDebugEnabled('eventloop')) {
-              if (time > 1000) {
-                error(`EVENTLOOP BLOCK !!! Blocked for ${time}ms, operation started here:`);
-                error(stack);
-              }
-            }
-          });
+          if (isDebugEnabled('eventloop')) {
+            warning('EVENTLOOP BLOCK DETECTION ENABLED! This may cause some performance issues.');
+            blocked((time: any, stack: any) => {
+              error(`EVENTLOOP BLOCK !!! Blocked for ${time}ms, operation started here:`);
+              error(stack);
+            }, {resourcesCap: 100, threshold: 1000});
+          }
         }, 30000);
       });
     }, 5000);
