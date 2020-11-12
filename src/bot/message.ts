@@ -243,19 +243,7 @@ class Message {
           .split('-to-');
 
         try {
-          let lastParamUsed = 0;
-          for (const index of numbers) {
-            if (!_.isFinite(parseInt(numbers[Number(index)], 10))) {
-              const param = attr.param.split(' ');
-              if (_.isNil(param[lastParamUsed])) {
-                return 0;
-              }
-
-              numbers[Number(index)] = param[lastParamUsed];
-              lastParamUsed++;
-            }
-          }
-          return _.random(Number(numbers[0]), Number(numbers[1]));
+          return Math.floor(Number(numbers[0]) + (Math.random() * (Number(numbers[1]) - Number(numbers[0]))));
         } catch (e) {
           return 0;
         }
