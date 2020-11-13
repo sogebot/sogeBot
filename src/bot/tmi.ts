@@ -617,7 +617,7 @@ class TMI extends Core {
       const user = await getRepository(User).findOne({ userId: recipientId });
       if (!user) {
         await getRepository(User).save({ userId: Number(recipientId), username });
-        this.subscription(message);
+        this.subgift(message);
         return;
       }
 
