@@ -173,11 +173,6 @@ export default class AlertsRegistryOverlays extends Vue {
     return text;
   }
 
-  isTTSPlayingFnc() {
-    isTTSPlaying = typeof window.responsiveVoice !== 'undefined' && window.responsiveVoice.isPlaying();
-    return isTTSPlaying
-  }
-
   animationTextClass() {
     if (this.runningAlert && this.runningAlert.showTextAt <= Date.now()) {
       return this.runningAlert.hideAt - Date.now() <= 0
@@ -214,8 +209,19 @@ export default class AlertsRegistryOverlays extends Vue {
     }
   }
 
-  speak(text: string, voice: string, rate: number, pitch: number, volume: number) {
-    window.responsiveVoice.speak(text, voice, { rate, pitch, volume });
+  async speak(text: string, voice: string, rate: number, pitch: number, volume: number) {
+    isTTSPlaying = true;
+    for (const TTS of text.split('/ ')) {
+      await new Promise(resolve => {
+        if (TTS.trim().length === 0) {
+          setTimeout(() => resolve(), 500);
+        } else {
+          console.log({rate, pitch, volume});
+          window.responsiveVoice.speak(TTS, voice, { rate, pitch, volume, onend: () => setTimeout(() => resolve(), 500) });
+        }
+      });
+    }
+    isTTSPlaying = false;
   }
 
   initResponsiveVoice() {
@@ -255,8 +261,6 @@ export default class AlertsRegistryOverlays extends Vue {
     this.checkResponsiveVoiceAPIKey();
     this.interval.push(window.setInterval(() => {
       if (this.runningAlert) {
-        const isTTSPlaying = this.isTTSPlayingFnc();
-
         this.runningAlert.animation = this.animationClass();
         this.runningAlert.animationSpeed = this.animationSpeed();
         this.runningAlert.animationText = this.animationTextClass();
