@@ -329,11 +329,20 @@ class API extends Core {
     }, intervals * 1000);
   }
 
-  async getModerators() {
+  async getModerators(opts: { isWarned: boolean }) {
     const token = oauth.broadcasterAccessToken;
     const needToWait = token === '';
     const notEnoughAPICalls = this.calls.broadcaster.remaining <= 30 && this.calls.broadcaster.refresh > Date.now() / 1000;
     const missingBroadcasterId = oauth.broadcasterId.length === 0;
+
+    if (!oauth.broadcasterCurrentScopes.includes('moderation:read')) {
+      if (!opts.isWarned) {
+        opts.isWarned = true;
+        warning('Missing Broadcaster oAuth scope moderation:read to read channel moderators.');
+        addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope moderation:read to read channel moderators.' });
+      }
+      return { state: false, opts };
+    }
 
     if ((needToWait || notEnoughAPICalls || missingBroadcasterId)) {
       return { state: false };
