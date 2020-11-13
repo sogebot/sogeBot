@@ -609,6 +609,16 @@ export default defineComponent({
       } else {
         if (sidebarSlideEnabled.value) {
           state.value.editationLoading = ButtonStates.progress;
+          // set initial editation item
+          editationItem.value = {
+            id: ctx.root.$route.params.id || uuid(),
+            name: '',
+            isEnabled: true,
+            triggered: {},
+            definitions: {},
+            operations: [],
+            filter: '',
+          }
           loadEditationItem();
         }
       }
