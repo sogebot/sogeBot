@@ -378,6 +378,7 @@ import { required, minValue } from 'vuelidate/lib/validators'
 export default class AlertsEditCheersForm extends Vue {
   @PropSync('alert') readonly data !: AlertTipInterface
   @Prop() readonly index !: number
+  @Prop() readonly validationDate !: number
 
   theme = localStorage.getItem('theme') || get(this.$store.state, 'configuration.core.ui.theme', 'light');
 
@@ -385,6 +386,11 @@ export default class AlertsEditCheersForm extends Vue {
   fonts: {text: string; value: string}[] = [];
   get = get;
   translate = translate;
+
+  @Watch('validationDate')
+  touchValidation() {
+    this.$v.$touch();
+  }
 
   @Watch('$v', { deep: true })
   emitValidation() {
