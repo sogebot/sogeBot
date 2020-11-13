@@ -39,6 +39,8 @@ const userHaveSubscriberBadges = (badges: Readonly<UserStateTags['badges']>) => 
 };
 
 class TMI extends Core {
+  shouldConnect = false;
+
   @settings('chat')
   sendWithMe = false;
 
@@ -160,6 +162,10 @@ class TMI extends Core {
    */
   async reconnect (type: 'bot' | 'broadcaster') {
     try {
+      if (!this.shouldConnect) {
+        setTimeout(() => this.reconnect(type), 1000);
+        return;
+      }
       const client = this.client[type];
       if (!client) {
         throw Error('TMI: cannot reconnect, connection is not established');

@@ -125,13 +125,15 @@ async function main () {
           setTimeout(() => require('./heapdump.js').init('heap/'), 120000);
         }
 
-        // load tmi last
-        require('./tmi');
-
         setTimeout(() => {
           if (existsSync('./restart.pid')) {
             unlinkSync('./restart.pid');
           }
+
+          // load tmi last
+          const tmi = require('./tmi');
+          tmi.default.shouldConnect = true;
+
           startWatcher();
           setIsBotStarted();
 
