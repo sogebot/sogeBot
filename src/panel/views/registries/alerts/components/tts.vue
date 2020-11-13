@@ -1,9 +1,9 @@
 <template>
     <b-card no-body>
       <b-card-header header-tag="header" class="p-1" role="tab">
-        <b-button block v-b-toggle.tts-accordion variant="light" class="text-left">{{translate('registry.alerts.tts.setting')}}</b-button>
+        <b-button block v-b-toggle="'tts-accordion-' + uuid" variant="light" class="text-left">{{translate('registry.alerts.tts.setting')}}</b-button>
       </b-card-header>
-      <b-collapse id="tts-accordion" accordion="my-tts-accordion" role="tabpanel">
+      <b-collapse :id="'tts-accordion-' + uuid" :accordion="'tts-accordion-' + uuid" role="tabpanel">
         <b-card-body v-if="state.loaded === $state.success">
           <b-form-group
             label-cols-sm="4"
@@ -58,10 +58,10 @@
 
           <b-form-group label-cols-sm="4" label-cols-lg="3"
                   :label="translate('registry.alerts.volume')"
-                  label-for="volume">
+                  :label-for="'volume' + uuid">
             <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
               <b-form-input
-                id="volume"
+                :id="'volume' + uuid"
                 v-model.number="data.volume"
                 type="range"
                 min="0"
@@ -78,10 +78,10 @@
 
           <b-form-group label-cols-sm="4" label-cols-lg="3"
                   :label="translate('registry.alerts.rate')"
-                  label-for="rate">
+                  :label-for="'rate' + uuid">
             <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
               <b-form-input
-                id="rate"
+                :id="'rate' + uuid"
                 v-model.number="data.rate"
                 type="range"
                 min="0"
@@ -98,10 +98,10 @@
 
           <b-form-group label-cols-sm="4" label-cols-lg="3"
                   :label="translate('registry.alerts.pitch')"
-                  label-for="pitch">
+                  :label-for="'pitch' + uuid">
             <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
               <b-form-input
-                id="pitch"
+                :id="'pitch' + uuid"
                 v-model.number="data.pitch"
                 type="range"
                 min="0"

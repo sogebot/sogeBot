@@ -113,17 +113,24 @@
       </b-form-group>
 
       <b-tabs align="center" v-model="selectedTabIndex" lazy>
-        <b-tab v-for="event in supportedEvents" :key="'event-tab-' + event" :title="translate('registry.alerts.event.' + event)">
-          <b-card no-body>
-            <b-tabs card vertical pills content-class="col-9" nav-wrapper-class="col-3" nav-class="p-0" lazy>
-              <b-tab :active="idx === 0" v-for="(alert, idx) of item[event]" :key="event + idx + selectedTabIndex">
+        <b-card no-body>
+          <b-tabs card vertical pills content-class="col-9" nav-wrapper-class="col-3" nav-class="p-0">
+            <div v-for="event in supportedEvents" :key="'event-tab-' + event">
+              <b-tab disabled :title-link-class="'alertRegistryEventHeaderTab'">
                 <template v-slot:title>
-                  <fa icon="exclamation-circle" v-if="!isValid[event][idx]" class="text-danger"/>
-                  <fa :icon="['far', 'check-circle']" v-else-if="alert.enabled"/>
-                  <fa :icon="['far', 'circle']" v-else/>
+                  {{ translate('registry.alerts.event.' + event) }}
+                </template>
+              </b-tab>
+              <b-tab :active="idx === 0 && event === 'follows'" v-for="(alert, idx) of item[event]" :key="event + idx + selectedTabIndex">
+                <template v-slot:title>
+                  <span style="margin: 1rem;">
+                    <fa icon="exclamation-circle" v-if="!isValid[event][idx]" class="text-danger"/>
+                    <fa :icon="['far', 'check-circle']" v-else-if="alert.enabled"/>
+                    <fa :icon="['far', 'circle']" v-else/>
 
-                  <template v-if="alert.title.length > 0">{{alert.title}}</template>
-                  <template v-else>Variant {{ idx + 1 }}</template>
+                    <template v-if="alert.title.length > 0">{{alert.title}}</template>
+                    <template v-else>Variant {{ idx + 1 }}</template>
+                  </span>
                 </template>
                 <p class="p-3" v-bind:key="event + idx">
                   <form-follow v-if="event === 'cmdredeems' || event === 'follows' || event === 'subs' || event === 'subgifts' || event === 'subcommunitygifts'" :validationDate.sync="validationDate" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
@@ -133,23 +140,14 @@
                   <form-reward v-else-if="event === 'rewardredeems'" :validationDate.sync="validationDate" :type="event" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                 </p>
               </b-tab>
-
-              <!-- New Tab Button (Using tabs slot) -->
-              <template v-slot:tabs-end>
-                <b-nav-item @click.prevent="newAlert" href="#">
-                  <fa icon="plus"/> <b>new alert</b></b-nav-item>
-              </template>
-
-              <!-- Render this if no tabs -->
-              <template v-slot:empty>
-                <div class="text-center text-muted">
-                  There are no alerts<br>
-                  Create new alert using the <b>+</b> button on left side.
-                </div>
-              </template>
-            </b-tabs>
-          </b-card>
-        </b-tab>
+            </div>
+            <template #tabs-end>
+              <b-button class="text-left" variant="link" v-for="event of supportedEvents" @click="newAlert(event)" v-bind:key="'add-alert-' + event">
+                <fa icon="plus"/> <b>new alert for {{ translate('registry.alerts.event.' + event) }} </b>
+              </b-button>
+            </template>
+          </b-tabs>
+        </b-card>
       </b-tabs>
     </b-form>
   </b-container>
@@ -175,6 +173,20 @@ import { required } from 'vuelidate/lib/validators';
 import { v4 as uuid } from 'uuid';
 
 const supportedEvents = ['follows', 'cheers', 'subs', 'resubs', 'subcommunitygifts', 'subgifts',  'tips', 'hosts', 'raids', 'cmdredeems', 'rewardredeems'] as const;
+
+type isValid = {
+  follows: boolean[];
+  cheers: boolean[];
+  subs: boolean[];
+  resubs: boolean[];
+  subgifts: boolean[];
+  subcommunitygifts: boolean[];
+  tips: boolean[];
+  hosts: boolean[];
+  raids: boolean[];
+  cmdredeems: boolean[];
+  rewardredeems: boolean[];
+};
 
 Component.registerHooks([
   'beforeRouteEnter',
@@ -238,19 +250,7 @@ export default class AlertsEdit extends Vue {
     rewardredeems: [],
   }
 
-  isValid: {
-    follows: boolean[];
-    cheers: boolean[];
-    subs: boolean[];
-    resubs: boolean[];
-    subgifts: boolean[];
-    subcommunitygifts: boolean[];
-    tips: boolean[];
-    hosts: boolean[];
-    raids: boolean[];
-    cmdredeems: boolean[];
-    rewardredeems: boolean[];
-  } = {
+  isValid: isValid = {
     follows: [],
     cheers: [],
     subs: [],
@@ -374,7 +374,7 @@ export default class AlertsEdit extends Vue {
     }
   }
 
-  newAlert() {
+  newAlert(event: keyof isValid) {
     const _default: CommonSettingsInterface = {
       messageTemplate: '',
 
@@ -432,8 +432,8 @@ export default class AlertsEdit extends Vue {
       { id: _default.imageId, b64data: 'data:image/gif;base64,' + defaultImage, chunkNo: 0 },
       { id: _default.soundId, b64data: 'data:audio/mp3;base64,' + defaultAudio, chunkNo: 0 },
     ], () => {
-      this.isValid[this.supportedEvents[this.selectedTabIndex]].push(true);
-      switch(this.supportedEvents[this.selectedTabIndex]) {
+      this.isValid[event].push(true);
+      switch(event) {
         case 'follows':
           this.item.follows.push({
             ..._default,
@@ -615,6 +615,10 @@ export default class AlertsEdit extends Vue {
 </script>
 
 <style>
+  .alertRegistryEventHeaderTab {
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
   .normalLabel .custom-control-label {
     font-size: 1rem !important;
     font-variant: inherit !important;
