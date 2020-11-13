@@ -82,7 +82,7 @@
             <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
               <b-form-input
                 id="rate"
-                v-model="data.rate"
+                v-model.number="data.rate"
                 type="range"
                 min="0"
                 max="1.5"
@@ -102,7 +102,7 @@
             <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
               <b-form-input
                 id="pitch"
-                v-model="data.pitch"
+                v-model.number="data.pitch"
                 type="range"
                 min="0"
                 max="2"
@@ -188,8 +188,16 @@ export default class TTS extends Vue {
     this.state.loaded = this.$state.success;
   }
 
-  speak() {
-    window.responsiveVoice.speak(this.text, this.data.voice, { rate: this.data.rate, pitch: this.data.pitch, volume: this.data.volume });
+  async speak() {
+    for (const text of this.text.split('/ ')) {
+      await new Promise(resolve => {
+        if (text.trim().length === 0) {
+          setTimeout(() => resolve(), 500);
+        } else {
+          window.responsiveVoice.speak(text.trim(), this.data.voice, { rate: this.data.rate, pitch: this.data.pitch, volume: this.data.volume, onend: () => setTimeout(() => resolve(), 500) });
+        }
+      });
+    }
   }
 }
 </script>
