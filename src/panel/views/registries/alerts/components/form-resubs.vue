@@ -13,10 +13,10 @@
       label-cols-sm="4"
       label-cols-lg="3"
       :label="translate('registry.alerts.title.name')"
-      label-for="title"
+      :label-for="'title' + data.id"
     >
       <b-form-input
-        id="title"
+        :id="'title' + data.id"
         v-model="data.title"
         type="text"
         :placeholder="translate('registry.alerts.title.placeholder')"
@@ -28,7 +28,7 @@
       label-cols-sm="4"
       label-cols-lg="3"
       :label="translate('registry.alerts.variant.name')"
-      label-for="variant"
+      :label-for="'variant' + data.id"
     >
       <variant
         :condition.sync="data.variantCondition"
@@ -41,11 +41,11 @@
       label-cols-sm="4"
       label-cols-lg="3"
       :label="translate('registry.alerts.messageTemplate.name')"
-      label-for="messageTemplate"
+      :label-for="'messageTemplate' + data.id"
       :description="translate('registry.alerts.messageTemplate.help')"
     >
       <b-form-input
-        id="messageTemplate"
+        :id="'messageTemplate' + data.id"
         v-model="data.messageTemplate"
         type="text"
         :placeholder="translate('registry.alerts.messageTemplate.placeholder')"
@@ -58,10 +58,10 @@
       label-cols-sm="4"
       label-cols-lg="3"
       :label="translate('registry.alerts.animationText.name')"
-      label-for="animationText"
+      :label-for="'animationText' + data.id"
     >
       <text-animation
-        id="animationText"
+        :id="'animationText' + data.id"
         :animation.sync="data.animationText"
         :animationOptions.sync="data.animationTextOptions"
       ></text-animation>
@@ -71,10 +71,10 @@
       label-cols-sm="4"
       label-cols-lg="3"
       :label="translate('registry.alerts.animationIn.name')"
-      label-for="animationIn"
+      :label-for="'animationIn' + data.id"
     >
       <animation-in
-        id="animationIn"
+        :id="'animationIn' + data.id"
         :animation.sync="data.animationIn"
         :animationDuration.sync="data.animationInDuration"
       ></animation-in>
@@ -84,10 +84,10 @@
       label-cols-sm="4"
       label-cols-lg="3"
       :label="translate('registry.alerts.animationOut.name')"
-      label-for="animationOut"
+      :label-for="'animationOut' + data.id"
     >
       <animation-out
-        id="animationOut"
+        :id="'animationOut' + data.id"
         :animation.sync="data.animationOut"
         :animationDuration.sync="data.animationOutDuration"
       ></animation-out>
@@ -95,10 +95,10 @@
 
     <b-form-group label-cols-sm="4" label-cols-lg="3"
                   :label="translate('registry.alerts.alertDurationInMs.name')"
-                  label-for="alertDurationInMs">
+                  :label-for="'alertDurationInMs' + data.id">
       <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
         <b-form-input
-          id="alertDurationInMs"
+          :id="'alertDurationInMs' + data.id"
           v-model.number="data.alertDurationInMs"
           type="range"
           min="0"
@@ -115,10 +115,10 @@
 
     <b-form-group label-cols-sm="4" label-cols-lg="3"
                   :label="translate('registry.alerts.alertTextDelayInMs.name')"
-                  label-for="alertTextDelayInMs">
+                  :label-for="'alertTextDelayInMs' + data.id">
       <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
         <b-form-input
-          id="alertTextDelayInMs"
+          :id="'alertTextDelayInMs' + data.id"
           v-model.number="data.alertTextDelayInMs"
           type="range"
           min="0"
@@ -141,22 +141,22 @@
 
     <b-form-group label-cols-sm="4" label-cols-lg="3"
             :label="translate('registry.alerts.image.name')"
-            label-for="image">
+            :label-for="'image' + data.id">
       <media :media.sync="data.imageId" type="image" socket="/registries/alerts" :key="'image-' + data.imageId" :volume="data.soundVolume"/>
     </b-form-group>
 
     <b-form-group label-cols-sm="4" label-cols-lg="3"
             :label="translate('registry.alerts.sound.name')"
-            label-for="sound">
+            :label-for="'sound' + data.id">
       <media :media.sync="data.soundId" type="audio" socket="/registries/alerts" :volume="data.soundVolume" :key="'sound-' + data.soundId"/>
     </b-form-group>
 
     <b-form-group label-cols-sm="4" label-cols-lg="3"
             :label="translate('registry.alerts.soundVolume.name')"
-            label-for="soundVolume">
+            :label-for="'soundVolume' + data.id">
       <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
         <b-form-input
-          id="soundVolume"
+          :id="'soundVolume' + data.id"
           v-model.number="data.soundVolume"
           type="range"
           min="0"
@@ -210,9 +210,9 @@
     </div>
     <b-card no-body>
       <b-card-header header-tag="header" class="p-1" role="tab">
-        <b-button block v-b-toggle.accordion-2 variant="light" class="text-left">{{translate('registry.alerts.message.setting')}}</b-button>
+        <b-button block v-b-toggle="'accordion-2' + data.id" variant="light" class="text-left">{{translate('registry.alerts.message.setting')}}</b-button>
       </b-card-header>
-      <b-collapse id="accordion-2" accordion="message-accordion" role="tabpanel">
+      <b-collapse :id="'accordion-2' + data.id" accordion="message-accordion" role="tabpanel">
         <b-card-body>
           <b-form-group
             label-cols-sm="4"
@@ -230,10 +230,10 @@
 
           <b-form-group label-cols-sm="4" label-cols-lg="3"
                   :label="translate('registry.alerts.font.size.name')"
-                  label-for="font.size">
+                  :label-for="'font.size' + data.id">
             <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
               <b-form-input
-                id="font.size"
+                :id="'font.size' + data.id"
                 v-model="data.message.font.size"
                 type="range"
                 min="1"
@@ -250,10 +250,10 @@
 
           <b-form-group label-cols-sm="4" label-cols-lg="3"
                   :label="translate('registry.alerts.font.weight.name')"
-                  label-for="font.weight">
+                  :label-for="'font.weight' + data.id">
             <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
               <b-form-input
-                id="font.weight"
+                :id="'font.weight' + data.id"
                 v-model="data.message.font.weight"
                 type="range"
                 min="100"
@@ -270,10 +270,10 @@
 
           <b-form-group label-cols-sm="4" label-cols-lg="3"
                   :label="translate('registry.alerts.font.borderPx.name')"
-                  label-for="font.borderPx">
+                  :label-for="'font.borderPx' + data.id">
             <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
               <b-form-input
-                id="font.borderPx"
+                :id="'font.borderPx' + data.id"
                 v-model="data.message.font.borderPx"
                 type="range"
                 min="0"
@@ -290,10 +290,10 @@
 
           <b-form-group label-cols-sm="4" label-cols-lg="3"
                   :label="translate('registry.alerts.font.borderColor.name')"
-                  label-for="font.borderColor">
+                  :label-for="'font.borderColor' + data.id">
             <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
               <b-form-input
-                id="font.borderColor"
+                :id="'font.borderColor' + data.id"
                 v-model="data.message.font.borderColor"
                 type="color"
               ></b-form-input>
@@ -302,10 +302,10 @@
 
           <b-form-group label-cols-sm="4" label-cols-lg="3"
                   :label="translate('registry.alerts.font.color.name')"
-                  label-for="font.color">
+                  :label-for="'font.color' + data.id">
             <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
               <b-form-input
-                id="font.color"
+                :id="'font.color' + data.id"
                 v-model="data.message.font.color"
                 type="color"
               ></b-form-input>
@@ -317,7 +317,7 @@
 
 
     <font :data.sync="data.font" key="form-resubs-font"/>
-    <tts :tts.sync="data.tts" :uuid="data.id"/>
+    <tts :tts.sync="data.tts" :uuid="'tts' + data.id"/>
 
     <hold-button @trigger="$emit('delete', data.id)" icon="trash" class="btn-danger btn-block btn-reverse mt-3">
       <template slot="title">{{translate('dialog.buttons.delete')}}</template>

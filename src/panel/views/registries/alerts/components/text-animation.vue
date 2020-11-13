@@ -29,10 +29,9 @@
             label-cols-sm="4"
             label-cols-lg="3"
             :label="translate('registry.alerts.speed.name')"
-            label-for="speed"
-          >
+            :label-for="'speed' + uuid">
             <b-form-input
-              id="speed"
+              :id="'speed' + uuid"
               v-model.number="animOptions.speed"
               type="number"
               min="0"
@@ -48,10 +47,10 @@
             label-cols-sm="4"
             label-cols-lg="3"
             :label="translate('registry.alerts.maxTimeToDecrypt.name')"
-            label-for="maxTimeToDecrypt"
+            :label-for="'maxTimeToDecrypt' + uuid"
           >
             <b-form-input
-              id="maxTimeToDecrypt"
+              :id="'maxTimeToDecrypt' + uuid"
               v-model.number="animOptions.maxTimeToDecrypt"
               type="number"
               min="0"
@@ -67,10 +66,10 @@
             label-cols-sm="4"
             label-cols-lg="3"
             :label="translate('registry.alerts.characters.name')"
-            label-for="characters"
+            :label-for="'characters' + uuid"
           >
             <b-form-input
-              id="characters"
+              :id="'characters' + uuid"
               v-model="animOptions.characters"
               :label="translate('registry.alerts.characters.name')"
             ></b-form-input>
@@ -84,6 +83,7 @@
 <script lang="ts">
 import { Vue, Component, PropSync, Watch } from 'vue-property-decorator';
 import translate from 'src/panel/helpers/translate';
+import { v4 as uuid } from 'uuid';
 
 require('../../../../../../scss/letter-animations.css');
 require('animate.css');
@@ -99,6 +99,7 @@ export default class TextAnimation extends Vue {
 
   text= 'Sample text'
   translate = translate;
+  uuid = uuid();
 
   speedOptions: { value: string, text: string }[] = [
     { value: 'slower', text: 'slower' },

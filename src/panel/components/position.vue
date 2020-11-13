@@ -1,9 +1,9 @@
 <template>
   <b-card no-body>
     <b-card-header header-tag="header" class="p-1" role="tab">
-      <b-button block v-b-toggle.accordion-position variant="light" class="text-left">{{translate('dialog.position.settings')}}</b-button>
+      <b-button block v-b-toggle="'accordion-position-' + uuid" variant="light" class="text-left">{{translate('dialog.position.settings')}}</b-button>
     </b-card-header>
-    <b-collapse id="accordion-position" accordion="accordion-position" role="tabpanel">
+    <b-collapse :id="'accordion-position-' + uuid" :accordion="'accordion-position-' + uuid" role="tabpanel">
       <b-card-body>
         <b-form-group>
           <label for="type_selector"> {{ translate('dialog.position.anchorX') }}</label>
@@ -79,6 +79,7 @@
 <script lang="ts">
 import { defineComponent, onMounted, onUnmounted, reactive, ref, toRefs, watch } from '@vue/composition-api'
 import type { Ref } from '@vue/composition-api'
+import { v4 as uuidv4 } from 'uuid';
 
 import type { RandomizerInterface } from 'src/bot/database/entity/randomizer';
 import translate from 'src/panel/helpers/translate';
@@ -99,6 +100,7 @@ export default defineComponent({
   setup(props: Props, context) {
     const timestamp = ref(0);
     const pos = reactive(props.position);
+    const uuid = ref(uuidv4());
 
     // refs
     const HTMLRef: {
@@ -154,7 +156,7 @@ export default defineComponent({
     onUnmounted(() => window.clearInterval(interval));
 
     return {
-      timestamp, positionGenerator, pos,
+      timestamp, positionGenerator, pos, uuid,
       example, ...toRefs(HTMLRef), translate,
     }
   }

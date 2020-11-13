@@ -1,9 +1,9 @@
 <template>
   <b-card no-body>
     <b-card-header header-tag="header" class="p-1" role="tab">
-      <b-button block v-b-toggle.accordion-1 variant="light" class="text-left">{{translate('registry.alerts.font.setting')}}</b-button>
+      <b-button block v-b-toggle="'accordion-font-' + uuid" variant="light" class="text-left">{{translate('registry.alerts.font.setting')}}</b-button>
     </b-card-header>
-    <b-collapse id="accordion-1" accordion="my-accordion" role="tabpanel">
+    <b-collapse :id="'accordion-font-' + uuid" :accordion="'accordion-font-' + uuid" role="tabpanel">
       <b-card-body>
         <b-form-group label-cols-sm="4" label-cols-lg="3"
                       :label="translate('registry.alerts.font.name')">
@@ -12,10 +12,10 @@
 
         <b-form-group label-cols-sm="4" label-cols-lg="3"
                 :label="translate('registry.alerts.font.size.name')"
-                label-for="font.size">
+                :label-for="'font.size' + uuid">
           <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
             <b-form-input
-              id="font.size"
+              :id="'font.size' + uuid"
               v-model="data.size"
               type="range"
               min="1"
@@ -32,10 +32,10 @@
 
         <b-form-group label-cols-sm="4" label-cols-lg="3"
                 :label="translate('registry.alerts.font.weight.name')"
-                label-for="font.weight">
+                :label-for="'font.weight' + uuid">
           <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
             <b-form-input
-              id="font.weight"
+              :id="'font.weight' + uuid"
               v-model="data.weight"
               type="range"
               min="100"
@@ -52,10 +52,10 @@
 
         <b-form-group label-cols-sm="4" label-cols-lg="3"
                 :label="translate('registry.alerts.font.borderPx.name')"
-                label-for="font.borderPx">
+                :label-for="'font.borderPx' + uuid">
           <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
             <b-form-input
-              id="font.borderPx"
+              :id="'font.borderPx' + uuid"
               v-model="data.borderPx"
               type="range"
               min="0"
@@ -72,10 +72,10 @@
 
         <b-form-group label-cols-sm="4" label-cols-lg="3"
                 :label="translate('registry.alerts.font.borderColor.name')"
-                label-for="font.borderColor">
+                :label-for="'font.borderColor' + uuid">
           <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
             <b-form-input
-              id="font.borderColor"
+              :id="'font.borderColor' + uuid"
               v-model="data.borderColor"
               type="color"
             ></b-form-input>
@@ -84,11 +84,11 @@
 
         <b-form-group label-cols-sm="4" label-cols-lg="3"
                 :label="translate('registry.alerts.font.color.name')"
-                label-for="font.color"
+                :label-for="'font.color' + uuid"
                 v-if="data.color">
           <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
             <b-form-input
-              id="font.color"
+              :id="'font.color' + uuid"
               v-model="data.color"
               type="color"
             ></b-form-input>
@@ -97,11 +97,11 @@
 
         <b-form-group label-cols-sm="4" label-cols-lg="3"
                 :label="translate('registry.alerts.font.highlightcolor.name')"
-                label-for="font.highlightcolor"
+                :label-for="'font.highlightcolor' + uuid"
                 v-if="data.highlightcolor">
           <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
             <b-form-input
-              id="font.highlightcolor"
+              :id="'font.highlightcolor' + uuid"
               v-model="data.highlightcolor"
               type="color"
             ></b-form-input>
@@ -122,10 +122,10 @@
             <b-tab v-for="i of Object.keys(data.shadow)" :key="'dyn-tab-' + i" :title="'Shadow ' + i">
               <b-form-group label-cols-sm="4" label-cols-lg="3"
                       :label="translate('dialog.font.shadowShiftRight')"
-                      label-for="font.shadowShiftRight">
+                      :label-for="'font.shadowShiftRight' + uuid">
                 <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
                   <b-form-input
-                    id="font.shadowShiftRight"
+                    :id="'font.shadowShiftRight' + uuid"
                     v-model="data.shadow[i].shiftRight"
                     type="range"
                     min="-50"
@@ -142,10 +142,10 @@
 
               <b-form-group label-cols-sm="4" label-cols-lg="3"
                       :label="translate('dialog.font.shadowShiftDown')"
-                      label-for="font.shadowShiftDown">
+                      :label-for="'font.shadowShiftDown' + uuid">
                 <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
                   <b-form-input
-                    id="font.shadowShiftDown"
+                    :id="'font.shadowShiftDown' + uuid"
                     v-model="data.shadow[i].shiftDown"
                     type="range"
                     min="-50"
@@ -162,10 +162,10 @@
 
               <b-form-group label-cols-sm="4" label-cols-lg="3"
                       :label="translate('dialog.font.shadowBlur')"
-                      label-for="font.shadowBlur">
+                      :label-for="'font.shadowBlur' + uuid">
                 <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
                   <b-form-input
-                    id="font.shadowBlur"
+                    :id="'font.shadowBlur' + uuid"
                     v-model="data.shadow[i].blur"
                     type="range"
                     min="0"
@@ -182,10 +182,10 @@
 
               <b-form-group label-cols-sm="4" label-cols-lg="3"
                       :label="translate('dialog.font.shadowOpacity')"
-                      label-for="font.shadowOpacity">
+                      :label-for="'font.shadowOpacity' + uuid">
                 <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
                   <b-form-input
-                    id="font.shadowOpacity"
+                    :id="'font.shadowOpacity' + uuid"
                     v-model="data.shadow[i].opacity"
                     type="range"
                     min="0"
@@ -202,10 +202,10 @@
 
               <b-form-group label-cols-sm="4" label-cols-lg="3"
                       :label="translate('dialog.font.color')"
-                      label-for="font.shadowColor">
+                      :label-for="'font.shadowColor' + uuid">
                 <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
                   <b-form-input
-                    id="font.shadowColor"
+                    :id="'font.shadowColor' + uuid"
                     v-model="data.shadow[i].color"
                     type="color"
                   ></b-form-input>
@@ -241,6 +241,7 @@
 <script lang="ts">
 import { defineComponent, ref, onBeforeMount, watch } from '@vue/composition-api'
 import { textStrokeGenerator, shadowGenerator } from 'src/panel/helpers/text';
+import { v4 as uuidv4 } from 'uuid';
 import translate from 'src/panel/helpers/translate';
 
 function loadFont(value: string) {
@@ -278,6 +279,7 @@ export default defineComponent({
   },
   setup(props: Props) {
     const exampleColor = ref('#000000');
+    const uuid = ref(uuidv4());
     const fonts = ref([] as {text: string; value: string}[]);
 
     const addShadow = () => {
@@ -321,7 +323,7 @@ export default defineComponent({
     watch(() => props.data.family, (val) => loadFont(val))
 
     return {
-      textStrokeGenerator, shadowGenerator, exampleColor, fonts, addShadow, removeShadow, translate,
+      textStrokeGenerator, shadowGenerator, exampleColor, fonts, addShadow, removeShadow, translate, uuid,
     }
   }
 });
