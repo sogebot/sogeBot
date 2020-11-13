@@ -44,7 +44,7 @@
       :label="translate('events.definitions.titleOfReward.label')"
       label-for="selectReward"
     >
-      <rewards :value.sync="data.rewardId"/>
+      <rewards :value.sync="data.rewardId" :state="$v.data.rewardId.$invalid && $v.data.rewardId.$dirty ? false : null"/>
     </b-form-group>
 
     <b-form-group
@@ -372,12 +372,18 @@ import { required, minValue } from 'vuelidate/lib/validators'
 export default class AlertsEditFollowForm extends Vue {
   @PropSync('alert') data !: CommonSettingsInterface
   @Prop() readonly index !: number
+  @Prop() readonly validationDate !: number
 
   theme = localStorage.getItem('theme') || get(this.$store.state, 'configuration.core.ui.theme', 'light');
   customShow: 'html' | 'css' | 'js' = 'html';
   fonts: {text: string; value: string}[] = [];
   get = get;
   translate = translate;
+
+  @Watch('validationDate')
+  touchValidation() {
+    this.$v.$touch();
+  }
 
   @Watch('$v', { deep: true })
   emitValidation() {
@@ -389,6 +395,7 @@ export default class AlertsEditFollowForm extends Vue {
     data: {
       variantAmount: {required, minValue: minValue(0)},
       messageTemplate: {required},
+      rewardId: {required},
     }
   }
 

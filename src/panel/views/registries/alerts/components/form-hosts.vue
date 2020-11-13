@@ -264,6 +264,7 @@ export default class AlertsEditHostForm extends Vue {
   @PropSync('alert') readonly data !: AlertHostInterface
   @PropSync('type') readonly alertType !: ['hosts', 'raids']
   @Prop() readonly index !: number
+  @Prop() readonly validationDate !: number
 
   theme = localStorage.getItem('theme') || get(this.$store.state, 'configuration.core.ui.theme', 'light');
 
@@ -272,14 +273,14 @@ export default class AlertsEditHostForm extends Vue {
   get = get;
   translate = translate;
 
+  @Watch('validationDate')
+  touchValidation() {
+    this.$v.$touch();
+  }
+
   @Watch('$v', { deep: true })
   emitValidation() {
     this.$emit('update:isValid', !this.$v.$error)
-  }
-
-  @Watch('data.variantAmount')
-  triggerInput() {
-    this.$v.$touch();
   }
 
   @Validations()

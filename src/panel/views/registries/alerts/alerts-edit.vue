@@ -126,11 +126,11 @@
                   <template v-else>Variant {{ idx + 1 }}</template>
                 </template>
                 <p class="p-3" v-bind:key="event + idx">
-                  <form-follow v-if="event === 'cmdredeems' || event === 'follows' || event === 'subs' || event === 'subgifts' || event === 'subcommunitygifts'" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
-                  <form-cheers v-else-if="event === 'cheers' || event === 'tips'" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
-                  <form-resubs v-else-if="event === 'resubs'" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
-                  <form-hosts v-else-if="event === 'hosts' || event === 'raids'" :type="event" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
-                  <form-reward v-else-if="event === 'rewardredeems'" :type="event" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                  <form-follow v-if="event === 'cmdredeems' || event === 'follows' || event === 'subs' || event === 'subgifts' || event === 'subcommunitygifts'" :validationDate.sync="validationDate" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                  <form-cheers v-else-if="event === 'cheers' || event === 'tips'" :validationDate.sync="validationDate" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                  <form-resubs v-else-if="event === 'resubs'" :validationDate.sync="validationDate" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                  <form-hosts v-else-if="event === 'hosts' || event === 'raids'" :validationDate.sync="validationDate" :type="event" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                  <form-reward v-else-if="event === 'rewardredeems'" :validationDate.sync="validationDate" :type="event" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                 </p>
               </b-tab>
 
@@ -204,6 +204,7 @@ export default class AlertsEdit extends Vue {
   socket = getSocket('/registries/alerts');
 
   error: any = null;
+  validationDate = Date.now();
 
   state: { loaded: number; save: number } = { loaded: this.$state.progress, save: this.$state.idle }
   pending: boolean = false;
@@ -581,6 +582,7 @@ export default class AlertsEdit extends Vue {
   }
 
   async save () {
+    this.validationDate = Date.now();
     this.$v.$touch();
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
