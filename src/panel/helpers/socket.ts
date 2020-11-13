@@ -62,7 +62,11 @@ export function getSocket(namespace: string, continueOnUnauthorized = false): So
       if (error.message.includes('Invalid namespace')) {
         throw new Error(error.message + ' ' + namespace);
       }
-      redirectLogin();
+      if (!continueOnUnauthorized) {
+        redirectLogin();
+      } else {
+        localStorage.setItem('userType', 'unauthorized');
+      }
     }
   });
   socket.on('forceDisconnect', () => {

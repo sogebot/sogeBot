@@ -246,7 +246,7 @@ class Socket extends Core {
     if (authToken === this.socketToken) {
       initEndpoints(socket, { haveAdminPrivileges: Authorized.isAuthorized, haveModPrivileges: Authorized.isAuthorized, haveViewerPrivileges: Authorized.isAuthorized });
     } else {
-      if (authToken !== '' && authToken !== 'null') {
+      if (authToken !== '' && authToken !== null) {
         try {
           const token = jwt.verify(authToken, _self.JWTKey) as {
             userId: number; username: string; privileges: Unpacked<ReturnType<typeof getPrivileges>>;
