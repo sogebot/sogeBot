@@ -259,10 +259,10 @@ class Spotify extends Integration {
     } catch (e) {
       if (e.message.includes('The access token expired.')) {
         await this.IRefreshToken();
-        if (!firstAuthorizationDone) {
-          firstAuthorizationDone = true;
+        if (firstAuthorizationDone) {
           info(chalk.yellow('SPOTIFY: ') + 'Get of user failed, incorrect access token. Refreshing token and retrying.');
         }
+        firstAuthorizationDone = true;
         this.getMe();
       } else  if (e.message !== 'Unauthorized') {
         this.isUnauthorized = true;
