@@ -243,7 +243,7 @@ class Spotify extends Integration {
     clearTimeout(this.timeouts.getMe);
 
     try {
-      if ((this.enabled) && !_.isNil(this.client)) {
+      if ((this.enabled) && !_.isNil(this.client) && this.userId) {
         const data = await this.client.getMe();
         this.username = data.body.display_name ? data.body.display_name : data.body.id;
         if (this.userId !== data.body.id) {
