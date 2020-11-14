@@ -33,6 +33,7 @@ type SpotifyTrack = {
 
 let _spotify: any = null;
 let currentSongHash = '';
+let firstAuthorizationDone = false;
 
 class Spotify extends Integration {
   client: null | SpotifyWebApi = null;
@@ -40,7 +41,10 @@ class Spotify extends Integration {
   state: any = null;
 
   @persistent()
+  isUnauthorized = false;
+  @persistent()
   songsHistory: string[] = [];
+  @persistent()
   userId: string | null = null;
   currentSong: string = JSON.stringify({});
 
@@ -159,6 +163,7 @@ class Spotify extends Integration {
     this.currentSong = JSON.stringify({});
     this.disconnect();
     if (this.enabled) {
+      this.isUnauthorized = false;
       this.connect();
       this.getMe();
     }
@@ -243,7 +248,7 @@ class Spotify extends Integration {
     clearTimeout(this.timeouts.getMe);
 
     try {
-      if ((this.enabled) && !_.isNil(this.client) && this.userId) {
+      if ((this.enabled) && !_.isNil(this.client) && !this.isUnauthorized) {
         const data = await this.client.getMe();
         this.username = data.body.display_name ? data.body.display_name : data.body.id;
         if (this.userId !== data.body.id) {
@@ -254,9 +259,13 @@ class Spotify extends Integration {
     } catch (e) {
       if (e.message.includes('The access token expired.')) {
         await this.IRefreshToken();
-        info(chalk.yellow('SPOTIFY: ') + 'Get of user failed, incorrect access token. Refreshing token and retrying.');
+        if (!firstAuthorizationDone) {
+          firstAuthorizationDone = true;
+          info(chalk.yellow('SPOTIFY: ') + 'Get of user failed, incorrect access token. Refreshing token and retrying.');
+        }
         this.getMe();
       } else  if (e.message !== 'Unauthorized') {
+        this.isUnauthorized = true;
         info(chalk.yellow('SPOTIFY: ') + 'Get of user failed, check your credentials');
       }
       this.username = '';
