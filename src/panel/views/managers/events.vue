@@ -17,9 +17,6 @@
     </panel>
 
     <loading v-if="state.loading === ButtonStates.progress" />
-    <div class="alert alert-info" v-else-if="state.loading === 0 && events.length === 0">
-      {{translate('events.noEvents')}}
-    </div>
     <div v-else>
       <b-sidebar
         @change="isSidebarVisibleChange"
@@ -156,7 +153,10 @@
           </form>
         </div>
       </b-sidebar>
-      <div v-for="(type, idx) of eventTypes" v-bind:key="type + idx">
+      <div class="alert alert-info" v-if="events.length === 0">
+        {{translate('events.noEvents')}}
+      </div>
+      <div v-else v-for="(type, idx) of eventTypes" v-bind:key="type + idx">
         <span class="title text-default mb-2" style="font-size: 20px !important;">{{capitalize(translate(type))}}</span>
         <div v-for="(event, i) of filteredEvents.filter(o => o.name === type)"
             v-bind:data-id="event.id"
@@ -518,7 +518,8 @@ export default defineComponent({
       ctx.root.$nextTick(() => {
         watchEventChange.value = true;
       })
-    }, { deep: true });
+    });
+
 
     const eventTypes = computed(() => {
       return [...new Set(events.value.map(o => o.name))];
@@ -560,7 +561,7 @@ export default defineComponent({
       });
     };
     const deleteEvent = (event: EventInterface) => {
-      if (confirm(`Do you want to delete event for ${editationItem.value.name} with ${editationItem.value.operations.length} operation(s)?`)) {
+      if (confirm(`Do you want to delete event for ${editationItem.value.name} with ${editationItem.value.operations.length - 1} operation(s)?`)) {
         socket.emit('events::remove', event, (err: string | null) => {
           if (err) {
             return error(err);
@@ -659,7 +660,7 @@ export default defineComponent({
 
               editationItem.value.id = eventGetAll.id;
               operationsClone.value = cloneDeep(eventGetAll.operations);
-              editationItem.value.operations = eventGetAll.operations;
+              editationItem.value.operations = cloneDeep(eventGetAll.operations);
               editationItem.value.name = eventGetAll.name;
               editationItem.value.isEnabled = eventGetAll.isEnabled;
               editationItem.value.triggered = { ...eventGetAll.triggered };
@@ -675,7 +676,9 @@ export default defineComponent({
         }),
         new Promise((resolve, reject) => {
           socket.emit('list.supported.operations', (err: string | null, data: Events.SupportedOperation[]) => {
-            if (err) reject(error(err));
+            if (err) {
+              reject(error(err));
+            }
             data.push({ // add do nothing - its basicaly delete of operation
               id: 'do-nothing',
               definitions: {},
@@ -706,7 +709,9 @@ export default defineComponent({
         }),
         new Promise((resolve, reject) => {
           socket.emit('list.supported.events', (err: string | null, data: Events.SupportedEvent[]) => {
-            if (err) reject(error(err));
+            if (err) {
+              reject(error(err));
+            }
 
             for (const d of data) {
               // sort variables
@@ -735,10 +740,6 @@ export default defineComponent({
               }
               return 0; //default return value (no sorting)
             });
-            if (!ctx.root.$route.params.id) {
-              // set first event if we are in create mode
-              editationItem.value.name = supported.value.events[0].id
-            }
             resolve();
           })
         }),
