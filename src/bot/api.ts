@@ -306,6 +306,7 @@ class API extends Core {
         debug('api.interval', chalk.yellow(fnc + '() ') + 'start');
         const value = await (this as any)[fnc](this.api_timeouts[fnc].opts);
         debug('api.interval', chalk.yellow(fnc + '(time: ' + (Date.now() - this.api_timeouts[fnc].lastRunAt) + ') ') + JSON.stringify(value));
+        this.api_timeouts[fnc].lastRunAt = Date.now(); // reset to get ending time
         this.api_timeouts[fnc].inProgress = false;
         if (value.disable) {
           debug('api.interval', chalk.yellow(fnc + '() ') + 'disabled');
