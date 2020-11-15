@@ -61,7 +61,6 @@ export const currentStreamTags: {
   };
 }[] = [];
 
-const intervals = 0;
 let lastIsAPIFreeKey = '__unset__';
 let lastIsAPIFreeKeyStart = Date.now();
 
