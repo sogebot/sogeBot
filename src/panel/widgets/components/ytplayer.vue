@@ -4,7 +4,7 @@
       <b-tabs class="h-100" pills card style="overflow:hidden" fill content-class="blackbg">
         <template v-slot:tabs-start>
           <template v-if="!popout">
-            <li class="nav-item px-2 grip text-secondary align-self-center shrink" v-if="typeof nodrag === 'undefined'">
+            <li class="nav-item px-2 grip text-secondary align-self-center shrink" v-if="!nodrag">
               <fa icon="grip-vertical" fixed-width></fa>
             </li>
           </template>
