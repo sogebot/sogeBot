@@ -4,7 +4,7 @@ import axios from 'axios';
 import { setTimeout } from 'timers';
 
 import { permission } from './helpers/permissions';
-import { error } from './helpers/log';
+import { debug, error, isDebugEnabled } from './helpers/log';
 import { adminEndpoint, viewerEndpoint } from './helpers/socket';
 import { Brackets, getConnection, getRepository, IsNull } from 'typeorm';
 import { User, UserBit, UserInterface, UserTip } from './database/entity/user';
@@ -62,6 +62,11 @@ class Users extends Core {
 
         if (typeof incrementedUsers.affected === 'undefined') {
           const users = await getRepository(User).find({ isOnline: true });
+          if (isDebugEnabled('tmi.watched')) {
+            for (const user of users) {
+              debug('tmi.watched', `User ${user.username}#${user.userId} added watched time ${interval}`);
+            }
+          }
           api.stats.currentWatchedTime += users.length * interval;
         } else {
           api.stats.currentWatchedTime += incrementedUsers.affected * interval;
