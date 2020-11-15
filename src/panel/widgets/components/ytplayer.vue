@@ -29,16 +29,18 @@
             <fa icon="list"></fa>
           </template>
           <b-card-text>
-            <table class="table table-sm">
-              <tr v-for="(request, index) of requests" :key="index">
-                <td>
-                  <b-button variant="outline-danger" class="border-0" @click="removeSongRequest(String(request.id))" :icon="'times'"></b-button>
-                </td>
-                <td>{{request.title}}</td>
-                <td>{{request.username}}</td>
-                <td class="pr-4">{{formatTime(request.length_seconds)}}</td>
-              </tr>
-            </table>
+            <b-table-simple small>
+              <b-tr v-for="(request, index) of requests" :key="index">
+                <b-td style="vertical-align: middle">{{request.title}}</b-td>
+                <b-td style="vertical-align: middle">{{request.username}}</b-td>
+                <b-td style="vertical-align: middle">{{formatTime(request.length)}}</b-td>
+                <b-td style="vertical-align: middle" class="text-right">
+                  <b-button variant="outline-danger" class="border-0" @click="removeSongRequest(String(request.id))">
+                    <fa :icon="'times'" fixed-width small/>
+                  </b-button>
+                </b-td>
+              </b-tr>
+            </b-table-simple>
           </b-card-text>
         </b-tab>
         <b-tab active title-link-class="p-0 text-left overflow" title-item-class="widthmincontent">
