@@ -121,8 +121,8 @@
       "event": "Ereignis",
       "noEvents": "Keine Ereignisse in der Datenbank gefunden.",
       "whatsthis": "Was ist das?",
-      "myRewardIsNotListed": "My reward is not listed!",
-      "redeemAndClickRefreshToSeeReward": "If you are missing your created reward in a list, refresh by clicking on refresh icon.",
+      "myRewardIsNotListed": "Meine Belohnung ist nicht gelistet!",
+      "redeemAndClickRefreshToSeeReward": "Wenn du deine erstellte Belohnung in einer Liste vermisst, aktualisiere sie indem du auf das Symbol aktualisierst.",
       "badges": {
         "enabled": "Aktiviert",
         "disabled": "Deaktiviert"
@@ -415,7 +415,7 @@
         "version": "Bot Version",
         "haveParam": "Haben Sie Befehlsparameter? (bool)",
         "source": "Aktuelle Quelle (twitch oder discord)",
-        "userInput": "User input during reward redeem",
+        "userInput": "Benutzereingabe beim Einlösen der Belohnung",
         "is": {
           "moderator": "Ist Benutzer Mod? (Bool)",
           "subscriber": "Ist Benutzer Sub? (Bool)",
@@ -943,7 +943,7 @@
   },
   "songs": {
     "playlist-is-empty": "$sender, die zu importierende Playlist ist leer",
-    "playlist-imported": "$sender, imported $imported and skipped $skipped to playlist",
+    "playlist-imported": "$sender importierte $imported und übersprungen $skipped zur Wiedergabeliste",
     "not-playing": "Keiner",
     "song-was-banned": "Song $name wurde gebannt und wird nie wieder gespielt!",
     "song-was-banned-timeout-message": "Du hast einen Timeout für das Posten von gesperrten Lied bekommen",
@@ -952,9 +952,9 @@
     "no-song-is-currently-playing": "Derzeit wird kein Lied abgespielt.",
     "current-song-from-playlist": "Aktueller Song ist $name von der Playlist",
     "current-song-from-songrequest": "Aktueller Song ist $name und wurde gewünscht von $username",
-    "songrequest-disabled": "Sorry, $sender, song requests are disabled",
+    "songrequest-disabled": "Entschuldigung, $sender, Songanfragen sind deaktiviert",
     "song-is-banned": "Sorry, $sender, aber dieser Song ist gesperrt",
-    "youtube-is-not-responding-correctly": "Sorry, $sender, but YouTube is sending unexpected responses, please try again later.",
+    "youtube-is-not-responding-correctly": "Entschuldigung, $sender, aber YouTube sendet unerwartete Antworten, bitte versuchen Sie es später erneut.",
     "song-was-not-found": "Sorry, $sender, aber dieser Song wurde nicht gefunden",
     "song-is-too-long": "Sorry, $sender, aber dieser Song ist zu lang",
     "incorrect-category": "Sorry, $sender, aber der Song muss eine Musikkategorie sein",
@@ -963,10 +963,10 @@
     "song-is-already-in-playlist": "$sender, Song $name ist bereits in der Playlist",
     "song-was-removed-from-playlist": "$sender, Song $name wurde von der Wiedergabeliste entfernt",
     "song-was-removed-from-queue": "$sender, dein Song $name wurde aus der Warteschlange entfernt",
-    "playlist-current": "$sender, current playlist is $playlist.",
-    "playlist-list": "$sender, available playlists: $list.",
-    "playlist-not-exist": "$sender, your requested playlist $playlist doesn't exist.",
-    "playlist-set": "$sender, you changed playlist to $playlist."
+    "playlist-current": "$sender, die aktuelle Playlist ist $playlist.",
+    "playlist-list": "$sender, verfügbare Playlists: $list.",
+    "playlist-not-exist": "$sender, deine angeforderte Playlist $playlist existiert nicht.",
+    "playlist-set": "$sender, du hast die Playlist zu $playlist gewechselt."
   },
   "price": {
     "price-parse-failed": "{core.command-parse} !price",
