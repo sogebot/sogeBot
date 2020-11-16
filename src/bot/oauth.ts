@@ -3,7 +3,7 @@ import axios from 'axios';
 import Core from './_interface';
 import * as constants from './constants';
 import { areDecoratorsLoaded, persistent, settings, ui } from './decorators';
-import { onChange } from './decorators/on';
+import { onChange, onLoad } from './decorators/on';
 import { error, info, warning } from './helpers/log';
 import api from './api';
 import tmi from './tmi';
@@ -21,11 +21,13 @@ class OAuth extends Core {
   public bot = '';
   public channelId = '';
   public botId = '';
-  @persistent()
-  public botClientId = '';
   public broadcasterId = '';
   @persistent()
+  public botClientId = '';
+  @persistent()
   public broadcasterClientId = '';
+
+  loadedTokens = 0;
 
   @settings('general')
   public generalChannel = '';
@@ -121,6 +123,12 @@ class OAuth extends Core {
       this.validateOAuth('broadcaster');
       this.getChannelId();
     }, 10000);
+  }
+
+  @onLoad('broadcasterAccessToken')
+  @onLoad('botAccessToken')
+  setBotAccessTokenLoaded() {
+    this.loadedTokens++;
   }
 
   @onChange('generalOwner')

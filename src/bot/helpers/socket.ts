@@ -87,7 +87,6 @@ function adminEndpoint (nsp: string, on: 'test.user', callback: (opts: { value: 
 function adminEndpoint (nsp: string, on: 'text::remove' | 'text::save', callback: (item: Readonly<Required<TextInterface>>, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'events::remove' | 'events::save', callback: (item: Readonly<Required<EventInterface>>, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'events::getRedeemedRewards', callback: (cb: (error: Error | string | null, response: string[]) => void) => void): void;
-function adminEndpoint (nsp: string, on: 'events::setRedeemedRewards', callback: (value:string) => void): void;
 function adminEndpoint (nsp: string, on: 'carousel::save', callback: (items: Readonly<Required<EventInterface>>[], cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'carousel::insert', callback: (data: string, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'goals::remove' | 'goals::save', callback: (item: Readonly<Required<GoalGroupInterface>>, cb: (error: Error | string | null, ...response: any) => void) => void): void;

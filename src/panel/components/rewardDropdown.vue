@@ -37,7 +37,6 @@ export default defineComponent({
     } as { redeemRewards: number })
 
     const redeemRewardsWithForcedSelected = (selected: string) => {
-      socket.emit('events::setRedeemedRewards', selected);
       return Array.from(new Set([selected, ...redeemRewards.value]));
     }
     const refreshRedeemedRewards = async () => {
