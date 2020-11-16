@@ -122,7 +122,7 @@
       "noEvents": "Žádné události nebyly nalezeny v databázi.",
       "whatsthis": "co je to?",
       "myRewardIsNotListed": "Moje odměna není zobrazena!",
-      "redeemAndClickRefreshToSeeReward": "If you are missing your created reward in a list, refresh by clicking on refresh icon.",
+      "redeemAndClickRefreshToSeeReward": "Pokud Vám chybí vytvořená odměna v seznamu obnovte seznam kliknutím na ikonu obnovení.",
       "badges": {
         "enabled": "Zapnuto",
         "disabled": "Vypnuto"
@@ -168,7 +168,7 @@
       },
       "definitions": {
         "filter": {
-          "label": "Filter"
+          "label": "Filtr"
         },
         "hashtag": {
           "label": "Hashtag nebo klíčové slovo",
