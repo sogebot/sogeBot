@@ -1981,7 +1981,7 @@ class API extends Core {
     this.calls.broadcaster.refresh = calls.refresh;
     this.calls.broadcaster.limit = calls.limit;
 
-    ioServer?.emit('api.stats', { method: method, data: response, timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: url, code: status, remaining: this.calls.broadcaster });
+    ioServer?.emit('api.stats', { method: method, data: response, timestamp: Date.now(), call: 'getCustomRewards', api: 'helix', endpoint: url, code: status, remaining: this.calls.broadcaster });
     return response;
   }
 
