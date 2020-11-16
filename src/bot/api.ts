@@ -12,8 +12,10 @@ import { getBroadcaster, isBot, isBroadcaster, isIgnored } from './commons';
 
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import { persistent } from './decorators';
-import { getChannelChattersUnofficialAPI } from './microservices/getChannelChattersUnofficialAPI';
 import { ThreadEvent } from './database/entity/threadEvent';
+
+import { getChannelChattersUnofficialAPI } from './microservices/getChannelChattersUnofficialAPI';
+import { getCustomRewards } from './microservices/getCustomRewards';
 
 import { getManager, getRepository, In, IsNull, Not } from 'typeorm';
 import { User, UserInterface } from './database/entity/user';
@@ -53,7 +55,6 @@ type APITimeouts = {
 type SubscribersEndpoint = { data: { broadcaster_id: string; broadcaster_name: string; is_gift: boolean; tier: string; plan_name: string; user_id: string; user_name: string; }[], pagination: { cursor: string } };
 type FollowsEndpoint = { total: number; data: { from_id: string; from_name: string; to_id: string; toname: string; followed_at: string; }[], pagination: { cursor: string } };
 export type StreamEndpoint = { data: { id: string; user_id: string, user_name: string, game_id: string, type: 'live' | '', title: string , viewer_count: number, started_at: string, language: string; thumbnail_url: string; tag_ids: string[] }[], pagination: { cursor: string } };
-type CustomRewardEndpoint = { data: { broadcaster_name: string; broadcaster_id: string; id: string; image: string | null; background_color: string; is_enabled: boolean; cost: number; title: string; prompt: string; is_user_input_required: false; max_per_stream_setting: { is_enabled: boolean; max_per_stream: number; }; max_per_user_per_stream_setting: { is_enabled: boolean; max_per_user_per_stream: number }; global_cooldown_setting: { is_enabled: boolean; global_cooldown_seconds: number }; is_paused: boolean; is_in_stock: boolean; default_image: { url_1x: string; url_2x: string; url_4x: string; }; should_redemptions_skip_request_queue: boolean; redemptions_redeemed_current_stream: null | number; cooldown_expires_at: null | string; }[] };
 
 export const currentStreamTags: {
   is_auto: boolean;
@@ -1974,38 +1975,14 @@ class API extends Core {
   }
 
   async getCustomRewards() {
-    const url = 'https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=' + oauth.channelId;
-    const token = oauth.broadcasterAccessToken;
-    try {
-      if (token === '') {
-        throw Error('No broadcaster access token');
-      }
+    const { calls, method, response, status, url } = await getCustomRewards();
 
-      const request = await axios.get<CustomRewardEndpoint>(url, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.broadcasterClientId,
-        },
-        timeout: 20000,
-      });
+    this.calls.broadcaster.remaining = calls.remaining;
+    this.calls.broadcaster.refresh = calls.refresh;
+    this.calls.broadcaster.limit = calls.limit;
 
-      // save remaining api calls
-      this.calls.broadcaster.remaining = request.headers['ratelimit-remaining'];
-      this.calls.broadcaster.refresh = request.headers['ratelimit-reset'];
-      this.calls.broadcaster.limit = request.headers['ratelimit-limit'];
-
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getCustomRewards', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.broadcaster });
-      return request.data.data;
-    } catch (e) {
-      if (e.isAxiosError) {
-        error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getCustomRewards', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response?.data, remaining: this.calls.bot });
-      } else {
-        error(e.stack);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getCustomRewards', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
-      }
-    }
+    ioServer?.emit('api.stats', { method: method, data: response, timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: url, code: status, remaining: this.calls.broadcaster });
+    return response;
   }
 
   async getTopClips (opts: any) {
