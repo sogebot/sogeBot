@@ -120,10 +120,9 @@
     "events": {
       "event": "Ereignis",
       "noEvents": "Keine Ereignisse in der Datenbank gefunden.",
-      "noEventsAfterSearch": "Keine Ereignisse für diese Suche gefunden.",
       "whatsthis": "Was ist das?",
       "myRewardIsNotListed": "My reward is not listed!",
-      "redeemAndClickRefreshToSeeReward": "If you are missing your created reward in a list, please redeem it and refresh by clicking on refresh icon.",
+      "redeemAndClickRefreshToSeeReward": "If you are missing your created reward in a list, refresh by clicking on refresh icon.",
       "badges": {
         "enabled": "Aktiviert",
         "disabled": "Deaktiviert"
@@ -168,6 +167,9 @@
         "operations": "Operationen"
       },
       "definitions": {
+        "filter": {
+          "label": "Filter"
+        },
         "hashtag": {
           "label": "Hashtag oder Schlüsselwort",
           "placeholder": "#DeinHashtagHier oder Schlüsselwort"
