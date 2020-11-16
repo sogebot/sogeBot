@@ -93,7 +93,7 @@ export const getCustomRewards = async (): Promise<getCustomRewardReturn> => {
         url: e.config.url,
         method: e.config.method.toUpperCase(),
         status: e.response?.status ?? 'n/a',
-        response: e.response.data,
+        response: e.response?.data ,
       } as const;
 
       debug('microservice', 'getCustomRewards::return');
