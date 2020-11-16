@@ -18,8 +18,6 @@ let connectionHash = '';
 
 let ERR_BADAUTH = false;
 
-export const redeemedRewards = new Set<string>();
-
 setInterval(() => {
   try {
     if (oauth.broadcasterAccessToken.length > 0 && oauth.broadcasterClientId.length > 0 && oauth.broadcasterId.length > 0) {
@@ -70,7 +68,6 @@ const connect = () => {
     if (message.type === 'MESSAGE') {
       const dataMessage = JSON.parse(message.data.message);
       if (dataMessage.type === 'reward-redeemed') {
-        redeemedRewards.add(dataMessage.data.redemption.reward.title);
         // trigger reward-redeemed event
         if (dataMessage.data.redemption.user_input) {
           redeem(`${dataMessage.data.redemption.user.login}#${dataMessage.data.redemption.user.id} redeemed ${dataMessage.data.redemption.reward.title}: ${dataMessage.data.redemption.user_input}`);

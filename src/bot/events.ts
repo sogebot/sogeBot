@@ -30,7 +30,6 @@ import { isDbConnected } from './helpers/database';
 import { addUIError } from './panel';
 import { translate } from './translate';
 import { dayjs } from './helpers/dayjs';
-import { redeemedRewards } from './pubsub';
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
@@ -582,12 +581,10 @@ class Events extends Core {
   }
 
   public sockets() {
-    adminEndpoint(this.nsp, 'events::setRedeemedRewards', async (reward) => {
-      redeemedRewards.add(reward);
-    });
     adminEndpoint(this.nsp, 'events::getRedeemedRewards', async (cb) => {
       try {
-        cb(null, [...redeemedRewards]);
+        const rewards = await api.getCustomRewards();
+        cb(null, rewards ? [...rewards.map(o => o.title)] : []);
       } catch (e) {
         cb(e.stack, []);
       }
