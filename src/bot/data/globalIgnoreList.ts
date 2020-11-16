@@ -1,4 +1,10 @@
 export const globalIgnoreList = {
+  '501326254': {
+    'reason': 'bot account',
+    'known_aliases': [
+      'letsdothis_music',
+    ],
+  },
   '2943': {
     'reason': 'bot account',
     'known_aliases': [
