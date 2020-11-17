@@ -120,10 +120,9 @@
     "events": {
       "event": "Událost",
       "noEvents": "Žádné události nebyly nalezeny v databázi.",
-      "noEventsAfterSearch": "Žádné události pro toto hledání nebyly nalezeny v databázi.",
       "whatsthis": "co je to?",
       "myRewardIsNotListed": "Moje odměna není zobrazena!",
-      "redeemAndClickRefreshToSeeReward": "Pokud Vám chybí vytvořená odměna v seznamu, kupte ji na Twitchi a obnovte kliknutím na ikonu obnovení.",
+      "redeemAndClickRefreshToSeeReward": "Pokud Vám chybí vytvořená odměna v seznamu obnovte seznam kliknutím na ikonu obnovení.",
       "badges": {
         "enabled": "Zapnuto",
         "disabled": "Vypnuto"
@@ -168,6 +167,9 @@
         "operations": "Operace"
       },
       "definitions": {
+        "filter": {
+          "label": "Filtr"
+        },
         "hashtag": {
           "label": "Hashtag nebo klíčové slovo",
           "placeholder": "#yourHashtagHere nebo klíčovéSlovo"

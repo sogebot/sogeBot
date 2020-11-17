@@ -26,6 +26,6 @@
       "help": "Falls festgelegt, wird diese Playlist nach Abschluss des Song-Requests fortgesetzt"
     },
     "continueOnPlaylistAfterRequest": "Wiedergabe der Playlist nach Song-Request fortsetzen",
-    "notify": "Send message on song change"
+    "notify": "Nachricht bei Änderung des Liedes senden"
   }
 }
