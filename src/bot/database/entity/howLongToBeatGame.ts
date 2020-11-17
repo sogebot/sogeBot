@@ -44,7 +44,7 @@ export const HowLongToBeatGameItem = new EntitySchema<Readonly<Required<HowLongT
   name: 'how_long_to_beat_game_item',
   columns: {
     id: { type: 'uuid', primary: true, generated: 'uuid' },
-    hltb_id: { type: Number },
+    hltb_id: { type: 'uuid' },
     createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
     offset: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
