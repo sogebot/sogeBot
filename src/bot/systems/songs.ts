@@ -9,7 +9,7 @@ import { announce, getBot, getBotSender, isModerator, prepare, timeout } from '.
 import { command, default_permission, persistent, settings, ui } from '../decorators';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
-import { onChange } from '../decorators/on';
+import { onChange, onStartup } from '../decorators/on';
 import { error, info } from '../helpers/log';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { Brackets, getConnection, getRepository } from 'typeorm';
@@ -52,19 +52,14 @@ class Songs extends System {
   @settings()
   calculateVolumeByLoudness = true;
 
-  constructor () {
-    super();
-
-    setTimeout(() => {
-      this.getMeanLoudness();
-
-      this.addMenu({ category: 'manage', name: 'playlist', id: 'manage/songs/playlist', this: this });
-      this.addMenu({ category: 'manage', name: 'bannedsongs', id: 'manage/songs/bannedsongs', this: this });
-      this.addMenuPublic({ id: 'songrequests', name: 'songs'});
-      this.addMenuPublic({ id: 'playlist', name: 'playlist'});
-      this.addWidget('ytplayer', 'widget-title-ytplayer', 'fas fa-headphones');
-
-    }, 10000);
+  @onStartup()
+  startup() {
+    this.getMeanLoudness();
+    this.addMenu({ category: 'manage', name: 'playlist', id: 'manage/songs/playlist', this: this });
+    this.addMenu({ category: 'manage', name: 'bannedsongs', id: 'manage/songs/bannedsongs', this: this });
+    this.addMenuPublic({ id: 'songrequests', name: 'songs'});
+    this.addMenuPublic({ id: 'playlist', name: 'playlist'});
+    this.addWidget('ytplayer', 'widget-title-ytplayer', 'fas fa-headphones');
   }
 
   async getTags() {
