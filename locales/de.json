@@ -122,7 +122,7 @@
       "noEvents": "Keine Ereignisse in der Datenbank gefunden.",
       "whatsthis": "Was ist das?",
       "myRewardIsNotListed": "Meine Belohnung ist nicht gelistet!",
-      "redeemAndClickRefreshToSeeReward": "Wenn du deine erstellte Belohnung in einer Liste vermisst, aktualisiere sie indem du auf das Symbol aktualisierst.",
+      "redeemAndClickRefreshToSeeReward": "Wenn du deine erstellte Belohnung in einer Liste vermisst, aktualisiere sie indem du auf das Symbol klickst.",
       "badges": {
         "enabled": "Aktiviert",
         "disabled": "Deaktiviert"
