@@ -39,7 +39,7 @@ if (argv._[0] === 'cli') {
     const body = spawnSync('git', ['log', commit, '-n', '1', '--pretty=format:%B']);
     const fixesRegexp = /(Fixes|Closes|Fixed|Closed)\s(\#\d*)/gmi;
     const fixesRegexpForum = /(Fixes|Closes|Fixed|Closed)\s(.*)/gmi;
-    const fixesRegexpDiscord = /(Fixes|Closes|Fixed|Closed)\s.*discordapp.*?(\d+)$/gmi
+    const fixesRegexpDiscord = /(Fixes|Closes|Fixed|Closed)\s.*discord.*?(\d+)$/gmi
     const fixesRegexpIdeas = /(Fixes|Closes|Fixed|Closed)\s.*ideas\.sogebot\.xyz.*?(\d+)/gmi
     let fixes = []
     if (body.stdout.toString().match(fixesRegexpIdeas)) {
