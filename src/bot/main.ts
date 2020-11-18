@@ -11,6 +11,7 @@ import 'reflect-metadata';
 import blocked from 'blocked-at';
 
 import { debug, error, info, isDebugEnabled, setDEBUG, warning } from './helpers/log';
+import { TypeORMLogger } from './helpers/logTypeorm';
 
 import { createConnection, getConnectionOptions } from 'typeorm';
 
@@ -42,16 +43,18 @@ const connect = async function () {
 
   if (type === 'mysql' || type === 'mariadb') {
     await createConnection({
-      logging: ['error'],
       ...connectionOptions,
+      logging: ['error'],
+      logger: new TypeORMLogger(),
       synchronize: false,
       migrationsRun: true,
       charset: 'UTF8MB4_GENERAL_CI',
     } as MysqlConnectionOptions);
   } else {
     await createConnection({
-      logging: ['error'],
       ...connectionOptions,
+      logging: ['error'],
+      logger: new TypeORMLogger(),
       synchronize: false,
       migrationsRun: true,
     });

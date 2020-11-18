@@ -96,8 +96,12 @@ export function isDebugEnabled(category: string) {
 }
 
 export const setDEBUG = (newDebugEnv: string) => {
-  warning('DEBUG set to: ' + newDebugEnv);
-  debugEnv = newDebugEnv;
+  if (newDebugEnv.trim().length === 0) {
+    warning('DEBUG unset');
+  } else {
+    warning('DEBUG set to: ' + newDebugEnv);
+  }
+  debugEnv = newDebugEnv.trim();
 };
 export const getDEBUG = () => {
   return debugEnv;
@@ -125,7 +129,11 @@ export function debug(category: string, message: any) {
   }
 }
 export function error(message: any) {
-  log(message);
+  // we have custom typeorm logger to show QueryFailedError
+  // stack from those errors are not usable so we don't need it
+  if (!message.startsWith('QueryFailedError: ')) {
+    log(message);
+  }
 }
 export function chatIn(message: any) {
   log(message);
