@@ -7,6 +7,7 @@ export const isUserLoggedIn = async function (mustBeLogged = true, mustBeAdmin =
   if (code.trim().length === 0) {
     if (mustBeLogged) {
       console.log('Redirecting, user is not authenticated');
+      localStorage.setItem('goto-after-login', location.href);
       if (window.location.href.includes('popout')) {
         window.location.assign(window.location.origin + '/login#error=popout+must+be+logged#url=' + window.location.href);
         return false;
@@ -86,6 +87,12 @@ export const isUserLoggedIn = async function (mustBeLogged = true, mustBeAdmin =
           };
           check();
         });
+      }
+
+      const gotoAfterLogin = localStorage.getItem('goto-after-login');
+      if (gotoAfterLogin) {
+        location.assign(gotoAfterLogin);
+        localStorage.removeItem('goto-after-login');
       }
       return data;
     } catch(e) {
