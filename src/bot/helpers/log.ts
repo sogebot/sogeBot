@@ -131,7 +131,7 @@ export function debug(category: string, message: any) {
 export function error(message: any) {
   // we have custom typeorm logger to show QueryFailedError
   // stack from those errors are not usable so we don't need it
-  if (!message.startsWith('QueryFailedError: ')) {
+  if (typeof message !== 'string' || (typeof message === 'string' && !message.startsWith('QueryFailedError: '))) {
     log(message);
   }
 }
