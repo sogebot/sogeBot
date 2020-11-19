@@ -19,6 +19,7 @@ import Expects from './expects';
 import users from './users';
 import { promisify } from 'util';
 import { HOUR, MINUTE } from './constants';
+import ranks from './systems/ranks';
 
 let isWarnedAboutCasters = false;
 let isRecacheRunning = false;
@@ -270,20 +271,24 @@ class Permissions extends Core {
           break;
       }
       debug('permissions.check', JSON.stringify({ access: shouldProceed && this.filters(user, pItem.filters), permission: pItem }));
-      return { access: shouldProceed && this.filters(user, pItem.filters), permission: pItem };
+      return { access: shouldProceed && await this.filters(user, pItem.filters), permission: pItem };
     } catch (e) {
       error(e.stack);
       return { access: false, permission: pItem };
     }
   }
 
-  protected filters(
+  async filters(
     user: Required<UserInterface>,
     filters: PermissionFiltersInterface[] = [],
-  ): boolean {
+  ): Promise<boolean> {
     for (const f of filters) {
       let amount = 0;
       switch (f.type) {
+        case 'ranks':
+          const rank = await ranks.get(user);
+          // we can return immediately
+          return rank.current === f.value;
         case 'bits':
           amount = user.bits.reduce((a, b) => (a + b.amount), 0);
           break;
@@ -314,12 +319,12 @@ class Permissions extends Core {
 
       switch (f.comparator) {
         case '<':
-          if (!(amount < f.value)) {
+          if (!(amount < Number(f.value))) {
             return false;
           }
           break;
         case '<=':
-          if (!(amount <= f.value)) {
+          if (!(amount <= Number(f.value))) {
             return false;
           }
           break;
@@ -329,12 +334,12 @@ class Permissions extends Core {
           }
           break;
         case '>':
-          if (!(amount > f.value)) {
+          if (!(amount > Number(f.value))) {
             return false;
           }
           break;
         case '>=':
-          if (!(amount >= f.value)) {
+          if (!(amount >= Number(f.value))) {
             return false;
           }
           break;

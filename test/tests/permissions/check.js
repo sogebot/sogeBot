@@ -35,6 +35,7 @@ const users = [
   { username: '__viewer_subtier__', userId: 12, id: 12, subscribeTier: 2 },
   { username: '__viewer_subcumulativemonths__', userId: 13, id: 13, subscribeCumulativeMonths: 2 },
   { username: '__viewer_substreakmonths__', userId: 14, id: 14, subscribeStreak: 2 },
+  { username: '__viewer_customrank__', userId: 15, id: 15, haveCustomRank: true, rank: 'Lorem Ipsum' },
 ];
 
 describe('Permissions - check()', () => {
@@ -382,6 +383,41 @@ describe('Permissions - check()', () => {
     }
   });
 
+  describe(`Permission only for user with rank Lorem Ipsum (__viewer_customrank__)`, () => {
+    beforeEach(async () => {
+      await getRepository(Permissions).save({
+        id: 'bbaac669-923f-4063-99e3-f9904b34dac3',
+        name: '__viewer_customrank__only',
+        order: Object.keys(permission).length + 1,
+        isCorePermission: false,
+        isWaterfallAllowed: false,
+        automation: 'viewers',
+        userIds: [],
+        excludeUserIds: [],
+        filters: [{
+          comparator: '==', type: 'ranks', value: 'Lorem Ipsum',
+        }],
+      });
+    });
+    for (let j = 0; j < users.length; j++) {
+      const user = users[j];
+      const pHash = 'bbaac669-923f-4063-99e3-f9904b34dac3';
+      if (user.username === '__viewer_customrank__') {
+        // have access
+        it(`+++ ${users[j].username} should have access to __viewer_customrank__only`, async () => {
+          const check = await permissions.check(user.userId, pHash);
+          assert.strictEqual(check.access, true);
+        });
+      } else {
+        // no access
+        it(`--- ${users[j].username} should NOT have access to __viewer_customrank__only`, async () => {
+          const check = await permissions.check(user.userId, pHash);
+          assert.strictEqual(check.access, false);
+        });
+      }
+    }
+  });
+
   describe(`Enabled !me command should work`, () => {
     beforeEach(async () => {
       await getRepository(PermissionCommands).clear();
@@ -397,6 +433,7 @@ describe('Permissions - check()', () => {
         let messages = '0';
         let tips = '0.00';
         let bits = '0';
+        let rank = '';
         if (users[j].username === '__viewer_points__') {
           points = '100';
         }
@@ -412,7 +449,10 @@ describe('Permissions - check()', () => {
         if (users[j].username === '__viewer_messages__') {
           messages = '100';
         }
-        assert.strictEqual(r[0].response, `$sender | ${hours}h | ${points} points | ${messages} messages | €${tips} | ${bits} bits`);
+        if (users[j].username === '__viewer_customrank__') {
+          rank = 'Lorem Ipsum | ';
+        }
+        assert.strictEqual(r[0].response, `$sender | ${rank}${hours}h | ${points} points | ${messages} messages | €${tips} | ${bits} bits`);
       });
     }
   });
