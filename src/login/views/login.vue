@@ -25,7 +25,7 @@
     </svg>
     <div>Cannot access without login.</div>
       <b-btn block variant="success" class="mt-3" @click="login">Login</b-btn>
-      <b-btn block variant="secondary" :href="popoutUrl">Try again</b-btn>
+      <b-btn block variant="secondary" @click="tryAgain">Try again</b-btn>
     </h4>
   </b-container>
 </template>
@@ -51,24 +51,19 @@ export default defineComponent({
       }
       return null;
     })
-    const popoutUrl = computed(() => {
-      const hash = window.location.hash
-      if (hash.trim().length > 0) {
-        const urlFromHash = hash.match(/url=[a-zA-Z0-9+:\?\/#]*/)
-        if (urlFromHash) {
-          return urlFromHash[0].split('=')[1];
-        }
-      }
-      return null;
-    })
     const url = computed(() => window.location.origin);
     const publicPage = () => {
       window.location.assign(url.value + '/public/');
     };
+    const tryAgain =  () => {
+      const gotoAfterLogin = localStorage.getItem('goto-after-login');
+      if (gotoAfterLogin) {
+        window.location.assign(gotoAfterLogin)
+      }
+    }
     const login = () => {
       window.location.assign('http://oauth.sogebot.xyz/?state=' + encodeURIComponent(window.btoa(
         JSON.stringify({
-          popoutUrl: popoutUrl.value,
           url: url.value,
           referrer: document.referrer,
         })
@@ -81,7 +76,7 @@ export default defineComponent({
         login();
       }
     });
-    return { error, popoutUrl, url, login, publicPage }
+    return { error, url, login, publicPage, tryAgain }
   }
 });
 </script>

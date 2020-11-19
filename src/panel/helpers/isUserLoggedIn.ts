@@ -88,12 +88,6 @@ export const isUserLoggedIn = async function (mustBeLogged = true, mustBeAdmin =
           check();
         });
       }
-
-      const gotoAfterLogin = localStorage.getItem('goto-after-login');
-      if (gotoAfterLogin) {
-        location.assign(gotoAfterLogin);
-        localStorage.removeItem('goto-after-login');
-      }
       return data;
     } catch(e) {
       console.debug(e);
