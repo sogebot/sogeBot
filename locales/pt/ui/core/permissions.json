@@ -28,6 +28,7 @@
   "subtier": "Nível de Sub(1, 2, ou 3)",
   "subcumulativemonths": "Sub-meses cumulativos",
   "substreakmonth": "SubSequência atual",
+  "rank": "Current rank",
   "isLowerThan": "é menor que",
   "isLowerThanOrEquals": "é menor que ou igual à",
   "equals": "igual a",
