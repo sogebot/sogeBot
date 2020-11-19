@@ -28,6 +28,7 @@
   "subtier": "Sub Tier (1, 2, or 3)",
   "subcumulativemonths": "Sub cumulative months",
   "substreakmonth": "Current sub streak",
+  "rank": "Current rank",
   "isLowerThan": "is lower than",
   "isLowerThanOrEquals": "is lower than or equals",
   "equals": "equals",
