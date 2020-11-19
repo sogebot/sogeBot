@@ -24,7 +24,12 @@
       // set it as new authorization
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
-      window.location.assign(`${state.popoutUrl || state.referrer || state.url}`);
+
+      // goto after login
+      const gotoAfterLogin = localStorage.getItem('goto-after-login');
+      localStorage.removeItem('goto-after-login');
+
+      window.location.assign(`${gotoAfterLogin || state.referrer || state.url}`);
     } catch (error) {
       console.log({error});
       window.location.assign(window.location.origin + '/login');
