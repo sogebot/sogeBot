@@ -1,5 +1,4 @@
 import { EntitySchema } from 'typeorm';
-import { ColumnNumericTransformer } from './_transformer';
 
 export interface PermissionsInterface {
   id?: string;
@@ -17,8 +16,8 @@ export interface PermissionFiltersInterface {
   id?: string;
   permission: PermissionsInterface;
   comparator: '<' | '>' | '==' | '<=' | '>=';
-  type: 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths' | 'followtime';
-  value: number;
+  type: 'ranks' | 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths' | 'followtime';
+  value: string;
 }
 
 export interface PermissionCommandsInterface {
@@ -55,7 +54,7 @@ export const PermissionFilters = new EntitySchema<Readonly<Required<PermissionFi
     id: { type: 'uuid', primary: true, generated: 'uuid' },
     comparator: { type: 'varchar', length: 3 },
     type: { type: 'varchar' },
-    value: { type: 'bigint', transformer: new ColumnNumericTransformer() },
+    value: { type: String },
   },
   relations: {
     permission: {
