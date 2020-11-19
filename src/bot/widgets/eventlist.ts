@@ -135,9 +135,9 @@ class EventList extends Widget {
       const mapping = new Map() as Map<string, string>;
       for (const event of events) {
         const values = JSON.parse(event.values_json);
-        if (values.from && values.from != '0') {
-          if (!mapping.has(values.from)) {
-            mapping.set(values.from, await users.getNameById(values.from));
+        if (values.fromId && values.fromId != '0') {
+          if (!mapping.has(values.fromId)) {
+            mapping.set(values.fromId, await users.getNameById(values.fromId));
           }
         }
         if (!mapping.has(event.userId)) {
@@ -147,8 +147,8 @@ class EventList extends Widget {
       this.emit('update',
         events.map(event => {
           const values = JSON.parse(event.values_json);
-          if (values.from && values.from != '0') {
-            values.from = mapping.get(values.from);
+          if (values.fromId && values.fromId != '0') {
+            values.fromId = mapping.get(values.fromId);
           }
           return {
             ...event,

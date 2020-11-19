@@ -15,19 +15,19 @@ class EventList extends Overlay {
 
   sockets () {
     adminEndpoint(this.nsp, 'eventlist::getUserEvents', async (userId, cb) => {
-      const eventsByUserId = await getRepository(EventListEntity).find({userId});
+      const eventsByUserId = await getRepository(EventListEntity).find({userId: String(userId)});
       // we also need subgifts by giver
       const eventsByRecipientId
         = (await getRepository(EventListEntity).find({event:'subgift'}))
-          .filter(o => JSON.parse(o.values_json).from === String(userId));
+          .filter(o => JSON.parse(o.values_json).fromId === String(userId));
       const events =  _.orderBy([ ...eventsByRecipientId, ...eventsByUserId ], 'timestamp', 'desc');
-      // we need to change userId => username and from => from username for eventlist compatibility
+      // we need to change userId => username and fromId => fromId username for eventlist compatibility
       const mapping = new Map() as Map<string, string>;
       for (const event of events) {
         const values = JSON.parse(event.values_json);
-        if (values.from && values.from != '0') {
-          if (!mapping.has(values.from)) {
-            mapping.set(values.from, await users.getNameById(values.from));
+        if (values.fromId && values.fromId != '0') {
+          if (!mapping.has(values.fromId)) {
+            mapping.set(values.fromId, await users.getNameById(values.fromId));
           }
         }
         if (!mapping.has(event.userId)) {
@@ -36,8 +36,8 @@ class EventList extends Overlay {
       }
       cb(null, events.map(event => {
         const values = JSON.parse(event.values_json);
-        if (values.from && values.from != '0') {
-          values.from = mapping.get(values.from);
+        if (values.fromId && values.fromId != '0') {
+          values.fromId = mapping.get(values.fromId);
         }
         return {
           ...event,
