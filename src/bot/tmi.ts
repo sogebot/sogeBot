@@ -594,6 +594,7 @@ class TMI extends Core {
   async subgift (message: Record<string, any>) {
     try {
       const username = message.tags.login;
+      const userId = message.tags.userId;
       const subCumulativeMonths = Number(message.parameters.months);
       const recipient = message.parameters.recipientUserName.toLowerCase();
       const recipientId = message.parameters.recipientId;
@@ -612,7 +613,7 @@ class TMI extends Core {
         events.fire('subgift', { username: username, recipient: recipient, tier });
         triggerInterfaceOnSub({
           username: recipient,
-          userId: recipientId,
+          userId: Number(recipientId),
           subCumulativeMonths: 0,
         });
       }
@@ -620,7 +621,7 @@ class TMI extends Core {
         return;
       }
 
-      const user = await getRepository(User).findOne({ userId: recipientId });
+      const user = await getRepository(User).findOne({ userId: Number(recipientId) });
       if (!user) {
         await getRepository(User).save({ userId: Number(recipientId), username });
         this.subgift(message);
@@ -639,12 +640,12 @@ class TMI extends Core {
       eventlist.add({
         event: 'subgift',
         userId: recipientId,
-        fromId: String(await users.getIdByName(username) ?? '0') ,
+        fromId: userId,
         monthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
         months: subCumulativeMonths,
         timestamp: Date.now(),
       });
-      subgift(`${recipient}#${recipientId}, from: ${username}, months: ${subCumulativeMonths}`);
+      subgift(`${recipient}#${recipientId}, from: ${username}#${userId}, months: ${subCumulativeMonths}`);
       alerts.trigger({
         event: 'subgifts',
         name: username,
@@ -658,7 +659,7 @@ class TMI extends Core {
 
       // also set subgift count to gifter
       if (!(isIgnored({username, userId: user.userId}))) {
-        await getRepository(User).increment({ userId: message.tags.userId }, 'giftedSubscribes', 1);
+        await getRepository(User).increment({ userId: Number(userId) }, 'giftedSubscribes', 1);
       }
     } catch (e) {
       error('Error parsing subgift event');

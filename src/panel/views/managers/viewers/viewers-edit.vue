@@ -288,7 +288,7 @@
                     {{ translate('managers.viewers.hostAndRaidViewersCount').replace('$value', JSON.parse(data.item.values_json).viewers) }}
                   </template>
                   <template v-else-if="data.item.event === 'subgift'">
-                    <div v-if="data.item.username === viewer.username" v-html="translate('managers.viewers.receivedSubscribeFrom').replace('$value', JSON.parse(data.item.values_json).from)" />
+                    <div v-if="data.item.username === viewer.username" v-html="translate('managers.viewers.receivedSubscribeFrom').replace('$value', JSON.parse(data.item.values_json).fromId)" />
                     <div v-else v-html="translate('managers.viewers.giftedSubscribeTo').replace('$value', data.item.username)" />
                   </template>
                 </template>

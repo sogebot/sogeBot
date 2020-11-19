@@ -313,7 +313,7 @@ export default {
       t = t.replace('$formatted_amount', '<strong style="font-size: 1rem">' + formatted_amount + '</strong>')
       t = t.replace('$viewers', '<strong style="font-size: 1rem">' + get(values, 'viewers', '0') + '</strong>')
       t = t.replace('$tier', `${translate('tier')} <strong style="font-size: 1rem">${get(values, 'tier', 'n/a')}</strong>`)
-      t = t.replace('$username', get(values, 'from', 'n/a'))
+      t = t.replace('$username', get(values, 'fromId', 'n/a'))
       t = t.replace('$subCumulativeMonthsName', get(values, 'subCumulativeMonthsName', 'months'))
       t = t.replace('$subCumulativeMonths', '<strong style="font-size: 1rem">' + get(values, 'subCumulativeMonths', '0') + '</strong>')
       t = t.replace('$subStreakName', get(values, 'subStreakName', 'months'))
