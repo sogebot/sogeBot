@@ -6,6 +6,7 @@ import { getFunctionNameFromStackTrace } from './stacktrace';
 
 import { dayjs, timezone } from './dayjs';
 import { isDbConnected } from './database';
+import { createStream, Generator } from 'rotating-file-stream';
 
 const logDir = './logs';
 
@@ -14,7 +15,18 @@ if (!fs.existsSync(logDir)) {
 }
 
 const logLevel = process.env.LOGLEVEL ? process.env.LOGLEVEL.toLowerCase().trim() : 'info';
-const logFile = fs.createWriteStream('./logs/sogebot.log', { flags: 'a' });
+
+const logFileName: Generator = (time: Date | number, index?: number) => {
+  console.log({time, index});
+  if (!time) {
+    return './logs/sogebot.log';
+  }
+  return `./logs/sogebot.log.${(index ?? 1)-1}.gz`;
+};
+const logFile = createStream(logFileName, {
+  size: '5M',
+  compress: 'gzip',
+});
 
 // until https://github.com/typescript-eslint/typescript-eslint/pull/1898 fixed
 /* eslint-disable */
