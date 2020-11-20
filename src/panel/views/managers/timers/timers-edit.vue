@@ -211,7 +211,7 @@ export default class timerssEdit extends Vue {
 
   async mounted() {
     if (this.$route.params.id) {
-      await new Promise((resolve, reject) => {
+      await new Promise<void>((resolve, reject) => {
         this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, data: Required<TimerInterface>) => {
         if (err) {
           reject(err)

@@ -144,7 +144,7 @@
     methods: {
       async save() {
         this.state.save = this.$state.progress;
-        await new Promise(resolve => {
+        await new Promise<void>(resolve => {
           this.socket.emit('permission::save', this.permissions, () => {
             resolve();
           });

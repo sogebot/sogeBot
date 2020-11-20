@@ -513,7 +513,7 @@ export default defineComponent({
     }
     const showGameAndTitleDlg = () => EventBus.$emit('show-game_and_title_dlg');
     const loadCustomVariableValue = async (variable: string) => {
-      return new Promise((resolve, reject) => {
+      return new Promise<string>((resolve, reject) => {
         socket.emit('custom.variable.value', variable, (err: string | null, value: string) => {
           resolve(value)
         })
@@ -579,7 +579,7 @@ export default defineComponent({
       socket.emit('version', async (recvVersion: string) => {
         version.value = recvVersion;
 
-        const { response } = await new Promise(resolve => {
+        const { response } = await new Promise<{ response: Record<string, any>}>(resolve => {
           const request = new XMLHttpRequest();
           request.open('GET', 'https://api.github.com/repos/sogehige/sogebot/releases/latest', true);
 

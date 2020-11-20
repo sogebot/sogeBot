@@ -182,7 +182,7 @@ class Permissions extends Core {
 
   public async check(userId: number, permId: string, partial = false): Promise<{access: boolean; permission: PermissionsInterface | undefined}> {
     if (!areDecoratorsLoaded) {
-      await new Promise((resolve) => {
+      await new Promise<void>((resolve) => {
         const check = () => {
           // wait for all data to be loaded
           if (areDecoratorsLoaded) {

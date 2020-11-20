@@ -24,7 +24,7 @@ class Translate {
 
   async _load () {
     this.custom = await getRepository(Translation).find();
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       const load = () => {
         if (!areDecoratorsLoaded) {
           // waiting for full load

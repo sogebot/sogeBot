@@ -545,7 +545,7 @@ export default class viewersEdit extends Vue {
 
   async created() {
     this.state.loading = this.$state.progress;
-    await new Promise((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       this.socket.emit('viewers::findOne', this.$route.params.id, (err: string | null, data: Readonly<Required<UserInterface>> & { aggregatedTips: number; aggregatedBits: number; permission: string }) => {
         if (err) {
           reject(console.error(err));
@@ -560,7 +560,7 @@ export default class viewersEdit extends Vue {
         resolve();
       })
     });
-    await new Promise((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       if (this.viewer) {
         this.socketEventList.emit('eventlist::getUserEvents', this.viewer.userId, (err: string | null, events: Required<EventListInterface>[]) => {
           if (err) {

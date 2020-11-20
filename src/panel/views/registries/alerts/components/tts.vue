@@ -190,7 +190,7 @@ export default class TTS extends Vue {
 
   async speak() {
     for (const text of this.text.split('/ ')) {
-      await new Promise(resolve => {
+      await new Promise<void>(resolve => {
         if (text.trim().length === 0) {
           setTimeout(() => resolve(), 500);
         } else {

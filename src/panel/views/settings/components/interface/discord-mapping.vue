@@ -50,7 +50,7 @@ export default class discordChannel extends Vue {
   mounted() {
     this.loading = this.$state.progress;
     const getDataFromServer = Promise.all([
-      new Promise((resolve) => {
+      new Promise<void>(resolve => {
         this.psocket.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
           if(err) {
             return console.error(err);
@@ -62,7 +62,7 @@ export default class discordChannel extends Vue {
           resolve()
         })
       }),
-      new Promise((resolve, reject) => {
+      new Promise<void>((resolve, reject) => {
         this.socket.emit('discord::getRoles', (err: string | null, roles: { html: string; value: string }[]) => {
           console.groupCollapsed('discord::getRoles')
           console.log({roles});
@@ -79,7 +79,7 @@ export default class discordChannel extends Vue {
       console.error(error)
       this.loading = this.$state.fail;
     }).then(() => this.loading = this.$state.success);
-    const timeout = new Promise(resolve => {
+    const timeout = new Promise<void>(resolve => {
       setTimeout(() => {
         if (this.loading === this.$state.progress) {
           this.loading = this.$state.fail;

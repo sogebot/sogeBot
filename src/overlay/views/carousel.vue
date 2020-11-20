@@ -44,7 +44,7 @@ export default class CarouselOverlay extends Vue {
   }
 
   wait (type: string) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       setTimeout(() => resolve(), this.images[this.currentImage][type])
     })
   }
@@ -85,7 +85,7 @@ export default class CarouselOverlay extends Vue {
         break
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       gsap.to((this.$refs[this.images[this.currentImage].id] as HTMLElement[]), {
         duration: this.images[this.currentImage].animationInDuration / 1000,
         ...animation,
@@ -117,7 +117,7 @@ export default class CarouselOverlay extends Vue {
         break
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       gsap.to((this.$refs[this.images[this.currentImage].id] as HTMLElement[]), {
         duration: this.images[this.currentImage].animationOutDuration / 1000,
         ...animation,

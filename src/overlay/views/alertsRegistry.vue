@@ -212,7 +212,7 @@ export default class AlertsRegistryOverlays extends Vue {
   async speak(text: string, voice: string, rate: number, pitch: number, volume: number) {
     isTTSPlaying = true;
     for (const TTS of text.split('/ ')) {
-      await new Promise(resolve => {
+      await new Promise<void>(resolve => {
         if (TTS.trim().length === 0) {
           setTimeout(() => resolve(), 500);
         } else {
@@ -566,7 +566,7 @@ export default class AlertsRegistryOverlays extends Vue {
       if (isUpdated) {
         console.debug('Alert is updating')
         this.updatedAt = updatedAt;
-        await new Promise((resolve) => {
+        await new Promise<void>((resolve) => {
           this.socket.emit('generic::getOne', this.id, async (err: string | null, data: AlertInterface) => {
             if (err) {
               return console.error(err);
@@ -667,7 +667,7 @@ export default class AlertsRegistryOverlays extends Vue {
                 head.appendChild(style);
 
                 // load emotes
-                await new Promise((done) => {
+                await new Promise<void>((done) => {
                   this.socketEmotes.emit('getCache', (err: string | null, data: any) => {
                     if (err) {
                       return console.error(err);

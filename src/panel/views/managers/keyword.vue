@@ -435,7 +435,7 @@ export default defineComponent({
       $v?.$touch();
       if (!$v?.$invalid) {
         state.value.save = ButtonStates.progress;
-        await new Promise((resolve, reject) => {
+        await new Promise<void>((resolve, reject) => {
           console.debug('Saving keyword', editationItem.value);
           socket.keyword.emit('generic::setById', { id: editationItem.value?.id, item: editationItem.value }, (err: string | null) => {
             if (err) {

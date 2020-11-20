@@ -223,7 +223,7 @@ export default class textOverlayEdit extends Vue {
   }
 
   async remove () {
-    await new Promise(resolve => {
+    await new Promise<void>(resolve => {
       this.socket.emit('text::remove', {
         id: this.id,
         name: this.name,

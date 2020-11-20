@@ -236,7 +236,7 @@ export default defineComponent({
 
     const refreshPlaylist = async () => {
       await Promise.all([
-        new Promise((resolve, reject) => {
+        new Promise<void>((resolve, reject) => {
           socket.emit('current.playlist.tag', (err: string | null, tag: string) => {
             if (err) {
               error(err)
@@ -246,7 +246,7 @@ export default defineComponent({
             resolve();
           })
         }),
-        new Promise((resolve, reject) => {
+        new Promise<void>((resolve, reject) => {
           socket.emit('get.playlist.tags', (err: string | null, _tags: string[]) => {
             if (err) {
               error(err)
@@ -256,7 +256,7 @@ export default defineComponent({
             resolve();
           })
         }),
-        new Promise((resolve, reject) => {
+        new Promise<void>((resolve, reject) => {
           socket.emit('find.playlist', { page: (currentPage.value - 1), search: search.value, tag: showTag.value }, (err: string | null, _items: SongPlaylistInterface[], _count: number) => {
             if (err) {
               error(err)

@@ -1,7 +1,7 @@
 export let mainLoaded = false;
 
 export const isAvailableVariable = async function(variable: string) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     const check = async (retry = 0) => {
       if (typeof (global as any)[variable] === 'undefined' || Object.keys((global as any)[variable]).length === 0) {
         if (retry > 500) {
@@ -24,7 +24,7 @@ export const setMainLoaded = async function () {
 };
 
 export const isMainLoaded = async function() {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     const check = async (retry = 0) => {
       if (!mainLoaded) {
         if (retry > 500) {

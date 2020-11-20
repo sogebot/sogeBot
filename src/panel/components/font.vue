@@ -294,7 +294,7 @@ export default defineComponent({
     }
 
     onBeforeMount(async () => {
-      const { response } = await new Promise(resolve => {
+      const { response } = await new Promise<{ response: Record<string, any>}>(resolve => {
         const request = new XMLHttpRequest();
         request.open('GET', '/fonts', true);
 

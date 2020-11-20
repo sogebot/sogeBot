@@ -132,7 +132,7 @@ class Donationalerts extends Integration {
 
   private socketConnect() {
     this.socketToDonationAlerts?.connect();
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.socketToDonationAlerts?.on('connect', () => {
         info(chalk.yellow('DONATIONALERTS.RU:') + ' Successfully connected socket to service.');
         resolve();

@@ -396,7 +396,7 @@ export default class customVariablesEdit extends Vue {
   async mounted() {
     this.state.loaded = false;
     await Promise.all([
-      new Promise(resolve => {
+      new Promise<void>(resolve => {
         this.psocket.emit('permissions', (err: string, data: Readonly<Required<PermissionsInterface>>[]) => {
           if(err) {
             return console.error(err);
@@ -411,7 +411,7 @@ export default class customVariablesEdit extends Vue {
           resolve()
         })
       }),
-      new Promise(resolve => {
+      new Promise<void>(resolve => {
         if (this.$route.params.id) {
           this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, data: Readonly<Required<VariableInterface>>) => {
             if (err) {
@@ -562,7 +562,7 @@ export default class customVariablesEdit extends Vue {
   }
 
   async remove () {
-    await new Promise(resolve => {
+    await new Promise<void>(resolve => {
       this.socket.emit('customvariables::delete', this.$route.params.id, () => {
         resolve();
       })
@@ -576,7 +576,7 @@ export default class customVariablesEdit extends Vue {
     try {
       await Promise.all([
         // check if variable name is unique
-        new Promise((resolve, reject) => {
+        new Promise<void>((resolve, reject) => {
           this.socket.emit('customvariables::isUnique', { variable: this.variableName, id: this.$route.params.id }, (err: string | null, isUnique: boolean) => {
             if (!isUnique) {
               reject(translate('registry.customvariables.variable.error.isNotUnique'))
@@ -584,12 +584,12 @@ export default class customVariablesEdit extends Vue {
             resolve()
           })
         }),
-        new Promise((resolve, reject) => {
+        new Promise<void>((resolve, reject) => {
           this.variableName.replace(/\$_/g, '').trim().length > 0
             ? resolve()
             : reject(translate('registry.customvariables.variable.error.isEmpty'))
         }),
-        new Promise((resolve, reject) => {
+        new Promise<void>((resolve, reject) => {
           this.selectedType !== 'options' || (this.usableOptionsArray.length > 0 && this.selectedType === 'options')
             ? resolve()
             : reject(translate('registry.customvariables.usableOptions.error.atLeastOneValue'))

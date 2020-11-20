@@ -627,7 +627,7 @@ export default defineComponent({
     const loadEditationItem = async () => {
       state.value.editationLoading = ButtonStates.progress
       await Promise.all([
-        new Promise((resolve, reject) => {
+        new Promise<void>((resolve, reject) => {
           if (ctx.root.$route.params.id) {
             socket.emit('generic::getOne', ctx.root.$route.params.id, (err: string | null, eventGetAll: Required<EventInterface> | undefined) => {
               if (err) {
@@ -674,7 +674,7 @@ export default defineComponent({
           }
           resolve();
         }),
-        new Promise((resolve, reject) => {
+        new Promise<void>((resolve, reject) => {
           socket.emit('list.supported.operations', (err: string | null, data: Events.SupportedOperation[]) => {
             if (err) {
               reject(error(err));
@@ -707,7 +707,7 @@ export default defineComponent({
             resolve();
           })
         }),
-        new Promise((resolve, reject) => {
+        new Promise<void>((resolve, reject) => {
           socket.emit('list.supported.events', (err: string | null, data: Events.SupportedEvent[]) => {
             if (err) {
               reject(error(err));

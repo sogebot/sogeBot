@@ -341,7 +341,7 @@ export default defineComponent({
       $v?.$touch();
       if (!$v?.$invalid) {
         state.value.save = ButtonStates.progress;
-        await new Promise((resolve, reject) => {
+        await new Promise<void>((resolve, reject) => {
           console.debug('Saving cooldown', editationItem.value);
           socket.emit('cooldown::save', editationItem.value, (err: string | null, data: CooldownInterface) => {
             if (err) {

@@ -573,7 +573,7 @@ export default class AlertsEdit extends Vue {
   }
 
   async remove () {
-    await new Promise(resolve => {
+    await new Promise<void>(resolve => {
       this.socket.emit('alerts::delete', this.item, () => {
         resolve();
       })

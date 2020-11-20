@@ -225,7 +225,7 @@ export default class customVariablesList extends Vue {
       }
 
       for (const mediaId of mediaMap.keys()) {
-        await new Promise(resolve => {
+        await new Promise<void>(resolve => {
           this.socket.emit('alerts::cloneMedia', [mediaId, mediaMap.get(mediaId)], (err: string | null) => {
             if (err) {
               console.error(err)
