@@ -88,10 +88,16 @@ export const isUserLoggedIn = async function (mustBeLogged = true, mustBeAdmin =
           check();
         });
       }
+      localStorage.setItem('cached-logged-user', JSON.stringify(data));
       return data;
     } catch(e) {
       console.debug(e);
+      const data = JSON.parse(localStorage.getItem('cached-logged-user') || 'null');
       if (mustBeLogged) {
+        if (e.message.toLowerCase().includes('network error') && data) {
+          console.warn('Network error, using cached logged user', data);
+          return data;
+        }
         if (e === 'User doesn\'t have access to this endpoint') {
           window.location.assign(window.location.origin + '/login#error=must+be+caster');
         } else {
@@ -103,7 +109,7 @@ export const isUserLoggedIn = async function (mustBeLogged = true, mustBeAdmin =
           }
         }
       }
-      return null;
+      return data;
     }
   }
 };
