@@ -447,7 +447,7 @@ export default defineComponent({
       $v?.$touch();
       if (!$v?.$invalid) {
         state.value.save = ButtonStates.progress;
-        await new Promise((resolve, reject) => {
+        await new Promise<void>((resolve, reject) => {
           console.debug('Saving command', editationItem.value);
           socket.command.emit('generic::setById', { id: editationItem.value?.id, item: editationItem.value }, (err: string | null) => {
             if (err) {

@@ -102,7 +102,7 @@ type Configuration = {
   [x:string]: Configuration | string;
 };
 export const getConfiguration = async (): Promise<Configuration> => {
-  return new Promise((resolve) => {
+  return new Promise<Configuration>((resolve) => {
     getSocket('/core/ui', true).emit('configuration', (err: string | null, configuration: Configuration) => {
       if (err) {
         return console.error(err);

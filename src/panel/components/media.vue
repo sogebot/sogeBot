@@ -172,7 +172,7 @@ export default defineComponent({
 
         for (let i = 0; i < chunks.length; i++) {
           promises.push(
-            new Promise((resolve, reject) => {
+            new Promise<void>((resolve, reject) => {
               const chunk = {
                 id,
                 b64data: chunks[i],
@@ -207,7 +207,7 @@ export default defineComponent({
         const chunks = String(reader.result).match(/.{1,1000000}/g)
         fileUpload(chunks);
 
-        await new Promise(res => {
+        await new Promise<void>(res => {
           const checkIsUploading = () => {
             if (isUploading.value) {
               setTimeout(() => checkIsUploading(), 100);

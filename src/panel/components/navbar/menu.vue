@@ -66,7 +66,7 @@ export default defineComponent({
       }
 
       const isLoaded = await Promise.race([
-        new Promise(resolve => {
+        new Promise<boolean>(resolve => {
           socket.emit('menu', (err: string | null, data: menuWithEnabled[]) => {
             if (err) {
               return console.error(err);
@@ -82,7 +82,7 @@ export default defineComponent({
             resolve(true);
           });
         }),
-        new Promise(resolve => {
+        new Promise<boolean>(resolve => {
           setTimeout(() => resolve(false), 4000);
         }),
       ]);

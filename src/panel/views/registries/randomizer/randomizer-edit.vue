@@ -496,7 +496,7 @@ export default class randomizerEdit extends Vue {
     this.$v.$touch();
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
-      await new Promise((resolve) => {
+      await new Promise<void>((resolve) => {
         this.item.isShown = this.isShown;
         console.debug('Saving randomizer', this.item);
         this.socket.emit('randomizer::save', this.item, (err: Error | null) => {
@@ -629,7 +629,7 @@ export default class randomizerEdit extends Vue {
   async created() {
     this.state.loading = this.$state.progress;
     await Promise.all([
-      new Promise(async (done) => {
+      new Promise<void>(async (done) => {
         if (this.$route.params.id) {
           this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, d: Required<RandomizerInterface>) => {
             if (err) {
@@ -653,8 +653,8 @@ export default class randomizerEdit extends Vue {
           done();
         }
       }),
-      new Promise(async (done) => {
-        const { response } = await new Promise(resolve => {
+      new Promise<void>(async (done) => {
+        const { response } = await new Promise<{ response: Record<string, any>}>(resolve => {
           const request = new XMLHttpRequest();
           request.open('GET', '/fonts', true);
 
@@ -676,7 +676,7 @@ export default class randomizerEdit extends Vue {
         })
         done();
       }),
-      new Promise(async(done) => {
+      new Promise<void>(async(done) => {
         this.psocket.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
         if(err) {
           return console.error(err);

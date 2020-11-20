@@ -136,7 +136,7 @@ export default class randomizerList extends Vue {
 
   async refresh() {
     await Promise.all([
-      new Promise(async(done) => {
+      new Promise<void>(async(done) => {
         this.psocket.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
           if(err) {
             return console.error(err);
@@ -145,7 +145,7 @@ export default class randomizerList extends Vue {
           done();
         });
       }),
-      new Promise(async(done) => {
+      new Promise<void>(async(done) => {
         this.socket.emit('generic::getAll', (err: string | null, data: Required<RandomizerInterface>[]) => {
           if (err) {
             return console.error(err);

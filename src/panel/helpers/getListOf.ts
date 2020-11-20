@@ -26,7 +26,7 @@ const list: getListOfReturn = {
   games: [],
 };
 export const populateListOf = async function<P extends possibleLists>(type: P): Promise<void> {
-  return new Promise((resolve) => {
+  return new Promise<void>((resolve) => {
     getSocket('/').emit(type, (err: string | null, data: getListOfReturn['systems']) => {
       if (err) {
         console.error(err);

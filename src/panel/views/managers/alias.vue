@@ -317,7 +317,7 @@ export default defineComponent({
         let promises: Promise<void>[] = [];
         for (const item of items.value.filter((o) => o.group === group)) {
           item.group = null;
-          promises.push(new Promise(resolve => {
+          promises.push(new Promise<void>(resolve => {
             socket.alias.emit('generic::setById', { id: item.id, item }, () => {
               resolve();
             })

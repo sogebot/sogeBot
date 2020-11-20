@@ -189,7 +189,7 @@ export default {
       this.socket.emit('randomizer::save', this.items, () => {})
     },
     refresh: function () {
-      return new Promise((resolve) => {
+      return new Promise<void>((resolve) => {
         this.socket.emit('generic::getAll', (err, data) => {
           if (err) {
             return console.error(err);
