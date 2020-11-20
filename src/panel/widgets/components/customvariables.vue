@@ -243,7 +243,7 @@ export default {
       this.socket.emit('watched::save', this.watched, () => {})
     },
     refreshVariablesList: function () {
-      return new Promise<void>((resolve) => {
+      return new Promise((resolve) => {
         this.socket.emit('customvariables::list', (err, data) => {
           if (err) {
             return console.error(err);
@@ -255,7 +255,7 @@ export default {
       })
     },
     refreshWatchList: function () {
-      return new Promise<void>((resolve) => {
+      return new Promise((resolve) => {
         this.socket.emit('list.watch', (err, data) => {
           this.watched = data
           resolve()

@@ -289,7 +289,7 @@ export default {
   methods: {
     refresh: async function () {
       await Promise.all([
-        new Promise<void>((resolve, reject) => {
+        new Promise((resolve, reject) => {
           this.socket.emit('raffle:getLatest', (err, raffle) => {
             console.groupCollapsed('raffle:getLatest')
             console.log({err, raffle})
