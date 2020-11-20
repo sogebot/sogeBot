@@ -198,7 +198,7 @@ export default defineComponent({
 
     onMounted(async () => {
       isLoaded.value = await Promise.race([
-        new Promise<void>(resolve => {
+        new Promise(resolve => {
           socket.emit('panel::dashboards', { userId: Number(ctx.root.$store.state.loggedUser.id), type: 'admin' }, (err, dashboardsFromSocket) => {
             console.groupCollapsed('dashboard::panel::dashboards');
             console.log({err, dashboards: dashboardsFromSocket});
@@ -215,7 +215,7 @@ export default defineComponent({
             resolve(true);
           });
         }),
-        new Promise<void>(resolve => {
+        new Promise(resolve => {
           setTimeout(() => resolve(false), 4000);
         }),
       ]);
