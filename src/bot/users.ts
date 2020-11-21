@@ -13,16 +13,17 @@ import oauth from './oauth';
 import api from './api';
 import currency from './currency';
 import { Permissions } from './database/entity/permissions';
+import { onStartup } from './decorators/on';
 
 class Users extends Core {
   constructor () {
     super();
-
     this.addMenu({ category: 'manage', name: 'viewers', id: 'manage/viewers/list', this: null });
+  }
 
-    setTimeout(() => {
-      this.updateWatchTime(true);
-    }, 30000);
+  @onStartup()
+  startup() {
+    this.updateWatchTime(true);
   }
 
   async getChatOf (id: number, online: boolean): Promise<number> {
