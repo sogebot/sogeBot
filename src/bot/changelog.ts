@@ -61,7 +61,9 @@ export const changelog = async () => {
 };
 
 setInterval(() => {
-  getRepository(Changelog).delete({
-    timestamp: LessThan(Date.now() - 60000),
-  });
+  if (isDbConnected) {
+    getRepository(Changelog).delete({
+      timestamp: LessThan(Date.now() - 60000),
+    });
+  }
 }, 60000);
