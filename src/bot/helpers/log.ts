@@ -17,7 +17,6 @@ if (!fs.existsSync(logDir)) {
 const logLevel = process.env.LOGLEVEL ? process.env.LOGLEVEL.toLowerCase().trim() : 'info';
 
 const logFileName: Generator = (time: Date | number, index?: number) => {
-  console.log({time, index});
   if (!time) {
     return './logs/sogebot.log';
   }
