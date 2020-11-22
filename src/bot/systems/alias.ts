@@ -26,6 +26,8 @@ import customcommands from './customcommands';
  * !alias group -unset ![alias]                     - unset alias from group
  * !alias group -list                                  - list alias groups
  * !alias group -list [group]                          - list alias group by name
+ * !alias group -enable [group]                        - enable alias group by name
+ * !alias group -disable [group]                       - disable alias group by name
  * !alias add (-p [uuid|name]) -a ![alias] -c ![cmd]   - add alias for specified command
  * !alias edit (-p [uuid|name]) -a ![alias] -c ![cmd]  - add alias for specified command
  * !alias remove ![alias]                              - remove specified alias
@@ -208,8 +210,26 @@ class Alias extends System {
             list: groups.length > 0 ? groups.join(', ') : `<${translate('core.empty')}>` });
           return [{ response, ...opts }];
         }
+      } else if (opts.parameters.includes('-enable')) {
+        const [group] = new Expects(opts.parameters)
+          .argument({ name: 'enable', type: String, multi: true, delimiter: '' }) // set as multi as group can contain spaces
+          .toArray();
+        await getRepository(AliasEntity).update({ group }, { enabled: true });
+        const response = prepare('alias.alias-group-list-enabled', {
+          group,
+        });
+        return [{ response, ...opts }];
+      } else if (opts.parameters.includes('-disable')) {
+        const [group] = new Expects(opts.parameters)
+          .argument({ name: 'disable', type: String, multi: true, delimiter: '' }) // set as multi as group can contain spaces
+          .toArray();
+        await getRepository(AliasEntity).update({ group }, { enabled: false });
+        const response = prepare('alias.alias-group-list-disabled', {
+          group,
+        });
+        return [{ response, ...opts }];
       } else {
-        throw new Error('-set, -unset or -list not found in command.');
+        throw new Error('-set, -unset, -enable, -disable or -list not found in command.');
       }
     } catch (e) {
       error(e.message);
