@@ -18,7 +18,7 @@ export interface UserInterface {
       xpOnlineGivenAt: number;
       xpOnlineMessages: number;
     }
-  }
+  } | null
 }
 
 export interface UserTipInterface {
@@ -95,7 +95,7 @@ export const User = new EntitySchema<Readonly<Required<UserInterface>>>({
     subscribeStreak: { type: Number, default: 0 },
     giftedSubscribes: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
     messages: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
-    extra: { type: 'simple-json', default: '{}' },
+    extra: { type: 'simple-json', nullable: true },
   },
   indices: [
     {

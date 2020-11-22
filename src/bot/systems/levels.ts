@@ -172,8 +172,8 @@ class Levels extends System {
       const chat = await users.getChatOf(userId, opts.isOnline);
       if (interval_calculated !== 0 && ptsPerInterval[permId] !== 0) {
         const givenAt = opts.isOnline
-          ? user.extra.levels?.xpOnlineGivenAt ?? chat
-          : user.extra.levels?.xpOfflineGivenAt ?? chat;
+          ? user.extra?.levels?.xpOnlineGivenAt ?? chat
+          : user.extra?.levels?.xpOfflineGivenAt ?? chat;
         debug('levels.update', `${user.username}#${userId}[${permId}] ${chat} | ${givenAt}`);
         let modifier = 0;
         let userTimeXP = givenAt + interval_calculated;
@@ -183,12 +183,12 @@ class Levels extends System {
 
         if (modifier > 0) {
           debug('levels.update', `${user.username}#${userId}[${permId}] +${Math.floor(ptsPerInterval * modifier)}`);
-          const levels: UserInterface['extra']['levels'] = {
-            xp: serialize(BigInt(Math.floor(ptsPerInterval * modifier)) + (unserialize<bigint>(user.extra.levels?.xp) ?? BigInt(0))),
-            xpOfflineGivenAt: !opts.isOnline ? userTimeXP : user.extra.levels?.xpOfflineGivenAt ?? chat,
-            xpOfflineMessages: user.extra.levels?.xpOfflineMessages ?? 0,
-            xpOnlineGivenAt:   opts.isOnline ? userTimeXP : user.extra.levels?.xpOnlineGivenAt ?? chat,
-            xpOnlineMessages: user.extra.levels?.xpOnlineMessages ?? 0,
+          const levels: NonNullable<UserInterface['extra']>['levels'] = {
+            xp: serialize(BigInt(Math.floor(ptsPerInterval * modifier)) + (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0))),
+            xpOfflineGivenAt: !opts.isOnline ? userTimeXP : user.extra?.levels?.xpOfflineGivenAt ?? chat,
+            xpOfflineMessages: user.extra?.levels?.xpOfflineMessages ?? 0,
+            xpOnlineGivenAt:   opts.isOnline ? userTimeXP : user.extra?.levels?.xpOnlineGivenAt ?? chat,
+            xpOnlineMessages: user.extra?.levels?.xpOnlineMessages ?? 0,
           };
           await getRepository(User).update({ userId: user.userId },
             {
@@ -199,12 +199,12 @@ class Levels extends System {
             });
         }
       } else {
-        const levels: UserInterface['extra']['levels'] = {
-          xp: serialize(BigInt(ptsPerInterval) + (unserialize<bigint>(user.extra.levels?.xp) ?? BigInt(0))),
-          xpOfflineGivenAt: !opts.isOnline ? chat : user.extra.levels?.xpOfflineGivenAt ?? chat,
-          xpOfflineMessages: user.extra.levels?.xpOfflineMessages ?? 0,
-          xpOnlineGivenAt:   opts.isOnline ? chat : user.extra.levels?.xpOnlineGivenAt ?? chat,
-          xpOnlineMessages: user.extra.levels?.xpOnlineMessages ?? 0,
+        const levels: NonNullable<UserInterface['extra']>['levels'] = {
+          xp: serialize(BigInt(ptsPerInterval) + (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0))),
+          xpOfflineGivenAt: !opts.isOnline ? chat : user.extra?.levels?.xpOfflineGivenAt ?? chat,
+          xpOfflineMessages: user.extra?.levels?.xpOfflineMessages ?? 0,
+          xpOnlineGivenAt:   opts.isOnline ? chat : user.extra?.levels?.xpOnlineGivenAt ?? chat,
+          xpOnlineMessages: user.extra?.levels?.xpOnlineMessages ?? 0,
         };
         await getRepository(User).update({ userId: user.userId },
           {
@@ -252,21 +252,21 @@ class Levels extends System {
 
     // next message count (be it offline or online)
     const messages = 1 + ((api.isStreamOnline
-      ? user.extra.levels?.xpOnlineMessages
-      : user.extra.levels?.xpOfflineMessages) ?? 0);
+      ? user.extra?.levels?.xpOnlineMessages
+      : user.extra?.levels?.xpOfflineMessages) ?? 0);
     const chat = await users.getChatOf(user.userId, api.isStreamOnline);
 
     // default level object
-    const levels: UserInterface['extra']['levels'] = {
-      xp: serialize(unserialize<bigint>(user.extra.levels?.xp) ?? BigInt(0)),
-      xpOfflineGivenAt: user.extra.levels?.xpOfflineGivenAt ?? chat,
+    const levels: NonNullable<UserInterface['extra']>['levels'] = {
+      xp: serialize(unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0)),
+      xpOfflineGivenAt: user.extra?.levels?.xpOfflineGivenAt ?? chat,
       xpOfflineMessages: !api.isStreamOnline
         ? 0
-        : user.extra.levels?.xpOfflineMessages ?? 0,
-      xpOnlineGivenAt: user.extra.levels?.xpOnlineGivenAt ?? chat,
+        : user.extra?.levels?.xpOfflineMessages ?? 0,
+      xpOnlineGivenAt: user.extra?.levels?.xpOnlineGivenAt ?? chat,
       xpOnlineMessages: api.isStreamOnline
         ? 0
-        : user.extra.levels?.xpOnlineMessages ?? 0,
+        : user.extra?.levels?.xpOnlineMessages ?? 0,
     };
 
     if (messages >= interval_calculated) {
@@ -278,7 +278,7 @@ class Levels extends System {
             levels: {
               ...levels,
               [api.isStreamOnline ? 'xpOnlineMessages' : 'xpOfflineMessages']: 0,
-              xp: serialize(BigInt(ptsPerInterval) + (unserialize<bigint>(user.extra.levels?.xp) ?? BigInt(0))),
+              xp: serialize(BigInt(ptsPerInterval) + (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0))),
             },
           },
         });
@@ -328,7 +328,7 @@ class Levels extends System {
       return 0;
     }
 
-    const currentXP = unserialize<bigint>(user.extra.levels?.xp) ?? BigInt(0);
+    const currentXP = unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0);
 
     if (currentXP < this.firstLevelStartsAt) {
       return 0;
@@ -364,7 +364,7 @@ class Levels extends System {
       const availablePoints = user.points;
       const currentLevel = this.getLevelOf(user);
       const xp = this.getLevelXP(currentLevel + 1);
-      const xpNeeded = xp - (unserialize<bigint>(user.extra.levels?.xp) ?? BigInt(0));
+      const xpNeeded = xp - (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0));
       const neededPoints = Number(xpNeeded * BigInt(this.conversionRate));
 
       if (neededPoints >= availablePoints) {
@@ -380,12 +380,12 @@ class Levels extends System {
       }
 
       const chat = await users.getChatOf(user.userId, api.isStreamOnline);
-      const levels: UserInterface['extra']['levels'] = {
+      const levels: NonNullable<UserInterface['extra']>['levels'] = {
         xp: serialize(xp),
-        xpOfflineGivenAt: user.extra.levels?.xpOfflineGivenAt ?? chat,
-        xpOfflineMessages: user.extra.levels?.xpOfflineMessages ?? 0,
-        xpOnlineGivenAt: user.extra.levels?.xpOnlineGivenAt ?? chat,
-        xpOnlineMessages: user.extra.levels?.xpOnlineMessages ?? 0,
+        xpOfflineGivenAt: user.extra?.levels?.xpOfflineGivenAt ?? chat,
+        xpOfflineMessages: user.extra?.levels?.xpOfflineMessages ?? 0,
+        xpOnlineGivenAt: user.extra?.levels?.xpOnlineGivenAt ?? chat,
+        xpOnlineMessages: user.extra?.levels?.xpOnlineMessages ?? 0,
       };
       await getRepository(User).update({ userId: user.userId },
         {
@@ -426,12 +426,12 @@ class Levels extends System {
       const user = await getRepository(User).findOneOrFail({ username });
       const chat = await users.getChatOf(user.userId, api.isStreamOnline);
 
-      const levels: UserInterface['extra']['levels'] = {
-        xp: serialize(bigIntMax(BigInt(xp) + BigInt((user.extra.levels?.xp ?? BigInt(0))), BigInt(0))),
-        xpOfflineGivenAt: user.extra.levels?.xpOfflineGivenAt ?? chat,
-        xpOfflineMessages: user.extra.levels?.xpOfflineMessages ?? 0,
-        xpOnlineGivenAt: user.extra.levels?.xpOnlineGivenAt ?? chat,
-        xpOnlineMessages: user.extra.levels?.xpOnlineMessages ?? 0,
+      const levels: NonNullable<UserInterface['extra']>['levels'] = {
+        xp: serialize(bigIntMax(BigInt(xp) + BigInt((user.extra?.levels?.xp ?? BigInt(0))), BigInt(0))),
+        xpOfflineGivenAt: user.extra?.levels?.xpOfflineGivenAt ?? chat,
+        xpOfflineMessages: user.extra?.levels?.xpOfflineMessages ?? 0,
+        xpOnlineGivenAt: user.extra?.levels?.xpOnlineGivenAt ?? chat,
+        xpOnlineMessages: user.extra?.levels?.xpOnlineMessages ?? 0,
       };
       await getRepository(User).update({ userId: user.userId },
         {
@@ -462,8 +462,8 @@ class Levels extends System {
       let nextXP = await this.getLevelXP(currentLevel + 1);
       let currentXP = BigInt(0);
 
-      if (user.extra.levels) {
-        currentXP = unserialize<bigint>(user.extra.levels.xp) ?? BigInt(0);
+      if (user.extra?.levels) {
+        currentXP = unserialize<bigint>(user.extra?.levels.xp) ?? BigInt(0);
         currentLevel = this.getLevelOf(user);
         nextXP = await this.getLevelXP(currentLevel + 1);
       }
