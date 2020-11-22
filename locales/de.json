@@ -874,7 +874,9 @@
     "alias-group-set": "$sender, Alias $alias wurde für Gruppe $group gesetzt",
     "alias-group-unset": "$sender, Alias $alias Gruppe wurde entfernt",
     "alias-group-list": "$sender, Liste der Aliasgruppen: $list",
-    "alias-group-list-aliases": "$sender, Liste der Aliase in $group: $list"
+    "alias-group-list-aliases": "$sender, Liste der Aliase in $group: $list",
+    "alias-group-list-enabled": "$sender, aliases in $group are enabled.",
+    "alias-group-list-disabled": "$sender, aliases in $group are disabled."
   },
   "customcmds": {
     "commands-parse-failed": "{core.command-parse} !Befehle",
