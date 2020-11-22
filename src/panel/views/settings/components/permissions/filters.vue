@@ -25,6 +25,7 @@
             <option value="subcumulativemonths">{{ translate('core.permissions.subcumulativemonths') }}</option>
             <option value="substreakmonths">{{ translate('core.permissions.substreakmonth') }}</option>
             <option value="ranks">{{ translate('core.permissions.rank') }}</option>
+            <option value="level">{{ translate('core.permissions.level') }}</option>
           </select>
         </div>
         <div class="form-group col-md-3">

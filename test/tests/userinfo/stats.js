@@ -21,14 +21,15 @@ describe('Userinfo - stats()', () => {
   const messages = '0';
   const tips = '0.00';
   const bits = '0';
+  const level = '0';
 
   it('!stats testuser should show testuser data', async () => {
     const r = await userinfo.showStats({ parameters: user.viewer.username, sender: user.owner });
-    assert.strictEqual(r[0].response, `$touser | ${hours}h | ${points} points | ${messages} messages | €${tips} | ${bits} bits`, user.owner, 1000);
+    assert.strictEqual(r[0].response, `$touser | Level ${level} | ${hours}h | ${points} points | ${messages} messages | €${tips} | ${bits} bits`, user.owner, 1000);
   });
 
   it('!stats should show owner data', async () => {
     const r = await userinfo.showStats({ parameters: '', sender: user.owner });
-    assert.strictEqual(r[0].response, `$sender | ${hours}h | ${points} points | ${messages} messages | €${tips} | ${bits} bits`, user.owner, 1000);
+    assert.strictEqual(r[0].response, `$sender | Level ${level} | ${hours}h | ${points} points | ${messages} messages | €${tips} | ${bits} bits`, user.owner, 1000);
   });
 });

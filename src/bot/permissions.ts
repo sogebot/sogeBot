@@ -20,6 +20,7 @@ import users from './users';
 import { promisify } from 'util';
 import { HOUR, MINUTE } from './constants';
 import ranks from './systems/ranks';
+import levels from './systems/levels';
 
 let isWarnedAboutCasters = false;
 let isRecacheRunning = false;
@@ -289,6 +290,9 @@ class Permissions extends Core {
           const rank = await ranks.get(user);
           // we can return immediately
           return rank.current === f.value;
+        case 'level':
+          amount = levels.getLevelOf(user);
+          break;
         case 'bits':
           amount = user.bits.reduce((a, b) => (a + b.amount), 0);
           break;

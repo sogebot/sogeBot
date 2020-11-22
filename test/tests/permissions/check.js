@@ -8,6 +8,7 @@ const assert = require('assert');
 
 const { permission } = require('../../../dest/helpers/permissions');
 const { invalidateParserCache } = require('../../../dest/helpers/cache');
+const { serialize } = require('../../../dest/helpers/type');
 const permissions = (require('../../../dest/permissions')).default;
 const Parser = require('../../../dest/parser').default;
 const currency = require('../../../dest/currency').default;
@@ -36,6 +37,7 @@ const users = [
   { username: '__viewer_subcumulativemonths__', userId: 13, id: 13, subscribeCumulativeMonths: 2 },
   { username: '__viewer_substreakmonths__', userId: 14, id: 14, subscribeStreak: 2 },
   { username: '__viewer_customrank__', userId: 15, id: 15, haveCustomRank: true, rank: 'Lorem Ipsum' },
+  { username: '__viewer_level5__', userId: 16, id: 16, extra: { levels: { xp: serialize(BigInt(5000)) }} },
 ];
 
 describe('Permissions - check()', () => {
@@ -418,6 +420,40 @@ describe('Permissions - check()', () => {
     }
   });
 
+  describe(`Permission only for user with level 5 (__viewer_level5__)`, () => {
+    beforeEach(async () => {
+      await getRepository(Permissions).save({
+        id: 'bbaac999-923f-4063-99e3-f9904b34dac3',
+        name: '__viewer_level5__only',
+        order: Object.keys(permission).length + 1,
+        isCorePermission: false,
+        isWaterfallAllowed: false,
+        automation: 'viewers',
+        userIds: [],
+        excludeUserIds: [],
+        filters: [{
+          comparator: '==', type: 'level', value: 5,
+        }],
+      });
+    });
+    for (let j = 0; j < users.length; j++) {
+      const user = users[j];
+      const pHash = 'bbaac999-923f-4063-99e3-f9904b34dac3';
+      if (user.username === '__viewer_level5__') {
+        // have access
+        it(`+++ ${users[j].username} should have access to __viewer_level5__only`, async () => {
+          const check = await permissions.check(user.userId, pHash);
+          assert.strictEqual(check.access, true);
+        });
+      } else {
+        // no access
+        it(`--- ${users[j].username} should NOT have access to __viewer_level5__only`, async () => {
+          const check = await permissions.check(user.userId, pHash);
+          assert.strictEqual(check.access, false);
+        });
+      }
+    }
+  });
   describe(`Enabled !me command should work`, () => {
     beforeEach(async () => {
       await getRepository(PermissionCommands).clear();
@@ -429,6 +465,7 @@ describe('Permissions - check()', () => {
         const r = await parse.process();
 
         let hours = '0.0';
+        let level = 'Level 0';
         let points = '0';
         let messages = '0';
         let tips = '0.00';
@@ -452,7 +489,10 @@ describe('Permissions - check()', () => {
         if (users[j].username === '__viewer_customrank__') {
           rank = 'Lorem Ipsum | ';
         }
-        assert.strictEqual(r[0].response, `$sender | ${rank}${hours}h | ${points} points | ${messages} messages | €${tips} | ${bits} bits`);
+        if (users[j].username === '__viewer_level5__') {
+          level = 'Level 5';
+        }
+        assert.strictEqual(r[0].response, `$sender | ${level} | ${rank}${hours}h | ${points} points | ${messages} messages | €${tips} | ${bits} bits`);
       });
     }
   });

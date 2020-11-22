@@ -40,6 +40,7 @@ import { SQLVariableLimit } from './helpers/sql';
 import { addUIError } from './panel';
 import { dayjs } from './helpers/dayjs';
 import { Socket } from 'socket.io';
+import { setImmediateAwait } from './helpers/setImmediateAwait';
 
 let latestFollowedAtTimestamp = 0;
 
@@ -85,12 +86,6 @@ const isAPIFree = (intervalList: APITimeouts) => {
   }
   lastIsAPIFreeKey = '__unset__';
   return true;
-};
-
-const setImmediateAwait = () => {
-  return new Promise(resolve => {
-    setTimeout(() => resolve(true), 10);
-  });
 };
 
 const limitProxy = {

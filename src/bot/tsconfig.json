@@ -2,7 +2,7 @@
   "compilerOptions": {
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
-    "target": "es6",
+    "target": "es2020",
     "strict": true,
     "module": "commonjs",
     "incremental": true,

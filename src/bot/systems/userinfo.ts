@@ -18,6 +18,7 @@ import Expects from '../expects';
 import { getUserFromTwitch } from '../microservices/getUserFromTwitch';
 import { dayjs } from '../helpers/dayjs';
 import general from '../general';
+import levels from './levels';
 
 /*
  * !me
@@ -38,7 +39,7 @@ class UserInfo extends System {
     toggleOnIcon: 'eye',
     toggleOffIcon: 'eye-slash',
   })
-  order: string[] = ['$sender', '$rank', '$role', '$watched', '$points', '$messages', '$tips', '$bits'];
+  order: string[] = ['$sender', '$level', '$rank', '$role', '$watched', '$points', '$messages', '$tips', '$bits'];
 
   @settings('me')
   _formatDisabled: string[] = ['$role'];
@@ -230,6 +231,16 @@ class UserInfo extends System {
         const rank = await ranks.get(await getRepository(User).findOne({ userId: Number(opts.sender.userId) }));
         if (ranks.enabled && !_.isNull(rank.current)) {
           message[idx] = typeof rank.current === 'string' ? rank.current : rank.current.rank;
+        } else {
+          message.splice(idx, 1);
+        }
+      }
+
+      if (message.includes('$level')) {
+        const idx = message.indexOf('$level');
+        if (levels.enabled) {
+          const level = await levels.getLevelOf(await getRepository(User).findOne({ userId: Number(opts.sender.userId) }));
+          message[idx] = `Level ${level}`;
         } else {
           message.splice(idx, 1);
         }

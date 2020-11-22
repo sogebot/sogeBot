@@ -10,6 +10,15 @@ export interface UserInterface {
   points?: number; pointsOnlineGivenAt?: number; pointsOfflineGivenAt?: number; pointsByMessageGivenAt?: number;
   subscribeTier?: string; subscribeCumulativeMonths?: number; subscribeStreak?: number; giftedSubscribes?: number;
   tips: UserTipInterface[]; bits: UserBitInterface[]; messages?: number;
+  extra: {
+    levels?: {
+      xp: string; // we need to use string as we cannot stringify bigint in typeorm
+      xpOfflineGivenAt: number;
+      xpOfflineMessages: number;
+      xpOnlineGivenAt: number;
+      xpOnlineMessages: number;
+    }
+  } | null
 }
 
 export interface UserTipInterface {
@@ -86,6 +95,7 @@ export const User = new EntitySchema<Readonly<Required<UserInterface>>>({
     subscribeStreak: { type: Number, default: 0 },
     giftedSubscribes: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
     messages: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
+    extra: { type: 'simple-json', nullable: true },
   },
   indices: [
     {

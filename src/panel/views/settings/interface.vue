@@ -264,6 +264,7 @@ enum State {
     'heist-results': () => import('./components/interface/heist-results.vue'),
     'helpbox': () => import('./components/interface/helpbox.vue'),
     'highlights-url-generator': () => import('./components/interface/highlights-url-generator.vue'),
+    'levels-showcase': () => import('./components/interface/levels-showcase.vue'),
     'loading': () => import('../../components/loading.vue'),
     'number-input': () => import('./components/interface/number-input.vue'),
     'selector': () => import('./components/interface/selector.vue'),
