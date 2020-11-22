@@ -85,13 +85,13 @@ describe('TMI - User should have counted messages - https://github.com/sogehige/
     }
   })
 
-  it ('testuser1 should have 10 messages', async () => {
+  it ('testuser1 should have 20 messages', async () => {
     const user = await getRepository(User).findOne({ userId: testuser1.userId })
-    assert(user.messages === 10, `Expected 10 messages, got ${user.messages} messages`);
+    assert(user.messages === 20, `Expected 20 messages, got ${user.messages} messages`);
   });
 
-  it ('testuser2 should have 5 messages', async () => {
+  it ('testuser2 should have 10 messages', async () => {
     const user = await getRepository(User).findOne({ userId: testuser2.userId })
-    assert(user.messages === 5, `Expected 5 messages, got ${user.messages} messages`);
+    assert(user.messages === 10, `Expected 10 messages, got ${user.messages} messages`);
   });
 });
