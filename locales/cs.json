@@ -875,8 +875,8 @@
     "alias-group-unset": "$sender, skupina aliasu $alias byla zrušena",
     "alias-group-list": "$sender, seznam skupin aliasů: $list",
     "alias-group-list-aliases": "$sender, seznam aliasů v $group: $list",
-    "alias-group-list-enabled": "$sender, aliases in $group are enabled.",
-    "alias-group-list-disabled": "$sender, aliases in $group are disabled."
+    "alias-group-list-enabled": "$sender, aliasy v $group jsou zapnuty.",
+    "alias-group-list-disabled": "$sender, aliasy v $group jsou vypnuty."
   },
   "customcmds": {
     "commands-parse-failed": "{core.command-parse} !commands",
