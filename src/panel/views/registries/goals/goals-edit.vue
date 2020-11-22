@@ -11,7 +11,7 @@
             {{group.name}}
             <small class="text-muted text-monospace" style="font-size:0.7rem">{{$route.params.id}}</small>
           </template>
-          <template v-else>{{translate('registry.goals.newGoalGroupInterface')}}</template>
+          <template v-else>{{translate('registry.goals.newGoalGroup')}}</template>
         </span>
       </div>
     </div>
