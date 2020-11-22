@@ -94,7 +94,7 @@ export const isUserLoggedIn = async function (mustBeLogged = true, mustBeAdmin =
       console.debug(e);
       const data = JSON.parse(localStorage.getItem('cached-logged-user') || 'null');
       if (mustBeLogged) {
-        if (e.message.toLowerCase().includes('network error') && data) {
+        if (e.message && e.message.toLowerCase().includes('network error') && data) {
           console.warn('Network error, using cached logged user', data);
           return data;
         }
