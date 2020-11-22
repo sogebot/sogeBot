@@ -1,6 +1,5 @@
 'use strict';
 
-import * as _ from 'lodash';
 import { evaluate as mathJsEvaluate, round } from 'mathjs';
 import { ResponseError } from '../helpers/commandError';
 
@@ -464,8 +463,8 @@ class Levels extends System {
       let currentXP = BigInt(0);
 
       if (user.extra.levels) {
-        currentXP = unserialize<bigint>(user.extra.levels?.xp) ?? BigInt(0);
-        currentLevel = await this.getLevelOf(user);
+        currentXP = unserialize<bigint>(user.extra.levels.xp) ?? BigInt(0);
+        currentLevel = this.getLevelOf(user);
         nextXP = await this.getLevelXP(currentLevel + 1);
       }
 
