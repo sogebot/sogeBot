@@ -1,7 +1,7 @@
 'use strict';
 
 import * as _ from 'lodash';
-import { evaluate as mathJsEvaluate } from 'mathjs';
+import { evaluate as mathJsEvaluate, round } from 'mathjs';
 import { ResponseError } from '../helpers/commandError';
 
 import { isBot, prepare } from '../commons';
@@ -22,6 +22,11 @@ import Expects from '../expects';
 import { permission } from '../helpers/permissions';
 import points from './points';
 import { adminEndpoint } from '../helpers/socket';
+import { bigIntMax, serialize, unserialize } from '../helpers/type';
+import general from '../general';
+
+let cachedLevelsHash = '';
+const cachedLevels: bigint[] = [];
 
 class Levels extends System {
   @settings('conversion')
@@ -70,16 +75,8 @@ class Levels extends System {
   sockets () {
     adminEndpoint(this.nsp, 'getLevelsExample', (cb) => {
       try {
-        const levels = [`${this.firstLevelStartsAt} ${this.xpName}`];
-        for (let i = 2; i < 9; i++) {
-          const xp = this.getNextLevelXP(levels.length);
-          if (xp <= 0) {
-            levels.push(`Something went wrong with calculation, this level have lower XP than previous.`);
-            break;
-          }
-          levels.push(`${xp} ${this.xpName}`);
-        }
-        cb(null, levels);
+        this.getLevelFromCache(21);
+        cb(null, cachedLevels.map(xp => `${Intl.NumberFormat(general.lang).format(xp)} ${this.xpName}`));
       } catch (e) {
         cb(e.stack, []);
       }
@@ -124,6 +121,30 @@ class Levels extends System {
     }
   }
 
+  getLevelFromCache(levelFromCache: number) {
+    const hash = `${this.nextLevelFormula} + ${this.firstLevelStartsAt}`;
+    if (hash !== cachedLevelsHash) {
+      cachedLevelsHash = hash;
+      cachedLevels.length = 0;
+      // level 0
+      cachedLevels.push(BigInt(0));
+    }
+
+    if (!cachedLevels[levelFromCache]) {
+      // recalculate from level (length is +1 as we start with level 0)
+      let level = cachedLevels.length;
+
+      if (levelFromCache >= 1) {
+        for (; level <= levelFromCache; level++) {
+          const xp = this.getLevelXP(level, true);
+          debug('levels.update', `Recalculating level ${level} - ${xp} XP`);
+          cachedLevels.push(xp);
+        }
+      }
+    }
+    return cachedLevels[levelFromCache];
+  }
+
   private async process(username: string, opts: {interval: {[permissionId: string]: any}; offlineInterval: {[permissionId: string]: any}; perInterval: {[permissionId: string]: any}; perOfflineInterval: {[permissionId: string]: any}; isOnline: boolean}): Promise<void> {
     const userId = await users.getIdByName(username);
     if (!userId) {
@@ -155,15 +176,20 @@ class Levels extends System {
           ? user.extra.levels?.xpOnlineGivenAt ?? chat
           : user.extra.levels?.xpOfflineGivenAt ?? chat;
         debug('levels.update', `${user.username}#${userId}[${permId}] ${chat} | ${givenAt}`);
-        if (givenAt + interval_calculated <= chat) {
-          // add xp to givenAt + interval to user to not overcalculate (this should ensure recursive add xp in time)
-          const userTimeXP = givenAt + interval_calculated;
-          debug('levels.update', `${user.username}#${userId}[${permId}] +${Math.floor(ptsPerInterval)}`);
+        let modifier = 0;
+        let userTimeXP = givenAt + interval_calculated;
+        for (; userTimeXP <= chat; userTimeXP += interval_calculated) {
+          modifier++;
+        }
+
+        if (modifier > 0) {
+          debug('levels.update', `${user.username}#${userId}[${permId}] +${Math.floor(ptsPerInterval * modifier)}`);
           const levels: UserInterface['extra']['levels'] = {
-            xp: Math.floor(ptsPerInterval + user.extra.levels?.xp),
+            xp: serialize(BigInt(Math.floor(ptsPerInterval * modifier)) + (unserialize<bigint>(user.extra.levels?.xp) ?? BigInt(0))),
             xpOfflineGivenAt: !opts.isOnline ? userTimeXP : user.extra.levels?.xpOfflineGivenAt ?? chat,
+            xpOfflineMessages: user.extra.levels?.xpOfflineMessages ?? 0,
             xpOnlineGivenAt:   opts.isOnline ? userTimeXP : user.extra.levels?.xpOnlineGivenAt ?? chat,
-            xpByMessageGivenAt: user.extra.levels?.xpByMessageGivenAt ?? user.messages,
+            xpOnlineMessages: user.extra.levels?.xpOnlineMessages ?? 0,
           };
           await getRepository(User).save({
             ...user,
@@ -175,10 +201,11 @@ class Levels extends System {
         }
       } else {
         const levels: UserInterface['extra']['levels'] = {
-          xp: Math.floor(ptsPerInterval + user.extra.levels?.xp),
+          xp: serialize(BigInt(ptsPerInterval) + (unserialize<bigint>(user.extra.levels?.xp) ?? BigInt(0))),
           xpOfflineGivenAt: !opts.isOnline ? chat : user.extra.levels?.xpOfflineGivenAt ?? chat,
+          xpOfflineMessages: user.extra.levels?.xpOfflineMessages ?? 0,
           xpOnlineGivenAt:   opts.isOnline ? chat : user.extra.levels?.xpOnlineGivenAt ?? chat,
-          xpByMessageGivenAt: user.extra.levels?.xpByMessageGivenAt ?? user.messages,
+          xpOnlineMessages: user.extra.levels?.xpOnlineMessages ?? 0,
         };
         await getRepository(User).save({
           ...user,
@@ -216,7 +243,7 @@ class Levels extends System {
     const ptsPerInterval = isOnline ? perMessageInterval[permId] : perMessageOfflineInterval[permId];
 
     if (interval_calculated === 0 || ptsPerInterval === 0) {
-      return;
+      return true;
     }
 
     const user = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
@@ -224,44 +251,77 @@ class Levels extends System {
       return true;
     }
 
-    const xpByMessageGivenAt = user.extra.levels?.xpByMessageGivenAt ?? 0;
-    if (xpByMessageGivenAt + interval_calculated <= user.messages) {
-      const chat = await users.getChatOf(user.userId, api.isStreamOnline);
-      const levels: UserInterface['extra']['levels'] = {
-        xp: Math.floor(ptsPerInterval + (user.extra.levels?.xp ?? 0)),
-        xpOfflineGivenAt: user.extra.levels?.xpOfflineGivenAt ?? chat,
-        xpOnlineGivenAt: user.extra.levels?.xpOnlineGivenAt ?? chat,
-        xpByMessageGivenAt: user.messages,
-      };
-      await getRepository(User).save({
-        ...user,
-        extra: {
-          ...user.extra,
-          levels,
-        },
-      });
+    // next message count (be it offline or online)
+    const messages = 1 + ((api.isStreamOnline
+      ? user.extra.levels?.xpOnlineMessages
+      : user.extra.levels?.xpOfflineMessages) ?? 0);
+    const chat = await users.getChatOf(user.userId, api.isStreamOnline);
+
+    // default level object
+    const levels: UserInterface['extra']['levels'] = {
+      xp: serialize(unserialize<bigint>(user.extra.levels?.xp) ?? BigInt(0)),
+      xpOfflineGivenAt: user.extra.levels?.xpOfflineGivenAt ?? chat,
+      xpOfflineMessages: !api.isStreamOnline
+        ? 0
+        : user.extra.levels?.xpOfflineMessages ?? 0,
+      xpOnlineGivenAt: user.extra.levels?.xpOnlineGivenAt ?? chat,
+      xpOnlineMessages: api.isStreamOnline
+        ? 0
+        : user.extra.levels?.xpOnlineMessages ?? 0,
+    };
+
+    if (messages >= interval_calculated) {
+      // add xp and set offline/online messages to 0
+      await getRepository(User).update({ userId: user.userId },
+        {
+          extra: {
+            ...user.extra,
+            levels: {
+              ...levels,
+              [api.isStreamOnline ? 'xpOnlineMessages' : 'xpOfflineMessages']: 0,
+              xp: serialize(BigInt(ptsPerInterval) + (unserialize<bigint>(user.extra.levels?.xp) ?? BigInt(0))),
+            },
+          },
+        });
+    } else {
+      await getRepository(User).update({ userId: user.userId },
+        {
+          extra: {
+            ...user.extra,
+            levels: {
+              ...levels,
+              [api.isStreamOnline ? 'xpOnlineMessages' : 'xpOfflineMessages']: messages,
+            },
+          },
+        });
     }
     return true;
   }
 
-  getNextLevelXP(level: number) {
-    let prevLevelXP = this.firstLevelStartsAt;
+  getLevelXP(level: number, calculate = false) {
+    let prevLevelXP = BigInt(this.firstLevelStartsAt);
+
     if (level === 0) {
-      return this.firstLevelStartsAt;
+      return BigInt(0);
+    }
+    if (level === 1) {
+      return BigInt(this.firstLevelStartsAt);
     }
 
-    for (let i = 1; i <= level; i++) {
-      const formula = Number(mathJsEvaluate(this.nextLevelFormula
+    for (let i = 1; i < level; i++) {
+      const expr = this.nextLevelFormula
         .replace(/\$prevLevelXP/g, String(prevLevelXP))
-        .replace(/\$prevLevel/g, String(i))
-      ));
-      if (formula <= prevLevelXP) {
+        .replace(/\$prevLevel/g, String(i));
+      const formula = !calculate
+        ? this.getLevelFromCache(i + 1)
+        : BigInt(round(mathJsEvaluate(expr)));
+      if (formula <= prevLevelXP && i > 1) {
         error('Next level cannot be equal or less than previous level');
-        return 0;
+        return BigInt(0);
       }
       prevLevelXP = formula;
     }
-    return Math.max(Math.floor(prevLevelXP), 0);
+    return bigIntMax(prevLevelXP, BigInt(0));
   }
 
   getLevelOf(user: UserInterface | undefined): number {
@@ -269,27 +329,24 @@ class Levels extends System {
       return 0;
     }
 
-    const currentXP = user.extra.levels?.xp ?? 0;
+    const currentXP = unserialize<bigint>(user.extra.levels?.xp) ?? BigInt(0);
 
     if (currentXP < this.firstLevelStartsAt) {
       return 0;
     }
 
-    let levelXP = this.firstLevelStartsAt;
+    let levelXP: BigInt = BigInt(this.firstLevelStartsAt);
     let level = 1;
     for (; currentXP > 0; level++) {
       if (level > 1) {
-        const formula = Number(mathJsEvaluate(this.nextLevelFormula
-          .replace(/\$prevLevelXP/g, String(levelXP))
-          .replace(/\$prevLevel/g, String(level))
-        ));
-        levelXP = Math.floor(formula);
-        if (formula === 0) {
+        const formula = this.getLevelFromCache(level);
+        levelXP = formula;
+        if (formula === BigInt(0)) {
           error('Formula of level calculation is returning 0, please adjust.');
           return 0;
         }
       }
-      if (currentXP < levelXP) {
+      if (BigInt(currentXP) < levelXP) {
         level--;
         break;
       }
@@ -307,9 +364,9 @@ class Levels extends System {
       const user = await getRepository(User).findOneOrFail({ userId: Number(opts.sender.userId) });
       const availablePoints = user.points;
       const currentLevel = this.getLevelOf(user);
-      const xp = this.getNextLevelXP(currentLevel);
-      const xpNeeded = xp - (user.extra.levels?.xp ?? 0);
-      const neededPoints = xpNeeded * this.conversionRate;
+      const xp = this.getLevelXP(currentLevel + 1);
+      const xpNeeded = xp - (unserialize<bigint>(user.extra.levels?.xp) ?? BigInt(0));
+      const neededPoints = Number(xpNeeded * BigInt(this.conversionRate));
 
       if (neededPoints >= availablePoints) {
         throw new ResponseError(
@@ -325,10 +382,11 @@ class Levels extends System {
 
       const chat = await users.getChatOf(user.userId, api.isStreamOnline);
       const levels: UserInterface['extra']['levels'] = {
-        xp,
+        xp: serialize(xp),
         xpOfflineGivenAt: user.extra.levels?.xpOfflineGivenAt ?? chat,
+        xpOfflineMessages: user.extra.levels?.xpOfflineMessages ?? 0,
         xpOnlineGivenAt: user.extra.levels?.xpOnlineGivenAt ?? chat,
-        xpByMessageGivenAt: user.extra.levels?.xpByMessageGivenAt ?? user.messages,
+        xpOnlineMessages: user.extra.levels?.xpOnlineMessages ?? 0,
       };
       await getRepository(User).save({
         ...user,
@@ -370,10 +428,11 @@ class Levels extends System {
       const chat = await users.getChatOf(user.userId, api.isStreamOnline);
 
       const levels: UserInterface['extra']['levels'] = {
-        xp: Math.max(Math.floor(xp + (user.extra.levels?.xp ?? 0)), 0),
+        xp: serialize(bigIntMax(BigInt(xp) + BigInt((user.extra.levels?.xp ?? BigInt(0))), BigInt(0))),
         xpOfflineGivenAt: user.extra.levels?.xpOfflineGivenAt ?? chat,
+        xpOfflineMessages: user.extra.levels?.xpOfflineMessages ?? 0,
         xpOnlineGivenAt: user.extra.levels?.xpOnlineGivenAt ?? chat,
-        xpByMessageGivenAt: user.extra.levels?.xpByMessageGivenAt ?? user.messages,
+        xpOnlineMessages: user.extra.levels?.xpOnlineMessages ?? 0,
       };
       await getRepository(User).save({
         ...user,
@@ -400,20 +459,20 @@ class Levels extends System {
       const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
       const user = await getRepository(User).findOneOrFail({ username });
 
-      let currentLevel = 0;
-      let nextXP = this.firstLevelStartsAt;
-      let currentXP = 0;
+      let currentLevel = this.firstLevelStartsAt === 0 ? 1 : 0;
+      let nextXP = await this.getLevelXP(currentLevel + 1);
+      let currentXP = BigInt(0);
 
       if (user.extra.levels) {
-        currentXP = user.extra.levels?.xp ?? 0;
+        currentXP = unserialize<bigint>(user.extra.levels?.xp) ?? BigInt(0);
         currentLevel = await this.getLevelOf(user);
-        nextXP = await this.getNextLevelXP(currentLevel);
+        nextXP = await this.getLevelXP(currentLevel + 1);
       }
 
       const response = prepare('systems.levels.currentLevel', {
         username,
         currentLevel,
-        nextXP: Math.max(nextXP - currentXP, 0),
+        nextXP: bigIntMax(nextXP - currentXP, BigInt(0)),
         currentXP,
         xpName: this.xpName,
       });

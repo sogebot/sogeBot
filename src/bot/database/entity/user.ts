@@ -12,10 +12,11 @@ export interface UserInterface {
   tips: UserTipInterface[]; bits: UserBitInterface[]; messages?: number;
   extra: {
     levels?: {
-      xp: number;
+      xp: string; // we need to use string as we cannot stringify bigint in typeorm
       xpOfflineGivenAt: number;
+      xpOfflineMessages: number;
       xpOnlineGivenAt: number;
-      xpByMessageGivenAt: number;
+      xpOnlineMessages: number;
     }
   }
 }

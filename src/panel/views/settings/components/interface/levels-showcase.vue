@@ -1,10 +1,31 @@
 <template>
   <div class="input-group">
-    <div class="d-block w-100 p-0 border-0" style="height: fit-content">
-      <b-list-group>
-        <b-list-group-item v-for="(xp, idx) in data" :key="'Level '+ idx + ': ' + xp">Level {{ idx + 1 }}: {{ xp }}</b-list-group-item>
-      </b-list-group>
-    </div>
+    <b-row class="w-100">
+      <b-col>
+        <b-table-simple small>
+          <b-tr v-for="(xp, idx) in data" :key="'Level '+ idx + ': ' + xp" v-show="idx > 0 && idx < 8">
+            <b-td style="vertical-align: middle">{{idx}}</b-td>
+            <b-td style="vertical-align: middle">{{xp}}</b-td>
+          </b-tr>
+        </b-table-simple>
+      </b-col>
+      <b-col>
+        <b-table-simple small>
+          <b-tr v-for="(xp, idx) in data" :key="'Level '+ idx + ': ' + xp" v-show="idx >= 8 && idx < 15">
+            <b-td style="vertical-align: middle">{{idx}}</b-td>
+            <b-td style="vertical-align: middle">{{xp}}</b-td>
+          </b-tr>
+        </b-table-simple>
+      </b-col>
+      <b-col>
+        <b-table-simple small>
+          <b-tr v-for="(xp, idx) in data" :key="'Level '+ idx + ': ' + xp" v-show="idx >= 15">
+            <b-td style="vertical-align: middle">{{idx}}</b-td>
+            <b-td style="vertical-align: middle">{{xp}}</b-td>
+          </b-tr>
+        </b-table-simple>
+      </b-col>
+    </b-row>
   </div>
 </template>
 
