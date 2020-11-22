@@ -191,13 +191,13 @@ class Levels extends System {
             xpOnlineGivenAt:   opts.isOnline ? userTimeXP : user.extra.levels?.xpOnlineGivenAt ?? chat,
             xpOnlineMessages: user.extra.levels?.xpOnlineMessages ?? 0,
           };
-          await getRepository(User).save({
-            ...user,
-            extra: {
-              ...user.extra,
-              levels,
-            },
-          });
+          await getRepository(User).update({ userId: user.userId },
+            {
+              extra: {
+                ...user.extra,
+                levels,
+              },
+            });
         }
       } else {
         const levels: UserInterface['extra']['levels'] = {
@@ -207,13 +207,13 @@ class Levels extends System {
           xpOnlineGivenAt:   opts.isOnline ? chat : user.extra.levels?.xpOnlineGivenAt ?? chat,
           xpOnlineMessages: user.extra.levels?.xpOnlineMessages ?? 0,
         };
-        await getRepository(User).save({
-          ...user,
-          extra: {
-            ...user.extra,
-            levels,
-          },
-        });
+        await getRepository(User).update({ userId: user.userId },
+          {
+            extra: {
+              ...user.extra,
+              levels,
+            },
+          });
         debug('levels.update', `${user.username}#${userId}[${permId}] levels disabled or interval is 0, settint levels time to chat`);
       }
     }
@@ -388,14 +388,14 @@ class Levels extends System {
         xpOnlineGivenAt: user.extra.levels?.xpOnlineGivenAt ?? chat,
         xpOnlineMessages: user.extra.levels?.xpOnlineMessages ?? 0,
       };
-      await getRepository(User).save({
-        ...user,
-        points: user.points - neededPoints,
-        extra: {
-          ...user.extra,
-          levels,
-        },
-      });
+      await getRepository(User).update({ userId: user.userId },
+        {
+          points: user.points - neededPoints,
+          extra: {
+            ...user.extra,
+            levels,
+          },
+        });
 
       const response = prepare('systems.levels.XPBoughtByPoints', {
         points: neededPoints,
@@ -434,13 +434,13 @@ class Levels extends System {
         xpOnlineGivenAt: user.extra.levels?.xpOnlineGivenAt ?? chat,
         xpOnlineMessages: user.extra.levels?.xpOnlineMessages ?? 0,
       };
-      await getRepository(User).save({
-        ...user,
-        extra: {
-          ...user.extra,
-          levels,
-        },
-      });
+      await getRepository(User).update({ userId: user.userId },
+        {
+          extra: {
+            ...user.extra,
+            levels,
+          },
+        });
 
       const response = prepare('systems.levels.changeXP', {
         username,
