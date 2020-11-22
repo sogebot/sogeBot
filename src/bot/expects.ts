@@ -208,7 +208,7 @@ class Expects {
 
   number (opts?: any) {
     opts = opts || {};
-    defaults(opts, { exec: false, optional: false });
+    defaults(opts, { exec: false, optional: false, minus: true });
     if (!opts.exec) {
       this.toExec.push({fnc: 'number', opts});
       return this;
@@ -220,7 +220,7 @@ class Expects {
       });
     }
 
-    const regexp = XRegExp('(?<number> [0-9]+ )', 'ix');
+    const regexp = opts.minus ? XRegExp('(?<number> -?[0-9]+ )', 'ix') : XRegExp('(?<number> [0-9]+ )', 'ix');
     const match = XRegExp.exec(this.text, regexp);
 
     if (!isNil(match)) {
