@@ -874,7 +874,9 @@
     "alias-group-set": "$sender, псевдоним $alias был установлен в группу $group",
     "alias-group-unset": "$sender, псевдоним $alias удалён из группы",
     "alias-group-list": "$sender, список групп псевдонимов: $list",
-    "alias-group-list-aliases": "$sender, список псевдонимов в $group: $list"
+    "alias-group-list-aliases": "$sender, список псевдонимов в $group: $list",
+    "alias-group-list-enabled": "$sender, aliases in $group are enabled.",
+    "alias-group-list-disabled": "$sender, aliases in $group are disabled."
   },
   "customcmds": {
     "commands-parse-failed": "{core.command-parse} !commands",
