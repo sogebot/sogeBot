@@ -98,14 +98,6 @@ const main = async () => {
       created() {
         // set proper dayjs locale
         setLocale(get(this.$store.state, 'configuration.lang', 'en'));
-
-        // theme load
-        const theme = localStorage.getItem('theme');
-        const head = document.getElementsByTagName('head')[0];
-        const link = (document.createElement('link') as any);
-        link.setAttribute('rel', 'stylesheet');
-        link.setAttribute('href',`/dist/css/${theme || get(store.state, 'configuration.core.ui.theme', 'light')}.css`);
-        head.appendChild(link);
       },
       template: `
       <div id="app" >
