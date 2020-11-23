@@ -9,7 +9,7 @@
         </template>
       </span>
     </div>
-    <input :min="min" :max="max" v-on:keyup="update" @focus="show = true" @blur="show = false" v-model="currentValue" :step="step || 1" type="number" class="form-control" :readonly="readonly" />
+    <input :min="min" :max="max" v-on:input="update" @focus="show = true" @blur="show = false" v-model="currentValue" :step="step || 1" type="number" class="form-control" :readonly="readonly" />
   </div>
 </template>
 
