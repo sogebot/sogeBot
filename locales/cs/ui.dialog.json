@@ -58,10 +58,10 @@
     "hold-to-delete": "Podržte pro smazání",
     "yes": "Ano",
     "no": "Ne",
-    "permission": "Permission",
-    "group": "Group",
-    "visibility": "Visibility",
-    "reset": "Reset "
+    "permission": "Oprávnění",
+    "group": "Skupina",
+    "visibility": "Viditelnost",
+    "reset": "Reset"
   },
   "changesPending": "Vaše změny nebyly uloženy.",
   "formNotValid": "Opravte chyby ve formuláři.",
