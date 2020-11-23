@@ -90,7 +90,7 @@
             <b-button block v-b-toggle="'alias-accordion-' + group" variant="dark" class="text-left">
               {{group === null ? 'Unnassigned group' : group }} ({{ fItems.filter(o => o.group === group).length }})
             </b-button>
-              <button-with-icon @click="removeGroup(group)" class="btn-danger btn-reverse btn-only-icon" v-if="group !== null">
+              <button-with-icon v-b-tooltip.hover :title="translate('dialog.buttons.delete')" @click="removeGroup(group)" class="btn-danger btn-reverse btn-only-icon" v-if="group !== null">
                 <template slot="icon">
                   <font-awesome-layers>
                     <fa icon="slash" transform="down-1" :mask="['fas', 'object-group']" />
@@ -107,13 +107,13 @@
             <b-table striped small hover :items="fItems.filter(o => o.group === group)" :fields="fields" @row-clicked="linkTo($event)" >
               <template v-slot:cell(buttons)="data">
                 <div class="float-right" style="width: max-content !important;">
-                  <button-with-icon :class="[ data.item.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.enabled = !data.item.enabled; update(data.item)">
+                  <button-with-icon v-b-tooltip.hover :title="translate('dialog.buttons.' + (data.item.enabled? 'enabled' : 'disabled'))" :class="[ data.item.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.enabled = !data.item.enabled; update(data.item)">
                     {{ translate('dialog.buttons.' + (data.item.enabled? 'enabled' : 'disabled')) }}
                   </button-with-icon>
-                  <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/alias/edit/' + data.item.id">
+                  <button-with-icon v-b-tooltip.hover :title="translate('dialog.buttons.edit')" class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/alias/edit/' + data.item.id">
                     {{ translate('dialog.buttons.edit') }}
                   </button-with-icon>
-                  <b-dropdown no-caret class="alias-table-btn">
+                  <b-dropdown no-caret class="alias-table-btn" v-b-tooltip.hover :title="translate('dialog.buttons.permission')" >
                     <template v-slot:button-content><fa icon="key" fixed-width/></template>
                     <b-dropdown-item
                       v-for="permission of permissions"
@@ -122,7 +122,7 @@
                       {{ permission.name }}
                     </b-dropdown-item>
                   </b-dropdown>
-                  <b-dropdown no-caret class="alias-table-btn">
+                  <b-dropdown no-caret class="alias-table-btn" v-b-tooltip.hover :title="translate('dialog.buttons.group')" >
                     <template v-slot:button-content><fa icon="object-group" fixed-width/></template>
                     <b-dropdown-item
                       v-for="group of groups"
@@ -138,10 +138,10 @@
                       Add new group
                     </b-dropdown-item>
                   </b-dropdown>
-                  <button-with-icon class="btn-only-icon btn-dark btn-reverse" :icon="['fas', data.item.visible ? 'eye' : 'eye-slash']" @click="data.item.visible = !data.item.visible; update(data.item)">
-                    {{ translate('dialog.buttons.edit') }}
+                  <button-with-icon v-b-tooltip.hover :title="translate('dialog.buttons.visibility')"  class="btn-only-icon btn-dark btn-reverse" :icon="['fas', data.item.visible ? 'eye' : 'eye-slash']" @click="data.item.visible = !data.item.visible; update(data.item)">
+                    {{ translate('dialog.buttons.visibility') }}
                   </button-with-icon>
-                  <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="del(data.item.id)">
+                  <button-with-icon v-b-tooltip.hover :title="translate('dialog.buttons.delete')" class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="del(data.item.id)">
                     {{ translate('dialog.buttons.delete') }}
                   </button-with-icon>
                 </div>
