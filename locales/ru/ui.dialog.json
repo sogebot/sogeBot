@@ -57,7 +57,11 @@
     "play": "Прослушать",
     "hold-to-delete": "Удерживайте, чтобы удалить",
     "yes": "Да",
-    "no": "Нет"
+    "no": "Нет",
+    "permission": "Permission",
+    "group": "Group",
+    "visibility": "Visibility",
+    "reset": "Reset "
   },
   "changesPending": "Ваши изменения не были сохранены.",
   "formNotValid": "Форма неверна.",
