@@ -197,6 +197,40 @@
   <strong>bot:</strong> @testuser, list of aliases in voice: !yes
 </blockquote>
 
+## Enable aliases in group
+
+`!alias group -enable <group>`
+
+!> Default permission is **OWNER**
+
+### Parameters
+
+- `<group>` - group of aliases to enable
+
+### Examples
+
+<blockquote>
+  <strong>testuser:</strong>!alias group -enable voice <br>
+  <strong>bot:</strong> @testuser, aliases in voice enabled.
+</blockquote>
+
+## Disable aliases in group
+
+`!alias group -disable <group>`
+
+!> Default permission is **OWNER**
+
+### Parameters
+
+- `<group>` - group of aliases to disable
+
+### Examples
+
+<blockquote>
+  <strong>testuser:</strong>!alias group -disable voice <br>
+  <strong>bot:</strong> @testuser, aliases in voice disabled.
+</blockquote>
+
 ## Other settings
 
 ### Enable or disable alias system
