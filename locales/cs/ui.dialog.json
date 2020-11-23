@@ -57,7 +57,11 @@
     "play": "Přehrát",
     "hold-to-delete": "Podržte pro smazání",
     "yes": "Ano",
-    "no": "Ne"
+    "no": "Ne",
+    "permission": "Permission",
+    "group": "Group",
+    "visibility": "Visibility",
+    "reset": "Reset "
   },
   "changesPending": "Vaše změny nebyly uloženy.",
   "formNotValid": "Opravte chyby ve formuláři.",
