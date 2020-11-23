@@ -10,6 +10,7 @@ import { onStreamStart } from './decorators/on';
 import api from './api';
 import Core from './_interface';
 import { debug } from './helpers/log';
+import { persistent } from './decorators';
 
 let validStatsUntil = Date.now();
 let cachedStats = {
@@ -23,20 +24,23 @@ let cachedStats = {
   currentWatched: 0,
 };
 
-let currentFollowers = 0;
-let currentViews = 0;
-let currentSubscribers = 0;
-
 class Stats extends Core {
+  @persistent()
+  currentFollowers = 0;
+  @persistent()
+  currentViews = 0;
+  @persistent()
+  currentSubscribers = 0;
+
   showInUI = false;
   latestTimestamp = 0;
 
   @onStreamStart()
   async setInitialValues() {
-    currentFollowers = api.stats.currentFollowers;
-    currentViews = api.stats.currentViews;
-    currentSubscribers = api.stats.currentSubscribers;
-    debug('stats', JSON.stringify({ currentFollowers, currentViews, currentSubscribers}));
+    this.currentFollowers = api.stats.currentFollowers;
+    this.currentViews = api.stats.currentViews;
+    this.currentSubscribers = api.stats.currentSubscribers;
+    debug('stats', JSON.stringify({ currentFollowers: this.currentFollowers, currentViews: this.currentViews, currentSubscribers: this.currentSubscribers }));
   }
 
   sockets() {
@@ -88,12 +92,12 @@ class Stats extends Core {
             stats.currentHosts = Number(Number(stats.currentHosts / statsFromDb.length).toFixed(0));
             stats.currentWatched = Number(Number(stats.currentWatched / statsFromDb.length).toFixed(0));
             cachedStats = cloneDeep(stats);
-            cb(null, {...stats, currentFollowers, currentViews, currentSubscribers});
+            cb(null, {...stats, currentFollowers: _self.currentFollowers, currentViews: _self.currentViews, currentSubscribers: _self.currentSubscribers});
           } else {
             cb(null, {});
           }
         } else {
-          cb(null, {...cachedStats, currentFollowers, currentViews, currentSubscribers});
+          cb(null, {...cachedStats, currentFollowers: _self.currentFollowers, currentViews: _self.currentViews, currentSubscribers: _self.currentSubscribers});
         }
       } catch (e) {
         error(e);
