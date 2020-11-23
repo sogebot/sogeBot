@@ -143,7 +143,11 @@ class Streamlabs extends Integration {
         } else {
           ioServer?.emit('api.stats', { method: 'GET', data: e.stack, timestamp: Date.now(), call: 'streamlabs', api: 'other', endpoint: url, code: 0 });
         }
-        error(e.stack);
+        if (e.message.includes('ETIMEDOUT')) {
+          error('Streamlabs connection timed out, will retry later.');
+        } else {
+          error(e.stack);
+        }
       }
     }
   }
