@@ -11,7 +11,11 @@ import { get } from 'lodash-es';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSun, faMoon } from '@fortawesome/free-solid-svg-icons';
+import { getSocket } from 'src/panel/helpers/socket';
+import { isUserLoggedIn } from 'src/panel/helpers/isUserLoggedIn';
 library.add(faSun, faMoon);
+
+const socket = getSocket('/core/users', true);
 
 export default defineComponent({
   setup(props, context) {
@@ -28,18 +32,31 @@ export default defineComponent({
       loadTheme(localStorage.getItem('theme') || 'dark');
     }
 
-    const loadTheme = (themeArg: string) => {
+    const loadTheme = async (themeArg: string) => {
       const head = document.getElementsByTagName('head')[0];
       const link = (document.createElement('link') as any);
       link.setAttribute('rel', 'stylesheet');
       link.setAttribute('href',`/dist/css/${themeArg}.css`);
       head.appendChild(link);
       theme.value = themeArg;
+
+      // we need to save users preferred theme
+      const user = await isUserLoggedIn(false, false);
+      if (user) {
+        socket.emit('theme::set', { theme: themeArg, userId: user.id}, () => {});
+      }
+      localStorage.setItem('theme', themeArg);
     }
 
-    onMounted(() => {
-      const theme = localStorage.getItem('theme');
-      loadTheme(theme || get(context.root.$store.state.configuration, 'core.ui.theme', 'light'));
+    onMounted(async () => {
+      const user = await isUserLoggedIn(false, false);
+      if (user) {
+        socket.emit('theme::get', { userId: user.id }, (err: string | null, themeArg: string | null) => {
+          loadTheme(themeArg || get(context.root.$store.state.configuration, 'core.ui.theme', 'light'))
+        });
+      } else {
+        loadTheme(localStorage.getItem('theme') || get(context.root.$store.state.configuration, 'core.ui.theme', 'light'));
+      }
     })
     return { theme, toggleTheme };
   }

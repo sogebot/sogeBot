@@ -17,7 +17,8 @@ export interface UserInterface {
       xpOfflineMessages: number;
       xpOnlineGivenAt: number;
       xpOnlineMessages: number;
-    }
+    },
+    theme: string;
   } | null
 }
 

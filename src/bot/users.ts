@@ -177,6 +177,31 @@ class Users extends Core {
   }
 
   sockets () {
+    viewerEndpoint(this.nsp, 'theme::set', async (data) => {
+      try {
+        const user = await getRepository(User).findOneOrFail({ userId: Number(data.userId) });
+        const payload = {
+          extra: {
+            ...user.extra,
+            theme: data.theme,
+          },
+        };
+        await getRepository(User).update({ userId: Number(data.userId) }, payload);
+      } catch (e) {
+        if (e.name !== 'EntityNotFound') {
+          error(e.stack);
+        }
+      }
+    });
+    viewerEndpoint(this.nsp, 'theme::get', async (data, cb) => {
+      try {
+        const user = await getRepository(User).findOneOrFail({ userId: Number(data.userId)});
+        cb(null, user.extra?.theme ?? null);
+      } catch (e) {
+        cb(e.stack, null);
+      }
+    });
+
     adminEndpoint(this.nsp, 'viewers::resetPointsAll', async (cb) => {
       await getRepository(User).update({}, { points: 0 });
       if (cb) {
