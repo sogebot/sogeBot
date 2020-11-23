@@ -427,7 +427,7 @@ class Levels extends System {
       const chat = await users.getChatOf(user.userId, api.isStreamOnline);
 
       const levels: NonNullable<UserInterface['extra']>['levels'] = {
-        xp: serialize(bigIntMax(BigInt(xp) + BigInt((user.extra?.levels?.xp ?? BigInt(0))), BigInt(0))),
+        xp: serialize(bigIntMax(BigInt(xp) + (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0)), BigInt(0))),
         xpOfflineGivenAt: user.extra?.levels?.xpOfflineGivenAt ?? chat,
         xpOfflineMessages: user.extra?.levels?.xpOfflineMessages ?? 0,
         xpOnlineGivenAt: user.extra?.levels?.xpOnlineGivenAt ?? chat,
