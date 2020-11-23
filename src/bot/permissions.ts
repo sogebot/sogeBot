@@ -21,6 +21,7 @@ import { promisify } from 'util';
 import { HOUR, MINUTE } from './constants';
 import ranks from './systems/ranks';
 import levels from './systems/levels';
+import { logAvgTime } from './helpers/profiler';
 
 let isWarnedAboutCasters = false;
 let isRecacheRunning = false;
@@ -132,6 +133,7 @@ class Permissions extends Core {
 
   recacheOnlineUsersPermission() {
     if (!isRecacheRunning && Date.now() - rechacheFinishedAt > 10 * MINUTE) {
+      const time = process.hrtime();
       const setImmediatePromise = promisify(setImmediate);
       getRepository(User).find({ isOnline: true }).then(async (users2) => {
         isRecacheRunning = true;
@@ -149,6 +151,7 @@ class Permissions extends Core {
         }
         isRecacheRunning = false;
         rechacheFinishedAt = Date.now();
+        logAvgTime('recacheOnlineUsersPermission()', process.hrtime(time));
       });
     }
 

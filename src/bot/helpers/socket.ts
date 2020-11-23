@@ -37,7 +37,7 @@ function adminEndpoint (
   | 'bets::getCurrentBet' | 'commands::count' | 'getLatestStats' | 'menu' | 'panel::errors'
   | 'removeCache' | 'testExplosion' | 'testFireworks' | 'test' | 'discord::authorize'
   | 'discord::getChannels' | 'discord::getRoles' | 'discord::getGuilds' | 'settings'
-  | 'debug::get' | 'getLevelsExample',
+  | 'debug::get' | 'getLevelsExample' | 'profiler::load',
   callback: (cb: (error: Error | string | null, ...response: any) => void) => void | Promise<void>): void;
 
 // id + cb

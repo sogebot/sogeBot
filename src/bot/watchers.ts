@@ -7,6 +7,7 @@ import { getFunctionList } from './decorators/on';
 import { isDbConnected } from './helpers/database';
 import { find } from './helpers/register';
 import { MINUTE, SECOND } from './constants';
+import { logAvgTime } from './helpers/profiler';
 
 const variables: {
   [x: string]: any;
@@ -25,6 +26,7 @@ export const startWatcher = () => {
         debug('watcher', 'watcher::check');
         const time = process.hrtime();
         await VariableWatcher.check();
+        logAvgTime('VariableWatcher.check()', process.hrtime(time));
         debug('watcher', `watcher::check Finished after ${process.hrtime(time)[0]}s ${process.hrtime(time)[1] / 1000000}ms`);
       } catch (e) {
         error(e.message);
