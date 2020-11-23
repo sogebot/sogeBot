@@ -7,9 +7,9 @@ yarn.lock
 *.zip
 db/
 *.db
+*.db*
 report
 tsconfig.tsbuildinfo
-sogebot.db*
 restart.pid
 .env
 
