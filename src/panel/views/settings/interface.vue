@@ -106,8 +106,9 @@
           <template v-if="permissions.length > 0 && Object.keys(settings).includes('__permission_based__') && settings['__permission_based__'][category]">
             <div :key="category + '__permission_based__#1'">
               <b-card no-body>
+                {{ update }}
                 <b-tabs pills card vertical>
-                  <b-tab v-for="permission of orderBy(getNotIgnoredPermissions(permissions, settings['__permission_based__'][category]), 'order', 'desc')" :key="permission.id" :title="permission.name">
+                  <b-tab v-for="permission of orderBy(getNotIgnoredPermissions(permissions, settings['__permission_based__'][category]), 'order', 'desc')" :key="permission.id + update" :title="permission.name" @click="update = Date.now()">
                     <b-card-text :key="update">
                       <template v-for="(currentValue, defaultValue) of settings['__permission_based__'][category]">
                         <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " :key="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue + String(currentValue[permission.id] === null)">
@@ -409,6 +410,9 @@ export default class interfaceSettings extends Vue {
   }
 
   @Watch('$route.params.id')
+
+
+  @Watch('$route.params.id')
   loadSettings(system: string) {
     if (!this.$route.params.id) {
       return this.refresh()
@@ -554,11 +558,11 @@ export default class interfaceSettings extends Vue {
     setTimeout(() => this.showError = false, 2000);
   }
   triggerDataChange() {
-    this.update = Date.now();
     this.isDataChanged = false; this.isDataChanged = true;
   }
 
   getPermissionSettingsValue(permId: string, values: { [x: string]: string | null }) {
+    console.log('getPermissionSettingsValue');
     const startingOrder = get(this.permissions.find(permission => permission.id === permId), 'order', this.permissions.length);
     for (let i = startingOrder; i <= this.permissions.length; i++) {
       const value = values[get(this.permissions.find(permission => permission.order === i), 'id', '0efd7b1c-e460-4167-8e06-8aaf2c170311' /* viewers */)];
