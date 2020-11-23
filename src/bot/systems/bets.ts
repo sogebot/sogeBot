@@ -13,6 +13,7 @@ import { Bets as BetsEntity, BetsInterface } from '../database/entity/bets';
 import { User } from '../database/entity/user';
 import { isDbConnected } from '../helpers/database';
 import points from './points';
+import { onStartup } from '../decorators/on';
 
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters';
 const ERROR_ALREADY_OPENED = '1';
@@ -45,10 +46,50 @@ class Bets extends System {
 
   constructor() {
     super();
-    this.checkIfBetExpired();
     this.addWidget('bets', 'widget-title-bets', 'far fa-money-bill-alt');
   }
 
+  @onStartup()
+  public async checkIfBetExpired() {
+    if (!isDbConnected) {
+      setTimeout(() => this.checkIfBetExpired(), 1000);
+      return;
+    }
+    try {
+      const currentBet = await getRepository(BetsEntity).findOne({
+        relations: ['participations'],
+        order: { createdAt: 'DESC' },
+      });
+      if (!currentBet || currentBet.isLocked) {
+        throw Error(ERROR_NOT_RUNNING);
+      }
+
+      if (currentBet.endedAt <= Date.now()) {
+        if (currentBet.participations.length > 0) {
+          if (!isEndAnnounced) {
+            announce(prepare('bets.locked'), 'bets');
+            isEndAnnounced = true;
+          }
+        } else {
+          announce(prepare('bets.removed'), 'bets');
+          await getRepository(BetsEntity).save({...currentBet, isLocked: true});
+        }
+      } else {
+        // bet is running;
+        isEndAnnounced = false;
+      }
+    } catch (e) {
+      switch (e.message) {
+        case ERROR_NOT_RUNNING:
+          break;
+        default:
+          error(e.stack);
+          break;
+      }
+    }
+    setTimeout(() => this.checkIfBetExpired(), 10000);
+  }
+  
   sockets() {
     adminEndpoint(this.nsp, 'bets::getCurrentBet', async (cb) => {
       try {
@@ -87,45 +128,6 @@ class Bets extends System {
         }, i * 500);
       }
     });
-  }
-
-  public async checkIfBetExpired() {
-    if (!isDbConnected) {
-      return;
-    }
-    try {
-      const currentBet = await getRepository(BetsEntity).findOne({
-        relations: ['participations'],
-        order: { createdAt: 'DESC' },
-      });
-      if (!currentBet || currentBet.isLocked) {
-        throw Error(ERROR_NOT_RUNNING);
-      }
-
-      if (currentBet.endedAt <= Date.now()) {
-        if (currentBet.participations.length > 0) {
-          if (!isEndAnnounced) {
-            announce(prepare('bets.locked'), 'bets');
-            isEndAnnounced = true;
-          }
-        } else {
-          announce(prepare('bets.removed'), 'bets');
-          await getRepository(BetsEntity).save({...currentBet, isLocked: true});
-        }
-      } else {
-        // bet is running;
-        isEndAnnounced = false;
-      }
-    } catch (e) {
-      switch (e.message) {
-        case ERROR_NOT_RUNNING:
-          break;
-        default:
-          error(e.stack);
-          break;
-      }
-    }
-    setTimeout(() => this.checkIfBetExpired(), 10000);
   }
 
   @command('!bet open')
