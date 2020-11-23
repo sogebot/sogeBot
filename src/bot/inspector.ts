@@ -3,8 +3,7 @@ import inspector from 'inspector';
 import fs from 'fs';
 import { MINUTE, SECOND } from './constants';
 import { gzip } from 'zlib';
-import { error } from 'console';
-import { getDEBUG, isDebugEnabled, setDEBUG, warning } from './helpers/log';
+import { error, getDEBUG, isDebugEnabled, setDEBUG, warning } from './helpers/log';
 
 let isProfilerRunning = false;
 
