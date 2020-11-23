@@ -11,6 +11,7 @@
   * [Custom Commands](/systems/custom-commands.md)
   * [Cooldowns](/systems/cooldowns.md)
   * [Keywords](/systems/keywords.md)
+  * [Levels](/systems/levels.md)
   * [Moderation](/systems/moderation.md)
   * [Timers](/systems/timers.md)
   * [Points](/systems/points.md)
