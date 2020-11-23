@@ -1,0 +1,21 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "conversionRate": "Konverzní kurz 1 XP pro x bodů",
+    "firstLevelStartsAt": "První úroveň začíná na XP",
+    "nextLevelFormula": {
+      "title": "Vzorec pro výpočet další úrovně",
+      "help": "Dostupné proměnné: $prevLevel, $prevLevelXP"
+    },
+    "levelShowcaseHelp": "Příklad úrovní bude obnoven po uložení",
+    "xpName": "Název",
+    "interval": "Minutový interval pro přidání XP online uživatelům při online streamu",
+    "offlineInterval": "Minutový interval pro přidání XP online uživatelům při offline streamu",
+    "messageInterval": "Kolik zpráv pro přidání XP",
+    "messageOfflineInterval": "Kolik zpráv pro přidání XP při offline streamu",
+    "perInterval": "Kolik XP přidat na online interval",
+    "perOfflineInterval": "Kolik XP přidat na offline interval",
+    "perMessageInterval": "Kolik XP přidat na interval zpráv",
+    "perMessageOfflineInterval": "Kolik XP přidat na offline interval zpráv"
+  }
+}

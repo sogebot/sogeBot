@@ -28,6 +28,8 @@
   "subtier": "Саб уровень (1, 2 или 3)",
   "subcumulativemonths": "Всего месяцев саба",
   "substreakmonth": "Текущий стрик саба",
+  "rank": "Current rank",
+  "level": "Current level",
   "isLowerThan": "ниже, чем",
   "isLowerThanOrEquals": "меньше или равно чем",
   "equals": "равно",
