@@ -107,7 +107,7 @@
             <div :key="category + '__permission_based__#1'">
               <b-card no-body>
                 <b-tabs pills card vertical>
-                  <b-tab v-for="permission of orderBy(getNotIgnoredPermissions(permissions, settings['__permission_based__'][category]), 'order', 'desc')" :key="permission.id" :title="permission.name">
+                  <b-tab v-for="permission of orderBy(getNotIgnoredPermissions(permissions, settings['__permission_based__'][category]), 'order', 'desc')" :key="permission.id" :title="permission.name" @click="update = Date.now()">
                     <b-card-text :key="update">
                       <template v-for="(currentValue, defaultValue) of settings['__permission_based__'][category]">
                         <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " :key="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue + String(currentValue[permission.id] === null)">
@@ -554,7 +554,6 @@ export default class interfaceSettings extends Vue {
     setTimeout(() => this.showError = false, 2000);
   }
   triggerDataChange() {
-    this.update = Date.now();
     this.isDataChanged = false; this.isDataChanged = true;
   }
 
