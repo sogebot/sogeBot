@@ -48,6 +48,7 @@ Vue.use(VueCompositionAPI);
 
 /* import widely used components */
 Vue.component('panel', () => import('./components/panel.vue'));
+Vue.component('theme', () => import('./components/navbar/theme.vue'));
 Vue.component('hold-button', () => import('./components/holdButton.vue'));
 Vue.component('button-with-icon', () => import('./components/button.vue'));
 Vue.component('state-button', () => import('./components/stateButton.vue'));
@@ -100,7 +101,8 @@ const main = async () => {
         setLocale(get(this.$store.state, 'configuration.lang', 'en'));
       },
       template: `
-      <div id="app" >
+      <div id="app">
+        <theme v-show="false"/> <!-- we need theme component to properly load theme -->
         <router-view></router-view>
       </div>
     `,
