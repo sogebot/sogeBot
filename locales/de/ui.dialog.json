@@ -57,7 +57,11 @@
     "play": "Abspielen",
     "hold-to-delete": "Halten zum Löschen",
     "yes": "Ja",
-    "no": "Nein"
+    "no": "Nein",
+    "permission": "Permission",
+    "group": "Group",
+    "visibility": "Visibility",
+    "reset": "Reset "
   },
   "changesPending": "Deine Änderungen wurden nicht gespeichert.",
   "formNotValid": "Formular ist ungültig.",
