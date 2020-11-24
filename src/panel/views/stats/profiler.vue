@@ -18,6 +18,9 @@
       <b-thead head-variant="dark">
         <b-tr>
           <b-th>Function</b-th>
+          <b-th>Samples</b-th>
+          <b-th>Min time</b-th>
+          <b-th>Max time</b-th>
           <b-th>Average time</b-th>
           <b-th></b-th>
         </b-tr>
@@ -25,6 +28,9 @@
       <b-tbody>
         <b-tr v-for="key of Object.keys(profiler)" :key="key">
           <b-th scope="row">{{ key }}</b-th>
+          <b-td><small class="text-muted">{{profiler[key].length}}</small></b-td>
+          <b-td>{{ min(profiler[key]) }} <small class="text-muted">ms</small></b-td>
+          <b-td>{{ max(profiler[key]) }} <small class="text-muted">ms</small></b-td>
           <b-td>{{ avg(profiler[key]) }} <small class="text-muted">ms</small></b-td>
           <b-td>
             <button
@@ -94,6 +100,14 @@ export default defineComponent({
       return data.reduce((a, b) => (a+b)) / data.length;
     }
 
+    const max = (data: number[]) => {
+      return Math.max(...data);
+    }
+
+    const min = (data: number[]) => {
+      return Math.min(...data);
+    }
+
     watch(showChartFunctions, () => {
       localStorage.setItem('/stats/commandcount/showChartFunctions', JSON.stringify(showChartFunctions.value))
     })
@@ -115,6 +129,8 @@ export default defineComponent({
       generateChartData,
       toggleFunctionChart,
       avg,
+      min,
+      max,
 
       translate,
     }
