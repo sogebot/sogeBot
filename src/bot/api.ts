@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 import querystring from 'querystring';
 import { setTimeout } from 'timers';
 import chalk from 'chalk';
-import { chunk, cloneDeep, defaults, filter, get, isNil, isNull, map } from 'lodash';
+import { chunk, defaults, filter, get, isNil, isNull, map } from 'lodash';
 
 import * as constants from './constants';
 import Core from './_interface';
@@ -32,7 +32,7 @@ import webhooks from './webhooks';
 import alerts from './registries/alerts';
 import eventlist from './overlays/eventlist';
 import stats from './stats';
-import { getFunctionList } from './decorators/on';
+import { getFunctionList, onStartup } from './decorators/on';
 import { linesParsed, setStatus } from './helpers/parser';
 import { isDbConnected } from './helpers/database';
 import { find } from './helpers/register';
@@ -41,17 +41,16 @@ import { addUIError } from './panel';
 import { dayjs } from './helpers/dayjs';
 import { Socket } from 'socket.io';
 import { setImmediateAwait } from './helpers/setImmediateAwait';
+import { logAvgTime } from './helpers/profiler';
 
 let latestFollowedAtTimestamp = 0;
 
-type APITimeouts = {
-  [fnc: string]: {
-    isRunning: boolean;
-    inProgress: boolean;
-    lastRunAt: number;
-    opts: any;
-  };
-};
+const intervals = new Map<string, {
+  interval: number;
+  isDisabled: boolean;
+  lastRunAt: number;
+  opts: Record<string, any>;
+}>();
 
 type SubscribersEndpoint = { data: { broadcaster_id: string; broadcaster_name: string; is_gift: boolean; tier: string; plan_name: string; user_id: string; user_name: string; }[], pagination: { cursor: string } };
 type FollowsEndpoint = { total: number; data: { from_id: string; from_name: string; to_id: string; toname: string; followed_at: string; }[], pagination: { cursor: string } };
@@ -63,30 +62,6 @@ export const currentStreamTags: {
     [lang: string]: string;
   };
 }[] = [];
-
-let lastIsAPIFreeKey = '__unset__';
-let lastIsAPIFreeKeyStart = Date.now();
-
-const isAPIFree = (intervalList: APITimeouts) => {
-  for (const key of Object.keys(intervalList)) {
-    if (intervalList[key].inProgress) {
-      if (lastIsAPIFreeKey !== key) {
-        lastIsAPIFreeKey = key;
-        lastIsAPIFreeKeyStart = Date.now();
-      }
-
-      if (Date.now() - lastIsAPIFreeKeyStart > 10 * constants.MINUTE) {
-        warning(`API call for ${key} is probably frozen (took more than 10minutes), forcefully unblocking`);
-        intervalList[key].inProgress = false;
-        lastIsAPIFreeKey = '__unset__';
-        return true;
-      }
-      return false;
-    }
-  }
-  lastIsAPIFreeKey = '__unset__';
-  return true;
-};
 
 const limitProxy = {
   get: function (obj: { limit: number; remaining: number; refresh: number }, prop: 'limit' | 'remaining' | 'refresh') {
@@ -253,8 +228,6 @@ class API extends Core {
     getChannelSubscribers: 0,
   };
 
-  api_timeouts: APITimeouts = {};
-
   constructor () {
     super();
     this.addMenu({ category: 'stats', name: 'api', id: 'stats/api', this: null });
@@ -289,48 +262,84 @@ class API extends Core {
     this.calls[type].refresh = refresh;
   }
 
-  async interval (fnc: string, interval: number) {
-    setInterval(async () => {
-      debug('api.interval', chalk.yellow(fnc + '() ') + 'check');
-      if (oauth.loadedTokens < 2) {
-        debug('api.interval', chalk.yellow(fnc + '() ') + 'tokens not loaded yet.');
-        return;
-      }
-      if (typeof this.api_timeouts[fnc] === 'undefined') {
-        this.api_timeouts[fnc] = { opts: {}, isRunning: false, inProgress: false, lastRunAt: 0 };
-      }
+  interval(fnc: string, interval: number) {
+    intervals.set(fnc, {
+      interval, lastRunAt: 0, opts: {}, isDisabled: false,
+    });
+  }
 
-      if (!this.api_timeouts[fnc].isRunning && isAPIFree(cloneDeep(this.api_timeouts)) && Date.now() - this.api_timeouts[fnc].lastRunAt >= interval) {
-        this.api_timeouts[fnc].inProgress = true;
-        this.api_timeouts[fnc].isRunning = true;
-        this.api_timeouts[fnc].lastRunAt = Date.now();
-        debug('api.interval', chalk.yellow(fnc + '() ') + 'start');
-        const value = await (this as any)[fnc](this.api_timeouts[fnc].opts);
-        debug('api.interval', chalk.yellow(fnc + '(time: ' + (Date.now() - this.api_timeouts[fnc].lastRunAt) + ') ') + JSON.stringify(value));
-        this.api_timeouts[fnc].lastRunAt = Date.now(); // reset to get ending time
-        this.api_timeouts[fnc].inProgress = false;
-        if (value.disable) {
-          debug('api.interval', chalk.yellow(fnc + '() ') + 'disabled');
+  @onStartup()
+  async intervalCheck () {
+    const check = async () => {
+      for (const fnc of intervals.keys()) {
+        await setImmediateAwait();
+        debug('api.interval', chalk.yellow(fnc + '() ') + 'check');
+        if (oauth.loadedTokens < 2) {
+          debug('api.interval', chalk.yellow(fnc + '() ') + 'tokens not loaded yet.');
           return;
         }
-        debug('api.interval', chalk.yellow(fnc + '() ') + 'done, value:' + JSON.stringify(value));
-        if (value.state) { // if is ok, update opts and run unlock after a while
-          if (typeof value.opts !== 'undefined') {
-            this.api_timeouts[fnc].opts = value.opts;
-          }
-          this.api_timeouts[fnc].isRunning = false;
-        } else { // else run next tick
-          if (typeof value.opts !== 'undefined') {
-            this.api_timeouts[fnc].opts = value.opts;
-          }
-          this.api_timeouts[fnc].isRunning = false;
-          this.api_timeouts[fnc].inProgress = false;
-          this.api_timeouts[fnc].lastRunAt = 0;
+        let interval = intervals.get(fnc);
+        if (!interval) {
+          error(`Interval ${fnc} not found.`);
+          continue;
         }
-      } else {
-        debug('api.interval', chalk.yellow(fnc + '() ') + `skip run, lastRunAt: ${this.api_timeouts[fnc].lastRunAt}, isRunning: ${this.api_timeouts[fnc].isRunning}, isAPIFree: ${isAPIFree(cloneDeep(this.api_timeouts))}`,  );
+        if (interval.isDisabled) {
+          debug('api.interval', chalk.yellow(fnc + '() ') + 'disabled');
+          continue;
+        }
+        if (Date.now() - interval.lastRunAt >= interval.interval) {
+          debug('api.interval', chalk.yellow(fnc + '() ') + 'start');
+          const time = process.hrtime();
+          const time2 = Date.now();
+          try {
+            const value = await Promise.race<Promise<any>>([
+              new Promise((resolve) => (this as any)[fnc](interval?.opts).then((data: any) => resolve(data))),
+              new Promise((_resolve, reject) => setTimeout(() => reject(), 10 * constants.MINUTE)),
+            ]);
+            logAvgTime(`api.${fnc}()`, process.hrtime(time));
+            debug('api.interval', chalk.yellow(fnc + '(time: ' + (Date.now() - time2 + ') ') + JSON.stringify(value)));
+            intervals.set(fnc, {
+              ...interval,
+              lastRunAt: Date.now(),
+            });
+            if (value.disable) {
+              intervals.set(fnc, {
+                ...interval,
+                isDisabled: true,
+              });
+              debug('api.interval', chalk.yellow(fnc + '() ') + 'disabled');
+              continue;
+            }
+            debug('api.interval', chalk.yellow(fnc + '() ') + 'done, value:' + JSON.stringify(value));
+
+            interval = intervals.get(fnc); // refresh data
+            if (!interval) {
+              error(`Interval ${fnc} not found.`);
+              continue;
+            }
+
+            if (value.state) { // if is ok, update opts and run unlock after a while
+              intervals.set(fnc, {
+                ...interval,
+                opts: value.opts ?? {},
+              });
+            } else { // else run next tick
+              intervals.set(fnc, {
+                ...interval,
+                opts: value.opts ?? {},
+                lastRunAt: 0,
+              });
+            }
+          } catch (e) {
+            warning(`API call for ${fnc} is probably frozen (took more than 10minutes), forcefully unblocking`);
+            continue;
+          }
+        } else {
+          debug('api.interval', chalk.yellow(fnc + '() ') + `skip run, lastRunAt: ${interval.lastRunAt}`,  );
+        }
       }
-    }, 5000);
+    };
+    setInterval(check, 10000);
   }
 
   async getModerators(opts: { isWarned: boolean }) {
