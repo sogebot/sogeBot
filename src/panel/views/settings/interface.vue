@@ -106,7 +106,6 @@
           <template v-if="permissions.length > 0 && Object.keys(settings).includes('__permission_based__') && settings['__permission_based__'][category]">
             <div :key="category + '__permission_based__#1'">
               <b-card no-body>
-                {{ update }}
                 <b-tabs pills card vertical>
                   <b-tab v-for="permission of orderBy(getNotIgnoredPermissions(permissions, settings['__permission_based__'][category]), 'order', 'desc')" :key="permission.id + update" :title="permission.name" @click="update = Date.now()">
                     <b-card-text :key="update">
