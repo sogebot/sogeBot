@@ -57,7 +57,11 @@
     "play": "Play",
     "hold-to-delete": "Hold to delete",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "permission": "Permission",
+    "group": "Group",
+    "visibility": "Visibility",
+    "reset": "Reset "
   },
   "changesPending": "Your changes was not saved.",
   "formNotValid": "Form is invalid.",
