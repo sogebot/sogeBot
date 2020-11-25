@@ -206,19 +206,19 @@
         </template>
         <template v-slot:cell(buttons)="data">
           <div class="float-right" style="width: max-content !important;">
-            <button-with-icon v-b-tooltip.hover :title="translate('dialog.buttons.' + (data.item.enabled? 'enabled' : 'disabled'))" :class="[ data.item.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.enabled = !data.item.enabled; sendUpdate(data.item.id)">
+            <button-with-icon v-b-tooltip.hover.noninteractive :title="translate('dialog.buttons.' + (data.item.enabled? 'enabled' : 'disabled'))" :class="[ data.item.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.enabled = !data.item.enabled; sendUpdate(data.item.id)">
               {{ translate('dialog.buttons.' + (data.item.enabled? 'enabled' : 'disabled')) }}
             </button-with-icon>
-            <button-with-icon v-b-tooltip.hover :title="translate('dialog.buttons.edit')" class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/commands/edit/' + data.item.id">
+            <button-with-icon v-b-tooltip.hover.noninteractive :title="translate('dialog.buttons.edit')" class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/commands/edit/' + data.item.id">
               {{ translate('dialog.buttons.edit') }}
             </button-with-icon>
-            <button-with-icon v-b-tooltip.hover :title="translate('dialog.buttons.visibility')" class="btn-only-icon btn-dark btn-reverse" :icon="['fas', data.item.visible ? 'eye' : 'eye-slash']" @click="data.item.visible = !data.item.visible; sendUpdate(data.item.id)">
+            <button-with-icon v-b-tooltip.hover.noninteractive :title="translate('dialog.buttons.visibility')" class="btn-only-icon btn-dark btn-reverse" :icon="['fas', data.item.visible ? 'eye' : 'eye-slash']" @click="data.item.visible = !data.item.visible; sendUpdate(data.item.id)">
               {{ translate('dialog.buttons.visibility') }}
             </button-with-icon>
-            <button-with-icon v-b-tooltip.hover :title="translate('dialog.buttons.reset')" class="btn-only-icon btn-danger btn-reverse" icon="history" @click="resetCount(data.item.id)">
+            <button-with-icon v-b-tooltip.hover.noninteractive :title="translate('dialog.buttons.reset')" class="btn-only-icon btn-danger btn-reverse" icon="history" @click="resetCount(data.item.id)">
               {{ translate('dialog.buttons.reset') }}
             </button-with-icon>
-            <button-with-icon v-b-tooltip.hover :title="translate('dialog.buttons.delete')" class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="del(data.item.id)">
+            <button-with-icon v-b-tooltip.hover.noninteractive :title="translate('dialog.buttons.delete')" class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="del(data.item.id)">
               {{ translate('dialog.buttons.delete') }}
             </button-with-icon>
           </div>
