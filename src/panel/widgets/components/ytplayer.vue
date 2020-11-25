@@ -61,11 +61,13 @@
               <fa icon="pause" v-else></fa></span>
           </template>
           <b-card-text class="vcenter">
-            <vue-plyr ref="playerRef" :key="updateTime + (currentSong || { videoId: ''}).videoId" v-if="currentSong !== null"
+            <vue-plyr
+              v-if="currentSong"
+              ref="playerRef"
               @timeupdate="videoTimeUpdated"
               @ended="videoEnded"
               :options="{ controls: ['volume', 'progress', 'current-time', 'restart', 'mute'], fullscreen: { enabled: false }, clickToPlay: false }">
-              <div data-plyr-provider="youtube" :data-plyr-embed-id="(currentSong || { videoId: ''}).videoId"></div>
+              <div data-plyr-provider="youtube" :data-plyr-embed-id="currentSong.videoId"></div> <!-- this is only needed for first init of player -->
             </vue-plyr>
           </b-card-text>
         </b-tab>
@@ -78,11 +80,16 @@
 import { defineComponent, ref, onMounted, watch, onUnmounted, computed } from '@vue/composition-api'
 import Vue from 'vue'
 import VuePlyr from 'vue-plyr'
+import 'vue-plyr/dist/vue-plyr.css'
 
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { isEqual } from 'lodash-es'
 import { getSocket } from 'src/panel/helpers/socket';
-Vue.use(VuePlyr)
+
+Vue.use(VuePlyr, {
+  plyr: {}
+})
+
 import translate from 'src/panel/helpers/translate';
 
 import type { SongRequestInterface } from 'src/bot/database/entity/song';
@@ -113,6 +120,30 @@ export default defineComponent({
     const intervals = [] as number[];
 
     watch(currentTag, (val) => socket.emit('set.playlist.tag', val));
+    watch(autoplay, async (val) => {
+      await waitForPlayerReady()
+      player.value.autoplay = val;
+      if (!val) {
+        player.value.pause()
+      } else {
+        player.value.play()
+      }
+    })
+
+    const waitForPlayerReady = () => new Promise<void>(resolve => {
+      const loop = () => {
+        if (player.value && player.value.ready) {
+          player.value.off('timeupdate')
+          player.value.off('ended')
+          player.value.on('timeupdate', (event: any) => videoTimeUpdated(event))
+          player.value.on('ended', () => videoEnded())
+          resolve();
+        } else {
+          setTimeout(() => loop(), 1000);
+        }
+      }
+      loop();
+    });
 
     const refreshPlaylist = () => {
       socket.emit('current.playlist.tag', (err: null, tag: string) => {
@@ -133,7 +164,6 @@ export default defineComponent({
 
     const videoEnded = () => {
       console.debug('[YTPLAYER.ended] - autoplay ', autoplay.value)
-      currentSong.value = null;
       if (autoplay.value) {
         next();
       }
@@ -164,18 +194,10 @@ export default defineComponent({
 
     const pause = () => {
       autoplay.value = false
-      if (player.value && currentSong.value) player.value.pause()
     };
 
-    const play = () => {
-      autoplay.value = true
-      if (currentSong.value) {
-        if (!player.value) {
-          setTimeout(() => play(), 1000);
-          return;
-        };
-        player.value.play();
-      }
+    const play = async () => {
+      autoplay.value = true;
       if (currentSong.value === null) {
         socket.emit('next')
       }
@@ -192,7 +214,7 @@ export default defineComponent({
       ].filter(a => a).join(':');
     }
 
-    const playThisSong = (item: any, retry = 0) => {
+    const playThisSong = async (item: any, retry = 0) => {
       waitingForNext.value = false
       if (!item) {
         currentSong.value = null
@@ -204,11 +226,35 @@ export default defineComponent({
       } else {
         currentSong.value = item
       }
-      ctx.root.$nextTick(() => {
-        try {
-          if(!player.value || !player.value.ready) {
-            throw new Error('player not init/ready yet');
+
+      const waitForPlayer = () => new Promise<void>(resolve => {
+        const loop = () => {
+          if (playerRef.value) {
+            resolve();
+          } else {
+            setTimeout(() => loop(), 1000);
           }
+        }
+        loop();
+      });
+      await waitForPlayer();
+
+      ctx.root.$nextTick(async () => {
+        try {
+          // change only if something is changed
+          if (!player.value.source.includes(item.videoId)) {
+            player.value.source = {
+              type: 'video',
+              sources: [
+                {
+                  src: item.videoId,
+                  provider: 'youtube',
+                },
+              ],
+            }
+          }
+          await waitForPlayerReady();
+
           if (item.startTime) {
             console.log(`Setting start time to ${item.startTime}s`)
             player.value.forward(item.startTime);
@@ -216,10 +262,7 @@ export default defineComponent({
 
           player.value.volume = item.volume / 100;
           player.value.muted = true;
-          ctx.root.$nextTick(() => {
-            if (autoplay.value) {
-              player.value.play();
-            }
+          ctx.root.$nextTick(async () => {
             player.value.muted = false;
           });
         } catch (e) {
@@ -235,8 +278,7 @@ export default defineComponent({
     onMounted(() => {
       refreshPlaylist();
 
-      socket.on('videoID', (item: any) => {
-        updateTime.value = Date.now(); // reset player
+      socket.on('videoID', async (item: any) => {
         playThisSong(item)
       })
 
