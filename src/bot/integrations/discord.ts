@@ -519,6 +519,7 @@ class Discord extends Integration {
         if (this.client) {
           info(chalk.yellow('DISCORD: ') + `Logged in as ${get(this.client, 'user.tag', 'unknown')}!`);
           this.changeClientOnlinePresence();
+          this.updateRolesOfLinkedUsers();
         }
       });
 
