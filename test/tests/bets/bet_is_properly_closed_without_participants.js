@@ -36,12 +36,25 @@ describe('Bets - bet should automatically be locked after given time without par
     await time.waitMs(15000);
   });
 
-  it('Bet should be locked in db', async () => {
-    const currentBet = await getRepository(Bets).findOne({
-      relations: ['participations'],
-      order: { createdAt: 'DESC' },
-    });
-    assert(currentBet.isLocked, 'Bet was not locked after 15 seconds.');
+  it('Bet should be locked in db in 15 seconds', async () => {
+    const result = await Promise.race([
+      new Promise(resolve => setTimeout(() => resolve(false), 15000)),
+      new Promise(resolve => {
+        const check = async () => {
+          const currentBet = await getRepository(Bets).findOne({
+            relations: ['participations'],
+            order: { createdAt: 'DESC' },
+          });
+          if (currentBet.isLocked) {
+            resolve(true);
+          } else {
+            setTimeout(() => check(), 50);
+          }
+        };
+        check();
+      }),
+    ]);
+    assert(result, 'Bet was not locked after 15 seconds.');
   });
 
   it('!bet should not show any running bet', async () => {
