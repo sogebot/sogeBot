@@ -391,6 +391,8 @@
         "spotifySong": "Aktuální skladba na Spotify",
         "latestFollower": "Poslední Follower",
         "latestSubscriber": "Poslední Subscriber",
+        "latestSubscriberMonths": "Poslední Subscriber - souhrnné měsíce",
+        "latestSubscriberStreak": "Poslední Subscriber - série měsíců předplatného",
         "latestTipAmount": "Poslední Tip (počet)",
         "latestTipCurrency": "Poslední Tip (měna)",
         "latestTipMessage": "Poslední Tip (zpráva)",

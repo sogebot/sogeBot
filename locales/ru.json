@@ -391,6 +391,8 @@
         "spotifySong": "Текущая песня в Spotify",
         "latestFollower": "Последний подписчик",
         "latestSubscriber": "Последний сабскрайбер",
+        "latestSubscriberMonths": "Latest Subscriber cumulative months",
+        "latestSubscriberStreak": "Latest Subscriber months streak",
         "latestTipAmount": "Последний донат (сумма)",
         "latestTipCurrency": "Последний донат (валюта)",
         "latestTipMessage": "Последний донат (сообщение)",
