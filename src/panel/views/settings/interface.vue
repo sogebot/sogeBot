@@ -52,6 +52,7 @@
                       :settings="settingsWithoutPermissions"
                       :value="currentValue"
                       :values="ui[category][defaultValue].values"
+                      :defaultValue="defaultValues[defaultValue]"
                       @update="value[defaultValue] = $event.value; triggerDataChange()"
                       :title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
                       :current="value[ui[category][defaultValue].current]"
@@ -85,6 +86,7 @@
                       v-else-if="typeof currentValue === 'number'"
                       class="pt-1 pb-1"
                       v-bind:type="typeof currentValue"
+                      v-bind:defaultValue="defaultValues[defaultValue]"
                       v-bind:value="currentValue"
                       min="0"
                       v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
@@ -95,6 +97,7 @@
                       class="pt-1 pb-1"
                       v-bind:type="typeof currentValue"
                       v-bind:value="currentValue"
+                      v-bind:defaultValue="defaultValues[defaultValue]"
                       v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
                       v-on:update="value[defaultValue] = $event.value; triggerDataChange()"
                     ></text-input>
@@ -130,6 +133,7 @@
                               v-else-if="typeof getPermissionSettingsValue(permission.id, currentValue) === 'number'"
                               v-bind:type="typeof getPermissionSettingsValue(permission.id, currentValue)"
                               v-bind:value="getPermissionSettingsValue(permission.id, currentValue)"
+                              v-bind:defaultValue="defaultValues[defaultValue]"
                               min="0"
                               :readonly="currentValue[permission.id] === null"
                               v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
@@ -139,6 +143,7 @@
                               v-else
                               v-bind:type="typeof getPermissionSettingsValue(permission.id, currentValue)"
                               v-bind:value="getPermissionSettingsValue(permission.id, currentValue)"
+                              v-bind:defaultValue="defaultValues[defaultValue]"
                               v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
                               :readonly="currentValue[permission.id] === null"
                               v-on:update="settings['__permission_based__'][category][defaultValue][permission.id] = $event.value; triggerDataChange()"
@@ -229,7 +234,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { cloneDeep, get, pickBy, filter, size, orderBy } from 'lodash-es';
+import { cloneDeep, get, pickBy, filter, size, orderBy, set } from 'lodash-es';
 import { flatten, unflatten } from 'src/bot/helpers/flatten';
 import { getListOf } from 'src/panel/helpers/getListOf';
 import { getConfiguration, getSocket } from 'src/panel/helpers/socket';
@@ -291,8 +296,10 @@ export default class interfaceSettings extends Vue {
   list: systemFromIO[] = [];
   state: { loaded: State; settings: State } = { loaded: State.NONE, settings: State.NONE };
   settings: any = {};
+  defaultValues: any = {};
   ui: any = {};
   isDataChanged: boolean = false;
+  isDataChangedCheck: boolean = true;
   update = Date.now();
   error: string | null = null;
   showError: boolean = false;
@@ -419,12 +426,16 @@ export default class interfaceSettings extends Vue {
 
     this.state.loaded = State.PROGRESS;
     getSocket(`/${this.$route.params.type}/${system}`)
-      .emit('settings', (err: string | null, _settings: { [x: string]: number | string }, _ui: { [x: string]: { [attr: string]: any } }) => {
+      .emit('settings', (err: string | null, _settings: { [x: string]: any }, _ui: { [x: string]: { [attr: string]: any } }) => {
         if (system !== this.$route.params.id) return // skip if we quickly changed system
 
-        this.state.loaded = State.DONE
+        this.isDataChangedCheck = false;
+
         const settingsEntries = Object.entries(_settings);
         const uiEntries = Object.entries(_ui);
+        console.groupCollapsed(`settings for ${system}`);
+        console.log(_settings);
+        console.groupEnd();
 
         let settings: any = { settings: {} }
         let ui: any = { settings: {} }
@@ -440,18 +451,43 @@ export default class interfaceSettings extends Vue {
           }
         }
 
-        // everything else except commands and enabled and are string|number|bool
-        for (let [name, value] of filter(settingsEntries, o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] !== 'object')) {
-          settings.settings[name] = value
+        // everything else except commands and enabled and are [string|number|bool, string|number|bool]
+        for (let [name, value] of filter(settingsEntries, o => o[0][0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && Array.isArray(o[1]))) {
+          settings.settings[name] = value[0]
+          this.defaultValues[name] = value[1];
         }
         // everything else except commands and enabled and are objects -> own category
-        for (let [name, value] of filter(settingsEntries, o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] === 'object')) {
-          settings[name] = value
+        for (let [category, obj] of filter(settingsEntries, o => o[0][0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && !Array.isArray(o[1]))) {
+          for (const [name, value] of Object.entries(obj)) {
+            console.log({category, name, value});
+            set(settings, `${category}.${name}`, (value as any)[0]);
+            this.defaultValues[name] = (value as any)[1];          }
+        }
+
+        // permission based
+        for (let [_name, value] of filter(settingsEntries, o => o[0] === '__permission_based__')) {
+          for (const category of Object.keys(value)) {
+            for (const key of Object.keys(value[category])) {
+              if (!settings.__permission_based__) {
+                settings.__permission_based__ = { ...settings.__permission_based__, [category]: {} };
+              }
+              settings.__permission_based__[category] = { ...settings.__permission_based__[category], [key]: value[category][key][0] }
+            }
+          }
         }
 
         // commands at last
-        for (let [name, value] of filter(settingsEntries, o => o[0] === 'commands')) {
-          settings[name] = value
+        for (let [_name, value] of filter(settingsEntries, o => o[0] === 'commands')) {
+          for (const key of Object.keys(value)) {
+            settings.commands = { ...settings.commands, [key]: value[key][0] }
+            this.defaultValues[key] = (value[key] as any)[1];
+          }
+        }
+        // command permissions
+        for (let [_key, value] of filter(settingsEntries, o => o[0] === '_permissions')) {
+          for (const key of Object.keys(value)) {
+            settings._permissions = { ...settings._permissions, [key]: value[key] }
+          }
         }
 
         // ui
@@ -469,7 +505,6 @@ export default class interfaceSettings extends Vue {
           }
           ui[name] = value
         }
-        this.isDataChanged = false;
 
         // remove empty categories
         Object.keys(settings).forEach(key => {
@@ -499,6 +534,12 @@ export default class interfaceSettings extends Vue {
         console.debug({ui, settings});
         this.settings = Object.assign({}, settings);
         this.ui = Object.assign({}, ui)
+        this.state.loaded = State.DONE
+        this.isDataChanged = false;
+
+        setTimeout(() => {
+          this.isDataChangedCheck = true;
+        }, 1000)
       })
   }
 
@@ -557,11 +598,12 @@ export default class interfaceSettings extends Vue {
     setTimeout(() => this.showError = false, 2000);
   }
   triggerDataChange() {
-    this.isDataChanged = false; this.isDataChanged = true;
+    if (this.state.loaded !== this.$state.progress && this.isDataChangedCheck) {
+      this.isDataChanged = false; this.isDataChanged = true;
+    }
   }
 
   getPermissionSettingsValue(permId: string, values: { [x: string]: string | null }) {
-    console.log('getPermissionSettingsValue');
     const startingOrder = get(this.permissions.find(permission => permission.id === permId), 'order', this.permissions.length);
     for (let i = startingOrder; i <= this.permissions.length; i++) {
       const value = values[get(this.permissions.find(permission => permission.order === i), 'id', '0efd7b1c-e460-4167-8e06-8aaf2c170311' /* viewers */)];

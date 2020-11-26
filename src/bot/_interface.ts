@@ -27,8 +27,8 @@ class Module {
   public dependsOn: Module[] = [];
   public showInUI = true;
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
-  public settingsList: { category?: string; key: string }[] = [];
-  public settingsPermList: { category?: string; key: string }[] = [];
+  public settingsList: { category?: string; key: string; defaultValue: any }[] = [];
+  public settingsPermList: { category?: string; key: string; defaultValue: any }[] = [];
   public on: InterfaceSettings.On;
   public socket: Namespace | null = null;
   public uuid = uuid();
@@ -242,7 +242,7 @@ class Module {
           this._commands = [];
         }
 
-        this.settingsList.push({ category: 'commands', key: c.name });
+        this.settingsList.push({ category: 'commands', key: c.name, defaultValue: c.name });
 
         // load command from db
         const dbc = await getRepository(Settings)
@@ -480,24 +480,24 @@ class Module {
     } = {};
 
     // go through expected settings
-    for (const { category, key } of this.settingsList) {
+    for (const { category, key, defaultValue } of this.settingsList) {
       if (category) {
         if (typeof promisedSettings[category] === 'undefined') {
           promisedSettings[category] = {};
         }
 
         if (category === 'commands') {
-          _.set(promisedSettings, `${category}.${key}`, this.getCommand(key));
+          _.set(promisedSettings, `${category}.${key}`, [this.getCommand(key), defaultValue]);
         } else {
-          _.set(promisedSettings, `${category}.${key}`, (this as any)[key]);
+          _.set(promisedSettings, `${category}.${key}`, [(this as any)[key], defaultValue]);
         }
       } else {
-        _.set(promisedSettings, key, (this as any)[key]);
+        _.set(promisedSettings, key, [(this as any)[key], defaultValue]);
       }
     }
 
     // go through expected permission based settings
-    for (const { category, key } of this.settingsPermList) {
+    for (const { category, key, defaultValue } of this.settingsPermList) {
       if (typeof promisedSettings.__permission_based__ === 'undefined') {
         promisedSettings.__permission_based__ = {};
       }
@@ -507,9 +507,9 @@ class Module {
           promisedSettings.__permission_based__[category] = {};
         }
 
-        _.set(promisedSettings, `__permission_based__.${category}.${key}`, await this.getPermissionBasedSettingsValue(key, false));
+        _.set(promisedSettings, `__permission_based__.${category}.${key}`, [await this.getPermissionBasedSettingsValue(key, false), defaultValue]);
       } else {
-        _.set(promisedSettings, `__permission_based__.${key}`, await this.getPermissionBasedSettingsValue(key, false));
+        _.set(promisedSettings, `__permission_based__.${key}`, [await this.getPermissionBasedSettingsValue(key, false), defaultValue]);
       }
     }
 
