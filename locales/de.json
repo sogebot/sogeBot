@@ -391,6 +391,8 @@
         "spotifySong": "Aktueller Song auf Spotify",
         "latestFollower": "Neuester Follower",
         "latestSubscriber": "Neuester Abonnent",
+        "latestSubscriberMonths": "Latest Subscriber cumulative months",
+        "latestSubscriberStreak": "Latest Subscriber months streak",
         "latestTipAmount": "Letzte Spende (Anzahl)",
         "latestTipCurrency": "Letzte Spende (Währung)",
         "latestTipMessage": "Letzte Spende (Nachricht)",
