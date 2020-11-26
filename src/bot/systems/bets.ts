@@ -64,7 +64,7 @@ class Bets extends System {
         throw Error(ERROR_NOT_RUNNING);
       }
 
-      if (currentBet.endedAt <= Date.now()) {
+      if (currentBet.endedAt < Date.now()) {
         if (currentBet.participations.length > 0) {
           if (!isEndAnnounced) {
             announce(prepare('bets.locked'), 'bets');
@@ -72,8 +72,8 @@ class Bets extends System {
           }
         } else {
           announce(prepare('bets.removed'), 'bets');
-          await getRepository(BetsEntity).save({...currentBet, isLocked: true});
         }
+        await getRepository(BetsEntity).update({ id: currentBet.id }, { isLocked: true});
       } else {
         // bet is running;
         isEndAnnounced = false;
@@ -89,7 +89,7 @@ class Bets extends System {
     }
     setTimeout(() => this.checkIfBetExpired(), 10000);
   }
-  
+
   sockets() {
     adminEndpoint(this.nsp, 'bets::getCurrentBet', async (cb) => {
       try {
