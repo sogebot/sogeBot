@@ -191,7 +191,7 @@ class Bets extends System {
       relations: ['participations'],
       order: { createdAt: 'DESC' },
     });
-    if (!currentBet) {
+    if (!currentBet || (currentBet.isLocked && currentBet.arePointsGiven)) {
       return [{ response: prepare('bets.notRunning'), ...opts } ];
     } else {
       return [{
@@ -227,7 +227,7 @@ class Bets extends System {
         if (tickets === 0) {
           throw Error(ERROR_ZERO_BET);
         }
-        if (!currentBet) {
+        if (!currentBet || (currentBet.isLocked && currentBet.arePointsGiven)) {
           throw Error(ERROR_NOT_RUNNING);
         }
         if (_.isNil(currentBet.options[index])) {
@@ -305,7 +305,7 @@ class Bets extends System {
       }
     } finally {
       if (currentBet) {
-        await getRepository(BetsEntity).save({...currentBet, arePointsGiven: true, isLocked: true});
+        await getRepository(BetsEntity).update({ id: currentBet.id }, { arePointsGiven: true, isLocked: true });
       }
     }
   }
@@ -337,7 +337,7 @@ class Bets extends System {
         }
       }
 
-      await getRepository(BetsEntity).save({...currentBet, arePointsGiven: true, isLocked: true});
+      await getRepository(BetsEntity).update({ id: currentBet.id }, { arePointsGiven: true, isLocked: true });
       return [{
         response: prepare('bets.closed')
           .replace(/\$option/g, currentBet.options[index])
