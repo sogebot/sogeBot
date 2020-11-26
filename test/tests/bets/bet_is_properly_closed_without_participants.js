@@ -32,10 +32,6 @@ describe('Bets - bet should automatically be locked after given time without par
     });
   });
 
-  it('We need to wait 15 seconds', async () => {
-    await time.waitMs(15000);
-  });
-
   it('Bet should be locked in db in 15 seconds', async () => {
     const result = await Promise.race([
       new Promise(resolve => setTimeout(() => resolve(false), 15000)),
