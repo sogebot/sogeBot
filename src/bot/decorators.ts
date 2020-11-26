@@ -130,7 +130,7 @@ export function settings(category?: string, isReadOnly = false) {
         }
 
         // add variable to settingsList
-        self.settingsList.push({ category, key });
+        self.settingsList.push({ category, key, defaultValue: (self as any)[key]});
       } catch (e) {
         process.stderr.write(JSON.stringify(e) + '\n');
       }
@@ -185,7 +185,7 @@ export function permission_settings(category?: string, exclude: string[] = []) {
         setTimeout(() => loadVariableValue(), 5000);
 
         // add variable to settingsPermList
-        self.settingsPermList.push({ category, key });
+        self.settingsPermList.push({ category, key, defaultValue: (self as any)[key] });
       } catch (e) {
         process.stderr.write(JSON.stringify(e) + '\n');
       }

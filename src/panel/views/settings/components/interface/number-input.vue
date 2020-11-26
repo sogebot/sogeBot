@@ -10,6 +10,11 @@
       </span>
     </div>
     <input :min="min" :max="max" v-on:input="update" @focus="show = true" @blur="show = false" v-model="currentValue" :step="step || 1" type="number" class="form-control" :readonly="readonly" />
+    <div class="input-group-append" v-if="defaultValue !== currentValue">
+      <b-button @click="currentValue = defaultValue; update()">
+        <fa icon="history" fixed-width/>
+      </b-button>
+    </div>
   </div>
 </template>
 
@@ -20,6 +25,7 @@ import translate from 'src/panel/helpers/translate';
 @Component({})
 export default class numberInput extends Vue {
   @Prop() readonly value!: any;
+  @Prop() readonly defaultValue!: any;
   @Prop() readonly title!: string;
   @Prop() readonly readonly: any;
   @Prop() readonly min: any;
