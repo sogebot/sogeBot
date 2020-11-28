@@ -1,4 +1,4 @@
-import { io, Socket } from 'socket.io-client';
+import io from 'socket.io-client-legacy';
 import chalk from 'chalk';
 
 import Integration from './_interface';
@@ -58,7 +58,7 @@ type StreamElementsEvent = {
   updatedAt: '2019-10-03T22:42:33.023Z'
 } */
 class StreamElements extends Integration {
-  socketToStreamElements: Socket | null = null;
+  socketToStreamElements: any | null = null;
 
   @settings()
   @ui({ type: 'text-input', secret: true })
@@ -76,7 +76,7 @@ class StreamElements extends Integration {
 
   async disconnect () {
     if (this.socketToStreamElements !== null) {
-      this.socketToStreamElements.offAny();
+      this.socketToStreamElements.removeListeners();
       this.socketToStreamElements.disconnect();
     }
   }
