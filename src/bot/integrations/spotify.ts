@@ -40,12 +40,11 @@ class Spotify extends Integration {
   retry: { IRefreshToken: number } = { IRefreshToken: 0 };
   state: any = null;
 
-  @persistent()
   isUnauthorized = false;
+  userId: string | null = null;
+
   @persistent()
   songsHistory: string[] = [];
-  @persistent()
-  userId: string | null = null;
   currentSong: string = JSON.stringify({});
 
   @settings()
@@ -419,6 +418,7 @@ class Spotify extends Integration {
       };
 
       this.currentSong = JSON.stringify({});
+      this.isUnauthorized = false;
       this.connect({ token });
       await waitForUsername();
       cb(null, true);

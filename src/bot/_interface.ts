@@ -201,7 +201,7 @@ class Module {
         // e.g. default { 'a': '', 'b': '' }, but loaded have only 'a' key, should not remove 'b' key
         const value = JSON.parse(variable.value);
         const defaultObject = (this as any)[key];
-        if (typeof value === 'object' && !Array.isArray(value) && Object.keys(defaultObject).length > 0) {
+        if (value !== null && typeof value === 'object' && !Array.isArray(value) && Object.keys(defaultObject).length > 0) {
           return Object.keys(defaultObject).reduce((a, b) => {
             return { ...a, [b]: value[b] ?? defaultObject[b] };
           }, {});
