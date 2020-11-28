@@ -19,6 +19,8 @@ import { debug, warning } from '../helpers/log';
 import { SQLVariableLimit } from '../helpers/sql';
 import api from '../api';
 import { isIgnored } from '../commons';
+import { TypeORMLogger } from '../helpers/logTypeorm';
+import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 
 const isThreadingEnabled = process.env.THREAD !== '0';
 
@@ -28,9 +30,24 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: 
   if (!isMainThread && isThreadingEnabled) {
     debug('microservice', 'getChannelChattersUnofficialAPI::createConnection');
     const connectionOptions = await getConnectionOptions();
-    await createConnection({
-      ...connectionOptions,
-    });
+    if (['mysql', 'mariadb'].includes(connectionOptions.type)) {
+      await createConnection({
+        ...connectionOptions,
+        logging: ['error'],
+        logger: new TypeORMLogger(),
+        synchronize: false,
+        migrationsRun: true,
+        charset: 'UTF8MB4_GENERAL_CI',
+      } as MysqlConnectionOptions);
+    } else {
+      await createConnection({
+        ...connectionOptions,
+        logging: ['error'],
+        logger: new TypeORMLogger(),
+        synchronize: false,
+        migrationsRun: true,
+      });
+    }
     await new Promise( resolve => setTimeout(resolve, 3000) );
   }
   debug('microservice', 'getChannelChattersUnofficialAPI::getConnection');
@@ -169,10 +186,12 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: 
       .from(ThreadEvent)
       .where('event = :event', { event: 'getChannelChattersUnofficialAPI' })
       .execute();
-    if (!isMainThread) {
-      debug('microservice', 'getChannelChattersUnofficialAPI::kill');
-      process.exit(0);
-    }
+    setTimeout(() => {
+      if (!isMainThread) {
+        debug('microservice', 'getChannelChattersUnofficialAPI::kill');
+        process.exit(0);
+      }
+    }, 100);
   }
 };
 

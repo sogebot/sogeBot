@@ -19,6 +19,7 @@ class OAuth extends Core {
   public profileImageUrl = '';
   public broadcaster = '';
   public bot = '';
+  @persistent()
   public channelId = '';
   public botId = '';
   public broadcasterId = '';
