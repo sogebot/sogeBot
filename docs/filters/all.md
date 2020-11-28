@@ -37,6 +37,10 @@ bot it is twitch by default
 
 `$latestSubscriber` - Latest Subscriber
 
+`$latestSubscriberMonths` - Latest Subscriber cumulative months
+
+`$latestSubscriberStreak` - Latest Subscriber months streak
+
 `$latestTipAmount` - Latest Tip (amount)
 
 `$latestTipCurrency` - Latest Tip (currency)
