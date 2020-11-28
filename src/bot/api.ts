@@ -1979,13 +1979,17 @@ class API extends Core {
   }
 
   async getCustomRewards() {
-    const { calls, method, response, status, url } = await getCustomRewards();
+    const { calls, method, response, status, url, error: err } = await getCustomRewards();
 
     this.calls.broadcaster.remaining = calls.remaining;
     this.calls.broadcaster.refresh = calls.refresh;
     this.calls.broadcaster.limit = calls.limit;
 
     ioServer?.emit('api.stats', { method: method, data: response, timestamp: Date.now(), call: 'getCustomRewards', api: 'helix', endpoint: url, code: status, remaining: this.calls.broadcaster });
+
+    if (err) {
+      throw new Error(err);
+    }
     return response;
   }
 
