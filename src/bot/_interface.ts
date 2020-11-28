@@ -474,7 +474,7 @@ class Module {
     addWidget(opts[0], opts[1], opts[2]);
   }
 
-  public async getAllSettings() {
+  public async getAllSettings(withoutDefaults = false) {
     const promisedSettings: {
       [x: string]: any;
     } = {};
@@ -487,12 +487,12 @@ class Module {
         }
 
         if (category === 'commands') {
-          _.set(promisedSettings, `${category}.${key}`, [this.getCommand(key), defaultValue]);
+          _.set(promisedSettings, `${category}.${key}`, withoutDefaults ? this.getCommand(key) : [this.getCommand(key), defaultValue]);
         } else {
-          _.set(promisedSettings, `${category}.${key}`, [(this as any)[key], defaultValue]);
+          _.set(promisedSettings, `${category}.${key}`, withoutDefaults ? (this as any)[key] : [(this as any)[key], defaultValue]);
         }
       } else {
-        _.set(promisedSettings, key, [(this as any)[key], defaultValue]);
+        _.set(promisedSettings, key, withoutDefaults ? (this as any)[key] : [(this as any)[key], defaultValue]);
       }
     }
 
@@ -507,9 +507,9 @@ class Module {
           promisedSettings.__permission_based__[category] = {};
         }
 
-        _.set(promisedSettings, `__permission_based__.${category}.${key}`, [await this.getPermissionBasedSettingsValue(key, false), defaultValue]);
+        _.set(promisedSettings, `__permission_based__.${category}.${key}`, withoutDefaults ? await this.getPermissionBasedSettingsValue(key, false) : [await this.getPermissionBasedSettingsValue(key, false), defaultValue]);
       } else {
-        _.set(promisedSettings, `__permission_based__.${key}`, [await this.getPermissionBasedSettingsValue(key, false), defaultValue]);
+        _.set(promisedSettings, `__permission_based__.${key}`, withoutDefaults ? await this.getPermissionBasedSettingsValue(key, false) : [await this.getPermissionBasedSettingsValue(key, false), defaultValue]);
       }
     }
 

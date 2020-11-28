@@ -59,11 +59,11 @@ class UI extends Core {
           if (!self) {
             throw new Error(`core.${name} not found in list`);
           }
-          data.core[system] = await self.getAllSettings();
+          data.core[system] = await self.getAllSettings(true);
         }
         for (const dir of ['systems', 'games', 'overlays', 'integrations']) {
           for (const system of list(dir)) {
-            set(data, `${dir}.${system.__moduleName__}`, await system.getAllSettings());
+            set(data, `${dir}.${system.__moduleName__}`, await system.getAllSettings(true));
           }
         }
         // currencies
@@ -90,7 +90,7 @@ class UI extends Core {
 
         for (const dir of ['systems', 'games']) {
           for (const system of list(dir)) {
-            set(data, `${dir}.${system.__moduleName__}`, await system.getAllSettings());
+            set(data, `${dir}.${system.__moduleName__}`, await system.getAllSettings(true));
           }
         }
 

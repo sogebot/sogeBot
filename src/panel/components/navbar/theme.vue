@@ -22,6 +22,7 @@ export default defineComponent({
     const theme = ref('light');
 
     const toggleTheme = () => {
+      debugger;
       const theme = localStorage.getItem('theme');
       if (theme === null || theme === 'light') {
         localStorage.setItem('theme', 'dark')
@@ -33,6 +34,10 @@ export default defineComponent({
     }
 
     const loadTheme = async (themeArg: string) => {
+      if (!['light', 'dark'].includes(themeArg)) {
+        console.error(`Unknown theme ${themeArg}, setting light theme`);
+        themeArg = 'light';
+      }
       const head = document.getElementsByTagName('head')[0];
       const link = (document.createElement('link') as any);
       link.setAttribute('rel', 'stylesheet');
