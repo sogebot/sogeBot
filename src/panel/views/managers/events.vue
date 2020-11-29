@@ -446,7 +446,7 @@ export default defineComponent({
       }
     })
     watch(editationItem, (val, oldVal) => {
-      if (state.value.loading === ButtonStates.success) {
+      if (state.value.editationLoading !== ButtonStates.progress && watchEventChange.value) {
         state.value.pending = true;
       }
     }, { deep: true });
@@ -545,6 +545,7 @@ export default defineComponent({
       loadEditationItem();
       if (ctx.root.$route.params.id) {
         isSidebarVisible.value = true;
+        setTimeout(() => state.value.pending = false, 1000);
       }
     });
 
@@ -744,7 +745,10 @@ export default defineComponent({
           })
         }),
       ]);
-      state.value.editationLoading = ButtonStates.success
+      ctx.root.$nextTick(() => {
+        state.value.pending = false;
+        state.value.editationLoading = ButtonStates.success
+      });
     }
     const getDefinitionValidation = (key: string) => {
       const $v = instance?.$v;
