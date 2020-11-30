@@ -9,8 +9,8 @@
         </template>
       </span>
     </div>
-    <input v-on:keyup="update" @focus="show = true" @blur="show = false" v-model="currentValue" class="form-control" :type="secret && !show ? 'password' : 'text'" :readonly="readonly" />
-    <div class="input-group-append" v-if="!secret && defaultValue !== currentValue">
+    <input @focus="show = true" @blur="show = false" v-model="currentValue" class="form-control" :type="secret && !show ? 'password' : 'text'" :readonly="readonly" />
+    <div class="input-group-append" v-if="!secret && defaultValue !== currentValue && !readonly">
       <b-button @click="currentValue = defaultValue; update()">
         <fa icon="history" fixed-width/>
       </b-button>
@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { isFinite } from 'lodash-es';
 import translate from 'src/panel/helpers/translate';
 
@@ -36,6 +36,7 @@ export default class textInput extends Vue {
   currentValue = this.value;
   translatedTitle = translate(this.title);
 
+  @Watch('currentValue')
   update() {
     if (this.type === 'number') {
       if (isFinite(Number(this.currentValue))) {

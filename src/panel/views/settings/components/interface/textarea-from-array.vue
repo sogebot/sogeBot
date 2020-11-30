@@ -10,18 +10,18 @@
         <small class="d-block">{{ translate('one-record-per-line') }}</small>
       </span>
     </div>
-    <textarea v-on:keyup="update" v-model="currentValue" class="form-control" type="text" :readonly="readonly"></textarea>
+    <textarea v-model="currentValue" class="form-control" type="text" :readonly="readonly"></textarea>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import translate from 'src/panel/helpers/translate';
 
 @Component({})
 export default class textAreaFromArray extends Vue {
   translate = translate;
-  
+
   @Prop() readonly value!: any;
   @Prop() readonly title!: string;
   @Prop() readonly readonly: any;
@@ -29,6 +29,7 @@ export default class textAreaFromArray extends Vue {
   currentValue = this.value.join('\n');
   translatedTitle = translate(this.title);
 
+  @Watch('currentValue')
   update() {
     this.$emit('update', this.currentValue.split('\n'));
   }
