@@ -11,7 +11,7 @@
   "loading": "Завантаження",
   "permissionNotFoundInDatabase": "Permission not found in database, please save before testing user.",
   "userHaveNoAccessToThisPermissionGroup": "User <strong>$username</strong> DOESN'T have access to this permission group.",
-  "userHaveAccessToThisPermissionGroup": "Користувач <strong>$username</strong> МАЄ мати доступ до цього дозволу галузі.",
+  "userHaveAccessToThisPermissionGroup": "User <strong>$username</strong> HAVE access to this permission group.",
   "accessDirectlyThrough": "<strong>Прямий</strong> доступ через",
   "accessThroughHigherPermission": "Access through higher permission",
   "somethingWentWrongUserWasNotFoundInBotDatabase": "Щось пішло не так, користувач <strong>$username</strong> не був знайдений в базі даних ботів.",
