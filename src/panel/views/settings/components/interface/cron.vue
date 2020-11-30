@@ -13,7 +13,7 @@
         </span>
       </div>
       <div class="d-block w-100 p-0 border-0" style="height: fit-content">
-        <input v-model="currentValue" v-on:keyup="update" class="form-control" />
+        <input v-model="currentValue" class="form-control" />
         <b-list-group>
           <b-list-group-item v-for="timestamp of data" :key="timestamp">{{ new Date(timestamp).toUTCString() }}</b-list-group-item>
         </b-list-group>
@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
@@ -41,6 +41,7 @@ export default class cronInput extends Vue {
     this.update();
   }
 
+  @Watch('currentValue')
   update() {
     getSocket(`/${this.$route.params.type}/${this.$route.params.id}`)
       .emit(this.emit, this.currentValue, (err: string | null, data: number[]) => {

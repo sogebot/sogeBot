@@ -3,7 +3,7 @@
     <div class="input-group-prepend">
       <span class="input-group-text">{{ command }}</span>
     </div>
-    <input v-on:keyup="update" v-model="currentValue" class="form-control" type="text" />
+    <input v-model="currentValue" class="form-control" type="text" />
     <div v-if="!permissionsLoaded" class="input-group-append">
       <div class="spinner-grow spinner-grow-sm" role="status">
         <span class="sr-only">Loading...</span>
@@ -68,6 +68,7 @@ export default class sortableList extends Vue {
   permissionsLoaded: boolean = false;
 
   @Watch('currentPermissions')
+  @Watch('currentValue')
   update() {
     if (this.type === 'number') {
       if (isFinite(Number(this.currentValue))) {
