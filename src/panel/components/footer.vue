@@ -7,12 +7,13 @@
     <span class="alert" :class="[classNameResponse(data.RES)]" style="padding:0;" :title="'Average bot response ' + data.RES + 'ms'">{{data.RES}}ms</span>
     <a href="https://github.com/sogehige/SogeBot">GitHub</a> |
     <a href="https://github.com/sogehige/SogeBot/issues">Issues</a> |
-    <a href="https://github.com/sogehige/SogeBot/blob/master/LICENSE">GPL-3.0 License</a>
+    <a href="https://github.com/sogehige/SogeBot/blob/master/LICENSE">GPL-3.0 License</a> |
+    <span class="alert" style="padding:0;">{{version}}</span>
   </footer>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, onMounted } from '@vue/composition-api'
+import { defineComponent, reactive, onMounted, ref } from '@vue/composition-api'
 import { getSocket } from '../helpers/socket';
 
 const socket = getSocket('/');
@@ -68,6 +69,7 @@ const setDebug = () => {
 
 export default defineComponent({
   setup() {
+    const version = ref('');
     const data: {
       SOC: boolean;
       MOD: boolean;
@@ -99,9 +101,12 @@ export default defineComponent({
       })
     }
 
-    onMounted(() => refresh());
+    onMounted(() => {
+      socket.emit('version', (recvVersion: string) => version.value = recvVersion);
+      refresh()
+    });
 
-    return { data, classNameMod, classNameResponse, className, title, setDebug }
+    return { version, data, classNameMod, classNameResponse, className, title, setDebug }
   }
 });
 </script>

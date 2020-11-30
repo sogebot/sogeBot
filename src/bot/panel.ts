@@ -505,6 +505,9 @@ export const init = () => {
     socket.on('name', function (cb: (botUsername: string) => void) {
       cb(oauth.botUsername);
     });
+    socket.on('channelName', function (cb: (currentChannel: string) => void) {
+      cb(oauth.currentChannel);
+    });
     socket.on('version', function (cb: (version: string) => void) {
       const version = _.get(process, 'env.npm_package_version', 'x.y.z');
       cb(version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'));

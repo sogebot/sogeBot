@@ -6,7 +6,8 @@
         b-col.text-left
           a(href="#/" style="line-height: 36px;").blog-header-logo.text-dark
             strong.text-uppercase {{ name }}
-              span.d-none.d-sm-inline.pl-2 {{ version }}
+              small.text-uppercase
+               | &nbsp;{{ channelName }}
         b-col.d-flex.justify-content-end.align-items-center
           checklist
           theme
@@ -48,17 +49,17 @@ export default defineComponent({
   },
   setup() {
     const name = ref('');
-    const version = ref('');
+    const channelName = ref('');
 
     onMounted(() => {
-      socket.emit('version', (recvVersion: string) => version.value = recvVersion);
       socket.emit('name', (recvName: string) => name.value = recvName );
+      socket.emit('channelName', (recvName: string) => channelName.value = recvName );
     })
 
     const joinBot = () => socket.emit('joinBot');
     const leaveBot = () => socket.emit('leaveBot');
 
-    return { name, version, joinBot, leaveBot, translate, }
+    return { name, channelName, joinBot, leaveBot, translate,  }
   }
 });
 </script>
