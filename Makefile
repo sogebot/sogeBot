@@ -38,10 +38,13 @@ css:
 	@npx node-sass --output-style expanded --precision 6 scss/themes/light.scss public/dist/css/light.css
 	@npx node-sass --output-style expanded --precision 6 scss/themes/dark.scss public/dist/css/dark.css
 	@npx postcss public/dist/css/*.css --use autoprefixer -d public/dist/css/
+	@gzip -f -9 public/dist/css/light.css
+	@gzip -f -9 public/dist/css/dark.css
 
 ui:
 	@echo -ne "\n\t ----- Bundling with webpack ($(ENV))\n"
 	@VERSION=${VERSION} NODE_ENV=$(ENV) node --max_old_space_size=4096 ./node_modules/webpack/bin/webpack.js --progress
+	@gzip -f -9 public/dist/js/*
 
 bot:
 	@echo -ne "\n\t ----- Building bot\n"

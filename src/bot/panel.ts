@@ -86,6 +86,30 @@ export const init = () => {
 
   // static routing
   app?.use('/dist', express.static(path.join(__dirname, '..', 'public', 'dist')));
+  app?.get('/dist/*/*.js', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', req.url + '.gz'), {
+      headers: {
+        'Content-Type': 'text/javascript',
+        'Content-Encoding': 'gzip',
+      },
+    });
+  });
+  app?.get('/dist/*/*.map', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', req.url + '.gz'), {
+      headers: {
+        'Content-Type': 'text/javascript',
+        'Content-Encoding': 'gzip',
+      },
+    });
+  });
+  app?.get('/dist/*/*.css', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', req.url + '.gz'), {
+      headers: {
+        'Content-Type': 'text/css',
+        'Content-Encoding': 'gzip',
+      },
+    });
+  });
   app?.get('/popout/', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'popout.html'));
   });

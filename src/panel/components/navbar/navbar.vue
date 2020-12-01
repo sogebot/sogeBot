@@ -1,6 +1,6 @@
 <template lang="pug">
   div.navbar.navbar-light.bg-light.fixed-top
-    vue-headful(:title='name.toUpperCase() + " " + version')
+    vue-headful(:title='name.toUpperCase() + " @ " + channelName')
     header.w-100
       b-row.flex-nowrap.justify-content-between.align-items-center
         b-col.text-left

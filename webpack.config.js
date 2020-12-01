@@ -89,7 +89,7 @@ const webpackConfig = {
     }),
     new HtmlWebpackPlugin({
       filename: '../../oauth-spotify.html', template: 'src/oauth/spotify.html', chunks: ['spotify']
-    })
+    }),
   ],
   module: {
     rules: [
