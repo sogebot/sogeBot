@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { gsap } from 'gsap'
+import gsap from 'gsap'
 import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})

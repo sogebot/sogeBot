@@ -62,7 +62,7 @@ finished: {{ (getCurrentAlertList() || []).filter(o => o.finished) }}
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
-import { gsap } from 'gsap'
+import gsap from 'gsap'
 import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})

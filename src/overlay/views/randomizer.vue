@@ -45,7 +45,7 @@ import type { RandomizerItemInterface, RandomizerInterface } from 'src/bot/datab
 import { Vue, Component } from 'vue-property-decorator';
 import { cloneDeep, isEqual, orderBy } from 'lodash-es';
 
-import { gsap } from 'gsap'
+import gsap from 'gsap'
 import Winwheel from 'winwheel'
 import JsonViewer from 'vue-json-viewer'
 

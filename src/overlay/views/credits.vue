@@ -27,7 +27,7 @@ current: {{ current }}
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
-import { gsap } from 'gsap';
+import gsap from 'gsap';
 import { groupBy } from 'lodash-es';
 import { getSocket } from 'src/panel/helpers/socket';
 

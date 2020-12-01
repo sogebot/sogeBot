@@ -26,7 +26,7 @@ nextOffset: {{ nextOffset }}
 <script lang="ts">
 
 import { Vue, Component, Watch } from 'vue-property-decorator';
-import { gsap } from 'gsap'
+import gsap from 'gsap'
 import { getSocket } from 'src/panel/helpers/socket';
 import { chunk, cloneDeep } from 'lodash-es';
 

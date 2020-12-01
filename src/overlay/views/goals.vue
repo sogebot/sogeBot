@@ -147,7 +147,7 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 Vue.use(ProgressPlugin);
 
-import { gsap } from 'gsap'
+import gsap from 'gsap'
 import { GoalInterface, GoalGroupInterface } from 'src/bot/database/entity/goal';
 import { dayjs } from 'src/bot/helpers/dayjs';
 console.log(dayjs());
