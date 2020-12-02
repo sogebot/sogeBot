@@ -31,13 +31,13 @@
                   | {{ capitalize(translate('refund')) }}
             div(v-else).alert.alert-info No bets are currently running
         b-tab
-          template v-slot:title
+          template(v-slot:title)
             fa(icon='cog')
           b-card-text
             div.input-group
               div.input-group-prepend
                 span.input-group-text {{translate('gain-every-option')}}
-              input(type="text" v-model="betPercentGain").form-control
+              input(type="number" v-model.number="betPercentGain").form-control
               div.input-group-append
                 span.input-group-text %
 </template>
@@ -88,11 +88,7 @@ export default defineComponent({
     const bets = ref([] as BetsParticipationsInterface[])
 
     watch(betPercentGain, (value, old) =>{
-      if (Number.isNaN(Number(value))) {
-        betPercentGain.value = old
-      } else {
-        socket.emit('settings.update', {betPercentGain: value}, () => {})
-      }
+      socket.emit('settings.update', {betPercentGain: value}, () => {})
     });
 
     onMounted(() => {
@@ -118,7 +114,7 @@ export default defineComponent({
         }), 1000)
       );
       socket.emit('settings', (err: string | null, settings: {[x: string]: any}) => {
-        betPercentGain.value = settings.betPercentGain
+        betPercentGain.value = settings.betPercentGain[0]
       })
     });
     onUnmounted(() => {

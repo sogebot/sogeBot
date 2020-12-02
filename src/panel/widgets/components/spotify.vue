@@ -129,8 +129,8 @@ export default {
     }, 50)
     this.socket.emit('settings', (err, s) => {
       this.command = s.commands['!spotify'];
-      this.songRequestsEnabled = s.songRequests;
-      this.continueOnPlaylistAfterRequest = s.continueOnPlaylistAfterRequest;
+      this.songRequestsEnabled = s.songRequests[0];
+      this.continueOnPlaylistAfterRequest = s.continueOnPlaylistAfterRequest[0];
       setTimeout(this.fetchCurrentSong, 1000)
       setTimeout(this.fetchSongRequests, 1000)
     })

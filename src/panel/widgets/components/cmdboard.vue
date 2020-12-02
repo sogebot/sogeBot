@@ -118,8 +118,8 @@ export default {
       })
       this.socket.emit('settings', (err, data) => {
         if (err) return console.error(err)
-        this.displayAs = data.displayAs
-        this.displayAsOpts = data.displayAsOpts
+        this.displayAs = data.displayAs[0]
+        this.displayAsOpts = data.displayAsOpts[0]
       })
   },
   methods: {

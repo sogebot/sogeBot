@@ -124,9 +124,9 @@ export default {
       if (err) {
         return console.error(err)
       }
-      this.eligibilityAll = data.eligibility.eligibilityAll
-      this.eligibilityFollowers = data.eligibility.eligibilityFollowers
-      this.eligibilitySubscribers = data.eligibility.eligibilitySubscribers
+      this.eligibilityAll = data.eligibility.eligibilityAll[0]
+      this.eligibilityFollowers = data.eligibility.eligibilityFollowers[0]
+      this.eligibilitySubscribers = data.eligibility.eligibilitySubscribers[0]
     })
     this.socket.emit('get.value', 'locked', (err, locked) => {
       this.locked = locked
