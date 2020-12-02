@@ -9,7 +9,7 @@
     "anchorY": "Cursor Y-Position",
     "left": "Links",
     "right": "Rechts",
-    "middle": "Mitten",
+    "middle": "Mitte",
     "top": "Oben",
     "bottom": "Unten",
     "x": "X",
@@ -18,12 +18,12 @@
   "font": {
     "shadowShiftRight": "Nach rechts verschieben",
     "shadowShiftDown": "Nach unten verschieben",
-    "shadowBlur": "Weichzeichnen",
+    "shadowBlur": "Unscharf",
     "shadowOpacity": "Deckkraft",
     "color": "Farbe"
   },
   "errors": {
-    "required": "Diese Eingabe darf nicht leer sein.",
+    "required": "Dieser Wert darf nicht leer sein.",
     "minValue": "Der niedrigste Wert dieser Eingabe ist $value."
   },
   "buttons": {
@@ -58,10 +58,10 @@
     "hold-to-delete": "Halten zum Löschen",
     "yes": "Ja",
     "no": "Nein",
-    "permission": "Permission",
-    "group": "Group",
-    "visibility": "Visibility",
-    "reset": "Reset "
+    "permission": "Berechtigung",
+    "group": "Gruppe",
+    "visibility": "Sichtbarkeit",
+    "reset": "Zurücksetzen"
   },
   "changesPending": "Deine Änderungen wurden nicht gespeichert.",
   "formNotValid": "Formular ist ungültig.",
