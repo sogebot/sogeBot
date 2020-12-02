@@ -87,8 +87,8 @@ export default defineComponent({
     const interval = ref([] as number[]);
     const bets = ref([] as BetsParticipationsInterface[])
 
-    watch(betPercentGain, (value, old) =>{
-      socket.emit('settings.update', {betPercentGain: value}, () => {})
+    watch(betPercentGain, (value, old) => {
+      socket.emit('settings.update', {betPercentGain: Number(value)}, () => {})
     });
 
     onMounted(() => {
