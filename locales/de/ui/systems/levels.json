@@ -1,11 +1,11 @@
 {
   "settings": {
     "enabled": "Status",
-    "conversionRate": "Conversion rate 1 XP for x Points",
-    "firstLevelStartsAt": "First level starts at XP",
+    "conversionRate": "Umrechnungsrate 1 XP für x Punkte",
+    "firstLevelStartsAt": "Erste Stufe beginnt bei XP",
     "nextLevelFormula": {
-      "title": "Next level calculation formula",
-      "help": "Available variables: $prevLevel, $prevLevelXP"
+      "title": "Berechnungsformel für nächste Ebene",
+      "help": "Verfügbare Variablen: $prevLevel, $prevLevelXP"
     },
     "levelShowcaseHelp": "Levels example will be refreshed on save",
     "xpName": "Name",
