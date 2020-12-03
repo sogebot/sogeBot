@@ -115,7 +115,7 @@ describe('Custom Commands - run()', () => {
     customcommands.run({ sender: owner, message: '!a', parameters: '' });
     await message.isSentRaw('Lorem Ipsum', owner);
 
-    const r2 = await customcommands.remove({ sender: owner, parameters: '!a' });
+    const r2 = await customcommands.remove({ sender: owner, parameters: '-c !a' });
     assert.strictEqual(r2[0].response, '$sender, command !a was removed');
   });
 
@@ -126,7 +126,7 @@ describe('Custom Commands - run()', () => {
     customcommands.run({ sender: owner, message: '!한글', parameters: '' });
     await message.isSentRaw('Lorem Ipsum', owner);
 
-    const r2 = await customcommands.remove({ sender: owner, parameters: '!한글' });
+    const r2 = await customcommands.remove({ sender: owner, parameters: '-c !한글' });
     assert.strictEqual(r2[0].response, '$sender, command !한글 was removed');
   });
 
@@ -137,7 +137,7 @@ describe('Custom Commands - run()', () => {
     customcommands.run({ sender: owner, message: '!русский', parameters: '' });
     await message.isSentRaw('Lorem Ipsum', owner);
 
-    const r2 = await customcommands.remove({ sender: owner, parameters: '!русский' });
+    const r2 = await customcommands.remove({ sender: owner, parameters: '-c !русский' });
     assert.strictEqual(r2[0].response, '$sender, command !русский was removed');
   });
 });

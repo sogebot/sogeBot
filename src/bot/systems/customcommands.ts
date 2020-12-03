@@ -161,7 +161,7 @@ class CustomCommands extends System {
       cacheValid = false;
       return [{ response: prepare('customcmds.command-was-edited', { command: cmd, response }), ...opts }];
     } catch (e) {
-      return [{ response: prepare('customcmds.commands-parse-failed'), ...opts }];
+      return [{ response: prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') }), ...opts }];
     }
   }
 
@@ -211,7 +211,7 @@ class CustomCommands extends System {
       cacheValid = false;
       return [{ response: prepare('customcmds.command-was-added', { command: cmd }), ...opts }];
     } catch (e) {
-      return [{ response: prepare('customcmds.commands-parse-failed'), ...opts }];
+      return [{ response: prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') }), ...opts }];
     }
   }
 
@@ -423,7 +423,7 @@ class CustomCommands extends System {
         return [{ response, ...opts }];
       }
     } catch (e) {
-      return [{ response: prepare('customcmds.commands-parse-failed'), ...opts }];
+      return [{ response: prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') }), ...opts }];
     }
   }
 }
