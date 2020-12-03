@@ -881,7 +881,7 @@
     "alias-group-list-disabled": "$sender, aliases in $group are disabled."
   },
   "customcmds": {
-    "commands-parse-failed": "{core.command-parse} !commands",
+    "commands-parse-failed": "{core.command-parse} $command",
     "command-was-not-found": "$sender, команда $command не найдена в базе данных",
     "response-was-not-found": "$sender, ответ #$response команды $command не найден в базе данных",
     "command-was-edited": "$sender, команда $command изменена на '$response'",
