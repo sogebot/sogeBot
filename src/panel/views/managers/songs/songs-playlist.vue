@@ -360,7 +360,7 @@ export default defineComponent({
 
     const deleteItem = (id: string) => {
       if (confirm('Do you want to delete song ' + items.value.find(o => o.videoId === id)?.title + '?')) {
-        socket.emit('delete.ban', id, () => {
+        socket.emit('delete.playlist', id, () => {
           items.value = items.value.filter((o) => o.videoId !== id)
         })
       }
