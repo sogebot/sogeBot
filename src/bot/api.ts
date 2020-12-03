@@ -463,7 +463,7 @@ class API extends Core {
     return null;
   }
 
-  async getIdFromTwitch (username: string, isChannelId = false) {
+  async getIdFromTwitch (username: string, isChannelId = false): Promise<string> {
     const url = `https://api.twitch.tv/helix/users?login=${username}`;
     let request;
     /*
@@ -487,7 +487,7 @@ class API extends Core {
     const needToWait = token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
     if ((needToWait || notEnoughAPICalls) && !isChannelId) {
-      return null;
+      throw new Error('API calls not available.');
     }
 
     try {
@@ -506,7 +506,7 @@ class API extends Core {
 
       ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
 
-      return request.data.data[0].id;
+      return String(request.data.data[0].id);
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
         this.calls.bot.remaining = 0;
@@ -514,11 +514,10 @@ class API extends Core {
 
         ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
       } else {
-
         ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: 'n/a', data: e.stack, remaining: this.calls.bot });
       }
+      throw new Error(`User ${username} not found on Twitch.`);
     }
-    return null;
   }
 
   async getChannelChattersUnofficialAPI (opts: any) {
