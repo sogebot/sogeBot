@@ -69,11 +69,11 @@ describe('Custom Commands - remove()', () => {
   it('remove response', async () => {
     const r = await customcommands.add({ sender: owner, parameters: '-c !a -r !me' });
     assert.strictEqual(r[0].response, '$sender, command !a was added');
-    const r = await customcommands.add({ sender: owner, parameters: '-c !a -r !me2' });
-    assert.strictEqual(r[0].response, '$sender, command !a was added');
+    const r2 = await customcommands.add({ sender: owner, parameters: '-c !a -r !me2' });
+    assert.strictEqual(r2[0].response, '$sender, command !a was added');
 
-    const r2 = await customcommands.remove({ sender: owner, parameters: '-c !a -r 0' });
-    assert.strictEqual(r2[0].response, '$sender, command !a was removed');
+    const r3 = await customcommands.remove({ sender: owner, parameters: '-c !a -r 0' });
+    assert.strictEqual(r3[0].response, '$sender, command !a was removed');
 
     await customcommands.run({ sender: owner, message: '!a', parameters: '' });
     await message.isSentRaw('!me2', user1);
