@@ -8,7 +8,7 @@ import { setInterval } from 'timers';
 import alerts from './registries/alerts';
 
 const pubsubEndpoint: Readonly<string> = 'wss://pubsub-edge.twitch.tv';
-const heartbeatInterval: Readonly<number> = 60 * SECOND;
+const heartbeatInterval: Readonly<number> = 2 * 60 * SECOND;
 const reconnectInterval: Readonly<number> = 3 * SECOND;
 
 let ws: WebSocket | null = null;
