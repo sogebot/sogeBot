@@ -3,9 +3,12 @@ import { ColumnNumericTransformer } from './_transformer';
 
 export interface CooldownInterface {
   id?: string;
-  name: string;
+  value: string[];
   miliseconds: number;
+  usageLimit: number;
   type: 'global' | 'user';
+  pool: 'per-item' | 'shared';
+  wipeType: 'full' | 'full-last' | 'gradual';
   timestamp?: number;
   isErrorMsgQuiet: boolean;
   isEnabled: boolean;
@@ -27,7 +30,7 @@ export const Cooldown = new EntitySchema<Readonly<Required<CooldownInterface>>>(
   name: 'cooldown',
   columns: {
     id: { type: 'uuid', primary: true, generated: 'uuid' },
-    name: { type: String },
+    value: { type: 'simple-json' },
     miliseconds: { type: Number },
     type: { type: 'varchar', length: 10 },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
