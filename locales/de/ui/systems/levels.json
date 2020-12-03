@@ -1,16 +1,16 @@
 {
   "settings": {
     "enabled": "Status",
-    "conversionRate": "Conversion rate 1 XP for x Points",
-    "firstLevelStartsAt": "First level starts at XP",
+    "conversionRate": "Umrechnungsrate 1 XP für x Punkte",
+    "firstLevelStartsAt": "Erste Stufe beginnt bei XP",
     "nextLevelFormula": {
-      "title": "Next level calculation formula",
-      "help": "Available variables: $prevLevel, $prevLevelXP"
+      "title": "Berechnungsformel für nächste Ebene",
+      "help": "Verfügbare Variablen: $prevLevel, $prevLevelXP"
     },
     "levelShowcaseHelp": "Levels example will be refreshed on save",
     "xpName": "Name",
-    "interval": "Minutes interval to add xp to online users when stream online",
-    "offlineInterval": "Minutes interval to add xp to online users when stream offline",
+    "interval": "Intervall in Minuten, in denen Zuschauer Punkte erhalten, während der Stream läuft",
+    "offlineInterval": "Intervall in Minuten, in denen Zuschauer Punkte erhalten, während der Stream läuft",
     "messageInterval": "How many messages to add xp",
     "messageOfflineInterval": "How many messages to add xp when stream offline",
     "perInterval": "How many xp to add per online interval",
