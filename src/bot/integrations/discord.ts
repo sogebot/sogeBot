@@ -474,7 +474,7 @@ class Discord extends Integration {
       const userObj = await getRepository(User).findOne({ username });
       if (!userObj && !attributes.test) {
         await getRepository(User).save({
-          userId: await api.getIdFromTwitch(username),
+          userId: Number(await api.getIdFromTwitch(username)),
           username,
         });
         return self.fireSendDiscordMessage(operation, {...attributes, username });
