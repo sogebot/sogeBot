@@ -1,5 +1,6 @@
 import XRegExp from 'xregexp';
 import { debug } from './helpers/log';
+import { ParameterError } from './helpers/parameterError';
 import { defaults, get, isNil } from 'lodash';
 
 declare global {
@@ -39,14 +40,14 @@ class Expects {
   checkText (opts?: any) {
     opts = opts || {};
     if (isNil(this.text)) {
-      throw Error('Text cannot be null');
+      throw new ParameterError('Text cannot be null');
     }
     if (this.text.trim().length === 0) {
       if (opts.expects) {
         if (opts.name) {
-          throw Error('Expected parameter <' + get(opts, 'name', '') + ':' + opts.expects + '> at position ' + this.match.length);
+          throw new ParameterError('Expected parameter <' + get(opts, 'name', '') + ':' + opts.expects + '> at position ' + this.match.length);
         } else {
-          throw Error('Expected parameter <' + opts.expects + '> at position ' + this.match.length);
+          throw new ParameterError('Expected parameter <' + opts.expects + '> at position ' + this.match.length);
         }
       } else {
         // generate expected parameters
@@ -127,7 +128,7 @@ class Expects {
               break;
           }
         }
-        throw Error(expectedParameters.join(' '));
+        throw new ParameterError(expectedParameters.join(' '));
       }
     }
     this.text = this.text.replace(/\s\s+/g, ' ').trim();
@@ -160,7 +161,7 @@ class Expects {
       this.text = this.text.replace(match.command, ''); // remove from text matched pattern
     } else {
       if (!opts.optional) {
-        throw Error('Command not found');
+        throw new ParameterError('Command not found');
       } else {
         this.match.push(null);
       }
@@ -198,7 +199,7 @@ class Expects {
       this.text = this.text.replace(match.points, ''); // remove from text matched pattern
     } else {
       if (!opts.optional) {
-        throw Error('Points not found');
+        throw new ParameterError('Points not found');
       } else {
         this.match.push(null);
       }
@@ -228,7 +229,7 @@ class Expects {
       this.text = this.text.replace(match.number, ''); // remove from text matched pattern
     } else {
       if (!opts.optional) {
-        throw Error('Number not found');
+        throw new ParameterError('Number not found');
       } else {
         this.match.push(null);
       }
@@ -245,10 +246,10 @@ class Expects {
     }
 
     if (isNil(opts.name)) {
-      throw Error('Argument name must be defined');
+      throw new ParameterError('Argument name must be defined');
     }
     if (isNil(opts.values)) {
-      throw Error('Values must be defined');
+      throw new ParameterError('Values must be defined');
     }
     if (!opts.optional) {
       this.checkText();
@@ -263,7 +264,7 @@ class Expects {
       this.text = this.text.replace(match[0], ''); // remove from text matched pattern
     } else {
       if (!opts.optional) {
-        throw Error('Argument not found');
+        throw new ParameterError('Argument not found');
       } else {
         this.match.push(opts.default);
       }
@@ -284,7 +285,7 @@ class Expects {
     }
 
     if (isNil(opts.name)) {
-      throw Error('Toggler name must be defined');
+      throw new ParameterError('Toggler name must be defined');
     }
 
     const regexp = XRegExp(`-${opts.name}\\b`, 'ix');
@@ -313,10 +314,10 @@ class Expects {
       return this;
     }
     if (isNil(opts.name)) {
-      throw Error('Permission name must be defined');
+      throw new ParameterError('Permission name must be defined');
     }
     if (opts.optional && opts.default === null) {
-      throw Error('Permission cannot be optional without default value');
+      throw new ParameterError('Permission cannot be optional without default value');
     }
 
     const pattern = `([0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})|(?:(?!-[a-zA-Z]).)+`; // capture until -something or [^-]*
@@ -330,7 +331,7 @@ class Expects {
       this.text = this.text.replace(match[0], ''); // remove from text matched pattern
     } else {
       if (!opts.optional) {
-        throw Error(`Permission ${opts.name} not found`);
+        throw new ParameterError(`Permission ${opts.name} not found`);
       } else {
         this.match.push(opts.default);
       }
@@ -359,7 +360,7 @@ class Expects {
     }
 
     if (isNil(opts.name)) {
-      throw Error('Argument name must be defined');
+      throw new ParameterError('Argument name must be defined');
     }
     if (!opts.optional) {
       this.checkText();
@@ -396,7 +397,7 @@ class Expects {
       this.text = this.text.replace(match[0], ''); // remove from text matched pattern
     } else {
       if (!opts.optional) {
-        throw Error(`Argument ${opts.name} not found`);
+        throw new ParameterError(`Argument ${opts.name} not found`);
       } else {
         this.match.push(opts.default);
       }
@@ -422,7 +423,7 @@ class Expects {
       this.text = this.text.replace(match.username, ''); // remove from text matched pattern
     } else {
       if (!opts.optional) {
-        throw Error('Username not found');
+        throw new ParameterError('Username not found');
       } else {
         this.match.push(opts.default);
       }
@@ -451,7 +452,7 @@ class Expects {
       this.text = this.text.replace(match.everything, ''); // remove from text matched pattern
     } else {
       if (!opts.optional) {
-        throw Error('There is no text found.');
+        throw new ParameterError('There is no text found.');
       } else {
         this.match.push(null);
       }
@@ -480,7 +481,7 @@ class Expects {
       this.text = this.text.replace(match.string, ''); // remove from text matched pattern
     } else {
       if (!opts.optional) {
-        throw Error('String not found');
+        throw new ParameterError('String not found');
       } else {
         this.match.push(null);
       }
@@ -504,7 +505,7 @@ class Expects {
       this.text = this.text.replace(match.list, ''); // remove from text matched pattern
     } else {
       if (!opts.optional) {
-        throw Error('List not found');
+        throw new ParameterError('List not found');
       } else {
         this.match.push([]);
       }
