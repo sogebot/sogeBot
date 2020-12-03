@@ -62,6 +62,7 @@ import translate from 'src/panel/helpers/translate';
   }
 })
 export default class translations extends Vue {
+  translate = translate;
   items: { name: string, current: string, default: string }[] = [];
   search: string = '';
 
