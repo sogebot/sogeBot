@@ -388,17 +388,39 @@ class CustomCommands extends System {
   @default_permission(permission.CASTERS)
   async remove (opts: CommandOptions) {
     try {
-      const [cmd] = new Expects(opts.parameters).command().toArray();
+      const [cmd, rId] = new Expects(opts.parameters)
+        .argument({ name: 'c', type: String, multi: true, delimiter: '' })
+        .argument({ name: 'rid', type: Number, optional: true, default: 0 })
+        .toArray();
+
+      if (!cmd.startsWith('!')) {
+        throw Error('Command should start with !');
+      }
 
       const command_db = await getRepository(Commands).findOne({
         where: { command: cmd },
+        relations: [ 'responses' ],
       });
       if (!command_db) {
         return [{ response: prepare('customcmds.command-was-not-found', { command: cmd }), ...opts }];
       } else {
-        await getRepository(Commands).remove(command_db);
+        let response = prepare('customcmds.command-was-removed', { command: cmd });
+        if (rId >= 1) {
+          const responseDb = command_db.responses.filter(o => o.order !== (rId - 1));
+          // reorder
+          responseDb.forEach((item, index) => {
+            item.order = index;
+          });
+          await getRepository(Commands).save({
+            ...command_db,
+            responses: responseDb,
+          });
+          response = prepare('customcmds.response-was-removed', { command: cmd, response: rId });
+        } else {
+          await getRepository(Commands).remove(command_db);
+        }
         cacheValid = false;
-        return [{ response: prepare('customcmds.command-was-removed', { command: cmd }), ...opts }];
+        return [{ response, ...opts }];
       }
     } catch (e) {
       return [{ response: prepare('customcmds.commands-parse-failed'), ...opts }];
