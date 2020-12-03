@@ -21,6 +21,7 @@ import users from '../users';
 import { translate } from '../translate';
 import { MINUTE } from '../constants';
 import oauth from '../oauth';
+import { ParameterError } from '../helpers/parameterError';
 
 class Points extends System {
   cronTask: any = null;
@@ -456,11 +457,16 @@ class Points extends System {
       const user = await getRepository(User).findOne({ username });
 
       if (!user) {
-        await getRepository(User).save({
-          userId: Number(await api.getIdFromTwitch(username)),
-          username,
-        });
-        return this.get(opts);
+        const userId = await api.getIdFromTwitch(username);
+        if (userId) {
+          await getRepository(User).save({
+            userId: Number(userId),
+            username,
+          });
+          return this.get(opts);
+        } else {
+          throw new Error(`User ${username} not found on twitch`);
+        }
       }
 
       const connection = await getConnection();
@@ -496,6 +502,9 @@ class Points extends System {
       });
       return [{ response, ...opts }];
     } catch (err) {
+      if (!(err instanceof ParameterError)) {
+        error(err.stack);
+      }
       return [{ response: translate('points.failed.get').replace('$command', opts.command), ...opts }];
     }
   }
