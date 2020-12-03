@@ -63,7 +63,7 @@ describe('Custom Commands - edit()', () => {
     for (const t of parseFailedTests) {
       it(generateCommand(t), async () => {
         const r = await customcommands.edit({ sender: owner, parameters: generateCommand(t) });
-        assert.strictEqual(r[0].response, 'Sorry, $sender, but this command is not correct, use !commands');
+        assert.strictEqual(r[0].response, 'Sorry, $sender, but this command is not correct, use !command');
       });
     }
   });

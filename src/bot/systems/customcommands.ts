@@ -161,7 +161,7 @@ class CustomCommands extends System {
       cacheValid = false;
       return [{ response: prepare('customcmds.command-was-edited', { command: cmd, response }), ...opts }];
     } catch (e) {
-      return [{ response: prepare('customcmds.commands-parse-failed'), ...opts }];
+      return [{ response: prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') }), ...opts }];
     }
   }
 
@@ -211,7 +211,7 @@ class CustomCommands extends System {
       cacheValid = false;
       return [{ response: prepare('customcmds.command-was-added', { command: cmd }), ...opts }];
     } catch (e) {
-      return [{ response: prepare('customcmds.commands-parse-failed'), ...opts }];
+      return [{ response: prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') }), ...opts }];
     }
   }
 
@@ -343,7 +343,7 @@ class CustomCommands extends System {
   async toggle (opts: CommandOptions): Promise<CommandResponse[]> {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP) as unknown as { [x: string]: string } | null;
     if (_.isNil(match)) {
-      const response = prepare('customcmds.commands-parse-failed');
+      const response = prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') });
       return [{ response, ...opts }];
     }
     const cmd = await getRepository(Commands).findOne({
@@ -366,7 +366,7 @@ class CustomCommands extends System {
   async toggleVisibility (opts: CommandOptions): Promise<CommandResponse[]> {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP) as unknown as { [x: string]: string } | null;
     if (_.isNil(match)) {
-      const response = prepare('customcmds.commands-parse-failed');
+      const response = prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') });
       return [{ response, ...opts }];
     }
 
@@ -388,20 +388,42 @@ class CustomCommands extends System {
   @default_permission(permission.CASTERS)
   async remove (opts: CommandOptions) {
     try {
-      const [cmd] = new Expects(opts.parameters).command().toArray();
+      const [cmd, rId] = new Expects(opts.parameters)
+        .argument({ name: 'c', type: String, multi: true, delimiter: '' })
+        .argument({ name: 'rid', type: Number, optional: true, default: 0 })
+        .toArray();
+
+      if (!cmd.startsWith('!')) {
+        throw Error('Command should start with !');
+      }
 
       const command_db = await getRepository(Commands).findOne({
         where: { command: cmd },
+        relations: [ 'responses' ],
       });
       if (!command_db) {
         return [{ response: prepare('customcmds.command-was-not-found', { command: cmd }), ...opts }];
       } else {
-        await getRepository(Commands).remove(command_db);
+        let response = prepare('customcmds.command-was-removed', { command: cmd });
+        if (rId >= 1) {
+          const responseDb = command_db.responses.filter(o => o.order !== (rId - 1));
+          // reorder
+          responseDb.forEach((item, index) => {
+            item.order = index;
+          });
+          await getRepository(Commands).save({
+            ...command_db,
+            responses: responseDb,
+          });
+          response = prepare('customcmds.response-was-removed', { command: cmd, response: rId });
+        } else {
+          await getRepository(Commands).remove(command_db);
+        }
         cacheValid = false;
-        return [{ response: prepare('customcmds.command-was-removed', { command: cmd }), ...opts }];
+        return [{ response, ...opts }];
       }
     } catch (e) {
-      return [{ response: prepare('customcmds.commands-parse-failed'), ...opts }];
+      return [{ response: prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') }), ...opts }];
     }
   }
 }
