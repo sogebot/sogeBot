@@ -881,7 +881,7 @@
     "alias-group-list-disabled": "$sender, aliasy v $group jsou vypnuty."
   },
   "customcmds": {
-    "commands-parse-failed": "{core.command-parse} !commands",
+    "commands-parse-failed": "{core.command-parse} $command",
     "command-was-not-found": "$sender, příkaz $command nebyl nalezen v databázi",
     "response-was-not-found": "$sender, odpověď #$response příkazu $command nebyla v databázi nalezena",
     "command-was-edited": "$sender, příkaz $command je změněn na '$response'",
