@@ -20,14 +20,20 @@ let ERR_BADAUTH = false;
 
 setInterval(() => {
   try {
+    if (oauth.broadcasterAccessToken.length === 0) {
+      connectionHash = '';
+    }
+
     if (oauth.broadcasterAccessToken.length > 0 && oauth.broadcasterClientId.length > 0 && oauth.broadcasterId.length > 0) {
-      if (connectionHash !== oauth.broadcasterClientId.concat(oauth.broadcasterAccessToken, oauth.broadcasterId)) {
+      const newConnectionHash = oauth.broadcasterClientId.concat(oauth.broadcasterId);
+      if (connectionHash !== newConnectionHash) {
+        debug('pubsub', `${connectionHash} != ${newConnectionHash}`);
         ws?.close();
         ws = null;
         ERR_BADAUTH = false;
       }
       if (!ws && !ERR_BADAUTH) {
-        connectionHash = oauth.broadcasterClientId.concat(oauth.broadcasterAccessToken, oauth.broadcasterId);
+        connectionHash = newConnectionHash;
         connect();
       }
     }
