@@ -18,7 +18,7 @@ describe('Custom Commands - toggleVisibility()', () => {
 
   it('', async () => {
     const r = await customcommands.toggleVisibility({ sender: owner, parameters: '' });
-    assert.strictEqual(r[0].response, 'Sorry, $sender, but this command is not correct, use !commands');
+    assert.strictEqual(r[0].response, 'Sorry, $sender, but this command is not correct, use !command');
   });
 
   it('!unknown', async () => {

@@ -19,7 +19,7 @@ describe('Custom Commands - toggle()', () => {
 
   it('', async () => {
     const r = await customcommands.toggle({ sender: owner, parameters: '' });
-    assert.strictEqual(r[0].response, 'Sorry, $sender, but this command is not correct, use !commands');
+    assert.strictEqual(r[0].response, 'Sorry, $sender, but this command is not correct, use !command');
   });
 
   it('!unknown', async () => {

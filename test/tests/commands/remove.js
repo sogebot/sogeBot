@@ -18,7 +18,7 @@ describe('Custom Commands - remove()', () => {
 
   it('', async () => {
     const r = await customcommands.remove({ sender: owner, parameters: '' });
-    assert.strictEqual(r[0].response, 'Sorry, $sender, but this command is not correct, use !commands');
+    assert.strictEqual(r[0].response, 'Sorry, $sender, but this command is not correct, use !command');
   });
 
   it('!alias', async () => {
@@ -28,7 +28,7 @@ describe('Custom Commands - remove()', () => {
 
   it('alias', async () => {
     const r = await customcommands.remove({ sender: owner, parameters: '-c alias' });
-    assert.strictEqual(r[0].response, 'Sorry, $sender, but this command is not correct, use !commands');
+    assert.strictEqual(r[0].response, 'Sorry, $sender, but this command is not correct, use !command');
   });
 
   it('!a', async () => {
@@ -43,7 +43,7 @@ describe('Custom Commands - remove()', () => {
     const r = await customcommands.add({ sender: owner, parameters: '-c !한글 -r !me' });
     assert.strictEqual(r[0].response, '$sender, command !한글 was added');
 
-    const r2 = await customcommands.remove({ sender: owner, parameters: '!한글' });
+    const r2 = await customcommands.remove({ sender: owner, parameters: '-c !한글' });
     assert.strictEqual(r2[0].response, '$sender, command !한글 was removed');
   });
 
@@ -51,7 +51,7 @@ describe('Custom Commands - remove()', () => {
     const r = await customcommands.add({ sender: owner, parameters: '-c !русский -r !me' });
     assert.strictEqual(r[0].response, '$sender, command !русский was added');
 
-    const r2 = await customcommands.remove({ sender: owner, parameters: '!русский' });
+    const r2 = await customcommands.remove({ sender: owner, parameters: '-c !русский' });
     assert.strictEqual(r2[0].response, '$sender, command !русский was removed');
   });
 
@@ -72,10 +72,10 @@ describe('Custom Commands - remove()', () => {
     const r2 = await customcommands.add({ sender: owner, parameters: '-c !a -r !me2' });
     assert.strictEqual(r2[0].response, '$sender, command !a was added');
 
-    const r3 = await customcommands.remove({ sender: owner, parameters: '-c !a -r 0' });
-    assert.strictEqual(r3[0].response, '$sender, command !a was removed');
+    const r3 = await customcommands.remove({ sender: owner, parameters: '-c !a -rid 1' });
+    assert.strictEqual(r3[0].response, '$sender, response #1 of !a was removed');
 
     await customcommands.run({ sender: owner, message: '!a', parameters: '' });
-    await message.isSentRaw('!me2', user1);
+    await message.isSentRaw('!me2', owner);
   });
 });

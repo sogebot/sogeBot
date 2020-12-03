@@ -343,7 +343,7 @@ class CustomCommands extends System {
   async toggle (opts: CommandOptions): Promise<CommandResponse[]> {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP) as unknown as { [x: string]: string } | null;
     if (_.isNil(match)) {
-      const response = prepare('customcmds.commands-parse-failed');
+      const response = prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') });
       return [{ response, ...opts }];
     }
     const cmd = await getRepository(Commands).findOne({
@@ -366,7 +366,7 @@ class CustomCommands extends System {
   async toggleVisibility (opts: CommandOptions): Promise<CommandResponse[]> {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP) as unknown as { [x: string]: string } | null;
     if (_.isNil(match)) {
-      const response = prepare('customcmds.commands-parse-failed');
+      const response = prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') });
       return [{ response, ...opts }];
     }
 
