@@ -47,7 +47,7 @@ class CustomVariables extends Core {
   }
 
   async executeVariablesInText(text: string, attr: { sender: { userId: number; username: string; source: 'twitch' | 'discord' }} | null): Promise<string> {
-    for (const variable of text.match(customVariableRegex) || []) {
+    for (const variable of text.match(customVariableRegex)?.sort((a, b) => b.length - a.length) || []) {
       const isVariable = await this.isVariableSet(variable);
       let value = '';
       if (isVariable) {
