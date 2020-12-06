@@ -109,9 +109,9 @@
           <template v-if="permissions.length > 0 && Object.keys(settings).includes('__permission_based__') && settings['__permission_based__'][category]">
             <div :key="category + '__permission_based__#1'">
               <b-card no-body>
-                <b-tabs pills card vertical>
-                  <b-tab v-for="permission of orderBy(getNotIgnoredPermissions(permissions, settings['__permission_based__'][category]), 'order', 'desc')" :key="permission.id + update" :title="permission.name" @click="update = Date.now()">
-                    <b-card-text :key="update">
+                <b-tabs pills card vertical lazy> <!-- set lazy as it will force to repaint on click -->
+                  <b-tab v-for="permission of orderBy(getNotIgnoredPermissions(permissions, settings['__permission_based__'][category]), 'order', 'desc')" :key="'b-tab' + category + permission.id" :title="permission.name">
+                    <b-card-text :key="'b-card-text' + category + permission.id">
                       <template v-for="(currentValue, defaultValue) of settings['__permission_based__'][category]">
                         <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " :key="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue + String(currentValue[permission.id] === null)">
                           <div class="d-flex pt-1 pb-1">
@@ -300,7 +300,7 @@ export default class interfaceSettings extends Vue {
   ui: any = {};
   isDataChanged: boolean = false;
   isDataChangedCheck: boolean = true;
-  update = Date.now();
+  update = {};
   error: string | null = null;
   showError: boolean = false;
 

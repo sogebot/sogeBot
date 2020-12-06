@@ -38,12 +38,12 @@ class Moderation extends System {
   cListsWhitelist: string[] = [];
   @settings('lists')
   cListsBlacklist: string[] = [];
-  @permission_settings('lists', [ permission.CASTERS ])
+  @permission_settings('lists', [ permission.CASTERS ], { [permission.MODERATORS]: false })
   cListsEnabled = true;
   @permission_settings('lists', [ permission.CASTERS ])
   cListsTimeout = 120;
 
-  @permission_settings('links', [ permission.CASTERS ])
+  @permission_settings('links', [ permission.CASTERS ], { [permission.MODERATORS]: false })
   cLinksEnabled = true;
   @permission_settings('links', [ permission.CASTERS ])
   cLinksIncludeSpaces = false;
@@ -52,7 +52,7 @@ class Moderation extends System {
   @permission_settings('links', [ permission.CASTERS ])
   cLinksTimeout = 120;
 
-  @permission_settings('symbols', [ permission.CASTERS ])
+  @permission_settings('symbols', [ permission.CASTERS ], { [permission.MODERATORS]: false })
   cSymbolsEnabled = true;
   @permission_settings('symbols', [ permission.CASTERS ])
   cSymbolsTriggerLength = 15;
@@ -63,14 +63,14 @@ class Moderation extends System {
   @permission_settings('symbols', [ permission.CASTERS ])
   cSymbolsTimeout = 120;
 
-  @permission_settings('longMessage', [ permission.CASTERS ])
+  @permission_settings('longMessage', [ permission.CASTERS ], { [permission.MODERATORS]: false })
   cLongMessageEnabled = true;
   @permission_settings('longMessage', [ permission.CASTERS ])
   cLongMessageTriggerLength = 300;
   @permission_settings('longMessage', [ permission.CASTERS ])
   cLongMessageTimeout = 120;
 
-  @permission_settings('caps', [ permission.CASTERS ])
+  @permission_settings('caps', [ permission.CASTERS ], { [permission.MODERATORS]: false })
   cCapsEnabled = true;
   @permission_settings('caps', [ permission.CASTERS ])
   cCapsTriggerLength = 15;
@@ -79,7 +79,7 @@ class Moderation extends System {
   @permission_settings('caps', [ permission.CASTERS ])
   cCapsTimeout = 120;
 
-  @permission_settings('spam', [ permission.CASTERS ])
+  @permission_settings('spam', [ permission.CASTERS ], { [permission.MODERATORS]: false })
   cSpamEnabled = true;
   @permission_settings('spam', [ permission.CASTERS ])
   cSpamTriggerLength = 15;
@@ -88,12 +88,12 @@ class Moderation extends System {
   @permission_settings('spam', [ permission.CASTERS ])
   cSpamTimeout = 300;
 
-  @permission_settings('color', [ permission.CASTERS ])
+  @permission_settings('color', [ permission.CASTERS ], { [permission.MODERATORS]: false })
   cColorEnabled = true;
   @permission_settings('color', [ permission.CASTERS ])
   cColorTimeout = 300;
 
-  @permission_settings('emotes', [ permission.CASTERS ])
+  @permission_settings('emotes', [ permission.CASTERS ], { [permission.MODERATORS]: false })
   cEmotesEnabled = true;
   @permission_settings('emotes', [ permission.CASTERS ])
   cEmotesEmojisAreEmotes = true;

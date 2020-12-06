@@ -142,7 +142,7 @@ export function settings(category?: string, isReadOnly = false) {
 }
 
 
-export function permission_settings(category?: string, exclude: string[] = []) {
+export function permission_settings(category?: string, exclude: string[] = [], enforcedDefaultValue?: { [permId: string]: any }) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: any, key: string) => {
@@ -171,14 +171,27 @@ export function permission_settings(category?: string, exclude: string[] = []) {
             setTimeout(() => loadVariableValue(), 1000);
             return;
           }
-          self.loadVariableValue('__permission_based__' + key).then((value: { [permissionId: string]: string }) => {
-            if (typeof value !== 'undefined') {
-              for (const exKey of exclude) {
-                value[exKey] = '%%%%___ignored___%%%%';
-              }
-              VariableWatcher.add(`${type}.${name}.__permission_based__${key}`, value, false);
-              _.set(self, '__permission_based__' + key, value);
+          self.loadVariableValue('__permission_based__' + key).then((value?: { [permissionId: string]: string }) => {
+            if (typeof value === 'undefined') {
+              value = {};
             }
+
+            for (const exKey of exclude) {
+              value[exKey] = '%%%%___ignored___%%%%';
+            }
+
+            // set forced default value
+            if (enforcedDefaultValue) {
+              for (const enforcedKey of Object.keys(enforcedDefaultValue)) {
+                if (typeof value[enforcedKey] === 'undefined' || value[enforcedKey] === null) {
+                  // change only if value is not set manually
+                  value[enforcedKey] = enforcedDefaultValue[enforcedKey];
+                }
+              }
+            }
+
+            VariableWatcher.add(`${type}.${name}.__permission_based__${key}`, value, false);
+            _.set(self, '__permission_based__' + key, value);
             loadingInProgress = loadingInProgress.filter(o => o !== `${type}.${name}.${key}`);
           });
         };
