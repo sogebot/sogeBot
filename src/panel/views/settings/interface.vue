@@ -459,7 +459,6 @@ export default class interfaceSettings extends Vue {
         // everything else except commands and enabled and are objects -> own category
         for (let [category, obj] of filter(settingsEntries, o => o[0][0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && !Array.isArray(o[1]))) {
           for (const [name, value] of Object.entries(obj)) {
-            console.log({category, name, value});
             set(settings, `${category}.${name}`, (value as any)[0]);
             this.defaultValues[name] = (value as any)[1];          }
         }
@@ -472,6 +471,7 @@ export default class interfaceSettings extends Vue {
                 settings.__permission_based__ = { ...settings.__permission_based__, [category]: {} };
               }
               settings.__permission_based__[category] = { ...settings.__permission_based__[category], [key]: value[category][key][0] }
+              this.defaultValues[key] = value[category][key][1]
             }
           }
         }

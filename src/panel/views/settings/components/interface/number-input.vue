@@ -10,7 +10,7 @@
       </span>
     </div>
     <input :min="min" :max="max" v-on:input="update" @focus="show = true" @blur="show = false" v-model="currentValue" :step="step || 1" type="number" class="form-control" :readonly="readonly" />
-    <div class="input-group-append" v-if="defaultValue !== currentValue">
+    <div class="input-group-append" v-if="defaultValue !== currentValue && !readonly">
       <b-button @click="currentValue = defaultValue; update()">
         <fa icon="history" fixed-width/>
       </b-button>
