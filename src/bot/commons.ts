@@ -4,7 +4,7 @@ import { join, normalize } from 'path';
 
 import { chatOut, debug, isDebugEnabled, warning, whisperOut } from './helpers/log';
 import { globalIgnoreList } from './data/globalIgnoreList';
-import { error } from './helpers/log';
+import { error, info } from './helpers/log';
 
 import oauth from './oauth';
 import { translate } from './translate';
@@ -258,18 +258,23 @@ export async function message(type: 'say' | 'whisper' | 'me', username: string |
 }
 
 /* TODO: move to tmi */
-export async function timeout(username: string, reason: string, timeMs: number, isMod: boolean) {
+export async function timeout(username: string, reason: string, seconds: number, isMod: boolean) {
   if (reason) {
     reason = reason.replace(/\$sender/g, username);
   }
   if (isMod) {
     if (tmi.client.broadcaster) {
-      tmi.client.broadcaster.chat.timeout(oauth.generalChannel, username, timeMs, reason);
+      tmi.client.broadcaster.chat.timeout(oauth.generalChannel, username, seconds, reason);
+      info(`Bot will set mod status for ${username} after ${seconds} seconds.`);
+      setTimeout(() => {
+        // we need to remod user
+        tmi.client.broadcaster?.chat.say(oauth.generalChannel, '/mod ' + username);
+      }, (seconds * 1000) + 1000);
     } else {
       error('Cannot timeout mod user, as you don\'t have set broadcaster in chat');
     }
   } else {
-    tmi.client.bot?.chat.timeout(oauth.generalChannel, username, timeMs, reason);
+    tmi.client.bot?.chat.timeout(oauth.generalChannel, username, seconds, reason);
   }
 }
 
