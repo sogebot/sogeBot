@@ -26,7 +26,7 @@
       <template v-slot:right>
         <b-alert show variant="info" v-if="pending" v-html="translate('dialog.changesPending')" class="mr-2 p-2 mb-0"></b-alert>
         <b-alert show variant="danger" v-if="error" v-html="error" class="mr-2 p-2 mb-0"></b-alert>
-        <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$error"/>
+        <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$invalid && !!$v.$dirty"/>
       </template>
     </panel>
 
@@ -53,8 +53,36 @@
             </b-form-group>
           </div>
           <div class="form-row pl-2 pr-2">
+            <b-form-group
+              class="w-100"
+              :label="translate('registry.textoverlay.refreshRate')"
+              label-for="refreshRate"
+            >
+              <b-input-group>
+                <template #append>
+                  <b-input-group-text >{{translate('seconds')}}</b-input-group-text>
+                </template>
+
+                <b-form-input
+                  id="refreshRate"
+                  v-model.number="refreshRate"
+                  type="number"
+                  min="-1"
+                  :state="$v.refreshRate.$invalid && $v.refreshRate.$dirty ? false : null"
+                  @update="$v.$touch()"
+                ></b-form-input>
+              </b-input-group>
+              <b-form-invalid-feedback :state="!($v.refreshRate.$invalid && $v.refreshRate.$dirty)">
+                <template v-if="!$v.refreshRate.required">{{ translate('errors.value_cannot_be_empty') }}</template>
+                <template v-else-if="!$v.refreshRate.cannotBeZero">{{ translate('errors.value_cannot_be').replace('$value', '0') }}</template>
+                <template v-else-if="!$v.refreshRate.minValue">{{ translate('errors.minValue_of_value_is').replace('$value', '-1') }}</template>
+              </b-form-invalid-feedback>
+              <b-form-text id="input-live-help">{{ translate('registry.textoverlay.refreshRateHelpText') }}</b-form-text>
+            </b-form-group>
+          </div>
+          <div class="form-row pl-2 pr-2">
             <div class="form-group col">
-              <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">EXTERNAL JS</label>
+              <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">External JS</label>
 
               <div class="input-group mb-3">
                 <input type="text" class="form-control" placeholder="e.g. https://code.jquery.com/jquery-3.3.1.min.js" v-model="externalJsInput">
@@ -115,7 +143,7 @@ import { codemirror } from 'vue-codemirror';
 import 'codemirror/lib/codemirror.css';
 
 import { Validate } from 'vuelidate-property-decorators';
-import { required } from 'vuelidate/lib/validators'
+import { required, minValue } from 'vuelidate/lib/validators'
 
 import { v4 as uuid } from 'uuid';
 import { TextInterface } from '../../../../bot/database/entity/text';
@@ -145,8 +173,11 @@ export default class textOverlayEdit extends Vue {
   js: string =  'function onLoad() { // triggered on page load\n\n}\n\nfunction onChange() { // triggered on variable change\n\n}';
   css: string =  '';
   external: string[] = [];
+  @Validate({ required, minValue: minValue(-1), cannotBeZero: (value: number) => value !== 0 })
+  refreshRate = 5;
 
   @Watch('name')
+  @Watch('refreshRate')
   @Watch('html')
   @Watch('js')
   @Watch('css')
@@ -216,6 +247,7 @@ export default class textOverlayEdit extends Vue {
         this.js = data.js
         this.css = data.css
         this.external = data.external || []
+        this.refreshRate = data.refreshRate;
         this.$nextTick(() => { this.pending = false })
         this.state.loaded = true
       })
@@ -248,6 +280,7 @@ export default class textOverlayEdit extends Vue {
       const data = {
         id: this.id,
         name: this.name,
+        refreshRate: this.refreshRate,
         text: this.html,
         js: this.js,
         css: this.css,

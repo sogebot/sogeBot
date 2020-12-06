@@ -14,6 +14,8 @@ export default defineComponent({
     const js = ref(null as any);
     const css = ref(null as any);
     const external = ref(false);
+    const refreshRate = ref(5);
+    const lastRefreshAt = ref(Date.now());
 
     const onChange = () => {
       if (js.value) {
@@ -24,11 +26,11 @@ export default defineComponent({
       }
     };
 
-    const refresh = (forceRefresh = false) => {
+    const refresh = () => {
       if (ctx.root.$route.params.id) {
-        socket.emit('generic::getOne', { id: ctx.root.$route.params.id, parseText: true, forceRefresh }, (err: string | null, cb: { external: string, text: string, js: string, css: string }) => {
+        socket.emit('generic::getOne', { id: ctx.root.$route.params.id, parseText: true }, (err: string | null, cb: { refreshRate: number, external: string, text: string, js: string, css: string }) => {
           if (err) {
-            return console.warn(err);
+            return console.error(err);
           }
           if (!cb) {
             return console.warn('No text overlay found with id ' + ctx.root.$route.params.id);
@@ -43,6 +45,9 @@ export default defineComponent({
             }
             external.value = true
           }
+
+          refreshRate.value = cb.refreshRate * 1000;
+          lastRefreshAt.value = Date.now();
 
           setTimeout(() => {
             const isChanged = text.value !== '' && text.value !== cb.text;
@@ -62,8 +67,17 @@ export default defineComponent({
     };
 
     onMounted(() => {
-      refresh(true);
-      setInterval(() => refresh(false), 1000);
+      refresh();
+      const interval = setInterval(() => {
+        if (refreshRate.value === -1000) {
+          console.warn('This resource refresh is disabled.');
+          clearInterval(interval);
+        } else {
+          if (Date.now() - lastRefreshAt.value >= refreshRate.value) {
+            refresh()
+          }
+        }
+      }, 200);
     });
 
     watch(css, (val: string) => {
