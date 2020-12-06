@@ -1,6 +1,9 @@
 {
   "new": "Создать новый текстовый оверлей",
   "title": "текстовый оверлей",
+  "refreshRate": "Refresh rate",
+  "refreshRateIs": "Refresh rate is",
+  "refreshRateHelpText": "To disable refresh rate set as -1.",
   "name": {
     "placeholder": "Задайте имя вашего текстового оверлея"
   }
