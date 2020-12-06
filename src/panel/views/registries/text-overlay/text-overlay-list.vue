@@ -52,6 +52,10 @@
 
       <div class="card-body border-top p-0 text-right">
         <div class="btn-group" role="group">
+          <div class="m-0 p-3 alert">
+            <span v-if="item.refreshRate === -1"> {{ translate('registry.textoverlay.refreshRateIs') }} {{ translate('disabled').toLowerCase() }}</span>
+            <span v-else>{{ translate('registry.textoverlay.refreshRateIs') }} {{ item.refreshRate }}s</span>
+          </div>
           <button class="btn btn-outline-dark p-3 border-0" @click="toggleShowMore(item.id)">
             <fa class="mr-1" :icon="!showMore.includes(item.id) ? 'ellipsis-h' : 'ellipsis-v'"></fa> {{ !showMore.includes(item.id) ? translate('commons.show-more') : translate('commons.show-less') }}</button>
           <a v-bind:href="'/overlays/text/'+ item.id" class="btn btn-outline-dark p-3 border-0" target="_blank"><fa icon="link"></fa> /overlays/text/{{ item.id }}</a>
