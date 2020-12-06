@@ -1,9 +1,9 @@
 {
   "new": "Vytvořte nový textový overlay",
   "title": "textový overlay",
-  "refreshRate": "Refresh rate",
-  "refreshRateIs": "Refresh rate is",
-  "refreshRateHelpText": "To disable refresh rate set as -1.",
+  "refreshRate": "Obnovovací frekvence",
+  "refreshRateIs": "Obnovovací frekvence je",
+  "refreshRateHelpText": "Pro vypnutí obnovovací frekvence nastavte na -1.",
   "name": {
     "placeholder": "Nastavte název textového overlaye"
   }
