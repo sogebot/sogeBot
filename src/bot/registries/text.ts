@@ -6,6 +6,8 @@ import { getRepository } from 'typeorm';
 import { Text as TextEntity } from '../database/entity/text';
 import customvariables from '../customvariables';
 
+const refreshMap = new Map<string, number>();
+
 class Text extends Registry {
   constructor () {
     super();
@@ -41,16 +43,36 @@ class Text extends Registry {
         cb(e.stack, null);
       }
     });
-    publicEndpoint(this.nsp, 'generic::getOne', async (opts: { id: any; parseText: boolean }, callback) => {
+    publicEndpoint(this.nsp, 'generic::getOne', async (opts: { id: any; parseText: boolean, forceRefresh: boolean }, callback) => {
       try {
+        if (opts.forceRefresh) {
+          refreshMap.set(opts.id, 0);
+        }
+
+        // update every 5s or fail
+        const gate = 5;
+        const remainingSeconds = Math.round((Date.now() - (refreshMap.get(opts.id) ?? 0)) / 1000);
+        if (remainingSeconds < gate) {
+          throw new Error(`This resource can be updated in ${gate - remainingSeconds}s`);
+        }
+
         const item = await getRepository(TextEntity).findOneOrFail({ id: opts.id });
+        refreshMap.set(opts.id, Date.now());
+
         let text = item.text;
         if (opts.parseText) {
           text = await new Message(await customvariables.executeVariablesInText(text, null)).parse();
         }
+
+        // cleanup old refresh items
+        for (const [key, timestamp] of refreshMap.entries()) {
+          if (Date.now() - timestamp > 30000) {
+            refreshMap.delete(key);
+          }
+        }
         callback(null, {...item, text});
       } catch(e) {
-        callback(e, null);
+        callback(e.message, null);
       }
     });
   }
