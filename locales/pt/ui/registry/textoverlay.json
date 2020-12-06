@@ -1,6 +1,9 @@
 {
   "new": "Create new text overlay",
   "title": "text overlay",
+  "refreshRate": "Refresh rate",
+  "refreshRateIs": "Refresh rate is",
+  "refreshRateHelpText": "To disable refresh rate set as -1.",
   "name": {
     "placeholder": "Set your text overlay name"
   }
