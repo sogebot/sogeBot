@@ -2,11 +2,13 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { default as tz } from 'dayjs/plugin/timezone';
 dayjs.extend(utc);
 dayjs.extend(tz);
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
+dayjs.extend(customParseFormat);
 
 require('dayjs/locale/cs');
 require('dayjs/locale/de');

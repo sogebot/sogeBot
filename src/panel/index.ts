@@ -137,8 +137,9 @@ const main = async () => {
         { path: '/manage/spotify/bannedsongs', name: 'spotifyManagerBannedsongs', component: () => import('./views/managers/spotify/spotify-bannedsongs.vue') },
         { path: '/manage/timers/list', name: 'TimersManagerList', component: () => import('./views/managers/timers/timers-list.vue') },
         { path: '/manage/timers/edit/:id?', name: 'TimersManagerEdit', component: () => import('./views/managers/timers/timers-edit.vue') },
-        { path: '/manage/viewers/list', name: 'viewersManagerList', component: () => import('./views/managers/viewers/viewers-list.vue') },
-        { path: '/manage/viewers/edit/:id?', name: 'viewersManagerEdit', component: () => import('./views/managers/viewers/viewers-edit.vue') },
+        { path: '/manage/viewers/', redirect: '/manage/viewers/list' },
+        { path: '/manage/viewers/list', name: 'viewersManagerList', component: () => import('./views/managers/viewers.vue') },
+        { path: '/manage/viewers/edit/:id?', name: 'viewersManagerEdit', component: () => import('./views/managers/viewers.vue') },
 
         { path: '/settings/permissions/:id?', name: 'PermissionsSettings', component: () => import('./views/settings/permissions.vue') },
         { path: '/settings/translations', name: 'TranslationsSettings', component: () => import('./views/settings/translations.vue') },
