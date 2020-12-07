@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import Game from './_interface';
-import { command, persistent, settings } from '../decorators';
+import { command, permission_settings, persistent, settings } from '../decorators';
 import { prepare } from '../commons';
 import { error } from '../helpers/log';
 
@@ -9,11 +9,20 @@ import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
 import { translate } from '../translate';
 import pointsSystem from '../systems/points';
+import permissions from '../permissions';
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0';
 const ERROR_ZERO_BET = '1';
 const ERROR_NOT_ENOUGH_POINTS = '2';
-const ERROR_MINIMAL_BET = '3';
+const ERROR_UNKNOWN_USER_PERMISSION = 'Unknown user permission';
+
+class MinimalBetError extends Error {
+  constructor(message: string) {
+    super(message);
+    Error.captureStackTrace(this, MinimalBetError);
+    this.name = 'MinimalBetError';
+  }
+}
 
 /*
  * !gamble [amount] - gamble [amount] points with `chanceToWin` chance
@@ -22,19 +31,19 @@ const ERROR_MINIMAL_BET = '3';
 class Gamble extends Game {
   dependsOn = [ pointsSystem ];
 
-  @settings()
+  @permission_settings('settings')
   minimalBet = 0;
-  @settings()
+  @permission_settings('settings')
   chanceToWin = 50;
-
-  @settings('jackpot')
-  enableJackpot = false;
-  @settings('jackpot')
-  maxJackpotValue = 10000;
-  @settings('jackpot')
-  lostPointsAddedToJackpot = 20;
-  @settings('jackpot')
+  @permission_settings('settings')
   chanceToTriggerJackpot = 5;
+
+  @settings()
+  enableJackpot = false;
+  @settings()
+  maxJackpotValue = 10000;
+  @settings()
+  lostPointsAddedToJackpot = 20;
   @persistent()
   jackpotValue = 0;
 
@@ -49,6 +58,11 @@ class Gamble extends Game {
         throw Error(ERROR_NOT_ENOUGH_OPTIONS);
       }
 
+      const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
+      if (permId === null) {
+        throw new Error(ERROR_UNKNOWN_USER_PERMISSION);
+      }
+
       const pointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
       points = parsed[1] === 'all' ? pointsOfUser : Number(parsed[1]);
 
@@ -58,12 +72,17 @@ class Gamble extends Game {
       if (pointsOfUser < points) {
         throw Error(ERROR_NOT_ENOUGH_POINTS);
       }
-      if (points < (this.minimalBet)) {
-        throw Error(ERROR_MINIMAL_BET);
+
+      const minimalBet = await this.getPermissionBasedSettingsValue('minimalBet');
+      if (points < minimalBet[permId]) {
+        throw new MinimalBetError(String(minimalBet[permId]));
       }
 
       await pointsSystem.decrement({ userId: Number(opts.sender.userId) }, points);
-      if (this.enableJackpot && _.random(0, 100, false) <= this.chanceToTriggerJackpot) {
+
+      const chanceToWin = await this.getPermissionBasedSettingsValue('chanceToWin');
+      const chanceToTriggerJackpot = await this.getPermissionBasedSettingsValue('chanceToTriggerJackpot');
+      if (this.enableJackpot && _.random(0, 100, false) <= chanceToTriggerJackpot[permId]) {
         const incrementPointsWithJackpot = (points * 2) + this.jackpotValue;
         await getRepository(User).increment({ userId: Number(opts.sender.userId) }, 'points', incrementPointsWithJackpot);
         const currentPointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
@@ -74,7 +93,7 @@ class Gamble extends Game {
           jackpot: this.jackpotValue,
         });
         this.jackpotValue = 0;
-      } else  if (_.random(0, 100, false) <= this.chanceToWin) {
+      } else if (_.random(0, 100, false) <= chanceToWin[permId]) {
         await getRepository(User).increment({ userId: Number(opts.sender.userId) }, 'points', points * 2);
         const updatedPoints = await pointsSystem.getPointsOf(opts.sender.userId);
         message = prepare('gambling.gamble.win', {
@@ -100,30 +119,31 @@ class Gamble extends Game {
       }
       return [{ response: message, ...opts }];
     } catch (e) {
-      switch (e.message) {
-        case ERROR_ZERO_BET:
-          message = prepare('gambling.gamble.zeroBet', {
-            pointsName: await pointsSystem.getPointsName(0),
-          });
-          return [{ response: message, ...opts }];
-        case ERROR_NOT_ENOUGH_OPTIONS:
-          return [{ response: translate('gambling.gamble.notEnoughOptions'), ...opts }];
-        case ERROR_NOT_ENOUGH_POINTS:
-          message = prepare('gambling.gamble.notEnoughPoints', {
-            pointsName: await pointsSystem.getPointsName(points ? Number(points) : 0),
-            points: points,
-          });
-          return [{ response: message, ...opts }];
-        case ERROR_MINIMAL_BET:
-          points = this.minimalBet;
-          message = prepare('gambling.gamble.lowerThanMinimalBet', {
-            pointsName: await pointsSystem.getPointsName(points),
-            points: points,
-          });
-          return [{ response: message, ...opts }];
-        default:
-          error(e.stack);
-          return [{ response: translate('core.error'), ...opts }];
+      if (e instanceof MinimalBetError) {
+        message = prepare('gambling.gamble.lowerThanMinimalBet', {
+          pointsName: await pointsSystem.getPointsName(Number(e.message)),
+          points: Number(e.message),
+        });
+        return [{ response: message, ...opts }];
+      } else {
+        switch (e.message) {
+          case ERROR_ZERO_BET:
+            message = prepare('gambling.gamble.zeroBet', {
+              pointsName: await pointsSystem.getPointsName(0),
+            });
+            return [{ response: message, ...opts }];
+          case ERROR_NOT_ENOUGH_OPTIONS:
+            return [{ response: translate('gambling.gamble.notEnoughOptions'), ...opts }];
+          case ERROR_NOT_ENOUGH_POINTS:
+            message = prepare('gambling.gamble.notEnoughPoints', {
+              pointsName: await pointsSystem.getPointsName(points ? Number(points) : 0),
+              points: points,
+            });
+            return [{ response: message, ...opts }];
+          default:
+            error(e.stack);
+            return [{ response: translate('core.error'), ...opts }];
+        }
       }
     }
   }
