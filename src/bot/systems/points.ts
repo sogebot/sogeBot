@@ -454,7 +454,13 @@ class Points extends System {
   async get (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
-      const user = await getRepository(User).findOne({ username });
+
+      let user: Readonly<Required<UserInterface>> | undefined;
+      if (opts.sender.username === username) {
+        user = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
+      } else {
+        user = await getRepository(User).findOne({ username });
+      }
 
       if (!user) {
         const userId = await api.getIdFromTwitch(username);
@@ -474,11 +480,11 @@ class Points extends System {
         switch(type) {
           case 'postgres':
           case 'better-sqlite3':
-            return `SELECT COUNT(*) as "order" FROM "user" WHERE "points" > (SELECT "points" FROM "user" WHERE "username"='${user.username}') AND "username"!='${oauth.broadcasterUsername}'`;
+            return `SELECT COUNT(*) as "order" FROM "user" WHERE "points" > (SELECT "points" FROM "user" WHERE "userId"=${user?.userId}) AND "username"!='${oauth.broadcasterUsername}'`;
           case 'mysql':
           case 'mariadb':
           default:
-            return `SELECT COUNT(*) as \`order\` FROM \`user\` WHERE \`points\` > (SELECT \`points\` FROM \`user\` WHERE \`username\`="${user.username}") AND "username"!='${oauth.broadcasterUsername}'`;
+            return `SELECT COUNT(*) as \`order\` FROM \`user\` WHERE \`points\` > (SELECT \`points\` FROM \`user\` WHERE \`userId\`=${user?.userId}) AND "username"!='${oauth.broadcasterUsername}'`;
         }
       };
 
