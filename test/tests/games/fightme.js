@@ -5,6 +5,7 @@ require('../../general.js');
 const assert = require('assert');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
+const time = require('../../general.js').time;
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
@@ -59,6 +60,33 @@ const tests = [
 ];
 
 describe('game/fightme - !fightme', () => {
+  describe('Challenge should be removed after a while', () => {
+    before(async () => {
+      await db.cleanup();
+      await message.prepare();
+      await getRepository(User).save({ userId: 10, username: 'user10' });
+      await getRepository(User).save({ userId: 11, username: 'user11' });
+    });
+
+    it('Challenger is starting !fightme', async () => {
+      await fightme.main({ command, sender: { userId: 10, username: 'user10' }, parameters: 'user11' });
+    });
+
+    it('Challenge should be saved', () => {
+      const fightMeChallenges = (require('../../../dest/games/fightme')).fightMeChallenges;
+      assert.strictEqual(fightMeChallenges.length, 1);
+    });
+
+    it('We need to wait at least 2 minutes ', async () => {
+      await time.waitMs(60000 * 2.5);
+    });
+
+    it('Challenges should be empty', () => {
+      const fightMeChallenges = (require('../../../dest/games/fightme')).fightMeChallenges;
+      assert.strictEqual(fightMeChallenges.length, 0);
+    });
+  });
+
   describe('Doubled challenge should not add to challenge, but refresh time', () => {
     let removeAt = 0;
 
