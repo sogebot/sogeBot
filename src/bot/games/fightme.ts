@@ -155,7 +155,6 @@ class FightMe extends Game {
       } else {
         isAlreadyChallenged.removeAt = Date.now() + (2 * MINUTE);
       }
-      console.log({fightMeChallenges});
       const response = prepare('gambling.fightme.challenge', { username: user.username, sender: opts.sender.username, command: opts.command });
       return [{ response, ...opts }];
     }

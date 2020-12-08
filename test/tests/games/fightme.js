@@ -10,7 +10,7 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const { prepare } = require('../../../dest/commons');
 
-const { default: fightme, fightMeChallenges}  = (require('../../../dest/games/fightme'));
+const fightme = (require('../../../dest/games/fightme')).default;
 const translate = require('../../../dest/translate').translate;
 
 const command = '!fightme';
@@ -59,7 +59,9 @@ const tests = [
 ];
 
 describe('game/fightme - !fightme', () => {
-  describe.only('Doubled challenge should not add to challenge', () => {
+  describe('Doubled challenge should not add to challenge, but refresh time', () => {
+    let removeAt = 0;
+
     before(async () => {
       await db.cleanup();
       await message.prepare();
@@ -72,16 +74,23 @@ describe('game/fightme - !fightme', () => {
     });
 
     it('Challenge should be saved', () => {
-      console.log({fightMeChallenges});
+      const fightMeChallenges = (require('../../../dest/games/fightme')).fightMeChallenges;
       assert.strictEqual(fightMeChallenges.length, 1);
+      removeAt = fightMeChallenges[0].removeAt;
     });
 
     it('Challenger is starting !fightme again ', async () => {
       await fightme.main({ command, sender: { userId: 10, username: 'user10' }, parameters: 'user11' });
     });
 
-    it('We are expecting not changed challenges', () => {
+    it('We are not expecting additional challenge', () => {
+      const fightMeChallenges = (require('../../../dest/games/fightme')).fightMeChallenges;
       assert.strictEqual(fightMeChallenges.length, 1);
+    });
+
+    it('We are expecting updated removeAt time', () => {
+      const fightMeChallenges = (require('../../../dest/games/fightme')).fightMeChallenges;
+      assert.notStrictEqual(fightMeChallenges[0].removeAt, removeAt);
     });
   });
 
