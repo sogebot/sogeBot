@@ -15,7 +15,7 @@ import points from '../systems/points';
  * !fightme [user] - challenge [user] to fight
  */
 
-let fightMeChallenges: {
+export let fightMeChallenges: {
   challenger: string; opponent: string; removeAt: number;
 }[] = [];
 
@@ -152,6 +152,8 @@ class FightMe extends Game {
           opponent: user.username,
           removeAt: Date.now() + (2 * MINUTE),
         });
+      } else {
+        isAlreadyChallenged.removeAt = Date.now() + (2 * MINUTE);
       }
       const response = prepare('gambling.fightme.challenge', { username: user.username, sender: opts.sender.username, command: opts.command });
       return [{ response, ...opts }];

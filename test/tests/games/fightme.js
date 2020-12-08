@@ -5,6 +5,7 @@ require('../../general.js');
 const assert = require('assert');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
+const time = require('../../general.js').time;
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
@@ -59,6 +60,73 @@ const tests = [
 ];
 
 describe('game/fightme - !fightme', () => {
+  describe('Challenge should be removed after a while', () => {
+    before(async () => {
+      await db.cleanup();
+      await message.prepare();
+      await getRepository(User).save({ userId: 10, username: 'user10' });
+      await getRepository(User).save({ userId: 11, username: 'user11' });
+    });
+
+    it('Challenger is starting !fightme', async () => {
+      await fightme.main({ command, sender: { userId: 10, username: 'user10' }, parameters: 'user11' });
+    });
+
+    it('Challenge should be saved', () => {
+      const fightMeChallenges = (require('../../../dest/games/fightme')).fightMeChallenges;
+      assert.strictEqual(fightMeChallenges.length, 1);
+    });
+
+    it('We need to wait at least 2.5 minutes', async() =>{
+      const steps = 100;
+      process.stdout.write(`\t... waiting ${(60 * 2.5)}s ...                `);
+      for (let i = 0; i < steps; i++) {
+        await time.waitMs((60000 * 2.5) / steps);
+        process.stdout.write(`\r\t... waiting ${(60 * 2.5) - (((60 * 2.5) / steps) * i)}s ...                `);
+      }
+    }).timeout(60000 * 3);
+
+    it('Challenges should be empty', () => {
+      const fightMeChallenges = (require('../../../dest/games/fightme')).fightMeChallenges;
+      assert.strictEqual(fightMeChallenges.length, 0);
+    });
+  });
+
+  describe('Doubled challenge should not add to challenge, but refresh time', () => {
+    let removeAt = 0;
+
+    before(async () => {
+      await db.cleanup();
+      await message.prepare();
+      await getRepository(User).save({ userId: 10, username: 'user10' });
+      await getRepository(User).save({ userId: 11, username: 'user11' });
+    });
+
+    it('Challenger is starting !fightme', async () => {
+      await fightme.main({ command, sender: { userId: 10, username: 'user10' }, parameters: 'user11' });
+    });
+
+    it('Challenge should be saved', () => {
+      const fightMeChallenges = (require('../../../dest/games/fightme')).fightMeChallenges;
+      assert.strictEqual(fightMeChallenges.length, 1);
+      removeAt = fightMeChallenges[0].removeAt;
+    });
+
+    it('Challenger is starting !fightme again ', async () => {
+      await fightme.main({ command, sender: { userId: 10, username: 'user10' }, parameters: 'user11' });
+    });
+
+    it('We are not expecting additional challenge', () => {
+      const fightMeChallenges = (require('../../../dest/games/fightme')).fightMeChallenges;
+      assert.strictEqual(fightMeChallenges.length, 1);
+    });
+
+    it('We are expecting updated removeAt time', () => {
+      const fightMeChallenges = (require('../../../dest/games/fightme')).fightMeChallenges;
+      assert.notStrictEqual(fightMeChallenges[0].removeAt, removeAt);
+    });
+  });
+
   for (const test of tests) {
     describe(`challenger: ${test.challenger.username} | challenging: ${test.challenging.username} => ${test.expected}`, async () => {
       let responses = [];
