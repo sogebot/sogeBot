@@ -16,6 +16,8 @@ async function retest() {
         console.log('\t=> Re-Running ' + suite + ' tests')
         console.log('------------------------------------------------------------------------------')
         const p = child_process.spawn('npx', [
+          'nyc',
+          '--reporter=lcov',
           'mocha',
           '-r', 'source-map-support/register',
           '--timeout', '60000',
