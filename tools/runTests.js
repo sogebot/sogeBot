@@ -69,12 +69,14 @@ async function retest() {
 async function test() {
   await new Promise((resolve) => {
     const p = child_process.spawn('npx', [
+      'nyc',
+      '--reporter=lcov',
       'mocha',
       '-r', 'source-map-support/register',
       '--timeout', '60000',
       '--exit',
       '--recursive',
-      'test/'
+      'test/tests/commands/add.js'
     ], {
       shell: true,
     });

@@ -171,6 +171,7 @@
     "minimist": "1.2.5",
     "mocha": "8.2.1",
     "node-sass": "5.0.0",
+    "nyc": "15.1.0",
     "postcss": "8.1.14",
     "postcss-cli": "8.3.0",
     "prismjs": "1.22.0",
