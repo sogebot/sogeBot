@@ -10,7 +10,7 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const { prepare } = require('../../../dest/commons');
 
-const fightme = (require('../../../dest/games/fightme')).default;
+const { default: fightme, fightMeChallenges}  = (require('../../../dest/games/fightme'));
 const translate = require('../../../dest/translate').translate;
 
 const command = '!fightme';
@@ -59,6 +59,32 @@ const tests = [
 ];
 
 describe('game/fightme - !fightme', () => {
+  describe.only('Doubled challenge should not add to challenge', () => {
+    before(async () => {
+      await db.cleanup();
+      await message.prepare();
+      await getRepository(User).save({ userId: 10, username: 'user10' });
+      await getRepository(User).save({ userId: 11, username: 'user11' });
+    });
+
+    it('Challenger is starting !fightme', async () => {
+      await fightme.main({ command, sender: { userId: 10, username: 'user10' }, parameters: 'user11' });
+    });
+
+    it('Challenge should be saved', () => {
+      console.log({fightMeChallenges});
+      assert.strictEqual(fightMeChallenges.length, 1);
+    });
+
+    it('Challenger is starting !fightme again ', async () => {
+      await fightme.main({ command, sender: { userId: 10, username: 'user10' }, parameters: 'user11' });
+    });
+
+    it('We are expecting not changed challenges', () => {
+      assert.strictEqual(fightMeChallenges.length, 1);
+    });
+  });
+
   for (const test of tests) {
     describe(`challenger: ${test.challenger.username} | challenging: ${test.challenging.username} => ${test.expected}`, async () => {
       let responses = [];
