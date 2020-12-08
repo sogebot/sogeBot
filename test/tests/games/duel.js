@@ -194,7 +194,7 @@ describe('Gambling - duel', () => {
       await duel.pickDuelWinner();
     });
 
-    it('Timestamp should be reset', async () => {
+    it('timestamp should be reset', async () => {
       assert.strictEqual(duel._timestamp, 0);
     });
   });
