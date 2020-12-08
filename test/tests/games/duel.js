@@ -114,7 +114,7 @@ describe('Gambling - duel', () => {
     });
   });
 
-  describe.only('Create duel with zero bet', () => {
+  describe('Create duel with zero bet', () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
@@ -131,7 +131,7 @@ describe('Gambling - duel', () => {
     });
   });
 
-  describe.only('Create duel with not enough points', () => {
+  describe('Create duel with not enough points', () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
@@ -152,7 +152,7 @@ describe('Gambling - duel', () => {
     });
   });
 
-  describe.only('Create duel with not enough points', () => {
+  describe('Create duel with not enough points', () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
