@@ -77,8 +77,28 @@ describe('game/fightme - !fightme', () => {
       assert.strictEqual(fightMeChallenges.length, 1);
     });
 
-    it('We need to wait at least 2 minutes ', async () => {
-      await time.waitMs(60000 * 2.5);
+    it('We need to wait at least 2.5 minutes', async () => {
+      await time.waitMs(30000);
+    });
+
+    it('We need to wait at least 2.5 minutes', async () => {
+      await time.waitMs(30000);
+    });
+
+    it('We need to wait at least 2.5 minutes', async () => {
+      await time.waitMs(30000);
+    });
+
+    it('We need to wait at least 2.5 minutes', async () => {
+      await time.waitMs(30000);
+    });
+
+    it('We need to wait at least 2.5 minutes', async () => {
+      await time.waitMs(30000);
+    });
+
+    it('We need to wait at least 2.5 minutes', async () => {
+      await time.waitMs(30000);
     });
 
     it('Challenges should be empty', () => {
