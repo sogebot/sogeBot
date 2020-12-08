@@ -27,7 +27,7 @@ class Duel extends Game {
 
   @persistent()
   _timestamp = 0;
-  _cooldown = String(new Date());
+  _cooldown = Date.now();
 
   @settings()
   cooldown = 0;
@@ -58,13 +58,12 @@ class Duel extends Game {
     ]);
     const total = users.reduce((a, b) => a + b.tickets, 0);
 
-    if (timestamp === 0 || new Date().getTime() - timestamp < 1000 * 60 * duelDuration) {
+    if (timestamp === 0 || Date.now() - timestamp < 1000 * 60 * duelDuration) {
       this.timeouts.pickDuelWinner = global.setTimeout(() => this.pickDuelWinner(), 30000);
       return;
     }
 
-    if (total === 0 && new Date().getTime() - timestamp >= 1000 * 60 * duelDuration) {
-      await getRepository(DuelEntity).clear();
+    if (total === 0 && Date.now() - timestamp >= 1000 * 60 * duelDuration) {
       this._timestamp = 0;
       return;
     }
@@ -153,11 +152,11 @@ class Duel extends Game {
         // check if under gambling cooldown
         const cooldown = this.cooldown;
         const isMod = isModerator(opts.sender);
-        if (new Date().getTime() - new Date(this._cooldown).getTime() > cooldown * 1000
+        if (Date.now() - new Date(this._cooldown).getTime() > cooldown * 1000
           || (this.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {
           // save new cooldown if not bypassed
           if (!(this.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {
-            this._cooldown = String(new Date());
+            this._cooldown = Date.now();
           }
           await getRepository(DuelEntity).save({
             id: Number(opts.sender.userId),
@@ -167,8 +166,8 @@ class Duel extends Game {
           await points.decrement({ userId: Number(opts.sender.userId) }, bet);
         } else {
           const response = prepare('gambling.fightme.cooldown', {
-            minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60), translate('core.minutes')),
-            cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60),
+            minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (Date.now() - new Date(this._cooldown).getTime())) / 1000 / 60), translate('core.minutes')),
+            cooldown: Math.round(((cooldown * 1000) - (Date.now() - new Date(this._cooldown).getTime())) / 1000 / 60),
             command: opts.command });
           return [{ response, ...opts }];
         }
