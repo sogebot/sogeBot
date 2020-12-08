@@ -69,7 +69,7 @@ async function retest() {
   console.log('------------------------------------------------------------------------------')
   console.log('\t=> Merging coverage.json');
   console.log('------------------------------------------------------------------------------')
-  const p = child_process.spawn('npx', [
+  child_process.spawnSync('npx', [
     'nyc',
     'merge',
     './.nyc_output/',
