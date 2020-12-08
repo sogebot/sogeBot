@@ -73,7 +73,7 @@ async function retest() {
     'nyc',
     'merge',
     './.nyc_output/',
-    'coverage.json',
+    './coverage/coverage-final.json',
   ], {
     shell: true,
   });
