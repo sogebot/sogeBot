@@ -64,7 +64,6 @@ class Duel extends Game {
     }
 
     if (total === 0 && new Date().getTime() - timestamp >= 1000 * 60 * duelDuration) {
-      await getRepository(DuelEntity).clear();
       this._timestamp = 0;
       return;
     }
