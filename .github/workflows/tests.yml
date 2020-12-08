@@ -61,6 +61,12 @@ jobs:
     - name: Run mocha
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: npm test
+    - uses: codecov/codecov-action@v1
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+        name: codecov-sqlite # optional
+        flags: sqlite
   postgres:
     name: PostgreSQL tests
     needs: eslint
@@ -98,6 +104,12 @@ jobs:
     - name: Run mocha
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: npm test
+    - uses: codecov/codecov-action@v1
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+        name: codecov-postgres # optional
+        flags: postgres
   mysql:
     name: MySQL/MariaDB tests
     needs: eslint
@@ -137,6 +149,12 @@ jobs:
     - name: Run mocha
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       run: npm test
+    - uses: codecov/codecov-action@v1
+      if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+        name: codecov-mysql # optional
+        flags: mysql
   fullbuild:
     name: Make test
     needs: eslint

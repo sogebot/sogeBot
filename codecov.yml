@@ -1,0 +1,3 @@
+ignore:
+  - "src/bot/database"
+  - "src/bot/data"

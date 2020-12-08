@@ -16,6 +16,8 @@ async function retest() {
         console.log('\t=> Re-Running ' + suite + ' tests')
         console.log('------------------------------------------------------------------------------')
         const p = child_process.spawn('npx', [
+          'nyc',
+          '--clean=false',
           'mocha',
           '-r', 'source-map-support/register',
           '--timeout', '60000',
@@ -63,18 +65,33 @@ async function retest() {
       console.log('\n\t No tests to rerun :)\n\n')
     }
   }
+
+  console.log('------------------------------------------------------------------------------')
+  console.log('\t=> Merging coverage.json');
+  console.log('------------------------------------------------------------------------------')
+  child_process.spawnSync('npx', [
+    'nyc',
+    'merge',
+    './.nyc_output/',
+    './coverage/coverage-final.json',
+  ], {
+    shell: true,
+  });
   process.exit(status);
 }
 
 async function test() {
   await new Promise((resolve) => {
     const p = child_process.spawn('npx', [
+      'nyc',
+      '--reporter=json',
+      '--clean=false',
       'mocha',
       '-r', 'source-map-support/register',
       '--timeout', '60000',
       '--exit',
       '--recursive',
-      'test/'
+      'test/',
     ], {
       shell: true,
     });
