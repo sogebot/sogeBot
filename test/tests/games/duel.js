@@ -180,5 +180,22 @@ describe('Gambling - duel', () => {
     });
   });
 
+  describe('Duel should be cleared on pickDuelWinner()', () => {
+    before(async () => {
+      await db.cleanup();
+      await message.prepare();
+    });
 
+    it('set duel timestamp to 1 to clean up duel', async () => {
+      duel._timestamp = 1;
+    });
+
+    it('pickDuelWinner should clean duel', async () => {
+      await duel.pickDuelWinner();
+    });
+
+    it('Timestamp should be reset', async () => {
+      assert.strictEqual(duel._timestamp, 0);
+    });
+  });
 });
