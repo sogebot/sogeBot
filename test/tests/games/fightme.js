@@ -199,7 +199,7 @@ describe('game/fightme - !fightme', () => {
     });
   });
 
-  describe.only('FightMe is on cooldown without bypass by mods', () => {
+  describe('FightMe is on cooldown without bypass by mods', () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
@@ -233,7 +233,7 @@ describe('game/fightme - !fightme', () => {
     });
   });
 
-  describe.only('FightMe is on cooldown without bypass by mods', () => {
+  describe('FightMe is on cooldown without bypass by mods', () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
