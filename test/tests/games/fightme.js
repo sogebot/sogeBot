@@ -77,29 +77,12 @@ describe('game/fightme - !fightme', () => {
       assert.strictEqual(fightMeChallenges.length, 1);
     });
 
-    it('We need to wait at least 2.5 minutes', async () => {
-      await time.waitMs(30000);
-    });
-
-    it('We need to wait at least 2.5 minutes', async () => {
-      await time.waitMs(30000);
-    });
-
-    it('We need to wait at least 2.5 minutes', async () => {
-      await time.waitMs(30000);
-    });
-
-    it('We need to wait at least 2.5 minutes', async () => {
-      await time.waitMs(30000);
-    });
-
-    it('We need to wait at least 2.5 minutes', async () => {
-      await time.waitMs(30000);
-    });
-
-    it('We need to wait at least 2.5 minutes', async () => {
-      await time.waitMs(30000);
-    });
+    const steps = 20;
+    for (let i = 0; i < steps; i++) {
+      it(i === 0 ? 'We need to wait at least 2.5 minutes' : '.'.repeat(i), async () => {
+        await time.waitMs((60000 * 2.5) / steps);
+      });
+    }
 
     it('Challenges should be empty', () => {
       const fightMeChallenges = (require('../../../dest/games/fightme')).fightMeChallenges;
