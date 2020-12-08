@@ -24,7 +24,7 @@ setInterval(() => {
 }, MINUTE / 2);
 
 class FightMe extends Game {
-  _cooldown = String(new Date());
+  _cooldown = Date.now();
 
   @settings()
   timeout = 10;
@@ -128,18 +128,18 @@ class FightMe extends Game {
       // check if under gambling cooldown
       const cooldown = this.cooldown;
       const isMod = isModerator(opts.sender);
-      if (new Date().getTime() - new Date(this._cooldown).getTime() < cooldown * 1000
+      if (Date.now() - new Date(this._cooldown).getTime() < cooldown * 1000
         && !(this.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {
         return [{ response: prepare('gambling.fightme.cooldown', {
           command: opts.command,
-          cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60),
-          minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60), translate('core.minutes')),
+          cooldown: Math.round(((cooldown * 1000) - (Date.now() - new Date(this._cooldown).getTime())) / 1000 / 60),
+          minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (Date.now() - new Date(this._cooldown).getTime())) / 1000 / 60), translate('core.minutes')),
         }), ...opts }];
       }
 
       // save new timestamp if not bypassed
       if (!(this.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {
-        this._cooldown = String(new Date());
+        this._cooldown = Date.now();
       }
 
       const isAlreadyChallenged = fightMeChallenges.find(ch => {
