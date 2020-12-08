@@ -76,7 +76,7 @@ async function test() {
       '--timeout', '60000',
       '--exit',
       '--recursive',
-      'test/tests/commands/add.js'
+      'test/tests/',
     ], {
       shell: true,
     });
