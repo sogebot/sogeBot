@@ -79,10 +79,10 @@ describe('game/fightme - !fightme', () => {
 
     it('We need to wait at least 2.5 minutes', async() =>{
       const steps = 100;
-      process.stdout.write(`\t... waiting ${(60 * 2.5)}ms`);
+      process.stdout.write(`\t... waiting ${(60 * 2.5)}s ...                `);
       for (let i = 0; i < steps; i++) {
         await time.waitMs((60000 * 2.5) / steps);
-        process.stdout.write(`\r\t... waiting ${(60 * 2.5) - (((60 * 2.5) / steps) * i)}s`);
+        process.stdout.write(`\r\t... waiting ${(60 * 2.5) - (((60 * 2.5) / steps) * i)}s ...                `);
       }
     }).timeout(60000 * 3);
 
