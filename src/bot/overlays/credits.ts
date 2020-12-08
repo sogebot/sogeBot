@@ -65,7 +65,7 @@ class Credits extends Overlay {
   @settings('text')
   cTextTip = 'Tips by';
 
-  @settings('customTexts')
+  @settings('custom_texts')
   @ui({ type: 'credits-custom-texts' })
   cCustomTextsValues: string[] = [];
 
@@ -73,21 +73,21 @@ class Credits extends Overlay {
   @ui({ type: 'credits-social' })
   cSocialValues: string[] = [];
 
-  @settings('clips')
+  @settings('customization')
   @ui({ type: 'selector', values: ['stream', 'custom'] })
   cClipsPeriod: 'stream' | 'custom' = 'custom';
-  @settings('clips')
+  @settings('customization')
   @ui({ type: 'number-input', step: '1', min: '0' })
   cClipsCustomPeriodInDays = 31;
-  @settings('clips')
+  @settings('customization')
   @ui({ type: 'number-input', step: '1', min: '0' })
   cClipsNumOfClips = 3;
-  @settings('clips')
+  @settings('customization')
   cClipsShouldPlay = true;
-  @settings('clips')
+  @settings('customization')
   @ui({ type: 'number-input', step: '1', min: '0', max: '100' })
   cClipsVolume = 20;
-  
+
   sockets () {
     publicEndpoint(this.nsp, 'load', async (cb) => {
       const when = api.isStreamOnline ? api.streamStatusChangeSince : _.now() - 50000000000;

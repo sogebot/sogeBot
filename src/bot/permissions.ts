@@ -393,7 +393,7 @@ class Permissions extends Core {
         ...opts,
       }];
     } catch (e) {
-      console.error(e);
+      error(e.stack);
       return [{ response: e.message, ...opts }];
     }
   }

@@ -6,15 +6,15 @@ import { getRepository } from 'typeorm';
 import { Poll } from '../database/entity/poll';
 
 class Polls extends Overlay {
-  @settings('display')
+  @settings('customization')
   @ui({ type: 'selector', values: ['light', 'dark', 'Soge\'s green']  })
   cDisplayTheme: 'light' | 'dark' | 'Soge\'s green' = 'light';
-  @settings('display')
+  @settings('customization')
   cDisplayHideAfterInactivity = true;
-  @settings('display')
+  @settings('customization')
   @ui({ type: 'number-input', min: 0 })
   cDisplayInactivityTime = 5000;
-  @settings('display')
+  @settings('customization')
   @ui({ type: 'selector', values: ['top', 'bottom'] })
   cDisplayAlign: 'top' | 'bottom' = 'top';
 

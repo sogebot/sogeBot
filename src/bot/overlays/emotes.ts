@@ -28,15 +28,15 @@ class Emotes extends Overlay {
   lastFFZEmoteChk = 0;
   lastBTTVEmoteChk = 0;
 
-  @settings('emotes')
+  @settings('customization')
   @ui({ type: 'selector', values: ['1', '2', '3'] })
   cEmotesSize: 1 | 2 | 3 = 1;
-  @settings('emotes')
+  @settings('customization')
   cEmotesMaxEmotesPerMessage = 5;
-  @settings('emotes')
+  @settings('customization')
   @ui({ type: 'selector', values: ['fadeup', 'fadezoom', 'facebook'] })
   cEmotesAnimation: 'fadeup' | 'fadezoom' | 'facebook' = 'fadeup';
-  @settings('emotes')
+  @settings('customization')
   cEmotesAnimationTime = 1000;
 
   @settings('explosion')

@@ -106,9 +106,6 @@ export function settings(category?: string, isReadOnly = false) {
         return;
       }
       try {
-        if (category === key) {
-          throw Error(`Category and variable name cannot be same - ${type}.${name}.${key} in category ${category}`);
-        }
         VariableWatcher.add(`${type}.${name}.${key}`, (self as any)[key], isReadOnly);
 
         if (!isReadOnly) {
@@ -132,7 +129,7 @@ export function settings(category?: string, isReadOnly = false) {
         // add variable to settingsList
         self.settingsList.push({ category, key, defaultValue: (self as any)[key]});
       } catch (e) {
-        process.stderr.write(JSON.stringify(e) + '\n');
+        error(e.stack);
       }
     };
     setTimeout(() => {
@@ -161,9 +158,6 @@ export function permission_settings(category?: string, exclude: string[] = [], e
         const self = find(type, name);
         if (!self) {
           throw new Error(`${type}.${name} not found in list`);
-        }
-        if (category === key) {
-          throw Error(`Category and variable name cannot be same - ${type}.${name}.${key} in category ${category}`);
         }
 
         _.set(self, '__permission_based__' + key, {}); // set init value
@@ -204,7 +198,7 @@ export function permission_settings(category?: string, exclude: string[] = [], e
         // add variable to settingsPermList
         self.settingsPermList.push({ category, key, defaultValue: (self as any)[key] });
       } catch (e) {
-        process.stderr.write(JSON.stringify(e) + '\n');
+
       }
     };
     setTimeout(() => {
@@ -241,7 +235,7 @@ export function persistent() {
         };
         setTimeout(() => loadVariableValue(), 5000);
       } catch (e) {
-        process.stderr.write(JSON.stringify(e) + '\n');
+        error(e.stack);
       }
     };
     setTimeout(() => {

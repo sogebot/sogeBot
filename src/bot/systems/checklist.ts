@@ -7,7 +7,7 @@ import { Checklist as ChecklistEntity } from '../database/entity/checklist';
 import { adminEndpoint } from '../helpers/socket';
 
 class Checklist extends System {
-  @settings('checklist')
+  @settings('customization')
   @ui({ type: 'configurable-list' })
   itemsArray: any[] = [];
 

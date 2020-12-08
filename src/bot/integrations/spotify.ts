@@ -60,7 +60,7 @@ class Spotify extends Integration {
   @settings()
   notify = false;
 
-  @settings('output')
+  @settings('customization')
   format = '$song - $artist';
 
   @settings('connection')

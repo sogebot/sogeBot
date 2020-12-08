@@ -47,7 +47,7 @@ class UserInfo extends System {
   @settings('me')
   formatSeparator = ' | ';
 
-  @settings('lastseen')
+  @settings('customization')
   lastSeenFormat = 'L LTS';
 
   @command('!followage')

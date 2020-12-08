@@ -27,7 +27,7 @@ const ERROR_MISSING_TOKEN = '2';
  */
 
 class Highlights extends System {
-  @settings('generator')
+  @settings('urls')
   @ui({ type: 'highlights-url-generator' })
   urls: { url: string; clip: boolean; highlight: boolean }[] = [];
 

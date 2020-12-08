@@ -43,63 +43,63 @@ class Moderation extends System {
   @permission_settings('lists', [ permission.CASTERS ])
   cListsTimeout = 120;
 
-  @permission_settings('links', [ permission.CASTERS ], { [permission.MODERATORS]: false })
+  @permission_settings('links_filter', [ permission.CASTERS ], { [permission.MODERATORS]: false })
   cLinksEnabled = true;
-  @permission_settings('links', [ permission.CASTERS ])
+  @permission_settings('links_filter', [ permission.CASTERS ])
   cLinksIncludeSpaces = false;
-  @permission_settings('links', [ permission.CASTERS ])
+  @permission_settings('links_filter', [ permission.CASTERS ])
   cLinksIncludeClips = true;
-  @permission_settings('links', [ permission.CASTERS ])
+  @permission_settings('links_filter', [ permission.CASTERS ])
   cLinksTimeout = 120;
 
-  @permission_settings('symbols', [ permission.CASTERS ], { [permission.MODERATORS]: false })
+  @permission_settings('symbols_filter', [ permission.CASTERS ], { [permission.MODERATORS]: false })
   cSymbolsEnabled = true;
-  @permission_settings('symbols', [ permission.CASTERS ])
+  @permission_settings('symbols_filter', [ permission.CASTERS ])
   cSymbolsTriggerLength = 15;
-  @permission_settings('symbols', [ permission.CASTERS ])
+  @permission_settings('symbols_filter', [ permission.CASTERS ])
   cSymbolsMaxSymbolsConsecutively = 10;
-  @permission_settings('symbols', [ permission.CASTERS ])
+  @permission_settings('symbols_filter', [ permission.CASTERS ])
   cSymbolsMaxSymbolsPercent = 50;
-  @permission_settings('symbols', [ permission.CASTERS ])
+  @permission_settings('symbols_filter', [ permission.CASTERS ])
   cSymbolsTimeout = 120;
 
-  @permission_settings('longMessage', [ permission.CASTERS ], { [permission.MODERATORS]: false })
+  @permission_settings('longMessage_filter', [ permission.CASTERS ], { [permission.MODERATORS]: false })
   cLongMessageEnabled = true;
-  @permission_settings('longMessage', [ permission.CASTERS ])
+  @permission_settings('longMessage_filter', [ permission.CASTERS ])
   cLongMessageTriggerLength = 300;
-  @permission_settings('longMessage', [ permission.CASTERS ])
+  @permission_settings('longMessage_filter', [ permission.CASTERS ])
   cLongMessageTimeout = 120;
 
-  @permission_settings('caps', [ permission.CASTERS ], { [permission.MODERATORS]: false })
+  @permission_settings('caps_filter', [ permission.CASTERS ], { [permission.MODERATORS]: false })
   cCapsEnabled = true;
-  @permission_settings('caps', [ permission.CASTERS ])
+  @permission_settings('caps_filter', [ permission.CASTERS ])
   cCapsTriggerLength = 15;
-  @permission_settings('caps', [ permission.CASTERS ])
+  @permission_settings('caps_filter', [ permission.CASTERS ])
   cCapsMaxCapsPercent = 50;
-  @permission_settings('caps', [ permission.CASTERS ])
+  @permission_settings('caps_filter', [ permission.CASTERS ])
   cCapsTimeout = 120;
 
-  @permission_settings('spam', [ permission.CASTERS ], { [permission.MODERATORS]: false })
+  @permission_settings('spam_filter', [ permission.CASTERS ], { [permission.MODERATORS]: false })
   cSpamEnabled = true;
-  @permission_settings('spam', [ permission.CASTERS ])
+  @permission_settings('spam_filter', [ permission.CASTERS ])
   cSpamTriggerLength = 15;
-  @permission_settings('spam', [ permission.CASTERS ])
+  @permission_settings('spam_filter', [ permission.CASTERS ])
   cSpamMaxLength = 50;
-  @permission_settings('spam', [ permission.CASTERS ])
+  @permission_settings('spam_filter', [ permission.CASTERS ])
   cSpamTimeout = 300;
 
-  @permission_settings('color', [ permission.CASTERS ], { [permission.MODERATORS]: false })
+  @permission_settings('color_filter', [ permission.CASTERS ], { [permission.MODERATORS]: false })
   cColorEnabled = true;
-  @permission_settings('color', [ permission.CASTERS ])
+  @permission_settings('color_filter', [ permission.CASTERS ])
   cColorTimeout = 300;
 
-  @permission_settings('emotes', [ permission.CASTERS ], { [permission.MODERATORS]: false })
+  @permission_settings('emotes_filter', [ permission.CASTERS ], { [permission.MODERATORS]: false })
   cEmotesEnabled = true;
-  @permission_settings('emotes', [ permission.CASTERS ])
+  @permission_settings('emotes_filter', [ permission.CASTERS ])
   cEmotesEmojisAreEmotes = true;
-  @permission_settings('emotes', [ permission.CASTERS ])
+  @permission_settings('emotes_filter', [ permission.CASTERS ])
   cEmotesMaxCount = 15;
-  @permission_settings('emotes', [ permission.CASTERS ])
+  @permission_settings('emotes_filter', [ permission.CASTERS ])
   cEmotesTimeout = 120;
 
   @settings('warnings')
