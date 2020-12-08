@@ -30,7 +30,7 @@ class Scrim extends System {
   lastRemindAt: number = Date.now();
   isCooldownOnly = false;
 
-  @settings('time')
+  @settings('customization')
   waitForMatchIdsInSeconds = 60;
 
   constructor() {

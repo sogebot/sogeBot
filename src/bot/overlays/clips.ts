@@ -4,13 +4,13 @@ import api from '../api';
 import { ioServer } from '../helpers/panel';
 
 class Clips extends Overlay {
-  @settings('clips')
+  @settings('customization')
   @ui({ type: 'number-input', step: '1', min: '0', max: '100' })
   cClipsVolume = 0;
-  @settings('clips')
+  @settings('customization')
   @ui({ type: 'selector', values: ['none', 'grayscale', 'sepia', 'tint', 'washed'] })
   cClipsFilter: 'none' | 'grayscale' | 'sepia' | 'tint' | 'washed' = 'none';
-  @settings('clips')
+  @settings('customization')
   cClipsLabel = true;
 
   async showClip (clipId: string) {

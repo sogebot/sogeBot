@@ -4,13 +4,13 @@ import { publicEndpoint } from '../helpers/socket';
 import api from '../api';
 
 class ClipsCarousel extends Overlay {
-  @settings('clips')
+  @settings('customization')
   @ui({ type: 'number-input', step: '1', min: '1' })
   cClipsCustomPeriodInDays = 31;
-  @settings('clips')
+  @settings('customization')
   @ui({ type: 'number-input', step: '1', min: '1' })
   cClipsNumOfClips = 20;
-  @settings('clips')
+  @settings('customization')
   @ui({ type: 'number-input', step: '1', min: '1' })
   cClipsTimeToNextClip = 45;
 
