@@ -10,7 +10,7 @@ if (['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'better-sqli
   new Promise(async () => {
     const updateSQLVariableLimit = async () => {
       if (!isDbConnected) {
-        setTimeout(() => updateSQLVariableLimit(), 1000);
+        setTimeout(() => updateSQLVariableLimit(), 10);
         return;
       }
       const query = await getManager().query(`show variables like 'max_prepared_stmt_count'`);
