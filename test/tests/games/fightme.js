@@ -77,12 +77,14 @@ describe('game/fightme - !fightme', () => {
       assert.strictEqual(fightMeChallenges.length, 1);
     });
 
-    const steps = 50;
-    for (let i = 0; i < steps; i++) {
-      it(i === 0 ? 'We need to wait at least 2.5 minutes' : '.'.repeat(i), async () => {
+    it('We need to wait at least 2.5 minutes', async() =>{
+      const steps = 100;
+      process.stdout.write(`\t... waiting ${(60 * 2.5)}ms`);
+      for (let i = 0; i < steps; i++) {
         await time.waitMs((60000 * 2.5) / steps);
-      });
-    }
+        process.stdout.write(`\r\t... waiting ${(60 * 2.5) - (((60 * 2.5) / steps) * i)}s`);
+      }
+    }).timeout(60000 * 3);
 
     it('Challenges should be empty', () => {
       const fightMeChallenges = (require('../../../dest/games/fightme')).fightMeChallenges;
