@@ -113,4 +113,72 @@ describe('Gambling - duel', () => {
       await duel.pickDuelWinner();
     });
   });
+
+  describe.only('Create duel with zero bet', () => {
+    before(async () => {
+      await db.cleanup();
+      await message.prepare();
+    });
+
+    it('set duel timestamp to 0 to force new duel', async () => {
+      duel._timestamp = 0;
+    });
+
+    it('user 1 is challenging with zero points and should fail', async () => {
+      const responses = await duel.main({ sender: user1, parameters: '0', command });
+      assert(responses.length > 0);
+      assert(responses[0].response === '$sender, you cannot duel 0 points', JSON.stringify({responses}));
+    });
+  });
+
+  describe.only('Create duel with not enough points', () => {
+    before(async () => {
+      await db.cleanup();
+      await message.prepare();
+    });
+
+    it('set duel timestamp to 0 to force new duel', async () => {
+      duel._timestamp = 0;
+    });
+
+    it('add points for users', async () => {
+      await getRepository(User).save({ userId: user1.userId, username: user1.username, points: 4 });
+    });
+
+    it('user 1 is challenging with not enough points', async () => {
+      const responses = await duel.main({ sender: user1, parameters: '5', command });
+      assert(responses.length > 0);
+      assert(responses[0].response === '$sender, you don\'t have 5 points to duel!', JSON.stringify({responses}));
+    });
+  });
+
+  describe.only('Create duel with not enough points', () => {
+    before(async () => {
+      await db.cleanup();
+      await message.prepare();
+    });
+    after(() => {
+      duel.minimalBet = 0;
+    });
+
+    it('set duel timestamp to 0 to force new duel', async () => {
+      duel._timestamp = 0;
+    });
+
+    it('set duel minimal bet to 10', async () => {
+      duel.minimalBet = 10;
+    });
+
+    it('add points for users', async () => {
+      await getRepository(User).save({ userId: user1.userId, username: user1.username, points: 100 });
+    });
+
+    it('user 1 is challenging with not enough points', async () => {
+      const responses = await duel.main({ sender: user1, parameters: '5', command });
+      assert(responses.length > 0);
+      assert(responses[0].response === '$sender, minimal bet for !duel is 10 points', JSON.stringify({responses}));
+    });
+  });
+
+
 });
