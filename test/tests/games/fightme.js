@@ -77,7 +77,7 @@ describe('game/fightme - !fightme', () => {
       assert.strictEqual(fightMeChallenges.length, 1);
     });
 
-    const steps = 20;
+    const steps = 50;
     for (let i = 0; i < steps; i++) {
       it(i === 0 ? 'We need to wait at least 2.5 minutes' : '.'.repeat(i), async () => {
         await time.waitMs((60000 * 2.5) / steps);
