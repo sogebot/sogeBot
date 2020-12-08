@@ -66,7 +66,7 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
         name: codecov-sqlite # optional
-        verbose: true # optional (default = false)
+        flags: sqlite
   postgres:
     name: PostgreSQL tests
     needs: eslint
@@ -109,7 +109,7 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
         name: codecov-postgres # optional
-        verbose: true # optional (default = false)
+        flags: postgres
   mysql:
     name: MySQL/MariaDB tests
     needs: eslint
@@ -154,7 +154,7 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
         name: codecov-mysql # optional
-        verbose: true # optional (default = false)
+        flags: mysql
   fullbuild:
     name: Make test
     needs: eslint
