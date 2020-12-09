@@ -238,9 +238,6 @@ class Parser {
   }
 
   async getCommandsList () {
-    if(isDebugEnabled('parser.command')) {
-      debug('parser.command', `Call stack ${(new Error()).stack ?? ''}`); // TODO: remove after fixed loop after end of stream
-    }
     let commands: any[] = [];
     for (let i = 0, length = this.list.length; i < length; i++) {
       if (_.isFunction(this.list[i].commands)) {
