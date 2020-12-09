@@ -12,7 +12,7 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
 // users
-const owner = { userId: Math.floor(Math.random() * 100000), badges: {}, username: 'soge__' };
+const owner = { userId: Math.floor(Math.random() * 100000), badges: {}, username: '__broadcaster__' };
 const subscriber = { userId: Math.floor(Math.random() * 100000), badges: { subscriber: 1 }, username: 'sub1'};
 
 describe('Cooldowns - toggleSubscribers()', () => {

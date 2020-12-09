@@ -14,7 +14,7 @@ const { Bets } = require('../../../dest/database/entity/bets');
 const bets = (require('../../../dest/systems/bets')).default;
 
 // users
-const owner = { username: 'soge__' };
+const owner = { username: '__broadcaster__' };
 
 const tests = {
   false: [

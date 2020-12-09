@@ -17,7 +17,7 @@ const { User } = require('../../../dest/database/entity/user');
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 
 // users
-const owner = { username: 'soge__', userId: Math.floor(Math.random() * 100000) };
+const owner = { username: '__broadcaster__', userId: Math.floor(Math.random() * 100000) };
 const user1 = { username: 'user1', userId: Math.floor(Math.random() * 100000) };
 
 describe('Custom Commands - run()', () => {
@@ -69,7 +69,7 @@ describe('Custom Commands - run()', () => {
     it('run command by owner', async () => {
       await customcommands.run({ sender: owner, message: '!test qwerty', parameters: 'qwerty' });
       await message.isSentRaw('qwerty by !test command with param', owner);
-      await message.isSentRaw('@soge__, $_variable was set to qwerty.', owner);
+      await message.isSentRaw('@__broadcaster__, $_variable was set to qwerty.', owner);
       await message.isSentRaw('This should be triggered', owner);
       await message.isSentRaw('This should be triggered as well', owner);
       await message.isNotSentRaw('This should not be triggered', owner);

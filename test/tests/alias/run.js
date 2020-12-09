@@ -16,7 +16,7 @@ const gamble = (require('../../../dest/games/gamble')).default;
 const customCommands = (require('../../../dest/systems/customcommands')).default;
 
 // users
-const owner = { username: 'soge__', userId: Math.floor(Math.random() * 100000) };
+const owner = { username: '__broadcaster__', userId: Math.floor(Math.random() * 100000) };
 const user = { username: 'user', userId: Math.floor(Math.random() * 100000) };
 
 describe('Alias - run()', () => {
@@ -52,7 +52,7 @@ describe('Alias - run()', () => {
     assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!a', command: '!duel' }));
 
     alias.run({ sender: owner, message: '!a' });
-    await message.debug('sendMessage.message', '@soge__, you need to specify points to dueling');
+    await message.debug('sendMessage.message', '@__broadcaster__, you need to specify points to dueling');
 
     const r2 = await alias.remove({ sender: owner, parameters: '!a' });
     assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!a' }));
@@ -65,7 +65,7 @@ describe('Alias - run()', () => {
     assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!a', command: '!duel' }));
 
     alias.run({ sender: owner, message: '!A' });
-    await message.debug('sendMessage.message', '@soge__, you need to specify points to dueling');
+    await message.debug('sendMessage.message', '@__broadcaster__, you need to specify points to dueling');
 
     const r2 = await alias.remove({ sender: owner, parameters: '!a' });
     assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!a' }));
@@ -78,7 +78,7 @@ describe('Alias - run()', () => {
     assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!a with spaces', command: '!duel' }));
 
     alias.run({ sender: owner, message: '!a with spaces' });
-    await message.debug('sendMessage.message', '@soge__, you need to specify points to dueling');
+    await message.debug('sendMessage.message', '@__broadcaster__, you need to specify points to dueling');
 
     const r2 = await alias.remove({ sender: owner, parameters: '!a with spaces' });
     assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!a with spaces' }));
@@ -91,7 +91,7 @@ describe('Alias - run()', () => {
     assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!한국어', command: '!duel' }));
 
     alias.run({ sender: owner, message: '!한국어' });
-    await message.debug('sendMessage.message', '@soge__, you need to specify points to dueling');
+    await message.debug('sendMessage.message', '@__broadcaster__, you need to specify points to dueling');
 
     const r2 = await alias.remove({ sender: owner, parameters: '!한국어' });
     assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!한국어' }));
@@ -104,7 +104,7 @@ describe('Alias - run()', () => {
     assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!русский', command: '!duel' }));
 
     alias.run({ sender: owner, message: '!русский' });
-    await message.debug('sendMessage.message', '@soge__, you need to specify points to dueling');
+    await message.debug('sendMessage.message', '@__broadcaster__, you need to specify points to dueling');
 
     const r2 = await alias.remove({ sender: owner, parameters: '!русский' });
     assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!русский' }));
@@ -117,7 +117,7 @@ describe('Alias - run()', () => {
     assert.strictEqual(r[0].response, prepare('alias.alias-was-added', { alias: '!крутить', command: '!gamble' }));
 
     alias.run({ sender: owner, message: '!крутить 1000' });
-    await message.debug('sendMessage.message', '@soge__, you don\'t have 1000 points to gamble');
+    await message.debug('sendMessage.message', '@__broadcaster__, you don\'t have 1000 points to gamble');
 
     const r2 = await alias.remove({ sender: owner, parameters: '!крутить' });
     assert.strictEqual(r2[0].response, prepare('alias.alias-was-removed', { alias: '!крутить' }));

@@ -14,7 +14,7 @@ const { User } = require('../../../dest/database/entity/user');
 const ranks = (require('../../../dest/systems/ranks')).default;
 
 // users
-const owner = { userId: Math.floor(Math.random() * 100000), username: 'soge__' };
+const owner = { userId: Math.floor(Math.random() * 100000), username: '__broadcaster__' };
 
 const vwrranks = [
   { hours: 0, rank: 'Zero'},

@@ -13,7 +13,7 @@ const { User } = require('../../../dest/database/entity/user');
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 
 // users
-const owner = { username: 'soge__', userId: Math.floor(Math.random() * 100000) };
+const owner = { username: '__broadcaster__', userId: Math.floor(Math.random() * 100000) };
 const user1 = { username: 'user1', userId: Math.floor(Math.random() * 100000) };
 
 describe('Custom Commands - count filter', () => {

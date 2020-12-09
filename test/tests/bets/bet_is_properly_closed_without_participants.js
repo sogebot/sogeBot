@@ -13,7 +13,7 @@ const { Bets } = require('../../../dest/database/entity/bets');
 const assert = require('assert');
 
 // users
-const owner = { username: 'soge__' };
+const owner = { username: '__broadcaster__' };
 
 describe('Bets - bet should automatically be locked after given time without participants', () => {
   before(async () => {

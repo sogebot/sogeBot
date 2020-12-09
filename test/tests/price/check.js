@@ -15,7 +15,7 @@ const { Price } = require('../../../dest/database/entity/price');
 const price = (require('../../../dest/systems/price')).default;
 
 // users
-const owner = { userId: Math.floor(Math.random() * 100000), username: 'soge__' };
+const owner = { userId: Math.floor(Math.random() * 100000), username: '__broadcaster__' };
 const user = { userId: Math.floor(Math.random() * 100000), username: 'testuser' };
 
 const tests = [

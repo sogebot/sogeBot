@@ -163,7 +163,7 @@ class Permissions extends Core {
     }
   }
 
-  public async getUserHighestPermission(userId: number): Promise<null | string> {
+  public async getUserHighestPermission(userId: number): Promise<string> {
     const cachedPermission = getFromCachedHighestPermission(userId);
     if (!cachedPermission) {
       const permissions = await getRepository(PermissionsEntity).find({
@@ -178,7 +178,7 @@ class Permissions extends Core {
           return p.id;
         }
       }
-      return null;
+      throw new Error('Unknown permission for user ' + userId);
     } else {
       return cachedPermission;
     }

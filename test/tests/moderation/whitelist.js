@@ -9,7 +9,7 @@ const moderation = (require('../../../dest/systems/moderation')).default;
 const songs = (require('../../../dest/systems/songs')).default;
 
 // users
-const owner = { username: 'soge__' };
+const owner = { username: '__broadcaster__' };
 
 const _ = require('lodash');
 const assert = require('assert');

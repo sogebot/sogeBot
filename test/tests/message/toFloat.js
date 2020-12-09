@@ -5,7 +5,7 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const Message = require('../../../dest/message').default;
 const assert = require('assert');
-const owner = { userId: Math.floor(Math.random() * 100000), username: 'soge__' };
+const owner = { userId: Math.floor(Math.random() * 100000), username: '__broadcaster__' };
 
 const tests = [
   { text: `(toFloat|2|0.5)`, expect: '0.50' },

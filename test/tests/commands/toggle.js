@@ -9,7 +9,7 @@ const assert = require('assert');
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 
 // users
-const owner = { username: 'soge__' };
+const owner = { username: '__broadcaster__' };
 
 describe('Custom Commands - toggle()', () => {
   beforeEach(async () => {

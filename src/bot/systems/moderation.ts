@@ -253,7 +253,7 @@ class Moderation extends System {
     const timeoutValues = await this.getPermissionBasedSettingsValue('cLinksTimeout');
     const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
 
-    if (permId === null || !enabled[permId] || permId === permission.CASTERS) {
+    if (!enabled[permId] || permId === permission.CASTERS) {
       return true;
     }
 
@@ -284,7 +284,7 @@ class Moderation extends System {
     const timeoutValues = await this.getPermissionBasedSettingsValue('cSymbolsTimeout');
     const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
 
-    if (permId === null || !enabled[permId] || permId === permission.CASTERS) {
+    if (!enabled[permId] || permId === permission.CASTERS) {
       return true;
     }
 
@@ -324,7 +324,7 @@ class Moderation extends System {
     const timeoutValues = await this.getPermissionBasedSettingsValue('cLongMessageTimeout');
     const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
 
-    if (permId === null || !enabled[permId] || permId === permission.CASTERS) {
+    if (!enabled[permId] || permId === permission.CASTERS) {
       return true;
     }
 
@@ -350,7 +350,7 @@ class Moderation extends System {
     const timeoutValues = await this.getPermissionBasedSettingsValue('cCapsTimeout');
     const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
 
-    if (permId === null || !enabled[permId] || permId === permission.CASTERS) {
+    if (!enabled[permId] || permId === permission.CASTERS) {
       return true;
     }
     let whitelisted = await this.whitelist(opts.message, permId);
@@ -402,7 +402,7 @@ class Moderation extends System {
     const timeoutValues = await this.getPermissionBasedSettingsValue('cSpamTimeout');
     const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
 
-    if (permId === null || !enabled[permId] || permId === permission.CASTERS) {
+    if (!enabled[permId] || permId === permission.CASTERS) {
       return true;
     }
     const whitelisted = await this.whitelist(opts.message,permId);
@@ -431,7 +431,7 @@ class Moderation extends System {
     const timeoutValues = await this.getPermissionBasedSettingsValue('cColorTimeout');
     const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
 
-    if (permId === null || !enabled[permId] || permId === permission.CASTERS) {
+    if (!enabled[permId] || permId === permission.CASTERS) {
       return true;
     }
 
@@ -458,7 +458,7 @@ class Moderation extends System {
     const timeoutValues = await this.getPermissionBasedSettingsValue('cEmotesTimeout');
     const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
 
-    if (permId === null || !enabled[permId] || permId === permission.CASTERS) {
+    if (!enabled[permId] || permId === permission.CASTERS) {
       return true;
     }
 
@@ -487,7 +487,7 @@ class Moderation extends System {
     const timeoutValues = await this.getPermissionBasedSettingsValue('cListsTimeout');
     const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
 
-    if (permId === null || !enabled[permId] || permId === permission.CASTERS) {
+    if (!enabled[permId] || permId === permission.CASTERS) {
       return true;
     }
 

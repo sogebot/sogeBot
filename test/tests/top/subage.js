@@ -18,7 +18,7 @@ const moment = require('moment-timezone');
 const assert = require('assert');
 
 // users
-const owner = { username: 'soge__' };
+const owner = { username: '__broadcaster__' };
 
 describe('Top - !top subage', () => {
   before(async () => {

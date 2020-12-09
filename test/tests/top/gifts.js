@@ -15,7 +15,7 @@ const tmi = (require('../../../dest/tmi')).default;
 const assert = require('assert');
 
 // users
-const owner = { username: 'soge__' };
+const owner = { username: '__broadcaster__' };
 
 describe('Top - !top gifts', () => {
   before(async () => {

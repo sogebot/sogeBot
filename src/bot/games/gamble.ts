@@ -14,7 +14,6 @@ import permissions from '../permissions';
 const ERROR_NOT_ENOUGH_OPTIONS = '0';
 const ERROR_ZERO_BET = '1';
 const ERROR_NOT_ENOUGH_POINTS = '2';
-const ERROR_UNKNOWN_USER_PERMISSION = 'Unknown user permission';
 
 class MinimalBetError extends Error {
   constructor(message: string) {
@@ -59,10 +58,6 @@ class Gamble extends Game {
       }
 
       const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
-      if (permId === null) {
-        throw new Error(ERROR_UNKNOWN_USER_PERMISSION);
-      }
-
       const pointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
       points = parsed[1] === 'all' ? pointsOfUser : Number(parsed[1]);
 
@@ -140,7 +135,7 @@ class Gamble extends Game {
               points: points,
             });
             return [{ response: message, ...opts }];
-          /* istanbul ignore next */ 
+          /* istanbul ignore next */
           default:
             error(e.stack);
             return [{ response: translate('core.error'), ...opts }];

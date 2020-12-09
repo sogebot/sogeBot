@@ -267,7 +267,7 @@ describe('game/fightme - !fightme', () => {
 
     it('owner is challenging and should not be on cooldown', async () => {
       const responses = await fightme.main({ command, sender: user.owner, parameters: user.viewer2.username });
-      assert(responses[0].response.includes('@soge__ wants to fight you @__viewer2__! If you accept, send !fightme @soge__'), JSON.stringify({responses}));
+      assert(responses[0].response.includes('@__broadcaster__ wants to fight you @__viewer2__! If you accept, send !fightme @__broadcaster__'), JSON.stringify({responses}));
     });
 
     it('reset fightme', async () => {

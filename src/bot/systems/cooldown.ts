@@ -164,10 +164,6 @@ class Cooldown extends System {
         if (!cooldown) {
           const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfCommandsInSeconds');
           const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
-          if (permId === null) {
-            // do nothing if user doesn't have permission
-            return false;
-          }
 
           // user group have some default cooldown
           if (defaultValue[permId] > 0) {
@@ -215,11 +211,6 @@ class Cooldown extends System {
             } else {
               const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfKeywordsInSeconds');
               const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
-              if (permId === null) {
-                // do nothing if user doesn't have permission
-                return false;
-              }
-
               // user group have some default cooldown
               if (defaultValue[permId] > 0) {
                 const canBeRunAt = (defaultCooldowns.find(o =>

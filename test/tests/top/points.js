@@ -16,7 +16,7 @@ const top = (require('../../../dest/systems/top')).default;
 const assert = require('assert');
 
 // users
-const owner = { username: 'soge__' };
+const owner = { username: '__broadcaster__' };
 
 describe('Top - !top points', () => {
   before(async () => {

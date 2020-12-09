@@ -18,7 +18,7 @@ const viewer2 = {
 
 const owner = {
   userId: 2,
-  username: 'soge__',
+  username: '__broadcaster__',
   badges: {},
   emotes: [],
 };
