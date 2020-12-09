@@ -47,8 +47,13 @@ ui:
 	@gzip -f -9 public/dist/js/*
 
 bot:
+ifeq ($(ENV),production)
+	@echo -ne "\n\t ----- Building bot (strip comments)\n"
+	@npx tsc -p src/bot --removeComments true
+else
 	@echo -ne "\n\t ----- Building bot\n"
-	@npx tsc -p src/bot
+	@npx tsc -p src/bot --removeComments false
+endif
 
 pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"
