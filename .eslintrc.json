@@ -26,6 +26,7 @@
         ]}
       ],
       "import/no-cycle": [1, { "maxDepth": 1 }],
+      "import/newline-after-import": ["error", { "count": 1 }],
 
       "no-shadow": "off",
       "@typescript-eslint/no-shadow": ["error"],
