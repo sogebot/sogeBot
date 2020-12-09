@@ -1,13 +1,14 @@
-import {Server as io} from 'socket.io';
-import https from 'https';
-import http, { Server } from 'http';
-import express from 'express';
 import fs from 'fs';
+import http, { Server } from 'http';
+import https from 'https';
+import { normalize } from 'path';
 
 import type { IconName } from '@fortawesome/free-solid-svg-icons';
+import express from 'express';
+import {Server as io} from 'socket.io';
+
 import Module from '../_interface';
 import { info } from './log';
-import { normalize } from 'path';
 
 export const menu: { category: string; name: string; id: string; this: Module | null }[] = [];
 export const menuPublic: { name: string; id: string }[] = [];

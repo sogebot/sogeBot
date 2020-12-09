@@ -1,17 +1,17 @@
+import { filter, isString, set } from 'lodash';
+
 import Core from './_interface';
+import { getBroadcaster } from './commons';
+import currency from './currency';
 import { settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
-import { adminEndpoint, publicEndpoint } from './helpers/socket';
-import { filter, isString, set } from 'lodash';
-import { getBroadcaster } from './commons';
-import oauth from './oauth';
 import general from './general';
-import currency from './currency';
-import webhooks from './webhooks';
-import { find, list } from './helpers/register';
-import { default as uiModule } from './ui';
-
 import { timezone } from './helpers/dayjs';
+import { find, list } from './helpers/register';
+import { adminEndpoint, publicEndpoint } from './helpers/socket';
+import oauth from './oauth';
+import { default as uiModule } from './ui';
+import webhooks from './webhooks';
 
 class UI extends Core {
   @settings()

@@ -4,10 +4,10 @@ import { HueApi, lightState } from 'node-hue-api';
 
 import { command, default_permission, settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import { permission } from '../helpers/permissions';
-import Integration from './_interface';
 import { error, info } from '../helpers/log';
+import { permission } from '../helpers/permissions';
 import { translate } from '../translate';
+import Integration from './_interface';
 
 interface State {
   rgb: number[];

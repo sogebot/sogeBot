@@ -1,7 +1,8 @@
-import Stats from './_interface';
-import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
+
 import { UserTip } from '../database/entity/user';
+import { adminEndpoint } from '../helpers/socket';
+import Stats from './_interface';
 
 class Tips extends Stats {
   constructor() {

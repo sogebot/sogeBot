@@ -1,39 +1,39 @@
 'use strict';
 
-import express from 'express';
-import bodyParser from 'body-parser';
 import path from 'path';
-import { flatten } from './helpers/flatten';
-import gitCommitInfo from 'git-commit-info';
-import { adminEndpoint, publicEndpoint } from './helpers/socket';
 
-import { getDEBUG, info, setDEBUG } from './helpers/log';
-import { CacheTitles, CacheTitlesInterface } from './database/entity/cacheTitles';
-import { v4 as uuid} from 'uuid';
+import bodyParser from 'body-parser';
+import express from 'express';
+import gitCommitInfo from 'git-commit-info';
+import _, { isEqual } from 'lodash';
 import { getConnection, getManager, getRepository, IsNull } from 'typeorm';
+import { v4 as uuid} from 'uuid';
+
+import api, { currentStreamTags } from './api';
+import { getOwnerAsSender } from './commons';
+import customvariables from './customvariables';
+import { CacheTitles, CacheTitlesInterface } from './database/entity/cacheTitles';
 import { Dashboard, DashboardInterface, Widget } from './database/entity/dashboard';
 import { Translation } from './database/entity/translation';
 import { TwitchTag, TwitchTagInterface } from './database/entity/twitch';
 import { User } from './database/entity/user';
-
-import { default as socketSystem } from './socket';
-import Parser from './parser';
-import webhooks from './webhooks';
 import general from './general';
-import translateLib, { translate } from './translate';
-import api, { currentStreamTags } from './api';
-import tmi from './tmi';
-import oauth from './oauth';
-import songs from './systems/songs';
-import spotify from './integrations/spotify';
-import lastfm from './integrations/lastfm';
+import { flatten } from './helpers/flatten';
+import { getDEBUG, info, setDEBUG } from './helpers/log';
+import { app, ioServer, menu, menuPublic, server, serverSecure, setApp, setServer, widgets } from './helpers/panel';
 import { linesParsed, status as statusObj } from './helpers/parser';
 import { list, systems } from './helpers/register';
-import customvariables from './customvariables';
+import { adminEndpoint, publicEndpoint } from './helpers/socket';
+import lastfm from './integrations/lastfm';
+import spotify from './integrations/spotify';
+import oauth from './oauth';
+import Parser from './parser';
+import { default as socketSystem } from './socket';
 import highlights from './systems/highlights';
-import _, { isEqual } from 'lodash';
-import { getOwnerAsSender } from './commons';
-import { app, ioServer, menu, menuPublic, server, serverSecure, setApp, setServer, widgets } from './helpers/panel';
+import songs from './systems/songs';
+import tmi from './tmi';
+import translateLib, { translate } from './translate';
+import webhooks from './webhooks';
 
 const port = process.env.PORT ?? '20000';
 const secureport = process.env.SECUREPORT ?? '20443';

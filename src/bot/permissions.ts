@@ -1,27 +1,27 @@
+import { promisify } from 'util';
+
 import _ from 'lodash';
+import { getRepository, LessThan } from 'typeorm';
 
 import Core from './_interface';
 import {
   getBroadcaster, isBot, isBroadcaster, isFollower, isModerator, isOwner, isSubscriber, isVIP, prepare,
 } from './commons';
-import { debug, warning } from './helpers/log';
-import { addToCachedHighestPermission, cleanViewersCache, getFromCachedHighestPermission, permission } from './helpers/permissions';
-import { areDecoratorsLoaded, command, default_permission } from './decorators';
-import { error } from './helpers/log';
-import { adminEndpoint } from './helpers/socket';
-
-import { PermissionCommands, PermissionFiltersInterface, Permissions as PermissionsEntity, PermissionsInterface } from './database/entity/permissions';
-import { getRepository, LessThan } from 'typeorm';
-import { User, UserInterface } from './database/entity/user';
-import oauth from './oauth';
-import currency from './currency';
-import Expects from './expects';
-import users from './users';
-import { promisify } from 'util';
 import { HOUR, MINUTE } from './constants';
-import ranks from './systems/ranks';
-import levels from './systems/levels';
+import currency from './currency';
+import { PermissionCommands, PermissionFiltersInterface, Permissions as PermissionsEntity, PermissionsInterface } from './database/entity/permissions';
+import { User, UserInterface } from './database/entity/user';
+import { areDecoratorsLoaded, command, default_permission } from './decorators';
+import Expects from './expects';
+import { debug, warning } from './helpers/log';
+import { error } from './helpers/log';
+import { addToCachedHighestPermission, cleanViewersCache, getFromCachedHighestPermission, permission } from './helpers/permissions';
 import { logAvgTime } from './helpers/profiler';
+import { adminEndpoint } from './helpers/socket';
+import oauth from './oauth';
+import levels from './systems/levels';
+import ranks from './systems/ranks';
+import users from './users';
 
 let isWarnedAboutCasters = false;
 let isRecacheRunning = false;

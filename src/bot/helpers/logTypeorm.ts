@@ -1,4 +1,5 @@
 import {Logger, QueryRunner} from 'typeorm';
+
 import { error as errorLog } from './log';
 
 export class TypeORMLogger implements Logger {

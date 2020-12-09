@@ -1,10 +1,10 @@
+import { getRepository } from 'typeorm';
+
+import customvariables from '../customvariables';
+import { Text as TextEntity } from '../database/entity/text';
+import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import Message from '../message';
 import Registry from './_interface';
-import { adminEndpoint, publicEndpoint } from '../helpers/socket';
-
-import { getRepository } from 'typeorm';
-import { Text as TextEntity } from '../database/entity/text';
-import customvariables from '../customvariables';
 
 class Text extends Registry {
   constructor () {

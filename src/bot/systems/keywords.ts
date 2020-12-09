@@ -1,18 +1,18 @@
-import Expects from '../expects';
-import { command, default_permission, helper, parser } from '../decorators';
-import { addToViewersCache, getFromViewersCache, permission } from '../helpers/permissions';
-import System from './_interface';
-import { isUUID, parserReply, prepare } from '../commons';
-import XRegExp from 'xregexp';
-import { debug, error, warning } from '../helpers/log';
-
-import { Keyword, KeywordInterface, KeywordsResponsesInterface } from '../database/entity/keyword';
-import { getRepository } from 'typeorm';
-import { adminEndpoint } from '../helpers/socket';
-import { translate } from '../translate';
-import permissions from '../permissions';
 import _ from 'lodash';
+import { getRepository } from 'typeorm';
+import XRegExp from 'xregexp';
+
+import { isUUID, parserReply, prepare } from '../commons';
+import { Keyword, KeywordInterface, KeywordsResponsesInterface } from '../database/entity/keyword';
+import { command, default_permission, helper, parser } from '../decorators';
+import Expects from '../expects';
 import { checkFilter } from '../helpers/checkFilter';
+import { debug, error, warning } from '../helpers/log';
+import { addToViewersCache, getFromViewersCache, permission } from '../helpers/permissions';
+import { adminEndpoint } from '../helpers/socket';
+import permissions from '../permissions';
+import { translate } from '../translate';
+import System from './_interface';
 
 class Keywords extends System {
   constructor() {

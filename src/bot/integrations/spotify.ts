@@ -1,23 +1,24 @@
+import crypto from 'crypto';
+
 import axios from 'axios';
 import chalk from 'chalk';
-import crypto from 'crypto';
 import _ from 'lodash';
 import SpotifyWebApi from 'spotify-web-api-node';
+import { getRepository } from 'typeorm';
 
+import api from '../api';
 import { announce, prepare } from '../commons';
+import { HOUR, SECOND } from '../constants';
+import { SpotifySongBan } from '../database/entity/spotify';
 import { command, default_permission, persistent, settings, ui } from '../decorators';
 import { onChange, onLoad, onStartup } from '../decorators/on';
 import Expects from '../expects';
-import Integration from './_interface';
-import { error, info } from '../helpers/log';
-import { adminEndpoint } from '../helpers/socket';
 import { CommandError } from '../helpers/commandError';
-import api from '../api';
-import { addUIError } from '../panel';
-import { HOUR, SECOND } from '../constants';
+import { error, info } from '../helpers/log';
 import { ioServer } from '../helpers/panel';
-import { getRepository } from 'typeorm';
-import { SpotifySongBan } from '../database/entity/spotify';
+import { adminEndpoint } from '../helpers/socket';
+import { addUIError } from '../panel';
+import Integration from './_interface';
 
 type SpotifyTrack = {
   uri: string; name: string; artists: { name: string }[]

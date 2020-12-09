@@ -1,10 +1,11 @@
 'use strict';
 
-import Widget from './_interface';
-import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
-import { Variable, VariableWatch, VariableWatchInterface } from '../database/entity/variable';
+
 import customvariables from '../customvariables';
+import { Variable, VariableWatch, VariableWatchInterface } from '../database/entity/variable';
+import { adminEndpoint } from '../helpers/socket';
+import Widget from './_interface';
 
 class CustomVariables extends Widget {
   constructor() {

@@ -1,7 +1,7 @@
-import { getTime } from '../helpers/getTime';
-import Overlay from './_interface';
-import { publicEndpoint } from '../helpers/socket';
 import api from '../api';
+import { getTime } from '../helpers/getTime';
+import { publicEndpoint } from '../helpers/socket';
+import Overlay from './_interface';
 
 class Stats extends Overlay {
   showInUI = false;

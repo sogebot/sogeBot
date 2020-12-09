@@ -1,15 +1,14 @@
 import _ from 'lodash';
-
-import { command, settings } from '../decorators';
-import Game from './_interface';
-import { MINUTE } from '../constants';
-import { isBroadcaster, isModerator, prepare, timeout } from '../commons';
-import { getLocalizedName } from '../helpers/getLocalized';
-
 import { getRepository } from 'typeorm';
+
+import { isBroadcaster, isModerator, prepare, timeout } from '../commons';
+import { MINUTE } from '../constants';
 import { User, UserInterface } from '../database/entity/user';
-import { translate } from '../translate';
+import { command, settings } from '../decorators';
+import { getLocalizedName } from '../helpers/getLocalized';
 import points from '../systems/points';
+import { translate } from '../translate';
+import Game from './_interface';
 
 /*
  * !fightme [user] - challenge [user] to fight

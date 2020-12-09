@@ -1,22 +1,23 @@
-import type { VariableInterface, VariableWatchInterface } from '../database/entity/variable';
-import type { PermissionsInterface } from '../database/entity/permissions';
-import type { TextInterface } from '../database/entity/text';
+import { Socket } from 'socket.io';
+
+import type { AlertInterface, AlertMediaInterface } from '../database/entity/alert';
+import type { CommandsBoardInterface } from '../database/entity/commands';
+import type { CooldownInterface } from '../database/entity/cooldown';
+import type { DashboardInterface } from '../database/entity/dashboard';
 import type { EventInterface } from '../database/entity/event';
 import type { GoalGroupInterface } from '../database/entity/goal';
-import type { AlertInterface, AlertMediaInterface } from '../database/entity/alert';
-import type { RandomizerInterface } from '../database/entity/randomizer';
-import type { CooldownInterface } from '../database/entity/cooldown';
 import type { HowLongToBeatGameInterface, HowLongToBeatGameItemInterface } from '../database/entity/howLongToBeatGame';
 import type { KeywordInterface } from '../database/entity/keyword';
-import type { RankInterface } from '../database/entity/rank';
-import type { TimerInterface } from '../database/entity/timer';
-import type { CommandsBoardInterface } from '../database/entity/commands';
-import type { UserInterface } from '../database/entity/user';
-import type { SongPlaylistInterface } from '../database/entity/song';
+import type { PermissionsInterface } from '../database/entity/permissions';
 import type { PriceInterface } from '../database/entity/price';
-import type { DashboardInterface } from '../database/entity/dashboard';
+import type { RandomizerInterface } from '../database/entity/randomizer';
+import type { RankInterface } from '../database/entity/rank';
+import type { SongPlaylistInterface } from '../database/entity/song';
+import type { TextInterface } from '../database/entity/text';
+import type { TimerInterface } from '../database/entity/timer';
+import type { UserInterface } from '../database/entity/user';
+import type { VariableInterface, VariableWatchInterface } from '../database/entity/variable';
 import type PUBG from '../integrations/pubg';
-import { Socket } from 'socket.io';
 
 const endpoints: {
   type: 'admin' | 'viewer' | 'public';

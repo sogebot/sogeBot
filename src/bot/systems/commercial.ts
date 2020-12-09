@@ -3,18 +3,18 @@
 import axios from 'axios';
 import * as _ from 'lodash';
 
-import { permission } from '../helpers/permissions';
-import { command, default_permission, helper } from '../decorators';
-import System from './_interface';
+import api from '../api';
 import { getOwner } from '../commons';
+import { command, default_permission, helper } from '../decorators';
+import events from '../events';
 import { error, warning } from '../helpers/log';
+import { ioServer } from '../helpers/panel';
+import { permission } from '../helpers/permissions';
 import { adminEndpoint } from '../helpers/socket';
 import oauth from '../oauth';
-import events from '../events';
-import { ioServer } from '../helpers/panel';
-import tmi from '../tmi';
 import { addUIError } from '../panel';
-import api from '../api';
+import tmi from '../tmi';
+import System from './_interface';
 
 /*
  * !commercial                        - gets an info about alias usage

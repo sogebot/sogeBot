@@ -1,22 +1,20 @@
 'use strict';
 
 import * as _ from 'lodash';
+import { getRepository } from 'typeorm';
 
-// bot libraries
-import Parser from '../parser';
-import System from './_interface';
+import { isOwner, parserReply, prepare } from '../commons';
 import * as constants from '../constants';
-import { permission } from '../helpers/permissions';
+import { Price as PriceEntity, PriceInterface } from '../database/entity/price';
+import { User } from '../database/entity/user';
 import { command, default_permission, rollback } from '../decorators';
 import { parser } from '../decorators';
-import { isOwner, parserReply, prepare } from '../commons';
-
-import { getRepository } from 'typeorm';
-import { User } from '../database/entity/user';
-import { Price as PriceEntity, PriceInterface } from '../database/entity/price';
-import { adminEndpoint } from '../helpers/socket';
 import { error } from '../helpers/log';
+import { permission } from '../helpers/permissions';
+import { adminEndpoint } from '../helpers/socket';
+import Parser from '../parser';
 import { translate } from '../translate';
+import System from './_interface';
 import points from './points';
 
 /*

@@ -1,19 +1,19 @@
 import { readdirSync } from 'fs';
-import _ from 'lodash';
 import { join, normalize } from 'path';
 
-import { chatOut, debug, isDebugEnabled, warning, whisperOut } from './helpers/log';
-import { globalIgnoreList } from './data/globalIgnoreList';
-import { error, info } from './helpers/log';
-
-import oauth from './oauth';
-import { translate } from './translate';
-import tmi from './tmi';
-import { UserStateTags } from 'twitch-js';
-import Discord from './integrations/discord';
 import { TextChannel } from 'discord.js';
-import { Message } from './message';
+import _ from 'lodash';
+import { UserStateTags } from 'twitch-js';
+
+import { globalIgnoreList } from './data/globalIgnoreList';
 import { UserInterface } from './database/entity/user';
+import { chatOut, debug, isDebugEnabled, warning, whisperOut } from './helpers/log';
+import { error, info } from './helpers/log';
+import Discord from './integrations/discord';
+import { Message } from './message';
+import oauth from './oauth';
+import tmi from './tmi';
+import { translate } from './translate';
 
 /**
  * Use to send message to correct platform in @parser

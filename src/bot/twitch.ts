@@ -1,21 +1,18 @@
-import { isIgnored, prepare } from './commons';
-import { command, default_permission, settings } from './decorators';
-import { permission } from './helpers/permissions';
-import Core from './_interface';
-
-import { adminEndpoint } from './helpers/socket';
-import { getTime } from './helpers/getTime';
-
 import { getRepository } from 'typeorm';
-import { EventList } from './database/entity/eventList';
 
-import { User } from './database/entity/user';
+import Core from './_interface';
 import api from './api';
+import { isIgnored, prepare } from './commons';
+import { EventList } from './database/entity/eventList';
+import { User } from './database/entity/user';
+import { command, default_permission, settings } from './decorators';
+import { dayjs, timezone } from './helpers/dayjs';
+import { getTime } from './helpers/getTime';
+import { permission } from './helpers/permissions';
+import { adminEndpoint } from './helpers/socket';
 import oauth from './oauth';
 import { translate } from './translate';
 import users from './users';
-
-import { dayjs, timezone } from './helpers/dayjs';
 
 class Twitch extends Core {
   @settings('general')

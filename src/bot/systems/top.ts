@@ -1,21 +1,20 @@
 import _ from 'lodash';
-
-import { dayjs } from '../helpers/dayjs';
+import { getConnection, getRepository } from 'typeorm';
 
 import { getIgnoreList, isIgnored } from '../commons';
-import { getLocalizedName } from '../helpers/getLocalized';
-import { command, default_permission } from '../decorators';
-import { permission } from '../helpers/permissions';
-import System from './_interface';
-import { debug } from '../helpers/log';
-import { getConnection, getRepository } from 'typeorm';
-import { User } from '../database/entity/user';
-import { translate } from '../translate';
-import oauth from '../oauth';
-import points from './points';
-import tmi from '../tmi';
 import currency from '../currency';
+import { User } from '../database/entity/user';
+import { command, default_permission } from '../decorators';
 import general from '../general';
+import { dayjs } from '../helpers/dayjs';
+import { getLocalizedName } from '../helpers/getLocalized';
+import { debug } from '../helpers/log';
+import { permission } from '../helpers/permissions';
+import oauth from '../oauth';
+import tmi from '../tmi';
+import { translate } from '../translate';
+import System from './_interface';
+import points from './points';
 
 enum TYPE {
   TIME = '0',

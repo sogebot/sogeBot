@@ -1,16 +1,15 @@
 import * as _ from 'lodash';
+import { getRepository } from 'typeorm';
 
 import { getBotSender, prepare } from '../commons';
+import { Queue as QueueEntity, QueueInterface } from '../database/entity/queue';
+import { User } from '../database/entity/user';
 import { command, default_permission, settings } from '../decorators';
 import { permission } from '../helpers/permissions';
-import System from './_interface';
 import { adminEndpoint } from '../helpers/socket';
-
-import { getRepository } from 'typeorm';
-import { User } from '../database/entity/user';
-import { Queue as QueueEntity, QueueInterface } from '../database/entity/queue';
-import { translate } from '../translate';
 import tmi from '../tmi';
+import { translate } from '../translate';
+import System from './_interface';
 
 /*
  * !queue                            - gets an info whether queue is opened or closed

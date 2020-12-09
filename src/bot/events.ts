@@ -1,35 +1,36 @@
+import { setTimeout } from 'timers'; // tslint workaround
+
 import axios from 'axios';
 import _ from 'lodash';
 import safeEval from 'safe-eval';
-import { setTimeout } from 'timers'; // tslint workaround
-import Core from './_interface';
-import { flatten } from './helpers/flatten';
-import { attributesReplace } from './helpers/attributesReplace';
-import { announce, getBotSender, getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, parserReply, prepare } from './commons';
-import { getLocalizedName } from './helpers/getLocalized';
-import Message from './message';
-import Parser from './parser';
-import { generateUsername } from './helpers/generateUsername';
-import { error, info, warning } from './helpers/log';
-import { adminEndpoint } from './helpers/socket';
-
 import { getRepository } from 'typeorm';
-import { User } from './database/entity/user';
-import { Event, EventInterface } from './database/entity/event';
+
+import Core from './_interface';
 import api from './api';
-import oauth from './oauth';
-import events from './events';
-import customvariables from './customvariables';
-import { ioServer } from './helpers/panel';
-import clips from './overlays/clips';
-import tmi from './tmi';
-import emotes from './overlays/emotes';
-import custom_variables from './widgets/customvariables';
+import { announce, getBotSender, getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, parserReply, prepare } from './commons';
 import currency from './currency';
+import customvariables from './customvariables';
+import { Event, EventInterface } from './database/entity/event';
+import { User } from './database/entity/user';
+import events from './events';
+import { attributesReplace } from './helpers/attributesReplace';
 import { isDbConnected } from './helpers/database';
-import { addUIError } from './panel';
-import { translate } from './translate';
 import { dayjs } from './helpers/dayjs';
+import { flatten } from './helpers/flatten';
+import { generateUsername } from './helpers/generateUsername';
+import { getLocalizedName } from './helpers/getLocalized';
+import { error, info, warning } from './helpers/log';
+import { ioServer } from './helpers/panel';
+import { adminEndpoint } from './helpers/socket';
+import Message from './message';
+import oauth from './oauth';
+import clips from './overlays/clips';
+import emotes from './overlays/emotes';
+import { addUIError } from './panel';
+import Parser from './parser';
+import tmi from './tmi';
+import { translate } from './translate';
+import custom_variables from './widgets/customvariables';
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};

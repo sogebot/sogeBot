@@ -1,11 +1,11 @@
-import Overlay from './_interface';
-import { v4 as uuid } from 'uuid';
-import { adminEndpoint } from '../helpers/socket';
-
 import { getRepository } from 'typeorm';
+import { v4 as uuid } from 'uuid';
+
 import { Gallery as GalleryEntity } from '../database/entity/gallery';
-import { app } from '../helpers/panel';
 import { debug } from '../helpers/log';
+import { app } from '../helpers/panel';
+import { adminEndpoint } from '../helpers/socket';
+import Overlay from './_interface';
 
 class Gallery extends Overlay {
   showInUI = false;

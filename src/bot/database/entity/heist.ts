@@ -1,4 +1,5 @@
 import { EntitySchema } from 'typeorm';
+
 import { ColumnNumericTransformer } from './_transformer';
 
 export interface HeistUserInterface {

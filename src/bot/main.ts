@@ -8,28 +8,26 @@ if (Number(process.versions.node.split('.')[0]) < 11) {
 }
 
 import 'reflect-metadata';
-import blocked from 'blocked-at';
 
-import { debug, error, info, isDebugEnabled, setDEBUG, warning } from './helpers/log';
-import { TypeORMLogger } from './helpers/logTypeorm';
-
-import { createConnection, getConnectionOptions } from 'typeorm';
-
-import figlet from 'figlet';
+import { existsSync, unlinkSync } from 'fs';
+import { normalize } from 'path';
 import util from 'util';
-import _ from 'lodash';
+
+import blocked from 'blocked-at';
+import chalk from 'chalk';
+import figlet from 'figlet';
 import gitCommitInfo from 'git-commit-info';
+import _ from 'lodash';
+import { createConnection, getConnectionOptions } from 'typeorm';
+import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 
 import { changelog } from './changelog';
 import { autoLoad } from './commons';
-import chalk from 'chalk';
-import { existsSync, unlinkSync } from 'fs';
-import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
-import { normalize } from 'path';
-import { startWatcher } from './watchers';
-
-import { expose as panelExpose, init as panelInit } from './panel';
 import { setIsBotStarted } from './helpers/database';
+import { debug, error, info, isDebugEnabled, setDEBUG, warning } from './helpers/log';
+import { TypeORMLogger } from './helpers/logTypeorm';
+import { expose as panelExpose, init as panelInit } from './panel';
+import { startWatcher } from './watchers';
 
 const connect = async function () {
   const connectionOptions = await getConnectionOptions();

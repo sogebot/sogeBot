@@ -1,9 +1,7 @@
-import Overlay from './_interface';
-
 import { command, default_permission, parser, settings, ui } from '../decorators';
-
-import { default as ResponsiveVoice } from '../integrations/responsivevoice';
 import { permission } from '../helpers/permissions';
+import { default as ResponsiveVoice } from '../integrations/responsivevoice';
+import Overlay from './_interface';
 
 class TextToSpeech extends Overlay {
   @ui({

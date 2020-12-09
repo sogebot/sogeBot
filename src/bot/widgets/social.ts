@@ -1,8 +1,8 @@
-import Widget from './_interface';
-import { publicEndpoint } from '../helpers/socket';
-
 import { getRepository } from 'typeorm';
+
 import { WidgetSocial } from '../database/entity/widget';
+import { publicEndpoint } from '../helpers/socket';
+import Widget from './_interface';
 
 class Social extends Widget {
   constructor() {

@@ -1,12 +1,13 @@
 import fs from 'fs';
 import os from 'os';
 import util from 'util';
-import stripAnsi from 'strip-ansi';
-import { getFunctionNameFromStackTrace } from './stacktrace';
 
-import { dayjs, timezone } from './dayjs';
-import { isDbConnected } from './database';
 import { createStream, Generator } from 'rotating-file-stream';
+import stripAnsi from 'strip-ansi';
+
+import { isDbConnected } from './database';
+import { dayjs, timezone } from './dayjs';
+import { getFunctionNameFromStackTrace } from './stacktrace';
 
 const logDir = './logs';
 

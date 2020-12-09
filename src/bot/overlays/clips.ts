@@ -1,7 +1,7 @@
-import Overlay from './_interface';
-import { settings, ui } from '../decorators';
 import api from '../api';
+import { settings, ui } from '../decorators';
 import { ioServer } from '../helpers/panel';
+import Overlay from './_interface';
 
 class Clips extends Overlay {
   @settings('customization')

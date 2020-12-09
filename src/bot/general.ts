@@ -1,21 +1,23 @@
 import { readdirSync, writeFileSync } from 'fs';
+
 import gitCommitInfo from 'git-commit-info';
 import { get, isBoolean, isNil, isNumber, isString, map } from 'lodash';
+import { getConnection, getRepository } from 'typeorm';
+
 import Core from './_interface';
+import api from './api';
+import { HOUR, MINUTE } from './constants';
+import { Widget } from './database/entity/dashboard';
 import { command, default_permission, settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
-import { permission } from './helpers/permissions';
-import { debug, error, warning } from './helpers/log';
-import { getConnection, getRepository } from 'typeorm';
-import { Widget } from './database/entity/dashboard';
-import oauth from './oauth';
-import translateLib, { translate } from './translate';
-import tmi from './tmi';
-import { HOUR, MINUTE } from './constants';
-import api from './api';
-import { socketsConnected } from './panel';
-import { find, list } from './helpers/register';
 import { setLocale } from './helpers/dayjs';
+import { debug, error, warning } from './helpers/log';
+import { permission } from './helpers/permissions';
+import { find, list } from './helpers/register';
+import oauth from './oauth';
+import { socketsConnected } from './panel';
+import tmi from './tmi';
+import translateLib, { translate } from './translate';
 
 let threadStartTimestamp = Date.now();
 const gracefulExit = () => {

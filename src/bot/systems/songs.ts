@@ -1,20 +1,21 @@
-import * as _ from 'lodash';
 import { setInterval } from 'timers';
-import ytdl from 'ytdl-core';
-import ytsr from 'ytsr';
-import ytpl from 'ytpl';
+
+import * as _ from 'lodash';
 import io from 'socket.io';
+import { Brackets, getConnection, getRepository } from 'typeorm';
+import ytdl from 'ytdl-core';
+import ytpl from 'ytpl';
+import ytsr from 'ytsr';
 
 import { announce, getBot, getBotSender, isModerator, prepare, timeout } from '../commons';
+import { SongBan, SongPlaylist, SongPlaylistInterface, SongRequest } from '../database/entity/song';
 import { command, default_permission, persistent, settings, ui } from '../decorators';
-import { permission } from '../helpers/permissions';
-import System from './_interface';
 import { onChange, onStartup } from '../decorators/on';
 import { error, info } from '../helpers/log';
+import { permission } from '../helpers/permissions';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
-import { Brackets, getConnection, getRepository } from 'typeorm';
-import { SongBan, SongPlaylist, SongPlaylistInterface, SongRequest } from '../database/entity/song';
 import { translate } from '../translate';
+import System from './_interface';
 
 let importInProgress = false;
 const cachedTags = new Set<string>();

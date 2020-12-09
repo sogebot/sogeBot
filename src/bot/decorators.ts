@@ -1,12 +1,14 @@
-import * as _ from 'lodash';
 import { parse, sep as separator } from 'path';
-import { VariableWatcher } from './watchers';
-import { debug, error } from './helpers/log';
-import { isDbConnected } from './helpers/database';
-import { find } from './helpers/register';
-import { permission as permissionType } from './helpers/permissions';
-import * as constants from './constants';
+
+import * as _ from 'lodash';
+
 import Module from './_interface';
+import * as constants from './constants';
+import { isDbConnected } from './helpers/database';
+import { debug, error } from './helpers/log';
+import { permission as permissionType } from './helpers/permissions';
+import { find } from './helpers/register';
+import { VariableWatcher } from './watchers';
 
 export let loadingInProgress: string[] = [];
 export let areDecoratorsLoaded = false;

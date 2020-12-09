@@ -1,16 +1,20 @@
+import { library } from '@fortawesome/fontawesome-svg-core';
+import {
+  faCaretLeft,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import VueCompositionAPI from '@vue/composition-api';
 import BootstrapVue from 'bootstrap-vue';
-
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import VueCompositionAPI from '@vue/composition-api';
 
 import { setLocale } from 'src/bot/helpers/dayjs';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { setMainLoaded } from 'src/panel/helpers/isAvailableVariable';
+import { isUserLoggedIn } from 'src/panel/helpers/isUserLoggedIn';
 import { getConfiguration, getTranslations } from 'src/panel/helpers/socket';
 import { store } from 'src/panel/helpers/store';
 
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 Vue.component('fa', FontAwesomeIcon);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
@@ -21,11 +25,6 @@ Vue.use(VueCompositionAPI);
 Vue.component('panel', () => import('src/panel/components/panel.vue'));
 Vue.component('button-with-icon', () => import('src/panel/components/button.vue'));
 
-import { library } from '@fortawesome/fontawesome-svg-core';
-import {
-  faCaretLeft,
-} from '@fortawesome/free-solid-svg-icons';
-import { isUserLoggedIn } from 'src/panel/helpers/isUserLoggedIn';
 library.add(faCaretLeft);
 
 export interface Global {

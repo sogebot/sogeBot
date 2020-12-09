@@ -1,12 +1,13 @@
-import Widget from './_interface';
-import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
+
 import { EventList as EventListDB } from '../database/entity/eventList';
-import { error } from '../helpers/log';
-import alerts from '../registries/alerts';
 import { getLocalizedName } from '../helpers/getLocalized';
-import users from '../users';
+import { error } from '../helpers/log';
+import { adminEndpoint } from '../helpers/socket';
+import alerts from '../registries/alerts';
 import { translate } from '../translate';
+import users from '../users';
+import Widget from './_interface';
 
 class EventList extends Widget {
   constructor() {

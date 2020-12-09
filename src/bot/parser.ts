@@ -1,22 +1,23 @@
-import {v4 as uuid} from 'uuid';
 import crypto from 'crypto';
 
 import _ from 'lodash';
-import * as constants from './constants';
+import {v4 as uuid} from 'uuid';
+
 import { getBotSender } from './commons';
-import { debug, error, warning } from './helpers/log';
-import { incrementCountOfCommandUsage } from './helpers/commands/count';
-import { addToViewersCache, getFromViewersCache } from './helpers/permissions';
-import permissions from './permissions';
-import events from './events';
-import users from './users';
-import twitch from './twitch';
-import { translate } from './translate';
+import * as constants from './constants';
 import currency from './currency';
+import events from './events';
 import general from './general';
-import tmi from './tmi';
-import { list } from './helpers/register';
 import { addToParserFindCache, cachedCommandsPermissions, parserFindCache } from './helpers/cache';
+import { incrementCountOfCommandUsage } from './helpers/commands/count';
+import { debug, error, warning } from './helpers/log';
+import { addToViewersCache, getFromViewersCache } from './helpers/permissions';
+import { list } from './helpers/register';
+import permissions from './permissions';
+import tmi from './tmi';
+import { translate } from './translate';
+import twitch from './twitch';
+import users from './users';
 
 class Parser {
   id = uuid();

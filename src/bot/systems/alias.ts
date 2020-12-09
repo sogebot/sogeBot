@@ -1,23 +1,22 @@
 'use strict';
 
 import * as _ from 'lodash';
+import { getRepository } from 'typeorm';
 
 import { parserReply, prepare } from '../commons';
+import customvariables from '../customvariables';
+import { Alias as AliasEntity } from '../database/entity/alias';
 import { command, default_permission, parser } from '../decorators';
 import Expects from '../expects';
-import Parser from '../parser';
-import { permission } from '../helpers/permissions';
-import System from './_interface';
 import { incrementCountOfCommandUsage } from '../helpers/commands/count';
 import { debug, error, warning } from '../helpers/log';
-
-import { Alias as AliasEntity } from '../database/entity/alias';
-import { getRepository } from 'typeorm';
-import { adminEndpoint, publicEndpoint } from '../helpers/socket';
+import { permission } from '../helpers/permissions';
 import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
+import { adminEndpoint, publicEndpoint } from '../helpers/socket';
+import Parser from '../parser';
 import permissions from '../permissions';
 import { translate } from '../translate';
-import customvariables from '../customvariables';
+import System from './_interface';
 import customcommands from './customcommands';
 
 /*

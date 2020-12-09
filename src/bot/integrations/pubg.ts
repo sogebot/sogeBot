@@ -1,16 +1,18 @@
 // bot libraries
-import Integration from './_interface';
-import { command, persistent, settings, ui } from '../decorators';
+
 import Axios from 'axios';
-import { adminEndpoint } from '../helpers/socket';
+import { escapeRegExp } from 'lodash';
+
+import { prepare } from '../commons';
 import { HOUR, MINUTE } from '../constants';
+import { command, persistent, settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import { error, info } from '../helpers/log';
-import Message from '../message';
 import Expects from '../expects';
 import { flatten } from '../helpers/flatten';
-import { escapeRegExp } from 'lodash';
-import { prepare } from '../commons';
+import { error, info } from '../helpers/log';
+import { adminEndpoint } from '../helpers/socket';
+import Message from '../message';
+import Integration from './_interface';
 
 class PUBG extends Integration {
   @settings()

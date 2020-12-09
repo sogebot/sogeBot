@@ -1,6 +1,6 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
 import axios from 'axios';
 import { chunk } from 'lodash';
+import {MigrationInterface, QueryRunner} from 'typeorm';
 
 const mapping = new Map() as Map<string, string>;
 

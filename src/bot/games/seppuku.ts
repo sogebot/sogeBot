@@ -1,7 +1,7 @@
 import { isBroadcaster, isModerator, timeout } from '../commons';
 import { command, settings } from '../decorators';
-import Game from './_interface';
 import { translate } from '../translate';
+import Game from './_interface';
 
 /*
  * !seppuku         - timeout yourself

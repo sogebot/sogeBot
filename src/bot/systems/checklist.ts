@@ -1,10 +1,10 @@
+import { getRepository } from 'typeorm';
+
+import { Checklist as ChecklistEntity } from '../database/entity/checklist';
 import { settings, ui } from '../decorators';
 import { onChange, onStreamEnd } from '../decorators/on';
-import System from './_interface';
-
-import { getRepository } from 'typeorm';
-import { Checklist as ChecklistEntity } from '../database/entity/checklist';
 import { adminEndpoint } from '../helpers/socket';
+import System from './_interface';
 
 class Checklist extends System {
   @settings('customization')

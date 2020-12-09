@@ -1,29 +1,29 @@
 // 3rdparty libraries
-import * as _ from 'lodash';
-import XRegExp from 'xregexp';
-import emojiRegex from 'emoji-regex';
-import tlds from 'tlds';
 
-import * as constants from '../constants';
-import { permission } from '../helpers/permissions';
-import { command, default_permission, parser, permission_settings, settings } from '../decorators';
-import Message from '../message';
-import System from './_interface';
+import emojiRegex from 'emoji-regex';
+import * as _ from 'lodash';
+import tlds from 'tlds';
+import { getRepository, LessThan } from 'typeorm';
+import XRegExp from 'xregexp';
+
 import { isModerator, parserReply, prepare, timeout } from '../commons';
+import * as constants from '../constants';
+import { Alias } from '../database/entity/alias';
+import { ModerationPermit, ModerationWarning } from '../database/entity/moderation';
+import { command, default_permission, parser, permission_settings, settings } from '../decorators';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { timeout as timeoutLog, warning as warningLog } from '../helpers/log';
+import { permission } from '../helpers/permissions';
 import { adminEndpoint } from '../helpers/socket';
-import { Alias } from '../database/entity/alias';
-
-import { getRepository, LessThan } from 'typeorm';
-import { ModerationPermit, ModerationWarning } from '../database/entity/moderation';
-import permissions from '../permissions';
-import { translate } from '../translate';
 import spotify from '../integrations/spotify';
-import songs from './songs';
-import aliasSystem from './alias';
-import users from '../users';
+import Message from '../message';
+import permissions from '../permissions';
 import tmi from '../tmi';
+import { translate } from '../translate';
+import users from '../users';
+import System from './_interface';
+import aliasSystem from './alias';
+import songs from './songs';
 
 const urlRegex = [
   new RegExp(`(www)? ??\\.? ?[a-zA-Z0-9]+([a-zA-Z0-9-]+) ??\\. ?(${tlds.join('|')})(?=\\P{L}|$)`, 'igu'),

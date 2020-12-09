@@ -1,15 +1,14 @@
 import _ from 'lodash';
-
-import Game from './_interface';
-import { command, permission_settings, persistent, settings } from '../decorators';
-import { prepare } from '../commons';
-import { error } from '../helpers/log';
-
 import { getRepository } from 'typeorm';
+
+import { prepare } from '../commons';
 import { User } from '../database/entity/user';
-import { translate } from '../translate';
-import pointsSystem from '../systems/points';
+import { command, permission_settings, persistent, settings } from '../decorators';
+import { error } from '../helpers/log';
 import permissions from '../permissions';
+import pointsSystem from '../systems/points';
+import { translate } from '../translate';
+import Game from './_interface';
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0';
 const ERROR_ZERO_BET = '1';

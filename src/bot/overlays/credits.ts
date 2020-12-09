@@ -1,13 +1,13 @@
 import _ from 'lodash';
+import { getRepository } from 'typeorm';
 
-import Overlay from './_interface';
+import api from '../api';
+import currency from '../currency';
+import { EventList, EventListInterface } from '../database/entity/eventList';
 import { settings, ui } from '../decorators';
 import { publicEndpoint } from '../helpers/socket';
-import { getRepository } from 'typeorm';
-import { EventList, EventListInterface } from '../database/entity/eventList';
-import api from '../api';
 import oauth from '../oauth';
-import currency from '../currency';
+import Overlay from './_interface';
 
 class Credits extends Overlay {
   @settings('credits')

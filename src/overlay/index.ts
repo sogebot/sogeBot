@@ -1,17 +1,15 @@
+import VueCompositionAPI from '@vue/composition-api';
 import Vue from 'vue';
-
-import translate from '../panel/helpers/translate';
 import LoadScript from 'vue-plugin-load-script';
 import VueRouter from 'vue-router';
-import VueCompositionAPI from '@vue/composition-api';
-
-import { ButtonStates, states } from '../panel/helpers/buttonStates';
-import { store } from 'src/panel/helpers/store';
-
-import urlParam from '../panel/helpers/urlParam';
-import { getConfiguration, getTranslations } from 'src/panel/helpers/socket';
 
 import { setLocale } from 'src/bot/helpers/dayjs';
+import { getConfiguration, getTranslations } from 'src/panel/helpers/socket';
+import { store } from 'src/panel/helpers/store';
+
+import { ButtonStates, states } from '../panel/helpers/buttonStates';
+import translate from '../panel/helpers/translate';
+import urlParam from '../panel/helpers/urlParam';
 
 Vue.use(VueRouter);
 Vue.use(LoadScript);

@@ -1,17 +1,17 @@
-import * as constants from '../constants';
-import System from './_interface';
-import { command, default_permission } from '../decorators';
-import { permission } from '../helpers/permissions';
 import { HowLongToBeatService } from 'howlongtobeat';
-import Expects from '../expects';
-import { prepare } from '../commons';
-
 import { getRepository } from 'typeorm';
-import { HowLongToBeatGame, HowLongToBeatGameItem } from '../database/entity/howLongToBeatGame';
-import { adminEndpoint } from '../helpers/socket';
+
 import api from '../api';
-import { debug, error, info, warning } from '../helpers/log';
+import { prepare } from '../commons';
+import * as constants from '../constants';
+import { HowLongToBeatGame, HowLongToBeatGameItem } from '../database/entity/howLongToBeatGame';
+import { command, default_permission } from '../decorators';
 import { onStreamStart } from '../decorators/on';
+import Expects from '../expects';
+import { debug, error, info, warning } from '../helpers/log';
+import { permission } from '../helpers/permissions';
+import { adminEndpoint } from '../helpers/socket';
+import System from './_interface';
 
 const notFoundGames = [] as string[];
 

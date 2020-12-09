@@ -1,6 +1,6 @@
-import Stats from './_interface';
-import { adminEndpoint } from '../helpers/socket';
 import { avgTime } from '../helpers/profiler';
+import { adminEndpoint } from '../helpers/socket';
+import Stats from './_interface';
 
 class Profiler extends Stats {
   constructor() {

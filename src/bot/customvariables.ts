@@ -1,31 +1,31 @@
-import safeEval from 'safe-eval';
-import axios from 'axios';
-import _ from 'lodash';
 import { setTimeout } from 'timers';
-import { filter, get, isNil, map, sample } from 'lodash';
-import strip from 'strip-comments';
+
+import axios from 'axios';
 import { js as jsBeautify } from 'js-beautify';
-
-import Message from './message';
-import { permission } from './helpers/permissions';
-import { getAllOnlineUsernames } from './helpers/getAllOnlineUsernames';
-import { getTime } from './helpers/getTime';
-import { announce, getBot, isModerator, prepare } from './commons';
-
+import { filter, get, isNil, map, sample } from 'lodash';
+import _ from 'lodash';
+import safeEval from 'safe-eval';
+import strip from 'strip-comments';
 import { getRepository, IsNull } from 'typeorm';
+
+import Core from './_interface';
+import api from './api';
+import { announce, getBot, isModerator, prepare } from './commons';
+import currency from './currency';
 import { User, UserInterface } from './database/entity/user';
 import { Variable, VariableHistory, VariableInterface, VariableURL, VariableWatch } from './database/entity/variable';
-import { addToViewersCache, getFromViewersCache } from './helpers/permissions';
-import users from './users';
-import api from './api';
-import permissions from './permissions';
-import custom_variables from './widgets/customvariables';
-import currency from './currency';
 import { isDbConnected } from './helpers/database';
-import { linesParsed } from './helpers/parser';
+import { getAllOnlineUsernames } from './helpers/getAllOnlineUsernames';
+import { getTime } from './helpers/getTime';
 import { debug, error, info, warning } from './helpers/log';
-import Core from './_interface';
+import { linesParsed } from './helpers/parser';
+import { permission } from './helpers/permissions';
+import { addToViewersCache, getFromViewersCache } from './helpers/permissions';
 import { adminEndpoint } from './helpers/socket';
+import Message from './message';
+import permissions from './permissions';
+import users from './users';
+import custom_variables from './widgets/customvariables';
 
 const customVariableRegex = new RegExp('\\$_[a-zA-Z0-9_]+', 'g');
 

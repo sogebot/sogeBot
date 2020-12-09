@@ -1,19 +1,18 @@
 import _ from 'lodash';
+import { getRepository } from 'typeorm';
 
 import { announce, getBotSender, getOwner, parserReply, prepare } from '../commons';
-import { command, default_permission, helper, settings, ui } from '../decorators';
-import Expects from '../expects';
-import { permission } from '../helpers/permissions';
-import System from './_interface';
-import { error, warning } from '../helpers/log';
-import { adminEndpoint } from '../helpers/socket';
-
-import { getRepository } from 'typeorm';
 import { Bets as BetsEntity, BetsInterface } from '../database/entity/bets';
 import { User } from '../database/entity/user';
-import { isDbConnected } from '../helpers/database';
-import points from './points';
+import { command, default_permission, helper, settings, ui } from '../decorators';
 import { onStartup } from '../decorators/on';
+import Expects from '../expects';
+import { isDbConnected } from '../helpers/database';
+import { error, warning } from '../helpers/log';
+import { permission } from '../helpers/permissions';
+import { adminEndpoint } from '../helpers/socket';
+import System from './_interface';
+import points from './points';
 
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters';
 const ERROR_ALREADY_OPENED = '1';

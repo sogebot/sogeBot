@@ -1,27 +1,27 @@
 'use strict';
 
-import * as _ from 'lodash';
 import * as cronparser from 'cron-parser';
-
-import { isBot, prepare } from '../commons';
-import { command, default_permission, parser, permission_settings, persistent, settings, ui } from '../decorators';
-import Expects from '../expects';
-import { permission } from '../helpers/permissions';
-import System from './_interface';
-import { debug, error, warning } from '../helpers/log';
-import { adminEndpoint } from '../helpers/socket';
+import * as _ from 'lodash';
 import { FindConditions, getConnection, getRepository, LessThanOrEqual } from 'typeorm';
-import { User, UserInterface } from '../database/entity/user';
-import { PointsChangelog } from '../database/entity/points';
-import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
-import { onChange, onLoad } from '../decorators/on';
-import permissions from '../permissions';
+
 import api from '../api';
-import users from '../users';
-import { translate } from '../translate';
+import { isBot, prepare } from '../commons';
 import { MINUTE } from '../constants';
-import oauth from '../oauth';
+import { PointsChangelog } from '../database/entity/points';
+import { User, UserInterface } from '../database/entity/user';
+import { command, default_permission, parser, permission_settings, persistent, settings, ui } from '../decorators';
+import { onChange, onLoad } from '../decorators/on';
+import Expects from '../expects';
+import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
+import { debug, error, warning } from '../helpers/log';
 import { ParameterError } from '../helpers/parameterError';
+import { permission } from '../helpers/permissions';
+import { adminEndpoint } from '../helpers/socket';
+import oauth from '../oauth';
+import permissions from '../permissions';
+import { translate } from '../translate';
+import users from '../users';
+import System from './_interface';
 
 class Points extends System {
   cronTask: any = null;

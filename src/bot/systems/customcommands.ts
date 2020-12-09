@@ -1,23 +1,22 @@
 import _ from 'lodash';
+import { getRepository } from 'typeorm';
 import XRegExp from 'xregexp';
 
-import { command, default_permission, helper } from '../decorators';
-import { permission } from '../helpers/permissions';
-import System from './_interface';
+import { parserReply, prepare } from '../commons';
 import * as constants from '../constants';
+import { Commands, CommandsInterface, CommandsResponsesInterface } from '../database/entity/commands';
+import { command, default_permission, helper } from '../decorators';
 import { parser } from '../decorators';
 import Expects from '../expects';
-import { parserReply, prepare } from '../commons';
+import { checkFilter } from '../helpers/checkFilter';
 import { getAllCountOfCommandUsage, getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage } from '../helpers/commands/count';
-
 import { warning } from '../helpers/log';
-import { adminEndpoint } from '../helpers/socket';
-import { getRepository } from 'typeorm';
-import { Commands, CommandsInterface, CommandsResponsesInterface } from '../database/entity/commands';
+import { permission } from '../helpers/permissions';
 import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
+import { adminEndpoint } from '../helpers/socket';
 import permissions from '../permissions';
 import { translate } from '../translate';
-import { checkFilter } from '../helpers/checkFilter';
+import System from './_interface';
 
 /*
  * !command                                                                            - gets an info about command usage

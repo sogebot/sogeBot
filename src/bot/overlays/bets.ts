@@ -1,8 +1,8 @@
-import Overlay from './_interface';
-import { publicEndpoint } from '../helpers/socket';
-
 import { getRepository } from 'typeorm';
+
 import { Bets as BetsEntity } from '../database/entity/bets';
+import { publicEndpoint } from '../helpers/socket';
+import Overlay from './_interface';
 
 class Bets extends Overlay {
   showInUI = false;

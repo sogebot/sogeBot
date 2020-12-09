@@ -1,5 +1,6 @@
-import Vue from 'vue';
 import VueCompositionApi from '@vue/composition-api';
+import Vue from 'vue';
+
 import App from './spotify.vue';
 
 Vue.use(VueCompositionApi);
