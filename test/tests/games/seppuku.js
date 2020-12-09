@@ -28,6 +28,6 @@ describe('game/seppuku - !seppuku', () => {
 
   it('Mod user', async () => {
     const responses = await seppuku.main({ sender: user.mod, parameters: '' });
-    assert(responses[0].response === '"$sender tried to commit seppuku, but broke a sword.', JSON.stringify({responses}));
+    assert(responses[0].response === '$sender tried to commit seppuku, but broke a sword.', JSON.stringify({responses}));
   });
 });
