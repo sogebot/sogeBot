@@ -3,10 +3,10 @@ import { getRepository, IsNull } from 'typeorm';
 import { LOW } from '../constants';
 import { Randomizer as RandomizerEntity, RandomizerItem } from '../database/entity/randomizer';
 import { parser } from '../decorators';
-import { adminEndpoint } from '../helpers/socket';
-import Registry from './_interface';
 import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
+import { adminEndpoint } from '../helpers/socket';
 import permissions from '../permissions';
+import Registry from './_interface';
 
 class Randomizer extends Registry {
   constructor() {
@@ -93,7 +93,6 @@ class Randomizer extends Registry {
       }
     });
   }
-
 
   /**
    * Check if command is in randomizer (priority: low, fireAndForget)

@@ -1,21 +1,19 @@
 import _ from 'lodash';
+import { getRepository } from 'typeorm';
 
+import api from '../api';
 import { announce, getOwnerAsSender, parserReply, prepare } from '../commons.js';
-import { getLocalizedName } from '../helpers/getLocalized';
+import currency from '../currency';
+import { Poll, PollVote } from '../database/entity/poll';
 import { command, default_permission, helper, parser, settings } from '../decorators';
 import { onBit, onMessage, onTip } from '../decorators/on';
 import Expects from '../expects.js';
-import { permission } from '../helpers/permissions';
-import System from './_interface';
-
+import { getLocalizedName } from '../helpers/getLocalized';
 import { warning } from '../helpers/log.js';
+import { permission } from '../helpers/permissions';
 import { adminEndpoint } from '../helpers/socket';
-
-import { getRepository } from 'typeorm';
-import { Poll, PollVote } from '../database/entity/poll';
 import { translate } from '../translate';
-import currency from '../currency';
-import api from '../api';
+import System from './_interface';
 
 enum ERROR {
   NOT_ENOUGH_OPTIONS,
@@ -54,7 +52,6 @@ class Polls extends System {
 
     this.addMenu({ category: 'manage', name: 'polls', id: 'manage/polls', this: this });
   }
-
 
   sendResponse(responses: CommandResponse[]) {
     for (let i = 0; i < responses.length; i++) {

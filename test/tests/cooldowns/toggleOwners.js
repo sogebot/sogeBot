@@ -12,7 +12,7 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
 // users
-const owner = { userId: Math.floor(Math.random() * 100000), username: 'soge__', badges: {} };
+const owner = { userId: Math.floor(Math.random() * 100000), username: '__broadcaster__', badges: {} };
 
 describe('Cooldowns - toggleOwners()', () => {
   beforeEach(async () => {

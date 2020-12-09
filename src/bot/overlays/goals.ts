@@ -1,13 +1,13 @@
 'use strict';
 
-import Overlay from '../overlays/_interface';
-
-import { onBit, onFollow, onSub, onTip } from '../decorators/on';
-import { adminEndpoint, publicEndpoint } from '../helpers/socket';
-import { Goal, GoalGroup } from '../database/entity/goal';
 import { getRepository, IsNull } from 'typeorm';
+
 import api from '../api';
 import currency from '../currency';
+import { Goal, GoalGroup } from '../database/entity/goal';
+import { onBit, onFollow, onSub, onTip } from '../decorators/on';
+import { adminEndpoint, publicEndpoint } from '../helpers/socket';
+import Overlay from '../overlays/_interface';
 
 class Goals extends Overlay {
   showInUI = false;

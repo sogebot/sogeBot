@@ -1,7 +1,7 @@
-import Overlay from './_interface';
+import api from '../api';
 import { settings, ui } from '../decorators';
 import { publicEndpoint } from '../helpers/socket';
-import api from '../api';
+import Overlay from './_interface';
 
 class ClipsCarousel extends Overlay {
   @settings('customization')

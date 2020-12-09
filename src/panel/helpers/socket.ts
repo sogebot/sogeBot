@@ -1,7 +1,7 @@
+import axios from 'axios';
 import type { Socket } from 'socket.io-client';
 
 import { setTranslations } from './translate';
-import axios from 'axios';
 
 export const redirectLogin = () => {
   if (window.location.href.includes('popout')) {

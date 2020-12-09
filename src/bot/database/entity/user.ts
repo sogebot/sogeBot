@@ -1,4 +1,5 @@
 import { EntitySchema } from 'typeorm';
+
 import { ColumnNumericTransformer, SafeNumberTransformer } from './_transformer';
 
 export interface UserInterface {

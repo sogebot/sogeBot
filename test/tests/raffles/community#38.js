@@ -15,7 +15,7 @@ const raffles = (require('../../../dest/systems/raffles')).default;
 
 const assert = require('assert');
 
-const owner = { username: 'soge__', userId: Number(_.random(999999, false)) };
+const owner = { username: '__broadcaster__', userId: Number(_.random(999999, false)) };
 
 describe('/t/raffle-everyone-can-join-even-raffle-runned-for-subscribers/38', () => {
   before(async () => {

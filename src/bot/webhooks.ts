@@ -1,21 +1,22 @@
-import axios from 'axios';
-import util from 'util';
 import { setTimeout } from 'timers';
+import util from 'util';
 
-import { isBot } from './commons';
-import { debug, error, follow, info, start } from './helpers/log';
-import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
+import axios from 'axios';
 import { getRepository } from 'typeorm';
-import { User } from './database/entity/user';
+
 import api, { StreamEndpoint } from './api';
-import events from './events';
-import oauth from './oauth';
-import ui from './ui';
-import alerts from './registries/alerts';
-import eventlist from './overlays/eventlist';
-import { linesParsed } from './helpers/parser';
+import { isBot } from './commons';
+import { User } from './database/entity/user';
 import { getFunctionList } from './decorators/on';
+import events from './events';
+import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
+import { debug, error, follow, info, start } from './helpers/log';
+import { linesParsed } from './helpers/parser';
 import { find } from './helpers/register';
+import oauth from './oauth';
+import eventlist from './overlays/eventlist';
+import alerts from './registries/alerts';
+import ui from './ui';
 
 type Type = 'follows' | 'streams';
 

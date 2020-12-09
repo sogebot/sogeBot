@@ -1,10 +1,11 @@
-import { getOwner } from '../commons';
-import { settings } from '../decorators';
-import Widget from './_interface';
-import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
+
+import { getOwner } from '../commons';
 import { CommandsBoard } from '../database/entity/commands';
+import { settings } from '../decorators';
+import { adminEndpoint } from '../helpers/socket';
 import tmi from '../tmi';
+import Widget from './_interface';
 
 class Cmdboard extends Widget {
   @settings()

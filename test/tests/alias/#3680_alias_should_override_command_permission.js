@@ -10,7 +10,7 @@ const { prepare } = (require('../../../dest/commons'));
 const Parser = require('../../../dest/parser').default;
 
 // users
-const owner = { username: 'soge__' };
+const owner = { username: '__broadcaster__' };
 
 describe('Alias - #3680 - alias should override command permission', () => {
   before(async () => {

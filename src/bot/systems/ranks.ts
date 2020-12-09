@@ -1,20 +1,19 @@
 'use strict';
 
 import * as _ from 'lodash';
+import { getRepository } from 'typeorm';
 
 import { prepare } from '../commons';
-import { getLocalizedName } from '../helpers/getLocalized';
-import { command, default_permission } from '../decorators';
-import { permission } from '../helpers/permissions';
-import System from './_interface';
-
-import { User, UserInterface } from '../database/entity/user';
-import { getRepository } from 'typeorm';
 import { Rank, RankInterface } from '../database/entity/rank';
-import { adminEndpoint } from '../helpers/socket';
-import users from '../users';
-import { translate } from '../translate';
+import { User, UserInterface } from '../database/entity/user';
+import { command, default_permission } from '../decorators';
 import { dayjs } from '../helpers/dayjs';
+import { getLocalizedName } from '../helpers/getLocalized';
+import { permission } from '../helpers/permissions';
+import { adminEndpoint } from '../helpers/socket';
+import { translate } from '../translate';
+import users from '../users';
+import System from './_interface';
 
 /*
  * !rank                          - show user rank
@@ -86,7 +85,6 @@ class Ranks extends System {
       const response = prepare('ranks.rank-parse-failed');
       return [{ response, ...opts }];
     }
-
 
     const value = parseInt(parsed[1], 10);
     const rank = await getRepository(Rank).findOne({ value, type });

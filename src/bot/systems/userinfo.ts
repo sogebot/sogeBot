@@ -1,24 +1,24 @@
 import _ from 'lodash';
-
-import { dateDiff, prepare } from '../commons';
-import { getLocalizedName } from '../helpers/getLocalized';
-import { command, default_permission, settings, ui } from '../decorators';
-import System from './_interface';
-import { debug, error } from '../helpers/log';
 import { getRepository } from 'typeorm';
-import { User } from '../database/entity/user';
-import permissions from '../permissions';
-import users from '../users';
+
 import api from '../api';
-import { translate } from '../translate';
+import { dateDiff, prepare } from '../commons';
 import currency from '../currency';
-import ranks from './ranks';
-import points from './points';
+import { User } from '../database/entity/user';
+import { command, default_permission, settings, ui } from '../decorators';
 import Expects from '../expects';
-import { getUserFromTwitch } from '../microservices/getUserFromTwitch';
-import { dayjs } from '../helpers/dayjs';
 import general from '../general';
+import { dayjs } from '../helpers/dayjs';
+import { getLocalizedName } from '../helpers/getLocalized';
+import { debug, error } from '../helpers/log';
+import { getUserFromTwitch } from '../microservices/getUserFromTwitch';
+import permissions from '../permissions';
+import { translate } from '../translate';
+import users from '../users';
+import System from './_interface';
 import levels from './levels';
+import points from './points';
+import ranks from './ranks';
 
 /*
  * !me
@@ -213,7 +213,6 @@ class UserInfo extends System {
         },
         cache: true,
       });
-
 
       if (!user) {
         throw Error(`User ${opts.sender.username}#${opts.sender.userId} not found.`);

@@ -1,18 +1,18 @@
 'use strict';
-import Core from './_interface';
+import https from 'https';
 
 import axios from 'axios';
-import https from 'https';
 import chalk from 'chalk';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import _ from 'lodash';
-
-import * as constants from './constants';
-import { settings, ui } from './decorators';
-import { error, info, warning } from './helpers/log';
-import { onChange, onLoad } from './decorators/on';
 import { getRepository } from 'typeorm';
+
+import Core from './_interface';
+import * as constants from './constants';
 import { UserTip } from './database/entity/user';
+import { settings, ui } from './decorators';
+import { onChange, onLoad } from './decorators/on';
+import { error, info, warning } from './helpers/log';
 
 class Currency extends Core {
   mainCurrencyLoaded = false;

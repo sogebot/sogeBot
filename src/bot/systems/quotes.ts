@@ -1,16 +1,15 @@
 import * as _ from 'lodash';
+import { getManager, getRepository } from 'typeorm';
 
 import { prepare } from '../commons';
+import { Quotes as QuotesEntity, QuotesInterface } from '../database/entity/quotes';
 import { command, default_permission } from '../decorators';
 import Expects from '../expects';
 import { permission } from '../helpers/permissions';
-import System from './_interface';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
-import { getManager, getRepository } from 'typeorm';
-
-import { Quotes as QuotesEntity, QuotesInterface } from '../database/entity/quotes';
-import users from '../users';
 import ui from '../ui';
+import users from '../users';
+import System from './_interface';
 
 class Quotes extends System {
   constructor () {

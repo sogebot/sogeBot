@@ -15,7 +15,7 @@ const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
 const { linesParsed } = require('../../../dest/helpers/parser');
 
 // users
-const owner = { username: 'soge__' };
+const owner = { username: '__broadcaster__' };
 
 describe('Timers - add()', () => {
   beforeEach(async () => {

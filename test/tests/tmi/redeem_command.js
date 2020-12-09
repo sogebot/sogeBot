@@ -20,7 +20,7 @@ const translate = require('../../../dest/translate').translate;
 
 const assert = require('assert');
 
-const owner = { username: 'soge__', userId: Math.floor(Math.random() * 10000) };
+const owner = { username: '__broadcaster__', userId: Math.floor(Math.random() * 10000) };
 
 describe('TMI - redeem command', () => {
   before(async () => {

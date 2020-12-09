@@ -17,7 +17,7 @@ const assert = require('assert');
 
 const max = Math.floor(Number.MAX_SAFE_INTEGER / 10000000);
 
-const owner = { username: 'soge__', userId: Number(_.random(999999, false)) };
+const owner = { username: '__broadcaster__', userId: Number(_.random(999999, false)) };
 const testuser = { username: 'testuser', userId: Number(_.random(999999, false)) };
 const testuser2 = { username: 'testuser2', userId: Number(_.random(999999, false)) };
 

@@ -1,9 +1,10 @@
 // bot libraries
-import Integration from './_interface';
-import { settings, ui } from '../decorators';
-import {  error } from '../helpers/log';
 import Axios from 'axios';
+
+import { settings, ui } from '../decorators';
 import { onChange } from '../decorators/on';
+import {  error } from '../helpers/log';
+import Integration from './_interface';
 
 let canSendRequests = true;
 

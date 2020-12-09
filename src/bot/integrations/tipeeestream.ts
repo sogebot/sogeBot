@@ -1,23 +1,22 @@
-import _ from 'lodash';
-import chalk from 'chalk';
 import axios from 'axios';
+import chalk from 'chalk';
+import _ from 'lodash';
 import { io, Socket } from 'socket.io-client';
+import { getRepository } from 'typeorm';
 
-import Integration from './_interface';
-import { onChange, onStartup } from '../decorators/on.js';
+import api from '../api.js';
+import currency from '../currency';
+import { User, UserTipInterface } from '../database/entity/user';
 import { settings } from '../decorators';
 import { ui } from '../decorators.js';
-import { error, info, tip } from '../helpers/log.js';
-import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
-
-import { getRepository } from 'typeorm';
-import { User, UserTipInterface } from '../database/entity/user';
-import api from '../api.js';
+import { onChange, onStartup } from '../decorators/on.js';
 import events from '../events.js';
-import users from '../users.js';
+import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
+import { error, info, tip } from '../helpers/log.js';
 import eventlist from '../overlays/eventlist.js';
-import currency from '../currency';
 import alerts from '../registries/alerts.js';
+import users from '../users.js';
+import Integration from './_interface';
 
 type TipeeestreamEvent = {
   appKey: string;

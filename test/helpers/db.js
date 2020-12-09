@@ -78,8 +78,8 @@ module.exports = {
 
       await permissions.ensurePreservedPermissionsInDb(); // re-do core permissions
 
-      oauth.generalChannel = 'soge__';
-      oauth.generalOwners = ['soge__', '__owner__'];
+      oauth.generalChannel = '__broadcaster__';
+      oauth.generalOwners = ['__broadcaster__', '__owner__'];
       oauth.broadcasterUsername = 'broadcaster';
       oauth.botUsername = 'bot';
       oauth.botId = '12345';

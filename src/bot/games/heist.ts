@@ -1,18 +1,17 @@
 import _ from 'lodash';
+import { getRepository } from 'typeorm';
 
-import Expects from '../expects.js';
-import Game from './_interface';
-import { command, settings, ui } from '../decorators';
 import { announce, prepare } from '../commons.js';
+import { HeistUser } from '../database/entity/heist';
+import { User } from '../database/entity/user';
+import { command, settings, ui } from '../decorators';
+import Expects from '../expects.js';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { warning } from '../helpers/log.js';
-
-import { getRepository } from 'typeorm';
-import { User } from '../database/entity/user';
-import { HeistUser } from '../database/entity/heist';
-import { translate } from '../translate';
-import tmi from '../tmi';
 import { default as pointsSystem } from '../systems/points';
+import tmi from '../tmi';
+import { translate } from '../translate';
+import Game from './_interface';
 
 export type Level = { name: string; winPercentage: number; payoutMultiplier: number; maxUsers: number };
 export type Result = { percentage: number; message: string };

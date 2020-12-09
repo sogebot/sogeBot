@@ -1,5 +1,6 @@
-import { ColumnNumericTransformer } from './_transformer';
 import { EntitySchema } from 'typeorm';
+
+import { ColumnNumericTransformer } from './_transformer';
 
 export interface WidgetSocialInterface {
   id: string;

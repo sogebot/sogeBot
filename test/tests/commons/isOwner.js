@@ -13,7 +13,7 @@ const { isOwner } = require('../../../dest/commons');
 
 const assert = require('assert');
 
-const owner = { username: 'soge__' };
+const owner = { username: '__broadcaster__' };
 const notOwner = { username: 'testuser' };
 
 describe('lib/commons - isOwner()', () => {
@@ -21,7 +21,7 @@ describe('lib/commons - isOwner()', () => {
     await db.cleanup();
     await message.prepare();
 
-    oauth.generalOwners = ['soge__'];
+    oauth.generalOwners = ['__broadcaster__'];
   });
 
   it('should be returned as owner', async () => {

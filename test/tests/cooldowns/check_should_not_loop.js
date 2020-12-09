@@ -17,7 +17,7 @@ const message = require('../../general.js').message;
 const cooldown = (require('../../../dest/systems/cooldown')).default;
 
 // users
-const owner = { userId: Math.floor(Math.random() * 100000), username: 'soge__', badges: {} };
+const owner = { userId: Math.floor(Math.random() * 100000), username: '__broadcaster__', badges: {} };
 const testUser = { userId: Math.floor(Math.random() * 100000), username: 'test', badges: {} };
 
 

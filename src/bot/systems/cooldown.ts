@@ -1,22 +1,21 @@
 import _ from 'lodash';
+import { getRepository } from 'typeorm';
 import XRegExp from 'xregexp';
 
 import { isOwner, parserReply, prepare } from '../commons';
 import * as constants from '../constants';
+import { Cooldown as CooldownEntity, CooldownInterface, CooldownViewer, CooldownViewerInterface } from '../database/entity/cooldown';
+import { Keyword } from '../database/entity/keyword';
+import { User } from '../database/entity/user';
 import { command, default_permission, parser, permission_settings, rollback, settings } from '../decorators';
 import Expects from '../expects';
-import Parser from '../parser';
-import { permission } from '../helpers/permissions';
-import System from './_interface';
-
-import { getRepository } from 'typeorm';
-import { Cooldown as CooldownEntity, CooldownInterface, CooldownViewer, CooldownViewerInterface } from '../database/entity/cooldown';
-import { User } from '../database/entity/user';
-import { adminEndpoint } from '../helpers/socket';
-import { Keyword } from '../database/entity/keyword';
-import customCommands from './customcommands';
 import { debug } from '../helpers/log';
+import { permission } from '../helpers/permissions';
+import { adminEndpoint } from '../helpers/socket';
+import Parser from '../parser';
 import permissions from '../permissions';
+import System from './_interface';
+import customCommands from './customcommands';
 
 const cache: { id: string; cooldowns: CooldownInterface[] }[] = [];
 const defaultCooldowns: { name: string; lastRunAt: number, permId: string }[] = [];
@@ -164,10 +163,6 @@ class Cooldown extends System {
         if (!cooldown) {
           const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfCommandsInSeconds');
           const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
-          if (permId === null) {
-            // do nothing if user doesn't have permission
-            return false;
-          }
 
           // user group have some default cooldown
           if (defaultValue[permId] > 0) {
@@ -215,11 +210,6 @@ class Cooldown extends System {
             } else {
               const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfKeywordsInSeconds');
               const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
-              if (permId === null) {
-                // do nothing if user doesn't have permission
-                return false;
-              }
-
               // user group have some default cooldown
               if (defaultValue[permId] > 0) {
                 const canBeRunAt = (defaultCooldowns.find(o =>

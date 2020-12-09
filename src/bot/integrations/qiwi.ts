@@ -1,19 +1,19 @@
 import axios from 'axios';
-import { onChange, onStartup } from '../decorators/on.js';
-import { settings } from '../decorators';
-import { ui } from '../decorators.js';
-import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
-import { error, tip } from '../helpers/log';
-import Integration from './_interface';
 import { getRepository } from 'typeorm';
 
-import { User, UserTipInterface } from '../database/entity/user';
-import users from '../users.js';
 import api from '../api.js';
-import events from '../events.js';
-import alerts from '../registries/alerts.js';
-import eventlist from '../overlays/eventlist.js';
 import currency from '../currency';
+import { User, UserTipInterface } from '../database/entity/user';
+import { settings } from '../decorators';
+import { ui } from '../decorators.js';
+import { onChange, onStartup } from '../decorators/on.js';
+import events from '../events.js';
+import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
+import { error, tip } from '../helpers/log';
+import eventlist from '../overlays/eventlist.js';
+import alerts from '../registries/alerts.js';
+import users from '../users.js';
+import Integration from './_interface';
 
 class Qiwi extends Integration {
   interval: any = null;

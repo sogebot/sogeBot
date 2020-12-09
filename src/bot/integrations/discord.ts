@@ -1,36 +1,35 @@
 // 3rdparty libraries
-import chalk from 'chalk';
-import { get } from 'lodash';
-import * as DiscordJs from 'discord.js';
 
 // bot libraries
-import Integration from './_interface';
+
+import chalk from 'chalk';
+import * as DiscordJs from 'discord.js';
+import { get } from 'lodash';
+import { getRepository, IsNull, LessThan, Not } from 'typeorm';
+import { v5 as uuidv5 } from 'uuid';
+
+import api from '../api';
+import { announceTypes, getOwner, isUUID, prepare } from '../commons';
+import { HOUR, MINUTE } from '../constants';
+import { DiscordLink } from '../database/entity/discord';
+import { Permissions as PermissionsEntity } from '../database/entity/permissions';
+import { User } from '../database/entity/user';
 import { command, persistent, settings, ui } from '../decorators';
 import { onChange, onStartup, onStreamEnd, onStreamStart } from '../decorators/on';
+import events from '../events';
+import Expects from '../expects';
+import { attributesReplace } from '../helpers/attributesReplace';
+import { isDbConnected } from '../helpers/database';
+import { dayjs, timezone } from '../helpers/dayjs';
+import { debounce } from '../helpers/debounce';
 import { chatIn, chatOut, debug, error, info, warning, whisperOut } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
-import { debounce } from '../helpers/debounce';
-
-import { v5 as uuidv5 } from 'uuid';
-import oauth from '../oauth';
-import Expects from '../expects';
-import { announceTypes, getOwner, isUUID, prepare } from '../commons';
-
-import { getRepository, IsNull, LessThan, Not } from 'typeorm';
-import { Permissions as PermissionsEntity } from '../database/entity/permissions';
-import { DiscordLink } from '../database/entity/discord';
-import { User } from '../database/entity/user';
-import { HOUR, MINUTE } from '../constants';
-import Parser from '../parser';
 import { Message } from '../message';
-import api from '../api';
-import { isDbConnected } from '../helpers/database';
+import oauth from '../oauth';
+import Parser from '../parser';
 import permissions from '../permissions';
-import events from '../events';
 import users from '../users';
-import { attributesReplace } from '../helpers/attributesReplace';
-import { dayjs, timezone } from '../helpers/dayjs';
-
+import Integration from './_interface';
 
 class Discord extends Integration {
   client: DiscordJs.Client | null = null;
@@ -536,7 +535,6 @@ class Discord extends Integration {
           if (isSelf || isDM || isDifferentGuild || isInIgnoreList) {
             return;
           }
-
 
           const channels = this.listenAtChannels.split(',').map(o => o.trim());
           if (msg.channel.type === 'text' && channels.length > 0) {

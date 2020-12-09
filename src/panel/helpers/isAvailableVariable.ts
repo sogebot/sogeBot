@@ -41,5 +41,3 @@ export const isMainLoaded = async function() {
     check();
   });
 };
-
-

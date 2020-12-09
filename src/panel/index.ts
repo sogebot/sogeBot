@@ -1,9 +1,3 @@
-import BootstrapVue from 'bootstrap-vue';
-import Vue from 'vue';
-import VueRouter from 'vue-router';
-import Vuelidate from 'vuelidate';
-import VueCompositionAPI from '@vue/composition-api';
-
 // eslint-disable-next-line
 import LoadScript from 'vue-plugin-load-script';
 
@@ -26,18 +20,23 @@ import {
   faTv, faUpload, faUser, faUsers,  faVial, faVolumeDown, faVolumeOff, faVolumeUp,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-
+import VueCompositionAPI from '@vue/composition-api';
+import BootstrapVue from 'bootstrap-vue';
 import { get } from 'lodash-es';
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import Vuelidate from 'vuelidate';
+
+import { setLocale } from 'src/bot/helpers/dayjs';
 
 import { ButtonStates, states } from './helpers/buttonStates';
+import type { getListOfReturn } from './helpers/getListOf';
+import { getListOf, populateListOf } from './helpers/getListOf';
 import { setMainLoaded } from './helpers/isAvailableVariable';
 import { isUserLoggedIn } from './helpers/isUserLoggedIn';
-import urlParam from './helpers/urlParam';
-import { getListOf, populateListOf } from './helpers/getListOf';
-import type { getListOfReturn } from './helpers/getListOf';
-import { store } from './helpers/store';
 import { getConfiguration, getTranslations } from './helpers/socket';
-import { setLocale } from 'src/bot/helpers/dayjs';
+import { store } from './helpers/store';
+import urlParam from './helpers/urlParam';
 
 library.add(faGlobeEurope, faHistory,faSortUp, faSortDown, faRedoAlt, faDice, faVolumeOff, faGripVertical, faImage, faUpload, faCircle2, faCaretRight, faTasks, faCaretDown, faSlash, faFilter, faToggleOn, faToggleOff, faBell, faShareSquare, faExclamationCircle, faQuestion, faVial, faEquals, faGreaterThanEqual, faLongArrowAltLeft, faBan, faPlusSquare, faMusic, faList, faPlay, faPause, faForward, faSpotify, faMoneyBillAlt, faPlus, faSpinner, faGift, faHeadphones, faTh, faDollarSign, faSignInAlt, faSignOutAlt, faUsers, faMusic, faCalendar, faTwitter, faCheck, faMusic, faMusic, faVolumeUp, faVolumeDown, faUsers, faGift, faTrophy, faCog, faExternalLinkAlt, faTrash, faPlus, faSync, faComments, faTwitch, faCircle, faCheckCircle, faLock, faUsers, faUser, faCheck, faTimes, faHeart, faStar, faLockOpen, faHandPointer, faRandom, faEyeSlash, faSignOutAlt, faSignInAlt, faBoxOpen, faEye, faCog, faExternalLinkAlt, faHeart, faTv, faRandom, faGem, faStar, faGift, faDollarSign, faStarHalf, faLongArrowAltRight, faCircleNotch, faCalendar, faDollarSign, faCog, faCode, faAngleUp, faTrashAlt, faAngleDown, faFont, faPlus, faMinus, faDownload, faDollarSign, faTerminal, faCog, faCommentAlt, faUsers, faExternalLinkAlt, faSyncAlt, faClock, faCog, faInfinity, faTrophy, faClone, faGem, faCoins, faExclamation, faStop, faBan, faSpinner, faCheck, faAngleRight, faPlus, faEdit, faEraser, faLink, faTrash, faPlus, faCaretLeft, faExternalLinkAlt, faLink, faSave, faThLarge, faThList, faSearch, faCircleNotch, faCheck, faEllipsisH, faEllipsisV, faPowerOff);
 Vue.component('fa', FontAwesomeIcon);

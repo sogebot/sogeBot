@@ -13,7 +13,7 @@ const { Keyword } = require('../../../dest/database/entity/keyword');
 const keywords = (require('../../../dest/systems/keywords')).default;
 
 // users
-const owner = { userId: Math.floor(Math.random() * 100000), username: 'soge__' };
+const owner = { userId: Math.floor(Math.random() * 100000), username: '__broadcaster__' };
 
 function randomString() {
   return Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
@@ -34,7 +34,7 @@ const failedTests = [
 
 const successTests = [
   {
-    keyword: 'test', response: '(!me)', actualResponse: '@soge__ | Level 0 | 0.0h | 0 points | 0 messages | €0.00 | 0 bits',
+    keyword: 'test', response: '(!me)', actualResponse: '@__broadcaster__ | Level 0 | 0.0h | 0 points | 0 messages | €0.00 | 0 bits',
     tests: [
       { type: 'add' },
       { type: 'run', triggers: ['This line will be triggered test'], '-triggers': [] },

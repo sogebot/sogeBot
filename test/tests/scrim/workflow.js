@@ -13,7 +13,7 @@ const { translate } = require('../../../dest/translate');
 const { getLocalizedName } = require('../../../dest/helpers/getLocalized');
 
 // users
-const owner = { username: 'soge__' };
+const owner = { username: '__broadcaster__' };
 
 describe('Scrim - full workflow', () => {
   describe('cooldown only', () => {

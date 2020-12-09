@@ -1,25 +1,24 @@
-import chalk from 'chalk';
-import _ from 'lodash';
+import { existsSync } from 'fs';
 import { setTimeout } from 'timers';
 
+import chalk from 'chalk';
+import _ from 'lodash';
+import type { Namespace } from 'socket.io/dist/namespace';
+import { getRepository } from 'typeorm';
+import { v4 as uuid } from 'uuid';
+
+import { PermissionCommands, Permissions as PermissionsEntity } from './database/entity/permissions';
+import { Settings } from './database/entity/settings';
 import { commandsToRegister, loadingInProgress, permissions as permissionsList } from './decorators';
 import { getFunctionList } from './decorators/on';
-import { permission } from './helpers/permissions';
-import { error, info, warning } from './helpers/log';
-
-import { getRepository } from 'typeorm';
-import { Settings } from './database/entity/settings';
-import { PermissionCommands, Permissions as PermissionsEntity } from './database/entity/permissions';
-import { adminEndpoint, publicEndpoint } from './helpers/socket';
-import { flatten, unflatten } from './helpers/flatten';
-import { existsSync } from 'fs';
-import { isDbConnected } from './helpers/database';
-import { register } from './helpers/register';
-import { addMenu, addMenuPublic, addWidget, ioServer, menu, menuPublic } from './helpers/panel';
-import { v4 as uuid } from 'uuid';
 import { invalidateParserCache, refreshCachedCommandPermissions } from './helpers/cache';
-
-import type { Namespace } from 'socket.io/dist/namespace';
+import { isDbConnected } from './helpers/database';
+import { flatten, unflatten } from './helpers/flatten';
+import { error, info, warning } from './helpers/log';
+import { addMenu, addMenuPublic, addWidget, ioServer, menu, menuPublic } from './helpers/panel';
+import { permission } from './helpers/permissions';
+import { register } from './helpers/register';
+import { adminEndpoint, publicEndpoint } from './helpers/socket';
 
 let socket: import('./socket').Socket | any = null;
 
@@ -270,7 +269,6 @@ class Module {
       error(e);
     }
   }
-
 
   public _sockets() {
     if (socket === null || ioServer === null) {

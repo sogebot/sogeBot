@@ -1,28 +1,28 @@
 'use strict';
 
 import { evaluate as mathJsEvaluate, round } from 'mathjs';
-import { ResponseError } from '../helpers/commandError';
-
-import { isBot, prepare } from '../commons';
-import { command, default_permission, parser, permission_settings, settings, ui } from '../decorators';
-import System from './_interface';
-import { debug, error } from '../helpers/log';
 import { getRepository } from 'typeorm';
-import { User, UserInterface } from '../database/entity/user';
-import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
-import { onStartup } from '../decorators/on';
-import permissions from '../permissions';
+
 import api from '../api';
-import users from '../users';
+import { isBot, prepare } from '../commons';
 import { MINUTE, SECOND } from '../constants';
-import { setImmediateAwait } from '../helpers/setImmediateAwait';
-import { translate } from '../translate';
+import { User, UserInterface } from '../database/entity/user';
+import { command, default_permission, parser, permission_settings, settings, ui } from '../decorators';
+import { onStartup } from '../decorators/on';
 import Expects from '../expects';
+import general from '../general';
+import { ResponseError } from '../helpers/commandError';
+import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
+import { debug, error } from '../helpers/log';
 import { permission } from '../helpers/permissions';
-import points from './points';
+import { setImmediateAwait } from '../helpers/setImmediateAwait';
 import { adminEndpoint } from '../helpers/socket';
 import { bigIntMax, serialize, unserialize } from '../helpers/type';
-import general from '../general';
+import permissions from '../permissions';
+import { translate } from '../translate';
+import users from '../users';
+import System from './_interface';
+import points from './points';
 
 let cachedLevelsHash = '';
 const cachedLevels: bigint[] = [];

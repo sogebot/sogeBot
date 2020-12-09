@@ -1,7 +1,7 @@
-import axios from 'axios';
-import { chunk, flatMap, includes } from 'lodash';
 import { isMainThread, parentPort, Worker } from 'worker_threads';
 
+import axios from 'axios';
+import { chunk, flatMap, includes } from 'lodash';
 import {
   createConnection,
   getConnection,
@@ -9,18 +9,18 @@ import {
   getManager,
   getRepository,
 } from 'typeorm';
+import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 
-import { User } from '../database/entity/user';
-import { ThreadEvent } from '../database/entity/threadEvent';
-import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
-import { Settings } from '../database/entity/settings';
-import { getUsersFromTwitch } from './getUserFromTwitch';
-import { debug, warning } from '../helpers/log';
-import { SQLVariableLimit } from '../helpers/sql';
 import api from '../api';
 import { isIgnored } from '../commons';
+import { Settings } from '../database/entity/settings';
+import { ThreadEvent } from '../database/entity/threadEvent';
+import { User } from '../database/entity/user';
+import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
+import { debug, warning } from '../helpers/log';
 import { TypeORMLogger } from '../helpers/logTypeorm';
-import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
+import { SQLVariableLimit } from '../helpers/sql';
+import { getUsersFromTwitch } from './getUserFromTwitch';
 
 const isThreadingEnabled = process.env.THREAD !== '0';
 
@@ -106,8 +106,6 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: 
       return !shouldExclude;
     });
     const allOnlineUsers = await getAllOnlineUsernames();
-
-
 
     const partedUsers: string[] = [];
     for (const username of allOnlineUsers) {

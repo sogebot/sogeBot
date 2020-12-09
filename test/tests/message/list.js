@@ -11,7 +11,7 @@ const alias = (require('../../../dest/systems/alias')).default;
 const cooldown = (require('../../../dest/systems/cooldown')).default;
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 const ranks = (require('../../../dest/systems/ranks')).default;
-const owner = { username: 'soge__', userId: Math.floor(Math.random() * 100000) };
+const owner = { username: '__broadcaster__', userId: Math.floor(Math.random() * 100000) };
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');

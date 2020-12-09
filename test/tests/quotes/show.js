@@ -13,7 +13,7 @@ const { User } = require('../../../dest/database/entity/user');
 const quotes = (require('../../../dest/systems/quotes')).default;
 
 // users
-const owner = { username: 'soge__', userId: '1' };
+const owner = { username: '__broadcaster__', userId: '1' };
 const user = { username: 'user', userId: '3' };
 
 const tests = [
@@ -60,7 +60,7 @@ describe('Quotes - main()', () => {
       } else {
         if (test.exist) {
           it('Should show quote', async () => {
-            assert.strictEqual(r[0].response, `Quote ${id} by soge__ 'Lorem Ipsum'`);
+            assert.strictEqual(r[0].response, `Quote ${id} by __broadcaster__ 'Lorem Ipsum'`);
           });
         } else {
           it('Should sent not-found message', async () => {

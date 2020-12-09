@@ -1,22 +1,21 @@
 'use strict';
 
 import * as _ from 'lodash';
-
-import { command, default_permission } from '../decorators';
-import { permission } from '../helpers/permissions';
-import System from './_interface';
-import { adminEndpoint } from '../helpers/socket';
-
-import { getRepository } from 'typeorm';
-import { Timer, TimerResponse } from '../database/entity/timer';
-import Expects from '../expects';
-import { translate } from '../translate';
-import { linesParsed } from '../helpers/parser';
-import { isDbConnected } from '../helpers/database';
-import api from '../api';
-import { MINUTE, SECOND } from '../constants';
-import { announce } from '../commons';
 import { sortBy } from 'lodash';
+import { getRepository } from 'typeorm';
+
+import api from '../api';
+import { announce } from '../commons';
+import { MINUTE, SECOND } from '../constants';
+import { Timer, TimerResponse } from '../database/entity/timer';
+import { command, default_permission } from '../decorators';
+import Expects from '../expects';
+import { isDbConnected } from '../helpers/database';
+import { linesParsed } from '../helpers/parser';
+import { permission } from '../helpers/permissions';
+import { adminEndpoint } from '../helpers/socket';
+import { translate } from '../translate';
+import System from './_interface';
 
 /*
  * !timers                                                                                                                      - gets an info about timers usage

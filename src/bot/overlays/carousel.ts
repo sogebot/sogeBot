@@ -1,9 +1,9 @@
-import Overlay from './_interface';
-import { v4 as uuid } from 'uuid';
-import { adminEndpoint, publicEndpoint } from '../helpers/socket';
-
 import { getRepository } from 'typeorm';
+import { v4 as uuid } from 'uuid';
+
 import { Carousel as CarouselEntity } from '../database/entity/carousel';
+import { adminEndpoint, publicEndpoint } from '../helpers/socket';
+import Overlay from './_interface';
 
 class Carousel extends Overlay {
   showInUI = false;

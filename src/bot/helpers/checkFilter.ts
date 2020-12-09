@@ -1,11 +1,12 @@
-import ranks from '../systems/ranks';
-import customvariables from '../customvariables';
-import safeEval from 'safe-eval';
-import { isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP } from '../commons';
-import { User } from '../database/entity/user';
-import api from '../api';
-import { getRepository } from 'typeorm';
 import _ from 'lodash';
+import safeEval from 'safe-eval';
+import { getRepository } from 'typeorm';
+
+import api from '../api';
+import { isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP } from '../commons';
+import customvariables from '../customvariables';
+import { User } from '../database/entity/user';
+import ranks from '../systems/ranks';
 
 export const checkFilter = async (opts: CommandOptions | ParserOptions, filter: string): Promise<boolean> => {
   if (typeof filter === 'undefined' || filter.trim().length === 0) {

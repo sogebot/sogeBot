@@ -12,7 +12,7 @@ const { User } = require('../../../dest/database/entity/user');
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 
 // users
-const owner = { username: 'soge__', userId: Math.floor(Math.random() * 100000) };
+const owner = { username: '__broadcaster__', userId: Math.floor(Math.random() * 100000) };
 
 describe('Custom Commands - https://discordapp.com/channels/317348946144002050/619437014001123338/715206737908465775 - Custom command can be called from custom command', () => {
   before(async () => {

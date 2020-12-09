@@ -6,11 +6,13 @@
  * @type {exports}
  */
 
-import chalk from 'chalk';
 import fs from 'fs';
 import { writeHeapSnapshot } from 'v8';
-import { info } from './helpers/log';
+
+import chalk from 'chalk';
+
 import api from './api';
+import { info } from './helpers/log';
 
 let _datadir: string;
 let memMBlast = 0;
@@ -45,7 +47,6 @@ function tickMemory() {
   heapUsed.push(process.memoryUsage().heapUsed / 1048576);
   heapTotal.push(process.memoryUsage().heapTotal / 1048576);
 }
-
 
 const arrAvg = (arr: number[]) => arr.reduce((a,b) => a + b, 0) / arr.length;
 

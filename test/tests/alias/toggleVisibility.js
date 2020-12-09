@@ -8,7 +8,7 @@ const assert = require('assert');
 const { prepare } = (require('../../../dest/commons'));
 
 // users
-const owner = { username: 'soge__' };
+const owner = { username: '__broadcaster__' };
 
 describe('Alias - toggleVisibility()', () => {
   beforeEach(async () => {

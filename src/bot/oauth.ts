@@ -1,14 +1,14 @@
 import axios from 'axios';
 
 import Core from './_interface';
+import api from './api';
 import * as constants from './constants';
 import { areDecoratorsLoaded, persistent, settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
 import { error, info, warning } from './helpers/log';
-import api from './api';
-import tmi from './tmi';
 import { setStatus } from './helpers/parser';
 import { cleanViewersCache } from './helpers/permissions';
+import tmi from './tmi';
 
 class OAuth extends Core {
   private toWait = 10;

@@ -1,19 +1,19 @@
-import io from 'socket.io-client-legacy';
 import chalk from 'chalk';
+import io from 'socket.io-client-legacy';
+import { getRepository } from 'typeorm';
 
-import Integration from './_interface';
+import api from '../api.js';
+import currency from '../currency';
+import { User, UserTipInterface } from '../database/entity/user';
 import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import { info, tip } from '../helpers/log';
-import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
-import { getRepository } from 'typeorm';
-import { User, UserTipInterface } from '../database/entity/user';
 import events from '../events';
-import alerts from '../registries/alerts';
-import currency from '../currency';
+import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
+import { info, tip } from '../helpers/log';
 import eventlist from '../overlays/eventlist';
-import api from '../api.js';
+import alerts from '../registries/alerts';
 import users from '../users';
+import Integration from './_interface';
 
 type StreamElementsEvent = {
   _id: string;

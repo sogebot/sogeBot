@@ -1,13 +1,14 @@
 import { cloneDeep, get, isEqual, set } from 'lodash';
-import { debug, error } from './helpers/log';
-import { change } from './changelog';
 import { getRepository } from 'typeorm';
+
+import { change } from './changelog';
+import { MINUTE, SECOND } from './constants';
 import { Settings } from './database/entity/settings';
 import { getFunctionList } from './decorators/on';
 import { isDbConnected } from './helpers/database';
-import { find } from './helpers/register';
-import { MINUTE, SECOND } from './constants';
+import { debug, error } from './helpers/log';
 import { logAvgTime } from './helpers/profiler';
+import { find } from './helpers/register';
 
 const variables: {
   [x: string]: any;

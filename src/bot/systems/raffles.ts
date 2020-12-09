@@ -1,24 +1,24 @@
 'use strict';
 
 import * as _ from 'lodash';
-
-import { announce, getOwnerAsSender, prepare } from '../commons';
-import { command, default_permission, parser, settings } from '../decorators';
-import { permission } from '../helpers/permissions';
-import System from './_interface';
-import { adminEndpoint } from '../helpers/socket';
-
 import { getRepository } from 'typeorm';
-import { User } from '../database/entity/user';
-import { Raffle, RaffleParticipant, RaffleParticipantInterface, RaffleParticipantMessageInterface } from '../database/entity/raffle';
-import { debug, warning } from '../helpers/log';
+
 import api from '../api';
-import points from './points';
+import { announce, getOwnerAsSender, prepare } from '../commons';
+import { Raffle, RaffleParticipant, RaffleParticipantInterface, RaffleParticipantMessageInterface } from '../database/entity/raffle';
+import { User } from '../database/entity/user';
+import { command, default_permission, parser, settings } from '../decorators';
 import { isDbConnected } from '../helpers/database';
-import { linesParsed } from '../helpers/parser';
 import { getLocalizedName } from '../helpers/getLocalized';
-import { translate } from '../translate';
+import { debug, warning } from '../helpers/log';
+import { linesParsed } from '../helpers/parser';
+import { permission } from '../helpers/permissions';
+import { adminEndpoint } from '../helpers/socket';
 import tmi from '../tmi';
+import { translate } from '../translate';
+import System from './_interface';
+import points from './points';
+
 const TYPE_NORMAL = 0;
 const TYPE_TICKETS = 1;
 

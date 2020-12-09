@@ -1,47 +1,44 @@
-import axios, { AxiosResponse } from 'axios';
 import querystring from 'querystring';
 import { setTimeout } from 'timers';
+
+import axios, { AxiosResponse } from 'axios';
 import chalk from 'chalk';
 import { chunk, defaults, filter, get, isNil, isNull, map } from 'lodash';
+import { Socket } from 'socket.io';
+import { getManager, getRepository, In, IsNull, Not } from 'typeorm';
 
-import * as constants from './constants';
 import Core from './_interface';
-
-import { debug, error, follow, info, start, stop, unfollow, warning } from './helpers/log';
 import { getBroadcaster, isBot, isBroadcaster, isIgnored } from './commons';
-
-import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
-import { persistent } from './decorators';
+import * as constants from './constants';
+import customvariables from './customvariables';
+import { CacheGames } from './database/entity/cacheGames';
 import { ThreadEvent } from './database/entity/threadEvent';
-
+import { TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from './database/entity/twitch';
+import { User, UserInterface } from './database/entity/user';
+import { persistent } from './decorators';
+import { getFunctionList, onStartup } from './decorators/on';
+import events from './events';
+import { isDbConnected } from './helpers/database';
+import { dayjs } from './helpers/dayjs';
+import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
+import { debug, error, follow, info, start, stop, unfollow, warning } from './helpers/log';
+import { ioServer } from './helpers/panel';
+import { linesParsed, setStatus } from './helpers/parser';
+import { logAvgTime } from './helpers/profiler';
+import { find } from './helpers/register';
+import { setImmediateAwait } from './helpers/setImmediateAwait';
+import { SQLVariableLimit } from './helpers/sql';
 import { getChannelChattersUnofficialAPI } from './microservices/getChannelChattersUnofficialAPI';
 import { getCustomRewards } from './microservices/getCustomRewards';
-
-import { getManager, getRepository, In, IsNull, Not } from 'typeorm';
-import { User, UserInterface } from './database/entity/user';
-import { TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from './database/entity/twitch';
-import { CacheGames } from './database/entity/cacheGames';
 import oauth from './oauth';
-import events from './events';
-import twitch from './twitch';
-import customvariables from './customvariables';
-import { translate } from './translate';
-import { ioServer } from './helpers/panel';
-import joinpart from './widgets/joinpart';
-import webhooks from './webhooks';
-import alerts from './registries/alerts';
 import eventlist from './overlays/eventlist';
-import stats from './stats';
-import { getFunctionList, onStartup } from './decorators/on';
-import { linesParsed, setStatus } from './helpers/parser';
-import { isDbConnected } from './helpers/database';
-import { find } from './helpers/register';
-import { SQLVariableLimit } from './helpers/sql';
 import { addUIError } from './panel';
-import { dayjs } from './helpers/dayjs';
-import { Socket } from 'socket.io';
-import { setImmediateAwait } from './helpers/setImmediateAwait';
-import { logAvgTime } from './helpers/profiler';
+import alerts from './registries/alerts';
+import stats from './stats';
+import { translate } from './translate';
+import twitch from './twitch';
+import webhooks from './webhooks';
+import joinpart from './widgets/joinpart';
 
 let latestFollowedAtTimestamp = 0;
 
@@ -875,7 +872,6 @@ class API extends Core {
 
       ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
 
-
       if (request.data.data.length > 0) {
         oauth.profileImageUrl = request.data.data[0].profile_image_url;
         oauth.broadcasterType = request.data.data[0].broadcaster_type;
@@ -1440,7 +1436,6 @@ class API extends Core {
       }
       return false;
     }
-
 
   }
 

@@ -19,7 +19,7 @@ const customcommands = (require('../../../dest/systems/customcommands')).default
 const gamble = (require('../../../dest/games/gamble')).default;
 
 // users
-const owner = { userId: Math.floor(Math.random() * 100000), username: 'soge__', badges: {} };
+const owner = { userId: Math.floor(Math.random() * 100000), username: '__broadcaster__', badges: {} };
 const usermod1 = { userId: Math.floor(Math.random() * 100000), username: 'usermod1', badges: { moderator: 1 } };
 const subuser1 = { userId: Math.floor(Math.random() * 100000), username: 'subuser1', badges: { subscriber: 1 } };
 const testUser = { userId: Math.floor(Math.random() * 100000), username: 'test', badges: {} };

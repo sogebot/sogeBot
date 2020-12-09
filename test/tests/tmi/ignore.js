@@ -14,7 +14,7 @@ const { Settings } = require('../../../dest/database/entity/settings');
 const tmi = (require('../../../dest/tmi')).default;
 
 // users
-const owner = { username: 'soge__' };
+const owner = { username: '__broadcaster__' };
 const testuser = { username: 'testuser', userId: 1 };
 const testuser2 = { username: 'testuser2', userId: 2 };
 const testuser3 = { username: 'testuser3', userId: 3 };

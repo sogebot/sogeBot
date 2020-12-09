@@ -1,41 +1,39 @@
-import { evaluate as mathJsEvaluate } from 'mathjs';
-import axios, { AxiosResponse } from 'axios';
-import safeEval from 'safe-eval';
-import querystring from 'querystring';
-import _ from 'lodash';
 import crypto from 'crypto';
-import gitCommitInfo from 'git-commit-info';
+import querystring from 'querystring';
 
-import { debug, error, warning } from './helpers/log';
-import { getCountOfCommandUsage } from './helpers/commands/count';
+import axios, { AxiosResponse } from 'axios';
+import gitCommitInfo from 'git-commit-info';
+import _ from 'lodash';
+import { evaluate as mathJsEvaluate } from 'mathjs';
+import safeEval from 'safe-eval';
 import { getRepository } from 'typeorm';
 
+import api from './api';
+import { getBotSender, isIgnored, parserReply, prepare } from './commons';
+import currency from './currency';
+import customvariables from './customvariables';
 import { Alias } from './database/entity/alias';
 import { Commands } from './database/entity/commands';
 import { Cooldown } from './database/entity/cooldown';
 import { EventList } from './database/entity/eventList';
-import { User, UserInterface } from './database/entity/user';
 import { Price } from './database/entity/price';
 import { Rank } from './database/entity/rank';
-
-import oauth from './oauth';
-import api from './api';
-import tmi from './tmi';
-import customvariables from './customvariables';
+import { User, UserInterface } from './database/entity/user';
+import { getCountOfCommandUsage } from './helpers/commands/count';
+import { getLocalizedName } from './helpers/getLocalized';
+import { debug, error, warning } from './helpers/log';
 import lastfm from './integrations/lastfm';
 import spotify from './integrations/spotify';
-import songs from './systems/songs';
+import oauth from './oauth';
 import Parser from './parser';
-import { translate } from './translate';
-import { getBotSender, isIgnored, parserReply, prepare } from './commons';
-import { getLocalizedName } from './helpers/getLocalized';
-import currency from './currency';
+import permissions from './permissions';
+import customcommands from './systems/customcommands';
 import points from './systems/points';
 import {default as priceSystem} from './systems/price';
-import permissions from './permissions';
+import songs from './systems/songs';
+import tmi from './tmi';
+import { translate } from './translate';
 import users from './users';
-import customcommands from './systems/customcommands';
-
 
 class Message {
   message = '';

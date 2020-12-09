@@ -1,9 +1,9 @@
-import Overlay from './_interface';
+import { getRepository } from 'typeorm';
+
+import { Poll } from '../database/entity/poll';
 import { settings, ui } from '../decorators';
 import { publicEndpoint } from '../helpers/socket';
-
-import { getRepository } from 'typeorm';
-import { Poll } from '../database/entity/poll';
+import Overlay from './_interface';
 
 class Polls extends Overlay {
   @settings('customization')

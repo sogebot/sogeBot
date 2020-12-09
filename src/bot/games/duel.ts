@@ -1,17 +1,16 @@
 import _ from 'lodash';
+import { getRepository } from 'typeorm';
 
 import { announce, isBroadcaster, isModerator, prepare } from '../commons';
-import { getLocalizedName } from '../helpers/getLocalized';
-import { command, persistent, settings } from '../decorators';
-import Game from './_interface';
-import { error } from '../helpers/log';
-
-import { getRepository } from 'typeorm';
-import { User } from '../database/entity/user';
 import { Duel as DuelEntity, DuelInterface } from '../database/entity/duel';
-import { translate } from '../translate';
-import points from '../systems/points';
+import { User } from '../database/entity/user';
+import { command, persistent, settings } from '../decorators';
 import { isDbConnected } from '../helpers/database';
+import { getLocalizedName } from '../helpers/getLocalized';
+import { error } from '../helpers/log';
+import points from '../systems/points';
+import { translate } from '../translate';
+import Game from './_interface';
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0';
 const ERROR_ZERO_BET = '1';

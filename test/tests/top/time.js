@@ -17,7 +17,7 @@ const { User } = require('../../../dest/database/entity/user');
 const assert = require('assert');
 
 // users
-const owner = { username: 'soge__' };
+const owner = { username: '__broadcaster__' };
 
 describe('Top - !top time', () => {
   before(async () => {

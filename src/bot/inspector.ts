@@ -1,8 +1,8 @@
-
-import inspector from 'inspector';
 import fs from 'fs';
-import { MINUTE, SECOND } from './constants';
+import inspector from 'inspector';
 import { gzip } from 'zlib';
+
+import { MINUTE, SECOND } from './constants';
 import { error, getDEBUG, isDebugEnabled, setDEBUG, warning } from './helpers/log';
 
 let isProfilerRunning = false;

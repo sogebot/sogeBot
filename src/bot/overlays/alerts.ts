@@ -1,14 +1,14 @@
 import { isNil } from 'lodash';
-
-import { command, default_permission, settings, ui } from '../decorators';
-import Message from '../message';
-import { permission } from '../helpers/permissions';
-import Overlay from './_interface';
-import api from '../api';
-import { publicEndpoint } from '../helpers/socket';
-import { Gallery } from '../database/entity/gallery';
 import { getRepository } from 'typeorm';
+
+import api from '../api';
+import { Gallery } from '../database/entity/gallery';
+import { command, default_permission, settings, ui } from '../decorators';
 import { debug } from '../helpers/log';
+import { permission } from '../helpers/permissions';
+import { publicEndpoint } from '../helpers/socket';
+import Message from '../message';
+import Overlay from './_interface';
 
 class Alerts extends Overlay {
   @settings()

@@ -3,11 +3,11 @@
  * change to update it on memory on cluster
  */
 
+import { getRepository, LessThan, MoreThan, Not } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 
-import { getRepository, LessThan, MoreThan, Not } from 'typeorm';
-import { Settings } from './database/entity/settings';
 import { Changelog } from './database/entity/changelog';
+import { Settings } from './database/entity/settings';
 import { isDbConnected } from './helpers/database';
 import { find } from './helpers/register';
 

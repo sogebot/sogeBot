@@ -1,19 +1,19 @@
-import Core from './_interface';
-
-import axios from 'axios';
 import { setTimeout } from 'timers';
 
-import { permission } from './helpers/permissions';
-import { debug, error, isDebugEnabled } from './helpers/log';
-import { adminEndpoint, viewerEndpoint } from './helpers/socket';
+import axios from 'axios';
 import { Brackets, getConnection, getRepository, IsNull } from 'typeorm';
-import { User, UserBit, UserInterface, UserTip } from './database/entity/user';
-import permissions from './permissions';
-import oauth from './oauth';
+
+import Core from './_interface';
 import api from './api';
 import currency from './currency';
 import { Permissions } from './database/entity/permissions';
+import { User, UserBit, UserInterface, UserTip } from './database/entity/user';
 import { onStartup } from './decorators/on';
+import { debug, error, isDebugEnabled } from './helpers/log';
+import { permission } from './helpers/permissions';
+import { adminEndpoint, viewerEndpoint } from './helpers/socket';
+import oauth from './oauth';
+import permissions from './permissions';
 
 class Users extends Core {
   constructor () {

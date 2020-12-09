@@ -1,15 +1,16 @@
+import { getRepository } from 'typeorm';
+
 import { announce, getBotSender, prepare, round5 } from '../commons';
-import { getLocalizedName } from '../helpers/getLocalized';
 import * as constants from '../constants';
-import { debug } from '../helpers/log';
+import { ScrimMatchId } from '../database/entity/scrimMatchId';
 import { command, default_permission, settings } from '../decorators';
 import Expects from '../expects.js';
+import { getLocalizedName } from '../helpers/getLocalized';
+import { debug } from '../helpers/log';
 import { permission } from '../helpers/permissions';
-import System from './_interface';
-import { getRepository } from 'typeorm';
-import { ScrimMatchId } from '../database/entity/scrimMatchId';
-import { translate } from '../translate';
 import tmi from '../tmi';
+import { translate } from '../translate';
+import System from './_interface';
 
 enum ERROR {
   ALREADY_OPENED,

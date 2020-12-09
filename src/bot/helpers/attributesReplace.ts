@@ -1,6 +1,5 @@
-
-import { flatten } from './flatten';
 import tmi from '../tmi';
+import { flatten } from './flatten';
 
 const attributesReplace = (attributes: Events.Attributes, replaceIn: string) => {
   const atUsername = tmi.showWithAt;

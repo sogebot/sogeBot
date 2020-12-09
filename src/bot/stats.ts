@@ -1,16 +1,18 @@
 'use strict';
 
-import { adminEndpoint } from './helpers/socket';
+import { error } from 'console';
+
 import { cloneDeep, isNil } from 'lodash';
 import { getRepository, LessThan } from 'typeorm';
-import { TwitchStats, TwitchStatsInterface } from './database/entity/twitch';
-import { error } from 'console';
-import { DAY, MINUTE } from './constants';
-import { onStreamStart } from './decorators/on';
-import api from './api';
+
 import Core from './_interface';
-import { debug } from './helpers/log';
+import api from './api';
+import { DAY, MINUTE } from './constants';
+import { TwitchStats, TwitchStatsInterface } from './database/entity/twitch';
 import { persistent } from './decorators';
+import { onStreamStart } from './decorators/on';
+import { debug } from './helpers/log';
+import { adminEndpoint } from './helpers/socket';
 
 let validStatsUntil = Date.now();
 let cachedStats = {
@@ -133,7 +135,6 @@ class Stats extends Core {
     return parseFloat(isNil(value) || isNaN(parseFloat(String(value))) ? String(0) : String(value));
   }
 }
-
 
 const _self = new Stats();
 export default _self;

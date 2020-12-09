@@ -1,5 +1,6 @@
-import { isDbConnected } from './database';
 import { getManager } from 'typeorm';
+
+import { isDbConnected } from './database';
 import { debug } from './log';
 
 // TODO: dynamic way to determinate limit of SQL variables

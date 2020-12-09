@@ -1,10 +1,12 @@
-import oauth from './oauth';
+import { setInterval } from 'timers';
+
 import WebSocket from 'ws';
-import { ban, debug, error, info, redeem, timeout, unban, warning } from './helpers/log';
+
 import { SECOND } from './constants';
 import events from './events';
+import { ban, debug, error, info, redeem, timeout, unban, warning } from './helpers/log';
+import oauth from './oauth';
 import { addUIError } from './panel';
-import { setInterval } from 'timers';
 import alerts from './registries/alerts';
 
 const pubsubEndpoint: Readonly<string> = 'wss://pubsub-edge.twitch.tv';

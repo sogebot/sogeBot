@@ -1,15 +1,16 @@
 'use strict';
 
-import glob from 'glob';
 import fs from 'fs';
-import _  from 'lodash';
-import { flatten } from './helpers/flatten';
 
-import { error, warning } from './helpers/log';
+import glob from 'glob';
+import _  from 'lodash';
 import { getRepository } from 'typeorm';
+
 import { Translation } from './database/entity/translation';
-import general from './general';
 import { areDecoratorsLoaded } from './decorators';
+import general from './general';
+import { flatten } from './helpers/flatten';
+import { error, warning } from './helpers/log';
 import { addMenu } from './helpers/panel';
 
 class Translate {
@@ -124,4 +125,3 @@ const translate_class = new Translate();
 const translate = translate_class.translate;
 export default translate_class;
 export { translate };
-

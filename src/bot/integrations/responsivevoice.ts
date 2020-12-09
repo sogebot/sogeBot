@@ -1,6 +1,6 @@
 // bot libraries
-import Integration from './_interface';
 import { settings, ui } from '../decorators';
+import Integration from './_interface';
 
 class ResponsiveVoice extends Integration {
   _enabled = null; // cannot be enabled / disabled

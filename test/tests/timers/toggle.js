@@ -8,7 +8,7 @@ const message = require('../../general.js').message;
 const { linesParsed } = require('../../../dest/helpers/parser');
 
 // users
-const owner = { username: 'soge__' };
+const owner = { username: '__broadcaster__' };
 
 const timers = (require('../../../dest/systems/timers')).default;
 

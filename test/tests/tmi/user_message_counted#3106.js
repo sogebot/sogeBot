@@ -14,7 +14,7 @@ const tmi = (require('../../../dest/tmi')).default;
 const api = (require('../../../dest/api')).default;
 
 // users
-const owner = { username: 'soge__' };
+const owner = { username: '__broadcaster__' };
 const testuser1 = { username: 'testuser1', userId: '1' };
 const testuser2 = { username: 'testuser2', userId: '2' };
 

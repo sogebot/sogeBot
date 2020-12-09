@@ -10,7 +10,7 @@ const { prepare } = require('../../../dest/commons');
 const permissions = (require('../../../dest/permissions')).default;
 
 // users
-const owner = { username: 'soge__' };
+const owner = { username: '__broadcaster__' };
 
 describe('Permissions - list()', () => {
   beforeEach(async () => {

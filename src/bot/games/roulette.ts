@@ -1,13 +1,12 @@
 import _ from 'lodash';
+import { getRepository } from 'typeorm';
 
 import { isBroadcaster, isModerator, timeout } from '../commons';
-import { command, settings } from '../decorators';
-import Game from './_interface';
-
-import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
-import { translate } from '../translate';
+import { command, settings } from '../decorators';
 import points from '../systems/points';
+import { translate } from '../translate';
+import Game from './_interface';
 
 /*
  * !roulette - 50/50 chance to timeout yourself
@@ -60,4 +59,3 @@ class Roulette extends Game {
 }
 
 export default new Roulette();
-

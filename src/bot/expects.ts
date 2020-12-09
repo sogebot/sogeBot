@@ -1,7 +1,8 @@
+import { defaults, get, isNil } from 'lodash';
 import XRegExp from 'xregexp';
+
 import { debug } from './helpers/log';
 import { ParameterError } from './helpers/parameterError';
-import { defaults, get, isNil } from 'lodash';
 
 declare global {
   interface RegExpExecArray extends Array<string> {

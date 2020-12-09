@@ -12,7 +12,7 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
 // users
-const owner = { userId: Math.floor(Math.random() * 100000), badges: {}, username: 'soge__' };
+const owner = { userId: Math.floor(Math.random() * 100000), badges: {}, username: '__broadcaster__' };
 const mod = { userId: Math.floor(Math.random() * 100000), badges: {}, username: 'mod' };
 
 describe('Cooldowns - toggleModerators()', () => {

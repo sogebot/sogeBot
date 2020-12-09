@@ -1,11 +1,11 @@
-import { getRepository } from 'typeorm';
-import { Settings } from '../database/entity/settings';
 import axios from 'axios';
+import { getRepository } from 'typeorm';
+
+import { Settings } from '../database/entity/settings';
 
 export const getUserFromTwitch = async (username: string) => {
   return (await getUsersFromTwitch([username]))[0];
 };
-
 
 export const getUsersFromTwitch = async (usernames: string[])  => {
   const url = `https://api.twitch.tv/helix/users?login=${usernames.join('&login=')}`;

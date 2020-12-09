@@ -7,7 +7,7 @@ const Message = require('../../../dest/message').default;
 const assert = require('assert');
 const { prepare } = require('../../../dest/commons');
 
-const owner = { userId: Math.floor(Math.random() * 100000), username: 'soge__' };
+const owner = { userId: Math.floor(Math.random() * 100000), username: '__broadcaster__' };
 const ignoredUser = { userId: Math.floor(Math.random() * 100000), username: 'ignoreduser' };
 const user = { userId: Math.floor(Math.random() * 100000), username: 'user1' };
 

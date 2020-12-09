@@ -1,24 +1,23 @@
+import axios from 'axios';
+import chalk from 'chalk';
 import * as _ from 'lodash';
 import { io, Socket } from 'socket.io-client';
-import chalk from 'chalk';
-import axios from 'axios';
+import { getRepository } from 'typeorm';
 
-import Integration from './_interface';
+import api from '../api';
+import { getBroadcaster } from '../commons';
+import currency from '../currency';
+import { User, UserTipInterface } from '../database/entity/user';
 import { persistent, settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import { debug, error, info, tip } from '../helpers/log';
-import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
-
-import { getRepository } from 'typeorm';
-import { User, UserTipInterface } from '../database/entity/user';
-import users from '../users';
-import api from '../api';
 import events from '../events';
-import currency from '../currency';
+import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
+import { debug, error, info, tip } from '../helpers/log';
+import { ioServer } from '../helpers/panel';
 import eventlist from '../overlays/eventlist';
 import alerts from '../registries/alerts';
-import { ioServer } from '../helpers/panel';
-import { getBroadcaster } from '../commons';
+import users from '../users';
+import Integration from './_interface';
 
 namespace StreamlabsEvent {
   export type Donation = {
