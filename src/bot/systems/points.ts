@@ -65,7 +65,6 @@ class Points extends System {
   @permission_settings('customization')
   perMessageOfflineInterval = 0;
 
-
   constructor() {
     super();
 

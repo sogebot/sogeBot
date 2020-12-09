@@ -66,7 +66,6 @@ class TextToSpeech extends Overlay {
     return [];
   }
 
-
   /**
    * Parsers text to speech
    * Inspired by: https://discordapp.com/channels/317348946144002050/317349069024395264/707237020342419507

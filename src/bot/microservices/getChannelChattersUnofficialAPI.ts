@@ -107,8 +107,6 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: 
     });
     const allOnlineUsers = await getAllOnlineUsernames();
 
-
-
     const partedUsers: string[] = [];
     for (const username of allOnlineUsers) {
       if (!includes(chatters, username) && username !== bot) {

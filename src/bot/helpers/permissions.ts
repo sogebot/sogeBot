@@ -17,7 +17,6 @@ let cachedHighestPermission: {
   [userId: number]: string | undefined;
 } = {};
 
-
 export function cleanViewersCache (userId?: number): void {
   if (typeof userId === 'number') {
     delete cachedViewers[userId];

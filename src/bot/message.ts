@@ -36,7 +36,6 @@ import permissions from './permissions';
 import users from './users';
 import customcommands from './systems/customcommands';
 
-
 class Message {
   message = '';
 

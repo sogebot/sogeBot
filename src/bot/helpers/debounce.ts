@@ -1,5 +1,3 @@
-
-
 const debouncing: { [func: string]: number } = {};
 
 export const debounce = async (identification: string, ms = 500): Promise<boolean> => {

@@ -31,7 +31,6 @@ import users from '../users';
 import { attributesReplace } from '../helpers/attributesReplace';
 import { dayjs, timezone } from '../helpers/dayjs';
 
-
 class Discord extends Integration {
   client: DiscordJs.Client | null = null;
 
@@ -536,7 +535,6 @@ class Discord extends Integration {
           if (isSelf || isDM || isDifferentGuild || isInIgnoreList) {
             return;
           }
-
 
           const channels = this.listenAtChannels.split(',').map(o => o.trim());
           if (msg.channel.type === 'text' && channels.length > 0) {

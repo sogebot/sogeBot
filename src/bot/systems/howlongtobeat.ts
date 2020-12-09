@@ -1,4 +1,3 @@
-
 import * as constants from '../constants';
 import System from './_interface';
 import { command, default_permission } from '../decorators';

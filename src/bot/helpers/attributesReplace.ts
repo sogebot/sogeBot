@@ -1,4 +1,3 @@
-
 import { flatten } from './flatten';
 import tmi from '../tmi';
 

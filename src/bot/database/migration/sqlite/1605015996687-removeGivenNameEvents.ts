@@ -29,7 +29,6 @@ export class removeGivenNameEvents1605015996687 implements MigrationInterface {
       );
     }
 
-
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

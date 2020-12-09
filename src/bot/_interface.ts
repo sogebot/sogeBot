@@ -271,7 +271,6 @@ class Module {
     }
   }
 
-
   public _sockets() {
     if (socket === null || ioServer === null) {
       setTimeout(() => this._sockets(), 100);

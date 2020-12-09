@@ -17,7 +17,6 @@ import users from './users';
 
 import { dayjs, timezone } from './helpers/dayjs';
 
-
 class Twitch extends Core {
   @settings('general')
   isTitleForced = false;

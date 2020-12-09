@@ -268,7 +268,6 @@ class Keywords extends System {
     }
   }
 
-
   /**
    * Enable/disable keyword
    *

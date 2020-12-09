@@ -3,7 +3,6 @@ import { getSocket } from './socket';
 const cache: { [id: string]: string } = {};
 const socket = getSocket('/core/users');
 
-
 export const getUsernameById = async function (id: number) {
   if (typeof cache[id] === 'undefined') {
     const username = await new Promise<string | null>((resolve, reject) => {

@@ -418,7 +418,6 @@ class Events extends Core {
     return shouldTrigger;
   }
 
-
   public async checkRaid(event: EventInterface, attributes: Events.Attributes) {
     event.definitions.viewersAtLeast = Number(event.definitions.viewersAtLeast); // force Integer
     const shouldTrigger = (attributes.viewers >= event.definitions.viewersAtLeast);

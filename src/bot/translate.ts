@@ -124,4 +124,3 @@ const translate_class = new Translate();
 const translate = translate_class.translate;
 export default translate_class;
 export { translate };
-

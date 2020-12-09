@@ -28,4 +28,3 @@ class Seppuku extends Game {
 }
 
 export default new Seppuku();
-

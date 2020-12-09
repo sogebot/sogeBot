@@ -131,7 +131,6 @@ class PhillipsHue extends Integration {
     }
   }
 
-
   @command('!hue')
   @default_permission(permission.CASTERS)
   hue (opts: CommandOptions) {

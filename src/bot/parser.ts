@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import _ from 'lodash';
 import * as constants from './constants';
 import { getBotSender } from './commons';
-import { debug, error, isDebugEnabled, warning } from './helpers/log';
+import { debug, error, warning } from './helpers/log';
 import { incrementCountOfCommandUsage } from './helpers/commands/count';
 import { addToViewersCache, getFromViewersCache } from './helpers/permissions';
 import permissions from './permissions';

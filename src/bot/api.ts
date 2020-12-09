@@ -875,7 +875,6 @@ class API extends Core {
 
       ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
 
-
       if (request.data.data.length > 0) {
         oauth.profileImageUrl = request.data.data[0].profile_image_url;
         oauth.broadcasterType = request.data.data[0].broadcaster_type;
@@ -1440,7 +1439,6 @@ class API extends Core {
       }
       return false;
     }
-
 
   }
 

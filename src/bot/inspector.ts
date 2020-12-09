@@ -1,4 +1,3 @@
-
 import inspector from 'inspector';
 import fs from 'fs';
 import { MINUTE, SECOND } from './constants';

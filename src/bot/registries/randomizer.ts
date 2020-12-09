@@ -94,7 +94,6 @@ class Randomizer extends Registry {
     });
   }
 
-
   /**
    * Check if command is in randomizer (priority: low, fireAndForget)
    *

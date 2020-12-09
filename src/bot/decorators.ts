@@ -138,7 +138,6 @@ export function settings(category?: string, isReadOnly = false) {
   };
 }
 
-
 export function permission_settings(category?: string, exclude: string[] = [], enforcedDefaultValue?: { [permId: string]: any }) {
   if (typeof category === 'undefined') {
     category = 'settings';

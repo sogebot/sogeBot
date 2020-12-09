@@ -55,7 +55,6 @@ class Polls extends System {
     this.addMenu({ category: 'manage', name: 'polls', id: 'manage/polls', this: this });
   }
 
-
   sendResponse(responses: CommandResponse[]) {
     for (let i = 0; i < responses.length; i++) {
       setTimeout(async () => {

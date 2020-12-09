@@ -60,4 +60,3 @@ class Roulette extends Game {
 }
 
 export default new Roulette();
-

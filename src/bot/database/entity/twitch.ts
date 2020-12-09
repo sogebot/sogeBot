@@ -1,9 +1,6 @@
 import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer.js';
 
-
-
-
 // Cache mirror from tags endpoint
 /* {
       "tag_id": "621fb5bf-5498-4d8f-b4ac-db4d40d401bf",

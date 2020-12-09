@@ -84,7 +84,6 @@ const levelFormat = {
   stop: '== STREAM STOPPED',
 };
 
-
 function format(level: Levels, message: any, category?: string) {
   const timestamp = dayjs().tz(timezone).format('YYYY-MM-DD[T]HH:mm:ss.SSS');
 

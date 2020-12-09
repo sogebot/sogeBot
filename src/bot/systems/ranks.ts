@@ -87,7 +87,6 @@ class Ranks extends System {
       return [{ response, ...opts }];
     }
 
-
     const value = parseInt(parsed[1], 10);
     const rank = await getRepository(Rank).findOne({ value, type });
     if (!rank) {

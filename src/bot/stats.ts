@@ -134,6 +134,5 @@ class Stats extends Core {
   }
 }
 
-
 const _self = new Stats();
 export default _self;
