@@ -6,6 +6,7 @@ const assert = require('assert');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
+const user = require('../../general.js').user;
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
@@ -163,4 +164,120 @@ describe('game/fightme - !fightme', () => {
       }
     });
   }
+
+  describe('FightMe is on cooldown without bypass by mods', () => {
+    before(async () => {
+      await db.cleanup();
+      await message.prepare();
+      await user.prepare();
+    });
+    after(() => {
+      fightme.cooldown = 0;
+    });
+
+    it('set cooldown to 10 minutes', async () => {
+      fightme.cooldown = 600;
+    });
+
+    it('set manually internal cooldown to 0', async () => {
+      fightme._cooldown = 0;
+    });
+
+    it('user 1 is challenging and should be OK', async () => {
+      const responses = await fightme.main({ command, sender: user.viewer, parameters: user.viewer2.username });
+      assert(responses[0].response.includes('@__viewer__ wants to fight you @__viewer2__! If you accept, send !fightme @__viewer__'), JSON.stringify({responses}));
+    });
+
+    it('user 2 is challenging and should be on cooldown', async () => {
+      const responses = await fightme.main({ command, sender: user.viewer2, parameters: user.mod.username });
+      assert(responses[0].response === '$sender, you cannot use !fightme for 10 minutes.', JSON.stringify({responses}));
+    });
+
+    it('user 2 accepting user 1 fight me, should be OK', async () => {
+      const responses = await fightme.main({ command, sender: user.viewer2, parameters: user.viewer.username });
+      assert(responses[0].response.includes('is proud winner'), JSON.stringify({responses}));
+    });
+  });
+
+  describe('FightMe is on cooldown without bypass by mods', () => {
+    before(async () => {
+      await db.cleanup();
+      await message.prepare();
+      await user.prepare();
+    });
+    after(() => {
+      fightme.cooldown = 0;
+    });
+
+    it('set cooldown to 10 minutes', async () => {
+      fightme.cooldown = 600;
+    });
+
+    it('set manually internal cooldown', async () => {
+      fightme._cooldown = Date.now();
+    });
+
+    it('user 1 is challenging and should be on cooldown', async () => {
+      const responses = await fightme.main({ command, sender: user.viewer, parameters: user.viewer2.username });
+      assert(responses[0].response === '$sender, you cannot use !fightme for 10 minutes.', JSON.stringify({responses}));
+    });
+
+    it('owner is challenging and should be on cooldown', async () => {
+      const responses = await fightme.main({ command, sender: user.owner, parameters: user.viewer2.username });
+      assert(responses[0].response === '$sender, you cannot use !fightme for 10 minutes.', JSON.stringify({responses}));
+    });
+
+    it('mod is challenging and should be on cooldown', async () => {
+      const responses = await fightme.main({ command, sender: user.mod, parameters: user.viewer2.username });
+      assert(responses[0].response === '$sender, you cannot use !fightme for 10 minutes.', JSON.stringify({responses}));
+    });
+  });
+
+  describe('FightMe is on cooldown without bypass by mods', () => {
+    before(async () => {
+      await db.cleanup();
+      await message.prepare();
+      await user.prepare();
+    });
+    after(() => {
+      fightme.cooldown = 0;
+      fightme.bypassCooldownByOwnerAndMods = false;
+    });
+
+    it('set cooldown to 10 minutes', async () => {
+      fightme.cooldown = 600;
+    });
+
+    it('set bypass by mods and owner', async () => {
+      fightme.bypassCooldownByOwnerAndMods = true;
+    });
+
+    it('set manually internal cooldown', async () => {
+      fightme._cooldown = Date.now();
+    });
+
+    it('set fightme timestamp to 0 to force new fightme', async () => {
+      fightme._timestamp = 0;
+    });
+
+    it('user 1 is challenging and should be on cooldown', async () => {
+      const responses = await fightme.main({ command, sender: user.viewer, parameters: user.viewer2.username });
+      assert(responses[0].response === '$sender, you cannot use !fightme for 10 minutes.', JSON.stringify({responses}));
+    });
+
+    it('owner is challenging and should not be on cooldown', async () => {
+      const responses = await fightme.main({ command, sender: user.owner, parameters: user.viewer2.username });
+      assert(responses[0].response.includes('@soge__ wants to fight you @__viewer2__! If you accept, send !fightme @soge__'), JSON.stringify({responses}));
+    });
+
+    it('reset fightme', async () => {
+      fightme._timestamp = 0;
+      fightme._cooldown = Date.now();
+    });
+
+    it('mod is challenging and should not be on cooldown', async () => {
+      const responses = await fightme.main({ command, sender: user.mod, parameters: user.viewer2.username });
+      assert(responses[0].response.includes('@__mod__ wants to fight you @__viewer2__! If you accept, send !fightme @__mod__'), JSON.stringify({responses}));
+    });
+  });
 });

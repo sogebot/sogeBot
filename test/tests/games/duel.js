@@ -86,7 +86,7 @@ describe('Gambling - duel', () => {
     it('winner should be announced', async () => {
       await message.isSentRaw([
         'Congratulations to @user1! He is last man standing and he won 200 points (50% with bet of 100 points)!',
-        'Congratulations to @user2! He is last man standing and he won 200 points (50% with bet of 100 points)!'
+        'Congratulations to @user2! He is last man standing and he won 200 points (50% with bet of 100 points)!',
       ], { username: 'bot'});
     });
   });
@@ -263,7 +263,7 @@ describe('Duel is on cooldown without bypass by mods', () => {
   });
 });
 
-describe('Duel is on cooldown without bypass by mods', () => {
+describe('Duel is on cooldown with bypass by mods', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();

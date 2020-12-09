@@ -140,6 +140,7 @@ class Gamble extends Game {
               points: points,
             });
             return [{ response: message, ...opts }];
+          /* istanbul ignore next */ 
           default:
             error(e.stack);
             return [{ response: translate('core.error'), ...opts }];

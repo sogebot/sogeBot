@@ -216,6 +216,7 @@ class Duel extends Game {
             command: opts.command,
           }), ...opts });
           break;
+        /* istanbul ignore next */
         default:
           error(e.stack);
           responses.push({ response: translate('core.error'), ...opts });
