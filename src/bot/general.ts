@@ -11,6 +11,7 @@ import { Widget } from './database/entity/dashboard';
 import { command, default_permission, settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
 import { setLocale } from './helpers/dayjs';
+import { setLang } from './helpers/locales';
 import { debug, error, warning } from './helpers/log';
 import { getMuteStatus } from './helpers/muteStatus';
 import { getOAuthStatus } from './helpers/OAuthStatus';
@@ -79,8 +80,15 @@ class General extends Core {
   public async onLangUpdate() {
     await translateLib._load();
     warning(translate('core.lang-selected'));
-    setLocale(this.lang);
     addUIWarn({ name: 'UI', message: translate('core.lang-selected') + '. ' + translate('core.refresh-panel') });
+    if (!(await translateLib.check(this.lang))) {
+      warning(`Language ${this.lang} not found - fallback to en`);
+      this.lang = 'en';
+    } else {
+      setLocale(this.lang);
+      setLang(this.lang);
+      warning(translate('core.lang-selected'));
+    }
   }
 
   public async onLangLoad() {
