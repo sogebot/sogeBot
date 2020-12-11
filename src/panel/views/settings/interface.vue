@@ -264,6 +264,7 @@ enum State {
     'discord-guild': () => import('./components/interface/discord-guild.vue'),
     'discord-channel': () => import('./components/interface/discord-channel.vue'),
     'discord-mapping': () => import('./components/interface/discord-mapping.vue'),
+    'emote-combo': () => import('./components/interface/emote-combo.vue'),
     'global-ignorelist-exclude': () => import('./components/interface/global-ignorelist-exclude.vue'),
     'heist-levels': () => import('./components/interface/heist-levels.vue'),
     'heist-results': () => import('./components/interface/heist-results.vue'),

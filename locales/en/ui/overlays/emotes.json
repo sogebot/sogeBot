@@ -12,6 +12,10 @@
 		"cExplosionNumOfEmotesPerExplosion": "No. of emotes per explosion",
 		"cExplosionNumOfExplosions": "No. of explosions",
 		"enableEmotesCombo": "Enable emotes combo",
+		"comboBreakMessages": "Combo break messages",
+		"threshold": "Threshold",
+		"noMessagesFound": "No messages found.",
+		"message": "Message",
 		"comboCooldown": {
 			"title": "Combo cooldown",
 			"help": "Cooldown of combo in seconds"
