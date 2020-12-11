@@ -1,5 +1,5 @@
 import axios from 'axios';
-import * as _ from 'lodash';
+import { shuffle } from 'lodash';
 import { getManager, getRepository } from 'typeorm';
 import { v4 as uuid} from 'uuid';
 import XRegExp from 'xregexp';
@@ -360,7 +360,7 @@ class Emotes extends Overlay {
 
   @parser({ priority: constants.LOW, fireAndForget: true })
   async containsEmotes (opts: ParserOptions) {
-    if (_.isNil(opts.sender) || !Array.isArray(opts.sender.emotes)) {
+    if (!opts.sender || !Array.isArray(opts.sender.emotes)) {
       return true;
     }
 
@@ -404,7 +404,7 @@ class Emotes extends Overlay {
       }
     }
 
-    const emotes = _.shuffle(parsed);
+    const emotes = shuffle(parsed);
     for (let i = 0; i < this.cEmotesMaxEmotesPerMessage && i < emotes.length; i++) {
       ioServer?.of('/overlays/emotes').emit('emote', {
         url: usedEmotes[emotes[i]].urls[this.cEmotesSize],
@@ -457,7 +457,7 @@ class Emotes extends Overlay {
     for (let i = 0, length = emotes.length; i < length; i++) {
       try {
         const items = await getRepository(CacheEmotes).find({ code: emotes[i] });
-        if (!_.isEmpty(items)) {
+        if (items.length > 0) {
           emotesArray.push(items[0].urls[this.cEmotesSize]);
         }
       } catch (e) {
