@@ -1004,7 +1004,7 @@
       "time": "$sender, $username folgt dem Kanal $diff"
     },
     "successSameUsername": {
-      "never": "$sender, sie sind kein Anhänger dieses Kanals",
+      "never": "$sender, sie sind kein follower dieses Kanals",
       "time": "$sender, sie folgen diesem Kanal seit $diff"
     }
   },
