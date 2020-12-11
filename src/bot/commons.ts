@@ -1,6 +1,3 @@
-import { readdirSync } from 'fs';
-import { join, normalize } from 'path';
-
 import { TextChannel } from 'discord.js';
 import _ from 'lodash';
 import { UserStateTags } from 'twitch-js';
@@ -94,24 +91,6 @@ export async function announce(messageToAnnounce: string, type: typeof announceT
       }
     }
   }
-}
-
-export async function autoLoad(directory: string): Promise<{ [x: string]: any }> {
-  const directoryListing = readdirSync(directory);
-  const loaded: { [x: string]: any } = {};
-  for (const file of directoryListing) {
-    if (file.startsWith('_')) {
-      continue;
-    }
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const imported = require(normalize(join(process.cwd(), directory, file)));
-    if (typeof imported.default !== 'undefined') {
-      loaded[file.split('.')[0]] = imported.default; // remap default to root object
-    } else {
-      loaded[file.split('.')[0]] = imported;
-    }
-  }
-  return loaded;
 }
 
 export function getIgnoreList() {

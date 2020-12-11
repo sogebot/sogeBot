@@ -6,6 +6,7 @@ import * as constants from './constants';
 import { areDecoratorsLoaded, persistent, settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
 import { error, info, warning } from './helpers/log';
+import { setOAuthStatus } from './helpers/OAuthStatus';
 import { setStatus } from './helpers/parser';
 import { cleanViewersCache } from './helpers/permissions';
 import tmi from './tmi';
@@ -168,6 +169,13 @@ class OAuth extends Core {
     }
 
     this.timeouts.getChannelId = global.setTimeout(() => this.getChannelId(), timeout);
+  }
+
+  @onChange('broadcasterUsername')
+  @onChange('botUsername')
+  setOAuthStatus() {
+    setOAuthStatus('bot', this.botUsername === '');
+    setOAuthStatus('broadcaster', this.broadcasterUsername === '');
   }
 
   @onChange('broadcasterUsername')

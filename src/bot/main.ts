@@ -22,7 +22,7 @@ import { createConnection, getConnectionOptions } from 'typeorm';
 import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 
 import { changelog } from './changelog';
-import { autoLoad } from './commons';
+import { autoLoad } from './helpers/autoLoad';
 import { setIsBotStarted } from './helpers/database';
 import { debug, error, info, isDebugEnabled, setDEBUG, warning } from './helpers/log';
 import { TypeORMLogger } from './helpers/logTypeorm';
@@ -93,24 +93,25 @@ async function main () {
   try {
     // Initialize all core singletons
     setTimeout(() => {
-      changelog();
-      panelInit();
-      require('./general');
-      require('./socket');
-      require('./ui');
-      require('./currency');
-      require('./stats');
-      require('./users');
-      require('./events');
-      require('./customvariables');
-      require('./twitch');
-      require('./permissions');
       translate = require('./translate');
-      require('./oauth');
-      require('./webhooks');
-      require('./api');
-      require('./pubsub');
+
+      changelog();
       translate.default._load().then(async () => {
+        panelInit();
+        require('./general');
+        require('./socket');
+        require('./ui');
+        require('./currency');
+        require('./stats');
+        require('./users');
+        require('./events');
+        require('./customvariables');
+        require('./twitch');
+        require('./permissions');
+        require('./oauth');
+        require('./webhooks');
+        require('./api');
+        require('./pubsub');
         await autoLoad('./dest/stats/');
         await autoLoad('./dest/registries/');
         await autoLoad('./dest/systems/');

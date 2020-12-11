@@ -8,19 +8,22 @@ import { getRepository } from 'typeorm';
 
 import { Translation } from './database/entity/translation';
 import { areDecoratorsLoaded } from './decorators';
-import general from './general';
 import { flatten } from './helpers/flatten';
+import { getLang } from './helpers/locales';
 import { error, warning } from './helpers/log';
 import { addMenu } from './helpers/panel';
 
 class Translate {
   custom: any[] = [];
   translations: any = {};
-  lang = 'en';
   isLoaded = false;
 
   constructor () {
     addMenu({ category: 'settings', name: 'translations', id: 'settings/translations', this: null });
+  }
+
+  async check(lang: string): Promise<boolean> {
+    return true;
   }
 
   async _load () {
@@ -32,7 +35,6 @@ class Translate {
           setTimeout(() => load(), 10);
           return;
         }
-        this.lang = general.lang;
         glob('./locales/**', (err, files) => {
           if (err) {
             reject(err);
@@ -55,19 +57,14 @@ class Translate {
             require('dayjs/locale/' + key);
           }
 
-          if (_.isNil(this.translations[this.lang])) {
-            warning(`Language ${this.lang} not found - fallback to en`);
-            this.lang = 'en';
-          }
-
           for (const c of this.custom) {
-            if (_.isNil(flatten(this.translations[this.lang])[c.name])) {
+            if (_.isNil(flatten(this.translations.en)[c.name])) {
               // remove if lang doesn't exist anymore
               getRepository(Translation).delete({ name: c.name });
               this.custom = _.remove(this.custom, (i) => i.name === c.name);
             }
           }
-          this.isLoaded = true; // used for mocha tests
+          this.isLoaded = true;
           resolve();
         });
       };
@@ -86,8 +83,12 @@ class Translate {
   }
 
   translate (text: string | { root: string }, orig = false) {
-    if (_.isUndefined(translate_class.translations[translate_class.lang]) && !_.isUndefined(text)) {
-      return '{missing_translation: ' + translate_class.lang + '.' + String(text) + '}';
+    if (!translate_class.isLoaded) {
+      const stack = (new Error('Translations are not yet loaded.')).stack;
+      warning(stack);
+    }
+    if (_.isUndefined(translate_class.translations[getLang()]) && !_.isUndefined(text)) {
+      return '{missing_translation: ' + getLang() + '.' + String(text) + '}';
     } else if (typeof text === 'object') {
       const t = _.cloneDeep(translate_class.translations)[translate_class.lang][text.root];
       for (const c of translate_class.custom) {
@@ -109,14 +110,14 @@ class Translate {
       if (customTranslated && customTranslated.value && !orig) {
         translated = customTranslated.value;
       } else {
-        translated = _.get(this.translations[this.lang], String(text), undefined);
+        translated = _.get(this.translations[getLang()], String(text), undefined);
       }
       _.each(translated.match(/(\{[\w-.]+\})/g), (toTranslate) => {
         translated = translated.replace(toTranslate, this.get(toTranslate.replace('{', '').replace('}', ''), orig));
       });
       return translated;
     } catch (err) {
-      return '{missing_translation: ' + this.lang + '.' + String(text) + '}';
+      return '{missing_translation: ' + getLang() + '.' + String(text) + '}';
     }
   }
 }
