@@ -28,9 +28,6 @@ const { PermissionCommands } = require('../../dest/database/entity/permissions')
 const { SongRequest } = require('../../dest/database/entity/song');
 const { EventList } = require('../../dest/database/entity/eventList');
 
-const oauth = (require('../../dest/oauth')).default;
-const tmi = (require('../../dest/tmi')).default;
-const permissions = (require('../../dest/permissions')).default;
 const translation = (require('../../dest/translate')).default;
 
 module.exports = {
@@ -42,6 +39,10 @@ module.exports = {
       } else {
         debug('test', `Bot is started`);
       }
+
+      const oauth = (require('../../dest/oauth')).default;
+      const tmi = (require('../../dest/tmi')).default;
+      const permissions = (require('../../dest/permissions')).default;
 
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));
       await waitMs(400); // wait little bit for transactions to be done

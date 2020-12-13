@@ -15,10 +15,6 @@ import oauth from '../oauth';
 import { translate } from '../translate';
 import Overlay from './_interface';
 
-let comboEmote = '';
-let comboEmoteCount = 0;
-let comboLastBreak = 0;
-
 class Emotes extends Overlay {
   fetch = {
     global: false,
@@ -65,7 +61,7 @@ class Emotes extends Overlay {
   btnRemoveCache = null;
 
   @settings('emotes_combo')
-  enableEmotesCombo = true;
+  enableEmotesCombo = false;
   @settings('emotes_combo')
   comboCooldown = 0;
   @settings('emotes_combo')
@@ -79,18 +75,14 @@ class Emotes extends Overlay {
     { messagesCount: 15, message: translate('ui.overlays.emotes.message.15') },
     { messagesCount: 20, message: translate('ui.overlays.emotes.message.20') },
   ];
+  comboEmote = '';
+  comboEmoteCount = 0;
+  comboLastBreak = 0;
 
   constructor () {
     super();
 
     setTimeout(() => {
-      // check comboMessages if we have missing translations -> re-do
-      for (const cm of this.comboMessages) {
-        if (cm.message.includes('{missing_translation:')) {
-          cm.message = translate('ui.overlays.emotes.message.' + cm.messagesCount);
-        }
-      }
-
       if (!this.fetch.global) {
         this.fetchEmotesGlobal();
       }
@@ -417,34 +409,34 @@ class Emotes extends Overlay {
       });
     }
 
-    if (this.enableEmotesCombo && Date.now() - comboLastBreak > this.comboCooldown * constants.SECOND) {
+    if (this.enableEmotesCombo && Date.now() - this.comboLastBreak > this.comboCooldown * constants.SECOND) {
       const uniqueEmotes = [...new Set(parsed)];
       // we want to count only messages with emotes (skip text only)
       if (uniqueEmotes.length !== 0) {
-        if (uniqueEmotes.length > 1 || (uniqueEmotes[0] !== comboEmote && comboEmote !== '')) {
+        if (uniqueEmotes.length > 1 || (uniqueEmotes[0] !== this.comboEmote && this.comboEmote !== '')) {
           // combo breaker
-          if (this.comboMessageMinThreshold <= comboEmoteCount) {
-            comboLastBreak = Date.now();
+          if (this.comboMessageMinThreshold <= this.comboEmoteCount) {
+            this.comboLastBreak = Date.now();
             const message = this.comboMessages
               .sort((a, b) => a.messagesCount - b.messagesCount)
-              .filter(o => o.messagesCount <= comboEmoteCount)
+              .filter(o => o.messagesCount <= this.comboEmoteCount)
               .pop();
             if (message) {
             // send message about combo break
               parserReply(
                 prepare(message.message, {
-                  emote: comboEmote,
-                  amount: comboEmoteCount,
+                  emote: this.comboEmote,
+                  amount: this.comboEmoteCount,
                 }, false),
                 opts,
               );
             }
           }
-          comboEmoteCount = 0;
-          comboEmote = '';
+          this.comboEmoteCount = 0;
+          this.comboEmote = '';
         } else {
-          comboEmoteCount++;
-          comboEmote = uniqueEmotes[0];
+          this.comboEmoteCount++;
+          this.comboEmote = uniqueEmotes[0];
         }
       }
     }

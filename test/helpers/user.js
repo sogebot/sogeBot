@@ -1,6 +1,5 @@
 const { getRepository } = require('typeorm');
 const { User } = require('../../dest/database/entity/user');
-const { default: oauth } = require('../../dest/oauth');
 
 const viewer = {
   userId: 1,
@@ -33,11 +32,12 @@ const mod = {
 
 module.exports = {
   prepare: async () => {
+    const { default: oauth } = require('../../dest/oauth');
+
     await getRepository(User).save(viewer);
     await getRepository(User).save(viewer2);
     await getRepository(User).save(owner);
     await getRepository(User).save(mod);
-
     // set owner as broadcaster
     oauth.broadcasterUsername = owner.username;
   },
