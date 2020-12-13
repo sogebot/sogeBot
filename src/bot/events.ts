@@ -25,7 +25,6 @@ import { adminEndpoint } from './helpers/socket';
 import Message from './message';
 import oauth from './oauth';
 import clips from './overlays/clips';
-import emotes from './overlays/emotes';
 import { addUIError } from './panel';
 import Parser from './parser';
 import tmi from './tmi';
@@ -266,10 +265,14 @@ class Events extends Core {
   }
 
   public async fireEmoteExplosion(operation: Events.OperationDefinitions) {
+    // we must require emotes as it is triggering translations in mocha
+    const emotes = require('./overlays/emotes').default;
     emotes.explode(String(operation.emotesToExplode).split(' '));
   }
 
   public async fireEmoteFirework(operation: Events.OperationDefinitions) {
+    // we must require emotes as it is triggering translations in mocha
+    const emotes = require('./overlays/emotes').default;
     emotes.firework(String(operation.emotesToFirework).split(' '));
   }
 

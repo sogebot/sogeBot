@@ -78,9 +78,10 @@ class General extends Core {
   @onChange('lang')
   @onLoad('lang')
   public async onLangUpdate() {
-    await translateLib._load();
-    warning(translate('core.lang-selected'));
-    addUIWarn({ name: 'UI', message: translate('core.lang-selected') + '. ' + translate('core.refresh-panel') });
+    if (!translateLib.isLoaded) {
+      setTimeout(() => this.onLangUpdate(), 10);
+      return;
+    }
     if (!(await translateLib.check(this.lang))) {
       warning(`Language ${this.lang} not found - fallback to en`);
       this.lang = 'en';
