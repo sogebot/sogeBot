@@ -266,14 +266,14 @@ class Events extends Core {
 
   public async fireEmoteExplosion(operation: Events.OperationDefinitions) {
     // we must require emotes as it is triggering translations in mocha
-    const emotes = require('./overlays/emotes').default;
-    emotes.explode(String(operation.emotesToExplode).split(' '));
+    const emotes: typeof import('./overlays/emotes') = require('./overlays/emotes');
+    emotes.default.explode(String(operation.emotesToExplode).split(' '));
   }
 
   public async fireEmoteFirework(operation: Events.OperationDefinitions) {
     // we must require emotes as it is triggering translations in mocha
-    const emotes = require('./overlays/emotes').default;
-    emotes.firework(String(operation.emotesToFirework).split(' '));
+    const emotes: typeof import('./overlays/emotes') = require('./overlays/emotes');
+    emotes.default.firework(String(operation.emotesToFirework).split(' '));
   }
 
   public async fireRunCommand(operation: Events.OperationDefinitions, attributes: Events.Attributes) {
