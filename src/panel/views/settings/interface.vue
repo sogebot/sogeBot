@@ -416,9 +416,6 @@ export default class interfaceSettings extends Vue {
   }
 
   @Watch('$route.params.id')
-
-
-  @Watch('$route.params.id')
   loadSettings(system: string) {
     if (!this.$route.params.id) {
       return this.refresh()
