@@ -11,16 +11,33 @@ export const redirectLogin = () => {
   }
 };
 
+const authorizedSocket = new Map<string, any>();
+const unauthorizedSocket = new Map<string, any>();
+
 export function getSocket(namespace: string, continueOnUnauthorized = false): Socket {
+  if (authorizedSocket.has(namespace)) {
+    return authorizedSocket.get(namespace);
+  }
+
+  if (unauthorizedSocket.has(namespace) && continueOnUnauthorized) {
+    return unauthorizedSocket.get(namespace);
+  }
+
   const socket = (window as any).io(namespace, {
-    forceNew: true,
+    transports: [ 'websocket' ],
     auth: (cb: (data: { token: string | null}) => void) => {
       cb({
         token: localStorage.getItem('accessToken'),
       });
     },
   }) as Socket;
-  socket.connect();
+
+  if (!continueOnUnauthorized) {
+    authorizedSocket.set(namespace, socket);
+  } else {
+    unauthorizedSocket.set(namespace, socket);
+  }
+
   socket.on('connect_error', (error: Error) => {
     if (error.message.includes('jwt expired')) {
       console.debug('Using refresh token to obtain new access token');
