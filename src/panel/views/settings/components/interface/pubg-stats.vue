@@ -18,8 +18,8 @@
       </b-button>
     </div>
     <h4>
-      <template v-if="title.toLowerCase().includes('ranked')">{{ translate('integrations.pubg.player_stats_ranked') }}</template>
-      <template v-else>{{ translate('integrations.pubg.player_stats') }}</template>
+      <title-divider v-if="title.toLowerCase().includes('ranked')">{{ translate('integrations.pubg.player_stats_ranked') }}</title-divider>
+      <title-divider v-else>{{ translate('integrations.pubg.player_stats') }}</title-divider>
     </h4>
     <json-viewer :value="fetchedPlayerStats"></json-viewer>
     <small class="text-muted">{{ translate('integrations.pubg.stats_are_automatically_refreshed_every_10_minutes') }}</small>
@@ -44,6 +44,7 @@ type Props = {
 export default defineComponent({
   components: {
     JsonViewer,
+    'title-divider': () => import('./title-divider.vue'),
   },
   props: {
     settings: Object,
@@ -86,7 +87,7 @@ export default defineComponent({
       })
     }
 
-    return { fetchedPlayerStats, getPlayerStats, state, ButtonStates, translatedTitle, getVariantByState }
+    return { fetchedPlayerStats, getPlayerStats, state, ButtonStates, translatedTitle, getVariantByState, translate }
   },
 });
 </script>

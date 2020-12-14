@@ -29,6 +29,7 @@ declare global {
 
 @Component({})
 export default class helpbox extends Vue {
+  translate = translate;
   @Prop() readonly value!: any;
   @Prop() readonly title!: string;
 
