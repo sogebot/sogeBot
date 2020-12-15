@@ -520,7 +520,7 @@
     "overlays-eventlist-subcommunitygift": "subcommunitygeschenk",
     "overlays-eventlist-host": "Host",
     "overlays-eventlist-sub": "Sub",
-    "overlays-eventlist-follow": "Folgen",
+    "overlays-eventlist-follow": "Follow",
     "overlays-eventlist-cheer": "Bits",
     "overlays-eventlist-tip": "Spende",
     "overlays-eventlist-raid": "Raid",
@@ -1004,7 +1004,7 @@
       "time": "$sender, $username folgt dem Kanal $diff"
     },
     "successSameUsername": {
-      "never": "$sender, sie sind kein Anhänger dieses Kanals",
+      "never": "$sender, sie sind kein follower dieses Kanals",
       "time": "$sender, sie folgen diesem Kanal seit $diff"
     }
   },
