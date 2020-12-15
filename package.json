@@ -149,7 +149,7 @@
     "axios-mock-adapter": "1.19.0",
     "base64-loader": "1.0.0",
     "bestzip": "2.1.7",
-    "bootstrap-vue": "2.21.0",
+    "bootstrap-vue": "2.20.1",
     "chart.js": "2.9.4",
     "clean-webpack-plugin": "3.0.0",
     "css-loader": "5.0.1",
