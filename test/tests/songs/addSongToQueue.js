@@ -13,7 +13,6 @@ const songs = (require('../../../dest/systems/songs')).default;
 const { getRepository } = require('typeorm');
 const { SongRequest } = require('../../../dest/database/entity/song');
 
-
 describe('Songs - addSongToQueue()', () => {
   describe('Add music song by videoId', () => {
     before(async () => {
@@ -81,16 +80,12 @@ describe('Songs - addSongToQueue()', () => {
 
     it(`Add music song ${videoSearch}`, async () => {
       const r = await songs.addSongToQueue({ parameters: videoSearch, sender: user.owner });
-      // we are expecting error until https://github.com/TimeForANinja/node-ytsr/issues/71 is fixed
-      assert.strictEqual(r[0].response, 'Sorry, $sender, but YouTube is sending unexpected responses, please try again later.');
-      // assert.strictEqual(r[0].response, '$sender, song Adele - Someone Like You (Official Music Video) was added to queue');
+      assert.strictEqual(r[0].response, '$sender, song Adele - Someone Like You (Official Music Video) was added to queue');
     });
 
     it(`Queue contains song`, async () => {
       const count = await getRepository(SongRequest).count();
-      // we are expecting 0 until https://github.com/TimeForANinja/node-ytsr/issues/71 is fixed
-      assert(count === 0);
-      // assert(count === 1);
+      assert(count === 1);
     });
   });
 
@@ -160,16 +155,12 @@ describe('Songs - addSongToQueue()', () => {
 
     it(`Add music song ${videoSearch}`, async () => {
       const r = await songs.addSongToQueue({ parameters: videoSearch, sender: user.owner });
-      // we are expecting error until https://github.com/TimeForANinja/node-ytsr/issues/71 is fixed
-      assert.strictEqual(r[0].response, 'Sorry, $sender, but YouTube is sending unexpected responses, please try again later.');
-      // assert.strictEqual(r[0].response, '$sender, song Adele - Someone Like You (Official Music Video) was added to queue');
+      assert.strictEqual(r[0].response, '$sender, song Adele - Someone Like You (Official Music Video) was added to queue');
     });
 
     it(`Queue contains song`, async () => {
       const count = await getRepository(SongRequest).count();
-      // we are expecting 0 until https://github.com/TimeForANinja/node-ytsr/issues/71 is fixed
-      assert(count === 0);
-      // assert(count === 1);
+      assert(count === 1);
     });
   });
 
@@ -239,9 +230,7 @@ describe('Songs - addSongToQueue()', () => {
 
     it(`Add non-music video ${videoSearch}`, async () => {
       const r = await songs.addSongToQueue({ parameters: videoSearch, sender: user.owner });
-      // we are expecting error until https://github.com/TimeForANinja/node-ytsr/issues/71 is fixed
-      assert.strictEqual(r[0].response, 'Sorry, $sender, but YouTube is sending unexpected responses, please try again later.');
-      // assert.strictEqual(r[0].response, 'Sorry, $sender, but this song must be music category');
+      assert.strictEqual(r[0].response, 'Sorry, $sender, but this song must be music category');
     });
 
     it(`Queue is empty`, async () => {

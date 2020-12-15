@@ -518,9 +518,9 @@ class Songs extends System {
       try {
         const search = await ytsr(opts.parameters, { limit: 1 });
         if (search.items.length > 0 && search.items[0].type === 'video') {
-          const videoId = /^\S+(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)(?<videoId>[^#&?]*).*/gi.exec(search.items[0].link)?.groups?.videoId;
+          const videoId = /^\S+(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)(?<videoId>[^#&?]*).*/gi.exec(search.items[0].url)?.groups?.videoId;
           if (!videoId) {
-            throw new Error('VideoID not parsed from ' + search.items[0].link);
+            throw new Error('VideoID not parsed from ' + search.items[0].url);
           }
           opts.parameters = videoId;
           return this.addSongToQueue(opts);
