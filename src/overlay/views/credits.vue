@@ -75,7 +75,7 @@ export default class CreditsOverlay extends Vue {
   isEnded = false;
 
   mounted () {
-    this.socket.emit('load', (err: string | null, opts: any) => {
+    this.socket.emit('load', async (err: string | null, opts: any) => {
       this.settings = opts.settings
 
       // set speed
@@ -119,6 +119,24 @@ export default class CreditsOverlay extends Vue {
           index: Math.random()
         }
       ])
+
+      // preload ttv-boxart
+      await new Promise((resolve) => {
+        fetch('https://static-cdn.jtvnw.net/ttv-boxart/' + encodeURIComponent(opts.game) + '-600x840.jpg')
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.blob();
+          })
+          .then(myBlob => {
+            console.debug('ttv-boxart loaded');
+            resolve(true);
+          })
+          .catch(error => {
+            console.error(`ttv-boxart not loaded`);
+          });
+      });
 
       let currentKey = ''
       let page: any = []
@@ -339,7 +357,7 @@ export default class CreditsOverlay extends Vue {
           }
         })
       }
-    }, 10)
+    }, 1000)
   }
 }
 </script>
