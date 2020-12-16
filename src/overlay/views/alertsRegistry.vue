@@ -257,7 +257,6 @@ export default class AlertsRegistryOverlays extends Vue {
   }
 
   mounted() {
-    console.debug('mounted')
     this.checkResponsiveVoiceAPIKey();
     this.interval.push(window.setInterval(() => {
       if (this.runningAlert) {
@@ -563,8 +562,13 @@ export default class AlertsRegistryOverlays extends Vue {
       if (err) {
         return console.error(err)
       }
-      if (isUpdated) {
-        console.debug('Alert is updating')
+
+      if (isUpdated && this.updatedAt > 0) {
+        location.reload(); // reload full page to be sure we have latest alert version
+      }
+
+      if (isUpdated && this.updatedAt === -1) {
+        console.debug('Alert is loading...')
         this.updatedAt = updatedAt;
         await new Promise<void>((resolve) => {
           this.socket.emit('generic::getOne', this.id, async (err: string | null, data: AlertInterface) => {
