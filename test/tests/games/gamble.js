@@ -75,7 +75,7 @@ describe('Gambling - gamble', () => {
       assert(r[0].response === '$sender, you need to specify points to gamble', JSON.stringify({r}, null, 2));
     });
 
-    describe('User uses !gamble with minimal value 20', () => {
+    describe('User uses !gamble with minimal value 10', () => {
       before(async () => {
         await db.cleanup();
         await message.prepare();
@@ -111,6 +111,25 @@ describe('Gambling - gamble', () => {
         assert(r[0].response === msg1 || r[0].response === msg2, JSON.stringify({r, msg1, msg2}, null, 2));
         assert(updatedPoints === 0 || updatedPoints === 200, updatedPoints);
       });
+    });
+  });
+
+  describe('User uses !gamble all with minimal value and with not enough points - https://community.sogebot.xyz/t/bypass-the-minimum-amount-for-gamble/219', () => {
+    before(async () => {
+      await db.cleanup();
+      await message.prepare();
+      gamble.minimalBet = 110;
+    });
+    after(() => {
+      gamble.minimalBet = 0;
+    });
+
+    it('user should unsuccessfully !gamble all', async () => {
+      const r = await gamble.main({ sender: user1, parameters: 'all', command });
+      const updatedPoints = await points.getPointsOf(user1.userId);
+
+      assert(r[0].response === '$sender, minimal bet for !gamble is 110 points', JSON.stringify({r}, null, 2));
+      assert.strictEqual(updatedPoints, 100);
     });
   });
 });
