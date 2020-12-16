@@ -44,7 +44,7 @@ css:
 ui:
 	@echo -ne "\n\t ----- Bundling with webpack ($(ENV))\n"
 	@VERSION=${VERSION} NODE_ENV=$(ENV) node --max_old_space_size=4096 ./node_modules/webpack/bin/webpack.js --progress
-	@gzip -f -9 public/dist/js/*
+	@gzip -f -9 public/dist/js/*.{js,map}
 
 bot:
 ifeq ($(ENV),production)
