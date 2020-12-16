@@ -84,11 +84,12 @@ class Alerts extends Registry {
         cb(e.stack, null);
       }
     });
-    adminEndpoint(this.nsp, 'alerts::saveMedia', async (items: AlertMediaInterface, cb) => {
+    publicEndpoint(this.nsp, 'alerts::saveMedia', async (items: AlertMediaInterface, cb) => {
       try {
+        const item = await getRepository(AlertMedia).save(items);
         cb(
           null,
-          await getRepository(AlertMedia).save(items)
+          item,
         );
       } catch (e) {
         cb(e.stack, null);

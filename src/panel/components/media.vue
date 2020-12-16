@@ -107,7 +107,7 @@ export default defineComponent({
     volume: Number,
   },
   setup(props: Props, context) {
-    let io: null | Socket = null;
+    let io: Socket = getSocket(props.socket);
     let interval = 0
 
     const b64data = ref('');
@@ -157,7 +157,7 @@ export default defineComponent({
 
     const removeMedia = () => {
       b64data.value = ''
-      io?.emit('alerts::deleteMedia', props.media, () => {})
+      io.emit('alerts::deleteMedia', props.media, () => {})
     }
 
     const fileUpload = (chunks: RegExpMatchArray | null) => {
@@ -179,7 +179,7 @@ export default defineComponent({
                 chunkNo: i
               }
               console.log('Uploading chunk#' + i, chunk)
-              io?.emit('alerts::saveMedia', [chunk], (err: string | null) => {
+              io.emit('alerts::saveMedia', [chunk], (err: string | null) => {
                 if (err) {
                   console.error(err)
                   reject();
@@ -204,13 +204,13 @@ export default defineComponent({
 
       const reader = new FileReader()
       reader.onload = (async e => {
-        const chunks = String(reader.result).match(/.{1,1000000}/g)
+        const chunks = String(reader.result).match(/.{1,500000}/g)
         fileUpload(chunks);
 
         await new Promise<void>(res => {
           const checkIsUploading = () => {
             if (isUploading.value) {
-              setTimeout(() => checkIsUploading(), 100);
+              setTimeout(() => checkIsUploading(), 500);
             } else {
               res()
             }
@@ -225,8 +225,7 @@ export default defineComponent({
 
     onMounted(() => {
       createdAt.value = Date.now();
-      io = getSocket(props.socket);
-      io?.emit('alerts::getOneMedia', props.media, (err: string| null, data: AlertMediaInterface[]) => {
+      io.emit('alerts::getOneMedia', props.media, (err: string| null, data: AlertMediaInterface[]) => {
         if (err) {
           return console.error(err);
         }
