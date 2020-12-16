@@ -219,7 +219,6 @@
             label-cols-lg="3"
             :label="translate('registry.alerts.minAmountToShow.name')"
             :label-for="'minAmountToShow' + data.id">
-          >
             <b-form-input
               :id="'minAmountToShow' + data.id"
               v-model="data.message.minAmountToShow"
@@ -243,6 +242,19 @@
           <b-form-group label-cols-sm="4" label-cols-lg="3"
                        :label="translate('registry.alerts.font.name')">
             <b-form-select v-model="data.message.font.family" :options="fonts" plain></b-form-select>
+          </b-form-group>
+
+          <b-form-group label-cols-sm="4" label-cols-lg="3"
+                  :label="translate('registry.alerts.font.align.name')"
+                  :label-for="'font.align' + data.id"
+                  v-if="data.message.font.align">
+            <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
+              <b-form-select v-model="data.message.font.align" class="mb-3" :id="'font.align' + data.id">
+                <b-form-select-option value="left">{{translate('registry.alerts.font.align.left')}}</b-form-select-option>
+                <b-form-select-option value="center">{{translate('registry.alerts.font.align.center')}}</b-form-select-option>
+                <b-form-select-option value="right">{{translate('registry.alerts.font.align.right')}}</b-form-select-option>
+              </b-form-select>
+            </b-input-group>
           </b-form-group>
 
           <b-form-group label-cols-sm="4" label-cols-lg="3"

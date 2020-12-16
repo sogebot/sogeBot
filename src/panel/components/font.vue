@@ -11,6 +11,19 @@
         </b-form-group>
 
         <b-form-group label-cols-sm="4" label-cols-lg="3"
+                :label="translate('registry.alerts.font.align.name')"
+                :label-for="'font.align' + uuid"
+                v-if="data.align">
+          <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
+            <b-form-select v-model="data.align" class="mb-3" :id="'font.align' + uuid">
+              <b-form-select-option value="left">{{translate('registry.alerts.font.align.left')}}</b-form-select-option>
+              <b-form-select-option value="center">{{translate('registry.alerts.font.align.center')}}</b-form-select-option>
+              <b-form-select-option value="right">{{translate('registry.alerts.font.align.right')}}</b-form-select-option>
+            </b-form-select>
+          </b-input-group>
+        </b-form-group>
+
+        <b-form-group label-cols-sm="4" label-cols-lg="3"
                 :label="translate('registry.alerts.font.size.name')"
                 :label-for="'font.size' + uuid">
           <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
@@ -257,6 +270,7 @@ function loadFont(value: string) {
 
 interface Props {
   data: {
+    align: 'left' | 'center' | 'right';
     family: string;
     size: number;
     borderPx: number;

@@ -96,6 +96,12 @@
   "font": {
     "setting": "Font settings",
     "name": "Font family",
+    "align": {
+      "name": "Alignment",
+      "left": "Left",
+      "center": "Center",
+      "right": "Right"
+    },
     "size": {
       "name": "Font size"
     },

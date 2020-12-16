@@ -70,6 +70,7 @@ export interface CommonSettingsInterface {
     minAmountToPlay: number;
   };
   font: {
+    align: 'left' | 'center' | 'right';
     family: string;
     size: number;
     borderPx: number;
@@ -137,6 +138,7 @@ export interface AlertTipInterface extends CommonSettingsInterface {
       bttv: boolean;
     };
     font: {
+      align: 'left' | 'center' | 'right';
       family: string;
       size: number;
       borderPx: number;
@@ -161,6 +163,7 @@ export interface AlertResubInterface extends CommonSettingsInterface {
       bttv: boolean;
     };
     font: {
+      align: 'left' | 'center' | 'right';
       family: string;
       size: number;
       borderPx: number;

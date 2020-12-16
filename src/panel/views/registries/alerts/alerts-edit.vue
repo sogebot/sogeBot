@@ -416,6 +416,7 @@ export default class AlertsEdit extends Vue {
         minAmountToPlay: 0,
       },
       font: {
+        align: 'center',
         family: 'PT Sans',
         size: 24,
         borderPx: 1,
@@ -450,6 +451,7 @@ export default class AlertsEdit extends Vue {
                 twitch: true, ffz: true, bttv: true
               },
               font: {
+                align: 'left',
                 family: 'PT Sans',
                 size: 16,
                 borderPx: 1,
@@ -482,6 +484,7 @@ export default class AlertsEdit extends Vue {
                 twitch: true, ffz: true, bttv: true
               },
               font: {
+                align: 'left',
                 family: 'PT Sans',
                 size: 16,
                 borderPx: 1,
@@ -516,6 +519,7 @@ export default class AlertsEdit extends Vue {
                 twitch: true, ffz: true, bttv: true
               },
               font: {
+                align: 'left',
                 family: 'PT Sans',
                 size: 12,
                 borderPx: 2,
@@ -537,6 +541,7 @@ export default class AlertsEdit extends Vue {
                 twitch: true, ffz: true, bttv: true
               },
               font: {
+                align: 'left',
                 family: 'PT Sans',
                 size: 12,
                 borderPx: 2,
