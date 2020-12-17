@@ -12,7 +12,7 @@ export class messageAlignmentForAlerts1608158764205 implements MigrationInterfac
       }
     }
     for (const type of ['cheer', 'resub', 'tip', 'reward_redeem', 'command_redeem', 'raid', 'host', 'subgift', 'subcommunitygift', 'sub', 'follow']) {
-      const alerts = await queryRunner.query(`SELECT * from \`alert_${type}\``, undefined);
+      const alerts = await queryRunner.query(`SELECT * from "alert_${type}"`, undefined);
       for (const alert of alerts) {
         const font = JSON.parse(alert.font);
         font.align = 'center';
@@ -31,7 +31,7 @@ export class messageAlignmentForAlerts1608158764205 implements MigrationInterfac
       }
     }
     for (const type of ['cheer', 'resub', 'tip', 'reward_redeem', 'command_redeem', 'raid', 'host', 'subgift', 'subcommunitygift', 'sub', 'follow']) {
-      const alerts = await queryRunner.query(`SELECT * from \`alert_${type}\``, undefined);
+      const alerts = await queryRunner.query(`SELECT * from "alert_${type}"`, undefined);
       for (const alert of alerts) {
         const font = JSON.parse(alert.font);
         delete font.align;
