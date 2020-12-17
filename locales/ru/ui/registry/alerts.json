@@ -63,7 +63,7 @@
   "messageTemplate": {
     "name": "Шаблон сообщения",
     "placeholder": "Установить шаблон сообщения",
-    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
+    "help": "Available variables: {name}, {amount} (bits, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "animationText": {
     "name": "Текст анимации"
@@ -96,6 +96,12 @@
   "font": {
     "setting": "Настройки шрифта",
     "name": "Семейство шрифтов",
+    "align": {
+      "name": "Alignment",
+      "left": "Left",
+      "center": "Center",
+      "right": "Right"
+    },
     "size": {
       "name": "Размер шрифта"
     },

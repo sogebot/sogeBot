@@ -96,6 +96,12 @@
   "font": {
     "setting": "Schrifteinstellungen",
     "name": "Schriftartfamilie",
+    "align": {
+      "name": "Alignment",
+      "left": "Left",
+      "center": "Center",
+      "right": "Right"
+    },
     "size": {
       "name": "Schriftgröße"
     },
