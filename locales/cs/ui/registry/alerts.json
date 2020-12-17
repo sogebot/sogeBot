@@ -63,7 +63,7 @@
   "messageTemplate": {
     "name": "Šablona zprávy",
     "placeholder": "Zadejte svou šablonu zprávy",
-    "help": "Dostupné proměnné: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
+    "help": "Dostupné proměnné: {name}, {amount} (bits, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "animationText": {
     "name": "Animace textu"
@@ -96,6 +96,12 @@
   "font": {
     "setting": "Nastavení fontu",
     "name": "Font",
+    "align": {
+      "name": "Zarovnání",
+      "left": "Vlevo",
+      "center": "Uprostřed",
+      "right": "Vpravo"
+    },
     "size": {
       "name": "Velikost fontu"
     },
