@@ -44,7 +44,7 @@ type Props = {
 export default defineComponent({
   components: {
     JsonViewer,
-    'title-divider': () => import('./title-divider.vue'),
+    'title-divider': () => import('src/panel/components/title-divider.vue'),
   },
   props: {
     settings: Object,
