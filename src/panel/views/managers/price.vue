@@ -65,7 +65,7 @@
             >
               <b-input-group>
                 <b-input-group-text slot="append" class="pr-3 pl-3">
-                  {{ getLocalizedName(editationItem ? editationItem.price : 0, $store.state.configuration.systems.Points.points.name)}}
+                  {{ getLocalizedName(editationItem ? editationItem.price : 0, $store.state.configuration.systems.Points.customization.name)}}
                 </b-input-group-text>
                 <b-form-input
                   v-if="editationItem"
@@ -219,7 +219,7 @@ export default defineComponent({
     const priceFormatter = (item: PriceInterface) => {
         const output = [];
         if (item.price !== 0) {
-          output.push(`${item.price} ${getLocalizedName(item.price, ctx.root.$store.state.configuration.systems.Points.points.name)}`)
+          output.push(`${item.price} ${getLocalizedName(item.price, ctx.root.$store.state.configuration.systems.Points.customization.name)}`)
         }
         if (item.priceBits !== 0) {
           output.push(`${item.priceBits} ${getLocalizedName(item.priceBits, translate('bot.bits'))}`)
