@@ -22,7 +22,7 @@
                 center: runningAlert.alert.layout === '3',
                 ['animate__' + runningAlert.animation]: true,
               }"
-              :style="{'text-align': 'center', 'animation-duration': runningAlert.animationSpeed + 'ms'}"
+              :style="{'text-align': runningAlert.alert.font.align, 'animation-duration': runningAlert.animationSpeed + 'ms'}"
               class="animate__animated">
                 <span :style="{
                   'font-family': runningAlert.alert.font.family,
@@ -42,7 +42,7 @@
                   }"
                   :style="{
                     'width': '30rem',
-                    'text-align': 'left',
+                    'text-align': runningAlert.alert.message.font.align,
                     'flex': '1 0 0px',
                     'font-family': runningAlert.alert.message.font.family,
                     'font-size': runningAlert.alert.message.font.size + 'px',
@@ -52,18 +52,38 @@
                   }" v-html="withEmotes(runningAlert.message)">
                 </div>
             </div>
-             <!-- empty div to mitigate text area -->
+             <!-- we need to have hidden div to have proper width -->
             <div v-else
               :style="{
                 'visibility': 'hidden',
-                'font-family': runningAlert.alert.font.family,
-                'font-size': runningAlert.alert.font.size + 'px',
-                'font-weight': runningAlert.alert.font.weight,
-                'color': runningAlert.alert.font.color,
-                'text-shadow': [textStrokeGenerator(runningAlert.alert.font.borderPx, runningAlert.alert.font.borderColor), shadowGenerator(runningAlert.alert.font.shadow)].filter(Boolean).join(', ')
               }">
-              {{runningAlert.alert.messageTemplate}}
-              <div>{{ runningAlert.message }}</div>
+                <span :style="{
+                  'font-family': runningAlert.alert.font.family,
+                  'font-size': runningAlert.alert.font.size + 'px',
+                  'font-weight': runningAlert.alert.font.weight,
+                  'color': runningAlert.alert.font.color,
+                  'text-shadow': [textStrokeGenerator(runningAlert.alert.font.borderPx, runningAlert.alert.font.borderColor), shadowGenerator(runningAlert.alert.font.shadow)].filter(Boolean).join(', ')
+                  }">
+                  <v-runtime-template :template="prepareMessageTemplate(runningAlert.alert.messageTemplate)"></v-runtime-template>
+                </span>
+                <div
+                  v-if="
+                      typeof runningAlert.alert.message !== 'undefined'
+                    && typeof runningAlert.alert.message.minAmountToShow !== 'undefined'
+                    && runningAlert.alert.message.minAmountToShow <= runningAlert.amount"
+                  :class="{
+                  }"
+                  :style="{
+                    'width': '30rem',
+                    'text-align': runningAlert.alert.message.font.align,
+                    'flex': '1 0 0px',
+                    'font-family': runningAlert.alert.message.font.family,
+                    'font-size': runningAlert.alert.message.font.size + 'px',
+                    'font-weight': runningAlert.alert.message.font.weight,
+                    'color': runningAlert.alert.message.font.color,
+                    'text-shadow': textStrokeGenerator(runningAlert.alert.message.font.borderPx, runningAlert.alert.message.font.borderColor)
+                  }" v-html="withEmotes(runningAlert.message)">
+                </div>
             </div>
             <!-- empty div to mitigate text area -->
           </template>
@@ -454,7 +474,7 @@ export default class AlertsRegistryOverlays extends Vue {
                       'font-size': runningAlert.alert.font.size + 'px',
                       'font-weight': runningAlert.alert.font.weight,
                       'color': runningAlert.alert.font.color,
-                      'text-align': 'center',
+                      'text-align': runningAlert.alert.font.align,
                       'text-shadow': [textStrokeGenerator(runningAlert.alert.font.borderPx, runningAlert.alert.font.borderColor), shadowGenerator(runningAlert.alert.font.shadow)].filter(Boolean).join(', ')
                     }"
                   `)
