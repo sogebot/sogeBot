@@ -62,88 +62,96 @@
 
             <b-form-group>
               <template v-if="editationItem">
-                <label>{{ translate('systems.customcommands.response.name') }}</label>
-                <div
-                  style="display: flex; flex: 1 1 auto"
+                <b-alert show v-if="editationItem.responses.length === 0">
+                  {{translate('systems.customcommands.no-responses-set')}}
+                </b-alert>
+                <b-row
+                  no-gutters
                   :key="i"
                   :class="[i !== 0 ? 'pt-2' : '']"
                   v-for="(response, i) of orderBy(editationItem.responses, 'order', 'asc')"
                 >
-                  <textarea-with-tags
-                    :value.sync="response.response"
-                    v-bind:placeholder="translate('systems.customcommands.response.placeholder')"
-                    v-bind:filters="['global', 'sender', 'param', '!param', 'touser']"
-                    v-on:update="response.response = $event"
-                    :state="true"
-                  ></textarea-with-tags>
-                  <textarea-with-tags
-                    :value.sync="response.filter"
-                    v-bind:placeholder="translate('systems.customcommands.filter.placeholder')"
-                    v-on:update="response.filter = $event"
-                    v-bind:filters="['sender', 'source', 'haveParam', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'rank', 'game', 'language', 'title', 'views', 'followers', 'hosts', 'subscribers']"
-                    :state="true"
-                  ></textarea-with-tags>
-                  <div class="h-auto w-auto" style="flex-shrink: 0;">
-                    <b-dropdown variant="outline-dark" toggle-class="border-0 h-auto w-auto" class="h-100">
-                      <template v-slot:button-content>
-                        <fa class="mr-1" icon="key" />
-                        <span
-                          v-if="getPermissionName(response.permission, permissions)"
-                        >{{ getPermissionName(response.permission, permissions) }}</span>
-                        <span v-else class="text-danger">
-                          <fa icon="exclamation-triangle" />Permission not found
-                        </span>
-                      </template>
-                      <b-dropdown-item
-                        v-for="p of permissions"
-                        :key="p.id"
-                        @click="response.permission = p.id; state.pending = true;"
-                      >{{ getPermissionName(p.id, permissions) | capitalize }}</b-dropdown-item>
-                    </b-dropdown>
-                  </div>
-                  <div class="h-auto w-auto" style="flex-shrink: 0;">
-                    <b-dropdown variant="outline-dark" toggle-class="border-0 h-auto w-auto" class="h-100">
-                      <template v-slot:button-content>
-                        <fa class="mr-1" :icon="response.stopIfExecuted ? 'stop' : 'play'" />
-                        {{ translate(response.stopIfExecuted ? 'commons.stop-if-executed' : 'commons.continue-if-executed') | capitalize }}
-                      </template>
-                      <b-dropdown-item
-                        @click="response.stopIfExecuted = true; state.pending = true"
-                      >{{ translate('commons.stop-if-executed') | capitalize }}</b-dropdown-item>
-                      <b-dropdown-item
-                        @click="response.stopIfExecuted = false; state.pending = true"
-                      >{{ translate('commons.continue-if-executed') | capitalize }}</b-dropdown-item>
-                    </b-dropdown>
-                  </div>
+                  <b-col>
+                    <title-divider>{{ translate('systems.customcommands.response.name') }} {{i+1}}</title-divider>
+                  </b-col>
 
-                  <div class="h-auto w-auto" style="flex-shrink: 0;">
-                    <b-dropdown
-                      variant="outline-dark"
-                      toggle-class="border-0 h-auto w-auto"
-                      class="h-100"
-                      no-caret
-                    >
-                      <template v-slot:button-content>
-                        <fa icon="ellipsis-v"></fa>
-                      </template>
-                      <b-dropdown-item v-if="i !== 0" @click="moveUpResponse(response.order)">
-                        <fa icon="sort-up" fixed-width></fa>
-                        {{ translate('commons.moveUp') | capitalize }}
-                      </b-dropdown-item>
-                      <b-dropdown-item
-                        v-if="i !== editationItem.responses.length - 1"
-                        @click="moveDownResponse(response.order)"
+                  <b-col md="auto" sm="12" align-self="end" class="text-right">
+                    <div class="h-auto w-auto" style="flex-shrink: 0;">
+                      <b-dropdown variant="outline-dark" toggle-class="border-0 h-auto w-auto" class="h-100">
+                        <template v-slot:button-content>
+                          <fa class="mr-1" icon="key" />
+                          <span
+                            v-if="getPermissionName(response.permission, permissions)"
+                          >{{ getPermissionName(response.permission, permissions) }}</span>
+                          <span v-else class="text-danger">
+                            <fa icon="exclamation-triangle" />Permission not found
+                          </span>
+                        </template>
+                        <b-dropdown-item
+                          v-for="p of permissions"
+                          :key="p.id"
+                          @click="response.permission = p.id; state.pending = true;"
+                        >{{ getPermissionName(p.id, permissions) | capitalize }}</b-dropdown-item>
+                      </b-dropdown>
+                      <b-dropdown variant="outline-dark" toggle-class="border-0 h-auto w-auto" class="h-100">
+                        <template v-slot:button-content>
+                          <fa class="mr-1" :icon="response.stopIfExecuted ? 'stop' : 'play'" />
+                          {{ translate(response.stopIfExecuted ? 'commons.stop-if-executed' : 'commons.continue-if-executed') | capitalize }}
+                        </template>
+                        <b-dropdown-item
+                          @click="response.stopIfExecuted = true; state.pending = true"
+                        >{{ translate('commons.stop-if-executed') | capitalize }}</b-dropdown-item>
+                        <b-dropdown-item
+                          @click="response.stopIfExecuted = false; state.pending = true"
+                        >{{ translate('commons.continue-if-executed') | capitalize }}</b-dropdown-item>
+                      </b-dropdown>
+                      <b-dropdown
+                        variant="outline-dark"
+                        toggle-class="border-0 h-auto w-auto"
+                        class="h-100"
+                        no-caret
                       >
-                        <fa icon="sort-down" fixed-width></fa>
-                        {{ translate('commons.moveDown') | capitalize }}
-                      </b-dropdown-item>
-                      <b-dropdown-item @click="deleteResponse(response.order)">
-                        <fa icon="trash-alt" fixed-width></fa>
-                        {{ translate('delete') }}
-                      </b-dropdown-item>
-                    </b-dropdown>
-                  </div>
-                </div>
+                        <template v-slot:button-content>
+                          <fa icon="ellipsis-v"></fa>
+                        </template>
+                        <b-dropdown-item v-if="i !== 0" @click="moveUpResponse(response.order)">
+                          <fa icon="sort-up" fixed-width></fa>
+                          {{ translate('commons.moveUp') | capitalize }}
+                        </b-dropdown-item>
+                        <b-dropdown-item
+                          v-if="i !== editationItem.responses.length - 1"
+                          @click="moveDownResponse(response.order)"
+                        >
+                          <fa icon="sort-down" fixed-width></fa>
+                          {{ translate('commons.moveDown') | capitalize }}
+                        </b-dropdown-item>
+                        <b-dropdown-item @click="deleteResponse(response.order)">
+                          <fa icon="trash-alt" fixed-width></fa>
+                          {{ translate('delete') }}
+                        </b-dropdown-item>
+                      </b-dropdown>
+                    </div>
+                  </b-col>
+
+                  <b-col cols="12" sm="8" md="9">
+                    <textarea-with-tags
+                      :value.sync="response.response"
+                      v-bind:placeholder="translate('systems.customcommands.response.placeholder')"
+                      v-bind:filters="['global', 'sender', 'param', '!param', 'touser']"
+                      v-on:update="response.response = $event"
+                      :state="true"
+                    ></textarea-with-tags>
+                  </b-col>
+                  <b-col cols="12" sm="4" md="3">
+                    <textarea-with-tags
+                      :value.sync="response.filter"
+                      v-bind:placeholder="translate('systems.customcommands.filter.placeholder')"
+                      v-on:update="response.filter = $event"
+                      v-bind:filters="['sender', 'source', 'haveParam', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'rank', 'game', 'language', 'title', 'views', 'followers', 'hosts', 'subscribers']"
+                      :state="true"
+                    ></textarea-with-tags>
+                  </b-col>
+                </b-row>
                 <button
                   class="btn btn-primary btn-block mt-2"
                   type="button"
@@ -261,6 +269,7 @@ export default defineComponent({
   components: {
     loading: () => import('../../components/loading.vue'),
     'text-with-tags': () => import('../../components/textWithTags.vue'),
+    'title-divider': () => import('src/panel/components/title-divider.vue'),
   },
   filters: {
     capitalize (value: string) {
