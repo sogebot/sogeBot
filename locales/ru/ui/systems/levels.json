@@ -1,6 +1,6 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Статус",
     "conversionRate": "Conversion rate 1 XP for x Points",
     "firstLevelStartsAt": "First level starts at XP",
     "nextLevelFormula": {
