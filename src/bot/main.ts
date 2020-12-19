@@ -120,6 +120,7 @@ async function main () {
         await autoLoad('./dest/integrations/');
 
         panelExpose();
+        startWatcher();
 
         if (process.env.HEAP) {
           warning(chalk.bgRed.bold('HEAP debugging is ENABLED'));
@@ -134,8 +135,6 @@ async function main () {
           // load tmi last
           const tmi = require('./tmi');
           tmi.default.shouldConnect = true;
-
-          startWatcher();
           setIsBotStarted();
 
           if (isDebugEnabled('eventloop')) {
