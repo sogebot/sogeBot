@@ -18,31 +18,44 @@ const readonly: {
 } = {};
 let checkInProgress = false;
 
-export const startWatcher = () => {
-  debug('watcher', 'watcher::start');
-  const watcher = async () => {
-    if (isDbConnected && !checkInProgress) {
-      try {
-        checkInProgress = true;
-        debug('watcher', 'watcher::check');
-        const time = process.hrtime();
-        await VariableWatcher.check();
-        logAvgTime('VariableWatcher.check()', process.hrtime(time));
-        debug('watcher', `watcher::check Finished after ${process.hrtime(time)[0]}s ${process.hrtime(time)[1] / 1000000}ms`);
-      } catch (e) {
-        error(e.message);
-      } finally {
-        setTimeout(() => {
-          checkInProgress = false;
-        }, 30 * SECOND);
-      }
-    } else {
-      debug('watcher', `watcher::skipped ${{ isDbConnected, checkInProgress }}`);
+export const check = async (forceCheck = false) => {
+  debug('watcher', `watcher::start ${forceCheck ? '(forced)': ''}`);
+  if (checkInProgress) {
+    await new Promise((resolve) => {
+      const awaiter = () => {
+        if (!checkInProgress) {
+          resolve(true);
+        } else {
+          setTimeout(() => {
+            awaiter();
+          }, 100);
+        }
+      };
+    });
+  }
+  if (isDbConnected && !checkInProgress) {
+    try {
+      checkInProgress = true;
+      debug('watcher', 'watcher::check');
+      const time = process.hrtime();
+      await VariableWatcher.check();
+      logAvgTime('VariableWatcher.check()', process.hrtime(time));
+      debug('watcher', `watcher::check Finished after ${process.hrtime(time)[0]}s ${process.hrtime(time)[1] / 1000000}ms`);
+    } catch (e) {
+      error(e.message);
+    } finally {
+      setTimeout(() => {
+        checkInProgress = false;
+      }, 5 * SECOND);
     }
-  };
+  } else {
+    debug('watcher', `watcher::skipped ${JSON.stringify({ isDbConnected, checkInProgress })}`);
+  }
+};
 
-  watcher();
-  setInterval(watcher, MINUTE);
+export const startWatcher = () => {
+  check();
+  setInterval(check, MINUTE);
 };
 
 export const VariableWatcher = {
@@ -80,6 +93,7 @@ export const VariableWatcher = {
           value: JSON.stringify(value),
         });
 
+        debug('watcher', `watcher::change *** ${type}.${name}.${variable} changed to ${value}`);
         change(`${type}.${name}.${variable}`);
         for (const event of getFunctionList('change', type === 'core' ? `${name}.${variable}` : `${type}.${name}.${variable}`)) {
           if (typeof (checkedModule as any)[event.fName] === 'function') {

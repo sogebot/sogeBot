@@ -43,9 +43,14 @@ export let socketsConnected = 0;
 export type UIError = { name: string; message: string };
 
 const errors: UIError[] = [];
+const warns: UIError[] = [];
 
 export const addUIError = (error: UIError) => {
   errors.push(error);
+};
+
+export const addUIWarn = (warn: UIError) => {
+  warns.push(warn);
 };
 
 export const init = () => {
@@ -358,21 +363,33 @@ export const init = () => {
       cb?.(null, '');
     });
 
-    adminEndpoint('/', 'panel::errors', (cb) => {
-      const errorsToShow: typeof errors  = [];
+    adminEndpoint('/', 'panel::alerts', (cb) => {
+      const toShow: { errors: typeof errors, warns: typeof warns }  = { errors: [], warns: [] };
       do {
         const error = errors.shift();
         if (!error) {
           break;
         }
 
-        if (!errorsToShow.find((o) => {
+        if (!toShow.errors.find((o) => {
           return o.name === error.name && o.message === error.message;
         })) {
-          errorsToShow.push(error);
+          toShow.errors.push(error);
         }
       } while (errors.length > 0);
-      cb(null, errorsToShow);
+      do {
+        const warn = warns.shift();
+        if (!warn) {
+          break;
+        }
+
+        if (!toShow.warns.find((o) => {
+          return o.name === warn.name && o.message === warn.message;
+        })) {
+          toShow.warns.push(warn);
+        }
+      } while (warns.length > 0);
+      cb(null, toShow);
     });
 
     adminEndpoint('/', 'panel::availableWidgets', async (opts, cb) => {

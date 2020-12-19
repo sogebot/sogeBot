@@ -15,7 +15,7 @@ import { debug, error, warning } from './helpers/log';
 import { permission } from './helpers/permissions';
 import { find, list } from './helpers/register';
 import oauth from './oauth';
-import { socketsConnected } from './panel';
+import { addUIWarn, socketsConnected } from './panel';
 import tmi from './tmi';
 import translateLib, { translate } from './translate';
 
@@ -80,6 +80,7 @@ class General extends Core {
     await translateLib._load();
     warning(translate('core.lang-selected'));
     setLocale(this.lang);
+    addUIWarn({ name: 'UI', message: translate('core.lang-selected') + '. ' + translate('core.refresh-panel') });
   }
 
   public async onLangLoad() {
