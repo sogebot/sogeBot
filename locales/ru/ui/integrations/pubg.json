@@ -1,15 +1,15 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Статус",
     "apiKey": {
-      "title": "API Key",
-      "help": "Get your API Key at https://developer.pubg.com/"
+      "title": "Ключ API",
+      "help": "Получите свой API ключ на https://developer.pubg.com/"
     },
-    "platform": "Platform",
-    "playerName": "Player Name",
-    "playerId": "Player ID",
+    "platform": "Платформа",
+    "playerName": "Имя игрока",
+    "playerId": "ID игрока",
     "seasonId": {
-      "title": "Season ID",
+      "title": "ID сезона",
       "help": "Current season ID is being fetch every hour."
     },
     "rankedGameModeStatsCustomization": "Customized message for ranked stats",
