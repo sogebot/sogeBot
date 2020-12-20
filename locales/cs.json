@@ -412,9 +412,9 @@
             "message": "Top Tip - během vysílání (zpráva)"
           }
         },
-        "latestCheerAmount": "Poslední Bit (počet)",
-        "latestCheerMessage": "Poslední Bit (zpráva)",
-        "latestCheer": "Poslední Bit (uživatel)",
+        "latestCheerAmount": "Poslední Bity (počet)",
+        "latestCheerMessage": "Poslední Bity (zpráva)",
+        "latestCheer": "Poslední Bity (uživatel)",
         "version": "Verze bota",
         "haveParam": "Příkaz má parametr? (bool)",
         "source": "Aktuální zdroj (twitch nebo discord)",
