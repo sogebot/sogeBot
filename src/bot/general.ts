@@ -89,6 +89,7 @@ class General extends Core {
       setLocale(this.lang);
       setLang(this.lang);
       warning(translate('core.lang-selected'));
+      addUIWarn({ name: 'UI', message: translate('core.lang-selected') + '. ' + translate('core.refresh-panel') });
     }
   }
 

@@ -23,7 +23,7 @@ class Translate {
   }
 
   async check(lang: string): Promise<boolean> {
-    return true;
+    return typeof this.translations[lang] !== 'undefined';
   }
 
   async _load () {
