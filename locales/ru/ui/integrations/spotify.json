@@ -7,8 +7,8 @@
       "help": "Рекомендуется отключить это во избежание достижения лимитов API"
     },
     "queueWhenOffline": {
-      "title": "Queue songs when stream is offline",
-      "help": "It's advised to have this disabled to avoid queueing when you are just listening music"
+      "title": "Очередь треков, когда стрим оффлайн",
+      "help": "Рекомендуется отключить этот параметр, чтобы избежать очереди, когда вы просто слушаете музыку"
     },
     "clientId": "clientId",
     "clientSecret": "clientSecret",
@@ -26,6 +26,6 @@
       "help": "Если установлено, по завершении заказанных песен этот плейлист будет продолжаться"
     },
     "continueOnPlaylistAfterRequest": "Продолжить воспроизведение плейлиста после заказанных песен",
-    "notify": "Send message on song change"
+    "notify": "Отправить сообщение при смене песни"
   }
 }

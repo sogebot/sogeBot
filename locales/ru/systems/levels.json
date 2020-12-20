@@ -1,7 +1,7 @@
 {
-  "currentLevel": "$username, level: $currentLevel ($currentXP $xpName), $nextXP $xpName to next level.",
-  "changeXP": "$sender, you changed $xpName by $amount $xpName to $username.",
-  "notEnoughPointsToBuy": "Sorry $sender, but you don't have $points $pointsName to buy $amount $xpName for level $level.",
-  "XPBoughtByPoints": "$sender, you bought $amount $xpName with $points $pointsName and reached level $level.",
-  "somethingGetWrong": "$sender, something get wrong with your request."
+  "currentLevel": "$username, уровень: $currentLevel ($currentXP $xpName), $nextXP $xpName на следующий уровень.",
+  "changeXP": "$sender, вы изменили $xpName от $amount $xpName на $username.",
+  "notEnoughPointsToBuy": "Извините $sender, но у вас нет $points $pointsName, чтобы купить $amount $xpName за $level уровень.",
+  "XPBoughtByPoints": "$sender, вы купили $amount $xpName за $points $pointsName и достигли уровня $level.",
+  "somethingGetWrong": "$sender, что-то пошло не так с вашим запросом."
 }

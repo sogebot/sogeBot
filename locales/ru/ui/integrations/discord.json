@@ -4,7 +4,7 @@
     "guild": "Сервер",
     "listenAtChannels": "Слушать на этих каналах",
     "sendOnlineAnnounceToChannel": "Отправить онлайн объявление в этот канал",
-    "sendAnnouncesToChannel": "Setup sending of announcements to channels",
+    "sendAnnouncesToChannel": "Настройка отправки объявлений в каналы",
     "deleteMessagesAfterWhile": "Удалить сообщение через некоторое время",
     "clientId": "ClientId",
     "token": "Токен",
@@ -14,12 +14,12 @@
     "noRoleSelected": "роль не выбрана",
     "noGuildSelected": "сервер не выбран",
     "noGuildSelectedBox": "Выберете сервер на котором должен работать бот, и вы увидите больше настроек",
-    "onlinePresenceStatusDefault": "Default Status",
-    "onlinePresenceStatusDefaultName": "Default Status Message",
-    "onlinePresenceStatusOnStream": "Status when Streaming",
+    "onlinePresenceStatusDefault": "Статус по умолчанию",
+    "onlinePresenceStatusDefaultName": "Сообщение о статусе по умолчанию",
+    "onlinePresenceStatusOnStream": "Статус при трансляции",
     "onlinePresenceStatusOnStreamName": "Status Message when Streaming",
     "ignorelist": {
-      "title": "Ignore list",
+      "title": "Черный список",
       "help": "username, username#0000 or userID"
     }
   }

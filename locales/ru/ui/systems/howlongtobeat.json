@@ -2,17 +2,17 @@
   "settings": {
     "enabled": "Статус"
   },
-  "empty": "No games were tracked yet.",
-  "emptyAfterSearch": "No tracked games were found by your search for <strong>\"$search\"</strong>.",
-  "when": "When streamed",
-  "time": "Tracked time",
-  "offset": "Offset of tracked time",
-  "main": "Main",
-  "extra": "Main+Extra",
-  "completionist": "Completionist",
-  "game": "Tracked game",
-  "startedAt": "Tracking started at",
-  "showHistory": "Show history ($count)",
-  "hideHistory": "Hide history ($count)",
-  "searchToAddNewGame": "Search to add new game to track"
+  "empty": "Нет отслеживаемых игр.",
+  "emptyAfterSearch": "Не найдено отслеживаемых игр по вашему запросу <strong>\"$search\"</strong>.",
+  "when": "При трансляции",
+  "time": "Отслеживаемое время",
+  "offset": "Смещение отслеживаемого времени",
+  "main": "Основной",
+  "extra": "Основной+Дополнительный",
+  "completionist": "Пройдено",
+  "game": "Отслеживаемая игра",
+  "startedAt": "Отслеживание начато в",
+  "showHistory": "Показать историю ($count)",
+  "hideHistory": "Скрыть историю ($count)",
+  "searchToAddNewGame": "Поиск новой игры для отслеживания"
 }
