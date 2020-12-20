@@ -121,7 +121,6 @@ async function main () {
         await autoLoad('./dest/integrations/');
 
         panelExpose();
-        startWatcher();
 
         if (process.env.HEAP) {
           warning(chalk.bgRed.bold('HEAP debugging is ENABLED'));
@@ -137,6 +136,7 @@ async function main () {
           const tmi = require('./tmi');
           tmi.default.shouldConnect = true;
           setIsBotStarted();
+          startWatcher();
 
           if (isDebugEnabled('eventloop')) {
             warning('EVENTLOOP BLOCK DETECTION ENABLED! This may cause some performance issues.');

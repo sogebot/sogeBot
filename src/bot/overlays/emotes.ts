@@ -63,6 +63,8 @@ class Emotes extends Overlay {
   @settings('emotes_combo')
   enableEmotesCombo = false;
   @settings('emotes_combo')
+  showEmoteInOverlayThreshold = 3;
+  @settings('emotes_combo')
   comboCooldown = 0;
   @settings('emotes_combo')
   comboMessageMinThreshold = 3;
@@ -241,7 +243,7 @@ class Emotes extends Overlay {
           const cachedEmote = (await getRepository(CacheEmotes).findOne({ code: emotes[i].code, type: 'ffz' }));
           await getRepository(CacheEmotes).save({
             ...cachedEmote,
-            code: emotes[i].code,
+            code: emotes[i].name,
             type: 'ffz',
             urls: emotes[i].urls,
           });
@@ -434,9 +436,15 @@ class Emotes extends Overlay {
           }
           this.comboEmoteCount = 0;
           this.comboEmote = '';
+          ioServer?.of('/overlays/emotes').emit('combo', {
+            count: this.comboEmoteCount, url: null, threshold: this.showEmoteInOverlayThreshold,
+          });
         } else {
           this.comboEmoteCount++;
           this.comboEmote = uniqueEmotes[0];
+          ioServer?.of('/overlays/emotes').emit('combo', {
+            count: this.comboEmoteCount, url: usedEmotes[this.comboEmote].urls['3'], threshold: this.showEmoteInOverlayThreshold,
+          });         
         }
       }
     }

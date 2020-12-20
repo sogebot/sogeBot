@@ -16,6 +16,7 @@
 		"threshold": "Threshold",
 		"noMessagesFound": "No messages found.",
 		"message": "Message",
+		"showEmoteInOverlayThreshold": "Minimal message threshold to show emote in overlay",
 		"comboCooldown": {
 			"title": "Combo cooldown",
 			"help": "Cooldown of combo in seconds"

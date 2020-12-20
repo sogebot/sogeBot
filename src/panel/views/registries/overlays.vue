@@ -82,6 +82,7 @@ export default defineComponent({
       { value: 'clipscarousel', text: 'clipscarousel' },
       { value: 'credits', text: 'credits' },
       { value: 'emotes', text: 'emotes' },
+      { value: 'emotescombo', text: 'emotescombo' },
       { value: 'eventlist', text: 'eventlist' },
       { value: 'polls', text: 'polls' },
       { value: 'randomizer', text: 'randomizer' },
