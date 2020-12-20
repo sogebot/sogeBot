@@ -66,7 +66,7 @@ export default class translations extends Vue {
   items: { name: string, current: string, default: string }[] = [];
   search: string = '';
 
-  currentPage = 0
+  currentPage = 1
   perPage = 10;
 
   fields = [
@@ -89,7 +89,7 @@ export default class translations extends Vue {
 
   @Watch('search')
   watchSearch() {
-    this.currentPage = 0;
+    this.currentPage = 1;
   }
 
   get rows() {
