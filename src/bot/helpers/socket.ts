@@ -115,6 +115,7 @@ function adminEndpoint (nsp: string, on: 'price::save', callback: (item: Readonl
 function adminEndpoint (nsp: string, on: 'panel::availableWidgets' | 'panel::dashboards', callback: (opts: { userId: number; type: DashboardInterface['type'] }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'panel::dashboards::remove', callback: (opts: { userId: number; type: DashboardInterface['type'], id: string }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'panel::dashboards::create', callback: (opts: { userId: number, name: string }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
+function adminEndpoint (nsp: string, on: 'panel::alerts', callback: (cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'lists.set', callback: (opts: { blacklist: string[]; whitelist: string[] }, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 function adminEndpoint (nsp: string, on: 'purgeAllConnections', callback: (cb: (error: Error | string | null) => void, socket: Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'pubg::searchForPlayerId', callback: (opts: { apiKey: string, platform: typeof PUBG.platform, playerName: string }, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;

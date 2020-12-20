@@ -19,6 +19,7 @@ import { addMenu, addMenuPublic, addWidget, ioServer, menu, menuPublic } from '.
 import { permission } from './helpers/permissions';
 import { register } from './helpers/register';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
+import * as watchers from './watchers';
 
 let socket: import('./socket').Socket | any = null;
 
@@ -381,6 +382,8 @@ class Module {
             setTimeout(() => cb(e.stack), 1000);
           }
         }
+
+        await watchers.check(true); // force watcher to refresh
 
         if (typeof cb === 'function') {
           setTimeout(() => cb(null), 1000);

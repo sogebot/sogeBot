@@ -1,6 +1,6 @@
 <template>
   <div class="stream-info-container container-fluid" :class="{ 'sticky-top': b_sticky }" :style="{ 'top': b_sticky ? top + 'px' : undefined }" ref="quickwindow">
-    <b-toast :title="error.name" no-auto-hide visible variant="danger" v-for="error of errors" :key="error.name + error.message + error.date">
+    <b-toast :title="error.name" no-auto-hide visible :variant="error.type === 'error' ? 'danger' : 'info'" v-for="error of errors" :key="error.name + error.message + error.date">
       <div v-html="error.message"/>
     </b-toast>
     <b-toast :title="translate('errors.owner_and_broadcaster_oauth_is_not_set')" no-auto-hide visible variant="danger" solid v-if="!$store.state.configuration.isCastersSet">
@@ -463,7 +463,7 @@ const numberReducer = (out: string, item: any) => {
 
 export default defineComponent({
   setup(props, context) {
-    const errors: Ref<(UIError & { date: number })[]> = ref([]);
+    const errors: Ref<(UIError & { date: number, type: 'error' | 'warn' })[]> = ref([]);
     const averageStats: any = reactive({});
     const hideStats = ref(localStorage.getItem('hideStats') === 'true');
     const timestamp: Ref<null | number> = ref(null);
@@ -618,18 +618,22 @@ export default defineComponent({
       })
 
       UIErrorInterval = window.setInterval(() => {
-        socket.emit('panel::errors', (err: string | null, data: { name: string; message: string }[]) => {
+        socket.emit('panel::alerts', (err: string | null, data: { errors: { name: string; message: string }[], warns: { name: string; message: string }[] }) => {
           if (err) {
             return console.error(err);
           }
-          for (const error of data) {
+          for (const error of data.errors) {
             console.error(`UIError: ${error.name} ¦ ${error.message}`);
-          errors.value.push({ ...error, date: Date.now() });
+            errors.value.push({ ...error, date: Date.now(), type: 'error' });
+          }
+          for (const error of data.warns) {
+            console.info(`UIWarn: ${error.name} ¦ ${error.message}`);
+            errors.value.push({ ...error, date: Date.now(), type: 'warn' });
           }
         });
       }, 5000);
       EventBus.$on('error', (err: UIError) => {
-        errors.value.push({ ...err, date: Date.now() });
+        errors.value.push({ ...err, date: Date.now(), type: 'error' });
       })
 
       getLatestStats();
