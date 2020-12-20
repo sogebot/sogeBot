@@ -3,8 +3,8 @@ import crypto from 'crypto';
 import * as _ from 'lodash';
 import { Brackets, getRepository } from 'typeorm';
 
-import { isBot } from '../commons';
 import { EventList as EventListEntity } from '../database/entity/eventList';
+import { isBot } from '../helpers/isBot';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import users from '../users';
 import eventlist from '../widgets/eventlist';

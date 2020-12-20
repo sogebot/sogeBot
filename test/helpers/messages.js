@@ -4,17 +4,16 @@ const chalk = require('chalk');
 const util = require('util');
 const sinon = require('sinon');
 const _ = require('lodash');
-const { prepare } = require('../../dest/commons');
 
 let eventSpy;
 
 const log = require('../../dest/helpers/log');
-const events = (require('../../dest/events')).default
-const tmi = (require('../../dest/tmi')).default
-
 
 module.exports = {
   prepare: function () {
+    const events = (require('../../dest/events')).default;
+    const tmi = (require('../../dest/tmi')).default;
+
     log.debug('test', chalk.bgRed('*** Restoring all spies ***'));
 
     if (eventSpy) {
@@ -77,6 +76,7 @@ module.exports = {
     }, waitMs);
   },
   isWarned: async function (entry, user, opts) {
+    const { prepare } = require('../../dest/commons');
     user = _.cloneDeep(user);
     opts = opts || {};
     await until(async setError => {
@@ -108,6 +108,7 @@ module.exports = {
     }, 5000);
   },
   isSent: util.deprecate(async function (entry, user, opts, wait) {
+    const { prepare } = require('../../dest/commons');
     if (typeof user === 'string') {
       user = {
         username: user,

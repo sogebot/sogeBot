@@ -143,7 +143,7 @@
     "@types/yargs": "15.0.12",
     "@typescript-eslint/eslint-plugin": "4.10.0",
     "@typescript-eslint/parser": "4.10.0",
-    "@vue/composition-api": "1.0.0-beta.22",
+    "@vue/composition-api": "1.0.0-beta.21",
     "animate.css": "4.1.1",
     "autoprefixer": "10.1.0",
     "axios-mock-adapter": "1.19.0",

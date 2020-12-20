@@ -11,15 +11,18 @@ import { Widget } from './database/entity/dashboard';
 import { command, default_permission, settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
 import { setLocale } from './helpers/dayjs';
+import { setLang } from './helpers/locales';
 import { debug, error, warning } from './helpers/log';
+import { getMuteStatus } from './helpers/muteStatus';
+import { getOAuthStatus } from './helpers/OAuthStatus';
 import { permission } from './helpers/permissions';
 import { find, list } from './helpers/register';
-import oauth from './oauth';
 import { addUIWarn, socketsConnected } from './panel';
-import tmi from './tmi';
 import translateLib, { translate } from './translate';
 
 let threadStartTimestamp = Date.now();
+let isInitialLangSet = true;
+
 const gracefulExit = () => {
   if (general.gracefulExitEachXHours > 0) {
     debug('thread', 'gracefulExit::check');
@@ -77,10 +80,22 @@ class General extends Core {
   @onChange('lang')
   @onLoad('lang')
   public async onLangUpdate() {
-    await translateLib._load();
-    warning(translate('core.lang-selected'));
-    setLocale(this.lang);
-    addUIWarn({ name: 'UI', message: translate('core.lang-selected') + '. ' + translate('core.refresh-panel') });
+    if (!translateLib.isLoaded) {
+      setTimeout(() => this.onLangUpdate(), 10);
+      return;
+    }
+    if (!(await translateLib.check(this.lang))) {
+      warning(`Language ${this.lang} not found - fallback to en`);
+      this.lang = 'en';
+    } else {
+      setLocale(this.lang);
+      setLang(this.lang);
+      warning(translate('core.lang-selected'));
+      if (!isInitialLangSet) {
+        addUIWarn({ name: 'UI', message: translate('core.lang-selected') + '. ' + translate('core.refresh-panel') });
+      }
+      isInitialLangSet = false;
+    }
   }
 
   public async onLangLoad() {
@@ -93,13 +108,7 @@ class General extends Core {
     const widgets = await getRepository(Widget).find();
     const connection = await getConnection();
 
-    const oauthInfo = {
-      broadcaster: oauth.broadcasterUsername !== '',
-      bot: oauth.botUsername !== '',
-    };
-
     const lang = this.lang;
-    const mute = tmi.mute;
 
     const enabledSystems: {
       systems: string[];
@@ -134,12 +143,12 @@ class General extends Core {
     debug('*', `             | HEAP: ${Number(process.memoryUsage().heapUsed / 1048576).toFixed(2)} MB`);
     debug('*', `             | Uptime: ${new Date(1000 * process.uptime()).toISOString().substr(11, 8)}`);
     debug('*', `             | Language: ${lang}`);
-    debug('*', `             | Mute: ${mute}`);
+    debug('*', `             | Mute: ${getMuteStatus()}`);
     debug('*', `SYSTEMS      | ${enabledSystems.systems.join(', ')}`);
     debug('*', `GAMES        | ${enabledSystems.games.join(', ')}`);
     debug('*', `INTEGRATIONS | ${enabledSystems.integrations.join(', ')}`);
     debug('*', `WIDGETS      | ${map(widgets, 'name').join(', ')}`);
-    debug('*', `OAUTH        | BOT ${oauthInfo.bot} | BROADCASTER ${oauthInfo.broadcaster}`);
+    debug('*', `OAUTH        | BOT ${getOAuthStatus('bot')} | BROADCASTER ${getOAuthStatus('broadcaster')}`);
     debug('*', '======= END OF DEBUG MESSAGE =======');
     return [];
   }

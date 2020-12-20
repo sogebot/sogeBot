@@ -6,20 +6,23 @@ import { getRepository } from 'typeorm';
 
 import Core from './_interface';
 import api from './api';
-import { getBotSender, getOwner, isBot, isIgnored, isOwner, prepare, sendMessage } from './commons';
+import { getBotSender, getOwner, isOwner, prepare, sendMessage } from './commons';
 import * as constants from './constants';
 import { Price } from './database/entity/price';
 import { User, UserBitInterface } from './database/entity/user';
 import { settings, ui } from './decorators';
 import { command, default_permission } from './decorators';
-import { getFunctionList } from './decorators/on';
+import { getFunctionList, onChange } from './decorators/on';
 import events from './events';
 import Expects from './expects';
 import { dayjs } from './helpers/dayjs';
 import { getLocalizedName } from './helpers/getLocalized';
 import { triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub } from './helpers/interface/triggers';
+import { isBot } from './helpers/isBot';
+import { isIgnored } from './helpers/isIgnored';
 import { isDebugEnabled } from './helpers/log';
 import { chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning, whisperIn } from './helpers/log';
+import { setMuteStatus } from './helpers/muteStatus';
 import { avgResponse, linesParsedIncrement, setStatus } from './helpers/parser';
 import { permission } from './helpers/permissions';
 import oauth from './oauth';
@@ -71,6 +74,11 @@ class TMI extends Core {
   broadcasterWarning = false;
 
   ignoreGiftsFromUser: { [x: string]: { count: number; time: Date }} = {};
+
+  @onChange('mute')
+  setMuteStatus() {
+    setMuteStatus(this.mute);
+  }
 
   @command('!ignore add')
   @default_permission(permission.CASTERS)

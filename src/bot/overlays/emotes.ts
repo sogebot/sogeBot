@@ -1,9 +1,10 @@
 import axios from 'axios';
-import * as _ from 'lodash';
+import { shuffle } from 'lodash';
 import { getManager, getRepository } from 'typeorm';
 import { v4 as uuid} from 'uuid';
 import XRegExp from 'xregexp';
 
+import { parserReply, prepare } from '../commons';
 import * as constants from '../constants';
 import { CacheEmotes, CacheEmotesInterface } from '../database/entity/cacheEmotes';
 import { parser, settings, ui } from '../decorators';
@@ -11,6 +12,7 @@ import { error, info, warning } from '../helpers/log';
 import { ioServer } from '../helpers/panel';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import oauth from '../oauth';
+import { translate } from '../translate';
 import Overlay from './_interface';
 
 class Emotes extends Overlay {
@@ -58,8 +60,30 @@ class Emotes extends Overlay {
   @ui({ type: 'btn-emit', class: 'btn btn-danger btn-block mt-1 mb-1', emit: 'removeCache' }, 'emotes')
   btnRemoveCache = null;
 
+  @settings('emotes_combo')
+  enableEmotesCombo = false;
+  @settings('emotes_combo')
+  showEmoteInOverlayThreshold = 3;
+  @settings('emotes_combo')
+  comboCooldown = 0;
+  @settings('emotes_combo')
+  comboMessageMinThreshold = 3;
+  @settings('emotes_combo')
+  @ui({ type: 'emote-combo' }, 'emotes_combo')
+  comboMessages = [
+    { messagesCount: 3, message: translate('ui.overlays.emotes.message.3') },
+    { messagesCount: 5, message: translate('ui.overlays.emotes.message.5') },
+    { messagesCount: 10, message: translate('ui.overlays.emotes.message.10') },
+    { messagesCount: 15, message: translate('ui.overlays.emotes.message.15') },
+    { messagesCount: 20, message: translate('ui.overlays.emotes.message.20') },
+  ];
+  comboEmote = '';
+  comboEmoteCount = 0;
+  comboLastBreak = 0;
+
   constructor () {
     super();
+
     setTimeout(() => {
       if (!this.fetch.global) {
         this.fetchEmotesGlobal();
@@ -219,7 +243,7 @@ class Emotes extends Overlay {
           const cachedEmote = (await getRepository(CacheEmotes).findOne({ code: emotes[i].code, type: 'ffz' }));
           await getRepository(CacheEmotes).save({
             ...cachedEmote,
-            code: emotes[i].code,
+            code: emotes[i].name,
             type: 'ffz',
             urls: emotes[i].urls,
           });
@@ -330,7 +354,7 @@ class Emotes extends Overlay {
 
   @parser({ priority: constants.LOW, fireAndForget: true })
   async containsEmotes (opts: ParserOptions) {
-    if (_.isNil(opts.sender) || !Array.isArray(opts.sender.emotes)) {
+    if (!opts.sender || !Array.isArray(opts.sender.emotes)) {
       return true;
     }
 
@@ -374,7 +398,7 @@ class Emotes extends Overlay {
       }
     }
 
-    const emotes = _.shuffle(parsed);
+    const emotes = shuffle(parsed);
     for (let i = 0; i < this.cEmotesMaxEmotesPerMessage && i < emotes.length; i++) {
       ioServer?.of('/overlays/emotes').emit('emote', {
         url: usedEmotes[emotes[i]].urls[this.cEmotesSize],
@@ -387,6 +411,43 @@ class Emotes extends Overlay {
       });
     }
 
+    if (this.enableEmotesCombo && Date.now() - this.comboLastBreak > this.comboCooldown * constants.SECOND) {
+      const uniqueEmotes = [...new Set(parsed)];
+      // we want to count only messages with emotes (skip text only)
+      if (uniqueEmotes.length !== 0) {
+        if (uniqueEmotes.length > 1 || (uniqueEmotes[0] !== this.comboEmote && this.comboEmote !== '')) {
+          // combo breaker
+          if (this.comboMessageMinThreshold <= this.comboEmoteCount) {
+            this.comboLastBreak = Date.now();
+            const message = this.comboMessages
+              .sort((a, b) => a.messagesCount - b.messagesCount)
+              .filter(o => o.messagesCount <= this.comboEmoteCount)
+              .pop();
+            if (message) {
+            // send message about combo break
+              parserReply(
+                prepare(message.message, {
+                  emote: this.comboEmote,
+                  amount: this.comboEmoteCount,
+                }, false),
+                opts,
+              );
+            }
+          }
+          this.comboEmoteCount = 0;
+          this.comboEmote = '';
+          ioServer?.of('/overlays/emotes').emit('combo', {
+            count: this.comboEmoteCount, url: null, threshold: this.showEmoteInOverlayThreshold,
+          });
+        } else {
+          this.comboEmoteCount++;
+          this.comboEmote = uniqueEmotes[0];
+          ioServer?.of('/overlays/emotes').emit('combo', {
+            count: this.comboEmoteCount, url: usedEmotes[this.comboEmote].urls['3'], threshold: this.showEmoteInOverlayThreshold,
+          });         
+        }
+      }
+    }
     return true;
   }
 
@@ -396,7 +457,7 @@ class Emotes extends Overlay {
     for (let i = 0, length = emotes.length; i < length; i++) {
       try {
         const items = await getRepository(CacheEmotes).find({ code: emotes[i] });
-        if (!_.isEmpty(items)) {
+        if (items.length > 0) {
           emotesArray.push(items[0].urls[this.cEmotesSize]);
         }
       } catch (e) {

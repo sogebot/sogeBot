@@ -1,9 +1,11 @@
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { isBroadcaster, isModerator, timeout } from '../commons';
+import { timeout } from '../commons';
 import { User } from '../database/entity/user';
 import { command, settings } from '../decorators';
+import { isBroadcaster } from '../helpers/isBroadcaster';
+import { isModerator } from '../helpers/isModerator';
 import points from '../systems/points';
 import { translate } from '../translate';
 import Game from './_interface';

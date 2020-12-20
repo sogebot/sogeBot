@@ -2,7 +2,7 @@ import { cloneDeep, get, isEqual, set } from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { change } from './changelog';
-import { MINUTE, SECOND } from './constants';
+import { SECOND } from './constants';
 import { Settings } from './database/entity/settings';
 import { getFunctionList } from './decorators/on';
 import { isDbConnected } from './helpers/database';
@@ -55,7 +55,7 @@ export const check = async (forceCheck = false) => {
 
 export const startWatcher = () => {
   check();
-  setInterval(check, MINUTE);
+  setInterval(check, 10 * SECOND);
 };
 
 export const VariableWatcher = {

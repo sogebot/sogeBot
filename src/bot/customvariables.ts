@@ -10,13 +10,14 @@ import { getRepository, IsNull } from 'typeorm';
 
 import Core from './_interface';
 import api from './api';
-import { announce, getBot, isModerator, prepare } from './commons';
+import { announce, getBot, prepare } from './commons';
 import currency from './currency';
 import { User, UserInterface } from './database/entity/user';
 import { Variable, VariableHistory, VariableInterface, VariableURL, VariableWatch } from './database/entity/variable';
 import { isDbConnected } from './helpers/database';
 import { getAllOnlineUsernames } from './helpers/getAllOnlineUsernames';
 import { getTime } from './helpers/getTime';
+import { isModerator } from './helpers/isModerator';
 import { debug, error, info, warning } from './helpers/log';
 import { linesParsed } from './helpers/parser';
 import { permission } from './helpers/permissions';

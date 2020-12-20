@@ -1,13 +1,13 @@
 import _ from 'lodash';
 import { getConnection, getRepository } from 'typeorm';
 
-import { getIgnoreList, isIgnored } from '../commons';
 import currency from '../currency';
 import { User } from '../database/entity/user';
 import { command, default_permission } from '../decorators';
 import general from '../general';
 import { dayjs } from '../helpers/dayjs';
 import { getLocalizedName } from '../helpers/getLocalized';
+import { getIgnoreList, isIgnored } from '../helpers/isIgnored';
 import { debug } from '../helpers/log';
 import { permission } from '../helpers/permissions';
 import oauth from '../oauth';

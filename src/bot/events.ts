@@ -7,7 +7,7 @@ import { getRepository } from 'typeorm';
 
 import Core from './_interface';
 import api from './api';
-import { announce, getBotSender, getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, parserReply, prepare } from './commons';
+import { announce, getBotSender, getOwner, isOwner, isSubscriber, isVIP, parserReply, prepare } from './commons';
 import currency from './currency';
 import customvariables from './customvariables';
 import { Event, EventInterface } from './database/entity/event';
@@ -19,13 +19,15 @@ import { dayjs } from './helpers/dayjs';
 import { flatten } from './helpers/flatten';
 import { generateUsername } from './helpers/generateUsername';
 import { getLocalizedName } from './helpers/getLocalized';
+import { isBot } from './helpers/isBot';
+import { isBroadcaster } from './helpers/isBroadcaster';
+import { isModerator } from './helpers/isModerator';
 import { error, info, warning } from './helpers/log';
 import { ioServer } from './helpers/panel';
 import { adminEndpoint } from './helpers/socket';
 import Message from './message';
 import oauth from './oauth';
 import clips from './overlays/clips';
-import emotes from './overlays/emotes';
 import { addUIError } from './panel';
 import Parser from './parser';
 import tmi from './tmi';
@@ -266,11 +268,15 @@ class Events extends Core {
   }
 
   public async fireEmoteExplosion(operation: Events.OperationDefinitions) {
-    emotes.explode(String(operation.emotesToExplode).split(' '));
+    // we must require emotes as it is triggering translations in mocha
+    const emotes: typeof import('./overlays/emotes') = require('./overlays/emotes');
+    emotes.default.explode(String(operation.emotesToExplode).split(' '));
   }
 
   public async fireEmoteFirework(operation: Events.OperationDefinitions) {
-    emotes.firework(String(operation.emotesToFirework).split(' '));
+    // we must require emotes as it is triggering translations in mocha
+    const emotes: typeof import('./overlays/emotes') = require('./overlays/emotes');
+    emotes.default.firework(String(operation.emotesToFirework).split(' '));
   }
 
   public async fireRunCommand(operation: Events.OperationDefinitions, attributes: Events.Attributes) {

@@ -1,5 +1,7 @@
-import { isBroadcaster, isModerator, timeout } from '../commons';
+import { timeout } from '../commons';
 import { command, settings } from '../decorators';
+import { isBroadcaster } from '../helpers/isBroadcaster';
+import { isModerator } from '../helpers/isModerator';
 import { translate } from '../translate';
 import Game from './_interface';
 

@@ -17,6 +17,7 @@ export default defineComponent({
     clipscarousel: () => import('./clipscarousel.vue'),
     credits: () => import('./credits.vue'),
     emotes: () => import('./emotes.vue'),
+    emotescombo: () => import('./emotescombo.vue'),
     eventlist: () => import('./eventlist.vue'),
     polls: () => import('./polls.vue'),
     randomizer: () => import('./randomizer.vue'),

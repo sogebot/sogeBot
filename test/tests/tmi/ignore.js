@@ -21,8 +21,8 @@ const testuser3 = { username: 'testuser3', userId: 3 };
 const nightbot = { username: 'nightbot', userId: 4 };
 const botwithchangedname = { username: 'asdsadas', userId: 24900234 };
 
-const commons = require('../../../dest/commons');
 const { VariableWatcher } = require('../../../dest/watchers');
+const { isIgnored } = require('../../../dest/helpers/isIgnored');
 
 describe('TMI - ignore', () => {
   before(async () => {
@@ -43,11 +43,11 @@ describe('TMI - ignore', () => {
 
   describe('Global ignore workflow', () => {
     it ('nightbot should be ignored by default', async () => {
-      assert(await commons.isIgnored(nightbot)); // checked by known_alias
+      assert(await isIgnored(nightbot)); // checked by known_alias
     });
 
     it ('botwithchangedname should be ignored by default', async () => {
-      assert(await commons.isIgnored(botwithchangedname)); // checked by id
+      assert(await isIgnored(botwithchangedname)); // checked by id
     });
 
     it ('exclude botwithchangedname from ignore list', async () => {
@@ -55,13 +55,13 @@ describe('TMI - ignore', () => {
     });
 
     it ('botwithchangedname should not be ignored anymore', async () => {
-      assert(!(await commons.isIgnored(botwithchangedname))); // checked by id
+      assert(!(await isIgnored(botwithchangedname))); // checked by id
     });
   });
 
   describe('Ignore workflow', () => {
     it('testuser is not ignored by default', async () => {
-      assert(!(await commons.isIgnored(testuser)));
+      assert(!(await isIgnored(testuser)));
     });
 
     it('add testuser to ignore list', async () => {
@@ -85,7 +85,7 @@ describe('TMI - ignore', () => {
       });
 
       assert.strictEqual(r[0].response, prepare('ignore.user.is.ignored', { username: 'testuser' }));
-      assert(await commons.isIgnored(testuser));
+      assert(await isIgnored(testuser));
       assert(typeof item !== 'undefined');
       assert(item.value.includes('testuser'));
     });
@@ -100,7 +100,7 @@ describe('TMI - ignore', () => {
       });
 
       assert.strictEqual(r[0].response, prepare('ignore.user.is.ignored', { username: 'testuser2' }));
-      assert(await commons.isIgnored(testuser2));
+      assert(await isIgnored(testuser2));
       assert(typeof item !== 'undefined');
       assert(item.value.includes('testuser2'));
     });
@@ -115,7 +115,7 @@ describe('TMI - ignore', () => {
       });
 
       assert.strictEqual(r[0].response, prepare('ignore.user.is.not.ignored', { username: 'testuser3' }));
-      assert(!(await commons.isIgnored(testuser3)));
+      assert(!(await isIgnored(testuser3)));
       assert(typeof item !== 'undefined');
       assert(!item.value.includes('testuser3'));
 
@@ -129,7 +129,7 @@ describe('TMI - ignore', () => {
     it('testuser should not be in ignore list', async () => {
       const r = await tmi.ignoreCheck({ sender: owner, parameters: 'testuser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.not.ignored', { username: 'testuser' }));
-      assert(!(await commons.isIgnored(testuser)));
+      assert(!(await isIgnored(testuser)));
     });
 
     it('add testuser by id to ignore list', async () => {
@@ -137,7 +137,7 @@ describe('TMI - ignore', () => {
     });
 
     it('user should be ignored by id', async () => {
-      assert(await commons.isIgnored(testuser));
+      assert(await isIgnored(testuser));
     });
   });
 });

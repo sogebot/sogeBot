@@ -1,12 +1,12 @@
 import { filter, isString, set } from 'lodash';
 
 import Core from './_interface';
-import { getBroadcaster } from './commons';
 import currency from './currency';
 import { settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
 import general from './general';
 import { timezone } from './helpers/dayjs';
+import { getBroadcaster } from './helpers/getBroadcaster';
 import { find, list } from './helpers/register';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import oauth from './oauth';

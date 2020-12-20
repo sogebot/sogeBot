@@ -2,12 +2,13 @@ import { getRepository } from 'typeorm';
 
 import Core from './_interface';
 import api from './api';
-import { isIgnored, prepare } from './commons';
+import { prepare } from './commons';
 import { EventList } from './database/entity/eventList';
 import { User } from './database/entity/user';
 import { command, default_permission, settings } from './decorators';
 import { dayjs, timezone } from './helpers/dayjs';
 import { getTime } from './helpers/getTime';
+import { isIgnored } from './helpers/isIgnored';
 import { permission } from './helpers/permissions';
 import { adminEndpoint } from './helpers/socket';
 import oauth from './oauth';

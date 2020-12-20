@@ -12,11 +12,11 @@ import {
 import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 
 import api from '../api';
-import { isIgnored } from '../commons';
 import { Settings } from '../database/entity/settings';
 import { ThreadEvent } from '../database/entity/threadEvent';
 import { User } from '../database/entity/user';
 import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
+import { isIgnored } from '../helpers/isIgnored';
 import { debug, warning } from '../helpers/log';
 import { TypeORMLogger } from '../helpers/logTypeorm';
 import { SQLVariableLimit } from '../helpers/sql';
