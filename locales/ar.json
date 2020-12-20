@@ -5,6 +5,7 @@
     "disabled": "معطّل",
     "usage": "الإستخدام",
     "lang-selected": "تم تعيين لغة البوت حاليا إلى اللغة العربية",
+    "refresh-panel": "You will need to refresh UI to see changes.",
     "command-parse": "عذراً، $sender، ولكن هذا الأمر غير صحيح، استخدم",
     "error": "عذراً، $sender، لكن حدث خطأ ما!",
     "no-response": "",

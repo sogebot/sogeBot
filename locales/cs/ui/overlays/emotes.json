@@ -1,15 +1,37 @@
 {
-  "settings": {
-    "btnRemoveCache": "Smazat cache",
-    "btnTestExplosion": "Exploze emotikonů",
-    "btnTestEmote": "Emotikon",
-    "btnTestFirework": "Ohňostroj emotikonů",
-    "cEmotesSize": "Velikost emotikonů",
-    "cEmotesMaxEmotesPerMessage": "Maximální počet emotikonů",
-    "cEmotesAnimation": "Animace",
-    "cEmotesAnimationTime": "Doba trvání animace",
-    "cExplosionNumOfEmotes": "Počet emotikonů",
-    "cExplosionNumOfEmotesPerExplosion": "Počet emotikonů za explozi",
-    "cExplosionNumOfExplosions": "Počet explozí"
-  }
+	"settings": {
+		"btnRemoveCache": "Smazat cache",
+		"btnTestExplosion": "Exploze emotikonů",
+		"btnTestEmote": "Emotikon",
+		"btnTestFirework": "Ohňostroj emotikonů",
+		"cEmotesSize": "Velikost emotikonů",
+		"cEmotesMaxEmotesPerMessage": "Maximální počet emotikonů",
+		"cEmotesAnimation": "Animace",
+		"cEmotesAnimationTime": "Doba trvání animace",
+		"cExplosionNumOfEmotes": "Počet emotikonů",
+		"cExplosionNumOfEmotesPerExplosion": "Počet emotikonů za explozi",
+		"cExplosionNumOfExplosions": "Počet explozí",
+		"enableEmotesCombo": "Povolit kombo emote",
+		"comboBreakMessages": "Zprávy přerušení komba",
+		"threshold": "Práh",
+		"noMessagesFound": "Žádné zprávy nenalezeny.",
+		"message": "Zpráva",
+		"showEmoteInOverlayThreshold": "Minimální práh počtu zpráv pro zobrazení emote v overlayi",
+		"comboCooldown": {
+			"title": "Cooldown komba",
+			"help": "Cooldown komba ve vteřinách"
+		},
+		"comboMessageMinThreshold": {
+			"title": "Minimální práh počtu zpráv",
+			"help": "Minimální práh počtu zpráv pro počítání emote jako kombo (do té doby se nespustí cooldown)"
+		},
+		"comboMessages": "Kombo zprávy"
+	},
+	"message": {
+		"3": "$amountx $emote kombo",
+		"5": "$amountx $emote kombo SeemsGood",
+		"10": "$amountx $emote kombo PogChamp",
+		"15": "$amountx $emote kombo TriHard",
+		"20": "$sender zničil $amountx $emote kombo! NotLikeThis"
+	}
 }
