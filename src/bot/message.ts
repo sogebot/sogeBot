@@ -9,7 +9,7 @@ import safeEval from 'safe-eval';
 import { getRepository } from 'typeorm';
 
 import api from './api';
-import { getBotSender, isIgnored, parserReply, prepare } from './commons';
+import { getBotSender, parserReply, prepare } from './commons';
 import currency from './currency';
 import customvariables from './customvariables';
 import { Alias } from './database/entity/alias';
@@ -21,6 +21,7 @@ import { Rank } from './database/entity/rank';
 import { User, UserInterface } from './database/entity/user';
 import { getCountOfCommandUsage } from './helpers/commands/count';
 import { getLocalizedName } from './helpers/getLocalized';
+import { isIgnored } from './helpers/isIgnored';
 import { debug, error, warning } from './helpers/log';
 import lastfm from './integrations/lastfm';
 import spotify from './integrations/spotify';

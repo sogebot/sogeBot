@@ -1,12 +1,14 @@
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { announce, isBroadcaster, isModerator, prepare } from '../commons';
+import { announce, prepare } from '../commons';
 import { Duel as DuelEntity, DuelInterface } from '../database/entity/duel';
 import { User } from '../database/entity/user';
 import { command, persistent, settings } from '../decorators';
 import { isDbConnected } from '../helpers/database';
 import { getLocalizedName } from '../helpers/getLocalized';
+import { isBroadcaster } from '../helpers/isBroadcaster';
+import { isModerator } from '../helpers/isModerator';
 import { error } from '../helpers/log';
 import points from '../systems/points';
 import { translate } from '../translate';

@@ -5,11 +5,11 @@ import axios from 'axios';
 import { getRepository } from 'typeorm';
 
 import api, { StreamEndpoint } from './api';
-import { isBot } from './commons';
 import { User } from './database/entity/user';
 import { getFunctionList } from './decorators/on';
 import events from './events';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
+import { isBot } from './helpers/isBot';
 import { debug, error, follow, info, start } from './helpers/log';
 import { linesParsed } from './helpers/parser';
 import { find } from './helpers/register';

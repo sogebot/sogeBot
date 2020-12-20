@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import { FindConditions, getConnection, getRepository, LessThanOrEqual } from 'typeorm';
 
 import api from '../api';
-import { isBot, prepare } from '../commons';
+import { prepare } from '../commons';
 import { MINUTE } from '../constants';
 import { PointsChangelog } from '../database/entity/points';
 import { User, UserInterface } from '../database/entity/user';
@@ -13,6 +13,7 @@ import { command, default_permission, parser, permission_settings, persistent, s
 import { onChange, onLoad } from '../decorators/on';
 import Expects from '../expects';
 import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
+import { isBot } from '../helpers/isBot';
 import { debug, error, warning } from '../helpers/log';
 import { ParameterError } from '../helpers/parameterError';
 import { permission } from '../helpers/permissions';

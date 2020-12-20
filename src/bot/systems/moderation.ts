@@ -6,12 +6,13 @@ import tlds from 'tlds';
 import { getRepository, LessThan } from 'typeorm';
 import XRegExp from 'xregexp';
 
-import { isModerator, parserReply, prepare, timeout } from '../commons';
+import { parserReply, prepare, timeout } from '../commons';
 import * as constants from '../constants';
 import { Alias } from '../database/entity/alias';
 import { ModerationPermit, ModerationWarning } from '../database/entity/moderation';
 import { command, default_permission, parser, permission_settings, settings } from '../decorators';
 import { getLocalizedName } from '../helpers/getLocalized';
+import { isModerator } from '../helpers/isModerator';
 import { timeout as timeoutLog, warning as warningLog } from '../helpers/log';
 import { permission } from '../helpers/permissions';
 import { adminEndpoint } from '../helpers/socket';

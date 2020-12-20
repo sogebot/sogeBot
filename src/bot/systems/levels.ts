@@ -4,7 +4,7 @@ import { evaluate as mathJsEvaluate, round } from 'mathjs';
 import { getRepository } from 'typeorm';
 
 import api from '../api';
-import { isBot, prepare } from '../commons';
+import { prepare } from '../commons';
 import { MINUTE, SECOND } from '../constants';
 import { User, UserInterface } from '../database/entity/user';
 import { command, default_permission, parser, permission_settings, settings, ui } from '../decorators';
@@ -13,6 +13,7 @@ import Expects from '../expects';
 import general from '../general';
 import { ResponseError } from '../helpers/commandError';
 import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
+import { isBot } from '../helpers/isBot';
 import { debug, error } from '../helpers/log';
 import { permission } from '../helpers/permissions';
 import { setImmediateAwait } from '../helpers/setImmediateAwait';

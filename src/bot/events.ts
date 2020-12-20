@@ -7,7 +7,7 @@ import { getRepository } from 'typeorm';
 
 import Core from './_interface';
 import api from './api';
-import { announce, getBotSender, getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, parserReply, prepare } from './commons';
+import { announce, getBotSender, getOwner, isOwner, isSubscriber, isVIP, parserReply, prepare } from './commons';
 import currency from './currency';
 import customvariables from './customvariables';
 import { Event, EventInterface } from './database/entity/event';
@@ -19,6 +19,9 @@ import { dayjs } from './helpers/dayjs';
 import { flatten } from './helpers/flatten';
 import { generateUsername } from './helpers/generateUsername';
 import { getLocalizedName } from './helpers/getLocalized';
+import { isBot } from './helpers/isBot';
+import { isBroadcaster } from './helpers/isBroadcaster';
+import { isModerator } from './helpers/isModerator';
 import { error, info, warning } from './helpers/log';
 import { ioServer } from './helpers/panel';
 import { adminEndpoint } from './helpers/socket';

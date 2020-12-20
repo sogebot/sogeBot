@@ -5,7 +5,7 @@ import { getRepository, LessThan } from 'typeorm';
 
 import Core from './_interface';
 import {
-  getBroadcaster, isBot, isBroadcaster, isFollower, isModerator, isOwner, isSubscriber, isVIP, prepare,
+  isFollower, isOwner, isSubscriber, isVIP, prepare,
 } from './commons';
 import { HOUR, MINUTE } from './constants';
 import currency from './currency';
@@ -13,6 +13,10 @@ import { PermissionCommands, PermissionFiltersInterface, Permissions as Permissi
 import { User, UserInterface } from './database/entity/user';
 import { areDecoratorsLoaded, command, default_permission } from './decorators';
 import Expects from './expects';
+import { getBroadcaster } from './helpers/getBroadcaster';
+import { isBot } from './helpers/isBot';
+import { isBroadcaster } from './helpers/isBroadcaster';
+import { isModerator } from './helpers/isModerator';
 import { debug, warning } from './helpers/log';
 import { error } from './helpers/log';
 import { addToCachedHighestPermission, cleanViewersCache, getFromCachedHighestPermission, permission } from './helpers/permissions';

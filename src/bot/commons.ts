@@ -2,7 +2,6 @@ import { TextChannel } from 'discord.js';
 import _ from 'lodash';
 import { UserStateTags } from 'twitch-js';
 
-import { globalIgnoreList } from './data/globalIgnoreList';
 import { UserInterface } from './database/entity/user';
 import { chatOut, debug, isDebugEnabled, warning, whisperOut } from './helpers/log';
 import { error, info } from './helpers/log';
@@ -91,36 +90,6 @@ export async function announce(messageToAnnounce: string, type: typeof announceT
       }
     }
   }
-}
-
-export function getIgnoreList() {
-  return tmi.ignorelist.map((o) => {
-    return typeof o === 'string' ? o.trim().toLowerCase() : o;
-  });
-}
-
-export function getGlobalIgnoreList() {
-  return Object.keys(globalIgnoreList)
-    .filter(o => !tmi.globalIgnoreListExclude.map((ex: number | string) => String(ex)).includes(o))
-    .map(o => {
-      const id = Number(o);
-      return { id, ...globalIgnoreList[id as unknown as keyof typeof globalIgnoreList] };
-    });
-}
-
-export function isIgnored(sender: { username: string | null; userId?: string | number }) {
-  if (typeof sender.userId === 'string') {
-    sender.userId = Number(sender.userId);
-  }
-  if (sender.username === null) {
-    return false; // null can be bot from dashboard or event
-  }
-
-  const isInIgnoreList = getIgnoreList().includes(sender.username) || getIgnoreList().includes(sender.userId);
-  const isInGlobalIgnoreList = typeof getGlobalIgnoreList().find(data => {
-    return data.id === sender.userId || data.known_aliases.includes((sender.username || '').toLowerCase());
-  }) !== 'undefined';
-  return (isInGlobalIgnoreList || isInIgnoreList) && !isBroadcaster(sender);
 }
 
 /**
@@ -324,29 +293,6 @@ export function getChannel() {
   }
 }
 
-export function getBroadcaster() {
-  try {
-    return oauth.broadcasterUsername.toLowerCase().trim();
-  } catch (e) {
-    return '';
-  }
-}
-
-export function isBroadcaster(user: string | CommandOptions['sender'] | { username: string | null; userId?: number | string } | UserStateTags) {
-  try {
-    return oauth.broadcasterUsername.toLowerCase().trim() === (_.isString(user) ? user : user.username?.toLowerCase().trim());
-  } catch (e) {
-    return false;
-  }
-}
-
-export function isModerator(user: UserInterface | UserStateTags): boolean {
-  if ('mod' in user) {
-    return user.mod === '1';
-  }
-  return user.isModerator ?? false;
-}
-
 export function isVIP(user: UserInterface): boolean {
   return user.isVIP ?? false;
 }
@@ -357,18 +303,6 @@ export function isFollower(user: UserInterface): boolean {
 
 export function isSubscriber(user: UserInterface): boolean {
   return user.isSubscriber ?? false;
-}
-
-export function isBot(user: string | CommandOptions['sender'] | UserInterface | UserStateTags) {
-  try {
-    if (oauth.botUsername) {
-      return oauth.botUsername.toLowerCase().trim() === (_.isString(user) ? user : user.username.toLowerCase().trim());
-    } else {
-      return false;
-    }
-  } catch (e) {
-    return true; // we can expect, if user is null -> bot or admin
-  }
 }
 
 export function isOwner(user: string | CommandOptions['sender'] | UserInterface | UserStateTags) {

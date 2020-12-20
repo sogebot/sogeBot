@@ -3,10 +3,13 @@ import safeEval from 'safe-eval';
 import { getRepository } from 'typeorm';
 
 import api from '../api';
-import { isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP } from '../commons';
+import { isOwner, isSubscriber, isVIP } from '../commons';
 import customvariables from '../customvariables';
 import { User } from '../database/entity/user';
 import ranks from '../systems/ranks';
+import { isBot } from './isBot';
+import { isBroadcaster } from './isBroadcaster';
+import { isModerator } from './isModerator';
 
 export const checkFilter = async (opts: CommandOptions | ParserOptions, filter: string): Promise<boolean> => {
   if (typeof filter === 'undefined' || filter.trim().length === 0) {

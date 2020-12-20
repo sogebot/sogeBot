@@ -6,12 +6,12 @@ import { getRepository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 
 import Core from './_interface';
-import { isModerator } from './commons';
 import { DAY } from './constants';
 import { Dashboard } from './database/entity/dashboard';
 import { User } from './database/entity/user';
 import { persistent, settings, ui } from './decorators';
 import { onLoad } from './decorators/on';
+import { isModerator } from './helpers/isModerator';
 import { debug } from './helpers/log';
 import { app, ioServer } from './helpers/panel';
 import { permission } from './helpers/permissions';

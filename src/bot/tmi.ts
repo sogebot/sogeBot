@@ -6,7 +6,7 @@ import { getRepository } from 'typeorm';
 
 import Core from './_interface';
 import api from './api';
-import { getBotSender, getOwner, isBot, isIgnored, isOwner, prepare, sendMessage } from './commons';
+import { getBotSender, getOwner, isOwner, prepare, sendMessage } from './commons';
 import * as constants from './constants';
 import { Price } from './database/entity/price';
 import { User, UserBitInterface } from './database/entity/user';
@@ -18,6 +18,8 @@ import Expects from './expects';
 import { dayjs } from './helpers/dayjs';
 import { getLocalizedName } from './helpers/getLocalized';
 import { triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub } from './helpers/interface/triggers';
+import { isBot } from './helpers/isBot';
+import { isIgnored } from './helpers/isIgnored';
 import { isDebugEnabled } from './helpers/log';
 import { chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning, whisperIn } from './helpers/log';
 import { setMuteStatus } from './helpers/muteStatus';
