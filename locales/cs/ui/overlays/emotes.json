@@ -16,22 +16,22 @@
 		"threshold": "Práh",
 		"noMessagesFound": "Žádné zprávy nenalezeny.",
 		"message": "Zpráva",
-		"showEmoteInOverlayThreshold": "Minimal message threshold to show emote in overlay",
+		"showEmoteInOverlayThreshold": "Minimální práh počtu zpráv pro zobrazení emote v overlayi",
 		"comboCooldown": {
-			"title": "Combo cooldown",
-			"help": "Cooldown of combo in seconds"
+			"title": "Cooldown komba",
+			"help": "Cooldown komba ve vteřinách"
 		},
 		"comboMessageMinThreshold": {
-			"title": "Minimal message threshold",
-			"help": "Minimal message threshold to count emotes as combo (until then won't trigger cooldown)"
+			"title": "Minimální práh počtu zpráv",
+			"help": "Minimální práh počtu zpráv pro počítání emote jako kombo (do té doby se nespustí cooldown)"
 		},
-		"comboMessages": "Combo messages"
+		"comboMessages": "Kombo zprávy"
 	},
 	"message": {
-		"3": "$amountx $emote combo",
-		"5": "$amountx $emote combo SeemsGood",
-		"10": "$amountx $emote combo PogChamp",
-		"15": "$amountx $emote combo TriHard",
-		"20": "$sender ruined $amountx $emote combo! NotLikeThis"
+		"3": "$amountx $emote kombo",
+		"5": "$amountx $emote kombo SeemsGood",
+		"10": "$amountx $emote kombo PogChamp",
+		"15": "$amountx $emote kombo TriHard",
+		"20": "$sender zničil $amountx $emote kombo! NotLikeThis"
 	}
 }
