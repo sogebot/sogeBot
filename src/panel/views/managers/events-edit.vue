@@ -492,7 +492,10 @@ export default defineComponent({
               editationItem.value.filter = eventGetAll.filter;
 
               console.debug('Loaded', eventGetAll);
-              ctx.root.$nextTick(() => (watchEventChange.value = true));
+              ctx.root.$nextTick(() => {
+                watchEventChange.value = true
+                ctx.emit('update:pending', false);
+              });
               resolve();
             });
           }
