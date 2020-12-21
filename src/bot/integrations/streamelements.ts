@@ -76,7 +76,7 @@ class StreamElements extends Integration {
 
   async disconnect () {
     if (this.socketToStreamElements !== null) {
-      this.socketToStreamElements.removeListeners();
+      this.socketToStreamElements.removeAllListeners();
       this.socketToStreamElements.disconnect();
     }
   }
