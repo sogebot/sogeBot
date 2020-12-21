@@ -19,7 +19,7 @@ import { onChange, onStartup, onStreamEnd, onStreamStart } from '../decorators/o
 import events from '../events';
 import Expects from '../expects';
 import { attributesReplace } from '../helpers/attributesReplace';
-import { isDbConnected } from '../helpers/database';
+import { isBotStarted, isDbConnected } from '../helpers/database';
 import { dayjs, timezone } from '../helpers/dayjs';
 import { debounce } from '../helpers/debounce';
 import { chatIn, chatOut, debug, error, info, warning, whisperOut } from '../helpers/log';
@@ -423,6 +423,12 @@ class Discord extends Integration {
   @onChange('onlinePresenceStatusOnStream')
   @onChange('onlinePresenceStatusDefault')
   async changeClientOnlinePresence() {
+    if (!isBotStarted) {
+      setTimeout(() => {
+        this.changeClientOnlinePresence();
+      }, 1000);
+      return;
+    }
     try {
       if (api.isStreamOnline) {
         const activityString = await new Message(this.onlinePresenceStatusOnStreamName).parse();
