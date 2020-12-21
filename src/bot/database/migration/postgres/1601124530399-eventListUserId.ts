@@ -21,7 +21,7 @@ export class eventListUserId1601124530399 implements MigrationInterface {
       throw new Error('Missing accessToken for bot or broadcaster, please set it up before bot upgrade.');
     }
     const evUsernamesFrom = events.filter((o: any) => JSON.parse(o.values_json).from && JSON.parse(o.values_json).from !== 'n/a').map((o: any) => JSON.parse(o.values_json).from.trim());
-    const uniqueUsernames = [...new Set([...evUsernamesFrom, ...events.filter((o: any) => /^[\x00-\x7F]*$/.test(o.username)).map((o: any) => o.username.trim())])];
+    const uniqueUsernames = [...new Set([...evUsernamesFrom, ...events.filter((o: any) => /^[\x00-\x7F]*$/.test(o.username)).map((o: any) => o.username.split(' ')[0].trim())])];
 
     for (const batch of chunk(uniqueUsernames, 100)) {
       const request = await axios.get(`https://api.twitch.tv/helix/users?login=${batch.join('&login=')}`, {
