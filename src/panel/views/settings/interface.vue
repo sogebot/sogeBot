@@ -275,6 +275,7 @@ enum State {
     'number-input': () => import('./components/interface/number-input.vue'),
     'selector': () => import('./components/interface/selector.vue'),
     'sortable-list': () => import('./components/interface/sortable-list.vue'),
+    'streamelements-jwt': () => import('./components/interface/streamelements-jwt.vue'),
     'text-input': () => import('./components/interface/text-input.vue'),
     'textarea-from-array': () => import('./components/interface/textarea-from-array.vue'),
     'uuid-generator': () => import('./components/interface/uuid-generator.vue'),

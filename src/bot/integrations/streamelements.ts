@@ -61,7 +61,7 @@ class StreamElements extends Integration {
   socketToStreamElements: any | null = null;
 
   @settings()
-  @ui({ type: 'text-input', secret: true })
+  @ui({ type: 'streamelements-jwt' })
   jwtToken = '';
 
   @onStartup()
