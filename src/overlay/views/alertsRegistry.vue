@@ -683,11 +683,20 @@ export default class AlertsRegistryOverlays extends Vue {
                   ...data.subgifts,
                   ...data.subs,
                   ...data.tips,
+                  ...data.cmdredeems,
+                  ...data.rewardredeems,
                 ]) {
                   if (!this.loadedFonts.includes(event.font.family)) {
                     console.debug('Loading font', event.font.family)
                     this.loadedFonts.push(event.font.family)
                     const font = event.font.family.replace(/ /g, '+')
+                    const css = "@import url('https://fonts.googleapis.com/css?family=" + font + "');"
+                    style.appendChild(document.createTextNode(css));
+                  }
+                  if (typeof (event as AlertTipInterface).message !== 'undefined' && !this.loadedFonts.includes((event as AlertTipInterface).message.font.family)) {
+                    console.debug('Loading font', (event as AlertTipInterface).message.font.family)
+                    this.loadedFonts.push((event as AlertTipInterface).message.font.family)
+                    const font = (event as AlertTipInterface).message.font.family.replace(/ /g, '+')
                     const css = "@import url('https://fonts.googleapis.com/css?family=" + font + "');"
                     style.appendChild(document.createTextNode(css));
                   }
