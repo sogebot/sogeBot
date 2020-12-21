@@ -186,12 +186,14 @@ export default class AlertsRegistryOverlays extends Vue {
   withEmotes(text: string) {
     // checking emotes
     for (let emote of this.emotes) {
-      if (get(this.runningAlert, `message.allowEmotes.${emote.type}`, false)) {
-        text = text
-          .replace(
-            new RegExp(`[!"#$%&'()*+,-.\\/:;<=>?\\b\\s]${emote.code}[!"#$%&'()*+,-.\\/:;<=>?\\b\\s]`, 'gm'),
-            ` <img src='${emote.urls[1]}' style='position: relative; top: 0.1rem;'/> `
-          );
+      if (get(this.runningAlert, `alert.message.allowEmotes.${emote.type}`, false)) {
+        const split = text.split(' ');
+        for (let i = 0; i < split.length; i++) {
+          if (split[i] === emote.code) {
+            split[i] = `<img src='${emote.urls[1]}' style='position: relative; top: 0.1rem;'/>`;
+          }
+        }
+        text = split.join(' ');
       }
     }
     return text;
