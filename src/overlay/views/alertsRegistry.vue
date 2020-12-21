@@ -9,7 +9,11 @@
         <audio ref="audio" v-if="typeOfMedia.get(runningAlert.alert.soundId) === 'audio'">
           <source :src="'/registry/alerts/' + runningAlert.alert.soundId">
         </audio>
-        <div v-if="runningAlert.isShowing" class="center" :class="['layout-' + runningAlert.alert.layout]">
+        <div v-if="runningAlert.isShowing"
+          :class="{
+            center: !runningAlert.alert.enableAdvancedMode,
+            ['layout-' + runningAlert.alert.layout]: true,
+          }">
           <template v-if="!runningAlert.alert.enableAdvancedMode">
             <video ref="video" v-if="typeOfMedia.get(runningAlert.alert.imageId) === 'video'" style="max-width:500px;" :class="{ center: runningAlert.alert.layout === '3', ['animate__' + runningAlert.animation]: true }" class="animate__animated w-100 pb-3" :style="{'animation-duration': runningAlert.animationSpeed + 'ms'}">
               <source :src="'/registry/alerts/' + runningAlert.alert.imageId" type="video/webm">
