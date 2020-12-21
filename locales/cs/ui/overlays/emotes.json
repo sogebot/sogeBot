@@ -18,8 +18,8 @@
 		"message": "Zpráva",
 		"showEmoteInOverlayThreshold": "Minimální práh počtu zpráv pro zobrazení emote v overlayi",
 		"hideEmoteInOverlayAfter": {
-			"title": "Hide emote in overlay after inactivity",
-			"help": "Will hide emote in overlay after certain time in seconds"
+			"title": "Skrýt emote v overlayi po nečinnosti",
+			"help": "Skryje emote v overlayi po určité době v sekundách"
 		},
 		"comboCooldown": {
 			"title": "Cooldown komba",
