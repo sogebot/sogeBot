@@ -373,6 +373,14 @@ class Points extends System {
       }
 
       const availablePoints = sender.points;
+      if (points === 0 || points === 'all' && availablePoints === 0) {
+        const response = prepare('points.failed.cannotGiveZeroPoints'.replace('$command', opts.command), {
+          amount: 0,
+          username,
+          pointsName: this.getPointsName(0),
+        });
+        return [{ response, ...opts }];
+      }
 
       if (points !== 'all' && availablePoints < points) {
         const response = prepare('points.failed.giveNotEnough'.replace('$command', opts.command), {
