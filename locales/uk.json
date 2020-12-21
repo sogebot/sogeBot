@@ -935,6 +935,7 @@
       "set": "{core.command-parse} $command [username] [amount]",
       "give": "{core.command-parse} $command [username] [amount]",
       "giveNotEnough": "Sorry, $sender, you don't have $amount $pointsName to give it to $username",
+      "cannotGiveZeroPoints": "Sorry, $sender, you cannot give $amount $pointsName to $username",
       "get": "{core.command-parse} $command [username]",
       "online": "{core.command-parse} $command [amount]",
       "all": "{core.command-parse} $command [amount]",

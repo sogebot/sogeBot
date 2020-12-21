@@ -17,6 +17,10 @@
 		"noMessagesFound": "No messages found.",
 		"message": "Message",
 		"showEmoteInOverlayThreshold": "Minimal message threshold to show emote in overlay",
+		"hideEmoteInOverlayAfter": {
+			"title": "Hide emote in overlay after inactivity",
+			"help": "Will hide emote in overlay after certain time in seconds"
+		},
 		"comboCooldown": {
 			"title": "Combo cooldown",
 			"help": "Cooldown of combo in seconds"

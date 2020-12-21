@@ -17,6 +17,10 @@
 		"noMessagesFound": "Žádné zprávy nenalezeny.",
 		"message": "Zpráva",
 		"showEmoteInOverlayThreshold": "Minimální práh počtu zpráv pro zobrazení emote v overlayi",
+		"hideEmoteInOverlayAfter": {
+			"title": "Hide emote in overlay after inactivity",
+			"help": "Will hide emote in overlay after certain time in seconds"
+		},
 		"comboCooldown": {
 			"title": "Cooldown komba",
 			"help": "Cooldown komba ve vteřinách"
