@@ -65,6 +65,8 @@ class Emotes extends Overlay {
   @settings('emotes_combo')
   showEmoteInOverlayThreshold = 3;
   @settings('emotes_combo')
+  hideEmoteInOverlayAfter = 30;
+  @settings('emotes_combo')
   comboCooldown = 0;
   @settings('emotes_combo')
   comboMessageMinThreshold = 3;
@@ -437,14 +439,14 @@ class Emotes extends Overlay {
           this.comboEmoteCount = 0;
           this.comboEmote = '';
           ioServer?.of('/overlays/emotes').emit('combo', {
-            count: this.comboEmoteCount, url: null, threshold: this.showEmoteInOverlayThreshold,
+            count: this.comboEmoteCount, url: null, threshold: this.showEmoteInOverlayThreshold, inactivity: this.hideEmoteInOverlayAfter,
           });
         } else {
           this.comboEmoteCount++;
           this.comboEmote = uniqueEmotes[0];
           ioServer?.of('/overlays/emotes').emit('combo', {
-            count: this.comboEmoteCount, url: usedEmotes[this.comboEmote].urls['3'], threshold: this.showEmoteInOverlayThreshold,
-          });         
+            count: this.comboEmoteCount, url: usedEmotes[this.comboEmote].urls['3'], threshold: this.showEmoteInOverlayThreshold, inactivity: this.hideEmoteInOverlayAfter,
+          });
         }
       }
     }
