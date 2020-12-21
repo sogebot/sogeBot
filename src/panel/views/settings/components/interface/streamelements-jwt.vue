@@ -87,7 +87,7 @@ export default class textInput extends Vue {
         this.validationState = ButtonStates.idle;
       }, 1000);
     } catch (e) {
-      error(e);
+      error('Invalid JWT Token, please recheck if you copied your token correctly');
       this.validationState = ButtonStates.fail;
       setTimeout(() => {
         this.validationState = ButtonStates.idle;
