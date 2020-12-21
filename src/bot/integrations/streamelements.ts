@@ -1,3 +1,4 @@
+import Axios from 'axios';
 import chalk from 'chalk';
 import io from 'socket.io-client-legacy';
 import { getRepository } from 'typeorm';
@@ -9,7 +10,7 @@ import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import events from '../events';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
-import { info, tip } from '../helpers/log';
+import { error, info, tip } from '../helpers/log';
 import eventlist from '../overlays/eventlist';
 import alerts from '../registries/alerts';
 import users from '../users';
@@ -86,6 +87,21 @@ class StreamElements extends Integration {
     this.disconnect();
 
     if (this.jwtToken.trim() === '' || !this.enabled) {
+      return;
+    }
+
+    // validate token
+    try {
+      await Axios('https://api.streamelements.com/kappa/v2/channels/me', {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          Authorization: 'Bearer ' + this.jwtToken,
+        },
+      });
+      info(chalk.yellow('STREAMELEMENTS:') + ' JWT token check OK.');
+    } catch (e) {
+      error(chalk.yellow('STREAMELEMENTS:') + ' JWT token is not valid.');
       return;
     }
 

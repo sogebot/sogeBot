@@ -73,21 +73,13 @@ export default class textInput extends Vue {
   async validate() {
     this.validationState = ButtonStates.progress;
     try {
-      const channel = await Axios("https://api.streamelements.com/kappa/v2/channels/" + this.$store.state.configuration.core.oauth.general.generalChannel, {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-        }
-      });
-      const channelId = channel.data._id;
-
-      await Axios("https://api.streamelements.com/kappa/v2/tips/" + channelId, {
+      await Axios("https://api.streamelements.com/kappa/v2/channels/me", {
         method: "GET",
         headers: {
           Accept: "application/json",
           Authorization: "Bearer " + this.currentValue,
         }
-      })
+      });
 
       // we don't need to check anything, if request passed it is enough
       this.validationState = ButtonStates.success;

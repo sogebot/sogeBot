@@ -418,7 +418,7 @@ class Module {
     }
 
     const isMasterAndStatusOnly = _.isNil(opts.state);
-    const isStatusChanged = !_.isNil(opts.state);
+    const isStatusChanged = !_.isNil(opts.state) && this.enabled !== opts.state;
 
     if (existsSync('./restart.pid') // force quiet if we have restart.pid
       || (this.enabled === opts.state && this.firstStatusSent) // force quiet if we actually don't change anything

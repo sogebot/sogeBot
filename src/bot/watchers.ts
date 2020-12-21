@@ -79,6 +79,7 @@ export const VariableWatcher = {
         throw new Error('Value not found, check your code!!! ' + JSON.stringify({k, variable, value}));
       }
       if (!isEqual(value, variables[k])) {
+        const oldValue = variables[k];
         variables[k] = value;
         const savedSetting = await getRepository(Settings).findOne({
           where: {
@@ -93,7 +94,7 @@ export const VariableWatcher = {
           value: JSON.stringify(value),
         });
 
-        debug('watcher', `watcher::change *** ${type}.${name}.${variable} changed to ${value}`);
+        debug('watcher', `watcher::change *** ${type}.${name}.${variable} changed from ${oldValue} to ${value}`);
         change(`${type}.${name}.${variable}`);
         for (const event of getFunctionList('change', type === 'core' ? `${name}.${variable}` : `${type}.${name}.${variable}`)) {
           if (typeof (checkedModule as any)[event.fName] === 'function') {
