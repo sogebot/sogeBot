@@ -112,43 +112,45 @@
         <b-textarea v-model="item.customProfanityList" placeholder="kitty, zebra, horse"></b-textarea>
       </b-form-group>
 
-      <b-tabs align="center" v-model="selectedTabIndex" lazy>
-        <b-card no-body>
-          <b-tabs card vertical pills content-class="col-9" nav-wrapper-class="col-3" nav-class="p-0">
-            <div v-for="event in supportedEvents" :key="'event-tab-' + event">
-              <b-tab disabled :title-link-class="'alertRegistryEventHeaderTab'">
-                <template v-slot:title>
-                  {{ translate('registry.alerts.event.' + event) }}
-                </template>
-              </b-tab>
-              <b-tab :active="idx === 0 && event === 'follows'" v-for="(alert, idx) of item[event]" :key="event + idx + selectedTabIndex">
-                <template v-slot:title>
+      <b-row no-gutters>
+        <b-col cols="auto">
+          <b-card>
+            <b-card-text style="max-width: 281px;">
+              <b-form inline>
+                <b-form-select v-model="selectedNewEvent">
+                  <b-select-option :value="event" v-for="event of supportedEvents" v-bind:key="'add-alert-' + event">{{ translate('registry.alerts.event.' + event) }}</b-select-option>
+                </b-form-select>
+                <b-button class="text-left" variant="success"@click="newAlert(selectedNewEvent)">
+                  <fa icon="plus"/>
+                </b-button>
+              </b-form>
+
+              <div v-for="event in supportedEvents" :key="'event-tab-' + event">
+                <title-divider>{{ translate('registry.alerts.event.' + event) }}</title-divider>
+                <b-button class="w-100 text-left" @click="selectedAlertId = alert.id" :variant="selectedAlertId === alert.id ? 'primary' : 'link'" v-for="(alert, idx) of item[event]" :key="event + alert.id">
                   <span style="margin: 1rem;">
-                    <fa icon="exclamation-circle" v-if="!isValid[event][idx]" class="text-danger"/>
+                    <fa icon="exclamation-circle" v-if="isValid[event][alert.id] === false" class="text-danger"/>
                     <fa :icon="['far', 'check-circle']" v-else-if="alert.enabled"/>
                     <fa :icon="['far', 'circle']" v-else/>
 
                     <template v-if="alert.title.length > 0">{{alert.title}}</template>
                     <template v-else>Variant {{ idx + 1 }}</template>
                   </span>
-                </template>
-                <p class="p-3" v-bind:key="event + idx">
-                  <form-follow v-if="event === 'cmdredeems' || event === 'follows' || event === 'subs' || event === 'subgifts' || event === 'subcommunitygifts'" :validationDate.sync="validationDate" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
-                  <form-cheers v-else-if="event === 'cheers' || event === 'tips'" :validationDate.sync="validationDate" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
-                  <form-resubs v-else-if="event === 'resubs'" :validationDate.sync="validationDate" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
-                  <form-hosts v-else-if="event === 'hosts' || event === 'raids'" :validationDate.sync="validationDate" :type="event" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
-                  <form-reward v-else-if="event === 'rewardredeems'" :validationDate.sync="validationDate" :type="event" :alert.sync="item[event][idx]" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
-                </p>
-              </b-tab>
-            </div>
-            <template #tabs-end>
-              <b-button class="text-left" variant="link" v-for="event of supportedEvents" @click="newAlert(event)" v-bind:key="'add-alert-' + event">
-                <fa icon="plus"/> <b>new alert for {{ translate('registry.alerts.event.' + event) }} </b>
-              </b-button>
-            </template>
-          </b-tabs>
-        </b-card>
-      </b-tabs>
+                </b-button>
+              </div>
+            </b-card-text>
+          </b-card>
+        </b-col>
+        <b-col>
+          <b-card>
+            <form-follow v-if="selectedAlertType === 'cmdredeems' || selectedAlertType === 'follows' || selectedAlertType === 'subs' || selectedAlertType === 'subgifts' || selectedAlertType === 'subcommunitygifts'" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
+            <form-cheers v-else-if="selectedAlertType === 'cheers' || selectedAlertType === 'tips'" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
+            <form-resubs v-else-if="selectedAlertType === 'resubs'" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
+            <form-hosts v-else-if="selectedAlertType === 'hosts' || selectedAlertType === 'raids'" :validationDate.sync="validationDate" :type="selectedAlertType" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
+            <form-reward v-else-if="selectedAlertType === 'rewardredeems'" :validationDate.sync="validationDate" :type="selectedAlertType" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
+          </b-card>
+        </b-col>
+      </b-row>
     </b-form>
   </b-container>
 </template>
@@ -175,17 +177,17 @@ import { v4 as uuid } from 'uuid';
 const supportedEvents = ['follows', 'cheers', 'subs', 'resubs', 'subcommunitygifts', 'subgifts',  'tips', 'hosts', 'raids', 'cmdredeems', 'rewardredeems'] as const;
 
 type isValid = {
-  follows: boolean[];
-  cheers: boolean[];
-  subs: boolean[];
-  resubs: boolean[];
-  subgifts: boolean[];
-  subcommunitygifts: boolean[];
-  tips: boolean[];
-  hosts: boolean[];
-  raids: boolean[];
-  cmdredeems: boolean[];
-  rewardredeems: boolean[];
+  follows: { [x: string]: boolean };
+  cheers: { [x: string]: boolean };
+  subs: { [x: string]: boolean };
+  resubs: { [x: string]: boolean };
+  subgifts: { [x: string]: boolean };
+  subcommunitygifts: { [x: string]: boolean };
+  tips: { [x: string]: boolean };
+  hosts: { [x: string]: boolean };
+  raids: { [x: string]: boolean };
+  cmdredeems: { [x: string]: boolean };
+  rewardredeems: { [x: string]: boolean };
 };
 
 Component.registerHooks([
@@ -202,6 +204,7 @@ Component.registerHooks([
     'form-resubs': () => import('./components/form-resubs.vue'),
     'form-hosts': () => import('./components/form-hosts.vue'),
     'form-reward': () => import('./components/form-reward.vue'),
+    'title-divider': () => import('src/panel/components/title-divider.vue'),
   },
   filters: {
     capitalize: function (value: string) {
@@ -222,7 +225,8 @@ export default class AlertsEdit extends Vue {
   pending: boolean = false;
 
   supportedEvents = supportedEvents;
-  selectedTabIndex: number = 0;
+  selectedNewEvent = 'follows'
+  selectedAlertId: string = '';
 
   item: AlertInterface = {
     id: uuid(),
@@ -251,17 +255,17 @@ export default class AlertsEdit extends Vue {
   }
 
   isValid: isValid = {
-    follows: [],
-    cheers: [],
-    subs: [],
-    resubs: [],
-    subgifts: [],
-    subcommunitygifts: [],
-    tips: [],
-    hosts: [],
-    raids: [],
-    cmdredeems: [],
-    rewardredeems: [],
+    follows: {},
+    cheers: {},
+    subs: {},
+    resubs: {},
+    subgifts: {},
+    subcommunitygifts: {},
+    tips: {},
+    hosts: {},
+    raids: {},
+    cmdredeems: {},
+    rewardredeems: {},
   };
 
   get isAllValid() {
@@ -271,6 +275,33 @@ export default class AlertsEdit extends Vue {
       }
     }
     return true;
+  }
+
+  get selectedAlert() {
+    const events = [
+      ...this.item.follows,
+      ...this.item.hosts,
+      ...this.item.raids,
+      ...this.item.cheers,
+      ...this.item.subs,
+      ...this.item.tips,
+      ...this.item.resubs,
+      ...this.item.subgifts,
+      ...this.item.subcommunitygifts,
+      ...this.item.cmdredeems,
+      ...this.item.rewardredeems,
+    ];
+    return events.find(o => o.id === this.selectedAlertId);
+  }
+
+  get selectedAlertType() {
+    const events = ['follows', 'hosts', 'raids', 'cheers', 'subs', 'tips', 'resubs', 'subgifts', 'subcommunitygifts', 'cmdredeems', 'rewardredeems'] as const
+    for (const event of events) {
+      if (this.item[event].find(o => o.id === this.selectedAlertId)) {
+        return event
+      }
+    }
+    return null;
   }
 
   profanityFilterTypeOptions: { value: string; text: string }[] = [
@@ -372,6 +403,22 @@ export default class AlertsEdit extends Vue {
     if (this.state.loaded === this.$state.success) {
       this.pending = true;
     }
+    const events = [
+      ...this.item.follows,
+      ...this.item.hosts,
+      ...this.item.raids,
+      ...this.item.cheers,
+      ...this.item.subs,
+      ...this.item.tips,
+      ...this.item.resubs,
+      ...this.item.subgifts,
+      ...this.item.subcommunitygifts,
+      ...this.item.cmdredeems,
+      ...this.item.rewardredeems,
+    ]
+    if (this.selectedAlertId === '' && events.length > 0) {
+      this.selectedAlertId = events[0].id as string;
+    }
   }
 
   newAlert(event: keyof isValid) {
@@ -433,7 +480,7 @@ export default class AlertsEdit extends Vue {
       { id: _default.imageId, b64data: 'data:image/gif;base64,' + defaultImage, chunkNo: 0 },
       { id: _default.soundId, b64data: 'data:audio/mp3;base64,' + defaultAudio, chunkNo: 0 },
     ], () => {
-      this.isValid[event].push(true);
+      this.isValid[event][_default.id as string] = true;
       switch(event) {
         case 'follows':
           this.item.follows.push({
