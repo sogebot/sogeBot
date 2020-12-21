@@ -362,7 +362,7 @@ import 'codemirror/theme/base16-dark.css';
 import 'codemirror/theme/base16-light.css';
 import 'codemirror/lib/codemirror.css';
 import text from 'src/bot/data/templates/alerts.txt';
-import textjs from 'src/bot/data/templates/alerts-js.txt';
+import textjs from 'src/bot/data/templates/alerts-with-message.txt';
 
 import { Validations } from 'vuelidate-property-decorators';
 import { required, minValue } from 'vuelidate/lib/validators'
