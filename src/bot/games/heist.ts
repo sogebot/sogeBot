@@ -253,11 +253,7 @@ class Heist extends Game {
     const level = _.find(levels, (o) => o.maxUsers >= users.length || _.isNil(o.maxUsers));
     if (level) {
       const nextLevel = _.find(levels, (o) => {
-        if (level) {
-          return o.maxUsers > level.maxUsers;
-        } else {
-          return true;
-        }
+        return level ? o.maxUsers > level.maxUsers : true;
       });
 
       if (this.lastAnnouncedLevel !== level.name) {
