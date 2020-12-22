@@ -15,6 +15,13 @@ const viewer2 = {
   emotes: [],
 };
 
+const viewer3 = {
+  userId: 5,
+  username: '__viewer3__',
+  badges: {},
+  emotes: [],
+};
+
 const owner = {
   userId: 2,
   username: '__broadcaster__',
@@ -36,6 +43,7 @@ module.exports = {
 
     await getRepository(User).save(viewer);
     await getRepository(User).save(viewer2);
+    await getRepository(User).save(viewer3);
     await getRepository(User).save(owner);
     await getRepository(User).save(mod);
     // set owner as broadcaster
@@ -43,6 +51,7 @@ module.exports = {
   },
   viewer,
   viewer2,
+  viewer3,
   owner,
   mod,
 };

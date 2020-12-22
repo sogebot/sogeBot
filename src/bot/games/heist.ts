@@ -105,17 +105,10 @@ class Heist extends Game {
   async iCheckFinished () {
     clearTimeout(this.timeouts.iCheckFinished);
 
-    const [startedAt, entryCooldown, lastHeistTimestamp, copsCooldown, started] = await Promise.all([
-      this.startedAt,
-      this.entryCooldownInSeconds,
-      this.lastHeistTimestamp,
-      this.copsCooldownInMinutes,
-      this.started,
-    ]);
     const levels = _.orderBy(this.levelsValues, 'maxUsers', 'asc');
 
     // check if heist is finished
-    if (!_.isNil(startedAt) && Date.now() - startedAt > (entryCooldown * 1000) + 10000) {
+    if (!_.isNil(this.startedAt) && Date.now() - this.startedAt > (this.entryCooldownInSeconds * 1000) + 10000) {
       const users = await getRepository(HeistUser).find();
       const level = _.find(levels, (o) => o.maxUsers >= users.length || _.isNil(o.maxUsers)); // find appropriate level or max level
 
@@ -132,7 +125,7 @@ class Heist extends Game {
         return;
       }
 
-      announce(started.replace('$bank', level.name), 'heist');
+      announce(this.started.replace('$bank', level.name), 'heist');
 
       if (users.length === 1) {
         // only one user
@@ -189,7 +182,7 @@ class Heist extends Game {
     }
 
     // check if cops done patrolling
-    if (lastHeistTimestamp !== 0 && Date.now() - lastHeistTimestamp >= copsCooldown * 60000) {
+    if (this.lastHeistTimestamp !== 0 && Date.now() - this.lastHeistTimestamp >= this.copsCooldownInMinutes * 60000) {
       this.lastHeistTimestamp = 0;
       announce(this.copsCooldown, 'heist');
     }
@@ -233,7 +226,7 @@ class Heist extends Game {
 
     let points: number | string = 0;
     try {
-      points = new Expects(opts.parameters).points().toArray()[0] as (number | string);
+      points = new Expects(opts.parameters).points({ all: true }).toArray()[0] as (number | string);
     } catch (e) {
       if (!newHeist) {
         warning(`${opts.command} ${e.message}`);
@@ -242,8 +235,9 @@ class Heist extends Game {
       return [];
     }
 
-    points = points === 'all' && !_.isNil(await pointsSystem.getPointsOf(opts.sender.userId)) ? await pointsSystem.getPointsOf(opts.sender.userId) : Number(points); // set all points
-    points = points > await pointsSystem.getPointsOf(opts.sender.userId) ? await pointsSystem.getPointsOf(opts.sender.userId) : points; // bet only user points
+    const userPoints = await pointsSystem.getPointsOf(opts.sender.userId);
+    points = points === 'all' ? userPoints : Number(points); // set all points
+    points = points > userPoints ? userPoints : points; // bet only user points
 
     if (points === 0 || _.isNil(points) || _.isNaN(points)) {
       return [{ response: translate('games.heist.entryInstruction').replace('$command', opts.command), ...opts }];

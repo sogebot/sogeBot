@@ -170,7 +170,7 @@ class Expects {
     return this;
   }
 
-  points (opts?: any) {
+  points (opts?: { exec?: boolean, optional?: boolean, all?: boolean, negative?: boolean }) {
     opts = opts || {};
     defaults(opts, { exec: false, optional: false, all: false, negative: false });
     if (!opts.exec) {
