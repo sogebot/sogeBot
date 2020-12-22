@@ -47,12 +47,12 @@ class Message {
     const variables = {
       game: api.stats.currentGame,
       language: api.stats.language,
-      viewers: api.stats.currentViewers,
+      viewers: api.isStreamOnline ? api.stats.currentViewers : 0,
       views: api.stats.currentViews,
       followers: api.stats.currentFollowers,
-      hosts: api.stats.currentHosts,
+      hosts: api.isStreamOnline ? api.stats.currentHosts : 0,
       subscribers: api.stats.currentSubscribers,
-      bits: api.stats.currentBits,
+      bits: api.isStreamOnline ? api.stats.currentBits : 0,
       title: api.stats.currentTitle,
       source: opts.sender && typeof opts.sender.discord !== 'undefined' ? 'discord' : 'twitch',
     };
