@@ -418,7 +418,7 @@ class Module {
     }
 
     const isMasterAndStatusOnly = _.isNil(opts.state);
-    const isStatusChanged = (!_.isNil(opts.state) && this.enabled !== opts.state) || !this.firstStatusSent;
+    const isStatusChanged = !_.isNil(opts.state) && this.enabled !== opts.state;
 
     if (existsSync('./restart.pid') // force quiet if we have restart.pid
       || (this.enabled === opts.state && this.firstStatusSent) // force quiet if we actually don't change anything
@@ -431,8 +431,6 @@ class Module {
     } else {
       opts.state = this.enabled;
     }
-
-    this.firstStatusSent = true;
 
     if (!this.areDependenciesEnabled || this.isDisabledByEnv) {
       opts.state = false;
@@ -450,7 +448,7 @@ class Module {
       }
     }
 
-    if ((isMasterAndStatusOnly || isStatusChanged) && !opts.quiet) {
+    if (!this.firstStatusSent || ((isMasterAndStatusOnly || isStatusChanged) && !opts.quiet)) {
       if (this.isDisabledByEnv) {
         info(`${chalk.red('DISABLED BY ENV')}: ${this.__moduleName__} (${this._name})`);
       } else if (this.areDependenciesEnabled) {
@@ -459,6 +457,8 @@ class Module {
         info(`${chalk.red('DISABLED BY DEP')}: ${this.__moduleName__} (${this._name})`);
       }
     }
+
+    this.firstStatusSent = true;
 
     return opts.state;
   }
