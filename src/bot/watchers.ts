@@ -26,11 +26,12 @@ export const check = async (forceCheck = false) => {
         if (!checkInProgress) {
           resolve(true);
         } else {
-          setTimeout(() => {
+          setImmediate(() => {
             awaiter();
-          }, 100);
+          });
         }
       };
+      awaiter();
     });
   }
   if (isDbConnected && !checkInProgress) {
@@ -44,9 +45,7 @@ export const check = async (forceCheck = false) => {
     } catch (e) {
       error(e.message);
     } finally {
-      setTimeout(() => {
-        checkInProgress = false;
-      }, 5 * SECOND);
+      checkInProgress = false;
     }
   } else {
     debug('watcher', `watcher::skipped ${JSON.stringify({ isDbConnected, checkInProgress })}`);
