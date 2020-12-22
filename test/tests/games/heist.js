@@ -298,7 +298,89 @@ describe('Heist - !bankheist', () => {
     it('We should get announce that cops are not on cooldown', async () => {
       await message.isSentRaw('Alright guys, looks like police forces are eating donuts and we can get that sweet money!', { username: 'bot'});
     });
-
   });
-  // !bankheist level announce
+
+  describe('!bankheist levels announcement', () => {
+    before(async () => {
+      await message.prepare();
+
+      // reset heist
+      heist.startedAt = null;
+      heist.lastAnnouncedLevel = '';
+      heist.lastHeistTimestamp = 0;
+      heist.lastAnnouncedCops = 0;
+      heist.lastAnnouncedHeistInProgress = 0;
+      heist.lastAnnouncedStart = 0;
+      heist.showMaxUsers = 20;
+      heist.entryCooldownInSeconds = 5; // adds 10 seconds to announce results
+
+      await getRepository(User).save({ userId: user.viewer.userId, username: user.viewer.username, points: 1000 });
+      // generate 50 users
+      for (let i=0; i < 50; i++) {
+        await getRepository(User).save({ userId: i * 9999, username: `user${i}`, points: 1000 });
+      }
+    });
+    after(() => {
+      heist.entryCooldownInSeconds = 120;
+    });
+
+    it('User start new bankheist with !bankheist 100', async () => {
+      const r = await heist.main({ sender: user.viewer, parameters: '100', command });
+      // if correct we don't expect any message
+      assert.strictEqual(r.length, 0);
+    });
+
+    it('bankVan level should be announced', async () => {
+      const current = 'Bank van';
+      const next = 'City bank';
+      await message.isSentRaw(`With this crew, we can heist ${current}! Let's see if we can get enough crew to heist ${next}`, { username: 'bot'});
+    });
+
+    it(`5 users joins bankheist`, async () => {
+      for (let i=0; i < 5; i++) {
+        await heist.main({ sender: { userId: i*9999, username: `user${i}` }, parameters: '100', command });
+      }
+    });
+
+    it('cityBank level should be announced', async () => {
+      const current = 'City bank';
+      const next = 'State bank';
+      await message.isSentRaw(`With this crew, we can heist ${current}! Let's see if we can get enough crew to heist ${next}`, { username: 'bot'});
+    });
+
+    it(`10 users joins bankheist`, async () => {
+      for (let i=5; i < 10; i++) {
+        await heist.main({ sender: { userId: i*9999, username: `user${i}` }, parameters: '100', command });
+      }
+    });
+
+    it('stateBank level should be announced', async () => {
+      const current = 'State bank';
+      const next = 'National reserve';
+      await message.isSentRaw(`With this crew, we can heist ${current}! Let's see if we can get enough crew to heist ${next}`, { username: 'bot'});
+    });
+
+    it(`10 users joins bankheist`, async () => {
+      for (let i=10; i < 20; i++) {
+        await heist.main({ sender: { userId: i*9999, username: `user${i}` }, parameters: '100', command });
+      }
+    });
+
+    it('nationalReserve level should be announced', async () => {
+      const current = 'National reserve';
+      const next = 'Federal reserve';
+      await message.isSentRaw(`With this crew, we can heist ${current}! Let's see if we can get enough crew to heist ${next}`, { username: 'bot'});
+    });
+
+    it(`30 users joins bankheist`, async () => {
+      for (let i=20; i < 50; i++) {
+        await heist.main({ sender: { userId: i*9999, username: `user${i}` }, parameters: '100', command });
+      }
+    });
+
+    it('maxLevelMessage level should be announced', async () => {
+      const current = 'Federal reserve';
+      await message.isSentRaw(`With this crew, we can heist ${current}! It cannot be any better!`, { username: 'bot'});
+    });
+  });
 });
