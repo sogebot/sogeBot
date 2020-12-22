@@ -6,10 +6,11 @@ import glob from 'glob';
 import _  from 'lodash';
 import { getRepository } from 'typeorm';
 
+import { Settings } from './database/entity/settings';
 import { Translation } from './database/entity/translation';
 import { areDecoratorsLoaded } from './decorators';
 import { flatten } from './helpers/flatten';
-import { getLang } from './helpers/locales';
+import { getLang, setLang } from './helpers/locales';
 import { error, warning } from './helpers/log';
 import { addMenu } from './helpers/panel';
 
@@ -29,12 +30,19 @@ class Translate {
   async _load () {
     this.custom = await getRepository(Translation).find();
     return new Promise<void>(async (resolve, reject) => {
-      const load = () => {
+      const load = async () => {
         if (!areDecoratorsLoaded) {
           // waiting for full load
           setTimeout(() => load(), 10);
           return;
         }
+
+        // we need to manually get if lang is changed so we have proper translations on init
+        const lang = await getRepository(Settings).findOne({ namespace: '/core/general', name: 'lang' });
+        if (lang) {
+          setLang(JSON.parse(lang.value));
+        }
+
         glob('./locales/**', (err, files) => {
           if (err) {
             reject(err);
