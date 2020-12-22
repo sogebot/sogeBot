@@ -164,6 +164,7 @@ describe('Heist - !bankheist', () => {
       await message.isSentRaw([
         'The heist payouts are: @__viewer__ and 2 more...',
         'The heist payouts are: @__viewer__ and 1 more...',
+        'The heist payouts are: @__viewer2__ and 1 more...',
         'The heist payouts are: @__viewer__',
         'The heist payouts are: @__viewer2__',
         'The heist payouts are: @__mod__',
