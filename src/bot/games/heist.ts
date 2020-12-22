@@ -6,6 +6,7 @@ import { HeistUser } from '../database/entity/heist';
 import { User } from '../database/entity/user';
 import { command, settings, ui } from '../decorators';
 import Expects from '../expects.js';
+import { flatten } from '../helpers/flatten.js';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { warning } from '../helpers/log.js';
 import { default as pointsSystem } from '../systems/points';
@@ -110,7 +111,7 @@ class Heist extends Game {
     // check if heist is finished
     if (!_.isNil(this.startedAt) && Date.now() - this.startedAt > (this.entryCooldownInSeconds * 1000) + 10000) {
       const users = await getRepository(HeistUser).find();
-      const level = _.find(levels, (o) => o.maxUsers >= users.length || _.isNil(o.maxUsers)); // find appropriate level or max level
+      const level = levels.find(o => o.maxUsers >= users.length || _.isNil(o.maxUsers)); // find appropriate level or max level
 
       if (!level) {
         return; // don't do anything if there is no level
@@ -153,7 +154,7 @@ class Heist extends Game {
         }
         const percentage = (100 / users.length) * winners.length;
         const ordered = _.orderBy(this.resultsValues, [(o) => o.percentage], 'asc');
-        const result = _.find(ordered, (o) => o.percentage >= percentage);
+        const result = ordered.find(o => o.percentage >= percentage);
         global.setTimeout(async () => {
           if (!_.isNil(result)) {
             announce(result.message, 'heist');
@@ -163,7 +164,7 @@ class Heist extends Game {
           global.setTimeout(async () => {
             const chunk: string[][] = _.chunk(winners, this.showMaxUsers);
             const winnersList = chunk.shift() || [];
-            const andXMore = _.flatten(winners).length - this.showMaxUsers;
+            const andXMore = flatten(winners).length - this.showMaxUsers;
 
             let message = await translate('games.heist.results');
             message = message.replace('$users', winnersList.map((o) => (tmi.showWithAt ? '@' : '') + o).join(', '));
@@ -250,12 +251,9 @@ class Heist extends Game {
 
     // check how many users are in heist
     const users = await getRepository(HeistUser).find();
-    const level = _.find(levels, (o) => o.maxUsers >= users.length || _.isNil(o.maxUsers));
+    const level = levels.find(o => o.maxUsers >= users.length || _.isNil(o.maxUsers));
     if (level) {
-      const nextLevel = _.find(levels, (o) => {
-        return level ? o.maxUsers > level.maxUsers : true;
-      });
-
+      const nextLevel = levels.find(o => o.maxUsers > level.maxUsers);
       if (this.lastAnnouncedLevel !== level.name) {
         this.lastAnnouncedLevel = level.name;
         if (nextLevel) {
