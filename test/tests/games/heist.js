@@ -218,7 +218,7 @@ describe('Heist - !bankheist', () => {
     });
   });
 
-  describe('!bankheist cops cooldown', () => {
+  describe.only('!bankheist cops cooldown', () => {
     before(async () => {
       await message.prepare();
 
@@ -283,6 +283,11 @@ describe('Heist - !bankheist', () => {
         '$sender, cops are still searching for last heist team. Try again after 0.2 minutes.',
         '$sender, cops are still searching for last heist team. Try again after 0.1 minutes.',
       ].includes(r[0].response), r[0].response);
+    });
+
+    it('Cops are still patrolling but we should not have new message in succession', async () => {
+      const r = await heist.main({ sender: user.viewer, parameters: '100', command });
+      assert(r.length === 0);
     });
     it('We need to wait at least 75 seconds', async() =>{
       const steps = 15;
