@@ -304,7 +304,7 @@ export default defineComponent({
     }
   },
   setup(props: Props, ctx) {
-    const instance = getCurrentInstance();
+    const instance = getCurrentInstance()?.proxy;
 
     const editationItem = ref({
       id: ctx.root.$route.params.id || uuid(),

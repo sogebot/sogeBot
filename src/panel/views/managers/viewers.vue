@@ -700,7 +700,7 @@ export default defineComponent({
     editationItemWatchedTime: { required, minValue: minValue(0) }
   },
   setup(props, ctx) {
-    const instance = getCurrentInstance();
+    const instance = getCurrentInstance()?.proxy;
     const isSidebarVisible = ref(false);
     const sidebarSlideEnabled = ref(true);
 

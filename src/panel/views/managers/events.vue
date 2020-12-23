@@ -140,7 +140,7 @@ export default defineComponent({
     'font-awesome-layers': FontAwesomeLayers,
   },
   setup(props, ctx) {
-    const instance = getCurrentInstance();
+    const instance = getCurrentInstance()?.proxy;
     const isSidebarVisible = ref(false);
     const sidebarSlideEnabled = ref(true);
 

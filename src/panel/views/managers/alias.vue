@@ -217,7 +217,7 @@ export default defineComponent({
     }
   },
   setup(props, ctx) {
-    const instance = getCurrentInstance();
+    const instance = getCurrentInstance()?.proxy;
     const isSidebarVisible = ref(false);
     const sidebarSlideEnabled = ref(true);
 
