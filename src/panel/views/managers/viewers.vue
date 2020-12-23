@@ -901,6 +901,7 @@ export default defineComponent({
         isSidebarVisible.value = isVisible;
         ctx.root.$router.push({ name: 'viewersManagerList' }).catch(() => {});
       } else {
+        state.value.save = ButtonStates.idle;
         if (sidebarSlideEnabled.value) {
           editationItem.value = null
           editationItemEvents.value = null
