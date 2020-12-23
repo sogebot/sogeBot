@@ -218,7 +218,7 @@ describe('Heist - !bankheist', () => {
     });
   });
 
-  describe.only('!bankheist cops cooldown', () => {
+  describe('!bankheist cops cooldown', () => {
     before(async () => {
       await message.prepare();
 
