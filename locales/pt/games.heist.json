@@ -25,5 +25,5 @@
     "federalReserve": "Federal reserve"
   },
   "results": "The heist payouts are: $users",
-  "andXMore": "and $count more ..."
+  "andXMore": "and $count more..."
 }
