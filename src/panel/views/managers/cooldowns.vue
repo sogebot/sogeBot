@@ -296,6 +296,7 @@ export default defineComponent({
         isSidebarVisible.value = isVisible;
         ctx.root.$router.push({ name: 'cooldownsManager' }).catch(() => {});
       } else {
+        state.value.save = ButtonStates.idle;
         if (sidebarSlideEnabled.value) {
           editationItem.value = null
           loadEditationItem();
