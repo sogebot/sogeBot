@@ -381,7 +381,7 @@ describe('Heist - !bankheist', () => {
     });
   });
 
-  describe.only('!bankheist no levels', () => {
+  describe('!bankheist no levels', () => {
     before(async () => {
       await message.prepare();
 
