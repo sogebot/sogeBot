@@ -25,5 +25,5 @@
     "federalReserve": "Národní klenoty"
   },
   "results": "Lup si odnesli: $users",
-  "andXMore": "a dalších $count..."
+  "andXMore": "and $count more..."
 }
