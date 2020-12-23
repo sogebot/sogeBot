@@ -381,7 +381,7 @@ describe('Heist - !bankheist', () => {
     });
   });
 
-  describe('!bankheist no levels', () => {
+  describe.only('!bankheist no levels', () => {
     before(async () => {
       await message.prepare();
 
@@ -394,7 +394,7 @@ describe('Heist - !bankheist', () => {
       heist.lastAnnouncedStart = 0;
       heist.showMaxUsers = 20;
       heist.entryCooldownInSeconds = 5; // adds 10 seconds to announce results
-      heist.levels = [];
+      heist.levelsValues = [];
 
       await getRepository(User).save({ userId: user.viewer.userId, username: user.viewer.username, points: 1000 });
     });
@@ -409,9 +409,9 @@ describe('Heist - !bankheist', () => {
     });
 
     it(`No levels to check return`, async () => {
-      this.startedAt = 0;
-      heist.iCheckFinished();
-      message.debug('heist', 'no levels to check');
+      heist.startedAt = 0;
+      await heist.iCheckFinished();
+      await message.debug('heist', 'no level to check');
     });
   });
 });
