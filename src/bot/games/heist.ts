@@ -6,6 +6,7 @@ import { HeistUser } from '../database/entity/heist';
 import { User } from '../database/entity/user';
 import { command, settings, ui } from '../decorators';
 import Expects from '../expects.js';
+import { flatten } from '../helpers/flatten.js';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { warning } from '../helpers/log.js';
 import { default as pointsSystem } from '../systems/points';
@@ -105,19 +106,12 @@ class Heist extends Game {
   async iCheckFinished () {
     clearTimeout(this.timeouts.iCheckFinished);
 
-    const [startedAt, entryCooldown, lastHeistTimestamp, copsCooldown, started] = await Promise.all([
-      this.startedAt,
-      this.entryCooldownInSeconds,
-      this.lastHeistTimestamp,
-      this.copsCooldownInMinutes,
-      this.started,
-    ]);
     const levels = _.orderBy(this.levelsValues, 'maxUsers', 'asc');
 
     // check if heist is finished
-    if (!_.isNil(startedAt) && Date.now() - startedAt > (entryCooldown * 1000) + 10000) {
+    if (!_.isNil(this.startedAt) && Date.now() - this.startedAt > (this.entryCooldownInSeconds * 1000) + 10000) {
       const users = await getRepository(HeistUser).find();
-      const level = _.find(levels, (o) => o.maxUsers >= users.length || _.isNil(o.maxUsers)); // find appropriate level or max level
+      const level = levels.find(o => o.maxUsers >= users.length || _.isNil(o.maxUsers)); // find appropriate level or max level
 
       if (!level) {
         return; // don't do anything if there is no level
@@ -132,7 +126,7 @@ class Heist extends Game {
         return;
       }
 
-      announce(started.replace('$bank', level.name), 'heist');
+      announce(this.started.replace('$bank', level.name), 'heist');
 
       if (users.length === 1) {
         // only one user
@@ -160,7 +154,7 @@ class Heist extends Game {
         }
         const percentage = (100 / users.length) * winners.length;
         const ordered = _.orderBy(this.resultsValues, [(o) => o.percentage], 'asc');
-        const result = _.find(ordered, (o) => o.percentage >= percentage);
+        const result = ordered.find(o => o.percentage >= percentage);
         global.setTimeout(async () => {
           if (!_.isNil(result)) {
             announce(result.message, 'heist');
@@ -170,7 +164,7 @@ class Heist extends Game {
           global.setTimeout(async () => {
             const chunk: string[][] = _.chunk(winners, this.showMaxUsers);
             const winnersList = chunk.shift() || [];
-            const andXMore = _.flatten(winners).length - this.showMaxUsers;
+            const andXMore = flatten(winners).length - this.showMaxUsers;
 
             let message = await translate('games.heist.results');
             message = message.replace('$users', winnersList.map((o) => (tmi.showWithAt ? '@' : '') + o).join(', '));
@@ -189,7 +183,7 @@ class Heist extends Game {
     }
 
     // check if cops done patrolling
-    if (lastHeistTimestamp !== 0 && Date.now() - lastHeistTimestamp >= copsCooldown * 60000) {
+    if (this.lastHeistTimestamp !== 0 && Date.now() - this.lastHeistTimestamp >= this.copsCooldownInMinutes * 60000) {
       this.lastHeistTimestamp = 0;
       announce(this.copsCooldown, 'heist');
     }
@@ -233,7 +227,7 @@ class Heist extends Game {
 
     let points: number | string = 0;
     try {
-      points = new Expects(opts.parameters).points().toArray()[0] as (number | string);
+      points = new Expects(opts.parameters).points({ all: true }).toArray()[0] as (number | string);
     } catch (e) {
       if (!newHeist) {
         warning(`${opts.command} ${e.message}`);
@@ -242,8 +236,9 @@ class Heist extends Game {
       return [];
     }
 
-    points = points === 'all' && !_.isNil(await pointsSystem.getPointsOf(opts.sender.userId)) ? await pointsSystem.getPointsOf(opts.sender.userId) : Number(points); // set all points
-    points = points > await pointsSystem.getPointsOf(opts.sender.userId) ? await pointsSystem.getPointsOf(opts.sender.userId) : points; // bet only user points
+    const userPoints = await pointsSystem.getPointsOf(opts.sender.userId);
+    points = points === 'all' ? userPoints : Number(points); // set all points
+    points = points > userPoints ? userPoints : points; // bet only user points
 
     if (points === 0 || _.isNil(points) || _.isNaN(points)) {
       return [{ response: translate('games.heist.entryInstruction').replace('$command', opts.command), ...opts }];
@@ -256,16 +251,9 @@ class Heist extends Game {
 
     // check how many users are in heist
     const users = await getRepository(HeistUser).find();
-    const level = _.find(levels, (o) => o.maxUsers >= users.length || _.isNil(o.maxUsers));
+    const level = levels.find(o => o.maxUsers >= users.length || _.isNil(o.maxUsers));
     if (level) {
-      const nextLevel = _.find(levels, (o) => {
-        if (level) {
-          return o.maxUsers > level.maxUsers;
-        } else {
-          return true;
-        }
-      });
-
+      const nextLevel = levels.find(o => o.maxUsers > level.maxUsers);
       if (this.lastAnnouncedLevel !== level.name) {
         this.lastAnnouncedLevel = level.name;
         if (nextLevel) {
