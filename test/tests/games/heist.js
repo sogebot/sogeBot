@@ -86,13 +86,16 @@ describe('Heist - !bankheist', () => {
       heist.lastAnnouncedCops = 0;
       heist.lastAnnouncedHeistInProgress = 0;
       heist.lastAnnouncedStart = 0;
-      heist.showMaxUsers = 20;
+      heist.showMaxUsers = 1;
 
       await getRepository(User).save({ userId: user.owner.userId, username: user.owner.username, points: 1000 });
       await getRepository(User).save({ userId: user.viewer.userId, username: user.viewer.username, points: 1000 });
       await getRepository(User).save({ userId: user.viewer2.userId, username: user.viewer2.username, points: 1000 });
       await getRepository(User).save({ userId: user.mod.userId, username: user.mod.username, points: 1000 });
-      heist.showMaxUsers = 1;
+      // generate 1000 users
+      for (let i=0; i < 1000; i++) {
+        await getRepository(User).save({ userId: i * 9999, username: `user${i}`, points: 1000 });
+      }
     });
 
     it('User start new bankheist with !bankheist 100', async () => {
@@ -127,21 +130,28 @@ describe('Heist - !bankheist', () => {
       assert.strictEqual(r[0].response, '$sender, type !bankheist <points> to enter.');
     });
 
-    it('Force heist to end', async () => {
-      heist.startedAt = 0;
+    it(`1000 users joins bankheist`, async () => {
+      for (let i=0; i < 1000; i++) {
+        await heist.main({ sender: { userId: i*9999, username: `user${i}` }, parameters: '100', command });
+      }
     });
 
-    it('We need to wait at least 20 seconds', async() =>{
-      const steps = 10;
-      process.stdout.write(`\t... waiting ${(20)}s ...                `);
+    it('Force heist to end', async () => {
+      heist.startedAt = 0;
+      // force instant result
+      heist.iCheckFinished();
+    });
+    it('We need to wait at least 7 seconds', async() =>{
+      const steps = 7;
+      process.stdout.write(`\t... waiting ${(7)}s ...                `);
       for (let i = 0; i < steps; i++) {
-        await time.waitMs(20000 / steps);
-        process.stdout.write(`\r\t... waiting ${20 - ((20 / steps) * i)}s ...                `);
+        await time.waitMs(7000 / steps);
+        process.stdout.write(`\r\t... waiting ${7 - ((7 / steps) * i)}s ...                `);
       }
     });
 
     it('Heist should be finished - start message', async () => {
-      await message.isSentRaw('Alright guys, check your equipment, this is what we trained for. This is not a game, this is real life. We will get money from Bank van!', { username: 'bot'});
+      await message.isSentRaw('Alright guys, check your equipment, this is what we trained for. This is not a game, this is real life. We will get money from Federal reserve!', { username: 'bot'});
     });
     it('Heist should be finished - result message', async () => {
       await message.isSentRaw([
@@ -161,14 +171,8 @@ describe('Heist - !bankheist', () => {
       }
     });
     it('Heist should be finished - userslist', async () => {
-      await message.isSentRaw([
-        'The heist payouts are: @__viewer__ and 2 more...',
-        'The heist payouts are: @__viewer__ and 1 more...',
-        'The heist payouts are: @__viewer2__ and 1 more...',
-        'The heist payouts are: @__viewer__',
-        'The heist payouts are: @__viewer2__',
-        'The heist payouts are: @__mod__',
-      ], { username: 'bot'});
+      await message.sentMessageContain('The heist payouts are: ');
+      await message.sentMessageContain('more...');
     });
   });
 
@@ -200,15 +204,7 @@ describe('Heist - !bankheist', () => {
 
     it('Force heist to end', async () => {
       heist.startedAt = 0;
-    });
-
-    it('We need to wait at least 20 seconds', async() =>{
-      const steps = 10;
-      process.stdout.write(`\t... waiting ${(20)}s ...                `);
-      for (let i = 0; i < steps; i++) {
-        await time.waitMs(20000 / steps);
-        process.stdout.write(`\r\t... waiting ${20 - ((20 / steps) * i)}s ...                `);
-      }
+      heist.iCheckFinished();
     });
 
     it('Heist should be finished - start message', async () => {
@@ -382,6 +378,40 @@ describe('Heist - !bankheist', () => {
     it('maxLevelMessage level should be announced', async () => {
       const current = 'Federal reserve';
       await message.isSentRaw(`With this crew, we can heist ${current}! It cannot be any better!`, { username: 'bot'});
+    });
+  });
+
+  describe('!bankheist no levels', () => {
+    before(async () => {
+      await message.prepare();
+
+      // reset heist
+      heist.startedAt = null;
+      heist.lastAnnouncedLevel = '';
+      heist.lastHeistTimestamp = 0;
+      heist.lastAnnouncedCops = 0;
+      heist.lastAnnouncedHeistInProgress = 0;
+      heist.lastAnnouncedStart = 0;
+      heist.showMaxUsers = 20;
+      heist.entryCooldownInSeconds = 5; // adds 10 seconds to announce results
+      heist.levels = [];
+
+      await getRepository(User).save({ userId: user.viewer.userId, username: user.viewer.username, points: 1000 });
+    });
+    after(() => {
+      heist.entryCooldownInSeconds = 120;
+    });
+
+    it('User start new bankheist with !bankheist 100', async () => {
+      const r = await heist.main({ sender: user.viewer, parameters: '100', command });
+      // if correct we don't expect any message
+      assert.strictEqual(r.length, 0);
+    });
+
+    it(`No levels to check return`, async () => {
+      this.startedAt = 0;
+      heist.iCheckFinished();
+      message.debug('heist', 'no levels to check');
     });
   });
 });
