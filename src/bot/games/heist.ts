@@ -6,9 +6,8 @@ import { HeistUser } from '../database/entity/heist';
 import { User } from '../database/entity/user';
 import { command, settings, ui } from '../decorators';
 import Expects from '../expects.js';
-import { flatten } from '../helpers/flatten.js';
 import { getLocalizedName } from '../helpers/getLocalized';
-import { warning } from '../helpers/log.js';
+import { debug, warning } from '../helpers/log.js';
 import { default as pointsSystem } from '../systems/points';
 import tmi from '../tmi';
 import { translate } from '../translate';
@@ -111,10 +110,16 @@ class Heist extends Game {
     // check if heist is finished
     if (!_.isNil(this.startedAt) && Date.now() - this.startedAt > (this.entryCooldownInSeconds * 1000) + 10000) {
       const users = await getRepository(HeistUser).find();
-      const level = levels.find(o => o.maxUsers >= users.length || _.isNil(o.maxUsers)); // find appropriate level or max level
+      let level = levels.find(o => o.maxUsers >= users.length || _.isNil(o.maxUsers)); // find appropriate level or max level
 
       if (!level) {
-        return; // don't do anything if there is no level
+        if (levels.length > 0) {
+          // select last level when max users are over (we have it already sorted)
+          level = levels[levels.length - 1];
+        } else {
+          debug('heist', 'no level to check');
+          return; // don't do anything if there is no level
+        }
       }
 
       if (users.length === 0) {
@@ -127,7 +132,6 @@ class Heist extends Game {
       }
 
       announce(this.started.replace('$bank', level.name), 'heist');
-
       if (users.length === 1) {
         // only one user
         const isSurvivor = _.random(0, 100, false) <= level.winPercentage;
@@ -164,7 +168,7 @@ class Heist extends Game {
           global.setTimeout(async () => {
             const chunk: string[][] = _.chunk(winners, this.showMaxUsers);
             const winnersList = chunk.shift() || [];
-            const andXMore = flatten(winners).length - this.showMaxUsers;
+            const andXMore = winners.length - this.showMaxUsers;
 
             let message = await translate('games.heist.results');
             message = message.replace('$users', winnersList.map((o) => (tmi.showWithAt ? '@' : '') + o).join(', '));

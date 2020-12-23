@@ -168,6 +168,34 @@ module.exports = {
       }
     }, wait || 5000);
   }, 'We should not use isSent as it may cause false positive tests'),
+  sentMessageContain: async function (expected, wait) {
+    if (!Array.isArray(expected)) {
+      expected = [expected];
+    }
+    return until(setError => {
+      try {
+        let isOK = false;
+        for (const e of expected) {
+          if (isOK) {
+            break;
+          }
+          for (const args of log.chatOut.args) {
+            if (args[0].includes(e)) {
+              isOK = true;
+              break;
+            }
+          }
+        }
+        assert(isOK);
+        return true;
+      } catch (err) {
+        return setError(
+          '\nExpected message to contain:\t' + expected
+          + '\nActual message:\t\t' + log.chatOut.args.join('\n\t\t\t')
+        );
+      }
+    }, wait || 5000);
+  },
   isSentRaw: async function (expected, user, wait) {
     if (!Array.isArray(expected)) {
       expected = [expected];
