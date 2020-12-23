@@ -124,8 +124,8 @@ class StreamElements extends Integration {
       }
     });
 
-    this.socketToStreamElements.on('authenticated', () => {
-      info(chalk.yellow('STREAMELEMENTS:') + ' Successfully authenticated on service');
+    this.socketToStreamElements.on('authenticated', ({ channelId }: { channelId: string }) => {
+      info(chalk.yellow('STREAMELEMENTS:') + ` Successfully authenticated on service (channel ${channelId})`);
     });
 
     this.socketToStreamElements.on('disconnect', () => {
