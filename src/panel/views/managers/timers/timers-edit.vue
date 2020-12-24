@@ -1,39 +1,6 @@
 <template>
-  <b-container fluid>
-    <b-row>
-      <b-col>
-        <span class="title text-default mb-2">
-          {{ translate('menu.manage') }}
-          <small><fa icon="angle-right"/></small>
-          {{ translate('menu.timers') }}
-          <template v-if="$route.params.id">
-            <small><fa icon="angle-right"/></small>
-            {{item.name}}
-            <small class="text-muted text-monospace" style="font-size:0.7rem">{{$route.params.id}}</small>
-          </template>
-        </span>
-      </b-col>
-    </b-row>
-
-    <panel>
-      <template v-slot:left>
-        <button-with-icon class="btn-secondary btn-reverse" icon="caret-left" href="#/manage/timers/list">{{translate('commons.back')}}</button-with-icon>
-        <hold-button v-if="$route.params.id || null" @trigger="del()" icon="trash" class="btn-danger">
-          <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-          <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
-        </hold-button>
-        <button-with-icon :class="[ item.isEnabled ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" icon="power-off" @click="item.isEnabled = !item.isEnabled">
-          {{ translate('dialog.buttons.' + (item.isEnabled? 'enabled' : 'disabled')) }}
-        </button-with-icon>
-      </template>
-      <template v-slot:right>
-        <b-alert show variant="info" v-if="state.pending" v-html="translate('dialog.changesPending')" class="mr-2 p-2 mb-0"></b-alert>
-        <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$invalid && !!$v.$dirty"/>
-      </template>
-    </panel>
-
-    <loading v-if="state.loading !== $state.success"/>
-    <b-form v-else>
+  <div class="px-3 py-2">
+    <b-form>
       <b-form-group
         :label="translate('timers.dialog.name')"
         :description="translate('timers.dialog.placeholders.name')"
@@ -66,8 +33,13 @@
                 type="number"
                 min="0"
                 :placeholder="translate('timers.dialog.placeholders.messages')"
+                :state="$v.item.triggerEveryMessage.$invalid && $v.item.triggerEveryMessage.$dirty ? false : null"
                 @input="$v.item.$touch()"
               ></b-form-input>
+              <b-form-invalid-feedback :state="!($v.item.triggerEveryMessage.$invalid && $v.item.triggerEveryMessage.$dirty)">
+                <template v-if="!$v.item.triggerEveryMessage.required">{{ translate('errors.value_cannot_be_empty') }}</template>
+                <template v-else-if="!$v.item.triggerEveryMessage.minValue">{{ translate('errors.minValue_of_value_is').replace('$value', '0') }}</template>
+              </b-form-invalid-feedback>
             </b-input-group>
         </b-form-group>
       </b-col>
@@ -84,8 +56,13 @@
               type="number"
               min="0"
               :placeholder="translate('timers.dialog.placeholders.seconds')"
+              :state="$v.item.triggerEverySecond.$invalid && $v.item.triggerEverySecond.$dirty ? false : null"
               @input="$v.item.$touch()"
-            ></b-form-input>
+              ></b-form-input>
+              <b-form-invalid-feedback :state="!($v.item.triggerEverySecond.$invalid && $v.item.triggerEverySecond.$dirty)">
+                <template v-if="!$v.item.triggerEverySecond.required">{{ translate('errors.value_cannot_be_empty') }}</template>
+                <template v-else-if="!$v.item.triggerEverySecond.minValue">{{ translate('errors.minValue_of_value_is').replace('$value', '0') }}</template>
+              </b-form-invalid-feedback>
             </b-input-group>
           </b-form-group>
         </b-col>
@@ -94,6 +71,12 @@
       <b-form-group>
         <label>{{translate('timers.dialog.responses')}}</label>
         <b-input-group v-for="(response, index) of item.messages" :key="index" class="pb-1">
+          <b-alert show variant="danger" v-if="markToDeleteIdx.includes(index)"
+          style="position: absolute;
+                 z-index: 9;
+                 height: 100%;
+                 width: calc(100% - 34.5px);
+                 opacity: 60%;"></b-alert>
           <b-input-group-prepend>
             <b-button @click="response.isEnabled = !response.isEnabled" :variant="response.isEnabled ? 'success' : 'danger'">
               {{ response.isEnabled ? translate('enabled') : translate('disabled') }}
@@ -105,185 +88,256 @@
             :value.sync="response.response"
             v-bind:filters="['global']"
             v-bind:placeholder="''"
+            @input="getMessageValidation(index).$touch();"
+            :state="!(getMessageValidation(index).$error && getMessageValidation(index).$dirty)"
             />
 
           <b-input-group-append>
-            <hold-button @trigger="delResponse(index)" icon="trash" class="btn-danger btn-reverse btn-only-icon"></hold-button>
+            <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="toggleMarkResponse(index)">
+              {{ translate('dialog.buttons.delete') }}
+            </button-with-icon>
           </b-input-group-append>
         </b-input-group>
         <button type="button" class="btn btn-success btn-block" @click="addResponse()">{{ translate('systems.timers.add_response') }}</button>
       </b-form-group>
     </b-form>
-  </b-container>
+  </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator';
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
-
-import { Route } from 'vue-router'
-import { NextFunction } from 'express';
-
-import { Validations } from 'vuelidate-property-decorators';
-import { required } from 'vuelidate/lib/validators';
-
-import { TimerInterface, TimerResponseInterface } from 'src/bot/database/entity/timer';
+import { defineComponent, ref, onMounted, watch, getCurrentInstance, onUnmounted } from '@vue/composition-api'
 
 import { v4 as uuid } from 'uuid';
+import { validationMixin } from 'vuelidate'
+import { minValue, required } from 'vuelidate/lib/validators';
 
-Component.registerHooks([
-  'beforeRouteEnter',
-  'beforeRouteLeave',
-  'beforeRouteUpdate' // for vue-router 2.2+
-])
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
+import { TimerInterface, TimerResponseInterface } from 'src/bot/database/entity/timer';
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import { error } from 'src/panel/helpers/error';
+import { EventBus } from 'src/panel/helpers/event-bus';
+import { get, xor } from 'lodash-es';
 
+type Props = {
+  id: string;
+  invalid: boolean;
+  pending: boolean;
+  saveState: number;
+}
 
 const mustBeCompliant = (value: string) => value.length === 0 || !!value.match(/^[a-zA-Z0-9_]+$/);
+const socket = getSocket('/systems/timers');
 
-@Component({
+export default defineComponent({
+  props: {
+    id: String,
+    invalid: Boolean,
+    pending: Boolean,
+    saveState: Number,
+  },
+  mixins: [ validationMixin ],
   components: {
-    'loading': () => import('../../../components/loading.vue'),
-    'hold-button': () => import('../../../components/holdButton.vue'),
+    loading: () => import('src/panel/components/loading.vue'),
     'textarea-with-tags': () => import('../../../components/textareaWithTags.vue'),
   },
-  filters: {
-    capitalize(value: string) {
-      if (!value) return ''
-      value = value.toString()
-      return value.charAt(0).toUpperCase() + value.slice(1)
-    }
-  }
-})
-export default class timerssEdit extends Vue {
-  translate = translate;
-  socket = getSocket('/systems/timers');
-
-  state: {
-    loading: number;
-    save: number;
-    pending: boolean;
-  } = {
-    loading: this.$state.progress,
-    save: this.$state.idle,
-    pending: false,
-  }
-
-  item: TimerInterface = {
-    id: uuid(),
-    name: '',
-    triggerEveryMessage: 0,
-    triggerEverySecond: 0,
-    isEnabled: true,
-    triggeredAtTimestamp: Date.now(),
-    triggeredAtMessages: 0,
-    messages: [],
-  }
-
-
-  @Validations()
-  validations = {
+  validations: {
     item: {
       name: { mustBeCompliant, required },
+      triggerEverySecond: { required, minValue: minValue(0) },
+      triggerEveryMessage: { required, minValue: minValue(0) },
+      messages: {
+        $each: {
+          response: { required },
+        },
+      },
     }
-  }
+  },
+  setup (props: Props, ctx) {
+    const instance = getCurrentInstance()?.proxy;
 
-  @Watch('item', { deep: true })
-  pending() {
-    if (this.state.loading === this.$state.success) {
-      this.state.pending = true;
-    }
-  }
+    const markToDeleteIdx = ref([] as number[])
+    const state = ref({
+      loading: ButtonStates.progress,
+    } as {
+      loading: number;
+    });
 
-  addResponse() {
-    const response: TimerResponseInterface = {
-      id: uuid(),
-      timestamp: Date.now(),
+    const item = ref({
+      id: ctx.root.$route.params.id || uuid(),
+      name: '',
+      triggerEveryMessage: 0,
+      triggerEverySecond: 0,
       isEnabled: true,
-      response: '',
-    };
-    this.item.messages.push(response);
-  }
+      triggeredAtTimestamp: Date.now(),
+      triggeredAtMessages: 0,
+      messages: [],
+    } as Required<TimerInterface>);
 
-  delResponse(index: number) {
-    this.item.messages.splice(index, 1);
-  }
+    watch([item, markToDeleteIdx], (val, oldVal) => {
+      if (state.value.loading !== ButtonStates.progress) {
+        ctx.emit('update:pending', true);
 
-  async mounted() {
-    if (this.$route.params.id) {
-      await new Promise<void>((resolve, reject) => {
-        this.socket.emit('generic::getOne', this.$route.params.id, (err: string | null, data: Required<TimerInterface>) => {
-        if (err) {
-          reject(err)
+        const $v = instance?.$v;
+        if ($v) {
+          ctx.emit('update:invalid', ($v.item.$error && $v.item.$dirty) || stateOfMessagesErrorsDirty());
         }
-        this.item = data;
-        resolve()
-        })
-      })
-    }
-
-    this.$nextTick(() => {
-      this.state.loading = this.$state.success;
-    })
-  }
-
-  del() {
-    this.socket.emit('generic::deleteById', this.$route.params.id, (err: string | null) => {
-      if (err) {
-        return console.error(err);
       }
-      this.$router.push({ name: 'TimersManagerList' })
+    }, { deep: true });
+
+    onMounted(() => {
+      loadEditationItem();
+      ctx.emit('update:pending', false);
+      EventBus.$on('managers::timers::save::' + item.value.id, () => {
+        console.debug('Save event received - managers::timers::save::' + item.value.id);
+        save();
+      });
+    });
+    onUnmounted(() => {
+      EventBus.$off('managers::timers::save::' + item.value.id);
     })
-  }
 
-  save() {
-    this.$v.$touch();
-    if (!this.$v.$invalid) {
-      this.state.save = this.$state.progress;
-
-      this.socket.emit('timers::save', this.item, (err: string | null, data: Required<TimerInterface>) => {
-        if (err) {
-          this.state.save = this.$state.fail;
-          return console.error(err);
-        }
-
-        this.state.save = this.$state.success;
-        this.item = data;
-        this.$nextTick(() => {
-          this.state.pending = false;
-          this.$router.push({ name: 'TimersManagerEdit', params: { id: String(this.item.id) } })
-        })
-        setTimeout(() => {
-          this.state.save = this.$state.idle;
-        }, 1000)
+    const loadEditationItem = async () => {
+      state.value.loading = ButtonStates.progress
+      await Promise.all([
+        new Promise<void>((resolve, reject) => {
+          if (ctx.root.$route.params.id) {
+            socket.emit('generic::getOne', ctx.root.$route.params.id, (err: string | null, timerGetAll: Required<TimerInterface> | undefined) => {
+              if (err) {
+                reject(error(err));
+              }
+              if (timerGetAll) {
+                console.debug('Loaded', timerGetAll);
+                item.value = timerGetAll;
+              }
+              ctx.root.$nextTick(() => {
+                ctx.emit('update:pending', false);
+              });
+              resolve();
+            });
+          }
+          resolve();
+        }),
+      ]);
+      ctx.root.$nextTick(() => {
+        ctx.emit('update:pending', false);
+        state.value.loading = ButtonStates.success
       });
     }
-  }
+    const save = () =>  {
+      const $v = instance?.$v;
+      $v?.$touch();
+      ctx.emit('update:invalid', ($v?.item.name?.$error && $v.item.name.$dirty) || stateOfMessagesErrorsDirty());
+      if (!$v?.$error) {
+        ctx.emit('update:saveState', ButtonStates.progress);
+        const messages = [];
+        for(let i = 0; i < item.value.messages.length; i++) {
+          if (!markToDeleteIdx.value.includes(i)) {
+            messages.push(item.value.messages[i])
+          }
+        }
+        const toSave = {
+          ...item.value,
+          messages,
+        } as Required<TimerInterface>;
 
-  beforeRouteUpdate(to: Route, from: Route, next: NextFunction) {
-    if (this.state.pending) {
-      const isOK = confirm('You will lose your pending changes. Do you want to continue?')
-      if (!isOK) {
-        next(false);
-      } else {
-        next();
+        socket.emit('timers::save', toSave, (err: string | null) => {
+          if (err) {
+            ctx.emit('update:saveState', ButtonStates.fail);
+            error(err)
+          } else {
+            item.value = toSave;
+            markToDeleteIdx.value = [];
+            ctx.emit('update:saveState', ButtonStates.success);
+          }
+          ctx.root.$nextTick(() => {
+            ctx.emit('update:pending', false);
+            ctx.emit('refresh');
+            setTimeout(() => {
+              ctx.emit('update:saveState', ButtonStates.idle);
+            }, 1000)
+          })
+        })
       }
-    } else {
-      next();
+    }
+    const addResponse = () => {
+      const response: TimerResponseInterface = {
+        id: uuid(),
+        timestamp: Date.now(),
+        isEnabled: true,
+        response: '',
+      };
+      item.value.messages.push(response);
+    }
+
+    const toggleMarkResponse = (index: number) => {
+      markToDeleteIdx.value = xor(markToDeleteIdx.value, [index])
+    }
+
+    const getMessageValidation = (idx: number) => {
+      const $v = instance?.$v;
+      return get($v, 'item.messages.$each[' + idx + '].response', { $error: false, $dirty: false, $touch: () => {} });
+    };
+    const stateOfMessagesErrorsDirty = () => {
+      const $v = instance?.$v;
+      return Object.values($v?.item.messages?.$each.$iter ?? []).filter((o, idx) => {
+        return !markToDeleteIdx.value.includes(idx) && (!!o.$error && !!o.$dirty)
+      }).length > 0;
+    }
+
+    return {
+      translate,
+      state,
+      item,
+      save,
+      addResponse,
+      toggleMarkResponse,
+      markToDeleteIdx,
+      getMessageValidation,
+      stateOfMessagesErrorsDirty
     }
   }
+});
+</script>
 
-  beforeRouteLeave(to: Route, from: Route, next: NextFunction) {
-    if (this.state.pending) {
-      const isOK = confirm('You will lose your pending changes. Do you want to continue?')
-      if (!isOK) {
-        next(false);
-      } else {
-        next();
-      }
-    } else {
-      next();
-    }
+<style scoped>
+@media only screen and (max-width: 1000px) {
+  .btn-shrink {
+    padding: 0!important;
+  }
+  .btn-shrink .text {
+    display: none !important;
+  }
+  .btn-shrink .btn-icon {
+    background: transparent !important;
   }
 }
-</script>
+
+.btn-only-icon .text {
+  display: none !important;
+}
+.btn-only-icon .btn-icon {
+  background: transparent !important;
+}
+
+.btn-with-icon {
+  padding: 0;
+  display: inline-block;
+  width: fit-content;
+}
+
+.btn-with-icon .text + .btn-icon {
+  background: rgba(0,0,0,0.15);
+}
+
+.btn-with-icon .btn-icon {
+  display: inline-block;
+  padding: 0.375rem 0.4rem;
+  flex-shrink: 10;
+}
+
+.btn-with-icon .text {
+  padding: 0.375rem 0.4rem;
+}
+</style>
+
