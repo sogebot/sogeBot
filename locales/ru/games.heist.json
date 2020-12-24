@@ -25,5 +25,5 @@
     "federalReserve": "Федеральный резерв"
   },
   "results": "Выплаты за ограбление: $users",
-  "andXMore": "и еще $count..."
+  "andXMore": "and $count more..."
 }
