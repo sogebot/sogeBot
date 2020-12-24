@@ -159,8 +159,7 @@ export default defineComponent({
     loading: () => import('src/panel/components/loading.vue'),
     'font-awesome-layers': FontAwesomeLayers,
   },
-
-    validations: {
+  validations: {
     editationItem: {
       name: { required, minLength: minLength(1) },
       operations: {
@@ -428,6 +427,7 @@ export default defineComponent({
     });
 
     onMounted(() => {
+      debugger;
       loadEditationItem();
       ctx.emit('update:pending', false);
       EventBus.$on('managers::events::save::' + editationItem.value.id, () => {
@@ -438,16 +438,6 @@ export default defineComponent({
     onUnmounted(() => {
       EventBus.$off('managers::events::save::' + editationItem.value.id);
     })
-    const sendUpdate = (event: EventInterface) => {
-      socket.emit('events::save', event, (err: string | null) => {
-        if (err) {
-          error(err);
-        }
-      })
-    };
-    const newItem = () => {
-      ctx.root.$router.push({ name: 'EventsManagerEdit', params: { id: uuid() } }).catch(() => {});
-    };
     const loadEditationItem = async () => {
       state.value.loading = ButtonStates.progress
       await Promise.all([
@@ -596,7 +586,6 @@ export default defineComponent({
             error(err)
           } else {
             ctx.emit('update:saveState', ButtonStates.success);
-            ctx.root.$router.push({ name: 'EventsManagerEdit', params: { id: editationItem.value?.id || '' } }).catch(() => {})
           }
           ctx.emit('update:pending', false);
           ctx.emit('refresh');
@@ -618,9 +607,7 @@ export default defineComponent({
       eventTypes,
       state,
       filteredEvents,
-      sendUpdate,
       save,
-      newItem,
 
       editationItem,
       supported,

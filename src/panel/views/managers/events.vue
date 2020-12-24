@@ -36,9 +36,9 @@
         </template>
         <events-edit v-if="$route.params.id" :id="$route.params.id" :saveState.sync="state.save" :invalid.sync="state.invalid" :pending.sync="state.pending" @refresh="refresh"/>
       </b-sidebar>
-      <div class="alert alert-info" v-if="events.length === 0">
+      <b-alert show variant="danger" v-if="events.length === 0">
         {{translate('events.noEvents')}}
-      </div>
+      </b-alert>
       <div v-else v-for="(type, idx) of eventTypes" v-bind:key="type + idx">
         <span class="title text-default mb-2" style="font-size: 20px !important;">{{capitalize(translate(type))}}</span>
         <div v-for="(event, i) of filteredEvents.filter(o => o.name === type)"
@@ -124,19 +124,16 @@ import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { error } from 'src/panel/helpers/error';
 import { capitalize } from 'src/panel/helpers/capitalize';
 
-import { validationMixin } from 'vuelidate'
 import { get } from 'lodash-es';
-import EventsEdit from './events-edit.vue';
 import { EventBus } from 'src/panel/helpers/event-bus';
 
 const socket = getSocket('/core/events');
 
 export default defineComponent({
-  mixins: [ validationMixin ],
   components: {
     rewards: () => import('src/panel/components/rewardDropdown.vue'),
     loading: () => import('src/panel/components/loading.vue'),
-    EventsEdit,
+    eventsEdit: () => import('./events-edit.vue'),
     'font-awesome-layers': FontAwesomeLayers,
   },
   setup(props, ctx) {
@@ -256,6 +253,8 @@ export default defineComponent({
         }
         isSidebarVisible.value = isVisible;
         ctx.root.$router.push({ name: 'EventsManagerList' }).catch(() => {});
+      } else {
+        state.value.save = ButtonStates.idle;
       }
     }
 
