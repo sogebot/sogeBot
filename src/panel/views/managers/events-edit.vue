@@ -427,7 +427,6 @@ export default defineComponent({
     });
 
     onMounted(() => {
-      debugger;
       loadEditationItem();
       ctx.emit('update:pending', false);
       EventBus.$on('managers::events::save::' + editationItem.value.id, () => {

@@ -5,7 +5,7 @@
     class="btn btn-with-icon"
     :target="target">
     <div style="display: flex">
-      <div class="text">
+      <div class="text w-100">
         <slot>{{text}}</slot>
       </div>
       <div class="btn-icon" v-if="icon">
@@ -17,7 +17,7 @@
   <button v-else type="button" class="btn btn-with-icon" style="flex-direction: row;"
     @click="$emit(event || 'click')" :disabled="disabled">
     <div style="display: flex">
-      <div class="text">
+      <div class="text w-100">
         <slot>{{text}}</slot>
       </div>
 
