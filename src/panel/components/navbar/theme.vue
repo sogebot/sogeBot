@@ -22,7 +22,6 @@ export default defineComponent({
     const theme = ref('light');
 
     const toggleTheme = () => {
-      debugger;
       const theme = localStorage.getItem('theme');
       if (theme === null || theme === 'light') {
         localStorage.setItem('theme', 'dark')

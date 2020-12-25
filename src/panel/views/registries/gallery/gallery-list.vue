@@ -1,5 +1,5 @@
 <template>
-  <b-container fluid ref="window">
+  <b-container fluid>
     <b-row>
       <b-col>
         <span class="title text-default mb-2">
@@ -29,10 +29,15 @@
               ref="uploadFileInput"
               :disabled="state.uploading === $state.progress"
               @change="filesChange($event.target.files)"
+              multiple
               accept="image/*, video/mp4, audio/*"/>
         </form>
       </template>
       <template v-slot:right>
+        <b-button variant="danger" v-if="markToDeleteIdx.length > 0" @click="remove">
+          Delete {{ markToDeleteIdx.length }} item(s)
+        </b-button>
+
         <button class="btn btn-primary border-0" :class="[exclude.includes('audio') ? 'btn-secondary' : 'btn-primary']" v-on:click="toggle('audio')">
           <fa :icon="['far', exclude.includes('audio') ? 'square' : 'check-square']" fixed-width></fa> Audio
         </button>
@@ -47,27 +52,28 @@
 
     <loading v-if="state.loading === $state.progress" />
     <div class="card-deck mb-3" v-else-if="filtered.length > 0" v-for="(chunk, index) of chunk(filtered, itemCountPerRow)" :key="'chunk-' + index">
-      <div class="card" v-for="item of chunk" :key="item.id">
-        <div class="card-body border-top p-0 text-right" style="flex: 0 1 auto;">
-          <a v-bind:href="'/gallery/'+ item.id" class="btn btn-outline-dark p-3 border-0 w-100" target="_blank"><fa icon="link"></fa> {{ item.name || item.id }}</a>
-        </div>
-        <div class="card-body border-top p-0 text-right" style="flex: 1 1 auto;">
-          <img class="w-100" :src="'/gallery/'+ item.id" v-if="item.type.includes('png') || item.type.includes('jpg') || item.type.includes('jpeg') || item.type.includes('gif')">
-          <video class="w-100" v-if="item.type.includes('mp4')" controls>
-            <source :type="item.type" :src="'/gallery/'+ item.id">
-          </video>
-          <audio class="w-100" v-if="item.type.includes('audio')" controls>
-            <source :type="item.type" :src="'/gallery/'+ item.id">
-          </audio>
-        </div>
+      <b-card no-body :bg-variant="markToDeleteIdx.includes(item.id) ? 'info' : undefined" :text-variant="markToDeleteIdx.includes(item.id) ? 'white' : undefined" v-for="item of chunk" :key="item.id">
+        <b-card-body class="p-0">
+          <b-card-title>
+            <a v-bind:href="'/gallery/'+ item.id" class="btn btn-outline-dark p-3 border-0 w-100" target="_blank"><fa icon="link"></fa> {{ item.name || item.id }}</a>
+          </b-card-title>
+          <b-card-text>
+            <img class="w-100" :src="'/gallery/'+ item.id" v-if="item.type.includes('png') || item.type.includes('jpg') || item.type.includes('jpeg') || item.type.includes('gif')">
+            <video class="w-100" v-if="item.type.includes('mp4')" controls>
+              <source :type="item.type" :src="'/gallery/'+ item.id">
+            </video>
+            <audio class="w-100" v-if="item.type.includes('audio')" controls>
+              <source :type="item.type" :src="'/gallery/'+ item.id">
+            </audio>
+          </b-card-text>
+        </b-card-body>
 
-        <div class="card-footer p-0">
-          <hold-button @trigger="remove(item.id)" icon="trash" class="btn-danger btn-reverse w-100">
-              <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-              <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
-          </hold-button>
-        </div>
-      </div>
+        <b-card-footer class="p-0">
+          <button-with-icon :class="markToDeleteIdx.includes(item.id) ? 'btn-info' : 'btn-danger'" class="btn-reverse w-100" icon="trash" @click="toggleMarkResponse(item.id)">
+            {{ translate('dialog.buttons.delete') }}
+          </button-with-icon>
+        </b-card-footer>
+      </b-card>
 
       <!-- add empty invisible cards if chunk is < 3-->
       <div class="card" v-for="index in (itemCountPerRow - chunk.length)" style="visibility: hidden" :key="'empty-' + index"></div>
@@ -76,10 +82,11 @@
 </template>
 
 <script lang="ts">
-import { getSocket } from 'src/panel/helpers/socket';
+import { defineComponent, ref, onMounted, computed, watch, onUnmounted } from '@vue/composition-api'
+import { chunk, xor } from 'lodash-es';
+import { v4 as uuid } from 'uuid';
 
-import { Vue, Component, Watch  } from 'vue-property-decorator';
-import { chunk } from 'lodash-es';
+import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -88,110 +95,159 @@ import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons';
 library.add(faLink, faTrash, faCheckSquare, faSquare);
 
 import type { GalleryInterface } from 'src/bot/database/entity/gallery';
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import { error } from 'src/panel/helpers/error';
 
-@Component({
+const socket = getSocket('/overlays/gallery');
+let interval: number = 0;
+
+export default defineComponent({
   components: {
-    loading: () => import('../../../components/loading.vue'),
-    'hold-button': () => import('../../../components/holdButton.vue'),
+    loading: () => import('src/panel/components/loading.vue'),
   },
-})
-export default class galleryRegistryEdit extends Vue {
-  chunk = chunk;
-  translate = translate;
+  setup() {
+    const domWidth = ref(document.body.clientWidth);
 
-  socket = getSocket('/overlays/gallery');
-  domWidth = 0;
+    const items = ref([] as GalleryInterface[]);
+    const exclude = ref([] as any[]);
+    const uploadedFiles = ref(0);
+    const isUploadingNum = ref(0);
+    const markToDeleteIdx = ref([] as string[])
 
-  state: {
-    loading: number;
-    uploading: number;
-  } = {
-    loading: this.$state.progress,
-    uploading: this.$state.idle,
-  }
+    const state = ref({
+      loading: ButtonStates.progress,
+      uploading: ButtonStates.idle,
+    } as {
+      uploading: number;
+      loading: number;
+    });
 
-  uploadedFiles = 0;
-  isUploadingNum = 0;
-
-  items: GalleryInterface[] = [];
-  exclude: any[] = [];
-
-  mounted() {
-    this.state.loading = this.$state.progress;
-    this.socket.emit('generic::getAll', (err: string | null, items: GalleryInterface[]) => {
-      console.debug('Loaded', items);
-      this.items = items
-      this.state.loading = this.$state.success;
-    })
-    setInterval(() => {
-      if (this.$refs['window']) {
-        this.domWidth = (this.$refs['window'] as HTMLElement).clientWidth
-      }
-    }, 1000)
-  }
-
-  get filtered() {
-    return this.items.filter(o => {
-      const isVideoIncluded = !(this.exclude.includes('video') && o.type.includes('video'))
-      const isImageIncluded = !(this.exclude.includes('images') && o.type.includes('image'))
-      const isAudioIncluded = !(this.exclude.includes('audio') && o.type.includes('audio'))
-      return isVideoIncluded && isImageIncluded && isAudioIncluded
-    })
-  }
-
-  get itemCountPerRow() {
-    if (this.domWidth > 1400) return 6
-    if (this.domWidth > 1300) return 5
-    if (this.domWidth > 1100) return 4
-    else if (this.domWidth > 800) return 3
-    else if (this.domWidth > 600) return 2
-    else return 4
-  }
-
-  @Watch('uploadedFiles')
-  _uploadedFiles(val: number) {
-    if (this.isUploadingNum === val) {
-      this.state.uploading = this.$state.idle;
-    }
-  }
-
-  toggle(type: GalleryInterface['type']) {
-    if (this.exclude.includes(type)) {
-      this.exclude = this.exclude.filter(o => o !== type)
-    } else this.exclude.push(type)
-  }
-
-  remove(id: string) {
-    this.socket.emit('generic::deleteById', id, (err: string | null) => {
-      if (err) {
-        console.error(err);
-      } else {
-        this.items = this.items.filter(o => o.id != id)
-      }
-    })
-  }
-
-  filesChange(files: HTMLInputElement['files']) {
-    if (!files) {
-      return;
-    }
-    this.state.uploading = this.$state.progress;
-    this.isUploadingNum = files.length
-    this.uploadedFiles = 0
-
-    for (let i = 0, l = files.length; i < l; i++) {
-      const reader = new FileReader()
-      reader.onload = ((e: any) => {
-        this.socket.emit('gallery::upload', [files[i].name, e.target.result], (err: string | null, item: GalleryInterface) => {
-          if (err) {
-            return console.error(err);
-          }
-          this.uploadedFiles++
-          this.items.push(item)
-        })
+    const filtered = computed(() => {
+      return items.value.filter(o => {
+        const isVideoIncluded = !(exclude.value.includes('video') && o.type.includes('video'))
+        const isImageIncluded = !(exclude.value.includes('images') && o.type.includes('image'))
+        const isAudioIncluded = !(exclude.value.includes('audio') && o.type.includes('audio'))
+        return isVideoIncluded && isImageIncluded && isAudioIncluded
       })
-      reader.readAsDataURL(files[i])
+    });
+    const itemCountPerRow = computed(() => {
+      if (domWidth.value > 1400) return 6
+      if (domWidth.value > 1300) return 5
+      if (domWidth.value > 1100) return 4
+      else if (domWidth.value > 800) return 3
+      else if (domWidth.value > 600) return 2
+      else return 4
+    })
+
+    onMounted(() => {
+      refresh();
+      interval = window.setInterval(() => {
+        domWidth.value = document.body.clientWidth
+      }, 1000)
+    });
+    onUnmounted(() => {
+      clearInterval(interval);
+    })
+
+    watch(uploadedFiles, (val: number) => {
+      if (isUploadingNum.value === val) {
+        state.value.uploading = ButtonStates.idle;
+      } else {
+        state.value.uploading = ButtonStates.progress;
+      }
+    })
+
+    const refresh = () => {
+      socket.emit('generic::getAll', (err: string | null, _items: GalleryInterface[]) => {
+        console.debug('Loaded', _items);
+        items.value = _items;
+        state.value.loading = ButtonStates.success;
+      })
+    }
+    const toggle = (type: GalleryInterface['type']) => {
+      if (exclude.value.includes(type)) {
+        exclude.value = exclude.value.filter(o => o !== type)
+      } else exclude.value.push(type)
+    }
+
+    const remove = () => {
+      for (const id of markToDeleteIdx.value) {
+        socket.emit('generic::deleteById', id, (err: string | null) => {
+          if (err) {
+            console.error(err);
+          } else {
+            items.value = items.value.filter(o => o.id != id)
+          }
+        })
+      }
+      markToDeleteIdx.value = [];
+    }
+
+    const toggleMarkResponse = (index: string) => {
+      markToDeleteIdx.value = xor(markToDeleteIdx.value, [index])
+    }
+
+    const filesChange = (files: HTMLInputElement['files']) => {
+      if (!files) {
+        return;
+      }
+      state.value.uploading = ButtonStates.progress;
+      isUploadingNum.value = files.length
+      uploadedFiles.value = 0
+
+      for (let i = 0, l = files.length; i < l; i++) {
+        const reader = new FileReader()
+        reader.onload = (async (e: any) => {
+          const id = uuid();
+          const chunks = String(reader.result).match(/.{1,500000}/g)
+          if (!chunks) {
+            return;
+          }
+          for (let j = 0; j < chunks.length; j++) {
+            // upload one by one to have full file
+            await new Promise(resolve => {
+              console.debug(`upload::${files[i].name}::chunk::${j}`)
+              socket.emit('gallery::upload', [files[i].name, {
+                id,
+                b64data: chunks[j],
+              }], (err: string | null) => {
+                if (err) {
+                  return error(err);
+                }
+                console.debug(`done::${files[i].name}::chunk::${j}`)
+                resolve(true);
+              })
+            })
+          }
+          uploadedFiles.value++;
+          socket.emit('generic::getOne', id, (err: string | null, _item: GalleryInterface) => {
+            console.debug('Loaded', items);
+            items.value.push(_item);
+          })
+        });
+        reader.readAsDataURL(files[i])
+      }
+    }
+
+    return {
+      domWidth,
+      state,
+      items,
+      exclude,
+      filtered,
+      itemCountPerRow,
+      toggle,
+      remove,
+      filesChange,
+      toggleMarkResponse,
+      markToDeleteIdx,
+
+      isUploadingNum,
+      uploadedFiles,
+
+      chunk,
+      translate,
     }
   }
-}
+});
 </script>
