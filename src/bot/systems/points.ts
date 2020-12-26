@@ -174,7 +174,7 @@ class Points extends System {
           for (; userTimePoints <= chat; userTimePoints += interval_calculated) {
             modifier++;
           }
-          if (user[userPointsKey] + interval_calculated <= chat) {
+          if (modifier > 0) {
             // add points to user[userPointsKey] + interval to user to not overcalculate (this should ensure recursive add points in time)
             debug('points.update', `${user.username}#${userId}[${permId}] +${Math.floor(ptsPerInterval * modifier)}`);
             await getRepository(User).save({
