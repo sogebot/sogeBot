@@ -21,7 +21,7 @@ import { isDbConnected } from './helpers/database';
 import { dayjs } from './helpers/dayjs';
 import { getBroadcaster } from './helpers/getBroadcaster';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
-import { isBot } from './helpers/isBot';
+import { isBot, isBotSubscriber } from './helpers/isBot';
 import { isBroadcaster } from './helpers/isBroadcaster';
 import { isIgnored } from './helpers/isIgnored';
 import { debug, error, follow, info, start, stop, unfollow, warning } from './helpers/log';
@@ -684,6 +684,11 @@ class API extends Core {
       } else {
         this.stats.currentSubscribers = subscribers.length + opts.count;
         this.setSubscribers(opts.subscribers.filter(o => !isBroadcaster(o.user_name) && !isBot(o.user_name)));
+        if (opts.subscribers.find(o => isBot(o.user_name))) {
+          isBotSubscriber(true);
+        } else {
+          isBotSubscriber(false);
+        }
       }
 
       // reset warning after correct calls (user may have affiliate or have correct oauth)

@@ -21,6 +21,7 @@ import { Rank } from './database/entity/rank';
 import { User, UserInterface } from './database/entity/user';
 import { getCountOfCommandUsage } from './helpers/commands/count';
 import { getLocalizedName } from './helpers/getLocalized';
+import { isBotSubscriber } from './helpers/isBot';
 import { isIgnored } from './helpers/isIgnored';
 import { debug, error, warning } from './helpers/log';
 import lastfm from './integrations/lastfm';
@@ -55,6 +56,7 @@ class Message {
       bits: api.isStreamOnline ? api.stats.currentBits : 0,
       title: api.stats.currentTitle,
       source: opts.sender && typeof opts.sender.discord !== 'undefined' ? 'discord' : 'twitch',
+      isBotSubscriber: isBotSubscriber(),
     };
     for (const variable of Object.keys(variables)) {
       const regexp = new RegExp(`\\$${variable}`, 'g');
