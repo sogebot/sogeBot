@@ -7,7 +7,7 @@ import { isOwner, isSubscriber, isVIP } from '../commons';
 import customvariables from '../customvariables';
 import { User } from '../database/entity/user';
 import ranks from '../systems/ranks';
-import { isBot } from './isBot';
+import { isBot, isBotSubscriber } from './isBot';
 import { isBroadcaster } from './isBroadcaster';
 import { isModerator } from './isModerator';
 
@@ -55,6 +55,7 @@ export const checkFilter = async (opts: CommandOptions | ParserOptions, filter: 
     $followers: api.stats.currentFollowers,
     $hosts: api.stats.currentHosts,
     $subscribers: api.stats.currentSubscribers,
+    $isBotSubscriber: isBotSubscriber(),
     ...customVariables,
   };
   let result = false;

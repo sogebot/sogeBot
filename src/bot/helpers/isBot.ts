@@ -12,3 +12,15 @@ export function isBot(user: string | CommandOptions['sender'] | UserInterface | 
     return true; // we can expect, if user is null -> bot or admin
   }
 }
+
+let _isBotSubscriber = false;
+function isBotSubscriber (value: boolean): boolean;
+function isBotSubscriber (): boolean;
+function isBotSubscriber(value?: boolean) {
+  if (typeof value !== 'undefined') {
+    _isBotSubscriber = value;
+  }
+  return _isBotSubscriber;
+}
+
+export { isBotSubscriber };

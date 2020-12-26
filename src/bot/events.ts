@@ -19,7 +19,7 @@ import { dayjs } from './helpers/dayjs';
 import { flatten } from './helpers/flatten';
 import { generateUsername } from './helpers/generateUsername';
 import { getLocalizedName } from './helpers/getLocalized';
-import { isBot } from './helpers/isBot';
+import { isBot, isBotSubscriber } from './helpers/isBot';
 import { isBroadcaster } from './helpers/isBroadcaster';
 import { isModerator } from './helpers/isModerator';
 import { error, info, warning } from './helpers/log';
@@ -575,6 +575,7 @@ class Events extends Core {
       $followers: api.stats.currentFollowers,
       $hosts: api.stats.currentHosts,
       $subscribers: api.stats.currentSubscribers,
+      $isBotSubscriber: isBotSubscriber(),
       ...customVariables,
     };
     let result = false;

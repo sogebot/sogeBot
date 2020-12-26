@@ -73,6 +73,8 @@ bot it is twitch by default
 
 `$version` - return current bot version
 
+`$isBotSubscriber` - return true/false (boolean) if bot is subscriber
+
 ## Eval
 `(eval <yourJScode>)` - will evaluate your javascript code - there **must** be return value
 
