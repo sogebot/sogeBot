@@ -3,6 +3,9 @@
     <b-toast :title="error.name" no-auto-hide visible :variant="error.type === 'error' ? 'danger' : 'info'" v-for="error of errors" :key="error.name + error.message + error.date">
       <div v-html="error.message"/>
     </b-toast>
+    <b-toast :title="translate('errors.channel_is_not_set')" no-auto-hide visible variant="danger" solid v-if="!$store.state.configuration.isChannelSet">
+      <div v-html="translate('errors.please_set_your_channel')"/>
+    </b-toast>
     <b-toast :title="translate('errors.owner_and_broadcaster_oauth_is_not_set')" no-auto-hide visible variant="danger" solid v-if="!$store.state.configuration.isCastersSet">
       <div v-html="translate('errors.please_set_your_broadcaster_oauth_or_owners')"/>
     </b-toast>
