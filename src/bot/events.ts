@@ -258,10 +258,11 @@ class Events extends Core {
       ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: api.calls.broadcaster });
       events.fire('commercial', { duration: Number(operation.durationOfCommercial) });
     } catch (e) {
-      error(`API: ${url} - ${e.stack}`);
       if (e.isAxiosError) {
+        error(`API: ${url} - ${e.response.data.message}`);
         ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.response.data });
       } else {
+        error(`API: ${url} - ${e.stack}`);
         ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
       }
     }
