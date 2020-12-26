@@ -170,7 +170,28 @@ class Levels extends System {
         username,
       });
     } else {
-      const chat = await users.getChatOf(userId, opts.isOnline);
+      const chat = await users.getChatOf(userId, true);
+      const chatOffline = await users.getChatOf(userId, false);
+
+      // we need to save if extra.levels are not defined
+      if (typeof user.extra?.levels === 'undefined') {
+        debug('levels.update', `${user.username}#${userId}[${permId}] -- initial data --`);
+        const levels: NonNullable<UserInterface['extra']>['levels'] = {
+          xp: serialize(BigInt(0)),
+          xpOfflineGivenAt: chatOffline,
+          xpOfflineMessages: 0,
+          xpOnlineGivenAt: chat,
+          xpOnlineMessages: 0,
+        };
+        await getRepository(User).update({ userId: user.userId },
+          {
+            extra: {
+              ...user.extra,
+              levels,
+            },
+          });
+      }
+
       if (interval_calculated !== 0 && ptsPerInterval[permId] !== 0) {
         const givenAt = opts.isOnline
           ? user.extra?.levels?.xpOnlineGivenAt ?? chat
@@ -186,7 +207,7 @@ class Levels extends System {
           debug('levels.update', `${user.username}#${userId}[${permId}] +${Math.floor(ptsPerInterval * modifier)}`);
           const levels: NonNullable<UserInterface['extra']>['levels'] = {
             xp: serialize(BigInt(Math.floor(ptsPerInterval * modifier)) + (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0))),
-            xpOfflineGivenAt: !opts.isOnline ? userTimeXP : user.extra?.levels?.xpOfflineGivenAt ?? chat,
+            xpOfflineGivenAt: !opts.isOnline ? userTimeXP : user.extra?.levels?.xpOfflineGivenAt ?? chatOffline,
             xpOfflineMessages: user.extra?.levels?.xpOfflineMessages ?? 0,
             xpOnlineGivenAt:   opts.isOnline ? userTimeXP : user.extra?.levels?.xpOnlineGivenAt ?? chat,
             xpOnlineMessages: user.extra?.levels?.xpOnlineMessages ?? 0,
