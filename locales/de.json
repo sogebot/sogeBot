@@ -419,6 +419,7 @@
         "haveParam": "Haben Sie Befehlsparameter? (bool)",
         "source": "Aktuelle Quelle (twitch oder discord)",
         "userInput": "Benutzereingabe beim Einlösen der Belohnung",
+        "isBotSubscriber": "Is bot subscriber (bool)",
         "is": {
           "moderator": "Ist Benutzer Mod? (Bool)",
           "subscriber": "Ist Benutzer Sub? (Bool)",
