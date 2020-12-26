@@ -51,6 +51,7 @@
             <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestCheerAmount'" @click="addVariable('latestCheerAmount')"> {{ translate('responses.variable.latestCheerAmount') }} </b-dropdown-item>
             <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestCheerMessage'" @click="addVariable('latestCheerMessage')"> {{ translate('responses.variable.latestCheerMessage') }} </b-dropdown-item>
             <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestCheer'" @click="addVariable('latestCheer')"> {{ translate('responses.variable.latestCheer') }} </b-dropdown-item>
+            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'isBotSubscriber'" @click="addVariable('isBotSubscriber')"> {{ translate('responses.variable.isBotSubscriber') }} </b-dropdown-item>
           </template>
           <template v-else>
             <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter" @click="addVariable(filter)"> {{ translate('responses.variable.' + filter) }} </b-dropdown-item>
