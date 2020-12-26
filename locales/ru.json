@@ -419,6 +419,7 @@
         "haveParam": "Есть параметр команды? (bool)",
         "source": "Current source (twitch or discord)",
         "userInput": "User input during reward redeem",
+        "isBotSubscriber": "Is bot subscriber (bool)",
         "is": {
           "moderator": "Пользователь модератор? (bool)",
           "subscriber": "Пользователь сабскрайбер? (bool)",
