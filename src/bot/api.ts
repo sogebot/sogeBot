@@ -21,8 +21,7 @@ import { isDbConnected } from './helpers/database';
 import { dayjs } from './helpers/dayjs';
 import { getBroadcaster } from './helpers/getBroadcaster';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
-import { isBot, isBotSubscriber } from './helpers/isBot';
-import { isBroadcaster } from './helpers/isBroadcaster';
+import { isBot, isBotId, isBotSubscriber } from './helpers/isBot';
 import { isIgnored } from './helpers/isIgnored';
 import { debug, error, follow, info, start, stop, unfollow, warning } from './helpers/log';
 import { ioServer } from './helpers/panel';
@@ -680,11 +679,11 @@ class API extends Core {
 
       if (subscribers.length === 100) {
         // move to next page
-        return this.getChannelSubscribers({ ...opts, cursor: request.data.pagination.cursor, count: opts.subscribers.length + opts.count, subscribers: opts.subscribers });
+        return this.getChannelSubscribers({ ...opts, cursor: request.data.pagination.cursor, count: opts.subscribers.length + opts.count, z: opts.subscribers });
       } else {
         this.stats.currentSubscribers = subscribers.length + opts.count;
-        this.setSubscribers(opts.subscribers.filter(o => !isBroadcaster(o.user_name) && !isBot(o.user_name)));
-        if (opts.subscribers.find(o => isBot(o.user_name))) {
+        this.setSubscribers(opts.subscribers.filter(o => !isBotId(o.user_id)));
+        if (opts.subscribers.find(o => isBotId(o.user_id))) {
           isBotSubscriber(true);
         } else {
           isBotSubscriber(false);

@@ -7,3 +7,11 @@ export function isBroadcaster(user: string | CommandOptions['sender'] | { userna
     return false;
   }
 }
+
+export function isBroadcasterId(userId: string) {
+  try {
+    return oauth.broadcasterId === userId;
+  } catch (e) {
+    return false;
+  }
+}
