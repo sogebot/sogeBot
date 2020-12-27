@@ -728,7 +728,7 @@ export default defineComponent({
 
     const currentPage = ref(1);
     const perPage = ref(25);
-    const historyCurrentPage = ref(0);
+    const historyCurrentPage = ref(1);
     const historyPerPage = ref(10);
 
     const sortDesc = ref(false);
@@ -805,6 +805,16 @@ export default defineComponent({
     watch(editationItem, (val, oldVal) => {
       if (val !== null && oldVal !== null) {
         state.value.pending = true;
+      }
+
+      if (val) {
+        const locale = get(ctx.root.$store.state, 'configuration.lang', 'en');
+        if (typeof val.subscribedAt === 'string' && editationItem.value) {
+          editationItem.value.subscribedAt = dayjs(val.subscribedAt, 'LLL', locale).unix() * 1000;
+        }
+        if (typeof val.followedAt === 'string' && editationItem.value) {
+          editationItem.value.followedAt = dayjs(val.followedAt, 'LLL', locale).unix() * 1000;
+        }
       }
     }, { deep: true });
 
