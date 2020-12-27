@@ -22,7 +22,6 @@ import { dayjs } from './helpers/dayjs';
 import { getBroadcaster } from './helpers/getBroadcaster';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import { isBot, isBotId, isBotSubscriber } from './helpers/isBot';
-import { isBroadcasterId } from './helpers/isBroadcaster';
 import { isIgnored } from './helpers/isIgnored';
 import { debug, error, follow, info, start, stop, unfollow, warning } from './helpers/log';
 import { ioServer } from './helpers/panel';
@@ -683,7 +682,7 @@ class API extends Core {
         return this.getChannelSubscribers({ ...opts, cursor: request.data.pagination.cursor, count: opts.subscribers.length + opts.count, z: opts.subscribers });
       } else {
         this.stats.currentSubscribers = subscribers.length + opts.count;
-        this.setSubscribers(opts.subscribers.filter(o => !isBroadcasterId(o.user_id) && !isBotId(o.user_id)));
+        this.setSubscribers(opts.subscribers.filter(o => !isBotId(o.user_id)));
         if (opts.subscribers.find(o => isBotId(o.user_id))) {
           isBotSubscriber(true);
         } else {
