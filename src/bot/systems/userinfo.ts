@@ -8,7 +8,7 @@ import { User } from '../database/entity/user';
 import { command, default_permission, settings, ui } from '../decorators';
 import Expects from '../expects';
 import general from '../general';
-import { dayjs } from '../helpers/dayjs';
+import { dayjs, timezone } from '../helpers/dayjs';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { debug, error } from '../helpers/log';
 import { getUserFromTwitch } from '../microservices/getUserFromTwitch';
@@ -178,7 +178,7 @@ class UserInfo extends System {
       } else {
         return [{ response: translate('lastseen.success.time')
           .replace(/\$username/g, username)
-          .replace(/\$when/g, dayjs(user.seenAt).format(this.lastSeenFormat)), ...opts }];
+          .replace(/\$when/g, dayjs(user.seenAt).tz(timezone).format(this.lastSeenFormat)), ...opts }];
       }
     } catch (e) {
       return [{ response: translate('lastseen.failed.parse'), ...opts }];
