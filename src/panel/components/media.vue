@@ -13,8 +13,8 @@
         <b-button squared variant="outline-danger" class="border-0" @click="removeMedia()" v-if="b64data.length > 0">
           <fa icon="times" class="mr-1"/> {{ translate('dialog.buttons.delete') }}
         </b-button>
-        <b-button squared variant="outline-primary" class="border-0" v-if="b64data.length > 0" @click="play()">
-          <fa icon="play" class="mr-1"/> {{ translate('dialog.buttons.play') }} ({{duration}}s)
+        <b-button squared variant="outline-primary" class="border-0" v-if="b64data.length > 0" @click="isPlaying ? stop() : play()">
+          <fa :icon="isPlaying ? 'stop' : 'play'" class="mr-1"/> {{ translate(isPlaying ? 'dialog.buttons.stop' : 'dialog.buttons.play') }} ({{duration}}s)
         </b-button>
         <b-button squared variant="outline-dark" class="border-0" @click="$refs.uploadImage.click()">
           <fa icon="upload" class="mr-1"/> {{ translate('dialog.buttons.upload.idle') }}
@@ -59,8 +59,8 @@
         <b-button squared variant="outline-danger" class="border-0" @click="removeMedia()" v-if="b64data.length > 0">
           <fa icon="times" class="mr-1"/> {{ translate('dialog.buttons.delete') }}
         </b-button>
-        <b-button squared variant="outline-primary" class="border-0" v-if="b64data.length > 0" @click="play()">
-          <fa icon="play" class="mr-1"/> {{ translate('dialog.buttons.play') }} ({{duration}}s)
+        <b-button squared variant="outline-primary" class="border-0" v-if="b64data.length > 0" @click="isPlaying ? stop() : play()">
+          <fa :icon="isPlaying ? 'stop' : 'play'" class="mr-1"/> {{ translate(isPlaying ? 'dialog.buttons.stop' : 'dialog.buttons.play') }} ({{duration}}s)
         </b-button>
         <b-button squared variant="outline-dark" class="border-0" @click="$refs['uploadAudio-' + media].click()">
           <fa icon="upload" class="mr-1"/> {{ translate('dialog.buttons.upload.idle') }}
@@ -114,6 +114,7 @@ export default defineComponent({
     const duration = ref(0);
     const isUploading = ref(false);
     const createdAt = ref(0);
+    const isPlaying = ref(false);
 
     // template refs
     const audio: Ref<null | HTMLAudioElement> = ref(null);
@@ -124,15 +125,64 @@ export default defineComponent({
       video.value?.play();
     };
 
+    const stop = () => {
+      if (audio.value) {
+        audio.value.pause();
+        audio.value.currentTime = 0;
+      }
+      if (video.value) {
+        video.value.pause();
+        video.value.currentTime = 0;
+      }
+    };
+
+    const isPlayingSetter = () => {
+      if (audio.value) {
+        isPlaying.value = !audio.value.paused;
+      } else if (video.value) {
+        isPlaying.value = !video.value.paused;
+      }
+    };
+
+    const setDuration = () => {
+      if (audio.value) {
+        duration.value = audio.value.duration;
+        if (isNaN(duration.value)) {
+          duration.value = 0;
+        } else {
+          duration.value = Math.floor(duration.value * 10) / 10;
+        }
+      }
+      if (video.value) {
+        duration.value = video.value.duration;
+        if (isNaN(duration.value)) {
+          duration.value = 0;
+        } else {
+          duration.value = Math.floor(duration.value * 10) / 10;
+        }
+      }
+    }
+
     const setVolume = () => {
       if ((props.type === 'audio' || (props.type === 'image' && b64data.value.startsWith('data:video/webm'))) && b64data.value.length > 0) {
-        if (typeof audio.value === 'undefined') {
-          console.debug(`Retrying setVolume ${props.media}`);
-          setTimeout(() => setVolume(), 100);
-          return;
-        }
-        if (audio.value) {
-          audio.value.volume = props.volume / 100;
+        if (props.type === 'audio') {
+          if (typeof audio.value === 'undefined') {
+            console.debug(`Retrying setVolume ${props.media}`);
+            setTimeout(() => setVolume(), 100);
+            return;
+          }
+          if (audio.value) {
+            audio.value.volume = props.volume / 100;
+          }
+        } else {
+          if (typeof video.value === 'undefined') {
+            console.debug(`Retrying setVolume ${props.media}`);
+            setTimeout(() => setVolume(), 100);
+            return;
+          }
+          if (video.value) {
+            video.value.volume = props.volume / 100;
+          }
         }
       }
     }
@@ -144,15 +194,9 @@ export default defineComponent({
           return;
         }
         setVolume();
-        if (audio.value) {
-          duration.value = audio.value.duration;
-          if (isNaN(duration.value)) {
-            duration.value = 0;
-          } else {
-            duration.value = Math.floor(duration.value * 10) / 10;
-          }
-        }
-      }, 500)
+        isPlayingSetter();
+        setDuration();
+      }, 100)
     }
 
     const removeMedia = () => {
@@ -240,7 +284,7 @@ export default defineComponent({
 
     return {
       b64data, duration, isUploading, createdAt, audio, video,
-      removeMedia, play, filesChange, translate,
+      removeMedia, play, filesChange, translate, isPlaying, stop,
     }
   }
 })
