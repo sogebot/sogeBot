@@ -25,7 +25,7 @@
   },
   "event": {
     "follows": "Sledující",
-    "cheers": "Bity",
+    "cheers": "Cheers",
     "subs": "Předplatitel",
     "resubs": "Předplatitel (resub)",
     "subgifts": "Darování subscribe",
@@ -63,7 +63,7 @@
   "messageTemplate": {
     "name": "Šablona zprávy",
     "placeholder": "Zadejte svou šablonu zprávy",
-    "help": "Dostupné proměnné: {name}, {amount} (bits, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
+    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "animationText": {
     "name": "Animace textu"
@@ -90,7 +90,7 @@
     "name": "Zvuk"
   },
   "soundVolume": {
-    "name": "Hlasitost zvuku"
+    "name": "Alert volume"
   },
   "enableAdvancedMode": "Zapnout pokročilý mód",
   "font": {
