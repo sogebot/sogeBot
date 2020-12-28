@@ -90,7 +90,7 @@
     "name": "Sound"
   },
   "soundVolume": {
-    "name": "Sound volume"
+    "name": "Alert volume"
   },
   "enableAdvancedMode": "Enable advanced mode",
   "font": {
