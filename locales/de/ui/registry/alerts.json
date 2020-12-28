@@ -8,7 +8,7 @@
     "placeholder": "Namen des Alerts festlegen"
   },
   "alertDelayInMs": {
-    "name": "Alarm-Verzögerung"
+    "name": "Alert Verzögerung"
   },
   "profanityFilterType": {
     "name": "Schimpfwort-Filter",
@@ -75,10 +75,10 @@
     "name": "Ausgehende Animation"
   },
   "alertDurationInMs": {
-    "name": "Dauer des Alarms"
+    "name": "Dauer des Alerts"
   },
   "alertTextDelayInMs": {
-    "name": "Verzögerung des Alarmtextes"
+    "name": "Verzögerung des Alert Textes"
   },
   "layoutPicker": {
     "name": "Layout"
