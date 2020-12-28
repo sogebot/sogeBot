@@ -120,7 +120,7 @@
                 <b-form-select v-model="selectedNewEvent">
                   <b-select-option :value="event" v-for="event of supportedEvents" v-bind:key="'add-alert-' + event">{{ translate('registry.alerts.event.' + event) }}</b-select-option>
                 </b-form-select>
-                <b-button class="text-left" variant="success"@click="newAlert(selectedNewEvent)">
+                <b-button class="text-left" variant="success" @click="newAlert(selectedNewEvent)">
                   <fa icon="plus"/>
                 </b-button>
               </b-form>
@@ -442,6 +442,11 @@ export default class AlertsEdit extends Vue {
         maxTimeToDecrypt: 4000,
       },
       imageId: uuid(),
+      imageOptions: {
+        translateX: 0,
+        translateY: 0,
+        scale: 100,
+      },
       soundId: uuid(),
       soundVolume: 20,
       alertDurationInMs: 10000,

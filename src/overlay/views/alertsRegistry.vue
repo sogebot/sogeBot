@@ -15,11 +15,20 @@
             ['layout-' + runningAlert.alert.layout]: true,
           }">
           <template v-if="!runningAlert.alert.enableAdvancedMode">
-            <video ref="video" v-if="typeOfMedia.get(runningAlert.alert.imageId) === 'video'" style="max-width:500px;" :class="{ center: runningAlert.alert.layout === '3', ['animate__' + runningAlert.animation]: true }" class="animate__animated w-100 pb-3" :style="{'animation-duration': runningAlert.animationSpeed + 'ms'}">
+            <video ref="video" v-if="typeOfMedia.get(runningAlert.alert.imageId) === 'video'" style="max-width:500px;" :class="{ center: runningAlert.alert.layout === '3', ['animate__' + runningAlert.animation]: true }" class="animate__animated w-100 pb-3"
+              :style="{
+                'transform': 'scale(' + runningAlert.alert.imageOptions.scale / 100 +') translate(' + runningAlert.alert.imageOptions.translateX +'px, ' + runningAlert.alert.imageOptions.translateY +'px)',
+                'animation-duration': runningAlert.animationSpeed + 'ms',
+              }
+            ">
               <source :src="'/registry/alerts/' + runningAlert.alert.imageId" type="video/webm">
               Your browser does not support the video tag.
             </video>
-            <img v-else-if="showImage" @error="showImage=false" :src="'/registry/alerts/' + runningAlert.alert.imageId" :class="{ center: runningAlert.alert.layout === '3', ['animate__' + runningAlert.animation]: true }" class="animate__animated" :style="{'animation-duration': runningAlert.animationSpeed + 'ms'}"/>
+            <img v-else-if="showImage" @error="showImage=false" :src="'/registry/alerts/' + runningAlert.alert.imageId" :class="{ center: runningAlert.alert.layout === '3', ['animate__' + runningAlert.animation]: true }" class="animate__animated"
+              :style="{
+                'transform': 'scale(' + runningAlert.alert.imageOptions.scale / 100 +') translate(' + runningAlert.alert.imageOptions.translateX +'px, ' + runningAlert.alert.imageOptions.translateY +'px)',
+                'animation-duration': runningAlert.animationSpeed + 'ms',
+              }"/>
             <div
               v-if="runningAlert.isShowingText"
               :class="{
