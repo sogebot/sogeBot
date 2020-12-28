@@ -25,7 +25,7 @@
   },
   "event": {
     "follows": "Подписки",
-    "cheers": "Чирсы",
+    "cheers": "Cheers",
     "subs": "Сабы",
     "resubs": "Ресабы",
     "subgifts": "Сабгифты",
@@ -63,7 +63,7 @@
   "messageTemplate": {
     "name": "Шаблон сообщения",
     "placeholder": "Установить шаблон сообщения",
-    "help": "Доступные переменные: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts), {recipient} (subgifts), {monthsName} (subs, subgifts), {currency} (tips)"
+    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "animationText": {
     "name": "Текст анимации"
@@ -90,7 +90,7 @@
     "name": "Звук"
   },
   "soundVolume": {
-    "name": "Громкость звука"
+    "name": "Alert volume"
   },
   "enableAdvancedMode": "Включить расширенный режим",
   "font": {
