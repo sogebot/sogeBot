@@ -1,9 +1,9 @@
 {
   "new": "Neues Text-Overlay erstellen",
   "title": "Text-Overlay",
-  "refreshRate": "Refresh rate",
-  "refreshRateIs": "Refresh rate is",
-  "refreshRateHelpText": "To disable refresh rate set as -1.",
+  "refreshRate": "Aktualisierungsrate",
+  "refreshRateIs": "Aktualisierungsrate ist",
+  "refreshRateHelpText": "Um die Aktualisierungsrate zu deaktivieren, wählen Sie -1.",
   "name": {
     "placeholder": "Name des Text-Overlays festlegen"
   }
