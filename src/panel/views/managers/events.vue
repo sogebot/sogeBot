@@ -34,7 +34,7 @@
             <state-button @click="EventBus.$emit('managers::events::save::' + $route.params.id)" text="saveChanges" :state="state.save" :invalid="state.invalid"/>
           </div>
         </template>
-        <events-edit v-if="$route.params.id" :id="$route.params.id" :saveState.sync="state.save" :invalid.sync="state.invalid" :pending.sync="state.pending" @refresh="refresh"/>
+        <events-edit v-if="$route.params.id" :id="$route.params.id" :saveState.sync="state.save" :invalid.sync="state.invalid" :pending.sync="state.pending" @refresh="refresh" :key="$route.params.id"/>
       </b-sidebar>
       <b-alert show variant="danger" v-if="events.length === 0">
         {{translate('events.noEvents')}}
