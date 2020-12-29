@@ -28,17 +28,17 @@ export class alertsImageOptions1609160442869 implements MigrationInterface {
     await queryRunner.query('UPDATE "alert_command_redeem" SET "imageOptions"=\'{"translateX":0,"translateY":0,"scale":100}\'');
     await queryRunner.query('UPDATE "alert_reward_redeem" SET "imageOptions"=\'{"translateX":0,"translateY":0,"scale":100}\'');
 
-    await queryRunner.query('ALTER TABLE "alert_follow" ALTER COLUMN "imageOptions" TYPE text NOT NULL, ALTER COLUMN "imageOptions" SET NOT NULL');
-    await queryRunner.query('ALTER TABLE "alert_sub" ALTER COLUMN "imageOptions" TYPE text NOT NULL, ALTER COLUMN "imageOptions" SET NOT NULL');
-    await queryRunner.query('ALTER TABLE "alert_subcommunitygift" ALTER COLUMN "imageOptions" TYPE text NOT NULL, ALTER COLUMN "imageOptions" SET NOT NULL');
-    await queryRunner.query('ALTER TABLE "alert_subgift" ALTER COLUMN "imageOptions" TYPE text NOT NULL, ALTER COLUMN "imageOptions" SET NOT NULL');
-    await queryRunner.query('ALTER TABLE "alert_host" ALTER COLUMN "imageOptions" TYPE text NOT NULL, ALTER COLUMN "imageOptions" SET NOT NULL');
-    await queryRunner.query('ALTER TABLE "alert_raid" ALTER COLUMN "imageOptions" TYPE text NOT NULL, ALTER COLUMN "imageOptions" SET NOT NULL');
-    await queryRunner.query('ALTER TABLE "alert_tip" ALTER COLUMN "imageOptions" TYPE text NOT NULL, ALTER COLUMN "imageOptions" SET NOT NULL');
-    await queryRunner.query('ALTER TABLE "alert_cheer" ALTER COLUMN "imageOptions" TYPE text NOT NULL, ALTER COLUMN "imageOptions" SET NOT NULL');
-    await queryRunner.query('ALTER TABLE "alert_resub" ALTER COLUMN "imageOptions" TYPE text NOT NULL, ALTER COLUMN "imageOptions" SET NOT NULL');
-    await queryRunner.query('ALTER TABLE "alert_command_redeem" ALTER COLUMN "imageOptions" TYPE text NOT NULL, ALTER COLUMN "imageOptions" SET NOT NULL');
-    await queryRunner.query('ALTER TABLE "alert_reward_redeem" ALTER COLUMN "imageOptions" TYPE text NOT NULL, ALTER COLUMN "imageOptions" SET NOT NULL');
+    await queryRunner.query('ALTER TABLE "alert_follow" ALTER COLUMN "imageOptions" TYPE text, ALTER COLUMN "imageOptions" SET NOT NULL');
+    await queryRunner.query('ALTER TABLE "alert_sub" ALTER COLUMN "imageOptions" TYPE text, ALTER COLUMN "imageOptions" SET NOT NULL');
+    await queryRunner.query('ALTER TABLE "alert_subcommunitygift" ALTER COLUMN "imageOptions" TYPE text, ALTER COLUMN "imageOptions" SET NOT NULL');
+    await queryRunner.query('ALTER TABLE "alert_subgift" ALTER COLUMN "imageOptions" TYPE text, ALTER COLUMN "imageOptions" SET NOT NULL');
+    await queryRunner.query('ALTER TABLE "alert_host" ALTER COLUMN "imageOptions" TYPE text, ALTER COLUMN "imageOptions" SET NOT NULL');
+    await queryRunner.query('ALTER TABLE "alert_raid" ALTER COLUMN "imageOptions" TYPE text, ALTER COLUMN "imageOptions" SET NOT NULL');
+    await queryRunner.query('ALTER TABLE "alert_tip" ALTER COLUMN "imageOptions" TYPE text, ALTER COLUMN "imageOptions" SET NOT NULL');
+    await queryRunner.query('ALTER TABLE "alert_cheer" ALTER COLUMN "imageOptions" TYPE text, ALTER COLUMN "imageOptions" SET NOT NULL');
+    await queryRunner.query('ALTER TABLE "alert_resub" ALTER COLUMN "imageOptions" TYPE text, ALTER COLUMN "imageOptions" SET NOT NULL');
+    await queryRunner.query('ALTER TABLE "alert_command_redeem" ALTER COLUMN "imageOptions" TYPE text, ALTER COLUMN "imageOptions" SET NOT NULL');
+    await queryRunner.query('ALTER TABLE "alert_reward_redeem" ALTER COLUMN "imageOptions" TYPE text, ALTER COLUMN "imageOptions" SET NOT NULL');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
