@@ -83,11 +83,22 @@
   "layoutPicker": {
     "name": "Размещение"
   },
+  "scale": {
+    "name": "Scale"
+  },
+  "translateX": {
+    "name": "Move -Up / +Down"
+  },
+  "translateY": {
+    "name": "Move -Left / +Right"
+  },
   "image": {
-    "name": "Изображение"
+    "name": "Image / Video(.webm)",
+    "setting": "Image / Video(.webm) settings"
   },
   "sound": {
-    "name": "Звук"
+    "name": "Звук",
+    "setting": "Sound settings"
   },
   "soundVolume": {
     "name": "Alert volume"
