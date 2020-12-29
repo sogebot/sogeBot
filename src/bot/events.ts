@@ -22,7 +22,7 @@ import { getLocalizedName } from './helpers/getLocalized';
 import { isBot, isBotSubscriber } from './helpers/isBot';
 import { isBroadcaster } from './helpers/isBroadcaster';
 import { isModerator } from './helpers/isModerator';
-import { error, info, warning } from './helpers/log';
+import { debug, error, info, warning } from './helpers/log';
 import { ioServer } from './helpers/panel';
 import { adminEndpoint } from './helpers/socket';
 import Message from './message';
@@ -107,6 +107,7 @@ class Events extends Core {
 
   public async fire(eventId: string, attributes: Events.Attributes): Promise<void> {
     attributes = _.cloneDeep(attributes) || {};
+    debug('events', JSON.stringify({eventId, attributes}));
 
     if (attributes.username !== null && typeof attributes.username !== 'undefined') {
       const user = attributes.userId
