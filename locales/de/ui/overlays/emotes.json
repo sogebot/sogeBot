@@ -11,31 +11,31 @@
 		"cExplosionNumOfEmotes": "Anzahl von Emotes",
 		"cExplosionNumOfEmotesPerExplosion": "Anzahl von Emotes pro Explosion",
 		"cExplosionNumOfExplosions": "Anzahl von Explosionen",
-		"enableEmotesCombo": "Enable emotes combo",
-		"comboBreakMessages": "Combo break messages",
-		"threshold": "Threshold",
-		"noMessagesFound": "No messages found.",
-		"message": "Message",
-		"showEmoteInOverlayThreshold": "Minimal message threshold to show emote in overlay",
+		"enableEmotesCombo": "Emotes Combo aktivieren",
+		"comboBreakMessages": "Combopreak Nachrichten",
+		"threshold": "Schwellenwert",
+		"noMessagesFound": "Keine Nachrichten gefunden.",
+		"message": "Nachricht",
+		"showEmoteInOverlayThreshold": "Minimaler Nachrichtenschwellenwert um Emote im Overlay anzuzeigen",
 		"hideEmoteInOverlayAfter": {
-			"title": "Hide emote in overlay after inactivity",
-			"help": "Will hide emote in overlay after certain time in seconds"
+			"title": "Emote im Overlay nach Inaktivität ausblenden",
+			"help": "Versteckt Emote in Overlay nach einer bestimmten Zeit in Sekunden"
 		},
 		"comboCooldown": {
-			"title": "Combo cooldown",
-			"help": "Cooldown of combo in seconds"
+			"title": "Combo Abklingzeit",
+			"help": "Abklingzeit der Combo in Sekunden"
 		},
 		"comboMessageMinThreshold": {
-			"title": "Minimal message threshold",
-			"help": "Minimal message threshold to count emotes as combo (until then won't trigger cooldown)"
+			"title": "Minimaler Nachrichtenschwellenwert",
+			"help": "Minimaler Nachrichtenschwellenwert, um Emotes als combo zu zählen (bis dahin wird keine Abklingzeit ausgelöst)"
 		},
-		"comboMessages": "Combo messages"
+		"comboMessages": "Combo Nachrichten"
 	},
 	"message": {
-		"3": "$amountx $emote combo",
-		"5": "$amountx $emote combo SeemsGood",
-		"10": "$amountx $emote combo PogChamp",
-		"15": "$amountx $emote combo TriHard",
-		"20": "$sender ruined $amountx $emote combo! NotLikeThis"
+		"3": "$amountx $emote Combo",
+		"5": "$amountx $emote Combo SeemsGood",
+		"10": "$amountx $emote Combo PogChamp",
+		"15": "$amountx $emote Combo TriHard",
+		"20": "$sender ruinierte $amountx $emote Combo! NotLikeDies"
 	}
 }

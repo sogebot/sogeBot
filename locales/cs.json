@@ -419,7 +419,7 @@
         "haveParam": "Příkaz má parametr? (bool)",
         "source": "Aktuální zdroj (twitch nebo discord)",
         "userInput": "Vstup uživatele během odměny",
-        "isBotSubscriber": "Is bot subscriber (bool)",
+        "isBotSubscriber": "Je bot předplatitelem (bool)",
         "is": {
           "moderator": "Je uživatel mod? (bool)",
           "subscriber": "Je uživatel sub? (bool)",

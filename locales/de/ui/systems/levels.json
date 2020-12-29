@@ -7,15 +7,15 @@
       "title": "Berechnungsformel für nächste Ebene",
       "help": "Verfügbare Variablen: $prevLevel, $prevLevelXP"
     },
-    "levelShowcaseHelp": "Levels example will be refreshed on save",
+    "levelShowcaseHelp": "Beispiel für Levels wird beim Speichern aktualisiert",
     "xpName": "Name",
     "interval": "Intervall in Minuten, in denen Zuschauer Punkte erhalten, während der Stream läuft",
-    "offlineInterval": "Intervall in Minuten, in denen Zuschauer Punkte erhalten, während der Stream läuft",
-    "messageInterval": "How many messages to add xp",
-    "messageOfflineInterval": "How many messages to add xp when stream offline",
-    "perInterval": "How many xp to add per online interval",
-    "perOfflineInterval": "How many xp to add per offline interval",
-    "perMessageInterval": "How many xp to add per message interval",
-    "perMessageOfflineInterval": "How many xp to add per message offline interval"
+    "offlineInterval": "Intervall in Minuten, in denen Zuschauer Punkte erhalten, während der Stream nicht läuft",
+    "messageInterval": "Anzahl der Nachrichten die xp hinzufügen",
+    "messageOfflineInterval": "Anzahl der Nachrichten die xp hinzufügen wenn der Stream offline ist",
+    "perInterval": "Punkte pro Intervall wenn der Stream Online ist",
+    "perOfflineInterval": "Punkte pro Intervall wenn der Stream Offline ist",
+    "perMessageInterval": "Wie viele XP pro Nachrichtenintervall hinzugefügt werden sollen",
+    "perMessageOfflineInterval": "Wie viele XP pro Nachrichten Offline Intervall hinzugefügt werden sollen"
   }
 }

@@ -8,7 +8,7 @@
     "placeholder": "Namen des Alerts festlegen"
   },
   "alertDelayInMs": {
-    "name": "Alarm-Verzögerung"
+    "name": "Alert Verzögerung"
   },
   "profanityFilterType": {
     "name": "Schimpfwort-Filter",
@@ -63,7 +63,7 @@
   "messageTemplate": {
     "name": "Nachrichtenvorlage",
     "placeholder": "Nachrichtenvorlage festlegen",
-    "help": "Verfügbare Variablen: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
+    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "animationText": {
     "name": "Animationstext"
@@ -75,32 +75,43 @@
     "name": "Ausgehende Animation"
   },
   "alertDurationInMs": {
-    "name": "Dauer des Alarms"
+    "name": "Dauer des Alerts"
   },
   "alertTextDelayInMs": {
-    "name": "Verzögerung des Alarmtextes"
+    "name": "Verzögerung des Alert Textes"
   },
   "layoutPicker": {
     "name": "Layout"
   },
+  "scale": {
+    "name": "Scale"
+  },
+  "translateX": {
+    "name": "Move -Up / +Down"
+  },
+  "translateY": {
+    "name": "Move -Left / +Right"
+  },
   "image": {
-    "name": "Bild"
+    "name": "Image / Video(.webm)",
+    "setting": "Image / Video(.webm) settings"
   },
   "sound": {
-    "name": "Sound"
+    "name": "Sound",
+    "setting": "Sound settings"
   },
   "soundVolume": {
-    "name": "Sound Lautstärke"
+    "name": "Alert volume"
   },
   "enableAdvancedMode": "Erweiterten Modus aktivieren",
   "font": {
     "setting": "Schrifteinstellungen",
     "name": "Schriftartfamilie",
     "align": {
-      "name": "Alignment",
-      "left": "Left",
-      "center": "Center",
-      "right": "Right"
+      "name": "Ausrichtung",
+      "left": "Links",
+      "center": "Mitte",
+      "right": "Rechts"
     },
     "size": {
       "name": "Schriftgröße"

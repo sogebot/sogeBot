@@ -25,7 +25,7 @@
   },
   "event": {
     "follows": "Follows",
-    "cheers": "Bits",
+    "cheers": "Cheers",
     "subs": "Subs",
     "resubs": "Resubs",
     "subgifts": "Subgifts",
@@ -63,7 +63,7 @@
   "messageTemplate": {
     "name": "Message template",
     "placeholder": "Set your message template",
-    "help": "Available variables: {name}, {amount} (bits, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
+    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "animationText": {
     "name": "Animation text"
@@ -83,14 +83,25 @@
   "layoutPicker": {
     "name": "Layout"
   },
+  "scale": {
+    "name": "Scale"
+  },
+  "translateX": {
+    "name": "Move -Up / +Down"
+  },
+  "translateY": {
+    "name": "Move -Left / +Right"
+  },
   "image": {
-    "name": "Image"
+    "name": "Image / Video(.webm)",
+    "setting": "Image / Video(.webm) settings"
   },
   "sound": {
-    "name": "Sound"
+    "name": "Sound",
+    "setting": "Sound settings"
   },
   "soundVolume": {
-    "name": "Sound volume"
+    "name": "Alert volume"
   },
   "enableAdvancedMode": "Enable advanced mode",
   "font": {

@@ -83,14 +83,25 @@
   "layoutPicker": {
     "name": "Rozvržení"
   },
+  "scale": {
+    "name": "Měřítko"
+  },
+  "translateX": {
+    "name": "Posunout -nahoru / +dolů"
+  },
+  "translateY": {
+    "name": "Posunout -vlevo / +vpravo"
+  },
   "image": {
-    "name": "Obrázek"
+    "name": "Obrázek / Video(.webm)",
+    "setting": "Nastavení obrázku / videa (.webm)"
   },
   "sound": {
-    "name": "Zvuk"
+    "name": "Zvuk",
+    "setting": "Nastavení zvuku"
   },
   "soundVolume": {
-    "name": "Hlasitost zvuku"
+    "name": "Hlasitost upozornění"
   },
   "enableAdvancedMode": "Zapnout pokročilý mód",
   "font": {

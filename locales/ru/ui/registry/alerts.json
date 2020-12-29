@@ -25,7 +25,7 @@
   },
   "event": {
     "follows": "Подписки",
-    "cheers": "Чирсы",
+    "cheers": "Cheers",
     "subs": "Сабы",
     "resubs": "Ресабы",
     "subgifts": "Сабгифты",
@@ -63,7 +63,7 @@
   "messageTemplate": {
     "name": "Шаблон сообщения",
     "placeholder": "Установить шаблон сообщения",
-    "help": "Доступные переменные: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts), {recipient} (subgifts), {monthsName} (subs, subgifts), {currency} (tips)"
+    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "animationText": {
     "name": "Текст анимации"
@@ -83,14 +83,25 @@
   "layoutPicker": {
     "name": "Размещение"
   },
+  "scale": {
+    "name": "Scale"
+  },
+  "translateX": {
+    "name": "Move -Up / +Down"
+  },
+  "translateY": {
+    "name": "Move -Left / +Right"
+  },
   "image": {
-    "name": "Изображение"
+    "name": "Image / Video(.webm)",
+    "setting": "Image / Video(.webm) settings"
   },
   "sound": {
-    "name": "Звук"
+    "name": "Звук",
+    "setting": "Sound settings"
   },
   "soundVolume": {
-    "name": "Громкость звука"
+    "name": "Alert volume"
   },
   "enableAdvancedMode": "Включить расширенный режим",
   "font": {
