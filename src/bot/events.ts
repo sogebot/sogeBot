@@ -12,6 +12,7 @@ import currency from './currency';
 import customvariables from './customvariables';
 import { Event, EventInterface } from './database/entity/event';
 import { User } from './database/entity/user';
+import { onStreamEnd } from './decorators/on';
 import events from './events';
 import { attributesReplace } from './helpers/attributesReplace';
 import { isDbConnected } from './helpers/database';
@@ -33,6 +34,8 @@ import Parser from './parser';
 import tmi from './tmi';
 import { translate } from './translate';
 import custom_variables from './widgets/customvariables';
+
+const excludedUsers = new Set<string>();
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
@@ -105,21 +108,36 @@ class Events extends Core {
     this.fadeOut();
   }
 
+  @onStreamEnd()
+  resetExcludedUsers() {
+    excludedUsers.clear();
+  }
+
   public async fire(eventId: string, attributes: Events.Attributes): Promise<void> {
     attributes = _.cloneDeep(attributes) || {};
     debug('events', JSON.stringify({eventId, attributes}));
 
-    if (attributes.username !== null && typeof attributes.username !== 'undefined') {
+    if (attributes.username !== null && typeof attributes.username !== 'undefined' && (!attributes.userId && !excludedUsers.has(attributes.username))) {
+      excludedUsers.delete(attributes.username); // remove from excluded users if passed first if
+
       const user = attributes.userId
         ? await getRepository(User).findOne({ userId: attributes.userId })
         : await getRepository(User).findOne({ username: attributes.username });
 
       if (!user) {
-        await getRepository(User).save({
-          userId: Number(attributes.userId ? attributes.userId : await api.getIdFromTwitch(attributes.username)),
-          username: attributes.username,
-        });
-        return this.fire(eventId, attributes);
+        try {
+          await getRepository(User).save({
+            userId: Number(attributes.userId ? attributes.userId : await api.getIdFromTwitch(attributes.username)),
+            username: attributes.username,
+          });
+          return this.fire(eventId, attributes);
+        } catch (e) {
+          excludedUsers.add(attributes.username);
+          warning(`User ${attributes.username} triggered event ${eventId} was not found on Twitch.`);
+          warning(`User ${attributes.username} will be excluded from events, until stream restarts or user writes in chat and his data will be saved.`);
+          warning(e);
+          return;
+        }
       }
 
       // add is object
