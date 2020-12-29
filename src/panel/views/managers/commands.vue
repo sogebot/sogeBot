@@ -67,14 +67,13 @@
                 </b-alert>
                 <b-row
                   no-gutters
-                  :key="i"
+                  :key="updatedAt + '' + i"
                   :class="[i !== 0 ? 'pt-2' : '']"
                   v-for="(response, i) of orderBy(editationItem.responses, 'order', 'asc')"
                 >
                   <b-col>
                     <title-divider>{{ translate('systems.customcommands.response.name') }} {{i+1}}</title-divider>
                   </b-col>
-
                   <b-col md="auto" sm="12" align-self="end" class="text-right">
                     <div class="h-auto w-auto" style="flex-shrink: 0;">
                       <b-dropdown variant="outline-dark" toggle-class="border-0 h-auto w-auto" class="h-100">
@@ -297,6 +296,7 @@ export default defineComponent({
     const permissions = ref([] as Required<PermissionsInterface>[]);
     const editationItem = ref(null as CommandsInterface | null);
     const isDataChanged = ref(false);
+    const updatedAt = ref(Date.now());
     const state = ref({
       loadedPerm: ButtonStates.progress,
       loadedCmd: ButtonStates.progress,
@@ -503,28 +503,38 @@ export default defineComponent({
       }
     }
     const deleteResponse = (order: number) => {
-      let i = 0
-      if (editationItem.value) {
-        editationItem.value.responses = editationItem.value.responses?.filter(o => o.order !== order)
-        orderBy(editationItem.value.responses, 'order', 'asc').map((o) => {
-          o.order = i++
+      if (editationItem.value?.responses) {
+        editationItem.value.responses.splice(order, 1);
+        orderBy(editationItem.value.responses, 'order', 'asc').map((o, i) => {
+          o.order = i
           return o
         })
+        updatedAt.value = Date.now();
       }
     }
     const moveUpResponse = (order: number) => {
-      editationItem.value?.responses?.filter((o) => o.order === order - 1 || o.order === order).map(o => {
-        if (o.order === order - 1) o.order++
-        else o.order--
-        return o
-      })
+      if (editationItem.value) {
+        editationItem.value.responses?.forEach(o => {
+          if (o.order === order - 1) {
+            o.order++;
+          } else if (o.order === order) {
+            o.order--;
+          }
+        })
+      }
+      updatedAt.value = Date.now()
     };
     const moveDownResponse = (order: number) => {
-      editationItem.value?.responses?.filter((o) => o.order === order + 1 || o.order === order).map(o => {
-        if (o.order === order + 1) o.order--
-        else o.order++
-        return o
-      })
+      if (editationItem.value) {
+        editationItem.value.responses?.forEach(o => {
+          if (o.order === order + 1) {
+            o.order--;
+          } else if (o.order === order) {
+            o.order++;
+          }
+        })
+      };
+      updatedAt.value = Date.now()
     }
 
     return {
@@ -552,6 +562,7 @@ export default defineComponent({
       moveUpResponse,
       moveDownResponse,
       translate,
+      updatedAt,
     }
   },
 });
