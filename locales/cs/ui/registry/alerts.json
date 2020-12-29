@@ -25,7 +25,7 @@
   },
   "event": {
     "follows": "Sledující",
-    "cheers": "Cheers",
+    "cheers": "Bity",
     "subs": "Předplatitel",
     "resubs": "Předplatitel (resub)",
     "subgifts": "Darování subscribe",
@@ -63,7 +63,7 @@
   "messageTemplate": {
     "name": "Šablona zprávy",
     "placeholder": "Zadejte svou šablonu zprávy",
-    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
+    "help": "Dostupné proměnné: {name}, {amount} (bits, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "animationText": {
     "name": "Animace textu"
@@ -84,24 +84,24 @@
     "name": "Rozvržení"
   },
   "scale": {
-    "name": "Scale"
+    "name": "Měřítko"
   },
   "translateX": {
-    "name": "Move -Up / +Down"
+    "name": "Posunout -nahoru / +dolů"
   },
   "translateY": {
-    "name": "Move -Left / +Right"
+    "name": "Posunout -vlevo / +vpravo"
   },
   "image": {
-    "name": "Image / Video(.webm)",
-    "setting": "Image / Video(.webm) settings"
+    "name": "Obrázek / Video(.webm)",
+    "setting": "Nastavení obrázku / videa (.webm)"
   },
   "sound": {
     "name": "Zvuk",
-    "setting": "Sound settings"
+    "setting": "Nastavení zvuku"
   },
   "soundVolume": {
-    "name": "Alert volume"
+    "name": "Hlasitost upozornění"
   },
   "enableAdvancedMode": "Zapnout pokročilý mód",
   "font": {
