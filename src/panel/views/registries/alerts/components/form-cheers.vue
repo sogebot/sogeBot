@@ -133,24 +133,6 @@
     </b-form-group>
 
     <b-form-group label-cols-sm="4" label-cols-lg="3"
-                  v-if="!data.enableAdvancedMode"
-                  :label="translate('registry.alerts.layoutPicker.name')">
-      <layout-picker :layout.sync="data.layout"/>
-    </b-form-group>
-
-    <b-form-group label-cols-sm="4" label-cols-lg="3"
-            :label="translate('registry.alerts.image.name')"
-            :label-for="'image' + data.id">
-      <media :media.sync="data.imageId" type="image" socket="/registries/alerts" :key="'image-' + data.imageId" :volume="data.soundVolume"/>
-    </b-form-group>
-
-    <b-form-group label-cols-sm="4" label-cols-lg="3"
-            :label="translate('registry.alerts.sound.name')"
-            :label-for="'sound' + data.id">
-      <media :media.sync="data.soundId" type="audio" socket="/registries/alerts" :volume="data.soundVolume" :key="'sound-' + data.soundId"/>
-    </b-form-group>
-
-    <b-form-group label-cols-sm="4" label-cols-lg="3"
             :label="translate('registry.alerts.soundVolume.name')"
             :label-for="'soundVolume' + data.id">
       <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
@@ -177,6 +159,12 @@
       :label="translate('registry.alerts.enableAdvancedMode')"
     >
       <b-form-checkbox v-bind:key="'enableAdvancedMode' + data.id" :id="'enableAdvancedMode' + data.id" v-model="data.enableAdvancedMode" :name="'enableAdvancedMode' + data.id" switch></b-form-checkbox>
+    </b-form-group>
+
+    <b-form-group label-cols-sm="4" label-cols-lg="3"
+                  v-if="!data.enableAdvancedMode"
+                  :label="translate('registry.alerts.layoutPicker.name')">
+      <layout-picker :layout.sync="data.layout"/>
     </b-form-group>
 
     <div class="btn-group col-md-12 p-0" role="group" v-if="data.enableAdvancedMode">
@@ -208,6 +196,97 @@
       }"></codemirror>
     </div>
 
+
+    <b-card no-body>
+      <b-card-header header-tag="header" class="p-1" role="tab">
+        <b-button block v-b-toggle="'accordion-image-' + data.id" variant="light" class="text-left">{{translate('registry.alerts.image.setting')}}</b-button>
+      </b-card-header>
+      <b-collapse :id="'accordion-image-' + data.id" :accordion="'accordion-image-' + data.id" role="tabpanel">
+        <b-card-body>
+          <b-form-group label-cols-sm="4" label-cols-lg="3"
+                  :label="translate('registry.alerts.image.name')"
+                  :label-for="'image' + data.id">
+            <media :media.sync="data.imageId" type="image" socket="/registries/alerts" :key="'image-' + data.imageId" :volume="data.soundVolume"/>
+          </b-form-group>
+
+          <b-form-group label-cols-sm="4" label-cols-lg="3"
+                  :label="translate('registry.alerts.scale.name')"
+                  :label-for="'scale' + data.id">
+            <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
+              <b-form-input
+                :id="'scale' + data.id"
+                v-model.number="data.imageOptions.scale"
+                type="range"
+                min="0"
+                max="500"
+                step="1"
+              ></b-form-input>
+              <b-input-group-text slot="append" class="pr-3 pl-3">
+                <div style="width: 3rem;">
+                  {{data.imageOptions.scale}}%
+                </div>
+              </b-input-group-text>
+            </b-input-group>
+          </b-form-group>
+
+          <b-form-group label-cols-sm="4" label-cols-lg="3"
+                  :label="translate('registry.alerts.translateX.name')"
+                  :label-for="'translateX' + data.id">
+            <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
+              <b-form-input
+                :id="'translateX' + data.id"
+                v-model.number="data.imageOptions.translateX"
+                type="range"
+                min="-1000"
+                max="1000"
+                step="1"
+              ></b-form-input>
+              <b-input-group-text slot="append" class="pr-3 pl-3">
+                <div style="width: 3rem;">
+                  {{data.imageOptions.translateX}}px
+                </div>
+              </b-input-group-text>
+            </b-input-group>
+          </b-form-group>
+
+          <b-form-group label-cols-sm="4" label-cols-lg="3"
+                  :label="translate('registry.alerts.translateY.name')"
+                  :label-for="'translateY' + data.id">
+            <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
+              <b-form-input
+                :id="'translateY' + data.id"
+                v-model.number="data.imageOptions.translateY"
+                type="range"
+                min="-1000"
+                max="1000"
+                step="1"
+              ></b-form-input>
+              <b-input-group-text slot="append" class="pr-3 pl-3">
+                <div style="width: 3rem;">
+                  {{data.imageOptions.translateY}}px
+                </div>
+              </b-input-group-text>
+            </b-input-group>
+          </b-form-group>
+        </b-card-body>
+      </b-collapse>
+    </b-card>
+
+    <b-card no-body>
+      <b-card-header header-tag="header" class="p-1" role="tab">
+        <b-button block v-b-toggle="'accordion-sound-' + data.id" variant="light" class="text-left">{{translate('registry.alerts.sound.setting')}}</b-button>
+      </b-card-header>
+      <b-collapse :id="'accordion-sound-' + data.id" :accordion="'accordion-sound-' + data.id" role="tabpanel">
+        <b-card-body>
+          <b-form-group label-cols-sm="4" label-cols-lg="3"
+                  :label="translate('registry.alerts.sound.name')"
+                  :label-for="'sound' + data.id">
+            <media :media.sync="data.soundId" type="audio" socket="/registries/alerts" :volume="data.soundVolume" :key="'sound-' + data.soundId"/>
+          </b-form-group>
+        </b-card-body>
+      </b-collapse>
+    </b-card>
+    
     <b-card no-body>
       <b-card-header header-tag="header" class="p-1" role="tab">
         <b-button block v-b-toggle="'accordion-2' + data.id" variant="light" class="text-left">{{translate('registry.alerts.message.setting')}}</b-button>

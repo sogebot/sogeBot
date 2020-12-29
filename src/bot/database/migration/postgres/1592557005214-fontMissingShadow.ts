@@ -1,6 +1,5 @@
 import {MigrationInterface, QueryRunner} from 'typeorm';
 
-import { AlertCheer, AlertFollow, AlertHost, AlertRaid, AlertResub, AlertSub, AlertSubcommunitygift, AlertSubgift, AlertTip } from '../../entity/alert';
 import { Goal } from '../../entity/goal';
 import { Randomizer } from '../../entity/randomizer';
 
@@ -17,14 +16,14 @@ export class fontMissingShadow1592557005214 implements MigrationInterface {
           .update({ id: item.id }, { customizationFont: {...item.customizationFont, shadow: []} });
       }
     }
-
-    for (const table of [AlertFollow, AlertSub, AlertSubcommunitygift, AlertSubgift, AlertHost, AlertRaid, AlertTip, AlertCheer, AlertResub]) {
-      const data2 = await queryRunner.manager.getRepository(table).find();
-      for (const item of data2) {
-        if (typeof item.font.shadow === 'undefined') {
-          await queryRunner.manager.getRepository(table)
-            .update({ id: item.id }, { font: {...item.font, shadow: []} });
+    for (const type of ['cheer', 'resub', 'tip', 'raid', 'host', 'subgift', 'subcommunitygift', 'sub', 'follow']) {
+      const alerts = await queryRunner.query(`SELECT * from "alert_${type}"`, undefined);
+      for (const alert of alerts) {
+        const font = JSON.parse(alert.font);
+        if (typeof font.shadow === 'undefined') {
+          font.shadow = [];
         }
+        await queryRunner.query(`UPDATE "alert_${type}" SET "font"="${JSON.stringify(font)}" WHERE "id"="${alert.id}"`);
       }
     }
 
@@ -51,14 +50,11 @@ export class fontMissingShadow1592557005214 implements MigrationInterface {
       }
     }
 
-    for (const table of [AlertFollow, AlertSub, AlertSubcommunitygift, AlertSubgift, AlertHost, AlertRaid, AlertTip, AlertCheer, AlertResub]) {
-      const data2 = await queryRunner.manager.getRepository(table).find();
-      for (const item of data2) {
-        if (typeof item.font.shadow !== 'undefined') {
-          const { shadow, ...font } = item.font;
-          await queryRunner.manager.getRepository(table)
-            .update({ id: item.id }, { font });
-        }
+    for (const type of ['cheer', 'resub', 'tip', 'raid', 'host', 'subgift', 'subcommunitygift', 'sub', 'follow']) {
+      const alerts = await queryRunner.query(`SELECT * from "alert_${type}"`, undefined);
+      for (const alert of alerts) {
+        const { shadow, ...font } = JSON.parse(alert.font);
+        await queryRunner.query(`UPDATE "alert_${type}" SET "font"="${JSON.stringify(font)}" WHERE "id"="${alert.id}"`);
       }
     }
 

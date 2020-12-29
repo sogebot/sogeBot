@@ -49,6 +49,11 @@ export interface CommonSettingsInterface {
     characters: string;
   };
   imageId: string;
+  imageOptions: {
+    translateX: number;
+    translateY: number;
+    scale: number;
+  };
   soundId: string;
   soundVolume: number;
   alertDurationInMs: number;
@@ -197,6 +202,7 @@ export const CommonSettingsSchema = {
   animationText: { type: 'varchar' } as EntitySchemaColumnOptions,
   animationTextOptions: { type: 'simple-json' } as EntitySchemaColumnOptions,
   imageId: { type: String } as EntitySchemaColumnOptions,
+  imageOptions: { type: 'simple-json' } as EntitySchemaColumnOptions,
   soundId: { type: String } as EntitySchemaColumnOptions,
   soundVolume: { type: Number } as EntitySchemaColumnOptions,
   alertDurationInMs: { type: Number } as EntitySchemaColumnOptions,
