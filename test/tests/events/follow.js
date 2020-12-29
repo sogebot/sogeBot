@@ -7,6 +7,7 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
+const user = require('../../general.js').user;
 const _ = require('lodash');
 
 const { getRepository } = require('typeorm');
@@ -19,6 +20,7 @@ describe('Events - follow event', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
+    await user.prepare();
   });
 
   describe('#1370 - Second follow event didn\'t trigger event ', function () {
@@ -51,13 +53,13 @@ describe('Events - follow event', () => {
       await getRepository(Event).save(event);
     });
 
-    for (const username of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs']) {
+    for (const follower of [user.viewer, user.viewer2, user.viewer3]) {
       it('trigger follow event', async () => {
-        await events.fire('follow', { username, userId: Math.floor(Math.random() * 100000), webhooks: _.random(1) === 1 });
+        await events.fire('follow', { username: follower.username, userId: follower.userId, webhooks: _.random(1) === 1 });
       });
 
       it('message should be send', async () => {
-        await message.isSentRaw(`Diky za follow, @${username}!`, { username });
+        await message.isSentRaw(`Diky za follow, @${follower.username}!`, { username: follower.username });
       });
 
       it('wait 5s', async () => {
