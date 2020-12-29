@@ -400,6 +400,54 @@ class Message {
         return api.stats.currentTitle || 'n/a';
       },
     };
+    const youtube = {
+      '$youtube(url, #)': async function (filter: string) {
+        const channel = filter
+          .replace('$youtube(url,', '')
+          .replace(')', '')
+          .trim();
+        try {
+          const response = await axios.get('https://www.youtube.com/channel/'+channel+'/videos?view=0&sort=dd');
+          const match = new RegExp('"videoId":"(.*?)",.*?title":{"runs":\\[{"text":"(.*?)"}]', 'gm').exec(response.data);
+          if (match) {
+            return `https://youtu.be/${match[1]}`;
+          } else {
+            return 'n/a';
+          }
+        } catch (e) {
+          const response = await axios.get('https://www.youtube.com/user/'+channel+'/videos?view=0&sort=dd');
+          const match = new RegExp('"videoId":"(.*?)",.*?title":{"runs":\\[{"text":"(.*?)"}]', 'gm').exec(response.data);
+          if (match) {
+            return `https://youtu.be/${match[1]}`;
+          } else {
+            return 'n/a';
+          }
+        }
+      },
+      '$youtube(title, #)': async function (filter: string) {
+        const channel = filter
+          .replace('$youtube(title,', '')
+          .replace(')', '')
+          .trim();
+        try {
+          const response = await axios.get('https://www.youtube.com/channel/'+channel+'/videos?view=0&sort=dd');
+          const match = new RegExp('"videoId":"(.*?)",.*?title":{"runs":\\[{"text":"(.*?)"}]', 'gm').exec(response.data);
+          if (match) {
+            return match[2];
+          } else {
+            return 'n/a';
+          }
+        } catch (e) {
+          const response = await axios.get('https://www.youtube.com/user/'+channel+'/videos?view=0&sort=dd');
+          const match = new RegExp('"videoId":"(.*?)",.*?title":{"runs":\\[{"text":"(.*?)"}]', 'gm').exec(response.data);
+          if (match) {
+            return match[2];
+          } else {
+            return 'n/a';
+          }
+        }
+      },
+    };
     const command = {
       '$count(\'#\')': async function (filter: string) {
         const countRegex = new RegExp('\\$count\\(\\\'(?<command>\\!\\S*)\\\'\\)', 'gm');
@@ -916,6 +964,7 @@ class Message {
 
     await this.parseMessageEach(price);
     await this.parseMessageEach(info);
+    await this.parseMessageEach(youtube);
     await this.parseMessageEach(random);
     await this.parseMessageEach(ifp, false);
     await this.parseMessageVariables(custom);
