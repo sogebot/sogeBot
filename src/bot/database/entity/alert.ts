@@ -6,6 +6,7 @@ import { ColumnNumericTransformer } from './_transformer';
 export interface EmitData {
   name: string;
   amount: number;
+  tier: number;
   recipient?: string;
   currency: string;
   monthsName: string;
@@ -19,7 +20,7 @@ export interface CommonSettingsInterface {
   alertId?: string;
   enabled: boolean;
   title: string;
-  variantCondition: 'random' | 'exact' | 'gt-eq';
+  variantCondition: 'random' | 'exact' | 'gt-eq' | 'tier-exact' | 'tier-gt-eq';
   variantAmount: number;
   messageTemplate: string;
   layout: '1' | '2' | '3' | '4' | '5';

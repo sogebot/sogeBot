@@ -31,9 +31,10 @@
       :label-for="'variant' + data.id"
     >
       <variant
+        :key="'variant-' + data.id"
         :condition.sync="data.variantCondition"
         :amount.sync="data.variantAmount"
-        event="follow"
+        :event="event"
         :state="$v.data.variantAmount.$invalid && $v.data.variantAmount.$dirty ? false : null"
       ></variant>
     </b-form-group>
@@ -332,6 +333,7 @@ import { required, minValue } from 'vuelidate/lib/validators'
 export default class AlertsEditFollowForm extends Vue {
   @PropSync('alert') data !: CommonSettingsInterface
   @Prop() readonly index !: number
+  @Prop() readonly event !: string
   @Prop() readonly validationDate !: number
 
   theme = localStorage.getItem('theme') || get(this.$store.state, 'configuration.core.ui.theme', 'light');

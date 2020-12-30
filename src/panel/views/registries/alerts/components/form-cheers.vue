@@ -31,8 +31,10 @@
       :label-for="'variant' + data.id"
     >
       <variant
+        :key="'variant-' + data.id"
         :condition.sync="data.variantCondition"
         :amount.sync="data.variantAmount"
+        :event="event"
         :state="$v.data.variantAmount.$invalid && $v.data.variantAmount.$dirty ? false : null"
       ></variant>
     </b-form-group>
@@ -286,7 +288,7 @@
         </b-card-body>
       </b-collapse>
     </b-card>
-    
+
     <b-card no-body>
       <b-card-header header-tag="header" class="p-1" role="tab">
         <b-button block v-b-toggle="'accordion-2' + data.id" variant="light" class="text-left">{{translate('registry.alerts.message.setting')}}</b-button>
@@ -469,6 +471,7 @@ import { required, minValue } from 'vuelidate/lib/validators'
 export default class AlertsEditCheersForm extends Vue {
   @PropSync('alert') readonly data !: AlertTipInterface
   @Prop() readonly index !: number
+  @Prop() readonly event !: string
   @Prop() readonly validationDate !: number
 
   theme = localStorage.getItem('theme') || get(this.$store.state, 'configuration.core.ui.theme', 'light');

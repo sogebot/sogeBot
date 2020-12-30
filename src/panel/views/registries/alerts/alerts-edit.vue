@@ -143,11 +143,11 @@
         </b-col>
         <b-col>
           <b-card>
-            <form-follow v-if="selectedAlertType === 'cmdredeems' || selectedAlertType === 'follows' || selectedAlertType === 'subs' || selectedAlertType === 'subgifts' || selectedAlertType === 'subcommunitygifts'" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
-            <form-cheers v-else-if="selectedAlertType === 'cheers' || selectedAlertType === 'tips'" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
-            <form-resubs v-else-if="selectedAlertType === 'resubs'" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
-            <form-hosts v-else-if="selectedAlertType === 'hosts' || selectedAlertType === 'raids'" :validationDate.sync="validationDate" :type="selectedAlertType" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
-            <form-reward v-else-if="selectedAlertType === 'rewardredeems'" :validationDate.sync="validationDate" :type="selectedAlertType" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
+            <form-follow :event="selectedAlertType" v-if="selectedAlertType === 'cmdredeems' || selectedAlertType === 'follows' || selectedAlertType === 'subs' || selectedAlertType === 'subgifts' || selectedAlertType === 'subcommunitygifts'" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
+            <form-cheers :event="selectedAlertType" v-else-if="selectedAlertType === 'cheers' || selectedAlertType === 'tips'" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
+            <form-resubs :event="selectedAlertType" v-else-if="selectedAlertType === 'resubs'" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
+            <form-hosts :event="selectedAlertType" v-else-if="selectedAlertType === 'hosts' || selectedAlertType === 'raids'" :validationDate.sync="validationDate" :type="selectedAlertType" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
+            <form-reward :event="selectedAlertType" v-else-if="selectedAlertType === 'rewardredeems'" :validationDate.sync="validationDate" :type="selectedAlertType" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
           </b-card>
         </b-col>
       </b-row>

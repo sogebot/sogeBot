@@ -186,6 +186,7 @@ class StreamElements extends Integration {
       event: 'tips',
       name: username.toLowerCase(),
       amount: Number(Number(eventData.data.amount).toFixed(2)),
+      tier: 0,
       currency: DONATION_CURRENCY,
       monthsName: '',
       message,

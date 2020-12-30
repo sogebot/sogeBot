@@ -112,6 +112,7 @@ class Qiwi extends Integration {
         event: 'tips',
         name: username || 'Anonymous',
         amount,
+        tier: 0,
         currency: DONATION_CURRENCY,
         monthsName: '',
         message,
