@@ -163,6 +163,7 @@ class TipeeeStream extends Integration {
         event: 'tips',
         name: username,
         amount: Number(Number(amount).toFixed(2)),
+        tier: 0,
         currency: donationCurrency,
         monthsName: '',
         message,

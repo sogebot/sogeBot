@@ -203,6 +203,7 @@ class Alerts extends Registry {
 
   test(opts: { event: keyof Omit<AlertInterface, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList'> }) {
     const amount = Math.floor(Math.random() * 1000);
+    const tier = Math.floor(Math.random() * 4);
     const messages = [
       'Lorem ipsum dolor sit amet, https://www.google.com',
       'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Etiam dictum tincidunt diam. Aliquam erat volutpat. Mauris tincidunt sem sed arcu. Etiam sapien elit, consequat eget, tristique non, venenatis quis, ante. Praesent id justo in neque elementum ultrices. Integer pellentesque quam vel velit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Etiam commodo dui eget wisi. Cras pede libero, dapibus nec, pretium sit amet, tempor quis. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.',
@@ -214,6 +215,7 @@ class Alerts extends Registry {
     const data: EmitData = {
       name: opts.event === 'cmdredeems' ? '!' + generateUsername() : generateUsername(),
       amount,
+      tier,
       recipient: generateUsername(),
       currency: currency.mainCurrency,
       monthsName: getLocalizedName(amount, translate('core.months')),

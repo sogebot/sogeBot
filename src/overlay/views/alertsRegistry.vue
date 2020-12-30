@@ -391,6 +391,20 @@ export default class AlertsRegistryOverlays extends Vue {
                   && o.variantAmount <= emitData.amount
             });
 
+            // search for tier-gt-eq variants
+            const possibleAlertsWithTierExactAmount = possibleAlerts.filter(o => {
+              return o.enabled
+                  && o.variantCondition === 'tier-exact'
+                  && o.variantAmount === emitData.tier
+            });
+
+            // search for tier-gt-eq variants
+            const possibleAlertsWithTierGtEqAmount = possibleAlerts.filter(o => {
+              return o.enabled
+                  && o.variantCondition === 'tier-gt-eq'
+                  && o.variantAmount <= emitData.tier
+            });
+
             // search for random variants
             let possibleAlertsWithRandomCount: (CommonSettingsInterface | AlertHostInterface | AlertTipInterface | AlertResubInterface)[] = [];
             for (const alert of possibleAlerts) {
@@ -405,13 +419,17 @@ export default class AlertsRegistryOverlays extends Vue {
               }
             }
 
-            console.debug({possibleAlertsWithRandomCount, possibleAlertsWithExactAmount, possibleAlertsWithGtEqAmount})
+            console.debug({emitData, possibleAlerts, possibleAlertsWithRandomCount, possibleAlertsWithExactAmount, possibleAlertsWithGtEqAmount, possibleAlertsWithTierExactAmount, possibleAlertsWithTierGtEqAmount})
 
             let alert: CommonSettingsInterface | AlertHostInterface | AlertTipInterface | AlertResubInterface | undefined;
             if (possibleAlertsWithExactAmount.length > 0) {
               alert = possibleAlertsWithExactAmount[Math.floor(Math.random() * possibleAlertsWithExactAmount.length)];
             } else if (possibleAlertsWithGtEqAmount.length > 0) {
               alert = possibleAlertsWithGtEqAmount[Math.floor(Math.random() * possibleAlertsWithGtEqAmount.length)];
+            } else if (possibleAlertsWithTierExactAmount.length > 0) {
+              alert = possibleAlertsWithTierExactAmount[Math.floor(Math.random() * possibleAlertsWithTierExactAmount.length)];
+            } else if (possibleAlertsWithTierGtEqAmount.length > 0) {
+              alert = possibleAlertsWithTierGtEqAmount[Math.floor(Math.random() * possibleAlertsWithTierGtEqAmount.length)];
             } else {
               alert = possibleAlertsWithRandomCount[Math.floor(Math.random() * possibleAlertsWithRandomCount.length)];
             }

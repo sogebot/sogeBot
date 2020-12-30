@@ -167,6 +167,7 @@ class Donationalerts extends Integration {
       event: 'tips',
       name: data.username.toLowerCase(),
       amount: Number(data.amount.toFixed(2)),
+      tier: 0,
       currency: data.currency,
       monthsName: '',
       message: data.message,

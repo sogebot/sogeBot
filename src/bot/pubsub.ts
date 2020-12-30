@@ -88,6 +88,7 @@ const connect = () => {
           event: 'rewardredeems',
           name: dataMessage.data.redemption.reward.title,
           amount: 0,
+          tier: 0,
           currency: '',
           monthsName: '',
           message: dataMessage.data.redemption.user_input,

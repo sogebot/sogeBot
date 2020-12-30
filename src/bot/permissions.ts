@@ -316,7 +316,7 @@ class Permissions extends Core {
           amount = user.subscribeStreak;
           break;
         case 'subtier':
-          amount = user.subscribeTier === 'Prime' ? 1 : Number(user.subscribeTier);
+          amount = user.subscribeTier === 'Prime' ? 0 : Number(user.subscribeTier);
           break;
         case 'tips':
           amount = user.tips.reduce((a, b) => (a + currency.exchange(b.amount, b.currency, currency.mainCurrency)), 0);

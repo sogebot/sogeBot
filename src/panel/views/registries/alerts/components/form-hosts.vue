@@ -31,8 +31,10 @@
       :label-for="'variant' + data.id"
     >
       <variant
+        :key="'variant-' + data.id"
         :condition.sync="data.variantCondition"
         :amount.sync="data.variantAmount"
+        :event="event"
         :state="$v.data.variantAmount.$invalid && $v.data.variantAmount.$dirty ? false : null"
       ></variant>
     </b-form-group>
@@ -342,6 +344,7 @@ export default class AlertsEditHostForm extends Vue {
   @PropSync('alert') readonly data !: AlertHostInterface
   @PropSync('type') readonly alertType !: ['hosts', 'raids']
   @Prop() readonly index !: number
+  @Prop() readonly event !: string
   @Prop() readonly validationDate !: number
 
   theme = localStorage.getItem('theme') || get(this.$store.state, 'configuration.core.ui.theme', 'light');

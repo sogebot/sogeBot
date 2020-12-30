@@ -260,6 +260,7 @@ class Webhooks {
             event: 'follows',
             name: data.from_name,
             amount: 0,
+            tier: 0,
             currency: '',
             monthsName: '',
             message: '',
