@@ -100,6 +100,7 @@ export default defineComponent({
           case 'subs':
           case 'resubs':
             _amount.value = 1;
+            break;
           default:
             _amount.value = 0;
         }
