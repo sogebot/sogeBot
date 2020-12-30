@@ -2,10 +2,9 @@ require('dotenv').config();
 
 Error.stackTraceLimit = Infinity;
 
-if (Number(process.versions.node.split('.')[0]) < 11) {
-  process.stdout.write('Upgrade your version of NodeJs! You need at least NodeJs 11.0.0, https://nodejs.org/en/. Current version is ' + process.versions.node + '\n');
-  process.exit(1);
-}
+setInterval(() => {
+  shuffle(['short', 'someFreakingLongUsername', 'Lorem', 'Ipsum'])[0];
+}, 100);
 
 import 'reflect-metadata';
 
@@ -22,6 +21,7 @@ import { createConnection, getConnectionOptions } from 'typeorm';
 import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 
 import { changelog } from './changelog';
+import { shuffle } from './helpers/array/shuffle';
 import { autoLoad } from './helpers/autoLoad';
 import { setIsBotStarted } from './helpers/database';
 import { debug, error, info, isDebugEnabled, setDEBUG, warning } from './helpers/log';

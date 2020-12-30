@@ -316,7 +316,7 @@ class CustomCommands extends System {
       const commands = await getRepository(Commands).find({
         where: { visible: true, enabled: true },
       });
-      const response = (commands.length === 0 ? translate('customcmds.list-is-empty') : translate('customcmds.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(commands, 'command'), 'command').join(', ')));
+      const response = (commands.length === 0 ? translate('customcmds.list-is-empty') : translate('customcmds.list-is-not-empty').replace(/\$list/g, _.orderBy(commands, 'command').map(o => o.command).join(', ')));
       return [{ response, ...opts }];
     } else {
       // print responses

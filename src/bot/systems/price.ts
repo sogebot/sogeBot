@@ -139,7 +139,7 @@ class Price extends System {
   @default_permission(permission.CASTERS)
   async list (opts: CommandOptions): Promise<CommandResponse[]> {
     const prices = await getRepository(PriceEntity).find();
-    const response = (prices.length === 0 ? translate('price.list-is-empty') : translate('price.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(prices, 'command'), (o) => {
+    const response = (prices.length === 0 ? translate('price.list-is-empty') : translate('price.list-is-not-empty').replace(/\$list/g, (_.orderBy(prices, 'command').map((o) => {
       return `${o.command} - ${o.price}`;
     })).join(', ')));
     return [{ response, ...opts }];

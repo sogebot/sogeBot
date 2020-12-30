@@ -204,7 +204,7 @@ class Ranks extends System {
   @default_permission(permission.CASTERS)
   async list (opts: CommandOptions, type: RankInterface['type'] = 'viewer'): Promise<CommandResponse[]> {
     const ranks = await getRepository(Rank).find({ type });
-    const response = prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', { list: _.map(_.orderBy(ranks, 'value', 'asc'), function (l) {
+    const response = prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', { list: _.orderBy(ranks, 'value', 'asc').map((l) => {
       return l.value + 'h - ' + l.rank;
     }).join(', ') });
     return [{ response, ...opts }];

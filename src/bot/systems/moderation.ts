@@ -374,7 +374,7 @@ class Moderation extends System {
     const regexp = /[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-./:;<=>?@[\]^_`{|}~]/gi;
     for (let i = 0; i < whitelisted.length; i++) {
       // if is emote or symbol - continue
-      if (_.includes(emotesCharList, i) || !_.isNull(whitelisted.charAt(i).match(regexp))) {
+      if (emotesCharList.includes(i) || whitelisted.charAt(i).match(regexp) !== null) {
         msgLength--;
         continue;
       } else if (!_.isFinite(parseInt(whitelisted.charAt(i), 10)) && whitelisted.charAt(i).toUpperCase() === whitelisted.charAt(i) && whitelisted.charAt(i) !== ' ') {

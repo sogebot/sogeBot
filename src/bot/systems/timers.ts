@@ -270,7 +270,7 @@ class Timers extends System {
 
     if (_.isNil(nameMatch)) {
       const timers = await getRepository(Timer).find();
-      return [{ response: translate('timers.timers-list').replace(/\$list/g, _.map(_.orderBy(timers, 'name'), (o) => (o.isEnabled ? '⚫' : '⚪') + ' ' + o.name).join(', ')), ...opts }];
+      return [{ response: translate('timers.timers-list').replace(/\$list/g, _.orderBy(timers, 'name').map((o) => (o.isEnabled ? '⚫' : '⚪') + ' ' + o.name).join(', ')), ...opts }];
     } else {
       name = nameMatch[1];
     }

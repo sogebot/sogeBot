@@ -189,7 +189,7 @@ class Keywords extends System {
       const keywords = await getRepository(Keyword).find({
         where: { enabled: true },
       });
-      const response = (keywords.length === 0 ? translate('keywords.list-is-empty') : translate('keywords.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(keywords, 'keyword'), 'keyword').join(', ')));
+      const response = (keywords.length === 0 ? translate('keywords.list-is-empty') : translate('keywords.list-is-not-empty').replace(/\$list/g, _.orderBy(keywords, 'keyword').map(o => o.keyword).join(', ')));
       return [{ response, ...opts }];
     } else {
       // print responses

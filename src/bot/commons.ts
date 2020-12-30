@@ -308,10 +308,8 @@ export function isSubscriber(user: UserInterface): boolean {
 export function isOwner(user: string | CommandOptions['sender'] | UserInterface | UserStateTags) {
   try {
     if (oauth.generalOwners) {
-      const owners = _.map(_.filter(oauth.generalOwners, _.isString), (owner) => {
-        return _.trim(owner.toLowerCase());
-      });
-      return _.includes(owners, (_.isString(user) ? user : user.username.toLowerCase().trim()));
+      const owners = oauth.generalOwners.filter(o => typeof o === 'string').map(o => o.trim().toLowerCase());
+      return owners.includes(typeof user === 'string' ? user : user.username.toLowerCase().trim());
     } else {
       return false;
     }

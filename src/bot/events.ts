@@ -14,6 +14,7 @@ import { Event, EventInterface } from './database/entity/event';
 import { User } from './database/entity/user';
 import { onStreamEnd } from './decorators/on';
 import events from './events';
+import { sample } from './helpers/array/sample';
 import { attributesReplace } from './helpers/attributesReplace';
 import { isDbConnected } from './helpers/database';
 import { dayjs } from './helpers/dayjs';
@@ -192,7 +193,7 @@ class Events extends Core {
       }
 
       for (const operation of event.operations) {
-        const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.name));
+        const isOperationSupported = typeof this.supportedOperationsList.find((o) => o.id === operation.name) !== 'undefined';
         if (isOperationSupported) {
           const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.name);
           if (foundOp) {
@@ -303,7 +304,7 @@ class Events extends Core {
     let command = String(operation.commandToRun);
     for (const key of Object.keys(attributes).sort((a, b) => a.length - b.length)) {
       const val = attributes[key];
-      if (_.isObject(val) && _.size(val) === 0) {
+      if (_.isObject(val) && Object.keys(val).length === 0) {
         return;
       } // skip empty object
       const replace = new RegExp(`\\$${key}`, 'g');
@@ -653,8 +654,8 @@ class Events extends Core {
 
     adminEndpoint(this.nsp, 'test.event', async (eventId, cb) => {
       try {
-        const username = _.sample(['short', 'someFreakingLongUsername', generateUsername()]) || 'short';
-        const recipient = _.sample(['short', 'someFreakingLongUsername', generateUsername()]) || 'short';
+        const username = sample(['short', 'someFreakingLongUsername', generateUsername()]);
+        const recipient = sample(['short', 'someFreakingLongUsername', generateUsername()]);
         const months = _.random(0, 99, false);
         const attributes = {
           test: true,
@@ -683,17 +684,17 @@ class Events extends Core {
           months,
           tier: _.random(0, 3, false),
           monthsName: getLocalizedName(months, translate('core.months')),
-          message: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
+          message: sample(['', 'Lorem Ipsum Dolor Sit Amet']),
           viewers: _.random(0, 9999, false),
           autohost: _.random(0, 1, false) === 0,
           bits: _.random(1, 1000000, false),
-          duration: _.sample([30, 60, 90, 120, 150, 180]),
-          reason: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
+          duration: sample([30, 60, 90, 120, 150, 180]),
+          reason: sample(['', 'Lorem Ipsum Dolor Sit Amet']),
           command: '!testcommand',
           count: _.random(0, 9999, false),
           method: _.random(0, 1, false) === 0 ? 'Twitch Prime' : '',
           amount: _.random(0, 9999, true).toFixed(2),
-          currency: _.sample(['CZK', 'USD', 'EUR']),
+          currency: sample(['CZK', 'USD', 'EUR']),
           currencyInBot: currency.mainCurrency,
           amountInBotCurrency: _.random(0, 9999, true).toFixed(2),
         };
@@ -714,7 +715,7 @@ class Events extends Core {
               const recipientis = attributes.recipientis;
               _.merge(attributes, flatten({ recipientis }));
             }
-            const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.name));
+            const isOperationSupported = typeof this.supportedOperationsList.find((o) => o.id === operation.name) === 'undefined';
             if (isOperationSupported) {
               const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.name);
               if (foundOp) {

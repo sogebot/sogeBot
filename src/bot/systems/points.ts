@@ -446,7 +446,7 @@ class Points extends System {
     }
 
     let pointsName = (points === 1 ? single : multi);
-    if (!_.isNull(xmulti) && _.isObject(xmulti) && points > 1 && points <= 10) {
+    if (xmulti !== null && _.isObject(xmulti) && points > 1 && points <= 10) {
       for (let i = points; i <= 10; i++) {
         if (typeof xmulti[i] === 'string') {
           pointsName = xmulti[i];

@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { getBotSender, prepare } from '../commons';
@@ -71,7 +70,7 @@ class Queue extends System {
       try {
         if (data.username) {
           const users: any[] = [];
-          if (_.isString(data.username)) {
+          if (typeof data.username === 'string') {
             data.username = [data.username];
           }
           for (let user of data.username) {
