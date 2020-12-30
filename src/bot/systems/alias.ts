@@ -312,7 +312,7 @@ class Alias extends System {
       = (alias.length === 0
         ? translate('alias.list-is-empty')
         : translate('alias.list-is-not-empty'))
-        .replace(/\$list/g, _.orderBy(alias, 'alias').map(o => o.alias)).join(', ');
+        .replace(/\$list/g, _.orderBy(alias, 'alias').map(o => o.alias).join(', '));
     return [{ response, ...opts }];
   }
 
