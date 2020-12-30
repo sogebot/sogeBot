@@ -60,7 +60,7 @@ class Commercial extends System {
 
     const cid = oauth.channelId;
     // check if duration is correct (30, 60, 90, 120, 150, 180)
-    if (_.includes([30, 60, 90, 120, 150, 180], commercial.duration)) {
+    if ([30, 60, 90, 120, 150, 180].includes(commercial.duration)) {
       const url = `https://api.twitch.tv/helix/channels/commercial`;
 
       const token = oauth.broadcasterAccessToken;

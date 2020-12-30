@@ -82,7 +82,7 @@ class Duel extends Game {
     if (winnerUser) {
       const probability = winnerUser.tickets / (total / 100);
 
-      const m = prepare(_.size(users) === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
+      const m = prepare(users.length === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
         pointsName: await points.getPointsName(total),
         points: total,
         probability: _.round(probability, 2),

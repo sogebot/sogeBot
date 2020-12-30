@@ -5,6 +5,7 @@ import { prepare } from '../commons';
 import { Quotes as QuotesEntity, QuotesInterface } from '../database/entity/quotes';
 import { command, default_permission } from '../decorators';
 import Expects from '../expects';
+import { sample } from '../helpers/array/sample';
 import { permission } from '../helpers/permissions';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import ui from '../ui';
@@ -177,7 +178,7 @@ class Quotes extends System {
       }
 
       if (quotesWithTags.length > 0) {
-        const quote = _.sample(quotesWithTags);
+        const quote = sample(quotesWithTags);
         if (typeof quote !== 'undefined') {
           const quotedBy = (await users.getUsernamesFromIds([quote.quotedBy]))[quote.quotedBy];
           const response = prepare('systems.quotes.show.ok', { quote: quote.quote, id: quote.id, quotedBy });

@@ -308,7 +308,11 @@ class Alias extends System {
   @default_permission(permission.CASTERS)
   async list (opts: CommandOptions) {
     const alias = await getRepository(AliasEntity).find({ visible: true, enabled: true });
-    const response = (alias.length === 0 ? translate('alias.list-is-empty') : translate('alias.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(alias, 'alias'), 'alias')).join(', ')));
+    const response
+      = (alias.length === 0
+        ? translate('alias.list-is-empty')
+        : translate('alias.list-is-not-empty'))
+        .replace(/\$list/g, _.orderBy(alias, 'alias').map(o => o.alias).join(', '));
     return [{ response, ...opts }];
   }
 

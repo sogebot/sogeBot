@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
 import api from '../api';
@@ -228,7 +227,7 @@ class UserInfo extends System {
       if (message.includes('$rank')) {
         const idx = message.indexOf('$rank');
         const rank = await ranks.get(await getRepository(User).findOne({ userId: Number(opts.sender.userId) }));
-        if (ranks.enabled && !_.isNull(rank.current)) {
+        if (ranks.enabled && rank.current !== null) {
           message[idx] = typeof rank.current === 'string' ? rank.current : rank.current.rank;
         } else {
           message.splice(idx, 1);

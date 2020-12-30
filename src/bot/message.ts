@@ -19,6 +19,7 @@ import { EventList } from './database/entity/eventList';
 import { Price } from './database/entity/price';
 import { Rank } from './database/entity/rank';
 import { User, UserInterface } from './database/entity/user';
+import { sample } from './helpers/array/sample';
 import { getCountOfCommandUsage } from './helpers/commands/count';
 import { getLocalizedName } from './helpers/getLocalized';
 import { isBotSubscriber } from './helpers/isBot';
@@ -170,7 +171,7 @@ class Message {
         if (viewers.length === 0) {
           return 'unknown';
         }
-        return _.sample(viewers.map(o => o.username ));
+        return sample(viewers.map(o => o.username ));
       },
       '(random.online.follower)': async function () {
         const followers = (await getRepository(User).createQueryBuilder('user')
@@ -185,7 +186,7 @@ class Message {
         if (followers.length === 0) {
           return 'unknown';
         }
-        return _.sample(followers.map(o => o.username ));
+        return sample(followers.map(o => o.username ));
       },
       '(random.online.subscriber)': async function () {
         const subscribers = (await getRepository(User).createQueryBuilder('user')
@@ -200,7 +201,7 @@ class Message {
         if (subscribers.length === 0) {
           return 'unknown';
         }
-        return _.sample(subscribers.map(o => o.username ));
+        return sample(subscribers.map(o => o.username ));
       },
       '(random.viewer)': async function () {
         const viewers = (await getRepository(User).createQueryBuilder('user')
@@ -213,7 +214,7 @@ class Message {
         if (viewers.length === 0) {
           return 'unknown';
         }
-        return _.sample(viewers.map(o => o.username ));
+        return sample(viewers.map(o => o.username ));
       },
       '(random.follower)': async function () {
         const followers = (await getRepository(User).createQueryBuilder('user')
@@ -227,7 +228,7 @@ class Message {
         if (followers.length === 0) {
           return 'unknown';
         }
-        return _.sample(followers.map(o => o.username ));
+        return sample(followers.map(o => o.username ));
       },
       '(random.subscriber)': async function () {
         const subscribers = (await getRepository(User).createQueryBuilder('user')
@@ -241,7 +242,7 @@ class Message {
         if (subscribers.length === 0) {
           return 'unknown';
         }
-        return _.sample(subscribers.map(o => o.username ));
+        return sample(subscribers.map(o => o.username ));
       },
       '(random.number-#-to-#)': async function (filter: string) {
         const numbers = filter.replace('(random.number-', '')
@@ -557,7 +558,7 @@ class Message {
         let listOutput: any = [];
         switch (system) {
           case 'alias':
-            return _.size(alias) === 0 ? ' ' : (_.map(alias, (o) => {
+            return alias.length === 0 ? ' ' : (alias.map((o) => {
               const findPrice = prices.find(p => p.command === o.alias);
               if (findPrice && priceSystem.enabled) {
                 if (findPrice.price > 0 && findPrice.priceBits === 0) {
@@ -571,7 +572,7 @@ class Message {
               return o.alias.replace('!', '');
             })).sort().join(', ');
           case '!alias':
-            return _.size(alias) === 0 ? ' ' : (_.map(alias, (o) => {
+            return alias.length === 0 ? ' ' : (alias.map((o) => {
               const findPrice = prices.find(p => p.command === o.alias);
               if (findPrice && priceSystem.enabled) {
                 if (findPrice.price > 0 && findPrice.priceBits === 0) {
@@ -616,7 +617,7 @@ class Message {
                 commands = [];
               }
             }
-            return _.size(commands) === 0 ? ' ' : (_.map(commands, (o) => {
+            return commands.length === 0 ? ' ' : (commands.map((o) => {
               const findPrice = prices.find(p => p.command === o.command);
               if (findPrice && priceSystem.enabled) {
                 if (findPrice.price > 0 && findPrice.priceBits === 0) {
@@ -640,7 +641,7 @@ class Message {
                 commands = [];
               }
             }
-            return _.size(commands) === 0 ? ' ' : (_.map(commands, (o) => {
+            return commands.length === 0 ? ' ' : (commands.map((o) => {
               const findPrice = prices.find(p => p.command === o.command);
               if (findPrice && priceSystem.enabled) {
                 if (findPrice.price > 0 && findPrice.priceBits === 0) {
@@ -654,30 +655,28 @@ class Message {
               return o.command;
             })).sort().join(', ');
           case 'cooldown':
-            listOutput = _.map(cooldowns, function (o, k) {
+            listOutput = cooldowns.map((o) => {
               const time = o.miliseconds;
               return o.name + ': ' + (time / 1000) + 's';
             }).sort().join(', ');
             return listOutput.length > 0 ? listOutput : ' ';
           case 'price':
-            listOutput = (await Promise.all(
-              _.map(prices, async (o) => {
-                return `${o.command} (${o.price}${await points.getPointsName(o.price)})`;
-              })
-            )).join(', ');
+            listOutput = prices.map((o) => {
+              return `${o.command} (${o.price}${points.getPointsName(o.price)})`;
+            }).join(', ');
             return listOutput.length > 0 ? listOutput : ' ';
           case 'ranks':
-            listOutput = _.map(_.orderBy(ranks.filter(o => o.type === 'viewer'), 'value', 'asc'), (o) => {
+            listOutput = _.orderBy(ranks.filter(o => o.type === 'viewer'), 'value', 'asc').map((o) => {
               return `${o.rank} (${o.value}h)`;
             }).join(', ');
             return listOutput.length > 0 ? listOutput : ' ';
           case 'ranks.follow':
-            listOutput = _.map(_.orderBy(ranks.filter(o => o.type === 'follower'), 'value', 'asc'), (o) => {
+            listOutput = _.orderBy(ranks.filter(o => o.type === 'follower'), 'value', 'asc').map((o) => {
               return `${o.rank} (${o.value} ${getLocalizedName(o.value, translate('core.months'))})`;
             }).join(', ');
             return listOutput.length > 0 ? listOutput : ' ';
           case 'ranks.sub':
-            listOutput = _.map(_.orderBy(ranks.filter(o => o.type === 'subscriber'), 'value', 'asc'), (o) => {
+            listOutput = _.orderBy(ranks.filter(o => o.type === 'subscriber'), 'value', 'asc').map((o) => {
               return `${o.rank} (${o.value} ${getLocalizedName(o.value, translate('core.months'))})`;
             }).join(', ');
             return listOutput.length > 0 ? listOutput : ' ';
@@ -804,13 +803,13 @@ class Message {
 
         const randomVar = {
           online: {
-            viewer: _.sample(_.map(onlineViewers, 'username')),
-            follower: _.sample(_.map(onlineFollowers, 'username')),
-            subscriber: _.sample(_.map(onlineSubscribers, 'username')),
+            viewer: sample(onlineViewers.map(o => o.username)),
+            follower: sample(onlineFollowers.map(o => o.username)),
+            subscriber: sample(onlineSubscribers.map(o => o.username)),
           },
-          viewer: _.sample(_.map(allUsers, 'username')),
-          follower: _.sample(_.map(_.filter(allUsers, (o) => _.get(o, 'is.follower', false)), 'username')),
-          subscriber: _.sample(_.map(_.filter(allUsers, (o) => _.get(o, 'is.subscriber', false)), 'username')),
+          viewer: sample(allUsers.map(o => o.username)),
+          follower: sample(allUsers.filter((o) => _.get(o, 'is.follower', false)).map(o => o.username)),
+          subscriber: sample(allUsers.filter((o) => _.get(o, 'is.subscriber', false)).map(o => o.username)),
         };
         const is = {
           follower: user.isFollower, subscriber: user.isSubscriber, moderator: user.isModerator, vip: user.isVIP, online: user.isOnline,
@@ -973,7 +972,7 @@ class Message {
     // local replaces
     if (!_.isNil(attr)) {
       for (let [key, value] of Object.entries(attr)) {
-        if (_.includes(['sender'], key)) {
+        if (key === 'sender') {
           if (typeof value.username !== 'undefined') {
             value = tmi.showWithAt && attr.forceWithoutAt !== true ? `@${value.username}` : value.username;
           } else {
@@ -1053,7 +1052,7 @@ class Message {
       // we want to handle # as \w - number in regexp
       regexp = regexp.replace(/#/g, '.*?');
       const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
-      if (!_.isNull(rMessage)) {
+      if (rMessage !== null) {
         for (const bkey in rMessage) {
           this.message = this.message.replace(rMessage[bkey], await fnc(rMessage[bkey])).trim();
         }
@@ -1076,7 +1075,7 @@ class Message {
       // we want to handle # as \w - number in regexp
       regexp = regexp.replace(/#/g, '(\\S+)');
       const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
-      if (!_.isNull(rMessage)) {
+      if (rMessage !== null) {
         for (const bkey in rMessage) {
           if (!(await fnc(rMessage[bkey]))) {
             this.message = '';
@@ -1103,7 +1102,7 @@ class Message {
       // we want to handle # as \w - number in regexp
       regexp = regexp.replace(/#/g, '([\\S ]+)');
       const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
-      if (!_.isNull(rMessage)) {
+      if (rMessage !== null) {
         for (const bkey in rMessage) {
           const newString = await fnc(rMessage[bkey]);
           if (_.isUndefined(newString) || newString.length === 0) {
@@ -1129,7 +1128,7 @@ class Message {
 
       regexp = regexp.replace(/#/g, '([a-zA-Z0-9_]+)');
       const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
-      if (!_.isNull(rMessage)) {
+      if (rMessage !== null) {
         for (const bkey in rMessage) {
           const newString = await fnc(rMessage[bkey]);
           if ((_.isNil(newString) || newString.length === 0) && removeWhenEmpty) {
@@ -1159,7 +1158,7 @@ class Message {
         regexp = regexp.replace(/#/g, '([\\S ]+?)'); // default behavior for if
       }
       const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
-      if (!_.isNull(rMessage)) {
+      if (rMessage !== null) {
         for (const bkey in rMessage) {
           const newString = await fnc(rMessage[bkey]);
           if ((_.isNil(newString) || newString.length === 0) && removeWhenEmpty) {

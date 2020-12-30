@@ -516,7 +516,7 @@ class Raffles extends System {
 
     let _total = 0;
     const [fLuck, sLuck] = await Promise.all([this.followersPercent, this.subscribersPercent]);
-    for (const participant of _.filter(raffle.participants, (o) => o.isEligible)) {
+    for (const participant of raffle.participants.filter((o) => o.isEligible)) {
       if (participant.isFollower || participant.isSubscriber) {
         if (participant.isSubscriber) {
           _total = _total + ((participant.tickets / 100) * sLuck);
@@ -530,7 +530,7 @@ class Raffles extends System {
 
     let winNumber = _.random(0, _total - 1, false);
     let winner: Readonly<RaffleParticipantInterface> | null = null;
-    for (const participant of _.filter(raffle.participants, (o) => o.isEligible)) {
+    for (const participant of raffle.participants.filter((o) => o.isEligible)) {
       let tickets = participant.tickets;
 
       if (participant.isSubscriber) {

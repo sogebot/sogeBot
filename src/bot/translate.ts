@@ -112,7 +112,7 @@ class Translate {
   get (text: string, orig: string | boolean) {
     try {
       let translated = '';
-      const customTranslated = _.find(this.custom, function (o) {
+      const customTranslated = this.custom.find((o) => {
         return o.name === text;
       });
       if (customTranslated && customTranslated.value && !orig) {

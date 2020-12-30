@@ -203,7 +203,7 @@ class Permissions extends Core {
       });
     }
 
-    if (_.filter(oauth.generalOwners, (o) => _.isString(o) && o.trim().length > 0).length === 0 && getBroadcaster() === '' && !isWarnedAboutCasters) {
+    if (oauth.generalOwners.filter(o => typeof o === 'string' && o.trim().length > 0).length === 0 && getBroadcaster() === '' && !isWarnedAboutCasters) {
       isWarnedAboutCasters = true;
       warning('Owners or broadcaster oauth is not set, all users are treated as CASTERS!!!');
       const pItem = await getRepository(PermissionsEntity).findOne({ id: permission.CASTERS });
@@ -256,7 +256,7 @@ class Permissions extends Core {
           shouldProceed = true;
           break;
         case 'casters':
-          if (_.filter(oauth.generalOwners, _.isString).length === 0 && getBroadcaster() === '') {
+          if (oauth.generalOwners.filter(o => typeof o === 'string').length === 0 && getBroadcaster() === '') {
             shouldProceed = true;
           } else {
             shouldProceed = isBot(user) || isBroadcaster(user) || isOwner(user);

@@ -197,13 +197,13 @@ class Cooldown extends System {
           getRepository(CooldownEntity).find({ relations: ['viewers'] }),
         ]);
 
-        keywords = _.filter(keywords, function (o) {
+        keywords = keywords.filter(o => {
           return opts.message.toLowerCase().search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword.toLowerCase()) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0;
         });
 
         data = [];
         for (const keyword of keywords) {
-          const cooldown = _.find(cooldowns, (o) => o.name.toLowerCase() === keyword.keyword.toLowerCase());
+          const cooldown = cooldowns.find((o) => o.name.toLowerCase() === keyword.keyword.toLowerCase());
           if (keyword.enabled) {
             if (cooldown) {
               data.push(cooldown);
