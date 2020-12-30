@@ -375,7 +375,6 @@ export default class AlertsRegistryOverlays extends Vue {
           if (emitData.event === 'rewardredeems') {
             possibleAlerts = (possibleAlerts as AlertRewardRedeemInterface[]).filter(o => o.rewardId === emitData.name)
           }
-
           if (possibleAlerts.length > 0) {
             // search for exact variants
             const possibleAlertsWithExactAmount = possibleAlerts.filter(o => {
