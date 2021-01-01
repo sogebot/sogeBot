@@ -6,7 +6,7 @@ import { ColumnNumericTransformer } from './_transformer';
 export interface EmitData {
   name: string;
   amount: number;
-  tier: number;
+  tier: null | 'Prime' | '1' | '2' | '3';
   recipient?: string;
   currency: string;
   monthsName: string;

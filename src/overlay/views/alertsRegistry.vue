@@ -394,14 +394,27 @@ export default class AlertsRegistryOverlays extends Vue {
             const possibleAlertsWithTierExactAmount = possibleAlerts.filter(o => {
               return o.enabled
                   && o.variantCondition === 'tier-exact'
-                  && o.variantAmount === emitData.tier
+                  && emitData.tier
+                  && (o.variantAmount === 0 ? 'Prime' : String(o.variantAmount)) === emitData.tier
             });
 
             // search for tier-gt-eq variants
             const possibleAlertsWithTierGtEqAmount = possibleAlerts.filter(o => {
+              const tiers = ['Prime', '1', '2', '3'];
+              const tier = (o.variantAmount === 0 ? 'Prime' : String(o.variantAmount));
+              const idx = tiers.findIndex((o) => o === tier);
+              const usable = tiers.slice(idx, tiers.length);
+              console.log({
+                tiers,
+                tier,
+                usable,
+                idx,
+              });
+
               return o.enabled
                   && o.variantCondition === 'tier-gt-eq'
-                  && o.variantAmount <= emitData.tier
+                  && emitData.tier
+                  && usable.includes(emitData.tier)
             });
 
             // search for random variants

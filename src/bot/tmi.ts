@@ -8,6 +8,7 @@ import Core from './_interface';
 import api from './api';
 import { getBotSender, getOwner, isOwner, prepare, sendMessage } from './commons';
 import * as constants from './constants';
+import type { EmitData } from './database/entity/alert';
 import { Price } from './database/entity/price';
 import { User, UserBitInterface } from './database/entity/user';
 import { settings, ui } from './decorators';
@@ -359,7 +360,7 @@ class TMI extends Core {
           event: 'hosts',
           name: username,
           amount: Number(viewers),
-          tier: 0,
+          tier: null,
           currency: '',
           monthsName: '',
           message: '',
@@ -394,7 +395,7 @@ class TMI extends Core {
         event: 'raids',
         name: message.parameters.login,
         amount: Number(message.parameters.viewerCount),
-        tier: 0,
+        tier: null,
         currency: '',
         monthsName: '',
         message: '',
@@ -435,7 +436,7 @@ class TMI extends Core {
       const username = message.tags.login;
       const subCumulativeMonths = Number(message.parameters.cumulativeMonths);
       const method = this.getMethod(message);
-      const tier = method.prime ? 'Prime' : method.plan / 1000;
+      const tier = (method.prime ? 'Prime' : String(method.plan / 1000)) as EmitData['tier'];
       const userstate = message.tags;
 
       if (isIgnored({username, userId: userstate.userId})) {
@@ -471,7 +472,7 @@ class TMI extends Core {
         event: 'subs',
         name: username,
         amount: 0,
-        tier: tier === 'Prime' ? 0 : Number(tier),
+        tier,
         currency: '',
         monthsName: '',
         message: '',
@@ -499,7 +500,7 @@ class TMI extends Core {
       const streakMonths = Number(message.parameters.multimonthTenure);
       const userstate = message.tags;
       const messageFromUser: string = message.message ?? '';
-      const tier = method.prime ? 'Prime' : String(method.plan / 1000);
+      const tier = (method.prime ? 'Prime' : String(method.plan / 1000)) as EmitData['tier'];
 
       if (isIgnored({username, userId: userstate.userId})) {
         return;
@@ -518,7 +519,7 @@ class TMI extends Core {
         ...user,
         isSubscriber: true,
         subscribedAt:  Number(dayjs().subtract(streakMonths, 'month').unix()) * 1000,
-        subscribeTier: tier,
+        subscribeTier: String(tier),
         subscribeCumulativeMonths: subCumulativeMonths,
         subscribeStreak: subStreak,
       });
@@ -550,7 +551,7 @@ class TMI extends Core {
         event: 'resubs',
         name: username,
         amount: Number(subCumulativeMonths),
-        tier: tier === 'Prime' ? 0 : Number(tier),
+        tier,
         currency: '',
         monthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
         message: messageFromUser,
@@ -589,7 +590,7 @@ class TMI extends Core {
         event: 'subcommunitygifts',
         name: username,
         amount: Number(count),
-        tier: 0,
+        tier: null,
         currency: '',
         monthsName: '',
         message: '',
@@ -662,7 +663,7 @@ class TMI extends Core {
         name: username,
         recipient,
         amount: subCumulativeMonths,
-        tier: 0,
+        tier: null,
         currency: '',
         monthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
         message: '',
@@ -747,7 +748,7 @@ class TMI extends Core {
                 recipient: username,
                 name: price.command,
                 amount: Number(userstate.bits),
-                tier: 0,
+                tier: null,
                 currency: '',
                 monthsName: '',
                 message: '',
@@ -764,7 +765,7 @@ class TMI extends Core {
           event: 'cheers',
           name: username,
           amount: Number(userstate.bits),
-          tier: 0,
+          tier: null,
           currency: '',
           monthsName: '',
           message: messageFromUser,

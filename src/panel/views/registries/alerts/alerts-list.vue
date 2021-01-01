@@ -24,7 +24,7 @@
       </template>
     </panel>
 
-    <b-modal id="alert-test-modal" title="Alert Tester" hide-footer><test/></b-modal>
+    <b-modal id="alert-test-modal" :title="translate('registry.alerts.testDlg.alertTester')" hide-footer><test/></b-modal>
 
     <loading v-if="state.loaded === $state.progress" />
     <b-alert show variant="danger" v-else-if="state.loaded === $state.success && filtered.length === 0 && search.length > 0">

@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-form>
-      <b-form-group id="event-type-input" label="Event:" label-for="event-type-input-select">
+      <b-form-group id="event-type-input" :label="translate('registry.alerts.testDlg.event')" label-for="event-type-input-select">
         <b-form-select
           id="event-type-input-select"
           v-model="event"
@@ -11,7 +11,8 @@
           </b-form-select-option>
         </b-form-select>
       </b-form-group>
-      <b-form-group id="event-username-input" label="Username:" label-for="event-username-input-text">
+
+      <b-form-group v-if="event !== 'rewardredeems'" id="event-username-input" :label="event === 'cmdredeems' ? translate('registry.alerts.testDlg.command') : translate('registry.alerts.testDlg.username')" label-for="event-username-input-text">
         <b-input-group>
           <template #prepend>
             <b-button :variant="isUsernameRandomized ? 'success':'danger'" @click="isUsernameRandomized = !isUsernameRandomized">
@@ -24,13 +25,38 @@
           <b-form-input
             id="event-username-input-text"
             v-model="username"
-            placeholder="Enter username"
             :disabled="isUsernameRandomized"
           ></b-form-input>
         </b-input-group>
       </b-form-group>
 
-      <b-form-group id="event-autohost-input" label="Autohost:" label-for="event-autohost-input-text" v-show="event === 'hosts'">
+      <b-form-group
+        v-show="event === 'rewardredeems'"
+        :label="translate('events.definitions.titleOfReward.label')"
+        :label-for="'selectReward'"
+      >
+        <rewards :value.sync="reward" :state="null" />
+    </b-form-group>
+
+      <b-form-group id="event-recipient-input" :label="translate('registry.alerts.testDlg.recipient')" label-for="event-recipient-input-text" v-if="haveRecipient">
+        <b-input-group>
+          <template #prepend>
+            <b-button :variant="isRecipientRandomized ? 'success':'danger'" @click="isRecipientRandomized = !isRecipientRandomized">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-shuffle" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.624 9.624 0 0 0 7.556 8a9.624 9.624 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.595 10.595 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.624 9.624 0 0 0 6.444 8a9.624 9.624 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5z"/>
+                <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z"/>
+              </svg>
+            </b-button>
+          </template>
+          <b-form-input
+            id="event-recipient-input-text"
+            v-model="recipient"
+            :disabled="isRecipientRandomized"
+          ></b-form-input>
+        </b-input-group>
+      </b-form-group>
+
+      <b-form-group id="event-autohost-input" :label="translate('registry.alerts.testDlg.autohost')" label-for="event-autohost-input-text" v-show="event === 'hosts'">
         <b-input-group>
           <template #prepend>
             <b-button :variant="isAutohostRandomized ? 'success':'danger'" @click="isAutohostRandomized = !isAutohostRandomized">
@@ -59,16 +85,52 @@
               </svg>
             </b-button>
           </template>
+          <template #append v-if="event === 'tips'">
+            <select class="form-control" v-model="currency">
+              <option value="USD">USD</option>
+              <option value="AUD">AUD</option>
+              <option value="BGN">BGN</option>
+              <option value="BRL">BRL</option>
+              <option value="CAD">CAD</option>
+              <option value="CHF">CHF</option>
+              <option value="CNY">CNY</option>
+              <option value="CZK">CZK</option>
+              <option value="DKK">DKK</option>
+              <option value="EUR">EUR</option>
+              <option value="GBP">GBP</option>
+              <option value="HKD">HKD</option>
+              <option value="HRK">HRK</option>
+              <option value="HUF">HUF</option>
+              <option value="IDR">IDR</option>
+              <option value="ILS">ILS</option>
+              <option value="INR">INR</option>
+              <option value="ISK">ISK</option>
+              <option value="JPY">JPY</option>
+              <option value="KRW">KRW</option>
+              <option value="MXN">MXN</option>
+              <option value="MYR">MYR</option>
+              <option value="NOK">NOK</option>
+              <option value="NZD">NZD</option>
+              <option value="PHP">PHP</option>
+              <option value="PLN">PLN</option>
+              <option value="RON">RON</option>
+              <option value="RUB">RUB</option>
+              <option value="SEK">SEK</option>
+              <option value="SGD">SGD</option>
+              <option value="THB">THB</option>
+              <option value="TRY">TRY</option>
+              <option value="ZAR">ZAR</option>
+            </select>
+          </template>
           <b-form-input
             id="event-amount-input-text"
             v-model.number="amount"
-            placeholder="Enter amount"
             :disabled="isAmountRandomized"
           ></b-form-input>
         </b-input-group>
       </b-form-group>
 
-      <b-form-group id="event-message-input" label="Message:" label-for="event-message-input-text" v-if="haveMessage">
+      <b-form-group id="event-message-input" :label="translate('registry.alerts.testDlg.message')" label-for="event-message-input-text" v-if="haveMessage">
         <b-input-group>
           <template #prepend>
             <b-button :variant="isMessageRandomized ? 'success':'danger'" @click="isMessageRandomized = !isMessageRandomized">
@@ -81,7 +143,6 @@
           <b-form-textarea
             id="event-message-input-text"
             v-model="message"
-            placeholder="Enter message"
             :disabled="isMessageRandomized"
             rows="3"
             max-rows="6"
@@ -89,7 +150,7 @@
         </b-input-group>
       </b-form-group>
 
-      <b-form-group id="event-tier-input" label="Tier:" label-for="event-tier-input-text" v-show="haveTier">
+      <b-form-group id="event-tier-input" :label="translate('registry.alerts.testDlg.tier')" label-for="event-tier-input-text" v-show="haveTier">
         <b-input-group>
           <template #prepend>
             <b-button :variant="isTierRandomized ? 'success':'danger'" @click="isTierRandomized = !isTierRandomized">
@@ -109,16 +170,6 @@
         </b-input-group>
       </b-form-group>
 
-      <b-form-group
-        v-show="event === 'rewardredeems'"
-        :label="translate('events.definitions.titleOfReward.label')"
-        :label-for="'selectReward'"
-      >
-        <rewards :value.sync="reward" :state="null" />
-    </b-form-group>
-
-
-
       <div class="d-flex align-items-center px-3 pt-3 border-top" style="justify-content: flex-end">
         <b-button class="mx-2" @click="$bvModal.hide('alert-test-modal')" variant="link">{{ translate('dialog.buttons.close') }}</b-button>
         <b-button @click="onSubmit" variant="primary">Test</b-button>
@@ -128,6 +179,10 @@
 </template>
 <script lang="ts">
 import { computed, defineComponent, ref } from '@vue/composition-api'
+import { random } from 'lodash';
+import { EmitData } from 'src/bot/database/entity/alert';
+import { shuffle } from 'src/bot/helpers/array/shuffle';
+import { generateUsername } from 'src/bot/helpers/generateUsername';
 
 import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
@@ -141,7 +196,14 @@ export default defineComponent({
   setup(props, ctx) {
     const event = ref('follows' as typeof events[number])
     const username = ref('');
+    const reward = ref('');
     const isUsernameRandomized = ref(true);
+
+    const recipient = ref('');
+    const isRecipientRandomized = ref(true);
+    const haveRecipient = computed(() => {
+      return ['rewardredeems', 'subgift'].includes(event.value)
+    });
 
     const message = ref('');
     const isMessageRandomized = ref(true);
@@ -157,21 +219,22 @@ export default defineComponent({
     const haveAmount = computed(() => {
       return amountLabel.value !== null;
     });
+    const currency = ref(ctx.root.$store.state.configuration.currency);
     const amountLabel = computed(() => {
       switch(event.value) {
         case 'hosts':
         case 'raids':
-          return 'Amount of viewers:';
+          return translate('registry.alerts.testDlg.amountOfViewers');
         case 'cheers':
         case 'cmdredeems':
-          return 'Amount of bits:';
+          return translate('registry.alerts.testDlg.amountOfBits');
         case 'tips':
-          return `Tip value (${ctx.root.$store.state.configuration.currency}):`;
+          return translate('registry.alerts.testDlg.amountOfTips');
         case 'subcommunitygifts':
-          return `Gifts amount:`;
+          return translate('registry.alerts.testDlg.amountOfGifts');
         case 'resubs':
         case 'subgifts':
-          return `Months:`;
+          return translate('registry.alerts.testDlg.amountOfMonths');
         default:
           return null;
       }
@@ -183,20 +246,46 @@ export default defineComponent({
       return ['subs', 'resubs'].includes(event.value)
     });
 
-    const reward = ref('');
-
     const tiers = ['Prime', '1', '2', '3'] as const;
     const events = ['follows', 'cheers', 'tips', 'subs', 'resubs', 'subcommunitygifts', 'subgifts', 'hosts', 'raids', 'cmdredeems', 'rewardredeems'] as const;
 
+
     const onSubmit = () => {
-      socket.emit('test', event.value)
+      const messages = [
+        'Lorem ipsum dolor sit amet, https://www.google.com',
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Etiam dictum tincidunt diam. Aliquam erat volutpat. Mauris tincidunt sem sed arcu. Etiam sapien elit, consequat eget, tristique non, venenatis quis, ante. Praesent id justo in neque elementum ultrices. Integer pellentesque quam vel velit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Etiam commodo dui eget wisi. Cras pede libero, dapibus nec, pretium sit amet, tempor quis. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.',
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.',
+        'This is some testing message :)',
+        'Lorem ipsum dolor sit amet',
+        '',
+      ];
+
+      const emit: EmitData = {
+        amount: isAmountRandomized.value ? Math.floor(Math.random() * 1000) : amount.value,
+        name:
+          event.value === 'rewardredeems' ? reward.value :
+            (isUsernameRandomized.value ? generateUsername() : username.value),
+        tier: isTierRandomized.value ? tiers[shuffle([0,1,2,3])[0]] : tier.value,
+        recipient: isRecipientRandomized.value ? generateUsername() : recipient.value,
+        currency: currency.value,
+        message: isMessageRandomized.value ? shuffle(messages)[0] : message.value,
+        autohost: isAutohostRandomized.value ? random(0, 1, false) === 0: autohost.value,
+        event: event.value,
+        monthsName: '' // will be added at server
+      }
+      socket.emit('test', emit)
     }
     return {
       event,
       events,
 
+      reward,
       username,
       isUsernameRandomized,
+
+      recipient,
+      isRecipientRandomized,
+      haveRecipient,
 
       autohost,
       isAutohostRandomized,
@@ -205,6 +294,7 @@ export default defineComponent({
       isAmountRandomized,
       haveAmount,
       amountLabel,
+      currency,
 
       tier,
       tiers,
@@ -214,8 +304,6 @@ export default defineComponent({
       message,
       isMessageRandomized,
       haveMessage,
-
-      reward,
 
       onSubmit,
 
