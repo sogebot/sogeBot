@@ -12,7 +12,7 @@ import { Settings } from './database/entity/settings';
 import { commandsToRegister, loadingInProgress, permissions as permissionsList } from './decorators';
 import { getFunctionList } from './decorators/on';
 import { invalidateParserCache, refreshCachedCommandPermissions } from './helpers/cache';
-import { isDbConnected } from './helpers/database';
+import { isBotStarted } from './helpers/database';
 import { flatten, unflatten } from './helpers/flatten';
 import { error, info, warning } from './helpers/log';
 import { addMenu, addMenuPublic, addWidget, ioServer, menu, menuPublic } from './helpers/panel';
@@ -131,7 +131,7 @@ class Module {
     this._sockets();
 
     const load = () => {
-      if (isDbConnected) {
+      if (isBotStarted) {
         setTimeout(async () => {
           const state = this._name === 'core' ? true : await this.loadVariableValue('enabled');
           const onStartup = async () => {

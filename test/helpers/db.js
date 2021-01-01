@@ -31,6 +31,8 @@ const { HeistUser } = require('../../dest/database/entity/heist')
 
 const translation = (require('../../dest/translate')).default;
 
+let initialCleanup = true;
+
 module.exports = {
   cleanup: async function () {
     const waitForIt = async (resolve, reject) => {
@@ -39,6 +41,10 @@ module.exports = {
         return setTimeout(() => waitForIt(resolve, reject), 1000);
       } else {
         debug('test', `Bot is started`);
+        if (initialCleanup) {
+          await waitMs(5000);
+          initialCleanup = false;
+        }
       }
 
       const oauth = (require('../../dest/oauth')).default;
