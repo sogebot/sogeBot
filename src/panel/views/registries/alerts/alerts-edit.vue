@@ -24,14 +24,7 @@
         </hold-button>
       </template>
       <template v-slot:right v-if="state.loaded === $state.success">
-        <b-dropdown id="dropdown-buttons" :text="translate('registry.alerts.test')" class="m-2" :disabled="pending">
-          <b-dropdown-item-button
-            @click="socket.emit('test', event)"
-            v-for="event of supportedEvents"
-            v-bind:key="event">
-            {{ translate('registry.alerts.event.' + event) }}</b-dropdown-item-button>
-        </b-dropdown>
-
+        <b-button variant="secondary" v-b-modal.alert-test-modal :disabled="pending">{{translate('registry.alerts.test')}}</b-button>
         <button-with-icon
           v-if="$route.params.id && state.loaded === $state.success"
           :text="'/overlays/alerts/' + item.id"
@@ -44,6 +37,8 @@
         <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$error || !isAllValid"/>
       </template>
     </panel>
+
+    <b-modal id="alert-test-modal" :title="translate('registry.alerts.testDlg.alertTester')" hide-footer><test/></b-modal>
 
     <loading v-if="state.loaded !== $state.success" />
     <b-form v-else>
@@ -205,6 +200,7 @@ Component.registerHooks([
     'form-hosts': () => import('./components/form-hosts.vue'),
     'form-reward': () => import('./components/form-reward.vue'),
     'title-divider': () => import('src/panel/components/title-divider.vue'),
+    'test': () => import('./alerts-test.vue'),
   },
   filters: {
     capitalize: function (value: string) {

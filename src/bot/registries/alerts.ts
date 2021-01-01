@@ -1,9 +1,7 @@
 import { getRepository, In, IsNull, Not } from 'typeorm';
 
-import currency from '../currency';
 import { Alert, AlertCheer, AlertCommandRedeem, AlertFollow, AlertHost, AlertInterface, AlertMedia, AlertMediaInterface, AlertRaid, AlertResub, AlertSub, AlertSubcommunitygift, AlertSubgift, AlertTip, EmitData } from '../database/entity/alert';
 import { persistent } from '../decorators';
-import { generateUsername } from '../helpers/generateUsername';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { debug } from '../helpers/log';
 import { app, ioServer } from '../helpers/panel';
@@ -190,8 +188,11 @@ class Alerts extends Registry {
         });
       }
     });
-    publicEndpoint(this.nsp, 'test', async (event: keyof Omit<AlertInterface, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList'>) => {
-      this.test({ event });
+    publicEndpoint(this.nsp, 'test', async (data: EmitData) => {
+      this.trigger({
+        ...data,
+        monthsName: getLocalizedName(data.amount, translate('core.months')),
+      });
     });
   }
 
@@ -199,34 +200,6 @@ class Alerts extends Registry {
     if (!this.areAlertsMuted) {
       ioServer?.of('/registries/alerts').emit('alert', opts);
     }
-  }
-
-  test(opts: { event: keyof Omit<AlertInterface, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList'> }) {
-    const amount = Math.floor(Math.random() * 1000);
-    const tier = Math.floor(Math.random() * 4);
-    const messages = [
-      'Lorem ipsum dolor sit amet, https://www.google.com',
-      'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Etiam dictum tincidunt diam. Aliquam erat volutpat. Mauris tincidunt sem sed arcu. Etiam sapien elit, consequat eget, tristique non, venenatis quis, ante. Praesent id justo in neque elementum ultrices. Integer pellentesque quam vel velit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Etiam commodo dui eget wisi. Cras pede libero, dapibus nec, pretium sit amet, tempor quis. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.',
-      'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.',
-      'This is some testing message :)',
-      'Lorem ipsum dolor sit amet',
-      '',
-    ];
-    const data: EmitData = {
-      name: opts.event === 'cmdredeems' ? '!' + generateUsername() : generateUsername(),
-      amount,
-      tier,
-      recipient: generateUsername(),
-      currency: currency.mainCurrency,
-      monthsName: getLocalizedName(amount, translate('core.months')),
-      event: opts.event,
-      autohost: true,
-      message: ['tips', 'cheers', 'resubs', 'rewardredeems'].includes(opts.event)
-        ? messages[Math.floor(Math.random() * messages.length)]
-        : '',
-    };
-
-    this.trigger(data);
   }
 }
 

@@ -20,15 +20,11 @@
           <fa icon="bell-slash" fixed-width v-else />
         </b-button>
         <b-tooltip target="registryAlertsToggleButton" :title="areAlertsMuted ? 'Alerts are disabled.' : 'Alerts are enabled!'"></b-tooltip>
-        <b-dropdown id="dropdown-buttons" :text="translate('registry.alerts.test')" class="m-2">
-          <b-dropdown-item-button
-            @click="socket.emit('test', event)"
-            v-for="event of ['follows', 'cheers', 'tips', 'subs', 'resubs', 'subcommunitygifts', 'subgifts', 'hosts', 'raids', 'cmdredeems', 'rewardredeems']"
-            v-bind:key="event">
-            {{ translate('registry.alerts.event.' + event) }}</b-dropdown-item-button>
-        </b-dropdown>
+        <b-button variant="secondary" v-b-modal.alert-test-modal>{{translate('registry.alerts.test')}}</b-button>
       </template>
     </panel>
+
+    <b-modal id="alert-test-modal" :title="translate('registry.alerts.testDlg.alertTester')" hide-footer><test/></b-modal>
 
     <loading v-if="state.loaded === $state.progress" />
     <b-alert show variant="danger" v-else-if="state.loaded === $state.success && filtered.length === 0 && search.length > 0">
@@ -111,6 +107,7 @@ library.add(faClone, faBell, faBellSlash);
 @Component({
   components: {
     'loading': () => import('../../../components/loading.vue'),
+    'test': () => import('./alerts-test.vue'),
   },
   filters: {
     capitalize: function (value: string) {

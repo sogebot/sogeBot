@@ -1,5 +1,6 @@
 import { getRepository } from 'typeorm';
 
+import type { EmitData } from '../database/entity/alert';
 import { EventList as EventListDB } from '../database/entity/eventList';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { error } from '../helpers/log';
@@ -47,7 +48,7 @@ class EventList extends Widget {
               event: eventType,
               name: await users.getNameById(event.userId),
               amount: 0,
-              tier: Number(values.tier === 'Prime' ? 0 : values.tier),
+              tier: String(values.tier) as EmitData['tier'],
               currency: '',
               monthsName: '',
               message: '',
@@ -60,7 +61,7 @@ class EventList extends Widget {
               event: eventType,
               name: await users.getNameById(event.userId),
               amount: Number(values.viewers),
-              tier: 0,
+              tier: null,
               currency: '',
               monthsName: '',
               message: '',
@@ -72,7 +73,7 @@ class EventList extends Widget {
               event: eventType,
               name: await users.getNameById(event.userId),
               amount: Number(values.subCumulativeMonths),
-              tier: Number(values.tier === 'Prime' ? 0 : values.tier),
+              tier: String(values.tier) as EmitData['tier'],
               currency: '',
               monthsName: getLocalizedName(values.subCumulativeMonths, translate('core.months')),
               message: values.message,
@@ -84,7 +85,7 @@ class EventList extends Widget {
               event: eventType,
               name: await users.getNameById(event.userId),
               amount: Number(values.count),
-              tier: 0,
+              tier: null,
               currency: '',
               monthsName: '',
               message: '',
@@ -96,7 +97,7 @@ class EventList extends Widget {
               event: eventType,
               name: await users.getNameById(event.userId),
               amount: Number(values.bits),
-              tier: 0,
+              tier: null,
               currency: '',
               monthsName: '',
               message: values.message,
@@ -108,7 +109,7 @@ class EventList extends Widget {
               event: eventType,
               name: await users.getNameById(event.userId),
               amount: Number(values.amount),
-              tier: 0,
+              tier: null,
               currency: values.currency,
               monthsName: '',
               message: values.message,
