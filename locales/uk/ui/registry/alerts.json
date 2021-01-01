@@ -1,5 +1,20 @@
 {
   "enabled": "Enabled",
+  "testDlg": {
+    "alertTester": "Alert tester",
+    "command": "Command",
+    "username": "Username",
+    "recipient": "Recipient",
+    "autohost": "Autohost",
+    "message": "Message",
+    "tier": "Tier",
+    "amountOfViewers": "Amount of viewers",
+    "amountOfBits": "Amount of bits",
+    "amountOfGifts": "Amount of gifts",
+    "amountOfMonths": "Amount of months",
+    "amountOfTips": "Tip",
+    "event": "Event"
+  },
   "empty": "Alerts registry is empty, create new alerts.",
   "emptyAfterSearch": "Alerts registry is empty in searching for \"<strong>$search</strong>\"",
   "revertcode": "Revert code to defaults",
