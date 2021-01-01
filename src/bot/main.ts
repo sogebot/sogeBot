@@ -2,10 +2,6 @@ require('dotenv').config();
 
 Error.stackTraceLimit = Infinity;
 
-setInterval(() => {
-  shuffle(['short', 'someFreakingLongUsername', 'Lorem', 'Ipsum'])[0];
-}, 100);
-
 import 'reflect-metadata';
 
 import { existsSync, unlinkSync } from 'fs';
@@ -21,7 +17,6 @@ import { createConnection, getConnectionOptions } from 'typeorm';
 import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 
 import { changelog } from './changelog';
-import { shuffle } from './helpers/array/shuffle';
 import { autoLoad } from './helpers/autoLoad';
 import { setIsBotStarted } from './helpers/database';
 import { debug, error, info, isDebugEnabled, setDEBUG, warning } from './helpers/log';
