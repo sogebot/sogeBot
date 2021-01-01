@@ -1,5 +1,20 @@
 {
   "enabled": "Status",
+  "testDlg": {
+    "alertTester": "Alert tester",
+    "command": "Command",
+    "username": "Username",
+    "recipient": "Recipient",
+    "autohost": "Autohost",
+    "message": "Message",
+    "tier": "Tier",
+    "amountOfViewers": "Amount of viewers",
+    "amountOfBits": "Amount of bits",
+    "amountOfGifts": "Amount of gifts",
+    "amountOfMonths": "Amount of months",
+    "amountOfTips": "Tip",
+    "event": "Event"
+  },
   "empty": "Registr alertů je prázdný, vytvořte nový.",
   "emptyAfterSearch": "Registr alertů je prázdný při hledání \"<strong>$search</strong>\"",
   "revertcode": "Vrátit kód do výchozího stavu",
