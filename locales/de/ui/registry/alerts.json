@@ -1,5 +1,20 @@
 {
   "enabled": "Aktiviert",
+  "testDlg": {
+    "alertTester": "Alert tester",
+    "command": "Command",
+    "username": "Username",
+    "recipient": "Recipient",
+    "autohost": "Autohost",
+    "message": "Message",
+    "tier": "Tier",
+    "amountOfViewers": "Amount of viewers",
+    "amountOfBits": "Amount of bits",
+    "amountOfGifts": "Amount of gifts",
+    "amountOfMonths": "Amount of months",
+    "amountOfTips": "Tip",
+    "event": "Event"
+  },
   "empty": "Die Alert-Registry ist leer, erstelle einen neuen Alert.",
   "emptyAfterSearch": "Alert Registry leer! Bei der Suche nach \"<strong>$search</strong>\" wurden keine Alerts gefunden",
   "revertcode": "Auf Standard zurücksetzen",
