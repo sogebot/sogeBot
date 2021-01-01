@@ -1,5 +1,20 @@
 {
   "enabled": "Включено",
+  "testDlg": {
+    "alertTester": "Alert tester",
+    "command": "Command",
+    "username": "Username",
+    "recipient": "Recipient",
+    "autohost": "Autohost",
+    "message": "Message",
+    "tier": "Tier",
+    "amountOfViewers": "Amount of viewers",
+    "amountOfBits": "Amount of bits",
+    "amountOfGifts": "Amount of gifts",
+    "amountOfMonths": "Amount of months",
+    "amountOfTips": "Tip",
+    "event": "Event"
+  },
   "empty": "Список оповещений пуст, создайте новые оповещения.",
   "emptyAfterSearch": "Реестр оповещений пуст при поиске \"<strong>$search</strong>\"",
   "revertcode": "Сбросить к заводским настройкам",
