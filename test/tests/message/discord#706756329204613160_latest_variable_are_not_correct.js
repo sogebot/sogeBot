@@ -3,6 +3,7 @@ require('../../general.js');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
+const eventlist = require('../../../dest/overlays/eventlist.js').default;
 const Message = require('../../../dest/message').default;
 
 const assert = require('assert');
@@ -66,15 +67,12 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
 
   it ('Add 10 cheer events', async () => {
     for (let i = 30; i < 40; i++) {
-      await getRepository(EventList).save({
-        isTest: false,
+      await eventlist.add({
         event: 'cheer',
-        timestamp: 4000 * i,
-        userId: `${i}`,
-        values_json: JSON.stringify({
-          amount: i,
-          message: `message${i-30}`,
-        }),
+        userId: String(i),
+        bits: i,
+        message: `message${i-30}`,
+        timestamp: Date.now(),
       });
     }
   });

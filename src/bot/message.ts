@@ -119,7 +119,7 @@ class Message {
         .orderBy('events.timestamp', 'DESC')
         .where('events.event = :event', { event: 'cheer' })
         .getOne();
-      this.message = this.message.replace(/\$latestCheerAmount/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).amount : 'n/a');
+      this.message = this.message.replace(/\$latestCheerAmount/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).bits : 'n/a');
       this.message = this.message.replace(/\$latestCheerMessage/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).message : 'n/a');
       this.message = this.message.replace(/\$latestCheer/g, !_.isNil(latestCheer) ? await users.getNameById(latestCheer.userId) : 'n/a');
     }
