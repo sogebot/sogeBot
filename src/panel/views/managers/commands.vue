@@ -146,7 +146,7 @@
                       :value.sync="response.filter"
                       v-bind:placeholder="translate('systems.customcommands.filter.placeholder')"
                       v-on:update="response.filter = $event"
-                      v-bind:filters="['sender', 'source', 'haveParam', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'rank', 'game', 'language', 'title', 'views', 'followers', 'hosts', 'subscribers', 'isBotSubscriber']"
+                      v-bind:filters="['sender', 'source', 'param', 'haveParam', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'rank', 'game', 'language', 'title', 'views', 'followers', 'hosts', 'subscribers', 'isBotSubscriber']"
                       :state="true"
                     ></textarea-with-tags>
                   </b-col>

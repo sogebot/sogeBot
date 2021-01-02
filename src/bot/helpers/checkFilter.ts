@@ -46,7 +46,8 @@ export const checkFilter = async (opts: CommandOptions | ParserOptions, filter: 
     $sender: opts.sender.username,
     $is,
     $rank,
-    $haveParam: opts.parameters.length > 0,
+    $haveParam: opts.parameters?.length > 0,
+    $param: opts.parameters,
     // add global variables
     $game: api.stats.currentGame || 'n/a',
     $language: api.stats.language || 'en',
