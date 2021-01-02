@@ -7,7 +7,7 @@ import { getRepository } from 'typeorm';
 import api from '../api';
 import { announce } from '../commons';
 import { MINUTE, SECOND } from '../constants';
-import { Timer, TimerResponse } from '../database/entity/timer';
+import { Timer, TimerResponse, TimerResponseInterface } from '../database/entity/timer';
 import { command, default_permission } from '../decorators';
 import Expects from '../expects';
 import { isDbConnected } from '../helpers/database';
@@ -130,14 +130,26 @@ class Timers extends System {
         continue;
       } // not ready to trigger with seconds
 
-      const response = _.orderBy(timer.messages, 'timestamp', 'asc')[0];
+      const announceResponse = (responses: TimerResponseInterface[]) => {
+        // check if at least one response is enabled
+        if (responses.filter(o => o.isEnabled).length === 0) {
+          return;
+        }
 
-      if (response) {
-        announce(response.response, 'timers');
-        response.timestamp = Date.now();
-        await getRepository(TimerResponse).save(response);
-      }
-      await getRepository(Timer).save({ ...timer, triggeredAtMessages: linesParsed, triggeredAtTimestamp: Date.now() });
+        responses = _.orderBy(responses, 'timestamp', 'asc');
+        const response = responses.shift();
+        if (response) {
+          getRepository(TimerResponse).update({ id: response.id }, { timestamp: Date.now() });
+          if (!response.isEnabled) {
+            // go to next possibly enabled response
+            announceResponse(responses);
+          } else {
+            announce(response.response, 'timers');
+          }
+        }
+      };
+      announceResponse(timer.messages);
+      await getRepository(Timer).update({ id: timer.id }, { triggeredAtMessages: linesParsed, triggeredAtTimestamp: Date.now() });
     }
     this.timeouts.timersCheck = global.setTimeout(() => this.check(), SECOND); // this will run check 1s after full check is correctly done
   }
