@@ -54,7 +54,7 @@ describe('Timers - disabled response should not be sent to chat - https://discor
   })
 });
 
-describe.only('Timers - disabled responses should not be sent to chat - https://discord.com/channels/317348946144002050/619437014001123338/794910249910796288', () => {
+describe('Timers - disabled responses should not be sent to chat - https://discord.com/channels/317348946144002050/619437014001123338/794910249910796288', () => {
   let timer;
   before(async () => {
     await db.cleanup();
