@@ -1,0 +1,54 @@
+import axios from 'axios';
+
+import { ResponseFilter } from '.';
+
+const youtube: ResponseFilter = {
+  '$youtube(url, #)': async function (filter: string) {
+    const channel = filter
+      .replace('$youtube(url,', '')
+      .replace(')', '')
+      .trim();
+    try {
+      const response = await axios.get('https://www.youtube.com/channel/'+channel+'/videos?view=0&sort=dd');
+      const match = new RegExp('"videoId":"(.*?)",.*?title":{"runs":\\[{"text":"(.*?)"}]', 'gm').exec(response.data);
+      if (match) {
+        return `https://youtu.be/${match[1]}`;
+      } else {
+        return 'n/a';
+      }
+    } catch (e) {
+      const response = await axios.get('https://www.youtube.com/user/'+channel+'/videos?view=0&sort=dd');
+      const match = new RegExp('"videoId":"(.*?)",.*?title":{"runs":\\[{"text":"(.*?)"}]', 'gm').exec(response.data);
+      if (match) {
+        return `https://youtu.be/${match[1]}`;
+      } else {
+        return 'n/a';
+      }
+    }
+  },
+  '$youtube(title, #)': async function (filter: string) {
+    const channel = filter
+      .replace('$youtube(title,', '')
+      .replace(')', '')
+      .trim();
+    try {
+      const response = await axios.get('https://www.youtube.com/channel/'+channel+'/videos?view=0&sort=dd');
+      const match = new RegExp('"videoId":"(.*?)",.*?title":{"runs":\\[{"text":"(.*?)"}]', 'gm').exec(response.data);
+      if (match) {
+        return match[2];
+      } else {
+        return 'n/a';
+      }
+    } catch (e) {
+      const response = await axios.get('https://www.youtube.com/user/'+channel+'/videos?view=0&sort=dd');
+      const match = new RegExp('"videoId":"(.*?)",.*?title":{"runs":\\[{"text":"(.*?)"}]', 'gm').exec(response.data);
+      if (match) {
+        return match[2];
+      } else {
+        return 'n/a';
+      }
+    }
+  },
+};
+
+export { youtube };

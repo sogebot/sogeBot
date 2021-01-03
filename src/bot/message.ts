@@ -1,38 +1,16 @@
-import crypto from 'crypto';
-import querystring from 'querystring';
-
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import gitCommitInfo from 'git-commit-info';
 import _ from 'lodash';
-import { evaluate as mathJsEvaluate } from 'mathjs';
-import safeEval from 'safe-eval';
 import { getRepository } from 'typeorm';
 
 import api from './api';
-import { getBotSender, parserReply, prepare } from './commons';
-import currency from './currency';
-import customvariables from './customvariables';
-import { Alias } from './database/entity/alias';
-import { Commands } from './database/entity/commands';
-import { Cooldown } from './database/entity/cooldown';
+import { getBotSender } from './commons';
 import { EventList } from './database/entity/eventList';
-import { Price } from './database/entity/price';
-import { Rank } from './database/entity/rank';
-import { User, UserInterface } from './database/entity/user';
-import { sample } from './helpers/array/sample';
-import { getCountOfCommandUsage } from './helpers/commands/count';
-import { getLocalizedName } from './helpers/getLocalized';
+import { User } from './database/entity/user';
+import { command, custom, evaluate, ifp, info, list, math, online, param, price, qs, random, ResponseFilter, stream, youtube } from './filters';
 import { isBotSubscriber } from './helpers/isBot';
-import { isIgnored } from './helpers/isIgnored';
-import { debug, error, warning } from './helpers/log';
 import lastfm from './integrations/lastfm';
 import spotify from './integrations/spotify';
-import oauth from './oauth';
-import Parser from './parser';
-import permissions from './permissions';
-import customcommands from './systems/customcommands';
-import points from './systems/points';
-import {default as priceSystem} from './systems/price';
 import songs from './systems/songs';
 import tmi from './tmi';
 import { translate } from './translate';
@@ -157,818 +135,16 @@ class Message {
   async parse (attr: { [name: string]: any, sender: CommandOptions['sender'], 'message-type'?: string, forceWithoutAt?: boolean } = { sender: getBotSender() }) {
     this.message = await this.message; // if is promise
 
-    const random = {
-      '(random.online.viewer)': async function () {
-        const viewers = (await getRepository(User).createQueryBuilder('user')
-          .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-          .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
-          .andWhere('user.isOnline = :isOnline', { isOnline: true })
-          .cache(true)
-          .getMany())
-          .filter(o => {
-            return !isIgnored({ username: o.username, userId: o.userId });
-          });
-        if (viewers.length === 0) {
-          return 'unknown';
-        }
-        return sample(viewers.map(o => o.username ));
-      },
-      '(random.online.follower)': async function () {
-        const followers = (await getRepository(User).createQueryBuilder('user')
-          .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-          .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
-          .andWhere('user.isFollower = :isFollower', { isFollower: true })
-          .andWhere('user.isOnline = :isOnline', { isOnline: true })
-          .cache(true)
-          .getMany()).filter(o => {
-          return !isIgnored({ username: o.username, userId: o.userId });
-        });
-        if (followers.length === 0) {
-          return 'unknown';
-        }
-        return sample(followers.map(o => o.username ));
-      },
-      '(random.online.subscriber)': async function () {
-        const subscribers = (await getRepository(User).createQueryBuilder('user')
-          .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-          .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
-          .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
-          .andWhere('user.isOnline = :isOnline', { isOnline: true })
-          .cache(true)
-          .getMany()).filter(o => {
-          return !isIgnored({ username: o.username, userId: o.userId });
-        });
-        if (subscribers.length === 0) {
-          return 'unknown';
-        }
-        return sample(subscribers.map(o => o.username ));
-      },
-      '(random.viewer)': async function () {
-        const viewers = (await getRepository(User).createQueryBuilder('user')
-          .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-          .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
-          .cache(true)
-          .getMany()).filter(o => {
-          return !isIgnored({ username: o.username, userId: o.userId });
-        });
-        if (viewers.length === 0) {
-          return 'unknown';
-        }
-        return sample(viewers.map(o => o.username ));
-      },
-      '(random.follower)': async function () {
-        const followers = (await getRepository(User).createQueryBuilder('user')
-          .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-          .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
-          .andWhere('user.isFollower = :isFollower', { isFollower: true })
-          .cache(true)
-          .getMany()).filter(o => {
-          return !isIgnored({ username: o.username, userId: o.userId });
-        });
-        if (followers.length === 0) {
-          return 'unknown';
-        }
-        return sample(followers.map(o => o.username ));
-      },
-      '(random.subscriber)': async function () {
-        const subscribers = (await getRepository(User).createQueryBuilder('user')
-          .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-          .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
-          .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
-          .cache(true)
-          .getMany()).filter(o => {
-          return !isIgnored({ username: o.username, userId: o.userId });
-        });
-        if (subscribers.length === 0) {
-          return 'unknown';
-        }
-        return sample(subscribers.map(o => o.username ));
-      },
-      '(random.number-#-to-#)': async function (filter: string) {
-        const numbers = filter.replace('(random.number-', '')
-          .replace(')', '')
-          .split('-to-');
-
-        try {
-          return Math.floor(Number(numbers[0]) + (Math.random() * (Number(numbers[1]) - Number(numbers[0]))));
-        } catch (e) {
-          return 0;
-        }
-      },
-      '(random.true-or-false)': async function () {
-        return Math.random() < 0.5;
-      },
-    };
-    const custom = {
-      '$_#': async (variable: string) => {
-        if (!_.isNil(attr.param) && attr.param.length !== 0) {
-          const state = await customvariables.setValueOf(variable, attr.param, { sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' } });
-          if (state.updated.responseType === 0) {
-            // default
-            if (state.isOk && !state.isEval) {
-              const msg = prepare('filters.setVariable', { value: state.setValue, variable: variable });
-              parserReply(msg, { sender: attr.sender, attr: { skip: true, quiet: _.get(attr, 'quiet', false) } });
-            }
-            return state.updated.currentValue;
-          } else if (state.updated.responseType === 1) {
-            // custom
-            if (state.updated.responseText) {
-              parserReply(state.updated.responseText.replace('$value', state.setValue), { sender: attr.sender, attr: { skip: true, quiet: _.get(attr, 'quiet', false) }});
-            }
-            return '';
-          } else {
-            // command
-            return state.isOk && !state.isEval ? state.setValue : state.updated.currentValue;
-          }
-        }
-        return customvariables.getValueOf(variable, {
-          sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' },
-          param: attr.param,
-        });
-      },
-      // force quiet variable set
-      '$!_#': async (variable: string) => {
-        variable = variable.replace('$!_', '$_');
-        if (!_.isNil(attr.param) && attr.param.length !== 0) {
-          const state = await customvariables.setValueOf(variable, attr.param, { sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' } });
-          return state.updated.currentValue;
-        }
-        return customvariables.getValueOf(variable, {
-          sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' },
-          param: attr.param,
-        });
-      },
-      // force full quiet variable
-      '$!!_#': async (variable: string) => {
-        variable = variable.replace('$!!_', '$_');
-        if (!_.isNil(attr.param) && attr.param.length !== 0) {
-          await customvariables.setValueOf(variable, attr.param, { sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' } });
-        }
-        return '';
-      },
-    };
-    const param = {
-      '$touser': async function () {
-        if (typeof attr.param !== 'undefined') {
-          attr.param = attr.param.replace('@', '');
-          if (attr.param.length > 0) {
-            if (tmi.showWithAt) {
-              attr.param = '@' + attr.param;
-            }
-            return attr.param;
-          }
-        }
-        return (tmi.showWithAt ? '@' : '') + attr.sender.username;
-      },
-      '$param': async function () {
-        if (!_.isUndefined(attr.param) && attr.param.length !== 0) {
-          return attr.param;
-        }
-        return '';
-      },
-      '$!param': async function () {
-        if (!_.isUndefined(attr.param) && attr.param.length !== 0) {
-          return attr.param;
-        }
-        return 'n/a';
-      },
-    };
-    const qs = {
-      '$querystring': async function () {
-        if (!_.isUndefined(attr.param) && attr.param.length !== 0) {
-          return querystring.escape(attr.param);
-        }
-        return '';
-      },
-      '(url|#)': async function () {
-        try {
-          return encodeURI(attr.param);
-        } catch (e) {
-          return '';
-        }
-      },
-    };
-    const info = {
-      '$toptip.#.#': async function (filter: string) {
-        const match = filter.match(/\$toptip\.(?<type>overall|stream)\.(?<value>username|amount|message|currency)/);
-        if (!match) {
-          return '';
-        }
-
-        let tips = (await getRepository(EventList).createQueryBuilder('events')
-          .select('events')
-          .orderBy('events.timestamp', 'DESC')
-          .where('events.event >= :event', { event: 'tip' })
-          .andWhere('NOT events.isTest')
-          .getMany())
-          .sort((a, b) => {
-            const aValue = JSON.parse(a.values_json);
-            const bValue = JSON.parse(b.values_json);
-            const aTip = currency.exchange(aValue.amount, aValue.currency, currency.mainCurrency);
-            const bTip = currency.exchange(bValue.amount, bValue.currency, currency.mainCurrency);
-            return bTip - aTip;
-          });
-
-        const type = match.groups?.type;
-        if (type === 'stream') {
-          const whenOnline = api.isStreamOnline ? api.streamStatusChangeSince : null;
-          if (whenOnline) {
-            tips = tips.filter((o) => o.timestamp >= (new Date(whenOnline)).getTime());
-          } else {
-            return '';
-          }
-        }
-
-        if (tips.length > 0) {
-          const value = match.groups?.value;
-          switch(value) {
-            case 'amount':
-              return Number(JSON.parse(tips[0].values_json).amount).toFixed(2);
-            case 'currency':
-              return Number(JSON.parse(tips[0].values_json).currency);
-            case 'message':
-              return Number(JSON.parse(tips[0].values_json).message);
-            case 'username':
-              return users.getNameById(tips[0].userId);
-          }
-        }
-        return '';
-      },
-      '(game)': async function () {
-        return api.stats.currentGame || 'n/a';
-      },
-      '(status)': async function () {
-        return api.stats.currentTitle || 'n/a';
-      },
-    };
-    const youtube = {
-      '$youtube(url, #)': async function (filter: string) {
-        const channel = filter
-          .replace('$youtube(url,', '')
-          .replace(')', '')
-          .trim();
-        try {
-          const response = await axios.get('https://www.youtube.com/channel/'+channel+'/videos?view=0&sort=dd');
-          const match = new RegExp('"videoId":"(.*?)",.*?title":{"runs":\\[{"text":"(.*?)"}]', 'gm').exec(response.data);
-          if (match) {
-            return `https://youtu.be/${match[1]}`;
-          } else {
-            return 'n/a';
-          }
-        } catch (e) {
-          const response = await axios.get('https://www.youtube.com/user/'+channel+'/videos?view=0&sort=dd');
-          const match = new RegExp('"videoId":"(.*?)",.*?title":{"runs":\\[{"text":"(.*?)"}]', 'gm').exec(response.data);
-          if (match) {
-            return `https://youtu.be/${match[1]}`;
-          } else {
-            return 'n/a';
-          }
-        }
-      },
-      '$youtube(title, #)': async function (filter: string) {
-        const channel = filter
-          .replace('$youtube(title,', '')
-          .replace(')', '')
-          .trim();
-        try {
-          const response = await axios.get('https://www.youtube.com/channel/'+channel+'/videos?view=0&sort=dd');
-          const match = new RegExp('"videoId":"(.*?)",.*?title":{"runs":\\[{"text":"(.*?)"}]', 'gm').exec(response.data);
-          if (match) {
-            return match[2];
-          } else {
-            return 'n/a';
-          }
-        } catch (e) {
-          const response = await axios.get('https://www.youtube.com/user/'+channel+'/videos?view=0&sort=dd');
-          const match = new RegExp('"videoId":"(.*?)",.*?title":{"runs":\\[{"text":"(.*?)"}]', 'gm').exec(response.data);
-          if (match) {
-            return match[2];
-          } else {
-            return 'n/a';
-          }
-        }
-      },
-    };
-    const command = {
-      '$count(\'#\')': async function (filter: string) {
-        const countRegex = new RegExp('\\$count\\(\\\'(?<command>\\!\\S*)\\\'\\)', 'gm');
-        const match = countRegex.exec(filter);
-        if (match && match.groups) {
-          return String(await getCountOfCommandUsage(match.groups.command));
-        }
-        return '0';
-      },
-      '$count': async function () {
-        if (attr.command) {
-          return String((await getCountOfCommandUsage(attr.command)));
-        }
-        return '0';
-      },
-      '(!!#)': async function (filter: string) {
-        const cmd = filter
-          .replace('!', '') // replace first !
-          .replace(/\(|\)/g, '')
-          .replace(/\$param/g, attr.param);
-        debug('message.process', cmd);
-
-        // check if we already checked cmd
-        if (!attr.processedCommands) {
-          attr.processedCommands = [];
-        }
-        if (attr.processedCommands.includes(cmd)) {
-          error(`Response ${filter} seems to be in loop! ${attr.processedCommands.join('->')}->${attr.command}`);
-          debug('message.error', `Response ${filter} seems to be in loop! ${attr.processedCommands.join('->')}->${attr.command}`);
-          return '';
-        } else {
-          attr.processedCommands.push(attr.command);
-        }
-
-        // run custom commands
-        if (customcommands.enabled) {
-          await customcommands.run({ sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, quiet: true, message: cmd, parameters: attr.param });
-        }
-        await new Parser().command(attr.sender, cmd, true);
-        // we are not sending back any responses!
-        return '';
-      },
-      '(!#)': async (filter: string) => {
-        const cmd = filter
-          .replace(/\(|\)/g, '')
-          .replace(/\$param/g, attr.param);
-        debug('message.process', cmd);
-
-        // check if we already checked cmd
-        if (!attr.processedCommands) {
-          attr.processedCommands = [];
-        }
-        if (attr.processedCommands.includes(cmd)) {
-          error(`Response ${filter} seems to be in loop! ${attr.processedCommands.join('->')}->${attr.command}`);
-          debug('message.error', `Response ${filter} seems to be in loop! ${attr.processedCommands.join('->')}->${attr.command}`);
-          return '';
-        } else {
-          attr.processedCommands.push(attr.command);
-        }
-
-        // run custom commands
-        if (customcommands.enabled) {
-          await customcommands.run({ sender: (attr.sender as ParserOptions['sender']), id: 'null', skip: false, message: cmd, parameters: attr.param, processedCommands: attr.processedCommands });
-        }
-        const responses = await new Parser().command(attr.sender, cmd, true);
-        for (let i = 0; i < responses.length; i++) {
-          setTimeout(async () => {
-            parserReply(await responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
-          }, 500 * i);
-        }
-        return '';
-      },
-    };
-    const price = {
-      '(price)': async function () {
-        const cmd = await getRepository(Price).findOne({ command: attr.cmd, enabled: true });
-        return [price, await points.getPointsName(cmd?.price ?? 0)].join(' ');
-      },
-    };
-    const online = {
-      '(onlineonly)': async function () {
-        return api.isStreamOnline;
-      },
-      '(offlineonly)': async function () {
-        return !(api.isStreamOnline);
-      },
-    };
-    const list = {
-      '(list.#)': async function (filter: string) {
-        const [main, permission] = filter.replace('(list.', '').replace(')', '').split('.');
-        let system = main;
-        let group: null | string | undefined = undefined;
-        if (main.includes('|')) {
-          [system, group] = main.split('|');
-          if (group.trim().length === 0) {
-            group = null;
-          }
-        }
-        let [alias, commands, cooldowns, ranks, prices] = await Promise.all([
-          getRepository(Alias).find({ where: typeof group !== 'undefined' ? { visible: true, enabled: true, group } : { visible: true, enabled: true } }),
-          getRepository(Commands).find({ relations: ['responses'], where: { visible: true, enabled: true } }),
-          getRepository(Cooldown).find({ where: { isEnabled: true } }),
-          getRepository(Rank).find(),
-          getRepository(Price).find({ where: { enabled: true } }),
-        ]);
-
-        let listOutput: any = [];
-        switch (system) {
-          case 'alias':
-            return alias.length === 0 ? ' ' : (alias.map((o) => {
-              const findPrice = prices.find(p => p.command === o.alias);
-              if (findPrice && priceSystem.enabled) {
-                if (findPrice.price > 0 && findPrice.priceBits === 0) {
-                  return o.alias.replace('!', '') + `(${findPrice.price} ${points.getPointsName(findPrice.price)})`;
-                } else if (findPrice.priceBits > 0 && findPrice.price === 0) {
-                  return o.alias.replace('!', '') + `(${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
-                } else {
-                  return o.alias.replace('!', '') + `(${findPrice.price} ${points.getPointsName(findPrice.price)} or ${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
-                }
-              }
-              return o.alias.replace('!', '');
-            })).sort().join(', ');
-          case '!alias':
-            return alias.length === 0 ? ' ' : (alias.map((o) => {
-              const findPrice = prices.find(p => p.command === o.alias);
-              if (findPrice && priceSystem.enabled) {
-                if (findPrice.price > 0 && findPrice.priceBits === 0) {
-                  return o.alias + `(${findPrice.price} ${points.getPointsName(findPrice.price)})`;
-                } else if (findPrice.priceBits > 0 && findPrice.price === 0) {
-                  return o.alias + `(${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
-                } else {
-                  return o.alias + `(${findPrice.price} ${points.getPointsName(findPrice.price)} or ${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
-                }
-              }
-              return o.alias;
-            })).sort().join(', ');
-          case 'core':
-          case '!core':
-            if (permission) {
-              const _permission = await permissions.get(permission);
-              if (_permission) {
-                const coreCommands = (await Promise.all((await new Parser().getCommandsList()).map(async (item) => {
-                  const customPermission = await permissions.getCommandPermission(item.id);
-                  return { ...item, permission: typeof customPermission !== 'undefined' ? customPermission : item.permission };
-                })))
-                  .filter(item => item.permission === _permission.id);
-                return coreCommands.length === 0
-                  ? ' '
-                  : coreCommands.map(item => system === '!core' ? item.command : item.command.replace('!', '')).sort().join(', ');
-              } else {
-                error(`Permission for (list.core.${permission}) not found.`);
-                return '';
-              }
-            } else {
-              error('Missing permission for (list.core.<missing>).');
-              return '';
-            }
-          case 'command':
-            if (permission) {
-              const responses = commands.map(o => o.responses).flat();
-              const _permission = await permissions.get(permission);
-              if (_permission) {
-                const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.id);
-                commands = commands.filter((o) => commandIds.includes(o.id));
-              } else {
-                commands = [];
-              }
-            }
-            return commands.length === 0 ? ' ' : (commands.map((o) => {
-              const findPrice = prices.find(p => p.command === o.command);
-              if (findPrice && priceSystem.enabled) {
-                if (findPrice.price > 0 && findPrice.priceBits === 0) {
-                  return o.command.replace('!', '') + `(${findPrice.price} ${points.getPointsName(findPrice.price)})`;
-                } else if (findPrice.priceBits > 0 && findPrice.price === 0) {
-                  return o.command.replace('!', '') + `(${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
-                } else {
-                  return o.command.replace('!', '') + `(${findPrice.price} ${points.getPointsName(findPrice.price)} or ${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
-                }
-              }
-              return o.command.replace('!', '');
-            })).sort().join(', ');
-          case '!command':
-            if (permission) {
-              const responses = commands.map(o => o.responses).flat();
-              const _permission = await permissions.get(permission);
-              if (_permission) {
-                const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.id);
-                commands = commands.filter((o) => commandIds.includes(o.id));
-              } else {
-                commands = [];
-              }
-            }
-            return commands.length === 0 ? ' ' : (commands.map((o) => {
-              const findPrice = prices.find(p => p.command === o.command);
-              if (findPrice && priceSystem.enabled) {
-                if (findPrice.price > 0 && findPrice.priceBits === 0) {
-                  return o.command + `(${findPrice.price} ${points.getPointsName(findPrice.price)})`;
-                } else if (findPrice.priceBits > 0 && findPrice.price === 0) {
-                  return o.command + `(${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
-                } else {
-                  return o.command + `(${findPrice.price} ${points.getPointsName(findPrice.price)} or ${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
-                }
-              }
-              return o.command;
-            })).sort().join(', ');
-          case 'cooldown':
-            listOutput = cooldowns.map((o) => {
-              const time = o.miliseconds;
-              return o.name + ': ' + (time / 1000) + 's';
-            }).sort().join(', ');
-            return listOutput.length > 0 ? listOutput : ' ';
-          case 'price':
-            listOutput = prices.map((o) => {
-              return `${o.command} (${o.price}${points.getPointsName(o.price)})`;
-            }).join(', ');
-            return listOutput.length > 0 ? listOutput : ' ';
-          case 'ranks':
-            listOutput = _.orderBy(ranks.filter(o => o.type === 'viewer'), 'value', 'asc').map((o) => {
-              return `${o.rank} (${o.value}h)`;
-            }).join(', ');
-            return listOutput.length > 0 ? listOutput : ' ';
-          case 'ranks.follow':
-            listOutput = _.orderBy(ranks.filter(o => o.type === 'follower'), 'value', 'asc').map((o) => {
-              return `${o.rank} (${o.value} ${getLocalizedName(o.value, translate('core.months'))})`;
-            }).join(', ');
-            return listOutput.length > 0 ? listOutput : ' ';
-          case 'ranks.sub':
-            listOutput = _.orderBy(ranks.filter(o => o.type === 'subscriber'), 'value', 'asc').map((o) => {
-              return `${o.rank} (${o.value} ${getLocalizedName(o.value, translate('core.months'))})`;
-            }).join(', ');
-            return listOutput.length > 0 ? listOutput : ' ';
-          default:
-            warning('unknown list system ' + system);
-            return '';
-        }
-      },
-    };
-    const math = {
-      '(math.#)': async function (filter: any) {
-        let toEvaluate = filter.replace(/\(math./g, '').replace(/\)/g, '');
-
-        // check if custom variables are here
-        const regexp = /(\$_\w+)/g;
-        const match = toEvaluate.match(regexp);
-        if (match) {
-          for (const variable of match) {
-            const currentValue = await customvariables.getValueOf(variable);
-            toEvaluate = toEvaluate.replace(
-              variable,
-              isNaN(Number(currentValue)) ? 0 : currentValue
-            );
-          }
-        }
-        return mathJsEvaluate(toEvaluate);
-      },
-      '(toPercent|#)': async function (filter: any) {
-        const _toEvaluate = filter.replace(/\(toPercent\|/g, '').replace(/\)/g, '');
-        let [toFixed, toEvaluate] = _toEvaluate.split('|');
-        if (!toEvaluate) {
-          toEvaluate = toFixed;
-          toFixed = 0;
-        }
-        toEvaluate = toEvaluate.replace(`${toFixed}|`, '');
-
-        // check if custom variables are here
-        const regexp = /(\$_\w+)/g;
-        const match = toEvaluate.match(regexp);
-        if (match) {
-          for (const variable of match) {
-            const currentValue = await customvariables.getValueOf(variable);
-            toEvaluate = toEvaluate.replace(
-              variable,
-              isNaN(Number(currentValue)) ? 0 : currentValue
-            );
-          }
-        }
-        return Number(100*toEvaluate).toFixed(toFixed);
-      },
-      '(toFloat|#)': async function (filter: any) {
-        const _toEvaluate = filter.replace(/\(toFloat\|/g, '').replace(/\)/g, '');
-        let [toFixed, toEvaluate] = _toEvaluate.split('|');
-        if (!toEvaluate) {
-          toEvaluate = toFixed;
-          toFixed = 0;
-        }
-        toEvaluate = toEvaluate.replace(`${toFixed}|`, '');
-
-        // check if custom variables are here
-        const regexp = /(\$_\w+)/g;
-        const match = toEvaluate.match(regexp);
-        if (match) {
-          for (const variable of match) {
-            const currentValue = await customvariables.getValueOf(variable);
-            toEvaluate = toEvaluate.replace(
-              variable,
-              isNaN(Number(currentValue)) ? 0 : currentValue
-            );
-          }
-        }
-        return Number(toEvaluate).toFixed(toFixed);
-      },
-    };
-    const evaluate = {
-      '(eval#)': async function (filter: any) {
-        let toEvaluate = filter.replace('(eval ', '').slice(0, -1);
-
-        const containUsers = !_.isNil(toEvaluate.match(/users/g));
-        const containRandom = !_.isNil(toEvaluate.replace(/Math\.random|_\.random/g, '').match(/random/g));
-        const containOnline = !_.isNil(toEvaluate.match(/online/g));
-        const containUrl = !_.isNil(toEvaluate.match(/url\(['"](.*?)['"]\)/g));
-
-        const urls: { id: string; response: AxiosResponse<any> }[] = [];
-        if (containUrl) {
-          for (const match of toEvaluate.match(/url\(['"](.*?)['"]\)/g)) {
-            const id = 'url' + crypto.randomBytes(64).toString('hex').slice(0, 5);
-            const url = match.replace(/url\(['"]|["']\)/g, '');
-            let response = await axios.get(url);
-            try {
-              response.data = JSON.parse(response.data.toString());
-            } catch (e) {
-              // JSON failed, treat like string
-              response = response.data.toString();
-            }
-            urls.push({ id, response });
-            toEvaluate = toEvaluate.replace(match, `url.${id}`);
-          }
-        }
-
-        let allUsers: Readonly<Required<UserInterface>>[] = [];
-        if (containUsers || containRandom) {
-          allUsers = await getRepository(User).find();
-        }
-        const user = await users.getUserByUsername(attr.sender.username);
-
-        let onlineViewers: Readonly<Required<UserInterface>>[] = [];
-        let onlineSubscribers: Readonly<Required<UserInterface>>[] = [];
-        let onlineFollowers: Readonly<Required<UserInterface>>[] = [];
-
-        if (containOnline) {
-          const viewers = (await getRepository(User).createQueryBuilder('user')
-            .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-            .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
-            .andWhere('user.isOnline = :isOnline', { isOnline: true })
-            .getMany()).filter(o => {
-            return isIgnored({ username: o.username, userId: o.userId });
-          });
-
-          onlineViewers = viewers;
-          onlineSubscribers = viewers.filter(o => o.isSubscriber);
-          onlineFollowers = viewers.filter(o => o.isFollower);
-        }
-
-        const randomVar = {
-          online: {
-            viewer: sample(onlineViewers.map(o => o.username)),
-            follower: sample(onlineFollowers.map(o => o.username)),
-            subscriber: sample(onlineSubscribers.map(o => o.username)),
-          },
-          viewer: sample(allUsers.map(o => o.username)),
-          follower: sample(allUsers.filter((o) => _.get(o, 'is.follower', false)).map(o => o.username)),
-          subscriber: sample(allUsers.filter((o) => _.get(o, 'is.subscriber', false)).map(o => o.username)),
-        };
-        const is = {
-          follower: user.isFollower, subscriber: user.isSubscriber, moderator: user.isModerator, vip: user.isVIP, online: user.isOnline,
-        };
-
-        const toEval = `(function evaluation () {  ${toEvaluate} })()`;
-        const context: {
-          _: typeof _;
-          users: typeof allUsers;
-          is: typeof is;
-          random: typeof randomVar;
-          sender: string;
-          param: string | null;
-          url: {
-            [urlId: string]: AxiosResponse<any>
-          };
-        } = {
-          _: _,
-          users: allUsers,
-          is: is,
-          random: randomVar,
-          sender: tmi.showWithAt ? `@${attr.sender.username}` : `${attr.sender.username}`,
-          param: _.isNil(attr.param) ? null : attr.param,
-          url: {},
-        };
-
-        if (containUrl) {
-          // add urls to context
-          for (const url of urls) {
-            context.url[url.id] = url.response;
-          }
-        }
-
-        return (safeEval(toEval, context));
-      },
-    };
-    const ifp = {
-      '(if#)': async function (filter: any) {
-        // (if $days>2|More than 2 days|Less than 2 days)
-        try {
-          const toEvaluate = filter
-            .replace('(if ', '')
-            .slice(0, -1)
-            .replace(/\$param|\$!param/g, attr.param); // replace params
-          let [check, ifTrue, ifFalse] = toEvaluate.split('|');
-          check = check.startsWith('>') || check.startsWith('<') || check.startsWith('=') ? false : check; // force check to false if starts with comparation
-          if (_.isNil(ifTrue)) {
-            return;
-          }
-          if (safeEval(check)) {
-            return ifTrue;
-          }
-          return _.isNil(ifFalse) ? '' : ifFalse;
-        } catch (e) {
-          return '';
-        }
-      },
-    };
-    const stream = {
-      '(stream|#|game)': async function (filter: any) {
-        const channel = filter.replace('(stream|', '').replace('|game)', '');
-
-        const token = await oauth.botAccessToken;
-        if (token === '') {
-          return 'n/a';
-        }
-
-        try {
-          let request = await axios.get(`https://api.twitch.tv/helix/search/channels?query=${channel}`, {
-            headers: {
-              'Authorization': 'Bearer ' + token,
-              'Client-ID': oauth.botClientId,
-            },
-          });
-          const channelId = request.data.data[0].id;
-          request = await axios.get(`https://api.twitch.tv/helix/channels?broadcaster_id=${channelId}`, {
-            headers: {
-              'Authorization': 'Bearer ' + token,
-              'Client-ID': oauth.botClientId,
-            },
-          });
-          return request.data.data[0].game_name;
-        } catch (e) {
-          return 'n/a';
-        } // return nothing on error
-      },
-      '(stream|#|title)': async function (filter: any) {
-        const channel = filter.replace('(stream|', '').replace('|title)', '');
-
-        const token = await oauth.botAccessToken;
-        if (token === '') {
-          return 'n/a';
-        }
-
-        try {
-          let request = await axios.get(`https://api.twitch.tv/helix/search/channels?query=${channel}`, {
-            headers: {
-              'Authorization': 'Bearer ' + token,
-              'Client-ID': oauth.botClientId,
-            },
-          });
-
-          const channelId = request.data.data[0].id;
-          request = await axios.get(`https://api.twitch.tv/helix/channels?broadcaster_id=${channelId}`, {
-            headers: {
-              'Authorization': 'Bearer ' + token,
-              'Client-ID': oauth.botClientId,
-            },
-          });
-          // save remaining api calls
-          api.calls.bot.remaining = request.headers['ratelimit-remaining'];
-          api.calls.bot.refresh = request.headers['ratelimit-reset'];
-          return request.data.data[0].title;
-        } catch (e) {
-          return 'n/a';
-        } // return nothing on error
-      },
-      '(stream|#|viewers)': async function (filter: any) {
-        const channel = filter.replace('(stream|', '').replace('|viewers)', '');
-
-        const token = await oauth.botAccessToken;
-        if (token === '') {
-          return '0';
-        }
-
-        try {
-          let request = await axios.get(`https://api.twitch.tv/helix/search/channels?query=${channel}`, {
-            headers: {
-              'Authorization': 'Bearer ' + token,
-              'Client-ID': oauth.botClientId,
-            },
-          });
-          const channelId = request.data.data[0].id;
-          request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
-            headers: {
-              'Authorization': 'Bearer ' + token,
-              'Client-ID': oauth.botClientId,
-            },
-          });
-          // save remaining api calls
-          api.calls.bot.remaining = request.headers['ratelimit-remaining'];
-          api.calls.bot.refresh = request.headers['ratelimit-reset'];
-          return request.data.data[0].viewer_count;
-        } catch (e) {
-          return '0';
-        } // return nothing on error
-      },
-    };
-
     await this.global({ sender: attr.sender });
 
-    await this.parseMessageEach(price);
-    await this.parseMessageEach(info);
-    await this.parseMessageEach(youtube);
-    await this.parseMessageEach(random);
-    await this.parseMessageEach(ifp, false);
-    await this.parseMessageVariables(custom);
-    await this.parseMessageEval(evaluate);
-    await this.parseMessageEach(param, true);
+    await this.parseMessageEach(price, attr);
+    await this.parseMessageEach(info, attr);
+    await this.parseMessageEach(youtube, attr);
+    await this.parseMessageEach(random, attr);
+    await this.parseMessageEach(ifp, attr, false);
+    await this.parseMessageVariables(custom, attr);
+    await this.parseMessageEval(evaluate, attr);
+    await this.parseMessageEach(param, attr, true);
     // local replaces
     if (!_.isNil(attr)) {
       for (let [key, value] of Object.entries(attr)) {
@@ -982,12 +158,12 @@ class Message {
         this.message = this.message.replace(new RegExp('[$]' + key, 'g'), value);
       }
     }
-    await this.parseMessageEach(math);
-    await this.parseMessageOnline(online);
-    await this.parseMessageCommand(command);
-    await this.parseMessageEach(qs, false);
-    await this.parseMessageEach(list);
-    await this.parseMessageEach(stream);
+    await this.parseMessageEach(math, attr);
+    await this.parseMessageOnline(online, attr);
+    await this.parseMessageCommand(command, attr);
+    await this.parseMessageEach(qs, attr, false);
+    await this.parseMessageEach(list, attr);
+    await this.parseMessageEach(stream, attr);
     await this.parseMessageApi();
 
     return this.message;
@@ -1037,7 +213,7 @@ class Message {
     }
   }
 
-  async parseMessageCommand (filters: { [filter: string]: (filter: any) => Promise<any> }) {
+  async parseMessageCommand (filters: ResponseFilter, attr: Parameters<ResponseFilter[string]>[1]) {
     if (this.message.trim().length === 0) {
       return;
     }
@@ -1054,13 +230,13 @@ class Message {
       const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
       if (rMessage !== null) {
         for (const bkey in rMessage) {
-          this.message = this.message.replace(rMessage[bkey], await fnc(rMessage[bkey])).trim();
+          this.message = this.message.replace(rMessage[bkey], await fnc(rMessage[bkey], _.cloneDeep(attr))).trim();
         }
       }
     }
   }
 
-  async parseMessageOnline (filters: { [filter: string]: (filter: any) => Promise<any> }) {
+  async parseMessageOnline (filters: ResponseFilter, attr: Parameters<ResponseFilter[string]>[1]) {
     if (this.message.trim().length === 0) {
       return;
     }
@@ -1077,7 +253,7 @@ class Message {
       const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
       if (rMessage !== null) {
         for (const bkey in rMessage) {
-          if (!(await fnc(rMessage[bkey]))) {
+          if (!(await fnc(rMessage[bkey], _.cloneDeep(attr)))) {
             this.message = '';
           } else {
             this.message = this.message.replace(rMessage[bkey], '').trim();
@@ -1087,7 +263,7 @@ class Message {
     }
   }
 
-  async parseMessageEval (filters: { [filter: string]: (filter: any) => Promise<any> }) {
+  async parseMessageEval (filters: ResponseFilter, attr: Parameters<ResponseFilter[string]>[1]) {
     if (this.message.trim().length === 0) {
       return;
     }
@@ -1104,7 +280,7 @@ class Message {
       const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
       if (rMessage !== null) {
         for (const bkey in rMessage) {
-          const newString = await fnc(rMessage[bkey]);
+          const newString = await fnc(rMessage[bkey], _.cloneDeep(attr));
           if (_.isUndefined(newString) || newString.length === 0) {
             this.message = '';
           }
@@ -1114,7 +290,7 @@ class Message {
     }
   }
 
-  async parseMessageVariables (filters: { [filter: string]: (filter: any) => Promise<any> }, removeWhenEmpty = true) {
+  async parseMessageVariables (filters: ResponseFilter, attr: Parameters<ResponseFilter[string]>[1], removeWhenEmpty = true) {
     if (this.message.trim().length === 0) {
       return;
     }
@@ -1130,7 +306,7 @@ class Message {
       const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
       if (rMessage !== null) {
         for (const bkey in rMessage) {
-          const newString = await fnc(rMessage[bkey]);
+          const newString = await fnc(rMessage[bkey], _.cloneDeep(attr));
           if ((_.isNil(newString) || newString.length === 0) && removeWhenEmpty) {
             this.message = '';
           }
@@ -1140,7 +316,7 @@ class Message {
     }
   }
 
-  async parseMessageEach (filters: { [filter: string]: (filter: any) => Promise<any> }, removeWhenEmpty = true) {
+  async parseMessageEach (filters: ResponseFilter, attr: Parameters<ResponseFilter[string]>[1], removeWhenEmpty = true) {
     if (this.message.trim().length === 0) {
       return;
     }
@@ -1160,7 +336,7 @@ class Message {
       const rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')));
       if (rMessage !== null) {
         for (const bkey in rMessage) {
-          const newString = await fnc(rMessage[bkey]);
+          const newString = await fnc(rMessage[bkey], _.cloneDeep(attr));
           if ((_.isNil(newString) || newString.length === 0) && removeWhenEmpty) {
             this.message = '';
           }

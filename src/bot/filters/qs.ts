@@ -1,0 +1,24 @@
+import querystring from 'querystring';
+
+import { ResponseFilter } from '.';
+
+const qs: ResponseFilter = {
+  '$querystring': async function (_variable, attr) {
+    if (typeof attr.param !== 'undefined' && attr.param.length !== 0) {
+      return querystring.escape(attr.param);
+    }
+    return '';
+  },
+  '(url|#)': async function (_variable, attr) {
+    try {
+      if (!attr.param) {
+        throw new Error('Missing param.');
+      }
+      return encodeURI(attr.param);
+    } catch (e) {
+      return '';
+    }
+  },
+};
+
+export { qs };
