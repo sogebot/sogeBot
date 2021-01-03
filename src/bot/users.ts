@@ -47,39 +47,47 @@ class Users extends Core {
 
   async updateWatchTime (isInit = false) {
     const interval = 30000;
-
-    if (isInit) {
-      // set all users offline on start
-      await getRepository(User).update({}, { isOnline: false });
-    } else {
-      // get new users
-      const newChatters = await getRepository(User).find({ isOnline: true, watchedTime: 0 });
-      api.stats.newChatters += newChatters.length;
-
-      if (api.isStreamOnline) {
-        const incrementedUsers = await getRepository(User).increment({ isOnline: true }, 'watchedTime', interval);
-        // chatTimeOnline + chatTimeOffline is solely use for points distribution
-        await getRepository(User).increment({ isOnline: true }, 'chatTimeOnline', interval);
-
-        if (typeof incrementedUsers.affected === 'undefined') {
-          const users = await getRepository(User).find({ isOnline: true });
-          if (isDebugEnabled('tmi.watched')) {
-            for (const user of users) {
-              debug('tmi.watched', `User ${user.username}#${user.userId} added watched time ${interval}`);
-            }
-          }
-          api.stats.currentWatchedTime += users.length * interval;
-        } else {
-          api.stats.currentWatchedTime += incrementedUsers.affected * interval;
-        }
-
-        permissions.recacheOnlineUsersPermission();
+    try {
+      if (isInit) {
+        // set all users offline on start
+        debug('tmi.watched', `Setting all users as offline.`);
+        await getRepository(User).update({}, { isOnline: false });
       } else {
-        await getRepository(User).increment({ isOnline: true }, 'chatTimeOffline', interval);
-      }
-    }
+        // get new users
+        const newChatters = await getRepository(User).find({ isOnline: true, watchedTime: 0 });
+        debug('tmi.watched', `Adding ${newChatters.length} users as new chatters.`);
+        api.stats.newChatters += newChatters.length;
 
-    setTimeout(() => this.updateWatchTime(), interval);
+        if (api.isStreamOnline) {
+          debug('tmi.watched', `Incrementing watchedTime by ${interval}`);
+          const incrementedUsers = await getRepository(User).increment({ isOnline: true }, 'watchedTime', interval);
+          // chatTimeOnline + chatTimeOffline is solely use for points distribution
+          debug('tmi.watched', `Incrementing chatTimeOnline by ${interval}`);
+          await getRepository(User).increment({ isOnline: true }, 'chatTimeOnline', interval);
+
+          if (typeof incrementedUsers.affected === 'undefined') {
+            const users = await getRepository(User).find({ isOnline: true });
+            if (isDebugEnabled('tmi.watched')) {
+              for (const user of users) {
+                debug('tmi.watched', `User ${user.username}#${user.userId} added watched time ${interval}`);
+              }
+            }
+            api.stats.currentWatchedTime += users.length * interval;
+          } else {
+            api.stats.currentWatchedTime += incrementedUsers.affected * interval;
+          }
+
+          permissions.recacheOnlineUsersPermission();
+        } else {
+          debug('tmi.watched', `Incrementing chatTimeOffline users by ${interval}`);
+          await getRepository(User).increment({ isOnline: true }, 'chatTimeOffline', interval);
+        }
+      }
+    } catch (e) {
+      error(e.stack);
+    } finally {
+      setTimeout(() => this.updateWatchTime(), interval);
+    }
   }
 
   async getWatchedOf (id: number): Promise<number> {
