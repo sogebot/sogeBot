@@ -92,7 +92,7 @@ const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], us
   if (!fullScale) {
     // we are handling only latest followers
     // handle users currently not following
-    users.filter(user => !user.isFollower).forEach(user => {
+    for (const user of users.filter(o => !o.isFollower)) {
       const apiUser = usersFromAPI.find(userFromAPI => userFromAPI.from_id === user.userId) as typeof usersFromAPI[0];
       if (new Date().getTime() - new Date(apiUser.followed_at).getTime() < 2 * constants.HOUR) {
         if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60 && !webhooks.existsInCache('follows', user.userId)) {
@@ -123,7 +123,7 @@ const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], us
           }
         }
       }
-    });
+    }
   }
   await getRepository(User).save(
     users.map(user => {
