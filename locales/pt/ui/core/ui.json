@@ -1,7 +1,10 @@
 {
   "settings": {
     "theme": "Tema padrão",
-    "domain": "Domínio",
+    "domain": {
+      "name": "Domain",
+      "help": "Format without http/https: yourdomain.com or your.domain.com"
+    },
     "percentage": "Diferença de porcentagem para estatísticas",
     "shortennumbers": "Formato curto dos números",
     "stickystats": "Grudar estatísticas no topo",
