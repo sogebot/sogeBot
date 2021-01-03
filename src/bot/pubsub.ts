@@ -101,16 +101,21 @@ const connect = () => {
           userInput: dataMessage.data.redemption.user_input,
         });
       } else if (dataMessage.type === 'moderation_action') {
-        const [ username, reason ] = dataMessage.data.args;
-        const createdBy = dataMessage.data.from_automod ? 'TwitchAutoMod' : `${dataMessage.data.created_by}#${dataMessage.data.created_by_user_id}`;
-        if (dataMessage.data.moderation_action === 'ban') {
-          ban(`${username}#${dataMessage.data.target_user_id} by ${createdBy}: ${reason ? reason : '<no reason>'}`);
-          events.fire('ban', { username, reason: reason ? reason : '<no reason>' });
-        } else if (dataMessage.data.moderation_action === 'unban') {
-          unban(`${username}#${dataMessage.data.target_user_id} by ${createdBy}`);
-        } else if (dataMessage.data.moderation_action === 'timeout') {
-          timeout(`${username}#${dataMessage.data.target_user_id} by ${createdBy} for ${reason} seconds`);
-          events.fire('timeout', { username, duration: reason });
+        try {
+          const createdBy = dataMessage.data.from_automod ? 'TwitchAutoMod' : `${dataMessage.data.created_by}#${dataMessage.data.created_by_user_id}`;
+          const [ username, reason ] = dataMessage.data.args;
+          if (dataMessage.data.moderation_action === 'ban') {
+            ban(`${username}#${dataMessage.data.target_user_id} by ${createdBy}: ${reason ? reason : '<no reason>'}`);
+            events.fire('ban', { username, reason: reason ? reason : '<no reason>' });
+          } else if (dataMessage.data.moderation_action === 'unban') {
+            unban(`${username}#${dataMessage.data.target_user_id} by ${createdBy}`);
+          } else if (dataMessage.data.moderation_action === 'timeout') {
+            timeout(`${username}#${dataMessage.data.target_user_id} by ${createdBy} for ${reason} seconds`);
+            events.fire('timeout', { username, duration: reason });
+          }
+        } catch (e) {
+          warning(`PUBSUB: Unknown moderation_action ${dataMessage.data.moderation_action}`);
+          warning(`${JSON.stringify(dataMessage.data, null, 2)}`);
         }
       }
     } else if (message.type === 'RECONNECT') {
