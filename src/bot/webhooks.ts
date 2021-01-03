@@ -71,7 +71,7 @@ class Webhooks {
     }
 
     const mode = 'unsubscribe';
-    const callback = `http://${domain}/webhooks/hub`;
+    const callback = `https://${domain}/webhooks/hub`;
 
     switch (type) {
       case 'follows':
@@ -184,6 +184,10 @@ class Webhooks {
   }
 
   async challenge (req: any, res: any) {
+    if (req.query['hub.mode'] === 'unsubscribe') {
+      return;
+    }
+
     const cid = oauth.channelId;
     // set webhooks enabled
     switch (req.query['hub.topic']) {
