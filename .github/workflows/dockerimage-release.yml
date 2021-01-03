@@ -5,28 +5,6 @@ on:
     types: [published]
 
 jobs:
-  artifact:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-        with:
-          ref: ${{ github.ref }}
-      - name: install node v14
-        uses: actions/setup-node@v1
-        with:
-          node-version: 14
-      - name: Build bot and UI
-        run: make
-      - name: Pack zip file
-        run: make pack
-      - name: Publish Artifact
-        uses: xresloader/upload-to-github-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          file: "*.zip"
-          update_latest_release: true
-          overwrite: true
   build:
     runs-on: ubuntu-latest
     steps:
