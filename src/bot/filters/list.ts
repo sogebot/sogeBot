@@ -1,0 +1,170 @@
+import _ from 'lodash';
+import { getRepository } from 'typeorm';
+
+import { Alias } from '../database/entity/alias';
+import { Commands } from '../database/entity/commands';
+import { Cooldown } from '../database/entity/cooldown';
+import { Price } from '../database/entity/price';
+import { Rank } from '../database/entity/rank';
+import { getLocalizedName } from '../helpers/getLocalized';
+import { error, warning } from '../helpers/log';
+import Parser from '../parser';
+import permissions from '../permissions';
+import points from '../systems/points';
+import {default as priceSystem} from '../systems/price';
+import { translate } from '../translate';
+
+import { ResponseFilter } from '.';
+
+const list: ResponseFilter = {
+  '(list.#)': async function (filter: string) {
+    const [main, permission] = filter.replace('(list.', '').replace(')', '').split('.');
+    let system = main;
+    let group: null | string | undefined = undefined;
+    if (main.includes('|')) {
+      [system, group] = main.split('|');
+      if (group.trim().length === 0) {
+        group = null;
+      }
+    }
+    let [alias, commands, cooldowns, ranks, prices] = await Promise.all([
+      getRepository(Alias).find({ where: typeof group !== 'undefined' ? { visible: true, enabled: true, group } : { visible: true, enabled: true } }),
+      getRepository(Commands).find({ relations: ['responses'], where: { visible: true, enabled: true } }),
+      getRepository(Cooldown).find({ where: { isEnabled: true } }),
+      getRepository(Rank).find(),
+      getRepository(Price).find({ where: { enabled: true } }),
+    ]);
+
+    let listOutput: any = [];
+    switch (system) {
+      case 'alias':
+        return alias.length === 0 ? ' ' : (alias.map((o) => {
+          const findPrice = prices.find(p => p.command === o.alias);
+          if (findPrice && priceSystem.enabled) {
+            if (findPrice.price > 0 && findPrice.priceBits === 0) {
+              return o.alias.replace('!', '') + `(${findPrice.price} ${points.getPointsName(findPrice.price)})`;
+            } else if (findPrice.priceBits > 0 && findPrice.price === 0) {
+              return o.alias.replace('!', '') + `(${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
+            } else {
+              return o.alias.replace('!', '') + `(${findPrice.price} ${points.getPointsName(findPrice.price)} or ${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
+            }
+          }
+          return o.alias.replace('!', '');
+        })).sort().join(', ');
+      case '!alias':
+        return alias.length === 0 ? ' ' : (alias.map((o) => {
+          const findPrice = prices.find(p => p.command === o.alias);
+          if (findPrice && priceSystem.enabled) {
+            if (findPrice.price > 0 && findPrice.priceBits === 0) {
+              return o.alias + `(${findPrice.price} ${points.getPointsName(findPrice.price)})`;
+            } else if (findPrice.priceBits > 0 && findPrice.price === 0) {
+              return o.alias + `(${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
+            } else {
+              return o.alias + `(${findPrice.price} ${points.getPointsName(findPrice.price)} or ${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
+            }
+          }
+          return o.alias;
+        })).sort().join(', ');
+      case 'core':
+      case '!core':
+        if (permission) {
+          const _permission = await permissions.get(permission);
+          if (_permission) {
+            const coreCommands = (await Promise.all((await new Parser().getCommandsList()).map(async (item) => {
+              const customPermission = await permissions.getCommandPermission(item.id);
+              return { ...item, permission: typeof customPermission !== 'undefined' ? customPermission : item.permission };
+            })))
+              .filter(item => item.permission === _permission.id);
+            return coreCommands.length === 0
+              ? ' '
+              : coreCommands.map(item => system === '!core' ? item.command : item.command.replace('!', '')).sort().join(', ');
+          } else {
+            error(`Permission for (list.core.${permission}) not found.`);
+            return '';
+          }
+        } else {
+          error('Missing permission for (list.core.<missing>).');
+          return '';
+        }
+      case 'command':
+        if (permission) {
+          const responses = commands.map(o => o.responses).flat();
+          const _permission = await permissions.get(permission);
+          if (_permission) {
+            const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.id);
+            commands = commands.filter((o) => commandIds.includes(o.id));
+          } else {
+            commands = [];
+          }
+        }
+        return commands.length === 0 ? ' ' : (commands.map((o) => {
+          const findPrice = prices.find(p => p.command === o.command);
+          if (findPrice && priceSystem.enabled) {
+            if (findPrice.price > 0 && findPrice.priceBits === 0) {
+              return o.command.replace('!', '') + `(${findPrice.price} ${points.getPointsName(findPrice.price)})`;
+            } else if (findPrice.priceBits > 0 && findPrice.price === 0) {
+              return o.command.replace('!', '') + `(${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
+            } else {
+              return o.command.replace('!', '') + `(${findPrice.price} ${points.getPointsName(findPrice.price)} or ${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
+            }
+          }
+          return o.command.replace('!', '');
+        })).sort().join(', ');
+      case '!command':
+        if (permission) {
+          const responses = commands.map(o => o.responses).flat();
+          const _permission = await permissions.get(permission);
+          if (_permission) {
+            const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.id);
+            commands = commands.filter((o) => commandIds.includes(o.id));
+          } else {
+            commands = [];
+          }
+        }
+        return commands.length === 0 ? ' ' : (commands.map((o) => {
+          const findPrice = prices.find(p => p.command === o.command);
+          if (findPrice && priceSystem.enabled) {
+            if (findPrice.price > 0 && findPrice.priceBits === 0) {
+              return o.command + `(${findPrice.price} ${points.getPointsName(findPrice.price)})`;
+            } else if (findPrice.priceBits > 0 && findPrice.price === 0) {
+              return o.command + `(${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
+            } else {
+              return o.command + `(${findPrice.price} ${points.getPointsName(findPrice.price)} or ${findPrice.priceBits} ${getLocalizedName(findPrice.priceBits, translate('core.bits'))})`;
+            }
+          }
+          return o.command;
+        })).sort().join(', ');
+      case 'cooldown':
+        listOutput = cooldowns.map((o) => {
+          const time = o.miliseconds;
+          return o.name + ': ' + (time / 1000) + 's';
+        }).sort().join(', ');
+        return listOutput.length > 0 ? listOutput : ' ';
+      case 'price':
+        listOutput = prices.map((o) => {
+          return `${o.command} (${o.price}${points.getPointsName(o.price)})`;
+        }).join(', ');
+        return listOutput.length > 0 ? listOutput : ' ';
+      case 'ranks':
+        listOutput = _.orderBy(ranks.filter(o => o.type === 'viewer'), 'value', 'asc').map((o) => {
+          return `${o.rank} (${o.value}h)`;
+        }).join(', ');
+        return listOutput.length > 0 ? listOutput : ' ';
+      case 'ranks.follow':
+        listOutput = _.orderBy(ranks.filter(o => o.type === 'follower'), 'value', 'asc').map((o) => {
+          return `${o.rank} (${o.value} ${getLocalizedName(o.value, translate('core.months'))})`;
+        }).join(', ');
+        return listOutput.length > 0 ? listOutput : ' ';
+      case 'ranks.sub':
+        listOutput = _.orderBy(ranks.filter(o => o.type === 'subscriber'), 'value', 'asc').map((o) => {
+          return `${o.rank} (${o.value} ${getLocalizedName(o.value, translate('core.months'))})`;
+        }).join(', ');
+        return listOutput.length > 0 ? listOutput : ' ';
+      default:
+        warning('unknown list system ' + system);
+        return '';
+    }
+  },
+};
+
+export { list };
