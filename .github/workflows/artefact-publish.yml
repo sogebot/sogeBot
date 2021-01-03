@@ -1,33 +1,27 @@
-name: Artefact build
-
 on:
   push:
+    # Sequence of patterns matched against refs/tags
     tags:
-      - "*"
+      - '*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+name: Create Release
 
 jobs:
-  artifact:
+  build:
+    name: Create Release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-        with:
-          ref: ${{ github.ref }}
-      - name: install node v14
-        uses: actions/setup-node@v1
-        with:
-          node-version: 14
-      - name: Build bot and UI
-        run: make
-      - name: Pack zip file
-        run: make pack
-      - name: Publish Artifact
-        uses: xresloader/upload-to-github-release@v1
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          file: "*.zip"
-          update_latest_release: true
-          tags: true
+          tag_name: ${{ github.ref }}
+          release_name: SOGEBOT ${{ github.ref }}
+          body: |
+            TBD
           draft: true
-          overwrite: true
-          verbose: true
+          prerelease: false
