@@ -1,7 +1,7 @@
 ## Prerequisites
 
 - **Browsers**: only latest Chrome/Chromium stable are supported
-- **[Node.js](https://nodejs.org/en/)**: latest **current** or **LTS** version
+- **[Node.js](https://nodejs.org/en/)**: **14.15.1 LTS** version
 - **RAM**: Minimum 512MB, Recommended 1024MB
 - **HDD**: Minimum 500MB
 - Twitch bot account
@@ -37,9 +37,25 @@
 
 ## From zipfile
 
+### Stable release
+
+- Download latest release from
+  [GitHub sogeBot release page](https://github.com/sogehige/sogeBot/releases)
+
+### Nightlies
+
+- Download desired nightly version from [GitHub sogeBot nightlies page](https://github.com/sogehige/sogeBot/actions?query=workflow%3ANightlies)
+- Select run, you want to use (newest first)
+
+![create-new-app](./_images/install/nightlies.png)
+
+- Scroll down and download nightly artifact
+
+![create-new-app](./_images/install/artifact.png)
+
 ### Installation
 
-- Download latest release from [GitHub sogeBot release page](https://github.com/sogehige/sogeBot/releases)
+- Download your stable release or nightly (see above)
 - Set your [database environment](configuration/database)
 - Add bot as channel editor
   in [Permissions settings](http://twitch.tv/dashboard/permissions) on Twitch
@@ -60,7 +76,7 @@
 
 - **Bash**, **Make**
 
-### Installation (snapshot)
+### Installation (latest snapshot)
 
 - Download [latest master zip](https://github.com/sogehige/sogeBot/archive/master.zip)
   or clone repository `git clone https://github.com/sogehige/sogeBot.git`
