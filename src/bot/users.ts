@@ -1,7 +1,7 @@
 import { setTimeout } from 'timers';
 
 import axios from 'axios';
-import { Brackets, getConnection, getRepository, IsNull } from 'typeorm';
+import { Brackets, FindOneOptions, getConnection, getRepository, IsNull } from 'typeorm';
 
 import Core from './_interface';
 import api from './api';
@@ -157,7 +157,7 @@ class Users extends Core {
     if (username.startsWith('@')) {
       username = username.substring(1);
     }
-    const user = await getRepository(User).findOne({ username });
+    const user = await getRepository(User).findOne({ where: { username }, select: ['userId'] });
     if (!user) {
       const savedUser = await getRepository(User).save({
         userId: Number(await api.getIdFromTwitch(username)),
@@ -168,8 +168,8 @@ class Users extends Core {
     return user.userId;
   }
 
-  async getUserByUsername(username: string) {
-    const userByUsername = await getRepository(User).findOne({ where: { username }});
+  async getUserByUsername(username: string, select?: FindOneOptions<Readonly<Required<UserInterface>>>['select']) {
+    const userByUsername = await getRepository(User).findOne({ where: { username }, select});
 
     if (userByUsername) {
       return userByUsername;

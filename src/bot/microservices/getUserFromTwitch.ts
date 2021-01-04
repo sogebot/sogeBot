@@ -3,11 +3,21 @@ import { getRepository } from 'typeorm';
 
 import { Settings } from '../database/entity/settings';
 
-export const getUserFromTwitch = async (username: string) => {
+type Await<T> = T extends {
+  then(onfulfilled?: (value: infer U) => unknown): unknown;
+} ? U : T;
+
+export const getUserFromTwitch = async (username: string): Promise<Await<ReturnType<typeof getUsersFromTwitch>>[number]> => {
+  const user = (await getUsersFromTwitch([username]))[0];
+  if (typeof user === 'undefined') {
+    throw new Error(`User ${username} not found on twitch`);
+  }
   return (await getUsersFromTwitch([username]))[0];
 };
 
-export const getUsersFromTwitch = async (usernames: string[])  => {
+export const getUsersFromTwitch = async (usernames: string[]): Promise<{
+  id: string; login: string; display_name: string; profile_image_url: string;
+}[]>  => {
   const url = `https://api.twitch.tv/helix/users?login=${usernames.join('&login=')}`;
   /*
     {
@@ -55,7 +65,5 @@ export const getUsersFromTwitch = async (usernames: string[])  => {
     },
   });
 
-  return request.data.data as {
-    id: string; login: string; display_name: string; profile_image_url: string;
-  }[];
+  return request.data.data;
 };
