@@ -24,6 +24,10 @@ jobs:
       - name: Zip a bot
         run: make pack
 
+      - name: Generate changelog
+        id: log
+        run: echo ::set-output name=MESSAGE::$(node tools/changelog.js generate)
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -33,7 +37,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: SOGEBOT ${{ github.ref }}
           body: |
-            TBD
+            ${{steps.log.outputs.MESSAGE}}
           draft: false
           prerelease: false
 
