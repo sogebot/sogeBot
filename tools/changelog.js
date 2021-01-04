@@ -13,6 +13,7 @@ const argv = require('yargs') // eslint-disable-line
     type: 'boolean',
   })
   .command('generate', 'generate changelog')
+  .command('nextTag', 'get next tag')
   .command('cli [commit]', 'create changelog between commits/tags', (yargs) => {
     yargs.demandOption(['commit'], 'Please provide commit or tag argument to work with this tool');
     yargs.positional('commit', {
@@ -23,6 +24,33 @@ const argv = require('yargs') // eslint-disable-line
   .demandCommand()
   .help()
   .argv;
+
+  if (argv._[0] === 'nextTag') {
+    gitSemverTags(function(err, tags) {
+      const tagsToGenerate = [];
+      const latestTag = tags[0];
+
+      const changesList = [];
+      const changesSpawn = spawnSync('git', ['log', `${latestTag}...HEAD`, '--oneline']);
+      changesList.push(...changes(changesSpawn.stdout.toString().split('\n')));
+
+      const [ latestMajorVersion, latestMinorVersion, latestPatchVersion ] = tags[0].split('.');
+      if (changesList.includes('### Features\n')) {
+        // new tag
+        process.stdout.write(`${latestMajorVersion}.${Number(latestMinorVersion)+1}.0`);
+      } else {
+        process.stdout.write(`${latestMajorVersion}.${latestMinorVersion}.${Number(latestPatchVersion)+1}`);
+      }
+    });
+  }
+
+if (argv._[0] === 'nextSnapshot') {
+  gitSemverTags(function(err, tags) {
+    const tagsToGenerate = [];
+    const [ latestMajorVersion, latestMinorVersion, latestPatchVersion ] = tags[0].split('.');
+    process.stdout.write(`${latestMajorVersion}.${Number(latestMinorVersion)+1}.0-SNAPSHOT`);
+  });
+}
 
 if (argv._[0] === 'generate') {
   gitSemverTags(function(err, tags) {
