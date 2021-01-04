@@ -24,6 +24,7 @@ import { permission } from './helpers/permissions';
 import { addToViewersCache, getFromViewersCache } from './helpers/permissions';
 import { adminEndpoint } from './helpers/socket';
 import Message from './message';
+import { getUserFromTwitch } from './microservices/getUserFromTwitch';
 import permissions from './permissions';
 import users from './users';
 import custom_variables from './widgets/customvariables';
@@ -316,7 +317,8 @@ class CustomVariables extends Core {
         if (_user) {
           const userObj = {
             username,
-            id: await users.getIdByName(username),
+            id: String(_user.userId),
+            displayname: _user.displayname,
             is: {
               online: _user.isOnline ?? false,
               follower: get(_user, 'is.follower', false),
@@ -327,7 +329,33 @@ class CustomVariables extends Core {
           };
           return userObj;
         } else {
-          return null;
+          try {
+            // we don't have data of user, we will try to get them
+            const userFromTwitch = await getUserFromTwitch(username);
+            const createdUser = await getRepository(User).save({
+              username,
+              userId: Number(userFromTwitch.id),
+              displayname: userFromTwitch.display_name,
+              profileImageUrl: userFromTwitch.profile_image_url,
+            });
+
+            const userObj = {
+              username,
+              id: String(createdUser.userId),
+              displayname: createdUser.displayname,
+              is: {
+                online: createdUser.isOnline ?? false,
+                follower: get(createdUser, 'is.follower', false),
+                vip: get(createdUser, 'is.vip', false),
+                subscriber: get(createdUser, 'is.subscriber', false),
+                mod: isModerator(createdUser),
+              },
+            };
+            return userObj;
+          } catch (e) {
+            error(e.stack);
+            return null;
+          }
         }
       },
       ...customVariables,
