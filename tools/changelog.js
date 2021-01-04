@@ -28,7 +28,8 @@ const argv = require('yargs') // eslint-disable-line
 if (argv._[0] === 'generate') {
   gitSemverTags(function(err, tags) {
     const tagsToGenerate = [];
-    const [ latestMajorVersion, latestMinorVersion, latestPatchVersion ] = tags[0].split('.');
+    //const [ latestMajorVersion, latestMinorVersion, latestPatchVersion ] = tags[0].split('.');
+    const [ latestMajorVersion, latestMinorVersion, latestPatchVersion ] = ['11', '38', '3'];
 
     for (let i = latestPatchVersion; i >= 0; i--) {
       tagsToGenerate.push(`${latestMajorVersion}.${latestMinorVersion}.${i}`);
