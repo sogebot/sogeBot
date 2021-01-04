@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # load full history
 
       - name: install node v14
         uses: actions/setup-node@v1
