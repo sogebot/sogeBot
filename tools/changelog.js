@@ -4,10 +4,15 @@ const path = require('path');
 const glob = require('glob');
 const { spawnSync } = require('child_process');
 const gitSemverTags = require('git-semver-tags');
+const yargs = require('yargs');
 
 
 const argv = require('yargs') // eslint-disable-line
   .usage('node tools/changelog.js <cmd> [args]')
+  .option('escape', {
+    description: 'Escapes outpu (useful for github action)',
+    type: 'boolean',
+  })
   .command('generate', 'generate changelog')
   .command('cli [commit]', 'create changelog between commits/tags', (yargs) => {
     yargs.demandOption(['commit'], 'Please provide commit or tag argument to work with this tool');
@@ -38,7 +43,7 @@ if (argv._[0] === 'generate') {
       const output = changes(changesSpawn.stdout.toString().split('\n'));
 
       if (tagsToGenerate.length > 1) {
-        output.unshift(`## ${tag}`);
+        output.unshift(`## ${tag}\n`);
       }
 
       changesList.push(output);
@@ -47,7 +52,7 @@ if (argv._[0] === 'generate') {
 
     for (const output of changesList.reverse()) {
       for (const line of output) {
-        console.log(line);
+        process.stdout.write(sanitizeLine(line));
       }
     }
   });
@@ -56,7 +61,7 @@ if (argv._[0] === 'generate') {
 if (argv._[0] === 'cli') {
   const changesSpawn = spawnSync('git', ['log', argv.commit, '--oneline']);
   for (const output of changes(changesSpawn.stdout.toString().split('\n'))) {
-    console.log(output);
+    process.stdout.write(sanitizeLine(output));
   }
 }
 
@@ -128,7 +133,7 @@ function changes(changesList) {
     for (const change of changesList.filter(o => o.message.startsWith('fix'))) {
       output.push(prepareMessage(change));
     }
-    output.push('');
+    output.push('\n');
   }
 
   if (changesList.filter(o => o.message.startsWith('feat')).length > 0) {
@@ -137,7 +142,7 @@ function changes(changesList) {
     for (const change of changesList.filter(o => o.message.startsWith('feat'))) {
       output.push(prepareMessage(change));
     }
-    output.push('');
+    output.push('\n');
   }
   return output;
 }
@@ -146,8 +151,20 @@ function prepareMessage(change) {
   const regexp = /(fix|feat)\((?<type>\w*)\)\: (?<message>.*)/;
   const match = regexp.exec(change.message);
   try {
-    return `* **${match.groups.type}** - ${match.groups.message}${change.fixes.length > 0 ? ', ' + change.fixes.join(', ') : ''} ([${change.commit}](https://github.com/sogehige/sogeBot/commit/${change.commit}))`;
+    return `* **${match.groups.type}** - ${match.groups.message}${change.fixes.length > 0 ? ', ' + change.fixes.join(', ') : ''} ([${change.commit}](https://github.com/sogehige/sogeBot/commit/${change.commit}))\n`;
   } catch (e) {
-    return `* ${change.message} [${change.commit}](https://github.com/sogehige/sogeBot/commit/${change.commit}))`;
+    return `* ${change.message} [${change.commit}](https://github.com/sogehige/sogeBot/commit/${change.commit}))\n`;
+  }
+}
+
+function sanitizeLine(line) {
+  if (argv.escape) {
+    const sanitized = line
+      .replace(/\%/g, '%25')
+      .replace(/\n/g, '%0A')
+      .replace(/\r/g, '%0D');
+    return sanitized;
+  } else {
+    return line;
   }
 }

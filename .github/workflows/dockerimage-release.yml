@@ -37,7 +37,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: SOGEBOT ${{ github.ref }}
           body: |
-            ${{steps.log.outputs.MESSAGE}}
+            $(node tools/changelog.js generate)
           draft: false
           prerelease: false
 
