@@ -136,10 +136,8 @@
         </template>
         <div class="px-3 py-2">
           <b-form>
-            <b-form-group
-              :label="translate('username')"
-              label-for="username"
-            >
+            <b-form-group>
+              <label-inside>{{ translate('username') }}</label-inside>
               <template v-if="editationItem">
                 <b-input-group>
                   <b-form-input
@@ -153,10 +151,8 @@
               <b-skeleton v-else type="input" class="w-100"></b-skeleton>
             </b-form-group>
 
-            <b-form-group
-              :label="translate('last-seen')"
-              label-for="seenAt"
-            >
+            <b-form-group>
+              <label-inside>{{ translate('last-seen') }}</label-inside>
               <template v-if="editationItem">
                 <b-input-group>
                   <b-form-input
@@ -172,10 +168,8 @@
 
             <b-row>
               <b-col>
-                <b-form-group
-                  :label="translate('followed-since')"
-                  label-for="followedAt"
-                >
+                <b-form-group>
+                  <label-inside style="padding-left: 40px;">{{ translate('followed-since') }}</label-inside>
                   <template v-if="editationItem">
                     <b-input-group>
                       <b-input-group-prepend>
@@ -205,10 +199,8 @@
                 </b-form-group>
               </b-col>
               <b-col>
-                <b-form-group
-                  :label="translate('subscribed-since')"
-                  label-for="subscribedAt"
-                >
+                <b-form-group>
+                  <label-inside>{{ translate('subscribed-since') }}</label-inside>
                   <template v-if="editationItem">
                     <b-input-group>
                       <datetime
@@ -234,10 +226,8 @@
 
             <b-row>
               <b-col>
-                <b-form-group
-                  :label="translate('message')"
-                  label-for="messages"
-                >
+                <b-form-group>
+                  <label-inside>{{ translate('message') }}</label-inside>
                   <template v-if="editationItem">
                     <b-input-group>
                       <b-form-input
@@ -258,10 +248,8 @@
                 </b-form-group>
               </b-col>
               <b-col>
-                <b-form-group
-                  :label="translate('subCumulativeMonths')"
-                  label-for="subCumulativeMonths"
-                >
+                <b-form-group>
+                  <label-inside>{{ translate('subCumulativeMonths') }}</label-inside>
                   <template v-if="editationItem">
                     <b-input-group>
                       <b-form-input
@@ -280,9 +268,7 @@
             <b-row>
               <b-col>
                 <b-form-group>
-                  <label for="watchedTime">
-                    {{ translate('watched-time') }} <small>{{ translate('hours') }}</small>
-                  </label>
+                  <label-inside>{{ translate('watched-time') }} <small>{{ translate('hours') }}</small></label-inside>
                   <template v-if="editationItem">
                     <b-input-group>
                       <b-form-input
@@ -303,10 +289,8 @@
                 </b-form-group>
               </b-col>
               <b-col>
-                <b-form-group
-                  :label="translate('subgifts')"
-                  label-for="subgifts"
-                >
+                <b-form-group>
+                  <label-inside>{{ translate('subgifts') }}</label-inside>
                   <template v-if="editationItem">
                     <b-input-group>
                       <b-form-input
@@ -324,10 +308,8 @@
 
             <b-row>
               <b-col>
-                <b-form-group
-                  :label="translate('points')"
-                  label-for="points"
-                >
+                <b-form-group>
+                  <label-inside>{{ translate('points') }}</label-inside>
                   <template v-if="editationItem">
                     <b-input-group>
                       <b-form-input
@@ -348,10 +330,8 @@
                 </b-form-group>
               </b-col>
               <b-col>
-                <b-form-group
-                  :label="translate('subStreak')"
-                  label-for="subStreak"
-                >
+                <b-form-group>
+                  <label-inside>{{ translate('subStreak') }}</label-inside>
                   <template v-if="editationItem">
                     <b-input-group>
                       <b-form-input
@@ -691,6 +671,7 @@ export default defineComponent({
   components: {
     'loading': () => import('src/panel/components/loading.vue'),
     datetime: VueFlatPickr,
+    'label-inside': () => import('src/panel/components/label-inside.vue')
   },
   validations: {
     editationItem: {

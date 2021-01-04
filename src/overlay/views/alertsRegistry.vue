@@ -116,12 +116,14 @@ import JsonViewer from 'vue-json-viewer'
 import VRuntimeTemplate from 'v-runtime-template';
 import { isEqual, get } from 'lodash-es';
 import urlRegex from 'url-regex';
+import safeEval from 'safe-eval';
 
 import { CacheEmotesInterface } from 'src/bot/database/entity/cacheEmotes';
 import { EmitData, AlertInterface, CommonSettingsInterface, AlertTipInterface, AlertResubInterface, AlertRewardRedeemInterface } from 'src/bot/database/entity/alert';
 
 import { getSocket } from 'src/panel/helpers/socket';
 import { textStrokeGenerator, shadowGenerator } from 'src/panel/helpers/text';
+import { itemsToEvalPart } from 'src/panel/views/registries/alerts/components/query-filter.vue';
 
 require('../../../scss/letter-animations.css');
 require('animate.css');
@@ -372,75 +374,50 @@ export default class AlertsRegistryOverlays extends Vue {
             possibleAlerts = (possibleAlerts as AlertRewardRedeemInterface[]).filter(o => o.rewardId === emitData.name)
           }
           if (possibleAlerts.length > 0) {
-            // search for exact variants
-            const possibleAlertsWithExactAmount = possibleAlerts.filter(o => {
-              return o.enabled
-                  && o.variantCondition === 'exact'
-                  && o.variantAmount === emitData.amount;
-            });
-
-            // search for gt-eq variants
-            const possibleAlertsWithGtEqAmount = possibleAlerts.filter(o => {
-              return o.enabled
-                  && o.variantCondition === 'gt-eq'
-                  && o.variantAmount <= emitData.amount
-            });
-
-            // search for tier-gt-eq variants
-            const possibleAlertsWithTierExactAmount = possibleAlerts.filter(o => {
-              return o.enabled
-                  && o.variantCondition === 'tier-exact'
-                  && emitData.tier
-                  && (o.variantAmount === 0 ? 'Prime' : String(o.variantAmount)) === emitData.tier
-            });
-
-            // search for tier-gt-eq variants
-            const possibleAlertsWithTierGtEqAmount = possibleAlerts.filter(o => {
-              const tiers = ['Prime', '1', '2', '3'];
-              const tier = (o.variantAmount === 0 ? 'Prime' : String(o.variantAmount));
-              const idx = tiers.findIndex((o) => o === tier);
-              const usable = tiers.slice(idx, tiers.length);
-              console.log({
-                tiers,
-                tier,
-                usable,
-                idx,
-              });
-
-              return o.enabled
-                  && o.variantCondition === 'tier-gt-eq'
-                  && emitData.tier
-                  && usable.includes(emitData.tier)
-            });
-
-            // search for random variants
-            let possibleAlertsWithRandomCount: (CommonSettingsInterface | AlertTipInterface | AlertResubInterface)[] = [];
-            for (const alert of possibleAlerts) {
-              if (!alert.enabled) {
-                continue;
+            // filter variants
+            possibleAlerts = possibleAlerts.filter(o => {
+              if (!o.enabled) {
+                return false;
               }
 
-              if (alert.variantCondition === 'random') {
+              if (o.filter && o.filter.items.length > 0) {
+                return safeEval(
+                  itemsToEvalPart(o.filter.items, o.filter.operator),
+                  {
+                    username: emitData.name,
+                    amount: emitData.amount,
+                    message: emitData.message,
+                    tier: emitData.tier,
+                    recipient: emitData.recipient,
+                  }
+                )
+              }
+
+              return true;
+            })
+
+            // after we have possible alerts -> generate random
+            let possibleAlertsWithRandomCount: (CommonSettingsInterface | AlertTipInterface | AlertResubInterface)[] = [];
+            // check if exclusive alert is there then run only it (+ other exclusive)
+            if (possibleAlerts.find(o => o.variantAmount === 5)) {
+              for (const alert of possibleAlerts.filter(o => o.variantAmount === 5)) {
+                possibleAlertsWithRandomCount.push(alert);
+              }
+            } else {
+              // randomize variants
+              for (const alert of possibleAlerts) {
                 for (let i = 0; i < alert.variantAmount; i++) {
                   possibleAlertsWithRandomCount.push(alert)
                 }
               }
             }
 
-            console.debug({emitData, possibleAlerts, possibleAlertsWithRandomCount, possibleAlertsWithExactAmount, possibleAlertsWithGtEqAmount, possibleAlertsWithTierExactAmount, possibleAlertsWithTierGtEqAmount})
+            console.debug({emitData, possibleAlerts, possibleAlertsWithRandomCount })
 
             let alert: CommonSettingsInterface | AlertTipInterface | AlertResubInterface | undefined;
-            if (possibleAlertsWithExactAmount.length > 0) {
-              alert = possibleAlertsWithExactAmount[Math.floor(Math.random() * possibleAlertsWithExactAmount.length)];
-            } else if (possibleAlertsWithGtEqAmount.length > 0) {
-              alert = possibleAlertsWithGtEqAmount[Math.floor(Math.random() * possibleAlertsWithGtEqAmount.length)];
-            } else if (possibleAlertsWithTierExactAmount.length > 0) {
-              alert = possibleAlertsWithTierExactAmount[Math.floor(Math.random() * possibleAlertsWithTierExactAmount.length)];
-            } else if (possibleAlertsWithTierGtEqAmount.length > 0) {
-              alert = possibleAlertsWithTierGtEqAmount[Math.floor(Math.random() * possibleAlertsWithTierGtEqAmount.length)];
-            } else {
-              alert = possibleAlertsWithRandomCount[Math.floor(Math.random() * possibleAlertsWithRandomCount.length)];
-            }
+            // Filter TBD
+
+            alert = possibleAlertsWithRandomCount[Math.floor(Math.random() * possibleAlertsWithRandomCount.length)];
             if (!alert || !alert.id) {
               console.log('No alert found or all are disabled');
               return;

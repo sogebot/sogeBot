@@ -27,14 +27,25 @@
     <b-form-group
       label-cols-sm="4"
       label-cols-lg="3"
+      :label="translate('registry.alerts.filter.name')"
+      :label-for="'filter' + data.id"
+    >
+      <query-filter
+        :key="'filter-' + data.id"
+        :filter.sync="data.filter"
+        :rules="rules"
+      ></query-filter>
+    </b-form-group>
+
+    <b-form-group
+      label-cols-sm="4"
+      label-cols-lg="3"
       :label="translate('registry.alerts.variant.name')"
       :label-for="'variant' + data.id"
     >
       <variant
         :key="'variant-' + data.id"
-        :condition.sync="data.variantCondition"
         :amount.sync="data.variantAmount"
-        :event="event"
         :state="$v.data.variantAmount.$invalid && $v.data.variantAmount.$dirty ? false : null"
       ></variant>
     </b-form-group>
@@ -466,6 +477,7 @@ import { required, minValue } from 'vuelidate/lib/validators'
     'tts': () => import('./tts.vue'),
     'hold-button': () => import('src/panel/components/holdButton.vue'),
     'font': () => import('src/panel/components/font.vue'),
+    'query-filter': () => import('./query-filter.vue'),
   }
 })
 export default class AlertsEditCheersForm extends Vue {
@@ -480,6 +492,7 @@ export default class AlertsEditCheersForm extends Vue {
   fonts: {text: string; value: string}[] = [];
   get = get;
   translate = translate;
+  rules: [string, string][] = [];
 
   @Watch('validationDate')
   touchValidation() {
@@ -499,6 +512,17 @@ export default class AlertsEditCheersForm extends Vue {
       message: {
         minAmountToShow: {required, minValue: minValue(0)},
       }
+    }
+  }
+
+  created() {
+    switch (this.$props.event) {
+      case 'tips':
+        this.rules = [['username', 'string'], ['amount', 'number'], ['currency', 'string'], ['message', 'string']];
+        break;
+      default:
+        this.rules = [['username', 'string'], ['amount', 'number'], ['message', 'string']];
+        break;
     }
   }
 

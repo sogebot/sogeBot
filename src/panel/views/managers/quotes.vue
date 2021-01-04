@@ -59,10 +59,8 @@
         <div class="px-3 py-2">
           <loading v-if="!editationItem" />
           <b-form v-else>
-            <b-form-group
-              :label="translate('systems.quotes.quote.name')"
-              label-for="quote"
-            >
+            <b-form-group>
+              <label-inside>{{ translate('systems.quotes.quote.name') }}</label-inside>
               <b-form-input
                 id="quote"
                 v-model="editationItem.quote"
@@ -74,10 +72,8 @@
               <b-form-invalid-feedback :state="!($v.editationItem.quote.$invalid && $v.editationItem.quote.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
             </b-form-group>
 
-            <b-form-group
-              :label="translate('systems.quotes.by.name')"
-              label-for="quotedBy"
-            >
+            <b-form-group>
+              <label-inside>{{ translate('systems.quotes.by.name') }}</label-inside>
               <b-form-input
                 id="quotedBy"
                 :disabled="true"
@@ -86,17 +82,15 @@
               ></b-form-input>
             </b-form-group>
 
-            <b-form-group
-              :label="translate('systems.quotes.tags.name')"
-              :description="translate('systems.quotes.tags.help')"
-              label-for="tags"
-            >
+            <b-form-group>
+              <label-inside>{{ translate('systems.quotes.tags.name') }}</label-inside>
               <b-form-input
                 id="tags"
                 v-model="tagsString"
                 type="text"
                 :placeholder="translate('systems.quotes.tags.placeholder')"
               ></b-form-input>
+              <small>{{translate('systems.quotes.tags.help')}}</small>
             </b-form-group>
           </b-form>
         </div>
@@ -160,6 +154,7 @@ export default defineComponent({
   mixins: [ validationMixin ],
   components: {
     'loading': () => import('src/panel/components/loading.vue'),
+    'label-inside': () => import('src/panel/components/label-inside.vue')
   },
   validations: {
     editationItem: {
