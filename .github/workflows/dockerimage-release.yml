@@ -1,11 +1,52 @@
 name: Docker Image CI - release
 
 on:
-  release:
-    types: [published]
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - '*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
-  build:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: install node v14
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - name: Build a bot
+        run: make
+
+      - name: Zip a bot
+        run: make pack
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: SOGEBOT ${{ github.ref }}
+          body: |
+            TBD
+          draft: false
+          prerelease: false
+
+      - name: Upload the artifacts
+        uses: skx/github-action-publish-binaries@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          releaseId: ${{ steps.create_release.outputs.id }}
+          args: '*.zip'
+
+  docker:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
