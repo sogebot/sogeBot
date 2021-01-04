@@ -28,7 +28,7 @@ jobs:
 
       - name: Generate changelog
         id: log
-        run: echo ::set-output name=MESSAGE::$(node tools/changelog.js generate)
+        run: echo ::set-output name=MESSAGE::$(node tools/changelog.js --escape generate)
 
       - name: Create Release
         id: create_release
@@ -39,7 +39,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: SOGEBOT ${{ github.ref }}
           body: |
-            $(node tools/changelog.js generate)
+            ${{ steps.log.outputs.MESSAGE }}
           draft: false
           prerelease: false
 
