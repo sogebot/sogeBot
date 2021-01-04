@@ -3,10 +3,12 @@ const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
 const { spawnSync } = require('child_process');
+const gitSemverTags = require('git-semver-tags');
 
 
 const argv = require('yargs') // eslint-disable-line
   .usage('node tools/changelog.js <cmd> [args]')
+  .command('generate', 'generate changelog')
   .command('cli [commit]', 'create changelog between commits/tags', (yargs) => {
     yargs.demandOption(['commit'], 'Please provide commit or tag argument to work with this tool');
     yargs.positional('commit', {
@@ -18,11 +20,49 @@ const argv = require('yargs') // eslint-disable-line
   .help()
   .argv;
 
+if (argv._[0] === 'generate') {
+  gitSemverTags(function(err, tags) {
+    const tagsToGenerate = [];
+    const [ latestMajorVersion, latestMinorVersion, latestPatchVersion ] = tags[0].split('.');
+
+    for (let i = latestPatchVersion; i >= 0; i--) {
+      tagsToGenerate.push(`${latestMajorVersion}.${latestMinorVersion}.${i}`);
+    }
+
+    // we need last release before
+    let beforeTag = tags[tags.findIndex((val) => val === tagsToGenerate[tagsToGenerate.length - 1]) + 1];
+
+    const changesList = [];
+    for (const tag of tagsToGenerate.reverse()) {
+      const changesSpawn = spawnSync('git', ['log', `${beforeTag}...${tag}`, '--oneline']);
+      const output = changes(changesSpawn.stdout.toString().split('\n'));
+
+      if (tagsToGenerate.length > 1) {
+        output.unshift(`## ${tag}`);
+      }
+
+      changesList.push(output);
+      beforeTag = tag;
+    }
+
+    for (const output of changesList.reverse()) {
+      for (const line of output) {
+        console.log(line);
+      }
+    }
+  });
+}
+
 if (argv._[0] === 'cli') {
   const changesSpawn = spawnSync('git', ['log', argv.commit, '--oneline']);
-  let changes = changesSpawn.stdout.toString().split('\n');
+  for (const output of changes(changesSpawn.stdout.toString().split('\n'))) {
+    console.log(output);
+  }
+}
+
+function changes(changesList) {
   // sort alphabetically
-  changes.sort((a, b) => {
+  changesList.sort((a, b) => {
     const i = a.indexOf(' ');
     const i2 = b.indexOf(' ');
     a = a.slice(i+1).trim();
@@ -31,10 +71,12 @@ if (argv._[0] === 'cli') {
     if(a > b) { return 1; }
     return 0;
   });
+  const output = [];
+
   // split commit and message and add fixes
-  changes = changes.map(o => {
+  changesList = changesList.map(o => {
     const i = o.indexOf(' ');
-    const commit = o.slice(0, i).trim()
+    const commit = o.slice(0, i).trim();
 
     const body = spawnSync('git', ['log', commit, '-n', '1', '--pretty=format:%B']);
     const fixesRegexp = /(Fixes|Closes|Fixed|Closed)\s(\#\d*)/gmi;
@@ -76,27 +118,28 @@ if (argv._[0] === 'cli') {
     return { commit, message: o.slice(i+1).trim(), fixes };
   });
   // filter to have only fix and feat
-  changes = changes.filter(o => {
+  changesList = changesList.filter(o => {
     return o.message.startsWith('fix') || o.message.startsWith('feat');
   });
 
-  if (changes.filter(o => o.message.startsWith('fix')).length > 0) {
+  if (changesList.filter(o => o.message.startsWith('fix')).length > 0) {
     // print out bugfixes
-    console.log('### Bug Fixes\n');
-    for (const change of changes.filter(o => o.message.startsWith('fix'))) {
-      console.log(prepareMessage(change));
+    output.push('### Bug Fixes\n');
+    for (const change of changesList.filter(o => o.message.startsWith('fix'))) {
+      output.push(prepareMessage(change));
     }
-    console.log('');
+    output.push('');
   }
 
-  if (changes.filter(o => o.message.startsWith('feat')).length > 0) {
+  if (changesList.filter(o => o.message.startsWith('feat')).length > 0) {
     // print out bugfixes
-    console.log('### Features\n');
-    for (const change of changes.filter(o => o.message.startsWith('feat'))) {
-      console.log(prepareMessage(change));
+    output.push('### Features\n');
+    for (const change of changesList.filter(o => o.message.startsWith('feat'))) {
+      output.push(prepareMessage(change));
     }
-    console.log('');
+    output.push('');
   }
+  return output;
 }
 
 function prepareMessage(change) {

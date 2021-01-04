@@ -161,6 +161,7 @@
     "eslint-plugin-import": "2.22.1",
     "eslint-plugin-unused-imports": "1.0.1",
     "file-loader": "6.2.0",
+    "git-semver-tags": "4.1.1",
     "gsap": "3.5.1",
     "html-webpack-plugin": "4.5.1",
     "husky": "4.3.6",
