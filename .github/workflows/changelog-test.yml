@@ -17,6 +17,9 @@ jobs:
         with:
           node-version: 14
 
+      - name: deps
+        run: ENV=development make dependencies
+
       - name: Generate changelog
         id: log
         run: echo ::set-output name=MESSAGE::$(node tools/changelog.js --escape generate)
