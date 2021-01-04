@@ -1,4 +1,4 @@
-name: Docker Image CI - nightly
+name: Nightlies
 
 on:
   push:
