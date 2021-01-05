@@ -35,6 +35,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: n1hility/cancel-previous-runs@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/checkout@master
       - name: Build & Push to GitHub Package with shasum
         uses: opspresso/action-docker@v0.2.1
