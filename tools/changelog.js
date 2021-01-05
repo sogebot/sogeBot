@@ -27,7 +27,6 @@ const argv = require('yargs') // eslint-disable-line
 
   if (argv._[0] === 'nextTag') {
     gitSemverTags(function(err, tags) {
-      const tagsToGenerate = [];
       const latestTag = tags[0];
 
       const changesList = [];
@@ -46,7 +45,6 @@ const argv = require('yargs') // eslint-disable-line
 
 if (argv._[0] === 'nextSnapshot') {
   gitSemverTags(function(err, tags) {
-    const tagsToGenerate = [];
     const [ latestMajorVersion, latestMinorVersion, latestPatchVersion ] = tags[0].split('.');
     process.stdout.write(`${latestMajorVersion}.${Number(latestMinorVersion)+1}.0-SNAPSHOT`);
   });
