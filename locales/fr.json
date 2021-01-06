@@ -1104,9 +1104,8 @@
     }
   },
   "cooldowns": {
-    "cooldown-parse-failed": "{core.command-parse} !cooldown [keyword|!command] [global|user] [seconds] [true/false]",
     "cooldown-was-set": "$sender, $type cooldown for $command was set to $secondss",
-    "cooldown-was-unset": "$sender, $type cooldown for $command was unset",
+    "cooldown-was-unset": "$sender, cooldown for $command was unset",
     "cooldown-triggered": "$sender, you cannot use $command, remaining $secondss",
     "cooldown-not-found": "$sender, cooldown for $command was not found",
     "cooldown-was-enabled": "$sender, cooldown for $command was enabled",
