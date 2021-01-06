@@ -5,7 +5,6 @@
     "command": "Command",
     "username": "Username",
     "recipient": "Recipient",
-    "autohost": "Autohost",
     "message": "Message",
     "tier": "Tier",
     "amountOfViewers": "Amount of viewers",
@@ -165,7 +164,6 @@
   "message": {
     "setting": "Message settings"
   },
-  "showAutoHost": "Show autohost",
   "voice": "Voice",
   "keepAlertShown": "Alert keeps visible during TTS",
   "skipUrls": "Skip URLs during TTS",

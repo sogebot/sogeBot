@@ -212,11 +212,6 @@
           "label": "Nejméně diváků",
           "placeholder": "Kolik diváků spustí událost"
         },
-        "ignoreAutohost": {
-          "label": "Ignorovat Autohost",
-          "true": "Ignorovat",
-          "false": "Neignorovat"
-        },
         "runInterval": {
           "label": "Interval spuštění (0 = spustit jednou za stream)",
           "placeholder": "Spustit událost každých x sekund"
@@ -379,7 +374,6 @@
         "message": "Zpráva",
         "reason": "Důvod",
         "target": "Cíl",
-        "autohost": "Autohost (true/false)",
         "duration": "Doba trvání",
         "method": "Metoda",
         "tier": "Tier",

@@ -93,7 +93,6 @@ const connect = () => {
           monthsName: '',
           message: dataMessage.data.redemption.user_input,
           recipient: dataMessage.data.redemption.user.login,
-          autohost: false,
         });
         events.fire('reward-redeemed', {
           username: dataMessage.data.redemption.user.login,

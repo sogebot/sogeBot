@@ -171,7 +171,6 @@ class Donationalerts extends Integration {
       currency: data.currency,
       monthsName: '',
       message: data.message,
-      autohost: false,
     });
 
     if (data.billing_system !== 'fake') {

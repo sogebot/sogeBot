@@ -335,15 +335,13 @@ class TMI extends Core {
         message = message as HostTargetMessage;
         // Someone is hosting the channel and the message contains how many viewers..
         const username = message.message.split(' ')[0].replace(':', '').toLowerCase();
-        const autohost = message.message.includes('auto');
         const viewers = (message as HostTargetMessage).numberOfViewers || 0;
 
-        host(`${username}, viewers: ${viewers}, autohost: ${autohost}`);
+        host(`${username}, viewers: ${viewers}`);
 
         const data = {
           username: username,
           viewers: viewers,
-          autohost: autohost,
           event: 'host',
           timestamp: Date.now(),
         };
@@ -351,7 +349,6 @@ class TMI extends Core {
         eventlist.add({
           userId: String(await users.getIdByName(username) ?? '0'),
           viewers: viewers,
-          autohost: autohost,
           event: 'host',
           timestamp: Date.now(),
         });
@@ -364,7 +361,6 @@ class TMI extends Core {
           currency: '',
           monthsName: '',
           message: '',
-          autohost,
         });
       });
     } else {
@@ -399,7 +395,6 @@ class TMI extends Core {
         currency: '',
         monthsName: '',
         message: '',
-        autohost: false,
       });
 
     } else if (message.event === 'SUBSCRIPTION') {
@@ -476,7 +471,6 @@ class TMI extends Core {
         currency: '',
         monthsName: '',
         message: '',
-        autohost: false,
       });
 
       triggerInterfaceOnSub({
@@ -555,7 +549,6 @@ class TMI extends Core {
         currency: '',
         monthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
         message: messageFromUser,
-        autohost: false,
       });
     } catch (e) {
       error('Error parsing resub event');
@@ -594,7 +587,6 @@ class TMI extends Core {
         currency: '',
         monthsName: '',
         message: '',
-        autohost: false,
       });
     } catch (e) {
       error('Error parsing subscriptionGiftCommunity event');
@@ -667,7 +659,6 @@ class TMI extends Core {
         currency: '',
         monthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
         message: '',
-        autohost: false,
       });
 
       // also set subgift count to gifter
@@ -752,7 +743,6 @@ class TMI extends Core {
                 currency: '',
                 monthsName: '',
                 message: '',
-                autohost: false,
               });
             }
           }
@@ -769,7 +759,6 @@ class TMI extends Core {
           currency: '',
           monthsName: '',
           message: messageFromUser,
-          autohost: false,
         });
       }
     } catch (e) {

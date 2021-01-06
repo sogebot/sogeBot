@@ -118,7 +118,7 @@ import { isEqual, get } from 'lodash-es';
 import urlRegex from 'url-regex';
 
 import { CacheEmotesInterface } from 'src/bot/database/entity/cacheEmotes';
-import { EmitData, AlertInterface, CommonSettingsInterface, AlertHostInterface, AlertTipInterface, AlertResubInterface, AlertRewardRedeemInterface } from 'src/bot/database/entity/alert';
+import { EmitData, AlertInterface, CommonSettingsInterface, AlertTipInterface, AlertResubInterface, AlertRewardRedeemInterface } from 'src/bot/database/entity/alert';
 
 import { getSocket } from 'src/panel/helpers/socket';
 import { textStrokeGenerator, shadowGenerator } from 'src/panel/helpers/text';
@@ -183,7 +183,7 @@ export default class AlertsRegistryOverlays extends Vue {
     showTextAt: number;
     showAt: number;
     waitingForTTS: boolean;
-    alert: CommonSettingsInterface | AlertHostInterface | AlertTipInterface | AlertResubInterface;
+    alert: CommonSettingsInterface | AlertTipInterface | AlertResubInterface;
   } | null = null;
 
   beforeDestroyed() {
@@ -367,10 +367,6 @@ export default class AlertsRegistryOverlays extends Vue {
         if (emitData && this.data) {
           let possibleAlerts = this.data[emitData.event];
 
-          // remove if autohost and autohosts are disabled for alert
-          if (emitData.event === 'hosts' && emitData.autohost) {
-            possibleAlerts = (possibleAlerts as AlertHostInterface[]).filter(o => o.showAutoHost)
-          }
           // select only correct triggered events
           if (emitData.event === 'rewardredeems') {
             possibleAlerts = (possibleAlerts as AlertRewardRedeemInterface[]).filter(o => o.rewardId === emitData.name)
@@ -418,7 +414,7 @@ export default class AlertsRegistryOverlays extends Vue {
             });
 
             // search for random variants
-            let possibleAlertsWithRandomCount: (CommonSettingsInterface | AlertHostInterface | AlertTipInterface | AlertResubInterface)[] = [];
+            let possibleAlertsWithRandomCount: (CommonSettingsInterface | AlertTipInterface | AlertResubInterface)[] = [];
             for (const alert of possibleAlerts) {
               if (!alert.enabled) {
                 continue;
@@ -433,7 +429,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
             console.debug({emitData, possibleAlerts, possibleAlertsWithRandomCount, possibleAlertsWithExactAmount, possibleAlertsWithGtEqAmount, possibleAlertsWithTierExactAmount, possibleAlertsWithTierGtEqAmount})
 
-            let alert: CommonSettingsInterface | AlertHostInterface | AlertTipInterface | AlertResubInterface | undefined;
+            let alert: CommonSettingsInterface | AlertTipInterface | AlertResubInterface | undefined;
             if (possibleAlertsWithExactAmount.length > 0) {
               alert = possibleAlertsWithExactAmount[Math.floor(Math.random() * possibleAlertsWithExactAmount.length)];
             } else if (possibleAlertsWithGtEqAmount.length > 0) {

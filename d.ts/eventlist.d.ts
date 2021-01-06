@@ -5,7 +5,6 @@ declare namespace EventList {
     userId: string;
     fromId?: string;
     isTest?: boolean;
-    autohost?: boolean;
     message?: string;
     amount?: number;
     currency?: string;

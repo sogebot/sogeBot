@@ -268,7 +268,6 @@ class Webhooks {
             currency: '',
             monthsName: '',
             message: '',
-            autohost: false,
           });
 
           triggerInterfaceOnFollow({

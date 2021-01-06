@@ -113,7 +113,6 @@ const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], us
               currency: '',
               monthsName: '',
               message: '',
-              autohost: false,
             });
 
             triggerInterfaceOnFollow({
@@ -1881,7 +1880,6 @@ class API extends Core {
           currency: '',
           monthsName: '',
           message: '',
-          autohost: false,
         });
 
         triggerInterfaceOnFollow({

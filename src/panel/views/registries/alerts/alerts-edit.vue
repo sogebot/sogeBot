@@ -138,10 +138,9 @@
         </b-col>
         <b-col>
           <b-card>
-            <form-follow :event="selectedAlertType" v-if="selectedAlertType === 'cmdredeems' || selectedAlertType === 'follows' || selectedAlertType === 'subs' || selectedAlertType === 'subgifts' || selectedAlertType === 'subcommunitygifts'" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
+            <form-follow :event="selectedAlertType" v-if="['cmdredeems', 'follows', 'subs', 'subgifts', 'subcommunitygifts', 'raids', 'hosts'].includes(selectedAlertType)" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
             <form-cheers :event="selectedAlertType" v-else-if="selectedAlertType === 'cheers' || selectedAlertType === 'tips'" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
             <form-resubs :event="selectedAlertType" v-else-if="selectedAlertType === 'resubs'" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
-            <form-hosts :event="selectedAlertType" v-else-if="selectedAlertType === 'hosts' || selectedAlertType === 'raids'" :validationDate.sync="validationDate" :type="selectedAlertType" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
             <form-reward :event="selectedAlertType" v-else-if="selectedAlertType === 'rewardredeems'" :validationDate.sync="validationDate" :type="selectedAlertType" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
           </b-card>
         </b-col>
@@ -197,7 +196,6 @@ Component.registerHooks([
     'form-follow': () => import('./components/form-follow.vue'),
     'form-cheers': () => import('./components/form-cheers.vue'),
     'form-resubs': () => import('./components/form-resubs.vue'),
-    'form-hosts': () => import('./components/form-hosts.vue'),
     'form-reward': () => import('./components/form-reward.vue'),
     'title-divider': () => import('src/panel/components/title-divider.vue'),
     'test': () => import('./alerts-test.vue'),
@@ -604,14 +602,12 @@ export default class AlertsEdit extends Vue {
         case 'hosts':
           this.item.hosts.push({
             ..._default,
-            showAutoHost: false,
             messageTemplate: '{name} is now hosting my stream with {amount} viewers!',
           })
           break;
         case 'raids':
           this.item.raids.push({
             ..._default,
-            showAutoHost: false,
             messageTemplate: '{name} is raiding with a party of {amount} raiders!',
           })
           break;

@@ -212,11 +212,6 @@
           "label": "Viewers At Least",
           "placeholder": "How many viewers at least to trigger event"
         },
-        "ignoreAutohost": {
-          "label": "Ignore Autohost",
-          "true": "Ignore",
-          "false": "Not ignore"
-        },
         "runInterval": {
           "label": "Run Interval (0 = run once per stream)",
           "placeholder": "Trigger event every x seconds"
@@ -379,7 +374,6 @@
         "message": "Message",
         "reason": "Reason",
         "target": "Target",
-        "autohost": "Autohost (true/false)",
         "duration": "Duration",
         "method": "Method",
         "tier": "Tier",
