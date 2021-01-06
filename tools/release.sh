@@ -2,6 +2,12 @@ currentSnapshot=$(node tools/changelog.js nextSnapshot)
 nextTag=$(node tools/changelog.js nextTag)
 file=./package.json
 
+echo Switching to master branch
+git checkout master
+
+echo Updating master branch
+git pull -r origin master
+
 echo Updating package.json version from $currentSnapshot to $nextTag
 sed -i "s/$currentSnapshot/$nextTag/g" "$file"
 git add $file
