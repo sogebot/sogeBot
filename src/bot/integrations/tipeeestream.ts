@@ -167,7 +167,6 @@ class TipeeeStream extends Integration {
         currency: donationCurrency,
         monthsName: '',
         message,
-        autohost: false,
       });
 
       const user = await users.getUserByUsername(username);

@@ -212,11 +212,6 @@
           "label": "Mindestens X Zuschauer",
           "placeholder": "Wie viele Zuschauer mindestens um das Event auszulösen"
         },
-        "ignoreAutohost": {
-          "label": "Auto-Host ignorieren",
-          "true": "Ignorieren",
-          "false": "Nicht ignorieren"
-        },
         "runInterval": {
           "label": "Ausführungsintervall (0 = einmal pro Stream ausführen)",
           "placeholder": "Ereignis alle X Sekunden auslösen"
@@ -379,7 +374,6 @@
         "message": "Nachricht",
         "reason": "Grund",
         "target": "Ziel",
-        "autohost": "Autohost (true/false)",
         "duration": "Dauer",
         "method": "Methode",
         "tier": "Stufe",

@@ -190,7 +190,6 @@ class StreamElements extends Integration {
       currency: DONATION_CURRENCY,
       monthsName: '',
       message,
-      autohost: false,
     });
 
     triggerInterfaceOnTip({

@@ -52,7 +52,6 @@ class EventList extends Widget {
               currency: '',
               monthsName: '',
               message: '',
-              autohost: false,
             });
             break;
           case 'hosts':
@@ -65,7 +64,6 @@ class EventList extends Widget {
               currency: '',
               monthsName: '',
               message: '',
-              autohost: values.autohost ?? false,
             });
             break;
           case 'resubs':
@@ -77,7 +75,6 @@ class EventList extends Widget {
               currency: '',
               monthsName: getLocalizedName(values.subCumulativeMonths, translate('core.months')),
               message: values.message,
-              autohost: false,
             });
             break;
           case 'subgifts':
@@ -89,7 +86,6 @@ class EventList extends Widget {
               currency: '',
               monthsName: '',
               message: '',
-              autohost: false,
             });
             break;
           case 'cheers':
@@ -101,7 +97,6 @@ class EventList extends Widget {
               currency: '',
               monthsName: '',
               message: values.message,
-              autohost: false,
             });
             break;
           case 'tips':
@@ -113,7 +108,6 @@ class EventList extends Widget {
               currency: values.currency,
               monthsName: '',
               message: values.message,
-              autohost: false,
             });
             break;
           default:

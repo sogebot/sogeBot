@@ -246,7 +246,6 @@ class Streamlabs extends Integration {
           currency: event.currency,
           monthsName: '',
           message: event.message,
-          autohost: false,
         });
 
         triggerInterfaceOnTip({

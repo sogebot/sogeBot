@@ -5,7 +5,6 @@
     "command": "Příkaz",
     "username": "Uživatelské jméno",
     "recipient": "Příjemce",
-    "autohost": "Autohost",
     "message": "Zpráva",
     "tier": "Tier",
     "amountOfViewers": "Počet diváků",
@@ -165,7 +164,6 @@
   "message": {
     "setting": "Nastavení zprávy"
   },
-  "showAutoHost": "Zobrazit autohost",
   "voice": "Hlas",
   "keepAlertShown": "Alert zůstane zobrazen během TTS",
   "skipUrls": "Přeskočit URL během TTS",

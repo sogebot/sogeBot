@@ -80,7 +80,7 @@ class Events extends Core {
       { id: 'action', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
       { id: 'ban', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'reason' ] },
       { id: 'hosting', variables: [ 'target', 'viewers' ] },
-      { id: 'hosted', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'viewers', 'autohost' ], definitions: { viewersAtLeast: 1, ignoreAutohost: false }, check: this.checkHosted },
+      { id: 'hosted', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'viewers' ], definitions: { viewersAtLeast: 1 }, check: this.checkHosted },
       { id: 'raid', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'viewers' ], definitions: { viewersAtLeast: 1 }, check: this.checkRaid },
       { id: 'mod', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
       { id: 'commercial', variables: [ 'duration' ] },
@@ -454,8 +454,7 @@ class Events extends Core {
 
   public async checkHosted(event: EventInterface, attributes: Events.Attributes) {
     event.definitions.viewersAtLeast = Number(event.definitions.viewersAtLeast); // force Integer
-    const shouldTrigger = (attributes.viewers >= event.definitions.viewersAtLeast)
-                        && ((!attributes.autohost && event.definitions.ignoreAutohost as boolean) || !(event.definitions.ignoreAutohost as boolean));
+    const shouldTrigger = (attributes.viewers >= event.definitions.viewersAtLeast);
     return shouldTrigger;
   }
 
@@ -587,7 +586,6 @@ class Events extends Core {
       $reason: _.get(attributes, 'reason', null),
       $target: _.get(attributes, 'target', null),
       $viewers: _.get(attributes, 'viewers', null),
-      $autohost: _.get(attributes, 'autohost', null),
       $duration: _.get(attributes, 'duration', null),
       // add global variables
       $game: api.stats.currentGame,
@@ -686,7 +684,6 @@ class Events extends Core {
           monthsName: getLocalizedName(months, translate('core.months')),
           message: sample(['', 'Lorem Ipsum Dolor Sit Amet']),
           viewers: _.random(0, 9999, false),
-          autohost: _.random(0, 1, false) === 0,
           bits: _.random(1, 1000000, false),
           duration: sample([30, 60, 90, 120, 150, 180]),
           reason: sample(['', 'Lorem Ipsum Dolor Sit Amet']),

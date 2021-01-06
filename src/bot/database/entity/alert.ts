@@ -12,7 +12,6 @@ export interface EmitData {
   monthsName: string;
   event: keyof Omit<AlertInterface, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList'>;
   message: string;
-  autohost: boolean;
 }
 
 export interface CommonSettingsInterface {
@@ -111,8 +110,8 @@ export interface AlertInterface {
   subs: CommonSettingsInterface[];
   subgifts: CommonSettingsInterface[];
   subcommunitygifts: CommonSettingsInterface[];
-  hosts: AlertHostInterface[];
-  raids: AlertHostInterface[];
+  hosts: CommonSettingsInterface[];
+  raids: CommonSettingsInterface[];
   tips: AlertTipInterface[];
   cheers: AlertTipInterface[];
   resubs: AlertResubInterface[];
@@ -125,10 +124,6 @@ export interface AlertMediaInterface {
   id: string;
   b64data: string;
   chunkNo: number;
-}
-
-export interface AlertHostInterface extends CommonSettingsInterface {
-  showAutoHost: boolean;
 }
 
 export interface AlertRewardRedeemInterface extends AlertTipInterface {
@@ -376,11 +371,10 @@ export const AlertSubgift = new EntitySchema<Readonly<Required<CommonSettingsInt
   },
 });
 
-export const AlertHost = new EntitySchema<Readonly<Required<AlertHostInterface>>>({
+export const AlertHost = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
   name: 'alert_host',
   columns: {
     ...CommonSettingsSchema,
-    showAutoHost: { type: Boolean },
   },
   relations: {
     alert: {
@@ -394,11 +388,10 @@ export const AlertHost = new EntitySchema<Readonly<Required<AlertHostInterface>>
   },
 });
 
-export const AlertRaid = new EntitySchema<Readonly<Required<AlertHostInterface>>>({
+export const AlertRaid = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
   name: 'alert_raid',
   columns: {
     ...CommonSettingsSchema,
-    showAutoHost: { type: Boolean },
   },
   relations: {
     alert: {
