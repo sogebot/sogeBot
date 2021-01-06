@@ -1104,9 +1104,8 @@
     }
   },
   "cooldowns": {
-    "cooldown-parse-failed": "{core.command-parse} !cooldown [keyword|!command] [global|Benutzer] [seconds] [true/false]",
     "cooldown-was-set": "$sender, $type Abklingzeit für $command wurde auf $secondss gesetzt",
-    "cooldown-was-unset": "$sender, $type Abklingzeit für $command wurde entfernt",
+    "cooldown-was-unset": "$sender, cooldown for $command was unset",
     "cooldown-triggered": "$sender, Sie können nicht $command verwenden, verbleibende Zeit $secondss",
     "cooldown-not-found": "$sender, Abklingzeit für $command wurde nicht gefunden",
     "cooldown-was-enabled": "$sender, Abklingzeit für $command wurde aktiviert",
