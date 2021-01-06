@@ -8,12 +8,14 @@ import { Cooldown as CooldownEntity, CooldownInterface, CooldownViewer, Cooldown
 import { Keyword } from '../database/entity/keyword';
 import { User } from '../database/entity/user';
 import { command, default_permission, parser, permission_settings, rollback, settings } from '../decorators';
+import { onChange } from '../decorators/on';
 import Expects from '../expects';
 import { debug } from '../helpers/log';
 import { permission } from '../helpers/permissions';
 import { adminEndpoint } from '../helpers/socket';
 import Parser from '../parser';
 import permissions from '../permissions';
+import { translate } from '../translate';
 import System from './_interface';
 import customCommands from './customcommands';
 
@@ -21,7 +23,8 @@ const cache: { id: string; cooldowns: CooldownInterface[] }[] = [];
 const defaultCooldowns: { name: string; lastRunAt: number, permId: string }[] = [];
 
 /*
- * !cooldown [keyword|!command] [global|user] [seconds] [true/false] - set cooldown for keyword or !command - 0 for disable, true/false set quiet mode
+ * !cooldown [keyword|!command] [global|user] [seconds] [true/false] - set cooldown for keyword or !command, true/false set quiet mode
+ * !cooldown unset [keyword|!command] - unset cooldown for keyword or !command, true/false set quiet mode
  * !cooldown toggle moderators [keyword|!command] [global|user]      - enable/disable specified keyword or !command cooldown for moderators
  * !cooldown toggle owners [keyword|!command] [global|user]          - enable/disable specified keyword or !command cooldown for owners
  * !cooldown toggle subscribers [keyword|!command] [global|user]     - enable/disable specified keyword or !command cooldown for owners
@@ -40,6 +43,22 @@ class Cooldown extends System {
 
   @settings()
   cooldownNotifyAsChat = true;
+
+  @onChange('defaultCooldownOfKeywordsInSeconds')
+  resetDefaultCooldownsKeyword() {
+    let idx: number;
+    while ((idx = defaultCooldowns.findIndex(o => !o.name.startsWith('!'))) !== -1) {
+      defaultCooldowns.splice(idx, 1);
+    }
+  }
+
+  @onChange('defaultCooldownOfCommandsInSeconds')
+  resetCooldownOfCommandsInSeconds(val: number) {
+    let idx: number;
+    while ((idx = defaultCooldowns.findIndex(o => o.name.startsWith('!'))) !== -1) {
+      defaultCooldowns.splice(idx, 1);
+    }
+  }
 
   constructor () {
     super();
@@ -85,13 +104,21 @@ class Cooldown extends System {
     });
   }
 
+  help (opts: CommandOptions): CommandResponse[] {
+    let url = 'http://sogehige.github.io/sogeBot/#/systems/cooldown';
+    if ((process.env?.npm_package_version ?? 'x.y.z-SNAPSHOT').includes('SNAPSHOT')) {
+      url = 'http://sogehige.github.io/sogeBot/#/_master/systems/cooldown';
+    }
+    return [{ response: translate('core.usage') + ' => ' + url, ...opts }];
+  }
+
   @command('!cooldown')
   @default_permission(permission.CASTERS)
   async main (opts: CommandOptions) {
     const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP_SET) as unknown as { [x: string]: string } | null;
 
     if (_.isNil(match)) {
-      return [{ response: prepare('cooldowns.cooldown-parse-failed'), ...opts }];
+      return this.help(opts);
     }
 
     const cooldown = await getRepository(CooldownEntity).findOne({
@@ -100,12 +127,6 @@ class Cooldown extends System {
         type: match.type as 'global' | 'user',
       },
     });
-    if (parseInt(match.seconds, 10) === 0) {
-      if (cooldown) {
-        await getRepository(CooldownEntity).remove(cooldown);
-      }
-      return [{ response: prepare('cooldowns.cooldown-was-unset', { type: match.type, command: match.command }), ...opts }];
-    }
 
     await getRepository(CooldownEntity).save({
       ...cooldown,
@@ -121,6 +142,20 @@ class Cooldown extends System {
       isFollowerAffected: true,
     });
     return [{ response: prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command }), ...opts }];
+  }
+
+  @command('!cooldown unset')
+  @default_permission(permission.CASTERS)
+  async unset (opts: CommandOptions) {
+    try {
+      const [ commandOrKeyword ] = new Expects(opts.parameters).everything().toArray();
+      await getRepository(CooldownEntity).delete({
+        name: commandOrKeyword,
+      });
+      return [{ response: prepare('cooldowns.cooldown-was-unset', { command: commandOrKeyword }), ...opts }];
+    } catch (e) {
+      return this.help(opts);
+    }
   }
 
   @parser({ priority: constants.HIGH })
@@ -356,7 +391,7 @@ class Cooldown extends System {
     const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP) as unknown as { [x: string]: string } | null;
 
     if (_.isNil(match)) {
-      return [{ response: prepare('cooldowns.cooldown-parse-failed'), ...opts }];
+      return this.help(opts);
     }
 
     const cooldown = await getRepository(CooldownEntity).findOne({

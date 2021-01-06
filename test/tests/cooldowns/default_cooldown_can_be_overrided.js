@@ -28,8 +28,8 @@ const testUser = { userId: Math.floor(Math.random() * 100000), username: 'test',
 const testUser2 = { userId: Math.floor(Math.random() * 100000), username: 'test2', badges: {} };
 
 
-describe('Cooldowns - default check', () => {
-  describe('command - default', async () => {
+describe('Cooldowns - default cooldown can be overrided', () => {
+  describe('command - override', async () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
@@ -62,31 +62,18 @@ describe('Cooldowns - default check', () => {
       assert(!isOk);
     });
 
-    it('wait 2 seconds', async () => {
-      await time.waitMs(2000);
+    it('Override !test global 0 true', async () => {
+      const r = await cooldown.main({ sender: owner, parameters: '!test global 0 true' });
+      assert.strictEqual(r[0].response, '$sender, global cooldown for !test was set to 0s');
     });
 
-    it('testuser2 should be affected by cooldown', async () => {
-      const isOk = await cooldown.check({ sender: testUser2, message: '!test 25' });
-      assert(!isOk);
-    });
-
-    it('subuser1 should NOT be affected by cooldown as it is different permGroup', async () => {
-      const isOk = await cooldown.check({ sender: subuser1, message: '!test 25' });
-      assert(isOk);
-    });
-
-    it('wait 4 seconds', async () => {
-      await time.waitMs(4000);
-    });
-
-    it('testuser2 should not be affected by cooldown second time', async () => {
-      const isOk = await cooldown.check({ sender: testUser2, message: '!test 15' });
+    it('testuser should not be affected by cooldown', async () => {
+      const isOk = await cooldown.check({ sender: testUser, message: '!test 10' });
       assert(isOk);
     });
   });
 
-  describe('keyword - default', async () => {
+  describe('keyword - override', async () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
@@ -109,32 +96,32 @@ describe('Cooldowns - default check', () => {
       await time.waitMs(5000);
     });
 
-    it('test', async () => {
+    it('Create me keyword', async () => {
       await getRepository(Keyword).save({
         keyword: 'me',
         response: '(!me)',
         enabled: true,
       });
+    });
 
-      let isOk = await cooldown.check({ sender: testUser, message: 'me' });
+    it('testuser should not be affected by cooldown', async () => {
+      const isOk = await cooldown.check({ sender: testUser, message: 'me' });
       assert(isOk);
+    });
 
-      isOk = await cooldown.check({ sender: testUser, message: 'me' });
-      assert(!isOk); // second should fail
+    it('testuser should be affected by cooldown second time', async () => {
+      const isOk = await cooldown.check({ sender: testUser, message: 'me' });
+      assert(!isOk);
+    });
 
-      isOk = await cooldown.check({ sender: subuser1, message: 'me' });
-      assert(isOk); // another perm group should not fail
+    it('Override me global 0 true', async () => {
+      const r = await cooldown.main({ sender: owner, parameters: 'me global 0 true' });
+      assert.strictEqual(r[0].response, '$sender, global cooldown for me was set to 0s');
+    });
 
-      await time.waitMs(2000);
-
-      isOk = await cooldown.check({ sender: testUser2, message: 'me' });
-      assert(!isOk); // another user should fail as well
-
-      await time.waitMs(4000);
-
-      isOk = await cooldown.check({ sender: testUser2, message: 'me' });
+    it('testuser should not be affected by cooldown', async () => {
+      const isOk = await cooldown.check({ sender: testUser, message: 'me' });
       assert(isOk);
-
     });
   });
 });

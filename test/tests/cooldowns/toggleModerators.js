@@ -30,7 +30,7 @@ describe('Cooldowns - toggleModerators()', () => {
     const r2 = await cooldown.toggleModerators({ sender: owner, parameters: command });
 
     assert.strictEqual(r[0].response, '$sender, user cooldown for !me was set to 60s');
-    assert.strictEqual(r2[0].response, 'Sorry, $sender, but this command is not correct, use !cooldown [keyword|!command] [global|user] [seconds] [true/false]');
+    assert.strictEqual(r2[0].response, 'Usage => http://sogehige.github.io/sogeBot/#/_master/systems/cooldown');
   });
 
   it('correct toggle', async () => {
