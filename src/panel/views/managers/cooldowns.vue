@@ -178,7 +178,7 @@ export default defineComponent({
   validations: {
     editationItem: {
       name: {required, minLength: minLength(2), },
-      miliseconds: { required, minValue: minValue(10000) }
+      miliseconds: { required, minValue: minValue(0) }
     }
   },
   setup(props, ctx) {
