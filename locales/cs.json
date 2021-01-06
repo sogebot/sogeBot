@@ -1104,9 +1104,8 @@
     }
   },
   "cooldowns": {
-    "cooldown-parse-failed": "{core.command-parse} !cooldown [keyword|!command] [global|user] [seconds] [true/false]",
     "cooldown-was-set": "$sender, $type cooldown pro $command byl nastaven na $secondss",
-    "cooldown-was-unset": "$sender, $type cooldown pro $command byl zrušen",
+    "cooldown-was-unset": "$sender, cooldown for $command was unset",
     "cooldown-triggered": "$sender, nemůžete použít $command, zbývá $secondss",
     "cooldown-not-found": "$sender, cooldown pro $command nebyl nalezen",
     "cooldown-was-enabled": "$sender, cooldown pro $command byl zapnut",
