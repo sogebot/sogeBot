@@ -504,7 +504,7 @@ export default defineComponent({
     }
     const deleteResponse = (order: number) => {
       if (editationItem.value?.responses) {
-        editationItem.value.responses.splice(order, 1);
+        editationItem.value.responses.splice(editationItem.value.responses.findIndex(o => o.order === order), 1);
         orderBy(editationItem.value.responses, 'order', 'asc').map((o, i) => {
           o.order = i
           return o
