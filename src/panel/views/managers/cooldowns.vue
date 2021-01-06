@@ -94,12 +94,12 @@
                   id="name"
                   v-model.number="seconds"
                   type="number"
-                  min="10"
+                  min="0"
                   @input="$v.editationItem.miliseconds.$touch()"
                   :state="$v.editationItem.miliseconds.$invalid && $v.editationItem.miliseconds.$dirty ? false : null"
                 ></b-form-input>
               </b-input-group>
-              <b-form-invalid-feedback :state="!($v.editationItem.miliseconds.$invalid && $v.editationItem.miliseconds.$dirty)">{{ translate('dialog.errors.minValue').replace('$value', 10) }}</b-form-invalid-feedback>
+              <b-form-invalid-feedback :state="!($v.editationItem.miliseconds.$invalid && $v.editationItem.miliseconds.$dirty)">{{ translate('dialog.errors.minValue').replace('$value', 0) }}</b-form-invalid-feedback>
             </b-form-group>
           </b-form>
         </div>

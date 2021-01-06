@@ -68,7 +68,7 @@ export const VariableWatcher = {
   async check() {
     for (const k of Object.keys(variables)) {
       const [ type, name, ...variableArr ] = k.split('.');
-      const variable = variableArr.join('.');
+      let variable = variableArr.join('.');
       const checkedModule = find(type, name);
       if (!checkedModule) {
         throw new Error(`${type}.${name} not found in list`);
@@ -93,9 +93,15 @@ export const VariableWatcher = {
           value: JSON.stringify(value),
         });
 
-        debug('watcher', `watcher::change *** ${type}.${name}.${variable} changed from ${oldValue} to ${value}`);
+        // we need this with __permission_based__
         change(`${type}.${name}.${variable}`);
-        for (const event of getFunctionList('change', type === 'core' ? `${name}.${variable}` : `${type}.${name}.${variable}`)) {
+
+        if (variable.includes('__permission_based__')) {
+          variable = variable.replace('__permission_based__', '');
+        }
+        debug('watcher', `watcher::change *** ${type}.${name}.${variable} changed from ${JSON.stringify(oldValue)} to ${JSON.stringify(value)}`);
+        const events = getFunctionList('change', type === 'core' ? `${name}.${variable}` : `${type}.${name}.${variable}`);
+        for (const event of events) {
           if (typeof (checkedModule as any)[event.fName] === 'function') {
             (checkedModule as any)[event.fName](variable, cloneDeep(value));
           } else {
