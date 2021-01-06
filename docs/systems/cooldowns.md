@@ -1,5 +1,7 @@
 ## Cooldowns system
-`!cooldown <!command|keyword> <global|user> <seconds> <true|false>` - **OWNER** - set cooldown for command or keyword (per user or global), true/false sets whisper message, if you want to unset, set 0 seconds
+`!cooldown <!command|keyword> <global|user> <seconds> <true|false>` - **OWNER** - set cooldown for command or keyword (per user or global), true/false sets whisper message
+
+`!cooldown unset <!command|keyword>` - **OWNER** - unset cooldown for command or keyword
 
 `!cooldown toggle moderators <keyword|!command> <global|user>` - **OWNER** - enable/disable specified keyword or !command cooldown for moderators (by default disabled)
 

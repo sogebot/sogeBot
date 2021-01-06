@@ -73,6 +73,8 @@ bot it is twitch by default
 
 `$version` - return current bot version
 
+`$isBotSubscriber` - return true/false (boolean) if bot is subscriber
+
 ## Eval
 `(eval <yourJScode>)` - will evaluate your javascript code - there **must** be return value
 
@@ -84,6 +86,7 @@ bot it is twitch by default
 `(if $viewers>5|Is more than 5 viewers)` - will evaluate your javascript if code, without else
 
 ## Online/offline filters
+
 `(onlineonly)` - will enable command only if stream is online
 
 `(offlineonly)` - will enable command only if stream is offline
@@ -233,6 +236,7 @@ e.g. `(api|https://httpbin.org/get?test=a\\nb) Lorem (api.args.test)`
 `(!!<command>)` - run command **silently**
 
 **Usage 1:**
+
 - _command:_ `!buypermit`
 - _response:_ `(!permit.sender) You have bought a 1 link permit for (price)`
 - _chat:_ `foobar: !buypermit`
@@ -240,6 +244,7 @@ e.g. `(api|https://httpbin.org/get?test=a\\nb) Lorem (api.args.test)`
 - Bot will then send permit command for sender `!permit foobar` with *muted* permit message
 
 **Usage 2:**
+
 - _command:_ `!play`
 - _response:_ `(!songrequest.J73cZQzhPW0) You just requested some song!`
 - _chat:_ `foobar: !play`
@@ -247,13 +252,23 @@ e.g. `(api|https://httpbin.org/get?test=a\\nb) Lorem (api.args.test)`
 - Bot will then send songrequest command for id `!songrequest J73cZQzhPW0` with *muted* songrequest message
 
 ## Stream filters
+
 `(stream|#name|game)` - returns game of `#name` channel, it something went wrong, returns `n/a`
 
 `(stream|#name|title)` - returns title of `#name` channel, it something went wrong, returns `n/a`
 
 `(stream|#name|viewers)` - returns viewers count of `#name` channel, it something went wrong, returns `0`
 
+## YouTube filters
+
+`$youtube(url, <channel-or-user>)` - returns latest video link e.g.
+`$youtube(url, stejk01)`
+
+`$youtube(title, <channel-or-user>)` - returns latest video title e.g.
+`$youtube(title, stejk01)`
+
 ## List filters
+
 `(list.alias)` - will return list of your visible aliases
 
 `(list.alias|<group>)` - will return list of your visible aliases for group
