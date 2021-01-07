@@ -57,6 +57,28 @@
   "variant": {
     "name": "Variantenvorkommen"
   },
+  "filter": {
+    "name": "Occurence filter",
+    "operator": "Operator",
+    "rule": "Rule",
+    "addRule": "Add rule",
+    "addGroup": "Add group",
+    "comparator": "Comparator",
+    "value": "Value",
+    "valueSplitByComma": "Values split by comma (e.g. val1, val2)",
+    "isEven": "is even",
+    "isOdd": "is odd",
+    "lessThan": "less than",
+    "lessThanOrEqual": "less than or equal",
+    "contain": "contains",
+    "equal": "equal",
+    "notEqual": "not equal",
+    "present": "is present",
+    "includes": "includes",
+    "greaterThan": "greater than",
+    "greaterThanOrEqual": "greater than or equal",
+    "noFilter": "no filter"
+  },
   "speed": {
     "name": "Geschwindigkeit"
   },
@@ -80,6 +102,7 @@
   "default": "Standard",
   "frequently": "Häufig",
   "very-frequently": "Sehr häufig",
+  "exclusive": "Exclusive",
   "messageTemplate": {
     "name": "Nachrichtenvorlage",
     "placeholder": "Nachrichtenvorlage festlegen",
