@@ -116,7 +116,7 @@ export const getCustomRewards = async (): Promise<getCustomRewardReturn> => {
           },
           url: e.config.url,
           method: e.config.method.toUpperCase(),
-          status: e.response?.status ?? 'n/a',
+          status: e.response.status ?? 'n/a',
           response: null,
           error: null,
         } as const;
