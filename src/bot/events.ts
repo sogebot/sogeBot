@@ -610,7 +610,7 @@ class Events extends Core {
     adminEndpoint(this.nsp, 'events::getRedeemedRewards', async (cb) => {
       try {
         const rewards = await api.getCustomRewards();
-        cb(null, rewards?.data.length > 0 ? [...rewards?.data.map(o => o.title)] : []);
+        cb(null, rewards?.data ? [...rewards?.data.map(o => o.title)] : []);
       } catch (e) {
         cb(e.stack, []);
       }
