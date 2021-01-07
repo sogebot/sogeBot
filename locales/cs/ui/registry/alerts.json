@@ -57,6 +57,28 @@
   "variant": {
     "name": "Výskyt varianty"
   },
+  "filter": {
+    "name": "Filtr výskytu",
+    "operator": "Operátor",
+    "rule": "Pravidlo",
+    "addRule": "Přidat pravidlo",
+    "addGroup": "Přidat skupinu",
+    "comparator": "Porovnání",
+    "value": "Hodnota",
+    "valueSplitByComma": "Hodnoty rozdělené čárkou (např. val1, val2)",
+    "isEven": "je sudé",
+    "isOdd": "je liché",
+    "lessThan": "menší než",
+    "lessThanOrEqual": "menší nebo rovno",
+    "contain": "obsahuje",
+    "equal": "rovná se",
+    "notEqual": "nerovná se",
+    "present": "je přítomen",
+    "includes": "zahrnuje",
+    "greaterThan": "větší než",
+    "greaterThanOrEqual": "větší nebo rovno",
+    "noFilter": "žádný filtr"
+  },
   "speed": {
     "name": "Rychlost"
   },
@@ -80,6 +102,7 @@
   "default": "Normálně",
   "frequently": "Často",
   "very-frequently": "Velmi často",
+  "exclusive": "Výhradní",
   "messageTemplate": {
     "name": "Šablona zprávy",
     "placeholder": "Zadejte svou šablonu zprávy",
