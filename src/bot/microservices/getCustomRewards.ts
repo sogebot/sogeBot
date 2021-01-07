@@ -106,7 +106,7 @@ export const getCustomRewards = async (): Promise<getCustomRewardReturn> => {
       warning(e.stack);
     }
     if (e.isAxiosError) {
-      if (e.response?.data === 'channel points are not available for the broadcaster') {
+      if (e.response && e.response.data === 'channel points are not available for the broadcaster') {
         warning('Microservice getCustomRewards ended with error: channel points are not available for the broadcaster');
         const toReturn = {
           calls: {
