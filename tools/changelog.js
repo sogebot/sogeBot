@@ -34,7 +34,10 @@ const argv = require('yargs') // eslint-disable-line
       changesList.push(...changes(changesSpawn.stdout.toString().split('\n')));
 
       const [ latestMajorVersion, latestMinorVersion, latestPatchVersion ] = tags[0].split('.');
-      if (changesList.includes('### Features\n')) {
+
+      if (changesList.includes('### BREAKING CHANGES\n')) {
+        process.stdout.write(`${Number(latestMajorVersion)+1}.0.0`);
+      } else if (changesList.includes('### Features\n')) {
         // new tag
         process.stdout.write(`${latestMajorVersion}.${Number(latestMinorVersion)+1}.0`);
       } else {
@@ -113,7 +116,15 @@ function changes(changesList) {
     const fixesRegexpForum = /(Fixes|Closes|Fixed|Closed)\s(.*)/gmi;
     const fixesRegexpDiscord = /(Fixes|Closes|Fixed|Closed)\s.*discord.*?(\d+)$/gmi
     const fixesRegexpIdeas = /(Fixes|Closes|Fixed|Closed)\s.*ideas\.sogebot\.xyz.*?(\d+)/gmi
-    let fixes = []
+    const fixesRegexpBreaking = /BREAKING (CHANGES|CHANGE):\s(.*)/gmis;
+    let fixes = [];
+    let breakingChange = null;
+
+    if (body.stdout.toString().match(fixesRegexpBreaking)) {
+      const text = body.stdout.toString().match(fixesRegexpBreaking)[0];
+      breakingChange = text;
+    }
+
     if (body.stdout.toString().match(fixesRegexpIdeas)) {
       const text = body.stdout.toString().match(fixesRegexpIdeas)[0];
       const link = text.split(' ')[1];
@@ -145,8 +156,23 @@ function changes(changesList) {
       }
     }
 
-    return { commit, message: o.slice(i+1).trim(), fixes };
+    return { commit, message: o.slice(i+1).trim(), fixes, breakingChange };
   });
+
+  // breaking changes from all commits
+  if (changesList.filter(o => o.breakingChange).length > 0) {
+    // print out bugfixes
+    output.push('### BREAKING CHANGES\n');
+    for (const change of changesList.filter(o => o.breakingChange)) {
+      output.push('* ' + change.breakingChange
+        .replace('BREAKING', '')
+        .replace('CHANGES:', '')
+        .replace('CHANGE:', '')
+      );
+    }
+    output.push('\n');
+  }
+
   // filter to have only fix and feat
   changesList = changesList.filter(o => {
     return o.message.startsWith('fix') || o.message.startsWith('feat');
@@ -169,6 +195,7 @@ function changes(changesList) {
     }
     output.push('\n');
   }
+
   return output;
 }
 
