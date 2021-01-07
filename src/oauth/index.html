@@ -26,8 +26,8 @@
       localStorage.removeItem('refreshToken');
 
       // goto after login
-      const gotoAfterLogin = localStorage.getItem('goto-after-login');
-      localStorage.removeItem('goto-after-login');
+      const gotoAfterLogin = sessionStorage.getItem('goto-after-login');
+      sessionStorage.removeItem('goto-after-login');
 
       window.location.assign(`${gotoAfterLogin || state.referrer || state.url}`);
     } catch (error) {

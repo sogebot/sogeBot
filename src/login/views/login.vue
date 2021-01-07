@@ -56,7 +56,7 @@ export default defineComponent({
       window.location.assign(url.value + '/public/');
     };
     const tryAgain =  () => {
-      const gotoAfterLogin = localStorage.getItem('goto-after-login');
+      const gotoAfterLogin = sessionStorage.getItem('goto-after-login');
       if (gotoAfterLogin) {
         window.location.assign(gotoAfterLogin)
       }
