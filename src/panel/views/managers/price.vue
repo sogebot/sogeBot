@@ -40,10 +40,8 @@
         </template>
         <div class="px-3 py-2">
           <b-form>
-            <b-form-group
-              :label="translate('systems.price.command.name')"
-              label-for="command"
-            >
+            <b-form-group>
+              <label-inside>{{ translate('systems.price.command.name') }}</label-inside>
               <b-input-group>
                 <b-form-input
                   v-if="editationItem"
@@ -59,10 +57,8 @@
               <b-form-invalid-feedback :state="!($v.editationItem.command.$invalid && $v.editationItem.command.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
             </b-form-group>
 
-            <b-form-group
-              :label="translate('systems.price.price.name')"
-              label-for="price"
-            >
+            <b-form-group>
+              <label-inside>{{ translate('systems.price.price.name') }}</label-inside>
               <b-input-group>
                 <b-input-group-text slot="append" class="pr-3 pl-3">
                   {{ getLocalizedName(editationItem ? editationItem.price : 0, $store.state.configuration.systems.Points.customization.name)}}
@@ -174,6 +170,7 @@ export default defineComponent({
   mixins: [ validationMixin ],
   components: {
     'loading': () => import('src/panel/components/loading.vue'),
+    'label-inside': () => import('src/panel/components/label-inside.vue')
   },
   validations: {
     editationItem: {

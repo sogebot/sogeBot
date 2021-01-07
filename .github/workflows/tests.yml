@@ -11,6 +11,11 @@ jobs:
     name: ESLint check
     runs-on: ubuntu-latest
     steps:
+    - uses: khan/pull-request-workflow-cancel@1.0.0
+      with:
+        workflows: "tests.yml"
+      env:
+        GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
     - uses: actions/checkout@v2
     - name: All test should be run - tests are not containing describe.only
       run: |

@@ -137,7 +137,7 @@
           </b-card>
         </b-col>
         <b-col>
-          <b-card>
+          <b-card :key="selectedAlertType">
             <form-follow :event="selectedAlertType" v-if="['cmdredeems', 'follows', 'subs', 'subgifts', 'subcommunitygifts', 'raids', 'hosts'].includes(selectedAlertType)" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
             <form-cheers :event="selectedAlertType" v-else-if="selectedAlertType === 'cheers' || selectedAlertType === 'tips'" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
             <form-resubs :event="selectedAlertType" v-else-if="selectedAlertType === 'resubs'" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
@@ -421,7 +421,7 @@ export default class AlertsEdit extends Vue {
 
       id: uuid(),
       title: '',
-      variantCondition: 'random',
+      filter: null,
       variantAmount: 2,
       enabled: true,
       layout: '1',

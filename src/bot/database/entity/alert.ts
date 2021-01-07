@@ -19,10 +19,18 @@ export interface CommonSettingsInterface {
   alertId?: string;
   enabled: boolean;
   title: string;
-  variantCondition: 'random' | 'exact' | 'gt-eq' | 'tier-exact' | 'tier-gt-eq';
   variantAmount: number;
   messageTemplate: string;
   layout: '1' | '2' | '3' | '4' | '5';
+  filter: {
+    operator: string;
+    items: (CommonSettingsInterface['filter'] | {
+      comparator: string;
+      value: string;
+      type: string;
+      typeof: string;
+    })[]
+  } | null;
   animationInDuration: number;
   animationIn: 'fadeIn' | 'fadeInDown' | 'fadeInLeft' | 'fadeInRight'
   | 'fadeInUp' | 'fadeInDownBig' | 'fadeInLeftBig' | 'fadeInRightBig'
@@ -187,7 +195,6 @@ export const CommonSettingsSchema = {
   alertId: { nullable: true, name: 'alertId', type: String } as EntitySchemaColumnOptions,
   enabled: { type: Boolean } as EntitySchemaColumnOptions,
   title: { type: String } as EntitySchemaColumnOptions,
-  variantCondition: { type: 'varchar' } as EntitySchemaColumnOptions,
   variantAmount: { type: Number } as EntitySchemaColumnOptions,
   messageTemplate: { type: String } as EntitySchemaColumnOptions,
   layout: { type: 'varchar' } as EntitySchemaColumnOptions,
@@ -199,6 +206,7 @@ export const CommonSettingsSchema = {
   animationTextOptions: { type: 'simple-json' } as EntitySchemaColumnOptions,
   imageId: { type: String } as EntitySchemaColumnOptions,
   imageOptions: { type: 'simple-json' } as EntitySchemaColumnOptions,
+  filter: { type: 'simple-json', nullable: true } as EntitySchemaColumnOptions,
   soundId: { type: String } as EntitySchemaColumnOptions,
   soundVolume: { type: Number } as EntitySchemaColumnOptions,
   alertDurationInMs: { type: Number } as EntitySchemaColumnOptions,

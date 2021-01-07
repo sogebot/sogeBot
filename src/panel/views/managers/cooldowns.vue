@@ -66,10 +66,8 @@
         <div class="px-3 py-2">
           <loading v-if="!editationItem"/>
           <b-form v-else>
-            <b-form-group
-              :label="'!' + translate('command') + ' ' + translate('or') + ' ' + translate('keyword')"
-              label-for="name"
-            >
+            <b-form-group>
+              <label-inside>{{'!' + translate('command') + ' ' + translate('or') + ' ' + translate('keyword')}}</label-inside>
               <b-input-group>
                 <b-form-input
                   id="name"
@@ -85,10 +83,8 @@
                 <template v-else>{{ translate('dialog.errors.required') }}</template>
               </b-form-invalid-feedback>
             </b-form-group>
-            <b-form-group
-              :label="translate('cooldown') + ' (' + translate('in-seconds') + ')'"
-              label-for="name"
-            >
+            <b-form-group>
+              <label-inside>{{translate('cooldown') + ' (' + translate('in-seconds') + ')'}}</label-inside>
               <b-input-group>
                 <b-form-input
                   id="name"
@@ -167,6 +163,7 @@ export default defineComponent({
   mixins: [ validationMixin ],
   components: {
     loading: () => import('../../components/loading.vue'),
+    'label-inside': () => import('src/panel/components/label-inside.vue'),
   },
   filters: {
     capitalize (value: string) {

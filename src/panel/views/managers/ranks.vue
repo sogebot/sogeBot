@@ -42,10 +42,8 @@
         <div class="px-3 py-2">
           <loading v-if="!editationItem" />
           <b-form v-else>
-            <b-form-group
-              :label="translate('rank')"
-              label-for="name"
-            >
+            <b-form-group>
+              <label-inside>{{ translate('rank') }}</label-inside>
               <b-input-group>
                 <b-form-input
                   id="name"
@@ -58,10 +56,8 @@
               <b-form-invalid-feedback :state="!($v.editationItem.rank.$invalid && $v.editationItem.rank.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
             </b-form-group>
 
-            <b-form-group
-              :label="translate('type')"
-              label-for="type"
-            >
+            <b-form-group>
+              <label-inside>{{ translate('type') }}</label-inside>
               <b-form-select v-model="editationItem.type" class="mb-3">
                 <b-form-select-option value="viewer">Watch Time</b-form-select-option>
                 <b-form-select-option value="follower">Follow time</b-form-select-option>
@@ -69,10 +65,8 @@
               </b-form-select>
             </b-form-group>
 
-            <b-form-group
-              :label="editationItem.type === 'viewer' ? translate('hours') : translate('months')"
-              label-for="name"
-            >
+            <b-form-group>
+              <label-inside>{{ editationItem.type === 'viewer' ? translate('hours') : translate('months') }}</label-inside>
               <b-input-group>
                 <b-form-input
                   id="name"
@@ -180,6 +174,7 @@ export default defineComponent({
   mixins: [ validationMixin ],
   components: {
     'loading': () => import('src/panel/components/loading.vue'),
+    'label-inside': () => import('src/panel/components/label-inside.vue')
   },
   validations: {
     editationItem: {

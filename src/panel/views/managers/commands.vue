@@ -41,21 +41,22 @@
         </template>
         <div class="px-3 py-2">
           <b-form>
-            <b-form-group :label="translate('systems.customcommands.command.name')" label-for="name">
+            <b-form-group>
+              <label-inside>{{ translate('systems.customcommands.command.name') }}</label-inside>
               <template v-if="editationItem">
-              <b-input-group>
-                  <b-form-input
-                    id="name"
-                    v-model="editationItem.command"
-                    type="text"
-                    :placeholder="translate('systems.customcommands.command.placeholder')"
-                    @input="$v.editationItem.command.$touch()"
-                    :state="$v.editationItem.command.$invalid && $v.editationItem.command.$dirty ? false : null"
-                  ></b-form-input>
-                </b-input-group>
-                <b-form-invalid-feedback
-                  :state="!($v.editationItem.command.$invalid && $v.editationItem.command.$dirty)"
-                >{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+                <b-input-group>
+                    <b-form-input
+                      id="name"
+                      v-model="editationItem.command"
+                      type="text"
+                      :placeholder="translate('systems.customcommands.command.placeholder')"
+                      @input="$v.editationItem.command.$touch()"
+                      :state="$v.editationItem.command.$invalid && $v.editationItem.command.$dirty ? false : null"
+                    ></b-form-input>
+                  </b-input-group>
+                  <b-form-invalid-feedback
+                    :state="!($v.editationItem.command.$invalid && $v.editationItem.command.$dirty)"
+                  >{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
               </template>
               <b-skeleton v-else type="input" class="w-100"></b-skeleton>
             </b-form-group>
@@ -133,6 +134,7 @@
                   </b-col>
 
                   <b-col cols="12" sm="8" md="9">
+                    <label-inside>{{ translate('systems.customcommands.response.name') }}</label-inside>
                     <textarea-with-tags
                       :value.sync="response.response"
                       v-bind:placeholder="translate('systems.customcommands.response.placeholder')"
@@ -142,6 +144,7 @@
                     ></textarea-with-tags>
                   </b-col>
                   <b-col cols="12" sm="4" md="3">
+                    <label-inside>{{ translate('systems.customcommands.filter.name') }}</label-inside>
                     <textarea-with-tags
                       :value.sync="response.filter"
                       v-bind:placeholder="translate('systems.customcommands.filter.placeholder')"
@@ -269,6 +272,7 @@ export default defineComponent({
     loading: () => import('../../components/loading.vue'),
     'text-with-tags': () => import('../../components/textWithTags.vue'),
     'title-divider': () => import('src/panel/components/title-divider.vue'),
+    'label-inside': () => import('src/panel/components/label-inside.vue')
   },
   filters: {
     capitalize (value: string) {

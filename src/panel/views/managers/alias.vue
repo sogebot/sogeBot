@@ -41,10 +41,8 @@
         </template>
         <div class="px-3 py-2">
           <b-form>
-            <b-form-group
-              :label="translate('systems.alias.alias.name')"
-              label-for="name"
-            >
+            <b-form-group>
+              <label-inside>{{ translate('systems.alias.alias.name') }}</label-inside>
               <template v-if="editationItem">
                 <b-input-group>
                   <b-form-input
@@ -62,7 +60,7 @@
             </b-form-group>
 
             <b-form-group>
-              <label>{{ translate('systems.alias.command.name') }}</label>
+              <label-inside>{{ translate('systems.alias.command.name') }}</label-inside>
               <template v-if="editationItem">
                 <textarea-with-tags
                   @input="$v.editationItem.command.$touch()"
@@ -209,6 +207,7 @@ export default defineComponent({
   components: {
     'loading': () => import('src/panel/components/loading.vue'),
     'font-awesome-layers': FontAwesomeLayers,
+    'label-inside': () => import('src/panel/components/label-inside.vue'),
   },
   validations: {
     editationItem: {

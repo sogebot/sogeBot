@@ -11,7 +11,7 @@
           <div class="card-header">{{translate('events.dialog.settings')}}</div>
           <div class="card-body">
             <div class="form-group col-md-12">
-              <label for="type_selector">{{ translate('events.dialog.event') }}</label>
+              <label-inside>{{ translate('events.dialog.event') }}</label-inside>
               <b-select
                   v-model="editationItem.name"
                   :state="$v.editationItem.name.$error && $v.editationItem.name.$dirty ? false : null">
@@ -21,7 +21,7 @@
               <b-form-invalid-feedback :state="!($v.editationItem.name.$error && $v.editationItem.name.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
             </div>
             <div class="form-group col-md-12" v-for="defKey of Object.keys(editationItem.definitions)" :key="defKey">
-              <label for="type_selector">{{ translate("events.definitions." + defKey + ".label") }}</label>
+              <label-inside>{{ translate("events.definitions." + defKey + ".label") }}</label-inside>
               <template v-if="defKey === 'titleOfReward'">
                 {{ $v.editationItem.definitions.titleOfReward.$error && $v.editationItem.definitions.titleOfReward.$dirty ? false : null }}
                 <rewards :value.sync="editationItem.definitions[defKey]" :state="$v.editationItem.definitions.titleOfReward.$error && $v.editationItem.definitions.titleOfReward.$dirty ? false : null"/>
@@ -42,7 +42,7 @@
               </div>
             </div>
             <div class="form-group col-md-12">
-              <label for="type_selector">{{ translate("events.dialog.filters") }}</label>
+              <label-inside>{{ translate("events.dialog.filters") }}</label-inside>
               <textarea v-model="editationItem.filter" class="form-control"/>
             </div>
           </div>
@@ -80,24 +80,28 @@
                 class="mt-2"
                 :class="{'pt-2': indexDef === 0}">
 
-                <label for="type_selector">{{ translate("events.definitions." + defKey + ".label") }}</label>
                 <template v-if="supported.operations.find(o => o.id === operation.name)">
-                  <textarea-with-tags
-                    v-if="['messageToSend', 'commandToRun'].includes(defKey)"
-                    :value.sync="operation.definitions[defKey]"
-                    @input="getOperationDefinitionValidation(index, defKey).$touch();"
-                    :placeholder="translate('events.definitions.' + defKey + '.placeholder')"
-                    :state="!(getOperationDefinitionValidation(index, defKey).$error && getOperationDefinitionValidation(index, defKey).$dirty)"
-                    :filters="['global', ...(supported.events.find((o) => o.id === editationItem.name) || { variables: []}).variables]"
-                    @update="operation.definitions[defKey] = $event"
-                  />
-                  <b-select
-                      class="form-control"
-                      v-else-if="Array.isArray(supported.operations.find(o => o.id === operation.name).definitions[defKey])"
-                      v-model="operation.definitions[defKey]">
-                    <b-select-option v-for="value of supported.operations.find(o => o.id === operation.name).definitions[defKey]" :key="value" :value="value">{{value}}</b-select-option>
-                  </b-select>
+                  <template v-if="['messageToSend', 'commandToRun'].includes(defKey)">
+                    <label-inside>{{ translate("events.definitions." + defKey + ".label") }}</label-inside>
+                    <textarea-with-tags
+                      :value.sync="operation.definitions[defKey]"
+                      @input="getOperationDefinitionValidation(index, defKey).$touch();"
+                      :placeholder="translate('events.definitions.' + defKey + '.placeholder')"
+                      :state="!(getOperationDefinitionValidation(index, defKey).$error && getOperationDefinitionValidation(index, defKey).$dirty)"
+                      :filters="['global', ...(supported.events.find((o) => o.id === editationItem.name) || { variables: []}).variables]"
+                      @update="operation.definitions[defKey] = $event"
+                    />
+                  </template>
+                  <template v-else-if="Array.isArray(supported.operations.find(o => o.id === operation.name).definitions[defKey])">
+                    <label-inside>{{ translate("events.definitions." + defKey + ".label") }}</label-inside>
+                    <b-select
+                        class="form-control"
+                        v-model="operation.definitions[defKey]">
+                      <b-select-option v-for="value of supported.operations.find(o => o.id === operation.name).definitions[defKey]" :key="value" :value="value">{{value}}</b-select-option>
+                    </b-select>
+                  </template>
                   <template v-else-if="typeof operation.definitions[defKey] === 'string'">
+                    <label-inside>{{ translate("events.definitions." + defKey + ".label") }}</label-inside>
                     <b-input
                       type="text" class="form-control"
                       v-model="operation.definitions[defKey]"
@@ -105,6 +109,7 @@
                       :placeholder="translate('events.definitions.' + defKey + '.placeholder')"/>
                   </template>
                   <template v-else-if="typeof operation.definitions[defKey] === 'boolean'">
+                    <label>{{ translate("events.definitions." + defKey + ".label") }}</label>
                     <button type="button" class="btn btn-success" v-if="operation.definitions[defKey]" @click="operation.definitions[defKey] = false">{{translate("dialog.buttons.yes")}}</button>
                     <button type="button" class="btn btn-danger" v-else @click="operation.definitions[defKey] = true">{{translate("dialog.buttons.no")}}</button>
                   </template>
@@ -158,6 +163,7 @@ export default defineComponent({
     rewards: () => import('src/panel/components/rewardDropdown.vue'),
     loading: () => import('src/panel/components/loading.vue'),
     'font-awesome-layers': FontAwesomeLayers,
+    'label-inside': () => import('src/panel/components/label-inside.vue')
   },
   validations: {
     editationItem: {

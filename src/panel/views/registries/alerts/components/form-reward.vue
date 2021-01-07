@@ -27,14 +27,29 @@
     <b-form-group
       label-cols-sm="4"
       label-cols-lg="3"
+      :label="translate('registry.alerts.filter.name')"
+      :label-for="'filter' + data.id"
+    >
+      <query-filter
+        :key="'filter-' + data.id"
+        :filter.sync="data.filter"
+        :rules="[
+          ['username', 'string'],
+          ['message', 'string'],
+          ['amount', 'number']
+        ]"
+      ></query-filter>
+    </b-form-group>
+
+    <b-form-group
+      label-cols-sm="4"
+      label-cols-lg="3"
       :label="translate('registry.alerts.variant.name')"
       :label-for="'variant' + data.id"
     >
       <variant
         :key="'variant-' + data.id"
-        :condition.sync="data.variantCondition"
         :amount.sync="data.variantAmount"
-        :event="event"
         :state="$v.data.variantAmount.$invalid && $v.data.variantAmount.$dirty ? false : null"
       ></variant>
     </b-form-group>
@@ -459,6 +474,7 @@ import { required, minValue } from 'vuelidate/lib/validators'
     'hold-button': () => import('../../../../components/holdButton.vue'),
     'tts': () => import('./tts.vue'),
     'rewards': () => import('src/panel/components/rewardDropdown.vue'),
+    'query-filter': () => import('./query-filter.vue'),
   }
 })
 export default class AlertsEditFollowForm extends Vue {

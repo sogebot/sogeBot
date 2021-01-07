@@ -1,0 +1,36 @@
+name: Pull Requests Artifacts
+
+on:
+  pull_request:
+
+jobs:
+  artifact:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: khan/pull-request-workflow-cancel@1.0.0
+        with:
+          workflows: "pullrequest-artifact.yml"
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # load full history
+      - name: Get short SHA
+        id: slug
+        run: echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
+      - name: install node v14
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - name: Build a bot
+        run: make
+
+      - name: Zip a bot
+        run: make pack
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: sogeBot-${{ steps.slug.outputs.sha8 }}
+          path: ${{ github.workspace }}/*.zip
