@@ -19,10 +19,10 @@ const evaluate: ResponseFilter = {
   '(eval#)': async function (filter, attr) {
     let toEvaluate = filter.replace('(eval ', '').slice(0, -1);
 
-    const containUsers = isNil(toEvaluate.match(/users/g));
-    const containRandom = isNil(toEvaluate.replace(/Math\.random|_\.random/g, '').match(/random/g));
-    const containOnline = isNil(toEvaluate.match(/online/g));
-    const containUrl = isNil(toEvaluate.match(/url\(['"](.*?)['"]\)/g));
+    const containUsers = !isNil(toEvaluate.match(/users/g));
+    const containRandom = !isNil(toEvaluate.replace(/Math\.random|_\.random/g, '').match(/random/g));
+    const containOnline = !isNil(toEvaluate.match(/online/g));
+    const containUrl = !isNil(toEvaluate.match(/url\(['"](.*?)['"]\)/g));
 
     const urls: { id: string; response: AxiosResponse<any> }[] = [];
     if (containUrl) {
