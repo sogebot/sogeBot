@@ -11,6 +11,7 @@ import VueRouter from 'vue-router';
 import { setLocale } from 'src/bot/helpers/dayjs';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { setMainLoaded } from 'src/panel/helpers/isAvailableVariable';
+import { isBotStarted } from 'src/panel/helpers/isBotStarted';
 import { isUserLoggedIn } from 'src/panel/helpers/isUserLoggedIn';
 import { getConfiguration, getTranslations } from 'src/panel/helpers/socket';
 import { store } from 'src/panel/helpers/store';
@@ -35,6 +36,8 @@ export interface Global {
 Vue.use(VueRouter);
 
 const main = async () => {
+  await isBotStarted();
+  
   await getTranslations();
   store.commit('setLoggedUser', await isUserLoggedIn(false, false));
   store.commit('setConfiguration', await getConfiguration());

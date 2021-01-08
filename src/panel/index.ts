@@ -33,6 +33,7 @@ import { ButtonStates, states } from './helpers/buttonStates';
 import type { getListOfReturn } from './helpers/getListOf';
 import { getListOf, populateListOf } from './helpers/getListOf';
 import { setMainLoaded } from './helpers/isAvailableVariable';
+import { isBotStarted } from './helpers/isBotStarted';
 import { isUserLoggedIn } from './helpers/isUserLoggedIn';
 import { getConfiguration, getTranslations } from './helpers/socket';
 import { store } from './helpers/store';
@@ -69,6 +70,8 @@ declare module 'vue/types/vue' {
 Vue.use(VueRouter);
 
 const main = async () => {
+  await isBotStarted();
+
   // init prototypes
   Vue.prototype.urlParam = (v: string) => urlParam(v);
   store.commit('setLoggedUser', await isUserLoggedIn());
