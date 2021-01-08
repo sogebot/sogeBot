@@ -4,11 +4,11 @@ import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { parserReply, prepare } from '../commons';
-import customvariables from '../customvariables';
 import { Alias as AliasEntity } from '../database/entity/alias';
 import { command, default_permission, parser } from '../decorators';
 import Expects from '../expects';
 import { incrementCountOfCommandUsage } from '../helpers/commands/count';
+import { executeVariablesInText } from '../helpers/customvariables';
 import { debug, error, warning } from '../helpers/log';
 import { permission } from '../helpers/permissions';
 import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
@@ -126,7 +126,7 @@ class Alias extends System {
         }
         if (getFromViewersCache(opts.sender.userId, alias.permission)) {
           // process custom variables
-          const response = await customvariables.executeVariablesInText(
+          const response = await executeVariablesInText(
             opts.message.replace(replace, alias.command), {
               sender: {
                 userId: Number(opts.sender.userId),

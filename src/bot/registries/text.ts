@@ -1,7 +1,7 @@
 import { getRepository } from 'typeorm';
 
-import customvariables from '../customvariables';
 import { Text as TextEntity } from '../database/entity/text';
+import { executeVariablesInText } from '../helpers/customvariables';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import Message from '../message';
 import Registry from './_interface';
@@ -47,7 +47,7 @@ class Text extends Registry {
 
         let text = item.text;
         if (opts.parseText) {
-          text = await new Message(await customvariables.executeVariablesInText(text, null)).parse();
+          text = await new Message(await executeVariablesInText(text, null)).parse();
         }
 
         callback(null, {...item, text});

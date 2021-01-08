@@ -9,13 +9,13 @@ import Core from './_interface';
 import api from './api';
 import { announce, getBotSender, getOwner, isOwner, isSubscriber, isVIP, parserReply, prepare } from './commons';
 import currency from './currency';
-import customvariables from './customvariables';
 import { Event, EventInterface } from './database/entity/event';
 import { User } from './database/entity/user';
 import { onStreamEnd } from './decorators/on';
 import events from './events';
 import { sample } from './helpers/array/sample';
 import { attributesReplace } from './helpers/attributesReplace';
+import { getAll, getValueOf, setValueOf } from './helpers/customvariables';
 import { isDbConnected } from './helpers/database';
 import { dayjs } from './helpers/dayjs';
 import { flatten } from './helpers/flatten';
@@ -384,13 +384,13 @@ class Events extends Core {
     const numberToIncrement = Number(operation.numberToIncrement);
 
     // check if value is number
-    let currentValue: string | number = await customvariables.getValueOf('$_' + customVariableName);
+    let currentValue: string | number = await getValueOf('$_' + customVariableName);
     if (!_.isFinite(parseInt(currentValue, 10))) {
       currentValue = String(numberToIncrement);
     } else {
       currentValue = String(parseInt(currentValue, 10) - numberToIncrement);
     }
-    await customvariables.setValueOf(String(customVariableName), currentValue, {});
+    await setValueOf(String(customVariableName), currentValue, {});
 
     // Update widgets and titles
     if (custom_variables.socket) {
@@ -409,13 +409,13 @@ class Events extends Core {
     const numberToDecrement = Number(operation.numberToDecrement);
 
     // check if value is number
-    let currentValue = await customvariables.getValueOf('$_' + customVariableName);
+    let currentValue = await getValueOf('$_' + customVariableName);
     if (!_.isFinite(parseInt(currentValue, 10))) {
       currentValue = String(numberToDecrement * -1);
     } else {
       currentValue = String(parseInt(currentValue, 10) - numberToDecrement);
     }
-    await customvariables.setValueOf(customVariableName, currentValue, {});
+    await setValueOf(customVariableName, currentValue, {});
 
     // Update widgets and titles
     if (custom_variables.socket) {
@@ -562,7 +562,7 @@ class Events extends Core {
       return true;
     }
 
-    const customVariables = customvariables.getAll();
+    const customVariables = getAll();
     const toEval = `(function evaluation () { return ${event.filter} })()`;
     const context = {
       $username: _.get(attributes, 'username', null),

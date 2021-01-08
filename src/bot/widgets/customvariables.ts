@@ -2,8 +2,8 @@
 
 import { getRepository } from 'typeorm';
 
-import customvariables from '../customvariables';
 import { Variable, VariableWatch, VariableWatchInterface } from '../database/entity/variable';
+import { isVariableSetById, setValueOf } from '../helpers/customvariables';
 import { adminEndpoint } from '../helpers/socket';
 import Widget from './_interface';
 
@@ -52,9 +52,9 @@ class CustomVariables extends Widget {
     });
     adminEndpoint(this.nsp, 'watched::setValue', async (opts, cb) => {
       try {
-        const variable = await customvariables.isVariableSetById(opts.id);
+        const variable = await isVariableSetById(opts.id);
         if (variable) {
-          await customvariables.setValueOf(variable.variableName, opts.value, {
+          await setValueOf(variable.variableName, opts.value, {
             readOnlyBypass: true,
           });
         }

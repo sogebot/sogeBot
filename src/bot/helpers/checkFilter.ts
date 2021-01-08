@@ -4,9 +4,9 @@ import { getRepository } from 'typeorm';
 
 import api from '../api';
 import { isOwner, isSubscriber, isVIP } from '../commons';
-import customvariables from '../customvariables';
 import { User } from '../database/entity/user';
 import ranks from '../systems/ranks';
+import { getAll } from './customvariables';
 import { isBot, isBotSubscriber } from './isBot';
 import { isBroadcaster } from './isBroadcaster';
 import { isModerator } from './isModerator';
@@ -40,7 +40,7 @@ export const checkFilter = async (opts: CommandOptions | ParserOptions, filter: 
     owner: isOwner(opts.sender.username),
   };
 
-  const customVariables = customvariables.getAll();
+  const customVariables = getAll();
   const context = {
     $source: typeof opts.sender.discord === 'undefined' ? 'twitch' : 'discord',
     $sender: opts.sender.username,

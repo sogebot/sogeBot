@@ -1,6 +1,6 @@
 import { evaluate as mathJsEvaluate } from 'mathjs';
 
-import customvariables from '../customvariables';
+import { getValueOf } from '../helpers/customvariables';
 
 import { ResponseFilter } from '.';
 
@@ -13,7 +13,7 @@ const math: ResponseFilter = {
     const match = toEvaluate.match(regexp);
     if (match) {
       for (const variable of match) {
-        const currentValue = await customvariables.getValueOf(variable);
+        const currentValue = await getValueOf(variable);
         toEvaluate = toEvaluate.replace(
           variable,
           isNaN(Number(currentValue)) ? 0 : currentValue
@@ -36,7 +36,7 @@ const math: ResponseFilter = {
     const match = toEvaluate.match(regexp);
     if (match) {
       for (const variable of match) {
-        const currentValue = await customvariables.getValueOf(variable);
+        const currentValue = await getValueOf(variable);
         toEvaluate = toEvaluate.replace(
           variable,
           isNaN(Number(currentValue)) ? 0 : currentValue
@@ -59,7 +59,7 @@ const math: ResponseFilter = {
     const match = toEvaluate.match(regexp);
     if (match) {
       for (const variable of match) {
-        const currentValue = await customvariables.getValueOf(variable);
+        const currentValue = await getValueOf(variable);
         toEvaluate = toEvaluate.replace(
           variable,
           isNaN(Number(currentValue)) ? 0 : currentValue

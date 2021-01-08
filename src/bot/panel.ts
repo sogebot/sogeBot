@@ -18,6 +18,7 @@ import { Translation } from './database/entity/translation';
 import { TwitchTag, TwitchTagInterface } from './database/entity/twitch';
 import { User } from './database/entity/user';
 import general from './general';
+import { getValueOf, isVariableSet } from './helpers/customvariables';
 import { getIsBotStarted } from './helpers/database';
 import { flatten } from './helpers/flatten';
 import { getDEBUG, info, setDEBUG } from './helpers/log';
@@ -319,9 +320,9 @@ export const init = () => {
     // custom var
     socket.on('custom.variable.value', async (variable: string, cb: (error: string | null, value: string) => void) => {
       let value = translate('webpanel.not-available');
-      const isVariableSet = await customvariables.isVariableSet(variable);
-      if (isVariableSet) {
-        value = await customvariables.getValueOf(variable);
+      const isVarSet = await isVariableSet(variable);
+      if (isVarSet) {
+        value = await getValueOf(variable);
       }
       cb(null, value);
     });

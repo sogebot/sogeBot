@@ -1,14 +1,14 @@
 import {get } from 'lodash';
 
 import { parserReply, prepare } from '../commons';
-import customvariables from '../customvariables';
+import { getValueOf, setValueOf } from '../helpers/customvariables';
 
 import type { ResponseFilter } from '.';
 
 const custom: ResponseFilter = {
   '$_#': async (variable, attr) => {
     if (typeof attr.param !== 'undefined' && attr.param.length !== 0) {
-      const state = await customvariables.setValueOf(variable, attr.param, { sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' } });
+      const state = await setValueOf(variable, attr.param, { sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' } });
       if (state.updated.responseType === 0) {
         // default
         if (state.isOk && !state.isEval) {
@@ -27,7 +27,7 @@ const custom: ResponseFilter = {
         return state.isOk && !state.isEval ? state.setValue : state.updated.currentValue;
       }
     }
-    return customvariables.getValueOf(variable, {
+    return getValueOf(variable, {
       sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' },
     });
   },
@@ -35,10 +35,10 @@ const custom: ResponseFilter = {
   '$!_#': async (variable, attr) => {
     variable = variable.replace('$!_', '$_');
     if (typeof attr.param !== 'undefined' && attr.param.length !== 0) {
-      const state = await customvariables.setValueOf(variable, attr.param, { sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' } });
+      const state = await setValueOf(variable, attr.param, { sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' } });
       return state.updated.currentValue;
     }
-    return customvariables.getValueOf(variable, {
+    return getValueOf(variable, {
       sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' },
     });
   },
@@ -46,7 +46,7 @@ const custom: ResponseFilter = {
   '$!!_#': async (variable, attr) => {
     variable = variable.replace('$!!_', '$_');
     if (typeof attr.param !== 'undefined' && attr.param.length !== 0) {
-      await customvariables.setValueOf(variable, attr.param, { sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' } });
+      await setValueOf(variable, attr.param, { sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' } });
     }
     return '';
   },

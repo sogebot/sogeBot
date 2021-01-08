@@ -1,35 +1,14 @@
 import { setTimeout } from 'timers';
 
-import axios from 'axios';
-import { js as jsBeautify } from 'js-beautify';
-import { filter, get, isNil, map, sample } from 'lodash';
-import _ from 'lodash';
-import safeEval from 'safe-eval';
-import strip from 'strip-comments';
+import { isNil } from 'lodash';
 import { getRepository, IsNull } from 'typeorm';
 
 import Core from './_interface';
-import api from './api';
 import { announce, getBot, prepare } from './commons';
-import currency from './currency';
-import { User, UserInterface } from './database/entity/user';
 import { Variable, VariableHistory, VariableInterface, VariableURL, VariableWatch } from './database/entity/variable';
+import { getValueOf, runScript, setValueOf, updateWidgetAndTitle } from './helpers/customvariables';
 import { isDbConnected } from './helpers/database';
-import { getAllOnlineUsernames } from './helpers/getAllOnlineUsernames';
-import { getTime } from './helpers/getTime';
-import { isModerator } from './helpers/isModerator';
-import { debug, error, info, warning } from './helpers/log';
-import { linesParsed } from './helpers/parser';
-import { permission } from './helpers/permissions';
-import { addToViewersCache, getFromViewersCache } from './helpers/permissions';
 import { adminEndpoint } from './helpers/socket';
-import Message from './message';
-import { getUserFromTwitch } from './microservices/getUserFromTwitch';
-import permissions from './permissions';
-import users from './users';
-import custom_variables from './widgets/customvariables';
-
-const customVariableRegex = new RegExp('\\$_[a-zA-Z0-9_]+', 'g');
 
 class CustomVariables extends Core {
   timeouts: {
@@ -42,24 +21,6 @@ class CustomVariables extends Core {
     this.checkIfCacheOrRefresh();
   }
 
-  async getAll() {
-    return (await getRepository(Variable).find()).reduce((prev: { [x: string]: any }, cur) => {
-      return { ...prev, [cur.variableName]: cur.currentValue };
-    }, {});
-  }
-
-  async executeVariablesInText(text: string, attr: { sender: { userId: number; username: string; source: 'twitch' | 'discord' }} | null): Promise<string> {
-    for (const variable of text.match(customVariableRegex)?.sort((a, b) => b.length - a.length) || []) {
-      const isVariable = await this.isVariableSet(variable);
-      let value = '';
-      if (isVariable) {
-        value = await this.getValueOf(variable, attr) || '';
-      }
-      text = text.replace(new RegExp(`\\${variable}`, 'g'), value);
-    }
-    return text;
-  }
-
   async getURL(req: any, res: any) {
     try {
       const variable = (await getRepository(Variable).find({
@@ -70,7 +31,7 @@ class CustomVariables extends Core {
         });
       if (variable) {
         if (variable.urls.find(url => url.id === req.params.id)?.GET) {
-          return res.status(200).send({ value: await this.getValueOf(variable.variableName) });
+          return res.status(200).send({ value: await getValueOf(variable.variableName) });
         } else {
           return res.status(403).send({ error: 'This endpoint is not enabled for GET', code: 403 });
         }
@@ -93,7 +54,7 @@ class CustomVariables extends Core {
         });
       if (variable) {
         if (variable.urls.find(url => url.id === req.params.id)?.POST) {
-          const value = await this.setValueOf(variable, req.body.value, { sender: null, readOnlyBypass: true });
+          const value = await setValueOf(variable, req.body.value, { sender: null, readOnlyBypass: true });
           if (value.isOk) {
             if (variable.urls.find(url => url.id === req.params.id)?.showResponse) {
               if (value.updated.responseType === 0) {
@@ -131,7 +92,7 @@ class CustomVariables extends Core {
         if (!item) {
           throw new Error('Variable not found');
         }
-        const newCurrentValue = await this.runScript(item.evalValue, { sender: null, _current: item.currentValue, isUI: true });
+        const newCurrentValue = await runScript(item.evalValue, { sender: null, _current: item.currentValue, isUI: true });
         const runAt = Date.now();
         cb(null, await getRepository(Variable).save({
           ...item, currentValue: newCurrentValue, runAt,
@@ -143,7 +104,7 @@ class CustomVariables extends Core {
     adminEndpoint(this.nsp, 'customvariables::testScript', async (opts, cb) => {
       let returnedValue;
       try {
-        returnedValue = await this.runScript(opts.evalValue, { isUI: true, _current: opts.currentValue, sender: { username: 'testuser', userId: 0, source: 'twitch' }});
+        returnedValue = await runScript(opts.evalValue, { isUI: true, _current: opts.currentValue, sender: { username: 'testuser', userId: 0, source: 'twitch' }});
       } catch (e) {
         cb(e.stack, null);
       }
@@ -157,7 +118,7 @@ class CustomVariables extends Core {
       if (item) {
         await getRepository(Variable).remove(item);
         await getRepository(VariableWatch).delete({ variableId: String(id) });
-        this.updateWidgetAndTitle();
+        updateWidgetAndTitle();
       }
       if (cb) {
         cb(null);
@@ -193,346 +154,12 @@ class CustomVariables extends Core {
         await getRepository(VariableHistory).delete({ variableId: IsNull() });
         await getRepository(VariableURL).delete({ variableId: IsNull() });
 
-        this.updateWidgetAndTitle(item.variableName);
+        updateWidgetAndTitle(item.variableName);
         cb(null, item.id);
       } catch (e) {
         cb(e.stack, item.id);
       }
     });
-  }
-
-  async runScript (script: string, opts: { sender: { userId: number; username: string; source: 'twitch' | 'discord' } | string | null, isUI: boolean; param?: string | number, _current: any }) {
-    debug('customvariables.eval', opts);
-    let sender = !isNil(opts.sender) ? opts.sender : null;
-    const isUI = !isNil(opts.isUI) ? opts.isUI : false;
-    const param = !isNil(opts.param) ? opts.param : null;
-    if (typeof sender === 'string') {
-      sender = {
-        username: sender,
-        userId: await users.getIdByName(sender),
-        source: 'twitch',
-      };
-    }
-
-    const strippedScript = strip(script);
-    // we need to check +1 variables, as they are part of commentary
-    const containUsers = strippedScript.match(/users/g) !== null;
-    const containRandom = strippedScript.replace(/Math\.random|_\.random/g, '').match(/random/g) !== null;
-    const containOnline = strippedScript.match(/online/g) !== null;
-    debug('customvariables.eval', { strippedScript, containOnline, containRandom, containUsers});
-
-    let usersList: UserInterface[] = [];
-    if (containUsers || containRandom) {
-      usersList = await getRepository(User).find();
-    }
-
-    let onlineViewers: string[] = [];
-    let onlineSubscribers: string[] = [];
-    let onlineFollowers: string[] = [];
-
-    if (containOnline) {
-      onlineViewers = await getAllOnlineUsernames();
-      onlineSubscribers = (await getRepository(User).find({
-        where: {
-          isSubscriber: true,
-          isOnline: true,
-        },
-      })).map(o => o.username);
-      onlineFollowers = (await getRepository(User).find({
-        where: {
-          isFollower: true,
-          isOnline: true,
-        },
-      })).map(o => o.username);
-    }
-
-    const randomVar = {
-      online: {
-        viewer: sample(onlineViewers),
-        follower: sample(onlineFollowers),
-        subscriber: sample(onlineSubscribers),
-      },
-      viewer: sample(map(usersList, 'username')),
-      follower: sample(map(filter(usersList, (o) => get(o, 'isFollower', false)), 'username')),
-      subscriber: sample(map(filter(usersList, (o) => get(o, 'isSubscriber', false)), 'username')),
-    };
-
-    // get custom variables
-    const customVariables = await this.getAll();
-
-    // update globals and replace theirs values
-    script = (await new Message(script).global({ escape: '\'' }));
-
-    const context = {
-      url: async (url: string, urlOpts?: { url: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', headers: undefined, data: undefined }) => {
-        if (typeof urlOpts === 'undefined') {
-          urlOpts = {
-            url,
-            method: 'GET',
-            headers: undefined,
-            data: undefined,
-          };
-        } else {
-          urlOpts.url = url;
-        }
-
-        if (!['GET', 'POST', 'PUT', 'DELETE'].includes(urlOpts.method.toUpperCase())) {
-          throw Error('only GET, POST, PUT, DELETE methods are supported');
-        }
-
-        if (urlOpts.url.trim().length === 0) {
-          throw Error('url was not properly specified');
-        }
-
-        const request = await axios(urlOpts);
-        return { data: request.data, status: request.status, statusText: request.statusText };
-      },
-      _: _,
-      users: users,
-      random: randomVar,
-      stream: {
-        uptime: getTime(api.isStreamOnline ? api.streamStatusChangeSince : null, false),
-        currentViewers: api.stats.currentViewers,
-        currentSubscribers: api.stats.currentSubscribers,
-        currentBits: api.stats.currentBits,
-        currentTips: api.stats.currentTips,
-        currency: currency.symbol(currency.mainCurrency),
-        chatMessages: (api.isStreamOnline) ? linesParsed - api.chatMessagesAtStart : 0,
-        currentFollowers: api.stats.currentFollowers,
-        currentViews: api.stats.currentViews,
-        maxViewers: api.stats.maxViewers,
-        newChatters: api.stats.newChatters,
-        game: api.stats.currentGame,
-        status: api.stats.currentTitle,
-        currentHosts: api.stats.currentHosts,
-        currentWatched: api.stats.currentWatchedTime,
-      },
-      sender,
-      info: info,
-      warning: warning,
-      param: param,
-      _current: opts._current,
-      user: async (username: string) => {
-        const _user = await getRepository(User).findOne({ username });
-        if (_user) {
-          const userObj = {
-            username,
-            id: String(_user.userId),
-            displayname: _user.displayname,
-            is: {
-              online: _user.isOnline ?? false,
-              follower: get(_user, 'is.follower', false),
-              vip: get(_user, 'is.vip', false),
-              subscriber: get(_user, 'is.subscriber', false),
-              mod: isModerator(_user),
-            },
-          };
-          return userObj;
-        } else {
-          try {
-            // we don't have data of user, we will try to get them
-            const userFromTwitch = await getUserFromTwitch(username);
-            const createdUser = await getRepository(User).save({
-              username,
-              userId: Number(userFromTwitch.id),
-              displayname: userFromTwitch.display_name,
-              profileImageUrl: userFromTwitch.profile_image_url,
-            });
-
-            const userObj = {
-              username,
-              id: String(createdUser.userId),
-              displayname: createdUser.displayname,
-              is: {
-                online: createdUser.isOnline ?? false,
-                follower: get(createdUser, 'is.follower', false),
-                vip: get(createdUser, 'is.vip', false),
-                subscriber: get(createdUser, 'is.subscriber', false),
-                mod: isModerator(createdUser),
-              },
-            };
-            return userObj;
-          } catch (e) {
-            error(e.stack);
-            return null;
-          }
-        }
-      },
-      ...customVariables,
-    };
-    // we need to add operation counter function
-    const opCounterFnc = 'let __opCount__ = 0; function __opCounter__() { if (__opCount__ > 100000) { throw new Error("Running script seems to be in infinite loop."); } else { __opCount__++; }};';
-    // add __opCounter__() after each ;
-    const toEval = `(async function evaluation () { ${opCounterFnc} ${jsBeautify(script).split(';\n').map(line => '__opCounter__();' + line).join(';\n')} })()`;
-    try {
-      const value = await safeEval(toEval, context);
-      debug('customvariables.eval', value);
-      return value;
-    } catch (e) {
-      debug('customvariables.eval', 'Running script seems to be in infinite loop.');
-      error(`Script is causing error:`);
-      error(`${jsBeautify(script)}`);
-      error(e.stack);
-      if (isUI) {
-        // if we have UI, rethrow error to show in UI
-        throw(e);
-      } else {
-        return '';
-      }
-    }
-  }
-
-  async isVariableSet (variableName: string) {
-    return getRepository(Variable).findOne({ variableName });
-  }
-
-  async isVariableSetById (id: string) {
-    return getRepository(Variable).findOne({ id });
-  }
-
-  async getValueOf (variableName: string, opts?: any) {
-    if (!variableName.startsWith('$_')) {
-      variableName = `$_${variableName}`;
-    }
-    const item = await getRepository(Variable).findOne({ variableName });
-    if (!item) {
-      return '';
-    } // return empty if variable doesn't exist
-
-    let currentValue = item.currentValue;
-    if (item.type === 'eval' && item.runEveryType === 'isUsed' ) {
-      // recheck permission as this may go outside of setValueOf
-      if (opts?.sender) {
-        if (typeof getFromViewersCache(opts.sender.userId, item.permission) === 'undefined') {
-          addToViewersCache(opts.sender.userId, item.permission, (await permissions.check(Number(opts.sender.userId), item.permission, false)).access);
-        }
-      }
-      const permissionsAreValid = isNil(opts?.sender) || getFromViewersCache(opts.sender.userId, item.permission);
-      if (permissionsAreValid) {
-        currentValue = await this.runScript(item.evalValue, {
-          _current: item.currentValue,
-          ...opts,
-        });
-        await getRepository(Variable).save({
-          ...item, currentValue,
-        });
-      }
-    }
-
-    return currentValue;
-  }
-
-  async setValueOf (variable: string | Readonly<VariableInterface>, currentValue: any, opts: any): Promise<{ updated: Readonly<VariableInterface>; isOk: boolean; setValue: string; isEval: boolean }> {
-    const item = typeof variable === 'string'
-      ? await getRepository(Variable).findOne({ variableName: variable })
-      : { ...variable };
-    let isOk = true;
-    let isEval = false;
-    const itemOldValue = item?.currentValue;
-    let itemCurrentValue = item?.currentValue;
-
-    opts.sender = isNil(opts.sender) ? null : opts.sender;
-    opts.readOnlyBypass = isNil(opts.readOnlyBypass) ? false : opts.readOnlyBypass;
-    // add simple text variable, if not existing
-    if (!item) {
-      const newItem: VariableInterface = {
-        variableName: variable as string,
-        currentValue: String(currentValue),
-        responseType: 0,
-        evalValue: '',
-        description: '',
-        responseText: '',
-        usableOptions: [],
-        type: 'text',
-        permission: permission.MODERATORS,
-      };
-      return this.setValueOf(newItem, currentValue, opts);
-    } else {
-      if (typeof opts.sender === 'string') {
-        opts.sender = {
-          username: opts.sender,
-          userId: await users.getIdByName(opts.sender),
-          source: 'twitch',
-        };
-      }
-
-      if (opts.sender) {
-        if (typeof getFromViewersCache(opts.sender.userId, item.permission) === 'undefined') {
-          addToViewersCache(opts.sender.userId, item.permission, (await permissions.check(Number(opts.sender.userId), item.permission, false)).access);
-        }
-      }
-      const permissionsAreValid = isNil(opts.sender) || getFromViewersCache(opts.sender.userId, item.permission);
-      if ((item.readOnly && !opts.readOnlyBypass) || !permissionsAreValid) {
-        isOk = false;
-      } else {
-        if (item.type === 'number') {
-          const match = /(?<sign>[+\-])([ ]*)?(?<number>\d*)?/g.exec(currentValue);
-          if (match && match.groups) {
-            const number = Number((match.groups.number || 1));
-            if (match.groups.sign === '+') {
-              itemCurrentValue = String(Number(itemCurrentValue) + number);
-            } else if (match.groups.sign === '-') {
-              itemCurrentValue = String(Number(itemCurrentValue) - number);
-            }
-          } else {
-            const isNumber = isFinite(Number(currentValue));
-            isOk = isNumber;
-            // we need to retype to get rid of +/-
-            itemCurrentValue = isNumber ? String(Number(currentValue)) : String(Number(itemCurrentValue));
-          }
-        } else if (item.type === 'options') {
-          // check if is in usableOptions
-          const isUsableOption = item.usableOptions.map((o) => o.trim()).includes(currentValue);
-          isOk = isUsableOption;
-          itemCurrentValue = isUsableOption ? currentValue : itemCurrentValue;
-        } else if (item.type === 'eval') {
-          opts.param = currentValue;
-          itemCurrentValue = await this.getValueOf(item.variableName, opts);
-          isEval = true;
-        } else if (item.type === 'text') {
-          itemCurrentValue = String(currentValue);
-          isOk = true;
-        }
-      }
-    }
-
-    // do update only on non-eval variables
-    if (item.type !== 'eval' && isOk) {
-      await getRepository(Variable).save({
-        ...item,
-        currentValue: itemCurrentValue,
-      });
-    }
-
-    const setValue = itemCurrentValue ?? '';
-    if (isOk) {
-      this.updateWidgetAndTitle(item.variableName);
-      if (!isEval) {
-        this.addChangeToHistory({ sender: opts.sender, item, oldValue: itemOldValue });
-      }
-    }
-    return { updated: {
-      ...item,
-      currentValue: isOk && !isEval ? '' : setValue, // be silent if parsed correctly eval
-    }, setValue, isOk, isEval };
-  }
-
-  async addChangeToHistory(opts: { sender: any; item: VariableInterface; oldValue: any }) {
-    const variable = await getRepository(Variable).findOne({
-      relations: ['history'],
-      where: { id: opts.item.id },
-    });
-    if (variable) {
-      variable.history.push({
-        username: opts.sender?.username ?? 'n/a',
-        userId: opts.sender?.userId ?? 0,
-        oldValue: opts.oldValue,
-        currentValue: opts.item.currentValue,
-        changedAt: Date.now(),
-        variableId: variable.id,
-      });
-      await getRepository(Variable).save(variable);
-    }
   }
 
   async checkIfCacheOrRefresh () {
@@ -549,29 +176,15 @@ class CustomVariables extends Core {
         item.runAt = isNil(item.runAt) ? 0 : item.runAt;
         const shouldRun = item.runEvery > 0 && Date.now() - new Date(item.runAt).getTime() >= item.runEvery;
         if (shouldRun) {
-          const newValue = await this.runScript(item.evalValue, { _current: item.currentValue, sender: getBot(), isUI: false });
+          const newValue = await runScript(item.evalValue, { _current: item.currentValue, sender: getBot(), isUI: false });
           item.runAt = Date.now();
           item.currentValue = newValue;
           await getRepository(Variable).save(item);
-          await this.updateWidgetAndTitle(item.variableName);
+          await updateWidgetAndTitle(item.variableName);
         }
       } catch (e) {} // silence errors
     }
     this.timeouts[`${this.constructor.name}.checkIfCacheOrRefresh`] = setTimeout(() => this.checkIfCacheOrRefresh(), 1000);
-  }
-
-  async updateWidgetAndTitle (variable: string | null = null) {
-    if (custom_variables.socket) {
-      custom_variables.socket.emit('refresh');
-    } // send update to widget
-
-    if (isNil(variable)) {
-      const regexp = new RegExp(`\\${variable}`, 'ig');
-
-      if (api.rawStatus.match(regexp)) {
-        api.setTitleAndGame({});
-      }
-    }
   }
 }
 

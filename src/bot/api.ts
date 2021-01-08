@@ -9,7 +9,6 @@ import { getManager, getRepository, In, IsNull, Not } from 'typeorm';
 
 import Core from './_interface';
 import * as constants from './constants';
-import customvariables from './customvariables';
 import { CacheGames } from './database/entity/cacheGames';
 import { ThreadEvent } from './database/entity/threadEvent';
 import { TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from './database/entity/twitch';
@@ -17,6 +16,7 @@ import { User, UserInterface } from './database/entity/user';
 import { persistent } from './decorators';
 import { getFunctionList, onStartup } from './decorators/on';
 import events from './events';
+import { getValueOf, isVariableSet } from './helpers/customvariables';
 import { isDbConnected } from './helpers/database';
 import { dayjs } from './helpers/dayjs';
 import { getBroadcaster } from './helpers/getBroadcaster';
@@ -1375,8 +1375,8 @@ class API extends Core {
     if (!isNil(match)) {
       for (const variable of match) {
         let value;
-        if (await customvariables.isVariableSet(variable)) {
-          value = await customvariables.getValueOf(variable);
+        if (await isVariableSet(variable)) {
+          value = await getValueOf(variable);
         } else {
           value = translate('webpanel.not-available');
         }
