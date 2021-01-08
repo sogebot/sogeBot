@@ -7,7 +7,7 @@ import { ResponseFilter } from '.';
 
 const stream: ResponseFilter = {
   '(stream|#|game)': async function (filter: any) {
-    const channel = filter.replace('(stream|', '').replace('|game)', '');
+    const channel = filter.replace('(stream|', '').replace('|game)', '').replace('@', '');
 
     const token = await oauth.botAccessToken;
     if (token === '') {
@@ -34,7 +34,7 @@ const stream: ResponseFilter = {
     } // return nothing on error
   },
   '(stream|#|title)': async function (filter: any) {
-    const channel = filter.replace('(stream|', '').replace('|title)', '');
+    const channel = filter.replace('(stream|', '').replace('|title)', '').replace('@', '');
 
     const token = await oauth.botAccessToken;
     if (token === '') {
