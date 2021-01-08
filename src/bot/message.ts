@@ -143,7 +143,6 @@ class Message {
     await this.parseMessageEach(random, attr);
     await this.parseMessageEach(ifp, attr, false);
     await this.parseMessageVariables(custom, attr);
-    await this.parseMessageEval(evaluate, attr);
     await this.parseMessageEach(param, attr, true);
     // local replaces
     if (!_.isNil(attr)) {
@@ -164,6 +163,7 @@ class Message {
     await this.parseMessageEach(qs, attr, false);
     await this.parseMessageEach(list, attr);
     await this.parseMessageEach(stream, attr);
+    await this.parseMessageEval(evaluate, attr);
     await this.parseMessageApi();
 
     return this.message;
