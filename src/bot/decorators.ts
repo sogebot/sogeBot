@@ -2,7 +2,7 @@ import { parse, sep as separator } from 'path';
 
 import * as _ from 'lodash';
 
-import Module from './_interface';
+import type { Module } from './_interface';
 import * as constants from './constants';
 import { isDbConnected } from './helpers/database';
 import { debug, error } from './helpers/log';

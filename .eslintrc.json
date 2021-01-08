@@ -25,7 +25,7 @@
           }
         ]}
       ],
-      "import/no-cycle": [1, { "maxDepth": 1 }],
+      "import/no-cycle": [2, { "maxDepth": 1 }],
       "import/newline-after-import": ["error", { "count": 1 }],
 
       "no-shadow": "off",
