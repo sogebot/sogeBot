@@ -15,7 +15,7 @@ const stream: ResponseFilter = {
     }
 
     try {
-      let request = await axios.get(`https://api.twitch.tv/helix/search/channels?query=${channel}`, {
+      let request = await axios.get(`https://api.twitch.tv/helix/users?login=${channel}`, {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Client-ID': oauth.botClientId,
@@ -28,7 +28,8 @@ const stream: ResponseFilter = {
           'Client-ID': oauth.botClientId,
         },
       });
-      return request.data.data[0].game_name;
+
+      return `'${request.data.data[0].game_name}'`;
     } catch (e) {
       return 'n/a';
     } // return nothing on error
@@ -42,7 +43,7 @@ const stream: ResponseFilter = {
     }
 
     try {
-      let request = await axios.get(`https://api.twitch.tv/helix/search/channels?query=${channel}`, {
+      let request = await axios.get(`https://api.twitch.tv/helix/users?login=${channel}`, {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Client-ID': oauth.botClientId,
@@ -59,7 +60,7 @@ const stream: ResponseFilter = {
       // save remaining api calls
       api.calls.bot.remaining = request.headers['ratelimit-remaining'];
       api.calls.bot.refresh = request.headers['ratelimit-reset'];
-      return request.data.data[0].title;
+      return `'${request.data.data[0].title}'`;
     } catch (e) {
       return 'n/a';
     } // return nothing on error
@@ -73,7 +74,7 @@ const stream: ResponseFilter = {
     }
 
     try {
-      let request = await axios.get(`https://api.twitch.tv/helix/search/channels?query=${channel}`, {
+      let request = await axios.get(`https://api.twitch.tv/helix/users?login=${channel}`, {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Client-ID': oauth.botClientId,
