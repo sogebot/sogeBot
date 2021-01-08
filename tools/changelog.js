@@ -1,11 +1,11 @@
-const chalk = require('chalk');
+const { spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const glob = require('glob');
-const { spawnSync } = require('child_process');
-const gitSemverTags = require('git-semver-tags');
-const yargs = require('yargs');
 
+const chalk = require('chalk');
+const gitSemverTags = require('git-semver-tags');
+const glob = require('glob');
+const yargs = require('yargs');
 const argv = require('yargs') // eslint-disable-line
   .usage('node tools/changelog.js <cmd> [args]')
   .option('escape', {
@@ -14,37 +14,37 @@ const argv = require('yargs') // eslint-disable-line
   })
   .command('generate', 'generate changelog')
   .command('nextTag', 'get next tag')
-  .command('cli [commit]', 'create changelog between commits/tags', (yargs) => {
-    yargs.demandOption(['commit'], 'Please provide commit or tag argument to work with this tool');
-    yargs.positional('commit', {
+  .command('cli [commit]', 'create changelog between commits/tags', (_yargs) => {
+    _yargs.demandOption(['commit'], 'Please provide commit or tag argument to work with this tool');
+    _yargs.positional('commit', {
       type: 'string',
-      describe: 'commit(preferred) or tag interval e.g. 9.0.3 or 9.0.2..9.0.3'
+      describe: 'commit(preferred) or tag interval e.g. 9.0.3 or 9.0.2..9.0.3',
     });
   })
   .demandCommand()
   .help()
   .argv;
 
-  if (argv._[0] === 'nextTag') {
-    gitSemverTags(function(err, tags) {
-      const latestTag = tags[0];
+if (argv._[0] === 'nextTag') {
+  gitSemverTags(function(err, tags) {
+    const latestTag = tags[0];
 
-      const changesList = [];
-      const changesSpawn = spawnSync('git', ['log', `${latestTag}...HEAD`, '--oneline']);
-      changesList.push(...changes(changesSpawn.stdout.toString().split('\n')));
+    const changesList = [];
+    const changesSpawn = spawnSync('git', ['log', `${latestTag}...HEAD`, '--oneline']);
+    changesList.push(...changes(changesSpawn.stdout.toString().split('\n')));
 
-      const [ latestMajorVersion, latestMinorVersion, latestPatchVersion ] = tags[0].split('.');
+    const [ latestMajorVersion, latestMinorVersion, latestPatchVersion ] = tags[0].split('.');
 
-      if (changesList.includes('### BREAKING CHANGES\n')) {
-        process.stdout.write(`${Number(latestMajorVersion)+1}.0.0`);
-      } else if (changesList.includes('### Features\n')) {
-        // new tag
-        process.stdout.write(`${latestMajorVersion}.${Number(latestMinorVersion)+1}.0`);
-      } else {
-        process.stdout.write(`${latestMajorVersion}.${latestMinorVersion}.${Number(latestPatchVersion)+1}`);
-      }
-    });
-  }
+    if (changesList.includes('### BREAKING CHANGES\n')) {
+      process.stdout.write(`${Number(latestMajorVersion)+1}.0.0`);
+    } else if (changesList.includes('### Features\n')) {
+      // new tag
+      process.stdout.write(`${latestMajorVersion}.${Number(latestMinorVersion)+1}.0`);
+    } else {
+      process.stdout.write(`${latestMajorVersion}.${latestMinorVersion}.${Number(latestPatchVersion)+1}`);
+    }
+  });
+}
 
 if (argv._[0] === 'nextSnapshot') {
   gitSemverTags(function(err, tags) {
@@ -71,7 +71,7 @@ if (argv._[0] === 'generate') {
       const output = changes(changesSpawn.stdout.toString().split('\n'));
 
       if (tagsToGenerate.length > 1) {
-        output.unshift(`## ${tag}\n`);
+        output.unshift(`## ${tag}\n\n`);
       }
 
       changesList.push(output);
@@ -100,8 +100,12 @@ function changes(changesList) {
     const i2 = b.indexOf(' ');
     a = a.slice(i+1).trim();
     b = b.slice(i2+1).trim();
-    if(a < b) { return -1; }
-    if(a > b) { return 1; }
+    if(a < b) {
+      return -1;
+    }
+    if(a > b) {
+      return 1;
+    }
     return 0;
   });
   const output = [];
@@ -114,8 +118,8 @@ function changes(changesList) {
     const body = spawnSync('git', ['log', commit, '-n', '1', '--pretty=format:%B']);
     const fixesRegexp = /(Fixes|Closes|Fixed|Closed)\s(\#\d*)/gmi;
     const fixesRegexpForum = /(Fixes|Closes|Fixed|Closed)\s(.*)/gmi;
-    const fixesRegexpDiscord = /(Fixes|Closes|Fixed|Closed)\s.*discord.*?(\d+)$/gmi
-    const fixesRegexpIdeas = /(Fixes|Closes|Fixed|Closed)\s.*ideas\.sogebot\.xyz.*?(\d+)/gmi
+    const fixesRegexpDiscord = /(Fixes|Closes|Fixed|Closed)\s.*discord.*?(\d+)$/gmi;
+    const fixesRegexpIdeas = /(Fixes|Closes|Fixed|Closed)\s.*ideas\.sogebot\.xyz.*?(\d+)/gmi;
     const fixesRegexpBreaking = /BREAKING (CHANGES|CHANGE):\s(.*)/gmis;
     let fixes = [];
     let breakingChange = null;
@@ -144,7 +148,7 @@ function changes(changesList) {
         ];
       }
     } else if (body.stdout.toString().match(fixesRegexp)) {
-      fixes = body.stdout.toString().match(fixesRegexp)
+      fixes = body.stdout.toString().match(fixesRegexp);
     } else if (body.stdout.toString().match(fixesRegexpForum)) {
       const text = body.stdout.toString().match(fixesRegexpForum)[0];
       const link = text.split(' ')[1];
@@ -168,9 +172,11 @@ function changes(changesList) {
         .replace('BREAKING', '')
         .replace('CHANGES:', '')
         .replace('CHANGE:', '')
+        .replace(/[\n\r]/g, ' ') // remove newlines
+        .replace(/\s{2,}/g, ' ') // remove multiple spaces
       );
     }
-    output.push('\n');
+    output.push('\n\n');
   }
 
   // filter to have only fix and feat
