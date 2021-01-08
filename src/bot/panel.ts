@@ -18,6 +18,7 @@ import { Translation } from './database/entity/translation';
 import { TwitchTag, TwitchTagInterface } from './database/entity/twitch';
 import { User } from './database/entity/user';
 import general from './general';
+import { getIsBotStarted } from './helpers/database';
 import { flatten } from './helpers/flatten';
 import { getDEBUG, info, setDEBUG } from './helpers/log';
 import { app, ioServer, menu, menuPublic, server, serverSecure, setApp, setServer, widgets } from './helpers/panel';
@@ -162,6 +163,10 @@ export const init = () => {
       socketsConnected--;
     });
     socketsConnected++;
+
+    socket.on('botStatus', (cb: (status: boolean) => void) => {
+      cb(getIsBotStarted());
+    });
 
     socket.on('getCachedTags', async (cb: (results: TwitchTagInterface[]) => void) => {
       const connection = await getConnection();

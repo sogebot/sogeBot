@@ -38,6 +38,15 @@ table * {
     transform: rotate(1800deg);
   }
 }
+.bot-starting-intro {
+  color: $secondary;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  font-weight: bold;
+  transform: translate(-50%, 120%);
+  font-family: "Open Sans", sans-serif;
+}
 
 
 .table tbody tr td {
