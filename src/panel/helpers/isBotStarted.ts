@@ -1,5 +1,7 @@
 import { getSocket } from './socket';
 
+let waitAfterStart = false;
+
 function isBotStarted() {
   const socket = getSocket('/', true);
   return new Promise(resolve => {
@@ -8,12 +10,13 @@ function isBotStarted() {
         const el = document.getElementById('bot-starting-intro');
         if (status) {
           console.log('Bot is started, continue');
-          resolve(true);
+          setTimeout(() => resolve(true), waitAfterStart ? 5000 : 0);
         } else {
           if (el) {
             el.style.display = 'block';
           }
           console.log('Bot not started yet, waiting');
+          waitAfterStart = true;
           setTimeout(() => check(), 1000);
         }
       });
