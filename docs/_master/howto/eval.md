@@ -50,4 +50,4 @@ These `eval` snippets are working with custom commands responses
 #### Shoutout command
 **command:** `!shoutout`
 
-**response:** `Shoutout to $param! Playing (stream|$param|game) - (stream|$param|title) for (stream|$param|viewers) viewers!`
+**response:** `Shoutout to $param! Playing (stream|$param|game) - (stream|$param|title) for (stream|$param|viewers) viewers! Check it out (stream|$param|link)!`

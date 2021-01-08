@@ -6,6 +6,15 @@ import oauth from '../oauth';
 import { ResponseFilter } from '.';
 
 const stream: ResponseFilter = {
+  '(stream|#|link)': async function (filter: any) {
+    const channel = filter.replace('(stream|', '').replace('|link)', '').replace('@', '');
+
+    if (channel.trim().length === 0) {
+      return '';
+    }
+
+    return `twitch.tv/${channel}`;
+  },
   '(stream|#|game)': async function (filter: any) {
     const channel = filter.replace('(stream|', '').replace('|game)', '').replace('@', '');
 
