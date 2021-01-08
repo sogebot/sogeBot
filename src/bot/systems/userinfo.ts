@@ -10,6 +10,7 @@ import general from '../general';
 import { dayjs, timezone } from '../helpers/dayjs';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { debug, error } from '../helpers/log';
+import { getUserHighestPermission } from '../helpers/permissions/';
 import { getUserFromTwitch } from '../microservices/getUserFromTwitch';
 import permissions from '../permissions';
 import { translate } from '../translate';
@@ -283,7 +284,7 @@ class UserInfo extends System {
       if (message.includes('$role')) {
         const idx = message.indexOf('$role');
         message[idx] = null;
-        const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
+        const permId = await getUserHighestPermission(Number(opts.sender.userId));
         if (permId) {
           const pItem = await permissions.get(permId);
           if (pItem) {

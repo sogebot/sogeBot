@@ -2,7 +2,7 @@ import { evaluate as mathJsEvaluate } from 'mathjs';
 
 import { getValueOf } from '../helpers/customvariables';
 
-import { ResponseFilter } from '.';
+import type { ResponseFilter } from '.';
 
 const math: ResponseFilter = {
   '(math.#)': async function (filter: any) {

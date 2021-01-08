@@ -16,7 +16,7 @@ import { isBotStarted } from './helpers/database';
 import { flatten, unflatten } from './helpers/flatten';
 import { error, info, warning } from './helpers/log';
 import { addMenu, addMenuPublic, addWidget, ioServer, menu, menuPublic } from './helpers/panel';
-import { permission } from './helpers/permissions';
+import { defaultPermissions } from './helpers/permissions/';
 import { register } from './helpers/register';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import * as watchers from './watchers';
@@ -220,7 +220,7 @@ class Module {
   public prepareCommand(opts:  Command) {
     const defaultPermission = permissionsList[`${this._name}.${this.__moduleName__.toLowerCase()}.${(opts.fnc || '').toLowerCase()}`];
     if (typeof defaultPermission === 'undefined') {
-      opts.permission = opts.permission || permission.VIEWERS;
+      opts.permission = opts.permission || defaultPermissions.VIEWERS;
     } else {
       opts.permission = defaultPermission;
     }
@@ -560,7 +560,7 @@ class Module {
       fireAndForget: boolean;
     }[] = [];
     for (const parser of this._parsers) {
-      parser.permission = typeof parser.permission !== 'undefined' ? parser.permission : permission.VIEWERS;
+      parser.permission = typeof parser.permission !== 'undefined' ? parser.permission : defaultPermissions.VIEWERS;
       parser.priority = typeof parser.priority !== 'undefined' ? parser.priority : 3 /* constants.LOW */;
 
       if (_.isNil(parser.name)) {
@@ -653,7 +653,7 @@ class Module {
           }
         }
 
-        command.permission = typeof command.permission === 'undefined' ? permission.VIEWERS : command.permission;
+        command.permission = typeof command.permission === 'undefined' ? defaultPermissions.VIEWERS : command.permission;
         command.command = typeof command.command === 'undefined' ? command.name : command.command;
         commands.push({
           this: this,
@@ -779,7 +779,7 @@ class Module {
 
   protected async getPermissionBasedSettingsValue(key: string, set_default_values = true): Promise<{[permissionId: string]: any}> {
     // current permission settings by user
-    let permId = permission.VIEWERS;
+    let permId: string = defaultPermissions.VIEWERS;
 
     // get current full list of permissions
     const permissions = await getRepository(PermissionsEntity).find({
@@ -790,8 +790,8 @@ class Module {
     });
     return permissions.reduce((prev, p) => {
       // set proper value for permId or default value
-      if (set_default_values || p.id === permission.VIEWERS) {
-        if (p.id === permission.VIEWERS) {
+      if (set_default_values || p.id === defaultPermissions.VIEWERS) {
+        if (p.id === defaultPermissions.VIEWERS) {
           // set default value if viewers
           permId = p.id;
           return { ...prev, [p.id]: _.get(this, `__permission_based__${key}.${p.id}`, (this as any)[key]) };

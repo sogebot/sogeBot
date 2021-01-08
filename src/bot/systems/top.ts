@@ -9,7 +9,7 @@ import { dayjs } from '../helpers/dayjs';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { getIgnoreList, isIgnored } from '../helpers/isIgnored';
 import { debug } from '../helpers/log';
-import { permission } from '../helpers/permissions';
+import { defaultPermissions } from '../helpers/permissions/';
 import oauth from '../oauth';
 import tmi from '../tmi';
 import { translate } from '../translate';
@@ -42,63 +42,63 @@ enum TYPE {
 
 class Top extends System {
   @command('!top time')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async time(opts: CommandOptions) {
     opts.parameters = TYPE.TIME;
     return this.showTop(opts);
   }
 
   @command('!top tips')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async tips(opts: CommandOptions) {
     opts.parameters = TYPE.TIPS;
     return this.showTop(opts);
   }
 
   @command('!top points')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async points(opts: CommandOptions) {
     opts.parameters = TYPE.POINTS;
     return this.showTop(opts);
   }
 
   @command('!top messages')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async messages(opts: CommandOptions) {
     opts.parameters = TYPE.MESSAGES;
     return this.showTop(opts);
   }
 
   @command('!top followage')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async followage(opts: CommandOptions) {
     opts.parameters = TYPE.FOLLOWAGE;
     return this.showTop(opts);
   }
 
   @command('!top subage')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async subage(opts: CommandOptions) {
     opts.parameters = TYPE.SUBAGE;
     return this.showTop(opts);
   }
 
   @command('!top submonths')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async submonths(opts: CommandOptions) {
     opts.parameters = TYPE.SUBMONTHS;
     return this.showTop(opts);
   }
 
   @command('!top bits')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async bits(opts: CommandOptions) {
     opts.parameters = TYPE.BITS;
     return this.showTop(opts);
   }
 
   @command('!top gifts')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async gifts(opts: CommandOptions) {
     opts.parameters = TYPE.GIFTS;
     return this.showTop(opts);

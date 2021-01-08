@@ -4,7 +4,7 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
-const { permission } = require('../../../dest/helpers/permissions');
+const { defaultPermissions } = require('../../../dest/helpers/permissions/');
 const alias = (require('../../../dest/systems/alias')).default;
 const assert = require('assert');
 const { prepare } = (require('../../../dest/commons'));
@@ -24,28 +24,28 @@ const notFoundTests = [
 
 const successTests = [
   {
-    from: { permission: permission.VIEWERS, alias: '!a', command: '!me' },
-    to: { permission: permission.VIEWERS, alias: '!a', command: '!uptime' },
+    from: { permission: defaultPermissions.VIEWERS, alias: '!a', command: '!me' },
+    to: { permission: defaultPermissions.VIEWERS, alias: '!a', command: '!uptime' },
   },
   {
     from: { permission: 'casters', alias: '!a', command: '!me' },
-    to: { permission: permission.VIEWERS, alias: '!a', command: '!uptime' },
+    to: { permission: defaultPermissions.VIEWERS, alias: '!a', command: '!uptime' },
   },
   {
-    from: { permission: permission.VIEWERS, alias: '!a', command: '!me' },
+    from: { permission: defaultPermissions.VIEWERS, alias: '!a', command: '!me' },
     to: { permission: 'moderators', alias: '!a', command: '!uptime' },
   },
   {
-    from: { permission: permission.VIEWERS, alias: '!한국어', command: '!me' },
-    to: { permission: permission.VIEWERS, alias: '!한국어', command: '!uptime' },
+    from: { permission: defaultPermissions.VIEWERS, alias: '!한국어', command: '!me' },
+    to: { permission: defaultPermissions.VIEWERS, alias: '!한국어', command: '!uptime' },
   },
   {
-    from: { permission: permission.VIEWERS, alias: '!русский', command: '!me' },
-    to: { permission: permission.VIEWERS, alias: '!русский', command: '!uptime' },
+    from: { permission: defaultPermissions.VIEWERS, alias: '!русский', command: '!me' },
+    to: { permission: defaultPermissions.VIEWERS, alias: '!русский', command: '!uptime' },
   },
   {
-    from: { permission: permission.VIEWERS, alias: '!a with spaces', command: '!me' },
-    to: { permission: permission.VIEWERS, alias: '!a with spaces', command: '!uptime' },
+    from: { permission: defaultPermissions.VIEWERS, alias: '!a with spaces', command: '!me' },
+    to: { permission: defaultPermissions.VIEWERS, alias: '!a with spaces', command: '!uptime' },
   },
 ];
 

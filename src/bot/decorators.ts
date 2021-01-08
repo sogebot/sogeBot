@@ -6,7 +6,7 @@ import type { Module } from './_interface';
 import * as constants from './constants';
 import { isDbConnected } from './helpers/database';
 import { debug, error } from './helpers/log';
-import { permission as permissionType } from './helpers/permissions';
+import { defaultPermissions } from './helpers/permissions/';
 import { find } from './helpers/register';
 import { VariableWatcher } from './watchers';
 
@@ -246,7 +246,7 @@ export function persistent() {
 }
 
 export function parser(
-  { fireAndForget = false, permission = permissionType.VIEWERS, priority = constants.MEDIUM, dependsOn = [] }:
+  { fireAndForget = false, permission = defaultPermissions.VIEWERS, priority = constants.MEDIUM, dependsOn = [] }:
   { fireAndForget?: boolean; permission?: string; priority?: number; dependsOn?: import('./_interface').Module[] } = {}) {
   const { name, type } = getNameAndTypeFromStackTrace();
 

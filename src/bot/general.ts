@@ -15,7 +15,7 @@ import { setLang } from './helpers/locales';
 import { debug, error, warning } from './helpers/log';
 import { getMuteStatus } from './helpers/muteStatus';
 import { getOAuthStatus } from './helpers/OAuthStatus';
-import { permission } from './helpers/permissions';
+import { defaultPermissions } from './helpers/permissions/';
 import { find, list } from './helpers/register';
 import { addUIWarn, socketsConnected } from './panel';
 import translateLib, { translate } from './translate';
@@ -66,13 +66,13 @@ class General extends Core {
   }
 
   @command('!enable')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   public async enable(opts: CommandOptions) {
     this.setStatus({...opts, enable: true});
   }
 
   @command('!disable')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   public async disable(opts: CommandOptions) {
     this.setStatus({...opts, enable: false});
   }
@@ -103,7 +103,7 @@ class General extends Core {
   }
 
   @command('!_debug')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   public async debug(opts: CommandOptions): Promise<CommandResponse[]> {
     const widgets = await getRepository(Widget).find();
     const connection = await getConnection();
@@ -165,7 +165,7 @@ class General extends Core {
   }
 
   @command('!set')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   public async setValue(opts: CommandOptions) {
     // get value so we have a type
     const splitted = opts.parameters.split(' ');

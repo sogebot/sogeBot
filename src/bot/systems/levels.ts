@@ -15,11 +15,11 @@ import { ResponseError } from '../helpers/commandError';
 import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
 import { isBot } from '../helpers/isBot';
 import { debug, error } from '../helpers/log';
-import { permission } from '../helpers/permissions';
+import { getUserHighestPermission } from '../helpers/permissions/';
+import { defaultPermissions } from '../helpers/permissions/';
 import { setImmediateAwait } from '../helpers/setImmediateAwait';
 import { adminEndpoint } from '../helpers/socket';
 import { bigIntMax, serialize, unserialize } from '../helpers/type';
-import permissions from '../permissions';
 import { translate } from '../translate';
 import users from '../users';
 import System from './_interface';
@@ -153,7 +153,7 @@ class Levels extends System {
     }
 
     // get user max permission
-    const permId = await permissions.getUserHighestPermission(userId);
+    const permId = await getUserHighestPermission(userId);
     if (!permId) {
       debug('levels.update', `User ${username}#${userId} permId not found`);
       return; // skip without id
@@ -255,7 +255,7 @@ class Levels extends System {
     ]);
 
     // get user max permission
-    const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
+    const permId = await getUserHighestPermission(Number(opts.sender.userId));
     if (!permId) {
       return true; // skip without permission
     }
@@ -441,7 +441,7 @@ class Levels extends System {
   }
 
   @command('!level change')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async add (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [username, xp] = new Expects(opts.parameters).username().number({ minus: true }).toArray();

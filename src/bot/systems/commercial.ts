@@ -9,7 +9,7 @@ import { command, default_permission, helper } from '../decorators';
 import events from '../events';
 import { error, warning } from '../helpers/log';
 import { ioServer } from '../helpers/panel';
-import { permission } from '../helpers/permissions';
+import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import oauth from '../oauth';
 import { addUIError } from '../panel';
@@ -40,7 +40,7 @@ class Commercial extends System {
   }
 
   @command('!commercial')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   @helper()
   async main (opts: CommandOptions) {
     const parsed = opts.parameters.match(/^([\d]+)? ?(.*)?$/);

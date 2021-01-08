@@ -4,7 +4,7 @@ import { debug, error } from '../helpers/log';
 import Parser from '../parser';
 import customcommands from '../systems/customcommands';
 
-import { ResponseFilter } from '.';
+import type { ResponseFilter } from '.';
 
 const command: ResponseFilter = {
   '$count(\'#\')': async function (filter: string) {

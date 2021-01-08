@@ -5,7 +5,7 @@ import { prepare } from '../commons';
 import { User } from '../database/entity/user';
 import { command, permission_settings, persistent, settings } from '../decorators';
 import { error } from '../helpers/log';
-import permissions from '../permissions';
+import { getUserHighestPermission } from '../helpers/permissions/';
 import pointsSystem from '../systems/points';
 import { translate } from '../translate';
 import Game from './_interface';
@@ -56,7 +56,7 @@ class Gamble extends Game {
         throw Error(ERROR_NOT_ENOUGH_OPTIONS);
       }
 
-      const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
+      const permId = await getUserHighestPermission(Number(opts.sender.userId));
       const pointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
       points = parsed[1] === 'all' ? pointsOfUser : Number(parsed[1]);
 

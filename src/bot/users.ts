@@ -10,10 +10,10 @@ import { Permissions } from './database/entity/permissions';
 import { User, UserBit, UserInterface, UserTip } from './database/entity/user';
 import { onStartup } from './decorators/on';
 import { debug, error, isDebugEnabled } from './helpers/log';
-import { permission } from './helpers/permissions';
+import { recacheOnlineUsersPermission } from './helpers/permissions';
+import { defaultPermissions, getUserHighestPermission } from './helpers/permissions/';
 import { adminEndpoint, viewerEndpoint } from './helpers/socket';
 import oauth from './oauth';
-import permissions from './permissions';
 
 class Users extends Core {
   constructor () {
@@ -77,7 +77,7 @@ class Users extends Core {
             api.stats.currentWatchedTime += incrementedUsers.affected * interval;
           }
 
-          permissions.recacheOnlineUsersPermission();
+          recacheOnlineUsersPermission();
         } else {
           debug('tmi.watched', `Incrementing chatTimeOffline users by ${interval}`);
           await getRepository(User).increment({ isOnline: true }, 'chatTimeOffline', interval);
@@ -392,9 +392,9 @@ class Users extends Core {
           const aggregatedTips = viewer.tips.map((o) => currency.exchange(o.amount, o.currency, currency.mainCurrency)).reduce((a, b) => a + b, 0);
           const aggregatedBits = viewer.bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0);
 
-          const permId = await permissions.getUserHighestPermission(userId);
+          const permId = await getUserHighestPermission(userId);
           const permissionGroup = (await getRepository(Permissions).findOneOrFail({
-            where: { id: permId || permission.VIEWERS },
+            where: { id: permId || defaultPermissions.VIEWERS },
           }));
           cb(null, {...viewer, aggregatedBits, aggregatedTips, permission: permissionGroup});
         } else {

@@ -12,7 +12,7 @@ const { User } = require('../../../dest/database/entity/user');
 const { Commands } = require('../../../dest/database/entity/commands');
 
 const customcommands = (require('../../../dest/systems/customcommands')).default;
-const { permission } = (require('../../../dest/helpers/permissions'));
+const { defaultPermissions } = (require('../../../dest/helpers/permissions/'));
 
 describe('Custom Commands - https://discord.com/channels/317348946144002050/317349069024395264/794732878595752016 - Custom command $param filter should be properly evaluated', () => {
   before(async () => {
@@ -28,14 +28,14 @@ describe('Custom Commands - https://discord.com/channels/317348946144002050/3173
         {
           order: 0,
           response: '1',
-          permission: permission.VIEWERS,
+          permission: defaultPermissions.VIEWERS,
           stopIfExecuted: true,
           filter: '$param === "1"'
         },
         {
           order: 1,
           response: '2',
-          permission: permission.VIEWERS,
+          permission: defaultPermissions.VIEWERS,
           stopIfExecuted: true,
           filter: '$param === "2"'
         }

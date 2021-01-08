@@ -23,6 +23,7 @@ import { isBotStarted, isDbConnected } from '../helpers/database';
 import { dayjs, timezone } from '../helpers/dayjs';
 import { debounce } from '../helpers/debounce';
 import { chatIn, chatOut, debug, error, info, warning, whisperOut } from '../helpers/log';
+import { check } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import { Message } from '../message';
 import oauth from '../oauth';
@@ -243,7 +244,7 @@ class Discord extends Integration {
           continue;
         }
 
-        const haveUserAnAccess = (await permissions.check(user.userId, botPermission.id, true)).access;
+        const haveUserAnAccess = (await check(user.userId, botPermission.id, true)).access;
         const role = await guild.roles.fetch(this.rolesMapping[botPermission.id]);
         if (!role) {
           warning(`Role with ID ${this.rolesMapping[botPermission.id]} not found on your Discord Server`);

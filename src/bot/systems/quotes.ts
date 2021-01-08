@@ -6,7 +6,7 @@ import { Quotes as QuotesEntity, QuotesInterface } from '../database/entity/quot
 import { command, default_permission } from '../decorators';
 import Expects from '../expects';
 import { sample } from '../helpers/array/sample';
-import { permission } from '../helpers/permissions';
+import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import ui from '../ui';
 import users from '../users';
@@ -69,7 +69,7 @@ class Quotes extends System {
   }
 
   @command('!quote add')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async add (opts: CommandOptions): Promise<(CommandResponse & QuotesInterface)[]> {
     try {
       if (opts.parameters.length === 0) {
@@ -88,7 +88,7 @@ class Quotes extends System {
   }
 
   @command('!quote remove')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async remove (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       if (opts.parameters.length === 0) {
@@ -112,7 +112,7 @@ class Quotes extends System {
   }
 
   @command('!quote set')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async set (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       if (opts.parameters.length === 0) {

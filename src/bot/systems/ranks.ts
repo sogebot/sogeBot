@@ -9,7 +9,7 @@ import { User, UserInterface } from '../database/entity/user';
 import { command, default_permission } from '../decorators';
 import { dayjs } from '../helpers/dayjs';
 import { getLocalizedName } from '../helpers/getLocalized';
-import { permission } from '../helpers/permissions';
+import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import { translate } from '../translate';
 import users from '../users';
@@ -77,7 +77,7 @@ class Ranks extends System {
   }
 
   @command('!rank add')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async add (opts: CommandOptions, type: RankInterface['type'] = 'viewer'): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^(\d+) ([\S].+)$/);
 
@@ -105,19 +105,19 @@ class Ranks extends System {
   }
 
   @command('!rank add-flw')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async addflw (opts: CommandOptions): Promise<CommandResponse[]> {
     return this.add(opts, 'follower');
   }
 
   @command('!rank add-sub')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async addsub (opts: CommandOptions): Promise<CommandResponse[]> {
     return this.add(opts, 'subscriber');
   }
 
   @command('!rank edit')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async edit (opts: CommandOptions, type: RankInterface['type'] = 'viewer'): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^(\d+) ([\S].+)$/);
 
@@ -149,19 +149,19 @@ class Ranks extends System {
   }
 
   @command('!rank edit-flw')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async editflw (opts: CommandOptions) {
     return this.edit(opts, 'follower');
   }
 
   @command('!rank edit-sub')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async editsub (opts: CommandOptions) {
     return this.edit(opts, 'subscriber');
   }
 
   @command('!rank set')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async set (opts: CommandOptions): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^([\S]+) ([\S ]+)$/);
 
@@ -176,7 +176,7 @@ class Ranks extends System {
   }
 
   @command('!rank unset')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async unset (opts: CommandOptions): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^([\S]+)$/);
 
@@ -191,7 +191,7 @@ class Ranks extends System {
   }
 
   @command('!rank help')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   help (opts: CommandOptions): CommandResponse[] {
     let url = 'http://sogehige.github.io/sogeBot/#/systems/ranks';
     if ((process.env?.npm_package_version ?? 'x.y.z-SNAPSHOT').includes('SNAPSHOT')) {
@@ -201,7 +201,7 @@ class Ranks extends System {
   }
 
   @command('!rank list')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async list (opts: CommandOptions, type: RankInterface['type'] = 'viewer'): Promise<CommandResponse[]> {
     const ranks = await getRepository(Rank).find({ type });
     const response = prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', { list: _.orderBy(ranks, 'value', 'asc').map((l) => {
@@ -211,19 +211,19 @@ class Ranks extends System {
   }
 
   @command('!rank list-flw')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async listflw (opts: CommandOptions) {
     return this.list(opts, 'follower');
   }
 
   @command('!rank list-sub')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async listsub (opts: CommandOptions) {
     return this.list(opts, 'subscriber');
   }
 
   @command('!rank rm')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async rm (opts: CommandOptions, type: RankInterface['type'] = 'viewer'): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^(\d+)$/);
     if (_.isNil(parsed)) {
@@ -244,13 +244,13 @@ class Ranks extends System {
   }
 
   @command('!rank rm-flw')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async rmflw (opts: CommandOptions) {
     return this.rm(opts, 'follower');
   }
 
   @command('!rank rm-sub')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async rmsub (opts: CommandOptions) {
     return this.rm(opts, 'subscriber');
   }

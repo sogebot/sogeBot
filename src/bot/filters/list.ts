@@ -14,7 +14,7 @@ import points from '../systems/points';
 import {default as priceSystem} from '../systems/price';
 import { translate } from '../translate';
 
-import { ResponseFilter } from '.';
+import type { ResponseFilter } from '.';
 
 const list: ResponseFilter = {
   '(list.#)': async function (filter: string) {

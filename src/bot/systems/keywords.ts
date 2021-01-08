@@ -8,7 +8,8 @@ import { command, default_permission, helper, parser } from '../decorators';
 import Expects from '../expects';
 import { checkFilter } from '../helpers/checkFilter';
 import { debug, error, warning } from '../helpers/log';
-import { addToViewersCache, getFromViewersCache, permission } from '../helpers/permissions';
+import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
+import { check, defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import permissions from '../permissions';
 import { translate } from '../translate';
@@ -59,7 +60,7 @@ class Keywords extends System {
   }
 
   @command('!keyword')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   @helper()
   public main(opts: CommandOptions): CommandResponse[] {
     let url = 'http://sogehige.github.io/sogeBot/#/systems/keywords';
@@ -77,11 +78,11 @@ class Keywords extends System {
    * @return {Promise<CommandResponse[]>}
    */
   @command('!keyword add')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   public async add(opts: CommandOptions): Promise<(CommandResponse & { id: string | null })[]> {
     try {
       const [userlevel, stopIfExecuted, keywordRegex, response] = new Expects(opts.parameters)
-        .permission({ optional: true, default: permission.VIEWERS })
+        .permission({ optional: true, default: defaultPermissions.VIEWERS })
         .argument({ optional: true, name: 's', default: false, type: Boolean })
         .argument({ name: 'k', type: String, multi: true, delimiter: '' })
         .argument({ name: 'r', type: String, multi: true, delimiter: '' })
@@ -105,7 +106,7 @@ class Keywords extends System {
         ...kDb,
         responses: [...kDb.responses, {
           order: kDb.responses.length,
-          permission: pItem.id ?? permission.VIEWERS,
+          permission: pItem.id ?? defaultPermissions.VIEWERS,
           stopIfExecuted: stopIfExecuted,
           response: response,
           filter: '',
@@ -126,11 +127,11 @@ class Keywords extends System {
    * @return {Promise<CommandResponse[]>}
    */
   @command('!keyword edit')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   public async edit(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [userlevel, stopIfExecuted, keywordRegexOrUUID, rId, response] = new Expects(opts.parameters)
-        .permission({ optional: true, default: permission.VIEWERS })
+        .permission({ optional: true, default: defaultPermissions.VIEWERS })
         .argument({ optional: true, name: 's', default: null, type: Boolean })
         .argument({ name: 'k', type: String, multi: true, delimiter: '' })
         .argument({ name: 'rid', type: Number })
@@ -161,7 +162,7 @@ class Keywords extends System {
         }
 
         responseDb.response = response;
-        responseDb.permission = pItem.id ?? permission.VIEWERS;
+        responseDb.permission = pItem.id ?? defaultPermissions.VIEWERS;
         if (stopIfExecuted) {
           responseDb.stopIfExecuted = stopIfExecuted;
         }
@@ -181,7 +182,7 @@ class Keywords extends System {
    * @returns {Promise<CommandResponse[]>}
    */
   @command('!keyword list')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   public async list(opts: CommandOptions): Promise<CommandResponse[]> {
     const keyword = new Expects(opts.parameters).everything({ optional: true }).toArray()[0];
     if (!keyword) {
@@ -218,7 +219,7 @@ class Keywords extends System {
    * @return {Promise<CommandResponse[]>}
    */
   @command('!keyword remove')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   public async remove(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [keywordRegexOrUUID, rId]
@@ -276,7 +277,7 @@ class Keywords extends System {
    * @return {Promise<CommandResponse[]>}
    */
   @command('!keyword toggle')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   public async toggle(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [keywordRegexOrUUID]
@@ -334,7 +335,7 @@ class Keywords extends System {
       const _responses: KeywordsResponsesInterface[] = [];
       for (const r of _.orderBy(k.responses, 'order', 'asc')) {
         if (typeof getFromViewersCache(opts.sender.userId, r.permission) === 'undefined') {
-          addToViewersCache(opts.sender.userId, r.permission, (await permissions.check(Number(opts.sender.userId), r.permission, false)).access);
+          addToViewersCache(opts.sender.userId, r.permission, (await check(Number(opts.sender.userId), r.permission, false)).access);
         }
 
         if (getFromViewersCache(opts.sender.userId, r.permission)

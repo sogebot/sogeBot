@@ -1,36 +1,18 @@
-import { promisify } from 'util';
-
-import _ from 'lodash';
-import { getRepository, LessThan } from 'typeorm';
+import { getRepository } from 'typeorm';
 
 import Core from './_interface';
 import {
-  isFollower, isOwner, isSubscriber, isVIP, prepare,
+  prepare,
 } from './commons';
-import { HOUR, MINUTE } from './constants';
-import currency from './currency';
-import { PermissionCommands, PermissionFiltersInterface, Permissions as PermissionsEntity, PermissionsInterface } from './database/entity/permissions';
-import { User, UserInterface } from './database/entity/user';
-import { areDecoratorsLoaded, command, default_permission } from './decorators';
+import { PermissionCommands, Permissions as PermissionsEntity, PermissionsInterface } from './database/entity/permissions';
+import { User } from './database/entity/user';
+import { command, default_permission } from './decorators';
 import Expects from './expects';
-import { getBroadcaster } from './helpers/getBroadcaster';
-import { isBot } from './helpers/isBot';
-import { isBroadcaster } from './helpers/isBroadcaster';
-import { isModerator } from './helpers/isModerator';
-import { debug, warning } from './helpers/log';
 import { error } from './helpers/log';
-import { addToCachedHighestPermission, cleanViewersCache, getFromCachedHighestPermission, permission } from './helpers/permissions';
-import { logAvgTime } from './helpers/profiler';
+import { cleanViewersCache } from './helpers/permissions';
+import { check, defaultPermissions } from './helpers/permissions/';
 import { adminEndpoint } from './helpers/socket';
-import oauth from './oauth';
-import levels from './systems/levels';
-import ranks from './systems/ranks';
 import users from './users';
-
-let isWarnedAboutCasters = false;
-let isRecacheRunning = false;
-let rechacheFinishedAt = 0;
-const recacheIds = new Map<number, number>();
 
 class Permissions extends Core {
   constructor() {
@@ -84,8 +66,8 @@ class Permissions extends Core {
       if (typeof opts.value === 'string') {
         const userByName = await getRepository(User).findOne({ username: opts.value });
         if (userByName) {
-          const status = await this.check(userByName.userId, opts.pid);
-          const partial = await this.check(userByName.userId, opts.pid, true);
+          const status = await check(userByName.userId, opts.pid);
+          const partial = await check(userByName.userId, opts.pid, true);
           cb(null, {
             status,
             partial,
@@ -96,8 +78,8 @@ class Permissions extends Core {
       } else if(isFinite(opts.value)) {
         const userById = await getRepository(User).findOne({ userId: Number(opts.value) });
         if (userById) {
-          const status = await this.check(userById.userId, opts.pid);
-          const partial = await this.check(userById.userId, opts.pid, true);
+          const status = await check(userById.userId, opts.pid);
+          const partial = await check(userById.userId, opts.pid, true);
           cb(null, {
             status,
             partial,
@@ -135,235 +117,11 @@ class Permissions extends Core {
     }
   }
 
-  recacheOnlineUsersPermission() {
-    if (!isRecacheRunning && Date.now() - rechacheFinishedAt > 10 * MINUTE) {
-      const time = process.hrtime();
-      const setImmediatePromise = promisify(setImmediate);
-      getRepository(User).find({ isOnline: true }).then(async (users2) => {
-        isRecacheRunning = true;
-        // we need to recache only users not recached in 30 minutes
-        for (const user of users2) {
-          if (!recacheIds.has(user.userId) || (Date.now() - (recacheIds.get(user.userId) ?? 0) > 30 * MINUTE)) {
-            debug('permissions.recache', `Recaching ${user.username}#${user.userId}`);
-            cleanViewersCache(user.userId);
-            await this.getUserHighestPermission(user.userId);
-            await setImmediatePromise();
-            recacheIds.set(user.userId, Date.now());
-          } else {
-            debug('permissions.recache', `Recaching SKIPPED ${user.username}#${user.userId}`);
-          }
-        }
-        isRecacheRunning = false;
-        rechacheFinishedAt = Date.now();
-        logAvgTime('recacheOnlineUsersPermission()', process.hrtime(time));
-      });
-    }
-
-    // remove all recacheIds when time is more than HOUR
-    for (const userId of Array.from(recacheIds.keys())) {
-      if (Date.now() - (recacheIds.get(userId) ?? 0) > HOUR) {
-        recacheIds.delete(userId);
-      }
-    }
-  }
-
-  public async getUserHighestPermission(userId: number): Promise<string> {
-    const cachedPermission = getFromCachedHighestPermission(userId);
-    if (!cachedPermission) {
-      const permissions = await getRepository(PermissionsEntity).find({
-        cache: true,
-        order: {
-          order: 'ASC',
-        },
-      });
-      for (const p of permissions) {
-        if ((await this.check(userId, p.id, true)).access) {
-          addToCachedHighestPermission(userId, p.id);
-          return p.id;
-        }
-      }
-      throw new Error('Unknown permission for user ' + userId);
-    } else {
-      return cachedPermission;
-    }
-  }
-
-  public async check(userId: number, permId: string, partial = false): Promise<{access: boolean; permission: PermissionsInterface | undefined}> {
-    if (!areDecoratorsLoaded) {
-      await new Promise<void>((resolve) => {
-        const check = () => {
-          // wait for all data to be loaded
-          if (areDecoratorsLoaded) {
-            resolve();
-          } else {
-            setTimeout(() => check(), 10);
-          }
-        };
-        check();
-      });
-    }
-
-    if (oauth.generalOwners.filter(o => typeof o === 'string' && o.trim().length > 0).length === 0 && getBroadcaster() === '' && !isWarnedAboutCasters) {
-      isWarnedAboutCasters = true;
-      warning('Owners or broadcaster oauth is not set, all users are treated as CASTERS!!!');
-      const pItem = await getRepository(PermissionsEntity).findOne({ id: permission.CASTERS });
-      return { access: true, permission: pItem };
-    }
-
-    const user = await getRepository(User).findOne({
-      where: { userId },
-    });
-    const pItem = (await getRepository(PermissionsEntity).findOne({
-      relations: ['filters'],
-      where: { id: permId },
-    })) as PermissionsInterface;
-    try {
-      if (!user) {
-        return { access: permId === permission.VIEWERS, permission: pItem };
-      }
-      if (!pItem) {
-        throw Error(`Permissions ${permId} doesn't exist`);
-      }
-
-      // if userId is part of excludeUserIds => fakse
-      if (pItem.excludeUserIds.includes(String(userId))) {
-        return { access: false, permission: pItem };
-      }
-
-      // if userId is part of userIds => true
-      if (pItem.userIds.includes(String(userId))) {
-        return { access: true, permission: pItem };
-      }
-
-      // get all higher permissions to check if not partial check only
-      if (!partial && pItem.isWaterfallAllowed) {
-        const partialPermission = await getRepository(PermissionsEntity).find({
-          where: {
-            order: LessThan(pItem.order),
-          },
-        });
-        for (const p of _.orderBy(partialPermission, 'order', 'asc')) {
-          const partialCheck = await this.check(userId, p.id, true);
-          if (partialCheck.access) {
-            return { access: true, permission: p}; // we don't need to continue, user have already access with higher permission
-          }
-        }
-      }
-
-      let shouldProceed = false;
-      switch (pItem.automation) {
-        case 'viewers':
-          shouldProceed = true;
-          break;
-        case 'casters':
-          if (oauth.generalOwners.filter(o => typeof o === 'string').length === 0 && getBroadcaster() === '') {
-            shouldProceed = true;
-          } else {
-            shouldProceed = isBot(user) || isBroadcaster(user) || isOwner(user);
-          }
-          break;
-        case 'moderators':
-          shouldProceed = isModerator(user);
-          break;
-        case 'subscribers':
-          shouldProceed = isSubscriber(user);
-          break;
-        case 'vip':
-          shouldProceed = isVIP(user);
-          break;
-        case 'followers':
-          shouldProceed = isFollower(user);
-          break;
-        default:
-          shouldProceed = false; // we don't have any automation
-          break;
-      }
-      debug('permissions.check', JSON.stringify({ access: shouldProceed && this.filters(user, pItem.filters), permission: pItem }));
-      return { access: shouldProceed && await this.filters(user, pItem.filters), permission: pItem };
-    } catch (e) {
-      error(e.stack);
-      return { access: false, permission: pItem };
-    }
-  }
-
-  async filters(
-    user: Required<UserInterface>,
-    filters: PermissionFiltersInterface[] = [],
-  ): Promise<boolean> {
-    for (const f of filters) {
-      let amount = 0;
-      switch (f.type) {
-        case 'ranks':
-          const rank = await ranks.get(user);
-          // we can return immediately
-          return rank.current === f.value;
-        case 'level':
-          amount = levels.getLevelOf(user);
-          break;
-        case 'bits':
-          amount = user.bits.reduce((a, b) => (a + b.amount), 0);
-          break;
-        case 'messages':
-          amount = user.messages;
-          break;
-        case 'points':
-          amount = user.points;
-          break;
-        case 'subcumulativemonths':
-          amount = user.subscribeCumulativeMonths;
-          break;
-        case 'substreakmonths':
-          amount = user.subscribeStreak;
-          break;
-        case 'subtier':
-          amount = user.subscribeTier === 'Prime' ? 0 : Number(user.subscribeTier);
-          break;
-        case 'tips':
-          amount = user.tips.reduce((a, b) => (a + currency.exchange(b.amount, b.currency, currency.mainCurrency)), 0);
-          break;
-        case 'followtime':
-          amount = (Date.now() - user.followedAt) / (31 * 24 * 60 * 60 * 1000 /*months*/);
-          break;
-        case 'watched':
-          amount = user.watchedTime / (60 * 60 * 1000 /*hours*/);
-      }
-
-      switch (f.comparator) {
-        case '<':
-          if (!(amount < Number(f.value))) {
-            return false;
-          }
-          break;
-        case '<=':
-          if (!(amount <= Number(f.value))) {
-            return false;
-          }
-          break;
-        case '==':
-          if (Number(amount) !== Number(f.value)) {
-            return false;
-          }
-          break;
-        case '>':
-          if (!(amount > Number(f.value))) {
-            return false;
-          }
-          break;
-        case '>=':
-          if (!(amount >= Number(f.value))) {
-            return false;
-          }
-          break;
-      }
-    }
-    return true;
-  }
-
   /**
    * !permission exclude-add -p SongRequest -u soge
    */
   @command('!permission exclude-add')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async excludeAdd(opts: CommandOptions): Promise<CommandResponse[]> {
     try  {
       const [userlevel, username] = new Expects(opts.parameters)
@@ -406,7 +164,7 @@ class Permissions extends Core {
    * !permission exclude-rm -p SongRequest -u soge
    */
   @command('!permission exclude-rm')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async excludeRm(opts: CommandOptions): Promise<CommandResponse[]> {
     try  {
       const [userlevel, username] = new Expects(opts.parameters)
@@ -442,7 +200,7 @@ class Permissions extends Core {
   }
 
   @command('!permission list')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   protected async list(opts: CommandOptions): Promise<CommandResponse[]> {
     const permissions = await getRepository(PermissionsEntity).find({
       order: {
@@ -470,7 +228,7 @@ class Permissions extends Core {
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'casters')) {
       await getRepository(PermissionsEntity).insert({
-        id: permission.CASTERS,
+        id: defaultPermissions.CASTERS,
         name: 'Casters',
         automation: 'casters',
         isCorePermission: true,
@@ -485,7 +243,7 @@ class Permissions extends Core {
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'moderators')) {
       await getRepository(PermissionsEntity).insert({
-        id: permission.MODERATORS,
+        id: defaultPermissions.MODERATORS,
         name: 'Moderators',
         automation: 'moderators',
         isCorePermission: true,
@@ -500,7 +258,7 @@ class Permissions extends Core {
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'subscribers')) {
       await getRepository(PermissionsEntity).insert({
-        id: permission.SUBSCRIBERS,
+        id: defaultPermissions.SUBSCRIBERS,
         name: 'Subscribers',
         automation: 'subscribers',
         isCorePermission: true,
@@ -515,7 +273,7 @@ class Permissions extends Core {
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'vip')) {
       await getRepository(PermissionsEntity).insert({
-        id: permission.VIP,
+        id: defaultPermissions.VIP,
         name: 'VIP',
         automation: 'vip',
         isCorePermission: true,
@@ -530,7 +288,7 @@ class Permissions extends Core {
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'followers')) {
       await getRepository(PermissionsEntity).insert({
-        id: permission.FOLLOWERS,
+        id: defaultPermissions.FOLLOWERS,
         name: 'Followers',
         automation: 'followers',
         isCorePermission: true,
@@ -545,7 +303,7 @@ class Permissions extends Core {
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'viewers')) {
       await getRepository(PermissionsEntity).insert({
-        id: permission.VIEWERS,
+        id: defaultPermissions.VIEWERS,
         name: 'Viewers',
         automation: 'viewers',
         isCorePermission: true,

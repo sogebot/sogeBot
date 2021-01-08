@@ -11,7 +11,7 @@ import { dayjs } from '../helpers/dayjs';
 import { timestampToObject } from '../helpers/getTime';
 import { error } from '../helpers/log';
 import { ioServer } from '../helpers/panel';
-import { permission } from '../helpers/permissions';
+import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import oauth from '../oauth';
 import { translate } from '../translate';
@@ -81,7 +81,7 @@ class Highlights extends System {
   }
 
   @command('!highlight')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   public async main(opts: CommandOptions): Promise<CommandResponse[]> {
     const token = oauth.botAccessToken;
     const cid = oauth.channelId;
@@ -143,7 +143,7 @@ class Highlights extends System {
   }
 
   @command('!highlight list')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   public async list(opts: CommandOptions): Promise<CommandResponse[]> {
     const sortedHighlights = await getRepository(Highlight).find({
       order: {

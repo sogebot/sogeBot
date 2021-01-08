@@ -9,7 +9,7 @@ import { command, default_permission, settings } from './decorators';
 import { dayjs, timezone } from './helpers/dayjs';
 import { getTime } from './helpers/getTime';
 import { isIgnored } from './helpers/isIgnored';
-import { permission } from './helpers/permissions';
+import { defaultPermissions } from './helpers/permissions/';
 import { adminEndpoint } from './helpers/socket';
 import oauth from './oauth';
 import { translate } from './translate';
@@ -129,7 +129,7 @@ class Twitch extends Core {
   }
 
   @command('!title set')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async setTitle (opts: CommandOptions) {
     if (opts.parameters.length === 0) {
       return [ { response: await translate('title.current').replace(/\$title/g, api.stats.currentTitle || 'n/a'), ...opts }];
@@ -144,7 +144,7 @@ class Twitch extends Core {
   }
 
   @command('!game set')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async setGame (opts: CommandOptions) {
     if (opts.parameters.length === 0) {
       return [ { response: translate('game.current').replace(/\$title/g, api.stats.currentGame || 'n/a'), ...opts }];

@@ -9,7 +9,7 @@ import { command, default_permission } from '../decorators';
 import { onStreamStart } from '../decorators/on';
 import Expects from '../expects';
 import { debug, error, info, warning } from '../helpers/log';
-import { permission } from '../helpers/permissions';
+import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import System from './_interface';
 
@@ -189,7 +189,7 @@ class HowLongToBeat extends System {
   }
 
   @command('!hltb')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async currentGameInfo(opts: CommandOptions, retry = false): Promise<CommandResponse[]> {
     let [gameInput] = new Expects(opts.parameters)
       .everything({ optional: true })

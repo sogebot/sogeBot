@@ -2,8 +2,8 @@ import { isNil } from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { Variable } from '../../database/entity/variable';
-import permissions from '../../permissions';
 import { addToViewersCache, getFromViewersCache } from '../permissions';
+import { check } from '../permissions/';
 import { runScript } from './runScript';
 
 async function getValueOf (variableName: string, opts?: any) {
@@ -20,7 +20,7 @@ async function getValueOf (variableName: string, opts?: any) {
     // recheck permission as this may go outside of setValueOf
     if (opts?.sender) {
       if (typeof getFromViewersCache(opts.sender.userId, item.permission) === 'undefined') {
-        addToViewersCache(opts.sender.userId, item.permission, (await permissions.check(Number(opts.sender.userId), item.permission, false)).access);
+        addToViewersCache(opts.sender.userId, item.permission, (await check(Number(opts.sender.userId), item.permission, false)).access);
       }
     }
     const permissionsAreValid = isNil(opts?.sender) || getFromViewersCache(opts.sender.userId, item.permission);

@@ -16,10 +16,10 @@ import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
 import { isBot } from '../helpers/isBot';
 import { debug, error, warning } from '../helpers/log';
 import { ParameterError } from '../helpers/parameterError';
-import { permission } from '../helpers/permissions';
+import { getUserHighestPermission } from '../helpers/permissions/';
+import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import oauth from '../oauth';
-import permissions from '../permissions';
 import { translate } from '../translate';
 import users from '../users';
 import System from './_interface';
@@ -143,7 +143,7 @@ class Points extends System {
       }
 
       // get user max permission
-      const permId = await permissions.getUserHighestPermission(userId);
+      const permId = await getUserHighestPermission(userId);
       if (!permId) {
         debug('points.update', `User ${username}#${userId} permId not found`);
         return resolve(); // skip without id
@@ -210,7 +210,7 @@ class Points extends System {
     ]);
 
     // get user max permission
-    const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
+    const permId = await getUserHighestPermission(Number(opts.sender.userId));
     if (!permId) {
       return true; // skip without permission
     }
@@ -282,7 +282,7 @@ class Points extends System {
   }
 
   @command('!points undo')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async undo(opts: CommandOptions) {
     try {
       const [username] = new Expects(opts.parameters).username().toArray();
@@ -319,7 +319,7 @@ class Points extends System {
   }
 
   @command('!points set')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async set (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
@@ -458,7 +458,7 @@ class Points extends System {
   }
 
   @command('!points get')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async get (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
@@ -524,7 +524,7 @@ class Points extends System {
   }
 
   @command('!points online')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async online (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       let points = new Expects(opts.parameters).points({ all: false, negative: true }).toArray()[0];
@@ -552,7 +552,7 @@ class Points extends System {
   }
 
   @command('!points all')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async all (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       let points: number = new Expects(opts.parameters).points({ all: false, negative: true }).toArray()[0];
@@ -579,7 +579,7 @@ class Points extends System {
   }
 
   @command('!makeitrain')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async rain (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const points = new Expects(opts.parameters).points({ all: false }).toArray()[0];
@@ -602,7 +602,7 @@ class Points extends System {
   }
 
   @command('!points add')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async add (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
@@ -639,7 +639,7 @@ class Points extends System {
   }
 
   @command('!points remove')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async remove (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: true }).toArray();

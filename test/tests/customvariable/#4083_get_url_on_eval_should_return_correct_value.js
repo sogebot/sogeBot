@@ -1,6 +1,6 @@
 /* global describe it before */
 
-const { permission } = require('../../../dest/helpers/permissions');
+const { defaultPermissions } = require('../../../dest/helpers/permissions/');
 const Parser = require('../../../dest/parser').default;
 
 require('../../general.js');
@@ -38,7 +38,7 @@ describe('Custom Variable - #4083 - Get url on eval should return correct value'
       currentValue: '0',
       type: 'eval',
       responseType: 2,
-      permission: permission.MODERATORS,
+      permission: defaultPermissions.MODERATORS,
       evalValue: 'return Date.now();',
       usableOptions: []
     });

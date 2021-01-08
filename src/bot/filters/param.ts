@@ -1,6 +1,6 @@
 import tmi from '../tmi';
 
-import { ResponseFilter } from '.';
+import type { ResponseFilter } from '.';
 
 const param: ResponseFilter = {
   '$touser': async function (_variable, attr) {

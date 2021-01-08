@@ -10,7 +10,7 @@ import { onBit, onMessage, onTip } from '../decorators/on';
 import Expects from '../expects.js';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { warning } from '../helpers/log.js';
-import { permission } from '../helpers/permissions';
+import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import { translate } from '../translate';
 import System from './_interface';
@@ -108,7 +108,7 @@ class Polls extends System {
   }
 
   @command('!poll close')
-  @default_permission(permission.MODERATORS)
+  @default_permission(defaultPermissions.MODERATORS)
   public async close(opts: CommandOptions): Promise<CommandResponse[]> {
     const responses: CommandResponse[] = [];
     const cVote = await getRepository(Poll).findOne({
@@ -168,7 +168,7 @@ class Polls extends System {
   }
 
   @command('!poll open')
-  @default_permission(permission.MODERATORS)
+  @default_permission(defaultPermissions.MODERATORS)
   public async open(opts: CommandOptions): Promise<CommandResponse[]> {
     const cVote = await getRepository(Poll).findOne({ isOpened: true });
 

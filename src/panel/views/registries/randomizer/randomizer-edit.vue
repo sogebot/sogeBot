@@ -229,6 +229,7 @@ import translate from 'src/panel/helpers/translate';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { defaultPermissions } from 'src/bot/helpers/permissions';
 library.add(faExclamationTriangle);
 
 Component.registerHooks([
@@ -291,7 +292,7 @@ export default class randomizerEdit extends Vue {
     command: '',
     items: [],
     createdAt: Date.now(),
-    permissionId: permission.CASTERS,
+    permissionId: defaultPermissions.CASTERS,
     isShown: false,
     shouldPlayTick: false,
     tickVolume: 1,

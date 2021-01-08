@@ -4,8 +4,8 @@ import { LOW } from '../constants';
 import { Randomizer as RandomizerEntity, RandomizerItem } from '../database/entity/randomizer';
 import { parser } from '../decorators';
 import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
+import { check } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
-import permissions from '../permissions';
 import Registry from './_interface';
 
 class Randomizer extends Registry {
@@ -118,7 +118,7 @@ class Randomizer extends Registry {
       addToViewersCache(
         opts.sender.userId,
         randomizer.permissionId,
-        (await permissions.check(Number(opts.sender.userId), randomizer.permissionId, false)).access,
+        (await check(Number(opts.sender.userId), randomizer.permissionId, false)).access,
       );
     }
 

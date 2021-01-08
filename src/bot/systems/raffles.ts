@@ -12,7 +12,7 @@ import { isDbConnected } from '../helpers/database';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { debug, warning } from '../helpers/log';
 import { linesParsed } from '../helpers/parser';
-import { permission } from '../helpers/permissions';
+import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import tmi from '../tmi';
 import { translate } from '../translate';
@@ -249,7 +249,7 @@ class Raffles extends System {
   }
 
   @command('!raffle remove')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async remove (opts: CommandOptions): Promise<CommandResponse[]> {
     const raffle = await getRepository(Raffle).findOne({ winner: null, isClosed: false });
     if (raffle) {
@@ -259,7 +259,7 @@ class Raffles extends System {
   }
 
   @command('!raffle open')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async open (opts: CommandOptions): Promise<CommandResponse[]> {
     const [followers, subscribers] = [opts.parameters.indexOf('followers') >= 0, opts.parameters.indexOf('subscribers') >= 0];
     let type = (opts.parameters.indexOf('-min') >= 0 || opts.parameters.indexOf('-max') >= 0) ? TYPE_TICKETS : TYPE_NORMAL;
@@ -495,7 +495,7 @@ class Raffles extends System {
   }
 
   @command('!raffle pick')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async pick (opts: CommandOptions): Promise<CommandResponse[]> {
     const raffle = await getRepository(Raffle).findOne({
       relations: ['participants'],

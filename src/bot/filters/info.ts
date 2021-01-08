@@ -5,7 +5,7 @@ import currency from '../currency';
 import { EventList } from '../database/entity/eventList';
 import users from '../users';
 
-import { ResponseFilter } from '.';
+import type { ResponseFilter } from '.';
 
 const info: ResponseFilter = {
   '$toptip.#.#': async function (filter: string) {

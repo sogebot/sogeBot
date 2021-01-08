@@ -1,6 +1,6 @@
 /* global describe it before */
 
-const { permission } = require('../../../dest/helpers/permissions');
+const { defaultPermissions } = require('../../../dest/helpers/permissions/');
 const { getOwner } = require('../../../dest/commons');
 
 require('../../general.js');
@@ -20,8 +20,8 @@ _.set(global, 'widgets.custom_variables.io.emit', function () {});
 
 describe('Message - cvars filter', async () => {
   const users = [
-    { username: '__owner__', userId: Math.floor(Math.random() * 100000), permission: permission.CASTERS },
-    { username: '__viewer__', userId: Math.floor(Math.random() * 100000), permission: permission.VIEWERS },
+    { username: '__owner__', userId: Math.floor(Math.random() * 100000), permission: defaultPermissions.CASTERS },
+    { username: '__viewer__', userId: Math.floor(Math.random() * 100000), permission: defaultPermissions.VIEWERS },
   ];
   const tests = [
     {

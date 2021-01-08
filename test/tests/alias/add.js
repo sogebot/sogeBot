@@ -4,7 +4,7 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
-const { permission } = require('../../../dest/helpers/permissions');
+const { defaultPermissions } = require('../../../dest/helpers/permissions/');
 const alias = (require('../../../dest/systems/alias')).default;
 const assert = require('assert');
 const { prepare } = (require('../../../dest/commons'));
@@ -29,7 +29,7 @@ const successTests = [
   { permission: null, alias: '!русский', command: '!me' },
   { permission: null, alias: '!with link', command: '!me http://google.com' },
   { permission: null, alias: '!a with spaces', command: '!top messages' },
-  { permission: permission.VIEWERS, alias: '!a', command: '!me' },
+  { permission: defaultPermissions.VIEWERS, alias: '!a', command: '!me' },
   { permission: 'casters', alias: '!a', command: '!me' },
 ];
 

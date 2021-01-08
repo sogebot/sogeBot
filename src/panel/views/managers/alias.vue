@@ -196,6 +196,7 @@ library.add(faKey, faObjectGroup);
 import { validationMixin } from 'vuelidate'
 import { required } from 'vuelidate/lib/validators'
 import { permission } from 'src/bot/helpers/permissions';
+import { defaultPermissions } from 'src/bot/helpers/permissions';
 
 const socket = {
   permission: getSocket('/core/permissions'),
@@ -410,7 +411,7 @@ export default defineComponent({
               id: ctx.root.$route.params.id,
               alias: '',
               command: '',
-              permission: permission.VIEWERS,
+              permission: defaultPermissions.VIEWERS,
               visible: true,
               group: null,
               enabled: true,

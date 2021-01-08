@@ -3,7 +3,7 @@ import axios from 'axios';
 import api from '../api';
 import oauth from '../oauth';
 
-import { ResponseFilter } from '.';
+import type { ResponseFilter } from '.';
 
 const stream: ResponseFilter = {
   '(stream|#|link)': async function (filter: any) {

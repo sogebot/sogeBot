@@ -6,7 +6,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const assert = require('assert');
 
-const { permission } = require('../../../dest/helpers/permissions');
+const { defaultPermissions } = require('../../../dest/helpers/permissions/');
 const { invalidateParserCache } = require('../../../dest/helpers/cache');
 const permissions = (require('../../../dest/permissions')).default;
 const Parser = require('../../../dest/parser').default;

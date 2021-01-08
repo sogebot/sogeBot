@@ -5,7 +5,7 @@ import { HueApi, lightState } from 'node-hue-api';
 import { command, default_permission, settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import { error, info } from '../helpers/log';
-import { permission } from '../helpers/permissions';
+import { defaultPermissions } from '../helpers/permissions/';
 import { translate } from '../translate';
 import Integration from './_interface';
 
@@ -116,7 +116,7 @@ class PhillipsHue extends Integration {
   }
 
   @command('!hue list')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   getLights (opts: CommandOptions): CommandResponse[] {
     try {
       const lights = this.api.lights();
@@ -132,7 +132,7 @@ class PhillipsHue extends Integration {
   }
 
   @command('!hue')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   hue (opts: CommandOptions) {
     let rgb = this.parseText(opts.parameters, 'rgb', '255,255,255').split(',').map(o => Number(o));
     if (rgb.length < 3) {

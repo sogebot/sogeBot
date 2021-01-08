@@ -25,7 +25,7 @@ import { isDebugEnabled } from './helpers/log';
 import { chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning, whisperIn } from './helpers/log';
 import { setMuteStatus } from './helpers/muteStatus';
 import { avgResponse, linesParsedIncrement, setStatus } from './helpers/parser';
-import { permission } from './helpers/permissions';
+import { defaultPermissions } from './helpers/permissions/';
 import oauth from './oauth';
 import eventlist from './overlays/eventlist';
 import Parser from './parser';
@@ -82,7 +82,7 @@ class TMI extends Core {
   }
 
   @command('!ignore add')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async ignoreAdd (opts: Record<string, any>) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
@@ -101,7 +101,7 @@ class TMI extends Core {
   }
 
   @command('!ignore remove')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async ignoreRm (opts: Record<string, any>) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
@@ -115,7 +115,7 @@ class TMI extends Core {
   }
 
   @command('!ignore check')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async ignoreCheck (opts: Record<string, any>) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();

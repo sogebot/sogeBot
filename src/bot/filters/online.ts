@@ -1,6 +1,6 @@
 import api from '../api';
 
-import { ResponseFilter } from '.';
+import type { ResponseFilter } from '.';
 
 const online: ResponseFilter = {
   '(onlineonly)': async function () {

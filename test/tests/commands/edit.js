@@ -8,7 +8,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 const customcommands = (require('../../../dest/systems/customcommands')).default;
-const { permission } = require('../../../dest/helpers/permissions');
+const { defaultPermissions } = require('../../../dest/helpers/permissions/');
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
@@ -28,16 +28,16 @@ const parseFailedTests = [
 ];
 
 const unknownCommandTests = [
-  { permission: permission.VIEWERS, command: '!cmd', rid: '1', response: 'Lorem Ipsum Dolor Sit Amet' },
+  { permission: defaultPermissions.VIEWERS, command: '!cmd', rid: '1', response: 'Lorem Ipsum Dolor Sit Amet' },
 ];
 
 const unknownResponseTests = [
-  { permission: permission.VIEWERS, command: '!cmd', rid: '2', response: 'Lorem Ipsum Dolor Sit Amet' },
+  { permission: defaultPermissions.VIEWERS, command: '!cmd', rid: '2', response: 'Lorem Ipsum Dolor Sit Amet' },
 ];
 
 const successTests = [
   { permission: null, command: '!cmd', rid: '1', response: 'Lorem Ipsum', edit: 'Dolor Ipsum'},
-  { permission: permission.VIEWERS, command: '!cmd', rid: '1', response: 'Lorem Ipsum', edit: 'Dolor Ipsum'},
+  { permission: defaultPermissions.VIEWERS, command: '!cmd', rid: '1', response: 'Lorem Ipsum', edit: 'Dolor Ipsum'},
   { permission: 'casters', command: '!cmd', rid: '1', response: 'Lorem Ipsum', edit: 'Dolor Ipsum'},
   { permission: null, command: '!한글', rid: '1', response: 'Lorem Ipsum', edit: 'Dolor Ipsum'},
   { permission: null, command: '!русский', rid: '1', response: 'Lorem Ipsum', edit: 'Dolor Ipsum'},
