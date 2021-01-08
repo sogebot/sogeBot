@@ -259,6 +259,8 @@ e.g. `(api|https://httpbin.org/get?test=a\\nb) Lorem (api.args.test)`
 
 `(stream|#name|viewers)` - returns viewers count of `#name` channel, it something went wrong, returns `0`
 
+`(stream|#name|link)` - returns link to twitch `#name` channel -> 'twitch.tv/#name'
+
 ## YouTube filters
 
 `$youtube(url, <channel-or-user>)` - returns latest video link e.g.
