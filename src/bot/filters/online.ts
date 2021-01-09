@@ -1,13 +1,13 @@
-import api from '../api';
+import { isStreamOnline } from '../helpers/api';
 
 import type { ResponseFilter } from '.';
 
 const online: ResponseFilter = {
   '(onlineonly)': async function () {
-    return api.isStreamOnline;
+    return isStreamOnline;
   },
   '(offlineonly)': async function () {
-    return !(api.isStreamOnline);
+    return !(isStreamOnline);
   },
 };
 

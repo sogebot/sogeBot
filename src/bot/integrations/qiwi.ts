@@ -1,13 +1,13 @@
 import axios from 'axios';
 import { getRepository } from 'typeorm';
 
-import api from '../api.js';
 import currency from '../currency';
 import { User, UserTipInterface } from '../database/entity/user';
 import { settings } from '../decorators';
 import { ui } from '../decorators.js';
 import { onChange, onStartup } from '../decorators/on.js';
 import events from '../events.js';
+import { isStreamOnline, setStats, stats } from '../helpers/api/index.js';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 import { error, tip } from '../helpers/log';
 import eventlist from '../overlays/eventlist.js';
@@ -84,8 +84,11 @@ class Qiwi extends Integration {
 
       }
 
-      if (api.isStreamOnline) {
-        api.stats.currentTips += currency.exchange(amount, DONATION_CURRENCY, currency.mainCurrency);
+      if (isStreamOnline) {
+        setStats({
+          ...stats,
+          currentTips: stats.currentTips + currency.exchange(amount, DONATION_CURRENCY, currency.mainCurrency),
+        });
       }
 
       eventlist.add({

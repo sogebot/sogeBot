@@ -1,12 +1,12 @@
 import { HowLongToBeatService } from 'howlongtobeat';
 import { getRepository } from 'typeorm';
 
-import api from '../api';
 import * as constants from '../constants';
 import { HowLongToBeatGame, HowLongToBeatGameItem } from '../database/entity/howLongToBeatGame';
 import { command, default_permission } from '../decorators';
 import { onStreamStart } from '../decorators/on';
 import Expects from '../expects';
+import { isStreamOnline, stats, streamStatusChangeSince } from '../helpers/api';
 import { prepare } from '../helpers/commons';
 import { debug, error, info, warning } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
@@ -27,13 +27,13 @@ class HowLongToBeat extends System {
 
     let lastDbgMessage = '';
     setInterval(async () => {
-      const isGameInNotFoundList = api.stats.currentGame && notFoundGames.includes(api.stats.currentGame);
-      const dbgMessage = `streamOnline: ${api.isStreamOnline}, enabled: ${this.enabled}, currentGame: ${ api.stats.currentGame}, isGameInNotFoundList: ${isGameInNotFoundList}`;
+      const isGameInNotFoundList = stats.currentGame && notFoundGames.includes(stats.currentGame);
+      const dbgMessage = `streamOnline: ${isStreamOnline}, enabled: ${this.enabled}, currentGame: ${ stats.currentGame}, isGameInNotFoundList: ${isGameInNotFoundList}`;
       if (lastDbgMessage !== dbgMessage) {
         lastDbgMessage = dbgMessage;
         debug('hltb', dbgMessage);
       }
-      if (api.isStreamOnline && this.enabled && !isGameInNotFoundList) {
+      if (isStreamOnline && this.enabled && !isGameInNotFoundList) {
         this.addToGameTimestamp();
       }
     }, this.interval);
@@ -127,59 +127,59 @@ class HowLongToBeat extends System {
   }
 
   async addToGameTimestamp() {
-    if (!api.stats.currentGame) {
+    if (!stats.currentGame) {
       debug('hltb', 'No game being played on stream.');
       return; // skip if we don't have game
     }
 
-    if (api.stats.currentGame.trim().length === 0 || api.stats.currentGame.trim() === 'IRL') {
+    if (stats.currentGame.trim().length === 0 || stats.currentGame.trim() === 'IRL') {
       debug('hltb', 'IRL or empty game is being played on stream');
       return; // skip if we have empty game
     }
 
     try {
-      const game = await getRepository(HowLongToBeatGame).findOneOrFail({ where: { game: api.stats.currentGame } });
-      const stream = await getRepository(HowLongToBeatGameItem).findOne({ where: { hltb_id: game.id, createdAt: api.streamStatusChangeSince } });
+      const game = await getRepository(HowLongToBeatGame).findOneOrFail({ where: { game: stats.currentGame } });
+      const stream = await getRepository(HowLongToBeatGameItem).findOne({ where: { hltb_id: game.id, createdAt: streamStatusChangeSince } });
       if (stream) {
-        debug('hltb', 'Another 15s entry of this stream for ' + api.stats.currentGame);
+        debug('hltb', 'Another 15s entry of this stream for ' + stats.currentGame);
         await getRepository(HowLongToBeatGameItem).increment({ id: stream.id }, 'timestamp', this.interval);
       } else {
-        debug('hltb', 'First entry of this stream for ' + api.stats.currentGame);
+        debug('hltb', 'First entry of this stream for ' + stats.currentGame);
         await getRepository(HowLongToBeatGameItem).save({
-          createdAt: api.streamStatusChangeSince,
+          createdAt: streamStatusChangeSince,
           hltb_id: game.id,
           timestamp: this.interval,
         });
       }
     } catch (e) {
       if (e.name === 'EntityNotFound') {
-        const gameFromHltb = (await this.hltbService.search(api.stats.currentGame))[0];
+        const gameFromHltb = (await this.hltbService.search(stats.currentGame))[0];
         if (gameFromHltb) {
-          debug('hltb', `Game ${api.stats.currentGame} found on HLTB service`);
+          debug('hltb', `Game ${stats.currentGame} found on HLTB service`);
           // we don't care if MP game or not (user might want to track his gameplay time)
           await getRepository(HowLongToBeatGame).save({
-            game: api.stats.currentGame,
+            game: stats.currentGame,
             imageUrl: gameFromHltb.imageUrl,
             startedAt: Date.now(),
             gameplayMain: gameFromHltb.gameplayMain,
             gameplayMainExtra: gameFromHltb.gameplayMainExtra,
             gameplayCompletionist: gameFromHltb.gameplayCompletionist,
           });
-          notFoundGames.splice(notFoundGames.indexOf(api.stats.currentGame), 1);
-          debug('hltb', `Game ${api.stats.currentGame} found on HLTB service`);
+          notFoundGames.splice(notFoundGames.indexOf(stats.currentGame), 1);
+          debug('hltb', `Game ${stats.currentGame} found on HLTB service`);
           debug('hltb', `notFoundGames: ${notFoundGames.join(', ')}`);
         } else {
-          if (!notFoundGames.includes(api.stats.currentGame)) {
-            warning(`HLTB: game '${api.stats.currentGame}' was not found on HLTB service ... retrying in a while`);
-            debug('hltb', `Adding game '${api.stats.currentGame}' to not found games.`);
-            notFoundGames.push(api.stats.currentGame);
+          if (!notFoundGames.includes(stats.currentGame)) {
+            warning(`HLTB: game '${stats.currentGame}' was not found on HLTB service ... retrying in a while`);
+            debug('hltb', `Adding game '${stats.currentGame}' to not found games.`);
+            notFoundGames.push(stats.currentGame);
             // do one retry in a minute (we need to call it manually as game is already in notFoundGames)
             setTimeout(() => {
               this.addToGameTimestamp();
             }, constants.MINUTE);
           } else {
             // already retried
-            warning(`HLTB: game '${api.stats.currentGame}' was not found on HLTB service ... skipping tracking this stream`);
+            warning(`HLTB: game '${stats.currentGame}' was not found on HLTB service ... skipping tracking this stream`);
           }
         }
       } else {
@@ -196,19 +196,19 @@ class HowLongToBeat extends System {
       .toArray();
 
     if (!gameInput) {
-      if (!api.stats.currentGame) {
+      if (!stats.currentGame) {
         return []; // skip if we don't have game
       } else {
-        gameInput = api.stats.currentGame;
+        gameInput = stats.currentGame;
       }
     }
     const gameToShow = await getRepository(HowLongToBeatGame).findOne({ where: { game: gameInput } });
     if (!gameToShow && !retry) {
-      if (!api.stats.currentGame) {
+      if (!stats.currentGame) {
         return this.currentGameInfo(opts, true);
       }
 
-      if (api.stats.currentGame.trim().length === 0 || api.stats.currentGame.trim() === 'IRL') {
+      if (stats.currentGame.trim().length === 0 || stats.currentGame.trim() === 'IRL') {
         return this.currentGameInfo(opts, true);
       }
       return this.currentGameInfo(opts, true);

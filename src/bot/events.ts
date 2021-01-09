@@ -13,6 +13,7 @@ import { Event, EventInterface } from './database/entity/event';
 import { User } from './database/entity/user';
 import { onStreamEnd } from './decorators/on';
 import events from './events';
+import { calls, isStreamOnline, setRateLimit, stats, streamStatusChangeSince } from './helpers/api';
 import { sample } from './helpers/array/sample';
 import { attributesReplace } from './helpers/attributesReplace';
 import { announce, getBotSender, getOwner, prepare } from './helpers/commons';
@@ -31,6 +32,7 @@ import { isBot, isBotSubscriber } from './helpers/user/isBot';
 import { isBroadcaster } from './helpers/user/isBroadcaster';
 import { isModerator } from './helpers/user/isModerator';
 import Message from './message';
+import { setTitleAndGame } from './microservices/setTitleAndGame';
 import oauth from './oauth';
 import clips from './overlays/clips';
 import Parser from './parser';
@@ -273,11 +275,9 @@ class Events extends Core {
       });
 
       // save remaining api calls
-      api.calls.broadcaster.remaining = request.headers['ratelimit-remaining'];
-      api.calls.broadcaster.refresh = request.headers['ratelimit-reset'];
-      api.calls.broadcaster.limit = request.headers['ratelimit-limit'];
+      setRateLimit('broadcaster', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: api.calls.broadcaster });
+      ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: calls.broadcaster });
       events.fire('commercial', { duration: Number(operation.durationOfCommercial) });
     } catch (e) {
       if (e.isAxiosError) {
@@ -402,7 +402,7 @@ class Events extends Core {
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = api.rawStatus;
     if (title.match(regexp)) {
-      api.setTitleAndGame({});
+      setTitleAndGame({});
     }
   }
 
@@ -426,7 +426,7 @@ class Events extends Core {
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = api.rawStatus;
     if (title.match(regexp)) {
-      api.setTitleAndGame({});
+      setTitleAndGame({});
     }
   }
 
@@ -461,12 +461,12 @@ class Events extends Core {
   }
 
   public async checkStreamIsRunningXMinutes(event: EventInterface) {
-    if (!api.isStreamOnline) {
+    if (!isStreamOnline) {
       return false;
     }
     event.triggered.runAfterXMinutes = _.get(event, 'triggered.runAfterXMinutes', 0);
     const shouldTrigger = event.triggered.runAfterXMinutes === 0
-                          && Number(dayjs.utc().unix()) - Number(dayjs.utc(api.streamStatusChangeSince).unix()) > Number(event.definitions.runAfterXMinutes) * 60;
+                          && Number(dayjs.utc().unix()) - Number(dayjs.utc(streamStatusChangeSince).unix()) > Number(event.definitions.runAfterXMinutes) * 60;
     if (shouldTrigger) {
       event.triggered.runAfterXMinutes = event.definitions.runAfterXMinutes;
       await getRepository(Event).save(event);
@@ -480,7 +480,7 @@ class Events extends Core {
     event.definitions.runInterval = Number(event.definitions.runInterval); // force Integer
     event.definitions.viewersAtLeast = Number(event.definitions.viewersAtLeast); // force Integer
 
-    const viewers = api.stats.currentViewers;
+    const viewers = stats.currentViewers;
 
     const shouldTrigger = viewers >= event.definitions.viewersAtLeast
                         && ((event.definitions.runInterval > 0 && Date.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000)
@@ -590,12 +590,12 @@ class Events extends Core {
       $viewers: _.get(attributes, 'viewers', null),
       $duration: _.get(attributes, 'duration', null),
       // add global variables
-      $game: api.stats.currentGame,
-      $title: api.stats.currentTitle,
-      $views: api.stats.currentViews,
-      $followers: api.stats.currentFollowers,
-      $hosts: api.stats.currentHosts,
-      $subscribers: api.stats.currentSubscribers,
+      $game: stats.currentGame,
+      $title: stats.currentTitle,
+      $views: stats.currentViews,
+      $followers: stats.currentFollowers,
+      $hosts: stats.currentHosts,
+      $subscribers: stats.currentSubscribers,
       $isBotSubscriber: isBotSubscriber(),
       ...customVariables,
     };

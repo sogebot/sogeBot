@@ -6,12 +6,12 @@ import safeEval from 'safe-eval';
 import strip from 'strip-comments';
 import { getRepository } from 'typeorm';
 
-import api from '../../api';
 import currency from '../../currency';
 import { User, UserInterface } from '../../database/entity/user';
 import Message from '../../message';
 import { getUserFromTwitch } from '../../microservices/getUserFromTwitch';
 import users from '../../users';
+import { chatMessagesAtStart, isStreamOnline, stats, streamStatusChangeSince } from '../api';
 import { getAllOnlineUsernames } from '../getAllOnlineUsernames';
 import { getTime } from '../getTime';
 import { debug, error, info, warning } from '../log';
@@ -109,21 +109,21 @@ async function runScript (script: string, opts: { sender: { userId: number; user
     users: users,
     random: randomVar,
     stream: {
-      uptime: getTime(api.isStreamOnline ? api.streamStatusChangeSince : null, false),
-      currentViewers: api.stats.currentViewers,
-      currentSubscribers: api.stats.currentSubscribers,
-      currentBits: api.stats.currentBits,
-      currentTips: api.stats.currentTips,
+      uptime: getTime(isStreamOnline ? streamStatusChangeSince : null, false),
+      currentViewers: stats.currentViewers,
+      currentSubscribers: stats.currentSubscribers,
+      currentBits: stats.currentBits,
+      currentTips: stats.currentTips,
       currency: currency.symbol(currency.mainCurrency),
-      chatMessages: (api.isStreamOnline) ? linesParsed - api.chatMessagesAtStart : 0,
-      currentFollowers: api.stats.currentFollowers,
-      currentViews: api.stats.currentViews,
-      maxViewers: api.stats.maxViewers,
-      newChatters: api.stats.newChatters,
-      game: api.stats.currentGame,
-      status: api.stats.currentTitle,
-      currentHosts: api.stats.currentHosts,
-      currentWatched: api.stats.currentWatchedTime,
+      chatMessages: (isStreamOnline) ? linesParsed - chatMessagesAtStart : 0,
+      currentFollowers: stats.currentFollowers,
+      currentViews: stats.currentViews,
+      maxViewers: stats.maxViewers,
+      newChatters: stats.newChatters,
+      game: stats.currentGame,
+      status: stats.currentTitle,
+      currentHosts: stats.currentHosts,
+      currentWatched: stats.currentWatchedTime,
     },
     sender,
     info: info,

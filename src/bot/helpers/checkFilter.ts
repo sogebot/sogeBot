@@ -2,9 +2,9 @@ import _ from 'lodash';
 import safeEval from 'safe-eval';
 import { getRepository } from 'typeorm';
 
-import api from '../api';
 import { User } from '../database/entity/user';
 import ranks from '../systems/ranks';
+import { stats } from './api';
 import { getAll } from './customvariables';
 import { isOwner, isSubscriber, isVIP } from './user';
 import { isBot, isBotSubscriber } from './user/isBot';
@@ -49,13 +49,13 @@ export const checkFilter = async (opts: CommandOptions | ParserOptions, filter: 
     $haveParam: opts.parameters?.length > 0,
     $param: opts.parameters,
     // add global variables
-    $game: api.stats.currentGame || 'n/a',
-    $language: api.stats.language || 'en',
-    $title: api.stats.currentTitle || 'n/a',
-    $views: api.stats.currentViews,
-    $followers: api.stats.currentFollowers,
-    $hosts: api.stats.currentHosts,
-    $subscribers: api.stats.currentSubscribers,
+    $game: stats.currentGame || 'n/a',
+    $language: stats.language || 'en',
+    $title: stats.currentTitle || 'n/a',
+    $views: stats.currentViews,
+    $followers: stats.currentFollowers,
+    $hosts: stats.currentHosts,
+    $subscribers: stats.currentSubscribers,
     $isBotSubscriber: isBotSubscriber(),
     ...customVariables,
   };

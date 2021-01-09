@@ -5,13 +5,13 @@ import _ from 'lodash';
 import { getRepository } from 'typeorm';
 import WebSocket from 'ws';
 
-import api from '../api.js';
 import currency from '../currency';
 import { User, UserTipInterface } from '../database/entity/user';
 import { settings } from '../decorators';
 import { ui } from '../decorators.js';
 import { onChange, onStartup } from '../decorators/on.js';
 import events from '../events.js';
+import { isStreamOnline, setStats, stats } from '../helpers/api/index.js';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
 import { info, tip } from '../helpers/log.js';
 import eventlist from '../overlays/eventlist.js';
@@ -188,8 +188,11 @@ class Donationalerts extends Integration {
 
       tip(`${data.username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
 
-      if (api.isStreamOnline) {
-        api.stats.currentTips += Number(currency.exchange(data.amount, data.currency, currency.mainCurrency));
+      if (isStreamOnline) {
+        setStats({
+          ...stats,
+          currentTips: stats.currentTips + Number(currency.exchange(data.amount, data.currency, currency.mainCurrency)),
+        });
       }
     }
 

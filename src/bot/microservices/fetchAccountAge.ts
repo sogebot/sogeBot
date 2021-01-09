@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { getRepository } from 'typeorm';
 
-import { Settings } from '../database/entity/settings';
 import { User } from '../database/entity/user';
+import { getToken } from '../helpers/api';
 import { error } from '../helpers/log';
 import { ioServer } from '../helpers/panel';
 
@@ -12,35 +12,12 @@ async function fetchAccountAge (id?: number | null) {
   }
 
   const url = `https://api.twitch.tv/kraken/users/${id}`;
-
-  const token = await getRepository(Settings).findOne({
-    where: {
-      name: 'botAccessToken',
-      namespace: '/core/oauth',
-    },
-  });
-
-  const clientId = await getRepository(Settings).findOne({
-    where: {
-      name: 'botClientId',
-      namespace: '/core/oauth',
-    },
-  });
-
-  if (!token) {
-    throw Error('Missing oauth token');
-  }
-
-  if (!clientId) {
-    throw Error('Missing oauth clientId');
-  }
-
   let request;
   try {
     request = await axios.get(url, {
       headers: {
         'Accept': 'application/vnd.twitchtv.v5+json',
-        'Authorization': 'OAuth ' + token,
+        'Authorization': 'OAuth ' + getToken('bot'),
       },
       timeout: 20000,
     });

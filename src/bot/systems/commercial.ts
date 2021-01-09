@@ -3,9 +3,9 @@
 import axios from 'axios';
 import * as _ from 'lodash';
 
-import api from '../api';
 import { command, default_permission, helper } from '../decorators';
 import events from '../events';
+import { calls, setRateLimit } from '../helpers/api';
 import { getOwner } from '../helpers/commons';
 import { error, warning } from '../helpers/log';
 import { ioServer } from '../helpers/panel';
@@ -88,11 +88,9 @@ class Commercial extends System {
         });
 
         // save remaining api calls
-        api.calls.broadcaster.remaining = request.headers['ratelimit-remaining'];
-        api.calls.broadcaster.refresh = request.headers['ratelimit-reset'];
-        api.calls.broadcaster.limit = request.headers['ratelimit-limit'];
+        setRateLimit('broadcaster', request.headers);
 
-        ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: api.calls.broadcaster });
+        ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: calls.broadcaster });
         events.fire('commercial', { duration: commercial.duration });
         if (!_.isNil(commercial.message)) {
           return [{ response: commercial.message, ...opts }];
@@ -100,10 +98,10 @@ class Commercial extends System {
       } catch (e) {
         if (e.isAxiosError) {
           error(`API: ${url} - ${e.response.data.message}`);
-          ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: api.calls.broadcaster });
+          ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.broadcaster });
         } else {
           error(`API: ${url} - ${e.stack}`);
-          ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: api.calls.broadcaster });
+          ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.broadcaster });
         }
       }
       return [];

@@ -3,10 +3,10 @@ import gitCommitInfo from 'git-commit-info';
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import api from './api';
 import { EventList } from './database/entity/eventList';
 import { User } from './database/entity/user';
 import { command, custom, evaluate, ifp, info, list, math, online, param, price, qs, random, ResponseFilter, stream, youtube } from './filters';
+import { isStreamOnline, stats } from './helpers/api';
 import { getBotSender } from './helpers/commons/getBotSender';
 import { isBotSubscriber } from './helpers/user/isBot';
 import lastfm from './integrations/lastfm';
@@ -25,15 +25,15 @@ class Message {
 
   async global (opts: { escape?: string, sender?: CommandOptions['sender'] }) {
     const variables = {
-      game: api.stats.currentGame,
-      language: api.stats.language,
-      viewers: api.isStreamOnline ? api.stats.currentViewers : 0,
-      views: api.stats.currentViews,
-      followers: api.stats.currentFollowers,
-      hosts: api.isStreamOnline ? api.stats.currentHosts : 0,
-      subscribers: api.stats.currentSubscribers,
-      bits: api.isStreamOnline ? api.stats.currentBits : 0,
-      title: api.stats.currentTitle,
+      game: stats.currentGame,
+      language: stats.language,
+      viewers: isStreamOnline ? stats.currentViewers : 0,
+      views: stats.currentViews,
+      followers: stats.currentFollowers,
+      hosts: isStreamOnline ? stats.currentHosts : 0,
+      subscribers: stats.currentSubscribers,
+      bits: isStreamOnline ? stats.currentBits : 0,
+      title: stats.currentTitle,
       source: opts.sender && typeof opts.sender.discord !== 'undefined' ? 'discord' : 'twitch',
       isBotSubscriber: isBotSubscriber(),
     };

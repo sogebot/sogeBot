@@ -1,6 +1,7 @@
 import { isNil } from 'lodash';
 
 import api from '../../api';
+import { setTitleAndGame } from '../../microservices/setTitleAndGame';
 import { default as custom_variables } from '../../widgets/customvariables';
 
 async function updateWidgetAndTitle (variable: string | null = null) {
@@ -12,7 +13,7 @@ async function updateWidgetAndTitle (variable: string | null = null) {
     const regexp = new RegExp(`\\${variable}`, 'ig');
 
     if (api.rawStatus.match(regexp)) {
-      api.setTitleAndGame({});
+      setTitleAndGame({});
     }
   }
 }

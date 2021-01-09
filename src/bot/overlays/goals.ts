@@ -2,10 +2,10 @@
 
 import { getRepository, IsNull } from 'typeorm';
 
-import api from '../api';
 import currency from '../currency';
 import { Goal, GoalGroup } from '../database/entity/goal';
 import { onBit, onFollow, onSub, onTip } from '../decorators/on';
+import { stats } from '../helpers/api';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import Overlay from '../overlays/_interface';
 
@@ -60,8 +60,8 @@ class Goals extends Overlay {
     });
     publicEndpoint(this.nsp, 'goals::current', async (cb) => {
       cb(null, {
-        subscribers: api.stats.currentSubscribers,
-        followers: api.stats.currentFollowers,
+        subscribers: stats.currentSubscribers,
+        followers: stats.currentFollowers,
       });
     });
   }

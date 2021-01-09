@@ -1,8 +1,8 @@
 import { getRepository } from 'typeorm';
 
-import api from '../api';
 import currency from '../currency';
 import { EventList } from '../database/entity/eventList';
+import { isStreamOnline, stats, streamStatusChangeSince } from '../helpers/api';
 import users from '../users';
 
 import type { ResponseFilter } from '.';
@@ -30,7 +30,7 @@ const info: ResponseFilter = {
 
     const type = match.groups?.type;
     if (type === 'stream') {
-      const whenOnline = api.isStreamOnline ? api.streamStatusChangeSince : null;
+      const whenOnline = isStreamOnline ? streamStatusChangeSince : null;
       if (whenOnline) {
         tips = tips.filter((o) => o.timestamp >= (new Date(whenOnline)).getTime());
       } else {
@@ -54,10 +54,10 @@ const info: ResponseFilter = {
     return '';
   },
   '(game)': async function () {
-    return api.stats.currentGame || 'n/a';
+    return stats.currentGame || 'n/a';
   },
   '(status)': async function () {
-    return api.stats.currentTitle || 'n/a';
+    return stats.currentTitle || 'n/a';
   },
 };
 

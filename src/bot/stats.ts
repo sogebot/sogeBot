@@ -6,11 +6,11 @@ import { cloneDeep, isNil } from 'lodash';
 import { getRepository, LessThan } from 'typeorm';
 
 import Core from './_interface';
-import api from './api';
 import { DAY, MINUTE } from './constants';
 import { TwitchStats, TwitchStatsInterface } from './database/entity/twitch';
 import { persistent } from './decorators';
 import { onStreamStart } from './decorators/on';
+import { stats } from './helpers/api';
 import { debug } from './helpers/log';
 import { adminEndpoint } from './helpers/socket';
 
@@ -39,9 +39,9 @@ class Stats extends Core {
 
   @onStreamStart()
   async setInitialValues() {
-    this.currentFollowers = api.stats.currentFollowers;
-    this.currentViews = api.stats.currentViews;
-    this.currentSubscribers = api.stats.currentSubscribers;
+    this.currentFollowers = stats.currentFollowers;
+    this.currentViews = stats.currentViews;
+    this.currentSubscribers = stats.currentSubscribers;
     debug('stats', JSON.stringify({ currentFollowers: this.currentFollowers, currentViews: this.currentViews, currentSubscribers: this.currentSubscribers }));
   }
 
@@ -61,7 +61,7 @@ class Stats extends Core {
             .where('stats.whenOnline > :whenOnline', { whenOnline: Date.now() - (DAY * 31) })
             .orderBy('stats.whenOnline', 'DESC')
             .getMany();
-          const stats = {
+          const statsToReturn = {
             currentViewers: 0,
             currentSubscribers: 0,
             currentBits: 0,
@@ -76,25 +76,25 @@ class Stats extends Core {
           };
           if (statsFromDb.length > 0) {
             for (const stat of statsFromDb) {
-              stats.currentViewers += _self.parseStat(stat.currentViewers);
-              stats.currentBits += _self.parseStat(stat.currentBits);
-              stats.currentTips += _self.parseStat(stat.currentTips);
-              stats.chatMessages += _self.parseStat(stat.chatMessages);
-              stats.maxViewers += _self.parseStat(stat.maxViewers);
-              stats.newChatters += _self.parseStat(stat.newChatters);
-              stats.currentHosts += _self.parseStat(stat.currentHosts);
-              stats.currentWatched += _self.parseStat(stat.currentWatched);
+              statsToReturn.currentViewers += _self.parseStat(stat.currentViewers);
+              statsToReturn.currentBits += _self.parseStat(stat.currentBits);
+              statsToReturn.currentTips += _self.parseStat(stat.currentTips);
+              statsToReturn.chatMessages += _self.parseStat(stat.chatMessages);
+              statsToReturn.maxViewers += _self.parseStat(stat.maxViewers);
+              statsToReturn.newChatters += _self.parseStat(stat.newChatters);
+              statsToReturn.currentHosts += _self.parseStat(stat.currentHosts);
+              statsToReturn.currentWatched += _self.parseStat(stat.currentWatched);
             }
-            stats.currentViewers = Number(Number(stats.currentViewers / statsFromDb.length).toFixed(0));
-            stats.currentBits = Number(Number(stats.currentBits / statsFromDb.length).toFixed(0));
-            stats.currentTips = Number(Number(stats.currentTips / statsFromDb.length).toFixed(2));
-            stats.chatMessages = Number(Number(stats.chatMessages / statsFromDb.length).toFixed(0));
-            stats.maxViewers = Number(Number(stats.maxViewers / statsFromDb.length).toFixed(0));
-            stats.newChatters = Number(Number(stats.newChatters / statsFromDb.length).toFixed(0));
-            stats.currentHosts = Number(Number(stats.currentHosts / statsFromDb.length).toFixed(0));
-            stats.currentWatched = Number(Number(stats.currentWatched / statsFromDb.length).toFixed(0));
-            cachedStats = cloneDeep(stats);
-            cb(null, {...stats, currentFollowers: _self.currentFollowers, currentViews: _self.currentViews, currentSubscribers: _self.currentSubscribers});
+            statsToReturn.currentViewers = Number(Number(statsToReturn.currentViewers / statsFromDb.length).toFixed(0));
+            statsToReturn.currentBits = Number(Number(statsToReturn.currentBits / statsFromDb.length).toFixed(0));
+            statsToReturn.currentTips = Number(Number(statsToReturn.currentTips / statsFromDb.length).toFixed(2));
+            statsToReturn.chatMessages = Number(Number(statsToReturn.chatMessages / statsFromDb.length).toFixed(0));
+            statsToReturn.maxViewers = Number(Number(statsToReturn.maxViewers / statsFromDb.length).toFixed(0));
+            statsToReturn.newChatters = Number(Number(statsToReturn.newChatters / statsFromDb.length).toFixed(0));
+            statsToReturn.currentHosts = Number(Number(statsToReturn.currentHosts / statsFromDb.length).toFixed(0));
+            statsToReturn.currentWatched = Number(Number(statsToReturn.currentWatched / statsFromDb.length).toFixed(0));
+            cachedStats = cloneDeep(statsToReturn);
+            cb(null, {...statsToReturn, currentFollowers: _self.currentFollowers, currentViews: _self.currentViews, currentSubscribers: _self.currentSubscribers});
           } else {
             cb(null, {});
           }

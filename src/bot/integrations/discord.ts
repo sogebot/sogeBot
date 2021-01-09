@@ -17,6 +17,7 @@ import { command, persistent, settings, ui } from '../decorators';
 import { onChange, onStartup, onStreamEnd, onStreamStart } from '../decorators/on';
 import events from '../events';
 import Expects from '../expects';
+import { isStreamOnline, stats } from '../helpers/api';
 import { attributesReplace } from '../helpers/attributesReplace';
 import { announceTypes, getOwner, isUUID, prepare } from '../helpers/commons';
 import { isBotStarted, isDbConnected } from '../helpers/database';
@@ -162,7 +163,7 @@ class Discord extends Integration {
 
     // embed updater
     setInterval(async () => {
-      if (api.isStreamOnline && this.client && this.embedMessageId.length > 0) {
+      if (isStreamOnline && this.client && this.embedMessageId.length > 0) {
         this.changeClientOnlinePresence();
         const channel = this.client.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
         if (channel) {
@@ -171,17 +172,17 @@ class Discord extends Integration {
           if (message && embed) {
             embed.spliceFields(0, embed.fields.length);
             embed.addFields([
-              { name: prepare('webpanel.responses.variable.game'), value: api.stats.currentGame},
-              { name: prepare('webpanel.responses.variable.title'), value: api.stats.currentTitle},
+              { name: prepare('webpanel.responses.variable.game'), value: stats.currentGame},
+              { name: prepare('webpanel.responses.variable.title'), value: stats.currentTitle},
               { name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true},
-              { name: prepare('webpanel.viewers'), value: api.stats.currentViewers, inline: true},
-              { name: prepare('webpanel.views'), value: api.stats.currentViews, inline: true},
-              { name: prepare('webpanel.followers'), value: api.stats.currentFollowers, inline: true},
+              { name: prepare('webpanel.viewers'), value: stats.currentViewers, inline: true},
+              { name: prepare('webpanel.views'), value: stats.currentViews, inline: true},
+              { name: prepare('webpanel.followers'), value: stats.currentFollowers, inline: true},
             ]);
             embed.setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${oauth.generalChannel}-1920x1080.jpg?${Date.now()}`);
 
             if (oauth.broadcasterType !== '') {
-              embed.addField(prepare('webpanel.subscribers'), api.stats.currentSubscribers, true);
+              embed.addField(prepare('webpanel.subscribers'), stats.currentSubscribers, true);
             }
             message.edit(embed);
           }
@@ -359,16 +360,16 @@ class Discord extends Integration {
         embed.setDescription(`${oauth.generalChannel.charAt(0).toUpperCase() + oauth.generalChannel.slice(1)} is not streaming anymore! Check it next time!`);
         embed.spliceFields(0, embed.fields.length);
         embed.addFields([
-          { name: prepare('webpanel.responses.variable.game'), value: api.stats.currentGame},
-          { name: prepare('webpanel.responses.variable.title'), value: api.stats.currentTitle},
+          { name: prepare('webpanel.responses.variable.game'), value: stats.currentGame},
+          { name: prepare('webpanel.responses.variable.title'), value: stats.currentTitle},
           { name: prepare('integrations.discord.streamed-at'), value: `${this.embedStartedAt} - ${dayjs().tz(timezone).format('LLL')}`, inline: true},
-          { name: prepare('webpanel.views'), value: api.stats.currentViews, inline: true},
-          { name: prepare('webpanel.followers'), value: api.stats.currentFollowers, inline: true},
+          { name: prepare('webpanel.views'), value: stats.currentViews, inline: true},
+          { name: prepare('webpanel.followers'), value: stats.currentFollowers, inline: true},
         ]);
         embed.setImage(`https://static-cdn.jtvnw.net/ttv-static/404_preview-1920x1080.jpg?${Date.now()}`);
 
         if (oauth.broadcasterType !== '') {
-          embed.addField(prepare('webpanel.subscribers'), api.stats.currentSubscribers, true);
+          embed.addField(prepare('webpanel.subscribers'), stats.currentSubscribers, true);
         }
         message.edit(embed);
       }
@@ -390,11 +391,11 @@ class Discord extends Integration {
         const embed = new DiscordJs.MessageEmbed()
           .setURL('https://twitch.tv/' + oauth.generalChannel)
           .addFields([
-            { name: prepare('webpanel.responses.variable.game'), value: api.stats.currentGame},
-            { name: prepare('webpanel.responses.variable.title'), value: api.stats.currentTitle},
+            { name: prepare('webpanel.responses.variable.game'), value: stats.currentGame},
+            { name: prepare('webpanel.responses.variable.title'), value: stats.currentTitle},
             { name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true},
-            { name: prepare('webpanel.views'), value: api.stats.currentViews, inline: true},
-            { name: prepare('webpanel.followers'), value: api.stats.currentFollowers, inline: true},
+            { name: prepare('webpanel.views'), value: stats.currentViews, inline: true},
+            { name: prepare('webpanel.followers'), value: stats.currentFollowers, inline: true},
           ])
           // Set the title of the field
           .setTitle('https://twitch.tv/' + oauth.generalChannel)
@@ -407,7 +408,7 @@ class Discord extends Integration {
           .setFooter('Announced by sogeBot - https://www.sogebot.xyz');
 
         if (oauth.broadcasterType !== '') {
-          embed.addField(prepare('webpanel.subscribers'), api.stats.currentSubscribers, true);
+          embed.addField(prepare('webpanel.subscribers'), stats.currentSubscribers, true);
         }
         // Send the embed to the same channel as the message
         const message = await (channel as DiscordJs.TextChannel).send(embed);
@@ -431,7 +432,7 @@ class Discord extends Integration {
       return;
     }
     try {
-      if (api.isStreamOnline) {
+      if (isStreamOnline) {
         const activityString = await new Message(this.onlinePresenceStatusOnStreamName).parse();
         if (this.onlinePresenceStatusOnStream === 'streaming') {
           this.client?.user?.setStatus('online');

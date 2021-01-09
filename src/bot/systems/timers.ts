@@ -4,11 +4,11 @@ import * as _ from 'lodash';
 import { sortBy } from 'lodash';
 import { getRepository } from 'typeorm';
 
-import api from '../api';
 import { MINUTE, SECOND } from '../constants';
 import { Timer, TimerResponse, TimerResponseInterface } from '../database/entity/timer';
 import { command, default_permission } from '../decorators';
 import Expects from '../expects';
+import { isStreamOnline } from '../helpers/api';
 import { announce } from '../helpers/commons';
 import { isDbConnected } from '../helpers/database';
 import { linesParsed } from '../helpers/parser';
@@ -112,7 +112,7 @@ class Timers extends System {
   async check () {
     clearTimeout(this.timeouts.timersCheck);
 
-    if (!api.isStreamOnline) {
+    if (!isStreamOnline) {
       await getRepository(Timer).update({}, { triggeredAtMessages: linesParsed, triggeredAtTimestamp: Date.now() });
       this.timeouts.timersCheck = global.setTimeout(() => this.check(), MINUTE / 2); // this will run check 1s after full check is correctly done
       return;

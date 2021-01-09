@@ -11,6 +11,7 @@ import { User, UserInterface } from '../database/entity/user';
 import { command, default_permission, parser, permission_settings, persistent, settings, ui } from '../decorators';
 import { onChange, onLoad } from '../decorators/on';
 import Expects from '../expects';
+import { isStreamOnline } from '../helpers/api';
 import { prepare } from '../helpers/commons';
 import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
 import { debug, error, warning } from '../helpers/log';
@@ -107,22 +108,21 @@ class Points extends System {
       updatedAt: LessThanOrEqual(Date.now() - (10 * MINUTE)),
     });
 
-    const [interval, offlineInterval, perInterval, perOfflineInterval, isOnline] = await Promise.all([
+    const [interval, offlineInterval, perInterval, perOfflineInterval] = await Promise.all([
       this.getPermissionBasedSettingsValue('interval'),
       this.getPermissionBasedSettingsValue('offlineInterval'),
       this.getPermissionBasedSettingsValue('perInterval'),
       this.getPermissionBasedSettingsValue('perOfflineInterval'),
-      api.isStreamOnline,
     ]);
 
     try {
       const userPromises: Promise<void>[] = [];
-      debug('points.update', `Started points adding, isOnline: ${isOnline}`);
+      debug('points.update', `Started points adding, isStreamOnline: ${isStreamOnline}`);
       for (const username of (await getAllOnlineUsernames())) {
         if (isBot(username)) {
           continue;
         }
-        userPromises.push(this.processPoints(username, { interval, offlineInterval, perInterval, perOfflineInterval, isOnline }));
+        userPromises.push(this.processPoints(username, { interval, offlineInterval, perInterval, perOfflineInterval, isStreamOnline }));
         await Promise.all(userPromises);
       }
     } catch (e) {
@@ -134,7 +134,7 @@ class Points extends System {
     }
   }
 
-  private async processPoints(username: string, opts: {interval: {[permissionId: string]: any}; offlineInterval: {[permissionId: string]: any}; perInterval: {[permissionId: string]: any}; perOfflineInterval: {[permissionId: string]: any}; isOnline: boolean}): Promise<void> {
+  private async processPoints(username: string, opts: {interval: {[permissionId: string]: any}; offlineInterval: {[permissionId: string]: any}; perInterval: {[permissionId: string]: any}; perOfflineInterval: {[permissionId: string]: any}; isStreamOnline: boolean}): Promise<void> {
     return new Promise(async (resolve) => {
       const userId = await users.getIdByName(username);
       if (!userId) {
@@ -149,8 +149,8 @@ class Points extends System {
         return resolve(); // skip without id
       }
 
-      const interval_calculated = opts.isOnline ? opts.interval[permId] * 60 * 1000 : opts.offlineInterval[permId]  * 60 * 1000;
-      const ptsPerInterval = opts.isOnline ? opts.perInterval[permId]  : opts.perOfflineInterval[permId] ;
+      const interval_calculated = opts.isStreamOnline ? opts.interval[permId] * 60 * 1000 : opts.offlineInterval[permId]  * 60 * 1000;
+      const ptsPerInterval = opts.isStreamOnline ? opts.perInterval[permId]  : opts.perOfflineInterval[permId] ;
 
       const user = await getRepository(User).findOne({ username });
       if (!user) {
@@ -163,8 +163,8 @@ class Points extends System {
           pointsOnlineGivenAt: 0,
         });
       } else {
-        const chat = await users.getChatOf(userId, opts.isOnline);
-        const userPointsKey = opts.isOnline ? 'pointsOnlineGivenAt' : 'pointsOfflineGivenAt';
+        const chat = await users.getChatOf(userId, opts.isStreamOnline);
+        const userPointsKey = opts.isStreamOnline ? 'pointsOnlineGivenAt' : 'pointsOfflineGivenAt';
         if (interval_calculated !== 0 && ptsPerInterval[permId]  !== 0) {
           const givenAt = user[userPointsKey] + interval_calculated;
           debug('points.update', `${user.username}#${userId}[${permId}] ${chat} | ${givenAt}`);
@@ -201,12 +201,11 @@ class Points extends System {
       return true;
     }
 
-    const [perMessageInterval, messageInterval, perMessageOfflineInterval, messageOfflineInterval, isOnline] = await Promise.all([
+    const [perMessageInterval, messageInterval, perMessageOfflineInterval, messageOfflineInterval] = await Promise.all([
       this.getPermissionBasedSettingsValue('perMessageInterval'),
       this.getPermissionBasedSettingsValue('messageInterval'),
       this.getPermissionBasedSettingsValue('perMessageOfflineInterval'),
       this.getPermissionBasedSettingsValue('messageOfflineInterval'),
-      api.isStreamOnline,
     ]);
 
     // get user max permission
@@ -215,8 +214,8 @@ class Points extends System {
       return true; // skip without permission
     }
 
-    const interval_calculated = isOnline ? messageInterval[permId] : messageOfflineInterval[permId];
-    const ptsPerInterval = isOnline ? perMessageInterval[permId] : perMessageOfflineInterval[permId];
+    const interval_calculated = isStreamOnline ? messageInterval[permId] : messageOfflineInterval[permId];
+    const ptsPerInterval = isStreamOnline ? perMessageInterval[permId] : perMessageOfflineInterval[permId];
 
     if (interval_calculated === 0 || ptsPerInterval === 0) {
       return;

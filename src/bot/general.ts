@@ -5,11 +5,11 @@ import { get, isBoolean, isNil, isNumber, isString, map } from 'lodash';
 import { getConnection, getRepository } from 'typeorm';
 
 import Core from './_interface';
-import api from './api';
 import { HOUR, MINUTE } from './constants';
 import { Widget } from './database/entity/dashboard';
 import { command, default_permission, settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
+import { isStreamOnline } from './helpers/api';
 import { setLocale } from './helpers/dayjs';
 import { setLang } from './helpers/locales';
 import { debug, error, warning } from './helpers/log';
@@ -28,7 +28,7 @@ const gracefulExit = () => {
   if (general.gracefulExitEachXHours > 0) {
     debug('thread', 'gracefulExit::check');
     if (Date.now() - threadStartTimestamp >= general.gracefulExitEachXHours * HOUR) {
-      if (!api.isStreamOnline && socketsConnected === 0) {
+      if (!isStreamOnline && socketsConnected === 0) {
         warning('Gracefully exiting sogeBot as planned and configured in UI in settings->general.');
         debug('thread', 'gracefulExit::exiting and creating restart file (so we dont have startup logging');
         writeFileSync('./restart.pid', ' ');

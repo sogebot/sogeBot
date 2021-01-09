@@ -4,12 +4,12 @@ import * as _ from 'lodash';
 import { io, Socket } from 'socket.io-client';
 import { getRepository } from 'typeorm';
 
-import api from '../api';
 import currency from '../currency';
 import { User, UserTipInterface } from '../database/entity/user';
 import { persistent, settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import events from '../events';
+import { isStreamOnline, setStats, stats } from '../helpers/api';
 import { getBroadcaster } from '../helpers/getBroadcaster';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 import { debug, error, info, tip } from '../helpers/log';
@@ -216,8 +216,11 @@ class Streamlabs extends Integration {
           user.tips.push(newTip);
           getRepository(User).save(user);
 
-          if (api.isStreamOnline) {
-            api.stats.currentTips += Number(currency.exchange(Number(event.amount), event.currency, currency.mainCurrency));
+          if (isStreamOnline) {
+            setStats({
+              ...stats,
+              currentTips: stats.currentTips + Number(currency.exchange(Number(event.amount), event.currency, currency.mainCurrency)),
+            });
           }
           tip(`${event.from.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(event.amount).toFixed(2)}${event.currency}, message: ${event.message}`);
         }

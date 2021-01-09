@@ -1,13 +1,13 @@
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import api from '../api';
 import { parserReply } from '../commons';
 import currency from '../currency';
 import { Poll, PollVote } from '../database/entity/poll';
 import { command, default_permission, helper, parser, settings } from '../decorators';
 import { onBit, onMessage, onTip } from '../decorators/on';
 import Expects from '../expects.js';
+import { isStreamOnline } from '../helpers/api';
 import { announce, getOwnerAsSender, prepare } from '../helpers/commons';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { warning } from '../helpers/log.js';
@@ -46,7 +46,7 @@ class Polls extends System {
     super();
 
     setInterval(() => {
-      if (api.isStreamOnline) {
+      if (isStreamOnline) {
         this.reminder();
       }
     }, 1000);

@@ -3,13 +3,13 @@
 import { evaluate as mathJsEvaluate, round } from 'mathjs';
 import { getRepository } from 'typeorm';
 
-import api from '../api';
 import { MINUTE, SECOND } from '../constants';
 import { User, UserInterface } from '../database/entity/user';
 import { command, default_permission, parser, permission_settings, settings, ui } from '../decorators';
 import { onStartup } from '../decorators/on';
 import Expects from '../expects';
 import general from '../general';
+import { isStreamOnline } from '../helpers/api';
 import { ResponseError } from '../helpers/commandError';
 import { prepare } from '../helpers/commons';
 import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
@@ -96,7 +96,7 @@ class Levels extends System {
       this.getPermissionBasedSettingsValue('offlineInterval'),
       this.getPermissionBasedSettingsValue('perInterval'),
       this.getPermissionBasedSettingsValue('perOfflineInterval'),
-      api.isStreamOnline,
+      isStreamOnline,
     ]);
 
     try {
@@ -251,7 +251,7 @@ class Levels extends System {
       this.getPermissionBasedSettingsValue('messageInterval'),
       this.getPermissionBasedSettingsValue('perMessageOfflineInterval'),
       this.getPermissionBasedSettingsValue('messageOfflineInterval'),
-      api.isStreamOnline,
+      isStreamOnline,
     ]);
 
     // get user max permission
@@ -273,20 +273,20 @@ class Levels extends System {
     }
 
     // next message count (be it offline or online)
-    const messages = 1 + ((api.isStreamOnline
+    const messages = 1 + ((isStreamOnline
       ? user.extra?.levels?.xpOnlineMessages
       : user.extra?.levels?.xpOfflineMessages) ?? 0);
-    const chat = await users.getChatOf(user.userId, api.isStreamOnline);
+    const chat = await users.getChatOf(user.userId, isStreamOnline);
 
     // default level object
     const levels: NonNullable<UserInterface['extra']>['levels'] = {
       xp: serialize(unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0)),
       xpOfflineGivenAt: user.extra?.levels?.xpOfflineGivenAt ?? chat,
-      xpOfflineMessages: !api.isStreamOnline
+      xpOfflineMessages: !isStreamOnline
         ? 0
         : user.extra?.levels?.xpOfflineMessages ?? 0,
       xpOnlineGivenAt: user.extra?.levels?.xpOnlineGivenAt ?? chat,
-      xpOnlineMessages: api.isStreamOnline
+      xpOnlineMessages: isStreamOnline
         ? 0
         : user.extra?.levels?.xpOnlineMessages ?? 0,
     };
@@ -299,7 +299,7 @@ class Levels extends System {
             ...user.extra,
             levels: {
               ...levels,
-              [api.isStreamOnline ? 'xpOnlineMessages' : 'xpOfflineMessages']: 0,
+              [isStreamOnline ? 'xpOnlineMessages' : 'xpOfflineMessages']: 0,
               xp: serialize(BigInt(ptsPerInterval) + (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0))),
             },
           },
@@ -311,7 +311,7 @@ class Levels extends System {
             ...user.extra,
             levels: {
               ...levels,
-              [api.isStreamOnline ? 'xpOnlineMessages' : 'xpOfflineMessages']: messages,
+              [isStreamOnline ? 'xpOnlineMessages' : 'xpOfflineMessages']: messages,
             },
           },
         });
@@ -401,7 +401,7 @@ class Levels extends System {
         );
       }
 
-      const chat = await users.getChatOf(user.userId, api.isStreamOnline);
+      const chat = await users.getChatOf(user.userId, isStreamOnline);
       const levels: NonNullable<UserInterface['extra']>['levels'] = {
         xp: serialize(xp),
         xpOfflineGivenAt: user.extra?.levels?.xpOfflineGivenAt ?? chat,
@@ -446,7 +446,7 @@ class Levels extends System {
     try {
       const [username, xp] = new Expects(opts.parameters).username().number({ minus: true }).toArray();
       const user = await getRepository(User).findOneOrFail({ username });
-      const chat = await users.getChatOf(user.userId, api.isStreamOnline);
+      const chat = await users.getChatOf(user.userId, isStreamOnline);
 
       const levels: NonNullable<UserInterface['extra']>['levels'] = {
         xp: serialize(bigIntMax(BigInt(xp) + (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0)), BigInt(0))),

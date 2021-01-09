@@ -17,6 +17,7 @@ import { Translation } from './database/entity/translation';
 import { TwitchTag, TwitchTagInterface } from './database/entity/twitch';
 import { User } from './database/entity/user';
 import general from './general';
+import { chatMessagesAtStart, isStreamOnline, stats, streamStatusChangeSince } from './helpers/api';
 import { getOwnerAsSender } from './helpers/commons';
 import { getValueOf, isVariableSet } from './helpers/customvariables';
 import { getIsBotStarted } from './helpers/database';
@@ -30,6 +31,8 @@ import { list, systems } from './helpers/register';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import lastfm from './integrations/lastfm';
 import spotify from './integrations/spotify';
+import { sendGameFromTwitch } from './microservices/sendGameFromTwitch';
+import { setTitleAndGame } from './microservices/setTitleAndGame';
 import oauth from './oauth';
 import Parser from './parser';
 import { default as socketSystem } from './socket';
@@ -189,7 +192,7 @@ export const init = () => {
     });
     // twitch game and title change
     socket.on('getGameFromTwitch', function (game: string) {
-      api.sendGameFromTwitch(socket, game);
+      sendGameFromTwitch(socket, game);
     });
     socket.on('getUserTwitchGames', async () => {
       const titles = await getRepository(CacheTitles).find();
@@ -268,7 +271,7 @@ export const init = () => {
       cb(null, allTitles);
     });
     socket.on('updateGameAndTitle', async (data: { game: string, title: string, tags: string[] }, cb: (status: boolean | null) => void) => {
-      const status = await api.setTitleAndGame(data);
+      const status = await setTitleAndGame(data);
       await api.setTags(data.tags);
 
       if (!status) { // twitch refused update
@@ -614,22 +617,22 @@ const sendStreamData = async () => {
 
     const data = {
       broadcasterType: oauth.broadcasterType,
-      uptime: api.isStreamOnline ? api.streamStatusChangeSince : null,
-      currentViewers: api.stats.currentViewers,
-      currentSubscribers: api.stats.currentSubscribers,
-      currentBits: api.stats.currentBits,
-      currentTips: api.stats.currentTips,
-      chatMessages: api.isStreamOnline ? linesParsed - api.chatMessagesAtStart : 0,
-      currentFollowers: api.stats.currentFollowers,
-      currentViews: api.stats.currentViews,
-      maxViewers: api.stats.maxViewers,
-      newChatters: api.stats.newChatters,
-      game: api.stats.currentGame,
-      status: api.stats.currentTitle,
+      uptime: isStreamOnline ? streamStatusChangeSince : null,
+      currentViewers: stats.currentViewers,
+      currentSubscribers: stats.currentSubscribers,
+      currentBits: stats.currentBits,
+      currentTips: stats.currentTips,
+      chatMessages: isStreamOnline ? linesParsed - chatMessagesAtStart : 0,
+      currentFollowers: stats.currentFollowers,
+      currentViews: stats.currentViews,
+      maxViewers: stats.maxViewers,
+      newChatters: stats.newChatters,
+      game: stats.currentGame,
+      status: stats.currentTitle,
       rawStatus: api.rawStatus,
       currentSong: lastfm.currentSong || ytCurrentSong || spotifyCurrentSong || translate('songs.not-playing'),
-      currentHosts: api.stats.currentHosts,
-      currentWatched: api.stats.currentWatchedTime,
+      currentHosts: stats.currentHosts,
+      currentWatched: stats.currentWatchedTime,
       tags: currentStreamTags,
     };
     if (!isEqual(data, lastDataSent)) {

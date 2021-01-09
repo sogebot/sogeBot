@@ -6,12 +6,12 @@ import _ from 'lodash';
 import SpotifyWebApi from 'spotify-web-api-node';
 import { getRepository } from 'typeorm';
 
-import api from '../api';
 import { HOUR, SECOND } from '../constants';
 import { SpotifySongBan } from '../database/entity/spotify';
 import { command, default_permission, persistent, settings, ui } from '../decorators';
 import { onChange, onLoad, onStartup } from '../decorators/on';
 import Expects from '../expects';
+import { isStreamOnline } from '../helpers/api';
 import { CommandError } from '../helpers/commandError';
 import { announce, prepare } from '../helpers/commons';
 import { error, info } from '../helpers/log';
@@ -278,7 +278,7 @@ class Spotify extends Integration {
     clearTimeout(this.timeouts.ICurrentSong);
 
     try {
-      if (!this.fetchCurrentSongWhenOffline && !(api.isStreamOnline)) {
+      if (!this.fetchCurrentSongWhenOffline && !(isStreamOnline)) {
         throw Error('Stream is offline');
       }
       if (this.client === null) {
@@ -588,7 +588,7 @@ class Spotify extends Integration {
   @command('!spotify')
   @default_permission(null)
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
-    if (!api.isStreamOnline && !this.queueWhenOffline) {
+    if (!isStreamOnline && !this.queueWhenOffline) {
       error(`${chalk.bgRed('SPOTIFY')}: stream is offline and you have disabled queue when offline.`);
       return [];
     } // don't do anything on offline stream*/

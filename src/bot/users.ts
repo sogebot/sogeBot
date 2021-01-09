@@ -9,6 +9,7 @@ import currency from './currency';
 import { Permissions } from './database/entity/permissions';
 import { User, UserBit, UserInterface, UserTip } from './database/entity/user';
 import { onStartup } from './decorators/on';
+import { isStreamOnline, setStats, stats } from './helpers/api';
 import { debug, error, isDebugEnabled } from './helpers/log';
 import { recacheOnlineUsersPermission } from './helpers/permissions';
 import { defaultPermissions, getUserHighestPermission } from './helpers/permissions/';
@@ -56,9 +57,12 @@ class Users extends Core {
         // get new users
         const newChatters = await getRepository(User).find({ isOnline: true, watchedTime: 0 });
         debug('tmi.watched', `Adding ${newChatters.length} users as new chatters.`);
-        api.stats.newChatters += newChatters.length;
+        setStats({
+          ...stats,
+          newChatters: stats.newChatters + newChatters.length,
+        });
 
-        if (api.isStreamOnline) {
+        if (isStreamOnline) {
           debug('tmi.watched', `Incrementing watchedTime by ${interval}`);
           const incrementedUsers = await getRepository(User).increment({ isOnline: true }, 'watchedTime', interval);
           // chatTimeOnline + chatTimeOffline is solely use for points distribution
@@ -72,9 +76,15 @@ class Users extends Core {
                 debug('tmi.watched', `User ${user.username}#${user.userId} added watched time ${interval}`);
               }
             }
-            api.stats.currentWatchedTime += users.length * interval;
+            setStats({
+              ...stats,
+              currentWatchedTime: users.length * interval,
+            });
           } else {
-            api.stats.currentWatchedTime += incrementedUsers.affected * interval;
+            setStats({
+              ...stats,
+              currentWatchedTime: incrementedUsers.affected * interval,
+            });
           }
 
           recacheOnlineUsersPermission();

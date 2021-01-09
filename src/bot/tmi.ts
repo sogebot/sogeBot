@@ -15,6 +15,7 @@ import { command, default_permission } from './decorators';
 import { getFunctionList, onChange, onLoad } from './decorators/on';
 import events from './events';
 import Expects from './expects';
+import { isStreamOnline, setStats, stats } from './helpers/api';
 import { getBotSender, getOwner, prepare } from './helpers/commons';
 import { sendMessage } from './helpers/commons/sendMessage';
 import { dayjs } from './helpers/dayjs';
@@ -738,8 +739,11 @@ class TMI extends Core {
 
       events.fire('cheer', { username, bits: userstate.bits, message: messageFromUser });
 
-      if (api.isStreamOnline) {
-        api.stats.currentBits += parseInt(userstate.bits, 10);
+      if (isStreamOnline) {
+        setStats({
+          ...stats,
+          currentBits: stats.currentBits + parseInt(userstate.bits, 10),
+        });
       }
 
       triggerInterfaceOnBit({

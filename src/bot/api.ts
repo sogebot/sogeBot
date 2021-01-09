@@ -3,19 +3,21 @@ import { setTimeout } from 'timers';
 
 import axios, { AxiosResponse } from 'axios';
 import chalk from 'chalk';
-import { chunk, defaults, filter, get, isNil, isNull, map } from 'lodash';
-import { Socket } from 'socket.io';
+import { chunk, defaults, filter, get, isNil } from 'lodash';
 import { getManager, getRepository, In, IsNull, Not } from 'typeorm';
 
 import Core from './_interface';
 import * as constants from './constants';
-import { CacheGames } from './database/entity/cacheGames';
 import { ThreadEvent } from './database/entity/threadEvent';
 import { TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from './database/entity/twitch';
 import { User, UserInterface } from './database/entity/user';
 import { persistent } from './decorators';
 import { getFunctionList, onStartup } from './decorators/on';
 import events from './events';
+import { stats as apiStats, calls, chatMessagesAtStart, emptyRateLimit, isStreamOnline, setChatMessagesAtStart, setIsStreamOnline, setRateLimit, setStats, setStreamStatusChangeSince, streamStatusChangeSince } from './helpers/api';
+import { curRetries, maxRetries, setCurrentRetries } from './helpers/api/retries';
+import { setStreamId, streamId } from './helpers/api/streamId';
+import { setStreamType, streamType } from './helpers/api/streamType';
 import { getValueOf, isVariableSet } from './helpers/customvariables';
 import { isDbConnected } from './helpers/database';
 import { dayjs } from './helpers/dayjs';
@@ -34,6 +36,8 @@ import { isBot, isBotId, isBotSubscriber } from './helpers/user/isBot';
 import { isIgnored } from './helpers/user/isIgnored';
 import { getChannelChattersUnofficialAPI } from './microservices/getChannelChattersUnofficialAPI';
 import { getCustomRewards } from './microservices/getCustomRewards';
+import { getGameNameFromId } from './microservices/getGameNameFromId';
+import { setTitleAndGame } from './microservices/setTitleAndGame';
 import oauth from './oauth';
 import eventlist from './overlays/eventlist';
 import alerts from './registries/alerts';
@@ -62,32 +66,6 @@ export const currentStreamTags: {
     [lang: string]: string;
   };
 }[] = [];
-
-const limitProxy = {
-  get: function (obj: { limit: number; remaining: number; refresh: number }, prop: 'limit' | 'remaining' | 'refresh') {
-    if (typeof obj[prop] === 'undefined') {
-      if (prop === 'limit') {
-        return 120;
-      }
-      if (prop === 'remaining') {
-        return 800;
-      }
-      if (prop === 'refresh') {
-        return (Date.now() / 1000) + 90;
-      }
-    } else {
-      return obj[prop];
-    }
-  },
-  set: function (obj: { limit: number; remaining: number; refresh: number }, prop: 'limit' | 'remaining' | 'refresh', value: number) {
-    if (Number(value) === Number(obj[prop])) {
-      return true;
-    }
-    value = Number(value);
-    obj[prop] = value;
-    return true;
-  },
-};
 
 const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], usersFromAPI: { from_name: string; from_id: number; followed_at: string }[], fullScale: boolean) => {
   if (!fullScale) {
@@ -170,56 +148,10 @@ const processFollowerState = async (users: { from_name: string; from_id: number;
 
 class API extends Core {
   @persistent()
-  stats: {
-    language: string;
-    currentWatchedTime: number;
-    currentViewers: number;
-    maxViewers: number;
-    currentSubscribers: number;
-    currentBits: number;
-    currentTips: number;
-    currentFollowers: number;
-    currentViews: number;
-    currentGame: string | null;
-    currentTitle: string | null;
-    currentHosts: number;
-    newChatters: number;
-  } = {
-    language: 'en',
-    currentWatchedTime: 0,
-    currentViewers: 0,
-    maxViewers: 0,
-    currentSubscribers: 0,
-    currentBits: 0,
-    currentTips: 0,
-    currentFollowers: 0,
-    currentViews: 0,
-    currentGame: null,
-    currentTitle: null,
-    currentHosts: 0,
-    newChatters: 0,
-  };
-
-  @persistent()
-  isStreamOnline = false;
-  @persistent()
-  streamStatusChangeSince: number =  Date.now();
-
-  @persistent()
   rawStatus = '';
 
   @persistent()
   gameCache = '';
-
-  calls = {
-    bot: new Proxy({ limit: 120, remaining: 800, refresh: (Date.now() / 1000) + 90 }, limitProxy),
-    broadcaster: new Proxy({ limit: 120, remaining: 800, refresh: (Date.now() / 1000) + 90 }, limitProxy),
-  };
-  chatMessagesAtStart = linesParsed;
-  maxRetries = 3;
-  curRetries = 0;
-  streamType = 'live';
-  streamId: null | string = null;
   gameOrTitleChangedManually = false;
 
   retries = {
@@ -254,12 +186,6 @@ class API extends Core {
         .where('event = :event', { event: 'getChannelChattersUnofficialAPI' })
         .execute();
     }, 30000);
-  }
-
-  async setRateLimit (type: 'bot' | 'broadcaster', limit: number, remaining: number, refresh: number) {
-    this.calls[type].limit = limit;
-    this.calls[type].remaining = remaining;
-    this.calls[type].refresh = refresh;
   }
 
   interval(fnc: string, interval: number) {
@@ -345,7 +271,7 @@ class API extends Core {
   async getModerators(opts: { isWarned: boolean }) {
     const token = oauth.broadcasterAccessToken;
     const needToWait = token === '';
-    const notEnoughAPICalls = this.calls.broadcaster.remaining <= 30 && this.calls.broadcaster.refresh > Date.now() / 1000;
+    const notEnoughAPICalls = calls.broadcaster.remaining <= 30 && calls.broadcaster.refresh > Date.now() / 1000;
     const missingBroadcasterId = oauth.broadcasterId.length === 0;
 
     if (!oauth.broadcasterCurrentScopes.includes('moderation:read')) {
@@ -373,9 +299,7 @@ class API extends Core {
       });
 
       // save remaining api calls
-      this.calls.broadcaster.remaining = request.headers['ratelimit-remaining'];
-      this.calls.broadcaster.refresh = request.headers['ratelimit-reset'];
-      this.calls.broadcaster.limit = request.headers['ratelimit-limit'];
+      setRateLimit('broadcaster', request.headers);
 
       const data = request.data.data;
       await getRepository(User).update({
@@ -389,10 +313,10 @@ class API extends Core {
     } catch (e) {
       if (e.isAxiosError) {
         error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getModerators', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: this.calls.broadcaster });
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getModerators', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.broadcaster });
       } else {
         error(e.stack);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getModerators', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.broadcaster });
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getModerators', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.broadcaster });
       }
     }
     return { state: true };
@@ -432,7 +356,7 @@ class API extends Core {
 
     const token = oauth.botAccessToken;
     const needToWait = token === '';
-    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
+    const notEnoughAPICalls = calls.bot.remaining <= 30 && calls.bot.refresh > Date.now() / 1000;
     if ((needToWait || notEnoughAPICalls)) {
       return null;
     }
@@ -447,18 +371,15 @@ class API extends Core {
       });
 
       // save remaining api calls
-      this.calls.bot.limit = request.headers['ratelimit-limit'];
-      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      this.calls.bot.refresh = request.headers['ratelimit-reset'];
+      setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
       return request.data.data[0].login;
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        this.calls.bot.remaining = 0;
-        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
+        emptyRateLimit('bot', e.response.headers);
       }
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
     }
     return null;
   }
@@ -485,7 +406,7 @@ class API extends Core {
 
     const token = oauth.botAccessToken;
     const needToWait = token === '';
-    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
+    const notEnoughAPICalls = calls.bot.remaining <= 30 && calls.bot.refresh > Date.now() / 1000;
     if ((needToWait || notEnoughAPICalls) && !isChannelId) {
       throw new Error('API calls not available.');
     }
@@ -500,21 +421,21 @@ class API extends Core {
       });
 
       // save remaining api calls
-      this.calls.bot.limit = request.headers['ratelimit-limit'];
-      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      this.calls.bot.refresh = request.headers['ratelimit-reset'];
+      calls.bot.limit = request.headers['ratelimit-limit'];
+      setRateLimit('bot', request.headers);
+      calls.bot.remaining = request.headers['ratelimit-remaining'];
+      calls.bot.refresh = request.headers['ratelimit-reset'];
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
 
       return String(request.data.data[0].id);
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        this.calls.bot.remaining = 0;
-        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
+        emptyRateLimit('bot', e.response.headers);
 
-        ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+        ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
       } else {
-        ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: 'n/a', data: e.stack, remaining: this.calls.bot });
+        ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: 'n/a', data: e.stack, remaining: calls.bot });
       }
       throw new Error(`User ${username} not found on Twitch.`);
     }
@@ -564,7 +485,7 @@ class API extends Core {
 
     const token = oauth.botAccessToken;
     const needToWait = token === '';
-    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
+    const notEnoughAPICalls = calls.bot.remaining <= 30 && calls.bot.refresh > Date.now() / 1000;
 
     if (needToWait || notEnoughAPICalls) {
       return { state: false, opts };
@@ -606,12 +527,10 @@ class API extends Core {
       await getRepository(TwitchTagLocalizationDescription).delete({ tagId: IsNull() });
       await getRepository(TwitchTagLocalizationName).delete({ tagId: IsNull() });
 
-      ioServer?.emit('api.stats', { method: 'GET', data: tags, timestamp: Date.now(), call: 'getAllStreamTags', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', data: tags, timestamp: Date.now(), call: 'getAllStreamTags', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
 
       // save remaining api calls
-      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      this.calls.bot.refresh = request.headers['ratelimit-reset'];
-      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      setRateLimit('bot', request.headers);
 
       if (tags.length === 100) {
         // move to next page
@@ -619,7 +538,7 @@ class API extends Core {
       }
     } catch (e) {
       error(`${url} - ${e.message}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getAllStreamTags', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getAllStreamTags', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
     }
     delete opts.cursor;
     return { state: true, opts };
@@ -640,13 +559,16 @@ class API extends Core {
 
     const token = oauth.broadcasterAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
-    const notEnoughAPICalls = this.calls.broadcaster.remaining <= 30 && this.calls.broadcaster.refresh > Date.now() / 1000;
+    const notEnoughAPICalls = calls.broadcaster.remaining <= 30 && calls.broadcaster.refresh > Date.now() / 1000;
 
     if (needToWait || notEnoughAPICalls || oauth.broadcasterType === '') {
       if (oauth.broadcasterType === '') {
         if (!opts.noAffiliateOrPartnerWarningSent) {
           warning('Broadcaster is not affiliate/partner, will not check subs');
-          this.stats.currentSubscribers = 0;
+          setStats({
+            ...apiStats,
+            currentSubscribers: 0,
+          });
         }
         delete opts.count;
         return { state: false, opts: { ...opts, noAffiliateOrPartnerWarningSent: true } };
@@ -671,18 +593,19 @@ class API extends Core {
         opts.subscribers = subscribers;
       }
 
-      ioServer?.emit('api.stats', { method: 'GET', data: subscribers, timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', data: subscribers, timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
 
       // save remaining api calls
-      this.calls.broadcaster.remaining = request.headers['ratelimit-remaining'];
-      this.calls.broadcaster.refresh = request.headers['ratelimit-reset'];
-      this.calls.broadcaster.limit = request.headers['ratelimit-limit'];
+      setRateLimit('broadcaster', request.headers);
 
       if (subscribers.length === 100) {
         // move to next page
         return this.getChannelSubscribers({ ...opts, cursor: request.data.pagination.cursor, count: opts.subscribers.length + opts.count, z: opts.subscribers });
       } else {
-        this.stats.currentSubscribers = subscribers.length + opts.count;
+        setStats({
+          ...apiStats,
+          currentSubscribers: subscribers.length + opts.count,
+        });
         this.setSubscribers(opts.subscribers.filter(o => !isBotId(o.user_id)));
         if (opts.subscribers.find(o => isBotId(o.user_id))) {
           isBotSubscriber(true);
@@ -700,11 +623,14 @@ class API extends Core {
           opts.notCorrectOauthWarningSent = true;
           warning('Broadcaster have not correct oauth, will not check subs');
         }
-        this.stats.currentSubscribers = 0;
+        setStats({
+          ...apiStats,
+          currentSubscribers: 0,
+        });
       } else {
         error(`${url} - ${e.stack}`);
 
-        ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+        ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
       }
     }
     delete opts.count;
@@ -755,7 +681,7 @@ class API extends Core {
     const url = `https://api.twitch.tv/helix/channels?broadcaster_id=${cid}`;
 
     // getChannelInformation only if stream is offline - we are using getCurrentStreamData for online stream title/game
-    if (this.isStreamOnline) {
+    if (isStreamOnline) {
       this.retries.getChannelInformation = 0;
       return { state: true, opts };
     }
@@ -776,11 +702,9 @@ class API extends Core {
         timeout: 20000,
       });
       // save remaining api calls
-      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      this.calls.bot.refresh = request.headers['ratelimit-reset'];
-      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data.data, timestamp: Date.now(), call: 'getChannelInformation', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', data: request.data.data, timestamp: Date.now(), call: 'getChannelInformation', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
 
       if (!this.gameOrTitleChangedManually) {
         // Just polling update
@@ -799,7 +723,7 @@ class API extends Core {
             if (twitch.isTitleForced) {
               const game = this.gameCache;
               info(`Title/game force enabled => ${game} | ${rawStatus}`);
-              this.setTitleAndGame({});
+              setTitleAndGame({});
               return { state: true, opts };
             } else {
               info(`Title/game changed outside of a bot => ${request.data.data[0].game_name} | ${request.data.data[0].title}`);
@@ -814,9 +738,12 @@ class API extends Core {
           this.retries.getChannelInformation = 0;
         }
 
-        this.stats.language = request.data.data[0].broadcaster_language;
-        this.stats.currentGame = request.data.data[0].game_name;
-        this.stats.currentTitle = request.data.data[0].title;
+        setStats({
+          ...apiStats,
+          language: request.data.data[0].broadcaster_language,
+          currentGame: request.data.data[0].game_name,
+          currentTitle: request.data.data[0].title,
+        });
         this.gameCache = request.data.data[0].game_name;
         this.rawStatus = rawStatus;
       } else {
@@ -824,7 +751,7 @@ class API extends Core {
       }
     } catch (e) {
       error(`${url} - ${e.message}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getChannelInformation', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getChannelInformation', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
       return { state: false, opts };
     }
 
@@ -843,11 +770,14 @@ class API extends Core {
     const url = `http://tmi.twitch.tv/hosts?include_logins=1&target=${cid}`;
     try {
       request = await axios.get(url);
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getChannelHosts', api: 'other', endpoint: url, code: request.status, remaining: this.calls.bot });
-      this.stats.currentHosts = request.data.hosts.length;
+      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getChannelHosts', api: 'other', endpoint: url, code: request.status, remaining: calls.bot });
+      setStats({
+        ...apiStats,
+        currentHosts: request.data.hosts.length,
+      });
     } catch (e) {
       error(`${url} - ${e.message}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getChannelHosts', api: 'other', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getChannelHosts', api: 'other', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
       return { state: e.response?.status === 500 };
     }
 
@@ -860,7 +790,7 @@ class API extends Core {
 
     const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
-    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
+    const notEnoughAPICalls = calls.bot.remaining <= 30 && calls.bot.refresh > Date.now() / 1000;
     if (needToWait || notEnoughAPICalls) {
       return { state: false };
     }
@@ -874,25 +804,25 @@ class API extends Core {
         },
       });
       // save remaining api calls
-      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      this.calls.bot.refresh = request.headers['ratelimit-reset'];
-      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
 
       if (request.data.data.length > 0) {
         oauth.profileImageUrl = request.data.data[0].profile_image_url;
         oauth.broadcasterType = request.data.data[0].broadcaster_type;
-        this.stats.currentViews = request.data.data[0].view_count;
+        setStats({
+          ...apiStats,
+          currentViews: request.data.data[0].view_count,
+        });
       }
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        this.calls.bot.remaining = 0;
-        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
+        emptyRateLimit('bot', e.response.headers);
       }
 
       error(`${url} - ${e.message}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
     }
     return { state: true };
   }
@@ -902,7 +832,7 @@ class API extends Core {
     const url = `https://api.twitch.tv/helix/users/follows?to_id=${cid}&first=100`;
     const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
-    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
+    const notEnoughAPICalls = calls.bot.remaining <= 30 && calls.bot.refresh > Date.now() / 1000;
 
     if (needToWait || notEnoughAPICalls) {
       return { state: false };
@@ -919,11 +849,9 @@ class API extends Core {
       }) as AxiosResponse<FollowsEndpoint>;
 
       // save remaining api calls
-      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      this.calls.bot.refresh = request.headers['ratelimit-reset'];
-      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
 
       if (request.status === 200 && !isNil(request.data.data)) {
         // we will go through only new users
@@ -942,15 +870,17 @@ class API extends Core {
           debug('api.followers', 'No new followers found.');
         }
       }
-      this.stats.currentFollowers =  request.data.total;
+      setStats({
+        ...apiStats,
+        currentFollowers: request.data.total,
+      });
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        this.calls.bot.remaining = 0;
-        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
+        emptyRateLimit('bot', e.response.headers);
       }
 
       error(`${url} - ${e.message}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
       return { state: false };
     }
     return { state: true };
@@ -963,7 +893,7 @@ class API extends Core {
 
     const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
-    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
+    const notEnoughAPICalls = calls.bot.remaining <= 30 && calls.bot.refresh > Date.now() / 1000;
 
     if (needToWait || notEnoughAPICalls) {
       return { state: false, opts };
@@ -986,16 +916,14 @@ class API extends Core {
       }) as AxiosResponse<FollowsEndpoint>;
 
       // save remaining api calls
-      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      this.calls.bot.refresh = request.headers['ratelimit-reset'];
-      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getChannelFollowers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getChannelFollowers', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
 
       if (request.status === 200 && !isNil(request.data.data)) {
         const followers = request.data.data;
 
-        ioServer?.emit('api.stats', { method: 'GET', data: followers, timestamp: Date.now(), call: 'getChannelFollowers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
+        ioServer?.emit('api.stats', { method: 'GET', data: followers, timestamp: Date.now(), call: 'getChannelFollowers', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
 
         debug('api.getChannelFollowers', `Followers loaded: ${followers.length}, cursor: ${request.data.pagination.cursor}`);
         debug('api.getChannelFollowers', `Followers list: \n\t${followers.map(o => o.from_name)}`);
@@ -1019,119 +947,15 @@ class API extends Core {
       }
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        this.calls.bot.remaining = 0;
-        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
+        emptyRateLimit('bot', e.response.headers);
       }
 
       error(`${url} - ${e.stack}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getChannelFollowers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getChannelFollowers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
     }
     // return from first page (but we will still go through all pages)
     delete opts.cursor;
     return { state: true, opts };
-  }
-
-  async getGameNameFromId (id: number) {
-    let request;
-    const url = `https://api.twitch.tv/helix/games?id=${id}`;
-
-    if (id.toString().trim().length === 0 || id === 0) {
-      return '';
-    } // return empty game if gid is empty
-
-    const gameFromDb = await getRepository(CacheGames).findOne({ id });
-
-    // check if id is cached
-    if (gameFromDb) {
-      return gameFromDb.name;
-    }
-
-    try {
-      const token = oauth.botAccessToken;
-      if (token === '') {
-        throw new Error('token not available');
-      }
-      request = await axios.get(url, {
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
-        },
-        timeout: 20000,
-      });
-
-      // save remaining api calls
-      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      this.calls.bot.refresh = request.headers['ratelimit-reset'];
-      this.calls.bot.limit = request.headers['ratelimit-limit'];
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
-
-      // add id->game to cache
-      const name = request.data.data[0].name;
-      await getRepository(CacheGames).save({ id, name });
-      return name;
-    } catch (e) {
-      if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        this.calls.bot.remaining = 0;
-        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
-      }
-
-      warning(`Couldn't find name of game for gid ${id} - fallback to ${this.stats.currentGame}`);
-      if (e.isAxiosError) {
-        error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
-      } else {
-        error(e.stack);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
-      }
-      return this.stats.currentGame;
-    }
-  }
-
-  async getGameIdFromName (name: string): Promise<number | null> {
-    let request;
-    const url = `https://api.twitch.tv/helix/games?name=${encodeURIComponent(name)}`;
-
-    const gameFromDb = await getRepository(CacheGames).findOne({ name });
-
-    // check if name is cached
-    if (gameFromDb) {
-      return gameFromDb.id;
-    }
-
-    try {
-      const token = oauth.botAccessToken;
-      if (token === '') {
-        throw new Error('token not available');
-      }
-      request = await axios.get(url, {
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
-        },
-        timeout: 20000,
-      });
-
-      // save remaining api calls
-      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      this.calls.bot.refresh = request.headers['ratelimit-reset'];
-      this.calls.bot.limit = request.headers['ratelimit-limit'];
-      ioServer?.emit('api.stats', { method: request.config.method?.toUpperCase(), data: request.data, timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: request.config.url, code: request.status, remaining: this.calls.bot });
-
-      // add id->game to cache
-      const id = Number(request.data.data[0].id);
-      await getRepository(CacheGames).save({ id, name });
-      return id;
-    } catch (e) {
-      warning(`Couldn't find name of game for name ${name} - fallback to ${this.stats.currentGame}`);
-      if (e.isAxiosError) {
-        error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
-      } else {
-        error(e.stack);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
-      }
-      return null;
-    }
   }
 
   async getCurrentStreamTags (opts: any) {
@@ -1140,7 +964,7 @@ class API extends Core {
 
     const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
-    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
+    const notEnoughAPICalls = calls.bot.remaining <= 30 && calls.bot.refresh > Date.now() / 1000;
     if (needToWait || notEnoughAPICalls) {
       return { state: false, opts };
     }
@@ -1156,11 +980,9 @@ class API extends Core {
       });
 
       // save remaining api calls
-      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      this.calls.bot.refresh = request.headers['ratelimit-reset'];
-      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getCurrentStreamTags', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getCurrentStreamTags', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
 
       if (request.status === 200 && !isNil(request.data.data[0])) {
         const tags = request.data.data;
@@ -1175,7 +997,7 @@ class API extends Core {
       }
     } catch (e) {
       error(`${url} - ${e.message}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getCurrentStreamTags', api: 'getCurrentStreamTags', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getCurrentStreamTags', api: 'getCurrentStreamTags', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
       return { state: false, opts };
     }
     return { state: true, opts };
@@ -1187,7 +1009,7 @@ class API extends Core {
 
     const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
-    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
+    const notEnoughAPICalls = calls.bot.remaining <= 30 && calls.bot.refresh > Date.now() / 1000;
     if (needToWait || notEnoughAPICalls) {
       return { state: false, opts };
     }
@@ -1205,11 +1027,9 @@ class API extends Core {
       setStatus('API', request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED);
 
       // save remaining api calls
-      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      this.calls.bot.refresh = request.headers['ratelimit-reset'];
-      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
 
       let justStarted = false;
 
@@ -1219,29 +1039,31 @@ class API extends Core {
         // correct status and we've got a data - stream online
         const stream = request.data.data[0];
 
-        if (dayjs(stream.started_at).valueOf() >=  dayjs(this.streamStatusChangeSince).valueOf()) {
-          this.streamStatusChangeSince = (new Date(stream.started_at)).getTime();
+        if (dayjs(stream.started_at).valueOf() >=  dayjs(streamStatusChangeSince).valueOf()) {
+          setStreamStatusChangeSince((new Date(stream.started_at)).getTime());
         }
-        if (!this.isStreamOnline || this.streamType !== stream.type) {
-          this.chatMessagesAtStart = linesParsed;
+        if (!isStreamOnline || streamType !== stream.type) {
+          setChatMessagesAtStart(linesParsed);
 
-          if (!webhooks.enabled.streams && Number(this.streamId) !== Number(stream.id)) {
+          if (!webhooks.enabled.streams && Number(streamId) !== Number(stream.id)) {
             debug('api.stream', 'API: ' + JSON.stringify(stream));
             start(
-              `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await this.getGameNameFromId(Number(stream.game_id))} | type: ${stream.type} | channel ID: ${cid}`
+              `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await getGameNameFromId(Number(stream.game_id))} | type: ${stream.type} | channel ID: ${cid}`
             );
 
             // reset quick stats on stream start
-            this.stats.currentWatchedTime = 0;
-            this.stats.maxViewers = 0;
-            this.stats.newChatters = 0;
-            this.stats.currentViewers = 0;
-            this.stats.currentBits = 0;
-            this.stats.currentTips = 0;
-
-            this.streamStatusChangeSince = new Date(stream.started_at).getTime();
-            this.streamId = stream.id;
-            this.streamType = stream.type;
+            setStats({
+              ...apiStats,
+              currentWatchedTime: 0,
+              maxViewers: 0,
+              newChatters: 0,
+              currentViewers: 0,
+              currentBits: 0,
+              currentTips: 0,
+            });
+            setStreamStatusChangeSince(new Date(stream.started_at).getTime());
+            setStreamId(stream.id);
+            setStreamType(stream.type);
 
             events.fire('stream-started', {});
             events.fire('command-send-x-times', { reset: true });
@@ -1262,9 +1084,9 @@ class API extends Core {
           }
         }
 
-        this.curRetries = 0;
+        setCurrentRetries(0);
         this.saveStreamData(stream);
-        this.isStreamOnline = true;
+        setIsStreamOnline(true);
 
         if (!justStarted) {
           // don't run events on first check
@@ -1276,10 +1098,13 @@ class API extends Core {
         if (!this.gameOrTitleChangedManually) {
           let rawStatus = this.rawStatus;
           const status = await this.parseTitle(null);
-          const game = await this.getGameNameFromId(Number(stream.game_id));
+          const game = await getGameNameFromId(Number(stream.game_id));
 
-          this.stats.currentTitle = stream.title;
-          this.stats.currentGame = game;
+          setStats({
+            ...apiStats,
+            currentTitle: stream.title,
+            currentGame: game,
+          });
 
           if (stream.title !== status) {
             // check if status is same as updated status
@@ -1298,17 +1123,17 @@ class API extends Core {
           this.rawStatus = rawStatus;
         }
       } else {
-        if (this.isStreamOnline && this.curRetries < this.maxRetries) {
+        if (isStreamOnline && curRetries < maxRetries) {
           // retry if it is not just some network / twitch issue
-          this.curRetries = this.curRetries + 1;
+          setCurrentRetries(curRetries + 1);
         } else {
           // stream is really offline
-          if (this.isStreamOnline) {
+          if (isStreamOnline) {
             // online -> offline transition
             stop('');
-            this.streamStatusChangeSince = Date.now();
-            this.isStreamOnline = false;
-            this.curRetries = 0;
+            setStreamStatusChangeSince(Date.now());
+            setIsStreamOnline(false);
+            setCurrentRetries(0);
             events.fire('stream-stopped', {});
             events.fire('stream-is-running-x-minutes', { reset: true });
             events.fire('number-of-viewers-is-at-least-x', { reset: true });
@@ -1324,44 +1149,49 @@ class API extends Core {
               }
             }
 
-            this.streamId = null;
+            setStreamId(null);
           }
         }
       }
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        this.calls.bot.remaining = 0;
-        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
+        emptyRateLimit('bot', e.response.headers);
       }
 
       error(`${url} - ${e.message}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
       return { state: false, opts };
     }
     return { state: true, opts };
   }
 
   saveStreamData (stream: StreamEndpoint['data'][number]) {
-    this.stats.currentViewers = stream.viewer_count;
+    setStats({
+      ...apiStats,
+      currentViewers: stream.viewer_count,
+    });
 
-    if (this.stats.maxViewers < stream.viewer_count) {
-      this.stats.maxViewers = stream.viewer_count;
+    if (apiStats.maxViewers < stream.viewer_count) {
+      setStats({
+        ...apiStats,
+        maxViewers: stream.viewer_count,
+      });
     }
 
     stats.save({
       timestamp: new Date().getTime(),
-      whenOnline: this.isStreamOnline ? this.streamStatusChangeSince : Date.now(),
-      currentViewers: this.stats.currentViewers,
-      currentSubscribers: this.stats.currentSubscribers,
-      currentFollowers: this.stats.currentFollowers,
-      currentBits: this.stats.currentBits,
-      currentTips: this.stats.currentTips,
-      chatMessages: linesParsed - this.chatMessagesAtStart,
-      currentViews: this.stats.currentViews,
-      maxViewers: this.stats.maxViewers,
-      newChatters: this.stats.newChatters,
-      currentHosts: this.stats.currentHosts,
-      currentWatched: this.stats.currentWatchedTime,
+      whenOnline: isStreamOnline ? streamStatusChangeSince : Date.now(),
+      currentViewers: apiStats.currentViewers,
+      currentSubscribers: apiStats.currentSubscribers,
+      currentFollowers: apiStats.currentFollowers,
+      currentBits: apiStats.currentBits,
+      currentTips: apiStats.currentTips,
+      chatMessages: linesParsed - chatMessagesAtStart,
+      currentViews: apiStats.currentViews,
+      maxViewers: apiStats.maxViewers,
+      newChatters: apiStats.newChatters,
+      currentHosts: apiStats.currentHosts,
+      currentWatched: apiStats.currentWatchedTime,
     });
   }
 
@@ -1425,190 +1255,22 @@ class API extends Core {
         },
       });
       // save remaining api calls
-      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      this.calls.bot.refresh = request.headers['ratelimit-reset'];
-      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      setRateLimit('bot', request.headers);
 
       await getRepository(TwitchTag).update({ is_auto: false }, { is_current: false });
       for (const tag_id of tag_ids) {
         await getRepository(TwitchTag).update({ tag_id }, { is_current: true });
       }
-      ioServer?.emit('api.stats', { method: 'PUT', request: { data: { tag_ids } }, timestamp: Date.now(), call: 'setTags', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'PUT', request: { data: { tag_ids } }, timestamp: Date.now(), call: 'setTags', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: calls.bot });
     } catch (e) {
       if (e.isAxiosError) {
         error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'setTags', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'setTags', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.bot });
       } else {
         error(e.stack);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'setTags', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'setTags', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
       }
       return false;
-    }
-
-  }
-
-  async setTitleAndGame (args: { title?: string | null; game?: string | null }): Promise<{ response: string; status: boolean } | null> {
-    args = defaults(args, { title: null }, { game: null });
-    const cid = oauth.channelId;
-    const url = `https://api.twitch.tv/helix/channels?broadcaster_id=${cid}`;
-
-    const token = oauth.broadcasterAccessToken;
-    const needToWait = isNil(cid) || cid === '' || token === '';
-
-    if (!oauth.broadcasterCurrentScopes.includes('channel_editor')) {
-      warning('Missing Broadcaster oAuth scope channel_editor to change game or title. This mean you can have inconsistent game set across Twitch: https://github.com/twitchdev/issues/issues/224');
-      addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope channel_editor to change game or title. This mean you can have inconsistent game set across Twitch: <a href="https://github.com/twitchdev/issues/issues/224">Twitch Issue # 224</a>' });
-    }
-    if (!oauth.broadcasterCurrentScopes.includes('user:edit:broadcast')) {
-      warning('Missing Broadcaster oAuth scope user:edit:broadcast to change game or title');
-      addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth scope user:edit:broadcast to change game or title' });
-      return { response: '', status: false };
-    }
-    if (needToWait) {
-      warning('Missing Broadcaster oAuth to change game or title');
-      addUIError({ name: 'OAUTH', message: 'Missing Broadcaster oAuth to change game or title' });
-      return { response: '', status: false };
-    }
-
-    let request;
-    let title;
-    let game;
-
-    let requestData = '';
-    try {
-      if (!isNil(args.title)) {
-        this.rawStatus = args.title; // save raw status to cache, if changing title
-      }
-      title = await this.parseTitle(this.rawStatus);
-
-      if (!isNil(args.game)) {
-        game = args.game;
-        this.gameCache = args.game; // save game to cache, if changing gae
-      } else {
-        game = this.gameCache;
-      } // we are not setting game -> load last game
-
-      requestData = JSON.stringify({
-        game_id: await this.getGameIdFromName(game), title,
-      });
-
-      /* workaround for https://github.com/twitchdev/issues/issues/224
-       * Modify Channel Information is not propagated correctly on twitch #224
-       */
-      try {
-        await axios({
-          method: 'put',
-          url: `https://api.twitch.tv/kraken/channels/${cid}`,
-          data: {
-            channel: {
-              game: game,
-              status: title,
-            },
-          },
-          headers: {
-            'Accept': 'application/vnd.twitchtv.v5+json',
-            'Authorization': 'OAuth ' + oauth.broadcasterAccessToken,
-          },
-        });
-      } catch (e) {
-        error(`API: https://api.twitch.tv/kraken/channels/${cid} - ${e.message}`);
-      }
-
-      request = await axios({
-        method: 'patch',
-        url,
-        data: requestData,
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.broadcasterClientId,
-          'Content-Type': 'application/json',
-        },
-      });
-      // save remaining api calls
-      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      this.calls.bot.refresh = request.headers['ratelimit-reset'];
-      this.calls.bot.limit = request.headers['ratelimit-limit'];
-
-      ioServer?.emit('api.stats', { method: 'PATCH', request: requestData, timestamp: Date.now(), call: 'setTitleAndGame', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
-    } catch (e) {
-      if (e.isAxiosError) {
-        error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'setTitleAndGame', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
-      } else {
-        error(e.stack);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'setTitleAndGame', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
-      }
-      return { response: '', status: false };
-    }
-
-    const responses: { response: string; status: boolean } = { response: '', status: false };
-
-    if (request.status === 204) {
-      if (!isNil(args.game)) {
-        responses.response = translate('game.change.success').replace(/\$game/g, args.game);
-        responses.status = true;
-        if (this.stats.currentGame !== args.game) {
-          events.fire('game-changed', { oldGame: this.stats.currentGame, game: args.game });
-        }
-        this.stats.currentGame = args.game;
-      }
-
-      if (!isNil(args.title)) {
-        responses.response = translate('title.change.success').replace(/\$title/g, args.title);
-        responses.status = true;
-        this.stats.currentTitle = args.title;
-      }
-      this.gameOrTitleChangedManually = true;
-      this.retries.getCurrentStreamData = 0;
-      return responses;
-    }
-    return { response: '', status: false };
-  }
-
-  async sendGameFromTwitch (socket: Socket | null, game: string) {
-    const url = `https://api.twitch.tv/helix/search/categories?query=${encodeURIComponent(game)}`;
-
-    const token = oauth.botAccessToken;
-    if (token === '') {
-      return;
-    }
-
-    let request;
-    try {
-      request = await axios.get(url, {
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
-        },
-        timeout: 20000,
-      });
-      // save remaining api calls
-      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      this.calls.bot.refresh = request.headers['ratelimit-reset'];
-      this.calls.bot.limit = request.headers['ratelimit-limit'];
-
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
-    } catch (e) {
-      if (e.isAxiosError) {
-        error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
-      } else {
-        error(e.stack);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
-      }
-      return;
-    }
-
-    if (isNull(request.data.data)) {
-      if (socket) {
-        socket.emit('sendGameFromTwitch', []);
-      }
-      return false;
-    } else {
-      if (socket) {
-        socket.emit('sendGameFromTwitch', map(request.data.data, 'name'));
-      }
-      return map(request.data.data, 'name');
     }
   }
 
@@ -1631,7 +1293,7 @@ class API extends Core {
       return { state: true };
     }
 
-    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
+    const notEnoughAPICalls = calls.bot.remaining <= 30 && calls.bot.refresh > Date.now() / 1000;
     if (notEnoughAPICalls) {
       return { state: false };
     }
@@ -1647,11 +1309,9 @@ class API extends Core {
       });
 
       // save remaining api calls
-      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      this.calls.bot.refresh = request.headers['ratelimit-reset'];
-      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
 
       for (const clip of request.data.data) {
         // clip found in twitch api
@@ -1659,22 +1319,21 @@ class API extends Core {
       }
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        this.calls.bot.remaining = 0;
-        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
+        emptyRateLimit('bot', e.response.headers);
       }
       if (e.isAxiosError) {
         error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.bot });
       } else {
         error(e.stack);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
       }
     }
     return { state: true };
   }
 
   async createClip (opts: any) {
-    if (!(this.isStreamOnline)) {
+    if (!(isStreamOnline)) {
       return;
     } // do nothing if stream is offline
 
@@ -1702,7 +1361,7 @@ class API extends Core {
 
     const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
-    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
+    const notEnoughAPICalls = calls.bot.remaining <= 30 && calls.bot.refresh > Date.now() / 1000;
     if (needToWait || notEnoughAPICalls) {
       setTimeout(() => this.createClip(opts), 1000);
       return;
@@ -1720,23 +1379,20 @@ class API extends Core {
       });
 
       // save remaining api calls
-      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      this.calls.bot.refresh = request.headers['ratelimit-reset'];
-      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'POST', data: request.data, timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'POST', data: request.data, timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        this.calls.bot.remaining = 0;
-        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
+        emptyRateLimit('bot', e.response.headers);
       }
 
       if (e.isAxiosError) {
         error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.bot });
       } else {
         error(e.stack);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
       }
       return;
     }
@@ -1767,11 +1423,9 @@ class API extends Core {
         timeout: 20000,
       });
       // save remaining api calls
-      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      this.calls.bot.refresh = request.headers['ratelimit-reset'];
-      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
     } catch (e) {
       if (e.errno === 'ECONNRESET' || e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT') {
         return;
@@ -1787,10 +1441,10 @@ class API extends Core {
       if (logError) {
         if (e.isAxiosError) {
           error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-          ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+          ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.bot });
         } else {
           error(e.stack);
-          ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+          ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
         }
       }
       return;
@@ -1811,7 +1465,7 @@ class API extends Core {
 
     const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
-    const notEnoughAPICalls = this.calls.bot.remaining <= 40 && this.calls.bot.refresh > Date.now() / 1000;
+    const notEnoughAPICalls = calls.bot.remaining <= 40 && calls.bot.refresh > Date.now() / 1000;
     if (needToWait || notEnoughAPICalls) {
       this.timeouts['isFollowerUpdate-' + id] = setTimeout(() => this.isFollowerUpdate(user), 1000);
       return null;
@@ -1828,22 +1482,19 @@ class API extends Core {
       });
 
       // save remaining api calls
-      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      this.calls.bot.refresh = request.headers['ratelimit-reset'];
-      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        this.calls.bot.remaining = 0;
-        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
+        emptyRateLimit('bot', e.response.headers);
       }
       if (e.isAxiosError) {
         error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.bot });
       } else {
         error(e.stack);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
       }
       return null;
     }
@@ -1927,11 +1578,9 @@ class API extends Core {
       });
 
       // save remaining api calls
-      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      this.calls.bot.refresh = request.headers['ratelimit-reset'];
-      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'POST', request: { data: { user_id: String(cid), description: 'Marked from sogeBot' } }, timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot, data: request });
+      ioServer?.emit('api.stats', { method: 'POST', request: { data: { user_id: String(cid), description: 'Marked from sogeBot' } }, timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, data: request });
     } catch (e) {
       if (e.errno === 'ECONNRESET' || e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT') {
         setTimeout(() => this.createMarker(), 1000);
@@ -1939,12 +1588,12 @@ class API extends Core {
       }
       if (e.isAxiosError) {
         error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.bot });
       } else {
         error(e.stack);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
       }
-      ioServer?.emit('api.stats', { method: 'POST', request: { data: { user_id: String(cid), description: 'Marked from sogeBot' } }, timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'POST', request: { data: { user_id: String(cid), description: 'Marked from sogeBot' } }, timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
     }
   }
 
@@ -1967,27 +1616,23 @@ class API extends Core {
         timeout: 20000,
       });
       // save remaining api calls
-      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      this.calls.bot.refresh = request.headers['ratelimit-reset'];
-      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
       return request.data;
     } catch (e) {
       error(`${url} - ${e.message}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: url, code: `${e.status} ${get(e, 'body.message', e.statusText)}`, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: url, code: `${e.status} ${get(e, 'body.message', e.statusText)}`, remaining: calls.bot });
       return null;
     }
   }
 
   async getCustomRewards() {
-    const { calls, method, response, status, url, error: err } = await getCustomRewards();
+    const { headers, method, response, status, url, error: err } = await getCustomRewards();
 
-    this.calls.broadcaster.remaining = calls.remaining;
-    this.calls.broadcaster.refresh = calls.refresh;
-    this.calls.broadcaster.limit = calls.limit;
+    setRateLimit('broadcaster', headers);
 
-    ioServer?.emit('api.stats', { method: method, data: response, timestamp: Date.now(), call: 'getCustomRewards', api: 'helix', endpoint: url, code: status, remaining: this.calls.broadcaster });
+    ioServer?.emit('api.stats', { method: method, data: response, timestamp: Date.now(), call: 'getCustomRewards', api: 'helix', endpoint: url, code: status, remaining: calls.broadcaster });
 
     if (err) {
       throw new Error(err);
@@ -2009,7 +1654,7 @@ class API extends Core {
       if (opts.period) {
         if (opts.period === 'stream') {
           url += '&' + querystring.stringify({
-            started_at: (new Date(this.streamStatusChangeSince)).toISOString(),
+            started_at: (new Date(streamStatusChangeSince)).toISOString(),
             ended_at: (new Date()).toISOString(),
           });
         } else {
@@ -2036,24 +1681,22 @@ class API extends Core {
       });
 
       // save remaining api calls
-      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      this.calls.bot.refresh = request.headers['ratelimit-reset'];
-      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot });
+      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
       // get mp4 from thumbnail
       for (const c of request.data.data) {
         c.mp4 = c.thumbnail_url.replace('-preview-480x272.jpg', '.mp4');
-        c.game = await this.getGameNameFromId(c.game_id);
+        c.game = await getGameNameFromId(c.game_id);
       }
       return request.data.data;
     } catch (e) {
       if (e.isAxiosError) {
         error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: this.calls.bot });
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.bot });
       } else {
         error(e.stack);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot });
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
       }
     }
   }

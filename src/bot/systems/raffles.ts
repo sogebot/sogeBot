@@ -3,10 +3,10 @@
 import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import api from '../api';
 import { Raffle, RaffleParticipant, RaffleParticipantInterface, RaffleParticipantMessageInterface } from '../database/entity/raffle';
 import { User } from '../database/entity/user';
 import { command, default_permission, parser, settings } from '../decorators';
+import { isStreamOnline } from '../helpers/api';
 import { announce, getOwnerAsSender, prepare } from '../helpers/commons';
 import { isDbConnected } from '../helpers/database';
 import { getLocalizedName } from '../helpers/getLocalized';
@@ -206,7 +206,7 @@ class Raffles extends System {
     const raffle = await getRepository(Raffle).findOne({ where: { winner: null, isClosed: false }, relations: ['participants'] });
     const isTimeToAnnounce = new Date().getTime() - new Date(this.lastAnnounce).getTime() >= (this.raffleAnnounceInterval * 60 * 1000);
     const isMessageCountToAnnounce = linesParsed - this.lastAnnounceMessageCount >= this.raffleAnnounceMessageInterval;
-    if (!(api.isStreamOnline) || !raffle || !isTimeToAnnounce || !isMessageCountToAnnounce) {
+    if (!(isStreamOnline) || !raffle || !isTimeToAnnounce || !isMessageCountToAnnounce) {
       this.timeouts.raffleAnnounce = global.setTimeout(() => this.announce(), 60000);
       return;
     }
