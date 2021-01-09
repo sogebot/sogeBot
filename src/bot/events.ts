@@ -27,6 +27,7 @@ import { getLocalizedName } from './helpers/getLocalized';
 import { debug, error, info, warning } from './helpers/log';
 import { ioServer } from './helpers/panel';
 import { addUIError } from './helpers/panel/';
+import { parserEmitter } from './helpers/parser/';
 import { adminEndpoint } from './helpers/socket';
 import { isOwner, isSubscriber, isVIP } from './helpers/user';
 import { isBot, isBotSubscriber } from './helpers/user/isBot';
@@ -36,7 +37,6 @@ import Message from './message';
 import { setTitleAndGame } from './microservices/setTitleAndGame';
 import oauth from './oauth';
 import clips from './overlays/clips';
-import Parser from './parser';
 import tmi from './tmi';
 import { translate } from './translate';
 import custom_variables from './widgets/customvariables';
@@ -355,18 +355,18 @@ class Events extends Core {
     command = await new Message(command).parse({ username: oauth.broadcasterUsername, sender: getBotSender() });
 
     if (global.mocha) {
-      const parse = new Parser({
+      parserEmitter.emit('process', {
         sender: { username: oauth.broadcasterUsername, userId: oauth.broadcasterId },
         message: command,
         skip: true,
-        quiet: _.get(operation, 'isCommandQuiet', false),
+        quiet: _.get(operation, 'isCommandQuiet', false) as boolean,
+      }, (responses) => {
+        for (let i = 0; i < responses.length; i++) {
+          setTimeout(async () => {
+            parserReply(await responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
+          }, 500 * i);
+        }
       });
-      const responses = await parse.process();
-      for (let i = 0; i < responses.length; i++) {
-        setTimeout(async () => {
-          parserReply(await responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
-        }, 500 * i);
-      }
     } else {
       tmi.message({
         message: {

@@ -4,21 +4,20 @@ import _ from 'lodash';
 import {v4 as uuid} from 'uuid';
 
 import * as constants from './constants';
-import currency from './currency';
-import events from './events';
-import general from './general';
 import { addToParserFindCache, cachedCommandsPermissions, parserFindCache } from './helpers/cache';
 import { incrementCountOfCommandUsage } from './helpers/commands/count';
 import { getBotSender } from './helpers/commons';
 import { debug, error, warning } from './helpers/log';
+import { parserEmitter } from './helpers/parser/';
+import { populatedList } from './helpers/parser/populatedList';
 import { addToViewersCache, getFromViewersCache } from './helpers/permissions';
 import { check } from './helpers/permissions/';
-import { list } from './helpers/register';
 import permissions from './permissions';
-import tmi from './tmi';
 import { translate } from './translate';
-import twitch from './twitch';
-import users from './users';
+
+parserEmitter.on('process', async (opts, cb) => {
+  cb(await (new Parser(opts)).process());
+});
 
 class Parser {
   id = uuid();
@@ -28,7 +27,6 @@ class Parser {
   skip = false;
   quiet = false;
   successfullParserRuns: any[] = [];
-  list: any = [];
 
   constructor (opts: any = {}) {
     this.message = opts.message || '';
@@ -36,8 +34,6 @@ class Parser {
     this.skip = opts.skip || false;
     this.quiet = opts.quiet || false;
     this.successfullParserRuns = [];
-
-    this.list = this.populateList();
   }
 
   get isCommand() {
@@ -150,24 +146,6 @@ class Parser {
     return [];
   }
 
-  populateList () {
-    const populatedList: any = [
-      currency,
-      events,
-      users,
-      permissions,
-      twitch,
-      general,
-      tmi,
-    ];
-    for (const dir of ['systems', 'games', 'overlays', 'integrations', 'registries']) {
-      for (const system of list(dir)) {
-        populatedList.push(system);
-      }
-    }
-    return populatedList;
-  }
-
   /**
    * Return all parsers
    * @constructor
@@ -175,9 +153,9 @@ class Parser {
    */
   async parsers () {
     let parsers: any[] = [];
-    for (let i = 0, length = this.list.length; i < length; i++) {
-      if (_.isFunction(this.list[i].parsers)) {
-        parsers.push(this.list[i].parsers());
+    for (let i = 0, length = populatedList.length; i < length; i++) {
+      if (_.isFunction(populatedList[i].parsers)) {
+        parsers.push(populatedList[i].parsers());
       }
     }
     parsers = _.orderBy(_.flatMap(await Promise.all(parsers)), 'priority', 'asc');
@@ -191,9 +169,9 @@ class Parser {
    */
   async rollbacks () {
     const rollbacks: any[] = [];
-    for (let i = 0, length = this.list.length; i < length; i++) {
-      if (_.isFunction(this.list[i].rollbacks)) {
-        rollbacks.push(this.list[i].rollbacks());
+    for (let i = 0, length = populatedList.length; i < length; i++) {
+      if (_.isFunction(populatedList[i].rollbacks)) {
+        rollbacks.push(populatedList[i].rollbacks());
       }
     }
     return _.flatMap(await Promise.all(rollbacks));
@@ -241,9 +219,9 @@ class Parser {
 
   async getCommandsList () {
     let commands: any[] = [];
-    for (let i = 0, length = this.list.length; i < length; i++) {
-      if (_.isFunction(this.list[i].commands)) {
-        commands.push(this.list[i].commands());
+    for (let i = 0, length = populatedList.length; i < length; i++) {
+      if (_.isFunction(populatedList[i].commands)) {
+        commands.push(populatedList[i].commands());
       }
     }
     commands = _(await Promise.all(commands)).flatMap().sortBy(o => -o.command.length).value();

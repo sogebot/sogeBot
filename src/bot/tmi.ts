@@ -31,7 +31,7 @@ import { isBot } from './helpers/user/isBot';
 import { isIgnored } from './helpers/user/isIgnored';
 import oauth from './oauth';
 import eventlist from './overlays/eventlist';
-import Parser from './parser';
+import { Parser } from './parser';
 import alerts from './registries/alerts';
 import customcommands from './systems/customcommands';
 import tmi from './tmi';
