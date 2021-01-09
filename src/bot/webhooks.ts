@@ -7,9 +7,9 @@ import { getRepository } from 'typeorm';
 import type { StreamEndpoint } from './api';
 import { User } from './database/entity/user';
 import { getFunctionList } from './decorators/on';
-import events from './events';
 import { chatMessagesAtStart, curRetries, isStreamOnline, setChatMessagesAtStart, setIsStreamOnline, setStats, setStreamStatusChangeSince, stats, streamId, streamStatusChangeSince } from './helpers/api';
 import { setCurrentRetries, setStreamId, setStreamType } from './helpers/api/';
+import { eventEmitter } from './helpers/events';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import { debug, error, follow, info, start } from './helpers/log';
 import { linesParsed } from './helpers/parser';
@@ -261,7 +261,7 @@ class Webhooks {
             timestamp: Date.now(),
           });
           follow(data.from_name);
-          events.fire('follow', { username: data.from_name, userId: Number(data.from_id), webhooks: true });
+          eventEmitter.emit('follow', { username: data.from_name, userId: Number(data.from_id), webhooks: true });
           alerts.trigger({
             event: 'follows',
             name: data.from_name,
@@ -325,10 +325,10 @@ class Webhooks {
         setIsStreamOnline(true);
         setChatMessagesAtStart(linesParsed);
 
-        events.fire('stream-started', {});
-        events.fire('command-send-x-times', { reset: true });
-        events.fire('keyword-send-x-times', { reset: true });
-        events.fire('every-x-minutes-of-stream', { reset: true });
+        eventEmitter.emit('stream-started');
+        eventEmitter.emit('command-send-x-times', { reset: true });
+        eventEmitter.emit('keyword-send-x-times', { reset: true });
+        eventEmitter.emit('every-x-minutes-of-stream', { reset: true });
 
         for (const event of getFunctionList('streamStart')) {
           const type = !event.path.includes('.') ? 'core' : event.path.split('.')[0];

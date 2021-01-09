@@ -23,6 +23,7 @@ import { announceTypes, getOwner, isUUID, prepare } from '../helpers/commons';
 import { isBotStarted, isDbConnected } from '../helpers/database';
 import { dayjs, timezone } from '../helpers/dayjs';
 import { debounce } from '../helpers/debounce';
+import { eventEmitter } from '../helpers/events';
 import { chatIn, chatOut, debug, error, info, warning, whisperOut } from '../helpers/log';
 import { check } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
@@ -610,9 +611,9 @@ class Discord extends Integration {
           mod: 'false', subscriber: 'false', turbo: 'false', discord: { author, channel },
         };
 
-        events.fire('keyword-send-x-times', { username: user.username, message: content, source: 'discord' });
+        eventEmitter.emit('keyword-send-x-times', { username: user.username, message: content, source: 'discord' });
         if (content.startsWith('!')) {
-          events.fire('command-send-x-times', { username: user.username, message: content, source: 'discord' });
+          eventEmitter.emit('command-send-x-times', { username: user.username, message: content, source: 'discord' });
         }
 
         parser.message = content;

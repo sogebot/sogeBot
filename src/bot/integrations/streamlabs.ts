@@ -8,8 +8,8 @@ import currency from '../currency';
 import { User, UserTipInterface } from '../database/entity/user';
 import { persistent, settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import events from '../events';
 import { isStreamOnline, setStats, stats } from '../helpers/api';
+import { eventEmitter } from '../helpers/events';
 import { getBroadcaster } from '../helpers/getBroadcaster';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 import { debug, error, info, tip } from '../helpers/log';
@@ -233,7 +233,7 @@ class Streamlabs extends Integration {
           timestamp: Date.now(),
           isTest: event.isTest,
         });
-        events.fire('tip', {
+        eventEmitter.emit('tip', {
           username: event.from.toLowerCase(),
           amount: parseFloat(event.amount).toFixed(2),
           currency: event.currency,

@@ -10,8 +10,8 @@ import { User, UserTipInterface } from '../database/entity/user';
 import { settings } from '../decorators';
 import { ui } from '../decorators.js';
 import { onChange, onStartup } from '../decorators/on.js';
-import events from '../events.js';
 import { isStreamOnline, setStats, stats } from '../helpers/api/index.js';
+import { eventEmitter } from '../helpers/events';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
 import { info, tip } from '../helpers/log.js';
 import eventlist from '../overlays/eventlist.js';
@@ -154,7 +154,7 @@ class Donationalerts extends Integration {
       timestamp: Date.now(),
     });
 
-    events.fire('tip', {
+    eventEmitter.emit('tip', {
       username: data.username.toLowerCase(),
       amount: data.amount.toFixed(2),
       currency: data.currency,

@@ -13,12 +13,12 @@ import { User, UserBitInterface } from './database/entity/user';
 import { settings, ui } from './decorators';
 import { command, default_permission } from './decorators';
 import { getFunctionList, onChange, onLoad } from './decorators/on';
-import events from './events';
 import Expects from './expects';
 import { isStreamOnline, setStats, stats } from './helpers/api';
 import { getBotSender, getOwner, prepare } from './helpers/commons';
 import { sendMessage } from './helpers/commons/sendMessage';
 import { dayjs } from './helpers/dayjs';
+import { eventEmitter } from './helpers/events';
 import { getLocalizedName } from './helpers/getLocalized';
 import { triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub } from './helpers/interface/triggers';
 import { isDebugEnabled } from './helpers/log';
@@ -329,7 +329,7 @@ class TMI extends Core {
             });
 
             if (message.tags['message-type'] === 'action') {
-              events.fire('action', { username: message.tags.username?.toLowerCase(), source: 'twitch' });
+              eventEmitter.emit('action', { username: message.tags.username?.toLowerCase(), source: 'twitch' });
             }
           }
         } else {
@@ -339,14 +339,14 @@ class TMI extends Core {
 
       client.chat.on('CLEARCHAT', message => {
         if (message.event !== 'USER_BANNED') {
-          events.fire('clearchat', {});
+          eventEmitter.emit('clearchat');
         }
       });
 
       client.chat.on('HOSTTARGET', message => {
         if (message.event === 'HOST_ON') {
           if (typeof message.numberOfViewers !== 'undefined') { // may occur on restart bot when hosting
-            events.fire('hosting', { target: message.username, viewers: message.numberOfViewers });
+            eventEmitter.emit('hosting', { target: message.username, viewers: message.numberOfViewers });
           }
         }
       });
@@ -380,7 +380,7 @@ class TMI extends Core {
           event: 'host',
           timestamp: Date.now(),
         });
-        events.fire('hosted', data);
+        eventEmitter.emit('hosted', data);
         alerts.trigger({
           event: 'hosts',
           name: username,
@@ -414,7 +414,7 @@ class TMI extends Core {
         event: 'raid',
         timestamp: Date.now(),
       });
-      events.fire('raid', data);
+      eventEmitter.emit('raid', data);
       alerts.trigger({
         event: 'raids',
         name: message.parameters.login,
@@ -490,7 +490,7 @@ class TMI extends Core {
         timestamp: Date.now(),
       });
       sub(`${username}#${userstate.userId}, tier: ${tier}`);
-      events.fire('subscription', { username: username, method: (isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths, tier });
+      eventEmitter.emit('subscription', { username: username, method: (isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths, tier: String(tier) });
       alerts.trigger({
         event: 'subs',
         name: username,
@@ -559,9 +559,9 @@ class TMI extends Core {
         timestamp: Date.now(),
       });
       resub(`${username}#${userstate.userId}, streak share: ${subStreakShareEnabled}, streak: ${subStreak}, months: ${subCumulativeMonths}, message: ${messageFromUser}, tier: ${tier}`);
-      events.fire('resub', {
+      eventEmitter.emit('resub', {
         username,
-        tier,
+        tier: String(tier),
         subStreakShareEnabled,
         subStreak,
         subStreakName: getLocalizedName(subStreak, translate('core.months')),
@@ -605,7 +605,7 @@ class TMI extends Core {
         count,
         timestamp: Date.now(),
       });
-      events.fire('subcommunitygift', { username, count });
+      eventEmitter.emit('subcommunitygift', { username, count });
       subcommunitygift(`${username}#${userId}, to ${count} viewers`);
       alerts.trigger({
         event: 'subcommunitygifts',
@@ -642,7 +642,7 @@ class TMI extends Core {
       if (typeof this.ignoreGiftsFromUser[username] !== 'undefined' && this.ignoreGiftsFromUser[username].count !== 0) {
         this.ignoreGiftsFromUser[username].count--;
       } else {
-        events.fire('subgift', { username: username, recipient: recipient, tier });
+        eventEmitter.emit('subgift', { username: username, recipient: recipient, tier });
         triggerInterfaceOnSub({
           username: recipient,
           userId: Number(recipientId),
@@ -737,7 +737,7 @@ class TMI extends Core {
       user.bits.push(newBits);
       getRepository(User).save(user);
 
-      events.fire('cheer', { username, bits: userstate.bits, message: messageFromUser });
+      eventEmitter.emit('cheer', { username, bits: Number(userstate.bits), message: messageFromUser });
 
       if (isStreamOnline) {
         setStats({
@@ -885,9 +885,9 @@ class TMI extends Core {
 
         api.followerUpdatePreCheck(sender.username);
 
-        events.fire('keyword-send-x-times', { username: sender.username, message: message, source: 'twitch' });
+        eventEmitter.emit('keyword-send-x-times', { username: sender.username, message: message, source: 'twitch' });
         if (message.startsWith('!')) {
-          events.fire('command-send-x-times', { username: sender.username, message: message, source: 'twitch' });
+          eventEmitter.emit('command-send-x-times', { username: sender.username, message: message, source: 'twitch' });
         } else if (!message.startsWith('!')) {
           getRepository(User).increment({ userId: Number(sender.userId) }, 'messages', 1);
         }

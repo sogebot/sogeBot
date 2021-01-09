@@ -12,13 +12,13 @@ import { ThreadEvent } from './database/entity/threadEvent';
 import { TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from './database/entity/twitch';
 import { User, UserInterface } from './database/entity/user';
 import { getFunctionList, onStartup } from './decorators/on';
-import events from './events';
 import { stats as apiStats, calls, chatMessagesAtStart, emptyRateLimit, gameCache, gameOrTitleChangedManually, isStreamOnline, parseTitle, rawStatus, setChatMessagesAtStart, setIsStreamOnline, setRateLimit, setStats, setStreamStatusChangeSince, streamStatusChangeSince } from './helpers/api';
 import { curRetries, maxRetries, retries, setCurrentRetries } from './helpers/api/retries';
 import { setStreamId, streamId } from './helpers/api/streamId';
 import { setStreamType, streamType } from './helpers/api/streamType';
 import { isDbConnected } from './helpers/database';
 import { dayjs } from './helpers/dayjs';
+import { eventEmitter } from './helpers/events';
 import { getBroadcaster } from './helpers/getBroadcaster';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import { debug, error, follow, info, start, stop, unfollow, warning } from './helpers/log';
@@ -80,7 +80,7 @@ const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], us
           });
           if (!isBot(user.username)) {
             follow(user.username);
-            events.fire('follow', { username: user.username, userId: user.userId });
+            eventEmitter.emit('follow', { username: user.username, userId: user.userId });
             alerts.trigger({
               event: 'follows',
               name: user.username,
@@ -443,7 +443,7 @@ class API extends Core {
       for (const username of partedUsers) {
         if (!isIgnored({ username: username })) {
           await setImmediateAwait();
-          events.fire('user-parted-channel', { username });
+          eventEmitter.emit('user-parted-channel', { username });
         }
       }
 
@@ -454,7 +454,7 @@ class API extends Core {
         } else {
           await setImmediateAwait();
           this.followerUpdatePreCheck(username);
-          events.fire('user-joined-channel', { username });
+          eventEmitter.emit('user-joined-channel', { username });
         }
       }
     }
@@ -1049,10 +1049,10 @@ class API extends Core {
             setStreamId(stream.id);
             setStreamType(stream.type);
 
-            events.fire('stream-started', {});
-            events.fire('command-send-x-times', { reset: true });
-            events.fire('keyword-send-x-times', { reset: true });
-            events.fire('every-x-minutes-of-stream', { reset: true });
+            eventEmitter.emit('stream-started');
+            eventEmitter.emit('command-send-x-times', { reset: true });
+            eventEmitter.emit('keyword-send-x-times', { reset: true });
+            eventEmitter.emit('every-x-minutes-of-stream', { reset: true });
             justStarted = true;
 
             for (const event of getFunctionList('streamStart')) {
@@ -1074,9 +1074,9 @@ class API extends Core {
 
         if (!justStarted) {
           // don't run events on first check
-          events.fire('number-of-viewers-is-at-least-x', {});
-          events.fire('stream-is-running-x-minutes', {});
-          events.fire('every-x-minutes-of-stream', {});
+          eventEmitter.emit('number-of-viewers-is-at-least-x', { reset: false });
+          eventEmitter.emit('stream-is-running-x-minutes', { reset: false });
+          eventEmitter.emit('every-x-minutes-of-stream', { reset: false });
         }
 
         if (!gameOrTitleChangedManually.value) {
@@ -1118,9 +1118,9 @@ class API extends Core {
             setStreamStatusChangeSince(Date.now());
             setIsStreamOnline(false);
             setCurrentRetries(0);
-            events.fire('stream-stopped', {});
-            events.fire('stream-is-running-x-minutes', { reset: true });
-            events.fire('number-of-viewers-is-at-least-x', { reset: true });
+            eventEmitter.emit('stream-stopped');
+            eventEmitter.emit('stream-is-running-x-minutes', { reset: true });
+            eventEmitter.emit('number-of-viewers-is-at-least-x', { reset: true });
 
             for (const event of getFunctionList('streamEnd')) {
               const type = !event.path.includes('.') ? 'core' : event.path.split('.')[0];
@@ -1466,7 +1466,7 @@ class API extends Core {
       // if was follower, fire unfollow event
       if (user.isFollower) {
         unfollow(user.username);
-        events.fire('unfollow', { username: user.username });
+        eventEmitter.emit('unfollow', { username: user.username });
       }
 
       await getRepository(User).update({ userId: user.userId },
@@ -1485,7 +1485,7 @@ class API extends Core {
           timestamp: Date.now(),
         });
         follow(user.username);
-        events.fire('follow', { username: user.username, userId: id });
+        eventEmitter.emit('follow', { username: user.username, userId: id });
         alerts.trigger({
           event: 'follows',
           name: user.username,

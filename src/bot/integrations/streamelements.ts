@@ -7,8 +7,8 @@ import currency from '../currency';
 import { User, UserTipInterface } from '../database/entity/user';
 import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import events from '../events';
 import { isStreamOnline, setStats, stats } from '../helpers/api/index.js';
+import { eventEmitter } from '../helpers/events';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 import { error, info, tip } from '../helpers/log';
 import eventlist from '../overlays/eventlist';
@@ -177,7 +177,7 @@ class StreamElements extends Integration {
       message,
       timestamp: Date.now(),
     });
-    events.fire('tip', {
+    eventEmitter.emit('tip', {
       username: username.toLowerCase(),
       amount: Number(amount).toFixed(2),
       currency: DONATION_CURRENCY,

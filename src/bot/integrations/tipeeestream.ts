@@ -9,9 +9,9 @@ import { User, UserTipInterface } from '../database/entity/user';
 import { settings } from '../decorators';
 import { ui } from '../decorators.js';
 import { onChange, onStartup } from '../decorators/on.js';
-import events from '../events.js';
 import { isStreamOnline } from '../helpers/api/index.js';
 import { setStats, stats } from '../helpers/api/stats.js';
+import { eventEmitter } from '../helpers/events';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
 import { error, info, tip } from '../helpers/log.js';
 import eventlist from '../overlays/eventlist.js';
@@ -151,7 +151,7 @@ class TipeeeStream extends Integration {
         timestamp: Date.now(),
       });
 
-      events.fire('tip', {
+      eventEmitter.emit('tip', {
         username,
         amount: Number(amount).toFixed(2),
         currency: donationCurrency,

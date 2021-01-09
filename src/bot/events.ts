@@ -114,12 +114,43 @@ class Events extends Core {
     this.fadeOut();
 
     // emitter .on listeners
-    eventEmitter.on('game-changed', (opts: {oldGame: string, game: string} ) => {
-      events.fire('game-changed', { ...opts });
-    });
-    eventEmitter.on('commercial', (opts: {duration: number}) => {
-      events.fire('commercial', { ...opts });
-    });
+    for (const event of [
+      'action',
+      'commercial',
+      'game-changed',
+      'follow',
+      'cheer',
+      'unfollow',
+      'user-joined-channel',
+      'user-parted-channel',
+      'subcommunitygift',
+      'reward-redeemed',
+      'timeout',
+      'ban',
+      'hosting',
+      'hosted',
+      'raid',
+      'stream-started',
+      'stream-stopped',
+      'subscription',
+      'resub',
+      'clearchat',
+      'command-send-x-times',
+      'keyword-send-x-times',
+      'every-x-minutes-of-stream',
+      'stream-is-running-x-minutes',
+      'subgift',
+      'number-of-viewers-is-at-least-x',
+      'tip',
+      'tweet-post-with-hashtag',
+    ] as const) {
+      eventEmitter.on(event, (opts?: Events.Attributes) => {
+        if (typeof opts === 'undefined') {
+          opts = {};
+        }
+        events.fire(event, { ...opts });
+      });
+    }
   }
 
   @onStreamEnd()
