@@ -24,7 +24,7 @@ import { isDebugEnabled } from './helpers/log';
 import { chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning, whisperIn } from './helpers/log';
 import { avgResponse, linesParsedIncrement, setStatus } from './helpers/parser';
 import { defaultPermissions } from './helpers/permissions/';
-import { setGlobalIgnoreListExclude, setIgnoreList, setMuteStatus, setSendWithMe } from './helpers/tmi/';
+import { setGlobalIgnoreListExclude, setIgnoreList, setMuteStatus, setSendWithMe, setShowWithAt } from './helpers/tmi/';
 import { isOwner } from './helpers/user';
 import { isBot } from './helpers/user/isBot';
 import { isIgnored } from './helpers/user/isIgnored';
@@ -77,6 +77,12 @@ class TMI extends Core {
   broadcasterWarning = false;
 
   ignoreGiftsFromUser: { [x: string]: { count: number; time: Date }} = {};
+
+  @onChange('showWithAt')
+  @onLoad('showWithAt')
+  setShowWithAt() {
+    setShowWithAt(this.showWithAt);
+  }
 
   @onChange('sendWithMe')
   @onLoad('sendWithMe')

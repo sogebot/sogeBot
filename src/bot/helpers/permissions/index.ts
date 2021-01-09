@@ -3,3 +3,4 @@ export * from './check';
 export * from './defaultPermissions';
 export * from './filters';
 export * from './getUserHighestPermission';
+export * from './recacheOnlineUsersPermission';

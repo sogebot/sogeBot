@@ -1,9 +1,8 @@
 import _ from 'lodash';
 
 import { Message } from '../../message';
-import tmi from '../../tmi';
 import { chatOut, debug, whisperOut } from '../log';
-import { message, sendWithMe } from '../tmi';
+import { getMuteStatus, message, sendWithMe, showWithAt } from '../tmi';
 
 import { getBotSender } from '.';
 
@@ -43,8 +42,8 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
   } // we don't want to reply on bot commands
 
   if (sender) {
-    messageToSend = !_.isNil(sender.username) ? messageToSend.replace(/\$sender/g, (tmi.showWithAt ? '@' : '') + sender.username) : messageToSend;
-    if (!tmi.mute || attr.force) {
+    messageToSend = !_.isNil(sender.username) ? messageToSend.replace(/\$sender/g, (showWithAt ? '@' : '') + sender.username) : messageToSend;
+    if (!getMuteStatus() || attr.force) {
       if ((!_.isNil(attr.quiet) && attr.quiet)) {
         return true;
       }
@@ -53,7 +52,7 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
         message('whisper', sender.username, messageToSend);
       } else {
         chatOut(`${messageToSend} [${sender.username}]`);
-        if (tmi.sendWithMe && !messageToSend.startsWith('/')) {
+        if (sendWithMe && !messageToSend.startsWith('/')) {
           message('me', null, messageToSend);
         } else {
           message('say', null, messageToSend);
