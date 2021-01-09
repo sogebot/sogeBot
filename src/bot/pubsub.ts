@@ -5,8 +5,8 @@ import WebSocket from 'ws';
 import { SECOND } from './constants';
 import events from './events';
 import { ban, debug, error, info, redeem, timeout, unban, warning } from './helpers/log';
+import { addUIError } from './helpers/panel/alerts';
 import oauth from './oauth';
-import { addUIError } from './panel';
 import alerts from './registries/alerts';
 
 const pubsubEndpoint: Readonly<string> = 'wss://pubsub-edge.twitch.tv';

@@ -9,6 +9,7 @@ import { timezone } from './helpers/dayjs';
 import { getBroadcaster } from './helpers/getBroadcaster';
 import { find, list } from './helpers/register';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
+import { setDomain } from './helpers/ui';
 import oauth from './oauth';
 import { default as uiModule } from './ui';
 import webhooks from './webhooks';
@@ -39,6 +40,7 @@ class UI extends Core {
   @onChange('domain')
   @onLoad('domain')
   subscribeWebhook() {
+    setDomain(this.domain);
     if (typeof webhooks === 'undefined') {
       setTimeout(() => this.subscribeWebhook(), 1000);
     } else {

@@ -24,6 +24,7 @@ import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import { debug, error, follow, info, start, stop, unfollow, warning } from './helpers/log';
 import { loadedTokens } from './helpers/oauth';
 import { ioServer } from './helpers/panel';
+import { addUIError } from './helpers/panel/';
 import { linesParsed, setStatus } from './helpers/parser';
 import { logAvgTime } from './helpers/profiler';
 import { find } from './helpers/register';
@@ -35,7 +36,6 @@ import { getChannelChattersUnofficialAPI } from './microservices/getChannelChatt
 import { getCustomRewards } from './microservices/getCustomRewards';
 import oauth from './oauth';
 import eventlist from './overlays/eventlist';
-import { addUIError } from './panel';
 import alerts from './registries/alerts';
 import stats from './stats';
 import { translate } from './translate';

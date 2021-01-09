@@ -9,10 +9,10 @@ import events from '../events';
 import { getOwner } from '../helpers/commons';
 import { error, warning } from '../helpers/log';
 import { ioServer } from '../helpers/panel';
+import { addUIError } from '../helpers/panel/alerts';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import oauth from '../oauth';
-import { addUIError } from '../panel';
 import tmi from '../tmi';
 import System from './_interface';
 

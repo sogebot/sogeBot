@@ -23,6 +23,8 @@ import { getIsBotStarted } from './helpers/database';
 import { flatten } from './helpers/flatten';
 import { getDEBUG, info, setDEBUG } from './helpers/log';
 import { app, ioServer, menu, menuPublic, server, serverSecure, setApp, setServer, widgets } from './helpers/panel';
+import { socketsConnectedDec, socketsConnectedInc } from './helpers/panel/';
+import { errors, warns } from './helpers/panel/alerts';
 import { linesParsed, status as statusObj } from './helpers/parser';
 import { list, systems } from './helpers/register';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
@@ -39,21 +41,6 @@ import webhooks from './webhooks';
 
 const port = process.env.PORT ?? '20000';
 const secureport = process.env.SECUREPORT ?? '20443';
-
-export let socketsConnected = 0;
-
-export type UIError = { name: string; message: string };
-
-const errors: UIError[] = [];
-const warns: UIError[] = [];
-
-export const addUIError = (error: UIError) => {
-  errors.push(error);
-};
-
-export const addUIWarn = (warn: UIError) => {
-  warns.push(warn);
-};
 
 export const init = () => {
   setApp(express());
@@ -161,9 +148,9 @@ export const init = () => {
 
   ioServer?.on('connect', async (socket) => {
     socket.on('disconnect', () => {
-      socketsConnected--;
+      socketsConnectedDec();
     });
-    socketsConnected++;
+    socketsConnectedInc();
 
     socket.on('botStatus', (cb: (status: boolean) => void) => {
       cb(getIsBotStarted());

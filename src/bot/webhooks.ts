@@ -12,11 +12,11 @@ import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import { debug, error, follow, info, start } from './helpers/log';
 import { linesParsed } from './helpers/parser';
 import { find } from './helpers/register';
+import { domain } from './helpers/ui';
 import { isBot } from './helpers/user/isBot';
 import oauth from './oauth';
 import eventlist from './overlays/eventlist';
 import alerts from './registries/alerts';
-import ui from './ui';
 
 type Type = 'follows' | 'streams';
 
@@ -65,7 +65,6 @@ class Webhooks {
       return;
     }
 
-    const domain = ui.domain;
     if (domain.includes('localhost')) {
       return;
     }
@@ -120,7 +119,6 @@ class Webhooks {
       return;
     }
 
-    const domain = ui.domain;
     if (domain.includes('localhost')) {
       return;
     }
