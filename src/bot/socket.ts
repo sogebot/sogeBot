@@ -11,11 +11,11 @@ import { Dashboard } from './database/entity/dashboard';
 import { User } from './database/entity/user';
 import { persistent, settings, ui } from './decorators';
 import { onLoad } from './decorators/on';
-import { isModerator } from './helpers/isModerator';
 import { debug } from './helpers/log';
 import { app, ioServer } from './helpers/panel';
 import { check, defaultPermissions, getUserHighestPermission } from './helpers/permissions/';
 import { adminEndpoint, endpoints } from './helpers/socket';
+import { isModerator } from './helpers/user/isModerator';
 
 let _self: any = null;
 

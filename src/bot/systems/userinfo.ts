@@ -1,16 +1,18 @@
 import { getRepository } from 'typeorm';
 
 import api from '../api';
-import { dateDiff, prepare } from '../commons';
+import { dateDiff } from '../commons';
 import currency from '../currency';
 import { User } from '../database/entity/user';
 import { command, default_permission, settings, ui } from '../decorators';
 import Expects from '../expects';
 import general from '../general';
+import { prepare } from '../helpers/commons/';
 import { dayjs, timezone } from '../helpers/dayjs';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { debug, error } from '../helpers/log';
 import { getUserHighestPermission } from '../helpers/permissions/';
+import { fetchAccountAge } from '../microservices/fetchAccountAge';
 import { getUserFromTwitch } from '../microservices/getUserFromTwitch';
 import permissions from '../permissions';
 import { translate } from '../translate';
@@ -136,7 +138,7 @@ class UserInfo extends System {
             username: username,
           });
         }
-        await api.fetchAccountAge(Number(userId));
+        await fetchAccountAge(Number(userId));
         if (!retry) {
           return this.age(opts, retry = true);
         } else {

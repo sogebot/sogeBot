@@ -3,11 +3,11 @@
 import Axios from 'axios';
 import { escapeRegExp } from 'lodash';
 
-import { prepare } from '../commons';
 import { HOUR, MINUTE } from '../constants';
 import { command, persistent, settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import Expects from '../expects';
+import { prepare } from '../helpers/commons';
 import { flatten } from '../helpers/flatten';
 import { error, info } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';

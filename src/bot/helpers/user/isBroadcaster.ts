@@ -1,4 +1,4 @@
-import oauth from '../oauth';
+import oauth from '../../oauth';
 
 export function isBroadcaster(user: string | CommandOptions['sender'] | { username: string | null; userId?: number | string } | UserStateTags) {
   try {

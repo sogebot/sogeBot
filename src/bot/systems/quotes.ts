@@ -1,11 +1,11 @@
 import * as _ from 'lodash';
 import { getManager, getRepository } from 'typeorm';
 
-import { prepare } from '../commons';
 import { Quotes as QuotesEntity, QuotesInterface } from '../database/entity/quotes';
 import { command, default_permission } from '../decorators';
 import Expects from '../expects';
 import { sample } from '../helpers/array/sample';
+import { prepare } from '../helpers/commons';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import ui from '../ui';

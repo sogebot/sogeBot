@@ -10,7 +10,6 @@ import { getConnection, getManager, getRepository, IsNull } from 'typeorm';
 import { v4 as uuid} from 'uuid';
 
 import api, { currentStreamTags } from './api';
-import { getOwnerAsSender } from './commons';
 import customvariables from './customvariables';
 import { CacheTitles, CacheTitlesInterface } from './database/entity/cacheTitles';
 import { Dashboard, DashboardInterface, Widget } from './database/entity/dashboard';
@@ -18,6 +17,7 @@ import { Translation } from './database/entity/translation';
 import { TwitchTag, TwitchTagInterface } from './database/entity/twitch';
 import { User } from './database/entity/user';
 import general from './general';
+import { getOwnerAsSender } from './helpers/commons';
 import { getValueOf, isVariableSet } from './helpers/customvariables';
 import { getIsBotStarted } from './helpers/database';
 import { flatten } from './helpers/flatten';

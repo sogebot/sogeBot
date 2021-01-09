@@ -2,11 +2,12 @@ import _ from 'lodash';
 import { getRepository } from 'typeorm';
 import XRegExp from 'xregexp';
 
-import { isUUID, parserReply, prepare } from '../commons';
+import { parserReply } from '../commons';
 import { Keyword, KeywordInterface, KeywordsResponsesInterface } from '../database/entity/keyword';
 import { command, default_permission, helper, parser } from '../decorators';
 import Expects from '../expects';
 import { checkFilter } from '../helpers/checkFilter';
+import { isUUID, prepare } from '../helpers/commons';
 import { debug, error, warning } from '../helpers/log';
 import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
 import { check, defaultPermissions } from '../helpers/permissions/';

@@ -3,11 +3,12 @@
 import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { parserReply, prepare } from '../commons';
+import { parserReply } from '../commons';
 import { Alias as AliasEntity } from '../database/entity/alias';
 import { command, default_permission, parser } from '../decorators';
 import Expects from '../expects';
 import { incrementCountOfCommandUsage } from '../helpers/commands/count';
+import { prepare } from '../helpers/commons';
 import { executeVariablesInText } from '../helpers/customvariables';
 import { debug, error, warning } from '../helpers/log';
 import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';

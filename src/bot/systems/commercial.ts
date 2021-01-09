@@ -4,9 +4,9 @@ import axios from 'axios';
 import * as _ from 'lodash';
 
 import api from '../api';
-import { getOwner } from '../commons';
 import { command, default_permission, helper } from '../decorators';
 import events from '../events';
+import { getOwner } from '../helpers/commons';
 import { error, warning } from '../helpers/log';
 import { ioServer } from '../helpers/panel';
 import { defaultPermissions } from '../helpers/permissions/';

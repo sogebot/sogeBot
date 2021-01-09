@@ -14,9 +14,9 @@ import { getUserFromTwitch } from '../../microservices/getUserFromTwitch';
 import users from '../../users';
 import { getAllOnlineUsernames } from '../getAllOnlineUsernames';
 import { getTime } from '../getTime';
-import { isModerator } from '../isModerator';
 import { debug, error, info, warning } from '../log';
 import { linesParsed } from '../parser';
+import { isModerator } from '../user/isModerator';
 import { getAll } from './getAll';
 
 async function runScript (script: string, opts: { sender: { userId: number; username: string; source: 'twitch' | 'discord' } | string | null, isUI: boolean; param?: string | number, _current: any }) {

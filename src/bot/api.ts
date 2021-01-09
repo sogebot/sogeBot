@@ -21,15 +21,16 @@ import { isDbConnected } from './helpers/database';
 import { dayjs } from './helpers/dayjs';
 import { getBroadcaster } from './helpers/getBroadcaster';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
-import { isBot, isBotId, isBotSubscriber } from './helpers/isBot';
-import { isIgnored } from './helpers/isIgnored';
 import { debug, error, follow, info, start, stop, unfollow, warning } from './helpers/log';
+import { loadedTokens } from './helpers/oauth';
 import { ioServer } from './helpers/panel';
 import { linesParsed, setStatus } from './helpers/parser';
 import { logAvgTime } from './helpers/profiler';
 import { find } from './helpers/register';
 import { setImmediateAwait } from './helpers/setImmediateAwait';
 import { SQLVariableLimit } from './helpers/sql';
+import { isBot, isBotId, isBotSubscriber } from './helpers/user/isBot';
+import { isIgnored } from './helpers/user/isIgnored';
 import { getChannelChattersUnofficialAPI } from './microservices/getChannelChattersUnofficialAPI';
 import { getCustomRewards } from './microservices/getCustomRewards';
 import oauth from './oauth';
@@ -273,7 +274,7 @@ class API extends Core {
       for (const fnc of intervals.keys()) {
         await setImmediateAwait();
         debug('api.interval', chalk.yellow(fnc + '() ') + 'check');
-        if (oauth.loadedTokens < 2) {
+        if (loadedTokens < 2) {
           debug('api.interval', chalk.yellow(fnc + '() ') + 'tokens not loaded yet.');
           return;
         }

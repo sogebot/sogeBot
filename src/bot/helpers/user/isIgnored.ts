@@ -1,5 +1,5 @@
-import { globalIgnoreList } from '../data/globalIgnoreList';
-import tmi from '../tmi';
+import { globalIgnoreList } from '../../data/globalIgnoreList';
+import { globalIgnoreListExclude, ignorelist } from '../tmi';
 import { isBroadcaster } from './isBroadcaster';
 
 export function isIgnored(sender: { username: string | null; userId?: string | number }) {
@@ -18,14 +18,14 @@ export function isIgnored(sender: { username: string | null; userId?: string | n
 }
 
 export function getIgnoreList() {
-  return tmi.ignorelist.map((o) => {
+  return ignorelist.map((o) => {
     return typeof o === 'string' ? o.trim().toLowerCase() : o;
   });
 }
 
 export function getGlobalIgnoreList() {
   return Object.keys(globalIgnoreList)
-    .filter(o => !tmi.globalIgnoreListExclude.map((ex: number | string) => String(ex)).includes(o))
+    .filter(o => !globalIgnoreListExclude.map((ex: number | string) => String(ex)).includes(o))
     .map(o => {
       const id = Number(o);
       return { id, ...globalIgnoreList[id as unknown as keyof typeof globalIgnoreList] };

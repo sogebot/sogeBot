@@ -1,5 +1,5 @@
-import type { UserInterface } from '../database/entity/user';
-import oauth from '../oauth';
+import type { UserInterface } from '../../database/entity/user';
+import oauth from '../../oauth';
 
 export function isBot(user: string | CommandOptions['sender'] | UserInterface | UserStateTags) {
   try {

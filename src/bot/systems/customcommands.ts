@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { getRepository } from 'typeorm';
 import XRegExp from 'xregexp';
 
-import { parserReply, prepare } from '../commons';
+import { parserReply } from '../commons';
 import * as constants from '../constants';
 import { Commands, CommandsInterface, CommandsResponsesInterface } from '../database/entity/commands';
 import { command, default_permission, helper } from '../decorators';
@@ -10,6 +10,7 @@ import { parser } from '../decorators';
 import Expects from '../expects';
 import { checkFilter } from '../helpers/checkFilter';
 import { getAllCountOfCommandUsage, getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage } from '../helpers/commands/count';
+import { prepare } from '../helpers/commons';
 import { warning } from '../helpers/log';
 import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
 import { check, defaultPermissions } from '../helpers/permissions/';

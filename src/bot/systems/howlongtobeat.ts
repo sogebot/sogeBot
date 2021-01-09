@@ -2,12 +2,12 @@ import { HowLongToBeatService } from 'howlongtobeat';
 import { getRepository } from 'typeorm';
 
 import api from '../api';
-import { prepare } from '../commons';
 import * as constants from '../constants';
 import { HowLongToBeatGame, HowLongToBeatGameItem } from '../database/entity/howLongToBeatGame';
 import { command, default_permission } from '../decorators';
 import { onStreamStart } from '../decorators/on';
 import Expects from '../expects';
+import { prepare } from '../helpers/commons';
 import { debug, error, info, warning } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';

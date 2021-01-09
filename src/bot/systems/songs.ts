@@ -7,14 +7,15 @@ import ytdl from 'ytdl-core';
 import ytpl from 'ytpl';
 import ytsr from 'ytsr';
 
-import { announce, getBot, getBotSender, prepare, timeout } from '../commons';
 import { SongBan, SongPlaylist, SongPlaylistInterface, SongRequest } from '../database/entity/song';
 import { command, default_permission, persistent, settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import { isModerator } from '../helpers/isModerator';
+import { announce, getBot, getBotSender, prepare } from '../helpers/commons';
 import { error, info } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
+import { timeout } from '../helpers/tmi';
+import { isModerator } from '../helpers/user/isModerator';
 import { translate } from '../translate';
 import System from './_interface';
 

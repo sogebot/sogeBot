@@ -4,8 +4,8 @@ import * as _ from 'lodash';
 import { Brackets, getRepository } from 'typeorm';
 
 import { EventList as EventListEntity } from '../database/entity/eventList';
-import { isBot } from '../helpers/isBot';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
+import { isBot } from '../helpers/user/isBot';
 import users from '../users';
 import eventlist from '../widgets/eventlist';
 import Overlay from './_interface';

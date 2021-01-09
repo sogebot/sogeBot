@@ -4,10 +4,11 @@ import { getManager, getRepository } from 'typeorm';
 import { v4 as uuid} from 'uuid';
 import XRegExp from 'xregexp';
 
-import { parserReply, prepare } from '../commons';
+import { parserReply } from '../commons';
 import * as constants from '../constants';
 import { CacheEmotes, CacheEmotesInterface } from '../database/entity/cacheEmotes';
 import { parser, settings, ui } from '../decorators';
+import { prepare } from '../helpers/commons';
 import { error, info, warning } from '../helpers/log';
 import { ioServer } from '../helpers/panel';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';

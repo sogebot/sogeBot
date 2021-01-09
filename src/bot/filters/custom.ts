@@ -1,6 +1,7 @@
 import {get } from 'lodash';
 
-import { parserReply, prepare } from '../commons';
+import { parserReply } from '../commons';
+import { prepare } from '../helpers/commons';
 import { getValueOf, setValueOf } from '../helpers/customvariables';
 
 import type { ResponseFilter } from '.';

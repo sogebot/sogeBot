@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-import { sendMessage } from '../commons';
-import { getIgnoreList } from '../helpers/isIgnored';
+import { sendMessage } from '../helpers/commons/sendMessage';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
+import { getIgnoreList } from '../helpers/user/isIgnored';
 import OAuth from '../oauth';
 import Widget from './_interface';
 

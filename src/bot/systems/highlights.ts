@@ -4,9 +4,9 @@ import { isNil } from 'lodash';
 import { getRepository } from 'typeorm';
 
 import api from '../api';
-import { getBotSender } from '../commons';
 import { Highlight, HighlightInterface } from '../database/entity/highlight';
 import { command, default_permission, settings, ui } from '../decorators';
+import { getBotSender } from '../helpers/commons';
 import { dayjs } from '../helpers/dayjs';
 import { timestampToObject } from '../helpers/getTime';
 import { error } from '../helpers/log';

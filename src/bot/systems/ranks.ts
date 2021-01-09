@@ -3,10 +3,10 @@
 import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { prepare } from '../commons';
 import { Rank, RankInterface } from '../database/entity/rank';
 import { User, UserInterface } from '../database/entity/user';
 import { command, default_permission } from '../decorators';
+import { prepare } from '../helpers/commons';
 import { dayjs } from '../helpers/dayjs';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { defaultPermissions } from '../helpers/permissions/';

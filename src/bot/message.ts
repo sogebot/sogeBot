@@ -4,11 +4,11 @@ import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
 import api from './api';
-import { getBotSender } from './commons';
 import { EventList } from './database/entity/eventList';
 import { User } from './database/entity/user';
 import { command, custom, evaluate, ifp, info, list, math, online, param, price, qs, random, ResponseFilter, stream, youtube } from './filters';
-import { isBotSubscriber } from './helpers/isBot';
+import { getBotSender } from './helpers/commons/getBotSender';
+import { isBotSubscriber } from './helpers/user/isBot';
 import lastfm from './integrations/lastfm';
 import spotify from './integrations/spotify';
 import songs from './systems/songs';

@@ -1,9 +1,9 @@
 import { getRepository } from 'typeorm';
 
-import { getBotSender, prepare } from '../commons';
 import { Queue as QueueEntity, QueueInterface } from '../database/entity/queue';
 import { User } from '../database/entity/user';
 import { command, default_permission, settings } from '../decorators';
+import { getBotSender, prepare } from '../helpers/commons';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import tmi from '../tmi';

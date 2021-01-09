@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { prepare } from '../commons';
 import { User } from '../database/entity/user';
 import { command, permission_settings, persistent, settings } from '../decorators';
+import { prepare } from '../helpers/commons';
 import { error } from '../helpers/log';
 import { getUserHighestPermission } from '../helpers/permissions/';
 import pointsSystem from '../systems/points';

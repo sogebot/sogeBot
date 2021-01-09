@@ -13,10 +13,10 @@ import { onChange, onLoad } from './decorators/on';
 import { setLocale } from './helpers/dayjs';
 import { setLang } from './helpers/locales';
 import { debug, error, warning } from './helpers/log';
-import { getMuteStatus } from './helpers/muteStatus';
 import { getOAuthStatus } from './helpers/OAuthStatus';
 import { defaultPermissions } from './helpers/permissions/';
 import { find, list } from './helpers/register';
+import { getMuteStatus } from './helpers/tmi/muteStatus';
 import { addUIWarn, socketsConnected } from './panel';
 import translateLib, { translate } from './translate';
 

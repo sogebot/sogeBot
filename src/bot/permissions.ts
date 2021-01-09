@@ -1,13 +1,11 @@
 import { getRepository } from 'typeorm';
 
 import Core from './_interface';
-import {
-  prepare,
-} from './commons';
 import { PermissionCommands, Permissions as PermissionsEntity, PermissionsInterface } from './database/entity/permissions';
 import { User } from './database/entity/user';
 import { command, default_permission } from './decorators';
 import Expects from './expects';
+import { prepare } from './helpers/commons';
 import { error } from './helpers/log';
 import { cleanViewersCache } from './helpers/permissions';
 import { check, defaultPermissions } from './helpers/permissions/';

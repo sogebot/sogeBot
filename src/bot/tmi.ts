@@ -6,26 +6,28 @@ import { getRepository } from 'typeorm';
 
 import Core from './_interface';
 import api from './api';
-import { getBotSender, getOwner, isOwner, prepare, sendMessage } from './commons';
 import * as constants from './constants';
 import type { EmitData } from './database/entity/alert';
 import { Price } from './database/entity/price';
 import { User, UserBitInterface } from './database/entity/user';
 import { settings, ui } from './decorators';
 import { command, default_permission } from './decorators';
-import { getFunctionList, onChange } from './decorators/on';
+import { getFunctionList, onChange, onLoad } from './decorators/on';
 import events from './events';
 import Expects from './expects';
+import { getBotSender, getOwner, prepare } from './helpers/commons';
+import { sendMessage } from './helpers/commons/sendMessage';
 import { dayjs } from './helpers/dayjs';
 import { getLocalizedName } from './helpers/getLocalized';
 import { triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub } from './helpers/interface/triggers';
-import { isBot } from './helpers/isBot';
-import { isIgnored } from './helpers/isIgnored';
 import { isDebugEnabled } from './helpers/log';
 import { chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning, whisperIn } from './helpers/log';
-import { setMuteStatus } from './helpers/muteStatus';
 import { avgResponse, linesParsedIncrement, setStatus } from './helpers/parser';
 import { defaultPermissions } from './helpers/permissions/';
+import { setGlobalIgnoreListExclude, setIgnoreList, setMuteStatus, setSendWithMe } from './helpers/tmi/';
+import { isOwner } from './helpers/user';
+import { isBot } from './helpers/user/isBot';
+import { isIgnored } from './helpers/user/isIgnored';
 import oauth from './oauth';
 import eventlist from './overlays/eventlist';
 import Parser from './parser';
@@ -76,7 +78,26 @@ class TMI extends Core {
 
   ignoreGiftsFromUser: { [x: string]: { count: number; time: Date }} = {};
 
+  @onChange('sendWithMe')
+  @onLoad('sendWithMe')
+  setSendWithMe() {
+    setSendWithMe(this.sendWithMe);
+  }
+
+  @onChange('ignoreList')
+  @onLoad('ignoreList')
+  setIgnoreList() {
+    setIgnoreList(this.ignorelist);
+  }
+
+  @onChange('globalIgnoreListExclude')
+  @onLoad('globalIgnoreListExclude')
+  setGlobalIgnoreListExclude() {
+    setGlobalIgnoreListExclude(this.globalIgnoreListExclude);
+  }
+
   @onChange('mute')
+  @onLoad('mute')
   setMuteStatus() {
     setMuteStatus(this.mute);
   }

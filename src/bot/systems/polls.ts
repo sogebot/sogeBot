@@ -2,12 +2,13 @@ import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
 import api from '../api';
-import { announce, getOwnerAsSender, parserReply, prepare } from '../commons.js';
+import { parserReply } from '../commons';
 import currency from '../currency';
 import { Poll, PollVote } from '../database/entity/poll';
 import { command, default_permission, helper, parser, settings } from '../decorators';
 import { onBit, onMessage, onTip } from '../decorators/on';
 import Expects from '../expects.js';
+import { announce, getOwnerAsSender, prepare } from '../helpers/commons';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { warning } from '../helpers/log.js';
 import { defaultPermissions } from '../helpers/permissions/';

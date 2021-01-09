@@ -4,10 +4,10 @@ import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
 
 import api from '../api';
-import { announce, getOwnerAsSender, prepare } from '../commons';
 import { Raffle, RaffleParticipant, RaffleParticipantInterface, RaffleParticipantMessageInterface } from '../database/entity/raffle';
 import { User } from '../database/entity/user';
 import { command, default_permission, parser, settings } from '../decorators';
+import { announce, getOwnerAsSender, prepare } from '../helpers/commons';
 import { isDbConnected } from '../helpers/database';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { debug, warning } from '../helpers/log';

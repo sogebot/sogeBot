@@ -11,15 +11,15 @@ import {
 } from 'typeorm';
 import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 
-import api from '../api';
 import { Settings } from '../database/entity/settings';
 import { ThreadEvent } from '../database/entity/threadEvent';
 import { User } from '../database/entity/user';
 import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
-import { isIgnored } from '../helpers/isIgnored';
 import { debug, warning } from '../helpers/log';
 import { TypeORMLogger } from '../helpers/logTypeorm';
 import { SQLVariableLimit } from '../helpers/sql';
+import { isIgnored } from '../helpers/user/isIgnored';
+import { fetchAccountAge } from './fetchAccountAge';
 import { getUsersFromTwitch } from './getUserFromTwitch';
 
 const isThreadingEnabled = process.env.THREAD !== '0';
@@ -132,7 +132,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: 
           await getRepository(User).save({...user, isOnline: true});
           if (user.createdAt === 0) {
             // run this after we save new user
-            await api.fetchAccountAge(user.userId);
+            await fetchAccountAge(user.userId);
           }
         } else {
           usersToFetch.push(username);

@@ -8,7 +8,7 @@ import { getRepository } from 'typeorm';
 
 import { User } from '../database/entity/user';
 import { UserInterface } from '../database/entity/user';
-import { isIgnored } from '../helpers/isIgnored';
+import { isIgnored } from '../helpers/user/isIgnored';
 import oauth from '../oauth';
 import tmi from '../tmi';
 import users from '../users';

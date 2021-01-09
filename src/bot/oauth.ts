@@ -6,6 +6,7 @@ import * as constants from './constants';
 import { areDecoratorsLoaded, persistent, settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
 import { error, info, warning } from './helpers/log';
+import { loadedTokensInc } from './helpers/oauth';
 import { setOAuthStatus } from './helpers/OAuthStatus';
 import { setStatus } from './helpers/parser';
 import { cleanViewersCache } from './helpers/permissions';
@@ -28,8 +29,6 @@ class OAuth extends Core {
   public botClientId = '';
   @persistent()
   public broadcasterClientId = '';
-
-  loadedTokens = 0;
 
   @settings('general')
   public generalChannel = '';
@@ -130,7 +129,7 @@ class OAuth extends Core {
   @onLoad('broadcasterAccessToken')
   @onLoad('botAccessToken')
   setBotAccessTokenLoaded() {
-    this.loadedTokens++;
+    loadedTokensInc();
   }
 
   @onChange('generalOwner')

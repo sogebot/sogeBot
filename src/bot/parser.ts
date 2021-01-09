@@ -3,13 +3,13 @@ import crypto from 'crypto';
 import _ from 'lodash';
 import {v4 as uuid} from 'uuid';
 
-import { getBotSender } from './commons';
 import * as constants from './constants';
 import currency from './currency';
 import events from './events';
 import general from './general';
 import { addToParserFindCache, cachedCommandsPermissions, parserFindCache } from './helpers/cache';
 import { incrementCountOfCommandUsage } from './helpers/commands/count';
+import { getBotSender } from './helpers/commons';
 import { debug, error, warning } from './helpers/log';
 import { addToViewersCache, getFromViewersCache } from './helpers/permissions';
 import { check } from './helpers/permissions/';

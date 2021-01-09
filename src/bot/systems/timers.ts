@@ -5,11 +5,11 @@ import { sortBy } from 'lodash';
 import { getRepository } from 'typeorm';
 
 import api from '../api';
-import { announce } from '../commons';
 import { MINUTE, SECOND } from '../constants';
 import { Timer, TimerResponse, TimerResponseInterface } from '../database/entity/timer';
 import { command, default_permission } from '../decorators';
 import Expects from '../expects';
+import { announce } from '../helpers/commons';
 import { isDbConnected } from '../helpers/database';
 import { linesParsed } from '../helpers/parser';
 import { defaultPermissions } from '../helpers/permissions/';

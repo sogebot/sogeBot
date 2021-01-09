@@ -1,16 +1,16 @@
 import _ from 'lodash';
 import { getRepository, LessThan } from 'typeorm';
 
-import { isFollower, isOwner, isSubscriber, isVIP } from '../../commons';
 import { Permissions, PermissionsInterface } from '../../database/entity/permissions';
 import { User } from '../../database/entity/user';
 import { areDecoratorsLoaded } from '../../decorators';
 import oauth from '../../oauth';
 import { getBroadcaster } from '../getBroadcaster';
-import { isBot } from '../isBot';
-import { isBroadcaster } from '../isBroadcaster';
-import { isModerator } from '../isModerator';
 import { debug, error, warning } from '../log';
+import { isFollower, isOwner, isSubscriber, isVIP } from '../user';
+import { isBot } from '../user/isBot';
+import { isBroadcaster } from '../user/isBroadcaster';
+import { isModerator } from '../user/isModerator';
 import { defaultPermissions } from './defaultPermissions';
 import { filters } from './filters';
 

@@ -4,8 +4,8 @@ import { isNil } from 'lodash';
 import { getRepository, IsNull } from 'typeorm';
 
 import Core from './_interface';
-import { announce, getBot, prepare } from './commons';
 import { Variable, VariableHistory, VariableInterface, VariableURL, VariableWatch } from './database/entity/variable';
+import { announce, getBot, prepare } from './helpers/commons';
 import { getValueOf, runScript, setValueOf, updateWidgetAndTitle } from './helpers/customvariables';
 import { isDbConnected } from './helpers/database';
 import { adminEndpoint } from './helpers/socket';

@@ -7,13 +7,13 @@ import _ from 'lodash';
 import Client from 'twitter';
 import { getRepository } from 'typeorm';
 
-import { getOwner } from '../commons';
 import { Event } from '../database/entity/event';
 import { WidgetSocial } from '../database/entity/widget';
 import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import events from '../events';
 import { attributesReplace } from '../helpers/attributesReplace';
+import { getOwner } from '../helpers/commons';
 import { error, info } from '../helpers/log';
 import Message from '../message';
 import Integration from './_interface';
