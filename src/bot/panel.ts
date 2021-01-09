@@ -17,7 +17,7 @@ import { Translation } from './database/entity/translation';
 import { TwitchTag, TwitchTagInterface } from './database/entity/twitch';
 import { User } from './database/entity/user';
 import general from './general';
-import { chatMessagesAtStart, isStreamOnline, stats, streamStatusChangeSince } from './helpers/api';
+import { chatMessagesAtStart, isStreamOnline, rawStatus, stats, streamStatusChangeSince } from './helpers/api';
 import { getOwnerAsSender } from './helpers/commons';
 import { getValueOf, isVariableSet } from './helpers/customvariables';
 import { getIsBotStarted } from './helpers/database';
@@ -629,7 +629,7 @@ const sendStreamData = async () => {
       newChatters: stats.newChatters,
       game: stats.currentGame,
       status: stats.currentTitle,
-      rawStatus: api.rawStatus,
+      rawStatus: rawStatus.value,
       currentSong: lastfm.currentSong || ytCurrentSong || spotifyCurrentSong || translate('songs.not-playing'),
       currentHosts: stats.currentHosts,
       currentWatched: stats.currentWatchedTime,

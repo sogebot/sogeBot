@@ -3,9 +3,8 @@ import { error } from 'console';
 import axios from 'axios';
 import { defaults, isNil } from 'lodash';
 
-import api from '../api';
-import events from '../events';
-import { calls, setRateLimit, stats } from '../helpers/api';
+import { calls, gameCache, gameOrTitleChangedManually, parseTitle, rawStatus, retries, setRateLimit, stats } from '../helpers/api';
+import { eventEmitter } from '../helpers/events/emitter';
 import { warning } from '../helpers/log';
 import { ioServer } from '../helpers/panel';
 import { addUIError } from '../helpers/panel/';
@@ -43,15 +42,15 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | 
   let requestData = '';
   try {
     if (!isNil(args.title)) {
-      api.rawStatus = args.title; // save raw status to cache, if changing title
+      rawStatus.value = args.title; // save raw status to cache, if changing title
     }
-    title = await api.parseTitle(api.rawStatus);
+    title = await parseTitle(rawStatus.value);
 
     if (!isNil(args.game)) {
       game = args.game;
-      api.gameCache = args.game; // save game to cache, if changing gae
+      gameCache.value = args.game; // save game to cache, if changing gae
     } else {
-      game = api.gameCache;
+      game = gameCache.value;
     } // we are not setting game -> load last game
 
     requestData = JSON.stringify({
@@ -112,7 +111,7 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | 
       responses.response = translate('game.change.success').replace(/\$game/g, args.game);
       responses.status = true;
       if (stats.currentGame !== args.game) {
-        events.fire('game-changed', { oldGame: stats.currentGame, game: args.game });
+        eventEmitter.emit('game-changed', { oldGame: stats.currentGame ?? 'n/a', game: args.game });
       }
       stats.currentGame = args.game;
     }
@@ -122,8 +121,8 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | 
       responses.status = true;
       stats.currentTitle = args.title;
     }
-    api.gameOrTitleChangedManually = true;
-    api.retries.getCurrentStreamData = 0;
+    gameOrTitleChangedManually.value = true;
+    retries.getCurrentStreamData = 0;
     return responses;
   }
   return { response: '', status: false };

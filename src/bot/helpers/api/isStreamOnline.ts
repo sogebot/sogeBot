@@ -21,7 +21,6 @@ async function load() {
         namespace: '/core/api', name: 'isStreamOnline',
       })).value
     );
-    console.log('loaded isStreamOnline from db');
   } catch (e) {
     // ignore if nothing was found
   }

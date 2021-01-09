@@ -11,14 +11,12 @@ import * as constants from './constants';
 import { ThreadEvent } from './database/entity/threadEvent';
 import { TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from './database/entity/twitch';
 import { User, UserInterface } from './database/entity/user';
-import { persistent } from './decorators';
 import { getFunctionList, onStartup } from './decorators/on';
 import events from './events';
-import { stats as apiStats, calls, chatMessagesAtStart, emptyRateLimit, isStreamOnline, setChatMessagesAtStart, setIsStreamOnline, setRateLimit, setStats, setStreamStatusChangeSince, streamStatusChangeSince } from './helpers/api';
-import { curRetries, maxRetries, setCurrentRetries } from './helpers/api/retries';
+import { stats as apiStats, calls, chatMessagesAtStart, emptyRateLimit, gameCache, gameOrTitleChangedManually, isStreamOnline, parseTitle, rawStatus, setChatMessagesAtStart, setIsStreamOnline, setRateLimit, setStats, setStreamStatusChangeSince, streamStatusChangeSince } from './helpers/api';
+import { curRetries, maxRetries, retries, setCurrentRetries } from './helpers/api/retries';
 import { setStreamId, streamId } from './helpers/api/streamId';
 import { setStreamType, streamType } from './helpers/api/streamType';
-import { getValueOf, isVariableSet } from './helpers/customvariables';
 import { isDbConnected } from './helpers/database';
 import { dayjs } from './helpers/dayjs';
 import { getBroadcaster } from './helpers/getBroadcaster';
@@ -42,7 +40,6 @@ import oauth from './oauth';
 import eventlist from './overlays/eventlist';
 import alerts from './registries/alerts';
 import stats from './stats';
-import { translate } from './translate';
 import twitch from './twitch';
 import webhooks from './webhooks';
 import joinpart from './widgets/joinpart';
@@ -147,19 +144,6 @@ const processFollowerState = async (users: { from_name: string; from_id: number;
 };
 
 class API extends Core {
-  @persistent()
-  rawStatus = '';
-
-  @persistent()
-  gameCache = '';
-  gameOrTitleChangedManually = false;
-
-  retries = {
-    getCurrentStreamData: 0,
-    getChannelInformation: 0,
-    getChannelSubscribers: 0,
-  };
-
   constructor () {
     super();
     this.addMenu({ category: 'stats', name: 'api', id: 'stats/api', this: null });
@@ -682,7 +666,7 @@ class API extends Core {
 
     // getChannelInformation only if stream is offline - we are using getCurrentStreamData for online stream title/game
     if (isStreamOnline) {
-      this.retries.getChannelInformation = 0;
+      retries.getChannelInformation = 0;
       return { state: true, opts };
     }
 
@@ -706,36 +690,36 @@ class API extends Core {
 
       ioServer?.emit('api.stats', { method: 'GET', data: request.data.data, timestamp: Date.now(), call: 'getChannelInformation', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
 
-      if (!this.gameOrTitleChangedManually) {
+      if (!gameOrTitleChangedManually.value) {
         // Just polling update
-        let rawStatus = this.rawStatus;
-        const title = await this.parseTitle(null);
+        let _rawStatus = rawStatus.value;
+        const title = await parseTitle(null);
 
-        if (request.data.data[0].title !== title && this.retries.getChannelInformation === -1) {
+        if (request.data.data[0].title !== title && retries.getChannelInformation === -1) {
           return { state: true, opts };
         } else if (request.data.data[0].title !== title && !opts.forceUpdate) {
           // check if title is same as updated title
           const numOfRetries = twitch.isTitleForced ? 1 : 15;
-          if (this.retries.getChannelInformation >= numOfRetries) {
-            this.retries.getChannelInformation = 0;
+          if (retries.getChannelInformation >= numOfRetries) {
+            retries.getChannelInformation = 0;
 
             // if we want title to be forced
             if (twitch.isTitleForced) {
-              const game = this.gameCache;
-              info(`Title/game force enabled => ${game} | ${rawStatus}`);
+              const game = gameCache.value;
+              info(`Title/game force enabled => ${game} | ${_rawStatus}`);
               setTitleAndGame({});
               return { state: true, opts };
             } else {
               info(`Title/game changed outside of a bot => ${request.data.data[0].game_name} | ${request.data.data[0].title}`);
-              this.retries.getChannelInformation = -1;
-              rawStatus = request.data.data[0].title;
+              retries.getChannelInformation = -1;
+              _rawStatus = request.data.data[0].title;
             }
           } else {
-            this.retries.getChannelInformation++;
+            retries.getChannelInformation++;
             return { state: false, opts };
           }
         } else {
-          this.retries.getChannelInformation = 0;
+          retries.getChannelInformation = 0;
         }
 
         setStats({
@@ -744,10 +728,10 @@ class API extends Core {
           currentGame: request.data.data[0].game_name,
           currentTitle: request.data.data[0].title,
         });
-        this.gameCache = request.data.data[0].game_name;
-        this.rawStatus = rawStatus;
+        gameCache.value = request.data.data[0].game_name;
+        rawStatus.value = _rawStatus;
       } else {
-        this.gameOrTitleChangedManually = false;
+        gameOrTitleChangedManually.value = false;
       }
     } catch (e) {
       error(`${url} - ${e.message}`);
@@ -755,7 +739,7 @@ class API extends Core {
       return { state: false, opts };
     }
 
-    this.retries.getChannelInformation = 0;
+    retries.getChannelInformation = 0;
     return { state: true, opts };
   }
 
@@ -1095,9 +1079,9 @@ class API extends Core {
           events.fire('every-x-minutes-of-stream', {});
         }
 
-        if (!this.gameOrTitleChangedManually) {
-          let rawStatus = this.rawStatus;
-          const status = await this.parseTitle(null);
+        if (!gameOrTitleChangedManually.value) {
+          let _rawStatus = rawStatus.value;
+          const status = await parseTitle(null);
           const game = await getGameNameFromId(Number(stream.game_id));
 
           setStats({
@@ -1108,19 +1092,19 @@ class API extends Core {
 
           if (stream.title !== status) {
             // check if status is same as updated status
-            if (this.retries.getCurrentStreamData >= 12) {
-              this.retries.getCurrentStreamData = 0;
-              rawStatus = stream.title;
-              this.rawStatus = rawStatus;
+            if (retries.getCurrentStreamData >= 12) {
+              retries.getCurrentStreamData = 0;
+              _rawStatus = stream.title;
+              rawStatus.value = _rawStatus;
             } else {
-              this.retries.getCurrentStreamData++;
+              retries.getCurrentStreamData++;
               return { state: false, opts };
             }
           } else {
-            this.retries.getCurrentStreamData = 0;
+            retries.getCurrentStreamData = 0;
           }
-          this.gameCache = game;
-          this.rawStatus = rawStatus;
+          gameCache.value = game;
+          rawStatus.value = _rawStatus;
         }
       } else {
         if (isStreamOnline && curRetries < maxRetries) {
@@ -1193,28 +1177,6 @@ class API extends Core {
       currentHosts: apiStats.currentHosts,
       currentWatched: apiStats.currentWatchedTime,
     });
-  }
-
-  async parseTitle (title: string | null) {
-    if (isNil(title)) {
-      title = this.rawStatus;
-    }
-
-    const regexp = new RegExp('\\$_[a-zA-Z0-9_]+', 'g');
-    const match = title.match(regexp);
-
-    if (!isNil(match)) {
-      for (const variable of match) {
-        let value;
-        if (await isVariableSet(variable)) {
-          value = await getValueOf(variable);
-        } else {
-          value = translate('webpanel.not-available');
-        }
-        title = title.replace(new RegExp(`\\${variable}`, 'g'), value);
-      }
-    }
-    return title;
   }
 
   async setTags (tagsArg: string[]) {

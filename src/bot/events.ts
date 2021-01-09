@@ -13,13 +13,14 @@ import { Event, EventInterface } from './database/entity/event';
 import { User } from './database/entity/user';
 import { onStreamEnd } from './decorators/on';
 import events from './events';
-import { calls, isStreamOnline, setRateLimit, stats, streamStatusChangeSince } from './helpers/api';
+import { calls, isStreamOnline, rawStatus, setRateLimit, stats, streamStatusChangeSince } from './helpers/api';
 import { sample } from './helpers/array/sample';
 import { attributesReplace } from './helpers/attributesReplace';
 import { announce, getBotSender, getOwner, prepare } from './helpers/commons';
 import { getAll, getValueOf, setValueOf } from './helpers/customvariables';
 import { isDbConnected } from './helpers/database';
 import { dayjs } from './helpers/dayjs';
+import { eventEmitter } from './helpers/events/emitter';
 import { flatten } from './helpers/flatten';
 import { generateUsername } from './helpers/generateUsername';
 import { getLocalizedName } from './helpers/getLocalized';
@@ -111,6 +112,14 @@ class Events extends Core {
 
     this.addMenu({ category: 'manage', name: 'event-listeners', id: 'manage/events/list', this: null });
     this.fadeOut();
+
+    // emitter .on listeners
+    eventEmitter.on('game-changed', (opts: {oldGame: string, game: string} ) => {
+      events.fire('game-changed', { ...opts });
+    });
+    eventEmitter.on('commercial', (opts: {duration: number}) => {
+      events.fire('commercial', { ...opts });
+    });
   }
 
   @onStreamEnd()
@@ -278,7 +287,7 @@ class Events extends Core {
       setRateLimit('broadcaster', request.headers);
 
       ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: calls.broadcaster });
-      events.fire('commercial', { duration: Number(operation.durationOfCommercial) });
+      eventEmitter.emit('commercial', { duration: Number(operation.durationOfCommercial) });
     } catch (e) {
       if (e.isAxiosError) {
         error(`API: ${url} - ${e.response.data.message}`);
@@ -400,7 +409,7 @@ class Events extends Core {
     }
 
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
-    const title = api.rawStatus;
+    const title = rawStatus.value;
     if (title.match(regexp)) {
       setTitleAndGame({});
     }
@@ -424,7 +433,7 @@ class Events extends Core {
       custom_variables.socket.emit('refresh');
     }
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
-    const title = api.rawStatus;
+    const title = rawStatus.value;
     if (title.match(regexp)) {
       setTitleAndGame({});
     }

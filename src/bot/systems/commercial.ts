@@ -4,9 +4,9 @@ import axios from 'axios';
 import * as _ from 'lodash';
 
 import { command, default_permission, helper } from '../decorators';
-import events from '../events';
 import { calls, setRateLimit } from '../helpers/api';
 import { getOwner } from '../helpers/commons';
+import { eventEmitter } from '../helpers/events';
 import { error, warning } from '../helpers/log';
 import { ioServer } from '../helpers/panel';
 import { addUIError } from '../helpers/panel/alerts';
@@ -91,7 +91,7 @@ class Commercial extends System {
         setRateLimit('broadcaster', request.headers);
 
         ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: calls.broadcaster });
-        events.fire('commercial', { duration: commercial.duration });
+        eventEmitter.emit('commercial', { duration: commercial.duration });
         if (!_.isNil(commercial.message)) {
           return [{ response: commercial.message, ...opts }];
         }
