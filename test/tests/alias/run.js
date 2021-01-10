@@ -2,7 +2,7 @@
 
 
 const assert = require('assert');
-const { prepare } = (require('../../../dest/commons'));
+const { prepare } = (require('../../../dest/helpers/commons/prepare'));
 require('../../general.js');
 
 const db = require('../../general.js').db;

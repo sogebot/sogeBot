@@ -76,7 +76,7 @@ module.exports = {
     }, waitMs);
   },
   isWarned: async function (entry, user, opts) {
-    const { prepare } = require('../../dest/commons');
+    const { prepare } = require('../../dest/helpers/commons/prepare');
     user = _.cloneDeep(user);
     opts = opts || {};
     await until(async setError => {
@@ -108,7 +108,7 @@ module.exports = {
     }, 5000);
   },
   isSent: util.deprecate(async function (entry, user, opts, wait) {
-    const { prepare } = require('../../dest/commons');
+    const { prepare } = require('../../dest/helpers/commons/prepare');
     if (typeof user === 'string') {
       user = {
         username: user,

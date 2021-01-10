@@ -5,7 +5,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const alias = (require('../../../dest/systems/alias')).default;
 const assert = require('assert');
-const { prepare } = (require('../../../dest/commons'));
+const { prepare } = (require('../../../dest/helpers/commons/prepare'));
 
 // users
 const owner = { username: '__broadcaster__' };
