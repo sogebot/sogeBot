@@ -11,7 +11,7 @@ const assert = require('assert');
 
 const oauth = (require('../../../dest/oauth')).default;
 const api = (require('../../../dest/api')).default;
-const eventEmitter = (require('../../dest/helpers/events/eventEmitter')).eventEmitter;
+const {eventEmitter} = (require('../../../dest/helpers/events/emitter'));
 
 describe('API - getLatest100Followers()', () => {
   before(async () => {

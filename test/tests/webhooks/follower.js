@@ -17,7 +17,7 @@ const testuser = { username: 'testuser', userId: id };
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
-const eventEmitter = (require('../../dest/helpers/events/eventEmitter')).eventEmitter;
+const {eventEmitter} = (require('../../../dest/helpers/events/emitter'));
 const webhooks = (require('../../../dest/webhooks')).default;
 
 describe('libs/webhooks - follower()', () => {
