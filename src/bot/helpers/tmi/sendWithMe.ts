@@ -1,7 +1,12 @@
-let sendWithMe = false;
+let _value = false;
 
-function setSendWithMe (value: boolean) {
-  sendWithMe = value;
-}
+const sendWithMe = {
+  set value(value: typeof _value) {
+    _value = value;
+  },
+  get value() {
+    return _value;
+  },
+};
 
-export { sendWithMe, setSendWithMe };
+export { sendWithMe };

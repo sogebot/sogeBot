@@ -9,7 +9,7 @@ const variable = require('../../general.js').variable;
 
 const oauth = (require('../../../dest/oauth')).default;
 
-const { isOwner } = require('../../../dest/commons');
+const { isOwner } = require('../../../dest/helpers/user/isOwner');
 
 const assert = require('assert');
 

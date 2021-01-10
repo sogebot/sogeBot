@@ -17,7 +17,7 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
   attr = attr || {};
   sender = sender || null;
 
-  if (sendWithMe) {
+  if (sendWithMe.value) {
     // replace /me in message if we are already sending with /me
     messageToSend = messageToSend.replace(/^(\/me)/gi, '').trim();
   }

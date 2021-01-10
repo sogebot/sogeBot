@@ -26,7 +26,7 @@ import { chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunity
 import { generalChannel } from './helpers/oauth/generalChannel';
 import { avgResponse, linesParsedIncrement, setStatus } from './helpers/parser';
 import { defaultPermissions } from './helpers/permissions/';
-import { setGlobalIgnoreListExclude, setIgnoreList, setMuteStatus, setSendWithMe, setShowWithAt, tmiEmitter } from './helpers/tmi/';
+import { sendWithMe, setGlobalIgnoreListExclude, setIgnoreList, setMuteStatus, setShowWithAt, tmiEmitter } from './helpers/tmi/';
 import { isOwner } from './helpers/user';
 import { isBot } from './helpers/user/isBot';
 import { isIgnored } from './helpers/user/isIgnored';
@@ -105,7 +105,7 @@ class TMI extends Core {
   @onChange('sendWithMe')
   @onLoad('sendWithMe')
   setSendWithMe() {
-    setSendWithMe(this.sendWithMe);
+    sendWithMe.value = this.sendWithMe;
   }
 
   @onChange('ignoreList')

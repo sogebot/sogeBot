@@ -6,9 +6,11 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 const tmi = (require('../../../dest/tmi')).default;
+const check = (require('../../../dest/watchers')).check;
 const assert = require('assert');
 
-const { sendMessage, getOwnerAsSender } = require('../../../dest/commons');
+const { sendMessage } = require('../../../dest/helpers/commons/sendMessage');
+const { getOwnerAsSender } = require('../../../dest/helpers/commons/getOwnerAsSender');
 
 describe('lib/commons - sendMessage()', () => {
   describe('remove /me when in color mode', () => {
@@ -17,8 +19,9 @@ describe('lib/commons - sendMessage()', () => {
       await message.prepare();
     });
 
-    it('enable color-mode', () => {
+    it('enable color-mode', async () => {
       tmi.sendWithMe = true;
+      await check();
     });
 
     it('send message containing /me', () => {
@@ -36,8 +39,9 @@ describe('lib/commons - sendMessage()', () => {
       await message.prepare();
     });
 
-    it('enable normal-mode', () => {
+    it('enable normal-mode', async () => {
       tmi.sendWithMe = false;
+      await check();
     });
 
     it('send message containing /me', () => {
