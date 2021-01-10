@@ -4,7 +4,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 
-const api = (require('../../../dest/api')).default;
+const setIsStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).setIsStreamOnline;
 const alias = (require('../../../dest/systems/alias')).default;
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 const timers = (require('../../../dest/systems/timers')).default;
@@ -40,7 +40,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
     });
     for (let i = 0; i < 5; i++) {
       await time.waitMs(1000);
-      api.isStreamOnline = true;
+      setIsStreamOnline(true);
       await check();
       await timers.check();
     }

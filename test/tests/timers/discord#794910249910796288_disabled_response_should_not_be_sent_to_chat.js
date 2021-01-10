@@ -8,7 +8,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 const timers = (require('../../../dest/systems/timers')).default;
-const api = (require('../../../dest/api')).default;
+const setIsStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).setIsStreamOnline;
 
 const { getRepository } = require('typeorm');
 const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
@@ -34,10 +34,10 @@ describe('Timers - disabled response should not be sent to chat - https://discor
       ]
     });
 
-    api.isStreamOnline = true;
+    setIsStreamOnline(true);
   });
   after(async () => {
-    api.isStreamOnline = false;
+    setIsStreamOnline(false);
   });
 
   it('We should have response 1 in chat in a while', async () => {
@@ -74,10 +74,10 @@ describe('Timers - disabled responses should not be sent to chat - https://disco
       ]
     });
 
-    api.isStreamOnline = true;
+    setIsStreamOnline(true);
   });
   after(async () => {
-    api.isStreamOnline = false;
+    setIsStreamOnline(false);
   });
 
   it('Timer should be updated in DB => checked', async () => {
