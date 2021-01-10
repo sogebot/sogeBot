@@ -1,5 +1,5 @@
 /* global describe it before */
-const commons = require('../../../dest/commons');
+const getOwner = require('../../../dest/helpers/commons/getOwner');
 const currency = require('../../../dest/currency').default;
 
 
@@ -56,7 +56,7 @@ describe('Top - !top tips', () => {
   });
 
   it('run !top tips and expect correct output', async () => {
-    const r = await top.tips({ sender: { username: commons.getOwner() } });
+    const r = await top.tips({ sender: { username: getOwner() } });
     assert.strictEqual(r[0].response, 'Top 10 (tips): 1. @user9 - €45.00, 2. @user8 - €36.00, 3. @user7 - €28.00, 4. @user6 - €21.00, 5. @user5 - €15.00, 6. @user4 - €10.00, 7. @user3 - €6.00, 8. @user2 - €3.00, 9. @user1 - €1.00', owner);
   });
 
@@ -66,7 +66,7 @@ describe('Top - !top tips', () => {
   });
 
   it('run !top tips and expect correct output', async () => {
-    const r = await top.tips({ sender: { username: commons.getOwner() } });
+    const r = await top.tips({ sender: { username: getOwner() } });
     assert.strictEqual(r[0].response, 'Top 10 (tips): 1. @user9 - €45.00, 2. @user8 - €36.00, 3. @user7 - €28.00, 4. @user6 - €21.00, 5. @user5 - €15.00, 6. @user4 - €10.00, 7. @user3 - €6.00, 8. @user2 - €3.00', owner);
   });
 });

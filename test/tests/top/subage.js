@@ -1,5 +1,5 @@
 /* global describe it before */
-const commons = require('../../../dest/commons');
+const getOwner = require('../../../dest/helpers/commons/getOwner');
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
@@ -47,7 +47,7 @@ describe('Top - !top subage', () => {
   });
 
   it('run !top subage and expect correct output', async () => {
-    const r = await top.subage({ sender: { username: commons.getOwner() } });
+    const r = await top.subage({ sender: { username: getOwner() } });
     const dates = [];
     for (let i = 0; i < 10; i++) {
       dates.push(`${moment.utc(Date.now() - (constants.HOUR * i)).format('L')} (${moment.utc(Date.now() - (constants.HOUR * i)).fromNow()})`);
@@ -61,7 +61,7 @@ describe('Top - !top subage', () => {
   });
 
   it('run !top subage and expect correct output', async () => {
-    const r = await top.subage({ sender: { username: commons.getOwner() } });
+    const r = await top.subage({ sender: { username: getOwner() } });
     const dates = [];
     for (let i = 0; i < 10; i++) {
       dates.push(`${moment.utc(Date.now() - (constants.HOUR * i)).format('L')} (${moment.utc(Date.now() - (constants.HOUR * i)).fromNow()})`);

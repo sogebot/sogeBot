@@ -1,6 +1,5 @@
 /* global describe it before */
-const commons = require('../../../dest/commons');
-
+const getOwner = require('../../../dest/helpers/commons/getOwner');
 
 require('../../general.js');
 
@@ -35,7 +34,7 @@ describe('Top - !top submonths', () => {
   });
 
   it('run !top submonths and expect correct output', async () => {
-    const r = await top.submonths({ sender: { username: commons.getOwner() } });
+    const r = await top.submonths({ sender: { username: getOwner() } });
     assert.strictEqual(r[0].response, 'Top 10 (submonths): 1. @user9 - 900 months, 2. @user8 - 800 months, 3. @user7 - 700 months, 4. @user6 - 600 months, 5. @user5 - 500 months, 6. @user4 - 400 months, 7. @user3 - 300 months, 8. @user2 - 200 months, 9. @user1 - 100 months, 10. @user0 - 0 months', owner);
   });
 
@@ -45,7 +44,7 @@ describe('Top - !top submonths', () => {
   });
 
   it('run !top submonths and expect correct output', async () => {
-    const r = await top.submonths({ sender: { username: commons.getOwner() } });
+    const r = await top.submonths({ sender: { username: getOwner() } });
     assert.strictEqual(r[0].response, 'Top 10 (submonths): 1. @user9 - 900 months, 2. @user8 - 800 months, 3. @user7 - 700 months, 4. @user6 - 600 months, 5. @user5 - 500 months, 6. @user4 - 400 months, 7. @user3 - 300 months, 8. @user2 - 200 months, 9. @user1 - 100 months', owner);
   });
 });

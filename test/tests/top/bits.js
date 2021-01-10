@@ -1,6 +1,5 @@
 /* global describe it before */
-const commons = require('../../../dest/commons');
-
+const getOwner = require('../../../dest/helpers/commons/getOwner');
 
 require('../../general.js');
 
@@ -49,7 +48,7 @@ describe('Top - !top bits', () => {
   });
 
   it('run !top bits and expect correct output', async () => {
-    const r = await top.bits({ sender: { username: commons.getOwner() } });
+    const r = await top.bits({ sender: { username: getOwner() } });
     assert.strictEqual(r[0].response, 'Top 10 (bits): 1. @user9 - 45, 2. @user8 - 36, 3. @user7 - 28, 4. @user6 - 21, 5. @user5 - 15, 6. @user4 - 10, 7. @user3 - 6, 8. @user2 - 3, 9. @user1 - 1');
   });
 
@@ -59,7 +58,7 @@ describe('Top - !top bits', () => {
   });
 
   it('run !top bits and expect correct output', async () => {
-    const r = await top.bits({ sender: { username: commons.getOwner() } });
+    const r = await top.bits({ sender: { username: getOwner() } });
     assert.strictEqual(r[0].response, 'Top 10 (bits): 1. @user9 - 45, 2. @user8 - 36, 3. @user7 - 28, 4. @user6 - 21, 5. @user5 - 15, 6. @user4 - 10, 7. @user3 - 6, 8. @user2 - 3');
   });
 });
