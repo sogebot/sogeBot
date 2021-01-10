@@ -12,7 +12,7 @@ import { Price } from './database/entity/price';
 import { User, UserBitInterface } from './database/entity/user';
 import { settings, ui } from './decorators';
 import { command, default_permission } from './decorators';
-import { getFunctionList, onChange, onLoad } from './decorators/on';
+import { getFunctionList, onChange, onLoad, onStartup } from './decorators/on';
 import Expects from './expects';
 import { isStreamOnline, setStats, stats } from './helpers/api';
 import { getBotSender, getOwner, prepare } from './helpers/commons';
@@ -25,7 +25,7 @@ import { isDebugEnabled } from './helpers/log';
 import { chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning, whisperIn } from './helpers/log';
 import { avgResponse, linesParsedIncrement, setStatus } from './helpers/parser';
 import { defaultPermissions } from './helpers/permissions/';
-import { setGlobalIgnoreListExclude, setIgnoreList, setMuteStatus, setSendWithMe, setShowWithAt } from './helpers/tmi/';
+import { setGlobalIgnoreListExclude, setIgnoreList, setMuteStatus, setSendWithMe, setShowWithAt, tmiEmitter } from './helpers/tmi/';
 import { isOwner } from './helpers/user';
 import { isBot } from './helpers/user/isBot';
 import { isIgnored } from './helpers/user/isIgnored';
@@ -34,7 +34,6 @@ import eventlist from './overlays/eventlist';
 import { Parser } from './parser';
 import alerts from './registries/alerts';
 import customcommands from './systems/customcommands';
-import tmi from './tmi';
 import { translate } from './translate';
 import users from './users';
 import joinpart from './widgets/joinpart';
@@ -109,14 +108,24 @@ class TMI extends Core {
     setMuteStatus(this.mute);
   }
 
+  @onStartup()
+  emitters() {
+    tmiEmitter.on('reconnect', (type) => {
+      this.reconnect(type);
+    });
+    tmiEmitter.on('part', (type) => {
+      this.part(type);
+    });
+  }
+
   @command('!ignore add')
   @default_permission(defaultPermissions.CASTERS)
   async ignoreAdd (opts: Record<string, any>) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
-      tmi.ignorelist = [
+      this.ignorelist = [
         ...new Set([
-          ...tmi.ignorelist,
+          ...this.ignorelist,
           username,
         ]
         )];
@@ -133,7 +142,7 @@ class TMI extends Core {
   async ignoreRm (opts: Record<string, any>) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
-      tmi.ignorelist = tmi.ignorelist.filter(o => o !== username);
+      this.ignorelist = this.ignorelist.filter(o => o !== username);
       // update ignore list
       return [{ response: prepare('ignore.user.is.removed', { username }), ...opts}];
     } catch (e) {
@@ -304,7 +313,7 @@ class TMI extends Core {
 
         if (!isBot(message.tags.username) || !message.isSelf) {
           message.tags['message-type'] = 'whisper';
-          tmi.message({message});
+          this.message({message});
           linesParsedIncrement();
         }
       });
@@ -320,7 +329,7 @@ class TMI extends Core {
           } else {
             // strip message from ACTION
             message.message = message.message.replace('\u0001ACTION ', '').replace('\u0001', '');
-            tmi.message({message});
+            this.message({message});
             linesParsedIncrement();
             triggerInterfaceOnMessage({
               sender: message.tags,
@@ -829,7 +838,7 @@ class TMI extends Core {
 
     if (!skip
         && sender['message-type'] === 'whisper'
-        && (tmi.whisperListener || isOwner(sender))) {
+        && (this.whisperListener || isOwner(sender))) {
       whisperIn(`${message} [${sender.username}]`);
     } else if (!skip && !isBot(sender.username)) {
       chatIn(`${message} [${sender.username}]`);

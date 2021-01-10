@@ -14,6 +14,7 @@ import { debug, error, isDebugEnabled } from './helpers/log';
 import { recacheOnlineUsersPermission } from './helpers/permissions';
 import { defaultPermissions, getUserHighestPermission } from './helpers/permissions/';
 import { adminEndpoint, viewerEndpoint } from './helpers/socket';
+import { getIdFromTwitch } from './microservices/getIdFromTwitch';
 import oauth from './oauth';
 
 class Users extends Core {
@@ -170,7 +171,7 @@ class Users extends Core {
     const user = await getRepository(User).findOne({ where: { username }, select: ['userId'] });
     if (!user) {
       const savedUser = await getRepository(User).save({
-        userId: Number(await api.getIdFromTwitch(username)),
+        userId: Number(await getIdFromTwitch(username)),
         username,
       });
       return savedUser.userId;

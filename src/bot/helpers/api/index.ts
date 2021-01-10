@@ -1,6 +1,7 @@
 export * from './cache';
 export * from './calls';
 export * from './chatMessagesAtStart';
+export * from './emitter';
 export * from './gameOrTitleChangedManually';
 export * from './getToken';
 export * from './getClientId';

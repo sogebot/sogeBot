@@ -1,16 +1,17 @@
 import axios from 'axios';
 
 import Core from './_interface';
-import api from './api';
 import * as constants from './constants';
 import { areDecoratorsLoaded, persistent, settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
+import { apiEmitter } from './helpers/api/emitter';
 import { error, info, warning } from './helpers/log';
 import { loadedTokensInc } from './helpers/oauth';
 import { setOAuthStatus } from './helpers/OAuthStatus';
 import { setStatus } from './helpers/parser';
 import { cleanViewersCache } from './helpers/permissions';
-import tmi from './tmi';
+import { tmiEmitter } from './helpers/tmi';
+import { getIdFromTwitch } from './microservices/getIdFromTwitch';
 
 class OAuth extends Core {
   private toWait = 10;
@@ -151,14 +152,14 @@ class OAuth extends Core {
     let timeout = 1000;
 
     if (this.currentChannel !== this.generalChannel && this.generalChannel !== '') {
-      const cid = await api.getIdFromTwitch(this.generalChannel, true);
+      const cid = await getIdFromTwitch(this.generalChannel, true);
       if (typeof cid !== 'undefined' && cid !== null) {
         this.currentChannel = this.generalChannel;
         this.channelId = cid;
         info('Channel ID set to ' + cid);
-        tmi.reconnect('bot');
-        tmi.reconnect('broadcaster');
-        api.updateChannelViewsAndBroadcasterType();
+        tmiEmitter.emit('reconnect', 'bot');
+        tmiEmitter.emit('reconnect', 'broadcaster');
+        apiEmitter.emit('updateChannelViewsAndBroadcasterType');
         this.toWait = 10;
       } else {
         error(`Cannot get channel ID of ${this.generalChannel} - waiting ${this.toWait.toFixed()}s`);
@@ -193,7 +194,7 @@ class OAuth extends Core {
         if (value === '') {
           this.cache.broadcaster = 'force_reconnect';
           this.broadcasterUsername = '';
-          tmi.part('broadcaster');
+          tmiEmitter.emit('part', 'broadcaster');
         }
         break;
       case 'botAccessToken':
@@ -201,7 +202,7 @@ class OAuth extends Core {
         if (value === '') {
           this.cache.bot = 'force_reconnect';
           this.botUsername = '';
-          tmi.part('bot');
+          tmiEmitter.emit('part', 'bot');
         }
         break;
     }
@@ -283,7 +284,7 @@ class OAuth extends Core {
 
       const cache = this.cache[type];
       if (cache !== '' && cache !== request.data.login + request.data.scopes.join(',')) {
-        tmi.reconnect(type); // force TMI reconnect
+        tmiEmitter.emit('reconnect', type); // force TMI reconnect
         this.cache[type] = request.data.login + request.data.scopes.join(',');
       }
 

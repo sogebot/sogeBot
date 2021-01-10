@@ -36,6 +36,7 @@ import { getChannelChattersUnofficialAPI } from './microservices/getChannelChatt
 import { getCustomRewards } from './microservices/getCustomRewards';
 import { getGameNameFromId } from './microservices/getGameNameFromId';
 import { setTitleAndGame } from './microservices/setTitleAndGame';
+import { updateChannelViewsAndBroadcasterType } from './microservices/updateChannelViewsAndBroadcasterType';
 import oauth from './oauth';
 import eventlist from './overlays/eventlist';
 import alerts from './registries/alerts';
@@ -203,7 +204,12 @@ class API extends Core {
           const time2 = Date.now();
           try {
             const value = await Promise.race<Promise<any>>([
-              new Promise((resolve) => (this as any)[fnc](interval?.opts).then((data: any) => resolve(data))),
+              new Promise((resolve) => {
+                if (fnc === 'updateChannelViewsAndBroadcasterType') {
+                  return updateChannelViewsAndBroadcasterType();
+                }
+                return (this as any)[fnc](interval?.opts).then((data: any) => resolve(data));
+              }),
               new Promise((_resolve, reject) => setTimeout(() => reject(), 10 * constants.MINUTE)),
             ]);
             logAvgTime(`api.${fnc}()`, process.hrtime(time));
@@ -366,63 +372,6 @@ class API extends Core {
       ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
     }
     return null;
-  }
-
-  async getIdFromTwitch (username: string, isChannelId = false): Promise<string> {
-    const url = `https://api.twitch.tv/helix/users?login=${username}`;
-    let request;
-    /*
-      {
-        "data": [{
-          "id": "44322889",
-          "login": "dallas",
-          "display_name": "dallas",
-          "type": "staff",
-          "broadcaster_type": "",
-          "description": "Just a gamer playing games and chatting. :)",
-          "profile_image_url": "https://static-cdn.jtvnw.net/jtv_user_pictures/dallas-profile_image-1a2c906ee2c35f12-300x300.png",
-          "offline_image_url": "https://static-cdn.jtvnw.net/jtv_user_pictures/dallas-channel_offline_image-1a2c906ee2c35f12-1920x1080.png",
-          "view_count": 191836881,
-          "email": "login@provider.com"
-        }]
-      }
-    */
-
-    const token = oauth.botAccessToken;
-    const needToWait = token === '';
-    const notEnoughAPICalls = calls.bot.remaining <= 30 && calls.bot.refresh > Date.now() / 1000;
-    if ((needToWait || notEnoughAPICalls) && !isChannelId) {
-      throw new Error('API calls not available.');
-    }
-
-    try {
-      request = await axios.get(url, {
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
-        },
-        timeout: 20000,
-      });
-
-      // save remaining api calls
-      calls.bot.limit = request.headers['ratelimit-limit'];
-      setRateLimit('bot', request.headers);
-      calls.bot.remaining = request.headers['ratelimit-remaining'];
-      calls.bot.refresh = request.headers['ratelimit-reset'];
-
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
-
-      return String(request.data.data[0].id);
-    } catch (e) {
-      if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        emptyRateLimit('bot', e.response.headers);
-
-        ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
-      } else {
-        ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: 'n/a', data: e.stack, remaining: calls.bot });
-      }
-      throw new Error(`User ${username} not found on Twitch.`);
-    }
   }
 
   async getChannelChattersUnofficialAPI (opts: any) {
@@ -765,49 +714,6 @@ class API extends Core {
       return { state: e.response?.status === 500 };
     }
 
-    return { state: true };
-  }
-
-  async updateChannelViewsAndBroadcasterType () {
-    const cid = oauth.channelId;
-    const url = `https://api.twitch.tv/helix/users/?id=${cid}`;
-
-    const token = oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || token === '';
-    const notEnoughAPICalls = calls.bot.remaining <= 30 && calls.bot.refresh > Date.now() / 1000;
-    if (needToWait || notEnoughAPICalls) {
-      return { state: false };
-    }
-
-    let request;
-    try {
-      request = await axios.get(url, {
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
-        },
-      });
-      // save remaining api calls
-      setRateLimit('bot', request.headers);
-
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
-
-      if (request.data.data.length > 0) {
-        oauth.profileImageUrl = request.data.data[0].profile_image_url;
-        oauth.broadcasterType = request.data.data[0].broadcaster_type;
-        setStats({
-          ...apiStats,
-          currentViews: request.data.data[0].view_count,
-        });
-      }
-    } catch (e) {
-      if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        emptyRateLimit('bot', e.response.headers);
-      }
-
-      error(`${url} - ${e.message}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
-    }
     return { state: true };
   }
 

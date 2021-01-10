@@ -34,6 +34,7 @@ import { isBot, isBotSubscriber } from './helpers/user/isBot';
 import { isBroadcaster } from './helpers/user/isBroadcaster';
 import { isModerator } from './helpers/user/isModerator';
 import Message from './message';
+import { getIdFromTwitch } from './microservices/getIdFromTwitch';
 import { setTitleAndGame } from './microservices/setTitleAndGame';
 import oauth from './oauth';
 import clips from './overlays/clips';
@@ -172,7 +173,7 @@ class Events extends Core {
       if (!user) {
         try {
           await getRepository(User).save({
-            userId: Number(attributes.userId ? attributes.userId : await api.getIdFromTwitch(attributes.username)),
+            userId: Number(attributes.userId ? attributes.userId : await getIdFromTwitch(attributes.username)),
             username: attributes.username,
           });
           return this.fire(eventId, attributes);
@@ -199,7 +200,7 @@ class Events extends Core {
       const user = await getRepository(User).findOne({ username: attributes.recipient });
       if (!user) {
         await getRepository(User).save({
-          userId: Number(await api.getIdFromTwitch(attributes.recipient)),
+          userId: Number(await getIdFromTwitch(attributes.recipient)),
           username: attributes.recipient,
         });
         this.fire(eventId, attributes);
@@ -385,7 +386,7 @@ class Events extends Core {
     const userObj = await getRepository(User).findOne({ username });
     if (!userObj && !attributes.test) {
       await getRepository(User).save({
-        userId: Number(await api.getIdFromTwitch(username)),
+        userId: Number(await getIdFromTwitch(username)),
         username,
       });
       return this.fireSendChatMessageOrWhisper(operation, {...attributes, userId, username }, whisper);

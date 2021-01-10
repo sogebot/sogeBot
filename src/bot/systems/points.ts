@@ -4,7 +4,6 @@ import * as cronparser from 'cron-parser';
 import * as _ from 'lodash';
 import { FindConditions, getConnection, getRepository, LessThanOrEqual } from 'typeorm';
 
-import api from '../api';
 import { MINUTE } from '../constants';
 import { PointsChangelog } from '../database/entity/points';
 import { User, UserInterface } from '../database/entity/user';
@@ -20,6 +19,7 @@ import { getUserHighestPermission } from '../helpers/permissions/';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import { isBot } from '../helpers/user/isBot';
+import { getIdFromTwitch } from '../microservices/getIdFromTwitch';
 import oauth from '../oauth';
 import { translate } from '../translate';
 import users from '../users';
@@ -365,7 +365,7 @@ class Points extends System {
 
       if (!guser) {
         await getRepository(User).save({
-          userId: Number(await api.getIdFromTwitch(username)),
+          userId: Number(await getIdFromTwitch(username)),
           username, points: 0,
         });
         return this.give(opts);
@@ -470,7 +470,7 @@ class Points extends System {
       }
 
       if (!user) {
-        const userId = await api.getIdFromTwitch(username);
+        const userId = await getIdFromTwitch(username);
         if (userId) {
           await getRepository(User).save({
             userId: Number(userId),
@@ -610,7 +610,7 @@ class Points extends System {
 
       if (!user) {
         await getRepository(User).save({
-          userId: Number(await api.getIdFromTwitch(username)),
+          userId: Number(await getIdFromTwitch(username)),
           username,
         });
         return this.add(opts);
@@ -646,7 +646,7 @@ class Points extends System {
       const user = await getRepository(User).findOne({ username });
       if (!user) {
         await getRepository(User).save({
-          userId: Number(await api.getIdFromTwitch(username)),
+          userId: Number(await getIdFromTwitch(username)),
           username, points: 0,
         });
         return this.remove(opts);

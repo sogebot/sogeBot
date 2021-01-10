@@ -8,7 +8,6 @@ import { get } from 'lodash';
 import { getRepository, IsNull, LessThan, Not } from 'typeorm';
 import { v5 as uuidv5 } from 'uuid';
 
-import api from '../api';
 import { HOUR, MINUTE } from '../constants';
 import { DiscordLink } from '../database/entity/discord';
 import { Permissions as PermissionsEntity } from '../database/entity/permissions';
@@ -28,6 +27,7 @@ import { chatIn, chatOut, debug, error, info, warning, whisperOut } from '../hel
 import { check } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import { Message } from '../message';
+import { getIdFromTwitch } from '../microservices/getIdFromTwitch';
 import oauth from '../oauth';
 import Parser from '../parser';
 import permissions from '../permissions';
@@ -482,7 +482,7 @@ class Discord extends Integration {
       const userObj = await getRepository(User).findOne({ username });
       if (!userObj && !attributes.test) {
         await getRepository(User).save({
-          userId: Number(await api.getIdFromTwitch(username)),
+          userId: Number(await getIdFromTwitch(username)),
           username,
         });
         return self.fireSendDiscordMessage(operation, {...attributes, username });
