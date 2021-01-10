@@ -38,10 +38,10 @@ async function getGameIdFromName (name: string): Promise<number | null> {
     warning(`Couldn't find name of game for name ${name} - fallback to ${stats.currentGame}`);
     if (e.isAxiosError) {
       error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-      ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.bot });
+      ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: e.config.url, code: e.response.status, data: e.response.data, remaining: calls.bot });
     } else {
       error(e.stack);
-      ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
+      ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: e.config.url, code: 'n/a', data: e.stack, remaining: calls.bot });
     }
     return null;
   }
