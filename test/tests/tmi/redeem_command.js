@@ -1,5 +1,5 @@
 /* global describe it before */
-const commons = require('../../../dest/commons');
+const {getBotSender} = require('../../../dest/helpers/commons/getBotSender');
 
 
 require('../../general.js');
@@ -103,12 +103,12 @@ describe('TMI - redeem command', () => {
   });
 
   it(`Command was !test redeemed`, async () => {
-    await message.isSentRaw('Lorem Ipsum', commons.getBotSender());
+    await message.isSentRaw('Lorem Ipsum', getBotSender());
     await message.debug('tmi.cmdredeems', '!test');
   });
 
   it(`Command !test2 was redeemed but without alert`, async () => {
-    await message.isSentRaw('Ipsum Lorem', commons.getBotSender());
+    await message.isSentRaw('Ipsum Lorem', getBotSender());
     try {
       await message.debug('tmi.cmdredeems', '!test2');
       assert(false, 'This should not get here');

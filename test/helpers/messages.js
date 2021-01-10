@@ -11,7 +11,7 @@ const log = require('../../dest/helpers/log');
 
 module.exports = {
   prepare: function () {
-    const events = (require('../../dest/events')).default;
+    const eventEmitter = (require('../../dest/helpers/events/eventEmitter')).eventEmitter;
     const tmi = (require('../../dest/tmi')).default;
 
     log.debug('test', chalk.bgRed('*** Restoring all spies ***'));
@@ -19,7 +19,7 @@ module.exports = {
     if (eventSpy) {
       eventSpy.restore();
     }
-    eventSpy = sinon.spy(events, 'fire');
+    eventSpy = sinon.spy(eventEmitter, 'emit');
 
     tmi.client = {
       bot: {

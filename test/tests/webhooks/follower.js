@@ -17,7 +17,7 @@ const testuser = { username: 'testuser', userId: id };
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
-const events = (require('../../../dest/events')).default;
+const eventEmitter = (require('../../dest/helpers/events/eventEmitter')).eventEmitter;
 const webhooks = (require('../../../dest/webhooks')).default;
 
 describe('libs/webhooks - follower()', () => {
@@ -36,7 +36,7 @@ describe('libs/webhooks - follower()', () => {
   });
 
   it('follow event should not be called', async () => {
-    assert(!events.fire.called);
+    assert(!eventEmitter.emit.called);
   });
 
   it('testuser payload for follower() several times', async () => {
@@ -57,7 +57,7 @@ describe('libs/webhooks - follower()', () => {
   });
 
   it('follow event should be fired only once', async () => {
-    assert(events.fire.calledOnce);
+    assert(eventEmitter.emit.calledOnce);
   });
 
   it('testuser payload for follower() several times for incorrect channel id', async () => {
