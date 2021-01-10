@@ -3,11 +3,16 @@ import { getRepository } from 'typeorm';
 import { Settings } from '../../database/entity/settings';
 import { isDbConnected } from '../database';
 
-let streamStatusChangeSince = Date.now();
+let _value = Date.now();
 
-function setStreamStatusChangeSince(value: typeof streamStatusChangeSince) {
-  streamStatusChangeSince = value;
-}
+const streamStatusChangeSince = {
+  set value(value: typeof _value) {
+    _value = value;
+  },
+  get value() {
+    return _value;
+  },
+};
 
 async function load() {
   if (!isDbConnected) {
@@ -16,7 +21,7 @@ async function load() {
   }
 
   try {
-    streamStatusChangeSince = JSON.parse(
+    streamStatusChangeSince.value = JSON.parse(
       (await getRepository(Settings).findOneOrFail({
         namespace: '/core/api', name: 'streamStatusChangeSince',
       })).value
@@ -28,4 +33,4 @@ async function load() {
 
 load();
 
-export { streamStatusChangeSince, setStreamStatusChangeSince };
+export { streamStatusChangeSince };

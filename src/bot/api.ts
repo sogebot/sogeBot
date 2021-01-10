@@ -12,7 +12,7 @@ import { ThreadEvent } from './database/entity/threadEvent';
 import { TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from './database/entity/twitch';
 import { User, UserInterface } from './database/entity/user';
 import { getFunctionList, onStartup } from './decorators/on';
-import { stats as apiStats, calls, chatMessagesAtStart, currentStreamTags, emptyRateLimit, gameCache, gameOrTitleChangedManually, isStreamOnline, rawStatus, setChatMessagesAtStart, setRateLimit, setStats, setStreamStatusChangeSince, streamStatusChangeSince } from './helpers/api';
+import { stats as apiStats, calls, chatMessagesAtStart, currentStreamTags, emptyRateLimit, gameCache, gameOrTitleChangedManually, isStreamOnline, rawStatus, setChatMessagesAtStart, setRateLimit, setStats, streamStatusChangeSince } from './helpers/api';
 import { parseTitle } from './helpers/api/parseTitle';
 import { curRetries, maxRetries, retries, setCurrentRetries } from './helpers/api/retries';
 import { setStreamId, streamId } from './helpers/api/streamId';
@@ -924,8 +924,8 @@ class API extends Core {
         // correct status and we've got a data - stream online
         const stream = request.data.data[0];
 
-        if (dayjs(stream.started_at).valueOf() >=  dayjs(streamStatusChangeSince).valueOf()) {
-          setStreamStatusChangeSince((new Date(stream.started_at)).getTime());
+        if (dayjs(stream.started_at).valueOf() >=  dayjs(streamStatusChangeSince.value).valueOf()) {
+          streamStatusChangeSince.value = (new Date(stream.started_at)).getTime();
         }
         if (!isStreamOnline.value || streamType !== stream.type) {
           setChatMessagesAtStart(linesParsed);
@@ -946,7 +946,7 @@ class API extends Core {
               currentBits: 0,
               currentTips: 0,
             });
-            setStreamStatusChangeSince(new Date(stream.started_at).getTime());
+            streamStatusChangeSince.value =new Date(stream.started_at).getTime();
             setStreamId(stream.id);
             setStreamType(stream.type);
 
@@ -1016,7 +1016,7 @@ class API extends Core {
           if (isStreamOnline.value) {
             // online -> offline transition
             stop('');
-            setStreamStatusChangeSince(Date.now());
+            streamStatusChangeSince.value =Date.now();
             isStreamOnline.value = false;
             setCurrentRetries(0);
             eventEmitter.emit('stream-stopped');
@@ -1065,7 +1065,7 @@ class API extends Core {
 
     stats.save({
       timestamp: new Date().getTime(),
-      whenOnline: isStreamOnline.value ? streamStatusChangeSince : Date.now(),
+      whenOnline: isStreamOnline.value ? streamStatusChangeSince.value : Date.now(),
       currentViewers: apiStats.currentViewers,
       currentSubscribers: apiStats.currentSubscribers,
       currentFollowers: apiStats.currentFollowers,
@@ -1460,7 +1460,7 @@ class API extends Core {
       if (opts.period) {
         if (opts.period === 'stream') {
           url += '&' + querystring.stringify({
-            started_at: (new Date(streamStatusChangeSince)).toISOString(),
+            started_at: (new Date(streamStatusChangeSince.value)).toISOString(),
             ended_at: (new Date()).toISOString(),
           });
         } else {

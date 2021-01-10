@@ -5,7 +5,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 const alias = (require('../../../dest/systems/alias')).default;
-const api = (require('../../../dest/api')).default;
+const streamStatusChangeSince = (require('../../../dest/helpers/api/streamStatusChangeSince')).streamStatusChangeSince;
 const assert = require('assert');
 const { prepare } = (require('../../../dest/helpers/commons/prepare'));
 
@@ -24,7 +24,7 @@ describe('Alias - discord#707718945515503748 - alias should parse response', () 
   });
 
   it('alias should return correct offline message', async () => {
-    api.streamStatusChangeSince = Date.now();
+    streamStatusChangeSince.value = Date.now();
     await alias.run({ sender: user.viewer, message: '!test' });
     await message.debug('sendMessage.message', [
       'Stream is currently offline for 0s',

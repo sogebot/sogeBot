@@ -7,7 +7,7 @@ import { getRepository } from 'typeorm';
 import type { StreamEndpoint } from './api';
 import { User } from './database/entity/user';
 import { getFunctionList } from './decorators/on';
-import { chatMessagesAtStart, curRetries, isStreamOnline, setChatMessagesAtStart, setStats, setStreamStatusChangeSince, stats, streamId, streamStatusChangeSince } from './helpers/api';
+import { chatMessagesAtStart, curRetries, isStreamOnline, setChatMessagesAtStart, setStats, stats, streamId, streamStatusChangeSince } from './helpers/api';
 import { setCurrentRetries, setStreamId, setStreamType } from './helpers/api/';
 import { eventEmitter } from './helpers/events';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
@@ -344,7 +344,7 @@ class Webhooks {
       }
 
       // Always keep this updated
-      setStreamStatusChangeSince((new Date(stream.started_at)).getTime());
+      streamStatusChangeSince.value = (new Date(stream.started_at)).getTime();
       setStreamId(stream.id);
       setStreamType(stream.type);
       setStats({
