@@ -223,7 +223,6 @@ import { getSocket } from 'src/panel/helpers/socket';
 import type { RandomizerInterface, RandomizerItemInterface } from 'src/bot/database/entity/randomizer';
 import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
 import { v4 as uuid } from 'uuid';
-import { permission } from 'src/bot/helpers/permissions';
 import { getRandomColor, getContrastColor } from 'src/panel/helpers/color';
 import translate from 'src/panel/helpers/translate';
 

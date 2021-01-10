@@ -20,8 +20,8 @@ async function getGameIdFromName (name: string): Promise<number | null> {
   try {
     request = await axios.get(url, {
       headers: {
-        'Authorization': 'Bearer ' + getToken('bot'),
-        'Client-ID': getClientId('bot'),
+        'Authorization': 'Bearer ' + await getToken('bot'),
+        'Client-ID': await getClientId('bot'),
       },
       timeout: 20000,
     });

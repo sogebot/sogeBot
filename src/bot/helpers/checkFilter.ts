@@ -40,7 +40,7 @@ export const checkFilter = async (opts: CommandOptions | ParserOptions, filter: 
     owner: isOwner(opts.sender.username),
   };
 
-  const customVariables = getAll();
+  const customVariables = await getAll();
   const context = {
     $source: typeof opts.sender.discord === 'undefined' ? 'twitch' : 'discord',
     $sender: opts.sender.username,

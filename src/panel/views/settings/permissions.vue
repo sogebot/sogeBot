@@ -52,9 +52,8 @@
   library.add(faExclamationTriangle)
 
   import { PermissionsInterface } from 'src/bot/database/entity/permissions'
-  import { permission } from 'src/bot/helpers/permissions';
   import translate from 'src/panel/helpers/translate';
-import { defaultPermissions } from 'src/bot/helpers/permissions';
+  import { defaultPermissions } from 'src/bot/helpers/permissions';
 
   export default Vue.extend({
     components: {

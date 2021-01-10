@@ -605,7 +605,7 @@ class Events extends Core {
       return true;
     }
 
-    const customVariables = getAll();
+    const customVariables = await getAll();
     const toEval = `(function evaluation () { return ${event.filter} })()`;
     const context = {
       $username: _.get(attributes, 'username', null),
