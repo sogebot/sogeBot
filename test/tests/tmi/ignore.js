@@ -22,7 +22,7 @@ const nightbot = { username: 'nightbot', userId: 4 };
 const botwithchangedname = { username: 'asdsadas', userId: 24900234 };
 
 const { VariableWatcher } = require('../../../dest/watchers');
-const { isIgnored } = require('../../../dest/helpers/isIgnored');
+const { isIgnored } = require('../../../dest/helpers/user/isIgnored');
 
 describe('TMI - ignore', () => {
   before(async () => {

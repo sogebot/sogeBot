@@ -50,11 +50,11 @@ describe('Permissions - check()', () => {
     }
   });
 
-  for (let i = 0, keys = Object.keys(permission); i < keys.length; i++) {
+  for (let i = 0, keys = Object.keys(defaultPermissions); i < keys.length; i++) {
     describe(`Permission ${keys[i]}`, () => {
       for (let j = 0; j < users.length; j++) {
         const user = users[j];
-        const pHash = permission[keys[i]];
+        const pHash = defaultPermissions[keys[i]];
         if (i >= j || (keys[i] === 'VIEWERS' && user.username.includes('viewer'))) {
           // have access
           it(`+++ ${users[j].username} should have access to ${keys[i]}`, async () => {
@@ -77,7 +77,7 @@ describe('Permissions - check()', () => {
       await getRepository(Permissions).save({
         id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer__only',
-        order: Object.keys(permission).length + 1,
+        order: Object.keys(defaultPermissions).length + 1,
         isCorePermission: false,
         isWaterfallAllowed: false,
         automation: 'none',
@@ -110,7 +110,7 @@ describe('Permissions - check()', () => {
       await getRepository(Permissions).save({
         id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_points__only',
-        order: Object.keys(permission).length + 1,
+        order: Object.keys(defaultPermissions).length + 1,
         isCorePermission: false,
         isWaterfallAllowed: false,
         automation: 'viewers',
@@ -145,7 +145,7 @@ describe('Permissions - check()', () => {
       await getRepository(Permissions).save({
         id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_watched__only',
-        order: Object.keys(permission).length + 1,
+        order: Object.keys(defaultPermissions).length + 1,
         isCorePermission: false,
         isWaterfallAllowed: false,
         automation: 'viewers',
@@ -180,7 +180,7 @@ describe('Permissions - check()', () => {
       await getRepository(Permissions).save({
         id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_tips__only',
-        order: Object.keys(permission).length + 1,
+        order: Object.keys(defaultPermissions).length + 1,
         isCorePermission: false,
         isWaterfallAllowed: false,
         automation: 'viewers',
@@ -215,7 +215,7 @@ describe('Permissions - check()', () => {
       await getRepository(Permissions).save({
         id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_bits__only',
-        order: Object.keys(permission).length + 1,
+        order: Object.keys(defaultPermissions).length + 1,
         isCorePermission: false,
         isWaterfallAllowed: false,
         automation: 'viewers',
@@ -250,7 +250,7 @@ describe('Permissions - check()', () => {
       await getRepository(Permissions).save({
         id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_messages__only',
-        order: Object.keys(permission).length + 1,
+        order: Object.keys(defaultPermissions).length + 1,
         isCorePermission: false,
         isWaterfallAllowed: false,
         automation: 'viewers',
@@ -285,7 +285,7 @@ describe('Permissions - check()', () => {
       await getRepository(Permissions).save({
         id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_subtier__only',
-        order: Object.keys(permission).length + 1,
+        order: Object.keys(defaultPermissions).length + 1,
         isCorePermission: false,
         isWaterfallAllowed: false,
         automation: 'viewers',
@@ -320,7 +320,7 @@ describe('Permissions - check()', () => {
       await getRepository(Permissions).save({
         id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_subcumulativemonths__only',
-        order: Object.keys(permission).length + 1,
+        order: Object.keys(defaultPermissions).length + 1,
         isCorePermission: false,
         isWaterfallAllowed: false,
         automation: 'viewers',
@@ -355,7 +355,7 @@ describe('Permissions - check()', () => {
       await getRepository(Permissions).save({
         id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_substreakmonths__only',
-        order: Object.keys(permission).length + 1,
+        order: Object.keys(defaultPermissions).length + 1,
         isCorePermission: false,
         isWaterfallAllowed: false,
         automation: 'viewers',
@@ -390,7 +390,7 @@ describe('Permissions - check()', () => {
       await getRepository(Permissions).save({
         id: 'bbaac669-923f-4063-99e3-f9904b34dac3',
         name: '__viewer_customrank__only',
-        order: Object.keys(permission).length + 1,
+        order: Object.keys(defaultPermissions).length + 1,
         isCorePermission: false,
         isWaterfallAllowed: false,
         automation: 'viewers',
@@ -425,7 +425,7 @@ describe('Permissions - check()', () => {
       await getRepository(Permissions).save({
         id: 'bbaac999-923f-4063-99e3-f9904b34dac3',
         name: '__viewer_level5__only',
-        order: Object.keys(permission).length + 1,
+        order: Object.keys(defaultPermissions).length + 1,
         isCorePermission: false,
         isWaterfallAllowed: false,
         automation: 'viewers',
