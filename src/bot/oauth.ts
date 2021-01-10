@@ -7,6 +7,12 @@ import { onChange, onLoad } from './decorators/on';
 import { apiEmitter } from './helpers/api/emitter';
 import { error, info, warning } from './helpers/log';
 import { loadedTokensInc, setChannelId } from './helpers/oauth';
+import { setBotId } from './helpers/oauth/botId';
+import { setBotUsername } from './helpers/oauth/botUsername';
+import { setBroadcasterId } from './helpers/oauth/broadcasterId';
+import { setBroadcasterUsername } from './helpers/oauth/broadcasterUsername';
+import { setGeneralChannel } from './helpers/oauth/generalChannel';
+import { setGeneralOwners } from './helpers/oauth/generalOwners';
 import { setOAuthStatus } from './helpers/OAuthStatus';
 import { setStatus } from './helpers/parser';
 import { cleanViewersCache } from './helpers/permissions';
@@ -174,6 +180,42 @@ class OAuth extends Core {
   setOAuthStatus() {
     setOAuthStatus('bot', this.botUsername === '');
     setOAuthStatus('broadcaster', this.broadcasterUsername === '');
+  }
+
+  @onChange('generalChannel')
+  @onLoad('generalChannel')
+  setGeneralChannel() {
+    setGeneralChannel(this.generalChannel);
+  }
+
+  @onChange('generalOwners')
+  @onLoad('generalOwners')
+  setGeneralOwners() {
+    setGeneralOwners(this.generalOwners);
+  }
+
+  @onChange('botUsername')
+  @onLoad('botUsername')
+  setBotUsername() {
+    setBotUsername(this.botUsername);
+  }
+
+  @onChange('botId')
+  @onLoad('botId')
+  setBotId() {
+    setBotId(this.botId);
+  }
+
+  @onChange('broadcasterId')
+  @onLoad('broadcasterId')
+  setBroadcasterId() {
+    setBroadcasterId(this.broadcasterId);
+  }
+
+  @onChange('broadcasterUsername')
+  @onLoad('broadcasterUsername')
+  setBroadcasterUsername() {
+    setBroadcasterUsername(this.broadcasterUsername);
   }
 
   @onChange('broadcasterUsername')

@@ -1,12 +1,12 @@
-import oauth from '../../oauth';
+import { generalOwners } from '../oauth/generalOwners';
 
 export function getOwner() {
   try {
-    return oauth.generalOwners[0].trim();
+    return generalOwners[0].trim();
   } catch (e) {
     return '';
   }
 }
 export function getOwners() {
-  return oauth.generalOwners;
+  return generalOwners;
 }

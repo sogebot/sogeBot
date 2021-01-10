@@ -4,9 +4,9 @@ import _ from 'lodash';
 import { prepare } from './helpers/commons';
 import { sendMessage } from './helpers/commons/sendMessage';
 import { chatOut, warning } from './helpers/log';
+import { generalChannel } from './helpers/oauth/generalChannel';
 import Discord from './integrations/discord';
 import { Message } from './message';
-import oauth from './oauth';
 
 export async function parserReply(response: string | Promise<string>, opts: { sender: CommandOptions['sender']; attr?: CommandOptions['attr'] }, messageType: 'chat' | 'whisper' = 'chat') {
   const senderObject = {
@@ -49,7 +49,7 @@ export async function parserReply(response: string | Promise<string>, opts: { se
 
 export function getChannel() {
   try {
-    return oauth.generalChannel.toLowerCase().trim();
+    return generalChannel.toLowerCase().trim();
   } catch (e) {
     return '';
   }

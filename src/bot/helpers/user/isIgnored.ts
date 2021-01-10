@@ -1,5 +1,5 @@
 import { globalIgnoreList } from '../../data/globalIgnoreList';
-import { globalIgnoreListExclude, ignorelist } from '../tmi';
+import { globalIgnoreListExclude, ignorelist } from '../tmi/ignoreList';
 import { isBroadcaster } from './isBroadcaster';
 
 export function isIgnored(sender: { username: string | null; userId?: string | number }) {

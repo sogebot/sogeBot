@@ -23,6 +23,7 @@ import { getLocalizedName } from './helpers/getLocalized';
 import { triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub } from './helpers/interface/triggers';
 import { isDebugEnabled } from './helpers/log';
 import { chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning, whisperIn } from './helpers/log';
+import { generalChannel } from './helpers/oauth/generalChannel';
 import { avgResponse, linesParsedIncrement, setStatus } from './helpers/parser';
 import { defaultPermissions } from './helpers/permissions/';
 import { setGlobalIgnoreListExclude, setIgnoreList, setMuteStatus, setSendWithMe, setShowWithAt, tmiEmitter } from './helpers/tmi/';
@@ -168,7 +169,7 @@ class TMI extends Core {
     clearTimeout(this.timeouts[`initClient.${type}`]);
     const token = type === 'bot' ? oauth.botAccessToken : oauth.broadcasterAccessToken;
     const username = type === 'bot' ? oauth.botUsername : oauth.broadcasterUsername;
-    const channel = oauth.generalChannel;
+    const channel = generalChannel;
 
     try {
       if (token === '' || username === '' || channel === '') {
@@ -216,7 +217,7 @@ class TMI extends Core {
       }
       const token = type === 'bot' ? oauth.botAccessToken : oauth.broadcasterAccessToken;
       const username = type === 'bot' ? oauth.botUsername : oauth.broadcasterUsername;
-      const channel = oauth.generalChannel;
+      const channel = generalChannel;
 
       info(`TMI: ${type} is reconnecting`);
 

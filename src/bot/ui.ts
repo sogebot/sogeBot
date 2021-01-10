@@ -7,10 +7,11 @@ import general from './general';
 import { mainCurrency, symbol } from './helpers/currency';
 import { timezone } from './helpers/dayjs';
 import { getBroadcaster } from './helpers/getBroadcaster';
+import { generalChannel } from './helpers/oauth/generalChannel';
+import { generalOwners } from './helpers/oauth/generalOwners';
 import { find, list } from './helpers/register';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import { setDomain } from './helpers/ui';
-import oauth from './oauth';
 import { default as uiModule } from './ui';
 import webhooks from './webhooks';
 
@@ -78,8 +79,8 @@ class UI extends Core {
         // lang
         data.lang = general.lang;
 
-        data.isCastersSet = filter(oauth.generalOwners, (o) => isString(o) && o.trim().length > 0).length > 0 || getBroadcaster() !== '';
-        data.isChannelSet = filter(oauth.generalChannel, (o) => isString(o) && o.trim().length > 0).length > 0;
+        data.isCastersSet = filter(generalOwners, (o) => isString(o) && o.trim().length > 0).length > 0 || getBroadcaster() !== '';
+        data.isChannelSet = filter(generalChannel, (o) => isString(o) && o.trim().length > 0).length > 0;
 
         cb(null, data);
       } catch (e) {

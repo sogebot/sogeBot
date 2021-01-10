@@ -1,8 +1,8 @@
-import oauth from '../oauth';
+import { broadcasterUsername } from './oauth/broadcasterUsername';
 
 export function getBroadcaster() {
   try {
-    return oauth.broadcasterUsername.toLowerCase().trim();
+    return broadcasterUsername.toLowerCase().trim();
   } catch (e) {
     return '';
   }

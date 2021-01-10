@@ -1,9 +1,12 @@
 import currency from '../../currency';
 import { PermissionFiltersInterface } from '../../database/entity/permissions';
 import { UserInterface } from '../../database/entity/user';
-import levels from '../../systems/levels';
-import ranks from '../../systems/ranks';
+import type { default as levelType } from '../../systems/levels';
+import type { default as ranksType } from '../../systems/ranks';
 import { mainCurrency } from '../currency';
+
+let levels: typeof levelType;
+let ranks: typeof ranksType;
 
 async function _filters(
   user: Required<UserInterface>,
@@ -13,10 +16,16 @@ async function _filters(
     let amount = 0;
     switch (f.type) {
       case 'ranks':
+        if (!ranks) {
+          ranks = require('../../systems/ranks').default;
+        }
         const rank = await ranks.get(user);
         // we can return immediately
         return rank.current === f.value;
       case 'level':
+        if (!levels) {
+          levels = require('../../systems/levels').default;
+        }
         amount = levels.getLevelOf(user);
         break;
       case 'bits':

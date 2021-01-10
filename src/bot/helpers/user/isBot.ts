@@ -1,10 +1,11 @@
 import type { UserInterface } from '../../database/entity/user';
-import oauth from '../../oauth';
+import { botId } from '../oauth/botId';
+import { botUsername } from '../oauth/botUsername';
 
 export function isBot(user: string | CommandOptions['sender'] | UserInterface | UserStateTags) {
   try {
-    if (oauth.botUsername) {
-      return oauth.botUsername.toLowerCase().trim() === (typeof user === 'string' ? user : user.username).toLowerCase().trim();
+    if (botUsername) {
+      return botUsername.toLowerCase().trim() === (typeof user === 'string' ? user : user.username).toLowerCase().trim();
     } else {
       return false;
     }
@@ -15,8 +16,8 @@ export function isBot(user: string | CommandOptions['sender'] | UserInterface | 
 
 export function isBotId(userId: string) {
   try {
-    if (oauth.botUsername) {
-      return oauth.botId === userId;
+    if (botUsername) {
+      return botId === userId;
     } else {
       return false;
     }

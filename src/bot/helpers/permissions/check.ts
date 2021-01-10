@@ -4,9 +4,9 @@ import { getRepository, LessThan } from 'typeorm';
 import { Permissions, PermissionsInterface } from '../../database/entity/permissions';
 import { User } from '../../database/entity/user';
 import { areDecoratorsLoaded } from '../../decorators';
-import oauth from '../../oauth';
 import { getBroadcaster } from '../getBroadcaster';
 import { debug, error, warning } from '../log';
+import { generalOwners } from '../oauth/generalOwners';
 import { isFollower, isOwner, isSubscriber, isVIP } from '../user';
 import { isBot } from '../user/isBot';
 import { isBroadcaster } from '../user/isBroadcaster';
@@ -31,7 +31,7 @@ async function check(userId: number, permId: string, partial = false): Promise<{
     });
   }
 
-  if (oauth.generalOwners.filter(o => typeof o === 'string' && o.trim().length > 0).length === 0 && getBroadcaster() === '' && !isWarnedAboutCasters) {
+  if (generalOwners.filter(o => typeof o === 'string' && o.trim().length > 0).length === 0 && getBroadcaster() === '' && !isWarnedAboutCasters) {
     isWarnedAboutCasters = true;
     warning('Owners or broadcaster oauth is not set, all users are treated as CASTERS!!!');
     const pItem = await getRepository(Permissions).findOne({ id: defaultPermissions.CASTERS });
@@ -84,7 +84,7 @@ async function check(userId: number, permId: string, partial = false): Promise<{
         shouldProceed = true;
         break;
       case 'casters':
-        if (oauth.generalOwners.filter(o => typeof o === 'string').length === 0 && getBroadcaster() === '') {
+        if (generalOwners.filter(o => typeof o === 'string').length === 0 && getBroadcaster() === '') {
           shouldProceed = true;
         } else {
           shouldProceed = isBot(user) || isBroadcaster(user) || isOwner(user);
