@@ -256,7 +256,7 @@ class Streamlabs extends Integration {
           amount: Number(event.amount),
           message: event.message,
           currency: event.currency,
-          timestamp: _.now(),
+          timestamp: Date.now(),
         });
       }
     }

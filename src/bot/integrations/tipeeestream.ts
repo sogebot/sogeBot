@@ -197,7 +197,7 @@ class TipeeeStream extends Integration {
         amount,
         message,
         currency: donationCurrency,
-        timestamp: _.now(),
+        timestamp: Date.now(),
       });
     } catch (e) {
       error(e);

@@ -202,7 +202,7 @@ class Donationalerts extends Integration {
       amount: data.amount,
       message: data.message,
       currency: data.currency,
-      timestamp: _.now(),
+      timestamp: Date.now(),
     });
   }
 }

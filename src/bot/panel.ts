@@ -617,7 +617,7 @@ const sendStreamData = async () => {
 
     const data = {
       broadcasterType: oauth.broadcasterType,
-      uptime: isStreamOnline.value ? streamStatusChangeSince : null,
+      uptime: isStreamOnline.value ? streamStatusChangeSince.value : null,
       currentViewers: stats.currentViewers,
       currentSubscribers: stats.currentSubscribers,
       currentBits: stats.currentBits,
