@@ -17,7 +17,7 @@ async function fetchAccountAge (id?: number | null) {
     request = await axios.get(url, {
       headers: {
         'Accept': 'application/vnd.twitchtv.v5+json',
-        'Authorization': 'OAuth ' + getToken('bot'),
+        'Authorization': 'OAuth ' + await getToken('bot'),
       },
       timeout: 20000,
     });
@@ -38,10 +38,10 @@ async function fetchAccountAge (id?: number | null) {
     if (logError) {
       if (e.isAxiosError) {
         error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: e.request.headers });
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: e.config.url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: e.request.headers });
       } else {
         error(e.stack);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: e.request.headers });
+        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: e.config.url, code: 'n/a', data: e.stack, remaining: e.request.headers });
       }
     }
     return;
