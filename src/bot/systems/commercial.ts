@@ -59,7 +59,7 @@ class Commercial extends System {
       return [{ response: 'Usage: !commercial [duration] [optional-message]', ...opts }];
     }
 
-    const cid = channelId;
+    const cid = channelId.value;
     // check if duration is correct (30, 60, 90, 120, 150, 180)
     if ([30, 60, 90, 120, 150, 180].includes(commercial.duration)) {
       const url = `https://api.twitch.tv/helix/channels/commercial`;

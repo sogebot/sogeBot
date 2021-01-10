@@ -3,11 +3,15 @@ import { getRepository } from 'typeorm';
 import { Settings } from '../../database/entity/settings';
 import { isDbConnected } from '../database';
 
-let isStreamOnline = false;
-
-function setIsStreamOnline(value: typeof isStreamOnline) {
-  isStreamOnline = value;
-}
+let _value = false;
+const isStreamOnline = {
+  get value() {
+    return _value;
+  },
+  set value(value: typeof _value) {
+    _value = value;
+  },
+};
 
 async function load() {
   if (!isDbConnected) {
@@ -16,7 +20,7 @@ async function load() {
   }
 
   try {
-    isStreamOnline = JSON.parse(
+    _value = JSON.parse(
       (await getRepository(Settings).findOneOrFail({
         namespace: '/core/api', name: 'isStreamOnline',
       })).value
@@ -28,4 +32,4 @@ async function load() {
 
 load();
 
-export { isStreamOnline, setIsStreamOnline };
+export { isStreamOnline };

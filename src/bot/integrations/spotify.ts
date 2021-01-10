@@ -277,7 +277,7 @@ class Spotify extends Integration {
     clearTimeout(this.timeouts.ICurrentSong);
 
     try {
-      if (!this.fetchCurrentSongWhenOffline && !(isStreamOnline)) {
+      if (!this.fetchCurrentSongWhenOffline && !(isStreamOnline.value)) {
         throw Error('Stream is offline');
       }
       if (this.client === null) {
@@ -587,7 +587,7 @@ class Spotify extends Integration {
   @command('!spotify')
   @default_permission(null)
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
-    if (!isStreamOnline && !this.queueWhenOffline) {
+    if (!isStreamOnline.value && !this.queueWhenOffline) {
       error(`${chalk.bgRed('SPOTIFY')}: stream is offline and you have disabled queue when offline.`);
       return [];
     } // don't do anything on offline stream*/

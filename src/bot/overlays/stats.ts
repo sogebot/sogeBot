@@ -9,7 +9,7 @@ class Stats extends Overlay {
   sockets () {
     publicEndpoint(this.nsp, 'get', async (cb) => {
       cb({
-        uptime: getTime(isStreamOnline ? streamStatusChangeSince : 0, false),
+        uptime: getTime(isStreamOnline.value ? streamStatusChangeSince : 0, false),
         viewers: stats.currentViewers,
         followers: stats.currentFollowers,
         subscribers: stats.currentSubscribers,

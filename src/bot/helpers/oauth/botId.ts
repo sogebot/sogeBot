@@ -1,7 +1,12 @@
-let botId = '';
+let _value = '';
 
-function setBotId(value: typeof botId) {
-  botId = value;
-}
+const botId = {
+  set value(value: typeof _value) {
+    _value = value;
+  },
+  get value() {
+    return _value;
+  },
+};
 
-export { setBotId, botId };
+export { botId };

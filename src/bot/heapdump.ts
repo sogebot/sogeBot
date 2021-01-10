@@ -64,7 +64,7 @@ function heapDump() {
 
   fs.appendFileSync(csvfilePath, `${String(new Date())}\t${avgHeapTotal}\t${memory}\t${String(change).replace('.', ',')}\n`);
 
-  info(chalk.bgRed((isStreamOnline ? 'Online' : 'Offline')
+  info(chalk.bgRed((isStreamOnline.value ? 'Online' : 'Offline')
     + ' # Current avg mem usage: ' + avgHeapUsed
     + ', last avg mem usage: ' + memMBlast
     + ', change: ' + change));
@@ -73,7 +73,7 @@ function heapDump() {
   heapCountdown--;
   if (change > 20 || heapCountdown === 0) {
     heapCountdown = 12;
-    info('Taking snapshot - ' + (isStreamOnline ? 'Online' : 'Offline'));
+    info('Taking snapshot - ' + (isStreamOnline.value ? 'Online' : 'Offline'));
     saveHeapSnapshot(_datadir);
   }
 }

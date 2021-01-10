@@ -28,12 +28,12 @@ class HowLongToBeat extends System {
     let lastDbgMessage = '';
     setInterval(async () => {
       const isGameInNotFoundList = stats.currentGame && notFoundGames.includes(stats.currentGame);
-      const dbgMessage = `streamOnline: ${isStreamOnline}, enabled: ${this.enabled}, currentGame: ${ stats.currentGame}, isGameInNotFoundList: ${isGameInNotFoundList}`;
+      const dbgMessage = `streamOnline: ${isStreamOnline.value}, enabled: ${this.enabled}, currentGame: ${ stats.currentGame}, isGameInNotFoundList: ${isGameInNotFoundList}`;
       if (lastDbgMessage !== dbgMessage) {
         lastDbgMessage = dbgMessage;
         debug('hltb', dbgMessage);
       }
-      if (isStreamOnline && this.enabled && !isGameInNotFoundList) {
+      if (isStreamOnline.value && this.enabled && !isGameInNotFoundList) {
         this.addToGameTimestamp();
       }
     }, this.interval);

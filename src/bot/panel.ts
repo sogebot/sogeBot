@@ -617,12 +617,12 @@ const sendStreamData = async () => {
 
     const data = {
       broadcasterType: oauth.broadcasterType,
-      uptime: isStreamOnline ? streamStatusChangeSince : null,
+      uptime: isStreamOnline.value ? streamStatusChangeSince : null,
       currentViewers: stats.currentViewers,
       currentSubscribers: stats.currentSubscribers,
       currentBits: stats.currentBits,
       currentTips: stats.currentTips,
-      chatMessages: isStreamOnline ? linesParsed - chatMessagesAtStart : 0,
+      chatMessages: isStreamOnline.value ? linesParsed - chatMessagesAtStart : 0,
       currentFollowers: stats.currentFollowers,
       currentViews: stats.currentViews,
       maxViewers: stats.maxViewers,

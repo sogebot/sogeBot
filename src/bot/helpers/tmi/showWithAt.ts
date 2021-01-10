@@ -1,7 +1,12 @@
-let showWithAt = false;
+let _value = false;
 
-function setShowWithAt (value: boolean) {
-  showWithAt = value;
-}
+const showWithAt = {
+  set value(value: typeof _value) {
+    _value = value;
+  },
+  get value() {
+    return _value;
+  },
+};
 
-export { showWithAt, setShowWithAt };
+export { showWithAt };

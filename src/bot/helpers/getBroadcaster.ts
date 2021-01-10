@@ -2,7 +2,7 @@ import { broadcasterUsername } from './oauth/broadcasterUsername';
 
 export function getBroadcaster() {
   try {
-    return broadcasterUsername.toLowerCase().trim();
+    return broadcasterUsername.value.toLowerCase().trim();
   } catch (e) {
     return '';
   }

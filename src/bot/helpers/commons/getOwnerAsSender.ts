@@ -13,6 +13,6 @@ export function getOwnerAsSender(): Readonly<UserStateTags & { userId: string }>
     color: '#000000',
     userType: 'empty',
     emoteSets: [],
-    userId: channelId,
+    userId: channelId.value,
   };
 }

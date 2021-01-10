@@ -7,7 +7,7 @@ import { getRepository } from 'typeorm';
 import type { StreamEndpoint } from './api';
 import { User } from './database/entity/user';
 import { getFunctionList } from './decorators/on';
-import { chatMessagesAtStart, curRetries, isStreamOnline, setChatMessagesAtStart, setIsStreamOnline, setStats, setStreamStatusChangeSince, stats, streamId, streamStatusChangeSince } from './helpers/api';
+import { chatMessagesAtStart, curRetries, isStreamOnline, setChatMessagesAtStart, setStats, setStreamStatusChangeSince, stats, streamId, streamStatusChangeSince } from './helpers/api';
 import { setCurrentRetries, setStreamId, setStreamType } from './helpers/api/';
 import { eventEmitter } from './helpers/events';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
@@ -62,7 +62,7 @@ class Webhooks {
   async unsubscribe (type: Type) {
     clearTimeout(this.timeouts[`unsubscribe-${type}`]);
 
-    const cid = channelId;
+    const cid = channelId.value;
     const clientId = oauth.botClientId;
     const token = oauth.botAccessToken;
     if (cid === '' || clientId === '' || token === '') {
@@ -116,7 +116,7 @@ class Webhooks {
   async subscribe (type: string) {
     clearTimeout(this.timeouts[`subscribe-${type}`]);
 
-    const cid = channelId;
+    const cid = channelId.value;
     const clientId = oauth.botClientId;
     const token = oauth.botAccessToken;
     if (cid === '' || clientId === '' || token === '') {
@@ -191,7 +191,7 @@ class Webhooks {
       return;
     }
 
-    const cid = channelId;
+    const cid = channelId.value;
     // set webhooks enabled
     switch (req.query['hub.topic']) {
       case `https://api.twitch.tv/helix/users/follows?first=1&to_id=${cid}`:
@@ -220,7 +220,7 @@ class Webhooks {
   */
   async follower (aEvent: followEvent, skipCacheCheck = false) {
     try {
-      const cid = channelId;
+      const cid = channelId.value;
       const data = aEvent.data;
 
       if (Object.keys(cid).length === 0) {
@@ -293,7 +293,7 @@ class Webhooks {
   }
 
   async stream (aEvent: StreamEndpoint) {
-    const cid = channelId;
+    const cid = channelId.value;
     if (cid === '') {
       setTimeout(() => this.stream(aEvent), 1000);
     } // wait until channelId is set
@@ -323,7 +323,7 @@ class Webhooks {
           currentTips: 0,
         });
 
-        setIsStreamOnline(true);
+        isStreamOnline.value = true;
         setChatMessagesAtStart(linesParsed);
 
         eventEmitter.emit('stream-started');
@@ -370,7 +370,7 @@ class Webhooks {
 
       coreStats.save({
         timestamp: new Date().getTime(),
-        whenOnline: isStreamOnline ? streamStatusChangeSince : Date.now(),
+        whenOnline: isStreamOnline.value ? streamStatusChangeSince : Date.now(),
         currentViewers: stats.currentViewers,
         currentSubscribers: stats.currentSubscribers,
         currentFollowers: stats.currentFollowers,

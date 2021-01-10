@@ -1,7 +1,12 @@
-let broadcasterUsername = '';
+let _value = '';
 
-function setBroadcasterUsername(value: typeof broadcasterUsername) {
-  broadcasterUsername = value;
-}
+const broadcasterUsername = {
+  set value(value: typeof _value) {
+    _value = value;
+  },
+  get value() {
+    return _value;
+  },
+};
 
-export { setBroadcasterUsername, broadcasterUsername };
+export { broadcasterUsername };

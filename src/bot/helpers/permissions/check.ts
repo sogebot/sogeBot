@@ -31,7 +31,7 @@ async function check(userId: number, permId: string, partial = false): Promise<{
     });
   }
 
-  if (generalOwners.filter(o => typeof o === 'string' && o.trim().length > 0).length === 0 && getBroadcaster() === '' && !isWarnedAboutCasters) {
+  if (generalOwners.value.filter(o => typeof o === 'string' && o.trim().length > 0).length === 0 && getBroadcaster() === '' && !isWarnedAboutCasters) {
     isWarnedAboutCasters = true;
     warning('Owners or broadcaster oauth is not set, all users are treated as CASTERS!!!');
     const pItem = await getRepository(Permissions).findOne({ id: defaultPermissions.CASTERS });
@@ -84,7 +84,7 @@ async function check(userId: number, permId: string, partial = false): Promise<{
         shouldProceed = true;
         break;
       case 'casters':
-        if (generalOwners.filter(o => typeof o === 'string').length === 0 && getBroadcaster() === '') {
+        if (generalOwners.value.filter(o => typeof o === 'string').length === 0 && getBroadcaster() === '') {
           shouldProceed = true;
         } else {
           shouldProceed = isBot(user) || isBroadcaster(user) || isOwner(user);

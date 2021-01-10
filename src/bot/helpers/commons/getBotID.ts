@@ -1,8 +1,8 @@
-import oauth from '../../oauth';
+import { botId } from '../oauth/botId';
 
 export function getBotID() {
   try {
-    return oauth.botId;
+    return botId.value;
   } catch (e) {
     return '0';
   }

@@ -26,12 +26,12 @@ class Chat extends Widget {
     });
 
     publicEndpoint(this.nsp, 'room', async (cb: (error: null, data: string) => void) => {
-      cb(null, generalChannel.toLowerCase());
+      cb(null, generalChannel.value.toLowerCase());
     });
 
     adminEndpoint(this.nsp, 'viewers', async (cb) => {
       try {
-        const url = `https://tmi.twitch.tv/group/user/${(await generalChannel).toLowerCase()}/chatters`;
+        const url = `https://tmi.twitch.tv/group/user/${generalChannel.value.toLowerCase()}/chatters`;
         const response = await axios.get(url);
 
         if (response.status === 200) {

@@ -1,7 +1,12 @@
-let generalChannel = '';
+let _value = '';
 
-function setGeneralChannel(value: typeof generalChannel) {
-  generalChannel = value;
-}
+const generalChannel = {
+  set value(value: typeof _value) {
+    _value = value;
+  },
+  get value() {
+    return _value;
+  },
+};
 
-export { setGeneralChannel, generalChannel };
+export { generalChannel };

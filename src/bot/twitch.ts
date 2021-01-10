@@ -42,7 +42,7 @@ class Twitch extends Core {
     const time = getTime(streamStatusChangeSince, true) as any;
     return [
       {
-        response: await translate(isStreamOnline ? 'uptime.online' : 'uptime.offline')
+        response: await translate(isStreamOnline.value ? 'uptime.online' : 'uptime.offline')
           .replace(/\$days/g, time.days)
           .replace(/\$hours/g, time.hours)
           .replace(/\$minutes/g, time.minutes)

@@ -46,7 +46,7 @@ class Polls extends System {
   @onStartup()
   onStartup() {
     setInterval(() => {
-      if (isStreamOnline) {
+      if (isStreamOnline.value) {
         this.reminder();
       }
     }, 1000);

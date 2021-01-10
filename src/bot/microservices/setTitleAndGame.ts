@@ -16,7 +16,7 @@ import { getGameIdFromName } from './getGameIdFromName';
 
 async function setTitleAndGame (args: { title?: string | null; game?: string | null }): Promise<{ response: string; status: boolean } | null> {
   args = defaults(args, { title: null }, { game: null });
-  const cid = channelId;
+  const cid = channelId.value;
   const url = `https://api.twitch.tv/helix/channels?broadcaster_id=${cid}`;
 
   const token = oauth.broadcasterAccessToken;

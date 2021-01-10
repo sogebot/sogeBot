@@ -5,7 +5,7 @@ import { generalChannel } from '../oauth/generalChannel';
 export async function message(type: 'say' | 'whisper' | 'me', username: string | undefined | null, messageToSend: string, retry = true) {
   try {
     if (username === null || typeof username === 'undefined') {
-      username = generalChannel;
+      username = generalChannel.value;
     }
     if (username === '') {
       error('TMI: channel is not defined, message cannot be sent');

@@ -150,7 +150,7 @@ class Emotes extends Overlay {
   }
 
   async fetchEmotesChannel () {
-    const cid = channelId;
+    const cid = channelId.value;
     this.fetch.channel = true;
 
     if (cid && oauth.broadcasterType !== null && (Date.now() - this.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.lastChannelChk !== cid)) {
@@ -225,7 +225,7 @@ class Emotes extends Overlay {
   }
 
   async fetchEmotesFFZ () {
-    const cid = channelId;
+    const cid = channelId.value;
     const channel = oauth.currentChannel;
     this.fetch.ffz = true;
 

@@ -216,7 +216,7 @@ class Streamlabs extends Integration {
           user.tips.push(newTip);
           getRepository(User).save(user);
 
-          if (isStreamOnline) {
+          if (isStreamOnline.value) {
             setStats({
               ...stats,
               currentTips: stats.currentTips + Number(currency.exchange(Number(event.amount), event.currency, mainCurrency.value)),

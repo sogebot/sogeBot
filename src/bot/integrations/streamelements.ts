@@ -161,7 +161,7 @@ class StreamElements extends Integration {
     user.tips.push(newTip);
     getRepository(User).save(user);
 
-    if (isStreamOnline) {
+    if (isStreamOnline.value) {
       setStats({
         ...stats,
         currentTips: stats.currentTips + currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value),

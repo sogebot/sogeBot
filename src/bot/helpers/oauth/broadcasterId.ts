@@ -1,7 +1,12 @@
-let broadcasterId = '';
+let _value = '';
 
-function setBroadcasterId(value: typeof broadcasterId) {
-  broadcasterId = value;
-}
+const broadcasterId = {
+  set value(value: typeof _value) {
+    _value = value;
+  },
+  get value() {
+    return _value;
+  },
+};
 
-export { setBroadcasterId, broadcasterId };
+export { broadcasterId };

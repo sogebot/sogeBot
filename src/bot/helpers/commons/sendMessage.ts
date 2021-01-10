@@ -42,7 +42,7 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
   } // we don't want to reply on bot commands
 
   if (sender) {
-    messageToSend = !_.isNil(sender.username) ? messageToSend.replace(/\$sender/g, (showWithAt ? '@' : '') + sender.username) : messageToSend;
+    messageToSend = !_.isNil(sender.username) ? messageToSend.replace(/\$sender/g, (showWithAt.value ? '@' : '') + sender.username) : messageToSend;
     if (!getMuteStatus() || attr.force) {
       if ((!_.isNil(attr.quiet) && attr.quiet)) {
         return true;

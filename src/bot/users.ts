@@ -65,7 +65,7 @@ class Users extends Core {
           newChatters: stats.newChatters + newChatters.length,
         });
 
-        if (isStreamOnline) {
+        if (isStreamOnline.value) {
           debug('tmi.watched', `Incrementing watchedTime by ${interval}`);
           const incrementedUsers = await getRepository(User).increment({ isOnline: true }, 'watchedTime', interval);
           // chatTimeOnline + chatTimeOffline is solely use for points distribution
@@ -371,7 +371,7 @@ class Users extends Core {
     });
     adminEndpoint(this.nsp, 'viewers::followedAt', async (id, cb) => {
       try {
-        const cid = channelId;
+        const cid = channelId.value;
         const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`;
 
         const token = oauth.botAccessToken;

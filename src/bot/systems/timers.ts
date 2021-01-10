@@ -111,8 +111,7 @@ class Timers extends System {
 
   async check () {
     clearTimeout(this.timeouts.timersCheck);
-
-    if (!isStreamOnline) {
+    if (!isStreamOnline.value) {
       await getRepository(Timer).update({}, { triggeredAtMessages: linesParsed, triggeredAtTimestamp: Date.now() });
       this.timeouts.timersCheck = global.setTimeout(() => this.check(), MINUTE / 2); // this will run check 1s after full check is correctly done
       return;

@@ -85,7 +85,7 @@ class Qiwi extends Integration {
 
       }
 
-      if (isStreamOnline) {
+      if (isStreamOnline.value) {
         setStats({
           ...stats,
           currentTips: stats.currentTips + currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value),

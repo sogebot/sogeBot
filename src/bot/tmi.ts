@@ -26,7 +26,7 @@ import { chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunity
 import { generalChannel } from './helpers/oauth/generalChannel';
 import { avgResponse, linesParsedIncrement, setStatus } from './helpers/parser';
 import { defaultPermissions } from './helpers/permissions/';
-import { sendWithMe, setGlobalIgnoreListExclude, setIgnoreList, setMuteStatus, setShowWithAt, tmiEmitter } from './helpers/tmi/';
+import { sendWithMe, setGlobalIgnoreListExclude, setIgnoreList, setMuteStatus, showWithAt, tmiEmitter } from './helpers/tmi/';
 import { isOwner } from './helpers/user';
 import { isBot } from './helpers/user/isBot';
 import { isIgnored } from './helpers/user/isIgnored';
@@ -99,7 +99,7 @@ class TMI extends Core {
   @onChange('showWithAt')
   @onLoad('showWithAt')
   setShowWithAt() {
-    setShowWithAt(this.showWithAt);
+    showWithAt.value = this.showWithAt;
   }
 
   @onChange('sendWithMe')
@@ -176,7 +176,7 @@ class TMI extends Core {
     clearTimeout(this.timeouts[`initClient.${type}`]);
     const token = type === 'bot' ? oauth.botAccessToken : oauth.broadcasterAccessToken;
     const username = type === 'bot' ? oauth.botUsername : oauth.broadcasterUsername;
-    const channel = generalChannel;
+    const channel = generalChannel.value;
 
     try {
       if (token === '' || username === '' || channel === '') {
@@ -224,7 +224,7 @@ class TMI extends Core {
       }
       const token = type === 'bot' ? oauth.botAccessToken : oauth.broadcasterAccessToken;
       const username = type === 'bot' ? oauth.botUsername : oauth.broadcasterUsername;
-      const channel = generalChannel;
+      const channel = generalChannel.value;
 
       info(`TMI: ${type} is reconnecting`);
 
@@ -756,7 +756,7 @@ class TMI extends Core {
 
       eventEmitter.emit('cheer', { username, bits: Number(userstate.bits), message: messageFromUser });
 
-      if (isStreamOnline) {
+      if (isStreamOnline.value) {
         setStats({
           ...stats,
           currentBits: stats.currentBits + parseInt(userstate.bits, 10),

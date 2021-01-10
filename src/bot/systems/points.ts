@@ -116,12 +116,12 @@ class Points extends System {
 
     try {
       const userPromises: Promise<void>[] = [];
-      debug('points.update', `Started points adding, isStreamOnline: ${isStreamOnline}`);
+      debug('points.update', `Started points adding, isStreamOnline: ${isStreamOnline.value}`);
       for (const username of (await getAllOnlineUsernames())) {
         if (isBot(username)) {
           continue;
         }
-        userPromises.push(this.processPoints(username, { interval, offlineInterval, perInterval, perOfflineInterval, isStreamOnline }));
+        userPromises.push(this.processPoints(username, { interval, offlineInterval, perInterval, perOfflineInterval, isStreamOnline: isStreamOnline.value }));
         await Promise.all(userPromises);
       }
     } catch (e) {
@@ -213,8 +213,8 @@ class Points extends System {
       return true; // skip without permission
     }
 
-    const interval_calculated = isStreamOnline ? messageInterval[permId] : messageOfflineInterval[permId];
-    const ptsPerInterval = isStreamOnline ? perMessageInterval[permId] : perMessageOfflineInterval[permId];
+    const interval_calculated = isStreamOnline.value ? messageInterval[permId] : messageOfflineInterval[permId];
+    const ptsPerInterval = isStreamOnline.value ? perMessageInterval[permId] : perMessageOfflineInterval[permId];
 
     if (interval_calculated === 0 || ptsPerInterval === 0) {
       return;

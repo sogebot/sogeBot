@@ -49,7 +49,7 @@ export async function parserReply(response: string | Promise<string>, opts: { se
 
 export function getChannel() {
   try {
-    return generalChannel.toLowerCase().trim();
+    return generalChannel.value.toLowerCase().trim();
   } catch (e) {
     return '';
   }

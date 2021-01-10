@@ -3,18 +3,23 @@ import { getRepository } from 'typeorm';
 import { Settings } from '../../database/entity/settings';
 import { isDbConnected } from '../database';
 
-let channelId = '';
+let _value = '';
 
-function setChannelId(value: typeof channelId) {
-  channelId = value;
-  getRepository(Settings).findOne({
-    namespace: '/core/oauth', name: 'channelId',
-  }).then(row => {
-    getRepository(Settings).save({
-      ...row, namespace: '/core/oauth', name: 'channelId', value: JSON.stringify(value),
+const channelId = {
+  set value(value: typeof _value) {
+    _value = value;
+    getRepository(Settings).findOne({
+      namespace: '/core/oauth', name: 'channelId',
+    }).then(row => {
+      getRepository(Settings).save({
+        ...row, namespace: '/core/oauth', name: 'channelId', value: JSON.stringify(value),
+      });
     });
-  });
-}
+  },
+  get value() {
+    return _value;
+  },
+};
 
 async function load() {
   if (!isDbConnected) {
@@ -23,7 +28,7 @@ async function load() {
   }
 
   try {
-    channelId = JSON.parse(
+    _value = JSON.parse(
       (await getRepository(Settings).findOneOrFail({
         namespace: '/core/oauth', name: 'channelId',
       })).value
@@ -35,4 +40,4 @@ async function load() {
 
 load();
 
-export { channelId, setChannelId };
+export { channelId };

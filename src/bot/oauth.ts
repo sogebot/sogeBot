@@ -6,13 +6,13 @@ import { areDecoratorsLoaded, persistent, settings, ui } from './decorators';
 import { onChange, onLoad, onStartup } from './decorators/on';
 import { apiEmitter } from './helpers/api/emitter';
 import { error, info, warning } from './helpers/log';
-import { loadedTokensInc, setChannelId } from './helpers/oauth';
-import { setBotId } from './helpers/oauth/botId';
-import { setBotUsername } from './helpers/oauth/botUsername';
-import { setBroadcasterId } from './helpers/oauth/broadcasterId';
-import { setBroadcasterUsername } from './helpers/oauth/broadcasterUsername';
-import { setGeneralChannel } from './helpers/oauth/generalChannel';
-import { setGeneralOwners } from './helpers/oauth/generalOwners';
+import { channelId, loadedTokensInc } from './helpers/oauth';
+import { botId } from './helpers/oauth/botId';
+import { botUsername } from './helpers/oauth/botUsername';
+import { broadcasterId } from './helpers/oauth/broadcasterId';
+import { broadcasterUsername } from './helpers/oauth/broadcasterUsername';
+import { generalChannel } from './helpers/oauth/generalChannel';
+import { generalOwners } from './helpers/oauth/generalOwners';
 import { setOAuthStatus } from './helpers/OAuthStatus';
 import { setStatus } from './helpers/parser';
 import { cleanViewersCache } from './helpers/permissions';
@@ -156,7 +156,7 @@ class OAuth extends Core {
       const cid = await getIdFromTwitch(this.generalChannel, true);
       if (typeof cid !== 'undefined' && cid !== null) {
         this.currentChannel = this.generalChannel;
-        setChannelId(cid);
+        channelId.value = cid;
         info('Channel ID set to ' + cid);
         tmiEmitter.emit('reconnect', 'bot');
         tmiEmitter.emit('reconnect', 'broadcaster');
@@ -182,37 +182,37 @@ class OAuth extends Core {
   @onChange('generalChannel')
   @onLoad('generalChannel')
   setGeneralChannel() {
-    setGeneralChannel(this.generalChannel);
+    generalChannel.value = this.generalChannel;
   }
 
   @onChange('generalOwners')
   @onLoad('generalOwners')
   setGeneralOwners() {
-    setGeneralOwners(this.generalOwners);
+    generalOwners.value = this.generalOwners;
   }
 
   @onChange('botUsername')
   @onLoad('botUsername')
   setBotUsername() {
-    setBotUsername(this.botUsername);
+    botUsername.value = this.botUsername;
   }
 
   @onChange('botId')
   @onLoad('botId')
   setBotId() {
-    setBotId(this.botId);
+    botId.value = this.botId;
   }
 
   @onChange('broadcasterId')
   @onLoad('broadcasterId')
   setBroadcasterId() {
-    setBroadcasterId(this.broadcasterId);
+    broadcasterId.value = this.broadcasterId;
   }
 
   @onChange('broadcasterUsername')
   @onLoad('broadcasterUsername')
   setBroadcasterUsername() {
-    setBroadcasterUsername(this.broadcasterUsername);
+    broadcasterUsername.value = this.broadcasterUsername;
   }
 
   @onChange('broadcasterUsername')

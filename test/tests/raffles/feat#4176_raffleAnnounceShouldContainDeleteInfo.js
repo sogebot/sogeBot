@@ -13,7 +13,7 @@ const { User } = require('../../../dest/database/entity/user');
 const { Raffle } = require('../../../dest/database/entity/raffle');
 
 const raffles = (require('../../../dest/systems/raffles')).default;
-const setIsStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).setIsStreamOnline;
+const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).isStreamOnline;
 
 const assert = require('assert');
 
@@ -27,7 +27,7 @@ describe('Raffles - announce should contain delete info #4176', () => {
 
   after(async () => {
     raffles.raffleAnnounceMessageInterval = 20;
-    setIsStreamOnline(false);
+    isStreamOnline.value = false;
     raffles.deleteRaffleJoinCommands = false;
   })
 
@@ -67,7 +67,7 @@ describe('Raffles - announce should contain delete info #4176', () => {
   });
 
   it('expecting 2 entries in announce message', async () => {
-    setIsStreamOnline(true);
+    isStreamOnline.value = true;
     raffles.lastAnnounceMessageCount = 0;
     raffles.lastAnnounce = 0;
     raffles.raffleAnnounceMessageInterval = 0;

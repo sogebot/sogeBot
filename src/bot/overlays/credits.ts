@@ -92,7 +92,7 @@ class Credits extends Overlay {
 
   sockets () {
     publicEndpoint(this.nsp, 'load', async (cb) => {
-      const when = isStreamOnline ? streamStatusChangeSince : _.now() - 50000000000;
+      const when = isStreamOnline.value ? streamStatusChangeSince : _.now() - 50000000000;
       const timestamp = new Date(when).getTime();
       const events: (EventListInterface & { values?: {
         currency: currency; amount: number;

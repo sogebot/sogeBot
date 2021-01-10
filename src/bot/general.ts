@@ -29,7 +29,7 @@ const gracefulExit = () => {
   if (general.gracefulExitEachXHours > 0) {
     debug('thread', 'gracefulExit::check');
     if (Date.now() - threadStartTimestamp >= general.gracefulExitEachXHours * HOUR) {
-      if (!isStreamOnline && socketsConnected === 0) {
+      if (!isStreamOnline.value && socketsConnected === 0) {
         warning('Gracefully exiting sogeBot as planned and configured in UI in settings->general.');
         debug('thread', 'gracefulExit::exiting and creating restart file (so we dont have startup logging');
         writeFileSync('./restart.pid', ' ');

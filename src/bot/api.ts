@@ -12,7 +12,7 @@ import { ThreadEvent } from './database/entity/threadEvent';
 import { TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from './database/entity/twitch';
 import { User, UserInterface } from './database/entity/user';
 import { getFunctionList, onStartup } from './decorators/on';
-import { stats as apiStats, calls, chatMessagesAtStart, currentStreamTags, emptyRateLimit, gameCache, gameOrTitleChangedManually, isStreamOnline, rawStatus, setChatMessagesAtStart, setIsStreamOnline, setRateLimit, setStats, setStreamStatusChangeSince, streamStatusChangeSince } from './helpers/api';
+import { stats as apiStats, calls, chatMessagesAtStart, currentStreamTags, emptyRateLimit, gameCache, gameOrTitleChangedManually, isStreamOnline, rawStatus, setChatMessagesAtStart, setRateLimit, setStats, setStreamStatusChangeSince, streamStatusChangeSince } from './helpers/api';
 import { parseTitle } from './helpers/api/parseTitle';
 import { curRetries, maxRetries, retries, setCurrentRetries } from './helpers/api/retries';
 import { setStreamId, streamId } from './helpers/api/streamId';
@@ -371,7 +371,7 @@ class API extends Core {
 
   async getChannelChattersUnofficialAPI (opts: any) {
     const oAuthIsSet = oauth.botUsername.length > 0
-      && channelId.length > 0
+      && channelId.value.length > 0
       && oauth.currentChannel.length > 0;
 
     if (!isDbConnected || !oAuthIsSet) {
@@ -476,7 +476,7 @@ class API extends Core {
   async getChannelSubscribers<T extends { cursor?: string; count?: number; noAffiliateOrPartnerWarningSent?: boolean; notCorrectOauthWarningSent?: boolean; subscribers?: SubscribersEndpoint['data'] }> (opts: T): Promise<{ state: boolean; opts: T }> {
     opts = opts || {};
 
-    const cid = channelId;
+    const cid = channelId.value;
     let url = `https://api.twitch.tv/helix/subscriptions?broadcaster_id=${cid}&first=100`;
     if (opts.cursor) {
       url += '&after=' + opts.cursor;
@@ -605,11 +605,11 @@ class API extends Core {
   }
 
   async getChannelInformation (opts: any) {
-    const cid = channelId;
+    const cid = channelId.value;
     const url = `https://api.twitch.tv/helix/channels?broadcaster_id=${cid}`;
 
     // getChannelInformation only if stream is offline - we are using getCurrentStreamData for online stream title/game
-    if (isStreamOnline) {
+    if (isStreamOnline.value) {
       retries.getChannelInformation = 0;
       return { state: true, opts };
     }
@@ -688,7 +688,7 @@ class API extends Core {
   }
 
   async getChannelHosts () {
-    const cid = channelId;
+    const cid = channelId.value;
 
     if (isNil(cid) || cid === '') {
       return { state: false };
@@ -713,7 +713,7 @@ class API extends Core {
   }
 
   async getLatest100Followers () {
-    const cid = channelId;
+    const cid = channelId.value;
     const url = `https://api.twitch.tv/helix/users/follows?to_id=${cid}&first=100`;
     const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
@@ -774,7 +774,7 @@ class API extends Core {
   async getChannelFollowers (opts: any) {
     opts = opts || {};
 
-    const cid = channelId;
+    const cid = channelId.value;
 
     const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
@@ -844,7 +844,7 @@ class API extends Core {
   }
 
   async getCurrentStreamTags (opts: any) {
-    const cid = channelId;
+    const cid = channelId.value;
     const url = `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${cid}`;
 
     const token = oauth.botAccessToken;
@@ -889,7 +889,7 @@ class API extends Core {
   }
 
   async getCurrentStreamData (opts: any) {
-    const cid = channelId;
+    const cid = channelId.value;
     const url = `https://api.twitch.tv/helix/streams?user_id=${cid}`;
 
     const token = oauth.botAccessToken;
@@ -927,7 +927,7 @@ class API extends Core {
         if (dayjs(stream.started_at).valueOf() >=  dayjs(streamStatusChangeSince).valueOf()) {
           setStreamStatusChangeSince((new Date(stream.started_at)).getTime());
         }
-        if (!isStreamOnline || streamType !== stream.type) {
+        if (!isStreamOnline.value || streamType !== stream.type) {
           setChatMessagesAtStart(linesParsed);
 
           if (!webhooks.enabled.streams && Number(streamId) !== Number(stream.id)) {
@@ -971,7 +971,7 @@ class API extends Core {
 
         setCurrentRetries(0);
         this.saveStreamData(stream);
-        setIsStreamOnline(true);
+        isStreamOnline.value = true;
 
         if (!justStarted) {
           // don't run events on first check
@@ -1008,16 +1008,16 @@ class API extends Core {
           rawStatus.value = _rawStatus;
         }
       } else {
-        if (isStreamOnline && curRetries < maxRetries) {
+        if (isStreamOnline.value && curRetries < maxRetries) {
           // retry if it is not just some network / twitch issue
           setCurrentRetries(curRetries + 1);
         } else {
           // stream is really offline
-          if (isStreamOnline) {
+          if (isStreamOnline.value) {
             // online -> offline transition
             stop('');
             setStreamStatusChangeSince(Date.now());
-            setIsStreamOnline(false);
+            isStreamOnline.value = false;
             setCurrentRetries(0);
             eventEmitter.emit('stream-stopped');
             eventEmitter.emit('stream-is-running-x-minutes', { reset: true });
@@ -1065,7 +1065,7 @@ class API extends Core {
 
     stats.save({
       timestamp: new Date().getTime(),
-      whenOnline: isStreamOnline ? streamStatusChangeSince : Date.now(),
+      whenOnline: isStreamOnline.value ? streamStatusChangeSince : Date.now(),
       currentViewers: apiStats.currentViewers,
       currentSubscribers: apiStats.currentSubscribers,
       currentFollowers: apiStats.currentFollowers,
@@ -1139,7 +1139,7 @@ class API extends Core {
   }
 
   async createClip (opts: any) {
-    if (!(isStreamOnline)) {
+    if (!(isStreamOnline.value)) {
       return;
     } // do nothing if stream is offline
 
@@ -1162,7 +1162,7 @@ class API extends Core {
 
     defaults(opts, { hasDelay: true });
 
-    const cid = channelId;
+    const cid = channelId.value;
     const url = `https://api.twitch.tv/helix/clips?broadcaster_id=${cid}`;
 
     const token = oauth.botAccessToken;
@@ -1266,7 +1266,7 @@ class API extends Core {
 
     clearTimeout(this.timeouts['isFollowerUpdate-' + id]);
 
-    const cid = channelId;
+    const cid = channelId.value;
     const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`;
 
     const token = oauth.botAccessToken;
@@ -1358,7 +1358,7 @@ class API extends Core {
 
   async createMarker () {
     const token = oauth.botAccessToken;
-    const cid = channelId;
+    const cid = channelId.value;
 
     const url = 'https://api.twitch.tv/helix/streams/markers';
     try {

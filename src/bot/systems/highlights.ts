@@ -62,7 +62,7 @@ class Highlights extends System {
       if (!this.enabled) {
         return res.status(412).send({ error: 'Highlights system is disabled' });
       } else {
-        if (!(isStreamOnline)) {
+        if (!(isStreamOnline.value)) {
           return res.status(412).send({ error: 'Stream is offline' });
         } else {
           if (url.clip) {
@@ -86,11 +86,11 @@ class Highlights extends System {
   @default_permission(defaultPermissions.CASTERS)
   public async main(opts: CommandOptions): Promise<CommandResponse[]> {
     const token = oauth.botAccessToken;
-    const cid = channelId;
+    const cid = channelId.value;
     const url = `https://api.twitch.tv/helix/videos?user_id=${cid}&type=archive&first=1`;
 
     try {
-      if (!isStreamOnline) {
+      if (!isStreamOnline.value) {
         throw Error(ERROR_STREAM_NOT_ONLINE);
       }
       if (token === '' || cid === '') {

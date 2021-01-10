@@ -164,7 +164,7 @@ class Discord extends Integration {
 
     // embed updater
     setInterval(async () => {
-      if (isStreamOnline && this.client && this.embedMessageId.length > 0) {
+      if (isStreamOnline.value && this.client && this.embedMessageId.length > 0) {
         this.changeClientOnlinePresence();
         const channel = this.client.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
         if (channel) {
@@ -180,7 +180,7 @@ class Discord extends Integration {
               { name: prepare('webpanel.views'), value: stats.currentViews, inline: true},
               { name: prepare('webpanel.followers'), value: stats.currentFollowers, inline: true},
             ]);
-            embed.setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${generalChannel}-1920x1080.jpg?${Date.now()}`);
+            embed.setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${generalChannel.value}-1920x1080.jpg?${Date.now()}`);
 
             if (oauth.broadcasterType !== '') {
               embed.addField(prepare('webpanel.subscribers'), stats.currentSubscribers, true);
@@ -358,7 +358,7 @@ class Discord extends Integration {
       const embed = message?.embeds[0];
       if (message && embed) {
         embed.setColor(0xff0000);
-        embed.setDescription(`${generalChannel.charAt(0).toUpperCase() + generalChannel.slice(1)} is not streaming anymore! Check it next time!`);
+        embed.setDescription(`${generalChannel.value.charAt(0).toUpperCase() + generalChannel.value.slice(1)} is not streaming anymore! Check it next time!`);
         embed.spliceFields(0, embed.fields.length);
         embed.addFields([
           { name: prepare('webpanel.responses.variable.game'), value: stats.currentGame},
@@ -390,7 +390,7 @@ class Discord extends Integration {
 
         this.embedStartedAt = dayjs().tz(timezone).format('LLL');
         const embed = new DiscordJs.MessageEmbed()
-          .setURL('https://twitch.tv/' + generalChannel)
+          .setURL('https://twitch.tv/' + generalChannel.value)
           .addFields([
             { name: prepare('webpanel.responses.variable.game'), value: stats.currentGame},
             { name: prepare('webpanel.responses.variable.title'), value: stats.currentTitle},
@@ -399,12 +399,12 @@ class Discord extends Integration {
             { name: prepare('webpanel.followers'), value: stats.currentFollowers, inline: true},
           ])
           // Set the title of the field
-          .setTitle('https://twitch.tv/' + generalChannel)
+          .setTitle('https://twitch.tv/' + generalChannel.value)
           // Set the color of the embed
           .setColor(0x00ff00)
           // Set the main content of the embed
-          .setDescription(`${generalChannel.charAt(0).toUpperCase() + generalChannel.slice(1)} started stream! Check it out!`)
-          .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${generalChannel}-1920x1080.jpg?${Date.now()}`)
+          .setDescription(`${generalChannel.value.charAt(0).toUpperCase() + generalChannel.value.slice(1)} started stream! Check it out!`)
+          .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${generalChannel.value}-1920x1080.jpg?${Date.now()}`)
           .setThumbnail(oauth.profileImageUrl)
           .setFooter('Announced by sogeBot - https://www.sogebot.xyz');
 
@@ -433,11 +433,11 @@ class Discord extends Integration {
       return;
     }
     try {
-      if (isStreamOnline) {
+      if (isStreamOnline.value) {
         const activityString = await new Message(this.onlinePresenceStatusOnStreamName).parse();
         if (this.onlinePresenceStatusOnStream === 'streaming') {
           this.client?.user?.setStatus('online');
-          this.client?.user?.setPresence({ status: 'online', activity: { name: activityString, type: 'STREAMING', url: `https://twitch.tv/${generalChannel}`} });
+          this.client?.user?.setPresence({ status: 'online', activity: { name: activityString, type: 'STREAMING', url: `https://twitch.tv/${generalChannel.value}`} });
         } else {
           this.client?.user?.setStatus(this.onlinePresenceStatusOnStream);
           if (activityString !== '') {
@@ -570,7 +570,7 @@ class Discord extends Integration {
         });
         const message = prepare('integrations.discord.link-whisper', {
           tag: msg.author.tag,
-          broadcaster: generalChannel,
+          broadcaster: generalChannel.value,
           id: link.id,
           command: this.getCommand('!link'),
         });

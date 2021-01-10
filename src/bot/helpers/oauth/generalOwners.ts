@@ -1,7 +1,12 @@
-let generalOwners: string[] = [];
+let _value: string[] = [];
 
-function setGeneralOwners(value: typeof generalOwners) {
-  generalOwners = value;
-}
+const generalOwners = {
+  set value(value: typeof _value) {
+    _value = value;
+  },
+  get value() {
+    return _value;
+  },
+};
 
-export { setGeneralOwners, generalOwners };
+export { generalOwners };

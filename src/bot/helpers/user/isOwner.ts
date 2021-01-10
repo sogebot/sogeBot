@@ -3,8 +3,8 @@ import { generalOwners } from '../oauth/generalOwners';
 
 export function isOwner(user: string | CommandOptions['sender'] | UserInterface | UserStateTags) {
   try {
-    if (generalOwners) {
-      const owners = generalOwners.filter(o => typeof o === 'string').map(o => o.trim().toLowerCase());
+    if (generalOwners.value) {
+      const owners = generalOwners.value.filter(o => typeof o === 'string').map(o => o.trim().toLowerCase());
       return owners.includes(typeof user === 'string' ? user : user.username.toLowerCase().trim());
     } else {
       return false;

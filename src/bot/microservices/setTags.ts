@@ -8,7 +8,7 @@ import { channelId } from '../helpers/oauth';
 import { ioServer } from '../helpers/panel';
 
 async function setTags (tagsArg: string[]) {
-  const cid = channelId;
+  const cid = channelId.value;
   const url = `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${cid}`;
 
   const tag_ids: string[] = [];

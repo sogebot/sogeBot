@@ -288,7 +288,7 @@ class Events extends Core {
   }
 
   public async fireStartCommercial(operation: Events.OperationDefinitions) {
-    const cid = channelId;
+    const cid = channelId.value;
     const url = `https://api.twitch.tv/helix/channels/commercial`;
 
     const token = await oauth.broadcasterAccessToken;
@@ -498,7 +498,7 @@ class Events extends Core {
   }
 
   public async checkStreamIsRunningXMinutes(event: EventInterface) {
-    if (!isStreamOnline) {
+    if (!isStreamOnline.value) {
       return false;
     }
     event.triggered.runAfterXMinutes = _.get(event, 'triggered.runAfterXMinutes', 0);
