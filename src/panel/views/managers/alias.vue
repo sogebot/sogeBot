@@ -195,7 +195,7 @@ library.add(faKey, faObjectGroup);
 
 import { validationMixin } from 'vuelidate'
 import { required } from 'vuelidate/lib/validators'
-import { defaultPermissions } from 'src/bot/helpers/permissions';
+import { defaultPermissions } from 'src/bot/helpers/permissions/defaultPermissions';
 
 const socket = {
   permission: getSocket('/core/permissions'),

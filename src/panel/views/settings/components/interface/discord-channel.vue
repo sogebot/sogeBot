@@ -28,7 +28,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
-import { announceTypes } from 'src/bot/commons';
+import { announceTypes } from 'src/bot/helpers/commons';
 import translate from 'src/panel/helpers/translate';
 
 type Channel = { text: string, value: string };

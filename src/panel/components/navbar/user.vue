@@ -69,7 +69,7 @@ import { defineComponent, ref, onMounted, onUnmounted, computed } from '@vue/com
 import type { Ref } from '@vue/composition-api'
 
 import { getSocket } from 'src/panel/helpers/socket';
-import { defaultPermissions } from 'src/bot/helpers/permissions/'
+import { defaultPermissions } from 'src/bot/helpers/permissions/defaultPermissions'
 import { UserInterface } from '../../../bot/database/entity/user';
 import { PermissionsInterface } from '../../../bot/database/entity/permissions';
 import translate from 'src/panel/helpers/translate';

@@ -228,7 +228,7 @@ import translate from 'src/panel/helpers/translate';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { defaultPermissions } from 'src/bot/helpers/permissions';
+import { defaultPermissions } from 'src/bot/helpers/permissions/defaultPermissions';
 library.add(faExclamationTriangle);
 
 Component.registerHooks([

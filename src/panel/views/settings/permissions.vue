@@ -53,7 +53,7 @@
 
   import { PermissionsInterface } from 'src/bot/database/entity/permissions'
   import translate from 'src/panel/helpers/translate';
-  import { defaultPermissions } from 'src/bot/helpers/permissions';
+  import { defaultPermissions } from 'src/bot/helpers/permissions/defaultPermissions';
 
   export default Vue.extend({
     components: {
