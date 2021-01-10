@@ -21,7 +21,6 @@ const testuser3 = { username: 'testuser3', userId: 3 };
 const nightbot = { username: 'nightbot', userId: 4 };
 const botwithchangedname = { username: 'asdsadas', userId: 24900234 };
 
-const { VariableWatcher } = require('../../../dest/watchers');
 const { isIgnored } = require('../../../dest/helpers/user/isIgnored');
 
 describe('TMI - ignore', () => {
@@ -35,10 +34,6 @@ describe('TMI - ignore', () => {
     await getRepository(User).save(testuser);
     await getRepository(User).save(testuser2);
     await getRepository(User).save(testuser3);
-  });
-
-  beforeEach(async () => {
-    await VariableWatcher.check();
   });
 
   describe('Global ignore workflow', () => {

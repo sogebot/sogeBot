@@ -1,5 +1,10 @@
 global.mocha = true;
 require('../dest/main.js');
+const { VariableWatcher } = require('../dest/watchers');
+
+beforeEach(async () => {
+  await VariableWatcher.check();
+});
 
 module.exports = {
   db: require('./helpers/db'),

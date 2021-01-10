@@ -7,7 +7,6 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 const user = require('../../general.js').user;
-const check = (require('../../../dest/watchers')).check;
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
@@ -178,7 +177,6 @@ describe('game/fightme - !fightme', () => {
 
     it('set cooldown to 10 minutes', async () => {
       fightme.cooldown = 600;
-      await check();
     });
 
     it('set manually internal cooldown to 0', async () => {
@@ -213,7 +211,6 @@ describe('game/fightme - !fightme', () => {
 
     it('set cooldown to 10 minutes', async () => {
       fightme.cooldown = 600;
-      await check();
     });
 
     it('set manually internal cooldown', async () => {
@@ -245,7 +242,6 @@ describe('game/fightme - !fightme', () => {
     after(async () => {
       fightme.cooldown = 0;
       fightme.bypassCooldownByOwnerAndMods = false;
-      await check();
     });
 
     it('set cooldown to 10 minutes', async () => {
@@ -254,7 +250,6 @@ describe('game/fightme - !fightme', () => {
 
     it('set bypass by mods and owner', async () => {
       fightme.bypassCooldownByOwnerAndMods = true;
-      await check();
     });
 
     it('set manually internal cooldown', async () => {

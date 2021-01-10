@@ -6,7 +6,6 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 const tmi = (require('../../../dest/tmi')).default;
-const check = (require('../../../dest/watchers')).check;
 const assert = require('assert');
 
 const { sendMessage } = require('../../../dest/helpers/commons/sendMessage');
@@ -21,7 +20,6 @@ describe('lib/commons - sendMessage()', () => {
 
     it('enable color-mode', async () => {
       tmi.sendWithMe = true;
-      await check();
     });
 
     it('send message containing /me', () => {
@@ -41,7 +39,6 @@ describe('lib/commons - sendMessage()', () => {
 
     it('enable normal-mode', async () => {
       tmi.sendWithMe = false;
-      await check();
     });
 
     it('send message containing /me', () => {
