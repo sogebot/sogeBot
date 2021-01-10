@@ -13,7 +13,7 @@ const { User } = require('../../../dest/database/entity/user');
 const { Raffle } = require('../../../dest/database/entity/raffle');
 
 const raffles = (require('../../../dest/systems/raffles')).default;
-const .value = =(require('../../../dest/helpers/api/.value = ))..alue =
+const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline' )).isStreamOnline
 const assert = require('assert');
 
 describe('Raffles - announce should contain total entries #4175', () => {
@@ -26,7 +26,7 @@ describe('Raffles - announce should contain total entries #4175', () => {
 
   after(async () => {
     raffles.raffleAnnounceMessageInterval = 20;
-    .value = value= false;
+    isStreamOnline.value = false;
   })
 
   it('create ticket raffle', async () => {
