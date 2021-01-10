@@ -5,7 +5,7 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const _ = require('lodash');
-const getOwnerAsSender = require('../../../dest/helpers/commons/getOwnerAsSender');
+const {getOwnerAsSender} = require('../../../dest/helpers/commons/getOwnerAsSender');
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');

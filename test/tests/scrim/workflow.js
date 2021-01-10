@@ -11,6 +11,7 @@ const scrim = (require('../../../dest/systems/scrim')).default;
 
 const { translate } = require('../../../dest/translate');
 const { getLocalizedName } = require('../../../dest/helpers/getLocalized');
+const {getBot} = require('../../../dest/helpers/commons/getBot');
 
 // users
 const owner = { username: '__broadcaster__' };
@@ -29,7 +30,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting 1 minute message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', commons.getBot(), {
+      await message.isSent('systems.scrim.countdown', getBot(), {
         time: 1,
         type: 'duo',
         unit: getLocalizedName(1, translate('core.minutes')),
@@ -37,7 +38,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting 45 seconds message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', commons.getBot(), {
+      await message.isSent('systems.scrim.countdown', getBot(), {
         time: 45,
         type: 'duo',
         unit: getLocalizedName(45, translate('core.seconds')),
@@ -45,7 +46,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting 30 seconds message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', commons.getBot(), {
+      await message.isSent('systems.scrim.countdown', getBot(), {
         time: 30,
         type: 'duo',
         unit: getLocalizedName(30, translate('core.seconds')),
@@ -53,7 +54,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting 15 seconds message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', commons.getBot(), {
+      await message.isSent('systems.scrim.countdown', getBot(), {
         time: 15,
         type: 'duo',
         unit: getLocalizedName(15, translate('core.seconds')),
@@ -61,7 +62,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting 3 seconds message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', commons.getBot(), {
+      await message.isSent('systems.scrim.countdown', getBot(), {
         time: '3.',
         type: 'duo',
         unit: '',
@@ -69,7 +70,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting 2 seconds message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', commons.getBot(), {
+      await message.isSent('systems.scrim.countdown', getBot(), {
         time: '2.',
         type: 'duo',
         unit: '',
@@ -77,7 +78,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting 1 seconds message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', commons.getBot(), {
+      await message.isSent('systems.scrim.countdown', getBot(), {
         time: '1.',
         type: 'duo',
         unit: '',
@@ -85,17 +86,17 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting go! message', async () => {
-      await message.isSent('systems.scrim.go', commons.getBot(), {}, 3000);
+      await message.isSent('systems.scrim.go', getBot(), {}, 3000);
     });
 
     it('NOT expecting put match id in chat message', async () => {
-      await message.isNotSent('systems.scrim.putMatchIdInChat', commons.getBot(), {
+      await message.isNotSent('systems.scrim.putMatchIdInChat', getBot(), {
         command: '!snipe match',
       }, 19000);
     });
 
     it('NOT expecting empty message list', async () => {
-      await message.isNotSent('systems.scrim.currentMatches', commons.getBot(), {
+      await message.isNotSent('systems.scrim.currentMatches', getBot(), {
         matches: '<' + translate('core.empty') + '>',
       }, 19000);
     });
@@ -119,7 +120,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting 1 minute message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', commons.getBot(), {
+      await message.isSent('systems.scrim.countdown', getBot(), {
         time: 1,
         type: 'duo',
         unit: getLocalizedName(1, translate('core.minutes')),
@@ -127,7 +128,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting 45 seconds message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', commons.getBot(), {
+      await message.isSent('systems.scrim.countdown', getBot(), {
         time: 45,
         type: 'duo',
         unit: getLocalizedName(45, translate('core.seconds')),
@@ -135,7 +136,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting 30 seconds message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', commons.getBot(), {
+      await message.isSent('systems.scrim.countdown', getBot(), {
         time: 30,
         type: 'duo',
         unit: getLocalizedName(30, translate('core.seconds')),
@@ -143,7 +144,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting 15 seconds message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', commons.getBot(), {
+      await message.isSent('systems.scrim.countdown', getBot(), {
         time: 15,
         type: 'duo',
         unit: getLocalizedName(15, translate('core.seconds')),
@@ -151,7 +152,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting 3 seconds message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', commons.getBot(), {
+      await message.isSent('systems.scrim.countdown', getBot(), {
         time: '3.',
         type: 'duo',
         unit: '',
@@ -159,7 +160,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting 2 seconds message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', commons.getBot(), {
+      await message.isSent('systems.scrim.countdown', getBot(), {
         time: '2.',
         type: 'duo',
         unit: '',
@@ -167,7 +168,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting 1 seconds message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', commons.getBot(), {
+      await message.isSent('systems.scrim.countdown', getBot(), {
         time: '1.',
         type: 'duo',
         unit: '',
@@ -175,17 +176,17 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting go! message', async () => {
-      await message.isSent('systems.scrim.go', commons.getBot(), {}, 3000);
+      await message.isSent('systems.scrim.go', getBot(), {}, 3000);
     });
 
     it('Expecting put match id in chat message', async () => {
-      await message.isSent('systems.scrim.putMatchIdInChat', commons.getBot(), {
+      await message.isSent('systems.scrim.putMatchIdInChat', getBot(), {
         command: '!snipe match',
       }, 19000);
     });
 
     it('Expecting empty message list', async () => {
-      await message.isSent('systems.scrim.currentMatches', commons.getBot(), {
+      await message.isSent('systems.scrim.currentMatches', getBot(), {
         matches: '<' + translate('core.empty') + '>',
       }, 19000);
     });
@@ -209,7 +210,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting 1 minute message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', commons.getBot(), {
+      await message.isSent('systems.scrim.countdown', getBot(), {
         time: 1,
         type: 'duo',
         unit: getLocalizedName(1, translate('core.minutes')),
@@ -217,7 +218,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting 45 seconds message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', commons.getBot(), {
+      await message.isSent('systems.scrim.countdown', getBot(), {
         time: 45,
         type: 'duo',
         unit: getLocalizedName(45, translate('core.seconds')),
@@ -225,7 +226,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting 30 seconds message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', commons.getBot(), {
+      await message.isSent('systems.scrim.countdown', getBot(), {
         time: 30,
         type: 'duo',
         unit: getLocalizedName(30, translate('core.seconds')),
@@ -233,7 +234,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting 15 seconds message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', commons.getBot(), {
+      await message.isSent('systems.scrim.countdown', getBot(), {
         time: 15,
         type: 'duo',
         unit: getLocalizedName(15, translate('core.seconds')),
@@ -241,7 +242,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting 3 seconds message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', commons.getBot(), {
+      await message.isSent('systems.scrim.countdown', getBot(), {
         time: '3.',
         type: 'duo',
         unit: '',
@@ -249,7 +250,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting 2 seconds message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', commons.getBot(), {
+      await message.isSent('systems.scrim.countdown', getBot(), {
         time: '2.',
         type: 'duo',
         unit: '',
@@ -257,7 +258,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting 1 seconds message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', commons.getBot(), {
+      await message.isSent('systems.scrim.countdown', getBot(), {
         time: '1.',
         type: 'duo',
         unit: '',
@@ -265,11 +266,11 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting go! message', async () => {
-      await message.isSent('systems.scrim.go', commons.getBot(), {}, 3000);
+      await message.isSent('systems.scrim.go', getBot(), {}, 3000);
     });
 
     it('Expecting put match id in chat message', async () => {
-      await message.isSent('systems.scrim.putMatchIdInChat', commons.getBot(), {
+      await message.isSent('systems.scrim.putMatchIdInChat', getBot(), {
         command: '!snipe match',
       }, 19000);
     });
@@ -292,7 +293,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting populated message list', async () => {
-      await message.isSent('systems.scrim.currentMatches', commons.getBot(),
+      await message.isSent('systems.scrim.currentMatches', getBot(),
         { matches: 'ABC - @user1, @user2, @user3 | ABD - @user4' }, 19000);
     });
 
