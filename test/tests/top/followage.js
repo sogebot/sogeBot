@@ -1,5 +1,5 @@
 /* global describe it before */
-const getOwner = require('../../../dest/helpers/commons/getOwner');
+const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 
 require('../../general.js');
 

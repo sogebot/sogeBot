@@ -1,5 +1,5 @@
 /* global describe it before */
-const getOwner = require('../../../dest/helpers/commons/getOwner');
+const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
