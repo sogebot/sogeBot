@@ -146,7 +146,7 @@ class HowLongToBeat extends System {
       } else {
         debug('hltb', 'First entry of this stream for ' + stats.currentGame);
         await getRepository(HowLongToBeatGameItem).save({
-          createdAt: streamStatusChangeSince,
+          createdAt: streamStatusChangeSince.value,
           hltb_id: game.id,
           timestamp: this.interval,
         });

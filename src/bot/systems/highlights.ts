@@ -107,7 +107,7 @@ class Highlights extends System {
       // save remaining api calls
       setRateLimit('bot', request.headers);
 
-      const timestamp = timestampToObject(dayjs().valueOf() - dayjs(streamStatusChangeSince).valueOf());
+      const timestamp = timestampToObject(dayjs().valueOf() - dayjs(streamStatusChangeSince.value).valueOf());
       const highlight = {
         videoId: request.data.data[0].id,
         timestamp: { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds },
