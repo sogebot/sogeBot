@@ -6,6 +6,7 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const user = require('../../general.js').user;
+const check = (require('../../../dest/watchers')).check;
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
@@ -162,6 +163,7 @@ describe('Gambling - duel', () => {
 
     it('set duel minimal bet to 10', async () => {
       duel.minimalBet = 10;
+      await check();
     });
 
     it('add points for users', async () => {
@@ -231,6 +233,7 @@ describe('Duel is on cooldown without bypass by mods', () => {
 
   it('set cooldown to 10 minutes', async () => {
     duel.cooldown = 600;
+    await check();
   });
 
   it('set manually internal cooldown', async () => {
@@ -276,10 +279,12 @@ describe('Duel is on cooldown with bypass by mods', () => {
 
   it('set cooldown to 10 minutes', async () => {
     duel.cooldown = 600;
+    await check();
   });
 
   it('set bypass by mods and owner', async () => {
     duel.bypassCooldownByOwnerAndMods = true;
+    await check();
   });
 
   it('set manually internal cooldown', async () => {

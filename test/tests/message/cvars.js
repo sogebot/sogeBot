@@ -1,7 +1,7 @@
 /* global describe it before */
 
-const { defaultPermissions } = require('../../../dest/helpers/permissions/');
-const { getOwner } = require('../../../dest/commons');
+const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
+const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 
 require('../../general.js');
 
@@ -167,7 +167,7 @@ describe('Message - cvars filter', async () => {
                   readOnly: false,
                   currentValue: String(test.initialValue),
                   type: test.type, responseType: typeof test.responseType === 'undefined' ? 0 : test.responseType,
-                  permission: permission[p],
+                  permission: defaultPermissions[p],
                   evalValue: '',
                   usableOptions: [],
                 });
@@ -257,7 +257,7 @@ describe('Message - cvars filter', async () => {
                   currentValue: String(test.initialValue),
                   type: test.type,
                   responseType: 0,
-                  permission: permission[p],
+                  permission: defaultPermissions[p],
                   evalValue: '',
                   usableOptions: [],
                 });
