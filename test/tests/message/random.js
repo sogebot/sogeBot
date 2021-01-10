@@ -36,11 +36,13 @@ describe('Message - random filter', () => {
 
       const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { username: 'ignoreduser' }));
+      await check();
     });
 
     it('add user ignoreduser to ignore list', async () => {
       const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { username: 'ignoreduser' }));
+      await check();
     });
 
     it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
@@ -63,10 +65,12 @@ describe('Message - random filter', () => {
 
       const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { username: 'ignoreduser' }));
+      await check();
     });
     it('add user ignoreduser to ignore list', async () => {
       const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { username: 'ignoreduser' }));
+      await check();
 
     });
 
@@ -97,10 +101,12 @@ describe('Message - random filter', () => {
 
       const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { username: 'ignoreduser' }));
+      await check();
     });
     it('add user ignoreduser to ignore list', async () => {
       const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { username: 'ignoreduser' }));
+      await check();
     });
 
     const users = ['ignoreduser', 'user1'];
@@ -130,11 +136,13 @@ describe('Message - random filter', () => {
 
       const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { username: 'ignoreduser' }));
+      await check();
     });
 
     it('add user ignoreduser to ignore list', async () => {
       const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { username: 'ignoreduser' }));
+      await check();
     });
 
     const users = ['ignoreduser', 'user1'];
@@ -163,10 +171,12 @@ describe('Message - random filter', () => {
 
       const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { username: 'ignoreduser' }));
+      await check();
     });
     it('add user ignoreduser to ignore list', async () => {
       const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { username: 'ignoreduser' }));
+      await check();
     });
 
     const users = ['ignoreduser', 'user1'];
@@ -195,6 +205,7 @@ describe('Message - random filter', () => {
 
       const r = await tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.removed', { username: 'ignoreduser' }));
+      await check();
     });
     it('add user ignoreduser to ignore list', async () => {
       const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });

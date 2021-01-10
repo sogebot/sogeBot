@@ -108,8 +108,8 @@ class TMI extends Core {
     sendWithMe.value = this.sendWithMe;
   }
 
-  @onChange('ignoreList')
-  @onLoad('ignoreList')
+  @onChange('ignorelist')
+  @onLoad('ignorelist')
   setIgnoreList() {
     setIgnoreList(this.ignorelist);
   }
