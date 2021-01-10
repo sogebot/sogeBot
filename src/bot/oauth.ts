@@ -3,7 +3,7 @@ import axios from 'axios';
 import Core from './_interface';
 import * as constants from './constants';
 import { areDecoratorsLoaded, persistent, settings, ui } from './decorators';
-import { onChange, onLoad } from './decorators/on';
+import { onChange, onLoad, onStartup } from './decorators/on';
 import { apiEmitter } from './helpers/api/emitter';
 import { error, info, warning } from './helpers/log';
 import { loadedTokensInc, setChannelId } from './helpers/oauth';
@@ -120,15 +120,12 @@ class OAuth extends Core {
   }, 'bot')
   public botGenerateLink = null;
 
-  constructor() {
-    super();
-
+  @onStartup()
+  onStartup() {
     this.addMenu({ category: 'settings', name: 'core', id: 'settings/core', this: null });
-    setTimeout(() => {
-      this.validateOAuth('bot');
-      this.validateOAuth('broadcaster');
-      this.getChannelId();
-    }, 10000);
+    this.validateOAuth('bot');
+    this.validateOAuth('broadcaster');
+    this.getChannelId();
   }
 
   @onLoad('broadcasterAccessToken')

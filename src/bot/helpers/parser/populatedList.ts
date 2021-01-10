@@ -8,7 +8,6 @@ function load () {
     setTimeout(() => load(), 1000);
     return;
   }
-  console.log('loaded');
   for (const dir of ['core', 'systems', 'games', 'overlays', 'integrations', 'registries']) {
     for (const system of list(dir)) {
       populatedList.push(system);

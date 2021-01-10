@@ -158,9 +158,8 @@ class Discord extends Integration {
   })
   deleteMessagesAfterWhile = false;
 
-  constructor() {
-    super();
-
+  @onStartup()
+  onStartup() {
     this.addEvent();
 
     // embed updater

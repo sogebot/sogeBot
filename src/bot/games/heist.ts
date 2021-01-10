@@ -4,6 +4,7 @@ import { getRepository } from 'typeorm';
 import { HeistUser } from '../database/entity/heist';
 import { User } from '../database/entity/user';
 import { command, settings, ui } from '../decorators';
+import { onStartup } from '../decorators/on';
 import Expects from '../expects.js';
 import { announce, prepare } from '../helpers/commons';
 import { getLocalizedName } from '../helpers/getLocalized';
@@ -95,11 +96,9 @@ class Heist extends Game {
     },
   ];
 
-  constructor () {
-    super();
-
-    // wait for proper config startup
-    this.timeouts.iCheckFinished = global.setTimeout(() => this.iCheckFinished(), 10000);
+  @onStartup()
+  onStartup() {
+    this.iCheckFinished();
   }
 
   async iCheckFinished () {

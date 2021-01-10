@@ -5,7 +5,7 @@ import { parserReply } from '../commons';
 import currency from '../currency';
 import { Poll, PollVote } from '../database/entity/poll';
 import { command, default_permission, helper, parser, settings } from '../decorators';
-import { onBit, onMessage, onTip } from '../decorators/on';
+import { onBit, onMessage, onStartup, onTip } from '../decorators/on';
 import Expects from '../expects.js';
 import { isStreamOnline } from '../helpers/api';
 import { announce, getOwnerAsSender, prepare } from '../helpers/commons';
@@ -43,9 +43,8 @@ class Polls extends System {
   @settings('reminder')
   everyXSeconds = 0;
 
-  constructor() {
-    super();
-
+  @onStartup()
+  onStartup() {
     setInterval(() => {
       if (isStreamOnline) {
         this.reminder();

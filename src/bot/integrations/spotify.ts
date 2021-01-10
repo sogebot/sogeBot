@@ -103,9 +103,8 @@ class Spotify extends Integration {
   }, 'connection')
   revokeBtn = null;
 
-  constructor () {
-    super();
-
+  @onStartup()
+  onStartup() {
     this.addWidget('spotify', 'widget-title-spotify', 'fab fa-spotify');
     this.addMenu({ category: 'manage', name: 'spotifybannedsongs', id: 'manage/spotify/bannedsongs', this: this });
 

@@ -42,9 +42,8 @@ class PhillipsHue extends Integration {
   @settings('connection')
   timeout = 30000;
 
-  constructor () {
-    super();
-
+  @onStartup()
+  onStartup() {
     setInterval(() => {
       if (!this.enabled) {
         return;

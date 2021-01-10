@@ -39,9 +39,8 @@ class Twitter extends Integration {
   @ui({ type: 'text-input', secret: true })
   secretToken = '';
 
-  constructor() {
-    super();
-
+  @onStartup()
+  onStartup() {
     this.addEvent();
     setInterval(() => {
       this.updateStreams();

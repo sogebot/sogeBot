@@ -10,7 +10,7 @@ import Core from './_interface';
 import * as constants from './constants';
 import { UserTip } from './database/entity/user';
 import { settings, ui } from './decorators';
-import { onChange, onLoad } from './decorators/on';
+import { onChange, onLoad, onStartup } from './decorators/on';
 import { mainCurrency } from './helpers/currency';
 import { error, info, warning } from './helpers/log';
 
@@ -34,9 +34,9 @@ class Currency extends Core {
   public timeouts: any = {};
   public base = 'CZK';
 
-  constructor() {
-    super();
-    setTimeout(() => this.updateRates(), 5 * constants.SECOND);
+  @onStartup()
+  onStartup() {
+    this.updateRates();
   }
 
   public isCodeSupported(code: currency) {

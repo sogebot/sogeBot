@@ -142,7 +142,10 @@ class API extends Core {
   constructor () {
     super();
     this.addMenu({ category: 'stats', name: 'api', id: 'stats/api', this: null });
+  }
 
+  @onStartup()
+  onStartup() {
     this.interval('getCurrentStreamData', constants.MINUTE);
     this.interval('getCurrentStreamTags', constants.MINUTE);
     this.interval('updateChannelViewsAndBroadcasterType', constants.HOUR);
@@ -156,15 +159,13 @@ class API extends Core {
     this.interval('getAllStreamTags', constants.DAY);
     this.interval('getModerators', 10 * constants.MINUTE);
 
-    setTimeout(() => {
-      // free thread_event
-      getManager()
-        .createQueryBuilder()
-        .delete()
-        .from(ThreadEvent)
-        .where('event = :event', { event: 'getChannelChattersUnofficialAPI' })
-        .execute();
-    }, 30000);
+    // free thread_event
+    getManager()
+      .createQueryBuilder()
+      .delete()
+      .from(ThreadEvent)
+      .where('event = :event', { event: 'getChannelChattersUnofficialAPI' })
+      .execute();
   }
 
   interval(fnc: string, interval: number) {

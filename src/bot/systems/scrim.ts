@@ -4,6 +4,7 @@ import { round5 } from '../commons';
 import * as constants from '../constants';
 import { ScrimMatchId } from '../database/entity/scrimMatchId';
 import { command, default_permission, settings } from '../decorators';
+import { onStartup } from '../decorators/on';
 import Expects from '../expects.js';
 import { announce, getBotSender, prepare } from '../helpers/commons';
 import { getLocalizedName } from '../helpers/getLocalized';
@@ -35,9 +36,8 @@ class Scrim extends System {
   @settings('customization')
   waitForMatchIdsInSeconds = 60;
 
-  constructor() {
-    super();
-
+  @onStartup()
+  onStartup() {
     this.reminder();
     setInterval(() => this.reminder(), 1000);
   }

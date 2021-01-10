@@ -4,6 +4,7 @@ import { getRepository } from 'typeorm';
 import { Duel as DuelEntity, DuelInterface } from '../database/entity/duel';
 import { User } from '../database/entity/user';
 import { command, persistent, settings } from '../decorators';
+import { onStartup } from '../decorators/on';
 import { announce, prepare } from '../helpers/commons';
 import { isDbConnected } from '../helpers/database';
 import { getLocalizedName } from '../helpers/getLocalized';
@@ -39,8 +40,8 @@ class Duel extends Game {
   @settings()
   bypassCooldownByOwnerAndMods = false;
 
-  constructor () {
-    super();
+  @onStartup()
+  onStartup() {
     this.pickDuelWinner();
   }
 

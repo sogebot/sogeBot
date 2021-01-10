@@ -8,6 +8,7 @@ import { parserReply } from '../commons';
 import * as constants from '../constants';
 import { CacheEmotes, CacheEmotesInterface } from '../database/entity/cacheEmotes';
 import { parser, settings, ui } from '../decorators';
+import { onStartup } from '../decorators/on';
 import { prepare } from '../helpers/commons';
 import { error, info, warning } from '../helpers/log';
 import { channelId } from '../helpers/oauth';
@@ -85,23 +86,20 @@ class Emotes extends Overlay {
   comboEmoteCount = 0;
   comboLastBreak = 0;
 
-  constructor () {
-    super();
-
-    setTimeout(() => {
-      if (!this.fetch.global) {
-        this.fetchEmotesGlobal();
-      }
-      if (!this.fetch.channel) {
-        this.fetchEmotesChannel();
-      }
-      if (!this.fetch.ffz) {
-        this.fetchEmotesFFZ();
-      }
-      if (!this.fetch.bttv) {
-        this.fetchEmotesBTTV();
-      }
-    }, 10000);
+  @onStartup()
+  onStartup() {
+    if (!this.fetch.global) {
+      this.fetchEmotesGlobal();
+    }
+    if (!this.fetch.channel) {
+      this.fetchEmotesChannel();
+    }
+    if (!this.fetch.ffz) {
+      this.fetchEmotesFFZ();
+    }
+    if (!this.fetch.bttv) {
+      this.fetchEmotesBTTV();
+    }
   }
 
   sockets () {

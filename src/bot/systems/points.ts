@@ -8,7 +8,7 @@ import { MINUTE } from '../constants';
 import { PointsChangelog } from '../database/entity/points';
 import { User, UserInterface } from '../database/entity/user';
 import { command, default_permission, parser, permission_settings, persistent, settings, ui } from '../decorators';
-import { onChange, onLoad } from '../decorators/on';
+import { onChange, onLoad, onStartup } from '../decorators/on';
 import Expects from '../expects';
 import { isStreamOnline } from '../helpers/api';
 import { prepare } from '../helpers/commons';
@@ -67,9 +67,8 @@ class Points extends System {
   @permission_settings('customization')
   perMessageOfflineInterval = 0;
 
-  constructor() {
-    super();
-
+  @onStartup()
+  onStartup() {
     setInterval(() => {
       try {
         const interval = cronparser.parseExpression(this.resetIntervalCron);

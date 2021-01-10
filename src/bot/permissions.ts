@@ -4,6 +4,7 @@ import Core from './_interface';
 import { PermissionCommands, Permissions as PermissionsEntity, PermissionsInterface } from './database/entity/permissions';
 import { User } from './database/entity/user';
 import { command, default_permission } from './decorators';
+import { onStartup } from './decorators/on';
 import Expects from './expects';
 import { prepare } from './helpers/commons';
 import { error } from './helpers/log';
@@ -13,10 +14,9 @@ import { adminEndpoint } from './helpers/socket';
 import users from './users';
 
 class Permissions extends Core {
-  constructor() {
-    super();
+  @onStartup()
+  onStartup() {
     this.addMenu({ category: 'settings', name: 'permissions', id: 'settings/permissions', this: null });
-
     this.ensurePreservedPermissionsInDb();
   }
 

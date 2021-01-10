@@ -8,7 +8,7 @@ import Core from './_interface';
 import { HOUR, MINUTE } from './constants';
 import { Widget } from './database/entity/dashboard';
 import { command, default_permission, settings, ui } from './decorators';
-import { onChange, onLoad } from './decorators/on';
+import { onChange, onLoad, onStartup } from './decorators/on';
 import { isStreamOnline } from './helpers/api';
 import { setLocale } from './helpers/dayjs';
 import { setValue } from './helpers/general';
@@ -60,11 +60,10 @@ class General extends Core {
   }})
   public lang = 'en';
 
-  constructor() {
-    super();
-    setInterval(gracefulExit, 1000);
-
+  @onStartup()
+  onStartup() {
     this.addMenuPublic({ name: 'dashboard', id: '' });
+    setInterval(gracefulExit, 1000);
   }
 
   @command('!enable')

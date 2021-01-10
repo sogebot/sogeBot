@@ -14,7 +14,7 @@ async function updateChannelViewsAndBroadcasterType () {
   const url = `https://api.twitch.tv/helix/users/?id=${cid}`;
 
   const notEnoughAPICalls = calls.bot.remaining <= 30 && calls.bot.refresh > Date.now() / 1000;
-  if (notEnoughAPICalls) {
+  if (notEnoughAPICalls || cid === '') {
     return { state: false };
   }
 

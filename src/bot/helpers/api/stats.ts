@@ -36,8 +36,12 @@ let stats: {
 
 function setStats(value: typeof stats) {
   stats = cloneDeep(value);
-  getRepository(Settings).save({
-    namespace: '/core/api', name: 'stats', value: JSON.stringify(stats),
+  getRepository(Settings).findOne({
+    namespace: '/core/api', name: 'stats',
+  }).then(row => {
+    getRepository(Settings).save({
+      ...row, namespace: '/core/api', name: 'stats', value: JSON.stringify(stats),
+    });
   });
 }
 

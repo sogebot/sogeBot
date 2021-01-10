@@ -70,9 +70,8 @@ class Streamlabs extends Integration {
   @ui({ type: 'text-input', secret: true })
   socketToken = '';
 
-  constructor() {
-    super();
-
+  @onStartup()
+  onStartup() {
     setInterval(() => {
       if (this.onStartupTriggered) {
         this.restApiInterval();

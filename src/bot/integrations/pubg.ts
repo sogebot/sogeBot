@@ -52,9 +52,8 @@ class PUBG extends Integration {
   @persistent()
   _lastGameModeStats = 0;
 
-  constructor() {
-    super();
-
+  @onStartup()
+  onStartup() {
     setInterval(() => {
       if (this._lastSeasonIdFetch > HOUR) {
         this.fetchSeasonId();

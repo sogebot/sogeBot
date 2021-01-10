@@ -7,8 +7,12 @@ let channelId = '';
 
 function setChannelId(value: typeof channelId) {
   channelId = value;
-  getRepository(Settings).save({
-    namespace: '/core/oauth', name: 'channelId', value: JSON.stringify(value),
+  getRepository(Settings).findOne({
+    namespace: '/core/oauth', name: 'channelId',
+  }).then(row => {
+    getRepository(Settings).save({
+      ...row, namespace: '/core/oauth', name: 'channelId', value: JSON.stringify(value),
+    });
   });
 }
 

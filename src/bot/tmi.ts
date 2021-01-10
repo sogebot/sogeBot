@@ -12,7 +12,7 @@ import { Price } from './database/entity/price';
 import { User, UserBitInterface } from './database/entity/user';
 import { settings, ui } from './decorators';
 import { command, default_permission } from './decorators';
-import { getFunctionList, onChange, onLoad, onStartup } from './decorators/on';
+import { getFunctionList, onChange, onLoad } from './decorators/on';
 import Expects from './expects';
 import { isStreamOnline, setStats, stats } from './helpers/api';
 import { getBotSender, getOwner, prepare } from './helpers/commons';
@@ -74,10 +74,27 @@ class TMI extends Core {
     bot: null,
     broadcaster: null,
   };
-  lastWorker = '';
   broadcasterWarning = false;
 
   ignoreGiftsFromUser: { [x: string]: { count: number; time: Date }} = {};
+
+  constructor() {
+    super();
+    this.emitter();
+  }
+
+  emitter() {
+    if (!tmiEmitter) {
+      setTimeout(() => this.emitter(), 10);
+      return;
+    }
+    tmiEmitter.on('reconnect', (type) => {
+      this.reconnect(type);
+    });
+    tmiEmitter.on('part', (type) => {
+      this.part(type);
+    });
+  }
 
   @onChange('showWithAt')
   @onLoad('showWithAt')
@@ -107,16 +124,6 @@ class TMI extends Core {
   @onLoad('mute')
   setMuteStatus() {
     setMuteStatus(this.mute);
-  }
-
-  @onStartup()
-  emitters() {
-    tmiEmitter.on('reconnect', (type) => {
-      this.reconnect(type);
-    });
-    tmiEmitter.on('part', (type) => {
-      this.part(type);
-    });
   }
 
   @command('!ignore add')

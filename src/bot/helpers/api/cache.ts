@@ -9,8 +9,12 @@ let _gameCache = '';
 const gameCache = {
   set value(value: string) {
     _gameCache = value;
-    getRepository(Settings).save({
-      namespace: '/core/api', name: 'gameCache', value: JSON.stringify(value),
+    getRepository(Settings).findOne({
+      namespace: '/core/api', name: 'gameCache',
+    }).then(row => {
+      getRepository(Settings).save({
+        ...row, namespace: '/core/api', name: 'gameCache', value: JSON.stringify(value),
+      });
     });
   },
   get value() {

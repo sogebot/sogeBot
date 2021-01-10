@@ -4,7 +4,7 @@ import { getRepository } from 'typeorm';
 import * as constants from '../constants';
 import { HowLongToBeatGame, HowLongToBeatGameItem } from '../database/entity/howLongToBeatGame';
 import { command, default_permission } from '../decorators';
-import { onStreamStart } from '../decorators/on';
+import { onStartup, onStreamStart } from '../decorators/on';
 import Expects from '../expects';
 import { isStreamOnline, stats, streamStatusChangeSince } from '../helpers/api';
 import { prepare } from '../helpers/commons';
@@ -19,8 +19,8 @@ class HowLongToBeat extends System {
   interval: number = constants.SECOND * 15;
   hltbService = new HowLongToBeatService();
 
-  constructor() {
-    super();
+  @onStartup()
+  onStartup() {
     this.addMenu({ category: 'manage', name: 'howlongtobeat', id: 'manage/hltb', this: this });
 
     this.refreshImageThumbnail();

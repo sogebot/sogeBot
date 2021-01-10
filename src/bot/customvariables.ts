@@ -5,6 +5,7 @@ import { getRepository, IsNull } from 'typeorm';
 
 import Core from './_interface';
 import { Variable, VariableHistory, VariableInterface, VariableURL, VariableWatch } from './database/entity/variable';
+import { onStartup } from './decorators/on';
 import { getBot } from './helpers/commons';
 import { runScript, updateWidgetAndTitle } from './helpers/customvariables';
 import { isDbConnected } from './helpers/database';
@@ -15,8 +16,8 @@ class CustomVariables extends Core {
     [x: string]: NodeJS.Timeout;
   } = {};
 
-  constructor () {
-    super();
+  @onStartup()
+  onStartup() {
     this.addMenu({ category: 'registry', name: 'custom-variables', id: 'registry.customVariables/list', this: null });
     this.checkIfCacheOrRefresh();
   }

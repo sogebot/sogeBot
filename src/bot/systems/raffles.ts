@@ -6,6 +6,7 @@ import { getRepository } from 'typeorm';
 import { Raffle, RaffleParticipant, RaffleParticipantInterface, RaffleParticipantMessageInterface } from '../database/entity/raffle';
 import { User } from '../database/entity/user';
 import { command, default_permission, parser, settings } from '../decorators';
+import { onStartup } from '../decorators/on';
 import { isStreamOnline } from '../helpers/api';
 import { announce, getOwnerAsSender, prepare } from '../helpers/commons';
 import { isDbConnected } from '../helpers/database';
@@ -59,8 +60,8 @@ class Raffles extends System {
   @settings('join')
   announceNewEntriesBatchTime = 15;
 
-  constructor () {
-    super();
+  @onStartup()
+  onStartup() {
     this.addWidget('raffles', 'widget-title-raffles', 'fas fa-gift');
 
     this.announce();
