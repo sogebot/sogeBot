@@ -1,6 +1,5 @@
 import axios from 'axios';
 import chalk from 'chalk';
-import _ from 'lodash';
 import { io, Socket } from 'socket.io-client';
 import { getRepository } from 'typeorm';
 
