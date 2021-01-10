@@ -13,7 +13,7 @@ const tmi = (require('../../../dest/tmi')).default;
 
 const moment = require('moment-timezone');
 
-const { prepare } = require('../../../dest/commons');
+const { prepare } = require('../../../dest/helpers/commons/prepare');
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const assert = require('assert');

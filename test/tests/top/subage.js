@@ -13,7 +13,7 @@ const constants = require('../../../dest/constants');
 const top = (require('../../../dest/systems/top')).default;
 const tmi = (require('../../../dest/tmi')).default;
 
-const { prepare } = require('../../../dest/commons');
+const { prepare } = require('../../../dest/helpers/commons/prepare');
 const moment = require('moment-timezone');
 const assert = require('assert');
 

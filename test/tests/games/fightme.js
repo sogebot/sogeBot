@@ -10,7 +10,7 @@ const user = require('../../general.js').user;
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
-const { prepare } = require('../../../dest/commons');
+const { prepare } = require('../../../dest/helpers/commons/prepare');
 
 const fightme = (require('../../../dest/games/fightme')).default;
 const translate = require('../../../dest/translate').translate;

@@ -11,7 +11,7 @@ const assert = require('assert');
 
 require('../../general.js');
 const { User } = require('../../../dest/database/entity/user');
-const { prepare } = require('../../../dest/commons');
+const { prepare } = require('../../../dest/helpers/commons/prepare');
 
 const command = '!bankheist';
 let heist;

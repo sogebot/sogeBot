@@ -4,7 +4,7 @@ const assert = require('assert');
 require('../../general.js');
 
 const db = require('../../general.js').db;
-const { prepare } = require('../../../dest/commons');
+const { prepare } = require('../../../dest/helpers/commons/prepare');
 const message = require('../../general.js').message;
 
 const { getRepository } = require('typeorm');

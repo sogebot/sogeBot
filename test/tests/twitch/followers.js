@@ -8,7 +8,7 @@ const time = require('../../general.js').time;
 
 const moment = require('moment');
 const assert = require('assert');
-const { prepare } = require('../../../dest/commons');
+const { prepare } = require('../../../dest/helpers/commons/prepare');
 
 const testuser = { username: 'testuser', id: Math.floor(Math.random() * 1000) };
 const testuser2 = { username: 'testuser2', id: Math.floor(Math.random() * 1000) };

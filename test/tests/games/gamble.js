@@ -11,7 +11,7 @@ const { User } = require('../../../dest/database/entity/user');
 
 const gamble = (require('../../../dest/games/gamble')).default;
 const points = (require('../../../dest/systems/points')).default;
-const { prepare } = require('../../../dest/commons');
+const { prepare } = require('../../../dest/helpers/commons/prepare');
 
 const _ = require('lodash');
 const assert = require('assert');

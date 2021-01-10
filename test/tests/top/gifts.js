@@ -9,7 +9,7 @@ const message = require('../../general.js').message;
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
-const { prepare } = require('../../../dest/commons');
+const { prepare } = require('../../../dest/helpers/commons/prepare');
 const top = (require('../../../dest/systems/top')).default;
 const tmi = (require('../../../dest/tmi')).default;
 const assert = require('assert');

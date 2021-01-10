@@ -12,7 +12,7 @@ const top = (require('../../../dest/systems/top')).default;
 const { getRepository } = require('typeorm');
 const { User, UserBit } = require('../../../dest/database/entity/user');
 
-const { prepare } = require('../../../dest/commons');
+const { prepare } = require('../../../dest/helpers/commons/prepare');
 const tmi = (require('../../../dest/tmi')).default;
 const assert = require('assert');
 
