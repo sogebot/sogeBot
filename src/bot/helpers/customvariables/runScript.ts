@@ -109,7 +109,7 @@ async function runScript (script: string, opts: { sender: { userId: number; user
     users: users,
     random: randomVar,
     stream: {
-      uptime: getTime(isStreamOnline.value ? streamStatusChangeSince : null, false),
+      uptime: getTime(isStreamOnline.value ? streamStatusChangeSince.value : null, false),
       currentViewers: stats.currentViewers,
       currentSubscribers: stats.currentSubscribers,
       currentBits: stats.currentBits,

@@ -39,7 +39,7 @@ class Twitch extends Core {
 
   @command('!uptime')
   async uptime (opts: CommandOptions) {
-    const time = getTime(streamStatusChangeSince, true) as any;
+    const time = getTime(streamStatusChangeSince.value, true) as any;
     return [
       {
         response: await translate(isStreamOnline.value ? 'uptime.online' : 'uptime.offline')

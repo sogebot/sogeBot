@@ -31,7 +31,7 @@ const info: ResponseFilter = {
 
     const type = match.groups?.type;
     if (type === 'stream') {
-      const whenOnline = isStreamOnline.value ? streamStatusChangeSince : null;
+      const whenOnline = isStreamOnline.value ? streamStatusChangeSince.value : null;
       if (whenOnline) {
         tips = tips.filter((o) => o.timestamp >= (new Date(whenOnline)).getTime());
       } else {

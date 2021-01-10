@@ -370,7 +370,7 @@ class Webhooks {
 
       coreStats.save({
         timestamp: new Date().getTime(),
-        whenOnline: isStreamOnline.value ? streamStatusChangeSince : Date.now(),
+        whenOnline: isStreamOnline.value ? streamStatusChangeSince.value : Date.now(),
         currentViewers: stats.currentViewers,
         currentSubscribers: stats.currentSubscribers,
         currentFollowers: stats.currentFollowers,
