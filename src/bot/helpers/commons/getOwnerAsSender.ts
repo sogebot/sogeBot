@@ -1,4 +1,4 @@
-import oauth from '../../oauth';
+import { channelId } from '../oauth';
 import { getOwner } from './getOwner';
 
 export function getOwnerAsSender(): Readonly<UserStateTags & { userId: string }> {
@@ -13,6 +13,6 @@ export function getOwnerAsSender(): Readonly<UserStateTags & { userId: string }>
     color: '#000000',
     userType: 'empty',
     emoteSets: [],
-    userId: oauth.channelId,
+    userId: channelId,
   };
 }

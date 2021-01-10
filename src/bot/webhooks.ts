@@ -12,6 +12,7 @@ import { setCurrentRetries, setStreamId, setStreamType } from './helpers/api/';
 import { eventEmitter } from './helpers/events';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import { debug, error, follow, info, start } from './helpers/log';
+import { channelId } from './helpers/oauth';
 import { linesParsed } from './helpers/parser';
 import { find } from './helpers/register';
 import { domain } from './helpers/ui';
@@ -61,7 +62,7 @@ class Webhooks {
   async unsubscribe (type: Type) {
     clearTimeout(this.timeouts[`unsubscribe-${type}`]);
 
-    const cid = oauth.channelId;
+    const cid = channelId;
     const clientId = oauth.botClientId;
     const token = oauth.botAccessToken;
     if (cid === '' || clientId === '' || token === '') {
@@ -115,7 +116,7 @@ class Webhooks {
   async subscribe (type: string) {
     clearTimeout(this.timeouts[`subscribe-${type}`]);
 
-    const cid = oauth.channelId;
+    const cid = channelId;
     const clientId = oauth.botClientId;
     const token = oauth.botAccessToken;
     if (cid === '' || clientId === '' || token === '') {
@@ -190,7 +191,7 @@ class Webhooks {
       return;
     }
 
-    const cid = oauth.channelId;
+    const cid = channelId;
     // set webhooks enabled
     switch (req.query['hub.topic']) {
       case `https://api.twitch.tv/helix/users/follows?first=1&to_id=${cid}`:
@@ -219,7 +220,7 @@ class Webhooks {
   */
   async follower (aEvent: followEvent, skipCacheCheck = false) {
     try {
-      const cid = oauth.channelId;
+      const cid = channelId;
       const data = aEvent.data;
 
       if (Object.keys(cid).length === 0) {
@@ -292,7 +293,7 @@ class Webhooks {
   }
 
   async stream (aEvent: StreamEndpoint) {
-    const cid = oauth.channelId;
+    const cid = channelId;
     if (cid === '') {
       setTimeout(() => this.stream(aEvent), 1000);
     } // wait until channelId is set

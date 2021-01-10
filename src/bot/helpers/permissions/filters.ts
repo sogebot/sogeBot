@@ -3,6 +3,7 @@ import { PermissionFiltersInterface } from '../../database/entity/permissions';
 import { UserInterface } from '../../database/entity/user';
 import levels from '../../systems/levels';
 import ranks from '../../systems/ranks';
+import { mainCurrency } from '../currency';
 
 async function _filters(
   user: Required<UserInterface>,
@@ -37,7 +38,7 @@ async function _filters(
         amount = user.subscribeTier === 'Prime' ? 0 : Number(user.subscribeTier);
         break;
       case 'tips':
-        amount = user.tips.reduce((a, b) => (a + currency.exchange(b.amount, b.currency, currency.mainCurrency)), 0);
+        amount = user.tips.reduce((a, b) => (a + currency.exchange(b.amount, b.currency, mainCurrency.value)), 0);
         break;
       case 'followtime':
         amount = (Date.now() - user.followedAt) / (31 * 24 * 60 * 60 * 1000 /*months*/);

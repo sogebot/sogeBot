@@ -8,6 +8,7 @@ import { User, UserTipInterface } from '../database/entity/user';
 import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import { isStreamOnline, setStats, stats } from '../helpers/api/index.js';
+import { mainCurrency } from '../helpers/currency';
 import { eventEmitter } from '../helpers/events';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 import { error, info, tip } from '../helpers/log';
@@ -152,7 +153,7 @@ class StreamElements extends Integration {
     const newTip: UserTipInterface = {
       amount: Number(amount),
       currency: DONATION_CURRENCY,
-      sortAmount: currency.exchange(Number(amount), DONATION_CURRENCY, currency.mainCurrency),
+      sortAmount: currency.exchange(Number(amount), DONATION_CURRENCY, mainCurrency.value),
       message,
       tippedAt: Date.now(),
       exchangeRates: currency.rates,
@@ -163,7 +164,7 @@ class StreamElements extends Integration {
     if (isStreamOnline) {
       setStats({
         ...stats,
-        currentTips: stats.currentTips + currency.exchange(amount, DONATION_CURRENCY, currency.mainCurrency),
+        currentTips: stats.currentTips + currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value),
       });
     }
 
@@ -181,8 +182,8 @@ class StreamElements extends Integration {
       username: username.toLowerCase(),
       amount: Number(amount).toFixed(2),
       currency: DONATION_CURRENCY,
-      amountInBotCurrency: Number(currency.exchange(amount, DONATION_CURRENCY, currency.mainCurrency)).toFixed(2),
-      currencyInBot: currency.mainCurrency,
+      amountInBotCurrency: Number(currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value)).toFixed(2),
+      currencyInBot: mainCurrency.value,
       message,
     });
     alerts.trigger({

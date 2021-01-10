@@ -9,6 +9,7 @@ import { onBit, onMessage, onTip } from '../decorators/on';
 import Expects from '../expects.js';
 import { isStreamOnline } from '../helpers/api';
 import { announce, getOwnerAsSender, prepare } from '../helpers/commons';
+import { mainCurrency } from '../helpers/currency';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { warning } from '../helpers/log.js';
 import { defaultPermissions } from '../helpers/permissions/';
@@ -390,7 +391,7 @@ class Polls extends System {
           await getRepository(PollVote).save({
             poll: cVote,
             option: i - 1,
-            votes: Number(currency.exchange(opts.amount, opts.currency, currency.mainCurrency)),
+            votes: Number(currency.exchange(opts.amount, opts.currency, mainCurrency.value)),
             votedBy: opts.username,
           });
           break;

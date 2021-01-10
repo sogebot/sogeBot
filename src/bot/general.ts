@@ -1,7 +1,7 @@
 import { readdirSync, writeFileSync } from 'fs';
 
 import gitCommitInfo from 'git-commit-info';
-import { get, isBoolean, isNil, isNumber, isString, map } from 'lodash';
+import { get, isNil, map } from 'lodash';
 import { getConnection, getRepository } from 'typeorm';
 
 import Core from './_interface';
@@ -11,13 +11,14 @@ import { command, default_permission, settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
 import { isStreamOnline } from './helpers/api';
 import { setLocale } from './helpers/dayjs';
+import { setValue } from './helpers/general';
 import { setLang } from './helpers/locales';
 import { debug, error, warning } from './helpers/log';
 import { getOAuthStatus } from './helpers/OAuthStatus';
 import { socketsConnected } from './helpers/panel/';
 import { addUIWarn } from './helpers/panel/';
 import { defaultPermissions } from './helpers/permissions/';
-import { find, list } from './helpers/register';
+import { list } from './helpers/register';
 import { getMuteStatus } from './helpers/tmi/muteStatus';
 import translateLib, { translate } from './translate';
 
@@ -168,46 +169,7 @@ class General extends Core {
   @command('!set')
   @default_permission(defaultPermissions.CASTERS)
   public async setValue(opts: CommandOptions) {
-    // get value so we have a type
-    const splitted = opts.parameters.split(' ');
-    const pointer = splitted.shift();
-    let newValue = splitted.join(' ');
-    if (!pointer) {
-      return [{ response: `$sender, settings does not exists`, ...opts }];
-    }
-
-    const [ type, module ] = pointer.split('.');
-    const self = find(type, module);
-    if (!self) {
-      throw new Error(`${type}.${name} not found in list`);
-    }
-
-    const currentValue = (self as any)[pointer.split('.')[2]];
-    if (typeof currentValue !== 'undefined') {
-      if (isBoolean(currentValue)) {
-        newValue = newValue.toLowerCase().trim();
-        if (['true', 'false'].includes(newValue)) {
-          (self as any)[pointer.split('.')[2]] = newValue === 'true';
-          return [{ response: `$sender, ${pointer} set to ${newValue}`, ...opts }];
-        } else {
-          return [{ response: `$sender, !set error: bool is expected`, ...opts }];
-        }
-      } else if (isNumber(currentValue)) {
-        if (isFinite(Number(newValue))) {
-          (self as any)[pointer.split('.')[2]] = Number(newValue);
-          return [{ response: `$sender, ${pointer} set to ${newValue}`, ...opts }];
-        } else {
-          return [{ response: `$sender, !set error: number is expected`, ...opts }];
-        }
-      } else if (isString(currentValue)) {
-        (self as any)[pointer.split('.')[2]] = newValue;
-        return [{ response: `$sender, ${pointer} set to '${newValue}'`, ...opts }];
-      } else {
-        return [{ response: `$sender, ${pointer} is not supported settings to change`, ...opts }];
-      }
-    } else {
-      return [{ response: `$sender, ${pointer} settings not exists`, ...opts }];
-    }
+    return setValue(opts);
   }
 
   private async setStatus(opts: CommandOptions & { enable: boolean }) {

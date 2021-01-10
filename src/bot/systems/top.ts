@@ -1,10 +1,10 @@
 import _ from 'lodash';
 import { getConnection, getRepository } from 'typeorm';
 
-import currency from '../currency';
 import { User } from '../database/entity/user';
 import { command, default_permission } from '../decorators';
 import general from '../general';
+import { mainCurrency } from '../helpers/currency';
 import { dayjs } from '../helpers/dayjs';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { debug } from '../helpers/log';
@@ -265,7 +265,7 @@ class Top extends System {
             message += [user.value, getLocalizedName(user.value, translate('core.months'))].join(' ');
             break;
           case TYPE.TIPS:
-            message += Intl.NumberFormat(general.lang, { style: 'currency', currency: currency.mainCurrency }).format(user.value);
+            message += Intl.NumberFormat(general.lang, { style: 'currency', currency: mainCurrency.value }).format(user.value);
             break;
           case TYPE.POINTS:
             message += user.value + ' ' + await points.getPointsName(user.value);

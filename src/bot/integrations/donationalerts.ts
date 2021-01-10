@@ -11,6 +11,7 @@ import { settings } from '../decorators';
 import { ui } from '../decorators.js';
 import { onChange, onStartup } from '../decorators/on.js';
 import { isStreamOnline, setStats, stats } from '../helpers/api/index.js';
+import { mainCurrency } from '../helpers/currency';
 import { eventEmitter } from '../helpers/events';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
 import { info, tip } from '../helpers/log.js';
@@ -158,8 +159,8 @@ class Donationalerts extends Integration {
       username: data.username.toLowerCase(),
       amount: data.amount.toFixed(2),
       currency: data.currency,
-      amountInBotCurrency: Number(currency.exchange(Number(data.amount), data.currency, currency.mainCurrency)).toFixed(2),
-      currencyInBot: currency.mainCurrency,
+      amountInBotCurrency: Number(currency.exchange(Number(data.amount), data.currency, mainCurrency.value)).toFixed(2),
+      currencyInBot: mainCurrency.value,
       message: data.message,
     });
 
@@ -178,7 +179,7 @@ class Donationalerts extends Integration {
       const newTip: UserTipInterface = {
         amount: Number(data.amount),
         currency: data.currency,
-        sortAmount: currency.exchange(Number(data.amount), data.currency, currency.mainCurrency),
+        sortAmount: currency.exchange(Number(data.amount), data.currency, mainCurrency.value),
         message: data.message,
         tippedAt: Date.now(),
         exchangeRates: currency.rates,
@@ -191,7 +192,7 @@ class Donationalerts extends Integration {
       if (isStreamOnline) {
         setStats({
           ...stats,
-          currentTips: stats.currentTips + Number(currency.exchange(data.amount, data.currency, currency.mainCurrency)),
+          currentTips: stats.currentTips + Number(currency.exchange(data.amount, data.currency, mainCurrency.value)),
         });
       }
     }

@@ -10,6 +10,7 @@ import { CacheEmotes, CacheEmotesInterface } from '../database/entity/cacheEmote
 import { parser, settings, ui } from '../decorators';
 import { prepare } from '../helpers/commons';
 import { error, info, warning } from '../helpers/log';
+import { channelId } from '../helpers/oauth';
 import { ioServer } from '../helpers/panel';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import oauth from '../oauth';
@@ -151,7 +152,7 @@ class Emotes extends Overlay {
   }
 
   async fetchEmotesChannel () {
-    const cid = oauth.channelId;
+    const cid = channelId;
     this.fetch.channel = true;
 
     if (cid && oauth.broadcasterType !== null && (Date.now() - this.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.lastChannelChk !== cid)) {
@@ -226,7 +227,7 @@ class Emotes extends Overlay {
   }
 
   async fetchEmotesFFZ () {
-    const cid = oauth.channelId;
+    const cid = channelId;
     const channel = oauth.currentChannel;
     this.fetch.ffz = true;
 

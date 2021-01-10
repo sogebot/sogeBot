@@ -8,7 +8,6 @@ import { getRepository } from 'typeorm';
 import Core from './_interface';
 import api from './api';
 import { parserReply } from './commons';
-import currency from './currency';
 import { Event, EventInterface } from './database/entity/event';
 import { User } from './database/entity/user';
 import { onStreamEnd } from './decorators/on';
@@ -17,7 +16,9 @@ import { calls, isStreamOnline, rawStatus, setRateLimit, stats, streamStatusChan
 import { sample } from './helpers/array/sample';
 import { attributesReplace } from './helpers/attributesReplace';
 import { announce, getBotSender, getOwner, prepare } from './helpers/commons';
+import { mainCurrency } from './helpers/currency';
 import { getAll, getValueOf, setValueOf } from './helpers/customvariables';
+import { csEmitter } from './helpers/customvariables/emitter';
 import { isDbConnected } from './helpers/database';
 import { dayjs } from './helpers/dayjs';
 import { eventEmitter } from './helpers/events/emitter';
@@ -25,6 +26,7 @@ import { flatten } from './helpers/flatten';
 import { generateUsername } from './helpers/generateUsername';
 import { getLocalizedName } from './helpers/getLocalized';
 import { debug, error, info, warning } from './helpers/log';
+import { channelId } from './helpers/oauth';
 import { ioServer } from './helpers/panel';
 import { addUIError } from './helpers/panel/';
 import { parserEmitter } from './helpers/parser/';
@@ -37,10 +39,8 @@ import Message from './message';
 import { getIdFromTwitch } from './microservices/getIdFromTwitch';
 import { setTitleAndGame } from './microservices/setTitleAndGame';
 import oauth from './oauth';
-import clips from './overlays/clips';
 import tmi from './tmi';
 import { translate } from './translate';
-import custom_variables from './widgets/customvariables';
 
 const excludedUsers = new Set<string>();
 
@@ -273,7 +273,7 @@ class Events extends Core {
   public async fireCreateAClipAndPlayReplay(operation: Events.OperationDefinitions, attributes: Events.Attributes) {
     const cid = await events.fireCreateAClip(operation);
     if (cid) { // clip created ok
-      clips.showClip(cid);
+      require('./overlays/clips').default.showClip(cid);
     }
   }
 
@@ -288,7 +288,7 @@ class Events extends Core {
   }
 
   public async fireStartCommercial(operation: Events.OperationDefinitions) {
-    const cid = oauth.channelId;
+    const cid = channelId;
     const url = `https://api.twitch.tv/helix/channels/commercial`;
 
     const token = await oauth.broadcasterAccessToken;
@@ -436,9 +436,7 @@ class Events extends Core {
     await setValueOf(String(customVariableName), currentValue, {});
 
     // Update widgets and titles
-    if (custom_variables.socket) {
-      custom_variables.socket.emit('refresh');
-    }
+    csEmitter.emit('refresh');
 
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = rawStatus.value;
@@ -461,9 +459,7 @@ class Events extends Core {
     await setValueOf(customVariableName, currentValue, {});
 
     // Update widgets and titles
-    if (custom_variables.socket) {
-      custom_variables.socket.emit('refresh');
-    }
+    csEmitter.emit('refresh');
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = rawStatus.value;
     if (title.match(regexp)) {
@@ -735,7 +731,7 @@ class Events extends Core {
           method: _.random(0, 1, false) === 0 ? 'Twitch Prime' : '',
           amount: _.random(0, 9999, true).toFixed(2),
           currency: sample(['CZK', 'USD', 'EUR']),
-          currencyInBot: currency.mainCurrency,
+          currencyInBot: mainCurrency.value,
           amountInBotCurrency: _.random(0, 9999, true).toFixed(2),
         };
 

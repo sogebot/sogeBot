@@ -6,12 +6,12 @@ import safeEval from 'safe-eval';
 import strip from 'strip-comments';
 import { getRepository } from 'typeorm';
 
-import currency from '../../currency';
 import { User, UserInterface } from '../../database/entity/user';
 import Message from '../../message';
 import { getUserFromTwitch } from '../../microservices/getUserFromTwitch';
 import users from '../../users';
 import { chatMessagesAtStart, isStreamOnline, stats, streamStatusChangeSince } from '../api';
+import { mainCurrency, symbol } from '../currency';
 import { getAllOnlineUsernames } from '../getAllOnlineUsernames';
 import { getTime } from '../getTime';
 import { debug, error, info, warning } from '../log';
@@ -114,7 +114,7 @@ async function runScript (script: string, opts: { sender: { userId: number; user
       currentSubscribers: stats.currentSubscribers,
       currentBits: stats.currentBits,
       currentTips: stats.currentTips,
-      currency: currency.symbol(currency.mainCurrency),
+      currency: symbol(mainCurrency.value),
       chatMessages: (isStreamOnline) ? linesParsed - chatMessagesAtStart : 0,
       currentFollowers: stats.currentFollowers,
       currentViews: stats.currentViews,

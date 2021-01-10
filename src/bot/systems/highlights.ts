@@ -11,6 +11,7 @@ import { getBotSender } from '../helpers/commons';
 import { dayjs } from '../helpers/dayjs';
 import { timestampToObject } from '../helpers/getTime';
 import { error } from '../helpers/log';
+import { channelId } from '../helpers/oauth';
 import { ioServer } from '../helpers/panel';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
@@ -85,7 +86,7 @@ class Highlights extends System {
   @default_permission(defaultPermissions.CASTERS)
   public async main(opts: CommandOptions): Promise<CommandResponse[]> {
     const token = oauth.botAccessToken;
-    const cid = oauth.channelId;
+    const cid = channelId;
     const url = `https://api.twitch.tv/helix/videos?user_id=${cid}&type=archive&first=1`;
 
     try {

@@ -12,7 +12,8 @@ import { ThreadEvent } from './database/entity/threadEvent';
 import { TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from './database/entity/twitch';
 import { User, UserInterface } from './database/entity/user';
 import { getFunctionList, onStartup } from './decorators/on';
-import { stats as apiStats, calls, chatMessagesAtStart, emptyRateLimit, gameCache, gameOrTitleChangedManually, isStreamOnline, parseTitle, rawStatus, setChatMessagesAtStart, setIsStreamOnline, setRateLimit, setStats, setStreamStatusChangeSince, streamStatusChangeSince } from './helpers/api';
+import { stats as apiStats, calls, chatMessagesAtStart, currentStreamTags, emptyRateLimit, gameCache, gameOrTitleChangedManually, isStreamOnline, rawStatus, setChatMessagesAtStart, setIsStreamOnline, setRateLimit, setStats, setStreamStatusChangeSince, streamStatusChangeSince } from './helpers/api';
+import { parseTitle } from './helpers/api/parseTitle';
 import { curRetries, maxRetries, retries, setCurrentRetries } from './helpers/api/retries';
 import { setStreamId, streamId } from './helpers/api/streamId';
 import { setStreamType, streamType } from './helpers/api/streamType';
@@ -22,7 +23,7 @@ import { eventEmitter } from './helpers/events';
 import { getBroadcaster } from './helpers/getBroadcaster';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import { debug, error, follow, info, start, stop, unfollow, warning } from './helpers/log';
-import { loadedTokens } from './helpers/oauth';
+import { channelId, loadedTokens } from './helpers/oauth';
 import { ioServer } from './helpers/panel';
 import { addUIError } from './helpers/panel/';
 import { linesParsed, setStatus } from './helpers/parser';
@@ -57,13 +58,6 @@ const intervals = new Map<string, {
 type SubscribersEndpoint = { data: { broadcaster_id: string; broadcaster_name: string; is_gift: boolean; tier: string; plan_name: string; user_id: string; user_name: string; }[], pagination: { cursor: string } };
 type FollowsEndpoint = { total: number; data: { from_id: string; from_name: string; to_id: string; toname: string; followed_at: string; }[], pagination: { cursor: string } };
 export type StreamEndpoint = { data: { id: string; user_id: string, user_name: string, game_id: string, type: 'live' | '', title: string , viewer_count: number, started_at: string, language: string; thumbnail_url: string; tag_ids: string[] }[], pagination: { cursor: string } };
-
-export const currentStreamTags: {
-  is_auto: boolean;
-  localization_names: {
-    [lang: string]: string;
-  };
-}[] = [];
 
 const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], usersFromAPI: { from_name: string; from_id: number; followed_at: string }[], fullScale: boolean) => {
   if (!fullScale) {
@@ -376,7 +370,7 @@ class API extends Core {
 
   async getChannelChattersUnofficialAPI (opts: any) {
     const oAuthIsSet = oauth.botUsername.length > 0
-      && oauth.channelId.length > 0
+      && channelId.length > 0
       && oauth.currentChannel.length > 0;
 
     if (!isDbConnected || !oAuthIsSet) {
@@ -481,7 +475,7 @@ class API extends Core {
   async getChannelSubscribers<T extends { cursor?: string; count?: number; noAffiliateOrPartnerWarningSent?: boolean; notCorrectOauthWarningSent?: boolean; subscribers?: SubscribersEndpoint['data'] }> (opts: T): Promise<{ state: boolean; opts: T }> {
     opts = opts || {};
 
-    const cid = oauth.channelId;
+    const cid = channelId;
     let url = `https://api.twitch.tv/helix/subscriptions?broadcaster_id=${cid}&first=100`;
     if (opts.cursor) {
       url += '&after=' + opts.cursor;
@@ -610,7 +604,7 @@ class API extends Core {
   }
 
   async getChannelInformation (opts: any) {
-    const cid = oauth.channelId;
+    const cid = channelId;
     const url = `https://api.twitch.tv/helix/channels?broadcaster_id=${cid}`;
 
     // getChannelInformation only if stream is offline - we are using getCurrentStreamData for online stream title/game
@@ -693,7 +687,7 @@ class API extends Core {
   }
 
   async getChannelHosts () {
-    const cid = oauth.channelId;
+    const cid = channelId;
 
     if (isNil(cid) || cid === '') {
       return { state: false };
@@ -718,7 +712,7 @@ class API extends Core {
   }
 
   async getLatest100Followers () {
-    const cid = oauth.channelId;
+    const cid = channelId;
     const url = `https://api.twitch.tv/helix/users/follows?to_id=${cid}&first=100`;
     const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
@@ -779,7 +773,7 @@ class API extends Core {
   async getChannelFollowers (opts: any) {
     opts = opts || {};
 
-    const cid = oauth.channelId;
+    const cid = channelId;
 
     const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
@@ -849,7 +843,7 @@ class API extends Core {
   }
 
   async getCurrentStreamTags (opts: any) {
-    const cid = oauth.channelId;
+    const cid = channelId;
     const url = `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${cid}`;
 
     const token = oauth.botAccessToken;
@@ -894,7 +888,7 @@ class API extends Core {
   }
 
   async getCurrentStreamData (opts: any) {
-    const cid = oauth.channelId;
+    const cid = channelId;
     const url = `https://api.twitch.tv/helix/streams?user_id=${cid}`;
 
     const token = oauth.botAccessToken;
@@ -1085,63 +1079,6 @@ class API extends Core {
     });
   }
 
-  async setTags (tagsArg: string[]) {
-    const cid = oauth.channelId;
-    const url = `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${cid}`;
-
-    const token = oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || token === '';
-    if (needToWait) {
-      setTimeout(() => this.setTags(tagsArg), 1000);
-      return;
-    }
-
-    const tag_ids: string[] = [];
-    try {
-      for (const tag of tagsArg) {
-        const name = await getRepository(TwitchTagLocalizationName).findOne({
-          where: {
-            value: tag,
-            tagId: Not(IsNull()),
-          },
-        });
-        if (name && name.tagId) {
-          tag_ids.push(name.tagId);
-        }
-      }
-
-      const request = await axios({
-        method: 'put',
-        url,
-        data: {
-          tag_ids,
-        },
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Content-Type': 'application/json',
-          'Client-ID': oauth.botClientId,
-        },
-      });
-      // save remaining api calls
-      setRateLimit('bot', request.headers);
-
-      await getRepository(TwitchTag).update({ is_auto: false }, { is_current: false });
-      for (const tag_id of tag_ids) {
-        await getRepository(TwitchTag).update({ tag_id }, { is_current: true });
-      }
-      ioServer?.emit('api.stats', { method: 'PUT', request: { data: { tag_ids } }, timestamp: Date.now(), call: 'setTags', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: calls.bot });
-    } catch (e) {
-      if (e.isAxiosError) {
-        error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'setTags', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.bot });
-      } else {
-        error(e.stack);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'setTags', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
-      }
-      return false;
-    }
-  }
-
   async checkClips () {
     const token = oauth.botAccessToken;
     if (token === '') {
@@ -1224,7 +1161,7 @@ class API extends Core {
 
     defaults(opts, { hasDelay: true });
 
-    const cid = oauth.channelId;
+    const cid = channelId;
     const url = `https://api.twitch.tv/helix/clips?broadcaster_id=${cid}`;
 
     const token = oauth.botAccessToken;
@@ -1328,7 +1265,7 @@ class API extends Core {
 
     clearTimeout(this.timeouts['isFollowerUpdate-' + id]);
 
-    const cid = oauth.channelId;
+    const cid = channelId;
     const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`;
 
     const token = oauth.botAccessToken;
@@ -1420,7 +1357,7 @@ class API extends Core {
 
   async createMarker () {
     const token = oauth.botAccessToken;
-    const cid = oauth.channelId;
+    const cid = channelId;
 
     const url = 'https://api.twitch.tv/helix/streams/markers';
     try {
@@ -1509,7 +1446,7 @@ class API extends Core {
   }
 
   async getTopClips (opts: any) {
-    let url = 'https://api.twitch.tv/helix/clips?broadcaster_id=' + oauth.channelId;
+    let url = 'https://api.twitch.tv/helix/clips?broadcaster_id=' + channelId;
     const token = oauth.botAccessToken;
     try {
       if (token === '') {

@@ -6,7 +6,7 @@ import { areDecoratorsLoaded, persistent, settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
 import { apiEmitter } from './helpers/api/emitter';
 import { error, info, warning } from './helpers/log';
-import { loadedTokensInc } from './helpers/oauth';
+import { loadedTokensInc, setChannelId } from './helpers/oauth';
 import { setOAuthStatus } from './helpers/OAuthStatus';
 import { setStatus } from './helpers/parser';
 import { cleanViewersCache } from './helpers/permissions';
@@ -22,8 +22,6 @@ class OAuth extends Core {
   public profileImageUrl = '';
   public broadcaster = '';
   public bot = '';
-  @persistent()
-  public channelId = '';
   public botId = '';
   public broadcasterId = '';
   @persistent()
@@ -155,7 +153,7 @@ class OAuth extends Core {
       const cid = await getIdFromTwitch(this.generalChannel, true);
       if (typeof cid !== 'undefined' && cid !== null) {
         this.currentChannel = this.generalChannel;
-        this.channelId = cid;
+        setChannelId(cid);
         info('Channel ID set to ' + cid);
         tmiEmitter.emit('reconnect', 'bot');
         tmiEmitter.emit('reconnect', 'broadcaster');

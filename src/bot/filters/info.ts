@@ -3,6 +3,7 @@ import { getRepository } from 'typeorm';
 import currency from '../currency';
 import { EventList } from '../database/entity/eventList';
 import { isStreamOnline, stats, streamStatusChangeSince } from '../helpers/api';
+import { mainCurrency } from '../helpers/currency';
 import users from '../users';
 
 import type { ResponseFilter } from '.';
@@ -23,8 +24,8 @@ const info: ResponseFilter = {
       .sort((a, b) => {
         const aValue = JSON.parse(a.values_json);
         const bValue = JSON.parse(b.values_json);
-        const aTip = currency.exchange(aValue.amount, aValue.currency, currency.mainCurrency);
-        const bTip = currency.exchange(bValue.amount, bValue.currency, currency.mainCurrency);
+        const aTip = currency.exchange(aValue.amount, aValue.currency, mainCurrency.value);
+        const bTip = currency.exchange(bValue.amount, bValue.currency, mainCurrency.value);
         return bTip - aTip;
       });
 

@@ -10,7 +10,9 @@ import { Permissions } from './database/entity/permissions';
 import { User, UserBit, UserInterface, UserTip } from './database/entity/user';
 import { onStartup } from './decorators/on';
 import { isStreamOnline, setStats, stats } from './helpers/api';
+import { mainCurrency } from './helpers/currency';
 import { debug, error, isDebugEnabled } from './helpers/log';
+import { channelId } from './helpers/oauth';
 import { recacheOnlineUsersPermission } from './helpers/permissions';
 import { defaultPermissions, getUserHighestPermission } from './helpers/permissions/';
 import { adminEndpoint, viewerEndpoint } from './helpers/socket';
@@ -369,7 +371,7 @@ class Users extends Core {
     });
     adminEndpoint(this.nsp, 'viewers::followedAt', async (id, cb) => {
       try {
-        const cid = oauth.channelId;
+        const cid = channelId;
         const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`;
 
         const token = oauth.botAccessToken;
@@ -400,7 +402,7 @@ class Users extends Core {
         });
 
         if (viewer) {
-          const aggregatedTips = viewer.tips.map((o) => currency.exchange(o.amount, o.currency, currency.mainCurrency)).reduce((a, b) => a + b, 0);
+          const aggregatedTips = viewer.tips.map((o) => currency.exchange(o.amount, o.currency, mainCurrency.value)).reduce((a, b) => a + b, 0);
           const aggregatedBits = viewer.bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0);
 
           const permId = await getUserHighestPermission(userId);

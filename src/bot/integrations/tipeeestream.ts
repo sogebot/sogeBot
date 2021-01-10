@@ -11,6 +11,7 @@ import { ui } from '../decorators.js';
 import { onChange, onStartup } from '../decorators/on.js';
 import { isStreamOnline } from '../helpers/api/index.js';
 import { setStats, stats } from '../helpers/api/stats.js';
+import { mainCurrency } from '../helpers/currency';
 import { eventEmitter } from '../helpers/events';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
 import { error, info, tip } from '../helpers/log.js';
@@ -155,8 +156,8 @@ class TipeeeStream extends Integration {
         username,
         amount: Number(amount).toFixed(2),
         currency: donationCurrency,
-        amountInBotCurrency: Number(currency.exchange(amount, donationCurrency, currency.mainCurrency)).toFixed(2),
-        currencyInBot: currency.mainCurrency,
+        amountInBotCurrency: Number(currency.exchange(amount, donationCurrency, mainCurrency.value)).toFixed(2),
+        currencyInBot: mainCurrency.value,
         message,
       });
 
@@ -174,7 +175,7 @@ class TipeeeStream extends Integration {
       const newTip: UserTipInterface = {
         amount,
         currency: donationCurrency,
-        sortAmount: currency.exchange(Number(amount), donationCurrency, currency.mainCurrency),
+        sortAmount: currency.exchange(Number(amount), donationCurrency, mainCurrency.value),
         message,
         exchangeRates: currency.rates,
         tippedAt: Date.now(),
@@ -187,7 +188,7 @@ class TipeeeStream extends Integration {
       if (isStreamOnline) {
         setStats({
           ...stats,
-          currentTips: stats.currentTips + Number(currency.exchange(amount, donationCurrency, currency.mainCurrency)),
+          currentTips: stats.currentTips + Number(currency.exchange(amount, donationCurrency, mainCurrency.value)),
         });
       }
 

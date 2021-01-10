@@ -3,9 +3,11 @@ import { error } from 'console';
 import axios from 'axios';
 import { defaults, isNil } from 'lodash';
 
-import { calls, gameCache, gameOrTitleChangedManually, parseTitle, rawStatus, retries, setRateLimit, stats } from '../helpers/api';
+import { calls, gameCache, gameOrTitleChangedManually, rawStatus, retries, setRateLimit, stats } from '../helpers/api';
+import { parseTitle } from '../helpers/api/parseTitle';
 import { eventEmitter } from '../helpers/events/emitter';
 import { warning } from '../helpers/log';
+import { channelId } from '../helpers/oauth';
 import { ioServer } from '../helpers/panel';
 import { addUIError } from '../helpers/panel/';
 import oauth from '../oauth';
@@ -14,7 +16,7 @@ import { getGameIdFromName } from './getGameIdFromName';
 
 async function setTitleAndGame (args: { title?: string | null; game?: string | null }): Promise<{ response: string; status: boolean } | null> {
   args = defaults(args, { title: null }, { game: null });
-  const cid = oauth.channelId;
+  const cid = channelId;
   const url = `https://api.twitch.tv/helix/channels?broadcaster_id=${cid}`;
 
   const token = oauth.broadcasterAccessToken;

@@ -7,6 +7,7 @@ import { settings } from '../decorators';
 import { ui } from '../decorators.js';
 import { onChange, onStartup } from '../decorators/on.js';
 import { isStreamOnline, setStats, stats } from '../helpers/api/index.js';
+import { mainCurrency } from '../helpers/currency';
 import { eventEmitter } from '../helpers/events';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 import { error, tip } from '../helpers/log';
@@ -74,7 +75,7 @@ class Qiwi extends Integration {
         const newTip: UserTipInterface = {
           amount: Number(amount),
           currency: DONATION_CURRENCY,
-          sortAmount: currency.exchange(Number(amount), DONATION_CURRENCY, currency.mainCurrency),
+          sortAmount: currency.exchange(Number(amount), DONATION_CURRENCY, mainCurrency.value),
           message: message,
           tippedAt: Date.now(),
           exchangeRates: currency.rates,
@@ -87,7 +88,7 @@ class Qiwi extends Integration {
       if (isStreamOnline) {
         setStats({
           ...stats,
-          currentTips: stats.currentTips + currency.exchange(amount, DONATION_CURRENCY, currency.mainCurrency),
+          currentTips: stats.currentTips + currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value),
         });
       }
 
@@ -106,8 +107,8 @@ class Qiwi extends Integration {
         username: username || 'Anonymous',
         amount: String(amount),
         currency: DONATION_CURRENCY,
-        amountInBotCurrency: Number(currency.exchange(amount, DONATION_CURRENCY, currency.mainCurrency)).toFixed(2),
-        currencyInBot: currency.mainCurrency,
+        amountInBotCurrency: Number(currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value)).toFixed(2),
+        currencyInBot: mainCurrency.value,
         message,
       });
 

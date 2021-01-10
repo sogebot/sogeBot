@@ -8,6 +8,7 @@ import { command, default_permission, settings, ui } from '../decorators';
 import Expects from '../expects';
 import general from '../general';
 import { prepare } from '../helpers/commons/';
+import { mainCurrency } from '../helpers/currency';
 import { dayjs, timezone } from '../helpers/dayjs';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { debug, error } from '../helpers/log';
@@ -271,9 +272,9 @@ class UserInfo extends System {
         const tips = user.tips;
         let tipAmount = 0;
         for (const t of tips) {
-          tipAmount += currency.exchange(Number(t.amount), t.currency, currency.mainCurrency);
+          tipAmount += currency.exchange(Number(t.amount), t.currency, mainCurrency.value);
         }
-        message[idx] = Intl.NumberFormat(general.lang, { style: 'currency', currency: currency.mainCurrency }).format(tipAmount);
+        message[idx] = Intl.NumberFormat(general.lang, { style: 'currency', currency: mainCurrency.value }).format(tipAmount);
       }
 
       if (message.includes('$bits')) {

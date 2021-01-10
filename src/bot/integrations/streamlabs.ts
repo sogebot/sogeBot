@@ -9,6 +9,7 @@ import { User, UserTipInterface } from '../database/entity/user';
 import { persistent, settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import { isStreamOnline, setStats, stats } from '../helpers/api';
+import { mainCurrency } from '../helpers/currency';
 import { eventEmitter } from '../helpers/events';
 import { getBroadcaster } from '../helpers/getBroadcaster';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
@@ -208,7 +209,7 @@ class Streamlabs extends Integration {
           const newTip: UserTipInterface = {
             amount: Number(event.amount),
             currency: event.currency,
-            sortAmount: currency.exchange(Number(event.amount), event.currency, currency.mainCurrency),
+            sortAmount: currency.exchange(Number(event.amount), event.currency, mainCurrency.value),
             message: event.message,
             tippedAt: created_at,
             exchangeRates: currency.rates,
@@ -219,7 +220,7 @@ class Streamlabs extends Integration {
           if (isStreamOnline) {
             setStats({
               ...stats,
-              currentTips: stats.currentTips + Number(currency.exchange(Number(event.amount), event.currency, currency.mainCurrency)),
+              currentTips: stats.currentTips + Number(currency.exchange(Number(event.amount), event.currency, mainCurrency.value)),
             });
           }
           tip(`${event.from.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(event.amount).toFixed(2)}${event.currency}, message: ${event.message}`);
@@ -237,8 +238,8 @@ class Streamlabs extends Integration {
           username: event.from.toLowerCase(),
           amount: parseFloat(event.amount).toFixed(2),
           currency: event.currency,
-          amountInBotCurrency: Number(currency.exchange(Number(event.amount), event.currency, currency.mainCurrency)).toFixed(2),
-          currencyInBot: currency.mainCurrency,
+          amountInBotCurrency: Number(currency.exchange(Number(event.amount), event.currency, mainCurrency.value)).toFixed(2),
+          currencyInBot: mainCurrency.value,
           message: event.message,
         });
         alerts.trigger({

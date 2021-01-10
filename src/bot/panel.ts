@@ -9,19 +9,18 @@ import _, { isEqual } from 'lodash';
 import { getConnection, getManager, getRepository, IsNull } from 'typeorm';
 import { v4 as uuid} from 'uuid';
 
-import api, { currentStreamTags } from './api';
-import customvariables from './customvariables';
 import { CacheTitles, CacheTitlesInterface } from './database/entity/cacheTitles';
 import { Dashboard, DashboardInterface, Widget } from './database/entity/dashboard';
 import { Translation } from './database/entity/translation';
 import { TwitchTag, TwitchTagInterface } from './database/entity/twitch';
 import { User } from './database/entity/user';
-import general from './general';
-import { chatMessagesAtStart, isStreamOnline, rawStatus, stats, streamStatusChangeSince } from './helpers/api';
-import { getOwnerAsSender } from './helpers/commons';
-import { getValueOf, isVariableSet } from './helpers/customvariables';
+import { chatMessagesAtStart, currentStreamTags, isStreamOnline, rawStatus, stats, streamStatusChangeSince } from './helpers/api';
+import { getOwnerAsSender } from './helpers/commons/getOwnerAsSender';
+import { getURL, getValueOf, isVariableSet, postURL } from './helpers/customvariables';
 import { getIsBotStarted } from './helpers/database';
 import { flatten } from './helpers/flatten';
+import { setValue } from './helpers/general';
+import { getLang } from './helpers/locales';
 import { getDEBUG, info, setDEBUG } from './helpers/log';
 import { app, ioServer, menu, menuPublic, server, serverSecure, setApp, setServer, widgets } from './helpers/panel';
 import { socketsConnectedDec, socketsConnectedInc } from './helpers/panel/';
@@ -32,6 +31,7 @@ import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import lastfm from './integrations/lastfm';
 import spotify from './integrations/spotify';
 import { sendGameFromTwitch } from './microservices/sendGameFromTwitch';
+import { setTags } from './microservices/setTags';
 import { setTitleAndGame } from './microservices/setTitleAndGame';
 import oauth from './oauth';
 import Parser from './parser';
@@ -75,10 +75,10 @@ export const init = () => {
 
   // customvariables system
   app?.get('/customvariables/:id', (req, res) => {
-    customvariables.getURL(req, res);
+    getURL(req, res);
   });
   app?.post('/customvariables/:id', (req, res) => {
-    customvariables.postURL(req, res);
+    postURL(req, res);
   });
 
   // static routing
@@ -170,7 +170,7 @@ export const init = () => {
         .addSelect('tags.is_auto', 'is_auto')
         .addSelect('tags.is_current', 'is_current')
         .leftJoinAndSelect('twitch_tag_localization_name', 'names', `${joinQuery} like :tag`)
-        .setParameter('tag', '%' + general.lang +'%');
+        .setParameter('tag', '%' + getLang() +'%');
 
       let results = await query.execute();
       if (results.length > 0) {
@@ -272,7 +272,7 @@ export const init = () => {
     });
     socket.on('updateGameAndTitle', async (data: { game: string, title: string, tags: string[] }, cb: (status: boolean | null) => void) => {
       const status = await setTitleAndGame(data);
-      await api.setTags(data.tags);
+      await setTags(data.tags);
 
       if (!status) { // twitch refused update
         cb(true);
@@ -318,7 +318,7 @@ export const init = () => {
     });
 
     socket.on('responses.get', async function (at: string | null, callback: (responses: Record<string, string>) => void) {
-      const responses = flatten(!_.isNil(at) ? translateLib.translations[general.lang][at] : translateLib.translations[general.lang]);
+      const responses = flatten(!_.isNil(at) ? translateLib.translations[getLang()][at] : translateLib.translations[getLang()]);
       _.each(responses, function (value, key) {
         const _at = !_.isNil(at) ? at + '.' + key : key;
         responses[key] = {}; // remap to obj
@@ -466,7 +466,7 @@ export const init = () => {
         if (value.startsWith('_')) {
           return true;
         }
-        general.setValue({ sender: getOwnerAsSender(), createdAt: 0, command: '', parameters: value + ' ' + index, attr: { quiet: data._quiet }});
+        setValue({ sender: getOwnerAsSender(), createdAt: 0, command: '', parameters: value + ' ' + index, attr: { quiet: data._quiet }});
       });
     });
 
@@ -633,7 +633,7 @@ const sendStreamData = async () => {
       currentSong: lastfm.currentSong || ytCurrentSong || spotifyCurrentSong || translate('songs.not-playing'),
       currentHosts: stats.currentHosts,
       currentWatched: stats.currentWatchedTime,
-      tags: currentStreamTags,
+      tags: currentStreamTags.value,
     };
     if (!isEqual(data, lastDataSent)) {
       ioServer?.emit('panel::stats', data);

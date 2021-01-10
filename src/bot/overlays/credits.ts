@@ -6,6 +6,7 @@ import currency from '../currency';
 import { EventList, EventListInterface } from '../database/entity/eventList';
 import { settings, ui } from '../decorators';
 import { isStreamOnline, stats, streamStatusChangeSince } from '../helpers/api';
+import { mainCurrency, symbol } from '../helpers/currency';
 import { publicEndpoint } from '../helpers/socket';
 import oauth from '../oauth';
 import Overlay from './_interface';
@@ -110,9 +111,9 @@ class Credits extends Overlay {
         if (event.values) {
           if (!_.isNil(event.values.amount) && !_.isNil(event.values.currency)) {
             event.values.amount = this.cCreditsAggregated
-              ? currency.exchange(event.values.amount, event.values.currency, currency.mainCurrency)
+              ? currency.exchange(event.values.amount, event.values.currency, mainCurrency.value)
               : event.values.amount;
-            event.values.currency = currency.symbol(this.cCreditsAggregated ? currency.mainCurrency : event.values.currency);
+            event.values.currency = symbol(this.cCreditsAggregated ? mainCurrency.value : event.values.currency);
           }
         }
       }

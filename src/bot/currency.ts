@@ -3,7 +3,6 @@ import https from 'https';
 
 import axios from 'axios';
 import chalk from 'chalk';
-import getSymbolFromCurrency from 'currency-symbol-map';
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
@@ -12,6 +11,7 @@ import * as constants from './constants';
 import { UserTip } from './database/entity/user';
 import { settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
+import { mainCurrency } from './helpers/currency';
 import { error, info, warning } from './helpers/log';
 
 class Currency extends Core {
@@ -43,10 +43,6 @@ class Currency extends Core {
     return code === this.base || !_.isNil(this.rates[code]);
   }
 
-  public symbol(code: string): currency {
-    return getSymbolFromCurrency(code) as currency;
-  }
-
   public exchange(value: number, from: currency, to: currency, rates?: { [key in currency]: number }): number {
     if (!rates) {
       rates = _.cloneDeep(this.rates);
@@ -75,8 +71,10 @@ class Currency extends Core {
   }
 
   @onLoad('mainCurrency')
+  @onChange('mainCurrency')
   setMainCurrencyLoaded() {
     this.mainCurrencyLoaded = true;
+    mainCurrency.value = this.mainCurrency;
   }
 
   @onChange('mainCurrency')
