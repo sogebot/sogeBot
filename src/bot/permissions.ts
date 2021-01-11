@@ -1,14 +1,14 @@
 import { getRepository } from 'typeorm';
 
 import Core from './_interface';
-import { PermissionCommands, Permissions as PermissionsEntity, PermissionsInterface } from './database/entity/permissions';
+import { Permissions as PermissionsEntity, PermissionsInterface } from './database/entity/permissions';
 import { User } from './database/entity/user';
 import { command, default_permission } from './decorators';
 import { onStartup } from './decorators/on';
 import Expects from './expects';
 import { prepare } from './helpers/commons';
 import { error } from './helpers/log';
-import { cleanViewersCache } from './helpers/permissions';
+import { cleanViewersCache, get } from './helpers/permissions';
 import { check, defaultPermissions } from './helpers/permissions/';
 import { adminEndpoint } from './helpers/socket';
 import users from './users';
@@ -94,27 +94,6 @@ class Permissions extends Core {
     });
   }
 
-  public async getCommandPermission(commandArg: string): Promise<string | null | undefined> {
-    const cItem = await getRepository(PermissionCommands).findOne({ name: commandArg });
-    if (cItem) {
-      return cItem.permission;
-    } else {
-      return undefined;
-    }
-  }
-
-  public async get(identifier: string): Promise<PermissionsInterface | undefined> {
-    const uuidRegex = /([0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})/;
-    if (identifier.search(uuidRegex) >= 0) {
-      return getRepository(PermissionsEntity).findOne({ id: identifier });
-    } else {
-      // get first name-like
-      return (await getRepository(PermissionsEntity).find()).find((o) => {
-        return o.name.toLowerCase() === identifier.toLowerCase();
-      }) || undefined;
-    }
-  }
-
   /**
    * !permission exclude-add -p SongRequest -u soge
    */
@@ -132,7 +111,7 @@ class Permissions extends Core {
         throw new Error(prepare('permissions.userNotFound', { username }));
       }
 
-      const pItem = await this.get(userlevel);
+      const pItem = await get(userlevel);
       if (!pItem) {
         throw Error(prepare('permissions.permissionNotFound', { userlevel }));
       }
@@ -175,7 +154,7 @@ class Permissions extends Core {
         throw new Error(prepare('permissions.userNotFound', { username }));
       }
 
-      const pItem = await this.get(userlevel);
+      const pItem = await get(userlevel);
       if (!pItem) {
         throw Error(prepare('permissions.permissionNotFound', { userlevel }));
       }

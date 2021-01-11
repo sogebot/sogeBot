@@ -278,7 +278,7 @@ class Cooldown extends System {
       const affectedCooldowns: CooldownInterface[] = [];
       for (const cooldown of data) {
         if (cooldown.type === 'default') {
-          debug('cooldown.check', `Checking default cooldown ${cooldown.name}`);
+          debug('cooldown.check', `Checking default cooldown ${cooldown.name} (${cooldown.permId}) ${cooldown.canBeRunAt}`);
           if (cooldown.canBeRunAt >= Date.now()) {
             debug('cooldown.check', `${opts.sender.username}#${opts.sender.userId} have ${cooldown.name} on global default cooldown, remaining ${Math.ceil((cooldown.canBeRunAt - Date.now()) / 1000)}s`);
             result = false;

@@ -9,9 +9,9 @@ import { Rank } from '../database/entity/rank';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { enabled } from '../helpers/interface/enabled';
 import { error, warning } from '../helpers/log';
+import { get, getCommandPermission } from '../helpers/permissions';
 import { getPointsName } from '../helpers/points';
 import Parser from '../parser';
-import permissions from '../permissions';
 import { translate } from '../translate';
 
 import type { ResponseFilter } from '.';
@@ -68,10 +68,10 @@ const list: ResponseFilter = {
       case 'core':
       case '!core':
         if (permission) {
-          const _permission = await permissions.get(permission);
+          const _permission = await get(permission);
           if (_permission) {
             const coreCommands = (await Promise.all((await new Parser().getCommandsList()).map(async (item) => {
-              const customPermission = await permissions.getCommandPermission(item.id);
+              const customPermission = await getCommandPermission(item.id);
               return { ...item, permission: typeof customPermission !== 'undefined' ? customPermission : item.permission };
             })))
               .filter(item => item.permission === _permission.id);
@@ -89,7 +89,7 @@ const list: ResponseFilter = {
       case 'command':
         if (permission) {
           const responses = commands.map(o => o.responses).flat();
-          const _permission = await permissions.get(permission);
+          const _permission = await get(permission);
           if (_permission) {
             const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.id);
             commands = commands.filter((o) => commandIds.includes(o.id));
@@ -113,7 +113,7 @@ const list: ResponseFilter = {
       case '!command':
         if (permission) {
           const responses = commands.map(o => o.responses).flat();
-          const _permission = await permissions.get(permission);
+          const _permission = await get(permission);
           if (_permission) {
             const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.id);
             commands = commands.filter((o) => commandIds.includes(o.id));

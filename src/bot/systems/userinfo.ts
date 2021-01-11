@@ -12,11 +12,10 @@ import { mainCurrency } from '../helpers/currency';
 import { dayjs, timezone } from '../helpers/dayjs';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { debug, error } from '../helpers/log';
-import { getUserHighestPermission } from '../helpers/permissions/';
+import { get, getUserHighestPermission } from '../helpers/permissions/';
 import { getPointsName } from '../helpers/points';
 import { fetchAccountAge } from '../microservices/fetchAccountAge';
 import { getUserFromTwitch } from '../microservices/getUserFromTwitch';
-import permissions from '../permissions';
 import { translate } from '../translate';
 import users from '../users';
 import System from './_interface';
@@ -290,7 +289,7 @@ class UserInfo extends System {
         message[idx] = null;
         const permId = await getUserHighestPermission(Number(opts.sender.userId));
         if (permId) {
-          const pItem = await permissions.get(permId);
+          const pItem = await get(permId);
           if (pItem) {
             message[idx] = pItem.name;
           }

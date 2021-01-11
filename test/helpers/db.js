@@ -41,7 +41,8 @@ module.exports = {
       } else {
         debug('test', `Bot is started`);
         if (initialCleanup) {
-          await waitMs(5000);
+          await waitMs(30000);
+          console.log('=============== Initial 30s wait until tests are started. =============== ');
           initialCleanup = false;
         }
       }

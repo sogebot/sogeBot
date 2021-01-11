@@ -9,10 +9,9 @@ import Expects from '../expects';
 import { checkFilter } from '../helpers/checkFilter';
 import { isUUID, prepare } from '../helpers/commons';
 import { debug, error, warning } from '../helpers/log';
-import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
+import { addToViewersCache, get, getFromViewersCache } from '../helpers/permissions';
 import { check, defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
-import permissions from '../permissions';
 import { translate } from '../translate';
 import System from './_interface';
 
@@ -98,7 +97,7 @@ class Keywords extends System {
         return this.add(opts);
       }
 
-      const pItem = await permissions.get(userlevel);
+      const pItem = await get(userlevel);
       if (!pItem) {
         throw Error('Permission ' + userlevel + ' not found.');
       }
@@ -157,7 +156,7 @@ class Keywords extends System {
           return [{ response: prepare('keywords.response-was-not-found', { keyword: keyword.keyword, response: rId }), ...opts }];
         }
 
-        const pItem = await permissions.get(userlevel);
+        const pItem = await get(userlevel);
         if (!pItem) {
           throw Error('Permission ' + userlevel + ' not found.');
         }
@@ -205,7 +204,7 @@ class Keywords extends System {
         return [{ response: prepare('keywords.list-of-responses-is-empty', { keyword: keyword_with_responses?.keyword || keyword }), ...opts }];
       }
       return Promise.all(_.orderBy(keyword_with_responses.responses, 'order', 'asc').map(async(r) => {
-        const perm = await permissions.get(r.permission);
+        const perm = await get(r.permission);
         const response = prepare('keywords.response', { keyword: keyword_with_responses.keyword, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: perm?.name ?? 'n/a' });
         return { response, ...opts };
       }));

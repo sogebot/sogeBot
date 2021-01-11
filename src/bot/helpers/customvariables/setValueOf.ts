@@ -3,7 +3,8 @@ import { getRepository } from 'typeorm';
 
 import { Variable, VariableInterface } from '../../database/entity/variable';
 import users from '../../users';
-import { addToViewersCache, getFromViewersCache } from '../permissions';
+import { warning } from '../log';
+import { addToViewersCache, get, getFromCachedHighestPermission, getFromViewersCache } from '../permissions';
 import { defaultPermissions } from '../permissions/';
 import { check } from '../permissions/';
 import { addChangeToHistory } from './addChangeToHistory';
@@ -51,6 +52,14 @@ async function setValueOf (variable: string | Readonly<VariableInterface>, curre
     }
     const permissionsAreValid = isNil(opts.sender) || getFromViewersCache(opts.sender.userId, item.permission);
     if ((item.readOnly && !opts.readOnlyBypass) || !permissionsAreValid) {
+      const highestPermission = getFromCachedHighestPermission(opts.sender.userId);
+      if (highestPermission) {
+        const userPermission = await get(highestPermission);
+        const variablePermission = await get(item.permission);
+        if (userPermission && variablePermission) {
+          warning(`User ${opts.sender.username}#${opts.sender.userId}(${userPermission.name}) doesn't have permission to change variable ${item.variableName}(${variablePermission.name})`);
+        }
+      }
       isOk = false;
     } else {
       if (item.type === 'number') {
