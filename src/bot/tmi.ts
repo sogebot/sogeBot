@@ -608,7 +608,7 @@ class TMI extends Core {
       const userId = message.tags.userId;
       const count = Number(message.parameters.massGiftCount);
 
-      await getRepository(User).increment({ userId }, 'giftedSubscribes', Number(message.parameters.senderCount));
+      await getRepository(User).increment({ userId }, 'giftedSubscribes', count);
 
       this.ignoreGiftsFromUser[username] = { count, time: new Date() };
 
@@ -650,7 +650,6 @@ class TMI extends Core {
       const tier = this.getMethod(message).plan / 1000;
 
       for (const [u, o] of Object.entries(this.ignoreGiftsFromUser)) {
-        // $FlowFixMe Incorrect mixed type from value of Object.entries https://github.com/facebook/flow/issues/5838
         if (o.count === 0 || new Date().getTime() - new Date(o.time).getTime() >= 1000 * 60 * 10) {
           delete this.ignoreGiftsFromUser[u];
         }
