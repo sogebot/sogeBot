@@ -608,7 +608,7 @@ class TMI extends Core {
       const userId = message.tags.userId;
       const count = Number(message.parameters.massGiftCount);
 
-      await getRepository(User).increment({ userId }, 'giftedSubscribes', count);
+      await getRepository(User).update({ userId }, { giftedSubscribes: Number(message.parameters.senderCount) });
 
       this.ignoreGiftsFromUser[username] = { count, time: new Date() };
 
