@@ -12,6 +12,7 @@ import { parser } from '../decorators';
 import { prepare } from '../helpers/commons';
 import { error } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
+import { getPointsName } from '../helpers/points';
 import { adminEndpoint } from '../helpers/socket';
 import { isOwner } from '../helpers/user';
 import Parser from '../parser';
@@ -95,7 +96,7 @@ class Price extends System {
       ...(await getRepository(PriceEntity).findOne({ command: cmd })),
       command: cmd, price: parseInt(argPrice, 10),
     });
-    const response = prepare('price.price-was-set', { command: cmd, amount: parseInt(argPrice, 10), pointsName: await points.getPointsName(price.price) });
+    const response = prepare('price.price-was-set', { command: cmd, amount: parseInt(argPrice, 10), pointsName: await getPointsName(price.price) });
     return [{ response, ...opts }];
   }
 
@@ -166,7 +167,7 @@ class Price extends System {
     const removePts = price.price;
     const haveEnoughPoints = availablePts >= removePts;
     if (!haveEnoughPoints) {
-      const response = prepare('price.user-have-not-enough-points', { amount: removePts, command: `${price.command}`, pointsName: await points.getPointsName(removePts) });
+      const response = prepare('price.user-have-not-enough-points', { amount: removePts, command: `${price.command}`, pointsName: await getPointsName(removePts) });
       parserReply(response, opts);
     } else {
       await points.decrement({ userId: Number(opts.sender.userId) }, removePts);

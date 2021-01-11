@@ -14,6 +14,7 @@ import { getFunctionList } from './decorators/on';
 import { invalidateParserCache, refreshCachedCommandPermissions } from './helpers/cache';
 import { isBotStarted } from './helpers/database';
 import { flatten, unflatten } from './helpers/flatten';
+import {enabled} from './helpers/interface/enabled';
 import { error, info, warning } from './helpers/log';
 import { addMenu, addMenuPublic, addWidget, ioServer, menu, menuPublic } from './helpers/panel';
 import { defaultPermissions } from './helpers/permissions/';
@@ -74,8 +75,11 @@ class Module {
 
   get enabled(): boolean {
     if (this.areDependenciesEnabled && !this.isDisabledByEnv) {
-      return _.get(this, '_enabled', true);
+      const isEnabled = _.get(this, '_enabled', true);
+      isEnabled ? enabled.enable(this.nsp) : enabled.disable(this.nsp);
+      return isEnabled;
     } else {
+      enabled.disable(this.nsp);
       return false;
     }
   }
@@ -83,6 +87,7 @@ class Module {
   set enabled(value: boolean) {
     if (!_.isEqual(_.get(this, '_enabled', true), value)) {
       _.set(this, '_enabled', value);
+      value ? enabled.enable(this.nsp) : enabled.disable(this.nsp);
       getRepository(Settings).findOne({
         where: {
           name: 'enabled',
@@ -106,7 +111,7 @@ class Module {
   public _rollback: { name: string }[];
   protected _enabled: boolean | null = true;
 
-  constructor(name = 'core', enabled = true) {
+  constructor(name = 'core', enabledArg = true) {
     this.__moduleName__ = this.constructor.name;
 
     this.on = {
@@ -123,7 +128,8 @@ class Module {
     this._rollback = [];
     this._ui = {};
     this._name = name;
-    this._enabled = enabled;
+    this._enabled = enabledArg;
+    enabledArg ? enabled.enable(this.nsp) : enabled.disable(this.nsp);
 
     register(this._name as any, this);
 

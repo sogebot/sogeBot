@@ -16,6 +16,7 @@ import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
 import { debug, error } from '../helpers/log';
 import { getUserHighestPermission } from '../helpers/permissions/';
 import { defaultPermissions } from '../helpers/permissions/';
+import { getPointsName } from '../helpers/points';
 import { setImmediateAwait } from '../helpers/setImmediateAwait';
 import { adminEndpoint } from '../helpers/socket';
 import { bigIntMax, serialize, unserialize } from '../helpers/type';
@@ -391,7 +392,7 @@ class Levels extends System {
         throw new ResponseError(
           prepare('systems.levels.notEnoughPointsToBuy', {
             points: neededPoints,
-            pointsName: points.getPointsName(neededPoints),
+            pointsName: getPointsName(neededPoints),
             amount: xpNeeded,
             level: currentLevel + 1,
             xpName: this.xpName,
@@ -418,7 +419,7 @@ class Levels extends System {
 
       const response = prepare('systems.levels.XPBoughtByPoints', {
         points: neededPoints,
-        pointsName: points.getPointsName(neededPoints),
+        pointsName: getPointsName(neededPoints),
         level: currentLevel + 1,
         amount: xpNeeded,
         xpName: this.xpName,

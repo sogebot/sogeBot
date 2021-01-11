@@ -13,6 +13,7 @@ import { dayjs, timezone } from '../helpers/dayjs';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { debug, error } from '../helpers/log';
 import { getUserHighestPermission } from '../helpers/permissions/';
+import { getPointsName } from '../helpers/points';
 import { fetchAccountAge } from '../microservices/fetchAccountAge';
 import { getUserFromTwitch } from '../microservices/getUserFromTwitch';
 import permissions from '../permissions';
@@ -256,7 +257,7 @@ class UserInfo extends System {
       if (message.includes('$points')) {
         const idx = message.indexOf('$points');
         if (points.enabled) {
-          message[idx] = user.points + ' ' + await points.getPointsName(user.points);
+          message[idx] = user.points + ' ' + await getPointsName(user.points);
         } else {
           message.splice(idx, 1);
         }

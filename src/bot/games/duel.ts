@@ -9,6 +9,7 @@ import { announce, prepare } from '../helpers/commons';
 import { isDbConnected } from '../helpers/database';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { error } from '../helpers/log';
+import { getPointsName } from '../helpers/points';
 import { isBroadcaster } from '../helpers/user/isBroadcaster';
 import { isModerator } from '../helpers/user/isModerator';
 import points from '../systems/points';
@@ -84,10 +85,10 @@ class Duel extends Game {
       const probability = winnerUser.tickets / (total / 100);
 
       const m = prepare(users.length === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
-        pointsName: await points.getPointsName(total),
+        pointsName: await getPointsName(total),
         points: total,
         probability: _.round(probability, 2),
-        ticketsName: await points.getPointsName(winnerUser.tickets),
+        ticketsName: await getPointsName(winnerUser.tickets),
         tickets: winnerUser.tickets,
         winner: winnerUser.username,
       });
@@ -113,7 +114,7 @@ class Duel extends Game {
       response: prepare('gambling.duel.bank', {
         command: this.getCommand('!duel'),
         points: bank,
-        pointsName: await points.getPointsName(bank),
+        pointsName: await getPointsName(bank),
       }),
       ...opts,
     }];
@@ -190,7 +191,7 @@ class Duel extends Game {
 
       const tickets = (await getRepository(DuelEntity).findOne({ id: Number(opts.sender.userId) }))?.tickets ?? 0;
       const response = prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
-        pointsName: await points.getPointsName(tickets),
+        pointsName: await getPointsName(tickets),
         points: tickets,
       });
       responses.push({ response, ...opts });
@@ -201,19 +202,19 @@ class Duel extends Game {
           break;
         case ERROR_ZERO_BET:
           responses.push({ response: prepare('gambling.duel.zeroBet', {
-            pointsName: await points.getPointsName(0),
+            pointsName: await getPointsName(0),
           }), ...opts });
           break;
         case ERROR_NOT_ENOUGH_POINTS:
           responses.push({ response: prepare('gambling.duel.notEnoughPoints', {
-            pointsName: await points.getPointsName(bet || 0),
+            pointsName: await getPointsName(bet || 0),
             points: bet,
           }), ...opts });
           break;
         case ERROR_MINIMAL_BET:
           bet = this.minimalBet;
           responses.push({ response: prepare('gambling.duel.lowerThanMinimalBet', {
-            pointsName: await points.getPointsName(bet),
+            pointsName: await getPointsName(bet),
             points: bet,
             command: opts.command,
           }), ...opts });

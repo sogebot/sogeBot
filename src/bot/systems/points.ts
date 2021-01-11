@@ -1,7 +1,6 @@
 'use strict';
 
 import * as cronparser from 'cron-parser';
-import * as _ from 'lodash';
 import { FindConditions, getConnection, getRepository, LessThanOrEqual } from 'typeorm';
 
 import { MINUTE } from '../constants';
@@ -17,6 +16,7 @@ import { debug, error, warning } from '../helpers/log';
 import { ParameterError } from '../helpers/parameterError';
 import { getUserHighestPermission } from '../helpers/permissions/';
 import { defaultPermissions } from '../helpers/permissions/';
+import { getPointsName, name } from '../helpers/points/';
 import { adminEndpoint } from '../helpers/socket';
 import { isBot } from '../helpers/user/isBot';
 import { getIdFromTwitch } from '../microservices/getIdFromTwitch';
@@ -66,6 +66,12 @@ class Points extends System {
 
   @permission_settings('customization')
   perMessageOfflineInterval = 0;
+
+  @onLoad('name')
+  @onChange('name')
+  setPointsName() {
+    name.value = this.name;
+  }
 
   @onStartup()
   onStartup() {
@@ -305,9 +311,9 @@ class Points extends System {
           username,
           command: undoOperation.command,
           originalValue: undoOperation.originalValue,
-          originalValuePointsLocale: this.getPointsName(undoOperation.originalValue),
+          originalValuePointsLocale: getPointsName(undoOperation.originalValue),
           updatedValue: undoOperation.updatedValue,
-          updatedValuePointsLocale: this.getPointsName(undoOperation.updatedValue),
+          updatedValuePointsLocale: getPointsName(undoOperation.updatedValue),
         }), ...opts,
       }];
     } catch (err) {
@@ -338,7 +344,7 @@ class Points extends System {
       const response = prepare('points.success.set', {
         amount: points,
         username,
-        pointsName: this.getPointsName(points),
+        pointsName: getPointsName(points),
       });
       return [{ response, ...opts }];
     } catch (err) {
@@ -375,7 +381,7 @@ class Points extends System {
         const response = prepare('points.failed.cannotGiveZeroPoints'.replace('$command', opts.command), {
           amount: 0,
           username,
-          pointsName: this.getPointsName(0),
+          pointsName: getPointsName(0),
         });
         return [{ response, ...opts }];
       }
@@ -384,7 +390,7 @@ class Points extends System {
         const response = prepare('points.failed.giveNotEnough'.replace('$command', opts.command), {
           amount: points,
           username,
-          pointsName: this.getPointsName(points),
+          pointsName: getPointsName(points),
         });
         return [{ response, ...opts }];
       } else if (points === 'all') {
@@ -395,7 +401,7 @@ class Points extends System {
         const response = prepare('points.success.give', {
           amount: availablePoints,
           username,
-          pointsName: this.getPointsName(availablePoints),
+          pointsName: getPointsName(availablePoints),
         });
         return [{ response, ...opts }];
       } else {
@@ -406,53 +412,13 @@ class Points extends System {
         const response = prepare('points.success.give', {
           amount: points,
           username,
-          pointsName: this.getPointsName(points),
+          pointsName: getPointsName(points),
         });
         return [{ response, ...opts }];
       }
     } catch (err) {
       return [{ response: translate('points.failed.give').replace('$command', opts.command), ...opts }];
     }
-  }
-
-  getPointsName (points: number): string {
-    const pointsNames = this.name.split('|').map(Function.prototype.call, String.prototype.trim);
-    let single, multi;
-    let xmulti: null | { [points: string]: string } = null;
-    // get single|x:multi|multi from pointsName
-    if (this.name.length === 0) {
-      return '';
-    } else {
-      switch (pointsNames.length) {
-        case 1:
-          single = multi = pointsNames[0];
-          break;
-        case 2:
-          single = pointsNames[0];
-          multi = pointsNames[1];
-          break;
-        default:
-          const len = pointsNames.length;
-          single = pointsNames[0];
-          multi = pointsNames[len - 1];
-          xmulti = pointsNames.reduce((prev: { [points: string]: string }, cur: string) => {
-            const [maxPts, name] = cur.split(':');
-            return { ...prev, [String(maxPts)]: name };
-          }, {});
-          break;
-      }
-    }
-
-    let pointsName = (points === 1 ? single : multi);
-    if (xmulti !== null && _.isObject(xmulti) && points > 1 && points <= 10) {
-      for (let i = points; i <= 10; i++) {
-        if (typeof xmulti[i] === 'string') {
-          pointsName = xmulti[i];
-          break;
-        }
-      }
-    }
-    return pointsName;
   }
 
   @command('!points get')
@@ -509,7 +475,7 @@ class Points extends System {
       const response = prepare('points.defaults.pointsResponse', {
         amount: this.maxSafeInteger(user.points),
         username: username,
-        pointsName: this.getPointsName(this.maxSafeInteger(user.points)),
+        pointsName: getPointsName(this.maxSafeInteger(user.points)),
         order, count,
       });
       return [{ response, ...opts }];
@@ -532,14 +498,14 @@ class Points extends System {
         await getRepository(User).increment({}, 'points', points);
         response = prepare('points.success.online.positive', {
           amount: points,
-          pointsName: this.getPointsName(points),
+          pointsName: getPointsName(points),
         });
       } else {
         points = Math.abs(points);
         await this.decrement({}, points);
         response = prepare('points.success.online.negative', {
           amount: -points,
-          pointsName: this.getPointsName(points),
+          pointsName: getPointsName(points),
         });
       }
 
@@ -559,14 +525,14 @@ class Points extends System {
         await getRepository(User).increment({}, 'points', points);
         response = prepare('points.success.all.positive', {
           amount: points,
-          pointsName: this.getPointsName(points),
+          pointsName: getPointsName(points),
         });
       } else {
         points = Math.abs(points);
         await this.decrement({}, points);
         response = prepare('points.success.all.negative', {
           amount: -points,
-          pointsName: this.getPointsName(points),
+          pointsName: getPointsName(points),
         });
       }
 
@@ -591,7 +557,7 @@ class Points extends System {
       }
       const response = prepare('points.success.rain', {
         amount: points,
-        pointsName: this.getPointsName(points),
+        pointsName: getPointsName(points),
       });
       return [{ response, ...opts }];
     } catch (err) {
@@ -628,7 +594,7 @@ class Points extends System {
       const response = prepare('points.success.add', {
         amount: points,
         username: username,
-        pointsName: this.getPointsName(points),
+        pointsName: getPointsName(points),
       });
       return [{ response, ...opts }];
     } catch (err) {
@@ -668,7 +634,7 @@ class Points extends System {
       const response = prepare('points.success.remove', {
         amount: points,
         username: username,
-        pointsName: this.getPointsName(points === 'all' ? 0 : points),
+        pointsName: getPointsName(points === 'all' ? 0 : points),
       });
       return [{ response, ...opts }];
     } catch (err) {

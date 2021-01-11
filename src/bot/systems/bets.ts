@@ -11,6 +11,7 @@ import { announce, getBotSender, getOwner, prepare } from '../helpers/commons';
 import { isDbConnected } from '../helpers/database';
 import { error, warning } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
+import { getPointsName } from '../helpers/points';
 import { adminEndpoint } from '../helpers/socket';
 import System from './_interface';
 import points from './points';
@@ -262,7 +263,7 @@ class Bets extends System {
     } catch (e) {
       switch (e.message) {
         case ERROR_ZERO_BET:
-          return [{ response: prepare('bets.zeroBet').replace(/\$pointsName/g, await points.getPointsName(0)), ...opts }];
+          return [{ response: prepare('bets.zeroBet').replace(/\$pointsName/g, await getPointsName(0)), ...opts }];
         case ERROR_NOT_RUNNING:
           return [{ response: prepare('bets.notRunning'), ...opts } ];
         case ERROR_UNDEFINED_BET:
@@ -342,7 +343,7 @@ class Bets extends System {
         response: prepare('bets.closed')
           .replace(/\$option/g, currentBet.options[index])
           .replace(/\$amount/g, String(currentBet.participations.filter((o) => o.optionIdx === index).length))
-          .replace(/\$pointsName/g, await points.getPointsName(total))
+          .replace(/\$pointsName/g, await getPointsName(total))
           .replace(/\$points/g, String(total)),
         ...opts,
       }];

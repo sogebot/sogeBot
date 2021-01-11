@@ -9,6 +9,7 @@ import { dayjs } from '../helpers/dayjs';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { debug } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
+import { getPointsName } from '../helpers/points';
 import { getIgnoreList, isIgnored } from '../helpers/user/isIgnored';
 import oauth from '../oauth';
 import tmi from '../tmi';
@@ -268,7 +269,7 @@ class Top extends System {
             message += Intl.NumberFormat(general.lang, { style: 'currency', currency: mainCurrency.value }).format(user.value);
             break;
           case TYPE.POINTS:
-            message += user.value + ' ' + await points.getPointsName(user.value);
+            message += user.value + ' ' + await getPointsName(user.value);
             break;
           case TYPE.MESSAGES:
           case TYPE.BITS:
