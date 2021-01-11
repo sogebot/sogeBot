@@ -10,9 +10,8 @@ import { getBotSender } from './helpers/commons';
 import { debug, error, warning } from './helpers/log';
 import { parserEmitter } from './helpers/parser/';
 import { populatedList } from './helpers/parser/populatedList';
-import { addToViewersCache, getFromViewersCache } from './helpers/permissions';
+import { addToViewersCache, getCommandPermission, getFromViewersCache } from './helpers/permissions';
 import { check } from './helpers/permissions/';
-import permissions from './permissions';
 import { translate } from './translate';
 
 parserEmitter.on('process', async (opts, cb) => {
@@ -204,7 +203,7 @@ class Parser {
         debug('parser.find', JSON.stringify({command: item.command, isStartingWith}));
 
         if (isStartingWith && (onlyParams.length === 0 || (onlyParams.length > 0 && onlyParams[0] === ' '))) {
-          const customPermission = await permissions.getCommandPermission(item.id);
+          const customPermission = await getCommandPermission(item.id);
           if (typeof customPermission !== 'undefined') {
             item.permission = customPermission;
           }

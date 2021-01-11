@@ -1,3 +1,5 @@
+import { defaultPermissions } from './defaultPermissions';
+
 export let cachedViewers: {
   [userId: number]: {
     [permId: string]: boolean;
@@ -20,7 +22,7 @@ export function cleanViewersCache (userId?: number): void {
 
 export const getFromCachedHighestPermission = (userId: number | string) => {
   userId = Number(userId);
-  return cachedHighestPermission[userId];
+  return cachedHighestPermission[userId] ?? defaultPermissions.VIEWERS;
 };
 
 export const getFromViewersCache = (userId: number | string, permId: string) => {

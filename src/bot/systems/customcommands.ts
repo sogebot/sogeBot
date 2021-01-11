@@ -12,10 +12,9 @@ import { checkFilter } from '../helpers/checkFilter';
 import { getAllCountOfCommandUsage, getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage } from '../helpers/commands/count';
 import { prepare } from '../helpers/commons';
 import { warning } from '../helpers/log';
-import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
+import { addToViewersCache, get, getFromViewersCache } from '../helpers/permissions';
 import { check, defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
-import permissions from '../permissions';
 import { translate } from '../translate';
 import System from './_interface';
 
@@ -146,7 +145,7 @@ class CustomCommands extends System {
         return [{ response: prepare('customcmds.response-was-not-found', { command: cmd, response: rId }), ...opts }];
       }
 
-      const pItem = await permissions.get(userlevel);
+      const pItem = await get(userlevel);
       if (!pItem) {
         throw Error('Permission ' + userlevel + ' not found.');
       }
@@ -193,7 +192,7 @@ class CustomCommands extends System {
         return this.add(opts);
       }
 
-      const pItem = await permissions.get(userlevel);
+      const pItem = await get(userlevel);
       if (!pItem) {
         throw Error('Permission ' + userlevel + ' not found.');
       }
@@ -331,7 +330,7 @@ class CustomCommands extends System {
         return [{ response: prepare('customcmds.list-of-responses-is-empty', { command: cmd }), ...opts }];
       }
       return Promise.all(_.orderBy(command_with_responses.responses, 'order', 'asc').map(async(r) => {
-        const perm = await permissions.get(r.permission);
+        const perm = await get(r.permission);
         const response = prepare('customcmds.response', { command: cmd, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: perm?.name ?? 'n/a' });
         return { response, ...opts };
       }));

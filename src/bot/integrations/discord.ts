@@ -26,12 +26,12 @@ import { eventEmitter } from '../helpers/events';
 import { chatIn, chatOut, debug, error, info, warning, whisperOut } from '../helpers/log';
 import { generalChannel } from '../helpers/oauth/generalChannel';
 import { check } from '../helpers/permissions/';
+import { get as getPermission } from '../helpers/permissions/get';
 import { adminEndpoint } from '../helpers/socket';
 import { Message } from '../message';
 import { getIdFromTwitch } from '../microservices/getIdFromTwitch';
 import oauth from '../oauth';
 import Parser from '../parser';
-import permissions from '../permissions';
 import users from '../users';
 import Integration from './_interface';
 
@@ -201,7 +201,7 @@ class Discord extends Integration {
 
     // go through mappings and delete zombies
     for (const mapped of Object.keys(this.rolesMapping)) {
-      const doesPermissionExist = typeof (await permissions.get(mapped)) !== 'undefined';
+      const doesPermissionExist = typeof (await getPermission(mapped)) !== 'undefined';
       if (!doesPermissionExist || this.rolesMapping[mapped] === '') {
         // delete permission if doesn't exist anymore
         delete this.rolesMapping[mapped];

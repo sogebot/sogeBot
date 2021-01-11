@@ -11,11 +11,10 @@ import { incrementCountOfCommandUsage } from '../helpers/commands/count';
 import { prepare } from '../helpers/commons';
 import { executeVariablesInText } from '../helpers/customvariables';
 import { debug, error, warning } from '../helpers/log';
-import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
+import { addToViewersCache, get, getFromViewersCache } from '../helpers/permissions';
 import { check, defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import Parser from '../parser';
-import permissions from '../permissions';
 import { translate } from '../translate';
 import System from './_interface';
 import customcommands from './customcommands';
@@ -252,7 +251,7 @@ class Alias extends System {
         throw Error('Alias/Command doesn\'t start with ! or command is not custom variable');
       }
 
-      const pItem = await permissions.get(perm);
+      const pItem = await get(perm);
       if (!pItem) {
         throw Error('Permission ' + perm + ' not found.');
       }
@@ -285,7 +284,7 @@ class Alias extends System {
         throw Error('Alias/Command doesn\'t start with ! or command is not custom variable');
       }
 
-      const pItem = await permissions.get(perm);
+      const pItem = await get(perm);
       if (!pItem) {
         throw Error('Permission ' + perm + ' not found.');
       }
