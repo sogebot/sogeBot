@@ -81,7 +81,7 @@ class Donationalerts extends Integration {
     await this.socketConnect();
 
     this.socketToDonationAlerts.on('disconnect', (reason: unknown) => {
-      info(chalk.yellow('DONATIONALERTS.RU:') + ' Disconnected from socket: ' + reason);
+      info(chalk.yellow('DONATIONALERTS.RU:') + ' Disconnected from socket: ' +  JSON.stringify(reason));
       this.connect();
     });
 
@@ -90,15 +90,15 @@ class Donationalerts extends Integration {
       info(chalk.yellow('DONATIONALERTS.RU:') + ' Successfully joined in donations channel.');
     });
     channel?.on('leaved', (reason: unknown) => {
-      info(chalk.yellow('DONATIONALERTS.RU:') + ' Leaved from donations channel, reason: ' + reason);
+      info(chalk.yellow('DONATIONALERTS.RU:') + ' Leaved from donations channel, reason: ' + JSON.stringify(reason));
       this.connect();
     });
     channel?.on('error', (reason: unknown) => {
-      info(chalk.yellow('DONATIONALERTS.RU:') + ' Some error occured: ' + reason);
+      info(chalk.yellow('DONATIONALERTS.RU:') + ' Some error occured: ' +  JSON.stringify(reason));
       this.connect();
     });
     channel?.on('unsubscribe', (reason: unknown) => {
-      info(chalk.yellow('DONATIONALERTS.RU:') + ' Unsubscribed, trying to resubscribe. Reason: ' + reason);
+      info(chalk.yellow('DONATIONALERTS.RU:') + ' Unsubscribed, trying to resubscribe. Reason: ' +  JSON.stringify(reason));
       this.connect();
     });
     channel?.on('publish', ({ data }: { data: DonationAlertsEvent }) => {
