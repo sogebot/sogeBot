@@ -48,12 +48,20 @@ module.exports = {
 
     try {
       sinon.stub(log, 'chatOut');
+    } catch (e) {
+      log.chatOut.reset();
+    }
+
+    try {
       sinon.stub(log, 'warning');
+    } catch (e) {
+      log.warning.reset();
+    }
+
+    try {
       sinon.spy(log, 'debug'); // spy because we want to have debug messages printed
     } catch (e) {
       log.chatOut.reset();
-      log.warning.reset();
-      log.debug.resetHistory();
     }
   },
   debug: async function (category, expected, waitMs = 5000) {

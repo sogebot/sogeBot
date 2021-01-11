@@ -24,7 +24,7 @@ describe('Alias - #3680 - alias should override command permission', () => {
   });
 
   it('call !alert directly with regular viewer should send permission error', async () => {
-    const parse = new Parser({ sender: user.owner, message: '!alert type=video', skip: false, quiet: false });
+    const parse = new Parser({ sender: user.viewer, message: '!alert type=video', skip: false, quiet: false });
     const r = await parse.process();
     assert.strictEqual(r[0].response, 'You don\'t have enough permissions for \'!alert type=video\'');
   });
