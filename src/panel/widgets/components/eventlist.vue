@@ -49,7 +49,7 @@
               <b-dropdown-item @click="state.editation = $state.progress">Edit events</b-dropdown-item>
               <b-dropdown-item target="_blank" href="/popout/#eventlist">{{ translate('popout') }}</b-dropdown-item>
               <b-dropdown-divider></b-dropdown-divider>
-              <b-dropdown-item><a class="text-danger" href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() =&gt; EventBus.$emit('remove-widget', 'eventlist'))" v-html="translate('remove-widget').replace('$name', translate('widget-title-eventlist'))"></a></b-dropdown-item>
+              <b-dropdown-item><a class="text-danger" href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'eventlist'))" v-html="translate('remove-widget').replace('$name', translate('widget-title-eventlist'))"></a></b-dropdown-item>
             </template>
           </b-dropdown>
         </li>
@@ -122,11 +122,17 @@
       </b-tab>
       <template v-slot:tabs-end>
         <li class="nav-item text-right" style="flex-grow: 1;">
-          <b-button @click="areAlertsMuted = !areAlertsMuted" class="border-0" :variant="areAlertsMuted ? 'outline-secondary' : 'outline-dark'" id="eventlistAlertsToggleButton">
-            <fa icon="bell" fixed-width v-if="!areAlertsMuted" />
-            <fa icon="bell-slash" fixed-width v-else />
-          </b-button>
-           <b-tooltip target="eventlistAlertsToggleButton" :title="areAlertsMuted ? 'Alerts are disabled.' : 'Alerts are enabled!'"></b-tooltip>
+          <b-button-group>
+            <b-button @click="emitSkipAlertEvent()" class="border-0" :variant="'outline-dark'" id="eventlistAlertsSkipButton">
+              <fa icon="forward" fixed-width />
+            </b-button>
+            <b-button @click="areAlertsMuted = !areAlertsMuted" class="border-0" :variant="areAlertsMuted ? 'outline-secondary' : 'outline-dark'" id="eventlistAlertsToggleButton">
+              <fa icon="bell" fixed-width v-if="!areAlertsMuted" />
+              <fa icon="bell-slash" fixed-width v-else />
+            </b-button>
+          </b-button-group>
+          <b-tooltip target="eventlistAlertsSkipButton" :title="'Skip alert'"></b-tooltip>
+          <b-tooltip target="eventlistAlertsToggleButton" :title="areAlertsMuted ? 'Alerts are disabled.' : 'Alerts are enabled!'"></b-tooltip>
         </li>
       </template>
     </b-tabs>
@@ -330,6 +336,10 @@ export default {
     toggle: function (id) {
       this.settings[id] = !this.settings[id];
       localStorage.setItem(id, this.settings[id]);
+    },
+    emitSkipAlertEvent() {
+      console.log('Skipping current alert')
+      this.socket.emit('skip')
     }
   }
 }

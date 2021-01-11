@@ -201,6 +201,10 @@ class Alerts extends Registry {
       ioServer?.of('/registries/alerts').emit('alert', opts);
     }
   }
+
+  skip() {
+    ioServer?.of('/registries/alerts').emit('skip');
+  }
 }
 
 export default new Alerts();
