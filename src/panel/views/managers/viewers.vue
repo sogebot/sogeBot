@@ -518,6 +518,9 @@
                     <template v-if="data.item.event === 'raid' || data.item.event === 'host'">
                       {{ translate('managers.viewers.hostAndRaidViewersCount').replace('$value', JSON.parse(data.item.values_json).viewers) }}
                     </template>
+                    <template v-else-if="data.item.event === 'subcommunitygift'">
+                      <strong>{{data.item.event}} - ${{JSON.parse(data.item.values_json).count}}</strong>
+                    </template>
                     <template v-else-if="data.item.event === 'subgift'">
                       <div v-if="data.item.username === editationItem.username" v-html="translate('managers.viewers.receivedSubscribeFrom').replace('$value', JSON.parse(data.item.values_json).fromId)" />
                       <div v-else v-html="translate('managers.viewers.giftedSubscribeTo').replace('$value', data.item.username)" />
