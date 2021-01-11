@@ -11,12 +11,11 @@ import { Dashboard } from './database/entity/dashboard';
 import { User } from './database/entity/user';
 import { persistent, settings, ui } from './decorators';
 import { onLoad } from './decorators/on';
-import { isModerator } from './helpers/isModerator';
 import { debug } from './helpers/log';
 import { app, ioServer } from './helpers/panel';
-import { permission } from './helpers/permissions';
+import { check, defaultPermissions, getUserHighestPermission } from './helpers/permissions/';
 import { adminEndpoint, endpoints } from './helpers/socket';
-import permissions from './permissions';
+import { isModerator } from './helpers/user/isModerator';
 
 let _self: any = null;
 
@@ -179,7 +178,7 @@ class Socket extends Core {
               throw new Error('Not matching userId');
             }
             const username = twitchValidation.data.login;
-            const haveCasterPermission = (await permissions.check(Number(userId), permission.CASTERS, true)).access;
+            const haveCasterPermission = (await check(Number(userId), defaultPermissions.CASTERS, true)).access;
             const user = await getRepository(User).findOne({ userId: Number(userId) });
             await getRepository(User).save({
               ...user,
@@ -212,7 +211,7 @@ class Socket extends Core {
             const data = jwt.verify(refreshTokenHeader, this.JWTKey) as {
               userId: number; username: string;
             };
-            const userPermission = await permissions.getUserHighestPermission(Number(data.userId));
+            const userPermission = await getUserHighestPermission(Number(data.userId));
             const user = await getRepository(User).findOne({ userId: Number(data.userId) });
             await getRepository(User).save({
               ...user,
@@ -223,13 +222,13 @@ class Socket extends Core {
             const accessToken = jwt.sign({
               userId: Number(data.userId),
               username: data.username,
-              privileges: await getPrivileges(userPermission === permission.CASTERS ? 'admin' : 'viewer', Number(data.userId)),
+              privileges: await getPrivileges(userPermission === defaultPermissions.CASTERS ? 'admin' : 'viewer', Number(data.userId)),
             }, this.JWTKey, { expiresIn: `${this.accessTokenExpirationTime}s` });
             const refreshToken = jwt.sign({
               userId: Number(data.userId),
               username: data.username,
             }, this.JWTKey, { expiresIn: `${this.refreshTokenExpirationTime}s` });
-            res.status(200).send({accessToken, refreshToken, userType: userPermission === permission.CASTERS ? 'admin' : 'viewer'});
+            res.status(200).send({accessToken, refreshToken, userType: userPermission === defaultPermissions.CASTERS ? 'admin' : 'viewer'});
           } catch(e) {
             debug('socket', e.stack);
             res.status(400).send('You don\'t have access to this server.');

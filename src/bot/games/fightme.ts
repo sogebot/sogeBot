@@ -1,13 +1,14 @@
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { prepare, timeout } from '../commons';
 import { MINUTE } from '../constants';
 import { User, UserInterface } from '../database/entity/user';
 import { command, settings } from '../decorators';
+import { prepare } from '../helpers/commons';
 import { getLocalizedName } from '../helpers/getLocalized';
-import { isBroadcaster } from '../helpers/isBroadcaster';
-import { isModerator } from '../helpers/isModerator';
+import { timeout } from '../helpers/tmi';
+import { isBroadcaster } from '../helpers/user/isBroadcaster';
+import { isModerator } from '../helpers/user/isModerator';
 import points from '../systems/points';
 import { translate } from '../translate';
 import Game from './_interface';

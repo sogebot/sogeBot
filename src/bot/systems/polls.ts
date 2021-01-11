@@ -1,16 +1,18 @@
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import api from '../api';
-import { announce, getOwnerAsSender, parserReply, prepare } from '../commons.js';
+import { parserReply } from '../commons';
 import currency from '../currency';
 import { Poll, PollVote } from '../database/entity/poll';
 import { command, default_permission, helper, parser, settings } from '../decorators';
-import { onBit, onMessage, onTip } from '../decorators/on';
+import { onBit, onMessage, onStartup, onTip } from '../decorators/on';
 import Expects from '../expects.js';
+import { isStreamOnline } from '../helpers/api';
+import { announce, getOwnerAsSender, prepare } from '../helpers/commons';
+import { mainCurrency } from '../helpers/currency';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { warning } from '../helpers/log.js';
-import { permission } from '../helpers/permissions';
+import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import { translate } from '../translate';
 import System from './_interface';
@@ -41,11 +43,10 @@ class Polls extends System {
   @settings('reminder')
   everyXSeconds = 0;
 
-  constructor() {
-    super();
-
+  @onStartup()
+  onStartup() {
     setInterval(() => {
-      if (api.isStreamOnline) {
+      if (isStreamOnline.value) {
         this.reminder();
       }
     }, 1000);
@@ -108,7 +109,7 @@ class Polls extends System {
   }
 
   @command('!poll close')
-  @default_permission(permission.MODERATORS)
+  @default_permission(defaultPermissions.MODERATORS)
   public async close(opts: CommandOptions): Promise<CommandResponse[]> {
     const responses: CommandResponse[] = [];
     const cVote = await getRepository(Poll).findOne({
@@ -168,7 +169,7 @@ class Polls extends System {
   }
 
   @command('!poll open')
-  @default_permission(permission.MODERATORS)
+  @default_permission(defaultPermissions.MODERATORS)
   public async open(opts: CommandOptions): Promise<CommandResponse[]> {
     const cVote = await getRepository(Poll).findOne({ isOpened: true });
 
@@ -389,7 +390,7 @@ class Polls extends System {
           await getRepository(PollVote).save({
             poll: cVote,
             option: i - 1,
-            votes: Number(currency.exchange(opts.amount, opts.currency, currency.mainCurrency)),
+            votes: Number(currency.exchange(opts.amount, opts.currency, mainCurrency.value)),
             votedBy: opts.username,
           });
           break;

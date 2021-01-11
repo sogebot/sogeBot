@@ -2,7 +2,7 @@ import { getRepository } from 'typeorm';
 
 import { User } from '../database/entity/user';
 import { sample } from '../helpers/array/sample';
-import { isIgnored } from '../helpers/isIgnored';
+import { isIgnored } from '../helpers/user/isIgnored';
 import oauth from '../oauth';
 
 import type { ResponseFilter } from '.';

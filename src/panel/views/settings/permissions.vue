@@ -52,8 +52,8 @@
   library.add(faExclamationTriangle)
 
   import { PermissionsInterface } from 'src/bot/database/entity/permissions'
-  import { permission } from 'src/bot/helpers/permissions';
   import translate from 'src/panel/helpers/translate';
+  import { defaultPermissions } from 'src/bot/helpers/permissions/defaultPermissions';
 
   export default Vue.extend({
     components: {
@@ -155,12 +155,12 @@
       },
       reorder() {
         // update orders
-        const permissionsToReorder = sortBy(this.permissions.filter(o => o.id !== permission.VIEWERS, 'order'));
+        const permissionsToReorder = sortBy(this.permissions.filter(o => o.id !== defaultPermissions.VIEWERS, 'order'));
         console.log(permissionsToReorder);
         for (let i = 0; i < permissionsToReorder.length; i++) {
           permissionsToReorder[i].order = i;
         }
-        const viewers = this.permissions.find(o => o.id === permission.VIEWERS)
+        const viewers = this.permissions.find(o => o.id === defaultPermissions.VIEWERS)
         if (viewers) {
           viewers.order = this.permissions.length - 1;
         }

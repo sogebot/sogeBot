@@ -6,18 +6,18 @@ import _ from 'lodash';
 import SpotifyWebApi from 'spotify-web-api-node';
 import { getRepository } from 'typeorm';
 
-import api from '../api';
-import { announce, prepare } from '../commons';
 import { HOUR, SECOND } from '../constants';
 import { SpotifySongBan } from '../database/entity/spotify';
 import { command, default_permission, persistent, settings, ui } from '../decorators';
 import { onChange, onLoad, onStartup } from '../decorators/on';
 import Expects from '../expects';
+import { isStreamOnline } from '../helpers/api';
 import { CommandError } from '../helpers/commandError';
+import { announce, prepare } from '../helpers/commons';
 import { error, info } from '../helpers/log';
 import { ioServer } from '../helpers/panel';
+import { addUIError } from '../helpers/panel/';
 import { adminEndpoint } from '../helpers/socket';
-import { addUIError } from '../panel';
 import Integration from './_interface';
 
 type SpotifyTrack = {
@@ -103,9 +103,8 @@ class Spotify extends Integration {
   }, 'connection')
   revokeBtn = null;
 
-  constructor () {
-    super();
-
+  @onStartup()
+  onStartup() {
     this.addWidget('spotify', 'widget-title-spotify', 'fab fa-spotify');
     this.addMenu({ category: 'manage', name: 'spotifybannedsongs', id: 'manage/spotify/bannedsongs', this: this });
 
@@ -278,7 +277,7 @@ class Spotify extends Integration {
     clearTimeout(this.timeouts.ICurrentSong);
 
     try {
-      if (!this.fetchCurrentSongWhenOffline && !(api.isStreamOnline)) {
+      if (!this.fetchCurrentSongWhenOffline && !(isStreamOnline.value)) {
         throw Error('Stream is offline');
       }
       if (this.client === null) {
@@ -588,7 +587,7 @@ class Spotify extends Integration {
   @command('!spotify')
   @default_permission(null)
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
-    if (!api.isStreamOnline && !this.queueWhenOffline) {
+    if (!isStreamOnline.value && !this.queueWhenOffline) {
       error(`${chalk.bgRed('SPOTIFY')}: stream is offline and you have disabled queue when offline.`);
       return [];
     } // don't do anything on offline stream*/

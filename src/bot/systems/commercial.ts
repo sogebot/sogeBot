@@ -3,16 +3,17 @@
 import axios from 'axios';
 import * as _ from 'lodash';
 
-import api from '../api';
-import { getOwner } from '../commons';
 import { command, default_permission, helper } from '../decorators';
-import events from '../events';
+import { calls, setRateLimit } from '../helpers/api';
+import { getOwner } from '../helpers/commons';
+import { eventEmitter } from '../helpers/events';
 import { error, warning } from '../helpers/log';
+import { channelId } from '../helpers/oauth';
 import { ioServer } from '../helpers/panel';
-import { permission } from '../helpers/permissions';
+import { addUIError } from '../helpers/panel/alerts';
+import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import oauth from '../oauth';
-import { addUIError } from '../panel';
 import tmi from '../tmi';
 import System from './_interface';
 
@@ -40,7 +41,7 @@ class Commercial extends System {
   }
 
   @command('!commercial')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   @helper()
   async main (opts: CommandOptions) {
     const parsed = opts.parameters.match(/^([\d]+)? ?(.*)?$/);
@@ -58,7 +59,7 @@ class Commercial extends System {
       return [{ response: 'Usage: !commercial [duration] [optional-message]', ...opts }];
     }
 
-    const cid = oauth.channelId;
+    const cid = channelId.value;
     // check if duration is correct (30, 60, 90, 120, 150, 180)
     if ([30, 60, 90, 120, 150, 180].includes(commercial.duration)) {
       const url = `https://api.twitch.tv/helix/channels/commercial`;
@@ -88,22 +89,20 @@ class Commercial extends System {
         });
 
         // save remaining api calls
-        api.calls.broadcaster.remaining = request.headers['ratelimit-remaining'];
-        api.calls.broadcaster.refresh = request.headers['ratelimit-reset'];
-        api.calls.broadcaster.limit = request.headers['ratelimit-limit'];
+        setRateLimit('broadcaster', request.headers);
 
-        ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: api.calls.broadcaster });
-        events.fire('commercial', { duration: commercial.duration });
+        ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: calls.broadcaster });
+        eventEmitter.emit('commercial', { duration: commercial.duration });
         if (!_.isNil(commercial.message)) {
           return [{ response: commercial.message, ...opts }];
         }
       } catch (e) {
         if (e.isAxiosError) {
           error(`API: ${url} - ${e.response.data.message}`);
-          ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: api.calls.broadcaster });
+          ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.broadcaster });
         } else {
           error(`API: ${url} - ${e.stack}`);
-          ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: api.calls.broadcaster });
+          ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.broadcaster });
         }
       }
       return [];

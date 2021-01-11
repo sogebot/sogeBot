@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { ResponseFilter } from '.';
+import type { ResponseFilter } from '.';
 
 const youtube: ResponseFilter = {
   '$youtube(url, #)': async function (filter: string) {

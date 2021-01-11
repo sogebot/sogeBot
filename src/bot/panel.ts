@@ -9,24 +9,30 @@ import _, { isEqual } from 'lodash';
 import { getConnection, getManager, getRepository, IsNull } from 'typeorm';
 import { v4 as uuid} from 'uuid';
 
-import api, { currentStreamTags } from './api';
-import { getOwnerAsSender } from './commons';
-import customvariables from './customvariables';
 import { CacheTitles, CacheTitlesInterface } from './database/entity/cacheTitles';
 import { Dashboard, DashboardInterface, Widget } from './database/entity/dashboard';
 import { Translation } from './database/entity/translation';
 import { TwitchTag, TwitchTagInterface } from './database/entity/twitch';
 import { User } from './database/entity/user';
-import general from './general';
+import { chatMessagesAtStart, currentStreamTags, isStreamOnline, rawStatus, stats, streamStatusChangeSince } from './helpers/api';
+import { getOwnerAsSender } from './helpers/commons/getOwnerAsSender';
+import { getURL, getValueOf, isVariableSet, postURL } from './helpers/customvariables';
 import { getIsBotStarted } from './helpers/database';
 import { flatten } from './helpers/flatten';
+import { setValue } from './helpers/general';
+import { getLang } from './helpers/locales';
 import { getDEBUG, info, setDEBUG } from './helpers/log';
 import { app, ioServer, menu, menuPublic, server, serverSecure, setApp, setServer, widgets } from './helpers/panel';
+import { socketsConnectedDec, socketsConnectedInc } from './helpers/panel/';
+import { errors, warns } from './helpers/panel/alerts';
 import { linesParsed, status as statusObj } from './helpers/parser';
 import { list, systems } from './helpers/register';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import lastfm from './integrations/lastfm';
 import spotify from './integrations/spotify';
+import { sendGameFromTwitch } from './microservices/sendGameFromTwitch';
+import { setTags } from './microservices/setTags';
+import { setTitleAndGame } from './microservices/setTitleAndGame';
 import oauth from './oauth';
 import Parser from './parser';
 import { default as socketSystem } from './socket';
@@ -38,21 +44,6 @@ import webhooks from './webhooks';
 
 const port = process.env.PORT ?? '20000';
 const secureport = process.env.SECUREPORT ?? '20443';
-
-export let socketsConnected = 0;
-
-export type UIError = { name: string; message: string };
-
-const errors: UIError[] = [];
-const warns: UIError[] = [];
-
-export const addUIError = (error: UIError) => {
-  errors.push(error);
-};
-
-export const addUIWarn = (warn: UIError) => {
-  warns.push(warn);
-};
 
 export const init = () => {
   setApp(express());
@@ -84,10 +75,10 @@ export const init = () => {
 
   // customvariables system
   app?.get('/customvariables/:id', (req, res) => {
-    customvariables.getURL(req, res);
+    getURL(req, res);
   });
   app?.post('/customvariables/:id', (req, res) => {
-    customvariables.postURL(req, res);
+    postURL(req, res);
   });
 
   // static routing
@@ -160,9 +151,9 @@ export const init = () => {
 
   ioServer?.on('connect', async (socket) => {
     socket.on('disconnect', () => {
-      socketsConnected--;
+      socketsConnectedDec();
     });
-    socketsConnected++;
+    socketsConnectedInc();
 
     socket.on('botStatus', (cb: (status: boolean) => void) => {
       cb(getIsBotStarted());
@@ -179,7 +170,7 @@ export const init = () => {
         .addSelect('tags.is_auto', 'is_auto')
         .addSelect('tags.is_current', 'is_current')
         .leftJoinAndSelect('twitch_tag_localization_name', 'names', `${joinQuery} like :tag`)
-        .setParameter('tag', '%' + general.lang +'%');
+        .setParameter('tag', '%' + getLang() +'%');
 
       let results = await query.execute();
       if (results.length > 0) {
@@ -201,7 +192,7 @@ export const init = () => {
     });
     // twitch game and title change
     socket.on('getGameFromTwitch', function (game: string) {
-      api.sendGameFromTwitch(socket, game);
+      sendGameFromTwitch(socket, game);
     });
     socket.on('getUserTwitchGames', async () => {
       const titles = await getRepository(CacheTitles).find();
@@ -280,8 +271,8 @@ export const init = () => {
       cb(null, allTitles);
     });
     socket.on('updateGameAndTitle', async (data: { game: string, title: string, tags: string[] }, cb: (status: boolean | null) => void) => {
-      const status = await api.setTitleAndGame(data);
-      await api.setTags(data.tags);
+      const status = await setTitleAndGame(data);
+      await setTags(data.tags);
 
       if (!status) { // twitch refused update
         cb(true);
@@ -319,15 +310,15 @@ export const init = () => {
     // custom var
     socket.on('custom.variable.value', async (variable: string, cb: (error: string | null, value: string) => void) => {
       let value = translate('webpanel.not-available');
-      const isVariableSet = await customvariables.isVariableSet(variable);
-      if (isVariableSet) {
-        value = await customvariables.getValueOf(variable);
+      const isVarSet = await isVariableSet(variable);
+      if (isVarSet) {
+        value = await getValueOf(variable);
       }
       cb(null, value);
     });
 
     socket.on('responses.get', async function (at: string | null, callback: (responses: Record<string, string>) => void) {
-      const responses = flatten(!_.isNil(at) ? translateLib.translations[general.lang][at] : translateLib.translations[general.lang]);
+      const responses = flatten(!_.isNil(at) ? translateLib.translations[getLang()][at] : translateLib.translations[getLang()]);
       _.each(responses, function (value, key) {
         const _at = !_.isNil(at) ? at + '.' + key : key;
         responses[key] = {}; // remap to obj
@@ -475,7 +466,7 @@ export const init = () => {
         if (value.startsWith('_')) {
           return true;
         }
-        general.setValue({ sender: getOwnerAsSender(), createdAt: 0, command: '', parameters: value + ' ' + index, attr: { quiet: data._quiet }});
+        setValue({ sender: getOwnerAsSender(), createdAt: 0, command: '', parameters: value + ' ' + index, attr: { quiet: data._quiet }});
       });
     });
 
@@ -626,23 +617,23 @@ const sendStreamData = async () => {
 
     const data = {
       broadcasterType: oauth.broadcasterType,
-      uptime: api.isStreamOnline ? api.streamStatusChangeSince : null,
-      currentViewers: api.stats.currentViewers,
-      currentSubscribers: api.stats.currentSubscribers,
-      currentBits: api.stats.currentBits,
-      currentTips: api.stats.currentTips,
-      chatMessages: api.isStreamOnline ? linesParsed - api.chatMessagesAtStart : 0,
-      currentFollowers: api.stats.currentFollowers,
-      currentViews: api.stats.currentViews,
-      maxViewers: api.stats.maxViewers,
-      newChatters: api.stats.newChatters,
-      game: api.stats.currentGame,
-      status: api.stats.currentTitle,
-      rawStatus: api.rawStatus,
+      uptime: isStreamOnline.value ? streamStatusChangeSince.value : null,
+      currentViewers: stats.currentViewers,
+      currentSubscribers: stats.currentSubscribers,
+      currentBits: stats.currentBits,
+      currentTips: stats.currentTips,
+      chatMessages: isStreamOnline.value ? linesParsed - chatMessagesAtStart : 0,
+      currentFollowers: stats.currentFollowers,
+      currentViews: stats.currentViews,
+      maxViewers: stats.maxViewers,
+      newChatters: stats.newChatters,
+      game: stats.currentGame,
+      status: stats.currentTitle,
+      rawStatus: rawStatus.value,
       currentSong: lastfm.currentSong || ytCurrentSong || spotifyCurrentSong || translate('songs.not-playing'),
-      currentHosts: api.stats.currentHosts,
-      currentWatched: api.stats.currentWatchedTime,
-      tags: currentStreamTags,
+      currentHosts: stats.currentHosts,
+      currentWatched: stats.currentWatchedTime,
+      tags: currentStreamTags.value,
     };
     if (!isEqual(data, lastDataSent)) {
       ioServer?.emit('panel::stats', data);

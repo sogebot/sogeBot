@@ -6,9 +6,8 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const assert = require('assert');
 
-const { permission } = require('../../../dest/helpers/permissions');
+const { defaultPermissions,check } = require('../../../dest/helpers/permissions/');
 const { invalidateParserCache } = require('../../../dest/helpers/cache');
-const permissions = (require('../../../dest/permissions')).default;
 const Parser = require('../../../dest/parser').default;
 const currency = require('../../../dest/currency').default;
 
@@ -35,7 +34,7 @@ describe('Permissions - https://community.sogebot.xyz/t/spotify-user-banlist/192
     await getRepository(Permissions).save({
       id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
       name: '__permission_with_excluded_user__',
-      order: Object.keys(permission).length + 1,
+      order: Object.keys(defaultPermissions).length + 1,
       isCorePermission: false,
       isWaterfallAllowed: false,
       automation: 'viewers',
@@ -51,14 +50,14 @@ describe('Permissions - https://community.sogebot.xyz/t/spotify-user-banlist/192
     if (user.username === '__viewer__') {
       // have access
       it(`+++ ${users[j].username} should have access to __permission_with_excluded_user__`, async () => {
-        const check = await permissions.check(user.userId, pHash);
-        assert.strictEqual(check.access, true);
+        const _check = await check(user.userId, pHash);
+        assert.strictEqual(_check.access, true);
       });
     } else {
       // no access
       it(`--- ${users[j].username} should NOT have access to __permission_with_excluded_user__`, async () => {
-        const check = await permissions.check(user.userId, pHash);
-        assert.strictEqual(check.access, false);
+        const _check = await check(user.userId, pHash);
+        assert.strictEqual(_check.access, false);
       });
     }
   }

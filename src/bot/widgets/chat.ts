@@ -1,8 +1,9 @@
 import axios from 'axios';
 
-import { sendMessage } from '../commons';
-import { getIgnoreList } from '../helpers/isIgnored';
+import { sendMessage } from '../helpers/commons/sendMessage';
+import { generalChannel } from '../helpers/oauth/generalChannel';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
+import { getIgnoreList } from '../helpers/user/isIgnored';
 import OAuth from '../oauth';
 import Widget from './_interface';
 
@@ -25,12 +26,12 @@ class Chat extends Widget {
     });
 
     publicEndpoint(this.nsp, 'room', async (cb: (error: null, data: string) => void) => {
-      cb(null, OAuth.generalChannel.toLowerCase());
+      cb(null, generalChannel.value.toLowerCase());
     });
 
     adminEndpoint(this.nsp, 'viewers', async (cb) => {
       try {
-        const url = `https://tmi.twitch.tv/group/user/${(await OAuth.generalChannel).toLowerCase()}/chatters`;
+        const url = `https://tmi.twitch.tv/group/user/${generalChannel.value.toLowerCase()}/chatters`;
         const response = await axios.get(url);
 
         if (response.status === 200) {

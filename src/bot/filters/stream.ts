@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-import api from '../api';
+import { setRateLimit } from '../helpers/api';
 import oauth from '../oauth';
 
-import { ResponseFilter } from '.';
+import type { ResponseFilter } from '.';
 
 const stream: ResponseFilter = {
   '(stream|#|link)': async function (filter: any) {
@@ -67,8 +67,7 @@ const stream: ResponseFilter = {
         },
       });
       // save remaining api calls
-      api.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      api.calls.bot.refresh = request.headers['ratelimit-reset'];
+      setRateLimit('bot', request.headers);
       return `'${request.data.data[0].title}'`;
     } catch (e) {
       return 'n/a';
@@ -97,8 +96,7 @@ const stream: ResponseFilter = {
         },
       });
       // save remaining api calls
-      api.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      api.calls.bot.refresh = request.headers['ratelimit-reset'];
+      setRateLimit('bot', request.headers);
       return request.data.data[0].viewer_count;
     } catch (e) {
       return '0';

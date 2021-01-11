@@ -1,17 +1,17 @@
 import axios from 'axios';
 import Centrifuge from 'centrifuge';
 import chalk from 'chalk';
-import _ from 'lodash';
 import { getRepository } from 'typeorm';
 import WebSocket from 'ws';
 
-import api from '../api.js';
 import currency from '../currency';
 import { User, UserTipInterface } from '../database/entity/user';
 import { settings } from '../decorators';
 import { ui } from '../decorators.js';
 import { onChange, onStartup } from '../decorators/on.js';
-import events from '../events.js';
+import { isStreamOnline, setStats, stats } from '../helpers/api/index.js';
+import { mainCurrency } from '../helpers/currency';
+import { eventEmitter } from '../helpers/events';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
 import { info, tip } from '../helpers/log.js';
 import eventlist from '../overlays/eventlist.js';
@@ -154,12 +154,12 @@ class Donationalerts extends Integration {
       timestamp: Date.now(),
     });
 
-    events.fire('tip', {
+    eventEmitter.emit('tip', {
       username: data.username.toLowerCase(),
       amount: data.amount.toFixed(2),
       currency: data.currency,
-      amountInBotCurrency: Number(currency.exchange(Number(data.amount), data.currency, currency.mainCurrency)).toFixed(2),
-      currencyInBot: currency.mainCurrency,
+      amountInBotCurrency: Number(currency.exchange(Number(data.amount), data.currency, mainCurrency.value)).toFixed(2),
+      currencyInBot: mainCurrency.value,
       message: data.message,
     });
 
@@ -178,7 +178,7 @@ class Donationalerts extends Integration {
       const newTip: UserTipInterface = {
         amount: Number(data.amount),
         currency: data.currency,
-        sortAmount: currency.exchange(Number(data.amount), data.currency, currency.mainCurrency),
+        sortAmount: currency.exchange(Number(data.amount), data.currency, mainCurrency.value),
         message: data.message,
         tippedAt: Date.now(),
         exchangeRates: currency.rates,
@@ -188,8 +188,11 @@ class Donationalerts extends Integration {
 
       tip(`${data.username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
 
-      if (api.isStreamOnline) {
-        api.stats.currentTips += Number(currency.exchange(data.amount, data.currency, currency.mainCurrency));
+      if (isStreamOnline.value) {
+        setStats({
+          ...stats,
+          currentTips: stats.currentTips + Number(currency.exchange(data.amount, data.currency, mainCurrency.value)),
+        });
       }
     }
 
@@ -198,7 +201,7 @@ class Donationalerts extends Integration {
       amount: data.amount,
       message: data.message,
       currency: data.currency,
-      timestamp: _.now(),
+      timestamp: Date.now(),
     });
   }
 }

@@ -3,23 +3,23 @@
 import { evaluate as mathJsEvaluate, round } from 'mathjs';
 import { getRepository } from 'typeorm';
 
-import api from '../api';
-import { prepare } from '../commons';
 import { MINUTE, SECOND } from '../constants';
 import { User, UserInterface } from '../database/entity/user';
 import { command, default_permission, parser, permission_settings, settings, ui } from '../decorators';
 import { onStartup } from '../decorators/on';
 import Expects from '../expects';
 import general from '../general';
+import { isStreamOnline } from '../helpers/api';
 import { ResponseError } from '../helpers/commandError';
+import { prepare } from '../helpers/commons';
 import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
-import { isBot } from '../helpers/isBot';
 import { debug, error } from '../helpers/log';
-import { permission } from '../helpers/permissions';
+import { getUserHighestPermission } from '../helpers/permissions/';
+import { defaultPermissions } from '../helpers/permissions/';
 import { setImmediateAwait } from '../helpers/setImmediateAwait';
 import { adminEndpoint } from '../helpers/socket';
 import { bigIntMax, serialize, unserialize } from '../helpers/type';
-import permissions from '../permissions';
+import { isBot } from '../helpers/user/isBot';
 import { translate } from '../translate';
 import users from '../users';
 import System from './_interface';
@@ -91,22 +91,21 @@ class Levels extends System {
       return;
     }
 
-    const [interval, offlineInterval, perInterval, perOfflineInterval, isOnline] = await Promise.all([
+    const [interval, offlineInterval, perInterval, perOfflineInterval] = await Promise.all([
       this.getPermissionBasedSettingsValue('interval'),
       this.getPermissionBasedSettingsValue('offlineInterval'),
       this.getPermissionBasedSettingsValue('perInterval'),
       this.getPermissionBasedSettingsValue('perOfflineInterval'),
-      api.isStreamOnline,
     ]);
 
     try {
-      debug('levels.update', `Started XP adding, isOnline: ${isOnline}`);
+      debug('levels.update', `Started XP adding, isOnline: ${isStreamOnline.value}`);
       let i = 0;
       for (const username of (await getAllOnlineUsernames())) {
         if (isBot(username)) {
           continue;
         }
-        await this.process(username, { interval, offlineInterval, perInterval, perOfflineInterval, isOnline });
+        await this.process(username, { interval, offlineInterval, perInterval, perOfflineInterval, isOnline: isStreamOnline.value });
         if ( i % 10 === 0) {
           await setImmediateAwait();
         }
@@ -153,7 +152,7 @@ class Levels extends System {
     }
 
     // get user max permission
-    const permId = await permissions.getUserHighestPermission(userId);
+    const permId = await getUserHighestPermission(userId);
     if (!permId) {
       debug('levels.update', `User ${username}#${userId} permId not found`);
       return; // skip without id
@@ -246,22 +245,21 @@ class Levels extends System {
       return true;
     }
 
-    const [perMessageInterval, messageInterval, perMessageOfflineInterval, messageOfflineInterval, isOnline] = await Promise.all([
+    const [perMessageInterval, messageInterval, perMessageOfflineInterval, messageOfflineInterval] = await Promise.all([
       this.getPermissionBasedSettingsValue('perMessageInterval'),
       this.getPermissionBasedSettingsValue('messageInterval'),
       this.getPermissionBasedSettingsValue('perMessageOfflineInterval'),
       this.getPermissionBasedSettingsValue('messageOfflineInterval'),
-      api.isStreamOnline,
     ]);
 
     // get user max permission
-    const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
+    const permId = await getUserHighestPermission(Number(opts.sender.userId));
     if (!permId) {
       return true; // skip without permission
     }
 
-    const interval_calculated = isOnline ? messageInterval[permId] : messageOfflineInterval[permId];
-    const ptsPerInterval = isOnline ? perMessageInterval[permId] : perMessageOfflineInterval[permId];
+    const interval_calculated = isStreamOnline.value ? messageInterval[permId] : messageOfflineInterval[permId];
+    const ptsPerInterval = isStreamOnline.value ? perMessageInterval[permId] : perMessageOfflineInterval[permId];
 
     if (interval_calculated === 0 || ptsPerInterval === 0) {
       return true;
@@ -273,20 +271,20 @@ class Levels extends System {
     }
 
     // next message count (be it offline or online)
-    const messages = 1 + ((api.isStreamOnline
+    const messages = 1 + ((isStreamOnline.value
       ? user.extra?.levels?.xpOnlineMessages
       : user.extra?.levels?.xpOfflineMessages) ?? 0);
-    const chat = await users.getChatOf(user.userId, api.isStreamOnline);
+    const chat = await users.getChatOf(user.userId, isStreamOnline.value);
 
     // default level object
     const levels: NonNullable<UserInterface['extra']>['levels'] = {
       xp: serialize(unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0)),
       xpOfflineGivenAt: user.extra?.levels?.xpOfflineGivenAt ?? chat,
-      xpOfflineMessages: !api.isStreamOnline
+      xpOfflineMessages: !isStreamOnline.value
         ? 0
         : user.extra?.levels?.xpOfflineMessages ?? 0,
       xpOnlineGivenAt: user.extra?.levels?.xpOnlineGivenAt ?? chat,
-      xpOnlineMessages: api.isStreamOnline
+      xpOnlineMessages: isStreamOnline.value
         ? 0
         : user.extra?.levels?.xpOnlineMessages ?? 0,
     };
@@ -299,7 +297,7 @@ class Levels extends System {
             ...user.extra,
             levels: {
               ...levels,
-              [api.isStreamOnline ? 'xpOnlineMessages' : 'xpOfflineMessages']: 0,
+              [isStreamOnline.value ? 'xpOnlineMessages' : 'xpOfflineMessages']: 0,
               xp: serialize(BigInt(ptsPerInterval) + (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0))),
             },
           },
@@ -311,7 +309,7 @@ class Levels extends System {
             ...user.extra,
             levels: {
               ...levels,
-              [api.isStreamOnline ? 'xpOnlineMessages' : 'xpOfflineMessages']: messages,
+              [isStreamOnline.value ? 'xpOnlineMessages' : 'xpOfflineMessages']: messages,
             },
           },
         });
@@ -401,7 +399,7 @@ class Levels extends System {
         );
       }
 
-      const chat = await users.getChatOf(user.userId, api.isStreamOnline);
+      const chat = await users.getChatOf(user.userId, isStreamOnline.value);
       const levels: NonNullable<UserInterface['extra']>['levels'] = {
         xp: serialize(xp),
         xpOfflineGivenAt: user.extra?.levels?.xpOfflineGivenAt ?? chat,
@@ -441,12 +439,12 @@ class Levels extends System {
   }
 
   @command('!level change')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async add (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [username, xp] = new Expects(opts.parameters).username().number({ minus: true }).toArray();
       const user = await getRepository(User).findOneOrFail({ username });
-      const chat = await users.getChatOf(user.userId, api.isStreamOnline);
+      const chat = await users.getChatOf(user.userId, isStreamOnline.value);
 
       const levels: NonNullable<UserInterface['extra']>['levels'] = {
         xp: serialize(bigIntMax(BigInt(xp) + (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0)), BigInt(0))),

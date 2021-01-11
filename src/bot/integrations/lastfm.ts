@@ -2,7 +2,7 @@
 import Axios from 'axios';
 
 import { settings, ui } from '../decorators';
-import { onChange } from '../decorators/on';
+import { onChange, onStartup } from '../decorators/on';
 import {  error } from '../helpers/log';
 import Integration from './_interface';
 
@@ -18,9 +18,8 @@ class LastFM extends Integration {
 
   currentSong: null | string = null;
 
-  constructor() {
-    super();
-
+  @onStartup()
+  onStartup() {
     setInterval(() => {
       this.fetchData();
     }, 5000);

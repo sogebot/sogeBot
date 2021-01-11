@@ -1,13 +1,15 @@
 import { getRepository } from 'typeorm';
 
-import { announce, getBotSender, prepare, round5 } from '../commons';
+import { round5 } from '../commons';
 import * as constants from '../constants';
 import { ScrimMatchId } from '../database/entity/scrimMatchId';
 import { command, default_permission, settings } from '../decorators';
+import { onStartup } from '../decorators/on';
 import Expects from '../expects.js';
+import { announce, getBotSender, prepare } from '../helpers/commons';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { debug } from '../helpers/log';
-import { permission } from '../helpers/permissions';
+import { defaultPermissions } from '../helpers/permissions/';
 import tmi from '../tmi';
 import { translate } from '../translate';
 import System from './_interface';
@@ -34,15 +36,14 @@ class Scrim extends System {
   @settings('customization')
   waitForMatchIdsInSeconds = 60;
 
-  constructor() {
-    super();
-
+  @onStartup()
+  onStartup() {
     this.reminder();
     setInterval(() => this.reminder(), 1000);
   }
 
   @command('!snipe')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   public async main(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [isCooldownOnly, type, minutes] = new Expects(opts.parameters)
@@ -104,7 +105,7 @@ class Scrim extends System {
   }
 
   @command('!scrim stop')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   public async stop(opts: CommandOptions): Promise<CommandResponse[]> {
     this.closingAt = 0;
     this.lastRemindAt = Date.now();

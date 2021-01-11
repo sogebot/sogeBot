@@ -1,6 +1,6 @@
 /* global describe it before */
 
-const { permission } = require('../../../dest/helpers/permissions');
+const { defaultPermissions } = require('../../../dest/helpers/permissions/');
 const Parser = require('../../../dest/parser').default;
 
 require('../../general.js');
@@ -40,7 +40,7 @@ describe('Custom Variable - #3879 - Eval should trigger with param with proper p
       currentValue: '0',
       type: 'eval',
       responseType: 2,
-      permission: permission.MODERATORS,
+      permission: defaultPermissions.MODERATORS,
       evalValue: 'return param || "no param sent";',
       usableOptions: [],
     });

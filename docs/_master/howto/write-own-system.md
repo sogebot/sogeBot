@@ -86,7 +86,7 @@ For setting helper function (e.g. price check is skipped for this command) use *
 
 ``` javascript
 @command('!yourcommand')
-@default_permission(permission.CASTERS)
+@default_permission(defaultPermissions.CASTERS)
 @helper()
 public foobar(opts: CommandOptions): CommandResponse[] {
   // ... command logic ...
@@ -103,7 +103,7 @@ To define function, which should be command, you must use decorator **@parser**.
   result and will not rollback, e.g. stats counting. `false`
 * `priority`: what priority should be given to parser, higher priority, sooner
   it will run. `constants.LOW`
-* `permission`: sets default permission for parser. `permission.VIEWERS`
+* `permission`: sets default permission for parser. `defaultPermissions.VIEWERS`
 
 ``` typescript
 @parser()

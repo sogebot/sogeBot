@@ -1,11 +1,12 @@
 import { getRepository } from 'typeorm';
 
-import api from '../api';
 import currency from '../currency';
 import { EventList } from '../database/entity/eventList';
+import { isStreamOnline, stats, streamStatusChangeSince } from '../helpers/api';
+import { mainCurrency } from '../helpers/currency';
 import users from '../users';
 
-import { ResponseFilter } from '.';
+import type { ResponseFilter } from '.';
 
 const info: ResponseFilter = {
   '$toptip.#.#': async function (filter: string) {
@@ -23,14 +24,14 @@ const info: ResponseFilter = {
       .sort((a, b) => {
         const aValue = JSON.parse(a.values_json);
         const bValue = JSON.parse(b.values_json);
-        const aTip = currency.exchange(aValue.amount, aValue.currency, currency.mainCurrency);
-        const bTip = currency.exchange(bValue.amount, bValue.currency, currency.mainCurrency);
+        const aTip = currency.exchange(aValue.amount, aValue.currency, mainCurrency.value);
+        const bTip = currency.exchange(bValue.amount, bValue.currency, mainCurrency.value);
         return bTip - aTip;
       });
 
     const type = match.groups?.type;
     if (type === 'stream') {
-      const whenOnline = api.isStreamOnline ? api.streamStatusChangeSince : null;
+      const whenOnline = isStreamOnline.value ? streamStatusChangeSince.value : null;
       if (whenOnline) {
         tips = tips.filter((o) => o.timestamp >= (new Date(whenOnline)).getTime());
       } else {
@@ -54,10 +55,10 @@ const info: ResponseFilter = {
     return '';
   },
   '(game)': async function () {
-    return api.stats.currentGame || 'n/a';
+    return stats.currentGame || 'n/a';
   },
   '(status)': async function () {
-    return api.stats.currentTitle || 'n/a';
+    return stats.currentTitle || 'n/a';
   },
 };
 

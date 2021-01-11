@@ -1,10 +1,10 @@
 import { getRepository } from 'typeorm';
 
-import { getBotSender, prepare } from '../commons';
 import { Queue as QueueEntity, QueueInterface } from '../database/entity/queue';
 import { User } from '../database/entity/user';
 import { command, default_permission, settings } from '../decorators';
-import { permission } from '../helpers/permissions';
+import { getBotSender, prepare } from '../helpers/commons';
+import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import tmi from '../tmi';
 import { translate } from '../translate';
@@ -129,14 +129,14 @@ class Queue extends System {
   }
 
   @command('!queue open')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   open (opts: CommandOptions): CommandResponse[] {
     this.locked = false;
     return [{ response: translate('queue.open'), ...opts }];
   }
 
   @command('!queue close')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   close (opts: CommandOptions): CommandResponse[] {
     this.locked = true;
     return [{ response: translate('queue.close'), ...opts }];
@@ -188,7 +188,7 @@ class Queue extends System {
   }
 
   @command('!queue clear')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   clear (opts: CommandOptions): CommandResponse[] {
     getRepository(QueueEntity).delete({});
     this.pickedUsers = [];
@@ -196,13 +196,13 @@ class Queue extends System {
   }
 
   @command('!queue random')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async random (opts: CommandOptions): Promise<CommandResponse[]> {
     return (await this.pickUsers(opts, false)).responses;
   }
 
   @command('!queue pick')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async pick (opts: CommandOptions): Promise<CommandResponse[]> {
     return (await this.pickUsers(opts, false)).responses;
   }
@@ -250,7 +250,7 @@ class Queue extends System {
   }
 
   @command('!queue list')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async list (opts: CommandOptions): Promise<CommandResponse[]> {
     const [atUsername, users] = await Promise.all([
       tmi.showWithAt,

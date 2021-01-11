@@ -1,16 +1,17 @@
 import axios from 'axios';
 import chalk from 'chalk';
-import _ from 'lodash';
 import { io, Socket } from 'socket.io-client';
 import { getRepository } from 'typeorm';
 
-import api from '../api.js';
 import currency from '../currency';
 import { User, UserTipInterface } from '../database/entity/user';
 import { settings } from '../decorators';
 import { ui } from '../decorators.js';
 import { onChange, onStartup } from '../decorators/on.js';
-import events from '../events.js';
+import { isStreamOnline } from '../helpers/api/index.js';
+import { setStats, stats } from '../helpers/api/stats.js';
+import { mainCurrency } from '../helpers/currency';
+import { eventEmitter } from '../helpers/events';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
 import { error, info, tip } from '../helpers/log.js';
 import eventlist from '../overlays/eventlist.js';
@@ -150,12 +151,12 @@ class TipeeeStream extends Integration {
         timestamp: Date.now(),
       });
 
-      events.fire('tip', {
+      eventEmitter.emit('tip', {
         username,
         amount: Number(amount).toFixed(2),
         currency: donationCurrency,
-        amountInBotCurrency: Number(currency.exchange(amount, donationCurrency, currency.mainCurrency)).toFixed(2),
-        currencyInBot: currency.mainCurrency,
+        amountInBotCurrency: Number(currency.exchange(amount, donationCurrency, mainCurrency.value)).toFixed(2),
+        currencyInBot: mainCurrency.value,
         message,
       });
 
@@ -173,7 +174,7 @@ class TipeeeStream extends Integration {
       const newTip: UserTipInterface = {
         amount,
         currency: donationCurrency,
-        sortAmount: currency.exchange(Number(amount), donationCurrency, currency.mainCurrency),
+        sortAmount: currency.exchange(Number(amount), donationCurrency, mainCurrency.value),
         message,
         exchangeRates: currency.rates,
         tippedAt: Date.now(),
@@ -183,8 +184,11 @@ class TipeeeStream extends Integration {
 
       tip(`${username}${user.userId ? '#' + user.userId : ''}, amount: ${amount.toFixed(2)}${donationCurrency}, message: ${message}`);
 
-      if (api.isStreamOnline) {
-        api.stats.currentTips += Number(currency.exchange(amount, donationCurrency, currency.mainCurrency));
+      if (isStreamOnline.value) {
+        setStats({
+          ...stats,
+          currentTips: stats.currentTips + Number(currency.exchange(amount, donationCurrency, mainCurrency.value)),
+        });
       }
 
       triggerInterfaceOnTip({
@@ -192,7 +196,7 @@ class TipeeeStream extends Integration {
         amount,
         message,
         currency: donationCurrency,
-        timestamp: _.now(),
+        timestamp: Date.now(),
       });
     } catch (e) {
       error(e);

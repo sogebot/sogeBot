@@ -1,13 +1,14 @@
 import axios from 'axios';
 import { getRepository } from 'typeorm';
 
-import api from '../api.js';
 import currency from '../currency';
 import { User, UserTipInterface } from '../database/entity/user';
 import { settings } from '../decorators';
 import { ui } from '../decorators.js';
 import { onChange, onStartup } from '../decorators/on.js';
-import events from '../events.js';
+import { isStreamOnline, setStats, stats } from '../helpers/api/index.js';
+import { mainCurrency } from '../helpers/currency';
+import { eventEmitter } from '../helpers/events';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 import { error, tip } from '../helpers/log';
 import eventlist from '../overlays/eventlist.js';
@@ -74,7 +75,7 @@ class Qiwi extends Integration {
         const newTip: UserTipInterface = {
           amount: Number(amount),
           currency: DONATION_CURRENCY,
-          sortAmount: currency.exchange(Number(amount), DONATION_CURRENCY, currency.mainCurrency),
+          sortAmount: currency.exchange(Number(amount), DONATION_CURRENCY, mainCurrency.value),
           message: message,
           tippedAt: Date.now(),
           exchangeRates: currency.rates,
@@ -84,8 +85,11 @@ class Qiwi extends Integration {
 
       }
 
-      if (api.isStreamOnline) {
-        api.stats.currentTips += currency.exchange(amount, DONATION_CURRENCY, currency.mainCurrency);
+      if (isStreamOnline.value) {
+        setStats({
+          ...stats,
+          currentTips: stats.currentTips + currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value),
+        });
       }
 
       eventlist.add({
@@ -99,12 +103,12 @@ class Qiwi extends Integration {
 
       tip(`${username ? username : 'Anonymous'}${id ? '#' + id : ''}, amount: ${Number(amount).toFixed(2)}${DONATION_CURRENCY}, ${message ? 'message: ' + message : ''}`);
 
-      events.fire('tip', {
+      eventEmitter.emit('tip', {
         username: username || 'Anonymous',
-        amount,
+        amount: String(amount),
         currency: DONATION_CURRENCY,
-        amountInBotCurrency: Number(currency.exchange(amount, DONATION_CURRENCY, currency.mainCurrency)).toFixed(2),
-        currencyInBot: currency.mainCurrency,
+        amountInBotCurrency: Number(currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value)).toFixed(2),
+        currencyInBot: mainCurrency.value,
         message,
       });
 

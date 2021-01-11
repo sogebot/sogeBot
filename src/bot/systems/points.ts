@@ -4,22 +4,23 @@ import * as cronparser from 'cron-parser';
 import * as _ from 'lodash';
 import { FindConditions, getConnection, getRepository, LessThanOrEqual } from 'typeorm';
 
-import api from '../api';
-import { prepare } from '../commons';
 import { MINUTE } from '../constants';
 import { PointsChangelog } from '../database/entity/points';
 import { User, UserInterface } from '../database/entity/user';
 import { command, default_permission, parser, permission_settings, persistent, settings, ui } from '../decorators';
-import { onChange, onLoad } from '../decorators/on';
+import { onChange, onLoad, onStartup } from '../decorators/on';
 import Expects from '../expects';
+import { isStreamOnline } from '../helpers/api';
+import { prepare } from '../helpers/commons';
 import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
-import { isBot } from '../helpers/isBot';
 import { debug, error, warning } from '../helpers/log';
 import { ParameterError } from '../helpers/parameterError';
-import { permission } from '../helpers/permissions';
+import { getUserHighestPermission } from '../helpers/permissions/';
+import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
+import { isBot } from '../helpers/user/isBot';
+import { getIdFromTwitch } from '../microservices/getIdFromTwitch';
 import oauth from '../oauth';
-import permissions from '../permissions';
 import { translate } from '../translate';
 import users from '../users';
 import System from './_interface';
@@ -66,9 +67,8 @@ class Points extends System {
   @permission_settings('customization')
   perMessageOfflineInterval = 0;
 
-  constructor() {
-    super();
-
+  @onStartup()
+  onStartup() {
     setInterval(() => {
       try {
         const interval = cronparser.parseExpression(this.resetIntervalCron);
@@ -107,22 +107,21 @@ class Points extends System {
       updatedAt: LessThanOrEqual(Date.now() - (10 * MINUTE)),
     });
 
-    const [interval, offlineInterval, perInterval, perOfflineInterval, isOnline] = await Promise.all([
+    const [interval, offlineInterval, perInterval, perOfflineInterval] = await Promise.all([
       this.getPermissionBasedSettingsValue('interval'),
       this.getPermissionBasedSettingsValue('offlineInterval'),
       this.getPermissionBasedSettingsValue('perInterval'),
       this.getPermissionBasedSettingsValue('perOfflineInterval'),
-      api.isStreamOnline,
     ]);
 
     try {
       const userPromises: Promise<void>[] = [];
-      debug('points.update', `Started points adding, isOnline: ${isOnline}`);
+      debug('points.update', `Started points adding, isStreamOnline: ${isStreamOnline.value}`);
       for (const username of (await getAllOnlineUsernames())) {
         if (isBot(username)) {
           continue;
         }
-        userPromises.push(this.processPoints(username, { interval, offlineInterval, perInterval, perOfflineInterval, isOnline }));
+        userPromises.push(this.processPoints(username, { interval, offlineInterval, perInterval, perOfflineInterval, isStreamOnline: isStreamOnline.value }));
         await Promise.all(userPromises);
       }
     } catch (e) {
@@ -134,7 +133,7 @@ class Points extends System {
     }
   }
 
-  private async processPoints(username: string, opts: {interval: {[permissionId: string]: any}; offlineInterval: {[permissionId: string]: any}; perInterval: {[permissionId: string]: any}; perOfflineInterval: {[permissionId: string]: any}; isOnline: boolean}): Promise<void> {
+  private async processPoints(username: string, opts: {interval: {[permissionId: string]: any}; offlineInterval: {[permissionId: string]: any}; perInterval: {[permissionId: string]: any}; perOfflineInterval: {[permissionId: string]: any}; isStreamOnline: boolean}): Promise<void> {
     return new Promise(async (resolve) => {
       const userId = await users.getIdByName(username);
       if (!userId) {
@@ -143,14 +142,14 @@ class Points extends System {
       }
 
       // get user max permission
-      const permId = await permissions.getUserHighestPermission(userId);
+      const permId = await getUserHighestPermission(userId);
       if (!permId) {
         debug('points.update', `User ${username}#${userId} permId not found`);
         return resolve(); // skip without id
       }
 
-      const interval_calculated = opts.isOnline ? opts.interval[permId] * 60 * 1000 : opts.offlineInterval[permId]  * 60 * 1000;
-      const ptsPerInterval = opts.isOnline ? opts.perInterval[permId]  : opts.perOfflineInterval[permId] ;
+      const interval_calculated = opts.isStreamOnline ? opts.interval[permId] * 60 * 1000 : opts.offlineInterval[permId]  * 60 * 1000;
+      const ptsPerInterval = opts.isStreamOnline ? opts.perInterval[permId]  : opts.perOfflineInterval[permId] ;
 
       const user = await getRepository(User).findOne({ username });
       if (!user) {
@@ -163,8 +162,8 @@ class Points extends System {
           pointsOnlineGivenAt: 0,
         });
       } else {
-        const chat = await users.getChatOf(userId, opts.isOnline);
-        const userPointsKey = opts.isOnline ? 'pointsOnlineGivenAt' : 'pointsOfflineGivenAt';
+        const chat = await users.getChatOf(userId, opts.isStreamOnline);
+        const userPointsKey = opts.isStreamOnline ? 'pointsOnlineGivenAt' : 'pointsOfflineGivenAt';
         if (interval_calculated !== 0 && ptsPerInterval[permId]  !== 0) {
           const givenAt = user[userPointsKey] + interval_calculated;
           debug('points.update', `${user.username}#${userId}[${permId}] ${chat} | ${givenAt}`);
@@ -201,22 +200,21 @@ class Points extends System {
       return true;
     }
 
-    const [perMessageInterval, messageInterval, perMessageOfflineInterval, messageOfflineInterval, isOnline] = await Promise.all([
+    const [perMessageInterval, messageInterval, perMessageOfflineInterval, messageOfflineInterval] = await Promise.all([
       this.getPermissionBasedSettingsValue('perMessageInterval'),
       this.getPermissionBasedSettingsValue('messageInterval'),
       this.getPermissionBasedSettingsValue('perMessageOfflineInterval'),
       this.getPermissionBasedSettingsValue('messageOfflineInterval'),
-      api.isStreamOnline,
     ]);
 
     // get user max permission
-    const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
+    const permId = await getUserHighestPermission(Number(opts.sender.userId));
     if (!permId) {
       return true; // skip without permission
     }
 
-    const interval_calculated = isOnline ? messageInterval[permId] : messageOfflineInterval[permId];
-    const ptsPerInterval = isOnline ? perMessageInterval[permId] : perMessageOfflineInterval[permId];
+    const interval_calculated = isStreamOnline.value ? messageInterval[permId] : messageOfflineInterval[permId];
+    const ptsPerInterval = isStreamOnline.value ? perMessageInterval[permId] : perMessageOfflineInterval[permId];
 
     if (interval_calculated === 0 || ptsPerInterval === 0) {
       return;
@@ -282,7 +280,7 @@ class Points extends System {
   }
 
   @command('!points undo')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async undo(opts: CommandOptions) {
     try {
       const [username] = new Expects(opts.parameters).username().toArray();
@@ -319,7 +317,7 @@ class Points extends System {
   }
 
   @command('!points set')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async set (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
@@ -366,7 +364,7 @@ class Points extends System {
 
       if (!guser) {
         await getRepository(User).save({
-          userId: Number(await api.getIdFromTwitch(username)),
+          userId: Number(await getIdFromTwitch(username)),
           username, points: 0,
         });
         return this.give(opts);
@@ -458,7 +456,7 @@ class Points extends System {
   }
 
   @command('!points get')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async get (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
@@ -471,7 +469,7 @@ class Points extends System {
       }
 
       if (!user) {
-        const userId = await api.getIdFromTwitch(username);
+        const userId = await getIdFromTwitch(username);
         if (userId) {
           await getRepository(User).save({
             userId: Number(userId),
@@ -524,7 +522,7 @@ class Points extends System {
   }
 
   @command('!points online')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async online (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       let points = new Expects(opts.parameters).points({ all: false, negative: true }).toArray()[0];
@@ -552,7 +550,7 @@ class Points extends System {
   }
 
   @command('!points all')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async all (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       let points: number = new Expects(opts.parameters).points({ all: false, negative: true }).toArray()[0];
@@ -579,7 +577,7 @@ class Points extends System {
   }
 
   @command('!makeitrain')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async rain (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const points = new Expects(opts.parameters).points({ all: false }).toArray()[0];
@@ -602,7 +600,7 @@ class Points extends System {
   }
 
   @command('!points add')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async add (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
@@ -611,7 +609,7 @@ class Points extends System {
 
       if (!user) {
         await getRepository(User).save({
-          userId: Number(await api.getIdFromTwitch(username)),
+          userId: Number(await getIdFromTwitch(username)),
           username,
         });
         return this.add(opts);
@@ -639,7 +637,7 @@ class Points extends System {
   }
 
   @command('!points remove')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async remove (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: true }).toArray();
@@ -647,7 +645,7 @@ class Points extends System {
       const user = await getRepository(User).findOne({ username });
       if (!user) {
         await getRepository(User).save({
-          userId: Number(await api.getIdFromTwitch(username)),
+          userId: Number(await getIdFromTwitch(username)),
           username, points: 0,
         });
         return this.remove(opts);

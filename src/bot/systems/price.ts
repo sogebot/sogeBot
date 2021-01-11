@@ -3,15 +3,17 @@
 import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { isOwner, parserReply, prepare } from '../commons';
+import { parserReply } from '../commons';
 import * as constants from '../constants';
 import { Price as PriceEntity, PriceInterface } from '../database/entity/price';
 import { User } from '../database/entity/user';
 import { command, default_permission, rollback } from '../decorators';
 import { parser } from '../decorators';
+import { prepare } from '../helpers/commons';
 import { error } from '../helpers/log';
-import { permission } from '../helpers/permissions';
+import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
+import { isOwner } from '../helpers/user';
 import Parser from '../parser';
 import { translate } from '../translate';
 import System from './_interface';
@@ -69,13 +71,13 @@ class Price extends System {
   }
 
   @command('!price')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   main (opts: CommandOptions): CommandResponse[] {
     return [{ response: translate('core.usage') + ': !price set <cmd> <price> | !price unset <cmd> | !price list | !price toggle <cmd>', ...opts }];
   }
 
   @command('!price set')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async set (opts: CommandOptions): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^(![\S]+) ([0-9]+)$/);
 
@@ -98,7 +100,7 @@ class Price extends System {
   }
 
   @command('!price unset')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async unset (opts: CommandOptions): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^(![\S]+)$/);
 
@@ -114,7 +116,7 @@ class Price extends System {
   }
 
   @command('!price toggle')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async toggle (opts: CommandOptions): Promise<CommandResponse[]> {
     const parsed = opts.parameters.match(/^(![\S]+)$/);
 
@@ -136,7 +138,7 @@ class Price extends System {
   }
 
   @command('!price list')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async list (opts: CommandOptions): Promise<CommandResponse[]> {
     const prices = await getRepository(PriceEntity).find();
     const response = (prices.length === 0 ? translate('price.list-is-empty') : translate('price.list-is-not-empty').replace(/\$list/g, (_.orderBy(prices, 'command').map((o) => {

@@ -3,11 +3,11 @@
 import Axios from 'axios';
 import { escapeRegExp } from 'lodash';
 
-import { prepare } from '../commons';
 import { HOUR, MINUTE } from '../constants';
 import { command, persistent, settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import Expects from '../expects';
+import { prepare } from '../helpers/commons';
 import { flatten } from '../helpers/flatten';
 import { error, info } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
@@ -52,9 +52,8 @@ class PUBG extends Integration {
   @persistent()
   _lastGameModeStats = 0;
 
-  constructor() {
-    super();
-
+  @onStartup()
+  onStartup() {
     setInterval(() => {
       if (this._lastSeasonIdFetch > HOUR) {
         this.fetchSeasonId();

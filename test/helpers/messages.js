@@ -11,7 +11,7 @@ const log = require('../../dest/helpers/log');
 
 module.exports = {
   prepare: function () {
-    const events = (require('../../dest/events')).default;
+    const eventEmitter = (require('../../dest/helpers/events/emitter')).eventEmitter;
     const tmi = (require('../../dest/tmi')).default;
 
     log.debug('test', chalk.bgRed('*** Restoring all spies ***'));
@@ -19,7 +19,7 @@ module.exports = {
     if (eventSpy) {
       eventSpy.restore();
     }
-    eventSpy = sinon.spy(events, 'fire');
+    eventSpy = sinon.spy(eventEmitter, 'emit');
 
     tmi.client = {
       bot: {
@@ -76,7 +76,7 @@ module.exports = {
     }, waitMs);
   },
   isWarned: async function (entry, user, opts) {
-    const { prepare } = require('../../dest/commons');
+    const { prepare } = require('../../dest/helpers/commons/prepare');
     user = _.cloneDeep(user);
     opts = opts || {};
     await until(async setError => {
@@ -108,7 +108,7 @@ module.exports = {
     }, 5000);
   },
   isSent: util.deprecate(async function (entry, user, opts, wait) {
-    const { prepare } = require('../../dest/commons');
+    const { prepare } = require('../../dest/helpers/commons/prepare');
     if (typeof user === 'string') {
       user = {
         username: user,

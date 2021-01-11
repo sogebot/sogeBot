@@ -6,19 +6,21 @@ import tlds from 'tlds';
 import { getRepository, LessThan } from 'typeorm';
 import XRegExp from 'xregexp';
 
-import { parserReply, prepare, timeout } from '../commons';
+import { parserReply } from '../commons';
 import * as constants from '../constants';
 import { Alias } from '../database/entity/alias';
 import { ModerationPermit, ModerationWarning } from '../database/entity/moderation';
 import { command, default_permission, parser, permission_settings, settings } from '../decorators';
+import { prepare } from '../helpers/commons';
 import { getLocalizedName } from '../helpers/getLocalized';
-import { isModerator } from '../helpers/isModerator';
 import { timeout as timeoutLog, warning as warningLog } from '../helpers/log';
-import { permission } from '../helpers/permissions';
+import { getUserHighestPermission } from '../helpers/permissions/';
+import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
+import { timeout } from '../helpers/tmi';
+import { isModerator } from '../helpers/user/isModerator';
 import spotify from '../integrations/spotify';
 import Message from '../message';
-import permissions from '../permissions';
 import tmi from '../tmi';
 import { translate } from '../translate';
 import users from '../users';
@@ -39,68 +41,68 @@ class Moderation extends System {
   cListsWhitelist: string[] = [];
   @settings('lists')
   cListsBlacklist: string[] = [];
-  @permission_settings('lists', [ permission.CASTERS ], { [permission.MODERATORS]: false })
+  @permission_settings('lists', [ defaultPermissions.CASTERS ], { [defaultPermissions.MODERATORS]: false })
   cListsEnabled = true;
-  @permission_settings('lists', [ permission.CASTERS ])
+  @permission_settings('lists', [ defaultPermissions.CASTERS ])
   cListsTimeout = 120;
 
-  @permission_settings('links_filter', [ permission.CASTERS ], { [permission.MODERATORS]: false })
+  @permission_settings('links_filter', [ defaultPermissions.CASTERS ], { [defaultPermissions.MODERATORS]: false })
   cLinksEnabled = true;
-  @permission_settings('links_filter', [ permission.CASTERS ])
+  @permission_settings('links_filter', [ defaultPermissions.CASTERS ])
   cLinksIncludeSpaces = false;
-  @permission_settings('links_filter', [ permission.CASTERS ])
+  @permission_settings('links_filter', [ defaultPermissions.CASTERS ])
   cLinksIncludeClips = true;
-  @permission_settings('links_filter', [ permission.CASTERS ])
+  @permission_settings('links_filter', [ defaultPermissions.CASTERS ])
   cLinksTimeout = 120;
 
-  @permission_settings('symbols_filter', [ permission.CASTERS ], { [permission.MODERATORS]: false })
+  @permission_settings('symbols_filter', [ defaultPermissions.CASTERS ], { [defaultPermissions.MODERATORS]: false })
   cSymbolsEnabled = true;
-  @permission_settings('symbols_filter', [ permission.CASTERS ])
+  @permission_settings('symbols_filter', [ defaultPermissions.CASTERS ])
   cSymbolsTriggerLength = 15;
-  @permission_settings('symbols_filter', [ permission.CASTERS ])
+  @permission_settings('symbols_filter', [ defaultPermissions.CASTERS ])
   cSymbolsMaxSymbolsConsecutively = 10;
-  @permission_settings('symbols_filter', [ permission.CASTERS ])
+  @permission_settings('symbols_filter', [ defaultPermissions.CASTERS ])
   cSymbolsMaxSymbolsPercent = 50;
-  @permission_settings('symbols_filter', [ permission.CASTERS ])
+  @permission_settings('symbols_filter', [ defaultPermissions.CASTERS ])
   cSymbolsTimeout = 120;
 
-  @permission_settings('longMessage_filter', [ permission.CASTERS ], { [permission.MODERATORS]: false })
+  @permission_settings('longMessage_filter', [ defaultPermissions.CASTERS ], { [defaultPermissions.MODERATORS]: false })
   cLongMessageEnabled = true;
-  @permission_settings('longMessage_filter', [ permission.CASTERS ])
+  @permission_settings('longMessage_filter', [ defaultPermissions.CASTERS ])
   cLongMessageTriggerLength = 300;
-  @permission_settings('longMessage_filter', [ permission.CASTERS ])
+  @permission_settings('longMessage_filter', [ defaultPermissions.CASTERS ])
   cLongMessageTimeout = 120;
 
-  @permission_settings('caps_filter', [ permission.CASTERS ], { [permission.MODERATORS]: false })
+  @permission_settings('caps_filter', [ defaultPermissions.CASTERS ], { [defaultPermissions.MODERATORS]: false })
   cCapsEnabled = true;
-  @permission_settings('caps_filter', [ permission.CASTERS ])
+  @permission_settings('caps_filter', [ defaultPermissions.CASTERS ])
   cCapsTriggerLength = 15;
-  @permission_settings('caps_filter', [ permission.CASTERS ])
+  @permission_settings('caps_filter', [ defaultPermissions.CASTERS ])
   cCapsMaxCapsPercent = 50;
-  @permission_settings('caps_filter', [ permission.CASTERS ])
+  @permission_settings('caps_filter', [ defaultPermissions.CASTERS ])
   cCapsTimeout = 120;
 
-  @permission_settings('spam_filter', [ permission.CASTERS ], { [permission.MODERATORS]: false })
+  @permission_settings('spam_filter', [ defaultPermissions.CASTERS ], { [defaultPermissions.MODERATORS]: false })
   cSpamEnabled = true;
-  @permission_settings('spam_filter', [ permission.CASTERS ])
+  @permission_settings('spam_filter', [ defaultPermissions.CASTERS ])
   cSpamTriggerLength = 15;
-  @permission_settings('spam_filter', [ permission.CASTERS ])
+  @permission_settings('spam_filter', [ defaultPermissions.CASTERS ])
   cSpamMaxLength = 50;
-  @permission_settings('spam_filter', [ permission.CASTERS ])
+  @permission_settings('spam_filter', [ defaultPermissions.CASTERS ])
   cSpamTimeout = 300;
 
-  @permission_settings('color_filter', [ permission.CASTERS ], { [permission.MODERATORS]: false })
+  @permission_settings('color_filter', [ defaultPermissions.CASTERS ], { [defaultPermissions.MODERATORS]: false })
   cColorEnabled = true;
-  @permission_settings('color_filter', [ permission.CASTERS ])
+  @permission_settings('color_filter', [ defaultPermissions.CASTERS ])
   cColorTimeout = 300;
 
-  @permission_settings('emotes_filter', [ permission.CASTERS ], { [permission.MODERATORS]: false })
+  @permission_settings('emotes_filter', [ defaultPermissions.CASTERS ], { [defaultPermissions.MODERATORS]: false })
   cEmotesEnabled = true;
-  @permission_settings('emotes_filter', [ permission.CASTERS ])
+  @permission_settings('emotes_filter', [ defaultPermissions.CASTERS ])
   cEmotesEmojisAreEmotes = true;
-  @permission_settings('emotes_filter', [ permission.CASTERS ])
+  @permission_settings('emotes_filter', [ defaultPermissions.CASTERS ])
   cEmotesMaxCount = 15;
-  @permission_settings('emotes_filter', [ permission.CASTERS ])
+  @permission_settings('emotes_filter', [ defaultPermissions.CASTERS ])
   cEmotesTimeout = 120;
 
   @settings('warnings')
@@ -223,7 +225,7 @@ class Moderation extends System {
   }
 
   @command('!permit')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async permitLink (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const parsed = opts.parameters.match(/^@?([\S]+) ?(\d+)?$/);
@@ -252,9 +254,9 @@ class Moderation extends System {
     const enabled = await this.getPermissionBasedSettingsValue('cLinksEnabled');
     const cLinksIncludeSpaces = await this.getPermissionBasedSettingsValue('cLinksIncludeSpaces');
     const timeoutValues = await this.getPermissionBasedSettingsValue('cLinksTimeout');
-    const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
+    const permId = await getUserHighestPermission(Number(opts.sender.userId));
 
-    if (!enabled[permId] || permId === permission.CASTERS) {
+    if (!enabled[permId] || permId === defaultPermissions.CASTERS) {
       return true;
     }
 
@@ -283,9 +285,9 @@ class Moderation extends System {
     const cSymbolsMaxSymbolsConsecutively = await this.getPermissionBasedSettingsValue('cSymbolsMaxSymbolsConsecutively');
     const cSymbolsMaxSymbolsPercent = await this.getPermissionBasedSettingsValue('cSymbolsMaxSymbolsPercent');
     const timeoutValues = await this.getPermissionBasedSettingsValue('cSymbolsTimeout');
-    const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
+    const permId = await getUserHighestPermission(Number(opts.sender.userId));
 
-    if (!enabled[permId] || permId === permission.CASTERS) {
+    if (!enabled[permId] || permId === defaultPermissions.CASTERS) {
       return true;
     }
 
@@ -323,9 +325,9 @@ class Moderation extends System {
     const enabled = await this.getPermissionBasedSettingsValue('cLongMessageEnabled');
     const cLongMessageTriggerLength = await this.getPermissionBasedSettingsValue('cLongMessageTriggerLength');
     const timeoutValues = await this.getPermissionBasedSettingsValue('cLongMessageTimeout');
-    const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
+    const permId = await getUserHighestPermission(Number(opts.sender.userId));
 
-    if (!enabled[permId] || permId === permission.CASTERS) {
+    if (!enabled[permId] || permId === defaultPermissions.CASTERS) {
       return true;
     }
 
@@ -349,9 +351,9 @@ class Moderation extends System {
     const cCapsTriggerLength = await this.getPermissionBasedSettingsValue('cCapsTriggerLength');
     const cCapsMaxCapsPercent = await this.getPermissionBasedSettingsValue('cCapsMaxCapsPercent');
     const timeoutValues = await this.getPermissionBasedSettingsValue('cCapsTimeout');
-    const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
+    const permId = await getUserHighestPermission(Number(opts.sender.userId));
 
-    if (!enabled[permId] || permId === permission.CASTERS) {
+    if (!enabled[permId] || permId === defaultPermissions.CASTERS) {
       return true;
     }
     let whitelisted = await this.whitelist(opts.message, permId);
@@ -401,9 +403,9 @@ class Moderation extends System {
     const cSpamTriggerLength = await this.getPermissionBasedSettingsValue('cSpamTriggerLength');
     const cSpamMaxLength = await this.getPermissionBasedSettingsValue('cSpamMaxLength');
     const timeoutValues = await this.getPermissionBasedSettingsValue('cSpamTimeout');
-    const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
+    const permId = await getUserHighestPermission(Number(opts.sender.userId));
 
-    if (!enabled[permId] || permId === permission.CASTERS) {
+    if (!enabled[permId] || permId === defaultPermissions.CASTERS) {
       return true;
     }
     const whitelisted = await this.whitelist(opts.message,permId);
@@ -430,9 +432,9 @@ class Moderation extends System {
   async color (opts: ParserOptions) {
     const enabled = await this.getPermissionBasedSettingsValue('cColorEnabled');
     const timeoutValues = await this.getPermissionBasedSettingsValue('cColorTimeout');
-    const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
+    const permId = await getUserHighestPermission(Number(opts.sender.userId));
 
-    if (!enabled[permId] || permId === permission.CASTERS) {
+    if (!enabled[permId] || permId === defaultPermissions.CASTERS) {
       return true;
     }
 
@@ -457,9 +459,9 @@ class Moderation extends System {
     const cEmotesEmojisAreEmotes = await this.getPermissionBasedSettingsValue('cEmotesEmojisAreEmotes');
     const cEmotesMaxCount = await this.getPermissionBasedSettingsValue('cEmotesMaxCount');
     const timeoutValues = await this.getPermissionBasedSettingsValue('cEmotesTimeout');
-    const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
+    const permId = await getUserHighestPermission(Number(opts.sender.userId));
 
-    if (!enabled[permId] || permId === permission.CASTERS) {
+    if (!enabled[permId] || permId === defaultPermissions.CASTERS) {
       return true;
     }
 
@@ -486,9 +488,9 @@ class Moderation extends System {
   async blacklist (opts: ParserOptions) {
     const enabled = await this.getPermissionBasedSettingsValue('cListsEnabled');
     const timeoutValues = await this.getPermissionBasedSettingsValue('cListsTimeout');
-    const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
+    const permId = await getUserHighestPermission(Number(opts.sender.userId));
 
-    if (!enabled[permId] || permId === permission.CASTERS) {
+    if (!enabled[permId] || permId === defaultPermissions.CASTERS) {
       return true;
     }
 

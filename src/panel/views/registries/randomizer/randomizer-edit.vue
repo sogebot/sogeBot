@@ -223,12 +223,12 @@ import { getSocket } from 'src/panel/helpers/socket';
 import type { RandomizerInterface, RandomizerItemInterface } from 'src/bot/database/entity/randomizer';
 import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
 import { v4 as uuid } from 'uuid';
-import { permission } from 'src/bot/helpers/permissions';
 import { getRandomColor, getContrastColor } from 'src/panel/helpers/color';
 import translate from 'src/panel/helpers/translate';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { defaultPermissions } from 'src/bot/helpers/permissions/defaultPermissions';
 library.add(faExclamationTriangle);
 
 Component.registerHooks([
@@ -291,7 +291,7 @@ export default class randomizerEdit extends Vue {
     command: '',
     items: [],
     createdAt: Date.now(),
-    permissionId: permission.CASTERS,
+    permissionId: defaultPermissions.CASTERS,
     isShown: false,
     shouldPlayTick: false,
     tickVolume: 1,

@@ -2,10 +2,11 @@
 
 import { getRepository, IsNull } from 'typeorm';
 
-import api from '../api';
 import currency from '../currency';
 import { Goal, GoalGroup } from '../database/entity/goal';
 import { onBit, onFollow, onSub, onTip } from '../decorators/on';
+import { stats } from '../helpers/api';
+import { mainCurrency } from '../helpers/currency';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import Overlay from '../overlays/_interface';
 
@@ -60,8 +61,8 @@ class Goals extends Overlay {
     });
     publicEndpoint(this.nsp, 'goals::current', async (cb) => {
       cb(null, {
-        subscribers: api.stats.currentSubscribers,
-        followers: api.stats.currentFollowers,
+        subscribers: stats.currentSubscribers,
+        followers: stats.currentFollowers,
       });
     });
   }
@@ -79,7 +80,7 @@ class Goals extends Overlay {
     const tipsGoals = await getRepository(Goal).find({ type: 'tips', countBitsAsTips: true });
     for (const goal of tipsGoals) {
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
-        const amount = Number(currency.exchange(bit.amount / 100, 'USD', currency.mainCurrency));
+        const amount = Number(currency.exchange(bit.amount / 100, 'USD', mainCurrency.value));
         await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', amount);
       }
     }
@@ -89,7 +90,7 @@ class Goals extends Overlay {
   public async onTip(tip: onEventTip) {
     const goals = await getRepository(Goal).find({ type: 'tips' });
     for (const goal of goals) {
-      const amount = Number(currency.exchange(tip.amount, tip.currency, currency.mainCurrency));
+      const amount = Number(currency.exchange(tip.amount, tip.currency, mainCurrency.value));
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
         await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', amount);
       }

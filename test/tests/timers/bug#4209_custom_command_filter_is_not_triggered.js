@@ -9,7 +9,7 @@ const message = require('../../general.js').message;
 
 const timers = (require('../../../dest/systems/timers')).default;
 const customcommands = (require('../../../dest/systems/customcommands')).default;
-const api = (require('../../../dest/api')).default;
+const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).isStreamOnline;
 
 const { getRepository } = require('typeorm');
 const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
@@ -25,7 +25,7 @@ describe('Timers - https://github.com/sogehige/sogeBot/issues/4209 - custom comm
     await message.prepare();
   });
   after(async () => {
-    api.isStreamOnline = false;
+    isStreamOnline.value = false;
   });
 
   it('Create timer', async () => {
@@ -54,7 +54,7 @@ describe('Timers - https://github.com/sogehige/sogeBot/issues/4209 - custom comm
   });
 
   it('Set manually stream to be online and manually trigger timers check', () => {
-    api.isStreamOnline = true;
+    isStreamOnline.value = true;
     timers.check();
   });
 

@@ -4,14 +4,16 @@ import { isNil } from 'lodash';
 import { getRepository } from 'typeorm';
 
 import api from '../api';
-import { getBotSender } from '../commons';
 import { Highlight, HighlightInterface } from '../database/entity/highlight';
 import { command, default_permission, settings, ui } from '../decorators';
+import { calls, isStreamOnline, setRateLimit, stats, streamStatusChangeSince } from '../helpers/api';
+import { getBotSender } from '../helpers/commons';
 import { dayjs } from '../helpers/dayjs';
 import { timestampToObject } from '../helpers/getTime';
 import { error } from '../helpers/log';
+import { channelId } from '../helpers/oauth';
 import { ioServer } from '../helpers/panel';
-import { permission } from '../helpers/permissions';
+import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import oauth from '../oauth';
 import { translate } from '../translate';
@@ -60,7 +62,7 @@ class Highlights extends System {
       if (!this.enabled) {
         return res.status(412).send({ error: 'Highlights system is disabled' });
       } else {
-        if (!(api.isStreamOnline)) {
+        if (!(isStreamOnline.value)) {
           return res.status(412).send({ error: 'Stream is offline' });
         } else {
           if (url.clip) {
@@ -81,14 +83,14 @@ class Highlights extends System {
   }
 
   @command('!highlight')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   public async main(opts: CommandOptions): Promise<CommandResponse[]> {
     const token = oauth.botAccessToken;
-    const cid = oauth.channelId;
+    const cid = channelId.value;
     const url = `https://api.twitch.tv/helix/videos?user_id=${cid}&type=archive&first=1`;
 
     try {
-      if (!api.isStreamOnline) {
+      if (!isStreamOnline.value) {
         throw Error(ERROR_STREAM_NOT_ONLINE);
       }
       if (token === '' || cid === '') {
@@ -103,22 +105,21 @@ class Highlights extends System {
         },
       });
       // save remaining api calls
-      api.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      api.calls.bot.refresh = request.headers['ratelimit-reset'];
+      setRateLimit('bot', request.headers);
 
-      const timestamp = timestampToObject(dayjs().valueOf() - dayjs(api.streamStatusChangeSince).valueOf());
+      const timestamp = timestampToObject(dayjs().valueOf() - dayjs(streamStatusChangeSince.value).valueOf());
       const highlight = {
         videoId: request.data.data[0].id,
         timestamp: { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds },
-        game: api.stats.currentGame || 'n/a',
-        title: api.stats.currentTitle || 'n/a',
+        game: stats.currentGame || 'n/a',
+        title: stats.currentTitle || 'n/a',
         createdAt: Date.now(),
       };
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: request.status, remaining: api.calls.bot.remaining });
+      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot.remaining });
       return this.add(highlight, timestamp, opts);
     } catch (e) {
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: e.stack, remaining: api.calls.bot.remaining });
+      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: e.stack, remaining: calls.bot.remaining });
       switch (e.message) {
         case ERROR_STREAM_NOT_ONLINE:
           error('Cannot highlight - stream offline');
@@ -143,7 +144,7 @@ class Highlights extends System {
   }
 
   @command('!highlight list')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   public async list(opts: CommandOptions): Promise<CommandResponse[]> {
     const sortedHighlights = await getRepository(Highlight).find({
       order: {

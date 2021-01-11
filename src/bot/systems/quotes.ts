@@ -1,14 +1,14 @@
 import * as _ from 'lodash';
 import { getManager, getRepository } from 'typeorm';
 
-import { prepare } from '../commons';
 import { Quotes as QuotesEntity, QuotesInterface } from '../database/entity/quotes';
 import { command, default_permission } from '../decorators';
 import Expects from '../expects';
 import { sample } from '../helpers/array/sample';
-import { permission } from '../helpers/permissions';
+import { prepare } from '../helpers/commons';
+import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
-import ui from '../ui';
+import { domain } from '../helpers/ui';
 import users from '../users';
 import System from './_interface';
 
@@ -69,7 +69,7 @@ class Quotes extends System {
   }
 
   @command('!quote add')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async add (opts: CommandOptions): Promise<(CommandResponse & QuotesInterface)[]> {
     try {
       if (opts.parameters.length === 0) {
@@ -88,7 +88,7 @@ class Quotes extends System {
   }
 
   @command('!quote remove')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async remove (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       if (opts.parameters.length === 0) {
@@ -112,7 +112,7 @@ class Quotes extends System {
   }
 
   @command('!quote set')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async set (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       if (opts.parameters.length === 0) {
@@ -143,10 +143,9 @@ class Quotes extends System {
 
   @command('!quote list')
   async list (opts: CommandOptions): Promise<CommandResponse[]> {
-    const urlBase = ui.domain;
     const response = prepare(
-      (['localhost', '127.0.0.1'].includes(urlBase) ? 'systems.quotes.list.is-localhost' : 'systems.quotes.list.ok'),
-      { urlBase });
+      (['localhost', '127.0.0.1'].includes(domain) ? 'systems.quotes.list.is-localhost' : 'systems.quotes.list.ok'),
+      { urlBase: domain });
     return [{ response, ...opts }];
   }
 

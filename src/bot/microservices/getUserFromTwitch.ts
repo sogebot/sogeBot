@@ -1,7 +1,6 @@
 import axios from 'axios';
-import { getRepository } from 'typeorm';
 
-import { Settings } from '../database/entity/settings';
+import { getClientId, getToken } from '../helpers/api';
 
 type Await<T> = T extends {
   then(onfulfilled?: (value: infer U) => unknown): unknown;
@@ -36,32 +35,10 @@ export const getUsersFromTwitch = async (usernames: string[]): Promise<{
     }
   */
 
-  const token = await getRepository(Settings).findOne({
-    where: {
-      name: 'botAccessToken',
-      namespace: '/core/oauth',
-    },
-  });
-
-  const clientId = await getRepository(Settings).findOne({
-    where: {
-      name: 'botClientId',
-      namespace: '/core/oauth',
-    },
-  });
-
-  if (!token) {
-    throw Error('Missing oauth token');
-  }
-
-  if (!clientId) {
-    throw Error('Missing oauth clientId');
-  }
-
   const request = await axios.get(url, {
     headers: {
-      'Authorization': 'Bearer ' + JSON.parse(token.value),
-      'Client-ID': JSON.parse(clientId.value),
+      'Authorization': 'Bearer ' + await getToken('bot'),
+      'Client-ID': await getClientId('bot'),
     },
   });
 

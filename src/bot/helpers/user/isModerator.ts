@@ -1,4 +1,4 @@
-import type { UserInterface } from '../database/entity/user';
+import type { UserInterface } from '../../database/entity/user';
 
 export function isModerator(user: UserInterface | UserStateTags): boolean {
   if ('mod' in user) {

@@ -5,7 +5,7 @@ const db = require('../../general.js').db;
 const msg = require('../../general.js').message;
 const Message = require('../../../dest/message').default;
 const assert = require('assert');
-const { prepare } = require('../../../dest/commons');
+const { prepare } = require('../../../dest/helpers/commons/prepare');
 
 const owner = { userId: Math.floor(Math.random() * 100000), username: '__broadcaster__' };
 const ignoredUser = { userId: Math.floor(Math.random() * 100000), username: 'ignoreduser' };
@@ -66,6 +66,7 @@ describe('Message - random filter', () => {
     it('add user ignoreduser to ignore list', async () => {
       const r = await tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
       assert.strictEqual(r[0].response, prepare('ignore.user.is.added', { username: 'ignoreduser' }));
+
     });
 
     const users = ['ignoreduser', 'user1'];

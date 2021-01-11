@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { getRepository } from 'typeorm';
 import XRegExp from 'xregexp';
 
-import { parserReply, prepare } from '../commons';
+import { parserReply } from '../commons';
 import * as constants from '../constants';
 import { Commands, CommandsInterface, CommandsResponsesInterface } from '../database/entity/commands';
 import { command, default_permission, helper } from '../decorators';
@@ -10,9 +10,10 @@ import { parser } from '../decorators';
 import Expects from '../expects';
 import { checkFilter } from '../helpers/checkFilter';
 import { getAllCountOfCommandUsage, getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage } from '../helpers/commands/count';
+import { prepare } from '../helpers/commons';
 import { warning } from '../helpers/log';
-import { permission } from '../helpers/permissions';
 import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
+import { check, defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import permissions from '../permissions';
 import { translate } from '../translate';
@@ -104,7 +105,7 @@ class CustomCommands extends System {
   }
 
   @command('!command')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   @helper()
   main (opts: CommandOptions) {
     let url = 'http://sogehige.github.io/sogeBot/#/systems/custom-commands';
@@ -115,11 +116,11 @@ class CustomCommands extends System {
   }
 
   @command('!command edit')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async edit (opts: CommandOptions) {
     try {
       const [userlevel, stopIfExecuted, cmd, rId, response] = new Expects(opts.parameters)
-        .permission({ optional: true, default: permission.VIEWERS })
+        .permission({ optional: true, default: defaultPermissions.VIEWERS })
         .argument({ optional: true, name: 's', default: null, type: Boolean })
         .argument({ name: 'c', type: String, multi: true, delimiter: '' })
         .argument({ name: 'rid', type: Number })
@@ -151,7 +152,7 @@ class CustomCommands extends System {
       }
 
       responseDb.response = response;
-      responseDb.permission = pItem.id ?? permission.VIEWERS;
+      responseDb.permission = pItem.id ?? defaultPermissions.VIEWERS;
       if (stopIfExecuted) {
         responseDb.stopIfExecuted = stopIfExecuted;
       }
@@ -165,11 +166,11 @@ class CustomCommands extends System {
   }
 
   @command('!command add')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async add (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [userlevel, stopIfExecuted, cmd, response] = new Expects(opts.parameters)
-        .permission({ optional: true, default: permission.VIEWERS })
+        .permission({ optional: true, default: defaultPermissions.VIEWERS })
         .argument({ optional: true, name: 's', default: false, type: Boolean })
         .argument({ name: 'c', type: String, multi: true, delimiter: '' })
         .argument({ name: 'r', type: String, multi: true, delimiter: '' })
@@ -201,7 +202,7 @@ class CustomCommands extends System {
         ...cDb,
         responses: [...cDb.responses, {
           order: cDb.responses.length,
-          permission: pItem.id ?? permission.VIEWERS,
+          permission: pItem.id ?? defaultPermissions.VIEWERS,
           stopIfExecuted: stopIfExecuted,
           response: response,
           filter: '',
@@ -278,7 +279,7 @@ class CustomCommands extends System {
       await incrementCountOfCommandUsage(cmd.command.command);
       for (const r of _.orderBy(cmd.command.responses, 'order', 'asc')) {
         if (typeof getFromViewersCache(opts.sender.userId, r.permission) === 'undefined') {
-          addToViewersCache(opts.sender.userId, r.permission, (await permissions.check(Number(opts.sender.userId), r.permission, false)).access);
+          addToViewersCache(opts.sender.userId, r.permission, (await check(Number(opts.sender.userId), r.permission, false)).access);
         }
 
         if (getFromViewersCache(opts.sender.userId, r.permission)
@@ -307,7 +308,7 @@ class CustomCommands extends System {
   }
 
   @command('!command list')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async list (opts: CommandOptions) {
     const cmd = new Expects(opts.parameters).command({ optional: true }).toArray()[0];
 
@@ -338,7 +339,7 @@ class CustomCommands extends System {
   }
 
   @command('!command toggle')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async toggle (opts: CommandOptions): Promise<CommandResponse[]> {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP) as unknown as { [x: string]: string } | null;
     if (_.isNil(match)) {
@@ -361,7 +362,7 @@ class CustomCommands extends System {
   }
 
   @command('!command toggle-visibility')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async toggleVisibility (opts: CommandOptions): Promise<CommandResponse[]> {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP) as unknown as { [x: string]: string } | null;
     if (_.isNil(match)) {
@@ -384,7 +385,7 @@ class CustomCommands extends System {
   }
 
   @command('!command remove')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async remove (opts: CommandOptions) {
     try {
       const [cmd, rId] = new Expects(opts.parameters)

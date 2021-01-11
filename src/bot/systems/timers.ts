@@ -4,15 +4,15 @@ import * as _ from 'lodash';
 import { sortBy } from 'lodash';
 import { getRepository } from 'typeorm';
 
-import api from '../api';
-import { announce } from '../commons';
 import { MINUTE, SECOND } from '../constants';
 import { Timer, TimerResponse, TimerResponseInterface } from '../database/entity/timer';
 import { command, default_permission } from '../decorators';
 import Expects from '../expects';
+import { isStreamOnline } from '../helpers/api';
+import { announce } from '../helpers/commons';
 import { isDbConnected } from '../helpers/database';
 import { linesParsed } from '../helpers/parser';
-import { permission } from '../helpers/permissions';
+import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import { translate } from '../translate';
 import System from './_interface';
@@ -86,7 +86,7 @@ class Timers extends System {
   }
 
   @command('!timers')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   main (opts: CommandOptions): CommandResponse[] {
     let url = 'http://sogehige.github.io/sogeBot/#/systems/timers';
     if ((process.env?.npm_package_version ?? 'x.y.z-SNAPSHOT').includes('SNAPSHOT')) {
@@ -111,8 +111,7 @@ class Timers extends System {
 
   async check () {
     clearTimeout(this.timeouts.timersCheck);
-
-    if (!api.isStreamOnline) {
+    if (!isStreamOnline.value) {
       await getRepository(Timer).update({}, { triggeredAtMessages: linesParsed, triggeredAtTimestamp: Date.now() });
       this.timeouts.timersCheck = global.setTimeout(() => this.check(), MINUTE / 2); // this will run check 1s after full check is correctly done
       return;
@@ -155,7 +154,7 @@ class Timers extends System {
   }
 
   @command('!timers set')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async set (opts: CommandOptions): Promise<CommandResponse[]> {
     // -name [name-of-timer] -messages [num-of-msgs-to-trigger|default:0] -seconds [trigger-every-x-seconds|default:60]
     const nameMatch = opts.parameters.match(/-name ([a-zA-Z0-9_]+)/);
@@ -198,7 +197,7 @@ class Timers extends System {
   }
 
   @command('!timers unset')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async unset (opts: CommandOptions): Promise<CommandResponse[]> {
     // -name [name-of-timer]
     const nameMatch = opts.parameters.match(/-name ([\S]+)/);
@@ -219,7 +218,7 @@ class Timers extends System {
   }
 
   @command('!timers rm')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async rm (opts: CommandOptions): Promise<CommandResponse[]> {
     // -id [id-of-response]
     try {
@@ -233,7 +232,7 @@ class Timers extends System {
   }
 
   @command('!timers add')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async add (opts: CommandOptions): Promise<CommandResponse[]> {
     // -name [name-of-timer] -response '[response]'
     const nameMatch = opts.parameters.match(/-name ([\S]+)/);
@@ -274,7 +273,7 @@ class Timers extends System {
   }
 
   @command('!timers list')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async list (opts: CommandOptions): Promise<CommandResponse[]> {
     // !timers list -name [name-of-timer]
     const nameMatch = opts.parameters.match(/-name ([\S]+)/);
@@ -304,7 +303,7 @@ class Timers extends System {
   }
 
   @command('!timers toggle')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async toggle (opts: CommandOptions): Promise<CommandResponse[]> {
     // -name [name-of-timer] or -id [id-of-response]
     const [id, name] = new Expects(opts.parameters)

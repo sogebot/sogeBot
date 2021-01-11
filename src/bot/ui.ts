@@ -1,15 +1,17 @@
 import { filter, isString, set } from 'lodash';
 
 import Core from './_interface';
-import currency from './currency';
 import { settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
 import general from './general';
+import { mainCurrency, symbol } from './helpers/currency';
 import { timezone } from './helpers/dayjs';
 import { getBroadcaster } from './helpers/getBroadcaster';
+import { generalChannel } from './helpers/oauth/generalChannel';
+import { generalOwners } from './helpers/oauth/generalOwners';
 import { find, list } from './helpers/register';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
-import oauth from './oauth';
+import { setDomain } from './helpers/ui';
 import { default as uiModule } from './ui';
 import webhooks from './webhooks';
 
@@ -39,6 +41,7 @@ class UI extends Core {
   @onChange('domain')
   @onLoad('domain')
   subscribeWebhook() {
+    setDomain(this.domain);
     if (typeof webhooks === 'undefined') {
       setTimeout(() => this.subscribeWebhook(), 1000);
     } else {
@@ -67,8 +70,8 @@ class UI extends Core {
           }
         }
         // currencies
-        data.currency = currency.mainCurrency;
-        data.currencySymbol = currency.symbol(currency.mainCurrency);
+        data.currency = mainCurrency.value;
+        data.currencySymbol = symbol(mainCurrency.value);
 
         // timezone
         data.timezone = timezone;
@@ -76,8 +79,8 @@ class UI extends Core {
         // lang
         data.lang = general.lang;
 
-        data.isCastersSet = filter(oauth.generalOwners, (o) => isString(o) && o.trim().length > 0).length > 0 || getBroadcaster() !== '';
-        data.isChannelSet = filter(oauth.generalChannel, (o) => isString(o) && o.trim().length > 0).length > 0;
+        data.isCastersSet = filter(generalOwners.value, (o) => isString(o) && o.trim().length > 0).length > 0 || getBroadcaster() !== '';
+        data.isChannelSet = filter(generalChannel.value, (o) => isString(o) && o.trim().length > 0).length > 0;
 
         cb(null, data);
       } catch (e) {
@@ -96,8 +99,8 @@ class UI extends Core {
         }
 
         // currencies
-        data.currency = currency.mainCurrency;
-        data.currencySymbol = currency.symbol(currency.mainCurrency);
+        data.currency = mainCurrency.value;
+        data.currencySymbol = symbol(mainCurrency.value);
 
         // timezone
         data.timezone = timezone;

@@ -7,8 +7,8 @@ const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 const alias = (require('../../../dest/systems/alias')).default;
 
-const { prepare } = (require('../../../dest/commons'));
-const { permission } = require('../../../dest/helpers/permissions');
+const { prepare } = (require('../../../dest/helpers/commons/prepare'));
+const { defaultPermissions } = require('../../../dest/helpers/permissions/');
 
 const { getRepository } = require('typeorm');
 const { Variable } = require('../../../dest/database/entity/variable');
@@ -26,7 +26,7 @@ describe('Alias - #3738 - alias should trigger commands by variable', () => {
       currentValue: '!alert type=video',
       type: 'string',
       responseType: 0,
-      permission: permission.CASTERS,
+      permission: defaultPermissions.CASTERS,
       evalValue: '',
       usableOptions: [],
     });

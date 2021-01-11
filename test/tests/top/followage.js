@@ -1,6 +1,5 @@
 /* global describe it before */
-const commons = require('../../../dest/commons');
-
+const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 
 require('../../general.js');
 
@@ -13,7 +12,7 @@ const tmi = (require('../../../dest/tmi')).default;
 
 const moment = require('moment-timezone');
 
-const { prepare } = require('../../../dest/commons');
+const { prepare } = require('../../../dest/helpers/commons/prepare');
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const assert = require('assert');
@@ -48,7 +47,7 @@ describe('Top - !top followage', () => {
   });
 
   it('run !top followage and expect correct output', async () => {
-    const r = await top.followage({ sender: { username: commons.getOwner() } });
+    const r = await top.followage({ sender: { username: getOwner() } });
     const dates = [];
     for (let i = 0; i < 10; i++) {
       dates.push(`${moment.utc(Date.now() - (constants.HOUR * i)).format('L')} (${moment.utc(Date.now() - (constants.HOUR * i)).fromNow()})`);
@@ -62,7 +61,7 @@ describe('Top - !top followage', () => {
   });
 
   it('run !top followage and expect correct output', async () => {
-    const r = await top.followage({ sender: { username: commons.getOwner() } });
+    const r = await top.followage({ sender: { username: getOwner() } });
     const dates = [];
     for (let i = 0; i < 10; i++) {
       dates.push(`${moment.utc(Date.now() - (constants.HOUR * i)).format('L')} (${moment.utc(Date.now() - (constants.HOUR * i)).fromNow()})`);

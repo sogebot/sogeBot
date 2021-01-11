@@ -5,7 +5,7 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const _ = require('lodash');
-const commons = require('../../../dest/commons');
+const {getOwnerAsSender} = require('../../../dest/helpers/commons/getOwnerAsSender');
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
@@ -34,7 +34,7 @@ describe('/t/raffle-owner-can-join-raffle-more-then-1-time/32', () => {
 
   it('loop through owner participations', async () => {
     for (let i = 0; i < 100; i++) {
-      const a = await raffles.participate({ sender: commons.getOwnerAsSender(), message: `!winme` });
+      const a = await raffles.participate({ sender: getOwnerAsSender(), message: `!winme` });
       assert(a);
     }
   });

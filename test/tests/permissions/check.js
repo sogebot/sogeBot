@@ -6,10 +6,9 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const assert = require('assert');
 
-const { permission } = require('../../../dest/helpers/permissions');
+const { defaultPermissions,check } = require('../../../dest/helpers/permissions/');
 const { invalidateParserCache } = require('../../../dest/helpers/cache');
 const { serialize } = require('../../../dest/helpers/type');
-const permissions = (require('../../../dest/permissions')).default;
 const Parser = require('../../../dest/parser').default;
 const currency = require('../../../dest/currency').default;
 
@@ -50,22 +49,22 @@ describe('Permissions - check()', () => {
     }
   });
 
-  for (let i = 0, keys = Object.keys(permission); i < keys.length; i++) {
+  for (let i = 0, keys = Object.keys(defaultPermissions); i < keys.length; i++) {
     describe(`Permission ${keys[i]}`, () => {
       for (let j = 0; j < users.length; j++) {
         const user = users[j];
-        const pHash = permission[keys[i]];
+        const pHash = defaultPermissions[keys[i]];
         if (i >= j || (keys[i] === 'VIEWERS' && user.username.includes('viewer'))) {
           // have access
           it(`+++ ${users[j].username} should have access to ${keys[i]}`, async () => {
-            const check = await permissions.check(user.userId, pHash);
-            assert.strictEqual(check.access, true);
+            const _check = await check(user.userId, pHash);
+            assert.strictEqual(_check.access, true);
           });
         } else {
           // no access
           it(`--- ${users[j].username} should NOT have access to ${keys[i]}`, async () => {
-            const check = await permissions.check(user.userId, pHash);
-            assert.strictEqual(check.access, false);
+            const _check = await check(user.userId, pHash);
+            assert.strictEqual(_check.access, false);
           });
         }
       }
@@ -77,7 +76,7 @@ describe('Permissions - check()', () => {
       await getRepository(Permissions).save({
         id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer__only',
-        order: Object.keys(permission).length + 1,
+        order: Object.keys(defaultPermissions).length + 1,
         isCorePermission: false,
         isWaterfallAllowed: false,
         automation: 'none',
@@ -92,14 +91,14 @@ describe('Permissions - check()', () => {
       if (user.username === '__viewer__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer__only`, async () => {
-          const check = await permissions.check(user.userId, pHash);
-          assert.strictEqual(check.access, true);
+          const _check = await check(user.userId, pHash);
+          assert.strictEqual(_check.access, true);
         });
       } else {
         // no access
         it(`--- ${users[j].username} should NOT have access to __viewer__only`, async () => {
-          const check = await permissions.check(user.userId, pHash);
-          assert.strictEqual(check.access, false);
+          const _check = await check(user.userId, pHash);
+          assert.strictEqual(_check.access, false);
         });
       }
     }
@@ -110,7 +109,7 @@ describe('Permissions - check()', () => {
       await getRepository(Permissions).save({
         id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_points__only',
-        order: Object.keys(permission).length + 1,
+        order: Object.keys(defaultPermissions).length + 1,
         isCorePermission: false,
         isWaterfallAllowed: false,
         automation: 'viewers',
@@ -127,14 +126,14 @@ describe('Permissions - check()', () => {
       if (user.username === '__viewer_points__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_points__only`, async () => {
-          const check = await permissions.check(user.userId, pHash);
-          assert.strictEqual(check.access, true);
+          const _check = await check(user.userId, pHash);
+          assert.strictEqual(_check.access, true);
         });
       } else {
         // no access
         it(`--- ${users[j].username} should NOT have access to __viewer_points__only`, async () => {
-          const check = await permissions.check(user.userId, pHash);
-          assert.strictEqual(check.access, false);
+          const _check = await check(user.userId, pHash);
+          assert.strictEqual(_check.access, false);
         });
       }
     }
@@ -145,7 +144,7 @@ describe('Permissions - check()', () => {
       await getRepository(Permissions).save({
         id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_watched__only',
-        order: Object.keys(permission).length + 1,
+        order: Object.keys(defaultPermissions).length + 1,
         isCorePermission: false,
         isWaterfallAllowed: false,
         automation: 'viewers',
@@ -162,14 +161,14 @@ describe('Permissions - check()', () => {
       if (user.username === '__viewer_watched__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_watched__only`, async () => {
-          const check = await permissions.check(user.userId, pHash);
-          assert.strictEqual(check.access, true);
+          const _check = await check(user.userId, pHash);
+          assert.strictEqual(_check.access, true);
         });
       } else {
         // no access
         it(`--- ${users[j].username} should NOT have access to __viewer_watched__only`, async () => {
-          const check = await permissions.check(user.userId, pHash);
-          assert.strictEqual(check.access, false);
+          const _check = await check(user.userId, pHash);
+          assert.strictEqual(_check.access, false);
         });
       }
     }
@@ -180,7 +179,7 @@ describe('Permissions - check()', () => {
       await getRepository(Permissions).save({
         id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_tips__only',
-        order: Object.keys(permission).length + 1,
+        order: Object.keys(defaultPermissions).length + 1,
         isCorePermission: false,
         isWaterfallAllowed: false,
         automation: 'viewers',
@@ -197,14 +196,14 @@ describe('Permissions - check()', () => {
       if (user.username === '__viewer_tips__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_tips__only`, async () => {
-          const check = await permissions.check(user.userId, pHash);
-          assert.strictEqual(check.access, true);
+          const _check = await check(user.userId, pHash);
+          assert.strictEqual(_check.access, true);
         });
       } else {
         // no access
         it(`--- ${users[j].username} should NOT have access to __viewer_tips__only`, async () => {
-          const check = await permissions.check(user.userId, pHash);
-          assert.strictEqual(check.access, false);
+          const _check = await check(user.userId, pHash);
+          assert.strictEqual(_check.access, false);
         });
       }
     }
@@ -215,7 +214,7 @@ describe('Permissions - check()', () => {
       await getRepository(Permissions).save({
         id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_bits__only',
-        order: Object.keys(permission).length + 1,
+        order: Object.keys(defaultPermissions).length + 1,
         isCorePermission: false,
         isWaterfallAllowed: false,
         automation: 'viewers',
@@ -232,14 +231,14 @@ describe('Permissions - check()', () => {
       if (user.username === '__viewer_bits__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_bits__only`, async () => {
-          const check = await permissions.check(user.userId, pHash);
-          assert.strictEqual(check.access, true);
+          const _check = await check(user.userId, pHash);
+          assert.strictEqual(_check.access, true);
         });
       } else {
         // no access
         it(`--- ${users[j].username} should NOT have access to __viewer_bits__only`, async () => {
-          const check = await permissions.check(user.userId, pHash);
-          assert.strictEqual(check.access, false);
+          const _check = await check(user.userId, pHash);
+          assert.strictEqual(_check.access, false);
         });
       }
     }
@@ -250,7 +249,7 @@ describe('Permissions - check()', () => {
       await getRepository(Permissions).save({
         id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_messages__only',
-        order: Object.keys(permission).length + 1,
+        order: Object.keys(defaultPermissions).length + 1,
         isCorePermission: false,
         isWaterfallAllowed: false,
         automation: 'viewers',
@@ -267,14 +266,14 @@ describe('Permissions - check()', () => {
       if (user.username === '__viewer_messages__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_messages__only`, async () => {
-          const check = await permissions.check(user.userId, pHash);
-          assert.strictEqual(check.access, true);
+          const _check = await check(user.userId, pHash);
+          assert.strictEqual(_check.access, true);
         });
       } else {
         // no access
         it(`--- ${users[j].username} should NOT have access to __viewer_messages__only`, async () => {
-          const check = await permissions.check(user.userId, pHash);
-          assert.strictEqual(check.access, false);
+          const _check = await check(user.userId, pHash);
+          assert.strictEqual(_check.access, false);
         });
       }
     }
@@ -285,7 +284,7 @@ describe('Permissions - check()', () => {
       await getRepository(Permissions).save({
         id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_subtier__only',
-        order: Object.keys(permission).length + 1,
+        order: Object.keys(defaultPermissions).length + 1,
         isCorePermission: false,
         isWaterfallAllowed: false,
         automation: 'viewers',
@@ -302,14 +301,14 @@ describe('Permissions - check()', () => {
       if (user.username === '__viewer_subtier__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_subtier__only`, async () => {
-          const check = await permissions.check(user.userId, pHash);
-          assert.strictEqual(check.access, true);
+          const _check = await check(user.userId, pHash);
+          assert.strictEqual(_check.access, true);
         });
       } else {
         // no access
         it(`--- ${users[j].username} should NOT have access to __viewer_subtier__only`, async () => {
-          const check = await permissions.check(user.userId, pHash);
-          assert.strictEqual(check.access, false);
+          const _check = await check(user.userId, pHash);
+          assert.strictEqual(_check.access, false);
         });
       }
     }
@@ -320,7 +319,7 @@ describe('Permissions - check()', () => {
       await getRepository(Permissions).save({
         id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_subcumulativemonths__only',
-        order: Object.keys(permission).length + 1,
+        order: Object.keys(defaultPermissions).length + 1,
         isCorePermission: false,
         isWaterfallAllowed: false,
         automation: 'viewers',
@@ -337,14 +336,14 @@ describe('Permissions - check()', () => {
       if (user.username === '__viewer_subcumulativemonths__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_subcumulativemonths__only`, async () => {
-          const check = await permissions.check(user.userId, pHash);
-          assert.strictEqual(check.access, true);
+          const _check = await check(user.userId, pHash);
+          assert.strictEqual(_check.access, true);
         });
       } else {
         // no access
         it(`--- ${users[j].username} should NOT have access to __viewer_subcumulativemonths__only`, async () => {
-          const check = await permissions.check(user.userId, pHash);
-          assert.strictEqual(check.access, false);
+          const _check = await check(user.userId, pHash);
+          assert.strictEqual(_check.access, false);
         });
       }
     }
@@ -355,7 +354,7 @@ describe('Permissions - check()', () => {
       await getRepository(Permissions).save({
         id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_substreakmonths__only',
-        order: Object.keys(permission).length + 1,
+        order: Object.keys(defaultPermissions).length + 1,
         isCorePermission: false,
         isWaterfallAllowed: false,
         automation: 'viewers',
@@ -372,14 +371,14 @@ describe('Permissions - check()', () => {
       if (user.username === '__viewer_substreakmonths__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_substreakmonths__only`, async () => {
-          const check = await permissions.check(user.userId, pHash);
-          assert.strictEqual(check.access, true);
+          const _check = await check(user.userId, pHash);
+          assert.strictEqual(_check.access, true);
         });
       } else {
         // no access
         it(`--- ${users[j].username} should NOT have access to __viewer_substreakmonths__only`, async () => {
-          const check = await permissions.check(user.userId, pHash);
-          assert.strictEqual(check.access, false);
+          const _check = await check(user.userId, pHash);
+          assert.strictEqual(_check.access, false);
         });
       }
     }
@@ -390,7 +389,7 @@ describe('Permissions - check()', () => {
       await getRepository(Permissions).save({
         id: 'bbaac669-923f-4063-99e3-f9904b34dac3',
         name: '__viewer_customrank__only',
-        order: Object.keys(permission).length + 1,
+        order: Object.keys(defaultPermissions).length + 1,
         isCorePermission: false,
         isWaterfallAllowed: false,
         automation: 'viewers',
@@ -407,14 +406,14 @@ describe('Permissions - check()', () => {
       if (user.username === '__viewer_customrank__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_customrank__only`, async () => {
-          const check = await permissions.check(user.userId, pHash);
-          assert.strictEqual(check.access, true);
+          const _check = await check(user.userId, pHash);
+          assert.strictEqual(_check.access, true);
         });
       } else {
         // no access
         it(`--- ${users[j].username} should NOT have access to __viewer_customrank__only`, async () => {
-          const check = await permissions.check(user.userId, pHash);
-          assert.strictEqual(check.access, false);
+          const _check = await check(user.userId, pHash);
+          assert.strictEqual(_check.access, false);
         });
       }
     }
@@ -425,7 +424,7 @@ describe('Permissions - check()', () => {
       await getRepository(Permissions).save({
         id: 'bbaac999-923f-4063-99e3-f9904b34dac3',
         name: '__viewer_level5__only',
-        order: Object.keys(permission).length + 1,
+        order: Object.keys(defaultPermissions).length + 1,
         isCorePermission: false,
         isWaterfallAllowed: false,
         automation: 'viewers',
@@ -442,14 +441,14 @@ describe('Permissions - check()', () => {
       if (user.username === '__viewer_level5__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_level5__only`, async () => {
-          const check = await permissions.check(user.userId, pHash);
-          assert.strictEqual(check.access, true);
+          const _check = await check(user.userId, pHash);
+          assert.strictEqual(_check.access, true);
         });
       } else {
         // no access
         it(`--- ${users[j].username} should NOT have access to __viewer_level5__only`, async () => {
-          const check = await permissions.check(user.userId, pHash);
-          assert.strictEqual(check.access, false);
+          const _check = await check(user.userId, pHash);
+          assert.strictEqual(_check.access, false);
         });
       }
     }

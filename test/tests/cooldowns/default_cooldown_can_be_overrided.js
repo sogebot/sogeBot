@@ -14,7 +14,7 @@ const assert = require('assert');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
-const { permission } = require('../../../dest/helpers/permissions.js');
+const { defaultPermissions } = require('../../../dest/helpers/permissions/');
 
 const cooldown = (require('../../../dest/systems/cooldown')).default;
 const customcommands = (require('../../../dest/systems/customcommands')).default;
@@ -35,7 +35,7 @@ describe('Cooldowns - default cooldown can be overrided', () => {
       await message.prepare();
 
       gamble.enabled = true;
-      cooldown.__permission_based__defaultCooldownOfCommandsInSeconds[permission.VIEWERS] = 5;
+      cooldown.__permission_based__defaultCooldownOfCommandsInSeconds[defaultPermissions.VIEWERS] = 5;
 
       await getRepository(User).save({ username: usermod1.username, userId: usermod1.userId, isModerator: true });
       await getRepository(User).save({ username: subuser1.username, userId: subuser1.userId, isSubscriber: true });
@@ -48,7 +48,7 @@ describe('Cooldowns - default cooldown can be overrided', () => {
 
     after(async () => {
       gamble.enabled = false;
-      cooldown.__permission_based__defaultCooldownOfCommandsInSeconds[permission.VIEWERS] = 0;
+      cooldown.__permission_based__defaultCooldownOfCommandsInSeconds[defaultPermissions.VIEWERS] = 0;
       await time.waitMs(5000);
     });
 
@@ -79,7 +79,7 @@ describe('Cooldowns - default cooldown can be overrided', () => {
       await message.prepare();
 
       gamble.enabled = true;
-      cooldown.__permission_based__defaultCooldownOfKeywordsInSeconds[permission.VIEWERS] = 5;
+      cooldown.__permission_based__defaultCooldownOfKeywordsInSeconds[defaultPermissions.VIEWERS] = 5;
 
       await getRepository(User).save({ username: usermod1.username, userId: usermod1.userId, isModerator: true });
       await getRepository(User).save({ username: subuser1.username, userId: subuser1.userId, isSubscriber: true });
@@ -92,7 +92,7 @@ describe('Cooldowns - default cooldown can be overrided', () => {
 
     after(async () => {
       gamble.enabled = false;
-      cooldown.__permission_based__defaultCooldownOfKeywordsInSeconds[permission.VIEWERS] = 0;
+      cooldown.__permission_based__defaultCooldownOfKeywordsInSeconds[defaultPermissions.VIEWERS] = 0;
       await time.waitMs(5000);
     });
 

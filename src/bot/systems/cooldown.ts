@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { getRepository } from 'typeorm';
 import XRegExp from 'xregexp';
 
-import { isOwner, parserReply, prepare } from '../commons';
+import { parserReply } from '../commons';
 import * as constants from '../constants';
 import { Cooldown as CooldownEntity, CooldownInterface, CooldownViewer, CooldownViewerInterface } from '../database/entity/cooldown';
 import { Keyword } from '../database/entity/keyword';
@@ -10,11 +10,13 @@ import { User } from '../database/entity/user';
 import { command, default_permission, parser, permission_settings, rollback, settings } from '../decorators';
 import { onChange } from '../decorators/on';
 import Expects from '../expects';
+import { prepare } from '../helpers/commons';
 import { debug } from '../helpers/log';
-import { permission } from '../helpers/permissions';
+import { getUserHighestPermission } from '../helpers/permissions/';
+import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
+import { isOwner } from '../helpers/user';
 import Parser from '../parser';
-import permissions from '../permissions';
 import { translate } from '../translate';
 import System from './_interface';
 import customCommands from './customcommands';
@@ -33,9 +35,9 @@ const defaultCooldowns: { name: string; lastRunAt: number, permId: string }[] = 
  */
 
 class Cooldown extends System {
-  @permission_settings('default', [ permission.CASTERS ])
+  @permission_settings('default', [ defaultPermissions.CASTERS ])
   defaultCooldownOfCommandsInSeconds = 0;
-  @permission_settings('default', [ permission.CASTERS ])
+  @permission_settings('default', [ defaultPermissions.CASTERS ])
   defaultCooldownOfKeywordsInSeconds = 0;
 
   @settings()
@@ -113,7 +115,7 @@ class Cooldown extends System {
   }
 
   @command('!cooldown')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async main (opts: CommandOptions) {
     const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP_SET) as unknown as { [x: string]: string } | null;
 
@@ -145,7 +147,7 @@ class Cooldown extends System {
   }
 
   @command('!cooldown unset')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async unset (opts: CommandOptions) {
     try {
       const [ commandOrKeyword ] = new Expects(opts.parameters).everything().toArray();
@@ -197,7 +199,7 @@ class Cooldown extends System {
         const cooldown = await getRepository(CooldownEntity).findOne({ where: { name }, relations: ['viewers'] });
         if (!cooldown) {
           const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfCommandsInSeconds');
-          const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
+          const permId = await getUserHighestPermission(Number(opts.sender.userId));
 
           // user group have some default cooldown
           if (defaultValue[permId] > 0) {
@@ -244,7 +246,7 @@ class Cooldown extends System {
               data.push(cooldown);
             } else {
               const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfKeywordsInSeconds');
-              const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
+              const permId = await getUserHighestPermission(Number(opts.sender.userId));
               // user group have some default cooldown
               if (defaultValue[permId] > 0) {
                 const canBeRunAt = (defaultCooldowns.find(o =>
@@ -440,31 +442,31 @@ class Cooldown extends System {
   }
 
   @command('!cooldown toggle enabled')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async toggleEnabled (opts: CommandOptions) {
     return this.toggle(opts, 'isEnabled');
   }
 
   @command('!cooldown toggle moderators')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async toggleModerators (opts: CommandOptions) {
     return this.toggle(opts, 'isModeratorAffected');
   }
 
   @command('!cooldown toggle owners')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async toggleOwners (opts: CommandOptions) {
     return this.toggle(opts, 'isOwnerAffected');
   }
 
   @command('!cooldown toggle subscribers')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async toggleSubscribers (opts: CommandOptions) {
     return this.toggle(opts, 'isSubscriberAffected');
   }
 
   @command('!cooldown toggle followers')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async toggleFollowers (opts: CommandOptions) {
     return this.toggle(opts, 'isFollowerAffected');
   }

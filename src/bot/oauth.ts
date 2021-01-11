@@ -1,15 +1,23 @@
 import axios from 'axios';
 
 import Core from './_interface';
-import api from './api';
 import * as constants from './constants';
 import { areDecoratorsLoaded, persistent, settings, ui } from './decorators';
-import { onChange, onLoad } from './decorators/on';
+import { onChange, onLoad, onStartup } from './decorators/on';
+import { apiEmitter } from './helpers/api/emitter';
 import { error, info, warning } from './helpers/log';
+import { channelId, loadedTokensInc } from './helpers/oauth';
+import { botId } from './helpers/oauth/botId';
+import { botUsername } from './helpers/oauth/botUsername';
+import { broadcasterId } from './helpers/oauth/broadcasterId';
+import { broadcasterUsername } from './helpers/oauth/broadcasterUsername';
+import { generalChannel } from './helpers/oauth/generalChannel';
+import { generalOwners } from './helpers/oauth/generalOwners';
 import { setOAuthStatus } from './helpers/OAuthStatus';
 import { setStatus } from './helpers/parser';
 import { cleanViewersCache } from './helpers/permissions';
-import tmi from './tmi';
+import { tmiEmitter } from './helpers/tmi';
+import { getIdFromTwitch } from './microservices/getIdFromTwitch';
 
 class OAuth extends Core {
   private toWait = 10;
@@ -20,16 +28,12 @@ class OAuth extends Core {
   public profileImageUrl = '';
   public broadcaster = '';
   public bot = '';
-  @persistent()
-  public channelId = '';
   public botId = '';
   public broadcasterId = '';
   @persistent()
   public botClientId = '';
   @persistent()
   public broadcasterClientId = '';
-
-  loadedTokens = 0;
 
   @settings('general')
   public generalChannel = '';
@@ -116,21 +120,18 @@ class OAuth extends Core {
   }, 'bot')
   public botGenerateLink = null;
 
-  constructor() {
-    super();
-
+  @onStartup()
+  onStartup() {
     this.addMenu({ category: 'settings', name: 'core', id: 'settings/core', this: null });
-    setTimeout(() => {
-      this.validateOAuth('bot');
-      this.validateOAuth('broadcaster');
-      this.getChannelId();
-    }, 10000);
+    this.validateOAuth('bot');
+    this.validateOAuth('broadcaster');
+    this.getChannelId();
   }
 
   @onLoad('broadcasterAccessToken')
   @onLoad('botAccessToken')
   setBotAccessTokenLoaded() {
-    this.loadedTokens++;
+    loadedTokensInc();
   }
 
   @onChange('generalOwner')
@@ -152,14 +153,14 @@ class OAuth extends Core {
     let timeout = 1000;
 
     if (this.currentChannel !== this.generalChannel && this.generalChannel !== '') {
-      const cid = await api.getIdFromTwitch(this.generalChannel, true);
+      const cid = await getIdFromTwitch(this.generalChannel, true);
       if (typeof cid !== 'undefined' && cid !== null) {
         this.currentChannel = this.generalChannel;
-        this.channelId = cid;
+        channelId.value = cid;
         info('Channel ID set to ' + cid);
-        tmi.reconnect('bot');
-        tmi.reconnect('broadcaster');
-        api.updateChannelViewsAndBroadcasterType();
+        tmiEmitter.emit('reconnect', 'bot');
+        tmiEmitter.emit('reconnect', 'broadcaster');
+        apiEmitter.emit('updateChannelViewsAndBroadcasterType');
         this.toWait = 10;
       } else {
         error(`Cannot get channel ID of ${this.generalChannel} - waiting ${this.toWait.toFixed()}s`);
@@ -178,6 +179,42 @@ class OAuth extends Core {
     setOAuthStatus('broadcaster', this.broadcasterUsername === '');
   }
 
+  @onChange('generalChannel')
+  @onLoad('generalChannel')
+  setGeneralChannel() {
+    generalChannel.value = this.generalChannel;
+  }
+
+  @onChange('generalOwners')
+  @onLoad('generalOwners')
+  setGeneralOwners() {
+    generalOwners.value = this.generalOwners;
+  }
+
+  @onChange('botUsername')
+  @onLoad('botUsername')
+  setBotUsername() {
+    botUsername.value = this.botUsername;
+  }
+
+  @onChange('botId')
+  @onLoad('botId')
+  setBotId() {
+    botId.value = this.botId;
+  }
+
+  @onChange('broadcasterId')
+  @onLoad('broadcasterId')
+  setBroadcasterId() {
+    broadcasterId.value = this.broadcasterId;
+  }
+
+  @onChange('broadcasterUsername')
+  @onLoad('broadcasterUsername')
+  setBroadcasterUsername() {
+    broadcasterUsername.value = this.broadcasterUsername;
+  }
+
   @onChange('broadcasterUsername')
   public async onChangeBroadcasterUsername(key: string, value: any) {
     if (!this.generalOwners.includes(value)) {
@@ -194,7 +231,7 @@ class OAuth extends Core {
         if (value === '') {
           this.cache.broadcaster = 'force_reconnect';
           this.broadcasterUsername = '';
-          tmi.part('broadcaster');
+          tmiEmitter.emit('part', 'broadcaster');
         }
         break;
       case 'botAccessToken':
@@ -202,7 +239,7 @@ class OAuth extends Core {
         if (value === '') {
           this.cache.bot = 'force_reconnect';
           this.botUsername = '';
-          tmi.part('bot');
+          tmiEmitter.emit('part', 'bot');
         }
         break;
     }
@@ -284,7 +321,7 @@ class OAuth extends Core {
 
       const cache = this.cache[type];
       if (cache !== '' && cache !== request.data.login + request.data.scopes.join(',')) {
-        tmi.reconnect(type); // force TMI reconnect
+        tmiEmitter.emit('reconnect', type); // force TMI reconnect
         this.cache[type] = request.data.login + request.data.scopes.join(',');
       }
 

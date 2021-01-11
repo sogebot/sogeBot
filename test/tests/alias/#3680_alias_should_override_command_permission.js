@@ -6,7 +6,7 @@ const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 const alias = (require('../../../dest/systems/alias')).default;
 const assert = require('assert');
-const { prepare } = (require('../../../dest/commons'));
+const { prepare } = (require('../../../dest/helpers/commons/prepare'));
 const Parser = require('../../../dest/parser').default;
 
 // users

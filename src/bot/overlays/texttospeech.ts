@@ -1,5 +1,5 @@
 import { command, default_permission, parser, settings, ui } from '../decorators';
-import { permission } from '../helpers/permissions';
+import { defaultPermissions } from '../helpers/permissions/';
 import { default as ResponsiveVoice } from '../integrations/responsivevoice';
 import Overlay from './_interface';
 
@@ -52,7 +52,7 @@ class TextToSpeech extends Overlay {
   triggerTTSByHighlightedMessage = false;
 
   @command('!tts')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   textToSpeech(opts: CommandOptions): CommandResponse[] {
     this.emit('speak', {
       text: opts.parameters,

@@ -11,7 +11,7 @@ const { User } = require('../../../dest/database/entity/user');
 const { Settings } = require('../../../dest/database/entity/settings');
 
 const tmi = (require('../../../dest/tmi')).default;
-const api = (require('../../../dest/api')).default;
+const isStreamOnline = (require('../../../dest/helpers/api/isStreamOnline')).isStreamOnline;
 
 // users
 const owner = { username: '__broadcaster__' };
@@ -34,7 +34,7 @@ describe('TMI - User should have counted messages - https://github.com/sogehige/
   });
 
   it ('Set stream as online', async () => {
-    api.isStreamOnline = true;
+    isStreamOnline.value = true;
   });
 
   it ('Send 10 messages as testuser1', async () => {
@@ -60,7 +60,7 @@ describe('TMI - User should have counted messages - https://github.com/sogehige/
   })
 
   it ('Set stream as offline', async () => {
-    api.isStreamOnline = false;
+    isStreamOnline.value = false;
   });
 
   it ('Send 10 messages as testuser1', async () => {

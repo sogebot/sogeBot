@@ -1,15 +1,19 @@
 import { getRepository } from 'typeorm';
 
 import api from '../api';
-import { dateDiff, prepare } from '../commons';
+import { dateDiff } from '../commons';
 import currency from '../currency';
 import { User } from '../database/entity/user';
 import { command, default_permission, settings, ui } from '../decorators';
 import Expects from '../expects';
 import general from '../general';
+import { prepare } from '../helpers/commons/';
+import { mainCurrency } from '../helpers/currency';
 import { dayjs, timezone } from '../helpers/dayjs';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { debug, error } from '../helpers/log';
+import { getUserHighestPermission } from '../helpers/permissions/';
+import { fetchAccountAge } from '../microservices/fetchAccountAge';
 import { getUserFromTwitch } from '../microservices/getUserFromTwitch';
 import permissions from '../permissions';
 import { translate } from '../translate';
@@ -135,7 +139,7 @@ class UserInfo extends System {
             username: username,
           });
         }
-        await api.fetchAccountAge(Number(userId));
+        await fetchAccountAge(Number(userId));
         if (!retry) {
           return this.age(opts, retry = true);
         } else {
@@ -268,9 +272,9 @@ class UserInfo extends System {
         const tips = user.tips;
         let tipAmount = 0;
         for (const t of tips) {
-          tipAmount += currency.exchange(Number(t.amount), t.currency, currency.mainCurrency);
+          tipAmount += currency.exchange(Number(t.amount), t.currency, mainCurrency.value);
         }
-        message[idx] = Intl.NumberFormat(general.lang, { style: 'currency', currency: currency.mainCurrency }).format(tipAmount);
+        message[idx] = Intl.NumberFormat(general.lang, { style: 'currency', currency: mainCurrency.value }).format(tipAmount);
       }
 
       if (message.includes('$bits')) {
@@ -283,7 +287,7 @@ class UserInfo extends System {
       if (message.includes('$role')) {
         const idx = message.indexOf('$role');
         message[idx] = null;
-        const permId = await permissions.getUserHighestPermission(Number(opts.sender.userId));
+        const permId = await getUserHighestPermission(Number(opts.sender.userId));
         if (permId) {
           const pItem = await permissions.get(permId);
           if (pItem) {

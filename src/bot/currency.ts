@@ -3,7 +3,6 @@ import https from 'https';
 
 import axios from 'axios';
 import chalk from 'chalk';
-import getSymbolFromCurrency from 'currency-symbol-map';
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
@@ -11,7 +10,8 @@ import Core from './_interface';
 import * as constants from './constants';
 import { UserTip } from './database/entity/user';
 import { settings, ui } from './decorators';
-import { onChange, onLoad } from './decorators/on';
+import { onChange, onLoad, onStartup } from './decorators/on';
+import { mainCurrency } from './helpers/currency';
 import { error, info, warning } from './helpers/log';
 
 class Currency extends Core {
@@ -34,17 +34,13 @@ class Currency extends Core {
   public timeouts: any = {};
   public base = 'CZK';
 
-  constructor() {
-    super();
-    setTimeout(() => this.updateRates(), 5 * constants.SECOND);
+  @onStartup()
+  onStartup() {
+    this.updateRates();
   }
 
   public isCodeSupported(code: currency) {
     return code === this.base || !_.isNil(this.rates[code]);
-  }
-
-  public symbol(code: string): currency {
-    return getSymbolFromCurrency(code) as currency;
   }
 
   public exchange(value: number, from: currency, to: currency, rates?: { [key in currency]: number }): number {
@@ -75,8 +71,10 @@ class Currency extends Core {
   }
 
   @onLoad('mainCurrency')
+  @onChange('mainCurrency')
   setMainCurrencyLoaded() {
     this.mainCurrencyLoaded = true;
+    mainCurrency.value = this.mainCurrency;
   }
 
   @onChange('mainCurrency')

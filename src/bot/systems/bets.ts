@@ -1,15 +1,16 @@
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { announce, getBotSender, getOwner, parserReply, prepare } from '../commons';
+import { parserReply } from '../commons';
 import { Bets as BetsEntity, BetsInterface } from '../database/entity/bets';
 import { User } from '../database/entity/user';
 import { command, default_permission, helper, settings, ui } from '../decorators';
 import { onStartup } from '../decorators/on';
 import Expects from '../expects';
+import { announce, getBotSender, getOwner, prepare } from '../helpers/commons';
 import { isDbConnected } from '../helpers/database';
 import { error, warning } from '../helpers/log';
-import { permission } from '../helpers/permissions';
+import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import System from './_interface';
 import points from './points';
@@ -130,7 +131,7 @@ class Bets extends System {
   }
 
   @command('!bet open')
-  @default_permission(permission.MODERATORS)
+  @default_permission(defaultPermissions.MODERATORS)
   public async open(opts: CommandOptions): Promise<CommandResponse[]> {
     const currentBet = await getRepository(BetsEntity).findOne({
       relations: ['participations'],
@@ -279,7 +280,7 @@ class Bets extends System {
   }
 
   @command('!bet refund')
-  @default_permission(permission.MODERATORS)
+  @default_permission(defaultPermissions.MODERATORS)
   public async refund(opts: CommandOptions): Promise<CommandResponse[]> {
     const currentBet = await getRepository(BetsEntity).findOne({
       relations: ['participations'],
@@ -310,7 +311,7 @@ class Bets extends System {
   }
 
   @command('!bet close')
-  @default_permission(permission.MODERATORS)
+  @default_permission(defaultPermissions.MODERATORS)
   public async close(opts: CommandOptions): Promise<CommandResponse[]> {
     const currentBet = await getRepository(BetsEntity).findOne({
       relations: ['participations'],
@@ -362,7 +363,7 @@ class Bets extends System {
   }
 
   @command('!bet')
-  @default_permission(permission.VIEWERS)
+  @default_permission(defaultPermissions.VIEWERS)
   @helper()
   async main(opts: CommandOptions): Promise<CommandResponse[]> {
     if (opts.parameters.length === 0) {

@@ -1,15 +1,15 @@
 import axios from 'axios';
 import chalk from 'chalk';
-import * as _ from 'lodash';
 import { io, Socket } from 'socket.io-client';
 import { getRepository } from 'typeorm';
 
-import api from '../api';
 import currency from '../currency';
 import { User, UserTipInterface } from '../database/entity/user';
 import { persistent, settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import events from '../events';
+import { isStreamOnline, setStats, stats } from '../helpers/api';
+import { mainCurrency } from '../helpers/currency';
+import { eventEmitter } from '../helpers/events';
 import { getBroadcaster } from '../helpers/getBroadcaster';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 import { debug, error, info, tip } from '../helpers/log';
@@ -69,9 +69,8 @@ class Streamlabs extends Integration {
   @ui({ type: 'text-input', secret: true })
   socketToken = '';
 
-  constructor() {
-    super();
-
+  @onStartup()
+  onStartup() {
     setInterval(() => {
       if (this.onStartupTriggered) {
         this.restApiInterval();
@@ -208,7 +207,7 @@ class Streamlabs extends Integration {
           const newTip: UserTipInterface = {
             amount: Number(event.amount),
             currency: event.currency,
-            sortAmount: currency.exchange(Number(event.amount), event.currency, currency.mainCurrency),
+            sortAmount: currency.exchange(Number(event.amount), event.currency, mainCurrency.value),
             message: event.message,
             tippedAt: created_at,
             exchangeRates: currency.rates,
@@ -216,8 +215,11 @@ class Streamlabs extends Integration {
           user.tips.push(newTip);
           getRepository(User).save(user);
 
-          if (api.isStreamOnline) {
-            api.stats.currentTips += Number(currency.exchange(Number(event.amount), event.currency, currency.mainCurrency));
+          if (isStreamOnline.value) {
+            setStats({
+              ...stats,
+              currentTips: stats.currentTips + Number(currency.exchange(Number(event.amount), event.currency, mainCurrency.value)),
+            });
           }
           tip(`${event.from.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(event.amount).toFixed(2)}${event.currency}, message: ${event.message}`);
         }
@@ -230,12 +232,12 @@ class Streamlabs extends Integration {
           timestamp: Date.now(),
           isTest: event.isTest,
         });
-        events.fire('tip', {
+        eventEmitter.emit('tip', {
           username: event.from.toLowerCase(),
           amount: parseFloat(event.amount).toFixed(2),
           currency: event.currency,
-          amountInBotCurrency: Number(currency.exchange(Number(event.amount), event.currency, currency.mainCurrency)).toFixed(2),
-          currencyInBot: currency.mainCurrency,
+          amountInBotCurrency: Number(currency.exchange(Number(event.amount), event.currency, mainCurrency.value)).toFixed(2),
+          currencyInBot: mainCurrency.value,
           message: event.message,
         });
         alerts.trigger({
@@ -253,7 +255,7 @@ class Streamlabs extends Integration {
           amount: Number(event.amount),
           message: event.message,
           currency: event.currency,
-          timestamp: _.now(),
+          timestamp: Date.now(),
         });
       }
     }

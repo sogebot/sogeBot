@@ -6,32 +6,35 @@ import { getRepository } from 'typeorm';
 
 import Core from './_interface';
 import api from './api';
-import { getBotSender, getOwner, isOwner, prepare, sendMessage } from './commons';
 import * as constants from './constants';
 import type { EmitData } from './database/entity/alert';
 import { Price } from './database/entity/price';
 import { User, UserBitInterface } from './database/entity/user';
 import { settings, ui } from './decorators';
 import { command, default_permission } from './decorators';
-import { getFunctionList, onChange } from './decorators/on';
-import events from './events';
+import { getFunctionList, onChange, onLoad } from './decorators/on';
 import Expects from './expects';
+import { isStreamOnline, setStats, stats } from './helpers/api';
+import { getBotSender, getOwner, prepare } from './helpers/commons';
+import { sendMessage } from './helpers/commons/sendMessage';
 import { dayjs } from './helpers/dayjs';
+import { eventEmitter } from './helpers/events';
 import { getLocalizedName } from './helpers/getLocalized';
 import { triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub } from './helpers/interface/triggers';
-import { isBot } from './helpers/isBot';
-import { isIgnored } from './helpers/isIgnored';
 import { isDebugEnabled } from './helpers/log';
 import { chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning, whisperIn } from './helpers/log';
-import { setMuteStatus } from './helpers/muteStatus';
+import { generalChannel } from './helpers/oauth/generalChannel';
 import { avgResponse, linesParsedIncrement, setStatus } from './helpers/parser';
-import { permission } from './helpers/permissions';
+import { defaultPermissions } from './helpers/permissions/';
+import { sendWithMe, setGlobalIgnoreListExclude, setIgnoreList, setMuteStatus, showWithAt, tmiEmitter } from './helpers/tmi/';
+import { isOwner } from './helpers/user';
+import { isBot } from './helpers/user/isBot';
+import { isIgnored } from './helpers/user/isIgnored';
 import oauth from './oauth';
 import eventlist from './overlays/eventlist';
-import Parser from './parser';
+import { Parser } from './parser';
 import alerts from './registries/alerts';
 import customcommands from './systems/customcommands';
-import tmi from './tmi';
 import { translate } from './translate';
 import users from './users';
 import joinpart from './widgets/joinpart';
@@ -71,24 +74,66 @@ class TMI extends Core {
     bot: null,
     broadcaster: null,
   };
-  lastWorker = '';
   broadcasterWarning = false;
 
   ignoreGiftsFromUser: { [x: string]: { count: number; time: Date }} = {};
 
+  constructor() {
+    super();
+    this.emitter();
+  }
+
+  emitter() {
+    if (!tmiEmitter) {
+      setTimeout(() => this.emitter(), 10);
+      return;
+    }
+    tmiEmitter.on('reconnect', (type) => {
+      this.reconnect(type);
+    });
+    tmiEmitter.on('part', (type) => {
+      this.part(type);
+    });
+  }
+
+  @onChange('showWithAt')
+  @onLoad('showWithAt')
+  setShowWithAt() {
+    showWithAt.value = this.showWithAt;
+  }
+
+  @onChange('sendWithMe')
+  @onLoad('sendWithMe')
+  setSendWithMe() {
+    sendWithMe.value = this.sendWithMe;
+  }
+
+  @onChange('ignorelist')
+  @onLoad('ignorelist')
+  setIgnoreList() {
+    setIgnoreList(this.ignorelist);
+  }
+
+  @onChange('globalIgnoreListExclude')
+  @onLoad('globalIgnoreListExclude')
+  setGlobalIgnoreListExclude() {
+    setGlobalIgnoreListExclude(this.globalIgnoreListExclude);
+  }
+
   @onChange('mute')
+  @onLoad('mute')
   setMuteStatus() {
     setMuteStatus(this.mute);
   }
 
   @command('!ignore add')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async ignoreAdd (opts: Record<string, any>) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
-      tmi.ignorelist = [
+      this.ignorelist = [
         ...new Set([
-          ...tmi.ignorelist,
+          ...this.ignorelist,
           username,
         ]
         )];
@@ -101,11 +146,11 @@ class TMI extends Core {
   }
 
   @command('!ignore remove')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async ignoreRm (opts: Record<string, any>) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
-      tmi.ignorelist = tmi.ignorelist.filter(o => o !== username);
+      this.ignorelist = this.ignorelist.filter(o => o !== username);
       // update ignore list
       return [{ response: prepare('ignore.user.is.removed', { username }), ...opts}];
     } catch (e) {
@@ -115,7 +160,7 @@ class TMI extends Core {
   }
 
   @command('!ignore check')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async ignoreCheck (opts: Record<string, any>) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
@@ -131,7 +176,7 @@ class TMI extends Core {
     clearTimeout(this.timeouts[`initClient.${type}`]);
     const token = type === 'bot' ? oauth.botAccessToken : oauth.broadcasterAccessToken;
     const username = type === 'bot' ? oauth.botUsername : oauth.broadcasterUsername;
-    const channel = oauth.generalChannel;
+    const channel = generalChannel.value;
 
     try {
       if (token === '' || username === '' || channel === '') {
@@ -179,7 +224,7 @@ class TMI extends Core {
       }
       const token = type === 'bot' ? oauth.botAccessToken : oauth.broadcasterAccessToken;
       const username = type === 'bot' ? oauth.botUsername : oauth.broadcasterUsername;
-      const channel = oauth.generalChannel;
+      const channel = generalChannel.value;
 
       info(`TMI: ${type} is reconnecting`);
 
@@ -276,7 +321,7 @@ class TMI extends Core {
 
         if (!isBot(message.tags.username) || !message.isSelf) {
           message.tags['message-type'] = 'whisper';
-          tmi.message({message});
+          this.message({message});
           linesParsedIncrement();
         }
       });
@@ -292,7 +337,7 @@ class TMI extends Core {
           } else {
             // strip message from ACTION
             message.message = message.message.replace('\u0001ACTION ', '').replace('\u0001', '');
-            tmi.message({message});
+            this.message({message});
             linesParsedIncrement();
             triggerInterfaceOnMessage({
               sender: message.tags,
@@ -301,7 +346,7 @@ class TMI extends Core {
             });
 
             if (message.tags['message-type'] === 'action') {
-              events.fire('action', { username: message.tags.username?.toLowerCase(), source: 'twitch' });
+              eventEmitter.emit('action', { username: message.tags.username?.toLowerCase(), source: 'twitch' });
             }
           }
         } else {
@@ -311,14 +356,14 @@ class TMI extends Core {
 
       client.chat.on('CLEARCHAT', message => {
         if (message.event !== 'USER_BANNED') {
-          events.fire('clearchat', {});
+          eventEmitter.emit('clearchat');
         }
       });
 
       client.chat.on('HOSTTARGET', message => {
         if (message.event === 'HOST_ON') {
           if (typeof message.numberOfViewers !== 'undefined') { // may occur on restart bot when hosting
-            events.fire('hosting', { target: message.username, viewers: message.numberOfViewers });
+            eventEmitter.emit('hosting', { target: message.username, viewers: message.numberOfViewers });
           }
         }
       });
@@ -352,7 +397,7 @@ class TMI extends Core {
           event: 'host',
           timestamp: Date.now(),
         });
-        events.fire('hosted', data);
+        eventEmitter.emit('hosted', data);
         alerts.trigger({
           event: 'hosts',
           name: username,
@@ -386,7 +431,7 @@ class TMI extends Core {
         event: 'raid',
         timestamp: Date.now(),
       });
-      events.fire('raid', data);
+      eventEmitter.emit('raid', data);
       alerts.trigger({
         event: 'raids',
         name: message.parameters.login,
@@ -462,7 +507,7 @@ class TMI extends Core {
         timestamp: Date.now(),
       });
       sub(`${username}#${userstate.userId}, tier: ${tier}`);
-      events.fire('subscription', { username: username, method: (isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths, tier });
+      eventEmitter.emit('subscription', { username: username, method: (isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths, tier: String(tier) });
       alerts.trigger({
         event: 'subs',
         name: username,
@@ -531,9 +576,9 @@ class TMI extends Core {
         timestamp: Date.now(),
       });
       resub(`${username}#${userstate.userId}, streak share: ${subStreakShareEnabled}, streak: ${subStreak}, months: ${subCumulativeMonths}, message: ${messageFromUser}, tier: ${tier}`);
-      events.fire('resub', {
+      eventEmitter.emit('resub', {
         username,
-        tier,
+        tier: String(tier),
         subStreakShareEnabled,
         subStreak,
         subStreakName: getLocalizedName(subStreak, translate('core.months')),
@@ -577,7 +622,7 @@ class TMI extends Core {
         count,
         timestamp: Date.now(),
       });
-      events.fire('subcommunitygift', { username, count });
+      eventEmitter.emit('subcommunitygift', { username, count });
       subcommunitygift(`${username}#${userId}, to ${count} viewers`);
       alerts.trigger({
         event: 'subcommunitygifts',
@@ -614,7 +659,7 @@ class TMI extends Core {
       if (typeof this.ignoreGiftsFromUser[username] !== 'undefined' && this.ignoreGiftsFromUser[username].count !== 0) {
         this.ignoreGiftsFromUser[username].count--;
       } else {
-        events.fire('subgift', { username: username, recipient: recipient, tier });
+        eventEmitter.emit('subgift', { username: username, recipient: recipient, tier });
         triggerInterfaceOnSub({
           username: recipient,
           userId: Number(recipientId),
@@ -709,10 +754,13 @@ class TMI extends Core {
       user.bits.push(newBits);
       getRepository(User).save(user);
 
-      events.fire('cheer', { username, bits: userstate.bits, message: messageFromUser });
+      eventEmitter.emit('cheer', { username, bits: Number(userstate.bits), message: messageFromUser });
 
-      if (api.isStreamOnline) {
-        api.stats.currentBits += parseInt(userstate.bits, 10);
+      if (isStreamOnline.value) {
+        setStats({
+          ...stats,
+          currentBits: stats.currentBits + parseInt(userstate.bits, 10),
+        });
       }
 
       triggerInterfaceOnBit({
@@ -798,7 +846,7 @@ class TMI extends Core {
 
     if (!skip
         && sender['message-type'] === 'whisper'
-        && (tmi.whisperListener || isOwner(sender))) {
+        && (this.whisperListener || isOwner(sender))) {
       whisperIn(`${message} [${sender.username}]`);
     } else if (!skip && !isBot(sender.username)) {
       chatIn(`${message} [${sender.username}]`);
@@ -854,9 +902,9 @@ class TMI extends Core {
 
         api.followerUpdatePreCheck(sender.username);
 
-        events.fire('keyword-send-x-times', { username: sender.username, message: message, source: 'twitch' });
+        eventEmitter.emit('keyword-send-x-times', { username: sender.username, message: message, source: 'twitch' });
         if (message.startsWith('!')) {
-          events.fire('command-send-x-times', { username: sender.username, message: message, source: 'twitch' });
+          eventEmitter.emit('command-send-x-times', { username: sender.username, message: message, source: 'twitch' });
         } else if (!message.startsWith('!')) {
           getRepository(User).increment({ userId: Number(sender.userId) }, 'messages', 1);
         }

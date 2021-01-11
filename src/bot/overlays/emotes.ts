@@ -4,11 +4,14 @@ import { getManager, getRepository } from 'typeorm';
 import { v4 as uuid} from 'uuid';
 import XRegExp from 'xregexp';
 
-import { parserReply, prepare } from '../commons';
+import { parserReply } from '../commons';
 import * as constants from '../constants';
 import { CacheEmotes, CacheEmotesInterface } from '../database/entity/cacheEmotes';
 import { parser, settings, ui } from '../decorators';
+import { onStartup } from '../decorators/on';
+import { prepare } from '../helpers/commons';
 import { error, info, warning } from '../helpers/log';
+import { channelId } from '../helpers/oauth';
 import { ioServer } from '../helpers/panel';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import oauth from '../oauth';
@@ -83,23 +86,20 @@ class Emotes extends Overlay {
   comboEmoteCount = 0;
   comboLastBreak = 0;
 
-  constructor () {
-    super();
-
-    setTimeout(() => {
-      if (!this.fetch.global) {
-        this.fetchEmotesGlobal();
-      }
-      if (!this.fetch.channel) {
-        this.fetchEmotesChannel();
-      }
-      if (!this.fetch.ffz) {
-        this.fetchEmotesFFZ();
-      }
-      if (!this.fetch.bttv) {
-        this.fetchEmotesBTTV();
-      }
-    }, 10000);
+  @onStartup()
+  onStartup() {
+    if (!this.fetch.global) {
+      this.fetchEmotesGlobal();
+    }
+    if (!this.fetch.channel) {
+      this.fetchEmotesChannel();
+    }
+    if (!this.fetch.ffz) {
+      this.fetchEmotesFFZ();
+    }
+    if (!this.fetch.bttv) {
+      this.fetchEmotesBTTV();
+    }
   }
 
   sockets () {
@@ -150,7 +150,7 @@ class Emotes extends Overlay {
   }
 
   async fetchEmotesChannel () {
-    const cid = oauth.channelId;
+    const cid = channelId.value;
     this.fetch.channel = true;
 
     if (cid && oauth.broadcasterType !== null && (Date.now() - this.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.lastChannelChk !== cid)) {
@@ -225,7 +225,7 @@ class Emotes extends Overlay {
   }
 
   async fetchEmotesFFZ () {
-    const cid = oauth.channelId;
+    const cid = channelId.value;
     const channel = oauth.currentChannel;
     this.fetch.ffz = true;
 

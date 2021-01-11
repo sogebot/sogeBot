@@ -3,15 +3,16 @@
 import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { parserReply, prepare } from '../commons';
-import customvariables from '../customvariables';
+import { parserReply } from '../commons';
 import { Alias as AliasEntity } from '../database/entity/alias';
 import { command, default_permission, parser } from '../decorators';
 import Expects from '../expects';
 import { incrementCountOfCommandUsage } from '../helpers/commands/count';
+import { prepare } from '../helpers/commons';
+import { executeVariablesInText } from '../helpers/customvariables';
 import { debug, error, warning } from '../helpers/log';
-import { permission } from '../helpers/permissions';
 import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
+import { check, defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import Parser from '../parser';
 import permissions from '../permissions';
@@ -122,11 +123,11 @@ class Alias extends System {
         return false;
       } else {
         if (typeof getFromViewersCache(opts.sender.userId, alias.permission) === 'undefined') {
-          addToViewersCache(opts.sender.userId, alias.permission, (await permissions.check(Number(opts.sender.userId), alias.permission, false)).access);
+          addToViewersCache(opts.sender.userId, alias.permission, (await check(Number(opts.sender.userId), alias.permission, false)).access);
         }
         if (getFromViewersCache(opts.sender.userId, alias.permission)) {
           // process custom variables
-          const response = await customvariables.executeVariablesInText(
+          const response = await executeVariablesInText(
             opts.message.replace(replace, alias.command), {
               sender: {
                 userId: Number(opts.sender.userId),
@@ -154,7 +155,7 @@ class Alias extends System {
   }
 
   @command('!alias')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   main (opts: CommandOptions): CommandResponse[] {
     let url = 'http://sogehige.github.io/sogeBot/#/systems/alias';
     if ((process.env?.npm_package_version ?? 'x.y.z-SNAPSHOT').includes('SNAPSHOT')) {
@@ -164,7 +165,7 @@ class Alias extends System {
   }
 
   @command('!alias group')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async group (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       if (opts.parameters.includes('-set')) {
@@ -238,11 +239,11 @@ class Alias extends System {
   }
 
   @command('!alias edit')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async edit (opts: CommandOptions) {
     try {
       const [perm, alias, cmd] = new Expects(opts.parameters)
-        .permission({ optional: true, default: permission.VIEWERS })
+        .permission({ optional: true, default: defaultPermissions.VIEWERS })
         .argument({ name: 'a', type: String, multi: true, delimiter: '' }) // set as multi as alias can contain spaces
         .argument({ name: 'c', type: String, multi: true, delimiter: '' }) // set as multi as command can contain spaces
         .toArray();
@@ -261,7 +262,7 @@ class Alias extends System {
         const response = prepare('alias.alias-was-not-found', { alias });
         return [{ response, ...opts }];
       }
-      await getRepository(AliasEntity).save({...item, command: cmd, permission: pItem.id ?? permission.VIEWERS});
+      await getRepository(AliasEntity).save({...item, command: cmd, permission: pItem.id ?? defaultPermissions.VIEWERS});
 
       const response = prepare('alias.alias-was-edited', { alias, command: cmd });
       return [{ response, ...opts }];
@@ -271,11 +272,11 @@ class Alias extends System {
   }
 
   @command('!alias add')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async add (opts: CommandOptions) {
     try {
       const [perm, alias, cmd] = new Expects(opts.parameters)
-        .permission({ optional: true, default: permission.VIEWERS })
+        .permission({ optional: true, default: defaultPermissions.VIEWERS })
         .argument({ name: 'a', type: String, multi: true, delimiter: '' }) // set as multi as alias can contain spaces
         .argument({ name: 'c', type: String, multi: true, delimiter: '' }) // set as multi as command can contain spaces
         .toArray();
@@ -295,7 +296,7 @@ class Alias extends System {
           command: cmd,
           enabled: true,
           visible: true,
-          permission: pItem.id ?? permission.VIEWERS,
+          permission: pItem.id ?? defaultPermissions.VIEWERS,
         })
       );
       return [{ response, ...opts }];
@@ -305,7 +306,7 @@ class Alias extends System {
   }
 
   @command('!alias list')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async list (opts: CommandOptions) {
     const alias = await getRepository(AliasEntity).find({ visible: true, enabled: true });
     const response
@@ -317,7 +318,7 @@ class Alias extends System {
   }
 
   @command('!alias toggle')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async toggle (opts: CommandOptions) {
     try {
       const [alias] = new Expects(opts.parameters)
@@ -343,7 +344,7 @@ class Alias extends System {
   }
 
   @command('!alias toggle-visibility')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async toggleVisibility (opts: CommandOptions) {
     try {
       const [alias] = new Expects(opts.parameters)
@@ -369,7 +370,7 @@ class Alias extends System {
   }
 
   @command('!alias remove')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async remove (opts: CommandOptions) {
     try {
       const [alias] = new Expects(opts.parameters)

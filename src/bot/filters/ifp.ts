@@ -1,7 +1,7 @@
 import { isNil } from 'lodash';
 import safeEval from 'safe-eval';
 
-import { ResponseFilter } from '.';
+import type { ResponseFilter } from '.';
 
 const ifp: ResponseFilter = {
   '(if#)': async function (filter: string, attr) {

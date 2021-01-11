@@ -7,34 +7,40 @@ import { getRepository } from 'typeorm';
 
 import Core from './_interface';
 import api from './api';
-import { announce, getBotSender, getOwner, isOwner, isSubscriber, isVIP, parserReply, prepare } from './commons';
-import currency from './currency';
-import customvariables from './customvariables';
+import { parserReply } from './commons';
 import { Event, EventInterface } from './database/entity/event';
 import { User } from './database/entity/user';
 import { onStreamEnd } from './decorators/on';
 import events from './events';
+import { calls, isStreamOnline, rawStatus, setRateLimit, stats, streamStatusChangeSince } from './helpers/api';
 import { sample } from './helpers/array/sample';
 import { attributesReplace } from './helpers/attributesReplace';
+import { announce, getBotSender, getOwner, prepare } from './helpers/commons';
+import { mainCurrency } from './helpers/currency';
+import { getAll, getValueOf, setValueOf } from './helpers/customvariables';
+import { csEmitter } from './helpers/customvariables/emitter';
 import { isDbConnected } from './helpers/database';
 import { dayjs } from './helpers/dayjs';
+import { eventEmitter } from './helpers/events/emitter';
 import { flatten } from './helpers/flatten';
 import { generateUsername } from './helpers/generateUsername';
 import { getLocalizedName } from './helpers/getLocalized';
-import { isBot, isBotSubscriber } from './helpers/isBot';
-import { isBroadcaster } from './helpers/isBroadcaster';
-import { isModerator } from './helpers/isModerator';
 import { debug, error, info, warning } from './helpers/log';
+import { channelId } from './helpers/oauth';
 import { ioServer } from './helpers/panel';
+import { addUIError } from './helpers/panel/';
+import { parserEmitter } from './helpers/parser/';
 import { adminEndpoint } from './helpers/socket';
+import { isOwner, isSubscriber, isVIP } from './helpers/user';
+import { isBot, isBotSubscriber } from './helpers/user/isBot';
+import { isBroadcaster } from './helpers/user/isBroadcaster';
+import { isModerator } from './helpers/user/isModerator';
 import Message from './message';
+import { getIdFromTwitch } from './microservices/getIdFromTwitch';
+import { setTitleAndGame } from './microservices/setTitleAndGame';
 import oauth from './oauth';
-import clips from './overlays/clips';
-import { addUIError } from './panel';
-import Parser from './parser';
 import tmi from './tmi';
 import { translate } from './translate';
-import custom_variables from './widgets/customvariables';
 
 const excludedUsers = new Set<string>();
 
@@ -107,6 +113,45 @@ class Events extends Core {
 
     this.addMenu({ category: 'manage', name: 'event-listeners', id: 'manage/events/list', this: null });
     this.fadeOut();
+
+    // emitter .on listeners
+    for (const event of [
+      'action',
+      'commercial',
+      'game-changed',
+      'follow',
+      'cheer',
+      'unfollow',
+      'user-joined-channel',
+      'user-parted-channel',
+      'subcommunitygift',
+      'reward-redeemed',
+      'timeout',
+      'ban',
+      'hosting',
+      'hosted',
+      'raid',
+      'stream-started',
+      'stream-stopped',
+      'subscription',
+      'resub',
+      'clearchat',
+      'command-send-x-times',
+      'keyword-send-x-times',
+      'every-x-minutes-of-stream',
+      'stream-is-running-x-minutes',
+      'subgift',
+      'number-of-viewers-is-at-least-x',
+      'tip',
+      'tweet-post-with-hashtag',
+    ] as const) {
+      eventEmitter.on(event, (opts?: Events.Attributes) => {
+        if (typeof opts === 'undefined') {
+          opts = {};
+        }
+        events.fire(event, { ...opts });
+      });
+    }
   }
 
   @onStreamEnd()
@@ -128,7 +173,7 @@ class Events extends Core {
       if (!user) {
         try {
           await getRepository(User).save({
-            userId: Number(attributes.userId ? attributes.userId : await api.getIdFromTwitch(attributes.username)),
+            userId: Number(attributes.userId ? attributes.userId : await getIdFromTwitch(attributes.username)),
             username: attributes.username,
           });
           return this.fire(eventId, attributes);
@@ -155,7 +200,7 @@ class Events extends Core {
       const user = await getRepository(User).findOne({ username: attributes.recipient });
       if (!user) {
         await getRepository(User).save({
-          userId: Number(await api.getIdFromTwitch(attributes.recipient)),
+          userId: Number(await getIdFromTwitch(attributes.recipient)),
           username: attributes.recipient,
         });
         this.fire(eventId, attributes);
@@ -228,7 +273,7 @@ class Events extends Core {
   public async fireCreateAClipAndPlayReplay(operation: Events.OperationDefinitions, attributes: Events.Attributes) {
     const cid = await events.fireCreateAClip(operation);
     if (cid) { // clip created ok
-      clips.showClip(cid);
+      require('./overlays/clips').default.showClip(cid);
     }
   }
 
@@ -243,7 +288,7 @@ class Events extends Core {
   }
 
   public async fireStartCommercial(operation: Events.OperationDefinitions) {
-    const cid = oauth.channelId;
+    const cid = channelId.value;
     const url = `https://api.twitch.tv/helix/channels/commercial`;
 
     const token = await oauth.broadcasterAccessToken;
@@ -271,12 +316,10 @@ class Events extends Core {
       });
 
       // save remaining api calls
-      api.calls.broadcaster.remaining = request.headers['ratelimit-remaining'];
-      api.calls.broadcaster.refresh = request.headers['ratelimit-reset'];
-      api.calls.broadcaster.limit = request.headers['ratelimit-limit'];
+      setRateLimit('broadcaster', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: api.calls.broadcaster });
-      events.fire('commercial', { duration: Number(operation.durationOfCommercial) });
+      ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: calls.broadcaster });
+      eventEmitter.emit('commercial', { duration: Number(operation.durationOfCommercial) });
     } catch (e) {
       if (e.isAxiosError) {
         error(`API: ${url} - ${e.response.data.message}`);
@@ -313,18 +356,18 @@ class Events extends Core {
     command = await new Message(command).parse({ username: oauth.broadcasterUsername, sender: getBotSender() });
 
     if (global.mocha) {
-      const parse = new Parser({
+      parserEmitter.emit('process', {
         sender: { username: oauth.broadcasterUsername, userId: oauth.broadcasterId },
         message: command,
         skip: true,
-        quiet: _.get(operation, 'isCommandQuiet', false),
+        quiet: _.get(operation, 'isCommandQuiet', false) as boolean,
+      }, (responses) => {
+        for (let i = 0; i < responses.length; i++) {
+          setTimeout(async () => {
+            parserReply(await responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
+          }, 500 * i);
+        }
       });
-      const responses = await parse.process();
-      for (let i = 0; i < responses.length; i++) {
-        setTimeout(async () => {
-          parserReply(await responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
-        }, 500 * i);
-      }
     } else {
       tmi.message({
         message: {
@@ -343,7 +386,7 @@ class Events extends Core {
     const userObj = await getRepository(User).findOne({ username });
     if (!userObj && !attributes.test) {
       await getRepository(User).save({
-        userId: Number(await api.getIdFromTwitch(username)),
+        userId: Number(await getIdFromTwitch(username)),
         username,
       });
       return this.fireSendChatMessageOrWhisper(operation, {...attributes, userId, username }, whisper);
@@ -384,23 +427,21 @@ class Events extends Core {
     const numberToIncrement = Number(operation.numberToIncrement);
 
     // check if value is number
-    let currentValue: string | number = await customvariables.getValueOf('$_' + customVariableName);
+    let currentValue: string | number = await getValueOf('$_' + customVariableName);
     if (!_.isFinite(parseInt(currentValue, 10))) {
       currentValue = String(numberToIncrement);
     } else {
       currentValue = String(parseInt(currentValue, 10) - numberToIncrement);
     }
-    await customvariables.setValueOf(String(customVariableName), currentValue, {});
+    await setValueOf(String(customVariableName), currentValue, {});
 
     // Update widgets and titles
-    if (custom_variables.socket) {
-      custom_variables.socket.emit('refresh');
-    }
+    csEmitter.emit('refresh');
 
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
-    const title = api.rawStatus;
+    const title = rawStatus.value;
     if (title.match(regexp)) {
-      api.setTitleAndGame({});
+      setTitleAndGame({});
     }
   }
 
@@ -409,22 +450,20 @@ class Events extends Core {
     const numberToDecrement = Number(operation.numberToDecrement);
 
     // check if value is number
-    let currentValue = await customvariables.getValueOf('$_' + customVariableName);
+    let currentValue = await getValueOf('$_' + customVariableName);
     if (!_.isFinite(parseInt(currentValue, 10))) {
       currentValue = String(numberToDecrement * -1);
     } else {
       currentValue = String(parseInt(currentValue, 10) - numberToDecrement);
     }
-    await customvariables.setValueOf(customVariableName, currentValue, {});
+    await setValueOf(customVariableName, currentValue, {});
 
     // Update widgets and titles
-    if (custom_variables.socket) {
-      custom_variables.socket.emit('refresh');
-    }
+    csEmitter.emit('refresh');
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
-    const title = api.rawStatus;
+    const title = rawStatus.value;
     if (title.match(regexp)) {
-      api.setTitleAndGame({});
+      setTitleAndGame({});
     }
   }
 
@@ -459,12 +498,12 @@ class Events extends Core {
   }
 
   public async checkStreamIsRunningXMinutes(event: EventInterface) {
-    if (!api.isStreamOnline) {
+    if (!isStreamOnline.value) {
       return false;
     }
     event.triggered.runAfterXMinutes = _.get(event, 'triggered.runAfterXMinutes', 0);
     const shouldTrigger = event.triggered.runAfterXMinutes === 0
-                          && Number(dayjs.utc().unix()) - Number(dayjs.utc(api.streamStatusChangeSince).unix()) > Number(event.definitions.runAfterXMinutes) * 60;
+                          && Number(dayjs.utc().unix()) - Number(dayjs.utc(streamStatusChangeSince.value).unix()) > Number(event.definitions.runAfterXMinutes) * 60;
     if (shouldTrigger) {
       event.triggered.runAfterXMinutes = event.definitions.runAfterXMinutes;
       await getRepository(Event).save(event);
@@ -478,7 +517,7 @@ class Events extends Core {
     event.definitions.runInterval = Number(event.definitions.runInterval); // force Integer
     event.definitions.viewersAtLeast = Number(event.definitions.viewersAtLeast); // force Integer
 
-    const viewers = api.stats.currentViewers;
+    const viewers = stats.currentViewers;
 
     const shouldTrigger = viewers >= event.definitions.viewersAtLeast
                         && ((event.definitions.runInterval > 0 && Date.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000)
@@ -562,7 +601,7 @@ class Events extends Core {
       return true;
     }
 
-    const customVariables = customvariables.getAll();
+    const customVariables = await getAll();
     const toEval = `(function evaluation () { return ${event.filter} })()`;
     const context = {
       $username: _.get(attributes, 'username', null),
@@ -588,12 +627,12 @@ class Events extends Core {
       $viewers: _.get(attributes, 'viewers', null),
       $duration: _.get(attributes, 'duration', null),
       // add global variables
-      $game: api.stats.currentGame,
-      $title: api.stats.currentTitle,
-      $views: api.stats.currentViews,
-      $followers: api.stats.currentFollowers,
-      $hosts: api.stats.currentHosts,
-      $subscribers: api.stats.currentSubscribers,
+      $game: stats.currentGame,
+      $title: stats.currentTitle,
+      $views: stats.currentViews,
+      $followers: stats.currentFollowers,
+      $hosts: stats.currentHosts,
+      $subscribers: stats.currentSubscribers,
       $isBotSubscriber: isBotSubscriber(),
       ...customVariables,
     };
@@ -692,7 +731,7 @@ class Events extends Core {
           method: _.random(0, 1, false) === 0 ? 'Twitch Prime' : '',
           amount: _.random(0, 9999, true).toFixed(2),
           currency: sample(['CZK', 'USD', 'EUR']),
-          currencyInBot: currency.mainCurrency,
+          currencyInBot: mainCurrency.value,
           amountInBotCurrency: _.random(0, 9999, true).toFixed(2),
         };
 

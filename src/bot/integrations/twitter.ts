@@ -7,13 +7,14 @@ import _ from 'lodash';
 import Client from 'twitter';
 import { getRepository } from 'typeorm';
 
-import { getOwner } from '../commons';
 import { Event } from '../database/entity/event';
 import { WidgetSocial } from '../database/entity/widget';
 import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import events from '../events';
 import { attributesReplace } from '../helpers/attributesReplace';
+import { getOwner } from '../helpers/commons';
+import { eventEmitter } from '../helpers/events';
 import { error, info } from '../helpers/log';
 import Message from '../message';
 import Integration from './_interface';
@@ -38,9 +39,8 @@ class Twitter extends Integration {
   @ui({ type: 'text-input', secret: true })
   secretToken = '';
 
-  constructor() {
-    super();
-
+  @onStartup()
+  onStartup() {
     this.addEvent();
     setInterval(() => {
       this.updateStreams();
@@ -94,7 +94,7 @@ class Twitter extends Integration {
             url: `https://twitter.com/${tweet.user.screen_name}/status/${tweet.id_str}`,
           };
           getRepository(WidgetSocial).save(data);
-          events.fire('tweet-post-with-hashtag', { tweet: data });
+          eventEmitter.emit('tweet-post-with-hashtag', { tweet: data });
         });
 
         stream.on('error', (onError) => {

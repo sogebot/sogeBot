@@ -1,7 +1,7 @@
 /* global describe it before */
 
-const { permission } = require('../../../dest/helpers/permissions');
-const { getOwner } = require('../../../dest/commons');
+const { defaultPermissions } = require('../../../dest/helpers/permissions/defaultPermissions');
+const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 
 require('../../general.js');
 
@@ -20,8 +20,8 @@ _.set(global, 'widgets.custom_variables.io.emit', function () {});
 
 describe('Message - cvars filter', async () => {
   const users = [
-    { username: '__owner__', userId: Math.floor(Math.random() * 100000), permission: permission.CASTERS },
-    { username: '__viewer__', userId: Math.floor(Math.random() * 100000), permission: permission.VIEWERS },
+    { username: '__owner__', userId: Math.floor(Math.random() * 100000), permission: defaultPermissions.CASTERS },
+    { username: '__viewer__', userId: Math.floor(Math.random() * 100000), permission: defaultPermissions.VIEWERS },
   ];
   const tests = [
     {
@@ -139,7 +139,7 @@ describe('Message - cvars filter', async () => {
     },
   ];
 
-  for (const p of Object.keys(permission)) {
+  for (const p of Object.keys(defaultPermissions)) {
     describe('Custom variable with ' + p + ' permission', async () => {
       for (const user of users) {
         describe('Custom variable with ' + p + ' permission => Testing with ' + user.username, async () => {
@@ -167,7 +167,7 @@ describe('Message - cvars filter', async () => {
                   readOnly: false,
                   currentValue: String(test.initialValue),
                   type: test.type, responseType: typeof test.responseType === 'undefined' ? 0 : test.responseType,
-                  permission: permission[p],
+                  permission: defaultPermissions[p],
                   evalValue: '',
                   usableOptions: [],
                 });
@@ -257,7 +257,7 @@ describe('Message - cvars filter', async () => {
                   currentValue: String(test.initialValue),
                   type: test.type,
                   responseType: 0,
-                  permission: permission[p],
+                  permission: defaultPermissions[p],
                   evalValue: '',
                   usableOptions: [],
                 });

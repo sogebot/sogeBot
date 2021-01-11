@@ -1,16 +1,18 @@
 import { getRepository } from 'typeorm';
 
 import Core from './_interface';
-import api from './api';
-import { prepare } from './commons';
 import { EventList } from './database/entity/eventList';
 import { User } from './database/entity/user';
 import { command, default_permission, settings } from './decorators';
+import { isStreamOnline, stats, streamStatusChangeSince } from './helpers/api';
+import { prepare } from './helpers/commons/prepare';
 import { dayjs, timezone } from './helpers/dayjs';
 import { getTime } from './helpers/getTime';
-import { isIgnored } from './helpers/isIgnored';
-import { permission } from './helpers/permissions';
+import { defaultPermissions } from './helpers/permissions/';
 import { adminEndpoint } from './helpers/socket';
+import { isIgnored } from './helpers/user/isIgnored';
+import { sendGameFromTwitch } from './microservices/sendGameFromTwitch';
+import { setTitleAndGame } from './microservices/setTitleAndGame';
 import oauth from './oauth';
 import { translate } from './translate';
 import users from './users';
@@ -37,10 +39,10 @@ class Twitch extends Core {
 
   @command('!uptime')
   async uptime (opts: CommandOptions) {
-    const time = getTime(api.streamStatusChangeSince, true) as any;
+    const time = getTime(streamStatusChangeSince.value, true) as any;
     return [
       {
-        response: await translate(api.isStreamOnline ? 'uptime.online' : 'uptime.offline')
+        response: await translate(isStreamOnline.value ? 'uptime.online' : 'uptime.offline')
           .replace(/\$days/g, time.days)
           .replace(/\$hours/g, time.hours)
           .replace(/\$minutes/g, time.minutes)
@@ -125,37 +127,37 @@ class Twitch extends Core {
 
   @command('!title')
   async getTitle (opts: CommandOptions) {
-    return [ { response: translate('title.current').replace(/\$title/g, api.stats.currentTitle || 'n/a'), ...opts }];
+    return [ { response: translate('title.current').replace(/\$title/g, stats.currentTitle || 'n/a'), ...opts }];
   }
 
   @command('!title set')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async setTitle (opts: CommandOptions) {
     if (opts.parameters.length === 0) {
-      return [ { response: await translate('title.current').replace(/\$title/g, api.stats.currentTitle || 'n/a'), ...opts }];
+      return [ { response: await translate('title.current').replace(/\$title/g, stats.currentTitle || 'n/a'), ...opts }];
     }
-    const status = await api.setTitleAndGame({ title: opts.parameters });
+    const status = await setTitleAndGame({ title: opts.parameters });
     return status ? [ { response: status.response, ...opts } ] : [];
   }
 
   @command('!game')
   async getGame (opts: CommandOptions) {
-    return [ { response: translate('game.current').replace(/\$title/g, api.stats.currentGame || 'n/a'), ...opts }];
+    return [ { response: translate('game.current').replace(/\$title/g, stats.currentGame || 'n/a'), ...opts }];
   }
 
   @command('!game set')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async setGame (opts: CommandOptions) {
     if (opts.parameters.length === 0) {
-      return [ { response: translate('game.current').replace(/\$title/g, api.stats.currentGame || 'n/a'), ...opts }];
+      return [ { response: translate('game.current').replace(/\$title/g, stats.currentGame || 'n/a'), ...opts }];
     }
-    const games = await api.sendGameFromTwitch(null, opts.parameters);
+    const games = await sendGameFromTwitch(null, opts.parameters);
     if (Array.isArray(games) && games.length > 0) {
       const exactMatchIdx = games.findIndex(name => name.toLowerCase() === opts.parameters.toLowerCase());
-      const status = await api.setTitleAndGame({ game: games[exactMatchIdx !== -1 ? exactMatchIdx : 0] });
+      const status = await setTitleAndGame({ game: games[exactMatchIdx !== -1 ? exactMatchIdx : 0] });
       return status ? [ { response: status.response, ...opts } ] : [];
     }
-    return [{ response: translate('game.change.failed').replace(/\$title/g, api.stats.currentGame || 'n/a'), ...opts }];
+    return [{ response: translate('game.change.failed').replace(/\$title/g, stats.currentGame || 'n/a'), ...opts }];
   }
 }
 

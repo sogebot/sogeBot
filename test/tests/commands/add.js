@@ -5,7 +5,7 @@ const db = require('../../general.js').db;
 const assert = require('assert');
 const message = require('../../general.js').message;
 
-const { permission } = require('../../../dest/helpers/permissions');
+const { defaultPermissions } = require('../../../dest/helpers/permissions/');
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
@@ -29,7 +29,7 @@ const successTests = [
   { permission: null, command: '!cmd', response: 'Lorem Ipsum Dolor Sit Amet 1' },
   { permission: null, command: '!한국어', response: 'Lorem Ipsum Dolor Sit Amet 2' },
   { permission: null, command: '!русский', response: 'Lorem Ipsum Dolor Sit Amet 3' },
-  { permission: permission.VIEWERS, command: '!cmd', response: 'Lorem Ipsum Dolor Sit Amet 4' },
+  { permission: defaultPermissions.VIEWERS, command: '!cmd', response: 'Lorem Ipsum Dolor Sit Amet 4' },
   { permission: 'casters', command: '!cmd', response: 'Lorem Ipsum Dolor Sit Amet 5' },
 ];
 

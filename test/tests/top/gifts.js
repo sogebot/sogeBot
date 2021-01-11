@@ -1,5 +1,5 @@
 /* global describe it before */
-const commons = require('../../../dest/commons');
+const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 
 require('../../general.js');
 
@@ -9,7 +9,7 @@ const message = require('../../general.js').message;
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
-const { prepare } = require('../../../dest/commons');
+const { prepare } = require('../../../dest/helpers/commons/prepare');
 const top = (require('../../../dest/systems/top')).default;
 const tmi = (require('../../../dest/tmi')).default;
 const assert = require('assert');
@@ -34,7 +34,7 @@ describe('Top - !top gifts', () => {
   });
 
   it('run !top gifts and expect correct output', async () => {
-    const r = await top.gifts({ sender: { username: commons.getOwner() } });
+    const r = await top.gifts({ sender: { username: getOwner() } });
     assert.strictEqual(r[0].response, 'Top 10 (subgifts): 1. @user9 - 900, 2. @user8 - 800, 3. @user7 - 700, 4. @user6 - 600, 5. @user5 - 500, 6. @user4 - 400, 7. @user3 - 300, 8. @user2 - 200, 9. @user1 - 100, 10. @user0 - 0', owner);
   });
 
@@ -44,7 +44,7 @@ describe('Top - !top gifts', () => {
   });
 
   it('run !top gifts and expect correct output', async () => {
-    const r = await top.gifts({ sender: { username: commons.getOwner() } });
+    const r = await top.gifts({ sender: { username: getOwner() } });
     assert.strictEqual(r[0].response, 'Top 10 (subgifts): 1. @user9 - 900, 2. @user8 - 800, 3. @user7 - 700, 4. @user6 - 600, 5. @user5 - 500, 6. @user4 - 400, 7. @user3 - 300, 8. @user2 - 200, 9. @user1 - 100', owner);
   });
 });

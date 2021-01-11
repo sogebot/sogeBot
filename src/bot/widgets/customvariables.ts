@@ -2,8 +2,9 @@
 
 import { getRepository } from 'typeorm';
 
-import customvariables from '../customvariables';
 import { Variable, VariableWatch, VariableWatchInterface } from '../database/entity/variable';
+import { isVariableSetById, setValueOf } from '../helpers/customvariables';
+import { csEmitter } from '../helpers/customvariables/emitter';
 import { adminEndpoint } from '../helpers/socket';
 import Widget from './_interface';
 
@@ -12,11 +13,8 @@ class CustomVariables extends Widget {
     super();
     this.addWidget('customvariables', 'widget-title-customvariables', 'fas fa-dollar-sign');
 
-    require('cluster').on('message', (_worker: Worker, message: { type: string, emit: string }) => {
-      if (message.type !== 'widget_custom_variables') {
-        return;
-      }
-      this.emit(message.emit); // send update to widget
+    csEmitter.on('refresh', () => {
+      this.emit('refresh');
     });
   }
 
@@ -52,9 +50,9 @@ class CustomVariables extends Widget {
     });
     adminEndpoint(this.nsp, 'watched::setValue', async (opts, cb) => {
       try {
-        const variable = await customvariables.isVariableSetById(opts.id);
+        const variable = await isVariableSetById(opts.id);
         if (variable) {
-          await customvariables.setValueOf(variable.variableName, opts.value, {
+          await setValueOf(variable.variableName, opts.value, {
             readOnlyBypass: true,
           });
         }

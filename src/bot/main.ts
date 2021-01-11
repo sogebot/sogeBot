@@ -115,6 +115,8 @@ async function main () {
         await autoLoad('./dest/games/');
         await autoLoad('./dest/integrations/');
 
+        const tmi = require('./tmi');
+
         panelExpose();
 
         if (process.env.HEAP) {
@@ -126,9 +128,6 @@ async function main () {
           if (existsSync('./restart.pid')) {
             unlinkSync('./restart.pid');
           }
-
-          // load tmi last
-          const tmi = require('./tmi');
           tmi.default.shouldConnect = true;
           setIsBotStarted();
           startWatcher();

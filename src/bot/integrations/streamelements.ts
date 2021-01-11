@@ -3,12 +3,13 @@ import chalk from 'chalk';
 import io from 'socket.io-client-legacy';
 import { getRepository } from 'typeorm';
 
-import api from '../api.js';
 import currency from '../currency';
 import { User, UserTipInterface } from '../database/entity/user';
 import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import events from '../events';
+import { isStreamOnline, setStats, stats } from '../helpers/api/index.js';
+import { mainCurrency } from '../helpers/currency';
+import { eventEmitter } from '../helpers/events';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 import { error, info, tip } from '../helpers/log';
 import eventlist from '../overlays/eventlist';
@@ -152,7 +153,7 @@ class StreamElements extends Integration {
     const newTip: UserTipInterface = {
       amount: Number(amount),
       currency: DONATION_CURRENCY,
-      sortAmount: currency.exchange(Number(amount), DONATION_CURRENCY, currency.mainCurrency),
+      sortAmount: currency.exchange(Number(amount), DONATION_CURRENCY, mainCurrency.value),
       message,
       tippedAt: Date.now(),
       exchangeRates: currency.rates,
@@ -160,8 +161,11 @@ class StreamElements extends Integration {
     user.tips.push(newTip);
     getRepository(User).save(user);
 
-    if (api.isStreamOnline) {
-      api.stats.currentTips += currency.exchange(amount, DONATION_CURRENCY, currency.mainCurrency);
+    if (isStreamOnline.value) {
+      setStats({
+        ...stats,
+        currentTips: stats.currentTips + currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value),
+      });
     }
 
     tip(`${username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(amount).toFixed(2)}${DONATION_CURRENCY}, message: ${message}`);
@@ -174,12 +178,12 @@ class StreamElements extends Integration {
       message,
       timestamp: Date.now(),
     });
-    events.fire('tip', {
+    eventEmitter.emit('tip', {
       username: username.toLowerCase(),
       amount: Number(amount).toFixed(2),
       currency: DONATION_CURRENCY,
-      amountInBotCurrency: Number(currency.exchange(amount, DONATION_CURRENCY, currency.mainCurrency)).toFixed(2),
-      currencyInBot: currency.mainCurrency,
+      amountInBotCurrency: Number(currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value)).toFixed(2),
+      currencyInBot: mainCurrency.value,
       message,
     });
     alerts.trigger({

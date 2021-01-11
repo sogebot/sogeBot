@@ -5,7 +5,7 @@ import api from '../api';
 import { Gallery } from '../database/entity/gallery';
 import { command, default_permission, settings, ui } from '../decorators';
 import { debug } from '../helpers/log';
-import { permission } from '../helpers/permissions';
+import { defaultPermissions } from '../helpers/permissions/';
 import { publicEndpoint } from '../helpers/socket';
 import Message from '../message';
 import Overlay from './_interface';
@@ -32,7 +32,7 @@ class Alerts extends Overlay {
   }
 
   @command('!alert')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   public async overlay(opts: CommandOptions): Promise<CommandResponse[]> {
     opts.parameters = await new Message(opts.parameters).parse();
 

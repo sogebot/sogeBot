@@ -8,7 +8,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const assert = require('assert');
 
-const { permission } = require('../../../dest/helpers/permissions');
+const { defaultPermissions } = require('../../../dest/helpers/permissions/');
 
 const { getRepository } = require('typeorm');
 const { Commands } = require('../../../dest/database/entity/commands');
@@ -33,35 +33,35 @@ describe('Custom Commands - run()', () => {
     it('create \'!test\' command with $_variable', async () => {
       await getRepository(Commands).save({
         id: uuid(), command: '!test', enabled: true, visible: true, responses: [{
-          filter: '', response: '$_variable', permission: permission.VIEWERS, stopIfExecuted: false, order: 0,
+          filter: '', response: '$_variable', permission: defaultPermissions.VIEWERS, stopIfExecuted: false, order: 0,
         }],
       });
     });
     it('create \'!test\' command with $param', async () => {
       await getRepository(Commands).save({
         id: uuid(), command: '!test', enabled: true, visible: true, responses: [{
-          filter: '', response: '$param by !test command with param', permission: permission.VIEWERS, stopIfExecuted: false, order: 0,
+          filter: '', response: '$param by !test command with param', permission: defaultPermissions.VIEWERS, stopIfExecuted: false, order: 0,
         }],
       });
     });
     it('create \'!test\' command without $param', async () => {
       await getRepository(Commands).save({
         id: uuid(), command: '!test', enabled: true, visible: true, responses: [{
-          filter: '!$haveParam', response: 'This should not be triggered', permission: permission.VIEWERS, stopIfExecuted: false, order: 0,
+          filter: '!$haveParam', response: 'This should not be triggered', permission: defaultPermissions.VIEWERS, stopIfExecuted: false, order: 0,
         }],
       });
     });
     it('create \'!test qwerty\' command without $param', async () => {
       await getRepository(Commands).save({
         id: uuid(), command: '!test qwerty', enabled: true, visible: true, responses: [{
-          filter: '', response: 'This should be triggered', permission: permission.VIEWERS, stopIfExecuted: false, order: 0,
+          filter: '', response: 'This should be triggered', permission: defaultPermissions.VIEWERS, stopIfExecuted: false, order: 0,
         }],
       });
     });
     it('create second \'!test qwerty\' command without $param', async () => {
       await getRepository(Commands).save({
         id: uuid(), command: '!test qwerty', enabled: true, visible: true, responses: [{
-          filter: '', response: 'This should be triggered as well', permission: permission.VIEWERS, stopIfExecuted: false, order: 0,
+          filter: '', response: 'This should be triggered as well', permission: defaultPermissions.VIEWERS, stopIfExecuted: false, order: 0,
         }],
       });
     });
@@ -92,7 +92,7 @@ describe('Custom Commands - run()', () => {
     it('create command and response with filter', async () => {
       await getRepository(Commands).save({
         id: uuid(), command: '!cmd', enabled: true, visible: true, responses: [{
-          filter: '$sender == "user1"', response: 'Lorem Ipsum', permission: permission.VIEWERS, stopIfExecuted: false, order: 0,
+          filter: '$sender == "user1"', response: 'Lorem Ipsum', permission: defaultPermissions.VIEWERS, stopIfExecuted: false, order: 0,
         }],
       });
     });

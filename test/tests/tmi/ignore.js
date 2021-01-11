@@ -4,7 +4,7 @@ const assert = require('assert');
 require('../../general.js');
 
 const db = require('../../general.js').db;
-const { prepare } = require('../../../dest/commons');
+const { prepare } = require('../../../dest/helpers/commons/prepare');
 const message = require('../../general.js').message;
 
 const { getRepository } = require('typeorm');
@@ -21,8 +21,7 @@ const testuser3 = { username: 'testuser3', userId: 3 };
 const nightbot = { username: 'nightbot', userId: 4 };
 const botwithchangedname = { username: 'asdsadas', userId: 24900234 };
 
-const { VariableWatcher } = require('../../../dest/watchers');
-const { isIgnored } = require('../../../dest/helpers/isIgnored');
+const { isIgnored } = require('../../../dest/helpers/user/isIgnored');
 
 describe('TMI - ignore', () => {
   before(async () => {
@@ -35,10 +34,6 @@ describe('TMI - ignore', () => {
     await getRepository(User).save(testuser);
     await getRepository(User).save(testuser2);
     await getRepository(User).save(testuser3);
-  });
-
-  beforeEach(async () => {
-    await VariableWatcher.check();
   });
 
   describe('Global ignore workflow', () => {

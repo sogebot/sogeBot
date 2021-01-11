@@ -9,11 +9,15 @@ import currency from './currency';
 import { Permissions } from './database/entity/permissions';
 import { User, UserBit, UserInterface, UserTip } from './database/entity/user';
 import { onStartup } from './decorators/on';
+import { isStreamOnline, setStats, stats } from './helpers/api';
+import { mainCurrency } from './helpers/currency';
 import { debug, error, isDebugEnabled } from './helpers/log';
-import { permission } from './helpers/permissions';
+import { channelId } from './helpers/oauth';
+import { recacheOnlineUsersPermission } from './helpers/permissions';
+import { defaultPermissions, getUserHighestPermission } from './helpers/permissions/';
 import { adminEndpoint, viewerEndpoint } from './helpers/socket';
+import { getIdFromTwitch } from './microservices/getIdFromTwitch';
 import oauth from './oauth';
-import permissions from './permissions';
 
 class Users extends Core {
   constructor () {
@@ -56,9 +60,12 @@ class Users extends Core {
         // get new users
         const newChatters = await getRepository(User).find({ isOnline: true, watchedTime: 0 });
         debug('tmi.watched', `Adding ${newChatters.length} users as new chatters.`);
-        api.stats.newChatters += newChatters.length;
+        setStats({
+          ...stats,
+          newChatters: stats.newChatters + newChatters.length,
+        });
 
-        if (api.isStreamOnline) {
+        if (isStreamOnline.value) {
           debug('tmi.watched', `Incrementing watchedTime by ${interval}`);
           const incrementedUsers = await getRepository(User).increment({ isOnline: true }, 'watchedTime', interval);
           // chatTimeOnline + chatTimeOffline is solely use for points distribution
@@ -72,12 +79,18 @@ class Users extends Core {
                 debug('tmi.watched', `User ${user.username}#${user.userId} added watched time ${interval}`);
               }
             }
-            api.stats.currentWatchedTime += users.length * interval;
+            setStats({
+              ...stats,
+              currentWatchedTime: users.length * interval,
+            });
           } else {
-            api.stats.currentWatchedTime += incrementedUsers.affected * interval;
+            setStats({
+              ...stats,
+              currentWatchedTime: incrementedUsers.affected * interval,
+            });
           }
 
-          permissions.recacheOnlineUsersPermission();
+          recacheOnlineUsersPermission();
         } else {
           debug('tmi.watched', `Incrementing chatTimeOffline users by ${interval}`);
           await getRepository(User).increment({ isOnline: true }, 'chatTimeOffline', interval);
@@ -160,7 +173,7 @@ class Users extends Core {
     const user = await getRepository(User).findOne({ where: { username }, select: ['userId'] });
     if (!user) {
       const savedUser = await getRepository(User).save({
-        userId: Number(await api.getIdFromTwitch(username)),
+        userId: Number(await getIdFromTwitch(username)),
         username,
       });
       return savedUser.userId;
@@ -358,7 +371,7 @@ class Users extends Core {
     });
     adminEndpoint(this.nsp, 'viewers::followedAt', async (id, cb) => {
       try {
-        const cid = oauth.channelId;
+        const cid = channelId.value;
         const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`;
 
         const token = oauth.botAccessToken;
@@ -389,12 +402,12 @@ class Users extends Core {
         });
 
         if (viewer) {
-          const aggregatedTips = viewer.tips.map((o) => currency.exchange(o.amount, o.currency, currency.mainCurrency)).reduce((a, b) => a + b, 0);
+          const aggregatedTips = viewer.tips.map((o) => currency.exchange(o.amount, o.currency, mainCurrency.value)).reduce((a, b) => a + b, 0);
           const aggregatedBits = viewer.bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0);
 
-          const permId = await permissions.getUserHighestPermission(userId);
+          const permId = await getUserHighestPermission(userId);
           const permissionGroup = (await getRepository(Permissions).findOneOrFail({
-            where: { id: permId || permission.VIEWERS },
+            where: { id: permId || defaultPermissions.VIEWERS },
           }));
           cb(null, {...viewer, aggregatedBits, aggregatedTips, permission: permissionGroup});
         } else {

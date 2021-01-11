@@ -1,15 +1,16 @@
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { announce, prepare } from '../commons';
 import { Duel as DuelEntity, DuelInterface } from '../database/entity/duel';
 import { User } from '../database/entity/user';
 import { command, persistent, settings } from '../decorators';
+import { onStartup } from '../decorators/on';
+import { announce, prepare } from '../helpers/commons';
 import { isDbConnected } from '../helpers/database';
 import { getLocalizedName } from '../helpers/getLocalized';
-import { isBroadcaster } from '../helpers/isBroadcaster';
-import { isModerator } from '../helpers/isModerator';
 import { error } from '../helpers/log';
+import { isBroadcaster } from '../helpers/user/isBroadcaster';
+import { isModerator } from '../helpers/user/isModerator';
 import points from '../systems/points';
 import { translate } from '../translate';
 import Game from './_interface';
@@ -39,8 +40,8 @@ class Duel extends Game {
   @settings()
   bypassCooldownByOwnerAndMods = false;
 
-  constructor () {
-    super();
+  @onStartup()
+  onStartup() {
     this.pickDuelWinner();
   }
 

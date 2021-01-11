@@ -6,7 +6,7 @@ const message = require('../../general.js').message;
 
 const alias = (require('../../../dest/systems/alias')).default;
 const customcommands = (require('../../../dest/systems/customcommands')).default;
-const { announce } = require('../../../dest/commons');
+const { announce } = require('../../../dest/helpers/commons/announce');
 
 // users
 const owner = { username: '__broadcaster__' };

@@ -436,7 +436,7 @@ import { EventBus } from 'src/panel/helpers/event-bus';
 import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
-import type { UIError } from 'src/bot/panel';
+import type { UIError } from 'src/bot/helpers/panel/alerts';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {

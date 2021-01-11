@@ -1,8 +1,8 @@
 import { getRepository } from 'typeorm';
 
-import { getOwner } from '../commons';
 import { CommandsBoard } from '../database/entity/commands';
 import { settings } from '../decorators';
+import { getOwner } from '../helpers/commons';
 import { adminEndpoint } from '../helpers/socket';
 import tmi from '../tmi';
 import Widget from './_interface';

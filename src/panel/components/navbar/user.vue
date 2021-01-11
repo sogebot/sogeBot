@@ -39,7 +39,7 @@
           </div>
         </div>
         <b-button-group class="pt-2 w-100">
-          <b-button variant="dark" v-if="isPublicPage && viewer.permission.id === permission.CASTERS" href="/">
+          <b-button variant="dark" v-if="isPublicPage && viewer.permission.id === defaultPermissions.CASTERS" href="/">
             {{ translate('go-to-admin') }}
           </b-button>
           <b-button variant="dark" v-if="!isPublicPage" href="/public/">
@@ -69,7 +69,7 @@ import { defineComponent, ref, onMounted, onUnmounted, computed } from '@vue/com
 import type { Ref } from '@vue/composition-api'
 
 import { getSocket } from 'src/panel/helpers/socket';
-import { permission } from 'src/bot/helpers/permissions'
+import { defaultPermissions } from 'src/bot/helpers/permissions/defaultPermissions'
 import { UserInterface } from '../../../bot/database/entity/user';
 import { PermissionsInterface } from '../../../bot/database/entity/permissions';
 import translate from 'src/panel/helpers/translate';
@@ -137,7 +137,7 @@ export default defineComponent({
         }
       })
     }
-    return { permission, isViewerLoaded, viewer, viewerIs, isPublicPage, logout, login, translate };
+    return { defaultPermissions, isViewerLoaded, viewer, viewerIs, isPublicPage, logout, login, translate };
   }
 })
 </script>

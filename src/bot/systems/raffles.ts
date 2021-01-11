@@ -3,16 +3,17 @@
 import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import api from '../api';
-import { announce, getOwnerAsSender, prepare } from '../commons';
 import { Raffle, RaffleParticipant, RaffleParticipantInterface, RaffleParticipantMessageInterface } from '../database/entity/raffle';
 import { User } from '../database/entity/user';
 import { command, default_permission, parser, settings } from '../decorators';
+import { onStartup } from '../decorators/on';
+import { isStreamOnline } from '../helpers/api';
+import { announce, getOwnerAsSender, prepare } from '../helpers/commons';
 import { isDbConnected } from '../helpers/database';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { debug, warning } from '../helpers/log';
 import { linesParsed } from '../helpers/parser';
-import { permission } from '../helpers/permissions';
+import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import tmi from '../tmi';
 import { translate } from '../translate';
@@ -59,8 +60,8 @@ class Raffles extends System {
   @settings('join')
   announceNewEntriesBatchTime = 15;
 
-  constructor () {
-    super();
+  @onStartup()
+  onStartup() {
     this.addWidget('raffles', 'widget-title-raffles', 'fas fa-gift');
 
     this.announce();
@@ -206,7 +207,7 @@ class Raffles extends System {
     const raffle = await getRepository(Raffle).findOne({ where: { winner: null, isClosed: false }, relations: ['participants'] });
     const isTimeToAnnounce = new Date().getTime() - new Date(this.lastAnnounce).getTime() >= (this.raffleAnnounceInterval * 60 * 1000);
     const isMessageCountToAnnounce = linesParsed - this.lastAnnounceMessageCount >= this.raffleAnnounceMessageInterval;
-    if (!(api.isStreamOnline) || !raffle || !isTimeToAnnounce || !isMessageCountToAnnounce) {
+    if (!(isStreamOnline.value) || !raffle || !isTimeToAnnounce || !isMessageCountToAnnounce) {
       this.timeouts.raffleAnnounce = global.setTimeout(() => this.announce(), 60000);
       return;
     }
@@ -249,7 +250,7 @@ class Raffles extends System {
   }
 
   @command('!raffle remove')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async remove (opts: CommandOptions): Promise<CommandResponse[]> {
     const raffle = await getRepository(Raffle).findOne({ winner: null, isClosed: false });
     if (raffle) {
@@ -259,7 +260,7 @@ class Raffles extends System {
   }
 
   @command('!raffle open')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async open (opts: CommandOptions): Promise<CommandResponse[]> {
     const [followers, subscribers] = [opts.parameters.indexOf('followers') >= 0, opts.parameters.indexOf('subscribers') >= 0];
     let type = (opts.parameters.indexOf('-min') >= 0 || opts.parameters.indexOf('-max') >= 0) ? TYPE_TICKETS : TYPE_NORMAL;
@@ -495,7 +496,7 @@ class Raffles extends System {
   }
 
   @command('!raffle pick')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async pick (opts: CommandOptions): Promise<CommandResponse[]> {
     const raffle = await getRepository(Raffle).findOne({
       relations: ['participants'],

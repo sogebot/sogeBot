@@ -7,14 +7,15 @@ import ytdl from 'ytdl-core';
 import ytpl from 'ytpl';
 import ytsr from 'ytsr';
 
-import { announce, getBot, getBotSender, prepare, timeout } from '../commons';
 import { SongBan, SongPlaylist, SongPlaylistInterface, SongRequest } from '../database/entity/song';
 import { command, default_permission, persistent, settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import { isModerator } from '../helpers/isModerator';
+import { announce, getBot, getBotSender, prepare } from '../helpers/commons';
 import { error, info } from '../helpers/log';
-import { permission } from '../helpers/permissions';
+import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
+import { timeout } from '../helpers/tmi';
+import { isModerator } from '../helpers/user/isModerator';
 import { translate } from '../translate';
 import System from './_interface';
 
@@ -263,7 +264,7 @@ class Songs extends System {
   }
 
   @command('!bansong')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async banSong (opts: CommandOptions): Promise<CommandResponse[]> {
     const videoID: string | null = opts.parameters.trim().length === 0 ? JSON.parse(this.currentSong).videoID : opts.parameters.trim();
     if (!videoID) {
@@ -328,7 +329,7 @@ class Songs extends System {
   }
 
   @command('!unbansong')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async unbanSong (opts: CommandOptions): Promise<CommandResponse[]> {
     const removed = await getRepository(SongBan).delete({ videoId: opts.parameters });
     if ((removed.affected || 0) > 0) {
@@ -339,7 +340,7 @@ class Songs extends System {
   }
 
   @command('!skipsong')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async sendNextSongID (): Promise<CommandResponse[]> {
     // check if there are any requests
     if (this.songrequest) {
@@ -454,7 +455,7 @@ class Songs extends System {
   }
 
   @command('!playlist steal')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async stealSong (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const currentSong = JSON.parse(this.currentSong);
@@ -472,19 +473,19 @@ class Songs extends System {
   }
 
   @command('!playlist')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async playlistCurrent (opts: CommandOptions): Promise<CommandResponse[]> {
     return [{ response: prepare('songs.playlist-current', { playlist: this.currentTag }), ...opts }];
   }
 
   @command('!playlist list')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async playlistList (opts: CommandOptions): Promise<CommandResponse[]> {
     return [{ response: prepare('songs.playlist-list', { list: (await this.getTags()).join(', ') }), ...opts }];
   }
 
   @command('!playlist set')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async playlistSet (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const tags = await this.getTags();
@@ -598,7 +599,7 @@ class Songs extends System {
   }
 
   @command('!playlist add')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async addSongToPlaylist (opts: CommandOptions): Promise<CommandResponse[]> {
     if (_.isNil(opts.parameters)) {
       return [];
@@ -651,7 +652,7 @@ class Songs extends System {
   }
 
   @command('!playlist remove')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async removeSongFromPlaylist (opts: CommandOptions): Promise<CommandResponse[]> {
     if (opts.parameters.length < 1) {
       return [];
@@ -678,7 +679,7 @@ class Songs extends System {
   }
 
   @command('!playlist import')
-  @default_permission(permission.CASTERS)
+  @default_permission(defaultPermissions.CASTERS)
   async importPlaylist (opts: CommandOptions): Promise<(CommandResponse & { imported: number; skipped: number })[]> {
     if (opts.parameters.length < 1) {
       return [];

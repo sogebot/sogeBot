@@ -3,10 +3,10 @@ import { setInterval } from 'timers';
 import WebSocket from 'ws';
 
 import { SECOND } from './constants';
-import events from './events';
+import { eventEmitter } from './helpers/events';
 import { ban, debug, error, info, redeem, timeout, unban, warning } from './helpers/log';
+import { addUIError } from './helpers/panel/alerts';
 import oauth from './oauth';
-import { addUIError } from './panel';
 import alerts from './registries/alerts';
 
 const pubsubEndpoint: Readonly<string> = 'wss://pubsub-edge.twitch.tv';
@@ -94,7 +94,7 @@ const connect = () => {
           message: dataMessage.data.redemption.user_input,
           recipient: dataMessage.data.redemption.user.login,
         });
-        events.fire('reward-redeemed', {
+        eventEmitter.emit('reward-redeemed', {
           username: dataMessage.data.redemption.user.login,
           titleOfReward: dataMessage.data.redemption.reward.title,
           userInput: dataMessage.data.redemption.user_input,
@@ -105,12 +105,12 @@ const connect = () => {
           const [ username, reason ] = dataMessage.data.args;
           if (dataMessage.data.moderation_action === 'ban') {
             ban(`${username}#${dataMessage.data.target_user_id} by ${createdBy}: ${reason ? reason : '<no reason>'}`);
-            events.fire('ban', { username, reason: reason ? reason : '<no reason>' });
+            eventEmitter.emit('ban', { username, reason: reason ? reason : '<no reason>' });
           } else if (dataMessage.data.moderation_action === 'unban') {
             unban(`${username}#${dataMessage.data.target_user_id} by ${createdBy}`);
           } else if (dataMessage.data.moderation_action === 'timeout') {
             timeout(`${username}#${dataMessage.data.target_user_id} by ${createdBy} for ${reason} seconds`);
-            events.fire('timeout', { username, duration: reason });
+            eventEmitter.emit('timeout', { username, duration: reason });
           }
         } catch (e) {
           warning(`PUBSUB: Unknown moderation_action ${dataMessage.data.moderation_action}`);
