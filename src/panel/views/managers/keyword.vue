@@ -300,6 +300,7 @@ export default defineComponent({
     const permissions = ref([] as Required<PermissionsInterface>[]);
     const editationItem = ref(null as KeywordInterface | null);
     const isDataChanged = ref(false);
+    const updatedAt = ref(Date.now());
     const state = ref({
       loadedPerm: ButtonStates.progress,
       loadedCmd: ButtonStates.progress,
@@ -481,28 +482,38 @@ export default defineComponent({
       }
     }
     const deleteResponse = (order: number) => {
-      let i = 0
-      if (editationItem.value) {
-        editationItem.value.responses = editationItem.value.responses?.filter(o => o.order !== order)
-        orderBy(editationItem.value.responses, 'order', 'asc').map((o) => {
-          o.order = i++
+      if (editationItem.value?.responses) {
+        editationItem.value.responses.splice(editationItem.value.responses.findIndex(o => o.order === order), 1);
+        orderBy(editationItem.value.responses, 'order', 'asc').map((o, i) => {
+          o.order = i
           return o
         })
+        updatedAt.value = Date.now();
       }
     }
     const moveUpResponse = (order: number) => {
-      editationItem.value?.responses?.filter((o) => o.order === order - 1 || o.order === order).map(o => {
-        if (o.order === order - 1) o.order++
-        else o.order--
-        return o
-      })
+      if (editationItem.value) {
+        editationItem.value.responses?.forEach(o => {
+          if (o.order === order - 1) {
+            o.order++;
+          } else if (o.order === order) {
+            o.order--;
+          }
+        })
+      }
+      updatedAt.value = Date.now()
     };
     const moveDownResponse = (order: number) => {
-      editationItem.value?.responses?.filter((o) => o.order === order + 1 || o.order === order).map(o => {
-        if (o.order === order + 1) o.order--
-        else o.order++
-        return o
-      })
+      if (editationItem.value) {
+        editationItem.value.responses?.forEach(o => {
+          if (o.order === order + 1) {
+            o.order--;
+          } else if (o.order === order) {
+            o.order++;
+          }
+        })
+      };
+      updatedAt.value = Date.now()
     }
 
     return {
@@ -510,6 +521,7 @@ export default defineComponent({
       search,
       keywords,
       state,
+      updatedAt,
       isDataChanged,
       permissions,
       keywordsFiltered,
