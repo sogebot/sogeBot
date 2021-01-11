@@ -53,10 +53,12 @@ async function setValueOf (variable: string | Readonly<VariableInterface>, curre
     const permissionsAreValid = isNil(opts.sender) || getFromViewersCache(opts.sender.userId, item.permission);
     if ((item.readOnly && !opts.readOnlyBypass) || !permissionsAreValid) {
       const highestPermission = getFromCachedHighestPermission(opts.sender.userId);
-      const userPermission = await get(highestPermission);
-      const variablePermission = await get(item.permission);
-      if (userPermission && variablePermission) {
-        warning(`User ${opts.sender.username}#${opts.sender.userId}(${userPermission.name}) doesn't have permission to change variable ${item.variableName}(${variablePermission.name})`);
+      if (highestPermission) {
+        const userPermission = await get(highestPermission);
+        const variablePermission = await get(item.permission);
+        if (userPermission && variablePermission) {
+          warning(`User ${opts.sender.username}#${opts.sender.userId}(${userPermission.name}) doesn't have permission to change variable ${item.variableName}(${variablePermission.name})`);
+        }
       }
       isOk = false;
     } else {
