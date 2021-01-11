@@ -32,6 +32,10 @@ class EventList extends Widget {
       this.update(count);
     });
 
+    adminEndpoint(this.nsp, 'skip', () => {
+      alerts.skip();
+    });
+
     adminEndpoint(this.nsp, 'cleanup', () => {
       getRepository(EventListDB).update({ isHidden: false }, { isHidden: true });
     });

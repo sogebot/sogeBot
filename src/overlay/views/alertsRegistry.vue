@@ -567,6 +567,18 @@ export default class AlertsRegistryOverlays extends Vue {
     this.id = this.$route.params.id
     this.refreshAlert();
 
+    this.socket.on('skip', () => {
+      if (this.runningAlert) {
+        console.log('Skipping playing alert')
+        this.runningAlert = null;
+        if (typeof window.responsiveVoice !== 'undefined') {
+          window.responsiveVoice.cancel();
+        }
+      } else {
+        console.log('No alert to skip')
+      }
+    });
+
     this.socket.on('alert', (data: EmitData) => {
       console.debug('Incoming alert', data);
 
