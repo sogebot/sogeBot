@@ -157,7 +157,7 @@ class Twitch extends Core {
       const status = await setTitleAndGame({ game: games[exactMatchIdx !== -1 ? exactMatchIdx : 0] });
       return status ? [ { response: status.response, ...opts } ] : [];
     }
-    return [{ response: translate('game.change.failed').replace(/\$title/g, stats.value.currentGame || 'n/a'), ...opts }];
+    return [{ response: translate('game.current').replace(/\$title/g, stats.value.currentGame || 'n/a'), ...opts }];
   }
 }
 
