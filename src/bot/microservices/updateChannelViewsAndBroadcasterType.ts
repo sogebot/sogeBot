@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { calls, emptyRateLimit, getClientId, getToken, setRateLimit, setStats, stats } from '../helpers/api';
+import { calls, emptyRateLimit, getClientId, getToken, setRateLimit, stats } from '../helpers/api';
 import { apiEmitter } from '../helpers/api/emitter';
 import { error } from '../helpers/log';
 import { channelId } from '../helpers/oauth';
@@ -34,10 +34,10 @@ async function updateChannelViewsAndBroadcasterType () {
     if (request.data.data.length > 0) {
       oauth.profileImageUrl = request.data.data[0].profile_image_url;
       oauth.broadcasterType = request.data.data[0].broadcaster_type;
-      setStats({
-        ...stats,
+      stats.value = {
+        ...stats.value,
         currentViews: request.data.data[0].view_count,
-      });
+      };
     }
   } catch (e) {
     if (typeof e.response !== 'undefined' && e.response.status === 429) {

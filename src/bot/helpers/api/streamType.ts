@@ -1,7 +1,12 @@
-let streamType = 'live';
+let _value = 'live';
 
-function setStreamType(value: typeof streamType) {
-  streamType = value;
-}
+const streamType = {
+  set value(value: typeof _value) {
+    _value = value;
+  },
+  get value() {
+    return _value;
+  },
+};
 
-export { streamType, setStreamType };
+export { streamType };

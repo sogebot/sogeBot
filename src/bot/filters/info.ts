@@ -55,10 +55,10 @@ const info: ResponseFilter = {
     return '';
   },
   '(game)': async function () {
-    return stats.currentGame || 'n/a';
+    return stats.value.currentGame || 'n/a';
   },
   '(status)': async function () {
-    return stats.currentTitle || 'n/a';
+    return stats.value.currentTitle || 'n/a';
   },
 };
 

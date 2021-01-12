@@ -9,7 +9,7 @@ import { settings } from '../decorators';
 import { ui } from '../decorators.js';
 import { onChange, onStartup } from '../decorators/on.js';
 import { isStreamOnline } from '../helpers/api/index.js';
-import { setStats, stats } from '../helpers/api/stats.js';
+import { stats } from '../helpers/api/stats.js';
 import { mainCurrency } from '../helpers/currency';
 import { eventEmitter } from '../helpers/events';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
@@ -185,10 +185,10 @@ class TipeeeStream extends Integration {
       tip(`${username}${user.userId ? '#' + user.userId : ''}, amount: ${amount.toFixed(2)}${donationCurrency}, message: ${message}`);
 
       if (isStreamOnline.value) {
-        setStats({
-          ...stats,
-          currentTips: stats.currentTips + Number(currency.exchange(amount, donationCurrency, mainCurrency.value)),
-        });
+        stats.value = {
+          ...stats.value,
+          currentTips: stats.value.currentTips + Number(currency.exchange(amount, donationCurrency, mainCurrency.value)),
+        };
       }
 
       triggerInterfaceOnTip({

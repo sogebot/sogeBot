@@ -61,8 +61,8 @@ class Goals extends Overlay {
     });
     publicEndpoint(this.nsp, 'goals::current', async (cb) => {
       cb(null, {
-        subscribers: stats.currentSubscribers,
-        followers: stats.currentFollowers,
+        subscribers: stats.value.currentSubscribers,
+        followers: stats.value.currentFollowers,
       });
     });
   }

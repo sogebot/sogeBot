@@ -9,7 +9,7 @@ import currency from './currency';
 import { Permissions } from './database/entity/permissions';
 import { User, UserBit, UserInterface, UserTip } from './database/entity/user';
 import { onStartup } from './decorators/on';
-import { isStreamOnline, setStats, stats } from './helpers/api';
+import { isStreamOnline, stats } from './helpers/api';
 import { mainCurrency } from './helpers/currency';
 import { debug, error, isDebugEnabled } from './helpers/log';
 import { channelId } from './helpers/oauth';
@@ -60,10 +60,10 @@ class Users extends Core {
         // get new users
         const newChatters = await getRepository(User).find({ isOnline: true, watchedTime: 0 });
         debug('tmi.watched', `Adding ${newChatters.length} users as new chatters.`);
-        setStats({
-          ...stats,
-          newChatters: stats.newChatters + newChatters.length,
-        });
+        stats.value = {
+          ...stats.value,
+          newChatters: stats.value.newChatters + newChatters.length,
+        };
 
         if (isStreamOnline.value) {
           debug('tmi.watched', `Incrementing watchedTime by ${interval}`);
@@ -79,15 +79,15 @@ class Users extends Core {
                 debug('tmi.watched', `User ${user.username}#${user.userId} added watched time ${interval}`);
               }
             }
-            setStats({
-              ...stats,
+            stats.value = {
+              ...stats.value,
               currentWatchedTime: users.length * interval,
-            });
+            };
           } else {
-            setStats({
-              ...stats,
+            stats.value = {
+              ...stats.value,
               currentWatchedTime: incrementedUsers.affected * interval,
-            });
+            };
           }
 
           recacheOnlineUsersPermission();

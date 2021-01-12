@@ -10,10 +10,10 @@ class Stats extends Overlay {
     publicEndpoint(this.nsp, 'get', async (cb) => {
       cb({
         uptime: getTime(isStreamOnline.value ? streamStatusChangeSince.value : 0, false),
-        viewers: stats.currentViewers,
-        followers: stats.currentFollowers,
-        subscribers: stats.currentSubscribers,
-        bits: stats.currentBits,
+        viewers: stats.value.currentViewers,
+        followers: stats.value.currentFollowers,
+        subscribers: stats.value.currentSubscribers,
+        bits: stats.value.currentBits,
       });
     });
   }

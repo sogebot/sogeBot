@@ -1,14 +1,23 @@
 import { cloneDeep } from 'lodash';
 
-let ignorelist: any[] = [];
-let globalIgnoreListExclude: any[] = [];
+let _ignorelist: any[] = [];
+let _globalIgnoreListExclude: any[] = [];
 
-function setIgnoreList(list: any[]) {
-  ignorelist = cloneDeep(list);
-}
+const ignorelist = {
+  set value(value: typeof _ignorelist) {
+    _ignorelist = cloneDeep(value);
+  },
+  get value() {
+    return _ignorelist;
+  },
+};
 
-function setGlobalIgnoreListExclude(list: any[]) {
-  globalIgnoreListExclude = cloneDeep(list);
-}
-
-export { globalIgnoreListExclude, ignorelist, setIgnoreList, setGlobalIgnoreListExclude };
+const globalIgnoreListExclude = {
+  set value(value: typeof _globalIgnoreListExclude) {
+    _globalIgnoreListExclude = cloneDeep(value);
+  },
+  get value() {
+    return _globalIgnoreListExclude;
+  },
+};
+export { globalIgnoreListExclude, ignorelist };

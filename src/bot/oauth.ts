@@ -6,7 +6,7 @@ import { areDecoratorsLoaded, persistent, settings, ui } from './decorators';
 import { onChange, onLoad, onStartup } from './decorators/on';
 import { apiEmitter } from './helpers/api/emitter';
 import { error, info, warning } from './helpers/log';
-import { channelId, loadedTokensInc } from './helpers/oauth';
+import { channelId, loadedTokens } from './helpers/oauth';
 import { botId } from './helpers/oauth/botId';
 import { botUsername } from './helpers/oauth/botUsername';
 import { broadcasterId } from './helpers/oauth/broadcasterId';
@@ -131,7 +131,7 @@ class OAuth extends Core {
   @onLoad('broadcasterAccessToken')
   @onLoad('botAccessToken')
   setBotAccessTokenLoaded() {
-    loadedTokensInc();
+    loadedTokens.value++;
   }
 
   @onChange('generalOwner')

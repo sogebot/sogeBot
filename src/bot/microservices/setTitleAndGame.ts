@@ -112,16 +112,16 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | 
     if (!isNil(args.game)) {
       responses.response = translate('game.change.success').replace(/\$game/g, args.game);
       responses.status = true;
-      if (stats.currentGame !== args.game) {
-        eventEmitter.emit('game-changed', { oldGame: stats.currentGame ?? 'n/a', game: args.game });
+      if (stats.value.currentGame !== args.game) {
+        eventEmitter.emit('game-changed', { oldGame: stats.value.currentGame ?? 'n/a', game: args.game });
       }
-      stats.currentGame = args.game;
+      stats.value.currentGame = args.game;
     }
 
     if (!isNil(args.title)) {
       responses.response = translate('title.change.success').replace(/\$title/g, args.title);
       responses.status = true;
-      stats.currentTitle = args.title;
+      stats.value.currentTitle = args.title;
     }
     gameOrTitleChangedManually.value = true;
     retries.getCurrentStreamData = 0;

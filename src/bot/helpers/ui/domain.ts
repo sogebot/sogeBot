@@ -1,7 +1,12 @@
-let domain = 'localhost';
+let _value = 'localhost';
 
-function setDomain(value: string) {
-  domain = value;
-}
+const domain = {
+  set value(value: typeof _value) {
+    _value = value;
+  },
+  get value() {
+    return _value;
+  },
+};
 
-export { domain, setDomain };
+export { domain };

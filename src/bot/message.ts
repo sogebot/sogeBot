@@ -25,15 +25,15 @@ class Message {
 
   async global (opts: { escape?: string, sender?: CommandOptions['sender'] }) {
     const variables = {
-      game: stats.currentGame,
-      language: stats.language,
-      viewers: isStreamOnline.value ? stats.currentViewers : 0,
-      views: stats.currentViews,
-      followers: stats.currentFollowers,
-      hosts: isStreamOnline.value ? stats.currentHosts : 0,
-      subscribers: stats.currentSubscribers,
-      bits: isStreamOnline.value ? stats.currentBits : 0,
-      title: stats.currentTitle,
+      game: stats.value.currentGame,
+      language: stats.value.language,
+      viewers: isStreamOnline.value ? stats.value.currentViewers : 0,
+      views: stats.value.currentViews,
+      followers: stats.value.currentFollowers,
+      hosts: isStreamOnline.value ? stats.value.currentHosts : 0,
+      subscribers: stats.value.currentSubscribers,
+      bits: isStreamOnline.value ? stats.value.currentBits : 0,
+      title: stats.value.currentTitle,
       source: opts.sender && typeof opts.sender.discord !== 'undefined' ? 'discord' : 'twitch',
       isBotSubscriber: isBotSubscriber(),
     };

@@ -1,7 +1,12 @@
-let chatMessagesAtStart = 0;
+let _value = 0;
 
-function setChatMessagesAtStart (value: typeof chatMessagesAtStart) {
-  chatMessagesAtStart = value;
-}
+const chatMessagesAtStart = {
+  set value(value: typeof _value) {
+    _value = value;
+  },
+  get value() {
+    return _value;
+  },
+};
 
-export { chatMessagesAtStart, setChatMessagesAtStart };
+export { chatMessagesAtStart };

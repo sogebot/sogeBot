@@ -7,7 +7,7 @@ import currency from '../currency';
 import { User, UserTipInterface } from '../database/entity/user';
 import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import { isStreamOnline, setStats, stats } from '../helpers/api/index.js';
+import { isStreamOnline, stats } from '../helpers/api/index.js';
 import { mainCurrency } from '../helpers/currency';
 import { eventEmitter } from '../helpers/events';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
@@ -162,10 +162,10 @@ class StreamElements extends Integration {
     getRepository(User).save(user);
 
     if (isStreamOnline.value) {
-      setStats({
-        ...stats,
-        currentTips: stats.currentTips + currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value),
-      });
+      stats.value = {
+        ...stats.value,
+        currentTips: stats.value.currentTips + currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value),
+      };
     }
 
     tip(`${username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(amount).toFixed(2)}${DONATION_CURRENCY}, message: ${message}`);

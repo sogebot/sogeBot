@@ -11,7 +11,7 @@ import { generalChannel } from './helpers/oauth/generalChannel';
 import { generalOwners } from './helpers/oauth/generalOwners';
 import { find, list } from './helpers/register';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
-import { setDomain } from './helpers/ui';
+import { domain } from './helpers/ui';
 import { default as uiModule } from './ui';
 import webhooks from './webhooks';
 
@@ -41,7 +41,7 @@ class UI extends Core {
   @onChange('domain')
   @onLoad('domain')
   subscribeWebhook() {
-    setDomain(this.domain);
+    domain.value = this.domain;
     if (typeof webhooks === 'undefined') {
       setTimeout(() => this.subscribeWebhook(), 1000);
     } else {

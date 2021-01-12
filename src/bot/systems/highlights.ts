@@ -111,8 +111,8 @@ class Highlights extends System {
       const highlight = {
         videoId: request.data.data[0].id,
         timestamp: { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds },
-        game: stats.currentGame || 'n/a',
-        title: stats.currentTitle || 'n/a',
+        game: stats.value.currentGame || 'n/a',
+        title: stats.value.currentTitle || 'n/a',
         createdAt: Date.now(),
       };
 

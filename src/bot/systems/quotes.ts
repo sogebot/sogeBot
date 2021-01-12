@@ -144,8 +144,8 @@ class Quotes extends System {
   @command('!quote list')
   async list (opts: CommandOptions): Promise<CommandResponse[]> {
     const response = prepare(
-      (['localhost', '127.0.0.1'].includes(domain) ? 'systems.quotes.list.is-localhost' : 'systems.quotes.list.ok'),
-      { urlBase: domain });
+      (['localhost', '127.0.0.1'].includes(domain.value) ? 'systems.quotes.list.is-localhost' : 'systems.quotes.list.ok'),
+      { urlBase: domain.value });
     return [{ response, ...opts }];
   }
 
