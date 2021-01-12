@@ -34,8 +34,8 @@ function adminEndpoint (
   | 'spotify::revoke' | 'spotify::skip' | 'spotify::state' | 'spotify::authorize'
   | 'getSoundBoardSounds'  | 'viewers' | 'viewers::resetPointsAll' | 'viewers::resetMessagesAll'
   | 'viewers::resetWatchedTimeAll' | 'viewers::resetBitsAll' | 'viewers::resetTipsAll'
-  | 'list.watch' | 'broadcaster' | 'configuration' | 'raffle:getLatest' | 'lists.get'
-  | 'bets::getCurrentBet' | 'commands::count' | 'getLatestStats' | 'menu' | 'panel::errors'
+  | 'viewers::resetSubgiftsAll' | 'list.watch' | 'broadcaster' | 'configuration' | 'raffle:getLatest'
+  | 'lists.get' | 'bets::getCurrentBet' | 'commands::count' | 'getLatestStats' | 'menu' | 'panel::errors'
   | 'removeCache' | 'testExplosion' | 'testFireworks' | 'test' | 'discord::authorize'
   | 'discord::getChannels' | 'discord::getRoles' | 'discord::getGuilds' | 'settings'
   | 'debug::get' | 'getLevelsExample' | 'profiler::load',
