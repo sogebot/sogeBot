@@ -607,13 +607,8 @@ class TMI extends Core {
       const username = message.tags.login;
       const userId = message.tags.userId;
       const count = Number(message.parameters.massGiftCount);
-      const totalCount = Number(message.parameters.senderCount);
 
-      if (totalCount > 0) {
-        await getRepository(User).update({ userId }, { giftedSubscribes: Number(totalCount) });
-      } else {
-        await getRepository(User).increment({ userId }, 'giftedSubscribes', Number(count));
-      }
+      await getRepository(User).increment({ userId }, 'giftedSubscribes', Number(count));
 
       this.ignoreGiftsFromUser[username] = { count, time: new Date() };
 
@@ -712,13 +707,7 @@ class TMI extends Core {
 
       // also set subgift count to gifter
       if (!(isIgnored({username, userId}))) {
-        const totalCount = Number(message.parameters.senderCount);
-
-        if (totalCount > 0) {
-          await getRepository(User).update({ userId }, { giftedSubscribes: Number(totalCount) });
-        } else {
-          await getRepository(User).increment({ userId }, 'giftedSubscribes', 1);
-        }
+        await getRepository(User).increment({ userId }, 'giftedSubscribes', 1);
       }
     } catch (e) {
       error('Error parsing subgift event');
