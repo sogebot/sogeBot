@@ -136,7 +136,7 @@ declare global {
 let isTTSPlaying = false;
 let cleanupAlert = false;
 
-let alerts: EmitData[] = [];
+let alerts: (EmitData & {isTTSMuted: boolean})[] = [];
 
 @Component({
   components: {
@@ -186,6 +186,7 @@ export default class AlertsRegistryOverlays extends Vue {
     showAt: number;
     waitingForTTS: boolean;
     alert: CommonSettingsInterface | AlertTipInterface | AlertResubInterface;
+    isTTSMuted: boolean;
   } | null = null;
 
   beforeDestroyed() {
@@ -253,7 +254,6 @@ export default class AlertsRegistryOverlays extends Vue {
         if (TTS.trim().length === 0) {
           setTimeout(() => resolve(), 500);
         } else {
-          console.log({rate, pitch, volume});
           window.responsiveVoice.speak(TTS, voice, { rate, pitch, volume, onend: () => setTimeout(() => resolve(), 500) });
         }
       });
@@ -349,7 +349,11 @@ export default class AlertsRegistryOverlays extends Vue {
               message = message.replace(match, '');
             }
           }
-          this.speak(message, this.runningAlert.alert.tts.voice, this.runningAlert.alert.tts.rate, this.runningAlert.alert.tts.pitch, this.runningAlert.alert.tts.volume)
+          if (!this.runningAlert.isTTSMuted) {
+            this.speak(message, this.runningAlert.alert.tts.voice, this.runningAlert.alert.tts.rate, this.runningAlert.alert.tts.pitch, this.runningAlert.alert.tts.volume)
+          } else {
+            console.log('TTS is muted.')
+          }
           this.runningAlert.waitingForTTS = false;
         }
 
@@ -579,7 +583,7 @@ export default class AlertsRegistryOverlays extends Vue {
       }
     });
 
-    this.socket.on('alert', (data: EmitData) => {
+    this.socket.on('alert', (data: (EmitData & {isTTSMuted: boolean})) => {
       console.debug('Incoming alert', data);
 
       // checking for vulgarities

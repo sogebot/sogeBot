@@ -12,6 +12,8 @@ import Registry from './_interface';
 class Alerts extends Registry {
   @persistent()
   areAlertsMuted = false;
+  @persistent()
+  isTTSMuted = false;
 
   constructor() {
     super();
@@ -62,6 +64,12 @@ class Alerts extends Registry {
         this.areAlertsMuted = areAlertsMuted;
       }
       cb(null, this.areAlertsMuted);
+    });
+    adminEndpoint(this.nsp, 'alerts::isTTSMuted', (isTTSMuted: boolean | null, cb) => {
+      if (isTTSMuted !== null) {
+        this.isTTSMuted = isTTSMuted;
+      }
+      cb(null, this.isTTSMuted);
     });
     adminEndpoint(this.nsp, 'alerts::deleteMedia', async (id, cb) => {
       cb(
@@ -198,7 +206,7 @@ class Alerts extends Registry {
 
   trigger(opts: EmitData) {
     if (!this.areAlertsMuted) {
-      ioServer?.of('/registries/alerts').emit('alert', opts);
+      ioServer?.of('/registries/alerts').emit('alert', {...opts, isTTSMuted: this.isTTSMuted });
     }
   }
 
