@@ -127,14 +127,14 @@ class Twitch extends Core {
 
   @command('!title')
   async getTitle (opts: CommandOptions) {
-    return [ { response: translate('title.current').replace(/\$title/g, stats.currentTitle || 'n/a'), ...opts }];
+    return [ { response: translate('title.current').replace(/\$title/g, stats.value.currentTitle || 'n/a'), ...opts }];
   }
 
   @command('!title set')
   @default_permission(defaultPermissions.CASTERS)
   async setTitle (opts: CommandOptions) {
     if (opts.parameters.length === 0) {
-      return [ { response: await translate('title.current').replace(/\$title/g, stats.currentTitle || 'n/a'), ...opts }];
+      return [ { response: await translate('title.current').replace(/\$title/g, stats.value.currentTitle || 'n/a'), ...opts }];
     }
     const status = await setTitleAndGame({ title: opts.parameters });
     return status ? [ { response: status.response, ...opts } ] : [];
@@ -142,14 +142,14 @@ class Twitch extends Core {
 
   @command('!game')
   async getGame (opts: CommandOptions) {
-    return [ { response: translate('game.current').replace(/\$title/g, stats.currentGame || 'n/a'), ...opts }];
+    return [ { response: translate('game.current').replace(/\$title/g, stats.value.currentGame || 'n/a'), ...opts }];
   }
 
   @command('!game set')
   @default_permission(defaultPermissions.CASTERS)
   async setGame (opts: CommandOptions) {
     if (opts.parameters.length === 0) {
-      return [ { response: translate('game.current').replace(/\$title/g, stats.currentGame || 'n/a'), ...opts }];
+      return [ { response: translate('game.current').replace(/\$title/g, stats.value.currentGame || 'n/a'), ...opts }];
     }
     const games = await sendGameFromTwitch(null, opts.parameters);
     if (Array.isArray(games) && games.length > 0) {
@@ -157,7 +157,7 @@ class Twitch extends Core {
       const status = await setTitleAndGame({ game: games[exactMatchIdx !== -1 ? exactMatchIdx : 0] });
       return status ? [ { response: status.response, ...opts } ] : [];
     }
-    return [{ response: translate('game.change.failed').replace(/\$title/g, stats.currentGame || 'n/a'), ...opts }];
+    return [{ response: translate('game.change.failed').replace(/\$title/g, stats.value.currentGame || 'n/a'), ...opts }];
   }
 }
 

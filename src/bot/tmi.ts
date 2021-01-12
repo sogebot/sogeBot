@@ -14,7 +14,7 @@ import { settings, ui } from './decorators';
 import { command, default_permission } from './decorators';
 import { getFunctionList, onChange, onLoad } from './decorators/on';
 import Expects from './expects';
-import { isStreamOnline, setStats, stats } from './helpers/api';
+import { isStreamOnline, stats } from './helpers/api';
 import { getBotSender, getOwner, prepare } from './helpers/commons';
 import { sendMessage } from './helpers/commons/sendMessage';
 import { dayjs } from './helpers/dayjs';
@@ -26,7 +26,7 @@ import { chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunity
 import { generalChannel } from './helpers/oauth/generalChannel';
 import { avgResponse, linesParsedIncrement, setStatus } from './helpers/parser';
 import { defaultPermissions } from './helpers/permissions/';
-import { sendWithMe, setGlobalIgnoreListExclude, setIgnoreList, setMuteStatus, showWithAt, tmiEmitter } from './helpers/tmi/';
+import { globalIgnoreListExclude, ignorelist, sendWithMe, setMuteStatus, showWithAt, tmiEmitter } from './helpers/tmi/';
 import { isOwner } from './helpers/user';
 import { isBot } from './helpers/user/isBot';
 import { isIgnored } from './helpers/user/isIgnored';
@@ -111,13 +111,13 @@ class TMI extends Core {
   @onChange('ignorelist')
   @onLoad('ignorelist')
   setIgnoreList() {
-    setIgnoreList(this.ignorelist);
+    ignorelist.value = this.ignorelist;
   }
 
   @onChange('globalIgnoreListExclude')
   @onLoad('globalIgnoreListExclude')
   setGlobalIgnoreListExclude() {
-    setGlobalIgnoreListExclude(this.globalIgnoreListExclude);
+    globalIgnoreListExclude.value = this.globalIgnoreListExclude;
   }
 
   @onChange('mute')
@@ -459,7 +459,7 @@ class TMI extends Core {
         TODO: update for tmi-js
         if (!users.newChattersList.includes(message.tags.login.toLowerCase())) {
           users.newChattersList.push(message.tags.login.toLowerCase())
-          api.stats.newChatters += 1;
+          api.stats.value.newChatters += 1;
         }
         */
       } else {
@@ -767,10 +767,10 @@ class TMI extends Core {
       eventEmitter.emit('cheer', { username, bits: Number(userstate.bits), message: messageFromUser });
 
       if (isStreamOnline.value) {
-        setStats({
-          ...stats,
-          currentBits: stats.currentBits + parseInt(userstate.bits, 10),
-        });
+        stats.value = {
+          ...stats.value,
+          currentBits: stats.value.currentBits + parseInt(userstate.bits, 10),
+        };
       }
 
       triggerInterfaceOnBit({

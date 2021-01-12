@@ -6,7 +6,7 @@ import { User, UserTipInterface } from '../database/entity/user';
 import { settings } from '../decorators';
 import { ui } from '../decorators.js';
 import { onChange, onStartup } from '../decorators/on.js';
-import { isStreamOnline, setStats, stats } from '../helpers/api/index.js';
+import { isStreamOnline, stats } from '../helpers/api/index.js';
 import { mainCurrency } from '../helpers/currency';
 import { eventEmitter } from '../helpers/events';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
@@ -86,10 +86,10 @@ class Qiwi extends Integration {
       }
 
       if (isStreamOnline.value) {
-        setStats({
-          ...stats,
-          currentTips: stats.currentTips + currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value),
-        });
+        stats.value = {
+          ...stats.value,
+          currentTips: stats.value.currentTips + currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value),
+        };
       }
 
       eventlist.add({

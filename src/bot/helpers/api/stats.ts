@@ -4,7 +4,7 @@ import { getRepository } from 'typeorm';
 import { Settings } from '../../database/entity/settings';
 import { isDbConnected } from '../database';
 
-let stats: {
+let _value: {
   language: string;
   currentWatchedTime: number;
   currentViewers: number;
@@ -34,16 +34,21 @@ let stats: {
   newChatters: 0,
 };
 
-function setStats(value: typeof stats) {
-  stats = cloneDeep(value);
-  getRepository(Settings).findOne({
-    namespace: '/core/api', name: 'stats',
-  }).then(row => {
-    getRepository(Settings).save({
-      ...row, namespace: '/core/api', name: 'stats', value: JSON.stringify(stats),
+const stats = {
+  set value(value: typeof _value) {
+    _value = cloneDeep(value);
+    getRepository(Settings).findOne({
+      namespace: '/core/api', name: 'stats',
+    }).then(row => {
+      getRepository(Settings).save({
+        ...row, namespace: '/core/api', name: 'stats', value: JSON.stringify(stats),
+      });
     });
-  });
-}
+  },
+  get value() {
+    return _value;
+  },
+};
 
 async function load() {
   if (!isDbConnected) {
@@ -52,7 +57,7 @@ async function load() {
   }
 
   try {
-    stats = JSON.parse(
+    stats.value = JSON.parse(
       (await getRepository(Settings).findOneOrFail({
         namespace: '/core/api', name: 'stats',
       })).value
@@ -64,4 +69,4 @@ async function load() {
 
 load();
 
-export { stats, setStats };
+export { stats };

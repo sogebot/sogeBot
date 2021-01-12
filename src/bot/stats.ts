@@ -39,9 +39,9 @@ class Stats extends Core {
 
   @onStreamStart()
   async setInitialValues() {
-    this.currentFollowers = stats.currentFollowers;
-    this.currentViews = stats.currentViews;
-    this.currentSubscribers = stats.currentSubscribers;
+    this.currentFollowers = stats.value.currentFollowers;
+    this.currentViews = stats.value.currentViews;
+    this.currentSubscribers = stats.value.currentSubscribers;
     debug('stats', JSON.stringify({ currentFollowers: this.currentFollowers, currentViews: this.currentViews, currentSubscribers: this.currentSubscribers }));
   }
 

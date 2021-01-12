@@ -9,7 +9,7 @@ import { User, UserTipInterface } from '../database/entity/user';
 import { settings } from '../decorators';
 import { ui } from '../decorators.js';
 import { onChange, onStartup } from '../decorators/on.js';
-import { isStreamOnline, setStats, stats } from '../helpers/api/index.js';
+import { isStreamOnline, stats } from '../helpers/api/index.js';
 import { mainCurrency } from '../helpers/currency';
 import { eventEmitter } from '../helpers/events';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
@@ -189,10 +189,10 @@ class Donationalerts extends Integration {
       tip(`${data.username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
 
       if (isStreamOnline.value) {
-        setStats({
-          ...stats,
-          currentTips: stats.currentTips + Number(currency.exchange(data.amount, data.currency, mainCurrency.value)),
-        });
+        stats.value = {
+          ...stats.value,
+          currentTips: stats.value.currentTips + Number(currency.exchange(data.amount, data.currency, mainCurrency.value)),
+        };
       }
     }
 

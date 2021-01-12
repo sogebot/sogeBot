@@ -517,7 +517,7 @@ class Events extends Core {
     event.definitions.runInterval = Number(event.definitions.runInterval); // force Integer
     event.definitions.viewersAtLeast = Number(event.definitions.viewersAtLeast); // force Integer
 
-    const viewers = stats.currentViewers;
+    const viewers = stats.value.currentViewers;
 
     const shouldTrigger = viewers >= event.definitions.viewersAtLeast
                         && ((event.definitions.runInterval > 0 && Date.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000)
@@ -627,12 +627,12 @@ class Events extends Core {
       $viewers: _.get(attributes, 'viewers', null),
       $duration: _.get(attributes, 'duration', null),
       // add global variables
-      $game: stats.currentGame,
-      $title: stats.currentTitle,
-      $views: stats.currentViews,
-      $followers: stats.currentFollowers,
-      $hosts: stats.currentHosts,
-      $subscribers: stats.currentSubscribers,
+      $game: stats.value.currentGame,
+      $title: stats.value.currentTitle,
+      $views: stats.value.currentViews,
+      $followers: stats.value.currentFollowers,
+      $hosts: stats.value.currentHosts,
+      $subscribers: stats.value.currentSubscribers,
       $isBotSubscriber: isBotSubscriber(),
       ...customVariables,
     };

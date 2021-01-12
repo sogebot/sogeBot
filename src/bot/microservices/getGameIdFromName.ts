@@ -35,7 +35,7 @@ async function getGameIdFromName (name: string): Promise<number | null> {
     await getRepository(CacheGames).save({ id, name });
     return id;
   } catch (e) {
-    warning(`Couldn't find name of game for name ${name} - fallback to ${stats.currentGame}`);
+    warning(`Couldn't find name of game for name ${name} - fallback to ${stats.value.currentGame}`);
     if (e.isAxiosError) {
       error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
       ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameIdFromName', api: 'helix', endpoint: e.config.url, code: e.response.status, data: e.response.data, remaining: calls.bot });

@@ -7,8 +7,8 @@ import { getRepository } from 'typeorm';
 import type { StreamEndpoint } from './api';
 import { User } from './database/entity/user';
 import { getFunctionList } from './decorators/on';
-import { chatMessagesAtStart, curRetries, isStreamOnline, setChatMessagesAtStart, setStats, stats, streamId, streamStatusChangeSince } from './helpers/api';
-import { setCurrentRetries, setStreamId, setStreamType } from './helpers/api/';
+import { chatMessagesAtStart, curRetries, isStreamOnline, stats, streamId, streamStatusChangeSince, streamType } from './helpers/api';
+import { setCurrentRetries } from './helpers/api/';
 import { eventEmitter } from './helpers/events';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import { debug, error, follow, info, start } from './helpers/log';
@@ -70,12 +70,12 @@ class Webhooks {
       return;
     }
 
-    if (domain.includes('localhost')) {
+    if (domain.value.includes('localhost')) {
       return;
     }
 
     const mode = 'unsubscribe';
-    const callback = `https://${domain}/webhooks/hub`;
+    const callback = `https://${domain.value}/webhooks/hub`;
 
     switch (type) {
       case 'follows':
@@ -124,13 +124,13 @@ class Webhooks {
       return;
     }
 
-    if (domain.includes('localhost')) {
+    if (domain.value.includes('localhost')) {
       return;
     }
 
     const leaseSeconds = 864000;
     const mode = 'subscribe';
-    const callback = `http://${domain}/webhooks/hub`;
+    const callback = `http://${domain.value}/webhooks/hub`;
 
     let res;
     switch (type) {
@@ -313,18 +313,18 @@ class Webhooks {
         );
 
         // reset quick stats on stream start
-        setStats({
-          ...stats,
+        stats.value = {
+          ...stats.value,
           currentWatchedTime: 0,
           maxViewers: 0,
           newChatters: 0,
           currentViewers: 0,
           currentBits: 0,
           currentTips: 0,
-        });
+        };
 
         isStreamOnline.value = true;
-        setChatMessagesAtStart(linesParsed);
+        chatMessagesAtStart.value = linesParsed;
 
         eventEmitter.emit('stream-started');
         eventEmitter.emit('command-send-x-times', { reset: true });
@@ -345,43 +345,43 @@ class Webhooks {
 
       // Always keep this updated
       streamStatusChangeSince.value = (new Date(stream.started_at)).getTime();
-      setStreamId(stream.id);
-      setStreamType(stream.type);
-      setStats({
-        ...stats,
+      streamId.value = stream.id;
+      streamType.value = stream.type;
+      stats.value = {
+        ...stats.value,
         currentTitle: stream.title,
         currentGame: await getGameNameFromId(Number(stream.game_id)),
-      });
+      };
 
       setCurrentRetries(0);
 
       /* TODO: does we really need all of below it there? */
-      setStats({
-        ...stats,
+      stats.value = {
+        ...stats.value,
         currentViewers: stream.viewer_count,
-      });
+      };
 
-      if (stats.maxViewers < stream.viewer_count) {
-        setStats({
-          ...stats,
+      if (stats.value.maxViewers < stream.viewer_count) {
+        stats.value = {
+          ...stats.value,
           maxViewers: stream.viewer_count,
-        });
+        };
       }
 
       coreStats.save({
         timestamp: new Date().getTime(),
         whenOnline: isStreamOnline.value ? streamStatusChangeSince.value : Date.now(),
-        currentViewers: stats.currentViewers,
-        currentSubscribers: stats.currentSubscribers,
-        currentFollowers: stats.currentFollowers,
-        currentBits: stats.currentBits,
-        currentTips: stats.currentTips,
-        chatMessages: linesParsed - chatMessagesAtStart,
-        currentViews: stats.currentViews,
-        maxViewers: stats.maxViewers,
-        newChatters: stats.newChatters,
-        currentHosts: stats.currentHosts,
-        currentWatched: stats.currentWatchedTime,
+        currentViewers: stats.value.currentViewers,
+        currentSubscribers: stats.value.currentSubscribers,
+        currentFollowers: stats.value.currentFollowers,
+        currentBits: stats.value.currentBits,
+        currentTips: stats.value.currentTips,
+        chatMessages: linesParsed - chatMessagesAtStart.value,
+        currentViews: stats.value.currentViews,
+        maxViewers: stats.value.maxViewers,
+        newChatters: stats.value.newChatters,
+        currentHosts: stats.value.currentHosts,
+        currentWatched: stats.value.currentWatchedTime,
       });
     } else {
       // stream is offline - add curRetry + 1

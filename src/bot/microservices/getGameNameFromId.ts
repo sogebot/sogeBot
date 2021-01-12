@@ -43,7 +43,7 @@ async function getGameNameFromId (id: number) {
       emptyRateLimit('bot', e.response.headers);
     }
 
-    warning(`Couldn't find name of game for gid ${id} - fallback to ${stats.currentGame}`);
+    warning(`Couldn't find name of game for gid ${id} - fallback to ${stats.value.currentGame}`);
     if (e.isAxiosError) {
       error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
       ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: e.config.url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: calls.bot });
@@ -51,7 +51,7 @@ async function getGameNameFromId (id: number) {
       error(e.stack);
       ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: e.config.url, code: 'n/a', data: e.stack, remaining: calls.bot });
     }
-    return stats.currentGame;
+    return stats.value.currentGame;
   }
 }
 

@@ -12,11 +12,11 @@ import { ThreadEvent } from './database/entity/threadEvent';
 import { TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from './database/entity/twitch';
 import { User, UserInterface } from './database/entity/user';
 import { getFunctionList, onStartup } from './decorators/on';
-import { stats as apiStats, calls, chatMessagesAtStart, currentStreamTags, emptyRateLimit, gameCache, gameOrTitleChangedManually, isStreamOnline, rawStatus, setChatMessagesAtStart, setRateLimit, setStats, streamStatusChangeSince } from './helpers/api';
+import { stats as apiStats, calls, chatMessagesAtStart, currentStreamTags, emptyRateLimit, gameCache, gameOrTitleChangedManually, isStreamOnline, rawStatus, setRateLimit, streamStatusChangeSince } from './helpers/api';
 import { parseTitle } from './helpers/api/parseTitle';
 import { curRetries, maxRetries, retries, setCurrentRetries } from './helpers/api/retries';
-import { setStreamId, streamId } from './helpers/api/streamId';
-import { setStreamType, streamType } from './helpers/api/streamType';
+import { streamId } from './helpers/api/streamId';
+import { streamType } from './helpers/api/streamType';
 import { isDbConnected } from './helpers/database';
 import { dayjs } from './helpers/dayjs';
 import { eventEmitter } from './helpers/events';
@@ -180,7 +180,7 @@ class API extends Core {
       for (const fnc of intervals.keys()) {
         await setImmediateAwait();
         debug('api.interval', chalk.yellow(fnc + '() ') + 'check');
-        if (loadedTokens < 2) {
+        if (loadedTokens.value < 2) {
           debug('api.interval', chalk.yellow(fnc + '() ') + 'tokens not loaded yet.');
           return;
         }
@@ -493,10 +493,10 @@ class API extends Core {
       if (oauth.broadcasterType === '') {
         if (!opts.noAffiliateOrPartnerWarningSent) {
           warning('Broadcaster is not affiliate/partner, will not check subs');
-          setStats({
-            ...apiStats,
+          apiStats.value = {
+            ...apiStats.value,
             currentSubscribers: 0,
-          });
+          };
         }
         delete opts.count;
         return { state: false, opts: { ...opts, noAffiliateOrPartnerWarningSent: true } };
@@ -530,10 +530,10 @@ class API extends Core {
         // move to next page
         return this.getChannelSubscribers({ ...opts, cursor: request.data.pagination.cursor, count: opts.subscribers.length + opts.count, z: opts.subscribers });
       } else {
-        setStats({
-          ...apiStats,
+        apiStats.value = {
+          ...apiStats.value,
           currentSubscribers: subscribers.length + opts.count,
-        });
+        };
         this.setSubscribers(opts.subscribers.filter(o => !isBotId(o.user_id)));
         if (opts.subscribers.find(o => isBotId(o.user_id))) {
           isBotSubscriber(true);
@@ -551,10 +551,10 @@ class API extends Core {
           opts.notCorrectOauthWarningSent = true;
           warning('Broadcaster have not correct oauth, will not check subs');
         }
-        setStats({
-          ...apiStats,
+        apiStats.value = {
+          ...apiStats.value,
           currentSubscribers: 0,
-        });
+        };
       } else {
         error(`${url} - ${e.stack}`);
 
@@ -666,12 +666,12 @@ class API extends Core {
           retries.getChannelInformation = 0;
         }
 
-        setStats({
-          ...apiStats,
+        apiStats.value = {
+          ...apiStats.value,
           language: request.data.data[0].broadcaster_language,
           currentGame: request.data.data[0].game_name,
           currentTitle: request.data.data[0].title,
-        });
+        };
         gameCache.value = request.data.data[0].game_name;
         rawStatus.value = _rawStatus;
       } else {
@@ -699,10 +699,10 @@ class API extends Core {
     try {
       request = await axios.get(url);
       ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getChannelHosts', api: 'other', endpoint: url, code: request.status, remaining: calls.bot });
-      setStats({
-        ...apiStats,
+      apiStats.value = {
+        ...apiStats.value,
         currentHosts: request.data.hosts.length,
-      });
+      };
     } catch (e) {
       error(`${url} - ${e.message}`);
       ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getChannelHosts', api: 'other', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
@@ -755,10 +755,10 @@ class API extends Core {
           debug('api.followers', 'No new followers found.');
         }
       }
-      setStats({
-        ...apiStats,
+      apiStats.value = {
+        ...apiStats.value,
         currentFollowers: request.data.total,
-      });
+      };
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
         emptyRateLimit('bot', e.response.headers);
@@ -927,8 +927,8 @@ class API extends Core {
         if (dayjs(stream.started_at).valueOf() >=  dayjs(streamStatusChangeSince.value).valueOf()) {
           streamStatusChangeSince.value = (new Date(stream.started_at)).getTime();
         }
-        if (!isStreamOnline.value || streamType !== stream.type) {
-          setChatMessagesAtStart(linesParsed);
+        if (!isStreamOnline.value || streamType.value !== stream.type) {
+          chatMessagesAtStart.value = linesParsed;
 
           if (!webhooks.enabled.streams && Number(streamId) !== Number(stream.id)) {
             debug('api.stream', 'API: ' + JSON.stringify(stream));
@@ -937,18 +937,18 @@ class API extends Core {
             );
 
             // reset quick stats on stream start
-            setStats({
-              ...apiStats,
+            apiStats.value = {
+              ...apiStats.value,
               currentWatchedTime: 0,
               maxViewers: 0,
               newChatters: 0,
               currentViewers: 0,
               currentBits: 0,
               currentTips: 0,
-            });
+            };
             streamStatusChangeSince.value =new Date(stream.started_at).getTime();
-            setStreamId(stream.id);
-            setStreamType(stream.type);
+            streamId.value = stream.id;
+            streamType.value = stream.type;
 
             eventEmitter.emit('stream-started');
             eventEmitter.emit('command-send-x-times', { reset: true });
@@ -985,11 +985,11 @@ class API extends Core {
           const status = await parseTitle(null);
           const game = await getGameNameFromId(Number(stream.game_id));
 
-          setStats({
-            ...apiStats,
+          apiStats.value = {
+            ...apiStats.value,
             currentTitle: stream.title,
             currentGame: game,
-          });
+          };
 
           if (stream.title !== status) {
             // check if status is same as updated status
@@ -1034,7 +1034,7 @@ class API extends Core {
               }
             }
 
-            setStreamId(null);
+            streamId.value = null;
           }
         }
       }
@@ -1051,32 +1051,32 @@ class API extends Core {
   }
 
   saveStreamData (stream: StreamEndpoint['data'][number]) {
-    setStats({
-      ...apiStats,
+    apiStats.value = {
+      ...apiStats.value,
       currentViewers: stream.viewer_count,
-    });
+    };
 
-    if (apiStats.maxViewers < stream.viewer_count) {
-      setStats({
-        ...apiStats,
+    if (apiStats.value.maxViewers < stream.viewer_count) {
+      apiStats.value = {
+        ...apiStats.value,
         maxViewers: stream.viewer_count,
-      });
+      };
     }
 
     stats.save({
       timestamp: new Date().getTime(),
       whenOnline: isStreamOnline.value ? streamStatusChangeSince.value : Date.now(),
-      currentViewers: apiStats.currentViewers,
-      currentSubscribers: apiStats.currentSubscribers,
-      currentFollowers: apiStats.currentFollowers,
-      currentBits: apiStats.currentBits,
-      currentTips: apiStats.currentTips,
-      chatMessages: linesParsed - chatMessagesAtStart,
-      currentViews: apiStats.currentViews,
-      maxViewers: apiStats.maxViewers,
-      newChatters: apiStats.newChatters,
-      currentHosts: apiStats.currentHosts,
-      currentWatched: apiStats.currentWatchedTime,
+      currentViewers: apiStats.value.currentViewers,
+      currentSubscribers: apiStats.value.currentSubscribers,
+      currentFollowers: apiStats.value.currentFollowers,
+      currentBits: apiStats.value.currentBits,
+      currentTips: apiStats.value.currentTips,
+      chatMessages: linesParsed - chatMessagesAtStart.value,
+      currentViews: apiStats.value.currentViews,
+      maxViewers: apiStats.value.maxViewers,
+      newChatters: apiStats.value.newChatters,
+      currentHosts: apiStats.value.currentHosts,
+      currentWatched: apiStats.value.currentWatchedTime,
     });
   }
 

@@ -7,7 +7,7 @@ import currency from '../currency';
 import { User, UserTipInterface } from '../database/entity/user';
 import { persistent, settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import { isStreamOnline, setStats, stats } from '../helpers/api';
+import { isStreamOnline, stats } from '../helpers/api';
 import { mainCurrency } from '../helpers/currency';
 import { eventEmitter } from '../helpers/events';
 import { getBroadcaster } from '../helpers/getBroadcaster';
@@ -216,10 +216,10 @@ class Streamlabs extends Integration {
           getRepository(User).save(user);
 
           if (isStreamOnline.value) {
-            setStats({
-              ...stats,
-              currentTips: stats.currentTips + Number(currency.exchange(Number(event.amount), event.currency, mainCurrency.value)),
-            });
+            stats.value = {
+              ...stats.value,
+              currentTips: stats.value.currentTips + Number(currency.exchange(Number(event.amount), event.currency, mainCurrency.value)),
+            };
           }
           tip(`${event.from.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(event.amount).toFixed(2)}${event.currency}, message: ${event.message}`);
         }

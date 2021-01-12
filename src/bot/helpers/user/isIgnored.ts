@@ -18,14 +18,14 @@ export function isIgnored(sender: { username: string | null; userId?: string | n
 }
 
 export function getIgnoreList() {
-  return ignorelist.map((o) => {
+  return ignorelist.value.map((o) => {
     return typeof o === 'string' ? o.trim().toLowerCase() : o;
   });
 }
 
 export function getGlobalIgnoreList() {
   return Object.keys(globalIgnoreList)
-    .filter(o => !globalIgnoreListExclude.map((ex: number | string) => String(ex)).includes(o))
+    .filter(o => !globalIgnoreListExclude.value.map((ex: number | string) => String(ex)).includes(o))
     .map(o => {
       const id = Number(o);
       return { id, ...globalIgnoreList[id as unknown as keyof typeof globalIgnoreList] };

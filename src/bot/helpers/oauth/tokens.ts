@@ -1,7 +1,12 @@
-let loadedTokens = 0;
+let _value = 0;
 
-function loadedTokensInc() {
-  loadedTokens++;
-}
+const loadedTokens = {
+  set value(value: typeof _value) {
+    _value = value;
+  },
+  get value() {
+    return _value;
+  },
+};
 
-export { loadedTokensInc, loadedTokens };
+export { loadedTokens };
