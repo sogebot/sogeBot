@@ -201,7 +201,7 @@ class API extends Core {
             const value = await Promise.race<Promise<any>>([
               new Promise((resolve) => {
                 if (fnc === 'updateChannelViewsAndBroadcasterType') {
-                  return updateChannelViewsAndBroadcasterType();
+                  return updateChannelViewsAndBroadcasterType().then((data: any) => resolve(data));
                 }
                 return (this as any)[fnc](interval?.opts).then((data: any) => resolve(data));
               }),
