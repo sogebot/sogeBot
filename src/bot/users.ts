@@ -241,6 +241,12 @@ class Users extends Core {
         cb(null);
       }
     });
+    adminEndpoint(this.nsp, 'viewers::resetSubgiftsAll', async (cb) => {
+      await getRepository(User).update({}, { giftedSubscribes: 0 });
+      if (cb) {
+        cb(null);
+      }
+    });
     adminEndpoint(this.nsp, 'viewers::resetBitsAll', async (cb) => {
       await getRepository(UserBit).clear();
       if (cb) {

@@ -60,6 +60,7 @@
             <b-dropdown-item @click="resetMessages">{{ translate('messages') }}</b-dropdown-item>
             <b-dropdown-item @click="resetBits">{{ translate('bits') }}</b-dropdown-item>
             <b-dropdown-item @click="resetTips">{{ translate('tips') }}</b-dropdown-item>
+            <b-dropdown-item @click="resetSubgifts">{{ translate('subgifts') }}</b-dropdown-item>
           </b-dropdown>
       </template>
 
@@ -871,6 +872,12 @@ export default defineComponent({
       })
     }
 
+    const resetSubgifts = () => {
+      socket.emit('viewers::resetSubgiftsAll', () => {
+        refresh();
+      })
+    }
+
     const linkTo = (item: Required<UserInterface>) => {
       console.debug('Clicked', item.userId);
       ctx.root.$router.push({ name: 'viewersManagerEdit', params: { id: String(item.userId) } });
@@ -1037,6 +1044,7 @@ export default defineComponent({
       resetPoints,
       removeTips,
       removeBits,
+      resetSubgifts,
       forceCheckFollowedAt,
       save,
 
