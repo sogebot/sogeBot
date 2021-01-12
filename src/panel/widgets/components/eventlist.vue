@@ -126,12 +126,16 @@
             <b-button @click="emitSkipAlertEvent()" class="border-0" :variant="'outline-dark'" id="eventlistAlertsSkipButton">
               <fa icon="forward" fixed-width />
             </b-button>
+            <b-button @click="isTTSMuted = !isTTSMuted" class="border-0" :variant="isTTSMuted ? 'outline-secondary' : 'outline-dark'" id="eventlistAlertsTTSButton">
+              <strong>TTS</strong>
+            </b-button>
             <b-button @click="areAlertsMuted = !areAlertsMuted" class="border-0" :variant="areAlertsMuted ? 'outline-secondary' : 'outline-dark'" id="eventlistAlertsToggleButton">
               <fa icon="bell" fixed-width v-if="!areAlertsMuted" />
               <fa icon="bell-slash" fixed-width v-else />
             </b-button>
           </b-button-group>
           <b-tooltip target="eventlistAlertsSkipButton" :title="'Skip alert'"></b-tooltip>
+          <b-tooltip target="eventlistAlertsTTSButton" :title="isTTSMuted ? 'TTS is disabled.' : 'TTS is enabled!'"></b-tooltip>
           <b-tooltip target="eventlistAlertsToggleButton" :title="areAlertsMuted ? 'Alerts are disabled.' : 'Alerts are enabled!'"></b-tooltip>
         </li>
       </template>
@@ -190,6 +194,7 @@ export default {
       interval: [],
       selected: [],
       areAlertsMuted: false,
+      isTTSMuted: false,
     }
   },
   beforeDestroy: function() {
@@ -226,6 +231,9 @@ export default {
     this.socketAlerts.emit('alerts::areAlertsMuted', null, (err, val) => {
       this.areAlertsMuted = val;
     })
+    this.socketAlerts.emit('alerts::isTTSMuted', null, (err, val) => {
+      this.isTTSMuted = val;
+    })
 
     // refresh timestamps
     this.interval.push(setInterval(() => this.socket.emit('eventlist::get', this.eventlistShow), 60000))
@@ -250,9 +258,15 @@ export default {
       this.socketAlerts.emit('alerts::areAlertsMuted', null, (err, value) => {
         this.areAlertsMuted = value;
       })
+      this.socketAlerts.emit('alerts::isTTSMuted', null, (err, value) => {
+        this.isTTSMuted = value;
+      })
     },
     'areAlertsMuted': function(val) {
       this.socketAlerts.emit('alerts::areAlertsMuted', this.areAlertsMuted, () => {})
+    },
+    'isTTSMuted': function(val) {
+      this.socketAlerts.emit('alerts::isTTSMuted', this.isTTSMuted, () => {})
     },
     'state.editation': function (val) {
       this.selected = []
