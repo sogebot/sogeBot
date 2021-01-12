@@ -136,7 +136,7 @@ declare global {
 let isTTSPlaying = false;
 let cleanupAlert = false;
 
-let alerts: (EmitData & {isTTSMuted: boolean})[] = [];
+let alerts: (EmitData & {isTTSMuted: boolean, isSoundMuted: boolean})[] = [];
 
 @Component({
   components: {
@@ -187,6 +187,7 @@ export default class AlertsRegistryOverlays extends Vue {
     waitingForTTS: boolean;
     alert: CommonSettingsInterface | AlertTipInterface | AlertResubInterface;
     isTTSMuted: boolean;
+    isSoundMuted: boolean;
   } | null = null;
 
   beforeDestroyed() {
@@ -331,7 +332,12 @@ export default class AlertsRegistryOverlays extends Vue {
 
           this.$nextTick(() => {
             if (this.$refs.video && this.runningAlert) {
-              (this.$refs.video as HTMLMediaElement).volume = this.runningAlert.alert.soundVolume / 100;
+              if (this.runningAlert.isSoundMuted) {
+                (this.$refs.video as HTMLMediaElement).volume = 0;
+                console.log('Audio is muted.')
+              } else {
+                (this.$refs.video as HTMLMediaElement).volume = this.runningAlert.alert.soundVolume / 100;
+              }
               (this.$refs.video as HTMLMediaElement).play();
             }
           })
@@ -349,7 +355,7 @@ export default class AlertsRegistryOverlays extends Vue {
               message = message.replace(match, '');
             }
           }
-          if (!this.runningAlert.isTTSMuted) {
+          if (!this.runningAlert.isTTSMuted && !this.runningAlert.isSoundMuted) {
             this.speak(message, this.runningAlert.alert.tts.voice, this.runningAlert.alert.tts.rate, this.runningAlert.alert.tts.pitch, this.runningAlert.alert.tts.volume)
           } else {
             console.log('TTS is muted.')
@@ -360,7 +366,12 @@ export default class AlertsRegistryOverlays extends Vue {
         if (this.runningAlert.showAt <= Date.now() && !this.runningAlert.soundPlayed) {
           console.debug('playing audio');
           if (this.typeOfMedia.get(this.runningAlert.alert.soundId) !== null) {
-            (this.$refs.audio as HTMLMediaElement).volume = this.runningAlert.alert.soundVolume / 100;
+            if (this.runningAlert.isSoundMuted) {
+              (this.$refs.audio as HTMLMediaElement).volume = 0;
+              console.log('Audio is muted.')
+            } else {
+              (this.$refs.audio as HTMLMediaElement).volume = this.runningAlert.alert.soundVolume / 100;
+            }
             (this.$refs.audio as HTMLMediaElement).play();
           }
           this.runningAlert.soundPlayed = true;
@@ -583,7 +594,7 @@ export default class AlertsRegistryOverlays extends Vue {
       }
     });
 
-    this.socket.on('alert', (data: (EmitData & {isTTSMuted: boolean})) => {
+    this.socket.on('alert', (data: (EmitData & {isTTSMuted: boolean, isSoundMuted: boolean })) => {
       console.debug('Incoming alert', data);
 
       // checking for vulgarities

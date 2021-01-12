@@ -124,6 +124,7 @@ function adminEndpoint (nsp: string, on: 'pubg::getUserStats', callback: (opts: 
 function adminEndpoint (nsp: string, on: 'pubg::exampleParse', callback: (opts: { text: string }, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'alerts::areAlertsMuted', callback: (areAlertsMuted: boolean, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'alerts::isTTSMuted', callback: (isTTSMuted: boolean, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'alerts::isSoundMuted', callback: (isSoundMuted: boolean, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'import.playlist', callback: (otps: {playlist: string, forcedTag: string}, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'import.video', callback: (opts: {playlist: string, forcedTag: string}, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'get.playlist.tags', callback: (cb: (error: Error | string | null, data: string[]) => void, socket: Socket) => void): void;

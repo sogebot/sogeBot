@@ -14,6 +14,8 @@ class Alerts extends Registry {
   areAlertsMuted = false;
   @persistent()
   isTTSMuted = false;
+  @persistent()
+  isSoundMuted = false;
 
   constructor() {
     super();
@@ -64,6 +66,12 @@ class Alerts extends Registry {
         this.areAlertsMuted = areAlertsMuted;
       }
       cb(null, this.areAlertsMuted);
+    });
+    adminEndpoint(this.nsp, 'alerts::isSoundMuted', (isSoundMuted: boolean | null, cb) => {
+      if (isSoundMuted !== null) {
+        this.isSoundMuted = isSoundMuted;
+      }
+      cb(null, this.isSoundMuted);
     });
     adminEndpoint(this.nsp, 'alerts::isTTSMuted', (isTTSMuted: boolean | null, cb) => {
       if (isTTSMuted !== null) {
@@ -206,7 +214,7 @@ class Alerts extends Registry {
 
   trigger(opts: EmitData) {
     if (!this.areAlertsMuted) {
-      ioServer?.of('/registries/alerts').emit('alert', {...opts, isTTSMuted: this.isTTSMuted });
+      ioServer?.of('/registries/alerts').emit('alert', {...opts, isTTSMuted: this.isTTSMuted, isSoundMuted: this.isSoundMuted });
     }
   }
 
