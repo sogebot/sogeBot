@@ -150,6 +150,7 @@ export default defineComponent({
     const updateLayout = () => {
       if (isLayoutInitialized.value) {
         console.debug('Layout is initialized, we are executing updateLayout()');
+        console.log(dashboards.value);
         for (const dashboard of dashboards.value) {
           dashboard.widgets = layout.value[dashboard.id].map(o => {
             return {
@@ -189,6 +190,7 @@ export default defineComponent({
         if (err) {
           return console.error(err);
         }
+        layout.value[created.id] = [];
         dashboards.value.push(created)
       })
       dashboardName.value = ''
