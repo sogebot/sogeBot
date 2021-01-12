@@ -52,7 +52,7 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
         message('whisper', sender.username, messageToSend);
       } else {
         chatOut(`${messageToSend} [${sender.username}]`);
-        if (sendWithMe && !messageToSend.startsWith('/')) {
+        if (sendWithMe.value && !messageToSend.startsWith('/')) {
           message('me', null, messageToSend);
         } else {
           message('say', null, messageToSend);
