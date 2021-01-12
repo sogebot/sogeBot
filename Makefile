@@ -18,6 +18,8 @@ dependencies:
 	@npm install --production
 	@echo -ne "\n\t ----- Installation of development dependencies\n"
 	@npm install --only=dev
+	@echo -ne "\n\t ----- Installation of husky\n"
+	npx husky install
 	@echo -ne "\n\t ----- Going through node_modules patches\n"
 	# How to create node_modules patch: https://opensource.christmas/2019/4
 	patch --forward node_modules/twitch-js/types/index.d.ts < patches/twitch-js-types.patch
