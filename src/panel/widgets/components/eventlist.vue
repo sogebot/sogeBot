@@ -129,6 +129,10 @@
             <b-button @click="isTTSMuted = !isTTSMuted" class="border-0" :variant="isTTSMuted ? 'outline-secondary' : 'outline-dark'" id="eventlistAlertsTTSButton">
               <strong>TTS</strong>
             </b-button>
+            <b-button @click="isSoundMuted = !isSoundMuted" class="border-0" :variant="isSoundMuted ? 'outline-secondary' : 'outline-dark'" id="eventlistSoundToggleButton">
+              <fa icon="volume-up" fixed-width v-if="!isSoundMuted" />
+              <fa icon="volume-mute" fixed-width v-else />
+            </b-button>
             <b-button @click="areAlertsMuted = !areAlertsMuted" class="border-0" :variant="areAlertsMuted ? 'outline-secondary' : 'outline-dark'" id="eventlistAlertsToggleButton">
               <fa icon="bell" fixed-width v-if="!areAlertsMuted" />
               <fa icon="bell-slash" fixed-width v-else />
@@ -136,6 +140,7 @@
           </b-button-group>
           <b-tooltip target="eventlistAlertsSkipButton" :title="'Skip alert'"></b-tooltip>
           <b-tooltip target="eventlistAlertsTTSButton" :title="isTTSMuted ? 'TTS is disabled.' : 'TTS is enabled!'"></b-tooltip>
+          <b-tooltip target="eventlistSoundToggleButton" :title="isSoundMuted ? 'Sound is muted.' : 'Sound is enabled!'"></b-tooltip>
           <b-tooltip target="eventlistAlertsToggleButton" :title="areAlertsMuted ? 'Alerts are disabled.' : 'Alerts are enabled!'"></b-tooltip>
         </li>
       </template>
@@ -154,8 +159,8 @@ import { chunk, debounce, get } from 'lodash-es';
 import translate from 'src/panel/helpers/translate';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faRedoAlt, faBell, faBellSlash } from '@fortawesome/free-solid-svg-icons';
-library.add(faRedoAlt, faBell, faBellSlash);
+import { faRedoAlt, faBell, faBellSlash, faVolumeMute } from '@fortawesome/free-solid-svg-icons';
+library.add(faRedoAlt, faBell, faBellSlash, faVolumeMute);
 
 export default {
   props: ['popout', 'nodrag'],
@@ -195,6 +200,7 @@ export default {
       selected: [],
       areAlertsMuted: false,
       isTTSMuted: false,
+      isSoundMuted: false,
     }
   },
   beforeDestroy: function() {
@@ -234,6 +240,9 @@ export default {
     this.socketAlerts.emit('alerts::isTTSMuted', null, (err, val) => {
       this.isTTSMuted = val;
     })
+    this.socketAlerts.emit('alerts::isSoundMuted', null, (err, val) => {
+      this.isSoundMuted = val;
+    })
 
     // refresh timestamps
     this.interval.push(setInterval(() => this.socket.emit('eventlist::get', this.eventlistShow), 60000))
@@ -261,12 +270,18 @@ export default {
       this.socketAlerts.emit('alerts::isTTSMuted', null, (err, value) => {
         this.isTTSMuted = value;
       })
+      this.socketAlerts.emit('alerts::isSoundMuted', null, (err, value) => {
+        this.isSoundMuted = value;
+      })
     },
     'areAlertsMuted': function(val) {
       this.socketAlerts.emit('alerts::areAlertsMuted', this.areAlertsMuted, () => {})
     },
     'isTTSMuted': function(val) {
       this.socketAlerts.emit('alerts::isTTSMuted', this.isTTSMuted, () => {})
+    },
+    'isSoundMuted': function(val) {
+      this.socketAlerts.emit('alerts::isSoundMuted', this.isSoundMuted, () => {})
     },
     'state.editation': function (val) {
       this.selected = []
