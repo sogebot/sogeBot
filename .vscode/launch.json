@@ -16,7 +16,7 @@
                 "ENV": "development",
                 "NODE_ENV": "development",
                 "DISABLE":"moderation",
-                "DEBUG": "tmi"
+                "DEBUG": "tmi.message"
             },
             "preLaunchTask": "npm: build",
             "sourceMaps": true,
@@ -36,7 +36,7 @@
             "env": {
                 "ENV": "development",
                 "NODE_ENV": "development",
-                "DEBUG": "tmi"
+                "DEBUG": "tmi.message"
             },
             "preLaunchTask": "npm: build",
             "sourceMaps": true,

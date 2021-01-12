@@ -10,7 +10,7 @@ export async function message(type: 'say' | 'whisper' | 'me', username: string |
     if (username === '') {
       error('TMI: channel is not defined, message cannot be sent');
     } else {
-      if (isDebugEnabled('tmi')) {
+      if (isDebugEnabled('tmi.message')) {
         return;
       }
       if (type === 'me') {
