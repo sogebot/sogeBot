@@ -607,8 +607,13 @@ class TMI extends Core {
       const username = message.tags.login;
       const userId = message.tags.userId;
       const count = Number(message.parameters.massGiftCount);
+      const totalCount = Number(message.parameters.senderCount);
 
-      await getRepository(User).increment({ userId }, 'giftedSubscribes', Number(message.parameters.senderCount));
+      if (totalCount > 0) {
+        await getRepository(User).update({ userId }, { giftedSubscribes: Number(totalCount) });
+      } else {
+        await getRepository(User).increment({ userId }, 'giftedSubscribes', Number(count));
+      }
 
       this.ignoreGiftsFromUser[username] = { count, time: new Date() };
 
@@ -650,7 +655,6 @@ class TMI extends Core {
       const tier = this.getMethod(message).plan / 1000;
 
       for (const [u, o] of Object.entries(this.ignoreGiftsFromUser)) {
-        // $FlowFixMe Incorrect mixed type from value of Object.entries https://github.com/facebook/flow/issues/5838
         if (o.count === 0 || new Date().getTime() - new Date(o.time).getTime() >= 1000 * 60 * 10) {
           delete this.ignoreGiftsFromUser[u];
         }
@@ -707,8 +711,14 @@ class TMI extends Core {
       });
 
       // also set subgift count to gifter
-      if (!(isIgnored({username, userId: user.userId}))) {
-        await getRepository(User).increment({ userId: Number(userId) }, 'giftedSubscribes', 1);
+      if (!(isIgnored({username, userId}))) {
+        const totalCount = Number(message.parameters.senderCount);
+
+        if (totalCount > 0) {
+          await getRepository(User).update({ userId }, { giftedSubscribes: Number(totalCount) });
+        } else {
+          await getRepository(User).increment({ userId }, 'giftedSubscribes', 1);
+        }
       }
     } catch (e) {
       error('Error parsing subgift event');
