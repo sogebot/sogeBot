@@ -139,7 +139,7 @@ class HowLongToBeat extends System {
 
     try {
       const game = await getRepository(HowLongToBeatGame).findOneOrFail({ where: { game: stats.value.currentGame } });
-      const stream = await getRepository(HowLongToBeatGameItem).findOne({ where: { hltb_id: game.id, createdAt: streamStatusChangeSince } });
+      const stream = await getRepository(HowLongToBeatGameItem).findOne({ where: { hltb_id: game.id, createdAt: streamStatusChangeSince.value } });
       if (stream) {
         debug('hltb', 'Another 15s entry of this stream for ' + stats.value.currentGame);
         await getRepository(HowLongToBeatGameItem).increment({ id: stream.id }, 'timestamp', this.interval);
