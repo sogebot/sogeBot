@@ -25,8 +25,12 @@ const gameCache = {
 const rawStatus = {
   set value(value: string) {
     _rawStatus = value;
-    getRepository(Settings).save({
-      namespace: '/core/api', name: 'rawStatus', value: JSON.stringify(value),
+    getRepository(Settings).findOne({
+      namespace: '/core/api', name: 'rawStatus',
+    }).then(row => {
+      getRepository(Settings).save({
+        ...row, namespace: '/core/api', name: 'rawStatus', value: JSON.stringify(value),
+      });
     });
   },
   get value() {

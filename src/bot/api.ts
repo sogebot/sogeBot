@@ -1016,7 +1016,7 @@ class API extends Core {
           if (isStreamOnline.value) {
             // online -> offline transition
             stop('');
-            streamStatusChangeSince.value =Date.now();
+            streamStatusChangeSince.value = Date.now();
             isStreamOnline.value = false;
             setCurrentRetries(0);
             eventEmitter.emit('stream-stopped');

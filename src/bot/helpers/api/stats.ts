@@ -41,7 +41,7 @@ const stats = {
       namespace: '/core/api', name: 'stats',
     }).then(row => {
       getRepository(Settings).save({
-        ...row, namespace: '/core/api', name: 'stats', value: JSON.stringify(stats),
+        ...row, namespace: '/core/api', name: 'stats', value: JSON.stringify(_value),
       });
     });
   },
@@ -57,11 +57,13 @@ async function load() {
   }
 
   try {
-    stats.value = JSON.parse(
-      (await getRepository(Settings).findOneOrFail({
-        namespace: '/core/api', name: 'stats',
-      })).value
-    );
+    stats.value = {
+      ...stats.value,
+      ...JSON.parse(
+        (await getRepository(Settings).findOneOrFail({
+          namespace: '/core/api', name: 'stats',
+        })).value),
+    };
   } catch (e) {
     // ignore if nothing was found
   }

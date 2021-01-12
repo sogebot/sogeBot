@@ -8,6 +8,13 @@ let _value = Date.now();
 const streamStatusChangeSince = {
   set value(value: typeof _value) {
     _value = value;
+    getRepository(Settings).findOne({
+      namespace: '/core/api', name: 'streamStatusChangeSince',
+    }).then(row => {
+      getRepository(Settings).save({
+        ...row, namespace: '/core/api', name: 'streamStatusChangeSince', value: JSON.stringify(value),
+      });
+    });
   },
   get value() {
     return _value;
