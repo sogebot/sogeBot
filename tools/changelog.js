@@ -63,22 +63,37 @@ if (argv._[0] === 'generate') {
     }
 
     // we need last release before
-    let beforeTag = tags[tags.findIndex((val) => val === tagsToGenerate[tagsToGenerate.length - 1]) + 1];
-
+    const beforeTag = tags[tags.findIndex((val) => val === tagsToGenerate[tagsToGenerate.length - 1]) + 1];
+    const majorTagRelease = tagsToGenerate[tagsToGenerate.length - 1];
     const changesList = [];
-    for (const tag of tagsToGenerate.reverse()) {
-      const changesSpawn = spawnSync('git', ['log', `${beforeTag}...${tag}`, '--oneline']);
-      const output = changes(changesSpawn.stdout.toString().split('\n'));
 
-      if (tagsToGenerate.length > 1) {
-        output.unshift(`## ${tag}\n\n`);
-      }
+    // we have minor patches
+    if (tagsToGenerate.length > 1) {
+      const latestMinorTag = tagsToGenerate[0];
 
-      changesList.push(output);
-      beforeTag = tag;
+      const minorChangesList = [];
+      minorChangesList.push(`## ${latestMajorVersion}.${latestMinorVersion}.x\n\n`);
+      const changesSpawn = spawnSync('git', ['log', `${majorTagRelease}...${latestMinorTag}`, '--oneline']);
+      minorChangesList.push(...changes(changesSpawn.stdout.toString().split('\n')));
+
+      // add *new* to commits introduced in this patch
+      const changesSpawnLatestOnly = spawnSync('git', ['log', `${tagsToGenerate[1]}...${latestMinorTag}`, '--oneline']);
+      const changesLatestOnly = changes(changesSpawnLatestOnly.stdout.toString().split('\n'));
+      changesList.push(...minorChangesList.map(o => {
+        if (changesLatestOnly.includes(o)) {
+          return o.replace('* **', '* **\*');
+        } else {
+          return o;
+        }
+      }));
     }
 
-    for (const output of changesList.reverse()) {
+    // major patch changelog
+    changesList.push(`## ${latestMajorVersion}.${latestMinorVersion}.0\n\n`);
+    const changesSpawn = spawnSync('git', ['log', `${beforeTag}...${majorTagRelease}`, '--oneline']);
+    changesList.push(...changes(changesSpawn.stdout.toString().split('\n')));
+
+    for (const output of changesList) {
       for (const line of output) {
         process.stdout.write(sanitizeLine(line));
       }
