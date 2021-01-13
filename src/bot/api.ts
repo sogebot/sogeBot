@@ -480,6 +480,10 @@ class API extends Core {
     let url = `https://api.twitch.tv/helix/subscriptions?broadcaster_id=${cid}&first=100`;
     if (opts.cursor) {
       url += '&after=' + opts.cursor;
+    } else {
+      // cursor is empty so we remove subscribers and count
+      delete opts.subscribers;
+      delete opts.count;
     }
     if (typeof opts.count === 'undefined') {
       opts.count = -1;
@@ -562,7 +566,6 @@ class API extends Core {
       }
     }
     delete opts.cursor;
-    delete opts.count;
     return { state: true, opts };
   }
 
