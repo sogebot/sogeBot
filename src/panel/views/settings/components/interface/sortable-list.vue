@@ -54,9 +54,6 @@ export default defineComponent({
     const translatedTitle = ref(translate(props.title))
     const draggingItem = ref(-1);
 
-    // Vue 2 composition API workaround to access refs - for Vue 3 -> https://stackoverflow.com/a/62133097
-    const refs = ctx.refs
-
     watch([currentValues, currentToggle], (val) => {
       ctx.emit('update', { value: currentValues.value, toggle: currentToggle.value })
     });
