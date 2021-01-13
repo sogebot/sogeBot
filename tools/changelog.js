@@ -72,7 +72,15 @@ if (argv._[0] === 'generate') {
       const latestMinorTag = tagsToGenerate[0];
 
       const minorChangesList = [];
-      minorChangesList.push(`## ${latestMajorVersion}.${latestMinorVersion}.x\n\n`);
+
+      if (tagsToGenerate[tagsToGenerate.length - 2] === latestMinorTag) {
+        minorChangesList.push(`## ${latestMinorTag}\n\n`);
+      } else {
+        minorChangesList.push(`## ${tagsToGenerate[tagsToGenerate.length - 2]} - ${latestMinorTag}\n\n`);
+      }
+
+      minorChangesList.push(`:information_source: Fixes tagged with **\\*** are newly added for release ${latestMinorTag}\n\n`);
+
       const changesSpawn = spawnSync('git', ['log', `${majorTagRelease}...${latestMinorTag}`, '--oneline']);
       minorChangesList.push(...changes(changesSpawn.stdout.toString().split('\n')));
 
