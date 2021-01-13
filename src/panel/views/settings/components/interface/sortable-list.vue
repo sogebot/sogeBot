@@ -71,29 +71,6 @@ export default defineComponent({
       ctx.emit('update', { value: currentValues.value, toggle: currentToggle.value })
     });
 
-    function listener (e: DragEvent) {
-      if (draggingItem.value !== -1) {
-        e = e || window.event;
-        const dragX = e.pageX;
-        const dragY = e.pageY;
-
-        // reset all
-        for (let i = 0, length = currentValues.value.length; i < length; i++) {
-          (refs['list_' + i] as HTMLElement[])[0].style.opacity = '1';
-          (refs['list_' + i] as HTMLElement[])[0].style.position = 'relative';
-          (refs['list_' + i] as HTMLElement[])[0].style.left = '0px';
-          (refs['list_' + i] as HTMLElement[])[0].style.top = '0px';
-          (refs['list_' + i] as HTMLElement[])[0].style.zIndex = '5';
-        }
-
-        // set current dragging
-        (refs['list_' + draggingItem.value] as HTMLElement[])[0].style.position = 'absolute';
-        (refs['list_' + draggingItem.value] as HTMLElement[])[0].style.left = `${dragX - 45}px`;
-        (refs['list_' + draggingItem.value] as HTMLElement[])[0].style.top = `${dragY - 570}px`;
-        (refs['list_' + draggingItem.value] as HTMLElement[])[0].style.zIndex = `99999`;
-      }
-    }
-
     function toggleItem(idx: number) {
       currentToggle.value = xor(currentToggle.value, [currentValues.value[idx]]);
       ctx.root.$forceUpdate()
@@ -108,9 +85,6 @@ export default defineComponent({
       draggingItem.value = idx;
       (refs['list_' + idx] as HTMLElement[])[0].style.opacity = '0.5';
       e.dataTransfer?.setData('text/plain', 'dummy');
-
-      document.addEventListener("dragover", listener, false);
-
     }
 
     function dragenter(newIndex: number, e: DragEvent) {
@@ -135,8 +109,6 @@ export default defineComponent({
         (refs['list_' + i] as HTMLElement[])[0].style.top = '0px';
       }
       draggingItem.value = -1;
-
-      document.removeEventListener('dragover', listener)
     }
 
     return {
