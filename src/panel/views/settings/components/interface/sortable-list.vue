@@ -10,82 +10,149 @@
       </span>
     </div>
     <ul class="list-group list-group-flush w-100 border border-input">
-      <li class="list-group-item border-0 d-flex" v-for='(v, index) of currentValues' :ref='"list_" + index' :key="index">
-        <div class="text-muted btn"
-          style="cursor: grab;"
-          v-on:dragstart="dragstart(index, $event)"
-          v-on:dragend="dragend(index, $event)"
-          v-on:dragenter="dragenter(index, $event)"
-          draggable="true">
-          <fa icon="ellipsis-v"></fa>
-        </div>
-        <div class="w-100" :key="index">
-          <input type="text" class="form-control" v-model="currentValues[index]" readonly="true"/>
-        </div>
-        <button class="btn btn-outline-dark border-0" @click="toggleItem(index)">
-          <fa :icon="isToggled(index) ? toggleofficon : toggleonicon" fixed-width></fa>
-        </button>
-      </li>
+      <template v-for='(v, index) of currentValues'>
+        <li class="list-group-item border-0 d-flex" :ref="'list_' + index" :key="index">
+          <div class="text-muted btn"
+            style="cursor: grab;"
+            v-on:dragstart.passive="dragstart(index, $event)"
+            v-on:dragend.passive="dragend(index, $event)"
+            v-on:dragenter.passive="dragenter(index, $event)"
+            draggable="true">
+            <fa icon="ellipsis-v"></fa>
+          </div>
+          <div class="w-100" :key="index">
+            <input type="text" class="form-control" v-model="currentValues[index]" readonly="true"/>
+          </div>
+          <button class="btn btn-outline-dark border-0" @click="toggleItem(index)">
+            <fa :icon="isToggled(index) ? toggleofficon : toggleonicon" fixed-width></fa>
+          </button>
+        </li>
+        <li class="list-group-item border-1" :class="{'d-flex': draggingItem === index, 'd-none': draggingItem !== index }" :key="'empty' + index"
+            v-on:dragstart.passive="dragstart(index, $event)"
+            v-on:dragend.passive="dragend(index, $event)"
+            v-on:dragenter.passive="dragenter(index, $event)"
+            draggable="true"
+        >
+          Dragging
+        </li>
+      </template>
     </ul>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import translate from 'src/panel/helpers/translate';
-
+import { defineComponent, ref, watch } from '@vue/composition-api'
 import { xor } from 'lodash-es';
 
-@Component({})
-export default class sortableList extends Vue {
-  @Prop() readonly values!: any;
-  @Prop() readonly toggle!: any;
-  @Prop() readonly toggleonicon: any;
-  @Prop() readonly toggleofficon: any;
-  @Prop() readonly title!: string;
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faEyeSlash } from '@fortawesome/free-regular-svg-icons';
+library.add(faEyeSlash)
 
-  currentValues = this.values;
-  currentToggle = this.toggle;
-  translatedTitle = translate(this.title);
-  draggingItem: any = null;
+import translate from 'src/panel/helpers/translate';
 
-  @Watch('currentValue')
-  onChange() {
-    this.$emit('update', { value: this.currentValues, toggle: this.currentToggle })
-  }
+export default defineComponent({
+  props: {
+    values: Array,
+    toggle: Array,
+    toggleonicon: String,
+    toggleofficon: String,
+    title: String,
+  },
+  setup(props: { values: string[]; toggle: string[], toggleonicon: string, togglefficon: string, title: string }, ctx) {
+    const currentValues = ref(props.values);
+    const currentToggle = ref(props.toggle);
+    const translatedTitle = ref(translate(props.title))
+    const draggingItem = ref(-1);
 
-  toggleItem(idx: number) {
-    this.currentToggle = xor(this.currentToggle, [this.currentValues[idx]]);
-    this.$forceUpdate()
-    this.onChange()
-  }
-  isToggled (idx: number) {
-    const value = this.currentValues[idx]
-    return this.currentToggle.indexOf(value) !== -1
-  }
-  dragstart(item: number, e: DragEvent) {
-    this.draggingItem = item;
-    (this.$refs['list_' + item] as HTMLElement[])[0].style.opacity = '0.5';
-    e.dataTransfer?.setData('text/plain', 'dummy');
-  }
-  dragenter(newIndex: number, e: DragEvent) {
-    const value = this.currentValues[this.draggingItem]
-    this.currentValues.splice(this.draggingItem, 1);
-    this.currentValues.splice(newIndex, 0, value);
-    this.draggingItem = newIndex;
+    // Vue 2 composition API workaround to access refs - for Vue 3 -> https://stackoverflow.com/a/62133097
+    const refs = ctx.refs
 
-    for (let i = 0, length = this.currentValues.length; i < length; i++) {
-      (this.$refs['list_' + i] as HTMLElement[])[0].style.opacity = '1';
+    watch([currentValues, currentToggle], (val) => {
+      ctx.emit('update', { value: currentValues.value, toggle: currentToggle.value })
+    });
+
+    function listener (e: DragEvent) {
+      if (draggingItem.value !== -1) {
+        e = e || window.event;
+        const dragX = e.pageX;
+        const dragY = e.pageY;
+
+        // reset all
+        for (let i = 0, length = currentValues.value.length; i < length; i++) {
+          (refs['list_' + i] as HTMLElement[])[0].style.opacity = '1';
+          (refs['list_' + i] as HTMLElement[])[0].style.position = 'relative';
+          (refs['list_' + i] as HTMLElement[])[0].style.left = '0px';
+          (refs['list_' + i] as HTMLElement[])[0].style.top = '0px';
+          (refs['list_' + i] as HTMLElement[])[0].style.zIndex = '5';
+        }
+
+        // set current dragging
+        (refs['list_' + draggingItem.value] as HTMLElement[])[0].style.position = 'absolute';
+        (refs['list_' + draggingItem.value] as HTMLElement[])[0].style.left = `${dragX - 45}px`;
+        (refs['list_' + draggingItem.value] as HTMLElement[])[0].style.top = `${dragY - 570}px`;
+        (refs['list_' + draggingItem.value] as HTMLElement[])[0].style.zIndex = `99999`;
+      }
     }
-    (this.$refs['list_' + newIndex] as HTMLElement[])[0].style.opacity = '0.5';
 
-    this.$forceUpdate()
-    this.onChange()
-  }
-  dragend(item: number, e: DragEvent) {
-    for (let i = 0, length = this.currentValues.length; i < length; i++) {
-      (this.$refs['list_' + i] as HTMLElement[])[0].style.opacity = '1';
+    function toggleItem(idx: number) {
+      currentToggle.value = xor(currentToggle.value, [currentValues.value[idx]]);
+      ctx.root.$forceUpdate()
+    }
+
+    function isToggled (idx: number) {
+      const value = currentValues.value[idx]
+      return currentToggle.value.indexOf(value) !== -1
+    }
+
+    function dragstart(idx: number, e: DragEvent) {
+      draggingItem.value = idx;
+      (refs['list_' + idx] as HTMLElement[])[0].style.opacity = '0.5';
+      e.dataTransfer?.setData('text/plain', 'dummy');
+
+      document.addEventListener("dragover", listener, false);
+
+    }
+
+    function dragenter(newIndex: number, e: DragEvent) {
+      const value = currentValues.value[draggingItem.value]
+      currentValues.value.splice(draggingItem.value, 1);
+      currentValues.value.splice(newIndex, 0, value);
+      draggingItem.value = newIndex;
+
+      for (let i = 0, length = currentValues.value.length; i < length; i++) {
+        (refs['list_' + i] as HTMLElement[])[0].style.opacity = '1';
+      }
+      (refs['list_' + newIndex] as HTMLElement[])[0].style.opacity = '0.5';
+
+      ctx.root.$forceUpdate()
+    }
+
+    function dragend(idx: number, e: DragEvent) {
+      for (let i = 0, length = currentValues.value.length; i < length; i++) {
+        (refs['list_' + i] as HTMLElement[])[0].style.opacity = '1';
+        (refs['list_' + i] as HTMLElement[])[0].style.position = 'relative';
+        (refs['list_' + i] as HTMLElement[])[0].style.left = '0px';
+        (refs['list_' + i] as HTMLElement[])[0].style.top = '0px';
+      }
+      draggingItem.value = -1;
+
+      document.removeEventListener('dragover', listener)
+    }
+
+    return {
+      currentValues,
+      currentToggle,
+      translatedTitle,
+
+      draggingItem,
+      toggleItem,
+      isToggled,
+      dragstart,
+      dragenter,
+      dragend,
+
+      translate,
     }
   }
-}
+});
 </script>
