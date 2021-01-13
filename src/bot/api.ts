@@ -561,6 +561,7 @@ class API extends Core {
         ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
       }
     }
+    delete opts.cursor;
     delete opts.count;
     return { state: true, opts };
   }
