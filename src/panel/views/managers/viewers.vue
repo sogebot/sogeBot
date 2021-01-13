@@ -137,35 +137,43 @@
         </template>
         <div class="px-3 py-2">
           <b-form>
-            <b-form-group>
-              <label-inside>{{ translate('username') }}</label-inside>
-              <template v-if="editationItem">
-                <b-input-group>
-                  <b-form-input
-                    id="name"
-                    v-model="editationItem.username"
-                    type="text"
-                    readonly
-                  ></b-form-input>
-                </b-input-group>
-              </template>
-              <b-skeleton v-else type="input" class="w-100"></b-skeleton>
-            </b-form-group>
-
-            <b-form-group>
-              <label-inside>{{ translate('last-seen') }}</label-inside>
-              <template v-if="editationItem">
-                <b-input-group>
-                  <b-form-input
-                    id="seenAt"
-                    :value="editationItem.seenAt ? dayjs(Number(editationItem.seenAt)).format('LLL') : ''"
-                    type="text"
-                    readonly
-                  ></b-form-input>
-                </b-input-group>
-              </template>
-              <b-skeleton v-else type="input" class="w-100"></b-skeleton>
-            </b-form-group>
+            <b-row>
+              <b-col>
+                <b-form-group>
+                  <label-inside>{{ translate('username') }}</label-inside>
+                  <template v-if="editationItem">
+                    <b-input-group>
+                      <b-form-input
+                        id="name"
+                        v-model="editationItem.username"
+                        type="text"
+                        readonly
+                      ></b-form-input>
+                    </b-input-group>
+                  </template>
+                  <b-skeleton v-else type="input" class="w-100"></b-skeleton>
+                </b-form-group>
+              </b-col>
+            </b-row>
+            
+            <b-row>
+              <b-col>
+                <b-form-group>
+                  <label-inside>{{ translate('last-seen') }}</label-inside>
+                  <template v-if="editationItem">
+                    <b-input-group>
+                      <b-form-input
+                        id="seenAt"
+                        :value="editationItem.seenAt ? dayjs(Number(editationItem.seenAt)).format('LLL') : ''"
+                        type="text"
+                        readonly
+                      ></b-form-input>
+                    </b-input-group>
+                  </template>
+                  <b-skeleton v-else type="input" class="w-100"></b-skeleton>
+                </b-form-group>
+              </b-col>
+            </b-row>
 
             <b-row>
               <b-col>
