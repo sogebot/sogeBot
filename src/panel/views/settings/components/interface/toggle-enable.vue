@@ -21,25 +21,32 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, ref, computed } from '@vue/composition-api'
 import translate from 'src/panel/helpers/translate';
 
-@Component({})
-export default class toggleEnable extends Vue {
-  @Prop() readonly value!: any;
-  @Prop() readonly title!: string;
-  @Prop() readonly disabled !: boolean;
+export default defineComponent({
+  props: {
+    value: Boolean,
+    title: String,
+    disabled: Boolean,
+  },
+  setup(props: { value: boolean; title: string; disabled: boolean }, ctx) {
+    const currentValue = ref(props.value);
+    const translatedTitle = computed(() => {
+      return props.title.includes('.settings.') ? translate(props.title) : props.title
+    })
 
-  currentValue = this.value;
-  translate = translate;
+    function update() {
+      currentValue.value = !currentValue.value
+      ctx.emit('update', { value: currentValue.value });
+    }
 
-  get translatedTitle() {
-    return this.title.includes('.settings.') ?translate(this.title) : this.title
+    return {
+      currentValue,
+      translatedTitle,
+      update,
+      translate,
+    }
   }
-
-  update() {
-    this.currentValue = !this.currentValue
-    this.$emit('update', { value: this.currentValue });
-  }
-}
+})
 </script>

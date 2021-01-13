@@ -11,7 +11,7 @@
     </div>
     <input @focus="show = true" @blur="show = false" v-model="currentValue" class="form-control" :type="secret && !show ? 'password' : 'text'" :readonly="readonly" />
     <div class="input-group-append" v-if="!secret && defaultValue !== currentValue && !readonly">
-      <b-button @click="currentValue = defaultValue; update()">
+      <b-button @click="currentValue = defaultValue">
         <fa icon="history" fixed-width/>
       </b-button>
     </div>
@@ -19,34 +19,50 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { defineComponent, ref, watch } from '@vue/composition-api'
 import { isFinite } from 'lodash-es';
 import translate from 'src/panel/helpers/translate';
 
-@Component({})
-export default class textInput extends Vue {
-  @Prop() readonly value!: any;
-  @Prop() readonly defaultValue!: any;
-  @Prop() readonly title!: string;
-  @Prop() readonly type: any;
-  @Prop() readonly readonly: any;
-  @Prop() readonly secret: any;
+export default defineComponent({
+  props: {
+    value: [String, Number],
+    defaultValue: String,
+    title: String,
+    type: String,
+    readonly: Boolean,
+    secret: Boolean,
+  },
+  setup(props: { value: string | number; title: string, defaultValue: string, type: string, readonly: boolean, secret: boolean }, ctx) {
+    const currentValue = ref(props.value);
+    const translatedTitle = ref(translate(props.title))
+    const show = ref(false);
 
-  show: boolean = false;
-  currentValue = this.value;
-  translatedTitle = translate(this.title);
+    watch(currentValue, (val) => {
+      if (props.type === 'number') {
+        if (isFinite(Number(val))) {
+          val = Number(val);
+        } else {
+          val = props.value;
+        };
+      }
+      ctx.emit('update', { value: val })
+    });
 
-  @Watch('currentValue')
-  update() {
-    if (this.type === 'number') {
-      if (isFinite(Number(this.currentValue))) {
-        this.currentValue = Number(this.currentValue);
-      } else {
-        this.currentValue = this.value;
-      };
+    return {
+      currentValue,
+      translatedTitle,
+      show,
+      translate,
     }
-    this.$emit('update', { value: this.currentValue });
   }
-}
+})
 </script>
 
+<style scoped>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+</style>

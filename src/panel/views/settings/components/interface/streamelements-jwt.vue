@@ -31,69 +31,69 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { isFinite } from 'lodash-es';
+import { defineComponent, ref, watch } from '@vue/composition-api'
 import translate from 'src/panel/helpers/translate';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { error } from 'src/panel/helpers/error';
 import { getVariantByState } from 'src/panel/helpers/variant';
 import Axios from 'axios';
 
-@Component({})
-export default class textInput extends Vue {
-  getVariantByState = getVariantByState;
-  ButtonStates = ButtonStates;
-  translate = translate;
+export default defineComponent({
+  props: {
+    value: String,
+    defaultValue: String,
+    title: String,
+    type: String,
+    readonly: Boolean,
+    secret: Boolean,
+  },
+  setup(props: { value: string | number; title: string, defaultValue: string, type: string, readonly: boolean, secret: boolean }, ctx) {
+    const currentValue = ref(props.value);
+    const translatedTitle = ref(translate(props.title))
+    const show = ref(false);
+    const validationState = ref(ButtonStates.idle as number);
 
-  @Prop() readonly value!: any;
-  @Prop() readonly defaultValue!: any;
-  @Prop() readonly title!: string;
-  @Prop() readonly type: any;
-  @Prop() readonly readonly: any;
-  @Prop() readonly secret: any;
+    watch(currentValue, (val) => {
+      ctx.emit('update', { value: val })
+    });
 
-  show: boolean = false;
-  currentValue = this.value;
-  translatedTitle = translate(this.title);
+    async function validate() {
+      validationState.value = ButtonStates.progress;
+      try {
+        await Axios("https://api.streamelements.com/kappa/v2/channels/me", {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            Authorization: "Bearer " + currentValue.value,
+          }
+        });
 
-  validationState: number = ButtonStates.idle
-
-  @Watch('currentValue')
-  update() {
-    if (this.type === 'number') {
-      if (isFinite(Number(this.currentValue))) {
-        this.currentValue = Number(this.currentValue);
-      } else {
-        this.currentValue = this.value;
-      };
+        // we don't need to check anything, if request passed it is enough
+        validationState.value = ButtonStates.success;
+        setTimeout(() => {
+          validationState.value = ButtonStates.idle;
+        }, 1000);
+      } catch (e) {
+        error('Invalid JWT Token, please recheck if you copied your token correctly');
+        validationState.value = ButtonStates.fail;
+        setTimeout(() => {
+          validationState.value = ButtonStates.idle;
+        }, 1000)
+      }
     }
-    this.$emit('update', { value: this.currentValue });
-  }
 
-  async validate() {
-    this.validationState = ButtonStates.progress;
-    try {
-      await Axios("https://api.streamelements.com/kappa/v2/channels/me", {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          Authorization: "Bearer " + this.currentValue,
-        }
-      });
+    return {
+      currentValue,
+      translatedTitle,
+      show,
+      validationState,
+      validate,
 
-      // we don't need to check anything, if request passed it is enough
-      this.validationState = ButtonStates.success;
-      setTimeout(() => {
-        this.validationState = ButtonStates.idle;
-      }, 1000);
-    } catch (e) {
-      error('Invalid JWT Token, please recheck if you copied your token correctly');
-      this.validationState = ButtonStates.fail;
-      setTimeout(() => {
-        this.validationState = ButtonStates.idle;
-      }, 1000)
+      getVariantByState,
+      ButtonStates,
+      translate,
     }
   }
-}
+})
 </script>
 

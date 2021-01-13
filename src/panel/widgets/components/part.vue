@@ -21,47 +21,51 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { defineComponent, ref, onMounted } from '@vue/composition-api'
 import { getSocket } from 'src/panel/helpers/socket';
 import { EventBus } from 'src/panel/helpers/event-bus';
 import translate from 'src/panel/helpers/translate';
-
 import { chunk } from 'lodash-es';
 
-@Component({
+const socket = getSocket('/widgets/joinpart');
+
+export default defineComponent({
   props: {
     popout: Boolean,
     nodrag: Boolean,
+  },
+  setup(props, ctx) {
+    const list = ref([] as any[]);
+
+    onMounted(() => {
+      ctx.root.$emit('mounted')
+      socket.on('joinpart', (data: { users: string[], type: 'join' | 'part' }) => {
+        if (data.type === 'part') {
+          for (const [ index, username ] of Object.entries(data.users)) {
+            if (!list.value.find(o => o.username === username)) {
+              list.value.push({
+                username, createdAt: Date.now() + Number(index)
+              })
+            }
+          }
+          list.value = chunk(list.value.sort((a, b) => {
+            if (a.createdAt > b.createdAt) {
+              return -1
+            }
+            if (a.createdAt < b.createdAt) {
+              return 1
+            }
+            return 0
+          }), 50)[0] || []
+        }
+      })
+    });
+
+    return {
+      list,
+      EventBus,
+      translate,
+    }
   }
 })
-export default class App extends Vue {
-  EventBus = EventBus;
-  translate = translate;
-  socket = getSocket('/widgets/joinpart');
-  list: any[] = [];
-
-  mounted() {
-    this.$emit('mounted')
-    this.socket.on('joinpart', (data: { users: string[], type: 'join' | 'part' }) => {
-      if (data.type === 'part') {
-        for (const [ index, username ] of Object.entries(data.users)) {
-          if (!this.list.find(o => o.username === username)) {
-            this.list.push({
-              username, createdAt: Date.now() + Number(index)
-            })
-          }
-        }
-        this.list = chunk(this.list.sort((a, b) => {
-          if (a.createdAt > b.createdAt) {
-            return -1
-          }
-          if (a.createdAt < b.createdAt) {
-            return 1
-          }
-          return 0
-        }), 50)[0] || []
-      }
-    })
-  }
-}
 </script>

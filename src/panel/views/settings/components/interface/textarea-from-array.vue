@@ -15,23 +15,28 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { defineComponent, ref, watch } from '@vue/composition-api'
 import translate from 'src/panel/helpers/translate';
 
-@Component({})
-export default class textAreaFromArray extends Vue {
-  translate = translate;
+export default defineComponent({
+  props: {
+    value: Array,
+    title: String,
+    readonly: Boolean,
+  },
+  setup(props: { value: string[]; title: string; readonly: boolean }, ctx) {
+    const currentValue = ref(props.value.join('\n'));
+    const translatedTitle = ref(translate(props.title))
 
-  @Prop() readonly value!: any;
-  @Prop() readonly title!: string;
-  @Prop() readonly readonly: any;
+    watch(currentValue, (val) => {
+      ctx.emit('update', { value: val.split('\n') })
+    })
 
-  currentValue = this.value.join('\n');
-  translatedTitle = translate(this.title);
-
-  @Watch('currentValue')
-  update() {
-    this.$emit('update', this.currentValue.split('\n'));
+    return {
+      currentValue,
+      translatedTitle,
+      translate,
+    }
   }
-}
+})
 </script>

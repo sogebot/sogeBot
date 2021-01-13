@@ -2,7 +2,7 @@
   "settings": {
     "theme": "Standard Design",
     "domain": {
-      "name": "Domain",
+      "title": "Domain",
       "help": "Format without http/https: yourdomain.com or your.domain.com"
     },
     "percentage": "Prozentsatz Differenz für Statistiken",

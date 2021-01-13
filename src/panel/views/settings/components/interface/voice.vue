@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { defineComponent, ref, onMounted, watch } from '@vue/composition-api'
 import translate from 'src/panel/helpers/translate';
 
 declare global {
@@ -27,59 +27,65 @@ declare global {
   }
 }
 
-@Component({})
-export default class helpbox extends Vue {
-  translate = translate;
-  @Prop() readonly value!: any;
-  @Prop() readonly title!: string;
+export default defineComponent({
+  props: {
+    value: String,
+    title: String,
+  },
+  setup(props: { value: string; title: string }, ctx) {
+    const currentValue = ref(props.value);
+    const translatedTitle = ref(translate(props.title))
+    const voices = ref([] as { text: string, value: string}[]);
+    const loading = ref(0);
 
-  voices: { text: string, value: string}[] = [];
-  currentValue = this.value;
+    watch(currentValue, (val) => {
+      ctx.emit('update', { value: val })
+    })
 
-  loading = 0;
+    onMounted(() => {
+      init();
+    })
 
-  translatedTitle = translate(this.title);
-
-  mounted() {
-    this.init();
-  }
-
-  init() {
-    if (this.$store.state.configuration.integrations.ResponsiveVoice.api.key.trim().length > 0) {
-      if (typeof window.responsiveVoice === 'undefined') {
-        this.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.$store.state.configuration.integrations.ResponsiveVoice.api.key)
-          .then(() => this.initResponsiveVoice(0));
+    function init() {
+      if (ctx.root.$store.state.configuration.integrations.ResponsiveVoice.api.key.trim().length > 0) {
+        if (typeof window.responsiveVoice === 'undefined') {
+          ctx.root.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + ctx.root.$store.state.configuration.integrations.ResponsiveVoice.api.key)
+            .then(() => initResponsiveVoice(0));
+        } else {
+          loadVoices();
+        }
       } else {
-        this.loadVoices();
+        loading.value = 1;
       }
-    } else {
-      this.loading = 1;
     }
-  }
 
-  loadVoices() {
-    this.voices = window.responsiveVoice.getVoices().map((o: { name: string }) => {
-      return { text: o.name, value: o.name }
-    });
-    this.loading = 2;
-  }
+    function loadVoices() {
+      voices.value = window.responsiveVoice.getVoices().map((o: { name: string }) => {
+        return { text: o.name, value: o.name }
+      });
+      loading.value = 2;
+    }
 
-  initResponsiveVoice(retry = 0) {
-    if (typeof window.responsiveVoice === 'undefined') {
-      if (retry === 10) {
-        this.loading = 1;
+    function initResponsiveVoice(retry = 0) {
+      if (typeof window.responsiveVoice === 'undefined') {
+        if (retry === 10) {
+          loading.value = 1;
+          return;
+        }
+        setTimeout(() => initResponsiveVoice(retry+1), 200);
         return;
       }
-      setTimeout(() => this.initResponsiveVoice(retry+1), 200);
-      return;
+      window.responsiveVoice.init();
+      loadVoices();
     }
-    window.responsiveVoice.init();
-    this.loadVoices();
-  }
 
-  @Watch('currentValue')
-  emitUpdate() {
-    this.$emit('update', { value: this.currentValue });
+    return {
+      currentValue,
+      translatedTitle,
+      voices,
+
+      translate,
+    }
   }
-}
+})
 </script>

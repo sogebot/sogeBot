@@ -2,7 +2,7 @@
   "settings": {
     "theme": "Tema padrão",
     "domain": {
-      "name": "Domain",
+      "title": "Domain",
       "help": "Format without http/https: yourdomain.com or your.domain.com"
     },
     "percentage": "Diferença de porcentagem para estatísticas",

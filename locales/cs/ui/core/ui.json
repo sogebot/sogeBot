@@ -2,7 +2,7 @@
   "settings": {
     "theme": "Výchozí motiv",
     "domain": {
-      "name": "Doména",
+      "title": "Doména",
       "help": "Formát bez http/https: yourdomain.com nebo your.domain.com"
     },
     "percentage": "Rozdíl v procentech u statistik",

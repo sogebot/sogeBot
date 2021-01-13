@@ -60,7 +60,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { defineComponent, ref, onMounted, computed } from '@vue/composition-api'
+import Vue from 'vue';
 import Chartkick from 'vue-chartkick';
 import Chart from 'chart.js';
 import { dayjs } from 'src/bot/helpers/dayjs';
@@ -71,25 +72,23 @@ Vue.use(Chartkick.use(Chart))
 
 import { getSocket } from 'src/panel/helpers/socket';
 
-@Component({
+const socket = getSocket('/');
+
+export default defineComponent({
   components: {
     'loading': () => import('../../components/loading.vue'),
-  }
-})
-export default class apiStats extends Vue {
-  socket = getSocket('/');
-  dayjs = dayjs;
-  translate = translate;
-  selected: string = 'helix';
-  data: any[] = [];
+  },
+  setup() {
+    const selected = ref('helix');
+    const data = ref([] as any[]);
 
-  get selectedData() {
-    return this.data.filter(o => o.api === this.selected).sort((a, b) => b.timestamp - a.timestamp)
-  }
+    const selectedData = computed(() => {
+      return data.value.filter(o => o.api === selected.value).sort((a, b) => b.timestamp - a.timestamp)
+    });
 
-   get graphData() {
-      let success = this.data.filter(o => o.api === this.selected && String(o.code).startsWith('2'))
-      let errors = this.data.filter(o => o.api === this.selected && !String(o.code).startsWith('2'))
+    const graphData = computed(() => {
+      let success = data.value.filter(o => o.api === selected.value && String(o.code).startsWith('2'))
+      let errors = data.value.filter(o => o.api === selected.value && !String(o.code).startsWith('2'))
 
       let successPerMinute: any = {}
       let _successPerMinute = groupBy(success, o => {
@@ -118,24 +117,36 @@ export default class apiStats extends Vue {
         {name: 'Success', data: successPerMinute},
         {name: 'Errors', data: errorsPerMinute},
       ]
-    }
+    })
 
-    mounted() {
-      this.socket.off('api.stats').on('api.stats', (c: { code: number, remaining: number | string, data: Object}) => {
+    onMounted(() => {
+      socket.off('api.stats').on('api.stats', (c: { code: number, remaining: number | string, data: Object}) => {
         c.code = get(c, 'code', 200) // set default to 200
         c.data = !isNil(c.data) ? JSON.stringify(c.data) : 'n/a'
         c.remaining = !isNil(c.remaining) ? c.remaining : 'n/a'
 
-        this.data.push(c)
+        data.value.push(c)
       })
-    }
+    });
 
-    parseJSON(data: string) {
+    function parseJSON(data: string) {
       try {
         return JSON.stringify(JSON.parse(data), null, 2)
       } catch (e) {
         return data
       }
     }
+
+    return {
+      data,
+      selected,
+      parseJSON,
+      selectedData,
+      graphData,
+
+      dayjs,
+      translate,
+    }
   }
+})
 </script>

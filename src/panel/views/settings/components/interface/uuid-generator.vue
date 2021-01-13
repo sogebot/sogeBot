@@ -19,37 +19,46 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { defineComponent, ref, watch } from '@vue/composition-api'
 import { v4 as uuid } from 'uuid'
 import translate from 'src/panel/helpers/translate';
 
-@Component({})
-export default class uuidGenerator extends Vue {
-  @Prop() readonly value!: any;
-  @Prop() readonly title!: string;
+export default defineComponent({
+  props: {
+    value: String,
+    title: String,
+  },
+  setup(props: { value: string; title: string }, ctx) {
+    const currentValue = ref(props.value);
+    const translatedTitle = ref(translate(props.title))
+    const show = ref(false);
+    const copied = ref(false);
 
-  show: boolean = false;
-  currentValue = this.value;
-  translatedTitle = translate(this.title);
+    watch(currentValue, (val) => {
+      ctx.emit('update', { value: val })
+    })
 
-  copied = false;
+    function copy() {
+      navigator.clipboard.writeText(currentValue.value);
+      copied.value = true;
+      setTimeout(() => {
+        copied.value = false;
+      }, 1000)
+    }
 
-  copy() {
-    navigator.clipboard.writeText(this.currentValue);
-    this.copied = true;
-    setTimeout(() => {
-      this.copied = false;
-    }, 1000)
+    function generate() {
+      currentValue.value = uuid();
+    }
+    return {
+      currentValue,
+      translatedTitle,
+      show,
+      copied,
+
+      copy,
+      generate,
+    }
   }
-
-  generate() {
-    this.currentValue = uuid();
-  }
-
-  @Watch('currentValue')
-  update() {
-    this.$emit('update', { value: this.currentValue });
-  }
-}
+});
 </script>
 
