@@ -9,34 +9,24 @@
         </template>
       </span>
     </div>
-    <ul class="list-group list-group-flush w-100 border border-input">
-      <template v-for='(v, index) of currentValues'>
-        <li class="list-group-item border-0 d-flex" :ref="'list_' + index" :key="index">
-          <div class="text-muted btn"
-            style="cursor: grab;"
-            v-on:dragstart.passive="dragstart(index, $event)"
-            v-on:dragend.passive="dragend(index, $event)"
-            v-on:dragenter.passive="dragenter(index, $event)"
-            draggable="true">
-            <fa icon="ellipsis-v"></fa>
-          </div>
-          <div class="w-100" :key="index">
-            <input type="text" class="form-control" v-model="currentValues[index]" readonly="true"/>
-          </div>
-          <button class="btn btn-outline-dark border-0" @click="toggleItem(index)">
-            <fa :icon="isToggled(index) ? toggleofficon : toggleonicon" fixed-width></fa>
-          </button>
-        </li>
-        <li class="list-group-item border-1" :class="{'d-flex': draggingItem === index, 'd-none': draggingItem !== index }" :key="'empty' + index"
-            v-on:dragstart.passive="dragstart(index, $event)"
-            v-on:dragend.passive="dragend(index, $event)"
-            v-on:dragenter.passive="dragenter(index, $event)"
-            draggable="true"
-        >
-          Dragging
-        </li>
-      </template>
-    </ul>
+    <transition-group name="list" tag="ul" class="list-group list-group-flush w-100 border border-input">
+      <li class="list-group-item border-0 d-flex" v-for='(v, index) of currentValues' :ref="'list_' + index" :key="v">
+        <div class="text-muted btn"
+          style="cursor: grab;"
+          v-on:dragstart.passive="dragstart(index, $event)"
+          v-on:dragend.passive="dragend(index, $event)"
+          v-on:dragenter.passive="dragenter(index, $event)"
+          draggable="true">
+          <fa icon="ellipsis-v"></fa>
+        </div>
+        <div class="w-100" :key="index">
+          <input type="text" class="form-control" v-model="currentValues[index]" readonly="true"/>
+        </div>
+        <button class="btn btn-outline-dark border-0" @click="toggleItem(index)">
+          <fa :icon="isToggled(index) ? toggleofficon : toggleonicon" fixed-width></fa>
+        </button>
+      </li>
+    </transition-group>
   </div>
 </template>
 
@@ -83,7 +73,6 @@ export default defineComponent({
 
     function dragstart(idx: number, e: DragEvent) {
       draggingItem.value = idx;
-      (refs['list_' + idx] as HTMLElement[])[0].style.opacity = '0.5';
       e.dataTransfer?.setData('text/plain', 'dummy');
     }
 
@@ -93,21 +82,10 @@ export default defineComponent({
       currentValues.value.splice(newIndex, 0, value);
       draggingItem.value = newIndex;
 
-      for (let i = 0, length = currentValues.value.length; i < length; i++) {
-        (refs['list_' + i] as HTMLElement[])[0].style.opacity = '1';
-      }
-      (refs['list_' + newIndex] as HTMLElement[])[0].style.opacity = '0.5';
-
       ctx.root.$forceUpdate()
     }
 
     function dragend(idx: number, e: DragEvent) {
-      for (let i = 0, length = currentValues.value.length; i < length; i++) {
-        (refs['list_' + i] as HTMLElement[])[0].style.opacity = '1';
-        (refs['list_' + i] as HTMLElement[])[0].style.position = 'relative';
-        (refs['list_' + i] as HTMLElement[])[0].style.left = '0px';
-        (refs['list_' + i] as HTMLElement[])[0].style.top = '0px';
-      }
       draggingItem.value = -1;
     }
 
@@ -128,3 +106,9 @@ export default defineComponent({
   }
 });
 </script>
+
+<style>
+.list-move {
+  transition: transform .2s;
+}
+</style>
