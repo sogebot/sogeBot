@@ -165,7 +165,7 @@ class Module {
           this.registerCommands();
         }, 5000); // slow down little bit to have everything preloaded or in progress of loading
       } else {
-        setTimeout(() => load(), 1000);
+        setImmediate(() => load());
       }
     };
     load();

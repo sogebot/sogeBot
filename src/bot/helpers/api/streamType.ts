@@ -23,7 +23,7 @@ const streamType = {
 
 async function load() {
   if (!isDbConnected) {
-    setTimeout(() => load(), 1000);
+    setImmediate(() => load());
     return;
   }
 

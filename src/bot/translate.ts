@@ -33,7 +33,7 @@ class Translate {
       const load = async () => {
         if (!areDecoratorsLoaded) {
           // waiting for full load
-          setTimeout(() => load(), 10);
+          setImmediate(() => load());
           return;
         }
 

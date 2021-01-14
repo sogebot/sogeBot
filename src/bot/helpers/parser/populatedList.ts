@@ -5,7 +5,7 @@ const populatedList: any[] = [];
 
 function load () {
   if (!isBotStarted) {
-    setTimeout(() => load(), 1000);
+    setImmediate(() => load());
     return;
   }
   for (const dir of ['core', 'systems', 'games', 'overlays', 'integrations', 'registries']) {
