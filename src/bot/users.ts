@@ -81,12 +81,12 @@ class Users extends Core {
             }
             stats.value = {
               ...stats.value,
-              currentWatchedTime: users.length * interval,
+              currentWatchedTime: stats.value.currentWatchedTime + users.length * interval,
             };
           } else {
             stats.value = {
               ...stats.value,
-              currentWatchedTime: incrementedUsers.affected * interval,
+              currentWatchedTime: stats.value.currentWatchedTime + incrementedUsers.affected * interval,
             };
           }
 
