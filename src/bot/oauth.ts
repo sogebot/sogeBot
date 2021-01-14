@@ -153,16 +153,21 @@ class OAuth extends Core {
     let timeout = 1000;
 
     if (this.currentChannel !== this.generalChannel && this.generalChannel !== '') {
-      const cid = await getIdFromTwitch(this.generalChannel, true);
-      if (typeof cid !== 'undefined' && cid !== null) {
-        this.currentChannel = this.generalChannel;
-        channelId.value = cid;
-        info('Channel ID set to ' + cid);
-        tmiEmitter.emit('reconnect', 'bot');
-        tmiEmitter.emit('reconnect', 'broadcaster');
-        apiEmitter.emit('updateChannelViewsAndBroadcasterType');
-        this.toWait = 10;
-      } else {
+      try {
+        const cid = await getIdFromTwitch(this.generalChannel, true);
+        if (typeof cid !== 'undefined' && cid !== null) {
+          this.currentChannel = this.generalChannel;
+          channelId.value = cid;
+          info('Channel ID set to ' + cid);
+          tmiEmitter.emit('reconnect', 'bot');
+          tmiEmitter.emit('reconnect', 'broadcaster');
+          apiEmitter.emit('updateChannelViewsAndBroadcasterType');
+          this.toWait = 10;
+        } else {
+          throw new Error();
+        }
+      } catch (e) {
+        error(e.stack);
         error(`Cannot get channel ID of ${this.generalChannel} - waiting ${this.toWait.toFixed()}s`);
         timeout = this.toWait * 1000;
         this.toWait = this.toWait * 2;

@@ -10,8 +10,8 @@ async function getToken(type: 'bot' | 'broadcaster'){
     },
   });
 
-  if (!token) {
-    throw Error('Missing oauth token');
+  if (!token || JSON.parse(token.value).trim().length === 0) {
+    throw Error(`Missing ${type} oauth token`);
   }
 
   return JSON.parse(token.value);

@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import { calls, emptyRateLimit, getClientId, getToken, setRateLimit } from '../helpers/api';
+import { error } from '../helpers/log';
 import { ioServer } from '../helpers/panel';
 
 async function getIdFromTwitch (username: string, isChannelId = false): Promise<string> {
@@ -54,7 +55,8 @@ async function getIdFromTwitch (username: string, isChannelId = false): Promise<
     } else {
       ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: 'n/a', data: e.stack, remaining: calls.bot });
     }
-    throw new Error(`User ${username} not found on Twitch.`);
+    error(`User ${username} not found on Twitch.`);
+    throw(e);
   }
 }
 

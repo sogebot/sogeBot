@@ -10,8 +10,8 @@ async function getClientId(type: 'bot' | 'broadcaster'){
     },
   });
 
-  if (!clientId) {
-    throw Error('Missing oauth clientId');
+  if (!clientId || JSON.parse(clientId.value).trim().length === 0) {
+    throw Error(`Missing ${type} oauth clientId`);
   }
 
   return JSON.parse(clientId.value);
