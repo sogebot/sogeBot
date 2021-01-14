@@ -59,6 +59,9 @@ export default defineComponent({
       const gotoAfterLogin = sessionStorage.getItem('goto-after-login');
       if (gotoAfterLogin) {
         window.location.assign(gotoAfterLogin)
+      } else {
+        // go back history
+        window.history.back();
       }
     }
     const login = () => {

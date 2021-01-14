@@ -9,7 +9,7 @@ export const isUserLoggedIn = async function (mustBeLogged = true, mustBeAdmin =
       console.log('Redirecting, user is not authenticated');
       sessionStorage.setItem('goto-after-login', location.href);
       if (window.location.href.includes('popout')) {
-        window.location.assign(window.location.origin + '/login#error=popout+must+be+logged#url=' + window.location.href);
+        window.location.assign(window.location.origin + '/login#error=popout+must+be+logged');
         return false;
       } else {
         window.location.assign(window.location.origin + '/login');
