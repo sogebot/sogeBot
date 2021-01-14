@@ -39,7 +39,7 @@ export function getSocket(namespace: string, continueOnUnauthorized = false): So
   }
 
   socket.on('connect_error', (error: Error) => {
-    if (error.message.includes('jwt expired')) {
+    if (error.message.includes('jwt expired') || error.message.includes('JsonWebTokenError')) {
       console.debug('Using refresh token to obtain new access token');
       const refreshToken = localStorage.getItem('refreshToken');
       if (refreshToken === '' || refreshToken === null) {
