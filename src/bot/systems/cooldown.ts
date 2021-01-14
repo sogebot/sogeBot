@@ -340,15 +340,15 @@ class Cooldown extends System {
           result = true;
           continue;
         } else {
-          if (!cooldown.isErrorMsgQuiet && this.cooldownNotifyAsWhisper) {
-            opts.sender['message-type'] = 'whisper'; // we want to whisp cooldown message
-            const response = prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
-            parserReply(response, opts);
-          }
-          if (!cooldown.isErrorMsgQuiet && this.cooldownNotifyAsChat) {
-            opts.sender['message-type'] = 'chat';
-            const response = prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
-            parserReply(response, opts);
+          if (!cooldown.isErrorMsgQuiet) {
+            if (this.cooldownNotifyAsWhisper) {
+              const response = prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
+              parserReply(response, opts, 'whisper'); // we want to whisp cooldown message
+            }
+            if (this.cooldownNotifyAsChat) {
+              const response = prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
+              parserReply(response, opts, 'chat');
+            }
           }
           debug('cooldown.check', `${opts.sender.username}#${opts.sender.userId} have ${cooldown.name} on cooldown, remaining ${Math.ceil((cooldown.miliseconds - now + timestamp) / 1000)}s`);
           result = false;
