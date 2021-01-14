@@ -80,7 +80,7 @@
                       v-else-if="currentValue.constructor === Array"
                       v-bind:value="currentValue"
                       v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
-                      v-on:update="value[defaultValue] = $event; triggerDataChange()"
+                      v-on:update="value[defaultValue] = $event.value; triggerDataChange()"
                     ></textarea-from-array>
                     <number-input
                       v-else-if="typeof currentValue === 'number'"
@@ -119,7 +119,7 @@
                               v-if="currentValue.constructor === Array"
                               v-bind:value="getPermissionSettingsValue(permission.id, currentValue)"
                               v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
-                              v-on:update="settings['__permission_based__'][category][defaultValue][permission.id] = $event; triggerDataChange()"
+                              v-on:update="settings['__permission_based__'][category][defaultValue][permission.id] = $event.value; triggerDataChange()"
                               :readonly="currentValue[permission.id] === null"
                             ></textarea-from-array>
                             <toggle-enable
