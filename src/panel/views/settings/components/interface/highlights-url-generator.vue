@@ -14,17 +14,17 @@
         <div class="w-100" :key="index">
           <input type="text" class="form-control" v-model="v.url" readonly="true"/>
         </div>
-        <button class="btn" :class="{ 'btn-success': v.clip, 'btn-danger': !v.clip }" @click="v.clip = !v.clip; onChange();">CLIP</button>
-        <button class="btn" :class="{ 'btn-success': v.highlight, 'btn-danger': !v.highlight }" @click="v.highlight = !v.highlight; onChange();">HIGHLIGHT</button>
+        <button class="btn" :class="{ 'btn-success': v.clip, 'btn-danger': !v.clip }" @click="v.clip = !v.clip">CLIP</button>
+        <button class="btn" :class="{ 'btn-success': v.highlight, 'btn-danger': !v.highlight }" @click="v.highlight = !v.highlight">HIGHLIGHT</button>
 
-        <button class="btn btn-outline-dark border-0" @click="removeItem(index); onChange()"><fa icon="times"></fa></button>
+        <button class="btn btn-outline-dark border-0" @click="removeItem(index)"><fa icon="times"></fa></button>
       </li>
       <li class="list-group-item">
         <button class="btn btn-success" type="button" @click="currentValues.push({
-          url: origin + '/highlights/' + uuid(),
+          url: origin + '/highlights/' + v4(),
           clip: false,
           highlight: false,
-        }); onChange();">
+        })">
           <fa icon="plus"></fa> Generate new url
         </button>
       </li>
@@ -34,49 +34,36 @@
 
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { computed, defineComponent, ref, watch } from '@vue/composition-api'
+import { v4 } from 'uuid';
 import translate from 'src/panel/helpers/translate';
 
-@Component({})
-export default class configurableList extends Vue {
-  @Prop() readonly values!: any;
-  @Prop() readonly title!: string;
+import type { default as Highlights } from 'src/bot/systems/highlights';
 
-  currentValues = this.values;
-  translatedTitle = translate(this.title);
+export default defineComponent({
+  props: {
+    values: Array,
+    title: String,
+  },
+  setup(props: { values: typeof Highlights['urls']; title: string }, ctx) {
+    const currentValues = ref(props.values);
+    const translatedTitle = ref(translate(props.title))
+    const origin = computed(() => window.location.origin);
 
-  get origin() {
-    return window.location.origin;
-  }
+    watch(currentValues, (val) => {
+      ctx.emit('update', { value: val })
+    }, { deep: true });
 
-  @Watch('currentValue')
-  onChange() {
-    this.$emit('update', this.currentValues);
-  }
-
-  removeItem(index: number) {
-    this.currentValues.splice(index, 1);
-  }
-
-  uuid() {
-    var dec2hex: any[] = [];
-    for (var i=0; i<=15; i++) {
-      dec2hex[i] = i.toString(16);
+    function removeItem(index: number) {
+      currentValues.value.splice(index, 1);
     }
-
-    var uuid = '';
-    for (var i=1; i<=36; i++) {
-      if (i===9 || i===14 || i===19 || i===24) {
-        uuid += '-';
-      } else if (i===15) {
-        uuid += 4;
-      } else if (i===20) {
-        uuid += dec2hex[(Math.random()*4|0 + 8)];
-      } else {
-        uuid += dec2hex[(Math.random()*16|0)];
-      }
+    return {
+      currentValues,
+      translatedTitle,
+      origin,
+      removeItem,
+      v4,
     }
-    return uuid;
   }
-}
+});
 </script>

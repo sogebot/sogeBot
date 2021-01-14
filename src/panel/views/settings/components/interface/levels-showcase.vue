@@ -30,34 +30,32 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, ref, onMounted } from '@vue/composition-api'
 import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
-@Component({})
-export default class cronInput extends Vue {
-  translate = translate;
+export default defineComponent({
+  props: {
+    emit: String,
+    title: String,
+    value: String,
+  },
+  setup(props: { value: string; emit: string; title: string }, ctx) {
+    const data = ref([] as string[]);
+    const translatedTitle = ref(translate(props.title))
 
-  @Prop() readonly emit: any;
-  @Prop() readonly title!: string;
-  @Prop() readonly value!: any;
+    onMounted(() => {
+      getSocket(`/${ctx.root.$route.params.type}/${ctx.root.$route.params.id}`)
+        .emit(props.emit, (err: string | null, _data: string[]) => {
+          if (err) {
+            console.error(err)
+          } else {
+            data.value = _data;
+          }
+        });
+    })
 
-  data: string[] = [];
-  translatedTitle = translate(this.title);
-
-  mounted() {
-    this.update();
+    return { data, translatedTitle, translate };
   }
-
-  update() {
-    getSocket(`/${this.$route.params.type}/${this.$route.params.id}`)
-      .emit(this.emit, (err: string | null, data: string[]) => {
-        if (err) {
-          console.error(err)
-        } else {
-          this.data = data;
-        }
-      });
-  }
-};
+});
 </script>

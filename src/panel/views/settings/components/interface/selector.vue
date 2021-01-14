@@ -9,30 +9,32 @@
         </template>
       </span>
     </div>
-    <select class="form-control" :readonly="readonly" v-model="currentValue" v-on:change="onChange">
+    <select class="form-control" :readonly="readonly" v-model="currentValue">
       <option v-for="(v, i) of values" :key="i">{{v}}</option>
     </select>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { defineComponent, ref, watch } from '@vue/composition-api'
 import translate from 'src/panel/helpers/translate';
 
-@Component({})
-export default class btnEmit extends Vue {
-  @Prop() readonly readonly: any;
-  @Prop() readonly value!: any;
-  @Prop() readonly title!: string;
-  @Prop() readonly current: any;
-  @Prop() readonly values: any;
+export default defineComponent({
+  props: {
+    values: Array,
+    value: String,
+    title: String,
+    readonly: Boolean
+  },
+  setup(props: { value: string; values: string[]; title: string, readonly: boolean }, ctx) {
+    const currentValue = ref(props.value);
+    const translatedTitle = ref(translate(props.title))
 
-  currentValue = this.value;
-  translatedTitle = translate(this.title);
+    watch(currentValue, (val) => {
+      ctx.emit('update', { value: currentValue.value })
+    });
 
-  @Watch('currentValue')
-  onChange() {
-    this.$emit('update', { value: this.currentValue });
+    return { currentValue, translatedTitle }
   }
-};
+});
 </script>
