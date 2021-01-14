@@ -9,13 +9,13 @@
         </template>
       </span>
     </div>
-    <ul class="list-group list-group-flush w-100 border border-input">
-      <li class="list-group-item border-0 d-flex" v-for='(v, index) of currentValues' :ref='"list_" + index' :key="index">
+    <transition-group name="list" tag="ul" class="list-group list-group-flush w-100 border border-input">
+      <li class="list-group-item border-0 d-flex" v-for='(v, index) of currentValues' :ref="'list_' + index" :key="v">
         <div class="text-muted btn"
           style="cursor: grab;"
-          v-on:dragstart="dragstart(index, $event)"
-          v-on:dragend="dragend(index, $event)"
-          v-on:dragenter="dragenter(index, $event)"
+          v-on:dragstart.passive="dragstart(index, $event)"
+          v-on:dragend.passive="dragend(index, $event)"
+          v-on:dragenter.passive="dragenter(index, $event)"
           draggable="true">
           <fa icon="ellipsis-v"></fa>
         </div>
@@ -26,66 +26,86 @@
           <fa :icon="isToggled(index) ? toggleofficon : toggleonicon" fixed-width></fa>
         </button>
       </li>
-    </ul>
+    </transition-group>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import translate from 'src/panel/helpers/translate';
-
+import { defineComponent, ref, watch } from '@vue/composition-api'
 import { xor } from 'lodash-es';
 
-@Component({})
-export default class sortableList extends Vue {
-  @Prop() readonly values!: any;
-  @Prop() readonly toggle!: any;
-  @Prop() readonly toggleonicon: any;
-  @Prop() readonly toggleofficon: any;
-  @Prop() readonly title!: string;
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faEyeSlash } from '@fortawesome/free-regular-svg-icons';
+library.add(faEyeSlash)
 
-  currentValues = this.values;
-  currentToggle = this.toggle;
-  translatedTitle = translate(this.title);
-  draggingItem: any = null;
+import translate from 'src/panel/helpers/translate';
 
-  @Watch('currentValue')
-  onChange() {
-    this.$emit('update', { value: this.currentValues, toggle: this.currentToggle })
-  }
+export default defineComponent({
+  props: {
+    values: Array,
+    toggle: Array,
+    toggleonicon: String,
+    toggleofficon: String,
+    title: String,
+  },
+  setup(props: { values: string[]; toggle: string[], toggleonicon: string, togglefficon: string, title: string }, ctx) {
+    const currentValues = ref(props.values);
+    const currentToggle = ref(props.toggle);
+    const translatedTitle = ref(translate(props.title))
+    const draggingItem = ref(-1);
 
-  toggleItem(idx: number) {
-    this.currentToggle = xor(this.currentToggle, [this.currentValues[idx]]);
-    this.$forceUpdate()
-    this.onChange()
-  }
-  isToggled (idx: number) {
-    const value = this.currentValues[idx]
-    return this.currentToggle.indexOf(value) !== -1
-  }
-  dragstart(item: number, e: DragEvent) {
-    this.draggingItem = item;
-    (this.$refs['list_' + item] as HTMLElement[])[0].style.opacity = '0.5';
-    e.dataTransfer?.setData('text/plain', 'dummy');
-  }
-  dragenter(newIndex: number, e: DragEvent) {
-    const value = this.currentValues[this.draggingItem]
-    this.currentValues.splice(this.draggingItem, 1);
-    this.currentValues.splice(newIndex, 0, value);
-    this.draggingItem = newIndex;
+    watch([currentValues, currentToggle], (val) => {
+      ctx.emit('update', { value: currentValues.value, toggle: currentToggle.value })
+    });
 
-    for (let i = 0, length = this.currentValues.length; i < length; i++) {
-      (this.$refs['list_' + i] as HTMLElement[])[0].style.opacity = '1';
+    function toggleItem(idx: number) {
+      currentToggle.value = xor(currentToggle.value, [currentValues.value[idx]]);
+      ctx.root.$forceUpdate()
     }
-    (this.$refs['list_' + newIndex] as HTMLElement[])[0].style.opacity = '0.5';
 
-    this.$forceUpdate()
-    this.onChange()
-  }
-  dragend(item: number, e: DragEvent) {
-    for (let i = 0, length = this.currentValues.length; i < length; i++) {
-      (this.$refs['list_' + i] as HTMLElement[])[0].style.opacity = '1';
+    function isToggled (idx: number) {
+      const value = currentValues.value[idx]
+      return currentToggle.value.indexOf(value) !== -1
+    }
+
+    function dragstart(idx: number, e: DragEvent) {
+      draggingItem.value = idx;
+      e.dataTransfer?.setData('text/plain', 'dummy');
+    }
+
+    function dragenter(newIndex: number, e: DragEvent) {
+      const value = currentValues.value[draggingItem.value]
+      currentValues.value.splice(draggingItem.value, 1);
+      currentValues.value.splice(newIndex, 0, value);
+      draggingItem.value = newIndex;
+
+      ctx.root.$forceUpdate()
+    }
+
+    function dragend(idx: number, e: DragEvent) {
+      draggingItem.value = -1;
+    }
+
+    return {
+      currentValues,
+      currentToggle,
+      translatedTitle,
+
+      draggingItem,
+      toggleItem,
+      isToggled,
+      dragstart,
+      dragenter,
+      dragend,
+
+      translate,
     }
   }
-}
+});
 </script>
+
+<style>
+.list-move {
+  transition: transform .2s;
+}
+</style>
