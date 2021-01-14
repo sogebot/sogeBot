@@ -32,7 +32,7 @@
                       v-else-if="ui[category][defaultValue].type === 'highlights-url-generator'"
                       :values="currentValue"
                       :title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
-                      v-on:update="value[defaultValue] = $event; triggerDataChange()"
+                      v-on:update="value[defaultValue] = $event.value; triggerDataChange()"
                     />
                     <a v-else-if="ui[category][defaultValue].type === 'link'" :href="ui[category][defaultValue].href" class="mt-1 mb-1" :class="ui[category][defaultValue].class" :target="ui[category][defaultValue].target">
                       <template v-if="ui[category][defaultValue].rawText">{{ ui[category][defaultValue].rawText }}</template>
@@ -553,6 +553,7 @@ export default class interfaceSettings extends Vue {
     this.state.settings = 1
     let settings = cloneDeep(this.settings)
 
+
     if (settings.settings) {
       for (let [name,value] of Object.entries(settings.settings)) {
         delete settings.settings[name]
@@ -561,20 +562,38 @@ export default class interfaceSettings extends Vue {
       delete settings.settings
     }
 
-    // flat permission based variables - getting rid of category
-    settings.__permission_based__ = flatten(settings.__permission_based__)
-    for (const key of Object.keys(settings.__permission_based__)) {
-      const match = key.match(/\./g);
-      if (match && match.length > 1) {
-        const value = settings.__permission_based__[key];
-        delete settings.__permission_based__[key]
-        const keyWithoutCategory = key.replace(/([\w]*\.)/, '');
-        console.debug(`FROM: ${key}`);
-        console.debug(`TO:   ${keyWithoutCategory}`);
-        settings.__permission_based__[keyWithoutCategory] = value;
-      };
+    // flat variables - getting rid of category
+    settings = flatten(settings)
+    for (const key of Object.keys(settings)) {
+      if (key.includes('__permission_based__') || key.includes('commands') || key.includes('_permission')) {
+        continue;
+      }
+
+      const value = settings[key];
+      const keyWithoutCategory = key.replace(/([\w]*\.)/, '');
+      delete settings[key];
+      console.debug(`FROM: ${key}`);
+      console.debug(`TO:   ${keyWithoutCategory}`);
+      settings[keyWithoutCategory] = value;
     }
-    settings.__permission_based__ = unflatten(settings.__permission_based__)
+    settings = unflatten(settings);
+
+    // flat permission based variables - getting rid of category
+    if(settings.__permission_based__) {
+      settings.__permission_based__ = flatten(settings.__permission_based__)
+      for (const key of Object.keys(settings.__permission_based__)) {
+        const match = key.match(/\./g);
+        if (match && match.length > 1) {
+          const value = settings.__permission_based__[key];
+          delete settings.__permission_based__[key]
+          const keyWithoutCategory = key.replace(/([\w]*\.)/, '');
+          console.debug(`FROM: ${key}`);
+          console.debug(`TO:   ${keyWithoutCategory}`);
+          settings.__permission_based__[keyWithoutCategory] = value;
+        };
+      }
+      settings.__permission_based__ = unflatten(settings.__permission_based__)
+    }
 
     console.debug('Saving settings', settings);
     getSocket(`/${this.$route.params.type}/${this.$route.params.id}`)
