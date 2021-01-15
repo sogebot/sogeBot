@@ -1,29 +1,45 @@
-import { getSocket } from './socket';
-
 let waitAfterStart = false;
 
 function isBotStarted() {
-  const socket = getSocket('/', true);
+  const el = document.getElementById('bot-starting-intro');
+
   return new Promise(resolve => {
     const check = () => {
-      socket.emit('botStatus', (status: boolean) => {
-        const el = document.getElementById('bot-starting-intro');
-        if (status) {
+      fetch('/health')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.blob();
+        }).then(() => {
           if (el) {
             el.innerHTML = '... registering sockets ...';
           }
-          console.log('Bot is started, continue');
-          setTimeout(() => resolve(true), waitAfterStart ? 5000 : 0);
-        } else {
+          if (!waitAfterStart) {
+            console.log('Bot is started, continue');
+            resolve(true);
+          } else {
+            console.log('Bot is started, registering sockets');
+            setTimeout(() => {
+              console.log('Bot is started, waiting to full bot load');
+              if (el) {
+                el.innerHTML = '... waiting to full bot load ...';
+              }
+              setTimeout(() => {
+                console.log('Bot is started, continue');
+                resolve(true);
+              }, 5000);
+            }, 5000);
+          }
+        }).catch(() => {
           if (el) {
             el.style.display = 'block';
             el.innerHTML = '... bot is starting ...';
           }
           console.log('Bot not started yet, waiting');
           waitAfterStart = true;
-          setTimeout(() => check(), 1000);
-        }
-      });
+          setTimeout(() => check(), 5000);
+        });
     };
     check();
   });

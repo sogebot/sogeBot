@@ -74,6 +74,15 @@ export const init = () => {
   });
 
   // customvariables system
+  app?.get('/health', (req, res) => {
+    if (getIsBotStarted()) {
+      res.status(200).send('OK');
+    } else {
+      res.status(503).send('Not OK');
+    }
+  });
+
+  // customvariables system
   app?.get('/customvariables/:id', (req, res) => {
     getURL(req, res);
   });
@@ -154,10 +163,6 @@ export const init = () => {
       socketsConnectedDec();
     });
     socketsConnectedInc();
-
-    socket.on('botStatus', (cb: (status: boolean) => void) => {
-      cb(getIsBotStarted());
-    });
 
     socket.on('getCachedTags', async (cb: (results: TwitchTagInterface[]) => void) => {
       const connection = await getConnection();
