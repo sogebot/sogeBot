@@ -10,6 +10,13 @@ const isStreamOnline = {
   },
   set value(value: typeof _value) {
     _value = value;
+    getRepository(Settings).findOne({
+      namespace: '/core/api', name: 'isStreamOnline',
+    }).then(row => {
+      getRepository(Settings).save({
+        ...row, namespace: '/core/api', name: 'isStreamOnline', value: JSON.stringify(value),
+      });
+    });
   },
 };
 
@@ -20,9 +27,9 @@ async function load() {
   }
 
   try {
-    _value = JSON.parse(
+    isStreamOnline.value = JSON.parse(
       (await getRepository(Settings).findOneOrFail({
-        namespace: '/core/api', name: 'isStreamOnline',
+        namespace: '/core/api', name: 'streamId',
       })).value
     );
   } catch (e) {

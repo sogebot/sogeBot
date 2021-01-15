@@ -30,7 +30,7 @@ async function load() {
   try {
     streamType.value = JSON.parse(
       (await getRepository(Settings).findOneOrFail({
-        namespace: '/core/api', name: 'streamStatusChangeSince',
+        namespace: '/core/api', name: 'streamType',
       })).value
     );
   } catch (e) {

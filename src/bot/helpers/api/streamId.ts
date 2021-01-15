@@ -9,10 +9,10 @@ const streamId = {
   set value(value: typeof _value) {
     _value = value;
     getRepository(Settings).findOne({
-      namespace: '/core/api', name: 'streamStatusChangeSince',
+      namespace: '/core/api', name: 'streamId',
     }).then(row => {
       getRepository(Settings).save({
-        ...row, namespace: '/core/api', name: 'streamStatusChangeSince', value: JSON.stringify(value),
+        ...row, namespace: '/core/api', name: 'streamId', value: JSON.stringify(value),
       });
     });
   },
@@ -30,7 +30,7 @@ async function load() {
   try {
     streamId.value = JSON.parse(
       (await getRepository(Settings).findOneOrFail({
-        namespace: '/core/api', name: 'streamStatusChangeSince',
+        namespace: '/core/api', name: 'streamId',
       })).value
     );
   } catch (e) {
