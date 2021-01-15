@@ -122,22 +122,27 @@
 
               <div v-for="event in supportedEvents" :key="'event-tab-' + event">
                 <title-divider>{{ translate('registry.alerts.event.' + event) }}</title-divider>
-                <b-button class="w-100 text-left" @click="selectedAlertId = alert.id" :variant="selectedAlertId === alert.id ? 'primary' : 'link'" v-for="(alert, idx) of item[event]" :key="event + alert.id">
-                  <span style="margin: 1rem;">
-                    <fa icon="exclamation-circle" v-if="isValid[event][alert.id] === false" class="text-danger"/>
-                    <fa :icon="['far', 'check-circle']" v-else-if="alert.enabled"/>
-                    <fa :icon="['far', 'circle']" v-else/>
+                <b-button-group class="w-100" v-for="(alert, idx) of item[event]" :key="event + alert.id">
+                  <b-button class="w-100 text-left" @click="selectedAlertId = alert.id" :variant="selectedAlertId === alert.id ? 'primary' : 'link'">
+                    <span style="margin: 1rem;">
+                      <fa icon="exclamation-circle" v-if="isValid[event][alert.id] === false" class="text-danger"/>
+                      <fa :icon="['far', 'check-circle']" v-else-if="alert.enabled"/>
+                      <fa :icon="['far', 'circle']" v-else/>
 
-                    <template v-if="alert.title.length > 0">{{alert.title}}</template>
-                    <template v-else>Variant {{ idx + 1 }}</template>
-                  </span>
-                </b-button>
+                      <template v-if="alert.title.length > 0">{{alert.title}}</template>
+                      <template v-else>Variant {{ idx + 1 }}</template>
+                    </span>
+                  </b-button>
+                  <b-button variant="light" v-if="selectedAlertId === alert.id" @click="duplicateVariant">
+                    <fa icon="clone"/>
+                  </b-button>
+                </b-button-group>
               </div>
             </b-card-text>
           </b-card>
         </b-col>
         <b-col>
-          <b-card :key="selectedAlertType">
+          <b-card :key="'b-card' + selectedAlertId + selectedAlertType">
             <form-follow :event="selectedAlertType" v-if="['cmdredeems', 'follows', 'subs', 'subgifts', 'subcommunitygifts', 'raids', 'hosts'].includes(selectedAlertType)" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
             <form-cheers :event="selectedAlertType" v-else-if="selectedAlertType === 'cheers' || selectedAlertType === 'tips'" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
             <form-resubs :event="selectedAlertType" v-else-if="selectedAlertType === 'resubs'" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
@@ -158,7 +163,7 @@ import translate from 'src/panel/helpers/translate';
 import { Route } from 'vue-router'
 import { NextFunction } from 'express';
 
-import { remove, every } from 'lodash-es';
+import { remove, every, cloneDeep } from 'lodash-es';
 
 import defaultImage from '!!base64-loader!./media/cow01.gif';
 import defaultAudio from '!!base64-loader!./media/456968__funwithsound__success-resolution-video-game-fanfare-sound-effect.mp3';
@@ -628,6 +633,39 @@ export default class AlertsEdit extends Vue {
       })
     })
     this.$router.push({ name: 'alertsList' });
+  }
+
+  async duplicateVariant() {
+    console.log('Duplicating variant')
+
+    if (this.selectedAlert && this.selectedAlertType) {
+      // generate new variant
+      const newVariant = cloneDeep(this.selectedAlert);
+      newVariant.id = uuid();
+      newVariant.title = '';
+
+      // remap image and sound
+      const mediaMap = new Map<string, string>();
+      const soundId = newVariant.soundId;
+      const imageId = newVariant.imageId;
+      newVariant.soundId = uuid();
+      newVariant.imageId = uuid();
+      mediaMap.set(soundId, newVariant.soundId);
+      mediaMap.set(imageId, newVariant.imageId);
+
+      for (const mediaId of mediaMap.keys()) {
+        await new Promise<void>(resolve => {
+          this.socket.emit('alerts::cloneMedia', [mediaId, mediaMap.get(mediaId)], (err: string | null) => {
+            if (err) {
+              console.error(err)
+            }
+            resolve();
+          })
+        })
+      }
+
+      this.item[this.selectedAlertType].push(newVariant as any);
+    }
   }
 
   async save () {
