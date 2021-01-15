@@ -2,13 +2,14 @@
 
 require('dotenv').config();
 
-const os = require('os');
-const fs = require('fs');
-const chalk = require('chalk');
-const logDir = './logs';
-
-const util = require('util');
 const exec = require('child_process').exec;
+const fs = require('fs');
+const os = require('os');
+const util = require('util');
+
+const chalk = require('chalk');
+
+const logDir = './logs';
 
 if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir);
@@ -24,6 +25,12 @@ try {
 const repo = ['better-sqlite3', 'postgres', 'mysql'];
 
 async function runMigration() {
+  if (+process.versions.node.split('.')[0] === 15) {
+    fs.writeFileSync(logFile, '✕ Sorry, this app is not supported on Node.js 15.x', { flag: 'a'});
+    console.error('✕ Sorry, this app is not supported on Node.js 15.x');
+    console.error('\n!!! Node version check FAILED, please check your logs/migration.log for additional information !!! \n');
+    process.exit(1);
+  }
   if (+process.versions.node.split('.')[0] < 14) {
     fs.writeFileSync(logFile, '✕ Sorry, this app requires Node.js 14.x or later', { flag: 'a'});
     console.error('✕ Sorry, this app requires Node.js 14.x or later');
