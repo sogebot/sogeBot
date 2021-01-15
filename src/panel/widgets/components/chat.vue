@@ -23,7 +23,7 @@
           b-card-text.h-100
             div.h-100
               b-alert(variant="danger" v-if="!isHttps" show)
-                | You need to run bot on HTTPS with valid certificate for this embed to be working
+                | You need to run bot on HTTPS on port 443 with valid certificate for this embed to be working
               iframe(
                 v-else-if="show"
                 frameborder="0"
@@ -83,7 +83,10 @@ export default {
   },
   computed: {
     isHttps() {
-      return window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const isSecureHttp = window.location.protocol === 'https:';
+      const isCorrectPort = ['', '443'].includes(window.location.port) && window.location.protocol === 'https:'
+      return isLocalhost || (isSecureHttp && isCorrectPort);
     },
 
     chatUrl() {
