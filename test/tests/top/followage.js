@@ -1,21 +1,19 @@
 /* global describe it before */
-const { getOwner } = require('../../../dest/helpers/commons/getOwner');
+const assert = require('assert');
 
-require('../../general.js');
+const { getRepository } = require('typeorm');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
 const constants = require('../../../dest/constants');
-
+const { User } = require('../../../dest/database/entity/user');
+const { getOwner } = require('../../../dest/helpers/commons/getOwner');
+const { prepare } = require('../../../dest/helpers/commons/prepare');
+const dayjs = require('../../../dest/helpers/dayjs').dayjs;
 const top = (require('../../../dest/systems/top')).default;
 const tmi = (require('../../../dest/tmi')).default;
+const db = require('../../general.js').db;
+const message = require('../../general.js').message;
 
-const moment = require('moment-timezone');
-
-const { prepare } = require('../../../dest/helpers/commons/prepare');
-const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/database/entity/user');
-const assert = require('assert');
+require('../../general.js');
 
 // users
 const owner = { username: '__broadcaster__' };
@@ -50,7 +48,7 @@ describe('Top - !top followage', () => {
     const r = await top.followage({ sender: { username: getOwner() } });
     const dates = [];
     for (let i = 0; i < 10; i++) {
-      dates.push(`${moment.utc(Date.now() - (constants.HOUR * i)).format('L')} (${moment.utc(Date.now() - (constants.HOUR * i)).fromNow()})`);
+      dates.push(`${dayjs.utc(Date.now() - (constants.HOUR * i)).format('L')} (${dayjs.utc(Date.now() - (constants.HOUR * i)).fromNow()})`);
     }
     assert.strictEqual(r[0].response, `Top 10 (followage): 1. @user9 - ${dates[9]}, 2. @user8 - ${dates[8]}, 3. @user7 - ${dates[7]}, 4. @user6 - ${dates[6]}, 5. @user5 - ${dates[5]}, 6. @user4 - ${dates[4]}, 7. @user3 - ${dates[3]}, 8. @user2 - ${dates[2]}, 9. @user1 - ${dates[1]}, 10. @user0 - ${dates[0]}`, owner);
   });
@@ -64,7 +62,7 @@ describe('Top - !top followage', () => {
     const r = await top.followage({ sender: { username: getOwner() } });
     const dates = [];
     for (let i = 0; i < 10; i++) {
-      dates.push(`${moment.utc(Date.now() - (constants.HOUR * i)).format('L')} (${moment.utc(Date.now() - (constants.HOUR * i)).fromNow()})`);
+      dates.push(`${dayjs.utc(Date.now() - (constants.HOUR * i)).format('L')} (${dayjs.utc(Date.now() - (constants.HOUR * i)).fromNow()})`);
     }
     assert.strictEqual(r[0].response, `Top 10 (followage): 1. @user9 - ${dates[9]}, 2. @user8 - ${dates[8]}, 3. @user7 - ${dates[7]}, 4. @user6 - ${dates[6]}, 5. @user5 - ${dates[5]}, 6. @user4 - ${dates[4]}, 7. @user3 - ${dates[3]}, 8. @user2 - ${dates[2]}, 9. @user1 - ${dates[1]}`, owner);
   });
