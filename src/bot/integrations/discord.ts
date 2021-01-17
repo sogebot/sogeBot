@@ -85,7 +85,7 @@ class Discord extends Integration {
     type: 'discord-channel',
     if: () => self.guild.length > 0,
   })
-  listenAtChannels = '';
+  listenAtChannels: string | string[] = '';
 
   @settings('bot')
   @ui({
@@ -545,10 +545,14 @@ class Discord extends Integration {
             return;
           }
 
-          const channels = this.listenAtChannels.split(',').map(o => o.trim());
-          if (msg.channel.type === 'text' && channels.length > 0) {
-            if (channels.includes(msg.channel.name) || channels.includes(msg.channel.id)) {
-              this.message(msg.content, msg.channel, msg.author, msg);
+          const listenAtChannels = [
+            ...Array.isArray(this.listenAtChannels) ? this.listenAtChannels : [this.listenAtChannels],
+          ].filter(o => o !== '');
+          for (const channel of listenAtChannels) {
+            if (msg.channel.type === 'text') {
+              if (channel === msg.channel.id) {
+                this.message(msg.content, msg.channel, msg.author, msg);
+              }
             }
           }
         }
@@ -557,7 +561,6 @@ class Discord extends Integration {
   }
 
   async message(content: string, channel: DiscordJsTextChannel, author: DiscordJsUser, msg?: DiscordJs.Message) {
-    const channels = this.listenAtChannels.split(',').map(o => o.trim());
     chatIn(`#${channel.name}: ${content} [${author.tag}]`);
     if (msg) {
       if (content === this.getCommand('!link')) {
@@ -621,7 +624,7 @@ class Discord extends Integration {
           if (responses) {
             for (let i = 0; i < responses.length; i++) {
               setTimeout(async () => {
-                if (channel.type === 'text' && channels.length > 0) {
+                if (channel.type === 'text') {
                   const messageToSend = await new Message(await responses[i].response).parse({
                     ...responses[i].attr,
                     forceWithoutAt: true, // we dont need @
