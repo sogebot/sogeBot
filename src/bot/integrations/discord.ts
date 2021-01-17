@@ -545,14 +545,12 @@ class Discord extends Integration {
             return;
           }
 
-          const listenAtChannels = [
-            ...Array.isArray(this.listenAtChannels) ? this.listenAtChannels : [this.listenAtChannels],
-          ].filter(o => o !== '');
-          for (const channel of listenAtChannels) {
-            if (msg.channel.type === 'text') {
-              if (channel === msg.channel.id) {
-                this.message(msg.content, msg.channel, msg.author, msg);
-              }
+          if (msg.channel.type === 'text') {
+            const listenAtChannels = [
+              ...Array.isArray(this.listenAtChannels) ? this.listenAtChannels : [this.listenAtChannels],
+            ].filter(o => o !== '');
+            if (listenAtChannels.includes(msg.channel.id)) {
+              this.message(msg.content, msg.channel, msg.author, msg);
             }
           }
         }
