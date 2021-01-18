@@ -78,7 +78,7 @@ class FightMe extends Game {
       if (isBroadcaster(opts.sender) || isBroadcaster(user.username)) {
         const isBroadcasterModCheck = isBroadcaster(opts.sender) ? isMod.user : isMod.sender;
         if (!isBroadcasterModCheck) {
-          timeout(isBroadcaster(opts.sender) ? user.username : opts.sender.username, '!fightme result', this.timeout, isBroadcaster(opts.sender) ? isMod.user : isMod.sender);
+          timeout(isBroadcaster(opts.sender) ? user.username : opts.sender.username, this.timeout, isBroadcaster(opts.sender) ? isMod.user : isMod.sender);
         }
         fightMeChallenges = fightMeChallenges.filter(ch => {
           return !(ch.opponent === opts.sender.username
@@ -101,7 +101,7 @@ class FightMe extends Game {
 
       // vs mod
       if (isMod.user || isMod.sender) {
-        timeout(isMod.sender ? user.username : opts.sender.username, '!fightme result', this.timeout, false);
+        timeout(isMod.sender ? user.username : opts.sender.username, this.timeout, false);
         fightMeChallenges = fightMeChallenges.filter(ch => {
           return !(ch.opponent === opts.sender.username
             && ch.challenger === user.username);
@@ -116,7 +116,7 @@ class FightMe extends Game {
       await getRepository(User).increment({ userId: Number(winner ? opts.sender.userId : user.userId) }, 'points', Math.abs(Number(winnerWillGet)));
       await points.decrement({ userId: Number(!winner ? opts.sender.userId : user.userId) }, Math.abs(Number(loserWillLose)));
 
-      timeout(winner ? opts.sender.username : user.username, '!fightme result', this.timeout, false);
+      timeout(winner ? opts.sender.username : user.username, this.timeout, false);
       fightMeChallenges = fightMeChallenges.filter(ch => {
         return !(ch.opponent === opts.sender.username
           && ch.challenger === user.username);

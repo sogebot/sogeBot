@@ -281,7 +281,7 @@ class Songs extends System {
       request.push(JSON.parse(this.currentSong).username);
     }
     for (const user of request) {
-      timeout(user, translate('songs.song-was-banned-timeout-message'), 300, isModerator(opts.sender));
+      timeout(user, 300, isModerator(opts.sender));
     }
 
     await Promise.all([

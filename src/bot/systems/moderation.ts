@@ -136,17 +136,15 @@ class Moderation extends System {
     text = text.trim();
 
     if (this.cWarningsAllowedCount === 0) {
-      msg = await new Message(msg.replace(/\$count/g, String(-1))).parse();
       timeoutLog(`${sender.username} [${type}] ${time}s timeout | ${text}`);
-      timeout(sender.username, msg, time, isModerator(sender));
+      timeout(sender.username, time, isModerator(sender));
       return;
     }
 
     const isWarningCountAboveThreshold = warnings.length >= this.cWarningsAllowedCount;
     if (isWarningCountAboveThreshold) {
-      msg = await new Message(warning.replace(/\$count/g, String(this.cWarningsAllowedCount - warnings.length))).parse();
       timeoutLog(`${sender.username} [${type}] ${time}s timeout | ${text}`);
-      timeout(sender.username, msg, time, isModerator(sender));
+      timeout(sender.username, time, isModerator(sender));
       await getRepository(ModerationWarning).delete({ userId: Number(sender.userId) });
     } else {
       await getRepository(ModerationWarning).insert({ userId: Number(sender.userId), timestamp: Date.now() });
@@ -154,7 +152,7 @@ class Moderation extends System {
       warning = await new Message(warning.replace(/\$count/g, String(warningsLeft < 0 ? 0 : warningsLeft))).parse();
       if (this.cWarningsShouldClearChat) {
         timeoutLog(`${sender.username} [${type}] 1s timeout, warnings left ${warningsLeft < 0 ? 0 : warningsLeft} | ${text}`);
-        timeout(sender.username, warning, 1, isModerator(sender));
+        timeout(sender.username, 1, isModerator(sender));
       }
 
       if (this.cWarningsAnnounceTimeouts) {

@@ -2,13 +2,10 @@ import tmi from '../../tmi';
 import { error, info } from '../log';
 import { generalChannel } from '../oauth/generalChannel';
 
-export async function timeout(username: string, reason: string, seconds: number, isMod: boolean) {
-  if (reason) {
-    reason = reason.replace(/\$sender/g, username);
-  }
+export async function timeout(username: string, seconds: number, isMod: boolean) {
   if (isMod) {
     if (tmi.client.broadcaster) {
-      tmi.client.broadcaster.chat.timeout(generalChannel.value, username, seconds, reason);
+      tmi.client.broadcaster.chat.timeout(generalChannel.value, username, seconds);
       info(`Bot will set mod status for ${username} after ${seconds} seconds.`);
       setTimeout(() => {
         // we need to remod user
@@ -18,6 +15,6 @@ export async function timeout(username: string, reason: string, seconds: number,
       error('Cannot timeout mod user, as you don\'t have set broadcaster in chat');
     }
   } else {
-    tmi.client.bot?.chat.timeout(generalChannel.value, username, seconds, reason);
+    tmi.client.bot?.chat.timeout(generalChannel.value, username, seconds);
   }
 }

@@ -3,6 +3,7 @@ import { getBotID } from './getBotID';
 
 export function getBotSender(): Readonly<CommandOptions['sender']> {
   return {
+    isModerator: true,
     username: getBot(),
     displayName: getBot(),
     userId: getBotID(),
