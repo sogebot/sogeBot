@@ -1,16 +1,17 @@
 import { parse, sep as separator } from 'path';
 
 import * as _ from 'lodash';
+import { xor } from 'lodash';
 
 import type { Module } from './_interface';
 import * as constants from './constants';
 import { isDbConnected } from './helpers/database';
 import { debug, error } from './helpers/log';
-import { defaultPermissions } from './helpers/permissions/';
+import { defaultPermissions } from './helpers/permissions/defaultPermissions';
 import { find } from './helpers/register';
 import { VariableWatcher } from './watchers';
 
-export let loadingInProgress: string[] = [];
+export let loadingInProgress: (string|symbol)[] = [];
 export let areDecoratorsLoaded = false;
 export const permissions: { [command: string]: string | null } = {};
 
@@ -350,4 +351,8 @@ function registerParser(opts: {
       error(e.stack);
     }
   }, 5000);
+}
+
+export function toggleLoadingInProgress(name: symbol) {
+  loadingInProgress = xor(loadingInProgress, [name]);
 }

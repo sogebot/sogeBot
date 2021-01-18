@@ -1,70 +1,15 @@
-import { getRepository } from 'typeorm';
+import { persistent } from '../core/persistent';
 
-import { Settings } from '../../database/entity/settings';
-import { isDbConnected } from '../database';
+const gameCache = persistent({
+  value: '',
+  name: 'gameCache',
+  namespace: '/core/api',
+});
 
-let _rawStatus = '';
-let _gameCache = '';
-
-const gameCache = {
-  set value(value: string) {
-    _gameCache = value;
-    getRepository(Settings).findOne({
-      namespace: '/core/api', name: 'gameCache',
-    }).then(row => {
-      getRepository(Settings).save({
-        ...row, namespace: '/core/api', name: 'gameCache', value: JSON.stringify(value),
-      });
-    });
-  },
-  get value() {
-    return _gameCache;
-  },
-};
-
-const rawStatus = {
-  set value(value: string) {
-    _rawStatus = value;
-    getRepository(Settings).findOne({
-      namespace: '/core/api', name: 'rawStatus',
-    }).then(row => {
-      getRepository(Settings).save({
-        ...row, namespace: '/core/api', name: 'rawStatus', value: JSON.stringify(value),
-      });
-    });
-  },
-  get value() {
-    return _rawStatus;
-  },
-};
-
-async function load() {
-  if (!isDbConnected) {
-    setImmediate(() => load());
-    return;
-  }
-
-  try {
-    _rawStatus = JSON.parse(
-      (await getRepository(Settings).findOneOrFail({
-        namespace: '/core/api', name: 'rawStatus',
-      })).value
-    );
-  } catch (e) {
-    // ignore if nothing was found
-  }
-
-  try {
-    _gameCache = JSON.parse(
-      (await getRepository(Settings).findOneOrFail({
-        namespace: '/core/api', name: 'gameCache',
-      })).value
-    );
-  } catch (e) {
-    // ignore if nothing was found
-  }
-}
-
-load();
+const rawStatus = persistent({
+  value: '',
+  name: 'rawStatus',
+  namespace: '/core/api',
+});
 
 export { rawStatus, gameCache };
