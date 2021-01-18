@@ -1451,7 +1451,7 @@ class API extends Core {
   }
 
   async getTopClips (opts: any) {
-    let url = 'https://api.twitch.tv/helix/clips?broadcaster_id=' + channelId;
+    let url = 'https://api.twitch.tv/helix/clips?broadcaster_id=' + channelId.value;
     const token = oauth.botAccessToken;
     try {
       if (token === '') {
