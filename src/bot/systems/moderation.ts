@@ -136,7 +136,6 @@ class Moderation extends System {
     text = text.trim();
 
     if (this.cWarningsAllowedCount === 0) {
-      msg = await new Message(msg.replace(/\$count/g, String(-1))).parse();
       timeoutLog(`${sender.username} [${type}] ${time}s timeout | ${text}`);
       timeout(sender.username, time, isModerator(sender));
       return;
@@ -144,7 +143,6 @@ class Moderation extends System {
 
     const isWarningCountAboveThreshold = warnings.length >= this.cWarningsAllowedCount;
     if (isWarningCountAboveThreshold) {
-      msg = await new Message(warning.replace(/\$count/g, String(this.cWarningsAllowedCount - warnings.length))).parse();
       timeoutLog(`${sender.username} [${type}] ${time}s timeout | ${text}`);
       timeout(sender.username, time, isModerator(sender));
       await getRepository(ModerationWarning).delete({ userId: Number(sender.userId) });
