@@ -3,6 +3,7 @@ import { getOwner } from './getOwner';
 
 export function getOwnerAsSender(): Readonly<UserStateTags & { userId: string }> {
   return {
+    isModerator: true,
     username: getOwner(),
     displayName: getOwner(),
     emotes: [],

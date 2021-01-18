@@ -407,6 +407,7 @@ class Events extends Core {
         color: '',
         emoteSets: [],
         userType: 'viewer',
+        isModerator: false,
         mod: '0',
         subscriber: '0',
         turbo: '0',

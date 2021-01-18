@@ -28,6 +28,7 @@ import { generalChannel } from '../helpers/oauth/generalChannel';
 import { check } from '../helpers/permissions/';
 import { get as getPermission } from '../helpers/permissions/get';
 import { adminEndpoint } from '../helpers/socket';
+import { isModerator } from '../helpers/user';
 import { Message } from '../message';
 import { getIdFromTwitch } from '../microservices/getIdFromTwitch';
 import oauth from '../oauth';
@@ -608,6 +609,7 @@ class Discord extends Integration {
         const parser = new Parser();
         parser.started_at = (msg || { createdTimestamp: Date.now() }).createdTimestamp;
         parser.sender = {
+          isModerator: isModerator(user),
           badges: {}, color: '',  displayName: '', emoteSets: [], emotes: [], userId: String(link.userId), username: user.username, userType: 'viewer',
           mod: 'false', subscriber: 'false', turbo: 'false', discord: { author, channel },
         };

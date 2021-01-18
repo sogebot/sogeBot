@@ -1,7 +1,7 @@
 import util from 'util';
 
 import { isNil } from 'lodash';
-import TwitchJs, { HostTargetMessage, Message, PrivateMessages, UserNoticeMessages, UserStateTags } from 'twitch-js';
+import TwitchJs, { BaseMessage, HostTargetMessage, Message, PrivateMessages, UserNoticeMessages, UserStateTags } from 'twitch-js';
 import { getRepository } from 'typeorm';
 
 import Core from './_interface';
@@ -230,7 +230,7 @@ class TMI extends Core {
 
       client.chat.removeAllListeners();
       await client.chat.part(this.channel);
-      await client.chat.reconnect({ token, username, onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(refresh_token => refresh_token) });
+      await client.chat.reconnect({ token, username, onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(refresh_token => refresh_token), connectionTimeout: 60000, joinTimeout: 60000 });
 
       this.loadListeners(type);
       await this.join(type, channel);
@@ -377,7 +377,7 @@ class TMI extends Core {
       });
     } else if (type === 'broadcaster') {
       client.chat.on('PRIVMSG/HOSTED', async (message) => {
-        message = message as HostTargetMessage;
+        message = message as BaseMessage;
         // Someone is hosting the channel and the message contains how many viewers..
         const username = message.message.split(' ')[0].replace(':', '').toLowerCase();
         const viewers = (message as HostTargetMessage).numberOfViewers || 0;

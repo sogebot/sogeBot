@@ -46,7 +46,7 @@ class Roulette extends Game {
 
     setTimeout(async () => {
       if (!isAlive) {
-        timeout(opts.sender.username, '', this.timeout, isModerator(opts.sender));
+        timeout(opts.sender.username, this.timeout, isModerator(opts.sender));
       }
     }, 2000);
 
