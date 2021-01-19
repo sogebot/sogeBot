@@ -155,7 +155,7 @@
                 </b-form-group>
               </b-col>
             </b-row>
-            
+
             <b-row>
               <b-col>
                 <b-form-group>
@@ -528,7 +528,7 @@
                       {{ translate('managers.viewers.hostAndRaidViewersCount').replace('$value', JSON.parse(data.item.values_json).viewers) }}
                     </template>
                     <template v-else-if="data.item.event === 'subcommunitygift'">
-                      <strong>{{data.item.event}} - ${{JSON.parse(data.item.values_json).count}}</strong>
+                      <strong>{{data.item.event}} - {{JSON.parse(data.item.values_json).count}}</strong>
                     </template>
                     <template v-else-if="data.item.event === 'subgift'">
                       <div v-if="data.item.username === editationItem.username" v-html="translate('managers.viewers.receivedSubscribeFrom').replace('$value', JSON.parse(data.item.values_json).fromId)" />
