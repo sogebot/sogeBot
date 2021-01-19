@@ -5,6 +5,7 @@ import { Brackets, FindOneOptions, getConnection, getRepository, IsNull } from '
 
 import Core from './_interface';
 import api from './api';
+import { HOUR } from './constants';
 import currency from './currency';
 import { Permissions } from './database/entity/permissions';
 import { User, UserBit, UserInterface, UserTip } from './database/entity/user';
@@ -28,6 +29,52 @@ class Users extends Core {
   @onStartup()
   startup() {
     this.updateWatchTime(true);
+    this.checkDuplicateUsernames();
+  }
+
+  async checkDuplicateUsernames() {
+    const connection = await getConnection();
+    try {
+      let query;
+      if (connection.options.type === 'postgres') {
+        query = getRepository(User).createQueryBuilder('user')
+          .select('COUNT(*)', 'count')
+          .addSelect('"user"."username"')
+          .groupBy('"user"."username"')
+          .having('"count" > 1');
+      } else {
+        query = getRepository(User).createQueryBuilder('user')
+          .select('COUNT(*)', 'count')
+          .addSelect('user.username')
+          .groupBy('user.username')
+          .having('count > 1');
+      }
+      const viewers = await query.getRawMany();
+      await Promise.all(viewers.map(async (duplicate) => {
+        const username = duplicate.user_username;
+        const duplicates = await getRepository(User).find({ username });
+        await Promise.all(duplicates.map(async (user) => {
+          try {
+            const newUsername = await api.getUsernameFromTwitch(user.userId);
+            if (newUsername === null) {
+              throw new Error('unknown');
+            }
+            if (newUsername !== username) {
+              await getRepository(User).update({ userId: user.userId }, { username: newUsername });
+              debug('users', `Duplicate username ${user.username}#${user.userId} changed to ${newUsername}#${user.userId}`);
+            }
+          } catch (e) {
+            // we are tagging user as __AnonymousUser__, we don't want to get rid of all information
+            debug('users', `Duplicate username ${user.username}#${user.userId} not found on Twitch => __AnonymousUser__#${user.userId}`);
+            await getRepository(User).update({ userId: user.userId }, { username: '__AnonymousUser__' });
+          }
+        }));
+      }));
+    } catch(e) {
+      error(e);
+    } finally {
+      setTimeout(() => this.checkDuplicateUsernames(), HOUR);
+    }
   }
 
   async getChatOf (id: number, online: boolean): Promise<number> {
