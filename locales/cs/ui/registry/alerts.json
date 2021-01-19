@@ -129,11 +129,11 @@
   "scale": {
     "name": "Měřítko"
   },
-  "translateX": {
-    "name": "Posunout -nahoru / +dolů"
-  },
   "translateY": {
-    "name": "Posunout -vlevo / +vpravo"
+    "name": "Move -Up / +Down"
+  },
+  "translateX": {
+    "name": "Move -Left / +Right"
   },
   "image": {
     "name": "Obrázek / Video(.webm)",
