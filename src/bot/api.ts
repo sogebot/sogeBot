@@ -1445,7 +1445,7 @@ class API extends Core {
     ioServer?.emit('api.stats', { method: method, data: response, timestamp: Date.now(), call: 'getCustomRewards', api: 'helix', endpoint: url, code: status, remaining: calls.broadcaster });
 
     if (err) {
-      throw new Error(err);
+      throw err;
     }
     return response;
   }

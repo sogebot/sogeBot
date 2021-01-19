@@ -10,12 +10,13 @@ import {
 import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 
 import { Settings } from '../database/entity/settings';
+import { getClientId, getToken } from '../helpers/api';
 import type { rateHeaders } from '../helpers/api/calls';
 import { debug, warning } from '../helpers/log';
 import { TypeORMLogger } from '../helpers/logTypeorm';
 
 type CustomRewardEndpoint = { data: { broadcaster_name: string; broadcaster_id: string; id: string; image: string | null; background_color: string; is_enabled: boolean; cost: number; title: string; prompt: string; is_user_input_required: false; max_per_stream_setting: { is_enabled: boolean; max_per_stream: number; }; max_per_user_per_stream_setting: { is_enabled: boolean; max_per_user_per_stream: number }; global_cooldown_setting: { is_enabled: boolean; global_cooldown_seconds: number }; is_paused: boolean; is_in_stock: boolean; default_image: { url_1x: string; url_2x: string; url_4x: string; }; should_redemptions_skip_request_queue: boolean; redemptions_redeemed_current_stream: null | number; cooldown_expires_at: null | string; }[] };
-type getCustomRewardReturn = { headers: rateHeaders; method: string; response: CustomRewardEndpoint | null; status: number | string; url: string; error: null | string };
+type getCustomRewardReturn = { headers: rateHeaders; method: string; response: CustomRewardEndpoint | null; status: number | string; url: string; error?: Error };
 
 const isThreadingEnabled = process.env.THREAD !== '0';
 
@@ -66,15 +67,13 @@ export const getCustomRewards = async (): Promise<getCustomRewardReturn> => {
   }
   try {
     const channelId = JSON.parse((await getRepository(Settings).findOneOrFail({ name: 'channelId' })).value);
-    const broadcasterAccessToken = JSON.parse((await getRepository(Settings).findOneOrFail({ name: 'broadcasterAccessToken' })).value);
-    const broadcasterClientId = JSON.parse((await getRepository(Settings).findOneOrFail({ name: 'broadcasterClientId' })).value);
 
     const url = 'https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=' + channelId;
     const request = await axios.get<CustomRewardEndpoint>(url, {
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + broadcasterAccessToken,
-        'Client-ID': broadcasterClientId,
+        'Authorization': 'Bearer ' + await getToken('broadcaster'),
+        'Client-ID': await getClientId('broadcaster'),
       },
       timeout: 20000,
     });
@@ -85,7 +84,6 @@ export const getCustomRewards = async (): Promise<getCustomRewardReturn> => {
       response: request.data,
       status: request.status,
       url,
-      error: null,
     } as const;
     debug('microservice', 'return::getCustomRewards');
     debug('microservice', toReturn);
@@ -109,7 +107,6 @@ export const getCustomRewards = async (): Promise<getCustomRewardReturn> => {
           method: e.config.method.toUpperCase(),
           status: e.response.status ?? 'n/a',
           response: null,
-          error: null,
         } as const;
 
         debug('microservice', 'getCustomRewards::return');
@@ -125,8 +122,8 @@ export const getCustomRewards = async (): Promise<getCustomRewardReturn> => {
           url: e.config.url,
           method: e.config.method.toUpperCase(),
           status: e.response.status ?? 'n/a',
-          response: e.response.data ,
-          error: e.message as string,
+          response: e.response.data,
+          error: e,
         } as const;
 
         debug('microservice', 'getCustomRewards::return');
@@ -148,7 +145,7 @@ export const getCustomRewards = async (): Promise<getCustomRewardReturn> => {
         method: 'GET',
         status: e.response?.status ?? 'n/a',
         response: null,
-        error: e.message as string,
+        error: e,
       };
 
       debug('microservice', 'getCustomRewards::return');
