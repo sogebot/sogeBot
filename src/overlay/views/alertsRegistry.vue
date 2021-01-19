@@ -15,20 +15,35 @@
             ['layout-' + runningAlert.alert.layout]: true,
           }">
           <template v-if="!runningAlert.alert.enableAdvancedMode">
-            <video ref="video" v-if="typeOfMedia.get(runningAlert.alert.imageId) === 'video'" style="max-width:500px;" :class="{ center: runningAlert.alert.layout === '3', ['animate__' + runningAlert.animation]: true }" class="animate__animated w-100 pb-3"
-              :style="{
-                'transform': 'scale(' + runningAlert.alert.imageOptions.scale / 100 +') translate(' + runningAlert.alert.imageOptions.translateX +'px, ' + runningAlert.alert.imageOptions.translateY +'px)',
-                'animation-duration': runningAlert.animationSpeed + 'ms',
-              }
-            ">
-              <source :src="'/registry/alerts/' + runningAlert.alert.imageId" type="video/webm">
-              Your browser does not support the video tag.
-            </video>
-            <img v-else-if="showImage" @error="showImage=false" :src="'/registry/alerts/' + runningAlert.alert.imageId" :class="{ center: runningAlert.alert.layout === '3', ['animate__' + runningAlert.animation]: true }" class="animate__animated"
-              :style="{
-                'transform': 'scale(' + runningAlert.alert.imageOptions.scale / 100 +') translate(' + runningAlert.alert.imageOptions.translateX +'px, ' + runningAlert.alert.imageOptions.translateY +'px)',
-                'animation-duration': runningAlert.animationSpeed + 'ms',
-              }"/>
+            <div v-if="typeOfMedia.get(runningAlert.alert.imageId) === 'video'" :class="{ center: runningAlert.alert.layout === '3', ['animate__' + runningAlert.animation]: true }" class="animate__animated w-100 pb-3">
+              <video ref="video"
+                     :style="{
+                      /* center */
+                      'display': 'block',
+                      'margin-left': 'auto',
+                      'margin-right': 'auto',
+                      'width': getSizeOfMedia(runningAlert.alert.imageId, runningAlert.alert.imageOptions.scale / 100, 'width'),
+                      'height': getSizeOfMedia(runningAlert.alert.imageId, runningAlert.alert.imageOptions.scale / 100, 'height'),
+                      'transform': 'translate(' + runningAlert.alert.imageOptions.translateX +'px, ' + runningAlert.alert.imageOptions.translateY +'px)',
+                      'animation-duration': runningAlert.animationSpeed + 'ms',
+                     }">
+                <source :src="'/registry/alerts/' + runningAlert.alert.imageId" type="video/webm">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <div v-else-if="showImage" @error="showImage=false" :class="{ center: runningAlert.alert.layout === '3', ['animate__' + runningAlert.animation]: true }" class="animate__animated">
+              <img :src="'/registry/alerts/' + runningAlert.alert.imageId"
+                   :style="{
+                     /* center */
+                     'display': 'block',
+                     'margin-left': 'auto',
+                     'margin-right': 'auto',
+                     'width': getSizeOfMedia(runningAlert.alert.imageId, runningAlert.alert.imageOptions.scale / 100, 'width'),
+                     'height': getSizeOfMedia(runningAlert.alert.imageId, runningAlert.alert.imageOptions.scale / 100, 'height'),
+                     'transform': 'translate(' + runningAlert.alert.imageOptions.translateX +'px, ' + runningAlert.alert.imageOptions.translateY +'px)',
+                     'animation-duration': runningAlert.animationSpeed + 'ms',
+                   }"/>
+            </div>
             <div
               v-if="runningAlert.isShowingText"
               :class="{
@@ -159,6 +174,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
   preparedAdvancedHTML: string = '';
   typeOfMedia: Map<string, 'audio' | 'image' | 'video' | null> = new Map();
+  sizeOfMedia: Map<string, [width: number, height: number]> = new Map();
 
   state: {
     loaded: number,
@@ -210,6 +226,21 @@ export default class AlertsRegistryOverlays extends Vue {
       }
     }
     return text;
+  }
+
+  getSizeOfMedia(mediaId: string, scale: number, type: 'height' | 'width') {
+    const [width, height] = this.sizeOfMedia.get(mediaId) ?? [0, 0];
+
+    if (height === 0 || width === 0) {
+      return 'auto';
+    }
+
+    console.log({width, height, scale})
+    if (type === 'height') {
+      return `${height * scale}px`;
+    } else {
+      return `${width * scale}px`;
+    }
   }
 
   animationTextClass() {
@@ -677,17 +708,35 @@ export default class AlertsRegistryOverlays extends Vue {
                       console.error(`Audio ${event.soundId} was not found on server.`);
                     });
                   fetch('/registry/alerts/' + event.imageId)
-                    .then(response => {
+                    .then(async response => {
                       if (!response.ok) {
                         throw new Error('Network response was not ok');
                       }
-                      return response.blob();
-                    })
-                    .then(myBlob => {
+                      const myBlob = await response.blob();
                       console.log(`${myBlob.type.startsWith('video') ? 'Video' : 'Image'} ${event.imageId} was found on server.`);
                       this.typeOfMedia.set(event.imageId, myBlob.type.startsWith('video') ? 'video' : 'image');
+
+                      const getMeta = (mediaId: string, type: 'Video' | 'Image') => {
+                        if (type === 'Video') {
+                          const vid = document.createElement("video");
+                          vid.addEventListener("loadedmetadata", (ev) => {
+                            const el = ev.target as HTMLVideoElement;
+                            this.sizeOfMedia.set(mediaId, [el.videoWidth, el.videoHeight]);
+                          });
+                          vid.src = `/registry/alerts/${mediaId}`;
+                        } else {
+                          const img = new Image();
+                          img.addEventListener("load", (ev) => {
+                            const el = ev.target as HTMLImageElement;
+                            this.sizeOfMedia.set(mediaId, [el.naturalWidth, el.naturalHeight]);
+                          });
+                          img.src = `/registry/alerts/${mediaId}`;
+                        }
+                      }
+                      getMeta(event.imageId, myBlob.type.startsWith('video') ? 'Video' : 'Image');
                     })
                     .catch(error => {
+                      console.error(error);
                       this.typeOfMedia.set(event.imageId, null);
                       console.error(`Image/Video ${event.imageId} was not found on server.`);
                     });
@@ -890,7 +939,6 @@ export default class AlertsRegistryOverlays extends Vue {
   }
 
   img {
-    max-width: max-content;
     margin-left: auto;
     margin-right: auto;
   }

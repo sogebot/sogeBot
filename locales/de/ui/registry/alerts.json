@@ -129,10 +129,10 @@
   "scale": {
     "name": "Scale"
   },
-  "translateX": {
+  "translateY": {
     "name": "Move -Up / +Down"
   },
-  "translateY": {
+  "translateX": {
     "name": "Move -Left / +Right"
   },
   "image": {

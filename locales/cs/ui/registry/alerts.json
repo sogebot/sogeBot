@@ -129,10 +129,10 @@
   "scale": {
     "name": "Měřítko"
   },
-  "translateX": {
+  "translateY": {
     "name": "Posunout -nahoru / +dolů"
   },
-  "translateY": {
+  "translateX": {
     "name": "Posunout -vlevo / +vpravo"
   },
   "image": {
