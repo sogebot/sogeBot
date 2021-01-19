@@ -38,7 +38,7 @@ function persistent<T>({value, name, namespace}: { value: T, name: string, names
         namespace, name,
       }).then(row => {
         getRepository(Settings).save({
-          ...row, namespace, name, value: JSON.stringify(value),
+          ...row, namespace, name, value: JSON.stringify(valueToSet),
         });
       });
     },
