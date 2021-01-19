@@ -94,14 +94,6 @@
 - To access webpanel, go to `http://localhost:<port>` where port is configured
   in config.json (default: 20000)
 
-### NEDB
-
-- run `node tools/database.js --from nedb`
-
-### MongoDB
-
-- run `node tools/database.js --from mongodb --mongoUri <your-mongouri>`
-
 ## Oauth generation
 
 Generate your oauth tokens in `ui->settings->general->oauth` and paste your
