@@ -235,7 +235,6 @@ export default class AlertsRegistryOverlays extends Vue {
       return 'auto';
     }
 
-    console.log({width, height, scale})
     if (type === 'height') {
       return `${height * scale}px`;
     } else {
