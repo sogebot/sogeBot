@@ -72,7 +72,7 @@ async function main () {
         verticalLayout: 'default',
       }));
       process.stdout.write('\n\n\n');
-      info('Bot is starting up');
+      info(`Bot is starting up (NodeJS: ${process.versions.node})`);
       if (process.env.DEBUG) {
         setDEBUG(process.env.DEBUG);
       }
