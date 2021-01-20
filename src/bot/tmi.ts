@@ -230,7 +230,13 @@ class TMI extends Core {
 
       client.chat.removeAllListeners();
       await client.chat.part(this.channel);
-      await client.chat.reconnect({ token, username, onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(refresh_token => refresh_token), connectionTimeout: 60000, joinTimeout: 60000 });
+      await client.chat.reconnect({
+        token,
+        username,
+        onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(refresh_token => refresh_token),
+        connectionTimeout: 60000,
+        joinTimeout: 60000,
+      });
 
       this.loadListeners(type);
       await this.join(type, channel);
