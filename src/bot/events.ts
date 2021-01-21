@@ -752,7 +752,7 @@ class Events extends Core {
               const recipientis = attributes.recipientis;
               _.merge(attributes, flatten({ recipientis }));
             }
-            const isOperationSupported = typeof this.supportedOperationsList.find((o) => o.id === operation.name) === 'undefined';
+            const isOperationSupported = typeof this.supportedOperationsList.find((o) => o.id === operation.name) !== 'undefined';
             if (isOperationSupported) {
               const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.name);
               if (foundOp) {

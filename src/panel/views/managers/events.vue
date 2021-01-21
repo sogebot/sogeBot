@@ -143,9 +143,7 @@ export default defineComponent({
 
     const events = ref([] as EventInterface[]);
 
-    const testingInProgress = ref({} as {[x:string]: number});
-    const deletionInProgress = ref({} as {[x:string]: number});
-    const heightOfElement = ref({} as {[x:string]: any});
+    const testingInProgressEntries = ref([] as [id: string, state: number][]);
     const state = ref({
       loading: ButtonStates.progress,
       save: ButtonStates.idle,
@@ -165,6 +163,10 @@ export default defineComponent({
       } else {
         state.value.pending = false;
       }
+    })
+
+    const testingInProgress = computed(() => {
+      return Object.fromEntries(testingInProgressEntries.value)
     })
 
     const eventTypes = computed(() => {
@@ -217,11 +219,17 @@ export default defineComponent({
       }
     };
     const triggerTest = (id: string) => {
-      testingInProgress.value[id] = 1;
+      let idx = testingInProgressEntries.value.findIndex(o => o[0] === id);
+      if (idx === -1) {
+        testingInProgressEntries.value.push([id, 0]);
+        idx = testingInProgressEntries.value.length - 1;
+      }
+
+      testingInProgressEntries.value.splice(idx, 1, [id, 1]);
       socket.emit('test.event', id, () => {
-        testingInProgress.value[id] = 2;
+          testingInProgressEntries.value.splice(idx, 1, [id, 2]);
         setTimeout(() => {
-          testingInProgress.value[id] = 0;
+          testingInProgressEntries.value.splice(idx, 1, [id, 0]);
         }, 1000)
       });
     };
@@ -262,8 +270,6 @@ export default defineComponent({
       events,
       eventTypes,
       testingInProgress,
-      deletionInProgress,
-      heightOfElement,
       state,
       filteredEvents,
       deleteEvent,
