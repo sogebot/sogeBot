@@ -1,3 +1,5 @@
+import { setImmediate } from 'timers';
+
 import axios from 'axios';
 import { shuffle } from 'lodash';
 import { getManager, getRepository } from 'typeorm';
@@ -227,6 +229,11 @@ class Emotes extends Overlay {
   async fetchEmotesFFZ () {
     const cid = channelId.value;
     const channel = oauth.currentChannel;
+
+    if (channel.length === 0) {
+      setImmediate(() => this.fetchEmotesFFZ());
+      return;
+    }
     this.fetch.ffz = true;
 
     // fetch FFZ emotes
@@ -265,6 +272,12 @@ class Emotes extends Overlay {
 
   async fetchEmotesBTTV () {
     const channel = oauth.currentChannel;
+
+    if (channel.length === 0) {
+      setImmediate(() => this.fetchEmotesFFZ());
+      return;
+    }
+
     this.fetch.bttv = true;
 
     // fetch BTTV emotes
