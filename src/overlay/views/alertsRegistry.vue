@@ -424,15 +424,16 @@ export default class AlertsRegistryOverlays extends Vue {
               if (!o.enabled) {
                 return false;
               }
-
               if (o.filter && o.filter.items.length > 0) {
+                const script = itemsToEvalPart(o.filter.items, o.filter.operator);
+                const tierAsNumber = emitData.tier === 'Prime' ? 0 : Number(emitData.tier);
                 return safeEval(
-                  itemsToEvalPart(o.filter.items, o.filter.operator),
+                  script,
                   {
                     username: emitData.name,
                     amount: emitData.amount,
                     message: emitData.message,
-                    tier: emitData.tier,
+                    tier: tierAsNumber,
                     recipient: emitData.recipient,
                   }
                 )
