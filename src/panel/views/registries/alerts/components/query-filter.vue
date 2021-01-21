@@ -111,8 +111,8 @@ import translate from 'src/panel/helpers/translate';
 const evalComparatorMap = new Map(Object.entries({
   lt: '<',
   'lt-eq': '<=',
-  eq: '===',
-  neq: '!==',
+  eq: '==',
+  neq: '!=',
   gt: '>',
   'gt-eq': '>=',
 }));
@@ -142,6 +142,10 @@ export function itemsToEvalPart (items: any[], operator: string): string {
         } else {
           output += `${item.type} ${evalComparatorMap.get(item.comparator)} '${item.value}'`
         }
+      } else if (item.typeof === 'tier') {
+          // we need to set Prime as value 0
+          const value = item.value === 'Prime' ? 0 : item.value;
+          output += `${item.type} ${evalComparatorMap.get(item.comparator)} ${value}`;
       } else {
         if (['is-even', 'is-odd'].includes(item.comparator)) {
           output += `${item.type} % 2 === ${item.comparator === 'is-even' ? 0 : 1}`
@@ -227,6 +231,9 @@ export default defineComponent({
             } else {
               output += `${item.type} ${item.comparator} '${item.value}'`
             }
+          } else if (item.typeof === 'tier') {
+            const value = item.value === 'Prime' ? 'Prime' : item.value;
+            output += `${item.type} ${item.comparator} ${value}`;
           } else {
             if (['is-even', 'is-odd', 'pr'].includes(item.comparator)) {
               output += `${item.type} ${item.comparator}`
