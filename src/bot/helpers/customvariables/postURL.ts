@@ -18,10 +18,10 @@ async function postURL(req: any, res: any) {
         if (value.isOk) {
           if (variable.urls.find(url => url.id === req.params.id)?.showResponse) {
             if (value.updated.responseType === 0) {
-              announce(prepare('filters.setVariable', { value: value.updated.currentValue, variable: variable }), 'general');
+              announce(prepare('filters.setVariable', { value: value.setValue, variable: variable.variableName }), 'general', false);
             } else if (value.updated.responseType === 1) {
               if (value.updated.responseText) {
-                announce(value.updated.responseText.replace('$value', value.updated.currentValue), 'general');
+                announce(value.updated.responseText.replace('$value', value.setValue), 'general');
               }
             }
           }

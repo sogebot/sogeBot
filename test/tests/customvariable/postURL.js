@@ -6,7 +6,6 @@ const { getRepository } = require('typeorm');
 const v4 = require('uuid').v4;
 
 const { Variable, VariableURL } = require('../../../dest/database/entity/variable');
-const postURL = require('../../../dest/helpers/customvariables/postURL').postURL;
 const { defaultPermissions } = require('../../../dest/helpers/permissions');
 require('../../general.js');
 const db = require('../../general.js').db;
@@ -21,19 +20,45 @@ describe('Custom Variable - helpers/customvariables/postURL', () => {
     await db.cleanup();
     await message.prepare();
 
+    postURL = require('../../../dest/helpers/customvariables/postURL').postURL;
+
     const variable = await getRepository(Variable).save({
       variableName: '$_variable',
       readOnly: false,
-      currentValue: 0,
+      currentValue: '0',
       type: 'number',
       responseType: 2,
       permission: defaultPermissions.VIEWERS,
       evalValue: '',
       usableOptions: [],
     });
+
+    const variable2 = await getRepository(Variable).save({
+      variableName: '$_variable2',
+      readOnly: false,
+      currentValue: '0',
+      type: 'number',
+      responseType: 0,
+      permission: defaultPermissions.VIEWERS,
+      evalValue: '',
+      usableOptions: [],
+    });
+
+    const variable3 = await getRepository(Variable).save({
+      variableName: '$_variable3',
+      readOnly: false,
+      currentValue: '0',
+      type: 'number',
+      responseType: 1,
+      responseText: 'This is custom update text: $value',
+      permission: defaultPermissions.VIEWERS,
+      evalValue: '',
+      usableOptions: [],
+    });
     urlId = (await getRepository(VariableURL).save({ GET: false, POST: true, showResponse: false, variableId: variable.id })).id;
     urlIdWithoutPOST = (await getRepository(VariableURL).save({ GET: false, POST: false, showResponse: false, variableId: variable.id })).id;
-    urlIdWithResponse = (await getRepository(VariableURL).save({ GET: false, POST: true, showResponse: true, variableId: variable.id })).id;
+    urlIdWithResponse1 = (await getRepository(VariableURL).save({ GET: false, POST: true, showResponse: true, variableId: variable2.id })).id;
+    urlIdWithResponse2 = (await getRepository(VariableURL).save({ GET: false, POST: true, showResponse: true, variableId: variable3.id })).id;
   });
 
   it ('with enabled POST - correct value', async () => {
@@ -57,10 +82,68 @@ describe('Custom Variable - helpers/customvariables/postURL', () => {
         value: 100,
       },
     }, res);
-    assert.strictEqual(res._toSend.oldValue, '0.0');
+    assert.strictEqual(res._toSend.oldValue, '0');
     assert.strictEqual(res._toSend.value, '100');
     assert.strictEqual(res._toSend.code, undefined);
     assert.strictEqual(res._status, 200);
+    await message.isNotSentRaw('@bot, $_variable2 was set to 101.', 'bot');
+    await message.isNotSentRaw('This is custom update text: 101', 'bot');
+  });
+
+  it ('with enabled POST and response type 0 - correct value', async () => {
+    const res = {
+      _status: 0,
+      _toSend: null,
+      status(value) {
+        this._status = value;
+        return this;
+      },
+      send(value) {
+        this._toSend = value;
+        return this;
+      },
+    };
+    await postURL({
+      params: {
+        id: urlIdWithResponse1,
+      },
+      body: {
+        value: 101,
+      },
+    }, res);
+    assert.strictEqual(res._toSend.oldValue, '0');
+    assert.strictEqual(res._toSend.value, '101');
+    assert.strictEqual(res._toSend.code, undefined);
+    assert.strictEqual(res._status, 200);
+    await message.isSentRaw('@bot, $_variable2 was set to 101.', 'bot');
+  });
+
+  it ('with enabled POST and response type 1 - correct value', async () => {
+    const res = {
+      _status: 0,
+      _toSend: null,
+      status(value) {
+        this._status = value;
+        return this;
+      },
+      send(value) {
+        this._toSend = value;
+        return this;
+      },
+    };
+    await postURL({
+      params: {
+        id: urlIdWithResponse2,
+      },
+      body: {
+        value: 101,
+      },
+    }, res);
+    assert.strictEqual(res._toSend.oldValue, '0');
+    assert.strictEqual(res._toSend.value, '101');
+    assert.strictEqual(res._toSend.code, undefined);
+    assert.strictEqual(res._status, 200);
+    await message.isSentRaw('This is custom update text: 101', 'bot');
   });
 
   it ('with enabled POST - incorrect value', async () => {
