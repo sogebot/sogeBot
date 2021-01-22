@@ -14,8 +14,8 @@ import { sendMessage } from './sendMessage';
  * announce('Lorem Ipsum Dolor', 'timers);
  */
 export const announceTypes = ['bets', 'duel', 'heist', 'timers', 'songs', 'scrim', 'raffles', 'polls', 'general'] as const;
-export async function announce(messageToAnnounce: string, type: typeof announceTypes[number]) {
-  messageToAnnounce = await new Message(messageToAnnounce).parse({ sender: getBotSender() }) as string;
+export async function announce(messageToAnnounce: string, type: typeof announceTypes[number], replaceCustomVariables = true) {
+  messageToAnnounce = await new Message(messageToAnnounce).parse({ sender: getBotSender(), replaceCustomVariables }) as string;
   sendMessage(messageToAnnounce, {
     username: oauth.botUsername,
     displayName: oauth.botUsername,

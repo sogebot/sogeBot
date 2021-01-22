@@ -142,7 +142,9 @@ class Message {
     await this.parseMessageEach(youtube, attr);
     await this.parseMessageEach(random, attr);
     await this.parseMessageEach(ifp, attr, false);
-    await this.parseMessageVariables(custom, attr);
+    if (attr.replaceCustomVariables || typeof attr.replaceCustomVariables === 'undefined') {
+      await this.parseMessageVariables(custom, attr);
+    }
     await this.parseMessageEach(param, attr, true);
     // local replaces
     if (!_.isNil(attr)) {

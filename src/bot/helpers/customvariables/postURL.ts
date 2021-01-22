@@ -18,10 +18,10 @@ async function postURL(req: any, res: any) {
         if (value.isOk) {
           if (variable.urls.find(url => url.id === req.params.id)?.showResponse) {
             if (value.updated.responseType === 0) {
-              announce(prepare('filters.setVariable', { value: value.updated.currentValue, variable: variable }), 'general');
+              announce(prepare('filters.setVariable', { value: value.setValue, variable: variable.variableName }), 'general', false);
             } else if (value.updated.responseType === 1) {
               if (value.updated.responseText) {
-                announce(value.updated.responseText.replace('$value', value.updated.currentValue), 'general');
+                announce(value.updated.responseText.replace('$value', value.setValue), 'general');
               }
             }
           }
@@ -35,7 +35,7 @@ async function postURL(req: any, res: any) {
     } else {
       return res.status(404).send({ error: 'Variable not found', code: 404 });
     }
-  } catch (e) {
+  } catch (e) /* istanbul ignore next */ {
     res.status(500).send({ error: 'Internal Server Error', code: 500 });
     throw e;
   }
