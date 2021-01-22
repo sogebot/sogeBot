@@ -36,6 +36,7 @@ async function postURL(req: any, res: any) {
       return res.status(404).send({ error: 'Variable not found', code: 404 });
     }
   } catch (e) {
+    /* istanbul ignore next */
     res.status(500).send({ error: 'Internal Server Error', code: 500 });
     throw e;
   }
