@@ -130,10 +130,10 @@
     "name": "Měřítko"
   },
   "translateY": {
-    "name": "Move -Up / +Down"
+    "name": "Posunout -nahoru / +dolů"
   },
   "translateX": {
-    "name": "Move -Left / +Right"
+    "name": "Posunout -vlevo / +vpravo"
   },
   "image": {
     "name": "Obrázek / Video(.webm)",
