@@ -1,6 +1,6 @@
 import axios from 'axios';
 import chalk from 'chalk';
-import { io, Socket } from 'socket.io-client';
+import io from 'socket.io-client-legacy';
 import { getRepository } from 'typeorm';
 
 import currency from '../currency';
@@ -52,7 +52,7 @@ type TipeeestreamEvent = {
 };
 
 class TipeeeStream extends Integration {
-  socketToTipeeestream: Socket | null = null;
+  socketToTipeeestream: any | null = null;
 
   @settings()
   @ui({ type: 'text-input', secret: false })
@@ -74,7 +74,7 @@ class TipeeeStream extends Integration {
 
   async disconnect () {
     if (this.socketToTipeeestream !== null) {
-      this.socketToTipeeestream.offAny();
+      this.socketToTipeeestream.removeAllListeners();
       this.socketToTipeeestream.disconnect();
       this.socketToTipeeestream = null;
     }
