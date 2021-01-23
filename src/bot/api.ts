@@ -473,7 +473,7 @@ class API extends Core {
 
   }
 
-  async getChannelSubscribers<T extends { cursor?: string; count?: number; noAffiliateOrPartnerWarningSent?: boolean; notCorrectOauthWarningSent?: boolean; subscribers?: SubscribersEndpoint['data'] }> (opts: T): Promise<{ state: boolean; opts: T }> {
+  async getChannelSubscribers<T extends { cursor?: string; noAffiliateOrPartnerWarningSent?: boolean; notCorrectOauthWarningSent?: boolean; subscribers?: SubscribersEndpoint['data'] }> (opts: T): Promise<{ state: boolean; opts: T }> {
     opts = opts || {};
 
     const cid = channelId.value;
@@ -481,13 +481,9 @@ class API extends Core {
     if (opts.cursor) {
       url += '&after=' + opts.cursor;
     } else {
-      // cursor is empty so we remove subscribers and count
+      // cursor is empty so we remove subscribers
       delete opts.subscribers;
-      delete opts.count;
     }
-    if (typeof opts.count === 'undefined') {
-      opts.count = -1;
-    } // start at -1 because owner is subbed as well
 
     const token = oauth.broadcasterAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
@@ -502,7 +498,6 @@ class API extends Core {
             currentSubscribers: 0,
           };
         }
-        delete opts.count;
         return { state: false, opts: { ...opts, noAffiliateOrPartnerWarningSent: true } };
       } else {
         return { state: false, opts: { ...opts, noAffiliateOrPartnerWarningSent: false } };
@@ -532,11 +527,11 @@ class API extends Core {
 
       if (subscribers.length === 100) {
         // move to next page
-        return this.getChannelSubscribers({ ...opts, cursor: request.data.pagination.cursor, count: opts.subscribers.length + opts.count, z: opts.subscribers });
+        return this.getChannelSubscribers({ ...opts, cursor: request.data.pagination.cursor, subscribers: opts.subscribers });
       } else {
         apiStats.value = {
           ...apiStats.value,
-          currentSubscribers: subscribers.length + opts.count,
+          currentSubscribers: opts.subscribers.length - 1, // exclude owner
         };
         this.setSubscribers(opts.subscribers.filter(o => !isBotId(o.user_id)));
         if (opts.subscribers.find(o => isBotId(o.user_id))) {
