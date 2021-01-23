@@ -28,8 +28,6 @@ class OAuth extends Core {
   public profileImageUrl = '';
   public broadcaster = '';
   public bot = '';
-  public botId = '';
-  public broadcasterId = '';
   @persistent()
   public botClientId = '';
   @persistent()
@@ -202,18 +200,6 @@ class OAuth extends Core {
     botUsername.value = this.botUsername;
   }
 
-  @onChange('botId')
-  @onLoad('botId')
-  setBotId() {
-    botId.value = this.botId;
-  }
-
-  @onChange('broadcasterId')
-  @onLoad('broadcasterId')
-  setBroadcasterId() {
-    broadcasterId.value = this.broadcasterId;
-  }
-
   @onChange('broadcasterUsername')
   @onLoad('broadcasterUsername')
   setBroadcasterUsername() {
@@ -306,13 +292,13 @@ class OAuth extends Core {
 
       if (type === 'bot') {
         this.botClientId = request.data.client_id;
-        this.botId = request.data.user_id;
+        botId.value = request.data.user_id;
       } else {
         this.broadcasterClientId = request.data.client_id;
-        this.broadcasterId = request.data.user_id;
+        broadcasterId.value = request.data.user_id;
       }
 
-      if (type === 'bot' && this.botId === this.broadcasterId) {
+      if (type === 'bot' && botId.value === broadcasterId.value) {
         warning('You shouldn\'t use same account for bot and broadcaster!');
       }
 
@@ -343,11 +329,11 @@ class OAuth extends Core {
         this.refreshAccessToken(type);
       } else {
         if (type === 'bot') {
-          this.botId = '';
+          botId.value = '';
           this.botUsername = '';
           this.botCurrentScopes = [];
         } else {
-          this.broadcasterId = '';
+          broadcasterId.value = '';
           this.broadcasterUsername = '';
           this.broadcasterCurrentScopes = [];
         }
@@ -402,11 +388,11 @@ class OAuth extends Core {
       return request.data.token;
     } catch (e) {
       if (type === 'bot') {
-        this.botId = '';
+        botId.value = '';
         this.botUsername = '';
         this.botCurrentScopes = [];
       } else {
-        this.broadcasterId = '';
+        broadcasterId.value = '';
         this.broadcasterUsername = '';
         this.broadcasterCurrentScopes = [];
       }

@@ -5,6 +5,7 @@ import WebSocket from 'ws';
 import { SECOND } from './constants';
 import { eventEmitter } from './helpers/events';
 import { ban, debug, error, info, redeem, timeout, unban, warning } from './helpers/log';
+import { broadcasterId } from './helpers/oauth/broadcasterId';
 import { addUIError } from './helpers/panel/alerts';
 import oauth from './oauth';
 import alerts from './registries/alerts';
@@ -26,8 +27,8 @@ setInterval(() => {
       connectionHash = '';
     }
 
-    if (oauth.broadcasterAccessToken.length > 0 && oauth.broadcasterClientId.length > 0 && oauth.broadcasterId.length > 0) {
-      const newConnectionHash = oauth.broadcasterClientId.concat(oauth.broadcasterId);
+    if (oauth.broadcasterAccessToken.length > 0 && oauth.broadcasterClientId.length > 0 && broadcasterId.value.length > 0) {
+      const newConnectionHash = oauth.broadcasterClientId.concat(broadcasterId.value);
       if (connectionHash !== newConnectionHash) {
         debug('pubsub', `${connectionHash} != ${newConnectionHash}`);
         ws?.close();
@@ -63,8 +64,8 @@ const connect = () => {
     heartbeat();
 
     // listen to points redemption
-    listen('channel-points-channel-v1.' + oauth.broadcasterId);
-    listen('chat_moderator_actions.' + oauth.broadcasterId);
+    listen('channel-points-channel-v1.' + broadcasterId.value);
+    listen('chat_moderator_actions.' + broadcasterId.value);
     heartbeatHandle = setInterval(heartbeat, heartbeatInterval);
   };
 

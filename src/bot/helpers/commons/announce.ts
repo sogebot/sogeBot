@@ -4,6 +4,7 @@ import Discord from '../../integrations/discord';
 import { Message } from '../../message';
 import oauth from '../../oauth';
 import { chatOut } from '../log';
+import { botId } from '../oauth/botId';
 import { getBotSender } from './getBotSender';
 import { sendMessage } from './sendMessage';
 
@@ -19,7 +20,7 @@ export async function announce(messageToAnnounce: string, type: typeof announceT
   sendMessage(messageToAnnounce, {
     username: oauth.botUsername,
     displayName: oauth.botUsername,
-    userId: oauth.botId,
+    userId: botId.value,
     emotes: [],
     badges: {},
     'message-type': 'chat',
