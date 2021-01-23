@@ -27,6 +27,7 @@ import { generateUsername } from './helpers/generateUsername';
 import { getLocalizedName } from './helpers/getLocalized';
 import { debug, error, info, warning } from './helpers/log';
 import { channelId } from './helpers/oauth';
+import { broadcasterId } from './helpers/oauth/broadcasterId';
 import { ioServer } from './helpers/panel';
 import { addUIError } from './helpers/panel/';
 import { parserEmitter } from './helpers/parser/';
@@ -357,7 +358,7 @@ class Events extends Core {
 
     if (global.mocha) {
       parserEmitter.emit('process', {
-        sender: { username: oauth.broadcasterUsername, userId: oauth.broadcasterId },
+        sender: { username: oauth.broadcasterUsername, userId: broadcasterId.value },
         message: command,
         skip: true,
         quiet: _.get(operation, 'isCommandQuiet', false) as boolean,
@@ -371,7 +372,7 @@ class Events extends Core {
     } else {
       tmi.message({
         message: {
-          tags: { username: oauth.broadcasterUsername , userId: oauth.broadcasterId},
+          tags: { username: oauth.broadcasterUsername , userId: broadcasterId.value},
           message: command,
         },
         skip: false,

@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import { sendMessage } from '../helpers/commons/sendMessage';
+import { botId } from '../helpers/oauth/botId';
 import { generalChannel } from '../helpers/oauth/generalChannel';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { getIgnoreList } from '../helpers/user/isIgnored';
@@ -18,7 +19,7 @@ class Chat extends Widget {
       sendMessage(message, {
         username: OAuth.botUsername,
         displayName: OAuth.botUsername,
-        userId: OAuth.botId,
+        userId: botId.value,
         emotes: [],
         badges: {},
         'message-type': 'chat',

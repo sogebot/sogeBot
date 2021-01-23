@@ -24,6 +24,8 @@ import { getBroadcaster } from './helpers/getBroadcaster';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import { debug, error, follow, info, start, stop, unfollow, warning } from './helpers/log';
 import { channelId, loadedTokens } from './helpers/oauth';
+import { botId } from './helpers/oauth/botId';
+import { broadcasterId } from './helpers/oauth/broadcasterId';
 import { ioServer } from './helpers/panel';
 import { addUIError } from './helpers/panel/';
 import { linesParsed, setStatus } from './helpers/parser';
@@ -257,7 +259,7 @@ class API extends Core {
     const token = oauth.broadcasterAccessToken;
     const needToWait = token === '';
     const notEnoughAPICalls = calls.broadcaster.remaining <= 30 && calls.broadcaster.refresh > Date.now() / 1000;
-    const missingBroadcasterId = oauth.broadcasterId.length === 0;
+    const missingBroadcasterId = broadcasterId.value.length === 0;
 
     if (!oauth.broadcasterCurrentScopes.includes('moderation:read')) {
       if (!opts.isWarned) {
@@ -271,7 +273,7 @@ class API extends Core {
     if ((needToWait || notEnoughAPICalls || missingBroadcasterId)) {
       return { state: false };
     }
-    const url = `https://api.twitch.tv/helix/moderation/moderators?broadcaster_id=${oauth.broadcasterId}`;
+    const url = `https://api.twitch.tv/helix/moderation/moderators?broadcaster_id=${broadcasterId.value}`;
     try {
       const request = await axios.request<{ pagination: any, data: { user_id: string; user_name: string }[] }>({
         method: 'get',
@@ -294,7 +296,7 @@ class API extends Core {
         userId: In(data.map(o => Number(o.user_id))),
       }, { isModerator: true });
 
-      setStatus('MOD', data.map(o => o.user_id).includes(oauth.botId));
+      setStatus('MOD', data.map(o => o.user_id).includes(botId.value));
     } catch (e) {
       if (e.isAxiosError) {
         error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
