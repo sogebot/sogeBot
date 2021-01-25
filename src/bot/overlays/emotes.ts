@@ -10,7 +10,7 @@ import { parserReply } from '../commons';
 import * as constants from '../constants';
 import { CacheEmotes, CacheEmotesInterface } from '../database/entity/cacheEmotes';
 import { parser, settings, ui } from '../decorators';
-import { onStartup } from '../decorators/on';
+import { onStartup, onStreamStart } from '../decorators/on';
 import { prepare } from '../helpers/commons';
 import { error, info, warning } from '../helpers/log';
 import { channelId } from '../helpers/oauth';
@@ -89,6 +89,7 @@ class Emotes extends Overlay {
   comboLastBreak = 0;
 
   @onStartup()
+  @onStreamStart()
   onStartup() {
     if (!this.fetch.global) {
       this.fetchEmotesGlobal();
