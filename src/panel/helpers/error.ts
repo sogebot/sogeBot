@@ -5,4 +5,8 @@ const error = (err: string, title?: string) => {
   console.error(err);
 };
 
-export { error };
+const success = (message: string, title: string) => {
+  EventBus.$emit('success', { name: title, message });
+};
+
+export { error, success };
