@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { parserReply } from '../commons';
+import * as constants from '../constants';
 import { Alias as AliasEntity } from '../database/entity/alias';
 import { command, default_permission, parser } from '../decorators';
 import Expects from '../expects';
@@ -74,7 +75,7 @@ class Alias extends System {
     });
   }
 
-  @parser()
+  @parser({ priority: constants.LOW })
   async run (opts: ParserOptions): Promise<boolean> {
     const p = new Parser();
     let alias;
