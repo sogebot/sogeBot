@@ -116,9 +116,6 @@
         </b-btn-group>
       </template>
     </panel>
-
-    <loading v-if="state.loading !== $state.success" slow/>
-    <template v-else>
       <b-sidebar
         @change="isSidebarVisibleChange"
         :visible="isSidebarVisible"
@@ -130,9 +127,14 @@
         right
         backdrop>
         <template v-slot:footer="{ hide }">
-          <div class="d-flex bg-opaque align-items-center px-3 py-2 border-top border-gray" style="justify-content: flex-end">
-            <b-button class="mx-2" @click="hide" variant="link">{{ translate('dialog.buttons.close') }}</b-button>
-            <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$invalid && !!$v.$dirty"/>
+          <div class="d-flex bg-opaque align-items-center px-3 py-2 border-top border-gray">
+            <div class="w-100">
+              <b-button @click="del()" variant="outline-danger" class="border-0">Delete</b-button>
+            </div>
+            <div class="w-100 text-right">
+              <b-button class="mx-2" @click="hide" variant="link">{{ translate('dialog.buttons.close') }}</b-button>
+              <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$invalid && !!$v.$dirty"/>
+            </div>
           </div>
         </template>
         <div class="px-3 py-2">
@@ -548,6 +550,9 @@
           </b-form>
         </div>
       </b-sidebar>
+
+      <loading v-if="state.loading !== $state.success" slow/>
+      <template v-else>
       <b-table
         hover striped small
         style="cursor: pointer;"
@@ -677,6 +682,7 @@ const socketEventList = getSocket('/overlays/eventlist');
 
 import VueFlatPickr from 'vue-flatpickr-component';
 import 'flatpickr/dist/flatpickr.css';
+import { error, success } from 'src/panel/helpers/error';
 
 export default defineComponent({
   mixins: [ validationMixin ],
@@ -975,6 +981,39 @@ export default defineComponent({
       }
     }
 
+    const del = () => {
+      if (!editationItem.value) {
+        return;
+      }
+
+      const h = ctx.root.$createElement
+      // Using HTML string
+      const titleVNode = h('div', {
+        domProps: {
+          innerHTML: `Are you sure you want to delete <strong>ALL DATA</strong> from user <strong>${editationItem.value.username}</strong> <small>(${editationItem.value.userId})</small>`
+        }
+      })
+      ctx.root.$bvModal.msgBoxConfirm([titleVNode], {
+        okVariant: 'danger',
+      })
+        .then(value => {
+          if (value && editationItem.value) {
+            const userId = editationItem.value.userId;
+            const username = editationItem.value.username;
+            socket.emit('viewers::remove', editationItem.value, () => {
+              refresh();
+              ctx.root.$router.push({ name: 'viewersManagerList' }).catch(() => {});
+              success(`User <strong>${username}</strong> <small>(${userId})</small> was deleted from database.`, `User ${username}#${userId} deleted`);
+              isSidebarVisible.value = false;
+            })
+          }
+        })
+        .catch(err => {
+          error(err);
+          // An error occurred
+        })
+    }
+
     const save = () => {
       if (!editationItem.value) {
         return;
@@ -1055,6 +1094,7 @@ export default defineComponent({
       resetSubgifts,
       forceCheckFollowedAt,
       save,
+      del,
 
       get,
       capitalize,

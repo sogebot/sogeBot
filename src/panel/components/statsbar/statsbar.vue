@@ -1,6 +1,6 @@
 <template>
   <div class="stream-info-container container-fluid" :class="{ 'sticky-top': b_sticky }" :style="{ 'top': b_sticky ? top + 'px' : undefined }" ref="quickwindow">
-    <b-toast :title="error.name" no-auto-hide visible :variant="error.type === 'error' ? 'danger' : 'info'" v-for="error of errors" :key="error.name + error.message + error.date">
+    <b-toast :title="error.name" :no-auto-hide="getErrorType(error.type) !== 'success'" visible :variant="getErrorType(error.type)" v-for="error of errors" :key="error.name + error.message + error.date">
       <div v-html="error.message"/>
     </b-toast>
     <b-toast :title="translate('errors.channel_is_not_set')" no-auto-hide visible variant="danger" solid v-if="!$store.state.configuration.isChannelSet">
@@ -466,7 +466,7 @@ const numberReducer = (out: string, item: any) => {
 
 export default defineComponent({
   setup(props, context) {
-    const errors: Ref<(UIError & { date: number, type: 'error' | 'warn' })[]> = ref([]);
+    const errors: Ref<(UIError & { date: number, type: 'error' | 'warn' | 'success' })[]> = ref([]);
     const averageStats: any = reactive({});
     const hideStats = ref(localStorage.getItem('hideStats') === 'true');
     const timestamp: Ref<null | number> = ref(null);
@@ -539,6 +539,16 @@ export default defineComponent({
       cachedTitle.value = raw
       return raw
     };
+    const getErrorType = (type: string) => {
+      switch (type) {
+        case 'error':
+          return 'danger';
+        case 'success':
+          return 'success';
+        default:
+          return 'info';
+      }
+    }
     const saveHighlight = () => highlightsSocket.emit('highlight');
     const filterTags = (is_auto: boolean) => {
         return tags.value.filter(o => !!o.is_auto === is_auto).map((o) => {
@@ -638,6 +648,9 @@ export default defineComponent({
       EventBus.$on('error', (err: UIError) => {
         errors.value.push({ ...err, date: Date.now(), type: 'error' });
       })
+      EventBus.$on('success', (err: UIError) => {
+        errors.value.push({ ...err, date: Date.now(), type: 'success' });
+      })
 
       getLatestStats();
 
@@ -724,6 +737,7 @@ export default defineComponent({
       getTime,
       translate,
       numberReducer,
+      getErrorType,
     }
   }
 });

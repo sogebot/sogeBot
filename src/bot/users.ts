@@ -332,7 +332,7 @@ class Users extends Core {
     });
     adminEndpoint(this.nsp, 'viewers::remove', async (viewer: Required<UserInterface>, cb) => {
       try {
-        await getRepository(User).remove(viewer);
+        cb(null, await getRepository(User).remove(viewer));
       } catch (e) {
         error(e);
         cb(e.stack);
