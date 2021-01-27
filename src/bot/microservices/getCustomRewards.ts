@@ -92,61 +92,59 @@ export const getCustomRewards = async (): Promise<getCustomRewardReturn> => {
     }
     return toReturn;
   } catch (e) {
+    debug('microservice', 'getCustomRewards::error - ' + JSON.stringify(e));
     if (e.message.includes('channelId')) {
       e.message = 'You need to set your channel first.';
-      warning('You need to set your channel first.');
-    } else {
-      warning(e.stack);
+      warning('Microservice getCustomRewards ended with error: You need to set your channel first.');
     }
-    if (e.isAxiosError) {
-      if (e.response.data === 'channel points are not available for the broadcaster') {
-        warning('Microservice getCustomRewards ended with error: channel points are not available for the broadcaster');
-        const toReturn = {
-          headers: e.response.headers,
-          url: e.config.url,
-          method: e.config.method.toUpperCase(),
-          status: e.response.status ?? 'n/a',
-          response: null,
-        } as const;
 
-        debug('microservice', 'getCustomRewards::return');
-        debug('microservice', toReturn);
-        if (!isMainThread) {
-          parentPort?.postMessage(toReturn);
-        }
-        return toReturn;
-      } else {
-        warning('Microservice getCustomRewards ended with error');
-        const toReturn = {
-          headers: e.response.headers,
-          url: e.config.url,
-          method: e.config.method.toUpperCase(),
-          status: e.response.status ?? 'n/a',
-          response: e.response.data,
-          error: e,
-        } as const;
+    const errors = {
+      403: 'Microservice getCustomRewards ended with error: Forbidden: Channel Points are not available for the broadcaster',
+      404: 'Not Found: No Custom Rewards with the specified IDs were found',
+    } as const;
 
-        debug('microservice', 'getCustomRewards::return');
-        debug('microservice', toReturn);
-        if (!isMainThread) {
-          parentPort?.postMessage(toReturn);
-        }
-        return toReturn;
-      }
-    } else {
-      warning('Microservice getCustomRewards ended with error');
+    if (Object.keys(errors).includes(String(e.response.status))) {
+      warning(errors[e.response.status as keyof typeof errors]);
       const toReturn = {
-        headers: {
-          'ratelimit-remaining': 800,
-          'ratelimit-reset': Date.now(),
-          'ratelimit-limit': 800,
-        },
-        url: 'n/a',
-        method: 'GET',
-        status: e.response?.status ?? 'n/a',
+        headers: e.response.headers,
+        url: e.config.url,
+        method: e.config.method.toUpperCase(),
+        status: e.response.status,
         response: null,
+      } as const;
+
+      debug('microservice', 'getCustomRewards::return');
+      debug('microservice', toReturn);
+      if (!isMainThread) {
+        parentPort?.postMessage(toReturn);
+      }
+      return toReturn;
+    } else if (e.isAxiosError) {
+      warning('Microservice getCustomRewards ended with error: unknown HTTP request error');
+      const toReturn = {
+        headers: e.response.headers,
+        url: e.config.url,
+        method: e.config.method.toUpperCase(),
+        status: e.response.status ?? 'n/a',
+        response: null,
+      } as const;
+
+      debug('microservice', 'getCustomRewards::return');
+      debug('microservice', toReturn);
+      if (!isMainThread) {
+        parentPort?.postMessage(toReturn);
+      }
+      return toReturn;
+    } else {
+      warning('Microservice getCustomRewards ended with error: unknown error');
+      const toReturn = {
+        headers: e.response.headers,
+        url: e.config.url,
+        method: e.config.method.toUpperCase(),
+        status: e.response.status ?? 'n/a',
+        response: e.response.data,
         error: e,
-      };
+      } as const;
 
       debug('microservice', 'getCustomRewards::return');
       debug('microservice', toReturn);
