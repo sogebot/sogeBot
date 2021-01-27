@@ -34,7 +34,7 @@
           target="_blank"
           />
         <b-alert show variant="info" v-if="pending" v-html="translate('dialog.changesPending')" class="mr-2 p-2 mb-0"></b-alert>
-        <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$error || !isAllValid"/>
+        <state-button @click="save()" :key="'save-' + keyDate" text="saveChanges" :state="state.save" :invalid="!!$v.$error || !isAllValid()"/>
       </template>
     </panel>
 
@@ -143,10 +143,10 @@
         </b-col>
         <b-col>
           <b-card :key="'b-card' + selectedAlertId + selectedAlertType">
-            <form-follow :event="selectedAlertType" v-if="['cmdredeems', 'follows', 'subs', 'subgifts', 'subcommunitygifts', 'raids', 'hosts'].includes(selectedAlertType)" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
-            <form-cheers :event="selectedAlertType" v-else-if="selectedAlertType === 'cheers' || selectedAlertType === 'tips'" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
-            <form-resubs :event="selectedAlertType" v-else-if="selectedAlertType === 'resubs'" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
-            <form-reward :event="selectedAlertType" v-else-if="selectedAlertType === 'rewardredeems'" :validationDate.sync="validationDate" :type="selectedAlertType" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @delete="deleteVariant(selectedAlertType, $event)"/>
+            <form-follow :event="selectedAlertType" v-if="['cmdredeems', 'follows', 'subs', 'subgifts', 'subcommunitygifts', 'raids', 'hosts'].includes(selectedAlertType)" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @update="keyDate = Date.now()" @delete="deleteVariant(selectedAlertType, $event)"/>
+            <form-cheers :event="selectedAlertType" v-else-if="selectedAlertType === 'cheers' || selectedAlertType === 'tips'" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @update="keyDate = Date.now()" @delete="deleteVariant(selectedAlertType, $event)"/>
+            <form-resubs :event="selectedAlertType" v-else-if="selectedAlertType === 'resubs'" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @update="keyDate = Date.now()" @delete="deleteVariant(selectedAlertType, $event)"/>
+            <form-reward :event="selectedAlertType" v-else-if="selectedAlertType === 'rewardredeems'" :validationDate.sync="validationDate" :type="selectedAlertType" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @update="keyDate = Date.now()" @delete="deleteVariant(selectedAlertType, $event)"/>
           </b-card>
         </b-col>
       </b-row>
@@ -219,6 +219,7 @@ export default class AlertsEdit extends Vue {
 
   error: any = null;
   validationDate = Date.now();
+  keyDate = Date.now();
 
   state: { loaded: number; save: number } = { loaded: this.$state.progress, save: this.$state.idle }
   pending: boolean = false;
@@ -267,8 +268,9 @@ export default class AlertsEdit extends Vue {
     rewardredeems: {},
   };
 
-  get isAllValid() {
+  isAllValid() {
     for (const key of Object.keys(this.isValid)) {
+      console.log(this.isValid[key as keyof AlertsEdit['isValid']]);
       if (!every(this.isValid[key as keyof AlertsEdit['isValid']])) {
         return false;
       }
@@ -546,7 +548,7 @@ export default class AlertsEdit extends Vue {
               },
             },
             messageTemplate: '{name} was redeemed by {recipient}!',
-            rewardId: '',
+            rewardId: null,
           })
           break;
         case 'cmdredeems':
@@ -671,19 +673,19 @@ export default class AlertsEdit extends Vue {
   async save () {
     this.validationDate = Date.now();
     this.$v.$touch();
-    if (!this.$v.$invalid) {
+    if (!this.$v.$invalid && this.isAllValid()) {
       this.state.save = this.$state.progress;
       this.item.updatedAt = Date.now(); // save updateAt
       console.debug('Saving', this.item);
       this.socket.emit('alerts::save', this.item, (err: string | null, data: AlertInterface) => {
         if (err) {
           this.state.save = this.$state.fail;
-          return console.error(err);
+          console.error(err);
+        } else {
+          this.state.save = this.$state.success;
+          this.pending = false;
+          this.$router.push({ name: 'alertsEdit', params: { id: String(data.id) } }).catch(err => {})
         }
-
-        this.state.save = this.$state.success;
-        this.pending = false;
-        this.$router.push({ name: 'alertsEdit', params: { id: String(data.id) } }).catch(err => {})
 
         setTimeout(() => {
           this.state.save = this.$state.idle;

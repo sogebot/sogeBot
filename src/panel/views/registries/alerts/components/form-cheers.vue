@@ -499,8 +499,10 @@ export default class AlertsEditCheersForm extends Vue {
     this.$v.$touch();
   }
 
+  @Watch('data', { deep: true })
   @Watch('$v', { deep: true })
   emitValidation() {
+    this.$emit('update')
     this.$emit('update:isValid', !this.$v.$error)
   }
 
