@@ -135,7 +135,7 @@ export interface AlertMediaInterface {
 }
 
 export interface AlertRewardRedeemInterface extends AlertTipInterface {
-  rewardId: string;
+  rewardId: null | string;
 }
 
 export interface AlertTipInterface extends CommonSettingsInterface {
@@ -489,7 +489,7 @@ export const AlertRewardRedeem = new EntitySchema<Readonly<Required<AlertRewardR
   columns: {
     ...CommonSettingsSchema,
     message: { type: 'simple-json' },
-    rewardId: { type: String },
+    rewardId: { type: String }, // even when rewardId type can be null, we don't want it to be saved in database
   },
   relations: {
     alert: {

@@ -1,7 +1,11 @@
 <template>
   <span>
     <b-input-group>
-      <b-form-select v-model="selectedReward" :options="redeemRewardsWithForcedSelected(selectedReward)" :state="state"></b-form-select>
+      <b-form-select v-model="selectedReward" :options="redeemRewards" :state="state">
+        <template #first>
+          <b-form-select-option :value="null" disabled>-- Please select a custom reward --</b-form-select-option>
+        </template>
+      </b-form-select>
       <b-input-group-append>
         <b-button text="Refresh" variant="secondary" @click="refreshRedeemedRewards()"><fa icon="sync" :spin="progress.redeemRewards === ButtonStates.progress"/></b-button>
       </b-input-group-append>
@@ -36,9 +40,6 @@ export default defineComponent({
       redeemRewards: ButtonStates.progress
     } as { redeemRewards: number })
 
-    const redeemRewardsWithForcedSelected = (selected: string) => {
-      return Array.from(new Set([selected, ...redeemRewards.value]));
-    }
     const refreshRedeemedRewards = async () => {
       progress.value.redeemRewards = ButtonStates.progress;
       return new Promise<void>(resolve => {
@@ -64,8 +65,8 @@ export default defineComponent({
     return {
       progress,
       selectedReward,
+      redeemRewards,
 
-      redeemRewardsWithForcedSelected,
       refreshRedeemedRewards,
 
       translate,
