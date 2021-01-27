@@ -31,7 +31,7 @@
       </b-form-group>
 
       <b-form-group
-        v-show="event === 'rewardredeems'"
+        v-if="event === 'rewardredeems'"
         :label="translate('events.definitions.titleOfReward.label')"
         :label-for="'selectReward'"
       >
@@ -56,7 +56,7 @@
         </b-input-group>
       </b-form-group>
 
-      <b-form-group id="event-amount-input" :label="amountLabel" label-for="event-amount-input-text" v-show="haveAmount">
+      <b-form-group id="event-amount-input" :label="amountLabel" label-for="event-amount-input-text" v-if="haveAmount">
         <b-input-group>
           <template #prepend>
             <b-button :variant="isAmountRandomized ? 'success':'danger'" @click="isAmountRandomized = !isAmountRandomized">
@@ -131,7 +131,7 @@
         </b-input-group>
       </b-form-group>
 
-      <b-form-group id="event-tier-input" :label="translate('registry.alerts.testDlg.tier')" label-for="event-tier-input-text" v-show="haveTier">
+      <b-form-group id="event-tier-input" :label="translate('registry.alerts.testDlg.tier')" label-for="event-tier-input-text" v-if="haveTier">
         <b-input-group>
           <template #prepend>
             <b-button :variant="isTierRandomized ? 'success':'danger'" @click="isTierRandomized = !isTierRandomized">
@@ -176,7 +176,7 @@ export default defineComponent({
   setup(props, ctx) {
     const event = ref('follows' as typeof events[number])
     const username = ref('');
-    const reward = ref('');
+    const reward = ref(null as null | string);
     const isUsernameRandomized = ref(true);
 
     const recipient = ref('');
@@ -240,7 +240,7 @@ export default defineComponent({
       const emit: EmitData = {
         amount: isAmountRandomized.value ? Math.floor(Math.random() * 1000) : amount.value,
         name:
-          event.value === 'rewardredeems' ? reward.value :
+          event.value === 'rewardredeems' ? reward.value || '' :
             (isUsernameRandomized.value ? generateUsername() : username.value),
         tier: isTierRandomized.value ? tiers[shuffle([0,1,2,3])[0]] : tier.value,
         recipient: isRecipientRandomized.value ? generateUsername() : recipient.value,
