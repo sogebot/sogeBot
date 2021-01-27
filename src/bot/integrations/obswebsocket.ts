@@ -66,6 +66,7 @@ class OBSWebsocket extends Integration {
           }
         }
       } else {
+        this.enableHeartBeat = false;
         info('OBSWEBSOCKET: Integration is enabled, but you need to use overlay to connect to OBS Websocket.');
       }
     }
