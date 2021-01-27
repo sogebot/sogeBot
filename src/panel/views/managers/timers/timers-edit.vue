@@ -70,7 +70,7 @@
 
       <b-form-group>
         <label>{{translate('timers.dialog.responses')}}</label>
-        <b-input-group v-for="(response, index) of item.messages" :key="index" class="pb-1">
+        <b-input-group v-for="(response, index) of item.messages" class="pb-1" :key="response">
           <b-alert show variant="danger" v-if="markToDeleteIdx.includes(index)"
           style="position: absolute;
                  z-index: 9;
@@ -230,12 +230,12 @@ export default defineComponent({
       ctx.emit('update:invalid', ($v?.item.name?.$error && $v.item.name.$dirty) || stateOfMessagesErrorsDirty());
       if (!$v?.$error) {
         ctx.emit('update:saveState', ButtonStates.progress);
-        const messages = [];
-        for(let i = 0; i < item.value.messages.length; i++) {
-          if (!markToDeleteIdx.value.includes(i)) {
-            messages.push(item.value.messages[i])
+        const messages: typeof item.value.messages = [];
+        item.value.messages.forEach((message, index) => {
+          if (!markToDeleteIdx.value.includes(index)) {
+            messages.push(message)
           }
-        }
+        })
         const toSave = {
           ...item.value,
           messages,
