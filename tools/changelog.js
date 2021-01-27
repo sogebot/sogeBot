@@ -71,34 +71,26 @@ if (argv._[0] === 'generate') {
     if (tagsToGenerate.length > 1) {
       const latestMinorTag = tagsToGenerate[0];
 
-      const minorChangesList = [];
-
+      // get change between new and last versions
+      changesList.push(`## ${latestMinorTag}\n\n`);
+      let changesSpawn;
       if (tagsToGenerate[tagsToGenerate.length - 2] === latestMinorTag) {
-        minorChangesList.push(`## ${latestMinorTag}\n\n`);
+        changesSpawn = spawnSync('git', ['log', `${majorTagRelease}...${latestMinorTag}`, '--oneline']);
       } else {
-        minorChangesList.push(`## ${tagsToGenerate[tagsToGenerate.length - 2]} - ${latestMinorTag}\n\n`);
+        changesSpawn = spawnSync('git', ['log', `${tagsToGenerate[1]}...${latestMinorTag}`, '--oneline']);
       }
-
-      minorChangesList.push(`:information_source: Fixes tagged with **\\*** are newly added for release ${latestMinorTag}\n\n`);
-
-      const changesSpawn = spawnSync('git', ['log', `${majorTagRelease}...${latestMinorTag}`, '--oneline']);
-      minorChangesList.push(...changes(changesSpawn.stdout.toString().split('\n')));
-
-      // add *new* to commits introduced in this patch
-      const changesSpawnLatestOnly = spawnSync('git', ['log', `${tagsToGenerate[1]}...${latestMinorTag}`, '--oneline']);
-      const changesLatestOnly = changes(changesSpawnLatestOnly.stdout.toString().split('\n'));
-      changesList.push(...minorChangesList.map(o => {
-        if (changesLatestOnly.includes(o)) {
-          return o.replace('* **', '* **\*');
-        } else {
-          return o;
-        }
-      }));
+      changesList.push(...changes(changesSpawn.stdout.toString().split('\n')));
     }
 
     // major patch changelog
-    changesList.push(`## ${latestMajorVersion}.${latestMinorVersion}.0\n\n`);
-    const changesSpawn = spawnSync('git', ['log', `${beforeTag}...${majorTagRelease}`, '--oneline']);
+    let changesSpawn;
+    if (tagsToGenerate.length > 1 && tagsToGenerate[1] !== majorTagRelease) {
+      changesList.push(`## ${latestMajorVersion}.${latestMinorVersion}.0 - ${tagsToGenerate[1]}\n\n`);
+      changesSpawn = spawnSync('git', ['log', `${beforeTag}...${tagsToGenerate[1]}`, '--oneline']);
+    } else {
+      changesList.push(`## ${latestMajorVersion}.${latestMinorVersion}.0\n\n`);
+      changesSpawn = spawnSync('git', ['log', `${beforeTag}...${majorTagRelease}`, '--oneline']);
+    }
     changesList.push(...changes(changesSpawn.stdout.toString().split('\n')));
 
     for (const output of changesList) {
