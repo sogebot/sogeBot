@@ -1,11 +1,11 @@
 <template>
-  <component :is="type" />
+  <component v-if="type" :is="type.value" :opts="type.opts" />
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from '@vue/composition-api'
 import { getSocket } from 'src/panel/helpers/socket';
-import type { OverlayMapperInterface } from 'src/bot/database/entity/overlay';
+import type { OverlayMapperInterface, OverlayMapperOBSWebsocket } from 'src/bot/database/entity/overlay';
 
 const socket = getSocket('/registries/overlays', true);
 export default defineComponent({
@@ -19,13 +19,14 @@ export default defineComponent({
     emotes: () => import('./emotes.vue'),
     emotescombo: () => import('./emotescombo.vue'),
     eventlist: () => import('./eventlist.vue'),
+    obswebsocket: () => import('./obswebsocket.vue'),
     polls: () => import('./polls.vue'),
     randomizer: () => import('./randomizer.vue'),
     stats: () => import('./stats.vue'),
     tts: () => import('./tts.vue'),
   },
   setup(props, ctx) {
-    const type = ref(null as null | string)
+    const type = ref(null as null | OverlayMapperInterface | OverlayMapperOBSWebsocket)
     onMounted(async () => {
       try {
         if (!ctx.root.$route.params.id) {
@@ -33,11 +34,11 @@ export default defineComponent({
         }
 
         type.value = await new Promise((resolve, reject) => {
-          socket.emit('generic::getOne', ctx.root.$route.params.id, (err: string, data: OverlayMapperInterface) => {
+          socket.emit('generic::getOne', ctx.root.$route.params.id, (err: string, data: OverlayMapperInterface | OverlayMapperOBSWebsocket) => {
             if (err || !data) {
               reject('Unknown overlay link ' + ctx.root.$route.params.id + '!')
             } else {
-              resolve(data.value);
+              resolve(data);
             }
           })
         })

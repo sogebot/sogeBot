@@ -1,4 +1,4 @@
-async function getCurrentIP() {
+async function getCurrentIP(): Promise<string> {
   return new Promise((resolve, reject) => {
     fetch('https://www.cloudflare.com/cdn-cgi/trace')
       .then(response => {

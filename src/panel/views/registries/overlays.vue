@@ -48,16 +48,15 @@
           </button-with-icon>
         </template>
         <template v-slot:row-details="data">
-          {{ data.item }}
           <template v-if="haveAnyOptions(data.item.value)">
             <template v-if="data.item.value === 'obswebsocket'">
               <b-form-group
                 :label="translate('registry.overlays.allowedIPs.name')"
                 :description="translate('registry.alerts.allowedIPs.help')"
               >
-                <b-textarea v-model="data.item.opts.allowedIPs" placeholder="kitty, zebra, horse"></b-textarea>
+                <b-textarea v-bind:value="data.item.opts.allowedIPs.join('\n')" @input="data.item.opts.allowedIPs = $event.split('\n')" rows="5"></b-textarea>
               </b-form-group>
-              <b-button @click="addCurrentIP">Add current IP</b-button>
+              <b-button @click="addCurrentIP(data.item.opts.allowedIPs)">Add current IP</b-button>
             </template>
           </template>
           <div v-else>
@@ -182,9 +181,9 @@ export default defineComponent({
       }
     })
 
-    const addCurrentIP = () => {
+    const addCurrentIP = (array: string[]) => {
       getCurrentIP().then(value => {
-        console.log({value});
+        array.push(value);
       });
     };
 
