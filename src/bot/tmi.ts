@@ -878,6 +878,7 @@ class TMI extends Core {
         if (user) {
           if (!user.isOnline) {
             joinpart.send({ users: [sender.username], type: 'join' });
+            eventEmitter.emit('user-joined-channel', { username: sender.username });
           }
           await getRepository(User).save({
             ...user,
@@ -894,6 +895,7 @@ class TMI extends Core {
           });
         } else {
           joinpart.send({ users: [sender.username], type: 'join' });
+          eventEmitter.emit('user-joined-channel', { username: sender.username });
           await getRepository(User).save({
             username: sender.username,
             userId: Number(sender.userId),
