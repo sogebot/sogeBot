@@ -1,12 +1,93 @@
+import OBSWebSocket from 'obs-websocket-js';
+
+import { SECOND } from '../constants';
 import { settings, ui } from '../decorators';
+import { onChange, onStartup } from '../decorators/on';
+import { error, info, warning } from '../helpers/log';
 import Integration from './_interface';
 
+const obs = new OBSWebSocket();
+
+let reconnectingTimeout: null | NodeJS.Timeout = null;
+
 class OBSWebsocket extends Integration {
+  reconnecting = false;
+  enableHeartBeat = false;
+
+  @settings('connection')
+  @ui({ type: 'selector', values: ['direct', 'overlay'] })
+  accessBy: 'direct' | 'overlay' = 'overlay';
   @settings('connection')
   address = 'localhost:4444';
   @settings('connection')
   @ui({ type: 'text-input', secret: true })
   password = '';
+
+  @onStartup()
+  @onChange('accessBy')
+  @onChange('address')
+  @onChange('password')
+  @onChange('enabled')
+  async onLoadAccessBy() {
+    this.initOBSWebsocket();
+  }
+
+  async initOBSWebsocket(isHeartBeat = false) {
+    obs.disconnect();
+    if (this.enabled) {
+      if (this.accessBy === 'direct') {
+        reconnectingTimeout = null; // free up setTimeout
+
+        isHeartBeat || this.reconnecting ? null : info('OBSWEBSOCKET: Connecting using direct access from bot.');
+        try {
+          if (this.password === '') {
+            await obs.connect({ address: this.address });
+          } else {
+            await obs.connect({ address: this.address, password: this.password });
+          }
+          info(isHeartBeat ? 'OBSWEBSOCKET: Reconnected OK!' : 'OBSWEBSOCKET: Connected OK!');
+          this.reconnecting = false;
+          this.enableHeartBeat = true;
+        } catch (e) {
+          this.enableHeartBeat = false;
+          if (e.code === 'CONNECTION_ERROR') {
+            if (!this.reconnecting && !isHeartBeat) {
+              warning(`OBSWEBSOCKET: Couldn't connect to OBS Websockets. Will be periodically trying to connect.`);
+              this.reconnecting = true;
+            }
+
+            if (!reconnectingTimeout) { // run timeout only once (race condition with heartBeat)
+              reconnectingTimeout = setTimeout(() => this.initOBSWebsocket(isHeartBeat), 10 * SECOND);
+            }
+          } else if (e.error === 'Authentication Failed.') {
+            error(`OBSWEBSOCKET: Authentication Failed to OBS Websocket. Please check your credentials.`);
+          } else {
+            error(e);
+          }
+        }
+      } else {
+        info('OBSWEBSOCKET: Integration is enabled, but you need to use overlay to connect to OBS Websocket.');
+      }
+    }
+  }
+
+  @onStartup()
+  async heartBeat() {
+    try {
+      if (this.enabled && this.accessBy === 'direct' && !this.reconnecting && this.enableHeartBeat) {
+        // getting just stream status to check connection
+        await obs.send('GetStreamingStatus');
+      }
+    } catch {
+      // try to reconnect on error (connection lost, OBS is not running)
+      if (!this.reconnecting) {
+        warning(`OBSWEBSOCKET: Lost connection to OBS Websockets. Will be periodically trying to reconnect.`);
+        this.initOBSWebsocket(true);
+      }
+    } finally {
+      setTimeout(() => this.heartBeat(), 10 * SECOND);
+    }
+  }
 }
 
 export default new OBSWebsocket();
