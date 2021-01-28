@@ -183,7 +183,11 @@ export default defineComponent({
 
     const addCurrentIP = (array: string[]) => {
       getCurrentIP().then(value => {
-        array.push(value);
+        if (array[array.length - 1] === '') {
+          array[array.length - 1] = value;
+        } else {
+          array.push(value);
+        }
       });
     };
 

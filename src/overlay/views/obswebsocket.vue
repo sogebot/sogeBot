@@ -59,9 +59,6 @@ export default defineComponent({
       } else {
         await obs.connect({ address, password });
       }
-      const scenes = await obs.send('ListSceneCollections')
-
-      console.log({scenes});
     })
   }
 });

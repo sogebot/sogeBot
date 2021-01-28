@@ -155,6 +155,7 @@ const main = async () => {
         { path: '/registry/customvariables/edit/:id?', name: 'CustomVariableEdit', component: () => import('./views/registries/custom-variables/custom-variables-edit.vue') },
         { path: '/registry/carousel/list', name: 'carouselRegistryList', component: () => import('./views/registries/carousel-overlay/carousel-overlay-list.vue') },
         { path: '/registry/carousel/edit/:id?', name: 'carouselRegistryEdit', component: () => import('./views/registries/carousel-overlay/carousel-overlay-edit.vue') },
+        { path: '/registry/obswebsocket/list', name: 'OBSWebsocketRegistryList', component: () => import('./views/registries/obswebsocket.vue') },
         { path: '/registry/overlays/list', name: 'overlaysList', component: () => import('./views/registries/overlays.vue') },
         { path: '/registry/randomizer/list', name: 'RandomizerRegistryList', component: () => import('./views/registries/randomizer/randomizer-list.vue') },
         { path: '/registry/randomizer/edit/:id?', name: 'RandomizerRegistryEdit', component: () => import('./views/registries/randomizer/randomizer-edit.vue') },

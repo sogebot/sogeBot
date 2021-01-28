@@ -73,6 +73,11 @@ class OBSWebsocket extends Integration {
   }
 
   @onStartup()
+  initialize() {
+    this.addMenu({ category: 'registry', name: 'obswebsocket', id: 'registry/obswebsocket/list', this: null });
+  }
+
+  @onStartup()
   async heartBeat() {
     try {
       if (this.enabled && this.accessBy === 'direct' && !this.reconnecting && this.enableHeartBeat) {

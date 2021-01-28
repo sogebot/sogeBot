@@ -1,0 +1,10 @@
+--- patched-index.d.ts	2021-01-28 12:17:26.473427127 +0100
++++ /home/soge/_WORK/sogeBot/node_modules/obs-websocket-js/types/index.d.ts	2021-01-28 12:17:33.609391969 +0100
+@@ -1144,6 +1144,5 @@
+     ): this;
+   }
+ 
+-  export default ObsWebSocket
+-  export { RequestMethodsArgsMap }
++  export = ObsWebSocket;
+ }

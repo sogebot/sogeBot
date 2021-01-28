@@ -1,0 +1,200 @@
+<template>
+  <b-container fluid ref="window">
+    <b-row>
+      <b-col>
+        <span class="title text-default mb-2">
+          {{ translate('menu.registry') }}
+          <small><fa icon="angle-right"/></small>
+          {{ translate('menu.obswebsocket') }}
+        </span>
+      </b-col>
+    </b-row>
+
+    <panel search @search="search = $event">
+      <template v-slot:left>
+        <button-with-icon class="btn-primary btn-reverse" icon="plus" @click="newItem">{{translate('integrations.obswebsocket.new')}}</button-with-icon>
+      </template>
+    </panel>
+
+    <loading v-if="state.loading === $state.progress" />
+    <div v-else>
+      <b-sidebar
+        @change="isSidebarVisibleChange"
+        :visible="isSidebarVisible"
+        :no-slide="!sidebarSlideEnabled"
+        width="800px"
+        no-close-on-route-change
+        shadow
+        no-header
+        right
+        backdrop>
+        <template v-slot:footer="{ hide }">
+          <div class="d-flex bg-opaque align-items-center px-3 py-2 border-top border-gray" style="justify-content: flex-end">
+            <b-button class="mx-2" @click="hide" variant="link">{{ translate('dialog.buttons.close') }}</b-button>
+            <state-button @click="EventBus.$emit('registries::obswebsocket::save::' + $route.params.id)" text="saveChanges" :state="state.save" :invalid="state.invalid"/>
+          </div>
+        </template>
+        <obswebsocket-edit v-if="$route.params.id" :id="$route.params.id" :saveState.sync="state.save" :invalid.sync="state.invalid" :pending.sync="state.pending" @refresh="refresh"/>
+      </b-sidebar>
+      <b-alert show variant="danger" v-if="state.loading === $state.success && filtered.length === 0 && search.length > 0">
+        <fa icon="search"/> <span v-html="translate('registries.obswebsocket.emptyAfterSearch').replace('$search', search)"/>
+      </b-alert>
+      <b-alert show v-else-if="state.loading === $state.success && items.length === 0">
+        {{translate('registries.obswebsocket.empty')}}
+      </b-alert>
+      <b-table v-else :fields="fields" :items="filtered" small style="cursor: pointer;">
+        <template v-slot:cell(buttons)="data">
+          <div class="text-right">
+            <button-with-icon :class="[ data.item.isEnabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.isEnabled = !data.item.isEnabled; update(data.item)">
+              {{ translate('dialog.buttons.' + (data.item.isEnabled? 'enabled' : 'disabled')) }}
+            </button-with-icon>
+            <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/registry/obswebsocket/edit/' + data.item.id">
+              {{ translate('dialog.buttons.edit') }}
+            </button-with-icon>
+
+            <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="del(data.item)">
+              {{ translate('dialog.buttons.delete') }}
+            </button-with-icon>
+          </div>
+        </template>
+      </b-table>
+    </div>
+  </b-container>
+</template>
+
+<script lang="ts">
+import { defineComponent, ref, onMounted, computed, watch, getCurrentInstance } from '@vue/composition-api'
+import { isNil } from 'lodash-es';
+import { v4 as uuid } from 'uuid';
+
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
+import { EventBus } from 'src/panel/helpers/event-bus';
+import { capitalize } from 'src/panel/helpers/capitalize';
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
+
+import { OBSWebsocketInterface } from 'src/bot/database/entity/obswebsocket';
+
+const socket = getSocket('/registries/obswebsocket')
+
+export default defineComponent({
+  components: {
+    loading: () => import('src/panel/components/loading.vue'),
+    obswebsocketEdit: () => import('./obswebsocket-edit.vue'),
+  },
+  setup(props, ctx) {
+    const instance = getCurrentInstance()?.proxy;
+    const isSidebarVisible = ref(false);
+    const sidebarSlideEnabled = ref(true);
+
+    const search = ref('');
+    const items = ref([] as OBSWebsocketInterface[]);
+    const state = ref({
+      loading: ButtonStates.progress,
+      save: ButtonStates.idle,
+      pending: false,
+      invalid: false,
+    } as {
+      loading: number;
+      save: number;
+      pending: boolean;
+      invalid: boolean;
+    });
+    const filtered = computed(() => {
+      if (search.value.length === 0) return items.value
+      return items.value.filter((o) => {
+        const isSearchInName = !isNil(o.name.match(new RegExp(search.value, 'ig')))
+        return isSearchInName
+      })
+    });
+    const fields = [
+      { key: 'name', label: translate('timers.dialog.name'), sortable: true },
+      // virtual attributes
+      { key: 'buttons', label: '' },
+    ];
+
+
+    onMounted(() => {
+      refresh();
+      if (ctx.root.$route.params.id) {
+        isSidebarVisible.value = true;
+        setTimeout(() => state.value.pending = false, 1000);
+      }
+    });
+
+    watch(() => ctx.root.$route.params.id, (val) => {
+      const $v = instance?.$v;
+      $v?.$reset();
+      if (val) {
+        isSidebarVisible.value = true;
+      } else {
+        state.value.pending = false;
+      }
+    })
+
+    const refresh = () => {
+      socket.emit('generic::getAll', (err: string | null, _items: OBSWebsocketInterface[]) => {
+        items.value = _items;
+        state.value.loading = ButtonStates.success;
+      })
+    }
+
+    const newItem = () => {
+      ctx.root.$router.push({ name: 'OBSWebsocketRegistryEdit', params: { id: uuid() } }).catch(() => {});
+    };
+    const isSidebarVisibleChange = (isVisible: boolean, ev: any) => {
+      if (!isVisible) {
+        if (state.value.pending) {
+          const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+          if (!isOK) {
+            sidebarSlideEnabled.value = false;
+            isSidebarVisible.value = false;
+            ctx.root.$nextTick(() => {
+              isSidebarVisible.value = true;
+              setTimeout(() => {
+                sidebarSlideEnabled.value = true;
+              }, 300);
+            });
+            return;
+          }
+        }
+        isSidebarVisible.value = isVisible;
+        ctx.root.$router.push({ name: 'OBSWebsocketRegistryList' }).catch(() => {});
+      } else {
+        state.value.save = ButtonStates.idle;
+      }
+    }
+    const del = (item: Required<OBSWebsocketInterface>) => {
+      if (confirm(`Do you want to delete timer ${item.name}?`)) {
+        socket.emit('generic::deleteById', item.id, () => {
+          items.value = items.value.filter((o) => o.id !== item.id)
+        })
+      }
+    }
+    const update = (item: OBSWebsocketInterface) => {
+      socket.emit('timers::save', item, () => {});
+    }
+
+    return {
+      search,
+      state,
+      items,
+      fields,
+      newItem,
+      filtered,
+      update,
+      del,
+      refresh,
+
+      isSidebarVisibleChange,
+      isSidebarVisible,
+      sidebarSlideEnabled,
+
+      translate,
+      ButtonStates,
+      EventBus,
+      capitalize,
+    }
+  }
+});
+</script>
