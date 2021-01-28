@@ -1,14 +1,20 @@
+const child_process = require('child_process');
 const fs = require('fs');
-const child_process = require('child_process')
 
-let status = 0
+const getMigrationType = require('../dest/helpers/getMigrationType').getMigrationType;
+require('dotenv').config();
 
+let status = 0;
 async function test() {
   await new Promise((resolve) => {
     const p = child_process.spawn('npx', [
       'typeorm',
-      'migration:run'
+      'migration:run',
     ], {
+      env: {
+        'TYPEORM_ENTITIES': 'dest/database/entity/*.js',
+        'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
+      },
       shell: true,
     });
     p.stdout.on('data', (data) => {
@@ -32,13 +38,17 @@ async function test() {
       'typeorm',
       'migration:generate',
       '-n',
-      'test'
+      'test',
     ], {
+      env: {
+        'TYPEORM_ENTITIES': 'dest/database/entity/*.js',
+        'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
+      },
       shell: true,
     });
     p.stdout.on('data', (data) => {
       process.stdout.write(data.toString());
-      output += data.toString()
+      output += data.toString();
     });
 
     p.stderr.on('data', (data) => {
@@ -56,15 +66,15 @@ async function test() {
       ], {
         shell: true,
       });
-      console.log('\n =================================== generated migration file  =================================== \n')
+      console.log('\n =================================== generated migration file  =================================== \n');
       cat.stdout.on('data', (data) => {
         process.stdout.write(data.toString());
       });
       cat.on('close', () => {
         resolve2();
       });
-    })
-  };
+    });
+  }
   process.exit(output === expectedOutput ? 0 : 1);
 }
 
