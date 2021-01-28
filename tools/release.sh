@@ -9,7 +9,7 @@ echo Updating master branch
 git pull -r origin master
 
 echo Updating package.json version from $currentSnapshot to $nextTag
-sed -i "s/$currentSnapshot/$nextTag/g" "$file"
+sed -i "s/$currentSnapshot/$nextTag/" "$file"
 git add $file
 git commit -m "build: $nextTag"
 echo Pushing build commit $nextTag
@@ -23,7 +23,7 @@ echo Released $nextTag
 
 nextSnapshot=$(node tools/changelog.js nextSnapshot)
 echo Updating package.json version from with $nextTag to $nextSnapshot
-sed -i "s/$nextTag/$nextSnapshot/g" "$file"
+sed -i "s/$nextTag/$nextSnapshot/" "$file"
 git add $file
 git commit -m "build: $nextSnapshot"
 echo Pushing snapshot commit $nextSnapshot
