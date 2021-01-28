@@ -4,6 +4,8 @@ import { SECOND } from '../constants';
 import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import { error, info, warning } from '../helpers/log';
+import { listScenes, taskRunner } from '../helpers/obswebsocket';
+import { adminEndpoint } from '../helpers/socket';
 import Integration from './_interface';
 
 const obs = new OBSWebSocket();
@@ -93,6 +95,25 @@ class OBSWebsocket extends Integration {
     } finally {
       setTimeout(() => this.heartBeat(), 10 * SECOND);
     }
+  }
+
+  sockets() {
+    adminEndpoint(this.nsp, 'integration::obswebsocket::listScene', async (cb) => {
+      try {
+        cb(null, await listScenes(obs));
+      } catch (e) {
+        cb(e.message, []);
+      }
+    });
+    adminEndpoint(this.nsp, 'integration::obswebsocket::test', async (tasks, cb) => {
+      try {
+        await taskRunner(obs, tasks);
+        cb(null);
+      } catch (e) {
+        cb(e.message);
+      }
+    });
+
   }
 }
 

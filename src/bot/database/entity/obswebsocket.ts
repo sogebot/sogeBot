@@ -1,19 +1,26 @@
 import type { RequestMethodsArgsMap } from 'obs-websocket-js';
 import { EntitySchema } from 'typeorm';
 
-type simpleModeTask<K extends keyof RequestMethodsArgsMap> = {
+export type simpleModeTask<K extends keyof RequestMethodsArgsMap> = {
+  id: string,
   event: K,
   args: RequestMethodsArgsMap[K] extends Record<string, unknown>
     ? RequestMethodsArgsMap[K]
     : null,
 };
 
+export type simpleModeTaskWaitMS = {
+  id: string,
+  event: 'WaitMs',
+  args: { miliseconds: number; }
+};
+
 export interface OBSWebsocketInterface {
-  id?: number;
+  id: string;
   name: string;
   advancedMode: boolean;
   advancedModeCode: string;
-  simpleModeTasks: simpleModeTask<keyof RequestMethodsArgsMap>[];
+  simpleModeTasks: (simpleModeTask<keyof RequestMethodsArgsMap> | simpleModeTaskWaitMS)[];
 }
 
 export const OBSWebsocket = new EntitySchema<Readonly<Required<OBSWebsocketInterface>>>({

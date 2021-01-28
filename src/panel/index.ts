@@ -156,6 +156,7 @@ const main = async () => {
         { path: '/registry/carousel/list', name: 'carouselRegistryList', component: () => import('./views/registries/carousel-overlay/carousel-overlay-list.vue') },
         { path: '/registry/carousel/edit/:id?', name: 'carouselRegistryEdit', component: () => import('./views/registries/carousel-overlay/carousel-overlay-edit.vue') },
         { path: '/registry/obswebsocket/list', name: 'OBSWebsocketRegistryList', component: () => import('./views/registries/obswebsocket.vue') },
+        { path: '/registry/obswebsocket/edit/:id?', name: 'OBSWebsocketRegistryEdit', component: () => import('./views/registries/obswebsocket.vue') },
         { path: '/registry/overlays/list', name: 'overlaysList', component: () => import('./views/registries/overlays.vue') },
         { path: '/registry/randomizer/list', name: 'RandomizerRegistryList', component: () => import('./views/registries/randomizer/randomizer-list.vue') },
         { path: '/registry/randomizer/edit/:id?', name: 'RandomizerRegistryEdit', component: () => import('./views/registries/randomizer/randomizer-edit.vue') },

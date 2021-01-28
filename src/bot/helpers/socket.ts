@@ -1,3 +1,4 @@
+import type ObsWebSocket from 'obs-websocket-js';
 import { Socket } from 'socket.io';
 
 import type { AlertInterface, AlertMediaInterface } from '../database/entity/alert';
@@ -8,6 +9,7 @@ import type { EventInterface } from '../database/entity/event';
 import type { GoalGroupInterface } from '../database/entity/goal';
 import type { HowLongToBeatGameInterface, HowLongToBeatGameItemInterface } from '../database/entity/howLongToBeatGame';
 import type { KeywordInterface } from '../database/entity/keyword';
+import { OBSWebsocketInterface } from '../database/entity/obswebsocket';
 import type { PermissionsInterface } from '../database/entity/permissions';
 import type { PriceInterface } from '../database/entity/price';
 import type { RandomizerInterface } from '../database/entity/randomizer';
@@ -125,10 +127,12 @@ function adminEndpoint (nsp: string, on: 'pubg::exampleParse', callback: (opts: 
 function adminEndpoint (nsp: string, on: 'alerts::areAlertsMuted', callback: (areAlertsMuted: boolean, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'alerts::isTTSMuted', callback: (isTTSMuted: boolean, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'alerts::isSoundMuted', callback: (isSoundMuted: boolean, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'import.playlist', callback: (otps: {playlist: string, forcedTag: string}, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'import.playlist', callback: (opts: {playlist: string, forcedTag: string}, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'import.video', callback: (opts: {playlist: string, forcedTag: string}, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'get.playlist.tags', callback: (cb: (error: Error | string | null, data: string[]) => void, socket: Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'set.playlist.tag', callback: (tag:string, socket: Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'integration::obswebsocket::listScene', callback: (cb: (error: Error | string | null, data: ObsWebSocket.Scene[]) => void, socket: Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'integration::obswebsocket::test', callback: (item: OBSWebsocketInterface['simpleModeTasks'], cb: (error: Error | string | null) => void, socket: Socket) => void): void;
 
 // generic functions
 function adminEndpoint (nsp: string, on: string, callback: (opts: { [x: string]: any }, cb?: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket): void;

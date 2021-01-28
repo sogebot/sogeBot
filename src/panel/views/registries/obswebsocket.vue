@@ -16,31 +16,32 @@
       </template>
     </panel>
 
+    <b-sidebar
+      @change="isSidebarVisibleChange"
+      :visible="isSidebarVisible"
+      :no-slide="!sidebarSlideEnabled"
+      width="800px"
+      no-close-on-route-change
+      shadow
+      no-header
+      right
+      backdrop>
+      <template v-slot:footer="{ hide }">
+        <div class="d-flex bg-opaque align-items-center px-3 py-2 border-top border-gray" style="justify-content: flex-end">
+          <b-button class="mx-2" @click="hide" variant="link">{{ translate('dialog.buttons.close') }}</b-button>
+          <state-button @click="EventBus.$emit('registry::obswebsocket::test::' + $route.params.id)" text="test" :state="state.test" :invalid="state.invalid"/>
+          <state-button @click="EventBus.$emit('registry::obswebsocket::save::' + $route.params.id)" text="saveChanges" :state="state.save" :invalid="state.invalid"/>
+        </div>
+      </template>
+      <obswebsocket-edit v-if="$route.params.id" :id="$route.params.id" :saveState.sync="state.save" :testState.sync="state.test" :invalid.sync="state.invalid" :pending.sync="state.pending" @refresh="refresh"/>
+    </b-sidebar>
     <loading v-if="state.loading === $state.progress" />
     <div v-else>
-      <b-sidebar
-        @change="isSidebarVisibleChange"
-        :visible="isSidebarVisible"
-        :no-slide="!sidebarSlideEnabled"
-        width="800px"
-        no-close-on-route-change
-        shadow
-        no-header
-        right
-        backdrop>
-        <template v-slot:footer="{ hide }">
-          <div class="d-flex bg-opaque align-items-center px-3 py-2 border-top border-gray" style="justify-content: flex-end">
-            <b-button class="mx-2" @click="hide" variant="link">{{ translate('dialog.buttons.close') }}</b-button>
-            <state-button @click="EventBus.$emit('registries::obswebsocket::save::' + $route.params.id)" text="saveChanges" :state="state.save" :invalid="state.invalid"/>
-          </div>
-        </template>
-        <obswebsocket-edit v-if="$route.params.id" :id="$route.params.id" :saveState.sync="state.save" :invalid.sync="state.invalid" :pending.sync="state.pending" @refresh="refresh"/>
-      </b-sidebar>
       <b-alert show variant="danger" v-if="state.loading === $state.success && filtered.length === 0 && search.length > 0">
-        <fa icon="search"/> <span v-html="translate('registries.obswebsocket.emptyAfterSearch').replace('$search', search)"/>
+        <fa icon="search"/> <span v-html="translate('registry.obswebsocket.emptyAfterSearch').replace('$search', search)"/>
       </b-alert>
       <b-alert show v-else-if="state.loading === $state.success && items.length === 0">
-        {{translate('registries.obswebsocket.empty')}}
+        {{translate('registry.obswebsocket.empty')}}
       </b-alert>
       <b-table v-else :fields="fields" :items="filtered" small style="cursor: pointer;">
         <template v-slot:cell(buttons)="data">
@@ -65,7 +66,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed, watch, getCurrentInstance } from '@vue/composition-api'
 import { isNil } from 'lodash-es';
-import { v4 as uuid } from 'uuid';
+import shortid from 'shortid';
 
 import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
@@ -73,7 +74,7 @@ import { EventBus } from 'src/panel/helpers/event-bus';
 import { capitalize } from 'src/panel/helpers/capitalize';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 
-import { OBSWebsocketInterface } from 'src/bot/database/entity/obswebsocket';
+import type { OBSWebsocketInterface } from 'src/bot/database/entity/obswebsocket';
 
 const socket = getSocket('/integrations/obswebsocket')
 
@@ -92,11 +93,13 @@ export default defineComponent({
     const state = ref({
       loading: ButtonStates.progress,
       save: ButtonStates.idle,
+      test: ButtonStates.idle,
       pending: false,
       invalid: false,
     } as {
       loading: number;
       save: number;
+      test: number;
       pending: boolean;
       invalid: boolean;
     });
@@ -140,7 +143,7 @@ export default defineComponent({
     }
 
     const newItem = () => {
-      ctx.root.$router.push({ name: 'OBSWebsocketRegistryEdit', params: { id: uuid() } }).catch(() => {});
+      ctx.root.$router.push({ name: 'OBSWebsocketRegistryEdit', params: { id: shortid.generate() } }).catch(() => {});
     };
     const isSidebarVisibleChange = (isVisible: boolean, ev: any) => {
       if (!isVisible) {
