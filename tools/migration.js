@@ -9,6 +9,8 @@ const util = require('util');
 
 const chalk = require('chalk');
 
+const getMigrationType = require('../dest/helpers/getMigrationType').getMigrationType;
+
 const logDir = './logs';
 
 if (!fs.existsSync(logDir)) {
@@ -61,7 +63,12 @@ async function runMigration() {
   }
 
   console.log('\n... Migration in progress, please wait (see logs/migration.log for progress and error) ...');
-  exec('typeorm migration:run', (error, stdout, stderr) => {
+  exec('npx typeorm migration:run', {
+    env: {
+      'TYPEORM_ENTITIES': 'dest/database/entity/*.js',
+      'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
+    },
+  }, (error, stdout, stderr) => {
     fs.writeFileSync(logFile, stdout + os.EOL, { flag: 'a'});
     fs.writeFileSync(logFile, stderr + os.EOL, { flag: 'a'});
 

@@ -75,7 +75,7 @@ import { ButtonStates } from 'src/panel/helpers/buttonStates';
 
 import { OBSWebsocketInterface } from 'src/bot/database/entity/obswebsocket';
 
-const socket = getSocket('/registries/obswebsocket')
+const socket = getSocket('/integrations/obswebsocket')
 
 export default defineComponent({
   components: {
