@@ -6,7 +6,7 @@ require('dotenv').config();
 
 async function test() {
   await new Promise((resolve) => {
-    exec('npx typeorm migration:run', {
+    exec('typeorm migration:run', {
       env: {
         'TYPEORM_ENTITIES': 'dest/database/entity/*.js',
         'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
@@ -22,7 +22,7 @@ async function test() {
   let output = '';
   const expectedOutput = 'No changes in database schema were found - cannot generate a migration. To create a new empty migration use "typeorm migration:create" command\n';
   await new Promise(async (resolve) => {
-    exec('npx typeorm migration:generate -n test', {
+    exec('typeorm migration:generate -n test', {
       env: {
         'TYPEORM_ENTITIES': 'dest/database/entity/*.js',
         'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
