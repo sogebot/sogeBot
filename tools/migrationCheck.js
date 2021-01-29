@@ -10,11 +10,22 @@ const envConfig = dotenv.parse(fs.readFileSync('.env'));
 async function test() {
   await new Promise((resolve) => {
     exec('npx typeorm migration:run', {
+      shell: true,
+    }, (error, stdout, stderr) => {
+      console.log({ error, stdout, stderr });
+      if (stdout) {
+        process.stdout.write(stdout);
+      }
+      resolve();
+    });
+  });
+  await new Promise((resolve) => {
+    exec('npx typeorm migration:run', {
       env: {
         'TYPEORM_ENTITIES':   'dest/database/entity/*.js',
         'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(envConfig.TYPEORM_CONNECTION)}/**/*.js`,
-      },        shell: true,
-
+      },
+      shell: true,
     }, (error, stdout, stderr) => {
       console.log({ error, stdout, stderr });
       if (stdout) {
@@ -31,8 +42,8 @@ async function test() {
       env: {
         'TYPEORM_ENTITIES':   'dest/database/entity/*.js',
         'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(envConfig.TYPEORM_CONNECTION)}/**/*.js`,
-      },        shell: true,
-
+      },
+      shell: true,
     }, (error, stdout, stderr) => {
       console.log({ error, stdout, stderr });
       output += stdout;
