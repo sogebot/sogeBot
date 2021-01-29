@@ -1,19 +1,18 @@
 const exec = require('child_process').exec;
 const fs = require('fs');
 
+const dotenv = require('dotenv');
+
 const getMigrationType = require('../dest/helpers/getMigrationType').getMigrationType;
 
-console.log(process.env);
-require('dotenv').config();
-
-console.log(process.env);
+const envConfig = dotenv.parse(fs.readFileSync('.env'));
 
 async function test() {
   await new Promise((resolve) => {
     exec('npx typeorm migration:run', {
       env: {
         'TYPEORM_ENTITIES':   'dest/database/entity/*.js',
-        'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
+        'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(envConfig.TYPEORM_CONNECTION)}/**/*.js`,
       },        shell: true,
 
     }, (error, stdout, stderr) => {
@@ -31,7 +30,7 @@ async function test() {
     exec('npx typeorm migration:generate -n generatedMigration', {
       env: {
         'TYPEORM_ENTITIES':   'dest/database/entity/*.js',
-        'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
+        'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(envConfig.TYPEORM_CONNECTION)}/**/*.js`,
       },        shell: true,
 
     }, (error, stdout, stderr) => {
