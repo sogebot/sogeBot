@@ -3,7 +3,9 @@ import OBSWebSocket from 'obs-websocket-js';
 import { SECOND } from '../constants';
 import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import { error, info, warning } from '../helpers/log';
+import {
+  error, info, warning, 
+} from '../helpers/log';
 import { listScenes, taskRunner } from '../helpers/obswebsocket';
 import { adminEndpoint } from '../helpers/socket';
 import Integration from './_interface';

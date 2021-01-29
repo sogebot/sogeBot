@@ -42,9 +42,9 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: 
         logger:        new TypeORMLogger(),
         synchronize:   false,
         migrationsRun: true,
-        charset: 'UTF8MB4_GENERAL_CI',
-        entities: [ 'dest/database/entity/*.js' ],
-        migrations: [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
+        charset:       'UTF8MB4_GENERAL_CI',
+        entities:      [ 'dest/database/entity/*.js' ],
+        migrations:    [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
       } as MysqlConnectionOptions);
     } else {
       await createConnection({
@@ -53,8 +53,8 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: 
         logger:        new TypeORMLogger(),
         synchronize:   false,
         migrationsRun: true,
-        entities: [ 'dest/database/entity/*.js' ],
-        migrations: [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
+        entities:      [ 'dest/database/entity/*.js' ],
+        migrations:    [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
       });
     }
     await new Promise( resolve => setTimeout(resolve, 3000) );

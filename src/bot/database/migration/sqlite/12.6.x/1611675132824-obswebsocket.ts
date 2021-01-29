@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class obswebsocket1611675132824 implements MigrationInterface {
   name = 'obswebsocket1611675132824';

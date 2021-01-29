@@ -24,12 +24,12 @@ export interface OBSWebsocketInterface {
 }
 
 export const OBSWebsocket = new EntitySchema<Readonly<Required<OBSWebsocketInterface>>>({
-  name: 'obswebsocket',
+  name:    'obswebsocket',
   columns: {
-    id: { type: Number, primary: true },
-    name: { type: String },
-    advancedMode: { type: 'boolean', default: false },
+    id:               { type: Number, primary: true },
+    name:             { type: String },
+    advancedMode:     { type: 'boolean', default: false },
     advancedModeCode: { type: 'text' },
-    simpleModeTasks: { type: 'simple-json' },
+    simpleModeTasks:  { type: 'simple-json' },
   },
 });

@@ -20,7 +20,9 @@ import { changelog } from './changelog';
 import { autoLoad } from './helpers/autoLoad';
 import { setIsBotStarted } from './helpers/database';
 import { getMigrationType } from './helpers/getMigrationType';
-import { debug, error, info, isDebugEnabled, setDEBUG, warning } from './helpers/log';
+import {
+  debug, error, info, isDebugEnabled, setDEBUG, warning, 
+} from './helpers/log';
 import { TypeORMLogger } from './helpers/logTypeorm';
 import { expose as panelExpose, init as panelInit } from './panel';
 import { startWatcher } from './watchers';
@@ -43,9 +45,9 @@ const connect = async function () {
       logger:        new TypeORMLogger(),
       synchronize:   false,
       migrationsRun: true,
-      charset: 'UTF8MB4_GENERAL_CI',
-      entities: [ 'dest/database/entity/*.js' ],
-      migrations: [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
+      charset:       'UTF8MB4_GENERAL_CI',
+      entities:      [ 'dest/database/entity/*.js' ],
+      migrations:    [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
     } as MysqlConnectionOptions);
   } else {
     await createConnection({
@@ -54,8 +56,8 @@ const connect = async function () {
       logger:        new TypeORMLogger(),
       synchronize:   false,
       migrationsRun: true,
-      entities: [ 'dest/database/entity/*.js' ],
-      migrations: [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
+      entities:      [ 'dest/database/entity/*.js' ],
+      migrations:    [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
     });
   }
   const typeToLog = {
