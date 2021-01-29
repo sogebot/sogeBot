@@ -87,6 +87,7 @@
     "watch": "cross-env NODE_ENV=development npx webpack --watch --progress",
     "build": "cross-env ENV=development make bot",
     "test": "node tools/runTests.js",
+    "test:migration": "node tools/migrationCheck.js",
     "test:config:mysql": "cp src/bot/data/.env.mysql .env",
     "test:config:postgres": "cp src/bot/data/.env.postgres .env",
     "test:config:sqlite": "cp src/bot/data/.env.sqlite .env",

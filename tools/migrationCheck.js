@@ -28,7 +28,6 @@ async function test() {
         'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
       },
     }, (error, stdout, stderr) => {
-      console.log({error, stdout, stderr});
       output += stdout;
       resolve();
     });
