@@ -1,14 +1,14 @@
 import { persistent } from '../core/persistent';
 
 const gameCache = persistent({
-  value: '',
-  name: 'gameCache',
+  value:     '',
+  name:      'gameCache',
   namespace: '/core/api',
 });
 
 const rawStatus = persistent({
-  value: '',
-  name: 'rawStatus',
+  value:     '',
+  name:      'rawStatus',
   namespace: '/core/api',
 });
 

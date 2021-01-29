@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class discordLink1588237244057 implements MigrationInterface {
   name = 'discordLink1588237244057';

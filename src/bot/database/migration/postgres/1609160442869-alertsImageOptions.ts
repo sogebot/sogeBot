@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class alertsImageOptions1609160442869 implements MigrationInterface {
   name = 'alertsImageOptions1609160442869';

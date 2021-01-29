@@ -18,21 +18,21 @@ export interface EventOperationInterface {
 }
 
 export const Event = new EntitySchema<Readonly<Required<EventInterface>>>({
-  name: 'event',
+  name:    'event',
   columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
-    name: { type: String },
-    isEnabled: { type: Boolean },
-    triggered: { type: 'simple-json' },
+    id:          { type: 'uuid', primary: true, generated: 'uuid' },
+    name:        { type: String },
+    isEnabled:   { type: Boolean },
+    triggered:   { type: 'simple-json' },
     definitions: { type: 'simple-json' },
-    filter: { type: String },
+    filter:      { type: String },
   },
   relations: {
     operations: {
-      type: 'one-to-many',
-      target: 'event_operation',
+      type:        'one-to-many',
+      target:      'event_operation',
       inverseSide: 'event',
-      cascade: true,
+      cascade:     true,
     },
   },
   indices: [
@@ -41,19 +41,19 @@ export const Event = new EntitySchema<Readonly<Required<EventInterface>>>({
 });
 
 export const EventOperation = new EntitySchema<Readonly<Required<EventOperationInterface>>>({
-  name: 'event_operation',
+  name:    'event_operation',
   columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
-    name: { type: String },
+    id:          { type: 'uuid', primary: true, generated: 'uuid' },
+    name:        { type: String },
     definitions: { type: 'simple-json' },
   },
   relations: {
     event: {
-      type: 'many-to-one',
-      target: 'event',
+      type:        'many-to-one',
+      target:      'event',
       inverseSide: 'operations',
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete:    'CASCADE',
+      onUpdate:    'CASCADE',
     },
   },
   indices: [

@@ -4,7 +4,7 @@ export let translations = {};
 
 function castObject (key: string, value: string | { [x: string]: any }) {
   if (typeof value === 'string') {
-    return {[key]: value};
+    return { [key]: value };
   } else {
     return value;
   }

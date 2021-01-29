@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class aliasCommandText1573941849651 implements MigrationInterface {
   name = 'aliasCommandText1573941849651';

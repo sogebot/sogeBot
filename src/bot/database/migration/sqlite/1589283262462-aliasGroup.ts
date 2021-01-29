@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class aliasGroup1589283262462 implements MigrationInterface {
   name = 'aliasGroup1589283262462';

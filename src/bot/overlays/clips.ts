@@ -25,7 +25,7 @@ class Clips extends Overlay {
         settings: {
           volume: this.cClipsVolume,
           filter: this.cClipsFilter,
-          label: this.cClipsLabel,
+          label:  this.cClipsLabel,
         },
       });
   }

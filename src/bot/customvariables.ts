@@ -4,7 +4,9 @@ import { isNil } from 'lodash';
 import { getRepository, IsNull } from 'typeorm';
 
 import Core from './_interface';
-import { Variable, VariableHistory, VariableInterface, VariableURL, VariableWatch } from './database/entity/variable';
+import {
+  Variable, VariableHistory, VariableInterface, VariableURL, VariableWatch, 
+} from './database/entity/variable';
 import { onStartup } from './decorators/on';
 import { getBot } from './helpers/commons';
 import { runScript, updateWidgetAndTitle } from './helpers/customvariables';
@@ -45,7 +47,7 @@ class CustomVariables extends Core {
     adminEndpoint(this.nsp, 'customvariables::testScript', async (opts, cb) => {
       let returnedValue;
       try {
-        returnedValue = await runScript(opts.evalValue, { isUI: true, _current: opts.currentValue, sender: { username: 'testuser', userId: 0, source: 'twitch' }});
+        returnedValue = await runScript(opts.evalValue, { isUI: true, _current: opts.currentValue, sender: { username: 'testuser', userId: 0, source: 'twitch' } });
       } catch (e) {
         cb(e.stack, null);
       }
@@ -68,7 +70,7 @@ class CustomVariables extends Core {
     adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
       cb(null, await getRepository(Variable).findOne({
         relations: ['history', 'urls'],
-        where: { id },
+        where:     { id },
       }));
     });
     adminEndpoint(this.nsp, 'customvariables::save', async (item, cb) => {

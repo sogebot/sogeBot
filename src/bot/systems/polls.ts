@@ -4,11 +4,17 @@ import { getRepository } from 'typeorm';
 import { parserReply } from '../commons';
 import currency from '../currency';
 import { Poll, PollVote } from '../database/entity/poll';
-import { command, default_permission, helper, parser, settings } from '../decorators';
-import { onBit, onMessage, onStartup, onTip } from '../decorators/on';
+import {
+  command, default_permission, helper, parser, settings, 
+} from '../decorators';
+import {
+  onBit, onMessage, onStartup, onTip, 
+} from '../decorators/on';
 import Expects from '../expects.js';
 import { isStreamOnline } from '../helpers/api';
-import { announce, getOwnerAsSender, prepare } from '../helpers/commons';
+import {
+  announce, getOwnerAsSender, prepare, 
+} from '../helpers/commons';
 import { mainCurrency } from '../helpers/currency';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { warning } from '../helpers/log.js';
@@ -67,7 +73,7 @@ class Polls extends System {
       try {
         cb(null, await getRepository(Poll).find({
           relations: ['votes'],
-          order: {
+          order:     {
             openedAt: 'DESC',
           },
         }));
@@ -79,11 +85,11 @@ class Polls extends System {
       try {
         const parameters = `-${vote.type} -title "${vote.title}" ${vote.options.filter((o) => o.trim().length > 0).join(' | ')}`;
         const response = await this.open({
-          command: this.getCommand('!poll open'),
+          command:   this.getCommand('!poll open'),
           parameters,
           createdAt: 0,
-          sender: getOwnerAsSender(),
-          attr: { skip: false, quiet: false },
+          sender:    getOwnerAsSender(),
+          attr:      { skip: false, quiet: false },
         });
         this.sendResponse(response);
         cb(null, null);
@@ -94,11 +100,11 @@ class Polls extends System {
     adminEndpoint(this.nsp, 'polls::close', async (vote, cb) => {
       try {
         const response = await this.close({
-          command: this.getCommand('!poll close'),
+          command:    this.getCommand('!poll close'),
           parameters: '',
-          createdAt: 0,
-          sender: getOwnerAsSender(),
-          attr: { skip: false, quiet: false },
+          createdAt:  0,
+          sender:     getOwnerAsSender(),
+          attr:       { skip: false, quiet: false },
         });
         this.sendResponse(response);
         cb(null);
@@ -114,7 +120,7 @@ class Polls extends System {
     const responses: CommandResponse[] = [];
     const cVote = await getRepository(Poll).findOne({
       relations: ['votes'],
-      where: { isOpened: true },
+      where:     { isOpened: true },
     });
 
     try {
@@ -133,7 +139,7 @@ class Polls extends System {
           if (!prev) {
             return { [cur.option]: cur.votes };
           } else {
-            return { ...prev, [cur.option]: Number(prev[cur.option] || 0) + cur.votes};
+            return { ...prev, [cur.option]: Number(prev[cur.option] || 0) + cur.votes };
           }
         }, null);
 
@@ -189,10 +195,10 @@ class Polls extends System {
       }
 
       await getRepository(Poll).save({
-        title: title,
+        title:    title,
         isOpened: true,
-        options: options,
-        type: type,
+        options:  options,
+        type:     type,
         openedAt: Date.now(),
       });
 
@@ -227,7 +233,7 @@ class Polls extends System {
 
           responses.push({
             response: prepare(translations, {
-              title: cVote.title,
+              title:   cVote.title,
               command: this.getCommand('!vote'),
             }), ...opts,
           });
@@ -253,7 +259,7 @@ class Polls extends System {
   public async main(opts: CommandOptions): Promise<CommandResponse[]> {
     const cVote = await getRepository(Poll).findOne({
       relations: ['votes'],
-      where: { isOpened: true },
+      where:     { isOpened: true },
     });
     let index: number;
 
@@ -266,7 +272,7 @@ class Polls extends System {
           if (!prev) {
             return { [cur.option]: cur.votes };
           } else {
-            return { ...prev, [cur.option]: Number(prev[cur.option] || 0) + cur.votes};
+            return { ...prev, [cur.option]: Number(prev[cur.option] || 0) + cur.votes };
           }
         }, null);
         // get vote status
@@ -306,10 +312,10 @@ class Polls extends System {
             await getRepository(Poll).save(cVote);
           } else {
             await getRepository(PollVote).save({
-              poll: cVote,
+              poll:    cVote,
               votedBy: opts.sender.username,
-              votes: 1,
-              option: index,
+              votes:   1,
+              option:  index,
             });
           }
         }
@@ -343,9 +349,9 @@ class Polls extends System {
             });
           } else {
             await getRepository(PollVote).save({
-              poll: cVote,
-              option: Number(opts.message) - 1,
-              votes: 1,
+              poll:    cVote,
+              option:  Number(opts.message) - 1,
+              votes:   1,
               votedBy: opts.sender.username,
             });
           }
@@ -367,9 +373,9 @@ class Polls extends System {
         if (opts.message.includes('#vote' + i)) {
           // no update as we will not switch vote option as in normal vote
           await getRepository(PollVote).save({
-            poll: cVote,
-            option: i - 1,
-            votes: opts.amount,
+            poll:    cVote,
+            option:  i - 1,
+            votes:   opts.amount,
             votedBy: opts.username,
           });
           break;
@@ -388,9 +394,9 @@ class Polls extends System {
         if (opts.message.includes('#vote' + i)) {
           // no update as we will not switch vote option as in normal vote
           await getRepository(PollVote).save({
-            poll: cVote,
-            option: i - 1,
-            votes: Number(currency.exchange(opts.amount, opts.currency, mainCurrency.value)),
+            poll:    cVote,
+            option:  i - 1,
+            votes:   Number(currency.exchange(opts.amount, opts.currency, mainCurrency.value)),
             votedBy: opts.username,
           });
           break;
@@ -441,7 +447,7 @@ class Polls extends System {
 
       const translations = `systems.polls.opened_${vote.type}`;
       announce(prepare(translations, {
-        title: vote.title,
+        title:   vote.title,
         command: this.getCommand('!vote'),
       }), 'polls');
       for (const index of Object.keys(vote.options)) {

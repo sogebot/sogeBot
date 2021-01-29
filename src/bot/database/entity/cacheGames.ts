@@ -6,9 +6,9 @@ export interface CacheGamesInterface {
 }
 
 export const CacheGames = new EntitySchema<Readonly<Required<CacheGamesInterface>>>({
-  name: 'cache_games',
+  name:    'cache_games',
   columns: {
-    id: { type: Number, primary: true },
+    id:   { type: Number, primary: true },
     name: { type: String },
   },
   indices: [

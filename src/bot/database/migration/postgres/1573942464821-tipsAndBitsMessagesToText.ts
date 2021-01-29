@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class tipsAndBitsMessagesToText1573942464821 implements MigrationInterface {
 

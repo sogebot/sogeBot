@@ -83,7 +83,7 @@ class Translate {
   async _save () {
     for (const c of this.custom) {
       await getRepository(Translation).save({
-        name: c.name,
+        name:  c.name,
         value: c.value,
       });
       await this._load();

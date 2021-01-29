@@ -3,13 +3,21 @@ import { getRepository } from 'typeorm';
 import XRegExp from 'xregexp';
 
 import { parserReply } from '../commons';
-import { Keyword, KeywordInterface, KeywordsResponsesInterface } from '../database/entity/keyword';
-import { command, default_permission, helper, parser } from '../decorators';
+import {
+  Keyword, KeywordInterface, KeywordsResponsesInterface, 
+} from '../database/entity/keyword';
+import {
+  command, default_permission, helper, parser, 
+} from '../decorators';
 import Expects from '../expects';
 import { checkFilter } from '../helpers/checkFilter';
 import { isUUID, prepare } from '../helpers/commons';
-import { debug, error, warning } from '../helpers/log';
-import { addToViewersCache, get, getFromViewersCache } from '../helpers/permissions';
+import {
+  debug, error, warning, 
+} from '../helpers/log';
+import {
+  addToViewersCache, get, getFromViewersCache, 
+} from '../helpers/permissions';
 import { check, defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import { translate } from '../translate';
@@ -25,7 +33,7 @@ class Keywords extends System {
     adminEndpoint(this.nsp, 'generic::setById', async (opts, cb) => {
       try {
         const item = await getRepository(Keyword).findOne({ id: String(opts.id) });
-        await getRepository(Keyword).save({ ...item, ...opts.item});
+        await getRepository(Keyword).save({ ...item, ...opts.item });
         if (typeof cb === 'function') {
           cb(null, item);
         }
@@ -45,7 +53,7 @@ class Keywords extends System {
       try {
         const items = await getRepository(Keyword).find({
           relations: ['responses'],
-          order: {
+          order:     {
             keyword: 'ASC',
           },
         });
@@ -90,7 +98,7 @@ class Keywords extends System {
 
       const kDb = await getRepository(Keyword).findOne({
         relations: ['responses'],
-        where: { keyword: keywordRegex },
+        where:     { keyword: keywordRegex },
       });
       if (!kDb) {
         await getRepository(Keyword).save({ keyword: keywordRegex, enabled: true });
@@ -105,11 +113,11 @@ class Keywords extends System {
       await getRepository(Keyword).save({
         ...kDb,
         responses: [...kDb.responses, {
-          order: kDb.responses.length,
-          permission: pItem.id ?? defaultPermissions.VIEWERS,
+          order:          kDb.responses.length,
+          permission:     pItem.id ?? defaultPermissions.VIEWERS,
           stopIfExecuted: stopIfExecuted,
-          response: response,
-          filter: '',
+          response:       response,
+          filter:         '',
         }],
       });
       return [{ response: prepare('keywords.keyword-was-added', kDb), ...opts, id: kDb.id }];
@@ -197,7 +205,7 @@ class Keywords extends System {
       const keyword_with_responses
         = await getRepository(Keyword).findOne({
           relations: ['responses'],
-          where: isUUID(keyword) ? { id: keyword } : { keyword },
+          where:     isUUID(keyword) ? { id: keyword } : { keyword },
         });
 
       if (!keyword_with_responses || keyword_with_responses.responses.length === 0) {
@@ -319,7 +327,7 @@ class Keywords extends System {
       return true;
     }
 
-    const keywords = (await getRepository(Keyword).find({ relations: ['responses']})).filter((o) => {
+    const keywords = (await getRepository(Keyword).find({ relations: ['responses'] })).filter((o) => {
       const regexp = `([!"#$%&'()*+,-.\\/:;<=>?\\b\\s]${o.keyword}[!"#$%&'()*+,-.\\/:;<=>?\\b\\s])|(^${o.keyword}[!"#$%&'()*+,-.\\/:;<=>?\\b\\s])|([!"#$%&'()*+,-.\\/:;<=>?\\b\\s]${o.keyword}$)|(^${o.keyword}$)`;
       const isFoundInMessage = XRegExp(regexp, 'giu').test(opts.message);
       const isEnabled = o.enabled;

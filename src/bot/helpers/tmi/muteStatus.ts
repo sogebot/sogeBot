@@ -8,4 +8,4 @@ function getMuteStatus() {
   return _mute;
 }
 
-export {setMuteStatus, getMuteStatus};
+export { setMuteStatus, getMuteStatus };

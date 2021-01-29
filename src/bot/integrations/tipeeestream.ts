@@ -13,7 +13,9 @@ import { stats } from '../helpers/api/stats.js';
 import { mainCurrency } from '../helpers/currency';
 import { eventEmitter } from '../helpers/events';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
-import { error, info, tip } from '../helpers/log.js';
+import {
+  error, info, tip, 
+} from '../helpers/log.js';
 import eventlist from '../overlays/eventlist.js';
 import alerts from '../registries/alerts.js';
 import users from '../users.js';
@@ -92,15 +94,15 @@ class TipeeeStream extends Integration {
       // get current avaliable host and port
       // destructured response from https://api.tipeeestream.com/v2.0/site/socket
       // example response: { "code": 200, "message": "success", "datas": { "port": "443", "host": "https://sso-cf.tipeeestream.com" } }
-      const { data: { datas: { host, port }}} = await axios.get('https://api.tipeeestream.com/v2.0/site/socket');
+      const { data: { datas: { host, port } } } = await axios.get('https://api.tipeeestream.com/v2.0/site/socket');
 
       this.socketToTipeeestream = io(`${host}:${port}`,
         {
-          reconnection: true,
-          reconnectionDelay: 1000,
+          reconnection:         true,
+          reconnectionDelay:    1000,
           reconnectionDelayMax: 5000,
           reconnectionAttempts: Infinity,
-          query: {
+          query:                {
             access_token: this.apiKey.trim(),
           },
         });
@@ -143,29 +145,29 @@ class TipeeeStream extends Integration {
       const donationCurrency = data.event.parameters.currency as currency;
 
       eventlist.add({
-        event: 'tip',
+        event:     'tip',
         amount,
-        currency: donationCurrency,
-        userId: String(await users.getIdByName(username)),
+        currency:  donationCurrency,
+        userId:    String(await users.getIdByName(username)),
         message,
         timestamp: Date.now(),
       });
 
       eventEmitter.emit('tip', {
         username,
-        amount: Number(amount).toFixed(2),
-        currency: donationCurrency,
+        amount:              Number(amount).toFixed(2),
+        currency:            donationCurrency,
         amountInBotCurrency: Number(currency.exchange(amount, donationCurrency, mainCurrency.value)).toFixed(2),
-        currencyInBot: mainCurrency.value,
+        currencyInBot:       mainCurrency.value,
         message,
       });
 
       alerts.trigger({
-        event: 'tips',
-        name: username,
-        amount: Number(Number(amount).toFixed(2)),
-        tier: null,
-        currency: donationCurrency,
+        event:      'tips',
+        name:       username,
+        amount:     Number(Number(amount).toFixed(2)),
+        tier:       null,
+        currency:   donationCurrency,
         monthsName: '',
         message,
       });
@@ -173,11 +175,11 @@ class TipeeeStream extends Integration {
       const user = await users.getUserByUsername(username);
       const newTip: UserTipInterface = {
         amount,
-        currency: donationCurrency,
-        sortAmount: currency.exchange(Number(amount), donationCurrency, mainCurrency.value),
+        currency:      donationCurrency,
+        sortAmount:    currency.exchange(Number(amount), donationCurrency, mainCurrency.value),
         message,
         exchangeRates: currency.rates,
-        tippedAt: Date.now(),
+        tippedAt:      Date.now(),
       };
       user.tips.push(newTip);
       getRepository(User).save(user);
@@ -195,7 +197,7 @@ class TipeeeStream extends Integration {
         username,
         amount,
         message,
-        currency: donationCurrency,
+        currency:  donationCurrency,
         timestamp: Date.now(),
       });
     } catch (e) {

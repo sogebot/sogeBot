@@ -17,9 +17,9 @@ export interface KeywordsResponsesInterface {
 }
 
 export const Keyword = new EntitySchema<Readonly<Required<KeywordInterface>>>({
-  name: 'keyword',
+  name:    'keyword',
   columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    id:      { type: 'uuid', primary: true, generated: 'uuid' },
     keyword: { type: String },
     enabled: { type: Boolean },
   },
@@ -28,31 +28,31 @@ export const Keyword = new EntitySchema<Readonly<Required<KeywordInterface>>>({
   ],
   relations: {
     responses: {
-      type: 'one-to-many',
-      target: 'keyword_responses',
+      type:        'one-to-many',
+      target:      'keyword_responses',
       inverseSide: 'keyword',
-      cascade: true,
+      cascade:     true,
     },
   },
 });
 
 export const CommandsResponses = new EntitySchema<Readonly<Required<KeywordsResponsesInterface>>>({
-  name: 'keyword_responses',
+  name:    'keyword_responses',
   columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
-    order: { type: Number },
-    response: { type: 'text' },
+    id:             { type: 'uuid', primary: true, generated: 'uuid' },
+    order:          { type: Number },
+    response:       { type: 'text' },
     stopIfExecuted: { type: Boolean },
-    permission: { type: String },
-    filter: { type: String },
+    permission:     { type: String },
+    filter:         { type: String },
   },
   relations: {
     keyword: {
-      type: 'many-to-one',
-      target: 'keyword',
+      type:        'many-to-one',
+      target:      'keyword',
       inverseSide: 'responses',
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete:    'CASCADE',
+      onUpdate:    'CASCADE',
     },
   },
 });

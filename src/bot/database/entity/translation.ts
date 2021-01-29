@@ -5,9 +5,9 @@ export interface TranslationInterface {
 }
 
 export const Translation = new EntitySchema<Readonly<Required<TranslationInterface>>>({
-  name: 'translation',
+  name:    'translation',
   columns: {
-    name: { type: String, primary: true },
+    name:  { type: String, primary: true },
     value: { type: String },
   },
 });

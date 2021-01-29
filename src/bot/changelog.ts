@@ -3,7 +3,9 @@
  * change to update it on memory on cluster
  */
 
-import { getRepository, LessThan, MoreThan, Not } from 'typeorm';
+import {
+  getRepository, LessThan, MoreThan, Not, 
+} from 'typeorm';
 import { v4 as uuid } from 'uuid';
 
 import { Changelog } from './database/entity/changelog';
@@ -31,7 +33,7 @@ export const changelog = async () => {
   const changes = await getRepository(Changelog).find({
     where: {
       timestamp: MoreThan(lastTimestamp),
-      threadId: Not(threadId),
+      threadId:  Not(threadId),
     },
   });
   for (const change2 of changes.sort((a, b) => a.timestamp - b.timestamp )) {

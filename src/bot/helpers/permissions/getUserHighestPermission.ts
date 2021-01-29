@@ -25,4 +25,4 @@ async function getUserHighestPermission(userId: number): Promise<string> {
   }
 }
 
-export {getUserHighestPermission};
+export { getUserHighestPermission };

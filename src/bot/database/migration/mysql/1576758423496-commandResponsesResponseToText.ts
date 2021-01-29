@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class commandResponsesResponseToText1576758423496 implements MigrationInterface {
   name = 'commandResponsesResponseToText1576758423496';

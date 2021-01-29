@@ -4,7 +4,9 @@ import Axios from 'axios';
 import { escapeRegExp } from 'lodash';
 
 import { HOUR, MINUTE } from '../constants';
-import { command, persistent, settings, ui } from '../decorators';
+import {
+  command, persistent, settings, ui, 
+} from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import Expects from '../expects';
 import { prepare } from '../helpers/commons';
@@ -79,7 +81,7 @@ class PUBG extends Integration {
         {
           headers: {
             Authorization: `Bearer ${this.apiKey}`,
-            Accept: 'application/vnd.api+json',
+            Accept:        'application/vnd.api+json',
           },
         }
       );
@@ -106,7 +108,7 @@ class PUBG extends Integration {
         {
           headers: {
             Authorization: `Bearer ${this.apiKey}`,
-            Accept: 'application/vnd.api+json',
+            Accept:        'application/vnd.api+json',
           },
         }
       );
@@ -126,7 +128,7 @@ class PUBG extends Integration {
           {
             headers: {
               Authorization: `Bearer ${apiKey}`,
-              Accept: 'application/vnd.api+json',
+              Accept:        'application/vnd.api+json',
             },
           }
         );
@@ -147,7 +149,7 @@ class PUBG extends Integration {
           {
             headers: {
               Authorization: `Bearer ${apiKey}`,
-              Accept: 'application/vnd.api+json',
+              Accept:        'application/vnd.api+json',
             },
           }
         );
@@ -168,7 +170,7 @@ class PUBG extends Integration {
           {
             headers: {
               Authorization: `Bearer ${apiKey}`,
-              Accept: 'application/vnd.api+json',
+              Accept:        'application/vnd.api+json',
             },
           }
         );

@@ -16,7 +16,7 @@ async function fetchAccountAge (id?: number | null) {
   try {
     request = await axios.get(url, {
       headers: {
-        'Accept': 'application/vnd.twitchtv.v5+json',
+        'Accept':        'application/vnd.twitchtv.v5+json',
         'Authorization': 'OAuth ' + await getToken('bot'),
       },
       timeout: 20000,

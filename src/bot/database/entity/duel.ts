@@ -7,10 +7,10 @@ export interface DuelInterface {
 }
 
 export const Duel = new EntitySchema<Readonly<Required<DuelInterface>>>({
-  name: 'duel',
+  name:    'duel',
   columns: {
-    id: { type: Number, primary: true },
+    id:       { type: Number, primary: true },
     username: { type: String },
-    tickets: { type: Number },
+    tickets:  { type: Number },
   },
 });

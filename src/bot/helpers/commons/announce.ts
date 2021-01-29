@@ -18,11 +18,11 @@ export const announceTypes = ['bets', 'duel', 'heist', 'timers', 'songs', 'scrim
 export async function announce(messageToAnnounce: string, type: typeof announceTypes[number], replaceCustomVariables = true) {
   messageToAnnounce = await new Message(messageToAnnounce).parse({ sender: getBotSender(), replaceCustomVariables }) as string;
   sendMessage(messageToAnnounce, {
-    username: oauth.botUsername,
-    displayName: oauth.botUsername,
-    userId: botId.value,
-    emotes: [],
-    badges: {},
+    username:       oauth.botUsername,
+    displayName:    oauth.botUsername,
+    userId:         botId.value,
+    emotes:         [],
+    badges:         {},
     'message-type': 'chat',
   }, { force: true, skip: true });
 

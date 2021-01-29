@@ -4,7 +4,9 @@ import WebSocket from 'ws';
 
 import { SECOND } from './constants';
 import { eventEmitter } from './helpers/events';
-import { ban, debug, error, info, redeem, timeout, unban, warning } from './helpers/log';
+import {
+  ban, debug, error, info, redeem, timeout, unban, warning, 
+} from './helpers/log';
 import { broadcasterId } from './helpers/oauth/broadcasterId';
 import { addUIError } from './helpers/panel/alerts';
 import oauth from './oauth';
@@ -86,19 +88,19 @@ const connect = () => {
           redeem(`${dataMessage.data.redemption.user.login}#${dataMessage.data.redemption.user.id} redeemed ${dataMessage.data.redemption.reward.title}`);
         }
         alerts.trigger({
-          event: 'rewardredeems',
-          name: dataMessage.data.redemption.reward.title,
-          amount: 0,
-          tier: null,
-          currency: '',
+          event:      'rewardredeems',
+          name:       dataMessage.data.redemption.reward.title,
+          amount:     0,
+          tier:       null,
+          currency:   '',
           monthsName: '',
-          message: dataMessage.data.redemption.user_input,
-          recipient: dataMessage.data.redemption.user.login,
+          message:    dataMessage.data.redemption.user_input,
+          recipient:  dataMessage.data.redemption.user.login,
         });
         eventEmitter.emit('reward-redeemed', {
-          username: dataMessage.data.redemption.user.login,
+          username:      dataMessage.data.redemption.user.login,
           titleOfReward: dataMessage.data.redemption.reward.title,
-          userInput: dataMessage.data.redemption.user_input,
+          userInput:     dataMessage.data.redemption.user_input,
         });
       } else if (dataMessage.type === 'moderation_action') {
         try {
@@ -146,10 +148,10 @@ const connect = () => {
 
 const listen = (topic: string) => {
   const message = {
-    type: 'LISTEN',
+    type:  'LISTEN',
     nonce: nonce(15),
-    data: {
-      topics: [topic],
+    data:  {
+      topics:     [topic],
       auth_token: oauth.broadcasterAccessToken,
     },
   };

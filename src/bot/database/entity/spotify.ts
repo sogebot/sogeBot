@@ -7,10 +7,10 @@ export interface SpotifySongBanInterface {
 }
 
 export const SpotifySongBan = new EntitySchema<Readonly<Required<SpotifySongBanInterface>>>({
-  name: 'spotify_song_ban',
+  name:    'spotify_song_ban',
   columns: {
     spotifyUri: { type: String, primary: true },
-    title: { type: String },
-    artists: { type: 'simple-array' },
+    title:      { type: String },
+    artists:    { type: 'simple-array' },
   },
 });

@@ -3,7 +3,9 @@ import { getRepository } from 'typeorm';
 
 import { Duel as DuelEntity, DuelInterface } from '../database/entity/duel';
 import { User } from '../database/entity/user';
-import { command, persistent, settings } from '../decorators';
+import {
+  command, persistent, settings, 
+} from '../decorators';
 import { onStartup } from '../decorators/on';
 import { announce, prepare } from '../helpers/commons';
 import { isDbConnected } from '../helpers/database';
@@ -85,12 +87,12 @@ class Duel extends Game {
       const probability = winnerUser.tickets / (total / 100);
 
       const m = prepare(users.length === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
-        pointsName: await getPointsName(total),
-        points: total,
+        pointsName:  await getPointsName(total),
+        points:      total,
         probability: _.round(probability, 2),
         ticketsName: await getPointsName(winnerUser.tickets),
-        tickets: winnerUser.tickets,
-        winner: winnerUser.username,
+        tickets:     winnerUser.tickets,
+        winner:      winnerUser.username,
       });
       announce(m, 'duel');
 
@@ -112,8 +114,8 @@ class Duel extends Game {
 
     return [{
       response: prepare('gambling.duel.bank', {
-        command: this.getCommand('!duel'),
-        points: bank,
+        command:    this.getCommand('!duel'),
+        points:     bank,
         pointsName: await getPointsName(bank),
       }),
       ...opts,
@@ -149,7 +151,7 @@ class Duel extends Game {
       const userFromDB = await getRepository(DuelEntity).findOne({ id: Number(opts.sender.userId) });
       const isNewDuelist = !userFromDB;
       if (userFromDB) {
-        await getRepository(DuelEntity).save({...userFromDB, tickets: Number(userFromDB.tickets) + Number(bet) });
+        await getRepository(DuelEntity).save({ ...userFromDB, tickets: Number(userFromDB.tickets) + Number(bet) });
         await points.decrement({ userId: Number(opts.sender.userId) }, bet);
       } else {
         // check if under gambling cooldown
@@ -162,16 +164,15 @@ class Duel extends Game {
             this._cooldown = Date.now();
           }
           await getRepository(DuelEntity).save({
-            id: Number(opts.sender.userId),
+            id:       Number(opts.sender.userId),
             username: opts.sender.username,
-            tickets: Number(bet),
+            tickets:  Number(bet),
           });
           await points.decrement({ userId: Number(opts.sender.userId) }, bet);
         } else {
-          const response = prepare('gambling.fightme.cooldown', {
-            minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (Date.now() - new Date(this._cooldown).getTime())) / 1000 / 60), translate('core.minutes')),
-            cooldown: Math.round(((cooldown * 1000) - (Date.now() - new Date(this._cooldown).getTime())) / 1000 / 60),
-            command: opts.command });
+          const response = prepare('gambling.fightme.cooldown', { minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (Date.now() - new Date(this._cooldown).getTime())) / 1000 / 60), translate('core.minutes')),
+            cooldown:    Math.round(((cooldown * 1000) - (Date.now() - new Date(this._cooldown).getTime())) / 1000 / 60),
+            command:     opts.command });
           return [{ response, ...opts }];
         }
       }
@@ -180,11 +181,10 @@ class Duel extends Game {
       const isNewDuel = (this._timestamp) === 0;
       if (isNewDuel) {
         this._timestamp = Number(new Date());
-        const response = prepare('gambling.duel.new', {
-          sender: opts.sender,
+        const response = prepare('gambling.duel.new', { sender:      opts.sender,
           minutesName: getLocalizedName(5, translate('core.minutes')),
-          minutes: this.duration,
-          command: opts.command });
+          minutes:     this.duration,
+          command:     opts.command });
         // if we have discord, we want to send notice on twitch channel as well
         announce(response, 'duel');
       }
@@ -192,7 +192,7 @@ class Duel extends Game {
       const tickets = (await getRepository(DuelEntity).findOne({ id: Number(opts.sender.userId) }))?.tickets ?? 0;
       const response = prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
         pointsName: await getPointsName(tickets),
-        points: tickets,
+        points:     tickets,
       });
       responses.push({ response, ...opts });
     } catch (e) {
@@ -208,15 +208,15 @@ class Duel extends Game {
         case ERROR_NOT_ENOUGH_POINTS:
           responses.push({ response: prepare('gambling.duel.notEnoughPoints', {
             pointsName: await getPointsName(bet || 0),
-            points: bet,
+            points:     bet,
           }), ...opts });
           break;
         case ERROR_MINIMAL_BET:
           bet = this.minimalBet;
           responses.push({ response: prepare('gambling.duel.lowerThanMinimalBet', {
             pointsName: await getPointsName(bet),
-            points: bet,
-            command: opts.command,
+            points:     bet,
+            command:    opts.command,
           }), ...opts });
           break;
         /* istanbul ignore next */

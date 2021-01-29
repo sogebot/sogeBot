@@ -11,14 +11,14 @@ export interface TextInterface {
 }
 
 export const Text = new EntitySchema<Readonly<Required<TextInterface>>>({
-  name: 'text',
+  name:    'text',
   columns: {
-    id: { type: String, primary: true, generated: 'uuid' },
-    name: { type: String },
+    id:          { type: String, primary: true, generated: 'uuid' },
+    name:        { type: String },
     refreshRate: { type: Number, default: 5 },
-    text: { type: 'text' },
-    css: { type: 'text' },
-    js: { type: 'text' },
-    external: { type: 'simple-array' },
+    text:        { type: 'text' },
+    css:         { type: 'text' },
+    js:          { type: 'text' },
+    external:    { type: 'simple-array' },
   },
 });

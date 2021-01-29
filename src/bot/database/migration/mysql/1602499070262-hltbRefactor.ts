@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class hltbRefactor1602499070262 implements MigrationInterface {
   name = 'hltbRefactor1602499070262';

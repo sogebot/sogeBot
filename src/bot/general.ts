@@ -1,19 +1,27 @@
 import { readdirSync, writeFileSync } from 'fs';
 
 import gitCommitInfo from 'git-commit-info';
-import { get, isNil, map } from 'lodash';
+import {
+  get, isNil, map, 
+} from 'lodash';
 import { getConnection, getRepository } from 'typeorm';
 
 import Core from './_interface';
 import { HOUR, MINUTE } from './constants';
 import { Widget } from './database/entity/dashboard';
-import { command, default_permission, settings, ui } from './decorators';
-import { onChange, onLoad, onStartup } from './decorators/on';
+import {
+  command, default_permission, settings, ui, 
+} from './decorators';
+import {
+  onChange, onLoad, onStartup, 
+} from './decorators/on';
 import { isStreamOnline } from './helpers/api';
 import { setLocale } from './helpers/dayjs';
 import { setValue } from './helpers/general';
 import { setLang } from './helpers/locales';
-import { debug, error, warning } from './helpers/log';
+import {
+  debug, error, warning, 
+} from './helpers/log';
 import { getOAuthStatus } from './helpers/OAuthStatus';
 import { socketsConnected } from './helpers/panel/';
 import { addUIWarn } from './helpers/panel/';
@@ -54,10 +62,10 @@ class General extends Core {
   gracefulExitEachXHours = 0;
 
   @settings('general')
-  @ui({ type: 'selector', values: () => {
+  @ui({ type:   'selector', values: () => {
     const f = readdirSync('./locales/');
     return [...new Set(f.map((o) => o.split('.')[0]))];
-  }})
+  } })
   public lang = 'en';
 
   @onStartup()
@@ -69,13 +77,13 @@ class General extends Core {
   @command('!enable')
   @default_permission(defaultPermissions.CASTERS)
   public async enable(opts: CommandOptions) {
-    this.setStatus({...opts, enable: true});
+    this.setStatus({ ...opts, enable: true });
   }
 
   @command('!disable')
   @default_permission(defaultPermissions.CASTERS)
   public async disable(opts: CommandOptions) {
-    this.setStatus({...opts, enable: false});
+    this.setStatus({ ...opts, enable: false });
   }
 
   @onChange('lang')
@@ -158,10 +166,10 @@ class General extends Core {
   ping(opts: CommandOptions): CommandResponse[] {
     if (opts.sender.discord) {
       const response = `$sender, Pong! \`${Date.now() - opts.createdAt}ms\``;
-      return [{response, ...opts}];
+      return [{ response, ...opts }];
     } else {
       const response = `$sender, Pong! ${Date.now() - opts.createdAt}ms`;
-      return [{response, ...opts}];
+      return [{ response, ...opts }];
     }
   }
 

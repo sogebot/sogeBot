@@ -6,7 +6,9 @@ import { User } from '../database/entity/user';
 import ranks from '../systems/ranks';
 import { stats } from './api';
 import { getAll } from './customvariables';
-import { isOwner, isSubscriber, isVIP } from './user';
+import {
+  isOwner, isSubscriber, isVIP, 
+} from './user';
 import { isBot, isBotSubscriber } from './user/isBot';
 import { isBroadcaster } from './user/isBroadcaster';
 import { isModerator } from './user/isModerator';
@@ -20,7 +22,7 @@ export const checkFilter = async (opts: CommandOptions | ParserOptions, filter: 
   const $userObject = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
   if (!$userObject) {
     await getRepository(User).save({
-      userId: Number(opts.sender.userId),
+      userId:   Number(opts.sender.userId),
       username: opts.sender.username,
     });
     return checkFilter(opts, filter);
@@ -32,36 +34,36 @@ export const checkFilter = async (opts: CommandOptions | ParserOptions, filter: 
   }
 
   const $is = {
-    moderator: isModerator($userObject),
-    subscriber: isSubscriber($userObject),
-    vip: isVIP($userObject),
+    moderator:   isModerator($userObject),
+    subscriber:  isSubscriber($userObject),
+    vip:         isVIP($userObject),
     broadcaster: isBroadcaster(opts.sender.username),
-    bot: isBot(opts.sender.username),
-    owner: isOwner(opts.sender.username),
+    bot:         isBot(opts.sender.username),
+    owner:       isOwner(opts.sender.username),
   };
 
   const customVariables = await getAll();
   const context = {
-    $source: typeof opts.sender.discord === 'undefined' ? 'twitch' : 'discord',
-    $sender: opts.sender.username,
+    $source:          typeof opts.sender.discord === 'undefined' ? 'twitch' : 'discord',
+    $sender:          opts.sender.username,
     $is,
     $rank,
-    $haveParam: opts.parameters?.length > 0,
-    $param: opts.parameters,
+    $haveParam:       opts.parameters?.length > 0,
+    $param:           opts.parameters,
     // add global variables
-    $game: stats.value.currentGame || 'n/a',
-    $language: stats.value.language || 'en',
-    $title: stats.value.currentTitle || 'n/a',
-    $views: stats.value.currentViews,
-    $followers: stats.value.currentFollowers,
-    $hosts: stats.value.currentHosts,
-    $subscribers: stats.value.currentSubscribers,
+    $game:            stats.value.currentGame || 'n/a',
+    $language:        stats.value.language || 'en',
+    $title:           stats.value.currentTitle || 'n/a',
+    $views:           stats.value.currentViews,
+    $followers:       stats.value.currentFollowers,
+    $hosts:           stats.value.currentHosts,
+    $subscribers:     stats.value.currentSubscribers,
     $isBotSubscriber: isBotSubscriber(),
     ...customVariables,
   };
   let result = false;
   try {
-    result = safeEval(toEval, {...context, _});
+    result = safeEval(toEval, { ...context, _ });
   } catch (e) {
     // do nothing
   }

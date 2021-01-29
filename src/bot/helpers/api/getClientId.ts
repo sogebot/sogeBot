@@ -5,7 +5,7 @@ import { Settings } from '../../database/entity/settings';
 async function getClientId(type: 'bot' | 'broadcaster'){
   const clientId = await getRepository(Settings).findOne({
     where: {
-      name: type + 'ClientId',
+      name:      type + 'ClientId',
       namespace: '/core/oauth',
     },
   });

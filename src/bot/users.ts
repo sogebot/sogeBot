@@ -1,18 +1,24 @@
 import { setTimeout } from 'timers';
 
 import axios from 'axios';
-import { Brackets, FindOneOptions, getConnection, getRepository, IsNull } from 'typeorm';
+import {
+  Brackets, FindOneOptions, getConnection, getRepository, IsNull, 
+} from 'typeorm';
 
 import Core from './_interface';
 import api from './api';
 import { HOUR } from './constants';
 import currency from './currency';
 import { Permissions } from './database/entity/permissions';
-import { User, UserBit, UserInterface, UserTip } from './database/entity/user';
+import {
+  User, UserBit, UserInterface, UserTip, 
+} from './database/entity/user';
 import { onStartup } from './decorators/on';
 import { isStreamOnline, stats } from './helpers/api';
 import { mainCurrency } from './helpers/currency';
-import { debug, error, isDebugEnabled } from './helpers/log';
+import {
+  debug, error, isDebugEnabled, 
+} from './helpers/log';
 import { channelId } from './helpers/oauth';
 import { recacheOnlineUsersPermission } from './helpers/permissions';
 import { defaultPermissions, getUserHighestPermission } from './helpers/permissions/';
@@ -78,7 +84,7 @@ class Users extends Core {
   }
 
   async getChatOf (id: number, online: boolean): Promise<number> {
-    const user = await getRepository(User).findOne({ where: { userId: id }});
+    const user = await getRepository(User).findOne({ where: { userId: id } });
     let chat = 0;
 
     if (user) {
@@ -151,7 +157,7 @@ class Users extends Core {
   }
 
   async getWatchedOf (id: number): Promise<number> {
-    const user = await getRepository(User).findOne({ where: { userId: id }});
+    const user = await getRepository(User).findOne({ where: { userId: id } });
 
     if (user) {
       return Number(user.watchedTime) <= Number.MAX_SAFE_INTEGER
@@ -163,7 +169,7 @@ class Users extends Core {
   }
 
   async getMessagesOf (id: number): Promise<number> {
-    const user = await getRepository(User).findOne({ where: { userId: id }});
+    const user = await getRepository(User).findOne({ where: { userId: id } });
 
     if (user) {
       return Number(user.messages) <= Number.MAX_SAFE_INTEGER
@@ -229,14 +235,14 @@ class Users extends Core {
   }
 
   async getUserByUsername(username: string, select?: FindOneOptions<Readonly<Required<UserInterface>>>['select']) {
-    const userByUsername = await getRepository(User).findOne({ where: { username }, select});
+    const userByUsername = await getRepository(User).findOne({ where: { username }, select });
 
     if (userByUsername) {
       return userByUsername;
     }
 
     const userId = await this.getIdByName(username);
-    const userById = await getRepository(User).findOne({ where: { userId }});
+    const userById = await getRepository(User).findOne({ where: { userId } });
 
     return userById || await getRepository(User).save({
       userId,
@@ -263,7 +269,7 @@ class Users extends Core {
     });
     viewerEndpoint(this.nsp, 'theme::get', async (data, cb) => {
       try {
-        const user = await getRepository(User).findOneOrFail({ userId: Number(data.userId)});
+        const user = await getRepository(User).findOneOrFail({ userId: Number(data.userId) });
         cb(null, user.extra?.theme ?? null);
       } catch (e) {
         cb(e.stack, null);
@@ -434,9 +440,9 @@ class Users extends Core {
 
         const request = await axios.get(url, {
           headers: {
-            'Accept': 'application/vnd.twitchtv.v5+json',
+            'Accept':        'application/vnd.twitchtv.v5+json',
             'Authorization': 'Bearer ' + token,
-            'Client-ID': oauth.botClientId,
+            'Client-ID':     oauth.botClientId,
           },
         });
         if (request.data.total === 0) {
@@ -462,7 +468,7 @@ class Users extends Core {
           const permissionGroup = (await getRepository(Permissions).findOneOrFail({
             where: { id: permId || defaultPermissions.VIEWERS },
           }));
-          cb(null, {...viewer, aggregatedBits, aggregatedTips, permission: permissionGroup});
+          cb(null, { ...viewer, aggregatedBits, aggregatedTips, permission: permissionGroup });
         } else {
           cb(null);
         }

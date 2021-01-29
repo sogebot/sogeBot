@@ -4,10 +4,14 @@ import XRegExp from 'xregexp';
 
 import { parserReply } from '../commons';
 import * as constants from '../constants';
-import { Cooldown as CooldownEntity, CooldownInterface, CooldownViewer, CooldownViewerInterface } from '../database/entity/cooldown';
+import {
+  Cooldown as CooldownEntity, CooldownInterface, CooldownViewer, CooldownViewerInterface, 
+} from '../database/entity/cooldown';
 import { Keyword } from '../database/entity/keyword';
 import { User } from '../database/entity/user';
-import { command, default_permission, parser, permission_settings, rollback, settings } from '../decorators';
+import {
+  command, default_permission, parser, permission_settings, rollback, settings, 
+} from '../decorators';
 import { onChange } from '../decorators/on';
 import Expects from '../expects';
 import { prepare } from '../helpers/commons';
@@ -132,16 +136,16 @@ class Cooldown extends System {
 
     await getRepository(CooldownEntity).save({
       ...cooldown,
-      name: match.command,
-      miliseconds: parseInt(match.seconds, 10) * 1000,
-      type: (match.type as 'global' | 'user'),
-      timestamp: 0,
-      isErrorMsgQuiet: _.isNil(match.quiet) ? false : !!match.quiet,
-      isEnabled: true,
-      isOwnerAffected: false,
-      isModeratorAffected: false,
+      name:                 match.command,
+      miliseconds:          parseInt(match.seconds, 10) * 1000,
+      type:                 (match.type as 'global' | 'user'),
+      timestamp:            0,
+      isErrorMsgQuiet:      _.isNil(match.quiet) ? false : !!match.quiet,
+      isEnabled:            true,
+      isOwnerAffected:      false,
+      isModeratorAffected:  false,
       isSubscriberAffected: true,
-      isFollowerAffected: true,
+      isFollowerAffected:   true,
     });
     return [{ response: prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command }), ...opts }];
   }
@@ -209,8 +213,8 @@ class Cooldown extends System {
             )?.lastRunAt ?? 0) + defaultValue[permId] * 1000;
             data.push({
               isEnabled: true,
-              name: cmd,
-              type: 'default',
+              name:      cmd,
+              type:      'default',
               canBeRunAt,
               permId,
             });
@@ -220,7 +224,7 @@ class Cooldown extends System {
             const message = opts.message.replace(replace, '').trim();
             if (message.length > 0 && opts.message !== message) {
               debug('cooldown.check', `Command ${name} not on cooldown, checking: ${message}`);
-              return this.check({...opts, message});
+              return this.check({ ...opts, message });
             } else {
               return true;
             }
@@ -255,8 +259,8 @@ class Cooldown extends System {
                 )?.lastRunAt ?? 0) + defaultValue[permId] * 1000;
                 data.push({
                   isEnabled: true,
-                  name: keyword.keyword,
-                  type: 'default',
+                  name:      keyword.keyword,
+                  type:      'default',
                   permId,
                   canBeRunAt,
                 });
@@ -292,8 +296,8 @@ class Cooldown extends System {
             } else {
               defaultCooldowns.push({
                 lastRunAt: Date.now(),
-                name: cooldown.name,
-                permId: cooldown.permId,
+                name:      cooldown.name,
+                permId:    cooldown.permId,
               });
             }
             result = true;
@@ -307,7 +311,7 @@ class Cooldown extends System {
 
         for (const item of cooldown.viewers?.filter(o => o.userId === Number(opts.sender.userId)) ?? []) {
           if (!viewer || viewer.timestamp < item.timestamp) {
-            viewer = {...item};
+            viewer = { ...item };
           } else {
             // remove duplicate
             cooldown.viewers = cooldown.viewers?.filter(o => o.id !== item.id);
@@ -377,7 +381,7 @@ class Cooldown extends System {
         } else {
           cooldown.viewers?.push({
             timestamp: 0,
-            userId: Number(opts.sender.userId),
+            userId:    Number(opts.sender.userId),
             ...cooldown.viewers.find(o => o.userId === Number(opts.sender.userId)),
           });
         }
@@ -398,7 +402,7 @@ class Cooldown extends System {
 
     const cooldown = await getRepository(CooldownEntity).findOne({
       relations: ['viewers'],
-      where: {
+      where:     {
         name: match.command,
         type: match.type as 'global' | 'user',
       },

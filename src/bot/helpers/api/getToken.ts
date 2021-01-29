@@ -5,7 +5,7 @@ import { Settings } from '../../database/entity/settings';
 async function getToken(type: 'bot' | 'broadcaster'){
   const token = await getRepository(Settings).findOne({
     where: {
-      name: type + 'AccessToken',
+      name:      type + 'AccessToken',
       namespace: '/core/oauth',
     },
   });

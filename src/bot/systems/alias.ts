@@ -6,13 +6,19 @@ import { getRepository } from 'typeorm';
 import { parserReply } from '../commons';
 import * as constants from '../constants';
 import { Alias as AliasEntity } from '../database/entity/alias';
-import { command, default_permission, parser } from '../decorators';
+import {
+  command, default_permission, parser, 
+} from '../decorators';
 import Expects from '../expects';
 import { incrementCountOfCommandUsage } from '../helpers/commands/count';
 import { prepare } from '../helpers/commons';
 import { executeVariablesInText } from '../helpers/customvariables';
-import { debug, error, warning } from '../helpers/log';
-import { addToViewersCache, get, getFromViewersCache } from '../helpers/permissions';
+import {
+  debug, error, warning, 
+} from '../helpers/log';
+import {
+  addToViewersCache, get, getFromViewersCache, 
+} from '../helpers/permissions';
 import { check, defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import Parser from '../parser';
@@ -62,7 +68,7 @@ class Alias extends System {
 
     adminEndpoint(this.nsp, 'generic::setById', async (opts, cb) => {
       try {
-        const item = await getRepository(AliasEntity).save({ ...(await getRepository(AliasEntity).findOne({ id: String(opts.id) })), ...opts.item});
+        const item = await getRepository(AliasEntity).save({ ...(await getRepository(AliasEntity).findOne({ id: String(opts.id) })), ...opts.item });
         cb(null, item);
       } catch (e) {
         cb(e.stack, null);
@@ -130,9 +136,9 @@ class Alias extends System {
           const response = await executeVariablesInText(
             opts.message.replace(replace, alias.command), {
               sender: {
-                userId: Number(opts.sender.userId),
+                userId:   Number(opts.sender.userId),
                 username: opts.sender.username,
-                source: typeof opts.sender.discord === 'undefined' ? 'twitch' : 'discord',
+                source:   typeof opts.sender.discord === 'undefined' ? 'twitch' : 'discord',
               },
             });
           debug('alias.process', response);
@@ -178,8 +184,8 @@ class Alias extends System {
           const response = prepare('alias.alias-was-not-found', { alias });
           return [{ response, ...opts }];
         }
-        await getRepository(AliasEntity).save({...item, group });
-        const response = prepare('alias.alias-group-set', {...item, group });
+        await getRepository(AliasEntity).save({ ...item, group });
+        const response = prepare('alias.alias-group-set', { ...item, group });
         return [{ response, ...opts }];
       } else if (opts.parameters.includes('-unset')) {
         const [alias] = new Expects(opts.parameters)
@@ -190,7 +196,7 @@ class Alias extends System {
           const response = prepare('alias.alias-was-not-found', { alias });
           return [{ response, ...opts }];
         }
-        await getRepository(AliasEntity).save({...item, group: null });
+        await getRepository(AliasEntity).save({ ...item, group: null });
         const response = prepare('alias.alias-group-unset', item);
         return [{ response, ...opts }];
       } else if (opts.parameters.includes('-list')) {
@@ -206,8 +212,7 @@ class Alias extends System {
         } else {
           const aliases = await getRepository(AliasEntity).find();
           const groups = [...new Set(aliases.map(o => o.group).filter(o => !!o).sort())];
-          const response = prepare('alias.alias-group-list', {
-            list: groups.length > 0 ? groups.join(', ') : `<${translate('core.empty')}>` });
+          const response = prepare('alias.alias-group-list', { list: groups.length > 0 ? groups.join(', ') : `<${translate('core.empty')}>` });
           return [{ response, ...opts }];
         }
       } else if (opts.parameters.includes('-enable')) {
@@ -262,7 +267,7 @@ class Alias extends System {
         const response = prepare('alias.alias-was-not-found', { alias });
         return [{ response, ...opts }];
       }
-      await getRepository(AliasEntity).save({...item, command: cmd, permission: pItem.id ?? defaultPermissions.VIEWERS});
+      await getRepository(AliasEntity).save({ ...item, command: cmd, permission: pItem.id ?? defaultPermissions.VIEWERS });
 
       const response = prepare('alias.alias-was-edited', { alias, command: cmd });
       return [{ response, ...opts }];
@@ -293,9 +298,9 @@ class Alias extends System {
       const response = prepare('alias.alias-was-added',
         await getRepository(AliasEntity).save({
           alias,
-          command: cmd,
-          enabled: true,
-          visible: true,
+          command:    cmd,
+          enabled:    true,
+          visible:    true,
           permission: pItem.id ?? defaultPermissions.VIEWERS,
         })
       );
@@ -334,7 +339,7 @@ class Alias extends System {
         const response = prepare('alias.alias-was-not-found', { alias });
         return [{ response, ...opts }];
       }
-      await getRepository(AliasEntity).save({...item, enabled: !item.enabled});
+      await getRepository(AliasEntity).save({ ...item, enabled: !item.enabled });
       const response = prepare(!item.enabled ? 'alias.alias-was-enabled' : 'alias.alias-was-disabled', item);
       return [{ response, ...opts }];
     } catch (e) {
@@ -360,7 +365,7 @@ class Alias extends System {
         const response = prepare('alias.alias-was-not-found', { alias });
         return [{ response, ...opts }];
       }
-      await getRepository(AliasEntity).save({...item, visible: !item.visible});
+      await getRepository(AliasEntity).save({ ...item, visible: !item.visible });
       const response = prepare(!item.visible ? 'alias.alias-was-exposed' : 'alias.alias-was-concealed', item);
       return [{ response, ...opts }];
     } catch (e) {

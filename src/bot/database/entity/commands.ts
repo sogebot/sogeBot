@@ -34,52 +34,52 @@ export interface CommandsBoardInterface {
 }
 
 export const Commands = new EntitySchema<Readonly<Required<CommandsInterface>>>({
-  name: 'commands',
+  name:    'commands',
   columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    id:      { type: 'uuid', primary: true, generated: 'uuid' },
     command: { type: String },
     enabled: { type: Boolean },
     visible: { type: Boolean },
   },
   relations: {
     responses: {
-      type: 'one-to-many',
-      target: 'commands_responses',
+      type:        'one-to-many',
+      target:      'commands_responses',
       inverseSide: 'command',
-      cascade: true,
+      cascade:     true,
     },
   },
   indices: [
-    { name: 'IDX_1a8c40f0a581447776c325cb4f', columns: [ 'command' ]},
+    { name: 'IDX_1a8c40f0a581447776c325cb4f', columns: [ 'command' ] },
   ],
 });
 
 export const CommandsResponses = new EntitySchema<Readonly<Required<CommandsResponsesInterface>>>({
-  name: 'commands_responses',
+  name:    'commands_responses',
   columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
-    order: { type: Number },
-    response: { type: 'text' },
+    id:             { type: 'uuid', primary: true, generated: 'uuid' },
+    order:          { type: Number },
+    response:       { type: 'text' },
     stopIfExecuted: { type: Boolean },
-    permission: { type: String },
-    filter: { type: String },
+    permission:     { type: String },
+    filter:         { type: String },
   },
   relations: {
     command: {
-      type: 'many-to-one',
-      target: 'commands',
+      type:        'many-to-one',
+      target:      'commands',
       inverseSide: 'responses',
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete:    'CASCADE',
+      onUpdate:    'CASCADE',
     },
   },
 });
 
 export const CommandsCount = new EntitySchema<Readonly<Required<CommandsCountInterface>>>({
-  name: 'commands_count',
+  name:    'commands_count',
   columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
-    command: { type: String },
+    id:        { type: 'uuid', primary: true, generated: 'uuid' },
+    command:   { type: String },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },
   indices: [
@@ -88,11 +88,11 @@ export const CommandsCount = new EntitySchema<Readonly<Required<CommandsCountInt
 });
 
 export const CommandsBoard = new EntitySchema<Readonly<Required<CommandsBoardInterface>>>({
-  name: 'commands_board',
+  name:    'commands_board',
   columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
-    order: { type: Number },
-    text: { type: String },
+    id:      { type: 'uuid', primary: true, generated: 'uuid' },
+    order:   { type: Number },
+    text:    { type: String },
     command: { type: String },
   },
 });

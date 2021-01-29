@@ -5,14 +5,18 @@ import { getRepository } from 'typeorm';
 
 import currency from '../currency';
 import { User, UserTipInterface } from '../database/entity/user';
-import { persistent, settings, ui } from '../decorators';
+import {
+  persistent, settings, ui, 
+} from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import { isStreamOnline, stats } from '../helpers/api';
 import { mainCurrency } from '../helpers/currency';
 import { eventEmitter } from '../helpers/events';
 import { getBroadcaster } from '../helpers/getBroadcaster';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
-import { debug, error, info, tip } from '../helpers/log';
+import {
+  debug, error, info, tip, 
+} from '../helpers/log';
 import { ioServer } from '../helpers/panel';
 import eventlist from '../overlays/eventlist';
 import alerts from '../registries/alerts';
@@ -57,11 +61,11 @@ class Streamlabs extends Integration {
   accessToken = '';
 
   @ui({
-    type: 'link',
-    href: 'https://www.sogebot.xyz/integrations/#StreamLabs',
-    class: 'btn btn-primary btn-block',
+    type:   'link',
+    href:   'https://www.sogebot.xyz/integrations/#StreamLabs',
+    class:  'btn btn-primary btn-block',
     target: '_blank',
-    text: 'integrations.streamlabs.settings.accessTokenBtn',
+    text:   'integrations.streamlabs.settings.accessTokenBtn',
   })
   accessTokenBtn = null;
 
@@ -113,24 +117,24 @@ class Streamlabs extends Integration {
 
           const { name, currency: currency2, amount, message, created_at } = item;
           this.parse({
-            type: 'donation',
+            type:    'donation',
             message: [{
               formatted_amount: `${currency2}${amount}`,
-              formattedAmount: `${currency2}${amount}`,
-              amount: String(amount),
-              message: decodeURI(message),
-              from: name,
-              isTest: false,
-              created_at: Number(created_at),
+              formattedAmount:  `${currency2}${amount}`,
+              amount:           String(amount),
+              message:          decodeURI(message),
+              from:             name,
+              isTest:           false,
+              created_at:       Number(created_at),
               // filling up
-              _id: '',
-              currency: currency2,
-              emotes: null,
-              from_user_id: null,
-              iconClassName: 'user',
-              id: 0,
+              _id:              '',
+              currency:         currency2,
+              emotes:           null,
+              from_user_id:     null,
+              iconClassName:    'user',
+              id:               0,
               name,
-              to: { name: getBroadcaster() },
+              to:               { name: getBroadcaster() },
             }],
             event_id: '',
           });
@@ -205,11 +209,11 @@ class Streamlabs extends Integration {
           }
 
           const newTip: UserTipInterface = {
-            amount: Number(event.amount),
-            currency: event.currency,
-            sortAmount: currency.exchange(Number(event.amount), event.currency, mainCurrency.value),
-            message: event.message,
-            tippedAt: created_at,
+            amount:        Number(event.amount),
+            currency:      event.currency,
+            sortAmount:    currency.exchange(Number(event.amount), event.currency, mainCurrency.value),
+            message:       event.message,
+            tippedAt:      created_at,
             exchangeRates: currency.rates,
           };
           user.tips.push(newTip);
@@ -224,37 +228,37 @@ class Streamlabs extends Integration {
           tip(`${event.from.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(event.amount).toFixed(2)}${event.currency}, message: ${event.message}`);
         }
         eventlist.add({
-          event: 'tip',
-          amount: Number(event.amount),
-          currency: event.currency,
-          userId: String(await users.getIdByName(event.from.toLowerCase())),
-          message: event.message,
+          event:     'tip',
+          amount:    Number(event.amount),
+          currency:  event.currency,
+          userId:    String(await users.getIdByName(event.from.toLowerCase())),
+          message:   event.message,
           timestamp: Date.now(),
-          isTest: event.isTest,
+          isTest:    event.isTest,
         });
         eventEmitter.emit('tip', {
-          username: event.from.toLowerCase(),
-          amount: parseFloat(event.amount).toFixed(2),
-          currency: event.currency,
+          username:            event.from.toLowerCase(),
+          amount:              parseFloat(event.amount).toFixed(2),
+          currency:            event.currency,
           amountInBotCurrency: Number(currency.exchange(Number(event.amount), event.currency, mainCurrency.value)).toFixed(2),
-          currencyInBot: mainCurrency.value,
-          message: event.message,
+          currencyInBot:       mainCurrency.value,
+          message:             event.message,
         });
         alerts.trigger({
-          event: 'tips',
-          name: event.from.toLowerCase(),
-          tier: null,
-          amount: Number(parseFloat(event.amount).toFixed(2)),
-          currency: event.currency,
+          event:      'tips',
+          name:       event.from.toLowerCase(),
+          tier:       null,
+          amount:     Number(parseFloat(event.amount).toFixed(2)),
+          currency:   event.currency,
           monthsName: '',
-          message: event.message,
+          message:    event.message,
         });
 
         triggerInterfaceOnTip({
-          username: event.from.toLowerCase(),
-          amount: Number(event.amount),
-          message: event.message,
-          currency: event.currency,
+          username:  event.from.toLowerCase(),
+          amount:    Number(event.amount),
+          message:   event.message,
+          currency:  event.currency,
           timestamp: Date.now(),
         });
       }

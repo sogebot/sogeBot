@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 const ttsDefaultValues = {
   enabled: false, pitch: 1, rate: 1, voice: 'UK English Female', volume: 0.5,

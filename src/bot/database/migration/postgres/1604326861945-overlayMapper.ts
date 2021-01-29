@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class overlayMapper1604326861945 implements MigrationInterface {
   name = 'overlayMapper1604326861945';

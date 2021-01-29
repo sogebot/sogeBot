@@ -5,8 +5,12 @@ import { getRepository } from 'typeorm';
 
 import api from '../api';
 import { Highlight, HighlightInterface } from '../database/entity/highlight';
-import { command, default_permission, settings, ui } from '../decorators';
-import { calls, isStreamOnline, setRateLimit, stats, streamStatusChangeSince } from '../helpers/api';
+import {
+  command, default_permission, settings, ui, 
+} from '../decorators';
+import {
+  calls, isStreamOnline, setRateLimit, stats, streamStatusChangeSince, 
+} from '../helpers/api';
 import { getBotSender } from '../helpers/commons';
 import { dayjs } from '../helpers/dayjs';
 import { timestampToObject } from '../helpers/getTime';
@@ -68,7 +72,7 @@ class Highlights extends System {
           if (url.clip) {
             const cid = await api.createClip({ hasDelay: false });
             if (!cid) { // Something went wrong
-              return res.status(403).send({ error: 'Clip was not created!'});
+              return res.status(403).send({ error: 'Clip was not created!' });
             }
           }
           if (url.highlight) {
@@ -101,7 +105,7 @@ class Highlights extends System {
       const request = await axios.get(url, {
         headers: {
           Authorization: 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
+          'Client-ID':   oauth.botClientId,
         },
       });
       // save remaining api calls
@@ -109,10 +113,10 @@ class Highlights extends System {
 
       const timestamp = timestampToObject(dayjs().valueOf() - dayjs(streamStatusChangeSince.value).valueOf());
       const highlight = {
-        videoId: request.data.data[0].id,
+        videoId:   request.data.data[0].id,
         timestamp: { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds },
-        game: stats.value.currentGame || 'n/a',
-        title: stats.value.currentTitle || 'n/a',
+        game:      stats.value.currentGame || 'n/a',
+        title:     stats.value.currentTitle || 'n/a',
         createdAt: Date.now(),
       };
 

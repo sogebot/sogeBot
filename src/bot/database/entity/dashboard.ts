@@ -23,12 +23,12 @@ export interface WidgetInterface {
 }
 
 export const Dashboard = new EntitySchema<Readonly<Required<DashboardInterface>>>({
-  name: 'dashboard',
+  name:    'dashboard',
   columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
-    name: { type: String },
-    type: { type: String, length: 6 },
-    userId: { type: Number },
+    id:        { type: 'uuid', primary: true, generated: 'uuid' },
+    name:      { type: String },
+    type:      { type: String, length: 6 },
+    userId:    { type: Number },
     createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },
   indices: [
@@ -36,33 +36,33 @@ export const Dashboard = new EntitySchema<Readonly<Required<DashboardInterface>>
   ],
   relations: {
     widgets: {
-      type: 'one-to-many',
-      target: 'widget',
+      type:        'one-to-many',
+      target:      'widget',
       inverseSide: 'dashboard',
-      cascade: true,
+      cascade:     true,
     },
   },
 });
 
 export const Widget = new EntitySchema<Readonly<Required<WidgetInterface>>>({
-  name: 'widget',
+  name:    'widget',
   columns: {
-    id: { type: String, primary: true, generated: 'uuid' },
-    name: { type: String },
-    positionX: { type: Number },
-    positionY: { type: Number },
-    height: { type: Number },
-    width: { type: Number },
+    id:          { type: String, primary: true, generated: 'uuid' },
+    name:        { type: String },
+    positionX:   { type: Number },
+    positionY:   { type: Number },
+    height:      { type: Number },
+    width:       { type: Number },
     dashboardId: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') ? { type: 'varchar', length: '36', nullable: true } : { type: 'uuid', nullable: true },
   },
   relations: {
     dashboard: {
-      type: 'many-to-one',
-      target: 'dashboard',
-      joinColumn: { name: 'dashboardId' },
+      type:        'many-to-one',
+      target:      'dashboard',
+      joinColumn:  { name: 'dashboardId' },
       inverseSide: 'widgets',
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete:    'CASCADE',
+      onUpdate:    'CASCADE',
     },
   },
 });

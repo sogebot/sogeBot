@@ -5,7 +5,9 @@ import { getRepository } from 'typeorm';
 
 import { EventList } from './database/entity/eventList';
 import { User } from './database/entity/user';
-import { command, custom, evaluate, ifp, info, list, math, online, param, price, qs, random, ResponseFilter, stream, youtube } from './filters';
+import {
+  command, custom, evaluate, ifp, info, list, math, online, param, price, qs, random, ResponseFilter, stream, youtube, 
+} from './filters';
 import { isStreamOnline, stats } from './helpers/api';
 import { getBotSender } from './helpers/commons/getBotSender';
 import { isBotSubscriber } from './helpers/user/isBot';
@@ -25,16 +27,16 @@ class Message {
 
   async global (opts: { escape?: string, sender?: CommandOptions['sender'] }) {
     const variables = {
-      game: stats.value.currentGame,
-      language: stats.value.language,
-      viewers: isStreamOnline.value ? stats.value.currentViewers : 0,
-      views: stats.value.currentViews,
-      followers: stats.value.currentFollowers,
-      hosts: isStreamOnline.value ? stats.value.currentHosts : 0,
-      subscribers: stats.value.currentSubscribers,
-      bits: isStreamOnline.value ? stats.value.currentBits : 0,
-      title: stats.value.currentTitle,
-      source: opts.sender && typeof opts.sender.discord !== 'undefined' ? 'discord' : 'twitch',
+      game:            stats.value.currentGame,
+      language:        stats.value.language,
+      viewers:         isStreamOnline.value ? stats.value.currentViewers : 0,
+      views:           stats.value.currentViews,
+      followers:       stats.value.currentFollowers,
+      hosts:           isStreamOnline.value ? stats.value.currentHosts : 0,
+      subscribers:     stats.value.currentSubscribers,
+      bits:            isStreamOnline.value ? stats.value.currentBits : 0,
+      title:           stats.value.currentTitle,
+      source:          opts.sender && typeof opts.sender.discord !== 'undefined' ? 'discord' : 'twitch',
       isBotSubscriber: isBotSubscriber(),
     };
     for (const variable of Object.keys(variables)) {

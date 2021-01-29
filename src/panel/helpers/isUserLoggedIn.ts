@@ -36,7 +36,7 @@ export const isUserLoggedIn = async function (mustBeLogged = true, mustBeAdmin =
       const axiosData = await axios.get(`https://api.twitch.tv/helix/users`, {
         headers: {
           'Authorization': 'Bearer ' + code,
-          'Client-Id': clientId,
+          'Client-Id':     clientId,
         },
       });
       const data = get(axiosData, 'data.data[0]', null);
@@ -57,7 +57,7 @@ export const isUserLoggedIn = async function (mustBeLogged = true, mustBeAdmin =
 
           axios.get(`${window.location.origin}/socket/validate`, {
             headers: {
-              'x-twitch-token': code,
+              'x-twitch-token':  code,
               'x-twitch-userid': data.id,
             },
           }).then(validation => {

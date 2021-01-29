@@ -1,4 +1,6 @@
-import { isMainThread, parentPort, Worker } from 'worker_threads';
+import {
+  isMainThread, parentPort, Worker, 
+} from 'worker_threads';
 
 import axios from 'axios';
 import {
@@ -29,18 +31,18 @@ export const getCustomRewards = async (): Promise<getCustomRewardReturn> => {
     if (['mysql', 'mariadb'].includes(connectionOptions.type)) {
       await createConnection({
         ...connectionOptions,
-        logging: ['error'],
-        logger: new TypeORMLogger(),
-        synchronize: false,
+        logging:       ['error'],
+        logger:        new TypeORMLogger(),
+        synchronize:   false,
         migrationsRun: true,
-        charset: 'UTF8MB4_GENERAL_CI',
+        charset:       'UTF8MB4_GENERAL_CI',
       } as MysqlConnectionOptions);
     } else {
       await createConnection({
         ...connectionOptions,
-        logging: ['error'],
-        logger: new TypeORMLogger(),
-        synchronize: false,
+        logging:       ['error'],
+        logger:        new TypeORMLogger(),
+        synchronize:   false,
         migrationsRun: true,
       });
     }
@@ -71,18 +73,18 @@ export const getCustomRewards = async (): Promise<getCustomRewardReturn> => {
     const url = 'https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=' + channelId;
     const request = await axios.get<CustomRewardEndpoint>(url, {
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type':  'application/json',
         'Authorization': 'Bearer ' + await getToken('broadcaster'),
-        'Client-ID': await getClientId('broadcaster'),
+        'Client-ID':     await getClientId('broadcaster'),
       },
       timeout: 20000,
     });
 
     const toReturn = {
-      headers: request.headers,
-      method: request.config.method?.toUpperCase() ?? 'GET',
+      headers:  request.headers,
+      method:   request.config.method?.toUpperCase() ?? 'GET',
       response: request.data,
-      status: request.status,
+      status:   request.status,
       url,
     } as const;
     debug('microservice', 'return::getCustomRewards');
@@ -106,10 +108,10 @@ export const getCustomRewards = async (): Promise<getCustomRewardReturn> => {
     if (Object.keys(errors).includes(String(e.response.status))) {
       warning(errors[e.response.status as keyof typeof errors]);
       const toReturn = {
-        headers: e.response.headers,
-        url: e.config.url,
-        method: e.config.method.toUpperCase(),
-        status: e.response.status,
+        headers:  e.response.headers,
+        url:      e.config.url,
+        method:   e.config.method.toUpperCase(),
+        status:   e.response.status,
         response: null,
       } as const;
 
@@ -122,10 +124,10 @@ export const getCustomRewards = async (): Promise<getCustomRewardReturn> => {
     } else if (e.isAxiosError) {
       warning('Microservice getCustomRewards ended with error: unknown HTTP request error');
       const toReturn = {
-        headers: e.response.headers,
-        url: e.config.url,
-        method: e.config.method.toUpperCase(),
-        status: e.response.status ?? 'n/a',
+        headers:  e.response.headers,
+        url:      e.config.url,
+        method:   e.config.method.toUpperCase(),
+        status:   e.response.status ?? 'n/a',
         response: null,
       } as const;
 
@@ -138,12 +140,12 @@ export const getCustomRewards = async (): Promise<getCustomRewardReturn> => {
     } else {
       warning('Microservice getCustomRewards ended with error: unknown error');
       const toReturn = {
-        headers: e.response.headers,
-        url: e.config.url,
-        method: e.config.method.toUpperCase(),
-        status: e.response.status ?? 'n/a',
+        headers:  e.response.headers,
+        url:      e.config.url,
+        method:   e.config.method.toUpperCase(),
+        status:   e.response.status ?? 'n/a',
         response: e.response.data,
-        error: e,
+        error:    e,
       } as const;
 
       debug('microservice', 'getCustomRewards::return');

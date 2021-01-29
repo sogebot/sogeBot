@@ -3,12 +3,18 @@
 import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { Raffle, RaffleParticipant, RaffleParticipantInterface, RaffleParticipantMessageInterface } from '../database/entity/raffle';
+import {
+  Raffle, RaffleParticipant, RaffleParticipantInterface, RaffleParticipantMessageInterface, 
+} from '../database/entity/raffle';
 import { User } from '../database/entity/user';
-import { command, default_permission, parser, settings } from '../decorators';
+import {
+  command, default_permission, parser, settings, 
+} from '../decorators';
 import { onStartup } from '../decorators/on';
 import { isStreamOnline } from '../helpers/api';
-import { announce, getOwnerAsSender, prepare } from '../helpers/commons';
+import {
+  announce, getOwnerAsSender, prepare, 
+} from '../helpers/commons';
 import { isDbConnected } from '../helpers/database';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { debug, warning } from '../helpers/log';
@@ -77,13 +83,13 @@ class Raffles extends System {
       try {
         cb(
           null,
-          await getRepository(User).findOne({username}),
+          await getRepository(User).findOne({ username }),
         );
       } catch (e) {
         cb(e.stack);
       }
     });
-    adminEndpoint(this.nsp, 'raffle::setEligibility', async ({id, isEligible}, cb) => {
+    adminEndpoint(this.nsp, 'raffle::setEligibility', async ({ id, isEligible }, cb) => {
       try {
         cb(
           null,
@@ -99,7 +105,7 @@ class Raffles extends System {
           null,
           await getRepository(Raffle).findOne({
             relations: ['participants', 'participants.messages'],
-            order: {
+            order:     {
               timestamp: 'DESC',
             },
           }),
@@ -145,7 +151,7 @@ class Raffles extends System {
     if (isWinner && isInFiveMinutesTreshold) {
       const winner = await getRepository(RaffleParticipant).findOne({
         relations: ['messages'],
-        where: {
+        where:     {
           username: opts.sender.username,
           raffle,
         },
@@ -153,7 +159,7 @@ class Raffles extends System {
       if (winner) {
         const message: RaffleParticipantMessageInterface = {
           timestamp: Date.now(),
-          text: opts.message,
+          text:      opts.message,
         };
         winner.messages.push(message);
         await getRepository(RaffleParticipant).save(winner);
@@ -178,14 +184,14 @@ class Raffles extends System {
 
       const message = prepare(raffle.type === TYPE_NORMAL ? 'raffles.added-entries' : 'raffles.added-ticket-entries', {
         l10n_entries: getLocalizedName(announceNewEntriesCount, translate('core.entries')),
-        count: announceNewEntriesCount,
-        countTotal: raffle.participants.reduce((a, b) => {
+        count:        announceNewEntriesCount,
+        countTotal:   raffle.participants.reduce((a, b) => {
           a += b.tickets;
           return a;
         }, 0),
-        keyword: raffle.keyword,
-        min: raffle.minTickets,
-        max: raffle.maxTickets,
+        keyword:     raffle.keyword,
+        min:         raffle.minTickets,
+        max:         raffle.maxTickets,
         eligibility: eligibility.join(', '),
       });
 
@@ -237,10 +243,10 @@ class Raffles extends System {
     let message = prepare(locale, {
       l10n_entries: getLocalizedName(count, translate('core.entries')),
       count,
-      keyword: raffle.keyword,
-      min: raffle.minTickets,
-      max: raffle.maxTickets,
-      eligibility: eligibility.join(', '),
+      keyword:      raffle.keyword,
+      min:          raffle.minTickets,
+      max:          raffle.maxTickets,
+      eligibility:  eligibility.join(', '),
     });
     if (this.deleteRaffleJoinCommands) {
       message += ' ' + prepare('raffles.join-messages-will-be-deleted');
@@ -298,15 +304,15 @@ class Raffles extends System {
     }
 
     await getRepository(Raffle).save({
-      keyword: keyword,
-      forFollowers: followers,
+      keyword:        keyword,
+      forFollowers:   followers,
       forSubscribers: subscribers,
       minTickets,
       maxTickets,
-      type: type,
-      winner: null,
-      isClosed: false,
-      timestamp: Date.now(),
+      type:           type,
+      winner:         null,
+      isClosed:       false,
+      timestamp:      Date.now(),
     });
 
     announceNewEntriesCount = 0;
@@ -325,11 +331,11 @@ class Raffles extends System {
 
     let response = prepare(type === TYPE_NORMAL ? 'raffles.announce-raffle' : 'raffles.announce-ticket-raffle', {
       l10n_entries: getLocalizedName(0, translate('core.entries')),
-      count: 0,
-      keyword: keyword,
-      eligibility: eligibility.join(', '),
-      min: minTickets,
-      max: maxTickets,
+      count:        0,
+      keyword:      keyword,
+      eligibility:  eligibility.join(', '),
+      min:          minTickets,
+      max:          maxTickets,
     });
 
     this.lastAnnounce = Date.now();
@@ -372,10 +378,10 @@ class Raffles extends System {
     let response = prepare(locale, {
       l10n_entries: getLocalizedName(count, translate('core.entries')),
       count,
-      keyword: raffle.keyword,
-      min: raffle.minTickets,
-      max: raffle.maxTickets,
-      eligibility: eligibility.join(', '),
+      keyword:      raffle.keyword,
+      min:          raffle.minTickets,
+      max:          raffle.maxTickets,
+      eligibility:  eligibility.join(', '),
     });
     if (this.deleteRaffleJoinCommands) {
       response += ' ' + prepare('raffles.join-messages-will-be-deleted');
@@ -391,7 +397,7 @@ class Raffles extends System {
 
     const raffle = await getRepository(Raffle).findOne({
       relations: ['participants'],
-      where: { winner: null, isClosed: false },
+      where:     { winner: null, isClosed: false },
     });
 
     if (!raffle) {
@@ -401,7 +407,7 @@ class Raffles extends System {
     const user = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
     if (!user) {
       await getRepository(User).save({
-        userId: Number(opts.sender.userId),
+        userId:   Number(opts.sender.userId),
         username: opts.sender.username,
       });
       return this.participate(opts);
@@ -451,11 +457,11 @@ class Raffles extends System {
     const selectedParticipant = {
       ...participant,
       raffle,
-      isEligible: participant?.isEligible ?? true,
-      username: opts.sender.username,
-      tickets: raffle.type === TYPE_NORMAL ? 1 : newTickets,
-      messages: [],
-      isFollower: user.isFollower,
+      isEligible:   participant?.isEligible ?? true,
+      username:     opts.sender.username,
+      tickets:      raffle.type === TYPE_NORMAL ? 1 : newTickets,
+      messages:     [],
+      isFollower:   user.isFollower,
       isSubscriber: user.isSubscriber,
     };
 
@@ -500,7 +506,7 @@ class Raffles extends System {
   async pick (opts: CommandOptions): Promise<CommandResponse[]> {
     const raffle = await getRepository(Raffle).findOne({
       relations: ['participants'],
-      order: {
+      order:     {
         timestamp: 'DESC',
       },
     });
@@ -511,7 +517,7 @@ class Raffles extends System {
     if (raffle.participants.length === 0) {
       const response = prepare('raffles.no-participants-to-pick-winner');
       // close raffle on pick
-      await getRepository(Raffle).save({...raffle, isClosed: true, timestamp: Date.now()});
+      await getRepository(Raffle).save({ ...raffle, isClosed: true, timestamp: Date.now() });
       return [{ response, ...opts }];
     }
 
@@ -562,19 +568,19 @@ class Raffles extends System {
     // uneligible winner (don't want to pick second time same user if repick)
     if (winner) {
       await Promise.all([
-        getRepository(RaffleParticipant).save({...winner, isEligible: false }),
-        getRepository(Raffle).save({...raffle, winner: winner.username, isClosed: true, timestamp: Date.now()}),
+        getRepository(RaffleParticipant).save({ ...winner, isEligible: false }),
+        getRepository(Raffle).save({ ...raffle, winner: winner.username, isClosed: true, timestamp: Date.now() }),
       ]);
 
       const response = prepare('raffles.raffle-winner-is', {
-        username: winner.username,
-        keyword: raffle.keyword,
+        username:    winner.username,
+        keyword:     raffle.keyword,
         probability: _.round(probability, 2),
       });
       announce(response, 'raffles');
     } else {
       // close raffle on pick
-      await getRepository(Raffle).save({...raffle, isClosed: true, timestamp: Date.now()}),
+      await getRepository(Raffle).save({ ...raffle, isClosed: true, timestamp: Date.now() }),
       warning('No winner found in raffle');
     }
     return [];

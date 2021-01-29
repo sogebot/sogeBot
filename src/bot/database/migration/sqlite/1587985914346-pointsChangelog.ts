@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class pointsChangelog1587985914346 implements MigrationInterface {
   name = 'pointsChangelog1587985914346';

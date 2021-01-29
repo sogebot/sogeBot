@@ -9,11 +9,15 @@ import Core from './_interface';
 import { DAY } from './constants';
 import { Dashboard } from './database/entity/dashboard';
 import { User } from './database/entity/user';
-import { persistent, settings, ui } from './decorators';
+import {
+  persistent, settings, ui, 
+} from './decorators';
 import { onLoad } from './decorators/on';
 import { debug } from './helpers/log';
 import { app, ioServer } from './helpers/panel';
-import { check, defaultPermissions, getUserHighestPermission } from './helpers/permissions/';
+import {
+  check, defaultPermissions, getUserHighestPermission, 
+} from './helpers/permissions/';
 import { adminEndpoint, endpoints } from './helpers/socket';
 import { isModerator } from './helpers/user/isModerator';
 
@@ -73,14 +77,14 @@ const getPrivileges = async(type: 'admin' | 'viewer' | 'public', userId: number)
   try {
     const user = await getRepository(User).findOneOrFail({ userId });
     return {
-      haveAdminPrivileges: type === 'admin' ? Authorized.isAuthorized : Authorized.NotAuthorized,
-      haveModPrivileges: isModerator(user) ? Authorized.isAuthorized : Authorized.NotAuthorized,
+      haveAdminPrivileges:  type === 'admin' ? Authorized.isAuthorized : Authorized.NotAuthorized,
+      haveModPrivileges:    isModerator(user) ? Authorized.isAuthorized : Authorized.NotAuthorized,
       haveViewerPrivileges: Authorized.isAuthorized,
     };
   } catch (e) {
     return {
-      haveAdminPrivileges: Authorized.NotAuthorized,
-      haveModPrivileges: Authorized.NotAuthorized,
+      haveAdminPrivileges:  Authorized.NotAuthorized,
+      haveModPrivileges:    Authorized.NotAuthorized,
       haveViewerPrivileges: Authorized.NotAuthorized,
     };
   }
@@ -138,9 +142,9 @@ class Socket extends Core {
   socketToken = '';
 
   @ui({
-    type: 'btn-emit',
+    type:  'btn-emit',
     class: 'btn btn-danger btn-block mt-1 mb-1',
-    emit: 'purgeAllConnections',
+    emit:  'purgeAllConnections',
   }, 'connection')
   purgeAllConnections = null;
 
@@ -187,7 +191,7 @@ class Socket extends Core {
             });
 
             const accessToken = jwt.sign({
-              userId: Number(userId),
+              userId:     Number(userId),
               username,
               privileges: await getPrivileges(haveCasterPermission ? 'admin' : 'viewer', Number(userId)),
             }, this.JWTKey, { expiresIn: `${this.accessTokenExpirationTime}s` });
@@ -195,7 +199,7 @@ class Socket extends Core {
               userId: Number(userId),
               username,
             }, this.JWTKey, { expiresIn: `${this.refreshTokenExpirationTime}s` });
-            res.status(200).send({accessToken, refreshToken, userType: haveCasterPermission ? 'admin' : 'viewer'});
+            res.status(200).send({ accessToken, refreshToken, userType: haveCasterPermission ? 'admin' : 'viewer' });
           } catch(e) {
             debug('socket', e.stack);
             res.status(400).send('You don\'t have access to this server.');
@@ -215,20 +219,20 @@ class Socket extends Core {
             const user = await getRepository(User).findOne({ userId: Number(data.userId) });
             await getRepository(User).save({
               ...user,
-              userId: Number(data.userId),
+              userId:   Number(data.userId),
               username: data.username,
             });
 
             const accessToken = jwt.sign({
-              userId: Number(data.userId),
-              username: data.username,
+              userId:     Number(data.userId),
+              username:   data.username,
               privileges: await getPrivileges(userPermission === defaultPermissions.CASTERS ? 'admin' : 'viewer', Number(data.userId)),
             }, this.JWTKey, { expiresIn: `${this.accessTokenExpirationTime}s` });
             const refreshToken = jwt.sign({
-              userId: Number(data.userId),
+              userId:   Number(data.userId),
               username: data.username,
             }, this.JWTKey, { expiresIn: `${this.refreshTokenExpirationTime}s` });
-            res.status(200).send({accessToken, refreshToken, userType: userPermission === defaultPermissions.CASTERS ? 'admin' : 'viewer'});
+            res.status(200).send({ accessToken, refreshToken, userType: userPermission === defaultPermissions.CASTERS ? 'admin' : 'viewer' });
           } catch(e) {
             debug('socket', e.stack);
             res.status(400).send('You don\'t have access to this server.');

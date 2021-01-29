@@ -2,7 +2,9 @@ import { getRepository } from 'typeorm';
 
 import { Queue as QueueEntity, QueueInterface } from '../database/entity/queue';
 import { User } from '../database/entity/user';
-import { command, default_permission, settings } from '../decorators';
+import {
+  command, default_permission, settings, 
+} from '../decorators';
 import { getBotSender, prepare } from '../helpers/commons';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
@@ -148,7 +150,7 @@ class Queue extends System {
       const user = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
       if (!user) {
         await getRepository(User).save({
-          userId: Number(opts.sender.userId),
+          userId:   Number(opts.sender.userId),
           username: opts.sender.username,
         });
         return this.join(opts);
@@ -171,11 +173,11 @@ class Queue extends System {
       if (eligible) {
         await getRepository(QueueEntity).save({
           ...(await getRepository(QueueEntity).findOne({ username: opts.sender.username })),
-          username: opts.sender.username,
-          isFollower: user.isFollower,
+          username:     opts.sender.username,
+          isFollower:   user.isFollower,
           isSubscriber: user.isSubscriber,
-          isModerator: user.isModerator,
-          createdAt: Date.now(),
+          isModerator:  user.isModerator,
+          createdAt:    Date.now(),
 
         });
         return [{ response: translate('queue.join.opened'), ...opts }];

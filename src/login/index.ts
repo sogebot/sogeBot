@@ -7,8 +7,8 @@ Vue.use(VueCompositionAPI);
 
 const init = async () => {
   const router = new VueRouter({
-    mode: 'history',
-    base: __dirname,
+    mode:   'history',
+    base:   __dirname,
     routes: [
       { path: '/login', name: 'login', component: () => import('./views/login.vue') },
     ],

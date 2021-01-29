@@ -1,4 +1,4 @@
-import {get } from 'lodash';
+import { get } from 'lodash';
 
 import { parserReply } from '../commons';
 import { prepare } from '../helpers/commons';
@@ -20,7 +20,7 @@ const custom: ResponseFilter = {
       } else if (state.updated.responseType === 1) {
         // custom
         if (state.updated.responseText) {
-          parserReply(state.updated.responseText.replace('$value', state.setValue), { sender: attr.sender, attr: { skip: true, quiet: get(attr, 'quiet', false) }});
+          parserReply(state.updated.responseText.replace('$value', state.setValue), { sender: attr.sender, attr: { skip: true, quiet: get(attr, 'quiet', false) } });
         }
         return '';
       } else {

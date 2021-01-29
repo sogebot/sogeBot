@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class socketsTable1574119661920 implements MigrationInterface {
   name = 'socketsTable1574119661920';

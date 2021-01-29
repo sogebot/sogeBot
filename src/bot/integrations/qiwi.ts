@@ -73,11 +73,11 @@ class Qiwi extends Integration {
         const user = await users.getUserByUsername(username);
         id = user.userId;
         const newTip: UserTipInterface = {
-          amount: Number(amount),
-          currency: DONATION_CURRENCY,
-          sortAmount: currency.exchange(Number(amount), DONATION_CURRENCY, mainCurrency.value),
-          message: message,
-          tippedAt: Date.now(),
+          amount:        Number(amount),
+          currency:      DONATION_CURRENCY,
+          sortAmount:    currency.exchange(Number(amount), DONATION_CURRENCY, mainCurrency.value),
+          message:       message,
+          tippedAt:      Date.now(),
           exchangeRates: currency.rates,
         };
         user.tips.push(newTip);
@@ -93,10 +93,10 @@ class Qiwi extends Integration {
       }
 
       eventlist.add({
-        event: 'tip',
+        event:     'tip',
         amount,
-        currency: DONATION_CURRENCY,
-        userId: String(username ? await users.getIdByName(username.toLowerCase()) ?? '0' : '0'),
+        currency:  DONATION_CURRENCY,
+        userId:    String(username ? await users.getIdByName(username.toLowerCase()) ?? '0' : '0'),
         message,
         timestamp: Date.now(),
       });
@@ -104,29 +104,29 @@ class Qiwi extends Integration {
       tip(`${username ? username : 'Anonymous'}${id ? '#' + id : ''}, amount: ${Number(amount).toFixed(2)}${DONATION_CURRENCY}, ${message ? 'message: ' + message : ''}`);
 
       eventEmitter.emit('tip', {
-        username: username || 'Anonymous',
-        amount: String(amount),
-        currency: DONATION_CURRENCY,
+        username:            username || 'Anonymous',
+        amount:              String(amount),
+        currency:            DONATION_CURRENCY,
         amountInBotCurrency: Number(currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value)).toFixed(2),
-        currencyInBot: mainCurrency.value,
+        currencyInBot:       mainCurrency.value,
         message,
       });
 
       alerts.trigger({
-        event: 'tips',
-        name: username || 'Anonymous',
+        event:      'tips',
+        name:       username || 'Anonymous',
         amount,
-        tier: null,
-        currency: DONATION_CURRENCY,
+        tier:       null,
+        currency:   DONATION_CURRENCY,
         monthsName: '',
         message,
       });
 
       triggerInterfaceOnTip({
-        username: username || 'Anonymous',
+        username:  username || 'Anonymous',
         amount,
         message,
-        currency: DONATION_CURRENCY,
+        currency:  DONATION_CURRENCY,
         timestamp: Date.now(),
       });
 

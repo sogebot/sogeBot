@@ -7,11 +7,15 @@ import { getRepository } from 'typeorm';
 import type { StreamEndpoint } from './api';
 import { User } from './database/entity/user';
 import { getFunctionList } from './decorators/on';
-import { chatMessagesAtStart, curRetries, isStreamOnline, stats, streamId, streamStatusChangeSince, streamType } from './helpers/api';
+import {
+  chatMessagesAtStart, curRetries, isStreamOnline, stats, streamId, streamStatusChangeSince, streamType, 
+} from './helpers/api';
 import { setCurrentRetries } from './helpers/api/';
 import { eventEmitter } from './helpers/events';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
-import { debug, error, follow, info, start } from './helpers/log';
+import {
+  debug, error, follow, info, start, 
+} from './helpers/log';
 import { channelId } from './helpers/oauth';
 import { linesParsed } from './helpers/parser';
 import { find } from './helpers/register';
@@ -43,8 +47,8 @@ class Webhooks {
 
   addIdToCache (type: Type, id: string | number) {
     this.cache.push({
-      id: String(id),
-      type: type,
+      id:        String(id),
+      type:      type,
       timestamp: Date.now(),
     });
   }
@@ -80,33 +84,33 @@ class Webhooks {
     switch (type) {
       case 'follows':
         await axios({
-          method: 'post',
-          url: 'https://api.twitch.tv/helix/webhooks/hub',
+          method:  'post',
+          url:     'https://api.twitch.tv/helix/webhooks/hub',
           headers: {
             'Authorization': 'Bearer ' + token,
-            'Client-ID': clientId,
-            'Content-Type': 'application/json',
+            'Client-ID':     clientId,
+            'Content-Type':  'application/json',
           },
           data: {
             'hub.callback': `${callback}/${type}`,
-            'hub.mode': mode,
-            'hub.topic': `https://api.twitch.tv/helix/users/follows?first=1&to_id=${cid}`,
+            'hub.mode':     mode,
+            'hub.topic':    `https://api.twitch.tv/helix/users/follows?first=1&to_id=${cid}`,
           },
         });
         break;
       case 'streams':
         await axios({
-          method: 'post',
-          url: 'https://api.twitch.tv/helix/webhooks/hub',
+          method:  'post',
+          url:     'https://api.twitch.tv/helix/webhooks/hub',
           headers: {
             'Authorization': 'Bearer ' + token,
-            'Client-ID': clientId,
-            'Content-Type': 'application/json',
+            'Client-ID':     clientId,
+            'Content-Type':  'application/json',
           },
           data: {
             'hub.callback': `${callback}/${type}`,
-            'hub.mode': mode,
-            'hub.topic': `https://api.twitch.tv/helix/streams?user_id=${cid}`,
+            'hub.mode':     mode,
+            'hub.topic':    `https://api.twitch.tv/helix/streams?user_id=${cid}`,
           },
         });
         break;
@@ -136,17 +140,17 @@ class Webhooks {
     switch (type) {
       case 'follows':
         res = await axios({
-          method: 'post',
-          url: 'https://api.twitch.tv/helix/webhooks/hub',
+          method:  'post',
+          url:     'https://api.twitch.tv/helix/webhooks/hub',
           headers: {
             'Authorization': 'Bearer ' + token,
-            'Client-ID': clientId,
-            'Content-Type': 'application/json',
+            'Client-ID':     clientId,
+            'Content-Type':  'application/json',
           },
           data: {
-            'hub.callback': `${callback}/${type}`,
-            'hub.mode': mode,
-            'hub.topic': `https://api.twitch.tv/helix/users/follows?first=1&to_id=${cid}`,
+            'hub.callback':      `${callback}/${type}`,
+            'hub.mode':          mode,
+            'hub.topic':         `https://api.twitch.tv/helix/users/follows?first=1&to_id=${cid}`,
             'hub.lease_seconds': leaseSeconds,
           },
         });
@@ -158,17 +162,17 @@ class Webhooks {
         break;
       case 'streams':
         res = await axios({
-          method: 'post',
-          url: 'https://api.twitch.tv/helix/webhooks/hub',
+          method:  'post',
+          url:     'https://api.twitch.tv/helix/webhooks/hub',
           headers: {
             'Authorization': 'Bearer ' + token,
-            'Client-ID': clientId,
-            'Content-Type': 'application/json',
+            'Client-ID':     clientId,
+            'Content-Type':  'application/json',
           },
           data: {
-            'hub.callback': `${callback}/${type}`,
-            'hub.mode': mode,
-            'hub.topic': `https://api.twitch.tv/helix/streams?user_id=${cid}`,
+            'hub.callback':      `${callback}/${type}`,
+            'hub.mode':          mode,
+            'hub.topic':         `https://api.twitch.tv/helix/streams?user_id=${cid}`,
             'hub.lease_seconds': leaseSeconds,
           },
         });
@@ -247,7 +251,7 @@ class Webhooks {
       const user = await getRepository(User).findOne({ userId: Number(data.from_id) });
       if (!user) {
         await getRepository(User).save({
-          userId: Number(data.from_id),
+          userId:   Number(data.from_id),
           username: data.from_name.toLowerCase(),
         });
         this.follower(aEvent, true);
@@ -257,33 +261,33 @@ class Webhooks {
       if (!user.isFollower && (user.followedAt === 0 || Date.now() - user.followedAt > 60000 * 60)) {
         if (!isBot(data.from_name)) {
           eventlist.add({
-            event: 'follow',
-            userId: data.from_id,
+            event:     'follow',
+            userId:    data.from_id,
             timestamp: Date.now(),
           });
           follow(data.from_name);
           eventEmitter.emit('follow', { username: data.from_name, userId: Number(data.from_id), webhooks: true });
           alerts.trigger({
-            event: 'follows',
-            name: data.from_name,
-            amount: 0,
-            tier: null,
-            currency: '',
+            event:      'follows',
+            name:       data.from_name,
+            amount:     0,
+            tier:       null,
+            currency:   '',
             monthsName: '',
-            message: '',
+            message:    '',
           });
 
           triggerInterfaceOnFollow({
             username: data.from_name,
-            userId: Number(data.from_id),
+            userId:   Number(data.from_id),
           });
         }
       }
 
       await getRepository(User).save({
         ...user,
-        isFollower: user.haveFollowerLock? user.isFollower : true,
-        followedAt: user.haveFollowedAtLock ? user.followedAt : Date.now(),
+        isFollower:    user.haveFollowerLock? user.isFollower : true,
+        followedAt:    user.haveFollowedAtLock ? user.followedAt : Date.now(),
         followCheckAt: Date.now(),
       });
     } catch (e) {
@@ -316,11 +320,11 @@ class Webhooks {
         stats.value = {
           ...stats.value,
           currentWatchedTime: 0,
-          maxViewers: 0,
-          newChatters: 0,
-          currentViewers: 0,
-          currentBits: 0,
-          currentTips: 0,
+          maxViewers:         0,
+          newChatters:        0,
+          currentViewers:     0,
+          currentBits:        0,
+          currentTips:        0,
         };
 
         isStreamOnline.value = true;
@@ -350,7 +354,7 @@ class Webhooks {
       stats.value = {
         ...stats.value,
         currentTitle: stream.title,
-        currentGame: await getGameNameFromId(Number(stream.game_id)),
+        currentGame:  await getGameNameFromId(Number(stream.game_id)),
       };
 
       setCurrentRetries(0);
@@ -369,19 +373,19 @@ class Webhooks {
       }
 
       coreStats.save({
-        timestamp: new Date().getTime(),
-        whenOnline: isStreamOnline.value ? streamStatusChangeSince.value : Date.now(),
-        currentViewers: stats.value.currentViewers,
+        timestamp:          new Date().getTime(),
+        whenOnline:         isStreamOnline.value ? streamStatusChangeSince.value : Date.now(),
+        currentViewers:     stats.value.currentViewers,
         currentSubscribers: stats.value.currentSubscribers,
-        currentFollowers: stats.value.currentFollowers,
-        currentBits: stats.value.currentBits,
-        currentTips: stats.value.currentTips,
-        chatMessages: linesParsed - chatMessagesAtStart.value,
-        currentViews: stats.value.currentViews,
-        maxViewers: stats.value.maxViewers,
-        newChatters: stats.value.newChatters,
-        currentHosts: stats.value.currentHosts,
-        currentWatched: stats.value.currentWatchedTime,
+        currentFollowers:   stats.value.currentFollowers,
+        currentBits:        stats.value.currentBits,
+        currentTips:        stats.value.currentTips,
+        chatMessages:       linesParsed - chatMessagesAtStart.value,
+        currentViews:       stats.value.currentViews,
+        maxViewers:         stats.value.maxViewers,
+        newChatters:        stats.value.newChatters,
+        currentHosts:       stats.value.currentHosts,
+        currentWatched:     stats.value.currentWatchedTime,
       });
     } else {
       // stream is offline - add curRetry + 1

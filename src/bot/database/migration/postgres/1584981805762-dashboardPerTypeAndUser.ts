@@ -1,4 +1,6 @@
-import {MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
+import {
+  MigrationInterface, QueryRunner, TableColumn, 
+} from 'typeorm';
 
 let broadcasterId: null | number = null;
 

@@ -29,4 +29,6 @@ const retries = {
   },
 };
 
-export { maxRetries, curRetries, setCurrentRetries, retries };
+export {
+  maxRetries, curRetries, setCurrentRetries, retries, 
+};

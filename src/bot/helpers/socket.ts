@@ -144,4 +144,6 @@ const publicEndpoint = (nsp: string, on: string, callback: (opts: any, cb: (erro
   endpoints.push({ nsp, on, callback, type: 'public' });
 };
 
-export { endpoints, adminEndpoint, viewerEndpoint, publicEndpoint };
+export {
+  endpoints, adminEndpoint, viewerEndpoint, publicEndpoint, 
+};

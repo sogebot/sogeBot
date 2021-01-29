@@ -3,7 +3,9 @@ import { getRepository } from 'typeorm';
 
 import { HeistUser } from '../database/entity/heist';
 import { User } from '../database/entity/user';
-import { command, settings, ui } from '../decorators';
+import {
+  command, settings, ui, 
+} from '../decorators';
 import { onStartup } from '../decorators/on';
 import Expects from '../expects.js';
 import { announce, prepare } from '../helpers/commons';
@@ -65,34 +67,34 @@ class Heist extends Game {
   @ui({ type: 'heist-levels' }, 'levels')
   levelsValues: Level[] = [
     {
-      'name': translate('games.heist.levels.bankVan'),
-      'winPercentage': 60,
+      'name':             translate('games.heist.levels.bankVan'),
+      'winPercentage':    60,
       'payoutMultiplier': 1.5,
-      'maxUsers': 5,
+      'maxUsers':         5,
     },
     {
-      'name': translate('games.heist.levels.cityBank'),
-      'winPercentage': 46,
+      'name':             translate('games.heist.levels.cityBank'),
+      'winPercentage':    46,
       'payoutMultiplier': 1.7,
-      'maxUsers': 10,
+      'maxUsers':         10,
     },
     {
-      'name': translate('games.heist.levels.stateBank'),
-      'winPercentage': 40,
+      'name':             translate('games.heist.levels.stateBank'),
+      'winPercentage':    40,
       'payoutMultiplier': 1.9,
-      'maxUsers': 20,
+      'maxUsers':         20,
     },
     {
-      'name': translate('games.heist.levels.nationalReserve'),
-      'winPercentage': 35,
+      'name':             translate('games.heist.levels.nationalReserve'),
+      'winPercentage':    35,
       'payoutMultiplier': 2.1,
-      'maxUsers': 30,
+      'maxUsers':         30,
     },
     {
-      'name': translate('games.heist.levels.federalReserve'),
-      'winPercentage': 31,
+      'name':             translate('games.heist.levels.federalReserve'),
+      'winPercentage':    31,
       'payoutMultiplier': 2.5,
-      'maxUsers': 1000,
+      'maxUsers':         1000,
     },
   ];
 
@@ -249,7 +251,7 @@ class Heist extends Game {
 
     await Promise.all([
       pointsSystem.decrement({ userId: Number(opts.sender.userId) }, Number(points)),
-      getRepository(HeistUser).save({ userId: Number(opts.sender.userId), username: opts.sender.username, points: Number(points)}), // add user to heist list
+      getRepository(HeistUser).save({ userId: Number(opts.sender.userId), username: opts.sender.username, points: Number(points) }), // add user to heist list
     ]);
 
     // check how many users are in heist

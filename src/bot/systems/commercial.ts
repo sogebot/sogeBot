@@ -3,7 +3,9 @@
 import axios from 'axios';
 import * as _ from 'lodash';
 
-import { command, default_permission, helper } from '../decorators';
+import {
+  command, default_permission, helper, 
+} from '../decorators';
 import { calls, setRateLimit } from '../helpers/api';
 import { getOwner } from '../helpers/commons';
 import { eventEmitter } from '../helpers/events';
@@ -32,7 +34,7 @@ class Commercial extends System {
     adminEndpoint(this.nsp, 'commercial.run', (data) => {
       tmi.message({
         message: {
-          tags: { username: getOwner() },
+          tags:    { username: getOwner() },
           message: '!commercial ' + data.seconds,
         },
         skip: true,
@@ -52,7 +54,7 @@ class Commercial extends System {
 
     const commercial = {
       duration: !_.isNil(parsed[1]) ? parseInt(parsed[1], 10) : null,
-      message: !_.isNil(parsed[2]) ? parsed[2] : null,
+      message:  !_.isNil(parsed[2]) ? parsed[2] : null,
     };
 
     if (_.isNil(commercial.duration)) {
@@ -78,13 +80,13 @@ class Commercial extends System {
 
       try {
         const request = await axios({
-          method: 'post',
+          method:  'post',
           url,
-          data: { broadcaster_id: String(cid), length: commercial.duration },
+          data:    { broadcaster_id: String(cid), length: commercial.duration },
           headers: {
             'Authorization': 'Bearer ' + token,
-            'Client-ID': oauth.broadcasterClientId,
-            'Content-Type': 'application/json',
+            'Client-ID':     oauth.broadcasterClientId,
+            'Content-Type':  'application/json',
           },
         });
 

@@ -4,15 +4,23 @@ import XRegExp from 'xregexp';
 
 import { parserReply } from '../commons';
 import * as constants from '../constants';
-import { Commands, CommandsInterface, CommandsResponsesInterface } from '../database/entity/commands';
-import { command, default_permission, helper } from '../decorators';
+import {
+  Commands, CommandsInterface, CommandsResponsesInterface, 
+} from '../database/entity/commands';
+import {
+  command, default_permission, helper, 
+} from '../decorators';
 import { parser } from '../decorators';
 import Expects from '../expects';
 import { checkFilter } from '../helpers/checkFilter';
-import { getAllCountOfCommandUsage, getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage } from '../helpers/commands/count';
+import {
+  getAllCountOfCommandUsage, getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage, 
+} from '../helpers/commands/count';
 import { prepare } from '../helpers/commons';
 import { warning } from '../helpers/log';
-import { addToViewersCache, get, getFromViewersCache } from '../helpers/permissions';
+import {
+  addToViewersCache, get, getFromViewersCache, 
+} from '../helpers/permissions';
 import { check, defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import { translate } from '../translate';
@@ -53,7 +61,7 @@ class CustomCommands extends System {
     adminEndpoint(this.nsp, 'generic::setById', async (opts, cb) => {
       try {
         const item = await getRepository(Commands).findOne({ id: String(opts.id) });
-        await getRepository(Commands).save({ ...item, ...opts.item});
+        await getRepository(Commands).save({ ...item, ...opts.item });
         cacheValid = false;
         if (typeof cb === 'function') {
           cb(null, item);
@@ -75,7 +83,7 @@ class CustomCommands extends System {
       try {
         const commands = await getRepository(Commands).find({
           relations: ['responses'],
-          order: {
+          order:     {
             command: 'ASC',
           },
         });
@@ -88,7 +96,7 @@ class CustomCommands extends System {
     adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
       try {
         const cmd = await getRepository(Commands).findOne({
-          where: { id },
+          where:     { id },
           relations: ['responses'],
         });
         if (!cmd) {
@@ -132,7 +140,7 @@ class CustomCommands extends System {
 
       const cDb = await getRepository(Commands).findOne({
         relations: ['responses'],
-        where: {
+        where:     {
           command: cmd,
         },
       });
@@ -181,7 +189,7 @@ class CustomCommands extends System {
 
       const cDb = await getRepository(Commands).findOne({
         relations: ['responses'],
-        where: {
+        where:     {
           command: cmd,
         },
       });
@@ -200,11 +208,11 @@ class CustomCommands extends System {
       await getRepository(Commands).save({
         ...cDb,
         responses: [...cDb.responses, {
-          order: cDb.responses.length,
-          permission: pItem.id ?? defaultPermissions.VIEWERS,
+          order:          cDb.responses.length,
+          permission:     pItem.id ?? defaultPermissions.VIEWERS,
           stopIfExecuted: stopIfExecuted,
-          response: response,
-          filter: '',
+          response:       response,
+          filter:         '',
         }],
       });
       cacheValid = false;
@@ -236,14 +244,14 @@ class CustomCommands extends System {
         const db_commands: CommandsInterface[]
           = await getRepository(Commands).find({
             relations: ['responses'],
-            where: {
+            where:     {
               command: cmdArray.join(' '),
             },
           });
         for (const cmd of db_commands) {
           commands.push({
             cmdArray: _.cloneDeep(cmdArray),
-            command: cmd,
+            command:  cmd,
           });
         }
         cmdArray.pop(); // remove last array item if not found
@@ -323,7 +331,7 @@ class CustomCommands extends System {
       const command_with_responses
         = await getRepository(Commands).findOne({
           relations: ['responses'],
-          where: { command: cmd },
+          where:     { command: cmd },
         });
 
       if (!command_with_responses || command_with_responses.responses.length === 0) {
@@ -376,7 +384,7 @@ class CustomCommands extends System {
       const response = prepare('customcmds.command-was-not-found', { command: match.command });
       return [{ response, ...opts }];
     }
-    await getRepository(Commands).save({...cmd, visible: !cmd.visible});
+    await getRepository(Commands).save({ ...cmd, visible: !cmd.visible });
 
     const response = prepare(!cmd.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: cmd.command });
     cacheValid = false;
@@ -397,7 +405,7 @@ class CustomCommands extends System {
       }
 
       const command_db = await getRepository(Commands).findOne({
-        where: { command: cmd },
+        where:     { command: cmd },
         relations: [ 'responses' ],
       });
       if (!command_db) {

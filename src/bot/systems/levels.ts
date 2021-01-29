@@ -5,7 +5,9 @@ import { getRepository } from 'typeorm';
 
 import { MINUTE, SECOND } from '../constants';
 import { User, UserInterface } from '../database/entity/user';
-import { command, default_permission, parser, permission_settings, settings, ui } from '../decorators';
+import {
+  command, default_permission, parser, permission_settings, settings, ui, 
+} from '../decorators';
 import { onStartup } from '../decorators/on';
 import Expects from '../expects';
 import general from '../general';
@@ -19,7 +21,9 @@ import { defaultPermissions } from '../helpers/permissions/';
 import { getPointsName } from '../helpers/points';
 import { setImmediateAwait } from '../helpers/setImmediateAwait';
 import { adminEndpoint } from '../helpers/socket';
-import { bigIntMax, serialize, unserialize } from '../helpers/type';
+import {
+  bigIntMax, serialize, unserialize, 
+} from '../helpers/type';
 import { isBot } from '../helpers/user/isBot';
 import { translate } from '../translate';
 import users from '../users';
@@ -177,11 +181,11 @@ class Levels extends System {
       if (typeof user.extra?.levels === 'undefined') {
         debug('levels.update', `${user.username}#${userId}[${permId}] -- initial data --`);
         const levels: NonNullable<UserInterface['extra']>['levels'] = {
-          xp: serialize(BigInt(0)),
-          xpOfflineGivenAt: chatOffline,
+          xp:                serialize(BigInt(0)),
+          xpOfflineGivenAt:  chatOffline,
           xpOfflineMessages: 0,
-          xpOnlineGivenAt: chat,
-          xpOnlineMessages: 0,
+          xpOnlineGivenAt:   chat,
+          xpOnlineMessages:  0,
         };
         await getRepository(User).update({ userId: user.userId },
           {
@@ -206,11 +210,11 @@ class Levels extends System {
         if (modifier > 0) {
           debug('levels.update', `${user.username}#${userId}[${permId}] +${Math.floor(ptsPerInterval * modifier)}`);
           const levels: NonNullable<UserInterface['extra']>['levels'] = {
-            xp: serialize(BigInt(Math.floor(ptsPerInterval * modifier)) + (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0))),
-            xpOfflineGivenAt: !opts.isOnline ? userTimeXP : user.extra?.levels?.xpOfflineGivenAt ?? chatOffline,
+            xp:                serialize(BigInt(Math.floor(ptsPerInterval * modifier)) + (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0))),
+            xpOfflineGivenAt:  !opts.isOnline ? userTimeXP : user.extra?.levels?.xpOfflineGivenAt ?? chatOffline,
             xpOfflineMessages: user.extra?.levels?.xpOfflineMessages ?? 0,
             xpOnlineGivenAt:   opts.isOnline ? userTimeXP : user.extra?.levels?.xpOnlineGivenAt ?? chat,
-            xpOnlineMessages: user.extra?.levels?.xpOnlineMessages ?? 0,
+            xpOnlineMessages:  user.extra?.levels?.xpOnlineMessages ?? 0,
           };
           await getRepository(User).update({ userId: user.userId },
             {
@@ -222,11 +226,11 @@ class Levels extends System {
         }
       } else {
         const levels: NonNullable<UserInterface['extra']>['levels'] = {
-          xp: serialize(BigInt(ptsPerInterval) + (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0))),
-          xpOfflineGivenAt: !opts.isOnline ? chat : user.extra?.levels?.xpOfflineGivenAt ?? chat,
+          xp:                serialize(BigInt(ptsPerInterval) + (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0))),
+          xpOfflineGivenAt:  !opts.isOnline ? chat : user.extra?.levels?.xpOfflineGivenAt ?? chat,
           xpOfflineMessages: user.extra?.levels?.xpOfflineMessages ?? 0,
           xpOnlineGivenAt:   opts.isOnline ? chat : user.extra?.levels?.xpOnlineGivenAt ?? chat,
-          xpOnlineMessages: user.extra?.levels?.xpOnlineMessages ?? 0,
+          xpOnlineMessages:  user.extra?.levels?.xpOnlineMessages ?? 0,
         };
         await getRepository(User).update({ userId: user.userId },
           {
@@ -279,12 +283,12 @@ class Levels extends System {
 
     // default level object
     const levels: NonNullable<UserInterface['extra']>['levels'] = {
-      xp: serialize(unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0)),
-      xpOfflineGivenAt: user.extra?.levels?.xpOfflineGivenAt ?? chat,
+      xp:                serialize(unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0)),
+      xpOfflineGivenAt:  user.extra?.levels?.xpOfflineGivenAt ?? chat,
       xpOfflineMessages: !isStreamOnline.value
         ? 0
         : user.extra?.levels?.xpOfflineMessages ?? 0,
-      xpOnlineGivenAt: user.extra?.levels?.xpOnlineGivenAt ?? chat,
+      xpOnlineGivenAt:  user.extra?.levels?.xpOnlineGivenAt ?? chat,
       xpOnlineMessages: isStreamOnline.value
         ? 0
         : user.extra?.levels?.xpOnlineMessages ?? 0,
@@ -299,7 +303,7 @@ class Levels extends System {
             levels: {
               ...levels,
               [isStreamOnline.value ? 'xpOnlineMessages' : 'xpOfflineMessages']: 0,
-              xp: serialize(BigInt(ptsPerInterval) + (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0))),
+              xp:                                                                serialize(BigInt(ptsPerInterval) + (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0))),
             },
           },
         });
@@ -391,38 +395,38 @@ class Levels extends System {
       if (neededPoints >= availablePoints) {
         throw new ResponseError(
           prepare('systems.levels.notEnoughPointsToBuy', {
-            points: neededPoints,
+            points:     neededPoints,
             pointsName: getPointsName(neededPoints),
-            amount: xpNeeded,
-            level: currentLevel + 1,
-            xpName: this.xpName,
+            amount:     xpNeeded,
+            level:      currentLevel + 1,
+            xpName:     this.xpName,
           })
         );
       }
 
       const chat = await users.getChatOf(user.userId, isStreamOnline.value);
       const levels: NonNullable<UserInterface['extra']>['levels'] = {
-        xp: serialize(xp),
-        xpOfflineGivenAt: user.extra?.levels?.xpOfflineGivenAt ?? chat,
+        xp:                serialize(xp),
+        xpOfflineGivenAt:  user.extra?.levels?.xpOfflineGivenAt ?? chat,
         xpOfflineMessages: user.extra?.levels?.xpOfflineMessages ?? 0,
-        xpOnlineGivenAt: user.extra?.levels?.xpOnlineGivenAt ?? chat,
-        xpOnlineMessages: user.extra?.levels?.xpOnlineMessages ?? 0,
+        xpOnlineGivenAt:   user.extra?.levels?.xpOnlineGivenAt ?? chat,
+        xpOnlineMessages:  user.extra?.levels?.xpOnlineMessages ?? 0,
       };
       await getRepository(User).update({ userId: user.userId },
         {
           points: user.points - neededPoints,
-          extra: {
+          extra:  {
             ...user.extra,
             levels,
           },
         });
 
       const response = prepare('systems.levels.XPBoughtByPoints', {
-        points: neededPoints,
+        points:     neededPoints,
         pointsName: getPointsName(neededPoints),
-        level: currentLevel + 1,
-        amount: xpNeeded,
-        xpName: this.xpName,
+        level:      currentLevel + 1,
+        amount:     xpNeeded,
+        xpName:     this.xpName,
       });
       return [{ response, ...opts }];
     } catch (e) {
@@ -448,11 +452,11 @@ class Levels extends System {
       const chat = await users.getChatOf(user.userId, isStreamOnline.value);
 
       const levels: NonNullable<UserInterface['extra']>['levels'] = {
-        xp: serialize(bigIntMax(BigInt(xp) + (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0)), BigInt(0))),
-        xpOfflineGivenAt: user.extra?.levels?.xpOfflineGivenAt ?? chat,
+        xp:                serialize(bigIntMax(BigInt(xp) + (unserialize<bigint>(user.extra?.levels?.xp) ?? BigInt(0)), BigInt(0))),
+        xpOfflineGivenAt:  user.extra?.levels?.xpOfflineGivenAt ?? chat,
         xpOfflineMessages: user.extra?.levels?.xpOfflineMessages ?? 0,
-        xpOnlineGivenAt: user.extra?.levels?.xpOnlineGivenAt ?? chat,
-        xpOnlineMessages: user.extra?.levels?.xpOnlineMessages ?? 0,
+        xpOnlineGivenAt:   user.extra?.levels?.xpOnlineGivenAt ?? chat,
+        xpOnlineMessages:  user.extra?.levels?.xpOnlineMessages ?? 0,
       };
       await getRepository(User).update({ userId: user.userId },
         {

@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 const positionDefaultValues = {
   x: 0, y: 0, anchorX: 'left', anchorY: 'top',

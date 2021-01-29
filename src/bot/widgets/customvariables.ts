@@ -2,7 +2,9 @@
 
 import { getRepository } from 'typeorm';
 
-import { Variable, VariableWatch, VariableWatchInterface } from '../database/entity/variable';
+import {
+  Variable, VariableWatch, VariableWatchInterface, 
+} from '../database/entity/variable';
 import { isVariableSetById, setValueOf } from '../helpers/customvariables';
 import { csEmitter } from '../helpers/customvariables/emitter';
 import { adminEndpoint } from '../helpers/socket';

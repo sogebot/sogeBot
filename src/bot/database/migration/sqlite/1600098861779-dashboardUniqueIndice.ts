@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class dashboardUniqueIndice1600098861779 implements MigrationInterface {
   name = 'dashboardUniqueIndice1600098861779';

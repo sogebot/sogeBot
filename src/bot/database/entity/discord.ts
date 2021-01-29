@@ -11,12 +11,12 @@ export interface DiscordLinkInterface {
 }
 
 export const DiscordLink = new EntitySchema<Readonly<Required<DiscordLinkInterface>>>({
-  name: 'discord_link',
+  name:    'discord_link',
   columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
-    tag: { type: String },
+    id:        { type: 'uuid', primary: true, generated: 'uuid' },
+    tag:       { type: String },
     discordId: { type: String },
     createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
-    userId: { type: Number, nullable: true },
+    userId:    { type: Number, nullable: true },
   },
 });

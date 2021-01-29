@@ -5,11 +5,11 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
   state: {
-    loggedUser: null,
+    loggedUser:    null,
     configuration: null,
-    currentGame: '',
-    currentTitle: '',
-    currentTags: [],
+    currentGame:   '',
+    currentTitle:  '',
+    currentTags:   [],
   },
   mutations: {
     setLoggedUser (state, user) {
@@ -30,4 +30,4 @@ const store = new Vuex.Store({
   },
 });
 
-export {store};
+export { store };

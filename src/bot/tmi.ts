@@ -1,7 +1,9 @@
 import util from 'util';
 
 import { isNil } from 'lodash';
-import TwitchJs, { BaseMessage, HostTargetMessage, Message, PrivateMessages, UserNoticeMessages, UserStateTags } from 'twitch-js';
+import TwitchJs, {
+  BaseMessage, HostTargetMessage, Message, PrivateMessages, UserNoticeMessages, UserStateTags, 
+} from 'twitch-js';
 import { getRepository } from 'typeorm';
 
 import Core from './_interface';
@@ -12,21 +14,33 @@ import { Price } from './database/entity/price';
 import { User, UserBitInterface } from './database/entity/user';
 import { settings, ui } from './decorators';
 import { command, default_permission } from './decorators';
-import { getFunctionList, onChange, onLoad } from './decorators/on';
+import {
+  getFunctionList, onChange, onLoad, 
+} from './decorators/on';
 import Expects from './expects';
 import { isStreamOnline, stats } from './helpers/api';
-import { getBotSender, getOwner, prepare } from './helpers/commons';
+import {
+  getBotSender, getOwner, prepare, 
+} from './helpers/commons';
 import { sendMessage } from './helpers/commons/sendMessage';
 import { dayjs } from './helpers/dayjs';
 import { eventEmitter } from './helpers/events';
 import { getLocalizedName } from './helpers/getLocalized';
-import { triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub } from './helpers/interface/triggers';
+import {
+  triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub, 
+} from './helpers/interface/triggers';
 import { isDebugEnabled } from './helpers/log';
-import { chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning, whisperIn } from './helpers/log';
+import {
+  chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning, whisperIn, 
+} from './helpers/log';
 import { generalChannel } from './helpers/oauth/generalChannel';
-import { avgResponse, linesParsedIncrement, setStatus } from './helpers/parser';
+import {
+  avgResponse, linesParsedIncrement, setStatus, 
+} from './helpers/parser';
 import { defaultPermissions } from './helpers/permissions/';
-import { globalIgnoreListExclude, ignorelist, sendWithMe, setMuteStatus, showWithAt, tmiEmitter } from './helpers/tmi/';
+import {
+  globalIgnoreListExclude, ignorelist, sendWithMe, setMuteStatus, showWithAt, tmiEmitter, 
+} from './helpers/tmi/';
 import { isOwner } from './helpers/user';
 import { isBot } from './helpers/user/isBot';
 import { isIgnored } from './helpers/user/isIgnored';
@@ -71,7 +85,7 @@ class TMI extends Core {
     bot: TwitchJs | null;
     broadcaster: TwitchJs | null;
   } = {
-    bot: null,
+    bot:         null,
     broadcaster: null,
   };
   broadcasterWarning = false;
@@ -138,7 +152,7 @@ class TMI extends Core {
         ]
         )];
       // update ignore list
-      return [{ response: prepare('ignore.user.is.added', { username }), ...opts}];
+      return [{ response: prepare('ignore.user.is.added', { username }), ...opts }];
     } catch (e) {
       error(e.message);
     }
@@ -152,7 +166,7 @@ class TMI extends Core {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
       this.ignorelist = this.ignorelist.filter(o => o !== username);
       // update ignore list
-      return [{ response: prepare('ignore.user.is.removed', { username }), ...opts}];
+      return [{ response: prepare('ignore.user.is.removed', { username }), ...opts }];
     } catch (e) {
       error(e.message);
     }
@@ -165,7 +179,7 @@ class TMI extends Core {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
       const isUserIgnored = isIgnored({ username });
-      return [{ response: prepare(isUserIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored', { username }), ...opts}];
+      return [{ response: prepare(isUserIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored', { username }), ...opts }];
     } catch (e) {
       error(e.stack);
     }
@@ -234,8 +248,8 @@ class TMI extends Core {
         token,
         username,
         onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(refresh_token => refresh_token),
-        connectionTimeout: 60000,
-        joinTimeout: 60000,
+        connectionTimeout:       60000,
+        joinTimeout:             60000,
       });
 
       this.loadListeners(type);
@@ -327,7 +341,7 @@ class TMI extends Core {
 
         if (!isBot(message.tags.username) || !message.isSelf) {
           message.tags['message-type'] = 'whisper';
-          this.message({message});
+          this.message({ message });
           linesParsedIncrement();
         }
       });
@@ -343,11 +357,11 @@ class TMI extends Core {
           } else {
             // strip message from ACTION
             message.message = message.message.replace('\u0001ACTION ', '').replace('\u0001', '');
-            this.message({message});
+            this.message({ message });
             linesParsedIncrement();
             triggerInterfaceOnMessage({
-              sender: message.tags,
-              message: message.message,
+              sender:    message.tags,
+              message:   message.message,
               timestamp: Date.now(),
             });
 
@@ -391,27 +405,27 @@ class TMI extends Core {
         host(`${username}, viewers: ${viewers}`);
 
         const data = {
-          username: username,
-          viewers: viewers,
-          event: 'host',
+          username:  username,
+          viewers:   viewers,
+          event:     'host',
           timestamp: Date.now(),
         };
 
         eventlist.add({
-          userId: String(await users.getIdByName(username) ?? '0'),
-          viewers: viewers,
-          event: 'host',
+          userId:    String(await users.getIdByName(username) ?? '0'),
+          viewers:   viewers,
+          event:     'host',
           timestamp: Date.now(),
         });
         eventEmitter.emit('hosted', data);
         alerts.trigger({
-          event: 'hosts',
-          name: username,
-          amount: Number(viewers),
-          tier: null,
-          currency: '',
+          event:      'hosts',
+          name:       username,
+          amount:     Number(viewers),
+          tier:       null,
+          currency:   '',
           monthsName: '',
-          message: '',
+          message:    '',
         });
       });
     } else {
@@ -425,27 +439,27 @@ class TMI extends Core {
       raid(`${message.parameters.login}, viewers: ${message.parameters.viewerCount}`);
 
       const data = {
-        username: message.parameters.login,
-        viewers: message.parameters.viewerCount,
-        event: 'raid',
+        username:  message.parameters.login,
+        viewers:   message.parameters.viewerCount,
+        event:     'raid',
         timestamp: Date.now(),
       };
 
       eventlist.add({
-        userId: String(await users.getIdByName(message.parameters.login) ?? '0'),
-        viewers: message.parameters.viewerCount,
-        event: 'raid',
+        userId:    String(await users.getIdByName(message.parameters.login) ?? '0'),
+        viewers:   message.parameters.viewerCount,
+        event:     'raid',
         timestamp: Date.now(),
       });
       eventEmitter.emit('raid', data);
       alerts.trigger({
-        event: 'raids',
-        name: message.parameters.login,
-        amount: Number(message.parameters.viewerCount),
-        tier: null,
-        currency: '',
+        event:      'raids',
+        name:       message.parameters.login,
+        amount:     Number(message.parameters.viewerCount),
+        tier:       null,
+        currency:   '',
         monthsName: '',
-        message: '',
+        message:    '',
       });
 
     } else if (message.event === 'SUBSCRIPTION') {
@@ -485,7 +499,7 @@ class TMI extends Core {
       const tier = (method.prime ? 'Prime' : String(method.plan / 1000)) as EmitData['tier'];
       const userstate = message.tags;
 
-      if (isIgnored({username, userId: userstate.userId})) {
+      if (isIgnored({ username, userId: userstate.userId })) {
         return;
       }
 
@@ -498,35 +512,35 @@ class TMI extends Core {
 
       await getRepository(User).save({
         ...user,
-        isSubscriber: user.haveSubscriberLock ? user.isSubscriber : true,
-        subscribedAt: user.haveSubscribedAtLock ? user.subscribedAt : Date.now(),
-        subscribeTier: String(tier),
+        isSubscriber:              user.haveSubscriberLock ? user.isSubscriber : true,
+        subscribedAt:              user.haveSubscribedAtLock ? user.subscribedAt : Date.now(),
+        subscribeTier:             String(tier),
         subscribeCumulativeMonths: subCumulativeMonths,
-        subscribeStreak: 0,
+        subscribeStreak:           0,
       });
 
       eventlist.add({
-        event: 'sub',
-        tier: String(tier),
-        userId: String(userstate.userId),
-        method: (isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' ,
+        event:     'sub',
+        tier:      String(tier),
+        userId:    String(userstate.userId),
+        method:    (isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' ,
         timestamp: Date.now(),
       });
       sub(`${username}#${userstate.userId}, tier: ${tier}`);
       eventEmitter.emit('subscription', { username: username, method: (isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths, tier: String(tier) });
       alerts.trigger({
-        event: 'subs',
-        name: username,
-        amount: 0,
+        event:      'subs',
+        name:       username,
+        amount:     0,
         tier,
-        currency: '',
+        currency:   '',
         monthsName: '',
-        message: '',
+        message:    '',
       });
 
       triggerInterfaceOnSub({
         username: username,
-        userId: userstate.userId,
+        userId:   userstate.userId,
         subCumulativeMonths,
       });
     } catch (e) {
@@ -547,7 +561,7 @@ class TMI extends Core {
       const messageFromUser: string = message.message ?? '';
       const tier = (method.prime ? 'Prime' : String(method.plan / 1000)) as EmitData['tier'];
 
-      if (isIgnored({username, userId: userstate.userId})) {
+      if (isIgnored({ username, userId: userstate.userId })) {
         return;
       }
 
@@ -562,44 +576,44 @@ class TMI extends Core {
 
       await getRepository(User).save({
         ...user,
-        isSubscriber: true,
-        subscribedAt:  Number(dayjs().subtract(streakMonths, 'month').unix()) * 1000,
-        subscribeTier: String(tier),
+        isSubscriber:              true,
+        subscribedAt:              Number(dayjs().subtract(streakMonths, 'month').unix()) * 1000,
+        subscribeTier:             String(tier),
         subscribeCumulativeMonths: subCumulativeMonths,
-        subscribeStreak: subStreak,
+        subscribeStreak:           subStreak,
       });
 
       eventlist.add({
-        event: 'resub',
-        tier: String(tier),
-        userId: String(userstate.userId),
+        event:                   'resub',
+        tier:                    String(tier),
+        userId:                  String(userstate.userId),
         subStreakShareEnabled,
         subStreak,
-        subStreakName: getLocalizedName(subStreak, translate('core.months')),
+        subStreakName:           getLocalizedName(subStreak, translate('core.months')),
         subCumulativeMonths,
         subCumulativeMonthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
-        message: messageFromUser,
-        timestamp: Date.now(),
+        message:                 messageFromUser,
+        timestamp:               Date.now(),
       });
       resub(`${username}#${userstate.userId}, streak share: ${subStreakShareEnabled}, streak: ${subStreak}, months: ${subCumulativeMonths}, message: ${messageFromUser}, tier: ${tier}`);
       eventEmitter.emit('resub', {
         username,
-        tier: String(tier),
+        tier:                    String(tier),
         subStreakShareEnabled,
         subStreak,
-        subStreakName: getLocalizedName(subStreak, translate('core.months')),
+        subStreakName:           getLocalizedName(subStreak, translate('core.months')),
         subCumulativeMonths,
         subCumulativeMonthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
-        message: messageFromUser,
+        message:                 messageFromUser,
       });
       alerts.trigger({
-        event: 'resubs',
-        name: username,
-        amount: Number(subCumulativeMonths),
+        event:      'resubs',
+        name:       username,
+        amount:     Number(subCumulativeMonths),
         tier,
-        currency: '',
+        currency:   '',
         monthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
-        message: messageFromUser,
+        message:    messageFromUser,
       });
     } catch (e) {
       error('Error parsing resub event');
@@ -618,26 +632,26 @@ class TMI extends Core {
 
       this.ignoreGiftsFromUser[username] = { count, time: new Date() };
 
-      if (isIgnored({username, userId})) {
+      if (isIgnored({ username, userId })) {
         return;
       }
 
       eventlist.add({
-        event: 'subcommunitygift',
-        userId: String(userId),
+        event:     'subcommunitygift',
+        userId:    String(userId),
         count,
         timestamp: Date.now(),
       });
       eventEmitter.emit('subcommunitygift', { username, count });
       subcommunitygift(`${username}#${userId}, to ${count} viewers`);
       alerts.trigger({
-        event: 'subcommunitygifts',
-        name: username,
-        amount: Number(count),
-        tier: null,
-        currency: '',
+        event:      'subcommunitygifts',
+        name:       username,
+        amount:     Number(count),
+        tier:       null,
+        currency:   '',
         monthsName: '',
-        message: '',
+        message:    '',
       });
     } catch (e) {
       error('Error parsing subscriptionGiftCommunity event');
@@ -666,12 +680,12 @@ class TMI extends Core {
       } else {
         eventEmitter.emit('subgift', { username: username, recipient: recipient, tier });
         triggerInterfaceOnSub({
-          username: recipient,
-          userId: Number(recipientId),
+          username:            recipient,
+          userId:              Number(recipientId),
           subCumulativeMonths: 0,
         });
       }
-      if (isIgnored({username, userId: recipientId})) {
+      if (isIgnored({ username, userId: recipientId })) {
         return;
       }
 
@@ -684,35 +698,35 @@ class TMI extends Core {
 
       await getRepository(User).save({
         ...user,
-        isSubscriber: true,
-        subscribedAt: Date.now(),
-        subscribeTier: String(tier),
+        isSubscriber:              true,
+        subscribedAt:              Date.now(),
+        subscribeTier:             String(tier),
         subscribeCumulativeMonths: subCumulativeMonths,
-        subscribeStreak: user.subscribeStreak + 1,
+        subscribeStreak:           user.subscribeStreak + 1,
       });
 
       eventlist.add({
-        event: 'subgift',
-        userId: recipientId,
-        fromId: userId,
+        event:      'subgift',
+        userId:     recipientId,
+        fromId:     userId,
         monthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
-        months: subCumulativeMonths,
-        timestamp: Date.now(),
+        months:     subCumulativeMonths,
+        timestamp:  Date.now(),
       });
       subgift(`${recipient}#${recipientId}, from: ${username}#${userId}, months: ${subCumulativeMonths}`);
       alerts.trigger({
-        event: 'subgifts',
-        name: username,
+        event:      'subgifts',
+        name:       username,
         recipient,
-        amount: subCumulativeMonths,
-        tier: null,
-        currency: '',
+        amount:     subCumulativeMonths,
+        tier:       null,
+        currency:   '',
         monthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
-        message: '',
+        message:    '',
       });
 
       // also set subgift count to gifter
-      if (!(isIgnored({username, userId}))) {
+      if (!(isIgnored({ username, userId }))) {
         await getRepository(User).increment({ userId }, 'giftedSubscribes', 1);
       }
     } catch (e) {
@@ -730,11 +744,11 @@ class TMI extends Core {
       // remove <string>X or <string>X from message, but exclude from remove #<string>X or !someCommand2
       const messageFromUser = message.message.replace(/(?<![#!])(\b\w+[\d]+\b)/g, '').trim();
 
-      if (isIgnored({username, userId})) {
+      if (isIgnored({ username, userId })) {
         return;
       }
 
-      const user = await getRepository(User).findOne({ where: { userId: userId }});
+      const user = await getRepository(User).findOne({ where: { userId: userId } });
       if (!user) {
         // if we still doesn't have user, we create new
         await getRepository(User).save({ userId: Number(userstate.userId), username });
@@ -743,18 +757,18 @@ class TMI extends Core {
       }
 
       eventlist.add({
-        event: 'cheer',
-        userId: String(userId),
-        bits: userstate.bits,
-        message: messageFromUser,
+        event:     'cheer',
+        userId:    String(userId),
+        bits:      userstate.bits,
+        message:   messageFromUser,
         timestamp: Date.now(),
       });
       cheer(`${username}#${userId}, bits: ${userstate.bits}, message: ${messageFromUser}`);
 
       const newBits: UserBitInterface = {
-        amount: Number(userstate.bits),
+        amount:    Number(userstate.bits),
         cheeredAt: Date.now(),
-        message: messageFromUser,
+        message:   messageFromUser,
       };
       user.bits.push(newBits);
       getRepository(User).save(user);
@@ -769,16 +783,16 @@ class TMI extends Core {
       }
 
       triggerInterfaceOnBit({
-        username: username,
-        amount: userstate.bits,
-        message: messageFromUser,
+        username:  username,
+        amount:    userstate.bits,
+        message:   messageFromUser,
         timestamp: Date.now(),
       });
 
       let redeemTriggered = false;
       if (messageFromUser.trim().startsWith('!')) {
         try {
-          const price = await getRepository(Price).findOneOrFail({ where: { command: messageFromUser.trim().toLowerCase(), enabled: true }});
+          const price = await getRepository(Price).findOneOrFail({ where: { command: messageFromUser.trim().toLowerCase(), enabled: true } });
           if (price.priceBits <= Number(userstate.bits)) {
             if (customcommands.enabled) {
               await customcommands.run({ sender: getBotSender(), id: 'null', skip: false, quiet: false, message: messageFromUser.trim().toLowerCase(), parameters: '' });
@@ -788,14 +802,14 @@ class TMI extends Core {
               redeemTriggered = true;
               debug('tmi.cmdredeems', messageFromUser);
               alerts.trigger({
-                event: 'cmdredeems',
-                recipient: username,
-                name: price.command,
-                amount: Number(userstate.bits),
-                tier: null,
-                currency: '',
+                event:      'cmdredeems',
+                recipient:  username,
+                name:       price.command,
+                amount:     Number(userstate.bits),
+                tier:       null,
+                currency:   '',
                 monthsName: '',
-                message: '',
+                message:    '',
               });
             }
           }
@@ -805,13 +819,13 @@ class TMI extends Core {
       }
       if (!redeemTriggered) {
         alerts.trigger({
-          event: 'cheers',
-          name: username,
-          amount: Number(userstate.bits),
-          tier: null,
-          currency: '',
+          event:      'cheers',
+          name:       username,
+          amount:     Number(userstate.bits),
+          tier:       null,
+          currency:   '',
           monthsName: '',
-          message: messageFromUser,
+          message:    messageFromUser,
         });
       }
     } catch (e) {
@@ -823,7 +837,7 @@ class TMI extends Core {
 
   getMethod (message: Record<string, any>) {
     return {
-      plan: message.parameters.subPlan === 'Prime' ? 1000 : message.parameters.subPlan,
+      plan:  message.parameters.subPlan === 'Prime' ? 1000 : message.parameters.subPlan,
       prime: message.parameters.subPlan === 'Prime' ? 'Prime' : false,
     };
   }
@@ -882,28 +896,28 @@ class TMI extends Core {
           }
           await getRepository(User).save({
             ...user,
-            username: sender.username,
-            userId: Number(sender.userId),
-            isOnline: true,
-            isVIP: typeof sender.badges.vip !== 'undefined',
-            isModerator: typeof sender.badges.moderator !== 'undefined',
-            isSubscriber: user.haveSubscriberLock ? user.isSubscriber : userHaveSubscriberBadges(sender.badges),
-            messages: user.messages ?? 0,
-            subscribeTier: String(userHaveSubscriberBadges(sender.badges) ? 0 : user.subscribeTier),
+            username:                  sender.username,
+            userId:                    Number(sender.userId),
+            isOnline:                  true,
+            isVIP:                     typeof sender.badges.vip !== 'undefined',
+            isModerator:               typeof sender.badges.moderator !== 'undefined',
+            isSubscriber:              user.haveSubscriberLock ? user.isSubscriber : userHaveSubscriberBadges(sender.badges),
+            messages:                  user.messages ?? 0,
+            subscribeTier:             String(userHaveSubscriberBadges(sender.badges) ? 0 : user.subscribeTier),
             subscribeCumulativeMonths: subCumulativeMonths(sender) || user.subscribeCumulativeMonths,
-            seenAt: Date.now(),
+            seenAt:                    Date.now(),
           });
         } else {
           joinpart.send({ users: [sender.username], type: 'join' });
           eventEmitter.emit('user-joined-channel', { username: sender.username });
           await getRepository(User).save({
-            username: sender.username,
-            userId: Number(sender.userId),
-            isOnline: true,
-            isVIP: typeof sender.badges.vip !== 'undefined',
-            isModerator: typeof sender.badges.moderator !== 'undefined',
+            username:     sender.username,
+            userId:       Number(sender.userId),
+            isOnline:     true,
+            isVIP:        typeof sender.badges.vip !== 'undefined',
+            isModerator:  typeof sender.badges.moderator !== 'undefined',
             isSubscriber: userHaveSubscriberBadges(sender.badges),
-            seenAt: Date.now(),
+            seenAt:       Date.now(),
           });
         }
 

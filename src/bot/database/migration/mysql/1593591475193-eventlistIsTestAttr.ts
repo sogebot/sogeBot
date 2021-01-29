@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class eventlistIsTestAttr1593591475193 implements MigrationInterface {
   name = 'eventlistIsTestAttr1593591475193';

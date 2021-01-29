@@ -79,19 +79,19 @@ class Twitter extends Integration {
 
   public async enableStreamForHash(hash: string): Promise<void> {
     if (!this.watchedStreams.find((o) => o.hash === hash)) {
-      this.client?.stream('statuses/filter', {track: hash}, (stream) => {
+      this.client?.stream('statuses/filter', { track: hash }, (stream) => {
         info(chalk.yellow('TWITTER: ') + 'Stream for ' + hash + ' was started.');
         this.watchedStreams.push({ hash, stream });
         stream.on('data', (tweet) => {
           const data = {
-            id: tweet.id_str,
-            type: 'twitter',
-            timestamp: Date.now(),
-            hashtag: hash,
-            text: tweet.text,
-            username: tweet.user.screen_name,
+            id:          tweet.id_str,
+            type:        'twitter',
+            timestamp:   Date.now(),
+            hashtag:     hash,
+            text:        tweet.text,
+            username:    tweet.user.screen_name,
             displayname: tweet.user.name,
-            url: `https://twitter.com/${tweet.user.screen_name}/status/${tweet.id_str}`,
+            url:         `https://twitter.com/${tweet.user.screen_name}/status/${tweet.id_str}`,
           };
           getRepository(WidgetSocial).save(data);
           eventEmitter.emit('tweet-post-with-hashtag', { tweet: data });
@@ -178,9 +178,9 @@ class Twitter extends Integration {
       }
 
       this.client = new Client({
-        consumer_key: this.consumerKey.trim(),
-        consumer_secret: this.consumerSecret.trim(),
-        access_token_key: this.accessToken.trim(),
+        consumer_key:        this.consumerKey.trim(),
+        consumer_secret:     this.consumerSecret.trim(),
+        access_token_key:    this.accessToken.trim(),
         access_token_secret: this.secretToken.trim(),
       });
       info(chalk.yellow('TWITTER: ') + 'Client connected to service');

@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class PermitByUserId1583162282970 implements MigrationInterface {
   name = 'PermitByUserId1583162282970';

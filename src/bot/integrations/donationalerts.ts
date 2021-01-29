@@ -34,11 +34,11 @@ class Donationalerts extends Integration {
   socketToDonationAlerts: Centrifuge | null = null;
 
   @ui({
-    type: 'link',
-    href: 'https://www.sogebot.xyz/integrations/#DonationAlerts',
-    class: 'btn btn-primary btn-block',
+    type:   'link',
+    href:   'https://www.sogebot.xyz/integrations/#DonationAlerts',
+    class:  'btn btn-primary btn-block',
     target: '_blank',
-    text: 'integrations.donationalerts.settings.accessTokenBtn',
+    text:   'integrations.donationalerts.settings.accessTokenBtn',
   })
   accessTokenBtn = null;
 
@@ -65,7 +65,7 @@ class Donationalerts extends Integration {
     }
 
     this.socketToDonationAlerts = new Centrifuge('wss://centrifugo.donationalerts.com/connection/websocket', {
-      websocket: WebSocket,
+      websocket:          WebSocket,
       onPrivateSubscribe: async ({ data }, cb) => {
         const request = await axios.post('https://www.donationalerts.com/api/v1/centrifuge/subscribe', data, {
           headers: { 'Authorization': `Bearer ${this.access_token.trim()}` },
@@ -125,7 +125,7 @@ class Donationalerts extends Integration {
 
     return {
       token: request.data.data.socket_connection_token,
-      id: request.data.data.id,
+      id:    request.data.data.id,
     };
   }
 
@@ -146,41 +146,41 @@ class Donationalerts extends Integration {
 
   async parseDonation(data: DonationAlertsEvent) {
     eventlist.add({
-      event: 'tip',
-      amount: data.amount,
-      currency: data.currency,
-      userId: String(await users.getIdByName(data.username.toLowerCase()) ?? '0'),
-      message: data.message,
+      event:     'tip',
+      amount:    data.amount,
+      currency:  data.currency,
+      userId:    String(await users.getIdByName(data.username.toLowerCase()) ?? '0'),
+      message:   data.message,
       timestamp: Date.now(),
     });
 
     eventEmitter.emit('tip', {
-      username: data.username.toLowerCase(),
-      amount: data.amount.toFixed(2),
-      currency: data.currency,
+      username:            data.username.toLowerCase(),
+      amount:              data.amount.toFixed(2),
+      currency:            data.currency,
       amountInBotCurrency: Number(currency.exchange(Number(data.amount), data.currency, mainCurrency.value)).toFixed(2),
-      currencyInBot: mainCurrency.value,
-      message: data.message,
+      currencyInBot:       mainCurrency.value,
+      message:             data.message,
     });
 
     alerts.trigger({
-      event: 'tips',
-      name: data.username.toLowerCase(),
-      amount: Number(data.amount.toFixed(2)),
-      tier: null,
-      currency: data.currency,
+      event:      'tips',
+      name:       data.username.toLowerCase(),
+      amount:     Number(data.amount.toFixed(2)),
+      tier:       null,
+      currency:   data.currency,
       monthsName: '',
-      message: data.message,
+      message:    data.message,
     });
 
     if (data.billing_system !== 'fake') {
       const user = await users.getUserByUsername(data.username);
       const newTip: UserTipInterface = {
-        amount: Number(data.amount),
-        currency: data.currency,
-        sortAmount: currency.exchange(Number(data.amount), data.currency, mainCurrency.value),
-        message: data.message,
-        tippedAt: Date.now(),
+        amount:        Number(data.amount),
+        currency:      data.currency,
+        sortAmount:    currency.exchange(Number(data.amount), data.currency, mainCurrency.value),
+        message:       data.message,
+        tippedAt:      Date.now(),
         exchangeRates: currency.rates,
       };
       user.tips.push(newTip);
@@ -197,10 +197,10 @@ class Donationalerts extends Integration {
     }
 
     triggerInterfaceOnTip({
-      username: data.username.toLowerCase(),
-      amount: data.amount,
-      message: data.message,
-      currency: data.currency,
+      username:  data.username.toLowerCase(),
+      amount:    data.amount,
+      message:   data.message,
+      currency:  data.currency,
       timestamp: Date.now(),
     });
   }

@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class idAlign1602499070261 implements MigrationInterface {
   name = 'idAlign1602499070261';

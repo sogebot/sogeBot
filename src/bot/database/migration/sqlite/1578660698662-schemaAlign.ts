@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class schemaAlign1578660698662 implements MigrationInterface {
   name = 'schemaAlign1578660698662';

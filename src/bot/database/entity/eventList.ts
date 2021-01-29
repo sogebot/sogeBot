@@ -13,14 +13,14 @@ export interface EventListInterface {
 }
 
 export const EventList = new EntitySchema<Readonly<Required<EventListInterface>>>({
-  name: 'event_list',
+  name:    'event_list',
   columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
-    event: { type: String },
-    userId: { type: String },
-    timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer() },
-    isTest: { type: 'boolean' },
-    isHidden: { type: 'boolean', default: false },
+    id:          { type: 'uuid', primary: true, generated: 'uuid' },
+    event:       { type: String },
+    userId:      { type: String },
+    timestamp:   { type: 'bigint', transformer: new ColumnNumericTransformer() },
+    isTest:      { type: 'boolean' },
+    isHidden:    { type: 'boolean', default: false },
     values_json: { type: 'text' },
   },
   indices: [

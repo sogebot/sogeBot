@@ -11,12 +11,12 @@ export interface QuotesInterface {
 }
 
 export const Quotes = new EntitySchema<Readonly<Required<QuotesInterface>>>({
-  name: 'quotes',
+  name:    'quotes',
   columns: {
-    id: { type: 'int', primary: true, generated: 'increment' },
-    tags: { type: 'simple-array' },
-    quote: { type: String },
-    quotedBy: { type: Number },
+    id:        { type: 'int', primary: true, generated: 'increment' },
+    tags:      { type: 'simple-array' },
+    quote:     { type: String },
+    quotedBy:  { type: Number },
     createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },
 });

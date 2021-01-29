@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class customvariableNullFix1573908249974 implements MigrationInterface {
   name = 'customvariableNullFix1573908249974';

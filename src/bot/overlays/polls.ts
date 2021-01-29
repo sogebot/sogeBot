@@ -25,14 +25,14 @@ class Polls extends Overlay {
     publicEndpoint(this.nsp, 'data', async (callback) => {
       const currentVote = await getRepository(Poll).findOne({
         relations: ['votes'],
-        where: { isOpened: true },
+        where:     { isOpened: true },
       });
       callback(currentVote, currentVote?.votes, {
         display: {
-          align: this.cDisplayAlign,
-          theme: this.cDisplayTheme,
+          align:               this.cDisplayAlign,
+          theme:               this.cDisplayTheme,
           hideAfterInactivity: this.cDisplayHideAfterInactivity,
-          inactivityTime: this.cDisplayInactivityTime,
+          inactivityTime:      this.cDisplayInactivityTime,
         },
       });
     });

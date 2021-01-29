@@ -1,4 +1,6 @@
-import { isBoolean, isNumber, isString } from 'lodash';
+import {
+  isBoolean, isNumber, isString, 
+} from 'lodash';
 
 import { find } from '../register';
 

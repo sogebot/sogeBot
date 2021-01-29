@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class CooldownViewerUsernameToUserId1580137967891 implements MigrationInterface {
   name = 'CooldownViewerUsernameToUserId1580137967891';

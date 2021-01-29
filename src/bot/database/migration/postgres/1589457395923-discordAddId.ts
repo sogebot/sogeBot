@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class discordAddId1589457395923 implements MigrationInterface {
   name = 'discordAddId1589457395923';

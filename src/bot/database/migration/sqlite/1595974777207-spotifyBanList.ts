@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class spotifyBanList1595974777207 implements MigrationInterface {
   name = 'spotifyBanList1595974777207';

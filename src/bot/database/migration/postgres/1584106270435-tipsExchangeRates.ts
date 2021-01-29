@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 const exchangeRates = {
   AUD: 14.728, BGN: 13.313, BRL: 5.006, CAD: 16.92, CHF: 24.554, CNY: 3.356, CZK: 1, DKK: 3.484, EUR: 26.04, GBP: 29.23, HKD: 3.019, HRK: 3.445, HUF: 0.077, IDR: 0.002, ILS: 6.37, INR: 0.318, ISK: 0.174, JPY: 0.219, KRW: 0.019, MXN: 1.094, MYR: 5.481, NOK: 2.345, NZD: 14.369, PHP: 0.46, PLN: 5.976, RON: 5.4, RUB: 0.322, SEK: 2.401, SGD: 16.603, THB: 0.739, TRY: 3.728, USD: 23.449, ZAR: 1.454, XDR: 32.316,
@@ -34,7 +34,7 @@ export class tipsExchangeRates1584106270435 implements MigrationInterface {
       tipsWithExchangeRates.push({
         ...tip,
         exchangeRates: exchangeRates,
-        sortAmount: exchange(tip.amount, tip.currency, mainCurrency(resultMainCurrency)),
+        sortAmount:    exchange(tip.amount, tip.currency, mainCurrency(resultMainCurrency)),
       });
     }
 

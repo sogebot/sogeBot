@@ -10,7 +10,9 @@ import { parserReply } from '../commons';
 import * as constants from '../constants';
 import { Alias } from '../database/entity/alias';
 import { ModerationPermit, ModerationWarning } from '../database/entity/moderation';
-import { command, default_permission, parser, permission_settings, settings } from '../decorators';
+import {
+  command, default_permission, parser, permission_settings, settings, 
+} from '../decorators';
 import { prepare } from '../helpers/commons';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { timeout as timeoutLog, warning as warningLog } from '../helpers/log';

@@ -3,8 +3,12 @@ import { getRepository } from 'typeorm';
 import Core from './_interface';
 import { EventList } from './database/entity/eventList';
 import { User } from './database/entity/user';
-import { command, default_permission, settings } from './decorators';
-import { isStreamOnline, stats, streamStatusChangeSince } from './helpers/api';
+import {
+  command, default_permission, settings, 
+} from './decorators';
+import {
+  isStreamOnline, stats, streamStatusChangeSince, 
+} from './helpers/api';
 import { prepare } from './helpers/commons/prepare';
 import { dayjs, timezone } from './helpers/dayjs';
 import { getTime } from './helpers/getTime';
@@ -83,8 +87,8 @@ class Twitch extends Core {
     }
 
     const response = prepare('followers', {
-      lastFollowAgo: lastFollowAgo,
-      lastFollowUsername: lastFollowUsername,
+      lastFollowAgo:        lastFollowAgo,
+      lastFollowUsername:   lastFollowUsername,
       onlineFollowersCount: onlineFollowers.length,
     });
     return [ { response, ...opts }];
@@ -118,9 +122,9 @@ class Twitch extends Core {
     }
 
     const response = prepare('subs', {
-      lastSubAgo: lastSubAgo,
+      lastSubAgo:      lastSubAgo,
       lastSubUsername: lastSubUsername,
-      onlineSubCount: onlineSubscribers.length,
+      onlineSubCount:  onlineSubscribers.length,
     });
     return [ { response, ...opts }];
   }

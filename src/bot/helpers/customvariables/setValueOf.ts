@@ -4,7 +4,9 @@ import { getRepository } from 'typeorm';
 import { Variable, VariableInterface } from '../../database/entity/variable';
 import users from '../../users';
 import { warning } from '../log';
-import { addToViewersCache, get, getFromCachedHighestPermission, getFromViewersCache } from '../permissions';
+import {
+  addToViewersCache, get, getFromCachedHighestPermission, getFromViewersCache, 
+} from '../permissions';
 import { defaultPermissions } from '../permissions/';
 import { check } from '../permissions/';
 import { addChangeToHistory } from './addChangeToHistory';
@@ -25,23 +27,23 @@ async function setValueOf (variable: string | Readonly<VariableInterface>, curre
   // add simple text variable, if not existing
   if (!item) {
     const newItem: VariableInterface = {
-      variableName: variable as string,
-      currentValue: String(currentValue),
-      responseType: 0,
-      evalValue: '',
-      description: '',
-      responseText: '',
+      variableName:  variable as string,
+      currentValue:  String(currentValue),
+      responseType:  0,
+      evalValue:     '',
+      description:   '',
+      responseText:  '',
       usableOptions: [],
-      type: 'text',
-      permission: defaultPermissions.MODERATORS,
+      type:          'text',
+      permission:    defaultPermissions.MODERATORS,
     };
     return setValueOf(newItem, currentValue, opts);
   } else {
     if (typeof opts.sender === 'string') {
       opts.sender = {
         username: opts.sender,
-        userId: await users.getIdByName(opts.sender),
-        source: 'twitch',
+        userId:   await users.getIdByName(opts.sender),
+        source:   'twitch',
       };
     }
 

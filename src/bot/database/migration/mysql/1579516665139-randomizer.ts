@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class randomizer1579516665139 implements MigrationInterface {
   name = 'randomizer1579516665139';

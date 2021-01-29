@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-import { calls, emptyRateLimit, getClientId, getToken, setRateLimit } from '../helpers/api';
+import {
+  calls, emptyRateLimit, getClientId, getToken, setRateLimit, 
+} from '../helpers/api';
 import { error } from '../helpers/log';
 import { ioServer } from '../helpers/panel';
 
@@ -33,7 +35,7 @@ async function getIdFromTwitch (username: string, isChannelId = false): Promise<
     request = await axios.get(url, {
       headers: {
         'Authorization': 'Bearer ' + await getToken('bot'),
-        'Client-ID': await getClientId('bot'),
+        'Client-ID':     await getClientId('bot'),
       },
       timeout: 20000,
     });

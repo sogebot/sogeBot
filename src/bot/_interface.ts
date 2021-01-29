@@ -9,14 +9,20 @@ import { v4 as uuid } from 'uuid';
 
 import { PermissionCommands, Permissions as PermissionsEntity } from './database/entity/permissions';
 import { Settings } from './database/entity/settings';
-import { commandsToRegister, loadingInProgress, permissions as permissionsList } from './decorators';
+import {
+  commandsToRegister, loadingInProgress, permissions as permissionsList, 
+} from './decorators';
 import { getFunctionList } from './decorators/on';
 import { invalidateParserCache, refreshCachedCommandPermissions } from './helpers/cache';
 import { isBotStarted } from './helpers/database';
 import { flatten, unflatten } from './helpers/flatten';
-import {enabled} from './helpers/interface/enabled';
-import { error, info, warning } from './helpers/log';
-import { addMenu, addMenuPublic, addWidget, ioServer, menu, menuPublic } from './helpers/panel';
+import { enabled } from './helpers/interface/enabled';
+import {
+  error, info, warning, 
+} from './helpers/log';
+import {
+  addMenu, addMenuPublic, addWidget, ioServer, menu, menuPublic, 
+} from './helpers/panel';
 import { defaultPermissions } from './helpers/permissions/';
 import { register } from './helpers/register';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
@@ -90,14 +96,14 @@ class Module {
       value ? enabled.enable(this.nsp) : enabled.disable(this.nsp);
       getRepository(Settings).findOne({
         where: {
-          name: 'enabled',
+          name:      'enabled',
           namespace: this.nsp,
         },
       }).then(data => {
         getRepository(Settings).save({
           ...data,
-          name: 'enabled',
-          value: JSON.stringify(value),
+          name:      'enabled',
+          value:     JSON.stringify(value),
           namespace: this.nsp,
         });
       });
@@ -217,7 +223,7 @@ class Module {
         return undefined;
       }
     } catch (e) {
-      error({key, variable});
+      error({ key, variable });
       error(e);
       return undefined;
     }
@@ -302,8 +308,8 @@ class Module {
           // skip commands, enabled and permissions
           if (o.startsWith('commands') || o.startsWith('enabled') || o.startsWith('_permissions')) {
             return {
-              key: o,
-              actual: o,
+              key:      o,
+              actual:   o,
               toRemove: [],
             };
           }
@@ -313,7 +319,7 @@ class Module {
             const isVariableFound = this.settingsList.find(o2 => possibleVariable === o2.key);
             if (isVariableFound) {
               return {
-                key: o,
+                key:    o,
                 actual: isVariableFound.key,
                 toRemove,
               };
@@ -322,8 +328,8 @@ class Module {
             }
           }
           return {
-            key: null,
-            actual: null,
+            key:      null,
+            actual:   null,
             toRemove: null,
           };
         });
@@ -359,7 +365,7 @@ class Module {
                   } else {
                     await getRepository(PermissionCommands).save({
                       ...(await getRepository(PermissionCommands).findOne({ name: c.name })),
-                      name: c.name,
+                      name:       c.name,
                       permission: currentValue as string,
                     });
                   }
@@ -400,7 +406,7 @@ class Module {
         try {
           (this as any)[opts.variable] = opts.value;
           if (cb) {
-            cb(null, {variable: opts.variable, value: opts.value});
+            cb(null, { variable: opts.variable, value: opts.value });
           }
         } catch (e) {
           if (cb) {
@@ -583,11 +589,11 @@ class Module {
       }
 
       parsers.push({
-        this: this,
-        name: `${this.__moduleName__}.${parser.name}`,
-        fnc: (this as any)[parser.name],
-        permission: parser.permission,
-        priority: parser.priority,
+        this:          this,
+        name:          `${this.__moduleName__}.${parser.name}`,
+        fnc:           (this as any)[parser.name],
+        permission:    parser.permission,
+        priority:      parser.priority,
         fireAndForget: parser.fireAndForget ? parser.fireAndForget : false,
       });
     }
@@ -612,7 +618,7 @@ class Module {
       rollbacks.push({
         this: this,
         name: `${this.__moduleName__}.${rollback.name}`,
-        fnc: (this as any)[rollback.name],
+        fnc:  (this as any)[rollback.name],
       });
     }
     return rollbacks;
@@ -662,13 +668,13 @@ class Module {
         command.permission = typeof command.permission === 'undefined' ? defaultPermissions.VIEWERS : command.permission;
         command.command = typeof command.command === 'undefined' ? command.name : command.command;
         commands.push({
-          this: this,
-          id: command.name,
-          command: command.command,
-          fnc: (this as any)[command.fnc],
-          _fncName: command.fnc,
+          this:       this,
+          id:         command.name,
+          command:    command.command,
+          fnc:        (this as any)[command.fnc],
+          _fncName:   command.fnc,
           permission: command.permission,
-          isHelper: command.isHelper ? command.isHelper : false,
+          isHelper:   command.isHelper ? command.isHelper : false,
         });
       }
 
@@ -760,7 +766,7 @@ class Module {
         // default value
         await getRepository(Settings).delete({
           namespace: this.nsp,
-          name: 'commands.' + command,
+          name:      'commands.' + command,
         });
         delete c.command;
       } else {
@@ -768,14 +774,14 @@ class Module {
         const savedCommand = await getRepository(Settings).findOne({
           where: {
             namespace: this.nsp,
-            name: 'commands.' + command,
+            name:      'commands.' + command,
           },
         });
         await getRepository(Settings).save({
           ...savedCommand,
           namespace: this.nsp,
-          name: 'commands.' + command,
-          value: JSON.stringify(updated),
+          name:      'commands.' + command,
+          value:     JSON.stringify(updated),
         });
       }
     } else {

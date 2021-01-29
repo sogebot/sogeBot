@@ -5,7 +5,9 @@ import { sortBy } from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { MINUTE, SECOND } from '../constants';
-import { Timer, TimerResponse, TimerResponseInterface } from '../database/entity/timer';
+import {
+  Timer, TimerResponse, TimerResponseInterface, 
+} from '../database/entity/timer';
 import { command, default_permission } from '../decorators';
 import Expects from '../expects';
 import { isStreamOnline } from '../helpers/api';
@@ -52,7 +54,7 @@ class Timers extends System {
       try {
         const timer = await getRepository(Timer).findOne({
           relations: ['messages'],
-          where: {
+          where:     {
             id,
           },
         });
@@ -119,7 +121,7 @@ class Timers extends System {
 
     const timers = await getRepository(Timer).find({
       relations: ['messages'],
-      where: { isEnabled: true },
+      where:     { isEnabled: true },
     });
     for (const timer of timers) {
       if (timer.triggerEveryMessage > 0 && timer.triggeredAtMessages - linesParsed + timer.triggerEveryMessage > 0) {
@@ -179,15 +181,15 @@ class Timers extends System {
     }
     const timer = await getRepository(Timer).findOne({
       relations: ['messages'],
-      where: { name },
+      where:     { name },
     });
     await getRepository(Timer).save({
       ...timer,
-      name: name,
-      triggerEveryMessage: messages,
-      triggerEverySecond: seconds,
-      isEnabled: true,
-      triggeredAtMessages: linesParsed,
+      name:                 name,
+      triggerEveryMessage:  messages,
+      triggerEverySecond:   seconds,
+      isEnabled:            true,
+      triggeredAtMessages:  linesParsed,
       triggeredAtTimestamp: Date.now(),
     });
     return [{ response: translate('timers.timer-was-set')
@@ -252,7 +254,7 @@ class Timers extends System {
     }
     const timer = await getRepository(Timer).findOne({
       relations: ['messages'],
-      where: { name },
+      where:     { name },
     });
     if (!timer) {
       return [{ response: translate('timers.timer-not-found')
@@ -262,8 +264,8 @@ class Timers extends System {
     const item = await getRepository(TimerResponse).save({
       isEnabled: true,
       timestamp: Date.now(),
-      response: response,
-      timer: timer,
+      response:  response,
+      timer:     timer,
     });
 
     return [{ response: translate('timers.response-was-added')
@@ -288,7 +290,7 @@ class Timers extends System {
 
     const timer = await getRepository(Timer).findOne({
       relations: ['messages'],
-      where: { name },
+      where:     { name },
     });
     if (!timer) {
       return [{ response: translate('timers.timer-not-found')

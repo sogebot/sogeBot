@@ -12,14 +12,14 @@ export interface PointsChangelogInterface {
 }
 
 export const PointsChangelog = new EntitySchema<Readonly<Required<PointsChangelogInterface>>>({
-  name: 'points_changelog',
+  name:    'points_changelog',
   columns: {
-    id: { type: Number, primary: true, generated: 'increment' },
-    userId: { type: Number },
+    id:            { type: Number, primary: true, generated: 'increment' },
+    userId:        { type: Number },
     originalValue: { type: Number },
-    updatedValue: { type: Number },
-    updatedAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
-    command: { type: String },
+    updatedValue:  { type: Number },
+    updatedAt:     { type: 'bigint', transformer: new ColumnNumericTransformer() },
+    command:       { type: String },
   },
   indices: [
     { name: 'IDX_points_changelog_userId', columns: ['userId'] },

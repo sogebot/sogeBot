@@ -4,7 +4,9 @@ import api from '../api';
 import { dateDiff } from '../commons';
 import currency from '../currency';
 import { User } from '../database/entity/user';
-import { command, default_permission, settings, ui } from '../decorators';
+import {
+  command, default_permission, settings, ui, 
+} from '../decorators';
 import Expects from '../expects';
 import general from '../general';
 import { prepare } from '../helpers/commons/';
@@ -36,10 +38,10 @@ import ranks from './ranks';
 class UserInfo extends System {
   @settings('me')
   @ui({
-    type: 'sortable-list',
-    values: 'order',
-    toggle: '_formatDisabled',
-    toggleOnIcon: 'eye',
+    type:          'sortable-list',
+    values:        'order',
+    toggle:        '_formatDisabled',
+    toggleOnIcon:  'eye',
     toggleOffIcon: 'eye-slash',
   })
   order: string[] = ['$sender', '$level', '$rank', '$role', '$watched', '$points', '$messages', '$tips', '$bits'];
@@ -119,8 +121,8 @@ class UserInfo extends System {
         subCumulativeMonths,
         subCumulativeMonthsName: getLocalizedName(subCumulativeMonths || 0, translate('core.months')),
         subStreak,
-        subStreakMonthsName: getLocalizedName(subStreak || 0, translate('core.months')),
-        diff: output.join(', '),
+        subStreakMonthsName:     getLocalizedName(subStreak || 0, translate('core.months')),
+        diff:                    output.join(', '),
       }), ...opts }];
     }
   }
@@ -135,7 +137,7 @@ class UserInfo extends System {
         const { id: userId } = await getUserFromTwitch(username);
         if (!user) {
           await getRepository(User).save({
-            userId: Number(userId),
+            userId:   Number(userId),
             username: username,
           });
         }
@@ -313,7 +315,7 @@ class UserInfo extends System {
   async showStats(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
-      const user = await getRepository(User).findOne({ where: { username: username.toLowerCase() }});
+      const user = await getRepository(User).findOne({ where: { username: username.toLowerCase() } });
 
       if (!user) {
         throw Error(`User ${username} not found.`);

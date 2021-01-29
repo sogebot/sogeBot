@@ -1,4 +1,6 @@
-import { cloneDeep, get, isEqual, set } from 'lodash';
+import {
+  cloneDeep, get, isEqual, set, 
+} from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { change } from './changelog';
@@ -75,22 +77,22 @@ export const VariableWatcher = {
       }
       const value = cloneDeep(get(checkedModule, variable, undefined));
       if (typeof value === 'undefined') {
-        throw new Error('Value not found, check your code!!! ' + JSON.stringify({k, variable, value}));
+        throw new Error('Value not found, check your code!!! ' + JSON.stringify({ k, variable, value }));
       }
       if (!isEqual(value, variables[k])) {
         const oldValue = variables[k];
         variables[k] = value;
         const savedSetting = await getRepository(Settings).findOne({
           where: {
-            name: variable,
+            name:      variable,
             namespace: checkedModule.nsp,
           },
         });
         await getRepository(Settings).save({
           ...savedSetting,
-          name: variable,
+          name:      variable,
           namespace: checkedModule.nsp,
-          value: JSON.stringify(value),
+          value:     JSON.stringify(value),
         });
 
         // we need this with __permission_based__

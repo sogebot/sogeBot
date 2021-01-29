@@ -10,16 +10,20 @@ import Core from './_interface';
 import * as constants from './constants';
 import { UserTip } from './database/entity/user';
 import { settings, ui } from './decorators';
-import { onChange, onLoad, onStartup } from './decorators/on';
+import {
+  onChange, onLoad, onStartup, 
+} from './decorators/on';
 import { mainCurrency } from './helpers/currency';
-import { error, info, warning } from './helpers/log';
+import {
+  error, info, warning, 
+} from './helpers/log';
 
 class Currency extends Core {
   mainCurrencyLoaded = false;
 
   @settings('currency')
   @ui({
-    type: 'selector',
+    type:   'selector',
     values: ['USD', 'AUD', 'BGN', 'BRL', 'CAD', 'CHF', 'CNY', 'CZK', 'DKK', 'EUR', 'GBP', 'HKD', 'HRK', 'HUF', 'IDR', 'ILS', 'INR', 'ISK', 'JPY', 'KRW', 'MXN', 'MYR', 'NOK', 'NZD', 'PHP', 'PLN', 'RON', 'RUB', 'SEK', 'SGD', 'THB', 'TRY', 'ZAR'],
   })
   public mainCurrency: currency = 'EUR';

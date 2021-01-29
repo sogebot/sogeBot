@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { js as jsBeautify } from 'js-beautify';
 import _ from 'lodash';
-import { filter, get, isNil, map, sample } from 'lodash';
+import {
+  filter, get, isNil, map, sample, 
+} from 'lodash';
 import safeEval from 'safe-eval';
 import strip from 'strip-comments';
 import { getRepository } from 'typeorm';
@@ -10,11 +12,15 @@ import { User, UserInterface } from '../../database/entity/user';
 import Message from '../../message';
 import { getUserFromTwitch } from '../../microservices/getUserFromTwitch';
 import users from '../../users';
-import { chatMessagesAtStart, isStreamOnline, stats, streamStatusChangeSince } from '../api';
+import {
+  chatMessagesAtStart, isStreamOnline, stats, streamStatusChangeSince, 
+} from '../api';
 import { mainCurrency, symbol } from '../currency';
 import { getAllOnlineUsernames } from '../getAllOnlineUsernames';
 import { getTime } from '../getTime';
-import { debug, error, info, warning } from '../log';
+import {
+  debug, error, info, warning, 
+} from '../log';
 import { linesParsed } from '../parser';
 import { isModerator } from '../user/isModerator';
 import { getAll } from './getAll';
@@ -27,8 +33,8 @@ async function runScript (script: string, opts: { sender: { userId: number; user
   if (typeof sender === 'string') {
     sender = {
       username: sender,
-      userId: await users.getIdByName(sender),
-      source: 'twitch',
+      userId:   await users.getIdByName(sender),
+      source:   'twitch',
     };
   }
 
@@ -37,7 +43,7 @@ async function runScript (script: string, opts: { sender: { userId: number; user
   const containUsers = strippedScript.match(/users/g) !== null;
   const containRandom = strippedScript.replace(/Math\.random|_\.random/g, '').match(/random/g) !== null;
   const containOnline = strippedScript.match(/online/g) !== null;
-  debug('customvariables.eval', { strippedScript, containOnline, containRandom, containUsers});
+  debug('customvariables.eval', { strippedScript, containOnline, containRandom, containUsers });
 
   let usersList: UserInterface[] = [];
   if (containUsers || containRandom) {
@@ -53,25 +59,25 @@ async function runScript (script: string, opts: { sender: { userId: number; user
     onlineSubscribers = (await getRepository(User).find({
       where: {
         isSubscriber: true,
-        isOnline: true,
+        isOnline:     true,
       },
     })).map(o => o.username);
     onlineFollowers = (await getRepository(User).find({
       where: {
         isFollower: true,
-        isOnline: true,
+        isOnline:   true,
       },
     })).map(o => o.username);
   }
 
   const randomVar = {
     online: {
-      viewer: sample(onlineViewers),
-      follower: sample(onlineFollowers),
+      viewer:     sample(onlineViewers),
+      follower:   sample(onlineFollowers),
       subscriber: sample(onlineSubscribers),
     },
-    viewer: sample(map(usersList, 'username')),
-    follower: sample(map(filter(usersList, (o) => get(o, 'isFollower', false)), 'username')),
+    viewer:     sample(map(usersList, 'username')),
+    follower:   sample(map(filter(usersList, (o) => get(o, 'isFollower', false)), 'username')),
     subscriber: sample(map(filter(usersList, (o) => get(o, 'isSubscriber', false)), 'username')),
   };
 
@@ -86,9 +92,9 @@ async function runScript (script: string, opts: { sender: { userId: number; user
       if (typeof urlOpts === 'undefined') {
         urlOpts = {
           url,
-          method: 'GET',
+          method:  'GET',
           headers: undefined,
-          data: undefined,
+          data:    undefined,
         };
       } else {
         urlOpts.url = url;
@@ -105,44 +111,44 @@ async function runScript (script: string, opts: { sender: { userId: number; user
       const request = await axios(urlOpts);
       return { data: request.data, status: request.status, statusText: request.statusText };
     },
-    _: _,
-    users: users,
+    _:      _,
+    users:  users,
     random: randomVar,
     stream: {
-      uptime: getTime(isStreamOnline.value ? streamStatusChangeSince.value : null, false),
-      currentViewers: stats.value.currentViewers,
+      uptime:             getTime(isStreamOnline.value ? streamStatusChangeSince.value : null, false),
+      currentViewers:     stats.value.currentViewers,
       currentSubscribers: stats.value.currentSubscribers,
-      currentBits: stats.value.currentBits,
-      currentTips: stats.value.currentTips,
-      currency: symbol(mainCurrency.value),
-      chatMessages: (isStreamOnline.value) ? linesParsed - chatMessagesAtStart.value : 0,
-      currentFollowers: stats.value.currentFollowers,
-      currentViews: stats.value.currentViews,
-      maxViewers: stats.value.maxViewers,
-      newChatters: stats.value.newChatters,
-      game: stats.value.currentGame,
-      status: stats.value.currentTitle,
-      currentHosts: stats.value.currentHosts,
-      currentWatched: stats.value.currentWatchedTime,
+      currentBits:        stats.value.currentBits,
+      currentTips:        stats.value.currentTips,
+      currency:           symbol(mainCurrency.value),
+      chatMessages:       (isStreamOnline.value) ? linesParsed - chatMessagesAtStart.value : 0,
+      currentFollowers:   stats.value.currentFollowers,
+      currentViews:       stats.value.currentViews,
+      maxViewers:         stats.value.maxViewers,
+      newChatters:        stats.value.newChatters,
+      game:               stats.value.currentGame,
+      status:             stats.value.currentTitle,
+      currentHosts:       stats.value.currentHosts,
+      currentWatched:     stats.value.currentWatchedTime,
     },
     sender,
-    info: info,
-    warning: warning,
-    param: param,
+    info:     info,
+    warning:  warning,
+    param:    param,
     _current: opts._current,
-    user: async (username: string) => {
+    user:     async (username: string) => {
       const _user = await getRepository(User).findOne({ username });
       if (_user) {
         const userObj = {
           username,
-          id: String(_user.userId),
+          id:          String(_user.userId),
           displayname: _user.displayname,
-          is: {
-            online: _user.isOnline ?? false,
-            follower: get(_user, 'is.follower', false),
-            vip: get(_user, 'is.vip', false),
+          is:          {
+            online:     _user.isOnline ?? false,
+            follower:   get(_user, 'is.follower', false),
+            vip:        get(_user, 'is.vip', false),
             subscriber: get(_user, 'is.subscriber', false),
-            mod: isModerator(_user),
+            mod:        isModerator(_user),
           },
         };
         return userObj;
@@ -152,21 +158,21 @@ async function runScript (script: string, opts: { sender: { userId: number; user
           const userFromTwitch = await getUserFromTwitch(username);
           const createdUser = await getRepository(User).save({
             username,
-            userId: Number(userFromTwitch.id),
-            displayname: userFromTwitch.display_name,
+            userId:          Number(userFromTwitch.id),
+            displayname:     userFromTwitch.display_name,
             profileImageUrl: userFromTwitch.profile_image_url,
           });
 
           const userObj = {
             username,
-            id: String(createdUser.userId),
+            id:          String(createdUser.userId),
             displayname: createdUser.displayname,
-            is: {
-              online: createdUser.isOnline ?? false,
-              follower: get(createdUser, 'is.follower', false),
-              vip: get(createdUser, 'is.vip', false),
+            is:          {
+              online:     createdUser.isOnline ?? false,
+              follower:   get(createdUser, 'is.follower', false),
+              vip:        get(createdUser, 'is.vip', false),
               subscriber: get(createdUser, 'is.subscriber', false),
-              mod: isModerator(createdUser),
+              mod:        isModerator(createdUser),
             },
           };
           return userObj;

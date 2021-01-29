@@ -15,10 +15,10 @@ class EventList extends Overlay {
 
   sockets () {
     adminEndpoint(this.nsp, 'eventlist::getUserEvents', async (userId, cb) => {
-      const eventsByUserId = await getRepository(EventListEntity).find({userId: String(userId)});
+      const eventsByUserId = await getRepository(EventListEntity).find({ userId: String(userId) });
       // we also need subgifts by giver
       const eventsByRecipientId
-        = (await getRepository(EventListEntity).find({event:'subgift'}))
+        = (await getRepository(EventListEntity).find({ event: 'subgift' }))
           .filter(o => JSON.parse(o.values_json).fromId === String(userId));
       const events =  _.orderBy([ ...eventsByRecipientId, ...eventsByUserId ], 'timestamp', 'desc');
       // we need to change userId => username and fromId => fromId username for eventlist compatibility
@@ -41,7 +41,7 @@ class EventList extends Overlay {
         }
         return {
           ...event,
-          username: mapping.get(event.userId),
+          username:    mapping.get(event.userId),
           values_json: JSON.stringify(values),
         };
       }));
@@ -86,7 +86,7 @@ class EventList extends Overlay {
         }
         return {
           ...event,
-          username: mapping.get(event.userId),
+          username:    mapping.get(event.userId),
           values_json: JSON.stringify(values),
         };
       }));
@@ -99,10 +99,10 @@ class EventList extends Overlay {
     } // don't save event from a bot
 
     await getRepository(EventListEntity).save({
-      event: data.event,
-      userId: data.userId,
-      timestamp: Date.now(),
-      isTest: data.isTest ?? false,
+      event:       data.event,
+      userId:      data.userId,
+      timestamp:   Date.now(),
+      isTest:      data.isTest ?? false,
       values_json: JSON.stringify(
         Object.keys(data)
           .filter(key => !['event', 'username', 'timestamp', 'isTest'].includes(key))
