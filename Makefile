@@ -52,6 +52,7 @@ else
 endif
 
 bot:
+	@rm -rf dest
 ifeq ($(ENV),production)
 	@echo -ne "\n\t ----- Building bot (strip comments)\n"
 	@npx tsc -p src/bot --removeComments true

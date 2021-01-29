@@ -222,7 +222,9 @@ export default defineComponent({
       ]);
       ctx.root.$nextTick(() => {
         ctx.emit('update:pending', false);
-        state.value.loading = ButtonStates.success
+        setTimeout(() => {
+          state.value.loading = ButtonStates.success
+        }, 100)
       });
     }
 
@@ -269,15 +271,17 @@ export default defineComponent({
     const save = () =>  {
       const $v = instance?.$v;
       $v?.$touch();
-      /*
-      ctx.emit('update:invalid', (!!$v?.editationItem.definitions?.$error && !!$v.editationItem.definitions.$dirty) || stateOfOperationsErrorsDirty() || (!$v?.editationItem.operations?.doesSomething && $v?.editationItem.operations?.$dirty)|| ($v?.editationItem.name?.$error && $v.editationItem.name.$dirty));
+      ctx.emit('update:invalid', (!!$v?.$error));
       if (!$v?.$error) {
         ctx.emit('update:saveState', ButtonStates.progress);
-        socket.emit('events::save', editationItem.value, (err: string | null, eventId: string) => {
+        socket.emit('generic::setById', { id: editationItem.value.id, item: editationItem.value }, (err: string | null, data: OBSWebsocketInterface) => {
           if (err) {
             ctx.emit('update:saveState', ButtonStates.fail);
             error(err)
           } else {
+            console.groupCollapsed('generic::setById')
+            console.log({data})
+            console.groupEnd();
             ctx.emit('update:saveState', ButtonStates.success);
           }
           ctx.emit('update:pending', false);
@@ -287,7 +291,6 @@ export default defineComponent({
           }, 1000)
         })
       }
-      */
     }
 
     return {

@@ -33,6 +33,7 @@
           <state-button @click="EventBus.$emit('registry::obswebsocket::save::' + $route.params.id)" text="saveChanges" :state="state.save" :invalid="state.invalid"/>
         </div>
       </template>
+      {{ state.pending }}
       <obswebsocket-edit v-if="$route.params.id" :id="$route.params.id" :saveState.sync="state.save" :testState.sync="state.test" :invalid.sync="state.invalid" :pending.sync="state.pending" @refresh="refresh"/>
     </b-sidebar>
     <loading v-if="state.loading === $state.progress" />
@@ -43,12 +44,12 @@
       <b-alert show v-else-if="state.loading === $state.success && items.length === 0">
         {{translate('registry.obswebsocket.empty')}}
       </b-alert>
-      <b-table v-else :fields="fields" :items="filtered" small style="cursor: pointer;">
+      <b-table v-else :fields="fields" :items="filtered" small hover striped style="cursor: pointer;">
+        <template v-slot:cell(command)="data">
+          <span class="variable" v-b-tooltip.hover :title="copied ? 'Copied!': 'Copy to clipboard'" @click="copy('!something something ' + data.item.id)">!something something {{data.item.id}}</span>
+        </template>
         <template v-slot:cell(buttons)="data">
           <div class="text-right">
-            <button-with-icon :class="[ data.item.isEnabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.isEnabled = !data.item.isEnabled; update(data.item)">
-              {{ translate('dialog.buttons.' + (data.item.isEnabled? 'enabled' : 'disabled')) }}
-            </button-with-icon>
             <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/registry/obswebsocket/edit/' + data.item.id">
               {{ translate('dialog.buttons.edit') }}
             </button-with-icon>
@@ -65,7 +66,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed, watch, getCurrentInstance } from '@vue/composition-api'
-import { isNil } from 'lodash-es';
+import { escapeRegExp, isNil } from 'lodash-es';
 import shortid from 'shortid';
 
 import { getSocket } from 'src/panel/helpers/socket';
@@ -88,6 +89,7 @@ export default defineComponent({
     const isSidebarVisible = ref(false);
     const sidebarSlideEnabled = ref(true);
 
+    const copied = ref(false);
     const search = ref('');
     const items = ref([] as OBSWebsocketInterface[]);
     const state = ref({
@@ -106,13 +108,14 @@ export default defineComponent({
     const filtered = computed(() => {
       if (search.value.length === 0) return items.value
       return items.value.filter((o) => {
-        const isSearchInName = !isNil(o.name.match(new RegExp(search.value, 'ig')))
+        const isSearchInName = !isNil(o.name.match(new RegExp(escapeRegExp(search.value), 'ig')))
         return isSearchInName
       })
     });
     const fields = [
       { key: 'name', label: translate('timers.dialog.name'), sortable: true },
       // virtual attributes
+      { key: 'command', label: translate('obswebsocket.command') },
       { key: 'buttons', label: '' },
     ];
 
@@ -178,6 +181,14 @@ export default defineComponent({
       socket.emit('timers::save', item, () => {});
     }
 
+    function copy(text: string) {
+      navigator.clipboard.writeText(text);
+      copied.value = true;
+      setTimeout(() => {
+        copied.value = false;
+      }, 1000)
+    }
+
     return {
       search,
       state,
@@ -188,6 +199,8 @@ export default defineComponent({
       update,
       del,
       refresh,
+      copied,
+      copy,
 
       isSidebarVisibleChange,
       isSidebarVisible,

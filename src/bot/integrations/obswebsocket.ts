@@ -1,10 +1,12 @@
 import OBSWebSocket from 'obs-websocket-js';
+import { getRepository } from 'typeorm';
 
 import { SECOND } from '../constants';
+import { OBSWebsocket as OBSWebsocketEntity } from '../database/entity/obswebsocket';
 import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import {
-  error, info, warning, 
+  error, info, warning,
 } from '../helpers/log';
 import { listScenes, taskRunner } from '../helpers/obswebsocket';
 import { adminEndpoint } from '../helpers/socket';
@@ -100,6 +102,39 @@ class OBSWebsocket extends Integration {
   }
 
   sockets() {
+    adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
+      try {
+        cb(null, await getRepository(OBSWebsocketEntity).find());
+      } catch (e) {
+        cb(e.stack, []);
+      }
+    });
+    adminEndpoint(this.nsp, 'generic::setById', async (opts, cb) => {
+      try {
+        console.log(opts.item);
+        const item = await getRepository(OBSWebsocketEntity).save({
+          ...(await getRepository(OBSWebsocketEntity).findOne({ id: String(opts.id) })),
+          ...opts.item,
+        });
+        cb(null, item);
+      } catch (e) {
+        cb(e.stack, null);
+      }
+    });
+
+    adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
+      try {
+        cb(null, await getRepository(OBSWebsocketEntity).findOne({ id: String(id) }));
+      } catch (e) {
+        cb(e.stack);
+      }
+    });
+
+    adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
+      await getRepository(OBSWebsocketEntity).delete({ id: String(id) });
+      cb(null);
+    });
+
     adminEndpoint(this.nsp, 'integration::obswebsocket::listScene', async (cb) => {
       try {
         cb(null, await listScenes(obs));
