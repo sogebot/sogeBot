@@ -2,7 +2,11 @@ const exec = require('child_process').exec;
 const fs = require('fs');
 
 const getMigrationType = require('../dest/helpers/getMigrationType').getMigrationType;
+
+console.log(process.env);
 require('dotenv').config();
+
+console.log(process.env);
 
 async function test() {
   await new Promise((resolve) => {
