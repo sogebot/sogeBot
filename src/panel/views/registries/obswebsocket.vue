@@ -33,7 +33,6 @@
           <state-button @click="EventBus.$emit('registry::obswebsocket::save::' + $route.params.id)" text="saveChanges" :state="state.save" :invalid="state.invalid"/>
         </div>
       </template>
-      {{ state.pending }}
       <obswebsocket-edit v-if="$route.params.id" :id="$route.params.id" :saveState.sync="state.save" :testState.sync="state.test" :invalid.sync="state.invalid" :pending.sync="state.pending" @refresh="refresh"/>
     </b-sidebar>
     <loading v-if="state.loading === $state.progress" />
