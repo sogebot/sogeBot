@@ -14,21 +14,7 @@ async function test() {
     exec('npx typeorm migration:run', {
       shell: true,
     }, (error, stdout, stderr) => {
-      console.log({ error, stdout, stderr });
-      if (stdout) {
-        process.stdout.write(stdout);
-      }
-      resolve();
-    });
-  });
-  await new Promise((resolve) => {
-    exec('npx typeorm migration:run', {
-      shell: true,
-    }, (error, stdout, stderr) => {
-      console.log({ error, stdout, stderr });
-      if (stdout) {
-        process.stdout.write(stdout);
-      }
+      process.stdout.write(stdout);
       resolve();
     });
   });
@@ -43,7 +29,6 @@ async function test() {
       },
       shell: true,
     }, (error, stdout, stderr) => {
-      console.log({ error, stdout, stderr });
       output += stdout;
       resolve();
     });
@@ -53,7 +38,6 @@ async function test() {
       exec('cat ./*generatedMigration*', {
         shell: true,
       }, (error, stdout, stderr) => {
-        console.log({ error, stdout, stderr });
         console.log('\n =================================== generated migration file  =================================== \n');
         console.log(stdout);
         resolve2();
