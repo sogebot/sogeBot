@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class removeGivenNameEvents1605015996687 implements MigrationInterface {
   name = 'removeGivenNameEvents1605015996687';

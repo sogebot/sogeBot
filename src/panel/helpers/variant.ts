@@ -13,4 +13,4 @@ const getVariantByState = (state: number) => {
   return 'primary';
 };
 
-export { getVariantByState};
+export { getVariantByState };

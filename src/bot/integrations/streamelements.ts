@@ -11,7 +11,9 @@ import { isStreamOnline, stats } from '../helpers/api/index.js';
 import { mainCurrency } from '../helpers/currency';
 import { eventEmitter } from '../helpers/events';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
-import { error, info, tip } from '../helpers/log';
+import {
+  error, info, tip, 
+} from '../helpers/log';
 import eventlist from '../overlays/eventlist';
 import alerts from '../registries/alerts';
 import users from '../users';
@@ -94,9 +96,9 @@ class StreamElements extends Integration {
     // validate token
     try {
       await Axios('https://api.streamelements.com/kappa/v2/channels/me', {
-        method: 'GET',
+        method:  'GET',
         headers: {
-          Accept: 'application/json',
+          Accept:        'application/json',
           Authorization: 'Bearer ' + this.jwtToken,
         },
       });
@@ -107,11 +109,11 @@ class StreamElements extends Integration {
     }
 
     this.socketToStreamElements = io('https://realtime.streamelements.com', {
-      reconnection: true,
-      reconnectionDelay: 1000,
+      reconnection:         true,
+      reconnectionDelay:    1000,
       reconnectionDelayMax: 5000,
       reconnectionAttempts: Infinity,
-      transports: ['websocket'],
+      transports:           ['websocket'],
     });
 
     this.socketToStreamElements.on('reconnect_attempt', () => {
@@ -151,11 +153,11 @@ class StreamElements extends Integration {
 
     const user = await users.getUserByUsername(username);
     const newTip: UserTipInterface = {
-      amount: Number(amount),
-      currency: DONATION_CURRENCY,
-      sortAmount: currency.exchange(Number(amount), DONATION_CURRENCY, mainCurrency.value),
+      amount:        Number(amount),
+      currency:      DONATION_CURRENCY,
+      sortAmount:    currency.exchange(Number(amount), DONATION_CURRENCY, mainCurrency.value),
       message,
-      tippedAt: Date.now(),
+      tippedAt:      Date.now(),
       exchangeRates: currency.rates,
     };
     user.tips.push(newTip);
@@ -171,36 +173,36 @@ class StreamElements extends Integration {
     tip(`${username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(amount).toFixed(2)}${DONATION_CURRENCY}, message: ${message}`);
 
     eventlist.add({
-      event: 'tip',
+      event:     'tip',
       amount,
-      currency: DONATION_CURRENCY,
-      userId: String(await users.getIdByName(username.toLowerCase())),
+      currency:  DONATION_CURRENCY,
+      userId:    String(await users.getIdByName(username.toLowerCase())),
       message,
       timestamp: Date.now(),
     });
     eventEmitter.emit('tip', {
-      username: username.toLowerCase(),
-      amount: Number(amount).toFixed(2),
-      currency: DONATION_CURRENCY,
+      username:            username.toLowerCase(),
+      amount:              Number(amount).toFixed(2),
+      currency:            DONATION_CURRENCY,
       amountInBotCurrency: Number(currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value)).toFixed(2),
-      currencyInBot: mainCurrency.value,
+      currencyInBot:       mainCurrency.value,
       message,
     });
     alerts.trigger({
-      event: 'tips',
-      name: username.toLowerCase(),
-      amount: Number(Number(eventData.data.amount).toFixed(2)),
-      tier: null,
-      currency: DONATION_CURRENCY,
+      event:      'tips',
+      name:       username.toLowerCase(),
+      amount:     Number(Number(eventData.data.amount).toFixed(2)),
+      tier:       null,
+      currency:   DONATION_CURRENCY,
       monthsName: '',
       message,
     });
 
     triggerInterfaceOnTip({
-      username: username.toLowerCase(),
+      username:  username.toLowerCase(),
       amount,
       message,
-      currency: DONATION_CURRENCY,
+      currency:  DONATION_CURRENCY,
       timestamp: Date.now(),
     });
   }

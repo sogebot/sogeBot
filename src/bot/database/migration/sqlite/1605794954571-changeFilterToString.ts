@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class changeFilterToString1605794954571 implements MigrationInterface {
   name = 'changeFilterToString1605794954571';

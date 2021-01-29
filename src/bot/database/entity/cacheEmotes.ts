@@ -8,9 +8,9 @@ export interface CacheEmotesInterface {
 }
 
 export const CacheEmotes = new EntitySchema<Readonly<Required<CacheEmotesInterface>>>({
-  name: 'cache_emotes',
+  name:    'cache_emotes',
   columns: {
-    id: { type: String, primary: true, generated: 'uuid' },
+    id:   { type: String, primary: true, generated: 'uuid' },
     code: { type: String },
     type: { type: 'varchar', length: 6 },
     urls: { type: 'simple-json' },

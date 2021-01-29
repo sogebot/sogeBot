@@ -3,7 +3,9 @@ import { getRepository } from 'typeorm';
 
 import api from '../api';
 import { Gallery } from '../database/entity/gallery';
-import { command, default_permission, settings, ui } from '../decorators';
+import {
+  command, default_permission, settings, ui, 
+} from '../decorators';
 import { debug } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
 import { publicEndpoint } from '../helpers/socket';

@@ -1,6 +1,6 @@
 import { isNil } from 'lodash';
 
-import {translate} from '../../translate';
+import { translate } from '../../translate';
 import { getValueOf, isVariableSet } from '../customvariables';
 import { rawStatus } from './cache';
 

@@ -5,25 +5,35 @@
 import chalk from 'chalk';
 import * as DiscordJs from 'discord.js';
 import { get } from 'lodash';
-import { getRepository, IsNull, LessThan, Not } from 'typeorm';
+import {
+  getRepository, IsNull, LessThan, Not, 
+} from 'typeorm';
 import { v5 as uuidv5 } from 'uuid';
 
 import { HOUR, MINUTE } from '../constants';
 import { DiscordLink } from '../database/entity/discord';
 import { Permissions as PermissionsEntity } from '../database/entity/permissions';
 import { User } from '../database/entity/user';
-import { command, persistent, settings, ui } from '../decorators';
-import { onChange, onStartup, onStreamEnd, onStreamStart } from '../decorators/on';
+import {
+  command, persistent, settings, ui, 
+} from '../decorators';
+import {
+  onChange, onStartup, onStreamEnd, onStreamStart, 
+} from '../decorators/on';
 import events from '../events';
 import Expects from '../expects';
 import { isStreamOnline, stats } from '../helpers/api';
 import { attributesReplace } from '../helpers/attributesReplace';
-import { announceTypes, getOwner, isUUID, prepare } from '../helpers/commons';
+import {
+  announceTypes, getOwner, isUUID, prepare, 
+} from '../helpers/commons';
 import { isBotStarted, isDbConnected } from '../helpers/database';
 import { dayjs, timezone } from '../helpers/dayjs';
 import { debounce } from '../helpers/debounce';
 import { eventEmitter } from '../helpers/events';
-import { chatIn, chatOut, debug, error, info, warning, whisperOut } from '../helpers/log';
+import {
+  chatIn, chatOut, debug, error, info, warning, whisperOut, 
+} from '../helpers/log';
 import { generalChannel } from '../helpers/oauth/generalChannel';
 import { check } from '../helpers/permissions/';
 import { get as getPermission } from '../helpers/permissions/get';
@@ -53,30 +63,30 @@ class Discord extends Integration {
   token = '';
 
   @ui({
-    type: 'btn-emit',
+    type:  'btn-emit',
     class: 'btn btn-primary btn-block mt-1 mb-1',
-    if: () => self.clientId.length > 0 && self.token.length > 0,
-    emit: 'discord::authorize',
+    if:    () => self.clientId.length > 0 && self.token.length > 0,
+    emit:  'discord::authorize',
   }, 'general')
   joinToServerBtn = null;
 
   @ui({
-    type: 'btn-emit',
+    type:  'btn-emit',
     class: 'btn btn-primary btn-block mt-1 mb-1',
-    if: () => self.clientId.length === 0 || self.token.length === 0,
+    if:    () => self.clientId.length === 0 || self.token.length === 0,
   }, 'general')
   cannotJoinToServerBtn = null;
 
   @settings('bot')
   @ui({
     type: 'discord-guild',
-    if: () => self.clientId.length > 0 && self.token.length > 0,
+    if:   () => self.clientId.length > 0 && self.token.length > 0,
   })
   guild = '';
 
   @ui({
-    if: () => self.clientId.length > 0 && self.guild.length === 0,
-    type: 'helpbox',
+    if:      () => self.clientId.length > 0 && self.guild.length === 0,
+    type:    'helpbox',
     variant: 'info',
   }, 'bot')
   noGuildSelectedBox = null;
@@ -84,32 +94,32 @@ class Discord extends Integration {
   @settings('bot')
   @ui({
     type: 'discord-channel',
-    if: () => self.guild.length > 0,
+    if:   () => self.guild.length > 0,
   })
   listenAtChannels: string | string[] = '';
 
   @settings('bot')
   @ui({
     type: 'discord-channel',
-    if: () => self.guild.length > 0,
+    if:   () => self.guild.length > 0,
   })
   sendOnlineAnnounceToChannel = '';
 
   @settings('bot')
   @ui({
     type: 'discord-channel',
-    if: () => self.guild.length > 0,
+    if:   () => self.guild.length > 0,
   })
   sendAnnouncesToChannel: { [key in typeof announceTypes[number]]: string } = {
-    bets: '',
-    duel: '',
+    bets:    '',
+    duel:    '',
     general: '',
-    heist: '',
-    polls: '',
+    heist:   '',
+    polls:   '',
     raffles: '',
-    scrim: '',
-    songs: '',
-    timers: '',
+    scrim:   '',
+    songs:   '',
+    timers:  '',
   };
 
   @settings('bot')
@@ -117,45 +127,45 @@ class Discord extends Integration {
 
   @settings('status')
   @ui({
-    type: 'selector', values: ['online', 'idle', 'invisible', 'dnd'],
-    if: () => self.guild.length > 0,
+    type:   'selector', values: ['online', 'idle', 'invisible', 'dnd'],
+    if:     () => self.guild.length > 0,
   })
   onlinePresenceStatusDefault: 'online' | 'idle' | 'invisible' | 'dnd' = 'online';
 
   @settings('status')
   @ui({
-    type: 'text-input',
+    type:   'text-input',
     secret: false,
-    if: () => self.guild.length > 0,
+    if:     () => self.guild.length > 0,
   })
   onlinePresenceStatusDefaultName = '';
 
   @settings('status')
   @ui({
-    type: 'selector', values: ['streaming', 'online', 'idle', 'invisible', 'dnd'],
-    if: () => self.guild.length > 0,
+    type:   'selector', values: ['streaming', 'online', 'idle', 'invisible', 'dnd'],
+    if:     () => self.guild.length > 0,
   })
   onlinePresenceStatusOnStream: 'streaming' | 'online' | 'idle' | 'invisible' | 'dnd' = 'online';
 
   @settings('status')
   @ui({
-    type: 'text-input',
+    type:   'text-input',
     secret: false,
-    if: () => self.guild.length > 0,
+    if:     () => self.guild.length > 0,
   })
   onlinePresenceStatusOnStreamName = '$title';
 
   @settings('mapping')
   @ui({
     type: 'discord-mapping',
-    if: () => self.guild.length > 0,
+    if:   () => self.guild.length > 0,
   })
   rolesMapping: { [permissionId: string]: string } = {};
 
   @settings('bot')
   @ui({
     type: 'toggle-enable',
-    if: () => self.guild.length > 0,
+    if:   () => self.guild.length > 0,
   })
   deleteMessagesAfterWhile = false;
 
@@ -174,12 +184,12 @@ class Discord extends Integration {
           if (message && embed) {
             embed.spliceFields(0, embed.fields.length);
             embed.addFields([
-              { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame},
-              { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle},
-              { name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true},
-              { name: prepare('webpanel.viewers'), value: stats.value.currentViewers, inline: true},
-              { name: prepare('webpanel.views'), value: stats.value.currentViews, inline: true},
-              { name: prepare('webpanel.followers'), value: stats.value.currentFollowers, inline: true},
+              { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame },
+              { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle },
+              { name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true },
+              { name: prepare('webpanel.viewers'), value: stats.value.currentViewers, inline: true },
+              { name: prepare('webpanel.views'), value: stats.value.currentViews, inline: true },
+              { name: prepare('webpanel.followers'), value: stats.value.currentFollowers, inline: true },
             ]);
             embed.setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${generalChannel.value}-1920x1080.jpg?${Date.now()}`);
 
@@ -226,7 +236,7 @@ class Discord extends Integration {
       }
       const botPermissionsSortedByPriority = await getRepository(PermissionsEntity).find({
         relations: ['filters'],
-        order: {
+        order:     {
           order: 'ASC',
         },
       });
@@ -335,7 +345,7 @@ class Discord extends Integration {
       await getRepository(DiscordLink).save({
         ...link, userId: Number(opts.sender.userId),
       });
-      return [{ response: prepare('integrations.discord.this-account-was-linked-with', { sender: opts.sender, discordTag: link.tag}), ...opts }];
+      return [{ response: prepare('integrations.discord.this-account-was-linked-with', { sender: opts.sender, discordTag: link.tag }), ...opts }];
     } catch (e) {
       if (e.message.includes('Expected parameter')) {
         return [
@@ -362,11 +372,11 @@ class Discord extends Integration {
         embed.setDescription(`${generalChannel.value.charAt(0).toUpperCase() + generalChannel.value.slice(1)} is not streaming anymore! Check it next time!`);
         embed.spliceFields(0, embed.fields.length);
         embed.addFields([
-          { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame},
-          { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle},
-          { name: prepare('integrations.discord.streamed-at'), value: `${this.embedStartedAt} - ${dayjs().tz(timezone).format('LLL')}`, inline: true},
-          { name: prepare('webpanel.views'), value: stats.value.currentViews, inline: true},
-          { name: prepare('webpanel.followers'), value: stats.value.currentFollowers, inline: true},
+          { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame },
+          { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle },
+          { name: prepare('integrations.discord.streamed-at'), value: `${this.embedStartedAt} - ${dayjs().tz(timezone).format('LLL')}`, inline: true },
+          { name: prepare('webpanel.views'), value: stats.value.currentViews, inline: true },
+          { name: prepare('webpanel.followers'), value: stats.value.currentFollowers, inline: true },
         ]);
         embed.setImage(`https://static-cdn.jtvnw.net/ttv-static/404_preview-1920x1080.jpg?${Date.now()}`);
 
@@ -393,11 +403,11 @@ class Discord extends Integration {
         const embed = new DiscordJs.MessageEmbed()
           .setURL('https://twitch.tv/' + generalChannel.value)
           .addFields([
-            { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame},
-            { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle},
-            { name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true},
-            { name: prepare('webpanel.views'), value: stats.value.currentViews, inline: true},
-            { name: prepare('webpanel.followers'), value: stats.value.currentFollowers, inline: true},
+            { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame },
+            { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle },
+            { name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true },
+            { name: prepare('webpanel.views'), value: stats.value.currentViews, inline: true },
+            { name: prepare('webpanel.followers'), value: stats.value.currentFollowers, inline: true },
           ])
           // Set the title of the field
           .setTitle('https://twitch.tv/' + generalChannel.value)
@@ -438,7 +448,7 @@ class Discord extends Integration {
         const activityString = await new Message(this.onlinePresenceStatusOnStreamName).parse();
         if (this.onlinePresenceStatusOnStream === 'streaming') {
           this.client?.user?.setStatus('online');
-          this.client?.user?.setPresence({ status: 'online', activity: { name: activityString, type: 'STREAMING', url: `https://twitch.tv/${generalChannel.value}`} });
+          this.client?.user?.setPresence({ status: 'online', activity: { name: activityString, type: 'STREAMING', url: `https://twitch.tv/${generalChannel.value}` } });
         } else {
           this.client?.user?.setStatus(this.onlinePresenceStatusOnStream);
           if (activityString !== '') {
@@ -486,7 +496,7 @@ class Discord extends Integration {
           userId: Number(await getIdFromTwitch(username)),
           username,
         });
-        return self.fireSendDiscordMessage(operation, {...attributes, username });
+        return self.fireSendDiscordMessage(operation, { ...attributes, username });
       } else if (!userObj) {
         return;
       }
@@ -522,7 +532,7 @@ class Discord extends Integration {
     if (!this.client) {
       this.client = new DiscordJs.Client({
         partials: ['REACTION', 'MESSAGE', 'CHANNEL'],
-        ws: { intents: ['GUILD_MESSAGES', 'GUILDS'] },
+        ws:       { intents: ['GUILD_MESSAGES', 'GUILDS'] },
       });
       this.client.on('ready', () => {
         if (this.client) {
@@ -565,16 +575,16 @@ class Discord extends Integration {
       if (content === this.getCommand('!link')) {
         this.removeExpiredLinks();
         const link = await getRepository(DiscordLink).save({
-          userId: null,
-          tag: author.tag,
+          userId:    null,
+          tag:       author.tag,
           discordId: author.id,
           createdAt: Date.now(),
         });
         const message = prepare('integrations.discord.link-whisper', {
-          tag: msg.author.tag,
+          tag:         msg.author.tag,
           broadcaster: generalChannel.value,
-          id: link.id,
-          command: this.getCommand('!link'),
+          id:          link.id,
+          command:     this.getCommand('!link'),
         });
         author.send(message);
         whisperOut(`${author.tag}: ${message}`);
@@ -610,8 +620,8 @@ class Discord extends Integration {
         parser.started_at = (msg || { createdTimestamp: Date.now() }).createdTimestamp;
         parser.sender = {
           isModerator: isModerator(user),
-          badges: {}, color: '',  displayName: '', emoteSets: [], emotes: [], userId: String(link.userId), username: user.username, userType: 'viewer',
-          mod: 'false', subscriber: 'false', turbo: 'false', discord: { author, channel },
+          badges:      {}, color:       '',  displayName: '', emoteSets:   [], emotes:      [], userId:      String(link.userId), username:    user.username, userType:    'viewer',
+          mod:         'false', subscriber:  'false', turbo:       'false', discord:     { author, channel },
         };
 
         eventEmitter.emit('keyword-send-x-times', { username: user.username, message: content, source: 'discord' });
@@ -628,7 +638,7 @@ class Discord extends Integration {
                   const messageToSend = await new Message(await responses[i].response).parse({
                     ...responses[i].attr,
                     forceWithoutAt: true, // we dont need @
-                    sender: { ...responses[i].sender, discord: { author, channel } },
+                    sender:         { ...responses[i].sender, discord: { author, channel } },
                   }) as string;
                   const reply = await channel.send(messageToSend);
                   chatOut(`#${channel.name}: ${messageToSend} [${author.tag}]`);
@@ -651,7 +661,7 @@ class Discord extends Integration {
         });
       }
     } catch (e) {
-      const message = prepare('integrations.discord.your-account-is-not-linked', { command: this.getCommand('!link')});
+      const message = prepare('integrations.discord.your-account-is-not-linked', { command: this.getCommand('!link') });
       if (msg) {
         const reply = await msg.reply(message);
         chatOut(`#${channel.name}: @${author.tag}, ${message} [${author.tag}]`);

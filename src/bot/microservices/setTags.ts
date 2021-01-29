@@ -1,8 +1,12 @@
 import axios from 'axios';
-import { getRepository, IsNull, Not } from 'typeorm';
+import {
+  getRepository, IsNull, Not, 
+} from 'typeorm';
 
 import { TwitchTag, TwitchTagLocalizationName } from '../database/entity/twitch';
-import { calls, getClientId, getToken, setRateLimit } from '../helpers/api';
+import {
+  calls, getClientId, getToken, setRateLimit, 
+} from '../helpers/api';
 import { error } from '../helpers/log';
 import { channelId } from '../helpers/oauth';
 import { ioServer } from '../helpers/panel';
@@ -28,13 +32,13 @@ async function setTags (tagsArg: string[]) {
     const request = await axios({
       method: 'put',
       url,
-      data: {
+      data:   {
         tag_ids,
       },
       headers: {
         'Authorization': 'Bearer ' + await getToken('bot'),
-        'Content-Type': 'application/json',
-        'Client-ID': await getClientId('bot'),
+        'Content-Type':  'application/json',
+        'Client-ID':     await getClientId('bot'),
       },
     });
     // save remaining api calls

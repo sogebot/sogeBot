@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { chunk } from 'lodash';
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 const mapping = new Map() as Map<string, string>;
 
@@ -26,7 +26,7 @@ export class eventListUserId1601124530399 implements MigrationInterface {
       const request = await axios.get(`https://api.twitch.tv/helix/users?login=${batch.join('&login=')}`, {
         headers: {
           'Authorization': 'Bearer ' + JSON.parse(accessToken),
-          'Client-ID': JSON.parse(clientId),
+          'Client-ID':     JSON.parse(clientId),
         },
         timeout: 20000,
       });

@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class carouselDataLongText1584634313840 implements MigrationInterface {
   name = 'carouselDataLongText1584634313840';

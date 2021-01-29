@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class randomizerTickToggle1589360083369 implements MigrationInterface {
   name = 'randomizerTickToggle1589360083369';

@@ -25,26 +25,26 @@ export interface CooldownViewerInterface {
 }
 
 export const Cooldown = new EntitySchema<Readonly<Required<CooldownInterface>>>({
-  name: 'cooldown',
+  name:    'cooldown',
   columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
-    name: { type: String },
-    miliseconds: { type: Number },
-    type: { type: 'varchar', length: 10 },
-    timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-    isErrorMsgQuiet: { type: Boolean },
-    isEnabled: { type: Boolean },
-    isOwnerAffected: { type: Boolean },
-    isModeratorAffected: { type: Boolean },
+    id:                   { type: 'uuid', primary: true, generated: 'uuid' },
+    name:                 { type: String },
+    miliseconds:          { type: Number },
+    type:                 { type: 'varchar', length: 10 },
+    timestamp:            { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
+    isErrorMsgQuiet:      { type: Boolean },
+    isEnabled:            { type: Boolean },
+    isOwnerAffected:      { type: Boolean },
+    isModeratorAffected:  { type: Boolean },
     isSubscriberAffected: { type: Boolean },
-    isFollowerAffected: { type: Boolean },
+    isFollowerAffected:   { type: Boolean },
   },
   relations: {
     viewers: {
-      type: 'one-to-many',
-      target: 'cooldown_viewer',
+      type:        'one-to-many',
+      target:      'cooldown_viewer',
       inverseSide: 'cooldown',
-      cascade: true,
+      cascade:     true,
     },
   },
   indices: [
@@ -53,19 +53,19 @@ export const Cooldown = new EntitySchema<Readonly<Required<CooldownInterface>>>(
 });
 
 export const CooldownViewer = new EntitySchema<Readonly<Required<CooldownViewerInterface>>>({
-  name: 'cooldown_viewer',
+  name:    'cooldown_viewer',
   columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
-    userId: { type: Number },
+    id:        { type: 'uuid', primary: true, generated: 'uuid' },
+    userId:    { type: Number },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },
   relations: {
     cooldown: {
-      type: 'many-to-one',
-      target: 'cooldown',
+      type:        'many-to-one',
+      target:      'cooldown',
       inverseSide: 'viewers',
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete:    'CASCADE',
+      onUpdate:    'CASCADE',
     },
   },
 });

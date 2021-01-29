@@ -4,10 +4,14 @@ import { getRepository } from 'typeorm';
 import { parserReply } from '../commons';
 import { Bets as BetsEntity, BetsInterface } from '../database/entity/bets';
 import { User } from '../database/entity/user';
-import { command, default_permission, helper, settings, ui } from '../decorators';
+import {
+  command, default_permission, helper, settings, ui, 
+} from '../decorators';
 import { onStartup } from '../decorators/on';
 import Expects from '../expects';
-import { announce, getBotSender, getOwner, prepare } from '../helpers/commons';
+import {
+  announce, getBotSender, getOwner, prepare, 
+} from '../helpers/commons';
 import { isDbConnected } from '../helpers/database';
 import { error, warning } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
@@ -59,7 +63,7 @@ class Bets extends System {
     try {
       const currentBet = await getRepository(BetsEntity).findOne({
         relations: ['participations'],
-        order: { createdAt: 'DESC' },
+        order:     { createdAt: 'DESC' },
       });
       if (!currentBet || currentBet.isLocked) {
         throw Error(ERROR_NOT_RUNNING);
@@ -74,7 +78,7 @@ class Bets extends System {
         } else {
           announce(prepare('bets.removed'), 'bets');
         }
-        await getRepository(BetsEntity).update({ id: currentBet.id }, { isLocked: true});
+        await getRepository(BetsEntity).update({ id: currentBet.id }, { isLocked: true });
       } else {
         // bet is running;
         isEndAnnounced = false;
@@ -96,7 +100,7 @@ class Bets extends System {
       try {
         const currentBet = await getRepository(BetsEntity).findOne({
           relations: ['participations'],
-          order: { createdAt: 'DESC' },
+          order:     { createdAt: 'DESC' },
         });
         cb(null, currentBet);
       } catch (e) {
@@ -108,19 +112,19 @@ class Bets extends System {
       let responses: CommandResponse[];
       if (option === 'refund') {
         responses = await bets.refund({
-          sender: getBotSender(),
-          createdAt: Date.now(),
+          sender:     getBotSender(),
+          createdAt:  Date.now(),
           parameters: '',
-          command: bets.getCommand('!bet refund'),
-          attr: {},
+          command:    bets.getCommand('!bet refund'),
+          attr:       {},
         });
       } else {
         responses = await bets.close({
-          sender: getBotSender(),
-          createdAt: Date.now(),
+          sender:     getBotSender(),
+          createdAt:  Date.now(),
           parameters: `${option}`,
-          command: bets.getCommand('!bet close'),
-          attr: {},
+          command:    bets.getCommand('!bet close'),
+          attr:       {},
         });
       }
       for (let i = 0; i < responses.length; i++) {
@@ -136,7 +140,7 @@ class Bets extends System {
   public async open(opts: CommandOptions): Promise<CommandResponse[]> {
     const currentBet = await getRepository(BetsEntity).findOne({
       relations: ['participations'],
-      order: { createdAt: 'DESC' },
+      order:     { createdAt: 'DESC' },
     });
     try {
       if (currentBet && !currentBet.isLocked) {
@@ -154,9 +158,9 @@ class Bets extends System {
 
       await getRepository(BetsEntity).save({
         createdAt: Date.now(),
-        endedAt: Date.now() + (timeout * 1000 * 60),
-        title: title,
-        options: options,
+        endedAt:   Date.now() + (timeout * 1000 * 60),
+        title:     title,
+        options:   options,
       });
 
       return [{
@@ -164,9 +168,9 @@ class Bets extends System {
           username: getOwner(),
           title,
           maxIndex: options.length,
-          minutes: timeout,
-          options: options.map((v, i) => `${i+1}. '${v}'`).join(', '),
-          command: this.getCommand('!bet'),
+          minutes:  timeout,
+          options:  options.map((v, i) => `${i+1}. '${v}'`).join(', '),
+          command:  this.getCommand('!bet'),
         }), ...opts,
       }];
     } catch (e) {
@@ -176,9 +180,9 @@ class Bets extends System {
         case ERROR_ALREADY_OPENED:
           return [{
             response: prepare('bets.running', {
-              command: this.getCommand('!bet'),
+              command:  this.getCommand('!bet'),
               maxIndex: String((currentBet as BetsInterface).options.length),
-              options: (currentBet as BetsInterface).options.map((v, i) => `${i+1}. '${v}'`).join(', '),
+              options:  (currentBet as BetsInterface).options.map((v, i) => `${i+1}. '${v}'`).join(', '),
             }), ...opts,
           }];
         default:
@@ -190,18 +194,18 @@ class Bets extends System {
   public async info(opts: CommandOptions) {
     const currentBet = await getRepository(BetsEntity).findOne({
       relations: ['participations'],
-      order: { createdAt: 'DESC' },
+      order:     { createdAt: 'DESC' },
     });
     if (!currentBet || (currentBet.isLocked && currentBet.arePointsGiven)) {
       return [{ response: prepare('bets.notRunning'), ...opts } ];
     } else {
       return [{
         response: prepare(currentBet.isLocked ? 'bets.lockedInfo' : 'bets.info', {
-          command: opts.command,
-          title: currentBet.title,
+          command:  opts.command,
+          title:    currentBet.title,
           maxIndex: String(currentBet.options.length),
-          options: currentBet.options.map((v, i) => `${i+1}. '${v}'`).join(', '),
-          minutes: Number((currentBet.endedAt - Date.now()) / 1000 / 60).toFixed(1),
+          options:  currentBet.options.map((v, i) => `${i+1}. '${v}'`).join(', '),
+          minutes:  Number((currentBet.endedAt - Date.now()) / 1000 / 60).toFixed(1),
         }), ...opts,
       }];
     }
@@ -210,7 +214,7 @@ class Bets extends System {
   public async participate(opts: CommandOptions): Promise<CommandResponse[]> {
     const currentBet = await getRepository(BetsEntity).findOne({
       relations: ['participations'],
-      order: { createdAt: 'DESC' },
+      order:     { createdAt: 'DESC' },
     });
 
     try {
@@ -243,10 +247,10 @@ class Bets extends System {
 
         if (!_betOfUser) {
           currentBet.participations.push({
-            username: opts.sender.username,
-            userId: Number(opts.sender.userId),
+            username:  opts.sender.username,
+            userId:    Number(opts.sender.userId),
             optionIdx: index,
-            points: tickets,
+            points:    tickets,
           });
         } else {
           // add points
@@ -285,7 +289,7 @@ class Bets extends System {
   public async refund(opts: CommandOptions): Promise<CommandResponse[]> {
     const currentBet = await getRepository(BetsEntity).findOne({
       relations: ['participations'],
-      order: { createdAt: 'DESC' },
+      order:     { createdAt: 'DESC' },
     });
     try {
       if (!currentBet || (currentBet.isLocked && currentBet.arePointsGiven)) {
@@ -316,7 +320,7 @@ class Bets extends System {
   public async close(opts: CommandOptions): Promise<CommandResponse[]> {
     const currentBet = await getRepository(BetsEntity).findOne({
       relations: ['participations'],
-      order: { createdAt: 'DESC' },
+      order:     { createdAt: 'DESC' },
     });
     try {
       const index = new Expects(opts.parameters).number().toArray()[0];

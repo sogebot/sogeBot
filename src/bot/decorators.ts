@@ -130,7 +130,7 @@ export function settings(category?: string, isReadOnly = false) {
         }
 
         // add variable to settingsList
-        self.settingsList.push({ category, key, defaultValue: (self as any)[key]});
+        self.settingsList.push({ category, key, defaultValue: (self as any)[key] });
       } catch (e) {
         error(e.stack);
       }
@@ -341,10 +341,10 @@ function registerParser(opts: {
         throw new Error(`${m.type}.${m.name} not found in list`);
       }
       self._parsers.push({
-        name: m.fnc,
-        permission: opts.permission,
-        priority: opts.priority,
-        dependsOn: opts.dependsOn,
+        name:          m.fnc,
+        permission:    opts.permission,
+        priority:      opts.priority,
+        dependsOn:     opts.dependsOn,
         fireAndForget: opts.fireAndForget,
       });
     } catch (e) {

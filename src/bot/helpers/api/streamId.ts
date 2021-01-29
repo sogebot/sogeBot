@@ -1,8 +1,8 @@
 import { persistent } from '../core/persistent';
 
 const streamId = persistent({
-  value: null as null | string,
-  name: 'streamId',
+  value:     null as null | string,
+  name:      'streamId',
   namespace: '/core/api',
 });
 

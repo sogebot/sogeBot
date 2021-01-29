@@ -73,18 +73,18 @@ class Carousel extends Overlay {
 
         const order = await getRepository(CarouselEntity).count();
         const image = await getRepository(CarouselEntity).save({
-          id: uuid(),
+          id:                    uuid(),
           type,
           base64,
           // timers in ms
-          waitBefore: 0,
-          waitAfter: 0,
-          duration: 5000,
+          waitBefore:            0,
+          waitAfter:             0,
+          duration:              5000,
           // animation
-          animationInDuration: 1000,
-          animationIn: 'fadeIn',
-          animationOutDuration: 1000,
-          animationOut: 'fadeOut',
+          animationInDuration:   1000,
+          animationIn:           'fadeIn',
+          animationOutDuration:  1000,
+          animationOut:          'fadeOut',
           // order
           order,
           // showOnlyOncePerStream

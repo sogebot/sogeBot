@@ -25,7 +25,7 @@ export function getSocket(namespace: string, continueOnUnauthorized = false): So
 
   const socket = (window as any).io(namespace, {
     transports: [ 'websocket' ],
-    auth: (cb: (data: { token: string | null}) => void) => {
+    auth:       (cb: (data: { token: string | null}) => void) => {
       cb({
         token: localStorage.getItem('accessToken'),
       });
@@ -113,7 +113,7 @@ export const getTranslations = async () => {
   getSocket('/', true).emit('translations', (translations: any) => {
     if (process.env.IS_DEV) {
       console.groupCollapsed('GET=>Translations');
-      console.debug({translations});
+      console.debug({ translations });
       console.groupEnd();
     }
     setTranslations(translations);
@@ -131,7 +131,7 @@ export const getConfiguration = async (): Promise<Configuration> => {
       }
       if (process.env.IS_DEV) {
         console.groupCollapsed('GET=>Configuration');
-        console.debug({configuration});
+        console.debug({ configuration });
         console.groupEnd();
       }
       resolve(configuration);

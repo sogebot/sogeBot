@@ -13,74 +13,74 @@ export interface VariableInterface {
 }
 
 export const Variable = new EntitySchema<Readonly<Required<VariableInterface>>>({
-  name: 'variable',
+  name:    'variable',
   columns: {
     id: {
-      type: 'uuid',
-      primary: true,
+      type:      'uuid',
+      primary:   true,
       generated: 'uuid',
     },
     variableName: {
       type: String,
     },
     description: {
-      type: String,
+      type:    String,
       default: '',
     },
     type: {
       type: String,
     },
     currentValue: {
-      type: String,
+      type:     String,
       nullable: true,
     },
     evalValue: {
       type: 'text',
     },
     runEveryTypeValue: {
-      type: Number,
+      type:    Number,
       default: 60000,
     },
     runEveryType: {
-      type: String,
+      type:    String,
       default: 'isUsed',
     },
     runEvery: {
-      type: Number,
+      type:    Number,
       default: 60000,
     },
     responseType: {
       type: Number,
     },
     responseText: {
-      type: String,
+      type:    String,
       default: '',
     },
     permission: {
       type: String,
     },
     readOnly: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     usableOptions: {
       type: 'simple-array',
     },
     runAt: {
-      type: 'bigint',
+      type:        'bigint',
       transformer: new ColumnNumericTransformer(),
-      default: 0,
+      default:     0,
     },
   },
   relations: {
     history: {
-      type: 'one-to-many',
-      target: 'variable_history',
+      type:        'one-to-many',
+      target:      'variable_history',
       inverseSide: 'variable',
     },
     urls: {
-      type: 'one-to-many',
-      target: 'variable_url',
+      type:        'one-to-many',
+      target:      'variable_url',
       inverseSide: 'variable',
     },
   },
@@ -93,19 +93,19 @@ export interface VariableHistoryInterface {
 }
 
 export const VariableHistory = new EntitySchema<Readonly<VariableHistoryInterface>>({
-  name: 'variable_history',
+  name:    'variable_history',
   columns: {
     id: {
-      type: Number,
-      primary: true,
+      type:      Number,
+      primary:   true,
       generated: 'increment',
     },
     userId: {
-      type: Number,
+      type:    Number,
       default: 0,
     },
     username: {
-      type: String,
+      type:    String,
       default: 'n/a',
     },
     currentValue: {
@@ -115,9 +115,9 @@ export const VariableHistory = new EntitySchema<Readonly<VariableHistoryInterfac
       type: 'simple-json',
     },
     changedAt: {
-      type: 'bigint',
+      type:        'bigint',
       transformer: new ColumnNumericTransformer(),
-      default: 0,
+      default:     0,
     },
     variableId: {
       type: String, nullable: true, name: 'variableId', length: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') ? 36 : undefined,
@@ -125,12 +125,12 @@ export const VariableHistory = new EntitySchema<Readonly<VariableHistoryInterfac
   },
   relations: {
     variable: {
-      type: 'many-to-one',
-      target: 'variable',
+      type:        'many-to-one',
+      target:      'variable',
       inverseSide: 'history',
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-      joinColumn: { name: 'variableId' },
+      onDelete:    'CASCADE',
+      onUpdate:    'CASCADE',
+      joinColumn:  { name: 'variableId' },
 
     },
   },
@@ -141,23 +141,23 @@ export interface VariableURLInterface {
 }
 
 export const VariableURL = new EntitySchema<Readonly<VariableURLInterface>>({
-  name: 'variable_url',
+  name:    'variable_url',
   columns: {
     id: {
-      type: String,
-      primary: true,
+      type:      String,
+      primary:   true,
       generated: 'uuid',
     },
     GET: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     POST: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     showResponse: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     variableId: {
@@ -166,12 +166,12 @@ export const VariableURL = new EntitySchema<Readonly<VariableURLInterface>>({
   },
   relations: {
     variable: {
-      type: 'many-to-one',
-      target: 'variable',
+      type:        'many-to-one',
+      target:      'variable',
       inverseSide: 'urls',
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-      joinColumn: { name: 'variableId' },
+      onDelete:    'CASCADE',
+      onUpdate:    'CASCADE',
+      joinColumn:  { name: 'variableId' },
     },
   },
 });
@@ -181,11 +181,11 @@ export interface VariableWatchInterface {
 }
 
 export const VariableWatch = new EntitySchema<Readonly<VariableWatchInterface>>({
-  name: 'variable_watch',
+  name:    'variable_watch',
   columns: {
     id: {
-      type: Number,
-      primary: true,
+      type:      Number,
+      primary:   true,
       generated: 'increment',
     },
     variableId: {

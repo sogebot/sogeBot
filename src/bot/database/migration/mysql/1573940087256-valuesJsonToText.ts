@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class valuesJsonToText1573940087256 implements MigrationInterface {
   name = 'valuesJsonToText1573940087256';

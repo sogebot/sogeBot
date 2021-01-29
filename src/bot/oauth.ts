@@ -2,10 +2,16 @@ import axios from 'axios';
 
 import Core from './_interface';
 import * as constants from './constants';
-import { areDecoratorsLoaded, persistent, settings, ui } from './decorators';
-import { onChange, onLoad, onStartup } from './decorators/on';
+import {
+  areDecoratorsLoaded, persistent, settings, ui, 
+} from './decorators';
+import {
+  onChange, onLoad, onStartup, 
+} from './decorators/on';
 import { apiEmitter } from './helpers/api/emitter';
-import { error, info, warning } from './helpers/log';
+import {
+  error, info, warning, 
+} from './helpers/log';
 import { channelId, loadedTokens } from './helpers/oauth';
 import { botId } from './helpers/oauth/botId';
 import { botUsername } from './helpers/oauth/botUsername';
@@ -71,10 +77,10 @@ class OAuth extends Core {
   public broadcasterCurrentScopes: string[] = [];
 
   @ui({
-    type: 'link',
-    href: 'https://twitchtokengenerator.com/quick/XH6B7JteDO',
-    class: 'btn btn-primary btn-block',
-    text: 'commons.generate',
+    type:   'link',
+    href:   'https://twitchtokengenerator.com/quick/XH6B7JteDO',
+    class:  'btn btn-primary btn-block',
+    text:   'commons.generate',
     target: '_blank',
   }, 'broadcaster')
   public broadcasterGenerateLink = null;
@@ -110,10 +116,10 @@ class OAuth extends Core {
   public botCurrentScopes: string[] = [];
 
   @ui({
-    type: 'link',
-    href: 'https://twitchtokengenerator.com/quick/jLbq7v1pzF',
-    class: 'btn btn-primary btn-block',
-    text: 'commons.generate',
+    type:   'link',
+    href:   'https://twitchtokengenerator.com/quick/jLbq7v1pzF',
+    class:  'btn btn-primary btn-block',
+    text:   'commons.generate',
     target: '_blank',
   }, 'bot')
   public botGenerateLink = null;

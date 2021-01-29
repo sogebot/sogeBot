@@ -5,9 +5,13 @@ import { Permissions, PermissionsInterface } from '../../database/entity/permiss
 import { User } from '../../database/entity/user';
 import { areDecoratorsLoaded } from '../../decorators';
 import { getBroadcaster } from '../getBroadcaster';
-import { debug, error, warning } from '../log';
+import {
+  debug, error, warning, 
+} from '../log';
 import { generalOwners } from '../oauth/generalOwners';
-import { isFollower, isOwner, isSubscriber, isVIP } from '../user';
+import {
+  isFollower, isOwner, isSubscriber, isVIP, 
+} from '../user';
 import { isBot } from '../user/isBot';
 import { isBroadcaster } from '../user/isBroadcaster';
 import { isModerator } from '../user/isModerator';
@@ -43,7 +47,7 @@ async function check(userId: number, permId: string, partial = false): Promise<{
   });
   const pItem = (await getRepository(Permissions).findOne({
     relations: ['filters'],
-    where: { id: permId },
+    where:     { id: permId },
   })) as PermissionsInterface;
   try {
     if (!user) {
@@ -73,7 +77,7 @@ async function check(userId: number, permId: string, partial = false): Promise<{
       for (const p of _.orderBy(partialPermission, 'order', 'asc')) {
         const partialCheck = await check(userId, p.id, true);
         if (partialCheck.access) {
-          return { access: true, permission: p}; // we don't need to continue, user have already access with higher permission
+          return { access: true, permission: p }; // we don't need to continue, user have already access with higher permission
         }
       }
     }

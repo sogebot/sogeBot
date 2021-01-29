@@ -2,7 +2,9 @@
 import LoadScript from 'vue-plugin-load-script';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faSpotify, faTwitch, faTwitter } from '@fortawesome/free-brands-svg-icons';
+import {
+  faSpotify, faTwitch, faTwitter, 
+} from '@fortawesome/free-brands-svg-icons';
 import {
   faBell, faCalendar, faCheckCircle, faCircle, faClock, faMoneyBillAlt,
 } from '@fortawesome/free-regular-svg-icons';
@@ -88,8 +90,8 @@ const main = async () => {
     Vue.prototype.$integrations = await getListOf('integrations');
 
     console.debug({
-      core: Vue.prototype.$core,
-      systems: Vue.prototype.$systems,
+      core:         Vue.prototype.$core,
+      systems:      Vue.prototype.$systems,
       integrations: Vue.prototype.$integrations,
     });
 
@@ -97,8 +99,8 @@ const main = async () => {
     setMainLoaded();
 
     const router = new VueRouter({
-      mode: 'hash',
-      base: __dirname,
+      mode:   'hash',
+      base:   __dirname,
       routes: [
         { path: '/', name: 'Dashboard', component: () => import('./views/dashboard/empty.vue') },
         { path: '/stats/api', name: 'APIStats', component: () => import('./views/stats/api.vue') },
@@ -168,11 +170,11 @@ const main = async () => {
       store,
       router,
       components: {
-        dashboard: () => import('./views/dashboard/dashboard.vue'),
-        navbar: () => import('./components/navbar/navbar.vue'),
-        statsbar: () => import('./components/statsbar/statsbar.vue'),
+        dashboard:        () => import('./views/dashboard/dashboard.vue'),
+        navbar:           () => import('./components/navbar/navbar.vue'),
+        statsbar:         () => import('./components/statsbar/statsbar.vue'),
         changegamedialog: () => import('./components/dialog/changegamedialog.vue'),
-        footerbar: () => import('./components/footer.vue'),
+        footerbar:        () => import('./components/footer.vue'),
       },
       data() {
         const object: {
@@ -181,8 +183,8 @@ const main = async () => {
           dropdownVue: any;
         } = {
           isDropdownHidden: true,
-          dropdown: null,
-          dropdownVue: null,
+          dropdown:         null,
+          dropdownVue:      null,
         };
         return object;
       },

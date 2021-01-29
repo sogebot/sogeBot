@@ -38,8 +38,8 @@ const overlays = async () => {
   Vue.prototype.$state = ButtonStates;
 
   const router = new VueRouter({
-    mode: 'history',
-    base: __dirname,
+    mode:   'history',
+    base:   __dirname,
     routes: [
       { path: '/overlays/alerts/:id', name: 'alertsRegistryOverlay', component: () => import('./views/alertsRegistry.vue') },
       { path: '/overlays/goals/:id', name: 'goalsOverlay', component: () => import('./views/goals.vue') },

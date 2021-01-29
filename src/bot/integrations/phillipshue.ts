@@ -2,7 +2,9 @@ import chalk from 'chalk';
 import _ from 'lodash';
 import { HueApi, lightState } from 'node-hue-api';
 
-import { command, default_permission, settings } from '../decorators';
+import {
+  command, default_permission, settings, 
+} from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import { error, info } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
@@ -139,14 +141,14 @@ class PhillipsHue extends Integration {
     }
 
     this.states.push({
-      'rgb': rgb,
-      'light': Number(this.parseText(opts.parameters, 'light', '1')),
-      'time': Number(this.parseText(opts.parameters, 'time', '100')),
-      'loop': Number(this.parseText(opts.parameters, 'loop', '3')),
+      'rgb':    rgb,
+      'light':  Number(this.parseText(opts.parameters, 'light', '1')),
+      'time':   Number(this.parseText(opts.parameters, 'time', '100')),
+      'loop':   Number(this.parseText(opts.parameters, 'loop', '3')),
       'status': {
-        'loop': 0,
-        'state': 0,
-        'time': new Date().getTime(),
+        'loop':    0,
+        'state':   0,
+        'time':    new Date().getTime(),
         'blocked': false,
       },
     });

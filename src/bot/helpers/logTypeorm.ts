@@ -1,4 +1,4 @@
-import {Logger, QueryRunner} from 'typeorm';
+import { Logger, QueryRunner } from 'typeorm';
 
 import { error as errorLog } from './log';
 

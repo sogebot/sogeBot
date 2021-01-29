@@ -17,7 +17,7 @@ class Quotes extends System {
     super();
 
     this.addMenu({ category: 'manage', name: 'quotes', id: 'manage/quotes/list', this: this });
-    this.addMenuPublic({ id: 'quotes', name: 'quotes'});
+    this.addMenuPublic({ id: 'quotes', name: 'quotes' });
   }
 
   sockets() {
@@ -95,13 +95,13 @@ class Quotes extends System {
         throw new Error();
       }
       const id = new Expects(opts.parameters).argument({ type: Number, name: 'id' }).toArray()[0];
-      const item = await getRepository(QuotesEntity).findOne({id});
+      const item = await getRepository(QuotesEntity).findOne({ id });
 
       if (!item) {
         const response = prepare('systems.quotes.remove.not-found', { id });
         return [{ response, ...opts }];
       } else {
-        await getRepository(QuotesEntity).delete({id});
+        await getRepository(QuotesEntity).delete({ id });
         const response = prepare('systems.quotes.remove.ok', { id });
         return [{ response, ...opts }];
       }
@@ -120,7 +120,7 @@ class Quotes extends System {
       }
       const [id, tag] = new Expects(opts.parameters).argument({ type: Number, name: 'id' }).argument({ name: 'tag', multi: true, delimiter: '' }).toArray() as [ number, string ];
 
-      const quote = await getRepository(QuotesEntity).findOne({id});
+      const quote = await getRepository(QuotesEntity).findOne({ id });
       if (quote) {
         const tags = tag.split(',').map((o) => o.trim());
         await getManager()
@@ -158,7 +158,7 @@ class Quotes extends System {
     }
 
     if (!_.isNil(id)) {
-      const quote = await getRepository(QuotesEntity).findOne({id});
+      const quote = await getRepository(QuotesEntity).findOne({ id });
       if (!_.isEmpty(quote) && typeof quote !== 'undefined') {
         const quotedBy = (await users.getUsernamesFromIds([quote.quotedBy]))[quote.quotedBy];
         const response = prepare('systems.quotes.show.ok', { quote: quote.quote, id: quote.id, quotedBy });

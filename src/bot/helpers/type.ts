@@ -13,12 +13,12 @@ export const serialize = (toSerialize: BigInt | Map<any, any>): string => {
     if(originalObject instanceof Map) {
       return {
         dataType: 'Map',
-        value: Array.from(originalObject.entries()), // or with spread: value: [...originalObject]
+        value:    Array.from(originalObject.entries()), // or with spread: value: [...originalObject]
       };
     } if (typeof originalObject === 'bigint') {
       return {
         dataType: 'BigInt',
-        value: String(value), // or with spread: value: [...originalObject]
+        value:    String(value), // or with spread: value: [...originalObject]
       };
     } else {
       return value;

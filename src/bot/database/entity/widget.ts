@@ -14,10 +14,10 @@ export interface WidgetSocialInterface {
 }
 
 export const WidgetSocial = new EntitySchema<Readonly<Required<WidgetSocialInterface>>>({
-  name: 'widget_social',
+  name:    'widget_social',
   columns: {
     id: {
-      type: String,
+      type:    String,
       primary: true,
     },
     type: {
@@ -39,9 +39,9 @@ export const WidgetSocial = new EntitySchema<Readonly<Required<WidgetSocialInter
       type: String,
     },
     timestamp: {
-      type: 'bigint',
+      type:        'bigint',
       transformer: new ColumnNumericTransformer(),
-      default: 0,
+      default:     0,
     },
   },
 });

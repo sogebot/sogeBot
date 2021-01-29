@@ -3,10 +3,14 @@ import { getRepository } from 'typeorm';
 import { round5 } from '../commons';
 import * as constants from '../constants';
 import { ScrimMatchId } from '../database/entity/scrimMatchId';
-import { command, default_permission, settings } from '../decorators';
+import {
+  command, default_permission, settings, 
+} from '../decorators';
 import { onStartup } from '../decorators/on';
 import Expects from '../expects.js';
-import { announce, getBotSender, prepare } from '../helpers/commons';
+import {
+  announce, getBotSender, prepare, 
+} from '../helpers/commons';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { debug } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
@@ -47,9 +51,9 @@ class Scrim extends System {
   public async main(opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const [isCooldownOnly, type, minutes] = new Expects(opts.parameters)
-        .toggler({name: 'c'})
-        .string({name: 'type'})
-        .number({name: 'minutes'})
+        .toggler({ name: 'c' })
+        .string({ name: 'type' })
+        .number({ name: 'minutes' })
         .toArray();
       if (this.closingAt !== 0) {
         throw Error(String(ERROR.ALREADY_OPENED));
@@ -88,8 +92,8 @@ class Scrim extends System {
       if (opts.parameters.length === 0) {
         return this.currentMatches(opts);
       } else {
-        const [matchId] = new Expects(opts.parameters).everything({name: 'matchId'}).toArray();
-        const scrimMatchId = await getRepository(ScrimMatchId).findOne({ username: opts.sender.username});
+        const [matchId] = new Expects(opts.parameters).everything({ name: 'matchId' }).toArray();
+        const scrimMatchId = await getRepository(ScrimMatchId).findOne({ username: opts.sender.username });
         await getRepository(ScrimMatchId).save({
           ...scrimMatchId,
           username: opts.sender.username,
@@ -166,10 +170,9 @@ class Scrim extends System {
     for (const id of Object.keys(matches).sort()) {
       output.push(id + ' - ' + matches[id].sort().join(', '));
     }
-    return [{
-      response: prepare('systems.scrim.currentMatches', {
-        matches: output.length === 0 ? '<' + translate('core.empty') + '>' : output.join(' | '),
-      }), ...opts }];
+    return [{ response: prepare('systems.scrim.currentMatches', {
+      matches: output.length === 0 ? '<' + translate('core.empty') + '>' : output.join(' | '),
+    }), ...opts }];
   }
 
   private countdown() {

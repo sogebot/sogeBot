@@ -6,9 +6,13 @@ import { HowLongToBeatGame, HowLongToBeatGameItem } from '../database/entity/how
 import { command, default_permission } from '../decorators';
 import { onStartup, onStreamStart } from '../decorators/on';
 import Expects from '../expects';
-import { isStreamOnline, stats, streamStatusChangeSince } from '../helpers/api';
+import {
+  isStreamOnline, stats, streamStatusChangeSince, 
+} from '../helpers/api';
 import { prepare } from '../helpers/commons';
-import { debug, error, info, warning } from '../helpers/log';
+import {
+  debug, error, info, warning, 
+} from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
 import System from './_interface';
@@ -64,11 +68,11 @@ class HowLongToBeat extends System {
         const gameFromHltb = (await this.hltbService.search(game))[0];
         if (gameFromHltb) {
           await getRepository(HowLongToBeatGame).save({
-            game: game,
-            imageUrl: gameFromHltb.imageUrl,
-            startedAt: Date.now(),
-            gameplayMain: gameFromHltb.gameplayMain,
-            gameplayMainExtra: gameFromHltb.gameplayMainExtra,
+            game:                  game,
+            imageUrl:              gameFromHltb.imageUrl,
+            startedAt:             Date.now(),
+            gameplayMain:          gameFromHltb.gameplayMain,
+            gameplayMainExtra:     gameFromHltb.gameplayMainExtra,
             gameplayCompletionist: gameFromHltb.gameplayCompletionist,
           });
         } else {
@@ -147,7 +151,7 @@ class HowLongToBeat extends System {
         debug('hltb', 'First entry of this stream for ' + stats.value.currentGame);
         await getRepository(HowLongToBeatGameItem).save({
           createdAt: streamStatusChangeSince.value,
-          hltb_id: game.id,
+          hltb_id:   game.id,
           timestamp: this.interval,
         });
       }
@@ -158,11 +162,11 @@ class HowLongToBeat extends System {
           debug('hltb', `Game ${stats.value.currentGame} found on HLTB service`);
           // we don't care if MP game or not (user might want to track his gameplay time)
           await getRepository(HowLongToBeatGame).save({
-            game: stats.value.currentGame,
-            imageUrl: gameFromHltb.imageUrl,
-            startedAt: Date.now(),
-            gameplayMain: gameFromHltb.gameplayMain,
-            gameplayMainExtra: gameFromHltb.gameplayMainExtra,
+            game:                  stats.value.currentGame,
+            imageUrl:              gameFromHltb.imageUrl,
+            startedAt:             Date.now(),
+            gameplayMain:          gameFromHltb.gameplayMain,
+            gameplayMainExtra:     gameFromHltb.gameplayMainExtra,
             gameplayCompletionist: gameFromHltb.gameplayCompletionist,
           });
           notFoundGames.splice(notFoundGames.indexOf(stats.value.currentGame), 1);
@@ -227,9 +231,9 @@ class HowLongToBeat extends System {
     if (gameplayMain === 0) {
       return [{
         response: prepare('systems.howlongtobeat.multiplayer-game', {
-          game: gameInput,
-          currentMain: timeToBeatMain.toFixed(1),
-          currentMainExtra: timeToBeatMainExtra.toFixed(1),
+          game:                 gameInput,
+          currentMain:          timeToBeatMain.toFixed(1),
+          currentMainExtra:     timeToBeatMainExtra.toFixed(1),
           currentCompletionist: timeToBeatCompletionist.toFixed(1),
         }), ...opts,
       }];
@@ -237,15 +241,15 @@ class HowLongToBeat extends System {
 
     return [{
       response: prepare('systems.howlongtobeat.game', {
-        game: gameInput,
-        hltbMain: gameplayMain,
-        hltbCompletionist: gameplayCompletionist,
-        hltbMainExtra: gameplayMainExtra,
-        currentMain: timeToBeatMain.toFixed(1),
-        currentMainExtra: timeToBeatMainExtra.toFixed(1),
+        game:                 gameInput,
+        hltbMain:             gameplayMain,
+        hltbCompletionist:    gameplayCompletionist,
+        hltbMainExtra:        gameplayMainExtra,
+        currentMain:          timeToBeatMain.toFixed(1),
+        currentMainExtra:     timeToBeatMainExtra.toFixed(1),
         currentCompletionist: timeToBeatCompletionist.toFixed(1),
-        percentMain: Number((timeToBeatMain / gameplayMain) * 100).toFixed(2),
-        percentMainExtra: Number((timeToBeatMainExtra / gameplayMainExtra) * 100).toFixed(2),
+        percentMain:          Number((timeToBeatMain / gameplayMain) * 100).toFixed(2),
+        percentMainExtra:     Number((timeToBeatMainExtra / gameplayMainExtra) * 100).toFixed(2),
         percentCompletionist: Number((timeToBeatCompletionist / gameplayCompletionist) * 100).toFixed(2),
       }), ...opts,
     }];

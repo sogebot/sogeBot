@@ -1,8 +1,12 @@
 import _ from 'lodash';
 
 import { Message } from '../../message';
-import { chatOut, debug, whisperOut } from '../log';
-import { getMuteStatus, message, sendWithMe, showWithAt } from '../tmi';
+import {
+  chatOut, debug, whisperOut, 
+} from '../log';
+import {
+  getMuteStatus, message, sendWithMe, showWithAt, 
+} from '../tmi';
 
 import { getBotSender } from '.';
 
@@ -23,14 +27,14 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
   }
 
   debug('sendMessage.message', messageToSend);
-  debug('commons.sendMessage', JSON.stringify({messageToSend, sender, attr}));
+  debug('commons.sendMessage', JSON.stringify({ messageToSend, sender, attr }));
 
   if (sender) {
     attr.sender = sender;
   }
 
   if (!attr.skip) {
-    messageToSend = await new Message(messageToSend).parse({...attr, sender: attr.sender ? attr.sender as UserStateTagsWithId : getBotSender()  }) as string;
+    messageToSend = await new Message(messageToSend).parse({ ...attr, sender: attr.sender ? attr.sender as UserStateTagsWithId : getBotSender()  }) as string;
   }
   if (messageToSend.length === 0) {
     return false;

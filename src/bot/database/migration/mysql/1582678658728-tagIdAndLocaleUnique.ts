@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class tagIdAndLocaleUnique1582678658728 implements MigrationInterface {
   name = 'tagIdAndLocaleUnique1582678658728';

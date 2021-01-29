@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class hltbIdFix1605640986450 implements MigrationInterface {
   name = 'hltbIdFix1605640986450';

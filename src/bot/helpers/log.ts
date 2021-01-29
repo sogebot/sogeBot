@@ -24,7 +24,7 @@ const logFileName: Generator = (time: Date | number, index?: number) => {
   return `./logs/sogebot.log.${(index ?? 1)-1}.gz`;
 };
 const logFile = createStream(logFileName, {
-  size: '5M',
+  size:     '5M',
   compress: 'gzip',
 });
 
@@ -59,30 +59,30 @@ enum Levels {
 /* eslint-enable */
 
 const levelFormat = {
-  error: '!!! ERROR !!!',
-  debug: 'DEBUG:',
-  chatIn: '<<<',
-  chatOut: '>>>',
-  whisperIn: '<w<',
-  whisperOut: '>w>',
-  info: '|',
-  warning: '|!',
-  timeout: '+timeout',
-  ban: '+ban',
-  unban: '-ban',
-  follow: '+follow',
-  host: '+host',
-  raid: '+raid',
-  redeem: '+++ redeem:',
-  unfollow: '-follow',
-  cheer: '+cheer',
-  tip: '+tip',
-  sub: '+sub',
-  subgift: '+subgift',
+  error:            '!!! ERROR !!!',
+  debug:            'DEBUG:',
+  chatIn:           '<<<',
+  chatOut:          '>>>',
+  whisperIn:        '<w<',
+  whisperOut:       '>w>',
+  info:             '|',
+  warning:          '|!',
+  timeout:          '+timeout',
+  ban:              '+ban',
+  unban:            '-ban',
+  follow:           '+follow',
+  host:             '+host',
+  raid:             '+raid',
+  redeem:           '+++ redeem:',
+  unfollow:         '-follow',
+  cheer:            '+cheer',
+  tip:              '+tip',
+  sub:              '+sub',
+  subgift:          '+subgift',
   subcommunitygift: '+subcommunitygift',
-  resub: '+resub',
-  start: '== STREAM STARTED =>',
-  stop: '== STREAM STOPPED',
+  resub:            '+resub',
+  start:            '== STREAM STARTED =>',
+  stop:             '== STREAM STOPPED',
 };
 
 function format(level: Levels, message: any, category?: string) {

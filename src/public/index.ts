@@ -1,7 +1,5 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
-import {
-  faCaretLeft,
-} from '@fortawesome/free-solid-svg-icons';
+import { faCaretLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import VueCompositionAPI from '@vue/composition-api';
 import BootstrapVue from 'bootstrap-vue';
@@ -47,8 +45,8 @@ const main = async () => {
   setMainLoaded();
 
   const router = new VueRouter({
-    mode: 'hash',
-    base: __dirname,
+    mode:   'hash',
+    base:   __dirname,
     routes: [
       { path: '/', name: 'Dashboard', component: () => import('./views/dashboard.vue') },
       { path: '/playlist', name: 'Playlist', component: () => import('./views/playlist.vue') },

@@ -3,7 +3,9 @@ import { error } from 'console';
 import axios from 'axios';
 import { defaults, isNil } from 'lodash';
 
-import { calls, gameCache, gameOrTitleChangedManually, rawStatus, retries, setRateLimit, stats } from '../helpers/api';
+import {
+  calls, gameCache, gameOrTitleChangedManually, rawStatus, retries, setRateLimit, stats, 
+} from '../helpers/api';
 import { parseTitle } from '../helpers/api/parseTitle';
 import { eventEmitter } from '../helpers/events/emitter';
 import { warning } from '../helpers/log';
@@ -11,7 +13,7 @@ import { channelId } from '../helpers/oauth';
 import { ioServer } from '../helpers/panel';
 import { addUIError } from '../helpers/panel/';
 import oauth from '../oauth';
-import {translate} from '../translate';
+import { translate } from '../translate';
 import { getGameIdFromName } from './getGameIdFromName';
 
 async function setTitleAndGame (args: { title?: string | null; game?: string | null }): Promise<{ response: string; status: boolean } | null> {
@@ -65,15 +67,15 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | 
     try {
       await axios({
         method: 'put',
-        url: `https://api.twitch.tv/kraken/channels/${cid}`,
-        data: {
+        url:    `https://api.twitch.tv/kraken/channels/${cid}`,
+        data:   {
           channel: {
-            game: game,
+            game:   game,
             status: title,
           },
         },
         headers: {
-          'Accept': 'application/vnd.twitchtv.v5+json',
+          'Accept':        'application/vnd.twitchtv.v5+json',
           'Authorization': 'OAuth ' + oauth.broadcasterAccessToken,
         },
       });
@@ -82,13 +84,13 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | 
     }
 
     request = await axios({
-      method: 'patch',
+      method:  'patch',
       url,
-      data: requestData,
+      data:    requestData,
       headers: {
         'Authorization': 'Bearer ' + token,
-        'Client-ID': oauth.broadcasterClientId,
-        'Content-Type': 'application/json',
+        'Client-ID':     oauth.broadcasterClientId,
+        'Content-Type':  'application/json',
       },
     });
     // save remaining api calls

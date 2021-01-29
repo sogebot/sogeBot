@@ -26,22 +26,22 @@ export interface BetsParticipationsInterface {
 }
 
 export const Bets = new EntitySchema<Readonly<Required<BetsInterface>>>({
-  name: 'bets',
+  name:    'bets',
   columns: {
-    id: { type: Number, primary: true, generated: 'increment' },
-    createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
-    endedAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
-    isLocked: { type: Boolean, default: false },
+    id:             { type: Number, primary: true, generated: 'increment' },
+    createdAt:      { type: 'bigint', transformer: new ColumnNumericTransformer() },
+    endedAt:        { type: 'bigint', transformer: new ColumnNumericTransformer() },
+    isLocked:       { type: Boolean, default: false },
     arePointsGiven: { type: Boolean, default: false },
-    options: { type: 'simple-array' },
-    title: { type: String },
+    options:        { type: 'simple-array' },
+    title:          { type: String },
   },
   relations: {
     participations: {
-      type: 'one-to-many',
-      target: 'bets_participations',
+      type:        'one-to-many',
+      target:      'bets_participations',
       inverseSide: 'bet',
-      cascade: true,
+      cascade:     true,
     },
   },
   indices: [
@@ -50,21 +50,21 @@ export const Bets = new EntitySchema<Readonly<Required<BetsInterface>>>({
 });
 
 export const BetsParticipations = new EntitySchema<Readonly<Required<BetsParticipationsInterface>>>({
-  name: 'bets_participations',
+  name:    'bets_participations',
   columns: {
-    id: { type: Number, primary: true, generated: 'increment' },
-    userId: { type: Number },
-    username: { type: String },
-    points: { type: 'bigint', transformer: new ColumnNumericTransformer() },
+    id:        { type: Number, primary: true, generated: 'increment' },
+    userId:    { type: Number },
+    username:  { type: String },
+    points:    { type: 'bigint', transformer: new ColumnNumericTransformer() },
     optionIdx: { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },
   relations: {
     bet: {
-      type: 'many-to-one',
-      target: 'bets',
+      type:        'many-to-one',
+      target:      'bets',
       inverseSide: 'participations',
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete:    'CASCADE',
+      onUpdate:    'CASCADE',
     },
   },
   indices: [

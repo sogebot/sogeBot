@@ -4,7 +4,9 @@ import { getRepository, IsNull } from 'typeorm';
 
 import currency from '../currency';
 import { Goal, GoalGroup } from '../database/entity/goal';
-import { onBit, onFollow, onSub, onTip } from '../decorators/on';
+import {
+  onBit, onFollow, onSub, onTip, 
+} from '../decorators/on';
 import { stats } from '../helpers/api';
 import { mainCurrency } from '../helpers/currency';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
@@ -52,7 +54,7 @@ class Goals extends Overlay {
       try {
         const item = await getRepository(GoalGroup).findOne({
           relations: ['goals'],
-          where: { id },
+          where:     { id },
         });
         cb(null, item);
       } catch (e) {
@@ -62,7 +64,7 @@ class Goals extends Overlay {
     publicEndpoint(this.nsp, 'goals::current', async (cb) => {
       cb(null, {
         subscribers: stats.value.currentSubscribers,
-        followers: stats.value.currentFollowers,
+        followers:   stats.value.currentFollowers,
       });
     });
   }

@@ -27,14 +27,14 @@ const stream: ResponseFilter = {
       let request = await axios.get(`https://api.twitch.tv/helix/users?login=${channel}`, {
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
+          'Client-ID':     oauth.botClientId,
         },
       });
       const channelId = request.data.data[0].id;
       request = await axios.get(`https://api.twitch.tv/helix/channels?broadcaster_id=${channelId}`, {
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
+          'Client-ID':     oauth.botClientId,
         },
       });
 
@@ -55,7 +55,7 @@ const stream: ResponseFilter = {
       let request = await axios.get(`https://api.twitch.tv/helix/users?login=${channel}`, {
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
+          'Client-ID':     oauth.botClientId,
         },
       });
 
@@ -63,7 +63,7 @@ const stream: ResponseFilter = {
       request = await axios.get(`https://api.twitch.tv/helix/channels?broadcaster_id=${channelId}`, {
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
+          'Client-ID':     oauth.botClientId,
         },
       });
       // save remaining api calls
@@ -85,14 +85,14 @@ const stream: ResponseFilter = {
       let request = await axios.get(`https://api.twitch.tv/helix/users?login=${channel}`, {
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
+          'Client-ID':     oauth.botClientId,
         },
       });
       const channelId = request.data.data[0].id;
       request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
+          'Client-ID':     oauth.botClientId,
         },
       });
       // save remaining api calls

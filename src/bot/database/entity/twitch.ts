@@ -84,105 +84,105 @@ export interface TwitchClipsInterface {
 }
 
 export const TwitchTag = new EntitySchema<Readonly<Required<TwitchTagInterface>>>({
-  name: 'twitch_tag',
+  name:    'twitch_tag',
   columns: {
-    tag_id: { type: String, primary: true },
-    is_auto: { type: Boolean },
+    tag_id:     { type: String, primary: true },
+    is_auto:    { type: Boolean },
     is_current: { type: Boolean, default: false },
   },
   relations: {
     localization_names: {
-      type: 'one-to-many',
-      target: 'twitch_tag_localization_name',
+      type:        'one-to-many',
+      target:      'twitch_tag_localization_name',
       inverseSide: 'tag',
-      cascade: true,
+      cascade:     true,
     },
     localization_descriptions: {
-      type: 'one-to-many',
-      target: 'twitch_tag_localization_description',
+      type:        'one-to-many',
+      target:      'twitch_tag_localization_description',
       inverseSide: 'tag',
-      cascade: true,
+      cascade:     true,
     },
   },
 });
 
 export const TwitchTagLocalizationName = new EntitySchema<Readonly<Required<TwitchTagLocalizationInterface>>>({
-  name: 'twitch_tag_localization_name',
+  name:    'twitch_tag_localization_name',
   columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    id:     { type: 'uuid', primary: true, generated: 'uuid' },
     locale: { type: String },
-    value: { type: String },
-    tagId: { type: String, nullable: true, name: 'tagId' },
+    value:  { type: String },
+    tagId:  { type: String, nullable: true, name: 'tagId' },
   },
   relations: {
     tag: {
-      type: 'many-to-one',
-      target: 'twitch_tag',
-      joinColumn: { name: 'tagId' },
+      type:        'many-to-one',
+      target:      'twitch_tag',
+      joinColumn:  { name: 'tagId' },
       inverseSide: 'localization_names',
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete:    'CASCADE',
+      onUpdate:    'CASCADE',
     },
   },
   indices: [
     {
-      name: 'IDX_dcf417a56c907f3a6788476047',
-      unique: true,
+      name:    'IDX_dcf417a56c907f3a6788476047',
+      unique:  true,
       columns: [ 'tagId', 'locale' ],
     },
   ],
 });
 
 export const TwitchTagLocalizationDescription = new EntitySchema<Readonly<Required<TwitchTagLocalizationInterface>>>({
-  name: 'twitch_tag_localization_description',
+  name:    'twitch_tag_localization_description',
   columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    id:     { type: 'uuid', primary: true, generated: 'uuid' },
     locale: { type: String },
-    value: { type: 'text' },
-    tagId: { type: String, nullable: true, name: 'tagId' },
+    value:  { type: 'text' },
+    tagId:  { type: String, nullable: true, name: 'tagId' },
   },
   relations: {
     tag: {
-      type: 'many-to-one',
-      target: 'twitch_tag',
-      joinColumn: { name: 'tagId' },
+      type:        'many-to-one',
+      target:      'twitch_tag',
+      joinColumn:  { name: 'tagId' },
       inverseSide: 'localization_names',
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete:    'CASCADE',
+      onUpdate:    'CASCADE',
     },
   },
   indices: [
     {
-      name: 'IDX_4d8108fc3e8dcbe5c112f53dd3',
-      unique: true,
+      name:    'IDX_4d8108fc3e8dcbe5c112f53dd3',
+      unique:  true,
       columns: [ 'tagId', 'locale' ],
     },
   ],
 });
 
 export const TwitchStats = new EntitySchema<Readonly<Required<TwitchStatsInterface>>>({
-  name: 'twitch_stats',
+  name:    'twitch_stats',
   columns: {
-    whenOnline: { type: 'bigint', transformer: new ColumnNumericTransformer(), primary: true },
-    currentViewers: { type: Number, default: 0 },
+    whenOnline:         { type: 'bigint', transformer: new ColumnNumericTransformer(), primary: true },
+    currentViewers:     { type: Number, default: 0 },
     currentSubscribers: { type: Number, default: 0 },
-    chatMessages: { type: 'bigint' },
-    currentFollowers: { type: Number, default: 0 },
-    currentViews: { type: Number, default: 0 },
-    maxViewers: { type: Number, default: 0 },
-    currentHosts: { type: Number, default: 0 },
-    newChatters: { type: Number, default: 0 },
-    currentBits: { type: 'bigint', transformer: new ColumnNumericTransformer() },
-    currentTips: { type: 'float', transformer: new ColumnNumericTransformer(), precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined  },
-    currentWatched: { type: 'bigint', transformer: new ColumnNumericTransformer() },
+    chatMessages:       { type: 'bigint' },
+    currentFollowers:   { type: Number, default: 0 },
+    currentViews:       { type: Number, default: 0 },
+    maxViewers:         { type: Number, default: 0 },
+    currentHosts:       { type: Number, default: 0 },
+    newChatters:        { type: Number, default: 0 },
+    currentBits:        { type: 'bigint', transformer: new ColumnNumericTransformer() },
+    currentTips:        { type: 'float', transformer: new ColumnNumericTransformer(), precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined  },
+    currentWatched:     { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },
 });
 
 export const TwitchClips = new EntitySchema<Readonly<Required<TwitchClipsInterface>>>({
-  name: 'twitch_clips',
+  name:    'twitch_clips',
   columns: {
-    clipId: { type: String, primary: true },
-    isChecked: { type: Boolean },
+    clipId:            { type: String, primary: true },
+    isChecked:         { type: Boolean },
     shouldBeCheckedAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },
 });

@@ -27,51 +27,51 @@ export interface PermissionCommandsInterface {
 }
 
 export const Permissions = new EntitySchema<Readonly<Required<PermissionsInterface>>>({
-  name: 'permissions',
+  name:    'permissions',
   columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
-    name: { type: String },
-    order: { type: Number },
-    isCorePermission: { type: Boolean },
+    id:                 { type: 'uuid', primary: true, generated: 'uuid' },
+    name:               { type: String },
+    order:              { type: Number },
+    isCorePermission:   { type: Boolean },
     isWaterfallAllowed: { type: Boolean },
-    automation: { type: 'varchar', length: 12 },
-    userIds: { type: 'simple-array' },
-    excludeUserIds: { type: 'simple-array' },
+    automation:         { type: 'varchar', length: 12 },
+    userIds:            { type: 'simple-array' },
+    excludeUserIds:     { type: 'simple-array' },
   },
   relations: {
     filters: {
-      type: 'one-to-many',
-      target: 'permission_filters',
+      type:        'one-to-many',
+      target:      'permission_filters',
       inverseSide: 'permission',
-      cascade: true,
+      cascade:     true,
     },
   },
 });
 
 export const PermissionFilters = new EntitySchema<Readonly<Required<PermissionFiltersInterface>>>({
-  name: 'permission_filters',
+  name:    'permission_filters',
   columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    id:         { type: 'uuid', primary: true, generated: 'uuid' },
     comparator: { type: 'varchar', length: 3 },
-    type: { type: 'varchar' },
-    value: { type: String },
+    type:       { type: 'varchar' },
+    value:      { type: String },
   },
   relations: {
     permission: {
-      type: 'many-to-one',
-      target: 'permissions',
+      type:        'many-to-one',
+      target:      'permissions',
       inverseSide: 'filters',
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete:    'CASCADE',
+      onUpdate:    'CASCADE',
     },
   },
 });
 
 export const PermissionCommands = new EntitySchema<Readonly<Required<PermissionCommandsInterface>>>({
-  name: 'permission_commands',
+  name:    'permission_commands',
   columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
-    name: { type: String },
+    id:         { type: 'uuid', primary: true, generated: 'uuid' },
+    name:       { type: String },
     permission: { type: 'varchar', nullable: true, length: 36 },
   },
   indices: [

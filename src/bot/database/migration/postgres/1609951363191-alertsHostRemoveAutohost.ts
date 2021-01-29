@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class alertsHostRemoveAutohost1609951363191 implements MigrationInterface {
   name = 'alertsHostRemoveAutohost1609951363191';

@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class multipleSongRequestWithSameVideoId1573998223383 implements MigrationInterface {
   name = 'multipleSongRequestWithSameVideoId1573998223383';

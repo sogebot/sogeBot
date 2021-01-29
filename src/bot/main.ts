@@ -19,7 +19,9 @@ import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOpti
 import { changelog } from './changelog';
 import { autoLoad } from './helpers/autoLoad';
 import { setIsBotStarted } from './helpers/database';
-import { debug, error, info, isDebugEnabled, setDEBUG, warning } from './helpers/log';
+import {
+  debug, error, info, isDebugEnabled, setDEBUG, warning, 
+} from './helpers/log';
 import { TypeORMLogger } from './helpers/logTypeorm';
 import { expose as panelExpose, init as panelInit } from './panel';
 import { startWatcher } from './watchers';
@@ -37,26 +39,26 @@ const connect = async function () {
   if (type === 'mysql' || type === 'mariadb') {
     await createConnection({
       ...connectionOptions,
-      logging: ['error'],
-      logger: new TypeORMLogger(),
-      synchronize: false,
+      logging:       ['error'],
+      logger:        new TypeORMLogger(),
+      synchronize:   false,
       migrationsRun: true,
-      charset: 'UTF8MB4_GENERAL_CI',
+      charset:       'UTF8MB4_GENERAL_CI',
     } as MysqlConnectionOptions);
   } else {
     await createConnection({
       ...connectionOptions,
-      logging: ['error'],
-      logger: new TypeORMLogger(),
-      synchronize: false,
+      logging:       ['error'],
+      logger:        new TypeORMLogger(),
+      synchronize:   false,
       migrationsRun: true,
     });
   }
   const typeToLog = {
     'better-sqlite3': 'SQLite3',
-    mariadb: 'MySQL/MariaDB',
-    mysql: 'MySQL/MariaDB',
-    postgres: 'PostgreSQL',
+    mariadb:          'MySQL/MariaDB',
+    mysql:            'MySQL/MariaDB',
+    postgres:         'PostgreSQL',
   };
   await new Promise( resolve => setTimeout(resolve, 3000) );
   info(`Initialized ${typeToLog[type as keyof typeof typeToLog]} database (${normalize(String(connectionOptions.database))})`);
@@ -67,9 +69,9 @@ async function main () {
     const version = _.get(process, 'env.npm_package_version', 'x.y.z');
     if (!existsSync('./restart.pid')) {
       process.stdout.write(figlet.textSync('sogeBot ' + version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'), {
-        font: 'ANSI Shadow',
+        font:             'ANSI Shadow',
         horizontalLayout: 'default',
-        verticalLayout: 'default',
+        verticalLayout:   'default',
       }));
       process.stdout.write('\n\n\n');
       info(`Bot is starting up (NodeJS: ${process.versions.node})`);
@@ -137,7 +139,7 @@ async function main () {
             blocked((time: any, stack: any) => {
               error(`EVENTLOOP BLOCK !!! Blocked for ${time}ms, operation started here:`);
               error(stack);
-            }, {threshold: 1000});
+            }, { threshold: 1000 });
           }
 
           require('./inspector');

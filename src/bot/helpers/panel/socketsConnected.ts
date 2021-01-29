@@ -8,4 +8,6 @@ function socketsConnectedInc() {
   socketsConnected++;
 }
 
-export { socketsConnected, socketsConnectedInc, socketsConnectedDec };
+export {
+  socketsConnected, socketsConnectedInc, socketsConnectedDec, 
+};

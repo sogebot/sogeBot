@@ -17,7 +17,7 @@ class Overlays extends Registry {
     });
     adminEndpoint(this.nsp, 'generic::setById', async (opts, cb) => {
       try {
-        const item = await getRepository(OverlayMapper).save({ ...(await getRepository(OverlayMapper).findOne({ id: String(opts.id) })), ...opts.item});
+        const item = await getRepository(OverlayMapper).save({ ...(await getRepository(OverlayMapper).findOne({ id: String(opts.id) })), ...opts.item });
         cb(null, item);
       } catch (e) {
         cb(e.stack, null);

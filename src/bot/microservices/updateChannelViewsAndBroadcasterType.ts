@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-import { calls, emptyRateLimit, getClientId, getToken, setRateLimit, stats } from '../helpers/api';
+import {
+  calls, emptyRateLimit, getClientId, getToken, setRateLimit, stats, 
+} from '../helpers/api';
 import { apiEmitter } from '../helpers/api/emitter';
 import { error } from '../helpers/log';
 import { channelId } from '../helpers/oauth';
@@ -23,7 +25,7 @@ async function updateChannelViewsAndBroadcasterType () {
     request = await axios.get(url, {
       headers: {
         'Authorization': 'Bearer ' + await getToken('bot'),
-        'Client-ID': await getClientId('bot'),
+        'Client-ID':     await getClientId('bot'),
       },
     });
     // save remaining api calls

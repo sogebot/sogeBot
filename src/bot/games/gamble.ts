@@ -2,7 +2,9 @@ import _ from 'lodash';
 import { getRepository } from 'typeorm';
 
 import { User } from '../database/entity/user';
-import { command, permission_settings, persistent, settings } from '../decorators';
+import {
+  command, permission_settings, persistent, settings, 
+} from '../decorators';
 import { prepare } from '../helpers/commons';
 import { error } from '../helpers/log';
 import { getUserHighestPermission } from '../helpers/permissions/';
@@ -82,10 +84,10 @@ class Gamble extends Game {
         await getRepository(User).increment({ userId: Number(opts.sender.userId) }, 'points', incrementPointsWithJackpot);
         const currentPointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
         message = prepare('gambling.gamble.winJackpot', {
-          pointsName: await getPointsName(currentPointsOfUser),
-          points: currentPointsOfUser,
+          pointsName:  await getPointsName(currentPointsOfUser),
+          points:      currentPointsOfUser,
           jackpotName: await getPointsName(this.jackpotValue),
-          jackpot: this.jackpotValue,
+          jackpot:     this.jackpotValue,
         });
         this.jackpotValue = 0;
       } else if (_.random(0, 100, false) <= chanceToWin[permId]) {
@@ -93,22 +95,22 @@ class Gamble extends Game {
         const updatedPoints = await pointsSystem.getPointsOf(opts.sender.userId);
         message = prepare('gambling.gamble.win', {
           pointsName: await getPointsName(updatedPoints),
-          points: updatedPoints,
+          points:     updatedPoints,
         });
       } else {
         if (this.enableJackpot) {
           const currentPointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
           this.jackpotValue = Math.min(Math.ceil(this.jackpotValue + (points * (this.lostPointsAddedToJackpot / 100))), this.maxJackpotValue);
           message = prepare('gambling.gamble.loseWithJackpot', {
-            pointsName: await getPointsName(currentPointsOfUser),
-            points: currentPointsOfUser,
+            pointsName:  await getPointsName(currentPointsOfUser),
+            points:      currentPointsOfUser,
             jackpotName: await getPointsName(this.jackpotValue),
-            jackpot: this.jackpotValue,
+            jackpot:     this.jackpotValue,
           });
         } else {
           message = prepare('gambling.gamble.lose', {
             pointsName: await getPointsName(await pointsSystem.getPointsOf(opts.sender.userId)),
-            points: await pointsSystem.getPointsOf(opts.sender.userId),
+            points:     await pointsSystem.getPointsOf(opts.sender.userId),
           });
         }
       }
@@ -117,7 +119,7 @@ class Gamble extends Game {
       if (e instanceof MinimalBetError) {
         message = prepare('gambling.gamble.lowerThanMinimalBet', {
           pointsName: await getPointsName(Number(e.message)),
-          points: Number(e.message),
+          points:     Number(e.message),
         });
         return [{ response: message, ...opts }];
       } else {
@@ -132,7 +134,7 @@ class Gamble extends Game {
           case ERROR_NOT_ENOUGH_POINTS:
             message = prepare('gambling.gamble.notEnoughPoints', {
               pointsName: await getPointsName(points ? Number(points) : 0),
-              points: points,
+              points:     points,
             });
             return [{ response: message, ...opts }];
           /* istanbul ignore next */
@@ -149,9 +151,9 @@ class Gamble extends Game {
     let message: string;
     if (this.enableJackpot) {
       message = prepare('gambling.gamble.currentJackpot', {
-        command: this.getCommand('!gamble'),
+        command:    this.getCommand('!gamble'),
         pointsName: await getPointsName(this.jackpotValue),
-        points: this.jackpotValue,
+        points:     this.jackpotValue,
       });
     } else {
       message = prepare('gambling.gamble.jackpotIsDisabled', {

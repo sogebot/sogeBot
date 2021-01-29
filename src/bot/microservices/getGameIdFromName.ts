@@ -2,7 +2,9 @@ import axios from 'axios';
 import { getRepository } from 'typeorm';
 
 import { CacheGames } from '../database/entity/cacheGames';
-import { calls, getClientId, getToken, setRateLimit, stats } from '../helpers/api';
+import {
+  calls, getClientId, getToken, setRateLimit, stats, 
+} from '../helpers/api';
 import { error, warning } from '../helpers/log';
 import { ioServer } from '../helpers/panel';
 
@@ -21,7 +23,7 @@ async function getGameIdFromName (name: string): Promise<number | null> {
     request = await axios.get(url, {
       headers: {
         'Authorization': 'Bearer ' + await getToken('bot'),
-        'Client-ID': await getClientId('bot'),
+        'Client-ID':     await getClientId('bot'),
       },
       timeout: 20000,
     });

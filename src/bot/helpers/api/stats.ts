@@ -2,19 +2,19 @@ import { persistent } from '../core/persistent';
 
 const stats = persistent({
   value: {
-    language: 'en',
+    language:           'en',
     currentWatchedTime: 0,
-    currentViewers: 0,
-    maxViewers: 0,
+    currentViewers:     0,
+    maxViewers:         0,
     currentSubscribers: 0,
-    currentBits: 0,
-    currentTips: 0,
-    currentFollowers: 0,
-    currentViews: 0,
-    currentGame: null,
-    currentTitle: null,
-    currentHosts: 0,
-    newChatters: 0,
+    currentBits:        0,
+    currentTips:        0,
+    currentFollowers:   0,
+    currentViews:       0,
+    currentGame:        null,
+    currentTitle:       null,
+    currentHosts:       0,
+    newChatters:        0,
   } as {
     language: string;
     currentWatchedTime: number;
@@ -30,7 +30,7 @@ const stats = persistent({
     currentHosts: number;
     newChatters: number;
   },
-  name: 'stats',
+  name:      'stats',
   namespace: '/core/api',
 });
 

@@ -43,7 +43,7 @@ class Cmdboard extends Widget {
     adminEndpoint(this.nsp, 'cmdboard::run', (item) => {
       tmi.message({
         message: {
-          tags: { username: getOwner() },
+          tags:    { username: getOwner() },
           message: item.command,
         },
         skip: true,

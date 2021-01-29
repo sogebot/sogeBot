@@ -1,7 +1,11 @@
-import { isMainThread, parentPort, Worker } from 'worker_threads';
+import {
+  isMainThread, parentPort, Worker, 
+} from 'worker_threads';
 
 import axios from 'axios';
-import { chunk, flatMap, includes } from 'lodash';
+import {
+  chunk, flatMap, includes, 
+} from 'lodash';
 import {
   createConnection,
   getConnection,
@@ -33,18 +37,18 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: 
     if (['mysql', 'mariadb'].includes(connectionOptions.type)) {
       await createConnection({
         ...connectionOptions,
-        logging: ['error'],
-        logger: new TypeORMLogger(),
-        synchronize: false,
+        logging:       ['error'],
+        logger:        new TypeORMLogger(),
+        synchronize:   false,
         migrationsRun: true,
-        charset: 'UTF8MB4_GENERAL_CI',
+        charset:       'UTF8MB4_GENERAL_CI',
       } as MysqlConnectionOptions);
     } else {
       await createConnection({
         ...connectionOptions,
-        logging: ['error'],
-        logger: new TypeORMLogger(),
-        synchronize: false,
+        logging:       ['error'],
+        logger:        new TypeORMLogger(),
+        synchronize:   false,
         migrationsRun: true,
       });
     }
@@ -127,9 +131,9 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: 
     const usersToFetch: string[] = [];
     if (joinedUsers.length > 0) {
       for (const username of joinedUsers) {
-        const user = await getRepository(User).findOne({ where: { username }});
+        const user = await getRepository(User).findOne({ where: { username } });
         if (user) {
-          await getRepository(User).save({...user, isOnline: true});
+          await getRepository(User).save({ ...user, isOnline: true });
           if (user.createdAt === 0) {
             // run this after we save new user
             await fetchAccountAge(user.userId);
@@ -146,9 +150,9 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: 
           getRepository(User).save(
             users.map(user => {
               return {
-                userId: Number(user.id),
-                username: user.login,
-                displayname: user.display_name,
+                userId:          Number(user.id),
+                username:        user.login,
+                displayname:     user.display_name,
                 profileImageUrl: user.profile_image_url,
               };
             }),
@@ -175,7 +179,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: 
     }
     debug('microservice', 'getChannelChattersUnofficialAPI::return');
     debug('microservice', { partedUsers: [], joinedUsers: [] });
-    return {partedUsers: [], joinedUsers: [] };
+    return { partedUsers: [], joinedUsers: [] };
   } finally {
     // free event
     await getManager()

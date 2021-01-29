@@ -67,12 +67,12 @@ const evaluate: ResponseFilter = {
 
     const randomVar = {
       online: {
-        viewer: sample(onlineViewers.map(o => o.username)),
-        follower: sample(onlineFollowers.map(o => o.username)),
+        viewer:     sample(onlineViewers.map(o => o.username)),
+        follower:   sample(onlineFollowers.map(o => o.username)),
         subscriber: sample(onlineSubscribers.map(o => o.username)),
       },
-      viewer: sample(allUsers.map(o => o.username)),
-      follower: sample(allUsers.filter((o) => _.get(o, 'is.follower', false)).map(o => o.username)),
+      viewer:     sample(allUsers.map(o => o.username)),
+      follower:   sample(allUsers.filter((o) => _.get(o, 'is.follower', false)).map(o => o.username)),
       subscriber: sample(allUsers.filter((o) => _.get(o, 'is.subscriber', false)).map(o => o.username)),
     };
     const is = {
@@ -91,13 +91,13 @@ const evaluate: ResponseFilter = {
         [urlId: string]: AxiosResponse<any>
       };
     } = {
-      _: _,
-      users: allUsers,
-      is: is,
+      _:      _,
+      users:  allUsers,
+      is:     is,
       random: randomVar,
       sender: tmi.showWithAt ? `@${attr.sender.username}` : `${attr.sender.username}`,
-      param: typeof attr.param === 'undefined'  ? null : attr.param,
-      url: {},
+      param:  typeof attr.param === 'undefined'  ? null : attr.param,
+      url:    {},
     };
 
     if (containUrl) {

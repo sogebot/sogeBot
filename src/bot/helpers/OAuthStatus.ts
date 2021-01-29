@@ -1,5 +1,5 @@
 const _status = {
-  bot: false,
+  bot:         false,
   broadcaster: false,
 };
 
@@ -11,4 +11,4 @@ function getOAuthStatus(type: keyof typeof _status) {
   return _status[type];
 }
 
-export {setOAuthStatus, getOAuthStatus};
+export { setOAuthStatus, getOAuthStatus };

@@ -3,16 +3,20 @@ import { setImmediate } from 'timers';
 import axios from 'axios';
 import { shuffle } from 'lodash';
 import { getManager, getRepository } from 'typeorm';
-import { v4 as uuid} from 'uuid';
+import { v4 as uuid } from 'uuid';
 import XRegExp from 'xregexp';
 
 import { parserReply } from '../commons';
 import * as constants from '../constants';
 import { CacheEmotes, CacheEmotesInterface } from '../database/entity/cacheEmotes';
-import { parser, settings, ui } from '../decorators';
+import {
+  parser, settings, ui, 
+} from '../decorators';
 import { onStartup, onStreamStart } from '../decorators/on';
 import { prepare } from '../helpers/commons';
-import { error, info, warning } from '../helpers/log';
+import {
+  error, info, warning, 
+} from '../helpers/log';
 import { channelId } from '../helpers/oauth';
 import { ioServer } from '../helpers/panel';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
@@ -22,10 +26,10 @@ import Overlay from './_interface';
 
 class Emotes extends Overlay {
   fetch = {
-    global: false,
+    global:  false,
     channel: false,
-    ffz: false,
-    bttv: false,
+    ffz:     false,
+    bttv:    false,
   };
 
   lastGlobalEmoteChk = 0;
@@ -327,10 +331,10 @@ class Emotes extends Overlay {
 
   async _test () {
     ioServer?.of('/overlays/emotes').emit('emote', {
-      url: 'https://static-cdn.jtvnw.net/emoticons/v1/9/' + this.cEmotesSize + '.0',
+      url:      'https://static-cdn.jtvnw.net/emoticons/v1/9/' + this.cEmotesSize + '.0',
       settings: {
         emotes: {
-          animation: this.cEmotesAnimation,
+          animation:     this.cEmotesAnimation,
           animationTime: this.cEmotesAnimationTime,
         },
       },
@@ -347,7 +351,7 @@ class Emotes extends Overlay {
         },
         fireworks: {
           numOfEmotesPerExplosion: this.cExplosionNumOfEmotesPerExplosion,
-          numOfExplosions: this.cExplosionNumOfExplosions,
+          numOfExplosions:         this.cExplosionNumOfExplosions,
         },
       },
     });
@@ -387,7 +391,7 @@ class Emotes extends Overlay {
         continue;
       }
       const data: Required<CacheEmotesInterface> = {
-        id: uuid(),
+        id:   uuid(),
         type: 'twitch',
         code: opts.message.slice(emote.start, emote.end+1),
         urls: {
@@ -417,10 +421,10 @@ class Emotes extends Overlay {
     const emotes = shuffle(parsed);
     for (let i = 0; i < this.cEmotesMaxEmotesPerMessage && i < emotes.length; i++) {
       ioServer?.of('/overlays/emotes').emit('emote', {
-        url: usedEmotes[emotes[i]].urls[this.cEmotesSize],
+        url:      usedEmotes[emotes[i]].urls[this.cEmotesSize],
         settings: {
           emotes: {
-            animation: this.cEmotesAnimation,
+            animation:     this.cEmotesAnimation,
             animationTime: this.cEmotesAnimationTime,
           },
         },
@@ -443,7 +447,7 @@ class Emotes extends Overlay {
             // send message about combo break
               parserReply(
                 prepare(message.message, {
-                  emote: this.comboEmote,
+                  emote:  this.comboEmote,
                   amount: this.comboEmoteCount,
                 }, false),
                 opts,

@@ -8,8 +8,12 @@ import { getRepository } from 'typeorm';
 
 import { HOUR, SECOND } from '../constants';
 import { SpotifySongBan } from '../database/entity/spotify';
-import { command, default_permission, persistent, settings, ui } from '../decorators';
-import { onChange, onLoad, onStartup } from '../decorators/on';
+import {
+  command, default_permission, persistent, settings, ui, 
+} from '../decorators';
+import {
+  onChange, onLoad, onStartup, 
+} from '../decorators/on';
 import Expects from '../expects';
 import { isStreamOnline } from '../helpers/api';
 import { CommandError } from '../helpers/commandError';
@@ -88,18 +92,18 @@ class Spotify extends Integration {
     'user-modify-playback-state' ];
 
   @ui({
-    type: 'btn-emit',
+    type:  'btn-emit',
     class: 'btn btn-primary btn-block mt-1 mb-1',
-    if: () => _spotify.username.length === 0,
-    emit: 'spotify::authorize',
+    if:    () => _spotify.username.length === 0,
+    emit:  'spotify::authorize',
   }, 'connection')
   authorizeBtn = null;
 
   @ui({
-    type: 'btn-emit',
+    type:  'btn-emit',
     class: 'btn btn-primary btn-block mt-1 mb-1',
-    if: () => _spotify.username.length > 0,
-    emit: 'spotify::revoke',
+    if:    () => _spotify.username.length > 0,
+    emit:  'spotify::revoke',
   }, 'connection')
   revokeBtn = null;
 
@@ -121,10 +125,10 @@ class Spotify extends Integration {
         const currentSong = JSON.parse(this.currentSong);
         const currentSongWithoutAttributes = JSON.stringify({
           started_at: currentSong.started_at,
-          song: currentSong.song,
-          artist: currentSong.artist,
-          artists: currentSong.artists,
-          uri: currentSong.uri,
+          song:       currentSong.song,
+          artist:     currentSong.artist,
+          artists:    currentSong.artists,
+          uri:        currentSong.uri,
         });
 
         if (currentSongHash !== currentSongWithoutAttributes) {
@@ -208,8 +212,8 @@ class Spotify extends Integration {
           const song: any = JSON.parse(this.songsHistory[index - 1]);
           responses.push({
             response: prepare('integrations.spotify.return-multiple-song-from-history-item', {
-              index: responses.length,
-              artists: song.artists, artist: song.artist, uri: song.uri, name: song.song,
+              index:   responses.length,
+              artists: song.artists, artist:  song.artist, uri:     song.uri, name:    song.song,
             }), ...opts,
           });
         }
@@ -232,8 +236,8 @@ class Spotify extends Integration {
   async cSkipSong() {
     if (this.client) {
       const skipResponse = await axios({
-        method: 'post',
-        url: 'https://api.spotify.com/v1/me/player/next',
+        method:  'post',
+        url:     'https://api.spotify.com/v1/me/player/next',
         headers: {
           'Authorization': 'Bearer ' + this.client.getAccessToken(),
         },
@@ -292,10 +296,10 @@ class Spotify extends Integration {
       if (typeof currentSong.song === 'undefined' || currentSong.song !== data.body.item.name) {
         currentSong = {
           started_at: Date.now(), // important for song history
-          song: data.body.item.name,
-          artist: data.body.item.artists[0].name,
-          artists: data.body.item.artists.map(o => o.name).join(', '),
-          uri: data.body.item.uri,
+          song:       data.body.item.name,
+          artist:     data.body.item.artists[0].name,
+          artists:    data.body.item.artists.map(o => o.name).join(', '),
+          uri:        data.body.item.uri,
           is_playing: data.body.is_playing,
           is_enabled: this.enabled,
         };
@@ -361,8 +365,8 @@ class Spotify extends Integration {
         }
 
         const response = await axios({
-          method: 'get',
-          url: 'https://api.spotify.com/v1/tracks/' + id,
+          method:  'get',
+          url:     'https://api.spotify.com/v1/tracks/' + id,
           headers: {
             'Authorization': 'Bearer ' + this.client.getAccessToken(),
           },
@@ -488,9 +492,9 @@ class Spotify extends Integration {
       }
 
       this.client = new SpotifyWebApi({
-        clientId: this.clientId,
+        clientId:     this.clientId,
         clientSecret: this.clientSecret,
-        redirectUri: this.redirectURI,
+        redirectUri:  this.redirectURI,
       });
 
       if (this._accessToken && this._refreshToken) {
@@ -549,7 +553,7 @@ class Spotify extends Integration {
   @default_permission(null)
   async unban (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
-      const songToUnban = await getRepository(SpotifySongBan).findOneOrFail({ where: { spotifyUri: opts.parameters }});
+      const songToUnban = await getRepository(SpotifySongBan).findOneOrFail({ where: { spotifyUri: opts.parameters } });
       await getRepository(SpotifySongBan).delete({ spotifyUri: opts.parameters });
       return [{ response: prepare('integrations.spotify.song-unbanned', {
         artist: songToUnban.artists[0], uri: songToUnban.spotifyUri, name: songToUnban.title,
@@ -619,8 +623,8 @@ class Spotify extends Integration {
           }
         }
         const response = await axios({
-          method: 'get',
-          url: 'https://api.spotify.com/v1/tracks/' + id,
+          method:  'get',
+          url:     'https://api.spotify.com/v1/tracks/' + id,
           headers: {
             'Authorization': 'Bearer ' + this.client.getAccessToken(),
           },
@@ -639,11 +643,11 @@ class Spotify extends Integration {
         }
       } else {
         const response = await axios({
-          method: 'get',
-          url: 'https://api.spotify.com/v1/search?type=track&limit=1&q=' + encodeURI(spotifyId),
+          method:  'get',
+          url:     'https://api.spotify.com/v1/search?type=track&limit=1&q=' + encodeURI(spotifyId),
           headers: {
             'Authorization': 'Bearer ' + this.client.getAccessToken(),
-            'Content-Type': 'application/json',
+            'Content-Type':  'application/json',
           },
         });
         ioServer?.emit('api.stats', { method: response.config.method?.toUpperCase(), data: response.data, timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: response.config.url, code: response.status });
@@ -674,14 +678,14 @@ class Spotify extends Integration {
   async requestSongByAPI(uri: string) {
     if (this.client) {
       try {
-        const isSongBanned = (await getRepository(SpotifySongBan).count({ where: { spotifyUri: uri }})) > 0;
+        const isSongBanned = (await getRepository(SpotifySongBan).count({ where: { spotifyUri: uri } })) > 0;
         if (isSongBanned) {
           throw new Error('Song is banned');
         }
 
         const queueResponse = await axios({
-          method: 'post',
-          url: 'https://api.spotify.com/v1/me/player/queue?uri=' + uri,
+          method:  'post',
+          url:     'https://api.spotify.com/v1/me/player/queue?uri=' + uri,
           headers: {
             'Authorization': 'Bearer ' + this.client.getAccessToken(),
           },

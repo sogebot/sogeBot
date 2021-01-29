@@ -1,16 +1,22 @@
 import crypto from 'crypto';
 
 import _ from 'lodash';
-import {v4 as uuid} from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 import * as constants from './constants';
-import { addToParserFindCache, cachedCommandsPermissions, parserFindCache } from './helpers/cache';
+import {
+  addToParserFindCache, cachedCommandsPermissions, parserFindCache, 
+} from './helpers/cache';
 import { incrementCountOfCommandUsage } from './helpers/commands/count';
 import { getBotSender } from './helpers/commons';
-import { debug, error, warning } from './helpers/log';
+import {
+  debug, error, warning, 
+} from './helpers/log';
 import { parserEmitter } from './helpers/parser/';
 import { populatedList } from './helpers/parser/populatedList';
-import { addToViewersCache, getCommandPermission, getFromViewersCache } from './helpers/permissions';
+import {
+  addToViewersCache, getCommandPermission, getFromViewersCache, 
+} from './helpers/permissions';
 import { check } from './helpers/permissions/';
 import { translate } from './translate';
 
@@ -58,10 +64,10 @@ class Parser {
       debug('parser.process', 'Processing ' + parser.name);
       const text = this.message.trim().replace(/^(!\w+)/i, '');
       const opts = {
-        sender: this.sender,
-        message: this.message.trim(),
+        sender:     this.sender,
+        message:    this.message.trim(),
         parameters: text.trim(),
-        skip: this.skip,
+        skip:       this.skip,
       };
       const isOk = await parser.fnc.apply(parser.this, [opts]);
 
@@ -101,11 +107,11 @@ class Parser {
         debug('parser.process', 'Processing ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ')');
         const text = this.message.trim().replace(/^(!\w+)/i, '');
         const opts = {
-          id: this.id,
-          sender: this.sender,
-          message: this.message.trim(),
+          id:         this.id,
+          sender:     this.sender,
+          message:    this.message.trim(),
           parameters: text.trim(),
-          skip: this.skip,
+          skip:       this.skip,
         };
 
         const time = Date.now();
@@ -130,7 +136,7 @@ class Parser {
             }
             return [];
           } else {
-            this.successfullParserRuns.push({name: parser.name, opts }); // need to save opts for permission rollback
+            this.successfullParserRuns.push({ name: parser.name, opts }); // need to save opts for permission rollback
           }
         }
         debug('parser.time', 'Processed ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ') took ' + ((Date.now() - time) / 1000));
@@ -186,9 +192,9 @@ class Parser {
   async find (message: string, cmdlist: {
     this: any; fnc: (opts: CommandOptions) => CommandResponse[]; command: string; id: string; permission: string | null; _fncName: string;
   }[] | null = null) {
-    debug('parser.find', JSON.stringify({message, cmdlist}));
+    debug('parser.find', JSON.stringify({ message, cmdlist }));
 
-    const hash = crypto.createHash('sha1').update(JSON.stringify({message, cmdlist})).digest('hex');
+    const hash = crypto.createHash('sha1').update(JSON.stringify({ message, cmdlist })).digest('hex');
     const cache = parserFindCache.find(o => o.hash === hash);
     if (cache) {
       return cache.command;
@@ -200,7 +206,7 @@ class Parser {
         const onlyParams = message.trim().toLowerCase().replace(item.command, '');
         const isStartingWith = message.trim().toLowerCase().startsWith(item.command);
 
-        debug('parser.find', JSON.stringify({command: item.command, isStartingWith}));
+        debug('parser.find', JSON.stringify({ command: item.command, isStartingWith }));
 
         if (isStartingWith && (onlyParams.length === 0 || (onlyParams.length > 0 && onlyParams[0] === ' '))) {
           const customPermission = await getCommandPermission(item.id);
@@ -265,12 +271,12 @@ class Parser {
     ) {
       const text = message.trim().replace(new RegExp('^(' + command.command + ')', 'i'), '').trim();
       const opts: CommandOptions = {
-        sender: sender || getBotSender(),
-        command: command.command,
+        sender:     sender || getBotSender(),
+        command:    command.command,
         parameters: text.trim(),
-        createdAt: this.started_at,
-        attr: {
-          skip: this.skip,
+        createdAt:  this.started_at,
+        attr:       {
+          skip:  this.skip,
           quiet: this.quiet,
         },
       };

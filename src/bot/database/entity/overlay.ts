@@ -6,9 +6,9 @@ export interface OverlayMapperInterface {
 }
 
 export const OverlayMapper = new EntitySchema<Readonly<Required<OverlayMapperInterface>>>({
-  name: 'overlay_mapper',
+  name:    'overlay_mapper',
   columns: {
-    id: { type: String, primary: true, generated: 'uuid' },
+    id:    { type: String, primary: true, generated: 'uuid' },
     value: { type: String, nullable: true },
   },
 });

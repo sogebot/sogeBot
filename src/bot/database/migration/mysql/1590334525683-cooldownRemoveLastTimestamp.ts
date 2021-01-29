@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class cooldownRemoveLastTimestamp1590334525683 implements MigrationInterface {
   name = 'cooldownRemoveLastTimestamp1590334525683';

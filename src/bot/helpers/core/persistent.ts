@@ -5,7 +5,7 @@ import { Settings } from '../../database/entity/settings';
 import { toggleLoadingInProgress } from '../../decorators';
 import { isDbConnected } from '../database';
 
-function persistent<T>({value, name, namespace}: { value: T, name: string, namespace: string }) {
+function persistent<T>({ value, name, namespace }: { value: T, name: string, namespace: string }) {
   let _value = cloneDeep(value);
   const sym = Symbol(name);
 

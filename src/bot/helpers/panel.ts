@@ -5,7 +5,7 @@ import { normalize } from 'path';
 
 import type { IconName } from '@fortawesome/free-solid-svg-icons';
 import express from 'express';
-import {Server as io} from 'socket.io';
+import { Server as io } from 'socket.io';
 
 import type { Module } from '../_interface';
 import { info } from './log';
@@ -48,7 +48,7 @@ export const setServer = () => {
     if (process.env.CA_CERT && process.env.CA_KEY) {
       info(`Using ${process.env.CA_CERT} certificate for HTTPS`);
       serverSecure = https.createServer({
-        key: fs.readFileSync(normalize(process.env.CA_KEY)),
+        key:  fs.readFileSync(normalize(process.env.CA_KEY)),
         cert: fs.readFileSync(normalize(process.env.CA_CERT)),
       }, app);
       if (ioServer) {

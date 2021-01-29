@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class registryAlertAnimationDuration1592557005200 implements MigrationInterface {
   name = 'registryAlertAnimationDuration1592557005200';

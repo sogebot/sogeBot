@@ -48,16 +48,16 @@ class Permissions extends Core {
       cb(null,
         await getRepository(PermissionsEntity).find({
           relations: ['filters'],
-          order: {
+          order:     {
             order: 'ASC',
           },
         }));
     });
     adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
-      cb(null, await getRepository(PermissionsEntity).findOne({id: String(id)}, { relations: ['filters'] }));
+      cb(null, await getRepository(PermissionsEntity).findOne({ id: String(id) }, { relations: ['filters'] }));
     });
     adminEndpoint(this.nsp, 'test.user', async (opts, cb) => {
-      if (!(await getRepository(PermissionsEntity).findOne({id: String(opts.pid)}))) {
+      if (!(await getRepository(PermissionsEntity).findOne({ id: String(opts.pid) }))) {
         cb('permissionNotFoundInDatabase');
         return;
       }
@@ -87,9 +87,9 @@ class Permissions extends Core {
         }
       }
       cb(null, {
-        status: { access: 2 },
+        status:  { access: 2 },
         partial: { access: 2 },
-        state: opts.state,
+        state:   opts.state,
       });
     });
   }
@@ -205,90 +205,90 @@ class Permissions extends Core {
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'casters')) {
       await getRepository(PermissionsEntity).insert({
-        id: defaultPermissions.CASTERS,
-        name: 'Casters',
-        automation: 'casters',
-        isCorePermission: true,
+        id:                 defaultPermissions.CASTERS,
+        name:               'Casters',
+        automation:         'casters',
+        isCorePermission:   true,
         isWaterfallAllowed: true,
-        order: p.length + addedCount,
-        userIds: [],
-        excludeUserIds: [],
-        filters: [],
+        order:              p.length + addedCount,
+        userIds:            [],
+        excludeUserIds:     [],
+        filters:            [],
       });
       addedCount++;
     }
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'moderators')) {
       await getRepository(PermissionsEntity).insert({
-        id: defaultPermissions.MODERATORS,
-        name: 'Moderators',
-        automation: 'moderators',
-        isCorePermission: true,
+        id:                 defaultPermissions.MODERATORS,
+        name:               'Moderators',
+        automation:         'moderators',
+        isCorePermission:   true,
         isWaterfallAllowed: true,
-        order: p.length + addedCount,
-        userIds: [],
-        excludeUserIds: [],
-        filters: [],
+        order:              p.length + addedCount,
+        userIds:            [],
+        excludeUserIds:     [],
+        filters:            [],
       });
       addedCount++;
     }
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'subscribers')) {
       await getRepository(PermissionsEntity).insert({
-        id: defaultPermissions.SUBSCRIBERS,
-        name: 'Subscribers',
-        automation: 'subscribers',
-        isCorePermission: true,
+        id:                 defaultPermissions.SUBSCRIBERS,
+        name:               'Subscribers',
+        automation:         'subscribers',
+        isCorePermission:   true,
         isWaterfallAllowed: true,
-        order: p.length + addedCount,
-        userIds: [],
-        excludeUserIds: [],
-        filters: [],
+        order:              p.length + addedCount,
+        userIds:            [],
+        excludeUserIds:     [],
+        filters:            [],
       });
       addedCount++;
     }
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'vip')) {
       await getRepository(PermissionsEntity).insert({
-        id: defaultPermissions.VIP,
-        name: 'VIP',
-        automation: 'vip',
-        isCorePermission: true,
+        id:                 defaultPermissions.VIP,
+        name:               'VIP',
+        automation:         'vip',
+        isCorePermission:   true,
         isWaterfallAllowed: true,
-        order: p.length + addedCount,
-        userIds: [],
-        excludeUserIds: [],
-        filters: [],
+        order:              p.length + addedCount,
+        userIds:            [],
+        excludeUserIds:     [],
+        filters:            [],
       });
       addedCount++;
     }
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'followers')) {
       await getRepository(PermissionsEntity).insert({
-        id: defaultPermissions.FOLLOWERS,
-        name: 'Followers',
-        automation: 'followers',
-        isCorePermission: true,
+        id:                 defaultPermissions.FOLLOWERS,
+        name:               'Followers',
+        automation:         'followers',
+        isCorePermission:   true,
         isWaterfallAllowed: true,
-        order: p.length + addedCount,
-        userIds: [],
-        excludeUserIds: [],
-        filters: [],
+        order:              p.length + addedCount,
+        userIds:            [],
+        excludeUserIds:     [],
+        filters:            [],
       });
       addedCount++;
     }
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'viewers')) {
       await getRepository(PermissionsEntity).insert({
-        id: defaultPermissions.VIEWERS,
-        name: 'Viewers',
-        automation: 'viewers',
-        isCorePermission: true,
+        id:                 defaultPermissions.VIEWERS,
+        name:               'Viewers',
+        automation:         'viewers',
+        isCorePermission:   true,
         isWaterfallAllowed: true,
-        order: p.length + addedCount,
-        userIds: [],
-        excludeUserIds: [],
-        filters: [],
+        order:              p.length + addedCount,
+        userIds:            [],
+        excludeUserIds:     [],
+        filters:            [],
       });
       addedCount++;
     }

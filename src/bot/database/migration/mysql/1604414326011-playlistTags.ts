@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class playlistTags1604414326011 implements MigrationInterface {
   name = 'playlistTags1604414326011';

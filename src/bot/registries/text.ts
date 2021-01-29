@@ -50,7 +50,7 @@ class Text extends Registry {
           text = await new Message(await executeVariablesInText(text, null)).parse();
         }
 
-        callback(null, {...item, text});
+        callback(null, { ...item, text });
       } catch(e) {
         callback(e.message, null);
       }

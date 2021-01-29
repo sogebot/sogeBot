@@ -49,69 +49,69 @@ class EventList extends Widget {
           case 'follows':
           case 'subs':
             alerts.trigger({
-              event: eventType,
-              name: await users.getNameById(event.userId),
-              amount: 0,
-              tier: String(values.tier) as EmitData['tier'],
-              currency: '',
+              event:      eventType,
+              name:       await users.getNameById(event.userId),
+              amount:     0,
+              tier:       String(values.tier) as EmitData['tier'],
+              currency:   '',
               monthsName: '',
-              message: '',
+              message:    '',
             });
             break;
           case 'hosts':
           case 'raids':
             alerts.trigger({
-              event: eventType,
-              name: await users.getNameById(event.userId),
-              amount: Number(values.viewers),
-              tier: null,
-              currency: '',
+              event:      eventType,
+              name:       await users.getNameById(event.userId),
+              amount:     Number(values.viewers),
+              tier:       null,
+              currency:   '',
               monthsName: '',
-              message: '',
+              message:    '',
             });
             break;
           case 'resubs':
             alerts.trigger({
-              event: eventType,
-              name: await users.getNameById(event.userId),
-              amount: Number(values.subCumulativeMonths),
-              tier: String(values.tier) as EmitData['tier'],
-              currency: '',
+              event:      eventType,
+              name:       await users.getNameById(event.userId),
+              amount:     Number(values.subCumulativeMonths),
+              tier:       String(values.tier) as EmitData['tier'],
+              currency:   '',
               monthsName: getLocalizedName(values.subCumulativeMonths, translate('core.months')),
-              message: values.message,
+              message:    values.message,
             });
             break;
           case 'subgifts':
             alerts.trigger({
-              event: eventType,
-              name: await users.getNameById(event.userId),
-              amount: Number(values.count),
-              tier: null,
-              currency: '',
+              event:      eventType,
+              name:       await users.getNameById(event.userId),
+              amount:     Number(values.count),
+              tier:       null,
+              currency:   '',
               monthsName: '',
-              message: '',
+              message:    '',
             });
             break;
           case 'cheers':
             alerts.trigger({
-              event: eventType,
-              name: await users.getNameById(event.userId),
-              amount: Number(values.bits),
-              tier: null,
-              currency: '',
+              event:      eventType,
+              name:       await users.getNameById(event.userId),
+              amount:     Number(values.bits),
+              tier:       null,
+              currency:   '',
               monthsName: '',
-              message: values.message,
+              message:    values.message,
             });
             break;
           case 'tips':
             alerts.trigger({
-              event: eventType,
-              name: await users.getNameById(event.userId),
-              amount: Number(values.amount),
-              tier: null,
-              currency: values.currency,
+              event:      eventType,
+              name:       await users.getNameById(event.userId),
+              amount:     Number(values.amount),
+              tier:       null,
+              currency:   values.currency,
               monthsName: '',
-              message: values.message,
+              message:    values.message,
             });
             break;
           default:
@@ -135,7 +135,7 @@ class EventList extends Widget {
           isHidden: false,
         },
         order: { timestamp: 'DESC' },
-        take: count,
+        take:  count,
       });
       // we need to change userId => username and from => from username for eventlist compatibility
       const mapping = new Map() as Map<string, string>;
@@ -158,7 +158,7 @@ class EventList extends Widget {
           }
           return {
             ...event,
-            username: mapping.get(event.userId),
+            username:    mapping.get(event.userId),
             values_json: JSON.stringify(values),
           };
         })

@@ -17,12 +17,12 @@ import { adminEndpoint } from './helpers/socket';
 let validStatsUntil = Date.now();
 let cachedStats = {
   currentViewers: 0,
-  currentBits: 0,
-  currentTips: 0,
-  chatMessages: 0,
-  maxViewers: 0,
-  currentHosts: 0,
-  newChatters: 0,
+  currentBits:    0,
+  currentTips:    0,
+  chatMessages:   0,
+  maxViewers:     0,
+  currentHosts:   0,
+  newChatters:    0,
   currentWatched: 0,
 };
 
@@ -52,7 +52,7 @@ class Stats extends Core {
           validStatsUntil = Date.now() + DAY;
 
           // cleanup
-          getRepository(TwitchStats).delete({ 'whenOnline': LessThan(Date.now() - (DAY * 31))});
+          getRepository(TwitchStats).delete({ 'whenOnline': LessThan(Date.now() - (DAY * 31)) });
 
           const statsFromDb = await getRepository(TwitchStats)
             .createQueryBuilder('stats')
@@ -62,17 +62,17 @@ class Stats extends Core {
             .orderBy('stats.whenOnline', 'DESC')
             .getMany();
           const statsToReturn = {
-            currentViewers: 0,
+            currentViewers:     0,
             currentSubscribers: 0,
-            currentBits: 0,
-            currentTips: 0,
-            chatMessages: 0,
-            currentFollowers: 0,
-            currentViews: 0,
-            maxViewers: 0,
-            currentHosts: 0,
-            newChatters: 0,
-            currentWatched: 0,
+            currentBits:        0,
+            currentTips:        0,
+            chatMessages:       0,
+            currentFollowers:   0,
+            currentViews:       0,
+            maxViewers:         0,
+            currentHosts:       0,
+            newChatters:        0,
+            currentWatched:     0,
           };
           if (statsFromDb.length > 0) {
             for (const stat of statsFromDb) {
@@ -94,12 +94,12 @@ class Stats extends Core {
             statsToReturn.currentHosts = Number(Number(statsToReturn.currentHosts / statsFromDb.length).toFixed(0));
             statsToReturn.currentWatched = Number(Number(statsToReturn.currentWatched / statsFromDb.length).toFixed(0));
             cachedStats = cloneDeep(statsToReturn);
-            cb(null, {...statsToReturn, currentFollowers: _self.currentFollowers, currentViews: _self.currentViews, currentSubscribers: _self.currentSubscribers});
+            cb(null, { ...statsToReturn, currentFollowers: _self.currentFollowers, currentViews: _self.currentViews, currentSubscribers: _self.currentSubscribers });
           } else {
             cb(null, {});
           }
         } else {
-          cb(null, {...cachedStats, currentFollowers: _self.currentFollowers, currentViews: _self.currentViews, currentSubscribers: _self.currentSubscribers});
+          cb(null, { ...cachedStats, currentFollowers: _self.currentFollowers, currentViews: _self.currentViews, currentSubscribers: _self.currentSubscribers });
         }
       } catch (e) {
         error(e);
@@ -111,20 +111,20 @@ class Stats extends Core {
   async save(data: Required<TwitchStatsInterface> & { timestamp: number }) {
     if (data.timestamp - this.latestTimestamp >= MINUTE * 15) {
       const whenOnline = new Date(data.whenOnline).getTime();
-      const statsFromDB = await getRepository(TwitchStats).findOne({'whenOnline': whenOnline});
+      const statsFromDB = await getRepository(TwitchStats).findOne({ 'whenOnline': whenOnline });
       await getRepository(TwitchStats).save({
-        currentViewers: statsFromDB ? Math.round((data.currentViewers + statsFromDB.currentViewers) / 2) : data.currentViewers,
-        currentHosts: statsFromDB ? Math.round((data.currentHosts + statsFromDB.currentHosts) / 2) : data.currentHosts,
-        whenOnline: statsFromDB ? statsFromDB.whenOnline : Date.now(),
+        currentViewers:     statsFromDB ? Math.round((data.currentViewers + statsFromDB.currentViewers) / 2) : data.currentViewers,
+        currentHosts:       statsFromDB ? Math.round((data.currentHosts + statsFromDB.currentHosts) / 2) : data.currentHosts,
+        whenOnline:         statsFromDB ? statsFromDB.whenOnline : Date.now(),
         currentSubscribers: data.currentSubscribers,
-        currentBits: data.currentBits,
-        currentTips: data.currentTips,
-        chatMessages: data.chatMessages,
-        currentFollowers: data.currentFollowers,
-        currentViews: data.currentViews,
-        maxViewers: data.maxViewers,
-        newChatters: data.newChatters,
-        currentWatched: data.currentWatched,
+        currentBits:        data.currentBits,
+        currentTips:        data.currentTips,
+        chatMessages:       data.chatMessages,
+        currentFollowers:   data.currentFollowers,
+        currentViews:       data.currentViews,
+        maxViewers:         data.maxViewers,
+        newChatters:        data.newChatters,
+        currentWatched:     data.currentWatched,
       });
 
       this.latestTimestamp = data.timestamp;

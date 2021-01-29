@@ -6,23 +6,35 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import gitCommitInfo from 'git-commit-info';
 import _, { isEqual } from 'lodash';
-import { getConnection, getManager, getRepository, IsNull } from 'typeorm';
-import { v4 as uuid} from 'uuid';
+import {
+  getConnection, getManager, getRepository, IsNull, 
+} from 'typeorm';
+import { v4 as uuid } from 'uuid';
 
 import { CacheTitles, CacheTitlesInterface } from './database/entity/cacheTitles';
-import { Dashboard, DashboardInterface, Widget } from './database/entity/dashboard';
+import {
+  Dashboard, DashboardInterface, Widget, 
+} from './database/entity/dashboard';
 import { Translation } from './database/entity/translation';
 import { TwitchTag, TwitchTagInterface } from './database/entity/twitch';
 import { User } from './database/entity/user';
-import { chatMessagesAtStart, currentStreamTags, isStreamOnline, rawStatus, stats, streamStatusChangeSince } from './helpers/api';
+import {
+  chatMessagesAtStart, currentStreamTags, isStreamOnline, rawStatus, stats, streamStatusChangeSince, 
+} from './helpers/api';
 import { getOwnerAsSender } from './helpers/commons/getOwnerAsSender';
-import { getURL, getValueOf, isVariableSet, postURL } from './helpers/customvariables';
+import {
+  getURL, getValueOf, isVariableSet, postURL, 
+} from './helpers/customvariables';
 import { getIsBotStarted } from './helpers/database';
 import { flatten } from './helpers/flatten';
 import { setValue } from './helpers/general';
 import { getLang } from './helpers/locales';
-import { getDEBUG, info, setDEBUG } from './helpers/log';
-import { app, ioServer, menu, menuPublic, server, serverSecure, setApp, setServer, widgets } from './helpers/panel';
+import {
+  getDEBUG, info, setDEBUG, 
+} from './helpers/log';
+import {
+  app, ioServer, menu, menuPublic, server, serverSecure, setApp, setServer, widgets, 
+} from './helpers/panel';
 import { socketsConnectedDec, socketsConnectedInc } from './helpers/panel/';
 import { errors, warns } from './helpers/panel/alerts';
 import { linesParsed, status as statusObj } from './helpers/parser';
@@ -95,7 +107,7 @@ export const init = () => {
   app?.get('/dist/*/*.js', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', req.url + '.gz'), {
       headers: {
-        'Content-Type': 'text/javascript',
+        'Content-Type':     'text/javascript',
         'Content-Encoding': 'gzip',
       },
     });
@@ -103,7 +115,7 @@ export const init = () => {
   app?.get('/dist/*/*.map', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', req.url + '.gz'), {
       headers: {
-        'Content-Type': 'text/javascript',
+        'Content-Type':     'text/javascript',
         'Content-Encoding': 'gzip',
       },
     });
@@ -111,7 +123,7 @@ export const init = () => {
   app?.get('/dist/*/*.css', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', req.url + '.gz'), {
       headers: {
-        'Content-Type': 'text/css',
+        'Content-Type':     'text/css',
         'Content-Encoding': 'gzip',
       },
     });
@@ -287,7 +299,7 @@ export const init = () => {
       data.game = data.game.trim();
 
       const item = await getRepository(CacheTitles).findOne({
-        game: data.game,
+        game:  data.game,
         title: data.title,
       });
 
@@ -399,7 +411,7 @@ export const init = () => {
           userId: opts.userId, type: opts.type,
         },
         relations: ['widgets'],
-        order: {
+        order:     {
           createdAt: 'ASC',
         },
       });
@@ -417,9 +429,9 @@ export const init = () => {
     adminEndpoint('/', 'panel::dashboards', async (opts, cb) => {
       getRepository(Widget).delete({ dashboardId: IsNull() });
       const dashboards = await getRepository(Dashboard).find({
-        where: { userId: opts.userId, type: opts.type },
+        where:     { userId: opts.userId, type: opts.type },
         relations: ['widgets'],
-        order: { createdAt: 'ASC' },
+        order:     { createdAt: 'ASC' },
       });
       cb(null, dashboards);
     });
@@ -438,7 +450,7 @@ export const init = () => {
       // add widget to bottom left
       const dashboard = await getRepository(Dashboard).findOne({
         relations: ['widgets'],
-        where: { id } ,
+        where:     { id } ,
       });
       if (dashboard) {
         let y = 0;
@@ -446,11 +458,11 @@ export const init = () => {
           y = Math.max(y, w.positionY + w.height);
         }
         dashboard.widgets.push({
-          name: widgetName,
+          name:      widgetName,
           positionX: 0,
           positionY: y,
-          width: 4,
-          height: 3,
+          width:     4,
+          height:    3,
         });
         cb(await getRepository(Dashboard).save(dashboard));
       } else {
@@ -471,7 +483,7 @@ export const init = () => {
         if (value.startsWith('_')) {
           return true;
         }
-        setValue({ sender: getOwnerAsSender(), createdAt: 0, command: '', parameters: value + ' ' + index, attr: { quiet: data._quiet }});
+        setValue({ sender: getOwnerAsSender(), createdAt: 0, command: '', parameters: value + ' ' + index, attr: { quiet: data._quiet } });
       });
     });
 
@@ -481,10 +493,10 @@ export const init = () => {
       const toEmit: toEmit = [];
       for (const system of systems) {
         toEmit.push({
-          name: system.__moduleName__.toLowerCase(),
-          enabled: system.enabled,
+          name:                   system.__moduleName__.toLowerCase(),
+          enabled:                system.enabled,
           areDependenciesEnabled: await system.areDependenciesEnabled,
-          isDisabledByEnv: system.isDisabledByEnv,
+          isDisabledByEnv:        system.isDisabledByEnv,
         });
       }
       cb(null, toEmit);
@@ -505,10 +517,10 @@ export const init = () => {
           continue;
         }
         toEmit.push({
-          name: system.__moduleName__.toLowerCase(),
-          enabled: system.enabled,
+          name:                   system.__moduleName__.toLowerCase(),
+          enabled:                system.enabled,
           areDependenciesEnabled: await system.areDependenciesEnabled,
-          isDisabledByEnv: system.isDisabledByEnv,
+          isDisabledByEnv:        system.isDisabledByEnv,
         });
       }
       cb(null, toEmit);
@@ -520,10 +532,10 @@ export const init = () => {
           continue;
         }
         toEmit.push({
-          name: system.__moduleName__.toLowerCase(),
-          enabled: system.enabled,
+          name:                   system.__moduleName__.toLowerCase(),
+          enabled:                system.enabled,
           areDependenciesEnabled: await system.areDependenciesEnabled,
-          isDisabledByEnv: system.isDisabledByEnv,
+          isDisabledByEnv:        system.isDisabledByEnv,
         });
       }
       cb(null, toEmit);
@@ -535,10 +547,10 @@ export const init = () => {
           continue;
         }
         toEmit.push({
-          name: system.__moduleName__.toLowerCase(),
-          enabled: system.enabled,
+          name:                   system.__moduleName__.toLowerCase(),
+          enabled:                system.enabled,
           areDependenciesEnabled: await system.areDependenciesEnabled,
-          isDisabledByEnv: system.isDisabledByEnv,
+          isDisabledByEnv:        system.isDisabledByEnv,
         });
       }
       cb(null, toEmit);
@@ -621,24 +633,24 @@ const sendStreamData = async () => {
     }
 
     const data = {
-      broadcasterType: oauth.broadcasterType,
-      uptime: isStreamOnline.value ? streamStatusChangeSince.value : null,
-      currentViewers: stats.value.currentViewers,
+      broadcasterType:    oauth.broadcasterType,
+      uptime:             isStreamOnline.value ? streamStatusChangeSince.value : null,
+      currentViewers:     stats.value.currentViewers,
       currentSubscribers: stats.value.currentSubscribers,
-      currentBits: stats.value.currentBits,
-      currentTips: stats.value.currentTips,
-      chatMessages: isStreamOnline.value ? linesParsed - chatMessagesAtStart.value : 0,
-      currentFollowers: stats.value.currentFollowers,
-      currentViews: stats.value.currentViews,
-      maxViewers: stats.value.maxViewers,
-      newChatters: stats.value.newChatters,
-      game: stats.value.currentGame,
-      status: stats.value.currentTitle,
-      rawStatus: rawStatus.value,
-      currentSong: lastfm.currentSong || ytCurrentSong || spotifyCurrentSong || translate('songs.not-playing'),
-      currentHosts: stats.value.currentHosts,
-      currentWatched: stats.value.currentWatchedTime,
-      tags: currentStreamTags.value,
+      currentBits:        stats.value.currentBits,
+      currentTips:        stats.value.currentTips,
+      chatMessages:       isStreamOnline.value ? linesParsed - chatMessagesAtStart.value : 0,
+      currentFollowers:   stats.value.currentFollowers,
+      currentViews:       stats.value.currentViews,
+      maxViewers:         stats.value.maxViewers,
+      newChatters:        stats.value.newChatters,
+      game:               stats.value.currentGame,
+      status:             stats.value.currentTitle,
+      rawStatus:          rawStatus.value,
+      currentSong:        lastfm.currentSong || ytCurrentSong || spotifyCurrentSong || translate('songs.not-playing'),
+      currentHosts:       stats.value.currentHosts,
+      currentWatched:     stats.value.currentWatchedTime,
+      tags:               currentStreamTags.value,
     };
     if (!isEqual(data, lastDataSent)) {
       ioServer?.emit('panel::stats', data);

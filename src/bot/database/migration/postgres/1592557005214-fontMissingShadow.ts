@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 import { Goal } from '../../entity/goal';
 import { Randomizer } from '../../entity/randomizer';
@@ -13,7 +13,7 @@ export class fontMissingShadow1592557005214 implements MigrationInterface {
     for (const item of data) {
       if (typeof item.customizationFont.shadow === 'undefined') {
         await queryRunner.manager.getRepository(Randomizer)
-          .update({ id: item.id }, { customizationFont: {...item.customizationFont, shadow: []} });
+          .update({ id: item.id }, { customizationFont: { ...item.customizationFont, shadow: [] } });
       }
     }
     for (const type of ['cheer', 'resub', 'tip', 'raid', 'host', 'subgift', 'subcommunitygift', 'sub', 'follow']) {
@@ -31,7 +31,7 @@ export class fontMissingShadow1592557005214 implements MigrationInterface {
     for (const item of data3) {
       if (typeof item.customizationFont.shadow === 'undefined') {
         await queryRunner.manager.getRepository(Randomizer)
-          .update({ id: item.id }, { customizationFont: {...item.customizationFont, shadow: []} });
+          .update({ id: item.id }, { customizationFont: { ...item.customizationFont, shadow: [] } });
       }
     }
   }

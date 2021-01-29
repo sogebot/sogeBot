@@ -3,18 +3,28 @@ import { setTimeout } from 'timers';
 
 import axios, { AxiosResponse } from 'axios';
 import chalk from 'chalk';
-import { chunk, defaults, filter, get, isNil } from 'lodash';
-import { getManager, getRepository, In, IsNull, Not } from 'typeorm';
+import {
+  chunk, defaults, filter, get, isNil, 
+} from 'lodash';
+import {
+  getManager, getRepository, In, IsNull, Not, 
+} from 'typeorm';
 
 import Core from './_interface';
 import * as constants from './constants';
 import { ThreadEvent } from './database/entity/threadEvent';
-import { TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from './database/entity/twitch';
+import {
+  TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName, 
+} from './database/entity/twitch';
 import { User, UserInterface } from './database/entity/user';
 import { getFunctionList, onStartup } from './decorators/on';
-import { stats as apiStats, calls, chatMessagesAtStart, currentStreamTags, emptyRateLimit, gameCache, gameOrTitleChangedManually, isStreamOnline, rawStatus, setRateLimit, streamStatusChangeSince } from './helpers/api';
+import {
+  stats as apiStats, calls, chatMessagesAtStart, currentStreamTags, emptyRateLimit, gameCache, gameOrTitleChangedManually, isStreamOnline, rawStatus, setRateLimit, streamStatusChangeSince, 
+} from './helpers/api';
 import { parseTitle } from './helpers/api/parseTitle';
-import { curRetries, maxRetries, retries, setCurrentRetries } from './helpers/api/retries';
+import {
+  curRetries, maxRetries, retries, setCurrentRetries, 
+} from './helpers/api/retries';
 import { streamId } from './helpers/api/streamId';
 import { streamType } from './helpers/api/streamType';
 import { isDbConnected } from './helpers/database';
@@ -22,7 +32,9 @@ import { dayjs } from './helpers/dayjs';
 import { eventEmitter } from './helpers/events';
 import { getBroadcaster } from './helpers/getBroadcaster';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
-import { debug, error, follow, info, start, stop, unfollow, warning } from './helpers/log';
+import {
+  debug, error, follow, info, start, stop, unfollow, warning, 
+} from './helpers/log';
 import { channelId, loadedTokens } from './helpers/oauth';
 import { botId } from './helpers/oauth/botId';
 import { broadcasterId } from './helpers/oauth/broadcasterId';
@@ -33,7 +45,9 @@ import { logAvgTime } from './helpers/profiler';
 import { find } from './helpers/register';
 import { setImmediateAwait } from './helpers/setImmediateAwait';
 import { SQLVariableLimit } from './helpers/sql';
-import { isBot, isBotId, isBotSubscriber } from './helpers/user/isBot';
+import {
+  isBot, isBotId, isBotSubscriber, 
+} from './helpers/user/isBot';
 import { isIgnored } from './helpers/user/isIgnored';
 import { getChannelChattersUnofficialAPI } from './microservices/getChannelChattersUnofficialAPI';
 import { getCustomRewards } from './microservices/getCustomRewards';
@@ -71,26 +85,26 @@ const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], us
         if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60 && !webhooks.existsInCache('follows', user.userId)) {
           webhooks.addIdToCache('follows', user.userId);
           eventlist.add({
-            event: 'follow',
-            userId: String(user.userId),
+            event:     'follow',
+            userId:    String(user.userId),
             timestamp: Date.now(),
           });
           if (!isBot(user.username)) {
             follow(user.username);
             eventEmitter.emit('follow', { username: user.username, userId: user.userId });
             alerts.trigger({
-              event: 'follows',
-              name: user.username,
-              amount: 0,
-              tier: null,
-              currency: '',
+              event:      'follows',
+              name:       user.username,
+              amount:     0,
+              tier:       null,
+              currency:   '',
               monthsName: '',
-              message: '',
+              message:    '',
             });
 
             triggerInterfaceOnFollow({
               username: user.username,
-              userId: user.userId,
+              userId:   user.userId,
             });
           }
         }
@@ -102,8 +116,8 @@ const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], us
       const apiUser = usersFromAPI.find(userFromAPI => userFromAPI.from_id === user.userId) as typeof usersFromAPI[0];
       return {
         ...user,
-        followedAt: user.haveFollowedAtLock ? user.followedAt : new Date(apiUser.followed_at).getTime(),
-        isFollower: user.haveFollowerLock? user.isFollower : true,
+        followedAt:    user.haveFollowedAtLock ? user.followedAt : new Date(apiUser.followed_at).getTime(),
+        isFollower:    user.haveFollowerLock? user.isFollower : true,
         followCheckAt: Date.now(),
       };
     }),
@@ -239,7 +253,7 @@ class API extends Core {
             } else { // else run next tick
               intervals.set(fnc, {
                 ...interval,
-                opts: value.opts ?? {},
+                opts:      value.opts ?? {},
                 lastRunAt: 0,
               });
             }
@@ -276,12 +290,12 @@ class API extends Core {
     const url = `https://api.twitch.tv/helix/moderation/moderators?broadcaster_id=${broadcasterId.value}`;
     try {
       const request = await axios.request<{ pagination: any, data: { user_id: string; user_name: string }[] }>({
-        method: 'get',
+        method:  'get',
         url,
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.broadcasterClientId,
-          'Content-Type': 'application/json',
+          'Client-ID':     oauth.broadcasterClientId,
+          'Content-Type':  'application/json',
         },
       });
 
@@ -352,7 +366,7 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
+          'Client-ID':     oauth.botClientId,
         },
         timeout: 20000,
       });
@@ -426,7 +440,7 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
+          'Client-ID':     oauth.botClientId,
         },
         timeout: 20000,
       });
@@ -436,20 +450,20 @@ class API extends Core {
         const localizationNames = await getRepository(TwitchTagLocalizationName).find({ tagId: tag.tag_id });
         const localizationDescriptions = await getRepository(TwitchTagLocalizationDescription).find({ tagId: tag.tag_id });
         await getRepository(TwitchTag).save({
-          tag_id: tag.tag_id,
-          is_auto: tag.is_auto,
+          tag_id:             tag.tag_id,
+          is_auto:            tag.is_auto,
           localization_names: Object.keys(tag.localization_names).map(key => {
             return {
-              id: localizationNames.find(o => o.locale === key && o.tagId === tag.tag_id)?.id,
+              id:     localizationNames.find(o => o.locale === key && o.tagId === tag.tag_id)?.id,
               locale: key,
-              value: tag.localization_names[key],
+              value:  tag.localization_names[key],
             };
           }),
           localization_descriptions: Object.keys(tag.localization_descriptions).map(key => {
             return {
-              id: localizationDescriptions.find(o => o.locale === key && o.tagId === tag.tag_id)?.id,
+              id:     localizationDescriptions.find(o => o.locale === key && o.tagId === tag.tag_id)?.id,
               locale: key,
-              value: tag.localization_descriptions[key],
+              value:  tag.localization_descriptions[key],
             };
           }),
         });
@@ -511,7 +525,7 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
+          'Client-ID':     oauth.botClientId,
         },
         timeout: 20000,
       }) as AxiosResponse<SubscribersEndpoint>;
@@ -581,7 +595,7 @@ class API extends Core {
         // subscriber is not sub anymore -> unsub and set subStreak to 0
         await getRepository(User).save({
           ...user,
-          isSubscriber: false,
+          isSubscriber:    false,
           subscribeStreak: 0,
         });
       }
@@ -597,8 +611,8 @@ class API extends Core {
           userId: Number(user.user_id),
         },
         {
-          username: user.user_name.toLowerCase(),
-          isSubscriber: true,
+          username:      user.user_name.toLowerCase(),
+          isSubscriber:  true,
           subscribeTier: String(Number(user.tier) / 1000),
         });
       }
@@ -626,7 +640,7 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
+          'Client-ID':     oauth.botClientId,
         },
         timeout: 20000,
       });
@@ -669,8 +683,8 @@ class API extends Core {
 
         apiStats.value = {
           ...apiStats.value,
-          language: request.data.data[0].broadcaster_language,
-          currentGame: request.data.data[0].game_name,
+          language:     request.data.data[0].broadcaster_language,
+          currentGame:  request.data.data[0].game_name,
           currentTitle: request.data.data[0].title,
         };
         gameCache.value = request.data.data[0].game_name;
@@ -729,7 +743,7 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
+          'Client-ID':     oauth.botClientId,
         },
         timeout: 20000,
       }) as AxiosResponse<FollowsEndpoint>;
@@ -746,8 +760,8 @@ class API extends Core {
             .filter(f => latestFollowedAtTimestamp < new Date(f.followed_at).getTime())
             .map(f => {
               return {
-                from_name: String(f.from_name).toLowerCase(),
-                from_id: Number(f.from_id),
+                from_name:   String(f.from_name).toLowerCase(),
+                from_id:     Number(f.from_id),
                 followed_at: f.followed_at,
               };
             }));
@@ -796,7 +810,7 @@ class API extends Core {
       const request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
+          'Client-ID':     oauth.botClientId,
         },
         timeout: 20000,
       }) as AxiosResponse<FollowsEndpoint>;
@@ -817,8 +831,8 @@ class API extends Core {
         // process each 100 not full scale at once
         processFollowerState(followers.map(f => {
           return {
-            from_name: String(f.from_name).toLowerCase(),
-            from_id: Number(f.from_id),
+            from_name:   String(f.from_name).toLowerCase(),
+            from_id:     Number(f.from_id),
             followed_at: f.followed_at,
           };
         }), true).then(async () => {
@@ -860,7 +874,7 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
+          'Client-ID':     oauth.botClientId,
         },
         timeout: 20000,
       });
@@ -905,7 +919,7 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
+          'Client-ID':     oauth.botClientId,
         },
         timeout: 20000,
       }) as AxiosResponse<StreamEndpoint>;
@@ -941,11 +955,11 @@ class API extends Core {
             apiStats.value = {
               ...apiStats.value,
               currentWatchedTime: 0,
-              maxViewers: 0,
-              newChatters: 0,
-              currentViewers: 0,
-              currentBits: 0,
-              currentTips: 0,
+              maxViewers:         0,
+              newChatters:        0,
+              currentViewers:     0,
+              currentBits:        0,
+              currentTips:        0,
             };
             streamStatusChangeSince.value =new Date(stream.started_at).getTime();
             streamId.value = stream.id;
@@ -989,7 +1003,7 @@ class API extends Core {
           apiStats.value = {
             ...apiStats.value,
             currentTitle: stream.title,
-            currentGame: game,
+            currentGame:  game,
           };
 
           if (stream.title !== status) {
@@ -1065,19 +1079,19 @@ class API extends Core {
     }
 
     stats.save({
-      timestamp: new Date().getTime(),
-      whenOnline: isStreamOnline.value ? streamStatusChangeSince.value : Date.now(),
-      currentViewers: apiStats.value.currentViewers,
+      timestamp:          new Date().getTime(),
+      whenOnline:         isStreamOnline.value ? streamStatusChangeSince.value : Date.now(),
+      currentViewers:     apiStats.value.currentViewers,
       currentSubscribers: apiStats.value.currentSubscribers,
-      currentFollowers: apiStats.value.currentFollowers,
-      currentBits: apiStats.value.currentBits,
-      currentTips: apiStats.value.currentTips,
-      chatMessages: linesParsed - chatMessagesAtStart.value,
-      currentViews: apiStats.value.currentViews,
-      maxViewers: apiStats.value.maxViewers,
-      newChatters: apiStats.value.newChatters,
-      currentHosts: apiStats.value.currentHosts,
-      currentWatched: apiStats.value.currentWatchedTime,
+      currentFollowers:   apiStats.value.currentFollowers,
+      currentBits:        apiStats.value.currentBits,
+      currentTips:        apiStats.value.currentTips,
+      chatMessages:       linesParsed - chatMessagesAtStart.value,
+      currentViews:       apiStats.value.currentViews,
+      maxViewers:         apiStats.value.maxViewers,
+      newChatters:        apiStats.value.newChatters,
+      currentHosts:       apiStats.value.currentHosts,
+      currentWatched:     apiStats.value.currentWatchedTime,
     });
   }
 
@@ -1110,7 +1124,7 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
+          'Client-ID':     oauth.botClientId,
         },
         timeout: 20000,
       });
@@ -1177,11 +1191,11 @@ class API extends Core {
     let request;
     try {
       request = await axios({
-        method: 'post',
+        method:  'post',
         url,
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
+          'Client-ID':     oauth.botClientId,
         },
       });
 
@@ -1224,7 +1238,7 @@ class API extends Core {
     try {
       request = await axios.get(url, {
         headers: {
-          'Accept': 'application/vnd.twitchtv.v5+json',
+          'Accept':        'application/vnd.twitchtv.v5+json',
           'Authorization': 'OAuth ' + token,
         },
         timeout: 20000,
@@ -1283,7 +1297,7 @@ class API extends Core {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
+          'Client-ID':     oauth.botClientId,
         },
         timeout: 20000,
       });
@@ -1316,8 +1330,8 @@ class API extends Core {
 
       await getRepository(User).update({ userId: user.userId },
         {
-          followedAt: user.haveFollowedAtLock ? user.followedAt : 0,
-          isFollower: user.haveFollowerLock? user.isFollower : false,
+          followedAt:    user.haveFollowedAtLock ? user.followedAt : 0,
+          isFollower:    user.haveFollowerLock? user.isFollower : false,
           followCheckAt: Date.now(),
         });
       return { isFollower: user.isFollower, followedAt: user.followedAt };
@@ -1325,32 +1339,32 @@ class API extends Core {
       // is follower
       if (!user.isFollower && new Date().getTime() - new Date(request.data.data[0].followed_at).getTime() < 60000 * 60) {
         eventlist.add({
-          event: 'follow',
-          userId: String(id),
+          event:     'follow',
+          userId:    String(id),
           timestamp: Date.now(),
         });
         follow(user.username);
         eventEmitter.emit('follow', { username: user.username, userId: id });
         alerts.trigger({
-          event: 'follows',
-          name: user.username,
-          amount: 0,
-          tier: null,
-          currency: '',
+          event:      'follows',
+          name:       user.username,
+          amount:     0,
+          tier:       null,
+          currency:   '',
           monthsName: '',
-          message: '',
+          message:    '',
         });
 
         triggerInterfaceOnFollow({
           username: user.username,
-          userId: id,
+          userId:   id,
         });
       }
 
       await getRepository(User).update({ userId: user.userId },
         {
-          followedAt: user.haveFollowedAtLock ? user.followedAt : dayjs(request.data.data[0].followed_at).valueOf(),
-          isFollower: user.haveFollowerLock? user.isFollower : true,
+          followedAt:    user.haveFollowedAtLock ? user.followedAt : dayjs(request.data.data[0].followed_at).valueOf(),
+          isFollower:    user.haveFollowerLock? user.isFollower : true,
           followCheckAt: Date.now(),
         });
       return { isFollower: user.isFollower, followedAt: user.followedAt };
@@ -1371,15 +1385,15 @@ class API extends Core {
       }
 
       const request = await axios({
-        method: 'post',
+        method:  'post',
         url,
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type':  'application/json',
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
+          'Client-ID':     oauth.botClientId,
         },
         data: {
-          user_id: String(cid),
+          user_id:     String(cid),
           description: 'Marked from sogeBot',
         },
       });
@@ -1416,9 +1430,9 @@ class API extends Core {
     try {
       request = await axios.get(url, {
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type':  'application/json',
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
+          'Client-ID':     oauth.botClientId,
         },
         timeout: 20000,
       });
@@ -1462,7 +1476,7 @@ class API extends Core {
         if (opts.period === 'stream') {
           url += '&' + querystring.stringify({
             started_at: (new Date(streamStatusChangeSince.value)).toISOString(),
-            ended_at: (new Date()).toISOString(),
+            ended_at:   (new Date()).toISOString(),
           });
         } else {
           if (!opts.days || opts.days < 0) {
@@ -1470,7 +1484,7 @@ class API extends Core {
           }
           url += '&' + querystring.stringify({
             started_at: (new Date((new Date()).setDate(-opts.days))).toISOString(),
-            ended_at: (new Date()).toISOString(),
+            ended_at:   (new Date()).toISOString(),
           });
         }
       }
@@ -1480,9 +1494,9 @@ class API extends Core {
 
       const request = await axios.get(url, {
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type':  'application/json',
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.botClientId,
+          'Client-ID':     oauth.botClientId,
         },
         timeout: 20000,
       });

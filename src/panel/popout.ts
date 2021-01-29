@@ -1,5 +1,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faSpotify, faTwitch, faTwitter } from '@fortawesome/free-brands-svg-icons';
+import {
+  faSpotify, faTwitch, faTwitter, 
+} from '@fortawesome/free-brands-svg-icons';
 import {
   faBell, faCalendar, faCheckCircle, faCircle, faClock, faMoneyBillAlt,
 } from '@fortawesome/free-regular-svg-icons';
@@ -88,8 +90,8 @@ const main = async () => {
     setMainLoaded();
 
     const router = new VueRouter({
-      mode: 'hash',
-      base: __dirname,
+      mode:   'hash',
+      base:   __dirname,
       routes: [
         { path: '/:widget', name: 'Popout', component: () => import('src/panel/views/dashboard/popout.vue') },
       ],

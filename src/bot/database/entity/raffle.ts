@@ -35,73 +35,73 @@ export interface RaffleParticipantMessageInterface {
 }
 
 export const Raffle = new EntitySchema<Readonly<Required<RaffleInterface>>>({
-  name: 'raffle',
+  name:    'raffle',
   columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
-    winner: { type: 'text', nullable: true },
-    timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-    keyword: { type: String },
-    minTickets: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-    maxTickets: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-    type: { type: Number },
-    forFollowers: { type: Boolean },
+    id:             { type: 'uuid', primary: true, generated: 'uuid' },
+    winner:         { type: 'text', nullable: true },
+    timestamp:      { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
+    keyword:        { type: String },
+    minTickets:     { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
+    maxTickets:     { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
+    type:           { type: Number },
+    forFollowers:   { type: Boolean },
     forSubscribers: { type: Boolean },
-    isClosed: { type: Boolean, default: false },
+    isClosed:       { type: Boolean, default: false },
   },
   indices: [
     { name: 'IDX_e83facaeb8fbe8b8ce9577209a', columns: ['keyword'] },
   ],
   relations: {
     participants: {
-      type: 'one-to-many',
-      target: 'raffle_participant',
+      type:        'one-to-many',
+      target:      'raffle_participant',
       inverseSide: 'raffle',
-      cascade: true,
+      cascade:     true,
     },
   },
 });
 
 export const RaffleParticipant = new EntitySchema<Readonly<Required<RaffleParticipantInterface>>>({
-  name: 'raffle_participant',
+  name:    'raffle_participant',
   columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
-    username: { type: String },
-    tickets: { type: Number },
-    isEligible: { type: Boolean },
-    isFollower: { type: Boolean },
+    id:           { type: 'uuid', primary: true, generated: 'uuid' },
+    username:     { type: String },
+    tickets:      { type: Number },
+    isEligible:   { type: Boolean },
+    isFollower:   { type: Boolean },
     isSubscriber: { type: Boolean },
   },
   relations: {
     raffle: {
-      type: 'many-to-one',
-      target: 'raffle',
+      type:        'many-to-one',
+      target:      'raffle',
       inverseSide: 'participants',
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete:    'CASCADE',
+      onUpdate:    'CASCADE',
     },
     messages: {
-      type: 'one-to-many',
-      target: 'raffle_participant_message',
+      type:        'one-to-many',
+      target:      'raffle_participant_message',
       inverseSide: 'participant',
-      cascade: true,
+      cascade:     true,
     },
   },
 });
 
 export const RaffleParticipantMessage = new EntitySchema<Readonly<Required<RaffleParticipantMessageInterface>>>({
-  name: 'raffle_participant_message',
+  name:    'raffle_participant_message',
   columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    id:        { type: 'uuid', primary: true, generated: 'uuid' },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-    text: { type: 'text' },
+    text:      { type: 'text' },
   },
   relations: {
     participant: {
-      type: 'many-to-one',
-      target: 'raffle_participant',
+      type:        'many-to-one',
+      target:      'raffle_participant',
       inverseSide: 'participant',
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
+      onDelete:    'CASCADE',
+      onUpdate:    'CASCADE',
     },
   },
 });

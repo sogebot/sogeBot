@@ -11,4 +11,6 @@ function addUIError (error: UIError) {
   errors.push(error);
 }
 
-export { warns, addUIWarn, errors, addUIError };
+export {
+  warns, addUIWarn, errors, addUIError, 
+};

@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class textOverlayRefreshRate1607215601801 implements MigrationInterface {
   name = 'textOverlayRefreshRate1607215601801';

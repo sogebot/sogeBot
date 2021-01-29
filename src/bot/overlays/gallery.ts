@@ -35,10 +35,10 @@ class Gallery extends Overlay {
           if (file) {
             const data = Buffer.from(file.data.split(',')[1], 'base64');
             res.writeHead(200, {
-              'Content-Type': file.type,
+              'Content-Type':   file.type,
               'Content-Length': data.length,
-              'Cache-Control': 'public, max-age=31536000',
-              'ETag': req.params.id + '-' + request.size,
+              'Cache-Control':  'public, max-age=31536000',
+              'ETag':           req.params.id + '-' + request.size,
             });
             res.end(data);
           }
@@ -87,9 +87,9 @@ class Gallery extends Overlay {
         const matches = filedata.b64data.match(/^data:([0-9A-Za-z-+/]+);base64,(.+)$/);
         if (!matches) {
           // update entity
-          const item = await getRepository(GalleryEntity).findOneOrFail({id: filedata.id});
+          const item = await getRepository(GalleryEntity).findOneOrFail({ id: filedata.id });
           await getRepository(GalleryEntity).save({
-            id: item.id,
+            id:   item.id,
             type: item.type,
             data: item.data + filedata.b64data,
             name: item.name,

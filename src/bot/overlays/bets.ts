@@ -11,8 +11,8 @@ class Bets extends Overlay {
     publicEndpoint(this.nsp, 'data', async (callback) => {
       const currentBet = await getRepository(BetsEntity).findOne({
         relations: ['participations'],
-        order: { createdAt: 'DESC' },
-        cache: 10000,
+        order:     { createdAt: 'DESC' },
+        cache:     10000,
       });
       callback(currentBet);
     });

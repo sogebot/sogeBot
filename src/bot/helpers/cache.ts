@@ -38,4 +38,6 @@ const addToParserFindCache = (hash: string, command: { this: any; fnc: (opts: Co
   parserFindCache.push({ hash, command });
 };
 
-export { addToParserFindCache, parserFindCache, invalidateParserCache, cachedCommandsPermissions, refreshCachedCommandPermissions };
+export {
+  addToParserFindCache, parserFindCache, invalidateParserCache, cachedCommandsPermissions, refreshCachedCommandPermissions, 
+};

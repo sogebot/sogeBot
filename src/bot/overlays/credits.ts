@@ -5,7 +5,9 @@ import api from '../api';
 import currency from '../currency';
 import { EventList, EventListInterface } from '../database/entity/eventList';
 import { settings, ui } from '../decorators';
-import { isStreamOnline, stats, streamStatusChangeSince } from '../helpers/api';
+import {
+  isStreamOnline, stats, streamStatusChangeSince, 
+} from '../helpers/api';
 import { mainCurrency, symbol } from '../helpers/currency';
 import { publicEndpoint } from '../helpers/socket';
 import oauth from '../oauth';
@@ -14,7 +16,7 @@ import Overlay from './_interface';
 class Credits extends Overlay {
   @settings('credits')
   @ui({
-    type: 'selector',
+    type:   'selector',
     values: ['very slow', 'slow', 'medium', 'fast', 'very fast'],
   })
   cCreditsSpeed: 'very slow' | 'slow' | 'medium' | 'fast' | 'very fast' = 'medium';
@@ -122,43 +124,43 @@ class Credits extends Overlay {
         settings: {
           clips: {
             shouldPlay: this.cClipsShouldPlay,
-            volume: this.cClipsVolume,
+            volume:     this.cClipsVolume,
           },
           speed: this.cCreditsSpeed,
-          text: {
-            lastMessage: this.cTextLastMessage,
-            lastSubMessage: this.cTextLastSubMessage,
-            streamBy: this.cTextStreamBy,
-            follow: this.cTextFollow,
-            host: this.cTextHost,
-            raid: this.cTextRaid,
-            cheer: this.cTextCheer,
-            sub: this.cTextSub,
-            resub: this.cTextResub,
-            subgift: this.cTextSubgift,
+          text:  {
+            lastMessage:      this.cTextLastMessage,
+            lastSubMessage:   this.cTextLastSubMessage,
+            streamBy:         this.cTextStreamBy,
+            follow:           this.cTextFollow,
+            host:             this.cTextHost,
+            raid:             this.cTextRaid,
+            cheer:            this.cTextCheer,
+            sub:              this.cTextSub,
+            resub:            this.cTextResub,
+            subgift:          this.cTextSubgift,
             subcommunitygift: this.cTextSubcommunitygift,
-            tip: this.cTextTip,
+            tip:              this.cTextTip,
           },
           show: {
-            follow: this.cShowFollowers,
-            host: this.cShowHosts,
-            raid: this.cShowRaids,
-            sub: this.cShowSubscribers,
-            subgift: this.cShowSubgifts,
+            follow:           this.cShowFollowers,
+            host:             this.cShowHosts,
+            raid:             this.cShowRaids,
+            sub:              this.cShowSubscribers,
+            subgift:          this.cShowSubgifts,
             subcommunitygift: this.cShowSubcommunitygifts,
-            resub: this.cShowResubs,
-            cheer: this.cShowCheers,
-            clips: this.cShowClips,
-            tip: this.cShowTips,
+            resub:            this.cShowResubs,
+            cheer:            this.cShowCheers,
+            clips:            this.cShowClips,
+            tip:              this.cShowTips,
           },
         },
-        streamer: oauth.broadcasterUsername,
-        game: stats.value.currentGame,
-        title: stats.value.currentTitle,
-        clips: this.cShowClips ? await api.getTopClips({ period: this.cClipsPeriod, days: this.cClipsCustomPeriodInDays, first: this.cClipsNumOfClips }) : [],
+        streamer:    oauth.broadcasterUsername,
+        game:        stats.value.currentGame,
+        title:       stats.value.currentTitle,
+        clips:       this.cShowClips ? await api.getTopClips({ period: this.cClipsPeriod, days: this.cClipsCustomPeriodInDays, first: this.cClipsNumOfClips }) : [],
         events,
         customTexts: this.cCustomTextsValues,
-        social: this.cSocialValues,
+        social:      this.cSocialValues,
       });
     });
   }

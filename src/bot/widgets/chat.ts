@@ -17,11 +17,11 @@ class Chat extends Widget {
   public sockets() {
     adminEndpoint(this.nsp, 'chat.message.send', async (message) => {
       sendMessage(message, {
-        username: OAuth.botUsername,
-        displayName: OAuth.botUsername,
-        userId: botId.value,
-        emotes: [],
-        badges: {},
+        username:       OAuth.botUsername,
+        displayName:    OAuth.botUsername,
+        userId:         botId.value,
+        emotes:         [],
+        badges:         {},
         'message-type': 'chat',
       }, { force: true });
     });
@@ -38,7 +38,7 @@ class Chat extends Widget {
         if (response.status === 200) {
           const chatters = response.data.chatters as { viewers: string[] };
           chatters.viewers = chatters.viewers.filter((o) => !getIgnoreList().includes(o));
-          cb(null, {chatters});
+          cb(null, { chatters });
         }
       } catch (e) {
         cb(e.message, {});

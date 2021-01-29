@@ -1,6 +1,10 @@
-import { getRepository, In, IsNull, Not } from 'typeorm';
+import {
+  getRepository, In, IsNull, Not, 
+} from 'typeorm';
 
-import { Alert, AlertCheer, AlertCommandRedeem, AlertFollow, AlertHost, AlertInterface, AlertMedia, AlertMediaInterface, AlertRaid, AlertResub, AlertSub, AlertSubcommunitygift, AlertSubgift, AlertTip, EmitData } from '../database/entity/alert';
+import {
+  Alert, AlertCheer, AlertCommandRedeem, AlertFollow, AlertHost, AlertInterface, AlertMedia, AlertMediaInterface, AlertRaid, AlertResub, AlertSub, AlertSubcommunitygift, AlertSubgift, AlertTip, EmitData, 
+} from '../database/entity/alert';
 import { persistent } from '../decorators';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { debug } from '../helpers/log';
@@ -36,7 +40,7 @@ class Alerts extends Registry {
             const match = (b64data.match(/^data:\w+\/\w+;base64,/) || [ 'data:image/gif;base64,' ])[0];
             const data = Buffer.from(b64data.replace(/^data:\w+\/\w+;base64,/, ''), 'base64');
             res.writeHead(200, {
-              'Content-Type': match.replace('data:', '').replace(';base64,', ''),
+              'Content-Type':   match.replace('data:', '').replace(';base64,', ''),
               'Content-Length': data.length,
             });
             res.end(data);
@@ -48,7 +52,7 @@ class Alerts extends Registry {
   }
 
   sockets () {
-    publicEndpoint(this.nsp, 'isAlertUpdated', async ({updatedAt, id}: { updatedAt: number; id: string }, cb: (err: Error | null, isUpdated: boolean, updatedAt: number) => void) => {
+    publicEndpoint(this.nsp, 'isAlertUpdated', async ({ updatedAt, id }: { updatedAt: number; id: string }, cb: (err: Error | null, isUpdated: boolean, updatedAt: number) => void) => {
       try {
         const alert = await getRepository(Alert).findOne({ id });
         if (alert) {
@@ -90,8 +94,7 @@ class Alerts extends Registry {
         const { primaryId, ...item } = await getRepository(AlertMedia).findOneOrFail({ id: toClone[0] });
         cb(
           null,
-          await getRepository(AlertMedia).save({
-            ...item,
+          await getRepository(AlertMedia).save({ ...item,
             id: toClone[1] })
         );
       } catch (e) {
@@ -135,7 +138,7 @@ class Alerts extends Registry {
         cb(
           null,
           await getRepository(Alert).findOne({
-            where: { id },
+            where:     { id },
             relations: ['rewardredeems', 'cmdredeems', 'cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'],
           })
         );
@@ -214,7 +217,7 @@ class Alerts extends Registry {
 
   trigger(opts: EmitData) {
     if (!this.areAlertsMuted) {
-      ioServer?.of('/registries/alerts').emit('alert', {...opts, isTTSMuted: this.isTTSMuted, isSoundMuted: this.isSoundMuted });
+      ioServer?.of('/registries/alerts').emit('alert', { ...opts, isTTSMuted: this.isTTSMuted, isSoundMuted: this.isSoundMuted });
     }
   }
 

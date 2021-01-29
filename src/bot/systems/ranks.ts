@@ -96,8 +96,8 @@ class Ranks extends System {
 
     const response = prepare(!rank ? 'ranks.rank-was-added' : 'ranks.rank-already-exist',
       {
-        rank: parsed[2],
-        hours: value,
+        rank:    parsed[2],
+        hours:   value,
         type,
         hlocale: getLocalizedName(value, translate(type === 'viewer' ? 'core.hours' : 'core.months')),
       });
@@ -140,7 +140,7 @@ class Ranks extends System {
     });
     const response = prepare('ranks.rank-was-edited',
       {
-        hours: parseInt(value, 10),
+        hours:   parseInt(value, 10),
         rank,
         type,
         hlocale: getLocalizedName(value, translate(type === 'viewer' ? 'core.hours' : 'core.months')),
@@ -236,7 +236,7 @@ class Ranks extends System {
 
     const response = prepare(removed ? 'ranks.rank-was-removed' : 'ranks.rank-was-not-found',
       {
-        hours: value,
+        hours:   value,
         type,
         hlocale: getLocalizedName(value, translate(type === 'viewer' ? 'core.hours' : 'core.months')),
       });
@@ -330,7 +330,7 @@ class Ranks extends System {
       }
 
       if (rankToReturn) {
-        return { current: rankToReturn, next: subNextRank};
+        return { current: rankToReturn, next: subNextRank };
       }
     }
 
@@ -348,7 +348,7 @@ class Ranks extends System {
       }
 
       if (rankToReturn) {
-        return { current: rankToReturn, next: subNextRank || flwNextRank};
+        return { current: rankToReturn, next: subNextRank || flwNextRank };
       }
     }
 
@@ -361,7 +361,7 @@ class Ranks extends System {
         nextRank = rank;
       }
     }
-    return { current: rankToReturn, next: subNextRank || flwNextRank || nextRank};
+    return { current: rankToReturn, next: subNextRank || flwNextRank || nextRank };
   }
 }
 

@@ -2,7 +2,9 @@ import { getRepository } from 'typeorm';
 
 import currency from '../currency';
 import { EventList } from '../database/entity/eventList';
-import { isStreamOnline, stats, streamStatusChangeSince } from '../helpers/api';
+import {
+  isStreamOnline, stats, streamStatusChangeSince, 
+} from '../helpers/api';
 import { mainCurrency } from '../helpers/currency';
 import users from '../users';
 

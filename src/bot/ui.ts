@@ -1,4 +1,6 @@
-import { filter, isString, set } from 'lodash';
+import {
+  filter, isString, set, 
+} from 'lodash';
 
 import Core from './_interface';
 import { settings, ui } from './decorators';
@@ -18,7 +20,7 @@ import webhooks from './webhooks';
 class UI extends Core {
   @settings()
   @ui({
-    type: 'selector',
+    type:   'selector',
     values: ['light', 'dark'],
   })
   public theme: 'light' | 'dark' = 'light';

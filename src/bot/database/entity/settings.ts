@@ -8,11 +8,11 @@ export interface SettingsInterface {
 }
 
 export const Settings = new EntitySchema<SettingsInterface>({
-  name: 'settings',
+  name:    'settings',
   columns: {
     id: {
-      type: Number,
-      primary: true,
+      type:      Number,
+      primary:   true,
       generated: true,
     },
     namespace: {
@@ -27,9 +27,9 @@ export const Settings = new EntitySchema<SettingsInterface>({
   },
   indices: [
     {
-      name: 'IDX_d8a83b9ffce680092c8dfee37d',
+      name:    'IDX_d8a83b9ffce680092c8dfee37d',
       columns: [ 'namespace', 'name' ],
-      unique: true,
+      unique:  true,
     },
   ],
 });

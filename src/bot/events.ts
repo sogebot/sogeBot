@@ -12,12 +12,18 @@ import { Event, EventInterface } from './database/entity/event';
 import { User } from './database/entity/user';
 import { onStreamEnd } from './decorators/on';
 import events from './events';
-import { calls, isStreamOnline, rawStatus, setRateLimit, stats, streamStatusChangeSince } from './helpers/api';
+import {
+  calls, isStreamOnline, rawStatus, setRateLimit, stats, streamStatusChangeSince, 
+} from './helpers/api';
 import { sample } from './helpers/array/sample';
 import { attributesReplace } from './helpers/attributesReplace';
-import { announce, getBotSender, getOwner, prepare } from './helpers/commons';
+import {
+  announce, getBotSender, getOwner, prepare, 
+} from './helpers/commons';
 import { mainCurrency } from './helpers/currency';
-import { getAll, getValueOf, setValueOf } from './helpers/customvariables';
+import {
+  getAll, getValueOf, setValueOf, 
+} from './helpers/customvariables';
 import { csEmitter } from './helpers/customvariables/emitter';
 import { isDbConnected } from './helpers/database';
 import { dayjs } from './helpers/dayjs';
@@ -25,14 +31,18 @@ import { eventEmitter } from './helpers/events/emitter';
 import { flatten } from './helpers/flatten';
 import { generateUsername } from './helpers/generateUsername';
 import { getLocalizedName } from './helpers/getLocalized';
-import { debug, error, info, warning } from './helpers/log';
+import {
+  debug, error, info, warning, 
+} from './helpers/log';
 import { channelId } from './helpers/oauth';
 import { broadcasterId } from './helpers/oauth/broadcasterId';
 import { ioServer } from './helpers/panel';
 import { addUIError } from './helpers/panel/';
 import { parserEmitter } from './helpers/parser/';
 import { adminEndpoint } from './helpers/socket';
-import { isOwner, isSubscriber, isVIP } from './helpers/user';
+import {
+  isOwner, isSubscriber, isVIP, 
+} from './helpers/user';
 import { isBot, isBotSubscriber } from './helpers/user/isBot';
 import { isBroadcaster } from './helpers/user/isBroadcaster';
 import { isModerator } from './helpers/user/isModerator';
@@ -162,7 +172,7 @@ class Events extends Core {
 
   public async fire(eventId: string, attributes: Events.Attributes): Promise<void> {
     attributes = _.cloneDeep(attributes) || {};
-    debug('events', JSON.stringify({eventId, attributes}));
+    debug('events', JSON.stringify({ eventId, attributes }));
 
     if (attributes.username !== null && typeof attributes.username !== 'undefined' && (!attributes.userId && !excludedUsers.has(attributes.username))) {
       excludedUsers.delete(attributes.username); // remove from excluded users if passed first if
@@ -174,7 +184,7 @@ class Events extends Core {
       if (!user) {
         try {
           await getRepository(User).save({
-            userId: Number(attributes.userId ? attributes.userId : await getIdFromTwitch(attributes.username)),
+            userId:   Number(attributes.userId ? attributes.userId : await getIdFromTwitch(attributes.username)),
             username: attributes.username,
           });
           return this.fire(eventId, attributes);
@@ -189,19 +199,19 @@ class Events extends Core {
 
       // add is object
       attributes.is = {
-        moderator: isModerator(user),
-        subscriber: isSubscriber(user),
-        vip: isVIP(user),
+        moderator:   isModerator(user),
+        subscriber:  isSubscriber(user),
+        vip:         isVIP(user),
         broadcaster: isBroadcaster(attributes.username),
-        bot: isBot(attributes.username),
-        owner: isOwner(attributes.username),
+        bot:         isBot(attributes.username),
+        owner:       isOwner(attributes.username),
       };
     }
     if (!_.isNil(_.get(attributes, 'recipient', null))) {
       const user = await getRepository(User).findOne({ username: attributes.recipient });
       if (!user) {
         await getRepository(User).save({
-          userId: Number(await getIdFromTwitch(attributes.recipient)),
+          userId:   Number(await getIdFromTwitch(attributes.recipient)),
           username: attributes.recipient,
         });
         this.fire(eventId, attributes);
@@ -210,12 +220,12 @@ class Events extends Core {
 
       // add is object
       attributes.recipientis = {
-        moderator: isModerator(user),
-        subscriber: isSubscriber(user),
-        vip: isVIP(user),
+        moderator:   isModerator(user),
+        subscriber:  isSubscriber(user),
+        vip:         isVIP(user),
         broadcaster: isBroadcaster(attributes.recipient),
-        bot: isBot(attributes.recipient),
-        owner: isOwner(attributes.recipient),
+        bot:         isBot(attributes.recipient),
+        owner:       isOwner(attributes.recipient),
       };
     }
     if (_.get(attributes, 'reset', false)) {
@@ -225,8 +235,8 @@ class Events extends Core {
 
     for (const event of (await getRepository(Event).find({
       relations: ['operations'],
-      where: {
-        name: eventId,
+      where:     {
+        name:      eventId,
         isEnabled: true,
       },
     }))) {
@@ -253,7 +263,7 @@ class Events extends Core {
   // set triggered attribute to empty object
   public async reset(eventId: string) {
     for (const event of await getRepository(Event).find({ name: eventId })) {
-      await getRepository(Event).save({...event, triggered: {}});
+      await getRepository(Event).save({ ...event, triggered: {} });
     }
   }
 
@@ -306,13 +316,13 @@ class Events extends Core {
 
     try {
       const request = await axios({
-        method: 'post',
+        method:  'post',
         url,
-        data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) },
+        data:    { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) },
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Client-ID': oauth.broadcasterClientId,
-          'Content-Type': 'application/json',
+          'Client-ID':     oauth.broadcasterClientId,
+          'Content-Type':  'application/json',
         },
       });
 
@@ -358,10 +368,10 @@ class Events extends Core {
 
     if (global.mocha) {
       parserEmitter.emit('process', {
-        sender: { username: oauth.broadcasterUsername, userId: broadcasterId.value },
+        sender:  { username: oauth.broadcasterUsername, userId: broadcasterId.value },
         message: command,
-        skip: true,
-        quiet: _.get(operation, 'isCommandQuiet', false) as boolean,
+        skip:    true,
+        quiet:   _.get(operation, 'isCommandQuiet', false) as boolean,
       }, (responses) => {
         for (let i = 0; i < responses.length; i++) {
           setTimeout(async () => {
@@ -372,10 +382,10 @@ class Events extends Core {
     } else {
       tmi.message({
         message: {
-          tags: { username: oauth.broadcasterUsername , userId: broadcasterId.value},
+          tags:    { username: oauth.broadcasterUsername , userId: broadcasterId.value },
           message: command,
         },
-        skip: false,
+        skip:  false,
         quiet: !!_.get(operation, 'isCommandQuiet', false),
       });
     }
@@ -390,7 +400,7 @@ class Events extends Core {
         userId: Number(await getIdFromTwitch(username)),
         username,
       });
-      return this.fireSendChatMessageOrWhisper(operation, {...attributes, userId, username }, whisper);
+      return this.fireSendChatMessageOrWhisper(operation, { ...attributes, userId, username }, whisper);
     } else if (attributes.test) {
       userId = attributes.userId;
     } else if (!userObj) {
@@ -400,18 +410,18 @@ class Events extends Core {
     const message = attributesReplace(attributes, String(operation.messageToSend));
     parserReply(message, {
       sender: {
-        badges: {},
-        emotes: [],
-        userId: String(userId),
+        badges:      {},
+        emotes:      [],
+        userId:      String(userId),
         username,
         displayName: userObj?.displayname || username,
-        color: '',
-        emoteSets: [],
-        userType: 'viewer',
+        color:       '',
+        emoteSets:   [],
+        userType:    'viewer',
         isModerator: false,
-        mod: '0',
-        subscriber: '0',
-        turbo: '0',
+        mod:         '0',
+        subscriber:  '0',
+        turbo:       '0',
       },
     }, whisper ? 'whisper' : 'chat');
   }
@@ -607,34 +617,34 @@ class Events extends Core {
     const toEval = `(function evaluation () { return ${event.filter} })()`;
     const context = {
       $username: _.get(attributes, 'username', null),
-      $source: _.get(attributes, 'source', null),
-      $is: {
-        moderator: _.get(attributes, 'is.moderator', false),
-        subscriber: _.get(attributes, 'is.subscriber', false),
-        vip: _.get(attributes, 'is.vip', false),
-        follower: _.get(attributes, 'is.follower', false),
+      $source:   _.get(attributes, 'source', null),
+      $is:       {
+        moderator:   _.get(attributes, 'is.moderator', false),
+        subscriber:  _.get(attributes, 'is.subscriber', false),
+        vip:         _.get(attributes, 'is.vip', false),
+        follower:    _.get(attributes, 'is.follower', false),
         broadcaster: _.get(attributes, 'is.broadcaster', false),
-        bot: _.get(attributes, 'is.bot', false),
-        owner: _.get(attributes, 'is.owner', false),
+        bot:         _.get(attributes, 'is.bot', false),
+        owner:       _.get(attributes, 'is.owner', false),
       },
-      $method: _.get(attributes, 'method', null),
-      $months: _.get(attributes, 'months', null),
-      $monthsName: _.get(attributes, 'monthsName', null),
-      $message: _.get(attributes, 'message', null),
-      $command: _.get(attributes, 'command', null),
-      $count: _.get(attributes, 'count', null),
-      $bits: _.get(attributes, 'bits', null),
-      $reason: _.get(attributes, 'reason', null),
-      $target: _.get(attributes, 'target', null),
-      $viewers: _.get(attributes, 'viewers', null),
-      $duration: _.get(attributes, 'duration', null),
+      $method:          _.get(attributes, 'method', null),
+      $months:          _.get(attributes, 'months', null),
+      $monthsName:      _.get(attributes, 'monthsName', null),
+      $message:         _.get(attributes, 'message', null),
+      $command:         _.get(attributes, 'command', null),
+      $count:           _.get(attributes, 'count', null),
+      $bits:            _.get(attributes, 'bits', null),
+      $reason:          _.get(attributes, 'reason', null),
+      $target:          _.get(attributes, 'target', null),
+      $viewers:         _.get(attributes, 'viewers', null),
+      $duration:        _.get(attributes, 'duration', null),
       // add global variables
-      $game: stats.value.currentGame,
-      $title: stats.value.currentTitle,
-      $views: stats.value.currentViews,
-      $followers: stats.value.currentFollowers,
-      $hosts: stats.value.currentHosts,
-      $subscribers: stats.value.currentSubscribers,
+      $game:            stats.value.currentGame,
+      $title:           stats.value.currentTitle,
+      $views:           stats.value.currentViews,
+      $followers:       stats.value.currentFollowers,
+      $hosts:           stats.value.currentHosts,
+      $subscribers:     stats.value.currentSubscribers,
       $isBotSubscriber: isBotSubscriber(),
       ...customVariables,
     };
@@ -669,7 +679,7 @@ class Events extends Core {
       try {
         const event = await getRepository(Event).findOne({
           relations: ['operations'],
-          where: { id },
+          where:     { id },
         });
         cb(null, event);
       } catch (e) {
@@ -697,49 +707,49 @@ class Events extends Core {
         const recipient = sample(['short', 'someFreakingLongUsername', generateUsername()]);
         const months = _.random(0, 99, false);
         const attributes = {
-          test: true,
+          test:   true,
           userId: 0,
           username,
-          is: {
-            moderator: _.random(0, 1, false) === 0,
-            subscriber: _.random(0, 1, false) === 0,
+          is:     {
+            moderator:   _.random(0, 1, false) === 0,
+            subscriber:  _.random(0, 1, false) === 0,
             broadcaster: _.random(0, 1, false) === 0,
-            bot: _.random(0, 1, false) === 0,
-            owner: _.random(0, 1, false) === 0,
+            bot:         _.random(0, 1, false) === 0,
+            owner:       _.random(0, 1, false) === 0,
           },
           recipient,
           recipientis: {
-            moderator: _.random(0, 1, false) === 0,
-            subscriber: _.random(0, 1, false) === 0,
+            moderator:   _.random(0, 1, false) === 0,
+            subscriber:  _.random(0, 1, false) === 0,
             broadcaster: _.random(0, 1, false) === 0,
-            bot: _.random(0, 1, false) === 0,
-            owner: _.random(0, 1, false) === 0,
+            bot:         _.random(0, 1, false) === 0,
+            owner:       _.random(0, 1, false) === 0,
           },
-          subStreakShareEnabled: _.random(0, 1, false) === 0,
-          subStreak: _.random(10, 99, false),
-          subStreakName: getLocalizedName(_.random(10, 99, false), 'core.months'),
-          subCumulativeMonths: _.random(10, 99, false),
+          subStreakShareEnabled:   _.random(0, 1, false) === 0,
+          subStreak:               _.random(10, 99, false),
+          subStreakName:           getLocalizedName(_.random(10, 99, false), 'core.months'),
+          subCumulativeMonths:     _.random(10, 99, false),
           subCumulativeMonthsName: getLocalizedName(_.random(10, 99, false), 'core.months'),
           months,
-          tier: _.random(0, 3, false),
-          monthsName: getLocalizedName(months, translate('core.months')),
-          message: sample(['', 'Lorem Ipsum Dolor Sit Amet']),
-          viewers: _.random(0, 9999, false),
-          bits: _.random(1, 1000000, false),
-          duration: sample([30, 60, 90, 120, 150, 180]),
-          reason: sample(['', 'Lorem Ipsum Dolor Sit Amet']),
-          command: '!testcommand',
-          count: _.random(0, 9999, false),
-          method: _.random(0, 1, false) === 0 ? 'Twitch Prime' : '',
-          amount: _.random(0, 9999, true).toFixed(2),
-          currency: sample(['CZK', 'USD', 'EUR']),
-          currencyInBot: mainCurrency.value,
-          amountInBotCurrency: _.random(0, 9999, true).toFixed(2),
+          tier:                    _.random(0, 3, false),
+          monthsName:              getLocalizedName(months, translate('core.months')),
+          message:                 sample(['', 'Lorem Ipsum Dolor Sit Amet']),
+          viewers:                 _.random(0, 9999, false),
+          bits:                    _.random(1, 1000000, false),
+          duration:                sample([30, 60, 90, 120, 150, 180]),
+          reason:                  sample(['', 'Lorem Ipsum Dolor Sit Amet']),
+          command:                 '!testcommand',
+          count:                   _.random(0, 9999, false),
+          method:                  _.random(0, 1, false) === 0 ? 'Twitch Prime' : '',
+          amount:                  _.random(0, 9999, true).toFixed(2),
+          currency:                sample(['CZK', 'USD', 'EUR']),
+          currencyInBot:           mainCurrency.value,
+          amountInBotCurrency:     _.random(0, 9999, true).toFixed(2),
         };
 
         const event = await getRepository(Event).findOne({
           relations: ['operations'],
-          where: { id: eventId },
+          where:     { id: eventId },
         });
         if (event) {
           for (const operation of event.operations) {
@@ -771,7 +781,7 @@ class Events extends Core {
 
     adminEndpoint(this.nsp, 'events::save', async (event, cb) => {
       try {
-        cb(null, await getRepository(Event).save({...event, operations: event.operations.filter(o => o.name !== 'do-nothing')}));
+        cb(null, await getRepository(Event).save({ ...event, operations: event.operations.filter(o => o.name !== 'do-nothing') }));
       } catch (e) {
         cb(e.stack, event);
       }
@@ -793,7 +803,7 @@ class Events extends Core {
       for (const event of (await getRepository(Event)
         .createQueryBuilder('event')
         .where('event.name = :event1', { event1: 'command-send-x-times' })
-        .orWhere('event.name = :event2', { event2: 'keyword-send-x-times '})
+        .orWhere('event.name = :event2', { event2: 'keyword-send-x-times ' })
         .getMany())) {
         if (_.isNil(_.get(event, 'triggered.fadeOutInterval', null))) {
           // fadeOutInterval init

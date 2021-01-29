@@ -7,7 +7,9 @@ import { parserReply } from '../commons';
 import * as constants from '../constants';
 import { Price as PriceEntity, PriceInterface } from '../database/entity/price';
 import { User } from '../database/entity/user';
-import { command, default_permission, rollback } from '../decorators';
+import {
+  command, default_permission, rollback, 
+} from '../decorators';
 import { parser } from '../decorators';
 import { prepare } from '../helpers/commons';
 import { error } from '../helpers/log';
@@ -133,7 +135,7 @@ class Price extends System {
       return [{ response, ...opts }];
     }
 
-    await getRepository(PriceEntity).save({...price, enabled: !price.enabled});
+    await getRepository(PriceEntity).save({ ...price, enabled: !price.enabled });
     const response = prepare(price.enabled ? 'price.price-was-enabled' : 'price.price-was-disabled', { command: cmd });
     return [{ response, ...opts }];
   }

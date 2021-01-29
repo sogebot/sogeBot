@@ -10,13 +10,13 @@ export interface PriceInterface {
 }
 
 export const Price = new EntitySchema<Readonly<Required<PriceInterface>>>({
-  name: 'price',
+  name:    'price',
   columns: {
-    id: { type: String, primary: true, generated: 'uuid' },
-    command: { type: String },
-    enabled: { type: Boolean, default: true },
-    price: { type: Number },
-    priceBits: { type: Number, default: 0 },
+    id:              { type: String, primary: true, generated: 'uuid' },
+    command:         { type: String },
+    enabled:         { type: Boolean, default: true },
+    price:           { type: Number },
+    priceBits:       { type: Number, default: 0 },
     emitRedeemEvent: { type: Boolean, default: false },
   },
   indices: [

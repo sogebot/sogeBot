@@ -9,10 +9,10 @@ export interface HeistUserInterface {
 }
 
 export const HeistUser = new EntitySchema<Readonly<Required<HeistUserInterface>>>({
-  name: 'heist_user',
+  name:    'heist_user',
   columns: {
-    userId: { type: Number, primary: true },
+    userId:   { type: Number, primary: true },
     username: { type: String },
-    points: { type: 'bigint', transformer: new ColumnNumericTransformer() },
+    points:   { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },
 });

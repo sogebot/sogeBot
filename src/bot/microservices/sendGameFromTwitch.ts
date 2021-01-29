@@ -4,7 +4,9 @@ import axios from 'axios';
 import { isNull, map } from 'lodash';
 import { Socket } from 'socket.io';
 
-import { calls, getClientId, getToken, setRateLimit } from '../helpers/api';
+import {
+  calls, getClientId, getToken, setRateLimit, 
+} from '../helpers/api';
 import { ioServer } from '../helpers/panel';
 import oauth from '../oauth';
 
@@ -21,7 +23,7 @@ async function sendGameFromTwitch (socket: Socket | null, game: string) {
     request = await axios.get(url, {
       headers: {
         'Authorization': 'Bearer ' + await getToken('bot'),
-        'Client-ID': await getClientId('bot'),
+        'Client-ID':     await getClientId('bot'),
       },
       timeout: 20000,
     });

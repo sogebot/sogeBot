@@ -19,11 +19,11 @@ export interface getListOfReturn {
 type possibleLists = 'systems' | 'core' | 'integrations' | 'overlays' | 'games';
 
 const list: getListOfReturn = {
-  systems: [],
-  core: [],
+  systems:      [],
+  core:         [],
   integrations: [],
-  overlays: [],
-  games: [],
+  overlays:     [],
+  games:        [],
 };
 export const populateListOf = async function<P extends possibleLists>(type: P): Promise<void> {
   return new Promise<void>((resolve) => {
