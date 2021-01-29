@@ -1,32 +1,20 @@
-const child_process = require('child_process');
+const exec = require('child_process').exec;
 const fs = require('fs');
 
 const getMigrationType = require('../dest/helpers/getMigrationType').getMigrationType;
 require('dotenv').config();
 
-let status = 0;
 async function test() {
   await new Promise((resolve) => {
-    const p = child_process.spawn('npx', [
-      'typeorm',
-      'migration:run',
-    ], {
+    exec('npx typeorm migration:run', {
       env: {
         'TYPEORM_ENTITIES': 'dest/database/entity/*.js',
         'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
       },
-      shell: true,
-    });
-    p.stdout.on('data', (data) => {
-      process.stdout.write(data.toString());
-    });
-
-    p.stderr.on('data', (data) => {
-      process.stderr.write(data.toString());
-    });
-
-    p.on('close', (code) => {
-      status = code;
+    }, (error, stdout, stderr) => {
+      if (stdout) {
+        process.stdout.write(stdout);
+      }
       resolve();
     });
   });
@@ -34,36 +22,20 @@ async function test() {
   let output = '';
   const expectedOutput = 'No changes in database schema were found - cannot generate a migration. To create a new empty migration use "typeorm migration:create" command\n';
   await new Promise(async (resolve) => {
-    const p = child_process.spawn('npx', [
-      'typeorm',
-      'migration:generate',
-      '-n',
-      'test',
-    ], {
+    exec('npx typeorm migration:generate -n test', {
       env: {
         'TYPEORM_ENTITIES': 'dest/database/entity/*.js',
         'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
       },
-      shell: true,
-    });
-    p.stdout.on('data', (data) => {
-      process.stdout.write(data.toString());
-      output += data.toString();
-    });
-
-    p.stderr.on('data', (data) => {
-      process.stderr.write(data.toString());
-    });
-
-    p.on('close', () => {
+    }, (error, stdout, stderr) => {
+      console.log({error, stdout, stderr});
+      output += stdout;
       resolve();
     });
   });
   if (output !== expectedOutput) {
     await new Promise((resolve2) => {
-      const cat = child_process.spawn('cat', [
-        './src/bot/database/migration/*/*test*',
-      ], {
+      const cat = exec('cat ./*test*', {
         shell: true,
       });
       console.log('\n =================================== generated migration file  =================================== \n');
