@@ -10,7 +10,8 @@ async function test() {
       env: {
         'TYPEORM_ENTITIES': 'dest/database/entity/*.js',
         'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
-      },
+      },        shell: true,
+
     }, (error, stdout, stderr) => {
       console.log({error, stdout, stderr});
       if (stdout) {
@@ -27,7 +28,8 @@ async function test() {
       env: {
         'TYPEORM_ENTITIES': 'dest/database/entity/*.js',
         'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
-      },
+      },        shell: true,
+
     }, (error, stdout, stderr) => {
       console.log({error, stdout, stderr});
       output += stdout;
