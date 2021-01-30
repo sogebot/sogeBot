@@ -20,7 +20,7 @@ const user1 = { username: 'user1', userId: String(_.random(999999, false)) };
 const command = '!gamble';
 
 describe('Gambling - gamble', () => {
-  beforeEach(async () => {
+  beforeEach(async () => {
     await getRepository(User).save({
       userId: user1.userId, username: user1.username, points: 100,
     });
@@ -131,7 +131,7 @@ describe('Gambling - gamble', () => {
         assert(r[0].response === msg1 || r[0].response === msg2, JSON.stringify({
           r, msg1, msg2,
         }, null, 2));
-        assert(updatedPoints === 90 || updatedPoints === 110, { updatedPoints });
+        assert(updatedPoints === 90 || updatedPoints === 110, { updatedPoints });
       });
 
       it('user should successfully !gamble all', async () => {

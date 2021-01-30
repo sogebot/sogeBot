@@ -1,36 +1,37 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "strict": true,
-    "module": "esnext",
+    "strictPropertyInitialization": false,
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
+    "target": "es2020",
+    "strict": true,
+    "module": "commonjs",
     "incremental": true,
     "removeComments": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "esModuleInterop": true,
+    "skipLibCheck": true,
     "moduleResolution": "node",
-    "lib": ["es2020", "dom"],
+    "lib": ["es2020"],
     "resolveJsonModule": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "declaration": false,
     "noResolve": false,
-    "baseUrl": "./",
-    "sourceMap": true
+    "baseUrl": "./src",
+    "outDir": "./dest",
+    "inlineSourceMap": true,
+    "typeRoots": ["./node_modules/@types"]
   },
   "include": [
-    "src/**/*.js",
-    "src/**/*.ts",
-    "src/**/*.vue",
-    "d.ts/*",
-    "tools/*",
-    "test/**/*"
+    "./",
+    "../d.ts/types.d.ts",
+    "../d.ts/*",
   ],
   "exclude": [
-    "src/bot",
+    "test",
     "node_modules"
   ]
 }

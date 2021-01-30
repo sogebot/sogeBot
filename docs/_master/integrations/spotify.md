@@ -15,7 +15,7 @@ Current integration is enabling `$spotifySong` and song requests(PREMIUM) from S
 4. Add Client ID and Client Secret to a bot
    ![Client ID and Client Secret](https://drive.google.com/uc?id=1Ro3zLLn2BuzD7zACllR9EHKQPvkKcbTR)
 5. Add Redirect URI to Spotify and a Bot - redirect URI is where you access a bot.
-   By default `http://localhost:20000/oauth/spotify` | **DON'T FORGET TO SAVE ON SPOTIFY**
+   By default `http://localhost:20000/credentials/oauth/spotify` | **DON'T FORGET TO SAVE ON SPOTIFY**
    ![Redirect URI #1](https://drive.google.com/uc?id=1JZ-z48F1g85hEqWvRZYfg54-QP8tIitl)
    ![Redirect URI #2](https://drive.google.com/uc?id=1-4fzHmhc6Wzc9c0ez8vTEVWe0DcniWWl)
 6. Enable integration in a bot

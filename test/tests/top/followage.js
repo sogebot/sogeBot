@@ -1,9 +1,9 @@
 /* global describe it before */
 const assert = require('assert');
 
+const constants = require('@sogebot/ui-helpers/constants');
 const { getRepository } = require('typeorm');
 
-const constants = require('../../../dest/constants');
 const { User } = require('../../../dest/database/entity/user');
 const { getOwner } = require('../../../dest/helpers/commons/getOwner');
 const { prepare } = require('../../../dest/helpers/commons/prepare');
@@ -27,8 +27,8 @@ describe('Top - !top followage', () => {
   it ('Add 10 users into db and last user will don\'t have any followage', async () => {
     for (let i = 0; i < 10; i++) {
       await getRepository(User).save({
-        userId: String(Math.floor(Math.random() * 100000)),
-        username: 'user' + i,
+        userId:     String(Math.floor(Math.random() * 100000)),
+        username:   'user' + i,
         isFollower: true,
         followedAt: Date.now() - (constants.HOUR * i),
       });
@@ -37,8 +37,8 @@ describe('Top - !top followage', () => {
 
   it ('Add user with long followage but not follower', async () => {
     await getRepository(User).save({
-      userId: String(Math.floor(Math.random() * 100000)),
-      username: 'user11',
+      userId:     String(Math.floor(Math.random() * 100000)),
+      username:   'user11',
       isFollower: false,
       followedAt: Date.now() - (constants.HOUR * 24 * 30),
     });

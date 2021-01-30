@@ -1,6 +1,6 @@
 {
   "plugins": ["@typescript-eslint", "unused-imports", "import"],
-  "extends": ["plugin:@typescript-eslint/recommended", "plugin:import/typescript", "plugin:vue/recommended"],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:import/typescript", "plugin:vue/recommended"],
   "rules": {
     "key-spacing": ["error", { "beforeColon": false, "afterColon": true, "align": "value" }],
     "object-curly-spacing": ["error", "always"],
@@ -80,6 +80,9 @@
     "project": [ "./tsconfig.json", "./src/bot/tsconfig.json" ],
     "tsconfigRootDir": "./",
     "extraFileExtensions": [".vue"]
+  },
+  "env": {
+    "node": true
   },
   "settings": {
     "import/resolver": {

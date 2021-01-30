@@ -1,4 +1,0 @@
-#!/bin/sh
-. "$(dirname $0)/_/husky.sh"
-
-node ./tools/pre-commit-message.js $1 $2 $3

@@ -55,7 +55,7 @@ async function runMigration() {
     fs.writeFileSync(logFile, '✓ Node version check OK.' + os.EOL + os.EOL, { flag: 'a' });
   }
 
-  // check if TYPEORM_CONNECTION is better-sqlite3, mysql or postgres
+  // check if TYPEORM_CONNECTION is better-sqlite3, mysql or postgres
   try {
     if (process.env.TYPEORM_CONNECTION) {
       if (!repo.includes(process.env.TYPEORM_CONNECTION)) {
@@ -85,7 +85,7 @@ async function runMigration() {
         'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
       },
     }).on('error', function( err ){
-      throw err; 
+      throw err;
     });
     migration.stdout.on('data', (data) => {
       fs.writeFileSync(logFile, data, { flag: 'a' });

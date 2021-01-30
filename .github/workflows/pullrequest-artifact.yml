@@ -1,4 +1,4 @@
-name: Pull Requests Artifacts
+name: Pull Requests Artifacts
 
 on:
   pull_request:

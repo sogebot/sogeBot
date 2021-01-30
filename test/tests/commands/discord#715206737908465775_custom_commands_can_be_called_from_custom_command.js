@@ -41,7 +41,7 @@ describe('Custom Commands - https://discordapp.com/channels/317348946144002050/6
   });
 
   describe('Custom command should warn if we have infinite loop between commands', () => {
-    it('Add custom command infinite loop test3 -> test4 -> test5 -> test3', async () => {
+    it('Add custom command infinite loop test3 -> test4 -> test5 -> test3', async () => {
       const r = await customcommands.add({ sender: owner, parameters: '-c !test3 -r (!test4)' });
       const r2 = await customcommands.add({ sender: owner, parameters: '-c !test4 -r (!test5)' });
       const r3 = await customcommands.add({ sender: owner, parameters: '-c !test5 -r (!test3)' });

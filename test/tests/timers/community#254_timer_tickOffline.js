@@ -24,7 +24,7 @@ describe('Timers - tickOffline should send response into chat when stream is off
       name: 'test',
       triggerEveryMessage: 0,
       triggerEverySecond: 1,
-      tickOffline: true,
+      tickOffline: true,
       isEnabled: true,
       triggeredAtTimestamp: Date.now(),
       triggeredAtMessage: linesParsed,
@@ -53,28 +53,28 @@ describe('Timers - tickOffline should send response into chat when stream is off
     isStreamOnline.value = false;
   });
 
-  it('We should have response 1 in chat in a while', async () => {
+  it('We should have response 1 in chat in a while', async () => {
     await message.isSentRaw('1', 'bot', 45000);
     // we need to wait little more as interval when offline is 30s
   }).timeout(60000);
 
-  it('We should NOT have response 2 in chat in a while', async () => {
+  it('We should NOT have response 2 in chat in a while', async () => {
     await message.isNotSentRaw('2', 'bot', 5000);
   })
 
-  it('We should have response 3 in chat in a while', async () => {
+  it('We should have response 3 in chat in a while', async () => {
     await message.isSentRaw('3', 'bot', 5000);
   })
 
-  it('We should NOT have response 4 in chat in a while', async () => {
+  it('We should NOT have response 4 in chat in a while', async () => {
     await message.isNotSentRaw('4', 'bot', 5000);
   })
 
-  it('We should NOT have response 5 in chat in a while', async () => {
+  it('We should NOT have response 5 in chat in a while', async () => {
     await message.isNotSentRaw('5', 'bot', 5000);
   })
 
-  it('We should NOT have response 5 in chat in a while', async () => {
+  it('We should NOT have response 5 in chat in a while', async () => {
     await message.isNotSentRaw('5', 'bot', 5000);
   })
 });

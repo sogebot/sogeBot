@@ -24,11 +24,11 @@ const tests = {
     {
       message: 'zdarec KAPOW KAPOW', sender:  {
         ...user.viewer, emotes: [{
-          id: '133537', start: 7, end: 11, 
+          id: '133537', start: 7, end: 11,
         }, {
-          id: '133537', start: 13, end: 17, 
-        }], 
-      }, 
+          id: '133537', start: 13, end: 17,
+        }],
+      },
     },
     { message: '😀 😁 😂 🤣 😃 😄 😅 😆 😉 😊 😋 😎 😍 😘 😗 😙 😚 🙂 🤗 🤩 🤔 🤨 😐 😑 😶 🙄 😏 😣 😥 😮 🤐 😯 😪 😫 😴 😌 😛 😜 😝 🤤 😒 😓 😔 😕 🙃 🤑 😲 ☹️ 🙁 😖 😞 😟 😤 😢 😭 😦 😧 😨 😩 🤯 😬 😰 😱', sender: user.viewer },
   ],
@@ -86,7 +86,7 @@ describe('systems/moderation - Caps()', () => {
     });
 
     it(`add user immunity`, async () => {
-      const r = await moderation.immune({ parameters: `${user.viewer.username} caps 5s` });
+      const r = await moderation.immune({ parameters: `${user.viewer.username} caps 5s` });
       assert(r[0].response === '$sender, user @__viewer__ have caps immunity for 5 seconds');
     });
 
