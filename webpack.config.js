@@ -43,6 +43,10 @@ const webpackConfig = {
     spotify: './src/oauth/spotify.ts',
   },
   resolve: {
+    fallback: {
+      "crypto": require.resolve("crypto-browserify"),
+      "stream": require.resolve("stream-browserify"),
+    },
     extensions: ['.ts', '.js', '.vue', '.json'],
     alias: {
       'vue$': 'vue/dist/vue.esm.js',

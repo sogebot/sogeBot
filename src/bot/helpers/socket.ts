@@ -132,7 +132,7 @@ function adminEndpoint (nsp: string, on: 'import.video', callback: (opts: {playl
 function adminEndpoint (nsp: string, on: 'get.playlist.tags', callback: (cb: (error: Error | string | null, data: string[]) => void, socket: Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'set.playlist.tag', callback: (tag:string, socket: Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'integration::obswebsocket::listScene', callback: (cb: (error: Error | string | null, data: ObsWebSocket.Scene[]) => void, socket: Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'integration::obswebsocket::test', callback: (item: OBSWebsocketInterface['simpleModeTasks'], cb: (error: Error | string | null) => void, socket: Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'integration::obswebsocket::test', callback: (item: OBSWebsocketInterface['simpleModeTasks'] | string, cb: (error: Error | string | null) => void, socket: Socket) => void): void;
 
 // generic functions
 function adminEndpoint (nsp: string, on: string, callback: (opts: { [x: string]: any }, cb?: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket): void;
@@ -149,5 +149,5 @@ const publicEndpoint = (nsp: string, on: string, callback: (opts: any, cb: (erro
 };
 
 export {
-  endpoints, adminEndpoint, viewerEndpoint, publicEndpoint, 
+  endpoints, adminEndpoint, viewerEndpoint, publicEndpoint,
 };

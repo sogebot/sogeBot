@@ -1,0 +1,17 @@
+<!--
+To properly wait function to complete, please use await for async functions.
+
+Functions exposed to eval:
+  (async) obs - see details at https://github.com/haganbmj/obs-websocket-js
+  (async) waitMs(miliseconds: number) - wait in script
+  log(message: string) - log message in bot logs
+
+Example:
+  await obs.send('SetCurrentScene', {
+    'scene-name': 'My Amazing Scene'
+  });
+  await waitMs(5000) // wait 5 seconds
+  await obs.send('SetCurrentScene', {
+    'scene-name': 'This is another scene'
+  });
+-->

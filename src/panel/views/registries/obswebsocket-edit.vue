@@ -26,7 +26,7 @@
       </b-form-group>
 
       <div class="col-md-12 p-0 pb-2" v-if="editationItem.advancedMode" :key="'advancedModeCode' + editationItem.id">
-        <codemirror style="font-size: 0.8em;" class="w-100" v-model="editationItem.advancedModeCode" :options="{
+        <codemirror style="font-size: 0.8em" class="w-100" v-model="editationItem.advancedModeCode" :options="{
           tabSize: 4,
           mode: 'text/javascript',
           theme: 'base16-' + theme,
@@ -37,7 +37,7 @@
       <template v-else>
         <b-row no-gutters>
           <b-col>
-            <title-divider>{{ translate('registry.obswebsocket.event') }}</title-divider>
+            <title-divider>{{ translate('registry.obswebsocket.actions') }}</title-divider>
           </b-col>
           <b-col md="auto" sm="12" align-self="end" class="text-right">
             <div class="h-auto w-auto" style="flex-shrink: 0;">
@@ -57,20 +57,47 @@
             </div>
           </b-col>
         </b-row>
-        <b-row v-for="task of editationItem.simpleModeTasks" :key="task.id" class="p-2">
+        <b-row v-for="(task, index) of editationItem.simpleModeTasks" :key="task.id" class="p-2">
           <b-col v-if="task.event === 'SetCurrentScene'">
-            <label-inside>{{translate('registry.obswebsocket.SetCurrentScene.name')}}</label-inside>
-            <b-select v-model="task.args.sceneName" :options="availableScenes">
-              <template #first>
-                <b-select-option value="" disabled>-- {{translate('registry.obswebsocket.noSceneSelected')}} --</b-select-option>
-              </template>
-            </b-select>
+            <b-row style="align-items: flex-end;">
+              <b-col>
+                <label-inside>{{translate('registry.obswebsocket.SetCurrentScene.name')}}</label-inside>
+                <b-select v-model="task.args.sceneName" :options="availableScenes">
+                  <template #first>
+                    <b-select-option value="" disabled>-- {{translate('registry.obswebsocket.noSceneSelected')}} --</b-select-option>
+                  </template>
+                </b-select>
+              </b-col>
+              <b-col cols="auto">
+                <b-btn variant="danger" @click="deleteAction(index)">{{translate('dialog.buttons.delete')}}</b-btn>
+              </b-col>
+            </b-row>
           </b-col>
           <b-col v-else-if="task.event === 'WaitMs'">
-            <label-inside>{{translate('registry.obswebsocket.WaitMs.name')}}</label-inside>
-            <b-input v-model.number="task.args.miliseconds"/>
+            <b-row style="align-items: flex-end;">
+              <b-col>
+                <label-inside>{{translate('registry.obswebsocket.WaitMs.name')}}</label-inside>
+                <b-input type="number" min="0" v-model.number="task.args.miliseconds"/>
+              </b-col>
+              <b-col cols="auto">
+                <b-btn variant="danger" @click="deleteAction(index)">{{translate('dialog.buttons.delete')}}</b-btn>
+              </b-col>
+            </b-row>
+          </b-col>
+          <b-col v-else-if="
+            [ 'StartReplayBuffer', 'StopReplayBuffer', 'SaveReplayBuffer',
+              'StartRecording', 'StopRecording', 'PauseRecording', 'ResumeRecording' ].includes(task.event)">
+            <b-row style="align-items: center">
+              <b-col>
+                <label-inside>{{translate('registry.obswebsocket.' + task.event + '.name')}}</label-inside>
+              </b-col>
+              <b-col cols="auto">
+                <b-btn variant="danger" @click="deleteAction(index)">{{translate('dialog.buttons.delete')}}</b-btn>
+              </b-col>
+            </b-row>
           </b-col>
           <b-col v-else>
+            {{ task }}
             Unknown task <em>{{task.name}}</em>
           </b-col>
         </b-row>
@@ -92,11 +119,12 @@ import 'codemirror/lib/codemirror.css';
 
 import { getSocket } from 'src/panel/helpers/socket';
 import type { OBSWebsocketInterface } from 'src/bot/database/entity/obswebsocket';
+import advancedModeCode from 'src/bot/data/templates/obswebsocket-code.txt';
 
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { error } from 'src/panel/helpers/error';
 import { capitalize } from 'src/panel/helpers/capitalize';
-import { availableActions } from 'src/bot/helpers/obswebsocket';
+import { availableActions } from 'src/bot/helpers/obswebsocket/actions';
 
 import { validationMixin } from 'vuelidate'
 import { minLength, required } from 'vuelidate/lib/validators'
@@ -139,7 +167,7 @@ export default defineComponent({
       id: ctx.root.$route.params.id || shortid.generate(),
       name: '',
       advancedMode: false,
-      advancedModeCode: '',
+      advancedModeCode,
       simpleModeTasks: [],
     } as OBSWebsocketInterface);
 
@@ -171,7 +199,10 @@ export default defineComponent({
       EventBus.$on('registry::obswebsocket::test::' + editationItem.value.id, () => {
         console.debug('Test event received - registry::obswebsocket::test::' + editationItem.value.id);
         ctx.emit('update:testState', ButtonStates.progress);
-        socket.emit('integration::obswebsocket::test', editationItem.value.simpleModeTasks, (err: string | null) => {
+        socket.emit('integration::obswebsocket::test',
+          editationItem.value.advancedMode
+          ? editationItem.value.advancedModeCode
+          : editationItem.value.simpleModeTasks, (err: string | null) => {
           if (err) {
             ctx.emit('update:testState', ButtonStates.fail);
             error(err)
@@ -201,7 +232,7 @@ export default defineComponent({
                   id: ctx.root.$route.params.id,
                   name: '',
                   advancedMode: false,
-                  advancedModeCode: '',
+                  advancedModeCode,
                   simpleModeTasks: [],
                 };
                 resolve();
@@ -293,10 +324,17 @@ export default defineComponent({
       }
     }
 
+    const deleteAction = (idx: number) => {
+      if (editationItem.value) {
+        editationItem.value.simpleModeTasks.splice(idx, 1);
+      }
+    }
+
     return {
       state,
       save,
       addAction,
+      deleteAction,
 
       editationItem,
 

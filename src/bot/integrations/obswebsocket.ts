@@ -8,7 +8,8 @@ import { onChange, onStartup } from '../decorators/on';
 import {
   error, info, warning,
 } from '../helpers/log';
-import { listScenes, taskRunner } from '../helpers/obswebsocket';
+import { listScenes } from '../helpers/obswebsocket/scenes';
+import { taskRunner } from '../helpers/obswebsocket/taskrunner';
 import { adminEndpoint } from '../helpers/socket';
 import Integration from './_interface';
 
@@ -111,7 +112,6 @@ class OBSWebsocket extends Integration {
     });
     adminEndpoint(this.nsp, 'generic::setById', async (opts, cb) => {
       try {
-        console.log(opts.item);
         const item = await getRepository(OBSWebsocketEntity).save({
           ...(await getRepository(OBSWebsocketEntity).findOne({ id: String(opts.id) })),
           ...opts.item,
@@ -147,7 +147,7 @@ class OBSWebsocket extends Integration {
         await taskRunner(obs, tasks);
         cb(null);
       } catch (e) {
-        cb(e.message);
+        cb(e.stack);
       }
     });
 

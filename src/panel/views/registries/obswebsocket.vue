@@ -29,7 +29,7 @@
       <template v-slot:footer="{ hide }">
         <div class="d-flex bg-opaque align-items-center px-3 py-2 border-top border-gray" style="justify-content: flex-end">
           <b-button class="mx-2" @click="hide" variant="link">{{ translate('dialog.buttons.close') }}</b-button>
-          <state-button @click="EventBus.$emit('registry::obswebsocket::test::' + $route.params.id)" text="test" :state="state.test" :invalid="state.invalid"/>
+          <state-button @click="EventBus.$emit('registry::obswebsocket::test::' + $route.params.id)" text="test" icon="vial" :state="state.test" :invalid="state.invalid" class="mx-2"/>
           <state-button @click="EventBus.$emit('registry::obswebsocket::save::' + $route.params.id)" text="saveChanges" :state="state.save" :invalid="state.invalid"/>
         </div>
       </template>
@@ -67,6 +67,10 @@
 import { defineComponent, ref, onMounted, computed, watch, getCurrentInstance } from '@vue/composition-api'
 import { escapeRegExp, isNil } from 'lodash-es';
 import shortid from 'shortid';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faVial } from '@fortawesome/free-solid-svg-icons';
+library.add(faVial)
 
 import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
