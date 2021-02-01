@@ -174,7 +174,7 @@ export default defineComponent({
       }
     }
     const del = (item: Required<OBSWebsocketInterface>) => {
-      if (confirm(`Do you want to delete timer ${item.name}?`)) {
+      if (confirm(`Do you want to delete ${item.name}?`)) {
         socket.emit('generic::deleteById', item.id, () => {
           items.value = items.value.filter((o) => o.id !== item.id)
         })
