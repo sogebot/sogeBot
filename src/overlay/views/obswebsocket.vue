@@ -8,6 +8,10 @@ import OBSWebSocket from 'obs-websocket-js';
 
 import { getSocket } from 'src/panel/helpers/socket';
 import { getCurrentIP } from 'src/panel/helpers/getCurrentIP'
+import { taskRunner } from 'src/bot/helpers/obswebsocket/taskrunner'
+import type { OBSWebsocketInterface } from 'src/bot/database/entity/obswebsocket';
+import { getSourcesList, getSourceTypesList } from 'src/bot/helpers/obswebsocket/sources';
+import { listScenes } from 'src/bot/helpers/obswebsocket/scenes';
 
 type Props = {
   opts: {
@@ -59,6 +63,30 @@ export default defineComponent({
       } else {
         await obs.connect({ address, password });
       }
+
+      socket.on('integration::obswebsocket::trigger', async (tasks: OBSWebsocketInterface['simpleModeTasks'] | string, cb: any) => {
+        console.log('integration::obswebsocket::trigger', tasks);
+        try {
+          await taskRunner(obs, tasks);
+        } catch (e) {
+          console.error(e);
+        } finally {
+          cb();
+        }
+      })
+
+      socket.on('integration::obswebsocket::function', async (fnc: any, cb: any) => {
+        console.debug('integration::obswebsocket::function', fnc);
+        switch(fnc) {
+          case 'getSourcesList':
+            return cb(await getSourcesList(obs))
+          case 'getTypesList':
+            return cb(await getSourceTypesList(obs))
+          case 'listScenes':
+            return cb(await listScenes(obs))
+        }
+        console.error('Unknown function');
+      });
     })
   }
 });

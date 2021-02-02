@@ -15,12 +15,15 @@ const availableActions = {
   'StopReplayBuffer':  stopReplayBuffer,
   'SaveReplayBuffer':  saveReplayBuffer,
   'WaitMs':            (obs: ObsWebSocket, miliseconds: number) => new Promise(resolve => setTimeout(resolve, miliseconds)),
-  'StartRecording':    startRecording,
-  'StopRecording':     stopRecording,
-  'PauseRecording':    pauseRecording,
-  'ResumeRecording':   resumeRecording,
-  'SetMute':           setMute,
-  'SetVolume':         setVolume,
+  'Log':               (obs: ObsWebSocket, logMessage: number) => {
+    (process.env.BUILD === 'web') ? console.error(logMessage) : require('../log').info;
+  },
+  'StartRecording':  startRecording,
+  'StopRecording':   stopRecording,
+  'PauseRecording':  pauseRecording,
+  'ResumeRecording': resumeRecording,
+  'SetMute':         setMute,
+  'SetVolume':       setVolume,
 } as const;
 
 export { availableActions };

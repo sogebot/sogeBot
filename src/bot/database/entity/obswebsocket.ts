@@ -15,12 +15,18 @@ export type simpleModeTaskWaitMS = {
   args: { miliseconds: number; }
 };
 
+export type simpleModeTaskLog = {
+  id: string,
+  event: 'Log',
+  args: { logMessage: string; }
+};
+
 export interface OBSWebsocketInterface {
   id: string;
   name: string;
   advancedMode: boolean;
   advancedModeCode: string;
-  simpleModeTasks: (simpleModeTask<keyof RequestMethodsArgsMap> | simpleModeTaskWaitMS)[];
+  simpleModeTasks: (simpleModeTask<keyof RequestMethodsArgsMap> | simpleModeTaskWaitMS | simpleModeTaskLog)[];
 }
 
 export const OBSWebsocket = new EntitySchema<Readonly<Required<OBSWebsocketInterface>>>({

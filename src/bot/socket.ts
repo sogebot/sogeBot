@@ -10,13 +10,13 @@ import { DAY } from './constants';
 import { Dashboard } from './database/entity/dashboard';
 import { User } from './database/entity/user';
 import {
-  persistent, settings, ui, 
+  persistent, settings, ui,
 } from './decorators';
 import { onLoad } from './decorators/on';
 import { debug } from './helpers/log';
 import { app, ioServer } from './helpers/panel';
 import {
-  check, defaultPermissions, getUserHighestPermission, 
+  check, defaultPermissions, getUserHighestPermission,
 } from './helpers/permissions/';
 import { adminEndpoint, endpoints } from './helpers/socket';
 import { isModerator } from './helpers/user/isModerator';
@@ -101,7 +101,7 @@ const initEndpoints = async(socket: SocketIO, privileges: Unpacked<ReturnType<ty
       const viewerEndpoint = endpointsToInit.find(o => o.type === 'viewer');
       const publicEndpoint = endpointsToInit.find(o => o.type === 'public');
       if (adminEndpointInit && privileges.haveAdminPrivileges) {
-        adminEndpointInit.callback(opts, cb, socket);
+        adminEndpointInit.callback(opts, cb ?? socket, socket);
         return;
       } else if (!viewerEndpoint && !publicEndpoint) {
         debug('sockets', `User dont have admin access to ${socket.nsp.name}`);
@@ -111,7 +111,7 @@ const initEndpoints = async(socket: SocketIO, privileges: Unpacked<ReturnType<ty
       }
 
       if (viewerEndpoint && privileges.haveViewerPrivileges) {
-        viewerEndpoint.callback(opts, cb, socket);
+        viewerEndpoint.callback(opts, cb ?? socket, socket);
         return;
       } else if (!publicEndpoint) {
         debug('sockets', `User dont have viewer access to ${socket.nsp.name}`);
@@ -120,7 +120,7 @@ const initEndpoints = async(socket: SocketIO, privileges: Unpacked<ReturnType<ty
         return;
       }
 
-      publicEndpoint.callback(opts, cb, socket);
+      publicEndpoint.callback(opts, cb ?? socket, socket);
     });
   }
 };

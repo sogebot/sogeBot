@@ -4,7 +4,6 @@ import type ObsWebSocket from 'obs-websocket-js';
 import safeEval from 'safe-eval';
 
 import { OBSWebsocketInterface, simpleModeTaskWaitMS } from '../../database/entity/obswebsocket';
-import { info } from '../log';
 import { setImmediateAwait } from '../setImmediateAwait';
 import { availableActions } from './actions';
 
@@ -29,13 +28,18 @@ const taskRunner = async (obs: ObsWebSocket, tasks: OBSWebsocketInterface['simpl
         waitMs: (ms: number) => {
           return new Promise((resolve) => setTimeout(resolve, ms));
         },
-        log: info,
+        // we are using error on code so it will be seen in OBS Log Viewer
+        log: (process.env.BUILD === 'web') ? console.error : require('../log').info,
       });
     } else {
       for (const task of tasks) {
         let args;
         const event = task.event as keyof typeof availableActions;
         switch(event) {
+          case 'Log':
+            args = task.args as any;
+            await availableActions[event](obs, args.logMessage);
+            break;
           case 'WaitMs':
             args = task.args as simpleModeTaskWaitMS['args'];
             await availableActions[event](obs, args.miliseconds);

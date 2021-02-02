@@ -73,6 +73,19 @@
               </b-col>
             </b-row>
           </b-col>
+
+          <b-col v-else-if="task.event === 'Log'">
+            <b-row style="align-items: flex-end;">
+              <b-col>
+                <label-inside>{{translate('registry.obswebsocket.Log.name')}}</label-inside>
+                <b-input v-model.trim="task.args.logMessage"/>
+              </b-col>
+              <b-col cols="auto">
+                <b-btn variant="danger" @click="deleteAction(index)">{{translate('dialog.buttons.delete')}}</b-btn>
+              </b-col>
+            </b-row>
+          </b-col>
+
           <b-col v-else-if="task.event === 'WaitMs'">
             <b-row style="align-items: flex-end;">
               <b-col>
@@ -84,6 +97,7 @@
               </b-col>
             </b-row>
           </b-col>
+
           <b-col v-else-if="
             [ 'StartReplayBuffer', 'StopReplayBuffer', 'SaveReplayBuffer',
               'StartRecording', 'StopRecording', 'PauseRecording', 'ResumeRecording' ].includes(task.event)">

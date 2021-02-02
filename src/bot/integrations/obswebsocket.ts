@@ -9,8 +9,11 @@ import {
   error, info, warning,
 } from '../helpers/log';
 import { listScenes } from '../helpers/obswebsocket/scenes';
-import { getSourcesList, getSourceTypesList } from '../helpers/obswebsocket/sources';
+import {
+  getSourcesList, getSourceTypesList, Source, Type, 
+} from '../helpers/obswebsocket/sources';
 import { taskRunner } from '../helpers/obswebsocket/taskrunner';
+import { ioServer } from '../helpers/panel';
 import { adminEndpoint } from '../helpers/socket';
 import Integration from './_interface';
 
@@ -138,7 +141,40 @@ class OBSWebsocket extends Integration {
 
     adminEndpoint(this.nsp, 'integration::obswebsocket::listSources', async (cb) => {
       try {
-        cb(null, await getSourcesList(obs), await getSourceTypesList(obs));
+        const availableSources = this.accessBy === 'direct'
+          ? await getSourcesList(obs)
+          : new Promise((resolve: (value: Source[]) => void) => {
+            const resolveSources = (sources: Source[]) => {
+              resolve(sources);
+            };
+
+            // we need to send on all sockets on /integrations/obswebsocket
+            const sockets = ioServer?.of('/integrations/obswebsocket').sockets;
+            if (sockets) {
+              for (const socket of sockets.values()) {
+                socket.emit('integration::obswebsocket::function', 'getSourcesList', resolveSources);
+              }
+            }
+            setTimeout(() => resolve([]), 10000);
+          });
+
+        const availableTypes = this.accessBy === 'direct'
+          ? await getSourceTypesList(obs)
+          : new Promise((resolve: (value: Type[]) => void) => {
+            const resolveTypes = (type: Type[]) => {
+              resolve(type);
+            };
+
+            // we need to send on all sockets on /integrations/obswebsocket
+            const sockets = ioServer?.of('/integrations/obswebsocket').sockets;
+            if (sockets) {
+              for (const socket of sockets.values()) {
+                socket.emit('integration::obswebsocket::function', 'getTypesList', resolveTypes);
+              }
+            }
+            setTimeout(() => resolve([]), 10000);
+          });
+        cb(null, await availableSources, await availableTypes);
       } catch (e) {
         cb(e.message, [], []);
       }
@@ -146,14 +182,43 @@ class OBSWebsocket extends Integration {
 
     adminEndpoint(this.nsp, 'integration::obswebsocket::listScene', async (cb) => {
       try {
-        cb(null, await listScenes(obs));
+        const availableScenes = this.accessBy === 'direct'
+          ? await listScenes(obs)
+          : new Promise((resolve: (value: OBSWebSocket.Scene[]) => void) => {
+            const resolveScenes = (scenes: OBSWebSocket.Scene[]) => {
+              resolve(scenes);
+            };
+
+            // we need to send on all sockets on /integrations/obswebsocket
+            const sockets = ioServer?.of('/integrations/obswebsocket').sockets;
+            if (sockets) {
+              for (const socket of sockets.values()) {
+                socket.emit('integration::obswebsocket::function', 'listScenes', resolveScenes);
+              }
+            }
+            setTimeout(() => resolve([]), 10000);
+          });
+        cb(null, await availableScenes);
       } catch (e) {
         cb(e.message, []);
       }
     });
     adminEndpoint(this.nsp, 'integration::obswebsocket::test', async (tasks, cb) => {
       try {
-        await taskRunner(obs, tasks);
+        if (this.accessBy === 'direct') {
+          await taskRunner(obs, tasks);
+        } else {
+          await new Promise((resolve, reject) => {
+            // we need to send on all sockets on /integrations/obswebsocket
+            const sockets = ioServer?.of('/integrations/obswebsocket').sockets;
+            if (sockets) {
+              for (const socket of sockets.values()) {
+                socket.emit('integration::obswebsocket::trigger', tasks, () => resolve(true));
+              }
+            }
+            setTimeout(() => reject('Test timed out. Please check if your overlay is opened.'), 10000);
+          });
+        }
         cb(null);
       } catch (e) {
         cb(e.stack);
