@@ -1,12 +1,12 @@
 import { createHash } from 'crypto';
-import safeEval from 'safe-eval';
 
 import type ObsWebSocket from 'obs-websocket-js';
+import safeEval from 'safe-eval';
 
 import { OBSWebsocketInterface, simpleModeTaskWaitMS } from '../../database/entity/obswebsocket';
+import { info } from '../log';
 import { setImmediateAwait } from '../setImmediateAwait';
 import { availableActions } from './actions';
-import { info } from '../log';
 
 const runningTasks: string[] = [];
 
@@ -27,7 +27,7 @@ const taskRunner = async (obs: ObsWebSocket, tasks: OBSWebsocketInterface['simpl
       await safeEval(toEval, {
         obs,
         waitMs: (ms: number) => {
-          return new Promise((resolve) => setTimeout(resolve, ms))
+          return new Promise((resolve) => setTimeout(resolve, ms));
         },
         log: info,
       });
@@ -43,6 +43,14 @@ const taskRunner = async (obs: ObsWebSocket, tasks: OBSWebsocketInterface['simpl
           case 'SetCurrentScene':
             args = task.args as any;
             await availableActions[event](obs, args.sceneName);
+            break;
+          case 'SetMute':
+            args = task.args as any;
+            await availableActions[event](obs, args.source, args.mute);
+            break;
+          case 'SetVolume':
+            args = task.args as any;
+            await availableActions[event](obs, args.source, args.volume, args.useDecibel);
             break;
           default:
             await availableActions[event](obs);

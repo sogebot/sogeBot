@@ -9,6 +9,7 @@ import {
   error, info, warning,
 } from '../helpers/log';
 import { listScenes } from '../helpers/obswebsocket/scenes';
+import { getSourcesList, getSourceTypesList } from '../helpers/obswebsocket/sources';
 import { taskRunner } from '../helpers/obswebsocket/taskrunner';
 import { adminEndpoint } from '../helpers/socket';
 import Integration from './_interface';
@@ -133,6 +134,14 @@ class OBSWebsocket extends Integration {
     adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
       await getRepository(OBSWebsocketEntity).delete({ id: String(id) });
       cb(null);
+    });
+
+    adminEndpoint(this.nsp, 'integration::obswebsocket::listSources', async (cb) => {
+      try {
+        cb(null, await getSourcesList(obs), await getSourceTypesList(obs));
+      } catch (e) {
+        cb(e.message, [], []);
+      }
     });
 
     adminEndpoint(this.nsp, 'integration::obswebsocket::listScene', async (cb) => {

@@ -96,9 +96,60 @@
               </b-col>
             </b-row>
           </b-col>
+
+          <b-col v-else-if="task.event === 'SetMute'">
+            <b-row style="align-items: flex-end;">
+              <b-col>
+                <label-inside>{{translate('registry.obswebsocket.SetMute.name')}}</label-inside>
+                <b-input-group>
+                  <b-select v-model="task.args.source" :options="availableAudioSources">
+                    <template #first>
+                      <b-select-option value="" disabled>-- {{translate('registry.obswebsocket.noSourceSelected')}} --</b-select-option>
+                    </template>
+                  </b-select>
+                  <template #append>
+                    <b-btn :variant="task.args.mute ? 'danger' : 'success'" @click="task.args.mute = !task.args.mute">
+                      {{translate('registry.obswebsocket.' + (task.args.mute ? 'mute' : 'unmute'))}}
+                    </b-btn>
+                  </template>
+                </b-input-group>
+              </b-col>
+              <b-col cols="auto">
+                <b-btn variant="danger" @click="deleteAction(index)">{{translate('dialog.buttons.delete')}}</b-btn>
+              </b-col>
+            </b-row>
+          </b-col>
+
+          <b-col v-else-if="task.event === 'SetVolume'">
+            <b-row style="align-items: flex-end;">
+              <b-col>
+                <label-inside>{{translate('registry.obswebsocket.SetVolume.name')}}</label-inside>
+                <b-input-group>
+                  <b-select v-model="task.args.source" :options="availableAudioSources">
+                    <template #first>
+                      <b-select-option value="" disabled>-- {{translate('registry.obswebsocket.noSourceSelected')}} --</b-select-option>
+                    </template>
+                  </b-select>
+                  <template #append>
+                    <b-input-group append="dB">
+                      <b-input type="number" min="-100" max="0" step="0.1" v-model.number="task.args.volume"/>
+                    </b-input-group>
+                  </template>
+                </b-input-group>
+              </b-col>
+              <b-col cols="auto">
+                <b-btn variant="danger" @click="deleteAction(index)">{{translate('dialog.buttons.delete')}}</b-btn>
+              </b-col>
+            </b-row>
+          </b-col>
+
           <b-col v-else>
-            {{ task }}
-            Unknown task <em>{{task.name}}</em>
+            <b-row style="align-items: flex-end;">
+              <b-col>Unknown task <em>{{task.event}}</em></b-col>
+              <b-col cols="auto">
+                <b-btn variant="danger" @click="deleteAction(index)">{{translate('dialog.buttons.delete')}}</b-btn>
+              </b-col>
+            </b-row>
           </b-col>
         </b-row>
       </template>
@@ -107,7 +158,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted,  watch, getCurrentInstance, onUnmounted } from '@vue/composition-api'
+import { defineComponent, ref, onMounted,  watch, getCurrentInstance, onUnmounted, computed } from '@vue/composition-api'
 import translate from 'src/panel/helpers/translate';
 import shortid from 'shortid';
 
@@ -119,6 +170,7 @@ import 'codemirror/lib/codemirror.css';
 
 import { getSocket } from 'src/panel/helpers/socket';
 import type { OBSWebsocketInterface } from 'src/bot/database/entity/obswebsocket';
+import type { Source, Type } from 'src/bot/helpers/obswebsocket/sources'
 import advancedModeCode from 'src/bot/data/templates/obswebsocket-code.txt';
 
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
@@ -130,7 +182,7 @@ import { validationMixin } from 'vuelidate'
 import { minLength, required } from 'vuelidate/lib/validators'
 import { cloneDeep, get } from 'lodash-es';
 import { EventBus } from 'src/panel/helpers/event-bus';
-import ObsWebSocket from 'obs-websocket-js';
+import type ObsWebSocket from 'obs-websocket-js';
 
 const socket = getSocket('/integrations/obswebsocket');
 
@@ -162,6 +214,16 @@ export default defineComponent({
     const instance = getCurrentInstance()?.proxy;
     const theme = localStorage.getItem('theme') || get(ctx.root.$store.state, 'configuration.core.ui.theme', 'light');
     const availableScenes = ref([] as { value: string; text: string }[])
+    const availableSources = ref([] as Source[])
+    const sourceTypes = ref([] as Type[])
+    let interval = 0;
+
+    const availableAudioSources = computed(() => {
+      const audioTypeId = sourceTypes.value.filter(type => type.caps.hasAudio).map(type => type.typeId)
+      return availableSources.value
+        .filter(source => audioTypeId.includes(source.typeId))
+        .map(source => ({value: source.name, text: source.name}))
+    })
 
     const editationItem = ref({
       id: ctx.root.$route.params.id || shortid.generate(),
@@ -188,9 +250,18 @@ export default defineComponent({
       }
     }, { deep: true });
 
+    onUnmounted(() => {
+      clearInterval(interval);
+    })
+
     onMounted(() => {
       loadEditationItem();
-      refreshScenes(true);
+      refreshScenes();
+      interval = window.setInterval(() => {
+        refreshScenes();
+        refreshSources();
+      }, 1000)
+
       ctx.emit('update:pending', false);
       EventBus.$on('registry::obswebsocket::save::' + editationItem.value.id, () => {
         console.debug('Save event received - registry::obswebsocket::save::' + editationItem.value.id);
@@ -264,30 +335,45 @@ export default defineComponent({
       const match = addActionRegex.exec(availableActions[actionKey].toString());
       const argsList = match?.groups?.arguments.split(',').map(o => o.trim()) || [];
       const args = argsList.reduce((prev, cur) => {
-        let value: number|string = '';
+        let value: number|string|boolean = '';
         switch(cur) {
           case 'miliseconds':
             value = 1000;
             break;
+          case 'mute':
+            value = false;
+            break;
+          case 'volume':
+            value = 0;
+            break;
+          case 'useDecibel':
+            value = true;
+            break;
         }
-          return { [cur]: value, ...prev }
+        return { [cur]: value, ...prev }
       }, {});
       editationItem.value.simpleModeTasks.push({
         id: shortid.generate(),
         event: actionKey,
         args: args as any,
       })
-      if (actionKey === 'SetCurrentScene') {
-        refreshScenes();
-      }
     }
 
-    const refreshScenes = (isQuiet = false) => {
+    const refreshSources = () => {
+      socket.emit('integration::obswebsocket::listSources', (err: string | null, sources: any, types: any) => {
+        if (err) {
+          console.error(err)
+        } else {
+          availableSources.value = sources;
+          sourceTypes.value = types;
+        }
+      })
+    }
+
+    const refreshScenes = () => {
       socket.emit('integration::obswebsocket::listScene', (err: string | null, listScene: ObsWebSocket.Scene[]) => {
         if (err) {
-          if (!isQuiet) {
-            error(err)
-          }
+          console.error(err)
         } else {
           availableScenes.value = listScene.map((scene) => {
             return {
@@ -345,7 +431,10 @@ export default defineComponent({
       theme,
 
       availableScenes,
+      availableSources,
       availableActions,
+      availableAudioSources,
+      sourceTypes,
     }
   }
 })
