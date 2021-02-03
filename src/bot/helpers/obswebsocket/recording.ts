@@ -46,4 +46,6 @@ const resumeRecording = (obs: OBSWebSocket) => {
   });
 };
 
-export { startRecording, stopRecording, pauseRecording, resumeRecording }
+export {
+  startRecording, stopRecording, pauseRecording, resumeRecording, 
+};
