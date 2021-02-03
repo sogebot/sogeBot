@@ -2,14 +2,13 @@
   <div class="px-3 py-2">
     <b-form>
       <b-form-group :key="'name' + editationItem.id">
-        <label-inside>{{ translate('registry.obswebsocket.name.name') }}</label-inside>
+        <label-inside>{{ translate('integrations.obswebsocket.name.name') }}</label-inside>
         <template v-if="editationItem">
           <b-input-group>
             <b-form-input
               id="name"
               v-model="editationItem.name"
               type="text"
-              :placeholder="translate('registry.obswebsocket.name.placeholder')"
               @input="$v.editationItem.name.$touch()"
               :state="$v.editationItem.name.$invalid && $v.editationItem.name.$dirty ? false : null"
             ></b-form-input>
@@ -37,7 +36,7 @@
       <template v-else>
         <b-row no-gutters>
           <b-col>
-            <title-divider>{{ translate('registry.obswebsocket.actions') }}</title-divider>
+            <title-divider>{{ translate('integrations.obswebsocket.actions') }}</title-divider>
           </b-col>
           <b-col md="auto" sm="12" align-self="end" class="text-right">
             <div class="h-auto w-auto" style="flex-shrink: 0;">
@@ -51,7 +50,7 @@
                   <fa icon="plus"></fa>
                 </template>
                 <b-dropdown-item v-for="action of Object.keys(availableActions)" @click="addAction(action)" :key="action">
-                  {{ translate('registry.obswebsocket.actions.' + action) }}
+                  {{ translate('integrations.obswebsocket.' + action + '.name') }}
                 </b-dropdown-item>
               </b-dropdown>
             </div>
@@ -61,10 +60,10 @@
           <b-col v-if="task.event === 'SetCurrentScene'">
             <b-row style="align-items: flex-end;">
               <b-col>
-                <label-inside>{{translate('registry.obswebsocket.SetCurrentScene.name')}}</label-inside>
+                <label-inside>{{translate('integrations.obswebsocket.SetCurrentScene.name')}}</label-inside>
                 <b-select v-model="task.args.sceneName" :options="availableScenes">
                   <template #first>
-                    <b-select-option value="" disabled>-- {{translate('registry.obswebsocket.noSceneSelected')}} --</b-select-option>
+                    <b-select-option value="" disabled>-- {{translate('integrations.obswebsocket.noSceneSelected')}} --</b-select-option>
                   </template>
                 </b-select>
               </b-col>
@@ -77,7 +76,7 @@
           <b-col v-else-if="task.event === 'Log'">
             <b-row style="align-items: flex-end;">
               <b-col>
-                <label-inside>{{translate('registry.obswebsocket.Log.name')}}</label-inside>
+                <label-inside>{{translate('integrations.obswebsocket.Log.name')}}</label-inside>
                 <b-input v-model.trim="task.args.logMessage"/>
               </b-col>
               <b-col cols="auto">
@@ -89,7 +88,7 @@
           <b-col v-else-if="task.event === 'WaitMs'">
             <b-row style="align-items: flex-end;">
               <b-col>
-                <label-inside>{{translate('registry.obswebsocket.WaitMs.name')}}</label-inside>
+                <label-inside>{{translate('integrations.obswebsocket.WaitMs.name')}}</label-inside>
                 <b-input type="number" min="0" v-model.number="task.args.miliseconds"/>
               </b-col>
               <b-col cols="auto">
@@ -103,7 +102,7 @@
               'StartRecording', 'StopRecording', 'PauseRecording', 'ResumeRecording' ].includes(task.event)">
             <b-row style="align-items: center">
               <b-col>
-                <label-inside>{{translate('registry.obswebsocket.' + task.event + '.name')}}</label-inside>
+                <label-inside>{{translate('integrations.obswebsocket.' + task.event + '.name')}}</label-inside>
               </b-col>
               <b-col cols="auto">
                 <b-btn variant="danger" @click="deleteAction(index)">{{translate('dialog.buttons.delete')}}</b-btn>
@@ -114,16 +113,16 @@
           <b-col v-else-if="task.event === 'SetMute'">
             <b-row style="align-items: flex-end;">
               <b-col>
-                <label-inside>{{translate('registry.obswebsocket.SetMute.name')}}</label-inside>
+                <label-inside>{{translate('integrations.obswebsocket.SetMute.name')}}</label-inside>
                 <b-input-group>
                   <b-select v-model="task.args.source" :options="availableAudioSources">
                     <template #first>
-                      <b-select-option value="" disabled>-- {{translate('registry.obswebsocket.noSourceSelected')}} --</b-select-option>
+                      <b-select-option value="" disabled>-- {{translate('integrations.obswebsocket.noSourceSelected')}} --</b-select-option>
                     </template>
                   </b-select>
                   <template #append>
                     <b-btn :variant="task.args.mute ? 'danger' : 'success'" @click="task.args.mute = !task.args.mute">
-                      {{translate('registry.obswebsocket.' + (task.args.mute ? 'mute' : 'unmute'))}}
+                      {{translate('integrations.obswebsocket.' + (task.args.mute ? 'mute' : 'unmute'))}}
                     </b-btn>
                   </template>
                 </b-input-group>
@@ -137,11 +136,11 @@
           <b-col v-else-if="task.event === 'SetVolume'">
             <b-row style="align-items: flex-end;">
               <b-col>
-                <label-inside>{{translate('registry.obswebsocket.SetVolume.name')}}</label-inside>
+                <label-inside>{{translate('integrations.obswebsocket.SetVolume.name')}}</label-inside>
                 <b-input-group>
                   <b-select v-model="task.args.source" :options="availableAudioSources">
                     <template #first>
-                      <b-select-option value="" disabled>-- {{translate('registry.obswebsocket.noSourceSelected')}} --</b-select-option>
+                      <b-select-option value="" disabled>-- {{translate('integrations.obswebsocket.noSourceSelected')}} --</b-select-option>
                     </template>
                   </b-select>
                   <template #append>

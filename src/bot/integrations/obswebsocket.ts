@@ -2,19 +2,25 @@ import OBSWebSocket from 'obs-websocket-js';
 import { getRepository } from 'typeorm';
 
 import { SECOND } from '../constants';
-import { OBSWebsocket as OBSWebsocketEntity } from '../database/entity/obswebsocket';
-import { settings, ui } from '../decorators';
+import { OBSWebsocket as OBSWebsocketEntity, OBSWebsocketInterface } from '../database/entity/obswebsocket';
+import {
+  command, default_permission, settings, ui, 
+} from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
+import Expects from '../expects';
 import {
   error, info, warning,
 } from '../helpers/log';
 import { listScenes } from '../helpers/obswebsocket/scenes';
 import {
-  getSourcesList, getSourceTypesList, Source, Type, 
+  getSourcesList, getSourceTypesList, Source, Type,
 } from '../helpers/obswebsocket/sources';
 import { taskRunner } from '../helpers/obswebsocket/taskrunner';
 import { ioServer } from '../helpers/panel';
+import { ParameterError } from '../helpers/parameterError';
+import { defaultPermissions } from '../helpers/permissions';
 import { adminEndpoint } from '../helpers/socket';
+import { translate } from '../translate';
 import Integration from './_interface';
 
 const obs = new OBSWebSocket();
@@ -203,29 +209,64 @@ class OBSWebsocket extends Integration {
         cb(e.message, []);
       }
     });
+    adminEndpoint(this.nsp, 'integration::obswebsocket::getCommand', (cb) => {
+      cb(obsws.getCommand('!obsws run'));
+    });
+
     adminEndpoint(this.nsp, 'integration::obswebsocket::test', async (tasks, cb) => {
       try {
-        if (this.accessBy === 'direct') {
-          await taskRunner(obs, tasks);
-        } else {
-          await new Promise((resolve, reject) => {
-            // we need to send on all sockets on /integrations/obswebsocket
-            const sockets = ioServer?.of('/integrations/obswebsocket').sockets;
-            if (sockets) {
-              for (const socket of sockets.values()) {
-                socket.emit('integration::obswebsocket::trigger', tasks, () => resolve(true));
-              }
-            }
-            setTimeout(() => reject('Test timed out. Please check if your overlay is opened.'), 10000);
-          });
-        }
+        await this.triggerTask(tasks);
         cb(null);
       } catch (e) {
         cb(e.stack);
       }
     });
+  }
 
+  async triggerTask(tasks: OBSWebsocketInterface['simpleModeTasks'] | string) {
+    if (this.accessBy === 'direct') {
+      await taskRunner(obs, tasks);
+    } else {
+      await new Promise((resolve, reject) => {
+        // we need to send on all sockets on /integrations/obswebsocket
+        const sockets = ioServer?.of('/integrations/obswebsocket').sockets;
+        if (sockets) {
+          for (const socket of sockets.values()) {
+            socket.emit('integration::obswebsocket::trigger', tasks, () => resolve(true));
+          }
+        }
+        setTimeout(() => reject('Test timed out. Please check if your overlay is opened.'), 10000);
+      });
+    }
+  }
+
+  @command('!obsws run')
+  @default_permission(defaultPermissions.CASTERS)
+  async runTask(opts: CommandOptions) {
+    try {
+      const [ taskId ] = new Expects(opts.parameters).string().toArray();
+      const task = await getRepository(OBSWebsocketEntity).findOneOrFail(taskId);
+
+      info(`OBSWEBSOCKETS: User ${opts.sender.username}#${opts.sender.userId} triggered task ${task.id}`);
+      await this.triggerTask(task.advancedMode ? task.advancedModeCode : task.simpleModeTasks);
+
+      return [];
+    } catch (err) {
+      const isEntityNotFound = err.name === 'EntityNotFound';
+      const isParameterError = (err instanceof ParameterError);
+
+      if (isEntityNotFound) {
+        const match = new RegExp('matching: \"(.*)\"').exec(err.message);
+        return [{ response: translate('integrations.obswebsocket.runTask.EntityNotFound').replace('$id', match ? match[1] : 'n/a'), ...opts }];
+      } else if (isParameterError) {
+        return [{ response: translate('integrations.obswebsocket.runTask.ParameterError'), ...opts }];
+      } else {
+        error(err.stack ?? err);
+        return [{ response: translate('integrations.obswebsocket.runTask.UnknownError'), ...opts }];
+      }
+    }
   }
 }
 
-export default new OBSWebsocket();
+const obsws = new OBSWebsocket();
+export default obsws;

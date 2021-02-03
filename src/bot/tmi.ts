@@ -2,7 +2,7 @@ import util from 'util';
 
 import { isNil } from 'lodash';
 import TwitchJs, {
-  BaseMessage, HostTargetMessage, Message, PrivateMessages, UserNoticeMessages, UserStateTags, 
+  BaseMessage, HostTargetMessage, Message, PrivateMessages, UserNoticeMessages, UserStateTags,
 } from 'twitch-js';
 import { getRepository } from 'typeorm';
 
@@ -15,31 +15,31 @@ import { User, UserBitInterface } from './database/entity/user';
 import { settings, ui } from './decorators';
 import { command, default_permission } from './decorators';
 import {
-  getFunctionList, onChange, onLoad, 
+  getFunctionList, onChange, onLoad,
 } from './decorators/on';
 import Expects from './expects';
 import { isStreamOnline, stats } from './helpers/api';
 import {
-  getBotSender, getOwner, prepare, 
+  getBotSender, getOwner, prepare,
 } from './helpers/commons';
 import { sendMessage } from './helpers/commons/sendMessage';
 import { dayjs } from './helpers/dayjs';
 import { eventEmitter } from './helpers/events';
 import { getLocalizedName } from './helpers/getLocalized';
 import {
-  triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub, 
+  triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub,
 } from './helpers/interface/triggers';
 import { isDebugEnabled } from './helpers/log';
 import {
-  chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning, whisperIn, 
+  chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning, whisperIn,
 } from './helpers/log';
 import { generalChannel } from './helpers/oauth/generalChannel';
 import {
-  avgResponse, linesParsedIncrement, setStatus, 
+  avgResponse, linesParsedIncrement, setStatus,
 } from './helpers/parser';
 import { defaultPermissions } from './helpers/permissions/';
 import {
-  globalIgnoreListExclude, ignorelist, sendWithMe, setMuteStatus, showWithAt, tmiEmitter, 
+  globalIgnoreListExclude, ignorelist, sendWithMe, setMuteStatus, showWithAt, tmiEmitter,
 } from './helpers/tmi/';
 import { isOwner } from './helpers/user';
 import { isBot } from './helpers/user/isBot';

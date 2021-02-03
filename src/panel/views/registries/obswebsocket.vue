@@ -38,14 +38,14 @@
     <loading v-if="state.loading === $state.progress" />
     <div v-else>
       <b-alert show variant="danger" v-if="state.loading === $state.success && filtered.length === 0 && search.length > 0">
-        <fa icon="search"/> <span v-html="translate('registry.obswebsocket.emptyAfterSearch').replace('$search', search)"/>
+        <fa icon="search"/> <span v-html="translate('integrations.obswebsocket.emptyAfterSearch').replace('$search', search)"/>
       </b-alert>
       <b-alert show v-else-if="state.loading === $state.success && items.length === 0">
-        {{translate('registry.obswebsocket.empty')}}
+        {{translate('integrations.obswebsocket.empty')}}
       </b-alert>
       <b-table v-else :fields="fields" :items="filtered" small hover striped style="cursor: pointer;">
         <template v-slot:cell(command)="data">
-          <span class="variable" v-b-tooltip.hover :title="copied ? 'Copied!': 'Copy to clipboard'" @click="copy('!something something ' + data.item.id)">!something something {{data.item.id}}</span>
+          <span class="variable" v-b-tooltip.hover :title="copied ? 'Copied!': 'Copy to clipboard'" @click="copy(command + ' ' + data.item.id)">{{command}} {{data.item.id}}</span>
         </template>
         <template v-slot:cell(buttons)="data">
           <div class="text-right">
@@ -92,6 +92,7 @@ export default defineComponent({
     const isSidebarVisible = ref(false);
     const sidebarSlideEnabled = ref(true);
 
+    const command = ref('!obsws run');
     const copied = ref(false);
     const search = ref('');
     const items = ref([] as OBSWebsocketInterface[]);
@@ -118,7 +119,7 @@ export default defineComponent({
     const fields = [
       { key: 'name', label: translate('timers.dialog.name'), sortable: true },
       // virtual attributes
-      { key: 'command', label: translate('obswebsocket.command') },
+      { key: 'command', label: translate('integrations.obswebsocket.command') },
       { key: 'buttons', label: '' },
     ];
 
@@ -142,6 +143,9 @@ export default defineComponent({
     })
 
     const refresh = () => {
+      socket.emit('integration::obswebsocket::getCommand', (cmd: string) => {
+        command.value = cmd;
+      })
       socket.emit('generic::getAll', (err: string | null, _items: OBSWebsocketInterface[]) => {
         items.value = _items;
         state.value.loading = ButtonStates.success;
@@ -204,6 +208,7 @@ export default defineComponent({
       refresh,
       copied,
       copy,
+      command,
 
       isSidebarVisibleChange,
       isSidebarVisible,
