@@ -1,8 +1,8 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Статус",
     "accessBy": {
-      "title": "Access by",
+      "title": "Доступ к",
       "help": "Direct - connect directly from a bot | Overlay - connect via overlay browser source"
     },
     "address": "Address",
