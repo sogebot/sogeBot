@@ -44,19 +44,19 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator';
-import { getSocket } from 'src/panel/helpers/socket';
-import JsonViewer from 'vue-json-viewer'
-import { PollInterface } from '../../bot/database/entity/poll';
-import { dayjs } from 'src/bot/helpers/dayjs';
+import JsonViewer from 'vue-json-viewer';
+import {
+  Component, Vue, Watch, 
+} from 'vue-property-decorator';
 
-@Component({
-  components: {
-    JsonViewer,
-  },
-})
+import { dayjs } from 'src/bot/helpers/dayjs';
+import { getSocket } from 'src/panel/helpers/socket';
+
+import { PollInterface } from '../../bot/database/entity/poll';
+
+@Component({ components: { JsonViewer } })
 export default class PollsOverlay extends Vue {
-  dayjs = dayjs
+  dayjs = dayjs;
   socket = getSocket('/overlays/polls', true);
   currentVote: any = null;
   votes: any[] = [];
@@ -65,10 +65,10 @@ export default class PollsOverlay extends Vue {
   cachedVotes: any[] = [];
   voteCommand = '!vote';
   settings = {
-    display: 'light',
+    display:             'light',
     hideAfterInactivity: true,
-    inativityTime: 5000,
-    align: 'top'
+    inativityTime:       5000,
+    align:               'top',
   };
   interval: any[] = [];
 
@@ -79,9 +79,9 @@ export default class PollsOverlay extends Vue {
   }
 
   created () {
-    this.refresh()
+    this.refresh();
     this.interval.push(setInterval(() => this.currentTime = Date.now(), 100));
-    this.socket.emit('getVoteCommand', (cmd: string) => this.voteCommand = cmd)
+    this.socket.emit('getVoteCommand', (cmd: string) => this.voteCommand = cmd);
   }
 
   get inactivityTime() {
@@ -89,40 +89,48 @@ export default class PollsOverlay extends Vue {
   }
 
   get activeTime () {
-    return new Date(this.currentVote.openedAt).getTime()
+    return new Date(this.currentVote.openedAt).getTime();
   }
   get totalVotes () {
-    let votes = 0
+    let votes = 0;
     for (let i = 0, length = this.votes.length; i < length; i++) {
-      votes += this.votes[i].votes
+      votes += this.votes[i].votes;
     }
-    return votes
+    return votes;
   }
 
   @Watch('votes')
   votesWatcher (val: any[], old: any[]) {
     if (this.currentVote && this.currentVote.options !== 'undefined') {
-      for (let idx of Object.keys(this.currentVote.options)) {
-        let count = 0
-        let cachedCount = 0
-        for (let v of val.filter(o => String(o.option) === idx)) count += v.votes
-        for (let v of this.cachedVotes.filter(o => String(o.option) === idx)) cachedCount += v.votes
-        if (cachedCount !== count) this.lastUpdatedAt = Date.now() // there is some change
+      for (const idx of Object.keys(this.currentVote.options)) {
+        let count = 0;
+        let cachedCount = 0;
+        for (const v of val.filter(o => String(o.option) === idx)) {
+          count += v.votes;
+        }
+        for (const v of this.cachedVotes.filter(o => String(o.option) === idx)) {
+          cachedCount += v.votes;
+        }
+        if (cachedCount !== count) {
+          this.lastUpdatedAt = Date.now();
+        } // there is some change
       }
-      this.cachedVotes = val // update cached votes
+      this.cachedVotes = val; // update cached votes
     } else {
-      this.cachedVotes = []
+      this.cachedVotes = [];
     }
   }
 
   getTheme (theme: string) {
-    return theme.replace(/ /g, '_').toLowerCase().replace(/\W/g, '')
+    return theme.replace(/ /g, '_').toLowerCase().replace(/\W/g, '');
   }
 
   getPercentage (index: number, toFixed: number) {
-    let votes = 0
+    let votes = 0;
     for (let i = 0, length = this.votes.length; i < length; i++) {
-      if (this.votes[i].option === index) votes += this.votes[i].votes
+      if (this.votes[i].option === index) {
+        votes += this.votes[i].votes;
+      }
     }
     return Number((100 / this.totalVotes) * votes || 0).toFixed(toFixed || 0);
   }
@@ -131,13 +139,13 @@ export default class PollsOverlay extends Vue {
     this.socket.emit('data', (cb: PollInterface, votes: any[], settings: { display: string, hideAfterInactivity: boolean, inativityTime: number, align: string }) => {
       // force show if new vote
       if (this.currentVote === null) {
-        this.lastUpdatedAt = Date.now()
+        this.lastUpdatedAt = Date.now();
       }
-      this.votes = votes
-      this.currentVote = cb
-      this.settings = settings
-      setTimeout(() => this.refresh(), 5000)
-    })
+      this.votes = votes;
+      this.currentVote = cb;
+      this.settings = settings;
+      setTimeout(() => this.refresh(), 5000);
+    });
   }
 }
 </script>

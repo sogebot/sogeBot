@@ -77,22 +77,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch, onUnmounted, computed } from '@vue/composition-api'
-import Vue from 'vue'
-import VuePlyr from 'vue-plyr'
-import 'vue-plyr/dist/vue-plyr.css'
-
-import { EventBus } from 'src/panel/helpers/event-bus';
-import { isEqual } from 'lodash-es'
-import { getSocket } from 'src/panel/helpers/socket';
-
-Vue.use(VuePlyr, {
-  plyr: {}
-})
-
-import translate from 'src/panel/helpers/translate';
+import {
+  computed, defineComponent, onMounted, onUnmounted, ref, watch,
+} from '@vue/composition-api';
+import { isEqual } from 'lodash-es';
+import Vue from 'vue';
+import VuePlyr from 'vue-plyr';
+import 'vue-plyr/dist/vue-plyr.css';
 
 import type { SongRequestInterface } from 'src/bot/database/entity/song';
+import { EventBus } from 'src/panel/helpers/event-bus';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
+
+Vue.use(VuePlyr, { plyr: {} });
 
 type Props = {
   popout: boolean;
@@ -114,34 +112,34 @@ export default defineComponent({
     const requests = ref([] as SongRequestInterface[]);
     const playerRef = ref(null as null | any);
     const player = computed(() => {
-      return playerRef.value ? playerRef.value.player : null
+      return playerRef.value ? playerRef.value.player : null;
     });
     const updateTime = ref(Date.now());
     const intervals = [] as number[];
 
     watch(currentTag, (val) => socket.emit('set.playlist.tag', val));
     watch(autoplay, async (val) => {
-      await waitForPlayerReady()
+      await waitForPlayerReady();
       player.value.autoplay = val;
       if (!val) {
-        player.value.pause()
+        player.value.pause();
       } else {
-        player.value.play()
+        player.value.play();
       }
-    })
+    });
 
     const waitForPlayerReady = () => new Promise<void>(resolve => {
       const loop = () => {
         if (player.value && player.value.ready) {
-          player.value.off('timeupdate')
-          player.value.off('ended')
-          player.value.on('timeupdate', (event: any) => videoTimeUpdated(event))
-          player.value.on('ended', () => videoEnded())
+          player.value.off('timeupdate');
+          player.value.off('ended');
+          player.value.on('timeupdate', (event: any) => videoTimeUpdated(event));
+          player.value.on('ended', () => videoEnded());
           resolve();
         } else {
           setTimeout(() => loop(), 1000);
         }
-      }
+      };
       loop();
     });
 
@@ -151,19 +149,21 @@ export default defineComponent({
       });
       socket.emit('get.playlist.tags', (err: null, tags: string[]) => {
         availableTags.value = tags;
-      })
+      });
     };
 
     const removeSongRequest = (id: string) => {
       if (confirm('Do you want to delete song request ' + requests.value.find(o => String(o.id) === id)?.title + ' from ' + requests.value.find(o => String(o.id) === id)?.username + '?')) {
-        console.log('Removing => ' + id)
-        requests.value = requests.value.filter((o) => String(o.id) !== id)
-        socket.emit('songs::removeRequest', id, () => {})
+        console.log('Removing => ' + id);
+        requests.value = requests.value.filter((o) => String(o.id) !== id);
+        socket.emit('songs::removeRequest', id, () => {
+          return;
+        });
       }
     };
 
     const videoEnded = () => {
-      console.debug('[YTPLAYER.ended] - autoplay ', autoplay.value)
+      console.debug('[YTPLAYER.ended] - autoplay ', autoplay.value);
       if (autoplay.value) {
         next();
       }
@@ -172,7 +172,7 @@ export default defineComponent({
     const videoTimeUpdated = (event: any) => {
       if (autoplay.value && currentSong.value) {
         if (currentSong.value.endTime && event.detail.plyr.currentTime >= currentSong.value.endTime) {
-          next() // go to next if we are at endTime
+          next(); // go to next if we are at endTime
         }
       }
     };
@@ -180,26 +180,28 @@ export default defineComponent({
     const nextAndRemoveFromPlaylist = () => {
       if (currentSong.value) {
         socket.emit('delete.playlist', currentSong.value.id);
-        next()
+        next();
       }
     };
 
     const next = () => {
       if (!waitingForNext.value) {
-        waitingForNext.value = true
-        if (player.value) player.value.pause()
-        socket.emit('next')
+        waitingForNext.value = true;
+        if (player.value) {
+          player.value.pause();
+        }
+        socket.emit('next');
       }
     };
 
     const pause = () => {
-      autoplay.value = false
+      autoplay.value = false;
     };
 
     const play = async () => {
       autoplay.value = true;
       if (currentSong.value === null) {
-        socket.emit('next')
+        socket.emit('next');
       }
     };
 
@@ -212,19 +214,19 @@ export default defineComponent({
         m > 9 ? m : (h ? '0' + m : m || '0'),
         s > 9 ? s : '0' + s,
       ].filter(a => a).join(':');
-    }
+    };
 
     const playThisSong = async (item: any, retry = 0) => {
-      waitingForNext.value = false
+      waitingForNext.value = false;
       if (!item) {
-        currentSong.value = null
-        return
+        currentSong.value = null;
+        return;
       }
 
       if (retry > 10 && currentSong.value && currentSong.value.videoId !== item.videoId) {
         return;
       } else {
-        currentSong.value = item
+        currentSong.value = item;
       }
 
       const waitForPlayer = () => new Promise<void>(resolve => {
@@ -234,7 +236,7 @@ export default defineComponent({
           } else {
             setTimeout(() => loop(), 1000);
           }
-        }
+        };
         loop();
       });
       await waitForPlayer();
@@ -244,19 +246,19 @@ export default defineComponent({
           // change only if something is changed
           if (!player.value.source.includes(item.videoId)) {
             player.value.source = {
-              type: 'video',
+              type:    'video',
               sources: [
                 {
-                  src: item.videoId,
+                  src:      item.videoId,
                   provider: 'youtube',
                 },
               ],
-            }
+            };
           }
           await waitForPlayerReady();
 
           if (item.startTime) {
-            console.log(`Setting start time to ${item.startTime}s`)
+            console.log(`Setting start time to ${item.startTime}s`);
             player.value.forward(item.startTime);
           }
 
@@ -267,20 +269,20 @@ export default defineComponent({
           });
         } catch (e) {
           return setTimeout(() => {
-            console.log('Retrying playThisSong')
-            console.log('If song is not playing and you are on Chrome, disable adblockers or popup blockers - https://github.com/sampotts/plyr/issues/1538')
+            console.log('Retrying playThisSong');
+            console.log('If song is not playing and you are on Chrome, disable adblockers or popup blockers - https://github.com/sampotts/plyr/issues/1538');
             playThisSong(item, retry++); //retry after while
-          }, 1000)
+          }, 1000);
         }
       });
-    }
+    };
 
     onMounted(() => {
       refreshPlaylist();
 
       socket.on('videoID', async (item: any) => {
-        playThisSong(item)
-      })
+        playThisSong(item);
+      });
 
       socket.on('isPlaying', (cb: (isPlaying: boolean) => void) => {
         if (player.value) {
@@ -288,7 +290,7 @@ export default defineComponent({
         } else {
           cb(false);
         }
-      })
+      });
 
       intervals.push(window.setInterval(() => {
         socket.emit('songs::getAllRequests', {}, (err: any, items: SongRequestInterface[]) => {
@@ -297,19 +299,19 @@ export default defineComponent({
               next();
             }
           }
-          requests.value = items
-        })
+          requests.value = items;
+        });
       }, 1000));
 
       intervals.push(window.setInterval(() => {
         refreshPlaylist();
       }, 10000));
-    })
+    });
     onUnmounted(() => {
       for(const interval of intervals) {
         clearInterval(interval);
       }
-    })
+    });
 
     return {
       currentTag,
@@ -332,9 +334,9 @@ export default defineComponent({
 
       translate,
       EventBus,
-    }
-  }
-})
+    };
+  },
+});
 </script>
 
 <style scoped>

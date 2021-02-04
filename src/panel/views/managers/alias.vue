@@ -174,46 +174,48 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, getCurrentInstance, computed, watch } from '@vue/composition-api'
-import { v4 as uuid } from 'uuid';
-
-import { getSocket } from 'src/panel/helpers/socket';
-import { getPermissionName } from 'src/panel/helpers/getPermissionName';
-
-import { AliasInterface } from 'src/bot/database/entity/alias';
-import { PermissionsInterface } from 'src/bot/database/entity/permissions';
-
-import { orderBy, isNil, escapeRegExp } from 'lodash-es';
-import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faKey, faObjectGroup } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
+import {
+  computed, defineComponent, getCurrentInstance, onMounted, ref, watch,
+} from '@vue/composition-api';
+import {
+  escapeRegExp, isNil, orderBy,
+} from 'lodash-es';
+import { v4 as uuid } from 'uuid';
+import { validationMixin } from 'vuelidate';
+import { required } from 'vuelidate/lib/validators';
+
+import { AliasInterface } from 'src/bot/database/entity/alias';
+import { PermissionsInterface } from 'src/bot/database/entity/permissions';
+import { defaultPermissions } from 'src/bot/helpers/permissions/defaultPermissions';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { error } from 'src/panel/helpers/error';
+import { getPermissionName } from 'src/panel/helpers/getPermissionName';
+import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
-library.add(faKey, faObjectGroup);
 
-import { validationMixin } from 'vuelidate'
-import { required } from 'vuelidate/lib/validators'
-import { defaultPermissions } from 'src/bot/helpers/permissions/defaultPermissions';
+library.add(faKey, faObjectGroup);
 
 const socket = {
   permission: getSocket('/core/permissions'),
-  alias: getSocket('/systems/alias'),
+  alias:      getSocket('/systems/alias'),
 } as const;
 
 export default defineComponent({
-  mixins: [ validationMixin ],
+  mixins:     [ validationMixin ],
   components: {
-    'loading': () => import('src/panel/components/loading.vue'),
+    'loading':             () => import('src/panel/components/loading.vue'),
     'font-awesome-layers': FontAwesomeLayers,
-    'label-inside': () => import('src/panel/components/label-inside.vue'),
+    'label-inside':        () => import('src/panel/components/label-inside.vue'),
   },
   validations: {
     editationItem: {
-      alias: {required},
-      command: {required},
-    }
+      alias:   { required },
+      command: { required },
+    },
   },
   setup(props, ctx) {
     const instance = getCurrentInstance()?.proxy;
@@ -232,8 +234,8 @@ export default defineComponent({
     const state = ref({
       loadingAls: ButtonStates.progress,
       loadingPrm: ButtonStates.idle,
-      save: ButtonStates.idle,
-      pending: false,
+      save:       ButtonStates.idle,
+      pending:    false,
     } as {
       loadingAls: number;
       loadingPrm: number;
@@ -249,7 +251,7 @@ export default defineComponent({
       } else {
         state.value.pending = false;
       }
-    })
+    });
     watch(editationItem, (val, oldVal) => {
       if (val !== null && oldVal !== null) {
         state.value.pending = true;
@@ -275,21 +277,27 @@ export default defineComponent({
       return [null, ...new Set(items.value.filter(o => o.group !== null).map(o => o.group).sort())];
     });
     const fItems = computed(() => {
-      if (search.value.length === 0) return items.value
+      if (search.value.length === 0) {
+        return items.value;
+      }
       return items.value.filter((o) => {
-        const isSearchInAlias = !isNil(o.alias.match(new RegExp(escapeRegExp(search.value), 'ig')))
-        const isSearchInCommand = !isNil(o.command.match(new RegExp(escapeRegExp(search.value), 'ig')))
-        return isSearchInAlias || isSearchInCommand
-      })
+        const isSearchInAlias = !isNil(o.alias.match(new RegExp(escapeRegExp(search.value), 'ig')));
+        const isSearchInCommand = !isNil(o.command.match(new RegExp(escapeRegExp(search.value), 'ig')));
+        return isSearchInAlias || isSearchInCommand;
+      });
     });
 
     const fields = [
-      { key: 'alias', label: translate('alias'), sortable: true },
-      { key: 'command', label: translate('command'), sortable: true },
       {
-        key: 'permission',
-        label: translate('permission'),
-        sortable: true,
+        key: 'alias', label: translate('alias'), sortable: true,
+      },
+      {
+        key: 'command', label: translate('command'), sortable: true,
+      },
+      {
+        key:       'permission',
+        label:     translate('permission'),
+        sortable:  true,
         formatter: (value: string, key: string, item: typeof items.value[number]) => {
           return getPermissionName(value, permissions.value);
         },
@@ -305,61 +313,71 @@ export default defineComponent({
         }
         permissions.value = data;
         state.value.loadingPrm = ButtonStates.success;
-      })
+      });
       socket.alias.emit('generic::getAll', (err: string | null, itemsGetAll: typeof items.value) => {
         items.value = orderBy(itemsGetAll, 'alias', 'asc');
         state.value.loadingAls = ButtonStates.success;
-      })
+      });
     };
     const removeGroup = async (group: AliasInterface['group']) => {
       if (confirm('Do you want to delete group ' + group + '?')) {
-        let promises: Promise<void>[] = [];
+        const promises: Promise<void>[] = [];
         for (const item of items.value.filter((o) => o.group === group)) {
           item.group = null;
           promises.push(new Promise<void>(resolve => {
             socket.alias.emit('generic::setById', { id: item.id, item }, () => {
               resolve();
-            })
-          }))
+            });
+          }));
         }
         await Promise.all(promises);
         ctx.root.$forceUpdate();
       }
-    }
+    };
     const updateGroup = (id: string, group: AliasInterface['group']) => {
-      let item = items.value.find((o) => o.id === id)
+      const item = items.value.find((o) => o.id === id);
       if (item) {
-        item.group = group
-        socket.alias.emit('generic::setById', { id: item.id, item }, () => {})
+        item.group = group;
+        socket.alias.emit('generic::setById', { id: item.id, item }, () => {
+          return;
+        });
         ctx.root.$forceUpdate();
       }
-    }
+    };
     const updatePermission = (id: string, permission: string) => {
-      let item = items.value.filter((o) => o.id === id)[0]
-      item.permission = permission
-      socket.alias.emit('generic::setById', { id: item.id, item }, () => {})
+      const item = items.value.filter((o) => o.id === id)[0];
+      item.permission = permission;
+      socket.alias.emit('generic::setById', { id: item.id, item }, () => {
+        return;
+      });
       ctx.root.$forceUpdate();
-    }
+    };
     const linkTo = (item: Required<AliasInterface>) => {
       console.debug('Clicked', item.id);
-      ctx.root.$router.push({ name: 'aliasManagerEdit', params: { id: item.id } }).catch(() => {});
-    }
+      ctx.root.$router.push({ name: 'aliasManagerEdit', params: { id: item.id } }).catch(() => {
+        return;
+      });
+    };
     const newItem = () => {
-      ctx.root.$router.push({ name: 'aliasManagerEdit', params: { id: uuid() } }).catch(() => {});
+      ctx.root.$router.push({ name: 'aliasManagerEdit', params: { id: uuid() } }).catch(() => {
+        return;
+      });
     };
     const update = (item: typeof items.value[number]) => {
-      socket.alias.emit('generic::setById', { id: item.id, item }, () => {})
-    }
+      socket.alias.emit('generic::setById', { id: item.id, item }, () => {
+        return;
+      });
+    };
     const resetModal = () => {
       newGroupName.value = '';
       newGroupNameUpdated.value = false;
-    }
+    };
     const handleOk = (bvModalEvt: Event) => {
       // Prevent modal from closing
-      bvModalEvt.preventDefault()
+      bvModalEvt.preventDefault();
       // Trigger submit handler
-      handleSubmit()
-    }
+      handleSubmit();
+    };
     const handleSubmit = () => {
       if (!newGroupNameValidity.value) {
         return;
@@ -368,13 +386,13 @@ export default defineComponent({
       updateGroup(newGroupForAliasId.value, newGroupName.value);
       // Hide the modal manually
       ctx.root.$nextTick(() => {
-        instance?.$bvModal.hide('create-new-group')
-      })
-    }
+        instance?.$bvModal.hide('create-new-group');
+      });
+    };
     const isSidebarVisibleChange = (isVisible: boolean, ev: any) => {
       if (!isVisible) {
         if (state.value.pending) {
-          const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+          const isOK = confirm('You will lose your pending changes. Do you want to continue?');
           if (!isOK) {
             sidebarSlideEnabled.value = false;
             isSidebarVisible.value = false;
@@ -388,41 +406,43 @@ export default defineComponent({
           }
         }
         isSidebarVisible.value = isVisible;
-        ctx.root.$router.push({ name: 'aliasManager' }).catch(() => {});
+        ctx.root.$router.push({ name: 'aliasManager' }).catch(() => {
+          return;
+        });
       } else {
         state.value.save = ButtonStates.idle;
         if (sidebarSlideEnabled.value) {
-          editationItem.value = null
+          editationItem.value = null;
           loadEditationItem();
         }
       }
-    }
+    };
     const loadEditationItem = () => {
       if (ctx.root.$route.params.id) {
         socket.alias.emit('generic::getOne', ctx.root.$route.params.id, (err: string | null, data: AliasInterface) => {
           if (err) {
             return error(err);
           }
-          console.debug({data})
+          console.debug({ data });
           if (data === null) {
             // we are creating new item
             editationItem.value = {
-              id: ctx.root.$route.params.id,
-              alias: '',
-              command: '',
+              id:         ctx.root.$route.params.id,
+              alias:      '',
+              command:    '',
               permission: defaultPermissions.VIEWERS,
-              visible: true,
-              group: null,
-              enabled: true,
-            }
+              visible:    true,
+              group:      null,
+              enabled:    true,
+            };
           } else {
             editationItem.value = data;
           }
-        })
+        });
       } else {
         editationItem.value = null;
       }
-    }
+    };
     const save = () =>  {
       const $v = instance?.$v;
       $v?.$touch();
@@ -434,22 +454,24 @@ export default defineComponent({
             state.value.save = ButtonStates.fail;
             return error(err);
           } else {
-            console.groupCollapsed('generic::setById')
-            console.log({data})
+            console.groupCollapsed('generic::setById');
+            console.log({ data });
             console.groupEnd();
             state.value.save = ButtonStates.success;
             ctx.root.$nextTick(() => {
               refresh();
               state.value.pending = false;
-              ctx.root.$router.push({ name: 'aliasManagerEdit', params: { id: String(data.id) } }).catch(() => {});
+              ctx.root.$router.push({ name: 'aliasManagerEdit', params: { id: String(data.id) } }).catch(() => {
+                return;
+              });
             });
           }
           setTimeout(() => {
             state.value.save = ButtonStates.idle;
-          }, 1000)
+          }, 1000);
         });
       }
-    }
+    };
     const del = (id: string) => {
       if (confirm('Do you want to delete alias ' + items.value.find(o => o.id === id)?.alias + '?')) {
         socket.alias.emit('generic::deleteById', id, (err: string | null) => {
@@ -457,9 +479,9 @@ export default defineComponent({
             return error(err);
           }
           refresh();
-        })
+        });
       }
-    }
+    };
 
     return {
       items,
@@ -489,9 +511,9 @@ export default defineComponent({
       newItem,
       del,
       translate,
-    }
-  }
-})
+    };
+  },
+});
 </script>
 
 <style>

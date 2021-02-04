@@ -35,7 +35,10 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import {
+  Component, Prop, Vue, Watch, 
+} from 'vue-property-decorator';
+
 import translate from 'src/panel/helpers/translate';
 
 @Component({})
@@ -49,7 +52,7 @@ export default class heistResults extends Vue {
 
   w_results = this.value.sort((a, b) => {
     return a.messagesCount - b.messagesCount;
-  })
+  });
 
   @Watch('w_results')
   update() {
@@ -59,7 +62,7 @@ export default class heistResults extends Vue {
   addResult() {
     this.w_results.push({
       messagesCount: 10,
-      message: ''
+      message:       '',
     });
   }
 

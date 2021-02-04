@@ -15,28 +15,31 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from '@vue/composition-api'
+import {
+  defineComponent, ref, watch, 
+} from '@vue/composition-api';
+
 import translate from 'src/panel/helpers/translate';
 
 export default defineComponent({
   props: {
-    value: Array,
-    title: String,
+    value:    Array,
+    title:    String,
     readonly: Boolean,
   },
   setup(props: { value: string[]; title: string; readonly: boolean }, ctx) {
     const currentValue = ref(props.value.join('\n'));
-    const translatedTitle = ref(translate(props.title))
+    const translatedTitle = ref(translate(props.title));
 
     watch(currentValue, (val) => {
-      ctx.emit('update', { value: val.split('\n') })
-    })
+      ctx.emit('update', { value: val.split('\n') });
+    });
 
     return {
       currentValue,
       translatedTitle,
       translate,
-    }
-  }
-})
+    };
+  },
+});
 </script>

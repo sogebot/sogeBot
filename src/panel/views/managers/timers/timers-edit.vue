@@ -105,73 +105,68 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch, getCurrentInstance, onUnmounted } from '@vue/composition-api'
-
+import {
+  defineComponent, getCurrentInstance, onMounted, onUnmounted, ref, watch,
+} from '@vue/composition-api';
+import { get, xor } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
-import { validationMixin } from 'vuelidate'
+import { validationMixin } from 'vuelidate';
 import { minValue, required } from 'vuelidate/lib/validators';
 
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 import { TimerInterface, TimerResponseInterface } from 'src/bot/database/entity/timer';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { error } from 'src/panel/helpers/error';
 import { EventBus } from 'src/panel/helpers/event-bus';
-import { get, xor } from 'lodash-es';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 type Props = {
   id: string;
   invalid: boolean;
   pending: boolean;
   saveState: number;
-}
+};
 
 const mustBeCompliant = (value: string) => value.length === 0 || !!value.match(/^[a-zA-Z0-9_]+$/);
 const socket = getSocket('/systems/timers');
 
 export default defineComponent({
   props: {
-    id: String,
-    invalid: Boolean,
-    pending: Boolean,
+    id:        String,
+    invalid:   Boolean,
+    pending:   Boolean,
     saveState: Number,
   },
-  mixins: [ validationMixin ],
+  mixins:     [ validationMixin ],
   components: {
-    loading: () => import('src/panel/components/loading.vue'),
+    loading:              () => import('src/panel/components/loading.vue'),
     'textarea-with-tags': () => import('../../../components/textareaWithTags.vue'),
   },
   validations: {
     item: {
-      name: { mustBeCompliant, required },
-      triggerEverySecond: { required, minValue: minValue(0) },
+      name:                { mustBeCompliant, required },
+      triggerEverySecond:  { required, minValue: minValue(0) },
       triggerEveryMessage: { required, minValue: minValue(0) },
-      messages: {
-        $each: {
-          response: { required },
-        },
-      },
-    }
+      messages:            { $each: { response: { required } } },
+    },
   },
   setup (props: Props, ctx) {
     const instance = getCurrentInstance()?.proxy;
 
-    const markToDeleteIdx = ref([] as number[])
-    const state = ref({
-      loading: ButtonStates.progress,
-    } as {
+    const markToDeleteIdx = ref([] as number[]);
+    const state = ref({ loading: ButtonStates.progress } as {
       loading: number;
     });
 
     const item = ref({
-      id: ctx.root.$route.params.id || uuid(),
-      name: '',
-      triggerEveryMessage: 0,
-      triggerEverySecond: 0,
-      isEnabled: true,
+      id:                   ctx.root.$route.params.id || uuid(),
+      name:                 '',
+      triggerEveryMessage:  0,
+      triggerEverySecond:   0,
+      isEnabled:            true,
       triggeredAtTimestamp: Date.now(),
-      triggeredAtMessages: 0,
-      messages: [],
+      triggeredAtMessages:  0,
+      messages:             [],
     } as Required<TimerInterface>);
 
     watch([item, markToDeleteIdx], (val, oldVal) => {
@@ -195,10 +190,10 @@ export default defineComponent({
     });
     onUnmounted(() => {
       EventBus.$off('managers::timers::save::' + item.value.id);
-    })
+    });
 
     const loadEditationItem = async () => {
-      state.value.loading = ButtonStates.progress
+      state.value.loading = ButtonStates.progress;
       await Promise.all([
         new Promise<void>((resolve, reject) => {
           if (ctx.root.$route.params.id) {
@@ -221,9 +216,9 @@ export default defineComponent({
       ]);
       ctx.root.$nextTick(() => {
         ctx.emit('update:pending', false);
-        state.value.loading = ButtonStates.success
+        state.value.loading = ButtonStates.success;
       });
-    }
+    };
     const save = () =>  {
       const $v = instance?.$v;
       $v?.$touch();
@@ -233,9 +228,9 @@ export default defineComponent({
         const messages: typeof item.value.messages = [];
         item.value.messages.forEach((message, index) => {
           if (!markToDeleteIdx.value.includes(index)) {
-            messages.push(message)
+            messages.push(message);
           }
-        })
+        });
         const toSave = {
           ...item.value,
           messages,
@@ -244,7 +239,7 @@ export default defineComponent({
         socket.emit('timers::save', toSave, (err: string | null) => {
           if (err) {
             ctx.emit('update:saveState', ButtonStates.fail);
-            error(err)
+            error(err);
           } else {
             item.value = toSave;
             markToDeleteIdx.value = [];
@@ -255,35 +250,39 @@ export default defineComponent({
             ctx.emit('refresh');
             setTimeout(() => {
               ctx.emit('update:saveState', ButtonStates.idle);
-            }, 1000)
-          })
-        })
+            }, 1000);
+          });
+        });
       }
-    }
+    };
     const addResponse = () => {
       const response: TimerResponseInterface = {
-        id: uuid(),
+        id:        uuid(),
         timestamp: Date.now(),
         isEnabled: true,
-        response: '',
+        response:  '',
       };
       item.value.messages.push(response);
-    }
+    };
 
     const toggleMarkResponse = (index: number) => {
-      markToDeleteIdx.value = xor(markToDeleteIdx.value, [index])
-    }
+      markToDeleteIdx.value = xor(markToDeleteIdx.value, [index]);
+    };
 
     const getMessageValidation = (idx: number) => {
       const $v = instance?.$v;
-      return get($v, 'item.messages.$each[' + idx + '].response', { $error: false, $dirty: false, $touch: () => {} });
+      return get($v, 'item.messages.$each[' + idx + '].response', {
+        $error: false, $dirty: false, $touch: () => {
+          return; 
+        },
+      });
     };
     const stateOfMessagesErrorsDirty = () => {
       const $v = instance?.$v;
       return Object.values($v?.item.messages?.$each.$iter ?? []).filter((o, idx) => {
-        return !markToDeleteIdx.value.includes(idx) && (!!o.$error && !!o.$dirty)
+        return !markToDeleteIdx.value.includes(idx) && (!!o.$error && !!o.$dirty);
       }).length > 0;
-    }
+    };
 
     return {
       translate,
@@ -294,9 +293,9 @@ export default defineComponent({
       toggleMarkResponse,
       markToDeleteIdx,
       getMessageValidation,
-      stateOfMessagesErrorsDirty
-    }
-  }
+      stateOfMessagesErrorsDirty,
+    };
+  },
 });
 </script>
 
@@ -340,4 +339,3 @@ export default defineComponent({
   padding: 0.375rem 0.4rem;
 }
 </style>
-

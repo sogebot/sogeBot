@@ -31,41 +31,43 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from '@vue/composition-api'
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faEyeSlash } from '@fortawesome/free-regular-svg-icons';
+import {
+  defineComponent, ref, watch, 
+} from '@vue/composition-api';
 import { xor } from 'lodash-es';
 
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faEyeSlash } from '@fortawesome/free-regular-svg-icons';
-library.add(faEyeSlash)
+library.add(faEyeSlash);
 
 import translate from 'src/panel/helpers/translate';
 
 export default defineComponent({
   props: {
-    values: Array,
-    toggle: Array,
-    toggleonicon: String,
+    values:        Array,
+    toggle:        Array,
+    toggleonicon:  String,
     toggleofficon: String,
-    title: String,
+    title:         String,
   },
   setup(props: { values: string[]; toggle: string[], toggleonicon: string, togglefficon: string, title: string }, ctx) {
     const currentValues = ref(props.values);
     const currentToggle = ref(props.toggle);
-    const translatedTitle = ref(translate(props.title))
+    const translatedTitle = ref(translate(props.title));
     const draggingItem = ref(-1);
 
     watch([currentValues, currentToggle], (val) => {
-      ctx.emit('update', { value: currentValues.value, toggle: currentToggle.value })
+      ctx.emit('update', { value: currentValues.value, toggle: currentToggle.value });
     });
 
     function toggleItem(idx: number) {
       currentToggle.value = xor(currentToggle.value, [currentValues.value[idx]]);
-      ctx.root.$forceUpdate()
+      ctx.root.$forceUpdate();
     }
 
     function isToggled (idx: number) {
-      const value = currentValues.value[idx]
-      return currentToggle.value.indexOf(value) !== -1
+      const value = currentValues.value[idx];
+      return currentToggle.value.indexOf(value) !== -1;
     }
 
     function dragstart(idx: number, e: DragEvent) {
@@ -74,12 +76,12 @@ export default defineComponent({
     }
 
     function dragenter(newIndex: number, e: DragEvent) {
-      const value = currentValues.value[draggingItem.value]
+      const value = currentValues.value[draggingItem.value];
       currentValues.value.splice(draggingItem.value, 1);
       currentValues.value.splice(newIndex, 0, value);
       draggingItem.value = newIndex;
 
-      ctx.root.$forceUpdate()
+      ctx.root.$forceUpdate();
     }
 
     function dragend(idx: number, e: DragEvent) {
@@ -99,8 +101,8 @@ export default defineComponent({
       dragend,
 
       translate,
-    }
-  }
+    };
+  },
 });
 </script>
 

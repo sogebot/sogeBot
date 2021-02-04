@@ -21,23 +21,26 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from '@vue/composition-api'
+import {
+  computed, defineComponent, ref, 
+} from '@vue/composition-api';
+
 import translate from 'src/panel/helpers/translate';
 
 export default defineComponent({
   props: {
-    value: Boolean,
-    title: String,
+    value:    Boolean,
+    title:    String,
     disabled: Boolean,
   },
   setup(props: { value: boolean; title: string; disabled: boolean }, ctx) {
     const currentValue = ref(props.value);
     const translatedTitle = computed(() => {
-      return props.title.includes('.settings.') ? translate(props.title) : props.title
-    })
+      return props.title.includes('.settings.') ? translate(props.title) : props.title;
+    });
 
     function update() {
-      currentValue.value = !currentValue.value
+      currentValue.value = !currentValue.value;
       ctx.emit('update', { value: currentValue.value });
     }
 
@@ -46,7 +49,7 @@ export default defineComponent({
       translatedTitle,
       update,
       translate,
-    }
-  }
-})
+    };
+  },
+});
 </script>

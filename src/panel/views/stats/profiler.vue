@@ -47,18 +47,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch } from '@vue/composition-api'
-import Vue from 'vue';
-
-import Chartkick from 'vue-chartkick';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faChartLine } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {
+  defineComponent, onMounted, ref, watch, 
+} from '@vue/composition-api';
 import Chart from 'chart.js';
+import Vue from 'vue';
+import Chartkick from 'vue-chartkick';
+
 import translate from 'src/panel/helpers/translate';
 
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faChartLine } from '@fortawesome/free-solid-svg-icons';
-
-library.add(faChartLine)
+library.add(faChartLine);
 Vue.use(Chartkick.use(Chart));
 
 import { getSocket } from '../../helpers/socket';
@@ -67,7 +68,7 @@ const socket = getSocket('/stats/profiler');
 
 export default defineComponent({
   components: {
-    panel: () => import('../../components/panel.vue'),
+    panel:               () => import('../../components/panel.vue'),
     'font-awesome-icon': FontAwesomeIcon,
   },
   setup() {
@@ -75,16 +76,14 @@ export default defineComponent({
     const profiler = ref({} as Record<string, number[]>);
 
     const generateChartData = () => {
-      const data = Object.entries(profiler.value)
+      const data = Object.entries(profiler.value);
       const generatedData = [];
 
       for (const [name, values] of data) {
         if (showChartFunctions.value.includes(name)) {
-        generatedData.push({
-          name, data: { ...values },
-        })
+          generatedData.push({ name, data: { ...values } });
         }
-      };
+      }
       return generatedData;
     };
 
@@ -98,29 +97,29 @@ export default defineComponent({
 
     const avg = (data: number[]) => {
       return data.reduce((a, b) => (a+b)) / data.length;
-    }
+    };
 
     const max = (data: number[]) => {
       return Math.max(...data);
-    }
+    };
 
     const min = (data: number[]) => {
       return Math.min(...data);
-    }
+    };
 
     watch(showChartFunctions, () => {
-      localStorage.setItem('/stats/commandcount/showChartFunctions', JSON.stringify(showChartFunctions.value))
-    })
+      localStorage.setItem('/stats/commandcount/showChartFunctions', JSON.stringify(showChartFunctions.value));
+    });
 
     onMounted(() => {
-      showChartFunctions.value = JSON.parse(localStorage.getItem('/stats/commandcount/showChartFunctions') || '[]')
+      showChartFunctions.value = JSON.parse(localStorage.getItem('/stats/commandcount/showChartFunctions') || '[]');
       socket.emit('profiler::load', (err: string | null, val: any) => {
         if (err) {
           return console.error(err);
         }
         profiler.value = Object.fromEntries(val);
-      })
-    })
+      });
+    });
 
     return {
       showChartFunctions,
@@ -133,9 +132,9 @@ export default defineComponent({
       max,
 
       translate,
-    }
-  }
-})
+    };
+  },
+});
 </script>
 
 <style scoped>

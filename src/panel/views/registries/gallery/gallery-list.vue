@@ -82,29 +82,28 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed, watch, onUnmounted } from '@vue/composition-api'
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons';
+import { faLink, faTrash } from '@fortawesome/free-solid-svg-icons';
+import {
+  computed, defineComponent, onMounted, onUnmounted, ref, watch, 
+} from '@vue/composition-api';
 import { chunk, xor } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
-
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faLink, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons';
 library.add(faLink, faTrash, faCheckSquare, faSquare);
 
 import type { GalleryInterface } from 'src/bot/database/entity/gallery';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { error } from 'src/panel/helpers/error';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/overlays/gallery');
-let interval: number = 0;
+let interval = 0;
 
 export default defineComponent({
-  components: {
-    loading: () => import('src/panel/components/loading.vue'),
-  },
+  components: { loading: () => import('src/panel/components/loading.vue') },
   setup() {
     const domWidth = ref(document.body.clientWidth);
 
@@ -112,10 +111,10 @@ export default defineComponent({
     const exclude = ref([] as any[]);
     const uploadedFiles = ref(0);
     const isUploadingNum = ref(0);
-    const markToDeleteIdx = ref([] as string[])
+    const markToDeleteIdx = ref([] as string[]);
 
     const state = ref({
-      loading: ButtonStates.progress,
+      loading:   ButtonStates.progress,
       uploading: ButtonStates.idle,
     } as {
       uploading: number;
@@ -124,30 +123,39 @@ export default defineComponent({
 
     const filtered = computed(() => {
       return items.value.filter(o => {
-        const isVideoIncluded = !(exclude.value.includes('video') && o.type.includes('video'))
-        const isImageIncluded = !(exclude.value.includes('images') && o.type.includes('image'))
-        const isAudioIncluded = !(exclude.value.includes('audio') && o.type.includes('audio'))
-        return isVideoIncluded && isImageIncluded && isAudioIncluded
-      })
+        const isVideoIncluded = !(exclude.value.includes('video') && o.type.includes('video'));
+        const isImageIncluded = !(exclude.value.includes('images') && o.type.includes('image'));
+        const isAudioIncluded = !(exclude.value.includes('audio') && o.type.includes('audio'));
+        return isVideoIncluded && isImageIncluded && isAudioIncluded;
+      });
     });
     const itemCountPerRow = computed(() => {
-      if (domWidth.value > 1400) return 6
-      if (domWidth.value > 1300) return 5
-      if (domWidth.value > 1100) return 4
-      else if (domWidth.value > 800) return 3
-      else if (domWidth.value > 600) return 2
-      else return 4
-    })
+      if (domWidth.value > 1400) {
+        return 6;
+      }
+      if (domWidth.value > 1300) {
+        return 5;
+      }
+      if (domWidth.value > 1100) {
+        return 4;
+      } else if (domWidth.value > 800) {
+        return 3;
+      } else if (domWidth.value > 600) {
+        return 2;
+      } else {
+        return 4;
+      }
+    });
 
     onMounted(() => {
       refresh();
       interval = window.setInterval(() => {
-        domWidth.value = document.body.clientWidth
-      }, 1000)
+        domWidth.value = document.body.clientWidth;
+      }, 1000);
     });
     onUnmounted(() => {
       clearInterval(interval);
-    })
+    });
 
     watch(uploadedFiles, (val: number) => {
       if (isUploadingNum.value === val) {
@@ -155,20 +163,22 @@ export default defineComponent({
       } else {
         state.value.uploading = ButtonStates.progress;
       }
-    })
+    });
 
     const refresh = () => {
       socket.emit('generic::getAll', (err: string | null, _items: GalleryInterface[]) => {
         console.debug('Loaded', _items);
         items.value = _items;
         state.value.loading = ButtonStates.success;
-      })
-    }
+      });
+    };
     const toggle = (type: GalleryInterface['type']) => {
       if (exclude.value.includes(type)) {
-        exclude.value = exclude.value.filter(o => o !== type)
-      } else exclude.value.push(type)
-    }
+        exclude.value = exclude.value.filter(o => o !== type);
+      } else {
+        exclude.value.push(type);
+      }
+    };
 
     const remove = () => {
       for (const id of markToDeleteIdx.value) {
@@ -176,37 +186,37 @@ export default defineComponent({
           if (err) {
             console.error(err);
           } else {
-            items.value = items.value.filter(o => o.id != id)
+            items.value = items.value.filter(o => o.id != id);
           }
-        })
+        });
       }
       markToDeleteIdx.value = [];
-    }
+    };
 
     const toggleMarkResponse = (index: string) => {
-      markToDeleteIdx.value = xor(markToDeleteIdx.value, [index])
-    }
+      markToDeleteIdx.value = xor(markToDeleteIdx.value, [index]);
+    };
 
     const filesChange = (files: HTMLInputElement['files']) => {
       if (!files) {
         return;
       }
       state.value.uploading = ButtonStates.progress;
-      isUploadingNum.value = files.length
-      uploadedFiles.value = 0
+      isUploadingNum.value = files.length;
+      uploadedFiles.value = 0;
 
       for (let i = 0, l = files.length; i < l; i++) {
-        const reader = new FileReader()
+        const reader = new FileReader();
         reader.onload = (async (e: any) => {
           const id = uuid();
-          const chunks = String(reader.result).match(/.{1,500000}/g)
+          const chunks = String(reader.result).match(/.{1,500000}/g);
           if (!chunks) {
             return;
           }
           for (let j = 0; j < chunks.length; j++) {
             // upload one by one to have full file
             await new Promise(resolve => {
-              console.debug(`upload::${files[i].name}::chunk::${j}`)
+              console.debug(`upload::${files[i].name}::chunk::${j}`);
               socket.emit('gallery::upload', [files[i].name, {
                 id,
                 b64data: chunks[j],
@@ -214,20 +224,20 @@ export default defineComponent({
                 if (err) {
                   return error(err);
                 }
-                console.debug(`done::${files[i].name}::chunk::${j}`)
+                console.debug(`done::${files[i].name}::chunk::${j}`);
                 resolve(true);
-              })
-            })
+              });
+            });
           }
           uploadedFiles.value++;
           socket.emit('generic::getOne', id, (err: string | null, _item: GalleryInterface) => {
             console.debug('Loaded', items);
             items.value.push(_item);
-          })
+          });
         });
-        reader.readAsDataURL(files[i])
+        reader.readAsDataURL(files[i]);
       }
-    }
+    };
 
     return {
       domWidth,
@@ -247,7 +257,7 @@ export default defineComponent({
 
       chunk,
       translate,
-    }
-  }
+    };
+  },
 });
 </script>

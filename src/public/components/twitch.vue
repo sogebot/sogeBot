@@ -28,9 +28,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed } from '@vue/composition-api'
-import { getSocket } from 'src/panel/helpers/socket';
+import {
+  computed, defineComponent, onMounted, ref, 
+} from '@vue/composition-api';
 import { get } from 'lodash-es';
+
+import { getSocket } from 'src/panel/helpers/socket';
 
 const socket = getSocket('/widgets/chat', true);
 
@@ -42,20 +45,20 @@ export default defineComponent({
     onMounted(() => {
       socket.emit('room', (err: string | null, _room: string) => {
         room.value = _room;
-      })
+      });
 
       setInterval(() => {
         theme.value = (localStorage.getItem('theme') || get(ctx.root.$store.state, 'configuration.core.ui.theme', 'light'));
-      }, 100)
+      }, 100);
     });
 
     const isHttps = computed(() => {
-      return window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    })
+      return window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    });
 
     const videoUrl = computed(() => {
-      return `${window.location.protocol}//player.twitch.tv/?channel=${room.value}&autoplay=true&parent=${window.location.hostname}`
-    })
+      return `${window.location.protocol}//player.twitch.tv/?channel=${room.value}&autoplay=true&parent=${window.location.hostname}`;
+    });
 
     const chatUrl = computed(() => {
       return window.location.protocol
@@ -63,12 +66,12 @@ export default defineComponent({
         + room.value
         + '/chat'
         + (theme.value === 'dark' ? '?darkpopout' : '')
-        + (theme.value === 'dark' ? '&parent=' + window.location.hostname : '?parent=' + window.location.hostname)
+        + (theme.value === 'dark' ? '&parent=' + window.location.hostname : '?parent=' + window.location.hostname);
     });
 
     return {
       isHttps, videoUrl, chatUrl,
-    }
-  }
+    };
+  },
 });
 </script>

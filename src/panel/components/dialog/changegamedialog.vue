@@ -1,4 +1,3 @@
-
 <template>
   <b-modal size="w-90" :title="translate('change-game')" no-fade v-model="show" ref="modalWindow">
     <div class="d-flex text-center" v-if="games.length > 0">
@@ -114,28 +113,29 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import {
+  computed, defineComponent, onMounted, onUnmounted, ref, watch,
+} from '@vue/composition-api';
+import type { Ref } from '@vue/composition-api';
 import { ModalPlugin } from 'bootstrap-vue';
-Vue.use(ModalPlugin);
-import { defineComponent, ref, onUnmounted, onMounted, watch, computed } from '@vue/composition-api'
-import type { Ref } from '@vue/composition-api'
-import { chunk, debounce } from 'lodash-es'
+import { chunk, debounce } from 'lodash-es';
+import Vue from 'vue';
 
 import { EventBus } from 'src/panel/helpers/event-bus';
-import { getSocket, getConfiguration } from 'src/panel/helpers/socket';
+import { getConfiguration, getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
+Vue.use(ModalPlugin);
+
 type Tag = {
-    tag_id: string;
-    locale: string;
-    value: string;
-    is_auto: boolean;
-  }
+  tag_id: string;
+  locale: string;
+  value: string;
+  is_auto: boolean;
+};
 
 export default defineComponent({
-  components: {
-    search: () => import('../searchDropdown.vue'),
-  },
+  components: { search: () => import('../searchDropdown.vue') },
   setup(props, context) {
     const data: Ref<{ id: string, game: string, title: string }[]> = ref([]);
     const currentGame: Ref<string | null> = ref(null);
@@ -161,8 +161,10 @@ export default defineComponent({
       return [
         { game: currentGame.value, title: currentTitle.value },
         ...data.value.filter((o: any) => o.game === currentGame.value),
-        { game: currentGame.value, title: '', id: 'new' }
-        ]
+        {
+          game: currentGame.value, title: '', id: 'new',
+        },
+      ];
     });
     const games = computed(() => {
       if (manuallySelected.value) {
@@ -172,8 +174,12 @@ export default defineComponent({
           ...new Set([
             currentGame.value,
             ...data.value.sort((a: any,b: any) => {
-              if (typeof a.timestamp === 'undefined') { a.timestamp = 0; }
-              if (typeof b.timestamp === 'undefined') { b.timestamp = 0; }
+              if (typeof a.timestamp === 'undefined') {
+                a.timestamp = 0;
+              }
+              if (typeof b.timestamp === 'undefined') {
+                b.timestamp = 0;
+              }
               if (a.timestamp > b.timestamp) {
                 return -1;
               } else if (a.timestamp < b.timestamp) {
@@ -181,13 +187,17 @@ export default defineComponent({
               } else {
                 return 0;
               }
-            }).map((o: any) => o.game)
-          ]
-        )];
+            }).map((o: any) => o.game),
+          ],
+          )];
       } else {
         cachedGamesOrder.value = [...new Set(data.value.sort((a: any,b: any) => {
-          if (typeof a.timestamp === 'undefined') { a.timestamp = 0; }
-          if (typeof b.timestamp === 'undefined') { b.timestamp = 0; }
+          if (typeof a.timestamp === 'undefined') {
+            a.timestamp = 0;
+          }
+          if (typeof b.timestamp === 'undefined') {
+            b.timestamp = 0;
+          }
           if (a.timestamp > b.timestamp) {
             return -1;
           } else if (a.timestamp < b.timestamp) {
@@ -208,7 +218,7 @@ export default defineComponent({
       // remove from order cache
       cachedGamesOrder.value.splice(cachedGamesOrder.value.findIndex(o => o === game), 1);
       currentGame.value = cachedGamesOrder.value[0];
-    }
+    };
     const deleteTitle = (id: string) => {
       data.value.splice(data.value.findIndex(o => o.id === id), 1);
       selectedTitle.value = 'current';
@@ -222,7 +232,7 @@ export default defineComponent({
       carouselPage.value = 0;
       socket.emit('getCachedTags', (socketCachedTags: Tag[]) => {
         cachedTags.value = socketCachedTags.filter(o => !o.is_auto);
-      })
+      });
       socket.emit('getUserTwitchGames');
 
       if (!currentGame.value) {
@@ -230,9 +240,9 @@ export default defineComponent({
         currentGame.value = context.root.$store.state.currentGame;
         currentTitle.value = context.root.$store.state.currentTitle;
         currentTags.value = context.root.$store.state.currentTags.filter((o: any) => !o.is_auto).map((o: any) => {
-          const key = Object.keys(o.localization_names).find(key => key.includes(configuration.lang as string))
+          const key = Object.keys(o.localization_names).find(key2 => key2.includes(configuration.lang as string));
           return o.localization_names[key || 'en-us'];
-        })
+        });
       }
     };
     const searchForGame = debounce((value: string)  => {
@@ -249,7 +259,7 @@ export default defineComponent({
       const arraySet = Array.from(new Set(cachedTags.value
         .map(o => o.value)
         .filter(o => {
-          return o && o.toLowerCase().includes(value) && !currentTags.value.includes(o)
+          return o && o.toLowerCase().includes(value) && !currentTags.value.includes(o);
         }).sort((a, b) => {
           if (a < b)  { //sort string ascending
             return -1;
@@ -258,20 +268,20 @@ export default defineComponent({
             return 1;
           }
           return 0; //default return value (no sorting)
-        })
+        }),
       ));
       for (const val of arraySet) {
         searchForTagsOpts.value.push(val);
       }
-    }
+    };
     const handleOk = () => {
       let title = '';
       if (selectedTitle.value === 'current') {
-        title = currentTitle.value
+        title = currentTitle.value;
       } else if (selectedTitle.value === 'new') {
-        title = newTitle.value
+        title = newTitle.value;
       } else {
-        title = (data.value.find(o => o.id === selectedTitle.value) || { title: '' }).title
+        title = (data.value.find(o => o.id === selectedTitle.value) || { title: '' }).title;
       }
 
       const emit = {
@@ -284,29 +294,29 @@ export default defineComponent({
       context.root.$store.commit('setCurrentTitle', emit.title);
       context.root.$store.commit('setCurrentTags', emit.tags);
 
-      console.debug('EMIT [updateGameAndTitle]', emit)
-      saveState.value = 1
+      console.debug('EMIT [updateGameAndTitle]', emit);
+      saveState.value = 1;
       socket.emit('updateGameAndTitle', emit, (err: string | null) => {
         if (err) {
           saveState.value = -1;
         } else {
           saveState.value = 2;
           show.value = false;
-          const emit = {
-            game: currentGame.value,
+          const emitData = {
+            game:   currentGame.value,
             title,
             titles: data.value,
           };
-          console.debug('EMIT [cleanupGameAndTitle]', emit)
-          socket.emit('cleanupGameAndTitle', emit, (err: string | null, dataSocket: any) => {
-            data.value = dataSocket
-          })
+          console.debug('EMIT [cleanupGameAndTitle]', emitData);
+          socket.emit('cleanupGameAndTitle', emitData, (_err: string | null, dataSocket: any) => {
+            data.value = dataSocket;
+          });
         }
         setTimeout(() => {
           saveState.value = 0;
         }, 1000);
-      })
-    }
+      });
+    };
 
     watch(windowWidth, (width) => {
       if (width < 304) {
@@ -348,7 +358,7 @@ export default defineComponent({
       window.addEventListener('resize', _resizeListener);
 
       init();
-      socket.on('sendGameFromTwitch', (data: string[]) => searchForGameOpts.value = data);
+      socket.on('sendGameFromTwitch', (data2: string[]) => searchForGameOpts.value = data2);
       socket.on('sendUserTwitchGamesAndTitles', (data2: typeof data.value) => {
         while (data.value.length > 0) {
           data.value.shift();
@@ -361,11 +371,13 @@ export default defineComponent({
         show.value = true;
         socket.emit('getUserTwitchGames');
       });
-    })
-    onUnmounted(() => window.removeEventListener('resize', _resizeListener))
+    });
+    onUnmounted(() => window.removeEventListener('resize', _resizeListener));
 
-    return { manuallySelected, carouselPage, show, newTitle, searchForTagsOpts, currentTags, handleOk, selectedTitle, currentGame, games, titles, saveState, chunk, thumbnailsPerPage, deleteGame, deleteTitle, searchForTags, searchForGame, searchForGameOpts, translate }
-  }
+    return {
+      manuallySelected, carouselPage, show, newTitle, searchForTagsOpts, currentTags, handleOk, selectedTitle, currentGame, games, titles, saveState, chunk, thumbnailsPerPage, deleteGame, deleteTitle, searchForTags, searchForGame, searchForGameOpts, translate,
+    };
+  },
 });
 </script>
 

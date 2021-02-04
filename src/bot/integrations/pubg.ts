@@ -83,7 +83,7 @@ class PUBG extends Integration {
             Authorization: `Bearer ${this.apiKey}`,
             Accept:        'application/vnd.api+json',
           },
-        }
+        },
       );
       for (const season of request.data.data) {
         if (season.isCurrentSeason) {
@@ -110,7 +110,7 @@ class PUBG extends Integration {
             Authorization: `Bearer ${this.apiKey}`,
             Accept:        'application/vnd.api+json',
           },
-        }
+        },
       );
       if (ranked) {
         this.rankedGameModeStats = request.data.data.attributes.rankedGameModeStats;
@@ -130,7 +130,7 @@ class PUBG extends Integration {
               Authorization: `Bearer ${apiKey}`,
               Accept:        'application/vnd.api+json',
             },
-          }
+          },
         );
         for (const season of request.data.data) {
           if (season.attributes.isCurrentSeason) {
@@ -151,7 +151,7 @@ class PUBG extends Integration {
               Authorization: `Bearer ${apiKey}`,
               Accept:        'application/vnd.api+json',
             },
-          }
+          },
         );
         if (ranked) {
           this.rankedGameModeStats = request.data.data.attributes.rankedGameModeStats;
@@ -172,7 +172,7 @@ class PUBG extends Integration {
               Authorization: `Bearer ${apiKey}`,
               Accept:        'application/vnd.api+json',
             },
-          }
+          },
         );
         cb(null, request.data);
       } catch (e) {

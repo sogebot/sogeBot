@@ -13,12 +13,12 @@ export class randomizerTickToggle1589360083369 implements MigrationInterface {
 
     for (const randomizer of randomizers) {
       await queryRunner.query(
-        `INSERT INTO "randomizer"(${Object.keys(randomizer).map(o=>`"${o}"`).join(', ')}, "shouldPlayTick", "tickVolume") values(${Object.keys(randomizer).map(o => `'${randomizer[o]}'`)}, 1, 100)`
+        `INSERT INTO "randomizer"(${Object.keys(randomizer).map(o=>`"${o}"`).join(', ')}, "shouldPlayTick", "tickVolume") values(${Object.keys(randomizer).map(o => `'${randomizer[o]}'`)}, 1, 100)`,
       );
     }
     for (const randomizer of randomizersItems) {
       await queryRunner.query(
-        `INSERT INTO "randomizer_item"(${Object.keys(randomizer).map(o=>`"${o}"`).join(', ')}) values(${Object.keys(randomizer).map(o => `'${randomizer[o]}'`)})`
+        `INSERT INTO "randomizer_item"(${Object.keys(randomizer).map(o=>`"${o}"`).join(', ')}) values(${Object.keys(randomizer).map(o => `'${randomizer[o]}'`)})`,
       );
     }
   }

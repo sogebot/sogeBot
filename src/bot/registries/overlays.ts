@@ -29,7 +29,7 @@ class Overlays extends Registry {
       try {
         cb(
           null,
-          await getRepository(OverlayMapper).find()
+          await getRepository(OverlayMapper).find(),
         );
       } catch (e) {
         cb (e, null);
@@ -39,7 +39,7 @@ class Overlays extends Registry {
       try {
         cb(
           null,
-          await getRepository(OverlayMapper).findOneOrFail({ where: { id } })
+          await getRepository(OverlayMapper).findOneOrFail({ where: { id } }),
         );
       } catch (e) {
         cb (e, null);

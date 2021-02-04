@@ -135,29 +135,28 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
-import safeEval from 'safe-eval';
+import { ProgressPlugin } from 'bootstrap-vue/esm/components/progress';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+import gsap from 'gsap';
 import { find } from 'lodash-es';
+import safeEval from 'safe-eval';
+import { Component, Vue } from 'vue-property-decorator';
 
+import { GoalGroupInterface, GoalInterface } from 'src/bot/database/entity/goal';
+import { dayjs } from 'src/bot/helpers/dayjs';
 import { getSocket } from 'src/panel/helpers/socket';
-import { textStrokeGenerator, shadowGenerator } from 'src/panel/helpers/text';
+import { shadowGenerator, textStrokeGenerator } from 'src/panel/helpers/text';
 
-import { ProgressPlugin} from 'bootstrap-vue/esm/components/progress'
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
 Vue.use(ProgressPlugin);
 
-import gsap from 'gsap'
-import { GoalInterface, GoalGroupInterface } from 'src/bot/database/entity/goal';
-import { dayjs } from 'src/bot/helpers/dayjs';
-console.log(dayjs());
 @Component({})
 export default class GoalsOverlay extends Vue {
   textStrokeGenerator = textStrokeGenerator;
   shadowGenerator = shadowGenerator;
   dayjs = dayjs;
 
-  show: number = -1;
+  show = -1;
   group: GoalGroupInterface | null = null;
   loadedFonts: string[] = [];
   socket = getSocket('/overlays/goals', true);
@@ -174,58 +173,71 @@ export default class GoalsOverlay extends Vue {
   }
 
   mounted() {
-    this.refresh()
+    this.refresh();
     this.interval.push(window.setInterval(() => this.refresh(), 5000));
     this.interval.push(window.setInterval(() => {
-      if (this.group === null) return
+      if (this.group === null) {
+        return;
+      }
 
-      if (this.show === -1) return (this.lastSwapTime = Date.now())
+      if (this.show === -1) {
+        return (this.lastSwapTime = Date.now());
+      }
 
       if (this.group.display.type === 'fade') {
         if (this.lastSwapTime + Number(this.group.display.durationMs) < Date.now()) {
-          this.lastSwapTime = Date.now() + Number(this.group.display.animationInMs) + Number(this.group.display.animationOutMs)
-          if (typeof this.group.goals[this.show + 1] === 'undefined') this.show = 0
-          else this.show = this.show + 1
+          this.lastSwapTime = Date.now() + Number(this.group.display.animationInMs) + Number(this.group.display.animationOutMs);
+          if (typeof this.group.goals[this.show + 1] === 'undefined') {
+            this.show = 0;
+          } else {
+            this.show = this.show + 1;
+          }
         }
       }
     }, 100));
   }
 
   beforeEnter (el: HTMLElement) {
-    el.style.opacity = '0'
+    el.style.opacity = '0';
   }
 
   doEnterAnimation (el: HTMLElement, done: () => void) {
-    if (this.group === null) return
+    if (this.group === null) {
+      return;
+    }
     if (this.group.display.type === 'fade') {
       gsap.to(el, {
-        duration: (this.group.display.animationInMs || 1000) / 1000,
-        opacity: 1,
+        duration:   (this.group.display.animationInMs || 1000) / 1000,
+        opacity:    1,
         onComplete: () => {
-          done()
-        }
-      })
+          done();
+        },
+      });
     }
   }
 
   doLeaveAnimation (el: HTMLElement, done: () => void) {
-    if (this.group === null) return
+    if (this.group === null) {
+      return;
+    }
     if (this.group.display.type === 'fade') {
       gsap.to(el, {
-        duration: (this.group.display.animationOutMs || 1000) / 1000,
-        opacity: 0,
+        duration:   (this.group.display.animationOutMs || 1000) / 1000,
+        opacity:    0,
         onComplete: () => {
-          done()
-        }
-      })
+          done();
+        },
+      });
     }
   }
 
   isDisabled(idx: number) {
-    if (this.group === null) return false;
+    if (this.group === null) {
+      return false;
+    }
 
-    const goal = this.group.goals[idx]
-    return new Date(goal.endAfter).getTime() <= new Date().getTime() && !goal.endAfterIgnore
+    const goal = this.group.goals[idx];
+    return new Date(goal.endAfter).getTime() <= new Date().getTime() && !goal.endAfterIgnore;
   }
 
   getFontFamilyCSS (family: string) {
@@ -233,24 +245,28 @@ export default class GoalsOverlay extends Vue {
   }
 
   refresh () {
-    const id = window.location.href.split('/')[window.location.href.split('/').length - 1]
+    const id = window.location.href.split('/')[window.location.href.split('/').length - 1];
     if (id) {
       this.socket.emit('goals::current', (err: string | null, current: { subscribers: number, followers: number }) => {
-        if (err) return console.error(err)
-        this.current = current
-      })
+        if (err) {
+          return console.error(err);
+        }
+        this.current = current;
+      });
       this.socket.emit('generic::getOne', id, (err: string | null, cb: Required<GoalGroupInterface> | undefined) => {
-        if (err) return console.error(err)
+        if (err) {
+          return console.error(err);
+        }
         this.group = cb || null;
 
         if (this.group) {
           if (this.group.goals.length > 0) {
             for (const goal of this.group.goals) {
-              let _goal = find(this.group.goals, (o) => o.id === goal.id)
+              const _goal = find(this.group.goals, (o) => o.id === goal.id);
               if (typeof _goal !== 'undefined') {
                 if (Number(_goal.currentAmount) !== Number(goal.currentAmount)) {
-                  console.debug(_goal.currentAmount + ' => ' + goal.currentAmount)
-                  this.triggerUpdate.push((goal as Required<GoalInterface>).id)
+                  console.debug(_goal.currentAmount + ' => ' + goal.currentAmount);
+                  this.triggerUpdate.push((goal as Required<GoalInterface>).id);
                 }
               }
             }
@@ -259,12 +275,16 @@ export default class GoalsOverlay extends Vue {
           // update currentAmount for current types
           for (const goal of this.group.goals) {
             if (goal.type === 'currentFollowers') {
-              if (goal.currentAmount !== this.current.followers) this.triggerUpdate.push((goal as Required<GoalInterface>).id)
-              goal.currentAmount = this.current.followers
+              if (goal.currentAmount !== this.current.followers) {
+                this.triggerUpdate.push((goal as Required<GoalInterface>).id);
+              }
+              goal.currentAmount = this.current.followers;
             }
             if (goal.type === 'currentSubscribers') {
-              if (goal.currentAmount !== this.current.subscribers) this.triggerUpdate.push((goal as Required<GoalInterface>).id)
-              goal.currentAmount = this.current.subscribers
+              if (goal.currentAmount !== this.current.subscribers) {
+                this.triggerUpdate.push((goal as Required<GoalInterface>).id);
+              }
+              goal.currentAmount = this.current.subscribers;
             }
           }
 
@@ -272,13 +292,13 @@ export default class GoalsOverlay extends Vue {
           for (const goal of this.group.goals) {
             if (!this.cssLoaded.includes((goal as Required<GoalInterface>).id)) {
               this.cssLoaded.push((goal as Required<GoalInterface>).id);
-              const head = document.getElementsByTagName('head')[0]
-              const style = document.createElement('style')
+              const head = document.getElementsByTagName('head')[0];
+              const style = document.createElement('style');
               style.type = 'text/css';
               if (!this.loadedFonts.includes(goal.customizationCss)) {
-                this.loadedFonts.push(goal.customizationCss)
+                this.loadedFonts.push(goal.customizationCss);
                 const css = goal.customizationCss
-                  .replace(/\#wrap/g, '#wrap-' + goal.id) // replace .wrap with only this goal wrap
+                  .replace(/\#wrap/g, '#wrap-' + goal.id); // replace .wrap with only this goal wrap
                 style.appendChild(document.createTextNode(css));
               }
               head.appendChild(style);
@@ -286,15 +306,15 @@ export default class GoalsOverlay extends Vue {
           }
 
           // add fonts import
-          const head = document.getElementsByTagName('head')[0]
-          const style = document.createElement('style')
+          const head = document.getElementsByTagName('head')[0];
+          const style = document.createElement('style');
           style.type = 'text/css';
 
           for (const goal of this.group.goals) {
             if (!this.loadedFonts.includes(goal.customizationFont.family)) {
-              this.loadedFonts.push(goal.customizationFont.family)
-              const font = goal.customizationFont.family.replace(/ /g, '+')
-              const css = "@import url('https://fonts.googleapis.com/css?family=" + font + "');"
+              this.loadedFonts.push(goal.customizationFont.family);
+              const font = goal.customizationFont.family.replace(/ /g, '+');
+              const css = '@import url(\'https://fonts.googleapis.com/css?family=' + font + '\');';
               style.appendChild(document.createTextNode(css));
             }
           }
@@ -309,7 +329,7 @@ export default class GoalsOverlay extends Vue {
                 .replace(/\$goalAmount/g, String(goal.goalAmount))
                 .replace(/\$currentAmount/g, String(goal.currentAmount))
                 .replace(/\$percentageAmount/g, Number((100 / (goal.goalAmount ?? 0)) * (goal.currentAmount ?? 0)).toFixed())
-                .replace(/\$endAfter/g, new Date(goal.endAfter).toISOString())
+                .replace(/\$endAfter/g, new Date(goal.endAfter).toISOString());
             }
 
             // trigger onUpdate on nextTick
@@ -318,18 +338,22 @@ export default class GoalsOverlay extends Vue {
                 const idx = this.triggerUpdate.indexOf((goal as Required<GoalInterface>).id);
                 this.triggerUpdate.splice(idx, 1);
 
-                console.debug('onUpdate : ' + goal.id)
-                let toEval = `(function evaluation () { ${goal.customizationJs}; onChange(${goal.currentAmount}) })()`
-                safeEval(toEval)
+                console.debug('onUpdate : ' + goal.id);
+                const toEval = `(function evaluation () { ${goal.customizationJs}; onChange(${goal.currentAmount}) })()`;
+                safeEval(toEval);
               }
-            })
+            });
           }
 
-          this.$nextTick(() => { if (this.show === -1) this.show = 0; })
+          this.$nextTick(() => {
+            if (this.show === -1) {
+              this.show = 0;
+            }
+          });
         }
-      })
+      });
     } else {
-      console.error('Missing id param in url')
+      console.error('Missing id param in url');
     }
   }
 }

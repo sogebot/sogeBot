@@ -252,18 +252,21 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onBeforeMount, watch } from '@vue/composition-api'
-import { textStrokeGenerator, shadowGenerator } from 'src/panel/helpers/text';
+import {
+  defineComponent, onBeforeMount, ref, watch, 
+} from '@vue/composition-api';
 import { v4 as uuidv4 } from 'uuid';
+
+import { shadowGenerator, textStrokeGenerator } from 'src/panel/helpers/text';
 import translate from 'src/panel/helpers/translate';
 
 function loadFont(value: string) {
   const head = document.getElementsByTagName('head')[0];
   const style = document.createElement('style');
   style.type = 'text/css';
-  console.debug('Loading font', value)
-  const font = value.replace(/ /g, '+')
-  const css = "@import url('https://fonts.googleapis.com/css?family=" + font + "');"
+  console.debug('Loading font', value);
+  const font = value.replace(/ /g, '+');
+  const css = '@import url(\'https://fonts.googleapis.com/css?family=' + font + '\');';
   style.appendChild(document.createTextNode(css));
   head.appendChild(style);
 }
@@ -288,9 +291,7 @@ interface Props {
   }
 }
 export default defineComponent({
-  props: {
-    data: Object,
-  },
+  props: { data: Object },
   setup(props: Props) {
     const exampleColor = ref('#000000');
     const uuid = ref(uuidv4());
@@ -298,14 +299,14 @@ export default defineComponent({
 
     const addShadow = () => {
       props.data.shadow.push({
-        shiftRight: 1, shiftDown: 1,
-        blur: 5, opacity: 100, color: "#ffffff",
+        shiftRight: 1, shiftDown:  1,
+        blur:       5, opacity:    100, color:      '#ffffff',
       });
-    }
+    };
 
     const removeShadow = (index: number)  => {
       props.data.shadow.splice(index, 1);
-    }
+    };
 
     onBeforeMount(async () => {
       const { response } = await new Promise<{ response: Record<string, any>}>(resolve => {
@@ -314,31 +315,31 @@ export default defineComponent({
 
         request.onload = function() {
           if (!(this.status >= 200 && this.status < 400)) {
-            console.error('Something went wrong getting font', this.status, this.response)
+            console.error('Something went wrong getting font', this.status, this.response);
           }
-          resolve({ response: JSON.parse(this.response)})
-        }
+          resolve({ response: JSON.parse(this.response) });
+        };
         request.onerror = function() {
-          console.error('Connection error to sogebot')
+          console.error('Connection error to sogebot');
           resolve( { response: {} });
         };
 
         request.send();
-      })
-      console.log({items: response.items});
+      });
+      console.log({ items: response.items });
       for (const font of response.items.map((o: { family: string }) => {
-        return { text: o.family, value: o.family }
+        return { text: o.family, value: o.family };
       })) {
         fonts.value.push(font);
       }
-      loadFont(props.data.family)
-    })
+      loadFont(props.data.family);
+    });
 
-    watch(() => props.data.family, (val) => loadFont(val))
+    watch(() => props.data.family, (val) => loadFont(val));
 
     return {
       textStrokeGenerator, shadowGenerator, exampleColor, fonts, addShadow, removeShadow, translate, uuid,
-    }
-  }
+    };
+  },
 });
 </script>

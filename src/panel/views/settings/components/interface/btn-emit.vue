@@ -7,7 +7,10 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import {
+  Component, Prop, Vue, 
+} from 'vue-property-decorator';
+
 import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
@@ -18,7 +21,7 @@ export default class btnEmit extends Vue {
 
   translate = translate;
 
-  state: number = 0
+  state = 0;
 
   emitToBackend() {
     this.state = 1;
@@ -43,5 +46,5 @@ export default class btnEmit extends Vue {
         }
       });
   }
-};
+}
 </script>

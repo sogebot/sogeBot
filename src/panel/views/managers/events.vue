@@ -112,28 +112,28 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed, watch, getCurrentInstance } from '@vue/composition-api'
-import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
-import translate from 'src/panel/helpers/translate';
+import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
+import {
+  computed, defineComponent, getCurrentInstance, onMounted, ref, watch,
+} from '@vue/composition-api';
+import { get } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
-
-import { getSocket } from 'src/panel/helpers/socket';
 
 import { EventInterface } from 'src/bot/database/entity/event';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
-import { error } from 'src/panel/helpers/error';
 import { capitalize } from 'src/panel/helpers/capitalize';
-
-import { get } from 'lodash-es';
+import { error } from 'src/panel/helpers/error';
 import { EventBus } from 'src/panel/helpers/event-bus';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/core/events');
 
 export default defineComponent({
   components: {
-    rewards: () => import('src/panel/components/rewardDropdown.vue'),
-    loading: () => import('src/panel/components/loading.vue'),
-    eventsEdit: () => import('./events-edit.vue'),
+    rewards:               () => import('src/panel/components/rewardDropdown.vue'),
+    loading:               () => import('src/panel/components/loading.vue'),
+    eventsEdit:            () => import('./events-edit.vue'),
     'font-awesome-layers': FontAwesomeLayers,
   },
   setup(props, ctx) {
@@ -146,7 +146,7 @@ export default defineComponent({
     const testingInProgressEntries = ref([] as [id: string, state: number][]);
     const state = ref({
       loading: ButtonStates.progress,
-      save: ButtonStates.idle,
+      save:    ButtonStates.idle,
       pending: false,
       invalid: false,
     } as {
@@ -163,18 +163,18 @@ export default defineComponent({
       } else {
         state.value.pending = false;
       }
-    })
+    });
 
     const testingInProgress = computed(() => {
-      return Object.fromEntries(testingInProgressEntries.value)
-    })
+      return Object.fromEntries(testingInProgressEntries.value);
+    });
 
     const eventTypes = computed(() => {
       return [...new Set(events.value.map(o => o.name))];
-    })
+    });
 
     const filteredEvents = computed(() => {
-      let _events = events.value
+      const _events = events.value;
       return _events.sort((a, b) => {
         const A = a.name.toLowerCase();
         const B = b.name.toLowerCase();
@@ -185,7 +185,7 @@ export default defineComponent({
           return 1;
         }
         return 0; //default return value (no sorting)
-        })
+      });
     });
 
     onMounted(() => {
@@ -202,8 +202,8 @@ export default defineComponent({
           return error(err);
         }
         events.value = data;
-        console.groupCollapsed('events::generic::getAll')
-        console.debug({data});
+        console.groupCollapsed('events::generic::getAll');
+        console.debug({ data });
         console.groupEnd();
         state.value.loading = ButtonStates.idle;
       });
@@ -215,7 +215,7 @@ export default defineComponent({
             return error(err);
           }
           refresh();
-        })
+        });
       }
     };
     const triggerTest = (id: string) => {
@@ -227,10 +227,10 @@ export default defineComponent({
 
       testingInProgressEntries.value.splice(idx, 1, [id, 1]);
       socket.emit('test.event', id, () => {
-          testingInProgressEntries.value.splice(idx, 1, [id, 2]);
+        testingInProgressEntries.value.splice(idx, 1, [id, 2]);
         setTimeout(() => {
           testingInProgressEntries.value.splice(idx, 1, [id, 0]);
-        }, 1000)
+        }, 1000);
       });
     };
     const sendUpdate = (event: EventInterface) => {
@@ -238,15 +238,17 @@ export default defineComponent({
         if (err) {
           error(err);
         }
-      })
+      });
     };
     const newItem = () => {
-      ctx.root.$router.push({ name: 'EventsManagerEdit', params: { id: uuid() } }).catch(() => {});
+      ctx.root.$router.push({ name: 'EventsManagerEdit', params: { id: uuid() } }).catch(() => {
+        return; 
+      });
     };
     const isSidebarVisibleChange = (isVisible: boolean, ev: any) => {
       if (!isVisible) {
         if (state.value.pending) {
-          const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+          const isOK = confirm('You will lose your pending changes. Do you want to continue?');
           if (!isOK) {
             sidebarSlideEnabled.value = false;
             isSidebarVisible.value = false;
@@ -260,11 +262,13 @@ export default defineComponent({
           }
         }
         isSidebarVisible.value = isVisible;
-        ctx.root.$router.push({ name: 'EventsManagerList' }).catch(() => {});
+        ctx.root.$router.push({ name: 'EventsManagerList' }).catch(() => {
+          return; 
+        });
       } else {
         state.value.save = ButtonStates.idle;
       }
-    }
+    };
 
     return {
       events,
@@ -287,9 +291,9 @@ export default defineComponent({
       ButtonStates,
       get,
       EventBus,
-    }
-  }
-})
+    };
+  },
+});
 </script>
 
 <style scoped>

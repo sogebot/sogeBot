@@ -33,19 +33,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api'
+import { defineComponent } from '@vue/composition-api';
 
 export default defineComponent({
   props: {
-    text: String,
-    href: String,
-    icon: [String, Array, Boolean],
-    target: String,
-    spin: Boolean,
+    text:     String,
+    href:     String,
+    icon:     [String, Array, Boolean],
+    target:   String,
+    spin:     Boolean,
     disabled: Boolean,
-    event: String
-  }
-})
+    event:    String,
+  },
+});
 </script>
 
 <style scoped>

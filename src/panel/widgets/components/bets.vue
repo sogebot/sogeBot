@@ -43,15 +43,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch, onUnmounted } from '@vue/composition-api'
-
-import { getSocket } from 'src/panel/helpers/socket';
-import { EventBus } from 'src/panel/helpers/event-bus';
-import { error } from 'src/panel/helpers/error';
-import { capitalize } from 'src/panel/helpers/capitalize';
-import translate from 'src/panel/helpers/translate';
+import {
+  defineComponent, onMounted, onUnmounted, ref, watch,
+} from '@vue/composition-api';
 
 import type { BetsInterface, BetsParticipationsInterface } from 'src/bot/database/entity/bets';
+import { capitalize } from 'src/panel/helpers/capitalize';
+import { error } from 'src/panel/helpers/error';
+import { EventBus } from 'src/panel/helpers/event-bus';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 type Props = {
   popout: boolean;
@@ -75,7 +76,7 @@ export default defineComponent({
         m > 9 ? m : (h ? '0' + m : m || '0'),
         s > 9 ? s : '0' + s,
       ].filter(a => a).join(':');
-    }
+    },
   },
   setup(props: Props, ctx) {
     const betPercentGain = ref(0);
@@ -85,37 +86,41 @@ export default defineComponent({
     const title = ref('');
     const arePointsGiven = ref(false);
     const interval = ref([] as number[]);
-    const bets = ref([] as BetsParticipationsInterface[])
+    const bets = ref([] as BetsParticipationsInterface[]);
 
     watch(betPercentGain, (value, old) => {
-      socket.emit('settings.update', {betPercentGain: Number(value)}, () => {})
+      socket.emit('settings.update', { betPercentGain: Number(value) }, () => {
+        return; 
+      });
     });
 
     onMounted(() => {
       interval.value.push(
         window.setInterval(() => socket.emit('bets::getCurrentBet', (err: string | null, _current: Required<BetsInterface>) => {
           if (err) {
-            return error(err)
+            return error(err);
           }
           if (_current) {
-            locked.value = _current.isLocked
-            options.value = _current.options
+            locked.value = _current.isLocked;
+            options.value = _current.options;
             timer.value = Number(Number((Number(_current.endedAt) - new Date().getTime()) / 1000).toFixed(0));
-            if (timer.value <= 0) timer.value = 0
-            title.value = _current.title
-            bets.value = _current.participations
-            arePointsGiven.value = _current.arePointsGiven
+            if (timer.value <= 0) {
+              timer.value = 0;
+            }
+            title.value = _current.title;
+            bets.value = _current.participations;
+            arePointsGiven.value = _current.arePointsGiven;
           } else {
-            title.value = ''
+            title.value = '';
             arePointsGiven.value = true;
             timer.value = null,
-            options.value = []
+            options.value = [];
           }
-        }), 1000)
+        }), 1000),
       );
       socket.emit('settings', (err: string | null, settings: {[x: string]: any}) => {
-        betPercentGain.value = settings.betPercentGain[0]
-      })
+        betPercentGain.value = settings.betPercentGain[0];
+      });
     });
     onUnmounted(() => {
       for(const i of interval.value) {
@@ -124,16 +129,18 @@ export default defineComponent({
     });
 
     const close = (index: number) => {
-      socket.emit('bets::close', index)
+      socket.emit('bets::close', index);
     };
     const getBetsPercentage = (index: number) => {
-      if (bets.value.length === 0) return 0
+      if (bets.value.length === 0) {
+        return 0;
+      }
 
-      let percentage = (100 / bets.value.length) * bets.value.filter(o => Number(o.optionIdx) === Number(index)).length + '%'
-      return percentage === '0%' ? '0' : percentage
+      const percentage = (100 / bets.value.length) * bets.value.filter(o => Number(o.optionIdx) === Number(index)).length + '%';
+      return percentage === '0%' ? '0' : percentage;
     };
     const getBets = (index: number) => {
-      return bets.value.filter(o => Number(o.optionIdx) === Number(index)).length
+      return bets.value.filter(o => Number(o.optionIdx) === Number(index)).length;
     };
 
     return {
@@ -151,7 +158,7 @@ export default defineComponent({
       capitalize,
       EventBus,
       translate,
-    }
+    };
   },
 });
 </script>

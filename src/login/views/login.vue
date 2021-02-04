@@ -31,26 +31,28 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted } from '@vue/composition-api'
-import { BContainer } from 'bootstrap-vue'
-import { BButton } from 'bootstrap-vue'
+import {
+  computed, defineComponent, onMounted, 
+} from '@vue/composition-api';
+import { BContainer } from 'bootstrap-vue';
+import { BButton } from 'bootstrap-vue';
 
 export default defineComponent({
   components: {
     'b-container': BContainer,
-    'b-btn': BButton,
+    'b-btn':       BButton,
   },
   setup() {
     const error = computed(() => {
-      const hash = window.location.hash
+      const hash = window.location.hash;
       if (hash.trim().length > 0) {
-        const errorFromHash = hash.match(/error=[a-zA-Z0-9+]*/)
+        const errorFromHash = hash.match(/error=[a-zA-Z0-9+]*/);
         if (errorFromHash) {
           return errorFromHash[0].split('=')[1];
         }
       }
       return null;
-    })
+    });
     const url = computed(() => window.location.origin);
     const publicPage = () => {
       window.location.assign(url.value + '/public/');
@@ -58,29 +60,31 @@ export default defineComponent({
     const tryAgain =  () => {
       const gotoAfterLogin = sessionStorage.getItem('goto-after-login');
       if (gotoAfterLogin) {
-        window.location.assign(gotoAfterLogin)
+        window.location.assign(gotoAfterLogin);
       } else {
         // go back history
         window.history.back();
       }
-    }
+    };
     const login = () => {
       window.location.assign('http://oauth.sogebot.xyz/?state=' + encodeURIComponent(window.btoa(
         JSON.stringify({
-          url: url.value,
+          url:      url.value,
           referrer: document.referrer,
-        })
-      )))
-    }
+        }),
+      )));
+    };
     onMounted(() => {
-      const hash = window.location.hash
+      const hash = window.location.hash;
       if (hash.trim().length === 0) {
         // autorefresh
         login();
       }
     });
-    return { error, url, login, publicPage, tryAgain }
-  }
+    return {
+      error, url, login, publicPage, tryAgain, 
+    };
+  },
 });
 </script>
 

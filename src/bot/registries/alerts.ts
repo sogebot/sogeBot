@@ -88,7 +88,7 @@ class Alerts extends Registry {
     adminEndpoint(this.nsp, 'alerts::deleteMedia', async (id, cb) => {
       cb(
         null,
-        await getRepository(AlertMedia).delete({ id: String(id) })
+        await getRepository(AlertMedia).delete({ id: String(id) }),
       );
     });
     adminEndpoint(this.nsp, 'alerts::cloneMedia', async (toClone: [string, string], cb) => {
@@ -99,7 +99,7 @@ class Alerts extends Registry {
           await getRepository(AlertMedia).save({
             ...item,
             id: toClone[1], 
-          })
+          }),
         );
       } catch (e) {
         cb(e.stack, null);
@@ -120,7 +120,7 @@ class Alerts extends Registry {
       try {
         cb(
           null,
-          await getRepository(AlertMedia).find({ id: String(id) })
+          await getRepository(AlertMedia).find({ id: String(id) }),
         );
 
       } catch (e) {
@@ -131,7 +131,7 @@ class Alerts extends Registry {
       try {
         cb(
           null,
-          await getRepository(Alert).save(item)
+          await getRepository(Alert).save(item),
         );
       } catch (e) {
         cb(e.stack, null);
@@ -144,7 +144,7 @@ class Alerts extends Registry {
           await getRepository(Alert).findOne({
             where:     { id },
             relations: ['rewardredeems', 'cmdredeems', 'cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'],
-          })
+          }),
         );
       } catch (e) {
         cb(e.stack);
@@ -154,7 +154,7 @@ class Alerts extends Registry {
       try {
         cb(
           null,
-          await getRepository(Alert).find({ relations: ['rewardredeems', 'cmdredeems', 'cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'] })
+          await getRepository(Alert).find({ relations: ['rewardredeems', 'cmdredeems', 'cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'] }),
         );
       } catch (e) {
         cb (e, []);

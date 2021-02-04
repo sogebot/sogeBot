@@ -171,6 +171,7 @@
     "eslint": "7.18.0",
     "eslint-plugin-import": "2.22.1",
     "eslint-plugin-unused-imports": "1.0.1",
+    "eslint-plugin-vue": "7.5.0",
     "file-loader": "6.2.0",
     "git-semver-tags": "4.1.1",
     "gsap": "3.6.0",
@@ -235,6 +236,9 @@
       "eslint --fix"
     ],
     "*.ts": [
+      "eslint --fix"
+    ],
+    "*.vue": [
       "eslint --fix"
     ],
     "*.json": [

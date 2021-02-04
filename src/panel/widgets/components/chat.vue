@@ -53,27 +53,28 @@
 </template>
 
 <script>
-import { getSocket } from 'src/panel/helpers/socket';
-import { sortedUniq, flatten } from 'lodash-es';
-import { EventBus } from 'src/panel/helpers/event-bus';
+import { flatten, sortedUniq } from 'lodash-es';
 import { get } from 'lodash-es';
+
+import { EventBus } from 'src/panel/helpers/event-bus';
+import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
 export default {
   props: ['popout', 'nodrag'],
-  data: function () {
+  data:  function () {
     return {
       translate,
-      theme: 'light',
-      socket: getSocket('/widgets/chat'),
-      chatMessage: '',
-      chatters: [],
+      theme:        'light',
+      socket:       getSocket('/widgets/chat'),
+      chatMessage:  '',
+      chatters:     [],
       isRefreshing: false,
-      room: '',
-      interval: [],
+      room:         '',
+      interval:     [],
       EventBus,
-      show: true,
-    }
+      show:         true,
+    };
   },
 
   beforeDestroy: function() {
@@ -85,7 +86,7 @@ export default {
     isHttps() {
       const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       const isSecureHttp = window.location.protocol === 'https:';
-      const isCorrectPort = ['', '443'].includes(window.location.port) && window.location.protocol === 'https:'
+      const isCorrectPort = ['', '443'].includes(window.location.port) && window.location.protocol === 'https:';
       return isLocalhost || (isSecureHttp && isCorrectPort);
     },
 
@@ -94,8 +95,8 @@ export default {
         + this.room
         + '/chat'
         + (this.theme === 'dark' ? '?darkpopout' : '')
-        + (this.theme === 'dark' ? '&parent=' + window.location.hostname : '?parent=' + window.location.hostname)
-    }
+        + (this.theme === 'dark' ? '&parent=' + window.location.hostname : '?parent=' + window.location.hostname);
+    },
   },
   methods: {
     refresh: function (event) {
@@ -103,22 +104,26 @@ export default {
       this.$nextTick(() => this.show = true);
     },
     sendChatMessage: function () {
-      if (this.chatMessage.length > 0) this.socket.emit('chat.message.send', this.chatMessage)
-      this.chatMessage = ''
+      if (this.chatMessage.length > 0) {
+        this.socket.emit('chat.message.send', this.chatMessage);
+      }
+      this.chatMessage = '';
     },
     _chatters() {
       if (this.room.length > 0) {
         this.socket.emit('viewers', (err, data) => {
-          if (err) return console.error('Server error', err)
-
-          let chatters = []
-          for (let chatter of Object.entries(data.chatters).map(o => o[1])) {
-            chatters.push(chatter)
+          if (err) {
+            return console.error('Server error', err);
           }
-          this.chatters = sortedUniq(flatten(chatters))
-        })
+
+          const chatters = [];
+          for (const chatter of Object.entries(data.chatters).map(o => o[1])) {
+            chatters.push(chatter);
+          }
+          this.chatters = sortedUniq(flatten(chatters));
+        });
       }
-    }
+    },
   },
   created: function () {
     this.interval.push(setInterval(() => {
@@ -126,14 +131,16 @@ export default {
     }, 60000));
 
     this.socket.emit('room', (err, room) => {
-      if (err) return console.error(err)
-      this.room = room
+      if (err) {
+        return console.error(err);
+      }
+      this.room = room;
       this._chatters();
-    })
+    });
 
     this.interval.push(setInterval(() => {
       this.theme = (localStorage.getItem('theme') || get(this.$store.state, 'configuration.core.ui.theme', 'light'));
     }, 100));
-  }
-}
+  },
+};
 </script>

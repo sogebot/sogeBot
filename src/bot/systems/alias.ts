@@ -324,7 +324,7 @@ class Alias extends System {
           enabled:    true,
           visible:    true,
           permission: pItem.id ?? defaultPermissions.VIEWERS,
-        })
+        }),
       );
       return [{ response, ...opts }];
     } catch (e) {

@@ -14,7 +14,7 @@ export class eventlistIsTestAttr1593591475193 implements MigrationInterface {
 
     for (const event of events) {
       await queryRunner.query(
-        `INSERT INTO event_list(${Object.keys(event).join(', ')}, isTest) values(${Object.keys(event).map(o => '?')}, ?)`, [ ...Object.keys(event).map(key => event[key]), false ]
+        `INSERT INTO event_list(${Object.keys(event).join(', ')}, isTest) values(${Object.keys(event).map(o => '?')}, ?)`, [ ...Object.keys(event).map(key => event[key]), false ],
       );
     }
   }
@@ -30,7 +30,7 @@ export class eventlistIsTestAttr1593591475193 implements MigrationInterface {
 
     for (const event of events) {
       await queryRunner.query(
-        `INSERT INTO event_list(${Object.keys(event).filter(o => o !== 'isTest').join(', ')}, isTest) values(${Object.keys(event).map(o => '?')}, ?)`, [ ...Object.keys(event).filter(o => o !== 'isTest').map(key => event[key]) ]
+        `INSERT INTO event_list(${Object.keys(event).filter(o => o !== 'isTest').join(', ')}, isTest) values(${Object.keys(event).map(o => '?')}, ?)`, [ ...Object.keys(event).filter(o => o !== 'isTest').map(key => event[key]) ],
       );
     }
   }

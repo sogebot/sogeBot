@@ -13,7 +13,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, onMounted, ref } from '@vue/composition-api'
+import {
+  defineComponent, onMounted, reactive, ref, 
+} from '@vue/composition-api';
+
 import { getSocket } from '../helpers/socket';
 
 const socket = getSocket('/');
@@ -24,11 +27,11 @@ function classNameMod(is: boolean) {
 
 function classNameResponse(ms: number) {
   if (ms >= 10000) {
-    return 'alert-danger'
+    return 'alert-danger';
   } else if (ms < 10000 && ms >= 6000) {
-    return 'alert-warning'
+    return 'alert-warning';
   } else {
-    return 'alert-success'
+    return 'alert-success';
   }
 }
 
@@ -60,12 +63,12 @@ function title(status: 0 | 1 | 2 | 3) {
 
 const setDebug = () => {
   socket.emit('debug::get', (err: null, debugEnv: string) => {
-    const debug = prompt("Set debug", debugEnv);
+    const debug = prompt('Set debug', debugEnv);
     if (debug !== null) {
       socket.emit('debug::set', debug);
     }
-  })
-}
+  });
+};
 
 export default defineComponent({
   setup() {
@@ -81,7 +84,7 @@ export default defineComponent({
       MOD: false,
       RES: 0,
       API: 0,
-      TMI: 0
+      TMI: 0,
     });
 
     const refresh = () => {
@@ -98,15 +101,17 @@ export default defineComponent({
         data.API = dataFromSocket.API;
         data.TMI = dataFromSocket.TMI;
         setTimeout(() => refresh(), 1000);
-      })
-    }
+      });
+    };
 
     onMounted(() => {
       socket.emit('version', (recvVersion: string) => version.value = recvVersion);
-      refresh()
+      refresh();
     });
 
-    return { version, data, classNameMod, classNameResponse, className, title, setDebug }
-  }
+    return {
+      version, data, classNameMod, classNameResponse, className, title, setDebug, 
+    };
+  },
 });
 </script>

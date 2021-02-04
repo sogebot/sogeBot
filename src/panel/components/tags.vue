@@ -33,8 +33,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from '@vue/composition-api';
+import {
+  defineComponent, ref, watch, 
+} from '@vue/composition-api';
 import { isEqual } from 'lodash';
+
 import translate from 'src/panel/helpers/translate';
 
 interface Props {
@@ -45,8 +48,8 @@ interface Props {
 
 export default defineComponent({
   props: {
-    value: Array,
-    ifEmptyTag: String,
+    value:       Array,
+    ifEmptyTag:  String,
     placeholder: String,
   },
   setup(props: Props, context) {
@@ -77,7 +80,7 @@ export default defineComponent({
     const emitUpdate = () => {
       if (Array.isArray(currentValue.value)) {
         currentValue.value.push(addToCurrentValue.value);
-        addToCurrentValue.value = ''
+        addToCurrentValue.value = '';
       }
       console.log('input: ' + currentValue.value);
       context.emit('input', currentValue.value);
@@ -97,8 +100,7 @@ export default defineComponent({
       addTag,
       removeTag,
       translate,
-    }
-  }
+    };
+  },
 });
 </script>
-

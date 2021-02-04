@@ -1,7 +1,6 @@
 {
-  "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint", "unused-imports", "import"],
-  "extends": ["plugin:@typescript-eslint/recommended", "plugin:import/typescript"],
+  "extends": ["plugin:@typescript-eslint/recommended", "plugin:import/typescript", "plugin:vue/base"],
   "rules": {
     "key-spacing": ["error", { "beforeColon": false, "afterColon": true, "align": "value" }],
     "object-curly-spacing": ["error", "always"],
@@ -73,6 +72,7 @@
     "no-useless-call": "error"
   },
   "parserOptions": {
+    "parser": "@typescript-eslint/parser",
     "ecmaFeatures": {
       "jsx": true
     },

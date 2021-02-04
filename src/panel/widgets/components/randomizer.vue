@@ -80,85 +80,90 @@
 </template>
 
 <script>
+import { library } from '@fortawesome/fontawesome-svg-core';
+import {
+  faDice, faDiceFive, faDiceFour, faDiceOne, faDiceSix, faDiceThree, faDiceTwo,
+} from '@fortawesome/free-solid-svg-icons';
+import {
+  isNil, orderBy, size,
+} from 'lodash-es';
+
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { getSocket } from 'src/panel/helpers/socket';
-import { isNil, size, orderBy } from 'lodash-es';
 import translate from 'src/panel/helpers/translate';
 
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faDice, faDiceOne, faDiceTwo, faDiceThree, faDiceFour, faDiceFive, faDiceSix } from '@fortawesome/free-solid-svg-icons';
 library.add(faDice, faDiceOne, faDiceTwo, faDiceThree, faDiceFour, faDiceFive, faDiceSix);
 
 export default {
-  props: ['popout', 'nodrag'],
-  components: {
-    loading: () => import('src/panel/components/loading.vue'),
-  },
-  data: function () {
+  props:      ['popout', 'nodrag'],
+  components: { loading: () => import('src/panel/components/loading.vue') },
+  data:       function () {
     return {
       EventBus,
       translate,
-      items: [],
+      items:    [],
       tabIndex: 0,
-      state: {
+      state:    {
         editation: this.$state.idle,
-        loading: this.$state.progress,
+        loading:   this.$state.progress,
       },
-      selected: [],
+      selected:         [],
       selectedVariable: null,
-      socket: getSocket('/registries/randomizer'),
-      draggingItem: null,
+      socket:           getSocket('/registries/randomizer'),
+      draggingItem:     null,
 
-      isSpinning: false,
-      diceIcon: ['one', 'two', 'three', 'four', 'five', 'six'],
+      isSpinning:  false,
+      diceIcon:    ['one', 'two', 'three', 'four', 'five', 'six'],
       diceIconIdx: 0,
 
       interval: 0,
-      }
+    };
   },
   created: async function () {
     this.state.loading = this.$state.progress;
     await Promise.all([
       this.refresh(),
-    ])
+    ]);
     this.state.loading = this.$state.success;
 
     this.interval = setInterval(() => {
       if (this.isSpinning) {
         this.diceIconIdx = Math.floor(Math.random() * this.diceIcon.length);
       }
-    }, 100)
+    }, 100);
   },
   beforeDestroy() {
     clearInterval(this.interval);
   },
   computed: {
     watchedItems: function () {
-      return orderBy(this.items.filter((o) => o.widgetOrder !== -1), 'widgetOrder', 'asc')
+      return orderBy(this.items.filter((o) => o.widgetOrder !== -1), 'widgetOrder', 'asc');
     },
     nonWatchedItems: function () {
       return [
-        ...this.items.filter((o) => o.widgetOrder === -1)
-      ]
+        ...this.items.filter((o) => o.widgetOrder === -1),
+      ];
     },
     nonWatchedItemsCount: function () {
-      return size(this.nonWatchedItems)
-    }
+      return size(this.nonWatchedItems);
+    },
   },
   watch: {
     nonWatchedItems: function (value) {
       if (!isNil(this.nonWatchedItems[0])) {
-        this.selectedVariable = this.nonWatchedItems[0].id
+        this.selectedVariable = this.nonWatchedItems[0].id;
       }
-    }
+    },
   },
   methods: {
     spin: function () {
       this.isSpinning = true;
-      this.socket.emit('randomizer::startSpin', () => {})
+      this.socket.emit('randomizer::startSpin', () => {
+        return; 
+      });
       setTimeout(() => {
         this.isSpinning = false;
-      }, 10000)
+      }, 10000);
     },
     toggleIsShown: function (variable) {
       const isShown = variable.isShown;
@@ -169,7 +174,7 @@ export default {
       this.save();
     },
     addToWatch: function (variable) {
-      this.items.find(o => o.id === variable).widgetOrder = this.watchedItems.length
+      this.items.find(o => o.id === variable).widgetOrder = this.watchedItems.length;
       this.save();
     },
     reorder() {
@@ -186,7 +191,9 @@ export default {
     },
     save() {
       this.state.editation = this.$state.idle;
-      this.socket.emit('randomizer::save', this.items, () => {})
+      this.socket.emit('randomizer::save', this.items, () => {
+        return; 
+      });
     },
     refresh: function () {
       return new Promise((resolve) => {
@@ -195,10 +202,10 @@ export default {
             return console.error(err);
           }
           console.log('Loaded', data);
-          this.items = data
-          resolve()
-        })
-      })
+          this.items = data;
+          resolve();
+        });
+      });
     },
     dragstart(order, e) {
       this.draggingItem = order;
@@ -206,10 +213,10 @@ export default {
       e.dataTransfer.setData('text/plain', 'dummy');
     },
     dragenter(newOrder, e) {
-      const value = this.items.find(o => o.widgetOrder === this.draggingItem)
-      const entered = this.items.find(o => o.widgetOrder === newOrder)
+      const value = this.items.find(o => o.widgetOrder === this.draggingItem);
+      const entered = this.items.find(o => o.widgetOrder === newOrder);
       entered.widgetOrder = this.draggingItem;
-      this.draggingItem = newOrder
+      this.draggingItem = newOrder;
       value.widgetOrder = this.draggingItem;
 
       for (let i = 0, length = this.watchedItems.length; i < length; i++) {
@@ -217,7 +224,7 @@ export default {
       }
       this.$refs['randomizer_item_' + this.draggingItem][0].style.opacity = 0.5;
 
-      this.$forceUpdate()
+      this.$forceUpdate();
     },
     dragend(order, e) {
       for (let i = 0, length = this.watchedItems.length; i < length; i++) {
@@ -231,6 +238,6 @@ export default {
         this.selected.push(item.id);
       }
     },
-  }
-}
+  },
+};
 </script>

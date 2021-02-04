@@ -23,17 +23,19 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, PropSync } from 'vue-property-decorator';
+import {
+  Component, PropSync, Vue, 
+} from 'vue-property-decorator';
 
-import layout1 from '../media/layout1.png'
-import layout2 from '../media/layout2.png'
-import layout3 from '../media/layout3.png'
-import layout4 from '../media/layout4.png'
-import layout5 from '../media/layout5.png'
+import layout1 from '../media/layout1.png';
+import layout2 from '../media/layout2.png';
+import layout3 from '../media/layout3.png';
+import layout4 from '../media/layout4.png';
+import layout5 from '../media/layout5.png';
 
 @Component({})
 export default class AlertsEditFollowForm extends Vue {
-  @PropSync('layout') readonly layout_number !: number
+  @PropSync('layout') readonly layout_number !: number;
 
   layout1 = layout1;
   layout2 = layout2;

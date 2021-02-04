@@ -72,23 +72,24 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed, watch, getCurrentInstance } from '@vue/composition-api'
+import {
+  computed, defineComponent, getCurrentInstance, onMounted, ref, watch,
+} from '@vue/composition-api';
 import { isNil } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 
+import { TimerInterface } from 'src/bot/database/entity/timer';
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import { capitalize } from 'src/panel/helpers/capitalize';
+import { EventBus } from 'src/panel/helpers/event-bus';
 import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
-import { EventBus } from 'src/panel/helpers/event-bus';
-import { capitalize } from 'src/panel/helpers/capitalize';
-import { ButtonStates } from 'src/panel/helpers/buttonStates';
 
-import { TimerInterface } from 'src/bot/database/entity/timer';
-
-const socket = getSocket('/systems/timers')
+const socket = getSocket('/systems/timers');
 
 export default defineComponent({
   components: {
-    loading: () => import('src/panel/components/loading.vue'),
+    loading:    () => import('src/panel/components/loading.vue'),
     timersEdit: () => import('./timers-edit.vue'),
   },
   setup(props, ctx) {
@@ -100,7 +101,7 @@ export default defineComponent({
     const items = ref([] as TimerInterface[]);
     const state = ref({
       loading: ButtonStates.progress,
-      save: ButtonStates.idle,
+      save:    ButtonStates.idle,
       pending: false,
       invalid: false,
     } as {
@@ -110,21 +111,28 @@ export default defineComponent({
       invalid: boolean;
     });
     const filtered = computed(() => {
-      if (search.value.length === 0) return items.value
+      if (search.value.length === 0) {
+        return items.value;
+      }
       return items.value.filter((o) => {
-        const isSearchInName = !isNil(o.name.match(new RegExp(search.value, 'ig')))
-        return isSearchInName
-      })
+        const isSearchInName = !isNil(o.name.match(new RegExp(search.value, 'ig')));
+        return isSearchInName;
+      });
     });
     const fields = [
-      { key: 'name', label: translate('timers.dialog.name'), sortable: true },
+      {
+        key: 'name', label: translate('timers.dialog.name'), sortable: true,
+      },
       // virtual attributes
-      { key: 'triggerEveryMessage', label: translate('messages'), sortable: true, tdClass: 'font-weight-bold text-primary font-bigger' },
-      { key: 'triggerEverySecond', label: capitalize(translate('seconds')), sortable: true, tdClass: 'font-weight-bold text-primary font-bigger' },
+      {
+        key: 'triggerEveryMessage', label: translate('messages'), sortable: true, tdClass: 'font-weight-bold text-primary font-bigger',
+      },
+      {
+        key: 'triggerEverySecond', label: capitalize(translate('seconds')), sortable: true, tdClass: 'font-weight-bold text-primary font-bigger',
+      },
       { key: 'responses', label: translate('timers.dialog.responses') },
       { key: 'buttons', label: '' },
     ];
-
 
     onMounted(() => {
       refresh();
@@ -142,22 +150,24 @@ export default defineComponent({
       } else {
         state.value.pending = false;
       }
-    })
+    });
 
     const refresh = () => {
       socket.emit('generic::getAll', (err: string | null, _items: TimerInterface[]) => {
         items.value = _items;
         state.value.loading = ButtonStates.success;
-      })
-    }
+      });
+    };
 
     const newItem = () => {
-      ctx.root.$router.push({ name: 'TimersManagerEdit', params: { id: uuid() } }).catch(() => {});
+      ctx.root.$router.push({ name: 'TimersManagerEdit', params: { id: uuid() } }).catch(() => {
+        return; 
+      });
     };
     const isSidebarVisibleChange = (isVisible: boolean, ev: any) => {
       if (!isVisible) {
         if (state.value.pending) {
-          const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+          const isOK = confirm('You will lose your pending changes. Do you want to continue?');
           if (!isOK) {
             sidebarSlideEnabled.value = false;
             isSidebarVisible.value = false;
@@ -171,25 +181,29 @@ export default defineComponent({
           }
         }
         isSidebarVisible.value = isVisible;
-        ctx.root.$router.push({ name: 'TimersManagerList' }).catch(() => {});
+        ctx.root.$router.push({ name: 'TimersManagerList' }).catch(() => {
+          return; 
+        });
       } else {
         state.value.save = ButtonStates.idle;
       }
-    }
+    };
     const del = (item: Required<TimerInterface>) => {
       if (confirm(`Do you want to delete timer ${item.name} with ${item.messages.length} message(s)?`)) {
         socket.emit('generic::deleteById', item.id, () => {
-          items.value = items.value.filter((o) => o.id !== item.id)
-        })
+          items.value = items.value.filter((o) => o.id !== item.id);
+        });
       }
-    }
+    };
     const linkTo = (item: Required<TimerInterface>) => {
       console.debug('Clicked', item.id);
       ctx.root.$router.push({ name: 'TimersManagerEdit', params: { id: item.id } });
-    }
+    };
     const update = (item: TimerInterface) => {
-      socket.emit('timers::save', item, () => {});
-    }
+      socket.emit('timers::save', item, () => {
+        return;
+      });
+    };
 
     return {
       search,
@@ -211,8 +225,8 @@ export default defineComponent({
       ButtonStates,
       EventBus,
       capitalize,
-    }
-  }
+    };
+  },
 });
 </script>
 
@@ -256,4 +270,3 @@ export default defineComponent({
   padding: 0.375rem 0.4rem;
 }
 </style>
-

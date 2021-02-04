@@ -157,26 +157,29 @@
 </template>
 
 <script lang="ts">
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
-
-import { defineComponent, ref, onMounted, computed, watch } from '@vue/composition-api'
-import { SongPlaylistInterface } from 'src/bot/database/entity/song';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faStepBackward, faStepForward } from '@fortawesome/free-solid-svg-icons';
-import { error } from 'src/panel/helpers/error';
+import {
+  computed, defineComponent, onMounted, ref, watch, 
+} from '@vue/composition-api';
+
+import { SongPlaylistInterface } from 'src/bot/database/entity/song';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import { error } from 'src/panel/helpers/error';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
+
 library.add(faStepBackward, faStepForward);
 
 let lastVariant = -1;
-let labelToVariant = new Map<string, string>();
+const labelToVariant = new Map<string, string>();
 const socket = getSocket('/systems/songs');
 
 export default defineComponent({
   components: {
     loading: () => import('../../../components/loading.vue'),
-    tags: () => import('../../../components/tags.vue'),
+    tags:    () => import('../../../components/tags.vue'),
   },
   filters: {
     formatTime(seconds: number) {
@@ -188,7 +191,7 @@ export default defineComponent({
         m > 9 ? m : (h ? '0' + m : m || '0'),
         s > 9 ? s : '0' + s,
       ].filter(a => a).join(':');
-    }
+    },
   },
   setup() {
     const items = ref([] as SongPlaylistInterface[]);
@@ -198,19 +201,21 @@ export default defineComponent({
 
     const state = ref({
       loading: ButtonStates.progress,
-      import: ButtonStates.idle,
-      save: ButtonStates.idle,
+      import:  ButtonStates.idle,
+      save:    ButtonStates.idle,
     } as {
       loading: number;
       import: number;
       save: number;
-    })
+    });
     const showTag = ref(null as string | null); // null === all
     const currentTag = ref('general');
-    const tags = ref([] as string[])
+    const tags = ref([] as string[]);
 
     const fields = [
-      { key: 'thumbnail', label: '', tdClass: 'fitThumbnail' },
+      {
+        key: 'thumbnail', label: '', tdClass: 'fitThumbnail', 
+      },
       { key: 'title', label: '' },
       { key: 'buttons', label: '' },
     ];
@@ -223,107 +228,109 @@ export default defineComponent({
 
     onMounted(() => {
       refreshPlaylist();
-    })
+    });
 
     watch(showTag, () => {
       currentPage.value = 1;
-      refreshPlaylist()
-    })
+      refreshPlaylist();
+    });
 
     watch([currentPage, search], () => {
-      refreshPlaylist()
-    })
+      refreshPlaylist();
+    });
 
     const refreshPlaylist = async () => {
       await Promise.all([
         new Promise<void>((resolve, reject) => {
           socket.emit('current.playlist.tag', (err: string | null, tag: string) => {
             if (err) {
-              error(err)
+              error(err);
               reject(err);
             }
             currentTag.value = tag;
             resolve();
-          })
+          });
         }),
         new Promise<void>((resolve, reject) => {
           socket.emit('get.playlist.tags', (err: string | null, _tags: string[]) => {
             if (err) {
-              error(err)
+              error(err);
               reject(err);
             }
             tags.value = [..._tags];
             resolve();
-          })
+          });
         }),
         new Promise<void>((resolve, reject) => {
-          socket.emit('find.playlist', { page: (currentPage.value - 1), search: search.value, tag: showTag.value }, (err: string | null, _items: SongPlaylistInterface[], _count: number) => {
+          socket.emit('find.playlist', {
+            page: (currentPage.value - 1), search: search.value, tag: showTag.value, 
+          }, (err: string | null, _items: SongPlaylistInterface[], _count: number) => {
             if (err) {
-              error(err)
+              error(err);
               reject(err);
             }
-            for (let item of _items) {
-              item.startTime = item.startTime ? item.startTime : 0
-              item.endTime = item.endTime ? item.endTime : item.length
+            for (const item of _items) {
+              item.startTime = item.startTime ? item.startTime : 0;
+              item.endTime = item.endTime ? item.endTime : item.length;
             }
             count.value = _count;
             items.value = _items;
             resolve();
-          })
+          });
         }),
       ]);
       state.value.loading = ButtonStates.success;
       if (showTag.value && !tags.value.includes(showTag.value)) {
         showTag.value = null;
       }
-    }
+    };
 
     const generateThumbnail = (videoId: string) => {
-      return `https://img.youtube.com/vi/${videoId}/1.jpg`
-    }
+      return `https://img.youtube.com/vi/${videoId}/1.jpg`;
+    };
 
     const stopImport = () => {
       if (state.value.import === 1) {
-        state.value.import = 0
+        state.value.import = 0;
         socket.emit('stop.import', () => {
-          refreshPlaylist()
-        })
+          refreshPlaylist();
+        });
       }
-    }
+    };
 
     const addSongOrPlaylist = (evt: Event) => {
       if (evt) {
-        evt.preventDefault()
+        evt.preventDefault();
       }
       if (state.value.import === 0) {
-        state.value.import = 1
+        state.value.import = 1;
         socket.emit(toAdd.value.includes('playlist') ? 'import.playlist' : 'import.video', { playlist: toAdd.value, forcedTag: showTag.value }, (err: string | null, info: (CommandResponse)[]) => {
           if (err) {
-            state.value.import = 3
+            state.value.import = 3;
             setTimeout(() => {
-              importInfo.value = ''
-              state.value.import = 0
-            }, 2000)
+              importInfo.value = '';
+              state.value.import = 0;
+            }, 2000);
           } else {
-            state.value.import = 2
-            refreshPlaylist()
-            toAdd.value = ''
-            showImportInfo()
+            state.value.import = 2;
+            refreshPlaylist();
+            toAdd.value = '';
+            showImportInfo();
           }
-        })
+        });
       }
-    }
+    };
 
     const showImportInfo = async () => {
       importInfo.value = 'OK';
       setTimeout(() => {
-        importInfo.value = ''
-        state.value.import = 0
-      }, 2000)
-    }
+        importInfo.value = '';
+        state.value.import = 0;
+      }, 2000);
+    };
 
     const getVariant = (type: string) => {
-      const variants = [ "primary", "secondary", "success", "danger", "warning", "info", "light", "dark" ]
+      const variants = [ 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark' ];
       if (labelToVariant.has(type)) {
         return labelToVariant.get(type);
       } else {
@@ -331,40 +338,40 @@ export default defineComponent({
           lastVariant = 0;
         }
         labelToVariant.set(type, variants[lastVariant]);
-        lastVariant++
+        lastVariant++;
         return labelToVariant.get(type);
       }
-    }
+    };
 
     const updateItem = (videoId: string) => {
-      state.value.save = 1
+      state.value.save = 1;
 
-      let item = items.value.find((o) => o.videoId === videoId)
+      const item = items.value.find((o) => o.videoId === videoId);
       if (item) {
-        item.volume = Number(item.volume)
-        item.startTime = Number(item.startTime)
-        item.endTime = Number(item.endTime)
+        item.volume = Number(item.volume);
+        item.startTime = Number(item.startTime);
+        item.endTime = Number(item.endTime);
         socket.emit('songs::save', item, (err: string | null) => {
           if (err) {
-            console.error(err)
-            return state.value.save = 3
+            console.error(err);
+            return state.value.save = 3;
           }
-          state.value.save = 2
+          state.value.save = 2;
           refreshPlaylist();
           setTimeout(() => {
-            state.value.save = 0
-          }, 1000)
-        })
+            state.value.save = 0;
+          }, 1000);
+        });
       }
-    }
+    };
 
     const deleteItem = (id: string) => {
       if (confirm('Do you want to delete song ' + items.value.find(o => o.videoId === id)?.title + '?')) {
         socket.emit('delete.playlist', id, () => {
-          items.value = items.value.filter((o) => o.videoId !== id)
-        })
+          items.value = items.value.filter((o) => o.videoId !== id);
+        });
       }
-    }
+    };
 
     return {
       items,
@@ -390,8 +397,8 @@ export default defineComponent({
 
       ButtonStates,
       translate,
-    }
-  }
+    };
+  },
 });
 </script>
 

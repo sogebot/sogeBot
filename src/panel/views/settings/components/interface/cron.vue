@@ -23,7 +23,10 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import {
+  Component, Prop, Vue, Watch, 
+} from 'vue-property-decorator';
+
 import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
@@ -46,12 +49,12 @@ export default class cronInput extends Vue {
     getSocket(`/${this.$route.params.type}/${this.$route.params.id}`)
       .emit(this.emit, this.currentValue, (err: string | null, data: number[]) => {
         if (err) {
-          console.error(err)
+          console.error(err);
         } else {
           this.data = data;
         }
       });
     this.$emit('update', { value: this.currentValue });
   }
-};
+}
 </script>

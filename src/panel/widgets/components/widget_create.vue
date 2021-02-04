@@ -35,31 +35,31 @@ import translate from 'src/panel/helpers/translate';
 
 export default {
   props: ['dashboardId'],
-  data: function () {
+  data:  function () {
     return {
       translate,
-      socket: getSocket('/'),
+      socket:  getSocket('/'),
       widgets: [],
-      state: 0
-    }
+      state:   0,
+    };
   },
   methods: {
     add: function (widgetId) {
       this.socket.emit('addWidget', widgetId, this.dashboardId, () => {
-        this.$emit('addWidget')
-      })
-      this.state = 0
+        this.$emit('addWidget');
+      });
+      this.state = 0;
     },
     load: function () {
-      this.state = 1
+      this.state = 1;
       this.socket.emit('panel::availableWidgets', { userId: Number(this.$store.state.loggedUser.id), type: 'admin' }, (err, widgets) => {
         if (err) {
           return console.error(err);
         }
         this.widgets = widgets;
-        this.state = 2
-      })
-    }
-  }
-}
+        this.state = 2;
+      });
+    },
+  },
+};
 </script>

@@ -716,7 +716,7 @@ class Discord extends Integration {
               // names must be equal
               return 0;
             })
-            .map(o => ({ html: `<strong>${o.name}</strong> &lt;${o.id}&gt;`, value: o.id }))
+            .map(o => ({ html: `<strong>${o.name}</strong> &lt;${o.id}&gt;`, value: o.id })),
           );
         } else {
           cb(null, []);
@@ -766,7 +766,7 @@ class Discord extends Integration {
               // names must be equal
               return 0;
             })
-            .map(o => ({ html: `<strong>#${(o as DiscordJs.TextChannel).name}</strong> &lt;${o.id}&gt;`, value: o.id }))
+            .map(o => ({ html: `<strong>#${(o as DiscordJs.TextChannel).name}</strong> &lt;${o.id}&gt;`, value: o.id })),
           );
         } else {
           cb(null, []);

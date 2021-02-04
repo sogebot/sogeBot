@@ -22,27 +22,30 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, computed, onMounted } from '@vue/composition-api'
-import translate from 'src/panel/helpers/translate';
-import { getSocket } from 'src/panel/helpers/socket';
-import { error } from 'src/panel/helpers/error';
-import { flatten } from 'src/bot/helpers/flatten';
+import {
+  computed, defineComponent, onMounted, ref, watch, 
+} from '@vue/composition-api';
 import { escapeRegExp } from 'lodash';
+
+import { flatten } from 'src/bot/helpers/flatten';
+import { error } from 'src/panel/helpers/error';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/integrations/pubg');
 
 type Props = {
   value: string; title: string, settings: { [x: string]: any }
-}
+};
 
 export default defineComponent({
   props: {
     settings: Object,
-    value: String,
-    title: String,
+    value:    String,
+    title:    String,
   },
   setup(props: Props, ctx) {
-    const statsType = props.title.toLowerCase().includes('ranked') ? 'rankedGameModeStats' : 'gameModeStats'
+    const statsType = props.title.toLowerCase().includes('ranked') ? 'rankedGameModeStats' : 'gameModeStats';
     const _value = ref(props.value);
     const translatedTitle = translate(props.title);
     const computedExample = ref(null as null | string);
@@ -53,7 +56,7 @@ export default defineComponent({
     const updateExample = () => {
       if (props.settings) {
         if (selectedExampleOption.value) {
-          const dataset = props.settings.stats[statsType][selectedExampleOption.value]
+          const dataset = props.settings.stats[statsType][selectedExampleOption.value];
           let text = _value.value || '';
           for (const key of Object.keys(flatten(dataset))) {
             text = text.replace(new RegExp(escapeRegExp(`$${key}`), 'gi'), flatten(dataset)[key]);
@@ -64,26 +67,25 @@ export default defineComponent({
             } else {
               computedExample.value = data;
             }
-          })
+          });
         } else {
           computedExample.value = `Stats not fetched or your user doesn't played any ranked yet`;
         }
       }
-    }
+    };
 
     watch(_value, (val) => {
       ctx.emit('update', { value: val });
-      updateExample()
-    })
+      updateExample();
+    });
 
     onMounted(() => {
       updateExample();
-    })
+    });
 
     return {
-      _value, translatedTitle, computedExample, selectedExampleOption, exampleOptions
-    }
-  }
+      _value, translatedTitle, computedExample, selectedExampleOption, exampleOptions,
+    };
+  },
 });
 </script>
-

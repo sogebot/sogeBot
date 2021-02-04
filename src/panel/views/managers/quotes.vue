@@ -136,31 +136,32 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, getCurrentInstance, computed, watch } from '@vue/composition-api'
+import {
+  computed, defineComponent, getCurrentInstance, onMounted, ref, watch,
+} from '@vue/composition-api';
+import {
+  flatten, orderBy, uniq, xor,
+} from 'lodash-es';
+import { validationMixin } from 'vuelidate';
+import { required } from 'vuelidate/lib/validators';
+
 import { QuotesInterface } from 'src/bot/database/entity/quotes';
-import { getSocket } from 'src/panel/helpers/socket';
-import { orderBy, uniq, xor, flatten } from 'lodash-es';
-import { validationMixin } from 'vuelidate'
-import { required } from 'vuelidate/lib/validators'
-import translate from 'src/panel/helpers/translate';
+import { dayjs } from 'src/bot/helpers/dayjs';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { error } from 'src/panel/helpers/error';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 import { getUsernameById } from 'src/panel/helpers/userById';
-import { dayjs } from 'src/bot/helpers/dayjs';
 
 const socket = getSocket('/systems/quotes');
 
 export default defineComponent({
-  mixins: [ validationMixin ],
+  mixins:     [ validationMixin ],
   components: {
-    'loading': () => import('src/panel/components/loading.vue'),
-    'label-inside': () => import('src/panel/components/label-inside.vue')
+    'loading':      () => import('src/panel/components/loading.vue'),
+    'label-inside': () => import('src/panel/components/label-inside.vue'),
   },
-  validations: {
-    editationItem: {
-      quote: {required},
-    }
-  },
+  validations: { editationItem: { quote: { required } } },
   setup(props, ctx) {
     const instance = getCurrentInstance()?.proxy;
     const isSidebarVisible = ref(false);
@@ -175,24 +176,30 @@ export default defineComponent({
     const tagsString = ref('');
 
     const fields = [
-      { key: 'createdAt', label: translate('systems.quotes.date.name'), sortable: true },
-      { key: 'quote', label: translate('systems.quotes.quote.name'), sortable: true },
+      {
+        key: 'createdAt', label: translate('systems.quotes.date.name'), sortable: true,
+      },
+      {
+        key: 'quote', label: translate('systems.quotes.quote.name'), sortable: true,
+      },
       { key: 'tags', label: translate('systems.quotes.tags.name') },
-      { key: 'quotedByName', label: translate('systems.quotes.by.name'), sortable: true },
+      {
+        key: 'quotedByName', label: translate('systems.quotes.by.name'), sortable: true,
+      },
       // virtual attributes
       { key: 'buttons', label: '' },
     ];
 
     const state = ref({
       loading: ButtonStates.progress,
-      save: ButtonStates.idle,
+      save:    ButtonStates.idle,
       pending: false,
     } as {
       settings: number,
       loading: number,
       save: number,
       pending: boolean,
-    })
+    });
 
     watch(() => ctx.root.$route.params.id, (val) => {
       const $v = instance?.$v;
@@ -202,7 +209,7 @@ export default defineComponent({
       } else {
         state.value.pending = false;
       }
-    })
+    });
     watch([editationItem, tagsString], (val, oldVal) => {
       if (val !== null && oldVal !== null) {
         state.value.pending = true;
@@ -219,15 +226,15 @@ export default defineComponent({
 
     const refresh = () => {
       socket.emit('quotes:getAll', {}, async (err: string | null, items: QuotesInterface[]) => {
-        quotesFromDb.value = items
+        quotesFromDb.value = items;
         state.value.loading = ButtonStates.success;
-      })
+      });
     };
 
     const quotes = computed(() => {
-      let quotesFilteredBySearch: QuotesInterface[] = []
+      let quotesFilteredBySearch: QuotesInterface[] = [];
       if (search.value.trim().length > 0) {
-        for (let quote of quotesFromDb.value) {
+        for (const quote of quotesFromDb.value) {
           if (quote.quote.toLowerCase().includes(search.value)) {
             quotesFilteredBySearch.push(quote);
           }
@@ -235,30 +242,33 @@ export default defineComponent({
       } else {
         quotesFilteredBySearch = quotesFromDb.value;
       }
-      if (filteredTags.value.length === 0) return quotesFilteredBySearch
-      else {
-        let quotesFilteredByTags: QuotesInterface[] = []
-        for (let quote of quotesFilteredBySearch) {
-          for (let tag of quote.tags) {
+      if (filteredTags.value.length === 0) {
+        return quotesFilteredBySearch;
+      } else {
+        const quotesFilteredByTags: QuotesInterface[] = [];
+        for (const quote of quotesFilteredBySearch) {
+          for (const tag of quote.tags) {
             if (filteredTags.value.includes(tag)) {
               quotesFilteredByTags.push(quote);
-              break
+              break;
             }
           }
         }
-        return quotesFilteredByTags
+        return quotesFilteredByTags;
       }
     });
 
     const tags = computed(() => {
-      let tags: string[][] = []
-      for (let quote of quotesFromDb.value) tags.push(quote.tags)
-      return orderBy(uniq(flatten(tags)))
+      const _tags: string[][] = [];
+      for (const quote of quotesFromDb.value) {
+        _tags.push(quote.tags);
+      }
+      return orderBy(uniq(flatten(_tags)));
     });
 
     const toggleTags = (tag: string) => {
-      filteredTags.value = xor(filteredTags.value, [tag])
-    }
+      filteredTags.value = xor(filteredTags.value, [tag]);
+    };
 
     const save = () =>  {
       const $v = instance?.$v;
@@ -267,29 +277,31 @@ export default defineComponent({
         state.value.save = ButtonStates.progress;
 
         socket.emit('generic::setById', {
-          id: ctx.root.$route.params.id,
-          item: { ...editationItem.value, tags: tagsString.value.split(',').map(o => o.trim()) }
+          id:   ctx.root.$route.params.id,
+          item: { ...editationItem.value, tags: tagsString.value.split(',').map(o => o.trim()) },
         }, (err: string | null, data: QuotesInterface) => {
           if (err) {
             state.value.save = ButtonStates.fail;
             return error(err);
           } else {
-            console.groupCollapsed('generic::setById')
-            console.log({data})
+            console.groupCollapsed('generic::setById');
+            console.log({ data });
             console.groupEnd();
             state.value.save = ButtonStates.success;
             ctx.root.$nextTick(() => {
               refresh();
               state.value.pending = false;
-              ctx.root.$router.push({ name: 'QuotesManagerEdit', params: { id: String(data.id) } }).catch(() => {});
+              ctx.root.$router.push({ name: 'QuotesManagerEdit', params: { id: String(data.id) } }).catch(() => {
+                return;
+              });
             });
           }
           setTimeout(() => {
             state.value.save = ButtonStates.idle;
-          }, 1000)
+          }, 1000);
         });
       }
-    }
+    };
     const del = (id: number) => {
       if (confirm('Do you want to delete alias ' + quotesFromDb.value.find(o => o.id === id)?.quote + '?')) {
         socket.emit('generic::deleteById', id, (err: string | null) => {
@@ -297,13 +309,13 @@ export default defineComponent({
             return error(err);
           }
           refresh();
-        })
+        });
       }
-    }
+    };
     const isSidebarVisibleChange = (isVisible: boolean, ev: any) => {
       if (!isVisible) {
         if (state.value.pending) {
-          const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+          const isOK = confirm('You will lose your pending changes. Do you want to continue?');
           if (!isOK) {
             sidebarSlideEnabled.value = false;
             isSidebarVisible.value = false;
@@ -317,31 +329,33 @@ export default defineComponent({
           }
         }
         isSidebarVisible.value = isVisible;
-        ctx.root.$router.push({ name: 'QuotesManagerList' }).catch(() => {});
+        ctx.root.$router.push({ name: 'QuotesManagerList' }).catch(() => {
+          return;
+        });
       } else {
         state.value.save = ButtonStates.idle;
         if (sidebarSlideEnabled.value) {
-          editationItem.value = null
+          editationItem.value = null;
           loadEditationItem();
         }
       }
-    }
+    };
     const loadEditationItem = () => {
       if (ctx.root.$route.params.id) {
         socket.emit('generic::getOne', ctx.root.$route.params.id, async (err: string | null, data: QuotesInterface) => {
           if (err) {
             return error(err);
           }
-          console.debug({data})
+          console.debug({ data });
           if (data === null) {
             // we are creating new item
             editationItem.value = {
-              id: undefined,
+              id:        undefined,
               createdAt: Date.now(),
-              tags: [],
-              quotedBy: ctx.root.$store.state.loggedUser.id,
-              quote: '',
-            }
+              tags:      [],
+              quotedBy:  ctx.root.$store.state.loggedUser.id,
+              quote:     '',
+            };
             tagsString.value = '';
             quotedByName.value = await getUsernameById(editationItem.value.quotedBy);
             state.value.pending = false;
@@ -351,18 +365,20 @@ export default defineComponent({
             quotedByName.value = await getUsernameById(data.quotedBy);
             state.value.pending = false;
           }
-        })
+        });
       } else {
         editationItem.value = null;
       }
-    }
+    };
 
     const linkTo = (item: Required<QuotesInterface>) => {
       console.debug('Clicked', item.id);
       ctx.root.$router.push({ name: 'QuotesManagerEdit', params: { id: String(item.id) } });
-    }
+    };
     const newItem = () => {
-      ctx.root.$router.push({ name: 'QuotesManagerEdit', params: { id: String(0) } }).catch(() => {});
+      ctx.root.$router.push({ name: 'QuotesManagerEdit', params: { id: String(0) } }).catch(() => {
+        return;
+      });
     };
 
     return {
@@ -386,7 +402,7 @@ export default defineComponent({
       del,
       dayjs,
       translate,
-    }
-  }
+    };
+  },
 });
 </script>

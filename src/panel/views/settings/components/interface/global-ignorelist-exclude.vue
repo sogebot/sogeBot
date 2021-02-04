@@ -30,11 +30,13 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { chunk } from 'lodash-es';
-import translate from 'src/panel/helpers/translate';
+import {
+  Component, Prop, Vue, Watch, 
+} from 'vue-property-decorator';
 
 import { globalIgnoreList } from 'src/bot/data/globalIgnoreList';
+import translate from 'src/panel/helpers/translate';
 
 @Component({})
 export default class btnEmit extends Vue {
@@ -60,13 +62,13 @@ export default class btnEmit extends Vue {
   get computedValues(): { [x: number]: { reason: string; known_aliases: string[]; }} {
     if (this.search.trim().length) {
       const keys = Object.keys(this.values).filter(key => {
-        return (key.includes(this.search) ||
-                this.values[Number(key)].known_aliases.filter(k => k.toLowerCase().includes(this.search.toLowerCase())).length > 0) &&
-                !this.excludedIds.includes(key);
+        return (key.includes(this.search)
+                || this.values[Number(key)].known_aliases.filter(k => k.toLowerCase().includes(this.search.toLowerCase())).length > 0)
+                && !this.excludedIds.includes(key);
       });
       return keys.reduce((prev, key) => {
         return { [Number(key)]: this.values[Number(key)], ...prev };
-      }, {})
+      }, {});
     } else {
       return [];
     }
@@ -79,7 +81,7 @@ export default class btnEmit extends Vue {
   get excludedValues(): { [x: number]: { reason: string; known_aliases: string[]; }} {
     return this.excludedIds.reduce((prev, key) => {
       return { [Number(key)]: this.values[Number(key)], ...prev };
-    }, {})
+    }, {});
   }
 
   addToExcludeList(key: number) {
@@ -89,5 +91,5 @@ export default class btnEmit extends Vue {
   removeFromExcludeList(key: number) {
     this.currentValue = this.currentValue.filter(o => o !== key);
   }
-};
+}
 </script>

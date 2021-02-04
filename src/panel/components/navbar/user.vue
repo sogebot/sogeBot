@@ -63,33 +63,33 @@
   </div>
 </template>
 
-
 <script lang="ts">
-import { defineComponent, ref, onMounted, onUnmounted, computed } from '@vue/composition-api'
-import type { Ref } from '@vue/composition-api'
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import {
+  computed, defineComponent, onMounted, onUnmounted, ref, 
+} from '@vue/composition-api';
+import type { Ref } from '@vue/composition-api';
 
+import { defaultPermissions } from 'src/bot/helpers/permissions/defaultPermissions';
 import { getSocket } from 'src/panel/helpers/socket';
-import { defaultPermissions } from 'src/bot/helpers/permissions/defaultPermissions'
-import { UserInterface } from '../../../bot/database/entity/user';
-import { PermissionsInterface } from '../../../bot/database/entity/permissions';
 import translate from 'src/panel/helpers/translate';
 
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faUserCircle } from '@fortawesome/free-solid-svg-icons'
+import { PermissionsInterface } from '../../../bot/database/entity/permissions';
+import { UserInterface } from '../../../bot/database/entity/user';
+
 library.add(faUserCircle);
 
 const socket = getSocket('/core/users', true);
 let interval = 0;
 
 export default defineComponent({
-  components: {
-    'loading': () => import('src/panel/components/loading.vue'),
-  },
+  components: { 'loading': () => import('src/panel/components/loading.vue') },
   setup(props, context) {
     const isViewerLoaded = ref(false);
     const viewer: Ref<(Required<UserInterface> & { aggregatedTips: number; aggregatedBits: number; permission: PermissionsInterface }) | null> = ref(null);
     const viewerIs = computed(() => {
-      let status: string[] = [];
+      const status: string[] = [];
       const isArray = ['isFollower', 'isSubscriber', 'isVIP'] as const;
       isArray.forEach((item: typeof isArray[number]) => {
         if (viewer.value && viewer.value[item]) {
@@ -104,13 +104,13 @@ export default defineComponent({
       refreshViewer();
       interval = window.setInterval(() => {
         refreshViewer();
-      }, 60000)
-    })
+      }, 60000);
+    });
     onUnmounted(() => clearInterval(interval));
 
     const logout = () => {
       socket.emit('logout', {
-        accessToken: localStorage.getItem('accessToken'),
+        accessToken:  localStorage.getItem('accessToken'),
         refreshToken: localStorage.getItem('refreshToken'),
       });
       localStorage.setItem('code', '');
@@ -118,7 +118,7 @@ export default defineComponent({
       localStorage.setItem('refreshToken', '');
       localStorage.setItem('userType', 'unauthorized');
       window.location.assign(window.location.origin + '/login#error=logged+out');
-    }
+    };
     const login = () => window.location.assign(window.location.origin + '/login');
     const refreshViewer = () => {
       if (typeof context.root.$store.state.loggedUser === 'undefined'|| context.root.$store.state.loggedUser === null) {
@@ -133,11 +133,13 @@ export default defineComponent({
           viewer.value = recvViewer;
           isViewerLoaded.value = true;
         } else {
-          console.error('Cannot find user data, try to write something in chat to load data')
+          console.error('Cannot find user data, try to write something in chat to load data');
         }
-      })
-    }
-    return { defaultPermissions, isViewerLoaded, viewer, viewerIs, isPublicPage, logout, login, translate };
-  }
-})
+      });
+    };
+    return {
+      defaultPermissions, isViewerLoaded, viewer, viewerIs, isPublicPage, logout, login, translate, 
+    };
+  },
+});
 </script>

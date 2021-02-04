@@ -6,13 +6,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from '@vue/composition-api'
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
+import {
+  defineComponent, onMounted, ref,
+} from '@vue/composition-api';
 import { get } from 'lodash-es';
 
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faSun, faMoon } from '@fortawesome/free-solid-svg-icons';
-import { getSocket } from 'src/panel/helpers/socket';
 import { isUserLoggedIn } from 'src/panel/helpers/isUserLoggedIn';
+import { getSocket } from 'src/panel/helpers/socket';
+
 library.add(faSun, faMoon);
 
 const socket = getSocket('/core/users', true);
@@ -22,15 +25,15 @@ export default defineComponent({
     const theme = ref('light');
 
     const toggleTheme = () => {
-      const theme = localStorage.getItem('theme');
-      if (theme === null || theme === 'light') {
-        localStorage.setItem('theme', 'dark')
+      const theme2 = localStorage.getItem('theme');
+      if (theme === null || theme2 === 'light') {
+        localStorage.setItem('theme', 'dark');
       }
-      if (theme === 'dark') {
+      if (theme2 === 'dark') {
         localStorage.setItem('theme', 'light');
       }
       loadTheme(localStorage.getItem('theme') || 'dark');
-    }
+    };
 
     const loadTheme = async (themeArg: string) => {
       if (!['light', 'dark'].includes(themeArg)) {
@@ -47,22 +50,24 @@ export default defineComponent({
       // we need to save users preferred theme
       const user = await isUserLoggedIn(false, false);
       if (user) {
-        socket.emit('theme::set', { theme: themeArg, userId: user.id}, () => {});
+        socket.emit('theme::set', { theme: themeArg, userId: user.id }, () => {
+          return;
+        });
       }
       localStorage.setItem('theme', themeArg);
-    }
+    };
 
     onMounted(async () => {
       const user = await isUserLoggedIn(false, false);
       if (user) {
         socket.emit('theme::get', { userId: user.id }, (err: string | null, themeArg: string | null) => {
-          loadTheme(themeArg || get(context.root.$store.state.configuration, 'core.ui.theme', 'light'))
+          loadTheme(themeArg || get(context.root.$store.state.configuration, 'core.ui.theme', 'light'));
         });
       } else {
         loadTheme(localStorage.getItem('theme') || get(context.root.$store.state.configuration, 'core.ui.theme', 'light'));
       }
-    })
+    });
     return { theme, toggleTheme };
-  }
+  },
 });
 </script>

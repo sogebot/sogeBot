@@ -19,22 +19,25 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from '@vue/composition-api'
+import {
+  defineComponent, ref, watch, 
+} from '@vue/composition-api';
 import { isFinite } from 'lodash-es';
+
 import translate from 'src/panel/helpers/translate';
 
 export default defineComponent({
   props: {
-    value: [String, Number],
+    value:        [String, Number],
     defaultValue: String,
-    title: String,
-    type: String,
-    readonly: Boolean,
-    secret: Boolean,
+    title:        String,
+    type:         String,
+    readonly:     Boolean,
+    secret:       Boolean,
   },
   setup(props: { value: string | number; title: string, defaultValue: string, type: string, readonly: boolean, secret: boolean }, ctx) {
     const currentValue = ref(props.value);
-    const translatedTitle = ref(translate(props.title))
+    const translatedTitle = ref(translate(props.title));
     const show = ref(false);
 
     watch(currentValue, (val) => {
@@ -43,9 +46,9 @@ export default defineComponent({
           val = Number(val);
         } else {
           val = props.value;
-        };
+        }
       }
-      ctx.emit('update', { value: val })
+      ctx.emit('update', { value: val });
     });
 
     return {
@@ -53,9 +56,9 @@ export default defineComponent({
       translatedTitle,
       show,
       translate,
-    }
-  }
-})
+    };
+  },
+});
 </script>
 
 <style scoped>

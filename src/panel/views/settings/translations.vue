@@ -51,39 +51,36 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator';
-import { getSocket } from 'src/panel/helpers/socket';
 import { isNil } from 'lodash-es';
+import {
+  Component, Vue, Watch, 
+} from 'vue-property-decorator';
+
+import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
-@Component({
-  components: {
-    'loading': () => import('../../components/loading.vue'),
-  }
-})
+@Component({ components: { 'loading': () => import('../../components/loading.vue') } })
 export default class translations extends Vue {
   translate = translate;
   items: { name: string, current: string, default: string }[] = [];
-  search: string = '';
+  search = '';
 
-  currentPage = 1
+  currentPage = 1;
   perPage = 10;
 
   fields = [
     {
-      key: 'name',
-      label: translate('integrations.responsivevoice.settings.key.title'),
+      key:      'name',
+      label:    translate('integrations.responsivevoice.settings.key.title'),
       sortable: true,
-      thStyle: "width: 375px",
+      thStyle:  'width: 375px',
     },
     { key: 'current', label: translate('core.permissions.value') },
-  ]
+  ];
 
   state: {
     loading: number,
-  } = {
-    loading: this.$state.progress,
-  }
+  } = { loading: this.$state.progress };
 
   socket = getSocket('/');
 
@@ -98,40 +95,40 @@ export default class translations extends Vue {
 
   revertTranslation(name: string) {
     this.socket.emit('responses.revert', { name }, (orig: string) => {
-      console.log('Reverted', name, orig)
-    })
+      console.log('Reverted', name, orig);
+    });
   }
 
   updateTranslation(name: string, value: string, defaultValue: string) {
     if (value === defaultValue) {
       this.revertTranslation(name);
     } else {
-      this.socket.emit('responses.set', { name, value })
+      this.socket.emit('responses.set', { name, value });
     }
   }
 
   created() {
     this.state.loading = this.$state.progress;
     this.socket.emit('responses.get', null, (data: { default: string; current: string }) => {
-      console.groupCollapsed('translations::responses.get')
+      console.groupCollapsed('translations::responses.get');
       console.log(data);
       console.groupEnd();
       this.items = Object
         .entries(data)
         .map(o => {
           if ((o[1] as any).current.startsWith('{missing')) {
-            console.debug(`${o[0]} have missing translation`)
+            console.debug(`${o[0]} have missing translation`);
           }
           return {
-            name: o[0] as string,
+            name:    o[0] as string,
             current: (o[1] as any).current as string,
             default: (o[1] as any).default as string,
           };
         })
         .filter(o => !o.name.startsWith('webpanel') && !o.name.startsWith('ui'))
         .sort((a, b) => {
-          var keyA = a.name.toUpperCase(); // ignore upper and lowercase
-          var keyB = b.name.toUpperCase(); // ignore upper and lowercase
+          const keyA = a.name.toUpperCase(); // ignore upper and lowercase
+          const keyB = b.name.toUpperCase(); // ignore upper and lowercase
           if (keyA < keyB) {
             return -1;
           }
@@ -141,17 +138,19 @@ export default class translations extends Vue {
 
           // names must be equal
           return 0;
-      });
+        });
       this.state.loading = this.$state.success;
-    })
-  };
+    });
+  }
 
   get fItems() {
-    if (this.search.length === 0) return this.items
+    if (this.search.length === 0) {
+      return this.items;
+    }
     return this.items.filter((o) => {
-      const isSearchInKey = !isNil(o.name.match(new RegExp(this.search, 'ig')))
-      return isSearchInKey
-    })
+      const isSearchInKey = !isNil(o.name.match(new RegExp(this.search, 'ig')));
+      return isSearchInKey;
+    });
   }
 }
 </script>

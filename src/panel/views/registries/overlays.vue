@@ -69,26 +69,29 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch, } from '@vue/composition-api'
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faChevronRight } from '@fortawesome/free-solid-svg-icons/faChevronRight';
+import {
+  defineComponent, onMounted, ref, watch, 
+} from '@vue/composition-api';
+import {
+  cloneDeep, isEqual, set, 
+} from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faChevronRight } from '@fortawesome/free-solid-svg-icons/faChevronRight';
-library.add(faChevronRight)
+library.add(faChevronRight);
 
-import { getSocket } from 'src/panel/helpers/socket';
+import type { OverlayMapperInterface, OverlayMapperOBSWebsocket } from 'src/bot/database/entity/overlay';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { error } from 'src/panel/helpers/error';
-import translate from 'src/panel/helpers/translate';
 import { getCurrentIP } from 'src/panel/helpers/getCurrentIP';
-import type { OverlayMapperInterface, OverlayMapperOBSWebsocket } from 'src/bot/database/entity/overlay';
-import { set, isEqual, cloneDeep } from 'lodash-es';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
+
 const socket = getSocket('/registries/overlays');
 
 export default defineComponent({
-  components: {
-    'loading': () => import('src/panel/components/loading.vue'),
-  },
+  components: { 'loading': () => import('src/panel/components/loading.vue') },
   setup(props, ctx) {
     const items = ref([] as (OverlayMapperInterface | OverlayMapperOBSWebsocket)[]);
     const cacheItems = ref([] as (OverlayMapperInterface | OverlayMapperOBSWebsocket)[]);
@@ -118,9 +121,7 @@ export default defineComponent({
       { key: 'buttons', label: '' },
     ];
 
-    const state = ref({
-      loading: ButtonStates.progress,
-    } as {
+    const state = ref({ loading: ButtonStates.progress } as {
       loading: number;
     });
 
@@ -131,7 +132,7 @@ export default defineComponent({
     const haveAnyOptions = (type: string) => {
       const withOpts = ['obswebsocket'];
       return withOpts.includes(type);
-    }
+    };
 
     const refresh = () => {
       socket.emit('generic::getAll', (err: string | null, data: Readonly<Required<OverlayMapperInterface>>[]) => {
@@ -141,21 +142,21 @@ export default defineComponent({
         items.value = cloneDeep(data);
         cacheItems.value = cloneDeep(data);
         state.value.loading = ButtonStates.success;
-      })
+      });
     };
 
     watch(items, async (val) => {
       if (isEqual(cacheItems.value, val)) {
-        console.log('skip')
+        console.log('skip');
         return;
       }
 
-      const promised: any[] = []
+      const promised: any[] = [];
       for (const item of val) {
         if (item.value === 'obswebsocket' && item.opts === null) {
-          set(item, 'opts.allowedIPs', [])
+          set(item, 'opts.allowedIPs', []);
         } else if (!haveAnyOptions(item.value || '')) {
-          item.opts = null
+          item.opts = null;
         }
         promised.push(
           new Promise((resolve, reject) => {
@@ -164,22 +165,22 @@ export default defineComponent({
                 reject(err);
                 return error(err);
               }
-              resolve(true)
-            })
-          })
-        )
-      };
+              resolve(true);
+            });
+          }),
+        );
+      }
       await Promise.all(promised);
-    }, { deep: true })
+    }, { deep: true });
     watch(copied, (val) => {
       if (val.length > 0) {
         navigator.clipboard.writeText(`https://${document.location.host}/overlays/${val}`);
         setTimeout(() => {
           copied.value = '';
-          ctx.root.$emit('bv::hide::tooltip')
+          ctx.root.$emit('bv::hide::tooltip');
         }, 1000);
       }
-    })
+    });
 
     const addCurrentIP = (array: string[]) => {
       getCurrentIP().then(value => {
@@ -192,8 +193,10 @@ export default defineComponent({
     };
 
     const newItem = () => {
-      items.value.push({ id: uuid(), value: null, opts: null })
-    }
+      items.value.push({
+        id: uuid(), value: null, opts: null, 
+      });
+    };
 
     const del = (id: string) => {
       if (confirm('Do you want to delete overlay ' + id + '?')) {
@@ -202,9 +205,9 @@ export default defineComponent({
             return error(err);
           }
           refresh();
-        })
+        });
       }
-    }
+    };
 
     return {
       items,
@@ -220,9 +223,9 @@ export default defineComponent({
 
       translate,
       ButtonStates,
-    }
-  }
-})
+    };
+  },
+});
 </script>
 
 <style>

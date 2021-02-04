@@ -81,23 +81,22 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, PropSync, Watch } from 'vue-property-decorator';
-import translate from 'src/panel/helpers/translate';
 import { v4 as uuid } from 'uuid';
+import {
+  Component, PropSync, Vue, Watch, 
+} from 'vue-property-decorator';
+
+import translate from 'src/panel/helpers/translate';
 
 require('../../../../../../scss/letter-animations.css');
 require('animate.css');
 
-@Component({
-  components: {
-    'baffle': () => import('src/panel/components/baffle.vue'),
-  }
-})
+@Component({ components: { 'baffle': () => import('src/panel/components/baffle.vue') } })
 export default class TextAnimation extends Vue {
-  @PropSync('animation') readonly animType !: string
+  @PropSync('animation') readonly animType !: string;
   @PropSync('animationOptions') readonly animOptions !: any;
 
-  text= 'Sample text'
+  text= 'Sample text';
   translate = translate;
   uuid = uuid();
 
@@ -106,7 +105,7 @@ export default class TextAnimation extends Vue {
     { value: 'slow', text: 'slow' },
     { value: 'fast', text: 'fast' },
     { value: 'faster', text: 'faster' },
-  ]
+  ];
 
   options: { value: string, text: string }[] = [
     { value: 'none', text: 'none' },
@@ -125,7 +124,7 @@ export default class TextAnimation extends Vue {
     { value: 'wiggle', text: 'wiggle' },
     { value: 'wiggle2', text: 'wiggle2' },
     { value: 'jello', text: 'jello' },
-  ]
+  ];
 
   @Watch('animType')
   setSpeed() {
@@ -134,7 +133,7 @@ export default class TextAnimation extends Vue {
       this.animOptions.characters = '█▓░ </>';
       this.animOptions.maxTimeToDecrypt = '4000';
     } else {
-      this.animOptions.speed = 'slower'
+      this.animOptions.speed = 'slower';
     }
   }
 }

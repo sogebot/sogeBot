@@ -5,8 +5,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, onUnmounted, onMounted, watch, computed, ref } from '@vue/composition-api'
-
+import {
+  computed, defineComponent, onMounted, onUnmounted, reactive, ref, watch, 
+} from '@vue/composition-api';
 
 const getTimeToReveal = (text: string, maxTimeToDecrypt: number) => {
   const baffledTimeToReveal = [];
@@ -14,7 +15,7 @@ const getTimeToReveal = (text: string, maxTimeToDecrypt: number) => {
     baffledTimeToReveal.push(Math.floor(Math.random() * 1000) + (maxTimeToDecrypt - 1000));
   }
   return baffledTimeToReveal;
-}
+};
 
 interface Props {
   text: string;
@@ -26,26 +27,32 @@ interface Props {
 }
 export default defineComponent({
   props: {
-    text: String,
+    text:    String,
     options: Object,
   },
   setup(props: Props) {
-    let interval = ref(0)
+    const interval = ref(0);
     const options = reactive({
-      startTime: 0,
-      changeTime: 0,
-      exclude: [' '],
+      startTime:    0,
+      changeTime:   0,
+      exclude:      [' '],
       baffledArray: props.text.split(''),
-    })
-    let baffledTimeToReveal: number[] = reactive([]);
+    });
+    const baffledTimeToReveal: number[] = reactive([]);
     const baffledText = computed(() => options.baffledArray.join(''));
 
     const start = () => {
-      const timeToReveal = getTimeToReveal(props.text, props.options.maxTimeToDecrypt)
-      console.debug('== baffle', { interval: interval.value, text: props.text, options: props.options, timeToReveal});
+      const timeToReveal = getTimeToReveal(props.text, props.options.maxTimeToDecrypt);
+      console.debug('== baffle', {
+        interval: interval.value, text: props.text, options: props.options, timeToReveal, 
+      });
       clearInterval(interval.value);
-      while(baffledTimeToReveal.length > 0) { baffledTimeToReveal.shift() };
-      while(baffledTimeToReveal.length !== timeToReveal.length) { baffledTimeToReveal.push(timeToReveal[baffledTimeToReveal.length]) }
+      while(baffledTimeToReveal.length > 0) {
+        baffledTimeToReveal.shift(); 
+      }
+      while(baffledTimeToReveal.length !== timeToReveal.length) {
+        baffledTimeToReveal.push(timeToReveal[baffledTimeToReveal.length]); 
+      }
 
       options.startTime = Date.now();
       interval.value = window.setInterval(() => {
@@ -61,16 +68,16 @@ export default defineComponent({
             }
           }
         }
-      }, 2)
-    }
+      }, 2);
+    };
 
     onMounted(() => {
-      start()
+      start();
     });
-    onUnmounted(() => clearInterval(interval.value))
+    onUnmounted(() => clearInterval(interval.value));
 
     watch(() => props, () => start(), { deep: true });
-    return { baffledText }
-  }
-})
+    return { baffledText };
+  },
+});
 </script>

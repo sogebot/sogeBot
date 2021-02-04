@@ -134,8 +134,10 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, PropSync } from 'vue-property-decorator';
-import type { CommonSettingsInterface } from 'src/bot/database/entity/alert';
+import {
+  Component, Prop, PropSync, Vue, 
+} from 'vue-property-decorator';
+
 import translate from 'src/panel/helpers/translate';
 
 declare global {
@@ -144,18 +146,15 @@ declare global {
   }
 }
 
-@Component({
-  components: {
-  }
-})
+@Component({ components: {} })
 export default class TTS extends Vue {
-  @PropSync('tts') readonly data !: Partial<CommonSettingsInterface["tts"]>;
+  @PropSync('tts') readonly data !: Partial<CommonSettingsInterface['tts']>;
   @Prop() readonly uuid !: string;
 
   translate = translate;
 
-  text = "This message should be said by TTS to test your settings.";
-  state: { loaded: number } = { loaded: this.$state.progress }
+  text = 'This message should be said by TTS to test your settings.';
+  state: { loaded: number } = { loaded: this.$state.progress };
 
   voices: {text: string; value: string}[] = [];
 
@@ -165,12 +164,12 @@ export default class TTS extends Vue {
       this.state.loaded = this.$state.fail;
     } else {
       if (typeof window.responsiveVoice === 'undefined') {
-        this.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.$store.state.configuration.integrations.ResponsiveVoice.api.key)
+        this.$loadScript('https://code.responsivevoice.org/responsivevoice.js?key=' + this.$store.state.configuration.integrations.ResponsiveVoice.api.key)
           .then(() => this.initResponsiveVoice());
       } else {
         this.state.loaded = this.$state.success;
         this.voices = window.responsiveVoice.getVoices().map((o: { name: string }) => {
-          return { text: o.name, value: o.name }
+          return { text: o.name, value: o.name };
         });
       }
     }
@@ -183,7 +182,7 @@ export default class TTS extends Vue {
     }
     window.responsiveVoice.init();
     this.voices = window.responsiveVoice.getVoices().map((o: { name: string }) => {
-      return { text: o.name, value: o.name }
+      return { text: o.name, value: o.name };
     });
     this.state.loaded = this.$state.success;
   }
@@ -194,7 +193,9 @@ export default class TTS extends Vue {
         if (text.trim().length === 0) {
           setTimeout(() => resolve(), 500);
         } else {
-          window.responsiveVoice.speak(text.trim(), this.data.voice, { rate: this.data.rate, pitch: this.data.pitch, volume: this.data.volume, onend: () => setTimeout(() => resolve(), 500) });
+          window.responsiveVoice.speak(text.trim(), this.data.voice, {
+            rate: this.data.rate, pitch: this.data.pitch, volume: this.data.volume, onend: () => setTimeout(() => resolve(), 500), 
+          });
         }
       });
     }

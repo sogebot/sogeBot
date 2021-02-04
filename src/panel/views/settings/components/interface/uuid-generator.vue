@@ -19,8 +19,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from '@vue/composition-api'
-import { v4 as uuid } from 'uuid'
+import {
+  defineComponent, ref, watch, 
+} from '@vue/composition-api';
+import { v4 as uuid } from 'uuid';
+
 import translate from 'src/panel/helpers/translate';
 
 export default defineComponent({
@@ -30,20 +33,20 @@ export default defineComponent({
   },
   setup(props: { value: string; title: string }, ctx) {
     const currentValue = ref(props.value);
-    const translatedTitle = ref(translate(props.title))
+    const translatedTitle = ref(translate(props.title));
     const show = ref(false);
     const copied = ref(false);
 
     watch(currentValue, (val) => {
-      ctx.emit('update', { value: val })
-    })
+      ctx.emit('update', { value: val });
+    });
 
     function copy() {
       navigator.clipboard.writeText(currentValue.value);
       copied.value = true;
       setTimeout(() => {
         copied.value = false;
-      }, 1000)
+      }, 1000);
     }
 
     function generate() {
@@ -57,8 +60,7 @@ export default defineComponent({
 
       copy,
       generate,
-    }
-  }
+    };
+  },
 });
 </script>
-

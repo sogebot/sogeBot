@@ -125,22 +125,24 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed, watch, getCurrentInstance, onUnmounted } from '@vue/composition-api'
-import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
-import translate from 'src/panel/helpers/translate';
+import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
+import {
+  computed, defineComponent, getCurrentInstance, onMounted, onUnmounted, ref, watch,
+} from '@vue/composition-api';
+import { cloneDeep, get } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
-
-import { getSocket } from 'src/panel/helpers/socket';
+import { validationMixin } from 'vuelidate';
+import {
+  minLength, minValue, numeric, required, requiredIf,
+} from 'vuelidate/lib/validators';
 
 import { EventInterface, EventOperationInterface } from 'src/bot/database/entity/event';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
-import { error } from 'src/panel/helpers/error';
 import { capitalize } from 'src/panel/helpers/capitalize';
-
-import { validationMixin } from 'vuelidate'
-import { minLength, minValue, required, requiredIf, numeric } from 'vuelidate/lib/validators'
-import { cloneDeep, get } from 'lodash-es';
+import { error } from 'src/panel/helpers/error';
 import { EventBus } from 'src/panel/helpers/event-bus';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/core/events');
 
@@ -149,189 +151,187 @@ type Props = {
   invalid: boolean;
   pending: boolean;
   saveState: number;
-}
+};
 
 export default defineComponent({
   props: {
-    id: String,
-    invalid: Boolean,
-    pending: Boolean,
+    id:        String,
+    invalid:   Boolean,
+    pending:   Boolean,
     saveState: Number,
   },
-  mixins: [ validationMixin ],
+  mixins:     [ validationMixin ],
   components: {
-    rewards: () => import('src/panel/components/rewardDropdown.vue'),
-    loading: () => import('src/panel/components/loading.vue'),
+    rewards:               () => import('src/panel/components/rewardDropdown.vue'),
+    loading:               () => import('src/panel/components/loading.vue'),
     'font-awesome-layers': FontAwesomeLayers,
-    'label-inside': () => import('src/panel/components/label-inside.vue')
+    'label-inside':        () => import('src/panel/components/label-inside.vue'),
   },
   validations: {
     editationItem: {
-      name: { required, minLength: minLength(1) },
+      name:       { required, minLength: minLength(1) },
       operations: {
         doesSomething: (val: Omit<EventOperationInterface, 'event'>[]) => {
-          return val.filter(o => o.name !== 'do-nothing').length > 0
+          return val.filter(o => o.name !== 'do-nothing').length > 0;
         },
         $each: {
           definitions: {
             messageToSend: {
               required: requiredIf(function (model) {
-                return typeof model?.messageToSend !== 'undefined'
+                return typeof model?.messageToSend !== 'undefined';
               }),
             },
             commandToRun: {
               required: requiredIf(function (model) {
-                return typeof model?.commandToRun !== 'undefined'
+                return typeof model?.commandToRun !== 'undefined';
               }),
             },
             emotesToExplode: {
               required: requiredIf(function (model) {
-                return typeof model?.emotesToExplode !== 'undefined'
+                return typeof model?.emotesToExplode !== 'undefined';
               }),
             },
             channel: {
               required: requiredIf(function (model) {
-                return typeof model?.channel !== 'undefined'
+                return typeof model?.channel !== 'undefined';
               }),
             },
             customVariable: {
               required: requiredIf(function (model) {
-                return typeof model?.customVariable !== 'undefined'
+                return typeof model?.customVariable !== 'undefined';
               }),
             },
             emotesToFirework: {
               required: requiredIf(function (model) {
-                return typeof model?.emotesToFirework !== 'undefined'
+                return typeof model?.emotesToFirework !== 'undefined';
               }),
             },
             numberToDecrement: {
               required: requiredIf(function (model) {
-                return typeof model?.numberToDecrement !== 'undefined'
+                return typeof model?.numberToDecrement !== 'undefined';
               }),
               minValue: minValue(1),
               numeric,
             },
             numberToIncrement: {
               required: requiredIf(function (model) {
-                return typeof model?.numberToIncrement !== 'undefined'
+                return typeof model?.numberToIncrement !== 'undefined';
               }),
               minValue: minValue(1),
               numeric,
             },
             durationOfCommercial: {
               required: requiredIf(function (model) {
-                return typeof model?.durationOfCommercial !== 'undefined'
-              })
+                return typeof model?.durationOfCommercial !== 'undefined';
+              }),
             },
-          }
+          },
         },
       },
       definitions: {
         fadeOutXCommands: {
           required: requiredIf(function (model) {
-            return typeof model?.fadeOutXCommands !== 'undefined'
+            return typeof model?.fadeOutXCommands !== 'undefined';
           }),
           numeric,
-          minValue: minValue(0)
+          minValue: minValue(0),
         },
         fadeOutInterval: {
           required: requiredIf(function (model) {
-            return typeof model?.fadeOutInterval !== 'undefined'
+            return typeof model?.fadeOutInterval !== 'undefined';
           }),
           numeric,
-          minValue: minValue(0)
+          minValue: minValue(0),
         },
         runEveryXCommands: {
           required: requiredIf(function (model) {
-            return typeof model?.runEveryXCommands !== 'undefined'
+            return typeof model?.runEveryXCommands !== 'undefined';
           }),
           numeric,
-          minValue: minValue(0)
+          minValue: minValue(0),
         },
         runEveryXKeywords: {
           required: requiredIf(function (model) {
-            return typeof model?.runEveryXKeywords !== 'undefined'
+            return typeof model?.runEveryXKeywords !== 'undefined';
           }),
           numeric,
-          minValue: minValue(0)
+          minValue: minValue(0),
         },
         fadeOutXKeywords: {
           required: requiredIf(function (model) {
-            return typeof model?.fadeOutXKeywords !== 'undefined'
+            return typeof model?.fadeOutXKeywords !== 'undefined';
           }),
           numeric,
-          minValue: minValue(0)
+          minValue: minValue(0),
         },
         runInterval: {
           required: requiredIf(function (model) {
-            return typeof model?.runInterval !== 'undefined'
+            return typeof model?.runInterval !== 'undefined';
           }),
           numeric,
-          minValue: minValue(0)
+          minValue: minValue(0),
         },
         commandToWatch: {
           required: requiredIf(function (model) {
-            return typeof model?.commandToWatch !== 'undefined'
+            return typeof model?.commandToWatch !== 'undefined';
           }),
         },
         keywordToWatch: {
           required: requiredIf(function (model) {
-            return typeof model?.keywordToWatch !== 'undefined'
+            return typeof model?.keywordToWatch !== 'undefined';
           }),
         },
         runAfterXMinutes: {
           required: requiredIf(function (model) {
-            return typeof model?.runAfterXMinutes !== 'undefined'
+            return typeof model?.runAfterXMinutes !== 'undefined';
           }),
           numeric,
-          minValue: minValue(1)
+          minValue: minValue(1),
         },
         runEveryXMinutes: {
           required: requiredIf(function (model) {
-            return typeof model?.runEveryXMinutes !== 'undefined'
+            return typeof model?.runEveryXMinutes !== 'undefined';
           }),
           numeric,
-          minValue: minValue(1)
+          minValue: minValue(1),
         },
         viewersAtLeast: {
           required: requiredIf(function (model) {
-            return typeof model?.viewersAtLeast !== 'undefined'
+            return typeof model?.viewersAtLeast !== 'undefined';
           }),
           numeric,
-          minValue: minValue(0)
+          minValue: minValue(0),
         },
         titleOfReward: {
           required: requiredIf(function (model) {
-            return typeof model?.titleOfReward !== 'undefined'
+            return typeof model?.titleOfReward !== 'undefined';
           }),
-        }
-      }
-    }
+        },
+      },
+    },
   },
   setup(props: Props, ctx) {
     const instance = getCurrentInstance()?.proxy;
 
     const editationItem = ref({
-      id: ctx.root.$route.params.id || uuid(),
-      name: '',
-      isEnabled: true,
-      triggered: {},
+      id:          ctx.root.$route.params.id || uuid(),
+      name:        '',
+      isEnabled:   true,
+      triggered:   {},
       definitions: {},
-      operations: [],
-      filter: '',
+      operations:  [],
+      filter:      '',
     } as Required<EventInterface>);
     const operationsClone = ref([] as Omit<EventOperationInterface, 'event'>[]);
     const watchOperationChange = ref(true);
     const watchEventChange = ref(true);
     const events = ref([] as EventInterface[]);
     const supported = ref({ operations: [], events: [] } as {
-        operations: Events.SupportedOperation[],
-        events: Events.SupportedEvent[]
+      operations: Events.SupportedOperation[],
+      events: Events.SupportedEvent[]
     });
 
-    const state = ref({
-      loading: ButtonStates.progress,
-    } as {
+    const state = ref({ loading: ButtonStates.progress } as {
       loading: number;
     });
 
@@ -346,8 +346,10 @@ export default defineComponent({
       }
     }, { deep: true });
     watch(() => editationItem.value.operations, (val: Omit<EventOperationInterface, 'event'>[]) => {
-      if (!watchOperationChange.value) return true;
-      watchOperationChange.value = false // remove watch
+      if (!watchOperationChange.value) {
+        return true;
+      }
+      watchOperationChange.value = false; // remove watch
       // remove all do-nothing
       val = val.filter((o) => o.name !== 'do-nothing');
 
@@ -361,17 +363,17 @@ export default defineComponent({
         }
         if (typeof operationsClone.value[j] !== 'undefined' && val[i].name === operationsClone.value[j].name) {
           j++;
-          continue
+          continue;
         }
 
-        val[i].definitions = {}
-        const defaultOperation = supported.value.operations.find((o) => o.id === val[i].name)
+        val[i].definitions = {};
+        const defaultOperation = supported.value.operations.find((o) => o.id === val[i].name);
         if (defaultOperation) {
           if (Object.keys(defaultOperation.definitions).length > 0) {
             for (const [key, value] of Object.entries(defaultOperation.definitions)) {
               val[i].definitions[key] = Array.isArray(value) ? value[0] : value; // select first option by default
             }
-            ctx.root.$forceUpdate()
+            ctx.root.$forceUpdate();
           }
         }
 
@@ -379,27 +381,29 @@ export default defineComponent({
         $v?.editationItem.operations?.$each[i]?.$reset();
         j++;
       }
-      operationsClone.value = cloneDeep(val)
+      operationsClone.value = cloneDeep(val);
       // add do-nothing at the end
       val.push({
-        id: uuid(),
-        name: 'do-nothing',
-        definitions: {}
+        id:          uuid(),
+        name:        'do-nothing',
+        definitions: {},
       });
 
       // update clone
-      editationItem.value.operations = cloneDeep(val)
-      ctx.root.$nextTick(() => (watchOperationChange.value = true)) // re-enable watch
+      editationItem.value.operations = cloneDeep(val);
+      ctx.root.$nextTick(() => (watchOperationChange.value = true)); // re-enable watch
 
     }, { deep: true });
     watch(() => editationItem.value.name, (val, oldVal) => {
-      if (!watchEventChange.value) return;
+      if (!watchEventChange.value) {
+        return;
+      }
       watchEventChange.value = false;
 
       if (val !== oldVal) {
         editationItem.value.definitions = {}; // reload definitions
 
-        const defaultEvent = supported.value.events.find((o) => o.id === val)
+        const defaultEvent = supported.value.events.find((o) => o.id === val);
         if (defaultEvent) {
           if (defaultEvent.definitions) {
             editationItem.value.definitions = defaultEvent.definitions;
@@ -411,14 +415,14 @@ export default defineComponent({
       }
       ctx.root.$nextTick(() => {
         watchEventChange.value = true;
-      })
+      });
     });
     const eventTypes = computed(() => {
       return [...new Set(events.value.map(o => o.name))];
-    })
+    });
 
     const filteredEvents = computed(() => {
-      let _events = events.value
+      const _events = events.value;
       return _events.sort((a, b) => {
         const A = a.name.toLowerCase();
         const B = b.name.toLowerCase();
@@ -429,7 +433,7 @@ export default defineComponent({
           return 1;
         }
         return 0; //default return value (no sorting)
-        })
+      });
     });
 
     onMounted(() => {
@@ -442,9 +446,9 @@ export default defineComponent({
     });
     onUnmounted(() => {
       EventBus.$off('managers::events::save::' + editationItem.value.id);
-    })
+    });
     const loadEditationItem = async () => {
-      state.value.loading = ButtonStates.progress
+      state.value.loading = ButtonStates.progress;
       await Promise.all([
         new Promise<void>((resolve, reject) => {
           if (ctx.root.$route.params.id) {
@@ -455,13 +459,13 @@ export default defineComponent({
               if (!eventGetAll) {
                 watchEventChange.value = false;
                 editationItem.value = {
-                  id: ctx.root.$route.params.id,
-                  name: '',
-                  isEnabled: true,
-                  triggered: {},
+                  id:          ctx.root.$route.params.id,
+                  name:        '',
+                  isEnabled:   true,
+                  triggered:   {},
                   definitions: {},
-                  operations: [],
-                  filter: '',
+                  operations:  [],
+                  filter:      '',
                 };
                 watchEventChange.value = true;
                 resolve();
@@ -471,9 +475,9 @@ export default defineComponent({
 
               if (eventGetAll.operations.length === 0 || eventGetAll.operations[eventGetAll.operations.length - 1].name !== 'do-nothing') {
                 eventGetAll.operations.push({
-                  id: uuid(),
-                  name: 'do-nothing',
-                  definitions: {}
+                  id:          uuid(),
+                  name:        'do-nothing',
+                  definitions: {},
                 });
               }
 
@@ -488,7 +492,7 @@ export default defineComponent({
 
               console.debug('Loaded', eventGetAll);
               ctx.root.$nextTick(() => {
-                watchEventChange.value = true
+                watchEventChange.value = true;
                 ctx.emit('update:pending', false);
               });
               resolve();
@@ -502,10 +506,12 @@ export default defineComponent({
               reject(error(err));
             }
             data.push({ // add do nothing - its basicaly delete of operation
-              id: 'do-nothing',
+              id:          'do-nothing',
               definitions: {},
-              fire: () => {},
-            })
+              fire:        () => {
+                return; 
+              },
+            });
             supported.value.operations = data.sort((a, b) => {
               const A = translate(a.id).toLowerCase();
               const B = translate(b.id).toLowerCase();
@@ -521,13 +527,13 @@ export default defineComponent({
             if (!ctx.root.$route.params.id) {
               // set first operation if we are in create mode
               editationItem.value.operations.push({
-                id: uuid(),
-                name: 'do-nothing',
+                id:          uuid(),
+                name:        'do-nothing',
                 definitions: {},
               });
             }
             resolve();
-          })
+          });
         }),
         new Promise<void>((resolve, reject) => {
           socket.emit('list.supported.events', (err: string | null, data: Events.SupportedEvent[]) => {
@@ -548,7 +554,7 @@ export default defineComponent({
                   return 0; //default return value (no sorting)
                 });
               } else {
-                d.variables = []
+                d.variables = [];
               }
             }
             supported.value.events = data.sort((a, b) => {
@@ -563,21 +569,25 @@ export default defineComponent({
               return 0; //default return value (no sorting)
             });
             resolve();
-          })
+          });
         }),
       ]);
       ctx.root.$nextTick(() => {
         ctx.emit('update:pending', false);
-        state.value.loading = ButtonStates.success
+        state.value.loading = ButtonStates.success;
       });
-    }
+    };
     const getDefinitionValidation = (key: string) => {
       const $v = instance?.$v;
       return get($v, 'editationItem.definitions.' + key, { $error: false });
     };
     const getOperationDefinitionValidation = (idx: number, key: string) => {
       const $v = instance?.$v;
-      return get($v, 'editationItem.operations.$each[' + idx + '].definitions.' + key, { $error: false, $dirty: false, $touch: () => {} });
+      return get($v, 'editationItem.operations.$each[' + idx + '].definitions.' + key, {
+        $error: false, $dirty: false, $touch: () => {
+          return; 
+        },
+      });
     };
     const save = () =>  {
       const $v = instance?.$v;
@@ -588,7 +598,7 @@ export default defineComponent({
         socket.emit('events::save', editationItem.value, (err: string | null, eventId: string) => {
           if (err) {
             ctx.emit('update:saveState', ButtonStates.fail);
-            error(err)
+            error(err);
           } else {
             ctx.emit('update:saveState', ButtonStates.success);
           }
@@ -596,16 +606,16 @@ export default defineComponent({
           ctx.emit('refresh');
           setTimeout(() => {
             ctx.emit('update:saveState', ButtonStates.idle);
-          }, 1000)
-        })
+          }, 1000);
+        });
       }
-    }
+    };
     const stateOfOperationsErrorsDirty = () => {
       const $v = instance?.$v;
       return Object.values($v?.editationItem.operations?.$each.$iter ?? []).filter(o => {
-        return (!!o.$error && !!o.$dirty)
+        return (!!o.$error && !!o.$dirty);
       }).length > 0;
-    }
+    };
 
     return {
       events,
@@ -624,9 +634,9 @@ export default defineComponent({
       capitalize,
       ButtonStates,
       get,
-    }
-  }
-})
+    };
+  },
+});
 </script>
 
 <style scoped>

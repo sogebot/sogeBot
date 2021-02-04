@@ -24,7 +24,10 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import {
+  Component, Prop, Vue, Watch, 
+} from 'vue-property-decorator';
+
 import type { Result } from 'src/bot/games/heist';
 import translate from 'src/panel/helpers/translate';
 
@@ -36,7 +39,7 @@ export default class heistResults extends Vue {
 
   w_results = this.value.sort((a, b) => {
     return a.percentage - b.percentage;
-  })
+  });
 
   @Watch('w_results')
   update() {
@@ -46,7 +49,7 @@ export default class heistResults extends Vue {
   addResult() {
     this.w_results.push({
       percentage: 10,
-      message: ''
+      message:    '',
     });
   }
 

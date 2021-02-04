@@ -3,7 +3,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch } from '@vue/composition-api'
+import {
+  defineComponent, onMounted, ref, watch, 
+} from '@vue/composition-api';
+
 import { getSocket } from 'src/panel/helpers/socket';
 
 const socket = getSocket('/registries/text', true);
@@ -19,10 +22,10 @@ export default defineComponent({
 
     const onChange = () => {
       if (js.value) {
-        console.group('onChange()')
-        console.log(js.value)
-        console.groupEnd()
-        eval(js.value + ';if (typeof onChange === "function") { onChange(); }')
+        console.group('onChange()');
+        console.log(js.value);
+        console.groupEnd();
+        eval(js.value + ';if (typeof onChange === "function") { onChange(); }');
       }
     };
 
@@ -37,13 +40,13 @@ export default defineComponent({
           }
           if (!external.value) {
             if (cb.external) {
-              for (let link of cb.external) {
-                var script = document.createElement('script')
-                script.src = link
-                document.getElementsByTagName('head')[0].appendChild(script)
+              for (const link of cb.external) {
+                const script = document.createElement('script');
+                script.src = link;
+                document.getElementsByTagName('head')[0].appendChild(script);
               }
             }
-            external.value = true
+            external.value = true;
           }
 
           refreshRate.value = cb.refreshRate * 1000;
@@ -51,18 +54,22 @@ export default defineComponent({
 
           setTimeout(() => {
             const isChanged = text.value !== '' && text.value !== cb.text;
-            text.value = cb.text
+            text.value = cb.text;
             ctx.root.$nextTick(() => {
-              if (!js.value && cb.js) js.value = cb.js
-              if (!css.value && cb.css) css.value = cb.css
+              if (!js.value && cb.js) {
+                js.value = cb.js;
+              }
+              if (!css.value && cb.css) {
+                css.value = cb.css;
+              }
               if (isChanged) {
                 onChange();
               }
-            })
-          }, 100)
-        })
+            });
+          }, 100);
+        });
       } else {
-        console.error('Missing id param in url')
+        console.error('Missing id param in url');
       }
     };
 
@@ -74,15 +81,15 @@ export default defineComponent({
           clearInterval(interval);
         } else {
           if (Date.now() - lastRefreshAt.value >= refreshRate.value) {
-            refresh()
+            refresh();
           }
         }
       }, 200);
     });
 
     watch(css, (val: string) => {
-      const head = document.getElementsByTagName('head')[0]
-      const style = (document.createElement('style') as any)
+      const head = document.getElementsByTagName('head')[0];
+      const style = (document.createElement('style') as any);
       style.type = 'text/css';
       if (style.styleSheet){
         // This is required for IE8 and below.
@@ -94,15 +101,15 @@ export default defineComponent({
     });
 
     watch(js, (val: string) => {
-      console.group('onLoad()')
-      console.log(val)
-      console.groupEnd()
-      eval(val + ';if (typeof onLoad === "function") { onLoad(); }')
+      console.group('onLoad()');
+      console.log(val);
+      console.groupEnd();
+      eval(val + ';if (typeof onLoad === "function") { onLoad(); }');
     });
 
     return {
       text, js, css, external,
-    }
-  }
+    };
+  },
 });
 </script>

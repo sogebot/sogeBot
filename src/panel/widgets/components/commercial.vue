@@ -30,21 +30,21 @@
 </template>
 
 <script>
-import { getSocket } from 'src/panel/helpers/socket';
 import { EventBus } from 'src/panel/helpers/event-bus';
+import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
 export default {
   props: ['popout', 'nodrag'],
-  data: function () {
+  data:  function () {
     return {
       translate,
       EventBus,
-      socket: getSocket('/systems/commercial'),
+      socket:    getSocket('/systems/commercial'),
       countdown: 0,
-      value: 30,
-      interval: [],
-    }
+      value:     30,
+      interval:  [],
+    };
   },
   beforeDestroy: function() {
     for(const interval of this.interval) {
@@ -54,7 +54,7 @@ export default {
   created: function () {
     this.interval.push(setInterval(() => {
       if (this.countdown > 0) {
-        this.countdown--
+        this.countdown--;
       }
     }, 1000));
   },
@@ -62,14 +62,14 @@ export default {
     formatTime() {
       const minutes = Math.trunc(this.value / 60);
       const seconds = this.value - (minutes * 60) || '00';
-      return `${minutes}:${seconds}`
+      return `${minutes}:${seconds}`;
     },
     run: function () {
-      this.countdown = this.value
-      this.socket.emit('commercial.run', { seconds: this.value })
-    }
-  }
-}
+      this.countdown = this.value;
+      this.socket.emit('commercial.run', { seconds: this.value });
+    },
+  },
+};
 </script>
 
 <style>

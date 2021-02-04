@@ -45,8 +45,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, watch } from '@vue/composition-api'
-import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
+import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
+import {
+  defineComponent, onMounted, ref, watch, 
+} from '@vue/composition-api';
 
 interface Props {
   cards?: boolean; table?: boolean; search?: boolean; sidebar: boolean;
@@ -54,12 +56,12 @@ interface Props {
 export default defineComponent({
   components: {
     'font-awesome-layers': FontAwesomeLayers,
-    holdButton: () => import('./holdButton.vue'),
+    holdButton:            () => import('./holdButton.vue'),
   },
   props: {
-    cards: Boolean,
-    table: Boolean,
-    search: Boolean,
+    cards:   Boolean,
+    table:   Boolean,
+    search:  Boolean,
     sidebar: Boolean,
   },
   setup(props: Props, context) {
@@ -70,19 +72,21 @@ export default defineComponent({
 
     const resetSearch = () => {
       if (isSearching.value) {
-        searchString.value = ''
-        isSearching.value = false
-        context.emit('search', '')
+        searchString.value = '';
+        isSearching.value = false;
+        context.emit('search', '');
       }
-    }
+    };
 
     watch(showAs, (value) => {
-      context.emit('showAs', value)
-    })
+      context.emit('showAs', value);
+    });
 
     onMounted(() => {
-      if (!!props.cards) showAs.value = 'table'
-    })
+      if (!!props.cards) {
+        showAs.value = 'table';
+      }
+    });
 
     return {
       searchString,
@@ -90,8 +94,8 @@ export default defineComponent({
       isFocused,
       isSearching,
       resetSearch,
-    }
-  }
+    };
+  },
 });
 </script>
 

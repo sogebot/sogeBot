@@ -79,30 +79,31 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { debounce, orderBy } from 'lodash-es';
-import { getSocket } from 'src/panel/helpers/socket';
 import { v4 as uuid } from 'uuid';
-import translate from 'src/panel/helpers/translate';
+import { Component, Vue } from 'vue-property-decorator';
 
 import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { VariableInterface } from '../../../../bot/database/entity/variable';
-library.add(faExclamationTriangle)
+
+library.add(faExclamationTriangle);
 
 @Component({
-  components: {
-    'loading': () => import('../../../components/loading.vue'),
-  },
-  filters: {
+  components: { 'loading': () => import('../../../components/loading.vue') },
+  filters:    {
     capitalize: function (value: string) {
-      if (!value) return ''
-      value = value.toString()
-      return value.charAt(0).toUpperCase() + value.slice(1)
-    }
-  }
+      if (!value) {
+        return '';
+      }
+      value = value.toString();
+      return value.charAt(0).toUpperCase() + value.slice(1);
+    },
+  },
 })
 export default class customVariablesList extends Vue {
   psocket = getSocket('/core/permissions');
@@ -110,9 +111,13 @@ export default class customVariablesList extends Vue {
   translate = translate;
 
   fields = [
-    { key: 'variableName', label: '$_', sortable: true },
+    {
+      key: 'variableName', label: '$_', sortable: true, 
+    },
     { key: 'description', label: translate('registry.customvariables.description.name') },
-    { key: 'type', sortable: true, label: translate('registry.customvariables.type.name') },
+    {
+      key: 'type', sortable: true, label: translate('registry.customvariables.type.name'), 
+    },
     { key: 'currentValue', label: translate('registry.customvariables.currentValue.name') },
     // virtual attributes
     { key: 'additional-info', label: translate('registry.customvariables.additional-info') },
@@ -122,9 +127,9 @@ export default class customVariablesList extends Vue {
   variables: VariableInterface[] = [];
   permissions: {id: string; name: string;}[] = [];
   debouncedRunScript: ((id: any) => void) | null = null;
-  search: string = '';
+  search = '';
 
-  state: { loaded: boolean; } = { loaded: false }
+  state: { loaded: boolean; } = { loaded: false };
 
   get filteredVariables() {
     if (this.search.trim().length === 0) {
@@ -144,14 +149,14 @@ export default class customVariablesList extends Vue {
     // finished typing before making the ajax request. To learn
     // more about the _.debounce function (and its cousin
     // _.throttle), visit: https://lodash.com/docs#debounce
-    this.debouncedRunScript = debounce(this.runScript, 1000)
+    this.debouncedRunScript = debounce(this.runScript, 1000);
 
     this.psocket.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
-  if(err) {
-    return console.error(err);
-  }
-      this.permissions = orderBy(data, 'order', 'asc')
-    })
+      if(err) {
+        return console.error(err);
+      }
+      this.permissions = orderBy(data, 'order', 'asc');
+    });
   }
 
   mounted() {
@@ -166,29 +171,33 @@ export default class customVariablesList extends Vue {
       }
       this.variables = data;
       this.state.loaded = true;
-    })
+    });
   }
 
   getPermissionName(id: string | null) {
-    if (!id) return null
+    if (!id) {
+      return null;
+    }
     const permission = this.permissions.find((o) => {
-      return o.id === id
-    })
+      return o.id === id;
+    });
     if (typeof permission !== 'undefined') {
       if (permission.name.trim() === '') {
-        return permission.id
+        return permission.id;
       } else {
-        return permission.name
+        return permission.name;
       }
     } else {
-      return null
+      return null;
     }
   }
 
   clone(item: VariableInterface) {
-    this.socket.emit('customvariables::save', { ...item, history: [], urls: [], id: uuid(), description: '(clone) of ' + item.variableName, variableName: `$_${Math.random().toString(36).substr(2, 5)}` }, (err: string | null, data: VariableInterface) => {
+    this.socket.emit('customvariables::save', {
+      ...item, history: [], urls: [], id: uuid(), description: '(clone) of ' + item.variableName, variableName: `$_${Math.random().toString(36).substr(2, 5)}`, 
+    }, (err: string | null, data: VariableInterface) => {
       if (err) {
-        console.error(err)
+        console.error(err);
       }
       this.refresh();
     });
@@ -197,10 +206,10 @@ export default class customVariablesList extends Vue {
   runScript(id: string) {
     this.socket.emit('customvariables::runScript', id, (err: string | null, item: Required<VariableInterface>) => {
       // update variable data
-      let variable = this.variables.filter((o) => o.id === id)[0]
-      variable.currentValue = item.currentValue
-      variable.runAt = item.runAt
-    })
+      const variable = this.variables.filter((o) => o.id === id)[0];
+      variable.currentValue = item.currentValue;
+      variable.runAt = item.runAt;
+    });
   }
 }
 </script>

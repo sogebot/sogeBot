@@ -91,13 +91,14 @@
 </template>
 
 <script>
-import { getSocket } from 'src/panel/helpers/socket';
-import { EventBus } from 'src/panel/helpers/event-bus';
 import { debounce } from 'lodash-es';
+
+import { EventBus } from 'src/panel/helpers/event-bus';
+import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
 export default {
-  props: ['popout', 'nodrag'],
+  props:         ['popout', 'nodrag'],
   beforeDestroy: function() {
     for(const interval of this.interval) {
       clearInterval(interval);
@@ -107,102 +108,111 @@ export default {
     this.interval.push(
       setInterval(() => this.socket.emit('queue::getAllPicked', (err, users) => {
         if (err) {
-          return console.error(err)
+          return console.error(err);
         }
-        this.picked = users
-      }), 1000)
+        this.picked = users;
+      }), 1000),
     );
     this.interval.push(
       setInterval(() => this.socket.emit('generic::getAll', (err, users) => {
         if (err) {
-          return console.error(err)
+          return console.error(err);
         }
-        this.users = users
-      }), 1000)
-    )
+        this.users = users;
+      }), 1000),
+    );
     this.socket.emit('settings', (err, data) => {
       if (err) {
-        return console.error(err)
+        return console.error(err);
       }
-      this.eligibilityAll = data.eligibility.eligibilityAll[0]
-      this.eligibilityFollowers = data.eligibility.eligibilityFollowers[0]
-      this.eligibilitySubscribers = data.eligibility.eligibilitySubscribers[0]
-    })
+      this.eligibilityAll = data.eligibility.eligibilityAll[0];
+      this.eligibilityFollowers = data.eligibility.eligibilityFollowers[0];
+      this.eligibilitySubscribers = data.eligibility.eligibilitySubscribers[0];
+    });
     this.socket.emit('get.value', 'locked', (err, locked) => {
-      this.locked = locked
-    })
+      this.locked = locked;
+    });
   },
   watch: {
     locked: function () {
-      this.updated = Date.now()
+      this.updated = Date.now();
     },
     updated: debounce(function () {
       const data = {
         eligibility: {
-          eligibilityAll: this.eligibilityAll,
-          eligibilityFollowers: this.eligibilityFollowers,
+          eligibilityAll:         this.eligibilityAll,
+          eligibilityFollowers:   this.eligibilityFollowers,
           eligibilitySubscribers: this.eligibilitySubscribers,
         },
-      }
-      this.socket.emit('settings.update', data, () => {})
-      this.socket.emit('set.value', { variable: 'locked', value: this.locked }, () => {})
-    }, 500)
+      };
+      this.socket.emit('settings.update', data, () => {
+        return; 
+      });
+      this.socket.emit('set.value', { variable: 'locked', value: this.locked }, () => {
+        return; 
+      });
+    }, 500),
   },
   computed: {
     fUsers: function () {
-      if (this.eligibilityAll) return this.users
-      else {
-        let users = this.users
-        if (this.eligibilityFollowers && this.eligibilitySubscribers) users = users.filter(o => o.is.follower || o.is.subscriber)
-        else if (this.eligibilityFollowers) users = users.filter(o => o.is.follower)
-        else if (this.eligibilitySubscribers) users = users.filter(o => o.is.subscriber)
-        return users.sort(o => -(new Date(o.created_at).getTime()))
+      if (this.eligibilityAll) {
+        return this.users;
+      } else {
+        let users = this.users;
+        if (this.eligibilityFollowers && this.eligibilitySubscribers) {
+          users = users.filter(o => o.is.follower || o.is.subscriber);
+        } else if (this.eligibilityFollowers) {
+          users = users.filter(o => o.is.follower);
+        } else if (this.eligibilitySubscribers) {
+          users = users.filter(o => o.is.subscriber);
+        }
+        return users.sort(o => -(new Date(o.created_at).getTime()));
       }
-    }
+    },
   },
   data: function () {
     return {
       EventBus,
       translate,
-      eligibilityAll: true,
-      eligibilityFollowers: false,
+      eligibilityAll:         true,
+      eligibilityFollowers:   false,
       eligibilitySubscribers: false,
-      selectedUsers: [],
-      locked: true,
-      multiSelection: false,
-      random: false,
-      selectCount: 1,
-      tabIndex: 1,
-      users: [],
-      picked: [],
-      updated: Date.now(),
-      socket: getSocket('/systems/queue'),
-      interval: [],
-    }
+      selectedUsers:          [],
+      locked:                 true,
+      multiSelection:         false,
+      random:                 false,
+      selectCount:            1,
+      tabIndex:               1,
+      users:                  [],
+      picked:                 [],
+      updated:                Date.now(),
+      socket:                 getSocket('/systems/queue'),
+      interval:               [],
+    };
   },
   methods: {
     clear: function () {
       this.socket.emit('queue::clear', (err) => {
         if (err) {
-          return console.error(err)
+          return console.error(err);
         }
-      })
+      });
     },
     pick: function (username) {
       const data = {
         random: this.random,
-        count: this.selectCount,
-        username
-      }
+        count:  this.selectCount,
+        username,
+      };
       this.socket.emit('queue::pick', data, (err, users) => {
         if (err) {
-          return console.error(err)
+          return console.error(err);
         }
-        this.tabIndex = 0
-        this.picked = users
-        this.multiSelection = false
-        this.selectedUsers = []
-      })
+        this.tabIndex = 0;
+        this.picked = users;
+        this.multiSelection = false;
+        this.selectedUsers = [];
+      });
     },
     toggle: function (pick) {
       if (pick === 'all') {
@@ -230,12 +240,15 @@ export default {
       if (!this.eligibilityFollowers && !this.eligibilitySubscribers) {
         this.eligibilityAll = true;
       }
-      this.updated = Date.now()
+      this.updated = Date.now();
     },
     select: function (username) {
-      if (this.selectedUsers.includes(username)) this.selectedUsers = this.selectedUsers.filter(o => o != username)
-      else this.selectedUsers.push(username)
-    }
-  }
-}
+      if (this.selectedUsers.includes(username)) {
+        this.selectedUsers = this.selectedUsers.filter(o => o != username);
+      } else {
+        this.selectedUsers.push(username);
+      }
+    },
+  },
+};
 </script>

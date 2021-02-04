@@ -29,10 +29,13 @@ isReady: {{ isReady }}
 
 <script lang="ts">
 
-import { Vue, Component, Watch } from 'vue-property-decorator';
-import gsap from 'gsap'
-import { getSocket } from 'src/panel/helpers/socket';
+import gsap from 'gsap';
 import { cloneDeep } from 'lodash-es';
+import {
+  Component, Vue, Watch, 
+} from 'vue-property-decorator';
+
+import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})
 export default class ClipsCarouselOverlay extends Vue {
@@ -47,40 +50,41 @@ export default class ClipsCarouselOverlay extends Vue {
   moveToNextClipInProgress = false;
 
   get debug() {
-    return Boolean(this.urlParam('debug'))
+    return Boolean(this.urlParam('debug'));
   }
 
   setOffset() {
     try {
-      this.nextOffset = -((this.$refs.clips as HTMLElement[])[2].offsetLeft - (window.innerWidth / 4))
-      this.offset = -((this.$refs.clips as HTMLElement[])[1].offsetLeft - (window.innerWidth / 4))
+      this.nextOffset = -((this.$refs.clips as HTMLElement[])[2].offsetLeft - (window.innerWidth / 4));
+      this.offset = -((this.$refs.clips as HTMLElement[])[1].offsetLeft - (window.innerWidth / 4));
     } catch (e) {}
   }
 
   created() {
     this.socket.emit('clips', (err: string | null, data: { clips: any, settings: any }) => {
       data.clips = data.clips
-        .map((a: any) => ({sort: Math.random(), value: a}))
+        .map((a: any) => ({ sort: Math.random(), value: a }))
         .sort((a: any, b: any) => a.sort - b.sort)
-        .map((a: any) => a.value)
+        .map((a: any) => a.value);
 
-      if (data.clips.length < 2) return console.error('At least 2 clips are needed')
+      if (data.clips.length < 2) {
+        return console.error('At least 2 clips are needed');
+      }
 
-
-      data.clips = this.fillToFourClips(data.clips)
-      this.clips = data.clips
-      this.getClipsSet()
+      data.clips = this.fillToFourClips(data.clips);
+      this.clips = data.clips;
+      this.getClipsSet();
       this.$nextTick(() => {
         // center to second clip
         this.setOffset();
-        this.moveToNextClip()
+        this.moveToNextClip();
 
         setInterval(() => {
           if (this.moveToNextClipInProgress) {
             return;
           }
 
-          this.getClipsSet()
+          this.getClipsSet();
           this.setOffset();
 
           if ((this.$refs.clips as HTMLVideoElement[])[1].ended) {
@@ -101,28 +105,32 @@ export default class ClipsCarouselOverlay extends Vue {
               }
             }
           }
-        }, 100)
-      })
-    })
+        }, 100);
+      });
+    });
   }
 
   @Watch('currentClip')
   currentClipWatcher() {
-    this.getClipsSet()
+    this.getClipsSet();
   }
 
   getClipsSet() {
-    if (this.clips.length === 0 ) return this.clipsSet
+    if (this.clips.length === 0 ) {
+      return this.clipsSet;
+    }
 
-    let clipsSet: any[] = []
+    const clipsSet: any[] = [];
     for (let i = this.currentClip, j = 0; j < 4; i++, j++) {
-      if (typeof this.clips[i] === 'undefined') i = i % this.clips.length
-      clipsSet.push(cloneDeep(this.clips[i]))
+      if (typeof this.clips[i] === 'undefined') {
+        i = i % this.clips.length;
+      }
+      clipsSet.push(cloneDeep(this.clips[i]));
     }
 
     this.$nextTick(() => {
       // on next tick we need to set proper opacities to 0.5
-      (this.$refs.carousel as HTMLElement).style.left = this.offset + 'px'
+      (this.$refs.carousel as HTMLElement).style.left = this.offset + 'px';
       if (this.$refs.clips) {
         for (let j = 0; j < 4; j++) {
           if (j === 1) {
@@ -134,24 +142,25 @@ export default class ClipsCarouselOverlay extends Vue {
           }
         }
       }
-    })
-    this.clipsSet = clipsSet
+    });
+    this.clipsSet = clipsSet;
   }
 
   fillToFourClips(clips: any) {
-    if (clips.length >= 4 || clips.length === 0) return clips
-    else {
-      let filledClips = [...clips]
+    if (clips.length >= 4 || clips.length === 0) {
+      return clips;
+    } else {
+      const filledClips = [...clips];
       for (let i = 0, length = clips.length, idx = 0; i < 4 - length % 4; i++) {
         if (clips[idx]) {
-          filledClips.push(cloneDeep(clips[idx]))
-          idx++
+          filledClips.push(cloneDeep(clips[idx]));
+          idx++;
         } else {
-          filledClips.push(cloneDeep(clips[0]))
-          idx = 1
+          filledClips.push(cloneDeep(clips[0]));
+          idx = 1;
         }
       }
-      return filledClips
+      return filledClips;
     }
   }
 
@@ -161,18 +170,20 @@ export default class ClipsCarouselOverlay extends Vue {
       this.setOffset();
       this.moveToNextClipInProgress = true;
       //this.$nextTick(this.moveToNextClip);
-      return
+      return;
     }
     if (this.stopAnimation) {
-      return
+      return;
     }
 
     this.moveToNextClipInProgress = true;
 
-    if (this.clips.length === 0 || (this.$refs.clips as HTMLElement[]).length < 4) return console.error('No clips were found')
+    if (this.clips.length === 0 || (this.$refs.clips as HTMLElement[]).length < 4) {
+      return console.error('No clips were found');
+    }
 
-    const clips = [...(this.$refs.clips as HTMLElement[])]
-    gsap.to(this.$refs.carousel, { duration: 1, left: this.nextOffset + 'px' })
+    const clips = [...(this.$refs.clips as HTMLElement[])];
+    gsap.to(this.$refs.carousel, { duration: 1, left: this.nextOffset + 'px' });
 
     for (let i = 0; i < 4; i++) {
       let opacity = 0.5;
@@ -181,10 +192,11 @@ export default class ClipsCarouselOverlay extends Vue {
         opacity = 1;
         filter = 'grayscale(0)';
       }
-      gsap.to(clips[i], { duration: 1, opacity, filter, onComplete: () => {
+      gsap.to(clips[i], {
+        duration:   1, opacity, filter, onComplete: () => {
           this.$nextTick(() => {
-            // on next tick we need to set proper opacities to 0.5
-            gsap.killTweensOf(clips[i]) // we need to kill tweens as it skip to incorrect videos
+          // on next tick we need to set proper opacities to 0.5
+            gsap.killTweensOf(clips[i]); // we need to kill tweens as it skip to incorrect videos
             this.$forceUpdate();
             setTimeout(() => {
               if (i === 3) {
@@ -195,12 +207,14 @@ export default class ClipsCarouselOverlay extends Vue {
                 }
               }
               this.moveToNextClipInProgress = false;
-              setTimeout(() => { this.isReady = true }, 1000);
+              setTimeout(() => {
+                this.isReady = true; 
+              }, 1000);
             }, 1000);
 
-          })
-        }
-      })
+          });
+        },
+      });
     }
   }
 }

@@ -37,7 +37,7 @@ setInterval(() => {
                   warning('Profiler saved at ./logs/profile-' + Date.now() + '.cpuprofile.gz');
                   setDEBUG(getDEBUG()
                     .replace(fullMatch, '')
-                    .replace(/,$/, '')
+                    .replace(/,$/, ''),
                   );
                   isProfilerRunning = false;
                 }

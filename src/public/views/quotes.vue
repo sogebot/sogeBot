@@ -18,65 +18,68 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from '@vue/composition-api'
+import {
+  defineComponent, onMounted, ref, 
+} from '@vue/composition-api';
 import VueScrollTo from 'vue-scrollto';
 
-import { getSocket } from 'src/panel/helpers/socket';
 import { QuotesInterface } from 'src/bot/database/entity/quotes';
 import { dayjs } from 'src/bot/helpers/dayjs';
-import translate from 'src/panel/helpers/translate';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
-
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/systems/quotes', true);
 export default defineComponent({
-  components: {
-    loading: () => import('src/panel/components/loading.vue'),
-  },
+  components: { loading: () => import('src/panel/components/loading.vue') },
   setup(props, ctx) {
     const items = ref([] as QuotesInterface[]);
     const quotesRef = ref(null as Element | null);
 
-    const state = ref({
-      loading: ButtonStates.progress,
-    } as {
+    const state = ref({ loading: ButtonStates.progress } as {
       loading: number;
-    })
+    });
 
     const fields = [
-      { key: 'createdAt', label: translate('systems.quotes.date.name'), sortable: true },
-      { key: 'quote', label: translate('systems.quotes.quote.name'), sortable: true },
+      {
+        key: 'createdAt', label: translate('systems.quotes.date.name'), sortable: true, 
+      },
+      {
+        key: 'quote', label: translate('systems.quotes.quote.name'), sortable: true, 
+      },
       { key: 'tags', label: translate('systems.quotes.tags.name') },
-      { key: 'quotedByName', label: translate('systems.quotes.by.name'), sortable: true },
+      {
+        key: 'quotedByName', label: translate('systems.quotes.by.name'), sortable: true, 
+      },
       // virtual attributes
       { key: 'buttons', label: '' },
-    ]
+    ];
 
     const moveTo = () => {
       VueScrollTo.scrollTo(quotesRef.value as Element, 500, {
         container: 'body',
-        force: true,
-        offset: -49,
-        onDone: function() {
-          const scrollPos = window.scrollY || document.getElementsByTagName("html")[0].scrollTop;
+        force:     true,
+        offset:    -49,
+        onDone:    function() {
+          const scrollPos = window.scrollY || document.getElementsByTagName('html')[0].scrollTop;
           if (scrollPos === 0) {
             setTimeout(() => moveTo(), 100);
           }
-        }
-      })
-    }
+        },
+      });
+    };
 
     onMounted(() => {
       state.value.loading = ButtonStates.progress;
       socket.emit('quotes:getAll', {}, (err: string | null, itemsGetAll: QuotesInterface[]) => {
-        console.debug('Loaded', {items})
-        items.value = itemsGetAll
+        console.debug('Loaded', { items });
+        items.value = itemsGetAll;
         state.value.loading = ButtonStates.success;
-      })
+      });
       ctx.root.$nextTick(() => {
         moveTo();
       });
-    })
+    });
 
     return {
       dayjs,
@@ -85,7 +88,7 @@ export default defineComponent({
       state,
       translate,
       quotesRef,
-    }
-  }
+    };
+  },
 });
 </script>

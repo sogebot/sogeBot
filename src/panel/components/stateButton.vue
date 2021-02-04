@@ -31,26 +31,24 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api'
+import { defineComponent } from '@vue/composition-api';
+
 import translate from 'src/panel/helpers/translate';
 
 export default defineComponent({
-  components: {
-    buttonWithIcon: () => import('./button.vue'),
-  },
-  props: {
-    state: Number,
-    text: String,
-    icon: [String, Array],
-    cl: String,
+  components: { buttonWithIcon: () => import('./button.vue') },
+  props:      {
+    state:   Number,
+    text:    String,
+    icon:    [String, Array],
+    cl:      String,
     invalid: Boolean,
   },
   setup(props, context) {
     const save = () => {
       context.emit('click');
-    }
-    return { save, translate, };
-  }
+    };
+    return { save, translate };
+  },
 });
 </script>
-

@@ -55,88 +55,95 @@
 </template>
 
 <script>
-import { getSocket } from 'src/panel/helpers/socket';
-import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
-import { EventBus } from 'src/panel/helpers/event-bus';
-import { debounce } from 'lodash-es';
-import translate from 'src/panel/helpers/translate';
-
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faList, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
+import { debounce } from 'lodash-es';
+
+import { EventBus } from 'src/panel/helpers/event-bus';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
+
 library.add(faList, faTimes);
 
 export default {
-  props: ['popout', 'nodrag'],
+  props:      ['popout', 'nodrag'],
   components: {
-    holdButton: () => import('../../components/holdButton.vue'),
+    holdButton:            () => import('../../components/holdButton.vue'),
     'font-awesome-layers': FontAwesomeLayers,
   },
   data: function () {
     return {
       translate,
       EventBus,
-      widgetWidth: 200,
-      interval: 0,
-      currentSong: {},
-      requests: [],
-      command: '!spotify',
-      songRequestsEnabled: true,
+      widgetWidth:                    200,
+      interval:                       0,
+      currentSong:                    {},
+      requests:                       [],
+      command:                        '!spotify',
+      songRequestsEnabled:            true,
       continueOnPlaylistAfterRequest: true,
 
-      socket: getSocket('/integrations/spotify')
-    }
+      socket: getSocket('/integrations/spotify'),
+    };
   },
   watch: {
     songRequestsEnabled: debounce(function (val) {
-      this.socket.emit('settings.update', { songRequests: val })
+      this.socket.emit('settings.update', { songRequests: val });
     }, 500),
     continueOnPlaylistAfterRequest: debounce(function (val) {
-      this.socket.emit('settings.update', { output: { continueOnPlaylistAfterRequest: val } })
-    }, 500)
+      this.socket.emit('settings.update', { output: { continueOnPlaylistAfterRequest: val } });
+    }, 500),
   },
   methods: {
     next(index) {
       this.requests.splice(index, 1);
-      this.socket.emit('spotify::skip', () => {});
+      this.socket.emit('spotify::skip', () => {
+        return; 
+      });
     },
     cleanupSongRequestList() {
       this.requests = [];
-      this.socket.emit('set.value', { variable: 'uris', value: this.requests }, () => {})
+      this.socket.emit('set.value', { variable: 'uris', value: this.requests }, () => {
+        return; 
+      });
     },
     removeSongRequest(index) {
-      this.requests.splice(index, 1)
-      this.socket.emit('set.value', { variable: 'uris', value: this.requests }, () => {})
+      this.requests.splice(index, 1);
+      this.socket.emit('set.value', { variable: 'uris', value: this.requests }, () => {
+        return; 
+      });
     },
     fetchCurrentSong() {
       this.socket.emit('get.value', 'currentSong', (err, v) => {
         this.currentSong = JSON.parse(v);
-        setTimeout(this.fetchCurrentSong, 1000)
-      })
+        setTimeout(this.fetchCurrentSong, 1000);
+      });
     },
     fetchSongRequests() {
       this.socket.emit('get.value', 'uris', (err, v) => {
-        this.requests = v
-        setTimeout(this.fetchSongRequests, 1000)
-      })
-    }
+        this.requests = v;
+        setTimeout(this.fetchSongRequests, 1000);
+      });
+    },
   },
   beforeDestroy() {
     window.clearInterval(this.interval);
   },
   created: function () {
     this.interval = window.setInterval(() => {
-      this.widgetWidth = this.$refs['widget'].clientWidth;
-    }, 50)
+      this.widgetWidth = this.$refs.widget.clientWidth;
+    }, 50);
     this.socket.emit('settings', (err, s) => {
       this.command = s.commands['!spotify'];
       this.songRequestsEnabled = s.songRequests[0];
       this.continueOnPlaylistAfterRequest = s.continueOnPlaylistAfterRequest[0];
-      setTimeout(this.fetchCurrentSong, 1000)
-      setTimeout(this.fetchSongRequests, 1000)
-    })
+      setTimeout(this.fetchCurrentSong, 1000);
+      setTimeout(this.fetchSongRequests, 1000);
+    });
   },
   mounted: function () {
-    this.widgetWidth = this.$refs['widget'].clientWidth;
-  }
-}
+    this.widgetWidth = this.$refs.widget.clientWidth;
+  },
+};
 </script>

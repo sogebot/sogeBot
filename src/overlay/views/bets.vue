@@ -25,9 +25,10 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
-import { getSocket } from 'src/panel/helpers/socket';
+import { Component, Vue } from 'vue-property-decorator';
+
 import { BetsInterface } from 'src/bot/database/entity/bets';
+import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})
 export default class BetsOverlay extends Vue {
@@ -37,7 +38,7 @@ export default class BetsOverlay extends Vue {
 
   get timeToEnd() {
     if (this.currentBet && !this.currentBet.isLocked) {
-      return Math.floor(Math.floor((this.currentBet.endedAt - Date.now()) / 1000) / 60)
+      return Math.floor(Math.floor((this.currentBet.endedAt - Date.now()) / 1000) / 60);
     } else {
       return 0;
     }
@@ -67,9 +68,9 @@ export default class BetsOverlay extends Vue {
   refresh() {
     this.socket.emit('data', (currentBet: Required<BetsInterface>) => {
       this.currentBet = currentBet ?? null;
-      console.log({currentBet});
-      setTimeout(() => this.refresh(), 5000)
-    })
+      console.log({ currentBet });
+      setTimeout(() => this.refresh(), 5000);
+    });
   }
 }
 </script>

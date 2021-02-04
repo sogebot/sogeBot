@@ -22,10 +22,13 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
-import gsap from 'gsap'
+import gsap from 'gsap';
+import {
+  every, random, sample, 
+} from 'lodash-es';
+import { Component, Vue } from 'vue-property-decorator';
+
 import { getSocket } from 'src/panel/helpers/socket';
-import { every, random, sample } from 'lodash-es';
 
 @Component({})
 export default class EmotesOverlay extends Vue {
@@ -41,153 +44,163 @@ export default class EmotesOverlay extends Vue {
   }
 
   created () {
-    this.socket.on('emote.explode', (opts: any) => this.explode(opts))
-    this.socket.on('emote.firework', (opts: any) => this.firework(opts))
-    this.socket.on('emote', (opts: any) => this.addEmote(opts))
+    this.socket.on('emote.explode', (opts: any) => this.explode(opts));
+    this.socket.on('emote.firework', (opts: any) => this.firework(opts));
+    this.socket.on('emote', (opts: any) => this.addEmote(opts));
 
     this.interval.push(setInterval(() => {
-      this.triggerAnimation()
-      this.cleanEmotes()
+      this.triggerAnimation();
+      this.cleanEmotes();
     }, 100));
   }
 
   cleanEmotes () {
-    if (every(this.emotes, o => o.animation.finished)) this.emotes = []
+    if (every(this.emotes, o => o.animation.finished)) {
+      this.emotes = [];
+    }
   }
   doAnimation (el: HTMLElement, done: () => void) {
-    const id = el.id
-    const emote = this.emotes.find(o => o.id === id)
+    const id = el.id;
+    const emote = this.emotes.find(o => o.id === id);
 
-    let animation: any = {
-      opacity: 0
-    }
+    let animation: any = { opacity: 0 };
 
     if (emote.animation.type === 'fadeup') {
       animation = {
-        top: emote.position.top - 150,
-        opacity: 0
-      }
+        top:     emote.position.top - 150,
+        opacity: 0,
+      };
     } else if (emote.animation.type === 'facebook') {
       animation = {
-        top: emote.position.top - random(window.innerHeight / 4, window.innerHeight / 1.2),
-        left: random(emote.position.left - 100, Math.min(emote.position.left + 100, window.innerWidth - 100)),
-        opacity: 0
-      }
+        top:     emote.position.top - random(window.innerHeight / 4, window.innerHeight / 1.2),
+        left:    random(emote.position.left - 100, Math.min(emote.position.left + 100, window.innerWidth - 100)),
+        opacity: 0,
+      };
     } else if (emote.animation.type === 'fadezoom') {
       animation = {
-        scale: 2,
-        opacity: 0
-      }
+        scale:   2,
+        opacity: 0,
+      };
     } else if (emote.animation.type === 'explosion') {
       animation = {
-        top: random(0, window.innerHeight - 100),
-        left: random(0, window.innerWidth - 100),
-        opacity: 0
-      }
+        top:     random(0, window.innerHeight - 100),
+        left:    random(0, window.innerWidth - 100),
+        opacity: 0,
+      };
     } else if (emote.animation.type === 'firework') {
       animation = {
-        top: random(emote.position.top - 100, emote.position.top + 100),
-        left: random(emote.position.left - 100, emote.position.left + 100),
-        opacity: 0
-      }
+        top:     random(emote.position.top - 100, emote.position.top + 100),
+        left:    random(emote.position.left - 100, emote.position.left + 100),
+        opacity: 0,
+      };
     }
 
     gsap.to(el, {
-      duration: this.emotes.find(o => o.id === id).animation.time / 1000,
+      duration:   this.emotes.find(o => o.id === id).animation.time / 1000,
       ...animation,
       onComplete: () => {
-        this.emotes.find(o => o.id === id).animation.finished = true
-        done()
-      }
-    })
+        this.emotes.find(o => o.id === id).animation.finished = true;
+        done();
+      },
+    });
   }
 
   triggerAnimation () {
     for (let i = 0, length = this.emotes.length; i < length; i++) {
       if (!this.emotes[i].animation.running && Date.now() - this.emotes[i].trigger > 0) {
         // show and after next tick hide -> trigger animation
-        this.emotes[i].show = true
-        this.$nextTick(function () { this.emotes[i].animation.running = true })
+        this.emotes[i].show = true;
+        this.$nextTick(function () {
+          this.emotes[i].animation.running = true; 
+        });
       }
     }
   }
 
   setLeft (type: string) {
-    if (type === 'fadeup' || type === 'fadezoom') return random(window.innerWidth - 200) + 100
-    else if (type === 'facebook') return random(200) + window.innerWidth - 350
-    else return window.innerWidth / 2
+    if (type === 'fadeup' || type === 'fadezoom') {
+      return random(window.innerWidth - 200) + 100;
+    } else if (type === 'facebook') {
+      return random(200) + window.innerWidth - 350;
+    } else {
+      return window.innerWidth / 2;
+    }
   }
 
   setTop (type: string) {
-    if (type === 'fadeup' || type === 'fadezoom') return random(window.innerHeight - 200) + 100
-    else if (type === 'facebook') return window.innerHeight - 20
-    else return window.innerHeight / 2
+    if (type === 'fadeup' || type === 'fadezoom') {
+      return random(window.innerHeight - 200) + 100;
+    } else if (type === 'facebook') {
+      return window.innerHeight - 20;
+    } else {
+      return window.innerHeight / 2;
+    }
   }
 
   addEmote (opts: any) {
     this.emotes.push({
-      id: Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9),
-      trigger: Date.now() + random(500),
-      show: false,
+      id:        Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9),
+      trigger:   Date.now() + random(500),
+      show:      false,
       animation: {
-        type: opts.settings.emotes.animation,
-        time: opts.settings.emotes.animationTime,
-        running: false,
-        finished: false
+        type:     opts.settings.emotes.animation,
+        time:     opts.settings.emotes.animationTime,
+        running:  false,
+        finished: false,
       },
       position: {
         left: this.setLeft(opts.settings.emotes.animation),
-        top: this.setTop(opts.settings.emotes.animation)
+        top:  this.setTop(opts.settings.emotes.animation),
       },
-      url: opts.url
-    })
+      url: opts.url,
+    });
   }
 
   explode (opts: any) {
-    for (var i = 0; i < opts.settings.explosion.numOfEmotes; i++) {
+    for (let i = 0; i < opts.settings.explosion.numOfEmotes; i++) {
       this.emotes.push({
-        id: Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9),
-        trigger: Date.now() + random(3000),
-        show: false,
+        id:        Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9),
+        trigger:   Date.now() + random(3000),
+        show:      false,
         animation: {
-          type: 'explosion',
-          time: opts.settings.emotes.animationTime,
-          running: false,
-          finished: false
+          type:     'explosion',
+          time:     opts.settings.emotes.animationTime,
+          running:  false,
+          finished: false,
         },
         position: {
           left: random(-300, 300) + window.innerWidth / 2,
-          top: random(-300, 300) + window.innerHeight / 2
+          top:  random(-300, 300) + window.innerHeight / 2,
         },
-        url: sample(opts.emotes)
-      })
+        url: sample(opts.emotes),
+      });
     }
   }
 
   firework (opts: any) {
     for (let i = 0; i < opts.settings.fireworks.numOfExplosions; i++) {
-      const commonTop = random(200, window.innerHeight - 200)
-      const commonLeft = random(200, window.innerWidth - 200)
-      const commonTrigger = Date.now() + random(3000)
-      const commonUrl = sample(opts.emotes)
+      const commonTop = random(200, window.innerHeight - 200);
+      const commonLeft = random(200, window.innerWidth - 200);
+      const commonTrigger = Date.now() + random(3000);
+      const commonUrl = sample(opts.emotes);
 
       for (let j = 0; j < opts.settings.fireworks.numOfEmotesPerExplosion; j++) {
         this.emotes.push({
-          id: Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9),
-          trigger: commonTrigger,
-          show: false,
+          id:        Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9),
+          trigger:   commonTrigger,
+          show:      false,
           animation: {
-            type: 'firework',
-            time: opts.settings.emotes.animationTime,
-            running: false,
-            finished: false
+            type:     'firework',
+            time:     opts.settings.emotes.animationTime,
+            running:  false,
+            finished: false,
           },
           position: {
             left: commonLeft,
-            top: commonTop
+            top:  commonTop,
           },
-          url: commonUrl
-        })
+          url: commonUrl,
+        });
       }
     }
   }

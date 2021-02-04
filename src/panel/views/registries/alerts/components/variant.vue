@@ -5,12 +5,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watch, ref } from '@vue/composition-api'
+import {
+  defineComponent, ref, watch, 
+} from '@vue/composition-api';
+
 import translate from 'src/panel/helpers/translate';
 
 type Props = {
   event: string; state: boolean; condition: string; amount: number;
-}
+};
 
 export default defineComponent({
   props: {
@@ -26,17 +29,17 @@ export default defineComponent({
       { value: 3, text: translate('registry.alerts.frequently') },
       { value: 4, text: translate('registry.alerts.very-frequently') },
       { value: 5, text: translate('registry.alerts.exclusive') },
-    ]
+    ];
     watch(_amount, (val) => {
       ctx.emit('update:amount', val);
-    })
+    });
 
     return {
       _amount,
       randomOptions,
 
       translate,
-    }
-  }
-})
+    };
+  },
+});
 </script>

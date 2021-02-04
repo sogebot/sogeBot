@@ -38,21 +38,21 @@
 </template>
 
 <script>
-import { getSocket } from 'src/panel/helpers/socket';
 import { EventBus } from 'src/panel/helpers/event-bus';
+import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
 export default {
   props: ['popout', 'nodrag'],
-  data: function () {
+  data:  function () {
     return {
       EventBus,
       translate,
-      socket: getSocket('/core/twitch'),
-      room: '',
-      show: true,
-      isRefreshing: false
-    }
+      socket:       getSocket('/core/twitch'),
+      room:         '',
+      show:         true,
+      isRefreshing: false,
+    };
   },
   created: function () {
     this.socket.emit('broadcaster', (err, room) => {
@@ -60,18 +60,18 @@ export default {
         return console.error(err);
       }
       this.room = room;
-    })
+    });
   },
   computed: {
     isHttps() {
       const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       const isSecureHttp = window.location.protocol === 'https:';
-      const isCorrectPort = ['', '443'].includes(window.location.port) && window.location.protocol === 'https:'
+      const isCorrectPort = ['', '443'].includes(window.location.port) && window.location.protocol === 'https:';
       return isLocalhost || (isSecureHttp && isCorrectPort);
     },
     videoUrl() {
-      return `${window.location.protocol}//player.twitch.tv/?channel=${this.room}&autoplay=true&muted=true&parent=${window.location.hostname}`
-    }
+      return `${window.location.protocol}//player.twitch.tv/?channel=${this.room}&autoplay=true&muted=true&parent=${window.location.hostname}`;
+    },
   },
   methods: {
     refresh: function (event) {
@@ -80,7 +80,7 @@ export default {
     },
   },
   mounted: function () {
-    this.$emit('mounted')
+    this.$emit('mounted');
   },
-}
+};
 </script>

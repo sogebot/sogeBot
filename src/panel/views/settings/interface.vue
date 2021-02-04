@@ -240,59 +240,62 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { cloneDeep, get, pickBy, filter, size, orderBy, set } from 'lodash-es';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import {
+  cloneDeep, filter, get, orderBy, pickBy, set, size, 
+} from 'lodash-es';
+import {
+  Component, Prop, Vue, Watch, 
+} from 'vue-property-decorator';
+
+import { PermissionsInterface } from 'src/bot/database/entity/permissions';
 import { flatten, unflatten } from 'src/bot/helpers/flatten';
 import { getListOf } from 'src/panel/helpers/getListOf';
 import { getConfiguration, getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
-import { PermissionsInterface } from 'src/bot/database/entity/permissions';
+library.add(faExclamationTriangle);
 
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-
-library.add(faExclamationTriangle)
-
-type systemFromIO = { name: string; enabled: boolean; areDependenciesEnabled: boolean; isDisabledByEnv: boolean }
+type systemFromIO = { name: string; enabled: boolean; areDependenciesEnabled: boolean; isDisabledByEnv: boolean };
 enum State {
   NONE, PROGRESS, DONE, ERROR
-};
+}
 
 @Component({
   components: {
-    'btn-emit': () => import('./components/interface/btn-emit.vue'),
-    'checklist': () => import('./components/interface/checklist.vue'),
+    'btn-emit':                      () => import('./components/interface/btn-emit.vue'),
+    'checklist':                     () => import('./components/interface/checklist.vue'),
     'command-input-with-permission': () => import('./components/interface/command-input-with-permission.vue'),
-    'configurable-list': () => import('./components/interface/configurable-list.vue'),
-    'credits-custom-texts': () => import('./components/interface/credits-custom-texts.vue'),
-    'credits-social': () => import('./components/interface/credits-social.vue'),
-    'cron': () => import('./components/interface/cron.vue'),
-    'discord-guild': () => import('./components/interface/discord-guild.vue'),
-    'discord-channel': () => import('./components/interface/discord-channel.vue'),
-    'discord-mapping': () => import('./components/interface/discord-mapping.vue'),
-    'emote-combo': () => import('./components/interface/emote-combo.vue'),
-    'global-ignorelist-exclude': () => import('./components/interface/global-ignorelist-exclude.vue'),
-    'heist-levels': () => import('./components/interface/heist-levels.vue'),
-    'heist-results': () => import('./components/interface/heist-results.vue'),
-    'helpbox': () => import('./components/interface/helpbox.vue'),
-    'highlights-url-generator': () => import('./components/interface/highlights-url-generator.vue'),
-    'levels-showcase': () => import('./components/interface/levels-showcase.vue'),
-    'loading': () => import('../../components/loading.vue'),
-    'number-input': () => import('./components/interface/number-input.vue'),
-    'selector': () => import('./components/interface/selector.vue'),
-    'sortable-list': () => import('./components/interface/sortable-list.vue'),
-    'streamelements-jwt': () => import('./components/interface/streamelements-jwt.vue'),
-    'text-input': () => import('./components/interface/text-input.vue'),
-    'textarea-from-array': () => import('./components/interface/textarea-from-array.vue'),
-    'uuid-generator': () => import('./components/interface/uuid-generator.vue'),
-    'voice': () => import('./components/interface/voice.vue'),
-    'toggle-enable': () => import('./components/interface/toggle-enable.vue'),
-    'pubg-player-id': () => import('./components/interface/pubg-player-id.vue'),
-    'pubg-season-id': () => import('./components/interface/pubg-season-id.vue'),
-    'pubg-stats': () => import('./components/interface/pubg-stats.vue'),
-    'pubg-customization': () => import('./components/interface/pubg-customization.vue'),
-    }
+    'configurable-list':             () => import('./components/interface/configurable-list.vue'),
+    'credits-custom-texts':          () => import('./components/interface/credits-custom-texts.vue'),
+    'credits-social':                () => import('./components/interface/credits-social.vue'),
+    'cron':                          () => import('./components/interface/cron.vue'),
+    'discord-guild':                 () => import('./components/interface/discord-guild.vue'),
+    'discord-channel':               () => import('./components/interface/discord-channel.vue'),
+    'discord-mapping':               () => import('./components/interface/discord-mapping.vue'),
+    'emote-combo':                   () => import('./components/interface/emote-combo.vue'),
+    'global-ignorelist-exclude':     () => import('./components/interface/global-ignorelist-exclude.vue'),
+    'heist-levels':                  () => import('./components/interface/heist-levels.vue'),
+    'heist-results':                 () => import('./components/interface/heist-results.vue'),
+    'helpbox':                       () => import('./components/interface/helpbox.vue'),
+    'highlights-url-generator':      () => import('./components/interface/highlights-url-generator.vue'),
+    'levels-showcase':               () => import('./components/interface/levels-showcase.vue'),
+    'loading':                       () => import('../../components/loading.vue'),
+    'number-input':                  () => import('./components/interface/number-input.vue'),
+    'selector':                      () => import('./components/interface/selector.vue'),
+    'sortable-list':                 () => import('./components/interface/sortable-list.vue'),
+    'streamelements-jwt':            () => import('./components/interface/streamelements-jwt.vue'),
+    'text-input':                    () => import('./components/interface/text-input.vue'),
+    'textarea-from-array':           () => import('./components/interface/textarea-from-array.vue'),
+    'uuid-generator':                () => import('./components/interface/uuid-generator.vue'),
+    'voice':                         () => import('./components/interface/voice.vue'),
+    'toggle-enable':                 () => import('./components/interface/toggle-enable.vue'),
+    'pubg-player-id':                () => import('./components/interface/pubg-player-id.vue'),
+    'pubg-season-id':                () => import('./components/interface/pubg-season-id.vue'),
+    'pubg-stats':                    () => import('./components/interface/pubg-stats.vue'),
+    'pubg-customization':            () => import('./components/interface/pubg-customization.vue'),
+  },
 })
 export default class interfaceSettings extends Vue {
   @Prop() readonly commons: any;
@@ -307,15 +310,15 @@ export default class interfaceSettings extends Vue {
   settings: any = {};
   defaultValues: any = {};
   ui: any = {};
-  isDataChanged: boolean = false;
-  isDataChangedCheck: boolean = true;
+  isDataChanged = false;
+  isDataChangedCheck = true;
   update = {};
   error: string | null = null;
-  showError: boolean = false;
+  showError = false;
 
-  topOfMenu: number = 168;
-  heightOfMenu: string = '0';
-  heightOfMenuInterval: number = 0;
+  topOfMenu = 168;
+  heightOfMenu = '0';
+  heightOfMenuInterval = 0;
 
   permissions: PermissionsInterface[] = [];
 
@@ -323,26 +326,26 @@ export default class interfaceSettings extends Vue {
     const keys = Object.keys(permission);
     if (keys.length > 0) {
       return permission[keys[0]][permId] === '%%%%___ignored___%%%%';
-    };
+    }
     return false;
   }
 
   getNotIgnoredPermissions(permissions: Required<PermissionsInterface>[], data: { [x: string]: any }) {
     return permissions.filter(o => {
       return !this.isPermissionCategoryIgnored(data, o.id);
-    })
+    });
   }
 
   get settingsWithoutPermissions() {
     let withoutPermissions: any = {};
     Object.keys(this.settings).filter(o => !o.includes('permission')).forEach((key) => {
-      withoutPermissions[key] = this.settings[key]
-    })
-    for (const k of Object.keys(this.settings['__permission_based__'] || {})) {
+      withoutPermissions[key] = this.settings[key];
+    });
+    for (const k of Object.keys(this.settings.__permission_based__ || {})) {
       withoutPermissions = {
         [k]: null,
-        ...withoutPermissions
-      }
+        ...withoutPermissions,
+      };
     }
 
     // set settings as first and commands as last
@@ -356,34 +359,34 @@ export default class interfaceSettings extends Vue {
       ordered = {
         settings,
         ...ordered,
-      }
+      };
     }
     if (commands) {
       ordered = {
         ...ordered,
         commands,
-      }
+      };
     }
-    return ordered
+    return ordered;
   }
 
   mounted() {
     this.refresh();
 
     this.heightOfMenuInterval = window.setInterval(() => {
-      this.heightOfMenuUpdate()
-    }, 1000)
+      this.heightOfMenuUpdate();
+    }, 1000);
 
     this.psocket.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
-  if(err) {
-    return console.error(err);
-  }
-      this.permissions = data
-    })
+      if(err) {
+        return console.error(err);
+      }
+      this.permissions = data;
+    });
   }
 
   destroyed() {
-    clearInterval(this.heightOfMenuInterval)
+    clearInterval(this.heightOfMenuInterval);
   }
 
   heightOfMenuUpdate() {
@@ -394,7 +397,7 @@ export default class interfaceSettings extends Vue {
   async refresh() {
     this.socket.emit(this.$route.params.type, (err: string | null, systems: systemFromIO[] ) => {
       const sortedSystems = systems.sort((a, b) => {
-        return translate('menu.' + a.name).localeCompare(translate('menu.' + b.name))
+        return translate('menu.' + a.name).localeCompare(translate('menu.' + b.name));
       });
       if (!sortedSystems.map(o => o.name).includes(this.$route.params.id)) {
         this.$router.push({ name: 'InterfaceSettings', params: { type: this.$route.params.type, id: sortedSystems[0].name } });
@@ -403,21 +406,21 @@ export default class interfaceSettings extends Vue {
         this.loadSettings(this.$route.params.id);
       }
       this.list = sortedSystems;
-    })
+    });
     this.$store.commit('setConfiguration', await getConfiguration()); // force refresh config
   }
 
   getBorderStyle(system: string) {
-    return system === this.$route.params.id ?
-      {
-        'border-width': '0px',
-        'border-left-width': '5px !important'
-      } :
-      {
-        'border-width': '0px',
+    return system === this.$route.params.id
+      ? {
+        'border-width':      '0px',
         'border-left-width': '5px !important',
-        'border-color': 'transparent'
       }
+      : {
+        'border-width':      '0px',
+        'border-left-width': '5px !important',
+        'border-color':      'transparent',
+      };
   }
 
   setSelected(system: string) {
@@ -427,13 +430,15 @@ export default class interfaceSettings extends Vue {
   @Watch('$route.params.id')
   loadSettings(system: string) {
     if (!this.$route.params.id) {
-      return this.refresh()
-    };
+      return this.refresh();
+    }
 
     this.state.loaded = State.PROGRESS;
     getSocket(`/${this.$route.params.type}/${system}`)
       .emit('settings', (err: string | null, _settings: { [x: string]: any }, _ui: { [x: string]: { [attr: string]: any } }) => {
-        if (system !== this.$route.params.id) return // skip if we quickly changed system
+        if (system !== this.$route.params.id) {
+          return;
+        } // skip if we quickly changed system
 
         this.isDataChangedCheck = false;
 
@@ -443,88 +448,95 @@ export default class interfaceSettings extends Vue {
         console.log(_settings);
         console.groupEnd();
 
-        let settings: any = { settings: {} }
-        let ui: any = { settings: {} }
+        const settings: any = { settings: {} };
+        const ui: any = { settings: {} };
 
         // sorting
         // enabled is first - remove on core/overlay
         if (!['core', 'overlays'].includes(this.$route.params.type)) {
           const enabled = settingsEntries.find(o => {
-            return o[0] === 'enabled'
-          })
+            return o[0] === 'enabled';
+          });
           if (enabled) {
-            settings.settings.enabled = enabled[1]
+            settings.settings.enabled = enabled[1];
           }
         }
 
         // everything else except commands and enabled and are [string|number|bool, string|number|bool]
-        for (let [name, value] of filter(settingsEntries, o => o[0][0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && Array.isArray(o[1]))) {
-          settings.settings[name] = value[0]
+        for (const [name, value] of filter(settingsEntries, o => o[0][0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && Array.isArray(o[1]))) {
+          settings.settings[name] = value[0];
           this.defaultValues[name] = value[1];
         }
         // everything else except commands and enabled and are objects -> own category
-        for (let [category, obj] of filter(settingsEntries, o => o[0][0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && !Array.isArray(o[1]))) {
+        for (const [category, obj] of filter(settingsEntries, o => o[0][0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && !Array.isArray(o[1]))) {
           for (const [name, value] of Object.entries(obj)) {
             set(settings, `${category}.${name}`, (value as any)[0]);
-            this.defaultValues[name] = (value as any)[1];          }
+            this.defaultValues[name] = (value as any)[1];          
+          }
         }
 
         // permission based
-        for (let [_name, value] of filter(settingsEntries, o => o[0] === '__permission_based__')) {
+        for (const [_name, value] of filter(settingsEntries, o => o[0] === '__permission_based__')) {
           for (const category of Object.keys(value)) {
             for (const key of Object.keys(value[category])) {
               if (!settings.__permission_based__) {
                 settings.__permission_based__ = { ...settings.__permission_based__, [category]: {} };
               }
-              settings.__permission_based__[category] = { ...settings.__permission_based__[category], [key]: value[category][key][0] }
-              this.defaultValues[key] = value[category][key][1]
+              settings.__permission_based__[category] = { ...settings.__permission_based__[category], [key]: value[category][key][0] };
+              this.defaultValues[key] = value[category][key][1];
             }
           }
         }
 
         // commands at last
-        for (let [_name, value] of filter(settingsEntries, o => o[0] === 'commands')) {
+        for (const [_name, value] of filter(settingsEntries, o => o[0] === 'commands')) {
           for (const key of Object.keys(value)) {
-            settings.commands = { ...settings.commands, [key]: value[key][0] }
+            settings.commands = { ...settings.commands, [key]: value[key][0] };
             this.defaultValues[key] = (value[key] as any)[1];
           }
         }
         // command permissions
-        for (let [_key, value] of filter(settingsEntries, o => o[0] === '_permissions')) {
+        for (const [_key, value] of filter(settingsEntries, o => o[0] === '_permissions')) {
           for (const key of Object.keys(value)) {
-            settings._permissions = { ...settings._permissions, [key]: value[key] }
+            settings._permissions = { ...settings._permissions, [key]: value[key] };
           }
         }
 
         // ui
         // everything else except commands and enabled and are string|number|bool
-        for (let [name, value] of filter(uiEntries, o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type !== 'undefined')) {
-          if (typeof settings.settings[name] === 'undefined') settings.settings[name] = null
-          ui.settings[name] = value
+        for (const [name, value] of filter(uiEntries, o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type !== 'undefined')) {
+          if (typeof settings.settings[name] === 'undefined') {
+            settings.settings[name] = null;
+          }
+          ui.settings[name] = value;
         }
 
         // everything else except commands and enabled and are objects -> own category
-        for (let [name, value] of filter(uiEntries, o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type === 'undefined')) {
-          if (typeof settings[name] === 'undefined') settings[name] = {}
-          for (let [k, /* v */] of Object.entries(value)) {
-            if (typeof settings[name][k] === 'undefined') settings[name][k] = null
+        for (const [name, value] of filter(uiEntries, o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type === 'undefined')) {
+          if (typeof settings[name] === 'undefined') {
+            settings[name] = {};
           }
-          ui[name] = value
+          for (const [k /* v */] of Object.entries(value)) {
+            if (typeof settings[name][k] === 'undefined') {
+              settings[name][k] = null;
+            }
+          }
+          ui[name] = value;
         }
 
         // remove empty categories
         Object.keys(settings).forEach(key => {
           if (size(settings[key]) === 0) {
-            delete settings[key]
+            delete settings[key];
           }
-        })
+        });
 
         Object.keys(ui).forEach(key => {
           if (size(ui[key]) === 0) {
-            delete ui[key]
+            delete ui[key];
           }
-        })
-        console.debug({ui, settings});
+        });
+        console.debug({ ui, settings });
 
         for (const k of Object.keys(settings)) {
           // dont update _permissions as they might be null
@@ -533,37 +545,36 @@ export default class interfaceSettings extends Vue {
               return value !== null || get(ui, `${k}.${key}`, null) !== null;
             });
             if (Object.keys(settings[k]).length === 0) {
-              delete settings[k]
+              delete settings[k];
             }
           }
-        };
-        console.debug({ui, settings});
+        }
+        console.debug({ ui, settings });
         this.settings = Object.assign({}, settings);
-        this.ui = Object.assign({}, ui)
-        this.state.loaded = State.DONE
+        this.ui = Object.assign({}, ui);
+        this.state.loaded = State.DONE;
         this.isDataChanged = false;
 
         setTimeout(() => {
           this.isDataChangedCheck = true;
-        }, 1000)
-      })
+        }, 1000);
+      });
   }
 
   saveSettings() {
-    this.state.settings = 1
-    let settings = cloneDeep(this.settings)
-
+    this.state.settings = 1;
+    let settings = cloneDeep(this.settings);
 
     if (settings.settings) {
-      for (let [name,value] of Object.entries(settings.settings)) {
-        delete settings.settings[name]
-        settings[name] = value
+      for (const [name,value] of Object.entries(settings.settings)) {
+        delete settings.settings[name];
+        settings[name] = value;
       }
-      delete settings.settings
+      delete settings.settings;
     }
 
     // flat variables - getting rid of category
-    settings = flatten(settings)
+    settings = flatten(settings);
     for (const key of Object.keys(settings)) {
       if (key.includes('__permission_based__') || key.includes('commands') || key.includes('_permission')) {
         continue;
@@ -580,31 +591,31 @@ export default class interfaceSettings extends Vue {
 
     // flat permission based variables - getting rid of category
     if(settings.__permission_based__) {
-      settings.__permission_based__ = flatten(settings.__permission_based__)
+      settings.__permission_based__ = flatten(settings.__permission_based__);
       for (const key of Object.keys(settings.__permission_based__)) {
         const match = key.match(/\./g);
         if (match && match.length > 1) {
           const value = settings.__permission_based__[key];
-          delete settings.__permission_based__[key]
+          delete settings.__permission_based__[key];
           const keyWithoutCategory = key.replace(/([\w]*\.)/, '');
           console.debug(`FROM: ${key}`);
           console.debug(`TO:   ${keyWithoutCategory}`);
           settings.__permission_based__[keyWithoutCategory] = value;
-        };
+        }
       }
-      settings.__permission_based__ = unflatten(settings.__permission_based__)
+      settings.__permission_based__ = unflatten(settings.__permission_based__);
     }
 
     console.debug('Saving settings', settings);
     getSocket(`/${this.$route.params.type}/${this.$route.params.id}`)
       .emit('settings.update', settings, async (err: string | null) => {
-        setTimeout(() => this.state.settings = 0, 1000)
+        setTimeout(() => this.state.settings = 0, 1000);
         if (err) {
-          this.state.settings = 3
-          console.error(err)
+          this.state.settings = 3;
+          console.error(err);
         } else {
-          this.state.settings = 2
-          this.isDataChanged = false
+          this.state.settings = 2;
+          this.isDataChanged = false;
 
           // Update prototypes
           Vue.prototype.$core = await getListOf('core');
@@ -613,9 +624,9 @@ export default class interfaceSettings extends Vue {
         }
         setTimeout(() => {
           this.refresh();
-        })
-      })
-    }
+        });
+      });
+  }
 
   triggerError (error: string) {
     this.error = error;
@@ -633,7 +644,7 @@ export default class interfaceSettings extends Vue {
     for (let i = startingOrder; i <= this.permissions.length; i++) {
       const value = values[get(this.permissions.find(permission => permission.order === i), 'id', '0efd7b1c-e460-4167-8e06-8aaf2c170311' /* viewers */)];
       if (typeof value !== 'undefined' && value !== null) {
-        return value
+        return value;
       }
     }
 
@@ -644,9 +655,9 @@ export default class interfaceSettings extends Vue {
 
   togglePermissionLock(permission: Required<PermissionsInterface>, currentValue: { [x: string]: string | null }) {
     if(currentValue[permission.id] === null) {
-      currentValue[permission.id] = this.getPermissionSettingsValue(permission.id, currentValue)
+      currentValue[permission.id] = this.getPermissionSettingsValue(permission.id, currentValue);
     } else {
-      currentValue[permission.id] = null
+      currentValue[permission.id] = null;
     }
   }
 }

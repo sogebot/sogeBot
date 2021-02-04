@@ -159,22 +159,22 @@
   </div>
 </template>
 <script lang="ts">
-import { computed, defineComponent, ref } from '@vue/composition-api'
+import {
+  computed, defineComponent, ref, 
+} from '@vue/composition-api';
+
 import { EmitData } from 'src/bot/database/entity/alert';
 import { shuffle } from 'src/bot/helpers/array/shuffle';
 import { generateUsername } from 'src/bot/helpers/generateUsername';
-
 import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/registries/alerts');
 
 export default defineComponent({
-  components: {
-    'rewards': () => import('src/panel/components/rewardDropdown.vue'),
-  },
+  components: { 'rewards': () => import('src/panel/components/rewardDropdown.vue') },
   setup(props, ctx) {
-    const event = ref('follows' as typeof events[number])
+    const event = ref('follows' as typeof events[number]);
     const username = ref('');
     const reward = ref(null as null | string);
     const isUsernameRandomized = ref(true);
@@ -182,13 +182,13 @@ export default defineComponent({
     const recipient = ref('');
     const isRecipientRandomized = ref(true);
     const haveRecipient = computed(() => {
-      return ['rewardredeems', 'subgift'].includes(event.value)
+      return ['rewardredeems', 'subgift'].includes(event.value);
     });
 
     const message = ref('');
     const isMessageRandomized = ref(true);
     const haveMessage = computed(() => {
-      return ['cheers', 'resubs', 'rewardredeems'].includes(event.value)
+      return ['cheers', 'resubs', 'rewardredeems'].includes(event.value);
     });
 
     const amount = ref(5);
@@ -215,17 +215,16 @@ export default defineComponent({
         default:
           return null;
       }
-    })
+    });
 
     const tier = ref('Prime' as typeof tiers[number]);
     const isTierRandomized = ref(true);
     const haveTier = computed(() => {
-      return ['subs', 'resubs'].includes(event.value)
+      return ['subs', 'resubs'].includes(event.value);
     });
 
     const tiers = ['Prime', '1', '2', '3'] as const;
     const events = ['follows', 'cheers', 'tips', 'subs', 'resubs', 'subcommunitygifts', 'subgifts', 'hosts', 'raids', 'cmdredeems', 'rewardredeems'] as const;
-
 
     const onSubmit = () => {
       const messages = [
@@ -240,17 +239,17 @@ export default defineComponent({
       const emit: EmitData = {
         amount: isAmountRandomized.value ? Math.floor(Math.random() * 1000) : amount.value,
         name:
-          event.value === 'rewardredeems' ? reward.value || '' :
-            (isUsernameRandomized.value ? generateUsername() : username.value),
-        tier: isTierRandomized.value ? tiers[shuffle([0,1,2,3])[0]] : tier.value,
-        recipient: isRecipientRandomized.value ? generateUsername() : recipient.value,
-        currency: currency.value,
-        message: isMessageRandomized.value ? shuffle(messages)[0] : message.value,
-        event: event.value,
-        monthsName: '' // will be added at server
-      }
-      socket.emit('test', emit)
-    }
+          event.value === 'rewardredeems' ? reward.value || ''
+            : (isUsernameRandomized.value ? generateUsername() : username.value),
+        tier:       isTierRandomized.value ? tiers[shuffle([0,1,2,3])[0]] : tier.value,
+        recipient:  isRecipientRandomized.value ? generateUsername() : recipient.value,
+        currency:   currency.value,
+        message:    isMessageRandomized.value ? shuffle(messages)[0] : message.value,
+        event:      event.value,
+        monthsName: '', // will be added at server
+      };
+      socket.emit('test', emit);
+    };
     return {
       event,
       events,
@@ -281,7 +280,7 @@ export default defineComponent({
       onSubmit,
 
       translate,
-    }
-  }
-})
+    };
+  },
+});
 </script>

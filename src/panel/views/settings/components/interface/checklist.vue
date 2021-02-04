@@ -16,7 +16,10 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import {
+  Component, Prop, Vue, 
+} from 'vue-property-decorator';
+
 import translate from 'src/panel/helpers/translate';
 
 @Component({})
@@ -27,5 +30,5 @@ export default class btnEmit extends Vue {
 
   currentValue = this.value;
   translatedTitle = translate(this.title);
-};
+}
 </script>

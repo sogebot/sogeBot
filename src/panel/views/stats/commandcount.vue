@@ -63,223 +63,223 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Chartkick from 'vue-chartkick';
-  import Chart from 'chart.js';
-  import { countBy } from 'lodash-es';
-  import translate from 'src/panel/helpers/translate';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faChartLine } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import Chart from 'chart.js';
+import { countBy } from 'lodash-es';
+import Vue from 'vue';
+import Chartkick from 'vue-chartkick';
 
-  import { library } from '@fortawesome/fontawesome-svg-core'
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-  import { faChartLine } from '@fortawesome/free-solid-svg-icons';
+import translate from 'src/panel/helpers/translate';
 
-  library.add(faChartLine)
-  Vue.use(Chartkick.use(Chart));
+library.add(faChartLine);
+Vue.use(Chartkick.use(Chart));
 
-  import { getSocket } from '../../helpers/socket';
+import { getSocket } from '../../helpers/socket';
 
-  export default Vue.extend({
-    components: {
-      panel: () => import('../../components/panel.vue'),
-      'font-awesome-icon': FontAwesomeIcon,
+export default Vue.extend({
+  components: {
+    panel:               () => import('../../components/panel.vue'),
+    'font-awesome-icon': FontAwesomeIcon,
+  },
+  data: function () {
+    const object: {
+      socket: any,
+      translate: any,
+      commandsUsage: {
+        _id: string,
+        command: string,
+        timestamp: number,
+      }[],
+      showChartCommands: string[],
+      maxFrom: Date,
+      minTo: Date,
+      maxTo: Date,
+      fromDate: Date,
+      toDate: Date,
+    } = {
+      translate:         translate,
+      socket:            getSocket('/stats/commandcount'),
+      commandsUsage:     [],
+      showChartCommands: [],
+      maxFrom:           new Date(new Date().getFullYear(), (new Date().getMonth() + 1), (new Date().getDate() - 1)),
+      maxTo:             new Date(),
+      minTo:             new Date(new Date().getFullYear(), (new Date().getMonth() + 1), (new Date().getDate() - 13)),
+      fromDate:          new Date(new Date().getFullYear(), (new Date().getMonth() + 1), (new Date().getDate() - 14)),
+      toDate:            new Date(new Date().getFullYear(), (new Date().getMonth() + 1), new Date().getDate()),
+    };
+    return object;
+  },
+  watch: {
+    showChartCommands() {
+      localStorage.setItem('/stats/commandcount/showChartCommands', JSON.stringify(this.showChartCommands));
     },
-    data: function () {
-      const object: {
-        socket: any,
-        translate: any,
-        commandsUsage: {
-          _id: string,
-          command: string,
-          timestamp: number,
-        }[],
-        showChartCommands: string[],
-        maxFrom: Date,
-        minTo: Date,
-        maxTo: Date,
-        fromDate: Date,
-        toDate: Date,
-      } = {
-        translate: translate,
-        socket: getSocket('/stats/commandcount'),
-        commandsUsage: [],
-        showChartCommands: [],
-        maxFrom: new Date(new Date().getFullYear(), (new Date().getMonth() + 1), (new Date().getDate() - 1)),
-        maxTo: new Date(),
-        minTo: new Date(new Date().getFullYear(), (new Date().getMonth() + 1), (new Date().getDate() - 13)),
-        fromDate: new Date(new Date().getFullYear(), (new Date().getMonth() + 1), (new Date().getDate() - 14)),
-        toDate: new Date(new Date().getFullYear(), (new Date().getMonth() + 1), new Date().getDate()),
+    toDate(val) {
+      this.maxFrom = new Date(val);
+      this.maxFrom.setDate(new Date(this.maxFrom).getDate() - 1);
+      localStorage.setItem('/stats/commandcount/toDate', val);
+    },
+    fromDate(val) {
+      this.minTo = new Date(val);
+      this.minTo.setDate(new Date(this.minTo).getDate() + 1);
+      if (this.toDate.getTime() < this.minTo.getTime()) {
+        this.toDate.setDate(new Date(this.minTo).getDate() + 1);
       }
-      return object
+      localStorage.setItem('/stats/commandcount/fromDate', val);
     },
-    watch: {
-      showChartCommands() {
-        localStorage.setItem('/stats/commandcount/showChartCommands', JSON.stringify(this.showChartCommands))
-      },
-      toDate(val) {
-        this.maxFrom = new Date(val);
-        this.maxFrom.setDate(new Date(this.maxFrom).getDate() - 1)
-        localStorage.setItem('/stats/commandcount/toDate', val)
-      },
-      fromDate(val) {
-        this.minTo = new Date(val);
-        this.minTo.setDate(new Date(this.minTo).getDate() + 1)
-        if (this.toDate.getTime() < this.minTo.getTime()) {
-          this.toDate.setDate(new Date(this.minTo).getDate() + 1)
-        }
-        localStorage.setItem('/stats/commandcount/fromDate', val)
+  },
+  computed: {
+    commands(): string[] {
+      return [...new Set(this.commandsUsage.map(o => o.command))];
+    },
+    timestampList(): number[] {
+      const from = new Date(this.fromDate).getTime();
+      const to = new Date(this.toDate).getTime();
+
+      const list: number[] = [];
+      for (
+        let timestamp = (from / (this.timestampSmooth) * (this.timestampSmooth));
+        timestamp <= (to / (this.timestampSmooth) * (this.timestampSmooth));
+        timestamp = timestamp + (this.timestampSmooth)) {
+        list.push(timestamp);
+      }
+      return list;
+    },
+    timestampSmooth(): number {
+      const from = new Date(this.fromDate).getTime();
+      const to = new Date(this.toDate).getTime();
+
+      const list: number[] = [];
+      for (
+        let timestamp = (from / (1000 * 60 * 30) * (1000 * 60 * 30));
+        timestamp <= (to / (1000 * 60 * 30) * (1000 * 60 * 30));
+        timestamp = timestamp + (1000 * 60 * 30)) {
+        list.push(timestamp);
+      }
+
+      if (list.length <= (48 /*day*/ * 1)) {
+        return 1000 * 60 * 30; // half hour
+      } else if (list.length <= (48 /*day*/ * 2)) {
+        return 1000 * 60 * 60; // hour
+      } else if (list.length <= (48 /*day*/ * 3)) {
+        return 1000 * 60 * 60 * 2; // 2 hours
+      } else if (list.length <= (48 /*day*/ * 6)) {
+        return 1000 * 60 * 60 * 4; // 4 hours
+      } else if (list.length <= (48 /*day*/ * 12)) {
+        return 1000 * 60 * 60 * 8; // 8 hours
+      } else if (list.length <= (48 /*day*/ * 21)) {
+        return 1000 * 60 * 60 * 12; // 12 hours
+      } else if (list.length <= (48 /*day*/ * 30)) {
+        return 1000 * 60 * 60 * 24; // day
+      } else if (list.length <= (48 /*day*/ * 365)) {
+        return 1000 * 60 * 60 * 24 * 30; // month
+      } else {
+        return 1000 * 60 * 60 * 24 * 30 * 12; // year
       }
     },
-    computed: {
-      commands(): string[] {
-        return [...new Set(this.commandsUsage.map(o => o.command))];
-      },
-      timestampList(): number[] {
-        const from = new Date(this.fromDate).getTime()
-        const to = new Date(this.toDate).getTime();
-
-        const list: number[] = []
-        for (
-          let timestamp = (from / (this.timestampSmooth) * (this.timestampSmooth));
-          timestamp <= (to / (this.timestampSmooth) * (this.timestampSmooth));
-          timestamp = timestamp + (this.timestampSmooth)) {
-            list.push(timestamp);
-        }
-        return list;
-      },
-      timestampSmooth(): number {
-        const from = new Date(this.fromDate).getTime()
-        const to = new Date(this.toDate).getTime();
-
-        const list: number[] = []
-        for (
-          let timestamp = (from / (1000 * 60 * 30) * (1000 * 60 * 30));
-          timestamp <= (to / (1000 * 60 * 30) * (1000 * 60 * 30));
-          timestamp = timestamp + (1000 * 60 * 30)) {
-            list.push(timestamp);
-        }
-
-        if (list.length <= (48 /*day*/ * 1)) {
-          return 1000 * 60 * 30 // half hour
-        } else if (list.length <= (48 /*day*/ * 2)) {
-          return 1000 * 60 * 60 // hour
-        } else if (list.length <= (48 /*day*/ * 3)) {
-          return 1000 * 60 * 60 * 2 // 2 hours
-        } else if (list.length <= (48 /*day*/ * 6)) {
-          return 1000 * 60 * 60 * 4 // 4 hours
-        } else if (list.length <= (48 /*day*/ * 12)) {
-          return 1000 * 60 * 60 * 8 // 8 hours
-        } else if (list.length <= (48 /*day*/ * 21)) {
-          return 1000 * 60 * 60 * 12 // 12 hours
-        } else if (list.length <= (48 /*day*/ * 30)) {
-          return 1000 * 60 * 60 * 24 // day
-        } else if (list.length <= (48 /*day*/ * 365)) {
-          return 1000 * 60 * 60 * 24 * 30 // month
-        } else {
-          return 1000 * 60 * 60 * 24 * 30 * 12 // year
-        }
+  },
+  methods: {
+    toggleCommandChart(command: string) {
+      if (this.showChartCommands.includes(command)) {
+        this.showChartCommands = this.showChartCommands.filter((o) => o !== command);
+      } else {
+        this.showChartCommands.push(command);
       }
     },
-    methods: {
-      toggleCommandChart(command: string) {
-        if (this.showChartCommands.includes(command)) {
-          this.showChartCommands = this.showChartCommands.filter((o) => o !== command);
-        } else {
-          this.showChartCommands.push(command);
-        }
-      },
-      generateChartData(): {
+    generateChartData(): {
+      name: string; data: { [x: string]: number };
+    }[] {
+      const data: {
         name: string; data: { [x: string]: number };
-      }[] {
-        const data: {
-          name: string; data: { [x: string]: number };
-        }[] = [];
+      }[] = [];
 
-        const from = new Date(this.fromDate).getTime()
-        const to = new Date(this.toDate).getTime();
+      const from = new Date(this.fromDate).getTime();
+      const to = new Date(this.toDate).getTime();
 
-        for (const command of this.commands) {
-          if (!this.showChartCommands.includes(command)) {
-            continue;
-          }
-          const timestamps = this.commandsUsage
-            .filter(o => {
-              const isCommand = o.command === command;
-              const isHigherThanFromDate = o.timestamp >= from;
-              const isLowerThanToDate = o.timestamp <= to;
-              return isCommand && isHigherThanFromDate && isLowerThanToDate;
-            })
-            .map(o => {
-              // find smooth timestamp
-              let timestamp = from;
-              while(timestamp <= o.timestamp) {
-                timestamp += this.timestampSmooth;
-              }
-              if (timestamp > to) {
-                timestamp = to;
-              }
-              return timestamp;
-            })
-          const countByTimestamps = countBy(timestamps)
-          for (const t of this.timestampList) {
-            if (!countByTimestamps[t]) {
-              countByTimestamps[t] = 0;
+      for (const command of this.commands) {
+        if (!this.showChartCommands.includes(command)) {
+          continue;
+        }
+        const timestamps = this.commandsUsage
+          .filter(o => {
+            const isCommand = o.command === command;
+            const isHigherThanFromDate = o.timestamp >= from;
+            const isLowerThanToDate = o.timestamp <= to;
+            return isCommand && isHigherThanFromDate && isLowerThanToDate;
+          })
+          .map(o => {
+            // find smooth timestamp
+            let timestamp = from;
+            while(timestamp <= o.timestamp) {
+              timestamp += this.timestampSmooth;
             }
-          }
-          const countByTimestampsOrdered: any = {}
-          for (const k of Object.keys(countByTimestamps).sort()) {
-            countByTimestampsOrdered[new Date(Number(k)).toLocaleString()] = countByTimestamps[k];
-          }
-          data.push({
-            name: command,
-            data: countByTimestampsOrdered,
+            if (timestamp > to) {
+              timestamp = to;
+            }
+            return timestamp;
           });
+        const countByTimestamps = countBy(timestamps);
+        for (const t of this.timestampList) {
+          if (!countByTimestamps[t]) {
+            countByTimestamps[t] = 0;
+          }
         }
-        return data;
-      },
-      totalInInterval(command: string, interval: number): number {
-        return this.commandsUsage.filter(o => {
-          const isCorrectCommand = o.command === command;
-          const isInInterval = Date.now() - interval <= o.timestamp;
-          return isCorrectCommand && isInInterval;
-        }).length;
-      },
-      total(command: string): number {
-        return this.commandsUsage.filter(o => o.command === command).length;
+        const countByTimestampsOrdered: any = {};
+        for (const k of Object.keys(countByTimestamps).sort()) {
+          countByTimestampsOrdered[new Date(Number(k)).toLocaleString()] = countByTimestamps[k];
+        }
+        data.push({
+          name: command,
+          data: countByTimestampsOrdered,
+        });
       }
+      return data;
     },
-    mounted() {
-      this.socket.emit('commands::count', (err: string | null, val: { command: string, timestamp: number, _id: string }[]) => {
-        if (err) {
-          return console.error(err);
-        }
+    totalInInterval(command: string, interval: number): number {
+      return this.commandsUsage.filter(o => {
+        const isCorrectCommand = o.command === command;
+        const isInInterval = Date.now() - interval <= o.timestamp;
+        return isCorrectCommand && isInInterval;
+      }).length;
+    },
+    total(command: string): number {
+      return this.commandsUsage.filter(o => o.command === command).length;
+    },
+  },
+  mounted() {
+    this.socket.emit('commands::count', (err: string | null, val: { command: string, timestamp: number, _id: string }[]) => {
+      if (err) {
+        return console.error(err);
+      }
 
-        const cacheShowChartCommands = localStorage.getItem('/stats/commandcount/showChartCommands')
-        if (!cacheShowChartCommands) {
-          this.showChartCommands = val.splice(0, 5).map(o => o.command);
-          localStorage.setItem('/stats/commandcount/showChartCommands', JSON.stringify(this.showChartCommands))
-        } else {
-          this.showChartCommands = JSON.parse(cacheShowChartCommands);
-        }
+      const cacheShowChartCommands = localStorage.getItem('/stats/commandcount/showChartCommands');
+      if (!cacheShowChartCommands) {
+        this.showChartCommands = val.splice(0, 5).map(o => o.command);
+        localStorage.setItem('/stats/commandcount/showChartCommands', JSON.stringify(this.showChartCommands));
+      } else {
+        this.showChartCommands = JSON.parse(cacheShowChartCommands);
+      }
 
-        const cacheFromDate = localStorage.getItem('/stats/commandcount/fromDate')
-        if (!cacheFromDate) {
-          this.fromDate = new Date(new Date().getFullYear(), (new Date().getMonth() + 1), (new Date().getDate() - 14));
-          localStorage.setItem('/stats/commandcount/fromDate', String(this.fromDate))
-        } else {
-          this.fromDate = new Date(cacheFromDate);
-        }
+      const cacheFromDate = localStorage.getItem('/stats/commandcount/fromDate');
+      if (!cacheFromDate) {
+        this.fromDate = new Date(new Date().getFullYear(), (new Date().getMonth() + 1), (new Date().getDate() - 14));
+        localStorage.setItem('/stats/commandcount/fromDate', String(this.fromDate));
+      } else {
+        this.fromDate = new Date(cacheFromDate);
+      }
 
-        const cacheToDate = localStorage.getItem('/stats/commandcount/toDate')
-        if (!cacheToDate) {
-          this.toDate = new Date(new Date().getFullYear(), (new Date().getMonth() + 1), new Date().getDate());
-          localStorage.setItem('/stats/commandcount/toDate', String(this.toDate))
-        } else {
-          this.toDate = new Date(cacheToDate);
-        }
-        this.commandsUsage = val;
-      })
-    }
-  })
+      const cacheToDate = localStorage.getItem('/stats/commandcount/toDate');
+      if (!cacheToDate) {
+        this.toDate = new Date(new Date().getFullYear(), (new Date().getMonth() + 1), new Date().getDate());
+        localStorage.setItem('/stats/commandcount/toDate', String(this.toDate));
+      } else {
+        this.toDate = new Date(cacheToDate);
+      }
+      this.commandsUsage = val;
+    });
+  },
+});
 </script>
 
 <style scoped>

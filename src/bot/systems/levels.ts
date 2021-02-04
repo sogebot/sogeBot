@@ -400,7 +400,7 @@ class Levels extends System {
             amount:     xpNeeded,
             level:      currentLevel + 1,
             xpName:     this.xpName,
-          })
+          }),
         );
       }
 

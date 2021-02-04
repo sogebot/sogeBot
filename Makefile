@@ -28,7 +28,7 @@ dependencies:
 
 eslint:
 	@echo -ne "\n\t ----- Checking eslint\n"
-	npx eslint --ext .ts src --quiet
+	npx eslint --ext .ts,.vue src --quiet
 
 jsonlint:
 	@echo -ne "\n\t ----- Checking jsonlint\n"

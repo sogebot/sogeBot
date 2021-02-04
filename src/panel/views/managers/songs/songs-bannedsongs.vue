@@ -64,21 +64,22 @@
 </template>
 
 <script lang="ts">
-import { getSocket } from 'src/panel/helpers/socket';
 
-import { defineComponent, ref, onMounted, computed } from '@vue/composition-api'
-import { isNil, escapeRegExp } from 'lodash-es';
+import {
+  computed, defineComponent, onMounted, ref, 
+} from '@vue/composition-api';
+import { escapeRegExp, isNil } from 'lodash-es';
+
 import { SongBanInterface } from 'src/bot/database/entity/song';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
-import translate from 'src/panel/helpers/translate';
 import { error } from 'src/panel/helpers/error';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/systems/songs');
 
 export default defineComponent({
-  components: {
-    'loading': () => import('src/panel/components/loading.vue'),
-  },
+  components: { 'loading': () => import('src/panel/components/loading.vue') },
   setup() {
     const items = ref([] as SongBanInterface[]);
     const search = ref('');
@@ -87,82 +88,86 @@ export default defineComponent({
 
     const state = ref({
       loading: ButtonStates.progress,
-      import: ButtonStates.idle,
+      import:  ButtonStates.idle,
     } as {
       loading: number;
       import: number;
-    })
+    });
 
     const fields = [
-      { key: 'thumbnail', label: '', tdClass: 'fitThumbnail' },
+      {
+        key: 'thumbnail', label: '', tdClass: 'fitThumbnail', 
+      },
       { key: 'title', label: '' },
       { key: 'buttons', label: '' },
     ];
 
     const fItems = computed(() => {
-      if (search.value.length === 0) return items.value
+      if (search.value.length === 0) {
+        return items.value;
+      }
       return items.value.filter((o) => {
-        const isSearchInTitle = !isNil(o.title.match(new RegExp(escapeRegExp(search.value), 'ig')))
-        return isSearchInTitle
-      })
+        const isSearchInTitle = !isNil(o.title.match(new RegExp(escapeRegExp(search.value), 'ig')));
+        return isSearchInTitle;
+      });
     });
 
     onMounted(() => {
-      refreshBanlist()
+      refreshBanlist();
     });
 
     const refreshBanlist = () => {
       socket.emit('songs::getAllBanned', {}, (err: string | null, getAllBanned: SongBanInterface[]) => {
         items.value = getAllBanned;
         state.value.loading = ButtonStates.success;
-      })
-    }
+      });
+    };
 
     const generateThumbnail = (videoId: string) => {
-      return `https://img.youtube.com/vi/${videoId}/1.jpg`
-    }
+      return `https://img.youtube.com/vi/${videoId}/1.jpg`;
+    };
 
     const deleteItem = (id: string) => {
       if (confirm('Do you want to delete banned song ' + items.value.find(o => o.videoId === id)?.title + '?')) {
         socket.emit('delete.ban', id, () => {
-          items.value = items.value.filter((o) => o.videoId !== id)
-        })
+          items.value = items.value.filter((o) => o.videoId !== id);
+        });
       }
-    }
+    };
 
     const showImportInfo = async () => {
       importInfo.value = 'BANNED!';
       setTimeout(() => {
-        importInfo.value = ''
-        state.value.import = 0
-      }, 5000)
-    }
+        importInfo.value = '';
+        state.value.import = 0;
+      }, 5000);
+    };
 
     const addSong = (evt: Event) => {
       if (evt) {
-        evt.preventDefault()
+        evt.preventDefault();
       }
       if (state.value.import === 0) {
-        state.value.import = 1
+        state.value.import = 1;
         socket.emit('import.ban', toAdd.value, (err: string | null, info: CommandResponse[]) => {
           if (err) {
-            toAdd.value = ''
-            importInfo.value = ''
-            state.value.import = 0
+            toAdd.value = '';
+            importInfo.value = '';
+            state.value.import = 0;
             return error(err);
           }
-          state.value.import = 2
-          refreshBanlist()
-          toAdd.value = ''
-          showImportInfo()
-        })
+          state.value.import = 2;
+          refreshBanlist();
+          toAdd.value = '';
+          showImportInfo();
+        });
       }
-    }
+    };
 
     const linkTo = (item: SongBanInterface) => {
       console.debug('Clicked', item.videoId);
       window.location.href = `http://youtu.be/${item.videoId}`;
-    }
+    };
 
     return {
       items,
@@ -181,8 +186,8 @@ export default defineComponent({
 
       translate,
       ButtonStates,
-    }
-  }
+    };
+  },
 });
 </script>
 

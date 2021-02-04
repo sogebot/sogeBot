@@ -13,21 +13,20 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator';
-import gsap from 'gsap'
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faCircle } from '@fortawesome/free-solid-svg-icons/faCircle';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import gsap from 'gsap';
+import {
+  Component, Vue, Watch, 
+} from 'vue-property-decorator';
+
 import { getSocket } from 'src/panel/helpers/socket';
 
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCircle } from '@fortawesome/free-solid-svg-icons/faCircle'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+library.add(faCircle);
 
-library.add(faCircle)
-
-@Component({
-  components: {
-    'font-awesome-icon': FontAwesomeIcon
-  }
-})
+@Component({ components: { 'font-awesome-icon': FontAwesomeIcon } })
 export default class ClipsOverlay extends Vue {
   socket = getSocket('/overlays/clips', true);
   isPlaying = false;
@@ -43,43 +42,47 @@ export default class ClipsOverlay extends Vue {
   created () {
     this.socket.on('clips', (data: any) => {
       for (let i = 0, len = data.clips.length; i < len; i++) {
-        this.settings.push(data.settings)
-        this.clips.push(data.clips[i])
+        this.settings.push(data.settings);
+        this.clips.push(data.clips[i]);
       }
-    })
+    });
 
     this.interval.push(setInterval(() => {
-      const video = this.$refs['video'] as HTMLMediaElement
+      const video = this.$refs.video as HTMLMediaElement;
       if (typeof video !== 'undefined' && video.ended) {
-        this.isPlaying = false
-        this.clips.shift()
-        this.settings.shift()
+        this.isPlaying = false;
+        this.clips.shift();
+        this.settings.shift();
       }
 
       if (!this.isPlaying) {
-        this.isPlaying = this.getPlayingClip() !== null
+        this.isPlaying = this.getPlayingClip() !== null;
       }
     }, 100));
   }
   @Watch('isPlaying')
   isPlayingWatcher (val: boolean) {
     if (val) {
-      const video = this.$refs['video'] as HTMLMediaElement
-      video.volume = this.getPlayingSettings().volume / 100
-      video.play()
+      const video = this.$refs.video as HTMLMediaElement;
+      video.volume = this.getPlayingSettings().volume / 100;
+      video.play();
 
       this.$nextTick(function () {
-        if (this.getPlayingSettings().label && this.$refs['label']) gsap.fromTo(this.$refs['label'], { duration: 1, opacity: 0 }, { opacity: 1, yoyo: true, repeat:-1} )
-      })
+        if (this.getPlayingSettings().label && this.$refs.label) {
+          gsap.fromTo(this.$refs.label, { duration: 1, opacity: 0 }, {
+            opacity: 1, yoyo: true, repeat: -1, 
+          } );
+        }
+      });
     }
   }
 
   getPlayingClip () {
-    return this.clips.length > 0 ? this.clips[0] : null
+    return this.clips.length > 0 ? this.clips[0] : null;
   }
 
   getPlayingSettings () {
-    return this.settings.length > 0 ? this.settings[0] : null
+    return this.settings.length > 0 ? this.settings[0] : null;
   }
 }
 </script>

@@ -67,42 +67,45 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCircleNotch, faUpload, faLongArrowAltUp, faLongArrowAltDown } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCircleNotch, faLongArrowAltDown, faLongArrowAltUp, faUpload, 
+} from '@fortawesome/free-solid-svg-icons';
+import {
+  Component, Vue, Watch, 
+} from 'vue-property-decorator';
+
 library.add(faCircleNotch, faUpload, faLongArrowAltUp, faLongArrowAltDown);
 
-import { getSocket } from 'src/panel/helpers/socket';
 import { CarouselInterface } from 'src/bot/database/entity/carousel';
+import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
-@Component({
-  components: {
-    loading: () => import('../../../components/loading.vue'),
-  },
-})
+@Component({ components: { loading: () => import('../../../components/loading.vue') } })
 export default class carouselOverlayList extends Vue {
   translate = translate;
   socket = getSocket('/overlays/carousel');
 
   fields = [
-    { key: 'thumbnail', label: '', tdClass: 'fitThumbnail' },
+    {
+      key: 'thumbnail', label: '', tdClass: 'fitThumbnail', 
+    },
     { key: 'info', label: '' },
     { key: 'buttons', label: '' },
   ];
 
-  items: CarouselInterface[] = []
+  items: CarouselInterface[] = [];
 
   state: {
     loading: number;
     uploading: number;
   } = {
-    loading: this.$state.progress,
+    loading:   this.$state.progress,
     uploading: this.$state.idle,
-  }
-  uploadedFiles: number = 0;
-  isUploadingNum: number = 0;
+  };
+  uploadedFiles = 0;
+  isUploadingNum = 0;
 
   created() {
     this.refresh();
@@ -116,7 +119,7 @@ export default class carouselOverlayList extends Vue {
       }
       this.items = items;
       this.state.loading = this.$state.success;
-    })
+    });
   }
 
   @Watch('uploadedFiles')
@@ -127,14 +130,14 @@ export default class carouselOverlayList extends Vue {
   }
 
   moveUp(order: number) {
-  this.items.filter((o) => o.order === order - 1 || o.order === order).map(o => {
+    this.items.filter((o) => o.order === order - 1 || o.order === order).map(o => {
       if (o.order === order - 1) {
-        o.order++
+        o.order++;
       } else {
-        o.order--
+        o.order--;
       }
-      return o
-    })
+      return o;
+    });
     this.socket.emit('carousel::save', this.items, (err: string | null) => {
       if (err) {
         return console.error(err);
@@ -143,14 +146,14 @@ export default class carouselOverlayList extends Vue {
   }
 
   moveDown(order: number) {
-  this.items.filter((o) => o.order === order + 1 || o.order === order).map(o => {
+    this.items.filter((o) => o.order === order + 1 || o.order === order).map(o => {
       if (o.order === order + 1) {
-        o.order--
+        o.order--;
       } else {
-        o.order++
+        o.order++;
       }
-      return o
-    })
+      return o;
+    });
     this.socket.emit('carousel::save', this.items, (err: string | null) => {
       if (err) {
         return console.error(err);
@@ -163,21 +166,21 @@ export default class carouselOverlayList extends Vue {
       return;
     }
     this.state.uploading = this.$state.progress;
-    this.isUploadingNum = files.length
-    this.uploadedFiles = 0
+    this.isUploadingNum = files.length;
+    this.uploadedFiles = 0;
 
     for (let i = 0, l = files.length; i < l; i++) {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onload = ((e: any )=> {
         this.socket.emit('carousel::insert', e.target.result, (err: string | null, image: CarouselInterface) => {
           if (err) {
             return console.error(err);
           }
-          this.uploadedFiles++
-          this.items.push(image)
-        })
-      })
-      reader.readAsDataURL(files[i])
+          this.uploadedFiles++;
+          this.items.push(image);
+        });
+      });
+      reader.readAsDataURL(files[i]);
     }
   }
 

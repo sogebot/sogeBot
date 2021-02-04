@@ -26,7 +26,10 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import {
+  Component, Prop, Vue, Watch, 
+} from 'vue-property-decorator';
+
 import translate from 'src/panel/helpers/translate';
 
 @Component({})
@@ -35,7 +38,7 @@ export default class configurableList extends Vue {
   @Prop() readonly value!: any;
   @Prop() readonly title!: string;
 
-  show: boolean = true;
+  show = true;
   currentValue = this.value;
   translatedTitle = translate(this.title);
 

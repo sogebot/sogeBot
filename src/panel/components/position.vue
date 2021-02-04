@@ -77,16 +77,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUnmounted, reactive, ref, toRefs, watch } from '@vue/composition-api'
-import type { Ref } from '@vue/composition-api'
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faSquare } from '@fortawesome/free-solid-svg-icons';
+import {
+  defineComponent, onMounted, onUnmounted, reactive, ref, toRefs, watch,
+} from '@vue/composition-api';
+import type { Ref } from '@vue/composition-api';
 import { v4 as uuidv4 } from 'uuid';
 
 import type { RandomizerInterface } from 'src/bot/database/entity/randomizer';
 import translate from 'src/panel/helpers/translate';
 
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faSquare } from '@fortawesome/free-solid-svg-icons';
-library.add(faSquare)
+library.add(faSquare);
 
 interface Props {
   position: RandomizerInterface['position'];
@@ -94,9 +96,7 @@ interface Props {
 
 let interval = 0;
 export default defineComponent({
-  props: {
-    position: Object,
-  },
+  props: { position: Object },
   setup(props: Props, context) {
     const timestamp = ref(0);
     const pos = reactive(props.position);
@@ -108,14 +108,14 @@ export default defineComponent({
       text: HTMLElement | null,
     } = reactive({
       anchor: null,
-      text: null,
+      text:   null,
     });
     const example: Ref<HTMLElement | null> = ref(null);
 
-    const positionGenerator = (ref: 'anchor' | 'text'): { transform: string } => {
+    const positionGenerator = (refType: 'anchor' | 'text'): { transform: string } => {
       if (example.value) {
-        if (HTMLRef[ref]) {
-          const el = HTMLRef[ref] as HTMLElement;
+        if (HTMLRef[refType]) {
+          const el = HTMLRef[refType] as HTMLElement;
           const widthPxPerCent = example.value.getBoundingClientRect().width / 100;
           const heightPxPerCent = example.value.getBoundingClientRect().height / 100;
 
@@ -133,24 +133,18 @@ export default defineComponent({
             left = el.getBoundingClientRect().width;
           }
 
-          return {
-            transform: `translate(${(pos.x * widthPxPerCent) - left}px, ${(pos.y * heightPxPerCent) - top}px)`,
-          };
+          return { transform: `translate(${(pos.x * widthPxPerCent) - left}px, ${(pos.y * heightPxPerCent) - top}px)` };
         } else {
-          return {
-            transform: `translate(0, 0)`,
-          };
+          return { transform: `translate(0, 0)` };
         }
       }
 
-      return {
-        transform: `translate(0, 0)`,
-      };
-    }
+      return { transform: `translate(0, 0)` };
+    };
 
     watch(pos, (value) => {
       context.emit('update:position', value);
-    })
+    });
 
     onMounted(() => interval = window.setInterval(() => timestamp.value = Date.now(), 200));
     onUnmounted(() => window.clearInterval(interval));
@@ -158,7 +152,7 @@ export default defineComponent({
     return {
       timestamp, positionGenerator, pos, uuid,
       example, ...toRefs(HTMLRef), translate,
-    }
-  }
+    };
+  },
 });
 </script>
