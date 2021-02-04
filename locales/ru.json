@@ -171,6 +171,10 @@
         "filter": {
           "label": "Filter"
         },
+        "linkFilter": {
+          "label": "Link Overlay Filter",
+          "placeholder": "If using overlay, add link or id of your overlay"
+        },
         "hashtag": {
           "label": "Хэштег или Ключевое слово",
           "placeholder": "#yourHashtagHere или Ключевое слово"
@@ -437,7 +441,8 @@
           "username": "Имя пользователя в Twitter",
           "displayname": "Отображаемое имя в твиттере",
           "url": "Ссылка твита"
-        }
+        },
+        "sceneName": "Name of scene"
       }
     },
     "page-settings": {
@@ -747,6 +752,7 @@
     "user-parted-channel": "пользователь вышел с канала",
     "follow": "новый подписчик",
     "tip": "новый донат",
+    "obs-scene-changed": "OBS scene changed",
     "unfollow": "отписка",
     "subscription": "новый сарскрайбер",
     "subgift": "новый подаренный саб",
