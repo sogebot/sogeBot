@@ -172,8 +172,8 @@
           "label": "Filtr"
         },
         "linkFilter": {
-          "label": "Link Overlay Filter",
-          "placeholder": "If using overlay, add link or id of your overlay"
+          "label": "Odkaz nebo ID overlaye",
+          "placeholder": "Pokud používáte overlay, přidejte odkaz nebo ID"
         },
         "hashtag": {
           "label": "Hashtag nebo klíčové slovo",
@@ -442,7 +442,7 @@
           "displayname": "Zobrazené jméno na Twitteru",
           "url": "Link na tweet"
         },
-        "sceneName": "Name of scene"
+        "sceneName": "Název scény"
       }
     },
     "page-settings": {
@@ -752,7 +752,7 @@
     "user-parted-channel": "uživatel se odešel z chatu",
     "follow": "nový follower",
     "tip": "nový tip",
-    "obs-scene-changed": "OBS scene changed",
+    "obs-scene-changed": "OBS scéna se změnila",
     "unfollow": "ztráta followera",
     "subscription": "nový subscription",
     "subgift": "nový subgift",
