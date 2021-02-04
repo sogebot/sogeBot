@@ -4,7 +4,7 @@ import path from 'path';
 
 import bodyParser from 'body-parser';
 import express from 'express';
-import { rateLimit } from 'express-rate-limit';
+import RateLimit from 'express-rate-limit';
 import gitCommitInfo from 'git-commit-info';
 import _, { isEqual } from 'lodash';
 import {
@@ -58,7 +58,7 @@ import webhooks from './webhooks';
 const port = process.env.PORT ?? '20000';
 const secureport = process.env.SECUREPORT ?? '20443';
 
-const limiter = rateLimit({
+const limiter = RateLimit({
   windowMs: 5 * 60 * 1000,
   max:      100,
   message:  'Too many requests from this IP, please try again after several minutes.',
