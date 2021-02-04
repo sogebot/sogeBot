@@ -2,35 +2,34 @@ require('dotenv').config();
 
 const fs = require('fs');
 
-const { createConnection, getConnectionOptions, getManager, getRepository } = require('typeorm');
-const yargs = require('yargs');
+const { createConnection, getConnectionOptions, getManager } = require('typeorm');
 const argv = require('yargs') // eslint-disable-line
   .usage('node tools/backup.js')
   .example('node tools/backup.js list')
   .example('node save alerts ./backup-alerts.json')
   .example('node load alerts ./backup-alerts.json')
   .command('list', 'list of tables')
-  .command('save [table] [path]', 'save backup of [table] to [path]', (_yargs) => {
-    _yargs.demandOption(['table'], 'Please provide table to backup');
-    _yargs.demandOption(['path'], 'Please provide path to your backup JSON file');
-    _yargs.positional('table', {
-      type: 'string',
+  .command('save [table] [path]', 'save backup of [table] to [path]', (yargs) => {
+    yargs.demandOption(['table'], 'Please provide table to backup');
+    yargs.demandOption(['path'], 'Please provide path to your backup JSON file');
+    yargs.positional('table', {
+      type:     'string',
       describe: 'table in database, e.g. settings, alert, etc.',
     });
-    _yargs.positional('path', {
-      type: 'string',
+    yargs.positional('path', {
+      type:     'string',
       describe: '/path/to/your/backup/file.json',
     });
   })
-  .command('load [table] [path]', 'load backup of [table] from [path]', (_yargs) => {
-    _yargs.demandOption(['table'], 'Please provide table to backup');
-    _yargs.demandOption(['path'], 'Please provide path to your backup JSON file');
-    _yargs.positional('table', {
-      type: 'string',
+  .command('load [table] [path]', 'load backup of [table] from [path]', (yargs) => {
+    yargs.demandOption(['table'], 'Please provide table to backup');
+    yargs.demandOption(['path'], 'Please provide path to your backup JSON file');
+    yargs.positional('table', {
+      type:     'string',
       describe: 'table in database, e.g. settings, alert, etc.',
     });
-    _yargs.positional('path', {
-      type: 'string',
+    yargs.positional('path', {
+      type:     'string',
       describe: '/path/to/your/backup/file.json',
     });
   })
@@ -46,14 +45,14 @@ async function main() {
   if (type === 'mysql' || type === 'mariadb') {
     connection = await createConnection({
       ...connectionOptions,
-      synchronize: false,
+      synchronize:   false,
       migrationsRun: false,
-      charset: 'UTF8MB4_GENERAL_CI',
+      charset:       'UTF8MB4_GENERAL_CI',
     });
   } else {
     connection = await createConnection({
       ...connectionOptions,
-      synchronize: false,
+      synchronize:   false,
       migrationsRun: false,
     });
   }

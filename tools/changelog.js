@@ -1,23 +1,18 @@
 const { spawnSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
 
-const chalk = require('chalk');
 const gitSemverTags = require('git-semver-tags');
-const glob = require('glob');
-const yargs = require('yargs');
 const argv = require('yargs') // eslint-disable-line
   .usage('node tools/changelog.js <cmd> [args]')
   .option('escape', {
     description: 'Escapes outpu (useful for github action)',
-    type: 'boolean',
+    type:        'boolean',
   })
   .command('generate', 'generate changelog')
   .command('nextTag', 'get next tag')
-  .command('cli [commit]', 'create changelog between commits/tags', (_yargs) => {
-    _yargs.demandOption(['commit'], 'Please provide commit or tag argument to work with this tool');
-    _yargs.positional('commit', {
-      type: 'string',
+  .command('cli [commit]', 'create changelog between commits/tags', (yargs) => {
+    yargs.demandOption(['commit'], 'Please provide commit or tag argument to work with this tool');
+    yargs.positional('commit', {
+      type:     'string',
       describe: 'commit(preferred) or tag interval e.g. 9.0.3 or 9.0.2..9.0.3',
     });
   })
@@ -48,7 +43,7 @@ if (argv._[0] === 'nextTag') {
 
 if (argv._[0] === 'nextSnapshot') {
   gitSemverTags(function(err, tags) {
-    const [ latestMajorVersion, latestMinorVersion, latestPatchVersion ] = tags[0].split('.');
+    const [ latestMajorVersion, latestMinorVersion ] = tags[0].split('.');
     process.stdout.write(`${latestMajorVersion}.${Number(latestMinorVersion)+1}.0-SNAPSHOT`);
   });
 }
@@ -175,7 +170,9 @@ function changes(changesList) {
       }
     }
 
-    return { commit, message: o.slice(i+1).trim(), fixes, breakingChange };
+    return {
+      commit, message: o.slice(i+1).trim(), fixes, breakingChange,
+    };
   });
 
   // breaking changes from all commits

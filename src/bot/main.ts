@@ -21,7 +21,7 @@ import { autoLoad } from './helpers/autoLoad';
 import { setIsBotStarted } from './helpers/database';
 import { getMigrationType } from './helpers/getMigrationType';
 import {
-  debug, error, info, isDebugEnabled, setDEBUG, warning, 
+  debug, error, info, isDebugEnabled, setDEBUG, warning,
 } from './helpers/log';
 import { TypeORMLogger } from './helpers/logTypeorm';
 import { expose as panelExpose, init as panelInit } from './panel';
@@ -35,7 +35,6 @@ const connect = async function () {
     process.exit(1);
   }
 
-  connectionOptions;
   debug('connection', { connectionOptions });
 
   if (type === 'mysql' || type === 'mariadb') {
