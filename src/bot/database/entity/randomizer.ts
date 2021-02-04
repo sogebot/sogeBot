@@ -53,13 +53,19 @@ export interface RandomizerItemInterface {
 export const Randomizer = new EntitySchema<Readonly<Required<RandomizerInterface>>>({
   name:    'randomizer',
   columns: {
-    id:                { type: 'uuid', primary: true, generated: 'uuid' },
-    createdAt:         { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-    command:           { type: String },
-    isShown:           { type: Boolean, default: false },
-    shouldPlayTick:    { type: Boolean },
-    tickVolume:        { type: Number },
-    type:              { type: 'varchar', length: 20, default: 'simple' },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
+    createdAt: {
+      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0, 
+    },
+    command:        { type: String },
+    isShown:        { type: Boolean, default: false },
+    shouldPlayTick: { type: Boolean },
+    tickVolume:     { type: Number },
+    type:           {
+      type: 'varchar', length: 20, default: 'simple', 
+    },
     position:          { type: 'simple-json' },
     customizationFont: { type: 'simple-json' },
     permissionId:      { type: String },
@@ -76,18 +82,26 @@ export const Randomizer = new EntitySchema<Readonly<Required<RandomizerInterface
     },
   },
   indices: [
-    { name: 'idx_randomizer_cmdunique', unique: true, columns: ['command'] },
+    {
+      name: 'idx_randomizer_cmdunique', unique: true, columns: ['command'], 
+    },
   ],
 });
 
 export const RandomizerItem = new EntitySchema<Readonly<Required<RandomizerItemInterface>>>({
   name:    'randomizer_item',
   columns: {
-    id:              { type: String, primary: true, generated: 'uuid' },
-    randomizerId:    { type: 'uuid', name: 'randomizerId', nullable: true },
-    groupId:         { type: 'varchar', nullable: true },
-    name:            { type: String },
-    color:           { type: 'varchar', length: 9, nullable: true },
+    id: {
+      type: String, primary: true, generated: 'uuid', 
+    },
+    randomizerId: {
+      type: 'uuid', name: 'randomizerId', nullable: true, 
+    },
+    groupId: { type: 'varchar', nullable: true },
+    name:    { type: String },
+    color:   {
+      type: 'varchar', length: 9, nullable: true, 
+    },
     numOfDuplicates: { type: 'int', default: 1 },
     minimalSpacing:  { type: 'int', default: 1 },
     order:           { type: 'int' },

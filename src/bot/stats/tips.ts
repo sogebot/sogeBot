@@ -7,15 +7,15 @@ import Stats from './_interface';
 class Tips extends Stats {
   constructor() {
     super();
-    this.addMenu({ category: 'stats', name: 'tips', id: 'stats/tips', this: null });
+    this.addMenu({
+      category: 'stats', name: 'tips', id: 'stats/tips', this: null, 
+    });
   }
 
   sockets() {
     adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
-        cb(null, await getRepository(UserTip).find({
-          relations: ['user'],
-        }));
+        cb(null, await getRepository(UserTip).find({ relations: ['user'] }));
       } catch (e) {
         cb(e.stack, []);
       }

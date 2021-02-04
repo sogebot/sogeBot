@@ -37,7 +37,7 @@ export function getFunctionList(type: keyof onEvents, path = ''): onEvent[] {
   if (path === '') {
     return on[type];
   } else {
-    return on[type].filter(o => o.path.includes(path));
+    return on[type].filter(o => o.path === path);
   }
 }
 

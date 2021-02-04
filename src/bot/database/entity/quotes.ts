@@ -13,7 +13,9 @@ export interface QuotesInterface {
 export const Quotes = new EntitySchema<Readonly<Required<QuotesInterface>>>({
   name:    'quotes',
   columns: {
-    id:        { type: 'int', primary: true, generated: 'increment' },
+    id: {
+      type: 'int', primary: true, generated: 'increment', 
+    },
     tags:      { type: 'simple-array' },
     quote:     { type: String },
     quotedBy:  { type: Number },

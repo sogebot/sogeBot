@@ -49,9 +49,7 @@ setInterval(() => {
 
 const heartbeat = () => {
   try {
-    const message = {
-      type: 'PING',
-    };
+    const message = { type: 'PING' };
     ws?.send(JSON.stringify(message));
     debug('pubsub', 'SENT: ' + JSON.stringify(message));
   } catch (e) {

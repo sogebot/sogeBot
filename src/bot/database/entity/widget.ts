@@ -20,25 +20,13 @@ export const WidgetSocial = new EntitySchema<Readonly<Required<WidgetSocialInter
       type:    String,
       primary: true,
     },
-    type: {
-      type: String,
-    },
-    hashtag: {
-      type: String,
-    },
-    text: {
-      type: 'text',
-    },
-    username: {
-      type: String,
-    },
-    displayname: {
-      type: String,
-    },
-    url: {
-      type: String,
-    },
-    timestamp: {
+    type:        { type: String },
+    hashtag:     { type: String },
+    text:        { type: 'text' },
+    username:    { type: String },
+    displayname: { type: String },
+    url:         { type: String },
+    timestamp:   {
       type:        'bigint',
       transformer: new ColumnNumericTransformer(),
       default:     0,

@@ -40,9 +40,7 @@ export const User = new EntitySchema<Readonly<Required<UserInterface>>>({
       type:    Number,
       primary: true,
     },
-    username: {
-      type: String,
-    },
+    username:    { type: String },
     displayname: {
       type:    String,
       default: '',
@@ -51,53 +49,63 @@ export const User = new EntitySchema<Readonly<Required<UserInterface>>>({
       type:    String,
       default: '',
     },
-    isOnline: {
-      type: Boolean, default: false,
+    isOnline:             { type: Boolean, default: false },
+    isVIP:                { type: Boolean, default: false },
+    isFollower:           { type: Boolean, default: false },
+    isModerator:          { type: Boolean, default: false },
+    isSubscriber:         { type: Boolean, default: false },
+    haveSubscriberLock:   { type: Boolean, default: false },
+    haveFollowerLock:     { type: Boolean, default: false },
+    haveSubscribedAtLock: { type: Boolean, default: false },
+    haveFollowedAtLock:   { type: Boolean, default: false },
+    rank:                 { type: String, default: '' },
+    haveCustomRank:       { type: Boolean, default: false },
+    followedAt:           {
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
     },
-    isVIP: {
-      type: Boolean, default: false,
+    followCheckAt: {
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
     },
-    isFollower: {
-      type: Boolean, default: false,
+    subscribedAt: {
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
     },
-    isModerator: {
-      type: Boolean, default: false,
+    seenAt: {
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
     },
-    isSubscriber: {
-      type: Boolean, default: false,
+    createdAt: {
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
     },
-    haveSubscriberLock: {
-      type: Boolean, default: false,
+    watchedTime: {
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
     },
-    haveFollowerLock: {
-      type: Boolean, default: false,
+    chatTimeOnline: {
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
     },
-    haveSubscribedAtLock: {
-      type: Boolean, default: false,
+    chatTimeOffline: {
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
     },
-    haveFollowedAtLock: {
-      type: Boolean, default: false,
+    points: {
+      type: 'bigint', default: 0, transformer: new SafeNumberTransformer(), 
     },
-    rank:                      { type: String, default: '' },
-    haveCustomRank:            { type: Boolean, default: false },
-    followedAt:                { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
-    followCheckAt:             { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
-    subscribedAt:              { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
-    seenAt:                    { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
-    createdAt:                 { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
-    watchedTime:               { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
-    chatTimeOnline:            { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
-    chatTimeOffline:           { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
-    points:                    { type: 'bigint', default: 0, transformer: new SafeNumberTransformer() },
-    pointsOnlineGivenAt:       { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
-    pointsOfflineGivenAt:      { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
-    pointsByMessageGivenAt:    { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
+    pointsOnlineGivenAt: {
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
+    },
+    pointsOfflineGivenAt: {
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
+    },
+    pointsByMessageGivenAt: {
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
+    },
     subscribeTier:             { type: String, default: '0' },
     subscribeCumulativeMonths: { type: Number, default: 0 },
     subscribeStreak:           { type: Number, default: 0 },
-    giftedSubscribes:          { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
-    messages:                  { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
-    extra:                     { type: 'simple-json', nullable: true },
+    giftedSubscribes:          {
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
+    },
+    messages: {
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
+    },
+    extra: { type: 'simple-json', nullable: true },
   },
   indices: [
     {
@@ -136,8 +144,12 @@ export const UserTip = new EntitySchema<Readonly<Required<UserTipInterface>>>({
     exchangeRates: { type: 'simple-json' },
     currency:      { type: String },
     message:       { type: 'text' },
-    tippedAt:      { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
-    userId:        { type: String, nullable: true, name: 'userUserId' },
+    tippedAt:      {
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
+    },
+    userId: {
+      type: String, nullable: true, name: 'userUserId', 
+    },
   },
   relations: {
     user: {
@@ -161,8 +173,12 @@ export const UserBit = new EntitySchema<Readonly<Required<UserBitInterface>>>({
     },
     amount:    { type: 'bigint', transformer: new ColumnNumericTransformer() },
     message:   { type: 'text' },
-    cheeredAt: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
-    userId:    { type: String, nullable: true, name: 'userUserId' },
+    cheeredAt: {
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
+    },
+    userId: {
+      type: String, nullable: true, name: 'userUserId', 
+    },
   },
   relations: {
     user: {

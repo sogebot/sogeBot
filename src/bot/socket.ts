@@ -10,13 +10,13 @@ import { DAY } from './constants';
 import { Dashboard } from './database/entity/dashboard';
 import { User } from './database/entity/user';
 import {
-  persistent, settings, ui, 
+  persistent, settings, ui,
 } from './decorators';
 import { onLoad } from './decorators/on';
 import { debug } from './helpers/log';
 import { app, ioServer } from './helpers/panel';
 import {
-  check, defaultPermissions, getUserHighestPermission, 
+  check, defaultPermissions, getUserHighestPermission,
 } from './helpers/permissions/';
 import { adminEndpoint, endpoints } from './helpers/socket';
 import { isModerator } from './helpers/user/isModerator';
@@ -101,7 +101,7 @@ const initEndpoints = async(socket: SocketIO, privileges: Unpacked<ReturnType<ty
       const viewerEndpoint = endpointsToInit.find(o => o.type === 'viewer');
       const publicEndpoint = endpointsToInit.find(o => o.type === 'public');
       if (adminEndpointInit && privileges.haveAdminPrivileges) {
-        adminEndpointInit.callback(opts, cb, socket);
+        adminEndpointInit.callback(opts, cb ?? socket, socket);
         return;
       } else if (!viewerEndpoint && !publicEndpoint) {
         debug('sockets', `User dont have admin access to ${socket.nsp.name}`);
@@ -111,7 +111,7 @@ const initEndpoints = async(socket: SocketIO, privileges: Unpacked<ReturnType<ty
       }
 
       if (viewerEndpoint && privileges.haveViewerPrivileges) {
-        viewerEndpoint.callback(opts, cb, socket);
+        viewerEndpoint.callback(opts, cb ?? socket, socket);
         return;
       } else if (!publicEndpoint) {
         debug('sockets', `User dont have viewer access to ${socket.nsp.name}`);
@@ -120,7 +120,7 @@ const initEndpoints = async(socket: SocketIO, privileges: Unpacked<ReturnType<ty
         return;
       }
 
-      publicEndpoint.callback(opts, cb, socket);
+      publicEndpoint.callback(opts, cb ?? socket, socket);
     });
   }
 };
@@ -136,9 +136,7 @@ class Socket extends Core {
   refreshTokenExpirationTime = DAY * 31;
 
   @settings('connection')
-  @ui({
-    type: 'uuid-generator',
-  }, 'connection')
+  @ui({ type: 'uuid-generator' }, 'connection')
   socketToken = '';
 
   @ui({
@@ -173,11 +171,7 @@ class Socket extends Core {
             if (!accessTokenHeader || !userId) {
               throw new Error('Insufficient data');
             }
-            const twitchValidation = await axios.get(`https://id.twitch.tv/oauth2/validate`, {
-              headers: {
-                'Authorization': 'OAuth ' + accessTokenHeader,
-              },
-            });
+            const twitchValidation = await axios.get(`https://id.twitch.tv/oauth2/validate`, { headers: { 'Authorization': 'OAuth ' + accessTokenHeader } });
             if (userId !== twitchValidation.data.user_id) {
               throw new Error('Not matching userId');
             }
@@ -199,7 +193,9 @@ class Socket extends Core {
               userId: Number(userId),
               username,
             }, this.JWTKey, { expiresIn: `${this.refreshTokenExpirationTime}s` });
-            res.status(200).send({ accessToken, refreshToken, userType: haveCasterPermission ? 'admin' : 'viewer' });
+            res.status(200).send({
+              accessToken, refreshToken, userType: haveCasterPermission ? 'admin' : 'viewer', 
+            });
           } catch(e) {
             debug('socket', e.stack);
             res.status(400).send('You don\'t have access to this server.');
@@ -232,7 +228,9 @@ class Socket extends Core {
               userId:   Number(data.userId),
               username: data.username,
             }, this.JWTKey, { expiresIn: `${this.refreshTokenExpirationTime}s` });
-            res.status(200).send({ accessToken, refreshToken, userType: userPermission === defaultPermissions.CASTERS ? 'admin' : 'viewer' });
+            res.status(200).send({
+              accessToken, refreshToken, userType: userPermission === defaultPermissions.CASTERS ? 'admin' : 'viewer', 
+            });
           } catch(e) {
             debug('socket', e.stack);
             res.status(400).send('You don\'t have access to this server.');
@@ -247,7 +245,9 @@ class Socket extends Core {
     const authToken = (socket.handshake.auth as any).token;
     // first check if token is socketToken
     if (authToken === this.socketToken) {
-      initEndpoints(socket, { haveAdminPrivileges: Authorized.isAuthorized, haveModPrivileges: Authorized.isAuthorized, haveViewerPrivileges: Authorized.isAuthorized });
+      initEndpoints(socket, {
+        haveAdminPrivileges: Authorized.isAuthorized, haveModPrivileges: Authorized.isAuthorized, haveViewerPrivileges: Authorized.isAuthorized, 
+      });
     } else {
       if (authToken !== '' && authToken !== null) {
         try {
@@ -262,7 +262,9 @@ class Socket extends Core {
           return;
         }
       } else {
-        initEndpoints(socket, { haveAdminPrivileges: Authorized.NotAuthorized, haveModPrivileges: Authorized.NotAuthorized, haveViewerPrivileges: Authorized.NotAuthorized });
+        initEndpoints(socket, {
+          haveAdminPrivileges: Authorized.NotAuthorized, haveModPrivileges: Authorized.NotAuthorized, haveViewerPrivileges: Authorized.NotAuthorized, 
+        });
         setTimeout(() => socket.emit('forceDisconnect'), 1000); // force disconnect if we must be logged in
       }
     }
@@ -273,7 +275,9 @@ class Socket extends Core {
     adminEndpoint(this.nsp, 'purgeAllConnections', (cb, socket) => {
       this.JWTKey = uuid();
       ioServer?.emit('forceDisconnect');
-      initEndpoints(socket, { haveAdminPrivileges: Authorized.NotAuthorized, haveModPrivileges: Authorized.NotAuthorized, haveViewerPrivileges: Authorized.NotAuthorized });
+      initEndpoints(socket, {
+        haveAdminPrivileges: Authorized.NotAuthorized, haveModPrivileges: Authorized.NotAuthorized, haveViewerPrivileges: Authorized.NotAuthorized, 
+      });
       cb(null);
     });
   }

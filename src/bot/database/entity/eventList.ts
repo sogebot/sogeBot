@@ -15,7 +15,9 @@ export interface EventListInterface {
 export const EventList = new EntitySchema<Readonly<Required<EventListInterface>>>({
   name:    'event_list',
   columns: {
-    id:          { type: 'uuid', primary: true, generated: 'uuid' },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
     event:       { type: String },
     userId:      { type: String },
     timestamp:   { type: 'bigint', transformer: new ColumnNumericTransformer() },

@@ -16,7 +16,9 @@ import users from './users';
 class Permissions extends Core {
   @onStartup()
   onStartup() {
-    this.addMenu({ category: 'settings', name: 'permissions', id: 'settings/permissions', this: null });
+    this.addMenu({
+      category: 'settings', name: 'permissions', id: 'settings/permissions', this: null, 
+    });
     this.ensurePreservedPermissionsInDb();
   }
 
@@ -48,9 +50,7 @@ class Permissions extends Core {
       cb(null,
         await getRepository(PermissionsEntity).find({
           relations: ['filters'],
-          order:     {
-            order: 'ASC',
-          },
+          order:     { order: 'ASC' },
         }));
     });
     adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
@@ -119,9 +119,7 @@ class Permissions extends Core {
         throw Error(prepare('permissions.cannotIgnoreForCorePermission', { userlevel: pItem.name }));
       }
 
-      await getRepository(PermissionsEntity).save({
-        ...pItem, excludeUserIds: [ String(userId), ...pItem.excludeUserIds ],
-      });
+      await getRepository(PermissionsEntity).save({ ...pItem, excludeUserIds: [ String(userId), ...pItem.excludeUserIds ] });
       cleanViewersCache();
 
       return [{
@@ -159,9 +157,7 @@ class Permissions extends Core {
         throw Error(prepare('permissions.permissionNotFound', { userlevel }));
       }
 
-      await getRepository(PermissionsEntity).save({
-        ...pItem, excludeUserIds: [ ...pItem.excludeUserIds.filter(id => id !== String(userId)) ],
-      });
+      await getRepository(PermissionsEntity).save({ ...pItem, excludeUserIds: [ ...pItem.excludeUserIds.filter(id => id !== String(userId)) ] });
       cleanViewersCache();
 
       return [{
@@ -179,11 +175,7 @@ class Permissions extends Core {
   @command('!permission list')
   @default_permission(defaultPermissions.CASTERS)
   protected async list(opts: CommandOptions): Promise<CommandResponse[]> {
-    const permissions = await getRepository(PermissionsEntity).find({
-      order: {
-        order: 'ASC',
-      },
-    });
+    const permissions = await getRepository(PermissionsEntity).find({ order: { order: 'ASC' } });
     const responses: CommandResponse[] = [];
     responses.push({ response: prepare('core.permissions.list'), ...opts });
     for (let i = 0; i < permissions.length; i++) {

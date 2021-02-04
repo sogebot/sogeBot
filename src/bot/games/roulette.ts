@@ -35,12 +35,16 @@ class Roulette extends Game {
 
     responses.push({ response: translate('gambling.roulette.trigger'), ...opts });
     if (isBroadcaster(opts.sender)) {
-      responses.push({ response: translate('gambling.roulette.broadcaster'), ...opts, isAlive: true });
+      responses.push({
+        response: translate('gambling.roulette.broadcaster'), ...opts, isAlive: true, 
+      });
       return responses;
     }
 
     if (isMod) {
-      responses.push({ response: translate('gambling.roulette.mod'), ...opts, isAlive: true });
+      responses.push({
+        response: translate('gambling.roulette.mod'), ...opts, isAlive: true, 
+      });
       return responses;
     }
 
@@ -55,7 +59,9 @@ class Roulette extends Game {
     } else {
       await points.decrement({ userId: Number(opts.sender.userId) }, Number(this.loserWillLose));
     }
-    responses.push({ response: isAlive ? translate('gambling.roulette.alive') : translate('gambling.roulette.dead'), ...opts, isAlive });
+    responses.push({
+      response: isAlive ? translate('gambling.roulette.alive') : translate('gambling.roulette.dead'), ...opts, isAlive, 
+    });
     return responses;
   }
 }

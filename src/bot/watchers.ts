@@ -77,7 +77,9 @@ export const VariableWatcher = {
       }
       const value = cloneDeep(get(checkedModule, variable, undefined));
       if (typeof value === 'undefined') {
-        throw new Error('Value not found, check your code!!! ' + JSON.stringify({ k, variable, value }));
+        throw new Error('Value not found, check your code!!! ' + JSON.stringify({
+          k, variable, value, 
+        }));
       }
       if (!isEqual(value, variables[k])) {
         const oldValue = variables[k];

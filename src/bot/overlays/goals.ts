@@ -17,7 +17,9 @@ class Goals extends Overlay {
 
   constructor() {
     super();
-    this.addMenu({ category: 'registry', name: 'goals', id: 'registry/goals/list', this: null });
+    this.addMenu({
+      category: 'registry', name: 'goals', id: 'registry/goals/list', this: null, 
+    });
   }
 
   public async sockets() {
@@ -41,9 +43,7 @@ class Goals extends Overlay {
     });
     adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
-        const items = await getRepository(GoalGroup).find({
-          relations: ['goals'],
-        });
+        const items = await getRepository(GoalGroup).find({ relations: ['goals'] });
         cb(null, items);
       } catch (e) {
         cb(e.stack, []);

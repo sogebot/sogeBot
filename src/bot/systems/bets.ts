@@ -5,12 +5,12 @@ import { parserReply } from '../commons';
 import { Bets as BetsEntity, BetsInterface } from '../database/entity/bets';
 import { User } from '../database/entity/user';
 import {
-  command, default_permission, helper, settings, ui, 
+  command, default_permission, helper, settings, ui,
 } from '../decorators';
 import { onStartup } from '../decorators/on';
 import Expects from '../expects';
 import {
-  announce, getBotSender, getOwner, prepare, 
+  announce, getBotSender, getOwner, prepare,
 } from '../helpers/commons';
 import { isDbConnected } from '../helpers/database';
 import { error, warning } from '../helpers/log';
@@ -46,7 +46,9 @@ class Bets extends System {
   public dependsOn = [ points ];
 
   @settings()
-  @ui({ type: 'number-input', step: 1, min: 0, max: 100 })
+  @ui({
+    type: 'number-input', step: 1, min: 0, max: 100,
+  })
   public betPercentGain = 20;
 
   constructor() {
@@ -148,8 +150,12 @@ class Bets extends System {
       }
 
       const [timeout, title, options] = new Expects(opts.parameters)
-        .argument({ name: 'timeout', optional: true, default: 2, type: Number })
-        .argument({ name: 'title', optional: false, multi: true })
+        .argument({
+          name: 'timeout', optional: true, default: 2, type: Number,
+        })
+        .argument({
+          name: 'title', optional: false, multi: true,
+        })
         .list({ delimiter: '|' })
         .toArray() as [number, string, string[]];
       if (options.length < 2) {
@@ -267,7 +273,7 @@ class Bets extends System {
     } catch (e) {
       switch (e.message) {
         case ERROR_ZERO_BET:
-          return [{ response: prepare('bets.zeroBet').replace(/\$pointsName/g, await getPointsName(0)), ...opts }];
+          return [{ response: prepare('bets.zeroBet').replace(/\$pointsName/g, getPointsName(0)), ...opts }];
         case ERROR_NOT_RUNNING:
           return [{ response: prepare('bets.notRunning'), ...opts } ];
         case ERROR_UNDEFINED_BET:
@@ -347,7 +353,7 @@ class Bets extends System {
         response: prepare('bets.closed')
           .replace(/\$option/g, currentBet.options[index])
           .replace(/\$amount/g, String(currentBet.participations.filter((o) => o.optionIdx === index).length))
-          .replace(/\$pointsName/g, await getPointsName(total))
+          .replace(/\$pointsName/g, getPointsName(total))
           .replace(/\$points/g, String(total)),
         ...opts,
       }];

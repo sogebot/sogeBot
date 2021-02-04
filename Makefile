@@ -24,6 +24,7 @@ dependencies:
 	# How to create node_modules patch: https://opensource.christmas/2019/4
 	patch --forward node_modules/twitch-js/types/index.d.ts < patches/twitch-js-types-2.patch
 	patch --forward node_modules/twitch-js/types/index.d.ts < patches/twitch-js-add-highlight-msgId.patch
+	patch --forward node_modules/obs-websocket-js/types/index.d.ts < patches/obswebsocketTypeExpose.patch
 
 eslint:
 	@echo -ne "\n\t ----- Checking eslint\n"
@@ -51,6 +52,7 @@ else
 endif
 
 bot:
+	@rm -rf dest
 ifeq ($(ENV),production)
 	@echo -ne "\n\t ----- Building bot (strip comments)\n"
 	@npx tsc -p src/bot --removeComments true

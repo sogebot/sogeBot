@@ -9,7 +9,9 @@ import Registry from './_interface';
 class Text extends Registry {
   constructor () {
     super();
-    this.addMenu({ category: 'registry', name: 'textoverlay', id: 'registry.textoverlay/list', this: null });
+    this.addMenu({
+      category: 'registry', name: 'textoverlay', id: 'registry.textoverlay/list', this: null, 
+    });
   }
 
   sockets () {

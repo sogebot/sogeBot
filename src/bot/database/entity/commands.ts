@@ -36,7 +36,9 @@ export interface CommandsBoardInterface {
 export const Commands = new EntitySchema<Readonly<Required<CommandsInterface>>>({
   name:    'commands',
   columns: {
-    id:      { type: 'uuid', primary: true, generated: 'uuid' },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
     command: { type: String },
     enabled: { type: Boolean },
     visible: { type: Boolean },
@@ -57,7 +59,9 @@ export const Commands = new EntitySchema<Readonly<Required<CommandsInterface>>>(
 export const CommandsResponses = new EntitySchema<Readonly<Required<CommandsResponsesInterface>>>({
   name:    'commands_responses',
   columns: {
-    id:             { type: 'uuid', primary: true, generated: 'uuid' },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
     order:          { type: Number },
     response:       { type: 'text' },
     stopIfExecuted: { type: Boolean },
@@ -78,7 +82,9 @@ export const CommandsResponses = new EntitySchema<Readonly<Required<CommandsResp
 export const CommandsCount = new EntitySchema<Readonly<Required<CommandsCountInterface>>>({
   name:    'commands_count',
   columns: {
-    id:        { type: 'uuid', primary: true, generated: 'uuid' },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
     command:   { type: String },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },
@@ -90,7 +96,9 @@ export const CommandsCount = new EntitySchema<Readonly<Required<CommandsCountInt
 export const CommandsBoard = new EntitySchema<Readonly<Required<CommandsBoardInterface>>>({
   name:    'commands_board',
   columns: {
-    id:      { type: 'uuid', primary: true, generated: 'uuid' },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
     order:   { type: Number },
     text:    { type: String },
     command: { type: String },

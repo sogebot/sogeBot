@@ -1,3 +1,4 @@
+import type ObsWebSocket from 'obs-websocket-js';
 import { Socket } from 'socket.io';
 
 import type { AlertInterface, AlertMediaInterface } from '../database/entity/alert';
@@ -8,6 +9,7 @@ import type { EventInterface } from '../database/entity/event';
 import type { GoalGroupInterface } from '../database/entity/goal';
 import type { HowLongToBeatGameInterface, HowLongToBeatGameItemInterface } from '../database/entity/howLongToBeatGame';
 import type { KeywordInterface } from '../database/entity/keyword';
+import { OBSWebsocketInterface } from '../database/entity/obswebsocket';
 import type { PermissionsInterface } from '../database/entity/permissions';
 import type { PriceInterface } from '../database/entity/price';
 import type { RandomizerInterface } from '../database/entity/randomizer';
@@ -38,7 +40,7 @@ function adminEndpoint (
   | 'lists.get' | 'bets::getCurrentBet' | 'commands::count' | 'getLatestStats' | 'menu' | 'panel::errors'
   | 'removeCache' | 'testExplosion' | 'testFireworks' | 'test' | 'discord::authorize'
   | 'discord::getChannels' | 'discord::getRoles' | 'discord::getGuilds' | 'settings'
-  | 'debug::get' | 'getLevelsExample' | 'profiler::load',
+  | 'debug::get' | 'getLevelsExample' | 'profiler::load' | 'integration::obswebsocket::getCommand',
   callback: (cb: (error: Error | string | null, ...response: any) => void) => void | Promise<void>): void;
 
 // id + cb
@@ -125,25 +127,35 @@ function adminEndpoint (nsp: string, on: 'pubg::exampleParse', callback: (opts: 
 function adminEndpoint (nsp: string, on: 'alerts::areAlertsMuted', callback: (areAlertsMuted: boolean, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'alerts::isTTSMuted', callback: (isTTSMuted: boolean, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'alerts::isSoundMuted', callback: (isSoundMuted: boolean, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
-function adminEndpoint (nsp: string, on: 'import.playlist', callback: (otps: {playlist: string, forcedTag: string}, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'import.playlist', callback: (opts: {playlist: string, forcedTag: string}, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'import.video', callback: (opts: {playlist: string, forcedTag: string}, cb: (error: Error | string | null, data: any) => void, socket: Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'get.playlist.tags', callback: (cb: (error: Error | string | null, data: string[]) => void, socket: Socket) => void): void;
 function adminEndpoint (nsp: string, on: 'set.playlist.tag', callback: (tag:string, socket: Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'integration::obswebsocket::listScene', callback: (cb: (error: Error | string | null, data: ObsWebSocket.Scene[]) => void, socket: Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'integration::obswebsocket::listSources', callback: (cb: (error: Error | string | null, scenes: any, types: any) => void, socket: Socket) => void): void;
+function adminEndpoint (nsp: string, on: 'integration::obswebsocket::test', callback: (item: OBSWebsocketInterface['simpleModeTasks'] | string, cb: (error: Error | string | null) => void, socket: Socket) => void): void;
 
 // generic functions
 function adminEndpoint (nsp: string, on: string, callback: (opts: { [x: string]: any }, cb?: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket): void;
 function adminEndpoint (nsp: string, on: string, callback: (cb?: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket): void;
 function adminEndpoint (nsp: any, on: any, callback: any): void{
-  endpoints.push({ nsp, on, callback, type: 'admin' });
+  endpoints.push({
+    nsp, on, callback, type: 'admin',
+  });
 }
 
 const viewerEndpoint = (nsp: string, on: string, callback: (opts: any, cb: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket) => {
-  endpoints.push({ nsp, on, callback, type: 'viewer' });
-};
-const publicEndpoint = (nsp: string, on: string, callback: (opts: any, cb: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket) => {
-  endpoints.push({ nsp, on, callback, type: 'public' });
+  endpoints.push({
+    nsp, on, callback, type: 'viewer',
+  });
 };
 
+function publicEndpoint (nsp: string, on: string, callback: (opts: any, cb: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket) {
+  endpoints.push({
+    nsp, on, callback, type: 'public',
+  });
+}
+
 export {
-  endpoints, adminEndpoint, viewerEndpoint, publicEndpoint, 
+  endpoints, adminEndpoint, viewerEndpoint, publicEndpoint,
 };

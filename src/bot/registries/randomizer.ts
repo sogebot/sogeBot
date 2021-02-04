@@ -11,7 +11,9 @@ import Registry from './_interface';
 class Randomizer extends Registry {
   constructor() {
     super();
-    this.addMenu({ category: 'registry', name: 'randomizer', id: 'registry/randomizer/list', this: null });
+    this.addMenu({
+      category: 'registry', name: 'randomizer', id: 'registry/randomizer/list', this: null, 
+    });
     this.addWidget('randomizer', 'widget-title-randomizer', 'fas fa-dice');
   }
 
@@ -20,9 +22,7 @@ class Randomizer extends Registry {
       try {
         cb(
           null,
-          await getRepository(RandomizerEntity).find({
-            relations: ['items'],
-          })
+          await getRepository(RandomizerEntity).find({ relations: ['items'] })
         );
       } catch (e) {
         cb(e.stack, []);

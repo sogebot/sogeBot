@@ -41,10 +41,18 @@ const overlays = async () => {
     mode:   'history',
     base:   __dirname,
     routes: [
-      { path: '/overlays/alerts/:id', name: 'alertsRegistryOverlay', component: () => import('./views/alertsRegistry.vue') },
-      { path: '/overlays/goals/:id', name: 'goalsOverlay', component: () => import('./views/goals.vue') },
-      { path: '/overlays/text/:id', name: 'textOverlay', component: () => import('./views/text.vue') },
-      { path: '/overlays/:id', name: '_mapper', component: () => import('./views/_mapper.vue') },
+      {
+        path: '/overlays/alerts/:id', name: 'alertsRegistryOverlay', component: () => import('./views/alertsRegistry.vue'), 
+      },
+      {
+        path: '/overlays/goals/:id', name: 'goalsOverlay', component: () => import('./views/goals.vue'), 
+      },
+      {
+        path: '/overlays/text/:id', name: 'textOverlay', component: () => import('./views/text.vue'), 
+      },
+      {
+        path: '/overlays/:id', name: '_mapper', component: () => import('./views/_mapper.vue'), 
+      },
     ],
   });
 

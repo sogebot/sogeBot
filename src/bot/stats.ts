@@ -42,7 +42,9 @@ class Stats extends Core {
     this.currentFollowers = stats.value.currentFollowers;
     this.currentViews = stats.value.currentViews;
     this.currentSubscribers = stats.value.currentSubscribers;
-    debug('stats', JSON.stringify({ currentFollowers: this.currentFollowers, currentViews: this.currentViews, currentSubscribers: this.currentSubscribers }));
+    debug('stats', JSON.stringify({
+      currentFollowers: this.currentFollowers, currentViews: this.currentViews, currentSubscribers: this.currentSubscribers, 
+    }));
   }
 
   sockets() {
@@ -94,12 +96,16 @@ class Stats extends Core {
             statsToReturn.currentHosts = Number(Number(statsToReturn.currentHosts / statsFromDb.length).toFixed(0));
             statsToReturn.currentWatched = Number(Number(statsToReturn.currentWatched / statsFromDb.length).toFixed(0));
             cachedStats = cloneDeep(statsToReturn);
-            cb(null, { ...statsToReturn, currentFollowers: _self.currentFollowers, currentViews: _self.currentViews, currentSubscribers: _self.currentSubscribers });
+            cb(null, {
+              ...statsToReturn, currentFollowers: _self.currentFollowers, currentViews: _self.currentViews, currentSubscribers: _self.currentSubscribers, 
+            });
           } else {
             cb(null, {});
           }
         } else {
-          cb(null, { ...cachedStats, currentFollowers: _self.currentFollowers, currentViews: _self.currentViews, currentSubscribers: _self.currentSubscribers });
+          cb(null, {
+            ...cachedStats, currentFollowers: _self.currentFollowers, currentViews: _self.currentViews, currentSubscribers: _self.currentSubscribers, 
+          });
         }
       } catch (e) {
         error(e);

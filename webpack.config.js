@@ -43,6 +43,10 @@ const webpackConfig = {
     spotify: './src/oauth/spotify.ts',
   },
   resolve: {
+    fallback: {
+      "crypto": require.resolve("crypto-browserify"),
+      "stream": require.resolve("stream-browserify"),
+    },
     extensions: ['.ts', '.js', '.vue', '.json'],
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
@@ -59,6 +63,9 @@ const webpackConfig = {
     pathinfo: false,
   },
   plugins: [
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+    }),
     new webpack.DefinePlugin({
       'process.env.BUILD': JSON.stringify('web'), // we need this until https://github.com/vuelidate/vuelidate/issues/365 is fixed
       'process.env.NODE_DEBUG': process.env.NODE_DEBUG, // 'util' need it

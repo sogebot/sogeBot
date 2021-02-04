@@ -4,8 +4,10 @@ import {
 
 let broadcasterId: null | number = null;
 
-const columnUserIdWithoutDefault = new TableColumn({ type: 'int', name: 'userId' });
-const columnTypeWithoutDefault = new TableColumn({ type: 'varchar', name: 'type', length: '6' });
+const columnUserIdWithoutDefault = new TableColumn({ type: 'integer', name: 'userId' });
+const columnTypeWithoutDefault = new TableColumn({
+  type: 'varchar', name: 'type', length: '6', 
+});
 
 export class dashboardPerTypeAndUser1584981805762 implements MigrationInterface {
   name = 'dashboardPerTypeAndUser1584981805762';
@@ -19,10 +21,14 @@ export class dashboardPerTypeAndUser1584981805762 implements MigrationInterface 
         throw new Error('broadcasterId');
       }
 
-      const columnUserId = new TableColumn({ type: 'int', default: broadcasterId, name: 'userId' });
-      const columnType = new TableColumn({ type: 'varchar', default: '\'admin\'', name: 'type', length: '6' });
+      const columnUserId = new TableColumn({
+        type: 'integer', default: broadcasterId, name: 'userId', 
+      });
+      const columnType = new TableColumn({
+        type: 'varchar', default: '\'admin\'', name: 'type', length: '6', 
+      });
 
-      const widgets = await queryRunner.query(`SELECT * from "widget" WHERE "dashboardId" IS NOT NULL`);
+      const widgets = await queryRunner.query(`SELECT * from widget WHERE dashboardId NOT NULL`);
 
       // add new columns with default values
       await queryRunner.addColumns('dashboard', [
@@ -33,18 +39,18 @@ export class dashboardPerTypeAndUser1584981805762 implements MigrationInterface 
       await queryRunner.changeColumn('dashboard', 'userId', columnUserIdWithoutDefault);
       await queryRunner.changeColumn('dashboard', 'type', columnTypeWithoutDefault);
 
-      await queryRunner.query('TRUNCATE TABLE "widget" CASCADE');
+      await queryRunner.clearTable('widget');
       for (const widget of widgets) {
         await queryRunner.query(
-          `INSERT INTO "widget"("id", "name", "positionX", "positionY", "height", "width", "dashboardId") values('${widget.id}', '${widget.name}', '${widget.positionX}', '${widget.positionY}', '${widget.height}', '${widget.width}', '${widget.dashboardId}')`
-        );
+          'INSERT INTO widget(id, name, positionX, positionY, height, width, dashboardId) values(?, ?, ?, ?, ?, ? ,?)',
+          [widget.id, widget.name, widget.positionX, widget.positionY, widget.height, widget.width, widget.dashboardId]);
       }
     } catch (e) {
       if (e.message !== 'broadcasterId') {
         throw new Error(e);
       }
-      await queryRunner.query('TRUNCATE TABLE "widget" CASCADE');
-      await queryRunner.query('TRUNCATE TABLE "dashboard" CASCADE');
+      await queryRunner.clearTable('widget');
+      await queryRunner.clearTable('dashboard');
       // add new columns without default values
       await queryRunner.addColumns('dashboard', [
         columnUserIdWithoutDefault, columnTypeWithoutDefault,

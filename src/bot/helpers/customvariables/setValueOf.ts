@@ -107,13 +107,17 @@ async function setValueOf (variable: string | Readonly<VariableInterface>, curre
   if (isOk) {
     updateWidgetAndTitle(item.variableName);
     if (!isEval) {
-      addChangeToHistory({ sender: opts.sender, item, oldValue: itemOldValue });
+      addChangeToHistory({
+        sender: opts.sender, item, oldValue: itemOldValue, 
+      });
     }
   }
-  return { updated: {
-    ...item,
-    currentValue: isOk && !isEval ? '' : setValue, // be silent if parsed correctly eval
-  }, setValue, isOk, isEval };
+  return {
+    updated: {
+      ...item,
+      currentValue: isOk && !isEval ? '' : setValue, // be silent if parsed correctly eval
+    }, setValue, isOk, isEval, 
+  };
 }
 
 export { setValueOf };

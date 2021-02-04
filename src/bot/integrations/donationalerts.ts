@@ -67,9 +67,7 @@ class Donationalerts extends Integration {
     this.socketToDonationAlerts = new Centrifuge('wss://centrifugo.donationalerts.com/connection/websocket', {
       websocket:          WebSocket,
       onPrivateSubscribe: async ({ data }, cb) => {
-        const request = await axios.post('https://www.donationalerts.com/api/v1/centrifuge/subscribe', data, {
-          headers: { 'Authorization': `Bearer ${this.access_token.trim()}` },
-        });
+        const request = await axios.post('https://www.donationalerts.com/api/v1/centrifuge/subscribe', data, { headers: { 'Authorization': `Bearer ${this.access_token.trim()}` } });
         cb({ status: 200, data: { channels: request.data.channels } });
       },
     });
@@ -119,9 +117,7 @@ class Donationalerts extends Integration {
       throw new Error('Access token is empty.');
     }
 
-    const request = await axios.get('https://www.donationalerts.com/api/v1/user/oauth', {
-      headers: { 'Authorization': `Bearer ${this.access_token}` },
-    });
+    const request = await axios.get('https://www.donationalerts.com/api/v1/user/oauth', { headers: { 'Authorization': `Bearer ${this.access_token}` } });
 
     return {
       token: request.data.data.socket_connection_token,

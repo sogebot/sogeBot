@@ -10,7 +10,9 @@ class Carousel extends Overlay {
 
   constructor () {
     super();
-    this.addMenu({ category: 'registry', name: 'carouseloverlay', id: 'registry.carousel/list', this: null });
+    this.addMenu({
+      category: 'registry', name: 'carouseloverlay', id: 'registry.carousel/list', this: null, 
+    });
   }
 
   sockets () {
@@ -23,11 +25,7 @@ class Carousel extends Overlay {
     });
     publicEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
-        cb(null, await getRepository(CarouselEntity).find({
-          order: {
-            order: 'ASC',
-          },
-        }));
+        cb(null, await getRepository(CarouselEntity).find({ order: { order: 'ASC' } }));
       } catch (e) {
         cb(e.stack, []);
       }
@@ -44,11 +42,7 @@ class Carousel extends Overlay {
       try {
         await getRepository(CarouselEntity).delete({ id: String(id) });
         // force reorder
-        const images = await getRepository(CarouselEntity).find({
-          order: {
-            order: 'ASC',
-          },
-        });
+        const images = await getRepository(CarouselEntity).find({ order: { order: 'ASC' } });
         await getRepository(CarouselEntity).save(images.map((image, index) => {
           return {
             ...image,

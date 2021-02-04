@@ -4,7 +4,7 @@ import axios from 'axios';
 import { defaults, isNil } from 'lodash';
 
 import {
-  calls, gameCache, gameOrTitleChangedManually, rawStatus, retries, setRateLimit, stats, 
+  calls, gameCache, gameOrTitleChangedManually, rawStatus, retries, setRateLimit, stats,
 } from '../helpers/api';
 import { parseTitle } from '../helpers/api/parseTitle';
 import { eventEmitter } from '../helpers/events/emitter';
@@ -57,9 +57,7 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | 
       game = gameCache.value;
     } // we are not setting game -> load last game
 
-    requestData = JSON.stringify({
-      game_id: await getGameIdFromName(game), title,
-    });
+    requestData = JSON.stringify({ game_id: await getGameIdFromName(game), title });
 
     /* workaround for https://github.com/twitchdev/issues/issues/224
       * Modify Channel Information is not propagated correctly on twitch #224
@@ -96,14 +94,20 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | 
     // save remaining api calls
     setRateLimit('bot', request.headers);
 
-    ioServer?.emit('api.stats', { method: 'PATCH', request: requestData, timestamp: Date.now(), call: 'setTitleAndGame', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
+    ioServer?.emit('api.stats', {
+      method: 'PATCH', request: requestData, timestamp: Date.now(), call: 'setTitleAndGame', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
+    });
   } catch (e) {
     if (e.isAxiosError) {
       error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-      ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'setTitleAndGame', api: 'helix', endpoint: e.config.url, code: e.response.status, data: e.response.data, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'setTitleAndGame', api: 'helix', endpoint: e.config.url, code: e.response.status, data: e.response?.data ?? 'n/a', remaining: calls.bot,
+      });
     } else {
       error(e.stack);
-      ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'setTitleAndGame', api: 'helix', endpoint: e.config.url, code: 'n/a', data: e.stack, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'setTitleAndGame', api: 'helix', endpoint: e.config.url, code: 'n/a', data: e.stack, remaining: calls.bot,
+      });
     }
     return { response: '', status: false };
   }

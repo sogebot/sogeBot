@@ -10,7 +10,9 @@ const init = async () => {
     mode:   'history',
     base:   __dirname,
     routes: [
-      { path: '/login', name: 'login', component: () => import('./views/login.vue') },
+      {
+        path: '/login', name: 'login', component: () => import('./views/login.vue'), 
+      },
     ],
   });
 

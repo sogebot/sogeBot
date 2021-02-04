@@ -170,6 +170,10 @@
         "filter": {
           "label": "Filter"
         },
+        "linkFilter": {
+          "label": "Link Overlay Filter",
+          "placeholder": "If using overlay, add link or id of your overlay"
+        },
         "hashtag": {
           "label": "Hashtag or Keyword",
           "placeholder": "#yourHashtagHere or Keyword"
@@ -436,7 +440,8 @@
           "username": "Username on Twitter",
           "displayname": "Screen name on twitter",
           "url": "Tweet link"
-        }
+        },
+        "sceneName": "Name of scene"
       }
     },
     "page-settings": {
@@ -746,6 +751,7 @@
     "user-parted-channel": "user parted a channel",
     "follow": "new follow",
     "tip": "new tip",
+    "obs-scene-changed": "OBS scene changed",
     "unfollow": "unfollow",
     "subscription": "new subscription",
     "subgift": "new subgift",

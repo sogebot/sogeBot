@@ -46,7 +46,9 @@ class Alias extends System {
   constructor () {
     super();
 
-    this.addMenu({ category: 'manage', name: 'alias', id: 'manage/alias', this: this });
+    this.addMenu({
+      category: 'manage', name: 'alias', id: 'manage/alias', this: this, 
+    });
   }
 
   sockets() {
@@ -176,8 +178,12 @@ class Alias extends System {
     try {
       if (opts.parameters.includes('-set')) {
         const [alias, group] = new Expects(opts.parameters)
-          .argument({ name: 'a', type: String, multi: true, delimiter: '' }) // set as multi as alias can contain spaces
-          .argument({ name: 'set', type: String, multi: true, delimiter: '' }) // set as multi as group can contain spaces
+          .argument({
+            name: 'a', type: String, multi: true, delimiter: '', 
+          }) // set as multi as alias can contain spaces
+          .argument({
+            name: 'set', type: String, multi: true, delimiter: '', 
+          }) // set as multi as group can contain spaces
           .toArray();
         const item = await getRepository(AliasEntity).findOne({ alias });
         if (!item) {
@@ -189,7 +195,9 @@ class Alias extends System {
         return [{ response, ...opts }];
       } else if (opts.parameters.includes('-unset')) {
         const [alias] = new Expects(opts.parameters)
-          .argument({ name: 'unset', type: String, multi: true, delimiter: '' }) // set as multi as alias can contain spaces
+          .argument({
+            name: 'unset', type: String, multi: true, delimiter: '', 
+          }) // set as multi as alias can contain spaces
           .toArray();
         const item = await getRepository(AliasEntity).findOne({ alias });
         if (!item) {
@@ -201,13 +209,17 @@ class Alias extends System {
         return [{ response, ...opts }];
       } else if (opts.parameters.includes('-list')) {
         const [group] = new Expects(opts.parameters)
-          .argument({ name: 'list', type: String, optional: true, multi: true, delimiter: '' }) // set as multi as group can contain spaces
+          .argument({
+            name: 'list', type: String, optional: true, multi: true, delimiter: '', 
+          }) // set as multi as group can contain spaces
           .toArray();
         if (group) {
-          const aliases = await getRepository(AliasEntity).find({ where: { visible: true, enabled: true, group } });
-          const response = prepare('alias.alias-group-list-aliases', {
-            group, list: aliases.length > 0 ? aliases.map(o => o.alias).sort().join(', ') : `<${translate('core.empty')}>`,
+          const aliases = await getRepository(AliasEntity).find({
+            where: {
+              visible: true, enabled: true, group, 
+            }, 
           });
+          const response = prepare('alias.alias-group-list-aliases', { group, list: aliases.length > 0 ? aliases.map(o => o.alias).sort().join(', ') : `<${translate('core.empty')}>` });
           return [{ response, ...opts }];
         } else {
           const aliases = await getRepository(AliasEntity).find();
@@ -217,21 +229,21 @@ class Alias extends System {
         }
       } else if (opts.parameters.includes('-enable')) {
         const [group] = new Expects(opts.parameters)
-          .argument({ name: 'enable', type: String, multi: true, delimiter: '' }) // set as multi as group can contain spaces
+          .argument({
+            name: 'enable', type: String, multi: true, delimiter: '', 
+          }) // set as multi as group can contain spaces
           .toArray();
         await getRepository(AliasEntity).update({ group }, { enabled: true });
-        const response = prepare('alias.alias-group-list-enabled', {
-          group,
-        });
+        const response = prepare('alias.alias-group-list-enabled', { group });
         return [{ response, ...opts }];
       } else if (opts.parameters.includes('-disable')) {
         const [group] = new Expects(opts.parameters)
-          .argument({ name: 'disable', type: String, multi: true, delimiter: '' }) // set as multi as group can contain spaces
+          .argument({
+            name: 'disable', type: String, multi: true, delimiter: '', 
+          }) // set as multi as group can contain spaces
           .toArray();
         await getRepository(AliasEntity).update({ group }, { enabled: false });
-        const response = prepare('alias.alias-group-list-disabled', {
-          group,
-        });
+        const response = prepare('alias.alias-group-list-disabled', { group });
         return [{ response, ...opts }];
       } else {
         throw new Error('-set, -unset, -enable, -disable or -list not found in command.');
@@ -249,8 +261,12 @@ class Alias extends System {
     try {
       const [perm, alias, cmd] = new Expects(opts.parameters)
         .permission({ optional: true, default: defaultPermissions.VIEWERS })
-        .argument({ name: 'a', type: String, multi: true, delimiter: '' }) // set as multi as alias can contain spaces
-        .argument({ name: 'c', type: String, multi: true, delimiter: '' }) // set as multi as command can contain spaces
+        .argument({
+          name: 'a', type: String, multi: true, delimiter: '', 
+        }) // set as multi as alias can contain spaces
+        .argument({
+          name: 'c', type: String, multi: true, delimiter: '', 
+        }) // set as multi as command can contain spaces
         .toArray();
 
       if (!alias.startsWith('!') || !(cmd.startsWith('!') || cmd.startsWith('$_'))) {
@@ -267,7 +283,9 @@ class Alias extends System {
         const response = prepare('alias.alias-was-not-found', { alias });
         return [{ response, ...opts }];
       }
-      await getRepository(AliasEntity).save({ ...item, command: cmd, permission: pItem.id ?? defaultPermissions.VIEWERS });
+      await getRepository(AliasEntity).save({
+        ...item, command: cmd, permission: pItem.id ?? defaultPermissions.VIEWERS, 
+      });
 
       const response = prepare('alias.alias-was-edited', { alias, command: cmd });
       return [{ response, ...opts }];
@@ -282,8 +300,12 @@ class Alias extends System {
     try {
       const [perm, alias, cmd] = new Expects(opts.parameters)
         .permission({ optional: true, default: defaultPermissions.VIEWERS })
-        .argument({ name: 'a', type: String, multi: true, delimiter: '' }) // set as multi as alias can contain spaces
-        .argument({ name: 'c', type: String, multi: true, delimiter: '' }) // set as multi as command can contain spaces
+        .argument({
+          name: 'a', type: String, multi: true, delimiter: '', 
+        }) // set as multi as alias can contain spaces
+        .argument({
+          name: 'c', type: String, multi: true, delimiter: '', 
+        }) // set as multi as command can contain spaces
         .toArray();
 
       if (!alias.startsWith('!') || !(cmd.startsWith('!') || cmd.startsWith('$_'))) {

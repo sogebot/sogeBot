@@ -17,9 +17,7 @@ class Social extends Widget {
           null,
           await getRepository(WidgetSocial).find({
             take:  opts.limit,
-            order: {
-              timestamp: 'DESC',
-            },
+            order: { timestamp: 'DESC' },
           })
         );
       }

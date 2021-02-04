@@ -50,23 +50,37 @@ class Emotes extends Overlay {
   cEmotesAnimationTime = 1000;
 
   @settings('explosion')
-  @ui({ type: 'number-input', step: '1', min: '1' })
+  @ui({
+    type: 'number-input', step: '1', min: '1', 
+  })
   cExplosionNumOfEmotes = 20;
 
   @settings('fireworks')
-  @ui({ type: 'number-input', step: '1', min: '1' })
+  @ui({
+    type: 'number-input', step: '1', min: '1', 
+  })
   cExplosionNumOfEmotesPerExplosion = 10;
   @settings('fireworks')
-  @ui({ type: 'number-input', step: '1', min: '1' })
+  @ui({
+    type: 'number-input', step: '1', min: '1', 
+  })
   cExplosionNumOfExplosions = 5;
 
-  @ui({ type: 'btn-emit', class: 'btn btn-secondary btn-block mt-1 mb-1', emit: 'testExplosion' }, 'test')
+  @ui({
+    type: 'btn-emit', class: 'btn btn-secondary btn-block mt-1 mb-1', emit: 'testExplosion', 
+  }, 'test')
   btnTestExplosion = null;
-  @ui({ type: 'btn-emit', class: 'btn btn-secondary btn-block mt-1 mb-1', emit: 'test' }, 'test')
+  @ui({
+    type: 'btn-emit', class: 'btn btn-secondary btn-block mt-1 mb-1', emit: 'test', 
+  }, 'test')
   btnTestEmote = null;
-  @ui({ type: 'btn-emit', class: 'btn btn-secondary btn-block mt-1 mb-1', emit: 'testFireworks' }, 'test')
+  @ui({
+    type: 'btn-emit', class: 'btn btn-secondary btn-block mt-1 mb-1', emit: 'testFireworks', 
+  }, 'test')
   btnTestFirework = null;
-  @ui({ type: 'btn-emit', class: 'btn btn-danger btn-block mt-1 mb-1', emit: 'removeCache' }, 'emotes')
+  @ui({
+    type: 'btn-emit', class: 'btn btn-danger btn-block mt-1 mb-1', emit: 'removeCache', 
+  }, 'emotes')
   btnRemoveCache = null;
 
   @settings('emotes_combo')
@@ -346,9 +360,7 @@ class Emotes extends Overlay {
     ioServer?.of('/overlays/emotes').emit('emote.firework', {
       emotes,
       settings: {
-        emotes: {
-          animationTime: this.cEmotesAnimationTime,
-        },
+        emotes:    { animationTime: this.cEmotesAnimationTime },
         fireworks: {
           numOfEmotesPerExplosion: this.cExplosionNumOfEmotesPerExplosion,
           numOfExplosions:         this.cExplosionNumOfExplosions,
@@ -362,12 +374,8 @@ class Emotes extends Overlay {
     ioServer?.of('/overlays/emotes').emit('emote.explode', {
       emotes,
       settings: {
-        emotes: {
-          animationTime: this.cEmotesAnimationTime,
-        },
-        explosion: {
-          numOfEmotes: this.cExplosionNumOfEmotes,
-        },
+        emotes:    { animationTime: this.cEmotesAnimationTime },
+        explosion: { numOfEmotes: this.cExplosionNumOfEmotes },
       },
     });
   }

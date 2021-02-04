@@ -1,13 +1,13 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-import { Goal } from '../../entity/goal';
-import { Randomizer } from '../../entity/randomizer';
+import { Goal } from '../../../entity/goal';
+import { Randomizer } from '../../../entity/randomizer';
 
 export class fontMissingShadow1592557005214 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // remove old migration
-    await queryRunner.query('DELETE FROM `migrations` WHERE `name`="fontMissingShadow1592557005213"');
+    await queryRunner.query(`DELETE FROM "migrations" WHERE "name"='fontMissingShadow1592557005213'`);
 
     const data = await queryRunner.manager.getRepository(Randomizer).find();
     for (const item of data) {
@@ -17,13 +17,13 @@ export class fontMissingShadow1592557005214 implements MigrationInterface {
       }
     }
     for (const type of ['cheer', 'resub', 'tip', 'raid', 'host', 'subgift', 'subcommunitygift', 'sub', 'follow']) {
-      const alerts = await queryRunner.query(`SELECT * from \`alert_${type}\``, undefined);
+      const alerts = await queryRunner.query(`SELECT * from "alert_${type}"`, undefined);
       for (const alert of alerts) {
         const font = JSON.parse(alert.font);
         if (typeof font.shadow === 'undefined') {
           font.shadow = [];
         }
-        await queryRunner.query(`UPDATE \`alert_${type}\` SET font='${JSON.stringify(font)}' WHERE id='${alert.id}'`);
+        await queryRunner.query(`UPDATE "alert_${type}" SET "font"="${JSON.stringify(font)}" WHERE "id"="${alert.id}"`);
       }
     }
 
@@ -51,10 +51,10 @@ export class fontMissingShadow1592557005214 implements MigrationInterface {
     }
 
     for (const type of ['cheer', 'resub', 'tip', 'raid', 'host', 'subgift', 'subcommunitygift', 'sub', 'follow']) {
-      const alerts = await queryRunner.query(`SELECT * from \`alert_${type}\``, undefined);
+      const alerts = await queryRunner.query(`SELECT * from "alert_${type}"`, undefined);
       for (const alert of alerts) {
         const { shadow, ...font } = JSON.parse(alert.font);
-        await queryRunner.query(`UPDATE \`alert_${type}\` SET font='${JSON.stringify(font)}' WHERE id='${alert.id}'`);
+        await queryRunner.query(`UPDATE "alert_${type}" SET "font"="${JSON.stringify(font)}" WHERE "id"="${alert.id}"`);
       }
     }
 

@@ -5,7 +5,7 @@ import { dateDiff } from '../commons';
 import currency from '../currency';
 import { User } from '../database/entity/user';
 import {
-  command, default_permission, settings, ui, 
+  command, default_permission, settings, ui,
 } from '../decorators';
 import Expects from '../expects';
 import general from '../general';
@@ -80,10 +80,12 @@ class UserInfo extends System {
         output.push(0 + ' ' + getLocalizedName(0, translate('core.minutes')));
       }
 
-      return [{ response: prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.time', {
-        username,
-        diff: output.join(', '),
-      }), ...opts }];
+      return [{
+        response: prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.time', {
+          username,
+          diff: output.join(', '),
+        }), ...opts,
+      }];
     }
   }
 
@@ -97,11 +99,13 @@ class UserInfo extends System {
     const localePath = 'subage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.';
 
     if (!user || !user.isSubscriber || user.subscribedAt === 0) {
-      return [{ response: prepare(localePath + (subCumulativeMonths ? 'notNow' : 'never'), {
-        username,
-        subCumulativeMonths,
-        subCumulativeMonthsName: getLocalizedName(subCumulativeMonths || 0, translate('core.months')),
-      }), ...opts }];
+      return [{
+        response: prepare(localePath + (subCumulativeMonths ? 'notNow' : 'never'), {
+          username,
+          subCumulativeMonths,
+          subCumulativeMonthsName: getLocalizedName(subCumulativeMonths || 0, translate('core.months')),
+        }), ...opts,
+      }];
     } else {
       const units = ['years', 'months', 'days', 'hours', 'minutes'] as const;
       const diff = dateDiff(new Date(user.subscribedAt).getTime(), Date.now());
@@ -116,14 +120,16 @@ class UserInfo extends System {
         output.push(0 + ' ' + getLocalizedName(0, translate('core.minutes')));
       }
 
-      return [{ response: prepare(localePath + (subStreak ? 'timeWithSubStreak' : 'time'), {
-        username,
-        subCumulativeMonths,
-        subCumulativeMonthsName: getLocalizedName(subCumulativeMonths || 0, translate('core.months')),
-        subStreak,
-        subStreakMonthsName:     getLocalizedName(subStreak || 0, translate('core.months')),
-        diff:                    output.join(', '),
-      }), ...opts }];
+      return [{
+        response: prepare(localePath + (subStreak ? 'timeWithSubStreak' : 'time'), {
+          username,
+          subCumulativeMonths,
+          subCumulativeMonthsName: getLocalizedName(subCumulativeMonths || 0, translate('core.months')),
+          subStreak,
+          subStreakMonthsName:     getLocalizedName(subStreak || 0, translate('core.months')),
+          diff:                    output.join(', '),
+        }), ...opts,
+      }];
     }
   }
 
@@ -166,10 +172,12 @@ class UserInfo extends System {
       if (output.length === 0) {
         output.push(0 + ' ' + getLocalizedName(0, translate('core.minutes')));
       }
-      return [{ response: prepare('age.success.' + (opts.sender.username === username.toLowerCase() ? 'withoutUsername' : 'withUsername'), {
-        username,
-        diff: output.join(', '),
-      }), ...opts }];
+      return [{
+        response: prepare('age.success.' + (opts.sender.username === username.toLowerCase() ? 'withoutUsername' : 'withUsername'), {
+          username,
+          diff: output.join(', '),
+        }), ...opts,
+      }];
     }
   }
 
@@ -181,9 +189,11 @@ class UserInfo extends System {
       if (!user || user.seenAt === 0) {
         return [{ response: translate('lastseen.success.never').replace(/\$username/g, username), ...opts }];
       } else {
-        return [{ response: translate('lastseen.success.time')
-          .replace(/\$username/g, username)
-          .replace(/\$when/g, dayjs(user.seenAt).tz(timezone).format(this.lastSeenFormat)), ...opts }];
+        return [{
+          response: translate('lastseen.success.time')
+            .replace(/\$username/g, username)
+            .replace(/\$when/g, dayjs(user.seenAt).tz(timezone).format(this.lastSeenFormat)), ...opts,
+        }];
       }
     } catch (e) {
       return [{ response: translate('lastseen.failed.parse'), ...opts }];
@@ -213,9 +223,7 @@ class UserInfo extends System {
     try {
       const message: (string | null)[] = [];
       const user = await getRepository(User).findOne({
-        where: {
-          userId: Number(opts.sender.userId),
-        },
+        where: { userId: Number(opts.sender.userId) },
         cache: true,
       });
 
@@ -258,7 +266,7 @@ class UserInfo extends System {
       if (message.includes('$points')) {
         const idx = message.indexOf('$points');
         if (points.enabled) {
-          message[idx] = user.points + ' ' + await getPointsName(user.points);
+          message[idx] = user.points + ' ' + getPointsName(user.points);
         } else {
           message.splice(idx, 1);
         }
@@ -302,7 +310,9 @@ class UserInfo extends System {
       if (returnOnly) {
         return response;
       } else {
-        return [{ response, sender: opts.sender, attr: opts.attr }];
+        return [{
+          response, sender: opts.sender, attr: opts.attr,
+        }];
       }
     } catch (e) {
       error(e.stack);
@@ -330,7 +340,9 @@ class UserInfo extends System {
         },
       }, true) as string;
       return [
-        { response: response.replace('$sender', '$touser'), sender: opts.sender, attr: { ...opts.attr, param: username } },
+        {
+          response: response.replace('$sender', '$touser'), sender: opts.sender, attr: { ...opts.attr, param: username },
+        },
       ];
     } catch (e) {
       if (e.message.includes('<username>')) {

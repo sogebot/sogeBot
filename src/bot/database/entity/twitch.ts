@@ -109,10 +109,14 @@ export const TwitchTag = new EntitySchema<Readonly<Required<TwitchTagInterface>>
 export const TwitchTagLocalizationName = new EntitySchema<Readonly<Required<TwitchTagLocalizationInterface>>>({
   name:    'twitch_tag_localization_name',
   columns: {
-    id:     { type: 'uuid', primary: true, generated: 'uuid' },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
     locale: { type: String },
     value:  { type: String },
-    tagId:  { type: String, nullable: true, name: 'tagId' },
+    tagId:  {
+      type: String, nullable: true, name: 'tagId', 
+    },
   },
   relations: {
     tag: {
@@ -136,10 +140,14 @@ export const TwitchTagLocalizationName = new EntitySchema<Readonly<Required<Twit
 export const TwitchTagLocalizationDescription = new EntitySchema<Readonly<Required<TwitchTagLocalizationInterface>>>({
   name:    'twitch_tag_localization_description',
   columns: {
-    id:     { type: 'uuid', primary: true, generated: 'uuid' },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
     locale: { type: String },
     value:  { type: 'text' },
-    tagId:  { type: String, nullable: true, name: 'tagId' },
+    tagId:  {
+      type: String, nullable: true, name: 'tagId', 
+    },
   },
   relations: {
     tag: {
@@ -163,7 +171,9 @@ export const TwitchTagLocalizationDescription = new EntitySchema<Readonly<Requir
 export const TwitchStats = new EntitySchema<Readonly<Required<TwitchStatsInterface>>>({
   name:    'twitch_stats',
   columns: {
-    whenOnline:         { type: 'bigint', transformer: new ColumnNumericTransformer(), primary: true },
+    whenOnline: {
+      type: 'bigint', transformer: new ColumnNumericTransformer(), primary: true, 
+    },
     currentViewers:     { type: Number, default: 0 },
     currentSubscribers: { type: Number, default: 0 },
     chatMessages:       { type: 'bigint' },
@@ -173,8 +183,10 @@ export const TwitchStats = new EntitySchema<Readonly<Required<TwitchStatsInterfa
     currentHosts:       { type: Number, default: 0 },
     newChatters:        { type: Number, default: 0 },
     currentBits:        { type: 'bigint', transformer: new ColumnNumericTransformer() },
-    currentTips:        { type: 'float', transformer: new ColumnNumericTransformer(), precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined  },
-    currentWatched:     { type: 'bigint', transformer: new ColumnNumericTransformer() },
+    currentTips:        {
+      type: 'float', transformer: new ColumnNumericTransformer(), precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined,  
+    },
+    currentWatched: { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },
 });
 

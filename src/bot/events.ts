@@ -13,16 +13,16 @@ import { User } from './database/entity/user';
 import { onStreamEnd } from './decorators/on';
 import events from './events';
 import {
-  calls, isStreamOnline, rawStatus, setRateLimit, stats, streamStatusChangeSince, 
+  calls, isStreamOnline, rawStatus, setRateLimit, stats, streamStatusChangeSince,
 } from './helpers/api';
 import { sample } from './helpers/array/sample';
 import { attributesReplace } from './helpers/attributesReplace';
 import {
-  announce, getBotSender, getOwner, prepare, 
+  announce, getBotSender, getOwner, prepare,
 } from './helpers/commons';
 import { mainCurrency } from './helpers/currency';
 import {
-  getAll, getValueOf, setValueOf, 
+  getAll, getValueOf, setValueOf,
 } from './helpers/customvariables';
 import { csEmitter } from './helpers/customvariables/emitter';
 import { isDbConnected } from './helpers/database';
@@ -32,7 +32,7 @@ import { flatten } from './helpers/flatten';
 import { generateUsername } from './helpers/generateUsername';
 import { getLocalizedName } from './helpers/getLocalized';
 import {
-  debug, error, info, warning, 
+  debug, error, info, warning,
 } from './helpers/log';
 import { channelId } from './helpers/oauth';
 import { broadcasterId } from './helpers/oauth/broadcasterId';
@@ -41,7 +41,7 @@ import { addUIError } from './helpers/panel/';
 import { parserEmitter } from './helpers/parser/';
 import { adminEndpoint } from './helpers/socket';
 import {
-  isOwner, isSubscriber, isVIP, 
+  isOwner, isSubscriber, isVIP,
 } from './helpers/user';
 import { isBot, isBotSubscriber } from './helpers/user/isBot';
 import { isBroadcaster } from './helpers/user/isBroadcaster';
@@ -86,43 +86,89 @@ class Events extends Core {
       { id: 'subcommunitygift', variables: [ 'username', 'count' ] },
       { id: 'resub', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'subStreakShareEnabled', 'subStreak', 'subStreakName', 'subCumulativeMonths', 'subCumulativeMonthsName', 'tier' ] },
       { id: 'tip', variables: [ 'username', 'amount', 'currency', 'message', 'amountInBotCurrency', 'currencyInBot' ] },
-      { id: 'command-send-x-times', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'command', 'count', 'source' ], definitions: { fadeOutXCommands: 0, fadeOutInterval: 0, runEveryXCommands: 10, commandToWatch: '', runInterval: 0 }, check: this.checkCommandSendXTimes }, // runInterval 0 or null - disabled; > 0 every x seconds
-      { id: 'keyword-send-x-times', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'command', 'count', 'source' ], definitions: { fadeOutXKeywords: 0, fadeOutInterval: 0, runEveryXKeywords: 10, keywordToWatch: '', runInterval: 0, resetCountEachMessage: false }, check: this.checkKeywordSendXTimes }, // runInterval 0 or null - disabled; > 0 every x seconds
-      { id: 'number-of-viewers-is-at-least-x', variables: [ 'count' ], definitions: { viewersAtLeast: 100, runInterval: 0 }, check: this.checkNumberOfViewersIsAtLeast }, // runInterval 0 or null - disabled; > 0 every x seconds
+      {
+        id:          'command-send-x-times', variables:   [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'command', 'count', 'source' ], definitions: {
+          fadeOutXCommands: 0, fadeOutInterval: 0, runEveryXCommands: 10, commandToWatch: '', runInterval: 0,
+        }, check: this.checkCommandSendXTimes,
+      }, // runInterval 0 or null - disabled; > 0 every x seconds
+      {
+        id:          'keyword-send-x-times', variables:   [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'command', 'count', 'source' ], definitions: {
+          fadeOutXKeywords: 0, fadeOutInterval: 0, runEveryXKeywords: 10, keywordToWatch: '', runInterval: 0, resetCountEachMessage: false,
+        }, check: this.checkKeywordSendXTimes,
+      }, // runInterval 0 or null - disabled; > 0 every x seconds
+      {
+        id: 'number-of-viewers-is-at-least-x', variables: [ 'count' ], definitions: { viewersAtLeast: 100, runInterval: 0 }, check: this.checkNumberOfViewersIsAtLeast,
+      }, // runInterval 0 or null - disabled; > 0 every x seconds
       { id: 'stream-started' },
       { id: 'stream-stopped' },
-      { id: 'stream-is-running-x-minutes', definitions: { runAfterXMinutes: 100 }, check: this.checkStreamIsRunningXMinutes },
+      {
+        id: 'stream-is-running-x-minutes', definitions: { runAfterXMinutes: 100 }, check: this.checkStreamIsRunningXMinutes,
+      },
       { id: 'cheer', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'bits', 'message' ] },
       { id: 'clearchat' },
       { id: 'action', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
       { id: 'ban', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'reason' ] },
       { id: 'hosting', variables: [ 'target', 'viewers' ] },
-      { id: 'hosted', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'viewers' ], definitions: { viewersAtLeast: 1 }, check: this.checkHosted },
-      { id: 'raid', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'viewers' ], definitions: { viewersAtLeast: 1 }, check: this.checkRaid },
+      {
+        id: 'hosted', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'viewers' ], definitions: { viewersAtLeast: 1 }, check: this.checkHosted,
+      },
+      {
+        id: 'raid', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'viewers' ], definitions: { viewersAtLeast: 1 }, check: this.checkRaid,
+      },
       { id: 'mod', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
       { id: 'commercial', variables: [ 'duration' ] },
       { id: 'timeout', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'duration' ] },
-      { id: 'every-x-minutes-of-stream', definitions: { runEveryXMinutes: 100 }, check: this.everyXMinutesOfStream },
+      {
+        id: 'every-x-minutes-of-stream', definitions: { runEveryXMinutes: 100 }, check: this.everyXMinutesOfStream,
+      },
       { id: 'game-changed', variables: [ 'oldGame', 'game' ] },
-      { id: 'reward-redeemed', definitions: { titleOfReward: '' }, variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'userInput' ], check: this.isCorrectReward },
+      {
+        id: 'reward-redeemed', definitions: { titleOfReward: '' }, variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'userInput' ], check: this.isCorrectReward,
+      },
     ];
 
     this.supportedOperationsList = [
-      { id: 'send-chat-message', definitions: { messageToSend: '' }, fire: this.fireSendChatMessage },
-      { id: 'send-whisper', definitions: { messageToSend: '' }, fire: this.fireSendWhisper },
-      { id: 'run-command', definitions: { commandToRun: '', isCommandQuiet: false }, fire: this.fireRunCommand },
-      { id: 'emote-explosion', definitions: { emotesToExplode: '' }, fire: this.fireEmoteExplosion },
-      { id: 'emote-firework', definitions: { emotesToFirework: '' }, fire: this.fireEmoteFirework },
-      { id: 'start-commercial', definitions: { durationOfCommercial: [30, 60, 90, 120, 150, 180] }, fire: this.fireStartCommercial },
-      { id: 'bot-will-join-channel', definitions: {}, fire: this.fireBotWillJoinChannel },
-      { id: 'bot-will-leave-channel', definitions: {}, fire: this.fireBotWillLeaveChannel },
-      { id: 'create-a-clip', definitions: { announce: false, hasDelay: true }, fire: this.fireCreateAClip },
-      { id: 'create-a-clip-and-play-replay', definitions: { announce: false, hasDelay: true }, fire: this.fireCreateAClipAndPlayReplay },
-      { id: 'increment-custom-variable', definitions: { customVariable: '', numberToIncrement: '1' }, fire: this.fireIncrementCustomVariable },
-      { id: 'decrement-custom-variable', definitions: { customVariable: '', numberToDecrement: '1' }, fire: this.fireDecrementCustomVariable },
+      {
+        id: 'send-chat-message', definitions: { messageToSend: '' }, fire: this.fireSendChatMessage,
+      },
+      {
+        id: 'send-whisper', definitions: { messageToSend: '' }, fire: this.fireSendWhisper,
+      },
+      {
+        id: 'run-command', definitions: { commandToRun: '', isCommandQuiet: false }, fire: this.fireRunCommand,
+      },
+      {
+        id: 'emote-explosion', definitions: { emotesToExplode: '' }, fire: this.fireEmoteExplosion,
+      },
+      {
+        id: 'emote-firework', definitions: { emotesToFirework: '' }, fire: this.fireEmoteFirework,
+      },
+      {
+        id: 'start-commercial', definitions: { durationOfCommercial: [30, 60, 90, 120, 150, 180] }, fire: this.fireStartCommercial,
+      },
+      {
+        id: 'bot-will-join-channel', definitions: {}, fire: this.fireBotWillJoinChannel,
+      },
+      {
+        id: 'bot-will-leave-channel', definitions: {}, fire: this.fireBotWillLeaveChannel,
+      },
+      {
+        id: 'create-a-clip', definitions: { announce: false, hasDelay: true }, fire: this.fireCreateAClip,
+      },
+      {
+        id: 'create-a-clip-and-play-replay', definitions: { announce: false, hasDelay: true }, fire: this.fireCreateAClipAndPlayReplay,
+      },
+      {
+        id: 'increment-custom-variable', definitions: { customVariable: '', numberToIncrement: '1' }, fire: this.fireIncrementCustomVariable,
+      },
+      {
+        id: 'decrement-custom-variable', definitions: { customVariable: '', numberToDecrement: '1' }, fire: this.fireDecrementCustomVariable,
+      },
     ];
 
-    this.addMenu({ category: 'manage', name: 'event-listeners', id: 'manage/events/list', this: null });
+    this.addMenu({
+      category: 'manage', name: 'event-listeners', id: 'manage/events/list', this: null,
+    });
     this.fadeOut();
 
     // emitter .on listeners
@@ -155,6 +201,7 @@ class Events extends Core {
       'number-of-viewers-is-at-least-x',
       'tip',
       'tweet-post-with-hashtag',
+      'obs-scene-changed',
     ] as const) {
       eventEmitter.on(event, (opts?: Events.Attributes) => {
         if (typeof opts === 'undefined') {
@@ -329,15 +376,21 @@ class Events extends Core {
       // save remaining api calls
       setRateLimit('broadcaster', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: calls.broadcaster });
+      ioServer?.emit('api.stats', {
+        method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: calls.broadcaster,
+      });
       eventEmitter.emit('commercial', { duration: Number(operation.durationOfCommercial) });
     } catch (e) {
       if (e.isAxiosError) {
         error(`API: ${url} - ${e.response.data.message}`);
-        ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.response.data });
+        ioServer?.emit('api.stats', {
+          method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.response?.data ?? 'n/a',
+        });
       } else {
         error(`API: ${url} - ${e.stack}`);
-        ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
+        ioServer?.emit('api.stats', {
+          method: 'POST', request: { data: { broadcaster_id: String(cid), length: Number(operation.durationOfCommercial) } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack,
+        });
       }
     }
   }
@@ -400,7 +453,9 @@ class Events extends Core {
         userId: Number(await getIdFromTwitch(username)),
         username,
       });
-      return this.fireSendChatMessageOrWhisper(operation, { ...attributes, userId, username }, whisper);
+      return this.fireSendChatMessageOrWhisper(operation, {
+        ...attributes, userId, username,
+      }, whisper);
     } else if (attributes.test) {
       userId = attributes.userId;
     } else if (!userObj) {
@@ -668,9 +723,7 @@ class Events extends Core {
     });
     adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
-        cb(null, await getRepository(Event).find({
-          relations: ['operations'],
-        }));
+        cb(null, await getRepository(Event).find({ relations: ['operations'] }));
       } catch (e) {
         cb(e.stack, []);
       }

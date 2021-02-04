@@ -26,9 +26,7 @@ export function getSocket(namespace: string, continueOnUnauthorized = false): So
   const socket = (window as any).io(namespace, {
     transports: [ 'websocket' ],
     auth:       (cb: (data: { token: string | null}) => void) => {
-      cb({
-        token: localStorage.getItem('accessToken'),
-      });
+      cb({ token: localStorage.getItem('accessToken') });
     },
   }) as Socket;
 
@@ -55,11 +53,7 @@ export function getSocket(namespace: string, continueOnUnauthorized = false): So
           redirectLogin();
         }
       } else {
-        axios.get(`${window.location.origin}/socket/refresh`, {
-          headers: {
-            'x-twitch-token': refreshToken,
-          },
-        }).then(validation => {
+        axios.get(`${window.location.origin}/socket/refresh`, { headers: { 'x-twitch-token': refreshToken } }).then(validation => {
           localStorage.setItem('accessToken', validation.data.accessToken);
           localStorage.setItem('refreshToken', validation.data.refreshToken);
           localStorage.setItem('userType', validation.data.userType);

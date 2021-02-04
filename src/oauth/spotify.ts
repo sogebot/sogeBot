@@ -5,6 +5,4 @@ import App from './spotify.vue';
 
 Vue.use(VueCompositionApi);
 
-new Vue({
-  render: h => h(App),
-}).$mount('#app');
+new Vue({ render: h => h(App) }).$mount('#app');

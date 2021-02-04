@@ -22,9 +22,13 @@ export interface ModerationMessageCooldownInterface {
 export const ModerationWarning = new EntitySchema<Readonly<Required<ModerationWarningInterface>>>({
   name:    'moderation_warning',
   columns: {
-    id:        { type: 'uuid', primary: true, generated: 'uuid' },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
     userId:    { type: Number },
-    timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
+    timestamp: {
+      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0, 
+    },
   },
   indices: [
     { name: 'IDX_f941603aef2741795a9108d0d2', columns: ['userId'] },
@@ -34,7 +38,9 @@ export const ModerationWarning = new EntitySchema<Readonly<Required<ModerationWa
 export const ModerationPermit = new EntitySchema<Readonly<Required<ModerationPermitInterface>>>({
   name:    'moderation_permit',
   columns: {
-    id:     { type: 'uuid', primary: true, generated: 'uuid' },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
     userId: { type: Number },
   },
   indices: [

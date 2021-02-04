@@ -15,15 +15,9 @@ export const Settings = new EntitySchema<SettingsInterface>({
       primary:   true,
       generated: true,
     },
-    namespace: {
-      type: String,
-    },
-    name: {
-      type: String,
-    },
-    value: {
-      type: 'text',
-    },
+    namespace: { type: String },
+    name:      { type: String },
+    value:     { type: 'text' },
   },
   indices: [
     {

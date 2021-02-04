@@ -7,15 +7,15 @@ import Stats from './_interface';
 class Bits extends Stats {
   constructor() {
     super();
-    this.addMenu({ category: 'stats', name: 'bits', id: 'stats/bits', this: null });
+    this.addMenu({
+      category: 'stats', name: 'bits', id: 'stats/bits', this: null, 
+    });
   }
 
   sockets() {
     adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
-        cb(null, await getRepository(UserBit).find({
-          relations: ['user'],
-        }));
+        cb(null, await getRepository(UserBit).find({ relations: ['user'] }));
       } catch (e) {
         cb(e, []);
       }

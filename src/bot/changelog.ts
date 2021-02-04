@@ -20,7 +20,9 @@ export const change = ((namespace: string) => {
   if (!isDbConnected) {
     setTimeout(() => change(namespace), 1000);
   } else {
-    getRepository(Changelog).insert({ namespace, timestamp: Date.now(), threadId });
+    getRepository(Changelog).insert({
+      namespace, timestamp: Date.now(), threadId, 
+    });
   }
 });
 
@@ -64,8 +66,6 @@ export const changelog = async () => {
 
 setInterval(() => {
   if (isDbConnected) {
-    getRepository(Changelog).delete({
-      timestamp: LessThan(Date.now() - 60000),
-    });
+    getRepository(Changelog).delete({ timestamp: LessThan(Date.now() - 60000) });
   }
 }, 60000);

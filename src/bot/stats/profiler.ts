@@ -5,7 +5,9 @@ import Stats from './_interface';
 class Profiler extends Stats {
   constructor() {
     super();
-    this.addMenu({ category: 'stats', name: 'profiler', id: 'stats/profiler', this: null });
+    this.addMenu({
+      category: 'stats', name: 'profiler', id: 'stats/profiler', this: null, 
+    });
   }
   public sockets() {
     adminEndpoint(this.nsp, 'profiler::load', async (cb) => {

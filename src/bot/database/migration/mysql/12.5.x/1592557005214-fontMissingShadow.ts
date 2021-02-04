@@ -1,13 +1,13 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-import { Goal } from '../../entity/goal';
-import { Randomizer } from '../../entity/randomizer';
+import { Goal } from '../../../entity/goal';
+import { Randomizer } from '../../../entity/randomizer';
 
 export class fontMissingShadow1592557005214 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // remove old migration
-    await queryRunner.query(`DELETE FROM "migrations" WHERE "name"='fontMissingShadow1592557005213'`);
+    await queryRunner.query('DELETE FROM `migrations` WHERE `name`="fontMissingShadow1592557005213"');
 
     const data = await queryRunner.manager.getRepository(Randomizer).find();
     for (const item of data) {

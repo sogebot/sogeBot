@@ -80,11 +80,15 @@ class Queue extends System {
             users.push(user);
           }
           if (cb) {
-            cb(null, (await this.pickUsers({ sender: getBotSender(), users, attr: {}, createdAt: Date.now(), command: '', parameters: '' }, data.random)).users);
+            cb(null, (await this.pickUsers({
+              sender: getBotSender(), users, attr: {}, createdAt: Date.now(), command: '', parameters: '', 
+            }, data.random)).users);
           }
         } else {
           if (cb) {
-            cb(null, (await this.pickUsers({ sender: getBotSender(), attr: {}, createdAt: Date.now(), command: '', parameters: String(data.count) }, data.random)).users);
+            cb(null, (await this.pickUsers({
+              sender: getBotSender(), attr: {}, createdAt: Date.now(), command: '', parameters: String(data.count), 
+            }, data.random)).users);
           }
         }
       } catch (e) {

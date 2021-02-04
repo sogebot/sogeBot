@@ -200,14 +200,10 @@ class PUBG extends Integration {
       for (const key of Object.keys(flatten(this.gameModeStats[gameType]))) {
         text = text.replace(new RegExp(escapeRegExp(`$${key}`), 'gi'), flatten(this.gameModeStats[gameType])[key]);
       }
-      return [{
-        response: await new Message(`$sender, ${text}`).parse(), ...opts,
-      }];
+      return [{ response: await new Message(`$sender, ${text}`).parse(), ...opts }];
     } catch (e) {
       if (e.message.includes('Expected parameter')) {
-        return [{
-          response: prepare('integrations.pubg.expected_one_of_these_parameters', { list: Object.keys(this.gameModeStats).join(', ') }), ...opts,
-        }];
+        return [{ response: prepare('integrations.pubg.expected_one_of_these_parameters', { list: Object.keys(this.gameModeStats).join(', ') }), ...opts }];
       } else {
         error(e.stack);
         return [];
@@ -226,14 +222,10 @@ class PUBG extends Integration {
       for (const key of Object.keys(flatten(this.rankedGameModeStats[gameType]))) {
         text = text.replace(new RegExp(escapeRegExp(`$${key}`), 'gi'), flatten(this.rankedGameModeStats[gameType])[key]);
       }
-      return [{
-        response: await new Message(`$sender, ${text}`).parse(), ...opts,
-      }];
+      return [{ response: await new Message(`$sender, ${text}`).parse(), ...opts }];
     } catch (e) {
       if (e.message.includes('Expected parameter')) {
-        return [{
-          response: prepare('integrations.pubg.expected_one_of_these_parameters', { list: Object.keys(this.rankedGameModeStats).join(', ') }), ...opts,
-        }];
+        return [{ response: prepare('integrations.pubg.expected_one_of_these_parameters', { list: Object.keys(this.rankedGameModeStats).join(', ') }), ...opts }];
       } else {
         error(e.stack);
         return [];

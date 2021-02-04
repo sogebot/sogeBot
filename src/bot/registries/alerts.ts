@@ -23,7 +23,9 @@ class Alerts extends Registry {
 
   constructor() {
     super();
-    this.addMenu({ category: 'registry', name: 'alerts', id: 'registry/alerts/list', this: null });
+    this.addMenu({
+      category: 'registry', name: 'alerts', id: 'registry/alerts/list', this: null, 
+    });
     const init = (retry = 0) => {
       if (retry === 10000) {
         throw new Error('Registry alert media endpoint failed.');
@@ -94,8 +96,10 @@ class Alerts extends Registry {
         const { primaryId, ...item } = await getRepository(AlertMedia).findOneOrFail({ id: toClone[0] });
         cb(
           null,
-          await getRepository(AlertMedia).save({ ...item,
-            id: toClone[1] })
+          await getRepository(AlertMedia).save({
+            ...item,
+            id: toClone[1], 
+          })
         );
       } catch (e) {
         cb(e.stack, null);
@@ -150,9 +154,7 @@ class Alerts extends Registry {
       try {
         cb(
           null,
-          await getRepository(Alert).find({
-            relations: ['rewardredeems', 'cmdredeems', 'cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'],
-          })
+          await getRepository(Alert).find({ relations: ['rewardredeems', 'cmdredeems', 'cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'] })
         );
       } catch (e) {
         cb (e, []);
@@ -179,9 +181,7 @@ class Alerts extends Registry {
       }
     });
     adminEndpoint(this.nsp, 'clear-media', async () => {
-      const alerts = await getRepository(Alert).find({
-        relations: ['rewardredeems', 'cmdredeems', 'cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'],
-      });
+      const alerts = await getRepository(Alert).find({ relations: ['rewardredeems', 'cmdredeems', 'cheers', 'follows', 'hosts', 'raids', 'resubs', 'subcommunitygifts', 'subgifts', 'subs', 'tips'] });
       const mediaIds: string[] = [];
       for (const alert of alerts) {
         for (const event of [
@@ -202,9 +202,7 @@ class Alerts extends Registry {
         }
       }
       if (mediaIds.length > 0) {
-        await getRepository(AlertMedia).delete({
-          id: Not(In(mediaIds)),
-        });
+        await getRepository(AlertMedia).delete({ id: Not(In(mediaIds)) });
       }
     });
     publicEndpoint(this.nsp, 'test', async (data: EmitData) => {
@@ -217,7 +215,9 @@ class Alerts extends Registry {
 
   trigger(opts: EmitData) {
     if (!this.areAlertsMuted) {
-      ioServer?.of('/registries/alerts').emit('alert', { ...opts, isTTSMuted: this.isTTSMuted, isSoundMuted: this.isSoundMuted });
+      ioServer?.of('/registries/alerts').emit('alert', {
+        ...opts, isTTSMuted: this.isTTSMuted, isSoundMuted: this.isSoundMuted, 
+      });
     }
   }
 

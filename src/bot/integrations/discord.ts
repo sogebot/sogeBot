@@ -186,10 +186,18 @@ class Discord extends Integration {
             embed.addFields([
               { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame },
               { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle },
-              { name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true },
-              { name: prepare('webpanel.viewers'), value: stats.value.currentViewers, inline: true },
-              { name: prepare('webpanel.views'), value: stats.value.currentViews, inline: true },
-              { name: prepare('webpanel.followers'), value: stats.value.currentFollowers, inline: true },
+              {
+                name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true, 
+              },
+              {
+                name: prepare('webpanel.viewers'), value: stats.value.currentViewers, inline: true, 
+              },
+              {
+                name: prepare('webpanel.views'), value: stats.value.currentViews, inline: true, 
+              },
+              {
+                name: prepare('webpanel.followers'), value: stats.value.currentFollowers, inline: true, 
+              },
             ]);
             embed.setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${generalChannel.value}-1920x1080.jpg?${Date.now()}`);
 
@@ -236,9 +244,7 @@ class Discord extends Integration {
       }
       const botPermissionsSortedByPriority = await getRepository(PermissionsEntity).find({
         relations: ['filters'],
-        order:     {
-          order: 'ASC',
-        },
+        order:     { order: 'ASC' },
       });
 
       const alreadyAssignedRoles: string[] = [];
@@ -317,9 +323,7 @@ class Discord extends Integration {
 
   removeExpiredLinks() {
     // remove expired links
-    getRepository(DiscordLink).delete({
-      userId: IsNull(), createdAt: LessThan(Date.now() - (MINUTE * 10)),
-    });
+    getRepository(DiscordLink).delete({ userId: IsNull(), createdAt: LessThan(Date.now() - (MINUTE * 10)) });
   }
 
   @command('!unlink')
@@ -342,9 +346,7 @@ class Discord extends Integration {
 
       const link = await getRepository(DiscordLink).findOneOrFail({ id: uuid });
       // link user
-      await getRepository(DiscordLink).save({
-        ...link, userId: Number(opts.sender.userId),
-      });
+      await getRepository(DiscordLink).save({ ...link, userId: Number(opts.sender.userId) });
       return [{ response: prepare('integrations.discord.this-account-was-linked-with', { sender: opts.sender, discordTag: link.tag }), ...opts }];
     } catch (e) {
       if (e.message.includes('Expected parameter')) {
@@ -374,9 +376,15 @@ class Discord extends Integration {
         embed.addFields([
           { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame },
           { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle },
-          { name: prepare('integrations.discord.streamed-at'), value: `${this.embedStartedAt} - ${dayjs().tz(timezone).format('LLL')}`, inline: true },
-          { name: prepare('webpanel.views'), value: stats.value.currentViews, inline: true },
-          { name: prepare('webpanel.followers'), value: stats.value.currentFollowers, inline: true },
+          {
+            name: prepare('integrations.discord.streamed-at'), value: `${this.embedStartedAt} - ${dayjs().tz(timezone).format('LLL')}`, inline: true, 
+          },
+          {
+            name: prepare('webpanel.views'), value: stats.value.currentViews, inline: true, 
+          },
+          {
+            name: prepare('webpanel.followers'), value: stats.value.currentFollowers, inline: true, 
+          },
         ]);
         embed.setImage(`https://static-cdn.jtvnw.net/ttv-static/404_preview-1920x1080.jpg?${Date.now()}`);
 
@@ -405,9 +413,15 @@ class Discord extends Integration {
           .addFields([
             { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame },
             { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle },
-            { name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true },
-            { name: prepare('webpanel.views'), value: stats.value.currentViews, inline: true },
-            { name: prepare('webpanel.followers'), value: stats.value.currentFollowers, inline: true },
+            {
+              name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true, 
+            },
+            {
+              name: prepare('webpanel.views'), value: stats.value.currentViews, inline: true, 
+            },
+            {
+              name: prepare('webpanel.followers'), value: stats.value.currentFollowers, inline: true, 
+            },
           ])
           // Set the title of the field
           .setTitle('https://twitch.tv/' + generalChannel.value)
@@ -448,7 +462,11 @@ class Discord extends Integration {
         const activityString = await new Message(this.onlinePresenceStatusOnStreamName).parse();
         if (this.onlinePresenceStatusOnStream === 'streaming') {
           this.client?.user?.setStatus('online');
-          this.client?.user?.setPresence({ status: 'online', activity: { name: activityString, type: 'STREAMING', url: `https://twitch.tv/${generalChannel.value}` } });
+          this.client?.user?.setPresence({
+            status:   'online', activity: {
+              name: activityString, type: 'STREAMING', url: `https://twitch.tv/${generalChannel.value}`, 
+            }, 
+          });
         } else {
           this.client?.user?.setStatus(this.onlinePresenceStatusOnStream);
           if (activityString !== '') {
@@ -477,7 +495,9 @@ class Discord extends Integration {
       setTimeout(() => this.addEvent(), 1000);
     } else {
       events.supportedOperationsList.push(
-        { id: 'send-discord-message', definitions: { channel: '', messageToSend: '' }, fire: this.fireSendDiscordMessage },
+        {
+          id: 'send-discord-message', definitions: { channel: '', messageToSend: '' }, fire: this.fireSendDiscordMessage, 
+        },
       );
     }
   }
@@ -624,9 +644,13 @@ class Discord extends Integration {
           mod:         'false', subscriber:  'false', turbo:       'false', discord:     { author, channel },
         };
 
-        eventEmitter.emit('keyword-send-x-times', { username: user.username, message: content, source: 'discord' });
+        eventEmitter.emit('keyword-send-x-times', {
+          username: user.username, message: content, source: 'discord', 
+        });
         if (content.startsWith('!')) {
-          eventEmitter.emit('command-send-x-times', { username: user.username, message: content, source: 'discord' });
+          eventEmitter.emit('command-send-x-times', {
+            username: user.username, message: content, source: 'discord', 
+          });
         }
 
         parser.message = content;

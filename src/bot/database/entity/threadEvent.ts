@@ -7,7 +7,9 @@ export interface ThreadEventInterface {
 export const ThreadEvent = new EntitySchema<Readonly<Required<ThreadEventInterface>>>({
   name:    'thread_event',
   columns: {
-    id:    { type: 'uuid', primary: true, generated: 'uuid' },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
     event: { type: String },
   },
   indices: [

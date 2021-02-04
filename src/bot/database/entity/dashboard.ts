@@ -25,14 +25,18 @@ export interface WidgetInterface {
 export const Dashboard = new EntitySchema<Readonly<Required<DashboardInterface>>>({
   name:    'dashboard',
   columns: {
-    id:        { type: 'uuid', primary: true, generated: 'uuid' },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
     name:      { type: String },
     type:      { type: String, length: 6 },
     userId:    { type: Number },
     createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },
   indices: [
-    { name: 'IDX_dashboard_userId_createdAt_type', columns: ['userId', 'createdAt', 'type'], unique: true },
+    {
+      name: 'IDX_dashboard_userId_createdAt_type', columns: ['userId', 'createdAt', 'type'], unique: true, 
+    },
   ],
   relations: {
     widgets: {
@@ -47,13 +51,17 @@ export const Dashboard = new EntitySchema<Readonly<Required<DashboardInterface>>
 export const Widget = new EntitySchema<Readonly<Required<WidgetInterface>>>({
   name:    'widget',
   columns: {
-    id:          { type: String, primary: true, generated: 'uuid' },
+    id: {
+      type: String, primary: true, generated: 'uuid', 
+    },
     name:        { type: String },
     positionX:   { type: Number },
     positionY:   { type: Number },
     height:      { type: Number },
     width:       { type: Number },
-    dashboardId: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') ? { type: 'varchar', length: '36', nullable: true } : { type: 'uuid', nullable: true },
+    dashboardId: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') ? {
+      type: 'varchar', length: '36', nullable: true, 
+    } : { type: 'uuid', nullable: true },
   },
   relations: {
     dashboard: {

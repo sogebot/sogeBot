@@ -84,10 +84,12 @@ class FightMe extends Game {
           return !(ch.opponent === opts.sender.username
             && ch.challenger === user.username);
         });
-        return [{ response: prepare('gambling.fightme.broadcaster', {
-          winner: isBroadcaster(opts.sender) ? opts.sender.username : user.username,
-          loser:  isBroadcaster(opts.sender) ? user.username : opts.sender.username,
-        }), ...opts }];
+        return [{
+          response: prepare('gambling.fightme.broadcaster', {
+            winner: isBroadcaster(opts.sender) ? opts.sender.username : user.username,
+            loser:  isBroadcaster(opts.sender) ? user.username : opts.sender.username,
+          }), ...opts, 
+        }];
       }
 
       // mod vs mod
@@ -106,10 +108,12 @@ class FightMe extends Game {
           return !(ch.opponent === opts.sender.username
             && ch.challenger === user.username);
         });
-        return [{ response: prepare('gambling.fightme.oneModerator', {
-          winner: isMod.sender ? opts.sender.username : user.username,
-          loser:  isMod.sender ? user.username : opts.sender.username,
-        }), ...opts }];
+        return [{
+          response: prepare('gambling.fightme.oneModerator', {
+            winner: isMod.sender ? opts.sender.username : user.username,
+            loser:  isMod.sender ? user.username : opts.sender.username,
+          }), ...opts, 
+        }];
       }
 
       const [winnerWillGet, loserWillLose] = await Promise.all([this.winnerWillGet, this.loserWillLose]);
@@ -121,22 +125,26 @@ class FightMe extends Game {
         return !(ch.opponent === opts.sender.username
           && ch.challenger === user.username);
       });
-      return [{ response: prepare('gambling.fightme.winner', {
-        username: user.username,
-        winner:   winner ? user.username : opts.sender.username,
-        loser:    winner ? opts.sender.username : user.username,
-      }), ...opts }];
+      return [{
+        response: prepare('gambling.fightme.winner', {
+          username: user.username,
+          winner:   winner ? user.username : opts.sender.username,
+          loser:    winner ? opts.sender.username : user.username,
+        }), ...opts, 
+      }];
     } else {
       // check if under gambling cooldown
       const cooldown = this.cooldown;
       const isMod = isModerator(opts.sender);
       if (Date.now() - new Date(this._cooldown).getTime() < cooldown * 1000
         && !(this.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {
-        return [{ response: prepare('gambling.fightme.cooldown', {
-          command:     opts.command,
-          cooldown:    Math.round(((cooldown * 1000) - (Date.now() - new Date(this._cooldown).getTime())) / 1000 / 60),
-          minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (Date.now() - new Date(this._cooldown).getTime())) / 1000 / 60), translate('core.minutes')),
-        }), ...opts }];
+        return [{
+          response: prepare('gambling.fightme.cooldown', {
+            command:     opts.command,
+            cooldown:    Math.round(((cooldown * 1000) - (Date.now() - new Date(this._cooldown).getTime())) / 1000 / 60),
+            minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (Date.now() - new Date(this._cooldown).getTime())) / 1000 / 60), translate('core.minutes')),
+          }), ...opts, 
+        }];
       }
 
       // save new timestamp if not bypassed
@@ -157,7 +165,9 @@ class FightMe extends Game {
       } else {
         isAlreadyChallenged.removeAt = Date.now() + (2 * MINUTE);
       }
-      const response = prepare('gambling.fightme.challenge', { username: user.username, sender: opts.sender.username, command: opts.command });
+      const response = prepare('gambling.fightme.challenge', {
+        username: user.username, sender: opts.sender.username, command: opts.command, 
+      });
       return [{ response, ...opts }];
     }
   }

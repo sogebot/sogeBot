@@ -37,12 +37,20 @@ export interface RaffleParticipantMessageInterface {
 export const Raffle = new EntitySchema<Readonly<Required<RaffleInterface>>>({
   name:    'raffle',
   columns: {
-    id:             { type: 'uuid', primary: true, generated: 'uuid' },
-    winner:         { type: 'text', nullable: true },
-    timestamp:      { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-    keyword:        { type: String },
-    minTickets:     { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-    maxTickets:     { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
+    winner:    { type: 'text', nullable: true },
+    timestamp: {
+      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0, 
+    },
+    keyword:    { type: String },
+    minTickets: {
+      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0, 
+    },
+    maxTickets: {
+      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0, 
+    },
     type:           { type: Number },
     forFollowers:   { type: Boolean },
     forSubscribers: { type: Boolean },
@@ -64,7 +72,9 @@ export const Raffle = new EntitySchema<Readonly<Required<RaffleInterface>>>({
 export const RaffleParticipant = new EntitySchema<Readonly<Required<RaffleParticipantInterface>>>({
   name:    'raffle_participant',
   columns: {
-    id:           { type: 'uuid', primary: true, generated: 'uuid' },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
     username:     { type: String },
     tickets:      { type: Number },
     isEligible:   { type: Boolean },
@@ -91,9 +101,13 @@ export const RaffleParticipant = new EntitySchema<Readonly<Required<RafflePartic
 export const RaffleParticipantMessage = new EntitySchema<Readonly<Required<RaffleParticipantMessageInterface>>>({
   name:    'raffle_participant_message',
   columns: {
-    id:        { type: 'uuid', primary: true, generated: 'uuid' },
-    timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-    text:      { type: 'text' },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
+    timestamp: {
+      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0, 
+    },
+    text: { type: 'text' },
   },
   relations: {
     participant: {

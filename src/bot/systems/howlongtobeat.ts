@@ -25,7 +25,9 @@ class HowLongToBeat extends System {
 
   @onStartup()
   onStartup() {
-    this.addMenu({ category: 'manage', name: 'howlongtobeat', id: 'manage/hltb', this: this });
+    this.addMenu({
+      category: 'manage', name: 'howlongtobeat', id: 'manage/hltb', this: this, 
+    });
 
     this.refreshImageThumbnail();
 

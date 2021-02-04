@@ -313,7 +313,9 @@ class Parser {
       // user doesn't have permissions for command
       if (sender) {
         sender['message-type'] = 'whisper';
-        return[{ response: translate('permissions.without-permission').replace(/\$command/g, message), sender, attr: {} }];
+        return[{
+          response: translate('permissions.without-permission').replace(/\$command/g, message), sender, attr: {}, 
+        }];
       }
       return [];
     }

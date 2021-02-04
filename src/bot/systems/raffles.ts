@@ -105,9 +105,7 @@ class Raffles extends System {
           null,
           await getRepository(Raffle).findOne({
             relations: ['participants', 'participants.messages'],
-            order:     {
-              timestamp: 'DESC',
-            },
+            order:     { timestamp: 'DESC' },
           }),
         );
       } catch (e) {
@@ -115,12 +113,16 @@ class Raffles extends System {
       }
     });
     adminEndpoint(this.nsp, 'raffle::pick', async () => {
-      this.pick({ attr: {}, command: '!raffle', createdAt: Date.now(), parameters: '', sender: getOwnerAsSender() });
+      this.pick({
+        attr: {}, command: '!raffle', createdAt: Date.now(), parameters: '', sender: getOwnerAsSender(), 
+      });
     });
     adminEndpoint(this.nsp, 'raffle::open', async (message) => {
       // force close raffles
       await getRepository(Raffle).update({}, { isClosed: true });
-      this.open({ attr: {}, command: '!raffle open', createdAt: Date.now(), sender: getOwnerAsSender(), parameters: message });
+      this.open({
+        attr: {}, command: '!raffle open', createdAt: Date.now(), sender: getOwnerAsSender(), parameters: message, 
+      });
     });
     adminEndpoint(this.nsp, 'raffle::close', async () => {
       await getRepository(Raffle).update({ isClosed: false }, { isClosed: true });
@@ -134,12 +136,8 @@ class Raffles extends System {
     }
 
     const raffle = await getRepository(Raffle).findOne({
-      where: {
-        isClosed: true,
-      },
-      order: {
-        timestamp: 'DESC',
-      },
+      where: { isClosed: true },
+      order: { timestamp: 'DESC' },
     });
     if (!raffle) {
       return true;
@@ -506,9 +504,7 @@ class Raffles extends System {
   async pick (opts: CommandOptions): Promise<CommandResponse[]> {
     const raffle = await getRepository(Raffle).findOne({
       relations: ['participants'],
-      order:     {
-        timestamp: 'DESC',
-      },
+      order:     { timestamp: 'DESC' },
     });
     if (!raffle) {
       return [];
@@ -517,7 +513,9 @@ class Raffles extends System {
     if (raffle.participants.length === 0) {
       const response = prepare('raffles.no-participants-to-pick-winner');
       // close raffle on pick
-      await getRepository(Raffle).save({ ...raffle, isClosed: true, timestamp: Date.now() });
+      await getRepository(Raffle).save({
+        ...raffle, isClosed: true, timestamp: Date.now(), 
+      });
       return [{ response, ...opts }];
     }
 
@@ -569,7 +567,9 @@ class Raffles extends System {
     if (winner) {
       await Promise.all([
         getRepository(RaffleParticipant).save({ ...winner, isEligible: false }),
-        getRepository(Raffle).save({ ...raffle, winner: winner.username, isClosed: true, timestamp: Date.now() }),
+        getRepository(Raffle).save({
+          ...raffle, winner: winner.username, isClosed: true, timestamp: Date.now(), 
+        }),
       ]);
 
       const response = prepare('raffles.raffle-winner-is', {
@@ -580,7 +580,9 @@ class Raffles extends System {
       announce(response, 'raffles');
     } else {
       // close raffle on pick
-      await getRepository(Raffle).save({ ...raffle, isClosed: true, timestamp: Date.now() }),
+      await getRepository(Raffle).save({
+        ...raffle, isClosed: true, timestamp: Date.now(), 
+      }),
       warning('No winner found in raffle');
     }
     return [];

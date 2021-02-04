@@ -117,9 +117,7 @@ class Points extends System {
     }
 
     // cleanup all undoes (only 10minutes should be kept)
-    await getRepository(PointsChangelog).delete({
-      updatedAt: LessThanOrEqual(Date.now() - (10 * MINUTE)),
-    });
+    await getRepository(PointsChangelog).delete({ updatedAt: LessThanOrEqual(Date.now() - (10 * MINUTE)) });
 
     const [interval, offlineInterval, perInterval, perOfflineInterval] = await Promise.all([
       this.getPermissionBasedSettingsValue('interval'),
@@ -135,7 +133,9 @@ class Points extends System {
         if (isBot(username)) {
           continue;
         }
-        userPromises.push(this.processPoints(username, { interval, offlineInterval, perInterval, perOfflineInterval, isStreamOnline: isStreamOnline.value }));
+        userPromises.push(this.processPoints(username, {
+          interval, offlineInterval, perInterval, perOfflineInterval, isStreamOnline: isStreamOnline.value, 
+        }));
         await Promise.all(userPromises);
       }
     } catch (e) {

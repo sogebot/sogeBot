@@ -32,7 +32,9 @@ export const addMenuPublic = (menuArg: typeof menuPublic[number]) => {
 };
 
 export const addWidget = (id: string, name: string, icon: IconName) => {
-  widgets.push({ id: id, name: name, icon: icon });
+  widgets.push({
+    id: id, name: name, icon: icon, 
+  });
 };
 
 export const setApp = (_app: express.Application) => {

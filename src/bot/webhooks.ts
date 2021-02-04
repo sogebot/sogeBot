@@ -266,7 +266,9 @@ class Webhooks {
             timestamp: Date.now(),
           });
           follow(data.from_name);
-          eventEmitter.emit('follow', { username: data.from_name, userId: Number(data.from_id), webhooks: true });
+          eventEmitter.emit('follow', {
+            username: data.from_name, userId: Number(data.from_id), webhooks: true, 
+          });
           alerts.trigger({
             event:      'follows',
             name:       data.from_name,

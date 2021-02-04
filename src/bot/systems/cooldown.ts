@@ -68,7 +68,9 @@ class Cooldown extends System {
 
   constructor () {
     super();
-    this.addMenu({ category: 'manage', name: 'cooldown', id: 'manage/cooldowns/list', this: this });
+    this.addMenu({
+      category: 'manage', name: 'cooldown', id: 'manage/cooldowns/list', this: this, 
+    });
   }
 
   sockets () {
@@ -88,11 +90,7 @@ class Cooldown extends System {
     });
     adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
-        const cooldown = await getRepository(CooldownEntity).find({
-          order: {
-            name: 'ASC',
-          },
-        });
+        const cooldown = await getRepository(CooldownEntity).find({ order: { name: 'ASC' } });
         cb(null, cooldown);
       } catch (e) {
         cb(e.stack);
@@ -100,9 +98,7 @@ class Cooldown extends System {
     });
     adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
       try {
-        const cooldown = await getRepository(CooldownEntity).findOne({
-          where: { id },
-        });
+        const cooldown = await getRepository(CooldownEntity).findOne({ where: { id } });
         cb(null, cooldown);
       } catch (e) {
         cb(e.stack);
@@ -147,7 +143,11 @@ class Cooldown extends System {
       isSubscriberAffected: true,
       isFollowerAffected:   true,
     });
-    return [{ response: prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command }), ...opts }];
+    return [{
+      response: prepare('cooldowns.cooldown-was-set', {
+        seconds: match.seconds, type: match.type, command: match.command, 
+      }), ...opts, 
+    }];
   }
 
   @command('!cooldown unset')
@@ -155,9 +155,7 @@ class Cooldown extends System {
   async unset (opts: CommandOptions) {
     try {
       const [ commandOrKeyword ] = new Expects(opts.parameters).everything().toArray();
-      await getRepository(CooldownEntity).delete({
-        name: commandOrKeyword,
-      });
+      await getRepository(CooldownEntity).delete({ name: commandOrKeyword });
       return [{ response: prepare('cooldowns.cooldown-was-unset', { command: commandOrKeyword }), ...opts }];
     } catch (e) {
       return this.help(opts);

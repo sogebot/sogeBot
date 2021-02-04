@@ -29,8 +29,12 @@ const limitProxy = {
 };
 
 const calls = {
-  bot:         new Proxy({ limit: 120, remaining: 800, refresh: (Date.now() / 1000) + 90 }, limitProxy),
-  broadcaster: new Proxy({ limit: 120, remaining: 800, refresh: (Date.now() / 1000) + 90 }, limitProxy),
+  bot: new Proxy({
+    limit: 120, remaining: 800, refresh: (Date.now() / 1000) + 90, 
+  }, limitProxy),
+  broadcaster: new Proxy({
+    limit: 120, remaining: 800, refresh: (Date.now() / 1000) + 90, 
+  }, limitProxy),
 };
 
 function setRateLimit(key: 'bot' | 'broadcaster', headers: {

@@ -20,7 +20,9 @@ class Translate {
   isLoaded = false;
 
   constructor () {
-    addMenu({ category: 'settings', name: 'translations', id: 'settings/translations', this: null });
+    addMenu({
+      category: 'settings', name: 'translations', id: 'settings/translations', this: null, 
+    });
   }
 
   async check(lang: string): Promise<boolean> {

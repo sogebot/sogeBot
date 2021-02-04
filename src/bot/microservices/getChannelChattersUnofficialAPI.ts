@@ -1,10 +1,10 @@
 import {
-  isMainThread, parentPort, Worker, 
+  isMainThread, parentPort, Worker,
 } from 'worker_threads';
 
 import axios from 'axios';
 import {
-  chunk, flatMap, includes, 
+  chunk, flatMap, includes,
 } from 'lodash';
 import {
   createConnection,
@@ -19,6 +19,7 @@ import { Settings } from '../database/entity/settings';
 import { ThreadEvent } from '../database/entity/threadEvent';
 import { User } from '../database/entity/user';
 import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
+import { getMigrationType } from '../helpers/getMigrationType';
 import { debug, warning } from '../helpers/log';
 import { TypeORMLogger } from '../helpers/logTypeorm';
 import { SQLVariableLimit } from '../helpers/sql';
@@ -42,6 +43,8 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: 
         synchronize:   false,
         migrationsRun: true,
         charset:       'UTF8MB4_GENERAL_CI',
+        entities:      [ 'dest/database/entity/*.js' ],
+        migrations:    [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
       } as MysqlConnectionOptions);
     } else {
       await createConnection({
@@ -50,6 +53,8 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: 
         logger:        new TypeORMLogger(),
         synchronize:   false,
         migrationsRun: true,
+        entities:      [ 'dest/database/entity/*.js' ],
+        migrations:    [ `dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
       });
     }
     await new Promise( resolve => setTimeout(resolve, 3000) );

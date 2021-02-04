@@ -27,7 +27,9 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
   }
 
   debug('sendMessage.message', messageToSend);
-  debug('commons.sendMessage', JSON.stringify({ messageToSend, sender, attr }));
+  debug('commons.sendMessage', JSON.stringify({
+    messageToSend, sender, attr, 
+  }));
 
   if (sender) {
     attr.sender = sender;
