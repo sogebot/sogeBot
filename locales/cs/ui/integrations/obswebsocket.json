@@ -1,0 +1,57 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "accessBy": {
+      "title": "Přístup přes",
+      "help": "Direct - přímé připojení z bota | Overlay - připojení přes overlay z browser source"
+    },
+    "address": "Adresa",
+    "password": "Heslo"
+  },
+  "noSourceSelected": "Není vybrán žádný zdroj",
+  "noSceneSelected": "Není vybrána žádná scéna",
+  "empty": "Zatím nebyly vytvořeny žádné sady akcí.",
+  "emptyAfterSearch": "Při hledání <strong>\"$search\"</strong> nenalezeny žádné sady akcí.",
+  "command": "Příkaz",
+  "new": "Vytvořit novou sadu akcí OBS Websocketu",
+  "actions": "Akce",
+  "name": {
+    "name": "Název"
+  },
+  "SetCurrentScene": {
+    "name": "SetCurrentScene"
+  },
+  "StartReplayBuffer": {
+    "name": "StartReplayBuffer"
+  },
+  "StopReplayBuffer": {
+    "name": "StopReplayBuffer"
+  },
+  "SaveReplayBuffer": {
+    "name": "SaveReplayBuffer"
+  },
+  "WaitMs": {
+    "name": "Počkat X milisekund"
+  },
+  "Log": {
+    "name": "Zaznamenat zprávu"
+  },
+  "StartRecording": {
+    "name": "StartRecording"
+  },
+  "StopRecording": {
+    "name": "StopRecording"
+  },
+  "PauseRecording": {
+    "name": "PauseRecording"
+  },
+  "ResumeRecording": {
+    "name": "ResumeRecording"
+  },
+  "SetMute": {
+    "name": "SetMute"
+  },
+  "SetVolume": {
+    "name": "SetVolume"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "runTask": {
+    "EntityNotFound": "$sender, žádné akce nejsou nastaveny pro id:$id!",
+    "ParameterError": "$sender, je třeba zadat id!",
+    "UnknownError": "$sender, něco se pokazilo. Pro další informace zkontrolujte logy bota."
+  }
+}
