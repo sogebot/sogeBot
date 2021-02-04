@@ -2,21 +2,21 @@
   "settings": {
     "enabled": "Status",
     "accessBy": {
-      "title": "Access by",
-      "help": "Direct - connect directly from a bot | Overlay - connect via overlay browser source"
+      "title": "Přístup přes",
+      "help": "Direct - přímé připojení z bota | Overlay - připojení přes overlay z browser source"
     },
-    "address": "Address",
-    "password": "Password"
+    "address": "Adresa",
+    "password": "Heslo"
   },
-  "noSourceSelected": "No source selected",
-  "noSceneSelected": "No scene selected",
-  "empty": "No action sets were created yet.",
-  "emptyAfterSearch": "No action sets were found by your search for <strong>\"$search\"</strong>.",
-  "command": "Command",
-  "new": "Create new OBS Websocket action set",
-  "actions": "Actions",
+  "noSourceSelected": "Není vybrán žádný zdroj",
+  "noSceneSelected": "Není vybrána žádná scéna",
+  "empty": "Zatím nebyly vytvořeny žádné sady akcí.",
+  "emptyAfterSearch": "Při hledání <strong>\"$search\"</strong> nenalezeny žádné sady akcí.",
+  "command": "Příkaz",
+  "new": "Vytvořit novou sadu akcí OBS Websocketu",
+  "actions": "Akce",
   "name": {
-    "name": "Name"
+    "name": "Název"
   },
   "SetCurrentScene": {
     "name": "SetCurrentScene"
@@ -31,10 +31,10 @@
     "name": "SaveReplayBuffer"
   },
   "WaitMs": {
-    "name": "Wait X miliseconds"
+    "name": "Počkat X milisekund"
   },
   "Log": {
-    "name": "Log message"
+    "name": "Zaznamenat zprávu"
   },
   "StartRecording": {
     "name": "StartRecording"
