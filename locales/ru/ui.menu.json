@@ -86,5 +86,6 @@
   "texttospeech": "Текст для озвучивания",
   "lastfm": "Last.fm",
   "pubg": "PLAYERUNKNOWN'S BATTLEGROUNDS",
-  "levels": "Levels"
+  "levels": "Levels",
+  "obswebsocket": "OBS Websocket"
 }
