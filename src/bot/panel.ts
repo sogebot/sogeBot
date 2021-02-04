@@ -7,6 +7,7 @@ import express from 'express';
 import RateLimit from 'express-rate-limit';
 import gitCommitInfo from 'git-commit-info';
 import _, { isEqual } from 'lodash';
+import sanitize from 'sanitize-filename';
 import {
   getConnection, getManager, getRepository, IsNull,
 } from 'typeorm';
@@ -113,7 +114,7 @@ export const init = () => {
   // static routing
   app?.use('/dist', express.static(path.join(__dirname, '..', 'public', 'dist')));
   app?.get('/dist/*/*.js', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', req.url + '.gz'), {
+    res.sendFile(path.join(__dirname, '..', 'public', sanitize(req.url + '.gz')), {
       headers: {
         'Content-Type':     'text/javascript',
         'Content-Encoding': 'gzip',
@@ -121,7 +122,7 @@ export const init = () => {
     });
   });
   app?.get('/dist/*/*.map', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', req.url + '.gz'), {
+    res.sendFile(path.join(__dirname, '..', 'public', sanitize(req.url + '.gz')), {
       headers: {
         'Content-Type':     'text/javascript',
         'Content-Encoding': 'gzip',
@@ -129,7 +130,7 @@ export const init = () => {
     });
   });
   app?.get('/dist/*/*.css', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', req.url + '.gz'), {
+    res.sendFile(path.join(__dirname, '..', 'public', sanitize(req.url + '.gz')), {
       headers: {
         'Content-Type':     'text/css',
         'Content-Encoding': 'gzip',
@@ -146,7 +147,7 @@ export const init = () => {
     res.sendFile(path.join(__dirname, '..', 'public', 'login.html'));
   });
   app?.get('/oauth/:page', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'oauth-' + req.params.page + '.html'));
+    res.sendFile(path.join(__dirname, '..', 'public', 'oauth-' + sanitize(req.params.page) + '.html'));
   });
   app?.get('/overlays/:overlay', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'overlays.html'));
@@ -155,7 +156,7 @@ export const init = () => {
     res.sendFile(path.join(__dirname, '..', 'public', 'overlays.html'));
   });
   app?.get('/custom/:custom', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'custom', req.params.custom + '.html'));
+    res.sendFile(path.join(__dirname, '..', 'public', 'custom', sanitize(req.params.custom) + '.html'));
   });
   app?.get('/public/', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'public.html'));
