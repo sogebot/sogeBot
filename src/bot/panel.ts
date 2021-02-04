@@ -4,36 +4,37 @@ import path from 'path';
 
 import bodyParser from 'body-parser';
 import express from 'express';
+import RateLimit from 'express-rate-limit';
 import gitCommitInfo from 'git-commit-info';
 import _, { isEqual } from 'lodash';
 import {
-  getConnection, getManager, getRepository, IsNull, 
+  getConnection, getManager, getRepository, IsNull,
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 
 import { CacheTitles, CacheTitlesInterface } from './database/entity/cacheTitles';
 import {
-  Dashboard, DashboardInterface, Widget, 
+  Dashboard, DashboardInterface, Widget,
 } from './database/entity/dashboard';
 import { Translation } from './database/entity/translation';
 import { TwitchTag, TwitchTagInterface } from './database/entity/twitch';
 import { User } from './database/entity/user';
 import {
-  chatMessagesAtStart, currentStreamTags, isStreamOnline, rawStatus, stats, streamStatusChangeSince, 
+  chatMessagesAtStart, currentStreamTags, isStreamOnline, rawStatus, stats, streamStatusChangeSince,
 } from './helpers/api';
 import { getOwnerAsSender } from './helpers/commons/getOwnerAsSender';
 import {
-  getURL, getValueOf, isVariableSet, postURL, 
+  getURL, getValueOf, isVariableSet, postURL,
 } from './helpers/customvariables';
 import { getIsBotStarted } from './helpers/database';
 import { flatten } from './helpers/flatten';
 import { setValue } from './helpers/general';
 import { getLang } from './helpers/locales';
 import {
-  getDEBUG, info, setDEBUG, 
+  getDEBUG, info, setDEBUG,
 } from './helpers/log';
 import {
-  app, ioServer, menu, menuPublic, server, serverSecure, setApp, setServer, widgets, 
+  app, ioServer, menu, menuPublic, server, serverSecure, setApp, setServer, widgets,
 } from './helpers/panel';
 import { socketsConnectedDec, socketsConnectedInc } from './helpers/panel/';
 import { errors, warns } from './helpers/panel/alerts';
@@ -57,8 +58,15 @@ import webhooks from './webhooks';
 const port = process.env.PORT ?? '20000';
 const secureport = process.env.SECUREPORT ?? '20443';
 
+const limiter = RateLimit({
+  windowMs: 5 * 60 * 1000,
+  max:      100,
+  message:  'Too many requests from this IP, please try again after several minutes.',
+});
+
 export const init = () => {
   setApp(express());
+  app?.use(limiter);
   app?.use(bodyParser.json());
   app?.use(bodyParser.urlencoded({ extended: true }));
   setServer();
@@ -163,7 +171,7 @@ export const init = () => {
   });
 
   menu.push({
-    category: 'main', name: 'dashboard', id: 'dashboard', this: null, 
+    category: 'main', name: 'dashboard', id: 'dashboard', this: null,
   });
 
   setTimeout(() => {
@@ -312,7 +320,7 @@ export const init = () => {
           .into(CacheTitles)
           .values([
             {
-              game: data.game, title: data.title, timestamp: Date.now(), 
+              game: data.game, title: data.title, timestamp: Date.now(),
             },
           ])
           .execute();
@@ -438,7 +446,7 @@ export const init = () => {
 
     adminEndpoint('/', 'panel::dashboards::remove', async (opts, cb) => {
       await getRepository(Dashboard).delete({
-        userId: opts.userId, type: opts.type, id: opts.id, 
+        userId: opts.userId, type: opts.type, id: opts.id,
       });
       await getRepository(Widget).delete({ dashboardId: IsNull() });
       cb(null);
@@ -446,7 +454,7 @@ export const init = () => {
 
     adminEndpoint('/', 'panel::dashboards::create', async (opts, cb) => {
       cb(null, await getRepository(Dashboard).save({
-        name: opts.name, createdAt: Date.now(), id: uuid(), userId: opts.userId, type: 'admin', 
+        name: opts.name, createdAt: Date.now(), id: uuid(), userId: opts.userId, type: 'admin',
       }));
     });
 
@@ -488,7 +496,7 @@ export const init = () => {
           return true;
         }
         setValue({
-          sender: getOwnerAsSender(), createdAt: 0, command: '', parameters: value + ' ' + index, attr: { quiet: data._quiet }, 
+          sender: getOwnerAsSender(), createdAt: 0, command: '', parameters: value + ' ' + index, attr: { quiet: data._quiet },
         });
       });
     });
@@ -577,7 +585,7 @@ export const init = () => {
 
     adminEndpoint('/', 'menu', (cb) => {
       cb(null, menu.map((o) => ({
-        category: o.category, name: o.name, id: o.id, enabled: o.this ? o.this.enabled : true, 
+        category: o.category, name: o.name, id: o.id, enabled: o.this ? o.this.enabled : true,
       })));
     });
 
