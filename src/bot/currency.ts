@@ -11,11 +11,11 @@ import * as constants from './constants';
 import { UserTip } from './database/entity/user';
 import { settings, ui } from './decorators';
 import {
-  onChange, onLoad, onStartup, 
+  onChange, onLoad, onStartup,
 } from './decorators/on';
 import { mainCurrency } from './helpers/currency';
 import {
-  error, info, warning, 
+  error, info, warning,
 } from './helpers/log';
 
 class Currency extends Core {
@@ -102,7 +102,7 @@ class Currency extends Core {
       info(chalk.yellow('CURRENCY:') + ' fetching rates');
       // base is always CZK
       // using IP because dns may fail occasionally, 193.85.3.250 => cnb.cz
-      const result = await axios.get('http://193.85.3.250/cs/financni_trhy/devizovy_trh/kurzy_devizoveho_trhu/denni_kurz.txt', { httpsAgent: new https.Agent({ rejectUnauthorized: false }) });
+      const result = await axios.get('http://193.85.3.250/cs/financni_trhy/devizovy_trh/kurzy_devizoveho_trhu/denni_kurz.txt', { httpsAgent: new https.Agent({ rejectUnauthorized: false }) }); // lgtm[js/disabling-certificate-validation]
 
       let linenum = 0;
       for (const line of result.data.toString().split('\n')) {

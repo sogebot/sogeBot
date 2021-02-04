@@ -152,7 +152,7 @@ export default class randomizerList extends Vue {
           }
           console.groupCollapsed('generic::getAll')
           console.debug(data);
-          console.groupEnd;
+          console.groupEnd();
           this.items = data;
           done();
         })

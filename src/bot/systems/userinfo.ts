@@ -149,7 +149,7 @@ class UserInfo extends System {
         }
         await fetchAccountAge(Number(userId));
         if (!retry) {
-          return this.age(opts, retry = true);
+          return this.age(opts, true);
         } else {
           throw new Error('retry');
         }
