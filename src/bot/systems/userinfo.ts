@@ -5,7 +5,7 @@ import { dateDiff } from '../commons';
 import currency from '../currency';
 import { User } from '../database/entity/user';
 import {
-  command, default_permission, settings, ui, 
+  command, default_permission, settings, ui,
 } from '../decorators';
 import Expects from '../expects';
 import general from '../general';
@@ -84,7 +84,7 @@ class UserInfo extends System {
         response: prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.time', {
           username,
           diff: output.join(', '),
-        }), ...opts, 
+        }), ...opts,
       }];
     }
   }
@@ -104,7 +104,7 @@ class UserInfo extends System {
           username,
           subCumulativeMonths,
           subCumulativeMonthsName: getLocalizedName(subCumulativeMonths || 0, translate('core.months')),
-        }), ...opts, 
+        }), ...opts,
       }];
     } else {
       const units = ['years', 'months', 'days', 'hours', 'minutes'] as const;
@@ -128,7 +128,7 @@ class UserInfo extends System {
           subStreak,
           subStreakMonthsName:     getLocalizedName(subStreak || 0, translate('core.months')),
           diff:                    output.join(', '),
-        }), ...opts, 
+        }), ...opts,
       }];
     }
   }
@@ -176,7 +176,7 @@ class UserInfo extends System {
         response: prepare('age.success.' + (opts.sender.username === username.toLowerCase() ? 'withoutUsername' : 'withUsername'), {
           username,
           diff: output.join(', '),
-        }), ...opts, 
+        }), ...opts,
       }];
     }
   }
@@ -192,7 +192,7 @@ class UserInfo extends System {
         return [{
           response: translate('lastseen.success.time')
             .replace(/\$username/g, username)
-            .replace(/\$when/g, dayjs(user.seenAt).tz(timezone).format(this.lastSeenFormat)), ...opts, 
+            .replace(/\$when/g, dayjs(user.seenAt).tz(timezone).format(this.lastSeenFormat)), ...opts,
         }];
       }
     } catch (e) {
@@ -266,7 +266,7 @@ class UserInfo extends System {
       if (message.includes('$points')) {
         const idx = message.indexOf('$points');
         if (points.enabled) {
-          message[idx] = user.points + ' ' + await getPointsName(user.points);
+          message[idx] = user.points + ' ' + getPointsName(user.points);
         } else {
           message.splice(idx, 1);
         }
@@ -311,7 +311,7 @@ class UserInfo extends System {
         return response;
       } else {
         return [{
-          response, sender: opts.sender, attr: opts.attr, 
+          response, sender: opts.sender, attr: opts.attr,
         }];
       }
     } catch (e) {
@@ -341,7 +341,7 @@ class UserInfo extends System {
       }, true) as string;
       return [
         {
-          response: response.replace('$sender', '$touser'), sender: opts.sender, attr: { ...opts.attr, param: username }, 
+          response: response.replace('$sender', '$touser'), sender: opts.sender, attr: { ...opts.attr, param: username },
         },
       ];
     } catch (e) {

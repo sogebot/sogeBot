@@ -4,7 +4,7 @@ import { getRepository } from 'typeorm';
 import { Duel as DuelEntity, DuelInterface } from '../database/entity/duel';
 import { User } from '../database/entity/user';
 import {
-  command, persistent, settings, 
+  command, persistent, settings,
 } from '../decorators';
 import { onStartup } from '../decorators/on';
 import { announce, prepare } from '../helpers/commons';
@@ -87,10 +87,10 @@ class Duel extends Game {
       const probability = winnerUser.tickets / (total / 100);
 
       const m = prepare(users.length === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
-        pointsName:  await getPointsName(total),
+        pointsName:  getPointsName(total),
         points:      total,
         probability: _.round(probability, 2),
-        ticketsName: await getPointsName(winnerUser.tickets),
+        ticketsName: getPointsName(winnerUser.tickets),
         tickets:     winnerUser.tickets,
         winner:      winnerUser.username,
       });
@@ -116,7 +116,7 @@ class Duel extends Game {
       response: prepare('gambling.duel.bank', {
         command:    this.getCommand('!duel'),
         points:     bank,
-        pointsName: await getPointsName(bank),
+        pointsName: getPointsName(bank),
       }),
       ...opts,
     }];
@@ -173,7 +173,7 @@ class Duel extends Game {
           const response = prepare('gambling.fightme.cooldown', {
             minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (Date.now() - new Date(this._cooldown).getTime())) / 1000 / 60), translate('core.minutes')),
             cooldown:    Math.round(((cooldown * 1000) - (Date.now() - new Date(this._cooldown).getTime())) / 1000 / 60),
-            command:     opts.command, 
+            command:     opts.command,
           });
           return [{ response, ...opts }];
         }
@@ -187,7 +187,7 @@ class Duel extends Game {
           sender:      opts.sender,
           minutesName: getLocalizedName(5, translate('core.minutes')),
           minutes:     this.duration,
-          command:     opts.command, 
+          command:     opts.command,
         });
         // if we have discord, we want to send notice on twitch channel as well
         announce(response, 'duel');
@@ -195,7 +195,7 @@ class Duel extends Game {
 
       const tickets = (await getRepository(DuelEntity).findOne({ id: Number(opts.sender.userId) }))?.tickets ?? 0;
       const response = prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
-        pointsName: await getPointsName(tickets),
+        pointsName: getPointsName(tickets),
         points:     tickets,
       });
       responses.push({ response, ...opts });
@@ -205,24 +205,24 @@ class Duel extends Game {
           responses.push({ response: translate('gambling.duel.notEnoughOptions'), ...opts });
           break;
         case ERROR_ZERO_BET:
-          responses.push({ response: prepare('gambling.duel.zeroBet', { pointsName: await getPointsName(0) }), ...opts });
+          responses.push({ response: prepare('gambling.duel.zeroBet', { pointsName: getPointsName(0) }), ...opts });
           break;
         case ERROR_NOT_ENOUGH_POINTS:
           responses.push({
             response: prepare('gambling.duel.notEnoughPoints', {
-              pointsName: await getPointsName(bet || 0),
+              pointsName: getPointsName(bet || 0),
               points:     bet,
-            }), ...opts, 
+            }), ...opts,
           });
           break;
         case ERROR_MINIMAL_BET:
           bet = this.minimalBet;
           responses.push({
             response: prepare('gambling.duel.lowerThanMinimalBet', {
-              pointsName: await getPointsName(bet),
+              pointsName: getPointsName(bet),
               points:     bet,
               command:    opts.command,
-            }), ...opts, 
+            }), ...opts,
           });
           break;
         /* istanbul ignore next */

@@ -9,10 +9,10 @@ import { getRepository } from 'typeorm';
 import { HOUR, SECOND } from '../constants';
 import { SpotifySongBan } from '../database/entity/spotify';
 import {
-  command, default_permission, persistent, settings, ui, 
+  command, default_permission, persistent, settings, ui,
 } from '../decorators';
 import {
-  onChange, onLoad, onStartup, 
+  onChange, onLoad, onStartup,
 } from '../decorators/on';
 import Expects from '../expects';
 import { isStreamOnline } from '../helpers/api';
@@ -111,7 +111,7 @@ class Spotify extends Integration {
   onStartup() {
     this.addWidget('spotify', 'widget-title-spotify', 'fab fa-spotify');
     this.addMenu({
-      category: 'manage', name: 'spotifybannedsongs', id: 'manage/spotify/bannedsongs', this: this, 
+      category: 'manage', name: 'spotifybannedsongs', id: 'manage/spotify/bannedsongs', this: this,
     });
 
     this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
@@ -199,7 +199,7 @@ class Spotify extends Integration {
         return [{
           response: prepare('integrations.spotify.return-one-song-from-history', {
             artists: latestSong.artists, artist: latestSong.artist, uri: latestSong.uri, name: latestSong.song,
-          }), ...opts, 
+          }), ...opts,
         }];
       } else {
         // return songs in desc order (excl. current song)
@@ -243,7 +243,7 @@ class Spotify extends Integration {
         headers: { 'Authorization': 'Bearer ' + this.client.getAccessToken() },
       });
       ioServer?.emit('api.stats', {
-        method: 'POST', data: skipResponse.data, timestamp: Date.now(), call: 'spotify::skip', api: 'other', endpoint: 'https://api.spotify.com/v1/me/player/next', code: skipResponse.status, 
+        method: 'POST', data: skipResponse.data, timestamp: Date.now(), call: 'spotify::skip', api: 'other', endpoint: 'https://api.spotify.com/v1/me/player/next', code: skipResponse.status,
       });
     }
     return [];
@@ -325,13 +325,13 @@ class Spotify extends Integration {
           this.client.setAccessToken(data.body.access_token);
           this.retry.IRefreshToken = 0;
           ioServer?.emit('api.stats', {
-            method: 'GET', data: data.body, timestamp: Date.now(), call: 'spotify::refreshToken', api: 'other', endpoint: 'n/a', code: 200, 
+            method: 'GET', data: data.body, timestamp: Date.now(), call: 'spotify::refreshToken', api: 'other', endpoint: 'n/a', code: 200,
           });
         }
       } catch (e) {
         this.retry.IRefreshToken++;
         ioServer?.emit('api.stats', {
-          method: 'GET', data: e.message, timestamp: Date.now(), call: 'spotify::refreshToken', api: 'other', endpoint: 'n/a', code: 500, 
+          method: 'GET', data: e.message, timestamp: Date.now(), call: 'spotify::refreshToken', api: 'other', endpoint: 'n/a', code: 500,
         });
         info(chalk.yellow('SPOTIFY: ') + 'Refreshing access token failed ' + (this.retry.IRefreshToken > 0 ? 'retrying #' + this.retry.IRefreshToken : ''));
       }
@@ -376,7 +376,7 @@ class Spotify extends Integration {
           headers: { 'Authorization': 'Bearer ' + this.client.getAccessToken() },
         });
         ioServer?.emit('api.stats', {
-          method: 'GET', data: response.data, timestamp: Date.now(), call: 'spotify::addBan', api: 'other', endpoint: response.headers.url, code: response.status, 
+          method: 'GET', data: response.data, timestamp: Date.now(), call: 'spotify::addBan', api: 'other', endpoint: response.headers.url, code: response.status,
         });
 
         const track = response.data as SpotifyTrack;
@@ -388,7 +388,7 @@ class Spotify extends Integration {
           addUIError({ name: 'Spotify Ban Import', message: 'Something went wrong with banning song. Check your spotifyURI.' });
         }
         ioServer?.emit('api.stats', {
-          method: 'GET', data: e.response, timestamp: Date.now(), call: 'spotify::addBan', api: 'other', endpoint: e.response.headers.url, code: e.response?.status ?? 'n/a', 
+          method: 'GET', data: e.response, timestamp: Date.now(), call: 'spotify::addBan', api: 'other', endpoint: e.response.headers.url, code: e.response?.status ?? 'n/a',
         });
       }
       if (cb) {
@@ -566,7 +566,7 @@ class Spotify extends Integration {
       return [{
         response: prepare('integrations.spotify.song-unbanned', {
           artist: songToUnban.artists[0], uri: songToUnban.spotifyUri, name: songToUnban.title,
-        }), ...opts, 
+        }), ...opts,
       }];
     } catch (e) {
       return [{ response: prepare('integrations.spotify.song-not-found-in-banlist', { uri: opts.parameters }), ...opts }];
@@ -593,7 +593,7 @@ class Spotify extends Integration {
       return [{
         response: prepare('integrations.spotify.song-banned', {
           artists: currentSong.artists, artist: currentSong.artist, uri: currentSong.uri, name: currentSong.song,
-        }), ...opts, 
+        }), ...opts,
       }];
     }
   }
@@ -638,7 +638,7 @@ class Spotify extends Integration {
           headers: { 'Authorization': 'Bearer ' + this.client.getAccessToken() },
         });
         ioServer?.emit('api.stats', {
-          method: response.config.method?.toUpperCase(), data: response.data, timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: response.config.url, code: response.status, 
+          method: response.config.method?.toUpperCase(), data: response.data, timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: response.config.url, code: response.status,
         });
 
         const track = response.data as SpotifyTrack;
@@ -646,13 +646,13 @@ class Spotify extends Integration {
           return [{
             response: prepare('integrations.spotify.song-requested', {
               name: track.name, artist: track.artists[0].name, artists: track.artists.map(o => o.name).join(', '),
-            }), ...opts, 
+            }), ...opts,
           }];
         } else {
           return [{
             response: prepare('integrations.spotify.cannot-request-song-is-banned', {
               name: track.name, artist: track.artists[0].name, artists: track.artists.map(o => o.name).join(', '),
-            }), ...opts, 
+            }), ...opts,
           }];
         }
       } else {
@@ -665,7 +665,7 @@ class Spotify extends Integration {
           },
         });
         ioServer?.emit('api.stats', {
-          method: response.config.method?.toUpperCase(), data: response.data, timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: response.config.url, code: response.status, 
+          method: response.config.method?.toUpperCase(), data: response.data, timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: response.config.url, code: response.status,
         });
 
         const track = (response.data.tracks.items[0] as SpotifyTrack);
@@ -682,7 +682,7 @@ class Spotify extends Integration {
         error(`${chalk.bgRed('SPOTIFY')}: you don't seem to have spotify PREMIUM.`);
       }
       ioServer?.emit('api.stats', {
-        method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, 
+        method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response?.data ?? 'n/a',
       });
 
       return [{ response: prepare('integrations.spotify.song-not-found'), ...opts }];
@@ -703,7 +703,7 @@ class Spotify extends Integration {
           headers: { 'Authorization': 'Bearer ' + this.client.getAccessToken() },
         });
         ioServer?.emit('api.stats', {
-          method: 'POST', data: queueResponse.data, timestamp: Date.now(), call: 'spotify::queue', api: 'other', endpoint: 'https://api.spotify.com/v1/me/player/queue?uri=' + uri, code: queueResponse.status, 
+          method: 'POST', data: queueResponse.data, timestamp: Date.now(), call: 'spotify::queue', api: 'other', endpoint: 'https://api.spotify.com/v1/me/player/queue?uri=' + uri, code: queueResponse.status,
         });
         return true;
       } catch (e) {

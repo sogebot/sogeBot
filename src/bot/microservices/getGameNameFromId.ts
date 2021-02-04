@@ -3,7 +3,7 @@ import { getRepository } from 'typeorm';
 
 import { CacheGames } from '../database/entity/cacheGames';
 import {
-  calls, emptyRateLimit, getClientId, getToken, setRateLimit, stats, 
+  calls, emptyRateLimit, getClientId, getToken, setRateLimit, stats,
 } from '../helpers/api';
 import { error, warning } from '../helpers/log';
 import { ioServer } from '../helpers/panel';
@@ -35,7 +35,7 @@ async function getGameNameFromId (id: number) {
     // save remaining api calls
     setRateLimit('bot', request.headers);
     ioServer?.emit('api.stats', {
-      method: 'GET', data: request.data, timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, 
+      method: 'GET', data: request.data, timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
     });
 
     // add id->game to cache
@@ -51,12 +51,12 @@ async function getGameNameFromId (id: number) {
     if (e.isAxiosError) {
       error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
       ioServer?.emit('api.stats', {
-        method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: e.config.url, code: e.response.status ?? 'n/a', data: e.response.data, remaining: calls.bot, 
+        method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: e.config.url, code: e.response.status ?? 'n/a', data: e.response?.data ?? 'n/a', remaining: calls.bot,
       });
     } else {
       error(e.stack);
       ioServer?.emit('api.stats', {
-        method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: e.config.url, code: 'n/a', data: e.stack, remaining: calls.bot, 
+        method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getGameNameFromId', api: 'helix', endpoint: e.config.url, code: 'n/a', data: e.stack, remaining: calls.bot,
       });
     }
     return stats.value.currentGame;

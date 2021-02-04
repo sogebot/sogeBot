@@ -261,7 +261,7 @@ class Top extends System {
         switch (type) {
           case TYPE.TIME:
             message += Intl.NumberFormat(general.lang, {
-              style: 'unit', unit: 'hour', minimumFractionDigits: 1, maximumFractionDigits: 1, 
+              style: 'unit', unit: 'hour', minimumFractionDigits: 1, maximumFractionDigits: 1,
             }).format(user.value / 1000 / 60 / 60);
             break;
           case TYPE.SUBMONTHS:
@@ -271,7 +271,7 @@ class Top extends System {
             message += Intl.NumberFormat(general.lang, { style: 'currency', currency: mainCurrency.value }).format(user.value);
             break;
           case TYPE.POINTS:
-            message += user.value + ' ' + await getPointsName(user.value);
+            message += user.value + ' ' + getPointsName(user.value);
             break;
           case TYPE.MESSAGES:
           case TYPE.BITS:

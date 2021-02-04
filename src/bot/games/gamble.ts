@@ -3,7 +3,7 @@ import { getRepository } from 'typeorm';
 
 import { User } from '../database/entity/user';
 import {
-  command, permission_settings, persistent, settings, 
+  command, permission_settings, persistent, settings,
 } from '../decorators';
 import { prepare } from '../helpers/commons';
 import { error } from '../helpers/log';
@@ -84,9 +84,9 @@ class Gamble extends Game {
         await getRepository(User).increment({ userId: Number(opts.sender.userId) }, 'points', incrementPointsWithJackpot);
         const currentPointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
         message = prepare('gambling.gamble.winJackpot', {
-          pointsName:  await getPointsName(currentPointsOfUser),
+          pointsName:  getPointsName(currentPointsOfUser),
           points:      currentPointsOfUser,
-          jackpotName: await getPointsName(this.jackpotValue),
+          jackpotName: getPointsName(this.jackpotValue),
           jackpot:     this.jackpotValue,
         });
         this.jackpotValue = 0;
@@ -94,7 +94,7 @@ class Gamble extends Game {
         await getRepository(User).increment({ userId: Number(opts.sender.userId) }, 'points', points * 2);
         const updatedPoints = await pointsSystem.getPointsOf(opts.sender.userId);
         message = prepare('gambling.gamble.win', {
-          pointsName: await getPointsName(updatedPoints),
+          pointsName: getPointsName(updatedPoints),
           points:     updatedPoints,
         });
       } else {
@@ -102,14 +102,14 @@ class Gamble extends Game {
           const currentPointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
           this.jackpotValue = Math.min(Math.ceil(this.jackpotValue + (points * (this.lostPointsAddedToJackpot / 100))), this.maxJackpotValue);
           message = prepare('gambling.gamble.loseWithJackpot', {
-            pointsName:  await getPointsName(currentPointsOfUser),
+            pointsName:  getPointsName(currentPointsOfUser),
             points:      currentPointsOfUser,
-            jackpotName: await getPointsName(this.jackpotValue),
+            jackpotName: getPointsName(this.jackpotValue),
             jackpot:     this.jackpotValue,
           });
         } else {
           message = prepare('gambling.gamble.lose', {
-            pointsName: await getPointsName(await pointsSystem.getPointsOf(opts.sender.userId)),
+            pointsName: getPointsName(await pointsSystem.getPointsOf(opts.sender.userId)),
             points:     await pointsSystem.getPointsOf(opts.sender.userId),
           });
         }
@@ -118,20 +118,20 @@ class Gamble extends Game {
     } catch (e) {
       if (e instanceof MinimalBetError) {
         message = prepare('gambling.gamble.lowerThanMinimalBet', {
-          pointsName: await getPointsName(Number(e.message)),
+          pointsName: getPointsName(Number(e.message)),
           points:     Number(e.message),
         });
         return [{ response: message, ...opts }];
       } else {
         switch (e.message) {
           case ERROR_ZERO_BET:
-            message = prepare('gambling.gamble.zeroBet', { pointsName: await getPointsName(0) });
+            message = prepare('gambling.gamble.zeroBet', { pointsName: getPointsName(0) });
             return [{ response: message, ...opts }];
           case ERROR_NOT_ENOUGH_OPTIONS:
             return [{ response: translate('gambling.gamble.notEnoughOptions'), ...opts }];
           case ERROR_NOT_ENOUGH_POINTS:
             message = prepare('gambling.gamble.notEnoughPoints', {
-              pointsName: await getPointsName(points ? Number(points) : 0),
+              pointsName: getPointsName(points ? Number(points) : 0),
               points:     points,
             });
             return [{ response: message, ...opts }];
@@ -150,7 +150,7 @@ class Gamble extends Game {
     if (this.enableJackpot) {
       message = prepare('gambling.gamble.currentJackpot', {
         command:    this.getCommand('!gamble'),
-        pointsName: await getPointsName(this.jackpotValue),
+        pointsName: getPointsName(this.jackpotValue),
         points:     this.jackpotValue,
       });
     } else {

@@ -8,7 +8,7 @@ import type { ResponseFilter } from '.';
 const price: ResponseFilter = {
   '(price)': async function (_variable, attr) {
     const cmd = await getRepository(Price).findOne({ command: attr.cmd, enabled: true });
-    return [price, await getPointsName(cmd?.price ?? 0)].join(' ');
+    return [price, getPointsName(cmd?.price ?? 0)].join(' ');
   },
 };
 

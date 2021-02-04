@@ -8,7 +8,7 @@ import * as constants from '../constants';
 import { Price as PriceEntity, PriceInterface } from '../database/entity/price';
 import { User } from '../database/entity/user';
 import {
-  command, default_permission, rollback, 
+  command, default_permission, rollback,
 } from '../decorators';
 import { parser } from '../decorators';
 import { prepare } from '../helpers/commons';
@@ -36,7 +36,7 @@ class Price extends System {
   constructor () {
     super();
     this.addMenu({
-      category: 'manage', name: 'price', id: 'manage/price/list', this: this, 
+      category: 'manage', name: 'price', id: 'manage/price/list', this: this,
     });
   }
 
@@ -97,7 +97,7 @@ class Price extends System {
       command: cmd, price: parseInt(argPrice, 10),
     });
     const response = prepare('price.price-was-set', {
-      command: cmd, amount: parseInt(argPrice, 10), pointsName: await getPointsName(price.price), 
+      command: cmd, amount: parseInt(argPrice, 10), pointsName: getPointsName(price.price),
     });
     return [{ response, ...opts }];
   }
@@ -170,7 +170,7 @@ class Price extends System {
     const haveEnoughPoints = availablePts >= removePts;
     if (!haveEnoughPoints) {
       const response = prepare('price.user-have-not-enough-points', {
-        amount: removePts, command: `${price.command}`, pointsName: await getPointsName(removePts), 
+        amount: removePts, command: `${price.command}`, pointsName: getPointsName(removePts),
       });
       parserReply(response, opts);
     } else {
