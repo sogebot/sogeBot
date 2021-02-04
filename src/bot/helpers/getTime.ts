@@ -6,7 +6,9 @@ export function getTime(time: null | number, isChat: boolean) {
   let minutes: string | number = 0;
   let seconds: string | number = 0;
   const now = time === null || !time
-    ? { days: 0, hours: 0, minutes: 0, seconds: 0 }
+    ? {
+      days: 0, hours: 0, minutes: 0, seconds: 0, 
+    }
     : timestampToObject(dayjs().valueOf() - dayjs(time).valueOf());
   if (isChat) {
     days = now.days > 0 ? now.days : '';
@@ -17,10 +19,12 @@ export function getTime(time: null | number, isChat: boolean) {
     if (days === '' && hours === '' && minutes === '' && seconds === '') {
       seconds = 1; // set seconds to 1 if everything else is missing
     }
-    return { days,
+    return {
+      days,
       hours,
       minutes,
-      seconds };
+      seconds, 
+    };
   } else {
     days = now.days > 0 ? now.days + 'd' : '';
     hours = now.hours >= 0 && now.hours < 10 ? '0' + now.hours + ':' : now.hours + ':';

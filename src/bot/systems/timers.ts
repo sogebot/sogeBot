@@ -35,16 +35,16 @@ class Timers extends System {
   constructor () {
     super();
 
-    this.addMenu({ category: 'manage', name: 'timers', id: 'manage/timers/list', this: this });
+    this.addMenu({
+      category: 'manage', name: 'timers', id: 'manage/timers/list', this: this, 
+    });
     this.init();
   }
 
   sockets () {
     adminEndpoint(this.nsp, 'generic::getAll', async (callback) => {
       try {
-        const timers = await getRepository(Timer).find({
-          relations: ['messages'],
-        });
+        const timers = await getRepository(Timer).find({ relations: ['messages'] });
         callback(null, timers);
       } catch(e) {
         callback(e, []);
@@ -54,9 +54,7 @@ class Timers extends System {
       try {
         const timer = await getRepository(Timer).findOne({
           relations: ['messages'],
-          where:     {
-            id,
-          },
+          where:     { id },
         });
         callback(null, timer);
       } catch (e) {
@@ -65,11 +63,7 @@ class Timers extends System {
     });
     adminEndpoint(this.nsp, 'generic::deleteById', async (id, callback) => {
       try {
-        const timer = await getRepository(Timer).findOne({
-          where: {
-            id,
-          },
-        });
+        const timer = await getRepository(Timer).findOne({ where: { id } });
         if (timer) {
           await getRepository(Timer).remove(timer);
         }
@@ -102,11 +96,11 @@ class Timers extends System {
       setTimeout(() => this.init(), 1000);
       return;
     }
-    const timers = await getRepository(Timer).find({
-      relations: ['messages'],
-    });
+    const timers = await getRepository(Timer).find({ relations: ['messages'] });
     for (const timer of timers) {
-      await getRepository(Timer).save({ ...timer, triggeredAtMessages: 0, triggeredAtTimestamp: Date.now() });
+      await getRepository(Timer).save({
+        ...timer, triggeredAtMessages: 0, triggeredAtTimestamp: Date.now(), 
+      });
     }
     this.check();
   }
@@ -192,10 +186,12 @@ class Timers extends System {
       triggeredAtMessages:  linesParsed,
       triggeredAtTimestamp: Date.now(),
     });
-    return [{ response: translate('timers.timer-was-set')
-      .replace(/\$name/g, name)
-      .replace(/\$messages/g, messages)
-      .replace(/\$seconds/g, seconds), ...opts }];
+    return [{
+      response: translate('timers.timer-was-set')
+        .replace(/\$name/g, name)
+        .replace(/\$messages/g, messages)
+        .replace(/\$seconds/g, seconds), ...opts, 
+    }];
   }
 
   @command('!timers unset')
@@ -226,8 +222,10 @@ class Timers extends System {
     try {
       const id = new Expects(opts.parameters).argument({ type: 'uuid', name: 'id' }).toArray()[0];
       await getRepository(TimerResponse).delete({ id });
-      return [{ response: translate('timers.response-deleted')
-        .replace(/\$id/g, id), ...opts }];
+      return [{
+        response: translate('timers.response-deleted')
+          .replace(/\$id/g, id), ...opts, 
+      }];
     } catch (e) {
       return [{ response: translate('timers.id-must-be-defined'), ...opts }];
     }
@@ -257,8 +255,10 @@ class Timers extends System {
       where:     { name },
     });
     if (!timer) {
-      return [{ response: translate('timers.timer-not-found')
-        .replace(/\$name/g, name), ...opts }];
+      return [{
+        response: translate('timers.timer-not-found')
+          .replace(/\$name/g, name), ...opts, 
+      }];
     }
 
     const item = await getRepository(TimerResponse).save({
@@ -268,10 +268,12 @@ class Timers extends System {
       timer:     timer,
     });
 
-    return [{ response: translate('timers.response-was-added')
-      .replace(/\$id/g, item.id)
-      .replace(/\$name/g, name)
-      .replace(/\$response/g, response), ...opts }];
+    return [{
+      response: translate('timers.response-was-added')
+        .replace(/\$id/g, item.id)
+        .replace(/\$name/g, name)
+        .replace(/\$response/g, response), ...opts, 
+    }];
   }
 
   @command('!timers list')
@@ -293,8 +295,10 @@ class Timers extends System {
       where:     { name },
     });
     if (!timer) {
-      return [{ response: translate('timers.timer-not-found')
-        .replace(/\$name/g, name), ...opts }];
+      return [{
+        response: translate('timers.timer-not-found')
+          .replace(/\$name/g, name), ...opts, 
+      }];
     }
     const responses: CommandResponse[] = [];
     responses.push({ response: translate('timers.responses-list').replace(/\$name/g, name), ...opts });
@@ -309,8 +313,12 @@ class Timers extends System {
   async toggle (opts: CommandOptions): Promise<CommandResponse[]> {
     // -name [name-of-timer] or -id [id-of-response]
     const [id, name] = new Expects(opts.parameters)
-      .argument({ type: 'uuid', name: 'id', optional: true })
-      .argument({ type: String, name: 'name', optional: true })
+      .argument({
+        type: 'uuid', name: 'id', optional: true, 
+      })
+      .argument({
+        type: String, name: 'name', optional: true, 
+      })
       .toArray();
 
     if ((_.isNil(id) && _.isNil(name)) || (!_.isNil(id) && !_.isNil(name))) {
@@ -324,8 +332,10 @@ class Timers extends System {
       }
 
       await getRepository(TimerResponse).save({ ...response, isEnabled: !response.isEnabled });
-      return [{ response: translate(!response.isEnabled ? 'timers.response-enabled' : 'timers.response-disabled')
-        .replace(/\$id/g, id), ...opts }];
+      return [{
+        response: translate(!response.isEnabled ? 'timers.response-enabled' : 'timers.response-disabled')
+          .replace(/\$id/g, id), ...opts, 
+      }];
     }
 
     if (!_.isNil(name)) {
@@ -335,8 +345,10 @@ class Timers extends System {
       }
 
       await getRepository(Timer).save({ ...timer, isEnabled: !timer.isEnabled });
-      return [{ response: translate(!timer.isEnabled ? 'timers.timer-enabled' : 'timers.timer-disabled')
-        .replace(/\$name/g, name), ...opts }];
+      return [{
+        response: translate(!timer.isEnabled ? 'timers.timer-enabled' : 'timers.timer-disabled')
+          .replace(/\$name/g, name), ...opts, 
+      }];
     }
     return [];
   }

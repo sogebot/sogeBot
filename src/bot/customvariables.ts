@@ -20,7 +20,9 @@ class CustomVariables extends Core {
 
   @onStartup()
   onStartup() {
-    this.addMenu({ category: 'registry', name: 'custom-variables', id: 'registry.customVariables/list', this: null });
+    this.addMenu({
+      category: 'registry', name: 'custom-variables', id: 'registry.customVariables/list', this: null, 
+    });
     this.checkIfCacheOrRefresh();
   }
 
@@ -35,7 +37,9 @@ class CustomVariables extends Core {
         if (!item) {
           throw new Error('Variable not found');
         }
-        const newCurrentValue = await runScript(item.evalValue, { sender: null, _current: item.currentValue, isUI: true });
+        const newCurrentValue = await runScript(item.evalValue, {
+          sender: null, _current: item.currentValue, isUI: true, 
+        });
         const runAt = Date.now();
         cb(null, await getRepository(Variable).save({
           ...item, currentValue: newCurrentValue, runAt,
@@ -47,7 +51,11 @@ class CustomVariables extends Core {
     adminEndpoint(this.nsp, 'customvariables::testScript', async (opts, cb) => {
       let returnedValue;
       try {
-        returnedValue = await runScript(opts.evalValue, { isUI: true, _current: opts.currentValue, sender: { username: 'testuser', userId: 0, source: 'twitch' } });
+        returnedValue = await runScript(opts.evalValue, {
+          isUI:     true, _current: opts.currentValue, sender:   {
+            username: 'testuser', userId: 0, source: 'twitch', 
+          }, 
+        });
       } catch (e) {
         cb(e.stack, null);
       }
@@ -119,7 +127,9 @@ class CustomVariables extends Core {
         item.runAt = isNil(item.runAt) ? 0 : item.runAt;
         const shouldRun = item.runEvery > 0 && Date.now() - new Date(item.runAt).getTime() >= item.runEvery;
         if (shouldRun) {
-          const newValue = await runScript(item.evalValue, { _current: item.currentValue, sender: getBot(), isUI: false });
+          const newValue = await runScript(item.evalValue, {
+            _current: item.currentValue, sender: getBot(), isUI: false, 
+          });
           item.runAt = Date.now();
           item.currentValue = newValue;
           await getRepository(Variable).save(item);

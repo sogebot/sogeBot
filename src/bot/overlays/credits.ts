@@ -81,15 +81,21 @@ class Credits extends Overlay {
   @ui({ type: 'selector', values: ['stream', 'custom'] })
   cClipsPeriod: 'stream' | 'custom' = 'custom';
   @settings('customization')
-  @ui({ type: 'number-input', step: '1', min: '0' })
+  @ui({
+    type: 'number-input', step: '1', min: '0', 
+  })
   cClipsCustomPeriodInDays = 31;
   @settings('customization')
-  @ui({ type: 'number-input', step: '1', min: '0' })
+  @ui({
+    type: 'number-input', step: '1', min: '0', 
+  })
   cClipsNumOfClips = 3;
   @settings('customization')
   cClipsShouldPlay = true;
   @settings('customization')
-  @ui({ type: 'number-input', step: '1', min: '0', max: '100' })
+  @ui({
+    type: 'number-input', step: '1', min: '0', max: '100', 
+  })
   cClipsVolume = 20;
 
   sockets () {
@@ -99,12 +105,8 @@ class Credits extends Overlay {
       const events: (EventListInterface & { values?: {
         currency: currency; amount: number;
       };})[] = await getRepository(EventList).find({
-        order: {
-          timestamp: 'DESC',
-        },
-        where: {
-          timestamp,
-        },
+        order: { timestamp: 'DESC' },
+        where: { timestamp },
       });
 
       // change tips if neccessary for aggregated events (need same currency)
@@ -154,10 +156,12 @@ class Credits extends Overlay {
             tip:              this.cShowTips,
           },
         },
-        streamer:    oauth.broadcasterUsername,
-        game:        stats.value.currentGame,
-        title:       stats.value.currentTitle,
-        clips:       this.cShowClips ? await api.getTopClips({ period: this.cClipsPeriod, days: this.cClipsCustomPeriodInDays, first: this.cClipsNumOfClips }) : [],
+        streamer: oauth.broadcasterUsername,
+        game:     stats.value.currentGame,
+        title:    stats.value.currentTitle,
+        clips:    this.cShowClips ? await api.getTopClips({
+          period: this.cClipsPeriod, days: this.cClipsCustomPeriodInDays, first: this.cClipsNumOfClips, 
+        }) : [],
         events,
         customTexts: this.cCustomTextsValues,
         social:      this.cSocialValues,

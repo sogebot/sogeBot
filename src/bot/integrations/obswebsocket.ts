@@ -4,13 +4,16 @@ import { getRepository } from 'typeorm';
 import { SECOND } from '../constants';
 import { OBSWebsocket as OBSWebsocketEntity, OBSWebsocketInterface } from '../database/entity/obswebsocket';
 import {
-  command, default_permission, settings, ui, 
+  command, default_permission, settings, ui,
 } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
+import events from '../events';
 import Expects from '../expects';
+import { eventEmitter } from '../helpers/events';
 import {
   error, info, warning,
 } from '../helpers/log';
+import { switchScenes } from '../helpers/obswebsocket/listeners';
 import { listScenes } from '../helpers/obswebsocket/scenes';
 import {
   getSourcesList, getSourceTypesList, Source, Type,
@@ -19,7 +22,7 @@ import { taskRunner } from '../helpers/obswebsocket/taskrunner';
 import { ioServer } from '../helpers/panel';
 import { ParameterError } from '../helpers/parameterError';
 import { defaultPermissions } from '../helpers/permissions';
-import { adminEndpoint } from '../helpers/socket';
+import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { translate } from '../translate';
 import Integration from './_interface';
 
@@ -49,6 +52,34 @@ class OBSWebsocket extends Integration {
     this.initOBSWebsocket();
   }
 
+  @onStartup()
+  addEvent() {
+    if (typeof events === 'undefined') {
+      setTimeout(() => this.addEvent(), 1000);
+    } else {
+      events.supportedEventsList.push({
+        id:          'obs-scene-changed',
+        variables:   [ 'sceneName' ],
+        definitions: { linkFilter: '' },
+        check:       this.eventIsProperlyFiltered,
+      },
+      );
+    }
+  }
+  protected async eventIsProperlyFiltered(event: any, attributes: Events.Attributes): Promise<boolean> {
+    const isDirect = attributes.isDirect;
+    const isTriggeredByCorrectOverlay = (function triggeredByCorrectOverlayCheck () {
+      const match = new RegExp('[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}').exec(attributes.linkFilter);
+      if (match) {
+        return match[0] === event.definitions.linkFilter
+          || attributes.linkFilter === event.definitions.linkFilter;
+      } else {
+        return false;
+      }
+    })();
+    return isDirect || isTriggeredByCorrectOverlay;
+  }
+
   async initOBSWebsocket(isHeartBeat = false) {
     obs.disconnect();
     if (this.enabled) {
@@ -63,6 +94,10 @@ class OBSWebsocket extends Integration {
             await obs.connect({ address: this.address, password: this.password });
           }
           info(isHeartBeat ? 'OBSWEBSOCKET: Reconnected OK!' : 'OBSWEBSOCKET: Connected OK!');
+
+          // add listeners
+          switchScenes(obs);
+
           this.reconnecting = false;
           this.enableHeartBeat = true;
         } catch (e) {
@@ -91,7 +126,9 @@ class OBSWebsocket extends Integration {
 
   @onStartup()
   initialize() {
-    this.addMenu({ category: 'registry', name: 'obswebsocket', id: 'registry/obswebsocket/list', this: null });
+    this.addMenu({
+      category: 'registry', name: 'obswebsocket', id: 'registry/obswebsocket/list', this: null,
+    });
   }
 
   @onStartup()
@@ -113,6 +150,14 @@ class OBSWebsocket extends Integration {
   }
 
   sockets() {
+    publicEndpoint(this.nsp, 'integration::obswebsocket::event', (opts) => {
+      eventEmitter.emit(opts.type, {
+        sceneName:  opts.sceneName,
+        isDirect:   false,
+        linkFilter: opts.location,
+      });
+    });
+
     adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
         cb(null, await getRepository(OBSWebsocketEntity).find());

@@ -12,6 +12,7 @@ import { taskRunner } from 'src/bot/helpers/obswebsocket/taskrunner'
 import type { OBSWebsocketInterface } from 'src/bot/database/entity/obswebsocket';
 import { getSourcesList, getSourceTypesList } from 'src/bot/helpers/obswebsocket/sources';
 import { listScenes } from 'src/bot/helpers/obswebsocket/scenes';
+import { switchScenes } from 'src/bot/helpers/obswebsocket/listeners';
 
 type Props = {
   opts: {
@@ -87,6 +88,9 @@ export default defineComponent({
         }
         console.error('Unknown function');
       });
+
+      // add listeners
+      switchScenes(obs, socket)
     })
   }
 });

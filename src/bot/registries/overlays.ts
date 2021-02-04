@@ -7,7 +7,9 @@ import Registry from './_interface';
 class Overlays extends Registry {
   constructor() {
     super();
-    this.addMenu({ category: 'registry', name: 'overlays', id: 'registry/overlays/list', this: null });
+    this.addMenu({
+      category: 'registry', name: 'overlays', id: 'registry/overlays/list', this: null, 
+    });
   }
 
   sockets () {

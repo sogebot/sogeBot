@@ -191,8 +191,12 @@ export interface AlertResubInterface extends CommonSettingsInterface {
 }
 
 export const CommonSettingsSchema = {
-  id:                   { type: 'uuid', primary: true, generated: 'uuid' } as EntitySchemaColumnOptions,
-  alertId:              { nullable: true, name: 'alertId', type: String } as EntitySchemaColumnOptions,
+  id: {
+    type: 'uuid', primary: true, generated: 'uuid', 
+  } as EntitySchemaColumnOptions,
+  alertId: {
+    nullable: true, name: 'alertId', type: String, 
+  } as EntitySchemaColumnOptions,
   enabled:              { type: Boolean } as EntitySchemaColumnOptions,
   title:                { type: String } as EntitySchemaColumnOptions,
   variantAmount:        { type: Number } as EntitySchemaColumnOptions,
@@ -220,8 +224,12 @@ export const CommonSettingsSchema = {
 export const Alert = new EntitySchema<Readonly<Required<AlertInterface>>>({
   name:    'alert',
   columns: {
-    id:                        { type: 'uuid', primary: true, generated: 'uuid' },
-    updatedAt:                 { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
+    updatedAt: {
+      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0, 
+    },
     name:                      { type: String },
     alertDelayInMs:            { type: Number },
     profanityFilterType:       { type: String },
@@ -301,10 +309,12 @@ export const Alert = new EntitySchema<Readonly<Required<AlertInterface>>>({
 export const AlertMedia = new EntitySchema<Readonly<Required<AlertMediaInterface>>>({
   name:    'alert_media',
   columns: {
-    primaryId: { type: Number, primary: true, generated: true },
-    id:        { type: String },
-    b64data:   { type: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') ? 'longtext' : 'text' },
-    chunkNo:   { type: Number },
+    primaryId: {
+      type: Number, primary: true, generated: true, 
+    },
+    id:      { type: String },
+    b64data: { type: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') ? 'longtext' : 'text' },
+    chunkNo: { type: Number },
   },
   indices: [
     { name: 'IDX_b0f12c32653ed88fd576d3520c', columns: ['id'] },
@@ -312,10 +322,8 @@ export const AlertMedia = new EntitySchema<Readonly<Required<AlertMediaInterface
 });
 
 export const AlertFollow = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
-  name:    'alert_follow',
-  columns: {
-    ...CommonSettingsSchema,
-  },
+  name:      'alert_follow',
+  columns:   { ...CommonSettingsSchema },
   relations: {
     alert: {
       type:        'many-to-one',
@@ -329,10 +337,8 @@ export const AlertFollow = new EntitySchema<Readonly<Required<CommonSettingsInte
 });
 
 export const AlertSub = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
-  name:    'alert_sub',
-  columns: {
-    ...CommonSettingsSchema,
-  },
+  name:      'alert_sub',
+  columns:   { ...CommonSettingsSchema },
   relations: {
     alert: {
       type:        'many-to-one',
@@ -346,10 +352,8 @@ export const AlertSub = new EntitySchema<Readonly<Required<CommonSettingsInterfa
 });
 
 export const AlertSubcommunitygift = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
-  name:    'alert_subcommunitygift',
-  columns: {
-    ...CommonSettingsSchema,
-  },
+  name:      'alert_subcommunitygift',
+  columns:   { ...CommonSettingsSchema },
   relations: {
     alert: {
       type:        'many-to-one',
@@ -363,10 +367,8 @@ export const AlertSubcommunitygift = new EntitySchema<Readonly<Required<CommonSe
 });
 
 export const AlertSubgift = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
-  name:    'alert_subgift',
-  columns: {
-    ...CommonSettingsSchema,
-  },
+  name:      'alert_subgift',
+  columns:   { ...CommonSettingsSchema },
   relations: {
     alert: {
       type:        'many-to-one',
@@ -380,10 +382,8 @@ export const AlertSubgift = new EntitySchema<Readonly<Required<CommonSettingsInt
 });
 
 export const AlertHost = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
-  name:    'alert_host',
-  columns: {
-    ...CommonSettingsSchema,
-  },
+  name:      'alert_host',
+  columns:   { ...CommonSettingsSchema },
   relations: {
     alert: {
       type:        'many-to-one',
@@ -397,10 +397,8 @@ export const AlertHost = new EntitySchema<Readonly<Required<CommonSettingsInterf
 });
 
 export const AlertRaid = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
-  name:    'alert_raid',
-  columns: {
-    ...CommonSettingsSchema,
-  },
+  name:      'alert_raid',
+  columns:   { ...CommonSettingsSchema },
   relations: {
     alert: {
       type:        'many-to-one',
@@ -468,10 +466,8 @@ export const AlertResub = new EntitySchema<Readonly<Required<AlertResubInterface
 });
 
 export const AlertCommandRedeem = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
-  name:    'alert_command_redeem',
-  columns: {
-    ...CommonSettingsSchema,
-  },
+  name:      'alert_command_redeem',
+  columns:   { ...CommonSettingsSchema },
   relations: {
     alert: {
       type:        'many-to-one',

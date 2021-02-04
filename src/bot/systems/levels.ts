@@ -45,9 +45,7 @@ class Levels extends System {
 
   @ui({ type: 'levels-showcase', emit: 'getLevelsExample' }, 'levels')
   levelShowcase = null;
-  @ui({
-    type: 'helpbox',
-  }, 'levels')
+  @ui({ type: 'helpbox' }, 'levels')
   levelShowcaseHelp = null;
 
   @settings('xp')
@@ -110,7 +108,9 @@ class Levels extends System {
         if (isBot(username)) {
           continue;
         }
-        await this.process(username, { interval, offlineInterval, perInterval, perOfflineInterval, isOnline: isStreamOnline.value });
+        await this.process(username, {
+          interval, offlineInterval, perInterval, perOfflineInterval, isOnline: isStreamOnline.value, 
+        });
         if ( i % 10 === 0) {
           await setImmediateAwait();
         }
@@ -431,9 +431,7 @@ class Levels extends System {
       return [{ response, ...opts }];
     } catch (e) {
       if (e instanceof ResponseError) {
-        return [{
-          response: e.message, ...opts,
-        }];
+        return [{ response: e.message, ...opts }];
       } else {
         if (e.message === 'Point system disabled.') {
           error(e.message);

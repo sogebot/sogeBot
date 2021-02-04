@@ -93,7 +93,9 @@ class Commercial extends System {
         // save remaining api calls
         setRateLimit('broadcaster', request.headers);
 
-        ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: calls.broadcaster });
+        ioServer?.emit('api.stats', {
+          method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: request.status, data: request.data, remaining: calls.broadcaster, 
+        });
         eventEmitter.emit('commercial', { duration: commercial.duration });
         if (!_.isNil(commercial.message)) {
           return [{ response: commercial.message, ...opts }];
@@ -101,10 +103,14 @@ class Commercial extends System {
       } catch (e) {
         if (e.isAxiosError) {
           error(`API: ${url} - ${e.response.data.message}`);
-          ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.broadcaster });
+          ioServer?.emit('api.stats', {
+            method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.broadcaster, 
+          });
         } else {
           error(`API: ${url} - ${e.stack}`);
-          ioServer?.emit('api.stats', { method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.broadcaster });
+          ioServer?.emit('api.stats', {
+            method: 'POST', request: { data: { broadcaster_id: String(cid), length: commercial.duration } }, timestamp: Date.now(), call: 'commercial', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.broadcaster, 
+          });
         }
       }
       return [];

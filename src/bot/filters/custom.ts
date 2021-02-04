@@ -28,9 +28,7 @@ const custom: ResponseFilter = {
         return state.isOk && !state.isEval ? state.setValue : state.updated.currentValue;
       }
     }
-    return getValueOf(variable, {
-      sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' },
-    });
+    return getValueOf(variable, { sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' } });
   },
   // force quiet variable set
   '$!_#': async (variable, attr) => {
@@ -39,9 +37,7 @@ const custom: ResponseFilter = {
       const state = await setValueOf(variable, attr.param, { sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' } });
       return state.updated.currentValue;
     }
-    return getValueOf(variable, {
-      sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' },
-    });
+    return getValueOf(variable, { sender: { ...attr.sender, source: typeof attr.sender.discord === 'undefined' ? 'twitch' : 'discord' } });
   },
   // force full quiet variable
   '$!!_#': async (variable, attr) => {

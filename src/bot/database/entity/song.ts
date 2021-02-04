@@ -34,25 +34,31 @@ export const SongPlaylist = new EntitySchema<Readonly<Required<SongPlaylistInter
   name:    'song_playlist',
   columns: {
     videoId:      { type: String, primary: true },
-    lastPlayedAt: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-    seed:         { type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined  },
-    title:        { type: String },
-    tags:         { type: 'simple-array' },
-    loudness:     { type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined  },
-    length:       { type: Number },
-    volume:       { type: Number },
-    startTime:    { type: Number },
-    endTime:      { type: Number },
-    forceVolume:  { type: Boolean, default: false },
+    lastPlayedAt: {
+      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0, 
+    },
+    seed:        { type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined  },
+    title:       { type: String },
+    tags:        { type: 'simple-array' },
+    loudness:    { type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined  },
+    length:      { type: Number },
+    volume:      { type: Number },
+    startTime:   { type: Number },
+    endTime:     { type: Number },
+    forceVolume: { type: Boolean, default: false },
   },
 });
 
 export const SongRequest = new EntitySchema<Readonly<Required<SongRequestInterface>>>({
   name:    'song_request',
   columns: {
-    id:       { type: String, primary: true, generated: 'uuid' },
-    videoId:  { type: String },
-    addedAt:  { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
+    id: {
+      type: String, primary: true, generated: 'uuid', 
+    },
+    videoId: { type: String },
+    addedAt: {
+      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0, 
+    },
     title:    { type: String },
     loudness: { type: 'float', precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined  },
     length:   { type: Number },

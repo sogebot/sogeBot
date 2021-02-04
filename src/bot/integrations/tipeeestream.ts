@@ -102,9 +102,7 @@ class TipeeeStream extends Integration {
           reconnectionDelay:    1000,
           reconnectionDelayMax: 5000,
           reconnectionAttempts: Infinity,
-          query:                {
-            access_token: this.apiKey.trim(),
-          },
+          query:                { access_token: this.apiKey.trim() },
         });
 
       if (this.socketToTipeeestream !== null) {

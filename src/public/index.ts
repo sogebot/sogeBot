@@ -48,10 +48,18 @@ const main = async () => {
     mode:   'hash',
     base:   __dirname,
     routes: [
-      { path: '/', name: 'Dashboard', component: () => import('./views/dashboard.vue') },
-      { path: '/playlist', name: 'Playlist', component: () => import('./views/playlist.vue') },
-      { path: '/songrequests', name: 'SongRequests', component: () => import('./views/songrequests.vue') },
-      { path: '/quotes', name: 'Quotes', component: () => import('./views/quotes.vue') },
+      {
+        path: '/', name: 'Dashboard', component: () => import('./views/dashboard.vue'), 
+      },
+      {
+        path: '/playlist', name: 'Playlist', component: () => import('./views/playlist.vue'), 
+      },
+      {
+        path: '/songrequests', name: 'SongRequests', component: () => import('./views/songrequests.vue'), 
+      },
+      {
+        path: '/quotes', name: 'Quotes', component: () => import('./views/quotes.vue'), 
+      },
     ],
   });
 

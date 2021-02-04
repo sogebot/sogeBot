@@ -57,7 +57,9 @@ class Polls extends System {
       }
     }, 1000);
 
-    this.addMenu({ category: 'manage', name: 'polls', id: 'manage/polls', this: this });
+    this.addMenu({
+      category: 'manage', name: 'polls', id: 'manage/polls', this: this, 
+    });
   }
 
   sendResponse(responses: CommandResponse[]) {
@@ -73,9 +75,7 @@ class Polls extends System {
       try {
         cb(null, await getRepository(Poll).find({
           relations: ['votes'],
-          order:     {
-            openedAt: 'DESC',
-          },
+          order:     { openedAt: 'DESC' },
         }));
       } catch(e) {
         cb(e.stack, []);
@@ -144,11 +144,7 @@ class Polls extends System {
         }, null);
 
         // get vote status
-        responses.push({
-          response: prepare('systems.polls.status_closed', {
-            title: cVote.title,
-          }), ...opts,
-        });
+        responses.push({ response: prepare('systems.polls.status_closed', { title: cVote.title }), ...opts });
         for (const index of Object.keys(cVote.options)) {
           const option = cVote.options[Number(index)];
           const votesCount = count ? count[Number(index)] || 0 : 0;
@@ -186,8 +182,12 @@ class Polls extends System {
       }
 
       const [type, title, options] = new Expects(opts.parameters)
-        .switch({ name: 'type', values: ['tips', 'bits', 'normal', 'numbers'], optional: true, default: 'normal' })
-        .argument({ name: 'title', optional: false, multi: true })
+        .switch({
+          name: 'type', values: ['tips', 'bits', 'normal', 'numbers'], optional: true, default: 'normal', 
+        })
+        .argument({
+          name: 'title', optional: false, multi: true, 
+        })
         .list({ delimiter: '|' })
         .toArray();
       if (options.length < 2) {
@@ -276,11 +276,7 @@ class Polls extends System {
           }
         }, null);
         // get vote status
-        responses.push({
-          response: prepare('systems.polls.status', {
-            title: cVote.title,
-          }), ...opts,
-        });
+        responses.push({ response: prepare('systems.polls.status', { title: cVote.title }), ...opts });
         for (const i of Object.keys(cVote.options)) {
           const option = cVote.options[Number(i)];
           const votesCount = count ? count[Number(i)] || 0 : 0;

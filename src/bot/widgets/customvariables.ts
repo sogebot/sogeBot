@@ -40,11 +40,7 @@ class CustomVariables extends Widget {
     });
     adminEndpoint(this.nsp, 'list.watch', async (cb) => {
       try {
-        const variables = await getRepository(VariableWatch).find({
-          order: {
-            order: 'ASC',
-          },
-        });
+        const variables = await getRepository(VariableWatch).find({ order: { order: 'ASC' } });
         cb(null, variables);
       } catch (e) {
         cb(e.stack, []);
@@ -54,9 +50,7 @@ class CustomVariables extends Widget {
       try {
         const variable = await isVariableSetById(opts.id);
         if (variable) {
-          await setValueOf(variable.variableName, opts.value, {
-            readOnlyBypass: true,
-          });
+          await setValueOf(variable.variableName, opts.value, { readOnlyBypass: true });
         }
         if (cb) {
           cb(null);

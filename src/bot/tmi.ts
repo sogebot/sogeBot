@@ -527,7 +527,9 @@ class TMI extends Core {
         timestamp: Date.now(),
       });
       sub(`${username}#${userstate.userId}, tier: ${tier}`);
-      eventEmitter.emit('subscription', { username: username, method: (isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths, tier: String(tier) });
+      eventEmitter.emit('subscription', {
+        username: username, method: (isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths, tier: String(tier), 
+      });
       alerts.trigger({
         event:      'subs',
         name:       username,
@@ -678,7 +680,9 @@ class TMI extends Core {
       if (typeof this.ignoreGiftsFromUser[username] !== 'undefined' && this.ignoreGiftsFromUser[username].count !== 0) {
         this.ignoreGiftsFromUser[username].count--;
       } else {
-        eventEmitter.emit('subgift', { username: username, recipient: recipient, tier });
+        eventEmitter.emit('subgift', {
+          username: username, recipient: recipient, tier, 
+        });
         triggerInterfaceOnSub({
           username:            recipient,
           userId:              Number(recipientId),
@@ -773,7 +777,9 @@ class TMI extends Core {
       user.bits.push(newBits);
       getRepository(User).save(user);
 
-      eventEmitter.emit('cheer', { username, bits: Number(userstate.bits), message: messageFromUser });
+      eventEmitter.emit('cheer', {
+        username, bits: Number(userstate.bits), message: messageFromUser, 
+      });
 
       if (isStreamOnline.value) {
         stats.value = {
@@ -795,7 +801,9 @@ class TMI extends Core {
           const price = await getRepository(Price).findOneOrFail({ where: { command: messageFromUser.trim().toLowerCase(), enabled: true } });
           if (price.priceBits <= Number(userstate.bits)) {
             if (customcommands.enabled) {
-              await customcommands.run({ sender: getBotSender(), id: 'null', skip: false, quiet: false, message: messageFromUser.trim().toLowerCase(), parameters: '' });
+              await customcommands.run({
+                sender: getBotSender(), id: 'null', skip: false, quiet: false, message: messageFromUser.trim().toLowerCase(), parameters: '', 
+              });
             }
             new Parser().command(null, messageFromUser, true);
             if (price.emitRedeemEvent) {
@@ -861,7 +869,9 @@ class TMI extends Core {
       sender.badges = {};
     }
 
-    const parse = new Parser({ sender: sender, message: message, skip: skip, quiet: quiet });
+    const parse = new Parser({
+      sender: sender, message: message, skip: skip, quiet: quiet, 
+    });
 
     if (!skip
         && sender['message-type'] === 'whisper'
@@ -883,11 +893,7 @@ class TMI extends Core {
           }
           return undefined; // undefined will not change any values
         };
-        const user = await getRepository(User).findOne({
-          where: {
-            userId: sender.userId,
-          },
-        });
+        const user = await getRepository(User).findOne({ where: { userId: sender.userId } });
 
         if (user) {
           if (!user.isOnline) {
@@ -923,9 +929,13 @@ class TMI extends Core {
 
         api.followerUpdatePreCheck(sender.username);
 
-        eventEmitter.emit('keyword-send-x-times', { username: sender.username, message: message, source: 'twitch' });
+        eventEmitter.emit('keyword-send-x-times', {
+          username: sender.username, message: message, source: 'twitch', 
+        });
         if (message.startsWith('!')) {
-          eventEmitter.emit('command-send-x-times', { username: sender.username, message: message, source: 'twitch' });
+          eventEmitter.emit('command-send-x-times', {
+            username: sender.username, message: message, source: 'twitch', 
+          });
         } else if (!message.startsWith('!')) {
           getRepository(User).increment({ userId: Number(sender.userId) }, 'messages', 1);
         }

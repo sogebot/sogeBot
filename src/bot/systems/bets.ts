@@ -46,7 +46,9 @@ class Bets extends System {
   public dependsOn = [ points ];
 
   @settings()
-  @ui({ type: 'number-input', step: 1, min: 0, max: 100 })
+  @ui({
+    type: 'number-input', step: 1, min: 0, max: 100, 
+  })
   public betPercentGain = 20;
 
   constructor() {
@@ -148,8 +150,12 @@ class Bets extends System {
       }
 
       const [timeout, title, options] = new Expects(opts.parameters)
-        .argument({ name: 'timeout', optional: true, default: 2, type: Number })
-        .argument({ name: 'title', optional: false, multi: true })
+        .argument({
+          name: 'timeout', optional: true, default: 2, type: Number, 
+        })
+        .argument({
+          name: 'title', optional: false, multi: true, 
+        })
         .list({ delimiter: '|' })
         .toArray() as [number, string, string[]];
       if (options.length < 2) {

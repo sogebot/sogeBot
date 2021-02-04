@@ -42,9 +42,7 @@ async function check(userId: number, permId: string, partial = false): Promise<{
     return { access: true, permission: pItem };
   }
 
-  const user = await getRepository(User).findOne({
-    where: { userId },
-  });
+  const user = await getRepository(User).findOne({ where: { userId } });
   const pItem = (await getRepository(Permissions).findOne({
     relations: ['filters'],
     where:     { id: permId },
@@ -69,11 +67,7 @@ async function check(userId: number, permId: string, partial = false): Promise<{
 
     // get all higher permissions to check if not partial check only
     if (!partial && pItem.isWaterfallAllowed) {
-      const partialPermission = await getRepository(Permissions).find({
-        where: {
-          order: LessThan(pItem.order),
-        },
-      });
+      const partialPermission = await getRepository(Permissions).find({ where: { order: LessThan(pItem.order) } });
       for (const p of _.orderBy(partialPermission, 'order', 'asc')) {
         const partialCheck = await check(userId, p.id, true);
         if (partialCheck.access) {

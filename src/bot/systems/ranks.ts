@@ -36,17 +36,15 @@ import System from './_interface';
 class Ranks extends System {
   constructor () {
     super();
-    this.addMenu({ category: 'manage', name: 'ranks', id: 'manage/ranks/list', this: this });
+    this.addMenu({
+      category: 'manage', name: 'ranks', id: 'manage/ranks/list', this: this, 
+    });
   }
 
   sockets () {
     adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
-        cb(null, await getRepository(Rank).find({
-          order: {
-            value: 'ASC',
-          },
-        }));
+        cb(null, await getRepository(Rank).find({ order: { value: 'ASC' } }));
       } catch (e) {
         cb(e.stack, []);
       }
@@ -135,9 +133,7 @@ class Ranks extends System {
       return [{ response, ...opts }];
     }
 
-    await getRepository(Rank).save({
-      ...item, rank,
-    });
+    await getRepository(Rank).save({ ...item, rank });
     const response = prepare('ranks.rank-was-edited',
       {
         hours:   parseInt(value, 10),
@@ -204,9 +200,11 @@ class Ranks extends System {
   @default_permission(defaultPermissions.CASTERS)
   async list (opts: CommandOptions, type: RankInterface['type'] = 'viewer'): Promise<CommandResponse[]> {
     const ranks = await getRepository(Rank).find({ type });
-    const response = prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', { list: _.orderBy(ranks, 'value', 'asc').map((l) => {
-      return l.value + 'h - ' + l.rank;
-    }).join(', ') });
+    const response = prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', {
+      list: _.orderBy(ranks, 'value', 'asc').map((l) => {
+        return l.value + 'h - ' + l.rank;
+      }).join(', '), 
+    });
     return [{ response, ...opts }];
   }
 
@@ -306,11 +304,7 @@ class Ranks extends System {
       return { current: user.rank, next: null };
     }
 
-    const ranks = await getRepository(Rank).find({
-      order: {
-        value: 'DESC',
-      },
-    });
+    const ranks = await getRepository(Rank).find({ order: { value: 'DESC' } });
 
     let rankToReturn: null | Required<RankInterface> = null;
     let subNextRank: null | Required<RankInterface> = null;

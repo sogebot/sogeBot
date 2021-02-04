@@ -5,7 +5,9 @@ import Overlay from './_interface';
 
 class Clips extends Overlay {
   @settings('customization')
-  @ui({ type: 'number-input', step: '1', min: '0', max: '100' })
+  @ui({
+    type: 'number-input', step: '1', min: '0', max: '100', 
+  })
   cClipsVolume = 0;
   @settings('customization')
   @ui({ type: 'selector', values: ['none', 'grayscale', 'sepia', 'tint', 'washed'] })

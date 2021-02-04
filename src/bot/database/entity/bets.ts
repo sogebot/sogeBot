@@ -28,7 +28,9 @@ export interface BetsParticipationsInterface {
 export const Bets = new EntitySchema<Readonly<Required<BetsInterface>>>({
   name:    'bets',
   columns: {
-    id:             { type: Number, primary: true, generated: 'increment' },
+    id: {
+      type: Number, primary: true, generated: 'increment', 
+    },
     createdAt:      { type: 'bigint', transformer: new ColumnNumericTransformer() },
     endedAt:        { type: 'bigint', transformer: new ColumnNumericTransformer() },
     isLocked:       { type: Boolean, default: false },
@@ -52,7 +54,9 @@ export const Bets = new EntitySchema<Readonly<Required<BetsInterface>>>({
 export const BetsParticipations = new EntitySchema<Readonly<Required<BetsParticipationsInterface>>>({
   name:    'bets_participations',
   columns: {
-    id:        { type: Number, primary: true, generated: 'increment' },
+    id: {
+      type: Number, primary: true, generated: 'increment', 
+    },
     userId:    { type: Number },
     username:  { type: String },
     points:    { type: 'bigint', transformer: new ColumnNumericTransformer() },

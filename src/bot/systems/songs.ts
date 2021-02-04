@@ -66,8 +66,12 @@ class Songs extends System {
   @onStartup()
   startup() {
     this.getMeanLoudness();
-    this.addMenu({ category: 'manage', name: 'playlist', id: 'manage/songs/playlist', this: this });
-    this.addMenu({ category: 'manage', name: 'bannedsongs', id: 'manage/songs/bannedsongs', this: this });
+    this.addMenu({
+      category: 'manage', name: 'playlist', id: 'manage/songs/playlist', this: this, 
+    });
+    this.addMenu({
+      category: 'manage', name: 'bannedsongs', id: 'manage/songs/bannedsongs', this: this, 
+    });
     this.addMenuPublic({ id: 'songrequests', name: 'songs' });
     this.addMenuPublic({ id: 'playlist', name: 'playlist' });
     this.addWidget('ytplayer', 'widget-title-ytplayer', 'fas fa-headphones');
@@ -164,9 +168,7 @@ class Songs extends System {
       where = where || {};
       cb(null, await getRepository(SongRequest).find({
         ...where,
-        order: {
-          addedAt: 'ASC',
-        },
+        order: { addedAt: 'ASC' },
       }));
     });
     adminEndpoint(this.nsp, 'delete.playlist', async (videoId, cb) => {
@@ -187,7 +189,9 @@ class Songs extends System {
     });
     adminEndpoint(this.nsp, 'import.ban', async (url, cb) => {
       try {
-        cb(null, await this.banSong({ parameters: this.getIdFromURL(url), sender: getBotSender(), command: '', createdAt: Date.now(), attr: {} }));
+        cb(null, await this.banSong({
+          parameters: this.getIdFromURL(url), sender: getBotSender(), command: '', createdAt: Date.now(), attr: {}, 
+        }));
       } catch (e) {
         cb(e.stack, []);
       }
@@ -195,14 +199,18 @@ class Songs extends System {
     adminEndpoint(this.nsp, 'import.playlist', async ({ playlist, forcedTag }, cb) => {
       try {
         isCachedTagsValid = false;
-        cb(null, await this.importPlaylist({ parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag } }));
+        cb(null, await this.importPlaylist({
+          parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag }, 
+        }));
       } catch (e) {
         cb(e.stack, null);
       }
     });
     adminEndpoint(this.nsp, 'import.video', async ({ playlist, forcedTag }, cb) => {
       try {
-        cb(null, await this.addSongToPlaylist({ parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag } }));
+        cb(null, await this.addSongToPlaylist({
+          parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag }, 
+        }));
       } catch (e) {
         cb(e.stack, null);
       }
@@ -352,11 +360,7 @@ class Songs extends System {
   async sendNextSongID (): Promise<CommandResponse[]> {
     // check if there are any requests
     if (this.songrequest) {
-      const sr = await getRepository(SongRequest).findOne({
-        order: {
-          addedAt: 'ASC',
-        },
-      });
+      const sr = await getRepository(SongRequest).findOne({ order: { addedAt: 'ASC' } });
       if (sr) {
         const currentSong: any = sr;
         currentSong.volume = await this.getVolume(currentSong);
@@ -400,7 +404,9 @@ class Songs extends System {
         return this.sendNextSongID(); // get next song as this don't belong to tag
       }
 
-      const updatedItem = await getRepository(SongPlaylist).save({ ...pl, seed: 1, lastPlayedAt: Date.now() });
+      const updatedItem = await getRepository(SongPlaylist).save({
+        ...pl, seed: 1, lastPlayedAt: Date.now(), 
+      });
       const currentSong = {
         ...updatedItem,
         volume:   await this.getVolume(updatedItem),
@@ -467,7 +473,9 @@ class Songs extends System {
   async stealSong (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const currentSong = JSON.parse(this.currentSong);
-      return this.addSongToPlaylist({ sender: getBotSender(), parameters: currentSong.videoID, attr: {}, createdAt: Date.now(), command: '' });
+      return this.addSongToPlaylist({
+        sender: getBotSender(), parameters: currentSong.videoID, attr: {}, createdAt: Date.now(), command: '', 
+      });
     } catch (err) {
       return [{ response: translate('songs.no-song-is-currently-playing'), ...opts }];
     }
@@ -622,18 +630,10 @@ class Songs extends System {
 
     if (idsFromDB.includes(id)) {
       info(`=> Skipped ${id} - Already in playlist`);
-      return [{
-        response: prepare('songs.song-is-already-in-playlist', { 
-          name: (await getRepository(SongPlaylist).findOneOrFail({ videoId: id })).title,
-        }), ...opts,
-      }];
+      return [{ response: prepare('songs.song-is-already-in-playlist', { name: (await getRepository(SongPlaylist).findOneOrFail({ videoId: id })).title }), ...opts }];
     } else if (banFromDb.includes(id)) {
       info(`=> Skipped ${id} - Song is banned`);
-      return [{
-        response: prepare('songs.song-is-banned', { 
-          name: (await getRepository(SongPlaylist).findOneOrFail({ videoId: id })).title,
-        }), ...opts,
-      }];
+      return [{ response: prepare('songs.song-is-banned', { name: (await getRepository(SongPlaylist).findOneOrFail({ videoId: id })).title }), ...opts }];
     } else {
       const videoInfo = await ytdl.getInfo('https://www.youtube.com/watch?v=' + id);
       if (videoInfo) {
@@ -695,7 +695,9 @@ class Songs extends System {
     const ids = await this.getSongsIdsFromPlaylist(opts.parameters);
 
     if (!ids || ids.length === 0) {
-      return [{ response: prepare('songs.playlist-is-empty'), ...opts, imported: 0, skipped: 0 }];
+      return [{
+        response: prepare('songs.playlist-is-empty'), ...opts, imported: 0, skipped: 0, 
+      }];
     } else {
       let imported = 0;
       let done = 0;
@@ -740,7 +742,9 @@ class Songs extends System {
       await this.refreshPlaylistVolume();
       await this.getMeanLoudness();
       info(`=> Playlist import done, ${imported} imported, ${done - imported} skipped`);
-      return [{ response: prepare('songs.playlist-imported', { imported, skipped: done - imported }), imported, skipped: done - imported, ...opts }];
+      return [{
+        response: prepare('songs.playlist-imported', { imported, skipped: done - imported }), imported, skipped: done - imported, ...opts, 
+      }];
     }
   }
 }

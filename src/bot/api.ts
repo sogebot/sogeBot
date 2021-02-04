@@ -157,7 +157,9 @@ const processFollowerState = async (users: { from_name: string; from_id: number;
 class API extends Core {
   constructor () {
     super();
-    this.addMenu({ category: 'stats', name: 'api', id: 'stats/api', this: null });
+    this.addMenu({
+      category: 'stats', name: 'api', id: 'stats/api', this: null, 
+    });
   }
 
   @onStartup()
@@ -303,21 +305,21 @@ class API extends Core {
       setRateLimit('broadcaster', request.headers);
 
       const data = request.data.data;
-      await getRepository(User).update({
-        userId: Not(In(data.map(o => Number(o.user_id)))),
-      }, { isModerator: false });
-      await getRepository(User).update({
-        userId: In(data.map(o => Number(o.user_id))),
-      }, { isModerator: true });
+      await getRepository(User).update({ userId: Not(In(data.map(o => Number(o.user_id)))) }, { isModerator: false });
+      await getRepository(User).update({ userId: In(data.map(o => Number(o.user_id))) }, { isModerator: true });
 
       setStatus('MOD', data.map(o => o.user_id).includes(botId.value));
     } catch (e) {
       if (e.isAxiosError) {
         error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getModerators', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.broadcaster });
+        ioServer?.emit('api.stats', {
+          method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getModerators', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.broadcaster, 
+        });
       } else {
         error(e.stack);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getModerators', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.broadcaster });
+        ioServer?.emit('api.stats', {
+          method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getModerators', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.broadcaster, 
+        });
       }
     }
     return { state: true };
@@ -374,13 +376,17 @@ class API extends Core {
       // save remaining api calls
       setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', data: request.data, timestamp: Date.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, 
+      });
       return request.data.data[0].login;
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
         emptyRateLimit('bot', e.response.headers);
       }
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', timestamp: Date.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot, 
+      });
     }
     return null;
   }
@@ -397,7 +403,9 @@ class API extends Core {
     const event = await getRepository(ThreadEvent).findOne({ event: 'getChannelChattersUnofficialAPI' });
     if (typeof event === 'undefined') {
       const { partedUsers, joinedUsers } = await getChannelChattersUnofficialAPI();
-      ioServer?.emit('api.stats', { method: 'GET', data: { partedUsers, joinedUsers }, timestamp: Date.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: `https://tmi.twitch.tv/group/user/${oauth.broadcasterUsername}/chatters`, code: 200, remaining: 'n/a' });
+      ioServer?.emit('api.stats', {
+        method: 'GET', data: { partedUsers, joinedUsers }, timestamp: Date.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: `https://tmi.twitch.tv/group/user/${oauth.broadcasterUsername}/chatters`, code: 200, remaining: 'n/a', 
+      });
 
       joinpart.send({ users: partedUsers, type: 'part' });
       for (const username of partedUsers) {
@@ -471,7 +479,9 @@ class API extends Core {
       await getRepository(TwitchTagLocalizationDescription).delete({ tagId: IsNull() });
       await getRepository(TwitchTagLocalizationName).delete({ tagId: IsNull() });
 
-      ioServer?.emit('api.stats', { method: 'GET', data: tags, timestamp: Date.now(), call: 'getAllStreamTags', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', data: tags, timestamp: Date.now(), call: 'getAllStreamTags', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, 
+      });
 
       // save remaining api calls
       setRateLimit('bot', request.headers);
@@ -482,7 +492,9 @@ class API extends Core {
       }
     } catch (e) {
       error(`${url} - ${e.message}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getAllStreamTags', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', timestamp: Date.now(), call: 'getAllStreamTags', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot, 
+      });
     }
     delete opts.cursor;
     return { state: true, opts };
@@ -536,14 +548,18 @@ class API extends Core {
         opts.subscribers = subscribers;
       }
 
-      ioServer?.emit('api.stats', { method: 'GET', data: subscribers, timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', data: subscribers, timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, 
+      });
 
       // save remaining api calls
       setRateLimit('broadcaster', request.headers);
 
       if (subscribers.length === 100) {
         // move to next page
-        return this.getChannelSubscribers({ ...opts, cursor: request.data.pagination.cursor, subscribers: opts.subscribers });
+        return this.getChannelSubscribers({
+          ...opts, cursor: request.data.pagination.cursor, subscribers: opts.subscribers, 
+        });
       } else {
         apiStats.value = {
           ...apiStats.value,
@@ -573,7 +589,9 @@ class API extends Core {
       } else {
         error(`${url} - ${e.stack}`);
 
-        ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
+        ioServer?.emit('api.stats', {
+          method: 'GET', timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot, 
+        });
       }
     }
     delete opts.cursor;
@@ -581,11 +599,7 @@ class API extends Core {
   }
 
   async setSubscribers (subscribers: SubscribersEndpoint['data']) {
-    const currentSubscribers = await getRepository(User).find({
-      where: {
-        isSubscriber: true,
-      },
-    });
+    const currentSubscribers = await getRepository(User).find({ where: { isSubscriber: true } });
 
     // check if current subscribers are still subs
     for (const user of currentSubscribers) {
@@ -607,14 +621,12 @@ class API extends Core {
       const isNotCurrentSubscriber = !current;
       const valuesNotMatch = current && (current.subscribeTier !== String(Number(user.tier) / 1000) || current.isSubscriber === false);
       if (isNotCurrentSubscriber || valuesNotMatch) {
-        await getRepository(User).update({
-          userId: Number(user.user_id),
-        },
-        {
-          username:      user.user_name.toLowerCase(),
-          isSubscriber:  true,
-          subscribeTier: String(Number(user.tier) / 1000),
-        });
+        await getRepository(User).update({ userId: Number(user.user_id) },
+          {
+            username:      user.user_name.toLowerCase(),
+            isSubscriber:  true,
+            subscribeTier: String(Number(user.tier) / 1000),
+          });
       }
     }
   }
@@ -647,7 +659,9 @@ class API extends Core {
       // save remaining api calls
       setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data.data, timestamp: Date.now(), call: 'getChannelInformation', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', data: request.data.data, timestamp: Date.now(), call: 'getChannelInformation', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, 
+      });
 
       if (!gameOrTitleChangedManually.value) {
         // Just polling update
@@ -694,7 +708,9 @@ class API extends Core {
       }
     } catch (e) {
       error(`${url} - ${e.message}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getChannelInformation', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', timestamp: Date.now(), call: 'getChannelInformation', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot, 
+      });
       return { state: false, opts };
     }
 
@@ -713,14 +729,18 @@ class API extends Core {
     const url = `http://tmi.twitch.tv/hosts?include_logins=1&target=${cid}`;
     try {
       request = await axios.get(url);
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getChannelHosts', api: 'other', endpoint: url, code: request.status, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', data: request.data, timestamp: Date.now(), call: 'getChannelHosts', api: 'other', endpoint: url, code: request.status, remaining: calls.bot, 
+      });
       apiStats.value = {
         ...apiStats.value,
         currentHosts: request.data.hosts.length,
       };
     } catch (e) {
       error(`${url} - ${e.message}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getChannelHosts', api: 'other', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', timestamp: Date.now(), call: 'getChannelHosts', api: 'other', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot, 
+      });
       return { state: e.response?.status === 500 };
     }
 
@@ -751,7 +771,9 @@ class API extends Core {
       // save remaining api calls
       setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', data: request.data, timestamp: Date.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, 
+      });
 
       if (request.status === 200 && !isNil(request.data.data)) {
         // we will go through only new users
@@ -780,7 +802,9 @@ class API extends Core {
       }
 
       error(`${url} - ${e.message}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', timestamp: Date.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot, 
+      });
       return { state: false };
     }
     return { state: true };
@@ -818,12 +842,16 @@ class API extends Core {
       // save remaining api calls
       setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getChannelFollowers', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', data: request.data, timestamp: Date.now(), call: 'getChannelFollowers', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, 
+      });
 
       if (request.status === 200 && !isNil(request.data.data)) {
         const followers = request.data.data;
 
-        ioServer?.emit('api.stats', { method: 'GET', data: followers, timestamp: Date.now(), call: 'getChannelFollowers', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
+        ioServer?.emit('api.stats', {
+          method: 'GET', data: followers, timestamp: Date.now(), call: 'getChannelFollowers', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, 
+        });
 
         debug('api.getChannelFollowers', `Followers loaded: ${followers.length}, cursor: ${request.data.pagination.cursor}`);
         debug('api.getChannelFollowers', `Followers list: \n\t${followers.map(o => o.from_name)}`);
@@ -851,7 +879,9 @@ class API extends Core {
       }
 
       error(`${url} - ${e.stack}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getChannelFollowers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', timestamp: Date.now(), call: 'getChannelFollowers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot, 
+      });
     }
     // return from first page (but we will still go through all pages)
     delete opts.cursor;
@@ -882,7 +912,9 @@ class API extends Core {
       // save remaining api calls
       setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getCurrentStreamTags', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', data: request.data, timestamp: Date.now(), call: 'getCurrentStreamTags', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, 
+      });
 
       if (request.status === 200 && !isNil(request.data.data[0])) {
         const tags = request.data.data;
@@ -890,14 +922,14 @@ class API extends Core {
           currentStreamTags.pop();
         }
         for (const tag of tags) {
-          currentStreamTags.push({
-            is_auto: tag.is_auto, localization_names: tag.localization_names,
-          });
+          currentStreamTags.push({ is_auto: tag.is_auto, localization_names: tag.localization_names });
         }
       }
     } catch (e) {
       error(`${url} - ${e.message}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getCurrentStreamTags', api: 'getCurrentStreamTags', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', timestamp: Date.now(), call: 'getCurrentStreamTags', api: 'getCurrentStreamTags', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot, 
+      });
       return { state: false, opts };
     }
     return { state: true, opts };
@@ -929,7 +961,9 @@ class API extends Core {
       // save remaining api calls
       setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', data: request.data, timestamp: Date.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, 
+      });
 
       let justStarted = false;
 
@@ -1059,7 +1093,9 @@ class API extends Core {
       }
 
       error(`${url} - ${e.message}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', timestamp: Date.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot, 
+      });
       return { state: false, opts };
     }
     return { state: true, opts };
@@ -1132,7 +1168,9 @@ class API extends Core {
       // save remaining api calls
       setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', data: request.data, timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, 
+      });
 
       for (const clip of request.data.data) {
         // clip found in twitch api
@@ -1144,10 +1182,14 @@ class API extends Core {
       }
       if (e.isAxiosError) {
         error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.bot });
+        ioServer?.emit('api.stats', {
+          method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.bot, 
+        });
       } else {
         error(e.stack);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
+        ioServer?.emit('api.stats', {
+          method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot, 
+        });
       }
     }
     return { state: true };
@@ -1202,7 +1244,9 @@ class API extends Core {
       // save remaining api calls
       setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'POST', data: request.data, timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'POST', data: request.data, timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, 
+      });
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
         emptyRateLimit('bot', e.response.headers);
@@ -1210,15 +1254,21 @@ class API extends Core {
 
       if (e.isAxiosError) {
         error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.bot });
+        ioServer?.emit('api.stats', {
+          method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.bot, 
+        });
       } else {
         error(e.stack);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
+        ioServer?.emit('api.stats', {
+          method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot, 
+        });
       }
       return;
     }
     const clipId = request.data.data[0].id;
-    await getRepository(TwitchClips).save({ clipId: clipId, isChecked: false, shouldBeCheckedAt: Date.now() + 120 * 1000 });
+    await getRepository(TwitchClips).save({
+      clipId: clipId, isChecked: false, shouldBeCheckedAt: Date.now() + 120 * 1000, 
+    });
     return (await isClipChecked(clipId)) ? clipId : null;
   }
 
@@ -1246,7 +1296,9 @@ class API extends Core {
       // save remaining api calls
       setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', data: request.data, timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, 
+      });
     } catch (e) {
       if (e.errno === 'ECONNRESET' || e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT') {
         return;
@@ -1262,10 +1314,14 @@ class API extends Core {
       if (logError) {
         if (e.isAxiosError) {
           error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-          ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.bot });
+          ioServer?.emit('api.stats', {
+            method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.bot, 
+          });
         } else {
           error(e.stack);
-          ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
+          ioServer?.emit('api.stats', {
+            method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'fetchAccountAge', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot, 
+          });
         }
       }
       return;
@@ -1305,17 +1361,23 @@ class API extends Core {
       // save remaining api calls
       setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', data: request.data, timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, 
+      });
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
         emptyRateLimit('bot', e.response.headers);
       }
       if (e.isAxiosError) {
         error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.bot });
+        ioServer?.emit('api.stats', {
+          method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.bot, 
+        });
       } else {
         error(e.stack);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
+        ioServer?.emit('api.stats', {
+          method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot, 
+        });
       }
       return null;
     }
@@ -1401,7 +1463,9 @@ class API extends Core {
       // save remaining api calls
       setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'POST', request: { data: { user_id: String(cid), description: 'Marked from sogeBot' } }, timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, data: request });
+      ioServer?.emit('api.stats', {
+        method: 'POST', request: { data: { user_id: String(cid), description: 'Marked from sogeBot' } }, timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, data: request, 
+      });
     } catch (e) {
       if (e.errno === 'ECONNRESET' || e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT') {
         setTimeout(() => this.createMarker(), 1000);
@@ -1409,12 +1473,18 @@ class API extends Core {
       }
       if (e.isAxiosError) {
         error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.bot });
+        ioServer?.emit('api.stats', {
+          method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.bot, 
+        });
       } else {
         error(e.stack);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
+        ioServer?.emit('api.stats', {
+          method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot, 
+        });
       }
-      ioServer?.emit('api.stats', { method: 'POST', request: { data: { user_id: String(cid), description: 'Marked from sogeBot' } }, timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'POST', request: { data: { user_id: String(cid), description: 'Marked from sogeBot' } }, timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot, 
+      });
     }
   }
 
@@ -1439,11 +1509,15 @@ class API extends Core {
       // save remaining api calls
       setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, 
+      });
       return request.data;
     } catch (e) {
       error(`${url} - ${e.message}`);
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: url, code: `${e.status} ${get(e, 'body.message', e.statusText)}`, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: url, code: `${e.status} ${get(e, 'body.message', e.statusText)}`, remaining: calls.bot, 
+      });
       return null;
     }
   }
@@ -1453,7 +1527,9 @@ class API extends Core {
 
     setRateLimit('broadcaster', headers);
 
-    ioServer?.emit('api.stats', { method: method, data: response, timestamp: Date.now(), call: 'getCustomRewards', api: 'helix', endpoint: url, code: status, remaining: calls.broadcaster });
+    ioServer?.emit('api.stats', {
+      method: method, data: response, timestamp: Date.now(), call: 'getCustomRewards', api: 'helix', endpoint: url, code: status, remaining: calls.broadcaster, 
+    });
 
     if (err) {
       throw err;
@@ -1504,7 +1580,9 @@ class API extends Core {
       // save remaining api calls
       setRateLimit('bot', request.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, 
+      });
       // get mp4 from thumbnail
       for (const c of request.data.data) {
         c.mp4 = c.thumbnail_url.replace('-preview-480x272.jpg', '.mp4');
@@ -1514,10 +1592,14 @@ class API extends Core {
     } catch (e) {
       if (e.isAxiosError) {
         error(`API: ${e.config.method.toUpperCase()} ${e.config.url} - ${e.response?.status ?? 0}\n${JSON.stringify(e.response?.data ?? '--nodata--', null, 4)}\n\n${e.stack}`);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.bot });
+        ioServer?.emit('api.stats', {
+          method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response.data, remaining: calls.bot, 
+        });
       } else {
         error(e.stack);
-        ioServer?.emit('api.stats', { method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
+        ioServer?.emit('api.stats', {
+          method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'getClipById', api: 'helix', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot, 
+        });
       }
     }
   }

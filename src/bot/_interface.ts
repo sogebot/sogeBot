@@ -121,10 +121,8 @@ class Module {
     this.__moduleName__ = this.constructor.name;
 
     this.on = {
-      change: {
-        enabled: [],
-      },
-      load: {},
+      change: { enabled: [] },
+      load:   {},
     };
 
     this.socket = null;
@@ -254,7 +252,9 @@ class Module {
           this._commands = [];
         }
 
-        this.settingsList.push({ category: 'commands', key: c.name, defaultValue: c.name });
+        this.settingsList.push({
+          category: 'commands', key: c.name, defaultValue: c.name, 
+        });
 
         // load command from db
         const dbc = await getRepository(Settings)
@@ -796,9 +796,7 @@ class Module {
     // get current full list of permissions
     const permissions = await getRepository(PermissionsEntity).find({
       cache: true,
-      order: {
-        order: 'DESC',
-      },
+      order: { order: 'DESC' },
     });
     return permissions.reduce((prev, p) => {
       // set proper value for permId or default value

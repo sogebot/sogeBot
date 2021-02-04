@@ -16,7 +16,9 @@ export interface HighlightInterface {
 export const Highlight = new EntitySchema<Readonly<Required<HighlightInterface>>>({
   name:    'highlight',
   columns: {
-    id:        { type: 'uuid', primary: true, generated: 'uuid' },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
     videoId:   { type: String },
     game:      { type: String },
     title:     { type: String },

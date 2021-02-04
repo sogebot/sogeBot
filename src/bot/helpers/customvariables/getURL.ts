@@ -5,9 +5,7 @@ import { getValueOf } from './getValueOf';
 
 async function getURL(req: any, res: any) {
   try {
-    const variable = (await getRepository(Variable).find({
-      relations: ['urls'],
-    }))
+    const variable = (await getRepository(Variable).find({ relations: ['urls'] }))
       .find(v => {
         return v.urls.find(url => url.id === req.params.id);
       });

@@ -11,7 +11,9 @@ class Gallery extends Overlay {
 
   constructor () {
     super();
-    this.addMenu({ category: 'registry', name: 'gallery', id: 'registry.gallery/list', this: null });
+    this.addMenu({
+      category: 'registry', name: 'gallery', id: 'registry.gallery/list', this: null, 
+    });
 
     const init = (retry = 0) => {
       if (retry === 10000) {
@@ -52,9 +54,7 @@ class Gallery extends Overlay {
     adminEndpoint(this.nsp, 'generic::getOne', async (id, cb) => {
       try {
         const item = await getRepository(GalleryEntity).findOne({
-          where: {
-            id,
-          },
+          where:  { id },
           select: ['id', 'name', 'type'],
         });
         cb(null, item);
@@ -64,9 +64,7 @@ class Gallery extends Overlay {
     });
     adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
-        const items = await getRepository(GalleryEntity).find({
-          select: ['id', 'name', 'type'],
-        });
+        const items = await getRepository(GalleryEntity).find({ select: ['id', 'name', 'type'] });
         cb(null, items);
       } catch (e) {
         cb(e.stack, []);
@@ -97,7 +95,9 @@ class Gallery extends Overlay {
         } else {
           // new entity
           const type = matches[1];
-          await getRepository(GalleryEntity).save({ id: filedata.id, type, data: filedata.b64data, name: filename });
+          await getRepository(GalleryEntity).save({
+            id: filedata.id, type, data: filedata.b64data, name: filename, 
+          });
         }
         if (cb) {
           cb(null);

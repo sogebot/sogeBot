@@ -19,7 +19,9 @@ export interface KeywordsResponsesInterface {
 export const Keyword = new EntitySchema<Readonly<Required<KeywordInterface>>>({
   name:    'keyword',
   columns: {
-    id:      { type: 'uuid', primary: true, generated: 'uuid' },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
     keyword: { type: String },
     enabled: { type: Boolean },
   },
@@ -39,7 +41,9 @@ export const Keyword = new EntitySchema<Readonly<Required<KeywordInterface>>>({
 export const CommandsResponses = new EntitySchema<Readonly<Required<KeywordsResponsesInterface>>>({
   name:    'keyword_responses',
   columns: {
-    id:             { type: 'uuid', primary: true, generated: 'uuid' },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
     order:          { type: Number },
     response:       { type: 'text' },
     stopIfExecuted: { type: Boolean },

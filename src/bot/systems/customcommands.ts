@@ -50,7 +50,9 @@ const findCache: {
 class CustomCommands extends System {
   constructor () {
     super();
-    this.addMenu({ category: 'manage', name: 'customcommands', id: 'manage/commands', this: this });
+    this.addMenu({
+      category: 'manage', name: 'customcommands', id: 'manage/commands', this: this, 
+    });
   }
 
   sockets () {
@@ -83,9 +85,7 @@ class CustomCommands extends System {
       try {
         const commands = await getRepository(Commands).find({
           relations: ['responses'],
-          order:     {
-            command: 'ASC',
-          },
+          order:     { command: 'ASC' },
         });
         const count = await getAllCountOfCommandUsage();
         cb(null, commands, count);
@@ -128,10 +128,16 @@ class CustomCommands extends System {
     try {
       const [userlevel, stopIfExecuted, cmd, rId, response] = new Expects(opts.parameters)
         .permission({ optional: true, default: defaultPermissions.VIEWERS })
-        .argument({ optional: true, name: 's', default: null, type: Boolean })
-        .argument({ name: 'c', type: String, multi: true, delimiter: '' })
+        .argument({
+          optional: true, name: 's', default: null, type: Boolean, 
+        })
+        .argument({
+          name: 'c', type: String, multi: true, delimiter: '', 
+        })
         .argument({ name: 'rid', type: Number })
-        .argument({ name: 'r', type: String, multi: true, delimiter: '' })
+        .argument({
+          name: 'r', type: String, multi: true, delimiter: '', 
+        })
         .toArray();
 
       if (!cmd.startsWith('!')) {
@@ -140,9 +146,7 @@ class CustomCommands extends System {
 
       const cDb = await getRepository(Commands).findOne({
         relations: ['responses'],
-        where:     {
-          command: cmd,
-        },
+        where:     { command: cmd },
       });
       if (!cDb) {
         return [{ response: prepare('customcmds.command-was-not-found', { command: cmd }), ...opts }];
@@ -178,9 +182,15 @@ class CustomCommands extends System {
     try {
       const [userlevel, stopIfExecuted, cmd, response] = new Expects(opts.parameters)
         .permission({ optional: true, default: defaultPermissions.VIEWERS })
-        .argument({ optional: true, name: 's', default: false, type: Boolean })
-        .argument({ name: 'c', type: String, multi: true, delimiter: '' })
-        .argument({ name: 'r', type: String, multi: true, delimiter: '' })
+        .argument({
+          optional: true, name: 's', default: false, type: Boolean, 
+        })
+        .argument({
+          name: 'c', type: String, multi: true, delimiter: '', 
+        })
+        .argument({
+          name: 'r', type: String, multi: true, delimiter: '', 
+        })
         .toArray();
 
       if (!cmd.startsWith('!')) {
@@ -189,9 +199,7 @@ class CustomCommands extends System {
 
       const cDb = await getRepository(Commands).findOne({
         relations: ['responses'],
-        where:     {
-          command: cmd,
-        },
+        where:     { command: cmd },
       });
       if (!cDb) {
         await getRepository(Commands).save({
@@ -244,9 +252,7 @@ class CustomCommands extends System {
         const db_commands: CommandsInterface[]
           = await getRepository(Commands).find({
             relations: ['responses'],
-            where:     {
-              command: cmdArray.join(' '),
-            },
+            where:     { command: cmdArray.join(' ') },
           });
         for (const cmd of db_commands) {
           commands.push({
@@ -300,7 +306,9 @@ class CustomCommands extends System {
       }
 
       if (!opts.quiet) {
-        this.sendResponse(_.cloneDeep(_responses), { param, sender: opts.sender, command: cmd.command.command, processedCommands: opts.processedCommands });
+        this.sendResponse(_.cloneDeep(_responses), {
+          param, sender: opts.sender, command: cmd.command.command, processedCommands: opts.processedCommands, 
+        });
       }
     }
     return atLeastOnePermissionOk;
@@ -321,9 +329,7 @@ class CustomCommands extends System {
 
     if (!cmd) {
       // print commands
-      const commands = await getRepository(Commands).find({
-        where: { visible: true, enabled: true },
-      });
+      const commands = await getRepository(Commands).find({ where: { visible: true, enabled: true } });
       const response = (commands.length === 0 ? translate('customcmds.list-is-empty') : translate('customcmds.list-is-not-empty').replace(/\$list/g, _.orderBy(commands, 'command').map(o => o.command).join(', ')));
       return [{ response, ...opts }];
     } else {
@@ -339,7 +345,9 @@ class CustomCommands extends System {
       }
       return Promise.all(_.orderBy(command_with_responses.responses, 'order', 'asc').map(async(r) => {
         const perm = await get(r.permission);
-        const response = prepare('customcmds.response', { command: cmd, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: perm?.name ?? 'n/a' });
+        const response = prepare('customcmds.response', {
+          command: cmd, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: perm?.name ?? 'n/a', 
+        });
         return { response, ...opts };
       }));
     }
@@ -353,9 +361,7 @@ class CustomCommands extends System {
       const response = prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') });
       return [{ response, ...opts }];
     }
-    const cmd = await getRepository(Commands).findOne({
-      where: { command: match.command },
-    });
+    const cmd = await getRepository(Commands).findOne({ where: { command: match.command } });
     if (!cmd) {
       const response = prepare('customcmds.command-was-not-found', { command: match.command });
       return [{ response, ...opts }];
@@ -377,9 +383,7 @@ class CustomCommands extends System {
       return [{ response, ...opts }];
     }
 
-    const cmd = await getRepository(Commands).findOne({
-      where: { command: match.command },
-    });
+    const cmd = await getRepository(Commands).findOne({ where: { command: match.command } });
     if (!cmd) {
       const response = prepare('customcmds.command-was-not-found', { command: match.command });
       return [{ response, ...opts }];
@@ -396,8 +400,12 @@ class CustomCommands extends System {
   async remove (opts: CommandOptions) {
     try {
       const [cmd, rId] = new Expects(opts.parameters)
-        .argument({ name: 'c', type: String, multi: true, delimiter: '' })
-        .argument({ name: 'rid', type: Number, optional: true, default: 0 })
+        .argument({
+          name: 'c', type: String, multi: true, delimiter: '', 
+        })
+        .argument({
+          name: 'rid', type: Number, optional: true, default: 0, 
+        })
         .toArray();
 
       if (!cmd.startsWith('!')) {

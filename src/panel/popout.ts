@@ -93,7 +93,9 @@ const main = async () => {
       mode:   'hash',
       base:   __dirname,
       routes: [
-        { path: '/:widget', name: 'Popout', component: () => import('src/panel/views/dashboard/popout.vue') },
+        {
+          path: '/:widget', name: 'Popout', component: () => import('src/panel/views/dashboard/popout.vue'), 
+        },
       ],
     });
 

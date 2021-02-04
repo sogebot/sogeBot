@@ -125,9 +125,7 @@ class Gamble extends Game {
       } else {
         switch (e.message) {
           case ERROR_ZERO_BET:
-            message = prepare('gambling.gamble.zeroBet', {
-              pointsName: await getPointsName(0),
-            });
+            message = prepare('gambling.gamble.zeroBet', { pointsName: await getPointsName(0) });
             return [{ response: message, ...opts }];
           case ERROR_NOT_ENOUGH_OPTIONS:
             return [{ response: translate('gambling.gamble.notEnoughOptions'), ...opts }];
@@ -156,9 +154,7 @@ class Gamble extends Game {
         points:     this.jackpotValue,
       });
     } else {
-      message = prepare('gambling.gamble.jackpotIsDisabled', {
-        command: this.getCommand('!gamble'),
-      });
+      message = prepare('gambling.gamble.jackpotIsDisabled', { command: this.getCommand('!gamble') });
     }
     return [{ response: message, ...opts }];
   }

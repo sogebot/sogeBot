@@ -146,7 +146,9 @@ class Expects {
 
   command (opts?: any) {
     opts = opts || {};
-    defaults(opts, { exec: false, optional: false, spaces: false });
+    defaults(opts, {
+      exec: false, optional: false, spaces: false, 
+    });
     if (!opts.exec) {
       this.toExec.push({ fnc: 'command', opts });
       return this;
@@ -158,7 +160,9 @@ class Expects {
     const regexp = XRegExp('(?<command> ^!\\S* )', 'ix');
     const match = XRegExp.exec(this.text, regexp);
 
-    debug('expects.command', JSON.stringify({ text: this.text, opts, match }));
+    debug('expects.command', JSON.stringify({
+      text: this.text, opts, match, 
+    }));
     if (!isNil(match)) {
       this.match.push(match.command.trim().toLowerCase());
       this.text = this.text.replace(match.command, ''); // remove from text matched pattern
@@ -174,7 +178,9 @@ class Expects {
 
   points (opts?: { exec?: boolean, optional?: boolean, all?: boolean, negative?: boolean }) {
     opts = opts || {};
-    defaults(opts, { exec: false, optional: false, all: false, negative: false });
+    defaults(opts, {
+      exec: false, optional: false, all: false, negative: false, 
+    });
     if (!opts.exec) {
       this.toExec.push({ fnc: 'points', opts });
       return this;
@@ -212,7 +218,9 @@ class Expects {
 
   number (opts?: any) {
     opts = opts || {};
-    defaults(opts, { exec: false, optional: false, minus: true });
+    defaults(opts, {
+      exec: false, optional: false, minus: true, 
+    });
     if (!opts.exec) {
       this.toExec.push({ fnc: 'number', opts });
       return this;
@@ -242,7 +250,9 @@ class Expects {
 
   switch (opts?: any) {
     opts = opts || {};
-    defaults(opts, { exec: false, optional: false, default: null });
+    defaults(opts, {
+      exec: false, optional: false, default: null, 
+    });
     if (!opts.exec) {
       this.toExec.push({ fnc: 'switch', opts });
       return this;
@@ -328,7 +338,9 @@ class Expects {
     const regexp = XRegExp(fullPattern, 'ix');
     const match = XRegExp.exec(this.text, regexp);
 
-    debug('expects.permission', JSON.stringify({ fullPattern, text: this.text, opts, match }));
+    debug('expects.permission', JSON.stringify({
+      fullPattern, text: this.text, opts, match, 
+    }));
     if (!isNil(match) && match[opts.name].trim().length !== 0) {
       this.match.push(String(match[opts.name].trim()));
       this.text = this.text.replace(match[0], ''); // remove from text matched pattern
@@ -388,7 +400,9 @@ class Expects {
     const regexp = XRegExp(fullPattern, 'ix');
     const match = XRegExp.exec(this.text, regexp);
 
-    debug('expects.argument', JSON.stringify({ fullPattern, text: this.text, opts, match }));
+    debug('expects.argument', JSON.stringify({
+      fullPattern, text: this.text, opts, match, 
+    }));
     if (!isNil(match) && match[opts.name].trim().length !== 0) {
       if (opts.type.name === 'Boolean') {
         this.match.push(opts.type(match[opts.name].trim().toLowerCase() === 'true'));
@@ -410,7 +424,9 @@ class Expects {
 
   username (opts?: any) {
     opts = opts || {};
-    defaults(opts, { exec: false, optional: false, default: null });
+    defaults(opts, {
+      exec: false, optional: false, default: null, 
+    });
     if (!opts.exec) {
       this.toExec.push({ fnc: 'username', opts });
       return this;
@@ -493,7 +509,9 @@ class Expects {
   }
 
   list (opts?: any) {
-    defaults(opts, { exec: false, optional: false, delimiter: ' ' });
+    defaults(opts, {
+      exec: false, optional: false, delimiter: ' ', 
+    });
     if (!opts.exec) {
       this.toExec.push({ fnc: 'list', opts });
       return this;

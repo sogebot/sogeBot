@@ -61,10 +61,14 @@ export interface GoalInterface {
 export const GoalGroup = new EntitySchema<Readonly<Required<GoalGroupInterface>>>({
   name:    'goal_group',
   columns: {
-    id:        { type: 'uuid', primary: true, generated: 'uuid' },
-    createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-    name:      { type: String },
-    display:   { type: 'simple-json' },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
+    createdAt: {
+      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0, 
+    },
+    name:    { type: String },
+    display: { type: 'simple-json' },
   },
   relations: {
     goals: {
@@ -79,15 +83,23 @@ export const GoalGroup = new EntitySchema<Readonly<Required<GoalGroupInterface>>
 export const Goal = new EntitySchema<Readonly<Required<GoalInterface>>>({
   name:    'goal',
   columns: {
-    id:                { type: 'uuid', primary: true, generated: 'uuid' },
-    name:              { type: String },
-    groupId:           { type: String, nullable: true },
-    type:              { type: 'varchar', length: 20 },
-    countBitsAsTips:   { type: Boolean },
-    display:           { type: 'varchar', length: 20 },
-    timestamp:         { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-    goalAmount:        { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined },
-    currentAmount:     { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
+    name:            { type: String },
+    groupId:         { type: String, nullable: true },
+    type:            { type: 'varchar', length: 20 },
+    countBitsAsTips: { type: Boolean },
+    display:         { type: 'varchar', length: 20 },
+    timestamp:       {
+      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0, 
+    },
+    goalAmount: {
+      type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined, 
+    },
+    currentAmount: {
+      type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: (process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') === 'mysql' ? 12 : undefined, 
+    },
     endAfter:          { type: String },
     endAfterIgnore:    { type: Boolean },
     customizationBar:  { type: 'simple-json' },

@@ -139,15 +139,22 @@ function adminEndpoint (nsp: string, on: 'integration::obswebsocket::test', call
 function adminEndpoint (nsp: string, on: string, callback: (opts: { [x: string]: any }, cb?: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket): void;
 function adminEndpoint (nsp: string, on: string, callback: (cb?: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket): void;
 function adminEndpoint (nsp: any, on: any, callback: any): void{
-  endpoints.push({ nsp, on, callback, type: 'admin' });
+  endpoints.push({
+    nsp, on, callback, type: 'admin',
+  });
 }
 
 const viewerEndpoint = (nsp: string, on: string, callback: (opts: any, cb: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket) => {
-  endpoints.push({ nsp, on, callback, type: 'viewer' });
+  endpoints.push({
+    nsp, on, callback, type: 'viewer',
+  });
 };
-const publicEndpoint = (nsp: string, on: string, callback: (opts: any, cb: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket) => {
-  endpoints.push({ nsp, on, callback, type: 'public' });
-};
+
+function publicEndpoint (nsp: string, on: string, callback: (opts: any, cb: (error: Error | string | null, ...response: any) => void) => void, socket?: Socket) {
+  endpoints.push({
+    nsp, on, callback, type: 'public',
+  });
+}
 
 export {
   endpoints, adminEndpoint, viewerEndpoint, publicEndpoint,

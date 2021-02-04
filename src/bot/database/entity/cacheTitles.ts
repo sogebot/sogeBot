@@ -12,7 +12,9 @@ export interface CacheTitlesInterface {
 export const CacheTitles = new EntitySchema<Readonly<Required<CacheTitlesInterface>>>({
   name:    'cache_titles',
   columns: {
-    id:        { type: Number, primary: true, generated: 'increment' },
+    id: {
+      type: Number, primary: true, generated: 'increment', 
+    },
     game:      { type: String },
     title:     { type: String },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer() },

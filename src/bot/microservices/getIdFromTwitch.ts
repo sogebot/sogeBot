@@ -46,16 +46,22 @@ async function getIdFromTwitch (username: string, isChannelId = false): Promise<
     calls.bot.remaining = request.headers['ratelimit-remaining'];
     calls.bot.refresh = request.headers['ratelimit-reset'];
 
-    ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
+    ioServer?.emit('api.stats', {
+      method: 'GET', data: request.data, timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, 
+    });
 
     return String(request.data.data[0].id);
   } catch (e) {
     if (typeof e.response !== 'undefined' && e.response.status === 429) {
       emptyRateLimit('bot', e.response.headers);
 
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot, 
+      });
     } else {
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: 'n/a', data: e.stack, remaining: calls.bot });
+      ioServer?.emit('api.stats', {
+        method: 'GET', timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: 'n/a', data: e.stack, remaining: calls.bot, 
+      });
     }
     error(`User ${username} not found on Twitch.`);
     throw(e);

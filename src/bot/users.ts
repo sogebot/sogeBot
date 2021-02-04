@@ -29,7 +29,9 @@ import oauth from './oauth';
 class Users extends Core {
   constructor () {
     super();
-    this.addMenu({ category: 'manage', name: 'viewers', id: 'manage/viewers/list', this: null });
+    this.addMenu({
+      category: 'manage', name: 'viewers', id: 'manage/viewers/list', this: null, 
+    });
   }
 
   @onStartup()
@@ -456,19 +458,17 @@ class Users extends Core {
     });
     viewerEndpoint(this.nsp, 'viewers::findOne', async (userId, cb) => {
       try {
-        const viewer = await getRepository(User).findOne({
-          where: { userId },
-        });
+        const viewer = await getRepository(User).findOne({ where: { userId } });
 
         if (viewer) {
           const aggregatedTips = viewer.tips.map((o) => currency.exchange(o.amount, o.currency, mainCurrency.value)).reduce((a, b) => a + b, 0);
           const aggregatedBits = viewer.bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0);
 
           const permId = await getUserHighestPermission(userId);
-          const permissionGroup = (await getRepository(Permissions).findOneOrFail({
-            where: { id: permId || defaultPermissions.VIEWERS },
-          }));
-          cb(null, { ...viewer, aggregatedBits, aggregatedTips, permission: permissionGroup });
+          const permissionGroup = (await getRepository(Permissions).findOneOrFail({ where: { id: permId || defaultPermissions.VIEWERS } }));
+          cb(null, {
+            ...viewer, aggregatedBits, aggregatedTips, permission: permissionGroup, 
+          });
         } else {
           cb(null);
         }

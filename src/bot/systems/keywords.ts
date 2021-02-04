@@ -26,7 +26,9 @@ import System from './_interface';
 class Keywords extends System {
   constructor() {
     super();
-    this.addMenu({ category: 'manage', name: 'keywords', id: 'manage/keywords/list', this: this });
+    this.addMenu({
+      category: 'manage', name: 'keywords', id: 'manage/keywords/list', this: this, 
+    });
   }
 
   sockets () {
@@ -53,9 +55,7 @@ class Keywords extends System {
       try {
         const items = await getRepository(Keyword).find({
           relations: ['responses'],
-          order:     {
-            keyword: 'ASC',
-          },
+          order:     { keyword: 'ASC' },
         });
         cb(null, items);
       } catch (e) {
@@ -91,9 +91,15 @@ class Keywords extends System {
     try {
       const [userlevel, stopIfExecuted, keywordRegex, response] = new Expects(opts.parameters)
         .permission({ optional: true, default: defaultPermissions.VIEWERS })
-        .argument({ optional: true, name: 's', default: false, type: Boolean })
-        .argument({ name: 'k', type: String, multi: true, delimiter: '' })
-        .argument({ name: 'r', type: String, multi: true, delimiter: '' })
+        .argument({
+          optional: true, name: 's', default: false, type: Boolean, 
+        })
+        .argument({
+          name: 'k', type: String, multi: true, delimiter: '', 
+        })
+        .argument({
+          name: 'r', type: String, multi: true, delimiter: '', 
+        })
         .toArray();
 
       const kDb = await getRepository(Keyword).findOne({
@@ -120,10 +126,14 @@ class Keywords extends System {
           filter:         '',
         }],
       });
-      return [{ response: prepare('keywords.keyword-was-added', kDb), ...opts, id: kDb.id }];
+      return [{
+        response: prepare('keywords.keyword-was-added', kDb), ...opts, id: kDb.id, 
+      }];
     } catch (e) {
       error(e.stack);
-      return [{ response: prepare('keywords.keyword-parse-failed'), ...opts, id: null }];
+      return [{
+        response: prepare('keywords.keyword-parse-failed'), ...opts, id: null, 
+      }];
     }
   }
 
@@ -140,10 +150,16 @@ class Keywords extends System {
     try {
       const [userlevel, stopIfExecuted, keywordRegexOrUUID, rId, response] = new Expects(opts.parameters)
         .permission({ optional: true, default: defaultPermissions.VIEWERS })
-        .argument({ optional: true, name: 's', default: null, type: Boolean })
-        .argument({ name: 'k', type: String, multi: true, delimiter: '' })
+        .argument({
+          optional: true, name: 's', default: null, type: Boolean, 
+        })
+        .argument({
+          name: 'k', type: String, multi: true, delimiter: '', 
+        })
         .argument({ name: 'rid', type: Number })
-        .argument({ name: 'r', type: String, multi: true, delimiter: '' })
+        .argument({
+          name: 'r', type: String, multi: true, delimiter: '', 
+        })
         .toArray();
 
       let keywords: Required<KeywordInterface>[] = [];
@@ -195,9 +211,7 @@ class Keywords extends System {
     const keyword = new Expects(opts.parameters).everything({ optional: true }).toArray()[0];
     if (!keyword) {
       // print keywords
-      const keywords = await getRepository(Keyword).find({
-        where: { enabled: true },
-      });
+      const keywords = await getRepository(Keyword).find({ where: { enabled: true } });
       const response = (keywords.length === 0 ? translate('keywords.list-is-empty') : translate('keywords.list-is-not-empty').replace(/\$list/g, _.orderBy(keywords, 'keyword').map(o => o.keyword).join(', ')));
       return [{ response, ...opts }];
     } else {
@@ -213,7 +227,9 @@ class Keywords extends System {
       }
       return Promise.all(_.orderBy(keyword_with_responses.responses, 'order', 'asc').map(async(r) => {
         const perm = await get(r.permission);
-        const response = prepare('keywords.response', { keyword: keyword_with_responses.keyword, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: perm?.name ?? 'n/a' });
+        const response = prepare('keywords.response', {
+          keyword: keyword_with_responses.keyword, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: perm?.name ?? 'n/a', 
+        });
         return { response, ...opts };
       }));
     }
@@ -232,8 +248,12 @@ class Keywords extends System {
     try {
       const [keywordRegexOrUUID, rId]
         = new Expects(opts.parameters)
-          .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
-          .argument({ name: 'rid', optional: true, type: Number })
+          .argument({
+            name: 'k', optional: false, multi: true, delimiter: '', 
+          })
+          .argument({
+            name: 'rid', optional: true, type: Number, 
+          })
           .toArray();
 
       let keywords: Required<KeywordInterface>[] = [];
@@ -290,7 +310,9 @@ class Keywords extends System {
     try {
       const [keywordRegexOrUUID]
         = new Expects(opts.parameters)
-          .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
+          .argument({
+            name: 'k', optional: false, multi: true, delimiter: '', 
+          })
           .toArray();
 
       let keywords: Required<KeywordInterface>[] = [];

@@ -14,7 +14,9 @@ export interface PointsChangelogInterface {
 export const PointsChangelog = new EntitySchema<Readonly<Required<PointsChangelogInterface>>>({
   name:    'points_changelog',
   columns: {
-    id:            { type: Number, primary: true, generated: 'increment' },
+    id: {
+      type: Number, primary: true, generated: 'increment', 
+    },
     userId:        { type: Number },
     originalValue: { type: Number },
     updatedValue:  { type: Number },

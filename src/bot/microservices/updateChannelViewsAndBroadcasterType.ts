@@ -31,7 +31,9 @@ async function updateChannelViewsAndBroadcasterType () {
     // save remaining api calls
     setRateLimit('bot', request.headers);
 
-    ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot });
+    ioServer?.emit('api.stats', {
+      method: 'GET', data: request.data, timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, 
+    });
 
     if (request.data.data.length > 0) {
       oauth.profileImageUrl = request.data.data[0].profile_image_url;
@@ -47,7 +49,9 @@ async function updateChannelViewsAndBroadcasterType () {
     }
 
     error(`${url} - ${e.message}`);
-    ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot });
+    ioServer?.emit('api.stats', {
+      method: 'GET', timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot, 
+    });
   }
   return { state: true };
 }

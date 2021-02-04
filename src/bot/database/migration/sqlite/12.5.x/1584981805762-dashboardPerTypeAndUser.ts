@@ -5,7 +5,9 @@ import {
 let broadcasterId: null | number = null;
 
 const columnUserIdWithoutDefault = new TableColumn({ type: 'integer', name: 'userId' });
-const columnTypeWithoutDefault = new TableColumn({ type: 'varchar', name: 'type', length: '6' });
+const columnTypeWithoutDefault = new TableColumn({
+  type: 'varchar', name: 'type', length: '6', 
+});
 
 export class dashboardPerTypeAndUser1584981805762 implements MigrationInterface {
   name = 'dashboardPerTypeAndUser1584981805762';
@@ -19,8 +21,12 @@ export class dashboardPerTypeAndUser1584981805762 implements MigrationInterface 
         throw new Error('broadcasterId');
       }
 
-      const columnUserId = new TableColumn({ type: 'integer', default: broadcasterId, name: 'userId' });
-      const columnType = new TableColumn({ type: 'varchar', default: '\'admin\'', name: 'type', length: '6' });
+      const columnUserId = new TableColumn({
+        type: 'integer', default: broadcasterId, name: 'userId', 
+      });
+      const columnType = new TableColumn({
+        type: 'varchar', default: '\'admin\'', name: 'type', length: '6', 
+      });
 
       const widgets = await queryRunner.query(`SELECT * from widget WHERE dashboardId NOT NULL`);
 

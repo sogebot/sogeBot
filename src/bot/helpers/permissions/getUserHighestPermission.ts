@@ -9,9 +9,7 @@ async function getUserHighestPermission(userId: number): Promise<string> {
   if (!cachedPermission) {
     const permissions = await getRepository(Permissions).find({
       cache: true,
-      order: {
-        order: 'ASC',
-      },
+      order: { order: 'ASC' },
     });
     for (const p of permissions) {
       if ((await check(userId, p.id, true)).access) {

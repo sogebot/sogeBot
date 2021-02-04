@@ -170,9 +170,7 @@ class Scrim extends System {
     for (const id of Object.keys(matches).sort()) {
       output.push(id + ' - ' + matches[id].sort().join(', '));
     }
-    return [{ response: prepare('systems.scrim.currentMatches', {
-      matches: output.length === 0 ? '<' + translate('core.empty') + '>' : output.join(' | '),
-    }), ...opts }];
+    return [{ response: prepare('systems.scrim.currentMatches', { matches: output.length === 0 ? '<' + translate('core.empty') + '>' : output.join(' | ') }), ...opts }];
   }
 
   private countdown() {
@@ -194,15 +192,15 @@ class Scrim extends System {
                 return; // user restarted !snipe
               }
               announce(
-                prepare('systems.scrim.putMatchIdInChat', {
-                  command: this.getCommand('!snipe match'),
-                }), 'scrim'
+                prepare('systems.scrim.putMatchIdInChat', { command: this.getCommand('!snipe match') }), 'scrim'
               );
               setTimeout(async () => {
                 if (this.closingAt !== 0) {
                   return; // user restarted !snipe
                 }
-                const currentMatches = await this.currentMatches({ sender: getBotSender(), parameters: '', createdAt: Date.now(), command: '', attr: {} });
+                const currentMatches = await this.currentMatches({
+                  sender: getBotSender(), parameters: '', createdAt: Date.now(), command: '', attr: {}, 
+                });
                 for (const r of currentMatches) {
                   announce(await r.response, 'scrim');
                 }

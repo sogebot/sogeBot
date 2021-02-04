@@ -20,23 +20,17 @@ export const Variable = new EntitySchema<Readonly<Required<VariableInterface>>>(
       primary:   true,
       generated: 'uuid',
     },
-    variableName: {
-      type: String,
-    },
-    description: {
+    variableName: { type: String },
+    description:  {
       type:    String,
       default: '',
     },
-    type: {
-      type: String,
-    },
+    type:         { type: String },
     currentValue: {
       type:     String,
       nullable: true,
     },
-    evalValue: {
-      type: 'text',
-    },
+    evalValue:         { type: 'text' },
     runEveryTypeValue: {
       type:    Number,
       default: 60000,
@@ -49,24 +43,18 @@ export const Variable = new EntitySchema<Readonly<Required<VariableInterface>>>(
       type:    Number,
       default: 60000,
     },
-    responseType: {
-      type: Number,
-    },
+    responseType: { type: Number },
     responseText: {
       type:    String,
       default: '',
     },
-    permission: {
-      type: String,
-    },
-    readOnly: {
+    permission: { type: String },
+    readOnly:   {
       type:    Boolean,
       default: false,
     },
-    usableOptions: {
-      type: 'simple-array',
-    },
-    runAt: {
+    usableOptions: { type: 'simple-array' },
+    runAt:         {
       type:        'bigint',
       transformer: new ColumnNumericTransformer(),
       default:     0,
@@ -108,13 +96,9 @@ export const VariableHistory = new EntitySchema<Readonly<VariableHistoryInterfac
       type:    String,
       default: 'n/a',
     },
-    currentValue: {
-      type: String,
-    },
-    oldValue: {
-      type: 'simple-json',
-    },
-    changedAt: {
+    currentValue: { type: String },
+    oldValue:     { type: 'simple-json' },
+    changedAt:    {
       type:        'bigint',
       transformer: new ColumnNumericTransformer(),
       default:     0,
@@ -191,8 +175,6 @@ export const VariableWatch = new EntitySchema<Readonly<VariableWatchInterface>>(
     variableId: {
       type: String, nullable: false, name: 'variableId',
     },
-    order: {
-      type: Number,
-    },
+    order: { type: Number },
   },
 });

@@ -162,7 +162,9 @@ export const init = () => {
     res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
   });
 
-  menu.push({ category: 'main', name: 'dashboard', id: 'dashboard', this: null });
+  menu.push({
+    category: 'main', name: 'dashboard', id: 'dashboard', this: null, 
+  });
 
   setTimeout(() => {
     adminEndpoint('/', 'panel::resetStatsState', () => lastDataSent = null);
@@ -309,7 +311,9 @@ export const init = () => {
           .insert()
           .into(CacheTitles)
           .values([
-            { game: data.game, title: data.title, timestamp: Date.now() },
+            {
+              game: data.game, title: data.title, timestamp: Date.now(), 
+            },
           ])
           .execute();
       }
@@ -407,13 +411,9 @@ export const init = () => {
 
     adminEndpoint('/', 'panel::availableWidgets', async (opts, cb) => {
       const dashboards = await getRepository(Dashboard).find({
-        where: {
-          userId: opts.userId, type: opts.type,
-        },
+        where:     { userId: opts.userId, type: opts.type },
         relations: ['widgets'],
-        order:     {
-          createdAt: 'ASC',
-        },
+        order:     { createdAt: 'ASC' },
       });
 
       const sendWidgets: typeof widgets = [];
@@ -437,13 +437,17 @@ export const init = () => {
     });
 
     adminEndpoint('/', 'panel::dashboards::remove', async (opts, cb) => {
-      await getRepository(Dashboard).delete({ userId: opts.userId, type: opts.type, id: opts.id });
+      await getRepository(Dashboard).delete({
+        userId: opts.userId, type: opts.type, id: opts.id, 
+      });
       await getRepository(Widget).delete({ dashboardId: IsNull() });
       cb(null);
     });
 
     adminEndpoint('/', 'panel::dashboards::create', async (opts, cb) => {
-      cb(null, await getRepository(Dashboard).save({ name: opts.name, createdAt: Date.now(), id: uuid(), userId: opts.userId, type: 'admin' }));
+      cb(null, await getRepository(Dashboard).save({
+        name: opts.name, createdAt: Date.now(), id: uuid(), userId: opts.userId, type: 'admin', 
+      }));
     });
 
     socket.on('addWidget', async function (widgetName: string, id: string, cb: (dashboard?: DashboardInterface) => void) {
@@ -483,7 +487,9 @@ export const init = () => {
         if (value.startsWith('_')) {
           return true;
         }
-        setValue({ sender: getOwnerAsSender(), createdAt: 0, command: '', parameters: value + ' ' + index, attr: { quiet: data._quiet } });
+        setValue({
+          sender: getOwnerAsSender(), createdAt: 0, command: '', parameters: value + ' ' + index, attr: { quiet: data._quiet }, 
+        });
       });
     });
 
@@ -504,9 +510,7 @@ export const init = () => {
     socket.on('core', async (cb: (err: string | null, toEmit: { name: string }[]) => void) => {
       const toEmit: { name: string }[] = [];
       for (const system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch', 'socket', 'permissions']) {
-        toEmit.push({
-          name: system.toLowerCase(),
-        });
+        toEmit.push({ name: system.toLowerCase() });
       }
       cb(null, toEmit);
     });
@@ -572,7 +576,9 @@ export const init = () => {
     });
 
     adminEndpoint('/', 'menu', (cb) => {
-      cb(null, menu.map((o) => ({ category: o.category, name: o.name, id: o.id, enabled: o.this ? o.this.enabled : true })));
+      cb(null, menu.map((o) => ({
+        category: o.category, name: o.name, id: o.id, enabled: o.this ? o.this.enabled : true, 
+      })));
     });
 
     publicEndpoint('/', 'menu::public', (cb) => {

@@ -29,9 +29,7 @@ async function getValueOf (variableName: string, opts?: any) {
         _current: item.currentValue,
         ...opts,
       });
-      await getRepository(Variable).save({
-        ...item, currentValue,
-      });
+      await getRepository(Variable).save({ ...item, currentValue });
     }
   }
 

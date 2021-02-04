@@ -13,7 +13,9 @@ export interface TextInterface {
 export const Text = new EntitySchema<Readonly<Required<TextInterface>>>({
   name:    'text',
   columns: {
-    id:          { type: String, primary: true, generated: 'uuid' },
+    id: {
+      type: String, primary: true, generated: 'uuid', 
+    },
     name:        { type: String },
     refreshRate: { type: Number, default: 5 },
     text:        { type: 'text' },

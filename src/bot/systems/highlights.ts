@@ -38,12 +38,16 @@ class Highlights extends System {
 
   constructor() {
     super();
-    this.addMenu({ category: 'manage', name: 'highlights', id: 'manage/highlights', this: this });
+    this.addMenu({
+      category: 'manage', name: 'highlights', id: 'manage/highlights', this: this, 
+    });
   }
 
   public sockets() {
     adminEndpoint(this.nsp, 'highlight', () => {
-      this.main({ parameters: '', sender: getBotSender(), attr: {}, command: '!highlight', createdAt: Date.now() });
+      this.main({
+        parameters: '', sender: getBotSender(), attr: {}, command: '!highlight', createdAt: Date.now(), 
+      });
     });
     adminEndpoint(this.nsp, 'generic::getAll', async (cb) => {
       try {
@@ -76,7 +80,9 @@ class Highlights extends System {
             }
           }
           if (url.highlight) {
-            this.main({ parameters: '', sender: getBotSender(), attr: {}, command: '!highlight', createdAt: Date.now() });
+            this.main({
+              parameters: '', sender: getBotSender(), attr: {}, command: '!highlight', createdAt: Date.now(), 
+            });
           }
           return res.status(200).send({ ok: true });
         }
@@ -114,16 +120,22 @@ class Highlights extends System {
       const timestamp = timestampToObject(dayjs().valueOf() - dayjs(streamStatusChangeSince.value).valueOf());
       const highlight = {
         videoId:   request.data.data[0].id,
-        timestamp: { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds },
+        timestamp: {
+          hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds, 
+        },
         game:      stats.value.currentGame || 'n/a',
         title:     stats.value.currentTitle || 'n/a',
         createdAt: Date.now(),
       };
 
-      ioServer?.emit('api.stats', { method: 'GET', data: request.data, timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot.remaining });
+      ioServer?.emit('api.stats', {
+        method: 'GET', data: request.data, timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot.remaining, 
+      });
       return this.add(highlight, timestamp, opts);
     } catch (e) {
-      ioServer?.emit('api.stats', { method: 'GET', timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: e.stack, remaining: calls.bot.remaining });
+      ioServer?.emit('api.stats', {
+        method: 'GET', timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: e.stack, remaining: calls.bot.remaining, 
+      });
       switch (e.message) {
         case ERROR_STREAM_NOT_ONLINE:
           error('Cannot highlight - stream offline');
@@ -141,20 +153,18 @@ class Highlights extends System {
   public async add(highlight: HighlightInterface, timestamp: TimestampObject, opts: CommandOptions): Promise<CommandResponse[]> {
     api.createMarker();
     getRepository(Highlight).insert(highlight);
-    return [{ response: translate('highlights.saved')
-      .replace(/\$hours/g, (timestamp.hours < 10) ? '0' + timestamp.hours : timestamp.hours)
-      .replace(/\$minutes/g, (timestamp.minutes < 10) ? '0' + timestamp.minutes : timestamp.minutes)
-      .replace(/\$seconds/g, (timestamp.seconds < 10) ? '0' + timestamp.seconds : timestamp.seconds), ...opts }];
+    return [{
+      response: translate('highlights.saved')
+        .replace(/\$hours/g, (timestamp.hours < 10) ? '0' + timestamp.hours : timestamp.hours)
+        .replace(/\$minutes/g, (timestamp.minutes < 10) ? '0' + timestamp.minutes : timestamp.minutes)
+        .replace(/\$seconds/g, (timestamp.seconds < 10) ? '0' + timestamp.seconds : timestamp.seconds), ...opts, 
+    }];
   }
 
   @command('!highlight list')
   @default_permission(defaultPermissions.CASTERS)
   public async list(opts: CommandOptions): Promise<CommandResponse[]> {
-    const sortedHighlights = await getRepository(Highlight).find({
-      order: {
-        createdAt: 'DESC',
-      },
-    });
+    const sortedHighlights = await getRepository(Highlight).find({ order: { createdAt: 'DESC' } });
     const latestStreamId = sortedHighlights.length > 0 ? sortedHighlights[0].videoId : null;
 
     if (isNil(latestStreamId)) {

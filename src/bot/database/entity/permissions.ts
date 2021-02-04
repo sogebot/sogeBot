@@ -29,7 +29,9 @@ export interface PermissionCommandsInterface {
 export const Permissions = new EntitySchema<Readonly<Required<PermissionsInterface>>>({
   name:    'permissions',
   columns: {
-    id:                 { type: 'uuid', primary: true, generated: 'uuid' },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
     name:               { type: String },
     order:              { type: Number },
     isCorePermission:   { type: Boolean },
@@ -51,7 +53,9 @@ export const Permissions = new EntitySchema<Readonly<Required<PermissionsInterfa
 export const PermissionFilters = new EntitySchema<Readonly<Required<PermissionFiltersInterface>>>({
   name:    'permission_filters',
   columns: {
-    id:         { type: 'uuid', primary: true, generated: 'uuid' },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
     comparator: { type: 'varchar', length: 3 },
     type:       { type: 'varchar' },
     value:      { type: String },
@@ -70,9 +74,13 @@ export const PermissionFilters = new EntitySchema<Readonly<Required<PermissionFi
 export const PermissionCommands = new EntitySchema<Readonly<Required<PermissionCommandsInterface>>>({
   name:    'permission_commands',
   columns: {
-    id:         { type: 'uuid', primary: true, generated: 'uuid' },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
     name:       { type: String },
-    permission: { type: 'varchar', nullable: true, length: 36 },
+    permission: {
+      type: 'varchar', nullable: true, length: 36, 
+    },
   },
   indices: [
     { name: 'IDX_ba6483f5c5882fa15299f22c0a', columns: ['name'] },

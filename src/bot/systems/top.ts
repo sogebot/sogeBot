@@ -260,7 +260,9 @@ class Top extends System {
         message += (i + 1) + '. ' + (tmi.showWithAt ? '@' : '') + (user.username || 'unknown') + ' - ';
         switch (type) {
           case TYPE.TIME:
-            message += Intl.NumberFormat(general.lang, { style: 'unit', unit: 'hour', minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(user.value / 1000 / 60 / 60);
+            message += Intl.NumberFormat(general.lang, {
+              style: 'unit', unit: 'hour', minimumFractionDigits: 1, maximumFractionDigits: 1, 
+            }).format(user.value / 1000 / 60 / 60);
             break;
           case TYPE.SUBMONTHS:
             message += [user.value, getLocalizedName(user.value, translate('core.months'))].join(' ');

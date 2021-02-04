@@ -16,7 +16,9 @@ class Alerts extends Overlay {
   @settings()
   galleryCache = false;
   @settings()
-  @ui({ type: 'number-input', step: '0.5', min: '0.5' })
+  @ui({
+    type: 'number-input', step: '0.5', min: '0.5', 
+  })
   galleryCacheLimitInMb = 50;
 
   sockets() {

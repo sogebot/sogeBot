@@ -129,9 +129,7 @@ class Moderation extends System {
 
   async timeoutUser (sender: CommandOptions['sender'], text: string, warning: string, msg: string, time: number, type: timeoutType ) {
     // cleanup warnings
-    await getRepository(ModerationWarning).delete({
-      timestamp: LessThan(Date.now() - 1000 * 60 * 60),
-    });
+    await getRepository(ModerationWarning).delete({ timestamp: LessThan(Date.now() - 1000 * 60 * 60) });
     const warnings = await getRepository(ModerationWarning).find({ userId: Number(sender.userId) });
     const silent = await this.isSilent(type);
 
@@ -242,7 +240,9 @@ class Moderation extends System {
         await getRepository(ModerationPermit).insert({ userId });
       }
 
-      const response = prepare('moderation.user-have-link-permit', { username: parsed[1].toLowerCase(), link: getLocalizedName(count, translate('core.links')), count: count });
+      const response = prepare('moderation.user-have-link-permit', {
+        username: parsed[1].toLowerCase(), link: getLocalizedName(count, translate('core.links')), count: count, 
+      });
       return [{ response, ...opts }];
     } catch (e) {
       return [{ response: translate('moderation.permit-parse-failed'), ...opts }];

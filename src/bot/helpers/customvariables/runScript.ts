@@ -43,7 +43,9 @@ async function runScript (script: string, opts: { sender: { userId: number; user
   const containUsers = strippedScript.match(/users/g) !== null;
   const containRandom = strippedScript.replace(/Math\.random|_\.random/g, '').match(/random/g) !== null;
   const containOnline = strippedScript.match(/online/g) !== null;
-  debug('customvariables.eval', { strippedScript, containOnline, containRandom, containUsers });
+  debug('customvariables.eval', {
+    strippedScript, containOnline, containRandom, containUsers, 
+  });
 
   let usersList: UserInterface[] = [];
   if (containUsers || containRandom) {
@@ -109,7 +111,9 @@ async function runScript (script: string, opts: { sender: { userId: number; user
       }
 
       const request = await axios(urlOpts);
-      return { data: request.data, status: request.status, statusText: request.statusText };
+      return {
+        data: request.data, status: request.status, statusText: request.statusText, 
+      };
     },
     _:      _,
     users:  users,

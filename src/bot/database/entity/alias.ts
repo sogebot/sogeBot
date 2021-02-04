@@ -13,7 +13,9 @@ export interface AliasInterface {
 export const Alias = new EntitySchema<Readonly<Required<AliasInterface>>>({
   name:    'alias',
   columns: {
-    id:         { type: String, primary: true, generated: 'uuid' },
+    id: {
+      type: String, primary: true, generated: 'uuid', 
+    },
     alias:      { type: String, nullable: false },
     command:    { type: 'text' },
     enabled:    { type: Boolean },

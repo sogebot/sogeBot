@@ -7,7 +7,9 @@ export interface ChecklistInterface {
 export const Checklist = new EntitySchema<Readonly<Required<ChecklistInterface>>>({
   name:    'checklist',
   columns: {
-    id:          { type: 'uuid', primary: true, generated: 'uuid' },
+    id: {
+      type: 'uuid', primary: true, generated: 'uuid', 
+    },
     isCompleted: { type: Boolean },
     value:       { type: String },
   },
