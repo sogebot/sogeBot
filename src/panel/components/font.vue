@@ -322,7 +322,7 @@
                 <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
                   <b-form-input
                     :id="'font.shadowColor' + uuid"
-                    v-model="fontDatashadow[i].color"
+                    v-model="fontData.shadow[i].color"
                     type="color"
                   />
                 </b-input-group>
@@ -343,7 +343,7 @@
           </b-tabs>
         </b-card>
 
-        <template v-if="typeof fontDatacolor === 'undefined'">
+        <template v-if="typeof fontData.color === 'undefined'">
           <b-form-input
             v-model="exampleColor"
             type="color"
@@ -353,12 +353,12 @@
         </template>
         <div
           :style="{
-            color: typeof fontDatacolor === 'undefined' ? exampleColor : fontDatacolor,
-            'font-size': fontDatasize + 'px',
-            'font-weight': fontDataweight,
-            'font-family': fontDatafamily,
+            color: typeof fontData.color === 'undefined' ? exampleColor : fontData.color,
+            'font-size': fontData.size + 'px',
+            'font-weight': fontData.weight,
+            'font-family': fontData.family,
             'text-align': 'center',
-            'text-shadow': [textStrokeGenerator(fontDataborderPx, fontDataborderColor), shadowGenerator(fontDatashadow)].filter(Boolean).join(', ')
+            'text-shadow': [textStrokeGenerator(fontData.borderPx, fontData.borderColor), shadowGenerator(fontData.shadow)].filter(Boolean).join(', ')
           }"
           class="pt-2"
         >
