@@ -1,7 +1,7 @@
 const exec = require('child_process').exec;
 const fs = require('fs');
 
-const dotenv = require('dotenv');
+require('dotenv').config();
 
 const getMigrationType = require('../dest/helpers/getMigrationType').getMigrationType;
 
