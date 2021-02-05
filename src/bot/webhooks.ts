@@ -8,13 +8,13 @@ import type { StreamEndpoint } from './api';
 import { User } from './database/entity/user';
 import { getFunctionList } from './decorators/on';
 import {
-  chatMessagesAtStart, curRetries, isStreamOnline, stats, streamId, streamStatusChangeSince, streamType, 
+  chatMessagesAtStart, curRetries, isStreamOnline, stats, streamId, streamStatusChangeSince, streamType,
 } from './helpers/api';
 import { setCurrentRetries } from './helpers/api/';
 import { eventEmitter } from './helpers/events';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import {
-  debug, error, follow, info, start, 
+  debug, error, follow, info, start,
 } from './helpers/log';
 import { channelId } from './helpers/oauth';
 import { linesParsed } from './helpers/parser';
@@ -207,7 +207,7 @@ class Webhooks {
         this.enabled.streams = true;
         break;
     }
-    res.send(req.query['hub.challenge']);
+    res.send(escape(req.query['hub.challenge']));
   }
 
   /*
@@ -267,7 +267,7 @@ class Webhooks {
           });
           follow(data.from_name);
           eventEmitter.emit('follow', {
-            username: data.from_name, userId: Number(data.from_id), webhooks: true, 
+            username: data.from_name, userId: Number(data.from_id), webhooks: true,
           });
           alerts.trigger({
             event:      'follows',
