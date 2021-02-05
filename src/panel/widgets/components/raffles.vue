@@ -157,7 +157,6 @@
                         fa(icon="slash" transform="down-2 left-2")
                       | {{translate('no-eligible-participants')}}
 
-
               div(class="table-responsive" style="margin-top: 0; padding-left: 10px; padding-right: 10px;")
                 table.table.table-sm
                   thead
@@ -173,17 +172,17 @@
 </template>
 
 <script>
-import { getSocket } from 'src/panel/helpers/socket';
-import { EventBus } from 'src/panel/helpers/event-bus';
+import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
 import { orderBy } from 'lodash-es';
 import Vue from 'vue';
-import translate from 'src/panel/helpers/translate';
 
 import loading from 'src/panel/components/loading.vue';
-import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
+import { EventBus } from 'src/panel/helpers/event-bus';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 export default {
-  props: ['popout', 'nodrag'],
+  props:      ['popout', 'nodrag'],
   components: {
     loading, /* somehow () => import() is not working in this context */
     'font-awesome-layers': FontAwesomeLayers,
@@ -199,41 +198,44 @@ export default {
       search: '',
 
       eligibility: {
-        all: true,
-        followers: false,
-        subscribers: false
+        all:         true,
+        followers:   false,
+        subscribers: false,
       },
 
       isTypeKeywords: true,
-      keyword: '',
-      running: false,
-      ticketsMax: 100,
-      ticketsMin: 1,
-      winner: null,
-      participants: [],
+      keyword:        '',
+      running:        false,
+      ticketsMax:     100,
+      ticketsMin:     1,
+      winner:         null,
+      participants:   [],
 
-      cacheInterval: 0,
+      cacheInterval:  0,
       refreshTimeout: 0,
 
-      socket: getSocket('/systems/raffles'),
-      updated: String(new Date())
-    }
+      socket:  getSocket('/systems/raffles'),
+      updated: String(new Date()),
+    };
   },
   computed: {
     fParticipants: function () {
-      if (this.search.trim().length === 0) return this.participants
-      else {
-        return this.participants.filter(o => o.username.includes(this.search.trim()))
+      if (this.search.trim().length === 0) {
+        return this.participants;
+      } else {
+        return this.participants.filter(o => o.username.includes(this.search.trim()));
       }
     },
     winnerMessages: function () {
       if (this.winner) {
-        const messages = this.participants.find(o => o.username === this.winner.username).messages
-        return messages.slice(Math.max(messages.length - 5, 0))
-      } else return []
+        const messages = this.participants.find(o => o.username === this.winner.username).messages;
+        return messages.slice(Math.max(messages.length - 5, 0));
+      } else {
+        return [];
+      }
     },
     countEligibleParticipants () {
-      return (this.participants.filter(o => o.isEligible)).length
+      return (this.participants.filter(o => o.isEligible)).length;
     },
   },
   destroyed () {
@@ -243,8 +245,9 @@ export default {
   created: function () {
     const cache = localStorage.getItem('/widget/raffles/');
     if (cache) {
-      for (const [key, value] of Object.entries(JSON.parse(cache)))
-      this[key] = value;
+      for (const [key, value] of Object.entries(JSON.parse(cache))) {
+        this[key] = value;
+      }
     }
 
     // better would be to have watcher, but there is no simple way
@@ -252,22 +255,24 @@ export default {
     this.cacheInterval = setInterval(() => {
       localStorage.setItem('/widget/raffles/', JSON.stringify({
         eligibility: {
-          all: this.eligibility.all,
-          followers: this.eligibility.followers,
+          all:         this.eligibility.all,
+          followers:   this.eligibility.followers,
           subscribers: this.eligibility.subscribers,
         },
         isTypeKeywords: this.isTypeKeywords,
-        keyword: this.keyword,
-        ticketsMax: this.ticketsMax,
-        ticketsMin: this.ticketsMin,
-      }))
+        keyword:        this.keyword,
+        ticketsMax:     this.ticketsMax,
+        ticketsMin:     this.ticketsMin,
+      }));
     }, 1000);
 
-    this.refresh()
+    this.refresh();
   },
   watch: {
     keyword: function () {
-      if (!this.keyword.startsWith('!')) this.keyword = '!' + this.keyword
+      if (!this.keyword.startsWith('!')) {
+        this.keyword = '!' + this.keyword;
+      }
     },
     ticketsMax(val) {
       if (val < this.ticketsMin) {
@@ -284,15 +289,15 @@ export default {
       if (val < 1) {
         this.ticketsMin = 1;
       }
-    }
+    },
   },
   methods: {
     refresh: async function () {
       await Promise.all([
         new Promise((resolve, reject) => {
           this.socket.emit('raffle:getLatest', (err, raffle) => {
-            console.groupCollapsed('raffle:getLatest')
-            console.log({err, raffle})
+            console.groupCollapsed('raffle:getLatest');
+            console.log({ err, raffle });
             console.groupEnd();
             if (err) {
               reject(err);
@@ -303,44 +308,44 @@ export default {
               this.waitingForNewWinner = false;
 
               if (!raffle.winner) {
-                this.winner = null
+                this.winner = null;
               } else {
                 if (this.winner === null || this.winner.username !== raffle.winner) {
-                  this.socket.emit('raffle::getWinner', raffle.winner, (err, user) => {
-                    if (err) {
-                      reject(err);
+                  this.socket.emit('raffle::getWinner', raffle.winner, (err2, user) => {
+                    if (err2) {
+                      reject(err2);
                     }
-                    this.winner = user
+                    this.winner = user;
                   });
                 }
               }
 
               if (this.running) {
-                this.keyword = raffle.keyword
-                this.isTypeKeywords = raffle.type === 0
-                this.ticketsMax = raffle.maxTickets
-                this.ticketsMin = raffle.minTickets
+                this.keyword = raffle.keyword;
+                this.isTypeKeywords = raffle.type === 0;
+                this.ticketsMax = raffle.maxTickets;
+                this.ticketsMin = raffle.minTickets;
 
                 // set eligibility
                 if (!raffle.subscribers && !raffle.followers) {
-                  this.eligibility.all = false
-                  this.toggle('all') // enable all
+                  this.eligibility.all = false;
+                  this.toggle('all'); // enable all
                 } else {
-                  this.eligibility.followers = !raffle.followers
-                  this.eligibility.subscribers = !raffle.subscribers
-                  this.toggle('followers')
-                  this.toggle('subscribers')
+                  this.eligibility.followers = !raffle.followers;
+                  this.eligibility.subscribers = !raffle.subscribers;
+                  this.toggle('followers');
+                  this.toggle('subscribers');
                 }
               }
             }
-            resolve()
-          })
+            resolve();
+          });
         }),
       ]).catch(err => {
         console.error(err);
-      })
+      });
 
-      this.refreshTimeout = setTimeout(() => this.refresh(), 1000)
+      this.refreshTimeout = setTimeout(() => this.refresh(), 1000);
     },
     toggleEligibility: function (participant) {
       participant.isEligible = !participant.isEligible;
@@ -351,37 +356,43 @@ export default {
       });
     },
     toggle: function (pick) {
-      Vue.set(this.eligibility, pick, !this.eligibility[pick])
+      Vue.set(this.eligibility, pick, !this.eligibility[pick]);
       if (pick === 'all' && this.eligibility[pick]) {
-        this.eligibility.followers = false
-        this.eligibility.subscribers = false
+        this.eligibility.followers = false;
+        this.eligibility.subscribers = false;
       }
-      if (!this.eligibility.all && !this.eligibility.followers && !this.eligibility.subscribers) this.eligibility.all = true
-      if (this.eligibility.followers || this.eligibility.subscribers) this.eligibility.all = false
-      this.updated = String(new Date())
+      if (!this.eligibility.all && !this.eligibility.followers && !this.eligibility.subscribers) {
+        this.eligibility.all = true;
+      }
+      if (this.eligibility.followers || this.eligibility.subscribers) {
+        this.eligibility.all = false;
+      }
+      this.updated = String(new Date());
 
-      localStorage.setItem('/widget/raffles/eligibility/all', JSON.stringify(this.eligibility.all))
-      localStorage.setItem('/widget/raffles/eligibility/followers', JSON.stringify(this.eligibility.followers))
-      localStorage.setItem('/widget/raffles/eligibility/subscribers', JSON.stringify(this.eligibility.subscribers))
+      localStorage.setItem('/widget/raffles/eligibility/all', JSON.stringify(this.eligibility.all));
+      localStorage.setItem('/widget/raffles/eligibility/followers', JSON.stringify(this.eligibility.followers));
+      localStorage.setItem('/widget/raffles/eligibility/subscribers', JSON.stringify(this.eligibility.subscribers));
     },
     open: function () {
-      let out = []
-      out.push(this.keyword)
-      if (this.eligibility.followers || this.eligibility.subscribers) out.push('-for ' + (this.eligibility.followers ? 'followers' : ' ') + (this.eligibility.subscribers ? 'subscribers' : ' '))
+      const out = [];
+      out.push(this.keyword);
+      if (this.eligibility.followers || this.eligibility.subscribers) {
+        out.push('-for ' + (this.eligibility.followers ? 'followers' : ' ') + (this.eligibility.subscribers ? 'subscribers' : ' '));
+      }
 
       if (!this.isTypeKeywords) {
-        out.push(`-min ${this.ticketsMin}`)
-        out.push(`-max ${this.ticketsMax}`)
+        out.push(`-min ${this.ticketsMin}`);
+        out.push(`-max ${this.ticketsMax}`);
       }
-      console.group('raffles open()')
-      console.debug('out: ', out.join(' '))
-      console.groupEnd()
-      this.socket.emit('raffle::open', out.join(' '))
+      console.group('raffles open()');
+      console.debug('out: ', out.join(' '));
+      console.groupEnd();
+      this.socket.emit('raffle::open', out.join(' '));
     },
     close: function () {
-      this.socket.emit('raffle::close')
-      this.running = false
-    }
-  }
-}
+      this.socket.emit('raffle::close');
+      this.running = false;
+    },
+  },
+};
 </script>

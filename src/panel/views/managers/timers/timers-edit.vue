@@ -12,11 +12,13 @@
             v-model="item.name"
             type="text"
             :placeholder="translate('timers.dialog.placeholders.name')"
-            @input="$v.item.$touch()"
             :state="$v.item.name.$invalid && $v.item.name.$dirty ? false : null"
-          ></b-form-input>
+            @input="$v.item.$touch()"
+          />
         </b-input-group>
-        <b-form-invalid-feedback :state="!($v.item.name.$invalid && $v.item.name.$dirty)">{{ translate('timers.errors.timer_name_must_be_compliant') }}</b-form-invalid-feedback>
+        <b-form-invalid-feedback :state="!($v.item.name.$invalid && $v.item.name.$dirty)">
+          {{ translate('timers.errors.timer_name_must_be_compliant') }}
+        </b-form-invalid-feedback>
       </b-form-group>
 
       <b-row>
@@ -35,33 +37,41 @@
                 :placeholder="translate('timers.dialog.placeholders.messages')"
                 :state="$v.item.triggerEveryMessage.$invalid && $v.item.triggerEveryMessage.$dirty ? false : null"
                 @input="$v.item.$touch()"
-              ></b-form-input>
+              />
               <b-form-invalid-feedback :state="!($v.item.triggerEveryMessage.$invalid && $v.item.triggerEveryMessage.$dirty)">
-                <template v-if="!$v.item.triggerEveryMessage.required">{{ translate('errors.value_cannot_be_empty') }}</template>
-                <template v-else-if="!$v.item.triggerEveryMessage.minValue">{{ translate('errors.minValue_of_value_is').replace('$value', '0') }}</template>
+                <template v-if="!$v.item.triggerEveryMessage.required">
+                  {{ translate('errors.value_cannot_be_empty') }}
+                </template>
+                <template v-else-if="!$v.item.triggerEveryMessage.minValue">
+                  {{ translate('errors.minValue_of_value_is').replace('$value', '0') }}
+                </template>
               </b-form-invalid-feedback>
             </b-input-group>
-        </b-form-group>
-      </b-col>
-      <b-col>
-        <b-form-group
-          :label="translate('timers.dialog.seconds')"
-          :description="translate('timers.dialog.placeholders.seconds')"
-          label-for="seconds"
-        >
-          <b-input-group>
-            <b-form-input
-              id="seconds"
-              v-model="item.triggerEverySecond"
-              type="number"
-              min="0"
-              :placeholder="translate('timers.dialog.placeholders.seconds')"
-              :state="$v.item.triggerEverySecond.$invalid && $v.item.triggerEverySecond.$dirty ? false : null"
-              @input="$v.item.$touch()"
-              ></b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col>
+          <b-form-group
+            :label="translate('timers.dialog.seconds')"
+            :description="translate('timers.dialog.placeholders.seconds')"
+            label-for="seconds"
+          >
+            <b-input-group>
+              <b-form-input
+                id="seconds"
+                v-model="item.triggerEverySecond"
+                type="number"
+                min="0"
+                :placeholder="translate('timers.dialog.placeholders.seconds')"
+                :state="$v.item.triggerEverySecond.$invalid && $v.item.triggerEverySecond.$dirty ? false : null"
+                @input="$v.item.$touch()"
+              />
               <b-form-invalid-feedback :state="!($v.item.triggerEverySecond.$invalid && $v.item.triggerEverySecond.$dirty)">
-                <template v-if="!$v.item.triggerEverySecond.required">{{ translate('errors.value_cannot_be_empty') }}</template>
-                <template v-else-if="!$v.item.triggerEverySecond.minValue">{{ translate('errors.minValue_of_value_is').replace('$value', '0') }}</template>
+                <template v-if="!$v.item.triggerEverySecond.required">
+                  {{ translate('errors.value_cannot_be_empty') }}
+                </template>
+                <template v-else-if="!$v.item.triggerEverySecond.minValue">
+                  {{ translate('errors.minValue_of_value_is').replace('$value', '0') }}
+                </template>
               </b-form-invalid-feedback>
             </b-input-group>
           </b-form-group>
@@ -69,16 +79,27 @@
       </b-row>
 
       <b-form-group>
-        <label>{{translate('timers.dialog.responses')}}</label>
-        <b-input-group v-for="(response, index) of item.messages" class="pb-1" :key="response">
-          <b-alert show variant="danger" v-if="markToDeleteIdx.includes(index)"
-          style="position: absolute;
+        <label>{{ translate('timers.dialog.responses') }}</label>
+        <b-input-group
+          v-for="(response, index) of item.messages"
+          :key="response"
+          class="pb-1"
+        >
+          <b-alert
+            v-if="markToDeleteIdx.includes(index)"
+            show
+            variant="danger"
+            style="position: absolute;
                  z-index: 9;
                  height: 100%;
                  width: calc(100% - 34.5px);
-                 opacity: 60%;"></b-alert>
+                 opacity: 60%;"
+          />
           <b-input-group-prepend>
-            <b-button @click="response.isEnabled = !response.isEnabled" :variant="response.isEnabled ? 'success' : 'danger'">
+            <b-button
+              :variant="response.isEnabled ? 'success' : 'danger'"
+              @click="response.isEnabled = !response.isEnabled"
+            >
               {{ response.isEnabled ? translate('enabled') : translate('disabled') }}
             </b-button>
           </b-input-group-prepend>
@@ -86,92 +107,94 @@
           <textarea-with-tags
             class="w-50"
             :value.sync="response.response"
-            v-bind:filters="['global']"
-            v-bind:placeholder="''"
-            @input="getMessageValidation(index).$touch();"
+            :filters="['global']"
+            :placeholder="''"
             :state="!(getMessageValidation(index).$error && getMessageValidation(index).$dirty)"
-            />
+            @input="getMessageValidation(index).$touch();"
+          />
 
           <b-input-group-append>
-            <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="toggleMarkResponse(index)">
+            <button-with-icon
+              class="btn-only-icon btn-danger btn-reverse"
+              icon="trash"
+              @click="toggleMarkResponse(index)"
+            >
               {{ translate('dialog.buttons.delete') }}
             </button-with-icon>
           </b-input-group-append>
         </b-input-group>
-        <button type="button" class="btn btn-success btn-block" @click="addResponse()">{{ translate('systems.timers.add_response') }}</button>
+        <button
+          type="button"
+          class="btn btn-success btn-block"
+          @click="addResponse()"
+        >
+          {{ translate('systems.timers.add_response') }}
+        </button>
       </b-form-group>
     </b-form>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch, getCurrentInstance, onUnmounted } from '@vue/composition-api'
-
+import {
+  defineComponent, getCurrentInstance, onMounted, onUnmounted, ref, watch,
+} from '@vue/composition-api';
+import { get, xor } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
-import { validationMixin } from 'vuelidate'
+import { validationMixin } from 'vuelidate';
 import { minValue, required } from 'vuelidate/lib/validators';
 
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 import { TimerInterface, TimerResponseInterface } from 'src/bot/database/entity/timer';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { error } from 'src/panel/helpers/error';
 import { EventBus } from 'src/panel/helpers/event-bus';
-import { get, xor } from 'lodash-es';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 type Props = {
   id: string;
   invalid: boolean;
   pending: boolean;
   saveState: number;
-}
+};
 
 const mustBeCompliant = (value: string) => value.length === 0 || !!value.match(/^[a-zA-Z0-9_]+$/);
 const socket = getSocket('/systems/timers');
 
 export default defineComponent({
-  props: {
-    id: String,
-    invalid: Boolean,
-    pending: Boolean,
+  components: { 'textarea-with-tags': () => import('../../../components/textareaWithTags.vue') },
+  mixins:     [ validationMixin ],
+  props:      {
+    id:        String,
+    invalid:   Boolean,
+    pending:   Boolean,
     saveState: Number,
-  },
-  mixins: [ validationMixin ],
-  components: {
-    loading: () => import('src/panel/components/loading.vue'),
-    'textarea-with-tags': () => import('../../../components/textareaWithTags.vue'),
   },
   validations: {
     item: {
-      name: { mustBeCompliant, required },
-      triggerEverySecond: { required, minValue: minValue(0) },
+      name:                { mustBeCompliant, required },
+      triggerEverySecond:  { required, minValue: minValue(0) },
       triggerEveryMessage: { required, minValue: minValue(0) },
-      messages: {
-        $each: {
-          response: { required },
-        },
-      },
-    }
+      messages:            { $each: { response: { required } } },
+    },
   },
   setup (props: Props, ctx) {
     const instance = getCurrentInstance()?.proxy;
 
-    const markToDeleteIdx = ref([] as number[])
-    const state = ref({
-      loading: ButtonStates.progress,
-    } as {
+    const markToDeleteIdx = ref([] as number[]);
+    const state = ref({ loading: ButtonStates.progress } as {
       loading: number;
     });
 
     const item = ref({
-      id: ctx.root.$route.params.id || uuid(),
-      name: '',
-      triggerEveryMessage: 0,
-      triggerEverySecond: 0,
-      isEnabled: true,
+      id:                   ctx.root.$route.params.id || uuid(),
+      name:                 '',
+      triggerEveryMessage:  0,
+      triggerEverySecond:   0,
+      isEnabled:            true,
       triggeredAtTimestamp: Date.now(),
-      triggeredAtMessages: 0,
-      messages: [],
+      triggeredAtMessages:  0,
+      messages:             [],
     } as Required<TimerInterface>);
 
     watch([item, markToDeleteIdx], (val, oldVal) => {
@@ -195,10 +218,10 @@ export default defineComponent({
     });
     onUnmounted(() => {
       EventBus.$off('managers::timers::save::' + item.value.id);
-    })
+    });
 
     const loadEditationItem = async () => {
-      state.value.loading = ButtonStates.progress
+      state.value.loading = ButtonStates.progress;
       await Promise.all([
         new Promise<void>((resolve, reject) => {
           if (ctx.root.$route.params.id) {
@@ -221,9 +244,9 @@ export default defineComponent({
       ]);
       ctx.root.$nextTick(() => {
         ctx.emit('update:pending', false);
-        state.value.loading = ButtonStates.success
+        state.value.loading = ButtonStates.success;
       });
-    }
+    };
     const save = () =>  {
       const $v = instance?.$v;
       $v?.$touch();
@@ -233,9 +256,9 @@ export default defineComponent({
         const messages: typeof item.value.messages = [];
         item.value.messages.forEach((message, index) => {
           if (!markToDeleteIdx.value.includes(index)) {
-            messages.push(message)
+            messages.push(message);
           }
-        })
+        });
         const toSave = {
           ...item.value,
           messages,
@@ -244,7 +267,7 @@ export default defineComponent({
         socket.emit('timers::save', toSave, (err: string | null) => {
           if (err) {
             ctx.emit('update:saveState', ButtonStates.fail);
-            error(err)
+            error(err);
           } else {
             item.value = toSave;
             markToDeleteIdx.value = [];
@@ -255,35 +278,39 @@ export default defineComponent({
             ctx.emit('refresh');
             setTimeout(() => {
               ctx.emit('update:saveState', ButtonStates.idle);
-            }, 1000)
-          })
-        })
+            }, 1000);
+          });
+        });
       }
-    }
+    };
     const addResponse = () => {
       const response: TimerResponseInterface = {
-        id: uuid(),
+        id:        uuid(),
         timestamp: Date.now(),
         isEnabled: true,
-        response: '',
+        response:  '',
       };
       item.value.messages.push(response);
-    }
+    };
 
     const toggleMarkResponse = (index: number) => {
-      markToDeleteIdx.value = xor(markToDeleteIdx.value, [index])
-    }
+      markToDeleteIdx.value = xor(markToDeleteIdx.value, [index]);
+    };
 
     const getMessageValidation = (idx: number) => {
       const $v = instance?.$v;
-      return get($v, 'item.messages.$each[' + idx + '].response', { $error: false, $dirty: false, $touch: () => {} });
+      return get($v, 'item.messages.$each[' + idx + '].response', {
+        $error: false, $dirty: false, $touch: () => {
+          return;
+        },
+      });
     };
     const stateOfMessagesErrorsDirty = () => {
       const $v = instance?.$v;
       return Object.values($v?.item.messages?.$each.$iter ?? []).filter((o, idx) => {
-        return !markToDeleteIdx.value.includes(idx) && (!!o.$error && !!o.$dirty)
+        return !markToDeleteIdx.value.includes(idx) && (!!o.$error && !!o.$dirty);
       }).length > 0;
-    }
+    };
 
     return {
       translate,
@@ -294,9 +321,9 @@ export default defineComponent({
       toggleMarkResponse,
       markToDeleteIdx,
       getMessageValidation,
-      stateOfMessagesErrorsDirty
-    }
-  }
+      stateOfMessagesErrorsDirty,
+    };
+  },
 });
 </script>
 
@@ -340,4 +367,3 @@ export default defineComponent({
   padding: 0.375rem 0.4rem;
 }
 </style>
-

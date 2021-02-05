@@ -28,8 +28,10 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { orderBy } from 'lodash-es';
+import {
+  Component, Prop, Vue, Watch, 
+} from 'vue-property-decorator';
 
 @Component({})
 export default class configurableList extends Vue {
@@ -45,52 +47,52 @@ export default class configurableList extends Vue {
     { value: 'header', text: 'Header' },
     { value: 'text', text: 'Text' },
     { value: 'smallText', text: 'Small Text' },
-    { value: 'separator', text: 'Separator' }
+    { value: 'separator', text: 'Separator' },
   ];
 
   @Watch('currentValues')
   onChange() {
-    this.$emit('update', { value: this.currentValues })
+    this.$emit('update', { value: this.currentValues });
   }
 
   moveUp(order: number) {
-    const val = Object.assign({}, this.currentValues.find(o => o.order === order))
-    const val2 = Object.assign({}, this.currentValues.find(o => o.order === order - 1))
+    const val = Object.assign({}, this.currentValues.find(o => o.order === order));
+    const val2 = Object.assign({}, this.currentValues.find(o => o.order === order - 1));
 
-    const findVal = this.currentValues.find(o => o.order === order)
+    const findVal = this.currentValues.find(o => o.order === order);
     const findVal2 = this.currentValues.find(o => o.order === order - 1);
     if (findVal && findVal2) {
-      findVal.order = val2.order
-      findVal2.order = val.order
+      findVal.order = val2.order;
+      findVal2.order = val.order;
     }
-    this.onChange()
+    this.onChange();
   }
 
   moveDn(order: number) {
-    const val = Object.assign({}, this.currentValues.find(o => o.order === order))
-    const val2 = Object.assign({}, this.currentValues.find(o => o.order === order + 1))
+    const val = Object.assign({}, this.currentValues.find(o => o.order === order));
+    const val2 = Object.assign({}, this.currentValues.find(o => o.order === order + 1));
 
-    const findVal = this.currentValues.find(o => o.order === order)
+    const findVal = this.currentValues.find(o => o.order === order);
     const findVal2 = this.currentValues.find(o => o.order === order + 1);
     if (findVal && findVal2) {
-      findVal.order = val2.order
-      findVal2.order = val.order
+      findVal.order = val2.order;
+      findVal2.order = val.order;
     }
-    this.onChange()
+    this.onChange();
   }
 
   remove(order: number) {
-    this.currentValues = this.currentValues.filter(o => o.order !== order)
+    this.currentValues = this.currentValues.filter(o => o.order !== order);
   }
 
   reorder() {
-    let val: any[] = []
+    const val: any[] = [];
     for (let i = 0, length = this.currentValues.length; i < length; i++) {
-      val[i] = this.currentValues[i]
-      val[i].order = i
+      val[i] = this.currentValues[i];
+      val[i].order = i;
     }
-    this.currentValues = val
-    this.onChange()
+    this.currentValues = val;
+    this.onChange();
   }
 }
 </script>

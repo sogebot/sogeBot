@@ -3,7 +3,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
+
 import { getSocket } from 'src/panel/helpers/socket';
 
 declare global {
@@ -11,7 +12,6 @@ declare global {
     responsiveVoice: any;
   }
 }
-
 
 @Component({})
 export default class AlertsRegistryOverlays extends Vue {
@@ -28,14 +28,16 @@ export default class AlertsRegistryOverlays extends Vue {
   speak(data: { text: string; rate: number; volume: number; pitch: number; voice: string; }) {
     if (!this.enabled) {
       console.error('ResponsiveVoice is not properly set, skipping');
-      return
+      return;
     }
     if (this.isTTSPlaying()) {
       // wait and try later
       setTimeout(() => this.speak(data), 1000);
       return;
     }
-    window.responsiveVoice.speak(data.text, data.voice, { rate: data.rate, pitch: data.pitch, volume: data.volume / 100 });
+    window.responsiveVoice.speak(data.text, data.voice, {
+      rate: data.rate, pitch: data.pitch, volume: data.volume / 100,
+    });
   }
 
   initResponsiveVoice() {
@@ -44,7 +46,7 @@ export default class AlertsRegistryOverlays extends Vue {
       return;
     }
     window.responsiveVoice.init();
-    console.debug('= ResponsiveVoice init OK')
+    console.debug('= ResponsiveVoice init OK');
     this.enabled = true;
   }
 
@@ -52,33 +54,35 @@ export default class AlertsRegistryOverlays extends Vue {
     this.socketRV.emit('get.value', 'key', (err: string | null, value: string) => {
       if (this.responsiveAPIKey !== value) {
         // unload if values doesn't match
-        this.$unloadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.responsiveAPIKey)
-          .catch(() => {}); // skip error
+        this.$unloadScript('https://code.responsivevoice.org/responsivevoice.js?key=' + this.responsiveAPIKey)
+          .catch(() => {
+            return; 
+          }); // skip error
         if (value.trim().length > 0) {
-          this.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + value)
+          this.$loadScript('https://code.responsivevoice.org/responsivevoice.js?key=' + value)
             .then(() => {
               this.responsiveAPIKey = value;
               this.initResponsiveVoice();
               setTimeout(() => this.checkResponsiveVoiceAPIKey(), 1000);
             });
         } else {
-          console.debug('TTS disabled, responsiveVoice key is not set')
+          console.debug('TTS disabled, responsiveVoice key is not set');
           this.enabled = false;
           this.responsiveAPIKey = value;
           setTimeout(() => this.checkResponsiveVoiceAPIKey(), 1000);
         }
       }
       setTimeout(() => this.checkResponsiveVoiceAPIKey(), 1000);
-    })
+    });
   }
 
   mounted() {
-    console.debug('mounted')
+    console.debug('mounted');
     this.checkResponsiveVoiceAPIKey();
     this.socket.on('speak', (data: { text: string; rate: number; volume: number; pitch: number; voice: string; }) => {
       console.debug('Incoming speak', data);
       this.speak(data);
-    })
+    });
   }
 }
 </script>

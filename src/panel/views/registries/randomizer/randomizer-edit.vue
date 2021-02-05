@@ -210,47 +210,51 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator';
-
-import { Route } from 'vue-router'
-import { NextFunction } from 'express';
-
-import { Validations } from 'vuelidate-property-decorators';
-import { required, minValue } from 'vuelidate/lib/validators';
-import { cloneDeep, isEqual, orderBy } from 'lodash-es';
-
-import { getSocket } from 'src/panel/helpers/socket';
-import type { RandomizerInterface, RandomizerItemInterface } from 'src/bot/database/entity/randomizer';
-import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
-import { v4 as uuid } from 'uuid';
-import { getRandomColor, getContrastColor } from 'src/panel/helpers/color';
-import translate from 'src/panel/helpers/translate';
-
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { NextFunction } from 'express';
+import {
+  cloneDeep, isEqual, orderBy,
+} from 'lodash-es';
+import { v4 as uuid } from 'uuid';
+import {
+  Component, Vue, Watch,
+} from 'vue-property-decorator';
+import { Route } from 'vue-router';
+import { Validations } from 'vuelidate-property-decorators';
+import { minValue, required } from 'vuelidate/lib/validators';
+
+import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
+import type { RandomizerInterface, RandomizerItemInterface } from 'src/bot/database/entity/randomizer';
 import { defaultPermissions } from 'src/bot/helpers/permissions/defaultPermissions';
+import { getContrastColor, getRandomColor } from 'src/panel/helpers/color';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
+
 library.add(faExclamationTriangle);
 
 Component.registerHooks([
   'beforeRouteEnter',
   'beforeRouteLeave',
-  'beforeRouteUpdate' // for vue-router 2.2+
-])
+  'beforeRouteUpdate', // for vue-router 2.2+
+]);
 
 @Component({
   components: {
-    tts: () => import('../alerts/components/tts.vue'),
-    font: () => import('src/panel/components/font.vue'),
+    tts:      () => import('../alerts/components/tts.vue'),
+    font:     () => import('src/panel/components/font.vue'),
     position: () => import('src/panel/components/position.vue'),
-    loading: () => import('../../../components/loading.vue'),
+    loading:  () => import('../../../components/loading.vue'),
   },
   filters: {
     capitalize(value: string) {
-      if (!value) return ''
-      value = value.toString()
-      return value.charAt(0).toUpperCase() + value.slice(1)
-    }
-  }
+      if (!value) {
+        return '';
+      }
+      value = value.toString();
+      return value.charAt(0).toUpperCase() + value.slice(1);
+    },
+  },
 })
 export default class randomizerEdit extends Vue {
   orderBy = orderBy;
@@ -276,7 +280,7 @@ export default class randomizerEdit extends Vue {
     loading: number; save: number;
   } = {
     loading: this.$state.idle,
-    save: this.$state.idle,
+    save:    this.$state.idle,
   };
   pending = false;
   spin = false;
@@ -286,67 +290,59 @@ export default class randomizerEdit extends Vue {
   permissions: {id: string; name: string;}[] = [];
   isShown = false;
   item: Required<RandomizerInterface> = {
-    id: uuid(),
-    name: '',
-    command: '',
-    items: [],
-    createdAt: Date.now(),
-    permissionId: defaultPermissions.CASTERS,
-    isShown: false,
+    id:             uuid(),
+    name:           '',
+    command:        '',
+    items:          [],
+    createdAt:      Date.now(),
+    permissionId:   defaultPermissions.CASTERS,
+    isShown:        false,
     shouldPlayTick: false,
-    tickVolume: 1,
-    type: 'simple',
-    widgetOrder: -1,
-    tts: {
+    tickVolume:     1,
+    type:           'simple',
+    widgetOrder:    -1,
+    tts:            {
       enabled: false,
-      voice: 'English Female',
-      pitch: 1,
-      volume: 0.5,
-      rate: 1,
+      voice:   'English Female',
+      pitch:   1,
+      volume:  0.5,
+      rate:    1,
     },
     position: {
-      x: 0,
-      y: 0,
+      x:       0,
+      y:       0,
       anchorX: 'left',
       anchorY: 'top',
     },
     customizationFont: {
-      family: 'PT Sans',
-      weight: 500,
-      size: 16,
+      family:      'PT Sans',
+      weight:      500,
+      size:        16,
       borderColor: '#000000',
-      borderPx: 1,
-      shadow: [],
-    }
+      borderPx:    1,
+      shadow:      [],
+    },
   };
 
   @Validations()
   validations = {
     item: {
-      name: {
-        required,
-      },
-      command: {
-        ifExistsMustBe: (value: string) => value.length === 0 || (value.startsWith('!') && value.length > 2),
-      },
-      permissionId: {
-        mustBeExisting: (value: string) => !!this.getPermissionName(value),
-      },
+      name:              { required },
+      command:           { ifExistsMustBe: (value: string) => value.length === 0 || (value.startsWith('!') && value.length > 2) },
+      permissionId:      { mustBeExisting: (value: string) => !!this.getPermissionName(value) },
       customizationFont: {
-        borderColor: {
-          isColor: (value: string) => !!value.match(/^(#{1})([0-9A-F]{8}|[0-9A-F]{6})$/ig),
-        },
-        size: {
+        borderColor: { isColor: (value: string) => !!value.match(/^(#{1})([0-9A-F]{8}|[0-9A-F]{6})$/ig) },
+        size:        {
           required,
           minValue: minValue(1),
         },
         borderPx: {
           required,
           minValue: minValue(0),
-        }
-      }
-    }
-  }
+        },
+      },
+    },
+  };
 
   generateItems(items: Required<RandomizerItemInterface>[], generatedItems: Required<RandomizerItemInterface>[] = []) {
     const beforeItems = cloneDeep(orderBy(items, 'order'));
@@ -360,19 +356,19 @@ export default class randomizerEdit extends Vue {
       } else {
         return count;
       }
-    }
+    };
     const haveMinimalSpacing = (item: Required<RandomizerItemInterface>) => {
-      let lastIdx = generatedItems.map(o => o.name).lastIndexOf(item.name);
+      const lastIdx = generatedItems.map(o => o.name).lastIndexOf(item.name);
       const currentIdx = generatedItems.length;
-      return lastIdx === -1 || lastIdx + item.minimalSpacing + countGroupItems(item) < currentIdx
-    }
-    const addGroupItems = (item: RandomizerItemInterface, generatedItems: RandomizerItemInterface[]) => {
+      return lastIdx === -1 || lastIdx + item.minimalSpacing + countGroupItems(item) < currentIdx;
+    };
+    const addGroupItems = (item: RandomizerItemInterface, _generatedItems: RandomizerItemInterface[]) => {
       const child = items.find(o => o.groupId === item.id);
       if (child) {
-        generatedItems.push(child);
-        addGroupItems(child, generatedItems);
+        _generatedItems.push(child);
+        addGroupItems(child, _generatedItems);
       }
-    }
+    };
 
     for (const item of items) {
 
@@ -400,7 +396,7 @@ export default class randomizerEdit extends Vue {
 
   beforeRouteUpdate(to: Route, from: Route, next: NextFunction) {
     if (this.pending) {
-      const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+      const isOK = confirm('You will lose your pending changes. Do you want to continue?');
       if (!isOK) {
         next(false);
       } else {
@@ -413,7 +409,7 @@ export default class randomizerEdit extends Vue {
 
   beforeRouteLeave(to: Route, from: Route, next: NextFunction) {
     if (this.pending) {
-      const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+      const isOK = confirm('You will lose your pending changes. Do you want to continue?');
       if (!isOK) {
         next(false);
       } else {
@@ -425,33 +421,35 @@ export default class randomizerEdit extends Vue {
   }
 
   getPermissionName(id: string | null) {
-    if (!id) return null
+    if (!id) {
+      return null;
+    }
     const permission = this.permissions.find((o) => {
-      return o.id === id
-    })
+      return o.id === id;
+    });
     if (typeof permission !== 'undefined') {
       if (permission.name.trim() === '') {
-        return permission.id
+        return permission.id;
       } else {
-        return permission.name
+        return permission.name;
       }
     } else {
-      return null
+      return null;
     }
   }
 
   addOption() {
     this.item.items.push({
-      id: uuid(),
-      name: '',
-      color: getRandomColor(),
+      id:              uuid(),
+      name:            '',
+      color:           getRandomColor(),
       numOfDuplicates: 1,
-      minimalSpacing: 1,
-      groupId: null,
-      randomizer: undefined,
-      randomizerId: undefined,
-      order: this.item.items.length,
-    })
+      minimalSpacing:  1,
+      groupId:         null,
+      randomizer:      undefined,
+      randomizerId:    undefined,
+      order:           this.item.items.length,
+    });
   }
 
   rmOption(id: string) {
@@ -472,12 +470,14 @@ export default class randomizerEdit extends Vue {
       } else {
         this.$router.push({ name: 'RandomizerRegistryList' });
       }
-    })
+    });
   }
 
   startSpin() {
     this.spin = true;
-    this.socket.emit('randomizer::startSpin', () => {});
+    this.socket.emit('randomizer::startSpin', () => {
+      return;
+    });
     setTimeout(() => {
       this.spin = false;
     }, 5000);
@@ -486,9 +486,13 @@ export default class randomizerEdit extends Vue {
   toggleVisibility() {
     this.isShown = !this.isShown;
     if(this.isShown) {
-      this.socket.emit('randomizer::showById', this.item.id, () => {});
+      this.socket.emit('randomizer::showById', this.item.id, () => {
+        return;
+      });
     } else {
-      this.socket.emit('randomizer::hideAll', () => {});
+      this.socket.emit('randomizer::hideAll', () => {
+        return;
+      });
     }
   }
 
@@ -503,14 +507,16 @@ export default class randomizerEdit extends Vue {
           if (err) {
             this.state.save = this.$state.fail;
             this.$bvToast.toast(err.message, {
-              title: `Error`,
+              title:   `Error`,
               variant: 'danger',
-              solid: true,
+              solid:   true,
             });
-            console.error(err.message)
+            console.error(err.message);
           } else {
             this.pending = false;
-            this.$router.push({ name: 'RandomizerRegistryEdit', params: { id: this.item.id } }).catch(err => {})
+            this.$router.push({ name: 'RandomizerRegistryEdit', params: { id: this.item.id } }).catch(() => {
+              return;
+            });
             this.state.save = this.$state.success;
           }
           resolve();
@@ -519,16 +525,16 @@ export default class randomizerEdit extends Vue {
     }
     setTimeout(() => {
       this.state.save = this.$state.idle;
-    }, 1000)
+    }, 1000);
   }
 
   isPartOfGroup(parentId: string, childId: string | null): boolean {
     if (!childId) {
       // not a part of any group or main parent
-      return false
+      return false;
     }
 
-    const child = this.item.items.find(o => o.id === childId)
+    const child = this.item.items.find(o => o.id === childId);
     if (!child) {
       // child not found
       return false;
@@ -564,26 +570,26 @@ export default class randomizerEdit extends Vue {
   }
   dragenter(newOrder: number, e: DragEvent) {
     if (this.draggingItem !== null && this.alreadyCalculatedOrder !== newOrder && newOrder !== this.draggingItem) {
-      this.alreadyCalculatedOrder = newOrder
-      const value = this.item.items.find(o => o.order === this.draggingItem)
-      const entered = this.item.items.find(o => o.order === newOrder)
+      this.alreadyCalculatedOrder = newOrder;
+      const value = this.item.items.find(o => o.order === this.draggingItem);
+      const entered = this.item.items.find(o => o.order === newOrder);
       if (entered && value) {
         // we want to jump only with parents
         if (!this.isPartOfGroup(value.id, entered.groupId)) {
-          const draggingChildren = this.getAllChildren(value.id)
-          let dragOffset = draggingChildren.length;
+          const draggingChildren = this.getAllChildren(value.id);
+          const dragOffset = draggingChildren.length;
           const initialOrder = value.order;
           if (initialOrder < newOrder) {
             console.debug('move-item-down');
             let offset = 0;
             const itemsToUpdate: Required<RandomizerItemInterface>[] = [
-              value, ...this.getAllChildren(value.id)
+              value, ...this.getAllChildren(value.id),
             ];
             for (const item of this.item.items.filter(o => o.order <= newOrder && o.order >= initialOrder)) {
               if (!itemsToUpdate.find(o => o.id === item.id)) {
                 if (!item.groupId) {
                   console.debug('dragging-item-up - ' + item.name, item.order, item.order - itemsToUpdate.length);
-                  item.order = item.order - itemsToUpdate.length
+                  item.order = item.order - itemsToUpdate.length;
                   offset++;
                   // we need to get children
                   for (const child of this.getAllChildren(item.id)) {
@@ -597,7 +603,7 @@ export default class randomizerEdit extends Vue {
             // we need to move down by offset
             for(const item of itemsToUpdate) {
               console.debug('dragging-item-down - ' + item.name, item.order, item.order + offset);
-              item.order = item.order + offset
+              item.order = item.order + offset;
             }
             console.debug('dragging-item-' + itemsToUpdate[0].order);
             this.draggingItem = itemsToUpdate[0].order;
@@ -608,18 +614,18 @@ export default class randomizerEdit extends Vue {
             for (const item of this.item.items.filter(o => o.order >= newOrder && o.order <= initialOrder + dragOffset)) {
               if (item.order >= initialOrder) {
                 console.debug('dragging-item-up - ' + item.name, item.order, item.order - moveBy);
-                item.order = item.order - moveBy
+                item.order = item.order - moveBy;
               } else {
                 // + 1 because at least parent is moving
                 console.debug('dragging-item-down - ' + item.name, item.order, item.order + dragOffset + 1);
-                item.order = item.order + dragOffset + 1
+                item.order = item.order + dragOffset + 1;
               }
             }
             this.draggingItem = newOrder;
           }
         }
       }
-      this.$forceUpdate()
+      this.$forceUpdate();
     }
   }
   dragend(order: number, e: DragEvent) {
@@ -636,7 +642,9 @@ export default class randomizerEdit extends Vue {
               console.error(err);
               return;
             }
-            if (Object.keys(d).length === 0) this.$router.push({ name: 'RandomizerRegistryList' })
+            if (Object.keys(d).length === 0) {
+              this.$router.push({ name: 'RandomizerRegistryList' });
+            }
 
             // workaround for missing weight after https://github.com/sogehige/sogeBot/issues/3871
             d.customizationFont.weight = d.customizationFont.weight ?? 500;
@@ -647,8 +655,8 @@ export default class randomizerEdit extends Vue {
             this.item = d;
             this.isShown = d.isShown;
             this.$route.params.id = d.id;
-            done()
-          })
+            done();
+          });
         } else {
           done();
         }
@@ -660,33 +668,33 @@ export default class randomizerEdit extends Vue {
 
           request.onload = function() {
             if (!(this.status >= 200 && this.status < 400)) {
-              console.error('Something went wrong getting font', this.status, this.response)
+              console.error('Something went wrong getting font', this.status, this.response);
             }
-            resolve({ response: JSON.parse(this.response)})
-          }
+            resolve({ response: JSON.parse(this.response) });
+          };
           request.onerror = function() {
-            console.error('Connection error to sogebot')
+            console.error('Connection error to sogebot');
             resolve( { response: {} });
           };
 
           request.send();
-        })
+        });
         this.fonts = response.items.map((o: { family: string }) => {
-          return { text: o.family, value: o.family }
-        })
+          return { text: o.family, value: o.family };
+        });
         done();
       }),
       new Promise<void>(async(done) => {
         this.psocket.emit('permissions', (err: string | null, data: Readonly<Required<PermissionsInterface>>[]) => {
-        if(err) {
-          return console.error(err);
-        }
-          this.permissions = data
+          if(err) {
+            return console.error(err);
+          }
+          this.permissions = data;
           done();
         });
-      })
-    ])
+      }),
+    ]);
     this.state.loading = this.$state.success;
-  };
+  }
 }
 </script>

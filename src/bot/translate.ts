@@ -21,7 +21,7 @@ class Translate {
 
   constructor () {
     addMenu({
-      category: 'settings', name: 'translations', id: 'settings/translations', this: null, 
+      category: 'settings', name: 'translations', id: 'settings/translations', this: null,
     });
   }
 

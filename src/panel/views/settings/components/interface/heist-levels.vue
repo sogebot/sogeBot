@@ -34,7 +34,10 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import {
+  Component, Prop, Vue, Watch, 
+} from 'vue-property-decorator';
+
 import type { Level } from 'src/bot/games/heist';
 import translate from 'src/panel/helpers/translate';
 
@@ -46,7 +49,7 @@ export default class heistLevels extends Vue {
 
   w_levels = this.value.sort((a, b) => {
     return a.maxUsers - b.maxUsers;
-  })
+  });
 
   @Watch('w_levels')
   update() {
@@ -55,10 +58,10 @@ export default class heistLevels extends Vue {
 
   addLevel() {
     this.w_levels.push({
-      name: '',
-      winPercentage: 10,
+      name:             '',
+      winPercentage:    10,
       payoutMultiplier: 1,
-      maxUsers: 10
+      maxUsers:         10,
     });
   }
 

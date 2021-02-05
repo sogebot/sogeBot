@@ -261,7 +261,6 @@
         </b-col>
       </b-row>
 
-
       <b-form-group
         v-if="selectedType.toLowerCase() !== 'eval' && $route.params.id"
         :label="translate('registry.customvariables.history')"
@@ -284,20 +283,23 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator';
-import { chunk, orderBy, get } from 'lodash-es';
-import { v4 as uuid } from 'uuid';
-import { getSocket } from 'src/panel/helpers/socket';
-import { dayjs } from 'src/bot/helpers/dayjs';
-import translate from 'src/panel/helpers/translate';
-
-import { Route } from 'vue-router'
 import { NextFunction } from 'express';
+import {
+  chunk, get, orderBy, 
+} from 'lodash-es';
+import { v4 as uuid } from 'uuid';
+import { codemirror } from 'vue-codemirror';
+import {
+  Component, Vue, Watch, 
+} from 'vue-property-decorator';
+import { Route } from 'vue-router';
 
 import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
 import type { VariableInterface } from 'src/bot/database/entity/variable';
+import { dayjs } from 'src/bot/helpers/dayjs';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
-import { codemirror } from 'vue-codemirror';
 import 'codemirror/lib/codemirror.css';
 
 import evalDefault from './custom-variables-code.txt';
@@ -305,11 +307,13 @@ import evalDefault from './custom-variables-code.txt';
 Component.registerHooks([
   'beforeRouteEnter',
   'beforeRouteLeave',
-  'beforeRouteUpdate' // for vue-router 2.2+
-])
+  'beforeRouteUpdate', // for vue-router 2.2+
+]);
 
-type State = { IDLE: 0, PROGRESS: 1, DONE: 2, ERROR: 3 }
-const State: State = { IDLE: 0, PROGRESS: 1, DONE: 2, ERROR: 3 }
+type State = { IDLE: 0, PROGRESS: 1, DONE: 2, ERROR: 3 };
+const State: State = {
+  IDLE: 0, PROGRESS: 1, DONE: 2, ERROR: 3, 
+};
 
 @Component({
   components: {
@@ -318,77 +322,79 @@ const State: State = { IDLE: 0, PROGRESS: 1, DONE: 2, ERROR: 3 }
   },
   filters: {
     capitalize: function (value: string) {
-      if (!value) return ''
-      value = value.toString()
-      return value.charAt(0).toUpperCase() + value.slice(1)
-    }
-  }
+      if (!value) {
+        return '';
+      }
+      value = value.toString();
+      return value.charAt(0).toUpperCase() + value.slice(1);
+    },
+  },
 })
 export default class customVariablesEdit extends Vue {
   dayjs = dayjs;
-  translate = translate
+  translate = translate;
   socket = getSocket('/core/customvariables');
   psocket = getSocket('/core/permissions');
 
   error: any = null;
 
   State: State = State;
-  state: { loaded: boolean; save: number; test: number } = { loaded: false, save: 0, test: State.IDLE }
-  pending: boolean = false;
+  state: { loaded: boolean; save: number; test: number } = {
+    loaded: false, save: 0, test: State.IDLE, 
+  };
+  pending = false;
 
   types = [{
-      value: 'number',
-      text: translate('registry.customvariables.types.number')
-    },
-    {
-      value: 'text',
-      text: translate('registry.customvariables.types.text')
-    },
-    {
-      value: 'options',
-      text: translate('registry.customvariables.types.options')
-    },
-    {
-      value: 'eval',
-      text: translate('registry.customvariables.types.eval')
-    }];
+    value: 'number',
+    text:  translate('registry.customvariables.types.number'),
+  },
+  {
+    value: 'text',
+    text:  translate('registry.customvariables.types.text'),
+  },
+  {
+    value: 'options',
+    text:  translate('registry.customvariables.types.options'),
+  },
+  {
+    value: 'eval',
+    text:  translate('registry.customvariables.types.eval'),
+  }];
   runEveryOptions = [
     { value: 0, type: 'isUsed' },
     { value: 1000, type: 'seconds' },
     { value: 1000 * 60, type: 'minutes' },
     { value: 1000 * 60 * 60, type: 'hours' },
     { value: 1000 * 60 * 60 * 24, type: 'days' },
-  ]
+  ];
 
-  selectedType: string = 'text';
-  selectedRunEvery: string = 'isUsed';
-  runEveryX: number = 1;
+  selectedType = 'text';
+  selectedRunEvery = 'isUsed';
+  runEveryX = 1;
 
-  showCurlExample: boolean = false;
+  showCurlExample = false;
 
-  variableName: string = '';
-  description: string = '';
-  currentValue: string = '';
-  usableOptions: string = '';
-  readOnly: boolean = false;
+  variableName = '';
+  description = '';
+  currentValue = '';
+  usableOptions = '';
+  readOnly = false;
   permission: string | null = null;
   urls: { id: string; showResponse: boolean; GET: boolean; POST: boolean }[] = [];
 
   evalValue: string = evalDefault;
-  evalError: string | null = null
+  evalError: string | null = null;
   cmOptions = {
-    mode:  "javascript",
-    tabSize: 2,
-    lineNumbers: true,
+    mode:          'javascript',
+    tabSize:       2,
+    lineNumbers:   true,
     matchBrackets: true,
-    lint: {
-      esversion: 6
-    },
-    gutters: ["CodeMirror-lint-markers"]
-  }
+    lint:          { esversion: 6 },
+    gutters:       ['CodeMirror-lint-markers'],
+  };
 
-  responseType: number = 0;
-  responseText: string = '';
+  responseType = 0;
+  responseText = '';
 
   history: any[] = [];
   permissions: any[] = [];
@@ -401,15 +407,15 @@ export default class customVariablesEdit extends Vue {
           if(err) {
             return console.error(err);
           }
-          this.permissions = orderBy(data, 'order', 'asc')
+          this.permissions = orderBy(data, 'order', 'asc');
 
           if (!this.$route.params.id) {
             if (!this.permission) {
-              this.permission = orderBy(this.permissions, 'order', 'asc')[0].id
+              this.permission = orderBy(this.permissions, 'order', 'asc')[0].id;
             }
           }
-          resolve()
-        })
+          resolve();
+        });
       }),
       new Promise<void>(resolve => {
         if (this.$route.params.id) {
@@ -432,18 +438,18 @@ export default class customVariablesEdit extends Vue {
             this.readOnly = data.readOnly || false;
             this.history = chunk(orderBy(data.history, 'changedAt', 'desc'), 15)[0] || [];
             resolve();
-          })
+          });
         } else {
           resolve();
         }
-      })
-    ])
+      }),
+    ]);
     this.state.loaded = true;
   }
 
   beforeRouteUpdate(to: Route, from: Route, next: NextFunction) {
     if (this.pending) {
-      const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+      const isOK = confirm('You will lose your pending changes. Do you want to continue?');
       if (!isOK) {
         next(false);
       } else {
@@ -456,7 +462,7 @@ export default class customVariablesEdit extends Vue {
 
   beforeRouteLeave(to: Route, from: Route, next: NextFunction) {
     if (this.pending) {
-      const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+      const isOK = confirm('You will lose your pending changes. Do you want to continue?');
       if (!isOK) {
         next(false);
       } else {
@@ -502,16 +508,16 @@ export default class customVariablesEdit extends Vue {
   setDefaultValue(value: string) {
     if (this.selectedType === 'options') {
       if (!this.usableOptionsArray.includes(this.currentValue)) {
-        this.currentValue = this.usableOptionsArray.length > 0 ? this.usableOptionsArray[0] : ''
+        this.currentValue = this.usableOptionsArray.length > 0 ? this.usableOptionsArray[0] : '';
       }
     }
   }
 
   get usableOptionsArray() {
     if (typeof this.usableOptions === 'string') {
-      return this.usableOptions.split(',').map((o) => o.trim()).filter((o) => o.length > 0)
+      return this.usableOptions.split(',').map((o) => o.trim()).filter((o) => o.length > 0);
     } else {
-      return []
+      return [];
     }
   }
 
@@ -521,10 +527,10 @@ export default class customVariablesEdit extends Vue {
 
   generateURL() {
     this.urls.push({
-      id: uuid(),
+      id:           uuid(),
       showResponse: false,
-      GET: false,
-      POST: false,
+      GET:          false,
+      POST:         false,
     });
   }
 
@@ -533,18 +539,20 @@ export default class customVariablesEdit extends Vue {
   }
 
   getPermissionName(id: string | null) {
-    if (!id) return 'Disabled'
+    if (!id) {
+      return 'Disabled';
+    }
     const permission = this.permissions.find((o) => {
-      return o.id === id
-    })
+      return o.id === id;
+    });
     if (typeof permission !== 'undefined') {
       if (permission.name.trim() === '') {
-        return permission.id
+        return permission.id;
       } else {
-        return permission.name
+        return permission.name;
       }
     } else {
-      return null
+      return null;
     }
   }
 
@@ -556,22 +564,22 @@ export default class customVariablesEdit extends Vue {
       } else {
         this.evalError = null;
       }
-      this.currentValue = response
-      this.state.test = State.IDLE
-    })
+      this.currentValue = response;
+      this.state.test = State.IDLE;
+    });
   }
 
   async remove () {
     await new Promise<void>(resolve => {
       this.socket.emit('customvariables::delete', this.$route.params.id, () => {
         resolve();
-      })
-    })
+      });
+    });
     this.$router.push({ name: 'CustomVariableList' });
   }
 
   async save () {
-    this.state.save = State.PROGRESS
+    this.state.save = State.PROGRESS;
 
     try {
       await Promise.all([
@@ -579,62 +587,62 @@ export default class customVariablesEdit extends Vue {
         new Promise<void>((resolve, reject) => {
           this.socket.emit('customvariables::isUnique', { variable: this.variableName, id: this.$route.params.id }, (err: string | null, isUnique: boolean) => {
             if (!isUnique) {
-              reject(translate('registry.customvariables.variable.error.isNotUnique'))
+              reject(translate('registry.customvariables.variable.error.isNotUnique'));
             }
-            resolve()
-          })
+            resolve();
+          });
         }),
         new Promise<void>((resolve, reject) => {
           this.variableName.replace(/\$_/g, '').trim().length > 0
             ? resolve()
-            : reject(translate('registry.customvariables.variable.error.isEmpty'))
+            : reject(translate('registry.customvariables.variable.error.isEmpty'));
         }),
         new Promise<void>((resolve, reject) => {
           this.selectedType !== 'options' || (this.usableOptionsArray.length > 0 && this.selectedType === 'options')
             ? resolve()
-            : reject(translate('registry.customvariables.usableOptions.error.atLeastOneValue'))
-        })
-      ])
+            : reject(translate('registry.customvariables.usableOptions.error.atLeastOneValue'));
+        }),
+      ]);
 
       const data = {
-        id: this.$route.params.id || uuid(),
-        variableName: this.variableName,
-        description: this.description,
-        currentValue: this.currentValue,
-        urls: this.urls,
+        id:            this.$route.params.id || uuid(),
+        variableName:  this.variableName,
+        description:   this.description,
+        currentValue:  this.currentValue,
+        urls:          this.urls,
         usableOptions: this.usableOptions || '',
-        evalValue: this.evalValue,
-        runEvery: this.selectedType === 'eval'
+        evalValue:     this.evalValue,
+        runEvery:      this.selectedType === 'eval'
           ? get(this.runEveryOptions.find((o) => o.type === this.selectedRunEvery), 'value', 0) * this.runEveryX
           : 0,
-        runEveryType:  this.selectedType === 'eval' ? this.selectedRunEvery : 'isUsed',
-        runEveryTypeValue:  this.selectedType === 'eval'
+        runEveryType:      this.selectedType === 'eval' ? this.selectedRunEvery : 'isUsed',
+        runEveryTypeValue: this.selectedType === 'eval'
           ? get(this.runEveryOptions.find((o) => o.type === this.selectedRunEvery), 'value', 0)
           : 0,
-        type: this.selectedType,
-        readOnly: this.readOnly,
+        type:         this.selectedType,
+        readOnly:     this.readOnly,
         responseType: this.responseType,
         responseText: this.responseText,
-        permission: this.permission
-      }
+        permission:   this.permission,
+      };
       this.socket.emit('customvariables::save', data, (err: string | null, id: string) => {
         if (err) {
-          console.error(err)
-          return this.state.save = State.ERROR
+          console.error(err);
+          return this.state.save = State.ERROR;
         }
-        this.state.save = State.DONE
+        this.state.save = State.DONE;
         this.error = null;
         this.pending = false;
         this.$router.push({ name: 'CustomVariableEdit', params: { id: id } });
-      })
+      });
     } catch (e) {
-      this.state.save = State.ERROR
-      this.error = e
+      this.state.save = State.ERROR;
+      this.error = e;
     }
 
     setTimeout(() => {
-      this.state.save = State.IDLE
-    }, 1000)
+      this.state.save = State.IDLE;
+    }, 1000);
   }
 }
 </script>

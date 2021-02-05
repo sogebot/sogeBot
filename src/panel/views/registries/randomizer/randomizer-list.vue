@@ -42,24 +42,20 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
-import { getSocket } from 'src/panel/helpers/socket';
-import { v4 as uuid } from 'uuid';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faClone, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { orderBy } from 'lodash-es';
+import { v4 as uuid } from 'uuid';
+import { Component, Vue } from 'vue-property-decorator';
+
+import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
+import type { RandomizerInterface } from 'src/bot/database/entity/randomizer';
+import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
-import type { RandomizerInterface } from 'src/bot/database/entity/randomizer';
-import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
+library.add(faExclamationTriangle, faClone);
 
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faExclamationTriangle, faClone } from '@fortawesome/free-solid-svg-icons';
-library.add(faExclamationTriangle, faClone)
-
-@Component({
-  components: {
-    'loading': () => import('../../../components/loading.vue'),
-  },
-})
+@Component({ components: { 'loading': () => import('../../../components/loading.vue') } })
 export default class randomizerList extends Vue {
   translate = translate;
   orderBy = orderBy;
@@ -67,8 +63,12 @@ export default class randomizerList extends Vue {
   socket = getSocket('/registries/randomizer');
 
   fields = [
-    { key: 'name', label: translate('registry.randomizer.form.name'), sortable: true },
-    { key: 'command', label: translate('registry.randomizer.form.command'), sortable: true },
+    {
+      key: 'name', label: translate('registry.randomizer.form.name'), sortable: true,
+    },
+    {
+      key: 'command', label: translate('registry.randomizer.form.command'), sortable: true,
+    },
     { key: 'permissionId', label: translate('registry.randomizer.form.permission') },
     // virtual attributes
     { key: 'options', label: translate('registry.randomizer.form.options') },
@@ -77,14 +77,12 @@ export default class randomizerList extends Vue {
 
   items: Required<RandomizerInterface>[] = [];
   permissions: {id: string; name: string;}[] = [];
-  search: string = '';
+  search = '';
   spin = false;
 
   state: {
     loading: number;
-  } = {
-    loading: this.$state.idle,
-  };
+  } = { loading: this.$state.idle };
 
   get filteredItems() {
     return this.items;
@@ -96,24 +94,24 @@ export default class randomizerList extends Vue {
     const clonedItemsRemapId = new Map();
     // remap items ids
     const clonedItems = item.items.map(o => {
-      clonedItemsRemapId.set(o.id, uuid())
-      return { ...o, id: clonedItemsRemapId.get(o.id) }
-    })
+      clonedItemsRemapId.set(o.id, uuid());
+      return { ...o, id: clonedItemsRemapId.get(o.id) };
+    });
 
     const clonedItem = {
       ...item,
-      id: clonedItemId,
-      name: item.name + ' (clone)',
+      id:      clonedItemId,
+      name:    item.name + ' (clone)',
       command: `!${Math.random().toString(36).substr(2, 5)}`,
       // we need to do another .map as we need to find groupId
-      items: clonedItems.map(o => ({ ...o, groupId: o.groupId === null ? o.groupId : clonedItemsRemapId.get(o.groupId) })),
-    }
+      items:   clonedItems.map(o => ({ ...o, groupId: o.groupId === null ? o.groupId : clonedItemsRemapId.get(o.groupId) })),
+    };
     this.socket.emit('randomizer::save', clonedItem, (err: Error | null) => {
       if (err) {
         console.error(err);
       }
       this.refresh();
-    })
+    });
   }
 
   toggleVisibility(item: Required<RandomizerInterface>) {
@@ -141,7 +139,7 @@ export default class randomizerList extends Vue {
           if(err) {
             return console.error(err);
           }
-          this.permissions = data
+          this.permissions = data;
           done();
         });
       }),
@@ -150,21 +148,23 @@ export default class randomizerList extends Vue {
           if (err) {
             return console.error(err);
           }
-          console.groupCollapsed('generic::getAll')
+          console.groupCollapsed('generic::getAll');
           console.debug(data);
           console.groupEnd();
           this.items = data;
           done();
-        })
-      })
-    ])
+        });
+      }),
+    ]);
 
     this.state.loading = this.$state.success;
   }
 
   startSpin() {
     this.spin = true;
-    this.socket.emit('randomizer::startSpin', () => {});
+    this.socket.emit('randomizer::startSpin', () => {
+      return; 
+    });
     setTimeout(() => {
       this.spin = false;
     }, 5000);
@@ -177,7 +177,7 @@ export default class randomizerList extends Vue {
       } else {
         this.refresh();
       }
-    })
+    });
   }
 
   linkTo(item: Required<RandomizerInterface>) {
@@ -186,18 +186,20 @@ export default class randomizerList extends Vue {
   }
 
   getPermissionName(id: string | null) {
-    if (!id) return null
+    if (!id) {
+      return null;
+    }
     const permission = this.permissions.find((o) => {
-      return o.id === id
-    })
+      return o.id === id;
+    });
     if (typeof permission !== 'undefined') {
       if (permission.name.trim() === '') {
-        return permission.id
+        return permission.id;
       } else {
-        return permission.name
+        return permission.name;
       }
     } else {
-      return null
+      return null;
     }
   }
 }

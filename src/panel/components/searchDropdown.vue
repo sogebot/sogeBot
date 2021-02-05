@@ -70,9 +70,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from '@vue/composition-api';
+import {
+  defineComponent, ref, watch, 
+} from '@vue/composition-api';
 import type { Ref } from '@vue/composition-api';
 import { isEqual } from 'lodash';
+
 import translate from 'src/panel/helpers/translate';
 
 interface Props {
@@ -85,10 +88,10 @@ interface Props {
 
 export default defineComponent({
   props: {
-    value: Array,
-    multiple: Boolean,
-    options: Array,
-    placeholder: String,
+    value:          Array,
+    multiple:       Boolean,
+    options:        Array,
+    placeholder:    String,
     showAllOptions: Boolean,
   },
   setup(props: Props, context) {
@@ -118,7 +121,7 @@ export default defineComponent({
     const emitUpdate = () => {
       if (props.multiple && Array.isArray(currentValue.value)) {
         currentValue.value.push(addToCurrentValue.value);
-        addToCurrentValue.value = ''
+        addToCurrentValue.value = '';
       } else {
         currentValue.value = addToCurrentValue.value;
       }
@@ -167,8 +170,7 @@ export default defineComponent({
       removeTag,
       emitSearch,
       translate,
-    }
-  }
+    };
+  },
 });
 </script>
-

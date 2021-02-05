@@ -191,7 +191,7 @@ class Users extends Core {
             return { id: id, username: user.username };
           }
           return null;
-        })
+        }),
     );
     return uniqueWithUsername.reduce(async (prev: any, cur) => {
       const value = await cur;

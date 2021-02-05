@@ -38,27 +38,28 @@
 </template>
 
 <script>
+import { isNil } from 'lodash-es';
+
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { getSocket } from 'src/panel/helpers/socket';
-import { isNil } from 'lodash-es';
 import translate from 'src/panel/helpers/translate';
 
 export default {
   props: ['popout', 'nodrag'],
-  data: function () {
+  data:  function () {
     return {
       translate,
       EventBus,
       socket: getSocket('/widgets/soundboard'),
       volume: 50,
-      audio: null,
-      sounds: []
-    }
+      audio:  null,
+      sounds: [],
+    };
   },
   watch: {
     volume: function (val) {
-      localStorage.setItem('/widget/soundboard/volume', JSON.stringify(val))
-    }
+      localStorage.setItem('/widget/soundboard/volume', JSON.stringify(val));
+    },
   },
   created: function () {
     this.socket.emit('getSoundBoardSounds', (err, sounds) => {
@@ -66,23 +67,27 @@ export default {
         return console.error(err);
       }
       this.sounds = sounds;
-    })
-    if (localStorage.getItem('/widget/soundboard/volume')) this.volume = JSON.parse(localStorage.getItem('/widget/soundboard/volume'))
+    });
+    if (localStorage.getItem('/widget/soundboard/volume')) {
+      this.volume = JSON.parse(localStorage.getItem('/widget/soundboard/volume'));
+    }
   },
   methods: {
     setVolume: function (ev) {
       // steps by 5
       const path = ev.path || (ev.composedPath && ev.composedPath());
-      this.volume = Math.round(Number(ev.offsetX / path[0].clientWidth * 100).toFixed(0) / 5) * 5
+      this.volume = Math.round(Number(ev.offsetX / path[0].clientWidth * 100).toFixed(0) / 5) * 5;
     },
     play: function (sound) {
-      if (!isNil(this.audio)) this.audio.pause()
-      this.audio = new Audio('dist/soundboard/' + sound + '.mp3')
+      if (!isNil(this.audio)) {
+        this.audio.pause();
+      }
+      this.audio = new Audio('dist/soundboard/' + sound + '.mp3');
       this.audio.addEventListener('loadedmetadata', () => {
-        this.audio.volume = this.volume / 100
-        this.audio.play()
-      })
-    }
-  }
-}
+        this.audio.volume = this.volume / 100;
+        this.audio.play();
+      });
+    },
+  },
+};
 </script>

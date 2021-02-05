@@ -207,7 +207,7 @@ class Cooldown extends System {
           if (defaultValue[permId] > 0) {
             const canBeRunAt = (defaultCooldowns.find(o =>
               o.permId === permId
-              && o.name === cmd
+              && o.name === cmd,
             )?.lastRunAt ?? 0) + defaultValue[permId] * 1000;
             data.push({
               isEnabled: true,
@@ -253,7 +253,7 @@ class Cooldown extends System {
               if (defaultValue[permId] > 0) {
                 const canBeRunAt = (defaultCooldowns.find(o =>
                   o.permId === permId
-                  && o.name === keyword.keyword
+                  && o.name === keyword.keyword,
                 )?.lastRunAt ?? 0) + defaultValue[permId] * 1000;
                 data.push({
                   isEnabled: true,
@@ -287,7 +287,7 @@ class Cooldown extends System {
           } else {
             const savedCooldown = defaultCooldowns.find(o =>
               o.permId === cooldown.permId
-              && o.name === cooldown.name
+              && o.name === cooldown.name,
             );
             if (savedCooldown) {
               savedCooldown.lastRunAt = Date.now();

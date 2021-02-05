@@ -234,28 +234,33 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed, watch, getCurrentInstance } from '@vue/composition-api'
-import { v4 as uuid } from 'uuid';
-
-import { isNil, orderBy } from 'lodash-es';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faEye, faExclamationTriangle, faEyeSlash, faPlay, faStop, faKey } from '@fortawesome/free-solid-svg-icons';
-library.add(faEye, faEyeSlash, faExclamationTriangle, faPlay, faKey, faStop);
+import {
+  faExclamationTriangle, faEye, faEyeSlash, faKey, faPlay, faStop,
+} from '@fortawesome/free-solid-svg-icons';
+import {
+  computed, defineComponent, getCurrentInstance, onMounted, ref, watch,
+} from '@vue/composition-api';
+import { isNil, orderBy } from 'lodash-es';
+import { v4 as uuid } from 'uuid';
+import { validationMixin } from 'vuelidate';
+import { minLength, required } from 'vuelidate/lib/validators';
 
-import { getSocket } from '../../helpers/socket';
-import { getPermissionName } from '../../helpers/getPermissionName';
 import type { KeywordInterface } from 'src/bot/database/entity/keyword';
 import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
-import translate from 'src/panel/helpers/translate';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { error } from 'src/panel/helpers/error';
-import { validationMixin } from 'vuelidate'
-import { required, minLength } from 'vuelidate/lib/validators'
+import translate from 'src/panel/helpers/translate';
+
+import { getPermissionName } from '../../helpers/getPermissionName';
+import { getSocket } from '../../helpers/socket';
+
+library.add(faEye, faEyeSlash, faExclamationTriangle, faPlay, faKey, faStop);
 
 const socket = {
   permission: getSocket('/core/permissions'),
-  keyword: getSocket('/systems/keywords'),
+  keyword:    getSocket('/systems/keywords'),
 } as const;
 const isValidRegex = (val: string) => {
   try {
@@ -264,21 +269,23 @@ const isValidRegex = (val: string) => {
   } catch (e) {
     return false;
   }
-}
+};
 
 export default defineComponent({
-  mixins: [ validationMixin ],
+  mixins:     [ validationMixin ],
   components: {
-    loading: () => import('../../components/loading.vue'),
+    loading:          () => import('../../components/loading.vue'),
     'text-with-tags': () => import('../../components/textWithTags.vue'),
-    'title-divider': () => import('src/panel/components/title-divider.vue'),
-    'label-inside': () => import('src/panel/components/label-inside.vue')
+    'title-divider':  () => import('src/panel/components/title-divider.vue'),
+    'label-inside':   () => import('src/panel/components/label-inside.vue'),
   },
   filters: {
     capitalize (value: string) {
-      if (!value) return ''
-      value = value.toString()
-      return value.charAt(0).toUpperCase() + value.slice(1)
+      if (!value) {
+        return '';
+      }
+      value = value.toString();
+      return value.charAt(0).toUpperCase() + value.slice(1);
     },
   },
   validations: {
@@ -288,7 +295,7 @@ export default defineComponent({
         minLength: minLength(2),
         isValidRegex,
       },
-    }
+    },
   },
   setup(props, ctx) {
     const instance = getCurrentInstance()?.proxy;
@@ -303,9 +310,9 @@ export default defineComponent({
     const updatedAt = ref(Date.now());
     const state = ref({
       loadedPerm: ButtonStates.progress,
-      loadedCmd: ButtonStates.progress,
-      save: ButtonStates.idle,
-      pending: false,
+      loadedCmd:  ButtonStates.progress,
+      save:       ButtonStates.idle,
+      pending:    false,
     } as {
       loadedPerm: number;
       loadedCmd: number;
@@ -314,18 +321,22 @@ export default defineComponent({
     });
 
     const keywordsFiltered = computed(() => {
-      if (search.value.length === 0) return keywords.value
+      if (search.value.length === 0) {
+        return keywords.value;
+      }
       return keywords.value.filter((o) => {
-        const isSearchInKeyword = !isNil(o.keyword.match(new RegExp(search.value, 'ig')))
-        const isSearchInResponse = o.responses.filter(o => {
-          return !isNil(o.response.match(new RegExp(search.value, 'ig')))
-        }).length > 0
-        return isSearchInKeyword || isSearchInResponse
-      })
-    })
+        const isSearchInKeyword = !isNil(o.keyword.match(new RegExp(search.value, 'ig')));
+        const isSearchInResponse = o.responses.filter(o2 => {
+          return !isNil(o2.response.match(new RegExp(search.value, 'ig')));
+        }).length > 0;
+        return isSearchInKeyword || isSearchInResponse;
+      });
+    });
 
     const fields = [
-      { key: 'keyword', label: translate('keyword'), sortable: true },
+      {
+        key: 'keyword', label: translate('keyword'), sortable: true,
+      },
       { key: 'response', label: translate('response') },
       { key: 'buttons', label: '' },
     ];
@@ -338,7 +349,7 @@ export default defineComponent({
       } else {
         state.value.pending = false;
       }
-    })
+    });
     watch(editationItem, (val, oldVal) => {
       if (val !== null && oldVal !== null) {
         state.value.pending = true;
@@ -352,16 +363,16 @@ export default defineComponent({
         }
         permissions.value = data;
         state.value.loadedPerm = ButtonStates.success;
-      })
+      });
       socket.keyword.emit('generic::getAll', (err: string | null, keywordsGetAll: Required<KeywordInterface>[] ) => {
         if (err) {
           return error(err);
         }
-        console.debug({ keywords })
+        console.debug({ keywords });
         keywords.value = keywordsGetAll;
         state.value.loadedCmd = ButtonStates.success;
-      })
-    }
+      });
+    };
 
     onMounted(() => {
       refresh();
@@ -372,21 +383,27 @@ export default defineComponent({
     });
 
     const updatePermission = (cid: string, rid: string, permission: string) => {
-      let keyword = keywords.value.filter((o) => o.id === cid)[0]
-      let response = keyword.responses.filter((o) => o.id === rid)[0]
-      response.permission = permission
-      socket.keyword.emit('generic::setById', { id: cid, item: keyword }, () => {});
+      const keyword = keywords.value.filter((o) => o.id === cid)[0];
+      const response = keyword.responses.filter((o) => o.id === rid)[0];
+      response.permission = permission;
+      socket.keyword.emit('generic::setById', { id: cid, item: keyword }, () => {
+        return;
+      });
       ctx.root.$forceUpdate();
-    }
+    };
     const updateStopIfExecuted = (cid: string, rid: string, stopIfExecuted: boolean) => {
-      let keyword = keywords.value.filter((o) => o.id === cid)[0]
-      let response = keyword.responses.filter((o) => o.id === rid)[0]
-      response.stopIfExecuted = stopIfExecuted
-      socket.keyword.emit('generic::setById', { id: cid, item: keyword }, () => {});
+      const keyword = keywords.value.filter((o) => o.id === cid)[0];
+      const response = keyword.responses.filter((o) => o.id === rid)[0];
+      response.stopIfExecuted = stopIfExecuted;
+      socket.keyword.emit('generic::setById', { id: cid, item: keyword }, () => {
+        return;
+      });
       ctx.root.$forceUpdate();
-    }
+    };
     const newItem = () => {
-      ctx.root.$router.push({ name: 'KeywordsManagerEdit', params: { id: uuid() } }).catch(() => {});
+      ctx.root.$router.push({ name: 'KeywordsManagerEdit', params: { id: uuid() } }).catch(() => {
+        return;
+      });
     };
     const sendUpdate = (id: string) => {
       socket.keyword.emit('generic::setById', { id, item: keywords.value.find((o) => o.id === id) }, (err: string | null) => {
@@ -394,11 +411,11 @@ export default defineComponent({
           return error(err);
         }
       });
-    }
+    };
     const isSidebarVisibleChange = (isVisible: boolean, ev: any) => {
       if (!isVisible) {
         if (state.value.pending) {
-          const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+          const isOK = confirm('You will lose your pending changes. Do you want to continue?');
           if (!isOK) {
             sidebarSlideEnabled.value = false;
             isSidebarVisible.value = false;
@@ -412,38 +429,40 @@ export default defineComponent({
           }
         }
         isSidebarVisible.value = isVisible;
-        ctx.root.$router.push({ name: 'KeywordsManagerList' }).catch(() => {});
+        ctx.root.$router.push({ name: 'KeywordsManagerList' }).catch(() => {
+          return;
+        });
       } else {
         state.value.save = ButtonStates.idle;
         if (sidebarSlideEnabled.value) {
-          editationItem.value = null
+          editationItem.value = null;
           loadEditationItem();
         }
       }
-    }
+    };
     const loadEditationItem = () => {
       if (ctx.root.$route.params.id) {
         socket.keyword.emit('generic::getOne', ctx.root.$route.params.id, (err: string | null, data: KeywordInterface) => {
           if (err) {
             return error(err);
           }
-          console.debug({data})
+          console.debug({ data });
           if (data === null) {
             // we are creating new item
             editationItem.value = {
-              id: ctx.root.$route.params.id,
-              keyword: '',
-              enabled: true,
+              id:        ctx.root.$route.params.id,
+              keyword:   '',
+              enabled:   true,
               responses: [],
-            }
+            };
           } else {
             editationItem.value = data;
           }
-        })
+        });
       } else {
         editationItem.value = null;
       }
-    }
+    };
     const save = async () => {
       const $v = instance?.$v;
       $v?.$touch();
@@ -456,7 +475,7 @@ export default defineComponent({
               state.value.save = ButtonStates.fail;
               reject(error(err));
             }
-            resolve()
+            resolve();
           });
         });
 
@@ -464,13 +483,15 @@ export default defineComponent({
         ctx.root.$nextTick(() => {
           refresh();
           state.value.pending = false;
-          ctx.root.$router.push({ name: 'KeywordsManagerEdit', params: { id: editationItem.value?.id || '' } }).catch(err => {})
+          ctx.root.$router.push({ name: 'KeywordsManagerEdit', params: { id: editationItem.value?.id || '' } }).catch(err => {
+            return;
+          });
         });
       }
       setTimeout(() => {
         state.value.save = ButtonStates.idle;
-      }, 1000)
-    }
+      }, 1000);
+    };
     const del = (id: string) => {
       if (confirm('Do you want to delete custom keyword ' + keywords.value.find(o => o.id === id)?.keyword + '?')) {
         socket.keyword.emit('generic::deleteById', id, (err: string | null) => {
@@ -478,19 +499,19 @@ export default defineComponent({
             return error(err);
           }
           refresh();
-        })
+        });
       }
-    }
+    };
     const deleteResponse = (order: number) => {
       if (editationItem.value?.responses) {
         editationItem.value.responses.splice(editationItem.value.responses.findIndex(o => o.order === order), 1);
         orderBy(editationItem.value.responses, 'order', 'asc').map((o, i) => {
-          o.order = i
-          return o
-        })
+          o.order = i;
+          return o;
+        });
         updatedAt.value = Date.now();
       }
-    }
+    };
     const moveUpResponse = (order: number) => {
       if (editationItem.value) {
         editationItem.value.responses?.forEach(o => {
@@ -499,9 +520,9 @@ export default defineComponent({
           } else if (o.order === order) {
             o.order--;
           }
-        })
+        });
       }
-      updatedAt.value = Date.now()
+      updatedAt.value = Date.now();
     };
     const moveDownResponse = (order: number) => {
       if (editationItem.value) {
@@ -511,10 +532,10 @@ export default defineComponent({
           } else if (o.order === order) {
             o.order++;
           }
-        })
-      };
-      updatedAt.value = Date.now()
-    }
+        });
+      }
+      updatedAt.value = Date.now();
+    };
 
     return {
       orderBy,
@@ -541,7 +562,7 @@ export default defineComponent({
       moveUpResponse,
       moveDownResponse,
       translate,
-    }
+    };
   },
 });
 </script>

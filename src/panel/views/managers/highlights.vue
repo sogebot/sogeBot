@@ -1,4 +1,3 @@
-
 <template>
   <b-container fluid>
     <b-row>
@@ -46,76 +45,74 @@
 </template>
 
 <script lang="ts">
-import { getSocket } from 'src/panel/helpers/socket';
-import { Vue, Component } from 'vue-property-decorator';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faCalendarAlt } from '@fortawesome/free-regular-svg-icons';
+import { faGamepad } from '@fortawesome/free-solid-svg-icons';
 import { isNil } from 'lodash-es';
+import { Component, Vue } from 'vue-property-decorator';
+
+import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faGamepad } from '@fortawesome/free-solid-svg-icons';
-import { faCalendarAlt } from '@fortawesome/free-regular-svg-icons';
 import { HighlightInterface } from '../../../bot/database/entity/highlight';
+
 library.add(faGamepad, faCalendarAlt);
 
-@Component({
-  components: {
-    loading: () => import('../../components/loading.vue'),
-  },
-})
+@Component({ components: { loading: () => import('../../components/loading.vue') } })
 export default class highlightsList extends Vue {
   translate = translate;
   socket = getSocket('/systems/highlights');
   items: HighlightInterface[] = [];
-  search: string = '';
+  search = '';
 
   fields = [
-    { key: 'thumbnail', label: '', tdClass: 'fitThumbnail' },
+    {
+      key: 'thumbnail', label: '', tdClass: 'fitThumbnail', 
+    },
     { key: 'title', label: '' },
     { key: 'buttons', label: '' },
   ];
 
   state: {
     loading: number;
-  } = {
-    loading: this.$state.progress,
-  }
+  } = { loading: this.$state.progress };
 
   get filtered() {
-    let items = this.items
+    let items = this.items;
     if (this.search.length > 0) {
       items = this.items.filter((o) => {
-        return !isNil(o.title.match(new RegExp(this.search, 'ig'))) || !isNil(o.game.match(new RegExp(this.search, 'ig')))
-      })
+        return !isNil(o.title.match(new RegExp(this.search, 'ig'))) || !isNil(o.game.match(new RegExp(this.search, 'ig')));
+      });
     }
     return items.sort((a, b) => {
-      return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
-    })
+      return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+    });
   }
 
   created() {
     this.state.loading = this.$state.progress;
     this.socket.emit('generic::getAll', (err: string | null, items: HighlightInterface[]) => {
-      this.items = items
+      this.items = items;
       this.state.loading = this.$state.success;
-    })
+    });
   }
 
   timestampToString(value: { hours: number; minutes: number; seconds: number }) {
-    const string = (value.hours ? `${value.hours}h` : '') +
-      (value.minutes ? `${value.minutes}m` : '') +
-      (value.seconds ? `${value.seconds}s` : '')
-    return string
+    const string = (value.hours ? `${value.hours}h` : '')
+      + (value.minutes ? `${value.minutes}m` : '')
+      + (value.seconds ? `${value.seconds}s` : '');
+    return string;
   }
 
   generateThumbnail(game: string) {
-    const template = 'https://static-cdn.jtvnw.net/ttv-boxart/./%{game}-60x80.jpg'
-    return template.replace('%{game}', encodeURI(game))
+    const template = 'https://static-cdn.jtvnw.net/ttv-boxart/./%{game}-60x80.jpg';
+    return template.replace('%{game}', encodeURI(game));
   }
 
   deleteItem(id: string) {
     this.socket.emit('generic::deleteById', id, () => {
-      this.items = this.items.filter((o) => o.id !== id)
-    })
+      this.items = this.items.filter((o) => o.id !== id);
+    });
   }
 }
 </script>

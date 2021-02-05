@@ -18,8 +18,10 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { orderBy } from 'lodash-es';
+import {
+  Component, Prop, Vue, Watch, 
+} from 'vue-property-decorator';
 
 @Component({})
 export default class configurableList extends Vue {
@@ -52,26 +54,26 @@ export default class configurableList extends Vue {
     { value: 'vk', text: 'VK' },
     { value: 'windows', text: 'Windows' },
     { value: 'xbox', text: 'XBox' },
-    { value: 'youtube', text: 'YouTube' }
+    { value: 'youtube', text: 'YouTube' },
   ];
 
   @Watch('currentValues')
   onChange() {
-    this.$emit('update', { value: this.currentValues })
+    this.$emit('update', { value: this.currentValues });
   }
 
   remove(order: number) {
-    this.currentValues = this.currentValues.filter(o => o.order !== order)
+    this.currentValues = this.currentValues.filter(o => o.order !== order);
   }
 
   reorder() {
-    let val: any[] = []
+    const val: any[] = [];
     for (let i = 0, length = this.currentValues.length; i < length; i++) {
-      val[i] = this.currentValues[i]
-      val[i].order = i
+      val[i] = this.currentValues[i];
+      val[i].order = i;
     }
-    this.currentValues = val
-    this.onChange()
+    this.currentValues = val;
+    this.onChange();
   }
 }
 </script>

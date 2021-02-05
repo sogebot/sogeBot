@@ -163,192 +163,205 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue'
-  import { chunk, cloneDeep, isNil } from 'lodash-es'
-  import { dayjs } from 'src/bot/helpers/dayjs';
-  import translate from 'src/panel/helpers/translate';
+import {
+  chunk, cloneDeep, isNil, 
+} from 'lodash-es';
+import { v4 as uuid } from 'uuid';
+import Vue from 'vue';
 
-  import { getSocket } from 'src/panel/helpers/socket';
-  import { PollInterface } from 'src/bot/database/entity/poll';
+import { PollInterface } from 'src/bot/database/entity/poll';
+import { dayjs } from 'src/bot/helpers/dayjs';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
-  import { v4 as uuid } from 'uuid'
+export default Vue.extend({
+  components: { panel: () => import('../../components/panel.vue') },
+  data:       function () {
+    const object: {
+      translate: any,
+      dayjs: any,
+      chunk: any,
+      socket: any,
+      votes: PollInterface[],
+      newVote: PollInterface,
+      currentTime: any,
+      isMounted: boolean,
+      domWidth: number,
+      interval: number,
+      search: string,
+    } = {
+      translate: translate,
+      dayjs:     dayjs,
+      chunk:     chunk,
+      socket:    getSocket('/systems/polls'),
+      votes:     [],
+      newVote:   {
+        id:       uuid(),
+        type:     'normal',
+        title:    '',
+        isOpened: true,
+        openedAt: Date.now(),
+        closedAt: 0,
+        options:  ['', '', '', '', ''],
+        votes:    [],
+      },
+      currentTime: 0,
+      isMounted:   false,
+      domWidth:    0,
+      interval:    0,
+      search:      '',
+    };
+    return object;
+  },
+  beforeDestroy: function () {
+    clearInterval(this.interval);
+  },
+  mounted: function () {
+    this.currentTime = Date.now();
+    this.domWidth = (this.$refs.window as HTMLElement).clientWidth;
+    this.refresh();
 
-  export default Vue.extend({
-    components: {
-      panel: () => import('../../components/panel.vue'),
-    },
-    data: function () {
-      const object: {
-        translate: any,
-        dayjs: any,
-        chunk: any,
-        socket: any,
-        votes: PollInterface[],
-        newVote: PollInterface,
-        currentTime: any,
-        isMounted: Boolean,
-        domWidth: number,
-        interval: number,
-        search: string,
-      } = {
-        translate: translate,
-        dayjs: dayjs,
-        chunk: chunk,
-        socket: getSocket('/systems/polls'),
-        votes: [],
-        newVote: {
-          id: uuid(),
-          type: 'normal',
-          title: '',
-          isOpened: true,
-          openedAt: Date.now(),
-          closedAt: 0,
-          options: ['', '', '', '', ''],
-          votes: [],
-        },
-        currentTime: 0,
-        isMounted: false,
-        domWidth: 0,
-        interval: 0,
-        search: '',
-      }
-      return object
-    },
-    beforeDestroy: function () {
-      clearInterval(this.interval)
-    },
-    mounted: function () {
-      this.currentTime = Date.now()
-      this.domWidth = (this.$refs['window'] as HTMLElement).clientWidth
+    this.interval = window.setInterval(() => {
+      this.domWidth = (this.$refs.window as HTMLElement).clientWidth;
+      this.currentTime = Date.now();
       this.refresh();
+    }, 1000);
 
-      this.interval = window.setInterval(() => {
-        this.domWidth = (this.$refs['window'] as HTMLElement).clientWidth
-        this.currentTime = Date.now()
-        this.refresh();
-      }, 1000)
-
-      this.isMounted = true
-    },
-    computed: {
-      filteredVotes: function (): Array<PollInterface | 'new'> {
-        const votes: Array<'new' | PollInterface> = [
-          'new', ...this.votes,
-        ];
-        if (this.search.trim().length === 0) return votes;
-          return votes.filter((o) => {
-            if (typeof o !== 'string') {
-            const isSearchInKeyword = !isNil(o.title.match(new RegExp(this.search, 'ig')))
-            const isOpened = o.isOpened === true
-            return isSearchInKeyword || isOpened
-            } else {
-              return true // is new -> must return
-            }
-          })
-      },
-      itemsPerPage: function (): number {
-        if(!this.isMounted) return 4
-        else {
-          if (this.domWidth > 1200) return 4
-          else if (this.domWidth > 850) return 3
-          else return 2
-        }
-      },
-      isRunning: function (): Boolean {
-        const running = this.votes.find(o => typeof o !== 'string' && o.isOpened);
-        return typeof running !== 'undefined';
-      },
-    },
-    methods: {
-      atLeastTwoOptions: function (): Boolean {
-        let options = 0
-        for (let i = 0; i < this.newVote.options.length; i++) {
-          if (this.newVote.options[i].trim().length > 0) options++
-        }
-        return options >= 2
-      },
-      refresh: function () {
-        this.socket.emit('generic::getAll', (err: string | null, data: PollInterface[]) =>  {
-          if (err) {
-            return console.error(err);
-          }
-          console.debug('Loaded', data);
-          this.votes = data
-        })
-      },
-      create: function () {
-        this.newVote.openedAt = Date.now()
-        this.newVote.isOpened = true
-        delete this.newVote.closedAt
-
-        this.socket.emit('polls::save', this.newVote, (err: string | null, data: PollInterface[]) => {
-            if (err) return console.error(err)
-            else {
-              this.refresh();
-              this.newVote = {
-                id: uuid(),
-                type: 'normal',
-                title: '',
-                isOpened: true,
-                options: ['', '', '', '', ''],
-                openedAt: Date.now(),
-              }
-            }
-          })
-      },
-      copy: function (vid: string) {
-        const vote = this.votes.find(o => typeof o !== 'string' && o.id === vid);
-        if (typeof vote === 'object') {
-          let newVote = cloneDeep(vote)
-          newVote.id = uuid();
-
-          for (let i = 0, length = newVote.options.length; i < 5 - length; i++) {
-            newVote.options.push('')
-          };
-
-          this.newVote = newVote;
-        }
-      },
-      stop: function (vid: string) {
-        let vote = this.votes.find(o => typeof o !== 'string' && o.id === vid)
-        if (typeof vote === 'object') {
-          vote.isOpened = false;
-          vote.closedAt = Date.now();
-          this.socket.emit('polls::close', vote, (err: string | null) => {
-            if (err) console.error(err)
-          })
-        }
-      },
-      totalVotes: function (vid: string) {
-        let totalVotes = 0
-        const votes = this.votes.find(o => o.id === vid);
-        if (votes?.votes) {
-          for (let i = 0, length = votes.votes.length; i < length; i++) {
-            totalVotes += votes.votes[i].votes
-          }
-        }
-        return totalVotes
-      },
-      activeTime: function (vid: string) {
-        const vote = this.votes.find(o => typeof o !== 'string' && o.id === vid);
-        if (typeof vote === 'object') {
-          return new Date(vote.openedAt || Date.now()).getTime();
+    this.isMounted = true;
+  },
+  computed: {
+    filteredVotes: function (): Array<PollInterface | 'new'> {
+      const votes: Array<'new' | PollInterface> = [
+        'new', ...this.votes,
+      ];
+      if (this.search.trim().length === 0) {
+        return votes;
+      }
+      return votes.filter((o) => {
+        if (typeof o !== 'string') {
+          const isSearchInKeyword = !isNil(o.title.match(new RegExp(this.search, 'ig')));
+          const isOpened = o.isOpened === true;
+          return isSearchInKeyword || isOpened;
         } else {
-          return 0;
+          return true; // is new -> must return
         }
-      },
-      getPercentage: function (vid: string, index: number, toFixed: number): string {
-        let numOfVotes = 0
-        const votes = this.votes.find(o => o.id === vid);
-        if (votes?.votes) {
-          for (let i = 0, length = votes.votes.length; i < length; i++) {
-            if (votes.votes[i].option === index) numOfVotes += votes.votes[i].votes
+      });
+    },
+    itemsPerPage: function (): number {
+      if(!this.isMounted) {
+        return 4;
+      } else {
+        if (this.domWidth > 1200) {
+          return 4;
+        } else if (this.domWidth > 850) {
+          return 3;
+        } else {
+          return 2;
+        }
+      }
+    },
+    isRunning: function (): boolean {
+      const running = this.votes.find(o => typeof o !== 'string' && o.isOpened);
+      return typeof running !== 'undefined';
+    },
+  },
+  methods: {
+    atLeastTwoOptions: function (): boolean {
+      let options = 0;
+      for (let i = 0; i < this.newVote.options.length; i++) {
+        if (this.newVote.options[i].trim().length > 0) {
+          options++;
+        }
+      }
+      return options >= 2;
+    },
+    refresh: function () {
+      this.socket.emit('generic::getAll', (err: string | null, data: PollInterface[]) =>  {
+        if (err) {
+          return console.error(err);
+        }
+        console.debug('Loaded', data);
+        this.votes = data;
+      });
+    },
+    create: function () {
+      this.newVote.openedAt = Date.now();
+      this.newVote.isOpened = true;
+      delete this.newVote.closedAt;
+
+      this.socket.emit('polls::save', this.newVote, (err: string | null, data: PollInterface[]) => {
+        if (err) {
+          return console.error(err);
+        } else {
+          this.refresh();
+          this.newVote = {
+            id:       uuid(),
+            type:     'normal',
+            title:    '',
+            isOpened: true,
+            options:  ['', '', '', '', ''],
+            openedAt: Date.now(),
+          };
+        }
+      });
+    },
+    copy: function (vid: string) {
+      const vote = this.votes.find(o => typeof o !== 'string' && o.id === vid);
+      if (typeof vote === 'object') {
+        const newVote = cloneDeep(vote);
+        newVote.id = uuid();
+
+        for (let i = 0, length = newVote.options.length; i < 5 - length; i++) {
+          newVote.options.push('');
+        }
+
+        this.newVote = newVote;
+      }
+    },
+    stop: function (vid: string) {
+      const vote = this.votes.find(o => typeof o !== 'string' && o.id === vid);
+      if (typeof vote === 'object') {
+        vote.isOpened = false;
+        vote.closedAt = Date.now();
+        this.socket.emit('polls::close', vote, (err: string | null) => {
+          if (err) {
+            console.error(err);
+          }
+        });
+      }
+    },
+    totalVotes: function (vid: string) {
+      let totalVotes = 0;
+      const votes = this.votes.find(o => o.id === vid);
+      if (votes?.votes) {
+        for (let i = 0, length = votes.votes.length; i < length; i++) {
+          totalVotes += votes.votes[i].votes;
+        }
+      }
+      return totalVotes;
+    },
+    activeTime: function (vid: string) {
+      const vote = this.votes.find(o => typeof o !== 'string' && o.id === vid);
+      if (typeof vote === 'object') {
+        return new Date(vote.openedAt || Date.now()).getTime();
+      } else {
+        return 0;
+      }
+    },
+    getPercentage: function (vid: string, index: number, toFixed: number): string {
+      let numOfVotes = 0;
+      const votes = this.votes.find(o => o.id === vid);
+      if (votes?.votes) {
+        for (let i = 0, length = votes.votes.length; i < length; i++) {
+          if (votes.votes[i].option === index) {
+            numOfVotes += votes.votes[i].votes;
           }
         }
-        return Number((100 / this.totalVotes(vid)) * numOfVotes || 0).toFixed(toFixed || 0);
-      },
-    }
-  })
+      }
+      return Number((100 / this.totalVotes(vid)) * numOfVotes || 0).toFixed(toFixed || 0);
+    },
+  },
+});
 </script>
 
 <style scoped>

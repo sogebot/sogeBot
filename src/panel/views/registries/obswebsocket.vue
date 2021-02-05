@@ -64,27 +64,28 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed, watch, getCurrentInstance } from '@vue/composition-api'
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faVial } from '@fortawesome/free-solid-svg-icons';
+import {
+  computed, defineComponent, getCurrentInstance, onMounted, ref, watch,
+} from '@vue/composition-api';
 import { escapeRegExp, isNil } from 'lodash-es';
 import shortid from 'shortid';
 
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faVial } from '@fortawesome/free-solid-svg-icons';
-library.add(faVial)
-
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
-import { EventBus } from 'src/panel/helpers/event-bus';
-import { capitalize } from 'src/panel/helpers/capitalize';
-import { ButtonStates } from 'src/panel/helpers/buttonStates';
+library.add(faVial);
 
 import type { OBSWebsocketInterface } from 'src/bot/database/entity/obswebsocket';
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import { capitalize } from 'src/panel/helpers/capitalize';
+import { EventBus } from 'src/panel/helpers/event-bus';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
-const socket = getSocket('/integrations/obswebsocket')
+const socket = getSocket('/integrations/obswebsocket');
 
 export default defineComponent({
   components: {
-    loading: () => import('src/panel/components/loading.vue'),
+    loading:          () => import('src/panel/components/loading.vue'),
     obswebsocketEdit: () => import('./obswebsocket-edit.vue'),
   },
   setup(props, ctx) {
@@ -98,8 +99,8 @@ export default defineComponent({
     const items = ref([] as OBSWebsocketInterface[]);
     const state = ref({
       loading: ButtonStates.progress,
-      save: ButtonStates.idle,
-      test: ButtonStates.idle,
+      save:    ButtonStates.idle,
+      test:    ButtonStates.idle,
       pending: false,
       invalid: false,
     } as {
@@ -110,19 +111,22 @@ export default defineComponent({
       invalid: boolean;
     });
     const filtered = computed(() => {
-      if (search.value.length === 0) return items.value
+      if (search.value.length === 0) {
+        return items.value;
+      }
       return items.value.filter((o) => {
-        const isSearchInName = !isNil(o.name.match(new RegExp(escapeRegExp(search.value), 'ig')))
-        return isSearchInName
-      })
+        const isSearchInName = !isNil(o.name.match(new RegExp(escapeRegExp(search.value), 'ig')));
+        return isSearchInName;
+      });
     });
     const fields = [
-      { key: 'name', label: translate('timers.dialog.name'), sortable: true },
+      {
+        key: 'name', label: translate('timers.dialog.name'), sortable: true,
+      },
       // virtual attributes
       { key: 'command', label: translate('integrations.obswebsocket.command') },
       { key: 'buttons', label: '' },
     ];
-
 
     onMounted(() => {
       refresh();
@@ -140,25 +144,27 @@ export default defineComponent({
       } else {
         state.value.pending = false;
       }
-    })
+    });
 
     const refresh = () => {
       socket.emit('integration::obswebsocket::getCommand', (cmd: string) => {
         command.value = cmd;
-      })
+      });
       socket.emit('generic::getAll', (err: string | null, _items: OBSWebsocketInterface[]) => {
         items.value = _items;
         state.value.loading = ButtonStates.success;
-      })
-    }
+      });
+    };
 
     const newItem = () => {
-      ctx.root.$router.push({ name: 'OBSWebsocketRegistryEdit', params: { id: shortid.generate() } }).catch(() => {});
+      ctx.root.$router.push({ name: 'OBSWebsocketRegistryEdit', params: { id: shortid.generate() } }).catch(() => {
+        return; 
+      });
     };
     const isSidebarVisibleChange = (isVisible: boolean, ev: any) => {
       if (!isVisible) {
         if (state.value.pending) {
-          const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+          const isOK = confirm('You will lose your pending changes. Do you want to continue?');
           if (!isOK) {
             sidebarSlideEnabled.value = false;
             isSidebarVisible.value = false;
@@ -172,28 +178,32 @@ export default defineComponent({
           }
         }
         isSidebarVisible.value = isVisible;
-        ctx.root.$router.push({ name: 'OBSWebsocketRegistryList' }).catch(() => {});
+        ctx.root.$router.push({ name: 'OBSWebsocketRegistryList' }).catch(() => {
+          return; 
+        });
       } else {
         state.value.save = ButtonStates.idle;
       }
-    }
+    };
     const del = (item: Required<OBSWebsocketInterface>) => {
       if (confirm(`Do you want to delete ${item.name}?`)) {
         socket.emit('generic::deleteById', item.id, () => {
-          items.value = items.value.filter((o) => o.id !== item.id)
-        })
+          items.value = items.value.filter((o) => o.id !== item.id);
+        });
       }
-    }
+    };
     const update = (item: OBSWebsocketInterface) => {
-      socket.emit('timers::save', item, () => {});
-    }
+      socket.emit('timers::save', item, () => {
+        return;
+      });
+    };
 
     function copy(text: string) {
       navigator.clipboard.writeText(text);
       copied.value = true;
       setTimeout(() => {
         copied.value = false;
-      }, 1000)
+      }, 1000);
     }
 
     return {
@@ -218,7 +228,7 @@ export default defineComponent({
       ButtonStates,
       EventBus,
       capitalize,
-    }
-  }
+    };
+  },
 });
 </script>

@@ -14,11 +14,13 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
-import { getSocket } from 'src/panel/helpers/socket';
 import { orderBy } from 'lodash-es';
-import { EventListInterface } from '../../bot/database/entity/eventList';
+import { Component, Vue } from 'vue-property-decorator';
+
+import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
+
+import { EventListInterface } from '../../bot/database/entity/eventList';
 
 @Component({})
 export default class ClipsOverlay extends Vue {
@@ -33,15 +35,15 @@ export default class ClipsOverlay extends Vue {
   refresh() {
     this.socket.emit('getEvents', {
       ignore: this.urlParam('ignore') || '',
-      limit: Number(this.urlParam('count') || 5)
+      limit:  Number(this.urlParam('count') || 5),
     }, (err: string | null, data: EventListInterface[]) => {
       if (err) {
         return console.error(err);
       }
-      var order = (this.urlParam('order') as "desc" | "asc") || 'desc'
+      const order = (this.urlParam('order') as 'desc' | 'asc') || 'desc';
       this.display = this.urlParam('display')?.split(',') || 'username,event'.split(',');
 
-      console.debug({order, display: this.display})
+      console.debug({ order, display: this.display });
       this.events = orderBy(data, 'timestamp', order).map((o) => {
         const values = JSON.parse(o.values_json);
         if (o.event === 'resub') {
@@ -53,10 +55,10 @@ export default class ClipsOverlay extends Vue {
         } else {
           return { ...o, summary: translate('overlays-eventlist-' + o.event) };
         }
-      })
+      });
       setTimeout(() => this.refresh(), 5000);
-    })
-}
+    });
+  }
 }
 </script>
 

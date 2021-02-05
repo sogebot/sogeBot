@@ -430,34 +430,32 @@
 </template>
 
 <script lang="ts">
-import { isNil } from 'lodash-es'
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
+import {
+  computed, ComputedRef, defineComponent, onMounted, onUnmounted, reactive, ref, watch,
+} from '@vue/composition-api';
+import type { Ref } from '@vue/composition-api';
+import { isNil } from 'lodash-es';
 
+import { getTime } from 'src/bot/helpers/getTime';
+import type { UIError } from 'src/bot/helpers/panel/alerts';
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
-import type { UIError } from 'src/bot/helpers/panel/alerts';
-
-import { library } from '@fortawesome/fontawesome-svg-core';
-import {
-  faCaretDown, faCaretUp
-} from '@fortawesome/free-solid-svg-icons';
 library.add(faCaretDown, faCaretUp);
 
 let interval = 0;
 let UIErrorInterval = 0;
 let widthOfMenuInterval = 0;
 
-import { defineComponent, ref, onMounted, onUnmounted, computed, reactive, ComputedRef, watch } from '@vue/composition-api'
-import type { Ref } from '@vue/composition-api'
-import { getTime } from 'src/bot/helpers/getTime';
-
 const highlightsSocket = getSocket('/systems/highlights');
 const socket = getSocket('/');
 
 const numberReducer = (out: string, item: any) => {
   if (['currency', 'compact'].includes(item.type)) {
-    out += `<small class="text-muted">${item.value}</small>`
+    out += `<small class="text-muted">${item.value}</small>`;
   } else {
     out += item.value;
   }
@@ -488,9 +486,7 @@ export default defineComponent({
     const version = ref('');
     const update: {
       version: null | string;
-    } = reactive({
-      version: null,
-    });
+    } = reactive({ version: null });
     const title: Ref<null | string> = ref(null);
     const game: Ref<null | string> = ref(null);
     const rawStatus = ref('');
@@ -509,35 +505,37 @@ export default defineComponent({
 
     watch(isStreamOnline, () => {
       getLatestStats();
-    })
+    });
 
     const widthOfMenuUpdate = () => {
       top.value = (quickwindow.value as unknown as HTMLElement).getBoundingClientRect().right < 900 ? '80' : '50';
-    }
+    };
     const showGameAndTitleDlg = () => EventBus.$emit('show-game_and_title_dlg');
     const loadCustomVariableValue = async (variable: string) => {
       return new Promise<string>((resolve, reject) => {
         socket.emit('custom.variable.value', variable, (err: string | null, value: string) => {
-          resolve(value)
-        })
-      })
+          resolve(value);
+        });
+      });
     };
     const generateTitle = async (current: string, raw: string) => {
-      if (raw.length === 0) return current
+      if (raw.length === 0) {
+        return current;
+      }
 
-      let variables = raw.match(/(\$_[a-zA-Z0-9_]+)/g)
+      const variables = raw.match(/(\$_[a-zA-Z0-9_]+)/g);
       if (cachedTitle.value === current && isNil(variables)) {
-        return cachedTitle.value
+        return cachedTitle.value;
       }
 
       if (!isNil(variables)) {
-        for (let variable of variables) {
-          let value = await loadCustomVariableValue(variable)
-          raw = raw.replace(variable, `<strong style="border-bottom: 1px dotted gray" data-toggle="tooltip" data-placement="bottom" title="${variable}">${value}</strong>`)
+        for (const variable of variables) {
+          const value = await loadCustomVariableValue(variable);
+          raw = raw.replace(variable, `<strong style="border-bottom: 1px dotted gray" data-toggle="tooltip" data-placement="bottom" title="${variable}">${value}</strong>`);
         }
       }
-      cachedTitle.value = raw
-      return raw
+      cachedTitle.value = raw;
+      return raw;
     };
     const getErrorType = (type: string) => {
       switch (type) {
@@ -548,31 +546,29 @@ export default defineComponent({
         default:
           return 'info';
       }
-    }
+    };
     const saveHighlight = () => highlightsSocket.emit('highlight');
     const filterTags = (is_auto: boolean) => {
-        return tags.value.filter(o => !!o.is_auto === is_auto).map((o) => {
-        const key = Object.keys(o.localization_names).find(key => key.includes(context.root.$store.state.configuration.lang))
-        return {
-          name: o.localization_names[key || 'en-us'], is_auto: !!o.is_auto
-        }
+      return tags.value.filter(o => !!o.is_auto === is_auto).map((o) => {
+        const key = Object.keys(o.localization_names).find(key2 => key2.includes(context.root.$store.state.configuration.lang));
+        return { name: o.localization_names[key || 'en-us'], is_auto: !!o.is_auto };
       }).sort((a, b) => {
-        if ((a || { name: ''}).name < (b || { name: ''}).name)  { //sort string ascending
+        if ((a || { name: '' }).name < (b || { name: '' }).name)  { //sort string ascending
           return -1;
         }
-        if ((a || { name: ''}).name > (b || { name: ''}).name) {
+        if ((a || { name: '' }).name > (b || { name: '' }).name) {
           return 1;
         }
         return 0; //default return value (no sorting)
       });
     };
     const toggleViewerShow = () => {
-      hideStats.value = !hideStats.value
-      localStorage.setItem('hideStats', String(hideStats.value))
+      hideStats.value = !hideStats.value;
+      localStorage.setItem('hideStats', String(hideStats.value));
     };
     const getLatestStats = () => {
       socket.emit('getLatestStats', (err: string | null, data: any) => {
-        console.groupCollapsed('navbar::getLatestStats')
+        console.groupCollapsed('navbar::getLatestStats');
         if (err) {
           return console.error(err);
         }
@@ -582,12 +578,12 @@ export default defineComponent({
           averageStats[key] = data[key];
         }
       });
-    }
+    };
 
     onMounted(() => {
       widthOfMenuInterval = window.setInterval(() => {
-        widthOfMenuUpdate()
-      }, 100)
+        widthOfMenuUpdate();
+      }, 100);
 
       socket.emit('version', async (recvVersion: string) => {
         version.value = recvVersion;
@@ -598,37 +594,38 @@ export default defineComponent({
 
           request.onload = function() {
             if (!(this.status >= 200 && this.status < 400)) {
-              console.error('Error getting version from git', this.status, this.response)
+              console.error('Error getting version from git', this.status, this.response);
             }
-            resolve({ response: JSON.parse(this.response)})
-          }
+            resolve({ response: JSON.parse(this.response) });
+          };
           request.onerror = function() {
-            console.error('Connection error to github')
+            console.error('Connection error to github');
             resolve( { response: {} });
           };
 
           request.send();
-        })
-        let botVersion = recvVersion.replace('-SNAPSHOT', '').split('.').map(o => Number(o))
-        let gitVersion = (response.tag_name as string).split('.').map(o => Number(o))
-        console.debug({botVersion, gitVersion});
+        });
+        const botVersion = recvVersion.replace('-SNAPSHOT', '').split('.').map(o => Number(o));
+        const gitVersion = (response.tag_name as string).split('.').map(o => Number(o));
+        console.debug({ botVersion, gitVersion });
 
-        let isNewer = false
+        let isNewer = false;
         for (let index = 0; index < botVersion.length; index++) {
           if (botVersion[index] < gitVersion[index]) {
-            isNewer = true
-            break
-          } else if (botVersion[index] === gitVersion[index]) continue
-          else {
-            isNewer = false
-            break
+            isNewer = true;
+            break;
+          } else if (botVersion[index] === gitVersion[index]) {
+            continue;
+          } else {
+            isNewer = false;
+            break;
           }
         }
 
         if (isNewer) {
           update.version = gitVersion.join('.');
         }
-      })
+      });
 
       UIErrorInterval = window.setInterval(() => {
         socket.emit('panel::alerts', (err: string | null, data: { errors: { name: string; message: string }[], warns: { name: string; message: string }[] }) => {
@@ -637,27 +634,35 @@ export default defineComponent({
           }
           for (const error of data.errors) {
             console.error(`UIError: ${error.name} ¦ ${error.message}`);
-            errors.value.push({ ...error, date: Date.now(), type: 'error' });
+            errors.value.push({
+              ...error, date: Date.now(), type: 'error',
+            });
           }
           for (const error of data.warns) {
             console.info(`UIWarn: ${error.name} ¦ ${error.message}`);
-            errors.value.push({ ...error, date: Date.now(), type: 'warn' });
+            errors.value.push({
+              ...error, date: Date.now(), type: 'warn',
+            });
           }
         });
       }, 5000);
       EventBus.$on('error', (err: UIError) => {
-        errors.value.push({ ...err, date: Date.now(), type: 'error' });
-      })
+        errors.value.push({
+          ...err, date: Date.now(), type: 'error',
+        });
+      });
       EventBus.$on('success', (err: UIError) => {
-        errors.value.push({ ...err, date: Date.now(), type: 'success' });
-      })
+        errors.value.push({
+          ...err, date: Date.now(), type: 'success',
+        });
+      });
 
       getLatestStats();
 
       socket.emit('panel::resetStatsState');
       socket.on('panel::stats', async (data: Record<string, any>) => {
-        console.groupCollapsed('panel::stats')
-        console.log(data)
+        console.groupCollapsed('panel::stats');
+        console.log(data);
         console.groupEnd();
 
         broadcasterType.value = data.broadcasterType;
@@ -677,7 +682,7 @@ export default defineComponent({
         currentHosts.value = data.currentHosts;
         currentWatched.value = data.currentWatched;
         tags.value = data.tags;
-        isLoaded.value = true
+        isLoaded.value = true;
         title.value = await generateTitle(data.status, data.rawStatus);
         rawStatus.value = data.rawStatus;
 
@@ -687,14 +692,14 @@ export default defineComponent({
       });
 
       interval = window.setInterval(() => {
-        timestamp.value = Date.now()
+        timestamp.value = Date.now();
       }, 1000);
     });
     onUnmounted(() => {
-      clearInterval(widthOfMenuInterval)
-      clearInterval(interval)
-      clearInterval(UIErrorInterval)
-    })
+      clearInterval(widthOfMenuInterval);
+      clearInterval(interval);
+      clearInterval(UIErrorInterval);
+    });
 
     return {
       errors,
@@ -738,8 +743,8 @@ export default defineComponent({
       translate,
       numberReducer,
       getErrorType,
-    }
-  }
+    };
+  },
 });
 </script>
 

@@ -104,23 +104,26 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref, watch } from '@vue/composition-api'
+import {
+  computed, defineComponent, ref, watch, 
+} from '@vue/composition-api';
+
 import type { CommonSettingsInterface } from 'src/bot/database/entity/alert';
 import translate from 'src/panel/helpers/translate';
 
 const evalComparatorMap = new Map(Object.entries({
-  lt: '<',
+  lt:      '<',
   'lt-eq': '<=',
-  eq: '==',
-  neq: '!=',
-  gt: '>',
+  eq:      '==',
+  neq:     '!=',
+  gt:      '>',
   'gt-eq': '>=',
 }));
 const evalOperatorMap = new Map(Object.entries({
-  and: '&&',
+  and:       '&&',
   'and not': '&& !(',
-  or: '||',
-  'or not': '|| !(',
+  or:        '||',
+  'or not':  '|| !(',
 }));
 
 export function itemsToEvalPart (items: any[], operator: string): string {
@@ -129,37 +132,37 @@ export function itemsToEvalPart (items: any[], operator: string): string {
     const item = items[i];
     if (item !== null && typeof item.items === 'undefined') {
       if (i > 0) {
-        output += ` ${evalOperatorMap.get(operator)} `
+        output += ` ${evalOperatorMap.get(operator)} `;
       }
 
       if (['pr'].includes(item.comparator)) {
-        output += `${item.type}.length > 0`
+        output += `${item.type}.length > 0`;
       } else if (item.typeof === 'string') {
         if (['includes'].includes(item.comparator)) {
-          output += `[${item.value.split(',').map((o: string) => `'${o.trim()}'`).join(', ')}].includes(${item.type})`
+          output += `[${item.value.split(',').map((o: string) => `'${o.trim()}'`).join(', ')}].includes(${item.type})`;
         } else if (['co'].includes(item.comparator)) {
-          output += `${item.type}.includes('${item.value}')`
+          output += `${item.type}.includes('${item.value}')`;
         } else {
-          output += `${item.type} ${evalComparatorMap.get(item.comparator)} '${item.value}'`
+          output += `${item.type} ${evalComparatorMap.get(item.comparator)} '${item.value}'`;
         }
       } else if (item.typeof === 'tier') {
-          // we need to set Prime as value 0
-          const value = item.value === 'Prime' ? 0 : item.value;
-          output += `${item.type} ${evalComparatorMap.get(item.comparator)} ${value}`;
+        // we need to set Prime as value 0
+        const value = item.value === 'Prime' ? 0 : item.value;
+        output += `${item.type} ${evalComparatorMap.get(item.comparator)} ${value}`;
       } else {
         if (['is-even', 'is-odd'].includes(item.comparator)) {
-          output += `${item.type} % 2 === ${item.comparator === 'is-even' ? 0 : 1}`
+          output += `${item.type} % 2 === ${item.comparator === 'is-even' ? 0 : 1}`;
         } else {
-          output += `${item.type} ${evalComparatorMap.get(item.comparator)} ${item.value}`
+          output += `${item.type} ${evalComparatorMap.get(item.comparator)} ${item.value}`;
         }
       }
       if (i > 0 && operator.includes('not')) {
-        output += `) ` // ending ')' after 'not' operator
+        output += `) `; // ending ')' after 'not' operator
       }
     } else {
       if (item !== null && item.items.length > 0) {
         if (i > 0) {
-        output += `${evalOperatorMap.get(operator)?.replace('(', '')}` // we need to replace '(' as it is already part of new group
+          output += `${evalOperatorMap.get(operator)?.replace('(', '')}`; // we need to replace '(' as it is already part of new group
         }
 
         output +=  '(' + itemsToEvalPart(item.items, item.operator) + ')';
@@ -173,23 +176,21 @@ type Props = {
   filter: CommonSettingsInterface['filter'],
   noInput: boolean,
   deletable: boolean,
-  rules: [[String, String]]
-}
+  rules: [[string, string]]
+};
 export default defineComponent({
-  name: 'query-filter',
+  name:  'query-filter',
   props: {
-    filter: Object,
-    rules: Array,
-    noInput: Boolean,
+    filter:    Object,
+    rules:     Array,
+    noInput:   Boolean,
     deletable: Boolean,
   },
-  components: {
-    'label-inside': () => import('src/panel/components/label-inside.vue')
-  },
+  components: { 'label-inside': () => import('src/panel/components/label-inside.vue') },
   setup(props: Props, ctx) {
     const _filter = ref((props.filter !== null ? props.filter : {
       operator: 'and',
-      items: [],
+      items:    [],
     }) as CommonSettingsInterface['filter']);
     const editationMode = ref(props.noInput);
     const addRuleType = ref([props.rules[0][0]]);
@@ -203,7 +204,7 @@ export default defineComponent({
         case 'tier':
           return 'Prime';
       }
-    }
+    };
 
     const getRuleType = (type: string) => {
       const rule = props.rules.find(o => o[0] === type);
@@ -212,7 +213,7 @@ export default defineComponent({
       } else {
         return rule[1];
       }
-    }
+    };
 
     const itemsToStringifiedPart = (items: any[], operator: string): string => {
       let output = '';
@@ -220,32 +221,32 @@ export default defineComponent({
         const item = items[i];
         if (item !== null && typeof item.items === 'undefined') {
           if (i > 0) {
-            output += ` ${operator} `
+            output += ` ${operator} `;
           }
 
           if (item.typeof === 'string') {
             if (['pr'].includes(item.comparator)) {
-              output += `${item.type} ${item.comparator}`
+              output += `${item.type} ${item.comparator}`;
             } else if (['includes'].includes(item.comparator)) {
-              output += `${item.type} ${item.comparator} [${item.value.split(',').map((o: string) => `'${o.trim()}'`).join(', ')}]`
+              output += `${item.type} ${item.comparator} [${item.value.split(',').map((o: string) => `'${o.trim()}'`).join(', ')}]`;
             } else {
-              output += `${item.type} ${item.comparator} '${item.value}'`
+              output += `${item.type} ${item.comparator} '${item.value}'`;
             }
           } else if (item.typeof === 'tier') {
             const value = item.value === 'Prime' ? 'Prime' : item.value;
             output += `${item.type} ${item.comparator} ${value}`;
           } else {
             if (['is-even', 'is-odd', 'pr'].includes(item.comparator)) {
-              output += `${item.type} ${item.comparator}`
+              output += `${item.type} ${item.comparator}`;
             } else {
-              output += `${item.type} ${item.comparator} ${item.value}`
+              output += `${item.type} ${item.comparator} ${item.value}`;
             }
 
           }
         } else {
           if (item !== null && item.items.length > 0) {
             if (i > 0) {
-              output += ` ${operator} `
+              output += ` ${operator} `;
             }
 
             output +=  '(' + itemsToStringifiedPart(item.items, item.operator) + ')';
@@ -253,7 +254,7 @@ export default defineComponent({
         }
       }
       return output;
-    }
+    };
 
     const stringifiedFilter = computed(() => {
       if (_filter.value) {
@@ -261,26 +262,26 @@ export default defineComponent({
         return filter.length > 0 ? filter : `<< ${translate('registry.alerts.filter.noFilter')} >>`;
       }
       return `<< ${translate('registry.alerts.filter.noFilter')} >>`;
-    })
+    });
 
     const deleteItem = (index: number, skipConfirm = false) => {
       if (_filter.value) {
         const item = _filter.value.items[index];
         if (typeof item !== 'undefined' && (skipConfirm || confirm('Do you want to permanently delete this rule?'))) {
-          _filter.value.items.splice(index, 1)
+          _filter.value.items.splice(index, 1);
         }
       }
-    }
+    };
 
     const deleteGroup = () => {
       if (confirm('Do you want to permanently delete this group?')) {
-        ctx.emit('delete') // parent need to remove this
+        ctx.emit('delete'); // parent need to remove this
       }
-    }
+    };
 
     watch(_filter, (val) => {
       ctx.emit('update:filter', val);
-    }, { deep: true })
+    }, { deep: true });
 
     return {
       _filter,
@@ -292,7 +293,7 @@ export default defineComponent({
       deleteItem,
       deleteGroup,
       translate,
-    }
-  }
-})
+    };
+  },
+});
 </script>

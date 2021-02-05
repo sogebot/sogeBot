@@ -33,31 +33,25 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
 
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { library } from '@fortawesome/fontawesome-svg-core'
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faClock } from '@fortawesome/free-solid-svg-icons/faClock';
+import { faEye } from '@fortawesome/free-solid-svg-icons/faEye';
+import { faGem } from '@fortawesome/free-solid-svg-icons/faGem';
+import { faStar } from '@fortawesome/free-solid-svg-icons/faStar';
+import { faUsers } from '@fortawesome/free-solid-svg-icons/faUsers';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { Component, Vue } from 'vue-property-decorator';
 
-import { faStar } from '@fortawesome/free-solid-svg-icons/faStar'
-import { faGem } from '@fortawesome/free-solid-svg-icons/faGem'
-import { faUsers } from '@fortawesome/free-solid-svg-icons/faUsers'
-import { faClock } from '@fortawesome/free-solid-svg-icons/faClock'
-import { faEye } from '@fortawesome/free-solid-svg-icons/faEye'
-
-library.add(faStar, faGem, faUsers, faClock, faEye)
+library.add(faStar, faGem, faUsers, faClock, faEye);
 
 import { getSocket } from 'src/panel/helpers/socket';
 
-
-@Component({
-  components: {
-    'font-awesome-icon': FontAwesomeIcon
-  }
-})
+@Component({ components: { 'font-awesome-icon': FontAwesomeIcon } })
 export default class StatsOverlay extends Vue {
   socket = getSocket('/overlays/stats', true);
   stats: any = {};
-  interval: any[] = []
+  interval: any[] = [];
 
   beforeDestroy() {
     for(const interval of this.interval) {
@@ -66,14 +60,14 @@ export default class StatsOverlay extends Vue {
   }
 
   created () {
-    this.refresh()
+    this.refresh();
     this.interval.push(setInterval(() => this.refresh(), 1000));
   }
 
   refresh () {
     this.socket.emit('get', (cb: any) => {
-      this.stats = cb
-    })
+      this.stats = cb;
+    });
   }
 }
 </script>

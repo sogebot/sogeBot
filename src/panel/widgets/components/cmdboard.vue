@@ -68,59 +68,60 @@
 </template>
 
 <script>
-import { getSocket } from 'src/panel/helpers/socket';
-import { EventBus } from 'src/panel/helpers/event-bus';
 import { orderBy } from 'lodash-es';
+
+import { EventBus } from 'src/panel/helpers/event-bus';
+import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
 export default {
-  props: ['popout', 'nodrag'],
-  components: {
-    loading: () => import('src/panel/components/loading.vue'),
-  },
-  data: function () {
+  props:      ['popout', 'nodrag'],
+  components: { loading: () => import('src/panel/components/loading.vue') },
+  data:       function () {
     return {
       translate,
       EventBus,
       orderBy,
       tabIndex: 0,
-      state: {
+      state:    {
         editation: this.$state.idle,
-        loading: this.$state.progress,
+        loading:   this.$state.progress,
       },
-      socket: getSocket('/widgets/cmdboard'),
-      displayAs: 'list',
+      socket:        getSocket('/widgets/cmdboard'),
+      displayAs:     'list',
       displayAsOpts: [],
-      name: '',
-      command: '',
-      items: [],
-      selected: [],
-      draggingItem: null,
-    }
+      name:          '',
+      command:       '',
+      items:         [],
+      selected:      [],
+      draggingItem:  null,
+    };
   },
   computed: {
     isConfirmEnabled: function () {
-      return this.name.trim().length > 0 && this.command.trim().length > 0
-    }
+      return this.name.trim().length > 0 && this.command.trim().length > 0;
+    },
   },
   watch: {
     'state.editation': function (val) {
-      this.selected = []
-    }
+      this.selected = [];
+    },
   },
   created: function () {
-      this.socket.emit('generic::getAll', (err, items) => {
-        if (err) {
-          return console.error(err);
-        }
-        this.items = items
-        this.state.loading = this.$state.success;
-      })
-      this.socket.emit('settings', (err, data) => {
-        if (err) return console.error(err)
-        this.displayAs = data.displayAs[0]
-        this.displayAsOpts = data.displayAsOpts[0]
-      })
+    this.socket.emit('generic::getAll', (err, items) => {
+      if (err) {
+        return console.error(err);
+      }
+      this.items = items;
+      this.state.loading = this.$state.success;
+    });
+    this.socket.emit('settings', (err, data) => {
+      if (err) {
+        return console.error(err);
+      }
+      this.displayAs = data.displayAs[0];
+      this.displayAsOpts = data.displayAsOpts[0];
+    });
   },
   methods: {
     toggle(item) {
@@ -136,49 +137,51 @@ export default {
       }
     },
     remove() {
-      this.socket.emit('cmdboard::remove', this.items.filter(o => this.selected.includes(String(o.id))), () => {});
-      this.items = this.items.filter(o => !this.selected.includes(String(o.id)))
+      this.socket.emit('cmdboard::remove', this.items.filter(o => this.selected.includes(String(o.id))), () => {
+        return; 
+      });
+      this.items = this.items.filter(o => !this.selected.includes(String(o.id)));
       this.selected = [];
       this.reorder();
     },
     save() {
       this.state.editation = this.$state.idle;
-      console.debug('saving', { items: Array(...this.items) })
+      console.debug('saving', { items: Array(...this.items) });
       this.socket.emit('cmdboard::save', this.items, (err) => {
         if (err) {
           return console.error(err);
         }
-      })
+      });
     },
     emit: function (item) {
-      this.socket.emit('cmdboard::run', item)
+      this.socket.emit('cmdboard::run', item);
     },
     add: function () {
       this.tabIndex = 0;
       this.socket.emit('cmdboard::save', [{
-          text: this.name,
-          command: this.command,
-          order: this.items.length,
-        }], (err, items) => {
+        text:    this.name,
+        command: this.command,
+        order:   this.items.length,
+      }], (err, items) => {
         if (err) {
           return console.error(err);
         }
-        this.items = [...this.items, ...items]
-      })
-      this.name = ''
-      this.command = ''
+        this.items = [...this.items, ...items];
+      });
+      this.name = '';
+      this.command = '';
     },
     dragstart(order, e) {
       this.draggingItem = order;
-      console.debug('dragging', order)
+      console.debug('dragging', order);
       this.$refs['item_' + order][0].style.opacity = 0.5;
       e.dataTransfer.setData('text/plain', 'dummy');
     },
     dragenter(newOrder, e) {
-      const value = this.items.find(o => o.order === this.draggingItem)
-      const entered = this.items.find(o => o.order === newOrder)
+      const value = this.items.find(o => o.order === this.draggingItem);
+      const entered = this.items.find(o => o.order === newOrder);
       entered.order = this.draggingItem;
-      this.draggingItem = newOrder
+      this.draggingItem = newOrder;
       value.order = this.draggingItem;
 
       for (let i = 0, length = this.items.length; i < length; i++) {
@@ -186,13 +189,13 @@ export default {
       }
       this.$refs['item_' + this.draggingItem][0].style.opacity = 0.5;
 
-      this.$forceUpdate()
+      this.$forceUpdate();
     },
     dragend(order, e) {
       for (let i = 0, length = this.items.length; i < length; i++) {
         this.$refs['item_' + this.items[i].order][0].style.opacity = 1;
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>

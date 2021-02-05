@@ -87,119 +87,129 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue'
-  import { chunk, filter, orderBy } from 'lodash-es';
-  import { v4 as uuid } from 'uuid';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faClone } from '@fortawesome/free-solid-svg-icons';
+import {
+  chunk, filter, orderBy, 
+} from 'lodash-es';
+import { v4 as uuid } from 'uuid';
+import Vue from 'vue';
 
-  import { getSocket } from 'src/panel/helpers/socket';
-  import { GoalGroupInterface } from 'src/bot/database/entity/goal';
-  import translate from 'src/panel/helpers/translate';
+import { GoalGroupInterface } from 'src/bot/database/entity/goal';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
-  import { library } from '@fortawesome/fontawesome-svg-core';
-  import { faClone } from '@fortawesome/free-solid-svg-icons';
-  library.add(faClone);
+library.add(faClone);
 
-  export default Vue.extend({
-    components: {
-      panel: () => import('../../../components/panel.vue'),
-      holdButton: () => import('../../../components/holdButton.vue'),
-      'button-with-icon': () => import('../../../components/button.vue'),
+export default Vue.extend({
+  components: {
+    panel:              () => import('../../../components/panel.vue'),
+    holdButton:         () => import('../../../components/holdButton.vue'),
+    'button-with-icon': () => import('../../../components/button.vue'),
+  },
+  data: function () {
+    const object: {
+      translate: typeof translate,
+      groups: GoalGroupInterface[],
+      socket: any,
+      search: string,
+      currentTime: any,
+      domWidth: number,
+      interval: number,
+      isMounted: boolean,
+      chunk: any,
+      filter: any,
+      orderBy: any,
+    } = {
+      translate:   translate,
+      socket:      getSocket('/overlays/goals'),
+      search:      '',
+      groups:      [],
+      currentTime: 0,
+      domWidth:    0,
+      interval:    0,
+      isMounted:   false,
+      chunk:       chunk,
+      filter:      filter,
+      orderBy:     orderBy,
+    };
+    return object;
+  },
+  computed: {
+    groupsFiltered: function (): GoalGroupInterface[] {
+      return this.groups.filter((o: GoalGroupInterface) => {
+        return o.name.includes(this.search);
+      });
     },
-    data: function () {
-      const object: {
-        translate: typeof translate,
-        groups: GoalGroupInterface[],
-        socket: any,
-        search: string,
-        currentTime: any,
-        domWidth: number,
-        interval: number,
-        isMounted: boolean,
-        chunk: any,
-        filter: any,
-        orderBy: any,
-      } = {
-        translate: translate,
-        socket: getSocket('/overlays/goals'),
-        search: '',
-        groups: [],
-        currentTime: 0,
-        domWidth: 0,
-        interval: 0,
-        isMounted: false,
-        chunk: chunk,
-        filter: filter,
-        orderBy: orderBy
-      }
-      return object
-    },
-    computed: {
-      groupsFiltered: function (): GoalGroupInterface[] {
-        return this.groups.filter((o: GoalGroupInterface) => {
-          return o.name.includes(this.search)
-        })
-      },
-      itemsPerPage: function () {
-        if(!this.isMounted) return 3
-        else {
-          if (this.domWidth > 1400) return 3
-          else if (this.domWidth > 850) return 2
-          else return 1
+    itemsPerPage: function () {
+      if(!this.isMounted) {
+        return 3;
+      } else {
+        if (this.domWidth > 1400) {
+          return 3;
+        } else if (this.domWidth > 850) {
+          return 2;
+        } else {
+          return 1;
         }
-      },
-    },
-    mounted: function() {
-      this.domWidth = (this.$refs['window'] as HTMLElement).clientWidth
-      this.currentTime = Date.now()
-      this.isMounted = true
-      this.interval = window.setInterval(() => {
-        this.domWidth = (this.$refs['window'] as HTMLElement).clientWidth
-        this.currentTime = Date.now()
-      }, 1000)
-
-      this.refresh();
-    },
-    beforeDestroy: function () {
-      clearInterval(this.interval)
-    },
-    methods: {
-      refresh() {
-        this.socket.emit('generic::getAll', (err: Error, items: GoalGroupInterface[]) => {
-          if (err) {
-            console.error(err);
-          } else {
-            console.debug('Loaded', items);
-            this.groups = items;
-          }
-        })
-      },
-      clone(group: GoalGroupInterface) {
-        const clonedGroupId = uuid();
-        const clonedGroup = {
-          ...group,
-          id: clonedGroupId,
-          name: group.name + ' (clone)',
-          goals: group.goals.map(goal => ({ ...goal, id: uuid(), groupId: clonedGroupId }))
-        }
-        this.socket.emit('goals::save', clonedGroup, (err: string | null) => {
-          if (err) {
-            console.error(err)
-          }
-          this.refresh();
-        });
-      },
-      removeGoal: function (group: GoalGroupInterface) {
-        console.debug(' => Removing', group.id)
-
-        this.socket.emit('goals::remove', group, (err: string | null) => {
-          if (err) {
-            console.error(err);
-          } else {
-            this.groups = this.groups.filter(o => o.id != group.id)          }
-        })
       }
-    }
-  })
+    },
+  },
+  mounted: function() {
+    this.domWidth = (this.$refs.window as HTMLElement).clientWidth;
+    this.currentTime = Date.now();
+    this.isMounted = true;
+    this.interval = window.setInterval(() => {
+      this.domWidth = (this.$refs.window as HTMLElement).clientWidth;
+      this.currentTime = Date.now();
+    }, 1000);
+
+    this.refresh();
+  },
+  beforeDestroy: function () {
+    clearInterval(this.interval);
+  },
+  methods: {
+    refresh() {
+      this.socket.emit('generic::getAll', (err: Error, items: GoalGroupInterface[]) => {
+        if (err) {
+          console.error(err);
+        } else {
+          console.debug('Loaded', items);
+          this.groups = items;
+        }
+      });
+    },
+    clone(group: GoalGroupInterface) {
+      const clonedGroupId = uuid();
+      const clonedGroup = {
+        ...group,
+        id:    clonedGroupId,
+        name:  group.name + ' (clone)',
+        goals: group.goals.map(goal => ({
+          ...goal, id: uuid(), groupId: clonedGroupId, 
+        })),
+      };
+      this.socket.emit('goals::save', clonedGroup, (err: string | null) => {
+        if (err) {
+          console.error(err);
+        }
+        this.refresh();
+      });
+    },
+    removeGoal: function (group: GoalGroupInterface) {
+      console.debug(' => Removing', group.id);
+
+      this.socket.emit('goals::remove', group, (err: string | null) => {
+        if (err) {
+          console.error(err);
+        } else {
+          this.groups = this.groups.filter(o => o.id != group.id);          
+        }
+      });
+    },
+  },
+});
 </script>
 
 <style scoped>

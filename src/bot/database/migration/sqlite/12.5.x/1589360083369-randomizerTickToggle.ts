@@ -14,12 +14,12 @@ export class randomizerTickToggle1589360083369 implements MigrationInterface {
 
     for (const randomizer of randomizers) {
       await queryRunner.query(
-        `INSERT INTO randomizer(${Object.keys(randomizer).join(', ')}, shouldPlayTick, tickVolume) values(${Object.keys(randomizer).map(o => '?')}, ?, ?)`, [ ...Object.keys(randomizer).map(key => randomizer[key]), 1, 100 ]
+        `INSERT INTO randomizer(${Object.keys(randomizer).join(', ')}, shouldPlayTick, tickVolume) values(${Object.keys(randomizer).map(o => '?')}, ?, ?)`, [ ...Object.keys(randomizer).map(key => randomizer[key]), 1, 100 ],
       );
     }
     for (const randomizer of randomizersItems) {
       await queryRunner.query(
-        `INSERT INTO randomizer_item(${Object.keys(randomizer).join(', ')}) values(${Object.keys(randomizer).map(o => '?')})`, Object.keys(randomizer).map(key => randomizer[key])
+        `INSERT INTO randomizer_item(${Object.keys(randomizer).join(', ')}) values(${Object.keys(randomizer).map(o => '?')})`, Object.keys(randomizer).map(key => randomizer[key]),
       );
     }
 
@@ -36,12 +36,12 @@ export class randomizerTickToggle1589360083369 implements MigrationInterface {
 
     for (const randomizer of randomizers) {
       await queryRunner.query(
-        `INSERT INTO randomizer(${Object.keys(randomizer).filter(o => o !== 'shouldPlayTick' && o !== 'tickVolume').join(', ')}) values(${Object.keys(randomizer).map(o => '?')})`, [ ...Object.keys(randomizer).filter(o => o !== 'shouldPlayTick' && o !== 'tickVolume').map(key => randomizer[key]) ]
+        `INSERT INTO randomizer(${Object.keys(randomizer).filter(o => o !== 'shouldPlayTick' && o !== 'tickVolume').join(', ')}) values(${Object.keys(randomizer).map(o => '?')})`, [ ...Object.keys(randomizer).filter(o => o !== 'shouldPlayTick' && o !== 'tickVolume').map(key => randomizer[key]) ],
       );
     }
     for (const randomizer of randomizerItems) {
       await queryRunner.query(
-        `INSERT INTO randomizer_item(${Object.keys(randomizer).join(', ')}) values(${Object.keys(randomizer).map(o => '?')})`, Object.keys(randomizer).map(key => randomizer[key])
+        `INSERT INTO randomizer_item(${Object.keys(randomizer).join(', ')}) values(${Object.keys(randomizer).map(o => '?')})`, Object.keys(randomizer).map(key => randomizer[key]),
       );
     }
 

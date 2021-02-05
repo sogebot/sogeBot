@@ -157,7 +157,7 @@ class EventList extends Widget {
             username:    mapping.get(event.userId),
             values_json: JSON.stringify(values),
           };
-        })
+        }),
       );
     } catch (e) {
       this.emit('update', []);

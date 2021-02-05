@@ -9,8 +9,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, Ref, ref } from '@vue/composition-api'
-import { getParentBackground } from '../helpers/getParentBackground'
+import {
+  defineComponent, onMounted, Ref, ref, 
+} from '@vue/composition-api';
+
+import { getParentBackground } from '../helpers/getParentBackground';
 
 export default defineComponent({
   setup(props, ctx) {
@@ -23,12 +26,12 @@ export default defineComponent({
           const color = getParentBackground(label.value);
           inside.value.style.backgroundColor = color;
         }
-      })
-    })
+      });
+    });
 
     return { label, inside };
-  }
-})
+  },
+});
 </script>
 
 <style scoped>

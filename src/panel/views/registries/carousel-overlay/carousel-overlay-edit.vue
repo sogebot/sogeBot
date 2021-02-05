@@ -130,46 +130,43 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator';
-import { getSocket } from 'src/panel/helpers/socket';
-import { CarouselInterface } from 'src/bot/database/entity/carousel';
-import translate from 'src/panel/helpers/translate';
-
-import { Route } from 'vue-router'
 import { NextFunction } from 'express';
-
+import {
+  Component, Vue, Watch, 
+} from 'vue-property-decorator';
+import { Route } from 'vue-router';
 import { Validations } from 'vuelidate-property-decorators';
-import { required, minValue } from 'vuelidate/lib/validators'
+import { minValue, required } from 'vuelidate/lib/validators';
+
+import { CarouselInterface } from 'src/bot/database/entity/carousel';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 Component.registerHooks([
   'beforeRouteEnter',
   'beforeRouteLeave',
-  'beforeRouteUpdate' // for vue-router 2.2+
-])
+  'beforeRouteUpdate', // for vue-router 2.2+
+]);
 
-@Component({
-  components: {
-    'loading': () => import('../../../components/loading.vue'),
-  }
-})
+@Component({ components: { 'loading': () => import('../../../components/loading.vue') } })
 export default class carouselOverlayEdit extends Vue {
   translate = translate;
   socket = getSocket('/overlays/carousel');
 
   item: CarouselInterface = {
-    id: '',
-    type: '',
-    base64: '',
-    waitBefore: 0,
-    waitAfter: 0,
-    duration: 0,
-    animationInDuration: 0,
-    animationIn: 'fadeIn',
-    animationOutDuration: 0,
-    animationOut: 'fadeIn',
-    order: 0,
+    id:                    '',
+    type:                  '',
+    base64:                '',
+    waitBefore:            0,
+    waitAfter:             0,
+    duration:              0,
+    animationInDuration:   0,
+    animationIn:           'fadeIn',
+    animationOutDuration:  0,
+    animationOut:          'fadeIn',
+    order:                 0,
     showOnlyOncePerStream: false,
-  }
+  };
 
   animationInOptions = [
     { value: 'fadeIn', text: 'fadeIn' },
@@ -178,7 +175,7 @@ export default class carouselOverlayEdit extends Vue {
     { value: 'slideDown', text: 'slideDown' },
     { value: 'slideLeft', text: 'slideLeft' },
     { value: 'slideRight', text: 'slideRight' },
-  ]
+  ];
 
   animationOutOptions = [
     { value: 'fadeOut', text: 'fadeOut' },
@@ -187,7 +184,7 @@ export default class carouselOverlayEdit extends Vue {
     { value: 'slideDown', text: 'slideDown' },
     { value: 'slideLeft', text: 'slideLeft' },
     { value: 'slideRight', text: 'slideRight' },
-  ]
+  ];
 
   state: {
     loading: number;
@@ -195,19 +192,19 @@ export default class carouselOverlayEdit extends Vue {
     pending: boolean;
   } = {
     loading: this.$state.progress,
-    save: this.$state.idle,
+    save:    this.$state.idle,
     pending: false,
-  }
+  };
 
   @Validations()
   validations = {
     item: {
-      waitBefore: {required, minValue: minValue(0)},
-      waitAfter: {required, minValue: minValue(0)},
-      animationInDuration: {required, minValue: minValue(100)},
-      animationOutDuration: {required, minValue: minValue(100)},
-    }
-  }
+      waitBefore:           { required, minValue: minValue(0) },
+      waitAfter:            { required, minValue: minValue(0) },
+      animationInDuration:  { required, minValue: minValue(100) },
+      animationOutDuration: { required, minValue: minValue(100) },
+    },
+  };
 
   @Watch('item', { deep: true })
   pending() {
@@ -227,10 +224,10 @@ export default class carouselOverlayEdit extends Vue {
         }
         this.state.save = this.$state.success;
         this.state.pending = false;
-        this.$router.push({ name: 'carouselRegistryEdit', params: { id: String(data.id) } })
+        this.$router.push({ name: 'carouselRegistryEdit', params: { id: String(data.id) } });
         setTimeout(() => {
           this.state.save = this.$state.idle;
-        }, 1000)
+        }, 1000);
       });
     }
   }
@@ -240,8 +237,8 @@ export default class carouselOverlayEdit extends Vue {
       if (err) {
         return console.error(err);
       }
-      this.$router.push({ name: 'carouselRegistryList' })
-    })
+      this.$router.push({ name: 'carouselRegistryList' });
+    });
   }
 
   created() {
@@ -253,13 +250,13 @@ export default class carouselOverlayEdit extends Vue {
       this.item = item;
       this.$nextTick(() => {
         this.state.loading = this.$state.success;
-      })
-    })
+      });
+    });
   }
 
   beforeRouteUpdate(to: Route, from: Route, next: NextFunction) {
     if (this.state.pending) {
-      const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+      const isOK = confirm('You will lose your pending changes. Do you want to continue?');
       if (!isOK) {
         next(false);
       } else {
@@ -272,7 +269,7 @@ export default class carouselOverlayEdit extends Vue {
 
   beforeRouteLeave(to: Route, from: Route, next: NextFunction) {
     if (this.state.pending) {
-      const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+      const isOK = confirm('You will lose your pending changes. Do you want to continue?');
       if (!isOK) {
         next(false);
       } else {

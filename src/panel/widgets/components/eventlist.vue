@@ -150,58 +150,63 @@
 </template>
 
 <script>
-import { getSocket } from 'src/panel/helpers/socket';
-import { EventBus } from 'src/panel/helpers/event-bus';
-import { toBoolean } from 'src/bot/helpers/toBoolean';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import {
+  faBell, faBellSlash, faRedoAlt, faVolumeMute,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
+import {
+  chunk, debounce, get,
+} from 'lodash-es';
+
 import { dayjs } from 'src/bot/helpers/dayjs';
-import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
-import { chunk, debounce, get } from 'lodash-es';
+import { toBoolean } from 'src/bot/helpers/toBoolean';
+import { EventBus } from 'src/panel/helpers/event-bus';
+import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faRedoAlt, faBell, faBellSlash, faVolumeMute } from '@fortawesome/free-solid-svg-icons';
 library.add(faRedoAlt, faBell, faBellSlash, faVolumeMute);
 
 export default {
-  props: ['popout', 'nodrag'],
+  props:      ['popout', 'nodrag'],
   components: {
     'font-awesome-layers': FontAwesomeLayers,
-    holdButton: () => import('../../components/holdButton.vue'),
-    loading: () => import('src/panel/components/loading.vue'),
+    holdButton:            () => import('../../components/holdButton.vue'),
+    loading:               () => import('src/panel/components/loading.vue'),
   },
   data: function () {
     return {
       translate,
       dayjs,
       EventBus,
-      isHovered: '',
-      socket: getSocket('/widgets/eventlist'),
+      isHovered:    '',
+      socket:       getSocket('/widgets/eventlist'),
       socketAlerts: getSocket('/registries/alerts'),
-      settings: {
-        widgetEventlistFollows: true,
-        widgetEventlistHosts: true,
-        widgetEventlistRaids: true,
-        widgetEventlistCheers: true,
-        widgetEventlistSubs: true,
-        widgetEventlistSubgifts: true,
+      settings:     {
+        widgetEventlistFollows:           true,
+        widgetEventlistHosts:             true,
+        widgetEventlistRaids:             true,
+        widgetEventlistCheers:            true,
+        widgetEventlistSubs:              true,
+        widgetEventlistSubgifts:          true,
         widgetEventlistSubcommunitygifts: true,
-        widgetEventlistResubs: true,
-        widgetEventlistTips: true,
+        widgetEventlistResubs:            true,
+        widgetEventlistTips:              true,
       },
       state: {
         editation: this.$state.idle,
-        loading: this.$state.progress,
+        loading:   this.$state.progress,
       },
-      events: [],
-      eventlistShow: 0,
-      eventlistSize: 0,
+      events:               [],
+      eventlistShow:        0,
+      eventlistSize:        0,
       eventlistMessageSize: 0,
-      interval: [],
-      selected: [],
-      areAlertsMuted: false,
-      isTTSMuted: false,
-      isSoundMuted: false,
-    }
+      interval:             [],
+      selected:             [],
+      areAlertsMuted:       false,
+      isTTSMuted:           false,
+      isSoundMuted:         false,
+    };
   },
   beforeDestroy: function() {
     for(const interval of this.interval) {
@@ -209,110 +214,139 @@ export default {
     }
   },
   created: function () {
-    this.state.loading = this.$state.progress
+    this.state.loading = this.$state.progress;
     this.settings = {
-      widgetEventlistFollows: toBoolean(localStorage.getItem('widgetEventlistFollows') ? localStorage.getItem('widgetEventlistFollows') : true),
-      widgetEventlistHosts: toBoolean(localStorage.getItem('widgetEventlistHosts') ? localStorage.getItem('widgetEventlistHosts') : true),
-      widgetEventlistRaids: toBoolean(localStorage.getItem('widgetEventlistRaids') ? localStorage.getItem('widgetEventlistRaids') : true),
-      widgetEventlistCheers: toBoolean(localStorage.getItem('widgetEventlistCheers') ? localStorage.getItem('widgetEventlistCheers') : true),
-      widgetEventlistSubs: toBoolean(localStorage.getItem('widgetEventlistSubs') ? localStorage.getItem('widgetEventlistSubs') : true),
-      widgetEventlistSubgifts: toBoolean(localStorage.getItem('widgetEventlistSubgifts') ? localStorage.getItem('widgetEventlistSubgifts') : true),
+      widgetEventlistFollows:           toBoolean(localStorage.getItem('widgetEventlistFollows') ? localStorage.getItem('widgetEventlistFollows') : true),
+      widgetEventlistHosts:             toBoolean(localStorage.getItem('widgetEventlistHosts') ? localStorage.getItem('widgetEventlistHosts') : true),
+      widgetEventlistRaids:             toBoolean(localStorage.getItem('widgetEventlistRaids') ? localStorage.getItem('widgetEventlistRaids') : true),
+      widgetEventlistCheers:            toBoolean(localStorage.getItem('widgetEventlistCheers') ? localStorage.getItem('widgetEventlistCheers') : true),
+      widgetEventlistSubs:              toBoolean(localStorage.getItem('widgetEventlistSubs') ? localStorage.getItem('widgetEventlistSubs') : true),
+      widgetEventlistSubgifts:          toBoolean(localStorage.getItem('widgetEventlistSubgifts') ? localStorage.getItem('widgetEventlistSubgifts') : true),
       widgetEventlistSubcommunitygifts: toBoolean(localStorage.getItem('widgetEventlistSubcommunitygifts') ? localStorage.getItem('widgetEventlistSubcommunitygifts') : true),
-      widgetEventlistResubs: toBoolean(localStorage.getItem('widgetEventlistResubs') ? localStorage.getItem('widgetEventlistResubs') : true),
-      widgetEventlistTips: toBoolean(localStorage.getItem('widgetEventlistTips') ? localStorage.getItem('widgetEventlistTips') : true),
-    }
+      widgetEventlistResubs:            toBoolean(localStorage.getItem('widgetEventlistResubs') ? localStorage.getItem('widgetEventlistResubs') : true),
+      widgetEventlistTips:              toBoolean(localStorage.getItem('widgetEventlistTips') ? localStorage.getItem('widgetEventlistTips') : true),
+    };
 
     this.eventlistShow = Number(localStorage.getItem('widgetEventlistShow') ? localStorage.getItem('widgetEventlistShow') : 100),
     this.eventlistSize = Number(localStorage.getItem('widgetEventlistSize') ? localStorage.getItem('widgetEventlistSize') : 20),
     this.eventlistMessageSize = Number(localStorage.getItem('widgetEventlistMessageSize') ? localStorage.getItem('widgetEventlistMessageSize') : 15),
-    console.group('Eventlist widgets settings')
-    console.debug(this.settings)
-    console.groupEnd()
-    this.socket.emit('eventlist::get', this.eventlistShow) // get initial widget state
+    console.group('Eventlist widgets settings');
+    console.debug(this.settings);
+    console.groupEnd();
+    this.socket.emit('eventlist::get', this.eventlistShow); // get initial widget state
     this.socket.on('askForGet', () => this.socket.emit('eventlist::get', this.eventlistShow));
     this.socket.on('update', events => {
-      this.state.loading = this.$state.success
-      this.events = events
-    })
+      this.state.loading = this.$state.success;
+      this.events = events;
+    });
     this.socketAlerts.emit('alerts::areAlertsMuted', null, (err, val) => {
       this.areAlertsMuted = val;
-    })
+    });
     this.socketAlerts.emit('alerts::isTTSMuted', null, (err, val) => {
       this.isTTSMuted = val;
-    })
+    });
     this.socketAlerts.emit('alerts::isSoundMuted', null, (err, val) => {
       this.isSoundMuted = val;
-    })
+    });
 
     // refresh timestamps
-    this.interval.push(setInterval(() => this.socket.emit('eventlist::get', this.eventlistShow), 60000))
+    this.interval.push(setInterval(() => this.socket.emit('eventlist::get', this.eventlistShow), 60000));
   },
   computed: {
     fEvents: function () {
-      let toShow = []
-      if (this.settings.widgetEventlistFollows) toShow.push('follow')
-      if (this.settings.widgetEventlistHosts) toShow.push('host')
-      if (this.settings.widgetEventlistRaids) toShow.push('raid')
-      if (this.settings.widgetEventlistCheers) toShow.push('cheer')
-      if (this.settings.widgetEventlistSubs) toShow.push('sub')
-      if (this.settings.widgetEventlistSubgifts) toShow.push('subgift')
-      if (this.settings.widgetEventlistSubcommunitygifts) toShow.push('subcommunitygift')
-      if (this.settings.widgetEventlistResubs) toShow.push('resub')
-      if (this.settings.widgetEventlistTips) toShow.push('tip')
-      return chunk(this.events.filter(o => toShow.includes(o.event)), this.eventlistShow)[0]
-    }
+      const toShow = [];
+      if (this.settings.widgetEventlistFollows) {
+        toShow.push('follow');
+      }
+      if (this.settings.widgetEventlistHosts) {
+        toShow.push('host');
+      }
+      if (this.settings.widgetEventlistRaids) {
+        toShow.push('raid');
+      }
+      if (this.settings.widgetEventlistCheers) {
+        toShow.push('cheer');
+      }
+      if (this.settings.widgetEventlistSubs) {
+        toShow.push('sub');
+      }
+      if (this.settings.widgetEventlistSubgifts) {
+        toShow.push('subgift');
+      }
+      if (this.settings.widgetEventlistSubcommunitygifts) {
+        toShow.push('subcommunitygift');
+      }
+      if (this.settings.widgetEventlistResubs) {
+        toShow.push('resub');
+      }
+      if (this.settings.widgetEventlistTips) {
+        toShow.push('tip');
+      }
+      return chunk(this.events.filter(o => toShow.includes(o.event)), this.eventlistShow)[0];
+    },
   },
   watch: {
     '$route': function(val) {
       this.socketAlerts.emit('alerts::areAlertsMuted', null, (err, value) => {
         this.areAlertsMuted = value;
-      })
+      });
       this.socketAlerts.emit('alerts::isTTSMuted', null, (err, value) => {
         this.isTTSMuted = value;
-      })
+      });
       this.socketAlerts.emit('alerts::isSoundMuted', null, (err, value) => {
         this.isSoundMuted = value;
-      })
+      });
     },
     'areAlertsMuted': function(val) {
-      this.socketAlerts.emit('alerts::areAlertsMuted', this.areAlertsMuted, () => {})
+      this.socketAlerts.emit('alerts::areAlertsMuted', this.areAlertsMuted, () => {
+        return; 
+      });
     },
     'isTTSMuted': function(val) {
-      this.socketAlerts.emit('alerts::isTTSMuted', this.isTTSMuted, () => {})
+      this.socketAlerts.emit('alerts::isTTSMuted', this.isTTSMuted, () => {
+        return; 
+      });
     },
     'isSoundMuted': function(val) {
-      this.socketAlerts.emit('alerts::isSoundMuted', this.isSoundMuted, () => {})
+      this.socketAlerts.emit('alerts::isSoundMuted', this.isSoundMuted, () => {
+        return; 
+      });
     },
     'state.editation': function (val) {
-      this.selected = []
+      this.selected = [];
     },
     eventlistSize: debounce(function (value, old) {
-      if (Number.isNaN(Number(value))) this.eventlistSize = old
-      else {
-        this.eventlistSize = value
-        localStorage.setItem('widgetEventlistSize', value)
+      if (Number.isNaN(Number(value))) {
+        this.eventlistSize = old;
+      } else {
+        this.eventlistSize = value;
+        localStorage.setItem('widgetEventlistSize', value);
       }
     }, 500),
     eventlistShow: debounce(function (value, old) {
-      if (Number.isNaN(Number(value))) this.eventlistShow = old
-      else {
-        this.eventlistShow = value
-        localStorage.setItem('widgetEventlistShow', value)
-        this.socket.emit('eventlist::get', this.eventlistShow) // get initial widget state
+      if (Number.isNaN(Number(value))) {
+        this.eventlistShow = old;
+      } else {
+        this.eventlistShow = value;
+        localStorage.setItem('widgetEventlistShow', value);
+        this.socket.emit('eventlist::get', this.eventlistShow); // get initial widget state
       }
     }, 500),
     eventlistMessageSize: debounce(function (value, old) {
-      if (Number.isNaN(Number(value))) this.eventlistMessageSize = old
-      else {
-        this.eventlistMessageSize = value
-        localStorage.setItem('widgetEventlistMessageSize', value)
+      if (Number.isNaN(Number(value))) {
+        this.eventlistMessageSize = old;
+      } else {
+        this.eventlistMessageSize = value;
+        localStorage.setItem('widgetEventlistMessageSize', value);
       }
     }, 500),
   },
   methods: {
     removeSelected() {
-      this.socket.emit('eventlist::removeById', this.selected, () => {});
-      this.events = this.events.filter(o => !this.selected.includes(o.id))
+      this.socket.emit('eventlist::removeById', this.selected, () => {
+        return; 
+      });
+      this.events = this.events.filter(o => !this.selected.includes(o.id));
       this.selected = [];
     },
     editationDone() {
@@ -331,45 +365,49 @@ export default {
       this.socket.emit('eventlist::resend', id);
     },
     cleanup: function () {
-      console.log('Cleanup => eventlist')
-      this.socket.emit('cleanup')
-      this.events = []
+      console.log('Cleanup => eventlist');
+      this.socket.emit('cleanup');
+      this.events = [];
     },
     prepareMessage: function (event) {
-      let t = translate(`eventlist-events.${event.event}`)
+      let t = translate(`eventlist-events.${event.event}`);
 
       // change resub translate if not shared substreak
       if (event.event === 'resub' && !event.subStreakShareEnabled) {
         t = translate(`eventlist-events.resubWithoutStreak`);
       }
 
-      const values = JSON.parse(event.values_json)
+      const values = JSON.parse(event.values_json);
       const formatted_amount = Intl.NumberFormat(this.$store.state.configuration.lang, { style: 'currency', currency: get(values, 'currency', 'USD') }).format(get(values, 'amount', '0'));
-      t = t.replace('$formatted_amount', '<strong style="font-size: 1rem">' + formatted_amount + '</strong>')
-      t = t.replace('$viewers', '<strong style="font-size: 1rem">' + get(values, 'viewers', '0') + '</strong>')
-      t = t.replace('$tier', `${translate('tier')} <strong style="font-size: 1rem">${get(values, 'tier', 'n/a')}</strong>`)
-      t = t.replace('$username', get(values, 'fromId', 'n/a'))
-      t = t.replace('$subCumulativeMonthsName', get(values, 'subCumulativeMonthsName', 'months'))
-      t = t.replace('$subCumulativeMonths', '<strong style="font-size: 1rem">' + get(values, 'subCumulativeMonths', '0') + '</strong>')
-      t = t.replace('$subStreakName', get(values, 'subStreakName', 'months'))
-      t = t.replace('$subStreak', '<strong style="font-size: 1rem">' + get(values, 'subStreak', '0') + '</strong>')
-      t = t.replace('$bits', '<strong style="font-size: 1rem">' + get(values, 'bits', '0') + '</strong>')
-      t = t.replace('$count', '<strong style="font-size: 1rem">' + get(values, 'count', '0') + '</strong>')
+      t = t.replace('$formatted_amount', '<strong style="font-size: 1rem">' + formatted_amount + '</strong>');
+      t = t.replace('$viewers', '<strong style="font-size: 1rem">' + get(values, 'viewers', '0') + '</strong>');
+      t = t.replace('$tier', `${translate('tier')} <strong style="font-size: 1rem">${get(values, 'tier', 'n/a')}</strong>`);
+      t = t.replace('$username', get(values, 'fromId', 'n/a'));
+      t = t.replace('$subCumulativeMonthsName', get(values, 'subCumulativeMonthsName', 'months'));
+      t = t.replace('$subCumulativeMonths', '<strong style="font-size: 1rem">' + get(values, 'subCumulativeMonths', '0') + '</strong>');
+      t = t.replace('$subStreakName', get(values, 'subStreakName', 'months'));
+      t = t.replace('$subStreak', '<strong style="font-size: 1rem">' + get(values, 'subStreak', '0') + '</strong>');
+      t = t.replace('$bits', '<strong style="font-size: 1rem">' + get(values, 'bits', '0') + '</strong>');
+      t = t.replace('$count', '<strong style="font-size: 1rem">' + get(values, 'count', '0') + '</strong>');
 
-      let output = `<span style="font-size:0.7rem; font-weight: normal">${t}</span>`
-      if (values.song_url && values.song_title) output += `<div style="font-size: 0.7rem"><strong>${translate('song-request')}:</strong> <a href="${values.song_url}">${values.song_title}</a></div>`
-      if (values.message) output += `<div class="eventlist-blockquote" style="font-size: ${this.eventlistMessageSize}px">${values.message.replace(/(\w{10})/g, '$1<wbr>')}</div>` // will force new line for long texts
+      let output = `<span style="font-size:0.7rem; font-weight: normal">${t}</span>`;
+      if (values.song_url && values.song_title) {
+        output += `<div style="font-size: 0.7rem"><strong>${translate('song-request')}:</strong> <a href="${values.song_url}">${values.song_title}</a></div>`;
+      }
+      if (values.message) {
+        output += `<div class="eventlist-blockquote" style="font-size: ${this.eventlistMessageSize}px">${values.message.replace(/(\w{10})/g, '$1<wbr>')}</div>`;
+      } // will force new line for long texts
 
-      return output
+      return output;
     },
     toggle: function (id) {
       this.settings[id] = !this.settings[id];
       localStorage.setItem(id, this.settings[id]);
     },
     emitSkipAlertEvent() {
-      console.log('Skipping current alert')
-      this.socket.emit('skip')
-    }
-  }
-}
+      console.log('Skipping current alert');
+      this.socket.emit('skip');
+    },
+  },
+};
 </script>

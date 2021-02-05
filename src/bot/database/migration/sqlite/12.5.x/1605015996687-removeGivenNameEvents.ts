@@ -17,7 +17,7 @@ export class removeGivenNameEvents1605015996687 implements MigrationInterface {
       const keys = Object.keys(event);
       await queryRunner.query(
         `INSERT INTO "event"(${keys.map(o => `"${o}"`).join(', ')}) values (${keys.map(o => `?`).join(', ')})`,
-        [keys.map(key => event[key])]
+        [keys.map(key => event[key])],
       );
     }
     // resave operations
@@ -25,7 +25,7 @@ export class removeGivenNameEvents1605015996687 implements MigrationInterface {
       const keys = Object.keys(operation);
       await queryRunner.query(
         `INSERT INTO "event_operation"(${keys.map(o => `"${o}"`).join(', ')}) values (${keys.map(o => `?`).join(', ')})`,
-        [keys.map(key => operation[key])]
+        [keys.map(key => operation[key])],
       );
     }
 
@@ -42,7 +42,7 @@ export class removeGivenNameEvents1605015996687 implements MigrationInterface {
     for (const event of events) {
       await queryRunner.query(
         `INSERT INTO "event"("id", "name", "givenName", "isEnabled", "triggered", "definitions", "filter") values (?, ?, ?, ?, ?, ?, ?)`,
-        [event.id, event.name, Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), event.isEnabled, event.triggered, event.definitions, event.filter]
+        [event.id, event.name, Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), event.isEnabled, event.triggered, event.definitions, event.filter],
       );
     }
     // resave operations
@@ -50,7 +50,7 @@ export class removeGivenNameEvents1605015996687 implements MigrationInterface {
       const keys = Object.keys(operation);
       await queryRunner.query(
         `INSERT INTO "event_operation"(${keys.map(o => `"${o}"`).join(', ')}) values (${keys.map(o => `?`).join(', ')})`,
-        [keys.map(key => operation[key])]
+        [keys.map(key => operation[key])],
       );
     }
 

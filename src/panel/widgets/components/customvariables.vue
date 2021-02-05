@@ -90,44 +90,54 @@
 </template>
 
 <script>
+import {
+  isNil, orderBy, size,
+} from 'lodash-es';
+
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { getSocket } from 'src/panel/helpers/socket';
-import { isNil, size, orderBy } from 'lodash-es';
 import translate from 'src/panel/helpers/translate';
 
-var numberOrTextComponent = {
+const numberOrTextComponent = {
   props: ['id', 'value', 'type'],
   watch: {
     value: function (val) {
-      this.currentValue = this.value
+      this.currentValue = this.value;
     },
     currentValue: function (val, old) {
-      this.showSaveButton = this.initialValue != this.currentValue
-    }
+      this.showSaveButton = this.initialValue != this.currentValue;
+    },
   },
   methods: {
     update: function (val) {
-      if (val) this.currentValue = Number(this.currentValue) + Number(val)
-      else if (this.type === 'number') this.currentValue = Number(this.currentValue)
-      if (Number.isNaN(this.currentValue)) this.currentValue = 0
+      if (val) {
+        this.currentValue = Number(this.currentValue) + Number(val);
+      } else if (this.type === 'number') {
+        this.currentValue = Number(this.currentValue);
+      }
+      if (Number.isNaN(this.currentValue)) {
+        this.currentValue = 0;
+      }
 
-      this.initialValue = this.currentValue
-      this.showSaveButton = false
+      this.initialValue = this.currentValue;
+      this.showSaveButton = false;
 
-      this.$emit('update', this.id, this.currentValue)
+      this.$emit('update', this.id, this.currentValue);
     },
     onKeyUp: function (event) {
-      if (event.key === 'Enter') this.update()
-    }
+      if (event.key === 'Enter') {
+        this.update();
+      }
+    },
   },
   data: function () {
     return {
       showSaveButton: false,
-      currentValue: this.value
-    }
+      currentValue:   this.value,
+    };
   },
   created: function () {
-    this.initialValue = this.value
+    this.initialValue = this.value;
   },
   template: `
     <div class="form-control p-0 d-flex border-0">
@@ -142,80 +152,82 @@ var numberOrTextComponent = {
         </span>
       </div>
     </div>
-    `
-}
+    `,
+};
 export default {
-  props: ['popout', 'nodrag'],
+  props:      ['popout', 'nodrag'],
   components: {
     'number-or-text': numberOrTextComponent,
-    loading: () => import('src/panel/components/loading.vue'),
+    loading:          () => import('src/panel/components/loading.vue'),
   },
   data: function () {
     return {
       translate,
       EventBus,
       variables: [],
-      watched: [],
-      tabIndex: 0,
-      state: {
+      watched:   [],
+      tabIndex:  0,
+      state:     {
         editation: this.$state.idle,
-        loading: this.$state.progress,
+        loading:   this.$state.progress,
       },
-      selected: [],
+      selected:         [],
       selectedVariable: null,
-      socket: getSocket('/widgets/customvariables'),
-      draggingItem: null,
-      }
+      socket:           getSocket('/widgets/customvariables'),
+      draggingItem:     null,
+    };
   },
   created: async function () {
     this.state.loading = this.$state.progress;
     this.socket.on('refresh', () => {
-      this.refreshVariablesList()
-      this.refreshWatchList()
-    })
+      this.refreshVariablesList();
+      this.refreshWatchList();
+    });
     await Promise.all([
       this.refreshVariablesList(),
       this.refreshWatchList(),
-    ])
+    ]);
     this.state.loading = this.$state.success;
   },
   computed: {
     watchedVariables: function () {
-      let watched = []
-      for (let variable of this.variables) {
-        let filtered = this.watched.filter((o) => o.variableId === variable.id)
+      const watched = [];
+      for (const variable of this.variables) {
+        const filtered = this.watched.filter((o) => o.variableId === variable.id);
         if (filtered.length !== 0) {
-          variable.order = filtered[0].order
-          watched.push(variable)
+          variable.order = filtered[0].order;
+          watched.push(variable);
         }
       }
-      return orderBy(watched, 'order', 'asc')
+      return orderBy(watched, 'order', 'asc');
     },
     nonWatchedVariables: function () {
-      let nonWatched = []
-      for (let variable of this.variables) {
-        let filtered = this.watched.filter((o) => o.variableId === variable.id)
-        if (filtered.length === 0) nonWatched.push(variable)
+      const nonWatched = [];
+      for (const variable of this.variables) {
+        const filtered = this.watched.filter((o) => o.variableId === variable.id);
+        if (filtered.length === 0) {
+          nonWatched.push(variable);
+        }
       }
-      return nonWatched
+      return nonWatched;
     },
     nonWatchedVariablesCount: function () {
-      return size(this.nonWatchedVariables)
-    }
+      return size(this.nonWatchedVariables);
+    },
   },
   watch: {
     nonWatchedVariables: function (value) {
       if (!isNil(this.nonWatchedVariables[0])) {
-        this.selectedVariable = this.nonWatchedVariables[0].id
+        this.selectedVariable = this.nonWatchedVariables[0].id;
       }
-    }
+    },
   },
   methods: {
     onUpdate: function (id, value) {
       this.socket.emit('watched::setValue', { id, value }, (err) => {
-        this.refreshVariablesList()
-        this.refreshWatchList()
-      })
+        this.refreshVariablesList();
+        this.refreshWatchList();
+      });
     },
     addToWatch: function (variableId) {
       this.tabIndex = 0;
@@ -223,8 +235,8 @@ export default {
         ...this.watched,
         {
           variableId: variableId,
-          order: this.watched.length,
-        }
+          order:      this.watched.length,
+        },
       ],
       this.save();
     },
@@ -234,13 +246,15 @@ export default {
       }
     },
     remove() {
-      this.watched = this.watched.filter(o => !this.selected.includes(String(o.variableId)))
+      this.watched = this.watched.filter(o => !this.selected.includes(String(o.variableId)));
       this.selected = [];
       this.reorder();
     },
     save() {
       this.state.editation = this.$state.idle;
-      this.socket.emit('watched::save', this.watched, () => {})
+      this.socket.emit('watched::save', this.watched, () => {
+        return; 
+      });
     },
     refreshVariablesList: function () {
       return new Promise((resolve) => {
@@ -249,18 +263,18 @@ export default {
             return console.error(err);
           }
           console.log('Loaded', data);
-          this.variables = data
-          resolve()
-        })
-      })
+          this.variables = data;
+          resolve();
+        });
+      });
     },
     refreshWatchList: function () {
       return new Promise((resolve) => {
         this.socket.emit('list.watch', (err, data) => {
-          this.watched = data
-          resolve()
-        })
-      })
+          this.watched = data;
+          resolve();
+        });
+      });
     },
     dragstart(order, e) {
       this.draggingItem = order;
@@ -268,10 +282,10 @@ export default {
       e.dataTransfer.setData('text/plain', 'dummy');
     },
     dragenter(newOrder, e) {
-      const value = this.watched.find(o => o.order === this.draggingItem)
-      const entered = this.watched.find(o => o.order === newOrder)
+      const value = this.watched.find(o => o.order === this.draggingItem);
+      const entered = this.watched.find(o => o.order === newOrder);
       entered.order = this.draggingItem;
-      this.draggingItem = newOrder
+      this.draggingItem = newOrder;
       value.order = this.draggingItem;
 
       for (let i = 0, length = this.watched.length; i < length; i++) {
@@ -279,7 +293,7 @@ export default {
       }
       this.$refs['item_' + this.draggingItem][0].style.opacity = 0.5;
 
-      this.$forceUpdate()
+      this.$forceUpdate();
     },
     dragend(order, e) {
       for (let i = 0, length = this.watched.length; i < length; i++) {
@@ -293,6 +307,6 @@ export default {
         this.selected.push(item.id);
       }
     },
-  }
-}
+  },
+};
 </script>

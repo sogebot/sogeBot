@@ -16,21 +16,21 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api'
-import { BSpinner } from 'bootstrap-vue'
+import { defineComponent } from '@vue/composition-api';
+import { BSpinner } from 'bootstrap-vue';
 
 import translate from 'src/panel/helpers/translate';
 
 export default defineComponent({
   props: {
     noMargin: Boolean,
-    slow: Boolean,
+    slow:     Boolean,
   },
   setup(props) {
     return {
       translate,
-      ...BSpinner
+      ...BSpinner,
     };
-  }
-})
+  },
+});
 </script>

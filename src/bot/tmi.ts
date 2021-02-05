@@ -149,7 +149,7 @@ class TMI extends Core {
         ...new Set([
           ...this.ignorelist,
           username,
-        ]
+        ],
         )];
       // update ignore list
       return [{ response: prepare('ignore.user.is.added', { username }), ...opts }];

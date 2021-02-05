@@ -27,7 +27,7 @@ class Alerts extends Overlay {
         const items = await getRepository(Gallery).find();
         cb(null, items
           .filter(o => Buffer.from(o.data.split(',')[1], 'base64').length <= this.galleryCacheLimitInMb * 1024 * 1024)
-          .map(o => o.id)
+          .map(o => o.id),
         );
       } else {
         cb('Gallery cache disabled.', []);

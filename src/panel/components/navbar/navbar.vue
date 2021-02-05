@@ -26,16 +26,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from '@vue/composition-api'
+import { library } from '@fortawesome/fontawesome-svg-core';
+import {
+  faBars, faSignInAlt, faSignOutAlt,
+} from '@fortawesome/free-solid-svg-icons';
+import {
+  defineComponent, onMounted, ref,
+} from '@vue/composition-api';
+import Vue from 'vue';
+import vueHeadful from 'vue-headful';
+
 import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
-import Vue from 'vue';
-import vueHeadful from 'vue-headful';
 Vue.component('vue-headful', vueHeadful);
-
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faBars, faSignInAlt, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 library.add(faBars, faSignInAlt, faSignOutAlt);
 
 const socket = getSocket('/');
@@ -43,9 +47,9 @@ const socket = getSocket('/');
 export default defineComponent({
   components: {
     checklist: () => import('./checklist.vue'),
-    user: () => import('./user.vue'),
-    navmenu: () => import('./menu.vue'),
-    theme: () => import('./theme.vue'),
+    user:      () => import('./user.vue'),
+    navmenu:   () => import('./menu.vue'),
+    theme:     () => import('./theme.vue'),
   },
   setup() {
     const name = ref('');
@@ -54,12 +58,14 @@ export default defineComponent({
     onMounted(() => {
       socket.emit('name', (recvName: string) => name.value = recvName );
       socket.emit('channelName', (recvName: string) => channelName.value = recvName );
-    })
+    });
 
     const joinBot = () => socket.emit('joinBot');
     const leaveBot = () => socket.emit('leaveBot');
 
-    return { name, channelName, joinBot, leaveBot, translate,  }
-  }
+    return {
+      name, channelName, joinBot, leaveBot, translate,
+    };
+  },
 });
 </script>

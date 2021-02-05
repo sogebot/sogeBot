@@ -7,42 +7,43 @@
 </template>
 
 <script lang="ts">
-import { ref, Ref, defineComponent } from "@vue/composition-api";
+import {
+  defineComponent, Ref, ref,
+} from '@vue/composition-api';
+
 import { getSocket } from 'src/panel/helpers/socket';
 
 export default defineComponent({
   setup() {
     const socket = getSocket('/integrations/spotify');
-    let state: Ref<boolean | null> = ref(null);
+    const state: Ref<boolean | null> = ref(null);
 
     if(window.location.hash || window.location.search) {
-      socket.emit('spotify::state', (err: string | null, spotifyState: any) => {
+      socket.emit('spotify::state', (_err: string | null, spotifyState: any) => {
         let urlState = '';
         let urlCode = '';
-        for (let url of window.location.search.split('&')) {
+        for (const url of window.location.search.split('&')) {
           if (url.startsWith('?code=') || url.startsWith('code=')) {
-            urlCode = url.replace(/\??code=/, '')
+            urlCode = url.replace(/\??code=/, '');
           }
           if (url.startsWith('?state=') || url.startsWith('state=')) {
-            urlState = url.replace(/\??state=/, '')
+            urlState = url.replace(/\??state=/, '');
           }
         }
 
         if (urlState === spotifyState) {
-          socket.emit('spotify::code', urlCode, (err: string | null) => {
+          socket.emit('spotify::code', urlCode, () => {
             state.value = true;
-            window.location.href = window.location.origin + "/#/settings/integrations/spotify"
-          })
+            window.location.href = window.location.origin + '/#/settings/integrations/spotify';
+          });
         } else {
           state.value = false;
-          console.error('State is not matching!')
+          console.error('State is not matching!');
         }
-      })
+      });
     }
 
-    return {
-      state,
-    };
-  }
+    return { state };
+  },
 });
 </script>

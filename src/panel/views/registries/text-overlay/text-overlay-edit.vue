@@ -135,17 +135,19 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator';
+import { v4 as uuid } from 'uuid';
+import { codemirror } from 'vue-codemirror';
+import {
+  Component, Vue, Watch,
+} from 'vue-property-decorator';
+import { Validate } from 'vuelidate-property-decorators';
+import { minValue, required } from 'vuelidate/lib/validators';
+
 import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
-import { codemirror } from 'vue-codemirror';
 import 'codemirror/lib/codemirror.css';
 
-import { Validate } from 'vuelidate-property-decorators';
-import { required, minValue } from 'vuelidate/lib/validators'
-
-import { v4 as uuid } from 'uuid';
 import { TextInterface } from '../../../../bot/database/entity/text';
 
 @Component({
@@ -155,25 +157,29 @@ import { TextInterface } from '../../../../bot/database/entity/text';
   },
   filters: {
     capitalize(value: string) {
-      if (!value) return ''
-      value = value.toString()
-      return value.charAt(0).toUpperCase() + value.slice(1)
-    }
-  }
+      if (!value) {
+        return '';
+      }
+      value = value.toString();
+      return value.charAt(0).toUpperCase() + value.slice(1);
+    },
+  },
 })
 export default class textOverlayEdit extends Vue {
   error: any = null;
-  pending: boolean = false;
+  pending = false;
   translate = translate;
 
   id: string = uuid();
   @Validate({ required })
-  name: string = '';
-  html: string = '<!-- you can also use html here, global filters and custom variables are also available -->\n\n';
-  js: string =  'function onLoad() { // triggered on page load\n\n}\n\nfunction onChange() { // triggered on variable change\n\n}';
-  css: string =  '';
+  name = '';
+  html = '<!-- you can also use html here, global filters and custom variables are also available -->\n\n';
+  js =  'function onLoad() { // triggered on page load\n\n}\n\nfunction onChange() { // triggered on variable change\n\n}';
+  css =  '';
   external: string[] = [];
-  @Validate({ required, minValue: minValue(-1), cannotBeZero: (value: number) => value !== 0 })
+  @Validate({
+    required, minValue: minValue(-1), cannotBeZero: (value: number) => value !== 0,
+  })
   refreshRate = 5;
 
   @Watch('name')
@@ -187,33 +193,27 @@ export default class textOverlayEdit extends Vue {
   }
 
   htmlOptions = {
-    mode:  "htmlmixed",
-    lineNumbers: true,
+    mode:          'htmlmixed',
+    lineNumbers:   true,
     matchBrackets: true,
-    lint: {
-      esversion: 6
-    },
-    gutters: ["CodeMirror-lint-markers"]
-  }
+    lint:          { esversion: 6 },
+    gutters:       ['CodeMirror-lint-markers'],
+  };
   jsOptions = {
-    mode:  "javascript",
-    lineNumbers: true,
+    mode:          'javascript',
+    lineNumbers:   true,
     matchBrackets: true,
-    lint: {
-      esversion: 6
-    },
-    gutters: ["CodeMirror-lint-markers"]
-  }
+    lint:          { esversion: 6 },
+    gutters:       ['CodeMirror-lint-markers'],
+  };
   cssOptions = {
-    mode:  "css",
-    lineNumbers: true,
+    mode:          'css',
+    lineNumbers:   true,
     matchBrackets: true,
-    lint: {
-      esversion: 6
-    },
-    gutters: ["CodeMirror-lint-markers"]
-  }
-  externalJsInput: string = '';
+    lint:          { esversion: 6 },
+    gutters:       ['CodeMirror-lint-markers'],
+  };
+  externalJsInput = '';
 
   socket = getSocket('/registries/text');
 
@@ -222,54 +222,58 @@ export default class textOverlayEdit extends Vue {
     save: number,
   } = {
     loaded: false,
-    save: 0,
+    save:   0,
   };
 
   removeExternalJS(js: string) {
-    this.external.splice(this.external.indexOf(js), 1)
+    this.external.splice(this.external.indexOf(js), 1);
   }
 
   created() {
     // load up from db
     if (this.$route.params.id) {
-      this.id = this.$route.params.id
+      this.id = this.$route.params.id;
       this.socket.emit('generic::getOne', { id: this.$route.params.id, parseText: false }, (err: null | Error, data: TextInterface) => {
         if (err) {
           this.$bvToast.toast(err.message, {
-            title: `Error`,
+            title:   `Error`,
             variant: 'danger',
-            solid: true,
+            solid:   true,
           });
           return console.error(err);
         }
-        this.name = data.name
-        this.html = data.text
-        this.js = data.js
-        this.css = data.css
-        this.external = data.external || []
+        this.name = data.name;
+        this.html = data.text;
+        this.js = data.js;
+        this.css = data.css;
+        this.external = data.external || [];
         this.refreshRate = data.refreshRate;
-        this.$nextTick(() => { this.pending = false })
-        this.state.loaded = true
-      })
-    } else this.state.loaded = true
+        this.$nextTick(() => {
+          this.pending = false;
+        });
+        this.state.loaded = true;
+      });
+    } else {
+      this.state.loaded = true;
+    }
   }
 
   async remove () {
     await new Promise<void>(resolve => {
       this.socket.emit('text::remove', {
-        id: this.id,
-        name: this.name,
-        text: this.html,
-        js: this.js,
-        css: this.css,
-        external: this.external
+        id:       this.id,
+        name:     this.name,
+        text:     this.html,
+        js:       this.js,
+        css:      this.css,
+        external: this.external,
       }, (err: string | null) => {
         if (err) {
           return console.error(err);
         }
         resolve();
-      })
-    })
+      });
+    });
     this.$router.push({ name: 'TextOverlayList' });
   }
 
@@ -278,28 +282,28 @@ export default class textOverlayEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = 1;
       const data = {
-        id: this.id,
-        name: this.name,
+        id:          this.id,
+        name:        this.name,
         refreshRate: this.refreshRate,
-        text: this.html,
-        js: this.js,
-        css: this.css,
-        external: this.external
-      }
-      this.socket.emit('text::save', data, (err: string | null, data: TextInterface) => {
+        text:        this.html,
+        js:          this.js,
+        css:         this.css,
+        external:    this.external,
+      };
+      this.socket.emit('text::save', data, (err: string | null) => {
         if (err) {
-          console.error(err)
-          return this.state.save = 3
+          console.error(err);
+          return this.state.save = 3;
         }
-        this.state.save = 2
-        this.pending = false
+        this.state.save = 2;
+        this.pending = false;
         this.$router.push({ name: 'TextOverlayEdit', params: { id: this.id } });
-        setTimeout(() => this.state.save = 0, 1000)
+        setTimeout(() => this.state.save = 0, 1000);
       });
     } else {
       setTimeout(() => {
         this.state.save = 0;
-      }, 1000)
+      }, 1000);
     }
   }
 }

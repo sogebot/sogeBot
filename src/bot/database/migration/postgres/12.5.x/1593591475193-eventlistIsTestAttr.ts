@@ -11,7 +11,7 @@ export class eventlistIsTestAttr1593591475193 implements MigrationInterface {
 
     for (const event of events) {
       await queryRunner.query(
-        `INSERT INTO "event_list"(${Object.keys(event).map(o=>`"${o}"`).join(', ')}, "isTest") values(${Object.keys(event).map(o => `'${event[o]}'`)}, 'false')`
+        `INSERT INTO "event_list"(${Object.keys(event).map(o=>`"${o}"`).join(', ')}, "isTest") values(${Object.keys(event).map(o => `'${event[o]}'`)}, 'false')`,
       );
     }
   }

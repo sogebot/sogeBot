@@ -53,40 +53,41 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue'
-  import translate from 'src/panel/helpers/translate';
+import Vue from 'vue';
 
-  export default Vue.extend({
-    props: ['filters'],
-    data() {
-      const data: {
-        cFilters: any[],
-        translate: typeof translate,
-      } = {
-        cFilters: this.filters,
-        translate: translate,
+import translate from 'src/panel/helpers/translate';
+
+export default Vue.extend({
+  props: ['filters'],
+  data() {
+    const data: {
+      cFilters: any[],
+      translate: typeof translate,
+    } = {
+      cFilters:  this.filters,
+      translate: translate,
+    };
+    return data;
+  },
+  methods: {
+    setComparator(filter: any) {
+      if (this.isNumber(filter.type)) {
+        filter.comparator = '=='; 
       }
-      return data;
     },
-    methods: {
-      setComparator(filter: any) {
-        if (this.isNumber(filter.type)) {
-          filter.comparator = '==' 
-        }
-      },
-      isNumber(type: string) {
-        return !type.includes('ranks')
-      },
-      remove(index: number) {
-        this.cFilters.splice(index, 1);
-      },
-      add() {
-        this.cFilters.push({
-          comparator: '>=',
-          type: 'watched',
-          value: 0,
-        })
-      }
-    }
-  })
+    isNumber(type: string) {
+      return !type.includes('ranks');
+    },
+    remove(index: number) {
+      this.cFilters.splice(index, 1);
+    },
+    add() {
+      this.cFilters.push({
+        comparator: '>=',
+        type:       'watched',
+        value:      0,
+      });
+    },
+  },
+});
 </script>

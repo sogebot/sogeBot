@@ -40,26 +40,24 @@
 </template>
 
 <script lang="ts">
-import type { RandomizerItemInterface, RandomizerInterface } from 'src/bot/database/entity/randomizer';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faSortDown } from '@fortawesome/free-solid-svg-icons/faSortDown';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import gsap from 'gsap';
+import {
+  cloneDeep, isEqual, orderBy,
+} from 'lodash-es';
+import JsonViewer from 'vue-json-viewer';
+import { Component, Vue } from 'vue-property-decorator';
+import Winwheel from 'winwheel';
 
-import { Vue, Component } from 'vue-property-decorator';
-import { cloneDeep, isEqual, orderBy } from 'lodash-es';
-
-import gsap from 'gsap'
-import Winwheel from 'winwheel'
-import JsonViewer from 'vue-json-viewer'
-
-import { getSocket } from 'src/panel/helpers/socket';
-import { textStrokeGenerator, shadowGenerator } from 'src/panel/helpers/text';
+import type { RandomizerInterface, RandomizerItemInterface } from 'src/bot/database/entity/randomizer';
 import { getContrastColor } from 'src/panel/helpers/color';
-
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faSortDown } from '@fortawesome/free-solid-svg-icons/faSortDown'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-
+import { getSocket } from 'src/panel/helpers/socket';
+import { shadowGenerator, textStrokeGenerator } from 'src/panel/helpers/text';
 import * as defaultTick from 'src/panel/views/registries/randomizer/media/click_wheel.mp3';
 
-library.add(faSortDown)
+library.add(faSortDown);
 
 let theWheel: any = null;
 
@@ -72,8 +70,8 @@ declare global {
 @Component({
   components: {
     JsonViewer,
-    'font-awesome-icon': FontAwesomeIcon
-  }
+    'font-awesome-icon': FontAwesomeIcon,
+  },
 })
 export default class RandomizerOverlay extends Vue {
   getContrastColor = getContrastColor;
@@ -99,39 +97,43 @@ export default class RandomizerOverlay extends Vue {
   position: string[] = [];
 
   speak(text: string, voice: string, rate: number, pitch: number, volume: number) {
-    window.responsiveVoice.speak(text, voice, { rate, pitch, volume });
+    window.responsiveVoice.speak(text, voice, {
+      rate, pitch, volume,
+    });
   }
 
   initResponsiveVoice() {
     if (typeof window.responsiveVoice === 'undefined') {
       setTimeout(() => this.initResponsiveVoice(), 200);
-      return
+      return;
     }
     window.responsiveVoice.init();
-    console.debug('= ResponsiveVoice init OK')
+    console.debug('= ResponsiveVoice init OK');
   }
 
   checkResponsiveVoiceAPIKey() {
     this.socketRV.emit('get.value', 'key', (err: string | null, value: string) => {
       if (this.responsiveAPIKey !== value) {
         // unload if values doesn't match
-        this.$unloadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.responsiveAPIKey)
-          .catch(() => {}); // skip error
+        this.$unloadScript('https://code.responsivevoice.org/responsivevoice.js?key=' + this.responsiveAPIKey)
+          .catch(() => {
+            return;
+          }); // skip error
         if (value.trim().length > 0) {
-          this.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + value)
+          this.$loadScript('https://code.responsivevoice.org/responsivevoice.js?key=' + value)
             .then(() => {
               this.responsiveAPIKey = value;
               this.initResponsiveVoice();
               setTimeout(() => this.checkResponsiveVoiceAPIKey(), 1000);
             });
         } else {
-          console.debug('TTS disabled, responsiveVoice key is not set')
+          console.debug('TTS disabled, responsiveVoice key is not set');
           this.responsiveAPIKey = value;
           setTimeout(() => this.checkResponsiveVoiceAPIKey(), 1000);
         }
       }
       setTimeout(() => this.checkResponsiveVoiceAPIKey(), 1000);
-    })
+    });
   }
 
   created () {
@@ -139,7 +141,7 @@ export default class RandomizerOverlay extends Vue {
     setInterval(() => {
       this.socket.emit('randomizer::getVisible', async (err: string | null, data: Required<RandomizerInterface>) => {
         if (err) {
-          return console.error(err)
+          return console.error(err);
         }
         if (!data) {
           this.data = null;
@@ -155,10 +157,10 @@ export default class RandomizerOverlay extends Vue {
         style.type = 'text/css';
 
         if (!this.loadedFonts.includes(data.customizationFont.family)) {
-          console.debug('Loading font', data.customizationFont.family)
-          this.loadedFonts.push(data.customizationFont.family)
-          const font = data.customizationFont.family.replace(/ /g, '+')
-          const css = "@import url('https://fonts.googleapis.com/css?family=" + font + "');"
+          console.debug('Loading font', data.customizationFont.family);
+          this.loadedFonts.push(data.customizationFont.family);
+          const font = data.customizationFont.family.replace(/ /g, '+');
+          const css = '@import url(\'https://fonts.googleapis.com/css?family=' + font + '\');';
           style.appendChild(document.createTextNode(css));
           head.appendChild(style);
         }
@@ -183,49 +185,51 @@ export default class RandomizerOverlay extends Vue {
               }
             }
 
-            let segments = new Array()
-            for (let option of this.generateItems(data.items)) {
-              segments.push({'fillStyle': option.color, 'textFillStyle': getContrastColor(option.color), 'text': option.name})
+            const segments = [];
+            for (const option of this.generateItems(data.items)) {
+              segments.push({
+                'fillStyle': option.color, 'textFillStyle': getContrastColor(option.color), 'text': option.name,
+              });
             }
 
-            gsap.to(this.$refs["pointer"], { duration: 1.5, opacity: 1 })
-            gsap.to(this.$refs["canvas"], { duration: 1.5, opacity: 1 })
+            gsap.to(this.$refs.pointer, { duration: 1.5, opacity: 1 });
+            gsap.to(this.$refs.canvas, { duration: 1.5, opacity: 1 });
 
             this.theWheel = new Winwheel({
-              'numSegments'  : this.generateItems(data.items).length, // Number of segments
-              'outerRadius'  : 450,                 // The size of the wheel.
-              'centerX'      : 960,                 // Used to position on the background correctly.
-              'centerY'      : 540,
-              'textFontSize' : data.customizationFont.size,                  // Font size.
-              'textFontWeight' : data.customizationFont.weight,                  // Font weight.
-              'textFontFamily' : data.customizationFont.family,                  // Font family.
-              'segments'     : segments,
-              'responsive'   : true,  // This wheel is responsive!
-              'animation'    :                      // Definition of the animation
+              'numSegments':    this.generateItems(data.items).length, // Number of segments
+              'outerRadius':    450,                 // The size of the wheel.
+              'centerX':        960,                 // Used to position on the background correctly.
+              'centerY':        540,
+              'textFontSize':   data.customizationFont.size,                  // Font size.
+              'textFontWeight': data.customizationFont.weight,                  // Font weight.
+              'textFontFamily': data.customizationFont.family,                  // Font family.
+              'segments':       segments,
+              'responsive':     true,  // This wheel is responsive!
+              'animation':      // Definition of the animation
               {
-                'type'     : 'spinToStop',
-                'duration' : 10,
-                'spins'    : 5,
-                'easing'   : 'Back.easeOut.config(4)',
-                'callbackFinished' : this.alertPrize,
-                'callbackAfter' : this.drawTriangle,
-                'callbackSound'    : playSound,   // Called when the tick sound is to be played.
-                'soundTrigger'     : 'pin',        // Specify pins are to trigger the sound.
-                'yoyo': true,
+                'type':             'spinToStop',
+                'duration':         10,
+                'spins':            5,
+                'easing':           'Back.easeOut.config(4)',
+                'callbackFinished': this.alertPrize,
+                'callbackAfter':    this.drawTriangle,
+                'callbackSound':    playSound,   // Called when the tick sound is to be played.
+                'soundTrigger':     'pin',        // Specify pins are to trigger the sound.
+                'yoyo':             true,
               },
-                'pins' :                // Turn pins on.
+              'pins': // Turn pins on.
                 {
-                    'number'     : 12,
-                    'fillStyle'  : 'silver',
-                    'outerRadius': 4,
-                }
+                  'number':      12,
+                  'fillStyle':   'silver',
+                  'outerRadius': 4,
+                },
             });
             theWheel = this.theWheel;
             this.drawTriangle();
           }
-        })
-      })
-    }, 1000)
+        });
+      });
+    }, 1000);
     this.socket.on('spin', this.spin);
   }
 
@@ -238,11 +242,11 @@ export default class RandomizerOverlay extends Vue {
     }, 1000);
     setTimeout(() => {
       this.wheelWin = null;
-    }, 5000)
+    }, 5000);
   }
 
   drawTriangle() {
-    let ctx = theWheel.ctx;
+    const ctx = theWheel.ctx;
     ctx.strokeStyle = 'navy';     // Set line colour.
     ctx.fillStyle   = 'aqua';     // Set fill colour.
     ctx.lineWidth   = 2;
@@ -261,7 +265,7 @@ export default class RandomizerOverlay extends Vue {
   spin() {
     if (this.data !== null) {
       if (this.data.type === 'wheelOfFortune' && this.theWheel) {
-        this.theWheel.rotationAngle = this.theWheel.rotationAngle % 360 // reset angle
+        this.theWheel.rotationAngle = this.theWheel.rotationAngle % 360; // reset angle
         this.theWheel.startAnimation();
       }
       if (this.data.type === 'simple') {
@@ -278,7 +282,7 @@ export default class RandomizerOverlay extends Vue {
           } else {
             this.showSimpleBlink = true;
           }
-        }
+        };
         const next = () => {
           if (this.data === null) {
             return;
@@ -309,20 +313,20 @@ export default class RandomizerOverlay extends Vue {
           }
           this.showSimpleLoop--;
           if (this.showSimpleLoop > 0) {
-            setTimeout(next, this.showSimpleSpeed)
+            setTimeout(next, this.showSimpleSpeed);
           } else {
             setTimeout(() => {
               if (Math.random() > 0.3) {
-                blink()
+                blink();
                 if (this.data && this.data.tts.enabled) {
                   this.speak(this.generateItems(this.data.items)[this.showSimpleValueIndex].name, this.data.tts.voice, this.data.tts.rate, this.data.tts.pitch, this.data.tts.volume);
                 }
-               } else {
-                 next();
-               }
+              } else {
+                next();
+              }
             }, this.showSimpleSpeed); // move one a bit if lucky or not
           }
-        }
+        };
         next();
       }
     }
@@ -368,7 +372,6 @@ export default class RandomizerOverlay extends Vue {
     items = cloneDeep(orderBy(items, 'order'));
     items = items.filter(o => o.numOfDuplicates > 0);
 
-
     const countGroupItems = (item: RandomizerItemInterface, count = 0): number => {
       const child = items.find(o => o.groupId === item.id);
       if (child) {
@@ -376,19 +379,19 @@ export default class RandomizerOverlay extends Vue {
       } else {
         return count;
       }
-    }
+    };
     const haveMinimalSpacing = (item: Required<RandomizerItemInterface>) => {
-      let lastIdx = generatedItems.map(o => o.name).lastIndexOf(item.name);
+      const lastIdx = generatedItems.map(o => o.name).lastIndexOf(item.name);
       const currentIdx = generatedItems.length;
-      return lastIdx === -1 || lastIdx + item.minimalSpacing + countGroupItems(item) < currentIdx
-    }
-    const addGroupItems = (item: RandomizerItemInterface, generatedItems: RandomizerItemInterface[]) => {
+      return lastIdx === -1 || lastIdx + item.minimalSpacing + countGroupItems(item) < currentIdx;
+    };
+    const addGroupItems = (item: RandomizerItemInterface, generatedItems2: RandomizerItemInterface[]) => {
       const child = items.find(o => o.groupId === item.id);
       if (child) {
-        generatedItems.push(child);
-        addGroupItems(child, generatedItems);
+        generatedItems2.push(child);
+        addGroupItems(child, generatedItems2);
       }
-    }
+    };
 
     for (const item of items) {
 

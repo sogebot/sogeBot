@@ -16,12 +16,12 @@ export class addTTSToRandomizer1587638203596 implements MigrationInterface {
 
     for (const randomizer of randomizers) {
       await queryRunner.query(
-        `INSERT INTO "randomizer"(${Object.keys(randomizer).map(o=>`"${o}"`).join(', ')}, "tts") values(${Object.keys(randomizer).map(o => `'${randomizer[o]}'`)}, '${JSON.stringify(ttsDefaultValues)}')`
+        `INSERT INTO "randomizer"(${Object.keys(randomizer).map(o=>`"${o}"`).join(', ')}, "tts") values(${Object.keys(randomizer).map(o => `'${randomizer[o]}'`)}, '${JSON.stringify(ttsDefaultValues)}')`,
       );
     }
     for (const randomizer of randomizersItems) {
       await queryRunner.query(
-        `INSERT INTO "randomizer_item"(${Object.keys(randomizer).map(o=>`"${o}"`).join(', ')}) values(${Object.keys(randomizer).map(o => `'${randomizer[o]}'`)})`
+        `INSERT INTO "randomizer_item"(${Object.keys(randomizer).map(o=>`"${o}"`).join(', ')}) values(${Object.keys(randomizer).map(o => `'${randomizer[o]}'`)})`,
       );
     }
   }

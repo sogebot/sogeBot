@@ -57,75 +57,78 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue'
-  import { getSocket } from 'src/panel/helpers/socket';
-  import { v4 as uuid } from 'uuid';
-  import translate from 'src/panel/helpers/translate';
+import { v4 as uuid } from 'uuid';
+import Vue from 'vue';
 
-  export default Vue.extend({
-    props: ['ids'],
-    data() {
-      const data: {
-        translate: typeof translate,
-        socket: any,
-        inputUsername: string,
-        testUsername: string,
-        isFocused: boolean,
-        isTesting: boolean,
-        state: string,
-        error: string,
-        status: {},
-        partialStatus: {},
-      } = {
-        translate: translate,
-        socket: getSocket('/core/permissions'),
-        inputUsername: '',
-        testUsername: '',
-        isFocused: false,
-        isTesting: false,
-        state: '',
-        error: '',
-        status: {},
-        partialStatus: {},
-      }
-      return data;
-    },
-    watch: {
-      inputUsername(val: string) {
-        // on change reset status
-        this.status = {}
-        this.partialStatus = {}
-        this.testUsername = ''
-      }
-    },
-    methods: {
-      testUser(val: string) {
-        this.isTesting = true
-        const state = uuid()
-        this.state = state
-        this.status = {}
-        this.partialStatus = {}
-        this.testUsername = val;
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
-        if (val.trim().length === 0) {
-           this.isTesting = false;
-        } else {
-          this.socket.emit('test.user', { pid: this.$route.params.id, value: val, state }, (err: string | null, r: { state: string; partial: boolean; status: { access: boolean } }) => {
-            if (err) {
-              this.error = err;
-              this.isTesting = false;
-              return console.error(translate('core.permissions.' + err));
-            }
-            this.error = '';
-            if (r.state === this.state) {
-              // expecting this data
-              this.status = r.status;
-              this.partialStatus = r.partial;
-              this.isTesting = false;
-            }
-          })
-        }
+export default Vue.extend({
+  props: ['ids'],
+  data() {
+    const data: {
+      translate: typeof translate,
+      socket: any,
+      inputUsername: string,
+      testUsername: string,
+      isFocused: boolean,
+      isTesting: boolean,
+      state: string,
+      error: string,
+      status: Record<string, any>,
+      partialStatus: Record<string, any>,
+    } = {
+      translate:     translate,
+      socket:        getSocket('/core/permissions'),
+      inputUsername: '',
+      testUsername:  '',
+      isFocused:     false,
+      isTesting:     false,
+      state:         '',
+      error:         '',
+      status:        {},
+      partialStatus: {},
+    };
+    return data;
+  },
+  watch: {
+    inputUsername(val: string) {
+      // on change reset status
+      this.status = {};
+      this.partialStatus = {};
+      this.testUsername = '';
+    },
+  },
+  methods: {
+    testUser(val: string) {
+      this.isTesting = true;
+      const state = uuid();
+      this.state = state;
+      this.status = {};
+      this.partialStatus = {};
+      this.testUsername = val;
+
+      if (val.trim().length === 0) {
+        this.isTesting = false;
+      } else {
+        this.socket.emit('test.user', {
+          pid: this.$route.params.id, value: val, state,
+        }, (err: string | null, r: { state: string; partial:  { access: boolean }; status: { access: boolean } }) => {
+          if (err) {
+            this.error = err;
+            this.isTesting = false;
+            return console.error(translate('core.permissions.' + err));
+          }
+          this.error = '';
+          if (r.state === this.state) {
+            // expecting this data
+            this.status = r.status;
+            this.partialStatus = r.partial;
+            this.isTesting = false;
+          }
+        });
       }
-    }
-  })
+    },
+  },
+});
 </script>

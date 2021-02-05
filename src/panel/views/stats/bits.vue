@@ -42,111 +42,113 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Chartkick from 'vue-chartkick';
-  import Chart from 'chart.js';
-  import { dayjs } from 'src/bot/helpers/dayjs';
-  import translate from 'src/panel/helpers/translate';
+import Chart from 'chart.js';
+import Vue from 'vue';
+import Chartkick from 'vue-chartkick';
 
-  import type { UserBitInterface } from 'src/bot/database/entity/user';
+import type { UserBitInterface } from 'src/bot/database/entity/user';
+import { dayjs } from 'src/bot/helpers/dayjs';
+import translate from 'src/panel/helpers/translate';
 
-  Vue.use(Chartkick.use(Chart));
+Vue.use(Chartkick.use(Chart));
 
-  import { getSocket } from '../../helpers/socket';
+import { getSocket } from '../../helpers/socket';
 
-  export default Vue.extend({
-    components: {
-      panel: () => import('../../components/panel.vue'),
+export default Vue.extend({
+  components: { panel: () => import('../../components/panel.vue') },
+  data:       function () {
+    const object: {
+      dayjs: any;
+      translate: any;
+
+      socket: any;
+      bits: Required<UserBitInterface>[];
+      selectedYear: number;
+
+      fields: any;
+      sortBy: string;
+      sortDesc: boolean;
+    } = {
+      dayjs:     dayjs,
+      translate: translate,
+
+      bits:         [],
+      socket:       getSocket('/stats/bits'),
+      selectedYear: new Date().getFullYear(),
+
+      fields: [
+        {
+          key: 'cheeredAt', label: 'cheeredAt', sortable: true, 
+        },
+        {
+          key: 'sortAmount', label: 'amount', sortable: true, 
+        },
+        { key: 'message', label: 'message' },
+        { key: 'user', label: 'user' },
+      ],
+      sortBy:   'cheeredAt',
+      sortDesc: false,
+    };
+    return object;
+  },
+  computed: {
+    years(): string[] {
+      return Object.keys(this.bitsByYear);
     },
-    data: function () {
-      const object: {
-        dayjs: any;
-        translate: any;
-
-        socket: any;
-        bits: Required<UserBitInterface>[];
-        selectedYear: number;
-
-        fields: any;
-        sortBy: string;
-        sortDesc: boolean;
-      } = {
-        dayjs: dayjs,
-        translate: translate,
-
-        bits: [],
-        socket: getSocket('/stats/bits'),
-        selectedYear: new Date().getFullYear(),
-
-        fields: [
-          { key: 'cheeredAt', label: 'cheeredAt', sortable: true },
-          { key: 'sortAmount', label: 'amount', sortable: true },
-          { key: 'message', label: 'message' },
-          { key: 'user', label: 'user' },
-        ],
-        sortBy: 'cheeredAt',
-        sortDesc: false,
+    bitsByYear(): { [year: number]: Required<UserBitInterface>[]} {
+      const d: { [year: number]: Required<UserBitInterface>[] } = { [new Date().getFullYear()]: [] };
+      for (const tip of this.bits) {
+        const year = new Date(tip.cheeredAt).getFullYear();
+        if (d[year]) {
+          d[year].push(tip);
+        } else {
+          d[year] = [ tip ];
+        }
       }
-      return object
+      return d;
     },
-    computed: {
-      years(): string[] {
-        return Object.keys(this.bitsByYear);
-      },
-      bitsByYear(): { [year: number]: Required<UserBitInterface>[]} {
-        const d: { [year: number]: Required<UserBitInterface>[] } = {[new Date().getFullYear()]: [] };
-        for (const tip of this.bits) {
-          const year = new Date(tip.cheeredAt).getFullYear();
-          if (d[year]) {
-            d[year].push(tip);
-          } else {
-            d[year] = [ tip ];
-          }
+    tipsByMonth(): { [month: number]: Required<UserBitInterface>[]} {
+      const d: { [month: number]: Required<UserBitInterface>[] } = {
+        0:  [], 1:  [], 2:  [], 3:  [], 4:  [], 5:  [],
+        6:  [], 7:  [], 8:  [], 9:  [], 10: [], 11: [],
+      };
+      for (const tip of this.bitsByYear[this.selectedYear]) {
+        const month = new Date(tip.cheeredAt).getMonth();
+        if (d[month]) {
+          d[month].push(tip);
+        } else {
+          d[month] = [ tip ];
         }
-        return d;
-      },
-      tipsByMonth(): { [month: number]: Required<UserBitInterface>[]} {
-        const d: { [month: number]: Required<UserBitInterface>[] } = {
-          0: [], 1: [], 2: [], 3: [], 4: [], 5: [],
-          6: [], 7: [], 8: [], 9: [], 10: [], 11: [],
-        };
-        for (const tip of this.bitsByYear[this.selectedYear]) {
-          const month = new Date(tip.cheeredAt).getMonth();
-          if (d[month]) {
-            d[month].push(tip);
-          } else {
-            d[month] = [ tip ];
-          }
-        }
-        return d;
       }
+      return d;
     },
-    methods: {
-      generateChartData(): [ string, number ][] {
-        const data: [ string, number ][] = [];
+  },
+  methods: {
+    generateChartData(): [ string, number ][] {
+      const data: [ string, number ][] = [];
 
-        for (const [month, bits] of Object.entries(this.tipsByMonth)) {
-          const monthFullName = dayjs().month(Number(month)).format("MMMM");
+      for (const [month, bits] of Object.entries(this.tipsByMonth)) {
+        const monthFullName = dayjs().month(Number(month)).format('MMMM');
 
-          data.push([
-            monthFullName,
-            bits.reduce((a, b) => {
-              return a + b.amount
-            }, 0),
-          ]);
-        }
-        return data;
-      },
+        data.push([
+          monthFullName,
+          bits.reduce((a, b) => {
+            return a + b.amount;
+          }, 0),
+        ]);
+      }
+      return data;
     },
-    mounted() {
-      this.socket.emit('generic::getAll', (err: string | null, val: Required<UserBitInterface>[]) => {
-        if (err) {
-          return console.error(err);
-        }
-        this.bits = val;
-      })
-    }
-  })
+  },
+  mounted() {
+    this.socket.emit('generic::getAll', (err: string | null, val: Required<UserBitInterface>[]) => {
+      if (err) {
+        return console.error(err);
+      }
+      this.bits = val;
+    });
+  },
+});
 </script>
 
 <style scoped>

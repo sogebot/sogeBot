@@ -40,83 +40,85 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue'
-  import { getSocket } from 'src/panel/helpers/socket';
-  import { orderBy, isEqual } from 'lodash-es';
-  import translate from 'src/panel/helpers/translate';
+import { isEqual, orderBy } from 'lodash-es';
+import Vue from 'vue';
 
-  import { PermissionsInterface } from 'src/bot/database/entity/permissions'
+import { PermissionsInterface } from 'src/bot/database/entity/permissions';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
-  export default Vue.extend({
-    props: ['permissions'],
-    data() {
-      const data: {
-        translate: typeof translate,
-        orderBy: any;
-        draggingPID: null | string,
-        currentData: PermissionsInterface[],
-        socket: any,
-      } = {
-        translate: translate,
-        orderBy: orderBy,
-        draggingPID: null,
-        currentData: this.permissions,
-        socket: getSocket('/core/permissions'),
-      }
-      return data
+export default Vue.extend({
+  props: ['permissions'],
+  data() {
+    const data: {
+      translate: typeof translate,
+      orderBy: any;
+      draggingPID: null | string,
+      currentData: PermissionsInterface[],
+      socket: any,
+    } = {
+      translate:   translate,
+      orderBy:     orderBy,
+      draggingPID: null,
+      currentData: this.permissions,
+      socket:      getSocket('/core/permissions'),
+    };
+    return data;
+  },
+  watch: {
+    permissions: {
+      deep: true,
+      handler(val) {
+        this.currentData = val;
+      },
     },
-    watch: {
-      permissions: {
-        deep: true,
-        handler(val) {
-          this.currentData = val;
+    currentData: {
+      deep: true,
+      handler(val) {
+        if (!isEqual(val, this.permissions)) {
+          this.$emit('update:permissions', val);
         }
       },
-      currentData: {
-        deep: true,
-        handler(val) {
-          if (!isEqual(val, this.permissions)) {
-            this.$emit('update:permissions', val);
+    },
+  },
+  methods: {
+    setPermission(pid: string) {
+      this.$router.push({ name: 'PermissionsSettings', params: { id: pid } }).catch(err => {
+        return; 
+      });
+    },
+    dragstart: function(pid: string, e: DragEvent) {
+      if (pid !== '0efd7b1c-e460-4167-8e06-8aaf2c170311') {
+        this.draggingPID = pid;
+        e.dataTransfer?.setData('text/plain', 'dummy');
+      } else {
+        this.draggingPID = null;
+        e.stopPropagation();
+      }
+    },
+    dragenter: async function(pid: string, e: DragEvent) {
+      if (this.draggingPID === null || pid === '0efd7b1c-e460-4167-8e06-8aaf2c170311') {
+        return;
+      }
+      const dragged = this.currentData.find((o) => o.id === this.draggingPID);
+      const drop = this.currentData.find((o) => o.id === pid);
+
+      if (dragged && drop && drop.id !== dragged.id) {
+        const oldOrderOfDragged = dragged.order;
+        const newOrderOfDragged = drop.order;
+
+        for (const permission of this.currentData.filter((o) => o.order >= Math.min(oldOrderOfDragged, newOrderOfDragged) && o.order <= Math.max(oldOrderOfDragged, newOrderOfDragged))) {
+          if (oldOrderOfDragged > newOrderOfDragged) {
+            permission.order++;
+          } else {
+            permission.order--;
           }
         }
+        dragged.order = newOrderOfDragged;
       }
+
+      this.$forceUpdate();
     },
-    methods: {
-      setPermission(pid: string) {
-        this.$router.push({ name: 'PermissionsSettings', params: { id: pid } }).catch(err => {})
-      },
-      dragstart: function(pid: string, e: DragEvent) {
-        if (pid !== '0efd7b1c-e460-4167-8e06-8aaf2c170311') {
-          this.draggingPID = pid;
-          e.dataTransfer?.setData('text/plain', 'dummy');
-        } else {
-          this.draggingPID = null;
-          e.stopPropagation();
-        }
-      },
-      dragenter: async function(pid: string, e: DragEvent) {
-        if (this.draggingPID === null || pid === '0efd7b1c-e460-4167-8e06-8aaf2c170311') {
-          return;
-        }
-        const dragged = this.currentData.find((o) => o.id === this.draggingPID)
-        const drop = this.currentData.find((o) => o.id === pid)
-
-        if (dragged && drop && drop.id !== dragged.id) {
-          const oldOrderOfDragged = dragged.order
-          const newOrderOfDragged = drop.order;
-
-          for (const permission of this.currentData.filter((o) => o.order >= Math.min(oldOrderOfDragged, newOrderOfDragged) && o.order <= Math.max(oldOrderOfDragged, newOrderOfDragged))) {
-            if (oldOrderOfDragged > newOrderOfDragged) {
-              permission.order++;
-            } else {
-              permission.order--;
-            }
-          }
-          dragged.order = newOrderOfDragged;
-        }
-
-        this.$forceUpdate();
-      },
-    }
-  })
+  },
+});
 </script>

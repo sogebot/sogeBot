@@ -22,11 +22,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from '@vue/composition-api'
-import { getSocket } from 'src/panel/helpers/socket';
-import { EventBus } from 'src/panel/helpers/event-bus';
-import translate from 'src/panel/helpers/translate';
+import {
+  defineComponent, onMounted, ref, 
+} from '@vue/composition-api';
 import { chunk } from 'lodash-es';
+
+import { EventBus } from 'src/panel/helpers/event-bus';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/widgets/joinpart');
 
@@ -39,34 +42,32 @@ export default defineComponent({
     const list = ref([] as any[]);
 
     onMounted(() => {
-      ctx.root.$emit('mounted')
+      ctx.root.$emit('mounted');
       socket.on('joinpart', (data: { users: string[], type: 'join' | 'part' }) => {
         if (data.type === 'join') {
           for (const [ index, username ] of Object.entries(data.users)) {
             if (!list.value.find(o => o.username === username)) {
-              list.value.push({
-                username, createdAt: Date.now() + Number(index)
-              })
+              list.value.push({ username, createdAt: Date.now() + Number(index) });
             }
           }
           list.value = chunk(list.value.sort((a, b) => {
             if (a.createdAt > b.createdAt) {
-              return -1
+              return -1;
             }
             if (a.createdAt < b.createdAt) {
-              return 1
+              return 1;
             }
-            return 0
-          }), 50)[0] || []
+            return 0;
+          }), 50)[0] || [];
         }
-      })
+      });
     });
 
     return {
       list,
       EventBus,
       translate,
-    }
-  }
-})
+    };
+  },
+});
 </script>

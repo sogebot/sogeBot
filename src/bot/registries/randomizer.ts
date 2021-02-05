@@ -22,7 +22,7 @@ class Randomizer extends Registry {
       try {
         cb(
           null,
-          await getRepository(RandomizerEntity).find({ relations: ['items'] })
+          await getRepository(RandomizerEntity).find({ relations: ['items'] }),
         );
       } catch (e) {
         cb(e.stack, []);
@@ -76,7 +76,7 @@ class Randomizer extends Registry {
       try {
         cb(
           null,
-          await getRepository(RandomizerEntity).findOne({ where: { id }, relations: ['items'] })
+          await getRepository(RandomizerEntity).findOne({ where: { id }, relations: ['items'] }),
         );
       } catch (e) {
         cb (e, null);
@@ -86,7 +86,7 @@ class Randomizer extends Registry {
       try {
         cb(
           null,
-          await getRepository(RandomizerEntity).findOne({ where: { isShown: true }, relations: ['items'] })
+          await getRepository(RandomizerEntity).findOne({ where: { isShown: true }, relations: ['items'] }),
         );
       } catch (e) {
         cb (e, null);

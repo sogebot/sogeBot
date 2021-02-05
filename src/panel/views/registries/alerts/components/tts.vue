@@ -11,11 +11,11 @@
             :label-for="'tts-enabled' + uuid"
             :label="translate('registry.alerts.enabled')"
           >
-            <b-form-checkbox v-bind:key="'tts-enabled' + uuid" :id="'tts-enabled' + uuid" v-model="data.enabled" :name="'tts-enabled' + uuid" switch></b-form-checkbox>
+            <b-form-checkbox v-bind:key="'tts-enabled' + uuid" :id="'tts-enabled' + uuid" v-model="TTSData.enabled" :name="'tts-enabled' + uuid" switch></b-form-checkbox>
           </b-form-group>
 
           <b-form-group
-            v-if="data.minAmountToPlay"
+            v-if="TTSData.minAmountToPlay"
             label-cols-sm="4"
             label-cols-lg="3"
             :label="translate('registry.alerts.minAmountToPlay.name')"
@@ -23,7 +23,7 @@
           >
             <b-form-input
               :id="'tts-minAmountToPlay' + uuid"
-              v-model="data.minAmountToPlay"
+              v-model="TTSData.minAmountToPlay"
               type="number"
               min="0"
               :placeholder="translate('registry.alerts.minAmountToPlay.placeholder')"
@@ -32,28 +32,28 @@
           </b-form-group>
 
           <b-form-group
-            v-if="data.skipUrls"
+            v-if="TTSData.skipUrls"
             label-cols-sm="4"
             label-cols-lg="3"
             :label-for="'tts-skipUrls' + uuid"
             :label="translate('registry.alerts.skipUrls')"
           >
-            <b-form-checkbox v-bind:key="'tts-skipUrls' + uuid" :id="'tts-skipUrls' + uuid" v-model="data.skipUrls" :name="'tts-skipUrls' + uuid" switch></b-form-checkbox>
+            <b-form-checkbox v-bind:key="'tts-skipUrls' + uuid" :id="'tts-skipUrls' + uuid" v-model="TTSData.skipUrls" :name="'tts-skipUrls' + uuid" switch></b-form-checkbox>
           </b-form-group>
 
           <b-form-group
-            v-if="data.keepAlertShown"
+            v-if="TTSData.keepAlertShown"
             label-cols-sm="4"
             label-cols-lg="3"
             :label-for="'tts-keepAlertShown' + uuid"
             :label="translate('registry.alerts.keepAlertShown')"
           >
-            <b-form-checkbox v-bind:key="'tts-keepAlertShown' + uuid" :id="'tts-keepAlertShown' + uuid" v-model="data.keepAlertShown" :name="'tts-keepAlertShown' + uuid" switch></b-form-checkbox>
+            <b-form-checkbox v-bind:key="'tts-keepAlertShown' + uuid" :id="'tts-keepAlertShown' + uuid" v-model="TTSData.keepAlertShown" :name="'tts-keepAlertShown' + uuid" switch></b-form-checkbox>
           </b-form-group>
 
           <b-form-group label-cols-sm="4" label-cols-lg="3"
               :label="translate('registry.alerts.voice')">
-            <b-form-select v-model="data.voice" :options="voices" plain></b-form-select>
+            <b-form-select v-model="TTSData.voice" :options="voices" plain></b-form-select>
           </b-form-group>
 
           <b-form-group label-cols-sm="4" label-cols-lg="3"
@@ -62,7 +62,7 @@
             <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
               <b-form-input
                 :id="'volume' + uuid"
-                v-model.number="data.volume"
+                v-model.number="TTSData.volume"
                 type="range"
                 min="0"
                 max="1"
@@ -70,7 +70,7 @@
               ></b-form-input>
               <b-input-group-text slot="append" class="pr-3 pl-3">
                 <div style="width: 3rem;">
-                  {{ Number(data.volume * 100).toFixed(0) + '%' }}
+                  {{ Number(TTSData.volume * 100).toFixed(0) + '%' }}
                 </div>
               </b-input-group-text>
             </b-input-group>
@@ -82,7 +82,7 @@
             <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
               <b-form-input
                 :id="'rate' + uuid"
-                v-model.number="data.rate"
+                v-model.number="TTSData.rate"
                 type="range"
                 min="0"
                 max="1.5"
@@ -90,7 +90,7 @@
               ></b-form-input>
               <b-input-group-text slot="append" class="pr-3 pl-3">
                 <div style="width: 3rem;">
-                  {{ String(data.rate) }}
+                  {{ String(TTSData.rate) }}
                 </div>
               </b-input-group-text>
             </b-input-group>
@@ -102,7 +102,7 @@
             <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
               <b-form-input
                 :id="'pitch' + uuid"
-                v-model.number="data.pitch"
+                v-model.number="TTSData.pitch"
                 type="range"
                 min="0"
                 max="2"
@@ -110,7 +110,7 @@
               ></b-form-input>
               <b-input-group-text slot="append" class="pr-3 pl-3">
                 <div style="width: 3rem;">
-                  {{ String(data.pitch) }}
+                  {{ String(TTSData.pitch) }}
                 </div>
               </b-input-group-text>
             </b-input-group>
@@ -134,8 +134,12 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, PropSync } from 'vue-property-decorator';
+import {
+  defineComponent, onMounted, ref, watch,
+} from '@vue/composition-api';
+
 import type { CommonSettingsInterface } from 'src/bot/database/entity/alert';
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import translate from 'src/panel/helpers/translate';
 
 declare global {
@@ -144,60 +148,72 @@ declare global {
   }
 }
 
-@Component({
-  components: {
-  }
-})
-export default class TTS extends Vue {
-  @PropSync('tts') readonly data !: Partial<CommonSettingsInterface["tts"]>;
-  @Prop() readonly uuid !: string;
+export default defineComponent({
+  props: {
+    tts:  Object,
+    uuid: String,
+  },
+  setup(props: { tts: Partial<CommonSettingsInterface['tts']>, uuid: string}, ctx) {
+    const text = ref('This message should be said by TTS to test your settings.');
+    const state = ref({ loaded: ButtonStates.progress } as { loaded: number });
+    const TTSData = ref(props.tts);
+    const voices = ref([] as {text: string; value: string}[]);
 
-  translate = translate;
-
-  text = "This message should be said by TTS to test your settings.";
-  state: { loaded: number } = { loaded: this.$state.progress }
-
-  voices: {text: string; value: string}[] = [];
-
-  mounted() {
-    this.state.loaded = this.$state.progress;
-    if (this.$store.state.configuration.integrations.ResponsiveVoice.api.key.trim().length === 0) {
-      this.state.loaded = this.$state.fail;
-    } else {
+    function initResponsiveVoice() {
       if (typeof window.responsiveVoice === 'undefined') {
-        this.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.$store.state.configuration.integrations.ResponsiveVoice.api.key)
-          .then(() => this.initResponsiveVoice());
-      } else {
-        this.state.loaded = this.$state.success;
-        this.voices = window.responsiveVoice.getVoices().map((o: { name: string }) => {
-          return { text: o.name, value: o.name }
+        setTimeout(() => initResponsiveVoice(), 200);
+        return;
+      }
+      window.responsiveVoice.init();
+      voices.value = window.responsiveVoice.getVoices().map((o: { name: string }) => {
+        return { text: o.name, value: o.name };
+      });
+      state.value.loaded = ButtonStates.success;
+    }
+
+    async function speak() {
+      for (const toSpeak of text.value.split('/ ')) {
+        await new Promise<void>(resolve => {
+          if (toSpeak.trim().length === 0) {
+            setTimeout(() => resolve(), 500);
+          } else {
+            window.responsiveVoice.speak(toSpeak.trim(), TTSData.value.voice, {
+              rate: TTSData.value.rate, pitch: TTSData.value.pitch, volume: TTSData.value.volume, onend: () => setTimeout(() => resolve(), 500),
+            });
+          }
         });
       }
     }
-  }
 
-  initResponsiveVoice() {
-    if (typeof window.responsiveVoice === 'undefined') {
-      setTimeout(() => this.initResponsiveVoice(), 200);
-      return;
-    }
-    window.responsiveVoice.init();
-    this.voices = window.responsiveVoice.getVoices().map((o: { name: string }) => {
-      return { text: o.name, value: o.name }
-    });
-    this.state.loaded = this.$state.success;
-  }
-
-  async speak() {
-    for (const text of this.text.split('/ ')) {
-      await new Promise<void>(resolve => {
-        if (text.trim().length === 0) {
-          setTimeout(() => resolve(), 500);
+    onMounted(() => {
+      state.value.loaded = ButtonStates.progress;
+      if (ctx.root.$store.state.configuration.integrations.ResponsiveVoice.api.key.trim().length === 0) {
+        state.value.loaded = ButtonStates.fail;
+      } else {
+        if (typeof window.responsiveVoice === 'undefined') {
+          ctx.root.$loadScript('https://code.responsivevoice.org/responsivevoice.js?key=' + ctx.root.$store.state.configuration.integrations.ResponsiveVoice.api.key)
+            .then(() => initResponsiveVoice());
         } else {
-          window.responsiveVoice.speak(text.trim(), this.data.voice, { rate: this.data.rate, pitch: this.data.pitch, volume: this.data.volume, onend: () => setTimeout(() => resolve(), 500) });
+          state.value.loaded = ButtonStates.success;
+          voices.value = window.responsiveVoice.getVoices().map((o: { name: string }) => {
+            return { text: o.name, value: o.name };
+          });
         }
-      });
-    }
-  }
-}
+      }
+    });
+
+    watch(TTSData, (val) => {
+      ctx.emit('update:tts', val);
+    }, { deep: true });
+
+    return {
+      voices,
+      TTSData,
+      state,
+      text,
+      translate,
+      speak,
+    };
+  },
+});
 </script>

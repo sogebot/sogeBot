@@ -43,16 +43,18 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { isFinite } from 'lodash-es';
-import { getSocket } from 'src/panel/helpers/socket';
 
-import { library } from '@fortawesome/fontawesome-svg-core'
+import { library } from '@fortawesome/fontawesome-svg-core';
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { isFinite } from 'lodash-es';
+import {
+  Component, Prop, Vue, Watch, 
+} from 'vue-property-decorator';
 
 import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
+import { getSocket } from 'src/panel/helpers/socket';
 
-library.add(faExclamationTriangle)
+library.add(faExclamationTriangle);
 
 @Component({})
 export default class sortableList extends Vue {
@@ -65,7 +67,7 @@ export default class sortableList extends Vue {
   currentValue = this.value;
   currentPermissions = this.permissions;
   permissionsList: PermissionsInterface[] = [];
-  permissionsLoaded: boolean = false;
+  permissionsLoaded = false;
 
   @Watch('currentPermissions')
   @Watch('currentValue')
@@ -75,7 +77,7 @@ export default class sortableList extends Vue {
         this.currentValue = Number(this.currentValue);
       } else {
         this.currentValue = this.value;
-      };
+      }
     }
     this.$emit('update', { value: this.currentValue, permissions: this.currentPermissions });
   }
@@ -103,7 +105,9 @@ export default class sortableList extends Vue {
   }
 
   getPermissionName(id: string | null) {
-    if (!id) {return 'Disabled';};
+    if (!id) {
+      return 'Disabled';
+    }
     const permission = this.permissionsList.find((o) => {
       return o.id === id;
     });
@@ -117,5 +121,5 @@ export default class sortableList extends Vue {
       return null;
     }
   }
-};
+}
 </script>

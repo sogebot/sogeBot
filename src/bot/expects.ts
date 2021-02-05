@@ -61,7 +61,7 @@ class Expects {
               expectedParameters.push(
                 (param.opts.optional ? '[' : '')
                 + (param.opts.spaces ? '!some command' : '!command')
-                + (param.opts.optional ? ']' : '')
+                + (param.opts.optional ? ']' : ''),
               );
               break;
             case 'points':
@@ -74,59 +74,59 @@ class Expects {
                   '100',
                 ].join(',')
                 + '>'
-                + (param.opts.optional ? ']' : '')
+                + (param.opts.optional ? ']' : ''),
               );
               break;
             case 'switch':
               expectedParameters.push(
                 (param.opts.optional ? '[' : '')
                 + `-${param.opts.name} (${param.opts.values.join(', ')})`
-                + (param.opts.optional ? ']' : '')
+                + (param.opts.optional ? ']' : ''),
               );
               break;
             case 'toggler':
               expectedParameters.push(
-                `[-${param.opts.name}]`
+                `[-${param.opts.name}]`,
               );
               break;
             case 'number':
               expectedParameters.push(
                 (param.opts.optional ? '[' : '')
                 + `<number>`
-                + (param.opts.optional ? ']' : '')
+                + (param.opts.optional ? ']' : ''),
               );
               break;
             case 'string':
               expectedParameters.push(
                 (param.opts.optional ? '[' : '')
                 + `<string>`
-                + (param.opts.optional ? ']' : '')
+                + (param.opts.optional ? ']' : ''),
               );
               break;
             case 'username':
               expectedParameters.push(
                 (param.opts.optional ? '[' : '')
                 + `<username>`
-                + (param.opts.optional ? ']' : '')
+                + (param.opts.optional ? ']' : ''),
               );
               break;
             case 'argument':
               expectedParameters.push(
                 (param.opts.optional ? '[' : '')
                 + `-${param.opts.name} ${param.opts.type.name === 'Number' ? '5' : '"Example string"'}`
-                + (param.opts.optional ? ']' : '')
+                + (param.opts.optional ? ']' : ''),
               );
               break;
             case 'permission':
               expectedParameters.push(
                 (param.opts.optional ? '[' : '')
                 + `-${param.opts.name} b38c5adb-e912-47e3-937a-89fabd12393a`
-                + (param.opts.optional ? ']' : '')
+                + (param.opts.optional ? ']' : ''),
               );
               break;
             case 'list':
               expectedParameters.push(
-                `Value1 ${param.opts.delimiter} Another value ${param.opts.delimiter} ...`
+                `Value1 ${param.opts.delimiter} Another value ${param.opts.delimiter} ...`,
               );
               break;
           }

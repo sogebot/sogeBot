@@ -2,59 +2,132 @@
   <div class="px-3 py-2">
     <form>
       <div class="row no-gutters pl-3 pr-3">
-        <div class="card mb-3 p-0"
-            :class="{
-                'col-md-6': (supported.events.find((o) => o.id === editationItem.name) || { variables: []}).variables.length > 0,
-                'col-md-12': !((supported.events.find((o) => o.id === editationItem.name) || { variables: []}).variables.length > 0)
-            }"
+        <div
+          class="card mb-3 p-0"
+          :class="{
+            'col-md-6': (supported.events.find((o) => o.id === editationItem.name) || { variables: []}).variables.length > 0,
+            'col-md-12': !((supported.events.find((o) => o.id === editationItem.name) || { variables: []}).variables.length > 0)
+          }"
         >
-          <div class="card-header">{{translate('events.dialog.settings')}}</div>
+          <div class="card-header">
+            {{ translate('events.dialog.settings') }}
+          </div>
           <div class="card-body">
             <div class="form-group col-md-12">
               <label-inside>{{ translate('events.dialog.event') }}</label-inside>
               <b-select
-                  v-model="editationItem.name"
-                  :state="$v.editationItem.name.$error && $v.editationItem.name.$dirty ? false : null">
-                <b-select-option :value="''" :key="'empty-event'" :disabled="true">--- please select event ---</b-select-option>
-                <b-select-option v-for="key of supported.events.map((o) => o.id)" :value="key" :key="key">{{capitalize(translate(key))}}</b-select-option>
+                v-model="editationItem.name"
+                :state="$v.editationItem.name.$error && $v.editationItem.name.$dirty ? false : null"
+              >
+                <b-select-option
+                  :key="'empty-event'"
+                  :value="''"
+                  :disabled="true"
+                >
+                  --- please select event ---
+                </b-select-option>
+                <b-select-option
+                  v-for="key of supported.events.map((o) => o.id)"
+                  :key="key"
+                  :value="key"
+                >
+                  {{ capitalize(translate(key)) }}
+                </b-select-option>
               </b-select>
-              <b-form-invalid-feedback :state="!($v.editationItem.name.$error && $v.editationItem.name.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+              <b-form-invalid-feedback :state="!($v.editationItem.name.$error && $v.editationItem.name.$dirty)">
+                {{ translate('dialog.errors.required') }}
+              </b-form-invalid-feedback>
             </div>
-            <div class="form-group col-md-12" v-for="defKey of Object.keys(editationItem.definitions)" :key="defKey">
+            <div
+              v-for="defKey of Object.keys(editationItem.definitions)"
+              :key="defKey"
+              class="form-group col-md-12"
+            >
               <label-inside>{{ translate("events.definitions." + defKey + ".label") }}</label-inside>
               <template v-if="defKey === 'titleOfReward'">
                 {{ $v.editationItem.definitions.titleOfReward.$error && $v.editationItem.definitions.titleOfReward.$dirty ? false : null }}
-                <rewards :value.sync="editationItem.definitions[defKey]" :state="$v.editationItem.definitions.titleOfReward.$error && $v.editationItem.definitions.titleOfReward.$dirty ? false : null"/>
-                <b-form-invalid-feedback :state="!($v.editationItem.definitions.titleOfReward.$error && $v.editationItem.definitions.titleOfReward.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+                <rewards
+                  :value.sync="editationItem.definitions[defKey]"
+                  :state="$v.editationItem.definitions.titleOfReward.$error && $v.editationItem.definitions.titleOfReward.$dirty ? false : null"
+                />
+                <b-form-invalid-feedback :state="!($v.editationItem.definitions.titleOfReward.$error && $v.editationItem.definitions.titleOfReward.$dirty)">
+                  {{ translate('dialog.errors.required') }}
+                </b-form-invalid-feedback>
               </template>
               <template v-else-if="typeof editationItem.definitions[defKey] === 'boolean'">
-                <button type="button" class="btn btn-success" v-if="editationItem.definitions[defKey]" @click="editationItem.definitions[defKey] = false">{{translate("dialog.buttons.yes")}}</button>
-                <button type="button" class="btn btn-danger" v-else @click="editationItem.definitions[defKey] = true">{{translate("dialog.buttons.no")}}</button>
+                <button
+                  v-if="editationItem.definitions[defKey]"
+                  type="button"
+                  class="btn btn-success"
+                  @click="editationItem.definitions[defKey] = false"
+                >
+                  {{ translate("dialog.buttons.yes") }}
+                </button>
+                <button
+                  v-else
+                  type="button"
+                  class="btn btn-danger"
+                  @click="editationItem.definitions[defKey] = true"
+                >
+                  {{ translate("dialog.buttons.no") }}
+                </button>
               </template>
-              <input v-else v-model="editationItem.definitions[defKey]" :class="{ 'is-invalid': getDefinitionValidation(defKey).$error }" type="text" class="form-control" :id="defKey + '_input'" :placeholder="translate('events.definitions.' + defKey + '.placeholder')">
-              <div class="invalid-feedback" v-if="getDefinitionValidation(defKey)">
+              <input
+                v-else
+                :id="defKey + '_input'"
+                v-model="editationItem.definitions[defKey]"
+                :class="{ 'is-invalid': getDefinitionValidation(defKey).$error }"
+                type="text"
+                class="form-control"
+                :placeholder="translate('events.definitions.' + defKey + '.placeholder')"
+              >
+              <div
+                v-if="getDefinitionValidation(defKey)"
+                class="invalid-feedback"
+              >
                 <template v-if="!get(getDefinitionValidation(defKey), 'minValue', true)">
-                  {{translate('dialog.errors.minValue').replace('$value', get(getDefinitionValidation(defKey), '$params.minValue.min', 0)) }}
+                  {{ translate('dialog.errors.minValue').replace('$value', get(getDefinitionValidation(defKey), '$params.minValue.min', 0)) }}
                 </template>
                 <template v-else>
-                  {{translate('dialog.errors.required')}}
+                  {{ translate('dialog.errors.required') }}
                 </template>
               </div>
             </div>
             <div class="form-group col-md-12">
               <label-inside>{{ translate("events.dialog.filters") }}</label-inside>
-              <textarea v-model="editationItem.filter" class="form-control"/>
+              <textarea
+                v-model="editationItem.filter"
+                class="form-control"
+              />
             </div>
           </div>
         </div>
-        <div class="card col-md-6 mb-3 p-0" v-if="(supported.events.find((o) => o.id === editationItem.name) || { variables: []}).variables.length > 0">
-          <div class="card-header">{{translate('events.dialog.usable-events-variables')}}</div>
+        <div
+          v-if="(supported.events.find((o) => o.id === editationItem.name) || { variables: []}).variables.length > 0"
+          class="card col-md-6 mb-3 p-0"
+        >
+          <div class="card-header">
+            {{ translate('events.dialog.usable-events-variables') }}
+          </div>
           <div class="card-body">
             <div class="form-group col-md-12 m-0">
-              <dl class="row m-0" style="font-size:0.7rem;">
+              <dl
+                class="row m-0"
+                style="font-size:0.7rem;"
+              >
                 <template v-for="variables of (supported.events.find((o) => o.id === editationItem.name) || { variables: []}).variables">
-                  <dt class="col-4" :key="variables + '1'">${{variables}}</dt>
-                  <dd class="col-8" :key="variables + '2'">{{translate('responses.variable.' + variables) }}</dd>
+                  <dt
+                    :key="variables + '1'"
+                    class="col-4"
+                  >
+                    ${{ variables }}
+                  </dt>
+                  <dd
+                    :key="variables + '2'"
+                    class="col-8"
+                  >
+                    {{ translate('responses.variable.' + variables) }}
+                  </dd>
                 </template>
               </dl>
             </div>
@@ -62,58 +135,107 @@
         </div>
       </div>
 
-      <b-card no-body class="ml-3 mr-3 border-bottom-0">
-        <b-card-header class="border-bottom-0">{{translate('events.dialog.operations')}}</b-card-header>
+      <b-card
+        no-body
+        class="ml-3 mr-3 border-bottom-0"
+      >
+        <b-card-header class="border-bottom-0">
+          {{ translate('events.dialog.operations') }}
+        </b-card-header>
       </b-card>
-      <div class="row no-gutters pl-3 pr-3" v-for="(operation, index) of editationItem.operations" :key="operation.name + index"
-          :class="{'pt-2': index !== 0}">
+      <div
+        v-for="(operation, index) of editationItem.operations"
+        :key="operation.name + index"
+        class="row no-gutters pl-3 pr-3"
+        :class="{'pt-2': index !== 0}"
+      >
         <div class="card col-12">
           <div class="card-body">
             <div class="form-group col-md-12">
-              <b-select v-model="operation.name"
-                :state="!$v.editationItem.operations.doesSomething && $v.editationItem.operations.$dirty ? false : null">
-                <b-select-option v-for="key of supported.operations.map((o) => o.id)" :value="key" :key="key">{{capitalize(translate(key))}}</b-select-option>
+              <b-select
+                v-model="operation.name"
+                :state="!$v.editationItem.operations.doesSomething && $v.editationItem.operations.$dirty ? false : null"
+              >
+                <b-select-option
+                  v-for="key of supported.operations.map((o) => o.id)"
+                  :key="key"
+                  :value="key"
+                >
+                  {{ capitalize(translate(key)) }}
+                </b-select-option>
               </b-select>
-              <b-form-invalid-feedback v-if="operation.name === 'do-nothing'" :state="!(!$v.editationItem.operations.doesSomething && $v.editationItem.operations.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+              <b-form-invalid-feedback
+                v-if="operation.name === 'do-nothing'"
+                :state="!(!$v.editationItem.operations.doesSomething && $v.editationItem.operations.$dirty)"
+              >
+                {{ translate('dialog.errors.required') }}
+              </b-form-invalid-feedback>
 
-              <div v-for="(defKey, indexDef) of Object.keys(operation.definitions)" :key="defKey"
+              <div
+                v-for="(defKey, indexDef) of Object.keys(operation.definitions)"
+                :key="defKey"
                 class="mt-2"
-                :class="{'pt-2': indexDef === 0}">
-
+                :class="{'pt-2': indexDef === 0}"
+              >
                 <template v-if="supported.operations.find(o => o.id === operation.name)">
                   <template v-if="['messageToSend', 'commandToRun'].includes(defKey)">
                     <label-inside>{{ translate("events.definitions." + defKey + ".label") }}</label-inside>
                     <textarea-with-tags
                       :value.sync="operation.definitions[defKey]"
-                      @input="getOperationDefinitionValidation(index, defKey).$touch();"
                       :placeholder="translate('events.definitions.' + defKey + '.placeholder')"
                       :state="!(getOperationDefinitionValidation(index, defKey).$error && getOperationDefinitionValidation(index, defKey).$dirty)"
                       :filters="['global', ...(supported.events.find((o) => o.id === editationItem.name) || { variables: []}).variables]"
+                      @input="getOperationDefinitionValidation(index, defKey).$touch();"
                       @update="operation.definitions[defKey] = $event"
                     />
                   </template>
                   <template v-else-if="Array.isArray(supported.operations.find(o => o.id === operation.name).definitions[defKey])">
                     <label-inside>{{ translate("events.definitions." + defKey + ".label") }}</label-inside>
                     <b-select
-                        class="form-control"
-                        v-model="operation.definitions[defKey]">
-                      <b-select-option v-for="value of supported.operations.find(o => o.id === operation.name).definitions[defKey]" :key="value" :value="value">{{value}}</b-select-option>
+                      v-model="operation.definitions[defKey]"
+                      class="form-control"
+                    >
+                      <b-select-option
+                        v-for="value of supported.operations.find(o => o.id === operation.name).definitions[defKey]"
+                        :key="value"
+                        :value="value"
+                      >
+                        {{ value }}
+                      </b-select-option>
                     </b-select>
                   </template>
                   <template v-else-if="typeof operation.definitions[defKey] === 'string'">
                     <label-inside>{{ translate("events.definitions." + defKey + ".label") }}</label-inside>
                     <b-input
-                      type="text" class="form-control"
                       v-model="operation.definitions[defKey]"
+                      type="text"
+                      class="form-control"
                       :state="getOperationDefinitionValidation(index, defKey).$error && getOperationDefinitionValidation(index, defKey).$dirty ? false : null"
-                      :placeholder="translate('events.definitions.' + defKey + '.placeholder')"/>
+                      :placeholder="translate('events.definitions.' + defKey + '.placeholder')"
+                    />
                   </template>
                   <template v-else-if="typeof operation.definitions[defKey] === 'boolean'">
                     <label>{{ translate("events.definitions." + defKey + ".label") }}</label>
-                    <button type="button" class="btn btn-success" v-if="operation.definitions[defKey]" @click="operation.definitions[defKey] = false">{{translate("dialog.buttons.yes")}}</button>
-                    <button type="button" class="btn btn-danger" v-else @click="operation.definitions[defKey] = true">{{translate("dialog.buttons.no")}}</button>
+                    <button
+                      v-if="operation.definitions[defKey]"
+                      type="button"
+                      class="btn btn-success"
+                      @click="operation.definitions[defKey] = false"
+                    >
+                      {{ translate("dialog.buttons.yes") }}
+                    </button>
+                    <button
+                      v-else
+                      type="button"
+                      class="btn btn-danger"
+                      @click="operation.definitions[defKey] = true"
+                    >
+                      {{ translate("dialog.buttons.no") }}
+                    </button>
                   </template>
-                  <b-form-invalid-feedback :state="!(getOperationDefinitionValidation(index, defKey).$error && getOperationDefinitionValidation(index, defKey).$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+                  <b-form-invalid-feedback :state="!(getOperationDefinitionValidation(index, defKey).$error && getOperationDefinitionValidation(index, defKey).$dirty)">
+                    {{ translate('dialog.errors.required') }}
+                  </b-form-invalid-feedback>
                 </template>
               </div>
             </div>
@@ -125,22 +247,23 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed, watch, getCurrentInstance, onUnmounted } from '@vue/composition-api'
-import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
-import translate from 'src/panel/helpers/translate';
+import {
+  computed, defineComponent, getCurrentInstance, onMounted, onUnmounted, ref, watch,
+} from '@vue/composition-api';
+import { cloneDeep, get } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
-
-import { getSocket } from 'src/panel/helpers/socket';
+import { validationMixin } from 'vuelidate';
+import {
+  minLength, minValue, numeric, required, requiredIf,
+} from 'vuelidate/lib/validators';
 
 import { EventInterface, EventOperationInterface } from 'src/bot/database/entity/event';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
-import { error } from 'src/panel/helpers/error';
 import { capitalize } from 'src/panel/helpers/capitalize';
-
-import { validationMixin } from 'vuelidate'
-import { minLength, minValue, required, requiredIf, numeric } from 'vuelidate/lib/validators'
-import { cloneDeep, get } from 'lodash-es';
+import { error } from 'src/panel/helpers/error';
 import { EventBus } from 'src/panel/helpers/event-bus';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/core/events');
 
@@ -149,189 +272,185 @@ type Props = {
   invalid: boolean;
   pending: boolean;
   saveState: number;
-}
+};
 
 export default defineComponent({
-  props: {
-    id: String,
-    invalid: Boolean,
-    pending: Boolean,
-    saveState: Number,
+  components: {
+    rewards:        () => import('src/panel/components/rewardDropdown.vue'),
+    'label-inside': () => import('src/panel/components/label-inside.vue'),
   },
   mixins: [ validationMixin ],
-  components: {
-    rewards: () => import('src/panel/components/rewardDropdown.vue'),
-    loading: () => import('src/panel/components/loading.vue'),
-    'font-awesome-layers': FontAwesomeLayers,
-    'label-inside': () => import('src/panel/components/label-inside.vue')
+  props:  {
+    id:        String,
+    invalid:   Boolean,
+    pending:   Boolean,
+    saveState: Number,
   },
   validations: {
     editationItem: {
-      name: { required, minLength: minLength(1) },
+      name:       { required, minLength: minLength(1) },
       operations: {
         doesSomething: (val: Omit<EventOperationInterface, 'event'>[]) => {
-          return val.filter(o => o.name !== 'do-nothing').length > 0
+          return val.filter(o => o.name !== 'do-nothing').length > 0;
         },
         $each: {
           definitions: {
             messageToSend: {
               required: requiredIf(function (model) {
-                return typeof model?.messageToSend !== 'undefined'
+                return typeof model?.messageToSend !== 'undefined';
               }),
             },
             commandToRun: {
               required: requiredIf(function (model) {
-                return typeof model?.commandToRun !== 'undefined'
+                return typeof model?.commandToRun !== 'undefined';
               }),
             },
             emotesToExplode: {
               required: requiredIf(function (model) {
-                return typeof model?.emotesToExplode !== 'undefined'
+                return typeof model?.emotesToExplode !== 'undefined';
               }),
             },
             channel: {
               required: requiredIf(function (model) {
-                return typeof model?.channel !== 'undefined'
+                return typeof model?.channel !== 'undefined';
               }),
             },
             customVariable: {
               required: requiredIf(function (model) {
-                return typeof model?.customVariable !== 'undefined'
+                return typeof model?.customVariable !== 'undefined';
               }),
             },
             emotesToFirework: {
               required: requiredIf(function (model) {
-                return typeof model?.emotesToFirework !== 'undefined'
+                return typeof model?.emotesToFirework !== 'undefined';
               }),
             },
             numberToDecrement: {
               required: requiredIf(function (model) {
-                return typeof model?.numberToDecrement !== 'undefined'
+                return typeof model?.numberToDecrement !== 'undefined';
               }),
               minValue: minValue(1),
               numeric,
             },
             numberToIncrement: {
               required: requiredIf(function (model) {
-                return typeof model?.numberToIncrement !== 'undefined'
+                return typeof model?.numberToIncrement !== 'undefined';
               }),
               minValue: minValue(1),
               numeric,
             },
             durationOfCommercial: {
               required: requiredIf(function (model) {
-                return typeof model?.durationOfCommercial !== 'undefined'
-              })
+                return typeof model?.durationOfCommercial !== 'undefined';
+              }),
             },
-          }
+          },
         },
       },
       definitions: {
         fadeOutXCommands: {
           required: requiredIf(function (model) {
-            return typeof model?.fadeOutXCommands !== 'undefined'
+            return typeof model?.fadeOutXCommands !== 'undefined';
           }),
           numeric,
-          minValue: minValue(0)
+          minValue: minValue(0),
         },
         fadeOutInterval: {
           required: requiredIf(function (model) {
-            return typeof model?.fadeOutInterval !== 'undefined'
+            return typeof model?.fadeOutInterval !== 'undefined';
           }),
           numeric,
-          minValue: minValue(0)
+          minValue: minValue(0),
         },
         runEveryXCommands: {
           required: requiredIf(function (model) {
-            return typeof model?.runEveryXCommands !== 'undefined'
+            return typeof model?.runEveryXCommands !== 'undefined';
           }),
           numeric,
-          minValue: minValue(0)
+          minValue: minValue(0),
         },
         runEveryXKeywords: {
           required: requiredIf(function (model) {
-            return typeof model?.runEveryXKeywords !== 'undefined'
+            return typeof model?.runEveryXKeywords !== 'undefined';
           }),
           numeric,
-          minValue: minValue(0)
+          minValue: minValue(0),
         },
         fadeOutXKeywords: {
           required: requiredIf(function (model) {
-            return typeof model?.fadeOutXKeywords !== 'undefined'
+            return typeof model?.fadeOutXKeywords !== 'undefined';
           }),
           numeric,
-          minValue: minValue(0)
+          minValue: minValue(0),
         },
         runInterval: {
           required: requiredIf(function (model) {
-            return typeof model?.runInterval !== 'undefined'
+            return typeof model?.runInterval !== 'undefined';
           }),
           numeric,
-          minValue: minValue(0)
+          minValue: minValue(0),
         },
         commandToWatch: {
           required: requiredIf(function (model) {
-            return typeof model?.commandToWatch !== 'undefined'
+            return typeof model?.commandToWatch !== 'undefined';
           }),
         },
         keywordToWatch: {
           required: requiredIf(function (model) {
-            return typeof model?.keywordToWatch !== 'undefined'
+            return typeof model?.keywordToWatch !== 'undefined';
           }),
         },
         runAfterXMinutes: {
           required: requiredIf(function (model) {
-            return typeof model?.runAfterXMinutes !== 'undefined'
+            return typeof model?.runAfterXMinutes !== 'undefined';
           }),
           numeric,
-          minValue: minValue(1)
+          minValue: minValue(1),
         },
         runEveryXMinutes: {
           required: requiredIf(function (model) {
-            return typeof model?.runEveryXMinutes !== 'undefined'
+            return typeof model?.runEveryXMinutes !== 'undefined';
           }),
           numeric,
-          minValue: minValue(1)
+          minValue: minValue(1),
         },
         viewersAtLeast: {
           required: requiredIf(function (model) {
-            return typeof model?.viewersAtLeast !== 'undefined'
+            return typeof model?.viewersAtLeast !== 'undefined';
           }),
           numeric,
-          minValue: minValue(0)
+          minValue: minValue(0),
         },
         titleOfReward: {
           required: requiredIf(function (model) {
-            return typeof model?.titleOfReward !== 'undefined'
+            return typeof model?.titleOfReward !== 'undefined';
           }),
-        }
-      }
-    }
+        },
+      },
+    },
   },
   setup(props: Props, ctx) {
     const instance = getCurrentInstance()?.proxy;
 
     const editationItem = ref({
-      id: ctx.root.$route.params.id || uuid(),
-      name: '',
-      isEnabled: true,
-      triggered: {},
+      id:          ctx.root.$route.params.id || uuid(),
+      name:        '',
+      isEnabled:   true,
+      triggered:   {},
       definitions: {},
-      operations: [],
-      filter: '',
+      operations:  [],
+      filter:      '',
     } as Required<EventInterface>);
     const operationsClone = ref([] as Omit<EventOperationInterface, 'event'>[]);
     const watchOperationChange = ref(true);
     const watchEventChange = ref(true);
     const events = ref([] as EventInterface[]);
     const supported = ref({ operations: [], events: [] } as {
-        operations: Events.SupportedOperation[],
-        events: Events.SupportedEvent[]
+      operations: Events.SupportedOperation[],
+      events: Events.SupportedEvent[]
     });
 
-    const state = ref({
-      loading: ButtonStates.progress,
-    } as {
+    const state = ref({ loading: ButtonStates.progress } as {
       loading: number;
     });
 
@@ -346,8 +465,10 @@ export default defineComponent({
       }
     }, { deep: true });
     watch(() => editationItem.value.operations, (val: Omit<EventOperationInterface, 'event'>[]) => {
-      if (!watchOperationChange.value) return true;
-      watchOperationChange.value = false // remove watch
+      if (!watchOperationChange.value) {
+        return true;
+      }
+      watchOperationChange.value = false; // remove watch
       // remove all do-nothing
       val = val.filter((o) => o.name !== 'do-nothing');
 
@@ -361,17 +482,17 @@ export default defineComponent({
         }
         if (typeof operationsClone.value[j] !== 'undefined' && val[i].name === operationsClone.value[j].name) {
           j++;
-          continue
+          continue;
         }
 
-        val[i].definitions = {}
-        const defaultOperation = supported.value.operations.find((o) => o.id === val[i].name)
+        val[i].definitions = {};
+        const defaultOperation = supported.value.operations.find((o) => o.id === val[i].name);
         if (defaultOperation) {
           if (Object.keys(defaultOperation.definitions).length > 0) {
             for (const [key, value] of Object.entries(defaultOperation.definitions)) {
               val[i].definitions[key] = Array.isArray(value) ? value[0] : value; // select first option by default
             }
-            ctx.root.$forceUpdate()
+            ctx.root.$forceUpdate();
           }
         }
 
@@ -379,27 +500,29 @@ export default defineComponent({
         $v?.editationItem.operations?.$each[i]?.$reset();
         j++;
       }
-      operationsClone.value = cloneDeep(val)
+      operationsClone.value = cloneDeep(val);
       // add do-nothing at the end
       val.push({
-        id: uuid(),
-        name: 'do-nothing',
-        definitions: {}
+        id:          uuid(),
+        name:        'do-nothing',
+        definitions: {},
       });
 
       // update clone
-      editationItem.value.operations = cloneDeep(val)
-      ctx.root.$nextTick(() => (watchOperationChange.value = true)) // re-enable watch
+      editationItem.value.operations = cloneDeep(val);
+      ctx.root.$nextTick(() => (watchOperationChange.value = true)); // re-enable watch
 
     }, { deep: true });
     watch(() => editationItem.value.name, (val, oldVal) => {
-      if (!watchEventChange.value) return;
+      if (!watchEventChange.value) {
+        return;
+      }
       watchEventChange.value = false;
 
       if (val !== oldVal) {
         editationItem.value.definitions = {}; // reload definitions
 
-        const defaultEvent = supported.value.events.find((o) => o.id === val)
+        const defaultEvent = supported.value.events.find((o) => o.id === val);
         if (defaultEvent) {
           if (defaultEvent.definitions) {
             editationItem.value.definitions = defaultEvent.definitions;
@@ -411,14 +534,14 @@ export default defineComponent({
       }
       ctx.root.$nextTick(() => {
         watchEventChange.value = true;
-      })
+      });
     });
     const eventTypes = computed(() => {
       return [...new Set(events.value.map(o => o.name))];
-    })
+    });
 
     const filteredEvents = computed(() => {
-      let _events = events.value
+      const _events = events.value;
       return _events.sort((a, b) => {
         const A = a.name.toLowerCase();
         const B = b.name.toLowerCase();
@@ -429,7 +552,7 @@ export default defineComponent({
           return 1;
         }
         return 0; //default return value (no sorting)
-        })
+      });
     });
 
     onMounted(() => {
@@ -442,9 +565,9 @@ export default defineComponent({
     });
     onUnmounted(() => {
       EventBus.$off('managers::events::save::' + editationItem.value.id);
-    })
+    });
     const loadEditationItem = async () => {
-      state.value.loading = ButtonStates.progress
+      state.value.loading = ButtonStates.progress;
       await Promise.all([
         new Promise<void>((resolve, reject) => {
           if (ctx.root.$route.params.id) {
@@ -455,13 +578,13 @@ export default defineComponent({
               if (!eventGetAll) {
                 watchEventChange.value = false;
                 editationItem.value = {
-                  id: ctx.root.$route.params.id,
-                  name: '',
-                  isEnabled: true,
-                  triggered: {},
+                  id:          ctx.root.$route.params.id,
+                  name:        '',
+                  isEnabled:   true,
+                  triggered:   {},
                   definitions: {},
-                  operations: [],
-                  filter: '',
+                  operations:  [],
+                  filter:      '',
                 };
                 watchEventChange.value = true;
                 resolve();
@@ -471,9 +594,9 @@ export default defineComponent({
 
               if (eventGetAll.operations.length === 0 || eventGetAll.operations[eventGetAll.operations.length - 1].name !== 'do-nothing') {
                 eventGetAll.operations.push({
-                  id: uuid(),
-                  name: 'do-nothing',
-                  definitions: {}
+                  id:          uuid(),
+                  name:        'do-nothing',
+                  definitions: {},
                 });
               }
 
@@ -488,7 +611,7 @@ export default defineComponent({
 
               console.debug('Loaded', eventGetAll);
               ctx.root.$nextTick(() => {
-                watchEventChange.value = true
+                watchEventChange.value = true;
                 ctx.emit('update:pending', false);
               });
               resolve();
@@ -502,10 +625,12 @@ export default defineComponent({
               reject(error(err));
             }
             data.push({ // add do nothing - its basicaly delete of operation
-              id: 'do-nothing',
+              id:          'do-nothing',
               definitions: {},
-              fire: () => {},
-            })
+              fire:        () => {
+                return;
+              },
+            });
             supported.value.operations = data.sort((a, b) => {
               const A = translate(a.id).toLowerCase();
               const B = translate(b.id).toLowerCase();
@@ -521,13 +646,13 @@ export default defineComponent({
             if (!ctx.root.$route.params.id) {
               // set first operation if we are in create mode
               editationItem.value.operations.push({
-                id: uuid(),
-                name: 'do-nothing',
+                id:          uuid(),
+                name:        'do-nothing',
                 definitions: {},
               });
             }
             resolve();
-          })
+          });
         }),
         new Promise<void>((resolve, reject) => {
           socket.emit('list.supported.events', (err: string | null, data: Events.SupportedEvent[]) => {
@@ -548,7 +673,7 @@ export default defineComponent({
                   return 0; //default return value (no sorting)
                 });
               } else {
-                d.variables = []
+                d.variables = [];
               }
             }
             supported.value.events = data.sort((a, b) => {
@@ -563,21 +688,25 @@ export default defineComponent({
               return 0; //default return value (no sorting)
             });
             resolve();
-          })
+          });
         }),
       ]);
       ctx.root.$nextTick(() => {
         ctx.emit('update:pending', false);
-        state.value.loading = ButtonStates.success
+        state.value.loading = ButtonStates.success;
       });
-    }
+    };
     const getDefinitionValidation = (key: string) => {
       const $v = instance?.$v;
       return get($v, 'editationItem.definitions.' + key, { $error: false });
     };
     const getOperationDefinitionValidation = (idx: number, key: string) => {
       const $v = instance?.$v;
-      return get($v, 'editationItem.operations.$each[' + idx + '].definitions.' + key, { $error: false, $dirty: false, $touch: () => {} });
+      return get($v, 'editationItem.operations.$each[' + idx + '].definitions.' + key, {
+        $error: false, $dirty: false, $touch: () => {
+          return;
+        },
+      });
     };
     const save = () =>  {
       const $v = instance?.$v;
@@ -588,7 +717,7 @@ export default defineComponent({
         socket.emit('events::save', editationItem.value, (err: string | null, eventId: string) => {
           if (err) {
             ctx.emit('update:saveState', ButtonStates.fail);
-            error(err)
+            error(err);
           } else {
             ctx.emit('update:saveState', ButtonStates.success);
           }
@@ -596,16 +725,16 @@ export default defineComponent({
           ctx.emit('refresh');
           setTimeout(() => {
             ctx.emit('update:saveState', ButtonStates.idle);
-          }, 1000)
-        })
+          }, 1000);
+        });
       }
-    }
+    };
     const stateOfOperationsErrorsDirty = () => {
       const $v = instance?.$v;
       return Object.values($v?.editationItem.operations?.$each.$iter ?? []).filter(o => {
-        return (!!o.$error && !!o.$dirty)
+        return (!!o.$error && !!o.$dirty);
       }).length > 0;
-    }
+    };
 
     return {
       events,
@@ -624,9 +753,9 @@ export default defineComponent({
       capitalize,
       ButtonStates,
       get,
-    }
-  }
-})
+    };
+  },
+});
 </script>
 
 <style scoped>

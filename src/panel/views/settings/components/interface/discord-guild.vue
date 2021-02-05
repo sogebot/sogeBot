@@ -14,7 +14,10 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import {
+  Component, Prop, Vue, Watch, 
+} from 'vue-property-decorator';
+
 import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
@@ -25,16 +28,16 @@ export default class discordGuild extends Vue {
   @Prop() readonly value!: any;
   @Prop() readonly title!: string;
 
-  socket = getSocket('/integrations/discord')
-  guilds: Guild[] = []
+  socket = getSocket('/integrations/discord');
+  guilds: Guild[] = [];
 
   currentValue = this.value;
   translatedTitle = translate(this.title);
 
   mounted() {
     this.socket.emit('discord::getGuilds', (err: string | null, guilds: Guild[]) => {
-      console.groupCollapsed('discord::getGuilds')
-      console.log({guilds});
+      console.groupCollapsed('discord::getGuilds');
+      console.log({ guilds });
       console.groupEnd();
       if (err) {
         return console.error(err);
@@ -51,5 +54,5 @@ export default class discordGuild extends Vue {
   onChange() {
     this.$emit('update', { value: this.currentValue });
   }
-};
+}
 </script>

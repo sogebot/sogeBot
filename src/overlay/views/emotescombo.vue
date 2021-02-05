@@ -12,15 +12,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from '@vue/composition-api'
+import {
+  defineComponent, onMounted, ref, 
+} from '@vue/composition-api';
+import JsonViewer from 'vue-json-viewer';
+
 import { getSocket } from 'src/panel/helpers/socket';
-import JsonViewer from 'vue-json-viewer'
 
 const socket = getSocket('/overlays/emotes', true);
 export default defineComponent({
-  components: {
-    JsonViewer,
-  },
+  components: { JsonViewer },
   setup() {
     const threshold = ref(3);
     const url = ref(null as null | string);
@@ -31,12 +32,12 @@ export default defineComponent({
 
     setInterval(() => {
       currentTime.value = Date.now();
-    }, 1000)
+    }, 1000);
 
     onMounted(() => {
       socket.on('combo', (opts: { count: number; url: string; threshold: number; inactivity: number }) => {
-        console.groupCollapsed('combo update received')
-        console.log({...opts});
+        console.groupCollapsed('combo update received');
+        console.log({ ...opts });
         console.groupEnd();
         threshold.value = opts.threshold;
         url.value = opts.url;
@@ -45,8 +46,10 @@ export default defineComponent({
         updatedAt.value = Date.now();
       });
     });
-    return { threshold, url, count, inactivity, updatedAt, currentTime }
-  }
+    return {
+      threshold, url, count, inactivity, updatedAt, currentTime, 
+    };
+  },
 });
 </script>
 

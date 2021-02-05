@@ -42,7 +42,7 @@ export class dashboardPerTypeAndUser1584981805762 implements MigrationInterface 
       await queryRunner.query('TRUNCATE TABLE "widget" CASCADE');
       for (const widget of widgets) {
         await queryRunner.query(
-          `INSERT INTO "widget"("id", "name", "positionX", "positionY", "height", "width", "dashboardId") values('${widget.id}', '${widget.name}', '${widget.positionX}', '${widget.positionY}', '${widget.height}', '${widget.width}', '${widget.dashboardId}')`
+          `INSERT INTO "widget"("id", "name", "positionX", "positionY", "height", "width", "dashboardId") values('${widget.id}', '${widget.name}', '${widget.positionX}', '${widget.positionY}', '${widget.height}', '${widget.width}', '${widget.dashboardId}')`,
         );
       }
     } catch (e) {

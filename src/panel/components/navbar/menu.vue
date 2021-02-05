@@ -36,24 +36,23 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from '@vue/composition-api'
+import {
+  defineComponent, onMounted, ref,
+} from '@vue/composition-api';
+import { PerfectScrollbar } from 'vue2-perfect-scrollbar';
 
-import translate from 'src/panel/helpers/translate';
+import type { menu as menuType } from 'src/bot/helpers/panel';
 import { getSocket } from 'src/panel/helpers/socket';
-import type { menu } from 'src/bot/helpers/panel';
+import translate from 'src/panel/helpers/translate';
 
-import { PerfectScrollbar } from 'vue2-perfect-scrollbar'
-import 'vue2-perfect-scrollbar/dist/vue2-perfect-scrollbar.css'
+import 'vue2-perfect-scrollbar/dist/vue2-perfect-scrollbar.css';
 
-
-type menuWithEnabled = Omit<typeof menu[number], 'this'> & { enabled: boolean };
+type menuWithEnabled = Omit<typeof menuType[number], 'this'> & { enabled: boolean };
 
 const socket = getSocket('/');
 
 export default defineComponent({
-  components: {
-    PerfectScrollbar
-  },
+  components: { PerfectScrollbar },
   setup() {
     const menu = ref([] as menuWithEnabled[]);
     const categories = ['manage', 'settings', 'registry', /* 'logs', */ 'stats'];
@@ -62,7 +61,7 @@ export default defineComponent({
     onMounted(async () => {
       // Workaround for touch screens - https://github.com/mdbootstrap/perfect-scrollbar/issues/867
       if (typeof (window as any).DocumentTouch === 'undefined') {
-        (window as any).DocumentTouch = HTMLDocument
+        (window as any).DocumentTouch = HTMLDocument;
       }
 
       const isLoaded = await Promise.race([
@@ -72,10 +71,10 @@ export default defineComponent({
               return console.error(err);
             }
             console.groupCollapsed('menu::menu');
-            console.log({data});
+            console.log({ data });
             console.groupEnd();
             for (const item of data.sort((a, b) => {
-              return translate('menu.' + a.name).localeCompare(translate('menu.' + b.name))
+              return translate('menu.' + a.name).localeCompare(translate('menu.' + b.name));
             })) {
               menu.value.push(item);
             }
@@ -88,15 +87,15 @@ export default defineComponent({
       ]);
 
       if (!isLoaded) {
-        console.error('menu not loaded, refreshing page')
+        console.error('menu not loaded, refreshing page');
         location.reload();
       }
     });
 
     return {
-      menu, categories, isDisabledHidden, translate
-    }
-  }
+      menu, categories, isDisabledHidden, translate,
+    };
+  },
 });
 
 </script>

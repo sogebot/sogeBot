@@ -62,20 +62,21 @@
 </template>
 
 <script lang="ts">
-import { getSocket } from 'src/panel/helpers/socket';
-import translate from 'src/panel/helpers/translate';
 
-import { defineComponent, ref, onMounted, computed } from '@vue/composition-api'
-import { isNil, escapeRegExp } from 'lodash-es';
+import {
+  computed, defineComponent, onMounted, ref, 
+} from '@vue/composition-api';
+import { escapeRegExp, isNil } from 'lodash-es';
+
 import { SpotifySongBanInterface } from 'src/bot/database/entity/spotify';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/integrations/spotify');
 
 export default defineComponent({
-  components: {
-    loading: () => import('../../../components/loading.vue'),
-  },
+  components: { loading: () => import('../../../components/loading.vue') },
   setup() {
     const items = ref([] as SpotifySongBanInterface[]);
 
@@ -83,7 +84,7 @@ export default defineComponent({
     const toAdd = ref('');
     const state = ref({
       loading: ButtonStates.progress,
-      import: ButtonStates.idle,
+      import:  ButtonStates.idle,
     } as {
       loading: number;
       import: number;
@@ -96,48 +97,50 @@ export default defineComponent({
     ];
 
     const fItems = computed (() => {
-      if (search.value.length === 0) return items.value
+      if (search.value.length === 0) {
+        return items.value;
+      }
       return items.value.filter((o) => {
-        const isSearchInTitle = !isNil(o.title.match(new RegExp(escapeRegExp(search.value), 'ig')))
-        return isSearchInTitle
-      })
-    })
+        const isSearchInTitle = !isNil(o.title.match(new RegExp(escapeRegExp(search.value), 'ig')));
+        return isSearchInTitle;
+      });
+    });
 
     onMounted(() => {
       refreshBanlist();
-    })
+    });
 
     const refreshBanlist = () => {
       state.value.loading = ButtonStates.progress;
       socket.emit('spotify::getAllBanned', {}, (err: string | null, _items: SpotifySongBanInterface[]) => {
-        items.value = _items
+        items.value = _items;
         state.value.loading = ButtonStates.success;
-      })
-    }
+      });
+    };
 
     const deleteItem = (id: string)  => {
       if (confirm('Do you want to delete ' + items.value.find((o) => o.spotifyUri === id)?.title + '?')) {
         socket.emit('spotify::deleteBan', { spotifyUri: id }, () => {
-          items.value = items.value.filter((o) => o.spotifyUri !== id)
-        })
+          items.value = items.value.filter((o) => o.spotifyUri !== id);
+        });
       }
-    }
+    };
 
     const addSongOrPlaylist = (evt: Event) => {
       if (evt) {
-        evt.preventDefault()
+        evt.preventDefault();
       }
       if (state.value.import === 0) {
-        state.value.import = 1
+        state.value.import = 1;
         socket.emit('spotify::addBan', toAdd.value, (err: string | null, info: { banned: number }) => {
-          state.value.import = 2
-          refreshBanlist()
+          state.value.import = 2;
+          refreshBanlist();
           setTimeout(() => {
-            state.value.import = 0
-          }, 5000)
-        })
+            state.value.import = 0;
+          }, 5000);
+        });
       }
-    }
+    };
 
     return {
       items,
@@ -150,9 +153,9 @@ export default defineComponent({
       addSongOrPlaylist,
 
       translate,
-    }
-  }
-})
+    };
+  },
+});
 </script>
 
 <style>

@@ -75,40 +75,41 @@
 </template>
 
 <script>
-import { EventBus } from 'src/panel/helpers/event-bus';
-import { getSocket } from 'src/panel/helpers/socket';
+import {
+  defineComponent, onMounted, ref, 
+} from '@vue/composition-api';
 import { sortBy } from 'lodash-es';
-
 import VueGridLayout from 'vue-grid-layout';
 import { vueWindowSizeMixin } from 'vue-window-size';
 
-import { defineComponent, ref, onMounted } from '@vue/composition-api'
+import { EventBus } from 'src/panel/helpers/event-bus';
+import { getSocket } from 'src/panel/helpers/socket';
 
 const socket = getSocket('/');
 
 export default defineComponent({
-  mixins: [ vueWindowSizeMixin ],
+  mixins:     [ vueWindowSizeMixin ],
   components: {
-    bets: () => import('src/panel/widgets/components/bets.vue'),
-    chat: () => import('src/panel/widgets/components/chat.vue'),
-    cmdboard: () => import('src/panel/widgets/components/cmdboard.vue'),
-    commercial: () => import('src/panel/widgets/components/commercial.vue'),
+    bets:            () => import('src/panel/widgets/components/bets.vue'),
+    chat:            () => import('src/panel/widgets/components/chat.vue'),
+    cmdboard:        () => import('src/panel/widgets/components/cmdboard.vue'),
+    commercial:      () => import('src/panel/widgets/components/commercial.vue'),
     customvariables: () => import('src/panel/widgets/components/customvariables.vue'),
-    eventlist: () => import('src/panel/widgets/components/eventlist.vue'),
-    join: () => import('src/panel/widgets/components/join.vue'),
-    part: () => import('src/panel/widgets/components/part.vue'),
-    queue: () => import('src/panel/widgets/components/queue.vue'),
-    raffles: () => import('src/panel/widgets/components/raffles.vue'),
-    randomizer: () => import('src/panel/widgets/components/randomizer.vue'),
-    soundboard: () => import('src/panel/widgets/components/soundboard.vue'),
-    spotify: () => import('src/panel/widgets/components/spotify.vue'),
-    twitch: () => import('src/panel/widgets/components/twitch.vue'),
-    widgetCreate: () => import('src/panel/widgets/components/widget_create.vue'),
+    eventlist:       () => import('src/panel/widgets/components/eventlist.vue'),
+    join:            () => import('src/panel/widgets/components/join.vue'),
+    part:            () => import('src/panel/widgets/components/part.vue'),
+    queue:           () => import('src/panel/widgets/components/queue.vue'),
+    raffles:         () => import('src/panel/widgets/components/raffles.vue'),
+    randomizer:      () => import('src/panel/widgets/components/randomizer.vue'),
+    soundboard:      () => import('src/panel/widgets/components/soundboard.vue'),
+    spotify:         () => import('src/panel/widgets/components/spotify.vue'),
+    twitch:          () => import('src/panel/widgets/components/twitch.vue'),
+    widgetCreate:    () => import('src/panel/widgets/components/widget_create.vue'),
     dashboardRemove: () => import('src/panel/widgets/components/dashboard_remove.vue'),
-    ytplayer: () => import('src/panel/widgets/components/ytplayer.vue'),
-    social: () => import('src/panel/widgets/components/social.vue'),
-    GridLayout: VueGridLayout.GridLayout,
-    GridItem: VueGridLayout.GridItem,
+    ytplayer:        () => import('src/panel/widgets/components/ytplayer.vue'),
+    social:          () => import('src/panel/widgets/components/social.vue'),
+    GridLayout:      VueGridLayout.GridLayout,
+    GridItem:        VueGridLayout.GridItem,
   },
   setup(props, ctx) {
     const dashboards = ref([]);
@@ -118,7 +119,7 @@ export default defineComponent({
     const mainDashboard =  ref('');
     const show =  ref(true);
     const isLoaded =  ref(false);
-    const layout =  ref({'null': []});
+    const layout =  ref({ 'null': [] });
     const isLayoutInitialized =  ref(false);
 
     const refreshWidgets = () => {
@@ -144,7 +145,7 @@ export default defineComponent({
       for (const dashboard of dashboards.value) {
         dashboard.widgets = dashboard.widgets.filter(o => o.name !== name);
       }
-      socket.emit('panel::dashboards::save', dashboards.value)
+      socket.emit('panel::dashboards::save', dashboards.value);
       refreshWidgets();
     };
     const updateLayout = () => {
@@ -154,25 +155,25 @@ export default defineComponent({
         for (const dashboard of dashboards.value) {
           dashboard.widgets = layout.value[dashboard.id].map(o => {
             return {
-              id: o.id,
-              positionX: o.x,
-              positionY: o.y,
-              width: o.w,
-              height: o.h,
-              name: o.name,
+              id:          o.id,
+              positionX:   o.x,
+              positionY:   o.y,
+              width:       o.w,
+              height:      o.h,
+              name:        o.name,
               dashboardId: dashboard.id,
             };
           });
-        };
-        socket.emit('panel::dashboards::save', dashboards.value)
+        }
+        socket.emit('panel::dashboards::save', dashboards.value);
       } else {
         console.debug('Layout is not initialized yet, we are skipping updateLayout()');
       }
     };
     const removeDashboard = (dashboardId) => {
-      dashboards.value = dashboards.value.filter(o => String(o.id) !== dashboardId)
-      currentDashboard.value = dashboards.value[0].id
-      socket.emit('panel::dashboards::save', dashboards.value)
+      dashboards.value = dashboards.value.filter(o => String(o.id) !== dashboardId);
+      currentDashboard.value = dashboards.value[0].id;
+      socket.emit('panel::dashboards::save', dashboards.value);
       refreshWidgets();
     };
     const addWidget = () => {
@@ -191,24 +192,24 @@ export default defineComponent({
           return console.error(err);
         }
         layout.value[created.id] = [];
-        dashboards.value.push(created)
-      })
-      dashboardName.value = ''
-      addDashboard.value = false
+        dashboards.value.push(created);
+      });
+      dashboardName.value = '';
+      addDashboard.value = false;
       refreshWidgets();
-    }
+    };
 
     onMounted(async () => {
       isLoaded.value = await Promise.race([
         new Promise(resolve => {
           socket.emit('panel::dashboards', { userId: Number(ctx.root.$store.state.loggedUser.id), type: 'admin' }, (err, dashboardsFromSocket) => {
             console.groupCollapsed('dashboard::panel::dashboards');
-            console.log({err, dashboards: dashboardsFromSocket});
+            console.log({ err, dashboards: dashboardsFromSocket });
             console.groupEnd();
             if (err) {
               return console.error(err);
             }
-            mainDashboard.value = dashboardsFromSocket[0].id
+            mainDashboard.value = dashboardsFromSocket[0].id;
             currentDashboard.value = dashboardsFromSocket[0].id;
             for (const item of dashboardsFromSocket) {
               dashboards.value.push(item);
@@ -222,14 +223,14 @@ export default defineComponent({
         }),
       ]);
       if (!isLoaded.value) {
-        console.error('panel::dashboards not loaded, refreshing page')
+        console.error('panel::dashboards not loaded, refreshing page');
         location.reload();
       }
 
       EventBus.$on('remove-widget', (id) => {
         removeWidget(id);
       });
-    })
+    });
 
     return {
       sortBy,
@@ -248,7 +249,7 @@ export default defineComponent({
       removeDashboard,
       addWidget,
       createDashboard,
-    }
-  }
-})
+    };
+  },
+});
 </script>

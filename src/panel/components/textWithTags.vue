@@ -3,8 +3,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api'
-import { sortBy, keys, isNil } from 'lodash-es';
+import { defineComponent } from '@vue/composition-api';
+import {
+  isNil, keys, sortBy, 
+} from 'lodash-es';
 
 import { flatten } from 'src/bot/helpers/flatten';
 import translate from 'src/panel/helpers/translate';
@@ -14,17 +16,15 @@ interface Props {
 }
 
 export default defineComponent({
-  props: {
-    value: String,
-  },
+  props: { value: String },
   setup(props: Props, context) {
     const filter = (val: string) => {
       const filtersRegExp = new RegExp('\\$(' + sortBy(keys(flatten(translate('responses.variable', true))), (o) => -o.length).join('|') + ')', 'g');
       val = val.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-      let matches = val.match(filtersRegExp);
+      const matches = val.match(filtersRegExp);
       let output = val;
       if (!isNil(matches)) {
-        for (let match of matches) {
+        for (const match of matches) {
           output = output.replace(match,
             `<span contenteditable="false" class="editable-variable">
               ${translate('responses.variable.' + match.replace('$', ''))}
@@ -32,8 +32,8 @@ export default defineComponent({
         }
       }
       return output;
-    }
-    return { filter }
-  }
+    };
+    return { filter };
+  },
 });
 </script>

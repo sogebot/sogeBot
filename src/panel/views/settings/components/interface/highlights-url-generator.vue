@@ -32,26 +32,27 @@
   </div>
 </template>
 
-
 <script lang="ts">
-import { computed, defineComponent, ref, watch } from '@vue/composition-api'
+import {
+  computed, defineComponent, ref, watch, 
+} from '@vue/composition-api';
 import { v4 } from 'uuid';
-import translate from 'src/panel/helpers/translate';
 
 import type { default as Highlights } from 'src/bot/systems/highlights';
+import translate from 'src/panel/helpers/translate';
 
 export default defineComponent({
   props: {
     values: Array,
-    title: String,
+    title:  String,
   },
   setup(props: { values: typeof Highlights['urls']; title: string }, ctx) {
     const currentValues = ref(props.values);
-    const translatedTitle = ref(translate(props.title))
+    const translatedTitle = ref(translate(props.title));
     const origin = computed(() => window.location.origin);
 
     watch(currentValues, (val) => {
-      ctx.emit('update', { value: val })
+      ctx.emit('update', { value: val });
     }, { deep: true });
 
     function removeItem(index: number) {
@@ -63,7 +64,7 @@ export default defineComponent({
       origin,
       removeItem,
       v4,
-    }
-  }
+    };
+  },
 });
 </script>

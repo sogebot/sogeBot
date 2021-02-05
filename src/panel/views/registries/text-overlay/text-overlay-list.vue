@@ -75,110 +75,121 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faHtml5 } from '@fortawesome/free-brands-svg-icons';
+import {
+  faClone, faEllipsisH, faEllipsisV, faPencilAlt, 
+} from '@fortawesome/free-solid-svg-icons';
 import { isNil, orderBy } from 'lodash-es';
-import Prism from 'vue-prism-component'
-import { getSocket } from 'src/panel/helpers/socket';
 import { v4 as uuid } from 'uuid';
+import Prism from 'vue-prism-component';
+import { Component, Vue } from 'vue-property-decorator';
+
+import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faPencilAlt, faEllipsisH, faEllipsisV, faClone } from '@fortawesome/free-solid-svg-icons';
-import { faHtml5 } from '@fortawesome/free-brands-svg-icons';
 library.add(faPencilAlt, faHtml5, faEllipsisH, faEllipsisV, faClone);
 
-import 'prismjs'
-import 'prismjs/themes/prism.css'
+import 'prismjs';
+import 'prismjs/themes/prism.css';
 import { TextInterface } from '../../../../bot/database/entity/text';
 
 @Component({
   components: {
-    'loading': () => import('../../../components/loading.vue'),
+    'loading':     () => import('../../../components/loading.vue'),
     'hold-button': () => import('../../../components/holdButton.vue'),
-    'prism': Prism,
+    'prism':       Prism,
   },
   filters: {
     capitalize(value: string) {
-      if (!value) return ''
-      value = value.toString()
-      return value.charAt(0).toUpperCase() + value.slice(1)
-    }
-  }
+      if (!value) {
+        return '';
+      }
+      value = value.toString();
+      return value.charAt(0).toUpperCase() + value.slice(1);
+    },
+  },
 })
 export default class textOverlayList extends Vue {
-    translate = translate;
-    search: string = '';
-    state: { loaded: boolean; } = { loaded: false }
-    showMore: string[] = [];
-    items: any[] = [];
-    socket = getSocket('/registries/text');
+  translate = translate;
+  search = '';
+  state: { loaded: boolean; } = { loaded: false };
+  showMore: string[] = [];
+  items: any[] = [];
+  socket = getSocket('/registries/text');
 
-    get filtered() {
-      if (this.search.length === 0) return this.items
-      return this.items.filter((o) => {
-        const isSearchInName = !isNil(o.name.match(new RegExp(this.search, 'ig')))
-        const isSearchInText = !isNil(o.text.match(new RegExp(this.search, 'ig')))
-        return isSearchInName || isSearchInText
-      })
+  get filtered() {
+    if (this.search.length === 0) {
+      return this.items;
     }
+    return this.items.filter((o) => {
+      const isSearchInName = !isNil(o.name.match(new RegExp(this.search, 'ig')));
+      const isSearchInText = !isNil(o.text.match(new RegExp(this.search, 'ig')));
+      return isSearchInName || isSearchInText;
+    });
+  }
 
-    created() {
-      this.state.loaded = false;
-      this.refresh();
-    }
+  created() {
+    this.state.loaded = false;
+    this.refresh();
+  }
 
-    refresh() {
-      this.socket.emit('generic::getAll', (err: string | null, items: TextInterface) => {
-        if (err) {
-          return console.error(err)
-        }
-        this.items = orderBy(items, 'name', 'asc')
-        this.items.map(o => { o.show = 'html'; return o })
-        this.state.loaded = true;
-      })
-    }
-
-    less(value: string, type: 'js' | 'html' | 'css') {
-      const comments = {
-        'js': { start: '/*', end: '*/' },
-        'css': { start: '/*', end: '*/' },
-        'html': { start: '<!--', end: '-->' }
+  refresh() {
+    this.socket.emit('generic::getAll', (err: string | null, items: TextInterface) => {
+      if (err) {
+        return console.error(err);
       }
-      const lines = value.split(/\r?\n/g)
-      value = lines.slice(0, 5).join('\n')
-
-      if (lines.length - 5 > 0) {
-        value += '\n\n' + comments[type].start + ' '  + (lines.length - 5) + ' lines hidden, click show more ' + comments[type].end
-      }
-      return value
-    }
-
-    toggleShowMore(_id: string) {
-      let idx = this.showMore.indexOf(_id)
-      if(idx !== -1) {
-        this.showMore.splice(idx, 1)
-      } else {
-        this.showMore.push(_id)
-      }
-    }
-
-    clone(item: TextInterface) {
-      this.socket.emit('text::save', { ...item, id: uuid(), name: item.name + ' (clone)' }, (err: string | null, data: TextInterface) => {
-        if (err) {
-          console.error(err)
-        }
-        this.refresh();
+      this.items = orderBy(items, 'name', 'asc');
+      this.items.map(o => {
+        o.show = 'html'; return o; 
       });
-    }
+      this.state.loaded = true;
+    });
+  }
 
-    remove(item: TextInterface) {
-      this.socket.emit('text::remove', item, () => {
-        this.items = this.items.filter(o => o.id != item.id)
-      })
-    }
+  less(value: string, type: 'js' | 'html' | 'css') {
+    const comments = {
+      'js':   { start: '/*', end: '*/' },
+      'css':  { start: '/*', end: '*/' },
+      'html': { start: '<!--', end: '-->' },
+    };
+    const lines = value.split(/\r?\n/g);
+    value = lines.slice(0, 5).join('\n');
 
-    goTo(id: string) {
-      this.$router.push({ name: 'TextOverlayEdit', params: { id } })
+    if (lines.length - 5 > 0) {
+      value += '\n\n' + comments[type].start + ' '  + (lines.length - 5) + ' lines hidden, click show more ' + comments[type].end;
     }
+    return value;
+  }
+
+  toggleShowMore(_id: string) {
+    const idx = this.showMore.indexOf(_id);
+    if(idx !== -1) {
+      this.showMore.splice(idx, 1);
+    } else {
+      this.showMore.push(_id);
+    }
+  }
+
+  clone(item: TextInterface) {
+    this.socket.emit('text::save', {
+      ...item, id: uuid(), name: item.name + ' (clone)', 
+    }, (err: string | null, data: TextInterface) => {
+      if (err) {
+        console.error(err);
+      }
+      this.refresh();
+    });
+  }
+
+  remove(item: TextInterface) {
+    this.socket.emit('text::remove', item, () => {
+      this.items = this.items.filter(o => o.id != item.id);
+    });
+  }
+
+  goTo(id: string) {
+    this.$router.push({ name: 'TextOverlayEdit', params: { id } });
+  }
 }
 </script>

@@ -44,20 +44,19 @@
 </template>
 
 <script lang="ts">
+import Vue from 'vue';
+
 import { EventBus } from 'src/panel/helpers/event-bus';
-import Vue from 'vue'
 import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
 export default Vue.extend({
-  props: ['popout', 'nodrag'],
-  components: {
-    loading: () => import('src/panel/components/loading.vue'),
-  },
-  data: function () {
+  props:      ['popout', 'nodrag'],
+  components: { loading: () => import('src/panel/components/loading.vue') },
+  data:       function () {
     const data: {
       EventBus: any,
-      items: Array<{}>,
+      items: Array<Record<string, any>>,
       socket: any,
       state: { loading: number },
       interval: number,
@@ -65,13 +64,11 @@ export default Vue.extend({
     } = {
       translate,
       EventBus,
-      socket: getSocket('/widgets/social'),
-      items: [],
-      state: {
-        loading: this.$state.progress,
-      },
+      socket:   getSocket('/widgets/social'),
+      items:    [],
+      state:    { loading: this.$state.progress },
       interval: 0,
-    }
+    };
     return data;
   },
   mounted: function () {
@@ -79,21 +76,21 @@ export default Vue.extend({
     this.load();
     this.interval = window.setInterval(() => {
       this.load();
-    }, 10000)
+    }, 10000);
   },
   beforeDestroy() {
     clearInterval(this.interval);
   },
   methods: {
     load() {
-      this.socket.emit('generic::getAll', { limit: 50 }, (err: string | null, d: Array<{}>) => {
+      this.socket.emit('generic::getAll', { limit: 50 }, (err: string | null, d: Array<Record<string, any>>) => {
         if (err) {
           return console.error(err);
         }
         this.items = d;
         this.state.loading = this.$state.success;
-      })
-    }
-  }
-})
+      });
+    },
+  },
+});
 </script>

@@ -16,7 +16,7 @@ const math: ResponseFilter = {
         const currentValue = await getValueOf(variable);
         toEvaluate = toEvaluate.replace(
           variable,
-          isNaN(Number(currentValue)) ? 0 : currentValue
+          isNaN(Number(currentValue)) ? 0 : currentValue,
         );
       }
     }
@@ -39,7 +39,7 @@ const math: ResponseFilter = {
         const currentValue = await getValueOf(variable);
         toEvaluate = toEvaluate.replace(
           variable,
-          isNaN(Number(currentValue)) ? 0 : currentValue
+          isNaN(Number(currentValue)) ? 0 : currentValue,
         );
       }
     }
@@ -62,7 +62,7 @@ const math: ResponseFilter = {
         const currentValue = await getValueOf(variable);
         toEvaluate = toEvaluate.replace(
           variable,
-          isNaN(Number(currentValue)) ? 0 : currentValue
+          isNaN(Number(currentValue)) ? 0 : currentValue,
         );
       }
     }

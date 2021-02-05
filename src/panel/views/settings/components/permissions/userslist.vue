@@ -59,117 +59,114 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue'
-  import { v4 as uuid } from 'uuid';
-  import { chunk, isEqual } from 'lodash-es';
-  import { getSocket } from 'src/panel/helpers/socket';
-  import translate from 'src/panel/helpers/translate';
+import { chunk, isEqual } from 'lodash-es';
+import { v4 as uuid } from 'uuid';
+import Vue from 'vue';
 
-  export default Vue.extend({
-    props: ['ids'],
-    data() {
-      const data: {
-        translate: any,
-        chunk: any,
-        usersSocket: any,
-        currentIds: number[],
-        currentUsers: {
-          username: string,
-          id: number,
-        }[],
-        users: any[],
-        testUsername: string,
-        inputUsername: string,
-        isFocused: boolean,
-        isSearching: boolean,
-        stateSearch: string,
-        searchData: string[],
-        searchPage: number,
-      } = {
-        translate: translate,
-        chunk: chunk,
-        usersSocket: getSocket('/core/users'),
-        currentIds: this.ids,
-        currentUsers: [],
-        users: [],
-        testUsername: '',
-        inputUsername: '',
-        isFocused: false,
-        isSearching: false,
-        stateSearch: '',
-        searchData: [],
-        searchPage: 0,
-      }
-      return data;
-    },
-    mounted() {
-      this.currentIds = this.currentIds.map(o => Number(o));
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
-      for (const id of this.currentIds) {
-        if (!this.currentUsers.find(o => o.id === id)) {
-          this.usersSocket.emit('getNameById', id, (err: string | null, username: string) => {
-            if (err) {
-              return console.error(err);
-            }
-            this.currentUsers.push({
-              id, username
-            });
-          });
-        }
+export default Vue.extend({
+  props: ['ids'],
+  data() {
+    const data: {
+      translate: any,
+      chunk: any,
+      usersSocket: any,
+      currentIds: number[],
+      currentUsers: {
+        username: string,
+        id: number,
+      }[],
+      users: any[],
+      testUsername: string,
+      inputUsername: string,
+      isFocused: boolean,
+      isSearching: boolean,
+      stateSearch: string,
+      searchData: string[],
+      searchPage: number,
+    } = {
+      translate:     translate,
+      chunk:         chunk,
+      usersSocket:   getSocket('/core/users'),
+      currentIds:    this.ids,
+      currentUsers:  [],
+      users:         [],
+      testUsername:  '',
+      inputUsername: '',
+      isFocused:     false,
+      isSearching:   false,
+      stateSearch:   '',
+      searchData:    [],
+      searchPage:    0,
+    };
+    return data;
+  },
+  mounted() {
+    this.currentIds = this.currentIds.map(o => Number(o));
+
+    for (const id of this.currentIds) {
+      if (!this.currentUsers.find(o => o.id === id)) {
+        this.usersSocket.emit('getNameById', id, (err: string | null, username: string) => {
+          if (err) {
+            return console.error(err);
+          }
+          this.currentUsers.push({ id, username });
+        });
+      }
+    }
+  },
+  watch: {
+    inputUsername(val) {
+      // on change reset status
+      this.isSearching = false;
+      this.searchPage = 0;
+      this.searchData = [];
+      this.testUsername = '';
+      this.stateSearch = uuid();
+    },
+    currentIds: function (val) {
+      if (!isEqual(val, this.ids)) {
+        this.$emit('update', val);
       }
     },
-    watch: {
-      inputUsername(val) {
-        // on change reset status
+  },
+  methods: {
+    search(val: string) {
+      this.isSearching = true;
+      const state = uuid();
+      this.stateSearch = state;
+
+      if (val.trim().length === 0) {
         this.isSearching = false;
         this.searchPage = 0;
         this.searchData = [];
-        this.testUsername = '';
-        this.stateSearch = uuid();
-      },
-      currentIds: function (val) {
-        if (!isEqual(val, this.ids)) {
-          this.$emit('update', val)
-        }
+      } else {
+        this.testUsername = val;
+        this.usersSocket.emit('find.viewers', { search: val, state }, (err: string | null, r: string[]) => {
+          if (err) {
+            return console.error(err);
+          }
+          if (state === this.stateSearch) {
+            // expecting this data
+            this.searchData = r;
+            this.searchPage = 0;
+            this.isSearching = false;
+          }
+        });
       }
     },
-    methods: {
-      search(val: string) {
-        this.isSearching = true
-        const state = uuid()
-        this.stateSearch = state
-
-        if (val.trim().length === 0) {
-           this.isSearching = false;
-           this.searchPage = 0;
-           this.searchData = [];
-        } else {
-          this.testUsername = val;
-          this.usersSocket.emit('find.viewers', { search: val, state }, (err: string | null, r: string[]) => {
-            if (err) {
-              return console.error(err);
-            }
-            if (state === this.stateSearch) {
-              // expecting this data
-              this.searchData = r;
-              this.searchPage = 0;
-              this.isSearching = false;
-            }
-          })
-        }
-      },
-      toggleUser(username: string, id: number) {
-        this.currentUsers.push({
-          username, id
-        })
-        if(this.currentIds.find((o) => o === id)) {
-          this.currentIds = this.currentIds.filter(o => o !== id)
-        } else {
-          this.currentIds.push(id);
-        }
+    toggleUser(username: string, id: number) {
+      this.currentUsers.push({ username, id });
+      if(this.currentIds.find((o) => o === id)) {
+        this.currentIds = this.currentIds.filter(o => o !== id);
+      } else {
+        this.currentIds.push(id);
       }
-    }
-  })
+    },
+  },
+});
 </script>
 
 <style scoped>

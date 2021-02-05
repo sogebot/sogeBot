@@ -192,7 +192,7 @@ class Scrim extends System {
                 return; // user restarted !snipe
               }
               announce(
-                prepare('systems.scrim.putMatchIdInChat', { command: this.getCommand('!snipe match') }), 'scrim'
+                prepare('systems.scrim.putMatchIdInChat', { command: this.getCommand('!snipe match') }), 'scrim',
               );
               setTimeout(async () => {
                 if (this.closingAt !== 0) {

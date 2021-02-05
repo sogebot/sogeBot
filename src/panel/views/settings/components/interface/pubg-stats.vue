@@ -26,20 +26,20 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref } from '@vue/composition-api'
+import { defineComponent, ref } from '@vue/composition-api';
+import JsonViewer from 'vue-json-viewer';
+
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { error } from 'src/panel/helpers/error';
 import { getSocket } from 'src/panel/helpers/socket';
-import { getVariantByState } from 'src/panel/helpers/variant';
 import translate from 'src/panel/helpers/translate';
-
-import JsonViewer from 'vue-json-viewer'
+import { getVariantByState } from 'src/panel/helpers/variant';
 
 const socket = getSocket('/integrations/pubg');
 
 type Props = {
   value: string; title: string, settings: { [x: string]: any }
-}
+};
 
 export default defineComponent({
   components: {
@@ -48,14 +48,12 @@ export default defineComponent({
   },
   props: {
     settings: Object,
-    value: Object,
-    title: String,
+    value:    Object,
+    title:    String,
   },
   setup(props: Props, ctx) {
     const fetchedPlayerStats = ref(props.value);
-    const state = ref({
-      fetching: ButtonStates.idle
-    } as {
+    const state = ref({ fetching: ButtonStates.idle } as {
       fetching: number;
     });
     const translatedTitle = translate(props.title);
@@ -63,11 +61,11 @@ export default defineComponent({
     const getPlayerStats = () => {
       state.value.fetching = ButtonStates.progress;
       socket.emit('pubg::getUserStats', {
-        apiKey: props.settings?.settings.apiKey,
+        apiKey:   props.settings?.settings.apiKey,
         platform: props.settings?.player.platform,
         playerId: props.settings?.player.playerId,
         seasonId: props.settings?.player.seasonId,
-        ranked: props.title.toLowerCase().includes('ranked'),
+        ranked:   props.title.toLowerCase().includes('ranked'),
       }, (err: string | null, data: any) => {
         if (err) {
           error(err);
@@ -83,11 +81,13 @@ export default defineComponent({
         }
         setTimeout(() => {
           state.value.fetching = ButtonStates.idle;
-        }, 1000)
-      })
-    }
+        }, 1000);
+      });
+    };
 
-    return { fetchedPlayerStats, getPlayerStats, state, ButtonStates, translatedTitle, getVariantByState, translate }
+    return {
+      fetchedPlayerStats, getPlayerStats, state, ButtonStates, translatedTitle, getVariantByState, translate, 
+    };
   },
 });
 </script>

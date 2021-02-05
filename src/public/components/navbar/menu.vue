@@ -9,28 +9,27 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from '@vue/composition-api'
+import {
+  defineComponent, onMounted, ref, 
+} from '@vue/composition-api';
+import { PerfectScrollbar } from 'vue2-perfect-scrollbar';
+import 'vue2-perfect-scrollbar/dist/vue2-perfect-scrollbar.css';
 
-import { PerfectScrollbar } from 'vue2-perfect-scrollbar'
-import 'vue2-perfect-scrollbar/dist/vue2-perfect-scrollbar.css'
-
+import type { menuPublic } from 'src/bot/helpers/panel';
 import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
-import type { menuPublic } from 'src/bot/helpers/panel';
 
 const socket = getSocket('/');
 
 export default defineComponent({
-  components: {
-    PerfectScrollbar
-  },
+  components: { PerfectScrollbar },
   setup() {
     const menu = ref([] as typeof menuPublic);
 
     onMounted(async () => {
       // Workaround for touch screens - https://github.com/mdbootstrap/perfect-scrollbar/issues/867
       if (typeof (window as any).DocumentTouch === 'undefined') {
-        (window as any).DocumentTouch = HTMLDocument
+        (window as any).DocumentTouch = HTMLDocument;
       }
 
       socket.emit('menu::public', (err: string | null, data: typeof menuPublic) => {
@@ -38,18 +37,18 @@ export default defineComponent({
           return console.error(err);
         }
         console.groupCollapsed('menu::menu::public');
-        console.log({data});
+        console.log({ data });
         console.groupEnd();
         for (const item of data.sort((a, b) => {
-          return translate('menu.' + a.name).localeCompare(translate('menu.' + b.name))
+          return translate('menu.' + a.name).localeCompare(translate('menu.' + b.name));
         })) {
           menu.value.push(item);
         }
       });
     });
-  return { menu, translate }
-  }
-})
+    return { menu, translate };
+  },
+});
 </script>
 <style>
 .ps__rail-x {

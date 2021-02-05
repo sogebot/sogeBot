@@ -155,23 +155,24 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator';
-import { getSocket } from 'src/panel/helpers/socket';
-import type { AlertInterface, CommonSettingsInterface } from 'src/bot/database/entity/alert';
-import translate from 'src/panel/helpers/translate';
-
-import { Route } from 'vue-router'
 import { NextFunction } from 'express';
-
-import { remove, every, cloneDeep } from 'lodash-es';
-
-import defaultImage from '!!base64-loader!./media/cow01.gif';
-import defaultAudio from '!!base64-loader!./media/456968__funwithsound__success-resolution-video-game-fanfare-sound-effect.mp3';
-
+import {
+  cloneDeep, every, remove,
+} from 'lodash-es';
+import { v4 as uuid } from 'uuid';
+import {
+  Component, Vue, Watch,
+} from 'vue-property-decorator';
+import { Route } from 'vue-router';
 import { Validations } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators';
 
-import { v4 as uuid } from 'uuid';
+import type { AlertInterface, CommonSettingsInterface } from 'src/bot/database/entity/alert';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
+
+import defaultAudio from '!!base64-loader!./media/456968__funwithsound__success-resolution-video-game-fanfare-sound-effect.mp3';
+import defaultImage from '!!base64-loader!./media/cow01.gif';
 
 const supportedEvents = ['follows', 'cheers', 'subs', 'resubs', 'subcommunitygifts', 'subgifts',  'tips', 'hosts', 'raids', 'cmdredeems', 'rewardredeems'] as const;
 
@@ -192,26 +193,28 @@ type isValid = {
 Component.registerHooks([
   'beforeRouteEnter',
   'beforeRouteLeave',
-  'beforeRouteUpdate' // for vue-router 2.2+
-])
+  'beforeRouteUpdate', // for vue-router 2.2+
+]);
 
 @Component({
   components: {
-    'loading': () => import('../../../components/loading.vue'),
-    'form-follow': () => import('./components/form-follow.vue'),
-    'form-cheers': () => import('./components/form-cheers.vue'),
-    'form-resubs': () => import('./components/form-resubs.vue'),
-    'form-reward': () => import('./components/form-reward.vue'),
+    'loading':       () => import('../../../components/loading.vue'),
+    'form-follow':   () => import('./components/form-follow.vue'),
+    'form-cheers':   () => import('./components/form-cheers.vue'),
+    'form-resubs':   () => import('./components/form-resubs.vue'),
+    'form-reward':   () => import('./components/form-reward.vue'),
     'title-divider': () => import('src/panel/components/title-divider.vue'),
-    'test': () => import('./alerts-test.vue'),
+    'test':          () => import('./alerts-test.vue'),
   },
   filters: {
     capitalize: function (value: string) {
-      if (!value) return ''
-      value = value.toString()
-      return value.charAt(0).toUpperCase() + value.slice(1)
-    }
-  }
+      if (!value) {
+        return '';
+      }
+      value = value.toString();
+      return value.charAt(0).toUpperCase() + value.slice(1);
+    },
+  },
 })
 export default class AlertsEdit extends Vue {
   translate = translate;
@@ -221,19 +224,19 @@ export default class AlertsEdit extends Vue {
   validationDate = Date.now();
   keyDate = Date.now();
 
-  state: { loaded: number; save: number } = { loaded: this.$state.progress, save: this.$state.idle }
-  pending: boolean = false;
+  state: { loaded: number; save: number } = { loaded: this.$state.progress, save: this.$state.idle };
+  pending = false;
 
   supportedEvents = supportedEvents;
-  selectedNewEvent = 'follows'
-  selectedAlertId: string = '';
+  selectedNewEvent = 'follows';
+  selectedAlertId = '';
 
   item: AlertInterface = {
-    id: uuid(),
-    updatedAt: Date.now(),
-    name: '',
-    alertDelayInMs: 0,
-    profanityFilterType: 'replace-with-asterisk',
+    id:                        uuid(),
+    updatedAt:                 Date.now(),
+    name:                      '',
+    alertDelayInMs:            0,
+    profanityFilterType:       'replace-with-asterisk',
     loadStandardProfanityList: {
       cs: false,
       en: true,
@@ -241,36 +244,35 @@ export default class AlertsEdit extends Vue {
     },
     customProfanityList: '',
 
-    follows: [],
-    hosts: [],
-    raids: [],
-    cheers: [],
-    subs: [],
-    tips: [],
-    resubs: [],
-    subgifts: [],
+    follows:           [],
+    hosts:             [],
+    raids:             [],
+    cheers:            [],
+    subs:              [],
+    tips:              [],
+    resubs:            [],
+    subgifts:          [],
     subcommunitygifts: [],
-    cmdredeems: [],
-    rewardredeems: [],
-  }
+    cmdredeems:        [],
+    rewardredeems:     [],
+  };
 
   isValid: isValid = {
-    follows: {},
-    cheers: {},
-    subs: {},
-    resubs: {},
-    subgifts: {},
+    follows:           {},
+    cheers:            {},
+    subs:              {},
+    resubs:            {},
+    subgifts:          {},
     subcommunitygifts: {},
-    tips: {},
-    hosts: {},
-    raids: {},
-    cmdredeems: {},
-    rewardredeems: {},
+    tips:              {},
+    hosts:             {},
+    raids:             {},
+    cmdredeems:        {},
+    rewardredeems:     {},
   };
 
   isAllValid() {
     for (const key of Object.keys(this.isValid)) {
-      console.log(this.isValid[key as keyof AlertsEdit['isValid']]);
       if (!every(this.isValid[key as keyof AlertsEdit['isValid']])) {
         return false;
       }
@@ -296,10 +298,10 @@ export default class AlertsEdit extends Vue {
   }
 
   get selectedAlertType() {
-    const events = ['follows', 'hosts', 'raids', 'cheers', 'subs', 'tips', 'resubs', 'subgifts', 'subcommunitygifts', 'cmdredeems', 'rewardredeems'] as const
+    const events = ['follows', 'hosts', 'raids', 'cheers', 'subs', 'tips', 'resubs', 'subgifts', 'subcommunitygifts', 'cmdredeems', 'rewardredeems'] as const;
     for (const event of events) {
       if (this.item[event].find(o => o.id === this.selectedAlertId)) {
-        return event
+        return event;
       }
     }
     return null;
@@ -311,14 +313,10 @@ export default class AlertsEdit extends Vue {
     { value: 'replace-with-happy-words', text: translate('registry.alerts.profanityFilterType.replace-with-happy-words') },
     { value: 'hide-messages', text: translate('registry.alerts.profanityFilterType.hide-messages') },
     { value: 'disable-alerts', text: translate('registry.alerts.profanityFilterType.disable-alerts') },
-  ]
+  ];
 
   @Validations()
-  validations = {
-    item: {
-      name: {required},
-    }
-  }
+  validations = { item: { name: { required } } };
 
   async mounted() {
     this.state.loaded = this.$state.progress;
@@ -327,7 +325,7 @@ export default class AlertsEdit extends Vue {
         if (err) {
           return console.error(err);
         }
-        console.debug('Loaded', {data});
+        console.debug('Loaded', { data });
         // workaround for missing weight after https://github.com/sogehige/sogeBot/issues/3871
         // workaround for missing shadow settings after https://github.com/sogehige/sogeBot/issues/3875
         for (const alert of data.follows) {
@@ -367,7 +365,7 @@ export default class AlertsEdit extends Vue {
         this.$nextTick(() => {
           this.pending = false;
         });
-      })
+      });
     } else {
       this.state.loaded = this.$state.success;
     }
@@ -375,7 +373,7 @@ export default class AlertsEdit extends Vue {
 
   beforeRouteUpdate(to: Route, from: Route, next: NextFunction) {
     if (this.pending) {
-      const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+      const isOK = confirm('You will lose your pending changes. Do you want to continue?');
       if (!isOK) {
         next(false);
       } else {
@@ -388,7 +386,7 @@ export default class AlertsEdit extends Vue {
 
   beforeRouteLeave(to: Route, from: Route, next: NextFunction) {
     if (this.pending) {
-      const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+      const isOK = confirm('You will lose your pending changes. Do you want to continue?');
       if (!isOK) {
         next(false);
       } else {
@@ -416,7 +414,7 @@ export default class AlertsEdit extends Vue {
       ...this.item.subcommunitygifts,
       ...this.item.cmdredeems,
       ...this.item.rewardredeems,
-    ]
+    ];
     if (this.selectedAlertId === '' && events.length > 0) {
       this.selectedAlertId = events[0].id as string;
     }
@@ -426,65 +424,69 @@ export default class AlertsEdit extends Vue {
     const _default: CommonSettingsInterface = {
       messageTemplate: '',
 
-      id: uuid(),
-      title: '',
-      filter: null,
-      variantAmount: 2,
-      enabled: true,
-      layout: '1',
-      animationInDuration: 1000,
+      id:                   uuid(),
+      title:                '',
+      filter:               null,
+      variantAmount:        2,
+      enabled:              true,
+      layout:               '1',
+      animationInDuration:  1000,
       animationOutDuration: 1000,
-      animationIn: 'fadeIn',
-      animationOut: 'fadeOut',
-      animationText: 'wiggle',
+      animationIn:          'fadeIn',
+      animationOut:         'fadeOut',
+      animationText:        'wiggle',
       animationTextOptions: {
-        speed: 'slow',
-        characters: '█▓░ </>',
+        speed:            'slow',
+        characters:       '█▓░ </>',
         maxTimeToDecrypt: 4000,
       },
-      imageId: uuid(),
+      imageId:      uuid(),
       imageOptions: {
         translateX: 0,
         translateY: 0,
-        scale: 100,
+        scale:      100,
       },
-      soundId: uuid(),
-      soundVolume: 20,
-      alertDurationInMs: 10000,
+      soundId:            uuid(),
+      soundVolume:        20,
+      alertDurationInMs:  10000,
       alertTextDelayInMs: 1500,
       enableAdvancedMode: false,
-      advancedMode: {
+      advancedMode:       {
         html: null,
-        css: '',
-        js: null,
+        css:  '',
+        js:   null,
       },
       tts: {
-        enabled: false,
-        skipUrls: true,
-        keepAlertShown: false,
-        voice: 'UK English Female',
-        volume: 1,
-        rate: 1,
-        pitch: 1,
+        enabled:         false,
+        skipUrls:        true,
+        keepAlertShown:  false,
+        voice:           'UK English Female',
+        volume:          1,
+        rate:            1,
+        pitch:           1,
         minAmountToPlay: 0,
       },
       font: {
-        align: 'center',
-        family: 'PT Sans',
-        size: 24,
-        borderPx: 1,
-        borderColor: '#000000',
-        weight: 800,
-        color: '#ffffff',
+        align:          'center',
+        family:         'PT Sans',
+        size:           24,
+        borderPx:       1,
+        borderColor:    '#000000',
+        weight:         800,
+        color:          '#ffffff',
         highlightcolor: '#00ff00',
-        shadow: []
-      }
-    }
+        shadow:         [],
+      },
+    };
 
     // save default media
     this.socket.emit('alerts::saveMedia', [
-      { id: _default.imageId, b64data: 'data:image/gif;base64,' + defaultImage, chunkNo: 0 },
-      { id: _default.soundId, b64data: 'data:audio/mp3;base64,' + defaultAudio, chunkNo: 0 },
+      {
+        id: _default.imageId, b64data: 'data:image/gif;base64,' + defaultImage, chunkNo: 0,
+      },
+      {
+        id: _default.soundId, b64data: 'data:audio/mp3;base64,' + defaultAudio, chunkNo: 0,
+      },
     ], () => {
       this.isValid[event][_default.id as string] = true;
       switch(event) {
@@ -492,131 +494,131 @@ export default class AlertsEdit extends Vue {
           this.item.follows.push({
             ..._default,
             messageTemplate: '{name} is now following!',
-          })
+          });
           break;
         case 'cheers':
           this.item.cheers.push({
             ..._default,
             messageTemplate: '{name} cheered! x{amount}',
-            message: {
+            message:         {
               minAmountToShow: 0,
-              allowEmotes: {
-                twitch: true, ffz: true, bttv: true
+              allowEmotes:     {
+                twitch: true, ffz: true, bttv: true,
               },
               font: {
-                align: 'left',
-                family: 'PT Sans',
-                size: 16,
-                borderPx: 1,
+                align:       'left',
+                family:      'PT Sans',
+                size:        16,
+                borderPx:    1,
                 borderColor: '#000000',
-                weight: 500,
-                color: '#ffffff',
-                shadow: [],
+                weight:      500,
+                color:       '#ffffff',
+                shadow:      [],
               },
             },
-          })
+          });
           break;
         case 'subcommunitygifts':
           this.item.subcommunitygifts.push({
             ..._default,
             messageTemplate: '{name} just gifted {amount} subscribes!',
-          })
+          });
           break;
         case 'subgifts':
           this.item.subgifts.push({
             ..._default,
             messageTemplate: '{name} just gifted sub to {recipient}! {amount} {monthsName}',
-          })
+          });
           break;
         case 'rewardredeems':
           this.item.rewardredeems.push({
             ..._default,
             message: {
               minAmountToShow: 0,
-              allowEmotes: {
-                twitch: true, ffz: true, bttv: true
+              allowEmotes:     {
+                twitch: true, ffz: true, bttv: true,
               },
               font: {
-                align: 'left',
-                family: 'PT Sans',
-                size: 16,
-                borderPx: 1,
+                align:       'left',
+                family:      'PT Sans',
+                size:        16,
+                borderPx:    1,
                 borderColor: '#000000',
-                weight: 500,
-                color: '#ffffff',
-                shadow: [],
+                weight:      500,
+                color:       '#ffffff',
+                shadow:      [],
               },
             },
             messageTemplate: '{name} was redeemed by {recipient}!',
-            rewardId: null,
-          })
+            rewardId:        null,
+          });
           break;
         case 'cmdredeems':
           this.item.cmdredeems.push({
             ..._default,
             messageTemplate: '{name} was redeemed by {recipient} for x${amount}!',
-          })
+          });
           break;
         case 'subs':
           this.item.subs.push({
             ..._default,
             messageTemplate: '{name} just subscribed!',
-          })
+          });
           break;
         case 'resubs':
           this.item.resubs.push({
             ..._default,
             messageTemplate: '{name} just resubscribed! {amount} {monthsName}',
-            message: {
+            message:         {
               allowEmotes: {
-                twitch: true, ffz: true, bttv: true
+                twitch: true, ffz: true, bttv: true,
               },
               font: {
-                align: 'left',
-                family: 'PT Sans',
-                size: 12,
-                borderPx: 2,
+                align:       'left',
+                family:      'PT Sans',
+                size:        12,
+                borderPx:    2,
                 borderColor: '#000000',
-                weight: 500,
-                color: '#ffffff',
-                shadow: [],
+                weight:      500,
+                color:       '#ffffff',
+                shadow:      [],
               },
             },
-          })
+          });
           break;
         case 'tips':
           this.item.tips.push({
             ..._default,
             messageTemplate: '{name} donated {amount}{currency}!',
-            message: {
+            message:         {
               minAmountToShow: 0,
-              allowEmotes: {
-                twitch: true, ffz: true, bttv: true
+              allowEmotes:     {
+                twitch: true, ffz: true, bttv: true,
               },
               font: {
-                align: 'left',
-                family: 'PT Sans',
-                size: 12,
-                borderPx: 2,
+                align:       'left',
+                family:      'PT Sans',
+                size:        12,
+                borderPx:    2,
                 borderColor: '#000000',
-                weight: 500,
-                color: '#ffffff',
-                shadow: [],
+                weight:      500,
+                color:       '#ffffff',
+                shadow:      [],
               },
             },
-          })
+          });
           break;
         case 'hosts':
           this.item.hosts.push({
             ..._default,
             messageTemplate: '{name} is now hosting my stream with {amount} viewers!',
-          })
+          });
           break;
         case 'raids':
           this.item.raids.push({
             ..._default,
             messageTemplate: '{name} is raiding with a party of {amount} raiders!',
-          })
+          });
           break;
       }
     });
@@ -632,13 +634,13 @@ export default class AlertsEdit extends Vue {
     await new Promise<void>(resolve => {
       this.socket.emit('alerts::delete', this.item, () => {
         resolve();
-      })
-    })
+      });
+    });
     this.$router.push({ name: 'alertsList' });
   }
 
   async duplicateVariant() {
-    console.log('Duplicating variant')
+    console.log('Duplicating variant');
 
     if (this.selectedAlert && this.selectedAlertType) {
       // generate new variant
@@ -659,11 +661,11 @@ export default class AlertsEdit extends Vue {
         await new Promise<void>(resolve => {
           this.socket.emit('alerts::cloneMedia', [mediaId, mediaMap.get(mediaId)], (err: string | null) => {
             if (err) {
-              console.error(err)
+              console.error(err);
             }
             resolve();
-          })
-        })
+          });
+        });
       }
 
       this.item[this.selectedAlertType].push(newVariant as any);
@@ -684,20 +686,22 @@ export default class AlertsEdit extends Vue {
         } else {
           this.state.save = this.$state.success;
           this.pending = false;
-          this.$router.push({ name: 'alertsEdit', params: { id: String(data.id) } }).catch(err => {})
+          this.$router.push({ name: 'alertsEdit', params: { id: String(data.id) } }).catch(() => {
+            return;
+          });
         }
 
         setTimeout(() => {
           this.state.save = this.$state.idle;
-        }, 1000)
+        }, 1000);
 
-        console.debug('Clearing unused media')
-        this.socket.emit('clear-media')
+        console.debug('Clearing unused media');
+        this.socket.emit('clear-media');
       });
     } else {
       setTimeout(() => {
         this.state.save = this.$state.idle;
-      }, 1000)
+      }, 1000);
     }
   }
 }

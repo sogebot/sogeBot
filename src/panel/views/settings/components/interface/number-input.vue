@@ -19,30 +19,33 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from '@vue/composition-api'
+import {
+  defineComponent, ref, watch, 
+} from '@vue/composition-api';
+
 import translate from 'src/panel/helpers/translate';
 
 export default defineComponent({
   props: {
-    value: Number,
+    value:        Number,
     defaultValue: Number,
-    title: String,
-    readonly: Boolean,
-    min: [Number, String],
-    max: [Number, String],
-    step: [Number, String],
+    title:        String,
+    readonly:     Boolean,
+    min:          [Number, String],
+    max:          [Number, String],
+    step:         [Number, String],
   },
   setup(props: {
-      defaultValue: number;
-      value: number;
-      min: number | string;
-      max: number | string;
-      step: number;
-      title: string,
-      readonly: boolean
-    }, ctx) {
+    defaultValue: number;
+    value: number;
+    min: number | string;
+    max: number | string;
+    step: number;
+    title: string,
+    readonly: boolean
+  }, ctx) {
     const currentValue = ref(props.value);
-    const translatedTitle = ref(translate(props.title))
+    const translatedTitle = ref(translate(props.title));
 
     watch(currentValue, (val) => {
       let step = String(props.step || 0);
@@ -52,13 +55,17 @@ export default defineComponent({
       }
 
       currentValue.value = Number(Number(currentValue.value).toFixed(Number(step)));
-      if (typeof props.min !== 'undefined' && props.min > currentValue.value) {currentValue.value = Number(props.min);}
-      if (typeof props.max !== 'undefined' && props.max < currentValue.value) {currentValue.value = Number(props.max);}
+      if (typeof props.min !== 'undefined' && props.min > currentValue.value) {
+        currentValue.value = Number(props.min);
+      }
+      if (typeof props.max !== 'undefined' && props.max < currentValue.value) {
+        currentValue.value = Number(props.max);
+      }
 
-      ctx.emit('update', { value: val })
+      ctx.emit('update', { value: val });
     });
 
-    return { currentValue, translatedTitle }
-  }
+    return { currentValue, translatedTitle };
+  },
 });
 </script>

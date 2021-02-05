@@ -15,9 +15,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, watch } from '@vue/composition-api';
-import translate from 'src/panel/helpers/translate';
+import {
+  defineComponent, onMounted, ref, watch, 
+} from '@vue/composition-api';
+
 import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
+
 import { ButtonStates } from '../helpers/buttonStates';
 import { error } from '../helpers/error';
 
@@ -36,9 +40,7 @@ export default defineComponent({
   setup(props: Props, ctx) {
     const redeemRewards = ref([] as string[]);
     const selectedReward = ref(props.value);
-    const progress = ref({
-      redeemRewards: ButtonStates.progress
-    } as { redeemRewards: number })
+    const progress = ref({ redeemRewards: ButtonStates.progress } as { redeemRewards: number });
 
     const refreshRedeemedRewards = async () => {
       progress.value.redeemRewards = ButtonStates.progress;
@@ -50,17 +52,17 @@ export default defineComponent({
           redeemRewards.value = redeems;
           setTimeout(() => progress.value.redeemRewards = ButtonStates.idle, 1000);
           resolve();
-        })
-      })
+        });
+      });
     };
 
     onMounted(() => {
       refreshRedeemedRewards();
-    })
+    });
 
     watch(selectedReward, (val) => {
       ctx.emit('update:value', val);
-    })
+    });
 
     return {
       progress,
@@ -71,8 +73,7 @@ export default defineComponent({
 
       translate,
       ButtonStates,
-    }
-  }
+    };
+  },
 });
 </script>
-

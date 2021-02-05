@@ -144,39 +144,46 @@
 </template>
 
 <script lang="ts">
-import { getSocket } from 'src/panel/helpers/socket';
 
-import { defineComponent, ref, onMounted, computed, watch, getCurrentInstance } from '@vue/composition-api'
-import { isNil, escapeRegExp } from 'lodash-es';
+import {
+  computed, defineComponent, getCurrentInstance, onMounted, ref, watch,
+} from '@vue/composition-api';
+import { escapeRegExp, isNil } from 'lodash-es';
+import { v4 as uuid } from 'uuid';
+import { validationMixin } from 'vuelidate';
+import {
+  minLength, minValue, required,
+} from 'vuelidate/lib/validators';
+
 import { CooldownInterface } from 'src/bot/database/entity/cooldown';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
-import translate from 'src/panel/helpers/translate';
-import { error } from 'src/panel/helpers/error';
-import { v4 as uuid } from 'uuid';
-import { validationMixin } from 'vuelidate'
-import { required, minValue, minLength } from 'vuelidate/lib/validators'
 import { capitalize } from 'src/panel/helpers/capitalize';
+import { error } from 'src/panel/helpers/error';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/systems/cooldown');
 
 export default defineComponent({
-  mixins: [ validationMixin ],
+  mixins:     [ validationMixin ],
   components: {
-    loading: () => import('../../components/loading.vue'),
+    loading:        () => import('../../components/loading.vue'),
     'label-inside': () => import('src/panel/components/label-inside.vue'),
   },
   filters: {
     capitalize (value: string) {
-      if (!value) return ''
-      value = value.toString()
-      return value.charAt(0).toUpperCase() + value.slice(1)
-    }
+      if (!value) {
+        return '';
+      }
+      value = value.toString();
+      return value.charAt(0).toUpperCase() + value.slice(1);
+    },
   },
   validations: {
     editationItem: {
-      name: {required, minLength: minLength(2), },
-      miliseconds: { required, minValue: minValue(0) }
-    }
+      name:        { required, minLength: minLength(2) },
+      miliseconds: { required, minValue: minValue(0) },
+    },
   },
   setup(props, ctx) {
     const instance = getCurrentInstance()?.proxy;
@@ -188,37 +195,53 @@ export default defineComponent({
     const search = ref('');
     const state = ref({
       loading: ButtonStates.progress,
-      save: ButtonStates.idle,
+      save:    ButtonStates.idle,
       pending: false,
     } as {
       loading: number;
       save: number;
       pending: boolean;
-    })
+    });
 
     const fields = [
-      { key: 'name', label: '!' + translate('command') + ' ' + translate('or') + ' ' + translate('keyword'), sortable: true },
       {
-        key: 'miliseconds',
-        label: translate('cooldown'),
+        key: 'name', label: '!' + translate('command') + ' ' + translate('or') + ' ' + translate('keyword'), sortable: true,
+      },
+      {
+        key:      'miliseconds',
+        label:    translate('cooldown'),
         sortable: true,
       },
-      { key: 'type', label: translate('type'), sortable: true, formatter: (value: string) => translate(value) },
-      { key: 'isErrorMsgQuiet', label: capitalize(translate('quiet')), sortable: true },
-      { key: 'isOwnerAffected', label: capitalize(translate('core.permissions.casters')), sortable: true },
-      { key: 'isModeratorAffected', label: capitalize(translate('core.permissions.moderators')), sortable: true },
-      { key: 'isSubscriberAffected', label: capitalize(translate('core.permissions.subscribers')), sortable: true },
-      { key: 'isFollowerAffected', label: capitalize(translate('core.permissions.followers')), sortable: true },
+      {
+        key: 'type', label: translate('type'), sortable: true, formatter: (value: string) => translate(value),
+      },
+      {
+        key: 'isErrorMsgQuiet', label: capitalize(translate('quiet')), sortable: true,
+      },
+      {
+        key: 'isOwnerAffected', label: capitalize(translate('core.permissions.casters')), sortable: true,
+      },
+      {
+        key: 'isModeratorAffected', label: capitalize(translate('core.permissions.moderators')), sortable: true,
+      },
+      {
+        key: 'isSubscriberAffected', label: capitalize(translate('core.permissions.subscribers')), sortable: true,
+      },
+      {
+        key: 'isFollowerAffected', label: capitalize(translate('core.permissions.followers')), sortable: true,
+      },
       { key: 'buttons', label: '' },
     ];
 
     const fItems = computed(() => {
-      if (search.value.length === 0) return items.value
+      if (search.value.length === 0) {
+        return items.value;
+      }
       return items.value.filter((o) => {
-        const isSearchInKey = !isNil(o.name.match(new RegExp(escapeRegExp(search.value), 'ig')))
-        return isSearchInKey
-      })
-    })
+        const isSearchInKey = !isNil(o.name.match(new RegExp(escapeRegExp(search.value), 'ig')));
+        return isSearchInKey;
+      });
+    });
 
     onMounted(() => {
       refresh();
@@ -229,7 +252,9 @@ export default defineComponent({
     });
 
     const newItem = () => {
-      ctx.root.$router.push({ name: 'cooldownsManagerEdit', params: { id: uuid() } }).catch(() => {});
+      ctx.root.$router.push({ name: 'cooldownsManagerEdit', params: { id: uuid() } }).catch(() => {
+        return;
+      });
     };
 
     const refresh = () => {
@@ -237,15 +262,15 @@ export default defineComponent({
         if (err) {
           return error(err);
         }
-        console.debug('Loaded', items.value)
+        console.debug('Loaded', items.value);
         items.value = itemsGetAll;
         state.value.loading = ButtonStates.success;
-      })
+      });
     };
 
     watch(items, (val) => {
       val.forEach((item) => update(item as Required<CooldownInterface>));
-    }, { deep: true })
+    }, { deep: true });
 
     watch(() => ctx.root.$route.params.id, (val) => {
       const $v = instance?.$v;
@@ -255,7 +280,7 @@ export default defineComponent({
       } else {
         state.value.pending = false;
       }
-    })
+    });
     watch(editationItem, (val, oldVal) => {
       if (val !== null && oldVal !== null) {
         state.value.pending = true;
@@ -264,20 +289,24 @@ export default defineComponent({
 
     const linkTo = (item: Required<CooldownInterface>) => {
       console.debug('Clicked', item.id);
-      ctx.root.$router.push({ name: 'cooldownsManagerEdit', params: { id: item.id } }).catch(() => {});
-    }
+      ctx.root.$router.push({ name: 'cooldownsManagerEdit', params: { id: item.id } }).catch(() => {
+        return;
+      });
+    };
     const remove = (id: string) => {
       socket.emit('generic::deleteById', id, () => {
-        items.value = items.value.filter((o) => o.id !== id)
-      })
-    }
+        items.value = items.value.filter((o) => o.id !== id);
+      });
+    };
     const update = (item: Required<CooldownInterface>) => {
-      socket.emit('cooldown::save', item , () => {});
-    }
+      socket.emit('cooldown::save', item , () => {
+        return;
+      });
+    };
     const isSidebarVisibleChange = (isVisible: boolean, ev: any) => {
       if (!isVisible) {
         if (state.value.pending) {
-          const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+          const isOK = confirm('You will lose your pending changes. Do you want to continue?');
           if (!isOK) {
             sidebarSlideEnabled.value = false;
             isSidebarVisible.value = false;
@@ -291,45 +320,47 @@ export default defineComponent({
           }
         }
         isSidebarVisible.value = isVisible;
-        ctx.root.$router.push({ name: 'cooldownsManager' }).catch(() => {});
+        ctx.root.$router.push({ name: 'cooldownsManager' }).catch(() => {
+          return;
+        });
       } else {
         state.value.save = ButtonStates.idle;
         if (sidebarSlideEnabled.value) {
-          editationItem.value = null
+          editationItem.value = null;
           loadEditationItem();
         }
       }
-    }
+    };
     const loadEditationItem = () => {
       if (ctx.root.$route.params.id) {
         socket.emit('generic::getOne', ctx.root.$route.params.id, (err: string | null, data: CooldownInterface) => {
           if (err) {
             return error(err);
           }
-          console.debug({data})
+          console.debug({ data });
           if (data === null) {
             // we are creating new item
             editationItem.value = {
-              id: ctx.root.$route.params.id,
-              name: '',
-              miliseconds: 600000,
-              type: 'global',
-              timestamp: 0,
-              isErrorMsgQuiet: false,
-              isEnabled: true,
-              isOwnerAffected: true,
-              isModeratorAffected: true,
+              id:                   ctx.root.$route.params.id,
+              name:                 '',
+              miliseconds:          600000,
+              type:                 'global',
+              timestamp:            0,
+              isErrorMsgQuiet:      false,
+              isEnabled:            true,
+              isOwnerAffected:      true,
+              isModeratorAffected:  true,
               isSubscriberAffected: true,
-              isFollowerAffected: true
-            }
+              isFollowerAffected:   true,
+            };
           } else {
             editationItem.value = data;
           }
-        })
+        });
       } else {
         editationItem.value = null;
       }
-    }
+    };
     const seconds = computed({
       get: () => editationItem.value ? editationItem.value.miliseconds / 1000 : 0,
       set: (value: number) => editationItem.value ? editationItem.value.miliseconds = value * 1000 : false,
@@ -350,7 +381,7 @@ export default defineComponent({
             }
             setTimeout(() => {
               state.value.save = ButtonStates.idle;
-            }, 1000)
+            }, 1000);
           });
         });
 
@@ -358,13 +389,15 @@ export default defineComponent({
         ctx.root.$nextTick(() => {
           refresh();
           state.value.pending = false;
-          ctx.root.$router.push({ name: 'cooldownsManagerEdit', params: { id: editationItem.value?.id || '' } }).catch(err => {})
+          ctx.root.$router.push({ name: 'cooldownsManagerEdit', params: { id: editationItem.value?.id || '' } }).catch(err => {
+            return; 
+          });
         });
       }
       setTimeout(() => {
         state.value.save = ButtonStates.idle;
-      }, 1000)
-    }
+      }, 1000);
+    };
     const del = (id: string) => {
       if (confirm('Do you want to delete cooldown ' + items.value.find(o => o.id === id)?.name + '?')) {
         socket.emit('generic::deleteById', id, (err: string | null) => {
@@ -372,9 +405,9 @@ export default defineComponent({
             return error(err);
           }
           refresh();
-        })
+        });
       }
-    }
+    };
 
     return {
       items,
@@ -394,7 +427,7 @@ export default defineComponent({
       seconds,
       del,
       translate,
-    }
-  }
+    };
+  },
 });
 </script>

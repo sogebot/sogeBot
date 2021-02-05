@@ -60,80 +60,84 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed } from '@vue/composition-api'
+import {
+  computed, defineComponent, onMounted, ref,
+} from '@vue/composition-api';
+import Chart from 'chart.js';
+import {
+  get, groupBy, isNil,
+} from 'lodash-es';
 import Vue from 'vue';
 import Chartkick from 'vue-chartkick';
-import Chart from 'chart.js';
+
 import { dayjs } from 'src/bot/helpers/dayjs';
-import { get, isNil, groupBy } from 'lodash-es'
+import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
-Vue.use(Chartkick.use(Chart))
-
-import { getSocket } from 'src/panel/helpers/socket';
+Vue.use(Chartkick.use(Chart));
 
 const socket = getSocket('/');
 
 export default defineComponent({
-  components: {
-    'loading': () => import('../../components/loading.vue'),
-  },
+  components: { 'loading': () => import('../../components/loading.vue') },
   setup() {
     const selected = ref('helix');
     const data = ref([] as any[]);
 
     const selectedData = computed(() => {
-      return data.value.filter(o => o.api === selected.value).sort((a, b) => b.timestamp - a.timestamp)
+      return data.value.filter(o => o.api === selected.value).sort((a, b) => b.timestamp - a.timestamp);
     });
 
     const graphData = computed(() => {
-      let success = data.value.filter(o => o.api === selected.value && String(o.code).startsWith('2'))
-      let errors = data.value.filter(o => o.api === selected.value && !String(o.code).startsWith('2'))
+      const success = data.value.filter(o => o.api === selected.value && String(o.code).startsWith('2'));
+      const errors = data.value.filter(o => o.api === selected.value && !String(o.code).startsWith('2'));
 
-      let successPerMinute: any = {}
-      let _successPerMinute = groupBy(success, o => {
-        return (new Date(o.timestamp)).getHours() + ':' + (new Date(o.timestamp)).getMinutes()
-      })
-      for (let minute of Object.keys(_successPerMinute)) {
-        let timestamp = String(new Date(_successPerMinute[minute][0].timestamp))
-        successPerMinute[timestamp] = _successPerMinute[minute].length
+      const successPerMinute: any = {};
+      const _successPerMinute = groupBy(success, o => {
+        return (new Date(o.timestamp)).getHours() + ':' + (new Date(o.timestamp)).getMinutes();
+      });
+      for (const minute of Object.keys(_successPerMinute)) {
+        const timestamp = String(new Date(_successPerMinute[minute][0].timestamp));
+        successPerMinute[timestamp] = _successPerMinute[minute].length;
       }
 
-      let errorsPerMinute: any = {}
-      let _errorsPerMinute = groupBy(errors, o => {
-        return (new Date(o.timestamp)).getMinutes()
-      })
-      for (let minute of Object.keys(_errorsPerMinute)) {
-        let timestamp = String(new Date(_errorsPerMinute[minute][0].timestamp))
-        errorsPerMinute[timestamp] = _errorsPerMinute[minute].length
+      const errorsPerMinute: any = {};
+      const _errorsPerMinute = groupBy(errors, o => {
+        return (new Date(o.timestamp)).getMinutes();
+      });
+      for (const minute of Object.keys(_errorsPerMinute)) {
+        const timestamp = String(new Date(_errorsPerMinute[minute][0].timestamp));
+        errorsPerMinute[timestamp] = _errorsPerMinute[minute].length;
       }
 
       // we need to have same datas for timestamps if errors are 0
-      for (let [timestamp,] of Object.entries(successPerMinute)) {
-        if (!errorsPerMinute[timestamp]) errorsPerMinute[timestamp] = 0
+      for (const [timestamp] of Object.entries(successPerMinute)) {
+        if (!errorsPerMinute[timestamp]) {
+          errorsPerMinute[timestamp] = 0;
+        }
       }
 
       return [
-        {name: 'Success', data: successPerMinute},
-        {name: 'Errors', data: errorsPerMinute},
-      ]
-    })
-
-    onMounted(() => {
-      socket.off('api.stats').on('api.stats', (c: { code: number, remaining: number | string, data: Object}) => {
-        c.code = get(c, 'code', 200) // set default to 200
-        c.data = !isNil(c.data) ? JSON.stringify(c.data) : 'n/a'
-        c.remaining = !isNil(c.remaining) ? c.remaining : 'n/a'
-
-        data.value.push(c)
-      })
+        { name: 'Success', data: successPerMinute },
+        { name: 'Errors', data: errorsPerMinute },
+      ];
     });
 
-    function parseJSON(data: string) {
+    onMounted(() => {
+      socket.off('api.stats').on('api.stats', (c: { code: number, remaining: number | string, data: string}) => {
+        c.code = get(c, 'code', 200); // set default to 200
+        c.data = !isNil(c.data) ? JSON.stringify(c.data) : 'n/a';
+        c.remaining = !isNil(c.remaining) ? c.remaining : 'n/a';
+
+        data.value.push(c);
+      });
+    });
+
+    function parseJSON(JSONString: string) {
       try {
-        return JSON.stringify(JSON.parse(data), null, 2)
+        return JSON.stringify(JSON.parse(JSONString), null, 2);
       } catch (e) {
-        return data
+        return JSONString;
       }
     }
 
@@ -146,7 +150,7 @@ export default defineComponent({
 
       dayjs,
       translate,
-    }
-  }
-})
+    };
+  },
+});
 </script>

@@ -660,43 +660,48 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch, getCurrentInstance } from '@vue/composition-api'
-import { getSocket } from 'src/panel/helpers/socket';
-import { get, orderBy, xor } from 'lodash-es';
-import { capitalize } from 'src/panel/helpers/capitalize';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import {
+  faLock, faSortAlphaDown, faSortAlphaUp, faSortDown, faSortUp, faSync, faUnlock,
+} from '@fortawesome/free-solid-svg-icons';
+import {
+  defineComponent, getCurrentInstance, onMounted, ref, watch,
+} from '@vue/composition-api';
+import {
+  get, orderBy, xor,
+} from 'lodash-es';
+import VueFlatPickr from 'vue-flatpickr-component';
+import { validationMixin } from 'vuelidate';
+import { minValue, required } from 'vuelidate/lib/validators';
+
+import { EventListInterface } from 'src/bot/database/entity/eventList';
+import { UserInterface } from 'src/bot/database/entity/user';
 import { dayjs } from 'src/bot/helpers/dayjs';
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import { capitalize } from 'src/panel/helpers/capitalize';
+import { error, success } from 'src/panel/helpers/error';
+import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faSortDown, faSortUp, faSortAlphaUp, faSortAlphaDown, faLock, faUnlock, faSync } from '@fortawesome/free-solid-svg-icons'
-import { UserInterface } from '../../../bot/database/entity/user';
-library.add(faSortDown, faSortUp, faSortAlphaUp, faSortAlphaDown, faLock, faUnlock, faSync)
+import 'flatpickr/dist/flatpickr.css';
 
-import { validationMixin } from 'vuelidate'
-import { required, minValue } from 'vuelidate/lib/validators';
-import { ButtonStates } from 'src/panel/helpers/buttonStates';
-import { EventListInterface } from 'src/bot/database/entity/eventList';
+library.add(faSortDown, faSortUp, faSortAlphaUp, faSortAlphaDown, faLock, faUnlock, faSync);
 
 const socket = getSocket('/core/users');
 const socketEventList = getSocket('/overlays/eventlist');
-
-import VueFlatPickr from 'vue-flatpickr-component';
-import 'flatpickr/dist/flatpickr.css';
-import { error, success } from 'src/panel/helpers/error';
-
 export default defineComponent({
-  mixins: [ validationMixin ],
+  mixins:     [ validationMixin ],
   components: {
-    'loading': () => import('src/panel/components/loading.vue'),
-    datetime: VueFlatPickr,
-    'label-inside': () => import('src/panel/components/label-inside.vue')
+    'loading':      () => import('src/panel/components/loading.vue'),
+    datetime:       VueFlatPickr,
+    'label-inside': () => import('src/panel/components/label-inside.vue'),
   },
   validations: {
     editationItem: {
       messages: { required, minValue: minValue(0) },
-      points: { required, minValue: minValue(0) },
+      points:   { required, minValue: minValue(0) },
     },
-    editationItemWatchedTime: { required, minValue: minValue(0) }
+    editationItemWatchedTime: { required, minValue: minValue(0) },
   },
   setup(props, ctx) {
     const instance = getCurrentInstance()?.proxy;
@@ -714,9 +719,9 @@ export default defineComponent({
     const search = ref('');
 
     const state = ref({
-      loading: ButtonStates.progress,
-      save: ButtonStates.idle,
-      pending: false,
+      loading:              ButtonStates.progress,
+      save:                 ButtonStates.idle,
+      pending:              false,
       forceCheckFollowedAt: ButtonStates.idle,
     } as {
       loading: number;
@@ -734,11 +739,11 @@ export default defineComponent({
     const sort = ref('user.username');
 
     const filter = ref({
-      followers: null,
+      followers:   null,
       subscribers: null,
-      vips: null,
-      active: null
-    })
+      vips:        null,
+      active:      null,
+    });
 
     const fields = [
       { key: 'username', label: '' },
@@ -758,8 +763,8 @@ export default defineComponent({
         return dayjs(Number(val)).format('LLL');
       },
       enableSeconds: true,
-      maxDate: Date.now(),
-      allowInput: true,
+      maxDate:       Date.now(),
+      allowInput:    true,
     } as const;
 
     const dateTimePickerConfigBitsTips = {
@@ -768,16 +773,16 @@ export default defineComponent({
         return dayjs(Number(val)).format('LLL');
       },
       enableSeconds: true,
-      maxDate: Date.now(),
-      allowInput: true,
+      maxDate:       Date.now(),
+      allowInput:    true,
     } as const;
 
     const refresh = () => {
       state.value.loading = ButtonStates.progress;
-      console.time('find.viewers')
-      socket.emit('find.viewers', { page: (currentPage.value - 1), order: {
-        orderBy: sort.value, sortOrder: sortDesc.value ? 'DESC' : 'ASC'
-      }, filter: filter.value, search: search.value.length > 0 ? search.value : undefined }, (err: string | null, items_: Required<UserInterface>[], count_: number) => {
+      console.time('find.viewers');
+      socket.emit('find.viewers', {
+        page: (currentPage.value - 1), order: { orderBy: sort.value, sortOrder: sortDesc.value ? 'DESC' : 'ASC' }, filter: filter.value, search: search.value.length > 0 ? search.value : undefined,
+      }, (err: string | null, items_: Required<UserInterface>[], count_: number) => {
         if (err) {
           return console.error(err);
         }
@@ -785,12 +790,12 @@ export default defineComponent({
         count.value = count_;
         state.value.loading = ButtonStates.success;
         console.timeEnd('find.viewers');
-      })
-    }
+      });
+    };
 
     watch([currentPage, sort, sortDesc, filter, search], () => {
       refresh();
-    }, { deep: true })
+    }, { deep: true });
 
     watch(() => ctx.root.$route.params.id, (val) => {
       const $v = instance?.$v;
@@ -800,7 +805,7 @@ export default defineComponent({
       } else {
         state.value.pending = false;
       }
-    })
+    });
     watch(editationItem, (val, oldVal) => {
       if (val !== null && oldVal !== null) {
         state.value.pending = true;
@@ -821,7 +826,7 @@ export default defineComponent({
       if (editationItem.value) {
         editationItem.value.watchedTime = val * 60 * 60 * 1000;
       }
-    })
+    });
 
     // we need to remap editationItem.followedAt to timestamp
     watch(() => editationItem.value?.followedAt, (value) => {
@@ -829,7 +834,7 @@ export default defineComponent({
         const locale = get(ctx.root.$store.state, 'configuration.lang', 'en');
         editationItem.value.followedAt = dayjs(value, 'LLL', locale).unix() * 1000;
       }
-    })
+    });
 
     // we need to remap editationItem bits and tips to timestamp
     watch([() => editationItem.value?.bits, () => editationItem.value?.tips], (value) => {
@@ -846,7 +851,7 @@ export default defineComponent({
           }
         }
       }
-    }, { deep: true })
+    }, { deep: true });
 
     onMounted(() => {
       refresh();
@@ -859,48 +864,48 @@ export default defineComponent({
     const resetPoints = () => {
       socket.emit('viewers::resetPointsAll', () => {
         refresh();
-      })
-    }
+      });
+    };
 
     const resetWatchedTime = () => {
       socket.emit('viewers::resetWatchedTimeAll', () => {
         refresh();
-      })
-    }
+      });
+    };
 
     const resetMessages = () => {
       socket.emit('viewers::resetMessagesAll', () => {
         refresh();
-      })
-    }
+      });
+    };
 
     const resetBits = () => {
       socket.emit('viewers::resetBitsAll', () => {
         refresh();
-      })
-    }
+      });
+    };
 
     const resetTips = () => {
       socket.emit('viewers::resetTipsAll', () => {
         refresh();
-      })
-    }
+      });
+    };
 
     const resetSubgifts = () => {
       socket.emit('viewers::resetSubgiftsAll', () => {
         refresh();
-      })
-    }
+      });
+    };
 
     const linkTo = (item: Required<UserInterface>) => {
       console.debug('Clicked', item.userId);
       ctx.root.$router.push({ name: 'viewersManagerEdit', params: { id: String(item.userId) } });
-    }
+    };
 
     const isSidebarVisibleChange = (isVisible: boolean, ev: any) => {
       if (!isVisible) {
         if (state.value.pending) {
-          const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+          const isOK = confirm('You will lose your pending changes. Do you want to continue?');
           if (!isOK) {
             sidebarSlideEnabled.value = false;
             isSidebarVisible.value = false;
@@ -914,16 +919,18 @@ export default defineComponent({
           }
         }
         isSidebarVisible.value = isVisible;
-        ctx.root.$router.push({ name: 'viewersManagerList' }).catch(() => {});
+        ctx.root.$router.push({ name: 'viewersManagerList' }).catch(() => {
+          return;
+        });
       } else {
         state.value.save = ButtonStates.idle;
         if (sidebarSlideEnabled.value) {
-          editationItem.value = null
-          editationItemEvents.value = null
+          editationItem.value = null;
+          editationItemEvents.value = null;
           loadEditationItem();
         }
       }
-    }
+    };
 
     const loadEditationItem = async () => {
       if (!ctx.root.$route.params.id) {
@@ -939,11 +946,11 @@ export default defineComponent({
             ...data,
             tips: orderBy(data.tips, 'tippedAt', 'desc'),
             bits: orderBy(data.bits, 'cheeredAt', 'desc'),
-          }
+          };
 
           editationItemWatchedTime.value = Number((data.watchedTime / (60 * 60 * 1000)).toFixed(1));
           resolve();
-        })
+        });
       });
       await new Promise<void>((resolve, reject) => {
         if (editationItem.value) {
@@ -953,18 +960,20 @@ export default defineComponent({
             }
             editationItemEvents.value = events;
             resolve();
-          })
+          });
         } else {
           resolve();
         }
       });
 
-      ctx.root.$nextTick(() => { state.value.pending = false })
-    }
+      ctx.root.$nextTick(() => {
+        state.value.pending = false;
+      });
+    };
 
     const forceCheckFollowedAt = () => {
       if (editationItem.value) {
-        state.value.pending = true
+        state.value.pending = true;
         state.value.forceCheckFollowedAt = ButtonStates.progress;
         socket.emit('viewers::followedAt', editationItem.value.userId, (err: string | null, followed_at: number) => {
           state.value.forceCheckFollowedAt = ButtonStates.idle;
@@ -972,47 +981,42 @@ export default defineComponent({
             if (err.includes('Not a follower') && editationItem.value) {
               editationItem.value.followedAt = 0;
             }
-            return console.error(err)
-          }
-          else if (editationItem.value) {
+            return console.error(err);
+          } else if (editationItem.value) {
             editationItem.value.followedAt = followed_at;
           }
-        })
+        });
       }
-    }
+    };
 
     const del = () => {
       if (!editationItem.value) {
         return;
       }
 
-      const h = ctx.root.$createElement
+      const h = ctx.root.$createElement;
       // Using HTML string
-      const titleVNode = h('div', {
-        domProps: {
-          innerHTML: `Are you sure you want to delete <strong>ALL DATA</strong> from user <strong>${editationItem.value.username}</strong> <small>(${editationItem.value.userId})</small>`
-        }
-      })
-      ctx.root.$bvModal.msgBoxConfirm([titleVNode], {
-        okVariant: 'danger',
-      })
+      const titleVNode = h('div', { domProps: { innerHTML: `Are you sure you want to delete <strong>ALL DATA</strong> from user <strong>${editationItem.value.username}</strong> <small>(${editationItem.value.userId})</small>` } });
+      ctx.root.$bvModal.msgBoxConfirm([titleVNode], { okVariant: 'danger' })
         .then(value => {
           if (value && editationItem.value) {
             const userId = editationItem.value.userId;
             const username = editationItem.value.username;
             socket.emit('viewers::remove', editationItem.value, () => {
               refresh();
-              ctx.root.$router.push({ name: 'viewersManagerList' }).catch(() => {});
+              ctx.root.$router.push({ name: 'viewersManagerList' }).catch(() => {
+                return;
+              });
               success(`User <strong>${username}</strong> <small>(${userId})</small> was deleted from database.`, `User ${username}#${userId} deleted`);
               isSidebarVisible.value = false;
-            })
+            });
           }
         })
         .catch(err => {
           error(err);
           // An error occurred
-        })
-    }
+        });
+    };
 
     const save = () => {
       if (!editationItem.value) {
@@ -1022,40 +1026,40 @@ export default defineComponent({
       const $v = instance?.$v;
       $v?.$touch();
       if (!$v?.$invalid) {
-        state.value.save = ButtonStates.progress
+        state.value.save = ButtonStates.progress;
         socket.emit('viewers::save', editationItem.value, (err: string | null, viewer: UserInterface) => {
           if (err) {
-            console.error(err)
+            console.error(err);
             return state.value.save = ButtonStates.fail;
           }
           state.value.save = ButtonStates.success;
           editationItem.value = viewer; // replace with new data (e.g. ids on tips etc)
           ctx.root.$nextTick(() => {
             refresh();
-            state.value.pending = false
+            state.value.pending = false;
           });
           setTimeout(() => {
             state.value.save = ButtonStates.idle;
-          }, 1000)
-        })
+          }, 1000);
+        });
       }
-    }
+    };
 
     const removeBits = (id: number) => {
       if (editationItem.value) {
         editationItem.value.bits.splice(id, 1);
         ctx.root.$forceUpdate();
       }
-      state.value.pending = true
-    }
+      state.value.pending = true;
+    };
 
     const removeTips = (id: number) => {
       if (editationItem.value) {
         editationItem.value.tips.splice(id, 1);
         ctx.root.$forceUpdate();
       }
-      state.value.pending = true
-    }
+      state.value.pending = true;
+    };
 
     return {
       fields,
@@ -1102,7 +1106,7 @@ export default defineComponent({
       translate,
       xor,
       ButtonStates,
-    }
-  }
+    };
+  },
 });
 </script>

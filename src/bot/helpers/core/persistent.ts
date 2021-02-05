@@ -19,7 +19,7 @@ function persistent<T>({ value, name, namespace }: { value: T, name: string, nam
 
     try {
       _value = JSON.parse(
-        (await getRepository(Settings).findOneOrFail({ namespace, name })).value
+        (await getRepository(Settings).findOneOrFail({ namespace, name })).value,
       );
     } catch (e) {
       // ignore if nothing was found

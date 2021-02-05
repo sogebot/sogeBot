@@ -18,12 +18,12 @@ export class addTTSToRandomizer1587636268054 implements MigrationInterface {
 
     for (const randomizer of randomizers) {
       await queryRunner.query(
-        `INSERT INTO randomizer(${Object.keys(randomizer).join(', ')}, tts) values(${Object.keys(randomizer).map(o => '?')}, ?)`, [ ...Object.keys(randomizer).map(key => randomizer[key]), JSON.stringify(ttsDefaultValues) ]
+        `INSERT INTO randomizer(${Object.keys(randomizer).join(', ')}, tts) values(${Object.keys(randomizer).map(o => '?')}, ?)`, [ ...Object.keys(randomizer).map(key => randomizer[key]), JSON.stringify(ttsDefaultValues) ],
       );
     }
     for (const randomizer of randomizersItems) {
       await queryRunner.query(
-        `INSERT INTO randomizer_item(${Object.keys(randomizer).join(', ')}) values(${Object.keys(randomizer).map(o => '?')})`, Object.keys(randomizer).map(key => randomizer[key])
+        `INSERT INTO randomizer_item(${Object.keys(randomizer).join(', ')}) values(${Object.keys(randomizer).map(o => '?')})`, Object.keys(randomizer).map(key => randomizer[key]),
       );
     }
 
@@ -41,12 +41,12 @@ export class addTTSToRandomizer1587636268054 implements MigrationInterface {
 
     for (const randomizer of randomizers) {
       await queryRunner.query(
-        `INSERT INTO randomizer(${Object.keys(randomizer).filter(o => o !== 'tts').join(', ')}) values(${Object.keys(randomizer).map(o => '?')})`, [ ...Object.keys(randomizer).filter(o => o !== 'tts').map(key => randomizer[key]) ]
+        `INSERT INTO randomizer(${Object.keys(randomizer).filter(o => o !== 'tts').join(', ')}) values(${Object.keys(randomizer).map(o => '?')})`, [ ...Object.keys(randomizer).filter(o => o !== 'tts').map(key => randomizer[key]) ],
       );
     }
     for (const randomizer of randomizerItems) {
       await queryRunner.query(
-        `INSERT INTO randomizer_item(${Object.keys(randomizer).join(', ')}) values(${Object.keys(randomizer).map(o => '?')})`, Object.keys(randomizer).map(key => randomizer[key])
+        `INSERT INTO randomizer_item(${Object.keys(randomizer).join(', ')}) values(${Object.keys(randomizer).map(o => '?')})`, Object.keys(randomizer).map(key => randomizer[key]),
       );
     }
 

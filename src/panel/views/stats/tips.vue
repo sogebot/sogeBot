@@ -42,111 +42,113 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Chartkick from 'vue-chartkick';
-  import Chart from 'chart.js';
-  import { dayjs } from 'src/bot/helpers/dayjs';
-  import translate from 'src/panel/helpers/translate';
+import Chart from 'chart.js';
+import Vue from 'vue';
+import Chartkick from 'vue-chartkick';
 
-  import type { UserTipInterface } from 'src/bot/database/entity/user';
+import type { UserTipInterface } from 'src/bot/database/entity/user';
+import { dayjs } from 'src/bot/helpers/dayjs';
+import translate from 'src/panel/helpers/translate';
 
-  Vue.use(Chartkick.use(Chart));
+Vue.use(Chartkick.use(Chart));
 
-  import { getSocket } from '../../helpers/socket';
+import { getSocket } from '../../helpers/socket';
 
-  export default Vue.extend({
-    components: {
-      panel: () => import('../../components/panel.vue'),
+export default Vue.extend({
+  components: { panel: () => import('../../components/panel.vue') },
+  data:       function () {
+    const object: {
+      dayjs: any;
+      translate: any;
+
+      socket: any;
+      tips: Required<UserTipInterface>[];
+      selectedYear: number;
+
+      fields: any;
+      sortBy: string;
+      sortDesc: boolean;
+    } = {
+      dayjs:     dayjs,
+      translate: translate,
+
+      tips:         [],
+      socket:       getSocket('/stats/tips'),
+      selectedYear: new Date().getFullYear(),
+
+      fields: [
+        {
+          key: 'tippedAt', label: 'tippedAt', sortable: true, 
+        },
+        {
+          key: 'sortAmount', label: 'amount', sortable: true, 
+        },
+        { key: 'message', label: 'message' },
+        { key: 'user', label: 'user' },
+      ],
+      sortBy:   'tippedAt',
+      sortDesc: false,
+    };
+    return object;
+  },
+  computed: {
+    years(): string[] {
+      return Object.keys(this.tipsByYear);
     },
-    data: function () {
-      const object: {
-        dayjs: any;
-        translate: any;
-
-        socket: any;
-        tips: Required<UserTipInterface>[];
-        selectedYear: number;
-
-        fields: any;
-        sortBy: string;
-        sortDesc: boolean;
-      } = {
-        dayjs: dayjs,
-        translate: translate,
-
-        tips: [],
-        socket: getSocket('/stats/tips'),
-        selectedYear: new Date().getFullYear(),
-
-        fields: [
-          { key: 'tippedAt', label: 'tippedAt', sortable: true },
-          { key: 'sortAmount', label: 'amount', sortable: true },
-          { key: 'message', label: 'message' },
-          { key: 'user', label: 'user' },
-        ],
-        sortBy: 'tippedAt',
-        sortDesc: false,
+    tipsByYear(): { [year: number]: Required<UserTipInterface>[]} {
+      const d: { [year: number]: Required<UserTipInterface>[] } = { [new Date().getFullYear()]: [] };
+      for (const tip of this.tips) {
+        const year = new Date(tip.tippedAt).getFullYear();
+        if (d[year]) {
+          d[year].push(tip);
+        } else {
+          d[year] = [ tip ];
+        }
       }
-      return object
+      return d;
     },
-    computed: {
-      years(): string[] {
-        return Object.keys(this.tipsByYear);
-      },
-      tipsByYear(): { [year: number]: Required<UserTipInterface>[]} {
-        const d: { [year: number]: Required<UserTipInterface>[] } = {[new Date().getFullYear()]: [] };
-        for (const tip of this.tips) {
-          const year = new Date(tip.tippedAt).getFullYear();
-          if (d[year]) {
-            d[year].push(tip);
-          } else {
-            d[year] = [ tip ];
-          }
+    tipsByMonth(): { [month: number]: Required<UserTipInterface>[]} {
+      const d: { [month: number]: Required<UserTipInterface>[] } = {
+        0:  [], 1:  [], 2:  [], 3:  [], 4:  [], 5:  [],
+        6:  [], 7:  [], 8:  [], 9:  [], 10: [], 11: [],
+      };
+      for (const tip of this.tipsByYear[this.selectedYear]) {
+        const month = new Date(tip.tippedAt).getMonth();
+        if (d[month]) {
+          d[month].push(tip);
+        } else {
+          d[month] = [ tip ];
         }
-        return d;
-      },
-      tipsByMonth(): { [month: number]: Required<UserTipInterface>[]} {
-        const d: { [month: number]: Required<UserTipInterface>[] } = {
-          0: [], 1: [], 2: [], 3: [], 4: [], 5: [],
-          6: [], 7: [], 8: [], 9: [], 10: [], 11: [],
-        };
-        for (const tip of this.tipsByYear[this.selectedYear]) {
-          const month = new Date(tip.tippedAt).getMonth();
-          if (d[month]) {
-            d[month].push(tip);
-          } else {
-            d[month] = [ tip ];
-          }
-        }
-        return d;
       }
+      return d;
     },
-    methods: {
-      generateChartData(): [ string, number ][] {
-        const data: [ string, number ][] = [];
+  },
+  methods: {
+    generateChartData(): [ string, number ][] {
+      const data: [ string, number ][] = [];
 
-        for (const [month, tips] of Object.entries(this.tipsByMonth)) {
-          const monthFullName = dayjs().month(Number(month)).format("MMMM");
+      for (const [month, tips] of Object.entries(this.tipsByMonth)) {
+        const monthFullName = dayjs().month(Number(month)).format('MMMM');
 
-          data.push([
-            monthFullName,
-            Number(tips.reduce((a, b) => {
-              return a + b.sortAmount
-            }, 0).toFixed(2)),
-          ]);
-        }
-        return data;
-      },
+        data.push([
+          monthFullName,
+          Number(tips.reduce((a, b) => {
+            return a + b.sortAmount;
+          }, 0).toFixed(2)),
+        ]);
+      }
+      return data;
     },
-    mounted() {
-      this.socket.emit('generic::getAll', (err: string | null, val: Required<UserTipInterface>[]) => {
-        if (err) {
-          return console.error(err);
-        }
-        this.tips = val;
-      })
-    }
-  })
+  },
+  mounted() {
+    this.socket.emit('generic::getAll', (err: string | null, val: Required<UserTipInterface>[]) => {
+      if (err) {
+        return console.error(err);
+      }
+      this.tips = val;
+    });
+  },
+});
 </script>
 
 <style scoped>

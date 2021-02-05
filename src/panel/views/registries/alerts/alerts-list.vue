@@ -93,29 +93,35 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import {
+  faBell, faBellSlash, faClone,
+} from '@fortawesome/free-solid-svg-icons';
 import { v4 as uuid } from 'uuid';
+import {
+  Component, Vue, Watch,
+} from 'vue-property-decorator';
+
+import type { AlertInterface } from 'src/bot/database/entity/alert';
+import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
-import { getSocket } from 'src/panel/helpers/socket';
-import type { AlertInterface } from 'src/bot/database/entity/alert';
-
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faClone, faBell, faBellSlash } from '@fortawesome/free-solid-svg-icons';
 library.add(faClone, faBell, faBellSlash);
 
 @Component({
   components: {
     'loading': () => import('../../../components/loading.vue'),
-    'test': () => import('./alerts-test.vue'),
+    'test':    () => import('./alerts-test.vue'),
   },
   filters: {
     capitalize: function (value: string) {
-      if (!value) return ''
-      value = value.toString()
-      return value.charAt(0).toUpperCase() + value.slice(1)
-    }
-  }
+      if (!value) {
+        return '';
+      }
+      value = value.toString();
+      return value.charAt(0).toUpperCase() + value.slice(1);
+    },
+  },
 })
 export default class customVariablesList extends Vue {
   translate = translate;
@@ -123,23 +129,25 @@ export default class customVariablesList extends Vue {
   areAlertsMuted = false;
 
   fields = [
-    { key: 'name', label: translate('registry.alerts.name.name'), sortable: true },
+    {
+      key: 'name', label: translate('registry.alerts.name.name'), sortable: true,
+    },
     // virtual attributes
     { key: 'additional-info', label: translate('registry.customvariables.additional-info') },
     { key: 'buttons', label: '' },
   ];
 
   items: AlertInterface[] = [];
-  search: string = '';
+  search = '';
 
-  state: { loaded: number; } = { loaded: this.$state.progress }
+  state: { loaded: number; } = { loaded: this.$state.progress };
 
   get filtered(): AlertInterface[] {
-    let items = this.items
+    let items = this.items;
     if (this.search.trim() !== '') {
       items = this.items.filter((o) => {
-        return o.name.trim().toLowerCase().includes(this.search.trim().toLowerCase())
-      })
+        return o.name.trim().toLowerCase().includes(this.search.trim().toLowerCase());
+      });
     }
     return items.sort((a, b) => {
       const A = a.name.toLowerCase();
@@ -151,85 +159,107 @@ export default class customVariablesList extends Vue {
         return 1;
       }
       return 0; //default return value (no sorting)
-      })
+    });
   }
 
   clone(item: Required<AlertInterface>) {
     const mediaMap = new Map() as Map<string, string>;
     this.socket.emit('alerts::save', {
       ...item,
-      id: uuid(),
+      id:        uuid(),
       updatedAt: Date.now(),
-      name: item.name + ' (clone)',
-      follows: item.follows.map(o => {
+      name:      item.name + ' (clone)',
+      follows:   item.follows.map(o => {
         mediaMap.set(o.soundId, uuid());
         mediaMap.set(o.imageId, uuid());
-        return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }
+        return {
+          ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId),
+        };
       }),
       subs: item.subs.map(o => {
         mediaMap.set(o.soundId, uuid());
         mediaMap.set(o.imageId, uuid());
-        return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }
+        return {
+          ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId),
+        };
       }),
       subgifts: item.subgifts.map(o => {
         mediaMap.set(o.soundId, uuid());
         mediaMap.set(o.imageId, uuid());
-        return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }
+        return {
+          ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId),
+        };
       }),
       subcommunitygifts: item.subcommunitygifts.map(o => {
         mediaMap.set(o.soundId, uuid());
         mediaMap.set(o.imageId, uuid());
-        return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }
+        return {
+          ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId),
+        };
       }),
       hosts: item.hosts.map(o => {
         mediaMap.set(o.soundId, uuid());
         mediaMap.set(o.imageId, uuid());
-        return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }
+        return {
+          ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId),
+        };
       }),
       raids: item.raids.map(o => {
         mediaMap.set(o.soundId, uuid());
         mediaMap.set(o.imageId, uuid());
-        return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }
+        return {
+          ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId),
+        };
       }),
       tips: item.tips.map(o => {
         mediaMap.set(o.soundId, uuid());
         mediaMap.set(o.imageId, uuid());
-        return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }
+        return {
+          ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId),
+        };
       }),
       cheers: item.cheers.map(o => {
         mediaMap.set(o.soundId, uuid());
         mediaMap.set(o.imageId, uuid());
-        return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }
+        return {
+          ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId),
+        };
       }),
       resubs: item.resubs.map(o => {
         mediaMap.set(o.soundId, uuid());
         mediaMap.set(o.imageId, uuid());
-        return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }
+        return {
+          ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId),
+        };
       }),
       cmdredeems: item.cmdredeems.map(o => {
         mediaMap.set(o.soundId, uuid());
         mediaMap.set(o.imageId, uuid());
-        return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }
+        return {
+          ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId),
+        };
       }),
       rewardredeems: item.rewardredeems.map(o => {
         mediaMap.set(o.soundId, uuid());
         mediaMap.set(o.imageId, uuid());
-        return { ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId) }
+        return {
+          ...o, id: uuid(), imageId: mediaMap.get(o.imageId), soundId: mediaMap.get(o.soundId),
+        };
       }),
-      } as AlertInterface, async (err: string | null, data: AlertInterface) => {
+    } as AlertInterface, async (err: string | null, data: AlertInterface) => {
       if (err) {
         return console.error(err);
       }
 
       for (const mediaId of mediaMap.keys()) {
         await new Promise<void>(resolve => {
-          this.socket.emit('alerts::cloneMedia', [mediaId, mediaMap.get(mediaId)], (err: string | null) => {
-            if (err) {
-              console.error(err)
+          this.socket.emit('alerts::cloneMedia', [mediaId, mediaMap.get(mediaId)], (err2: string | null) => {
+            if (err2) {
+              console.error(err2);
             }
             resolve();
-          })
-        })
+          });
+        });
       }
       this.refresh();
     });
@@ -246,7 +276,7 @@ export default class customVariablesList extends Vue {
         return console.error(err);
       }
       this.refresh();
-    })
+    });
   }
 
   refresh() {
@@ -255,10 +285,10 @@ export default class customVariablesList extends Vue {
       if (err) {
         return console.error(err);
       }
-      console.debug('Loaded', data)
+      console.debug('Loaded', data);
       this.items = data;
       this.state.loaded = this.$state.success;
-    })
+    });
   }
 
   mounted() {
@@ -270,11 +300,13 @@ export default class customVariablesList extends Vue {
   onRouteChange() {
     this.socket.emit('alerts::areAlertsMuted', null, (err: Error | null, val: boolean) => {
       this.areAlertsMuted = val;
-    })
+    });
   }
   @Watch('areAlertsMuted')
   areAlertsMutedWatch(val: boolean) {
-    this.socket.emit('alerts::areAlertsMuted', val, () => {});
+    this.socket.emit('alerts::areAlertsMuted', val, () => {
+      return;
+    });
   }
 }
 </script>

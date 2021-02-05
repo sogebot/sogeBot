@@ -20,16 +20,18 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, PropSync } from 'vue-property-decorator';
+import {
+  Component, PropSync, Vue, 
+} from 'vue-property-decorator';
 
 require('../../../../../../scss/letter-animations.css');
 require('animate.css');
 
 @Component({})
 export default class AnimationOut extends Vue {
-  @PropSync('animation') readonly animType !: string
-  @PropSync('animationDuration') animDuration !: number
-  test: boolean = false
+  @PropSync('animation') readonly animType !: string;
+  @PropSync('animationDuration') animDuration !: number;
+  test = false;
 
   get computedClass() {
     if (this.test) {
@@ -81,7 +83,7 @@ export default class AnimationOut extends Vue {
     { value: 'zoomOutRight', text: 'zoomOutRight' },
     { value: 'zoomOutUp', text: 'zoomOutUp' },
     { value: 'rollOut', text: 'rollOut' },
-  ]
+  ];
 }
 </script>
 

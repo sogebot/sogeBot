@@ -61,8 +61,11 @@ finished: {{ (getCurrentAlertList() || []).filter(o => o.finished) }}
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator';
-import gsap from 'gsap'
+import gsap from 'gsap';
+import {
+  Component, Vue, Watch, 
+} from 'vue-property-decorator';
+
 import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})
@@ -84,201 +87,217 @@ export default class AlertsOverlay extends Vue {
         return console.error(err);
       }
       for (const galleryItem of data) {
-        await fetch(new Request('/gallery/' + galleryItem, {
-          cache: 'default',
-        }))
-        console.log('/gallery/' + galleryItem + ' loaded.')
+        await fetch(new Request('/gallery/' + galleryItem, { cache: 'default' }));
+        console.log('/gallery/' + galleryItem + ' loaded.');
       }
-    })
+    });
     this.socket.on('alert', (data: any) => {
-      for (let d of data) {
-        d.run = false
-        d.isLoaded = false
-        d.finished = false
-        d.leaveAnimation = false
-        d.receivedAt = Date.now()
+      for (const d of data) {
+        d.run = false;
+        d.isLoaded = false;
+        d.finished = false;
+        d.leaveAnimation = false;
+        d.receivedAt = Date.now();
       }
-      this.alerts.push(data)
-    })
+      this.alerts.push(data);
+    });
 
     this.interval.push(setInterval(() => {
       try {
         if (!this.isPlaying) {
-          this.isPlaying = this.getCurrentAlertList() !== null
+          this.isPlaying = this.getCurrentAlertList() !== null;
         } else {
-          for (let a of this.getCurrentAlertList()) {
-            if (a.run) continue
+          for (const a of this.getCurrentAlertList()) {
+            if (a.run) {
+              continue;
+            }
 
-            a.delay = Number(a.delay)
-            if (isNaN(a.delay)) a.delay = 0
-            if (a.receivedAt + a.delay < Date.now()) a.run = true
-            else continue
+            a.delay = Number(a.delay);
+            if (isNaN(a.delay)) {
+              a.delay = 0;
+            }
+            if (a.receivedAt + a.delay < Date.now()) {
+              a.run = true;
+            } else {
+              continue;
+            }
 
             if (a.type === 'audio') {
               if (!a.url) {
-                a.finished = true
-                continue
+                a.finished = true;
+                continue;
               }
-              const audio = this.$refs.audio as HTMLMediaElement[]
+              const audio = this.$refs.audio as HTMLMediaElement[];
               if (audio) {
-                for (let el of audio) {
+                for (const el of audio) {
                   if (el.src === a.url) {
-                    if (a.volume) el.volume = Number(a.volume) / 100
+                    if (a.volume) {
+                      el.volume = Number(a.volume) / 100;
+                    }
                     if (!el.error) {
-                      el.onended = () => a.finished = true
-                      console.log('playing')
+                      el.onended = () => a.finished = true;
+                      console.log('playing');
                       el.play().catch((err) => {
                         if (err) {
-                          console.error('Something went wrong with your audio file')
+                          console.error('Something went wrong with your audio file');
                           console.error(err.message);
                           if ((a.url.startsWith('https://') && window.location.protocol.startsWith('http:'))
                               || (a.url.startsWith('http://') && window.location.protocol.startsWith('https:'))) {
-                            console.error('You are using mixed content https + http')
+                            console.error('You are using mixed content https + http');
                           }
                           a.finished = true;
                         }
-                      })
+                      });
                       //el.play()
                     } else {
-                      a.finished = true
-                      console.error('Something went wrong with your audio file')
+                      a.finished = true;
+                      console.error('Something went wrong with your audio file');
                     }
                   }
                 }
               } else {
-                a.run = false // we need to repeat if audio was not loaded yet
+                a.run = false; // we need to repeat if audio was not loaded yet
               }
             }
 
             if (a.type === 'video' || a.type === 'clip') {
               if (!a.url) {
-                a.finished = true
-                continue
+                a.finished = true;
+                continue;
               }
-              const video = this.$refs.video as HTMLMediaElement[]
+              const video = this.$refs.video as HTMLMediaElement[];
               if (video) {
-                for (let el of video) {
+                for (const el of video) {
                   if (el.dataset.src === a.url) {
-                    if (typeof a.size === 'undefined') a.size = '100%'
+                    if (typeof a.size === 'undefined') {
+                      a.size = '100%';
+                    }
                     if (!el.error) {
                       el.onended = () => {
-                        a.leaveAnimation = true // trigger leave animation
-                        setTimeout(() => a.finished = true, Number(a.duration || 1000)) // trigger finished
-                      }
+                        a.leaveAnimation = true; // trigger leave animation
+                        setTimeout(() => a.finished = true, Number(a.duration || 1000)); // trigger finished
+                      };
                       setTimeout(() => {
                         // run even if oncanplaythrough wasn't triggered
                         if (!a.canBePlayed) {
                           if (!a.thumbnail) {
-                            a.thumbnail = true
-                            el.volume = 0
+                            a.thumbnail = true;
+                            el.volume = 0;
                             el.play().catch((err) => {
                               if (err) {
-                                console.error('Something went wrong with your video file')
+                                console.error('Something went wrong with your video file');
                                 console.error(err.message);
                                 if ((a.url.startsWith('https://') && window.location.protocol.startsWith('http:'))
                                     || (a.url.startsWith('http://') && window.location.protocol.startsWith('https:'))) {
-                                  console.error('You are using mixed content https + http')
+                                  console.error('You are using mixed content https + http');
                                 }
                                 a.finished = true;
                               }
-                            })
+                            });
                             setTimeout(() => {
-                              el.pause()
+                              el.pause();
                               setTimeout(() => {
-                                if (a.volume) el.volume = Number(a.volume) / 100
-                                a.isLoaded = true
+                                if (a.volume) {
+                                  el.volume = Number(a.volume) / 100;
+                                }
+                                a.isLoaded = true;
                                 el.play().catch((err) => {
                                   if (err) {
-                                    console.error('Something went wrong with your video file')
+                                    console.error('Something went wrong with your video file');
                                     console.error(err.message);
                                     if ((a.url.startsWith('https://') && window.location.protocol.startsWith('http:'))
                                         || (a.url.startsWith('http://') && window.location.protocol.startsWith('https:'))) {
-                                      console.error('You are using mixed content https + http')
+                                      console.error('You are using mixed content https + http');
                                     }
                                     a.finished = true;
                                   }
-                                })
-                              }, 1000)
-                            }, 100)
+                                });
+                              }, 1000);
+                            }, 100);
                           }
                         }
-                      }, 5000)
+                      }, 5000);
                       el.oncanplaythrough = () => {
-                        a.canBePlayed = true
+                        a.canBePlayed = true;
                         if (!a.thumbnail) {
-                          a.thumbnail = true
-                          el.volume = 0
+                          a.thumbnail = true;
+                          el.volume = 0;
                           el.play()
-                              .catch((err) => {
-                                if (err) {
-                                  console.error('Something went wrong with your video file')
-                                  console.error(err.message);
-                                  if ((a.url.startsWith('https://') && window.location.protocol.startsWith('http:'))
+                            .catch((err) => {
+                              if (err) {
+                                console.error('Something went wrong with your video file');
+                                console.error(err.message);
+                                if ((a.url.startsWith('https://') && window.location.protocol.startsWith('http:'))
                                       || (a.url.startsWith('http://') && window.location.protocol.startsWith('https:'))) {
-                                    console.error('You are using mixed content https + http')
-                                  }
-                                  a.finished = true;
+                                  console.error('You are using mixed content https + http');
                                 }
-                              }).then(() => {
+                                a.finished = true;
+                              }
+                            }).then(() => {
+                              setTimeout(() => {
+                                el.pause();
                                 setTimeout(() => {
-                                  el.pause()
-                                  setTimeout(() => {
-                                    if (a.volume) el.volume = Number(a.volume) / 100
-                                    a.isLoaded = true
-                                    el.play()
-                                    console.log('Playing video ' + el.dataset.src);
-                                  }, 1000)
-                                }, 150)
-                              })
+                                  if (a.volume) {
+                                    el.volume = Number(a.volume) / 100;
+                                  }
+                                  a.isLoaded = true;
+                                  el.play();
+                                  console.log('Playing video ' + el.dataset.src);
+                                }, 1000);
+                              }, 150);
+                            });
                         }
-                      }
+                      };
                     } else {
-                      a.leaveAnimation = true // trigger leave animation
-                      a.finished = true
-                      console.error('Something went wrong with your video file')
+                      a.leaveAnimation = true; // trigger leave animation
+                      a.finished = true;
+                      console.error('Something went wrong with your video file');
                       console.error(el.error);
                     }
                   }
                 }
               } else {
-                a.run = false // we need to repeat if audio was not loaded yet
+                a.run = false; // we need to repeat if audio was not loaded yet
               }
             }
 
             if (!a.finished && !['audio', 'video', 'clip'].includes(a.type)) {
-              setTimeout(() => a.leaveAnimation = true, Number(a.duration || 1000) + Number(a.time||1000)) // trigger leave animation
-              setTimeout(() => a.finished = true, Number(a.duration || 1000) + Number(a.duration || 1000) + Number(a.time||1000)) // trigger finished
+              setTimeout(() => a.leaveAnimation = true, Number(a.duration || 1000) + Number(a.time||1000)); // trigger leave animation
+              setTimeout(() => a.finished = true, Number(a.duration || 1000) + Number(a.duration || 1000) + Number(a.time||1000)); // trigger finished
             }
 
           }
         }
       } catch (e) {
-        console.error(e)
+        console.error(e);
       }
     }, 100));
   }
 
   get finishedCount () {
     if (this.getCurrentAlertList()) {
-      return this.getCurrentAlertList().filter((o: any) => o.finished).length
-    } else return 0
+      return this.getCurrentAlertList().filter((o: any) => o.finished).length;
+    } else {
+      return 0;
+    }
   }
 
   get isFinished () {
-    if (this.getCurrentAlertList())
-      return this.finishedCount === this.getCurrentAlertList().length
-    else
-      return true
+    if (this.getCurrentAlertList()) {
+      return this.finishedCount === this.getCurrentAlertList().length;
+    } else {
+      return true;
+    }
   }
 
   @Watch('isFinished')
   isFinishedWatch (val: boolean) {
     if (val) {
       this.isPlaying = false,
-      this.alerts.shift()
+      this.alerts.shift();
       if (this.alerts[0]) {
-        for (let a of this.alerts[0]) {
-          a.receivedAt = Date.now()
+        for (const a of this.alerts[0]) {
+          a.receivedAt = Date.now();
         }
       }
     }
@@ -286,26 +305,26 @@ export default class AlertsOverlay extends Vue {
 
   doEnterAnimation (el: HTMLElement, done: () => void) {
     gsap.to(el, {
-      duration: (this.getCurrentAlertList()[el.dataset.index || 0].duration || 1000) / 1000,
-      opacity: 1,
+      duration:   (this.getCurrentAlertList()[el.dataset.index || 0].duration || 1000) / 1000,
+      opacity:    1,
       onComplete: () => {
-        done()
-      }
-    })
+        done();
+      },
+    });
   }
 
   doLeaveAnimation (el: HTMLElement, done: () => void) {
     gsap.to(el, {
-      duration: (this.getCurrentAlertList()[el.dataset.index || 0].duration || 1000) / 1000,
-      opacity: 0,
+      duration:   (this.getCurrentAlertList()[el.dataset.index || 0].duration || 1000) / 1000,
+      opacity:    0,
       onComplete: () => {
-        done()
-      }
-    })
+        done();
+      },
+    });
   }
 
   getCurrentAlertList () {
-    return this.alerts.length > 0 ? this.alerts[0] : null
+    return this.alerts.length > 0 ? this.alerts[0] : null;
   }
 }
 </script>

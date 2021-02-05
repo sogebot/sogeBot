@@ -140,7 +140,6 @@
                       </button>
                     </div>
 
-
                     <div class="form-group col-md-12">
                       <label for="goalAmount-input">{{ translate('registry.goals.input.goalAmount.title') }}</label>
                       <input v-model="currentGoal.goalAmount" type="number" min="1" class="form-control" id="goalAmount-input">
@@ -263,31 +262,29 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
 import { get } from 'lodash-es';
-import translate from 'src/panel/helpers/translate';
-
+import { v4 as uuid } from 'uuid';
+import Vue from 'vue';
 import { codemirror } from 'vue-codemirror';
-import 'codemirror/mode/javascript/javascript.js'
-import 'codemirror/mode/htmlmixed/htmlmixed.js'
-import 'codemirror/mode/css/css.js'
-import 'codemirror/theme/base16-dark.css'
-import 'codemirror/theme/base16-light.css'
-import 'codemirror/lib/codemirror.css'
-
+import 'codemirror/mode/javascript/javascript.js';
+import 'codemirror/mode/htmlmixed/htmlmixed.js';
+import 'codemirror/mode/css/css.js';
+import 'codemirror/theme/base16-dark.css';
+import 'codemirror/theme/base16-light.css';
+import 'codemirror/lib/codemirror.css';
 import VueFlatPickr from 'vue-flatpickr-component';
 import 'flatpickr/dist/flatpickr.css';
 
-import { getSocket } from 'src/panel/helpers/socket';
-import { v4 as uuid } from 'uuid';
 import { GoalGroupInterface, GoalInterface } from 'src/bot/database/entity/goal';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 export default Vue.extend({
   components: {
-    panel: () => import('../../../components/panel.vue'),
+    panel:      () => import('../../../components/panel.vue'),
     holdButton: () => import('../../../components/holdButton.vue'),
-    font: () => import('../../../components/font.vue'),
-    datetime: VueFlatPickr,
+    font:       () => import('../../../components/font.vue'),
+    datetime:   VueFlatPickr,
     codemirror,
   },
   data: function () {
@@ -311,64 +308,67 @@ export default Vue.extend({
       },
       dateTimePicker: any,
     } = {
-      get: get,
+      get:       get,
       translate: translate,
-      socket: getSocket('/overlays/goals'),
-      search: '',
-      groupId: uuid(),
-      group: {
-        id: this.$route.params.id,
-        name: '',
+      socket:    getSocket('/overlays/goals'),
+      search:    '',
+      groupId:   uuid(),
+      group:     {
+        id:        this.$route.params.id,
+        name:      '',
         createdAt: Date.now(),
-        display: {
-          type: 'multi',
+        display:   {
+          type:                  'multi',
           spaceBetweenGoalsInPx: 10,
         },
         goals: [],
       },
-      fonts: [],
-      uiShowGoal: '',
-      typeOpts: ['followers', 'currentFollowers', 'currentSubscribers', 'subscribers', 'tips', 'bits'],
-      displayOpts: ['simple', 'full', 'custom'],
+      fonts:            [],
+      uiShowGoal:       '',
+      typeOpts:         ['followers', 'currentFollowers', 'currentSubscribers', 'subscribers', 'tips', 'bits'],
+      displayOpts:      ['simple', 'full', 'custom'],
       groupDisplayOpts: ['fade', 'multi'],
-      theme: localStorage.getItem('theme') || get(this.$store.state, 'configuration.core.ui.theme', 'light'),
+      theme:            localStorage.getItem('theme') || get(this.$store.state, 'configuration.core.ui.theme', 'light'),
 
-      customShow: 'html',
-      state: {
-        save: 0
-      },
+      customShow:     'html',
+      state:          { save: 0 },
       dateTimePicker: {
         enableTime: true,
-        altFormat: 'M	j, Y H:i',
-        altInput: true,
-        dateFormat: 'Z'
+        altFormat:  'M	j, Y H:i',
+        altInput:   true,
+        dateFormat: 'Z',
       },
-    }
-    return object
+    };
+    return object;
   },
   computed: {
-    isEditation: function (): boolean { return this.$route.params.id !== null },
+    isEditation: function (): boolean {
+      return this.$route.params.id !== null;
+    },
     currentGoal: function (): GoalInterface | null {
-      if (this.uiShowGoal === '') return null
-      else return this.group.goals.find((o) => o.id === this.uiShowGoal) || null
-    }
+      if (this.uiShowGoal === '') {
+        return null;
+      } else {
+        return this.group.goals.find((o) => o.id === this.uiShowGoal) || null;
+      }
+    },
   },
   watch: {
     'group.display.type': function (val) {
       if (val === 'fade') {
         this.$set(this.group, 'display', {
-          type: 'fade',
-          animationInMs: 1000,
+          type:           'fade',
+          animationInMs:  1000,
           animationOutMs: 1000,
-          durationMs: 60000
-        })
+          durationMs:     60000,
+        });
       } else {
         this.$set(this.group, 'display', {
-          type: val,
-          spaceBetweenGoalsInPx: 10
-        })
+          type:                  val,
+          spaceBetweenGoalsInPx: 10,
+        });
       }
-    }
+    },
   },
   methods: {
     del: function () {
@@ -378,34 +378,34 @@ export default Vue.extend({
         } else {
           this.$router.push({ name: 'GoalsRegistryList' });
         }
-      })
+      });
     },
     save: function () {
-      this.state.save = 1
+      this.state.save = 1;
       this.$forceUpdate();
 
-      this.group.id = this.groupId
+      this.group.id = this.groupId;
       if (this.group.name.trim().length === 0) {
-        this.group.name = [...Array(10)].map(() => Math.random().toString(36)[3]).join('')
+        this.group.name = [...Array(10)].map(() => Math.random().toString(36)[3]).join('');
       }
 
       this.socket.emit('goals::save', this.group, (err: string | null) => {
         if (err) {
           console.error(err);
         } else {
-          this.state.save = 2
+          this.state.save = 2;
         }
-        this.$router.push({ name: 'GoalsRegistryEdit', params: { id: this.group.id } })
+        this.$router.push({ name: 'GoalsRegistryEdit', params: { id: this.group.id } });
         setTimeout(() => {
           this.state.save = 0;
-        }, 1000)
-      })
+        }, 1000);
+      });
     },
     removeGoal: function (id: string) {
-      this.group.goals = this.group.goals.filter((o) => o.id !== id)
+      this.group.goals = this.group.goals.filter((o) => o.id !== id);
     },
     addGoal: function () {
-      const id = uuid()
+      const id = uuid();
       this.group.goals.push({
         id,
         name: '',
@@ -414,58 +414,58 @@ export default Vue.extend({
         display: 'full',
 
         customizationBar: {
-          color: '#00aa00',
+          color:           '#00aa00',
           backgroundColor: '#e9ecef',
-          borderColor: '#000000',
-          borderPx: 0,
-          height: 50,
+          borderColor:     '#000000',
+          borderPx:        0,
+          height:          50,
         },
         customizationFont: {
-          family: 'PT Sans',
-          weight: 500,
-          color: '#ffffff',
-          size: 20,
+          family:      'PT Sans',
+          weight:      500,
+          color:       '#ffffff',
+          size:        20,
           borderColor: '#000000',
-          borderPx: 1,
-          shadow: [],
+          borderPx:    1,
+          shadow:      [],
         },
-        customizationHtml: '\n\t<!-- ' +
-                '\n\t\tAll html objects will be wrapped in the #wrap div' +
-                '\n\t\tBootstrap classes are available' +
-                '\n\t\tAvailable variables:' +
-                  '\n\t\t\t$name - name of goal ; $type - type of goal ; $goalAmount - total amount' +
-                  '\n\t\t\t$currentAmount - current amount ; $percentageAmount - how much is achieved ; $endAfter - when goal ends' +
-              '\n\t-->' +
-              '\n' +
-              '\n\t<div class="row no-gutters">' +
-                '\n\t\t<div class="col-4 text-left text-nowrap pl-2 pr-2">$name</div>' +
-                '\n\t\t<div class="col-4 text-nowrap text-center">$currentAmount</div>' +
-                '\n\t\t<div class="col-4 text-nowrap text-right pr-2">$goalAmount</div>' +
-              '\n\t</div>' +
-              '\n' +
-              '\n\t<div class="progress">' +
-                '\n\t\t<div class="progress-bar" role="progressbar" style="width: $percentageAmount%" aria-valuenow="$percentageAmount" aria-valuemin="0" aria-valuemax="$goalAmount"></div>' +
-              '\n\t</div>' +
-              '\n',
-        customizationJs: '\n\tfunction onChange(currentAmount) {' +
-                '\n\t\tconsole.log(\'new value is \' + currentAmount);' +
-              '\n\t}' +
-              '\n',
-        customizationCss: '\n\t/* All html objects will be wrapped in the #wrap div */' +
-              '\n\n\t#wrap .progress-bar {' +
-                '\n\t\tbackground: black;' +
-              '\n\t}' +
-              '\n',
-        timestamp: Date.now(),
-        goalAmount: 1000,
-        currentAmount: 0,
-        endAfter: (new Date(Date.now() + 24 * 60 * 60 * 1000)).toISOString(),
-        endAfterIgnore: true,
+        customizationHtml: '\n\t<!-- '
+                + '\n\t\tAll html objects will be wrapped in the #wrap div'
+                + '\n\t\tBootstrap classes are available'
+                + '\n\t\tAvailable variables:'
+                  + '\n\t\t\t$name - name of goal ; $type - type of goal ; $goalAmount - total amount'
+                  + '\n\t\t\t$currentAmount - current amount ; $percentageAmount - how much is achieved ; $endAfter - when goal ends'
+              + '\n\t-->'
+              + '\n'
+              + '\n\t<div class="row no-gutters">'
+                + '\n\t\t<div class="col-4 text-left text-nowrap pl-2 pr-2">$name</div>'
+                + '\n\t\t<div class="col-4 text-nowrap text-center">$currentAmount</div>'
+                + '\n\t\t<div class="col-4 text-nowrap text-right pr-2">$goalAmount</div>'
+              + '\n\t</div>'
+              + '\n'
+              + '\n\t<div class="progress">'
+                + '\n\t\t<div class="progress-bar" role="progressbar" style="width: $percentageAmount%" aria-valuenow="$percentageAmount" aria-valuemin="0" aria-valuemax="$goalAmount"></div>'
+              + '\n\t</div>'
+              + '\n',
+        customizationJs: '\n\tfunction onChange(currentAmount) {'
+                + '\n\t\tconsole.log(\'new value is \' + currentAmount);'
+              + '\n\t}'
+              + '\n',
+        customizationCss: '\n\t/* All html objects will be wrapped in the #wrap div */'
+              + '\n\n\t#wrap .progress-bar {'
+                + '\n\t\tbackground: black;'
+              + '\n\t}'
+              + '\n',
+        timestamp:       Date.now(),
+        goalAmount:      1000,
+        currentAmount:   0,
+        endAfter:        (new Date(Date.now() + 24 * 60 * 60 * 1000)).toISOString(),
+        endAfterIgnore:  true,
         countBitsAsTips: false,
-      })
+      });
 
-      this.uiShowGoal = id
-    }
+      this.uiShowGoal = id;
+    },
   },
   mounted: async function () {
     if (this.$route.params.id) {
@@ -474,8 +474,10 @@ export default Vue.extend({
           console.error(err);
           return;
         }
-        if (Object.keys(d).length === 0) this.$router.push({ name: 'GoalsRegistryList' })
-        this.groupId = String(d.id)
+        if (Object.keys(d).length === 0) {
+          this.$router.push({ name: 'GoalsRegistryList' });
+        }
+        this.groupId = String(d.id);
 
         // workaround for missing weight after https://github.com/sogehige/sogeBot/issues/3871
         // workaround for missing shadow settings after https://github.com/sogehige/sogeBot/issues/3875
@@ -484,12 +486,12 @@ export default Vue.extend({
           goal.customizationFont.shadow = goal.customizationFont.shadow ?? [];
         }
 
-        this.group = d
+        this.group = d;
 
         if (this.uiShowGoal === '' && this.group.goals.length > 0) {
           this.uiShowGoal = this.group.goals[0].id ?? '';
         }
-      })
+      });
     }
     const { response } = await new Promise<{ response: Record<string, any>}>(resolve => {
       const request = new XMLHttpRequest();
@@ -497,22 +499,22 @@ export default Vue.extend({
 
       request.onload = function() {
         if (!(this.status >= 200 && this.status < 400)) {
-          console.error('Something went wrong getting font', this.status, this.response)
+          console.error('Something went wrong getting font', this.status, this.response);
         }
-        resolve({ response: JSON.parse(this.response)})
-      }
+        resolve({ response: JSON.parse(this.response) });
+      };
       request.onerror = function() {
-        console.error('Connection error to sogebot')
+        console.error('Connection error to sogebot');
         resolve( { response: {} });
       };
 
       request.send();
-    })
+    });
     this.fonts = response.items.map((o: { family: string }) => {
-      return { text: o.family, value: o.family }
-    })
-  }
-})
+      return { text: o.family, value: o.family };
+    });
+  },
+});
 </script>
 
 <style scoped>

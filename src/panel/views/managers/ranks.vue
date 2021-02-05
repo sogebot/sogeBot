@@ -155,32 +155,34 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, getCurrentInstance, computed, watch } from '@vue/composition-api'
-import { getSocket } from 'src/panel/helpers/socket';
-import { capitalize } from 'src/panel/helpers/capitalize';
-import { validationMixin } from 'vuelidate'
+import {
+  computed, defineComponent, getCurrentInstance, onMounted, ref, watch,
+} from '@vue/composition-api';
+import { escapeRegExp, isNil } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
+import { validationMixin } from 'vuelidate';
+import { minValue, required } from 'vuelidate/lib/validators';
 
-import { isNil, escapeRegExp } from 'lodash-es';
 import { RankInterface } from 'src/bot/database/entity/rank';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
-import translate from 'src/panel/helpers/translate';
+import { capitalize } from 'src/panel/helpers/capitalize';
 import { error } from 'src/panel/helpers/error';
-import { minValue, required } from 'vuelidate/lib/validators';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/systems/ranks');
 
 export default defineComponent({
-  mixins: [ validationMixin ],
+  mixins:     [ validationMixin ],
   components: {
-    'loading': () => import('src/panel/components/loading.vue'),
-    'label-inside': () => import('src/panel/components/label-inside.vue')
+    'loading':      () => import('src/panel/components/loading.vue'),
+    'label-inside': () => import('src/panel/components/label-inside.vue'),
   },
   validations: {
     editationItem: {
-      rank: {required},
-      value: {required, minValue: minValue(0)},
-    }
+      rank:  { required },
+      value: { required, minValue: minValue(0) },
+    },
   },
   setup(props, ctx) {
     const instance = getCurrentInstance()?.proxy;
@@ -193,7 +195,7 @@ export default defineComponent({
 
     const state = ref({
       loading: ButtonStates.progress,
-      save: ButtonStates.idle,
+      save:    ButtonStates.idle,
       pending: false,
     } as {
       loading: number;
@@ -202,14 +204,22 @@ export default defineComponent({
     });
 
     const fields = [
-      { key: 'value', label: capitalize(translate('hours')), sortable: true },
-      { key: 'rank', label: translate('rank'), sortable: true },
+      {
+        key: 'value', label: capitalize(translate('hours')), sortable: true,
+      },
+      {
+        key: 'rank', label: translate('rank'), sortable: true,
+      },
       { key: 'buttons', label: '' },
     ];
 
     const fields2 = [
-      { key: 'value', label: capitalize(translate('months')), sortable: true },
-      { key: 'rank', label: translate('rank'), sortable: true },
+      {
+        key: 'value', label: capitalize(translate('months')), sortable: true,
+      },
+      {
+        key: 'rank', label: translate('rank'), sortable: true,
+      },
       { key: 'buttons', label: '' },
     ];
 
@@ -219,10 +229,10 @@ export default defineComponent({
       }
       return items.value.filter((o) => {
         const isViewer = o.type === 'viewer';
-        const isSearchInHours = !isNil(String(o.value).match(new RegExp(escapeRegExp(search.value), 'ig')))
-        const isSearchInValue = !isNil(o.rank.match(new RegExp(escapeRegExp(search.value), 'ig')))
+        const isSearchInHours = !isNil(String(o.value).match(new RegExp(escapeRegExp(search.value), 'ig')));
+        const isSearchInValue = !isNil(o.rank.match(new RegExp(escapeRegExp(search.value), 'ig')));
         return isViewer && (isSearchInHours || isSearchInValue);
-      })
+      });
     });
     const fFollowerItems = computed(() => {
       if (search.value.length === 0) {
@@ -230,22 +240,22 @@ export default defineComponent({
       }
       return items.value.filter((o) => {
         const isFollower = o.type === 'follower';
-        const isSearchInHours = !isNil(String(o.value).match(new RegExp(escapeRegExp(search.value), 'ig')))
-        const isSearchInValue = !isNil(o.rank.match(new RegExp(escapeRegExp(search.value), 'ig')))
+        const isSearchInHours = !isNil(String(o.value).match(new RegExp(escapeRegExp(search.value), 'ig')));
+        const isSearchInValue = !isNil(o.rank.match(new RegExp(escapeRegExp(search.value), 'ig')));
         return isFollower && (isSearchInHours || isSearchInValue);
-      })
-    })
+      });
+    });
     const fSubscriberItems = computed(() => {
       if (search.value.length === 0) {
         return items.value.filter((o) => o.type === 'subscriber');
       }
       return items.value.filter((o) => {
         const isSubscriber = o.type === 'subscriber';
-        const isSearchInHours = !isNil(String(o.value).match(new RegExp(escapeRegExp(search.value), 'ig')))
-        const isSearchInValue = !isNil(o.rank.match(new RegExp(escapeRegExp(search.value), 'ig')))
+        const isSearchInHours = !isNil(String(o.value).match(new RegExp(escapeRegExp(search.value), 'ig')));
+        const isSearchInValue = !isNil(o.rank.match(new RegExp(escapeRegExp(search.value), 'ig')));
         return isSubscriber && (isSearchInHours || isSearchInValue);
-      })
-    })
+      });
+    });
 
     watch(() => ctx.root.$route.params.id, (val) => {
       const $v = instance?.$v;
@@ -255,7 +265,7 @@ export default defineComponent({
       } else {
         state.value.pending = false;
       }
-    })
+    });
     watch(editationItem, (val, oldVal) => {
       if (val !== null && oldVal !== null) {
         state.value.pending = true;
@@ -275,16 +285,16 @@ export default defineComponent({
         if (err) {
           return error(err);
         }
-        console.debug('Loaded', items)
+        console.debug('Loaded', items);
         items.value = itemsSocket;
         state.value.loading = ButtonStates.success;
-      })
-    }
+      });
+    };
 
     const linkTo = (item: Required<RankInterface>) => {
       console.debug('Clicked', item.id);
       ctx.root.$router.push({ name: 'RanksManagerEdit', params: { id: item.id } });
-    }
+    };
 
     const del = (id: string) => {
       if (confirm('Do you want to delete rank ' + items.value.find(o => o.id === id)?.rank + ' ('+items.value.find(o => o.id === id)?.value+')?')) {
@@ -293,9 +303,9 @@ export default defineComponent({
             return error(err);
           }
           refresh();
-        })
+        });
       }
-    }
+    };
 
     const save = () =>  {
       const $v = instance?.$v;
@@ -308,26 +318,28 @@ export default defineComponent({
             state.value.save = ButtonStates.fail;
             return error(err);
           } else {
-            console.groupCollapsed('generic::setById')
-            console.log({data})
+            console.groupCollapsed('generic::setById');
+            console.log({ data });
             console.groupEnd();
             state.value.save = ButtonStates.success;
             ctx.root.$nextTick(() => {
               refresh();
               state.value.pending = false;
-              ctx.root.$router.push({ name: 'RanksManagerEdit', params: { id: String(data.id) } }).catch(() => {});
+              ctx.root.$router.push({ name: 'RanksManagerEdit', params: { id: String(data.id) } }).catch(() => {
+                return; 
+              });
             });
           }
           setTimeout(() => {
             state.value.save = ButtonStates.idle;
-          }, 1000)
+          }, 1000);
         });
       }
-    }
+    };
     const isSidebarVisibleChange = (isVisible: boolean, ev: any) => {
       if (!isVisible) {
         if (state.value.pending) {
-          const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+          const isOK = confirm('You will lose your pending changes. Do you want to continue?');
           if (!isOK) {
             sidebarSlideEnabled.value = false;
             isSidebarVisible.value = false;
@@ -341,40 +353,44 @@ export default defineComponent({
           }
         }
         isSidebarVisible.value = isVisible;
-        ctx.root.$router.push({ name: 'RanksManagerList' }).catch(() => {});
+        ctx.root.$router.push({ name: 'RanksManagerList' }).catch(() => {
+          return; 
+        });
       } else {
         state.value.save = ButtonStates.idle;
         if (sidebarSlideEnabled.value) {
-          editationItem.value = null
+          editationItem.value = null;
           loadEditationItem();
         }
       }
-    }
+    };
     const loadEditationItem = () => {
       if (ctx.root.$route.params.id) {
         socket.emit('generic::getOne', ctx.root.$route.params.id, (err: string | null, data: RankInterface) => {
           if (err) {
             return error(err);
           }
-          console.debug({data})
+          console.debug({ data });
           if (data === null) {
             // we are creating new item
             editationItem.value = {
-              id: ctx.root.$route.params.id,
+              id:    ctx.root.$route.params.id,
               value: 20,
-              rank: '',
-              type: 'viewer'
-            }
+              rank:  '',
+              type:  'viewer',
+            };
           } else {
             editationItem.value = data;
           }
-        })
+        });
       } else {
         editationItem.value = null;
       }
-    }
+    };
     const newItem = () => {
-      ctx.root.$router.push({ name: 'RanksManagerEdit', params: { id: uuid() } }).catch(() => {});
+      ctx.root.$router.push({ name: 'RanksManagerEdit', params: { id: uuid() } }).catch(() => {
+        return; 
+      });
     };
 
     return {
@@ -394,7 +410,7 @@ export default defineComponent({
       fFollowerItems,
       fSubscriberItems,
       translate,
-    }
-  }
-})
+    };
+  },
+});
 </script>

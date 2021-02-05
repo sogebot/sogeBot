@@ -105,17 +105,21 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed, watch } from '@vue/composition-api'
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faRedo } from '@fortawesome/free-solid-svg-icons';
+import {
+  computed, defineComponent, onMounted, ref, watch, 
+} from '@vue/composition-api';
+import { cloneDeep, debounce } from 'lodash-es';
+
+import { HowLongToBeatGameInterface, HowLongToBeatGameItemInterface } from 'src/bot/database/entity/howLongToBeatGame';
+import { getTime, timestampToObject } from 'src/bot/helpers/getTime';
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import { error } from 'src/panel/helpers/error';
+import translate from 'src/panel/helpers/translate';
 
 import { getSocket } from '../../helpers/socket';
-import { HowLongToBeatGameInterface, HowLongToBeatGameItemInterface } from 'src/bot/database/entity/howLongToBeatGame';
-import { error } from 'src/panel/helpers/error';
-import { getTime, timestampToObject } from 'src/bot/helpers/getTime';
-import translate from 'src/panel/helpers/translate';
-import { ButtonStates } from 'src/panel/helpers/buttonStates';
-import { faRedo } from '@fortawesome/free-solid-svg-icons';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { cloneDeep, debounce } from 'lodash-es';
+
 library.add(faRedo);
 
 const socket = getSocket('/systems/howlongtobeat');
@@ -123,8 +127,8 @@ const socket = getSocket('/systems/howlongtobeat');
 export default defineComponent({
   components: {
     'loading': () => import('src/panel/components/loading.vue'),
-    search: () => import('src/panel/components/searchDropdown.vue'),
-    panel: () => import('../../components/panel.vue'),
+    search:    () => import('src/panel/components/searchDropdown.vue'),
+    panel:     () => import('../../components/panel.vue'),
   },
   setup(props, ctx) {
     const items = ref([] as HowLongToBeatGameInterface[]);
@@ -133,9 +137,7 @@ export default defineComponent({
     const oldStreams = ref([] as HowLongToBeatGameItemInterface[]);
     const searchForGameOpts = ref([] as string[]);
     const gameToAdd = ref('');
-    const state = ref({
-      loading: ButtonStates.progress,
-    } as {
+    const state = ref({ loading: ButtonStates.progress } as {
       loading: number;
     });
     const search = ref('');
@@ -144,13 +146,13 @@ export default defineComponent({
       return streams.value
         .filter(o => o.hltb_id === hltb_id && ((type === 'main' && o.isMainCounted) || (type === 'completionist' && o.isCompletionistCounted) || (type === 'extra' && o.isExtraCounted)))
         .reduce((a,b) => a + b.offset, 0);
-    }
+    };
 
     const getStreamsTimestamp = (hltb_id: string, type: 'extra' | 'main' | 'completionist') => {
       return streams.value
         .filter(o => o.hltb_id === hltb_id && ((type === 'main' && o.isMainCounted) || (type === 'completionist' && o.isCompletionistCounted) || (type === 'extra' && o.isExtraCounted)))
         .reduce((a,b) => a + b.timestamp, 0);
-    }
+    };
 
     const fItems = computed(() => {
       return items.value
@@ -158,7 +160,7 @@ export default defineComponent({
           if (search.value.trim() === '') {
             return true;
           }
-          return o.game.trim().toLowerCase().includes(search.value.trim().toLowerCase())
+          return o.game.trim().toLowerCase().includes(search.value.trim().toLowerCase());
         })
         .sort((a, b) => {
           const A = a.game.toLowerCase();
@@ -170,23 +172,27 @@ export default defineComponent({
             return 1;
           }
           return 0; //default return value (no sorting)
-        })
+        });
     });
 
     const fields = [
-      { key: 'thumbnail', label: '', },
-      { key: 'game', label: translate('systems.howlongtobeat.game'), sortable: true },
-      { key: 'startedAt', label: translate('systems.howlongtobeat.startedAt'), sortable: true },
-      { key: 'main', label: translate('systems.howlongtobeat.main')},
-      { key: 'extra', label: translate('systems.howlongtobeat.extra')},
+      { key: 'thumbnail', label: '' },
+      {
+        key: 'game', label: translate('systems.howlongtobeat.game'), sortable: true, 
+      },
+      {
+        key: 'startedAt', label: translate('systems.howlongtobeat.startedAt'), sortable: true, 
+      },
+      { key: 'main', label: translate('systems.howlongtobeat.main') },
+      { key: 'extra', label: translate('systems.howlongtobeat.extra') },
       { key: 'completionist', label: translate('systems.howlongtobeat.completionist') },
       { key: 'offset', label: translate('systems.howlongtobeat.offset') },
-      { key: 'buttons', label: '', },
+      { key: 'buttons', label: '' },
     ];
 
     onMounted(() => {
       refresh();
-    })
+    });
     const refresh = () => {
       socket.emit('generic::getAll', (err: string | null, _games: HowLongToBeatGameInterface[], _streams: HowLongToBeatGameItemInterface[]) => {
         if (err) {
@@ -197,28 +203,28 @@ export default defineComponent({
         streams.value = cloneDeep(_streams);
         oldStreams.value = cloneDeep(_streams);
         state.value.loading = ButtonStates.success;
-      })
-    }
+      });
+    };
 
     const timeToReadable = (data: { days: number; hours: number; minutes: number; seconds: number}) => {
       const output = [];
       if (data.days) {
-        output.push(`${data.days}d`)
+        output.push(`${data.days}d`);
       }
       if (data.hours) {
-        output.push(`${data.hours}h`)
+        output.push(`${data.hours}h`);
       }
       if (data.minutes) {
-        output.push(`${data.minutes}m`)
+        output.push(`${data.minutes}m`);
       }
       if (data.seconds || output.length === 0) {
-        output.push(`${data.seconds}s`)
+        output.push(`${data.seconds}s`);
       }
       return output.join(' ');
-    }
+    };
     const minutesFormatter = (value: number) => {
       return (value < 0 ? '- ' : '+ ') + timeToReadable(timestampToObject(Math.abs(value)));
-    }
+    };
 
     const del = (id: string) => {
       if (confirm('Do you want to delete tracked game ' + items.value.find(o => o.id === id)?.game + '?')) {
@@ -227,9 +233,9 @@ export default defineComponent({
             return error(err);
           }
           refresh();
-        })
+        });
       }
-    }
+    };
 
     watch(items, (val) => {
       for (const game of val) {
@@ -237,15 +243,15 @@ export default defineComponent({
         const oldGame = oldItems.value.find(o => o.id === game.id);
         if (oldGame
           && (oldGame.offset !== game.offset)) {
-              socket.emit('hltb::save', game, (err: string | null) => {
-                if (err) {
-                  error(err);
-                }
-              })
+          socket.emit('hltb::save', game, (err: string | null) => {
+            if (err) {
+              error(err);
             }
+          });
+        }
       }
       oldItems.value = cloneDeep(items.value);
-    }, { deep: true })
+    }, { deep: true });
 
     watch(streams, (val) => {
       for (const stream of val) {
@@ -256,15 +262,15 @@ export default defineComponent({
             || oldStream.isCompletionistCounted !== stream.isCompletionistCounted
             || oldStream.isExtraCounted !== stream.isExtraCounted
             || oldStream.offset !== stream.offset)) {
-              socket.emit('hltb::saveStreamChange', stream, (err: string | null) => {
-                if (err) {
-                  error(err);
-                }
-              })
+          socket.emit('hltb::saveStreamChange', stream, (err: string | null) => {
+            if (err) {
+              error(err);
             }
+          });
+        }
       }
       oldStreams.value = cloneDeep(streams.value);
-    }, { deep: true })
+    }, { deep: true });
 
     watch(gameToAdd, (val) => {
       if (val.trim().length > 0) {
@@ -272,11 +278,11 @@ export default defineComponent({
           if (err) {
             error(err);
           }
-          gameToAdd.value = ''
+          gameToAdd.value = '';
           refresh();
         });
       }
-    })
+    });
 
     const searchForGame = debounce((value: string)  => {
       if (value.trim().length !== 0) {
@@ -309,9 +315,9 @@ export default defineComponent({
       searchForGameOpts,
       gameToAdd,
       translate,
-    }
+    };
   },
-})
+});
 </script>
 
 <style scoped>

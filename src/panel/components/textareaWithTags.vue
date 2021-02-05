@@ -65,11 +65,16 @@
   </div>
 </template>
 <script lang="ts">
-import { computed, defineComponent, Ref, ref, watch } from '@vue/composition-api'
+import {
+  computed, defineComponent, Ref, ref, watch, 
+} from '@vue/composition-api';
+import {
+  isNil, keys, sortBy, 
+} from 'lodash-es';
+
+import translate from 'src/panel/helpers/translate';
 
 import { flatten } from '../../bot/helpers/flatten';
-import { sortBy, keys, isNil } from 'lodash-es';
-import translate from 'src/panel/helpers/translate';
 
 interface Props {
   value: string;
@@ -82,32 +87,32 @@ interface Props {
 export default defineComponent({
   filters: {
     filterize: function (val: string) {
-      const filtersRegExp = new RegExp('\\$(' + sortBy(keys(flatten(translate('responses.variable', true))), (o) => -o.length).join('|') + ')', 'g')
-      val = val.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-      let matches = val.match(filtersRegExp)
-      let output = val
+      const filtersRegExp = new RegExp('\\$(' + sortBy(keys(flatten(translate('responses.variable', true))), (o) => -o.length).join('|') + ')', 'g');
+      val = val.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      const matches = val.match(filtersRegExp);
+      let output = val;
       if (!isNil(matches)) {
-        for (let match of matches) {
+        for (const match of matches) {
           output = output.replace(match,
             `<span contenteditable="false" class="editable-variable">
               ${translate('responses.variable.' + match.replace('$', ''))}
-            </span>&nbsp;`)
+            </span>&nbsp;`);
         }
       }
-      return output
+      return output;
     },
   },
   props: {
-    value: String,
-    filters: Array,
-    error: Boolean,
+    value:       String,
+    filters:     Array,
+    error:       Boolean,
     placeholder: String,
-    state: [Boolean, Object],
+    state:       [Boolean, Object],
   },
   setup(props: Props, context) {
     const height = ref(0);
     const editation = ref(false);
-    const d_placeholder = !props.placeholder || props.placeholder.trim().length === 0 ? '&nbsp;' : props.placeholder
+    const d_placeholder = !props.placeholder || props.placeholder.trim().length === 0 ? '&nbsp;' : props.placeholder;
     const _value = ref(props.value);
 
     // refs
@@ -116,38 +121,42 @@ export default defineComponent({
     const div: Ref<HTMLElement | null> = ref(null);
 
     const heightStyle = computed(() => {
-      if (height.value === 0) return 'height: auto'
-      return `height: ${height.value + 2}px`
+      if (height.value === 0) {
+        return 'height: auto';
+      }
+      return `height: ${height.value + 2}px`;
     });
 
     watch(_value, (val) => {
-      context.emit('update:value', val)
-      context.emit('input')
+      context.emit('update:value', val);
+      context.emit('input');
     });
     watch(editation, (val, old) => {
       if (textarea.value && placeholderRef.value && div.value) {
         if (val) {
           // focus textarea and set height
           if (_value.value.trim().length === 0) {
-            height.value = placeholderRef.value.clientHeight
-          } else height.value = div.value.clientHeight
+            height.value = placeholderRef.value.clientHeight;
+          } else {
+            height.value = div.value.clientHeight;
+          }
           context.root.$nextTick(() => {
-            textarea.value?.focus()
-          })
+            textarea.value?.focus();
+          });
         } else {
           // texteare unfocused, set height of div
-          height.value = textarea.value.clientHeight
+          height.value = textarea.value.clientHeight;
         }
       }
     });
 
     const onEnter = (e: Event) => {
       // don't add newline
-      e.stopPropagation()
-      e.preventDefault()
-      e.returnValue = false
-      _value.value = (e.target as any).value
-    }
+      e.stopPropagation();
+      e.preventDefault();
+      e.returnValue = false;
+      _value.value = (e.target as any).value;
+    };
 
     const addVariable = (variable: string) => {
       _value.value = _value.value + ' $' + variable;
@@ -157,9 +166,9 @@ export default defineComponent({
           if (textarea.value) {
             textarea.value.focus();
           }
-        }, 10)
-      })
-    }
+        }, 10);
+      });
+    };
 
     return {
       height,
@@ -173,8 +182,8 @@ export default defineComponent({
       placeholderRef,
       div,
       translate,
-    }
-  }
+    };
+  },
 });
 </script>
 

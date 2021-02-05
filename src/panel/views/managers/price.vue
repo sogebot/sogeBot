@@ -151,45 +151,46 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed, watch, getCurrentInstance } from '@vue/composition-api'
+import {
+  computed, defineComponent, getCurrentInstance, onMounted, ref, watch,
+} from '@vue/composition-api';
 import { capitalize, isNil } from 'lodash-es';
-import { getSocket } from 'src/panel/helpers/socket';
-import type { PriceInterface } from 'src/bot/database/entity/price';
-import { ButtonStates } from 'src/panel/helpers/buttonStates';
-import { getLocalizedName } from 'src/bot/helpers/getLocalized';
-import translate from 'src/panel/helpers/translate';
-
+import { v4 as uuid } from 'uuid';
 import { validationMixin } from 'vuelidate';
 import { minValue, required } from 'vuelidate/lib/validators';
-import { error } from 'src/panel/helpers/error';
 
-import { v4 as uuid } from 'uuid';
+import type { PriceInterface } from 'src/bot/database/entity/price';
+import { getLocalizedName } from 'src/bot/helpers/getLocalized';
+import { ButtonStates } from 'src/panel/helpers/buttonStates';
+import { error } from 'src/panel/helpers/error';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/systems/price');
 export default defineComponent({
-  mixins: [ validationMixin ],
+  mixins:     [ validationMixin ],
   components: {
-    'loading': () => import('src/panel/components/loading.vue'),
-    'label-inside': () => import('src/panel/components/label-inside.vue')
+    'loading':      () => import('src/panel/components/loading.vue'),
+    'label-inside': () => import('src/panel/components/label-inside.vue'),
   },
   validations: {
     editationItem: {
       command: { required },
-      price: {
-        minValue: minValue(0),
+      price:   {
+        minValue:            minValue(0),
         required,
         oneValueIsAboveZero: (value, vm) => {
           return vm ? value + vm.priceBits > 0 : true;
-        }
+        },
       },
       priceBits: {
-        minValue: minValue(0),
+        minValue:            minValue(0),
         required,
         oneValueIsAboveZero: (value, vm) => {
           return vm ? value + vm.price > 0 : true;
-        }
+        },
       },
-    }
+    },
   },
   setup(props, ctx) {
     const instance = getCurrentInstance()?.proxy;
@@ -200,35 +201,39 @@ export default defineComponent({
     const editationItem = ref(null as PriceInterface | null);
     const state = ref({
       loading: ButtonStates.progress,
-      save: ButtonStates.idle,
+      save:    ButtonStates.idle,
       pending: false,
     } as {
       loading: number;
       save: number;
       pending: boolean;
-    })
+    });
     const fields = [
-      { key: 'command', label: capitalize(translate('systems.price.command.name')), sortable: true },
+      {
+        key: 'command', label: capitalize(translate('systems.price.command.name')), sortable: true,
+      },
       { key: 'price', label: capitalize(translate('systems.price.price.name')) },
       { key: 'emitRedeemEvent', label: '' },
       { key: 'buttons', label: '' },
     ];
     const priceFormatter = (item: PriceInterface) => {
-        const output = [];
-        if (item.price !== 0) {
-          output.push(`${item.price} ${getLocalizedName(item.price, ctx.root.$store.state.configuration.systems.Points.customization.name)}`)
-        }
-        if (item.priceBits !== 0) {
-          output.push(`${item.priceBits} ${getLocalizedName(item.priceBits, translate('bot.bits'))}`)
-        }
-        return output.join(` <small class="text-muted text-center">${translate('or')}</small> `);
+      const output = [];
+      if (item.price !== 0) {
+        output.push(`${item.price} ${getLocalizedName(item.price, ctx.root.$store.state.configuration.systems.Points.customization.name)}`);
       }
+      if (item.priceBits !== 0) {
+        output.push(`${item.priceBits} ${getLocalizedName(item.priceBits, translate('bot.bits'))}`);
+      }
+      return output.join(` <small class="text-muted text-center">${translate('or')}</small> `);
+    };
     const fItems = computed(() => {
-      if (search.value.length === 0) return items.value
+      if (search.value.length === 0) {
+        return items.value;
+      }
       return items.value.filter((o) => {
-        const isSearchInPrice = !isNil(o.command.match(new RegExp(search.value, 'ig')))
-        return isSearchInPrice
-      })
+        const isSearchInPrice = !isNil(o.command.match(new RegExp(search.value, 'ig')));
+        return isSearchInPrice;
+      });
     });
 
     watch(() => ctx.root.$route.params.id, (val) => {
@@ -239,7 +244,7 @@ export default defineComponent({
       } else {
         state.value.pending = false;
       }
-    })
+    });
     watch(editationItem, (val, oldVal) => {
       if (val !== null && oldVal !== null) {
         state.value.pending = true;
@@ -257,7 +262,7 @@ export default defineComponent({
     const isSidebarVisibleChange = (isVisible: boolean, ev: any) => {
       if (!isVisible) {
         if (state.value.pending) {
-          const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+          const isOK = confirm('You will lose your pending changes. Do you want to continue?');
           if (!isOK) {
             sidebarSlideEnabled.value = false;
             isSidebarVisible.value = false;
@@ -271,15 +276,17 @@ export default defineComponent({
           }
         }
         isSidebarVisible.value = isVisible;
-        ctx.root.$router.push({ name: 'PriceManager' }).catch(() => {});
+        ctx.root.$router.push({ name: 'PriceManager' }).catch(() => {
+          return; 
+        });
       } else {
         state.value.save = ButtonStates.idle;
         if (sidebarSlideEnabled.value) {
-          editationItem.value = null
+          editationItem.value = null;
           loadEditationItem();
         }
       }
-    }
+    };
 
     const refresh = () => {
       socket.emit('generic::getAll', (err: string | null, itemsGetAll: PriceInterface[]) => {
@@ -287,35 +294,35 @@ export default defineComponent({
           return error(err);
         }
         items.value = itemsGetAll;
-        console.debug({ items: itemsGetAll })
+        console.debug({ items: itemsGetAll });
         state.value.loading = ButtonStates.success;
-      })
-    }
+      });
+    };
     const loadEditationItem = () => {
       if (ctx.root.$route.params.id) {
         socket.emit('generic::getOne', ctx.root.$route.params.id, (err: string | null, data: PriceInterface) => {
           if (err) {
             return error(err);
           }
-          console.debug({data})
+          console.debug({ data });
           if (data === null) {
             // we are creating new item
             editationItem.value = {
-              command: '',
-              price: 10,
-              priceBits: 0,
-              id: ctx.root.$route.params.id,
-              enabled: true,
+              command:         '',
+              price:           10,
+              priceBits:       0,
+              id:              ctx.root.$route.params.id,
+              enabled:         true,
               emitRedeemEvent: false,
-            }
+            };
           } else {
             editationItem.value = data;
           }
-        })
+        });
       } else {
         editationItem.value = null;
       }
-    }
+    };
     const update = (item: PriceInterface) => {
       socket.emit('price::save', item, (err: string | null) => {
         if (err) {
@@ -330,16 +337,20 @@ export default defineComponent({
             return error(err);
           }
           refresh();
-        })
+        });
       }
-    }
+    };
     const newItem = () => {
-      ctx.root.$router.push({ name: 'PriceManagerEdit', params: { id: uuid() } }).catch(() => {});
+      ctx.root.$router.push({ name: 'PriceManagerEdit', params: { id: uuid() } }).catch(() => {
+        return; 
+      });
     };
     const linkTo = (item: Required<PriceInterface>) => {
       console.debug('Clicked', item.id);
-      ctx.root.$router.push({ name: 'PriceManagerEdit', params: { id: item.id } }).catch(() => {});
-    }
+      ctx.root.$router.push({ name: 'PriceManagerEdit', params: { id: item.id } }).catch(() => {
+        return; 
+      });
+    };
     const save = () => {
       const $v = instance?.$v;
       $v?.$touch();
@@ -356,11 +367,13 @@ export default defineComponent({
           ctx.root.$nextTick(() => {
             refresh();
             state.value.pending = false;
-            ctx.root.$router.push({ name: 'PriceManagerEdit', params: { id: String(editationItem.value?.id) } }).catch(() => {});
-          })
+            ctx.root.$router.push({ name: 'PriceManagerEdit', params: { id: String(editationItem.value?.id) } }).catch(() => {
+              return; 
+            });
+          });
           setTimeout(() => {
             state.value.save = ButtonStates.idle;
-          }, 1000)
+          }, 1000);
         });
       }
     };
@@ -383,7 +396,7 @@ export default defineComponent({
       getLocalizedName,
       priceFormatter,
       translate,
-    }
-  }
+    };
+  },
 });
 </script>

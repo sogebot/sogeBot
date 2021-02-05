@@ -443,52 +443,52 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, PropSync, Watch } from 'vue-property-decorator';
-import type { CommonSettingsInterface } from 'src/bot/database/entity/alert';
 import { get } from 'lodash-es';
-import translate from 'src/panel/helpers/translate';
-
 import { codemirror } from 'vue-codemirror';
+import {
+  Component, Prop, PropSync, Vue, Watch,
+} from 'vue-property-decorator';
 import 'codemirror/mode/javascript/javascript.js';
 import 'codemirror/mode/htmlmixed/htmlmixed.js';
 import 'codemirror/mode/css/css.js';
 import 'codemirror/theme/base16-dark.css';
 import 'codemirror/theme/base16-light.css';
 import 'codemirror/lib/codemirror.css';
-import text from 'src/bot/data/templates/alerts.txt';
-import textjs from 'src/bot/data/templates/alerts-with-message.txt';
-
 import { Validations } from 'vuelidate-property-decorators';
-import { required, minValue } from 'vuelidate/lib/validators'
+import { minValue, required } from 'vuelidate/lib/validators';
+
+import textjs from 'src/bot/data/templates/alerts-with-message.txt';
+import text from 'src/bot/data/templates/alerts.txt';
+import type { CommonSettingsInterface } from 'src/bot/database/entity/alert';
+import translate from 'src/panel/helpers/translate';
 
 @Component({
   components: {
     codemirror,
-    media: () => import('src/panel/components/media.vue'),
-    'layout-picker': () => import('./layout-picker.vue'),
+    media:            () => import('src/panel/components/media.vue'),
+    'layout-picker':  () => import('./layout-picker.vue'),
     'text-animation': () => import('./text-animation.vue'),
-    'animation-in': () => import('./animation-in.vue'),
-    'animation-out': () => import('./animation-out.vue'),
-    'variant': () => import('./variant.vue'),
-    'font': () => import('src/panel/components/font.vue'),
-    'hold-button': () => import('../../../../components/holdButton.vue'),
-    'tts': () => import('./tts.vue'),
-    'rewards': () => import('src/panel/components/rewardDropdown.vue'),
-    'query-filter': () => import('./query-filter.vue'),
-  }
+    'animation-in':   () => import('./animation-in.vue'),
+    'animation-out':  () => import('./animation-out.vue'),
+    'variant':        () => import('./variant.vue'),
+    'font':           () => import('src/panel/components/font.vue'),
+    'hold-button':    () => import('../../../../components/holdButton.vue'),
+    'tts':            () => import('./tts.vue'),
+    'rewards':        () => import('src/panel/components/rewardDropdown.vue'),
+    'query-filter':   () => import('./query-filter.vue'),
+  },
 })
 export default class AlertsEditFollowForm extends Vue {
-  @PropSync('alert') data !: CommonSettingsInterface
-  @Prop() readonly index !: number
-  @Prop() readonly event !: string
-  @Prop() readonly validationDate !: number
+  @PropSync('alert') data !: CommonSettingsInterface;
+  @Prop() readonly index !: number;
+  @Prop() readonly event !: string;
+  @Prop() readonly validationDate !: number;
 
   theme = localStorage.getItem('theme') || get(this.$store.state, 'configuration.core.ui.theme', 'light');
   customShow: 'html' | 'css' | 'js' = 'html';
   fonts: {text: string; value: string}[] = [];
   get = get;
   translate = translate;
-
 
   @Watch('validationDate')
   touchValidation() {
@@ -498,18 +498,18 @@ export default class AlertsEditFollowForm extends Vue {
   @Watch('data', { deep: true })
   @Watch('$v', { deep: true })
   emitValidation() {
-    this.$emit('update')
-    this.$emit('update:isValid', !this.$v.$error)
+    this.$emit('update');
+    this.$emit('update:isValid', !this.$v.$error);
   }
 
   @Validations()
   validations = {
     data: {
-      variantAmount: {required, minValue: minValue(0)},
-      messageTemplate: {required},
-      rewardId: {required},
-    }
-  }
+      variantAmount:   { required, minValue: minValue(0) },
+      messageTemplate: { required },
+      rewardId:        { required },
+    },
+  };
 
   revertCode() {
     if (this.customShow === 'css') {
@@ -534,20 +534,20 @@ export default class AlertsEditFollowForm extends Vue {
 
       request.onload = function() {
         if (!(this.status >= 200 && this.status < 400)) {
-          console.error('Something went wrong getting font', this.status, this.response)
+          console.error('Something went wrong getting font', this.status, this.response);
         }
-        resolve({ response: JSON.parse(this.response)})
-      }
+        resolve({ response: JSON.parse(this.response) });
+      };
       request.onerror = function() {
-        console.error('Connection error to sogebot')
+        console.error('Connection error to sogebot');
         resolve( { response: {} });
       };
 
       request.send();
-    })
+    });
     this.fonts = response.items.map((o: { family: string }) => {
-      return { text: o.family, value: o.family }
-    })
+      return { text: o.family, value: o.family };
+    });
     this.emitValidation();
   }
 }

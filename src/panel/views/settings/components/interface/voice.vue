@@ -18,7 +18,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch } from '@vue/composition-api'
+import {
+  defineComponent, onMounted, ref, watch, 
+} from '@vue/composition-api';
+
 import translate from 'src/panel/helpers/translate';
 
 declare global {
@@ -34,22 +37,22 @@ export default defineComponent({
   },
   setup(props: { value: string; title: string }, ctx) {
     const currentValue = ref(props.value);
-    const translatedTitle = ref(translate(props.title))
+    const translatedTitle = ref(translate(props.title));
     const voices = ref([] as { text: string, value: string}[]);
     const loading = ref(0);
 
     watch(currentValue, (val) => {
-      ctx.emit('update', { value: val })
-    })
+      ctx.emit('update', { value: val });
+    });
 
     onMounted(() => {
       init();
-    })
+    });
 
     function init() {
       if (ctx.root.$store.state.configuration.integrations.ResponsiveVoice.api.key.trim().length > 0) {
         if (typeof window.responsiveVoice === 'undefined') {
-          ctx.root.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + ctx.root.$store.state.configuration.integrations.ResponsiveVoice.api.key)
+          ctx.root.$loadScript('https://code.responsivevoice.org/responsivevoice.js?key=' + ctx.root.$store.state.configuration.integrations.ResponsiveVoice.api.key)
             .then(() => initResponsiveVoice(0));
         } else {
           loadVoices();
@@ -61,7 +64,7 @@ export default defineComponent({
 
     function loadVoices() {
       voices.value = window.responsiveVoice.getVoices().map((o: { name: string }) => {
-        return { text: o.name, value: o.name }
+        return { text: o.name, value: o.name };
       });
       loading.value = 2;
     }
@@ -85,7 +88,7 @@ export default defineComponent({
       voices,
 
       translate,
-    }
-  }
-})
+    };
+  },
+});
 </script>

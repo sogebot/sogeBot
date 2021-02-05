@@ -77,38 +77,37 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import AudioVisual from 'vue-audio-visual'
-
-Vue.use(AudioVisual);
-
-import { defineComponent, onMounted, onUnmounted, ref } from '@vue/composition-api'
-import type  { Ref } from '@vue/composition-api'
+import {
+  defineComponent, onMounted, onUnmounted, ref,
+} from '@vue/composition-api';
+import type  { Ref } from '@vue/composition-api';
+import { Socket } from 'socket.io-client';
 import { v4 as uuid } from 'uuid';
+import Vue from 'vue';
+import AudioVisual from 'vue-audio-visual';
+
+import type { AlertMediaInterface } from 'src/bot/database/entity/alert';
+import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
-import { getSocket } from '../helpers/socket';
-import type { AlertMediaInterface } from 'src/bot/database/entity/alert';
-import { Socket } from 'socket.io-client';
+Vue.use(AudioVisual);
 
 interface Props {
   media: string; default?: string; socket: string; type: 'image' | 'audio'; volume: number;
 }
 
 export default defineComponent({
-  components: {
-    loading: () => import('./loading.vue'),
-  },
-  props: {
-    media: String,
+  components: { loading: () => import('./loading.vue') },
+  props:      {
+    media:   String,
     default: String,
-    socket: String,
-    type: String,
-    volume: Number,
+    socket:  String,
+    type:    String,
+    volume:  Number,
   },
   setup(props: Props, context) {
-    let io: Socket = getSocket(props.socket);
-    let interval = 0
+    const io: Socket = getSocket(props.socket);
+    let interval = 0;
 
     const b64data = ref('');
     const duration = ref(0);
@@ -161,7 +160,7 @@ export default defineComponent({
           duration.value = Math.floor(duration.value * 10) / 10;
         }
       }
-    }
+    };
 
     const setVolume = () => {
       if ((props.type === 'audio' || (props.type === 'image' && b64data.value.startsWith('data:video/webm'))) && b64data.value.length > 0) {
@@ -185,7 +184,7 @@ export default defineComponent({
           }
         }
       }
-    }
+    };
 
     const startInterval = () => {
       interval = window.setInterval(() => {
@@ -196,13 +195,15 @@ export default defineComponent({
         setVolume();
         isPlayingSetter();
         setDuration();
-      }, 100)
-    }
+      }, 100);
+    };
 
     const removeMedia = () => {
-      b64data.value = ''
-      io.emit('alerts::deleteMedia', props.media, () => {})
-    }
+      b64data.value = '';
+      io.emit('alerts::deleteMedia', props.media, () => {
+        return;
+      });
+    };
 
     const fileUpload = (chunks: RegExpMatchArray | null) => {
       if (!chunks) {
@@ -210,7 +211,7 @@ export default defineComponent({
       }
       const id = uuid();
       isUploading.value = true;
-      const promises: Promise<void>[] = []
+      const promises: Promise<void>[] = [];
       context.root.$nextTick(async () => {
         console.log('Uploading new media with id', id);
 
@@ -220,35 +221,35 @@ export default defineComponent({
               const chunk = {
                 id,
                 b64data: chunks[i],
-                chunkNo: i
-              }
-              console.log('Uploading chunk#' + i, chunk)
+                chunkNo: i,
+              };
+              console.log('Uploading chunk#' + i, chunk);
               io.emit('alerts::saveMedia', [chunk], (err: string | null) => {
                 if (err) {
-                  console.error(err)
+                  console.error(err);
                   reject();
                 }
                 console.log('Uploaded chunk#' + i);
-                resolve()
-              })
-            })
-          )
-        };
+                resolve();
+              });
+            }),
+          );
+        }
 
         await Promise.all(promises);
         context.emit('update:media', id);
         isUploading.value = false;
       });
-    }
+    };
 
     const filesChange = (file: HTMLInputElement['files']) => {
       if (!file) {
         return;
       }
 
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onload = (async e => {
-        const chunks = String(reader.result).match(/.{1,500000}/g)
+        const chunks = String(reader.result).match(/.{1,500000}/g);
         fileUpload(chunks);
 
         await new Promise<void>(res => {
@@ -256,16 +257,16 @@ export default defineComponent({
             if (isUploading.value) {
               setTimeout(() => checkIsUploading(), 500);
             } else {
-              res()
+              res();
             }
           };
           checkIsUploading();
-        })
-        console.log('done')
+        });
+        console.log('done');
         b64data.value = String(reader.result);
-      })
-      reader.readAsDataURL(file[0])
-    }
+      });
+      reader.readAsDataURL(file[0]);
+    };
 
     onMounted(() => {
       createdAt.value = Date.now();
@@ -273,21 +274,21 @@ export default defineComponent({
         if (err) {
           return console.error(err);
         }
-        console.groupCollapsed('alerts::getOneMedia ' + props.media)
-        console.log(data)
+        console.groupCollapsed('alerts::getOneMedia ' + props.media);
+        console.log(data);
         console.groupEnd();
         b64data.value = data.sort((a,b) => a.chunkNo - b.chunkNo).map(o => o.b64data).join('');
         startInterval();
       });
     });
-    onUnmounted(() => clearInterval(interval))
+    onUnmounted(() => clearInterval(interval));
 
     return {
       b64data, duration, isUploading, createdAt, audio, video,
       removeMedia, play, filesChange, translate, isPlaying, stop,
-    }
-  }
-})
+    };
+  },
+});
 </script>
 <style scoped>
   .card-img {

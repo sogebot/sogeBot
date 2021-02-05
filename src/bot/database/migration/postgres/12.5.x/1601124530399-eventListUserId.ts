@@ -49,7 +49,7 @@ export class eventListUserId1601124530399 implements MigrationInterface {
     await queryRunner.query(`CREATE TABLE "temporary_event_list" ("id" SERIAL NOT NULL, "event" character varying NOT NULL, "userId" character varying NOT NULL, "timestamp" bigint NOT NULL, "values_json" text NOT NULL, "isTest" boolean NOT NULL, CONSTRAINT "PK_1cc2e9353e9ae8acf95d976cf6g" PRIMARY KEY ("id"))`, undefined);
     for (const event of migratedEvents) {
       await queryRunner.query(
-        `INSERT INTO temporary_event_list(${Object.keys(event).join(', ')}) values(${Object.keys(event).map((o: any) => '?')})`, [ ...Object.keys(event).map(key => event[key]) ]
+        `INSERT INTO temporary_event_list(${Object.keys(event).join(', ')}) values(${Object.keys(event).map((o: any) => '?')})`, [ ...Object.keys(event).map(key => event[key]) ],
       );
     }
     await queryRunner.query(`DROP TABLE "event_list"`);

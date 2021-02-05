@@ -19,7 +19,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch, onUnmounted } from '@vue/composition-api'
+import {
+  defineComponent, onMounted, onUnmounted, ref, watch, 
+} from '@vue/composition-api';
 
 interface Props {
   ttc: number;
@@ -29,10 +31,10 @@ interface Props {
 }
 export default defineComponent({
   props: {
-    ttc: Number,
-    icon: String,
+    ttc:      Number,
+    icon:     String,
     disabled: Boolean,
-    small: Boolean,
+    small:    Boolean,
   },
   setup(props: Props, context) {
     const intervals: number[] = [];
@@ -42,51 +44,55 @@ export default defineComponent({
     const percentage = ref(0);
 
     const shouldBeTriggered = () => {
-      const ttc = props.ttc || 1000
+      const ttc = props.ttc || 1000;
       if (isMouseOver.value && onMouseDownStarted.value !== 0) {
-        percentage.value = (ttc / 10) * ((Date.now() - onMouseDownStarted.value) / 1000)
-        if (percentage.value > 100) percentage.value = 100
+        percentage.value = (ttc / 10) * ((Date.now() - onMouseDownStarted.value) / 1000);
+        if (percentage.value > 100) {
+          percentage.value = 100;
+        }
 
         if (Date.now() - onMouseDownStarted.value > ttc) {
-          trigger.value = true
+          trigger.value = true;
         }
       }
-    }
+    };
 
     const onMouseDown = () => {
-      onMouseDownStarted.value = Date.now()
+      onMouseDownStarted.value = Date.now();
     };
 
     const onMouseUp = () => {
-      onMouseDownStarted.value = 0
-      trigger.value = false
-      percentage.value = 0
+      onMouseDownStarted.value = 0;
+      trigger.value = false;
+      percentage.value = 0;
     };
 
     onMounted(() => {
-      intervals.push(window.setInterval(() => shouldBeTriggered(), 10))
+      intervals.push(window.setInterval(() => shouldBeTriggered(), 10));
     });
     onUnmounted(() => {
-      for (let i of intervals) clearInterval(i)
-    })
+      for (const i of intervals) {
+        clearInterval(i);
+      }
+    });
 
     watch(trigger, (val) => {
       if (val) {
-        context.emit('trigger')
+        context.emit('trigger');
       }
-    })
+    });
     watch(isMouseOver, (val) => {
       if (!val) {
-        onMouseDownStarted.value = 0
-        trigger.value = false
-        percentage.value = 0
+        onMouseDownStarted.value = 0;
+        trigger.value = false;
+        percentage.value = 0;
       }
-    })
+    });
 
     return {
-      onMouseDownStarted, isMouseOver, percentage, onMouseDown, onMouseUp
-    }
-  }
+      onMouseDownStarted, isMouseOver, percentage, onMouseDown, onMouseUp,
+    };
+  },
 });
 </script>
 

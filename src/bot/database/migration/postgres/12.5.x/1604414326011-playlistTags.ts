@@ -10,7 +10,7 @@ export class playlistTags1604414326011 implements MigrationInterface {
     for (const item of playlist) {
       await queryRunner.query(
         `INSERT INTO "song_playlist"("videoId", "lastPlayedAt", "seed", "title", "length", "loudness", "forceVolume", "volume", "startTime", "endTime", "tags") values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [item.videoId, item.lastPlayedAt, item.seed, item.title, item.length, item.loudness, item.forceVolume, item.volume, item.startTime, item.endTime, 'general']
+        [item.videoId, item.lastPlayedAt, item.seed, item.title, item.length, item.loudness, item.forceVolume, item.volume, item.startTime, item.endTime, 'general'],
       );
     }
   }

@@ -135,7 +135,7 @@ const processFollowerState = async (users: { from_name: string; from_id: number;
   const usersGotFromDb = (await Promise.all(
     chunk(users, SQLVariableLimit).map(async (bulk) => {
       return await getRepository(User).findByIds(bulk.map(user => user.from_id));
-    })
+    }),
   )).flat();
   debug('api.followers', `Found ${usersGotFromDb.length} followers in database`);
   if (users.length > usersGotFromDb.length) {
@@ -264,7 +264,7 @@ class API extends Core {
             continue;
           }
         } else {
-          debug('api.interval', chalk.yellow(fnc + '() ') + `skip run, lastRunAt: ${interval.lastRunAt}`,  );
+          debug('api.interval', chalk.yellow(fnc + '() ') + `skip run, lastRunAt: ${interval.lastRunAt}`  );
         }
       }
     };
@@ -982,7 +982,7 @@ class API extends Core {
           if (!webhooks.enabled.streams && Number(streamId) !== Number(stream.id)) {
             debug('api.stream', 'API: ' + JSON.stringify(stream));
             start(
-              `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await getGameNameFromId(Number(stream.game_id))} | type: ${stream.type} | channel ID: ${cid}`
+              `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await getGameNameFromId(Number(stream.game_id))} | type: ${stream.type} | channel ID: ${cid}`,
             );
 
             // reset quick stats on stream start

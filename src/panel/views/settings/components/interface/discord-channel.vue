@@ -41,25 +41,24 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { getSocket } from 'src/panel/helpers/socket';
-import { announceTypes } from 'src/bot/helpers/commons';
-import translate from 'src/panel/helpers/translate';
 import { isEqual } from 'lodash';
+import {
+  Component, Prop, Vue, Watch, 
+} from 'vue-property-decorator';
+
+import { announceTypes } from 'src/bot/helpers/commons';
+import { getSocket } from 'src/panel/helpers/socket';
+import translate from 'src/panel/helpers/translate';
 
 type Channel = { text: string, value: string };
 
-@Component({
-  components: {
-    'title-divider': () => import('src/panel/components/title-divider.vue'),
-  }
-})
+@Component({ components: { 'title-divider': () => import('src/panel/components/title-divider.vue') } })
 export default class discordChannel extends Vue {
   @Prop() readonly value!: string[] | string | { [key in typeof announceTypes[number]]: string };
   @Prop() readonly title!: string;
 
-  socket = getSocket('/integrations/discord')
-  channels: Channel[] = []
+  socket = getSocket('/integrations/discord');
+  channels: Channel[] = [];
 
   currentValue = this.value;
   translatedTitle = translate(this.title);
@@ -70,8 +69,8 @@ export default class discordChannel extends Vue {
     }
 
     this.socket.emit('discord::getChannels', (err: string | null, channels: Channel[]) => {
-      console.groupCollapsed('discord::getChannels')
-      console.log({channels});
+      console.groupCollapsed('discord::getChannels');
+      console.log({ channels });
       console.groupEnd();
       if (err) {
         return console.error(err);
@@ -108,12 +107,12 @@ export default class discordChannel extends Vue {
     if (Array.isArray(this.currentValue)) {
       // remove all empty arrays
       const newCurrentValue = [...this.currentValue.filter(o => o !== ''), ''];
-      console.log({newCurrentValue, cur: this.currentValue})
+      console.log({ newCurrentValue, cur: this.currentValue });
       if (!isEqual(this.currentValue, newCurrentValue)) {
         this.currentValue = newCurrentValue;
       }
     }
     this.$emit('update', { value: this.currentValue });
   }
-};
+}
 </script>

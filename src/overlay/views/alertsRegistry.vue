@@ -126,18 +126,19 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
-import JsonViewer from 'vue-json-viewer'
-import VRuntimeTemplate from 'v-runtime-template';
-import { isEqual, get } from 'lodash-es';
-import urlRegex from 'url-regex';
+import { get, isEqual } from 'lodash-es';
 import safeEval from 'safe-eval';
+import urlRegex from 'url-regex';
+import VRuntimeTemplate from 'v-runtime-template';
+import JsonViewer from 'vue-json-viewer';
+import { Component, Vue } from 'vue-property-decorator';
 
+import {
+  AlertInterface, AlertResubInterface, AlertRewardRedeemInterface, AlertTipInterface, CommonSettingsInterface, EmitData,
+} from 'src/bot/database/entity/alert';
 import { CacheEmotesInterface } from 'src/bot/database/entity/cacheEmotes';
-import { EmitData, AlertInterface, CommonSettingsInterface, AlertTipInterface, AlertResubInterface, AlertRewardRedeemInterface } from 'src/bot/database/entity/alert';
-
 import { getSocket } from 'src/panel/helpers/socket';
-import { textStrokeGenerator, shadowGenerator } from 'src/panel/helpers/text';
+import { shadowGenerator, textStrokeGenerator } from 'src/panel/helpers/text';
 import { itemsToEvalPart } from 'src/panel/views/registries/alerts/components/query-filter.vue';
 
 require('../../../scss/letter-animations.css');
@@ -151,14 +152,14 @@ declare global {
 let isTTSPlaying = false;
 let cleanupAlert = false;
 
-let alerts: (EmitData & {isTTSMuted: boolean, isSoundMuted: boolean})[] = [];
+const alerts: (EmitData & {isTTSMuted: boolean, isSoundMuted: boolean})[] = [];
 
 @Component({
   components: {
     JsonViewer,
     VRuntimeTemplate,
     'baffle': () => import('src/panel/components/baffle.vue'),
-  }
+  },
 })
 export default class AlertsRegistryOverlays extends Vue {
   textStrokeGenerator = textStrokeGenerator;
@@ -172,18 +173,16 @@ export default class AlertsRegistryOverlays extends Vue {
   loadedCSS: string[] = [];
   responsiveAPIKey: string | null = null;
 
-  preparedAdvancedHTML: string = '';
+  preparedAdvancedHTML = '';
   typeOfMedia: Map<string, 'audio' | 'image' | 'video' | null> = new Map();
   sizeOfMedia: Map<string, [width: number, height: number]> = new Map();
 
   state: {
     loaded: number,
-  } = {
-    loaded: this.$state.progress,
-  }
+  } = { loaded: this.$state.progress };
 
   id: null | string = null;
-  updatedAt: number = -1; // force initial load
+  updatedAt = -1; // force initial load
   data: null | AlertInterface = null;
   defaultProfanityList: string[] = [];
   listHappyWords: string[] = [];
@@ -214,7 +213,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
   withEmotes(text: string) {
     // checking emotes
-    for (let emote of this.emotes) {
+    for (const emote of this.emotes) {
       if (get(this.runningAlert, `alert.message.allowEmotes.${emote.type}`, false)) {
         const split = text.split(' ');
         for (let i = 0; i < split.length; i++) {
@@ -285,7 +284,9 @@ export default class AlertsRegistryOverlays extends Vue {
         if (TTS.trim().length === 0) {
           setTimeout(() => resolve(), 500);
         } else {
-          window.responsiveVoice.speak(TTS, voice, { rate, pitch, volume, onend: () => setTimeout(() => resolve(), 500) });
+          window.responsiveVoice.speak(TTS, voice, {
+            rate, pitch, volume, onend: () => setTimeout(() => resolve(), 500),
+          });
         }
       });
     }
@@ -298,30 +299,32 @@ export default class AlertsRegistryOverlays extends Vue {
       return;
     }
     window.responsiveVoice.init();
-    console.debug('= ResponsiveVoice init OK')
+    console.debug('= ResponsiveVoice init OK');
   }
 
   checkResponsiveVoiceAPIKey() {
     this.socketRV.emit('get.value', 'key', (err: string | null, value: string) => {
       if (this.responsiveAPIKey !== value) {
         // unload if values doesn't match
-        this.$unloadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.responsiveAPIKey)
-          .catch(() => {}); // skip error
+        this.$unloadScript('https://code.responsivevoice.org/responsivevoice.js?key=' + this.responsiveAPIKey)
+          .catch(() => {
+            return;
+          }); // skip error
         if (value.trim().length > 0) {
-          this.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + value)
+          this.$loadScript('https://code.responsivevoice.org/responsivevoice.js?key=' + value)
             .then(() => {
               this.responsiveAPIKey = value;
               this.initResponsiveVoice();
               setTimeout(() => this.checkResponsiveVoiceAPIKey(), 1000);
             });
         } else {
-          console.debug('TTS disabled, responsiveVoice key is not set')
+          console.debug('TTS disabled, responsiveVoice key is not set');
           this.responsiveAPIKey = value;
           setTimeout(() => this.checkResponsiveVoiceAPIKey(), 1000);
         }
       }
       setTimeout(() => this.checkResponsiveVoiceAPIKey(), 1000);
-    })
+    });
   }
 
   mounted() {
@@ -336,20 +339,22 @@ export default class AlertsRegistryOverlays extends Vue {
         if (this.runningAlert.hideAt - Date.now() <= 0
           && !isTTSPlaying
           && !this.runningAlert.waitingForTTS) {
-            if (!cleanupAlert) {
-            console.debug('Cleanin up', { isTTSPlaying, waitingForTTS: this.runningAlert.waitingForTTS, hideAt: this.runningAlert.hideAt - Date.now() <= 0 })
+          if (!cleanupAlert) {
+            console.debug('Cleanin up', {
+              isTTSPlaying, waitingForTTS: this.runningAlert.waitingForTTS, hideAt: this.runningAlert.hideAt - Date.now() <= 0,
+            });
             // eval onEnded
             this.$nextTick(() => {
               if (this.runningAlert && this.runningAlert.alert.enableAdvancedMode) {
                 eval(`${this.runningAlert.alert.advancedMode.js}; if (typeof onEnded === 'function') { onEnded() } else { console.log('no onEnded() function found'); }`);
               }
-            })
+            });
 
             cleanupAlert = true;
             setTimeout(() => {
               this.runningAlert = null;
               cleanupAlert = false;
-            }, this.runningAlert.alert.animationOutDuration + 1000)
+            }, this.runningAlert.alert.animationOutDuration + 1000);
           }
           return;
         } else {
@@ -364,13 +369,13 @@ export default class AlertsRegistryOverlays extends Vue {
             if (this.$refs.video && this.runningAlert) {
               if (this.runningAlert.isSoundMuted) {
                 (this.$refs.video as HTMLMediaElement).volume = 0;
-                console.log('Audio is muted.')
+                console.log('Audio is muted.');
               } else {
                 (this.$refs.video as HTMLMediaElement).volume = this.runningAlert.alert.soundVolume / 100;
               }
               (this.$refs.video as HTMLMediaElement).play();
             }
-          })
+          });
         }
 
         if (this.runningAlert.showTextAt <= Date.now() && !this.runningAlert.isShowingText) {
@@ -381,14 +386,14 @@ export default class AlertsRegistryOverlays extends Vue {
         if (this.runningAlert.waitingForTTS && (this.typeOfMedia.get(this.runningAlert.alert.soundId) === null || (this.$refs.audio as HTMLMediaElement).ended)) {
           let message = this.runningAlert.message;
           if (this.runningAlert.alert.tts.skipUrls) {
-            for (const match of message.match(urlRegex({strict: false})) ?? []) {
+            for (const match of message.match(urlRegex({ strict: false })) ?? []) {
               message = message.replace(match, '');
             }
           }
           if (!this.runningAlert.isTTSMuted && !this.runningAlert.isSoundMuted) {
-            this.speak(message, this.runningAlert.alert.tts.voice, this.runningAlert.alert.tts.rate, this.runningAlert.alert.tts.pitch, this.runningAlert.alert.tts.volume)
+            this.speak(message, this.runningAlert.alert.tts.voice, this.runningAlert.alert.tts.rate, this.runningAlert.alert.tts.pitch, this.runningAlert.alert.tts.volume);
           } else {
-            console.log('TTS is muted.')
+            console.log('TTS is muted.');
           }
           this.runningAlert.waitingForTTS = false;
         }
@@ -398,7 +403,7 @@ export default class AlertsRegistryOverlays extends Vue {
           if (this.typeOfMedia.get(this.runningAlert.alert.soundId) !== null) {
             if (this.runningAlert.isSoundMuted) {
               (this.$refs.audio as HTMLMediaElement).volume = 0;
-              console.log('Audio is muted.')
+              console.log('Audio is muted.');
             } else {
               (this.$refs.audio as HTMLMediaElement).volume = this.runningAlert.alert.soundVolume / 100;
             }
@@ -410,13 +415,13 @@ export default class AlertsRegistryOverlays extends Vue {
 
       if (this.runningAlert === null && alerts.length > 0) {
         this.showImage = true;
-        const emitData = alerts.shift()
+        const emitData = alerts.shift();
         if (emitData && this.data) {
           let possibleAlerts = this.data[emitData.event];
 
           // select only correct triggered events
           if (emitData.event === 'rewardredeems') {
-            possibleAlerts = (possibleAlerts as AlertRewardRedeemInterface[]).filter(o => o.rewardId === emitData.name)
+            possibleAlerts = (possibleAlerts as AlertRewardRedeemInterface[]).filter(o => o.rewardId === emitData.name);
           }
           if (possibleAlerts.length > 0) {
             // filter variants
@@ -430,20 +435,20 @@ export default class AlertsRegistryOverlays extends Vue {
                 return safeEval(
                   script,
                   {
-                    username: emitData.name,
-                    amount: emitData.amount,
-                    message: emitData.message,
-                    tier: tierAsNumber,
+                    username:  emitData.name,
+                    amount:    emitData.amount,
+                    message:   emitData.message,
+                    tier:      tierAsNumber,
                     recipient: emitData.recipient,
-                  }
-                )
+                  },
+                );
               }
 
               return true;
-            })
+            });
 
             // after we have possible alerts -> generate random
-            let possibleAlertsWithRandomCount: (CommonSettingsInterface | AlertTipInterface | AlertResubInterface)[] = [];
+            const possibleAlertsWithRandomCount: (CommonSettingsInterface | AlertTipInterface | AlertResubInterface)[] = [];
             // check if exclusive alert is there then run only it (+ other exclusive)
             if (possibleAlerts.find(o => o.variantAmount === 5)) {
               for (const alert of possibleAlerts.filter(o => o.variantAmount === 5)) {
@@ -453,17 +458,16 @@ export default class AlertsRegistryOverlays extends Vue {
               // randomize variants
               for (const alert of possibleAlerts) {
                 for (let i = 0; i < alert.variantAmount; i++) {
-                  possibleAlertsWithRandomCount.push(alert)
+                  possibleAlertsWithRandomCount.push(alert);
                 }
               }
             }
 
-            console.debug({emitData, possibleAlerts, possibleAlertsWithRandomCount })
+            console.debug({
+              emitData, possibleAlerts, possibleAlertsWithRandomCount,
+            });
 
-            let alert: CommonSettingsInterface | AlertTipInterface | AlertResubInterface | undefined;
-            // Filter TBD
-
-            alert = possibleAlertsWithRandomCount[Math.floor(Math.random() * possibleAlertsWithRandomCount.length)];
+            const alert: CommonSettingsInterface | AlertTipInterface | AlertResubInterface | undefined = possibleAlertsWithRandomCount[Math.floor(Math.random() * possibleAlertsWithRandomCount.length)];
             if (!alert || !alert.id) {
               console.log('No alert found or all are disabled');
               return;
@@ -503,9 +507,9 @@ export default class AlertsRegistryOverlays extends Vue {
                 .replace(/\{recipient\}/g, '{recipient:highlight}')
                 .replace(/\{amount\}/g, '{amount:highlight}')
                 .replace(/\{monthsName\}/g, '{monthsName:highlight}')
-                .replace(/\{currency\}/g, '{currency:highlight}')
-              this.preparedAdvancedHTML =
-                this.preparedAdvancedHTML
+                .replace(/\{currency\}/g, '{currency:highlight}');
+              this.preparedAdvancedHTML
+                = this.preparedAdvancedHTML
                   .replace(/\{message\}/g, `
                     <span :style="{
                       'font-family': runningAlert.alert.message.font.family + ' !important',
@@ -558,11 +562,11 @@ export default class AlertsRegistryOverlays extends Vue {
               if (!this.loadedCSS.includes(alert.id)) {
                 console.debug('loaded custom CSS for ' + alert.id);
                 this.loadedCSS.push(alert.id);
-                const head = document.getElementsByTagName('head')[0]
-                const style = document.createElement('style')
+                const head = document.getElementsByTagName('head')[0];
+                const style = document.createElement('style');
                 style.type = 'text/css';
                 const css = alert.advancedMode.css
-                  .replace(/\#wrap/g, '#wrap-' + alert.id) // replace .wrap with only this goal wrap
+                  .replace(/\#wrap/g, '#wrap-' + alert.id); // replace .wrap with only this goal wrap
                 style.appendChild(document.createTextNode(css));
                 head.appendChild(style);
               }
@@ -575,7 +579,7 @@ export default class AlertsRegistryOverlays extends Vue {
                     eval(`${alert.advancedMode.js}; if (typeof onStarted === 'function') { onStarted() } else { console.log('no onStarted() function found'); }`);
                   }
                 });
-              })
+              });
             } else {
               // we need to add :highlight to name, amount, monthName, currency by default
               alert.messageTemplate = alert.messageTemplate
@@ -589,16 +593,16 @@ export default class AlertsRegistryOverlays extends Vue {
             const isAmountForTTSInRange = alert.tts.minAmountToPlay <= emitData.amount;
             this.runningAlert = {
               ...emitData,
-              animation: "none",
-              animationText: "none",
+              animation:      'none',
+              animationText:  'none',
               animationSpeed: 1000,
-              soundPlayed: false,
-              isShowing: false,
-              isShowingText: false,
-              showAt: this.data.alertDelayInMs + Date.now(),
-              hideAt: this.data.alertDelayInMs + Date.now() + alert.alertDurationInMs + alert.animationInDuration,
-              showTextAt: this.data.alertDelayInMs + Date.now() + alert.alertTextDelayInMs,
-              waitingForTTS: alert.tts.enabled && isAmountForTTSInRange && typeof window.responsiveVoice !== 'undefined',
+              soundPlayed:    false,
+              isShowing:      false,
+              isShowingText:  false,
+              showAt:         this.data.alertDelayInMs + Date.now(),
+              hideAt:         this.data.alertDelayInMs + Date.now() + alert.alertDurationInMs + alert.animationInDuration,
+              showTextAt:     this.data.alertDelayInMs + Date.now() + alert.alertTextDelayInMs,
+              waitingForTTS:  alert.tts.enabled && isAmountForTTSInRange && typeof window.responsiveVoice !== 'undefined',
               alert,
             };
           } else {
@@ -610,18 +614,18 @@ export default class AlertsRegistryOverlays extends Vue {
       }
     }, 1000));
 
-    this.id = this.$route.params.id
+    this.id = this.$route.params.id;
     this.refreshAlert();
 
     this.socket.on('skip', () => {
       if (this.runningAlert) {
-        console.log('Skipping playing alert')
+        console.log('Skipping playing alert');
         this.runningAlert = null;
         if (typeof window.responsiveVoice !== 'undefined') {
           window.responsiveVoice.cancel();
         }
       } else {
-        console.log('No alert to skip')
+        console.log('No alert to skip');
       }
     });
 
@@ -629,15 +633,15 @@ export default class AlertsRegistryOverlays extends Vue {
       console.debug('Incoming alert', data);
 
       // checking for vulgarities
-      for (let vulgar of this.defaultProfanityList) {
+      for (const vulgar of this.defaultProfanityList) {
         if (this.data) {
           if (this.data.profanityFilterType === 'replace-with-asterisk') {
-            data.message = data.message.replace(new RegExp(vulgar, 'gmi'), '***')
+            data.message = data.message.replace(new RegExp(vulgar, 'gmi'), '***');
           } else if (this.data.profanityFilterType === 'replace-with-happy-words') {
-            data.message = data.message.replace(new RegExp(vulgar, 'gmi'), this.listHappyWords[Math.floor(Math.random() * this.listHappyWords.length)])
+            data.message = data.message.replace(new RegExp(vulgar, 'gmi'), this.listHappyWords[Math.floor(Math.random() * this.listHappyWords.length)]);
           } else if (this.data.profanityFilterType === 'hide-messages') {
             if (data.message.search(new RegExp(vulgar, 'gmi')) >= 0) {
-              console.debug('Message contain vulgarity "' + vulgar + '" and is hidden.')
+              console.debug('Message contain vulgarity "' + vulgar + '" and is hidden.');
               data.message = '';
             }
           } else if (this.data.profanityFilterType === 'disable-alerts') {
@@ -649,14 +653,14 @@ export default class AlertsRegistryOverlays extends Vue {
         }
       }
 
-      alerts.push(data)
-    })
+      alerts.push(data);
+    });
   }
 
   refreshAlert() {
     this.socket.emit('isAlertUpdated', { updatedAt: this.updatedAt, id: this.id }, async (err: Error | null, isUpdated: boolean, updatedAt: number) => {
       if (err) {
-        return console.error(err)
+        return console.error(err);
       }
 
       if (isUpdated && this.updatedAt > 0) {
@@ -664,12 +668,12 @@ export default class AlertsRegistryOverlays extends Vue {
       }
 
       if (isUpdated && this.updatedAt === -1) {
-        console.debug('Alert is loading...')
+        console.debug('Alert is loading...');
         this.updatedAt = updatedAt;
         await new Promise<void>((resolve) => {
-          this.socket.emit('generic::getOne', this.id, async (err: string | null, data: AlertInterface) => {
-            if (err) {
-              return console.error(err);
+          this.socket.emit('generic::getOne', this.id, async (err2: string | null, data: AlertInterface) => {
+            if (err2) {
+              return console.error(err2);
             }
             try {
               if (this.runningAlert !== null) {
@@ -718,21 +722,21 @@ export default class AlertsRegistryOverlays extends Vue {
 
                       const getMeta = (mediaId: string, type: 'Video' | 'Image') => {
                         if (type === 'Video') {
-                          const vid = document.createElement("video");
-                          vid.addEventListener("loadedmetadata", (ev) => {
+                          const vid = document.createElement('video');
+                          vid.addEventListener('loadedmetadata', (ev) => {
                             const el = ev.target as HTMLVideoElement;
                             this.sizeOfMedia.set(mediaId, [el.videoWidth, el.videoHeight]);
                           });
                           vid.src = `/registry/alerts/${mediaId}`;
                         } else {
                           const img = new Image();
-                          img.addEventListener("load", (ev) => {
+                          img.addEventListener('load', (ev) => {
                             const el = ev.target as HTMLImageElement;
                             this.sizeOfMedia.set(mediaId, [el.naturalWidth, el.naturalHeight]);
                           });
                           img.src = `/registry/alerts/${mediaId}`;
                         }
-                      }
+                      };
                       getMeta(event.imageId, myBlob.type.startsWith('video') ? 'Video' : 'Image');
                     })
                     .catch(error => {
@@ -744,25 +748,25 @@ export default class AlertsRegistryOverlays extends Vue {
 
                 for (const [lang, isEnabled] of Object.entries(this.data.loadStandardProfanityList)) {
                   if (isEnabled) {
-                    let list = require('../../bot/data/vulgarities/' + lang + '.txt');
-                    this.defaultProfanityList = [...this.defaultProfanityList, ...list.default.split(/\r?\n/)]
+                    const list = require('../../bot/data/vulgarities/' + lang + '.txt');
+                    this.defaultProfanityList = [...this.defaultProfanityList, ...list.default.split(/\r?\n/)];
 
-                    let listHappyWords = require('../../bot/data/happyWords/' + lang + '.txt');
-                    this.listHappyWords = [...this.listHappyWords, ...listHappyWords.default.split(/\r?\n/)].filter(o => o.trim().length > 0)
+                    const listHappyWords = require('../../bot/data/happyWords/' + lang + '.txt');
+                    this.listHappyWords = [...this.listHappyWords, ...listHappyWords.default.split(/\r?\n/)].filter(o => o.trim().length > 0);
                   }
                 }
 
                 this.defaultProfanityList = [
                   ...this.defaultProfanityList,
                   ...data.customProfanityList.split(',').map(o => o.trim()),
-                ].filter(o => o.trim().length > 0)
+                ].filter(o => o.trim().length > 0);
 
                 console.debug('Profanity list', this.defaultProfanityList);
                 console.debug('Happy words', this.listHappyWords);
                 this.state.loaded = this.$state.success;
 
-                const head = document.getElementsByTagName('head')[0]
-                const style = document.createElement('style')
+                const head = document.getElementsByTagName('head')[0];
+                const style = document.createElement('style');
                 style.type = 'text/css';
                 for (const event of [
                   ...data.cheers,
@@ -777,17 +781,17 @@ export default class AlertsRegistryOverlays extends Vue {
                   ...data.rewardredeems,
                 ]) {
                   if (!this.loadedFonts.includes(event.font.family)) {
-                    console.debug('Loading font', event.font.family)
-                    this.loadedFonts.push(event.font.family)
-                    const font = event.font.family.replace(/ /g, '+')
-                    const css = "@import url('https://fonts.googleapis.com/css?family=" + font + "');"
+                    console.debug('Loading font', event.font.family);
+                    this.loadedFonts.push(event.font.family);
+                    const font = event.font.family.replace(/ /g, '+');
+                    const css = '@import url(\'https://fonts.googleapis.com/css?family=' + font + '\');';
                     style.appendChild(document.createTextNode(css));
                   }
                   if (typeof (event as AlertTipInterface).message !== 'undefined' && !this.loadedFonts.includes((event as AlertTipInterface).message.font.family)) {
-                    console.debug('Loading font', (event as AlertTipInterface).message.font.family)
-                    this.loadedFonts.push((event as AlertTipInterface).message.font.family)
-                    const font = (event as AlertTipInterface).message.font.family.replace(/ /g, '+')
-                    const css = "@import url('https://fonts.googleapis.com/css?family=" + font + "');"
+                    console.debug('Loading font', (event as AlertTipInterface).message.font.family);
+                    this.loadedFonts.push((event as AlertTipInterface).message.font.family);
+                    const font = (event as AlertTipInterface).message.font.family.replace(/ /g, '+');
+                    const css = '@import url(\'https://fonts.googleapis.com/css?family=' + font + '\');';
                     style.appendChild(document.createTextNode(css));
                   }
                 }
@@ -795,30 +799,29 @@ export default class AlertsRegistryOverlays extends Vue {
 
                 // load emotes
                 await new Promise<void>((done) => {
-                  this.socketEmotes.emit('getCache', (err: string | null, data: any) => {
-                    if (err) {
-                      return console.error(err);
+                  this.socketEmotes.emit('getCache', (err3: string | null, data3: any) => {
+                    if (err3) {
+                      return console.error(err3);
                     }
-                    this.emotes = data;
-                    console.debug('= Emotes loaded')
+                    this.emotes = data3;
+                    console.debug('= Emotes loaded');
                     done();
-                  })
-                })
+                  });
+                });
 
-                console.debug('== alerts ready ==')
+                console.debug('== alerts ready ==');
                 resolve();
               }
             } catch (e) {
-              console.error({data});
+              console.error({ data });
               console.error(e);
             }
-          })
-        })
+          });
+        });
       }
 
-      setTimeout(() => this.refreshAlert(), 10000)
-    })
-
+      setTimeout(() => this.refreshAlert(), 10000);
+    });
 
   }
 
@@ -830,14 +833,14 @@ export default class AlertsRegistryOverlays extends Vue {
         } else {
           return char;
         }
-      })
+      });
       let recipient: string | string[] = (this.runningAlert.recipient || '').split('').map((char, index) => {
         if (this.runningAlert !== null) {
           return `<div class="animate__animated animate__infinite animate__${this.runningAlert.alert.animationText} animate__${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font.highlightcolor}; display: inline-block;">${char}</div>`;
         } else {
           return char;
         }
-      })
+      });
 
       let amount: string | string[] = String(this.runningAlert.amount).split('').map((char, index) => {
         if (this.runningAlert !== null) {
@@ -845,7 +848,7 @@ export default class AlertsRegistryOverlays extends Vue {
         } else {
           return char;
         }
-      })
+      });
 
       let currency: string | string[] = String(this.runningAlert.currency).split('').map((char, index) => {
         if (this.runningAlert !== null) {
@@ -853,7 +856,7 @@ export default class AlertsRegistryOverlays extends Vue {
         } else {
           return char;
         }
-      })
+      });
 
       let monthsName: string | string[] = String(this.runningAlert.monthsName).split('').map((char, index) => {
         if (this.runningAlert !== null) {
@@ -861,21 +864,21 @@ export default class AlertsRegistryOverlays extends Vue {
         } else {
           return char;
         }
-      })
+      });
 
       if (this.runningAlert.alert.animationText === 'baffle') {
-        let maxTimeToDecrypt = this.runningAlert.alert.animationTextOptions.maxTimeToDecrypt
+        let maxTimeToDecrypt = this.runningAlert.alert.animationTextOptions.maxTimeToDecrypt;
         // set maxTimeToDecrypt 0 if fading out to not reset decryption
         if (this.runningAlert.hideAt - Date.now() <= 0
           && !isTTSPlaying
           && !this.runningAlert.waitingForTTS) {
           maxTimeToDecrypt = 0;
         }
-        name = `<baffle :key="'name-' + this.runningAlert.name" :text="this.runningAlert.name" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`
-        recipient = `<baffle :key="'recipient-' + this.runningAlert.recipient" :text="this.runningAlert.recipient" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`
-        amount = `<baffle :key="'amount-' + this.runningAlert.amount" :text="String(this.runningAlert.amount)" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`
-        currency = `<baffle :key="'currency-' + this.runningAlert.currency" :text="this.runningAlert.currency" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`
-        monthsName = `<baffle :key="'monthsName-' + this.runningAlert.monthsName" :text="this.runningAlert.monthsName" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`
+        name = `<baffle :key="'name-' + this.runningAlert.name" :text="this.runningAlert.name" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`;
+        recipient = `<baffle :key="'recipient-' + this.runningAlert.recipient" :text="this.runningAlert.recipient" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`;
+        amount = `<baffle :key="'amount-' + this.runningAlert.amount" :text="String(this.runningAlert.amount)" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`;
+        currency = `<baffle :key="'currency-' + this.runningAlert.currency" :text="this.runningAlert.currency" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`;
+        monthsName = `<baffle :key="'monthsName-' + this.runningAlert.monthsName" :text="this.runningAlert.monthsName" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`;
       } else {
         name = name.join('');
         recipient = recipient.join('');
