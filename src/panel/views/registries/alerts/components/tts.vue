@@ -11,11 +11,11 @@
             :label-for="'tts-enabled' + uuid"
             :label="translate('registry.alerts.enabled')"
           >
-            <b-form-checkbox v-bind:key="'tts-enabled' + uuid" :id="'tts-enabled' + uuid" v-model="data.enabled" :name="'tts-enabled' + uuid" switch></b-form-checkbox>
+            <b-form-checkbox v-bind:key="'tts-enabled' + uuid" :id="'tts-enabled' + uuid" v-model="TTSData.enabled" :name="'tts-enabled' + uuid" switch></b-form-checkbox>
           </b-form-group>
 
           <b-form-group
-            v-if="data.minAmountToPlay"
+            v-if="TTSData.minAmountToPlay"
             label-cols-sm="4"
             label-cols-lg="3"
             :label="translate('registry.alerts.minAmountToPlay.name')"
@@ -23,7 +23,7 @@
           >
             <b-form-input
               :id="'tts-minAmountToPlay' + uuid"
-              v-model="data.minAmountToPlay"
+              v-model="TTSData.minAmountToPlay"
               type="number"
               min="0"
               :placeholder="translate('registry.alerts.minAmountToPlay.placeholder')"
@@ -32,28 +32,28 @@
           </b-form-group>
 
           <b-form-group
-            v-if="data.skipUrls"
+            v-if="TTSData.skipUrls"
             label-cols-sm="4"
             label-cols-lg="3"
             :label-for="'tts-skipUrls' + uuid"
             :label="translate('registry.alerts.skipUrls')"
           >
-            <b-form-checkbox v-bind:key="'tts-skipUrls' + uuid" :id="'tts-skipUrls' + uuid" v-model="data.skipUrls" :name="'tts-skipUrls' + uuid" switch></b-form-checkbox>
+            <b-form-checkbox v-bind:key="'tts-skipUrls' + uuid" :id="'tts-skipUrls' + uuid" v-model="TTSData.skipUrls" :name="'tts-skipUrls' + uuid" switch></b-form-checkbox>
           </b-form-group>
 
           <b-form-group
-            v-if="data.keepAlertShown"
+            v-if="TTSData.keepAlertShown"
             label-cols-sm="4"
             label-cols-lg="3"
             :label-for="'tts-keepAlertShown' + uuid"
             :label="translate('registry.alerts.keepAlertShown')"
           >
-            <b-form-checkbox v-bind:key="'tts-keepAlertShown' + uuid" :id="'tts-keepAlertShown' + uuid" v-model="data.keepAlertShown" :name="'tts-keepAlertShown' + uuid" switch></b-form-checkbox>
+            <b-form-checkbox v-bind:key="'tts-keepAlertShown' + uuid" :id="'tts-keepAlertShown' + uuid" v-model="TTSData.keepAlertShown" :name="'tts-keepAlertShown' + uuid" switch></b-form-checkbox>
           </b-form-group>
 
           <b-form-group label-cols-sm="4" label-cols-lg="3"
               :label="translate('registry.alerts.voice')">
-            <b-form-select v-model="data.voice" :options="voices" plain></b-form-select>
+            <b-form-select v-model="TTSData.voice" :options="voices" plain></b-form-select>
           </b-form-group>
 
           <b-form-group label-cols-sm="4" label-cols-lg="3"
@@ -62,7 +62,7 @@
             <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
               <b-form-input
                 :id="'volume' + uuid"
-                v-model.number="data.volume"
+                v-model.number="TTSData.volume"
                 type="range"
                 min="0"
                 max="1"
@@ -70,7 +70,7 @@
               ></b-form-input>
               <b-input-group-text slot="append" class="pr-3 pl-3">
                 <div style="width: 3rem;">
-                  {{ Number(data.volume * 100).toFixed(0) + '%' }}
+                  {{ Number(TTSData.volume * 100).toFixed(0) + '%' }}
                 </div>
               </b-input-group-text>
             </b-input-group>
@@ -82,7 +82,7 @@
             <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
               <b-form-input
                 :id="'rate' + uuid"
-                v-model.number="data.rate"
+                v-model.number="TTSData.rate"
                 type="range"
                 min="0"
                 max="1.5"
@@ -90,7 +90,7 @@
               ></b-form-input>
               <b-input-group-text slot="append" class="pr-3 pl-3">
                 <div style="width: 3rem;">
-                  {{ String(data.rate) }}
+                  {{ String(TTSData.rate) }}
                 </div>
               </b-input-group-text>
             </b-input-group>
@@ -149,10 +149,14 @@ declare global {
 }
 
 export default defineComponent({
-  setup(props: { data: Partial<CommonSettingsInterface['tts']>, uuid: string}, ctx) {
+  props: {
+    tts:  Object,
+    uuid: String,
+  },
+  setup(props: { tts: Partial<CommonSettingsInterface['tts']>, uuid: string}, ctx) {
     const text = ref('This message should be said by TTS to test your settings.');
     const state = ref({ loaded: ButtonStates.progress } as { loaded: number });
-    const TTSData = ref(props.data);
+    const TTSData = ref(props.tts);
     const voices = ref([] as {text: string; value: string}[]);
 
     function initResponsiveVoice() {
@@ -199,7 +203,7 @@ export default defineComponent({
     });
 
     watch(TTSData, (val) => {
-      ctx.emit('update:data', val);
+      ctx.emit('update:tts', val);
     }, { deep: true });
 
     return {

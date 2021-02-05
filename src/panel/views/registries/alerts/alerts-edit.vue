@@ -273,7 +273,6 @@ export default class AlertsEdit extends Vue {
 
   isAllValid() {
     for (const key of Object.keys(this.isValid)) {
-      console.log(this.isValid[key as keyof AlertsEdit['isValid']]);
       if (!every(this.isValid[key as keyof AlertsEdit['isValid']])) {
         return false;
       }
