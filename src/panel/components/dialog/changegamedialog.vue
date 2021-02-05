@@ -1,43 +1,75 @@
 <template>
-  <b-modal size="w-90" :title="translate('change-game')" no-fade v-model="show" ref="modalWindow">
-    <div class="d-flex text-center" v-if="games.length > 0">
-      <button class="btn btn-lg btn-block btn-outline-dark border-0 p-3" style="width: fit-content;flex: max-content;" @click="carouselPage--;" :disabled="carouselPage === 0">
-        <font-awesome-icon icon="caret-left"></font-awesome-icon>
+  <b-modal
+    ref="modalWindow"
+    v-model="show"
+    size="w-90"
+    :title="translate('change-game')"
+    no-fade
+  >
+    <div
+      v-if="games.length > 0"
+      class="d-flex text-center"
+    >
+      <button
+        class="btn btn-lg btn-block btn-outline-dark border-0 p-3"
+        style="width: fit-content;flex: max-content;"
+        :disabled="carouselPage === 0"
+        @click="carouselPage--;"
+      >
+        <font-awesome-icon icon="caret-left" />
       </button>
 
-      <div class="w-100 d-flex" style="flex-wrap: wrap;justify-content: center;"
+      <div
+        class="w-100 d-flex"
+        style="flex-wrap: wrap;justify-content: center;"
         :style="{
           height: '154px',
           overflow: 'hidden',
-        }">
+        }"
+      >
         <div
           v-for="game of chunk(games, thumbnailsPerPage)[carouselPage]"
+          :key="game"
           class="d-flex onHover m-1"
           style="flex-direction: column; margin-top: 0.55rem !important;"
           :style="{
             width: (90 / thumbnailsPerPage) + '%',
           }"
-          :key="game">
+        >
           <div class="buttonToShow">
-            <hold-button @trigger="deleteGame(game)" class="btn-danger w-100" small>
-              <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-              <template slot="onHoldTitle">{{translate('dialog.buttons.delete')}}</template>
+            <hold-button
+              class="btn-danger w-100"
+              small
+              @trigger="deleteGame(game)"
+            >
+              <template slot="title">
+                {{ translate('dialog.buttons.delete') }}
+              </template>
+              <template slot="onHoldTitle">
+                {{ translate('dialog.buttons.delete') }}
+              </template>
             </hold-button>
           </div>
           <img
-              :style="{
-                'border-bottom': '0.3rem solid',
-                'border-color': game !== currentGame ? 'transparent !important' : undefined
-              }"
-              class="border-warning"
-              :src="'https://static-cdn.jtvnw.net/ttv-boxart/' + encodeURIComponent(game) + '-100x140.jpg'"
-              :title="game"
-              @click="manuallySelected = true; currentGame = game"/>
+            :style="{
+              'border-bottom': '0.3rem solid',
+              'border-color': game !== currentGame ? 'transparent !important' : undefined
+            }"
+            class="border-warning"
+            :src="'https://static-cdn.jtvnw.net/ttv-boxart/' + encodeURIComponent(game) + '-100x140.jpg'"
+            :title="game"
+            @click="manuallySelected = true; currentGame = game"
+          >
         </div>
       </div>
 
-      <button class="btn btn-lg  btn-block btn-outline-dark border-0 p-3" style="width: fit-content;flex: max-content;" @click="carouselPage++;" :disabled="(carouselPage + 1) === chunk(this.games, 6).length">
-        <font-awesome-icon icon="caret-right"></font-awesome-icon>
+      <button
+        class="btn btn-lg  btn-block btn-outline-dark border-0 p-3"
+        style="width: fit-content;flex: max-content;"
+        :disabled="(carouselPage + 1) === chunk(this.games, 6).length"
+        @click="carouselPage++;"
+      >
+        <font-awesome-icon icon="caret-right" />
       </button>
     </div>
 
@@ -47,67 +79,106 @@
       :options="searchForGameOpts"
       :value="[currentGame]"
       @search="searchForGame($event);"
-      @input="currentGame = $event"></search>
+      @input="currentGame = $event"
+    />
 
     <h5 class="modal-title">
       {{ translate('change-title') }} <small>{{ translate('for') }} {{ currentGame }}</small>
     </h5>
-    <div v-for="(title, index) of titles" :key="index">
+    <div
+      v-for="(title, index) of titles"
+      :key="index"
+    >
       <b-input-group @mousedown="selectedTitle = typeof title.id === 'undefined' ? (index === 0 ? 'current' : 'new') : title.id">
         <b-input-group-prepend is-text>
-          <b-form-radio plain v-model="selectedTitle" name="selectedTitle" :value="typeof title.id === 'undefined' ? (index === 0 ? 'current' : 'new') : title.id"></b-form-radio>
+          <b-form-radio
+            v-model="selectedTitle"
+            plain
+            name="selectedTitle"
+            :value="typeof title.id === 'undefined' ? (index === 0 ? 'current' : 'new') : title.id"
+          />
         </b-input-group-prepend>
-        <b-form-input :placeholder="['current', 'new'].includes(title.id) ? translate('create-and-use-a-new-title') : ''" v-if="title.id === 'new'" v-model="newTitle"></b-form-input>
-        <b-form-input :placeholder="['current', 'new'].includes(title.id) ? translate('create-and-use-a-new-title') : ''" v-else v-model="title.title" :disabled="typeof title.id === 'undefined' && index === 0"></b-form-input>
-        <button slot="append" v-if="!['current', 'new'].includes(title.id) && index !== 0" class="btn btn-danger" @click="deleteTitle(title.id)">
-          <font-awesome-icon icon="trash"/>
+        <b-form-input
+          v-if="title.id === 'new'"
+          v-model="newTitle"
+          :placeholder="['current', 'new'].includes(title.id) ? translate('create-and-use-a-new-title') : ''"
+        />
+        <b-form-input
+          v-else
+          v-model="title.title"
+          :placeholder="['current', 'new'].includes(title.id) ? translate('create-and-use-a-new-title') : ''"
+          :disabled="typeof title.id === 'undefined' && index === 0"
+        />
+        <button
+          v-if="!['current', 'new'].includes(title.id) && index !== 0"
+          slot="append"
+          class="btn btn-danger"
+          @click="deleteTitle(title.id)"
+        >
+          <font-awesome-icon icon="trash" />
         </button>
       </b-input-group>
     </div>
 
     <h5 class="modal-title mt-4">
-      {{ translate('tags')}}
+      {{ translate('tags') }}
     </h5>
     <search
       class="mt-2 mb-4"
       :placeholder="translate('search-tags')"
       :options="searchForTagsOpts"
       :value="currentTags"
+      multiple
+      show-all-options
       @search="searchForTags($event);"
       @input="currentTags = $event"
-      multiple
-      showAllOptions
-      ></search>
+    />
 
-    <div slot="modal-footer" class="w-100">
+    <div
+      slot="modal-footer"
+      class="w-100"
+    >
       <b-button
         v-if="saveState === -1"
         variant="danger"
         class="float-right"
-      >{{ translate('dialog.buttons.something-went-wrong')}}</b-button>
+      >
+        {{ translate('dialog.buttons.something-went-wrong') }}
+      </b-button>
       <b-button
         v-else-if="saveState === 0"
         variant="primary"
         class="float-right"
         @click="handleOk"
-      >{{ translate('dialog.buttons.saveChanges.idle')}}</b-button>
+      >
+        {{ translate('dialog.buttons.saveChanges.idle') }}
+      </b-button>
       <b-button
         v-else-if="saveState === 1"
         :disabled="true"
         variant="primary"
         class="float-right"
-      ><fa icon="spinner" spin/> {{ translate('dialog.buttons.saveChanges.progress')}}</b-button>
+      >
+        <fa
+          icon="spinner"
+          spin
+        /> {{ translate('dialog.buttons.saveChanges.progress') }}
+      </b-button>
       <b-button
         v-else-if="saveState === 2"
         variant="success"
         class="float-right"
-      >{{ translate('dialog.buttons.saveChanges.done')}}</b-button>
+      >
+        {{ translate('dialog.buttons.saveChanges.done') }}
+      </b-button>
 
       <b-button
         variant="danger"
         class="float-right mr-2"
         @click="show=false"
-      >{{ translate('close')}}</b-button>
+      >
+        {{ translate('close') }}
+      </b-button>
     </div>
   </b-modal>
 </template>
@@ -142,7 +213,7 @@ export default defineComponent({
     const currentTitle = ref('');
     const carouselPage = ref(0);
     const manuallySelected = ref(false);
-    const cachedGamesOrder: Ref<string[]> = ref([]);
+    const games: Ref<string[]> = ref([]);
     const searchForGameOpts: Ref<string[]> = ref([]);
     const searchForTagsOpts: Ref<string[]> = ref([]);
     const selectedTitle = ref('current');
@@ -166,11 +237,11 @@ export default defineComponent({
         },
       ];
     });
-    const games = computed(() => {
-      if (manuallySelected.value) {
-        return cachedGamesOrder.value;
-      } else if (currentGame.value) {
-        cachedGamesOrder.value = [
+
+    watch([manuallySelected, currentGame], (val) => {
+      if (!manuallySelected.value && currentGame.value) {
+        // reorder
+        games.value = [
           ...new Set([
             currentGame.value,
             ...data.value.sort((a: any,b: any) => {
@@ -191,7 +262,7 @@ export default defineComponent({
           ],
           )];
       } else {
-        cachedGamesOrder.value = [...new Set(data.value.sort((a: any,b: any) => {
+        games.value = [...new Set(data.value.sort((a: any,b: any) => {
           if (typeof a.timestamp === 'undefined') {
             a.timestamp = 0;
           }
@@ -207,7 +278,6 @@ export default defineComponent({
           }
         }).map((o: any) => o.game))];
       }
-      return cachedGamesOrder.value;
     });
 
     const socket = getSocket('/');
@@ -216,8 +286,8 @@ export default defineComponent({
     const deleteGame = (game: string) => {
       data.value = data.value.filter(o => o.game !== game);
       // remove from order cache
-      cachedGamesOrder.value.splice(cachedGamesOrder.value.findIndex(o => o === game), 1);
-      currentGame.value = cachedGamesOrder.value[0];
+      games.value.splice(games.value.findIndex(o => o === game), 1);
+      currentGame.value = games.value[0];
     };
     const deleteTitle = (id: string) => {
       data.value.splice(data.value.findIndex(o => o.id === id), 1);

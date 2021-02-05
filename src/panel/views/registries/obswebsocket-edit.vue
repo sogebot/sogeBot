@@ -9,66 +9,115 @@
               id="name"
               v-model="editationItem.name"
               type="text"
-              @input="$v.editationItem.name.$touch()"
               :state="$v.editationItem.name.$invalid && $v.editationItem.name.$dirty ? false : null"
-            ></b-form-input>
+              @input="$v.editationItem.name.$touch()"
+            />
           </b-input-group>
-          <b-form-invalid-feedback :state="!($v.editationItem.name.$invalid && $v.editationItem.name.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+          <b-form-invalid-feedback :state="!($v.editationItem.name.$invalid && $v.editationItem.name.$dirty)">
+            {{ translate('dialog.errors.required') }}
+          </b-form-invalid-feedback>
         </template>
-        <b-skeleton v-else type="input" class="w-100"></b-skeleton>
+        <b-skeleton
+          v-else
+          type="input"
+          class="w-100"
+        />
       </b-form-group>
 
       <b-form-group :key="'advancedMode' + editationItem.id">
-        <b-form-checkbox :id="'advancedMode' + editationItem.id" v-model="editationItem.advancedMode" :name="'advancedMode' + editationItem.id" switch>
+        <b-form-checkbox
+          :id="'advancedMode' + editationItem.id"
+          v-model="editationItem.advancedMode"
+          :name="'advancedMode' + editationItem.id"
+          switch
+        >
           {{ translate('registry.alerts.enableAdvancedMode') }}
         </b-form-checkbox>
       </b-form-group>
 
-      <div class="col-md-12 p-0 pb-2" v-if="editationItem.advancedMode" :key="'advancedModeCode' + editationItem.id">
-        <codemirror style="font-size: 0.8em" class="w-100" v-model="editationItem.advancedModeCode" :options="{
-          tabSize: 4,
-          mode: 'text/javascript',
-          theme: 'base16-' + theme,
-          lineNumbers: true,
-          line: true,
-        }"></codemirror>
+      <div
+        v-if="editationItem.advancedMode"
+        :key="'advancedModeCode' + editationItem.id"
+        class="col-md-12 p-0 pb-2"
+      >
+        <codemirror
+          v-model="editationItem.advancedModeCode"
+          style="font-size: 0.8em"
+          class="w-100"
+          :options="{
+            tabSize: 4,
+            mode: 'text/javascript',
+            theme: 'base16-' + theme,
+            lineNumbers: true,
+            line: true,
+          }"
+        />
       </div>
       <template v-else>
         <b-row no-gutters>
           <b-col>
             <title-divider>{{ translate('integrations.obswebsocket.actions') }}</title-divider>
           </b-col>
-          <b-col md="auto" sm="12" align-self="end" class="text-right">
-            <div class="h-auto w-auto" style="flex-shrink: 0;">
+          <b-col
+            md="auto"
+            sm="12"
+            align-self="end"
+            class="text-right"
+          >
+            <div
+              class="h-auto w-auto"
+              style="flex-shrink: 0;"
+            >
               <b-dropdown
                 variant="outline-dark"
                 toggle-class="border-0 h-auto w-auto"
                 class="h-100"
                 no-caret
               >
-                <template v-slot:button-content>
-                  <fa icon="plus"></fa>
+                <template #button-content>
+                  <fa icon="plus" />
                 </template>
-                <b-dropdown-item v-for="action of Object.keys(availableActions)" @click="addAction(action)" :key="action">
+                <b-dropdown-item
+                  v-for="action of Object.keys(availableActions)"
+                  :key="action"
+                  @click="addAction(action)"
+                >
                   {{ translate('integrations.obswebsocket.' + action + '.name') }}
                 </b-dropdown-item>
               </b-dropdown>
             </div>
           </b-col>
         </b-row>
-        <b-row v-for="(task, index) of editationItem.simpleModeTasks" :key="task.id" class="p-2">
+        <b-row
+          v-for="(task, index) of editationItem.simpleModeTasks"
+          :key="task.id"
+          class="p-2"
+        >
           <b-col v-if="task.event === 'SetCurrentScene'">
             <b-row style="align-items: flex-end;">
               <b-col>
-                <label-inside>{{translate('integrations.obswebsocket.SetCurrentScene.name')}}</label-inside>
-                <b-select v-model="task.args.sceneName" :options="availableScenes">
+                <label-inside>{{ translate('integrations.obswebsocket.SetCurrentScene.name') }}</label-inside>
+                <b-select
+                  v-model="task.args.sceneName"
+                  :options="availableScenes"
+                >
                   <template #first>
-                    <b-select-option value="" disabled>-- {{translate('integrations.obswebsocket.noSceneSelected')}} --</b-select-option>
+                    <b-select-option
+                      value=""
+                      disabled
+                    >
+                      -- {{ translate('integrations.obswebsocket.noSceneSelected') }} --
+                    </b-select-option>
                   </template>
                 </b-select>
               </b-col>
               <b-col cols="auto">
-                <b-btn variant="danger" @click="deleteAction(index)">{{translate('dialog.buttons.delete')}}</b-btn>
+                <b-btn
+                  variant="danger"
+                  @click="deleteAction(index)"
+                >
+                  {{ translate('dialog.buttons.delete') }}
+                </b-btn>
               </b-col>
             </b-row>
           </b-col>
@@ -76,11 +125,16 @@
           <b-col v-else-if="task.event === 'Log'">
             <b-row style="align-items: flex-end;">
               <b-col>
-                <label-inside>{{translate('integrations.obswebsocket.Log.name')}}</label-inside>
-                <b-input v-model.trim="task.args.logMessage"/>
+                <label-inside>{{ translate('integrations.obswebsocket.Log.name') }}</label-inside>
+                <b-input v-model.trim="task.args.logMessage" />
               </b-col>
               <b-col cols="auto">
-                <b-btn variant="danger" @click="deleteAction(index)">{{translate('dialog.buttons.delete')}}</b-btn>
+                <b-btn
+                  variant="danger"
+                  @click="deleteAction(index)"
+                >
+                  {{ translate('dialog.buttons.delete') }}
+                </b-btn>
               </b-col>
             </b-row>
           </b-col>
@@ -88,24 +142,40 @@
           <b-col v-else-if="task.event === 'WaitMs'">
             <b-row style="align-items: flex-end;">
               <b-col>
-                <label-inside>{{translate('integrations.obswebsocket.WaitMs.name')}}</label-inside>
-                <b-input type="number" min="0" v-model.number="task.args.miliseconds"/>
+                <label-inside>{{ translate('integrations.obswebsocket.WaitMs.name') }}</label-inside>
+                <b-input
+                  v-model.number="task.args.miliseconds"
+                  type="number"
+                  min="0"
+                />
               </b-col>
               <b-col cols="auto">
-                <b-btn variant="danger" @click="deleteAction(index)">{{translate('dialog.buttons.delete')}}</b-btn>
+                <b-btn
+                  variant="danger"
+                  @click="deleteAction(index)"
+                >
+                  {{ translate('dialog.buttons.delete') }}
+                </b-btn>
               </b-col>
             </b-row>
           </b-col>
 
-          <b-col v-else-if="
-            [ 'StartReplayBuffer', 'StopReplayBuffer', 'SaveReplayBuffer',
-              'StartRecording', 'StopRecording', 'PauseRecording', 'ResumeRecording' ].includes(task.event)">
+          <b-col
+            v-else-if="
+              [ 'StartReplayBuffer', 'StopReplayBuffer', 'SaveReplayBuffer',
+                'StartRecording', 'StopRecording', 'PauseRecording', 'ResumeRecording' ].includes(task.event)"
+          >
             <b-row style="align-items: center">
               <b-col>
-                <label-inside>{{translate('integrations.obswebsocket.' + task.event + '.name')}}</label-inside>
+                <label-inside>{{ translate('integrations.obswebsocket.' + task.event + '.name') }}</label-inside>
               </b-col>
               <b-col cols="auto">
-                <b-btn variant="danger" @click="deleteAction(index)">{{translate('dialog.buttons.delete')}}</b-btn>
+                <b-btn
+                  variant="danger"
+                  @click="deleteAction(index)"
+                >
+                  {{ translate('dialog.buttons.delete') }}
+                </b-btn>
               </b-col>
             </b-row>
           </b-col>
@@ -113,22 +183,38 @@
           <b-col v-else-if="task.event === 'SetMute'">
             <b-row style="align-items: flex-end;">
               <b-col>
-                <label-inside>{{translate('integrations.obswebsocket.SetMute.name')}}</label-inside>
+                <label-inside>{{ translate('integrations.obswebsocket.SetMute.name') }}</label-inside>
                 <b-input-group>
-                  <b-select v-model="task.args.source" :options="availableAudioSources">
+                  <b-select
+                    v-model="task.args.source"
+                    :options="availableAudioSources"
+                  >
                     <template #first>
-                      <b-select-option value="" disabled>-- {{translate('integrations.obswebsocket.noSourceSelected')}} --</b-select-option>
+                      <b-select-option
+                        value=""
+                        disabled
+                      >
+                        -- {{ translate('integrations.obswebsocket.noSourceSelected') }} --
+                      </b-select-option>
                     </template>
                   </b-select>
                   <template #append>
-                    <b-btn :variant="task.args.mute ? 'danger' : 'success'" @click="task.args.mute = !task.args.mute">
-                      {{translate('integrations.obswebsocket.' + (task.args.mute ? 'mute' : 'unmute'))}}
+                    <b-btn
+                      :variant="task.args.mute ? 'danger' : 'success'"
+                      @click="task.args.mute = !task.args.mute"
+                    >
+                      {{ translate('integrations.obswebsocket.' + (task.args.mute ? 'mute' : 'unmute')) }}
                     </b-btn>
                   </template>
                 </b-input-group>
               </b-col>
               <b-col cols="auto">
-                <b-btn variant="danger" @click="deleteAction(index)">{{translate('dialog.buttons.delete')}}</b-btn>
+                <b-btn
+                  variant="danger"
+                  @click="deleteAction(index)"
+                >
+                  {{ translate('dialog.buttons.delete') }}
+                </b-btn>
               </b-col>
             </b-row>
           </b-col>
@@ -136,31 +222,55 @@
           <b-col v-else-if="task.event === 'SetVolume'">
             <b-row style="align-items: flex-end;">
               <b-col>
-                <label-inside>{{translate('integrations.obswebsocket.SetVolume.name')}}</label-inside>
+                <label-inside>{{ translate('integrations.obswebsocket.SetVolume.name') }}</label-inside>
                 <b-input-group>
-                  <b-select v-model="task.args.source" :options="availableAudioSources">
+                  <b-select
+                    v-model="task.args.source"
+                    :options="availableAudioSources"
+                  >
                     <template #first>
-                      <b-select-option value="" disabled>-- {{translate('integrations.obswebsocket.noSourceSelected')}} --</b-select-option>
+                      <b-select-option
+                        value=""
+                        disabled
+                      >
+                        -- {{ translate('integrations.obswebsocket.noSourceSelected') }} --
+                      </b-select-option>
                     </template>
                   </b-select>
                   <template #append>
                     <b-input-group append="dB">
-                      <b-input type="number" min="-100" max="0" step="0.1" v-model.number="task.args.volume"/>
+                      <b-input
+                        v-model.number="task.args.volume"
+                        type="number"
+                        min="-100"
+                        max="0"
+                        step="0.1"
+                      />
                     </b-input-group>
                   </template>
                 </b-input-group>
               </b-col>
               <b-col cols="auto">
-                <b-btn variant="danger" @click="deleteAction(index)">{{translate('dialog.buttons.delete')}}</b-btn>
+                <b-btn
+                  variant="danger"
+                  @click="deleteAction(index)"
+                >
+                  {{ translate('dialog.buttons.delete') }}
+                </b-btn>
               </b-col>
             </b-row>
           </b-col>
 
           <b-col v-else>
             <b-row style="align-items: flex-end;">
-              <b-col>Unknown task <em>{{task.event}}</em></b-col>
+              <b-col>Unknown task <em>{{ task.event }}</em></b-col>
               <b-col cols="auto">
-                <b-btn variant="danger" @click="deleteAction(index)">{{translate('dialog.buttons.delete')}}</b-btn>
+                <b-btn
+                  variant="danger"
+                  @click="deleteAction(index)"
+                >
+                  {{ translate('dialog.buttons.delete') }}
+                </b-btn>
               </b-col>
             </b-row>
           </b-col>
@@ -205,17 +315,16 @@ type Props = {
 };
 
 export default defineComponent({
-  props: {
+  components: {
+    codemirror,
+    'label-inside':  () => import('src/panel/components/label-inside.vue'),
+    'title-divider': () => import('src/panel/components/title-divider.vue'),
+  },
+  mixins: [ validationMixin ],
+  props:  {
     id:      String,
     invalid: Boolean,
     pending: Boolean,
-  },
-  mixins:     [ validationMixin ],
-  components: {
-    codemirror,
-    loading:         () => import('src/panel/components/loading.vue'),
-    'label-inside':  () => import('src/panel/components/label-inside.vue'),
-    'title-divider': () => import('src/panel/components/title-divider.vue'),
   },
   validations: { editationItem: { name: { required, minLength: minLength(1) } } },
   setup(props: Props, ctx) {

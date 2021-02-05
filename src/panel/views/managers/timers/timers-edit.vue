@@ -12,11 +12,13 @@
             v-model="item.name"
             type="text"
             :placeholder="translate('timers.dialog.placeholders.name')"
-            @input="$v.item.$touch()"
             :state="$v.item.name.$invalid && $v.item.name.$dirty ? false : null"
-          ></b-form-input>
+            @input="$v.item.$touch()"
+          />
         </b-input-group>
-        <b-form-invalid-feedback :state="!($v.item.name.$invalid && $v.item.name.$dirty)">{{ translate('timers.errors.timer_name_must_be_compliant') }}</b-form-invalid-feedback>
+        <b-form-invalid-feedback :state="!($v.item.name.$invalid && $v.item.name.$dirty)">
+          {{ translate('timers.errors.timer_name_must_be_compliant') }}
+        </b-form-invalid-feedback>
       </b-form-group>
 
       <b-row>
@@ -35,33 +37,41 @@
                 :placeholder="translate('timers.dialog.placeholders.messages')"
                 :state="$v.item.triggerEveryMessage.$invalid && $v.item.triggerEveryMessage.$dirty ? false : null"
                 @input="$v.item.$touch()"
-              ></b-form-input>
+              />
               <b-form-invalid-feedback :state="!($v.item.triggerEveryMessage.$invalid && $v.item.triggerEveryMessage.$dirty)">
-                <template v-if="!$v.item.triggerEveryMessage.required">{{ translate('errors.value_cannot_be_empty') }}</template>
-                <template v-else-if="!$v.item.triggerEveryMessage.minValue">{{ translate('errors.minValue_of_value_is').replace('$value', '0') }}</template>
+                <template v-if="!$v.item.triggerEveryMessage.required">
+                  {{ translate('errors.value_cannot_be_empty') }}
+                </template>
+                <template v-else-if="!$v.item.triggerEveryMessage.minValue">
+                  {{ translate('errors.minValue_of_value_is').replace('$value', '0') }}
+                </template>
               </b-form-invalid-feedback>
             </b-input-group>
-        </b-form-group>
-      </b-col>
-      <b-col>
-        <b-form-group
-          :label="translate('timers.dialog.seconds')"
-          :description="translate('timers.dialog.placeholders.seconds')"
-          label-for="seconds"
-        >
-          <b-input-group>
-            <b-form-input
-              id="seconds"
-              v-model="item.triggerEverySecond"
-              type="number"
-              min="0"
-              :placeholder="translate('timers.dialog.placeholders.seconds')"
-              :state="$v.item.triggerEverySecond.$invalid && $v.item.triggerEverySecond.$dirty ? false : null"
-              @input="$v.item.$touch()"
-              ></b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col>
+          <b-form-group
+            :label="translate('timers.dialog.seconds')"
+            :description="translate('timers.dialog.placeholders.seconds')"
+            label-for="seconds"
+          >
+            <b-input-group>
+              <b-form-input
+                id="seconds"
+                v-model="item.triggerEverySecond"
+                type="number"
+                min="0"
+                :placeholder="translate('timers.dialog.placeholders.seconds')"
+                :state="$v.item.triggerEverySecond.$invalid && $v.item.triggerEverySecond.$dirty ? false : null"
+                @input="$v.item.$touch()"
+              />
               <b-form-invalid-feedback :state="!($v.item.triggerEverySecond.$invalid && $v.item.triggerEverySecond.$dirty)">
-                <template v-if="!$v.item.triggerEverySecond.required">{{ translate('errors.value_cannot_be_empty') }}</template>
-                <template v-else-if="!$v.item.triggerEverySecond.minValue">{{ translate('errors.minValue_of_value_is').replace('$value', '0') }}</template>
+                <template v-if="!$v.item.triggerEverySecond.required">
+                  {{ translate('errors.value_cannot_be_empty') }}
+                </template>
+                <template v-else-if="!$v.item.triggerEverySecond.minValue">
+                  {{ translate('errors.minValue_of_value_is').replace('$value', '0') }}
+                </template>
               </b-form-invalid-feedback>
             </b-input-group>
           </b-form-group>
@@ -69,16 +79,27 @@
       </b-row>
 
       <b-form-group>
-        <label>{{translate('timers.dialog.responses')}}</label>
-        <b-input-group v-for="(response, index) of item.messages" class="pb-1" :key="response">
-          <b-alert show variant="danger" v-if="markToDeleteIdx.includes(index)"
-          style="position: absolute;
+        <label>{{ translate('timers.dialog.responses') }}</label>
+        <b-input-group
+          v-for="(response, index) of item.messages"
+          :key="response"
+          class="pb-1"
+        >
+          <b-alert
+            v-if="markToDeleteIdx.includes(index)"
+            show
+            variant="danger"
+            style="position: absolute;
                  z-index: 9;
                  height: 100%;
                  width: calc(100% - 34.5px);
-                 opacity: 60%;"></b-alert>
+                 opacity: 60%;"
+          />
           <b-input-group-prepend>
-            <b-button @click="response.isEnabled = !response.isEnabled" :variant="response.isEnabled ? 'success' : 'danger'">
+            <b-button
+              :variant="response.isEnabled ? 'success' : 'danger'"
+              @click="response.isEnabled = !response.isEnabled"
+            >
               {{ response.isEnabled ? translate('enabled') : translate('disabled') }}
             </b-button>
           </b-input-group-prepend>
@@ -86,19 +107,29 @@
           <textarea-with-tags
             class="w-50"
             :value.sync="response.response"
-            v-bind:filters="['global']"
-            v-bind:placeholder="''"
-            @input="getMessageValidation(index).$touch();"
+            :filters="['global']"
+            :placeholder="''"
             :state="!(getMessageValidation(index).$error && getMessageValidation(index).$dirty)"
-            />
+            @input="getMessageValidation(index).$touch();"
+          />
 
           <b-input-group-append>
-            <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="toggleMarkResponse(index)">
+            <button-with-icon
+              class="btn-only-icon btn-danger btn-reverse"
+              icon="trash"
+              @click="toggleMarkResponse(index)"
+            >
               {{ translate('dialog.buttons.delete') }}
             </button-with-icon>
           </b-input-group-append>
         </b-input-group>
-        <button type="button" class="btn btn-success btn-block" @click="addResponse()">{{ translate('systems.timers.add_response') }}</button>
+        <button
+          type="button"
+          class="btn btn-success btn-block"
+          @click="addResponse()"
+        >
+          {{ translate('systems.timers.add_response') }}
+        </button>
       </b-form-group>
     </b-form>
   </div>
@@ -131,16 +162,13 @@ const mustBeCompliant = (value: string) => value.length === 0 || !!value.match(/
 const socket = getSocket('/systems/timers');
 
 export default defineComponent({
-  props: {
+  components: { 'textarea-with-tags': () => import('../../../components/textareaWithTags.vue') },
+  mixins:     [ validationMixin ],
+  props:      {
     id:        String,
     invalid:   Boolean,
     pending:   Boolean,
     saveState: Number,
-  },
-  mixins:     [ validationMixin ],
-  components: {
-    loading:              () => import('src/panel/components/loading.vue'),
-    'textarea-with-tags': () => import('../../../components/textareaWithTags.vue'),
   },
   validations: {
     item: {
@@ -273,7 +301,7 @@ export default defineComponent({
       const $v = instance?.$v;
       return get($v, 'item.messages.$each[' + idx + '].response', {
         $error: false, $dirty: false, $touch: () => {
-          return; 
+          return;
         },
       });
     };

@@ -2,59 +2,132 @@
   <div class="px-3 py-2">
     <form>
       <div class="row no-gutters pl-3 pr-3">
-        <div class="card mb-3 p-0"
-            :class="{
-                'col-md-6': (supported.events.find((o) => o.id === editationItem.name) || { variables: []}).variables.length > 0,
-                'col-md-12': !((supported.events.find((o) => o.id === editationItem.name) || { variables: []}).variables.length > 0)
-            }"
+        <div
+          class="card mb-3 p-0"
+          :class="{
+            'col-md-6': (supported.events.find((o) => o.id === editationItem.name) || { variables: []}).variables.length > 0,
+            'col-md-12': !((supported.events.find((o) => o.id === editationItem.name) || { variables: []}).variables.length > 0)
+          }"
         >
-          <div class="card-header">{{translate('events.dialog.settings')}}</div>
+          <div class="card-header">
+            {{ translate('events.dialog.settings') }}
+          </div>
           <div class="card-body">
             <div class="form-group col-md-12">
               <label-inside>{{ translate('events.dialog.event') }}</label-inside>
               <b-select
-                  v-model="editationItem.name"
-                  :state="$v.editationItem.name.$error && $v.editationItem.name.$dirty ? false : null">
-                <b-select-option :value="''" :key="'empty-event'" :disabled="true">--- please select event ---</b-select-option>
-                <b-select-option v-for="key of supported.events.map((o) => o.id)" :value="key" :key="key">{{capitalize(translate(key))}}</b-select-option>
+                v-model="editationItem.name"
+                :state="$v.editationItem.name.$error && $v.editationItem.name.$dirty ? false : null"
+              >
+                <b-select-option
+                  :key="'empty-event'"
+                  :value="''"
+                  :disabled="true"
+                >
+                  --- please select event ---
+                </b-select-option>
+                <b-select-option
+                  v-for="key of supported.events.map((o) => o.id)"
+                  :key="key"
+                  :value="key"
+                >
+                  {{ capitalize(translate(key)) }}
+                </b-select-option>
               </b-select>
-              <b-form-invalid-feedback :state="!($v.editationItem.name.$error && $v.editationItem.name.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+              <b-form-invalid-feedback :state="!($v.editationItem.name.$error && $v.editationItem.name.$dirty)">
+                {{ translate('dialog.errors.required') }}
+              </b-form-invalid-feedback>
             </div>
-            <div class="form-group col-md-12" v-for="defKey of Object.keys(editationItem.definitions)" :key="defKey">
+            <div
+              v-for="defKey of Object.keys(editationItem.definitions)"
+              :key="defKey"
+              class="form-group col-md-12"
+            >
               <label-inside>{{ translate("events.definitions." + defKey + ".label") }}</label-inside>
               <template v-if="defKey === 'titleOfReward'">
                 {{ $v.editationItem.definitions.titleOfReward.$error && $v.editationItem.definitions.titleOfReward.$dirty ? false : null }}
-                <rewards :value.sync="editationItem.definitions[defKey]" :state="$v.editationItem.definitions.titleOfReward.$error && $v.editationItem.definitions.titleOfReward.$dirty ? false : null"/>
-                <b-form-invalid-feedback :state="!($v.editationItem.definitions.titleOfReward.$error && $v.editationItem.definitions.titleOfReward.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+                <rewards
+                  :value.sync="editationItem.definitions[defKey]"
+                  :state="$v.editationItem.definitions.titleOfReward.$error && $v.editationItem.definitions.titleOfReward.$dirty ? false : null"
+                />
+                <b-form-invalid-feedback :state="!($v.editationItem.definitions.titleOfReward.$error && $v.editationItem.definitions.titleOfReward.$dirty)">
+                  {{ translate('dialog.errors.required') }}
+                </b-form-invalid-feedback>
               </template>
               <template v-else-if="typeof editationItem.definitions[defKey] === 'boolean'">
-                <button type="button" class="btn btn-success" v-if="editationItem.definitions[defKey]" @click="editationItem.definitions[defKey] = false">{{translate("dialog.buttons.yes")}}</button>
-                <button type="button" class="btn btn-danger" v-else @click="editationItem.definitions[defKey] = true">{{translate("dialog.buttons.no")}}</button>
+                <button
+                  v-if="editationItem.definitions[defKey]"
+                  type="button"
+                  class="btn btn-success"
+                  @click="editationItem.definitions[defKey] = false"
+                >
+                  {{ translate("dialog.buttons.yes") }}
+                </button>
+                <button
+                  v-else
+                  type="button"
+                  class="btn btn-danger"
+                  @click="editationItem.definitions[defKey] = true"
+                >
+                  {{ translate("dialog.buttons.no") }}
+                </button>
               </template>
-              <input v-else v-model="editationItem.definitions[defKey]" :class="{ 'is-invalid': getDefinitionValidation(defKey).$error }" type="text" class="form-control" :id="defKey + '_input'" :placeholder="translate('events.definitions.' + defKey + '.placeholder')">
-              <div class="invalid-feedback" v-if="getDefinitionValidation(defKey)">
+              <input
+                v-else
+                :id="defKey + '_input'"
+                v-model="editationItem.definitions[defKey]"
+                :class="{ 'is-invalid': getDefinitionValidation(defKey).$error }"
+                type="text"
+                class="form-control"
+                :placeholder="translate('events.definitions.' + defKey + '.placeholder')"
+              >
+              <div
+                v-if="getDefinitionValidation(defKey)"
+                class="invalid-feedback"
+              >
                 <template v-if="!get(getDefinitionValidation(defKey), 'minValue', true)">
-                  {{translate('dialog.errors.minValue').replace('$value', get(getDefinitionValidation(defKey), '$params.minValue.min', 0)) }}
+                  {{ translate('dialog.errors.minValue').replace('$value', get(getDefinitionValidation(defKey), '$params.minValue.min', 0)) }}
                 </template>
                 <template v-else>
-                  {{translate('dialog.errors.required')}}
+                  {{ translate('dialog.errors.required') }}
                 </template>
               </div>
             </div>
             <div class="form-group col-md-12">
               <label-inside>{{ translate("events.dialog.filters") }}</label-inside>
-              <textarea v-model="editationItem.filter" class="form-control"/>
+              <textarea
+                v-model="editationItem.filter"
+                class="form-control"
+              />
             </div>
           </div>
         </div>
-        <div class="card col-md-6 mb-3 p-0" v-if="(supported.events.find((o) => o.id === editationItem.name) || { variables: []}).variables.length > 0">
-          <div class="card-header">{{translate('events.dialog.usable-events-variables')}}</div>
+        <div
+          v-if="(supported.events.find((o) => o.id === editationItem.name) || { variables: []}).variables.length > 0"
+          class="card col-md-6 mb-3 p-0"
+        >
+          <div class="card-header">
+            {{ translate('events.dialog.usable-events-variables') }}
+          </div>
           <div class="card-body">
             <div class="form-group col-md-12 m-0">
-              <dl class="row m-0" style="font-size:0.7rem;">
+              <dl
+                class="row m-0"
+                style="font-size:0.7rem;"
+              >
                 <template v-for="variables of (supported.events.find((o) => o.id === editationItem.name) || { variables: []}).variables">
-                  <dt class="col-4" :key="variables + '1'">${{variables}}</dt>
-                  <dd class="col-8" :key="variables + '2'">{{translate('responses.variable.' + variables) }}</dd>
+                  <dt
+                    :key="variables + '1'"
+                    class="col-4"
+                  >
+                    ${{ variables }}
+                  </dt>
+                  <dd
+                    :key="variables + '2'"
+                    class="col-8"
+                  >
+                    {{ translate('responses.variable.' + variables) }}
+                  </dd>
                 </template>
               </dl>
             </div>
@@ -62,58 +135,107 @@
         </div>
       </div>
 
-      <b-card no-body class="ml-3 mr-3 border-bottom-0">
-        <b-card-header class="border-bottom-0">{{translate('events.dialog.operations')}}</b-card-header>
+      <b-card
+        no-body
+        class="ml-3 mr-3 border-bottom-0"
+      >
+        <b-card-header class="border-bottom-0">
+          {{ translate('events.dialog.operations') }}
+        </b-card-header>
       </b-card>
-      <div class="row no-gutters pl-3 pr-3" v-for="(operation, index) of editationItem.operations" :key="operation.name + index"
-          :class="{'pt-2': index !== 0}">
+      <div
+        v-for="(operation, index) of editationItem.operations"
+        :key="operation.name + index"
+        class="row no-gutters pl-3 pr-3"
+        :class="{'pt-2': index !== 0}"
+      >
         <div class="card col-12">
           <div class="card-body">
             <div class="form-group col-md-12">
-              <b-select v-model="operation.name"
-                :state="!$v.editationItem.operations.doesSomething && $v.editationItem.operations.$dirty ? false : null">
-                <b-select-option v-for="key of supported.operations.map((o) => o.id)" :value="key" :key="key">{{capitalize(translate(key))}}</b-select-option>
+              <b-select
+                v-model="operation.name"
+                :state="!$v.editationItem.operations.doesSomething && $v.editationItem.operations.$dirty ? false : null"
+              >
+                <b-select-option
+                  v-for="key of supported.operations.map((o) => o.id)"
+                  :key="key"
+                  :value="key"
+                >
+                  {{ capitalize(translate(key)) }}
+                </b-select-option>
               </b-select>
-              <b-form-invalid-feedback v-if="operation.name === 'do-nothing'" :state="!(!$v.editationItem.operations.doesSomething && $v.editationItem.operations.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+              <b-form-invalid-feedback
+                v-if="operation.name === 'do-nothing'"
+                :state="!(!$v.editationItem.operations.doesSomething && $v.editationItem.operations.$dirty)"
+              >
+                {{ translate('dialog.errors.required') }}
+              </b-form-invalid-feedback>
 
-              <div v-for="(defKey, indexDef) of Object.keys(operation.definitions)" :key="defKey"
+              <div
+                v-for="(defKey, indexDef) of Object.keys(operation.definitions)"
+                :key="defKey"
                 class="mt-2"
-                :class="{'pt-2': indexDef === 0}">
-
+                :class="{'pt-2': indexDef === 0}"
+              >
                 <template v-if="supported.operations.find(o => o.id === operation.name)">
                   <template v-if="['messageToSend', 'commandToRun'].includes(defKey)">
                     <label-inside>{{ translate("events.definitions." + defKey + ".label") }}</label-inside>
                     <textarea-with-tags
                       :value.sync="operation.definitions[defKey]"
-                      @input="getOperationDefinitionValidation(index, defKey).$touch();"
                       :placeholder="translate('events.definitions.' + defKey + '.placeholder')"
                       :state="!(getOperationDefinitionValidation(index, defKey).$error && getOperationDefinitionValidation(index, defKey).$dirty)"
                       :filters="['global', ...(supported.events.find((o) => o.id === editationItem.name) || { variables: []}).variables]"
+                      @input="getOperationDefinitionValidation(index, defKey).$touch();"
                       @update="operation.definitions[defKey] = $event"
                     />
                   </template>
                   <template v-else-if="Array.isArray(supported.operations.find(o => o.id === operation.name).definitions[defKey])">
                     <label-inside>{{ translate("events.definitions." + defKey + ".label") }}</label-inside>
                     <b-select
-                        class="form-control"
-                        v-model="operation.definitions[defKey]">
-                      <b-select-option v-for="value of supported.operations.find(o => o.id === operation.name).definitions[defKey]" :key="value" :value="value">{{value}}</b-select-option>
+                      v-model="operation.definitions[defKey]"
+                      class="form-control"
+                    >
+                      <b-select-option
+                        v-for="value of supported.operations.find(o => o.id === operation.name).definitions[defKey]"
+                        :key="value"
+                        :value="value"
+                      >
+                        {{ value }}
+                      </b-select-option>
                     </b-select>
                   </template>
                   <template v-else-if="typeof operation.definitions[defKey] === 'string'">
                     <label-inside>{{ translate("events.definitions." + defKey + ".label") }}</label-inside>
                     <b-input
-                      type="text" class="form-control"
                       v-model="operation.definitions[defKey]"
+                      type="text"
+                      class="form-control"
                       :state="getOperationDefinitionValidation(index, defKey).$error && getOperationDefinitionValidation(index, defKey).$dirty ? false : null"
-                      :placeholder="translate('events.definitions.' + defKey + '.placeholder')"/>
+                      :placeholder="translate('events.definitions.' + defKey + '.placeholder')"
+                    />
                   </template>
                   <template v-else-if="typeof operation.definitions[defKey] === 'boolean'">
                     <label>{{ translate("events.definitions." + defKey + ".label") }}</label>
-                    <button type="button" class="btn btn-success" v-if="operation.definitions[defKey]" @click="operation.definitions[defKey] = false">{{translate("dialog.buttons.yes")}}</button>
-                    <button type="button" class="btn btn-danger" v-else @click="operation.definitions[defKey] = true">{{translate("dialog.buttons.no")}}</button>
+                    <button
+                      v-if="operation.definitions[defKey]"
+                      type="button"
+                      class="btn btn-success"
+                      @click="operation.definitions[defKey] = false"
+                    >
+                      {{ translate("dialog.buttons.yes") }}
+                    </button>
+                    <button
+                      v-else
+                      type="button"
+                      class="btn btn-danger"
+                      @click="operation.definitions[defKey] = true"
+                    >
+                      {{ translate("dialog.buttons.no") }}
+                    </button>
                   </template>
-                  <b-form-invalid-feedback :state="!(getOperationDefinitionValidation(index, defKey).$error && getOperationDefinitionValidation(index, defKey).$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+                  <b-form-invalid-feedback :state="!(getOperationDefinitionValidation(index, defKey).$error && getOperationDefinitionValidation(index, defKey).$dirty)">
+                    {{ translate('dialog.errors.required') }}
+                  </b-form-invalid-feedback>
                 </template>
               </div>
             </div>
@@ -125,7 +247,6 @@
 </template>
 
 <script lang="ts">
-import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
 import {
   computed, defineComponent, getCurrentInstance, onMounted, onUnmounted, ref, watch,
 } from '@vue/composition-api';
@@ -154,18 +275,16 @@ type Props = {
 };
 
 export default defineComponent({
-  props: {
+  components: {
+    rewards:        () => import('src/panel/components/rewardDropdown.vue'),
+    'label-inside': () => import('src/panel/components/label-inside.vue'),
+  },
+  mixins: [ validationMixin ],
+  props:  {
     id:        String,
     invalid:   Boolean,
     pending:   Boolean,
     saveState: Number,
-  },
-  mixins:     [ validationMixin ],
-  components: {
-    rewards:               () => import('src/panel/components/rewardDropdown.vue'),
-    loading:               () => import('src/panel/components/loading.vue'),
-    'font-awesome-layers': FontAwesomeLayers,
-    'label-inside':        () => import('src/panel/components/label-inside.vue'),
   },
   validations: {
     editationItem: {
@@ -509,7 +628,7 @@ export default defineComponent({
               id:          'do-nothing',
               definitions: {},
               fire:        () => {
-                return; 
+                return;
               },
             });
             supported.value.operations = data.sort((a, b) => {
@@ -585,7 +704,7 @@ export default defineComponent({
       const $v = instance?.$v;
       return get($v, 'editationItem.operations.$each[' + idx + '].definitions.' + key, {
         $error: false, $dirty: false, $touch: () => {
-          return; 
+          return;
         },
       });
     };
