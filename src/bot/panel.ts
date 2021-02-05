@@ -60,9 +60,12 @@ const port = process.env.PORT ?? '20000';
 const secureport = process.env.SECUREPORT ?? '20443';
 
 const limiter = RateLimit({
-  windowMs: 5 * 60 * 1000,
-  max:      100,
-  message:  'Too many requests from this IP, please try again after several minutes.',
+  windowMs:     5 * 60 * 1000,
+  max:          100,
+  message:      'Too many requests from this IP, please try again after several minutes.',
+  keyGenerator: (req, res) => {
+    return req.ip + req.url;
+  },
 });
 
 export const init = () => {
@@ -114,26 +117,29 @@ export const init = () => {
   // static routing
   app?.use('/dist', express.static(path.join(__dirname, '..', 'public', 'dist')));
   app?.get('/dist/*/*.js', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', sanitize(req.url + '.gz')), {
+    res.sendFile(path.join(__dirname, '..', 'public', (req.url + '.gz').split('/').map(o => sanitize(o)).join('/')), {
       headers: {
         'Content-Type':     'text/javascript',
         'Content-Encoding': 'gzip',
+        'Cache-Control':    'public',
       },
     });
   });
   app?.get('/dist/*/*.map', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', sanitize(req.url + '.gz')), {
+    res.sendFile(path.join(__dirname, '..', 'public', (req.url + '.gz').split('/').map(o => sanitize(o)).join('/')), {
       headers: {
         'Content-Type':     'text/javascript',
         'Content-Encoding': 'gzip',
+        'Cache-Control':    'public',
       },
     });
   });
   app?.get('/dist/*/*.css', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', sanitize(req.url + '.gz')), {
+    res.sendFile(path.join(__dirname, '..', 'public', (req.url + '.gz').split('/').map(o => sanitize(o)).join('/')), {
       headers: {
         'Content-Type':     'text/css',
         'Content-Encoding': 'gzip',
+        'Cache-Control':    'public',
       },
     });
   });
