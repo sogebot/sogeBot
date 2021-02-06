@@ -1,32 +1,70 @@
 <template>
-  <b-container fluid ref="window">
+  <b-container
+    ref="window"
+    fluid
+  >
     <b-row>
       <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.registry') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.textoverlay') }}
           <template v-if="state.loaded && $route.params.id">
-            <small><fa icon="angle-right"/></small>
-            {{name}}
-            <small class="text-muted text-monospace" style="font-size:0.7rem">{{$route.params.id}}</small>
+            <small><fa icon="angle-right" /></small>
+            {{ name }}
+            <small
+              class="text-muted text-monospace"
+              style="font-size:0.7rem"
+            >{{ $route.params.id }}</small>
           </template>
         </span>
       </b-col>
     </b-row>
 
     <panel>
-      <template v-slot:left>
-        <button-with-icon class="btn-secondary btn-reverse" icon="caret-left" href="#/registry/textoverlay/list">{{translate('commons.back')}}</button-with-icon>
-        <hold-button v-if="$route.params.id" icon="trash" class="btn-danger" @trigger="remove()">
-          <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-          <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+      <template #left>
+        <button-with-icon
+          class="btn-secondary btn-reverse"
+          icon="caret-left"
+          href="#/registry/textoverlay/list"
+        >
+          {{ translate('commons.back') }}
+        </button-with-icon>
+        <hold-button
+          v-if="$route.params.id"
+          icon="trash"
+          class="btn-danger"
+          @trigger="remove()"
+        >
+          <template slot="title">
+            {{ translate('dialog.buttons.delete') }}
+          </template>
+          <template slot="onHoldTitle">
+            {{ translate('dialog.buttons.hold-to-delete') }}
+          </template>
         </hold-button>
       </template>
-      <template v-slot:right>
-        <b-alert show variant="info" v-if="pending" v-html="translate('dialog.changesPending')" class="mr-2 p-2 mb-0"></b-alert>
-        <b-alert show variant="danger" v-if="error" v-html="error" class="mr-2 p-2 mb-0"></b-alert>
-        <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$invalid && !!$v.$dirty"/>
+      <template #right>
+        <b-alert
+          v-if="pending"
+          show
+          variant="info"
+          class="mr-2 p-2 mb-0"
+          v-html="translate('dialog.changesPending')"
+        />
+        <b-alert
+          v-if="error"
+          show
+          variant="danger"
+          class="mr-2 p-2 mb-0"
+          v-html="error"
+        />
+        <state-button
+          text="saveChanges"
+          :state="state.save"
+          :invalid="!!$v.$invalid && !!$v.$dirty"
+          @click="save()"
+        />
       </template>
     </panel>
 
@@ -48,36 +86,10 @@
                 :placeholder="translate('registry.textoverlay.name.placeholder')"
                 :state="$v.name.$invalid && $v.name.$dirty ? false : null"
                 @input="$v.name.$touch()"
-              ></b-form-input>
-              <b-form-invalid-feedback :state="!($v.name.$invalid && $v.name.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
-            </b-form-group>
-          </div>
-          <div class="form-row pl-2 pr-2">
-            <b-form-group
-              class="w-100"
-              :label="translate('registry.textoverlay.refreshRate')"
-              label-for="refreshRate"
-            >
-              <b-input-group>
-                <template #append>
-                  <b-input-group-text >{{translate('seconds')}}</b-input-group-text>
-                </template>
-
-                <b-form-input
-                  id="refreshRate"
-                  v-model.number="refreshRate"
-                  type="number"
-                  min="-1"
-                  :state="$v.refreshRate.$invalid && $v.refreshRate.$dirty ? false : null"
-                  @update="$v.$touch()"
-                ></b-form-input>
-              </b-input-group>
-              <b-form-invalid-feedback :state="!($v.refreshRate.$invalid && $v.refreshRate.$dirty)">
-                <template v-if="!$v.refreshRate.required">{{ translate('errors.value_cannot_be_empty') }}</template>
-                <template v-else-if="!$v.refreshRate.cannotBeZero">{{ translate('errors.value_cannot_be').replace('$value', '0') }}</template>
-                <template v-else-if="!$v.refreshRate.minValue">{{ translate('errors.minValue_of_value_is').replace('$value', '-1') }}</template>
+              />
+              <b-form-invalid-feedback :state="!($v.name.$invalid && $v.name.$dirty)">
+                {{ translate('dialog.errors.required') }}
               </b-form-invalid-feedback>
-              <b-form-text id="input-live-help">{{ translate('registry.textoverlay.refreshRateHelpText') }}</b-form-text>
             </b-form-group>
           </div>
           <div class="form-row pl-2 pr-2">
@@ -85,15 +97,37 @@
               <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">External JS</label>
 
               <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="e.g. https://code.jquery.com/jquery-3.3.1.min.js" v-model="externalJsInput">
+                <input
+                  v-model="externalJsInput"
+                  type="text"
+                  class="form-control"
+                  placeholder="e.g. https://code.jquery.com/jquery-3.3.1.min.js"
+                >
                 <div class="input-group-append">
-                  <button type="button" class="btn btn-primary" @click="if (externalJsInput) { external.push(externalJsInput); pending = true; } externalJsInput = ''"><fa icon="plus"></fa> Add external JS</button>
+                  <button
+                    type="button"
+                    class="btn btn-primary"
+                    @click="if (externalJsInput) { external.push(externalJsInput); pending = true; } externalJsInput = ''"
+                  >
+                    <fa icon="plus" /> Add external JS
+                  </button>
                 </div>
               </div>
               <ul class="list-group">
-                <li style="padding: 0.1rem 0.5rem" class="list-group-item list-group-item-info d-flex justify-content-between align-items-center" v-for="js of external" :key="js" >
-                  {{js}}
-                  <button type="button" class="btn btn-outline-info border-0" @click="removeExternalJS(js); pending = true"><fa icon="times"></fa></button>
+                <li
+                  v-for="js of external"
+                  :key="js"
+                  style="padding: 0.1rem 0.5rem"
+                  class="list-group-item list-group-item-info d-flex justify-content-between align-items-center"
+                >
+                  {{ js }}
+                  <button
+                    type="button"
+                    class="btn btn-outline-info border-0"
+                    @click="removeExternalJS(js); pending = true"
+                  >
+                    <fa icon="times" />
+                  </button>
                 </li>
               </ul>
             </div>
@@ -102,30 +136,33 @@
             <div class="form-group col">
               <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">HTML</label>
               <codemirror
+                v-model="html"
                 class="border"
                 style="font-size: 12px;"
-                v-model="html"
-                :options="htmlOptions"/>
+                :options="htmlOptions"
+              />
             </div>
           </div>
           <div class="form-row pl-2 pr-2">
             <div class="form-group col">
               <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">JS</label>
               <codemirror
+                v-model="js"
                 class="border"
                 style="font-size: 12px;"
-                v-model="js"
-                :options="jsOptions"/>
+                :options="jsOptions"
+              />
             </div>
           </div>
           <div class="form-row pl-2 pr-2">
             <div class="form-group col">
               <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">CSS</label>
               <codemirror
+                v-model="css"
                 class="border"
                 style="font-size: 12px;"
-                v-model="css"
-                :options="cssOptions"/>
+                :options="cssOptions"
+              />
             </div>
           </div>
         </form>
@@ -141,7 +178,7 @@ import {
   Component, Vue, Watch,
 } from 'vue-property-decorator';
 import { Validate } from 'vuelidate-property-decorators';
-import { minValue, required } from 'vuelidate/lib/validators';
+import { required } from 'vuelidate/lib/validators';
 
 import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
@@ -177,13 +214,8 @@ export default class textOverlayEdit extends Vue {
   js =  'function onLoad() { // triggered on page load\n\n}\n\nfunction onChange() { // triggered on variable change\n\n}';
   css =  '';
   external: string[] = [];
-  @Validate({
-    required, minValue: minValue(-1), cannotBeZero: (value: number) => value !== 0,
-  })
-  refreshRate = 5;
 
   @Watch('name')
-  @Watch('refreshRate')
   @Watch('html')
   @Watch('js')
   @Watch('css')
@@ -247,7 +279,6 @@ export default class textOverlayEdit extends Vue {
         this.js = data.js;
         this.css = data.css;
         this.external = data.external || [];
-        this.refreshRate = data.refreshRate;
         this.$nextTick(() => {
           this.pending = false;
         });
@@ -282,13 +313,12 @@ export default class textOverlayEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = 1;
       const data = {
-        id:          this.id,
-        name:        this.name,
-        refreshRate: this.refreshRate,
-        text:        this.html,
-        js:          this.js,
-        css:         this.css,
-        external:    this.external,
+        id:       this.id,
+        name:     this.name,
+        text:     this.html,
+        js:       this.js,
+        css:      this.css,
+        external: this.external,
       };
       this.socket.emit('text::save', data, (err: string | null) => {
         if (err) {
