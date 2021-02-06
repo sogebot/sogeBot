@@ -3,14 +3,15 @@ import axios from 'axios';
 import Core from './_interface';
 import * as constants from './constants';
 import {
-  areDecoratorsLoaded, persistent, settings, ui, 
+  areDecoratorsLoaded, persistent, settings, ui,
 } from './decorators';
 import {
-  onChange, onLoad, onStartup, 
+  onChange, onLoad, onStartup,
 } from './decorators/on';
 import { apiEmitter } from './helpers/api/emitter';
 import {
-  error, info, warning, 
+  debug,
+  error, info, warning,
 } from './helpers/log';
 import { channelId, loadedTokens } from './helpers/oauth';
 import { botId } from './helpers/oauth/botId';
@@ -127,7 +128,7 @@ class OAuth extends Core {
   @onStartup()
   onStartup() {
     this.addMenu({
-      category: 'settings', name: 'core', id: 'settings/core', this: null, 
+      category: 'settings', name: 'core', id: 'settings/core', this: null,
     });
     this.validateOAuth('bot');
     this.validateOAuth('broadcaster');
@@ -278,7 +279,9 @@ class OAuth extends Core {
 
       let request;
       try {
+        debug('oauth.validate', `Checking ${type} - retry no. ${retry}`);
         request = await axios.get(url, { headers: { Authorization: 'OAuth ' + (type === 'bot' ? this.botAccessToken : this.broadcasterAccessToken) } });
+        debug('oauth.validate', JSON.stringify(request));
       } catch (e) {
         if (e.isAxiosError) {
           if (e.response.status !== 401 && retry < 5) {
@@ -290,6 +293,7 @@ class OAuth extends Core {
           }
           throw new Error(`Error on validate ${type} OAuth token, error: ${e.response.status} - ${e.response.statusText} - ${e.response.data.message}`);
         } else {
+          debug('oauth.validate', e.stack);
           throw new Error(e);
         }
       }
