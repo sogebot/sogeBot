@@ -316,7 +316,7 @@ class Webhooks {
         return;
       }
 
-      if (Number(streamId) !== Number(stream.id)) {
+      if (Number(streamId.value) !== Number(stream.id)) {
         debug('webhooks.stream', 'WEBHOOKS: ' + JSON.stringify(aEvent));
         start(
           `id: ${stream.id} | webhooks | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await getGameNameFromId(Number(stream.game_id))} | type: ${stream.type} | channel ID: ${cid}`,
