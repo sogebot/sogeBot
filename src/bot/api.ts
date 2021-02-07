@@ -995,7 +995,7 @@ class API extends Core {
               currentBits:        0,
               currentTips:        0,
             };
-            streamStatusChangeSince.value =new Date(stream.started_at).getTime();
+            streamStatusChangeSince.value = new Date(stream.started_at).getTime();
             streamId.value = stream.id;
             streamType.value = stream.type;
 

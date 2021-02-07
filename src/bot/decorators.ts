@@ -131,7 +131,7 @@ export function settings(category?: string, isReadOnly = false) {
 
         // add variable to settingsList
         self.settingsList.push({
-          category, key, defaultValue: (self as any)[key], 
+          category, key, defaultValue: (self as any)[key],
         });
       } catch (e) {
         error(e.stack);
@@ -201,7 +201,7 @@ export function permission_settings(category?: string, exclude: string[] = [], e
 
         // add variable to settingsPermList
         self.settingsPermList.push({
-          category, key, defaultValue: (self as any)[key], 
+          category, key, defaultValue: (self as any)[key],
         });
       } catch (e) {
 
@@ -257,9 +257,9 @@ export function parser(
 
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
     registerParser({
-      fireAndForget, permission, priority, dependsOn, 
+      fireAndForget, permission, priority, dependsOn,
     }, {
-      type, name, fnc: key, 
+      type, name, fnc: key,
     });
     return descriptor;
   };
@@ -271,8 +271,8 @@ export function command(opts: string) {
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
     commandsToRegister.push({
       opts, m: {
-        type, name, fnc: key, 
-      }, 
+        type, name, fnc: key,
+      },
     });
     return descriptor;
   };
@@ -291,7 +291,7 @@ export function helper() {
 
   return (target: any, key: string | symbol, descriptor: PropertyDescriptor) => {
     registerHelper({
-      type, name, fnc: String(key), 
+      type, name, fnc: String(key),
     });
     return descriptor;
   };
@@ -302,7 +302,7 @@ export function rollback() {
 
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
     registerRollback({
-      type, name, fnc: key, 
+      type, name, fnc: key,
     });
     return descriptor;
   };
@@ -365,6 +365,10 @@ function registerParser(opts: {
       error(e.stack);
     }
   }, 5000);
+}
+
+export function IsLoadingInProgress(name: symbol) {
+  return loadingInProgress.includes(name);
 }
 
 export function toggleLoadingInProgress(name: symbol) {
