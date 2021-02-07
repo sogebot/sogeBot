@@ -390,9 +390,8 @@ export const init = () => {
       cb(null, getDEBUG());
     });
 
-    adminEndpoint('/', 'debug::set', (data, cb) => {
+    adminEndpoint('/', 'debug::set', (data) => {
       setDEBUG(data);
-      cb?.(null, '');
     });
 
     adminEndpoint('/', 'panel::alerts', (cb) => {
