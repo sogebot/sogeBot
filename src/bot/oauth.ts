@@ -281,7 +281,7 @@ class OAuth extends Core {
       try {
         debug('oauth.validate', `Checking ${type} - retry no. ${retry}`);
         request = await axios.get(url, { headers: { Authorization: 'OAuth ' + (type === 'bot' ? this.botAccessToken : this.broadcasterAccessToken) } });
-        debug('oauth.validate', JSON.stringify(request));
+        debug('oauth.validate', JSON.stringify(request.data));
       } catch (e) {
         if (e.isAxiosError) {
           if (e.response.status !== 401 && retry < 5) {
