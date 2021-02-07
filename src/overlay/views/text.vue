@@ -78,8 +78,6 @@ export default defineComponent({
       });
     };
 
-    watch;
-
     onMounted(async () => {
       await refresh();
       socket.on('variable-changed', (variableName: string) => {
