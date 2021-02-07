@@ -5,11 +5,12 @@ import { Variable, VariableInterface } from '../../database/entity/variable';
 import users from '../../users';
 import { warning } from '../log';
 import {
-  addToViewersCache, get, getFromCachedHighestPermission, getFromViewersCache, 
+  addToViewersCache, get, getFromCachedHighestPermission, getFromViewersCache,
 } from '../permissions';
 import { defaultPermissions } from '../permissions/';
 import { check } from '../permissions/';
 import { addChangeToHistory } from './addChangeToHistory';
+import { csEmitter } from './emitter';
 import { getValueOf } from './getValueOf';
 import { updateWidgetAndTitle } from './updateWidgetAndTitle';
 
@@ -106,9 +107,10 @@ async function setValueOf (variable: string | Readonly<VariableInterface>, curre
   const setValue = itemCurrentValue ?? '';
   if (isOk) {
     updateWidgetAndTitle(item.variableName);
+    csEmitter.emit('variable-changed', item.variableName);
     if (!isEval) {
       addChangeToHistory({
-        sender: opts.sender, item, oldValue: itemOldValue, 
+        sender: opts.sender, item, oldValue: itemOldValue,
       });
     }
   }
@@ -116,7 +118,7 @@ async function setValueOf (variable: string | Readonly<VariableInterface>, curre
     updated: {
       ...item,
       currentValue: isOk && !isEval ? '' : setValue, // be silent if parsed correctly eval
-    }, setValue, isOk, isEval, 
+    }, setValue, isOk, isEval,
   };
 }
 

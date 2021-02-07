@@ -1,7 +1,10 @@
 import { getRepository } from 'typeorm';
 
 import { Text as TextEntity } from '../database/entity/text';
+import { onStartup } from '../decorators/on';
 import { executeVariablesInText } from '../helpers/customvariables';
+import { csEmitter } from '../helpers/customvariables/emitter';
+import { ioServer } from '../helpers/panel';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import Message from '../message';
 import Registry from './_interface';
@@ -10,7 +13,18 @@ class Text extends Registry {
   constructor () {
     super();
     this.addMenu({
-      category: 'registry', name: 'textoverlay', id: 'registry.textoverlay/list', this: null, 
+      category: 'registry', name: 'textoverlay', id: 'registry.textoverlay/list', this: null,
+    });
+  }
+
+  @onStartup()
+  onStartup() {
+    csEmitter.on('variable-changed', (variableName) => {
+      if(ioServer) {
+        for (const socket of ioServer.of(this.nsp).sockets.values()) {
+          socket.emit('variable-changed', variableName);
+        }
+      }
     });
   }
 
@@ -52,7 +66,7 @@ class Text extends Registry {
           text = await new Message(await executeVariablesInText(text, null)).parse();
         }
 
-        callback(null, { ...item, text });
+        callback(null, { ...item, parsedText: text });
       } catch(e) {
         callback(e.message, null);
       }

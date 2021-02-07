@@ -1,10 +1,13 @@
 <template>
-  <div v-html="text" id="main"></div>
+  <div
+    id="main"
+    v-html="text"
+  />
 </template>
 
 <script lang="ts">
 import {
-  defineComponent, onMounted, ref, watch, 
+  defineComponent, onMounted, ref, watch,
 } from '@vue/composition-api';
 
 import { getSocket } from 'src/panel/helpers/socket';
@@ -13,12 +16,11 @@ const socket = getSocket('/registries/text', true);
 
 export default defineComponent({
   setup(props, ctx) {
+    const nonParsedText = ref('');
     const text = ref('');
     const js = ref(null as any);
     const css = ref(null as any);
     const external = ref(false);
-    const refreshRate = ref(5);
-    const lastRefreshAt = ref(Date.now());
 
     const onChange = () => {
       if (js.value) {
@@ -30,61 +32,60 @@ export default defineComponent({
     };
 
     const refresh = () => {
-      if (ctx.root.$route.params.id) {
-        socket.emit('generic::getOne', { id: ctx.root.$route.params.id, parseText: true }, (err: string | null, cb: { refreshRate: number, external: string, text: string, js: string, css: string }) => {
-          if (err) {
-            return console.error(err);
-          }
-          if (!cb) {
-            return console.warn('No text overlay found with id ' + ctx.root.$route.params.id);
-          }
-          if (!external.value) {
-            if (cb.external) {
-              for (const link of cb.external) {
-                const script = document.createElement('script');
-                script.src = link;
-                document.getElementsByTagName('head')[0].appendChild(script);
-              }
+      return new Promise(resolve => {
+        console.debug(`${Date().toLocaleString()} - refresh()`);
+        if (ctx.root.$route.params.id) {
+          socket.emit('generic::getOne', { id: ctx.root.$route.params.id, parseText: true }, (err: string | null, cb: { external: string, text: string, js: string, css: string, parsedText: string }) => {
+            if (err) {
+              return console.error(err);
             }
-            external.value = true;
-          }
+            if (!cb) {
+              return console.warn('No text overlay found with id ' + ctx.root.$route.params.id);
+            }
+            if (!external.value) {
+              if (cb.external) {
+                for (const link of cb.external) {
+                  const script = document.createElement('script');
+                  script.src = link;
+                  document.getElementsByTagName('head')[0].appendChild(script);
+                }
+              }
+              external.value = true;
+            }
 
-          refreshRate.value = cb.refreshRate * 1000;
-          lastRefreshAt.value = Date.now();
-
-          setTimeout(() => {
-            const isChanged = text.value !== '' && text.value !== cb.text;
-            text.value = cb.text;
-            ctx.root.$nextTick(() => {
-              if (!js.value && cb.js) {
-                js.value = cb.js;
-              }
-              if (!css.value && cb.css) {
-                css.value = cb.css;
-              }
-              if (isChanged) {
-                onChange();
-              }
-            });
-          }, 100);
-        });
-      } else {
-        console.error('Missing id param in url');
-      }
+            setTimeout(() => {
+              const isChanged = text.value !== '' && text.value !== cb.parsedText;
+              nonParsedText.value = cb.text;
+              text.value = cb.parsedText;
+              ctx.root.$nextTick(() => {
+                if (!js.value && cb.js) {
+                  js.value = cb.js;
+                }
+                if (!css.value && cb.css) {
+                  css.value = cb.css;
+                }
+                if (isChanged) {
+                  onChange();
+                }
+                resolve(true);
+              });
+            }, 100);
+          });
+        } else {
+          console.error('Missing id param in url');
+          resolve(true);
+        }
+      });
     };
 
-    onMounted(() => {
-      refresh();
-      const interval = setInterval(() => {
-        if (refreshRate.value === -1000) {
-          console.warn('This resource refresh is disabled.');
-          clearInterval(interval);
-        } else {
-          if (Date.now() - lastRefreshAt.value >= refreshRate.value) {
-            refresh();
-          }
+    onMounted(async () => {
+      await refresh();
+      socket.on('variable-changed', (variableName: string) => {
+        if (nonParsedText.value.includes(variableName)) {
+          console.log(`Variable ${variableName} changed. Refreshing.`);
+          refresh();
         }
-      }, 200);
+      });
     });
 
     watch(css, (val: string) => {
