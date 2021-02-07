@@ -5,7 +5,7 @@ import WebSocket from 'ws';
 import { SECOND } from './constants';
 import { eventEmitter } from './helpers/events';
 import {
-  ban, debug, error, info, redeem, timeout, unban, warning, 
+  ban, debug, error, info, redeem, timeout, unban, warning,
 } from './helpers/log';
 import { broadcasterId } from './helpers/oauth/broadcasterId';
 import { addUIError } from './helpers/panel/alerts';
@@ -103,15 +103,40 @@ const connect = () => {
       } else if (dataMessage.type === 'moderation_action') {
         try {
           const createdBy = dataMessage.data.from_automod ? 'TwitchAutoMod' : `${dataMessage.data.created_by}#${dataMessage.data.created_by_user_id}`;
-          const [ username, reason ] = dataMessage.data.args;
           if (dataMessage.data.moderation_action === 'ban') {
+            const [ username, reason ] = dataMessage.data.args;
             ban(`${username}#${dataMessage.data.target_user_id} by ${createdBy}: ${reason ? reason : '<no reason>'}`);
             eventEmitter.emit('ban', { username, reason: reason ? reason : '<no reason>' });
           } else if (dataMessage.data.moderation_action === 'unban') {
+            const [ username ] = dataMessage.data.args;
             unban(`${username}#${dataMessage.data.target_user_id} by ${createdBy}`);
           } else if (dataMessage.data.moderation_action === 'timeout') {
+            const [ username, reason ] = dataMessage.data.args;
             timeout(`${username}#${dataMessage.data.target_user_id} by ${createdBy} for ${reason} seconds`);
             eventEmitter.emit('timeout', { username, duration: reason });
+          } else if (dataMessage.data.moderation_action === 'followersoff') {
+            info(`${createdBy} disabled followers-only mode.`);
+          } else if (dataMessage.data.moderation_action === 'followers') {
+            if (dataMessage.data.args !== null && Number(dataMessage.data.args[0]) !== 0) {
+              info(`${createdBy} enabled followers-only mode for follows at least ${dataMessage.data.args[0]} minutes old.`);
+            } else {
+              info(`${createdBy} enabled followers-only mode (any follower).`);
+            }
+          } else if (dataMessage.data.moderation_action === 'slow') {
+            if (dataMessage.data.args === null) {
+              dataMessage.data.args = [30]; // default;
+            }
+            info(`${createdBy} enabled slow mode with ${dataMessage.data.args[0]}s wait time.`);
+          } else if (dataMessage.data.moderation_action === 'slowoff') {
+            info(`${createdBy} disabled slow mode.`);
+          } else if (dataMessage.data.moderation_action === 'subscribersoff') {
+            info(`${createdBy} disabled subscribers-only mode.`);
+          } else if (dataMessage.data.moderation_action === 'subscribers') {
+            info(`${createdBy} enabled subscribers-only mode.`);
+          } else if (dataMessage.data.moderation_action === 'emoteonlyoff') {
+            info(`${createdBy} disabled emote-only mode.`);
+          } else if (dataMessage.data.moderation_action === 'emoteonly') {
+            info(`${createdBy} enabled emote-only mode.`);
           }
         } catch (e) {
           warning(`PUBSUB: Unknown moderation_action ${dataMessage.data.moderation_action}`);
