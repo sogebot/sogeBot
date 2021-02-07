@@ -14,7 +14,7 @@ import { mainCurrency } from '../helpers/currency';
 import { eventEmitter } from '../helpers/events';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
 import {
-  error, info, tip, 
+  error, info, tip,
 } from '../helpers/log.js';
 import eventlist from '../overlays/eventlist.js';
 import alerts from '../registries/alerts.js';
@@ -108,6 +108,7 @@ class TipeeeStream extends Integration {
       if (this.socketToTipeeestream !== null) {
         this.socketToTipeeestream.on('connect_error', (e: Error) => {
           error(chalk.red('TIPEEESTREAM.COM:') + ' error while connecting, ' + e);
+          this.connect(); // rerun all connect process
         });
         this.socketToTipeeestream.on('connect', () => {
           if (this.socketToTipeeestream !== null) {
