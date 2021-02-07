@@ -391,10 +391,6 @@ class TMI extends Core {
       client.chat.on('USERNOTICE', message => {
         this.usernotice(message);
       });
-
-      client.chat.on('NOTICE', message => {
-        info(message.message);
-      });
     } else if (type === 'broadcaster') {
       client.chat.on('PRIVMSG/HOSTED', async (message) => {
         message = message as BaseMessage;
