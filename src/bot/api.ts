@@ -979,7 +979,7 @@ class API extends Core {
         if (!isStreamOnline.value || streamType.value !== stream.type) {
           chatMessagesAtStart.value = linesParsed;
 
-          if (!webhooks.enabled.streams && Number(streamId) !== Number(stream.id)) {
+          if (!webhooks.enabled.streams && Number(streamId.value) !== Number(stream.id)) {
             debug('api.stream', 'API: ' + JSON.stringify(stream));
             start(
               `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await getGameNameFromId(Number(stream.game_id))} | type: ${stream.type} | channel ID: ${cid}`,
