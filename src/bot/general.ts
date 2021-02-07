@@ -2,7 +2,7 @@ import { readdirSync, writeFileSync } from 'fs';
 
 import gitCommitInfo from 'git-commit-info';
 import {
-  get, isNil, map, 
+  get, isNil, map,
 } from 'lodash';
 import { getConnection, getRepository } from 'typeorm';
 
@@ -10,17 +10,17 @@ import Core from './_interface';
 import { HOUR, MINUTE } from './constants';
 import { Widget } from './database/entity/dashboard';
 import {
-  command, default_permission, settings, ui, 
+  command, default_permission, settings, ui,
 } from './decorators';
 import {
-  onChange, onLoad, onStartup, 
+  onChange, onLoad, onStartup,
 } from './decorators/on';
 import { isStreamOnline } from './helpers/api';
 import { setLocale } from './helpers/dayjs';
 import { setValue } from './helpers/general';
 import { setLang } from './helpers/locales';
 import {
-  debug, error, warning, 
+  debug, error, warning,
 } from './helpers/log';
 import { getOAuthStatus } from './helpers/OAuthStatus';
 import { socketsConnected } from './helpers/panel/';
@@ -64,7 +64,7 @@ class General extends Core {
     type:   'selector', values: () => {
       const f = readdirSync('./locales/');
       return [...new Set(f.map((o) => o.split('.')[0]))];
-    }, 
+    },
   })
   public lang = 'en';
 
@@ -201,7 +201,7 @@ class General extends Core {
         throw new Error(`Not found - ${type}s - ${name}`);
       }
     } catch (e) {
-      error(e.message);
+      error(e.stack);
     }
   }
 }

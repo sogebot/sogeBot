@@ -154,7 +154,7 @@ class TMI extends Core {
       // update ignore list
       return [{ response: prepare('ignore.user.is.added', { username }), ...opts }];
     } catch (e) {
-      error(e.message);
+      error(e.stack);
     }
     return [];
   }
@@ -168,7 +168,7 @@ class TMI extends Core {
       // update ignore list
       return [{ response: prepare('ignore.user.is.removed', { username }), ...opts }];
     } catch (e) {
-      error(e.message);
+      error(e.stack);
     }
     return [];
   }
@@ -528,7 +528,7 @@ class TMI extends Core {
       });
       sub(`${username}#${userstate.userId}, tier: ${tier}`);
       eventEmitter.emit('subscription', {
-        username: username, method: (isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths, tier: String(tier), 
+        username: username, method: (isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths, tier: String(tier),
       });
       alerts.trigger({
         event:      'subs',
@@ -681,7 +681,7 @@ class TMI extends Core {
         this.ignoreGiftsFromUser[username].count--;
       } else {
         eventEmitter.emit('subgift', {
-          username: username, recipient: recipient, tier, 
+          username: username, recipient: recipient, tier,
         });
         triggerInterfaceOnSub({
           username:            recipient,
@@ -778,7 +778,7 @@ class TMI extends Core {
       getRepository(User).save(user);
 
       eventEmitter.emit('cheer', {
-        username, bits: Number(userstate.bits), message: messageFromUser, 
+        username, bits: Number(userstate.bits), message: messageFromUser,
       });
 
       if (isStreamOnline.value) {
@@ -802,7 +802,7 @@ class TMI extends Core {
           if (price.priceBits <= Number(userstate.bits)) {
             if (customcommands.enabled) {
               await customcommands.run({
-                sender: getBotSender(), id: 'null', skip: false, quiet: false, message: messageFromUser.trim().toLowerCase(), parameters: '', 
+                sender: getBotSender(), id: 'null', skip: false, quiet: false, message: messageFromUser.trim().toLowerCase(), parameters: '',
               });
             }
             new Parser().command(null, messageFromUser, true);
@@ -870,7 +870,7 @@ class TMI extends Core {
     }
 
     const parse = new Parser({
-      sender: sender, message: message, skip: skip, quiet: quiet, 
+      sender: sender, message: message, skip: skip, quiet: quiet,
     });
 
     if (!skip
@@ -930,11 +930,11 @@ class TMI extends Core {
         api.followerUpdatePreCheck(sender.username);
 
         eventEmitter.emit('keyword-send-x-times', {
-          username: sender.username, message: message, source: 'twitch', 
+          username: sender.username, message: message, source: 'twitch',
         });
         if (message.startsWith('!')) {
           eventEmitter.emit('command-send-x-times', {
-            username: sender.username, message: message, source: 'twitch', 
+            username: sender.username, message: message, source: 'twitch',
           });
         } else if (!message.startsWith('!')) {
           getRepository(User).increment({ userId: Number(sender.userId) }, 'messages', 1);

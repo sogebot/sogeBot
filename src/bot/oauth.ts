@@ -330,7 +330,7 @@ class OAuth extends Core {
       this.getChannelId();
     } catch (e) {
       if (!e.message.includes('no access token')) {
-        error(e.message);
+        error(e.stack);
       }
       status = false;
       if ((type === 'bot' ? this.botRefreshToken : this.broadcasterRefreshToken) !== '') {

@@ -7,17 +7,17 @@ import { parserReply } from '../commons';
 import * as constants from '../constants';
 import { Alias as AliasEntity } from '../database/entity/alias';
 import {
-  command, default_permission, parser, 
+  command, default_permission, parser,
 } from '../decorators';
 import Expects from '../expects';
 import { incrementCountOfCommandUsage } from '../helpers/commands/count';
 import { prepare } from '../helpers/commons';
 import { executeVariablesInText } from '../helpers/customvariables';
 import {
-  debug, error, warning, 
+  debug, error, warning,
 } from '../helpers/log';
 import {
-  addToViewersCache, get, getFromViewersCache, 
+  addToViewersCache, get, getFromViewersCache,
 } from '../helpers/permissions';
 import { check, defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
@@ -47,7 +47,7 @@ class Alias extends System {
     super();
 
     this.addMenu({
-      category: 'manage', name: 'alias', id: 'manage/alias', this: this, 
+      category: 'manage', name: 'alias', id: 'manage/alias', this: this,
     });
   }
 
@@ -179,10 +179,10 @@ class Alias extends System {
       if (opts.parameters.includes('-set')) {
         const [alias, group] = new Expects(opts.parameters)
           .argument({
-            name: 'a', type: String, multi: true, delimiter: '', 
+            name: 'a', type: String, multi: true, delimiter: '',
           }) // set as multi as alias can contain spaces
           .argument({
-            name: 'set', type: String, multi: true, delimiter: '', 
+            name: 'set', type: String, multi: true, delimiter: '',
           }) // set as multi as group can contain spaces
           .toArray();
         const item = await getRepository(AliasEntity).findOne({ alias });
@@ -196,7 +196,7 @@ class Alias extends System {
       } else if (opts.parameters.includes('-unset')) {
         const [alias] = new Expects(opts.parameters)
           .argument({
-            name: 'unset', type: String, multi: true, delimiter: '', 
+            name: 'unset', type: String, multi: true, delimiter: '',
           }) // set as multi as alias can contain spaces
           .toArray();
         const item = await getRepository(AliasEntity).findOne({ alias });
@@ -210,14 +210,14 @@ class Alias extends System {
       } else if (opts.parameters.includes('-list')) {
         const [group] = new Expects(opts.parameters)
           .argument({
-            name: 'list', type: String, optional: true, multi: true, delimiter: '', 
+            name: 'list', type: String, optional: true, multi: true, delimiter: '',
           }) // set as multi as group can contain spaces
           .toArray();
         if (group) {
           const aliases = await getRepository(AliasEntity).find({
             where: {
-              visible: true, enabled: true, group, 
-            }, 
+              visible: true, enabled: true, group,
+            },
           });
           const response = prepare('alias.alias-group-list-aliases', { group, list: aliases.length > 0 ? aliases.map(o => o.alias).sort().join(', ') : `<${translate('core.empty')}>` });
           return [{ response, ...opts }];
@@ -230,7 +230,7 @@ class Alias extends System {
       } else if (opts.parameters.includes('-enable')) {
         const [group] = new Expects(opts.parameters)
           .argument({
-            name: 'enable', type: String, multi: true, delimiter: '', 
+            name: 'enable', type: String, multi: true, delimiter: '',
           }) // set as multi as group can contain spaces
           .toArray();
         await getRepository(AliasEntity).update({ group }, { enabled: true });
@@ -239,7 +239,7 @@ class Alias extends System {
       } else if (opts.parameters.includes('-disable')) {
         const [group] = new Expects(opts.parameters)
           .argument({
-            name: 'disable', type: String, multi: true, delimiter: '', 
+            name: 'disable', type: String, multi: true, delimiter: '',
           }) // set as multi as group can contain spaces
           .toArray();
         await getRepository(AliasEntity).update({ group }, { enabled: false });
@@ -249,7 +249,7 @@ class Alias extends System {
         throw new Error('-set, -unset, -enable, -disable or -list not found in command.');
       }
     } catch (e) {
-      error(e.message);
+      error(e.stack);
       return [{ response: prepare('alias.alias-parse-failed'), ...opts }];
     }
 
@@ -262,10 +262,10 @@ class Alias extends System {
       const [perm, alias, cmd] = new Expects(opts.parameters)
         .permission({ optional: true, default: defaultPermissions.VIEWERS })
         .argument({
-          name: 'a', type: String, multi: true, delimiter: '', 
+          name: 'a', type: String, multi: true, delimiter: '',
         }) // set as multi as alias can contain spaces
         .argument({
-          name: 'c', type: String, multi: true, delimiter: '', 
+          name: 'c', type: String, multi: true, delimiter: '',
         }) // set as multi as command can contain spaces
         .toArray();
 
@@ -284,7 +284,7 @@ class Alias extends System {
         return [{ response, ...opts }];
       }
       await getRepository(AliasEntity).save({
-        ...item, command: cmd, permission: pItem.id ?? defaultPermissions.VIEWERS, 
+        ...item, command: cmd, permission: pItem.id ?? defaultPermissions.VIEWERS,
       });
 
       const response = prepare('alias.alias-was-edited', { alias, command: cmd });
@@ -301,10 +301,10 @@ class Alias extends System {
       const [perm, alias, cmd] = new Expects(opts.parameters)
         .permission({ optional: true, default: defaultPermissions.VIEWERS })
         .argument({
-          name: 'a', type: String, multi: true, delimiter: '', 
+          name: 'a', type: String, multi: true, delimiter: '',
         }) // set as multi as alias can contain spaces
         .argument({
-          name: 'c', type: String, multi: true, delimiter: '', 
+          name: 'c', type: String, multi: true, delimiter: '',
         }) // set as multi as command can contain spaces
         .toArray();
 

@@ -1,5 +1,5 @@
 import {
-  cloneDeep, get, isEqual, set, 
+  cloneDeep, get, isEqual, set,
 } from 'lodash';
 import { getRepository } from 'typeorm';
 
@@ -45,7 +45,7 @@ export const check = async (forceCheck = false) => {
       logAvgTime('VariableWatcher.check()', process.hrtime(time));
       debug('watcher', `watcher::check Finished after ${process.hrtime(time)[0]}s ${process.hrtime(time)[1] / 1000000}ms`);
     } catch (e) {
-      error(e.message);
+      error(e.stack);
     } finally {
       checkInProgress = false;
     }
@@ -78,7 +78,7 @@ export const VariableWatcher = {
       const value = cloneDeep(get(checkedModule, variable, undefined));
       if (typeof value === 'undefined') {
         throw new Error('Value not found, check your code!!! ' + JSON.stringify({
-          k, variable, value, 
+          k, variable, value,
         }));
       }
       if (!isEqual(value, variables[k])) {

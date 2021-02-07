@@ -6,7 +6,7 @@ import { getRepository } from 'typeorm';
 import { MINUTE, SECOND } from '../constants';
 import { User, UserInterface } from '../database/entity/user';
 import {
-  command, default_permission, parser, permission_settings, settings, ui, 
+  command, default_permission, parser, permission_settings, settings, ui,
 } from '../decorators';
 import { onStartup } from '../decorators/on';
 import Expects from '../expects';
@@ -22,7 +22,7 @@ import { getPointsName } from '../helpers/points';
 import { setImmediateAwait } from '../helpers/setImmediateAwait';
 import { adminEndpoint } from '../helpers/socket';
 import {
-  bigIntMax, serialize, unserialize, 
+  bigIntMax, serialize, unserialize,
 } from '../helpers/type';
 import { isBot } from '../helpers/user/isBot';
 import { translate } from '../translate';
@@ -109,7 +109,7 @@ class Levels extends System {
           continue;
         }
         await this.process(username, {
-          interval, offlineInterval, perInterval, perOfflineInterval, isOnline: isStreamOnline.value, 
+          interval, offlineInterval, perInterval, perOfflineInterval, isOnline: isStreamOnline.value,
         });
         if ( i % 10 === 0) {
           await setImmediateAwait();
@@ -434,7 +434,7 @@ class Levels extends System {
         return [{ response: e.message, ...opts }];
       } else {
         if (e.message === 'Point system disabled.') {
-          error(e.message);
+          error(e.stack);
         }
         return [{ response: translate('systems.levels.somethingGetWrong').replace('$command', opts.command), ...opts }];
       }
