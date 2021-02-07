@@ -25,7 +25,7 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
       if (typeof onChange !== 'undefined' && typeof prop === 'string') {
         const oldObject = proxy.value;
         let newObject;
-        if (typeof proxy.value === 'string' || typeof proxy.value === 'number') {
+        if (typeof proxy.value === 'string' || typeof proxy.value === 'number' || proxy.value === null) {
           newObject = receiver;
         } else if (this.path.length === 0) {
           newObject = { ...proxy.value, ...receiver };
