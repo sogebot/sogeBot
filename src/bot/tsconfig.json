@@ -21,7 +21,8 @@
     "noResolve": false,
     "baseUrl": "src/bot",
     "outDir": "../../dest",
-    "inlineSourceMap": true
+    "inlineSourceMap": true,
+    "typeRoots": ["./node_modules/@types"]
   },
   "include": [
     "./",
