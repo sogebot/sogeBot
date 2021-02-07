@@ -207,7 +207,11 @@ class Webhooks {
         this.enabled.streams = true;
         break;
     }
-    res.send(escape(req.query['hub.challenge']));
+    const queryChallenge = req.query['hub.challenge'];
+    const escapedQueryChallenge = escape(queryChallenge);
+    debug('webhooks.challenge', queryChallenge);
+    debug('webhooks.challenge', escapedQueryChallenge);
+    res.send(escapedQueryChallenge);
   }
 
   /*
