@@ -134,7 +134,7 @@ class Webhooks {
 
     const leaseSeconds = 864000;
     const mode = 'subscribe';
-    const callback = `http://${domain.value}/webhooks/hub`;
+    const callback = `https://${domain.value}/webhooks/hub`;
 
     let res;
     switch (type) {
