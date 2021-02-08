@@ -4,63 +4,98 @@
       <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.registry') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.overlays') }}
         </span>
       </b-col>
     </b-row>
 
     <panel>
-      <template v-slot:left>
-        <button-with-icon class="btn-primary btn-reverse" icon="plus" @click="newItem">{{translate('registry.overlays.newMapping')}}</button-with-icon>
+      <template #left>
+        <button-with-icon
+          class="btn-primary btn-reverse"
+          icon="plus"
+          @click="newItem"
+        >
+          {{ translate('registry.overlays.newMapping') }}
+        </button-with-icon>
       </template>
     </panel>
 
-    <loading v-if="state.loading !== ButtonStates.success"/>
+    <loading v-if="state.loading !== ButtonStates.success" />
     <template v-else>
-      <b-alert show v-if="items.length === 0">
-        {{translate('registry.overlays.emptyMapping')}}
+      <b-alert
+        v-if="items.length === 0"
+        show
+      >
+        {{ translate('registry.overlays.emptyMapping') }}
       </b-alert>
-      <b-table :items="items" :fields="fields" bordered outlined class="hide-header w-auto m-auto table-light">
-        <template v-slot:cell(id)="data">
-          <pre class="m-0" style="display: inline-block; padding: 0.5rem 0 0 0;">{{data.item.id}}</pre>
+      <b-table
+        :items="items"
+        :fields="fields"
+        bordered
+        outlined
+        class="hide-header w-auto m-auto table-light"
+      >
+        <template #cell(id)="data">
+          <pre
+            class="m-0"
+            style="display: inline-block; padding: 0.5rem 0 0 0;"
+          >{{ data.item.id }}</pre>
         </template>
-        <template v-slot:cell(arrow)>
-          <div style="display: inline-block; padding: 0.375rem 0.4rem;"><fa icon="chevron-right" fixed-width/></div>
+        <template #cell(arrow)>
+          <div style="display: inline-block; padding: 0.375rem 0.4rem;">
+            <fa
+              icon="chevron-right"
+              fixed-width
+            />
+          </div>
         </template>
-        <template v-slot:cell(overlay)="data">
-          <b-form-select v-model="data.item.value" :options="options"></b-form-select>
+        <template #cell(overlay)="data">
+          <b-form-select
+            v-model="data.item.value"
+            :options="options"
+          />
         </template>
-        <template v-slot:cell(buttons)="data">
+        <template #cell(buttons)="data">
           <button-with-icon
             :text="'/overlays/' + data.item.id"
             :href="'/overlays/' + data.item.id"
             class="btn-dark btn-only-icon"
             icon="link"
             target="_blank"
-            />
-          <button-with-icon v-b-tooltip.focus="'Copied!'" class="btn-only-icon btn-primary btn-reverse" :icon="data.item.id === copied ? 'check' : 'clone'" :disabled="copied===data.item.id" @click="copied=data.item.id"/>
-          <button-with-icon :pressed="data.detailsShowing" @click="data.toggleDetails" class="btn-only-icon btn-secondary btn-reverse" icon="cog">
+          />
+          <button-with-icon
+            v-b-tooltip.focus="'Copied!'"
+            class="btn-only-icon btn-primary btn-reverse"
+            :icon="data.item.id === copied ? 'check' : 'clone'"
+            :disabled="copied===data.item.id"
+            @click="copied=data.item.id"
+          />
+          <button-with-icon
+            :pressed="data.detailsShowing"
+            class="btn-only-icon btn-secondary btn-reverse"
+            icon="cog"
+            @click="data.toggleDetails"
+          >
             {{ translate('dialog.buttons.settings') }}
           </button-with-icon>
-          <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="del(data.item.id)">
+          <button-with-icon
+            class="btn-only-icon btn-danger btn-reverse"
+            icon="trash"
+            @click="del(data.item.id)"
+          >
             {{ translate('dialog.buttons.delete') }}
           </button-with-icon>
         </template>
-        <template v-slot:row-details="data">
-          <template v-if="haveAnyOptions(data.item.value)">
-            <template v-if="data.item.value === 'obswebsocket'">
-              <b-form-group
-                :label="translate('registry.overlays.allowedIPs.name')"
-                :description="translate('registry.alerts.allowedIPs.help')"
-              >
-                <b-textarea v-bind:value="data.item.opts.allowedIPs.join('\n')" @input="data.item.opts.allowedIPs = $event.split('\n')" rows="5"></b-textarea>
-              </b-form-group>
-              <b-button @click="addCurrentIP(data.item.opts.allowedIPs)">Add current IP</b-button>
-            </template>
-          </template>
+        <template #row-details="data">
+          <component
+            :is="data.item.value"
+            v-if="haveAnyOptions(data.item.value)"
+            :opts.sync="data.item.opts"
+          />
           <div v-else>
-            No settings for <em>{{data.item.value || 'this'}} overlay</em>
+            No settings for <em>{{ data.item.value || 'this' }} overlay</em>
           </div>
         </template>
       </b-table>
@@ -72,10 +107,10 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons/faChevronRight';
 import {
-  defineComponent, onMounted, ref, watch, 
+  defineComponent, onMounted, ref, watch,
 } from '@vue/composition-api';
 import {
-  cloneDeep, isEqual, set, 
+  cloneDeep, isEqual, set,
 } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 
@@ -84,14 +119,17 @@ library.add(faChevronRight);
 import type { OverlayMapperInterface, OverlayMapperOBSWebsocket } from 'src/bot/database/entity/overlay';
 import { ButtonStates } from 'src/panel/helpers/buttonStates';
 import { error } from 'src/panel/helpers/error';
-import { getCurrentIP } from 'src/panel/helpers/getCurrentIP';
 import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
 
 const socket = getSocket('/registries/overlays');
 
 export default defineComponent({
-  components: { 'loading': () => import('src/panel/components/loading.vue') },
+  components: {
+    'loading':       () => import('src/panel/components/loading.vue'),
+    'clipscarousel': () => import('./components/clipscarousel.vue'),
+    'obswebsocket':  () => import('./components/obswebsocket.vue'),
+  },
   setup(props, ctx) {
     const items = ref([] as (OverlayMapperInterface | OverlayMapperOBSWebsocket)[]);
     const cacheItems = ref([] as (OverlayMapperInterface | OverlayMapperOBSWebsocket)[]);
@@ -130,7 +168,7 @@ export default defineComponent({
     });
 
     const haveAnyOptions = (type: string) => {
-      const withOpts = ['obswebsocket'];
+      const withOpts = ['obswebsocket', 'clipscarousel'];
       return withOpts.includes(type);
     };
 
@@ -182,19 +220,9 @@ export default defineComponent({
       }
     });
 
-    const addCurrentIP = (array: string[]) => {
-      getCurrentIP().then(value => {
-        if (array[array.length - 1] === '') {
-          array[array.length - 1] = value;
-        } else {
-          array.push(value);
-        }
-      });
-    };
-
     const newItem = () => {
       items.value.push({
-        id: uuid(), value: null, opts: null, 
+        id: uuid(), value: null, opts: null,
       });
     };
 
@@ -216,7 +244,6 @@ export default defineComponent({
       copied,
       fields,
 
-      addCurrentIP,
       haveAnyOptions,
       newItem,
       del,

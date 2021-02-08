@@ -1,6 +1,10 @@
 <template>
-<div>
-  <pre class="debug" v-if="urlParam('debug')" style="overflow: scroll; resize: both;">
+  <div>
+    <pre
+      v-if="urlParam('debug')"
+      class="debug"
+      style="overflow: scroll; resize: both;"
+    >
 <button @click="stopAnimation = !stopAnimation">Toggle Animation</button>
 
 stopAnimation: {{ stopAnimation }}
@@ -12,19 +16,32 @@ nextOffset: {{ nextOffset }}
 moveToNextClipInProgress: {{ moveToNextClipInProgress }}
 isReady: {{ isReady }}
   </pre>
-  <div ref="carousel" :style="{
-    width: '99999999999%',
-    position: 'absolute',
-    opacity: isReady ? '1' : '0',
-    transition: 'opacity 1s'
-  }">
-    <template v-for="(clip, index) of clipsSet">
-      <video preload="auto" ref="clips" playsinline :key="clip.id" :id="clip.id" muted :style="{ opacity: index === 1 ? '1' : '0.5', filter: 'grayscale(' + (index === 1 ? '0' : '1') + ')'}">
-        <source :src="clip.mp4" type="video/mp4">
-      </video>
-    </template>
+    <div
+      ref="carousel"
+      :style="{
+        width: '99999999999%',
+        position: 'absolute',
+        opacity: isReady ? '1' : '0',
+        transition: 'opacity 1s'
+      }"
+    >
+      <template v-for="(clip, index) of clipsSet">
+        <video
+          :id="clip.id"
+          ref="clips"
+          :key="clip.id"
+          preload="auto"
+          playsinline
+          :style="{ opacity: index === 1 ? '1' : '0.5', filter: 'grayscale(' + (index === 1 ? '0' : '1') + ')'}"
+        >
+          <source
+            :src="clip.mp4"
+            type="video/mp4"
+          >
+        </video>
+      </template>
+    </div>
   </div>
-</div>
 </template>
 
 <script lang="ts">
@@ -32,13 +49,15 @@ isReady: {{ isReady }}
 import gsap from 'gsap';
 import { cloneDeep } from 'lodash-es';
 import {
-  Component, Vue, Watch, 
+  Component, Prop, Vue, Watch,
 } from 'vue-property-decorator';
 
 import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})
 export default class ClipsCarouselOverlay extends Vue {
+  @Prop() readonly opts !: null | { volume: number };
+
   socket = getSocket('/overlays/clipscarousel', true);
   clips: any[] = [];
   clipsSet: any[] = [];
@@ -98,8 +117,10 @@ export default class ClipsCarouselOverlay extends Vue {
             if (!(this.$refs.clips as HTMLVideoElement[])[1].ended) {
               for (let i=0; i < 4; i++) {
                 if (i===1) {
+                  (this.$refs.clips as HTMLVideoElement[])[i].volume = (this.opts?.volume ?? 0) / 100;
                   (this.$refs.clips as HTMLVideoElement[])[i].play();
                 } else {
+                  (this.$refs.clips as HTMLVideoElement[])[i].volume = 0;
                   (this.$refs.clips as HTMLVideoElement[])[i].pause();
                 }
               }
@@ -208,7 +229,7 @@ export default class ClipsCarouselOverlay extends Vue {
               }
               this.moveToNextClipInProgress = false;
               setTimeout(() => {
-                this.isReady = true; 
+                this.isReady = true;
               }, 1000);
             }, 1000);
 
