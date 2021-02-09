@@ -1,18 +1,17 @@
 /* global describe it before */
+const assert = require('assert');
 
+const _ = require('lodash');
 require('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
 const alias = (require('../../../dest/systems/alias')).default;
 const moderation = (require('../../../dest/systems/moderation')).default;
 const songs = (require('../../../dest/systems/songs')).default;
+const message = require('../../general.js').message;
+const db = require('../../general.js').db;
 
 // users
 const owner = { username: '__broadcaster__' };
-
-const _ = require('lodash');
-const assert = require('assert');
 
 const tests = {
   'osu.ppy.sh': {
@@ -171,6 +170,7 @@ describe('systems/moderation - whitelist()', () => {
 
     const r = await alias.add({ sender: owner, parameters: '-a !sr -c !songrequest' });
     assert.strictEqual(r[0].response, '$sender, alias !sr for !songrequest was added');
+    await songs.setCommand('!songrequest', '!songrequest');
   });
 
   for (const [pattern, test] of Object.entries(tests)) {
