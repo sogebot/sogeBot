@@ -3,7 +3,7 @@ import LoadScript from 'vue-plugin-load-script';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
-  faSpotify, faTwitch, faTwitter, 
+  faSpotify, faTwitch, faTwitter,
 } from '@fortawesome/free-brands-svg-icons';
 import {
   faBell, faCalendar, faCheckCircle, faCircle, faClock, faMoneyBillAlt,
@@ -42,8 +42,8 @@ import { store } from './helpers/store';
 import urlParam from './helpers/urlParam';
 
 library.add(faGlobeEurope, faHistory,faSortUp, faSortDown, faRedoAlt, faDice, faVolumeOff, faGripVertical, faImage, faUpload, faCircle2, faCaretRight, faTasks, faCaretDown, faSlash, faFilter, faToggleOn, faToggleOff, faBell, faShareSquare, faExclamationCircle, faQuestion, faVial, faEquals, faGreaterThanEqual, faLongArrowAltLeft, faBan, faPlusSquare, faMusic, faList, faPlay, faPause, faForward, faSpotify, faMoneyBillAlt, faPlus, faSpinner, faGift, faHeadphones, faTh, faDollarSign, faSignInAlt, faSignOutAlt, faUsers, faMusic, faCalendar, faTwitter, faCheck, faMusic, faMusic, faVolumeUp, faVolumeDown, faUsers, faGift, faTrophy, faCog, faExternalLinkAlt, faTrash, faPlus, faSync, faComments, faTwitch, faCircle, faCheckCircle, faLock, faUsers, faUser, faCheck, faTimes, faHeart, faStar, faLockOpen, faHandPointer, faRandom, faEyeSlash, faSignOutAlt, faSignInAlt, faBoxOpen, faEye, faCog, faExternalLinkAlt, faHeart, faTv, faRandom, faGem, faStar, faGift, faDollarSign, faStarHalf, faLongArrowAltRight, faCircleNotch, faCalendar, faDollarSign, faCog, faCode, faAngleUp, faTrashAlt, faAngleDown, faFont, faPlus, faMinus, faDownload, faDollarSign, faTerminal, faCog, faCommentAlt, faUsers, faExternalLinkAlt, faSyncAlt, faClock, faCog, faInfinity, faTrophy, faClone, faGem, faCoins, faExclamation, faStop, faBan, faSpinner, faCheck, faAngleRight, faPlus, faEdit, faEraser, faLink, faTrash, faPlus, faCaretLeft, faExternalLinkAlt, faLink, faSave, faThLarge, faThList, faSearch, faCircleNotch, faCheck, faEllipsisH, faEllipsisV, faPowerOff);
-Vue.component('fa', FontAwesomeIcon);
-Vue.component('font-awesome-icon', FontAwesomeIcon);
+Vue.component('Fa', FontAwesomeIcon);
+Vue.component('FontAwesomeIcon', FontAwesomeIcon);
 
 Vue.use(BootstrapVue);
 Vue.use(Vuelidate);
@@ -51,11 +51,11 @@ Vue.use(LoadScript);
 Vue.use(VueCompositionAPI);
 
 /* import widely used components */
-Vue.component('panel', () => import('./components/panel.vue'));
-Vue.component('hold-button', () => import('./components/holdButton.vue'));
-Vue.component('button-with-icon', () => import('./components/button.vue'));
-Vue.component('state-button', () => import('./components/stateButton.vue'));
-Vue.component('textarea-with-tags', () => import('./components/textareaWithTags.vue'));
+Vue.component('Panel', () => import('./components/panel.vue'));
+Vue.component('HoldButton', () => import('./components/holdButton.vue'));
+Vue.component('ButtonWithIcon', () => import('./components/button.vue'));
+Vue.component('StateButton', () => import('./components/stateButton.vue'));
+Vue.component('TextareaWithTags', () => import('./components/textareaWithTags.vue'));
 
 declare module 'vue/types/vue' {
   interface Vue {
@@ -103,169 +103,169 @@ const main = async () => {
       base:   __dirname,
       routes: [
         {
-          path: '/', name: 'Dashboard', component: () => import('./views/dashboard/empty.vue'), 
+          path: '/', name: 'Dashboard', component: () => import('./views/dashboard/empty.vue'),
         },
         {
-          path: '/stats/api', name: 'APIStats', component: () => import('./views/stats/api.vue'), 
+          path: '/stats/api', name: 'APIStats', component: () => import('./views/stats/api.vue'),
         },
         {
-          path: '/stats/commandcount', name: 'CommandCountStats', component: () => import('./views/stats/commandcount.vue'), 
+          path: '/stats/commandcount', name: 'CommandCountStats', component: () => import('./views/stats/commandcount.vue'),
         },
         {
-          path: '/stats/tips', name: 'TipsStats', component: () => import('./views/stats/tips.vue'), 
+          path: '/stats/tips', name: 'TipsStats', component: () => import('./views/stats/tips.vue'),
         },
         {
-          path: '/stats/bits', name: 'BitsStats', component: () => import('./views/stats/bits.vue'), 
+          path: '/stats/bits', name: 'BitsStats', component: () => import('./views/stats/bits.vue'),
         },
         {
-          path: '/stats/profiler', name: 'ProfilerStats', component: () => import('./views/stats/profiler.vue'), 
+          path: '/stats/profiler', name: 'ProfilerStats', component: () => import('./views/stats/profiler.vue'),
         },
 
         { path: '/manage/alias/', redirect: '/manage/alias/list' },
         {
-          path: '/manage/alias/list', name: 'aliasManager', component: () => import('./views/managers/alias.vue'), 
+          path: '/manage/alias/list', name: 'aliasManager', component: () => import('./views/managers/alias.vue'),
         },
         {
-          path: '/manage/alias/edit/:id?', name: 'aliasManagerEdit', component: () => import('./views/managers/alias.vue'), 
+          path: '/manage/alias/edit/:id?', name: 'aliasManagerEdit', component: () => import('./views/managers/alias.vue'),
         },
         { path: '/manage/commands/', redirect: '/manage/commands/list' },
         {
-          path: '/manage/commands/list', name: 'CommandsManagerList', component: () => import('./views/managers/commands.vue'), 
+          path: '/manage/commands/list', name: 'CommandsManagerList', component: () => import('./views/managers/commands.vue'),
         },
         {
-          path: '/manage/commands/edit/:id?', name: 'CommandsManagerEdit', component: () => import('./views/managers/commands.vue'), 
+          path: '/manage/commands/edit/:id?', name: 'CommandsManagerEdit', component: () => import('./views/managers/commands.vue'),
         },
         { path: '/manage/cooldowns/', redirect: '/manage/cooldowns/list' },
         {
-          path: '/manage/cooldowns/list', name: 'cooldownsManager', component: () => import('./views/managers/cooldowns.vue'), 
+          path: '/manage/cooldowns/list', name: 'cooldownsManager', component: () => import('./views/managers/cooldowns.vue'),
         },
         {
-          path: '/manage/cooldowns/edit/:id?', name: 'cooldownsManagerEdit', component: () => import('./views/managers/cooldowns.vue'), 
+          path: '/manage/cooldowns/edit/:id?', name: 'cooldownsManagerEdit', component: () => import('./views/managers/cooldowns.vue'),
         },
         {
-          path: '/manage/highlights', name: 'HighlightsManager', component: () => import('./views/managers/highlights.vue'), 
+          path: '/manage/highlights', name: 'HighlightsManager', component: () => import('./views/managers/highlights.vue'),
         },
         {
-          path: '/manage/hltb', name: 'HLTBManager', component: () => import('./views/managers/hltb.vue'), 
+          path: '/manage/hltb', name: 'HLTBManager', component: () => import('./views/managers/hltb.vue'),
         },
         {
-          path: '/manage/polls', name: 'PollsManager', component: () => import('./views/managers/polls.vue'), 
+          path: '/manage/polls', name: 'PollsManager', component: () => import('./views/managers/polls.vue'),
         },
         { path: '/manage/events/', redirect: '/manage/events/list' },
         {
-          path: '/manage/events/list', name: 'EventsManagerList', component: () => import('./views/managers/events.vue'), 
+          path: '/manage/events/list', name: 'EventsManagerList', component: () => import('./views/managers/events.vue'),
         },
         {
-          path: '/manage/events/edit/:id?', name: 'EventsManagerEdit', component: () => import('./views/managers/events.vue'), 
+          path: '/manage/events/edit/:id?', name: 'EventsManagerEdit', component: () => import('./views/managers/events.vue'),
         },
         { path: '/manage/keywords/', redirect: '/manage/keywords/list' },
         {
-          path: '/manage/keywords/list', name: 'KeywordsManagerList', component: () => import('./views/managers/keyword.vue'), 
+          path: '/manage/keywords/list', name: 'KeywordsManagerList', component: () => import('./views/managers/keyword.vue'),
         },
         {
-          path: '/manage/keywords/edit/:id?', name: 'KeywordsManagerEdit', component: () => import('./views/managers/keyword.vue'), 
+          path: '/manage/keywords/edit/:id?', name: 'KeywordsManagerEdit', component: () => import('./views/managers/keyword.vue'),
         },
         { path: '/manage/price/', redirect: '/manage/price/list' },
         {
-          path: '/manage/price/list', name: 'PriceManager', component: () => import('./views/managers/price.vue'), 
+          path: '/manage/price/list', name: 'PriceManager', component: () => import('./views/managers/price.vue'),
         },
         {
-          path: '/manage/price/edit/:id?', name: 'PriceManagerEdit', component: () => import('./views/managers/price.vue'), 
+          path: '/manage/price/edit/:id?', name: 'PriceManagerEdit', component: () => import('./views/managers/price.vue'),
         },
         { path: '/manage/quotes/', redirect: '/manage/quotes/list' },
         {
-          path: '/manage/quotes/list', name: 'QuotesManagerList', component: () => import('./views/managers/quotes.vue'), 
+          path: '/manage/quotes/list', name: 'QuotesManagerList', component: () => import('./views/managers/quotes.vue'),
         },
         {
-          path: '/manage/quotes/edit/:id?', name: 'QuotesManagerEdit', component: () => import('./views/managers/quotes.vue'), 
+          path: '/manage/quotes/edit/:id?', name: 'QuotesManagerEdit', component: () => import('./views/managers/quotes.vue'),
         },
         { path: '/manage/ranks/', redirect: '/manage/ranks/list' },
         {
-          path: '/manage/ranks/list', name: 'RanksManagerList', component: () => import('./views/managers/ranks.vue'), 
+          path: '/manage/ranks/list', name: 'RanksManagerList', component: () => import('./views/managers/ranks.vue'),
         },
         {
-          path: '/manage/ranks/edit/:id?', name: 'RanksManagerEdit', component: () => import('./views/managers/ranks.vue'), 
+          path: '/manage/ranks/edit/:id?', name: 'RanksManagerEdit', component: () => import('./views/managers/ranks.vue'),
         },
         {
-          path: '/manage/songs/playlist', name: 'songsManagerPlaylist', component: () => import('./views/managers/songs/songs-playlist.vue'), 
+          path: '/manage/songs/playlist', name: 'songsManagerPlaylist', component: () => import('./views/managers/songs/songs-playlist.vue'),
         },
         {
-          path: '/manage/songs/bannedsongs', name: 'songsManagerBannedsongs', component: () => import('./views/managers/songs/songs-bannedsongs.vue'), 
+          path: '/manage/songs/bannedsongs', name: 'songsManagerBannedsongs', component: () => import('./views/managers/songs/songs-bannedsongs.vue'),
         },
         {
-          path: '/manage/spotify/bannedsongs', name: 'spotifyManagerBannedsongs', component: () => import('./views/managers/spotify/spotify-bannedsongs.vue'), 
+          path: '/manage/spotify/bannedsongs', name: 'spotifyManagerBannedsongs', component: () => import('./views/managers/spotify/spotify-bannedsongs.vue'),
         },
         {
-          path: '/manage/timers/list', name: 'TimersManagerList', component: () => import('./views/managers/timers/timers-list.vue'), 
+          path: '/manage/timers/list', name: 'TimersManagerList', component: () => import('./views/managers/timers/timers-list.vue'),
         },
         {
-          path: '/manage/timers/edit/:id?', name: 'TimersManagerEdit', component: () => import('./views/managers/timers/timers-list.vue'), 
+          path: '/manage/timers/edit/:id?', name: 'TimersManagerEdit', component: () => import('./views/managers/timers/timers-list.vue'),
         },
         { path: '/manage/viewers/', redirect: '/manage/viewers/list' },
         {
-          path: '/manage/viewers/list', name: 'viewersManagerList', component: () => import('./views/managers/viewers.vue'), 
+          path: '/manage/viewers/list', name: 'viewersManagerList', component: () => import('./views/managers/viewers.vue'),
         },
         {
-          path: '/manage/viewers/edit/:id?', name: 'viewersManagerEdit', component: () => import('./views/managers/viewers.vue'), 
-        },
-
-        {
-          path: '/settings/permissions/:id?', name: 'PermissionsSettings', component: () => import('./views/settings/permissions.vue'), 
-        },
-        {
-          path: '/settings/translations', name: 'TranslationsSettings', component: () => import('./views/settings/translations.vue'), 
-        },
-        {
-          path: '/settings/:type/:id?', name: 'InterfaceSettings', component: () => import('./views/settings/interface.vue'), 
+          path: '/manage/viewers/edit/:id?', name: 'viewersManagerEdit', component: () => import('./views/managers/viewers.vue'),
         },
 
         {
-          path: '/registry/alerts/list', name: 'alertsList', component: () => import('./views/registries/alerts/alerts-list.vue'), 
+          path: '/settings/permissions/:id?', name: 'PermissionsSettings', component: () => import('./views/settings/permissions.vue'),
         },
         {
-          path: '/registry/alerts/edit/:id?', name: 'alertsEdit', component: () => import('./views/registries/alerts/alerts-edit.vue'), 
+          path: '/settings/translations', name: 'TranslationsSettings', component: () => import('./views/settings/translations.vue'),
         },
         {
-          path: '/registry/customvariables/list', name: 'CustomVariableList', component: () => import('./views/registries/custom-variables/custom-variables-list.vue'), 
+          path: '/settings/:type/:id?', name: 'InterfaceSettings', component: () => import('./views/settings/interface.vue'),
+        },
+
+        {
+          path: '/registry/alerts/list', name: 'alertsList', component: () => import('./views/registries/alerts/alerts-list.vue'),
         },
         {
-          path: '/registry/customvariables/edit/:id?', name: 'CustomVariableEdit', component: () => import('./views/registries/custom-variables/custom-variables-edit.vue'), 
+          path: '/registry/alerts/edit/:id?', name: 'alertsEdit', component: () => import('./views/registries/alerts/alerts-edit.vue'),
         },
         {
-          path: '/registry/carousel/list', name: 'carouselRegistryList', component: () => import('./views/registries/carousel-overlay/carousel-overlay-list.vue'), 
+          path: '/registry/customvariables/list', name: 'CustomVariableList', component: () => import('./views/registries/custom-variables/custom-variables-list.vue'),
         },
         {
-          path: '/registry/carousel/edit/:id?', name: 'carouselRegistryEdit', component: () => import('./views/registries/carousel-overlay/carousel-overlay-edit.vue'), 
+          path: '/registry/customvariables/edit/:id?', name: 'CustomVariableEdit', component: () => import('./views/registries/custom-variables/custom-variables-edit.vue'),
         },
         {
-          path: '/registry/obswebsocket/list', name: 'OBSWebsocketRegistryList', component: () => import('./views/registries/obswebsocket.vue'), 
+          path: '/registry/carousel/list', name: 'carouselRegistryList', component: () => import('./views/registries/carousel-overlay/carousel-overlay-list.vue'),
         },
         {
-          path: '/registry/obswebsocket/edit/:id?', name: 'OBSWebsocketRegistryEdit', component: () => import('./views/registries/obswebsocket.vue'), 
+          path: '/registry/carousel/edit/:id?', name: 'carouselRegistryEdit', component: () => import('./views/registries/carousel-overlay/carousel-overlay-edit.vue'),
         },
         {
-          path: '/registry/overlays/list', name: 'overlaysList', component: () => import('./views/registries/overlays.vue'), 
+          path: '/registry/obswebsocket/list', name: 'OBSWebsocketRegistryList', component: () => import('./views/registries/obswebsocket.vue'),
         },
         {
-          path: '/registry/randomizer/list', name: 'RandomizerRegistryList', component: () => import('./views/registries/randomizer/randomizer-list.vue'), 
+          path: '/registry/obswebsocket/edit/:id?', name: 'OBSWebsocketRegistryEdit', component: () => import('./views/registries/obswebsocket.vue'),
         },
         {
-          path: '/registry/randomizer/edit/:id?', name: 'RandomizerRegistryEdit', component: () => import('./views/registries/randomizer/randomizer-edit.vue'), 
+          path: '/registry/overlays/list', name: 'overlaysList', component: () => import('./views/registries/overlays/overlays.vue'),
         },
         {
-          path: '/registry/textoverlay/list', name: 'TextOverlayList', component: () => import('./views/registries/text-overlay/text-overlay-list.vue'), 
+          path: '/registry/randomizer/list', name: 'RandomizerRegistryList', component: () => import('./views/registries/randomizer/randomizer-list.vue'),
         },
         {
-          path: '/registry/textoverlay/edit/:id?', name: 'TextOverlayEdit', component: () => import('./views/registries/text-overlay/text-overlay-edit.vue'), 
+          path: '/registry/randomizer/edit/:id?', name: 'RandomizerRegistryEdit', component: () => import('./views/registries/randomizer/randomizer-edit.vue'),
         },
         {
-          path: '/registry/gallery/list', name: 'galleryRegistryEdit', component: () => import('./views/registries/gallery/gallery-list.vue'), 
+          path: '/registry/textoverlay/list', name: 'TextOverlayList', component: () => import('./views/registries/text-overlay/text-overlay-list.vue'),
         },
         {
-          path: '/registry/goals/list', name: 'GoalsRegistryList', component: () => import('./views/registries/goals/goals-list.vue'), 
+          path: '/registry/textoverlay/edit/:id?', name: 'TextOverlayEdit', component: () => import('./views/registries/text-overlay/text-overlay-edit.vue'),
         },
         {
-          path: '/registry/goals/edit/:id?', name: 'GoalsRegistryEdit', component: () => import('./views/registries/goals/goals-edit.vue'), 
+          path: '/registry/gallery/list', name: 'galleryRegistryEdit', component: () => import('./views/registries/gallery/gallery-list.vue'),
+        },
+        {
+          path: '/registry/goals/list', name: 'GoalsRegistryList', component: () => import('./views/registries/goals/goals-list.vue'),
+        },
+        {
+          path: '/registry/goals/edit/:id?', name: 'GoalsRegistryEdit', component: () => import('./views/registries/goals/goals-edit.vue'),
         },
       ],
     });
