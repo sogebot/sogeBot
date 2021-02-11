@@ -1,8 +1,11 @@
 import {
-  defaults, get, isNil, 
+  defaults, get, isNil,
 } from 'lodash';
 import XRegExp from 'xregexp';
 
+import {
+  DAY, HOUR, MINUTE, SECOND, 
+} from './constants';
 import { debug } from './helpers/log';
 import { ParameterError } from './helpers/parameterError';
 
@@ -147,7 +150,7 @@ class Expects {
   command (opts?: any) {
     opts = opts || {};
     defaults(opts, {
-      exec: false, optional: false, spaces: false, 
+      exec: false, optional: false, spaces: false,
     });
     if (!opts.exec) {
       this.toExec.push({ fnc: 'command', opts });
@@ -161,7 +164,7 @@ class Expects {
     const match = XRegExp.exec(this.text, regexp);
 
     debug('expects.command', JSON.stringify({
-      text: this.text, opts, match, 
+      text: this.text, opts, match,
     }));
     if (!isNil(match)) {
       this.match.push(match.command.trim().toLowerCase());
@@ -179,7 +182,7 @@ class Expects {
   points (opts?: { exec?: boolean, optional?: boolean, all?: boolean, negative?: boolean }) {
     opts = opts || {};
     defaults(opts, {
-      exec: false, optional: false, all: false, negative: false, 
+      exec: false, optional: false, all: false, negative: false,
     });
     if (!opts.exec) {
       this.toExec.push({ fnc: 'points', opts });
@@ -219,7 +222,7 @@ class Expects {
   number (opts?: any) {
     opts = opts || {};
     defaults(opts, {
-      exec: false, optional: false, minus: true, 
+      exec: false, optional: false, minus: true,
     });
     if (!opts.exec) {
       this.toExec.push({ fnc: 'number', opts });
@@ -251,7 +254,7 @@ class Expects {
   switch (opts?: any) {
     opts = opts || {};
     defaults(opts, {
-      exec: false, optional: false, default: null, 
+      exec: false, optional: false, default: null,
     });
     if (!opts.exec) {
       this.toExec.push({ fnc: 'switch', opts });
@@ -339,7 +342,7 @@ class Expects {
     const match = XRegExp.exec(this.text, regexp);
 
     debug('expects.permission', JSON.stringify({
-      fullPattern, text: this.text, opts, match, 
+      fullPattern, text: this.text, opts, match,
     }));
     if (!isNil(match) && match[opts.name].trim().length !== 0) {
       this.match.push(String(match[opts.name].trim()));
@@ -401,7 +404,7 @@ class Expects {
     const match = XRegExp.exec(this.text, regexp);
 
     debug('expects.argument', JSON.stringify({
-      fullPattern, text: this.text, opts, match, 
+      fullPattern, text: this.text, opts, match,
     }));
     if (!isNil(match) && match[opts.name].trim().length !== 0) {
       if (opts.type.name === 'Boolean') {
@@ -425,7 +428,7 @@ class Expects {
   username (opts?: any) {
     opts = opts || {};
     defaults(opts, {
-      exec: false, optional: false, default: null, 
+      exec: false, optional: false, default: null,
     });
     if (!opts.exec) {
       this.toExec.push({ fnc: 'username', opts });
@@ -479,6 +482,70 @@ class Expects {
     return this;
   }
 
+  duration ({ optional = false, exec = false }: { optional?: boolean, exec?: boolean }) {
+    if (!optional) {
+      this.checkText({
+        expects: 'duration',
+        optional,
+      });
+    }
+    if (!exec) {
+      this.toExec.push({ fnc: 'duration', opts: { optional } });
+      return this;
+    }
+
+    const regexp = XRegExp(`(?<duration> (\\d+(s|m|h|d)) )`, 'igx');
+    const match = XRegExp.exec(`${this.text.trim()}`, regexp);
+    if (!isNil(match)) {
+      if (match.duration.includes('s')) {
+        match.duration = Number(match.duration.replace('s', '') * SECOND);
+      } else if (match.duration.includes('m')) {
+        match.duration = Number(match.duration.replace('m', '') * MINUTE);
+      } else if (match.duration.includes('h')) {
+        match.duration = Number(match.duration.replace('h', '') * HOUR);
+      } else if (match.duration.includes('d')) {
+        match.duration = Number(match.duration.replace('d', '') * DAY);
+      }
+      this.match.push(match.duration);
+      this.text = this.text.replace(match.duration, ''); // remove from text matched pattern
+    } else {
+      if (!optional) {
+        throw new ParameterError('Duration not found');
+      } else {
+        this.match.push(null);
+      }
+    }
+    return this;
+  }
+
+  oneOf ({ optional = false, values, exec = false }: { exec?: boolean, optional?: boolean, values: string[] | Readonly<string[]> }) {
+    if (!optional) {
+      this.checkText({
+        expects: 'oneOf',
+        optional,
+        values,
+      });
+    }
+    if (!exec) {
+      this.toExec.push({ fnc: 'oneOf', opts: { optional, values } });
+      return this;
+    }
+
+    const regexp = XRegExp(`(?<oneOf> ${values.join('|')} )`, 'igx');
+    const match = XRegExp.exec(`${this.text.trim()}`, regexp);
+    if (!isNil(match)) {
+      this.match.push(match.oneOf.trim());
+      this.text = this.text.replace(match.string, ''); // remove from text matched pattern
+    } else {
+      if (!optional) {
+        throw new ParameterError('OneOf not found');
+      } else {
+        this.match.push(null);
+      }
+    }
+    return this;
+  }
+
   string (opts?: any) {
     opts = opts || {};
     defaults(opts, { exec: false, optional: false });
@@ -510,7 +577,7 @@ class Expects {
 
   list (opts?: any) {
     defaults(opts, {
-      exec: false, optional: false, delimiter: ' ', 
+      exec: false, optional: false, delimiter: ' ',
     });
     if (!opts.exec) {
       this.toExec.push({ fnc: 'list', opts });

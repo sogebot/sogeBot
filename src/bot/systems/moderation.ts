@@ -11,11 +11,15 @@ import * as constants from '../constants';
 import { Alias } from '../database/entity/alias';
 import { ModerationPermit, ModerationWarning } from '../database/entity/moderation';
 import {
-  command, default_permission, parser, permission_settings, settings, 
+  command, default_permission, parser, permission_settings, settings,
 } from '../decorators';
+import Expects from '../expects';
 import { prepare } from '../helpers/commons';
 import { getLocalizedName } from '../helpers/getLocalized';
-import { timeout as timeoutLog, warning as warningLog } from '../helpers/log';
+import {
+  error, timeout as timeoutLog, warning as warningLog,
+} from '../helpers/log';
+import { ParameterError } from '../helpers/parameterError';
 import { getUserHighestPermission } from '../helpers/permissions/';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
@@ -35,8 +39,33 @@ const urlRegex = [
   new RegExp(`[a-zA-Z0-9]+([a-zA-Z0-9-]+)?\\.(${tlds.join('|')})(?=\\P{L}|$)`, 'igu'),
 ];
 
-type timeoutType = 'links' | 'symbols' | 'caps' | 'longmessage' | 'spam' | 'color' | 'emotes' | 'blacklist';
-const ModerationMessageCooldown = new Map<timeoutType, number>();
+const timeoutType = ['links', 'symbols', 'caps', 'longmessage', 'spam', 'color', 'emotes', 'blacklist'] as const;
+const ModerationMessageCooldown = new Map<typeof timeoutType[number], number>();
+const immuneUsers = new Map<typeof timeoutType[number], Map<string, number>>([
+  ['links', new Map()],
+  ['symbols', new Map()],
+  ['caps', new Map()],
+  ['longmessage', new Map()],
+  ['spam', new Map()],
+  ['color', new Map()],
+  ['emotes', new Map()],
+  ['blacklist', new Map()],
+]);
+
+setInterval(() => {
+  // cleanup map
+  for (const type of timeoutType) {
+    const map = immuneUsers.get(type);
+    if (map) {
+      for (const userId of map.keys()) {
+        const immuneExpiresIn = map.get(userId);
+        if(immuneExpiresIn && immuneExpiresIn < Date.now()) {
+          map.delete(userId);
+        }
+      }
+    }
+  }
+}, 1000);
 
 class Moderation extends System {
   @settings('lists')
@@ -127,7 +156,43 @@ class Moderation extends System {
     });
   }
 
-  async timeoutUser (sender: CommandOptions['sender'], text: string, warning: string, msg: string, time: number, type: timeoutType ) {
+  @command('!immune')
+  @default_permission(defaultPermissions.CASTERS)
+  public async immune(opts: CommandOptions): Promise<CommandResponse[]> {
+    try {
+      const [ username, type, time ] = new Expects(opts.parameters)
+        .username()
+        .oneOf({ values: timeoutType })
+        .duration({})
+        .toArray();
+
+      const userId = await users.getIdByName(username);
+
+      const map = immuneUsers.get(type);
+      if (map) {
+        map.set(String(userId), Date.now() + Number(time));
+      }
+
+      return [{
+        response: prepare('moderation.user-have-immunity', {
+          username,
+          type,
+          time: time / 1000,
+        }), ...opts,
+      }];
+    } catch (err) {
+      const isParameterError = (err instanceof ParameterError);
+
+      if (isParameterError) {
+        return [{ response: prepare('moderation.user-have-immunity-parameterError', { command: opts.command }), ...opts }, { response: '# <type> - ' + timeoutType.join(', '), ...opts }, { response: '# <duration> - 5s, 10m, 12h, 1d', ...opts }];
+      } else {
+        error(err.stack);
+        return [{ response: '$sender, unknown error, please check your logs', ...opts }];
+      }
+    }
+  }
+
+  async timeoutUser (sender: CommandOptions['sender'], text: string, warning: string, msg: string, time: number, type: typeof timeoutType[number] ) {
     // cleanup warnings
     await getRepository(ModerationWarning).delete({ timestamp: LessThan(Date.now() - 1000 * 60 * 60) });
     const warnings = await getRepository(ModerationWarning).find({ userId: Number(sender.userId) });
@@ -184,8 +249,8 @@ class Moderation extends System {
 
     // check if songrequest -or- alias of songrequest contain youtube link
     if (songs.enabled) {
-      const alias = await getRepository(Alias).findOne({ where: { command: '!songrequest' } });
       const cmd = songs.getCommand('!songrequest');
+      const alias = await getRepository(Alias).findOne({ where: { command: cmd } });
       if (alias && alias.enabled && aliasSystem.enabled) {
         ytRegex = new RegExp('^(' + cmd + '|' + alias.alias + ') \\S+(?:youtu.be\\/|v\\/|e\\/|u\\/\\w+\\/|embed\\/|v=)([^#&?]*).*', 'gi');
       } else {
@@ -241,7 +306,7 @@ class Moderation extends System {
       }
 
       const response = prepare('moderation.user-have-link-permit', {
-        username: parsed[1].toLowerCase(), link: getLocalizedName(count, translate('core.links')), count: count, 
+        username: parsed[1].toLowerCase(), link: getLocalizedName(count, translate('core.links')), count: count,
       });
       return [{ response, ...opts }];
     } catch (e) {
@@ -251,6 +316,10 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async containsLink (opts: ParserOptions) {
+    if (immuneUsers.get('links')?.has(String(opts.sender.userId))) {
+      return true;
+    }
+
     const enabled = await this.getPermissionBasedSettingsValue('cLinksEnabled');
     const cLinksIncludeSpaces = await this.getPermissionBasedSettingsValue('cLinksIncludeSpaces');
     const timeoutValues = await this.getPermissionBasedSettingsValue('cLinksTimeout');
@@ -280,6 +349,10 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async symbols (opts: ParserOptions) {
+    if (immuneUsers.get('symbols')?.has(String(opts.sender.userId))) {
+      return true;
+    }
+
     const enabled = await this.getPermissionBasedSettingsValue('cSymbolsEnabled');
     const cSymbolsTriggerLength = await this.getPermissionBasedSettingsValue('cSymbolsTriggerLength');
     const cSymbolsMaxSymbolsConsecutively = await this.getPermissionBasedSettingsValue('cSymbolsMaxSymbolsConsecutively');
@@ -322,6 +395,10 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async longMessage (opts: ParserOptions) {
+    if (immuneUsers.get('longmessage')?.has(String(opts.sender.userId))) {
+      return true;
+    }
+
     const enabled = await this.getPermissionBasedSettingsValue('cLongMessageEnabled');
     const cLongMessageTriggerLength = await this.getPermissionBasedSettingsValue('cLongMessageTriggerLength');
     const timeoutValues = await this.getPermissionBasedSettingsValue('cLongMessageTimeout');
@@ -347,6 +424,10 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async caps (opts: ParserOptions) {
+    if (immuneUsers.get('caps')?.has(String(opts.sender.userId))) {
+      return true;
+    }
+
     const enabled = await this.getPermissionBasedSettingsValue('cCapsEnabled');
     const cCapsTriggerLength = await this.getPermissionBasedSettingsValue('cCapsTriggerLength');
     const cCapsMaxCapsPercent = await this.getPermissionBasedSettingsValue('cCapsMaxCapsPercent');
@@ -399,6 +480,10 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async spam (opts: ParserOptions) {
+    if (immuneUsers.get('spam')?.has(String(opts.sender.userId))) {
+      return true;
+    }
+
     const enabled = await this.getPermissionBasedSettingsValue('cSpamEnabled');
     const cSpamTriggerLength = await this.getPermissionBasedSettingsValue('cSpamTriggerLength');
     const cSpamMaxLength = await this.getPermissionBasedSettingsValue('cSpamMaxLength');
@@ -430,6 +515,10 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async color (opts: ParserOptions) {
+    if (immuneUsers.get('color')?.has(String(opts.sender.userId))) {
+      return true;
+    }
+
     const enabled = await this.getPermissionBasedSettingsValue('cColorEnabled');
     const timeoutValues = await this.getPermissionBasedSettingsValue('cColorTimeout');
     const permId = await getUserHighestPermission(Number(opts.sender.userId));
@@ -451,6 +540,10 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async emotes (opts: ParserOptions) {
+    if (immuneUsers.get('emotes')?.has(String(opts.sender.userId))) {
+      return true;
+    }
+
     if (!(Symbol.iterator in Object(opts.sender.emotes))) {
       return true;
     }
@@ -486,6 +579,10 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async blacklist (opts: ParserOptions) {
+    if (immuneUsers.get('blacklist')?.has(String(opts.sender.userId))) {
+      return true;
+    }
+
     const enabled = await this.getPermissionBasedSettingsValue('cListsEnabled');
     const timeoutValues = await this.getPermissionBasedSettingsValue('cListsTimeout');
     const permId = await getUserHighestPermission(Number(opts.sender.userId));
@@ -512,7 +609,7 @@ class Moderation extends System {
     return isOK;
   }
 
-  async isSilent (name: timeoutType) {
+  async isSilent (name: typeof timeoutType[number]) {
     const cooldown = ModerationMessageCooldown.get(name);
     if (!cooldown || (Date.now() - cooldown) >= 60000) {
       ModerationMessageCooldown.set(name, Date.now());

@@ -1058,6 +1058,8 @@
     "without-permission": "You don't have enough permissions for '$command'"
   },
   "moderation": {
+    "user-have-immunity": "$sender, user $username have $type immunity for $time seconds",
+    "user-have-immunity-parameterError": "$sender, parameter error. $command <username> <type> <duration>",
     "user-have-link-permit": "User $username can post a $count $link to chat",
     "permit-parse-failed": "{core.command-parse} !permit [username]",
     "user-is-warned-about-links": "No links allowed, ask for !permit [$count warnings left]",
