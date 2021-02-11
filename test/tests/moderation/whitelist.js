@@ -191,10 +191,10 @@ describe('systems/moderation - whitelist()', () => {
   }
 
   describe(`#2392 - changed !songrequest => !zahrej should be whitelisted`, () => {
-    after(() => {
+    after(async () => {
       await songs.setCommand('!songrequest', '!songrequest');
     });
-    
+
     it('change command from !songrequest => !zahrej', async () => {
       await songs.setCommand('!songrequest', '!zahrej');
     });
