@@ -5,11 +5,12 @@ import { getRepository } from 'typeorm';
 import { Settings } from '../../database/entity/settings';
 import { IsLoadingInProgress, toggleLoadingInProgress } from '../../decorators';
 import { isDbConnected } from '../database';
+import { debug } from '../log';
 
 function persistent<T>({ value, name, namespace, onChange }: { value: T, name: string, namespace: string, onChange?: (cur: T, old: T) => void }) {
   const sym = Symbol(name);
 
-  const proxy = new DeepProxy({ value }, {
+  const proxy = new DeepProxy({ __loaded__: false, value }, {
     get(target, prop, receiver) {
       const val = Reflect.get(target, prop, receiver);
       if (typeof val === 'object' && val !== null) {
@@ -19,31 +20,30 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
       }
     },
     set(target, prop, receiver) {
-      if (IsLoadingInProgress(sym)) {
+      if (IsLoadingInProgress(sym) || prop === '__loaded__') {
         return Reflect.set(target, prop, receiver);
       }
-      if (typeof onChange !== 'undefined' && typeof prop === 'string') {
-        const oldObject = proxy.value;
-        let newObject;
-        if (typeof proxy.value === 'string' || typeof proxy.value === 'number' || proxy.value === null) {
-          newObject = receiver;
-        } else if (this.path.length === 0) {
-          newObject = { ...proxy.value, ...receiver };
-        } else {
-          // remove first key (which is value)
-          const [, ...path] = [...this.path, prop];
-          newObject = set<T>(cloneDeep(proxy.value as any), path.join('.'), receiver);
-        }
+
+      const oldObject = proxy.value;
+      let newObject;
+      if (typeof proxy.value === 'string' || typeof proxy.value === 'number' || proxy.value === null) {
+        newObject = receiver;
+      } else if (this.path.length === 0) {
+        newObject = { ...proxy.value, ...receiver };
+      } else {
+        // remove first key (which is value)
+        const [, ...path] = [...this.path, prop];
+        newObject = set<T>(cloneDeep(proxy.value as any), path.join('.'), receiver);
+      }
+      if (onChange) {
         onChange(newObject, oldObject);
       }
-      setTimeout(() => {
-        // saving updated object
-        getRepository(Settings).findOne({ namespace, name }).then(row => {
-          getRepository(Settings).save({
-            ...row, namespace, name, value: JSON.stringify(proxy.value),
-          });
-        });
-      }, 1000);
+      debug('persistent', `Updating ${namespace}/${name}`);
+      debug('persistent', newObject);
+      getRepository(Settings).update({ namespace, name }, { value: JSON.stringify(newObject) }).then(() => {
+        debug('persistent', `Update done on ${namespace}/${name}`);
+      });
+
       return Reflect.set(target, prop, receiver);
     },
   });
@@ -57,13 +57,19 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
     }
 
     try {
+      debug('persistent', `Loading ${namespace}/${name}`);
       proxy.value = JSON.parse(
         (await getRepository(Settings).findOneOrFail({ namespace, name })).value,
       );
     } catch (e) {
-      // ignore if nothing was found
+      debug('persistent', `Data not found, creating ${namespace}/${name}`);
+      await getRepository(Settings).insert({
+        name, namespace, value: JSON.stringify(value),
+      });
     } finally {
       toggleLoadingInProgress(sym);
+      proxy.__loaded__ = true;
+      debug('persistent', `Load done ${namespace}/${name}`);
     }
   }
   load();
