@@ -4,7 +4,7 @@ import {
 import XRegExp from 'xregexp';
 
 import {
-  DAY, HOUR, MINUTE, SECOND, 
+  DAY, HOUR, MINUTE, SECOND,
 } from './constants';
 import { debug } from './helpers/log';
 import { ParameterError } from './helpers/parameterError';
@@ -166,9 +166,9 @@ class Expects {
     debug('expects.command', JSON.stringify({
       text: this.text, opts, match,
     }));
-    if (!isNil(match)) {
-      this.match.push(match.command.trim().toLowerCase());
-      this.text = this.text.replace(match.command, ''); // remove from text matched pattern
+    if (match && match.groups) {
+      this.match.push(match.groups.command.trim().toLowerCase());
+      this.text = this.text.replace(match.groups.command, ''); // remove from text matched pattern
     } else {
       if (!opts.optional) {
         throw new ParameterError('Command not found');
@@ -199,16 +199,17 @@ class Expects {
       regexp = XRegExp('(?<points> -?[0-9]+ )', 'ix');
     }
     const match = XRegExp.exec(this.text, regexp);
-    if (!isNil(match)) {
-      if (match.points === 'all') {
-        this.match.push(match.points);
+    if (match && match.groups) {
+      if (match.groups.points === 'all') {
+        this.match.push(match.groups.points);
       } else {
-        this.match.push(parseInt(
-          Number(match.points) <= Number.MAX_SAFE_INTEGER
-            ? (opts.negative ? match.points : Math.abs(match.points))
-            : Number.MAX_SAFE_INTEGER, 10)); // return only max safe
+        const points = Number(match.groups.points);
+        this.match.push(
+          points <= Number.MAX_SAFE_INTEGER
+            ? (opts.negative ? points : Math.abs(points))
+            : Number.MAX_SAFE_INTEGER); // return only max safe
       }
-      this.text = this.text.replace(match.points, ''); // remove from text matched pattern
+      this.text = this.text.replace(match.groups.points, ''); // remove from text matched pattern
     } else {
       if (!opts.optional) {
         throw new ParameterError('Points not found');
@@ -238,9 +239,9 @@ class Expects {
     const regexp = opts.minus ? XRegExp('(?<number> -?[0-9]+ )', 'ix') : XRegExp('(?<number> [0-9]+ )', 'ix');
     const match = XRegExp.exec(this.text, regexp);
 
-    if (!isNil(match)) {
-      this.match.push(Number(match.number));
-      this.text = this.text.replace(match.number, ''); // remove from text matched pattern
+    if (match && match.groups) {
+      this.match.push(Number(match.groups.number));
+      this.text = this.text.replace(match.groups.number, ''); // remove from text matched pattern
     } else {
       if (!opts.optional) {
         throw new ParameterError('Number not found');
@@ -275,8 +276,8 @@ class Expects {
 
     const regexp = XRegExp(`-(?<${opts.name}>${pattern})`, 'ix');
     const match = XRegExp.exec(this.text, regexp);
-    if (!isNil(match) && match[opts.name].trim().length !== 0) {
-      this.match.push(match[opts.name]);
+    if (match && match.groups && match.groups[opts.name].trim().length !== 0) {
+      this.match.push(match.groups[opts.name]);
       this.text = this.text.replace(match[0], ''); // remove from text matched pattern
     } else {
       if (!opts.optional) {
@@ -306,7 +307,7 @@ class Expects {
 
     const regexp = XRegExp(`-${opts.name}\\b`, 'ix');
     const match = XRegExp.exec(this.text, regexp);
-    if (!isNil(match)) {
+    if (match) {
       this.match.push(true);
       this.text = this.text.replace(match[0], ''); // remove from text matched pattern
     } else {
@@ -344,8 +345,8 @@ class Expects {
     debug('expects.permission', JSON.stringify({
       fullPattern, text: this.text, opts, match,
     }));
-    if (!isNil(match) && match[opts.name].trim().length !== 0) {
-      this.match.push(String(match[opts.name].trim()));
+    if (match && match.groups && match.groups[opts.name].trim().length !== 0) {
+      this.match.push(String(match.groups[opts.name].trim()));
       this.text = this.text.replace(match[0], ''); // remove from text matched pattern
     } else {
       if (!opts.optional) {
@@ -406,13 +407,13 @@ class Expects {
     debug('expects.argument', JSON.stringify({
       fullPattern, text: this.text, opts, match,
     }));
-    if (!isNil(match) && match[opts.name].trim().length !== 0) {
+    if (match && match.groups && match.groups[opts.name].trim().length !== 0) {
       if (opts.type.name === 'Boolean') {
-        this.match.push(opts.type(match[opts.name].trim().toLowerCase() === 'true'));
+        this.match.push(opts.type(match.groups[opts.name].trim().toLowerCase() === 'true'));
       } else if (['uuid', 'username'].includes(opts.type)) {
-        this.match.push(match[opts.name].trim());
+        this.match.push(match.groups[opts.name].trim());
       } else {
-        this.match.push(opts.type(match[opts.name].trim()));
+        this.match.push(opts.type(match.groups[opts.name].trim()));
       }
       this.text = this.text.replace(match[0], ''); // remove from text matched pattern
     } else {
@@ -440,9 +441,9 @@ class Expects {
 
     const regexp = XRegExp(`@?(?<username>[A-Za-z0-9_]+)`, 'ix');
     const match = XRegExp.exec(`${this.text}`, regexp);
-    if (!isNil(match)) {
-      this.match.push(match.username.toLowerCase());
-      this.text = this.text.replace(match.username, ''); // remove from text matched pattern
+    if (match && match.groups) {
+      this.match.push(match.groups.username.toLowerCase());
+      this.text = this.text.replace(match.groups.username, ''); // remove from text matched pattern
     } else {
       if (!opts.optional) {
         throw new ParameterError('Username not found');
@@ -469,9 +470,9 @@ class Expects {
 
     const regexp = XRegExp(`(?<everything> .* )`, 'ix');
     const match = XRegExp.exec(` ${this.text} `, regexp);
-    if (!isNil(match)) {
-      this.match.push(match.everything.substring(1, match.everything.length - 1).trim());
-      this.text = this.text.replace(match.everything, ''); // remove from text matched pattern
+    if (match && match.groups) {
+      this.match.push(match.groups.everything.substring(1, match.everything.length - 1).trim());
+      this.text = this.text.replace(match.groups.everything, ''); // remove from text matched pattern
     } else {
       if (!opts.optional) {
         throw new ParameterError('There is no text found.');
@@ -496,18 +497,19 @@ class Expects {
 
     const regexp = XRegExp(`(?<duration> (\\d+(s|m|h|d)) )`, 'igx');
     const match = XRegExp.exec(`${this.text.trim()}`, regexp);
-    if (!isNil(match)) {
-      if (match.duration.includes('s')) {
-        match.duration = Number(match.duration.replace('s', '') * SECOND);
-      } else if (match.duration.includes('m')) {
-        match.duration = Number(match.duration.replace('m', '') * MINUTE);
-      } else if (match.duration.includes('h')) {
-        match.duration = Number(match.duration.replace('h', '') * HOUR);
-      } else if (match.duration.includes('d')) {
-        match.duration = Number(match.duration.replace('d', '') * DAY);
+    if (match && match.groups) {
+      let value = 0;
+      if (match.groups.duration.includes('s')) {
+        value = Number(match.groups.duration.replace('s', '')) * SECOND;
+      } else if (match.groups.duration.includes('m')) {
+        value = Number(match.groups.duration.replace('m', '')) * MINUTE;
+      } else if (match.groups.duration.includes('h')) {
+        value = Number(match.groups.duration.replace('h', '')) * HOUR;
+      } else if (match.groups.duration.includes('d')) {
+        value = Number(match.groups.duration.replace('d', '')) * DAY;
       }
-      this.match.push(match.duration);
-      this.text = this.text.replace(match.duration, ''); // remove from text matched pattern
+      this.match.push(value);
+      this.text = this.text.replace(String(value), ''); // remove from text matched pattern
     } else {
       if (!optional) {
         throw new ParameterError('Duration not found');
@@ -533,9 +535,9 @@ class Expects {
 
     const regexp = XRegExp(`(?<oneOf> ${values.join('|')} )`, 'igx');
     const match = XRegExp.exec(`${this.text.trim()}`, regexp);
-    if (!isNil(match)) {
-      this.match.push(match.oneOf.trim());
-      this.text = this.text.replace(match.string, ''); // remove from text matched pattern
+    if (match && match.groups) {
+      this.match.push(match.groups.oneOf.trim());
+      this.text = this.text.replace(match.groups.oneOf, ''); // remove from text matched pattern
     } else {
       if (!optional) {
         throw new ParameterError('OneOf not found');
@@ -562,9 +564,9 @@ class Expects {
 
     const regexp = XRegExp(`(?<string> \\S* )`, 'igx');
     const match = XRegExp.exec(`${this.text.trim()}`, regexp);
-    if (!isNil(match)) {
-      this.match.push(match.string.trim());
-      this.text = this.text.replace(match.string, ''); // remove from text matched pattern
+    if (match && match.groups) {
+      this.match.push(match.groups.string.trim());
+      this.text = this.text.replace(match.groups.string, ''); // remove from text matched pattern
     } else {
       if (!opts.optional) {
         throw new ParameterError('String not found');
@@ -588,9 +590,9 @@ class Expects {
     const regexp = XRegExp('(?<list> .*)', 'ix');
     const match = XRegExp.exec(this.text, regexp);
 
-    if (!isNil(match)) {
-      this.match.push((match.list as string).split(opts.delimiter).map((o) => o.trim()));
-      this.text = this.text.replace(match.list, ''); // remove from text matched pattern
+    if (match && match.groups) {
+      this.match.push(match.groups.list.split(opts.delimiter).map((o) => o.trim()));
+      this.text = this.text.replace(match.groups.list, ''); // remove from text matched pattern
     } else {
       if (!opts.optional) {
         throw new ParameterError('List not found');
