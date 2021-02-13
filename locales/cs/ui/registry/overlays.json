@@ -2,7 +2,7 @@
   "newMapping": "Vytvořit nové mapování overlaye",
   "emptyMapping": "Zatím nebylo vytvořeno žádné mapování odkazů pro overlaye.",
   "allowedIPs": {
-    "name": "Allowed IPs",
-    "help": "Allow access from set IPs separated by new line"
+    "name": "Povolené IP adresy",
+    "help": "Povolit přístup ze sady IP oddělených novým řádkem"
   }
 }
