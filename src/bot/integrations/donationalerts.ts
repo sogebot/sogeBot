@@ -19,6 +19,8 @@ import alerts from '../registries/alerts.js';
 import users from '../users.js';
 import Integration from './_interface';
 
+const parsedTips: string[] = [];
+
 type DonationAlertsEvent = {
   id: string;
   name: string;
@@ -141,6 +143,14 @@ class Donationalerts extends Integration {
   }
 
   async parseDonation(data: DonationAlertsEvent) {
+    // we will save id to not parse it twice (websocket shenanigans may happen)
+    if (parsedTips.includes(data.id)) {
+      return;
+    } else {
+      parsedTips.unshift(data.id);
+      parsedTips.length = 20;
+    }
+
     eventlist.add({
       event:     'tip',
       amount:    data.amount,
