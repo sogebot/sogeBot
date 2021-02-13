@@ -1053,8 +1053,8 @@
     "without-permission": "Nemáte dostatečná oprávnění pro '$command'"
   },
   "moderation": {
-    "user-have-immunity": "$sender, user $username have $type immunity for $time seconds",
-    "user-have-immunity-parameterError": "$sender, parameter error. $command <username> <type> <duration>",
+    "user-have-immunity": "$sender, uživatel $username má $type imunitu po dobu $time vteřin",
+    "user-have-immunity-parameterError": "$sender, chyba parametru. $command <username> <type> <duration>",
     "user-have-link-permit": "Uživatel $username může odeslat $count $link do chatu",
     "permit-parse-failed": "{core.command-parse} !permit [username]",
     "user-is-warned-about-links": "Nejsou povoleny žádné odkazy, požádejte o povolení [$count varování zbývá]",
