@@ -471,7 +471,7 @@ class Expects {
     const regexp = XRegExp(`(?<everything> .* )`, 'ix');
     const match = XRegExp.exec(` ${this.text} `, regexp);
     if (match && match.groups) {
-      this.match.push(match.groups.everything.substring(1, match.everything.length - 1).trim());
+      this.match.push(match.groups.everything.substring(1, match.groups.everything.length - 1).trim());
       this.text = this.text.replace(match.groups.everything, ''); // remove from text matched pattern
     } else {
       if (!opts.optional) {
