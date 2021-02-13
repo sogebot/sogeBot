@@ -1,25 +1,24 @@
 import _ from 'lodash';
 import { getRepository } from 'typeorm';
-import XRegExp from 'xregexp';
 
 import { parserReply } from '../commons';
 import * as constants from '../constants';
 import {
-  Commands, CommandsInterface, CommandsResponsesInterface, 
+  Commands, CommandsInterface, CommandsResponsesInterface,
 } from '../database/entity/commands';
 import {
-  command, default_permission, helper, 
+  command, default_permission, helper,
 } from '../decorators';
 import { parser } from '../decorators';
 import Expects from '../expects';
 import { checkFilter } from '../helpers/checkFilter';
 import {
-  getAllCountOfCommandUsage, getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage, 
+  getAllCountOfCommandUsage, getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage,
 } from '../helpers/commands/count';
 import { prepare } from '../helpers/commons';
 import { warning } from '../helpers/log';
 import {
-  addToViewersCache, get, getFromViewersCache, 
+  addToViewersCache, get, getFromViewersCache,
 } from '../helpers/permissions';
 import { check, defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
@@ -51,7 +50,7 @@ class CustomCommands extends System {
   constructor () {
     super();
     this.addMenu({
-      category: 'manage', name: 'customcommands', id: 'manage/commands', this: this, 
+      category: 'manage', name: 'customcommands', id: 'manage/commands', this: this,
     });
   }
 
@@ -129,14 +128,14 @@ class CustomCommands extends System {
       const [userlevel, stopIfExecuted, cmd, rId, response] = new Expects(opts.parameters)
         .permission({ optional: true, default: defaultPermissions.VIEWERS })
         .argument({
-          optional: true, name: 's', default: null, type: Boolean, 
+          optional: true, name: 's', default: null, type: Boolean,
         })
         .argument({
-          name: 'c', type: String, multi: true, delimiter: '', 
+          name: 'c', type: String, multi: true, delimiter: '',
         })
         .argument({ name: 'rid', type: Number })
         .argument({
-          name: 'r', type: String, multi: true, delimiter: '', 
+          name: 'r', type: String, multi: true, delimiter: '',
         })
         .toArray();
 
@@ -183,13 +182,13 @@ class CustomCommands extends System {
       const [userlevel, stopIfExecuted, cmd, response] = new Expects(opts.parameters)
         .permission({ optional: true, default: defaultPermissions.VIEWERS })
         .argument({
-          optional: true, name: 's', default: false, type: Boolean, 
+          optional: true, name: 's', default: false, type: Boolean,
         })
         .argument({
-          name: 'c', type: String, multi: true, delimiter: '', 
+          name: 'c', type: String, multi: true, delimiter: '',
         })
         .argument({
-          name: 'r', type: String, multi: true, delimiter: '', 
+          name: 'r', type: String, multi: true, delimiter: '',
         })
         .toArray();
 
@@ -307,7 +306,7 @@ class CustomCommands extends System {
 
       if (!opts.quiet) {
         this.sendResponse(_.cloneDeep(_responses), {
-          param, sender: opts.sender, command: cmd.command.command, processedCommands: opts.processedCommands, 
+          param, sender: opts.sender, command: cmd.command.command, processedCommands: opts.processedCommands,
         });
       }
     }
@@ -346,7 +345,7 @@ class CustomCommands extends System {
       return Promise.all(_.orderBy(command_with_responses.responses, 'order', 'asc').map(async(r) => {
         const perm = await get(r.permission);
         const response = prepare('customcmds.response', {
-          command: cmd, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: perm?.name ?? 'n/a', 
+          command: cmd, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: perm?.name ?? 'n/a',
         });
         return { response, ...opts };
       }));
@@ -356,43 +355,53 @@ class CustomCommands extends System {
   @command('!command toggle')
   @default_permission(defaultPermissions.CASTERS)
   async toggle (opts: CommandOptions): Promise<CommandResponse[]> {
-    const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP) as unknown as { [x: string]: string } | null;
-    if (_.isNil(match)) {
+    try {
+      const [cmdInput, subcommand] = new Expects(opts.parameters)
+        .command()
+        .string({ optional: true })
+        .toArray();
+
+      const cmd = await getRepository(Commands).findOne({ where: { command: (cmdInput + ' ' + subcommand).trim() } });
+      if (!cmd) {
+        const response = prepare('customcmds.command-was-not-found', { command: (cmdInput + ' ' + subcommand).trim() });
+        return [{ response, ...opts }];
+      }
+      await getRepository(Commands).save({
+        ...cmd,
+        enabled: !cmd.enabled,
+      });
+      cacheValid = false;
+      return [{ response: prepare(!cmd.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: cmd.command }), ...opts }];
+    } catch (e) {
       const response = prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') });
       return [{ response, ...opts }];
     }
-    const cmd = await getRepository(Commands).findOne({ where: { command: match.command } });
-    if (!cmd) {
-      const response = prepare('customcmds.command-was-not-found', { command: match.command });
-      return [{ response, ...opts }];
-    }
-    await getRepository(Commands).save({
-      ...cmd,
-      enabled: !cmd.enabled,
-    });
-    cacheValid = false;
-    return [{ response: prepare(!cmd.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: cmd.command }), ...opts }];
   }
 
   @command('!command toggle-visibility')
   @default_permission(defaultPermissions.CASTERS)
   async toggleVisibility (opts: CommandOptions): Promise<CommandResponse[]> {
-    const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP) as unknown as { [x: string]: string } | null;
-    if (_.isNil(match)) {
+    try {
+      const [cmdInput, subcommand] = new Expects(opts.parameters)
+        .command()
+        .string({ optional: true })
+        .toArray();
+
+      const cmd = await getRepository(Commands).findOne({ where: { command: (cmdInput + ' ' + subcommand).trim() } });
+      if (!cmd) {
+        const response = prepare('customcmds.command-was-not-found', { command: (cmdInput + ' ' + subcommand).trim() });
+        return [{ response, ...opts }];
+      }
+      await getRepository(Commands).save({ ...cmd, visible: !cmd.visible });
+
+      const response = prepare(!cmd.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: cmd.command });
+      cacheValid = false;
+      return [{ response, ...opts }];
+
+    } catch (e) {
       const response = prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') });
       return [{ response, ...opts }];
     }
-
-    const cmd = await getRepository(Commands).findOne({ where: { command: match.command } });
-    if (!cmd) {
-      const response = prepare('customcmds.command-was-not-found', { command: match.command });
-      return [{ response, ...opts }];
-    }
-    await getRepository(Commands).save({ ...cmd, visible: !cmd.visible });
-
-    const response = prepare(!cmd.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: cmd.command });
-    cacheValid = false;
-    return [{ response, ...opts }];
   }
 
   @command('!command remove')
@@ -401,10 +410,10 @@ class CustomCommands extends System {
     try {
       const [cmd, rId] = new Expects(opts.parameters)
         .argument({
-          name: 'c', type: String, multi: true, delimiter: '', 
+          name: 'c', type: String, multi: true, delimiter: '',
         })
         .argument({
-          name: 'rid', type: Number, optional: true, default: 0, 
+          name: 'rid', type: Number, optional: true, default: 0,
         })
         .toArray();
 

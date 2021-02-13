@@ -5,12 +5,12 @@ import XRegExp from 'xregexp';
 import { parserReply } from '../commons';
 import * as constants from '../constants';
 import {
-  Cooldown as CooldownEntity, CooldownInterface, CooldownViewer, CooldownViewerInterface, 
+  Cooldown as CooldownEntity, CooldownInterface, CooldownViewer, CooldownViewerInterface,
 } from '../database/entity/cooldown';
 import { Keyword } from '../database/entity/keyword';
 import { User } from '../database/entity/user';
 import {
-  command, default_permission, parser, permission_settings, rollback, settings, 
+  command, default_permission, parser, permission_settings, rollback, settings,
 } from '../decorators';
 import { onChange } from '../decorators/on';
 import Expects from '../expects';
@@ -69,7 +69,7 @@ class Cooldown extends System {
   constructor () {
     super();
     this.addMenu({
-      category: 'manage', name: 'cooldown', id: 'manage/cooldowns/list', this: this, 
+      category: 'manage', name: 'cooldown', id: 'manage/cooldowns/list', this: this,
     });
   }
 
@@ -117,24 +117,24 @@ class Cooldown extends System {
   @command('!cooldown')
   @default_permission(defaultPermissions.CASTERS)
   async main (opts: CommandOptions) {
-    const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP_SET) as unknown as { [x: string]: string } | null;
+    const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP_SET);
 
-    if (_.isNil(match)) {
+    if (!match || !match.groups) {
       return this.help(opts);
     }
 
     const cooldown = await getRepository(CooldownEntity).findOne({
       where: {
-        name: match.command,
-        type: match.type as 'global' | 'user',
+        name: match.groups.command,
+        type: match.groups.type as 'global' | 'user',
       },
     });
 
     await getRepository(CooldownEntity).save({
       ...cooldown,
-      name:                 match.command,
-      miliseconds:          parseInt(match.seconds, 10) * 1000,
-      type:                 (match.type as 'global' | 'user'),
+      name:                 match.groups.command,
+      miliseconds:          parseInt(match.groups.seconds, 10) * 1000,
+      type:                 (match.groups.type as 'global' | 'user'),
       timestamp:            0,
       isErrorMsgQuiet:      _.isNil(match.quiet) ? false : !!match.quiet,
       isEnabled:            true,
@@ -145,8 +145,8 @@ class Cooldown extends System {
     });
     return [{
       response: prepare('cooldowns.cooldown-was-set', {
-        seconds: match.seconds, type: match.type, command: match.command, 
-      }), ...opts, 
+        seconds: match.groups.seconds, type: match.groups.type, command: match.groups.command,
+      }), ...opts,
     }];
   }
 
@@ -392,21 +392,21 @@ class Cooldown extends System {
   }
 
   async toggle (opts: CommandOptions, type: 'isEnabled' | 'isModeratorAffected' | 'isOwnerAffected' | 'isSubscriberAffected' | 'isFollowerAffected' | 'isErrorMsgQuiet' | 'type') {
-    const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP) as unknown as { [x: string]: string } | null;
+    const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP);
 
-    if (_.isNil(match)) {
+    if (!match || !match.groups) {
       return this.help(opts);
     }
 
     const cooldown = await getRepository(CooldownEntity).findOne({
       relations: ['viewers'],
       where:     {
-        name: match.command,
-        type: match.type as 'global' | 'user',
+        name: match.groups.command,
+        type: match.groups.type as 'global' | 'user',
       },
     });
     if (!cooldown) {
-      return [{ response: prepare('cooldowns.cooldown-not-found', { command: match.command }), ...opts }];
+      return [{ response: prepare('cooldowns.cooldown-not-found', { command: match.groups.command }), ...opts }];
     }
 
     if (type === 'type') {

@@ -149,9 +149,7 @@ class Expects {
 
   command (opts?: any) {
     opts = opts || {};
-    defaults(opts, {
-      exec: false, optional: false, spaces: false,
-    });
+    defaults(opts, { exec: false, optional: false });
     if (!opts.exec) {
       this.toExec.push({ fnc: 'command', opts });
       return this;

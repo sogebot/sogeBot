@@ -21,8 +21,6 @@ export const HOUR = 1000 * 60 * 60;
 export const DAY = 1000 * 60 * 60 * 24;
 
 // regexp
-export const COMMAND_REGEXP = XRegExp('(?<command> ![\\pL0-9]* ) # command', 'ix');
-
 export const COOLDOWN_REGEXP = XRegExp(`(?<command> !?[\\pL0-9 ]* ) # command
            \\s                         # empty space
            (?<type> global|user      ) # type`, 'ix');
