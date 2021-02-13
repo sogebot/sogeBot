@@ -1,6 +1,6 @@
 import { cloneDeep, set } from 'lodash';
 import DeepProxy from 'proxy-deep';
-import { getRepository } from 'typeorm';
+import { getManager, getRepository } from 'typeorm';
 
 import { Settings } from '../../database/entity/settings';
 import { IsLoadingInProgress, toggleLoadingInProgress } from '../../decorators';
@@ -62,10 +62,12 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
         (await getRepository(Settings).findOneOrFail({ namespace, name })).value,
       );
     } catch (e) {
-      await getRepository(Settings).delete({ name, namespace });
       debug('persistent', `Data not found, creating ${namespace}/${name}`);
-      await getRepository(Settings).insert({
-        name, namespace, value: JSON.stringify(value),
+      await getManager().transaction(async transactionalEntityManager => {
+        await transactionalEntityManager.delete(Settings, { name, namespace });
+        await transactionalEntityManager.insert(Settings, {
+          name, namespace, value: JSON.stringify(value),
+        });
       });
     } finally {
       toggleLoadingInProgress(sym);
