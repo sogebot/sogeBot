@@ -18,6 +18,11 @@ describe('Persistent object', () => {
     await db.cleanup();
     const { persistent } =  require('../../../dest/helpers/core/persistent');
 
+    // save incorrect value
+    await getRepository(Settings).save({
+      name: 'stats', namespace: '/test', value: '{"language":"da","currentWatchedTime":140040000,"currentViewers":5,"maxViewers":8,"currentSubscribers":13,"currentBits":0,"currentTips":0,"currentFollowers":2286,"currentViews":87594,"currentGame":"World of Warcraft","currentTitle":"{ENG/DA}:teddy_bear: 9/10 HC Progression - Rygstopsforsøg dag 7 - !donogoal !nytskema !job !uddannelse:teddy_bear:","currentHosts":0,"newChatters":11,"value":{"language":"da","currentWatchedTime":0,"currentViewers":0,"maxViewers":0,"currentSubscribers":13,"currentBits":0,"currentTips":0,"currentFollowers":2288,"currentViews":87131,"currentGame":"World of Warcraft","currentTitle":"{ENG/DA}:teddy_bear:Late night wow hygge - Stadig høj over afsluttet uddannelse! - !RGB !uddannelse:teddy_bear:\n","currentHosts":0,"newChatters":0}}',
+    });
+
     stats = persistent({
       value: {
         language:           'en',

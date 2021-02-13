@@ -62,6 +62,7 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
         (await getRepository(Settings).findOneOrFail({ namespace, name })).value,
       );
     } catch (e) {
+      await getRepository(Settings).delete({ name, namespace });
       debug('persistent', `Data not found, creating ${namespace}/${name}`);
       await getRepository(Settings).insert({
         name, namespace, value: JSON.stringify(value),
