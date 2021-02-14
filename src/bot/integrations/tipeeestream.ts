@@ -186,10 +186,7 @@ class TipeeeStream extends Integration {
       tip(`${username}${user.userId ? '#' + user.userId : ''}, amount: ${amount.toFixed(2)}${donationCurrency}, message: ${message}`);
 
       if (isStreamOnline.value) {
-        stats.value = {
-          ...stats.value,
-          currentTips: stats.value.currentTips + Number(currency.exchange(amount, donationCurrency, mainCurrency.value)),
-        };
+        stats.value.currentTips = stats.value.currentTips + Number(currency.exchange(amount, donationCurrency, mainCurrency.value));
       }
 
       triggerInterfaceOnTip({

@@ -12,7 +12,7 @@ import { mainCurrency } from '../helpers/currency';
 import { eventEmitter } from '../helpers/events';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 import {
-  error, info, tip, 
+  error, info, tip,
 } from '../helpers/log';
 import eventlist from '../overlays/eventlist';
 import alerts from '../registries/alerts';
@@ -164,10 +164,7 @@ class StreamElements extends Integration {
     getRepository(User).save(user);
 
     if (isStreamOnline.value) {
-      stats.value = {
-        ...stats.value,
-        currentTips: stats.value.currentTips + currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value),
-      };
+      stats.value.currentTips = stats.value.currentTips + currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value);
     }
 
     tip(`${username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(amount).toFixed(2)}${DONATION_CURRENCY}, message: ${message}`);

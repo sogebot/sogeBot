@@ -6,7 +6,7 @@ import { getRepository } from 'typeorm';
 import currency from '../currency';
 import { User, UserTipInterface } from '../database/entity/user';
 import {
-  persistent, settings, ui, 
+  persistent, settings, ui,
 } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import { isStreamOnline, stats } from '../helpers/api';
@@ -15,7 +15,7 @@ import { eventEmitter } from '../helpers/events';
 import { getBroadcaster } from '../helpers/getBroadcaster';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 import {
-  debug, error, info, tip, 
+  debug, error, info, tip,
 } from '../helpers/log';
 import { ioServer } from '../helpers/panel';
 import eventlist from '../overlays/eventlist';
@@ -108,7 +108,7 @@ class Streamlabs extends Integration {
         debug('streamlabs', url);
         debug('streamlabs', result);
         ioServer?.emit('api.stats', {
-          method: 'GET', data: result, timestamp: Date.now(), call: 'streamlabs', api: 'other', endpoint: url, code: 200, 
+          method: 'GET', data: result, timestamp: Date.now(), call: 'streamlabs', api: 'other', endpoint: url, code: 200,
         });
         let donationIdSet = false;
         for (const item of result.data) {
@@ -144,11 +144,11 @@ class Streamlabs extends Integration {
       } catch (e) {
         if (e.isAxiosError) {
           ioServer?.emit('api.stats', {
-            method: 'GET', data: e.message, timestamp: Date.now(), call: 'streamlabs', api: 'other', endpoint: url, code: e.response?.status ?? 'n/a', 
+            method: 'GET', data: e.message, timestamp: Date.now(), call: 'streamlabs', api: 'other', endpoint: url, code: e.response?.status ?? 'n/a',
           });
         } else {
           ioServer?.emit('api.stats', {
-            method: 'GET', data: e.stack, timestamp: Date.now(), call: 'streamlabs', api: 'other', endpoint: url, code: 0, 
+            method: 'GET', data: e.stack, timestamp: Date.now(), call: 'streamlabs', api: 'other', endpoint: url, code: 0,
           });
         }
         if (e.message.includes('ETIMEDOUT')) {
@@ -226,10 +226,7 @@ class Streamlabs extends Integration {
           getRepository(User).save(user);
 
           if (isStreamOnline.value) {
-            stats.value = {
-              ...stats.value,
-              currentTips: stats.value.currentTips + Number(currency.exchange(Number(event.amount), event.currency, mainCurrency.value)),
-            };
+            stats.value.currentTips = stats.value.currentTips + Number(currency.exchange(Number(event.amount), event.currency, mainCurrency.value));
           }
           tip(`${event.from.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(event.amount).toFixed(2)}${event.currency}, message: ${event.message}`);
         }

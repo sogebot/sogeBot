@@ -195,10 +195,7 @@ class Donationalerts extends Integration {
       tip(`${data.username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
 
       if (isStreamOnline.value) {
-        stats.value = {
-          ...stats.value,
-          currentTips: stats.value.currentTips + Number(currency.exchange(data.amount, data.currency, mainCurrency.value)),
-        };
+        stats.value.currentTips = stats.value.currentTips + Number(currency.exchange(data.amount, data.currency, mainCurrency.value));
       }
     }
 

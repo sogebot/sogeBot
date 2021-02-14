@@ -323,15 +323,12 @@ class Webhooks {
         );
 
         // reset quick stats on stream start
-        stats.value = {
-          ...stats.value,
-          currentWatchedTime: 0,
-          maxViewers:         0,
-          newChatters:        0,
-          currentViewers:     0,
-          currentBits:        0,
-          currentTips:        0,
-        };
+        stats.value.currentWatchedTime = 0;
+        stats.value.maxViewers = 0;
+        stats.value.newChatters = 0;
+        stats.value.currentViewers = 0;
+        stats.value.currentBits = 0;
+        stats.value.currentTips = 0;
 
         isStreamOnline.value = true;
         chatMessagesAtStart.value = linesParsed;
@@ -357,25 +354,16 @@ class Webhooks {
       streamStatusChangeSince.value = (new Date(stream.started_at)).getTime();
       streamId.value = stream.id;
       streamType.value = stream.type;
-      stats.value = {
-        ...stats.value,
-        currentTitle: stream.title,
-        currentGame:  await getGameNameFromId(Number(stream.game_id)),
-      };
+      stats.value.currentTitle = stream.title;
+      stats.value.currentGame = await getGameNameFromId(Number(stream.game_id));
 
       setCurrentRetries(0);
 
       /* TODO: does we really need all of below it there? */
-      stats.value = {
-        ...stats.value,
-        currentViewers: stream.viewer_count,
-      };
+      stats.value.currentViewers = stream.viewer_count;
 
       if (stats.value.maxViewers < stream.viewer_count) {
-        stats.value = {
-          ...stats.value,
-          maxViewers: stream.viewer_count,
-        };
+        stats.value.maxViewers = stream.viewer_count;
       }
 
       coreStats.save({

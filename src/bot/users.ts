@@ -2,7 +2,7 @@ import { setTimeout } from 'timers';
 
 import axios from 'axios';
 import {
-  Brackets, FindOneOptions, getConnection, getRepository, IsNull, 
+  Brackets, FindOneOptions, getConnection, getRepository, IsNull,
 } from 'typeorm';
 
 import Core from './_interface';
@@ -11,13 +11,13 @@ import { HOUR } from './constants';
 import currency from './currency';
 import { Permissions } from './database/entity/permissions';
 import {
-  User, UserBit, UserInterface, UserTip, 
+  User, UserBit, UserInterface, UserTip,
 } from './database/entity/user';
 import { onStartup } from './decorators/on';
 import { isStreamOnline, stats } from './helpers/api';
 import { mainCurrency } from './helpers/currency';
 import {
-  debug, error, isDebugEnabled, 
+  debug, error, isDebugEnabled,
 } from './helpers/log';
 import { channelId } from './helpers/oauth';
 import { recacheOnlineUsersPermission } from './helpers/permissions';
@@ -30,7 +30,7 @@ class Users extends Core {
   constructor () {
     super();
     this.addMenu({
-      category: 'manage', name: 'viewers', id: 'manage/viewers/list', this: null, 
+      category: 'manage', name: 'viewers', id: 'manage/viewers/list', this: null,
     });
   }
 
@@ -115,10 +115,7 @@ class Users extends Core {
         // get new users
         const newChatters = await getRepository(User).find({ isOnline: true, watchedTime: 0 });
         debug('tmi.watched', `Adding ${newChatters.length} users as new chatters.`);
-        stats.value = {
-          ...stats.value,
-          newChatters: stats.value.newChatters + newChatters.length,
-        };
+        stats.value.newChatters = stats.value.newChatters + newChatters.length;
 
         if (isStreamOnline.value) {
           debug('tmi.watched', `Incrementing watchedTime by ${interval}`);
@@ -134,15 +131,9 @@ class Users extends Core {
                 debug('tmi.watched', `User ${user.username}#${user.userId} added watched time ${interval}`);
               }
             }
-            stats.value = {
-              ...stats.value,
-              currentWatchedTime: stats.value.currentWatchedTime + users.length * interval,
-            };
+            stats.value.currentWatchedTime = stats.value.currentWatchedTime + users.length * interval;
           } else {
-            stats.value = {
-              ...stats.value,
-              currentWatchedTime: stats.value.currentWatchedTime + incrementedUsers.affected * interval,
-            };
+            stats.value.currentWatchedTime = stats.value.currentWatchedTime + incrementedUsers.affected * interval;
           }
 
           recacheOnlineUsersPermission();
@@ -467,7 +458,7 @@ class Users extends Core {
           const permId = await getUserHighestPermission(userId);
           const permissionGroup = (await getRepository(Permissions).findOneOrFail({ where: { id: permId || defaultPermissions.VIEWERS } }));
           cb(null, {
-            ...viewer, aggregatedBits, aggregatedTips, permission: permissionGroup, 
+            ...viewer, aggregatedBits, aggregatedTips, permission: permissionGroup,
           });
         } else {
           cb(null);

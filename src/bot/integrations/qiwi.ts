@@ -86,10 +86,7 @@ class Qiwi extends Integration {
       }
 
       if (isStreamOnline.value) {
-        stats.value = {
-          ...stats.value,
-          currentTips: stats.value.currentTips + currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value),
-        };
+        stats.value.currentTips = stats.value.currentTips + currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value);
       }
 
       eventlist.add({
