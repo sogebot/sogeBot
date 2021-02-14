@@ -521,10 +521,7 @@ class API extends Core {
       if (oauth.broadcasterType === '') {
         if (!opts.noAffiliateOrPartnerWarningSent) {
           warning('Broadcaster is not affiliate/partner, will not check subs');
-          apiStats.value = {
-            ...apiStats.value,
-            currentSubscribers: 0,
-          };
+          apiStats.value.currentSubscribers = 0;
         }
         return { state: false, opts: { ...opts, noAffiliateOrPartnerWarningSent: true } };
       } else {
@@ -561,10 +558,7 @@ class API extends Core {
           ...opts, cursor: request.data.pagination.cursor, subscribers: opts.subscribers,
         });
       } else {
-        apiStats.value = {
-          ...apiStats.value,
-          currentSubscribers: opts.subscribers.length - 1, // exclude owner
-        };
+        apiStats.value.currentSubscribers = opts.subscribers.length - 1; // exclude owner
         this.setSubscribers(opts.subscribers.filter(o => !isBotId(o.user_id)));
         if (opts.subscribers.find(o => isBotId(o.user_id))) {
           isBotSubscriber(true);
@@ -582,10 +576,7 @@ class API extends Core {
           opts.notCorrectOauthWarningSent = true;
           warning('Broadcaster have not correct oauth, will not check subs');
         }
-        apiStats.value = {
-          ...apiStats.value,
-          currentSubscribers: 0,
-        };
+        apiStats.value.currentSubscribers = 0;
       } else {
         error(`${url} - ${e.stack}`);
 
@@ -695,12 +686,10 @@ class API extends Core {
           retries.getChannelInformation = 0;
         }
 
-        apiStats.value = {
-          ...apiStats.value,
-          language:     request.data.data[0].broadcaster_language,
-          currentGame:  request.data.data[0].game_name,
-          currentTitle: request.data.data[0].title,
-        };
+        apiStats.value.language = request.data.data[0].broadcaster_language;
+        apiStats.value.currentGame = request.data.data[0].game_name;
+        apiStats.value.currentTitle = request.data.data[0].title;
+
         gameCache.value = request.data.data[0].game_name;
         rawStatus.value = _rawStatus;
       } else {
@@ -732,10 +721,7 @@ class API extends Core {
       ioServer?.emit('api.stats', {
         method: 'GET', data: request.data, timestamp: Date.now(), call: 'getChannelHosts', api: 'other', endpoint: url, code: request.status, remaining: calls.bot,
       });
-      apiStats.value = {
-        ...apiStats.value,
-        currentHosts: request.data.hosts.length,
-      };
+      apiStats.value.currentHosts = request.data.hosts.length;
     } catch (e) {
       error(`${url} - ${e.message}`);
       ioServer?.emit('api.stats', {
@@ -792,10 +778,7 @@ class API extends Core {
           debug('api.followers', 'No new followers found.');
         }
       }
-      apiStats.value = {
-        ...apiStats.value,
-        currentFollowers: request.data.total,
-      };
+      apiStats.value.currentFollowers = request.data.total;
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
         emptyRateLimit('bot', e.response.headers);
@@ -986,15 +969,13 @@ class API extends Core {
             );
 
             // reset quick stats on stream start
-            apiStats.value = {
-              ...apiStats.value,
-              currentWatchedTime: 0,
-              maxViewers:         0,
-              newChatters:        0,
-              currentViewers:     0,
-              currentBits:        0,
-              currentTips:        0,
-            };
+            apiStats.value.currentWatchedTime = 0;
+            apiStats.value.maxViewers = 0;
+            apiStats.value.newChatters = 0;
+            apiStats.value.currentViewers = 0;
+            apiStats.value.currentBits = 0;
+            apiStats.value.currentTips = 0;
+
             streamStatusChangeSince.value = new Date(stream.started_at).getTime();
             streamId.value = stream.id;
             streamType.value = stream.type;
@@ -1034,11 +1015,8 @@ class API extends Core {
           const status = await parseTitle(null);
           const game = await getGameNameFromId(Number(stream.game_id));
 
-          apiStats.value = {
-            ...apiStats.value,
-            currentTitle: stream.title,
-            currentGame:  game,
-          };
+          apiStats.value.currentTitle = stream.title;
+          apiStats.value.currentGame = game;
 
           if (stream.title !== status) {
             // check if status is same as updated status
@@ -1102,16 +1080,10 @@ class API extends Core {
   }
 
   saveStreamData (stream: StreamEndpoint['data'][number]) {
-    apiStats.value = {
-      ...apiStats.value,
-      currentViewers: stream.viewer_count,
-    };
+    apiStats.value.currentViewers = stream.viewer_count;
 
     if (apiStats.value.maxViewers < stream.viewer_count) {
-      apiStats.value = {
-        ...apiStats.value,
-        maxViewers: stream.viewer_count,
-      };
+      apiStats.value.maxViewers = stream.viewer_count;
     }
 
     stats.save({

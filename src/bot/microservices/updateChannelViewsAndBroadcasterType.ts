@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import {
-  calls, emptyRateLimit, getClientId, getToken, setRateLimit, stats, 
+  calls, emptyRateLimit, getClientId, getToken, setRateLimit, stats,
 } from '../helpers/api';
 import { apiEmitter } from '../helpers/api/emitter';
 import { error } from '../helpers/log';
@@ -32,16 +32,13 @@ async function updateChannelViewsAndBroadcasterType () {
     setRateLimit('bot', request.headers);
 
     ioServer?.emit('api.stats', {
-      method: 'GET', data: request.data, timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot, 
+      method: 'GET', data: request.data, timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
     });
 
     if (request.data.data.length > 0) {
       oauth.profileImageUrl = request.data.data[0].profile_image_url;
       oauth.broadcasterType = request.data.data[0].broadcaster_type;
-      stats.value = {
-        ...stats.value,
-        currentViews: request.data.data[0].view_count,
-      };
+      stats.value.currentViews = request.data.data[0].view_count;
     }
   } catch (e) {
     if (typeof e.response !== 'undefined' && e.response.status === 429) {
@@ -50,7 +47,7 @@ async function updateChannelViewsAndBroadcasterType () {
 
     error(`${url} - ${e.message}`);
     ioServer?.emit('api.stats', {
-      method: 'GET', timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot, 
+      method: 'GET', timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot,
     });
   }
   return { state: true };

@@ -778,10 +778,7 @@ class TMI extends Core {
       });
 
       if (isStreamOnline.value) {
-        stats.value = {
-          ...stats.value,
-          currentBits: stats.value.currentBits + parseInt(userstate.bits, 10),
-        };
+        stats.value.currentBits = stats.value.currentBits + parseInt(userstate.bits, 10);
       }
 
       triggerInterfaceOnBit({
