@@ -1,6 +1,7 @@
 import { persistent } from '../core/persistent';
 import { csEmitter } from '../customvariables/emitter';
 
+const old = new Map<string, any>();
 const stats = persistent({
   value: {
     language:           'en',
@@ -33,7 +34,7 @@ const stats = persistent({
   },
   name:      'stats',
   namespace: '/core/api',
-  onChange:  (cur, old) => {
+  onChange:  (cur) => {
     const mapper = new Map<string, string>([
       ['currentGame', 'game'],
       ['language', 'language'],
@@ -48,9 +49,10 @@ const stats = persistent({
     Object.keys(cur).forEach((key) => {
       const variable = mapper.get(key);
       if (variable) {
-        if ((cur as any)[key] !== (old as any)[key]) {
+        if ((cur as any)[key] !== old.get(key)) {
           csEmitter.emit('variable-changed', variable);
         }
+        old.set(key, (cur as any)[key]);
       }
     });
   },

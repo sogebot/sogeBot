@@ -51,7 +51,7 @@ describe('Persistent string', () => {
 
   describe('On change should be triggered', () => {
     it('check on change value', () => {
-      assert(onChangeTriggered > 0);
+      assert.strictEqual(onChangeTriggered, 1);
     });
   });
 });

@@ -22,7 +22,7 @@ describe('Persistent number', () => {
       value:     0,
       name:      'number',
       namespace: '/test',
-      onChange:  () => {
+      onChange:  (val) => {
         onChangeTriggered++;
       },
     });
@@ -36,7 +36,6 @@ describe('Persistent number', () => {
         }
       })();
     });
-    stats.value = 0;
   });
 
   describe('Number++', () => {
@@ -74,7 +73,7 @@ describe('Persistent number', () => {
 
   describe('On change should be triggered', () => {
     it('check on change value', () => {
-      assert(onChangeTriggered > 0);
+      assert.strictEqual(onChangeTriggered, 3);
     });
   });
 });

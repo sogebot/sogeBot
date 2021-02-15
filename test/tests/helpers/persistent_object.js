@@ -155,7 +155,7 @@ describe('Persistent object', () => {
 
   describe('On change should be triggered', () => {
     it('check on change value', () => {
-      assert(onChangeTriggered > 0);
+      assert.strictEqual(onChangeTriggered, 6);
     });
   });
 });

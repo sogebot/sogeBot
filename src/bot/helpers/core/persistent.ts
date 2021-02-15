@@ -1,4 +1,3 @@
-import { cloneDeep, set } from 'lodash';
 import DeepProxy from 'proxy-deep';
 import { getManager, getRepository } from 'typeorm';
 
@@ -7,7 +6,7 @@ import { IsLoadingInProgress, toggleLoadingInProgress } from '../../decorators';
 import { isDbConnected } from '../database';
 import { debug } from '../log';
 
-function persistent<T>({ value, name, namespace, onChange }: { value: T, name: string, namespace: string, onChange?: (cur: T, old: T) => void }) {
+function persistent<T>({ value, name, namespace, onChange }: { value: T, name: string, namespace: string, onChange?: (cur: T) => void }) {
   const sym = Symbol(name);
 
   const proxy = new DeepProxy({ __loaded__: false, value }, {
@@ -23,9 +22,6 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
       }
 
       try {
-        debug('persistent.get', JSON.stringify({
-          name, namespace, target: JSON.stringify((target as any)[prop]),
-        }, null, 2));
         const val = Reflect.get(target, prop, receiver);
         if (typeof val === 'object' && val !== null) {
           return this.nest(val);
@@ -38,38 +34,26 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
       }
     },
     set(target, prop, receiver) {
-      debug('persistent.set', JSON.stringify({
-        name, namespace, target: JSON.stringify((target as any)[prop]),
-      }, null, 2));
       if (IsLoadingInProgress(sym) || prop === '__loaded__') {
         return Reflect.set(target, prop, receiver);
       }
-
-      const oldObject = proxy.value;
-      let newObject;
-      if (typeof proxy.value === 'string' || typeof proxy.value === 'number' || proxy.value === null) {
-        newObject = receiver;
-      } else if (this.path.length === 0) {
-        newObject = cloneDeep({ ...proxy.value, ...receiver });
-      } else {
-        // remove first key (which is value)
-        const [, ...path] = [...this.path, prop];
-        newObject = set<T>(cloneDeep(proxy.value as any), path.join('.'), receiver);
-      }
-      if (onChange) {
-        onChange(newObject, oldObject);
-      }
-      debug('persistent.set', `Updating ${namespace}/${name}`);
-      debug('persistent.set', newObject);
-      getRepository(Settings).update({ namespace, name }, { value: JSON.stringify(newObject) }).then(() => {
-        debug('persistent.set', `Update done on ${namespace}/${name}`);
-      });
-
+      setImmediate(() => save());
       return Reflect.set(target, prop, receiver);
     },
   });
 
   toggleLoadingInProgress(sym);
+
+  async function save() {
+    if (onChange) {
+      onChange(proxy.value);
+    }
+    debug('persistent.set', `Updating ${namespace}/${name}`);
+    debug('persistent.set', proxy.value);
+    getRepository(Settings).update({ namespace, name }, { value: JSON.stringify(proxy.value) }).then(() => {
+      debug('persistent.set', `Update done on ${namespace}/${name}`);
+    });
+  }
 
   async function load() {
     if (!isDbConnected) {
