@@ -19,10 +19,14 @@
     "experimentalDecorators": true,
     "declaration": false,
     "noResolve": false,
-    "baseUrl": "src/bot",
+    "baseUrl": "./",
     "outDir": "../../dest",
     "inlineSourceMap": true,
-    "typeRoots": ["./node_modules/@types"]
+    "typeRoots": ["./node_modules/@types"],
+    "paths": {
+      "@helpers/*": ["./helpers/*"],
+      "@decorators/*": ["./decorators/*"]
+    }
   },
   "include": [
     "./",

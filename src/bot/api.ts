@@ -17,7 +17,7 @@ import {
   TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName,
 } from './database/entity/twitch';
 import { User, UserInterface } from './database/entity/user';
-import { getFunctionList, onStartup } from './decorators/on';
+import { onStartup } from './decorators/on';
 import {
   stats as apiStats, calls, chatMessagesAtStart, currentStreamTags, emptyRateLimit, gameCache, gameOrTitleChangedManually, isStreamOnline, rawStatus, setRateLimit, streamStatusChangeSince,
 } from './helpers/api';
@@ -27,13 +27,14 @@ import {
 } from './helpers/api/retries';
 import { streamId } from './helpers/api/streamId';
 import { streamType } from './helpers/api/streamType';
+import * as stream from './helpers/core/stream';
 import { isDbConnected } from './helpers/database';
 import { dayjs } from './helpers/dayjs';
 import { eventEmitter } from './helpers/events';
 import { getBroadcaster } from './helpers/getBroadcaster';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import {
-  debug, error, follow, info, start, stop, unfollow, warning,
+  debug, error, follow, info, unfollow, warning,
 } from './helpers/log';
 import { channelId, loadedTokens } from './helpers/oauth';
 import { botId } from './helpers/oauth/botId';
@@ -42,7 +43,6 @@ import { ioServer } from './helpers/panel';
 import { addUIError } from './helpers/panel/';
 import { linesParsed, setStatus } from './helpers/parser';
 import { logAvgTime } from './helpers/profiler';
-import { find } from './helpers/register';
 import { setImmediateAwait } from './helpers/setImmediateAwait';
 import { SQLVariableLimit } from './helpers/sql';
 import {
@@ -954,53 +954,25 @@ class API extends Core {
 
       if (request.status === 200 && request.data.data[0]) {
         // correct status and we've got a data - stream online
-        const stream = request.data.data[0];
+        const streamData = request.data.data[0];
 
-        if (dayjs(stream.started_at).valueOf() >=  dayjs(streamStatusChangeSince.value).valueOf()) {
-          streamStatusChangeSince.value = (new Date(stream.started_at)).getTime();
+        if (dayjs(streamData.started_at).valueOf() >=  dayjs(streamStatusChangeSince.value).valueOf()) {
+          streamStatusChangeSince.value = (new Date(streamData.started_at)).getTime();
         }
-        if (!isStreamOnline.value || streamType.value !== stream.type) {
+        if (!isStreamOnline.value || streamType.value !== streamData.type) {
           chatMessagesAtStart.value = linesParsed;
 
-          if (!webhooks.enabled.streams && Number(streamId.value) !== Number(stream.id)) {
-            debug('api.stream', 'API: ' + JSON.stringify(stream));
-            start(
-              `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await getGameNameFromId(Number(stream.game_id))} | type: ${stream.type} | channel ID: ${cid}`,
-            );
+          if (!webhooks.enabled.streams && Number(streamId.value) !== Number(streamData.id)) {
+            debug('api.stream', 'API: ' + JSON.stringify(streamData));
 
-            // reset quick stats on stream start
-            apiStats.value.currentWatchedTime = 0;
-            apiStats.value.maxViewers = 0;
-            apiStats.value.newChatters = 0;
-            apiStats.value.currentViewers = 0;
-            apiStats.value.currentBits = 0;
-            apiStats.value.currentTips = 0;
-
-            streamStatusChangeSince.value = new Date(stream.started_at).getTime();
-            streamId.value = stream.id;
-            streamType.value = stream.type;
-
-            eventEmitter.emit('stream-started');
-            eventEmitter.emit('command-send-x-times', { reset: true });
-            eventEmitter.emit('keyword-send-x-times', { reset: true });
-            eventEmitter.emit('every-x-minutes-of-stream', { reset: true });
+            stream.end();
+            stream.start(streamData);
             justStarted = true;
-
-            for (const event of getFunctionList('streamStart')) {
-              const type = !event.path.includes('.') ? 'core' : event.path.split('.')[0];
-              const module = !event.path.includes('.') ? event.path.split('.')[0] : event.path.split('.')[1];
-              const self = find(type, module);
-              if (self) {
-                (self as any)[event.fName]();
-              } else {
-                error(`streamStart: ${event.path} not found`);
-              }
-            }
           }
         }
 
         setCurrentRetries(0);
-        this.saveStreamData(stream);
+        this.saveStreamData(streamData);
         isStreamOnline.value = true;
 
         if (!justStarted) {
@@ -1013,16 +985,16 @@ class API extends Core {
         if (!gameOrTitleChangedManually.value) {
           let _rawStatus = rawStatus.value;
           const status = await parseTitle(null);
-          const game = await getGameNameFromId(Number(stream.game_id));
+          const game = await getGameNameFromId(Number(streamData.game_id));
 
-          apiStats.value.currentTitle = stream.title;
+          apiStats.value.currentTitle = streamData.title;
           apiStats.value.currentGame = game;
 
-          if (stream.title !== status) {
+          if (streamData.title !== status) {
             // check if status is same as updated status
             if (retries.getCurrentStreamData >= 12) {
               retries.getCurrentStreamData = 0;
-              _rawStatus = stream.title;
+              _rawStatus = streamData.title;
               rawStatus.value = _rawStatus;
             } else {
               retries.getCurrentStreamData++;
@@ -1039,30 +1011,7 @@ class API extends Core {
           // retry if it is not just some network / twitch issue
           setCurrentRetries(curRetries + 1);
         } else {
-          // stream is really offline
-          if (isStreamOnline.value) {
-            // online -> offline transition
-            stop('');
-            streamStatusChangeSince.value = Date.now();
-            isStreamOnline.value = false;
-            setCurrentRetries(0);
-            eventEmitter.emit('stream-stopped');
-            eventEmitter.emit('stream-is-running-x-minutes', { reset: true });
-            eventEmitter.emit('number-of-viewers-is-at-least-x', { reset: true });
-
-            for (const event of getFunctionList('streamEnd')) {
-              const type = !event.path.includes('.') ? 'core' : event.path.split('.')[0];
-              const module = !event.path.includes('.') ? event.path.split('.')[0] : event.path.split('.')[1];
-              const self = find(type, module);
-              if (self) {
-                (self as any)[event.fName]();
-              } else {
-                error(`streamEnd: ${event.path} not found`);
-              }
-            }
-
-            streamId.value = null;
-          }
+          stream.end();
         }
       }
     } catch (e) {
@@ -1079,11 +1028,11 @@ class API extends Core {
     return { state: true, opts };
   }
 
-  saveStreamData (stream: StreamEndpoint['data'][number]) {
-    apiStats.value.currentViewers = stream.viewer_count;
+  saveStreamData (streamData: StreamEndpoint['data'][number]) {
+    apiStats.value.currentViewers = streamData.viewer_count;
 
-    if (apiStats.value.maxViewers < stream.viewer_count) {
-      apiStats.value.maxViewers = stream.viewer_count;
+    if (apiStats.value.maxViewers < streamData.viewer_count) {
+      apiStats.value.maxViewers = streamData.viewer_count;
     }
 
     stats.save({

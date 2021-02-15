@@ -6,19 +6,18 @@ import { getRepository } from 'typeorm';
 
 import type { StreamEndpoint } from './api';
 import { User } from './database/entity/user';
-import { getFunctionList } from './decorators/on';
 import {
   chatMessagesAtStart, curRetries, isStreamOnline, stats, streamId, streamStatusChangeSince, streamType,
 } from './helpers/api';
 import { setCurrentRetries } from './helpers/api/';
+import * as stream from './helpers/core/stream';
 import { eventEmitter } from './helpers/events';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import {
-  debug, error, follow, info, start,
+  debug, error, follow, info,
 } from './helpers/log';
 import { channelId } from './helpers/oauth';
 import { linesParsed } from './helpers/parser';
-import { find } from './helpers/register';
 import { domain } from './helpers/ui';
 import { isBot } from './helpers/user/isBot';
 import { getGameNameFromId } from './microservices/getGameNameFromId';
@@ -310,60 +309,32 @@ class Webhooks {
 
     // stream is online
     if (aEvent.data.length > 0) {
-      const stream = aEvent.data[0];
+      const streamEvent = aEvent.data[0];
 
-      if (parseInt(stream.user_id, 10) !== parseInt(cid, 10)) {
+      if (parseInt(streamEvent.user_id, 10) !== parseInt(cid, 10)) {
         return;
       }
 
-      if (Number(streamId.value) !== Number(stream.id)) {
+      if (Number(streamId.value) !== Number(streamEvent.id)) {
         debug('webhooks.stream', 'WEBHOOKS: ' + JSON.stringify(aEvent));
-        start(
-          `id: ${stream.id} | webhooks | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await getGameNameFromId(Number(stream.game_id))} | type: ${stream.type} | channel ID: ${cid}`,
-        );
-
-        // reset quick stats on stream start
-        stats.value.currentWatchedTime = 0;
-        stats.value.maxViewers = 0;
-        stats.value.newChatters = 0;
-        stats.value.currentViewers = 0;
-        stats.value.currentBits = 0;
-        stats.value.currentTips = 0;
-
-        isStreamOnline.value = true;
-        chatMessagesAtStart.value = linesParsed;
-
-        eventEmitter.emit('stream-started');
-        eventEmitter.emit('command-send-x-times', { reset: true });
-        eventEmitter.emit('keyword-send-x-times', { reset: true });
-        eventEmitter.emit('every-x-minutes-of-stream', { reset: true });
-
-        for (const event of getFunctionList('streamStart')) {
-          const type = !event.path.includes('.') ? 'core' : event.path.split('.')[0];
-          const module = !event.path.includes('.') ? event.path.split('.')[0] : event.path.split('.')[1];
-          const self = find(type, module);
-          if (self) {
-            (self as any)[event.fName]();
-          } else {
-            error(`streamStart: ${event.path} not found`);
-          }
-        }
+        stream.end();
+        stream.start(streamEvent);
       }
 
       // Always keep this updated
-      streamStatusChangeSince.value = (new Date(stream.started_at)).getTime();
-      streamId.value = stream.id;
-      streamType.value = stream.type;
-      stats.value.currentTitle = stream.title;
-      stats.value.currentGame = await getGameNameFromId(Number(stream.game_id));
+      streamStatusChangeSince.value = (new Date(streamEvent.started_at)).getTime();
+      streamId.value = streamEvent.id;
+      streamType.value = streamEvent.type;
+      stats.value.currentTitle = streamEvent.title;
+      stats.value.currentGame = await getGameNameFromId(Number(streamEvent.game_id));
 
       setCurrentRetries(0);
 
       /* TODO: does we really need all of below it there? */
-      stats.value.currentViewers = stream.viewer_count;
+      stats.value.currentViewers = streamEvent.viewer_count;
 
-      if (stats.value.maxViewers < stream.viewer_count) {
-        stats.value.maxViewers = stream.viewer_count;
+      if (stats.value.maxViewers < streamEvent.viewer_count) {
+        stats.value.maxViewers = streamEvent.viewer_count;
       }
 
       coreStats.save({

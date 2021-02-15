@@ -60,6 +60,10 @@ else
 	@echo -ne "\n\t ----- Building bot\n"
 	@npx tsc -p src/bot --removeComments false
 endif
+	@echo -ne "\n\t ----- Replacing @helpers and @decorators\n"
+	find ./dest \( -type d -name .git -prune \) -o -type f -print0 | xargs -0 sed -i 's/\@helpers/\/dest\/helpers/g'
+	find ./dest \( -type d -name .git -prune \) -o -type f -print0 | xargs -0 sed -i 's/\@decorators/\/dest\/decorators/g'
+
 
 pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"
