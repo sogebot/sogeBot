@@ -24,8 +24,9 @@
     "inlineSourceMap": true,
     "typeRoots": ["./node_modules/@types"],
     "paths": {
-      "@helpers/*": ["./helpers/*"],
-      "@decorators/*": ["./decorators/*"]
+      "$helpers/*": ["./helpers/*"],
+      "$decorators/*": ["./decorators/*"],
+      "$bot/*": ["./*"]
     }
   },
   "include": [

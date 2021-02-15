@@ -1,19 +1,19 @@
-import { getFunctionList } from '@decorators/on';
-import { streamType } from '@helpers/api';
-import { isStreamOnline } from '@helpers/api/isStreamOnline';
-import { setCurrentRetries } from '@helpers/api/retries';
-import { stats } from '@helpers/api/stats';
-import { streamId } from '@helpers/api/streamId';
-import { streamStatusChangeSince } from '@helpers/api/streamStatusChangeSince';
-import { eventEmitter } from '@helpers/events/emitter';
+import type { StreamEndpoint } from '../../api';
+
+import { getGameNameFromId } from '$bot/microservices/getGameNameFromId';
+import { getFunctionList } from '$decorators/on';
+import { streamType } from '$helpers/api';
+import { isStreamOnline } from '$helpers/api/isStreamOnline';
+import { setCurrentRetries } from '$helpers/api/retries';
+import { stats } from '$helpers/api/stats';
+import { streamId } from '$helpers/api/streamId';
+import { streamStatusChangeSince } from '$helpers/api/streamStatusChangeSince';
+import { eventEmitter } from '$helpers/events/emitter';
 import {
   error, start as startLog, stop,
-} from '@helpers/log';
-import { channelId } from '@helpers/oauth';
-import { find } from '@helpers/register';
-import { getGameNameFromId } from 'microservices/getGameNameFromId';
-
-import type { StreamEndpoint } from '../../api';
+} from '$helpers/log';
+import { channelId } from '$helpers/oauth';
+import { find } from '$helpers/register';
 
 async function start(data: StreamEndpoint['data'][number], webhooks = false) {
   startLog(
