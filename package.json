@@ -249,8 +249,5 @@
   },
   "browser": {
     "vue": "vue/dist/vue.common.js"
-  },
-  "_moduleAliases": {
-    "@root": "."
   }
 }

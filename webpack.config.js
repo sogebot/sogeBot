@@ -52,7 +52,7 @@ const webpackConfig = {
       'vue$': 'vue/dist/vue.esm.js',
       src: path.resolve(__dirname, 'src'),
       'vm': 'vm-browserify',
-      'util': 'util',
+      'util': 'util'
     }
   },
   output: {
