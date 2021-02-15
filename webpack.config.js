@@ -51,9 +51,6 @@ const webpackConfig = {
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
       src: path.resolve(__dirname, 'src'),
-      '$bot': path.resolve(__dirname, 'src', 'bot'),
-      '$helpers': path.resolve(__dirname, 'src', 'bot', 'helpers'),
-      '$decorators': path.resolve(__dirname, 'src', 'bot', 'decorators'),
       'vm': 'vm-browserify',
       'util': 'util'
     }

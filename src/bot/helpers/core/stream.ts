@@ -1,19 +1,18 @@
 import type { StreamEndpoint } from '../../api';
-
-import { getGameNameFromId } from '$bot/microservices/getGameNameFromId';
-import { getFunctionList } from '$decorators/on';
-import { streamType } from '$helpers/api';
-import { isStreamOnline } from '$helpers/api/isStreamOnline';
-import { setCurrentRetries } from '$helpers/api/retries';
-import { stats } from '$helpers/api/stats';
-import { streamId } from '$helpers/api/streamId';
-import { streamStatusChangeSince } from '$helpers/api/streamStatusChangeSince';
-import { eventEmitter } from '$helpers/events/emitter';
+import { getFunctionList } from '../../decorators/on';
+import { getGameNameFromId } from '../../microservices/getGameNameFromId';
+import { streamType } from '../api';
+import { isStreamOnline } from '../api/isStreamOnline';
+import { setCurrentRetries } from '../api/retries';
+import { stats } from '../api/stats';
+import { streamId } from '../api/streamId';
+import { streamStatusChangeSince } from '../api/streamStatusChangeSince';
+import { eventEmitter } from '../events/emitter';
 import {
   error, start as startLog, stop,
-} from '$helpers/log';
-import { channelId } from '$helpers/oauth';
-import { find } from '$helpers/register';
+} from '../log';
+import { channelId } from '../oauth';
+import { find } from '../register';
 
 async function start(data: StreamEndpoint['data'][number], webhooks = false) {
   startLog(
