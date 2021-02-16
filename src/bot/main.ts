@@ -1,16 +1,5 @@
 require('dotenv').config();
 
-// eslint-disable-next-line import/order
-import tsConfig from './tsconfig.json';
-// eslint-disable-next-line import/order
-import { register } from 'tsconfig-paths';
-
-const baseUrl = './'; // Either absolute or relative path. If relative it's resolved to current working directory.
-register({
-  baseUrl,
-  paths: tsConfig.compilerOptions.paths,
-});
-
 Error.stackTraceLimit = Infinity;
 
 import 'reflect-metadata';
