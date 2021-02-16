@@ -158,14 +158,17 @@ class Expects {
       this.checkText();
     }
 
-    const regexp = XRegExp('(?<command> ^!\\S* )', 'ix');
+    const exclamationMark = opts.canBeWithoutExclamationMark ? '!?' : '!';
+    const subCommandRegexp = `(^['"]${exclamationMark}[\\pL0-9 ]*['"])`;
+    const commandRegexp = `(^${exclamationMark}[\\pL0-9]*)`;
+    const regexp = XRegExp(
+      `(?<command> ${[subCommandRegexp, commandRegexp].join('|')})` , 'ix');
     const match = XRegExp.exec(this.text, regexp);
-
     debug('expects.command', JSON.stringify({
       text: this.text, opts, match,
     }));
     if (match && match.groups) {
-      this.match.push(match.groups.command.trim().toLowerCase());
+      this.match.push(match.groups.command.trim().toLowerCase().replace(/[\'\"]/g, ''));
       this.text = this.text.replace(match.groups.command, ''); // remove from text matched pattern
     } else {
       if (!opts.optional) {
@@ -518,7 +521,7 @@ class Expects {
     return this;
   }
 
-  oneOf ({ optional = false, values, exec = false }: { exec?: boolean, optional?: boolean, values: string[] | Readonly<string[]> }) {
+  oneOf ({ optional = false, values, exec = false, name }: { exec?: boolean, name?: string, optional?: boolean, values: string[] | Readonly<string[]> }) {
     if (!optional) {
       this.checkText({
         expects: 'oneOf',
@@ -527,7 +530,11 @@ class Expects {
       });
     }
     if (!exec) {
-      this.toExec.push({ fnc: 'oneOf', opts: { optional, values } });
+      this.toExec.push({
+        fnc:  'oneOf', opts: {
+          optional, values, name, 
+        }, 
+      });
       return this;
     }
 

@@ -15,7 +15,8 @@ import {
 import { onChange } from '../decorators/on';
 import Expects from '../expects';
 import { prepare } from '../helpers/commons';
-import { debug } from '../helpers/log';
+import { debug, error } from '../helpers/log';
+import { ParameterError } from '../helpers/parameterError';
 import { getUserHighestPermission } from '../helpers/permissions/';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
@@ -106,7 +107,7 @@ class Cooldown extends System {
     });
   }
 
-  help (opts: CommandOptions): CommandResponse[] {
+  async help (opts: CommandOptions): Promise<CommandResponse[]> {
     let url = 'http://sogehige.github.io/sogeBot/#/systems/cooldown';
     if ((process.env?.npm_package_version ?? 'x.y.z-SNAPSHOT').includes('SNAPSHOT')) {
       url = 'http://sogehige.github.io/sogeBot/#/_master/systems/cooldown';
@@ -116,38 +117,49 @@ class Cooldown extends System {
 
   @command('!cooldown')
   @default_permission(defaultPermissions.CASTERS)
-  async main (opts: CommandOptions) {
-    const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP_SET);
+  async main (opts: CommandOptions): Promise<CommandResponse[]> {
+    try {
+      const [name, type, seconds, quiet] = new Expects(opts.parameters)
+        .command({ canBeWithoutExclamationMark: true })
+        .oneOf({ values: ['global', 'user'], name: 'type' })
+        .number()
+        .oneOf({ values: ['true'], optional: true })
+        .toArray();
 
-    if (!match || !match.groups) {
-      return this.help(opts);
+      const cooldown = await getRepository(CooldownEntity).findOne({
+        where: {
+          name,
+          type,
+        },
+      });
+
+      await getRepository(CooldownEntity).save({
+        ...cooldown,
+        name,
+        miliseconds:          parseInt(seconds, 10) * 1000,
+        type,
+        timestamp:            0,
+        isErrorMsgQuiet:      quiet !== null,
+        isEnabled:            true,
+        isOwnerAffected:      false,
+        isModeratorAffected:  false,
+        isSubscriberAffected: true,
+        isFollowerAffected:   true,
+      });
+      return [{
+        response: prepare('cooldowns.cooldown-was-set', {
+          seconds, type, command: name,
+        }), ...opts,
+      }];
+    } catch (e) {
+      error(`${opts.command} ${opts.parameters} [${opts.sender.username}#${opts.sender.userId}]`);
+      error(e.stack);
+      if (e instanceof ParameterError) {
+        return this.help(opts);
+      } else {
+        return [];
+      }
     }
-
-    const cooldown = await getRepository(CooldownEntity).findOne({
-      where: {
-        name: match.groups.command,
-        type: match.groups.type as 'global' | 'user',
-      },
-    });
-
-    await getRepository(CooldownEntity).save({
-      ...cooldown,
-      name:                 match.groups.command,
-      miliseconds:          parseInt(match.groups.seconds, 10) * 1000,
-      type:                 (match.groups.type as 'global' | 'user'),
-      timestamp:            0,
-      isErrorMsgQuiet:      _.isNil(match.quiet) ? false : !!match.quiet,
-      isEnabled:            true,
-      isOwnerAffected:      false,
-      isModeratorAffected:  false,
-      isSubscriberAffected: true,
-      isFollowerAffected:   true,
-    });
-    return [{
-      response: prepare('cooldowns.cooldown-was-set', {
-        seconds: match.groups.seconds, type: match.groups.type, command: match.groups.command,
-      }), ...opts,
-    }];
   }
 
   @command('!cooldown unset')
@@ -391,56 +403,66 @@ class Cooldown extends System {
     return true;
   }
 
-  async toggle (opts: CommandOptions, type: 'isEnabled' | 'isModeratorAffected' | 'isOwnerAffected' | 'isSubscriberAffected' | 'isFollowerAffected' | 'isErrorMsgQuiet' | 'type') {
-    const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP);
+  async toggle (opts: CommandOptions, type: 'isEnabled' | 'isModeratorAffected' | 'isOwnerAffected' | 'isSubscriberAffected' | 'isFollowerAffected' | 'isErrorMsgQuiet' | 'type'): Promise<CommandResponse[]> {
+    try {
+      const [name, typeParameter] = new Expects(opts.parameters)
+        .command({ canBeWithoutExclamationMark: true })
+        .oneOf({ values: ['global', 'user'], name: 'type' })
+        .toArray();
 
-    if (!match || !match.groups) {
-      return this.help(opts);
-    }
-
-    const cooldown = await getRepository(CooldownEntity).findOne({
-      relations: ['viewers'],
-      where:     {
-        name: match.groups.command,
-        type: match.groups.type as 'global' | 'user',
-      },
-    });
-    if (!cooldown) {
-      return [{ response: prepare('cooldowns.cooldown-not-found', { command: match.groups.command }), ...opts }];
-    }
-
-    if (type === 'type') {
-      await getRepository(CooldownEntity).save({
-        ...cooldown,
-        [type]: cooldown[type] === 'global' ? 'user' : 'global',
+      const cooldown = await getRepository(CooldownEntity).findOne({
+        relations: ['viewers'],
+        where:     {
+          name,
+          type: typeParameter,
+        },
       });
-    } else {
-      await getRepository(CooldownEntity).save({
-        ...cooldown,
-        [type]: !cooldown[type],
-      });
-    }
+      if (!cooldown) {
+        return [{ response: prepare('cooldowns.cooldown-not-found', { command: name }), ...opts }];
+      }
 
-    let path = '';
-    const status = !cooldown[type] ? 'enabled' : 'disabled';
+      if (type === 'type') {
+        await getRepository(CooldownEntity).save({
+          ...cooldown,
+          [type]: cooldown[type] === 'global' ? 'user' : 'global',
+        });
+      } else {
+        await getRepository(CooldownEntity).save({
+          ...cooldown,
+          [type]: !cooldown[type],
+        });
+      }
 
-    if (type === 'isModeratorAffected') {
-      path = '-for-moderators';
-    }
-    if (type === 'isOwnerAffected') {
-      path = '-for-owners';
-    }
-    if (type === 'isSubscriberAffected') {
-      path = '-for-subscribers';
-    }
-    if (type === 'isFollowerAffected') {
-      path = '-for-followers';
-    }
-    if (type === 'isErrorMsgQuiet' || type === 'type') {
-      return;
-    } // those two are setable only from dashboard
+      let path = '';
+      const status = !cooldown[type] ? 'enabled' : 'disabled';
 
-    return [{ response: prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.name }), ...opts }];
+      if (type === 'isModeratorAffected') {
+        path = '-for-moderators';
+      }
+      if (type === 'isOwnerAffected') {
+        path = '-for-owners';
+      }
+      if (type === 'isSubscriberAffected') {
+        path = '-for-subscribers';
+      }
+      if (type === 'isFollowerAffected') {
+        path = '-for-followers';
+      }
+      if (type === 'isErrorMsgQuiet' || type === 'type') {
+        return [];
+      } // those two are setable only from dashboard
+
+      return [{ response: prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.name }), ...opts }];
+    } catch (e) {
+
+      error(`${opts.command} ${opts.parameters} [${opts.sender.username}#${opts.sender.userId}]`);
+      error(e.stack);
+      if (e instanceof ParameterError) {
+        return this.help(opts);
+      } else {
+        return [];
+      }
+    }
   }
 
   @command('!cooldown toggle enabled')

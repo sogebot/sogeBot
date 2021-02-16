@@ -1,5 +1,3 @@
-import XRegExp from 'xregexp';
-
 // PRIORITIES
 export const MODERATION = -1;
 export const HIGHEST = 0;
@@ -19,16 +17,3 @@ export const SECOND = 1000;
 export const MINUTE = 1000 * 60;
 export const HOUR = 1000 * 60 * 60;
 export const DAY = 1000 * 60 * 60 * 24;
-
-// regexp
-export const COOLDOWN_REGEXP = XRegExp(`(?<command> !?[\\pL0-9 ]* ) # command
-           \\s                         # empty space
-           (?<type> global|user      ) # type`, 'ix');
-
-export const COOLDOWN_REGEXP_SET = XRegExp(`(?<command> !?[\\pL0-9 ]* ) # command
-           \\s                      # empty space
-           (?<type> global|user   ) # type
-           \\s                      # empty space
-           (?<seconds> \\d*       ) # seconds
-           ?\\s                     # empty space
-           ?(?<quiet> \\w*        ) # optional-quiet`, 'ix');
