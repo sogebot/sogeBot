@@ -6,7 +6,7 @@ import chalk from 'chalk';
 import * as DiscordJs from 'discord.js';
 import { get } from 'lodash';
 import {
-  getRepository, IsNull, LessThan, Not, 
+  getRepository, IsNull, LessThan, Not,
 } from 'typeorm';
 import { v5 as uuidv5 } from 'uuid';
 
@@ -15,24 +15,24 @@ import { DiscordLink } from '../database/entity/discord';
 import { Permissions as PermissionsEntity } from '../database/entity/permissions';
 import { User } from '../database/entity/user';
 import {
-  command, persistent, settings, ui, 
+  command, persistent, settings, ui,
 } from '../decorators';
 import {
-  onChange, onStartup, onStreamEnd, onStreamStart, 
+  onChange, onStartup, onStreamEnd, onStreamStart,
 } from '../decorators/on';
 import events from '../events';
 import Expects from '../expects';
 import { isStreamOnline, stats } from '../helpers/api';
 import { attributesReplace } from '../helpers/attributesReplace';
 import {
-  announceTypes, getOwner, isUUID, prepare, 
+  announceTypes, getOwner, isUUID, prepare,
 } from '../helpers/commons';
 import { isBotStarted, isDbConnected } from '../helpers/database';
 import { dayjs, timezone } from '../helpers/dayjs';
 import { debounce } from '../helpers/debounce';
 import { eventEmitter } from '../helpers/events';
 import {
-  chatIn, chatOut, debug, error, info, warning, whisperOut, 
+  chatIn, chatOut, debug, error, info, warning, whisperOut,
 } from '../helpers/log';
 import { generalChannel } from '../helpers/oauth/generalChannel';
 import { check } from '../helpers/permissions/';
@@ -187,16 +187,16 @@ class Discord extends Integration {
               { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame },
               { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle },
               {
-                name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true, 
+                name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true,
               },
               {
-                name: prepare('webpanel.viewers'), value: stats.value.currentViewers, inline: true, 
+                name: prepare('webpanel.viewers'), value: stats.value.currentViewers, inline: true,
               },
               {
-                name: prepare('webpanel.views'), value: stats.value.currentViews, inline: true, 
+                name: prepare('webpanel.views'), value: stats.value.currentViews, inline: true,
               },
               {
-                name: prepare('webpanel.followers'), value: stats.value.currentFollowers, inline: true, 
+                name: prepare('webpanel.followers'), value: stats.value.currentFollowers, inline: true,
               },
             ]);
             embed.setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${generalChannel.value}-1920x1080.jpg?${Date.now()}`);
@@ -366,32 +366,36 @@ class Discord extends Integration {
   async updateStreamStartAnnounce() {
     this.changeClientOnlinePresence();
     const channel = this.client?.guilds.cache.get(this.guild)?.channels.cache.get(this.sendOnlineAnnounceToChannel);
-    if (channel) {
-      const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
-      const embed = message?.embeds[0];
-      if (message && embed) {
-        embed.setColor(0xff0000);
-        embed.setDescription(`${generalChannel.value.charAt(0).toUpperCase() + generalChannel.value.slice(1)} is not streaming anymore! Check it next time!`);
-        embed.spliceFields(0, embed.fields.length);
-        embed.addFields([
-          { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame },
-          { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle },
-          {
-            name: prepare('integrations.discord.streamed-at'), value: `${this.embedStartedAt} - ${dayjs().tz(timezone).format('LLL')}`, inline: true, 
-          },
-          {
-            name: prepare('webpanel.views'), value: stats.value.currentViews, inline: true, 
-          },
-          {
-            name: prepare('webpanel.followers'), value: stats.value.currentFollowers, inline: true, 
-          },
-        ]);
-        embed.setImage(`https://static-cdn.jtvnw.net/ttv-static/404_preview-1920x1080.jpg?${Date.now()}`);
+    if (channel && this.embedMessageId !== '') {
+      try {
+        const message = await (channel as DiscordJs.TextChannel).messages.fetch(this.embedMessageId);
+        const embed = message?.embeds[0];
+        if (message && embed) {
+          embed.setColor(0xff0000);
+          embed.setDescription(`${generalChannel.value.charAt(0).toUpperCase() + generalChannel.value.slice(1)} is not streaming anymore! Check it next time!`);
+          embed.spliceFields(0, embed.fields.length);
+          embed.addFields([
+            { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame },
+            { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle },
+            {
+              name: prepare('integrations.discord.streamed-at'), value: `${this.embedStartedAt} - ${dayjs().tz(timezone).format('LLL')}`, inline: true,
+            },
+            {
+              name: prepare('webpanel.views'), value: stats.value.currentViews, inline: true,
+            },
+            {
+              name: prepare('webpanel.followers'), value: stats.value.currentFollowers, inline: true,
+            },
+          ]);
+          embed.setImage(`https://static-cdn.jtvnw.net/ttv-static/404_preview-1920x1080.jpg?${Date.now()}`);
 
-        if (oauth.broadcasterType !== '') {
-          embed.addField(prepare('webpanel.subscribers'), stats.value.currentSubscribers, true);
+          if (oauth.broadcasterType !== '') {
+            embed.addField(prepare('webpanel.subscribers'), stats.value.currentSubscribers, true);
+          }
+          message.edit(embed);
         }
-        message.edit(embed);
+      } catch (e) {
+        warning(`Discord embed couldn't be changed to offline - ${e.message}`);
       }
     }
     this.embedMessageId = '';
@@ -414,13 +418,13 @@ class Discord extends Integration {
             { name: prepare('webpanel.responses.variable.game'), value: stats.value.currentGame },
             { name: prepare('webpanel.responses.variable.title'), value: stats.value.currentTitle },
             {
-              name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true, 
+              name: prepare('integrations.discord.started-at'), value: this.embedStartedAt, inline: true,
             },
             {
-              name: prepare('webpanel.views'), value: stats.value.currentViews, inline: true, 
+              name: prepare('webpanel.views'), value: stats.value.currentViews, inline: true,
             },
             {
-              name: prepare('webpanel.followers'), value: stats.value.currentFollowers, inline: true, 
+              name: prepare('webpanel.followers'), value: stats.value.currentFollowers, inline: true,
             },
           ])
           // Set the title of the field
@@ -464,8 +468,8 @@ class Discord extends Integration {
           this.client?.user?.setStatus('online');
           this.client?.user?.setPresence({
             status:   'online', activity: {
-              name: activityString, type: 'STREAMING', url: `https://twitch.tv/${generalChannel.value}`, 
-            }, 
+              name: activityString, type: 'STREAMING', url: `https://twitch.tv/${generalChannel.value}`,
+            },
           });
         } else {
           this.client?.user?.setStatus(this.onlinePresenceStatusOnStream);
@@ -496,7 +500,7 @@ class Discord extends Integration {
     } else {
       events.supportedOperationsList.push(
         {
-          id: 'send-discord-message', definitions: { channel: '', messageToSend: '' }, fire: this.fireSendDiscordMessage, 
+          id: 'send-discord-message', definitions: { channel: '', messageToSend: '' }, fire: this.fireSendDiscordMessage,
         },
       );
     }
@@ -645,11 +649,11 @@ class Discord extends Integration {
         };
 
         eventEmitter.emit('keyword-send-x-times', {
-          username: user.username, message: content, source: 'discord', 
+          username: user.username, message: content, source: 'discord',
         });
         if (content.startsWith('!')) {
           eventEmitter.emit('command-send-x-times', {
-            username: user.username, message: content, source: 'discord', 
+            username: user.username, message: content, source: 'discord',
           });
         }
 
