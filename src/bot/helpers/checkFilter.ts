@@ -7,7 +7,7 @@ import ranks from '../systems/ranks';
 import { stats } from './api';
 import { getAll } from './customvariables';
 import {
-  isOwner, isSubscriber, isVIP, 
+  isOwner, isSubscriber, isVIP,
 } from './user';
 import { isBot, isBotSubscriber } from './user/isBot';
 import { isBroadcaster } from './user/isBroadcaster';
@@ -56,7 +56,6 @@ export const checkFilter = async (opts: CommandOptions | ParserOptions, filter: 
     $title:           stats.value.currentTitle || 'n/a',
     $views:           stats.value.currentViews,
     $followers:       stats.value.currentFollowers,
-    $hosts:           stats.value.currentHosts,
     $subscribers:     stats.value.currentSubscribers,
     $isBotSubscriber: isBotSubscriber(),
     ...customVariables,

@@ -668,7 +668,6 @@ const sendStreamData = async () => {
       status:             stats.value.currentTitle,
       rawStatus:          rawStatus.value,
       currentSong:        lastfm.currentSong || ytCurrentSong || spotifyCurrentSong || translate('songs.not-playing'),
-      currentHosts:       stats.value.currentHosts,
       currentWatched:     stats.value.currentWatchedTime,
       tags:               currentStreamTags.value,
     };
