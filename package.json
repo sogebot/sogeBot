@@ -49,6 +49,7 @@
     "node-hue-api": "3.4.3",
     "obs-websocket-js": "4.0.2",
     "page": "1.11.6",
+    "patch-package": "6.2.2",
     "pg": "8.5.1",
     "plyr": "3.6.4",
     "popper.js": "1.16.1",
@@ -88,6 +89,7 @@
     "ytsr": "3.2.4"
   },
   "scripts": {
+    "postinstall": "patch-package",
     "prestart": "node ./tools/migration.js",
     "watch": "cross-env NODE_ENV=development npx webpack --watch --progress",
     "build": "cross-env ENV=development make bot",

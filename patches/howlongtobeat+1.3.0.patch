@@ -1,6 +1,8 @@
---- node_modules/howlongtobeat/dist/main/htmlscraper.js	2021-02-17 00:08:45.727929100 +0100
-+++ patches/htmlscraper.js	2021-02-17 00:08:15.905789400 +0100
-@@ -38,6 +38,11 @@
+diff --git a/node_modules/howlongtobeat/dist/main/htmlscraper.js b/node_modules/howlongtobeat/dist/main/htmlscraper.js
+index ebf471f..e45fb82 100644
+--- a/node_modules/howlongtobeat/dist/main/htmlscraper.js
++++ b/node_modules/howlongtobeat/dist/main/htmlscraper.js
+@@ -38,6 +38,11 @@ class HtmlScraper {
                      qs: {
                          page: 1
                      },
