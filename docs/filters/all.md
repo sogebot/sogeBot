@@ -19,8 +19,6 @@ bot it is twitch by default
 
 `$views` - return current views count
 
-`$hosts` - return current hosts count
-
 `$followers` - return current followers count
 
 `$subscribers` - return current subscribers count

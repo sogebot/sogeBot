@@ -35,6 +35,11 @@
     - Release version: `docker-compose up`
     - Nightly version: `docker-compose -f docker-compose-nightly.yml up`
 
+### Upgrade
+
+1. Stop your docker container
+2. Run steps 3. and 4. from Installation
+
 ## From zipfile
 
 ### Stable release
@@ -70,6 +75,13 @@
 - To access webpanel, go to `http://localhost:<port>` where port is configured
   as PORT env variable, e.g. `PORT=20001 npm start`
 
+### Upgrade
+
+1. Backup your `.env` and, if using sqlite3, `sogebot.db` file
+2. Remove your sogeBot directory
+3. Go through Installation steps
+4. Before `npm start` recopy your backup back to bot folder
+
 ## From git
 
 ### Build prerequisites
@@ -93,6 +105,13 @@
 
 - To access webpanel, go to `http://localhost:<port>` where port is configured
   in config.json (default: 20000)
+
+### Upgrade
+
+1. Backup your database
+2. Update bot with `git pull -r origin master`
+3. Run `make`
+4. Start bot `npm start`
 
 ## Oauth generation
 
