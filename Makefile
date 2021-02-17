@@ -25,6 +25,7 @@ dependencies:
 	patch --forward node_modules/twitch-js/types/index.d.ts < patches/twitch-js-types-2.patch
 	patch --forward node_modules/twitch-js/types/index.d.ts < patches/twitch-js-add-highlight-msgId.patch
 	patch --forward node_modules/obs-websocket-js/types/index.d.ts < patches/obswebsocketTypeExpose.patch
+	patch --forward node_modules/howlongtobeat/dist/main/htmlscraper.js < patches/hltb-htmlscraper-headers.patch
 
 eslint:
 	@echo -ne "\n\t ----- Checking eslint\n"

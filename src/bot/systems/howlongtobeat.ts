@@ -7,11 +7,11 @@ import { command, default_permission } from '../decorators';
 import { onStartup, onStreamStart } from '../decorators/on';
 import Expects from '../expects';
 import {
-  isStreamOnline, stats, streamStatusChangeSince, 
+  isStreamOnline, stats, streamStatusChangeSince,
 } from '../helpers/api';
 import { prepare } from '../helpers/commons';
 import {
-  debug, error, info, warning, 
+  debug, error, info, warning,
 } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
 import { adminEndpoint } from '../helpers/socket';
@@ -26,7 +26,7 @@ class HowLongToBeat extends System {
   @onStartup()
   onStartup() {
     this.addMenu({
-      category: 'manage', name: 'howlongtobeat', id: 'manage/hltb', this: this, 
+      category: 'manage', name: 'howlongtobeat', id: 'manage/hltb', this: this,
     });
 
     this.refreshImageThumbnail();
@@ -121,9 +121,10 @@ class HowLongToBeat extends System {
       for (const game of games) {
         const gamesFromHltb = await this.hltbService.search(game.game);
         const gameFromHltb = gamesFromHltb.length > 0 ? gamesFromHltb[0] : null;
-        if (gameFromHltb && game.imageUrl !== gameFromHltb.imageUrl) {
+        const imageUrl = 'https://howlongtobeat.com' + game.imageUrl;
+        if (gameFromHltb && imageUrl !== gameFromHltb.imageUrl) {
           info(`HowLongToBeat | Thumbnail for ${game.game} is updated.`);
-          getRepository(HowLongToBeatGame).update({ id: game.id }, { imageUrl: gameFromHltb.imageUrl });
+          getRepository(HowLongToBeatGame).update({ id: game.id }, { imageUrl });
         }
       }
     } catch (e) {

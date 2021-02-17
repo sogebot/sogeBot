@@ -1,0 +1,14 @@
+--- node_modules/howlongtobeat/dist/main/htmlscraper.js	2021-02-17 00:08:45.727929100 +0100
++++ patches/htmlscraper.js	2021-02-17 00:08:15.905789400 +0100
+@@ -38,6 +38,11 @@
+                     qs: {
+                         page: 1
+                     },
++                    headers: {
++                      Referer: 'https://howlongtobeat.com/',
++                      'Content-type': 'application/x-www-form-urlencoded',
++                      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36',
++                    },
+                     form: {
+                         'queryString': query,
+                         't': 'games',
