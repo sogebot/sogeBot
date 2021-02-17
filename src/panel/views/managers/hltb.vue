@@ -1,100 +1,193 @@
 <template>
-  <div class="container-fluid" ref="window">
+  <div
+    ref="window"
+    class="container-fluid"
+  >
     <b-row>
       <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.manage') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.howlongtobeat') }}
         </span>
       </b-col>
-      <b-col v-if="!$systems.find(o => o.name === 'howlongtobeat').enabled" style=" text-align: right;">
-        <b-alert show variant="danger" style="padding: .5rem; margin: 0; display: inline-block;">
-          <fa icon="exclamation-circle" fixed-width/> {{ translate('this-system-is-disabled') }}
+      <b-col
+        v-if="!$systems.find(o => o.name === 'howlongtobeat').enabled"
+        style=" text-align: right;"
+      >
+        <b-alert
+          show
+          variant="danger"
+          style="padding: .5rem; margin: 0; display: inline-block;"
+        >
+          <fa
+            icon="exclamation-circle"
+            fixed-width
+          /> {{ translate('this-system-is-disabled') }}
         </b-alert>
       </b-col>
     </b-row>
 
-    <panel search @search="search = $event">
-      <template v-slot:left>
+    <panel
+      search
+      @search="search = $event"
+    >
+      <template #left>
         <div style="min-width: 300px">
           <search
             :placeholder="translate('systems.howlongtobeat.searchToAddNewGame')"
             :options="searchForGameOpts"
             :value="[gameToAdd]"
             @search="searchForGame($event);"
-            @input="gameToAdd = $event"></search>
+            @input="gameToAdd = $event"
+          />
         </div>
       </template>
     </panel>
-    <loading v-if="state.loading !== $state.success"/>
+    <loading v-if="state.loading !== $state.success" />
     <template v-else>
-      <b-alert show variant="danger" v-if="fItems.length === 0 && search.length > 0">
-        <fa icon="search"/> <span v-html="translate('systems.howlongtobeat.emptyAfterSearch').replace('$search', search)"/>
+      <b-alert
+        v-if="fItems.length === 0 && search.length > 0"
+        show
+        variant="danger"
+      >
+        <fa icon="search" /> <span v-html="translate('systems.howlongtobeat.emptyAfterSearch').replace('$search', search)" />
       </b-alert>
-      <b-alert show v-else-if="items.length === 0">
-        {{translate('systems.howlongtobeat.empty')}}
+      <b-alert
+        v-else-if="items.length === 0"
+        show
+      >
+        {{ translate('systems.howlongtobeat.empty') }}
       </b-alert>
-      <b-table v-else striped small :items="fItems" :fields="fields">
-        <template v-slot:row-details="data">
+      <b-table
+        v-else
+        striped
+        small
+        :items="fItems"
+        :fields="fields"
+      >
+        <template #row-details="data">
           <b-card>
             <template v-for="stream of streams.filter(o => o.hltb_id === data.item.id)">
               <b-row :key="stream.id + '1'">
                 <b-col><b>{{ translate('systems.howlongtobeat.when') }}</b></b-col>
                 <b-col><b>{{ translate('systems.howlongtobeat.time') }}</b></b-col>
-                <b-col></b-col>
+                <b-col />
                 <b-col><b>{{ translate('systems.howlongtobeat.offset') }}</b></b-col>
               </b-row>
               <b-row :key="stream.id + '2'">
                 <b-col>{{ (new Date(stream.createdAt)).toLocaleString() }}</b-col>
                 <b-col>{{ timeToReadable(timestampToObject(stream.timestamp)) }}</b-col>
                 <b-col>
-                  <b-button :pressed.sync="stream.isMainCounted" variant="outline-success">{{ translate('systems.howlongtobeat.main') }}</b-button>
-                  <b-button :pressed.sync="stream.isExtraCounted" variant="outline-success">{{ translate('systems.howlongtobeat.extra') }}</b-button>
-                  <b-button :pressed.sync="stream.isCompletionistCounted" variant="outline-success">{{ translate('systems.howlongtobeat.completionist') }}</b-button>
+                  <b-button
+                    :pressed.sync="stream.isMainCounted"
+                    variant="outline-success"
+                  >
+                    {{ translate('systems.howlongtobeat.main') }}
+                  </b-button>
+                  <b-button
+                    :pressed.sync="stream.isExtraCounted"
+                    variant="outline-success"
+                  >
+                    {{ translate('systems.howlongtobeat.extra') }}
+                  </b-button>
+                  <b-button
+                    :pressed.sync="stream.isCompletionistCounted"
+                    variant="outline-success"
+                  >
+                    {{ translate('systems.howlongtobeat.completionist') }}
+                  </b-button>
                 </b-col>
                 <b-col>
                   <b-input-group>
-                    <b-form-spinbutton v-model="stream.offset" inline step="10000" :formatter-fn="minutesFormatter" :min="-stream.timestamp" :max="Number.MAX_SAFE_INTEGER" repeat-step-multiplier="50"></b-form-spinbutton>
-                    <b-button @click="stream.offset = 0" variant="dark"><fa icon="redo" fixed-width/></b-button>
+                    <b-form-spinbutton
+                      v-model="stream.offset"
+                      inline
+                      step="10000"
+                      :formatter-fn="minutesFormatter"
+                      :min="-stream.timestamp"
+                      :max="Number.MAX_SAFE_INTEGER"
+                      repeat-step-multiplier="50"
+                    />
+                    <b-button
+                      variant="dark"
+                      @click="stream.offset = 0"
+                    >
+                      <fa
+                        icon="redo"
+                        fixed-width
+                      />
+                    </b-button>
                   </b-input-group>
                 </b-col>
               </b-row>
             </template>
           </b-card>
         </template>
-        <template v-slot:cell(thumbnail)="data">
-          <b-img thumbnail width="70" height="70" :src="data.item.imageUrl" :alt="data.item.game + ' thumbnail'"></b-img>
+        <template #cell(thumbnail)="data">
+          <b-img
+            thumbnail
+            width="70"
+            height="70"
+            :src="'https://howlongtobeat.com' + data.item.imageUrl"
+            :alt="data.item.game + ' thumbnail'"
+          />
         </template>
-        <template v-slot:cell(startedAt)="data">
+        <template #cell(startedAt)="data">
           {{ (new Date(data.item.startedAt)).toLocaleString() }}
         </template>
-        <template v-slot:cell(main)="data">
+        <template #cell(main)="data">
           {{ timeToReadable(timestampToObject(getStreamsTimestamp(data.item.id, 'main') + +data.item.offset + getStreamsOffset(data.item.id, 'main'))) }} <span v-if="data.item.gameplayMain">/ {{ timeToReadable(timestampToObject(data.item.gameplayMain * 3600000)) }}</span>
         </template>
-        <template v-slot:cell(extra)="data">
+        <template #cell(extra)="data">
           {{ timeToReadable(timestampToObject(getStreamsTimestamp(data.item.id, 'extra') + +data.item.offset + getStreamsOffset(data.item.id, 'extra'))) }} <span v-if="data.item.gameplayMain">/ {{ timeToReadable(timestampToObject(data.item.gameplayMainExtra * 3600000)) }}</span>
         </template>
-        <template v-slot:cell(completionist)="data">
+        <template #cell(completionist)="data">
           {{ timeToReadable(timestampToObject(getStreamsTimestamp(data.item.id, 'completionist') + +data.item.offset + getStreamsOffset(data.item.id, 'completionist'))) }} <span v-if="data.item.gameplayMain">/ {{ timeToReadable(timestampToObject(data.item.gameplayCompletionist * 3600000)) }}</span>
         </template>
-        <template v-slot:cell(offset)="data">
+        <template #cell(offset)="data">
           <b-input-group>
-            <b-form-spinbutton v-model="data.item.offset" inline step="10000" :formatter-fn="minutesFormatter" :min="0" :max="Number.MAX_SAFE_INTEGER" repeat-step-multiplier="50"></b-form-spinbutton>
-            <b-button @click="data.item.offset = 0" variant="dark"><fa icon="redo" fixed-width/></b-button>
+            <b-form-spinbutton
+              v-model="data.item.offset"
+              inline
+              step="10000"
+              :formatter-fn="minutesFormatter"
+              :min="0"
+              :max="Number.MAX_SAFE_INTEGER"
+              repeat-step-multiplier="50"
+            />
+            <b-button
+              variant="dark"
+              @click="data.item.offset = 0"
+            >
+              <fa
+                icon="redo"
+                fixed-width
+              />
+            </b-button>
           </b-input-group>
         </template>
-        <template v-slot:cell(buttons)="data">
-          <div class="float-right" style="width: max-content !important;">
-            <b-button @click="data.toggleDetails" :variant="data.detailsShowing ? 'primary' : 'outline-primary'">
+        <template #cell(buttons)="data">
+          <div
+            class="float-right"
+            style="width: max-content !important;"
+          >
+            <b-button
+              :variant="data.detailsShowing ? 'primary' : 'outline-primary'"
+              @click="data.toggleDetails"
+            >
               {{
                 (data.detailsShowing
                   ? translate('systems.howlongtobeat.hideHistory')
                   : translate('systems.howlongtobeat.showHistory'))
-                    .replace('$count', streams.filter(o => o.hltb_id === data.item.id).length)
+                  .replace('$count', streams.filter(o => o.hltb_id === data.item.id).length)
               }}
             </b-button>
-            <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="del(data.item.id)">
+            <button-with-icon
+              class="btn-only-icon btn-danger btn-reverse"
+              icon="trash"
+              @click="del(data.item.id)"
+            >
               {{ translate('dialog.buttons.delete') }}
             </button-with-icon>
           </div>
@@ -108,7 +201,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faRedo } from '@fortawesome/free-solid-svg-icons';
 import {
-  computed, defineComponent, onMounted, ref, watch, 
+  computed, defineComponent, onMounted, ref, watch,
 } from '@vue/composition-api';
 import { cloneDeep, debounce } from 'lodash-es';
 
@@ -178,10 +271,10 @@ export default defineComponent({
     const fields = [
       { key: 'thumbnail', label: '' },
       {
-        key: 'game', label: translate('systems.howlongtobeat.game'), sortable: true, 
+        key: 'game', label: translate('systems.howlongtobeat.game'), sortable: true,
       },
       {
-        key: 'startedAt', label: translate('systems.howlongtobeat.startedAt'), sortable: true, 
+        key: 'startedAt', label: translate('systems.howlongtobeat.startedAt'), sortable: true,
       },
       { key: 'main', label: translate('systems.howlongtobeat.main') },
       { key: 'extra', label: translate('systems.howlongtobeat.extra') },
