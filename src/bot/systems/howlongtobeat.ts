@@ -121,7 +121,7 @@ class HowLongToBeat extends System {
       for (const game of games) {
         const gamesFromHltb = await this.hltbService.search(game.game);
         const gameFromHltb = gamesFromHltb.length > 0 ? gamesFromHltb[0] : null;
-        const imageUrl = 'https://howlongtobeat.com' + game.imageUrl;
+        const imageUrl = 'https://howlongtobeat.com' + gameFromHltb?.imageUrl;
         if (gameFromHltb && imageUrl !== gameFromHltb.imageUrl) {
           info(`HowLongToBeat | Thumbnail for ${game.game} is updated.`);
           getRepository(HowLongToBeatGame).update({ id: game.id }, { imageUrl });
