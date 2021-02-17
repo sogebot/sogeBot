@@ -169,7 +169,6 @@ class API extends Core {
     this.interval('updateChannelViewsAndBroadcasterType', constants.HOUR);
     this.interval('getLatest100Followers', constants.MINUTE);
     this.interval('getChannelFollowers', constants.DAY);
-    this.interval('getChannelHosts', 10 * constants.MINUTE);
     this.interval('getChannelSubscribers', 2 * constants.MINUTE);
     this.interval('getChannelChattersUnofficialAPI', 5 * constants.MINUTE);
     this.interval('getChannelInformation', constants.MINUTE);
@@ -707,32 +706,6 @@ class API extends Core {
     return { state: true, opts };
   }
 
-  async getChannelHosts () {
-    const cid = channelId.value;
-
-    if (isNil(cid) || cid === '') {
-      return { state: false };
-    }
-
-    let request;
-    const url = `http://tmi.twitch.tv/hosts?include_logins=1&target=${cid}`;
-    try {
-      request = await axios.get(url);
-      ioServer?.emit('api.stats', {
-        method: 'GET', data: request.data, timestamp: Date.now(), call: 'getChannelHosts', api: 'other', endpoint: url, code: request.status, remaining: calls.bot,
-      });
-      apiStats.value.currentHosts = request.data.hosts.length;
-    } catch (e) {
-      error(`${url} - ${e.message}`);
-      ioServer?.emit('api.stats', {
-        method: 'GET', timestamp: Date.now(), call: 'getChannelHosts', api: 'other', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: calls.bot,
-      });
-      return { state: e.response?.status === 500 };
-    }
-
-    return { state: true };
-  }
-
   async getLatest100Followers () {
     const cid = channelId.value;
     const url = `https://api.twitch.tv/helix/users/follows?to_id=${cid}&first=100`;
@@ -1047,7 +1020,6 @@ class API extends Core {
       currentViews:       apiStats.value.currentViews,
       maxViewers:         apiStats.value.maxViewers,
       newChatters:        apiStats.value.newChatters,
-      currentHosts:       apiStats.value.currentHosts,
       currentWatched:     apiStats.value.currentWatchedTime,
     });
   }

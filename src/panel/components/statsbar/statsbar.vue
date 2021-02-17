@@ -1,26 +1,69 @@
 <template>
-  <div class="stream-info-container container-fluid" :class="{ 'sticky-top': b_sticky }" :style="{ 'top': b_sticky ? top + 'px' : undefined }" ref="quickwindow">
-    <b-toast :title="error.name" :no-auto-hide="getErrorType(error.type) !== 'success'" visible :variant="getErrorType(error.type)" v-for="error of errors" :key="error.name + error.message + error.date">
-      <div v-html="error.message"/>
+  <div
+    ref="quickwindow"
+    class="stream-info-container container-fluid"
+    :class="{ 'sticky-top': b_sticky }"
+    :style="{ 'top': b_sticky ? top + 'px' : undefined }"
+  >
+    <b-toast
+      v-for="error of errors"
+      :key="error.name + error.message + error.date"
+      :title="error.name"
+      :no-auto-hide="getErrorType(error.type) !== 'success'"
+      visible
+      :variant="getErrorType(error.type)"
+    >
+      <div v-html="error.message" />
     </b-toast>
-    <b-toast :title="translate('errors.channel_is_not_set')" no-auto-hide visible variant="danger" solid v-if="!$store.state.configuration.isChannelSet">
-      <div v-html="translate('errors.please_set_your_channel')"/>
+    <b-toast
+      v-if="!$store.state.configuration.isChannelSet"
+      :title="translate('errors.channel_is_not_set')"
+      no-auto-hide
+      visible
+      variant="danger"
+      solid
+    >
+      <div v-html="translate('errors.please_set_your_channel')" />
     </b-toast>
-    <b-toast :title="translate('errors.owner_and_broadcaster_oauth_is_not_set')" no-auto-hide visible variant="danger" solid v-if="!$store.state.configuration.isCastersSet">
-      <div v-html="translate('errors.please_set_your_broadcaster_oauth_or_owners')"/>
+    <b-toast
+      v-if="!$store.state.configuration.isCastersSet"
+      :title="translate('errors.owner_and_broadcaster_oauth_is_not_set')"
+      no-auto-hide
+      visible
+      variant="danger"
+      solid
+    >
+      <div v-html="translate('errors.please_set_your_broadcaster_oauth_or_owners')" />
     </b-toast>
-    <b-toast :title="translate('errors.new_update_available')" no-auto-hide visible variant="info" solid v-if="update.version">
-      <div v-html="translate('errors.new_bot_version_available_at').replace(/\$version/gmi, update.version)"/>
+    <b-toast
+      v-if="update.version"
+      :title="translate('errors.new_update_available')"
+      no-auto-hide
+      visible
+      variant="info"
+      solid
+    >
+      <div v-html="translate('errors.new_bot_version_available_at').replace(/\$version/gmi, update.version)" />
     </b-toast>
     <template v-if="!isLoaded">
       <div class="mx-auto text-center p-3 pt-4">
-        <div class="spinner-grow" role="status"></div>
+        <div
+          class="spinner-grow"
+          role="status"
+        />
       </div>
     </template>
     <template v-else>
       <div class="row">
-        <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info" @click="saveHighlight">
-          <span class="data" id="uptime" :key="timestamp">{{ getTime(uptime, false) }}</span>
+        <div
+          class="col-6 col-sm-5 col-md-4 col-lg-2 stream-info"
+          @click="saveHighlight"
+        >
+          <span
+            id="uptime"
+            :key="timestamp"
+            class="data"
+          >{{ getTime(uptime, false) }}</span>
           <span class="stats">&nbsp;</span>
           <h2>
             <span>{{ translate('uptime') }}</span>
@@ -28,7 +71,10 @@
           </h2>
         </div>
 
-        <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info" v-on:click="toggleViewerShow">
+        <div
+          class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info"
+          @click="toggleViewerShow"
+        >
           <span class="data">
             <template v-if="!hideStats">
               {{
@@ -39,7 +85,7 @@
                 )
               }}
             </template>
-            <small v-else>{{translate('hidden')}}</small>
+            <small v-else>{{ translate('hidden') }}</small>
           </span>
           <span class="stats">&nbsp;</span>
           <h2>
@@ -48,7 +94,10 @@
           </h2>
         </div>
 
-        <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info" v-on:click="toggleViewerShow">
+        <div
+          class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info"
+          @click="toggleViewerShow"
+        >
           <span class="data">
             <template v-if="!hideStats">
               {{
@@ -59,18 +108,23 @@
                 )
               }}
             </template>
-            <small v-else>{{translate('hidden')}}</small>
+            <small v-else>{{ translate('hidden') }}</small>
           </span>
-          <span class="stats" v-if="!hideStats">
-            <small v-if="b_showAvgDiff && isStreamOnline && maxViewers - averageStats.maxViewers !== 0"
-                   :class="{
-                     'text-success': maxViewers - averageStats.maxViewers > 0,
-                     'stats-up': maxViewers - averageStats.maxViewers > 0,
-                     'text-danger': maxViewers - averageStats.maxViewers < 0,
-                     'stats-down': maxViewers - averageStats.maxViewers < 0,
-                   }">
+          <span
+            v-if="!hideStats"
+            class="stats"
+          >
+            <small
+              v-if="b_showAvgDiff && isStreamOnline && maxViewers - averageStats.maxViewers !== 0"
+              :class="{
+                'text-success': maxViewers - averageStats.maxViewers > 0,
+                'stats-up': maxViewers - averageStats.maxViewers > 0,
+                'text-danger': maxViewers - averageStats.maxViewers < 0,
+                'stats-down': maxViewers - averageStats.maxViewers < 0,
+              }"
+            >
               <template v-if="maxViewers - averageStats.maxViewers !== 0">
-                <fa :icon="maxViewers - averageStats.maxViewers > 0 ? 'caret-up' : 'caret-down'"/>
+                <fa :icon="maxViewers - averageStats.maxViewers > 0 ? 'caret-up' : 'caret-down'" />
                 <span>
                   {{
                     Intl.NumberFormat($store.state.configuration.lang, {  
@@ -82,35 +136,49 @@
               </template>
             </small>
           </span>
-          <span class="stats" v-else>&nbsp;</span>
+          <span
+            v-else
+            class="stats"
+          >&nbsp;</span>
           <h2>
             <span>{{ translate('max-viewers') }}</span>
             <small>{{ translate('click-to-toggle-display') }}</small>
           </h2>
         </div>
 
-        <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info" v-on:click="toggleViewerShow">
+        <div
+          class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info"
+          @click="toggleViewerShow"
+        >
           <span class="data">
             <template v-if="!hideStats">
-              <span v-bind:title="newChatters" v-html="
-                Intl.NumberFormat($store.state.configuration.lang, {  
-                  notation: b_shortenNumber ? 'compact' : 'standard',
-                  maximumFractionDigits: b_shortenNumber ? 1 : 0,
-                }).formatToParts(isStreamOnline ? newChatters : 0).reduce(numberReducer, '')
-              "/>
+              <span
+                :title="newChatters"
+                v-html="
+                  Intl.NumberFormat($store.state.configuration.lang, {  
+                    notation: b_shortenNumber ? 'compact' : 'standard',
+                    maximumFractionDigits: b_shortenNumber ? 1 : 0,
+                  }).formatToParts(isStreamOnline ? newChatters : 0).reduce(numberReducer, '')
+                "
+              />
             </template>
-            <small v-else>{{translate('hidden')}}</small>
+            <small v-else>{{ translate('hidden') }}</small>
           </span>
-          <span class="stats" v-if="!hideStats">
-            <small v-if="b_showAvgDiff && isStreamOnline && newChatters - averageStats.newChatters !== 0"
-                   :class="{
-                     'text-success': newChatters - averageStats.newChatters > 0,
-                     'stats-up': newChatters - averageStats.newChatters > 0,
-                     'text-danger': newChatters - averageStats.newChatters < 0,
-                     'stats-down': newChatters - averageStats.newChatters < 0,
-                   }">
+          <span
+            v-if="!hideStats"
+            class="stats"
+          >
+            <small
+              v-if="b_showAvgDiff && isStreamOnline && newChatters - averageStats.newChatters !== 0"
+              :class="{
+                'text-success': newChatters - averageStats.newChatters > 0,
+                'stats-up': newChatters - averageStats.newChatters > 0,
+                'text-danger': newChatters - averageStats.newChatters < 0,
+                'stats-down': newChatters - averageStats.newChatters < 0,
+              }"
+            >
               <template v-if="newChatters - averageStats.newChatters !== 0">
-                <fa :icon="newChatters - averageStats.newChatters > 0 ? 'caret-up' : 'caret-down'"/>
+                <fa :icon="newChatters - averageStats.newChatters > 0 ? 'caret-up' : 'caret-down'" />
                 <span>
                   {{
                     Intl.NumberFormat($store.state.configuration.lang, {  
@@ -123,7 +191,10 @@
               </template>
             </small>
           </span>
-          <span class="stats" v-else>&nbsp;</span>
+          <span
+            v-else
+            class="stats"
+          >&nbsp;</span>
           <h2>
             <span>{{ translate('new-chatters') }}</span>
             <small>{{ translate('click-to-toggle-display') }}</small>
@@ -131,22 +202,28 @@
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
-          <span class="data" v-bind:title="chatMessages" v-html="
-            Intl.NumberFormat($store.state.configuration.lang, {  
-              notation: b_shortenNumber ? 'compact' : 'standard',
-              maximumFractionDigits: b_shortenNumber ? 1 : 0,
-            }).formatToParts(isStreamOnline ? chatMessages : 0).reduce(numberReducer, '')
-          "/>
+          <span
+            class="data"
+            :title="chatMessages"
+            v-html="
+              Intl.NumberFormat($store.state.configuration.lang, {  
+                notation: b_shortenNumber ? 'compact' : 'standard',
+                maximumFractionDigits: b_shortenNumber ? 1 : 0,
+              }).formatToParts(isStreamOnline ? chatMessages : 0).reduce(numberReducer, '')
+            "
+          />
           <span class="stats">
-            <small v-if="b_showAvgDiff && isStreamOnline && chatMessages - averageStats.chatMessages !== 0"
-                   :class="{
-                     'text-success': chatMessages - averageStats.chatMessages > 0,
-                     'stats-up': chatMessages - averageStats.chatMessages > 0,
-                     'text-danger': chatMessages - averageStats.chatMessages < 0,
-                     'stats-down': chatMessages - averageStats.chatMessages < 0,
-                   }">
+            <small
+              v-if="b_showAvgDiff && isStreamOnline && chatMessages - averageStats.chatMessages !== 0"
+              :class="{
+                'text-success': chatMessages - averageStats.chatMessages > 0,
+                'stats-up': chatMessages - averageStats.chatMessages > 0,
+                'text-danger': chatMessages - averageStats.chatMessages < 0,
+                'stats-down': chatMessages - averageStats.chatMessages < 0,
+              }"
+            >
               <template v-if="chatMessages - averageStats.chatMessages !== 0">
-                <fa :icon="chatMessages - averageStats.chatMessages > 0 ? 'caret-up' : 'caret-down'"/>
+                <fa :icon="chatMessages - averageStats.chatMessages > 0 ? 'caret-up' : 'caret-down'" />
                 <span>
                   {{
                     Intl.NumberFormat($store.state.configuration.lang, {  
@@ -163,22 +240,28 @@
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
-          <span class="data" v-bind:title="currentViews" v-html="
-            Intl.NumberFormat($store.state.configuration.lang, {  
-              notation: b_shortenNumber ? 'compact' : 'standard',
-              maximumFractionDigits: b_shortenNumber ? 1 : 0,
-            }).formatToParts(currentViews).reduce(numberReducer, '')
-          "/>
+          <span
+            class="data"
+            :title="currentViews"
+            v-html="
+              Intl.NumberFormat($store.state.configuration.lang, {  
+                notation: b_shortenNumber ? 'compact' : 'standard',
+                maximumFractionDigits: b_shortenNumber ? 1 : 0,
+              }).formatToParts(currentViews).reduce(numberReducer, '')
+            "
+          />
           <span class="stats">
-            <small v-if="b_showAvgDiff && isStreamOnline && currentViews - averageStats.currentViews !== 0"
-                   :class="{
-                     'text-success': currentViews - averageStats.currentViews > 0,
-                     'stats-up': currentViews - averageStats.currentViews > 0,
-                     'text-danger': currentViews - averageStats.currentViews < 0,
-                     'stats-down': currentViews - averageStats.currentViews < 0,
-                   }">
+            <small
+              v-if="b_showAvgDiff && isStreamOnline && currentViews - averageStats.currentViews !== 0"
+              :class="{
+                'text-success': currentViews - averageStats.currentViews > 0,
+                'stats-up': currentViews - averageStats.currentViews > 0,
+                'text-danger': currentViews - averageStats.currentViews < 0,
+                'stats-down': currentViews - averageStats.currentViews < 0,
+              }"
+            >
               <template v-if="currentViews - averageStats.currentViews !== 0">
-                <fa :icon="currentViews - averageStats.currentViews > 0 ? 'caret-up' : 'caret-down'"/>
+                <fa :icon="currentViews - averageStats.currentViews > 0 ? 'caret-up' : 'caret-down'" />
                 <span>
                   {{
                     Intl.NumberFormat($store.state.configuration.lang, {  
@@ -195,33 +278,28 @@
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
-          <span class="data" v-bind:title="currentHosts" v-html="
-            Intl.NumberFormat($store.state.configuration.lang, {  
-              notation: b_shortenNumber ? 'compact' : 'standard',
-              maximumFractionDigits: b_shortenNumber ? 1 : 0,
-            }).formatToParts(isStreamOnline ? currentHosts : 0).reduce(numberReducer, '')
-          "/>
-          <span class="stats">&nbsp;</span>
-          <h2>{{ translate('hosts') }}</h2>
-        </div>
-
-        <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
-          <span class="data" v-bind:title="currentFollowers" v-html="
-            Intl.NumberFormat($store.state.configuration.lang, {  
-              notation: b_shortenNumber ? 'compact' : 'standard',
-              maximumFractionDigits: b_shortenNumber ? 1 : 0,
-            }).formatToParts(currentFollowers).reduce(numberReducer, '')
-          "/>
+          <span
+            class="data"
+            :title="currentFollowers"
+            v-html="
+              Intl.NumberFormat($store.state.configuration.lang, {  
+                notation: b_shortenNumber ? 'compact' : 'standard',
+                maximumFractionDigits: b_shortenNumber ? 1 : 0,
+              }).formatToParts(currentFollowers).reduce(numberReducer, '')
+            "
+          />
           <span class="stats">
-            <small v-if="b_showAvgDiff && isStreamOnline && currentFollowers - averageStats.currentFollowers !== 0"
-                   :class="{
-                     'text-success': currentFollowers - averageStats.currentFollowers > 0,
-                     'stats-up': currentFollowers - averageStats.currentFollowers > 0,
-                     'text-danger': currentFollowers - averageStats.currentFollowers < 0,
-                     'stats-down': currentFollowers - averageStats.currentFollowers < 0,
-                   }">
+            <small
+              v-if="b_showAvgDiff && isStreamOnline && currentFollowers - averageStats.currentFollowers !== 0"
+              :class="{
+                'text-success': currentFollowers - averageStats.currentFollowers > 0,
+                'stats-up': currentFollowers - averageStats.currentFollowers > 0,
+                'text-danger': currentFollowers - averageStats.currentFollowers < 0,
+                'stats-down': currentFollowers - averageStats.currentFollowers < 0,
+              }"
+            >
               <template v-if="currentFollowers - averageStats.currentFollowers !== 0">
-                <fa :icon="currentFollowers - averageStats.currentFollowers > 0 ? 'caret-up' : 'caret-down'"/>
+                <fa :icon="currentFollowers - averageStats.currentFollowers > 0 ? 'caret-up' : 'caret-down'" />
                 <span>
                   {{
                     Intl.NumberFormat($store.state.configuration.lang, {  
@@ -239,22 +317,28 @@
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
           <template v-if="broadcasterType !== ''">
-            <span class="data" v-bind:title="currentSubscribers" v-html="
-              Intl.NumberFormat($store.state.configuration.lang, {  
-                notation: b_shortenNumber ? 'compact' : 'standard',
-                maximumFractionDigits: b_shortenNumber ? 1 : 0,
-              }).formatToParts(currentSubscribers).reduce(numberReducer, '')
-            "/>
+            <span
+              class="data"
+              :title="currentSubscribers"
+              v-html="
+                Intl.NumberFormat($store.state.configuration.lang, {  
+                  notation: b_shortenNumber ? 'compact' : 'standard',
+                  maximumFractionDigits: b_shortenNumber ? 1 : 0,
+                }).formatToParts(currentSubscribers).reduce(numberReducer, '')
+              "
+            />
             <span class="stats">
-              <small v-if="b_showAvgDiff && isStreamOnline && currentSubscribers - averageStats.currentSubscribers !== 0"
-                    :class="{
-                      'text-success': currentSubscribers - averageStats.currentSubscribers > 0,
-                      'stats-up': currentSubscribers - averageStats.currentSubscribers > 0,
-                      'text-danger': currentSubscribers - averageStats.currentSubscribers < 0,
-                      'stats-down': currentSubscribers - averageStats.currentSubscribers < 0,
-                    }">
+              <small
+                v-if="b_showAvgDiff && isStreamOnline && currentSubscribers - averageStats.currentSubscribers !== 0"
+                :class="{
+                  'text-success': currentSubscribers - averageStats.currentSubscribers > 0,
+                  'stats-up': currentSubscribers - averageStats.currentSubscribers > 0,
+                  'text-danger': currentSubscribers - averageStats.currentSubscribers < 0,
+                  'stats-down': currentSubscribers - averageStats.currentSubscribers < 0,
+                }"
+              >
                 <template v-if="currentSubscribers - averageStats.currentSubscribers !== 0">
-                  <fa :icon="currentSubscribers - averageStats.currentSubscribers > 0 ? 'caret-up' : 'caret-down'"/>
+                  <fa :icon="currentSubscribers - averageStats.currentSubscribers > 0 ? 'caret-up' : 'caret-down'" />
                   <span>
                     {{
                       Intl.NumberFormat($store.state.configuration.lang, {  
@@ -269,35 +353,44 @@
             </span>
           </template>
           <template v-else>
-            <span class="data text-muted" style="font-size:0.7rem;">{{ translate('not-affiliate-or-partner') }}</span>
+            <span
+              class="data text-muted"
+              style="font-size:0.7rem;"
+            >{{ translate('not-affiliate-or-partner') }}</span>
           </template>
           <h2>{{ translate('subscribers') }}</h2>
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
           <template v-if="broadcasterType !== ''">
-            <span class="data" v-bind:title="currentBits" v-html="
-              Intl.NumberFormat($store.state.configuration.lang, {  
-                notation: b_shortenNumber ? 'compact' : 'standard',
-                maximumFractionDigits: b_shortenNumber ? 1 : 0,
-              }).formatToParts(isStreamOnline ? currentBits : 0).reduce(numberReducer, '')
-            "/>
+            <span
+              class="data"
+              :title="currentBits"
+              v-html="
+                Intl.NumberFormat($store.state.configuration.lang, {  
+                  notation: b_shortenNumber ? 'compact' : 'standard',
+                  maximumFractionDigits: b_shortenNumber ? 1 : 0,
+                }).formatToParts(isStreamOnline ? currentBits : 0).reduce(numberReducer, '')
+              "
+            />
             <span class="stats">
-              <small v-if="b_showAvgDiff && isStreamOnline && currentBits - averageStats.currentBits !== 0"
-                    :class="{
-                      'text-success': currentBits - averageStats.currentBits > 0,
-                      'stats-up': currentBits - averageStats.currentBits > 0,
-                      'text-danger': currentBits - averageStats.currentBits < 0,
-                      'stats-down': currentBits - averageStats.currentBits < 0,
-                    }">
+              <small
+                v-if="b_showAvgDiff && isStreamOnline && currentBits - averageStats.currentBits !== 0"
+                :class="{
+                  'text-success': currentBits - averageStats.currentBits > 0,
+                  'stats-up': currentBits - averageStats.currentBits > 0,
+                  'text-danger': currentBits - averageStats.currentBits < 0,
+                  'stats-down': currentBits - averageStats.currentBits < 0,
+                }"
+              >
                 <template v-if="currentBits - averageStats.currentBits !== 0">
-                  <fa :icon="currentBits - averageStats.currentBits > 0 ? 'caret-up' : 'caret-down'"/>
+                  <fa :icon="currentBits - averageStats.currentBits > 0 ? 'caret-up' : 'caret-down'" />
                   <span>
                     {{
                       Intl.NumberFormat($store.state.configuration.lang, {  
                         style: b_percentage ? 'percent' : 'decimal',
                         notation: b_shortenNumber ? 'compact' : 'standard',
-                       maximumFractionDigits: b_shortenNumber && !b_percentage ? 1 : 0,
+                        maximumFractionDigits: b_shortenNumber && !b_percentage ? 1 : 0,
                       }).format(b_percentage ? Math.abs(currentBits - averageStats.currentBits) / (averageStats.currentBits || 1) : currentBits - averageStats.currentBits)
                     }}
                   </span>
@@ -306,80 +399,99 @@
             </span>
           </template>
           <template v-else>
-            <span class="data text-muted" style="font-size:0.7rem;">{{ translate('not-affiliate-or-partner') }}</span>
+            <span
+              class="data text-muted"
+              style="font-size:0.7rem;"
+            >{{ translate('not-affiliate-or-partner') }}</span>
           </template>
           <h2>{{ translate('bits') }}</h2>
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
-          <span class="data" v-html="
-            Intl.NumberFormat($store.state.configuration.lang, {  
-              style: 'currency',
-              currency: $store.state.configuration.currency,
-            }).formatToParts(isStreamOnline ? currentTips : 0).reduce(numberReducer, '')
-          "/>
+          <span
+            class="data"
+            v-html="
+              Intl.NumberFormat($store.state.configuration.lang, {  
+                style: 'currency',
+                currency: $store.state.configuration.currency,
+              }).formatToParts(isStreamOnline ? currentTips : 0).reduce(numberReducer, '')
+            "
+          />
           <span class="stats">
-            <small v-if="b_showAvgDiff && isStreamOnline && currentTips - averageStats.currentTips !== 0"
-                  :class="{
-                    'text-success': currentTips - averageStats.currentTips > 0,
-                    'stats-up': currentTips - averageStats.currentTips > 0,
-                    'text-danger': currentTips - averageStats.currentTips < 0,
-                    'stats-down': currentTips - averageStats.currentTips < 0,
-                  }">
-                <template v-if="currentTips - averageStats.currentTips !== 0">
-                  <fa :icon="currentTips - averageStats.currentTips > 0 ? 'caret-up' : 'caret-down'"/>
-                  <span>
-                    {{
-                      Intl.NumberFormat($store.state.configuration.lang, {  
-                        style: b_percentage ? 'percent' : 'currency',
-                        currency: $store.state.configuration.currency,
-                      }).format(b_percentage ? Math.abs(currentTips - averageStats.currentTips) / (averageStats.currentTips || 1) : currentTips - averageStats.currentTips)
-                    }}
-                  </span>
-                </template>
+            <small
+              v-if="b_showAvgDiff && isStreamOnline && currentTips - averageStats.currentTips !== 0"
+              :class="{
+                'text-success': currentTips - averageStats.currentTips > 0,
+                'stats-up': currentTips - averageStats.currentTips > 0,
+                'text-danger': currentTips - averageStats.currentTips < 0,
+                'stats-down': currentTips - averageStats.currentTips < 0,
+              }"
+            >
+              <template v-if="currentTips - averageStats.currentTips !== 0">
+                <fa :icon="currentTips - averageStats.currentTips > 0 ? 'caret-up' : 'caret-down'" />
+                <span>
+                  {{
+                    Intl.NumberFormat($store.state.configuration.lang, {  
+                      style: b_percentage ? 'percent' : 'currency',
+                      currency: $store.state.configuration.currency,
+                    }).format(b_percentage ? Math.abs(currentTips - averageStats.currentTips) / (averageStats.currentTips || 1) : currentTips - averageStats.currentTips)
+                  }}
+                </span>
+              </template>
             </small>
           </span>
           <h2>{{ translate('tips') }}</h2>
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
-          <span class="data" v-html="
-            [
-              ...Intl.NumberFormat($store.state.configuration.lang, {  
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }).formatToParts((isStreamOnline ? currentWatched : 0) / 1000 / 60 / 60),
-              { type:'', value: ' '},
-              { type:'currency', value: 'h'}
-            ].reduce(numberReducer, '')
-          "/>
+          <span
+            class="data"
+            v-html="
+              [
+                ...Intl.NumberFormat($store.state.configuration.lang, {  
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).formatToParts((isStreamOnline ? currentWatched : 0) / 1000 / 60 / 60),
+                { type:'', value: ' '},
+                { type:'currency', value: 'h'}
+              ].reduce(numberReducer, '')
+            "
+          />
           <span class="stats">
-            <small v-if="b_showAvgDiff && isStreamOnline && currentWatched - averageStats.currentWatched !== 0"
-                  :class="{
-                    'text-success': currentWatched - averageStats.currentWatched > 0,
-                    'stats-up': currentWatched - averageStats.currentWatched > 0,
-                    'text-danger': currentWatched - averageStats.currentWatched < 0,
-                    'stats-down': currentWatched - averageStats.currentWatched < 0,
-                  }">
+            <small
+              v-if="b_showAvgDiff && isStreamOnline && currentWatched - averageStats.currentWatched !== 0"
+              :class="{
+                'text-success': currentWatched - averageStats.currentWatched > 0,
+                'stats-up': currentWatched - averageStats.currentWatched > 0,
+                'text-danger': currentWatched - averageStats.currentWatched < 0,
+                'stats-down': currentWatched - averageStats.currentWatched < 0,
+              }"
+            >
               <template v-if="currentWatched - averageStats.currentWatched !== 0">
-                <fa :icon="currentWatched - averageStats.currentWatched > 0 ? 'caret-up' : 'caret-down'"/>
-                <span v-if="b_percentage" v-html="
-                  [
-                    ...Intl.NumberFormat($store.state.configuration.lang, {  
-                      style: 'percent',
-                    }).formatToParts(averageStats.currentWatched / currentWatched),
-                  ].reduce(numberReducer, '')
-                "/>
-                <span v-else v-html="
-                  [
-                    ...Intl.NumberFormat($store.state.configuration.lang, {  
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    }).formatToParts((currentWatched - averageStats.currentWatched) / 1000 / 60 / 60),
-                    { type:'', value: ' '},
-                    { type:'', value: 'h'}
-                  ].reduce(numberReducer, '')
-                "/>
+                <fa :icon="currentWatched - averageStats.currentWatched > 0 ? 'caret-up' : 'caret-down'" />
+                <span
+                  v-if="b_percentage"
+                  v-html="
+                    [
+                      ...Intl.NumberFormat($store.state.configuration.lang, {  
+                        style: 'percent',
+                      }).formatToParts(averageStats.currentWatched / currentWatched),
+                    ].reduce(numberReducer, '')
+                  "
+                />
+                <span
+                  v-else
+                  v-html="
+                    [
+                      ...Intl.NumberFormat($store.state.configuration.lang, {  
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).formatToParts((currentWatched - averageStats.currentWatched) / 1000 / 60 / 60),
+                      { type:'', value: ' '},
+                      { type:'', value: 'h'}
+                    ].reduce(numberReducer, '')
+                  "
+                />
               </template>
             </small>
           </span>
@@ -388,25 +500,54 @@
       </div>
 
       <div class="row">
-        <div class="col-12 col-sm-12 col-md-4 col-lg-4 stream-info" @click="showGameAndTitleDlg">
-          <span class="data" v-if="game" :title="game">{{ game }}</span>
-          <span  class="data" v-else>{{ translate('not-available') }}</span>
+        <div
+          class="col-12 col-sm-12 col-md-4 col-lg-4 stream-info"
+          @click="showGameAndTitleDlg"
+        >
+          <span
+            v-if="game"
+            class="data"
+            :title="game"
+          >{{ game }}</span>
+          <span
+            v-else
+            class="data"
+          >{{ translate('not-available') }}</span>
           <h2>
             <span>{{ translate('game') }}</span>
             <small>{{ translate('click-to-change') }}</small>
           </h2>
         </div>
 
-        <div class="col-12 col-sm-12 col-md-4 col-lg-4 stream-info" @click="showGameAndTitleDlg">
-          <span class="data" v-if="title" :title="rawStatus" v-html="title"></span>
-          <span class="data" v-else>{{ translate('not-available') }}</span>
+        <div
+          class="col-12 col-sm-12 col-md-4 col-lg-4 stream-info"
+          @click="showGameAndTitleDlg"
+        >
+          <span
+            v-if="title"
+            class="data"
+            :title="rawStatus"
+            v-html="title"
+          />
+          <span
+            v-else
+            class="data"
+          >{{ translate('not-available') }}</span>
           <span class="data">
-            <small v-for="tag of filterTags(true)" :key="tag.name"
-              :class="{ 'text-muted': tag.is_auto }" :title="tag.is_auto ? 'Automatically added tag' : 'Manual tag'">
+            <small
+              v-for="tag of filterTags(true)"
+              :key="tag.name"
+              :class="{ 'text-muted': tag.is_auto }"
+              :title="tag.is_auto ? 'Automatically added tag' : 'Manual tag'"
+            >
               {{ tag.name }}
             </small>
-            <span v-for="tag of filterTags(false)" :key="tag.name"
-              :class="{ 'text-muted': tag.is_auto }" :title="tag.is_auto ? 'Automatically added tag' : 'Manual tag'">
+            <span
+              v-for="tag of filterTags(false)"
+              :key="tag.name"
+              :class="{ 'text-muted': tag.is_auto }"
+              :title="tag.is_auto ? 'Automatically added tag' : 'Manual tag'"
+            >
               {{ tag.name }}
             </span>
           </span>
@@ -473,7 +614,6 @@ export default defineComponent({
     const maxViewers = ref(0);
     const chatMessages = ref(0);
     const newChatters = ref(0);
-    const currentHosts = ref(0);
     const currentViews = ref(0);
     const currentBits = ref(0);
     const currentWatched = ref(0);
@@ -679,7 +819,6 @@ export default defineComponent({
         newChatters.value = data.newChatters;
         rawStatus.value = data.rawStatus;
         currentSong.value = data.currentSong;
-        currentHosts.value = data.currentHosts;
         currentWatched.value = data.currentWatched;
         tags.value = data.tags;
         isLoaded.value = true;
@@ -711,7 +850,6 @@ export default defineComponent({
       maxViewers,
       chatMessages,
       newChatters,
-      currentHosts,
       currentViews,
       currentBits,
       currentWatched,

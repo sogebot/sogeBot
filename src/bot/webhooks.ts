@@ -349,7 +349,6 @@ class Webhooks {
         currentViews:       stats.value.currentViews,
         maxViewers:         stats.value.maxViewers,
         newChatters:        stats.value.newChatters,
-        currentHosts:       stats.value.currentHosts,
         currentWatched:     stats.value.currentWatchedTime,
       });
     } else {

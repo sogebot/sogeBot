@@ -15,7 +15,6 @@ const stats = persistent({
     currentViews:       0,
     currentGame:        null,
     currentTitle:       null,
-    currentHosts:       0,
     newChatters:        0,
   } as {
     language: string;
@@ -29,7 +28,6 @@ const stats = persistent({
     currentViews: number;
     currentGame: string | null;
     currentTitle: string | null;
-    currentHosts: number;
     newChatters: number;
   },
   name:      'stats',

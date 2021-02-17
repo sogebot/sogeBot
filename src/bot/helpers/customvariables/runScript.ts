@@ -2,7 +2,7 @@ import axios from 'axios';
 import { js as jsBeautify } from 'js-beautify';
 import _ from 'lodash';
 import {
-  filter, get, isNil, map, sample, 
+  filter, get, isNil, map, sample,
 } from 'lodash';
 import safeEval from 'safe-eval';
 import strip from 'strip-comments';
@@ -13,13 +13,13 @@ import Message from '../../message';
 import { getUserFromTwitch } from '../../microservices/getUserFromTwitch';
 import users from '../../users';
 import {
-  chatMessagesAtStart, isStreamOnline, stats, streamStatusChangeSince, 
+  chatMessagesAtStart, isStreamOnline, stats, streamStatusChangeSince,
 } from '../api';
 import { mainCurrency, symbol } from '../currency';
 import { getAllOnlineUsernames } from '../getAllOnlineUsernames';
 import { getTime } from '../getTime';
 import {
-  debug, error, info, warning, 
+  debug, error, info, warning,
 } from '../log';
 import { linesParsed } from '../parser';
 import { isModerator } from '../user/isModerator';
@@ -44,7 +44,7 @@ async function runScript (script: string, opts: { sender: { userId: number; user
   const containRandom = strippedScript.replace(/Math\.random|_\.random/g, '').match(/random/g) !== null;
   const containOnline = strippedScript.match(/online/g) !== null;
   debug('customvariables.eval', {
-    strippedScript, containOnline, containRandom, containUsers, 
+    strippedScript, containOnline, containRandom, containUsers,
   });
 
   let usersList: UserInterface[] = [];
@@ -112,7 +112,7 @@ async function runScript (script: string, opts: { sender: { userId: number; user
 
       const request = await axios(urlOpts);
       return {
-        data: request.data, status: request.status, statusText: request.statusText, 
+        data: request.data, status: request.status, statusText: request.statusText,
       };
     },
     _:      _,
@@ -132,7 +132,6 @@ async function runScript (script: string, opts: { sender: { userId: number; user
       newChatters:        stats.value.newChatters,
       game:               stats.value.currentGame,
       status:             stats.value.currentTitle,
-      currentHosts:       stats.value.currentHosts,
       currentWatched:     stats.value.currentWatchedTime,
     },
     sender,

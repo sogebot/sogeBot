@@ -43,7 +43,7 @@ class Stats extends Core {
     this.currentViews = stats.value.currentViews;
     this.currentSubscribers = stats.value.currentSubscribers;
     debug('stats', JSON.stringify({
-      currentFollowers: this.currentFollowers, currentViews: this.currentViews, currentSubscribers: this.currentSubscribers, 
+      currentFollowers: this.currentFollowers, currentViews: this.currentViews, currentSubscribers: this.currentSubscribers,
     }));
   }
 
@@ -84,7 +84,6 @@ class Stats extends Core {
               statsToReturn.chatMessages += _self.parseStat(stat.chatMessages);
               statsToReturn.maxViewers += _self.parseStat(stat.maxViewers);
               statsToReturn.newChatters += _self.parseStat(stat.newChatters);
-              statsToReturn.currentHosts += _self.parseStat(stat.currentHosts);
               statsToReturn.currentWatched += _self.parseStat(stat.currentWatched);
             }
             statsToReturn.currentViewers = Number(Number(statsToReturn.currentViewers / statsFromDb.length).toFixed(0));
@@ -93,18 +92,17 @@ class Stats extends Core {
             statsToReturn.chatMessages = Number(Number(statsToReturn.chatMessages / statsFromDb.length).toFixed(0));
             statsToReturn.maxViewers = Number(Number(statsToReturn.maxViewers / statsFromDb.length).toFixed(0));
             statsToReturn.newChatters = Number(Number(statsToReturn.newChatters / statsFromDb.length).toFixed(0));
-            statsToReturn.currentHosts = Number(Number(statsToReturn.currentHosts / statsFromDb.length).toFixed(0));
             statsToReturn.currentWatched = Number(Number(statsToReturn.currentWatched / statsFromDb.length).toFixed(0));
             cachedStats = cloneDeep(statsToReturn);
             cb(null, {
-              ...statsToReturn, currentFollowers: _self.currentFollowers, currentViews: _self.currentViews, currentSubscribers: _self.currentSubscribers, 
+              ...statsToReturn, currentFollowers: _self.currentFollowers, currentViews: _self.currentViews, currentSubscribers: _self.currentSubscribers,
             });
           } else {
             cb(null, {});
           }
         } else {
           cb(null, {
-            ...cachedStats, currentFollowers: _self.currentFollowers, currentViews: _self.currentViews, currentSubscribers: _self.currentSubscribers, 
+            ...cachedStats, currentFollowers: _self.currentFollowers, currentViews: _self.currentViews, currentSubscribers: _self.currentSubscribers,
           });
         }
       } catch (e) {
@@ -120,7 +118,6 @@ class Stats extends Core {
       const statsFromDB = await getRepository(TwitchStats).findOne({ 'whenOnline': whenOnline });
       await getRepository(TwitchStats).save({
         currentViewers:     statsFromDB ? Math.round((data.currentViewers + statsFromDB.currentViewers) / 2) : data.currentViewers,
-        currentHosts:       statsFromDB ? Math.round((data.currentHosts + statsFromDB.currentHosts) / 2) : data.currentHosts,
         whenOnline:         statsFromDB ? statsFromDB.whenOnline : Date.now(),
         currentSubscribers: data.currentSubscribers,
         currentBits:        data.currentBits,
