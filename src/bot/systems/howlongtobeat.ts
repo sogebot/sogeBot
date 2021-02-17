@@ -123,7 +123,7 @@ class HowLongToBeat extends System {
         const gameFromHltb = gamesFromHltb.length > 0 ? gamesFromHltb[0] : null;
         if (gameFromHltb && gameFromHltb.imageUrl !== game.imageUrl) {
           info(`HowLongToBeat | Thumbnail for ${game.game} is updated.`);
-          getRepository(HowLongToBeatGame).update({ id: game.id }, { imageUrl });
+          getRepository(HowLongToBeatGame).update({ id: game.id }, { imageUrl: gameFromHltb.imageUrl });
         }
       }
     } catch (e) {
