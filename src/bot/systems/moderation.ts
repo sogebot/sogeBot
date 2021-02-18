@@ -11,7 +11,7 @@ import * as constants from '../constants';
 import { Alias } from '../database/entity/alias';
 import { ModerationPermit, ModerationWarning } from '../database/entity/moderation';
 import {
-  command, default_permission, parser, permission_settings, settings,
+  command, default_permission, parser, permission_settings, settings, ui,
 } from '../decorators';
 import Expects from '../expects';
 import { prepare } from '../helpers/commons';
@@ -71,6 +71,10 @@ class Moderation extends System {
   @settings('lists')
   cListsWhitelist: string[] = [];
   @settings('lists')
+  @ui({
+    type:   'textarea-from-array',
+    secret: true,
+  })
   cListsBlacklist: string[] = [];
   @permission_settings('lists', [ defaultPermissions.CASTERS ], { [defaultPermissions.MODERATORS]: false })
   cListsEnabled = true;
@@ -599,8 +603,8 @@ class Moderation extends System {
         if (XRegExp.exec(` ${opts.message} `, regexp)) {
           isOK = false;
           this.timeoutUser(opts.sender, opts.message,
-            translate('moderation.user-is-warned-about-blacklist'),
-            translate('moderation.user-have-timeout-for-blacklist'),
+            translate('moderation.user-is-warned-about-forbidden-words'),
+            translate('moderation.user-have-timeout-for-forbidden-words'),
             timeoutValues[permId], 'blacklist');
           break;
         }
