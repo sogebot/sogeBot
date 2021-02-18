@@ -1064,7 +1064,7 @@
     "user-is-warned-about-spam": "Spamming ist nicht erlaubt [$count Warnungen übrig]",
     "user-is-warned-about-color": "Farben und /me sind nicht erlaubt [$count Warnungen übrig]",
     "user-is-warned-about-emotes": "Keine Emotes Spamming [$count Warnungen übrig]",
-    "user-is-warned-about-blacklist": "Keine Wörter auf der Sperrliste erlaubt [$count Warnungen übrig]",
+    "user-is-warned-about-forbidden-words": "No forbidden words [$count warnings left]",
     "user-have-timeout-for-links": "Keine Links erlaubt. Frage nach !permit",
     "user-have-timeout-for-symbols": "Keine übermäßige Verwendung von Symbolen",
     "user-have-timeout-for-long-message": "Lange Nachricht ist nicht erlaubt",
@@ -1072,7 +1072,7 @@
     "user-have-timeout-for-spam": "Spammen ist nicht erlaubt",
     "user-have-timeout-for-color": "Farben und /me sind nicht erlaubt",
     "user-have-timeout-for-emotes": "Kein Emotes Spamming",
-    "user-have-timeout-for-blacklist": "Keine blockierten Wörter"
+    "user-have-timeout-for-forbidden-words": "No forbidden words"
   },
   "queue": {
     "list": "$sender, aktueller Warteschlangen pool: $users",
