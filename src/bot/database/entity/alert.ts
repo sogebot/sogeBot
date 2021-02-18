@@ -10,7 +10,7 @@ export interface EmitData {
   recipient?: string;
   currency: string;
   monthsName: string;
-  event: keyof Omit<AlertInterface, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList'>;
+  event: keyof Omit<AlertInterface, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList' | 'tts'>;
   message: string;
 }
 
@@ -76,10 +76,6 @@ export interface CommonSettingsInterface {
     enabled: boolean;
     skipUrls: boolean;
     keepAlertShown: boolean;
-    voice: string;
-    pitch: number;
-    volume: number;
-    rate: number;
     minAmountToPlay: number;
   };
   font: {
@@ -113,6 +109,12 @@ export interface AlertInterface {
     en: boolean;
     ru: boolean;
   };
+  tts: {
+    voice: string;
+    pitch: number;
+    volume: number;
+    rate: number;
+  } | null;
   customProfanityList: string;
   follows: CommonSettingsInterface[];
   subs: CommonSettingsInterface[];
@@ -192,10 +194,10 @@ export interface AlertResubInterface extends CommonSettingsInterface {
 
 export const CommonSettingsSchema = {
   id: {
-    type: 'uuid', primary: true, generated: 'uuid', 
+    type: 'uuid', primary: true, generated: 'uuid',
   } as EntitySchemaColumnOptions,
   alertId: {
-    nullable: true, name: 'alertId', type: String, 
+    nullable: true, name: 'alertId', type: String,
   } as EntitySchemaColumnOptions,
   enabled:              { type: Boolean } as EntitySchemaColumnOptions,
   title:                { type: String } as EntitySchemaColumnOptions,
@@ -225,16 +227,17 @@ export const Alert = new EntitySchema<Readonly<Required<AlertInterface>>>({
   name:    'alert',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid', 
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     updatedAt: {
-      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0, 
+      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,
     },
     name:                      { type: String },
     alertDelayInMs:            { type: Number },
     profanityFilterType:       { type: String },
     loadStandardProfanityList: { type: 'simple-json' },
     customProfanityList:       { type: 'text' },
+    tts:                       { type: 'simple-json', nullable: true },
   },
   relations: {
     follows: {
@@ -310,7 +313,7 @@ export const AlertMedia = new EntitySchema<Readonly<Required<AlertMediaInterface
   name:    'alert_media',
   columns: {
     primaryId: {
-      type: Number, primary: true, generated: true, 
+      type: Number, primary: true, generated: true,
     },
     id:      { type: String },
     b64data: { type: ['mysql', 'mariadb'].includes(process.env.TYPEORM_CONNECTION ?? 'better-sqlite3') ? 'longtext' : 'text' },
