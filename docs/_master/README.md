@@ -44,7 +44,7 @@ You can also contact me on my email sogehige@gmail.com or get support on our [di
 | Spotify            | **Songrequest** for Spotify Premium Users                                                                                                |
 | Cooldowns          | Stop spamming of commands with cooldowns!                                                                                                |
 | Permissions        | Set your custom permissions for your commands! (owner, mods, regular, viewer)                                                            |
-| Moderation         | Automoderate links, colors, symbols, blacklist and more!                                                                                 |
+| Moderation         | Automoderate links, colors, symbols, forbidden words and more!                                                                                 |
 | Twitch             | Be able to change your game and title from webpanel and much more! !uptime, !lastseen, etc.                                              |
 | Webpanel and Stats | Bot is tracking your twitch **stats** and bot **webpanel** is user friendly and full of features!                                        |
 |                    | Many widgets for your dashboard: customizable soundboard (/public/dist/soundboard/), follower list, twitch monitor, bets, songs and more |
