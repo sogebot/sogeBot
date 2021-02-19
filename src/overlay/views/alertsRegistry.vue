@@ -858,7 +858,7 @@ export default class AlertsRegistryOverlays extends Vue {
                   ...data.cmdredeems,
                   ...data.rewardredeems,
                 ]) {
-                  const fontFamily = event.font ? event.font.family : this.data?.font.family;
+                  const fontFamily = event.font ? event.font.family : this.data.font.family;
                   if (!this.loadedFonts.includes(fontFamily)) {
                     console.debug('Loading font', fontFamily);
                     this.loadedFonts.push(fontFamily);
