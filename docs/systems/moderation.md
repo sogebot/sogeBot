@@ -2,9 +2,9 @@
 `!permit <username> <count:optional:default:1>` - **MODS** - user will be able
 to post a <count> of link without timeout
 
-You can blacklist/whitelist words in UI `settings->moderation`
+You can allow/forbide words in UI `settings->moderation`
 
-## Blacklisting and whitelisting words
+## Allowing and forbidding words
 
 ### Available special characters
 
