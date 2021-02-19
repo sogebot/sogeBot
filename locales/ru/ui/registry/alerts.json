@@ -150,6 +150,7 @@
   "font": {
     "setting": "Настройки шрифта",
     "name": "Семейство шрифтов",
+    "overrideGlobal": "Override global font settings",
     "align": {
       "name": "Расположение",
       "left": "Слева",
