@@ -6,7 +6,13 @@
       :label-for="'enabled' + data.id"
       :label="translate('registry.alerts.enabled')"
     >
-      <b-form-checkbox v-bind:key="'enabled' + data.id" :id="'enabled' + data.id" v-model="data.enabled" :name="'enabled' + data.id" switch></b-form-checkbox>
+      <b-form-checkbox
+        :id="'enabled' + data.id"
+        :key="'enabled' + data.id"
+        v-model="data.enabled"
+        :name="'enabled' + data.id"
+        switch
+      />
     </b-form-group>
 
     <b-form-group
@@ -21,7 +27,7 @@
         type="text"
         :placeholder="translate('registry.alerts.title.placeholder')"
         @input="$v.data.$touch()"
-      ></b-form-input>
+      />
     </b-form-group>
 
     <b-form-group
@@ -39,7 +45,7 @@
           ['amount', 'number'],
           ['tier', 'tier']
         ]"
-      ></query-filter>
+      />
     </b-form-group>
 
     <b-form-group
@@ -52,7 +58,7 @@
         :key="'variant-' + data.id"
         :amount.sync="data.variantAmount"
         :state="$v.data.variantAmount.$invalid && $v.data.variantAmount.$dirty ? false : null"
-      ></variant>
+      />
     </b-form-group>
 
     <b-form-group
@@ -67,9 +73,9 @@
         v-model="data.messageTemplate"
         type="text"
         :placeholder="translate('registry.alerts.messageTemplate.placeholder')"
-        @input="$v.data.$touch()"
         :state="$v.data.messageTemplate.$invalid && $v.data.messageTemplate.$dirty ? false : null"
-      ></b-form-input>
+        @input="$v.data.$touch()"
+      />
     </b-form-group>
 
     <b-form-group
@@ -81,8 +87,8 @@
       <text-animation
         :id="'animationText' + data.id"
         :animation.sync="data.animationText"
-        :animationOptions.sync="data.animationTextOptions"
-      ></text-animation>
+        :animation-options.sync="data.animationTextOptions"
+      />
     </b-form-group>
 
     <b-form-group
@@ -94,8 +100,8 @@
       <animation-in
         :id="'animationIn' + data.id"
         :animation.sync="data.animationIn"
-        :animationDuration.sync="data.animationInDuration"
-      ></animation-in>
+        :animation-duration.sync="data.animationInDuration"
+      />
     </b-form-group>
 
     <b-form-group
@@ -107,13 +113,16 @@
       <animation-out
         :id="'animationOut' + data.id"
         :animation.sync="data.animationOut"
-        :animationDuration.sync="data.animationOutDuration"
-      ></animation-out>
+        :animation-duration.sync="data.animationOutDuration"
+      />
     </b-form-group>
 
-    <b-form-group label-cols-sm="4" label-cols-lg="3"
-                  :label="translate('registry.alerts.alertDurationInMs.name')"
-                  :label-for="'alertDurationInMs' + data.id">
+    <b-form-group
+      label-cols-sm="4"
+      label-cols-lg="3"
+      :label="translate('registry.alerts.alertDurationInMs.name')"
+      :label-for="'alertDurationInMs' + data.id"
+    >
       <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
         <b-form-input
           :id="'alertDurationInMs' + data.id"
@@ -122,8 +131,11 @@
           min="0"
           max="60000"
           step="500"
-        ></b-form-input>
-        <b-input-group-text slot="append" class="pr-3 pl-3">
+        />
+        <b-input-group-text
+          slot="append"
+          class="pr-3 pl-3"
+        >
           <div style="width: 3rem;">
             {{ String(data.alertDurationInMs / 1000) + 's' }}
           </div>
@@ -131,9 +143,12 @@
       </b-input-group>
     </b-form-group>
 
-    <b-form-group label-cols-sm="4" label-cols-lg="3"
-                  :label="translate('registry.alerts.alertTextDelayInMs.name')"
-                  :label-for="'alertTextDelayInMs' + data.id">
+    <b-form-group
+      label-cols-sm="4"
+      label-cols-lg="3"
+      :label="translate('registry.alerts.alertTextDelayInMs.name')"
+      :label-for="'alertTextDelayInMs' + data.id"
+    >
       <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
         <b-form-input
           :id="'alertTextDelayInMs' + data.id"
@@ -142,8 +157,11 @@
           min="0"
           max="60000"
           step="500"
-        ></b-form-input>
-        <b-input-group-text slot="append" class="pr-3 pl-3">
+        />
+        <b-input-group-text
+          slot="append"
+          class="pr-3 pl-3"
+        >
           <div style="width: 3rem;">
             {{ String(data.alertTextDelayInMs / 1000) + 's' }}
           </div>
@@ -151,9 +169,12 @@
       </b-input-group>
     </b-form-group>
 
-    <b-form-group label-cols-sm="4" label-cols-lg="3"
-            :label="translate('registry.alerts.soundVolume.name')"
-            :label-for="'soundVolume' + data.id">
+    <b-form-group
+      label-cols-sm="4"
+      label-cols-lg="3"
+      :label="translate('registry.alerts.soundVolume.name')"
+      :label-for="'soundVolume' + data.id"
+    >
       <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
         <b-form-input
           :id="'soundVolume' + data.id"
@@ -162,10 +183,13 @@
           min="0"
           max="100"
           step="1"
-        ></b-form-input>
-        <b-input-group-text slot="append" class="pr-3 pl-3">
+        />
+        <b-input-group-text
+          slot="append"
+          class="pr-3 pl-3"
+        >
           <div style="width: 3rem;">
-            {{data.soundVolume}}%
+            {{ data.soundVolume }}%
           </div>
         </b-input-group-text>
       </b-input-group>
@@ -177,59 +201,142 @@
       :label-for="'enableAdvancedMode' + data.id"
       :label="translate('registry.alerts.enableAdvancedMode')"
     >
-      <b-form-checkbox v-bind:key="'enableAdvancedMode' + data.id" :id="'enableAdvancedMode' + data.id" v-model="data.enableAdvancedMode" :name="'enableAdvancedMode' + data.id" switch></b-form-checkbox>
+      <b-form-checkbox
+        :id="'enableAdvancedMode' + data.id"
+        :key="'enableAdvancedMode' + data.id"
+        v-model="data.enableAdvancedMode"
+        :name="'enableAdvancedMode' + data.id"
+        switch
+      />
     </b-form-group>
 
-    <b-form-group label-cols-sm="4" label-cols-lg="3"
-                  v-if="!data.enableAdvancedMode"
-                  :label="translate('registry.alerts.layoutPicker.name')">
-      <layout-picker :layout.sync="data.layout"/>
+    <b-form-group
+      v-if="!data.enableAdvancedMode"
+      label-cols-sm="4"
+      label-cols-lg="3"
+      :label="translate('registry.alerts.layoutPicker.name')"
+    >
+      <layout-picker :layout.sync="data.layout" />
     </b-form-group>
 
-    <div class="btn-group col-md-12 p-0" role="group" v-if="data.enableAdvancedMode">
-      <button type="button" class="btn" @click="customShow = 'html'" :class="[customShow === 'html' ? 'btn-dark' : 'btn-outline-dark']">HTML</button>
-      <button type="button" class="btn" @click="customShow = 'css'" :class="[customShow === 'css' ? 'btn-dark' : 'btn-outline-dark']">CSS</button>
-      <button type="button" class="btn" @click="customShow = 'js'" :class="[customShow === 'js' ? 'btn-dark' : 'btn-outline-dark']">JS</button>
+    <div
+      v-if="data.enableAdvancedMode"
+      class="btn-group col-md-12 p-0"
+      role="group"
+    >
+      <button
+        type="button"
+        class="btn"
+        :class="[customShow === 'html' ? 'btn-dark' : 'btn-outline-dark']"
+        @click="customShow = 'html'"
+      >
+        HTML
+      </button>
+      <button
+        type="button"
+        class="btn"
+        :class="[customShow === 'css' ? 'btn-dark' : 'btn-outline-dark']"
+        @click="customShow = 'css'"
+      >
+        CSS
+      </button>
+      <button
+        type="button"
+        class="btn"
+        :class="[customShow === 'js' ? 'btn-dark' : 'btn-outline-dark']"
+        @click="customShow = 'js'"
+      >
+        JS
+      </button>
     </div>
-    <div class="col-md-12 p-0 pb-2" v-if="data.enableAdvancedMode" :key="customShow + data.id + 'advancedMode'">
-      <codemirror style="font-size: 0.8em;" v-if="customShow === 'html'" class="w-100" v-model="data.advancedMode.html" :options="{
-        tabSize: 4,
-        mode: 'text/html',
-        theme: 'base16-' + theme,
-        lineNumbers: true,
-        line: true,
-      }"></codemirror>
-      <codemirror style="font-size: 0.8em;" v-if="customShow === 'js'" class="w-100" v-model="data.advancedMode.js" :options="{
-        tabSize: 4,
-        mode: 'text/javascript',
-        theme: 'base16-' + theme,
-        lineNumbers: true,
-        line: true,
-      }"></codemirror>
-      <codemirror style="font-size: 0.8em;" v-if="customShow === 'css'" class="w-100"  v-model="data.advancedMode.css" :options="{
-        tabSize: 4,
-        mode: 'text/css',
-        theme: 'base16-' + theme,
-        lineNumbers: true,
-        line: true,
-      }"></codemirror>
+    <div
+      v-if="data.enableAdvancedMode"
+      :key="customShow + data.id + 'advancedMode'"
+      class="col-md-12 p-0 pb-2"
+    >
+      <codemirror
+        v-if="customShow === 'html'"
+        v-model="data.advancedMode.html"
+        style="font-size: 0.8em;"
+        class="w-100"
+        :options="{
+          tabSize: 4,
+          mode: 'text/html',
+          theme: 'base16-' + theme,
+          lineNumbers: true,
+          line: true,
+        }"
+      />
+      <codemirror
+        v-if="customShow === 'js'"
+        v-model="data.advancedMode.js"
+        style="font-size: 0.8em;"
+        class="w-100"
+        :options="{
+          tabSize: 4,
+          mode: 'text/javascript',
+          theme: 'base16-' + theme,
+          lineNumbers: true,
+          line: true,
+        }"
+      />
+      <codemirror
+        v-if="customShow === 'css'"
+        v-model="data.advancedMode.css"
+        style="font-size: 0.8em;"
+        class="w-100"
+        :options="{
+          tabSize: 4,
+          mode: 'text/css',
+          theme: 'base16-' + theme,
+          lineNumbers: true,
+          line: true,
+        }"
+      />
     </div>
 
     <b-card no-body>
-      <b-card-header header-tag="header" class="p-1" role="tab">
-        <b-button block v-b-toggle="'accordion-image-' + data.id" variant="light" class="text-left">{{translate('registry.alerts.image.setting')}}</b-button>
+      <b-card-header
+        header-tag="header"
+        class="p-1"
+        role="tab"
+      >
+        <b-button
+          v-b-toggle="'accordion-image-' + data.id"
+          block
+          variant="light"
+          class="text-left"
+        >
+          {{ translate('registry.alerts.image.setting') }}
+        </b-button>
       </b-card-header>
-      <b-collapse :id="'accordion-image-' + data.id" :accordion="'accordion-image-' + data.id" role="tabpanel">
+      <b-collapse
+        :id="'accordion-image-' + data.id"
+        :accordion="'accordion-image-' + data.id"
+        role="tabpanel"
+      >
         <b-card-body>
-          <b-form-group label-cols-sm="4" label-cols-lg="3"
-                  :label="translate('registry.alerts.image.name')"
-                  :label-for="'image' + data.id">
-            <media :media.sync="data.imageId" type="image" socket="/registries/alerts" :key="'image-' + data.imageId" :volume="data.soundVolume"/>
+          <b-form-group
+            label-cols-sm="4"
+            label-cols-lg="3"
+            :label="translate('registry.alerts.image.name')"
+            :label-for="'image' + data.id"
+          >
+            <media
+              :key="'image-' + data.imageId"
+              :media.sync="data.imageId"
+              type="image"
+              socket="/registries/alerts"
+              :volume="data.soundVolume"
+            />
           </b-form-group>
 
-          <b-form-group label-cols-sm="4" label-cols-lg="3"
-                  :label="translate('registry.alerts.scale.name')"
-                  :label-for="'scale' + data.id">
+          <b-form-group
+            label-cols-sm="4"
+            label-cols-lg="3"
+            :label="translate('registry.alerts.scale.name')"
+            :label-for="'scale' + data.id"
+          >
             <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
               <b-form-input
                 :id="'scale' + data.id"
@@ -238,18 +345,24 @@
                 min="0"
                 max="500"
                 step="1"
-              ></b-form-input>
-              <b-input-group-text slot="append" class="pr-3 pl-3">
+              />
+              <b-input-group-text
+                slot="append"
+                class="pr-3 pl-3"
+              >
                 <div style="width: 3rem;">
-                  {{data.imageOptions.scale}}%
+                  {{ data.imageOptions.scale }}%
                 </div>
               </b-input-group-text>
             </b-input-group>
           </b-form-group>
 
-          <b-form-group label-cols-sm="4" label-cols-lg="3"
-                  :label="translate('registry.alerts.translateX.name')"
-                  :label-for="'translateX' + data.id">
+          <b-form-group
+            label-cols-sm="4"
+            label-cols-lg="3"
+            :label="translate('registry.alerts.translateX.name')"
+            :label-for="'translateX' + data.id"
+          >
             <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
               <b-form-input
                 :id="'translateX' + data.id"
@@ -258,18 +371,24 @@
                 min="-1000"
                 max="1000"
                 step="1"
-              ></b-form-input>
-              <b-input-group-text slot="append" class="pr-3 pl-3">
+              />
+              <b-input-group-text
+                slot="append"
+                class="pr-3 pl-3"
+              >
                 <div style="width: 3rem;">
-                  {{data.imageOptions.translateX}}px
+                  {{ data.imageOptions.translateX }}px
                 </div>
               </b-input-group-text>
             </b-input-group>
           </b-form-group>
 
-          <b-form-group label-cols-sm="4" label-cols-lg="3"
-                  :label="translate('registry.alerts.translateY.name')"
-                  :label-for="'translateY' + data.id">
+          <b-form-group
+            label-cols-sm="4"
+            label-cols-lg="3"
+            :label="translate('registry.alerts.translateY.name')"
+            :label-for="'translateY' + data.id"
+          >
             <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
               <b-form-input
                 :id="'translateY' + data.id"
@@ -278,10 +397,13 @@
                 min="-1000"
                 max="1000"
                 step="1"
-              ></b-form-input>
-              <b-input-group-text slot="append" class="pr-3 pl-3">
+              />
+              <b-input-group-text
+                slot="append"
+                class="pr-3 pl-3"
+              >
                 <div style="width: 3rem;">
-                  {{data.imageOptions.translateY}}px
+                  {{ data.imageOptions.translateY }}px
                 </div>
               </b-input-group-text>
             </b-input-group>
@@ -291,146 +413,98 @@
     </b-card>
 
     <b-card no-body>
-      <b-card-header header-tag="header" class="p-1" role="tab">
-        <b-button block v-b-toggle="'accordion-sound-' + data.id" variant="light" class="text-left">{{translate('registry.alerts.sound.setting')}}</b-button>
+      <b-card-header
+        header-tag="header"
+        class="p-1"
+        role="tab"
+      >
+        <b-button
+          v-b-toggle="'accordion-sound-' + data.id"
+          block
+          variant="light"
+          class="text-left"
+        >
+          {{ translate('registry.alerts.sound.setting') }}
+        </b-button>
       </b-card-header>
-      <b-collapse :id="'accordion-sound-' + data.id" :accordion="'accordion-sound-' + data.id" role="tabpanel">
-        <b-card-body>
-          <b-form-group label-cols-sm="4" label-cols-lg="3"
-                  :label="translate('registry.alerts.sound.name')"
-                  :label-for="'sound' + data.id">
-            <media :media.sync="data.soundId" type="audio" socket="/registries/alerts" :volume="data.soundVolume" :key="'sound-' + data.soundId"/>
-          </b-form-group>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
-
-    <b-card no-body>
-      <b-card-header header-tag="header" class="p-1" role="tab">
-        <b-button block v-b-toggle="'accordion-2' + data.id" variant="light" class="text-left">{{translate('registry.alerts.message.setting')}}</b-button>
-      </b-card-header>
-      <b-collapse :id="'accordion-2' + data.id" accordion="message-accordion" role="tabpanel">
+      <b-collapse
+        :id="'accordion-sound-' + data.id"
+        :accordion="'accordion-sound-' + data.id"
+        role="tabpanel"
+      >
         <b-card-body>
           <b-form-group
             label-cols-sm="4"
             label-cols-lg="3"
-            :label="translate('registry.alerts.allowEmotes.name')">
-            <b-form-checkbox v-model="data.message.allowEmotes.twitch" name="twitch">Twitch</b-form-checkbox>
-            <b-form-checkbox v-model="data.message.allowEmotes.ffz" name="ffz">FrankenFaceZ</b-form-checkbox>
-            <b-form-checkbox v-model="data.message.allowEmotes.bttv" name="bttv">BetterTTV</b-form-checkbox>
-          </b-form-group>
-
-          <b-form-group label-cols-sm="4" label-cols-lg="3"
-                       :label="translate('registry.alerts.font.name')">
-            <b-form-select v-model="data.message.font.family" :options="fonts" plain></b-form-select>
-          </b-form-group>
-
-          <b-form-group label-cols-sm="4" label-cols-lg="3"
-                  :label="translate('registry.alerts.font.align.name')"
-                  :label-for="'font.align' + data.id"
-                  v-if="data.message.font.align">
-            <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-              <b-form-select v-model="data.message.font.align" class="mb-3" :id="'font.align' + data.id">
-                <b-form-select-option value="left">{{translate('registry.alerts.font.align.left')}}</b-form-select-option>
-                <b-form-select-option value="center">{{translate('registry.alerts.font.align.center')}}</b-form-select-option>
-                <b-form-select-option value="right">{{translate('registry.alerts.font.align.right')}}</b-form-select-option>
-              </b-form-select>
-            </b-input-group>
-          </b-form-group>
-
-          <b-form-group label-cols-sm="4" label-cols-lg="3"
-                  :label="translate('registry.alerts.font.size.name')"
-                  :label-for="'font.size' + data.id">
-            <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-              <b-form-input
-                :id="'font.size' + data.id"
-                v-model="data.message.font.size"
-                type="range"
-                min="1"
-                max="200"
-                step="1"
-              ></b-form-input>
-              <b-input-group-text slot="append" class="pr-3 pl-3">
-                <div style="width: 3rem;">
-                  {{data.message.font.size}}px
-                </div>
-              </b-input-group-text>
-            </b-input-group>
-          </b-form-group>
-
-          <b-form-group label-cols-sm="4" label-cols-lg="3"
-                  :label="translate('registry.alerts.font.weight.name')"
-                  :label-for="'font.weight' + data.id">
-            <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-              <b-form-input
-                :id="'font.weight' + data.id"
-                v-model="data.message.font.weight"
-                type="range"
-                min="100"
-                max="900"
-                step="100"
-              ></b-form-input>
-              <b-input-group-text slot="append" class="pr-3 pl-3">
-                <div style="width: 3rem;">
-                  {{ data.message.font.weight}}
-                </div>
-              </b-input-group-text>
-            </b-input-group>
-          </b-form-group>
-
-          <b-form-group label-cols-sm="4" label-cols-lg="3"
-                  :label="translate('registry.alerts.font.borderPx.name')"
-                  :label-for="'font.borderPx' + data.id">
-            <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-              <b-form-input
-                :id="'font.borderPx' + data.id"
-                v-model="data.message.font.borderPx"
-                type="range"
-                min="0"
-                max="100"
-                step="1"
-              ></b-form-input>
-              <b-input-group-text slot="append" class="pr-3 pl-3">
-                <div style="width: 3rem;">
-                  {{ data.message.font.borderPx}}px
-                </div>
-              </b-input-group-text>
-            </b-input-group>
-          </b-form-group>
-
-          <b-form-group label-cols-sm="4" label-cols-lg="3"
-                  :label="translate('registry.alerts.font.borderColor.name')"
-                  :label-for="'font.borderColor' + data.id">
-            <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-              <b-form-input
-                :id="'font.borderColor' + data.id"
-                v-model="data.message.font.borderColor"
-                type="color"
-              ></b-form-input>
-            </b-input-group>
-          </b-form-group>
-
-          <b-form-group label-cols-sm="4" label-cols-lg="3"
-                  :label="translate('registry.alerts.font.color.name')"
-                  :label-for="'font.color' + data.id">
-            <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-              <b-form-input
-                :id="'font.color' + data.id"
-                v-model="data.message.font.color"
-                type="color"
-              ></b-form-input>
-            </b-input-group>
+            :label="translate('registry.alerts.sound.name')"
+            :label-for="'sound' + data.id"
+          >
+            <media
+              :key="'sound-' + data.soundId"
+              :media.sync="data.soundId"
+              type="audio"
+              socket="/registries/alerts"
+              :volume="data.soundVolume"
+            />
           </b-form-group>
         </b-card-body>
       </b-collapse>
     </b-card>
 
-    <font :data.sync="data.font" key="form-resubs-font"/>
-    <tts :tts.sync="data.tts" :uuid="'tts' + data.id"/>
+    <font
+      key="form-resubs-messagefont"
+      :parent="parent.fontMessage"
+      :data.sync="data.message.font"
+      :is-child="true"
+      title="message"
+    >
+      <b-form-group
+        label-cols-sm="4"
+        label-cols-lg="3"
+        :label="translate('registry.alerts.allowEmotes.name')"
+      >
+        <b-form-checkbox
+          v-model="data.message.allowEmotes.twitch"
+          name="twitch"
+        >
+          Twitch
+        </b-form-checkbox>
+        <b-form-checkbox
+          v-model="data.message.allowEmotes.ffz"
+          name="ffz"
+        >
+          FrankenFaceZ
+        </b-form-checkbox>
+        <b-form-checkbox
+          v-model="data.message.allowEmotes.bttv"
+          name="bttv"
+        >
+          BetterTTV
+        </b-form-checkbox>
+      </b-form-group>
+    </font>
+    <font
+      key="form-resubs-font"
+      :parent="parent.font"
+      :data.sync="data.font"
+      :is-child="true"
+    />
+    <tts
+      :tts.sync="data.tts"
+      :uuid="'tts' + data.id"
+    />
 
-    <hold-button @trigger="$emit('delete', data.id)" icon="trash" class="btn-danger btn-block btn-reverse mt-3">
-      <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-      <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+    <hold-button
+      icon="trash"
+      class="btn-danger btn-block btn-reverse mt-3"
+      @trigger="$emit('delete', data.id)"
+    >
+      <template slot="title">
+        {{ translate('dialog.buttons.delete') }}
+      </template>
+      <template slot="onHoldTitle">
+        {{ translate('dialog.buttons.hold-to-delete') }}
+      </template>
     </hold-button>
   </div>
 </template>
@@ -452,7 +526,7 @@ import { minValue, required } from 'vuelidate/lib/validators';
 
 import textjs from 'src/bot/data/templates/alerts-js.txt';
 import text from 'src/bot/data/templates/alerts-with-message.txt';
-import type { AlertResubInterface } from 'src/bot/database/entity/alert';
+import type { AlertInterface, AlertResubInterface } from 'src/bot/database/entity/alert';
 import translate from 'src/panel/helpers/translate';
 
 @Component({
@@ -472,6 +546,7 @@ import translate from 'src/panel/helpers/translate';
 })
 export default class AlertsEditFollowForm extends Vue {
   @PropSync('alert') readonly data !: AlertResubInterface;
+  @Prop() readonly parent !: AlertInterface;
   @Prop() readonly index !: number;
   @Prop() readonly event !: string;
   @Prop() readonly validationDate !: number;

@@ -10,7 +10,7 @@ export interface EmitData {
   recipient?: string;
   currency: string;
   monthsName: string;
-  event: keyof Omit<AlertInterface, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList' | 'tts'>;
+  event: keyof Omit<AlertInterface, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList' | 'tts' | 'font' | 'fontMessage'>;
   message: string;
 }
 
@@ -94,7 +94,7 @@ export interface CommonSettingsInterface {
       opacity: number;
       color: string;
     }[];
-  };
+  } | null;
   alert?: AlertInterface;
 }
 
@@ -115,6 +115,39 @@ export interface AlertInterface {
     volume: number;
     rate: number;
   } | null;
+  fontMessage: {
+    align: 'left' | 'center' | 'right';
+    family: string;
+    size: number;
+    borderPx: number;
+    borderColor: string;
+    weight: number;
+    color: string;
+    shadow: {
+      shiftRight: number;
+      shiftDown: number;
+      blur: number;
+      opacity: number;
+      color: string;
+    }[]
+  };
+  font: {
+    align: 'left' | 'center' | 'right';
+    family: string;
+    size: number;
+    borderPx: number;
+    borderColor: string;
+    weight: number;
+    color: string;
+    highlightcolor: string;
+    shadow: {
+      shiftRight: number;
+      shiftDown: number;
+      blur: number;
+      opacity: number;
+      color: string;
+    }[];
+  };
   customProfanityList: string;
   follows: CommonSettingsInterface[];
   subs: CommonSettingsInterface[];
@@ -163,7 +196,7 @@ export interface AlertTipInterface extends CommonSettingsInterface {
         opacity: number;
         color: string;
       }[];
-    };
+    } | null;
   };
 }
 export interface AlertResubInterface extends CommonSettingsInterface {
@@ -188,7 +221,7 @@ export interface AlertResubInterface extends CommonSettingsInterface {
         opacity: number;
         color: string;
       }[];
-    };
+    } | null;
   };
 }
 
@@ -220,7 +253,7 @@ export const CommonSettingsSchema = {
   enableAdvancedMode:   { type: Boolean } as EntitySchemaColumnOptions,
   advancedMode:         { type: 'simple-json' } as EntitySchemaColumnOptions,
   tts:                  { type: 'simple-json' } as EntitySchemaColumnOptions,
-  font:                 { type: 'simple-json' } as EntitySchemaColumnOptions,
+  font:                 { type: 'simple-json', nullable: true } as EntitySchemaColumnOptions,
 };
 
 export const Alert = new EntitySchema<Readonly<Required<AlertInterface>>>({
@@ -238,6 +271,8 @@ export const Alert = new EntitySchema<Readonly<Required<AlertInterface>>>({
     loadStandardProfanityList: { type: 'simple-json' },
     customProfanityList:       { type: 'text' },
     tts:                       { type: 'simple-json', nullable: true },
+    font:                      { type: 'simple-json' },
+    fontMessage:               { type: 'simple-json' },
   },
   relations: {
     follows: {
