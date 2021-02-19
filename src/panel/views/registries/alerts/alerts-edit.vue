@@ -173,6 +173,15 @@
         />
       </b-form-group>
 
+      <font
+        key="form-global-font"
+        :data.sync="item.font"
+      />
+      <font
+        key="form-global-fontMessage"
+        :data.sync="item.fontMessage"
+        title="message"
+      />
       <tts
         :tts.sync="item.tts"
         :uuid="'tts' + item.id"
@@ -256,6 +265,7 @@
               :validation-date.sync="validationDate"
               :alert.sync="selectedAlert"
               :is-valid.sync="isValid[selectedAlertType][selectedAlertId]"
+              :parent="item"
               @update="keyDate = Date.now()"
               @delete="deleteVariant(selectedAlertType, $event)"
             />
@@ -264,6 +274,7 @@
               :event="selectedAlertType"
               :validation-date.sync="validationDate"
               :alert.sync="selectedAlert"
+              :parent="item"
               :is-valid.sync="isValid[selectedAlertType][selectedAlertId]"
               @update="keyDate = Date.now()"
               @delete="deleteVariant(selectedAlertType, $event)"
@@ -273,6 +284,7 @@
               :event="selectedAlertType"
               :validation-date.sync="validationDate"
               :alert.sync="selectedAlert"
+              :parent="item"
               :is-valid.sync="isValid[selectedAlertType][selectedAlertId]"
               @update="keyDate = Date.now()"
               @delete="deleteVariant(selectedAlertType, $event)"
@@ -284,6 +296,7 @@
               :type="selectedAlertType"
               :alert.sync="selectedAlert"
               :is-valid.sync="isValid[selectedAlertType][selectedAlertId]"
+              :parent="item"
               @update="keyDate = Date.now()"
               @delete="deleteVariant(selectedAlertType, $event)"
             />
@@ -346,6 +359,7 @@ Component.registerHooks([
     'tts':           () => import('./components/tts-global.vue'),
     'title-divider': () => import('src/panel/components/title-divider.vue'),
     'test':          () => import('./alerts-test.vue'),
+    'font':          () => import('src/panel/components/font.vue'),
   },
   filters: {
     capitalize: function (value: string) {
@@ -385,6 +399,39 @@ export default class AlertsEdit extends Vue {
     },
     customProfanityList: '',
     tts:                 null,
+    font:                {
+      align:          'center',
+      family:         'PT Sans',
+      size:           24,
+      borderPx:       1,
+      borderColor:    '#000000',
+      weight:         800,
+      color:          '#ffffff',
+      highlightcolor: '#00ff00',
+      shadow:         [] as {
+        shiftRight: number;
+        shiftDown: number;
+        blur: number;
+        opacity: number;
+        color: string;
+      }[],
+    },
+    fontMessage: {
+      align:       'left',
+      family:      'PT Sans',
+      size:        16,
+      borderPx:    1,
+      borderColor: '#000000',
+      weight:      500,
+      color:       '#ffffff',
+      shadow:      [] as {
+        shiftRight: number;
+        shiftDown: number;
+        blur: number;
+        opacity: number;
+        color: string;
+      }[],
+    },
 
     follows:           [],
     hosts:             [],
@@ -471,36 +518,52 @@ export default class AlertsEdit extends Vue {
         // workaround for missing weight after https://github.com/sogehige/sogeBot/issues/3871
         // workaround for missing shadow settings after https://github.com/sogehige/sogeBot/issues/3875
         for (const alert of data.follows) {
-          alert.font.weight = alert.font.weight ?? 500;
-          alert.font.shadow = alert.font.shadow ?? [];
+          if (alert.font) {
+            alert.font.weight = alert.font.weight ?? 500;
+            alert.font.shadow = alert.font.shadow ?? [];
+          }
         }
         for (const alert of data.subs) {
-          alert.font.weight = alert.font.weight ?? 500;
-          alert.font.shadow = alert.font.shadow ?? [];
+          if (alert.font) {
+            alert.font.weight = alert.font.weight ?? 500;
+            alert.font.shadow = alert.font.shadow ?? [];
+          }
         }
         for (const alert of data.subcommunitygifts) {
-          alert.font.weight = alert.font.weight ?? 500;
-          alert.font.shadow = alert.font.shadow ?? [];
+          if (alert.font) {
+            alert.font.weight = alert.font.weight ?? 500;
+            alert.font.shadow = alert.font.shadow ?? [];
+          }
         }
         for (const alert of data.hosts) {
-          alert.font.weight = alert.font.weight ?? 500;
-          alert.font.shadow = alert.font.shadow ?? [];
+          if (alert.font) {
+            alert.font.weight = alert.font.weight ?? 500;
+            alert.font.shadow = alert.font.shadow ?? [];
+          }
         }
         for (const alert of data.raids) {
-          alert.font.weight = alert.font.weight ?? 500;
-          alert.font.shadow = alert.font.shadow ?? [];
+          if (alert.font) {
+            alert.font.weight = alert.font.weight ?? 500;
+            alert.font.shadow = alert.font.shadow ?? [];
+          }
         }
         for (const alert of data.tips) {
-          alert.font.weight = alert.font.weight ?? 500;
-          alert.font.shadow = alert.font.shadow ?? [];
+          if (alert.font) {
+            alert.font.weight = alert.font.weight ?? 500;
+            alert.font.shadow = alert.font.shadow ?? [];
+          }
         }
         for (const alert of data.cheers) {
-          alert.font.weight = alert.font.weight ?? 500;
-          alert.font.shadow = alert.font.shadow ?? [];
+          if (alert.font) {
+            alert.font.weight = alert.font.weight ?? 500;
+            alert.font.shadow = alert.font.shadow ?? [];
+          }
         }
         for (const alert of data.resubs) {
-          alert.font.weight = alert.font.weight ?? 500;
-          alert.font.shadow = alert.font.shadow ?? [];
+          if (alert.font) {
+            alert.font.weight = alert.font.weight ?? 500;
+            alert.font.shadow = alert.font.shadow ?? [];
+          }
         }
         this.item = data;
         this.state.loaded = this.$state.success;
@@ -604,17 +667,7 @@ export default class AlertsEdit extends Vue {
         keepAlertShown:  false,
         minAmountToPlay: 0,
       },
-      font: {
-        align:          'center',
-        family:         'PT Sans',
-        size:           24,
-        borderPx:       1,
-        borderColor:    '#000000',
-        weight:         800,
-        color:          '#ffffff',
-        highlightcolor: '#00ff00',
-        shadow:         [],
-      },
+      font: null, // no override
     };
 
     // save default media
@@ -643,16 +696,7 @@ export default class AlertsEdit extends Vue {
               allowEmotes:     {
                 twitch: true, ffz: true, bttv: true,
               },
-              font: {
-                align:       'left',
-                family:      'PT Sans',
-                size:        16,
-                borderPx:    1,
-                borderColor: '#000000',
-                weight:      500,
-                color:       '#ffffff',
-                shadow:      [],
-              },
+              font: null,
             },
           });
           break;
@@ -676,16 +720,7 @@ export default class AlertsEdit extends Vue {
               allowEmotes:     {
                 twitch: true, ffz: true, bttv: true,
               },
-              font: {
-                align:       'left',
-                family:      'PT Sans',
-                size:        16,
-                borderPx:    1,
-                borderColor: '#000000',
-                weight:      500,
-                color:       '#ffffff',
-                shadow:      [],
-              },
+              font: null,
             },
             messageTemplate: '{name} was redeemed by {recipient}!',
             rewardId:        null,
