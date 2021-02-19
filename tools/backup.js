@@ -6,8 +6,8 @@ const { createConnection, getConnectionOptions, getManager } = require('typeorm'
 const argv = require('yargs') // eslint-disable-line
   .usage('node tools/backup.js')
   .example('node tools/backup.js list')
-  .example('node save alerts ./backup-alerts.json')
-  .example('node load alerts ./backup-alerts.json')
+  .example('node tools/backup.js save alert ./backup-alert.json')
+  .example('node tools/backup.js load alert ./backup-alert.json')
   .command('list', 'list of tables')
   .command('save [table] [path]', 'save backup of [table] to [path]', (yargs) => {
     yargs.demandOption(['table'], 'Please provide table to backup');
@@ -37,6 +37,8 @@ const argv = require('yargs') // eslint-disable-line
   .help()
   .argv;
 
+const { getMigrationType } = require('../dest/helpers/getMigrationType');
+
 async function main() {
   const type = process.env.TYPEORM_CONNECTION;
   const connectionOptions = await getConnectionOptions();
@@ -48,12 +50,16 @@ async function main() {
       synchronize:   false,
       migrationsRun: false,
       charset:       'UTF8MB4_GENERAL_CI',
+      entities:      [ './dest/database/entity/*.js' ],
+      migrations:    [ `./dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
     });
   } else {
     connection = await createConnection({
       ...connectionOptions,
       synchronize:   false,
       migrationsRun: false,
+      entities:      [ './dest/database/entity/*.js' ],
+      migrations:    [ `./dest/database/migration/${getMigrationType(connectionOptions.type)}/**/*.js` ],
     });
   }
 
@@ -67,10 +73,11 @@ async function main() {
   }
 
   if (argv._[0] === 'save') {
-    const entity = await getManager().connection.entityMetadatas.find(o => o.tableName === argv.table);
+    const metadatas = await getManager().connection.entityMetadatas;
+    const entity = metadatas.find(o => o.tableName === argv.table);
     const relations = entity.ownRelations.map(o => o.propertyName);
     const backupData = await connection.getRepository(entity.tableName).find({ relations });
-    fs.writeFileSync(argv.path, JSON.stringify(backupData));
+    fs.writeFileSync(argv.path, JSON.stringify(backupData, null, 2));
   }
 
   if (argv._[0] === 'load') {
