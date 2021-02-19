@@ -1,30 +1,60 @@
 <template>
-  <b-container fluid ref="window">
+  <b-container
+    ref="window"
+    fluid
+  >
     <b-row>
       <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.registry') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.alerts') }}
           <template v-if="state.loaded === $state.success && $route.params.id">
-            <small><fa icon="angle-right"/></small>
-            {{item.name}}
-            <small class="text-muted text-monospace" style="font-size:0.7rem">{{$route.params.id}}</small>
+            <small><fa icon="angle-right" /></small>
+            {{ item.name }}
+            <small
+              class="text-muted text-monospace"
+              style="font-size:0.7rem"
+            >{{ $route.params.id }}</small>
           </template>
         </span>
       </b-col>
     </b-row>
 
     <panel>
-      <template v-slot:left>
-        <button-with-icon class="btn-secondary btn-reverse" icon="caret-left" href="#/registry/alerts/list">{{translate('commons.back')}}</button-with-icon>
-        <hold-button v-if="$route.params.id && state.loaded === $state.success" icon="trash" class="btn-danger" @trigger="remove()">
-          <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-          <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+      <template #left>
+        <button-with-icon
+          class="btn-secondary btn-reverse"
+          icon="caret-left"
+          href="#/registry/alerts/list"
+        >
+          {{ translate('commons.back') }}
+        </button-with-icon>
+        <hold-button
+          v-if="$route.params.id && state.loaded === $state.success"
+          icon="trash"
+          class="btn-danger"
+          @trigger="remove()"
+        >
+          <template slot="title">
+            {{ translate('dialog.buttons.delete') }}
+          </template>
+          <template slot="onHoldTitle">
+            {{ translate('dialog.buttons.hold-to-delete') }}
+          </template>
         </hold-button>
       </template>
-      <template v-slot:right v-if="state.loaded === $state.success">
-        <b-button variant="secondary" v-b-modal.alert-test-modal :disabled="pending">{{translate('registry.alerts.test')}}</b-button>
+      <template
+        v-if="state.loaded === $state.success"
+        #right
+      >
+        <b-button
+          v-b-modal.alert-test-modal
+          variant="secondary"
+          :disabled="pending"
+        >
+          {{ translate('registry.alerts.test') }}
+        </b-button>
         <button-with-icon
           v-if="$route.params.id && state.loaded === $state.success"
           :text="'/overlays/alerts/' + item.id"
@@ -32,13 +62,31 @@
           class="btn-dark mr-3"
           icon="link"
           target="_blank"
-          />
-        <b-alert show variant="info" v-if="pending" v-html="translate('dialog.changesPending')" class="mr-2 p-2 mb-0"></b-alert>
-        <state-button @click="save()" :key="'save-' + keyDate" text="saveChanges" :state="state.save" :invalid="!!$v.$error || !isAllValid()"/>
+        />
+        <b-alert
+          v-if="pending"
+          show
+          variant="info"
+          class="mr-2 p-2 mb-0"
+          v-html="translate('dialog.changesPending')"
+        />
+        <state-button
+          :key="'save-' + keyDate"
+          text="saveChanges"
+          :state="state.save"
+          :invalid="!!$v.$error || !isAllValid()"
+          @click="save()"
+        />
       </template>
     </panel>
 
-    <b-modal id="alert-test-modal" :title="translate('registry.alerts.testDlg.alertTester')" hide-footer><test/></b-modal>
+    <b-modal
+      id="alert-test-modal"
+      :title="translate('registry.alerts.testDlg.alertTester')"
+      hide-footer
+    >
+      <test />
+    </b-modal>
 
     <loading v-if="state.loaded !== $state.success" />
     <b-form v-else>
@@ -51,10 +99,12 @@
           v-model="item.name"
           type="text"
           :placeholder="translate('registry.alerts.name.placeholder')"
-          @input="$v.item.name.$touch()"
           :state="$v.item.name.$invalid && $v.item.name.$dirty ? false : null"
-        ></b-form-input>
-        <b-form-invalid-feedback :state="!($v.item.name.$invalid && $v.item.name.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+          @input="$v.item.name.$touch()"
+        />
+        <b-form-invalid-feedback :state="!($v.item.name.$invalid && $v.item.name.$dirty)">
+          {{ translate('dialog.errors.required') }}
+        </b-form-invalid-feedback>
       </b-form-group>
 
       <b-form-group
@@ -70,13 +120,15 @@
             max="30000"
             step="500"
             :placeholder="translate('AlertDelayInMs.placeholder')"
-          ></b-form-input>
-          <b-input-group-text slot="append" class="pr-3 pl-3">
+          />
+          <b-input-group-text
+            slot="append"
+            class="pr-3 pl-3"
+          >
             <div style="width: 3rem;">
               {{ String(item.alertDelayInMs / 1000) + 's' }}
             </div>
           </b-input-group-text>
-
         </b-input-group>
       </b-form-group>
 
@@ -84,7 +136,11 @@
         :label="translate('registry.alerts.profanityFilterType.name')"
         label-for="profanityFilterType"
       >
-        <b-form-select v-model="item.profanityFilterType" :options="profanityFilterTypeOptions" plain />
+        <b-form-select
+          v-model="item.profanityFilterType"
+          :options="profanityFilterTypeOptions"
+          plain
+        />
       </b-form-group>
 
       <b-form-group
@@ -92,8 +148,15 @@
         label-for="profanityFilterType"
       >
         <b-row>
-          <b-col sm="auto" v-for="lang of Object.keys(item.loadStandardProfanityList)" v-bind:key="lang">
-            <b-form-checkbox class="mt-2 ml-2 normalLabel" v-model="item.loadStandardProfanityList[lang]">
+          <b-col
+            v-for="lang of Object.keys(item.loadStandardProfanityList)"
+            :key="lang"
+            sm="auto"
+          >
+            <b-form-checkbox
+              v-model="item.loadStandardProfanityList[lang]"
+              class="mt-2 ml-2 normalLabel"
+            >
               {{ lang }}
             </b-form-checkbox>
           </b-col>
@@ -104,8 +167,17 @@
         label-for="customProfanityList"
         :description="translate('registry.alerts.customProfanityList.help')"
       >
-        <b-textarea v-model="item.customProfanityList" placeholder="kitty, zebra, horse"></b-textarea>
+        <b-textarea
+          v-model="item.customProfanityList"
+          placeholder="kitty, zebra, horse"
+        />
       </b-form-group>
+
+      <tts
+        :tts.sync="item.tts"
+        :uuid="'tts' + item.id"
+        class="mb-2"
+      />
 
       <b-row no-gutters>
         <b-col cols="auto">
@@ -113,28 +185,63 @@
             <b-card-text style="max-width: 281px;">
               <b-form inline>
                 <b-form-select v-model="selectedNewEvent">
-                  <b-select-option :value="event" v-for="event of supportedEvents" v-bind:key="'add-alert-' + event">{{ translate('registry.alerts.event.' + event) }}</b-select-option>
+                  <b-select-option
+                    v-for="event of supportedEvents"
+                    :key="'add-alert-' + event"
+                    :value="event"
+                  >
+                    {{ translate('registry.alerts.event.' + event) }}
+                  </b-select-option>
                 </b-form-select>
-                <b-button class="text-left" variant="success" @click="newAlert(selectedNewEvent)">
-                  <fa icon="plus"/>
+                <b-button
+                  class="text-left"
+                  variant="success"
+                  @click="newAlert(selectedNewEvent)"
+                >
+                  <fa icon="plus" />
                 </b-button>
               </b-form>
 
-              <div v-for="event in supportedEvents" :key="'event-tab-' + event">
+              <div
+                v-for="event in supportedEvents"
+                :key="'event-tab-' + event"
+              >
                 <title-divider>{{ translate('registry.alerts.event.' + event) }}</title-divider>
-                <b-button-group class="w-100" v-for="(alert, idx) of item[event]" :key="event + alert.id">
-                  <b-button class="w-100 text-left" @click="selectedAlertId = alert.id" :variant="selectedAlertId === alert.id ? 'primary' : 'link'">
+                <b-button-group
+                  v-for="(alert, idx) of item[event]"
+                  :key="event + alert.id"
+                  class="w-100"
+                >
+                  <b-button
+                    class="w-100 text-left"
+                    :variant="selectedAlertId === alert.id ? 'primary' : 'link'"
+                    @click="selectedAlertId = alert.id"
+                  >
                     <span style="margin: 1rem;">
-                      <fa icon="exclamation-circle" v-if="isValid[event][alert.id] === false" class="text-danger"/>
-                      <fa :icon="['far', 'check-circle']" v-else-if="alert.enabled"/>
-                      <fa :icon="['far', 'circle']" v-else/>
+                      <fa
+                        v-if="isValid[event][alert.id] === false"
+                        icon="exclamation-circle"
+                        class="text-danger"
+                      />
+                      <fa
+                        v-else-if="alert.enabled"
+                        :icon="['far', 'check-circle']"
+                      />
+                      <fa
+                        v-else
+                        :icon="['far', 'circle']"
+                      />
 
-                      <template v-if="alert.title.length > 0">{{alert.title}}</template>
+                      <template v-if="alert.title.length > 0">{{ alert.title }}</template>
                       <template v-else>Variant {{ idx + 1 }}</template>
                     </span>
                   </b-button>
-                  <b-button variant="light" v-if="selectedAlertId === alert.id" @click="duplicateVariant">
-                    <fa icon="clone"/>
+                  <b-button
+                    v-if="selectedAlertId === alert.id"
+                    variant="light"
+                    @click="duplicateVariant"
+                  >
+                    <fa icon="clone" />
                   </b-button>
                 </b-button-group>
               </div>
@@ -143,10 +250,43 @@
         </b-col>
         <b-col>
           <b-card :key="'b-card' + selectedAlertId + selectedAlertType">
-            <form-follow :event="selectedAlertType" v-if="['cmdredeems', 'follows', 'subs', 'subgifts', 'subcommunitygifts', 'raids', 'hosts'].includes(selectedAlertType)" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @update="keyDate = Date.now()" @delete="deleteVariant(selectedAlertType, $event)"/>
-            <form-cheers :event="selectedAlertType" v-else-if="selectedAlertType === 'cheers' || selectedAlertType === 'tips'" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @update="keyDate = Date.now()" @delete="deleteVariant(selectedAlertType, $event)"/>
-            <form-resubs :event="selectedAlertType" v-else-if="selectedAlertType === 'resubs'" :validationDate.sync="validationDate" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @update="keyDate = Date.now()" @delete="deleteVariant(selectedAlertType, $event)"/>
-            <form-reward :event="selectedAlertType" v-else-if="selectedAlertType === 'rewardredeems'" :validationDate.sync="validationDate" :type="selectedAlertType" :alert.sync="selectedAlert" :isValid.sync="isValid[selectedAlertType][selectedAlertId]" @update="keyDate = Date.now()" @delete="deleteVariant(selectedAlertType, $event)"/>
+            <form-follow
+              v-if="['cmdredeems', 'follows', 'subs', 'subgifts', 'subcommunitygifts', 'raids', 'hosts'].includes(selectedAlertType)"
+              :event="selectedAlertType"
+              :validation-date.sync="validationDate"
+              :alert.sync="selectedAlert"
+              :is-valid.sync="isValid[selectedAlertType][selectedAlertId]"
+              @update="keyDate = Date.now()"
+              @delete="deleteVariant(selectedAlertType, $event)"
+            />
+            <form-cheers
+              v-else-if="selectedAlertType === 'cheers' || selectedAlertType === 'tips'"
+              :event="selectedAlertType"
+              :validation-date.sync="validationDate"
+              :alert.sync="selectedAlert"
+              :is-valid.sync="isValid[selectedAlertType][selectedAlertId]"
+              @update="keyDate = Date.now()"
+              @delete="deleteVariant(selectedAlertType, $event)"
+            />
+            <form-resubs
+              v-else-if="selectedAlertType === 'resubs'"
+              :event="selectedAlertType"
+              :validation-date.sync="validationDate"
+              :alert.sync="selectedAlert"
+              :is-valid.sync="isValid[selectedAlertType][selectedAlertId]"
+              @update="keyDate = Date.now()"
+              @delete="deleteVariant(selectedAlertType, $event)"
+            />
+            <form-reward
+              v-else-if="selectedAlertType === 'rewardredeems'"
+              :event="selectedAlertType"
+              :validation-date.sync="validationDate"
+              :type="selectedAlertType"
+              :alert.sync="selectedAlert"
+              :is-valid.sync="isValid[selectedAlertType][selectedAlertId]"
+              @update="keyDate = Date.now()"
+              @delete="deleteVariant(selectedAlertType, $event)"
+            />
           </b-card>
         </b-col>
       </b-row>
@@ -203,6 +343,7 @@ Component.registerHooks([
     'form-cheers':   () => import('./components/form-cheers.vue'),
     'form-resubs':   () => import('./components/form-resubs.vue'),
     'form-reward':   () => import('./components/form-reward.vue'),
+    'tts':           () => import('./components/tts-global.vue'),
     'title-divider': () => import('src/panel/components/title-divider.vue'),
     'test':          () => import('./alerts-test.vue'),
   },
@@ -243,6 +384,7 @@ export default class AlertsEdit extends Vue {
       ru: false,
     },
     customProfanityList: '',
+    tts:                 null,
 
     follows:           [],
     hosts:             [],
@@ -460,10 +602,6 @@ export default class AlertsEdit extends Vue {
         enabled:         false,
         skipUrls:        true,
         keepAlertShown:  false,
-        voice:           'UK English Female',
-        volume:          1,
-        rate:            1,
-        pitch:           1,
         minAmountToPlay: 0,
       },
       font: {
