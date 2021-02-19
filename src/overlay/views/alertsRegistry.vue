@@ -254,11 +254,15 @@ export default class AlertsRegistryOverlays extends Vue {
     }
   }
 
-  withEmotes(text: string) {
+  withEmotes(text: string | undefined) {
+    if (typeof text === 'undefined' || text.length === 0) {
+      return '';
+    }
+
     // checking emotes
     for (const emote of this.emotes) {
       if (get(this.runningAlert, `alert.message.allowEmotes.${emote.type}`, false)) {
-        const split = text.split(' ');
+        const split: string[] = (text as string).split(' ');
         for (let i = 0; i < split.length; i++) {
           if (split[i] === emote.code) {
             split[i] = `<img src='${emote.urls[1]}' style='position: relative; top: 0.1rem;'/>`;
@@ -679,21 +683,23 @@ export default class AlertsRegistryOverlays extends Vue {
       console.debug('Incoming alert', data);
 
       // checking for vulgarities
-      for (const vulgar of this.defaultProfanityList) {
-        if (this.data) {
-          if (this.data.profanityFilterType === 'replace-with-asterisk') {
-            data.message = data.message.replace(new RegExp(vulgar, 'gmi'), '***');
-          } else if (this.data.profanityFilterType === 'replace-with-happy-words') {
-            data.message = data.message.replace(new RegExp(vulgar, 'gmi'), this.listHappyWords[Math.floor(Math.random() * this.listHappyWords.length)]);
-          } else if (this.data.profanityFilterType === 'hide-messages') {
-            if (data.message.search(new RegExp(vulgar, 'gmi')) >= 0) {
-              console.debug('Message contain vulgarity "' + vulgar + '" and is hidden.');
-              data.message = '';
-            }
-          } else if (this.data.profanityFilterType === 'disable-alerts') {
-            if (data.message.search(new RegExp(vulgar, 'gmi')) >= 0) {
-              console.debug('Message contain vulgarity "' + vulgar + '" and is alert disabled.');
-              return;
+      if (data.message && data.message.length > 0) {
+        for (const vulgar of this.defaultProfanityList) {
+          if (this.data) {
+            if (this.data.profanityFilterType === 'replace-with-asterisk') {
+              data.message = data.message.replace(new RegExp(vulgar, 'gmi'), '***');
+            } else if (this.data.profanityFilterType === 'replace-with-happy-words') {
+              data.message = data.message.replace(new RegExp(vulgar, 'gmi'), this.listHappyWords[Math.floor(Math.random() * this.listHappyWords.length)]);
+            } else if (this.data.profanityFilterType === 'hide-messages') {
+              if (data.message.search(new RegExp(vulgar, 'gmi')) >= 0) {
+                console.debug('Message contain vulgarity "' + vulgar + '" and is hidden.');
+                data.message = '';
+              }
+            } else if (this.data.profanityFilterType === 'disable-alerts') {
+              if (data.message.search(new RegExp(vulgar, 'gmi')) >= 0) {
+                console.debug('Message contain vulgarity "' + vulgar + '" and is alert disabled.');
+                return;
+              }
             }
           }
         }
