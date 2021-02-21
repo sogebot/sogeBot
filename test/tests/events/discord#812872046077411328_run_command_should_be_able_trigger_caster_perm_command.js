@@ -50,7 +50,7 @@ describe('Events - event run command should be able to run caster command - http
   });
 
   after(() => {
-    commercial.setCommand('!test', '!commercial');
+    commercial.setCommand('!commercial', '!commercial');
   });
 
   for (const follower of [user.viewer, user.viewer2, user.viewer3]) {
@@ -59,7 +59,7 @@ describe('Events - event run command should be able to run caster command - http
     });
     it('trigger follow event', async () => {
       await events.fire('follow', {
-        username: follower.username, userId: follower.userId, webhooks: _.random(1) === 1, 
+        username: follower.username, userId: follower.userId, webhooks: _.random(1) === 1,
       });
     });
 
