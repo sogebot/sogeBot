@@ -58,7 +58,7 @@ class Commercial extends System {
     };
 
     if (_.isNil(commercial.duration)) {
-      return [{ response: 'Usage: !commercial [duration] [optional-message]', ...opts }];
+      return [{ response: `Usage: ${opts.command} [duration] [optional-message]`, ...opts }];
     }
 
     const cid = channelId.value;
