@@ -921,8 +921,6 @@ class API extends Core {
         method: 'GET', data: request.data, timestamp: Date.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: calls.bot,
       });
 
-      let justStarted = false;
-
       debug('api.stream', 'API: ' + JSON.stringify(request.data));
 
       if (request.status === 200 && request.data.data[0]) {
@@ -940,20 +938,11 @@ class API extends Core {
 
             stream.end();
             stream.start(streamData);
-            justStarted = true;
           }
         }
 
         setCurrentRetries(0);
         this.saveStreamData(streamData);
-        isStreamOnline.value = true;
-
-        if (!justStarted) {
-          // don't run events on first check
-          eventEmitter.emit('number-of-viewers-is-at-least-x', { reset: false });
-          eventEmitter.emit('stream-is-running-x-minutes', { reset: false });
-          eventEmitter.emit('every-x-minutes-of-stream', { reset: false });
-        }
 
         if (!gameOrTitleChangedManually.value) {
           let _rawStatus = rawStatus.value;

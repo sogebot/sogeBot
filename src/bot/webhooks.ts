@@ -318,7 +318,7 @@ class Webhooks {
       if (Number(streamId.value) !== Number(streamEvent.id)) {
         debug('webhooks.stream', 'WEBHOOKS: ' + JSON.stringify(aEvent));
         stream.end();
-        stream.start(streamEvent);
+        stream.start(streamEvent, true);
       }
 
       // Always keep this updated

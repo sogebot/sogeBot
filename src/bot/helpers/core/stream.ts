@@ -30,6 +30,7 @@ async function start(data: StreamEndpoint['data'][number], webhooks = false) {
   streamStatusChangeSince.value = new Date(data.started_at).getTime();
   streamId.value = data.id;
   streamType.value = data.type;
+  isStreamOnline.value = true;
 
   eventEmitter.emit('stream-started');
   eventEmitter.emit('command-send-x-times', { reset: true });
@@ -49,6 +50,14 @@ async function start(data: StreamEndpoint['data'][number], webhooks = false) {
 }
 
 function end() {
+  // reset quick stats on stream end
+  stats.value.currentWatchedTime = 0;
+  stats.value.maxViewers = 0;
+  stats.value.newChatters = 0;
+  stats.value.currentViewers = 0;
+  stats.value.currentBits = 0;
+  stats.value.currentTips = 0;
+
   // stream is really offline
   if (isStreamOnline.value) {
     // online -> offline transition
