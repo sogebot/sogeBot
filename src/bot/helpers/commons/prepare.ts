@@ -1,5 +1,5 @@
-import tmi from '../../tmi';
 import { translate } from '../../translate';
+import { showWithAt } from '../tmi/showWithAt';
 
 /**
  * Prepares strings with replacement attributes
@@ -20,9 +20,9 @@ export function prepare(toTranslate: string, attr?: {[x: string]: any }, isTrans
     let value = attr[key];
     if (['username', 'who', 'winner', 'sender', 'loser'].includes(key)) {
       if (typeof value.username !== 'undefined') {
-        value = tmi.showWithAt ? `@${value.username}` : value.username;
+        value = showWithAt.value ? `@${value.username}` : value.username;
       } else {
-        value = tmi.showWithAt ? `@${value}` : value;
+        value = showWithAt.value ? `@${value}` : value;
       }
     }
     msg = msg.replace(new RegExp('[$]' + key, 'g'), value);
