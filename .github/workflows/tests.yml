@@ -20,7 +20,7 @@ jobs:
             exit 1
           fi;
     - name: install node v14
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       with:
         node-version: 14
     - name: Install eslint and dependencies
@@ -44,7 +44,7 @@ jobs:
       run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%s%b)
     - name: install node v14
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       with:
         node-version: 14
     - name: Install all dependencies and build just a bot
@@ -87,7 +87,7 @@ jobs:
       run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%s%b)
     - name: install node v14
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       with:
         node-version: 14
     - name: Install all dependencies and build just a bot
@@ -132,7 +132,7 @@ jobs:
       run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%s%b)
     - name: install node v14
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       with:
         node-version: 14
     - name: Install all dependencies and build just a bot
@@ -166,7 +166,7 @@ jobs:
       run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%s%b)
     - name: install node v14
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       with:
         node-version: 14
     - name: Install all dependencies and build everything
