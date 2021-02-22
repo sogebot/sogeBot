@@ -1,12 +1,9 @@
 import { TextChannel } from 'discord.js';
 
-import Discord from '../../integrations/discord';
-import { Message } from '../../message';
-import oauth from '../../oauth';
 import { chatOut } from '../log';
 import { botId } from '../oauth/botId';
+import { botUsername } from '../oauth/botUsername';
 import { getBotSender } from './getBotSender';
-import { sendMessage } from './sendMessage';
 
 /**
  * Announce in all channels (discord, twitch)
@@ -16,10 +13,15 @@ import { sendMessage } from './sendMessage';
  */
 export const announceTypes = ['bets', 'duel', 'heist', 'timers', 'songs', 'scrim', 'raffles', 'polls', 'general'] as const;
 export async function announce(messageToAnnounce: string, type: typeof announceTypes[number], replaceCustomVariables = true) {
+  // importing here as we want to get rid of import loops
+  const Discord = (require('../../integrations/discord') as typeof import('../../integrations/discord')).default;
+  const Message = (require('../../message') as typeof import('../../message')).Message;
+  const sendMessage = (require('./sendMessage') as typeof import('./sendMessage')).sendMessage;
+
   messageToAnnounce = await new Message(messageToAnnounce).parse({ sender: getBotSender(), replaceCustomVariables }) as string;
   sendMessage(messageToAnnounce, {
-    username:       oauth.botUsername,
-    displayName:    oauth.botUsername,
+    username:       botUsername.value,
+    displayName:    botUsername.value,
     userId:         botId.value,
     emotes:         [],
     badges:         {},

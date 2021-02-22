@@ -1,8 +1,8 @@
-import oauth from '../../oauth';
+import { botUsername } from '../oauth/botUsername';
 
 export function getBot() {
   try {
-    return oauth.botUsername.toLowerCase().trim();
+    return botUsername.value.toLowerCase().trim();
   } catch (e) {
     return '';
   }
