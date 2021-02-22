@@ -24,7 +24,7 @@ async function retest() {
           '--exit',
           '--grep="' + suite.replace('(!#)', '') + '"',
           '--recursive',
-          'test/tests/alias',
+          'test/',
         ], { shell: true });
 
         let output = '';
