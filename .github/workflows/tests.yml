@@ -20,7 +20,7 @@ jobs:
             exit 1
           fi;
     - name: install node v14
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       with:
         node-version: 14
     - name: Install eslint and dependencies
@@ -33,7 +33,6 @@ jobs:
       run: ENV=development make jsonlint
   sqlite:
     name: SQLite tests
-    needs: eslint
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
@@ -44,7 +43,7 @@ jobs:
       run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%s%b)
     - name: install node v14
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       with:
         node-version: 14
     - name: Install all dependencies and build just a bot
@@ -67,7 +66,6 @@ jobs:
         flags: sqlite
   postgres:
     name: PostgreSQL tests
-    needs: eslint
     services:
       postgres:
         image: postgres:11.5
@@ -87,7 +85,7 @@ jobs:
       run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%s%b)
     - name: install node v14
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       with:
         node-version: 14
     - name: Install all dependencies and build just a bot
@@ -110,7 +108,6 @@ jobs:
         flags: postgres
   mysql:
     name: MySQL/MariaDB tests
-    needs: eslint
     runs-on: ubuntu-latest
     steps:
     - name: Shutdown Ubuntu MySQL (SUDO)
@@ -132,7 +129,7 @@ jobs:
       run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%s%b)
     - name: install node v14
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       with:
         node-version: 14
     - name: Install all dependencies and build just a bot
@@ -155,7 +152,6 @@ jobs:
         flags: mysql
   fullbuild:
     name: Make test
-    needs: eslint
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
@@ -166,7 +162,7 @@ jobs:
       run: echo ::set-output name=MESSAGE::$(git log --no-merges -1 --pretty=format:%s%b)
     - name: install node v14
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       with:
         node-version: 14
     - name: Install all dependencies and build everything

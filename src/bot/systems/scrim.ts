@@ -1,16 +1,16 @@
 import { getRepository } from 'typeorm';
 
-import { round5 } from '../commons';
 import * as constants from '../constants';
 import { ScrimMatchId } from '../database/entity/scrimMatchId';
 import {
-  command, default_permission, settings, 
+  command, default_permission, settings,
 } from '../decorators';
 import { onStartup } from '../decorators/on';
 import Expects from '../expects.js';
-import {
-  announce, getBotSender, prepare, 
-} from '../helpers/commons';
+import { announce } from '../helpers/commons/announce';
+import { getBotSender } from '../helpers/commons/getBotSender';
+import { prepare } from '../helpers/commons/prepare';
+import { round5 } from '../helpers/commons/round5';
 import { getLocalizedName } from '../helpers/getLocalized';
 import { debug } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
@@ -43,7 +43,7 @@ class Scrim extends System {
   @onStartup()
   onStartup() {
     this.reminder();
-    setInterval(() => this.reminder(), 1000);
+    setInterval(() => this.reminder(), 250);
   }
 
   @command('!snipe')
@@ -173,42 +173,43 @@ class Scrim extends System {
     return [{ response: prepare('systems.scrim.currentMatches', { matches: output.length === 0 ? '<' + translate('core.empty') + '>' : output.join(' | ') }), ...opts }];
   }
 
-  private countdown() {
-    for (let i = 0; i < 4; i++) {
-      setTimeout(() => {
-        if (i < 3) {
+  async countdown() {
+    await Promise.all([...Array(4)].map((_, i) => {
+      return new Promise(resolve => {
+        setTimeout(() => {
           announce(
             prepare('systems.scrim.countdown', {
               type: this.type,
               time: (3 - i) + '.',
               unit: '',
             }), 'scrim');
-        } else {
-          this.closingAt = 0;
-          announce(prepare('systems.scrim.go'), 'scrim');
-          if (!this.isCooldownOnly) {
-            setTimeout(() => {
-              if (this.closingAt !== 0) {
-                return; // user restarted !snipe
-              }
-              announce(
-                prepare('systems.scrim.putMatchIdInChat', { command: this.getCommand('!snipe match') }), 'scrim',
-              );
-              setTimeout(async () => {
-                if (this.closingAt !== 0) {
-                  return; // user restarted !snipe
-                }
-                const currentMatches = await this.currentMatches({
-                  sender: getBotSender(), parameters: '', createdAt: Date.now(), command: '', attr: {}, 
-                });
-                for (const r of currentMatches) {
-                  announce(await r.response, 'scrim');
-                }
-              }, this.waitForMatchIdsInSeconds * constants.SECOND);
-            }, 15 * constants.SECOND);
-          }
+          resolve(true);
+        }, (i + 1) * 1000);
+      });
+    }));
+
+    this.closingAt = 0;
+    announce(prepare('systems.scrim.go'), 'scrim');
+    if (!this.isCooldownOnly) {
+      setTimeout(() => {
+        if (this.closingAt !== 0) {
+          return; // user restarted !snipe
         }
-      }, (i + 1) * 1000);
+        announce(
+          prepare('systems.scrim.putMatchIdInChat', { command: this.getCommand('!snipe match') }), 'scrim',
+        );
+        setTimeout(async () => {
+          if (this.closingAt !== 0) {
+            return; // user restarted !snipe
+          }
+          const currentMatches = await this.currentMatches({
+            sender: getBotSender(), parameters: '', createdAt: Date.now(), command: '', attr: {},
+          });
+          for (const r of currentMatches) {
+            announce(await r.response, 'scrim');
+          }
+        }, this.waitForMatchIdsInSeconds * constants.SECOND);
+      }, 15 * constants.SECOND);
     }
   }
 }

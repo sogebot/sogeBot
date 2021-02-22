@@ -1,7 +1,7 @@
 import { TextChannel } from 'discord.js';
 import _ from 'lodash';
 
-import { prepare } from './helpers/commons';
+import { prepare } from './helpers/commons/prepare';
 import { sendMessage } from './helpers/commons/sendMessage';
 import { chatOut, warning } from './helpers/log';
 import { generalChannel } from './helpers/oauth/generalChannel';
@@ -53,13 +53,6 @@ export function getChannel() {
   } catch (e) {
     return '';
   }
-}
-
-/*
- * returns nearest 5
- */
-export function round5(x: number) {
-  return Math.round(x / 5 ) * 5;
 }
 
 /**

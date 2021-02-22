@@ -1,10 +1,8 @@
 /* global describe it before */
 const assert = require('assert');
 
-const commons = require('../../../dest/commons');
 const { getBot } = require('../../../dest/helpers/commons/getBot');
 const { getLocalizedName } = require('../../../dest/helpers/getLocalized');
-const scrim = (require('../../../dest/systems/scrim')).default;
 const { translate } = require('../../../dest/translate');
 require('../../general.js');
 const db = require('../../general.js').db;
@@ -13,7 +11,9 @@ const message = require('../../general.js').message;
 // users
 const owner = { username: '__broadcaster__' };
 
+let scrim;
 describe('Scrim - full workflow', () => {
+  scrim = (require('../../../dest/systems/scrim')).default;
   describe('cooldown only', () => {
     before(async () => {
       await db.cleanup();
@@ -36,25 +36,19 @@ describe('Scrim - full workflow', () => {
 
     it('Expecting 45 seconds message cooldown', async () => {
       await message.isSentRaw([
-        'Snipe match (duo) starting in 40 seconds',
         'Snipe match (duo) starting in 45 seconds',
-        'Snipe match (duo) starting in 50 seconds',
       ], getBot(), 20000);
     });
 
     it('Expecting 30 seconds message cooldown', async () => {
       await message.isSentRaw([
-        'Snipe match (duo) starting in 25 seconds',
         'Snipe match (duo) starting in 30 seconds',
-        'Snipe match (duo) starting in 35 seconds',
       ], getBot(), 20000);
     });
 
     it('Expecting 15 seconds message cooldown', async () => {
       await message.isSentRaw([
-        'Snipe match (duo) starting in 10 seconds',
         'Snipe match (duo) starting in 15 seconds',
-        'Snipe match (duo) starting in 20 seconds',
       ], getBot(), 20000);
     });
 
@@ -121,27 +115,21 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Expecting 45 seconds message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', getBot(), {
-        time: 45,
-        type: 'duo',
-        unit: getLocalizedName(45, translate('core.seconds')),
-      }, 19000);
+      await message.isSentRaw([
+        'Snipe match (duo) starting in 45 seconds',
+      ], getBot(), 20000);
     });
 
     it('Expecting 30 seconds message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', getBot(), {
-        time: 30,
-        type: 'duo',
-        unit: getLocalizedName(30, translate('core.seconds')),
-      }, 19000);
+      await message.isSentRaw([
+        'Snipe match (duo) starting in 30 seconds',
+      ], getBot(), 20000);
     });
 
     it('Expecting 15 seconds message cooldown', async () => {
-      await message.isSent('systems.scrim.countdown', getBot(), {
-        time: 15,
-        type: 'duo',
-        unit: getLocalizedName(15, translate('core.seconds')),
-      }, 19000);
+      await message.isSentRaw([
+        'Snipe match (duo) starting in 15 seconds',
+      ], getBot(), 20000);
     });
 
     it('Expecting 3 seconds message cooldown', async () => {

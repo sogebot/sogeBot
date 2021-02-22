@@ -6,7 +6,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const variable = require('../../general.js').variable;
 
-const { round5 } = require('../../../dest/commons');
+const { round5 } = require('../../../dest/helpers/commons/round5');
 
 const assert = require('assert');
 
