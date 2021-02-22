@@ -150,6 +150,7 @@
   "font": {
     "setting": "Font settings",
     "name": "Font family",
+    "overrideGlobal": "Override global font settings",
     "align": {
       "name": "Alignment",
       "left": "Left",
