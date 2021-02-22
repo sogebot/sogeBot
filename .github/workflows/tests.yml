@@ -25,6 +25,8 @@ jobs:
         node-version: 14
     - name: Install eslint and dependencies
       run: |
+        apt-get update;
+        apt-get install -y build-essential nasm libtool make bash git python autoconf;
         npm install glob;
         npm install --only=dev typescript eslint jsonlint-mod @typescript-eslint/parser @typescript-eslint/eslint-plugin mkdirp@latest;
     - name: Run eslint
