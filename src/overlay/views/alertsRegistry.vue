@@ -17,7 +17,7 @@
         :expand-depth="2"
       />
     </div>
-    <template v-if="state.loaded === $state.success && this.data">
+    <template v-if="state.loaded === $state.success && data">
       <div v-if="runningAlert">
         <audio
           v-if="typeOfMedia.get(runningAlert.alert.soundId) === 'audio'"
@@ -84,21 +84,21 @@
                 center: runningAlert.alert.layout === '3',
                 ['animate__' + runningAlert.animation]: true,
               }"
-              :style="{'text-align': (runningAlert.alert.font ? runningAlert.alert.font.align : this.data.font.align), 'animation-duration': runningAlert.animationSpeed + 'ms'}"
+              :style="{'text-align': (runningAlert.alert.font ? runningAlert.alert.font.align : data.font.align), 'animation-duration': runningAlert.animationSpeed + 'ms'}"
               class="animate__animated"
             >
               <span
                 :style="{
-                  'font-family': runningAlert.alert.font ? runningAlert.alert.font.family : this.data.font.family,
-                  'font-size': (runningAlert.alert.font ? runningAlert.alert.font.size : this.data.font.size) + 'px',
-                  'font-weight': runningAlert.alert.font ? runningAlert.alert.font.weight : this.data.font.weight,
-                  'color': runningAlert.alert.font ? runningAlert.alert.font.color : this.data.font.color,
+                  'font-family': runningAlert.alert.font ? runningAlert.alert.font.family : data.font.family,
+                  'font-size': (runningAlert.alert.font ? runningAlert.alert.font.size : data.font.size) + 'px',
+                  'font-weight': runningAlert.alert.font ? runningAlert.alert.font.weight : data.font.weight,
+                  'color': runningAlert.alert.font ? runningAlert.alert.font.color : data.font.color,
                   'text-shadow': [
                     textStrokeGenerator(
-                      runningAlert.alert.font ? runningAlert.alert.font.borderPx : this.data.font.borderPx,
-                      runningAlert.alert.font ? runningAlert.alert.font.borderColor : this.data.font.borderColor
+                      runningAlert.alert.font ? runningAlert.alert.font.borderPx : data.font.borderPx,
+                      runningAlert.alert.font ? runningAlert.alert.font.borderColor : data.font.borderColor
                     ),
-                    shadowGenerator(runningAlert.alert.font ? runningAlert.alert.font.shadow : this.data.font.shadow)].filter(Boolean).join(', ')
+                    shadowGenerator(runningAlert.alert.font ? runningAlert.alert.font.shadow : data.font.shadow)].filter(Boolean).join(', ')
                 }"
               >
                 <v-runtime-template :template="prepareMessageTemplate(runningAlert.alert.messageTemplate)" />
@@ -115,7 +115,7 @@
                   'text-align': runningAlert.alert.message.font ? runningAlert.alert.message.font.align : data.fontMessage.align,
                   'flex': '1 0 0px',
                   'font-family': runningAlert.alert.message.font ? runningAlert.alert.message.font.family : data.fontMessage.family,
-                  'font-size': runningAlert.alert.message.font ? runningAlert.alert.message.font.size : data.fontMessage.size + 'px',
+                  'font-size': (runningAlert.alert.message.font ? runningAlert.alert.message.font.size : data.fontMessage.size) + 'px',
                   'font-weight': runningAlert.alert.message.font ? runningAlert.alert.message.font.weight : data.fontMessage.weight,
                   'color': runningAlert.alert.message.font ? runningAlert.alert.message.font.color : data.fontMessage.color,
                   'text-shadow': textStrokeGenerator(
@@ -135,16 +135,16 @@
             >
               <span
                 :style="{
-                  'font-family': runningAlert.alert.font ? runningAlert.alert.font.family : this.data.font.family,
-                  'font-size': (runningAlert.alert.font ? runningAlert.alert.font.size : this.data.font.size) + 'px',
-                  'font-weight': runningAlert.alert.font ? runningAlert.alert.font.weight : this.data.font.weight,
-                  'color': runningAlert.alert.font ? runningAlert.alert.font.color : this.data.font.color,
+                  'font-family': runningAlert.alert.font ? runningAlert.alert.font.family : data.font.family,
+                  'font-size': (runningAlert.alert.font ? runningAlert.alert.font.size : data.font.size) + 'px',
+                  'font-weight': runningAlert.alert.font ? runningAlert.alert.font.weight : data.font.weight,
+                  'color': runningAlert.alert.font ? runningAlert.alert.font.color : data.font.color,
                   'text-shadow': [
                     textStrokeGenerator(
-                      runningAlert.alert.font ? runningAlert.alert.font.borderPx : this.data.font.borderPx,
-                      runningAlert.alert.font ? runningAlert.alert.font.borderColor : this.data.font.borderColor
+                      runningAlert.alert.font ? runningAlert.alert.font.borderPx : data.font.borderPx,
+                      runningAlert.alert.font ? runningAlert.alert.font.borderColor : data.font.borderColor
                     ),
-                    shadowGenerator(runningAlert.alert.font ? runningAlert.alert.font.shadow : this.data.font.shadow)].filter(Boolean).join(', ')
+                    shadowGenerator(runningAlert.alert.font ? runningAlert.alert.font.shadow : data.font.shadow)].filter(Boolean).join(', ')
                 }"
               >
                 <v-runtime-template :template="prepareMessageTemplate(runningAlert.alert.messageTemplate)" />
@@ -568,6 +568,14 @@ export default class AlertsRegistryOverlays extends Vue {
                 }
               }
 
+              const fontFamily = alert.font ? alert.font.family : this.data.font.family;
+              const fontSize = alert.font ? alert.font.size : this.data.font.size;
+              const fontWeight = alert.font ? alert.font.weight : this.data.font.weight;
+              const fontColor = alert.font ? alert.font.color : this.data.font.color;
+              const shadowBorderPx = alert.font ? alert.font.borderPx : this.data.font.borderPx;
+              const shadowBorderColor = alert.font ? alert.font.borderColor : this.data.font.borderColor;
+              const shadow = (alert.font ? alert.font.shadow : this.data.font.shadow).filter(Boolean).join(', ');
+
               const messageTemplate = get(alert, 'messageTemplate', '')
                 .replace(/\{name\}/g, '{name:highlight}')
                 .replace(/\{recipient\}/g, '{recipient:highlight}')
@@ -582,13 +590,15 @@ export default class AlertsRegistryOverlays extends Vue {
                       'font-size': (runningAlert.alert.message.font ? runningAlert.alert.message.font.size : data.fontMessage.size) + 'px !important',
                       'font-weight': (runningAlert.alert.message.font ? runningAlert.alert.message.font.weight : data.fontMessage.weight) + ' !important',
                       'color': (runningAlert.alert.message.font ? runningAlert.alert.message.font.color : data.fontMessage.color) + ' !important',
-                      'text-shadow': [textStrokeGenerator(
+                      'text-shadow': [
+                        textStrokeGenerator(
                           runningAlert.alert.message.font ? runningAlert.alert.message.font.borderPx : data.fontMessage.borderPx,
                           runningAlert.alert.message.font ? runningAlert.alert.message.font.borderColor : data.fontMessage.borderColor
                         ),
                         shadowGenerator(
                           runningAlert.alert.message.font ? runningAlert.alert.message.font.shadow : data.fontMessage.shadow
-                        )].filter(Boolean).join(', ') + ' !important'
+                        )
+                      ].filter(Boolean).join(', ') + ' !important'
                     }"
                     v-html="withEmotes(runningAlert.message)"></span>`)
                   .replace(/\{messageTemplate\}/g, messageTemplate)
@@ -610,16 +620,17 @@ export default class AlertsRegistryOverlays extends Vue {
                     class=" animate__animated ${refTextClass}"
                     :style="{
                       'animation-duration': runningAlert.animationSpeed + 'ms',
-                      'font-family': runningAlert.alert.font ? runningAlert.alert.font.family : this.data?.font.family,
-                      'font-size': (runningAlert.alert.font ? runningAlert.alert.font.size : this.data?.font.size) + 'px',
-                      'font-weight': runningAlert.alert.font ? runningAlert.alert.font.weight : this.data?.font.weight,
-                      'color': runningAlert.alert.font ? runningAlert.alert.font.color : this.data?.font.color,
+                      'font-family': '${fontFamily}',
+                      'font-size': '${fontSize} px',
+                      'font-weight': '${fontWeight}',
+                      'color': '${fontColor}',
                       'text-shadow': [
                         textStrokeGenerator(
-                          runningAlert.alert.font ? runningAlert.alert.font.borderPx : this.data?.font.borderPx,
-                          runningAlert.alert.font ? runningAlert.alert.font.borderColor : this.data?.font.borderColor
+                          '${shadowBorderPx}',
+                          '${shadowBorderColor}',
                         ),
-                        shadowGenerator(runningAlert.alert.font ? runningAlert.alert.font.shadow : this.data?.font.shadow)].filter(Boolean).join(', ')
+                        shadowGenerator(${shadow})
+                      ]
                     }"
                   `)
                   .replace(/\<div.*class="(.*?)".*ref="image"\>|\<div.*ref="image".*class="(.*?)"\>/gm, '<div ref="image">') // we need to replace ref with class with proper ref
@@ -908,14 +919,14 @@ export default class AlertsRegistryOverlays extends Vue {
     if (this.runningAlert !== null) {
       let name: string | string[] = this.runningAlert.name.split('').map((char, index) => {
         if (this.runningAlert !== null) {
-          return `<div class="animate__animated animate__infinite animate__${this.runningAlert.alert.animationText} animate__${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font ? this.runningAlert.alert.font.highlightcolor : this.data?.font}; display: inline-block;">${char}</div>`;
+          return `<div class="animate__animated animate__infinite animate__${this.runningAlert.alert.animationText} animate__${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font ? this.runningAlert.alert.font.highlightcolor : this.data?.font.highlightcolor}; display: inline-block;">${char}</div>`;
         } else {
           return char;
         }
       });
       let recipient: string | string[] = (this.runningAlert.recipient || '').split('').map((char, index) => {
         if (this.runningAlert !== null) {
-          return `<div class="animate__animated animate__infinite animate__${this.runningAlert.alert.animationText} animate__${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font ? this.runningAlert.alert.font.highlightcolor : this.data?.font}; display: inline-block;">${char}</div>`;
+          return `<div class="animate__animated animate__infinite animate__${this.runningAlert.alert.animationText} animate__${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font ? this.runningAlert.alert.font.highlightcolor : this.data?.font.highlightcolor}; display: inline-block;">${char}</div>`;
         } else {
           return char;
         }
@@ -923,7 +934,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
       let amount: string | string[] = String(this.runningAlert.amount).split('').map((char, index) => {
         if (this.runningAlert !== null) {
-          return `<div class="animate__animated animate__infinite animate__${this.runningAlert.alert.animationText} animate__${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font ? this.runningAlert.alert.font.highlightcolor : this.data?.font}; display: inline-block;">${char}</div>`;
+          return `<div class="animate__animated animate__infinite animate__${this.runningAlert.alert.animationText} animate__${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font ? this.runningAlert.alert.font.highlightcolor : this.data?.font.highlightcolor}; display: inline-block;">${char}</div>`;
         } else {
           return char;
         }
@@ -931,7 +942,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
       let currency: string | string[] = String(this.runningAlert.currency).split('').map((char, index) => {
         if (this.runningAlert !== null) {
-          return `<div class="animate__animated animate__infinite animate__${this.runningAlert.alert.animationText} animate__${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font ? this.runningAlert.alert.font.highlightcolor : this.data?.font}; display: inline-block;">${char}</div>`;
+          return `<div class="animate__animated animate__infinite animate__${this.runningAlert.alert.animationText} animate__${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font ? this.runningAlert.alert.font.highlightcolor : this.data?.font.highlightcolor}; display: inline-block;">${char}</div>`;
         } else {
           return char;
         }
@@ -939,7 +950,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
       let monthsName: string | string[] = String(this.runningAlert.monthsName).split('').map((char, index) => {
         if (this.runningAlert !== null) {
-          return `<div class="animate__animated animate__infinite animate__${this.runningAlert.alert.animationText} animate__${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font ? this.runningAlert.alert.font.highlightcolor : this.data?.font}; display: inline-block;">${char}</div>`;
+          return `<div class="animate__animated animate__infinite animate__${this.runningAlert.alert.animationText} animate__${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font ? this.runningAlert.alert.font.highlightcolor : this.data?.font.highlightcolor}; display: inline-block;">${char}</div>`;
         } else {
           return char;
         }
@@ -953,11 +964,11 @@ export default class AlertsRegistryOverlays extends Vue {
           && !this.runningAlert.waitingForTTS) {
           maxTimeToDecrypt = 0;
         }
-        name = `<baffle :key="'name-' + this.runningAlert.name" :text="this.runningAlert.name" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font ? this.runningAlert.alert.font.highlightcolor : this.data?.font.highlightcolor}"/>`;
-        recipient = `<baffle :key="'recipient-' + this.runningAlert.recipient" :text="this.runningAlert.recipient" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font ? this.runningAlert.alert.font.highlightcolor : this.data?.font.highlightcolor}"/>`;
-        amount = `<baffle :key="'amount-' + this.runningAlert.amount" :text="String(this.runningAlert.amount)" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font ? this.runningAlert.alert.font.highlightcolor : this.data?.font.highlightcolor}"/>`;
-        currency = `<baffle :key="'currency-' + this.runningAlert.currency" :text="this.runningAlert.currency" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font ? this.runningAlert.alert.font.highlightcolor : this.data?.font.highlightcolor}"/>`;
-        monthsName = `<baffle :key="'monthsName-' + this.runningAlert.monthsName" :text="this.runningAlert.monthsName" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font ? this.runningAlert.alert.font.highlightcolor : this.data?.font.highlightcolor}"/>`;
+        name = `<baffle :key="'name-' + this.runningAlert.name" :text="this.runningAlert.name" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font ? this.runningAlert.alert.font.highlightcolor : this.data?.font.highlightcolor}"/>`;
+        recipient = `<baffle :key="'recipient-' + this.runningAlert.recipient" :text="this.runningAlert.recipient" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font ? this.runningAlert.alert.font.highlightcolor : this.data?.font.highlightcolor}"/>`;
+        amount = `<baffle :key="'amount-' + this.runningAlert.amount" :text="String(this.runningAlert.amount)" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font ? this.runningAlert.alert.font.highlightcolor : this.data?.font.highlightcolor}"/>`;
+        currency = `<baffle :key="'currency-' + this.runningAlert.currency" :text="this.runningAlert.currency" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font ? this.runningAlert.alert.font.highlightcolor : this.data?.font.highlightcolor}"/>`;
+        monthsName = `<baffle :key="'monthsName-' + this.runningAlert.monthsName" :text="this.runningAlert.monthsName" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font ? this.runningAlert.alert.font.highlightcolor : this.data?.font.highlightcolor}"/>`;
       } else {
         name = name.join('');
         recipient = recipient.join('');
