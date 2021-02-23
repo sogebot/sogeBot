@@ -10,7 +10,7 @@ interface Events {
   'user-joined-channel': (opts: {username: string}) => void;
   'user-parted-channel': (opts: {username: string}) => void;
   'subcommunitygift': (opts: {username: string; count: number}) => void;
-  'reward-redeemed': (opts: {username: string; titleOfReward: string; userInput: string;}) => void;
+  'reward-redeemed': (opts: {userId: string; username: string; titleOfReward: string; userInput: string;}) => void;
   'timeout': (opts: {username: string; duration: number}) => void;
   'ban': (opts: {username: string; reason: string}) => void;
   'hosting': (opts: {target: string, viewers: number}) => void;

@@ -96,6 +96,7 @@ const connect = () => {
           recipient:  dataMessage.data.redemption.user.login,
         });
         eventEmitter.emit('reward-redeemed', {
+          userId:        dataMessage.data.redemption.user.id,
           username:      dataMessage.data.redemption.user.login,
           titleOfReward: dataMessage.data.redemption.reward.title,
           userInput:     dataMessage.data.redemption.user_input,
