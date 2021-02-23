@@ -657,7 +657,9 @@ class Spotify extends Integration {
         }
       }
     } catch (e) {
-      if (e.message !== 'Song not found') {
+      if (e.message === 'PREMIUM_REQUIRED') {
+        error('Spotify Premium is required to request a song.');
+      } else if (e.message !== 'Song not found') {
         throw e;
       }
       return [{ response: prepare('integrations.spotify.song-not-found'), ...opts }];
@@ -669,7 +671,7 @@ class Spotify extends Integration {
       try {
         const isSongBanned = (await getRepository(SpotifySongBan).count({ where: { spotifyUri: uri } })) > 0;
         if (isSongBanned) {
-          throw new Error('Song is banned');
+          return false;
         }
 
         const queueResponse = await this.client.addToQueue(uri);
@@ -679,6 +681,9 @@ class Spotify extends Integration {
         return true;
       } catch (e) {
         if (e.stack.includes('WebapiPlayerError')) {
+          if (e.message.includes('PREMIUM_REQUIRED')) {
+            throw new Error('PREMIUM_REQUIRED');
+          }
           error(e.message);
           return false;
         } else {
