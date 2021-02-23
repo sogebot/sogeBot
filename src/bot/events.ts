@@ -18,7 +18,7 @@ import {
 import { sample } from './helpers/array/sample';
 import { attributesReplace } from './helpers/attributesReplace';
 import {
-  announce, getBotSender, getOwner, prepare,
+  announce, getOwner, getUserSender, prepare,
 } from './helpers/commons';
 import { mainCurrency } from './helpers/currency';
 import {
@@ -52,6 +52,7 @@ import { setTitleAndGame } from './microservices/setTitleAndGame';
 import oauth from './oauth';
 import tmi from './tmi';
 import { translate } from './translate';
+import users from './users';
 
 const excludedUsers = new Set<string>();
 
@@ -408,6 +409,9 @@ class Events extends Core {
   }
 
   public async fireRunCommand(operation: Events.OperationDefinitions, attributes: Events.Attributes) {
+    const username = _.isNil(attributes.username) ? getOwner() : attributes.username;
+    const userId = attributes.userId ? attributes.userId : await users.getIdByName(username);
+
     let command = String(operation.commandToRun);
     for (const key of Object.keys(attributes).sort((a, b) => a.length - b.length)) {
       const val = attributes[key];
@@ -417,7 +421,7 @@ class Events extends Core {
       const replace = new RegExp(`\\$${key}`, 'g');
       command = command.replace(replace, val);
     }
-    command = await new Message(command).parse({ username: oauth.broadcasterUsername, sender: getBotSender() });
+    command = await new Message(command).parse({ username, sender: getUserSender(String(userId), username) });
 
     if (global.mocha) {
       parserEmitter.emit('process', {
@@ -435,10 +439,10 @@ class Events extends Core {
     } else {
       tmi.message({
         message: {
-          tags:    { username: oauth.broadcasterUsername , userId: broadcasterId.value },
+          tags:    { username, userId },
           message: command,
         },
-        skip:  false,
+        skip:  true,
         quiet: !!_.get(operation, 'isCommandQuiet', false),
       });
     }

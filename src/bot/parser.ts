@@ -5,17 +5,17 @@ import { v4 as uuid } from 'uuid';
 
 import * as constants from './constants';
 import {
-  addToParserFindCache, cachedCommandsPermissions, parserFindCache, 
+  addToParserFindCache, cachedCommandsPermissions, parserFindCache,
 } from './helpers/cache';
 import { incrementCountOfCommandUsage } from './helpers/commands/count';
 import { getBotSender } from './helpers/commons';
 import {
-  debug, error, warning, 
+  debug, error, warning,
 } from './helpers/log';
 import { parserEmitter } from './helpers/parser/';
 import { populatedList } from './helpers/parser/populatedList';
 import {
-  addToViewersCache, getCommandPermission, getFromViewersCache, 
+  addToViewersCache, getCommandPermission, getFromViewersCache,
 } from './helpers/permissions';
 import { check } from './helpers/permissions/';
 import { translate } from './translate';
@@ -314,7 +314,7 @@ class Parser {
       if (sender) {
         sender['message-type'] = 'whisper';
         return[{
-          response: translate('permissions.without-permission').replace(/\$command/g, message), sender, attr: {}, 
+          response: translate('permissions.without-permission').replace(/\$command/g, message), sender, attr: {},
         }];
       }
       return [];
