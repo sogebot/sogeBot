@@ -1,6 +1,5 @@
 import crypto from 'crypto';
 
-import axios from 'axios';
 import chalk from 'chalk';
 import _ from 'lodash';
 import SpotifyWebApi from 'spotify-web-api-node';
@@ -23,10 +22,6 @@ import { ioServer } from '../helpers/panel';
 import { addUIError } from '../helpers/panel/';
 import { adminEndpoint } from '../helpers/socket';
 import Integration from './_interface';
-
-type SpotifyTrack = {
-  uri: string; name: string; artists: { name: string }[]
-};
 
 /*
  * How to integrate:
@@ -237,13 +232,9 @@ class Spotify extends Integration {
   @default_permission(null)
   async cSkipSong() {
     if (this.client) {
-      const skipResponse = await axios({
-        method:  'post',
-        url:     'https://api.spotify.com/v1/me/player/next',
-        headers: { 'Authorization': 'Bearer ' + this.client.getAccessToken() },
-      });
+      this.client.skipToNext();
       ioServer?.emit('api.stats', {
-        method: 'POST', data: skipResponse.data, timestamp: Date.now(), call: 'spotify::skip', api: 'other', endpoint: 'https://api.spotify.com/v1/me/player/next', code: skipResponse.status,
+        method: 'POST', data: 'n/a', timestamp: Date.now(), call: 'spotify::skip', api: 'other', endpoint: 'n/a', code: 200,
       });
     }
     return [];
@@ -370,16 +361,13 @@ class Spotify extends Integration {
           }
         }
 
-        const response = await axios({
-          method:  'get',
-          url:     'https://api.spotify.com/v1/tracks/' + id,
-          headers: { 'Authorization': 'Bearer ' + this.client.getAccessToken() },
-        });
+        const response = await this.client.getTrack(id);
+
         ioServer?.emit('api.stats', {
-          method: 'GET', data: response.data, timestamp: Date.now(), call: 'spotify::addBan', api: 'other', endpoint: response.headers.url, code: response.status,
+          method: 'GET', data: response.body, timestamp: Date.now(), call: 'spotify::addBan', api: 'other', endpoint: response.headers.url, code: response.statusCode,
         });
 
-        const track = response.data as SpotifyTrack;
+        const track = response.body;
         await getRepository(SpotifySongBan).save({
           artists: track.artists.map(o => o.name), spotifyUri: track.uri, title: track.name,
         });
@@ -632,16 +620,12 @@ class Spotify extends Integration {
             throw Error('ID was not found in ' + spotifyId);
           }
         }
-        const response = await axios({
-          method:  'get',
-          url:     'https://api.spotify.com/v1/tracks/' + id,
-          headers: { 'Authorization': 'Bearer ' + this.client.getAccessToken() },
-        });
+        const response = await this.client.getTrack(id);
         ioServer?.emit('api.stats', {
-          method: response.config.method?.toUpperCase(), data: response.data, timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: response.config.url, code: response.status,
+          method: 'GET', data: response.body, timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: 'n/a', code: response.statusCode,
         });
 
-        const track = response.data as SpotifyTrack;
+        const track = response.body;
         if(await this.requestSongByAPI(track.uri)) {
           return [{
             response: prepare('integrations.spotify.song-requested', {
@@ -656,19 +640,16 @@ class Spotify extends Integration {
           }];
         }
       } else {
-        const response = await axios({
-          method:  'get',
-          url:     'https://api.spotify.com/v1/search?type=track&limit=1&q=' + encodeURI(spotifyId),
-          headers: {
-            'Authorization': 'Bearer ' + this.client.getAccessToken(),
-            'Content-Type':  'application/json',
-          },
-        });
+        const response = await this.client.searchTracks(spotifyId);
         ioServer?.emit('api.stats', {
-          method: response.config.method?.toUpperCase(), data: response.data, timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: response.config.url, code: response.status,
+          method: 'GET', data: response.body, timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: 'n/a', code: response.statusCode,
         });
 
-        const track = (response.data.tracks.items[0] as SpotifyTrack);
+        if (!response.body.tracks || response.body.tracks.items.length === 0) {
+          throw new Error('Song not found');
+        }
+
+        const track =  response.body.tracks.items[0]; //(response.body.tracks.items[0] as SpotifyTrack);
         if(await this.requestSongByAPI(track.uri)) {
           return [{ response: prepare('integrations.spotify.song-requested', { name: track.name, artist: track.artists[0].name }), ...opts }];
         } else {
@@ -676,15 +657,9 @@ class Spotify extends Integration {
         }
       }
     } catch (e) {
-      if (e.response.status === 401) {
-        error(`${chalk.bgRed('SPOTIFY')}: you don't have access to spotify API, try to revoke and authorize again.`);
-      } else if (e.response.status === 403) {
-        error(`${chalk.bgRed('SPOTIFY')}: you don't seem to have spotify PREMIUM.`);
+      if (e.message !== 'Song not found') {
+        throw e;
       }
-      ioServer?.emit('api.stats', {
-        method: e.config.method.toUpperCase(), timestamp: Date.now(), call: 'spotify::search', api: 'other', endpoint: e.config.url, code: e.response?.status ?? 'n/a', data: e.response?.data ?? 'n/a',
-      });
-
       return [{ response: prepare('integrations.spotify.song-not-found'), ...opts }];
     }
   }
@@ -697,17 +672,14 @@ class Spotify extends Integration {
           throw new Error('Song is banned');
         }
 
-        const queueResponse = await axios({
-          method:  'post',
-          url:     'https://api.spotify.com/v1/me/player/queue?uri=' + uri,
-          headers: { 'Authorization': 'Bearer ' + this.client.getAccessToken() },
-        });
+        const queueResponse = await this.client.addToQueue(uri);
         ioServer?.emit('api.stats', {
-          method: 'POST', data: queueResponse.data, timestamp: Date.now(), call: 'spotify::queue', api: 'other', endpoint: 'https://api.spotify.com/v1/me/player/queue?uri=' + uri, code: queueResponse.status,
+          method: 'POST', data: queueResponse.body, timestamp: Date.now(), call: 'spotify::queue', api: 'other', endpoint: 'https://api.spotify.com/v1/me/player/queue?uri=' + uri, code: queueResponse.statusCode,
         });
         return true;
       } catch (e) {
-        if (!e.isAxiosError) {
+        if (e.stack.includes('WebapiPlayerError')) {
+          error(e.message);
           return false;
         } else {
           // rethrow error
