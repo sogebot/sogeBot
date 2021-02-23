@@ -848,6 +848,11 @@ class TMI extends Core {
   }
 
   async message (data: { skip?: boolean, quiet?: boolean, message: Pick<Message, 'message' | 'tags'>}) {
+    // ignore if it is part of custom reward // we have it laready logged in redeem log
+    if (data.message.tags.customRewardId) {
+      return;
+    }
+
     const sender = data.message.tags as UserStateTagsWithId;
     const message = data.message.message;
     const skip = data.skip ?? false;
