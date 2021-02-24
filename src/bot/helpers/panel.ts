@@ -33,7 +33,7 @@ export const addMenuPublic = (menuArg: typeof menuPublic[number]) => {
 
 export const addWidget = (id: string, name: string, icon: IconName) => {
   widgets.push({
-    id: id, name: name, icon: icon, 
+    id: id, name: name, icon: icon,
   });
 };
 
@@ -44,7 +44,16 @@ export const setApp = (_app: express.Application) => {
 export const setServer = () => {
   if (app) {
     server = http.createServer(app);
-    ioServer = new io(server);
+    if (process.env.CORS) {
+      ioServer = new io(server, {
+        cors: {
+          origin:  process.env.CORS,
+          methods: ['GET', 'POST'],
+        },
+      });
+    } else {
+      ioServer = new io(server);
+    }
     ioServer.sockets.setMaxListeners(200);
 
     if (process.env.CA_CERT && process.env.CA_KEY) {
