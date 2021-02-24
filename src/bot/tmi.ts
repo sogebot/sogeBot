@@ -90,7 +90,7 @@ class TMI extends Core {
   };
   broadcasterWarning = false;
 
-  ignoreGiftsFromUser: { [x: string]: { count: number; time: Date }} = {};
+  ignoreGiftsFromUser = new Map<string, number>();
 
   constructor() {
     super();
@@ -628,7 +628,8 @@ class TMI extends Core {
 
       await getRepository(User).increment({ userId }, 'giftedSubscribes', Number(count));
 
-      this.ignoreGiftsFromUser[username] = { count, time: new Date() };
+      const ignoreGifts = this.ignoreGiftsFromUser.get(username) ?? 0;
+      this.ignoreGiftsFromUser.set(username, ignoreGifts + count);
 
       if (isIgnored({ username, userId })) {
         return;
@@ -667,15 +668,26 @@ class TMI extends Core {
       const recipientId = message.parameters.recipientId;
       const tier = this.getMethod(message).plan / 1000;
 
-      for (const [u, o] of Object.entries(this.ignoreGiftsFromUser)) {
-        if (o.count === 0 || new Date().getTime() - new Date(o.time).getTime() >= 1000 * 60 * 10) {
-          delete this.ignoreGiftsFromUser[u];
-        }
+      const ignoreGifts = (this.ignoreGiftsFromUser.get(username) ?? 0);
+      let isGiftIgnored = false;
+
+      if (ignoreGifts > 0) {
+        isGiftIgnored = true;
+        this.ignoreGiftsFromUser.set(username, ignoreGifts - 1);
       }
 
-      if (typeof this.ignoreGiftsFromUser[username] !== 'undefined' && this.ignoreGiftsFromUser[username].count !== 0) {
-        this.ignoreGiftsFromUser[username].count--;
-      } else {
+      if (!isGiftIgnored) {
+        debug('tmi.subgift', `Triggered: ${username}#${userId} -> ${recipient}#${recipientId}`);
+        alerts.trigger({
+          event:      'subgifts',
+          name:       username,
+          recipient,
+          amount:     subCumulativeMonths,
+          tier:       null,
+          currency:   '',
+          monthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
+          message:    '',
+        });
         eventEmitter.emit('subgift', {
           username: username, recipient: recipient, tier,
         });
@@ -684,6 +696,8 @@ class TMI extends Core {
           userId:              Number(recipientId),
           subCumulativeMonths: 0,
         });
+      } else {
+        debug('tmi.subgift', `Ignored: ${username}#${userId} -> ${recipient}#${recipientId}`);
       }
       if (isIgnored({ username, userId: recipientId })) {
         return;
@@ -714,19 +728,9 @@ class TMI extends Core {
         timestamp:  Date.now(),
       });
       subgift(`${recipient}#${recipientId}, from: ${username}#${userId}, months: ${subCumulativeMonths}`);
-      alerts.trigger({
-        event:      'subgifts',
-        name:       username,
-        recipient,
-        amount:     subCumulativeMonths,
-        tier:       null,
-        currency:   '',
-        monthsName: getLocalizedName(subCumulativeMonths, translate('core.months')),
-        message:    '',
-      });
 
       // also set subgift count to gifter
-      if (!(isIgnored({ username, userId }))) {
+      if (!(isIgnored({ username, userId })) && !isGiftIgnored) {
         await getRepository(User).increment({ userId }, 'giftedSubscribes', 1);
       }
     } catch (e) {
