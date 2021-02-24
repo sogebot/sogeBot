@@ -28,10 +28,11 @@ const webpackConfig = {
       config: [ __filename ] // you may omit this when your CLI automatically adds it
     }
   },
+  watch: process.env.NODE_ENV === 'watch',
   watchOptions: {
     ignored: ['/node_modules/*'],
   },
-  mode: process.env.NODE_ENV,
+  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   performance: { hints: process.env.NODE_ENV === 'production' ? false : 'warning' },
   optimization,
   entry: {
