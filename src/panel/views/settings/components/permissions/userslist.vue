@@ -1,57 +1,109 @@
 <template>
   <div>
-    <div class="input-group border w-100"
-         :class="{'focus-border': isFocused }">
+    <div
+      class="input-group border w-100"
+      :class="{'focus-border': isFocused }"
+    >
       <div class="input-group-prepend">
         <div class="input-group-text bg-transparent border-0">
-          <fa icon="search" v-if="!isSearching"></fa>
-          <fa icon="spinner" spin v-else></fa>
+          <fa
+            v-if="!isSearching"
+            icon="search"
+          />
+          <fa
+            v-else
+            icon="spinner"
+            spin
+          />
         </div>
       </div>
       <input
-        @focus="isFocused = true"
-        @blur="isFocused = false"
         v-model="inputUsername"
-        v-on:keyup.enter="search(inputUsername)"
         type="text"
         class="form-control border-0"
-        :placeholder="translate('core.permissions.typeUsernameOrIdToSearch')"/>
+        :placeholder="translate('core.permissions.typeUsernameOrIdToSearch')"
+        @focus="isFocused = true"
+        @blur="isFocused = false"
+        @keyup.enter="search(inputUsername)"
+      >
     </div>
 
-    <div class="p-3 alert-warning" v-if="searchData.length === 0 && testUsername.length != 0 && !isSearching">
-      {{translate('core.permissions.noUsersWereFound')}}
+    <div
+      v-if="searchData.length === 0 && testUsername.length != 0 && !isSearching"
+      class="p-3 alert-warning"
+    >
+      {{ translate('core.permissions.noUsersWereFound') }}
     </div>
-    <div class="border" v-else-if="searchData.length > 0">
+    <div
+      v-else-if="searchData.length > 0"
+      class="border"
+    >
       <div>
-        <button type="button"
-                class="btn col-4"
-                v-for="user of chunk(searchData, 15)[searchPage]"
-                :class="[!currentIds.includes(user.userId) ? 'btn-light' : 'btn-dark']"
-                :key="user.username"
-                @click="toggleUser(user.username, user.userId)">
-          <span v-html="user.username.replace(testUsername, '<strong>' + testUsername + '</strong>')"></span>
-          <small class="text-muted" v-html="String(user.userId).replace(testUsername, '<strong>' + testUsername + '</strong>')"></small>
+        <button
+          v-for="user of chunk(searchData, 15)[searchPage]"
+          :key="user.username"
+          type="button"
+          class="btn col-4"
+          :class="[!currentIds.includes(user.userId) ? 'btn-light' : 'btn-dark']"
+          @click="toggleUser(user.username, user.userId)"
+        >
+          <span v-html="user.username.replace(testUsername, '<strong>' + testUsername + '</strong>')" />
+          <small
+            class="text-muted"
+            v-html="String(user.userId).replace(testUsername, '<strong>' + testUsername + '</strong>')"
+          />
         </button>
       </div>
       <div class="d-flex">
-        <button class="btn btn-success col-4" type="button" @click="inputUsername = ''; searchData = []">{{translate('core.permissions.done')}}</button>
-        <button class="btn btn-primary col-4" type="button" :disabled="typeof chunk(searchData, 15)[searchPage-1] === 'undefined'" @click="searchPage--">{{translate('core.permissions.previous')}}</button>
-        <button class="btn btn-primary col-4" type="button" :disabled="typeof chunk(searchData, 15)[searchPage+1] === 'undefined'" @click="searchPage++">{{translate('core.permissions.next')}}</button>
+        <button
+          class="btn btn-success col-4"
+          type="button"
+          @click="inputUsername = ''; searchData = []"
+        >
+          {{ translate('core.permissions.done') }}
+        </button>
+        <button
+          class="btn btn-primary col-4"
+          type="button"
+          :disabled="typeof chunk(searchData, 15)[searchPage-1] === 'undefined'"
+          @click="searchPage--"
+        >
+          {{ translate('core.permissions.previous') }}
+        </button>
+        <button
+          class="btn btn-primary col-4"
+          type="button"
+          :disabled="typeof chunk(searchData, 15)[searchPage+1] === 'undefined'"
+          @click="searchPage++"
+        >
+          {{ translate('core.permissions.next') }}
+        </button>
       </div>
     </div>
-    <div class='p-3 alert-warning' v-else-if="currentIds.length === 0">
-      {{translate('core.permissions.noUsersManuallyAddedToPermissionYet')}}
+    <div
+      v-else-if="currentIds.length === 0"
+      class="p-3 alert-warning"
+    >
+      {{ translate('core.permissions.noUsersManuallyAddedToPermissionYet') }}
     </div>
-    <div class="border" v-else>
+    <div
+      v-else
+      class="border"
+    >
       <div>
-        <button type="button"
-                class="btn col-4 btn-dark"
-                v-for="id of currentIds"
-                :key="id"
-                @click="currentIds = currentIds.filter((o) => o !== id)">
-          <span>{{(currentUsers.find(o => o.id === id) || { username: translate('core.permissions.loading')}).username}}</span>
-          <small class="text-muted">{{id}}</small>
-          <fa class="text-muted" icon="times"></fa>
+        <button
+          v-for="id of currentIds"
+          :key="id"
+          type="button"
+          class="btn col-4 btn-dark"
+          @click="currentIds = currentIds.filter((o) => o !== id)"
+        >
+          <span>{{ (currentUsers.find(o => o.id === id) || { username: translate('core.permissions.loading')}).username }}</span>
+          <small class="text-muted">{{ id }}</small>
+          <fa
+            class="text-muted"
+            icon="times"
+          />
         </button>
       </div>
     </div>
@@ -103,20 +155,6 @@ export default Vue.extend({
     };
     return data;
   },
-  mounted() {
-    this.currentIds = this.currentIds.map(o => Number(o));
-
-    for (const id of this.currentIds) {
-      if (!this.currentUsers.find(o => o.id === id)) {
-        this.usersSocket.emit('getNameById', id, (err: string | null, username: string) => {
-          if (err) {
-            return console.error(err);
-          }
-          this.currentUsers.push({ id, username });
-        });
-      }
-    }
-  },
   watch: {
     inputUsername(val) {
       // on change reset status
@@ -132,6 +170,20 @@ export default Vue.extend({
       }
     },
   },
+  mounted() {
+    this.currentIds = this.currentIds.map(o => Number(o));
+
+    for (const id of this.currentIds) {
+      if (!this.currentUsers.find(o => o.id === id)) {
+        this.usersSocket.emit('getNameById', id, (err: string | null, username: string) => {
+          if (err) {
+            return console.error(err);
+          }
+          this.currentUsers.push({ id, username });
+        });
+      }
+    }
+  },
   methods: {
     search(val: string) {
       this.isSearching = true;
@@ -144,7 +196,9 @@ export default Vue.extend({
         this.searchData = [];
       } else {
         this.testUsername = val;
-        this.usersSocket.emit('find.viewers', { search: val, state }, (err: string | null, r: string[]) => {
+        this.usersSocket.emit('find.viewers', {
+          search: val, state, exactUsernameFromTwitch: true, 
+        }, (err: string | null, r: string[]) => {
           if (err) {
             return console.error(err);
           }

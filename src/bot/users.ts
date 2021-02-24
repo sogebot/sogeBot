@@ -414,7 +414,21 @@ class Users extends Core {
         }
 
         const viewers = await query.getRawMany();
-        const count = await query.getCount();
+        let count = await query.getCount();
+
+        if (opts.exactUsernameFromTwitch && opts.search) {
+          // we need to check if viewers have already opts.search in list (we don't need to fetch twitch data)
+          if (!viewers.find(o => o.username === opts.search)) {
+            try {
+              const userId = await getIdFromTwitch(opts.search);
+              viewers.unshift({ userId, username: opts.search });
+              count++;
+            } catch (e) {
+              // we don't care if user is not found
+            }
+
+          }
+        }
 
         cb(null, viewers, count, opts.state);
       } catch (e) {
