@@ -9,8 +9,11 @@
     "cSpamEnabled": "Erzwinge die Regel",
     "cColorEnabled": "Erzwinge die Regel",
     "cEmotesEnabled": "Erzwinge die Regel",
-    "cListsWhitelist": "Whitelist",
-    "cListsBlacklist": "Blacklist",
+    "cListsWhitelist": {
+      "title": "Allowed words",
+      "help": "To allow domains use \"domain:prtzl.io\""
+    },
+    "cListsBlacklist": "Forbidden words",
     "cListsTimeout": "Dauer der Zeitüberschreitung",
     "cLinksTimeout": "Dauer der Zeitüberschreitung",
     "cSymbolsTimeout": "Dauer der Zeitüberschreitung",

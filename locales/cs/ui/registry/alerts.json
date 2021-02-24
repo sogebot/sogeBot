@@ -150,7 +150,7 @@
   "font": {
     "setting": "Nastavení fontu",
     "name": "Font",
-    "overrideGlobal": "Override global font settings",
+    "overrideGlobal": "Přepsat globální nastavení písma",
     "align": {
       "name": "Zarovnání",
       "left": "Vlevo",
