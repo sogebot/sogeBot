@@ -9,7 +9,10 @@
     "cSpamEnabled": "Vynutit pravidlo",
     "cColorEnabled": "Vynutit pravidlo",
     "cEmotesEnabled": "Vynutit pravidlo",
-    "cListsWhitelist": "Povolená slova",
+    "cListsWhitelist": {
+      "title": "Povolená slova",
+      "help": "Pro povolení domén použijte \"domain:prtzl.io\""
+    },
     "cListsBlacklist": "Zakázaná slova",
     "cListsTimeout": "Čas trvání timeoutu",
     "cLinksTimeout": "Čas trvání timeoutu",
