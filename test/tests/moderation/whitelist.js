@@ -14,6 +14,13 @@ const db = require('../../general.js').db;
 const owner = { username: '__broadcaster__' };
 
 const tests = {
+  'domain:prtzl.io': {
+    'should.return.changed': [
+      'Now Playing: Eden (Waveshaper Remix) - Instrumental by Scandroid -> https://prtzl.io/QbHKjGenxvZg49uG',
+    ],
+    'should.return.same': [
+    ],
+  },
   'osu.ppy.sh': {
     'should.return.changed': [
       'Lorem Ipsum osu.ppy.sh dolor sit amet',
