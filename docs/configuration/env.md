@@ -63,6 +63,13 @@ Force worker_threads to be disabled in special cases (e.g. getChannelChattersUno
 
 !> Timezone is affecting only bot logs and `!time` command
 
+## CORS
+
+Enable socket.io cors settings
+
+- `CORS=*`
+- nothing is set *default*
+
 ### What is this?
 
 Changes timezone settings for a bot. Useful if you are on machine, where you
