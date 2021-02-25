@@ -8,6 +8,7 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const tmi = (require('../../../dest/tmi')).default;
 const db = require('../../general.js').db;
+const time = require('../../general.js').time;
 const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 
@@ -119,6 +120,7 @@ describe('TMI - subcommunitygift after gifts should be ignored', () => {
   });
 
   it('Viewer1 should have 6 subgifts', async () => {
+    await time.waitMs(1000);
     const _user = await getRepository(User).findOne({ userId: user.viewer.userId });
     assert(_user.giftedSubscribes === 6, `Expected 6 (5 community + 1 normal) subgifts, got ${_user.giftedSubscribes} subgifts`);
   });
