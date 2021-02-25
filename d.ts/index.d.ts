@@ -29,6 +29,7 @@ interface Parser {
   permission?: string;
   priority?: number;
   fireAndForget?: boolean;
+  skippable?: boolean;
   dependsOn?: import('../src/bot/_interface').Module[];
 }
 

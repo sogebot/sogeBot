@@ -2,24 +2,24 @@
 
 import * as cronparser from 'cron-parser';
 import {
-  FindConditions, getConnection, getRepository, LessThanOrEqual, 
+  FindConditions, getConnection, getRepository, LessThanOrEqual,
 } from 'typeorm';
 
 import { MINUTE } from '../constants';
 import { PointsChangelog } from '../database/entity/points';
 import { User, UserInterface } from '../database/entity/user';
 import {
-  command, default_permission, parser, permission_settings, persistent, settings, ui, 
+  command, default_permission, parser, permission_settings, persistent, settings, ui,
 } from '../decorators';
 import {
-  onChange, onLoad, onStartup, 
+  onChange, onLoad, onStartup,
 } from '../decorators/on';
 import Expects from '../expects';
 import { isStreamOnline } from '../helpers/api';
 import { prepare } from '../helpers/commons';
 import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
 import {
-  debug, error, warning, 
+  debug, error, warning,
 } from '../helpers/log';
 import { ParameterError } from '../helpers/parameterError';
 import { getUserHighestPermission } from '../helpers/permissions/';
@@ -134,7 +134,7 @@ class Points extends System {
           continue;
         }
         userPromises.push(this.processPoints(username, {
-          interval, offlineInterval, perInterval, perOfflineInterval, isStreamOnline: isStreamOnline.value, 
+          interval, offlineInterval, perInterval, perOfflineInterval, isStreamOnline: isStreamOnline.value,
         }));
         await Promise.all(userPromises);
       }
@@ -208,7 +208,7 @@ class Points extends System {
     });
   }
 
-  @parser({ fireAndForget: true })
+  @parser({ fireAndForget: true, skippable: true })
   async messagePoints (opts: ParserOptions) {
     if (opts.skip || opts.message.startsWith('!')) {
       return true;

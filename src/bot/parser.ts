@@ -99,10 +99,12 @@ class Parser {
           debug('parser.permission', `Permission cached for ${this.sender.username}#${this.sender.userId} | ${parser.permission}`);
         }
       }
+
       if (
-        _.isNil(this.sender) // if user is null -> we are running command through a bot
-        || this.skip
-        || getFromViewersCache(this.sender.userId, parser.permission)
+        !(this.skip && parser.skippable) // parser is not fully skippable
+        && (_.isNil(this.sender) // if user is null -> we are running command through a bot
+          || this.skip
+          || getFromViewersCache(this.sender.userId, parser.permission))
       ) {
         debug('parser.process', 'Processing ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ')');
         const text = this.message.trim().replace(/^(!\w+)/i, '');
@@ -288,7 +290,8 @@ class Parser {
       if (typeof command.fnc === 'function' && !_.isNil(command.id)) {
         incrementCountOfCommandUsage(command.command);
         debug('parser.command', 'Running ' + command.command);
-        return command.fnc.apply(command.this, [opts]) as CommandResponse[];
+        const responses = command.fnc.apply(command.this, [opts]) as CommandResponse[];
+        return responses;
       } else {
         error(command.command + ' have wrong undefined function ' + command._fncName + '() registered!');
         return [];
