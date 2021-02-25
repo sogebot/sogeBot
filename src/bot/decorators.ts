@@ -251,13 +251,13 @@ export function persistent() {
 }
 
 export function parser(
-  { fireAndForget = false, permission = defaultPermissions.VIEWERS, priority = constants.MEDIUM, dependsOn = [] }:
-  { fireAndForget?: boolean; permission?: string; priority?: number; dependsOn?: import('./_interface').Module[] } = {}) {
+  { skippable = false, fireAndForget = false, permission = defaultPermissions.VIEWERS, priority = constants.MEDIUM, dependsOn = [] }:
+  { skippable?: boolean; fireAndForget?: boolean; permission?: string; priority?: number; dependsOn?: import('./_interface').Module[] } = {}) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
     registerParser({
-      fireAndForget, permission, priority, dependsOn,
+      fireAndForget, permission, priority, dependsOn, skippable,
     }, {
       type, name, fnc: key,
     });
@@ -346,7 +346,7 @@ function registerRollback(m: { type: string, name: string, fnc: string }) {
 }
 
 function registerParser(opts: {
-  permission: string; priority: number, dependsOn: Module[]; fireAndForget: boolean;
+  permission: string; priority: number, dependsOn: Module[]; fireAndForget: boolean; skippable: boolean;
 }, m: { type: string, name: string, fnc: string }) {
   setTimeout(() => {
     try {
@@ -359,6 +359,7 @@ function registerParser(opts: {
         permission:    opts.permission,
         priority:      opts.priority,
         dependsOn:     opts.dependsOn,
+        skippable:     opts.skippable,
         fireAndForget: opts.fireAndForget,
       });
     } catch (e) {

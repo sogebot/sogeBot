@@ -174,7 +174,7 @@ class Cooldown extends System {
     }
   }
 
-  @parser({ priority: constants.HIGH })
+  @parser({ priority: constants.HIGH, skippable: true })
   async check (opts: ParserOptions): Promise<boolean> {
     try {
       let data: (CooldownInterface | { type: 'default'; canBeRunAt: number; isEnabled: true; name: string; permId: string })[] = [];

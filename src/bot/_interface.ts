@@ -10,7 +10,7 @@ import { v4 as uuid } from 'uuid';
 import { PermissionCommands, Permissions as PermissionsEntity } from './database/entity/permissions';
 import { Settings } from './database/entity/settings';
 import {
-  commandsToRegister, loadingInProgress, permissions as permissionsList, 
+  commandsToRegister, loadingInProgress, permissions as permissionsList,
 } from './decorators';
 import { getFunctionList } from './decorators/on';
 import { invalidateParserCache, refreshCachedCommandPermissions } from './helpers/cache';
@@ -18,10 +18,10 @@ import { isBotStarted } from './helpers/database';
 import { flatten, unflatten } from './helpers/flatten';
 import { enabled } from './helpers/interface/enabled';
 import {
-  error, info, warning, 
+  error, info, warning,
 } from './helpers/log';
 import {
-  addMenu, addMenuPublic, addWidget, ioServer, menu, menuPublic, 
+  addMenu, addMenuPublic, addWidget, ioServer, menu, menuPublic,
 } from './helpers/panel';
 import { defaultPermissions } from './helpers/permissions/';
 import { register } from './helpers/register';
@@ -253,7 +253,7 @@ class Module {
         }
 
         this.settingsList.push({
-          category: 'commands', key: c.name, defaultValue: c.name, 
+          category: 'commands', key: c.name, defaultValue: c.name,
         });
 
         // load command from db
@@ -570,6 +570,7 @@ class Module {
       permission: string;
       priority: number;
       fireAndForget: boolean;
+      skippable: boolean;
     }[] = [];
     for (const parser of this._parsers) {
       parser.permission = typeof parser.permission !== 'undefined' ? parser.permission : defaultPermissions.VIEWERS;
@@ -594,6 +595,7 @@ class Module {
         fnc:           (this as any)[parser.name],
         permission:    parser.permission,
         priority:      parser.priority,
+        skippable:     parser.skippable ? parser.skippable : false,
         fireAndForget: parser.fireAndForget ? parser.fireAndForget : false,
       });
     }
