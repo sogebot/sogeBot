@@ -18,6 +18,8 @@
   "name": {
     "name": "Název"
   },
+  "mute": "Mute",
+  "unmute": "Unmute",
   "SetCurrentScene": {
     "name": "SetCurrentScene"
   },
