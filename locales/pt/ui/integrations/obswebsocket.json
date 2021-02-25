@@ -18,6 +18,8 @@
   "name": {
     "name": "Name"
   },
+  "mute": "Mute",
+  "unmute": "Unmute",
   "SetCurrentScene": {
     "name": "SetCurrentScene"
   },
