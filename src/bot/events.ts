@@ -226,7 +226,7 @@ class Events extends Core {
       excludedUsers.delete(attributes.username); // remove from excluded users if passed first if
 
       const user = attributes.userId
-        ? await getRepository(User).findOne({ userId: attributes.userId })
+        ? await getRepository(User).findOne({ userId: Number(attributes.userId) })
         : await getRepository(User).findOne({ username: attributes.username });
 
       if (!user) {
@@ -764,7 +764,7 @@ class Events extends Core {
         const months = _.random(0, 99, false);
         const attributes = {
           test:   true,
-          userId: 0,
+          userId: '0',
           username,
           is:     {
             moderator:   _.random(0, 1, false) === 0,
