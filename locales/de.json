@@ -279,6 +279,10 @@
           "label": "Zu erhöhende Zahl",
           "placeholder": ""
         },
+        "value": {
+          "label": "Value",
+          "placeholder": ""
+        },
         "numberToDecrement": {
           "label": "Zu verringernde Zahl",
           "placeholder": ""
@@ -811,6 +815,7 @@
     "create-a-clip": "Clip erstellen",
     "create-a-clip-and-play-replay": "einen Clip erstellen und als Wiedergabe abspielen (Overlay/Alers)",
     "increment-custom-variable": "Erhöhen Sie eine benutzerdefinierte Variable",
+    "set-custom-variable": "set a custom variable",
     "decrement-custom-variable": "Verringern Sie eine benutzerdefinierte Variable",
     "omit": "weglassen",
     "comply": "erfüllen",
