@@ -163,6 +163,9 @@ class Events extends Core {
         id: 'increment-custom-variable', definitions: { customVariable: '', numberToIncrement: '1' }, fire: this.fireIncrementCustomVariable,
       },
       {
+        id: 'set-custom-variable', definitions: { customVariable: '', value: '' }, fire: this.fireSetCustomVariable,
+      },
+      {
         id: 'decrement-custom-variable', definitions: { customVariable: '', numberToDecrement: '1' }, fire: this.fireDecrementCustomVariable,
       },
     ];
@@ -493,6 +496,20 @@ class Events extends Core {
     events.fireSendChatMessageOrWhisper(operation, attributes, false);
   }
 
+  public async fireSetCustomVariable(operation: Events.OperationDefinitions) {
+    const customVariableName = operation.customVariable;
+    const value = operation.value;
+    await setValueOf(String(customVariableName), value, {});
+
+    // Update widgets and titles
+    csEmitter.emit('refresh');
+
+    const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
+    const title = rawStatus.value;
+    if (title.match(regexp)) {
+      setTitleAndGame({});
+    }
+  }
   public async fireIncrementCustomVariable(operation: Events.OperationDefinitions) {
     const customVariableName = operation.customVariable;
     const numberToIncrement = Number(operation.numberToIncrement);

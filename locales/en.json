@@ -278,6 +278,10 @@
           "label": "Number to increment",
           "placeholder": ""
         },
+        "value": {
+          "label": "Value",
+          "placeholder": ""
+        },
         "numberToDecrement": {
           "label": "Number to decrement",
           "placeholder": ""
@@ -810,6 +814,7 @@
     "create-a-clip": "create a clip",
     "create-a-clip-and-play-replay": "create a clip and play as replay (overlay/alerts)",
     "increment-custom-variable": "increment a custom variable",
+    "set-custom-variable": "set a custom variable",
     "decrement-custom-variable": "decrement a custom variable",
     "omit": "omit",
     "comply": "comply",
