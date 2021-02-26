@@ -1,0 +1,70 @@
+{
+  "title": {
+    "edit": "Edit",
+    "add": "Add"
+  },
+  "position": {
+    "settings": "Position settings",
+    "anchorX": "Anchor X position",
+    "anchorY": "Anchor Y position",
+    "left": "Left",
+    "right": "Right",
+    "middle": "Middle",
+    "top": "Top",
+    "bottom": "Bottom",
+    "x": "X",
+    "y": "Y"
+  },
+  "font": {
+    "shadowShiftRight": "Shift Right",
+    "shadowShiftDown": "Shift Down",
+    "shadowBlur": "Blur",
+    "shadowOpacity": "Opacity",
+    "color": "Color"
+  },
+  "errors": {
+    "required": "This input cannot be empty.",
+    "minValue": "Lowest value of this input is $value."
+  },
+  "buttons": {
+    "reorder": "Reorder",
+    "upload": {
+      "idle": "Upload",
+      "progress": "Uploading",
+      "done": "Uploaded"
+    },
+    "cancel": "Cancel",
+    "close": "Close",
+    "test": {
+      "idle": "Test",
+      "progress": "Testing in progress",
+      "done": "Testing done"
+    },
+    "saveChanges": {
+      "idle": "Save changes",
+      "invalid": "Cannot save changes",
+      "progress": "Saving changes",
+      "done": "Changes saved"
+    },
+    "something-went-wrong": "Something went wrong",
+    "mark-to-delete": "Mark to delete",
+    "disable": "Disable",
+    "enable": "Enable",
+    "disabled": "Disabled",
+    "enabled": "Enabled",
+    "edit": "Edit",
+    "delete": "Delete",
+    "play": "Play",
+    "stop": "Stop",
+    "hold-to-delete": "Hold to delete",
+    "yes": "Yes",
+    "no": "No",
+    "permission": "Permission",
+    "group": "Group",
+    "visibility": "Visibility",
+    "reset": "Reset "
+  },
+  "changesPending": "Your changes was not saved.",
+  "formNotValid": "Form is invalid.",
+  "nothingToShow": "Nothing to show here."
+}
