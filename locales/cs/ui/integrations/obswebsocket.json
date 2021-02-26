@@ -18,8 +18,8 @@
   "name": {
     "name": "Název"
   },
-  "mute": "Mute",
-  "unmute": "Unmute",
+  "mute": "Ztlumit",
+  "unmute": "Zrušit ztlumení",
   "SetCurrentScene": {
     "name": "SetCurrentScene"
   },
