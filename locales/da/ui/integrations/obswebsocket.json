@@ -1,0 +1,59 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "accessBy": {
+      "title": "Access by",
+      "help": "Direct - connect directly from a bot | Overlay - connect via overlay browser source"
+    },
+    "address": "Address",
+    "password": "Password"
+  },
+  "noSourceSelected": "No source selected",
+  "noSceneSelected": "No scene selected",
+  "empty": "No action sets were created yet.",
+  "emptyAfterSearch": "No action sets were found by your search for <strong>\"$search\"</strong>.",
+  "command": "Command",
+  "new": "Create new OBS Websocket action set",
+  "actions": "Actions",
+  "name": {
+    "name": "Name"
+  },
+  "mute": "Mute",
+  "unmute": "Unmute",
+  "SetCurrentScene": {
+    "name": "SetCurrentScene"
+  },
+  "StartReplayBuffer": {
+    "name": "StartReplayBuffer"
+  },
+  "StopReplayBuffer": {
+    "name": "StopReplayBuffer"
+  },
+  "SaveReplayBuffer": {
+    "name": "SaveReplayBuffer"
+  },
+  "WaitMs": {
+    "name": "Wait X miliseconds"
+  },
+  "Log": {
+    "name": "Log message"
+  },
+  "StartRecording": {
+    "name": "StartRecording"
+  },
+  "StopRecording": {
+    "name": "StopRecording"
+  },
+  "PauseRecording": {
+    "name": "PauseRecording"
+  },
+  "ResumeRecording": {
+    "name": "ResumeRecording"
+  },
+  "SetMute": {
+    "name": "SetMute"
+  },
+  "SetVolume": {
+    "name": "SetVolume"
+  }
+}
