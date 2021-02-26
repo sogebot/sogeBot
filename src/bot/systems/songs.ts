@@ -3,21 +3,22 @@ import { setInterval } from 'timers';
 import * as _ from 'lodash';
 import io from 'socket.io';
 import {
-  Brackets, getConnection, getRepository, 
+  Brackets, getConnection, getRepository, In,
 } from 'typeorm';
 import ytdl from 'ytdl-core';
 import ytpl from 'ytpl';
 import ytsr from 'ytsr';
 
 import {
-  SongBan, SongPlaylist, SongPlaylistInterface, SongRequest, 
+  SongBan, SongPlaylist, SongPlaylistInterface, SongRequest,
 } from '../database/entity/song';
+import { User } from '../database/entity/user';
 import {
-  command, default_permission, persistent, settings, ui, 
+  command, default_permission, persistent, settings, ui,
 } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import {
-  announce, getBot, getBotSender, prepare, 
+  announce, getBot, getBotSender, prepare,
 } from '../helpers/commons';
 import { error, info } from '../helpers/log';
 import { defaultPermissions } from '../helpers/permissions/';
@@ -67,10 +68,10 @@ class Songs extends System {
   startup() {
     this.getMeanLoudness();
     this.addMenu({
-      category: 'manage', name: 'playlist', id: 'manage/songs/playlist', this: this, 
+      category: 'manage', name: 'playlist', id: 'manage/songs/playlist', this: this,
     });
     this.addMenu({
-      category: 'manage', name: 'bannedsongs', id: 'manage/songs/bannedsongs', this: this, 
+      category: 'manage', name: 'bannedsongs', id: 'manage/songs/bannedsongs', this: this,
     });
     this.addMenuPublic({ id: 'songrequests', name: 'songs' });
     this.addMenuPublic({ id: 'playlist', name: 'playlist' });
@@ -190,7 +191,7 @@ class Songs extends System {
     adminEndpoint(this.nsp, 'import.ban', async (url, cb) => {
       try {
         cb(null, await this.banSong({
-          parameters: this.getIdFromURL(url), sender: getBotSender(), command: '', createdAt: Date.now(), attr: {}, 
+          parameters: this.getIdFromURL(url), sender: getBotSender(), command: '', createdAt: Date.now(), attr: {},
         }));
       } catch (e) {
         cb(e.stack, []);
@@ -200,7 +201,7 @@ class Songs extends System {
       try {
         isCachedTagsValid = false;
         cb(null, await this.importPlaylist({
-          parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag }, 
+          parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag },
         }));
       } catch (e) {
         cb(e.stack, null);
@@ -209,7 +210,7 @@ class Songs extends System {
     adminEndpoint(this.nsp, 'import.video', async ({ playlist, forcedTag }, cb) => {
       try {
         cb(null, await this.addSongToPlaylist({
-          parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag }, 
+          parameters: playlist, sender: getBotSender(), command: '', createdAt: Date.now(), attr: { forcedTag },
         }));
       } catch (e) {
         cb(e.stack, null);
@@ -296,8 +297,10 @@ class Songs extends System {
     if (JSON.parse(this.currentSong).videoID === videoID) {
       request.push(JSON.parse(this.currentSong).username);
     }
-    for (const user of request) {
-      timeout(user, 300, isModerator(opts.sender));
+    const users = await getRepository(User).find({ username: In(request) });
+    for (const username of request) {
+      const data = users.find(o => o.username === username);
+      timeout(username, 300, typeof data !== 'undefined' && isModerator(data));
     }
 
     await Promise.all([
@@ -405,7 +408,7 @@ class Songs extends System {
       }
 
       const updatedItem = await getRepository(SongPlaylist).save({
-        ...pl, seed: 1, lastPlayedAt: Date.now(), 
+        ...pl, seed: 1, lastPlayedAt: Date.now(),
       });
       const currentSong = {
         ...updatedItem,
@@ -474,7 +477,7 @@ class Songs extends System {
     try {
       const currentSong = JSON.parse(this.currentSong);
       return this.addSongToPlaylist({
-        sender: getBotSender(), parameters: currentSong.videoID, attr: {}, createdAt: Date.now(), command: '', 
+        sender: getBotSender(), parameters: currentSong.videoID, attr: {}, createdAt: Date.now(), command: '',
       });
     } catch (err) {
       return [{ response: translate('songs.no-song-is-currently-playing'), ...opts }];
@@ -696,7 +699,7 @@ class Songs extends System {
 
     if (!ids || ids.length === 0) {
       return [{
-        response: prepare('songs.playlist-is-empty'), ...opts, imported: 0, skipped: 0, 
+        response: prepare('songs.playlist-is-empty'), ...opts, imported: 0, skipped: 0,
       }];
     } else {
       let imported = 0;
@@ -743,7 +746,7 @@ class Songs extends System {
       await this.getMeanLoudness();
       info(`=> Playlist import done, ${imported} imported, ${done - imported} skipped`);
       return [{
-        response: prepare('songs.playlist-imported', { imported, skipped: done - imported }), imported, skipped: done - imported, ...opts, 
+        response: prepare('songs.playlist-imported', { imported, skipped: done - imported }), imported, skipped: done - imported, ...opts,
       }];
     }
   }
