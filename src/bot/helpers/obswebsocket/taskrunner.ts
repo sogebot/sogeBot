@@ -54,7 +54,7 @@ const taskRunner = async (obs: ObsWebSocket, tasks: OBSWebsocketInterface['simpl
             break;
           case 'SetVolume':
             args = task.args as any;
-            await availableActions[event](obs, args.source, args.volume, args.useDecibel);
+            await availableActions[event](obs, args.source, args.volume);
             break;
           default:
             await availableActions[event](obs);
