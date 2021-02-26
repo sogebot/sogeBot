@@ -106,8 +106,8 @@ export class globalFontForAlerts1613738901696 implements MigrationInterface {
     await queryRunner.query(`ALTER TABLE "temporary_alert_reward_redeem" RENAME TO "alert_reward_redeem"`);
 
     for (const alert of alerts.global) {
-      alert.loadStandardProfanityList = JSON.parse(alert.loadStandardProfanityList);
-      alert.tts = JSON.parse(alert.tts);
+      alert.loadStandardProfanityList = JSON.parse(alert.loadStandardProfanityList) as any;
+      alert.tts = JSON.parse(alert.tts) as any;
       await queryRunner.manager.getRepository(`alert`).insert({
         ...alert,
         fontMessage: {

@@ -32,11 +32,17 @@ let importInProgress = false;
 const cachedTags = new Set<string>();
 let isCachedTagsValid = false;
 
+type currentSongType = {
+  videoId: null | string, title: string, type: string, username: string, volume: number; loudness: number; forceVolume: boolean;
+};
+
 class Songs extends System {
   interval: { [id: string]: NodeJS.Timeout } = {};
 
   meanLoudness = -15;
-  currentSong: string = JSON.stringify({ videoID: null });
+  currentSong = JSON.stringify({
+    videoId: null, title: '', type: '', username: '', volume: 0, loudness: 0, forceVolume: false,
+  } as currentSongType);
   isPlaying: {[socketId: string]: boolean } = {};
   @persistent()
   currentTag = 'general';
@@ -258,7 +264,7 @@ class Songs extends System {
     return loudness / playlist.length;
   }
 
-  async getVolume (item: SongPlaylistInterface) {
+  async getVolume (item: SongPlaylistInterface | currentSongType) {
     if (!item.forceVolume && this.calculateVolumeByLoudness) {
       item.loudness = !_.isNil(item.loudness) ? item.loudness : -15;
       const volume = this.volume;
@@ -283,18 +289,18 @@ class Songs extends System {
   @command('!bansong')
   @default_permission(defaultPermissions.CASTERS)
   async banSong (opts: CommandOptions): Promise<CommandResponse[]> {
-    const videoID: string | null = opts.parameters.trim().length === 0 ? JSON.parse(this.currentSong).videoID : opts.parameters.trim();
+    const videoID: string | null = opts.parameters.trim().length === 0 ? JSON.parse(this.currentSong).videoId : opts.parameters.trim();
     if (!videoID) {
       throw new Error('Unknown videoId to ban song.');
     }
-    const videoTitle: string | null = opts.parameters.trim().length === 0 ? JSON.parse(this.currentSong).title : (await this.getVideoDetails(videoID))?.videoDetails.title;
+    const videoTitle: string | null = (opts.parameters.trim().length === 0 ? JSON.parse(this.currentSong).title : (await this.getVideoDetails(videoID))?.videoDetails.title) ?? null;
     if (!videoTitle) {
       throw new Error('Cannot fetch video data, check your url or try again later.');
     }
 
     // send timeouts to all users who requested song
     const request = (await getRepository(SongRequest).find({ videoId: videoID })).map(o => o.username);
-    if (JSON.parse(this.currentSong).videoID === videoID) {
+    if (JSON.parse(this.currentSong).videoId === videoID) {
       request.push(JSON.parse(this.currentSong).username);
     }
     const users = await getRepository(User).find({ username: In(request) });
@@ -411,10 +417,13 @@ class Songs extends System {
         ...pl, seed: 1, lastPlayedAt: Date.now(),
       });
       const currentSong = {
-        ...updatedItem,
-        volume:   await this.getVolume(updatedItem),
-        username: getBot(),
-        type:     'playlist',
+        videoId:     updatedItem.videoId,
+        title:       updatedItem.title,
+        type:        'playlist',
+        username:    getBot(),
+        forceVolume: updatedItem.forceVolume,
+        loudness:    updatedItem.loudness,
+        volume:      await this.getVolume(updatedItem),
       };
       this.currentSong = JSON.stringify(currentSong);
 
@@ -451,7 +460,7 @@ class Songs extends System {
       }
     }
 
-    const response = prepare(translation, currentSong.videoID !== null ? { name: currentSong.title, username: currentSong.username } : {});
+    const response = prepare(translation, currentSong.videoId !== null ? { name: currentSong.title, username: currentSong.username } : {});
     return [{ response, ...opts }];
   }
 
@@ -476,8 +485,13 @@ class Songs extends System {
   async stealSong (opts: CommandOptions): Promise<CommandResponse[]> {
     try {
       const currentSong = JSON.parse(this.currentSong);
+
+      if (currentSong.videoId === null) {
+        throw new Error();
+      }
+
       return this.addSongToPlaylist({
-        sender: getBotSender(), parameters: currentSong.videoID, attr: {}, createdAt: Date.now(), command: '',
+        sender: getBotSender(), parameters: currentSong.videoId, attr: {}, createdAt: Date.now(), command: '',
       });
     } catch (err) {
       return [{ response: translate('songs.no-song-is-currently-playing'), ...opts }];

@@ -19,7 +19,7 @@ export class eventListUserId1601124530399 implements MigrationInterface {
     if ((!accessToken || !clientId) && events.length > 0) {
       throw new Error('Missing accessToken for bot or broadcaster, please set it up before bot upgrade.');
     }
-    const evUsernamesFrom = events.filter((o: any) => JSON.parse(o.values_json).from && JSON.parse(o.values_json).from !== 'n/a').map((o: any) => JSON.parse(o.values_json).from.trim());
+    const evUsernamesFrom = events.filter((o: any) => (JSON.parse(o.values_json) as any).from && (JSON.parse(o.values_json) as any).from !== 'n/a').map((o: any) => (JSON.parse(o.values_json) as any).from.trim());
     const uniqueUsernames = [...new Set([...evUsernamesFrom, ...events.filter((o: any) => /^[\x00-\x7F]*$/.test(o.username)).map((o: any) => o.username.split(' ')[0].trim())])];
 
     for (const batch of chunk(uniqueUsernames, 100)) {
@@ -36,13 +36,13 @@ export class eventListUserId1601124530399 implements MigrationInterface {
     }
     const migratedEvents = events.filter((o: any) => mapping.has(o.username)).map((o: any) => {
       const username = o.username;
-      const values = JSON.parse(o.values_json);
+      const values:any = JSON.parse(o.values_json);
       delete o.username;
       if (values.from) {
         values.from = values.from === 'n/a' ? '0' : mapping.get(values.from);
       }
       return {
-        ...o, userId: mapping.get(username), values_json: JSON.stringify(values), 
+        ...o, userId: mapping.get(username), values_json: JSON.stringify(values),
       };
     });
     await queryRunner.query(`CREATE TABLE "temporary_event_list" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "event" varchar NOT NULL, "userId" varchar NOT NULL, "timestamp" bigint NOT NULL, "values_json" text NOT NULL, "isTest" boolean NOT NULL)`);

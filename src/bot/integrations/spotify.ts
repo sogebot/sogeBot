@@ -31,7 +31,6 @@ import Integration from './_interface';
  * 3. Authorize your user through UI
  */
 
-let _spotify: any = null;
 let currentSongHash = '';
 let firstAuthorizationDone = false;
 
@@ -45,7 +44,9 @@ class Spotify extends Integration {
 
   @persistent()
   songsHistory: string[] = [];
-  currentSong: string = JSON.stringify({});
+  currentSong = JSON.stringify(null as null | {
+    started_at: number; song: string; artist: string; artists: string, uri: string; is_playing: boolean; is_enabled: boolean;
+  });
 
   @settings()
   _accessToken: string | null = null;
@@ -117,9 +118,9 @@ class Spotify extends Integration {
   @onLoad('songsHistory')
   onSongsHistoryLoad() {
     setInterval(() => {
-      if (this.currentSong !== '{}') {
+      const currentSong = JSON.parse(this.currentSong);
+      if (currentSong !== null) {
         // we need to exclude is_playing and is_enabled from currentSong
-        const currentSong = JSON.parse(this.currentSong);
         const currentSongWithoutAttributes = JSON.stringify({
           started_at: currentSong.started_at,
           song:       currentSong.song,
@@ -160,7 +161,7 @@ class Spotify extends Integration {
   @onChange('clientId')
   @onChange('clientSecret')
   onConnectionVariablesChange () {
-    this.currentSong = JSON.stringify({});
+    this.currentSong = JSON.stringify(null);
     this.disconnect();
     if (this.enabled) {
       this.isUnauthorized = false;
@@ -172,7 +173,7 @@ class Spotify extends Integration {
   @onStartup()
   @onChange('enabled')
   onStateChange (key: string, value: boolean) {
-    this.currentSong = JSON.stringify({});
+    this.currentSong = JSON.stringify(null);
     if (value) {
       this.connect();
       this.getMe();
@@ -286,7 +287,7 @@ class Spotify extends Integration {
       }
 
       let currentSong = JSON.parse(this.currentSong);
-      if (typeof currentSong.song === 'undefined' || currentSong.song !== data.body.item.name) {
+      if (currentSong === null || currentSong.song !== data.body.item.name) {
         currentSong = {
           started_at: Date.now(), // important for song history
           song:       data.body.item.name,
@@ -301,7 +302,7 @@ class Spotify extends Integration {
       currentSong.is_enabled = this.enabled;
       this.currentSong = JSON.stringify(currentSong);
     } catch (e) {
-      this.currentSong = JSON.stringify({});
+      this.currentSong = JSON.stringify(null);
     }
     this.timeouts.ICurrentSong = global.setTimeout(() => this.ICurrentSong(), 5000);
   }
@@ -417,7 +418,7 @@ class Spotify extends Integration {
         });
       };
 
-      this.currentSong = JSON.stringify({});
+      this.currentSong = JSON.stringify(null);
       this.isUnauthorized = false;
       this.connect({ token });
       await waitForUsername();
@@ -436,7 +437,7 @@ class Spotify extends Integration {
         this._accessToken = null;
         this._refreshToken = null;
         this.username = '';
-        this.currentSong = JSON.stringify({});
+        this.currentSong = JSON.stringify(null);
 
         info(chalk.yellow('SPOTIFY: ') + `Access to account ${username} is revoked`);
 
@@ -695,5 +696,5 @@ class Spotify extends Integration {
   }
 }
 
-_spotify = new Spotify();
+const _spotify = new Spotify();
 export default _spotify;
