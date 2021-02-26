@@ -1,6 +1,5 @@
 import { setInterval } from 'timers';
 
-import { User } from 'database/entity/user';
 import * as _ from 'lodash';
 import io from 'socket.io';
 import {
@@ -13,6 +12,7 @@ import ytsr from 'ytsr';
 import {
   SongBan, SongPlaylist, SongPlaylistInterface, SongRequest,
 } from '../database/entity/song';
+import { User } from '../database/entity/user';
 import {
   command, default_permission, persistent, settings, ui,
 } from '../decorators';
