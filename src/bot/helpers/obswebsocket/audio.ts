@@ -16,11 +16,10 @@ const setMute = (obs: OBSWebSocket, source: string, mute: boolean) => {
 const setVolume = (obs: OBSWebSocket, source: string, volume: number) => {
   return new Promise((resolve: (value: boolean) => void) => {
     obs.send('SetVolume', {
-      source, volume, useDecibel: true, 
+      source, volume, useDecibel: true,
     }).then(() => {
       resolve(true);
     }).catch((e) => {
-      console.log(e);
       handleOBSError(e);
       resolve(false);
     });
