@@ -77,7 +77,7 @@ const connect = () => {
     const message = JSON.parse(event.data.toString());
     debug('pubsub', 'RECV: ' + JSON.stringify(message));
     if (message.type === 'MESSAGE') {
-      const dataMessage = JSON.parse(message.data.message);
+      const dataMessage: any = JSON.parse(message.data.message);
       if (dataMessage.type === 'reward-redeemed') {
         // trigger reward-redeemed event
         if (dataMessage.data.redemption.user_input) {

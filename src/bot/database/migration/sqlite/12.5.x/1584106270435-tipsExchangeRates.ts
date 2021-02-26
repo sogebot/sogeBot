@@ -7,7 +7,7 @@ const exchangeRates = {
 let tips: any[] = [];
 
 const mainCurrency = (result: any) => {
-  return result.length > 0 ? JSON.parse(result[0].value) : 'EUR';
+  return result.length > 0 ? JSON.parse(result[0].value as string) : 'EUR';
 };
 
 const exchange = (value: number, from: string, to: string): number => {

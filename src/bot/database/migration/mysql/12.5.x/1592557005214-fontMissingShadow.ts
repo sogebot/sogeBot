@@ -19,7 +19,7 @@ export class fontMissingShadow1592557005214 implements MigrationInterface {
     for (const type of ['cheer', 'resub', 'tip', 'raid', 'host', 'subgift', 'subcommunitygift', 'sub', 'follow']) {
       const alerts = await queryRunner.query(`SELECT * from \`alert_${type}\``, undefined);
       for (const alert of alerts) {
-        const font = JSON.parse(alert.font);
+        const font:any = JSON.parse(alert.font);
         if (typeof font.shadow === 'undefined') {
           font.shadow = [];
         }
@@ -53,7 +53,7 @@ export class fontMissingShadow1592557005214 implements MigrationInterface {
     for (const type of ['cheer', 'resub', 'tip', 'raid', 'host', 'subgift', 'subcommunitygift', 'sub', 'follow']) {
       const alerts = await queryRunner.query(`SELECT * from \`alert_${type}\``, undefined);
       for (const alert of alerts) {
-        const { shadow, ...font } = JSON.parse(alert.font);
+        const { shadow, ...font }:any = JSON.parse(alert.font);
         await queryRunner.query(`UPDATE \`alert_${type}\` SET font='${JSON.stringify(font)}' WHERE id='${alert.id}'`);
       }
     }

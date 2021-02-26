@@ -6,7 +6,7 @@ export class extraLevelsReset1608945825341 implements MigrationInterface {
     const users = await queryRunner.query(`SELECT "userId", "extra" from "user"`);
     for (const user of users) {
       if (user.extra) {
-        const { levels, ...extra } = JSON.parse(user.extra);
+        const { levels, ...extra }:any = JSON.parse(user.extra);
         if (levels) {
           await queryRunner.query(`UPDATE "user" SET "extra"='${JSON.stringify(extra)}'`);
         }

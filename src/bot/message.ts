@@ -104,7 +104,7 @@ class Message {
     }
 
     const spotifySong = JSON.parse(spotify.currentSong);
-    if (!_.isEmpty(spotifySong) && spotifySong.is_playing && spotifySong.is_enabled) {
+    if (spotifySong !== null && spotifySong.is_playing && spotifySong.is_enabled) {
       // load spotify format
       const format = spotify.format;
       if (opts.escape) {
