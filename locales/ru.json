@@ -279,6 +279,10 @@
           "label": "Число для увеличения",
           "placeholder": ""
         },
+        "value": {
+          "label": "Value",
+          "placeholder": ""
+        },
         "numberToDecrement": {
           "label": "Число для уменьшения",
           "placeholder": ""
@@ -811,6 +815,7 @@
     "create-a-clip": "создать клип",
     "create-a-clip-and-play-replay": "создать клип и воспроизвести как повтор (overlay/alerts)",
     "increment-custom-variable": "увеличенить переменную",
+    "set-custom-variable": "set a custom variable",
     "decrement-custom-variable": "уменьшить переменную",
     "omit": "пропустить",
     "comply": "соблюдать",
