@@ -1,0 +1,13 @@
+{
+  "new": "New Cooldown",
+  "empty": "No cooldowns were created yet.",
+  "emptyAfterSearch": "No cooldown were found by your search for <strong>\"$search\"</strong>.",
+  "notify-as-whisper": "Notify as whisper",
+  "settings": {
+    "enabled": "Status",
+    "cooldownNotifyAsWhisper": "Whisper cooldown informations",
+    "cooldownNotifyAsChat": "Chat message cooldown informations",
+    "defaultCooldownOfCommandsInSeconds": "Default cooldown for commands (in seconds)",
+    "defaultCooldownOfKeywordsInSeconds": "Default cooldown for keywords (in seconds)"
+  }
+}
