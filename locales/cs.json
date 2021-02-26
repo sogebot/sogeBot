@@ -279,6 +279,10 @@
           "label": "Kolik přičíst",
           "placeholder": ""
         },
+        "value": {
+          "label": "Value",
+          "placeholder": ""
+        },
         "numberToDecrement": {
           "label": "Kolik odečíst",
           "placeholder": ""
@@ -811,6 +815,7 @@
     "create-a-clip": "vytvořit klip",
     "create-a-clip-and-play-replay": "vytvořit klip a přehrát (overlay/alerts)",
     "increment-custom-variable": "přičíst do vlastní proměnné",
+    "set-custom-variable": "set a custom variable",
     "decrement-custom-variable": "odečíst z vlastní proměnné",
     "omit": "vynechat",
     "comply": "dodržovat",
