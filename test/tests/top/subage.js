@@ -25,7 +25,7 @@ describe('Top - !top subage', () => {
   it ('Add 10 users into db and last user will don\'t have any subage', async () => {
     for (let i = 0; i < 10; i++) {
       await getRepository(User).save({
-        userId: Math.floor(Math.random() * 100000),
+        userId: String(Math.floor(Math.random() * 100000)),
         username: 'user' + i,
         isSubscriber: true,
         subscribedAt: Date.now() - (constants.HOUR * i),
@@ -35,7 +35,7 @@ describe('Top - !top subage', () => {
 
   it ('Add user with long subage but not subscriber', async () => {
     await getRepository(User).save({
-      userId: Math.floor(Math.random() * 100000),
+      userId: String(Math.floor(Math.random() * 100000)),
       username: 'user11',
       isSubscriber: false,
       subscribedAt: Date.now() - (constants.HOUR * 24 * 30),

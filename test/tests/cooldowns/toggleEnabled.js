@@ -9,8 +9,8 @@ const message = require('../../general.js').message;
 const cooldown = (require('../../../dest/systems/cooldown')).default;
 
 // users
-const owner = { userId: Math.floor(Math.random() * 100000), badges: {}, username: '__broadcaster__' };
-const testUser = { userId: Math.floor(Math.random() * 100000), badges: {}, username: 'test' };
+const owner = { userId: String(Math.floor(Math.random() * 100000)), badges: {}, username: '__broadcaster__' };
+const testUser = { userId: String(Math.floor(Math.random() * 100000)), badges: {}, username: 'test' };
 
 describe('Cooldowns - toggleEnabled()', () => {
   beforeEach(async () => {

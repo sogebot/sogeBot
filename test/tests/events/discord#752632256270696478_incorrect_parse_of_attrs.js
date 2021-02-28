@@ -38,13 +38,13 @@ describe('discord#752632256270696478 - event attrs are not correctly parsed', ()
       }],
     });
 
-    await getRepository(User).save({ username, userId: Math.floor(Math.random() * 100000) });
+    await getRepository(User).save({ username, userId: String(Math.floor(Math.random() * 100000)) });
   });
 
   it('trigger tip event for 10 EUR - ' + username, async () => {
     log.tip(`${username}, amount: 10.00EUR, message: Ahoj jak je`);
     events.fire('tip', {
-      userId: Math.floor(Math.random * 100000),
+      userId: String(Math.floor(Math.random * 100000)),
       username: username,
       amount: 10.00,
       message: 'Ahoj jak je',

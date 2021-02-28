@@ -13,7 +13,7 @@ const message = require('../../general.js').message;
 
 // users
 const owner = {
-  userId: Math.floor(Math.random() * 100000), badges: {}, username: '__broadcaster__',
+  userId: String(Math.floor(Math.random() * 100000)), badges: {}, username: '__broadcaster__',
 };
 const follower = {
   badges: {}, username: 'follower', userId: String(_.random(999999, false)), isFollower: true,

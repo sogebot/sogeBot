@@ -9,7 +9,7 @@ const assert = require('assert');
 
 const Parser = require('../../../dest/parser').default;
 
-const owner = { username: '__broadcaster__', userId: Math.floor(Math.random() * 100000) };
+const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');

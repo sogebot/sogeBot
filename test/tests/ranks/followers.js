@@ -12,7 +12,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 // users
-const owner = { userId: Math.floor(Math.random() * 100000), username: '__broadcaster__' };
+const owner = { userId: String(Math.floor(Math.random() * 100000)), username: '__broadcaster__' };
 
 const vwrranks = [
   { hours: 0, rank: 'Zero' },

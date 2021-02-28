@@ -20,7 +20,7 @@ const translate = require('../../../dest/translate').translate;
 
 const assert = require('assert');
 
-const owner = { username: '__broadcaster__', userId: Math.floor(Math.random() * 10000) };
+const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.random() * 10000)) };
 
 describe('TMI - redeem command', () => {
   before(async () => {
@@ -48,7 +48,7 @@ describe('TMI - redeem command', () => {
     await tmi.cheer({
       tags: {
         username: 'testuser',
-        userId: Math.floor(Math.random() * 100000),
+        userId: String(Math.floor(Math.random() * 100000)),
         bits: 5,
       },
       message: '!test',
@@ -59,7 +59,7 @@ describe('TMI - redeem command', () => {
     await tmi.cheer({
       tags: {
         username: 'testuser',
-        userId: Math.floor(Math.random() * 100000),
+        userId: String(Math.floor(Math.random() * 100000)),
         bits: 5,
       },
       message: '!test2',
@@ -84,7 +84,7 @@ describe('TMI - redeem command', () => {
     await tmi.cheer({
       tags: {
         username: 'testuser',
-        userId: Math.floor(Math.random() * 100000),
+        userId: String(Math.floor(Math.random() * 100000)),
         bits: 10,
       },
       message: '!test',
@@ -95,7 +95,7 @@ describe('TMI - redeem command', () => {
     await tmi.cheer({
       tags: {
         username: 'testuser',
-        userId: Math.floor(Math.random() * 100000),
+        userId: String(Math.floor(Math.random() * 100000)),
         bits: 10,
       },
       message: '!test2',

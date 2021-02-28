@@ -18,19 +18,19 @@ const message = require('../../general.js').message;
 
 // users
 const owner = {
-  userId: Math.floor(Math.random() * 100000), username: '__broadcaster__', badges: {},
+  userId: String(Math.floor(Math.random() * 100000)), username: '__broadcaster__', badges: {},
 };
 const usermod1 = {
-  userId: Math.floor(Math.random() * 100000), username: 'usermod1', badges: { moderator: 1 },
+  userId: String(Math.floor(Math.random() * 100000)), username: 'usermod1', badges: { moderator: 1 },
 };
 const subuser1 = {
-  userId: Math.floor(Math.random() * 100000), username: 'subuser1', badges: { subscriber: 1 },
+  userId: String(Math.floor(Math.random() * 100000)), username: 'subuser1', badges: { subscriber: 1 },
 };
 const testUser = {
-  userId: Math.floor(Math.random() * 100000), username: 'test', badges: {},
+  userId: String(Math.floor(Math.random() * 100000)), username: 'test', badges: {},
 };
 const testUser2 = {
-  userId: Math.floor(Math.random() * 100000), username: 'test2', badges: {},
+  userId: String(Math.floor(Math.random() * 100000)), username: 'test2', badges: {},
 };
 
 describe('Cooldowns - check()', () => {

@@ -17,8 +17,8 @@ const message = require('../../general.js').message;
 const cooldown = (require('../../../dest/systems/cooldown')).default;
 
 // users
-const owner = { userId: Math.floor(Math.random() * 100000), username: '__broadcaster__', badges: {} };
-const testUser = { userId: Math.floor(Math.random() * 100000), username: 'test', badges: {} };
+const owner = { userId: String(Math.floor(Math.random() * 100000)), username: '__broadcaster__', badges: {} };
+const testUser = { userId: String(Math.floor(Math.random() * 100000)), username: 'test', badges: {} };
 
 
 describe('cooldown check should not endlessly loop', () => {

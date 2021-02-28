@@ -16,8 +16,8 @@ const gamble = (require('../../../dest/games/gamble')).default;
 const customCommands = (require('../../../dest/systems/customcommands')).default;
 
 // users
-const owner = { username: '__broadcaster__', userId: Math.floor(Math.random() * 100000) };
-const user = { username: 'user', userId: Math.floor(Math.random() * 100000) };
+const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
+const user = { username: 'user', userId: String(Math.floor(Math.random() * 100000)) };
 
 describe('Alias - run()', () => {
   beforeEach(async () => {

@@ -19,7 +19,7 @@ const polls = (require('../../../dest/systems/polls')).default;
 
 const assert = require('assert');
 
-const owner = { username: '__broadcaster__', userId: Math.floor(Math.random() * 10000) };
+const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.random() * 10000)) };
 
 describe('Polls - numbers', () => {
   before(async () => {
@@ -98,7 +98,7 @@ describe('Polls - numbers', () => {
     it(`10 users will vote for option 1 and another 10 for option 2`, async () => {
       for (const o of [1,2]) {
         for (let i = 0; i < 10; i++) {
-          await getRepository(User).save({ userId: Math.floor(Math.random() * 100000), username: 'user' + [o, i].join('') })
+          await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), username: 'user' + [o, i].join('') })
           const user = 'user' + [o, i].join('');
           await polls.participateByNumber({ sender: { username: user }, message: String(o) });
 

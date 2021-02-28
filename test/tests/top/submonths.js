@@ -26,7 +26,7 @@ describe('Top - !top submonths', () => {
   it ('Add 10 users into db and last user will don\'t have any submonths', async () => {
     for (let i = 0; i < 10; i++) {
       await getRepository(User).save({
-        userId: Math.floor(Math.random() * 100000),
+        userId: String(Math.floor(Math.random() * 100000)),
         username: 'user' + i,
         subscribeCumulativeMonths: i * 100,
       });
