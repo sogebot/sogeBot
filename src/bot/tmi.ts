@@ -637,7 +637,7 @@ class TMI extends Core {
 
       eventlist.add({
         event:     'subcommunitygift',
-        userId:    String(userId),
+        userId:    userId,
         count,
         timestamp: Date.now(),
       });
@@ -743,7 +743,7 @@ class TMI extends Core {
   async cheer (message: Record<string, any>) {
     try {
       const username = message.tags.username;
-      const userId = Number(message.tags.userId);
+      const userId = message.tags.userId;
       const userstate = message.tags;
       // remove <string>X or <string>X from message, but exclude from remove #<string>X or !someCommand2
       const messageFromUser = message.message.replace(/(?<![#!])(\b\w+[\d]+\b)/g, '').trim();
@@ -762,7 +762,7 @@ class TMI extends Core {
 
       eventlist.add({
         event:     'cheer',
-        userId:    String(userId),
+        userId:    userId,
         bits:      userstate.bits,
         message:   messageFromUser,
         timestamp: Date.now(),

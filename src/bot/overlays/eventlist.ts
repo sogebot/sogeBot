@@ -15,11 +15,11 @@ class EventList extends Overlay {
 
   sockets () {
     adminEndpoint(this.nsp, 'eventlist::getUserEvents', async (userId, cb) => {
-      const eventsByUserId = await getRepository(EventListEntity).find({ userId: String(userId) });
+      const eventsByUserId = await getRepository(EventListEntity).find({ userId: userId });
       // we also need subgifts by giver
       const eventsByRecipientId
         = (await getRepository(EventListEntity).find({ event: 'subgift' }))
-          .filter(o => JSON.parse(o.values_json).fromId === String(userId));
+          .filter(o => JSON.parse(o.values_json).fromId === userId);
       const events =  _.orderBy([ ...eventsByRecipientId, ...eventsByUserId ], 'timestamp', 'desc');
       // we need to change userId => username and fromId => fromId username for eventlist compatibility
       const mapping = new Map() as Map<string, string>;

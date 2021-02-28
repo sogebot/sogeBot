@@ -2,10 +2,7 @@ import { globalIgnoreList } from '../../data/globalIgnoreList';
 import { globalIgnoreListExclude, ignorelist } from '../tmi/ignoreList';
 import { isBroadcaster } from './isBroadcaster';
 
-export function isIgnored(sender: { username: string | null; userId?: string | number }) {
-  if (typeof sender.userId === 'string') {
-    sender.userId = Number(sender.userId);
-  }
+export function isIgnored(sender: { username: string | null; userId?: string }) {
   if (sender.username === null) {
     return false; // null can be bot from dashboard or event
   }
@@ -26,8 +23,7 @@ export function getIgnoreList() {
 export function getGlobalIgnoreList() {
   return Object.keys(globalIgnoreList)
     .filter(o => !globalIgnoreListExclude.value.map((ex: number | string) => String(ex)).includes(o))
-    .map(o => {
-      const id = Number(o);
+    .map(id => {
       return { id, ...globalIgnoreList[id as unknown as keyof typeof globalIgnoreList] };
     });
 }
