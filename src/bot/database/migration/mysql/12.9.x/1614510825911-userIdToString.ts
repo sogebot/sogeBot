@@ -7,7 +7,7 @@ export class userIdToString1614510825911 implements MigrationInterface {
     await queryRunner.query(`ALTER TABLE \`cooldown_viewer\` MODIFY \`userId\` varchar(255)`);
     await queryRunner.query(`ALTER TABLE \`discord_link\` MODIFY \`userId\` varchar(255)`);
     await queryRunner.query(`ALTER TABLE \`duel\` MODIFY \`id\` varchar(255)`);
-    await queryRunner.query(`ALTER TABLE \`heist_user\` MODIFY \`id\` varchar(255)`);
+    await queryRunner.query(`ALTER TABLE \`heist_user\` MODIFY \`userId\` varchar(255)`);
     await queryRunner.query(`ALTER TABLE \`moderation_warning\` MODIFY \`userId\` varchar(255)`);
     await queryRunner.query(`ALTER TABLE \`moderation_permit\` MODIFY \`userId\` varchar(255)`);
     await queryRunner.query(`ALTER TABLE \`points_changelog\` MODIFY \`userId\` varchar(255)`);
@@ -22,7 +22,7 @@ export class userIdToString1614510825911 implements MigrationInterface {
     await queryRunner.query(`ALTER TABLE \`cooldown_viewer\` MODIFY \`userId\` int`);
     await queryRunner.query(`ALTER TABLE \`discord_link\` MODIFY \`userId\` int`);
     await queryRunner.query(`ALTER TABLE \`duel\` MODIFY \`id\` int`);
-    await queryRunner.query(`ALTER TABLE \`heist_user\` MODIFY \`id\` int`);
+    await queryRunner.query(`ALTER TABLE \`heist_user\` MODIFY \`userId\` int`);
     await queryRunner.query(`ALTER TABLE \`moderation_warning\` MODIFY \`userId\` int`);
     await queryRunner.query(`ALTER TABLE \`moderation_permit\` MODIFY \`userId\` int`);
     await queryRunner.query(`ALTER TABLE \`points_changelog\` MODIFY \`userId\` int`);
