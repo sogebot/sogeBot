@@ -1,4 +1,3 @@
-import { setImmediateAwait } from 'helpers/setImmediateAwait';
 import DeepProxy from 'proxy-deep';
 import { getRepository } from 'typeorm';
 
@@ -6,6 +5,7 @@ import { Settings } from '../../database/entity/settings';
 import { IsLoadingInProgress, toggleLoadingInProgress } from '../../decorators';
 import { isDbConnected } from '../database';
 import { debug } from '../log';
+import { setImmediateAwait } from '../setImmediateAwait';
 
 function persistent<T>({ value, name, namespace, onChange }: { value: T, name: string, namespace: string, onChange?: (cur: T) => void }) {
   const sym = Symbol(name);
@@ -67,9 +67,13 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
       proxy.value = JSON.parse(
         (await getRepository(Settings).findOneOrFail({ namespace, name })).value,
       );
+      console.log(proxy.value);
     } catch (e) {
       debug('persistent.load', `Data not found, creating ${namespace}/${name}`);
-      await getRepository(Settings).delete({ name, namespace });
+      if (e.name !== 'EntityNotFound') {
+        await setImmediateAwait();
+        await getRepository(Settings).delete({ name, namespace });
+      }
       await setImmediateAwait();
       await getRepository(Settings).insert({
         name, namespace, value: JSON.stringify(value),

@@ -19,8 +19,8 @@
     "experimentalDecorators": true,
     "declaration": false,
     "noResolve": false,
-    "baseUrl": "./",
-    "outDir": "../../dest",
+    "baseUrl": "src/bot",
+    "outDir": "../../dest/",
     "inlineSourceMap": true,
     "typeRoots": ["./node_modules/@types"]
   },
