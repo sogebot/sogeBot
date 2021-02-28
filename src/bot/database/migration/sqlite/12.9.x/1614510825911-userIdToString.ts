@@ -2,6 +2,7 @@ import { chunk } from 'lodash';
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class userIdToString1614510825911 implements MigrationInterface {
+  name = 'userIdToString1614510825911';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`DROP INDEX "IDX_eb26a8222f1ed29abbef861295"`);
