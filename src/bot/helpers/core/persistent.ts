@@ -68,12 +68,24 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
       );
     } catch (e) {
       debug('persistent.load', `Data not found, creating ${namespace}/${name}`);
-      await getManager().transaction(async transactionalEntityManager => {
-        await transactionalEntityManager.delete(Settings, { name, namespace });
-        await transactionalEntityManager.insert(Settings, {
-          name, namespace, value: JSON.stringify(value),
+      (async function transaction (retries = 0) {
+        await getManager().transaction(async transactionalEntityManager => {
+          await transactionalEntityManager.delete(Settings, { name, namespace });
+          await transactionalEntityManager.insert(Settings, {
+            name, namespace, value: JSON.stringify(value),
+          });
+        }).catch((transactionError) => {
+          if (retries === 10) {
+            throw transactionError;
+          }
+          retries++;
+          debug('persistent.load', transactionError);
+          debug('persistent.load', `Retry#${retries}: ${namespace}/${name}`);
+          setImmediate(() => {
+            transaction(retries);
+          });
         });
-      });
+      })();
     } finally {
       toggleLoadingInProgress(sym);
       proxy.__loaded__ = true;
