@@ -20,6 +20,13 @@ export class userIdToString1614510825911 implements MigrationInterface {
     await queryRunner.query(`ALTER TABLE \`user\` MODIFY \`userId\` varchar(255)`);
     await queryRunner.query('ALTER TABLE `user_tip` ADD CONSTRAINT `FK_36683fb221201263b38344a9880` FOREIGN KEY (`userUserId`) REFERENCES `user`(`userId`) ON DELETE CASCADE ON UPDATE CASCADE', undefined);
     await queryRunner.query('ALTER TABLE `user_bit` ADD CONSTRAINT `FK_cca96526faa532e7d20a0f775b0` FOREIGN KEY (`userUserId`) REFERENCES `user`(`userId`) ON DELETE CASCADE ON UPDATE CASCADE', undefined);
+
+    await queryRunner.query('ALTER TABLE `bets_participations` CHANGE `userId` `userId` varchar(255) NOT NULL');
+    await queryRunner.query('ALTER TABLE `cooldown_viewer` CHANGE `userId` `userId` varchar(255) NOT NULL');
+    await queryRunner.query('ALTER TABLE `moderation_warning` CHANGE `userId` `userId` varchar(255) NOT NULL');
+    await queryRunner.query('ALTER TABLE `moderation_permit` CHANGE `userId` `userId` varchar(255) NOT NULL');
+    await queryRunner.query('ALTER TABLE `points_changelog` CHANGE `userId` `userId` varchar(255) NOT NULL');
+    await queryRunner.query('ALTER TABLE `quotes` CHANGE `quotedBy` `quotedBy` varchar(255) NOT NULL');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
