@@ -28,8 +28,10 @@ export class userIdToString1614510825911 implements MigrationInterface {
     await queryRunner.query('ALTER TABLE `points_changelog` CHANGE `userId` `userId` varchar(255) NOT NULL');
     await queryRunner.query('ALTER TABLE `quotes` CHANGE `quotedBy` `quotedBy` varchar(255) NOT NULL');
 
-    await queryRunner.query(`ALTER TABLE \`dashboard\` MODIFY \`userId\` varchar(255)`);
-    await queryRunner.query(`ALTER TABLE \`variable_history\` MODIFY \`userId\` varchar(255)`);
+    await queryRunner.query('DROP INDEX `IDX_dashboard_userId_createdAt_type` ON `dashboard`');
+    await queryRunner.query('ALTER TABLE `dashboard` CHANGE `userId` `userId` varchar(255) NOT NULL');
+    await queryRunner.query('ALTER TABLE `variable_history` CHANGE `userId` `userId` varchar(255) NOT NULL DEFAULT \'0\'');
+    await queryRunner.query('CREATE UNIQUE INDEX `IDX_dashboard_userId_createdAt_type` ON `dashboard` (`userId`, `createdAt`, `type`)');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
