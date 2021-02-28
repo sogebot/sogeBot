@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner } from 'rm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class userIdToString1614510825911 implements MigrationInterface {
 
