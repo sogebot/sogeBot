@@ -161,7 +161,7 @@ describe('Heist - !bankheist', () => {
     it(`1000 users joins bankheist`, async () => {
       for (let i=0; i < 1000; i++) {
         await heist.main({
-          sender: { userId: i*9999, username: `user${i}` }, parameters: '100', command,
+          sender: { userId: String(i*9999), username: `user${i}` }, parameters: '100', command,
         });
       }
     });
@@ -364,7 +364,7 @@ describe('Heist - !bankheist', () => {
       // generate 50 users
       for (let i=0; i < 50; i++) {
         await getRepository(User).save({
-          userId: i * 9999, username: `user${i}`, points: 1000,
+          userId: String(i * 9999), username: `user${i}`, points: 1000,
         });
       }
     });
@@ -389,7 +389,7 @@ describe('Heist - !bankheist', () => {
     it(`5 users joins bankheist`, async () => {
       for (let i=0; i < 5; i++) {
         await heist.main({
-          sender: { userId: i*9999, username: `user${i}` }, parameters: '100', command,
+          sender: { userId: String(i*9999), username: `user${i}` }, parameters: '100', command,
         });
       }
     });
@@ -403,7 +403,7 @@ describe('Heist - !bankheist', () => {
     it(`10 users joins bankheist`, async () => {
       for (let i=5; i < 10; i++) {
         await heist.main({
-          sender: { userId: i*9999, username: `user${i}` }, parameters: '100', command,
+          sender: { userId: String(i*9999), username: `user${i}` }, parameters: '100', command,
         });
       }
     });
@@ -417,7 +417,7 @@ describe('Heist - !bankheist', () => {
     it(`10 users joins bankheist`, async () => {
       for (let i=10; i < 20; i++) {
         await heist.main({
-          sender: { userId: i*9999, username: `user${i}` }, parameters: '100', command,
+          sender: { userId: String(i*9999), username: `user${i}` }, parameters: '100', command,
         });
       }
     });
@@ -431,7 +431,7 @@ describe('Heist - !bankheist', () => {
     it(`30 users joins bankheist`, async () => {
       for (let i=20; i < 50; i++) {
         await heist.main({
-          sender: { userId: i*9999, username: `user${i}` }, parameters: '100', command,
+          sender: { userId: String(i*9999), username: `user${i}` }, parameters: '100', command,
         });
       }
     });

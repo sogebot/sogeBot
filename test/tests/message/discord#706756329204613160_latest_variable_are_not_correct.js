@@ -15,12 +15,12 @@ const { User } = require('../../../dest/database/entity/user');
 // users
 const owner = { username: '__broadcaster__' };
 
-describe('Message - https://discordapp.com/channels/317348946144002050/619437014001123338/706756329204613160 - latest global variables are not correct', () => {
+describe.only('Message - https://discordapp.com/channels/317348946144002050/619437014001123338/706756329204613160 - latest global variables are not correct', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
     for (let i = 0; i < 40; i++) {
-      await getRepository(User).save({ username: `user${i}`, userId: i });
+      await getRepository(User).save({ username: `user${i}`, userId: String(i) });
     }
 
   });

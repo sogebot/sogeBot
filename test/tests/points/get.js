@@ -13,10 +13,10 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 const hugePointsUser = {
-  username: 'hugeuser', points: 99999999999999999999999999999999, userId: String(_.random(999999, false)), 
+  username: 'hugeuser', points: 99999999999999999999999999999999, userId: String(_.random(999999, false)),
 };
 const tinyPointsUser = {
-  username: 'tinyuser', points: 100, userId: String(_.random(999999, false)), 
+  username: 'tinyuser', points: 100, userId: String(_.random(999999, false)),
 };
 
 describe('Points - get()', () => {
@@ -28,7 +28,7 @@ describe('Points - get()', () => {
   describe('User with more than safe points should return safe points', () => {
     it('create user with huge amount of points', async () => {
       await getRepository(User).save({
-        username: hugePointsUser.username, userId: hugePointsUser.userId, points: hugePointsUser.points, 
+        username: hugePointsUser.username, userId: hugePointsUser.userId, points: hugePointsUser.points,
       });
     });
 
@@ -41,7 +41,7 @@ describe('Points - get()', () => {
   describe('User with less than safe points should return unchanged points', () => {
     it('create user with normal amount of points', async () => {
       await getRepository(User).save({
-        username: tinyPointsUser.username, userId: tinyPointsUser.userId, points: tinyPointsUser.points, 
+        username: tinyPointsUser.username, userId: tinyPointsUser.userId, points: tinyPointsUser.points,
       });
     });
 
@@ -60,14 +60,14 @@ describe('Points - get()', () => {
     for (let i = 1; i <= 10; i++) {
       it(`create user${i} with ${i*100} points`, async () => {
         await getRepository(User).save({
-          username: `user${i}`, userId: i, points: i*100, 
+          username: `user${i}`, userId: String(i), points: i*100,
         });
       });
     }
 
     for (let i = 1; i <= 10; i++) {
       it(`user${i} should have correct order and position`, async () => {
-        const r = await points.get({ sender: { username: `user${i}`, userId: i }, parameters: '' });
+        const r = await points.get({ sender: { username: `user${i}`, userId: String(i) }, parameters: '' });
         assert.strictEqual(r[0].response, `@user${i} has currently ${i*100} points. Your position is ${11-i}/10.`);
       });
     }
