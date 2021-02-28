@@ -4,7 +4,7 @@ import { getManager, getRepository } from 'typeorm';
 import { Settings } from '../../database/entity/settings';
 import { IsLoadingInProgress, toggleLoadingInProgress } from '../../decorators';
 import { isDbConnected } from '../database';
-import { debug } from '../log';
+import { debug, error } from '../log';
 
 function persistent<T>({ value, name, namespace, onChange }: { value: T, name: string, namespace: string, onChange?: (cur: T) => void }) {
   const sym = Symbol(name);
@@ -76,14 +76,15 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
           });
         }).catch((transactionError) => {
           if (retries === 10) {
+            error(`Insert of fresh data to ${namespace}/${name} failed after 10 retries.`);
             throw transactionError;
           }
           retries++;
           debug('persistent.load', transactionError);
           debug('persistent.load', `Retry#${retries}: ${namespace}/${name}`);
-          setImmediate(() => {
+          setTimeout(() => {
             transaction(retries);
-          });
+          }, 100 * retries);
         });
       })();
     } finally {
