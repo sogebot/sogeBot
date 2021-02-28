@@ -55,7 +55,7 @@ async function check(userId: string, permId: string, partial = false): Promise<{
       throw Error(`Permissions ${permId} doesn't exist`);
     }
 
-    // if userId is part of excludeUserIds => fakse
+    // if userId is part of excludeUserIds => false
     if (pItem.excludeUserIds.includes(String(userId))) {
       return { access: false, permission: pItem };
     }

@@ -180,7 +180,7 @@ class Quotes extends System {
     if (!_.isNil(id)) {
       const quote = await getRepository(QuotesEntity).findOne({ id });
       if (!_.isEmpty(quote) && typeof quote !== 'undefined') {
-        const quotedBy = (await users.getUsernamesFromIds([quote.quotedBy])).find(o => o.id === quote.quotedBy);
+        const quotedBy = await users.getNameById(quote.quotedBy);
         const response = prepare('systems.quotes.show.ok', {
           quote: quote.quote, id: quote.id, quotedBy,
         });
@@ -201,7 +201,7 @@ class Quotes extends System {
       if (quotesWithTags.length > 0) {
         const quote = sample(quotesWithTags);
         if (typeof quote !== 'undefined') {
-          const quotedBy = (await users.getUsernamesFromIds([quote.quotedBy])).find(o => o.id === quote.quotedBy);
+          const quotedBy = await users.getNameById(quote.quotedBy);
           const response = prepare('systems.quotes.show.ok', {
             quote: quote.quote, id: quote.id, quotedBy,
           });
