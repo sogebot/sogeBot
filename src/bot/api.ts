@@ -931,8 +931,6 @@ class API extends Core {
           streamStatusChangeSince.value = (new Date(streamData.started_at)).getTime();
         }
         if (!isStreamOnline.value || streamType.value !== streamData.type) {
-          chatMessagesAtStart.value = linesParsed;
-
           if (!webhooks.enabled.streams && Number(streamId.value) !== Number(streamData.id)) {
             debug('api.stream', 'API: ' + JSON.stringify(streamData));
 
