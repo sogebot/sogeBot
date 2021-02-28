@@ -148,11 +148,11 @@ class Duel extends Game {
       }
 
       // check if user is already in duel and add points
-      const userFromDB = await getRepository(DuelEntity).findOne({ id: Number(opts.sender.userId) });
+      const userFromDB = await getRepository(DuelEntity).findOne({ id: opts.sender.userId });
       const isNewDuelist = !userFromDB;
       if (userFromDB) {
         await getRepository(DuelEntity).save({ ...userFromDB, tickets: Number(userFromDB.tickets) + Number(bet) });
-        await points.decrement({ userId: Number(opts.sender.userId) }, bet);
+        await points.decrement({ userId: opts.sender.userId }, bet);
       } else {
         // check if under gambling cooldown
         const cooldown = this.cooldown;
@@ -164,11 +164,11 @@ class Duel extends Game {
             this._cooldown = Date.now();
           }
           await getRepository(DuelEntity).save({
-            id:       Number(opts.sender.userId),
+            id:       opts.sender.userId,
             username: opts.sender.username,
             tickets:  Number(bet),
           });
-          await points.decrement({ userId: Number(opts.sender.userId) }, bet);
+          await points.decrement({ userId: opts.sender.userId }, bet);
         } else {
           const response = prepare('gambling.fightme.cooldown', {
             minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (Date.now() - new Date(this._cooldown).getTime())) / 1000 / 60), translate('core.minutes')),
@@ -193,7 +193,7 @@ class Duel extends Game {
         announce(response, 'duel');
       }
 
-      const tickets = (await getRepository(DuelEntity).findOne({ id: Number(opts.sender.userId) }))?.tickets ?? 0;
+      const tickets = (await getRepository(DuelEntity).findOne({ id: opts.sender.userId }))?.tickets ?? 0;
       const response = prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
         pointsName: getPointsName(tickets),
         points:     tickets,

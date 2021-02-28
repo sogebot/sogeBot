@@ -85,7 +85,7 @@ class Users extends Core {
     }
   }
 
-  async getChatOf (id: number, online: boolean): Promise<number> {
+  async getChatOf (id: string, online: boolean): Promise<number> {
     const user = await getRepository(User).findOne({ where: { userId: id } });
     let chat = 0;
 
@@ -149,7 +149,7 @@ class Users extends Core {
     }
   }
 
-  async getWatchedOf (id: number): Promise<number> {
+  async getWatchedOf (id: string): Promise<number> {
     const user = await getRepository(User).findOne({ where: { userId: id } });
 
     if (user) {
@@ -173,7 +173,7 @@ class Users extends Core {
     }
   }
 
-  async getUsernamesFromIds (IdsList: number[]): Promise<{ id: number; username: string }[]> {
+  async getUsernamesFromIds (IdsList: string[]): Promise<{ id: string; username: string }[]> {
     const uniqueWithUsername = await Promise.all(
       [...new Set(IdsList)]
         .map(async (id) => {
@@ -194,8 +194,7 @@ class Users extends Core {
     }, {});
   }
 
-  async getNameById (userId: number | string): Promise<string> {
-    userId = Number(userId);
+  async getNameById (userId: string): Promise<string> {
     const user = await getRepository(User).findOne({ userId });
     if (!user) {
       const username = await api.getUsernameFromTwitch(userId);
@@ -219,7 +218,7 @@ class Users extends Core {
     const user = await getRepository(User).findOne({ where: { username }, select: ['userId'] });
     if (!user) {
       const savedUser = await getRepository(User).save({
-        userId: Number(await getIdFromTwitch(username)),
+        userId: await getIdFromTwitch(username),
         username,
       });
       return savedUser.userId;
@@ -246,14 +245,14 @@ class Users extends Core {
   sockets () {
     viewerEndpoint(this.nsp, 'theme::set', async (data) => {
       try {
-        const user = await getRepository(User).findOneOrFail({ userId: Number(data.userId) });
+        const user = await getRepository(User).findOneOrFail({ userId: data.userId });
         const payload = {
           extra: {
             ...user.extra,
             theme: data.theme,
           },
         };
-        await getRepository(User).update({ userId: Number(data.userId) }, payload);
+        await getRepository(User).update({ userId: data.userId }, payload);
       } catch (e) {
         if (e.name !== 'EntityNotFound') {
           error(e.stack);
@@ -262,7 +261,7 @@ class Users extends Core {
     });
     viewerEndpoint(this.nsp, 'theme::get', async (data, cb) => {
       try {
-        const user = await getRepository(User).findOneOrFail({ userId: Number(data.userId) });
+        const user = await getRepository(User).findOneOrFail({ userId: data.userId });
         cb(null, user.extra?.theme ?? null);
       } catch (e) {
         cb(e.stack, null);

@@ -4,7 +4,7 @@ import { Permissions } from '../../database/entity/permissions';
 import { addToCachedHighestPermission, getFromCachedHighestPermission } from './cache';
 import { check } from './check';
 
-async function getUserHighestPermission(userId: number): Promise<string> {
+async function getUserHighestPermission(userId: string): Promise<string> {
   const cachedPermission = getFromCachedHighestPermission(userId);
   if (!cachedPermission) {
     const permissions = await getRepository(Permissions).find({

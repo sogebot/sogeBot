@@ -17,7 +17,7 @@ class Permissions extends Core {
   @onStartup()
   onStartup() {
     this.addMenu({
-      category: 'settings', name: 'permissions', id: 'settings/permissions', this: null, 
+      category: 'settings', name: 'permissions', id: 'settings/permissions', this: null,
     });
     this.ensurePreservedPermissionsInDb();
   }
@@ -74,7 +74,7 @@ class Permissions extends Core {
           return;
         }
       } else if(isFinite(opts.value)) {
-        const userById = await getRepository(User).findOne({ userId: Number(opts.value) });
+        const userById = await getRepository(User).findOne({ userId: String(opts.value) });
         if (userById) {
           const status = await check(userById.userId, opts.pid);
           const partial = await check(userById.userId, opts.pid, true);

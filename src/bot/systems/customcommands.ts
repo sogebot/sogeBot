@@ -295,7 +295,7 @@ class CustomCommands extends System {
       await incrementCountOfCommandUsage(cmd.command.command);
       for (const r of _.orderBy(cmd.command.responses, 'order', 'asc')) {
         if (typeof getFromViewersCache(opts.sender.userId, r.permission) === 'undefined') {
-          addToViewersCache(opts.sender.userId, r.permission, (await check(Number(opts.sender.userId), r.permission, false)).access);
+          addToViewersCache(opts.sender.userId, r.permission, (await check(opts.sender.userId, r.permission, false)).access);
         }
 
         if ((opts.skip || getFromViewersCache(opts.sender.userId, r.permission))

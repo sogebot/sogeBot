@@ -45,13 +45,13 @@ interface Parser {
 
 type onEventSub = {
   username: string;
-  userId: number;
+  userId: string;
   subCumulativeMonths: number;
 };
 
 type onEventFollow = {
   username: string;
-  userId: number;
+  userId: string;
 };
 
 type onEventTip = {

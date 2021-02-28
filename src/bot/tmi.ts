@@ -501,7 +501,7 @@ class TMI extends Core {
 
       const user = await getRepository(User).findOne({ userId: userstate.userId });
       if (!user) {
-        await getRepository(User).save({ userId: Number(userstate.userId), username });
+        await getRepository(User).save({ userId: userstate.userId, username });
         this.subscription(message);
         return;
       }
@@ -567,7 +567,7 @@ class TMI extends Core {
 
       const user = await getRepository(User).findOne({ userId: userstate.userId });
       if (!user) {
-        await getRepository(User).save({ userId: Number(userstate.userId), username });
+        await getRepository(User).save({ userId: userstate.userId, username });
         this.resub(message);
         return;
       }
@@ -693,7 +693,7 @@ class TMI extends Core {
         });
         triggerInterfaceOnSub({
           username:            recipient,
-          userId:              Number(recipientId),
+          userId:              recipientId,
           subCumulativeMonths: 0,
         });
       } else {
@@ -703,9 +703,9 @@ class TMI extends Core {
         return;
       }
 
-      const user = await getRepository(User).findOne({ userId: Number(recipientId) });
+      const user = await getRepository(User).findOne({ userId: recipientId });
       if (!user) {
-        await getRepository(User).save({ userId: Number(recipientId), username });
+        await getRepository(User).save({ userId: recipientId, username });
         this.subgift(message);
         return;
       }
@@ -755,7 +755,7 @@ class TMI extends Core {
       const user = await getRepository(User).findOne({ where: { userId: userId } });
       if (!user) {
         // if we still doesn't have user, we create new
-        await getRepository(User).save({ userId: Number(userstate.userId), username });
+        await getRepository(User).save({ userId: userstate.userId, username });
         this.cheer(message);
         return;
       }
@@ -905,7 +905,7 @@ class TMI extends Core {
           await getRepository(User).save({
             ...user,
             username:                  sender.username,
-            userId:                    Number(sender.userId),
+            userId:                    sender.userId,
             isOnline:                  true,
             isVIP:                     typeof sender.badges.vip !== 'undefined',
             isModerator:               typeof sender.badges.moderator !== 'undefined',
@@ -920,7 +920,7 @@ class TMI extends Core {
           eventEmitter.emit('user-joined-channel', { username: sender.username });
           await getRepository(User).save({
             username:     sender.username,
-            userId:       Number(sender.userId),
+            userId:       sender.userId,
             isOnline:     true,
             isVIP:        typeof sender.badges.vip !== 'undefined',
             isModerator:  typeof sender.badges.moderator !== 'undefined',
@@ -939,7 +939,7 @@ class TMI extends Core {
             username: sender.username, message: message, source: 'twitch',
           });
         } else if (!message.startsWith('!')) {
-          getRepository(User).increment({ userId: Number(sender.userId) }, 'messages', 1);
+          getRepository(User).increment({ userId: sender.userId }, 'messages', 1);
         }
       }
       const responses = await parse.process();

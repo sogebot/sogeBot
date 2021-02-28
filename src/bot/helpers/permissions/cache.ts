@@ -1,15 +1,15 @@
 export let cachedViewers: {
-  [userId: number]: {
+  [userId: string]: {
     [permId: string]: boolean;
   };
 } = {};
 
 let cachedHighestPermission: {
-  [userId: number]: string | undefined;
+  [userId: string]: string | undefined;
 } = {};
 
-export function cleanViewersCache (userId?: number): void {
-  if (typeof userId === 'number') {
+export function cleanViewersCache (userId?: string): void {
+  if (typeof userId !== 'undefined') {
     delete cachedViewers[userId];
     delete cachedHighestPermission[userId];
   } else {

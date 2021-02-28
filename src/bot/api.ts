@@ -75,7 +75,7 @@ type SubscribersEndpoint = { data: { broadcaster_id: string; broadcaster_name: s
 type FollowsEndpoint = { total: number; data: { from_id: string; from_name: string; to_id: string; toname: string; followed_at: string; }[], pagination: { cursor: string } };
 export type StreamEndpoint = { data: { id: string; user_id: string, user_name: string, game_id: string, type: 'live' | '', title: string , viewer_count: number, started_at: string, language: string; thumbnail_url: string; tag_ids: string[] }[], pagination: { cursor: string } };
 
-const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], usersFromAPI: { from_name: string; from_id: number; followed_at: string }[], fullScale: boolean) => {
+const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], usersFromAPI: { from_name: string; from_id: string; followed_at: string }[], fullScale: boolean) => {
   if (!fullScale) {
     // we are handling only latest followers
     // handle users currently not following
@@ -86,7 +86,7 @@ const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], us
           webhooks.addIdToCache('follows', user.userId);
           eventlist.add({
             event:     'follow',
-            userId:    String(user.userId),
+            userId:    user.userId,
             timestamp: Date.now(),
           });
           if (!isBot(user.username)) {
@@ -125,7 +125,7 @@ const updateFollowerState = async(users: Readonly<Required<UserInterface>>[], us
   );
 };
 
-const processFollowerState = async (users: { from_name: string; from_id: number; followed_at: string }[], fullScale = false) => {
+const processFollowerState = async (users: { from_name: string; from_id: string; followed_at: string }[], fullScale = false) => {
   const timer = Date.now();
   if (users.length === 0) {
     debug('api.followers', `No followers to process.`);
@@ -304,8 +304,8 @@ class API extends Core {
       setRateLimit('broadcaster', request.headers);
 
       const data = request.data.data;
-      await getRepository(User).update({ userId: Not(In(data.map(o => Number(o.user_id)))) }, { isModerator: false });
-      await getRepository(User).update({ userId: In(data.map(o => Number(o.user_id))) }, { isModerator: true });
+      await getRepository(User).update({ userId: Not(In(data.map(o => o.user_id))) }, { isModerator: false });
+      await getRepository(User).update({ userId: In(data.map(o => o.user_id)) }, { isModerator: true });
 
       setStatus('MOD', data.map(o => o.user_id).includes(botId.value));
     } catch (e) {
@@ -336,7 +336,7 @@ class API extends Core {
     }
   }
 
-  async getUsernameFromTwitch (id: number) {
+  async getUsernameFromTwitch (id: string) {
     const url = `https://api.twitch.tv/helix/users?id=${id}`;
     let request;
     /*
@@ -607,11 +607,11 @@ class API extends Core {
 
     // update subscribers tier and set them active
     for (const user of subscribers) {
-      const current = currentSubscribers.find(o => Number(o.userId) === Number(user.user_id));
+      const current = currentSubscribers.find(o => o.userId === user.user_id);
       const isNotCurrentSubscriber = !current;
       const valuesNotMatch = current && (current.subscribeTier !== String(Number(user.tier) / 1000) || current.isSubscriber === false);
       if (isNotCurrentSubscriber || valuesNotMatch) {
-        await getRepository(User).update({ userId: Number(user.user_id) },
+        await getRepository(User).update({ userId: user.user_id },
           {
             username:      user.user_name.toLowerCase(),
             isSubscriber:  true,
@@ -742,7 +742,7 @@ class API extends Core {
             .map(f => {
               return {
                 from_name:   String(f.from_name).toLowerCase(),
-                from_id:     Number(f.from_id),
+                from_id:     String(f.from_id),
                 followed_at: f.followed_at,
               };
             }));
@@ -816,7 +816,7 @@ class API extends Core {
         processFollowerState(followers.map(f => {
           return {
             from_name:   String(f.from_name).toLowerCase(),
-            from_id:     Number(f.from_id),
+            from_id:     String(f.from_id),
             followed_at: f.followed_at,
           };
         }), true).then(async () => {
@@ -1152,8 +1152,8 @@ class API extends Core {
     return (await isClipChecked(clipId)) ? clipId : null;
   }
 
-  async fetchAccountAge (id?: number | null) {
-    if (id === 0 || id === null || typeof id === 'undefined') {
+  async fetchAccountAge (id?: string | null) {
+    if (id === '0' || id === null || typeof id === 'undefined') {
       return;
     }
 

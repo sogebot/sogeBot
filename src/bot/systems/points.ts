@@ -222,7 +222,7 @@ class Points extends System {
     ]);
 
     // get user max permission
-    const permId = await getUserHighestPermission(Number(opts.sender.userId));
+    const permId = await getUserHighestPermission(opts.sender.userId);
     if (!permId) {
       return true; // skip without permission
     }
@@ -234,7 +234,7 @@ class Points extends System {
       return;
     }
 
-    const user = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
+    const user = await getRepository(User).findOne({ userId: opts.sender.userId });
     if (!user) {
       return true;
     }
@@ -370,7 +370,7 @@ class Points extends System {
       }
 
       const guser = await getRepository(User).findOne({ username });
-      const sender = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
+      const sender = await getRepository(User).findOne({ userId: opts.sender.userId });
 
       if (!sender) {
         throw new Error('Sender was not found in DB!');
@@ -378,7 +378,7 @@ class Points extends System {
 
       if (!guser) {
         await getRepository(User).save({
-          userId: Number(await getIdFromTwitch(username)),
+          userId: await getIdFromTwitch(username),
           username, points: 0,
         });
         return this.give(opts);
@@ -437,7 +437,7 @@ class Points extends System {
 
       let user: Readonly<Required<UserInterface>> | undefined;
       if (opts.sender.username === username) {
-        user = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
+        user = await getRepository(User).findOne({ userId: opts.sender.userId });
       } else {
         user = await getRepository(User).findOne({ username });
       }
@@ -446,7 +446,7 @@ class Points extends System {
         const userId = await getIdFromTwitch(username);
         if (userId) {
           await getRepository(User).save({
-            userId: Number(userId),
+            userId,
             username,
           });
           return this.get(opts);
@@ -583,7 +583,7 @@ class Points extends System {
 
       if (!user) {
         await getRepository(User).save({
-          userId: Number(await getIdFromTwitch(username)),
+          userId: await getIdFromTwitch(username),
           username,
         });
         return this.add(opts);
@@ -619,7 +619,7 @@ class Points extends System {
       const user = await getRepository(User).findOne({ username });
       if (!user) {
         await getRepository(User).save({
-          userId: Number(await getIdFromTwitch(username)),
+          userId: await getIdFromTwitch(username),
           username, points: 0,
         });
         return this.remove(opts);

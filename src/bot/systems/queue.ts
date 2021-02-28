@@ -3,7 +3,7 @@ import { getRepository } from 'typeorm';
 import { Queue as QueueEntity, QueueInterface } from '../database/entity/queue';
 import { User } from '../database/entity/user';
 import {
-  command, default_permission, settings, 
+  command, default_permission, settings,
 } from '../decorators';
 import { getBotSender, prepare } from '../helpers/commons';
 import { defaultPermissions } from '../helpers/permissions/';
@@ -81,13 +81,13 @@ class Queue extends System {
           }
           if (cb) {
             cb(null, (await this.pickUsers({
-              sender: getBotSender(), users, attr: {}, createdAt: Date.now(), command: '', parameters: '', 
+              sender: getBotSender(), users, attr: {}, createdAt: Date.now(), command: '', parameters: '',
             }, data.random)).users);
           }
         } else {
           if (cb) {
             cb(null, (await this.pickUsers({
-              sender: getBotSender(), attr: {}, createdAt: Date.now(), command: '', parameters: String(data.count), 
+              sender: getBotSender(), attr: {}, createdAt: Date.now(), command: '', parameters: String(data.count),
             }, data.random)).users);
           }
         }
@@ -151,10 +151,10 @@ class Queue extends System {
   @command('!queue join')
   async join (opts: CommandOptions): Promise<CommandResponse[]> {
     if (!(this.locked)) {
-      const user = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
+      const user = await getRepository(User).findOne({ userId: opts.sender.userId });
       if (!user) {
         await getRepository(User).save({
-          userId:   Number(opts.sender.userId),
+          userId:   opts.sender.userId,
           username: opts.sender.username,
         });
         return this.join(opts);

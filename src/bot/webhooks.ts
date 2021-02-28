@@ -251,10 +251,10 @@ class Webhooks {
         this.addIdToCache('follows', data.from_id);
       }
 
-      const user = await getRepository(User).findOne({ userId: Number(data.from_id) });
+      const user = await getRepository(User).findOne({ userId: data.from_id });
       if (!user) {
         await getRepository(User).save({
-          userId:   Number(data.from_id),
+          userId:   data.from_id,
           username: data.from_name.toLowerCase(),
         });
         this.follower(aEvent, true);
@@ -270,7 +270,7 @@ class Webhooks {
           });
           follow(data.from_name);
           eventEmitter.emit('follow', {
-            username: data.from_name, userId: Number(data.from_id), webhooks: true,
+            username: data.from_name, userId: data.from_id, webhooks: true,
           });
           alerts.trigger({
             event:      'follows',
@@ -284,7 +284,7 @@ class Webhooks {
 
           triggerInterfaceOnFollow({
             username: data.from_name,
-            userId:   Number(data.from_id),
+            userId:   data.from_id,
           });
         }
       }

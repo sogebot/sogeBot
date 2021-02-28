@@ -55,16 +55,11 @@ function adminEndpoint (
 function adminEndpoint (
   nsp: string,
   on: 'chat.message.send' | 'import.ban' | 'songs::removeRequest' | 'delete.playlist' | 'delete.ban'
-  | 'raffle::getWinner' | 'raffle::open' | 'parseCron' | 'debug::set'
+  | 'raffle::getWinner' | 'raffle::open' | 'parseCron' | 'debug::set' | 'getNameById'
   | 'commands::resetCountByCommand' | 'bets::close' | 'spotify::code',
   callback: (string: string, cb: (error: Error | string | null, ...response: any) => void) => void): void;
 
 // number + cb
-function adminEndpoint (
-  nsp: string,
-  on: 'getNameById',
-  callback: (string: number, cb: (error: Error | string | null, ...response: any) => void) => void): void;
-
 function adminEndpoint (
   nsp: string,
   on: 'generic::setById',

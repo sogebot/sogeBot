@@ -68,7 +68,7 @@ class Qiwi extends Integration {
       const message = DONATION_MESSAGE ? DONATION_MESSAGE : '';
       const amount = Number(DONATION_AMOUNT);
 
-      let id: number | null = null;
+      let id: string | null = null;
       if (username) {
         const user = await users.getUserByUsername(username);
         id = user.userId;

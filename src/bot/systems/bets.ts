@@ -254,7 +254,7 @@ class Bets extends System {
         if (!_betOfUser) {
           currentBet.participations.push({
             username:  opts.sender.username,
-            userId:    Number(opts.sender.userId),
+            userId:    opts.sender.userId,
             optionIdx: index,
             points:    tickets,
           });
@@ -264,7 +264,7 @@ class Bets extends System {
         }
 
         // All OK
-        await points.decrement({ userId: Number(opts.sender.userId) }, tickets);
+        await points.decrement({ userId: opts.sender.userId }, tickets);
         await getRepository(BetsEntity).save(currentBet);
         return [];
       } else {
@@ -302,7 +302,7 @@ class Bets extends System {
         throw Error(ERROR_NOT_RUNNING);
       }
       for (const user of currentBet.participations) {
-        await getRepository(User).increment({ userId: Number(opts.sender.userId) }, 'points', user.points);
+        await getRepository(User).increment({ userId: opts.sender.userId }, 'points', user.points);
       }
       return [{ response: prepare('bets.refund'), ...opts } ];
     } catch (e) {
@@ -344,7 +344,7 @@ class Bets extends System {
       for (const user of currentBet.participations) {
         if (user.optionIdx === index) {
           total += user.points + Math.round((user.points * percentGain));
-          await getRepository(User).increment({ userId: Number(user.userId) }, 'points', user.points + Math.round((user.points * percentGain)));
+          await getRepository(User).increment({ userId: user.userId }, 'points', user.points + Math.round((user.points * percentGain)));
         }
       }
 

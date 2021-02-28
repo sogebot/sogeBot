@@ -59,7 +59,7 @@ class Gamble extends Game {
         throw Error(ERROR_NOT_ENOUGH_OPTIONS);
       }
 
-      const permId = await getUserHighestPermission(Number(opts.sender.userId));
+      const permId = await getUserHighestPermission(opts.sender.userId);
       const pointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
       points = parsed[1] === 'all' ? pointsOfUser : Number(parsed[1]);
 
@@ -75,13 +75,13 @@ class Gamble extends Game {
         throw new MinimalBetError(String(minimalBet[permId]));
       }
 
-      await pointsSystem.decrement({ userId: Number(opts.sender.userId) }, points);
+      await pointsSystem.decrement({ userId: opts.sender.userId }, points);
 
       const chanceToWin = await this.getPermissionBasedSettingsValue('chanceToWin');
       const chanceToTriggerJackpot = await this.getPermissionBasedSettingsValue('chanceToTriggerJackpot');
       if (this.enableJackpot && _.random(0, 100, false) <= chanceToTriggerJackpot[permId]) {
         const incrementPointsWithJackpot = (points * 2) + this.jackpotValue;
-        await getRepository(User).increment({ userId: Number(opts.sender.userId) }, 'points', incrementPointsWithJackpot);
+        await getRepository(User).increment({ userId: opts.sender.userId }, 'points', incrementPointsWithJackpot);
         const currentPointsOfUser = await pointsSystem.getPointsOf(opts.sender.userId);
         message = prepare('gambling.gamble.winJackpot', {
           pointsName:  getPointsName(currentPointsOfUser),
@@ -91,7 +91,7 @@ class Gamble extends Game {
         });
         this.jackpotValue = 0;
       } else if (_.random(0, 100, false) <= chanceToWin[permId]) {
-        await getRepository(User).increment({ userId: Number(opts.sender.userId) }, 'points', points * 2);
+        await getRepository(User).increment({ userId: opts.sender.userId }, 'points', points * 2);
         const updatedPoints = await pointsSystem.getPointsOf(opts.sender.userId);
         message = prepare('gambling.gamble.win', {
           pointsName: getPointsName(updatedPoints),

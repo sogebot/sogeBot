@@ -4,7 +4,7 @@ interface Events {
   'action': (opts: { username: string; source: 'discord' | 'twitch' }) => void;
   'commercial': (opts: { duration: number }) => void;
   'game-changed': (opts: {oldGame: string, game: string}) => void;
-  'follow': (opts: {username: string, userId: number, webhooks?: boolean}) => void;
+  'follow': (opts: {username: string, userId: string, webhooks?: boolean}) => void;
   'cheer': (opts: {username: string, bits: number, message: string}) => void;
   'unfollow': (opts: {username: string}) => void;
   'user-joined-channel': (opts: {username: string}) => void;

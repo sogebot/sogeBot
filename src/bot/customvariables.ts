@@ -5,7 +5,7 @@ import { getRepository, IsNull } from 'typeorm';
 
 import Core from './_interface';
 import {
-  Variable, VariableHistory, VariableInterface, VariableURL, VariableWatch, 
+  Variable, VariableHistory, VariableInterface, VariableURL, VariableWatch,
 } from './database/entity/variable';
 import { onStartup } from './decorators/on';
 import { getBot } from './helpers/commons';
@@ -21,7 +21,7 @@ class CustomVariables extends Core {
   @onStartup()
   onStartup() {
     this.addMenu({
-      category: 'registry', name: 'custom-variables', id: 'registry.customVariables/list', this: null, 
+      category: 'registry', name: 'custom-variables', id: 'registry.customVariables/list', this: null,
     });
     this.checkIfCacheOrRefresh();
   }
@@ -38,7 +38,7 @@ class CustomVariables extends Core {
           throw new Error('Variable not found');
         }
         const newCurrentValue = await runScript(item.evalValue, {
-          sender: null, _current: item.currentValue, isUI: true, 
+          sender: null, _current: item.currentValue, isUI: true,
         });
         const runAt = Date.now();
         cb(null, await getRepository(Variable).save({
@@ -53,8 +53,8 @@ class CustomVariables extends Core {
       try {
         returnedValue = await runScript(opts.evalValue, {
           isUI:     true, _current: opts.currentValue, sender:   {
-            username: 'testuser', userId: 0, source: 'twitch', 
-          }, 
+            username: 'testuser', userId: '0', source: 'twitch',
+          },
         });
       } catch (e) {
         cb(e.stack, null);
@@ -128,7 +128,7 @@ class CustomVariables extends Core {
         const shouldRun = item.runEvery > 0 && Date.now() - new Date(item.runAt).getTime() >= item.runEvery;
         if (shouldRun) {
           const newValue = await runScript(item.evalValue, {
-            _current: item.currentValue, sender: getBot(), isUI: false, 
+            _current: item.currentValue, sender: getBot(), isUI: false,
           });
           item.runAt = Date.now();
           item.currentValue = newValue;

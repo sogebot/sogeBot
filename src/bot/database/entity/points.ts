@@ -4,7 +4,7 @@ import { ColumnNumericTransformer } from './_transformer';
 
 export interface PointsChangelogInterface {
   id: number;
-  userId: number;
+  userId: string;
   originalValue: number;
   updatedValue: number;
   updatedAt: number;
@@ -15,9 +15,9 @@ export const PointsChangelog = new EntitySchema<Readonly<Required<PointsChangelo
   name:    'points_changelog',
   columns: {
     id: {
-      type: Number, primary: true, generated: 'increment', 
+      type: Number, primary: true, generated: 'increment',
     },
-    userId:        { type: Number },
+    userId:        { type: String },
     originalValue: { type: Number },
     updatedValue:  { type: Number },
     updatedAt:     { type: 'bigint', transformer: new ColumnNumericTransformer() },

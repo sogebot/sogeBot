@@ -65,7 +65,7 @@ class Message {
         .orWhere('events.event = :event3', { event3: 'subgift' })
         .getOne();
       if (latestSubscriber && (this.message.includes('$latestSubscriberMonths') || this.message.includes('$latestSubscriberStreak'))) {
-        const latestSubscriberUser = await getRepository(User).findOne({ userId: Number(latestSubscriber.userId) });
+        const latestSubscriberUser = await getRepository(User).findOne({ userId: latestSubscriber.userId });
         this.message = this.message.replace(/\$latestSubscriberMonths/g, latestSubscriberUser ? String(latestSubscriberUser.subscribeCumulativeMonths) : 'n/a');
         this.message = this.message.replace(/\$latestSubscriberStreak/g, latestSubscriberUser ? String(latestSubscriberUser.subscribeStreak) : 'n/a');
       }
