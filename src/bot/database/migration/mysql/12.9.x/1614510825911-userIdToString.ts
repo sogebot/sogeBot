@@ -27,6 +27,9 @@ export class userIdToString1614510825911 implements MigrationInterface {
     await queryRunner.query('ALTER TABLE `moderation_permit` CHANGE `userId` `userId` varchar(255) NOT NULL');
     await queryRunner.query('ALTER TABLE `points_changelog` CHANGE `userId` `userId` varchar(255) NOT NULL');
     await queryRunner.query('ALTER TABLE `quotes` CHANGE `quotedBy` `quotedBy` varchar(255) NOT NULL');
+
+    await queryRunner.query(`ALTER TABLE \`dashboard\` MODIFY \`userId\` varchar(255)`);
+    await queryRunner.query(`ALTER TABLE \`variable_history\` MODIFY \`userId\` varchar(255)`);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

@@ -19,6 +19,8 @@ export class userIdToString1614510825911 implements MigrationInterface {
     await queryRunner.query(`ALTER TABLE "user_tip" ALTER COLUMN "userUserId" TYPE character varying`);
     await queryRunner.query(`ALTER TABLE "user_tip" ADD CONSTRAINT "FK_36683fb221201263b38344a9880" FOREIGN KEY ("userUserId") REFERENCES "user"("userId") ON DELETE CASCADE ON UPDATE CASCADE`, undefined);
     await queryRunner.query(`ALTER TABLE "user_bit" ADD CONSTRAINT "FK_cca96526faa532e7d20a0f775b0" FOREIGN KEY ("userUserId") REFERENCES "user"("userId") ON DELETE CASCADE ON UPDATE CASCADE`, undefined);
+    await queryRunner.query(`ALTER TABLE "dashboard" ALTER COLUMN "userId" TYPE character varying`);
+    await queryRunner.query(`ALTER TABLE "variable_history" ALTER COLUMN "userId" TYPE character varying`);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

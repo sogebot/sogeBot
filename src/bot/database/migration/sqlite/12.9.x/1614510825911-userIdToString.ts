@@ -164,6 +164,27 @@ export class userIdToString1614510825911 implements MigrationInterface {
     for (const data of user_tip) {
       await queryRunner.manager.getRepository(`user_tip`).save(data);
     }
+
+    await queryRunner.query(`DROP INDEX "IDX_dashboard_userId_createdAt_type"`);
+    await queryRunner.query(`CREATE TABLE "temporary_dashboard" ("id" varchar PRIMARY KEY NOT NULL, "name" varchar NOT NULL, "createdAt" bigint NOT NULL, "userId" integer NOT NULL, "type" varchar(6) NOT NULL)`);
+    await queryRunner.query(`INSERT INTO "temporary_dashboard"("id", "name", "createdAt", "userId", "type") SELECT "id", "name", "createdAt", "userId", "type" FROM "dashboard"`);
+    await queryRunner.query(`DROP TABLE "dashboard"`);
+    await queryRunner.query(`ALTER TABLE "temporary_dashboard" RENAME TO "dashboard"`);
+    await queryRunner.query(`CREATE UNIQUE INDEX "IDX_dashboard_userId_createdAt_type" ON "dashboard" ("userId", "createdAt", "type") `);
+    await queryRunner.query(`CREATE TABLE "temporary_variable_history" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "userId" integer NOT NULL DEFAULT (0), "username" varchar NOT NULL DEFAULT ('n/a'), "currentValue" varchar NOT NULL, "oldValue" text NOT NULL, "changedAt" bigint NOT NULL DEFAULT (0), "variableId" varchar, CONSTRAINT "FK_94d39c77652e9c332751a0cee02" FOREIGN KEY ("variableId") REFERENCES "variable" ("id") ON DELETE CASCADE ON UPDATE CASCADE)`);
+    await queryRunner.query(`INSERT INTO "temporary_variable_history"("id", "userId", "username", "currentValue", "oldValue", "changedAt", "variableId") SELECT "id", "userId", "username", "currentValue", "oldValue", "changedAt", "variableId" FROM "variable_history"`);
+    await queryRunner.query(`DROP TABLE "variable_history"`);
+    await queryRunner.query(`ALTER TABLE "temporary_variable_history" RENAME TO "variable_history"`);
+    await queryRunner.query(`DROP INDEX "IDX_dashboard_userId_createdAt_type"`);
+    await queryRunner.query(`CREATE TABLE "temporary_dashboard" ("id" varchar PRIMARY KEY NOT NULL, "name" varchar NOT NULL, "createdAt" bigint NOT NULL, "userId" varchar NOT NULL, "type" varchar(6) NOT NULL)`);
+    await queryRunner.query(`INSERT INTO "temporary_dashboard"("id", "name", "createdAt", "userId", "type") SELECT "id", "name", "createdAt", "userId", "type" FROM "dashboard"`);
+    await queryRunner.query(`DROP TABLE "dashboard"`);
+    await queryRunner.query(`ALTER TABLE "temporary_dashboard" RENAME TO "dashboard"`);
+    await queryRunner.query(`CREATE TABLE "temporary_variable_history" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "userId" varchar NOT NULL DEFAULT ('0'), "username" varchar NOT NULL DEFAULT ('n/a'), "currentValue" varchar NOT NULL, "oldValue" text NOT NULL, "changedAt" bigint NOT NULL DEFAULT (0), "variableId" varchar, CONSTRAINT "FK_94d39c77652e9c332751a0cee02" FOREIGN KEY ("variableId") REFERENCES "variable" ("id") ON DELETE CASCADE ON UPDATE CASCADE)`);
+    await queryRunner.query(`INSERT INTO "temporary_variable_history"("id", "userId", "username", "currentValue", "oldValue", "changedAt", "variableId") SELECT "id", "userId", "username", "currentValue", "oldValue", "changedAt", "variableId" FROM "variable_history"`);
+    await queryRunner.query(`DROP TABLE "variable_history"`);
+    await queryRunner.query(`ALTER TABLE "temporary_variable_history" RENAME TO "variable_history"`);
+    await queryRunner.query(`CREATE UNIQUE INDEX "IDX_dashboard_userId_createdAt_type" ON "dashboard" ("userId", "createdAt", "type") `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
