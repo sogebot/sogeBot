@@ -83,7 +83,7 @@ describe('Heist - !bankheist', () => {
     });
   });
 
-  describe.only('!bankheist with several joins', () => {
+  describe('!bankheist with several joins', () => {
     before(async () => {
       await message.prepare();
 
