@@ -70,21 +70,23 @@ function persistent<T>({ value, name, namespace, onChange }: { value: T, name: s
       debug('persistent.load', `Data not found, creating ${namespace}/${name}`);
       (async function transaction (retries = 0) {
         await getManager().transaction(async transactionalEntityManager => {
-          await transactionalEntityManager.delete(Settings, { name, namespace });
-          await transactionalEntityManager.insert(Settings, {
-            name, namespace, value: JSON.stringify(value),
-          });
-        }).catch((transactionError) => {
-          if (retries === 10) {
-            error(`Insert of fresh data to ${namespace}/${name} failed after 10 retries.`);
-            throw transactionError;
+          try {
+            await transactionalEntityManager.delete(Settings, { name, namespace });
+            await transactionalEntityManager.insert(Settings, {
+              name, namespace, value: JSON.stringify(value),
+            });
+          } catch (transactionError) {
+            if (retries === 10) {
+              error(`Insert of fresh data to ${namespace}/${name} failed after 10 retries.`);
+              throw transactionError;
+            }
+            retries++;
+            debug('persistent.load', transactionError);
+            debug('persistent.load', `Retry#${retries}: ${namespace}/${name}`);
+            setTimeout(() => {
+              transaction(retries);
+            }, 100 * retries);
           }
-          retries++;
-          debug('persistent.load', transactionError);
-          debug('persistent.load', `Retry#${retries}: ${namespace}/${name}`);
-          setTimeout(() => {
-            transaction(retries);
-          }, 100 * retries);
         });
       })();
     } finally {
