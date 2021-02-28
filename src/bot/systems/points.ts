@@ -275,8 +275,8 @@ class Points extends System {
       : Number.MAX_SAFE_INTEGER;
   }
 
-  async getPointsOf(id: number | string) {
-    const user = await getRepository(User).findOne({ where: { userId: Number(id) } });
+  async getPointsOf(userId: string) {
+    const user = await getRepository(User).findOne({ where: { userId } });
 
     if (user) {
       if (user.points < 0) {

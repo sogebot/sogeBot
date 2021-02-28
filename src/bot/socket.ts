@@ -35,7 +35,7 @@ type Unpacked<T> =
       T extends Promise<infer E> ? E :
         T;
 
-const createDashboardIfNeeded = async (userId: number, opts: { haveAdminPrivileges: Authorized; haveModPrivileges: Authorized; haveViewerPrivileges: Authorized }) => {
+const createDashboardIfNeeded = async (userId: string, opts: { haveAdminPrivileges: Authorized; haveModPrivileges: Authorized; haveViewerPrivileges: Authorized }) => {
   // create main admin dashboard if needed;
   if (opts.haveAdminPrivileges === Authorized.isAuthorized) {
     const mainDashboard = await getRepository(Dashboard).findOne({
@@ -252,7 +252,7 @@ class Socket extends Core {
       if (authToken !== '' && authToken !== null) {
         try {
           const token = jwt.verify(authToken, _self.JWTKey) as {
-            userId: number; username: string; privileges: Unpacked<ReturnType<typeof getPrivileges>>;
+            userId: string; username: string; privileges: Unpacked<ReturnType<typeof getPrivileges>>;
           };
           debug('socket', JSON.stringify(token, null, 4));
           await createDashboardIfNeeded(token.userId, token.privileges);

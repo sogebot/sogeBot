@@ -18,13 +18,11 @@ export function cleanViewersCache (userId?: string): void {
   }
 }
 
-export const getFromCachedHighestPermission = (userId: number | string) => {
-  userId = Number(userId);
+export const getFromCachedHighestPermission = (userId: string) => {
   return cachedHighestPermission[userId];
 };
 
-export const getFromViewersCache = (userId: number | string, permId: string) => {
-  userId = Number(userId);
+export const getFromViewersCache = (userId: string, permId: string) => {
   const permList = cachedViewers[userId];
   if (permList) {
     return permList[permId];
@@ -33,15 +31,13 @@ export const getFromViewersCache = (userId: number | string, permId: string) => 
   }
 };
 
-export const addToViewersCache = (userId: number | string, permId: string, haveAccess: boolean) => {
-  userId = Number(userId);
+export const addToViewersCache = (userId: string, permId: string, haveAccess: boolean) => {
   if (typeof cachedViewers[userId] === 'undefined') {
     cachedViewers[userId] = {};
   }
   cachedViewers[userId][permId] = haveAccess;
 };
 
-export const addToCachedHighestPermission = (userId: number | string, permId: string) => {
-  userId = Number(userId);
+export const addToCachedHighestPermission = (userId: string, permId: string) => {
   cachedHighestPermission[userId] = permId;
 };

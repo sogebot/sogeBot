@@ -3,28 +3,22 @@
 
 require('../../general.js');
 
+const assert = require('assert');
+
+const _ = require('lodash');
+const { getRepository } = require('typeorm');
+
+const { User } = require('../../../dest/database/entity/user');
+const roulette = (require('../../../dest/games/roulette')).default;
+const points = (require('../../../dest/systems/points')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const user = require('../../general.js').user;
-const assert = require('assert');
-const _ = require('lodash');
-
-const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/database/entity/user');
-
-const points = (require('../../../dest/systems/points')).default;
-const roulette = (require('../../../dest/games/roulette')).default;
 
 const tests = [
-  {
-    user: { username: 'user1', userId: Number(_.random(999999, false)) },
-  },
-  {
-    user: user.owner,
-  },
-  {
-    user: user.mod,
-  },
+  { user: { username: 'user1', userId: String(_.random(999999, false)) } },
+  { user: user.owner },
+  { user: user.mod },
 ];
 
 describe('game/roulette - !roulette', () => {
@@ -43,17 +37,19 @@ describe('game/roulette - !roulette', () => {
 
       if (user.mod.username === test.user.username) {
         it('Expecting mod message', async () => {
-          assert(r[1].response === '$sender is incompement and completely missed his head!', JSON.stringify({r}, null, 2));
+          assert(r[1].response === '$sender is incompement and completely missed his head!', JSON.stringify({ r }, null, 2));
         });
       } else if (user.owner.username === test.user.username) {
         it('Expecting owner message', async () => {
-          assert(r[1].response === '$sender is using blanks, boo!', JSON.stringify({r}, null, 2));
+          assert(r[1].response === '$sender is using blanks, boo!', JSON.stringify({ r }, null, 2));
         });
       } else {
         it('Expecting win or lose', async () => {
           const msg1 = '$sender is alive! Nothing happened.';
           const msg2 = '$sender\'s brain was splashed on the wall!';
-          assert(r[1].response === msg1 || r[1].response === msg2, JSON.stringify({r, msg1, msg2}, null, 2));
+          assert(r[1].response === msg1 || r[1].response === msg2, JSON.stringify({
+            r, msg1, msg2, 
+          }, null, 2));
         });
       }
     });
@@ -78,7 +74,7 @@ describe('game/roulette - !roulette', () => {
         isAlive = r[1].isAlive;
       }
       const msg1 = '$sender\'s brain was splashed on the wall!';
-      assert(r[1].response === msg1, JSON.stringify({r, msg1}));
+      assert(r[1].response === msg1, JSON.stringify({ r, msg1 }));
     });
 
     it(`User should not have negative points`, async () => {
@@ -118,7 +114,9 @@ describe('game/roulette - !roulette', () => {
         await message.prepare();
         await user.prepare();
         roulette.loserWillLose = 100;
-        await getRepository(User).save({ userId: user.viewer.userId, username: user.viewer.username, points: 100 });
+        await getRepository(User).save({
+          userId: user.viewer.userId, username: user.viewer.username, points: 100, 
+        });
       });
       after(() => {
         roulette.loserWillLose = 0;
