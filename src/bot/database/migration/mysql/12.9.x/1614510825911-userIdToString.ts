@@ -17,7 +17,7 @@ export class userIdToString1614510825911 implements MigrationInterface {
     await queryRunner.query('ALTER TABLE `user_tip` DROP FOREIGN KEY `FK_36683fb221201263b38344a9880`', undefined);
     await queryRunner.query(`ALTER TABLE \`user_bit\` MODIFY \`userUserId\` varchar(255)`);
     await queryRunner.query(`ALTER TABLE \`user_tip\` MODIFY \`userUserId\` varchar(255)`);
-    await queryRunner.query(`ALTER TABLE \`user\` MODIFY \`userUserId\` varchar(255)`);
+    await queryRunner.query(`ALTER TABLE \`user\` MODIFY \`userId\` varchar(255)`);
     await queryRunner.query('ALTER TABLE `user_tip` ADD CONSTRAINT `FK_36683fb221201263b38344a9880` FOREIGN KEY (`userUserId`) REFERENCES `user`(`userId`) ON DELETE CASCADE ON UPDATE CASCADE', undefined);
     await queryRunner.query('ALTER TABLE `user_bit` ADD CONSTRAINT `FK_cca96526faa532e7d20a0f775b0` FOREIGN KEY (`userUserId`) REFERENCES `user`(`userId`) ON DELETE CASCADE ON UPDATE CASCADE', undefined);
   }
@@ -37,7 +37,7 @@ export class userIdToString1614510825911 implements MigrationInterface {
     await queryRunner.query('ALTER TABLE `user_tip` DROP FOREIGN KEY `FK_36683fb221201263b38344a9880`', undefined);
     await queryRunner.query(`ALTER TABLE \`user_bit\` MODIFY \`userUserId\` int`);
     await queryRunner.query(`ALTER TABLE \`user_tip\` MODIFY \`userUserId\` int`);
-    await queryRunner.query(`ALTER TABLE \`user\` MODIFY \`userUserId\` int`);
+    await queryRunner.query(`ALTER TABLE \`user\` MODIFY \`userId\` int`);
     await queryRunner.query('ALTER TABLE `user_tip` ADD CONSTRAINT `FK_36683fb221201263b38344a9880` FOREIGN KEY (`userUserId`) REFERENCES `user`(`userId`) ON DELETE CASCADE ON UPDATE CASCADE', undefined);
     await queryRunner.query('ALTER TABLE `user_bit` ADD CONSTRAINT `FK_cca96526faa532e7d20a0f775b0` FOREIGN KEY (`userUserId`) REFERENCES `user`(`userId`) ON DELETE CASCADE ON UPDATE CASCADE', undefined);
   }
