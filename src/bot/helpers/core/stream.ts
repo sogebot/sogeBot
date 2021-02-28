@@ -1,7 +1,7 @@
 import type { StreamEndpoint } from '../../api';
 import { getFunctionList } from '../../decorators/on';
 import { getGameNameFromId } from '../../microservices/getGameNameFromId';
-import { streamType } from '../api';
+import { chatMessagesAtStart, streamType } from '../api';
 import { isStreamOnline } from '../api/isStreamOnline';
 import { setCurrentRetries } from '../api/retries';
 import { stats } from '../api/stats';
@@ -12,6 +12,7 @@ import {
   error, start as startLog, stop,
 } from '../log';
 import { channelId } from '../oauth';
+import { linesParsed } from '../parser';
 import { find } from '../register';
 
 async function start(data: StreamEndpoint['data'][number], webhooks = false) {
@@ -26,6 +27,7 @@ async function start(data: StreamEndpoint['data'][number], webhooks = false) {
   stats.value.currentViewers = 0;
   stats.value.currentBits = 0;
   stats.value.currentTips = 0;
+  chatMessagesAtStart.value = linesParsed;
 
   streamStatusChangeSince.value = new Date(data.started_at).getTime();
   streamId.value = data.id;
