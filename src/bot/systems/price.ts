@@ -165,12 +165,21 @@ class Price extends System {
     if (!price) { // no price set
       return true;
     }
+
+    let translation = 'price.user-have-not-enough-points';
+    if (price.price === 0 && price.priceBits > 0) {
+      translation = 'price.user-have-not-enough-bits';
+    }
+    if (price.price > 0 && price.priceBits > 0) {
+      translation = 'price.user-have-not-enough-points-or-bits';
+    }
+
     const availablePts = await points.getPointsOf(opts.sender.userId);
     const removePts = price.price;
-    const haveEnoughPoints = availablePts >= removePts;
+    const haveEnoughPoints = price.price > 0 && availablePts >= removePts;
     if (!haveEnoughPoints) {
-      const response = prepare('price.user-have-not-enough-points', {
-        amount: removePts, command: `${price.command}`, pointsName: getPointsName(removePts),
+      const response = prepare(translation, {
+        bitsAmount: price.priceBits, amount: removePts, command: `${price.command}`, pointsName: getPointsName(removePts),
       });
       parserReply(response, opts);
     } else {

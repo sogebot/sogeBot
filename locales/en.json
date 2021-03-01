@@ -993,6 +993,8 @@
     "price-was-enabled": "$sender, price for $command was enabled",
     "price-was-disabled": "$sender, price for $command was disabled",
     "user-have-not-enough-points": "Sorry, $sender, but you don't have $amount $pointsName to use $command",
+    "user-have-not-enough-points-or-bits": "Sorry, $sender, but you don't have $amount $pointsName or redeem command by $bitsAmount bits to use $command",
+    "user-have-not-enough-bits": "Sorry, $sender, but you need to redeem command by $bitsAmount bits to use $command",
     "list-is-empty": "$sender, list of prices is empty",
     "list-is-not-empty": "$sender, list of prices: $list"
   },

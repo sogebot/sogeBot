@@ -8,6 +8,7 @@ import { getRepository } from 'typeorm';
 
 import Core from './_interface';
 import api from './api';
+import { parserReply } from './commons';
 import * as constants from './constants';
 import type { EmitData } from './database/entity/alert';
 import { Price } from './database/entity/price';
@@ -20,7 +21,7 @@ import {
 import Expects from './expects';
 import { isStreamOnline, stats } from './helpers/api';
 import {
-  getBotSender, getOwner, prepare,
+  getOwner, getUserSender, prepare,
 } from './helpers/commons';
 import { sendMessage } from './helpers/commons/sendMessage';
 import { dayjs } from './helpers/dayjs';
@@ -48,6 +49,7 @@ import oauth from './oauth';
 import eventlist from './overlays/eventlist';
 import { Parser } from './parser';
 import alerts from './registries/alerts';
+import alias from './systems/alias';
 import customcommands from './systems/customcommands';
 import { translate } from './translate';
 import users from './users';
@@ -799,10 +801,20 @@ class TMI extends Core {
           if (price.priceBits <= Number(userstate.bits)) {
             if (customcommands.enabled) {
               await customcommands.run({
-                sender: getBotSender(), id: 'null', skip: false, quiet: false, message: messageFromUser.trim().toLowerCase(), parameters: '',
+                sender: getUserSender(userId, username), id: 'null', skip: true, quiet: false, message: messageFromUser.trim().toLowerCase(), parameters: '',
               });
             }
-            new Parser().command(null, messageFromUser, true);
+            if (alias.enabled) {
+              await alias.run({
+                sender: getUserSender(userId, username), id: 'null', skip: true, message: messageFromUser.trim().toLowerCase(), parameters: '',
+              });
+            }
+            const responses = await new Parser().command(getUserSender(userId, username), messageFromUser, true);
+            for (let i = 0; i < responses.length; i++) {
+              setTimeout(async () => {
+                parserReply(await responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
+              }, 500 * i);
+            }
             if (price.emitRedeemEvent) {
               redeemTriggered = true;
               debug('tmi.cmdredeems', messageFromUser);
