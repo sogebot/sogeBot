@@ -844,7 +844,6 @@ class Events extends Core {
             }
           }
         }
-
         cb(null);
       } catch (e) {
         cb(e.stack);

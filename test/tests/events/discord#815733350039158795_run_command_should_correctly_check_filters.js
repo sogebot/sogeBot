@@ -19,13 +19,14 @@ const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 const user = require('../../general.js').user;
 
-describe('Events - event run command should correctly parse filters - https://discord.com/channels/317348946144002050/619437014001123338/8157333500391587958', () => {
+let event;
+describe('Events - event run command should correctly parse filters and be able to use CASTERS permissions - https://discord.com/channels/317348946144002050/619437014001123338/8157333500391587958', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
     await user.prepare();
 
-    const event = {};
+    event = {};
     event.id = uuidv4();
     event.name = 'follow';
     event.givenName = 'Follow alert';
@@ -50,14 +51,14 @@ describe('Events - event run command should correctly parse filters - https://di
         {
           order:          0,
           response:       '1',
-          permission:     defaultPermissions.VIEWERS,
+          permission:     defaultPermissions.CASTERS,
           stopIfExecuted: true,
           filter:         '$isBotSubscriber',
         },
         {
           order:          1,
           response:       '2',
-          permission:     defaultPermissions.VIEWERS,
+          permission:     defaultPermissions.MODERATORS,
           stopIfExecuted: true,
           filter:         `$sender === '${user.viewer2.username}'`,
         },
@@ -110,5 +111,10 @@ describe('Events - event run command should correctly parse filters - https://di
 
   it('commands should be triggered', async () => {
     await message.isSentRaw(`3`, user.viewer3);
+  });
+
+  it('set bot as subscriber', async () => {
+    await message.prepare();
+    isBotSubscriber(true);
   });
 });

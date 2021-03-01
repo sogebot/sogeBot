@@ -294,7 +294,7 @@ class CustomCommands extends System {
           addToViewersCache(opts.sender.userId, r.permission, (await check(Number(opts.sender.userId), r.permission, false)).access);
         }
 
-        if (getFromViewersCache(opts.sender.userId, r.permission)
+        if ((opts.skip || getFromViewersCache(opts.sender.userId, r.permission))
             && await checkFilter(opts, r.filter)) {
           _responses.push(r);
           atLeastOnePermissionOk = true;
