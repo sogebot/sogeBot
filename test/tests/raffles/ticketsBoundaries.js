@@ -2,26 +2,24 @@
 
 require('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const _ = require('lodash');
-const commons = require('../../../dest/commons');
-
-const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/database/entity/user');
-const { RaffleParticipant } = require('../../../dest/database/entity/raffle');
-
-const raffles = (require('../../../dest/systems/raffles')).default;
-
 const assert = require('assert');
+
+const _ = require('lodash');
+const { getRepository } = require('typeorm');
+
+const { RaffleParticipant } = require('../../../dest/database/entity/raffle');
+const { User } = require('../../../dest/database/entity/user');
+const raffles = (require('../../../dest/systems/raffles')).default;
+const message = require('../../general.js').message;
+const db = require('../../general.js').db;
 
 const max = 100;
 
-const owner = { username: '__broadcaster__', userId: Number(_.random(999999, false)) };
-const testuser = { username: 'testuser', userId: Number(_.random(999999, false)) };
-const testuser2 = { username: 'testuser2', userId: Number(_.random(999999, false)) };
-const testuser3 = { username: 'testuser3', userId: Number(_.random(999999, false)) };
-const testuser4 = { username: 'testuser4', userId: Number(_.random(999999, false)) };
+const owner = { username: '__broadcaster__', userId: String(_.random(999999, false)) };
+const testuser = { username: 'testuser', userId: String(_.random(999999, false)) };
+const testuser2 = { username: 'testuser2', userId: String(_.random(999999, false)) };
+const testuser3 = { username: 'testuser3', userId: String(_.random(999999, false)) };
+const testuser4 = { username: 'testuser4', userId: String(_.random(999999, false)) };
 
 describe('Raffles - user should be able to compete within boundaries of tickets', () => {
   before(async () => {
@@ -36,14 +34,22 @@ describe('Raffles - user should be able to compete within boundaries of tickets'
   });
 
   it('create testuser/testuser2/testuser3 with max points', async () => {
-    await getRepository(User).delete({username: testuser.username});
-    await getRepository(User).delete({username: testuser2.username});
-    await getRepository(User).delete({username: testuser3.username});
-    await getRepository(User).delete({username: testuser4.username});
-    await getRepository(User).save({ username: testuser.username, userId: testuser.userId, points: max });
-    await getRepository(User).save({ username: testuser2.username, userId: testuser2.userId, points: max });
-    await getRepository(User).save({ username: testuser3.username, userId: testuser3.userId, points: max });
-    await getRepository(User).save({ username: testuser4.username, userId: testuser4.userId, points: max });
+    await getRepository(User).delete({ username: testuser.username });
+    await getRepository(User).delete({ username: testuser2.username });
+    await getRepository(User).delete({ username: testuser3.username });
+    await getRepository(User).delete({ username: testuser4.username });
+    await getRepository(User).save({
+      username: testuser.username, userId: testuser.userId, points: max,
+    });
+    await getRepository(User).save({
+      username: testuser2.username, userId: testuser2.userId, points: max,
+    });
+    await getRepository(User).save({
+      username: testuser3.username, userId: testuser3.userId, points: max,
+    });
+    await getRepository(User).save({
+      username: testuser4.username, userId: testuser4.userId, points: max,
+    });
   });
 
   it('testuser bets min', async () => {

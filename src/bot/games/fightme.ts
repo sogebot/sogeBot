@@ -53,7 +53,7 @@ class FightMe extends Game {
       }
       const username = match[1].toLowerCase();
       user = await getRepository(User).findOneOrFail({ where: { username: username.toLowerCase() } });
-      challenger = await getRepository(User).findOneOrFail({ where: { userId: Number(opts.sender.userId) } });
+      challenger = await getRepository(User).findOneOrFail({ where: { userId: opts.sender.userId } });
     } catch (e) {
       return [{ response: translate('gambling.fightme.notEnoughOptions'), ...opts }];
     }
@@ -88,7 +88,7 @@ class FightMe extends Game {
           response: prepare('gambling.fightme.broadcaster', {
             winner: isBroadcaster(opts.sender) ? opts.sender.username : user.username,
             loser:  isBroadcaster(opts.sender) ? user.username : opts.sender.username,
-          }), ...opts, 
+          }), ...opts,
         }];
       }
 
@@ -112,13 +112,13 @@ class FightMe extends Game {
           response: prepare('gambling.fightme.oneModerator', {
             winner: isMod.sender ? opts.sender.username : user.username,
             loser:  isMod.sender ? user.username : opts.sender.username,
-          }), ...opts, 
+          }), ...opts,
         }];
       }
 
       const [winnerWillGet, loserWillLose] = await Promise.all([this.winnerWillGet, this.loserWillLose]);
-      await getRepository(User).increment({ userId: Number(winner ? opts.sender.userId : user.userId) }, 'points', Math.abs(Number(winnerWillGet)));
-      await points.decrement({ userId: Number(!winner ? opts.sender.userId : user.userId) }, Math.abs(Number(loserWillLose)));
+      await getRepository(User).increment({ userId: winner ? opts.sender.userId : user.userId }, 'points', Math.abs(Number(winnerWillGet)));
+      await points.decrement({ userId: !winner ? opts.sender.userId : user.userId }, Math.abs(Number(loserWillLose)));
 
       timeout(winner ? opts.sender.username : user.username, this.timeout, false);
       fightMeChallenges = fightMeChallenges.filter(ch => {
@@ -130,7 +130,7 @@ class FightMe extends Game {
           username: user.username,
           winner:   winner ? user.username : opts.sender.username,
           loser:    winner ? opts.sender.username : user.username,
-        }), ...opts, 
+        }), ...opts,
       }];
     } else {
       // check if under gambling cooldown
@@ -143,7 +143,7 @@ class FightMe extends Game {
             command:     opts.command,
             cooldown:    Math.round(((cooldown * 1000) - (Date.now() - new Date(this._cooldown).getTime())) / 1000 / 60),
             minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (Date.now() - new Date(this._cooldown).getTime())) / 1000 / 60), translate('core.minutes')),
-          }), ...opts, 
+          }), ...opts,
         }];
       }
 
@@ -166,7 +166,7 @@ class FightMe extends Game {
         isAlreadyChallenged.removeAt = Date.now() + (2 * MINUTE);
       }
       const response = prepare('gambling.fightme.challenge', {
-        username: user.username, sender: opts.sender.username, command: opts.command, 
+        username: user.username, sender: opts.sender.username, command: opts.command,
       });
       return [{ response, ...opts }];
     }

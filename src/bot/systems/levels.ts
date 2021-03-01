@@ -258,7 +258,7 @@ class Levels extends System {
     ]);
 
     // get user max permission
-    const permId = await getUserHighestPermission(Number(opts.sender.userId));
+    const permId = await getUserHighestPermission(opts.sender.userId);
     if (!permId) {
       return true; // skip without permission
     }
@@ -270,7 +270,7 @@ class Levels extends System {
       return true;
     }
 
-    const user = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
+    const user = await getRepository(User).findOne({ userId: opts.sender.userId });
     if (!user) {
       return true;
     }
@@ -385,7 +385,7 @@ class Levels extends System {
         throw new Error('Point system disabled.');
       }
 
-      const user = await getRepository(User).findOneOrFail({ userId: Number(opts.sender.userId) });
+      const user = await getRepository(User).findOneOrFail({ userId: opts.sender.userId });
       const availablePoints = user.points;
       const currentLevel = this.getLevelOf(user);
       const xp = this.getLevelXP(currentLevel + 1);

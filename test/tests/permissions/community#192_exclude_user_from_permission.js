@@ -16,8 +16,8 @@ const { Permissions, PermissionCommands } = require('../../../dest/database/enti
 const { User } = require('../../../dest/database/entity/user');
 
 const users = [
-  { username: '__viewer__', userId: 6, id: 6 },
-  { username: '__excluded_viewer__', userId: 7, id: 7 },
+  { username: '__viewer__', userId: String(6), id: 6 },
+  { username: '__excluded_viewer__', userId: String(7), id: 7 },
 ];
 
 describe('Permissions - https://community.sogebot.xyz/t/spotify-user-banlist/192 - exclude user from permission', () => {

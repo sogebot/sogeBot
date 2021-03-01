@@ -3,7 +3,7 @@ import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer, SafeNumberTransformer } from './_transformer';
 
 export interface UserInterface {
-  id?: string; userId: number; username: string; displayname?: string; profileImageUrl?: string;
+  id?: string; userId: string; username: string; displayname?: string; profileImageUrl?: string;
   isOnline?: boolean; isVIP?: boolean; isFollower?: boolean; isModerator?: boolean; isSubscriber?: boolean;
   haveSubscriberLock?: boolean; haveFollowerLock?: boolean; haveSubscribedAtLock?: boolean; haveFollowedAtLock?: boolean; rank?: string; haveCustomRank?: boolean;
   followedAt?: number; followCheckAt?: number; subscribedAt?: number; seenAt?: number; createdAt?: number;
@@ -25,19 +25,19 @@ export interface UserInterface {
 
 export interface UserTipInterface {
   id?: string; user?: UserInterface; amount: number; currency: currency; message: string; tippedAt?: number; sortAmount: number;
-  exchangeRates: { [key in currency]: number }; userId?: number;
+  exchangeRates: { [key in currency]: number }; userId?: string;
 }
 
 export interface UserBitInterface {
   id?: string; user?: UserInterface; amount: number; message: string; cheeredAt?: number;
-  userId?: number;
+  userId?: string;
 }
 
 export const User = new EntitySchema<Readonly<Required<UserInterface>>>({
   name:    'user',
   columns: {
     userId: {
-      type:    Number,
+      type:    String,
       primary: true,
     },
     username:    { type: String },
@@ -61,49 +61,49 @@ export const User = new EntitySchema<Readonly<Required<UserInterface>>>({
     rank:                 { type: String, default: '' },
     haveCustomRank:       { type: Boolean, default: false },
     followedAt:           {
-      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
     },
     followCheckAt: {
-      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
     },
     subscribedAt: {
-      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
     },
     seenAt: {
-      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
     },
     createdAt: {
-      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
     },
     watchedTime: {
-      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
     },
     chatTimeOnline: {
-      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
     },
     chatTimeOffline: {
-      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
     },
     points: {
-      type: 'bigint', default: 0, transformer: new SafeNumberTransformer(), 
+      type: 'bigint', default: 0, transformer: new SafeNumberTransformer(),
     },
     pointsOnlineGivenAt: {
-      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
     },
     pointsOfflineGivenAt: {
-      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
     },
     pointsByMessageGivenAt: {
-      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
     },
     subscribeTier:             { type: String, default: '0' },
     subscribeCumulativeMonths: { type: Number, default: 0 },
     subscribeStreak:           { type: Number, default: 0 },
     giftedSubscribes:          {
-      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
     },
     messages: {
-      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
     },
     extra: { type: 'simple-json', nullable: true },
   },
@@ -145,10 +145,10 @@ export const UserTip = new EntitySchema<Readonly<Required<UserTipInterface>>>({
     currency:      { type: String },
     message:       { type: 'text' },
     tippedAt:      {
-      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
     },
     userId: {
-      type: String, nullable: true, name: 'userUserId', 
+      type: String, nullable: true, name: 'userUserId',
     },
   },
   relations: {
@@ -174,10 +174,10 @@ export const UserBit = new EntitySchema<Readonly<Required<UserBitInterface>>>({
     amount:    { type: 'bigint', transformer: new ColumnNumericTransformer() },
     message:   { type: 'text' },
     cheeredAt: {
-      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(), 
+      type: 'bigint', default: 0, transformer: new ColumnNumericTransformer(),
     },
     userId: {
-      type: String, nullable: true, name: 'userUserId', 
+      type: String, nullable: true, name: 'userUserId',
     },
   },
   relations: {

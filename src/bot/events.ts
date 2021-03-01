@@ -228,13 +228,13 @@ class Events extends Core {
       excludedUsers.delete(attributes.username); // remove from excluded users if passed first if
 
       const user = attributes.userId
-        ? await getRepository(User).findOne({ userId: Number(attributes.userId) })
+        ? await getRepository(User).findOne({ userId: attributes.userId })
         : await getRepository(User).findOne({ username: attributes.username });
 
       if (!user) {
         try {
           await getRepository(User).save({
-            userId:   Number(attributes.userId ? attributes.userId : await getIdFromTwitch(attributes.username)),
+            userId:   attributes.userId ? attributes.userId : await getIdFromTwitch(attributes.username),
             username: attributes.username,
           });
           return this.fire(eventId, attributes);
@@ -261,7 +261,7 @@ class Events extends Core {
       const user = await getRepository(User).findOne({ username: attributes.recipient });
       if (!user) {
         await getRepository(User).save({
-          userId:   Number(await getIdFromTwitch(attributes.recipient)),
+          userId:   await getIdFromTwitch(attributes.recipient),
           username: attributes.recipient,
         });
         this.fire(eventId, attributes);
@@ -456,7 +456,7 @@ class Events extends Core {
     const userObj = await getRepository(User).findOne({ username });
     if (!userObj && !attributes.test) {
       await getRepository(User).save({
-        userId: Number(await getIdFromTwitch(username)),
+        userId: await getIdFromTwitch(username),
         username,
       });
       return this.fireSendChatMessageOrWhisper(operation, {

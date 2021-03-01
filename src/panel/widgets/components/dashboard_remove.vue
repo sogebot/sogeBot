@@ -22,7 +22,7 @@ export default {
   methods: {
     remove: function () {
       this.socket.emit('panel::dashboards::remove', {
-        userId: Number(this.$store.state.loggedUser.id), type: 'admin', id: this.dashboardId, 
+        userId: this.$store.state.loggedUser.id, type: 'admin', id: this.dashboardId,
       }, (err) => {
         if (err) {
           console.error(err);

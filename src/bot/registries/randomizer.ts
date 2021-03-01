@@ -12,7 +12,7 @@ class Randomizer extends Registry {
   constructor() {
     super();
     this.addMenu({
-      category: 'registry', name: 'randomizer', id: 'registry/randomizer/list', this: null, 
+      category: 'registry', name: 'randomizer', id: 'registry/randomizer/list', this: null,
     });
     this.addWidget('randomizer', 'widget-title-randomizer', 'fas fa-dice');
   }
@@ -118,7 +118,7 @@ class Randomizer extends Registry {
       addToViewersCache(
         opts.sender.userId,
         randomizer.permissionId,
-        (await check(Number(opts.sender.userId), randomizer.permissionId, false)).access,
+        (await check(opts.sender.userId, randomizer.permissionId, false)).access,
       );
     }
 

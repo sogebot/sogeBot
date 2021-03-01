@@ -35,7 +35,7 @@ type Unpacked<T> =
       T extends Promise<infer E> ? E :
         T;
 
-const createDashboardIfNeeded = async (userId: number, opts: { haveAdminPrivileges: Authorized; haveModPrivileges: Authorized; haveViewerPrivileges: Authorized }) => {
+const createDashboardIfNeeded = async (userId: string, opts: { haveAdminPrivileges: Authorized; haveModPrivileges: Authorized; haveViewerPrivileges: Authorized }) => {
   // create main admin dashboard if needed;
   if (opts.haveAdminPrivileges === Authorized.isAuthorized) {
     const mainDashboard = await getRepository(Dashboard).findOne({
@@ -73,7 +73,7 @@ const createDashboardIfNeeded = async (userId: number, opts: { haveAdminPrivileg
   }
 };
 
-const getPrivileges = async(type: 'admin' | 'viewer' | 'public', userId: number) => {
+const getPrivileges = async(type: 'admin' | 'viewer' | 'public', userId: string) => {
   try {
     const user = await getRepository(User).findOneOrFail({ userId });
     return {
@@ -176,25 +176,25 @@ class Socket extends Core {
               throw new Error('Not matching userId');
             }
             const username = twitchValidation.data.login;
-            const haveCasterPermission = (await check(Number(userId), defaultPermissions.CASTERS, true)).access;
-            const user = await getRepository(User).findOne({ userId: Number(userId) });
+            const haveCasterPermission = (await check(userId, defaultPermissions.CASTERS, true)).access;
+            const user = await getRepository(User).findOne({ userId });
             await getRepository(User).save({
               ...user,
-              userId: Number(userId),
+              userId,
               username,
             });
 
             const accessToken = jwt.sign({
               userId:     Number(userId),
               username,
-              privileges: await getPrivileges(haveCasterPermission ? 'admin' : 'viewer', Number(userId)),
+              privileges: await getPrivileges(haveCasterPermission ? 'admin' : 'viewer', userId),
             }, this.JWTKey, { expiresIn: `${this.accessTokenExpirationTime}s` });
             const refreshToken = jwt.sign({
-              userId: Number(userId),
+              userId,
               username,
             }, this.JWTKey, { expiresIn: `${this.refreshTokenExpirationTime}s` });
             res.status(200).send({
-              accessToken, refreshToken, userType: haveCasterPermission ? 'admin' : 'viewer', 
+              accessToken, refreshToken, userType: haveCasterPermission ? 'admin' : 'viewer',
             });
           } catch(e) {
             debug('socket', e.stack);
@@ -209,27 +209,27 @@ class Socket extends Core {
               throw new Error('Insufficient data');
             }
             const data = jwt.verify(refreshTokenHeader, this.JWTKey) as {
-              userId: number; username: string;
+              userId: string; username: string;
             };
-            const userPermission = await getUserHighestPermission(Number(data.userId));
-            const user = await getRepository(User).findOne({ userId: Number(data.userId) });
+            const userPermission = await getUserHighestPermission(data.userId);
+            const user = await getRepository(User).findOne({ userId: data.userId });
             await getRepository(User).save({
               ...user,
-              userId:   Number(data.userId),
+              userId:   data.userId,
               username: data.username,
             });
 
             const accessToken = jwt.sign({
-              userId:     Number(data.userId),
+              userId:     data.userId,
               username:   data.username,
-              privileges: await getPrivileges(userPermission === defaultPermissions.CASTERS ? 'admin' : 'viewer', Number(data.userId)),
+              privileges: await getPrivileges(userPermission === defaultPermissions.CASTERS ? 'admin' : 'viewer', data.userId),
             }, this.JWTKey, { expiresIn: `${this.accessTokenExpirationTime}s` });
             const refreshToken = jwt.sign({
-              userId:   Number(data.userId),
+              userId:   data.userId,
               username: data.username,
             }, this.JWTKey, { expiresIn: `${this.refreshTokenExpirationTime}s` });
             res.status(200).send({
-              accessToken, refreshToken, userType: userPermission === defaultPermissions.CASTERS ? 'admin' : 'viewer', 
+              accessToken, refreshToken, userType: userPermission === defaultPermissions.CASTERS ? 'admin' : 'viewer',
             });
           } catch(e) {
             debug('socket', e.stack);
@@ -246,13 +246,13 @@ class Socket extends Core {
     // first check if token is socketToken
     if (authToken === this.socketToken) {
       initEndpoints(socket, {
-        haveAdminPrivileges: Authorized.isAuthorized, haveModPrivileges: Authorized.isAuthorized, haveViewerPrivileges: Authorized.isAuthorized, 
+        haveAdminPrivileges: Authorized.isAuthorized, haveModPrivileges: Authorized.isAuthorized, haveViewerPrivileges: Authorized.isAuthorized,
       });
     } else {
       if (authToken !== '' && authToken !== null) {
         try {
           const token = jwt.verify(authToken, _self.JWTKey) as {
-            userId: number; username: string; privileges: Unpacked<ReturnType<typeof getPrivileges>>;
+            userId: string; username: string; privileges: Unpacked<ReturnType<typeof getPrivileges>>;
           };
           debug('socket', JSON.stringify(token, null, 4));
           await createDashboardIfNeeded(token.userId, token.privileges);
@@ -263,7 +263,7 @@ class Socket extends Core {
         }
       } else {
         initEndpoints(socket, {
-          haveAdminPrivileges: Authorized.NotAuthorized, haveModPrivileges: Authorized.NotAuthorized, haveViewerPrivileges: Authorized.NotAuthorized, 
+          haveAdminPrivileges: Authorized.NotAuthorized, haveModPrivileges: Authorized.NotAuthorized, haveViewerPrivileges: Authorized.NotAuthorized,
         });
         setTimeout(() => socket.emit('forceDisconnect'), 1000); // force disconnect if we must be logged in
       }
@@ -276,7 +276,7 @@ class Socket extends Core {
       this.JWTKey = uuid();
       ioServer?.emit('forceDisconnect');
       initEndpoints(socket, {
-        haveAdminPrivileges: Authorized.NotAuthorized, haveModPrivileges: Authorized.NotAuthorized, haveViewerPrivileges: Authorized.NotAuthorized, 
+        haveAdminPrivileges: Authorized.NotAuthorized, haveModPrivileges: Authorized.NotAuthorized, haveViewerPrivileges: Authorized.NotAuthorized,
       });
       cb(null);
     });

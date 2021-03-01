@@ -6,8 +6,8 @@ import { getToken } from '../helpers/api';
 import { error } from '../helpers/log';
 import { ioServer } from '../helpers/panel';
 
-async function fetchAccountAge (id?: number | null) {
-  if (id === 0 || id === null || typeof id === 'undefined') {
+async function fetchAccountAge (id?: string | null) {
+  if (id === '0' || id === null || typeof id === 'undefined') {
     return;
   }
 

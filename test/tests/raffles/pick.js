@@ -2,24 +2,22 @@
 
 require('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const _ = require('lodash');
-const commons = require('../../../dest/commons');
-
-const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/database/entity/user');
-const { Raffle } = require('../../../dest/database/entity/raffle');
-
-const raffles = (require('../../../dest/systems/raffles')).default;
-
 const assert = require('assert');
+
+const _ = require('lodash');
+const { getRepository } = require('typeorm');
+
+const { Raffle } = require('../../../dest/database/entity/raffle');
+const { User } = require('../../../dest/database/entity/user');
+const raffles = (require('../../../dest/systems/raffles')).default;
+const message = require('../../general.js').message;
+const db = require('../../general.js').db;
 
 const max = Math.floor(Number.MAX_SAFE_INTEGER / 10000000);
 
-const owner = { username: '__broadcaster__', userId: Number(_.random(999999, false)) };
-const testuser = { username: 'testuser', userId: Number(_.random(999999, false)) };
-const testuser2 = { username: 'testuser2', userId: Number(_.random(999999, false)) };
+const owner = { username: '__broadcaster__', userId: String(_.random(999999, false)) };
+const testuser = { username: 'testuser', userId: String(_.random(999999, false)) };
+const testuser2 = { username: 'testuser2', userId: String(_.random(999999, false)) };
 
 describe('Raffles - pick()', () => {
   before(async () => {
@@ -35,11 +33,7 @@ describe('Raffles - pick()', () => {
 
     it('pick a winner', async () => {
       const r = await raffles.pick({ sender: owner });
-      const raffle = await getRepository(Raffle).findOne({
-        order: {
-          timestamp: 'DESC',
-        },
-      });
+      const raffle = await getRepository(Raffle).findOne({ order: { timestamp: 'DESC' } });
       assert.strictEqual(r[0].response, '$sender, nobody joined a raffle');
       assert(raffle.isClosed);
       assert(raffle.winner === null);
@@ -59,11 +53,13 @@ describe('Raffles - pick()', () => {
     const subs = ['sub1', 'sub2', 'sub3', 'sub4'];
     for (const [id, v] of Object.entries(subs)) {
       it('Add user ' + v + ' to db', async () => {
-        await getRepository(User).save({ username: v , userId: Number('100' + id), isSubscriber: true });
+        await getRepository(User).save({
+          username: v , userId: String('100' + id), isSubscriber: true,
+        });
       });
 
       it('Add user ' + v + ' to raffle', async () => {
-        const a = await raffles.participate({ sender: { username: v, userId: Number('100' + id) }, message: '!winme' });
+        const a = await raffles.participate({ sender: { username: v, userId: String('100' + id) }, message: '!winme' });
         assert(a);
       });
     }
@@ -85,12 +81,15 @@ describe('Raffles - pick()', () => {
       await message.isSentRaw('Raffle is running (0 entries). To enter type "!winme <1-'+max+'>". Raffle is opened for everyone.', { username: 'bot' });
     });
 
-
     it('Create testuser/testuser2 with max points', async () => {
-      await getRepository(User).delete({username: testuser.username})
-      await getRepository(User).delete({username: testuser2.username})
-      user1 = await getRepository(User).save({ username: testuser.username , userId: testuser.userId, points: max });
-      user2 = await getRepository(User).save({ username: testuser2.username , userId: testuser2.userId, points: max });
+      await getRepository(User).delete({ username: testuser.username });
+      await getRepository(User).delete({ username: testuser2.username });
+      user1 = await getRepository(User).save({
+        username: testuser.username , userId: testuser.userId, points: max,
+      });
+      user2 = await getRepository(User).save({
+        username: testuser2.username , userId: testuser2.userId, points: max,
+      });
     });
 
     it('testuser bets max', async () => {
@@ -121,10 +120,14 @@ describe('Raffles - pick()', () => {
     });
 
     it('Create testuser/testuser2 with max points', async () => {
-      await getRepository(User).delete({username: testuser.username})
-      await getRepository(User).delete({username: testuser2.username})
-      user1 = await getRepository(User).save({ isFollower: true, username: testuser.username , userId: testuser.userId, points: max });
-      user2 = await getRepository(User).save({ username: testuser2.username , userId: testuser2.userId, points: max });
+      await getRepository(User).delete({ username: testuser.username });
+      await getRepository(User).delete({ username: testuser2.username });
+      user1 = await getRepository(User).save({
+        isFollower: true, username: testuser.username , userId: testuser.userId, points: max,
+      });
+      user2 = await getRepository(User).save({
+        username: testuser2.username , userId: testuser2.userId, points: max,
+      });
     });
 
     it('testuser bets 100', async () => {
@@ -153,10 +156,14 @@ describe('Raffles - pick()', () => {
     });
 
     it('Create testuser/testuser2 with max points', async () => {
-      await getRepository(User).delete({username: testuser.username})
-      await getRepository(User).delete({username: testuser2.username})
-      user1 = await getRepository(User).save({ isSubscriber: true, username: testuser.username , userId: testuser.userId, points: max });
-      user2 = await getRepository(User).save({ username: testuser2.username , userId: testuser2.userId, points: max });
+      await getRepository(User).delete({ username: testuser.username });
+      await getRepository(User).delete({ username: testuser2.username });
+      user1 = await getRepository(User).save({
+        isSubscriber: true, username: testuser.username , userId: testuser.userId, points: max,
+      });
+      user2 = await getRepository(User).save({
+        username: testuser2.username , userId: testuser2.userId, points: max,
+      });
     });
 
     it('testuser bets 100', async () => {
@@ -185,10 +192,14 @@ describe('Raffles - pick()', () => {
     });
 
     it('Create testuser/testuser2 with max points', async () => {
-      await getRepository(User).delete({username: testuser.username})
-      await getRepository(User).delete({username: testuser2.username})
-      user1 = await getRepository(User).save({ isSubscriber: true, username: testuser.username , userId: testuser.userId, points: max });
-      user2 = await getRepository(User).save({ isFollower: true, username: testuser2.username , userId: testuser2.userId, points: max });
+      await getRepository(User).delete({ username: testuser.username });
+      await getRepository(User).delete({ username: testuser2.username });
+      user1 = await getRepository(User).save({
+        isSubscriber: true, username: testuser.username , userId: testuser.userId, points: max,
+      });
+      user2 = await getRepository(User).save({
+        isFollower: true, username: testuser2.username , userId: testuser2.userId, points: max,
+      });
     });
 
     it('testuser bets 100', async () => {

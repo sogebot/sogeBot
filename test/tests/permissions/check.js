@@ -17,26 +17,26 @@ const { Permissions, PermissionCommands } = require('../../../dest/database/enti
 const { User } = require('../../../dest/database/entity/user');
 
 const users = [
-  { username: '__owner__', userId: 1, id: 1 },
-  { username: '__moderator__', userId: 2, id: 2, isModerator: true, badges: { moderator: true } },
-  { username: '__subscriber__', userId: 3, id: 3, isSubscriber: true },
-  { username: '__vip__', userId: 4, id: 4, isVIP: true, badges: { vip: true } },
-  { username: '__follower__', userId: 5, id: 5, isFollower: true },
-  { username: '__viewer__', userId: 6, id: 6 },
-  { username: '__viewer_points__', userId: 7, id: 7, points: 100 },
-  { username: '__viewer_watched__', userId: 8, id: 8, watchedTime: 100 * (60 * 60 * 1000 /*hours*/) },
-  { username: '__viewer_tips__', userId: 9, id: 9, tips: [{
+  { username: '__owner__', userId: String(1), id: 1 },
+  { username: '__moderator__', userId: String(2), id: 2, isModerator: true, badges: { moderator: true } },
+  { username: '__subscriber__', userId: String(3), id: 3, isSubscriber: true },
+  { username: '__vip__', userId: String(4), id: 4, isVIP: true, badges: { vip: true } },
+  { username: '__follower__', userId: String(5), id: 5, isFollower: true },
+  { username: '__viewer__', userId: String(6), id: 6 },
+  { username: '__viewer_points__', userId: String(7), id: 7, points: 100 },
+  { username: '__viewer_watched__', userId: String(8), id: 8, watchedTime: 100 * (60 * 60 * 1000 /*hours*/) },
+  { username: '__viewer_tips__', userId: String(9), id: 9, tips: [{
     exchangeRates: currency.rates, currency: 'EUR', amount: 100, sortAmount: 100, timestamp: Math.random(), message: '',
   }] },
-  { username: '__viewer_bits__', userId: 10, id: 10, bits: [{
+  { username: '__viewer_bits__', userId: String(10), id: 10, bits: [{
     amount: 100, timestamp: Math.random(), message: '',
   }] },
-  { username: '__viewer_messages__', userId: 11, id: 11, messages: 100 },
-  { username: '__viewer_subtier__', userId: 12, id: 12, subscribeTier: 2 },
-  { username: '__viewer_subcumulativemonths__', userId: 13, id: 13, subscribeCumulativeMonths: 2 },
-  { username: '__viewer_substreakmonths__', userId: 14, id: 14, subscribeStreak: 2 },
-  { username: '__viewer_customrank__', userId: 15, id: 15, haveCustomRank: true, rank: 'Lorem Ipsum' },
-  { username: '__viewer_level5__', userId: 16, id: 16, extra: { levels: { xp: serialize(BigInt(5000)) }} },
+  { username: '__viewer_messages__', userId: String(11), id: 11, messages: 100 },
+  { username: '__viewer_subtier__', userId: String(12), id: 12, subscribeTier: 2 },
+  { username: '__viewer_subcumulativemonths__', userId: String(13), id: 13, subscribeCumulativeMonths: 2 },
+  { username: '__viewer_substreakmonths__', userId: String(14), id: 14, subscribeStreak: 2 },
+  { username: '__viewer_customrank__', userId: String(15), id: 15, haveCustomRank: true, rank: 'Lorem Ipsum' },
+  { username: '__viewer_level5__', userId: String(16), id: 16, extra: { levels: { xp: serialize(BigInt(5000)) }} },
 ];
 
 describe('Permissions - check()', () => {

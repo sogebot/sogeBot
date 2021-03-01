@@ -7,18 +7,18 @@ export interface DiscordLinkInterface {
   tag: string;
   discordId: string;
   createdAt: number;
-  userId: null | number;
+  userId: null | string;
 }
 
 export const DiscordLink = new EntitySchema<Readonly<Required<DiscordLinkInterface>>>({
   name:    'discord_link',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid', 
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     tag:       { type: String },
     discordId: { type: String },
     createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
-    userId:    { type: Number, nullable: true },
+    userId:    { type: String, nullable: true },
   },
 });

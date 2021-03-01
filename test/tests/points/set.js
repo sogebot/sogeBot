@@ -1,18 +1,18 @@
 /* global describe it before */
 
-require('../../general.js');
-
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const _ = require('lodash');
 const assert = require('assert');
 
+const _ = require('lodash');
 const { getRepository } = require('typeorm');
+
+require('../../general.js');
+
 const { User } = require('../../../dest/database/entity/user');
-
 const points = (require('../../../dest/systems/points')).default;
+const db = require('../../general.js').db;
+const message = require('../../general.js').message;
 
-const user = { username: 'oneuser', userId: Number(_.random(999999, false)) };
+const user = { username: 'oneuser', userId: String(_.random(999999, false)) };
 
 describe('Points - set()', () => {
   before(async () => {

@@ -25,7 +25,7 @@ import { linesParsed } from '../parser';
 import { isModerator } from '../user/isModerator';
 import { getAll } from './getAll';
 
-async function runScript (script: string, opts: { sender: { userId: number; username: string; source: 'twitch' | 'discord' } | string | null, isUI: boolean; param?: string | number, _current: any }) {
+async function runScript (script: string, opts: { sender: { userId: string; username: string; source: 'twitch' | 'discord' } | string | null, isUI: boolean; param?: string | number, _current: any }) {
   debug('customvariables.eval', opts);
   let sender = !isNil(opts.sender) ? opts.sender : null;
   const isUI = !isNil(opts.isUI) ? opts.isUI : false;
@@ -161,14 +161,14 @@ async function runScript (script: string, opts: { sender: { userId: number; user
           const userFromTwitch = await getUserFromTwitch(username);
           const createdUser = await getRepository(User).save({
             username,
-            userId:          Number(userFromTwitch.id),
+            userId:          userFromTwitch.id,
             displayname:     userFromTwitch.display_name,
             profileImageUrl: userFromTwitch.profile_image_url,
           });
 
           const userObj = {
             username,
-            id:          String(createdUser.userId),
+            id:          createdUser.userId,
             displayname: createdUser.displayname,
             is:          {
               online:     createdUser.isOnline ?? false,

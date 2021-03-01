@@ -29,7 +29,7 @@ describe('Top - !top tips', () => {
     for (let i = 0; i < 10; i++) {
       const user = {
         tips: [],
-        ...await getRepository(User).save({ userId: Math.floor(Math.random() * 100000), username: 'user' + i }),
+        ...await getRepository(User).save({ userId: String(Math.floor(Math.random() * 100000)), username: 'user' + i }),
       };
 
       if (i === 0) {

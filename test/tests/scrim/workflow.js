@@ -255,7 +255,7 @@ describe('Scrim - full workflow', () => {
       it('Add ' + user + ' to match with id ' + matchId, async () => {
         scrim.match({
           parameters: matchId,
-          sender:     { username: user, userId: Math.floor(Math.random() * 100000) },
+          sender:     { username: user, userId: String(Math.floor(Math.random() * 100000)) },
         });
       });
     }

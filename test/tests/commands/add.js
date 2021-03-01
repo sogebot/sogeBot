@@ -13,7 +13,7 @@ const { User } = require('../../../dest/database/entity/user');
 const customcommands = (require('../../../dest/systems/customcommands')).default;
 
 // users
-const owner = { username: '__broadcaster__', userId: Math.floor(Math.random() * 100000) };
+const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 
 const failedTests = [
   { permission: null, command: null, response: null },

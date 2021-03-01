@@ -37,7 +37,7 @@ class Ranks extends System {
   constructor () {
     super();
     this.addMenu({
-      category: 'manage', name: 'ranks', id: 'manage/ranks/list', this: this, 
+      category: 'manage', name: 'ranks', id: 'manage/ranks/list', this: this,
     });
   }
 
@@ -203,7 +203,7 @@ class Ranks extends System {
     const response = prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', {
       list: _.orderBy(ranks, 'value', 'asc').map((l) => {
         return l.value + 'h - ' + l.rank;
-      }).join(', '), 
+      }).join(', '),
     });
     return [{ response, ...opts }];
   }
@@ -255,8 +255,8 @@ class Ranks extends System {
 
   @command('!rank')
   async main (opts: CommandOptions): Promise<CommandResponse[]> {
-    const user = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
-    const watched = await users.getWatchedOf(Number(opts.sender.userId));
+    const user = await getRepository(User).findOne({ userId: opts.sender.userId });
+    const watched = await users.getWatchedOf(opts.sender.userId);
     const rank = await this.get(user);
 
     if (_.isNil(rank.current)) {

@@ -14,7 +14,7 @@ const ranks = (require('../../../dest/systems/ranks')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
-const owner = { username: '__broadcaster__', userId: Math.floor(Math.random() * 100000) };
+const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.random() * 100000)) };
 
 describe('Message - list filter', () => {
   before(async () => {

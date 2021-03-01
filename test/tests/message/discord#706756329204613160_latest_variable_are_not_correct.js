@@ -20,7 +20,7 @@ describe('Message - https://discordapp.com/channels/317348946144002050/619437014
     await db.cleanup();
     await message.prepare();
     for (let i = 0; i < 40; i++) {
-      await getRepository(User).save({ username: `user${i}`, userId: i });
+      await getRepository(User).save({ username: `user${i}`, userId: String(i) });
     }
 
   });

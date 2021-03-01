@@ -4,7 +4,7 @@ import { getRepository } from 'typeorm';
 import { HeistUser } from '../database/entity/heist';
 import { User } from '../database/entity/user';
 import {
-  command, settings, ui, 
+  command, settings, ui,
 } from '../decorators';
 import { onStartup } from '../decorators/on';
 import Expects from '../expects.js';
@@ -250,9 +250,9 @@ class Heist extends Game {
     } // send entryInstruction if command is not ok
 
     await Promise.all([
-      pointsSystem.decrement({ userId: Number(opts.sender.userId) }, Number(points)),
+      pointsSystem.decrement({ userId: opts.sender.userId }, Number(points)),
       getRepository(HeistUser).save({
-        userId: Number(opts.sender.userId), username: opts.sender.username, points: Number(points), 
+        userId: opts.sender.userId, username: opts.sender.username, points: Number(points),
       }), // add user to heist list
     ]);
 

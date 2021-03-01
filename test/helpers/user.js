@@ -3,63 +3,63 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../dest/database/entity/user');
 
 const viewer = {
-  userId:   1,
+  userId:   '1',
   username: '__viewer__',
   badges:   {},
   emotes:   [],
 };
 
 const viewer2 = {
-  userId:   3,
+  userId:   '3',
   username: '__viewer2__',
   badges:   {},
   emotes:   [],
 };
 
 const viewer3 = {
-  userId:   5,
+  userId:   '5',
   username: '__viewer3__',
   badges:   {},
   emotes:   [],
 };
 
 const viewer4 = {
-  userId:   50,
+  userId:   '50',
   username: '__viewer4__',
   badges:   {},
   emotes:   [],
 };
 
 const viewer5 = {
-  userId:   55,
+  userId:   '55',
   username: '__viewer5__',
   badges:   {},
   emotes:   [],
 };
 
 const viewer6 = {
-  userId:   56,
+  userId:   '56',
   username: '__viewer6__',
   badges:   {},
   emotes:   [],
 };
 
 const viewer7 = {
-  userId:   57,
+  userId:   '57',
   username: '__viewer7__',
   badges:   {},
   emotes:   [],
 };
 
 const owner = {
-  userId:   2,
+  userId:   '2',
   username: '__broadcaster__',
   badges:   {},
   emotes:   [],
 };
 
 const mod = {
-  userId:      4,
+  userId:      '4',
   username:    '__mod__',
   badges:      {},
   emotes:      [],

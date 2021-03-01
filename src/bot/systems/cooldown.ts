@@ -213,7 +213,7 @@ class Cooldown extends System {
         const cooldown = await getRepository(CooldownEntity).findOne({ where: { name }, relations: ['viewers'] });
         if (!cooldown) {
           const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfCommandsInSeconds');
-          const permId = await getUserHighestPermission(Number(opts.sender.userId));
+          const permId = await getUserHighestPermission(opts.sender.userId);
 
           // user group have some default cooldown
           if (defaultValue[permId] > 0) {
@@ -260,7 +260,7 @@ class Cooldown extends System {
               data.push(cooldown);
             } else {
               const defaultValue = await this.getPermissionBasedSettingsValue('defaultCooldownOfKeywordsInSeconds');
-              const permId = await getUserHighestPermission(Number(opts.sender.userId));
+              const permId = await getUserHighestPermission(opts.sender.userId);
               // user group have some default cooldown
               if (defaultValue[permId] > 0) {
                 const canBeRunAt = (defaultCooldowns.find(o =>
@@ -283,7 +283,7 @@ class Cooldown extends System {
         return true;
       }
 
-      const user = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
+      const user = await getRepository(User).findOne({ userId: opts.sender.userId });
       if (!user) {
         return true;
       }
@@ -319,7 +319,7 @@ class Cooldown extends System {
           continue;
         }
 
-        for (const item of cooldown.viewers?.filter(o => o.userId === Number(opts.sender.userId)) ?? []) {
+        for (const item of cooldown.viewers?.filter(o => o.userId === opts.sender.userId) ?? []) {
           if (!viewer || viewer.timestamp < item.timestamp) {
             viewer = { ...item };
           } else {
@@ -344,7 +344,7 @@ class Cooldown extends System {
           } else {
             debug('cooldown.check', `${opts.sender.username}#${opts.sender.userId} added to cooldown list.`);
             await getRepository(CooldownViewer).insert({
-              cooldown, userId: Number(opts.sender.userId), timestamp: now,
+              cooldown, userId: opts.sender.userId, timestamp: now,
             });
           }
           affectedCooldowns.push({
@@ -391,8 +391,8 @@ class Cooldown extends System {
         } else {
           cooldown.viewers?.push({
             timestamp: 0,
-            userId:    Number(opts.sender.userId),
-            ...cooldown.viewers.find(o => o.userId === Number(opts.sender.userId)),
+            userId:    opts.sender.userId,
+            ...cooldown.viewers.find(o => o.userId === opts.sender.userId),
           });
         }
         // rollback timestamp

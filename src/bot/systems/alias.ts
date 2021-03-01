@@ -131,14 +131,14 @@ class Alias extends System {
         return false;
       } else {
         if (typeof getFromViewersCache(opts.sender.userId, alias.permission) === 'undefined') {
-          addToViewersCache(opts.sender.userId, alias.permission, (await check(Number(opts.sender.userId), alias.permission, false)).access);
+          addToViewersCache(opts.sender.userId, alias.permission, (await check(opts.sender.userId, alias.permission, false)).access);
         }
         if (getFromViewersCache(opts.sender.userId, alias.permission)) {
           // process custom variables
           const response = await executeVariablesInText(
             opts.message.replace(replace, alias.command), {
               sender: {
-                userId:   Number(opts.sender.userId),
+                userId:   opts.sender.userId,
                 username: opts.sender.username,
                 source:   typeof opts.sender.discord === 'undefined' ? 'twitch' : 'discord',
               },

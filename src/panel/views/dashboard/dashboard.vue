@@ -1,48 +1,86 @@
 <template>
-<div>
-  <div class="btn-group" role="group" style="padding-left: 11px;">
-    <button
-      v-for="board of dashboards"
-      v-bind:key="board.createdAt"
-      class="btn btn-sm"
-      :class="[currentDashboard === board.id ? 'btn-primary' : 'btn-outline-primary border-0']"
-      @click="currentDashboard = board.id">{{board.name}}</button>
-    <button type="button" class="btn btn-sm btn-outline-primary border-0" v-if="!addDashboard" @click="addDashboard = true">
-      <fa icon='plus-square'></fa>
-    </button>
-    <div class="input-group input-group-sm" v-if="addDashboard" >
-      <div class="input-group-prepend">
-        <button class="btn btn-outline-danger border-0" type="button" @click="dashboardName = ''; addDashboard = false">
-          <fa icon='ban'></fa>
-        </button>
-      </div>
-      <input type="text" class="form-control" placeholder="" aria-label="" v-model="dashboardName">
-      <div class="input-group-append">
-        <button class="btn btn-outline-success border-0" type="button" @click="createDashboard()">
-          <fa icon='plus-square'></fa>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div class="widgets pt-1">
-    <!-- mobile show -->
-    <div v-if="windowWidth <= 750">
-      <template v-for="dashboard of dashboards">
-        <div v-for="item in sortBy(layout[dashboard.id], (o) => o.y)" class="pl-2 pr-2 pb-2" :key="'widget' + item.name" v-show="dashboard.id === currentDashboard">
-          <keep-alive>
-            <component :is="item.name" :popout="false" nodrag :style="{ height: String(item.h * 50) + 'px'}"></component>
-          </keep-alive>
+  <div>
+    <div
+      class="btn-group"
+      role="group"
+      style="padding-left: 11px;"
+    >
+      <button
+        v-for="board of dashboards"
+        :key="board.createdAt"
+        class="btn btn-sm"
+        :class="[currentDashboard === board.id ? 'btn-primary' : 'btn-outline-primary border-0']"
+        @click="currentDashboard = board.id"
+      >
+        {{ board.name }}
+      </button>
+      <button
+        v-if="!addDashboard"
+        type="button"
+        class="btn btn-sm btn-outline-primary border-0"
+        @click="addDashboard = true"
+      >
+        <fa icon="plus-square" />
+      </button>
+      <div
+        v-if="addDashboard"
+        class="input-group input-group-sm"
+      >
+        <div class="input-group-prepend">
+          <button
+            class="btn btn-outline-danger border-0"
+            type="button"
+            @click="dashboardName = ''; addDashboard = false"
+          >
+            <fa icon="ban" />
+          </button>
         </div>
-      </template>
+        <input
+          v-model="dashboardName"
+          type="text"
+          class="form-control"
+          placeholder=""
+          aria-label=""
+        >
+        <div class="input-group-append">
+          <button
+            class="btn btn-outline-success border-0"
+            type="button"
+            @click="createDashboard()"
+          >
+            <fa icon="plus-square" />
+          </button>
+        </div>
+      </div>
     </div>
-    <div v-else>
-      <grid-layout
+
+    <div class="widgets pt-1">
+      <!-- mobile show -->
+      <div v-if="windowWidth <= 750">
+        <template v-for="dashboard of dashboards">
+          <div
+            v-for="item in sortBy(layout[dashboard.id], (o) => o.y)"
+            v-show="dashboard.id === currentDashboard"
+            :key="'widget' + item.name"
+            class="pl-2 pr-2 pb-2"
+          >
+            <keep-alive>
+              <component
+                :is="item.name"
+                :popout="false"
+                nodrag
+                :style="{ height: String(item.h * 50) + 'px'}"
+              />
+            </keep-alive>
+          </div>
+        </template>
+      </div>
+      <div v-else>
+        <grid-layout
           v-for="dashboard of dashboards"
           v-show="dashboard.id === currentDashboard"
           :key="dashboard.id"
           :layout="layout[dashboard.id] || []"
-          @layout-updated="updateLayout"
           :col-num="12"
           :row-height="38"
           :is-draggable="true"
@@ -51,32 +89,48 @@
           :vertical-compact="false"
           :margin="[10, 10]"
           :use-css-transforms="true"
-      >
-        <grid-item v-for="item in layout[dashboard.id]"
-                    drag-allow-from=".grip"
-                    :x="item.x"
-                    :y="item.y"
-                    :w="item.w"
-                    :h="item.h"
-                    :i="item.i"
-                    :key="'widget2' + item.name">
-          <keep-alive>
-            <component :is="item.name" :popout="false"></component>
-          </keep-alive>
-        </grid-item>
-      </grid-layout>
-    </div>
+          @layout-updated="updateLayout"
+        >
+          <grid-item
+            v-for="item in layout[dashboard.id]"
+            :key="'widget2' + item.name"
+            drag-allow-from=".grip"
+            :x="item.x"
+            :y="item.y"
+            :w="item.w"
+            :h="item.h"
+            :i="item.i"
+          >
+            <keep-alive>
+              <component
+                :is="item.name"
+                :popout="false"
+              />
+            </keep-alive>
+          </grid-item>
+        </grid-layout>
+      </div>
 
-    <div class="w-100"></div>
-    <widget-create v-bind:dashboardId="currentDashboard" class="pt-4" @addWidget="addWidget"></widget-create>
-    <dashboard-remove v-if="currentDashboard !== mainDashboard" v-bind:dashboardId="currentDashboard" class="pt-4" @update="currentDashboard = mainDashboard" @removeDashboard="removeDashboard"></dashboard-remove>
+      <div class="w-100" />
+      <widget-create
+        :dashboard-id="currentDashboard"
+        class="pt-4"
+        @addWidget="addWidget"
+      />
+      <dashboard-remove
+        v-if="currentDashboard !== mainDashboard"
+        :dashboard-id="currentDashboard"
+        class="pt-4"
+        @update="currentDashboard = mainDashboard"
+        @removeDashboard="removeDashboard"
+      />
+    </div>
   </div>
-</div>
 </template>
 
 <script>
 import {
-  defineComponent, onMounted, ref, 
+  defineComponent, onMounted, ref,
 } from '@vue/composition-api';
 import { sortBy } from 'lodash-es';
 import VueGridLayout from 'vue-grid-layout';
@@ -88,7 +142,6 @@ import { getSocket } from 'src/panel/helpers/socket';
 const socket = getSocket('/');
 
 export default defineComponent({
-  mixins:     [ vueWindowSizeMixin ],
   components: {
     bets:            () => import('src/panel/widgets/components/bets.vue'),
     chat:            () => import('src/panel/widgets/components/chat.vue'),
@@ -111,6 +164,7 @@ export default defineComponent({
     GridLayout:      VueGridLayout.GridLayout,
     GridItem:        VueGridLayout.GridItem,
   },
+  mixins: [ vueWindowSizeMixin ],
   setup(props, ctx) {
     const dashboards = ref([]);
     const dashboardName = ref('');
@@ -177,7 +231,7 @@ export default defineComponent({
       refreshWidgets();
     };
     const addWidget = () => {
-      socket.emit('panel::dashboards', { userId: Number(ctx.root.$store.state.loggedUser.id), type: 'admin' }, (err, dashboards2) => {
+      socket.emit('panel::dashboards', { userId: ctx.root.$store.state.loggedUser.id, type: 'admin' }, (err, dashboards2) => {
         if (err) {
           return console.error(err);
         }
@@ -187,7 +241,7 @@ export default defineComponent({
       });
     };
     const createDashboard = () => {
-      socket.emit('panel::dashboards::create', { userId: Number(ctx.root.$store.state.loggedUser.id), name: dashboardName.value }, (err, created) => {
+      socket.emit('panel::dashboards::create', { userId: ctx.root.$store.state.loggedUser.id, name: dashboardName.value }, (err, created) => {
         if (err) {
           return console.error(err);
         }
@@ -202,7 +256,7 @@ export default defineComponent({
     onMounted(async () => {
       isLoaded.value = await Promise.race([
         new Promise(resolve => {
-          socket.emit('panel::dashboards', { userId: Number(ctx.root.$store.state.loggedUser.id), type: 'admin' }, (err, dashboardsFromSocket) => {
+          socket.emit('panel::dashboards', { userId: ctx.root.$store.state.loggedUser.id, type: 'admin' }, (err, dashboardsFromSocket) => {
             console.groupCollapsed('dashboard::panel::dashboards');
             console.log({ err, dashboards: dashboardsFromSocket });
             console.groupEnd();

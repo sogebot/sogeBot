@@ -6,11 +6,11 @@ import { User } from '../../database/entity/user';
 import { areDecoratorsLoaded } from '../../decorators';
 import { getBroadcaster } from '../getBroadcaster';
 import {
-  debug, error, warning, 
+  debug, error, warning,
 } from '../log';
 import { generalOwners } from '../oauth/generalOwners';
 import {
-  isFollower, isOwner, isSubscriber, isVIP, 
+  isFollower, isOwner, isSubscriber, isVIP,
 } from '../user';
 import { isBot } from '../user/isBot';
 import { isBroadcaster } from '../user/isBroadcaster';
@@ -20,7 +20,7 @@ import { filters } from './filters';
 
 let isWarnedAboutCasters = false;
 
-async function check(userId: number, permId: string, partial = false): Promise<{access: boolean; permission: PermissionsInterface | undefined}> {
+async function check(userId: string, permId: string, partial = false): Promise<{access: boolean; permission: PermissionsInterface | undefined}> {
   if (!areDecoratorsLoaded) {
     await new Promise<void>((resolve) => {
       const _check = () => {
@@ -55,7 +55,7 @@ async function check(userId: number, permId: string, partial = false): Promise<{
       throw Error(`Permissions ${permId} doesn't exist`);
     }
 
-    // if userId is part of excludeUserIds => fakse
+    // if userId is part of excludeUserIds => false
     if (pItem.excludeUserIds.includes(String(userId))) {
       return { access: false, permission: pItem };
     }

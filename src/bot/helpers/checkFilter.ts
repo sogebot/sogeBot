@@ -19,10 +19,10 @@ export const checkFilter = async (opts: CommandOptions | ParserOptions, filter: 
   }
   const toEval = `(function evaluation () { return ${filter} })()`;
 
-  const $userObject = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
+  const $userObject = await getRepository(User).findOne({ userId: opts.sender.userId });
   if (!$userObject) {
     await getRepository(User).save({
-      userId:   Number(opts.sender.userId),
+      userId:   opts.sender.userId,
       username: opts.sender.username,
     });
     return checkFilter(opts, filter);

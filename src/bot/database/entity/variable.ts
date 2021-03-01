@@ -76,7 +76,7 @@ export const Variable = new EntitySchema<Readonly<Required<VariableInterface>>>(
 
 export interface VariableHistoryInterface {
   id?: string; variable?: VariableInterface; variableId: string | null;
-  userId: number; username: string;
+  userId: string; username: string;
   currentValue: string; oldValue: any; changedAt: number;
 }
 
@@ -89,8 +89,8 @@ export const VariableHistory = new EntitySchema<Readonly<VariableHistoryInterfac
       generated: 'increment',
     },
     userId: {
-      type:    Number,
-      default: 0,
+      type:    String,
+      default: '0',
     },
     username: {
       type:    String,

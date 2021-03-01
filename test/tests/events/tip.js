@@ -43,7 +43,7 @@ describe('Events - tip event', () => {
       });
 
       for (const user of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs']) {
-        await getRepository(User).save({ username: user, userId: Math.floor(Math.random() * 100000) });
+        await getRepository(User).save({ username: user, userId: String(Math.floor(Math.random() * 100000)) });
       }
     });
 
@@ -51,7 +51,7 @@ describe('Events - tip event', () => {
       describe(username + ' tip event', () => {
         it('trigger tip event for 10 EUR - ' + username, async () => {
           log.tip(`${username}, amount: 10.00EUR, message: Ahoj jak je`);
-          events.fire('tip', { userId: Math.floor(Math.random * 100000), username: username, amount: 10.00, message: 'Ahoj jak je', currency: 'EUR' });
+          events.fire('tip', { userId: String(Math.floor(Math.random * 100000)), username: username, amount: 10.00, message: 'Ahoj jak je', currency: 'EUR' });
         });
 
         it('wait 1s', async () => {

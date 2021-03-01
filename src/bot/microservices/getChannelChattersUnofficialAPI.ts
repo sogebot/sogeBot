@@ -155,7 +155,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ partedUsers: 
           getRepository(User).save(
             users.map(user => {
               return {
-                userId:          Number(user.id),
+                userId:          user.id,
                 username:        user.login,
                 displayname:     user.display_name,
                 profileImageUrl: user.profile_image_url,

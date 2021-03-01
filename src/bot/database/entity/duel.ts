@@ -1,7 +1,7 @@
 import { EntitySchema } from 'typeorm';
 
 export interface DuelInterface {
-  id?: number;
+  id?: string;
   username: string;
   tickets: number;
 }
@@ -9,7 +9,7 @@ export interface DuelInterface {
 export const Duel = new EntitySchema<Readonly<Required<DuelInterface>>>({
   name:    'duel',
   columns: {
-    id:       { type: Number, primary: true },
+    id:       { type: String, primary: true },
     username: { type: String },
     tickets:  { type: Number },
   },

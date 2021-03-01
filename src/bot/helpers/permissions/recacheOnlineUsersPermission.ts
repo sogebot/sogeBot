@@ -10,7 +10,7 @@ import { getUserHighestPermission } from './getUserHighestPermission';
 
 let isRecacheRunning = false;
 let rechacheFinishedAt = 0;
-const recacheIds = new Map<number, number>();
+const recacheIds = new Map<string, number>();
 
 export function recacheOnlineUsersPermission() {
   if (!isRecacheRunning && Date.now() - rechacheFinishedAt > 10 * MINUTE) {

@@ -3,7 +3,7 @@ import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
 export interface HeistUserInterface {
-  userId: number;
+  userId: string;
   username: string;
   points: number;
 }
@@ -11,7 +11,7 @@ export interface HeistUserInterface {
 export const HeistUser = new EntitySchema<Readonly<Required<HeistUserInterface>>>({
   name:    'heist_user',
   columns: {
-    userId:   { type: Number, primary: true },
+    userId:   { type: String, primary: true },
     username: { type: String },
     points:   { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },

@@ -7,7 +7,7 @@
   _, _current, users, param (only in custom command)
   sender?: { // (only in custom commands, keyword)
     username: string,
-    userId: number,
+    userId: string,
     source: 'twitch' | 'discord'
   }
   random: {

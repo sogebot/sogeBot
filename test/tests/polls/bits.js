@@ -19,7 +19,7 @@ const translate = require('../../../dest/translate').translate;
 
 const assert = require('assert');
 
-const owner = { username: '__broadcaster__', userId: Math.floor(Math.random() * 10000) };
+const owner = { username: '__broadcaster__', userId: String(Math.floor(Math.random() * 10000)) };
 
 describe('Polls - bits', () => {
   before(async () => {
@@ -90,7 +90,7 @@ describe('Polls - bits', () => {
           await tmi.cheer({
             tags: {
               username: user,
-              userId: Math.floor(Math.random() * 100000),
+              userId: String(Math.floor(Math.random() * 100000)),
               bits: 10,
             },
             message: 'Cool I am voting for #vote' + o + ' enjoy!',

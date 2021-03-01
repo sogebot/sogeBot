@@ -2,21 +2,28 @@
 require('../../general.js');
 
 const assert = require('assert');
-const _ = require('lodash');
 
+const _ = require('lodash');
+const { getRepository } = require('typeorm');
+
+const { User } = require('../../../dest/database/entity/user');
+const cooldown = (require('../../../dest/systems/cooldown')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
-const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/database/entity/user');
-
-const cooldown = (require('../../../dest/systems/cooldown')).default;
-
 // users
-const owner = { userId: Math.floor(Math.random() * 100000), badges: {}, username: '__broadcaster__' };
-const follower = { badges: {}, username: 'follower', userId: Number(_.random(999999, false)), isFollower: true };
-const commonUser = { badges: {}, username: 'user1', userId: Number(_.random(999999, false)) };
-const commonUser2 = { badges: {}, username: 'user2', userId: Number(_.random(999999, false)) };
+const owner = {
+  userId: String(Math.floor(Math.random() * 100000)), badges: {}, username: '__broadcaster__',
+};
+const follower = {
+  badges: {}, username: 'follower', userId: String(_.random(999999, false)), isFollower: true,
+};
+const commonUser = {
+  badges: {}, username: 'user1', userId: String(_.random(999999, false)),
+};
+const commonUser2 = {
+  badges: {}, username: 'user2', userId: String(_.random(999999, false)),
+};
 
 describe('Cooldowns - toggleFollowers()', () => {
   beforeEach(async () => {

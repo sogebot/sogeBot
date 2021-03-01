@@ -4,16 +4,16 @@ import * as _ from 'lodash';
 import { getRepository } from 'typeorm';
 
 import {
-  Raffle, RaffleParticipant, RaffleParticipantInterface, RaffleParticipantMessageInterface, 
+  Raffle, RaffleParticipant, RaffleParticipantInterface, RaffleParticipantMessageInterface,
 } from '../database/entity/raffle';
 import { User } from '../database/entity/user';
 import {
-  command, default_permission, parser, settings, 
+  command, default_permission, parser, settings,
 } from '../decorators';
 import { onStartup } from '../decorators/on';
 import { isStreamOnline } from '../helpers/api';
 import {
-  announce, getOwnerAsSender, prepare, 
+  announce, getOwnerAsSender, prepare,
 } from '../helpers/commons';
 import { isDbConnected } from '../helpers/database';
 import { getLocalizedName } from '../helpers/getLocalized';
@@ -114,14 +114,14 @@ class Raffles extends System {
     });
     adminEndpoint(this.nsp, 'raffle::pick', async () => {
       this.pick({
-        attr: {}, command: '!raffle', createdAt: Date.now(), parameters: '', sender: getOwnerAsSender(), 
+        attr: {}, command: '!raffle', createdAt: Date.now(), parameters: '', sender: getOwnerAsSender(),
       });
     });
     adminEndpoint(this.nsp, 'raffle::open', async (message) => {
       // force close raffles
       await getRepository(Raffle).update({}, { isClosed: true });
       this.open({
-        attr: {}, command: '!raffle open', createdAt: Date.now(), sender: getOwnerAsSender(), parameters: message, 
+        attr: {}, command: '!raffle open', createdAt: Date.now(), sender: getOwnerAsSender(), parameters: message,
       });
     });
     adminEndpoint(this.nsp, 'raffle::close', async () => {
@@ -402,10 +402,10 @@ class Raffles extends System {
       return true;
     }
 
-    const user = await getRepository(User).findOne({ userId: Number(opts.sender.userId) });
+    const user = await getRepository(User).findOne({ userId: opts.sender.userId });
     if (!user) {
       await getRepository(User).save({
-        userId:   Number(opts.sender.userId),
+        userId:   opts.sender.userId,
         username: opts.sender.username,
       });
       return this.participate(opts);
@@ -477,7 +477,7 @@ class Raffles extends System {
       }
       if (raffle.type === TYPE_TICKETS) {
         announceNewEntriesCount += newTickets - curTickets;
-        await points.decrement({ userId: Number(opts.sender.userId) }, newTickets - curTickets);
+        await points.decrement({ userId: opts.sender.userId }, newTickets - curTickets);
       } else {
         announceNewEntriesCount += 1;
       }
@@ -514,7 +514,7 @@ class Raffles extends System {
       const response = prepare('raffles.no-participants-to-pick-winner');
       // close raffle on pick
       await getRepository(Raffle).save({
-        ...raffle, isClosed: true, timestamp: Date.now(), 
+        ...raffle, isClosed: true, timestamp: Date.now(),
       });
       return [{ response, ...opts }];
     }
@@ -568,7 +568,7 @@ class Raffles extends System {
       await Promise.all([
         getRepository(RaffleParticipant).save({ ...winner, isEligible: false }),
         getRepository(Raffle).save({
-          ...raffle, winner: winner.username, isClosed: true, timestamp: Date.now(), 
+          ...raffle, winner: winner.username, isClosed: true, timestamp: Date.now(),
         }),
       ]);
 
@@ -581,7 +581,7 @@ class Raffles extends System {
     } else {
       // close raffle on pick
       await getRepository(Raffle).save({
-        ...raffle, isClosed: true, timestamp: Date.now(), 
+        ...raffle, isClosed: true, timestamp: Date.now(),
       }),
       warning('No winner found in raffle');
     }

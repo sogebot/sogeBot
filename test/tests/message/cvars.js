@@ -20,8 +20,8 @@ _.set(global, 'widgets.custom_variables.io.emit', function () {});
 
 describe('Message - cvars filter', async () => {
   const users = [
-    { username: '__owner__', userId: Math.floor(Math.random() * 100000), permission: defaultPermissions.CASTERS },
-    { username: '__viewer__', userId: Math.floor(Math.random() * 100000), permission: defaultPermissions.VIEWERS },
+    { username: '__owner__', userId: String(Math.floor(Math.random() * 100000)), permission: defaultPermissions.CASTERS },
+    { username: '__viewer__', userId: String(Math.floor(Math.random() * 100000)), permission: defaultPermissions.VIEWERS },
   ];
   const tests = [
     {

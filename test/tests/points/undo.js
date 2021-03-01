@@ -3,18 +3,18 @@
 
 require('../../general.js');
 
-const db = require('../../general.js').db;
-const message = require('../../general.js').message;
-const _ = require('lodash');
 const assert = require('assert');
 
+const _ = require('lodash');
 const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/database/entity/user');
+
 const { PointsChangelog } = require('../../../dest/database/entity/points');
-
+const { User } = require('../../../dest/database/entity/user');
 const points = (require('../../../dest/systems/points')).default;
+const db = require('../../general.js').db;
+const message = require('../../general.js').message;
 
-const user = { username: 'oneuser', userId: Number(_.random(999999, false)) };
+const user = { username: 'oneuser', userId: String(_.random(999999, false)) };
 
 describe('Points - undo()', () => {
   before(async () => {
@@ -24,7 +24,9 @@ describe('Points - undo()', () => {
 
   describe('!point add command should be undoable', () => {
     it('create user', async () => {
-      await getRepository(User).save({ username: user.username, userId: user.userId, points: 150 });
+      await getRepository(User).save({
+        username: user.username, userId: user.userId, points: 150, 
+      });
     });
 
     it('!points add 100', async () => {
@@ -67,7 +69,9 @@ describe('Points - undo()', () => {
 
   describe('!point set command should be undoable', () => {
     it('create user', async () => {
-      await getRepository(User).save({ username: user.username, userId: user.userId, points: 0 });
+      await getRepository(User).save({
+        username: user.username, userId: user.userId, points: 0, 
+      });
     });
 
     it('!points set 100', async () => {
@@ -110,7 +114,9 @@ describe('Points - undo()', () => {
 
   describe('!point remove command should be undoable', () => {
     it('create user', async () => {
-      await getRepository(User).save({ username: user.username, userId: user.userId, points: 100 });
+      await getRepository(User).save({
+        username: user.username, userId: user.userId, points: 100, 
+      });
     });
 
     it('!points remove 25', async () => {
@@ -124,7 +130,7 @@ describe('Points - undo()', () => {
     });
 
     it('Changelog should have 100 -> 75 log', async () => {
-      const changelog = await getRepository(PointsChangelog).findOne({ where: { userId: user.userId }, order: { updatedAt: 'DESC' }});
+      const changelog = await getRepository(PointsChangelog).findOne({ where: { userId: user.userId }, order: { updatedAt: 'DESC' } });
       assert(typeof changelog !== 'undefined');
       assert.strictEqual(changelog.originalValue, 100);
       assert.strictEqual(changelog.updatedValue, 75);
@@ -141,7 +147,7 @@ describe('Points - undo()', () => {
     });
 
     it('Changelog should have 75 -> 0 log', async () => {
-      const changelog = await getRepository(PointsChangelog).findOne({ where: { userId: user.userId }, order: { updatedAt: 'DESC' }});
+      const changelog = await getRepository(PointsChangelog).findOne({ where: { userId: user.userId }, order: { updatedAt: 'DESC' } });
       assert(typeof changelog !== 'undefined');
       assert.strictEqual(changelog.originalValue, 75);
       assert.strictEqual(changelog.updatedValue, 0);

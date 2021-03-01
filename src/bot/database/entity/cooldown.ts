@@ -20,7 +20,7 @@ export interface CooldownInterface {
 export interface CooldownViewerInterface {
   id?: string;
   cooldown?: CooldownInterface;
-  userId: number;
+  userId: string;
   timestamp: number;
 }
 
@@ -28,13 +28,13 @@ export const Cooldown = new EntitySchema<Readonly<Required<CooldownInterface>>>(
   name:    'cooldown',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid', 
+      type: 'uuid', primary: true, generated: 'uuid',
     },
     name:        { type: String },
     miliseconds: { type: Number },
     type:        { type: 'varchar', length: 10 },
     timestamp:   {
-      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0, 
+      type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0,
     },
     isErrorMsgQuiet:      { type: Boolean },
     isEnabled:            { type: Boolean },
@@ -53,7 +53,7 @@ export const Cooldown = new EntitySchema<Readonly<Required<CooldownInterface>>>(
   },
   indices: [
     {
-      name: 'IDX_aa85aa267ec6eaddf7f93e3665', columns: [ 'name' ], unique: true, 
+      name: 'IDX_aa85aa267ec6eaddf7f93e3665', columns: [ 'name' ], unique: true,
     },
   ],
 });
@@ -62,9 +62,9 @@ export const CooldownViewer = new EntitySchema<Readonly<Required<CooldownViewerI
   name:    'cooldown_viewer',
   columns: {
     id: {
-      type: 'uuid', primary: true, generated: 'uuid', 
+      type: 'uuid', primary: true, generated: 'uuid',
     },
-    userId:    { type: Number },
+    userId:    { type: String },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },
   relations: {

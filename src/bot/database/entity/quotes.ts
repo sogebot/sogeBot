@@ -6,7 +6,7 @@ export interface QuotesInterface {
   id?: number;
   tags: string[];
   quote: string;
-  quotedBy: number;
+  quotedBy: string;
   createdAt: number;
 }
 
@@ -14,11 +14,11 @@ export const Quotes = new EntitySchema<Readonly<Required<QuotesInterface>>>({
   name:    'quotes',
   columns: {
     id: {
-      type: 'int', primary: true, generated: 'increment', 
+      type: 'int', primary: true, generated: 'increment',
     },
     tags:      { type: 'simple-array' },
     quote:     { type: String },
-    quotedBy:  { type: Number },
+    quotedBy:  { type: String },
     createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },
 });

@@ -329,7 +329,7 @@ class Discord extends Integration {
   @command('!unlink')
   async unlinkAccounts(opts: CommandOptions) {
     this.removeExpiredLinks();
-    await getRepository(DiscordLink).delete({ userId: Number(opts.sender.userId) });
+    await getRepository(DiscordLink).delete({ userId: opts.sender.userId });
     return [{ response: prepare('integrations.discord.all-your-links-were-deleted', { sender: opts.sender }), ...opts }];
   }
 
@@ -346,7 +346,7 @@ class Discord extends Integration {
 
       const link = await getRepository(DiscordLink).findOneOrFail({ id: uuid });
       // link user
-      await getRepository(DiscordLink).save({ ...link, userId: Number(opts.sender.userId) });
+      await getRepository(DiscordLink).save({ ...link, userId: opts.sender.userId });
       return [{ response: prepare('integrations.discord.this-account-was-linked-with', { sender: opts.sender, discordTag: link.tag }), ...opts }];
     } catch (e) {
       if (e.message.includes('Expected parameter')) {
@@ -517,7 +517,7 @@ class Discord extends Integration {
       const userObj = await getRepository(User).findOne({ username });
       if (!userObj && !attributes.test) {
         await getRepository(User).save({
-          userId: Number(await getIdFromTwitch(username)),
+          userId: await getIdFromTwitch(username),
           username,
         });
         return self.fireSendDiscordMessage(operation, { ...attributes, username });

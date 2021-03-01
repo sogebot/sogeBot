@@ -12,7 +12,7 @@ const {channelId} = (require('../../../dest/helpers/oauth/channelId'));
 
 // users
 const id = _.random(99999, false);
-const testuser = { username: 'testuser', userId: id };
+const testuser = { username: 'testuser', userId: String(id) };
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
