@@ -810,6 +810,7 @@ class TMI extends Core {
               });
             }
             const responses = await new Parser().command(getUserSender(userId, username), messageFromUser, true);
+            console.log({ responses });
             for (let i = 0; i < responses.length; i++) {
               setTimeout(async () => {
                 parserReply(await responses[i].response, { sender: responses[i].sender, attr: responses[i].attr });
