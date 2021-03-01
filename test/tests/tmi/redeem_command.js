@@ -103,12 +103,12 @@ describe('TMI - redeem command', () => {
   });
 
   it(`Command was !test redeemed`, async () => {
-    await message.isSentRaw('Lorem Ipsum', getBotSender());
+    await message.isSentRaw('Lorem Ipsum', 'testuser');
     await message.debug('tmi.cmdredeems', '!test');
   });
 
   it(`Command !test2 was redeemed but without alert`, async () => {
-    await message.isSentRaw('Ipsum Lorem', getBotSender());
+    await message.isSentRaw('Ipsum Lorem', 'testuser');
     try {
       await message.debug('tmi.cmdredeems', '!test2');
       assert(false, 'This should not get here');
