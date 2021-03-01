@@ -86,6 +86,7 @@
       "dialog": {
         "timer": "Časovač",
         "name": "Název",
+        "tickOffline": "Should tick if stream offline",
         "interval": "Interval",
         "responses": "Odpovědi",
         "messages": "Každých x zpráv",
@@ -1133,6 +1134,7 @@
     "response-must-be-defined": "$sender, odpověď časovače musí být definována.",
     "cannot-set-messages-and-seconds-0": "$sender, nemůžete nastavit zprávy i sekundy na 0.",
     "timer-was-set": "$sender, časovač $name byl nastaven na $messages zpráv a $seconds sekund ke spuštění",
+    "timer-was-set-with-offline-flag": "$sender, timer $name was set with $messages messages and $seconds seconds to trigger even when stream is offline",
     "timer-not-found": "$sender, časovač (název: $name) nebyl nalezen v databázi. Pro seznam časovačů -> !timers list",
     "timer-deleted": "$sender, časovač $name a jeho odpovědi byly odstraněny.",
     "timer-enabled": "$sender, časovač (název: $name) byl povolen",
