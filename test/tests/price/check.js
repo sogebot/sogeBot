@@ -136,7 +136,7 @@ describe('Price - check()', () => {
     await message.isSentRaw('Lorem Ipsum', user.username, 20000);
   });
 
-  it.only(`Cheer should trigger core command`, async () => {
+  it(`Cheer should trigger core command`, async () => {
     await getRepository(Price).save({
       command: '!me', price: 100, priceBits: 10,
     });
