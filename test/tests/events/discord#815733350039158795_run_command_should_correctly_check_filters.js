@@ -14,6 +14,7 @@ const { defaultPermissions } = (require('../../../dest/helpers/permissions/'));
 const { isBotSubscriber } = require('../../../dest/helpers/user/isBot');
 const alias = (require('../../../dest/systems/alias')).default;
 const commercial = (require('../../../dest/systems/commercial')).default;
+const customcommands = (require('../../../dest/systems/customcommands')).default;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
@@ -37,14 +38,14 @@ describe('Events - event run command should correctly parse filters and be able 
     event.operations = [{
       name:        'run-command',
       definitions: {
-        commandToRun:   '!test',
+        commandToRun:   '!test33',
         isCommandQuiet: false,
       },
     }];
     await getRepository(Event).save(event);
 
     const command = await getRepository(Commands).save({
-      command:   '!test',
+      command:   '!test33',
       enabled:   true,
       visible:   true,
       responses: [
@@ -71,6 +72,7 @@ describe('Events - event run command should correctly parse filters and be able 
         },
       ],
     });
+    customcommands.invalidateCache();
   });
 
   it('set bot as subscriber', async () => {

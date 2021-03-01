@@ -63,7 +63,7 @@ class CustomCommands extends System {
       try {
         const item = await getRepository(Commands).findOne({ id: String(opts.id) });
         await getRepository(Commands).save({ ...item, ...opts.item });
-        cacheValid = false;
+        this.invalidateCache();
         if (typeof cb === 'function') {
           cb(null, item);
         }
@@ -75,7 +75,7 @@ class CustomCommands extends System {
     });
     adminEndpoint(this.nsp, 'generic::deleteById', async (id, cb) => {
       await getRepository(Commands).delete({ id: String(id) });
-      cacheValid = false;
+      this.invalidateCache();
       if (cb) {
         cb(null);
       }
@@ -168,7 +168,7 @@ class CustomCommands extends System {
       }
 
       await getRepository(Commands).save(cDb);
-      cacheValid = false;
+      this.invalidateCache();
       return [{ response: prepare('customcmds.command-was-edited', { command: cmd, response }), ...opts }];
     } catch (e) {
       return [{ response: prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') }), ...opts }];
@@ -222,11 +222,15 @@ class CustomCommands extends System {
           filter:         '',
         }],
       });
-      cacheValid = false;
+      this.invalidateCache();
       return [{ response: prepare('customcmds.command-was-added', { command: cmd }), ...opts }];
     } catch (e) {
       return [{ response: prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') }), ...opts }];
     }
+  }
+
+  invalidateCache() {
+    cacheValid = false;
   }
 
   async find(search: string) {
@@ -370,7 +374,7 @@ class CustomCommands extends System {
         ...cmd,
         enabled: !cmd.enabled,
       });
-      cacheValid = false;
+      this.invalidateCache();
       return [{ response: prepare(!cmd.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: cmd.command }), ...opts }];
     } catch (e) {
       const response = prepare('customcmds.commands-parse-failed', { command: this.getCommand('!command') });
@@ -395,7 +399,7 @@ class CustomCommands extends System {
       await getRepository(Commands).save({ ...cmd, visible: !cmd.visible });
 
       const response = prepare(!cmd.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: cmd.command });
-      cacheValid = false;
+      this.invalidateCache();
       return [{ response, ...opts }];
 
     } catch (e) {
@@ -443,7 +447,7 @@ class CustomCommands extends System {
         } else {
           await getRepository(Commands).remove(command_db);
         }
-        cacheValid = false;
+        this.invalidateCache();
         return [{ response, ...opts }];
       }
     } catch (e) {

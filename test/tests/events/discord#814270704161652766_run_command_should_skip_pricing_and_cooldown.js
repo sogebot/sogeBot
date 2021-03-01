@@ -64,7 +64,7 @@ describe('Events - event run command should be able to skip pricing and cooldown
     });
 
     it('command should be triggered', async () => {
-      await message.isSentRaw(`Usage: !commercial [duration] [optional-message]`, user.owner);
+      await message.isSentRaw(`Usage: !commercial [duration] [optional-message]`, follower);
     });
   }
 });
