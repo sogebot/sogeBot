@@ -2,7 +2,7 @@
 Timers system will periodically print out set responses, when certain requirements are met.
 
 ### Commands | OWNER
-`!timers set -name [name-of-timer] -messages [num-of-msgs-to-trigger|default:0] -seconds [trigger-every-x-seconds|default:60]` - will create or update timers with specified requirements to meet
+`!timers set -name [name-of-timer] -messages [num-of-msgs-to-trigger|default:0] -seconds [trigger-every-x-seconds|default:60] [-offline]` - will create or update timers with specified requirements to meet
 
 `!timers unset -name [name-of-timer]` - remove timer and all responses
 

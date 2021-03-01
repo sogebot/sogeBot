@@ -106,4 +106,17 @@ describe('Timers - set()', () => {
     assert.strictEqual(item.triggerEverySecond, 5);
     assert.strictEqual(item.triggerEveryMessage, 6);
   });
+
+  it('-name test -seconds 5 -messages 6 -offline', async () => {
+    const r = await timers.set({ sender: owner, parameters: '-name test -seconds 5 -messages 6 -offline' });
+    assert.strictEqual(r[0].response, '$sender, timer test was set with 6 messages and 5 seconds to trigger even when stream is offline');
+
+    const item = await getRepository(Timer).findOne({
+      relations: ['messages'],
+      where: { name: 'test' },
+    });
+    assert.strictEqual(item.triggerEverySecond, 5);
+    assert.strictEqual(item.triggerEveryMessage, 6);
+    assert.strictEqual(item.tickOffline, true);
+  });
 });

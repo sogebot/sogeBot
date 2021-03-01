@@ -4,9 +4,9 @@ import * as _ from 'lodash';
 import { sortBy } from 'lodash';
 import { getRepository } from 'typeorm';
 
-import { MINUTE, SECOND } from '../constants';
+import { SECOND } from '../constants';
 import {
-  Timer, TimerResponse, TimerResponseInterface, 
+  Timer, TimerResponse, TimerResponseInterface,
 } from '../database/entity/timer';
 import { command, default_permission } from '../decorators';
 import Expects from '../expects';
@@ -20,15 +20,15 @@ import { translate } from '../translate';
 import System from './_interface';
 
 /*
- * !timers                                                                                                                      - gets an info about timers usage
- * !timers set -name [name-of-timer] -messages [num-of-msgs-to-trigger|default:0] -seconds [trigger-every-x-seconds|default:60] - add new timer
- * !timers unset -name [name-of-timer]                                                                                          - remove timer
- * !timers add -name [name-of-timer] -response '[response]'                                                                     - add new response to timer
- * !timers rm -id [response-id]                                                                                                 - remove response by id
- * !timers toggle -name [name-of-timer]                                                                                         - enable/disable timer by name
- * !timers toggle -id [id-of-response]                                                                                          - enable/disable response by id
- * !timers list                                                                                                                 - get timers list
- * !timers list -name [name-of-timer]                                                                                           - get list of responses on timer
+ * !timers                                                                                                                                 - gets an info about timers usage
+ * !timers set -name [name-of-timer] -messages [num-of-msgs-to-trigger|default:0] -seconds [trigger-every-x-seconds|default:60] [-offline] - add new timer
+ * !timers unset -name [name-of-timer]                                                                                                     - remove timer
+ * !timers add -name [name-of-timer] -response '[response]'                                                                                - add new response to timer
+ * !timers rm -id [response-id]                                                                                                            - remove response by id
+ * !timers toggle -name [name-of-timer]                                                                                                    - enable/disable timer by name
+ * !timers toggle -id [id-of-response]                                                                                                     - enable/disable response by id
+ * !timers list                                                                                                                            - get timers list
+ * !timers list -name [name-of-timer]                                                                                                      - get list of responses on timer
  */
 
 class Timers extends System {
@@ -36,7 +36,7 @@ class Timers extends System {
     super();
 
     this.addMenu({
-      category: 'manage', name: 'timers', id: 'manage/timers/list', this: this, 
+      category: 'manage', name: 'timers', id: 'manage/timers/list', this: this,
     });
     this.init();
   }
@@ -99,7 +99,7 @@ class Timers extends System {
     const timers = await getRepository(Timer).find({ relations: ['messages'] });
     for (const timer of timers) {
       await getRepository(Timer).save({
-        ...timer, triggeredAtMessages: 0, triggeredAtTimestamp: Date.now(), 
+        ...timer, triggeredAtMessages: 0, triggeredAtTimestamp: Date.now(),
       });
     }
     this.check();
@@ -107,16 +107,16 @@ class Timers extends System {
 
   async check () {
     clearTimeout(this.timeouts.timersCheck);
+
     if (!isStreamOnline.value) {
-      await getRepository(Timer).update({}, { triggeredAtMessages: linesParsed, triggeredAtTimestamp: Date.now() });
-      this.timeouts.timersCheck = global.setTimeout(() => this.check(), MINUTE / 2); // this will run check 1s after full check is correctly done
-      return;
+      await getRepository(Timer).update({ tickOffline: false }, { triggeredAtMessages: linesParsed, triggeredAtTimestamp: Date.now() });
     }
 
     const timers = await getRepository(Timer).find({
       relations: ['messages'],
-      where:     { isEnabled: true },
+      where:     isStreamOnline.value ? { isEnabled: true } : { isEnabled: true, tickOffline: true },
     });
+
     for (const timer of timers) {
       if (timer.triggerEveryMessage > 0 && timer.triggeredAtMessages - linesParsed + timer.triggerEveryMessage > 0) {
         continue;
@@ -152,10 +152,11 @@ class Timers extends System {
   @command('!timers set')
   @default_permission(defaultPermissions.CASTERS)
   async set (opts: CommandOptions): Promise<CommandResponse[]> {
-    // -name [name-of-timer] -messages [num-of-msgs-to-trigger|default:0] -seconds [trigger-every-x-seconds|default:60]
+    // -name [name-of-timer] -messages [num-of-msgs-to-trigger|default:0] -seconds [trigger-every-x-seconds|default:60] -offline
     const nameMatch = opts.parameters.match(/-name ([a-zA-Z0-9_]+)/);
     const messagesMatch = opts.parameters.match(/-messages ([0-9]+)/);
     const secondsMatch = opts.parameters.match(/-seconds ([0-9]+)/);
+    const tickOffline = !!opts.parameters.match(/-offline/);
 
     let name = '';
     let messages = 0;
@@ -179,6 +180,7 @@ class Timers extends System {
     });
     await getRepository(Timer).save({
       ...timer,
+      tickOffline,
       name:                 name,
       triggerEveryMessage:  messages,
       triggerEverySecond:   seconds,
@@ -186,11 +188,12 @@ class Timers extends System {
       triggeredAtMessages:  linesParsed,
       triggeredAtTimestamp: Date.now(),
     });
+
     return [{
-      response: translate('timers.timer-was-set')
+      response: translate(tickOffline ? 'timers.timer-was-set-with-offline-flag' : 'timers.timer-was-set')
         .replace(/\$name/g, name)
         .replace(/\$messages/g, messages)
-        .replace(/\$seconds/g, seconds), ...opts, 
+        .replace(/\$seconds/g, seconds), ...opts,
     }];
   }
 
@@ -224,7 +227,7 @@ class Timers extends System {
       await getRepository(TimerResponse).delete({ id });
       return [{
         response: translate('timers.response-deleted')
-          .replace(/\$id/g, id), ...opts, 
+          .replace(/\$id/g, id), ...opts,
       }];
     } catch (e) {
       return [{ response: translate('timers.id-must-be-defined'), ...opts }];
@@ -257,7 +260,7 @@ class Timers extends System {
     if (!timer) {
       return [{
         response: translate('timers.timer-not-found')
-          .replace(/\$name/g, name), ...opts, 
+          .replace(/\$name/g, name), ...opts,
       }];
     }
 
@@ -272,7 +275,7 @@ class Timers extends System {
       response: translate('timers.response-was-added')
         .replace(/\$id/g, item.id)
         .replace(/\$name/g, name)
-        .replace(/\$response/g, response), ...opts, 
+        .replace(/\$response/g, response), ...opts,
     }];
   }
 
@@ -297,7 +300,7 @@ class Timers extends System {
     if (!timer) {
       return [{
         response: translate('timers.timer-not-found')
-          .replace(/\$name/g, name), ...opts, 
+          .replace(/\$name/g, name), ...opts,
       }];
     }
     const responses: CommandResponse[] = [];
@@ -314,10 +317,10 @@ class Timers extends System {
     // -name [name-of-timer] or -id [id-of-response]
     const [id, name] = new Expects(opts.parameters)
       .argument({
-        type: 'uuid', name: 'id', optional: true, 
+        type: 'uuid', name: 'id', optional: true,
       })
       .argument({
-        type: String, name: 'name', optional: true, 
+        type: String, name: 'name', optional: true,
       })
       .toArray();
 
@@ -334,7 +337,7 @@ class Timers extends System {
       await getRepository(TimerResponse).save({ ...response, isEnabled: !response.isEnabled });
       return [{
         response: translate(!response.isEnabled ? 'timers.response-enabled' : 'timers.response-disabled')
-          .replace(/\$id/g, id), ...opts, 
+          .replace(/\$id/g, id), ...opts,
       }];
     }
 
@@ -347,7 +350,7 @@ class Timers extends System {
       await getRepository(Timer).save({ ...timer, isEnabled: !timer.isEnabled });
       return [{
         response: translate(!timer.isEnabled ? 'timers.timer-enabled' : 'timers.timer-disabled')
-          .replace(/\$name/g, name), ...opts, 
+          .replace(/\$name/g, name), ...opts,
       }];
     }
     return [];
