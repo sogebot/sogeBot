@@ -21,6 +21,18 @@
         </b-form-invalid-feedback>
       </b-form-group>
 
+      <b-form-group>
+        <b-form-checkbox
+          id="tickOffline"
+          v-model="item.tickOffline"
+          name="tickOffline"
+          :value="true"
+          :unchecked-value="false"
+        >
+          {{translate('timers.dialog.tickOffline')}}
+        </b-form-checkbox>
+      </b-form-group>
+
       <b-row>
         <b-col>
           <b-form-group
@@ -60,7 +72,7 @@
                 id="seconds"
                 v-model="item.triggerEverySecond"
                 type="number"
-                min="0"
+                min="1"
                 :placeholder="translate('timers.dialog.placeholders.seconds')"
                 :state="$v.item.triggerEverySecond.$invalid && $v.item.triggerEverySecond.$dirty ? false : null"
                 @input="$v.item.$touch()"
@@ -70,7 +82,7 @@
                   {{ translate('errors.value_cannot_be_empty') }}
                 </template>
                 <template v-else-if="!$v.item.triggerEverySecond.minValue">
-                  {{ translate('errors.minValue_of_value_is').replace('$value', '0') }}
+                  {{ translate('errors.minValue_of_value_is').replace('$value', '1') }}
                 </template>
               </b-form-invalid-feedback>
             </b-input-group>
@@ -173,7 +185,7 @@ export default defineComponent({
   validations: {
     item: {
       name:                { mustBeCompliant, required },
-      triggerEverySecond:  { required, minValue: minValue(0) },
+      triggerEverySecond:  { required, minValue: minValue(1) },
       triggerEveryMessage: { required, minValue: minValue(0) },
       messages:            { $each: { response: { required } } },
     },
@@ -190,7 +202,8 @@ export default defineComponent({
       id:                   ctx.root.$route.params.id || uuid(),
       name:                 '',
       triggerEveryMessage:  0,
-      triggerEverySecond:   0,
+      tickOffline:          false,
+      triggerEverySecond:   60,
       isEnabled:            true,
       triggeredAtTimestamp: Date.now(),
       triggeredAtMessages:  0,

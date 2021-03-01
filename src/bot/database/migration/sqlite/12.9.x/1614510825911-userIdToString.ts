@@ -5,6 +5,7 @@ export class userIdToString1614510825911 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     const discordLink = await queryRunner.manager.getRepository(`discord_link`).find();
+    const widget: any[] = await queryRunner.manager.getRepository(`widget`).find();
     const pointsChangelog = await queryRunner.manager.getRepository(`points_changelog`).find();
     const quotes = await queryRunner.manager.getRepository(`quotes`).find();
     const user: any[] = (await queryRunner.manager.getRepository(`user`).find()).map((o: any) => ({ ...o, userId: String(o.userId) }));
@@ -185,6 +186,8 @@ export class userIdToString1614510825911 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE "variable_history"`);
     await queryRunner.query(`ALTER TABLE "temporary_variable_history" RENAME TO "variable_history"`);
     await queryRunner.query(`CREATE UNIQUE INDEX "IDX_dashboard_userId_createdAt_type" ON "dashboard" ("userId", "createdAt", "type") `);
+
+    await queryRunner.manager.getRepository(`widget`).save(widget);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

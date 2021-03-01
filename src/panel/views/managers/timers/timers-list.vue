@@ -1,31 +1,51 @@
 <template>
-  <b-container fluid ref="window">
+  <b-container
+    ref="window"
+    fluid
+  >
     <b-row>
       <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.manage') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.timers') }}
         </span>
       </b-col>
-      <b-col v-if="!$systems.find(o => o.name === 'timers').enabled" style=" text-align: right;">
-        <b-alert show variant="danger" style="padding: .5rem; margin: 0; display: inline-block;">
-          <fa icon="exclamation-circle" fixed-width/> {{ translate('this-system-is-disabled') }}
+      <b-col
+        v-if="!$systems.find(o => o.name === 'timers').enabled"
+        style=" text-align: right;"
+      >
+        <b-alert
+          show
+          variant="danger"
+          style="padding: .5rem; margin: 0; display: inline-block;"
+        >
+          <fa
+            icon="exclamation-circle"
+            fixed-width
+          /> {{ translate('this-system-is-disabled') }}
         </b-alert>
       </b-col>
     </b-row>
 
-    <panel search @search="search = $event">
-      <template v-slot:left>
-        <button-with-icon class="btn-primary btn-reverse" icon="plus" @click="newItem">{{translate('systems.timers.new')}}</button-with-icon>
+    <panel
+      search
+      @search="search = $event"
+    >
+      <template #left>
+        <button-with-icon
+          class="btn-primary btn-reverse"
+          icon="plus"
+          @click="newItem"
+        >
+          {{ translate('systems.timers.new') }}
+        </button-with-icon>
       </template>
     </panel>
 
     <loading v-if="state.loading === $state.progress" />
     <div v-else>
-
       <b-sidebar
-        @change="isSidebarVisibleChange"
         :visible="isSidebarVisible"
         :no-slide="!sidebarSlideEnabled"
         width="800px"
@@ -33,35 +53,86 @@
         shadow
         no-header
         right
-        backdrop>
-        <template v-slot:footer="{ hide }">
-          <div class="d-flex bg-opaque align-items-center px-3 py-2 border-top border-gray" style="justify-content: flex-end">
-            <b-button class="mx-2" @click="hide" variant="link">{{ translate('dialog.buttons.close') }}</b-button>
-            <state-button @click="EventBus.$emit('managers::timers::save::' + $route.params.id)" text="saveChanges" :state="state.save" :invalid="state.invalid"/>
+        backdrop
+        @change="isSidebarVisibleChange"
+      >
+        <template #footer="{ hide }">
+          <div
+            class="d-flex bg-opaque align-items-center px-3 py-2 border-top border-gray"
+            style="justify-content: flex-end"
+          >
+            <b-button
+              class="mx-2"
+              variant="link"
+              @click="hide"
+            >
+              {{ translate('dialog.buttons.close') }}
+            </b-button>
+            <state-button
+              text="saveChanges"
+              :state="state.save"
+              :invalid="state.invalid"
+              @click="EventBus.$emit('managers::timers::save::' + $route.params.id)"
+            />
           </div>
         </template>
-        <timers-edit v-if="$route.params.id" :id="$route.params.id" :saveState.sync="state.save" :invalid.sync="state.invalid" :pending.sync="state.pending" @refresh="refresh"/>
+        <timers-edit
+          v-if="$route.params.id"
+          :id="$route.params.id"
+          :save-state.sync="state.save"
+          :invalid.sync="state.invalid"
+          :pending.sync="state.pending"
+          @refresh="refresh"
+        />
       </b-sidebar>
-      <b-alert show variant="danger" v-if="state.loading === $state.success && filtered.length === 0 && search.length > 0">
-        <fa icon="search"/> <span v-html="translate('systems.timers.emptyAfterSearch').replace('$search', search)"/>
+      <b-alert
+        v-if="state.loading === $state.success && filtered.length === 0 && search.length > 0"
+        show
+        variant="danger"
+      >
+        <fa icon="search" /> <span v-html="translate('systems.timers.emptyAfterSearch').replace('$search', search)" />
       </b-alert>
-      <b-alert show v-else-if="state.loading === $state.success && items.length === 0">
-        {{translate('systems.timers.empty')}}
+      <b-alert
+        v-else-if="state.loading === $state.success && items.length === 0"
+        show
+      >
+        {{ translate('systems.timers.empty') }}
       </b-alert>
-      <b-table v-else :fields="fields" :items="filtered" hover small style="cursor: pointer;" @row-clicked="linkTo($event)">
-        <template v-slot:cell(responses)="data">
+      <b-table
+        v-else
+        :fields="fields"
+        :items="filtered"
+        hover
+        small
+        style="cursor: pointer;"
+        @row-clicked="linkTo($event)"
+      >
+        <template #cell(responses)="data">
           <div><span class="font-weight-bold text-primary font-bigger">{{ data.item.messages.length }}</span></div>
         </template>
-        <template v-slot:cell(buttons)="data">
+        <template #cell(buttons)="data">
           <div class="text-right">
-            <button-with-icon :class="[ data.item.isEnabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.isEnabled = !data.item.isEnabled; update(data.item)">
+            <button-with-icon
+              :class="[ data.item.isEnabled ? 'btn-success' : 'btn-danger' ]"
+              class="btn-only-icon btn-reverse"
+              icon="power-off"
+              @click="data.item.isEnabled = !data.item.isEnabled; update(data.item)"
+            >
               {{ translate('dialog.buttons.' + (data.item.isEnabled? 'enabled' : 'disabled')) }}
             </button-with-icon>
-            <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/timers/edit/' + data.item.id">
+            <button-with-icon
+              class="btn-only-icon btn-primary btn-reverse"
+              icon="edit"
+              :href="'#/manage/timers/edit/' + data.item.id"
+            >
               {{ translate('dialog.buttons.edit') }}
             </button-with-icon>
 
-            <button-with-icon class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="del(data.item)">
+            <button-with-icon
+              class="btn-only-icon btn-danger btn-reverse"
+              icon="trash"
+              @click="del(data.item)"
+            >
               {{ translate('dialog.buttons.delete') }}
             </button-with-icon>
           </div>
@@ -123,6 +194,7 @@ export default defineComponent({
       {
         key: 'name', label: translate('timers.dialog.name'), sortable: true,
       },
+      { key: 'tickOffline', label: translate('timers.dialog.tickOffline') },
       // virtual attributes
       {
         key: 'triggerEveryMessage', label: translate('messages'), sortable: true, tdClass: 'font-weight-bold text-primary font-bigger',
@@ -161,7 +233,7 @@ export default defineComponent({
 
     const newItem = () => {
       ctx.root.$router.push({ name: 'TimersManagerEdit', params: { id: uuid() } }).catch(() => {
-        return; 
+        return;
       });
     };
     const isSidebarVisibleChange = (isVisible: boolean, ev: any) => {
@@ -182,7 +254,7 @@ export default defineComponent({
         }
         isSidebarVisible.value = isVisible;
         ctx.root.$router.push({ name: 'TimersManagerList' }).catch(() => {
-          return; 
+          return;
         });
       } else {
         state.value.save = ButtonStates.idle;
