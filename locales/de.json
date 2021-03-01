@@ -86,6 +86,7 @@
       "dialog": {
         "timer": "Timer",
         "name": "Name",
+        "tickOffline": "Should tick if stream offline",
         "interval": "Intervall",
         "responses": "Rückmeldungen",
         "messages": "Alle X Nachrichten auslösen",
@@ -1133,6 +1134,7 @@
     "response-must-be-defined": "$sender, Timer Antwort muss definiert werden.",
     "cannot-set-messages-and-seconds-0": "$sender, Sie können nicht beide Nachrichten und Sekunden auf 0 setzen.",
     "timer-was-set": "$sender, der Timer $name wurde mit der Nachricht $messages und $seconds Sekunden gesetzt, um ihn auszulösen",
+    "timer-was-set-with-offline-flag": "$sender, timer $name was set with $messages messages and $seconds seconds to trigger even when stream is offline",
     "timer-not-found": "$sender, Timer (Name: $name) wurde in der Datenbank nicht gefunden. Überprüfe Timer mit der !timers list",
     "timer-deleted": "$sender, Timer $name und seine Antworten wurden gelöscht.",
     "timer-enabled": "$sender, timer (name: $name) wurde aktiviert",
