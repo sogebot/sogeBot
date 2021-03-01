@@ -55,8 +55,8 @@ async function runMigration() {
     console.log(chalk.green('✓ TYPEORM_CONNECTION check OK.'));
     fs.writeFileSync(logFile, '✓ TYPEORM_CONNECTION check OK.' + os.EOL + os.EOL, { flag: 'a' });
   } catch (e) {
-    console.error(chalk.red(`✕ Incompatible TYPEORM_CONNECTION=${e.message} found. Available options: ${repo.join(', ')}`));
-    fs.writeFileSync(logFile, `✕ Incompatible TYPEORM_CONNECTION=${e.message} found. Available options: ${repo.join(', ')}` + os.EOL + os.EOL, { flag: 'a' });
+    console.error(chalk.red(`✕ Incompatible TYPEORM_CONNECTION=${e.message} found. Available options: ${repo.join(', ')} \n[!] Lookup the Documentation about Configuration Database`));
+    fs.writeFileSync(logFile, `✕ Incompatible TYPEORM_CONNECTION=${e.message} found. Available options: ${repo.join(', ')} \n[!] Lookup the Documentation about Configuration Database` + os.EOL + os.EOL, { flag: 'a' });
     console.error('\n!!! TYPEORM_CONNECTION version check FAILED, please check your logs/migration.log for additional information !!! \n');
     process.exit(1);
   }
