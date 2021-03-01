@@ -460,11 +460,11 @@ class Points extends System {
         switch(type) {
           case 'postgres':
           case 'better-sqlite3':
-            return `SELECT COUNT(*) as "order" FROM "user" WHERE "points" > (SELECT "points" FROM "user" WHERE "userId"=${user?.userId}) AND "username"!='${oauth.broadcasterUsername}'`;
+            return `SELECT COUNT(*) as "order" FROM "user" WHERE "points" > (SELECT "points" FROM "user" WHERE "userId"='${user?.userId}') AND "username"!='${oauth.broadcasterUsername}'`;
           case 'mysql':
           case 'mariadb':
           default:
-            return `SELECT COUNT(*) as \`order\` FROM \`user\` WHERE \`points\` > (SELECT \`points\` FROM \`user\` WHERE \`userId\`=${user?.userId}) AND "username"!='${oauth.broadcasterUsername}'`;
+            return `SELECT COUNT(*) as \`order\` FROM \`user\` WHERE \`points\` > (SELECT \`points\` FROM \`user\` WHERE \`userId\`='${user?.userId}') AND "username"!='${oauth.broadcasterUsername}'`;
         }
       };
 
