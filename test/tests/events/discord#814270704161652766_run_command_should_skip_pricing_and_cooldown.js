@@ -47,7 +47,7 @@ describe('Events - event run command should be able to skip pricing and cooldown
     assert.strictEqual(r[0].response, '$sender, global cooldown for !test was set to 20s');
   });
 
-  for (const follower of [user.viewer/*, user.viewer2, user.viewer3*/]) {
+  for (const follower of [user.viewer, user.viewer2, user.viewer3]) {
     it ('reset message', async () => {
       await message.prepare();
     });
@@ -64,7 +64,7 @@ describe('Events - event run command should be able to skip pricing and cooldown
     });
 
     it('command should be triggered', async () => {
-      await message.isSentRaw(`Usage: !commercial [duration] [optional-message]`, user.owner);
+      await message.isSentRaw(`Usage: !commercial [duration] [optional-message]`, follower);
     });
   }
 });

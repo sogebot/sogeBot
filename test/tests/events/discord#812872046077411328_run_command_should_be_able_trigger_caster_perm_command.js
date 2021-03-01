@@ -64,8 +64,8 @@ describe('Events - event run command should be able to run caster command - http
     });
 
     it('commands should be triggered', async () => {
-      await message.isSentRaw(`Usage: !test [duration] [optional-message]`, user.owner);
-      await message.isSentRaw(`Usage => http://sogehige.github.io/sogeBot/#/_master/systems/custom-commands`, user.owner);
+      await message.isSentRaw(`Usage: !test [duration] [optional-message]`, follower);
+      await message.isSentRaw(`Usage => http://sogehige.github.io/sogeBot/#/_master/systems/custom-commands`, follower);
     });
 
     it('wait 5s', async () => {
