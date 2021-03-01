@@ -28,6 +28,7 @@ const { SongRequest } = require('../../dest/database/entity/song');
 const { EventList } = require('../../dest/database/entity/eventList');
 const { HeistUser } = require('../../dest/database/entity/heist')
 
+const { invalidateParserCache } = require('../../dest/helpers/cache');
 const translation = (require('../../dest/translate')).default;
 
 let initialCleanup = true;
@@ -95,6 +96,7 @@ module.exports = {
       oauth.broadcasterId = '54321';
       tmi.ignorelist = [];
 
+      invalidateParserCache();
       resolve();
     };
     return new Promise((resolve, reject) => {

@@ -57,7 +57,7 @@ jobs:
       run: npm run test:migration
     - name: Run mocha
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
-      run: DEBUG=parser.command,permissions.check npm test
+      run: npm test
     - uses: codecov/codecov-action@v1
       if: "!contains(steps.log.outputs.MESSAGE, '[skip-tests]')"
       with:
