@@ -63,7 +63,8 @@ async function runMigration() {
 
   console.log('\n... Migration in progress, please wait (see logs/migration.log for progress and error) ...');
   exec('npx typeorm migration:run', {
-    env: {
+    maxBuffer: Number.MAX_SAFE_INTEGER,
+    env:       {
       ...process.env,
       'TYPEORM_ENTITIES':   'dest/database/entity/*.js',
       'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
