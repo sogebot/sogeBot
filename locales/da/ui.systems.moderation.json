@@ -1,0 +1,41 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "cListsEnabled": "Enforce the rule",
+    "cLinksEnabled": "Enforce the rule",
+    "cSymbolsEnabled": "Enforce the rule",
+    "cLongMessageEnabled": "Enforce the rule",
+    "cCapsEnabled": "Enforce the rule",
+    "cSpamEnabled": "Enforce the rule",
+    "cColorEnabled": "Enforce the rule",
+    "cEmotesEnabled": "Enforce the rule",
+    "cListsWhitelist": {
+      "title": "Allowed words",
+      "help": "To allow domains use \"domain:prtzl.io\""
+    },
+    "cListsBlacklist": "Forbidden words",
+    "cListsTimeout": "Timeout duration",
+    "cLinksTimeout": "Timeout duration",
+    "cSymbolsTimeout": "Timeout duration",
+    "cLongMessageTimeout": "Timeout duration",
+    "cCapsTimeout": "Timeout duration",
+    "cSpamTimeout": "Timeout duration",
+    "cColorTimeout": "Timeout duration",
+    "cEmotesTimeout": "Timeout duration",
+    "cWarningsShouldClearChat": "Should clear chat (will timeout for 1s)",
+    "cLinksIncludeSpaces": "Include spaces",
+    "cLinksIncludeClips": "Include clips",
+    "cSymbolsTriggerLength": "Trigger length of message",
+    "cLongMessageTriggerLength": "Trigger length of message",
+    "cCapsTriggerLength": "Trigger length of message",
+    "cSpamTriggerLength": "Trigger length of message",
+    "cSymbolsMaxSymbolsConsecutively": "Max symbols consecutively",
+    "cSymbolsMaxSymbolsPercent": "Max symbols %",
+    "cCapsMaxCapsPercent": "Max caps %",
+    "cSpamMaxLength": "Max length",
+    "cEmotesMaxCount": "Max count",
+    "cWarningsAnnounceTimeouts": "Announce timeouts in chat for everyone",
+    "cWarningsAllowedCount": "Warning count",
+    "cEmotesEmojisAreEmotes": "Treat Emojis as Emotes"
+  }
+}

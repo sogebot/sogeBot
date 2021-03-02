@@ -1,0 +1,86 @@
+{
+  "addGoalGroup": "Add Goal Group",
+  "addGoal": "Add Goal",
+  "newGoal": "new Goal",
+  "newGoalGroup": "new Goal Group",
+  "goals": "Goals",
+  "general": "General",
+  "display": "Display",
+  "fontSettings": "Font Settings",
+  "barSettings": "Bar Settings",
+  "selectGoalOnLeftSide": "Select or add goal on left side",
+  "input": {
+    "description": {
+      "title": "Description"
+    },
+    "goalAmount": {
+      "title": "Goal Amount"
+    },
+    "countBitsAsTips": {
+      "title": "Count Bits as Tips"
+    },
+    "currentAmount": {
+      "title": "Current Amount"
+    },
+    "endAfter": {
+      "title": "End After"
+    },
+    "endAfterIgnore": {
+      "title": "Goal will not expire"
+    },
+    "borderPx": {
+      "title": "Border",
+      "help": "Border size is in pixels"
+    },
+    "barHeight": {
+      "title": "Bar Height",
+      "help": "Bar height is in pixels"
+    },
+    "color": {
+      "title": "Color"
+    },
+    "borderColor": {
+      "title": "Border Color"
+    },
+    "backgroundColor": {
+      "title": "Background Color"
+    },
+    "type": {
+      "title": "Type"
+    },
+    "nameGroup": {
+      "title": "Name of this goal group",
+      "placeholder": "Set name of this goal group",
+      "help": "If kept empty, name will be randomly generated"
+    },
+    "name": {
+      "title": "Name of this goal",
+      "placeholder": "Set name of this goal"
+    },
+    "displayAs": {
+      "title": "Display as",
+      "help": "Sets how goal group will be shown"
+    },
+    "durationMs": {
+      "title": "Duration",
+      "help": "This value is in milliseconds",
+      "placeholder": "How long goal should be shown"
+    },
+    "animationInMs": {
+      "title": "Animation In duration",
+      "help": "This value is in milliseconds",
+      "placeholder": "Set your animation In duration"
+    },
+    "animationOutMs": {
+      "title": "Animation Out duration",
+      "help": "This value is in milliseconds",
+      "placeholder": "Set your animation Out duration"
+    },
+    "spaceBetweenGoalsInPx": {
+      "title": "Space between goals",
+      "help": "This value is in pixels",
+      "placeholder": "Set your space between goals"
+    }
+  },
+  "groupSettings": "Group Settings"
+}

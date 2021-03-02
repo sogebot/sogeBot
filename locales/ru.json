@@ -86,6 +86,7 @@
       "dialog": {
         "timer": "Таймер",
         "name": "Название",
+        "tickOffline": "Should tick if stream offline",
         "interval": "Интервал",
         "responses": "Ответы",
         "messages": "Срабатывать каждое X сообщение",
@@ -277,6 +278,10 @@
         },
         "numberToIncrement": {
           "label": "Число для увеличения",
+          "placeholder": ""
+        },
+        "value": {
+          "label": "Value",
           "placeholder": ""
         },
         "numberToDecrement": {
@@ -811,6 +816,7 @@
     "create-a-clip": "создать клип",
     "create-a-clip-and-play-replay": "создать клип и воспроизвести как повтор (overlay/alerts)",
     "increment-custom-variable": "увеличенить переменную",
+    "set-custom-variable": "set a custom variable",
     "decrement-custom-variable": "уменьшить переменную",
     "omit": "пропустить",
     "comply": "соблюдать",
@@ -983,6 +989,8 @@
     "price-was-enabled": "$sender, цена для $command включена",
     "price-was-disabled": "$sender, цена для $command отключена",
     "user-have-not-enough-points": "Извините, $sender, но у вас нет $amount $pointsName для использования $command",
+    "user-have-not-enough-points-or-bits": "Sorry, $sender, but you don't have $amount $pointsName or redeem command by $bitsAmount bits to use $command",
+    "user-have-not-enough-bits": "Sorry, $sender, but you need to redeem command by $bitsAmount bits to use $command",
     "list-is-empty": "$sender, список цен пуст",
     "list-is-not-empty": "$sender, список цен: $list"
   },
@@ -1128,6 +1136,7 @@
     "response-must-be-defined": "$sender, ответ таймера должен быть определен.",
     "cannot-set-messages-and-seconds-0": "$sender, вы не можете установить сообщения и секунды в 0.",
     "timer-was-set": "$sender, таймер $name был установлен с $messages сообщениями и $seconds секунд для срабатывания",
+    "timer-was-set-with-offline-flag": "$sender, timer $name was set with $messages messages and $seconds seconds to trigger even when stream is offline",
     "timer-not-found": "$sender, таймер (имя: $name) не найден в базе данных. Проверьте таймеры с помощью списка !timers list",
     "timer-deleted": "$sender, таймер $name и его ответы были удалены.",
     "timer-enabled": "$sender, таймер (имя: $name) включен",

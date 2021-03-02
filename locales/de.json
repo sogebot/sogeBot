@@ -86,6 +86,7 @@
       "dialog": {
         "timer": "Timer",
         "name": "Name",
+        "tickOffline": "Should tick if stream offline",
         "interval": "Intervall",
         "responses": "Rückmeldungen",
         "messages": "Alle X Nachrichten auslösen",
@@ -277,6 +278,10 @@
         },
         "numberToIncrement": {
           "label": "Zu erhöhende Zahl",
+          "placeholder": ""
+        },
+        "value": {
+          "label": "Value",
           "placeholder": ""
         },
         "numberToDecrement": {
@@ -811,6 +816,7 @@
     "create-a-clip": "Clip erstellen",
     "create-a-clip-and-play-replay": "einen Clip erstellen und als Wiedergabe abspielen (Overlay/Alers)",
     "increment-custom-variable": "Erhöhen Sie eine benutzerdefinierte Variable",
+    "set-custom-variable": "set a custom variable",
     "decrement-custom-variable": "Verringern Sie eine benutzerdefinierte Variable",
     "omit": "weglassen",
     "comply": "erfüllen",
@@ -983,6 +989,8 @@
     "price-was-enabled": "$sender, Preis für $command wurde aktiviert",
     "price-was-disabled": "$sender, der Preis für $command wurde deaktiviert",
     "user-have-not-enough-points": "Entschuldigung, $sender, aber du hast nicht $amount $pointsName um $command zu benutzen",
+    "user-have-not-enough-points-or-bits": "Sorry, $sender, but you don't have $amount $pointsName or redeem command by $bitsAmount bits to use $command",
+    "user-have-not-enough-bits": "Sorry, $sender, but you need to redeem command by $bitsAmount bits to use $command",
     "list-is-empty": "$sender, Liste der Preise ist leer",
     "list-is-not-empty": "$sender, Liste der Preise: $list"
   },
@@ -1128,6 +1136,7 @@
     "response-must-be-defined": "$sender, Timer Antwort muss definiert werden.",
     "cannot-set-messages-and-seconds-0": "$sender, Sie können nicht beide Nachrichten und Sekunden auf 0 setzen.",
     "timer-was-set": "$sender, der Timer $name wurde mit der Nachricht $messages und $seconds Sekunden gesetzt, um ihn auszulösen",
+    "timer-was-set-with-offline-flag": "$sender, timer $name was set with $messages messages and $seconds seconds to trigger even when stream is offline",
     "timer-not-found": "$sender, Timer (Name: $name) wurde in der Datenbank nicht gefunden. Überprüfe Timer mit der !timers list",
     "timer-deleted": "$sender, Timer $name und seine Antworten wurden gelöscht.",
     "timer-enabled": "$sender, timer (name: $name) wurde aktiviert",

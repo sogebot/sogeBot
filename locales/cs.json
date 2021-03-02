@@ -86,6 +86,7 @@
       "dialog": {
         "timer": "Časovač",
         "name": "Název",
+        "tickOffline": "Should tick if stream offline",
         "interval": "Interval",
         "responses": "Odpovědi",
         "messages": "Každých x zpráv",
@@ -277,6 +278,10 @@
         },
         "numberToIncrement": {
           "label": "Kolik přičíst",
+          "placeholder": ""
+        },
+        "value": {
+          "label": "Hodnota",
           "placeholder": ""
         },
         "numberToDecrement": {
@@ -811,6 +816,7 @@
     "create-a-clip": "vytvořit klip",
     "create-a-clip-and-play-replay": "vytvořit klip a přehrát (overlay/alerts)",
     "increment-custom-variable": "přičíst do vlastní proměnné",
+    "set-custom-variable": "nastavit vlastní proměnnou",
     "decrement-custom-variable": "odečíst z vlastní proměnné",
     "omit": "vynechat",
     "comply": "dodržovat",
@@ -983,6 +989,8 @@
     "price-was-enabled": "$sender, cena za $command byla zapnuta",
     "price-was-disabled": "$sender, cena za $command byla vypnuta",
     "user-have-not-enough-points": "Omlouváme se, $sender, ale nemáš $amount $pointsName k použití $command",
+    "user-have-not-enough-points-or-bits": "Omlouváme se, $sender, ale nemáš $amount $pointsName nebo $bitsAmount bitů k použití $command",
+    "user-have-not-enough-bits": "Omlouváme se, $sender, ale k použití $command musíte použít $bitsAmount bitů",
     "list-is-empty": "$sender, seznam cen je prázdný",
     "list-is-not-empty": "$sender, seznam cen: $list"
   },
@@ -1128,6 +1136,7 @@
     "response-must-be-defined": "$sender, odpověď časovače musí být definována.",
     "cannot-set-messages-and-seconds-0": "$sender, nemůžete nastavit zprávy i sekundy na 0.",
     "timer-was-set": "$sender, časovač $name byl nastaven na $messages zpráv a $seconds sekund ke spuštění",
+    "timer-was-set-with-offline-flag": "$sender, časovač $name byl nastaven na $messages zpráv a $seconds sekund ke spuštění, i když je stream offline",
     "timer-not-found": "$sender, časovač (název: $name) nebyl nalezen v databázi. Pro seznam časovačů -> !timers list",
     "timer-deleted": "$sender, časovač $name a jeho odpovědi byly odstraněny.",
     "timer-enabled": "$sender, časovač (název: $name) byl povolen",

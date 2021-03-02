@@ -1,0 +1,14 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "minimalBet": "Minimal bet",
+    "chanceToWin": {
+      "title": "Chance to win",
+      "help": "Percent"
+    },
+    "enableJackpot": "Enable jackpot",
+    "chanceToTriggerJackpot": "Chance to trigger jackpot in %",
+    "maxJackpotValue": "Maximum value of jackpot",
+    "lostPointsAddedToJackpot": "How many lost points should be added to jackpot in %"
+  }
+}
