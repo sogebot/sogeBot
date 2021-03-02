@@ -3,7 +3,7 @@ export function getUserSender(userId: string, username: string): Readonly<Comman
     isModerator:    true,
     username:       username,
     displayName:    username,
-    userId:         username,
+    userId:         userId,
     emotes:         [],
     badges:         { admin: false },
     'message-type': 'chat',

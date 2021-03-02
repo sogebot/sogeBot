@@ -1,6 +1,7 @@
 const { getRepository } = require('typeorm');
 
 const { User } = require('../../dest/database/entity/user');
+const { generalOwners } = require('../../dest/helpers/oauth/generalOwners');
 
 const viewer = {
   userId:   '1',
@@ -81,6 +82,7 @@ module.exports = {
     await getRepository(User).save(mod);
     // set owner as broadcaster
     oauth.broadcasterUsername = owner.username;
+    generalOwners.value = [owner.username];
   },
   viewer,
   viewer2,

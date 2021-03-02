@@ -504,6 +504,10 @@ describe('Permissions - check()', () => {
       });
       invalidateParserCache();
     });
+    after(async () => {
+      await getRepository(PermissionCommands).clear();
+      invalidateParserCache();
+    });
     for (let j = 0; j < users.length; j++) {
       it (`--- ${users[j].username} should NOT trigger disabled command !me`, async () => {
         const parse = new Parser({ sender: users[j], message: '!me', skip: false, quiet: false });
