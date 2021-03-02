@@ -989,6 +989,8 @@
     "price-was-enabled": "$sender, Preis für $command wurde aktiviert",
     "price-was-disabled": "$sender, der Preis für $command wurde deaktiviert",
     "user-have-not-enough-points": "Entschuldigung, $sender, aber du hast nicht $amount $pointsName um $command zu benutzen",
+    "user-have-not-enough-points-or-bits": "Sorry, $sender, but you don't have $amount $pointsName or redeem command by $bitsAmount bits to use $command",
+    "user-have-not-enough-bits": "Sorry, $sender, but you need to redeem command by $bitsAmount bits to use $command",
     "list-is-empty": "$sender, Liste der Preise ist leer",
     "list-is-not-empty": "$sender, Liste der Preise: $list"
   },
