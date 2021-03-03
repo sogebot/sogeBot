@@ -21,10 +21,12 @@ try {
       console.log(chalk.green(`✓ created folder for logfiles`));
     } catch (error) {
       console.error(`✕ No read or write permission in ${logDir}\n${err}`);
+      process.exit(1);
     }
   }
 } catch (err) {
   console.error(`✕ No read or write permission in bot root folder\ncheck your file permissions\n${err}`);
+  process.exit(1);
 }
 
 const logFile = './logs/migration.log';
