@@ -18,7 +18,7 @@ try {
   if (!fs.existsSync(logDir)) {
     try {
       fs.mkdirSync(logDir);
-      console.log(chalk.green(`✓ creatd folder for logfiles`));
+      console.log(chalk.green(`✓ created folder for logfiles`));
     } catch (error) {
       console.error(`✕ No read or write permission in ${logDir}\n${err}`);
     }
