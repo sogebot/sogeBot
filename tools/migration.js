@@ -12,8 +12,19 @@ const getMigrationType = require('../dest/helpers/getMigrationType').getMigratio
 
 const logDir = './logs';
 
-if (!fs.existsSync(logDir)) {
-  fs.mkdirSync(logDir);
+try {
+  fs.accessSync('./', fs.constants.R_OK | fs.constants.W_OK);
+  console.log(chalk.green(`✓ Read/Write permissions check`));
+  if (!fs.existsSync(logDir)) {
+    try {
+      fs.mkdirSync(logDir);
+      console.log(chalk.green(`✓ creatd folder for logfiles`));
+    } catch (error) {
+      console.error(`✕ No read or write permission in ${logDir}\n${err}`);
+    }
+  }
+} catch (err) {
+  console.error(`✕ No read or write permission in bot root folder\ncheck your file permissions\n${err}`);
 }
 
 const logFile = './logs/migration.log';
