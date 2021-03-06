@@ -1,16 +1,17 @@
 import _ from 'lodash';
-import { getRepository } from 'typeorm';
+import { getRepository, MoreThanOrEqual } from 'typeorm';
 
 import api from '../api';
 import currency from '../currency';
 import { EventList, EventListInterface } from '../database/entity/eventList';
 import { settings, ui } from '../decorators';
 import {
-  isStreamOnline, stats, streamStatusChangeSince, 
+  isStreamOnline, stats, streamStatusChangeSince,
 } from '../helpers/api';
-import { mainCurrency, symbol } from '../helpers/currency';
+import { mainCurrency } from '../helpers/currency';
 import { publicEndpoint } from '../helpers/socket';
 import oauth from '../oauth';
+import users from '../users';
 import Overlay from './_interface';
 
 class Credits extends Overlay {
@@ -20,8 +21,6 @@ class Credits extends Overlay {
     values: ['very slow', 'slow', 'medium', 'fast', 'very fast'],
   })
   cCreditsSpeed: 'very slow' | 'slow' | 'medium' | 'fast' | 'very fast' = 'medium';
-  @settings('credits')
-  cCreditsAggregated = false;
 
   @settings('show')
   cShowFollowers = true;
@@ -82,19 +81,19 @@ class Credits extends Overlay {
   cClipsPeriod: 'stream' | 'custom' = 'custom';
   @settings('customization')
   @ui({
-    type: 'number-input', step: '1', min: '0', 
+    type: 'number-input', step: '1', min: '0',
   })
   cClipsCustomPeriodInDays = 31;
   @settings('customization')
   @ui({
-    type: 'number-input', step: '1', min: '0', 
+    type: 'number-input', step: '1', min: '0',
   })
   cClipsNumOfClips = 3;
   @settings('customization')
   cClipsShouldPlay = true;
   @settings('customization')
   @ui({
-    type: 'number-input', step: '1', min: '0', max: '100', 
+    type: 'number-input', step: '1', min: '0', max: '100',
   })
   cClipsVolume = 20;
 
@@ -102,22 +101,26 @@ class Credits extends Overlay {
     publicEndpoint(this.nsp, 'load', async (cb) => {
       const when = isStreamOnline.value ? streamStatusChangeSince.value : Date.now() - 50000000000;
       const timestamp = new Date(when).getTime();
-      const events: (EventListInterface & { values?: {
+      const events: (EventListInterface & { username?: string, values?: {
         currency: currency; amount: number;
       };})[] = await getRepository(EventList).find({
         order: { timestamp: 'DESC' },
-        where: { timestamp },
+        where: { timestamp: MoreThanOrEqual(timestamp) },
       });
+
+      // we need to map usernames
+      const mapping = await users.getUsernamesFromIds(events.map(o => o.userId));
+      for (const event of events) {
+        event.username = mapping.get(event.userId) ?? 'n/a';
+      }
 
       // change tips if neccessary for aggregated events (need same currency)
       for (const event of events) {
         event.values = JSON.parse(event.values_json);
         if (event.values) {
           if (!_.isNil(event.values.amount) && !_.isNil(event.values.currency)) {
-            event.values.amount = this.cCreditsAggregated
-              ? currency.exchange(event.values.amount, event.values.currency, mainCurrency.value)
-              : event.values.amount;
-            event.values.currency = symbol(this.cCreditsAggregated ? mainCurrency.value : event.values.currency);
+            event.values.amount = currency.exchange(event.values.amount, event.values.currency, mainCurrency.value);
+            event.values.currency = mainCurrency.value;
           }
         }
       }
@@ -160,7 +163,7 @@ class Credits extends Overlay {
         game:     stats.value.currentGame,
         title:    stats.value.currentTitle,
         clips:    this.cShowClips ? await api.getTopClips({
-          period: this.cClipsPeriod, days: this.cClipsCustomPeriodInDays, first: this.cClipsNumOfClips, 
+          period: this.cClipsPeriod, days: this.cClipsCustomPeriodInDays, first: this.cClipsNumOfClips,
         }) : [],
         events,
         customTexts: this.cCustomTextsValues,

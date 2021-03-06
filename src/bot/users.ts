@@ -173,25 +173,22 @@ class Users extends Core {
     }
   }
 
-  async getUsernamesFromIds (IdsList: string[]): Promise<{ id: string; username: string }[]> {
-    const uniqueWithUsername = await Promise.all(
+  async getUsernamesFromIds (IdsList: string[]) {
+    const uniqueWithUsername = (await Promise.all(
       [...new Set(IdsList)]
         .map(async (id) => {
           const user = await getRepository(User).findOne({ userId: id });
           if (user) {
-            return { id: id, username: user.username };
+            return { [id]: user.username };
           }
-          return null;
+          return { [id]: 'n/a' };
         }),
-    );
-    return uniqueWithUsername.reduce(async (prev: any, cur) => {
-      const value = await cur;
-      if (value) {
-        return { ...prev, [value.id]: value.username };
-      } else {
-        return prev;
-      }
+    )).reduce((prev, cur) => {
+      const entries = Object.entries(cur)[0];
+      return { ...prev, [entries[0]]: entries[1] };
     }, {});
+
+    return new Map<string, string>(Object.entries(uniqueWithUsername));
   }
 
   async getNameById (userId: string): Promise<string> {

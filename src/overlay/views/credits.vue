@@ -1,6 +1,9 @@
 <template>
-<div>
-  <pre class="debug" v-if="urlParam('debug')">
+  <div>
+    <pre
+      v-if="urlParam('debug')"
+      class="debug"
+    >
 settings: {{ settings }}
 currentPage: {{ currentPage }}
 clipsPages: {{ clipsPages }}
@@ -9,20 +12,50 @@ isPlaying: {{ isPlaying }}
 isEnded: {{ isEnded }}
 current: {{ current }}
   </pre>
-  <div ref="page" class="page">
-    <template v-for="el of current">
-      <video class="video" v-if="el.type === 'video'" playsinline ref="video" :key="el.index">
-        <source :src="el.clip" type="video/mp4">
-      </video>
-      <div v-else-if="el.type ==='with-icon'" :key="el.index" class="text4" style="text-align: left; padding-left:5vw; padding-top: 0;">
-        <font-awesome-icon :icon="['fab', el.class]" fixed-width />
-        {{el.text}}
-      </div>
-      <img v-else-if="el.type === 'image'" :src="el.image" :class="el.class" :key="el.index" />
-      <div v-else :class="el.class" :key="el.index" v-html="el.text"></div>
-    </template>
+    <div
+      ref="page"
+      class="page"
+    >
+      <template v-for="el of current">
+        <video
+          v-if="el.type === 'video'"
+          ref="video"
+          :key="el.index"
+          class="video"
+          playsinline
+        >
+          <source
+            :src="el.clip"
+            type="video/mp4"
+          >
+        </video>
+        <div
+          v-else-if="el.type ==='with-icon'"
+          :key="el.index"
+          class="text4"
+          style="text-align: left; padding-left:5vw; padding-top: 0;"
+        >
+          <font-awesome-icon
+            :icon="['fab', el.class]"
+            fixed-width
+          />
+          {{ el.text }}
+        </div>
+        <img
+          v-else-if="el.type === 'image'"
+          :key="el.index"
+          :src="el.image"
+          :class="el.class"
+        >
+        <div
+          v-else
+          :key="el.index"
+          :class="el.class"
+          v-html="el.text"
+        />
+      </template>
+    </div>
   </div>
-</div>
 </template>
 
 <script lang="ts">
@@ -54,7 +87,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import gsap from 'gsap';
 import { groupBy } from 'lodash-es';
 import {
-  Component, Vue, Watch, 
+  Component, Vue, Watch,
 } from 'vue-property-decorator';
 
 import { getSocket } from 'src/panel/helpers/socket';
@@ -167,13 +200,13 @@ export default class CreditsOverlay extends Vue {
         for (const [username, o] of groupByUsername) {
           let html = username;
           if (key === 'cheer') {
-            html = `<strong style="font-size:65%">${o.reduce((a, b) => ({ bits: Number(a.bits) + Number(b.values.bits) })).bits} bits</strong> <br> ${username}`;
+            html = `<strong style="font-size:65%">${o.reduce((a, b) => a + Number(b.values.bits), 0)} bits</strong> <br> ${username}`;
           } else if (['raid', 'host'].includes(key)) {
-            html = `<strong style="font-size:65%">${o.reduce((a, b) => ({ viewers: Number(a.viewers) + Number(b.values.viewers) })).viewers} viewers</strong> <br> ${username}`;
+            html = `<strong style="font-size:65%">${o.reduce((a, b) => a + Number(b.values.viewers), 0)} viewers</strong> <br> ${username}`;
           } else if (['resub'].includes(key)) {
             html = `<strong style="font-size:65%">${o[0].values.subCumulativeMonths} months</strong> <br> ${username}`;
           } else if (['tip'].includes(key)) {
-            html = `<strong style="font-size:65%">${Intl.NumberFormat(this.$store.state.configuration.lang, { style: 'currency', currency: o[0].currency }).format(Number(o.reduce((a, b) => ({ amount: Number(a.amount) + Number(b.values.amount) })).amount))}</strong> <br> ${username}`;
+            html = `<strong style="font-size:65%">${Intl.NumberFormat(this.$store.state.configuration.lang, { style: 'currency', currency: o[0].values.currency }).format(Number(o.reduce((a, b) => a + Number(b.values.amount), 0)))}</strong> <br> ${username}`;
           }
           page.push({
             text:  html,
