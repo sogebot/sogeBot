@@ -1,11 +1,11 @@
 {
   "core": {
     "loaded": "is loaded and",
-    "enabled": "enabled",
-    "disabled": "disabled",
-    "usage": "Usage",
-    "lang-selected": "Bot language is currently set to english",
-    "refresh-panel": "You will need to refresh UI to see changes.",
+    "enabled": "slået til",
+    "disabled": "slået fra",
+    "usage": "Anvendelse",
+    "lang-selected": "Bot sprog er i øjeblikket sat til engelsk",
+    "refresh-panel": "Du er nødsaget til at opdatere brugergrænsefladen for at se ændringer.",
     "command-parse": "Sorry, $sender, but this command is not correct, use",
     "error": "Sorry, $sender, but something went wrong!",
     "no-response": "",
@@ -15,14 +15,14 @@
     },
     "api": {
       "error": "$sender, API is not responding correctly!",
-      "not-available": "not available"
+      "not-available": "ikke tilgængelig"
     },
     "percentage": {
       "true": "",
       "false": ""
     },
-    "years": "year|years",
-    "months": "month|months",
+    "years": "år|år",
+    "months": "måned|måneder",
     "days": "dag|dage",
     "hours": "time|timer",
     "minutes": "minut|minutter",
@@ -39,35 +39,35 @@
     "offline": "Stream is currently offline for (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
   },
   "webpanel": {
-    "this-system-is-disabled": "This system is disabled",
-    "loading": "Loading",
+    "this-system-is-disabled": "Dette system er deaktiveret",
+    "loading": "Indlæser",
     "this-may-take-a-while": "This <strong>may</strong> take a while",
-    "display-as": "Display as",
-    "go-to-admin": "Go to Admin",
-    "go-to-public": "Go to Public",
-    "logout": "Logout",
+    "display-as": "Vis som",
+    "go-to-admin": "Gå til Administrator",
+    "go-to-public": "Gå til Offentlig",
+    "logout": "Log ud",
     "popout": "Popout",
-    "not-logged-in": "Not logged in",
+    "not-logged-in": "Ikke logget ind",
     "remove-widget": "Remove <strong>$name</strong> widget",
-    "join-channel": "Join bot to channel",
-    "leave-channel": "Leave bot from channel",
-    "set-default": "Set default",
-    "add": "Add",
+    "join-channel": "Tilslut bot til kanal",
+    "leave-channel": "Fjern bot fra kanal",
+    "set-default": "Angiv som standard",
+    "add": "Tilføj",
     "placeholders": {
-      "text-url-generator": "Paste your text or html to generate base64 below and URL above",
-      "text-decode-base64": "Paste your base64 to generate URL and text above",
+      "text-url-generator": "Indsæt din tekst eller html for at generere base64 nedenfor og URL ovenfor",
+      "text-decode-base64": "Indsæt din base64 for at generere URL og tekst ovenfor",
       "creditsSpeed": "Set speed of credits rolling, lower = faster"
     },
     "custom-variables": {
       "set-your-variables-to-watch-here": "Set your variables to watch here",
       "type": "type",
-      "unwatch": "Unwatch",
-      "watch": "Watch",
+      "unwatch": "Stop overvågning",
+      "watch": "Overvåg",
       "options": "options",
       "number": "number",
-      "text": "text",
-      "options-placeholder": "option1, option2, option3, here is option 4",
-      "no-options-set": "You didn't set your options yet"
+      "text": "tekst",
+      "options-placeholder": "valgmulighed1, valgmulighed, 2, valgmulighed, 3, her er mulighed 4",
+      "no-options-set": "Du har endnu ikke angivet dine valgmuligheder"
     },
     "timers": {
       "title": "Timers",
@@ -110,18 +110,18 @@
         "save-changes": "Save changes",
         "disable": "Disable",
         "enable": "Enable",
-        "edit": "Edit",
-        "delete": "Delete",
-        "yes": "Yes",
-        "no": "No"
+        "edit": "Rediger",
+        "delete": "Slet",
+        "yes": "Ja",
+        "no": "Nej"
       },
       "popovers": {
         "are_you_sure_you_want_to_delete_timer": "Are you sure you want to <strong class='text-danger'>delete</strong> timer"
       }
     },
     "events": {
-      "event": "Event",
-      "noEvents": "No events found in database.",
+      "event": "Hændelse",
+      "noEvents": "Ingen hændelser fundet i database.",
       "whatsthis": "what's this?",
       "myRewardIsNotListed": "My reward is not listed!",
       "redeemAndClickRefreshToSeeReward": "If you are missing your created reward in a list, refresh by clicking on refresh icon.",
