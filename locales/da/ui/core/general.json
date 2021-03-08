@@ -5,6 +5,6 @@
       "title": "Hensynsfuld nedlukning hver X time",
       "help": "0 - deaktiveret"
     },
-    "shouldGracefulExitHelp": "Enabling of graceful exit is <strong>recommended</strong> if your bot is running endlessly on server. You should have bot running on pm2 (or similar service) or have it dockerized to ensure automatic bot restart. Bot <strong>won't</strong> gracefully exit when stream is online."
+    "shouldGracefulExitHelp": "Aktivering af hensynsfuld nedlukning anbefales <strong>på det kraftigste</strong> hvis din bot kører konstant på en server. Du skal have din bot til at kører på pm2 (eller lignende service), eller have den som docker for at sikre automatisk genstart. Bot genstarter <strong>IKKE</strong>, hvis stream er online."
   }
 }
