@@ -235,27 +235,27 @@
         },
         "channel": {
           "label": "Kanal",
-          "placeholder": "Channelname or ID"
+          "placeholder": "Kanalnavn eller ID"
         },
         "commandToRun": {
-          "label": "Command To Run",
-          "placeholder": "Set your !commandToRun"
+          "label": "Kommando at kører",
+          "placeholder": "Sæt din !KommandoTilKørsel"
         },
         "isCommandQuiet": {
-          "label": "Should be command quiet",
+          "label": "Bør kommando være stille",
           "true": "Kommando vil være stille",
           "false": "Kommando vil ikke være stille"
         },
         "urlOfSoundFile": {
-          "label": "Url Of Your Sound File",
+          "label": "Url på din lydfil",
           "placeholder": "http://www.pathToYour.url/where/is/file.mp3"
         },
         "emotesToExplode": {
-          "label": "Emotes To Explode",
+          "label": "Emotes At Eksplodere",
           "placeholder": "List of emotes to explode, e.g. Kappa PurpleHeart"
         },
         "emotesToFirework": {
-          "label": "Emotes To Firework",
+          "label": "Emotes Til Fyrværkeri",
           "placeholder": "List of emotes to firework, e.g. Kappa PurpleHeart"
         },
         "announce": {
@@ -348,7 +348,7 @@
         "nextrank": "Next rank",
         "username": "Brugernavn",
         "value": "Værdi",
-        "variable": "Variable",
+        "variable": "Variabel",
         "count": "Antal",
         "link": "Link (translated)",
         "winner": "Vinder",
@@ -380,23 +380,23 @@
         "subStreakName": "localized name of month (1 month, 2 months) for current sub strek",
         "subCumulativeMonths": "Cumulative subscribe months",
         "subCumulativeMonthsName": "localized name of month (1 month, 2 months) for cumulative subscribe months",
-        "message": "Message",
+        "message": "Besked",
         "reason": "Årsag",
-        "target": "Target",
-        "duration": "Duration",
-        "method": "Method",
+        "target": "Destination",
+        "duration": "Varighed",
+        "method": "Metode",
         "tier": "Niveau",
-        "months": "Months",
-        "monthsName": "localized name of month (1 month, 2 months)",
-        "oldGame": "Game before change",
+        "months": "Måneder",
+        "monthsName": "lokalt navn på måneden (1 måned, 2 måneder)",
+        "oldGame": "Spil før ændring",
         "recipientObject": "Full recipient object",
         "recipient": "Modtager",
         "ytSong": "Nuværende sang på YouTube",
-        "spotifySong": "Current song on Spotify",
+        "spotifySong": "Nuværende sang på Spotify",
         "latestFollower": "Seneste Følger",
         "latestSubscriber": "Seneste Subscriber",
-        "latestSubscriberMonths": "Latest Subscriber cumulative months",
-        "latestSubscriberStreak": "Latest Subscriber months streak",
+        "latestSubscriberMonths": "Seneste abonnent samlede måneder",
+        "latestSubscriberStreak": "Seneste abonnent måneder i træk",
         "latestTipAmount": "Seneste Tip (beløb)",
         "latestTipCurrency": "Seneste Tip (valuta)",
         "latestTipMessage": "Seneste Tip (besked)",
@@ -415,53 +415,53 @@
             "message": "Top Tip - during stream (message)"
           }
         },
-        "latestCheerAmount": "Latest Bits (amount)",
-        "latestCheerMessage": "Latest Bits (message)",
-        "latestCheer": "Latest Bits (username)",
+        "latestCheerAmount": "Seneste Bits (beløb)",
+        "latestCheerMessage": "Seneste Bits (besked)",
+        "latestCheer": "Seneste Bits (brugernavn)",
         "version": "Bot version",
-        "haveParam": "Have command parameter? (bool)",
-        "source": "Current source (twitch or discord)",
+        "haveParam": "Har kommando parameter? (bool)",
+        "source": "Nuværende kilde (Twitch eller Discord)",
         "userInput": "User input during reward redeem",
-        "isBotSubscriber": "Is bot subscriber (bool)",
+        "isBotSubscriber": "Er bot sub? (bool)",
         "is": {
-          "moderator": "Is user mod? (bool)",
-          "subscriber": "Is user sub? (bool)",
-          "vip": "Is user vip? (bool)",
-          "follower": "Is user follower? (bool)",
-          "broadcaster": "Is user broadcaster? (bool)",
-          "bot": "Is user bot? (bool)",
-          "owner": "Is user bot owner? (bool)"
+          "moderator": "Er bruger mod? (bool)",
+          "subscriber": "Er bruger sub? (bool)",
+          "vip": "Er bruger VIP? (bool)",
+          "follower": "Er bruger følger? (bool)",
+          "broadcaster": "Er bruger broadcaster? (bool)",
+          "bot": "Er bruger bot? (bool)",
+          "owner": "Er bruger ejer af bot? (bool)"
         },
         "recipientis": {
-          "moderator": "Is recipient mod? (bool)",
-          "subscriber": "Is recipient sub? (bool)",
-          "vip": "Is recipient vip? (bool)",
-          "follower": "Is recipient follower? (bool)",
-          "broadcaster": "Is recipient broadcaster? (bool)",
-          "bot": "Is recipient bot? (bool)",
-          "owner": "Is recipient bot owner? (bool)"
+          "moderator": "Er modtageren mod? (bool)",
+          "subscriber": "Er modtageren sub? (bool)",
+          "vip": "Er modtageren VIP? (bool)",
+          "follower": "Er modtageren følger? (bool)",
+          "broadcaster": "Er modtageren broadcaster? (bool)",
+          "bot": "Er modtageren bot? (bool)",
+          "owner": "Er modtageren ejer af bot? (bool)"
         },
         "tweet": {
           "text": "Tekst til tweet",
-          "username": "Username on Twitter",
-          "displayname": "Screen name on twitter",
-          "url": "Tweet link"
+          "username": "Brugernavn på Twitter",
+          "displayname": "Skærmnavn på Twitter",
+          "url": "Llink til Tweet"
         },
-        "sceneName": "Name of scene"
+        "sceneName": "Navn på scene"
       }
     },
     "page-settings": {
       "systems": {
         "others": {
-          "title": "Others",
-          "currency": "Currency"
+          "title": "Andet",
+          "currency": "Valuta"
         },
         "whispers": {
           "title": "Whispers",
           "toggle": {
-            "listener": "Listen commands on whisper",
-            "settings": "Whispers on settings change",
-            "raffle": "Whispers on raffle join",
+            "listener": "Lyt til kommandoer på Whisper",
+            "settings": "Whispers ved ændring af indstillinger",
+            "raffle": "Whispers på Raffle-tilmelding",
             "permissions": "Whispers on insufficient permissions",
             "cooldowns": "Whispers on cooldown (if set as notify)"
           }
@@ -531,7 +531,7 @@
     "overlays-eventlist-tip": "tip",
     "overlays-eventlist-raid": "raid",
     "requested-by": "Requested by",
-    "description": "Description",
+    "description": "Beskrivelse",
     "raffle-type": "Raffle type",
     "raffle-type-keywords": "Only keyword",
     "raffle-type-tickets": "With tickets",
