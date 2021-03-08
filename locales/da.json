@@ -63,20 +63,20 @@
       "type": "type",
       "unwatch": "Stop overvågning",
       "watch": "Overvåg",
-      "options": "options",
+      "options": "valgmuligheder",
       "number": "number",
       "text": "tekst",
       "options-placeholder": "valgmulighed1, valgmulighed, 2, valgmulighed, 3, her er mulighed 4",
       "no-options-set": "Du har endnu ikke angivet dine valgmuligheder"
     },
     "timers": {
-      "title": "Timers",
+      "title": "Tidsur",
       "timer": "Timer",
-      "messages": "messages",
-      "seconds": "seconds",
+      "messages": "beskeder",
+      "seconds": "sekunder",
       "badges": {
-        "enabled": "Enabled",
-        "disabled": "Disabled"
+        "enabled": "Aktiveret",
+        "disabled": "Deaktiveret"
       },
       "errors": {
         "timer_name_must_be_compliant": "This value can contain only a-zA-Z09_",
@@ -85,15 +85,15 @@
       },
       "dialog": {
         "timer": "Timer",
-        "name": "Name",
+        "name": "Navn",
         "tickOffline": "Should tick if stream offline",
         "interval": "Interval",
-        "responses": "Responses",
-        "messages": "Trigger every X Messages",
-        "seconds": "Trigger every X Seconds",
+        "responses": "Svar",
+        "messages": "Udløs hver X beskeder",
+        "seconds": "Udløs hver X sekunder",
         "title": {
-          "new": "New timer",
-          "edit": "Edit timer"
+          "new": "Ny timer",
+          "edit": "Rediger timer"
         },
         "placeholders": {
           "name": "Set name of your timer, can contain only these characters a-zA-Z0-9_",
@@ -102,14 +102,14 @@
         },
         "alerts": {
           "success": "Timer was <strong>successfully</strong> saved.",
-          "fail": "Something went <strong>wrong</strong>."
+          "fail": "Noget gik <strong>galt</strong>."
         }
       },
       "buttons": {
-        "close": "Close",
-        "save-changes": "Save changes",
-        "disable": "Disable",
-        "enable": "Enable",
+        "close": "Luk",
+        "save-changes": "Gem ændringer",
+        "disable": "Deaktivér",
+        "enable": "Aktivér",
         "edit": "Rediger",
         "delete": "Slet",
         "yes": "Ja",
@@ -122,20 +122,20 @@
     "events": {
       "event": "Hændelse",
       "noEvents": "Ingen hændelser fundet i database.",
-      "whatsthis": "what's this?",
+      "whatsthis": "Hvad er det her?",
       "myRewardIsNotListed": "My reward is not listed!",
       "redeemAndClickRefreshToSeeReward": "If you are missing your created reward in a list, refresh by clicking on refresh icon.",
       "badges": {
         "enabled": "Aktiveret",
-        "disabled": "Disabled"
+        "disabled": "Deaktiveret"
       },
       "buttons": {
         "test": "Test",
-        "enable": "Enable",
-        "disable": "Disable",
-        "edit": "Edit",
-        "delete": "Delete",
-        "yes": "Yes",
+        "enable": "Aktivér",
+        "disable": "Deaktivér",
+        "edit": "Redigér",
+        "delete": "Slet",
+        "yes": "Ja",
         "no": "Nej"
       },
       "popovers": {
@@ -231,10 +231,10 @@
         },
         "messageToSend": {
           "label": "Besked At sende",
-          "placeholder": "Set your message"
+          "placeholder": "Indstil din besked"
         },
         "channel": {
-          "label": "Channel",
+          "label": "Kanal",
           "placeholder": "Channelname or ID"
         },
         "commandToRun": {
@@ -340,14 +340,14 @@
         "messages": "Beskeder",
         "amount": "Antal",
         "amountInBotCurrency": "Valuta i bot",
-        "currency": "Currency",
+        "currency": "Valuta",
         "currencyInBot": "Valuta i bot",
         "pointsName": "Points name",
         "points": "Points",
         "rank": "Rank",
         "nextrank": "Next rank",
         "username": "Brugernavn",
-        "value": "Value",
+        "value": "Værdi",
         "variable": "Variable",
         "count": "Antal",
         "link": "Link (translated)",
@@ -442,7 +442,7 @@
           "owner": "Is recipient bot owner? (bool)"
         },
         "tweet": {
-          "text": "Text of tweet",
+          "text": "Tekst til tweet",
           "username": "Username on Twitter",
           "displayname": "Screen name on twitter",
           "url": "Tweet link"
@@ -474,18 +474,18 @@
         "follows": "Follows",
         "subs": "Subs & Resubs",
         "cheers": "Bits",
-        "responses": "Bot responses",
+        "responses": "Bot svar",
         "whispers": "Whispers",
-        "hosts": "Hosts",
-        "bans": "Bans",
-        "timeouts": "Timeouts"
+        "hosts": "Værter",
+        "bans": "Udelukninger",
+        "timeouts": "Timeout"
       },
       "range": {
-        "day": "a day",
-        "week": "a week",
-        "month": "a month",
-        "year": "an year",
-        "all": "All time"
+        "day": "en dag",
+        "week": "en uge",
+        "month": "en måned",
+        "year": "et år",
+        "all": "Altid"
       },
       "order": {
         "asc": "Ascending",
@@ -502,9 +502,9 @@
       "hide": "Hide stats"
     },
     "translations": "Custom translations",
-    "bot-responses": "Bot responses",
-    "duration": "Duration",
-    "viewers-reset-attributes": "Reset attributes",
+    "bot-responses": "Bot svar",
+    "duration": "Varighed",
+    "viewers-reset-attributes": "Nulstil attributter",
     "viewers-points-of-all-users": "Points of all users",
     "viewers-watchtime-of-all-users": "Watch time of all users",
     "viewers-messages-of-all-users": "Messages of all users",
@@ -514,7 +514,7 @@
     "events-method-used-to-subscribe": "method used to subscribe",
     "events-months-of-subscription": "months of subscription",
     "events-monthsName-of-subscription": "word 'month' by number (1 month, 2 months)",
-    "events-user-message": "user message",
+    "events-user-message": "bruger besked",
     "events-bits-user-sent": "bits user sent",
     "events-reason-for-ban-timeout": "reason for ban/timeout",
     "events-duration-of-timeout": "duration of timeout",
@@ -542,39 +542,39 @@
     "cooldown-quiet-toggle-no": "Notify",
     "cooldown-quiet-toggle-yes": "Won't notify",
     "cooldown-moderators": "Moderators",
-    "cooldown-owners": "Owners",
-    "cooldown-subscribers": "Subscribers",
-    "cooldown-followers": "Followers",
+    "cooldown-owners": "Ejere",
+    "cooldown-subscribers": "Abonnenter",
+    "cooldown-followers": "Følgere",
     "in-seconds": "in seconds",
-    "songs": "Songs",
+    "songs": "Sange",
     "show-usernames-with-at": "Show usernames with @",
     "twitter-send-message": "Tweet",
     "send-message-as-a-bot": "Send message as a bot",
     "chat-as-bot": "Chat (as bot)",
-    "product": "Product",
-    "optional": "optional",
-    "placeholder-search": "Search",
-    "placeholder-enter-product": "Enter product",
-    "placeholder-enter-keyword": "Enter keyword",
-    "credits": "Credits",
-    "fade-out-top": "fade up",
+    "product": "Produkt",
+    "optional": "valgfrit",
+    "placeholder-search": "Søg",
+    "placeholder-enter-product": "Indtast produkt",
+    "placeholder-enter-keyword": "Indtast søgeord",
+    "credits": "Kreditter",
+    "fade-out-top": "fade op",
     "fade-out-zoom": "fade zoom",
     "global": "Global",
-    "user": "User",
-    "alerts": "Alerts",
-    "eventlist": "EventList",
-    "dashboard": "Dashboard",
+    "user": "Bruger",
+    "alerts": "Advarsler",
+    "eventlist": "Begivenhedliste",
+    "dashboard": "Kontrolpanel",
     "carousel": "Image Carousel",
-    "text": "Text",
-    "permissions": "Permissions",
-    "permission": "Permission",
-    "viewers": "Viewers",
-    "systems": "Systems",
+    "text": "Tekst",
+    "permissions": "Tilladelser",
+    "permission": "Tilladelse",
+    "viewers": "Seere",
+    "systems": "Systemer",
     "overlays": "Overlays",
     "gallery": "Media gallery",
     "aliases": "Aliases",
     "alias": "Alias",
-    "command": "Command",
+    "command": "Kommando",
     "cooldowns": "Cooldowns",
     "title-template": "Title template",
     "keyword": "Keyword",
