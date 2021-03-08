@@ -394,13 +394,13 @@
         "ytSong": "Nuværende sang på YouTube",
         "spotifySong": "Current song on Spotify",
         "latestFollower": "Seneste Følger",
-        "latestSubscriber": "Latest Subscriber",
+        "latestSubscriber": "Seneste Subscriber",
         "latestSubscriberMonths": "Latest Subscriber cumulative months",
         "latestSubscriberStreak": "Latest Subscriber months streak",
-        "latestTipAmount": "Latest Tip (amount)",
-        "latestTipCurrency": "Latest Tip (currency)",
-        "latestTipMessage": "Latest Tip (message)",
-        "latestTip": "Latest Tip (username)",
+        "latestTipAmount": "Seneste Tip (beløb)",
+        "latestTipCurrency": "Seneste Tip (valuta)",
+        "latestTipMessage": "Seneste Tip (besked)",
+        "latestTip": "Seneste Tip (brugernavn)",
         "toptip": {
           "overall": {
             "username": "Top Tip - overall (username)",
