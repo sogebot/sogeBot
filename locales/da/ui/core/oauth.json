@@ -1,14 +1,14 @@
 {
   "settings": {
-    "generalChannel": "Channel",
-    "generalOwners": "Owners",
+    "generalChannel": "Kanal",
+    "generalOwners": "Ejere",
     "botAccessToken": "AccessToken",
     "broadcasterAccessToken": "AccessToken",
     "botRefreshToken": "RefreshToken",
     "broadcasterRefreshToken": "RefreshToken",
-    "botUsername": "Username",
-    "broadcasterUsername": "Username",
-    "botExpectedScopes": "Scopes",
-    "broadcasterExpectedScopes": "Scopes"
+    "botUsername": "Brugernavn",
+    "broadcasterUsername": "Brugernavn",
+    "botExpectedScopes": "Områder",
+    "broadcasterExpectedScopes": "Områder"
   }
 }
