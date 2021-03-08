@@ -126,7 +126,7 @@
       "myRewardIsNotListed": "My reward is not listed!",
       "redeemAndClickRefreshToSeeReward": "If you are missing your created reward in a list, refresh by clicking on refresh icon.",
       "badges": {
-        "enabled": "Enabled",
+        "enabled": "Aktiveret",
         "disabled": "Disabled"
       },
       "buttons": {
@@ -136,15 +136,15 @@
         "edit": "Edit",
         "delete": "Delete",
         "yes": "Yes",
-        "no": "No"
+        "no": "Nej"
       },
       "popovers": {
         "are_you_sure_you_want_to_delete_event": "Are you sure you want to <strong class='text-danger'>delete</strong> event",
         "example_of_user_object_data": "Example of user object data"
       },
       "errors": {
-        "command_must_start_with_!": "Command must start with !",
-        "this_value_must_be_a_positive_number_or_0": "This value must be a positive number or 0",
+        "command_must_start_with_!": "Kommando skal starte med !",
+        "this_value_must_be_a_positive_number_or_0": "Denne værdi skal være et positivt tal eller 0",
         "value_cannot_be_empty": "Value cannot be empty"
       },
       "dialog": {
@@ -159,14 +159,14 @@
           "success": "Event was <strong>successfully</strong> saved.",
           "fail": "Something went <strong>wrong</strong>."
         },
-        "close": "Close",
+        "close": "Luk",
         "save-changes": "Save changes",
         "event": "Event",
-        "name": "Name",
+        "name": "Navn",
         "usable-events-variables": "Usable events variables",
-        "settings": "Settings",
+        "settings": "Indstillinger",
         "filters": "Filters",
-        "operations": "Operations"
+        "operations": "Opgaver"
       },
       "definitions": {
         "filter": {
@@ -177,7 +177,7 @@
           "placeholder": "If using overlay, add link or id of your overlay"
         },
         "hashtag": {
-          "label": "Hashtag or Keyword",
+          "label": "Hashtag eller Keyword",
           "placeholder": "#yourHashtagHere or Keyword"
         },
         "fadeOutXCommands": {
@@ -210,11 +210,11 @@
         },
         "resetCountEachMessage": {
           "label": "Reset count each message",
-          "true": "Reset count",
-          "false": "Keep count"
+          "true": "Nulstil tæller",
+          "false": "Behold tælling"
         },
         "viewersAtLeast": {
-          "label": "Viewers At Least",
+          "label": "Seere Er Mindst",
           "placeholder": "How many viewers at least to trigger event"
         },
         "runInterval": {
@@ -230,7 +230,7 @@
           "placeholder": "Trigger event every x minutes"
         },
         "messageToSend": {
-          "label": "Message To Send",
+          "label": "Besked At sende",
           "placeholder": "Set your message"
         },
         "channel": {
@@ -243,8 +243,8 @@
         },
         "isCommandQuiet": {
           "label": "Should be command quiet",
-          "true": "Command will be quiet",
-          "false": "Command won't be quiet"
+          "true": "Kommando vil være stille",
+          "false": "Kommando vil ikke være stille"
         },
         "urlOfSoundFile": {
           "label": "Url Of Your Sound File",
@@ -259,14 +259,14 @@
           "placeholder": "List of emotes to firework, e.g. Kappa PurpleHeart"
         },
         "announce": {
-          "label": "Announce in chat",
-          "true": "Will be announced",
-          "false": "Will not be announced"
+          "label": "Annoncer i chat",
+          "true": "Vil blive annonceret",
+          "false": "Vil ikke blive annonceret"
         },
         "hasDelay": {
           "label": "Clip should have slight delay (to be closer what viewer see)",
-          "true": "Will have delay",
-          "false": "Will not have delay"
+          "true": "Vil have forsinkelse",
+          "false": "Vil ikke have forsinkelse"
         },
         "durationOfCommercial": {
           "label": "Duration Of Commercial",
@@ -274,14 +274,14 @@
         },
         "customVariable": {
           "label": "$_",
-          "placeholder": "Custom variable to update"
+          "placeholder": "Brugerdefineret variabel til opdatering"
         },
         "numberToIncrement": {
           "label": "Number to increment",
           "placeholder": ""
         },
         "value": {
-          "label": "Value",
+          "label": "Værdi",
           "placeholder": ""
         },
         "numberToDecrement": {
@@ -310,69 +310,69 @@
     "responses": {
       "variable": {
         "sender": "User who initiated",
-        "title": "Current title",
-        "game": "Current game",
+        "title": "Nuværende titel",
+        "game": "Nuværende spil",
         "language": "Current stream language",
-        "viewers": "Current viewers count",
-        "views": "Current views count",
-        "hosts": "Current hosts count",
+        "viewers": "Antal aktuelle seere",
+        "views": "Antal aktuelle visninger",
+        "hosts": "Antal hosts",
         "followers": "Current followers count",
-        "subscribers": "Current subscribers count",
+        "subscribers": "Antal nuværende abonnenter",
         "arg": "Argument",
-        "param": "Parameter (required)",
-        "touser": "Username parameter",
-        "!param": "Parameter (not required)",
+        "param": "Parameter (påkrævet)",
+        "touser": "Brugernavns parameter",
+        "!param": "Parameter (ikke påkrævet)",
         "alias": "Alias",
-        "command": "Command",
+        "command": "Kommando",
         "keyword": "Keyword",
-        "response": "Response",
+        "response": "Svar",
         "list": "Populated list",
         "type": "Type",
-        "days": "Days",
-        "hours": "Hours",
+        "days": "Dage",
+        "hours": "Timer",
         "minutesName": "Singular or Plural of word minute",
-        "minutes": "Minutes",
-        "seconds": "Seconds",
-        "description": "Description",
+        "minutes": "Minutter",
+        "seconds": "Sekunder",
+        "description": "Beskrivelse",
         "quiet": "Quiet (bool)",
         "id": "ID",
-        "name": "Name",
-        "messages": "Messages",
-        "amount": "Amount",
-        "amountInBotCurrency": "Amount in bot currency",
+        "name": "Navn",
+        "messages": "Beskeder",
+        "amount": "Antal",
+        "amountInBotCurrency": "Valuta i bot",
         "currency": "Currency",
-        "currencyInBot": "Currency in bot",
+        "currencyInBot": "Valuta i bot",
         "pointsName": "Points name",
         "points": "Points",
         "rank": "Rank",
         "nextrank": "Next rank",
-        "username": "Username",
+        "username": "Brugernavn",
         "value": "Value",
         "variable": "Variable",
-        "count": "Count",
+        "count": "Antal",
         "link": "Link (translated)",
-        "winner": "Winner",
-        "loser": "Loser",
+        "winner": "Vinder",
+        "loser": "Taber",
         "challenger": "Challenger",
         "min": "Minimum",
-        "max": "Maximum",
+        "max": "Maksimum",
         "eligibility": "Eligibility",
         "probability": "Probability",
         "time": "Time",
-        "options": "Options",
+        "options": "Indstillinger",
         "option": "Option",
-        "when": "When",
-        "diff": "Difference",
-        "users": "Users",
+        "when": "Når",
+        "diff": "Forskel",
+        "users": "Brugere",
         "user": "User",
         "bank": "Bank",
         "nextBank": "Next bank",
-        "cooldown": "Cooldown",
-        "tickets": "Tickets",
-        "ticketsName": "Tickets name",
-        "fromUsername": "From username",
-        "toUsername": "To username",
-        "items": "Items",
+        "cooldown": "Nedkøling",
+        "tickets": "Sager",
+        "ticketsName": "Sagens navn",
+        "fromUsername": "Fra brugernavn",
+        "toUsername": "Til brugernavn",
+        "items": "Elementer",
         "bits": "Bits",
         "subgifts": "Subgifts",
         "subStreakShareEnabled": "Is substreak share enabled (true/false)",
@@ -381,19 +381,19 @@
         "subCumulativeMonths": "Cumulative subscribe months",
         "subCumulativeMonthsName": "localized name of month (1 month, 2 months) for cumulative subscribe months",
         "message": "Message",
-        "reason": "Reason",
+        "reason": "Årsag",
         "target": "Target",
         "duration": "Duration",
         "method": "Method",
-        "tier": "Tier",
+        "tier": "Niveau",
         "months": "Months",
         "monthsName": "localized name of month (1 month, 2 months)",
         "oldGame": "Game before change",
         "recipientObject": "Full recipient object",
-        "recipient": "Recipient",
-        "ytSong": "Current song on YouTube",
+        "recipient": "Modtager",
+        "ytSong": "Nuværende sang på YouTube",
         "spotifySong": "Current song on Spotify",
-        "latestFollower": "Latest Follower",
+        "latestFollower": "Seneste Følger",
         "latestSubscriber": "Latest Subscriber",
         "latestSubscriberMonths": "Latest Subscriber cumulative months",
         "latestSubscriberStreak": "Latest Subscriber months streak",
