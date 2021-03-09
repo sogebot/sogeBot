@@ -1,13 +1,13 @@
 {
   "settings": {
-    "theme": "Default theme",
+    "theme": "Standardtema",
     "domain": {
       "title": "Domain",
-      "help": "Format without http/https: yourdomain.com or your.domain.com"
+      "help": "Format uden http/https: ditdomain.dk eller dit.domain.dk"
     },
-    "percentage": "Percentage difference for stats",
-    "shortennumbers": "Short format of numbers",
-    "stickystats": "Stick stats to top",
-    "showdiff": "Show difference"
+    "percentage": "Procentsats forskel i statistik",
+    "shortennumbers": "Kort format for numre",
+    "stickystats": "Sæt stats fast i toppen",
+    "showdiff": "Vis forskel"
   }
 }

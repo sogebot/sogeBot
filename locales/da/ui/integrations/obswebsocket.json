@@ -2,24 +2,24 @@
   "settings": {
     "enabled": "Status",
     "accessBy": {
-      "title": "Access by",
+      "title": "Tilgængelig for",
       "help": "Direct - connect directly from a bot | Overlay - connect via overlay browser source"
     },
-    "address": "Address",
-    "password": "Password"
+    "address": "Adresse",
+    "password": "Adgangskode"
   },
-  "noSourceSelected": "No source selected",
-  "noSceneSelected": "No scene selected",
-  "empty": "No action sets were created yet.",
-  "emptyAfterSearch": "No action sets were found by your search for <strong>\"$search\"</strong>.",
-  "command": "Command",
-  "new": "Create new OBS Websocket action set",
-  "actions": "Actions",
+  "noSourceSelected": "Ingen kilde valgt",
+  "noSceneSelected": "Ingen scene valgt",
+  "empty": "Ingen handlingssæt er blevet oprettet endnu.",
+  "emptyAfterSearch": "Ingen handlingsssæt blev fundet ved din søgning efter <strong>\"$search\"</strong>.",
+  "command": "Kommando",
+  "new": "Opret nyt OBS Websocket handlingssæt",
+  "actions": "Handlinger",
   "name": {
-    "name": "Name"
+    "name": "Navn"
   },
-  "mute": "Mute",
-  "unmute": "Unmute",
+  "mute": "Lyd fra",
+  "unmute": "Lyd til",
   "SetCurrentScene": {
     "name": "SetCurrentScene"
   },
@@ -33,22 +33,22 @@
     "name": "SaveReplayBuffer"
   },
   "WaitMs": {
-    "name": "Wait X miliseconds"
+    "name": "Vent X millisekunder"
   },
   "Log": {
-    "name": "Log message"
+    "name": "Log meddelelser"
   },
   "StartRecording": {
-    "name": "StartRecording"
+    "name": "StartOptagelse"
   },
   "StopRecording": {
-    "name": "StopRecording"
+    "name": "StopOptagelse"
   },
   "PauseRecording": {
-    "name": "PauseRecording"
+    "name": "PauseOptagelse"
   },
   "ResumeRecording": {
-    "name": "ResumeRecording"
+    "name": "FortsætOptagelse"
   },
   "SetMute": {
     "name": "SetMute"

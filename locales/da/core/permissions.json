@@ -1,8 +1,8 @@
 {
-  "list": "List of your permissions:",
-  "excludeAddSuccessful": "$sender, you added $username to exclude list for permission $permissionName",
-  "excludeRmSuccessful": "$sender, you removed $username from exclude list for permission $permissionName",
-  "userNotFound": "$sender, user $username was not found in database.",
-  "permissionNotFound": "$sender, permission $userlevel was not found in database.",
-  "cannotIgnoreForCorePermission": "$sender, you cannot manually exclude user for core permission $userlevel"
+  "list": "Liste over tilladelser:",
+  "excludeAddSuccessful": "$sender, du tilføjede $username til 'udelukke-listen' for tilladelse $permissionName",
+  "excludeRmSuccessful": "$sender, du fjernede $username fra 'udelukke-listen' for tilladelse $permissionName",
+  "userNotFound": "$sender, bruger $username blev ikke fundet i databasen.",
+  "permissionNotFound": "$sender, tilladelse $userlevel blev ikke fundet i databasen.",
+  "cannotIgnoreForCorePermission": "$sender, du kan ikke manuelt udelukke bruger fra kerne-tilladelse $userlevel"
 }

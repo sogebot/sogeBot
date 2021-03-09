@@ -4,8 +4,8 @@
     "formatSeparator": "Format separator",
     "order": "Format",
     "lastSeenFormat": {
-      "title": "Time format",
-      "help": "Possible formats at https://momentjs.com/docs/#/displaying/format/"
+      "title": "Tidsformat",
+      "help": "Mulige formater kan findes på https://momentjs.com/docs/#/displaying/format/"
     }
   }
 }

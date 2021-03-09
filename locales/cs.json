@@ -86,7 +86,7 @@
       "dialog": {
         "timer": "Časovač",
         "name": "Název",
-        "tickOffline": "Should tick if stream offline",
+        "tickOffline": "Bude odpočítávat i při vypnutém streamu",
         "interval": "Interval",
         "responses": "Odpovědi",
         "messages": "Každých x zpráv",
