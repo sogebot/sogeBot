@@ -1,26 +1,26 @@
 {
-  "new": "New Keyword",
-  "empty": "No keywords were created yet.",
-  "emptyAfterSearch": "No keywords were found by your search for <strong>\"$search\"</strong>.",
+  "new": "Nyt Keyword",
+  "empty": "Ingen keywords er blevet oprettet endnu.",
+  "emptyAfterSearch": "Ingen keywords blev fundet ved din søgning efter <strong>\"$search\"</strong>.",
   "keyword": {
     "name": "Keyword / Regular Expression",
-    "placeholder": "Set your keyword or regular expression to trigger keyword.",
-    "help": "You can use regexp (case insensitive) to use keywords, e.g. <strong>hello.*|hi</strong>"
+    "placeholder": "Sæt dit keyword eller regular expression for at aktivere keyword.",
+    "help": "Du kan bruge regexp (ingen forskel på store og små-bogstaver) til keywords, f.eks <strong>hello.*|hi</strong>"
   },
   "response": {
-    "name": "Response",
-    "placeholder": "Set your response here."
+    "name": "Svar",
+    "placeholder": "Sæt dit svar her."
   },
   "error": {
-    "isEmpty": "This value cannot be empty"
+    "isEmpty": "Dette input må ikke være tomt"
   },
-  "no-responses-set": "No responses",
-  "addResponse": "Add response",
+  "no-responses-set": "Intet svar",
+  "addResponse": "Tilføj svar",
   "filter": {
     "name": "filter",
-    "placeholder": "Add filter for this response"
+    "placeholder": "Tilføj filter for dette svar"
   },
-  "warning": "This action cannot be reverted!",
+  "warning": "Denne handling kan ikke fortrydes!",
   "settings": {
     "enabled": "Status"
   }
