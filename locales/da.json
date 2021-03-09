@@ -1021,16 +1021,16 @@
   },
   "subage": {
     "success": {
-      "never": "$sender, $username er ikke subscriber på kanalen.",
-      "notNow": "$sender, $username er på nuværende tidspunkt ikke subscriber på kanalen, og i alt været subscriber på kanalen i $subCumulativeMonths $subCumulativeMonthsName.",
-      "timeWithSubStreak": "$sender, $username er subscriber på kanalen og har været det i $diff ($subStreak $subStreakMonthsName) i træk, og i alt været subscriber på kanalen i $subCumulativeMonths $subCumulativeMonthsName.",
-      "time": "$sender, $username er subscriber på kanalen, og i alt været subscriber på kanalen i $subCumulativeMonths $subCumulativeMonthsName."
+      "never": "$sender, $username er ikke abonnent på kanalen.",
+      "notNow": "$sender, $username er på nuværende tidspunkt ikke abonnent på kanalen, og har i alt været abonnent på kanalen i $subCumulativeMonths $subCumulativeMonthsName.",
+      "timeWithSubStreak": "$sender, $username er abonnent på kanalen og har været det i $diff ($subStreak $subStreakMonthsName) i træk, og har i alt været abonnent på kanalen i $subCumulativeMonths $subCumulativeMonthsName.",
+      "time": "$sender, $username er abonnent på kanalen, og har i alt været abonnent på kanalen i $subCumulativeMonths $subCumulativeMonthsName."
     },
     "successSameUsername": {
-      "never": "$sender, du er ikke subscriber på denne kanal.",
-      "notNow": "$sender, du er på nuværende tidspunkt ikke subscriber på kanalen, og i alt været subscriber på kanalen i $subCumulativeMonths $subCumulativeMonthsName.",
-      "timeWithSubStreak": "$sender, du er subscriber på kanalen og har været det i $diff ($subStreak $subStreakMonthsName) i træk, og i alt været subscriber på kanalen i $subCumulativeMonths $subCumulativeMonthsName.",
-      "time": "$sender, er subscriber på kanalen, og i alt været subscriber på kanalen i $subCumulativeMonths $subCumulativeMonthsName."
+      "never": "$sender, du er ikke abonnent på denne kanal.",
+      "notNow": "$sender, du er på nuværende tidspunkt ikke abonnent på kanalen, og har i alt været abonnent på kanalen i $subCumulativeMonths $subCumulativeMonthsName.",
+      "timeWithSubStreak": "$sender, du er abonnent på kanalen og har været det i $diff ($subStreak $subStreakMonthsName) i træk, og har i alt været abonnent på kanalen i $subCumulativeMonths $subCumulativeMonthsName.",
+      "time": "$sender, er abonnent på kanalen, og har i alt været abonnent på kanalen i $subCumulativeMonths $subCumulativeMonthsName."
     }
   },
   "age": {
