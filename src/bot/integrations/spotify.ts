@@ -282,7 +282,7 @@ class Spotify extends Integration {
         throw Error('Spotify Web Api not connected');
       }
       const data = await this.client.getMyCurrentPlayingTrack();
-      if (data.body.item === null) {
+      if (data.body.item === null || data.body.item.type === 'episode') {
         throw Error('No song was received from spotify');
       }
 
