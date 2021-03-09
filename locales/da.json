@@ -1,12 +1,12 @@
 {
   "core": {
-    "loaded": "is loaded and",
+    "loaded": "er indlæst og",
     "enabled": "slået til",
     "disabled": "slået fra",
     "usage": "Anvendelse",
     "lang-selected": "Bot-sprog er i øjeblikket sat til dansk",
     "refresh-panel": "Du er nødsaget til at opdatere brugergrænsefladen for at se ændringerne.",
-    "command-parse": "Sorry, $sender, but this command is not correct, use",
+    "command-parse": "Beklager, $sender, men denne kommando er ikke korrekt, brug",
     "error": "Desværre, $sender, men noget gik galt!",
     "no-response": "",
     "no-response-bool": {
@@ -35,13 +35,13 @@
     "isRegistered": "$sender, du kan ikke bruge !$keyword, fordi den allerede er i brug i en anden handling!"
   },
   "uptime": {
-    "online": "Stream is online for (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)",
-    "offline": "Stream is currently offline for (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
+    "online": "Stream har været online i (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)",
+    "offline": "Stream har været offline i (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
   },
   "webpanel": {
     "this-system-is-disabled": "Dette system er deaktiveret",
     "loading": "Indlæser",
-    "this-may-take-a-while": "This <strong>may</strong> take a while",
+    "this-may-take-a-while": "Dette <strong>kan</strong> tage et stykke tid",
     "display-as": "Vis som",
     "go-to-admin": "Gå til Administrator",
     "go-to-public": "Gå til Offentlig",
@@ -512,17 +512,17 @@
     "events-game-before-change": "game before change",
     "events-user-triggered-event": "user triggered event",
     "events-method-used-to-subscribe": "method used to subscribe",
-    "events-months-of-subscription": "months of subscription",
-    "events-monthsName-of-subscription": "word 'month' by number (1 month, 2 months)",
+    "events-months-of-subscription": "måneder som abonnent",
+    "events-monthsName-of-subscription": "ord 'måned' efter antal (1 måned, 2 måneder)",
     "events-user-message": "bruger besked",
     "events-bits-user-sent": "bits user sent",
-    "events-reason-for-ban-timeout": "reason for ban/timeout",
-    "events-duration-of-timeout": "duration of timeout",
-    "events-duration-of-commercial": "duration of commercial",
-    "events-target-of-your-hosting": "target of your hosting",
-    "events-viewers-of-hosting": "viewers of hosting",
-    "overlays-eventlist-resub": "resub",
-    "overlays-eventlist-subgift": "subgift",
+    "events-reason-for-ban-timeout": "årsag til ban/timeout",
+    "events-duration-of-timeout": "varighed af timeout",
+    "events-duration-of-commercial": "varighed af reklame",
+    "events-target-of-your-hosting": "mål for dit host",
+    "events-viewers-of-hosting": "seere af host",
+    "overlays-eventlist-resub": "gentegning af abonnement",
+    "overlays-eventlist-subgift": "abonnements-gave",
     "overlays-eventlist-subcommunitygift": "subcommunitygift",
     "overlays-eventlist-host": "host",
     "overlays-eventlist-sub": "sub",
