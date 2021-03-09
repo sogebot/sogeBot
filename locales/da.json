@@ -36,7 +36,7 @@
   },
   "uptime": {
     "online": "Stream har været online i (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)",
-    "offline": "Stream har været offline i (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
+    "offline": "Stream har været OFFLINE i (if $days>0|$daysd )(if $hours>0|$hours )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
   },
   "webpanel": {
     "this-system-is-disabled": "Dette system er deaktiveret",
