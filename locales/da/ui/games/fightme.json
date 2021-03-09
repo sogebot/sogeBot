@@ -1,13 +1,13 @@
 {
   "settings": {
     "enabled": "Status",
-    "cooldown": "Cooldown",
+    "cooldown": "Nedkøling",
     "timeout": {
-      "title": "Timeout duration",
-      "help": "Seconds"
+      "title": "Timeout varighed",
+      "help": "Sekunder"
     },
-    "bypassCooldownByOwnerAndMods": "Bypass cooldown by owner and mods",
-    "winnerWillGet": "How many points will be added on win",
-    "loserWillLose": "How many points will be lost on lose"
+    "bypassCooldownByOwnerAndMods": "Omgå nedkøling for ejer og mods",
+    "winnerWillGet": "Hvor mange point vil blive tilføjet ved gevinst",
+    "loserWillLose": "Hvor mange point vil gå tabt ved tab"
   }
 }
