@@ -39,7 +39,6 @@ const stats = persistent({
       ['currentViewers', 'viewers'],
       ['currentViews', 'views'],
       ['currentFollowers', 'followers'],
-      ['currentHosts', 'hosts'],
       ['currentSubscribers', 'subscribers'],
       ['currentBits', 'bits'],
       ['currentTitle', 'title'],

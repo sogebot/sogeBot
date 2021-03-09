@@ -21,7 +21,6 @@ let cachedStats = {
   currentTips:    0,
   chatMessages:   0,
   maxViewers:     0,
-  currentHosts:   0,
   newChatters:    0,
   currentWatched: 0,
 };
@@ -72,7 +71,6 @@ class Stats extends Core {
             currentFollowers:   0,
             currentViews:       0,
             maxViewers:         0,
-            currentHosts:       0,
             newChatters:        0,
             currentWatched:     0,
           };

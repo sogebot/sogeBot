@@ -1,64 +1,296 @@
 <template>
-  <div style="flex: 1 1 auto; height: fit-content; height: -moz-fit-content;"
+  <div
+    style="flex: 1 1 auto; height: fit-content; height: -moz-fit-content;"
     class="border-0 p-0 m-0 d-flex"
-    v-bind:class="{ 'is-invalid': error || state === false }">
-    <textarea style="min-height: 6em;" v-show="editation" v-on:keydown.enter="onEnter" v-on:blur="editation = false" ref="textarea" v-model="_value" v-bind:placeholder="placeholder" class="form-control" v-bind:style="heightStyle"></textarea>
+    :class="{ 'is-invalid': error || state === false }"
+  >
+    <textarea
+      v-show="editation"
+      ref="textarea"
+      v-model="_value"
+      style="min-height: 6em;"
+      :placeholder="placeholder"
+      @keydown.enter="onEnter"
+class="form-control" :style="heightStyle" @blur="editation = false"
+    />
 
-    <div class="form-control" ref="placeholderRef" style="cursor: text; overflow: auto; resize: vertical; min-height: 6em;"
-      v-bind:class="{ 'is-invalid': error || state === false }"
+    <div
       v-show="!editation && _value.trim().length === 0"
-      v-bind:style="heightStyle"
-      v-on:click="editation=true"><span class="text-muted" v-html="d_placeholder"></span>
+      ref="placeholderRef"
+      class="form-control"
+      style="cursor: text; overflow: auto; resize: vertical; min-height: 6em;"
+      :class="{ 'is-invalid': error || state === false }"
+      :style="heightStyle"
+      @click="editation=true"
+    >
+      <span
+        class="text-muted"
+        v-html="d_placeholder"
+      />
     </div>
 
-    <div class="form-control" ref="div" style="word-break: break-all; cursor: text; overflow: auto; resize: vertical; min-height: 6em;"
-      v-bind:class="{ 'is-invalid': error || state === false }"
+    <div
       v-show="!editation && _value.trim().length > 0"
-      v-on:click="editation=true"
-      v-bind:style="heightStyle"
-      v-html="$options.filters.filterize(_value)">
-    </div>
+      ref="div"
+      class="form-control"
+      style="word-break: break-all; cursor: text; overflow: auto; resize: vertical; min-height: 6em;"
+      :class="{ 'is-invalid': error || state === false }"
+      :style="heightStyle"
+      @click="editation=true"
+      v-html="$options.filters.filterize(_value)"
+    />
 
     <div v-if="filters && filters.length > 0">
-      <b-dropdown id="dropdown-1" variant="dark" class="h-100" :dropleft="true" menu-class="dropdown-scroll">
+      <b-dropdown
+        id="dropdown-1"
+        variant="dark"
+        class="h-100"
+        :dropleft="true"
+        menu-class="dropdown-scroll"
+      >
         <template v-for="filter of filters">
           <template v-if="filter === 'global'">
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'title'" @click="addVariable('title')"> {{ translate('responses.variable.title') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'game'" @click="addVariable('game')"> {{ translate('responses.variable.game') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'viewers'" @click="addVariable('viewers')"> {{ translate('responses.variable.viewers') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'views'" @click="addVariable('views')"> {{ translate('responses.variable.views') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'hosts'" @click="addVariable('hosts')"> {{ translate('responses.variable.hosts') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'followers'" @click="addVariable('followers')"> {{ translate('responses.variable.followers') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'subscribers'" @click="addVariable('subscribers')"> {{ translate('responses.variable.subscribers') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'spotifySong'" @click="addVariable('spotifySong')"> {{ translate('responses.variable.spotifySong') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'ytSong'" @click="addVariable('ytSong')"> {{ translate('responses.variable.ytSong') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestFollower'" @click="addVariable('latestFollower')"> {{ translate('responses.variable.latestFollower') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestSubscriber'" @click="addVariable('latestSubscriber')"> {{ translate('responses.variable.latestSubscriber') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestSubscriberMonths'" @click="addVariable('latestSubscriberMonths')"> {{ translate('responses.variable.latestSubscriberMonths') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestSubscriberStreak'" @click="addVariable('latestSubscriberStreak')"> {{ translate('responses.variable.latestSubscriberStreak') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestTipAmount'" @click="addVariable('latestTipAmount')"> {{ translate('responses.variable.latestTipAmount') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestTipCurrency'" @click="addVariable('latestTipCurrency')"> {{ translate('responses.variable.latestTipCurrency') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestTipMessage'" @click="addVariable('latestTipMessage')"> {{ translate('responses.variable.latestTipMessage') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestTip'" @click="addVariable('latestTip')"> {{ translate('responses.variable.latestTip') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'toptip.overall.username'" @click="addVariable('toptip.overall.username')"> {{ translate('responses.variable.toptip.overall.username') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'toptip.overall.amount'" @click="addVariable('toptip.overall.amount')"> {{ translate('responses.variable.toptip.overall.amount') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'toptip.overall.currency'" @click="addVariable('toptip.overall.currency')"> {{ translate('responses.variable.toptip.overall.currency') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'toptip.overall.message'" @click="addVariable('toptip.overall.message')"> {{ translate('responses.variable.toptip.overall.message') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'toptip.stream.username'" @click="addVariable('toptip.stream.username')"> {{ translate('responses.variable.toptip.stream.username') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'toptip.stream.amount'" @click="addVariable('toptip.stream.amount')"> {{ translate('responses.variable.toptip.stream.amount') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'toptip.stream.currency'" @click="addVariable('toptip.stream.currency')"> {{ translate('responses.variable.toptip.stream.currency') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'toptip.stream.message'" @click="addVariable('toptip.stream.message')"> {{ translate('responses.variable.toptip.stream.message') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestCheerAmount'" @click="addVariable('latestCheerAmount')"> {{ translate('responses.variable.latestCheerAmount') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestCheerMessage'" @click="addVariable('latestCheerMessage')"> {{ translate('responses.variable.latestCheerMessage') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestCheer'" @click="addVariable('latestCheer')"> {{ translate('responses.variable.latestCheer') }} </b-dropdown-item>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'isBotSubscriber'" @click="addVariable('isBotSubscriber')"> {{ translate('responses.variable.isBotSubscriber') }} </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'title'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('title')"
+            >
+              {{ translate('responses.variable.title') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'game'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('game')"
+            >
+              {{ translate('responses.variable.game') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'viewers'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('viewers')"
+            >
+              {{ translate('responses.variable.viewers') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'views'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('views')"
+            >
+              {{ translate('responses.variable.views') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'followers'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('followers')"
+            >
+              {{ translate('responses.variable.followers') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'subscribers'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('subscribers')"
+            >
+              {{ translate('responses.variable.subscribers') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'spotifySong'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('spotifySong')"
+            >
+              {{ translate('responses.variable.spotifySong') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'ytSong'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('ytSong')"
+            >
+              {{ translate('responses.variable.ytSong') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'latestFollower'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('latestFollower')"
+            >
+              {{ translate('responses.variable.latestFollower') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'latestSubscriber'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('latestSubscriber')"
+            >
+              {{ translate('responses.variable.latestSubscriber') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'latestSubscriberMonths'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('latestSubscriberMonths')"
+            >
+              {{ translate('responses.variable.latestSubscriberMonths') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'latestSubscriberStreak'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('latestSubscriberStreak')"
+            >
+              {{ translate('responses.variable.latestSubscriberStreak') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'latestTipAmount'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('latestTipAmount')"
+            >
+              {{ translate('responses.variable.latestTipAmount') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'latestTipCurrency'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('latestTipCurrency')"
+            >
+              {{ translate('responses.variable.latestTipCurrency') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'latestTipMessage'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('latestTipMessage')"
+            >
+              {{ translate('responses.variable.latestTipMessage') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'latestTip'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('latestTip')"
+            >
+              {{ translate('responses.variable.latestTip') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'toptip.overall.username'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('toptip.overall.username')"
+            >
+              {{ translate('responses.variable.toptip.overall.username') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'toptip.overall.amount'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('toptip.overall.amount')"
+            >
+              {{ translate('responses.variable.toptip.overall.amount') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'toptip.overall.currency'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('toptip.overall.currency')"
+            >
+              {{ translate('responses.variable.toptip.overall.currency') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'toptip.overall.message'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('toptip.overall.message')"
+            >
+              {{ translate('responses.variable.toptip.overall.message') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'toptip.stream.username'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('toptip.stream.username')"
+            >
+              {{ translate('responses.variable.toptip.stream.username') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'toptip.stream.amount'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('toptip.stream.amount')"
+            >
+              {{ translate('responses.variable.toptip.stream.amount') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'toptip.stream.currency'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('toptip.stream.currency')"
+            >
+              {{ translate('responses.variable.toptip.stream.currency') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'toptip.stream.message'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('toptip.stream.message')"
+            >
+              {{ translate('responses.variable.toptip.stream.message') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'latestCheerAmount'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('latestCheerAmount')"
+            >
+              {{ translate('responses.variable.latestCheerAmount') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'latestCheerMessage'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('latestCheerMessage')"
+            >
+              {{ translate('responses.variable.latestCheerMessage') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'latestCheer'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('latestCheer')"
+            >
+              {{ translate('responses.variable.latestCheer') }}
+            </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter + 'isBotSubscriber'"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable('isBotSubscriber')"
+            >
+              {{ translate('responses.variable.isBotSubscriber') }}
+            </b-dropdown-item>
           </template>
           <template v-else>
-            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter" @click="addVariable(filter)"> {{ translate('responses.variable.' + filter) }} </b-dropdown-item>
+            <b-dropdown-item
+              :key="filter"
+              class="dropdown-item"
+              style="cursor: pointer"
+              @click="addVariable(filter)"
+            >
+              {{ translate('responses.variable.' + filter) }}
+            </b-dropdown-item>
           </template>
         </template>
         <template slot="button-content">
-          <fa icon="dollar-sign" size="lg"/>
+          <fa
+            icon="dollar-sign"
+            size="lg"
+          />
         </template>
       </b-dropdown>
     </div>
@@ -66,10 +298,10 @@
 </template>
 <script lang="ts">
 import {
-  computed, defineComponent, Ref, ref, watch, 
+  computed, defineComponent, Ref, ref, watch,
 } from '@vue/composition-api';
 import {
-  isNil, keys, sortBy, 
+  isNil, keys, sortBy,
 } from 'lodash-es';
 
 import translate from 'src/panel/helpers/translate';
