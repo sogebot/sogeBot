@@ -1022,15 +1022,15 @@
   "subage": {
     "success": {
       "never": "$sender, $username er ikke subscriber på kanalen.",
-      "notNow": "$sender, $username er på nuværende tidspunkt ikke subscriber på kanalen. Subscriber på kanalen i alt $subCumulativeMonths $subCumulativeMonthsName.",
-      "timeWithSubStreak": "$sender, $username er subscriber på kanalen. Nuværende sub-i-træk $diff ($subStreak $subStreakMonthsName) og har været subscriber \npå kanalen i alt $subCumulativeMonths $subCumulativeMonthsName.",
-      "time": "$sender, $username er subscriber på kanalen, og har været det i alt i $subCumulativeMonths $subCumulativeMonthsName."
+      "notNow": "$sender, $username er på nuværende tidspunkt ikke subscriber på kanalen, og i alt været subscriber på kanalen i $subCumulativeMonths $subCumulativeMonthsName.",
+      "timeWithSubStreak": "$sender, $username er subscriber på kanalen og har været det i $diff ($subStreak $subStreakMonthsName) i træk, og i alt været subscriber på kanalen i $subCumulativeMonths $subCumulativeMonthsName.",
+      "time": "$sender, $username er subscriber på kanalen, og i alt været subscriber på kanalen i $subCumulativeMonths $subCumulativeMonthsName."
     },
     "successSameUsername": {
       "never": "$sender, du er ikke subscriber på denne kanal.",
-      "notNow": "$sender, du er på nuværende tidspunkt ikke subscriber på kanalen. Subscriber på kanalen i alt $subCumulativeMonths $subCumulativeMonthsName.",
-      "timeWithSubStreak": "$sender, du er subscriber på kanalen. Nuværende sub-i-træk $diff ($subStreak $subStreakMonthsName) og har været subscriber på kanalen i alt $subCumulativeMonths $subCumulativeMonthsName.",
-      "time": "$sender, er subscriber på kanalen. Subscriber på kanalen i alt $subCumulativeMonths $subCumulativeMonthsName."
+      "notNow": "$sender, du er på nuværende tidspunkt ikke subscriber på kanalen, og i alt været subscriber på kanalen i $subCumulativeMonths $subCumulativeMonthsName.",
+      "timeWithSubStreak": "$sender, du er subscriber på kanalen og har været det i $diff ($subStreak $subStreakMonthsName) i træk, og i alt været subscriber på kanalen i $subCumulativeMonths $subCumulativeMonthsName.",
+      "time": "$sender, er subscriber på kanalen, og i alt været subscriber på kanalen i $subCumulativeMonths $subCumulativeMonthsName."
     }
   },
   "age": {
