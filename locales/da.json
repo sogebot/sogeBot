@@ -1222,7 +1222,7 @@
   "phillipsHue": {
     "list": "$sender, Liste over Phillips Hue tilsluttede lys: "
   },
-  "time": "Current streamers time in his timezone is $time",
+  "time": "Streamerens tid i dennes tidszone er $time",
   "subs": "$sender, der er i øjeblikket $onlineSubCount abonnenter online. Sidste abonnerende var $lastSubUsername $lastSubAgo",
   "followers": "$sender, der er i øjeblikket $onlineFollowersCount følgere online. Sidste følger var $lastFollowUsername $lastFollowAgo",
   "ignore": {
@@ -1231,13 +1231,13 @@
         "not": {
           "ignored": "$sender, bruger $username ignoreres ikke af bot"
         },
-        "added": "$sender, user $username is added to bot ignorelist",
-        "removed": "$sender, user $username is removed from bot ignorelist",
-        "ignored": "$sender, user $username is ignored by bot"
+        "added": "$sender, bruger $username er tilføjet til bottens ignoreringsliste",
+        "removed": "$sender, bruger $username er fjernet fra bottens ignoreringsliste",
+        "ignored": "$sender, bruger $username ignoreres af bot"
       }
     }
   },
   "filters": {
-    "setVariable": "$sender, $variable was set to $value."
+    "setVariable": "$sender, $variable blev sat til $value."
   }
 }
