@@ -4,17 +4,17 @@
     "enabled": "slået til",
     "disabled": "slået fra",
     "usage": "Anvendelse",
-    "lang-selected": "Bot sprog er i øjeblikket sat til engelsk",
-    "refresh-panel": "Du er nødsaget til at opdatere brugergrænsefladen for at se ændringer.",
+    "lang-selected": "Bot-sprog er i øjeblikket sat til dansk",
+    "refresh-panel": "Du er nødsaget til at opdatere brugergrænsefladen for at se ændringerne.",
     "command-parse": "Sorry, $sender, but this command is not correct, use",
-    "error": "Sorry, $sender, but something went wrong!",
+    "error": "Desværre, $sender, men noget gik galt!",
     "no-response": "",
     "no-response-bool": {
       "true": "",
       "false": ""
     },
     "api": {
-      "error": "$sender, API is not responding correctly!",
+      "error": "$sender, API svare ikke korrekt!",
       "not-available": "ikke tilgængelig"
     },
     "percentage": {
