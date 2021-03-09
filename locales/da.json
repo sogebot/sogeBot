@@ -1043,7 +1043,7 @@
   "lastseen": {
     "success": {
       "never": "$username har aldrig været forbi denne kanal!",
-      "time": "$username was last seen at $when in this channel"
+      "time": "$username blev sidst set $when på denne kanal"
     },
     "failed": {
       "parse": "{core.command-parse} !lastseen [username]"
@@ -1051,23 +1051,23 @@
   },
   "watched": {
     "success": {
-      "time": "$username watched this channel for $time hours"
+      "time": "$username har set denne kanal i $time timer"
     },
     "failed": {
       "parse": "{core.command-parse} !watched or !watched [username]"
     }
   },
   "permissions": {
-    "without-permission": "You don't have enough permissions for '$command'"
+    "without-permission": "Du har ikke nok tilladelser til '$command'"
   },
   "moderation": {
-    "user-have-immunity": "$sender, user $username have $type immunity for $time seconds",
-    "user-have-immunity-parameterError": "$sender, parameter error. $command <username> <type> <duration>",
-    "user-have-link-permit": "User $username can post a $count $link to chat",
+    "user-have-immunity": "$sender, bruger $username har $type immunitet i $time sekunder",
+    "user-have-immunity-parameterError": "$sender, parameterfejl. $command <username> <type> <duration>",
+    "user-have-link-permit": "Brugeren $username kan sende $count $link i chatten",
     "permit-parse-failed": "{core.command-parse} !permit [username]",
-    "user-is-warned-about-links": "No links allowed, ask for !permit [$count warnings left]",
-    "user-is-warned-about-symbols": "No excessive symbols usage [$count warnings left]",
-    "user-is-warned-about-long-message": "Long messages are not allowed [$count warnings left]",
+    "user-is-warned-about-links": "Links er ikke tilladt, bed om tilladelse først (!permit) [$count advarsler tilbage]",
+    "user-is-warned-about-symbols": "Ingen overdreven brug af store bogstaver [$count advarsler tilbage]",
+    "user-is-warned-about-long-message": "Lange beskeder er ikke tilladt [$count advarsler tilbage]",
     "user-is-warned-about-caps": "Ingen overdreven brug af store bogstaver [$count advarsler tilbage]",
     "user-is-warned-about-spam": "Spamming er ikke tilladt [$count advarsler tilbage]",
     "user-is-warned-about-color": "/me er ikke tilladt [$count advarsler tilbage]",
@@ -1102,24 +1102,24 @@
     }
   },
   "title": {
-    "current": "$sender, title of stream is '$title'.",
+    "current": "$sender, nuværende titel på stream er '$title'.",
     "change": {
-      "success": "$sender, title was set to: $title"
+      "success": "$sender, titlen er nu ændret til: $title"
     }
   },
   "game": {
-    "current": "$sender, streamer is currently playing $game.",
+    "current": "$sender, streamer spiller i øjeblikket $game.",
     "change": {
-      "success": "$sender, game was set to: $game"
+      "success": "$sender, spil er nu ændret til: $game"
     }
   },
   "cooldowns": {
-    "cooldown-was-set": "$sender, $type cooldown for $command was set to $secondss",
-    "cooldown-was-unset": "$sender, cooldown for $command was unset",
-    "cooldown-triggered": "$sender, you cannot use $command, remaining $secondss",
-    "cooldown-not-found": "$sender, cooldown for $command was not found",
-    "cooldown-was-enabled": "$sender, cooldown for $command was enabled",
-    "cooldown-was-disabled": "$sender, cooldown for $command was disabled",
+    "cooldown-was-set": "$sender, $type cooldown for $command er nu sat til $secondss",
+    "cooldown-was-unset": "$sender, cooldown for $command blev ikke sat",
+    "cooldown-triggered": "$sender, du kan ikke benytte $command, før om $secondss",
+    "cooldown-not-found": "$sender, cooldown for $command blev ikke fundet",
+    "cooldown-was-enabled": "$sender, cooldown for $command er aktiveret",
+    "cooldown-was-disabled": "$sender, cooldown for $command er deaktiveret",
     "cooldown-was-enabled-for-moderators": "$sender, cooldown for $command was enabled for moderators",
     "cooldown-was-disabled-for-moderators": "$sender, cooldown for $command was disabled for moderators",
     "cooldown-was-enabled-for-owners": "$sender, cooldown for $command was enabled for owners",
@@ -1165,7 +1165,7 @@
     },
     "roulette": {
       "trigger": "$sender is trying his luck and pulled a trigger",
-      "alive": "$sender is alive! Nothing happened.",
+      "alive": "$sender er i live! Intet skete.",
       "dead": "$sender's brain was splashed on the wall!",
       "mod": "$sender is incompement and completely missed his head!",
       "broadcaster": "$sender is using blanks, boo!",
