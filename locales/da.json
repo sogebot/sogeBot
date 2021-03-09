@@ -1023,26 +1023,26 @@
     "success": {
       "never": "$sender, $username er ikke subscriber på kanalen.",
       "notNow": "$sender, $username er på nuværende tidspunkt ikke subscriber på kanalen. Subscriber på kanalen i alt $subCumulativeMonths $subCumulativeMonthsName.",
-      "timeWithSubStreak": "$sender, $username er subscriber på kanalen. Nuværende Sub-i-træk $diff ($subStreak $subStreakMonthsName) og har været subscriber i alt $subCumulativeMonths $subCumulativeMonthsName.",
-      "time": "$sender, $username er subscriber på kanalen. I alt $subCumulativeMonths $subCumulativeMonthsName."
+      "timeWithSubStreak": "$sender, $username er subscriber på kanalen. Nuværende sub-i-træk $diff ($subStreak $subStreakMonthsName) og har været subscriber \npå kanalen i alt $subCumulativeMonths $subCumulativeMonthsName.",
+      "time": "$sender, $username er subscriber på kanalen. Subscriber på kanalen i alt $subCumulativeMonths $subCumulativeMonthsName."
     },
     "successSameUsername": {
       "never": "$sender, du er ikke subscriber på denne kanal.",
       "notNow": "$sender, du er på nuværende tidspunkt ikke subscriber på kanalen. Subscriber på kanalen i alt $subCumulativeMonths $subCumulativeMonthsName.",
-      "timeWithSubStreak": "$sender, you are subscriber of channel. Current sub streak for $diff ($subStreak $subStreakMonthsName) and in total of $subCumulativeMonths $subCumulativeMonthsName.",
-      "time": "$sender, you are subscriber of channel. In total of $subCumulativeMonths $subCumulativeMonthsName."
+      "timeWithSubStreak": "$sender, du er subscriber på kanalen. Nuværende sub-i-træk $diff ($subStreak $subStreakMonthsName) og har været subscriber på kanalen i alt $subCumulativeMonths $subCumulativeMonthsName.",
+      "time": "$sender, er subscriber på kanalen. Subscriber på kanalen i alt $subCumulativeMonths $subCumulativeMonthsName."
     }
   },
   "age": {
-    "failed": "$sender, I don't have data for $username account age",
+    "failed": "$sender, jeg har ingen data for alderen på kontoen tilhørende $username",
     "success": {
-      "withUsername": "$sender, account age for $username is $diff",
-      "withoutUsername": "$sender, your account age is $diff"
+      "withUsername": "$sender, alderen på kontoen tilhørende $username er $diff",
+      "withoutUsername": "$sender, alderen på din konto er $diff"
     }
   },
   "lastseen": {
     "success": {
-      "never": "$username was never in this channel!",
+      "never": "$username har aldrig været forbi denne kanal!",
       "time": "$username was last seen at $when in this channel"
     },
     "failed": {
