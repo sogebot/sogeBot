@@ -315,7 +315,6 @@
         "language": "Aktuelle Sprache des Stream",
         "viewers": "Anzahl der aktuellen Zuschauer",
         "views": "Aktuelle Zuschaueranzahl",
-        "hosts": "Anzahl aktueller Hosts",
         "followers": "Aktuelle Follower Anzahl",
         "subscribers": "Anzahl aktueller Abonnenten",
         "arg": "Argument",
@@ -476,7 +475,6 @@
         "cheers": "Bits",
         "responses": "Bot Antworten",
         "whispers": "Whisper",
-        "hosts": "Hosts",
         "bans": "Banns",
         "timeouts": "Zeigüberschreitung"
       },
@@ -605,7 +603,6 @@
     "new-chatters": "Neue Chatter",
     "chat-messages": "Chat-Nachrichten",
     "views": "Ansichten",
-    "hosts": "Hosts",
     "followers": "Followers",
     "subscribers": "Abonnenten",
     "bits": "Bits",
