@@ -1,6 +1,7 @@
 import util from 'util';
 
 import { isNil } from 'lodash';
+import { setInterval } from 'node:timers';
 import TwitchJs, {
   BaseMessage, HostTargetMessage, Message, PrivateMessages, UserNoticeMessages, UserStateTags,
 } from 'twitch-js';
