@@ -303,6 +303,7 @@ class TMI extends Core {
             (this.client.bot as TwitchJs).chat.send('PING');
 
             if (Date.now() - intervalBotPONG > 10 * constants.MINUTE) {
+              error(`TMI: bot PONG not returned in 10 minutes. Force reconnect.`);
               this.reconnect('bot');
             }
           }, 10000);
@@ -318,6 +319,7 @@ class TMI extends Core {
             (this.client.broadcaster as TwitchJs).chat.send('PING');
 
             if (Date.now() - intervalBroadcasterPONG > 10 * constants.MINUTE) {
+              error(`TMI: broadcaster PONG not returned in 10 minutes. Force reconnect.`);
               this.reconnect('broadcaster');
             }
           }, 10000);
