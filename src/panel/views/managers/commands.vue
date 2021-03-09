@@ -1,30 +1,52 @@
 <template>
-  <b-container fluid ref="window">
+  <b-container
+    ref="window"
+    fluid
+  >
     <b-row>
       <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.manage') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.customcommands') }}
         </span>
       </b-col>
-      <b-col v-if="!$systems.find(o => o.name === 'customcommands').enabled" style=" text-align: right;">
-        <b-alert show variant="danger" style="padding: .5rem; margin: 0; display: inline-block;">
-          <fa icon="exclamation-circle" fixed-width/> {{ translate('this-system-is-disabled') }}
+      <b-col
+        v-if="!$systems.find(o => o.name === 'customcommands').enabled"
+        style=" text-align: right;"
+      >
+        <b-alert
+          show
+          variant="danger"
+          style="padding: .5rem; margin: 0; display: inline-block;"
+        >
+          <fa
+            icon="exclamation-circle"
+            fixed-width
+          /> {{ translate('this-system-is-disabled') }}
         </b-alert>
       </b-col>
     </b-row>
 
-    <panel search @search="search = $event" @showAs='showAs = $event'>
-      <template v-slot:left>
-        <button-with-icon class="btn-primary btn-reverse" icon="plus" @click="newItem">{{translate('systems.customcommands.new')}}</button-with-icon>
+    <panel
+      search
+      @search="search = $event"
+      @showAs="showAs = $event"
+    >
+      <template #left>
+        <button-with-icon
+          class="btn-primary btn-reverse"
+          icon="plus"
+          @click="newItem"
+        >
+          {{ translate('systems.customcommands.new') }}
+        </button-with-icon>
       </template>
     </panel>
 
-    <loading v-if="state.loadedCmd === 1 || state.loadedPerm === 1"/>
+    <loading v-if="state.loadedCmd === 1 || state.loadedPerm === 1" />
     <template v-else>
       <b-sidebar
-        @change="isSidebarVisibleChange"
         :visible="isSidebarVisible"
         :no-slide="!sidebarSlideEnabled"
         width="1200px"
@@ -32,11 +54,27 @@
         shadow
         no-header
         right
-        backdrop>
-        <template v-slot:footer="{ hide }">
-          <div class="d-flex bg-opaque align-items-center px-3 py-2 border-top border-gray" style="justify-content: flex-end">
-            <b-button class="mx-2" @click="hide" variant="link">{{ translate('dialog.buttons.close') }}</b-button>
-            <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$invalid && !!$v.$dirty"/>
+        backdrop
+        @change="isSidebarVisibleChange"
+      >
+        <template #footer="{ hide }">
+          <div
+            class="d-flex bg-opaque align-items-center px-3 py-2 border-top border-gray"
+            style="justify-content: flex-end"
+          >
+            <b-button
+              class="mx-2"
+              variant="link"
+              @click="hide"
+            >
+              {{ translate('dialog.buttons.close') }}
+            </b-button>
+            <state-button
+              text="saveChanges"
+              :state="state.save"
+              :invalid="!!$v.$invalid && !!$v.$dirty"
+              @click="save()"
+            />
           </div>
         </template>
         <div class="px-3 py-2">
@@ -45,45 +83,72 @@
               <label-inside>{{ translate('systems.customcommands.command.name') }}</label-inside>
               <template v-if="editationItem">
                 <b-input-group>
-                    <b-form-input
-                      id="name"
-                      v-model="editationItem.command"
-                      type="text"
-                      :placeholder="translate('systems.customcommands.command.placeholder')"
-                      @input="$v.editationItem.command.$touch()"
-                      :state="$v.editationItem.command.$invalid && $v.editationItem.command.$dirty ? false : null"
-                    ></b-form-input>
-                  </b-input-group>
-                  <b-form-invalid-feedback
-                    :state="!($v.editationItem.command.$invalid && $v.editationItem.command.$dirty)"
-                  >{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+                  <b-form-input
+                    id="name"
+                    v-model="editationItem.command"
+                    type="text"
+                    :placeholder="translate('systems.customcommands.command.placeholder')"
+                    :state="$v.editationItem.command.$invalid && $v.editationItem.command.$dirty ? false : null"
+                    @input="$v.editationItem.command.$touch()"
+                  />
+                </b-input-group>
+                <b-form-invalid-feedback
+                  :state="!($v.editationItem.command.$invalid && $v.editationItem.command.$dirty)"
+                >
+                  {{ translate('dialog.errors.required') }}
+                </b-form-invalid-feedback>
               </template>
-              <b-skeleton v-else type="input" class="w-100"></b-skeleton>
+              <b-skeleton
+                v-else
+                type="input"
+                class="w-100"
+              />
             </b-form-group>
 
             <b-form-group>
               <template v-if="editationItem">
-                <b-alert show v-if="editationItem.responses.length === 0">
-                  {{translate('systems.customcommands.no-responses-set')}}
+                <b-alert
+                  v-if="editationItem.responses.length === 0"
+                  show
+                >
+                  {{ translate('systems.customcommands.no-responses-set') }}
                 </b-alert>
                 <b-row
-                  no-gutters
-                  :key="updatedAt + '' + i"
-                  :class="[i !== 0 ? 'pt-2' : '']"
                   v-for="(response, i) of orderBy(editationItem.responses, 'order', 'asc')"
+                  :key="updatedAt + '' + i"
+                  no-gutters
+                  :class="[i !== 0 ? 'pt-2' : '']"
                 >
                   <b-col>
-                    <title-divider>{{ translate('systems.customcommands.response.name') }} {{i+1}}</title-divider>
+                    <title-divider>{{ translate('systems.customcommands.response.name') }} {{ i+1 }}</title-divider>
                   </b-col>
-                  <b-col md="auto" sm="12" align-self="end" class="text-right">
-                    <div class="h-auto w-auto" style="flex-shrink: 0;">
-                      <b-dropdown variant="outline-dark" toggle-class="border-0 h-auto w-auto" class="h-100">
-                        <template v-slot:button-content>
-                          <fa class="mr-1" icon="key" />
+                  <b-col
+                    md="auto"
+                    sm="12"
+                    align-self="end"
+                    class="text-right"
+                  >
+                    <div
+                      class="h-auto w-auto"
+                      style="flex-shrink: 0;"
+                    >
+                      <b-dropdown
+                        variant="outline-dark"
+                        toggle-class="border-0 h-auto w-auto"
+                        class="h-100"
+                      >
+                        <template #button-content>
+                          <fa
+                            class="mr-1"
+                            icon="key"
+                          />
                           <span
                             v-if="getPermissionName(response.permission, permissions)"
                           >{{ getPermissionName(response.permission, permissions) }}</span>
-                          <span v-else class="text-danger">
+                          <span
+                            v-else
+                            class="text-danger"
+                          >
                             <fa icon="exclamation-triangle" />Permission not found
                           </span>
                         </template>
@@ -91,19 +156,32 @@
                           v-for="p of permissions"
                           :key="p.id"
                           @click="response.permission = p.id; state.pending = true;"
-                        >{{ getPermissionName(p.id, permissions) | capitalize }}</b-dropdown-item>
+                        >
+                          {{ getPermissionName(p.id, permissions) | capitalize }}
+                        </b-dropdown-item>
                       </b-dropdown>
-                      <b-dropdown variant="outline-dark" toggle-class="border-0 h-auto w-auto" class="h-100">
-                        <template v-slot:button-content>
-                          <fa class="mr-1" :icon="response.stopIfExecuted ? 'stop' : 'play'" />
+                      <b-dropdown
+                        variant="outline-dark"
+                        toggle-class="border-0 h-auto w-auto"
+                        class="h-100"
+                      >
+                        <template #button-content>
+                          <fa
+                            class="mr-1"
+                            :icon="response.stopIfExecuted ? 'stop' : 'play'"
+                          />
                           {{ translate(response.stopIfExecuted ? 'commons.stop-if-executed' : 'commons.continue-if-executed') | capitalize }}
                         </template>
                         <b-dropdown-item
                           @click="response.stopIfExecuted = true; state.pending = true"
-                        >{{ translate('commons.stop-if-executed') | capitalize }}</b-dropdown-item>
+                        >
+                          {{ translate('commons.stop-if-executed') | capitalize }}
+                        </b-dropdown-item>
                         <b-dropdown-item
                           @click="response.stopIfExecuted = false; state.pending = true"
-                        >{{ translate('commons.continue-if-executed') | capitalize }}</b-dropdown-item>
+                        >
+                          {{ translate('commons.continue-if-executed') | capitalize }}
+                        </b-dropdown-item>
                       </b-dropdown>
                       <b-dropdown
                         variant="outline-dark"
@@ -111,94 +189,161 @@
                         class="h-100"
                         no-caret
                       >
-                        <template v-slot:button-content>
-                          <fa icon="ellipsis-v"></fa>
+                        <template #button-content>
+                          <fa icon="ellipsis-v" />
                         </template>
-                        <b-dropdown-item v-if="i !== 0" @click="moveUpResponse(response.order)">
-                          <fa icon="sort-up" fixed-width></fa>
+                        <b-dropdown-item
+                          v-if="i !== 0"
+                          @click="moveUpResponse(response.order)"
+                        >
+                          <fa
+                            icon="sort-up"
+                            fixed-width
+                          />
                           {{ translate('commons.moveUp') | capitalize }}
                         </b-dropdown-item>
                         <b-dropdown-item
                           v-if="i !== editationItem.responses.length - 1"
                           @click="moveDownResponse(response.order)"
                         >
-                          <fa icon="sort-down" fixed-width></fa>
+                          <fa
+                            icon="sort-down"
+                            fixed-width
+                          />
                           {{ translate('commons.moveDown') | capitalize }}
                         </b-dropdown-item>
                         <b-dropdown-item @click="deleteResponse(response.order)">
-                          <fa icon="trash-alt" fixed-width></fa>
+                          <fa
+                            icon="trash-alt"
+                            fixed-width
+                          />
                           {{ translate('delete') }}
                         </b-dropdown-item>
                       </b-dropdown>
                     </div>
                   </b-col>
 
-                  <b-col cols="12" sm="8" md="9">
+                  <b-col
+                    cols="12"
+                    sm="8"
+                    md="9"
+                  >
                     <label-inside>{{ translate('systems.customcommands.response.name') }}</label-inside>
                     <textarea-with-tags
                       :value.sync="response.response"
-                      v-bind:placeholder="translate('systems.customcommands.response.placeholder')"
-                      v-bind:filters="['global', 'sender', 'param', '!param', 'touser']"
-                      v-on:update="response.response = $event"
+                      :placeholder="translate('systems.customcommands.response.placeholder')"
+                      :filters="['global', 'sender', 'param', '!param', 'touser']"
                       :state="true"
-                    ></textarea-with-tags>
+                      @update="response.response = $event"
+                    />
                   </b-col>
-                  <b-col cols="12" sm="4" md="3">
+                  <b-col
+                    cols="12"
+                    sm="4"
+                    md="3"
+                  >
                     <label-inside>{{ translate('systems.customcommands.filter.name') }}</label-inside>
                     <textarea-with-tags
                       :value.sync="response.filter"
-                      v-bind:placeholder="translate('systems.customcommands.filter.placeholder')"
-                      v-on:update="response.filter = $event"
-                      v-bind:filters="['sender', 'source', 'param', 'haveParam', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'rank', 'game', 'language', 'title', 'views', 'followers', 'hosts', 'subscribers', 'isBotSubscriber']"
+                      :placeholder="translate('systems.customcommands.filter.placeholder')"
+                      :filters="['sender', 'source', 'param', 'haveParam', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'rank', 'game', 'language', 'title', 'views', 'followers', 'subscribers', 'isBotSubscriber']"
                       :state="true"
-                    ></textarea-with-tags>
+                      @update="response.filter = $event"
+                    />
                   </b-col>
                 </b-row>
                 <button
                   class="btn btn-primary btn-block mt-2"
                   type="button"
                   @click="editationItem.responses.push({ filter: '', order: editationItem.responses.length, response: '', stopIfExecuted: false, permission: orderBy(permissions, 'order', 'asc').pop().id })"
-                >{{ translate('systems.customcommands.addResponse') }}</button>
+                >
+                  {{ translate('systems.customcommands.addResponse') }}
+                </button>
               </template>
-              <b-skeleton v-else type="input" class="w-100" style="height: 600px !important"></b-skeleton>
+              <b-skeleton
+                v-else
+                type="input"
+                class="w-100"
+                style="height: 600px !important"
+              />
             </b-form-group>
           </b-form>
         </div>
       </b-sidebar>
-      <b-alert show variant="danger" v-if="commandsFiltered.length === 0 && search.length > 0">
-        <fa icon="search"/> <span v-html="translate('systems.customcommands.emptyAfterSearch').replace('$search', search)"/>
+      <b-alert
+        v-if="commandsFiltered.length === 0 && search.length > 0"
+        show
+        variant="danger"
+      >
+        <fa icon="search" /> <span v-html="translate('systems.customcommands.emptyAfterSearch').replace('$search', search)" />
       </b-alert>
-      <b-alert show v-else-if="commands.length === 0">
-        {{translate('systems.customcommands.empty')}}
+      <b-alert
+        v-else-if="commands.length === 0"
+        show
+      >
+        {{ translate('systems.customcommands.empty') }}
       </b-alert>
-      <b-table v-else striped small :items="commandsFiltered" :fields="fields" responsive >
-        <template v-slot:cell(response)="data">
-          <span v-if="data.item.responses.length === 0" class="text-muted">{{ translate('systems.customcommands.no-responses-set') }}</span>
+      <b-table
+        v-else
+        striped
+        small
+        :items="commandsFiltered"
+        :fields="fields"
+        responsive
+      >
+        <template #cell(response)="data">
+          <span
+            v-if="data.item.responses.length === 0"
+            class="text-muted"
+          >{{ translate('systems.customcommands.no-responses-set') }}</span>
           <template v-for="(r, i) of orderBy(data.item.responses, 'order', 'asc')">
-            <div :key="i" :style="{ 'margin-top': i !== 0 ? '15px' : 'inherit' }" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: -3px;">
+            <div
+              :key="i"
+              :style="{ 'margin-top': i !== 0 ? '15px' : 'inherit' }"
+              style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: -3px;"
+            >
               <span style="display: inline-block">
-                {{translate('response')}}#{{i + 1}}
+                {{ translate('response') }}#{{ i + 1 }}
               </span>
 
               <span style="display: inline-block">
-                <b-dropdown variant="outline-dark" toggle-class="border-0" size="sm">
-                  <template v-slot:button-content>
-                    <fa class="mr-1" icon="key"/>
+                <b-dropdown
+                  variant="outline-dark"
+                  toggle-class="border-0"
+                  size="sm"
+                >
+                  <template #button-content>
+                    <fa
+                      class="mr-1"
+                      icon="key"
+                    />
                     <span v-if="getPermissionName(r.permission, permissions)">{{ getPermissionName(r.permission, permissions) }}</span>
-                    <span v-else class="text-danger"><fa icon="exclamation-triangle"/> Permission not found</span>
+                    <span
+                      v-else
+                      class="text-danger"
+                    ><fa icon="exclamation-triangle" /> Permission not found</span>
                   </template>
-                  <b-dropdown-item v-for="p of permissions"
-                                  :key="p.id"
-                                  @click="updatePermission(data.item.id, r.id, p.id)">
+                  <b-dropdown-item
+                    v-for="p of permissions"
+                    :key="p.id"
+                    @click="updatePermission(data.item.id, r.id, p.id)"
+                  >
                     {{ getPermissionName(p.id, permissions) | capitalize }}
                   </b-dropdown-item>
                 </b-dropdown>
               </span>
 
               <span style="display: inline-block">
-                <b-dropdown variant="outline-dark" toggle-class="border-0" size="sm">
-                  <template v-slot:button-content>
-                    <fa class="mr-1" :icon="r.stopIfExecuted ? 'stop' : 'play'"/>
+                <b-dropdown
+                  variant="outline-dark"
+                  toggle-class="border-0"
+                  size="sm"
+                >
+                  <template #button-content>
+                    <fa
+                      class="mr-1"
+                      :icon="r.stopIfExecuted ? 'stop' : 'play'"
+                    />
                     {{ translate(r.stopIfExecuted ? 'commons.stop-if-executed' : 'commons.continue-if-executed') | capitalize }}
                   </template>
                   <b-dropdown-item @click="updateStopIfExecuted(data.item.id, r.id, true)">
@@ -210,25 +355,68 @@
                 </b-dropdown>
               </span>
             </div>
-            <text-with-tags :key="10 + i" v-if='r.filter' :value='r.filter' style="font-size: .8rem;border: 1px dashed #eee; display: inline-block;padding: 0.1rem; padding-left: 0.3rem; padding-right: 0.3rem;"></text-with-tags>
-            <text-with-tags :key="100 + i" :value='r.response' style="display: inline-block"></text-with-tags>
+            <text-with-tags
+              v-if="r.filter"
+              :key="10 + i"
+              :value="r.filter"
+              style="font-size: .8rem;border: 1px dashed #eee; display: inline-block;padding: 0.1rem; padding-left: 0.3rem; padding-right: 0.3rem;"
+            />
+            <text-with-tags
+              :key="100 + i"
+              :value="r.response"
+              style="display: inline-block"
+            />
           </template>
         </template>
-        <template v-slot:cell(buttons)="data">
-          <div class="float-right" style="width: max-content !important;">
-            <button-with-icon v-b-tooltip.hover.noninteractive :title="translate('dialog.buttons.' + (data.item.enabled? 'enabled' : 'disabled'))" :class="[ data.item.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.enabled = !data.item.enabled; sendUpdate(data.item.id)">
+        <template #cell(buttons)="data">
+          <div
+            class="float-right"
+            style="width: max-content !important;"
+          >
+            <button-with-icon
+              v-b-tooltip.hover.noninteractive
+              :title="translate('dialog.buttons.' + (data.item.enabled? 'enabled' : 'disabled'))"
+              :class="[ data.item.enabled ? 'btn-success' : 'btn-danger' ]"
+              class="btn-only-icon btn-reverse"
+              icon="power-off"
+              @click="data.item.enabled = !data.item.enabled; sendUpdate(data.item.id)"
+            >
               {{ translate('dialog.buttons.' + (data.item.enabled? 'enabled' : 'disabled')) }}
             </button-with-icon>
-            <button-with-icon v-b-tooltip.hover.noninteractive :title="translate('dialog.buttons.edit')" class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/commands/edit/' + data.item.id">
+            <button-with-icon
+              v-b-tooltip.hover.noninteractive
+              :title="translate('dialog.buttons.edit')"
+              class="btn-only-icon btn-primary btn-reverse"
+              icon="edit"
+              :href="'#/manage/commands/edit/' + data.item.id"
+            >
               {{ translate('dialog.buttons.edit') }}
             </button-with-icon>
-            <button-with-icon v-b-tooltip.hover.noninteractive :title="translate('dialog.buttons.visibility')" class="btn-only-icon btn-dark btn-reverse" :icon="['fas', data.item.visible ? 'eye' : 'eye-slash']" @click="data.item.visible = !data.item.visible; sendUpdate(data.item.id)">
+            <button-with-icon
+              v-b-tooltip.hover.noninteractive
+              :title="translate('dialog.buttons.visibility')"
+              class="btn-only-icon btn-dark btn-reverse"
+              :icon="['fas', data.item.visible ? 'eye' : 'eye-slash']"
+              @click="data.item.visible = !data.item.visible; sendUpdate(data.item.id)"
+            >
               {{ translate('dialog.buttons.visibility') }}
             </button-with-icon>
-            <button-with-icon v-b-tooltip.hover.noninteractive :title="translate('dialog.buttons.reset')" class="btn-only-icon btn-danger btn-reverse" icon="history" @click="resetCount(data.item.id)">
+            <button-with-icon
+              v-b-tooltip.hover.noninteractive
+              :title="translate('dialog.buttons.reset')"
+              class="btn-only-icon btn-danger btn-reverse"
+              icon="history"
+              @click="resetCount(data.item.id)"
+            >
               {{ translate('dialog.buttons.reset') }}
             </button-with-icon>
-            <button-with-icon v-b-tooltip.hover.noninteractive :title="translate('dialog.buttons.delete')" class="btn-only-icon btn-danger btn-reverse" icon="trash" @click="del(data.item.id)">
+            <button-with-icon
+              v-b-tooltip.hover.noninteractive
+              :title="translate('dialog.buttons.delete')"
+              class="btn-only-icon btn-danger btn-reverse"
+              icon="trash"
+              @click="del(data.item.id)"
+            >
               {{ translate('dialog.buttons.delete') }}
             </button-with-icon>
           </div>
@@ -273,7 +461,6 @@ const socket = {
 } as const;
 
 export default defineComponent({
-  mixins:     [ validationMixin ],
   components: {
     loading:          () => import('../../components/loading.vue'),
     'text-with-tags': () => import('../../components/textWithTags.vue'),
@@ -289,6 +476,7 @@ export default defineComponent({
       return value.charAt(0).toUpperCase() + value.slice(1);
     },
   },
+  mixins:      [ validationMixin ],
   validations: {
     editationItem: {
       command: {
