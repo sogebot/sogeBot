@@ -59,6 +59,11 @@ const userHaveSubscriberBadges = (badges: Readonly<UserStateTags['badges']>) => 
   return typeof badges.subscriber !== 'undefined' || typeof badges.founder !== 'undefined';
 };
 
+let intervalBroadcaster: NodeJS.Timeout;
+let intervalBot: NodeJS.Timeout;
+let intervalBroadcasterPONG = Date.now();
+let intervalBotPONG = Date.now();
+
 class TMI extends Core {
   shouldConnect = false;
 
@@ -242,6 +247,12 @@ class TMI extends Core {
       const username = type === 'bot' ? oauth.botUsername : oauth.broadcasterUsername;
       const channel = generalChannel.value;
 
+      if (type === 'bot') {
+        clearInterval(intervalBot);
+      } else {
+        clearInterval(intervalBroadcaster);
+      }
+
       info(`TMI: ${type} is reconnecting`);
 
       client.chat.removeAllListeners();
@@ -278,6 +289,36 @@ class TMI extends Core {
           setStatus('TMI', constants.CONNECTED);
         }
         this.channel = channel;
+
+        if (type === 'bot') {
+          if (intervalBot) {
+            clearInterval(intervalBot);
+          }
+          intervalBot = setInterval(() => {
+            if (!this.client.bot || this.channel === '') {
+              return;
+            }
+            (this.client.bot as TwitchJs).chat.send('PING');
+
+            if (Date.now() - intervalBotPONG > 10 * constants.MINUTE) {
+              this.reconnect('bot');
+            }
+          }, 10000);
+        } else if (type === 'broadcaster') {
+          if (intervalBroadcaster) {
+            clearInterval(intervalBroadcaster);
+          }
+          intervalBroadcaster = setInterval(() => {
+            if (!this.client.broadcaster || this.channel === '') {
+              return;
+            }
+            (this.client.broadcaster as TwitchJs).chat.send('PING');
+
+            if (Date.now() - intervalBroadcasterPONG > 10 * constants.MINUTE) {
+              this.reconnect('broadcaster');
+            }
+          }, 10000);
+        }
       }
     }
   }
@@ -289,6 +330,11 @@ class TMI extends Core {
     } else {
       await client.chat.part(this.channel);
       info(`TMI: ${type} parted channel ${this.channel}`);
+      if (type === 'bot') {
+        clearInterval(intervalBot);
+      } else if (type === 'broadcaster') {
+        clearInterval(intervalBroadcaster);
+      }
     }
   }
 
@@ -311,6 +357,13 @@ class TMI extends Core {
     client.chat.removeAllListeners();
 
     // common for bot and broadcaster
+    client.chat.on('PONG', async () => {
+      if (type === 'bot') {
+        intervalBotPONG = Date.now();
+      } else {
+        intervalBroadcasterPONG = Date.now();
+      }
+    });
     client.chat.on('DISCONNECT', async () => {
       info(`TMI: ${type} is disconnected`);
       setStatus('TMI', constants.DISCONNECTED);
