@@ -36,9 +36,7 @@ import {
   chatIn, cheer, debug, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning, whisperIn,
 } from './helpers/log';
 import { generalChannel } from './helpers/oauth/generalChannel';
-import {
-  avgResponse, linesParsedIncrement, setStatus,
-} from './helpers/parser';
+import { linesParsedIncrement, setStatus } from './helpers/parser';
 import { defaultPermissions } from './helpers/permissions/';
 import {
   globalIgnoreListExclude, ignorelist, sendWithMe, setMuteStatus, showWithAt, tmiEmitter,
@@ -1019,8 +1017,6 @@ class TMI extends Core {
         }, 500 * i);
       }
     }
-
-    avgResponse({ value: parse.time(), message });
   }
 }
 
