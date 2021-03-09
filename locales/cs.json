@@ -315,7 +315,6 @@
         "language": "Aktuální jazyk vysílání",
         "viewers": "Aktuální počet diváků",
         "views": "Aktuální počet zobrazení",
-        "hosts": "Aktuální počet hostů",
         "followers": "Aktuální počet followerů",
         "subscribers": "Aktuální počet subscriberů",
         "arg": "Parametr",
@@ -476,7 +475,6 @@
         "cheers": "Bity",
         "responses": "Odpovědi bota",
         "whispers": "Šeptání",
-        "hosts": "Hostování",
         "bans": "Bany",
         "timeouts": "Timeouty"
       },
@@ -605,7 +603,6 @@
     "new-chatters": "Nových diváků",
     "chat-messages": "Zpráv v chatu",
     "views": "Shlédnutí",
-    "hosts": "Hostování",
     "followers": "Followeři",
     "subscribers": "Subscribeři",
     "bits": "Bity",

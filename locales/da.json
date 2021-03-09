@@ -315,7 +315,6 @@
         "language": "Current stream language",
         "viewers": "Antal aktuelle seere",
         "views": "Antal aktuelle visninger",
-        "hosts": "Antal hosts",
         "followers": "Current followers count",
         "subscribers": "Antal nuværende abonnenter",
         "arg": "Argument",
@@ -476,7 +475,6 @@
         "cheers": "Bits",
         "responses": "Bot svar",
         "whispers": "Whispers",
-        "hosts": "Værter",
         "bans": "Udelukninger",
         "timeouts": "Timeout"
       },
@@ -605,7 +603,6 @@
     "new-chatters": "Nye Chattere",
     "chat-messages": "Chatbeskeder",
     "views": "Visninger",
-    "hosts": "Værter",
     "followers": "Følgere",
     "subscribers": "Abonnenter",
     "bits": "Bits",

@@ -315,7 +315,6 @@
         "language": "Current stream language",
         "viewers": "Current viewers count",
         "views": "Current views count",
-        "hosts": "Current hosts count",
         "followers": "Current followers count",
         "subscribers": "Current subscribers count",
         "arg": "Argument",
@@ -476,7 +475,6 @@
         "cheers": "Bits",
         "responses": "Bot responses",
         "whispers": "Whispers",
-        "hosts": "Hosts",
         "bans": "Bans",
         "timeouts": "Timeouts"
       },
@@ -605,7 +603,6 @@
     "new-chatters": "New Chatters",
     "chat-messages": "Chat messages",
     "views": "Views",
-    "hosts": "Hosts",
     "followers": "Followers",
     "subscribers": "Subscribers",
     "bits": "Bits",
