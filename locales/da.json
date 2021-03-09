@@ -1021,14 +1021,14 @@
   },
   "subage": {
     "success": {
-      "never": "$sender, $username is not a channel subscriber.",
-      "notNow": "$sender, $username is currently not a channel subscriber. In total of $subCumulativeMonths $subCumulativeMonthsName.",
-      "timeWithSubStreak": "$sender, $username is subscriber of channel. Current sub streak for $diff ($subStreak $subStreakMonthsName) and in total of $subCumulativeMonths $subCumulativeMonthsName.",
-      "time": "$sender, $username is subscriber of channel. In total of $subCumulativeMonths $subCumulativeMonthsName."
+      "never": "$sender, $username er ikke subscriber på kanalen.",
+      "notNow": "$sender, $username er på nuværende tidspunkt ikke subscriber på kanalen. Subscriber på kanalen i alt $subCumulativeMonths $subCumulativeMonthsName.",
+      "timeWithSubStreak": "$sender, $username er subscriber på kanalen. Nuværende Sub-i-træk $diff ($subStreak $subStreakMonthsName) og har været subscriber i alt $subCumulativeMonths $subCumulativeMonthsName.",
+      "time": "$sender, $username er subscriber på kanalen. I alt $subCumulativeMonths $subCumulativeMonthsName."
     },
     "successSameUsername": {
-      "never": "$sender, you are not a channel subscriber.",
-      "notNow": "$sender, you are currently not a channel subscriber. In total of $subCumulativeMonths $subCumulativeMonthsName.",
+      "never": "$sender, du er ikke subscriber på denne kanal.",
+      "notNow": "$sender, du er på nuværende tidspunkt ikke subscriber på kanalen. Subscriber på kanalen i alt $subCumulativeMonths $subCumulativeMonthsName.",
       "timeWithSubStreak": "$sender, you are subscriber of channel. Current sub streak for $diff ($subStreak $subStreakMonthsName) and in total of $subCumulativeMonths $subCumulativeMonthsName.",
       "time": "$sender, you are subscriber of channel. In total of $subCumulativeMonths $subCumulativeMonthsName."
     }
