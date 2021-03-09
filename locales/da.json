@@ -1115,19 +1115,19 @@
     "cooldown-was-unset": "$sender, cooldown for $command blev ikke sat",
     "cooldown-triggered": "$sender, du kan ikke benytte $command, før om $secondss",
     "cooldown-not-found": "$sender, cooldown for $command blev ikke fundet",
-    "cooldown-was-enabled": "$sender, cooldown for $command er aktiveret",
-    "cooldown-was-disabled": "$sender, cooldown for $command er deaktiveret",
-    "cooldown-was-enabled-for-moderators": "$sender, nedkøling for $command blev aktiveret for moderatorer",
-    "cooldown-was-disabled-for-moderators": "$sender, nedkøling for $command blev deaktiveret for moderatorer",
-    "cooldown-was-enabled-for-owners": "$sender, nedkøling for $command blev aktiveret for ejere",
-    "cooldown-was-disabled-for-owners": "$sender, nedkøling for $command blev deaktiveret for ejere",
-    "cooldown-was-enabled-for-subscribers": "$sender, nedkøling for $command blev aktiveret for abonnenter",
-    "cooldown-was-disabled-for-subscribers": "$sender, nedkøling for $command blev deaktiveret for abonnenter",
-    "cooldown-was-enabled-for-followers": "$sender, nedkøling for $command blev aktiveret for følgere",
-    "cooldown-was-disabled-for-followers": "$sender, nedkøling for $command blev deaktiveret for følgere"
+    "cooldown-was-enabled": "$sender, cooldown for $command blev slået til",
+    "cooldown-was-disabled": "$sender, cooldown for $command blev slået fra",
+    "cooldown-was-enabled-for-moderators": "$sender, nedkøling for $command blev slået til for moderatorer",
+    "cooldown-was-disabled-for-moderators": "$sender, nedkøling for $command blev slået fra for moderatorer",
+    "cooldown-was-enabled-for-owners": "$sender, nedkøling for $command blev slået til for ejere",
+    "cooldown-was-disabled-for-owners": "$sender, nedkøling for $command blev slået fra for ejere",
+    "cooldown-was-enabled-for-subscribers": "$sender, nedkøling for $command blev slået til for abonnenter",
+    "cooldown-was-disabled-for-subscribers": "$sender, nedkøling for $command blev slået fra for abonnenter",
+    "cooldown-was-enabled-for-followers": "$sender, nedkøling for $command blev slået til for følgere",
+    "cooldown-was-disabled-for-followers": "$sender, nedkøling for $command blev slået fra for følgere"
   },
   "timers": {
-    "id-must-be-defined": "$sender, response id must be defined.",
+    "id-must-be-defined": "$sender, svar-id skal defineres.",
     "id-or-name-must-be-defined": "$sender, response id or timer name must be defined.",
     "name-must-be-defined": "$sender, timer name must be defined.",
     "response-must-be-defined": "$sender, timer response must be defined.",
@@ -1143,8 +1143,8 @@
     "response-deleted": "$sender, response (id: $id) was deleted.",
     "response-was-added": "$sender, response (id: $id) for timer (name: $name) was added - '$response'",
     "response-not-found": "$sender, response (id: $id) was not found in database",
-    "response-enabled": "$sender, response (id: $id) was enabled",
-    "response-disabled": "$sender, response (id: $id) was disabled"
+    "response-enabled": "$sender, svar (id: $id) blev aktiveret",
+    "response-disabled": "$sender, svar (id: $id) blev deaktiveret"
   },
   "gambling": {
     "duel": {
@@ -1214,22 +1214,22 @@
         "false": "Bot will send permissions insufficient errors through whispers"
       },
       "disableCooldownWhispers": {
-        "true": "Bot won't send cooldown notifications",
-        "false": "Bot will send cooldown notifications through whispers"
+        "true": "Bot sender ikke nedkølingsmeddelelser",
+        "false": "Bot vil sende nedkølingsmeddelelser via whispers"
       }
     }
   },
   "phillipsHue": {
-    "list": "$sender, List of Phillips Hue connected lights: "
+    "list": "$sender, Liste over Phillips Hue tilsluttede lys: "
   },
   "time": "Current streamers time in his timezone is $time",
-  "subs": "$sender, there is currently $onlineSubCount online subscribers. Last sub/resub was $lastSubUsername $lastSubAgo",
-  "followers": "$sender, there is currently $onlineFollowersCount online followers. Last follow was $lastFollowUsername $lastFollowAgo",
+  "subs": "$sender, der er i øjeblikket $onlineSubCount abonnenter online. Sidste abonnerende var $lastSubUsername $lastSubAgo",
+  "followers": "$sender, der er i øjeblikket $onlineFollowersCount følgere online. Sidste følger var $lastFollowUsername $lastFollowAgo",
   "ignore": {
     "user": {
       "is": {
         "not": {
-          "ignored": "$sender, user $username is not ignored by bot"
+          "ignored": "$sender, bruger $username ignoreres ikke af bot"
         },
         "added": "$sender, user $username is added to bot ignorelist",
         "removed": "$sender, user $username is removed from bot ignorelist",
