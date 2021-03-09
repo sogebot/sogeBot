@@ -70,7 +70,7 @@ const connect = () => {
   };
 
   ws.onerror = function(errorArg) {
-    error('PUBSUB: ' + JSON.stringify(errorArg));
+    error('PUBSUB: ' + errorArg.message);
   };
 
   ws.onmessage = function(event) {
