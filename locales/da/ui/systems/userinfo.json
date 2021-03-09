@@ -5,7 +5,7 @@
     "order": "Format",
     "lastSeenFormat": {
       "title": "Tidsformat",
-      "help": "Possible formats at https://momentjs.com/docs/#/displaying/format/"
+      "help": "Mulige formater kan findes på https://momentjs.com/docs/#/displaying/format/"
     }
   }
 }
