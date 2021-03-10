@@ -1,5 +1,5 @@
 <template>
-  <div></div>
+  <div />
 </template>
 
 <script lang="ts">
@@ -65,12 +65,11 @@ export default defineComponent({
 
       socket.on('integration::obswebsocket::trigger', async (tasks: OBSWebsocketInterface['simpleModeTasks'] | string, cb: any) => {
         console.log('integration::obswebsocket::trigger', tasks);
+        cb(); // resolve first so connection is OK
         try {
           await taskRunner(obs, tasks);
         } catch (e) {
           console.error(e);
-        } finally {
-          cb();
         }
       });
 
