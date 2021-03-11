@@ -15,7 +15,7 @@
 
 - **Docker**, Any of the [supported repositories](http://sogehige.github.io/sogeBot/#/configuration/database)
 
-### Installation
+### Docker installation
 
 !> If you want to use **SQLite**, be sure to use `./shared/sogebot.db` path to
    your db file, so you have an access outside of docker.
@@ -35,17 +35,18 @@
     - Release version: `docker-compose up`
     - Nightly version: `docker-compose -f docker-compose-nightly.yml up`
 
-### Upgrade
+### Upgrade bot from Docker
 
 1. Stop your docker container
 2. Run steps 3. and 4. from Installation
 
-## From zipfile
+## From ZIP
 
-### Stable release
+### Stable
 
 - Download latest release from
   [GitHub sogeBot release page](https://github.com/sogehige/sogeBot/releases)
+- Continue at [ZIP Installation](#zip-installation)
 
 ### Nightlies
 
@@ -58,7 +59,9 @@
 
 ![create-new-app](./_images/install/artifact.png)
 
-### Installation
+- Continue at [ZIP Installation](#zip-installation)
+
+### ZIP Installation
 
 - Download your stable release or nightly (see above)
 - Set your [database environment](configuration/database)
@@ -75,20 +78,20 @@
 - To access webpanel, go to `http://localhost:<port>` where port is configured
   as PORT env variable, e.g. `PORT=20001 npm start`
 
-### Upgrade
+### Upgrade bot from ZIP
 
 1. Backup your `.env` and, if using sqlite3, `sogebot.db` file
 2. Remove your sogeBot directory
 3. Go through Installation steps
 4. Before `npm start` recopy your backup back to bot folder
 
-## From git
+## From GIT
 
 ### Build prerequisites
 
 - **Bash**, **Make**
 
-### Installation (latest snapshot)
+### GIT Installation
 
 - Download [latest master zip](https://github.com/sogehige/sogeBot/archive/master.zip)
   or clone repository `git clone https://github.com/sogehige/sogeBot.git`
@@ -106,7 +109,7 @@
 - To access webpanel, go to `http://localhost:<port>` where port is configured
   in config.json (default: 20000)
 
-### Upgrade
+### Upgrade bot from GIT
 
 1. Backup your database
 2. Update bot with `git pull -r origin master`
