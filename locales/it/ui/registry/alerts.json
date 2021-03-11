@@ -1,0 +1,201 @@
+{
+  "enabled": "Enabled",
+  "testDlg": {
+    "alertTester": "Alert tester",
+    "command": "Command",
+    "username": "Username",
+    "recipient": "Recipient",
+    "message": "Message",
+    "tier": "Tier",
+    "amountOfViewers": "Amount of viewers",
+    "amountOfBits": "Amount of bits",
+    "amountOfGifts": "Amount of gifts",
+    "amountOfMonths": "Amount of months",
+    "amountOfTips": "Tip",
+    "event": "Event"
+  },
+  "empty": "Alerts registry is empty, create new alerts.",
+  "emptyAfterSearch": "Alerts registry is empty in searching for \"<strong>$search</strong>\"",
+  "revertcode": "Revert code to defaults",
+  "name": {
+    "name": "Name",
+    "placeholder": "Set name of your alerts"
+  },
+  "alertDelayInMs": {
+    "name": "Alert delay"
+  },
+  "profanityFilterType": {
+    "name": "Profanity filter",
+    "disabled": "Disabled",
+    "replace-with-asterisk": "Replace with asterisk",
+    "replace-with-happy-words": "Replace with happy words",
+    "hide-messages": "Hide messages",
+    "disable-alerts": "Disable alerts"
+  },
+  "loadStandardProfanityList": "Load standard profanity list",
+  "customProfanityList": {
+    "name": "Custom profanity list",
+    "help": "Words should be separated with comma."
+  },
+  "event": {
+    "follows": "Follows",
+    "cheers": "Cheers",
+    "subs": "Subs",
+    "resubs": "Resubs",
+    "subgifts": "Subgifts",
+    "subcommunitygifts": "Subgifts to community",
+    "tips": "Tips",
+    "hosts": "Hosts",
+    "raids": "Raids",
+    "cmdredeems": "Command Redeems",
+    "rewardredeems": "Reward Redeems"
+  },
+  "title": {
+    "name": "Variant name",
+    "placeholder": "Set your variant name"
+  },
+  "variant": {
+    "name": "Variant occurence"
+  },
+  "filter": {
+    "name": "Occurence filter",
+    "operator": "Operator",
+    "rule": "Rule",
+    "addRule": "Add rule",
+    "addGroup": "Add group",
+    "comparator": "Comparator",
+    "value": "Value",
+    "valueSplitByComma": "Values split by comma (e.g. val1, val2)",
+    "isEven": "is even",
+    "isOdd": "is odd",
+    "lessThan": "less than",
+    "lessThanOrEqual": "less than or equal",
+    "contain": "contains",
+    "equal": "equal",
+    "notEqual": "not equal",
+    "present": "is present",
+    "includes": "includes",
+    "greaterThan": "greater than",
+    "greaterThanOrEqual": "greater than or equal",
+    "noFilter": "no filter"
+  },
+  "speed": {
+    "name": "Speed"
+  },
+  "maxTimeToDecrypt": {
+    "name": "Max time to decrypt"
+  },
+  "characters": {
+    "name": "Characters"
+  },
+  "random": "Random",
+  "exact-amount": "Exact amount",
+  "greater-than-or-equal-to-amount": "Greater than or equal to amount",
+  "tier-exact-amount": "Tier is exactly",
+  "tier-greater-than-or-equal-to-amount": "Tier is higher or equal to",
+  "months-exact-amount": "Months amount is exactly",
+  "months-greater-than-or-equal-to-amount": "Months amount is higher or equal to",
+  "gifts-exact-amount": "Gifts amount is exactly",
+  "gifts-greater-than-or-equal-to-amount": "Gifts amount is higher or equal to",
+  "very-rarely": "Very rarely",
+  "rarely": "Rarely",
+  "default": "Default",
+  "frequently": "Frequently",
+  "very-frequently": "Very frequently",
+  "exclusive": "Exclusive",
+  "messageTemplate": {
+    "name": "Message template",
+    "placeholder": "Set your message template",
+    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
+  },
+  "animationText": {
+    "name": "Animation text"
+  },
+  "animationIn": {
+    "name": "Animation in"
+  },
+  "animationOut": {
+    "name": "Animation out"
+  },
+  "alertDurationInMs": {
+    "name": "Alert duration"
+  },
+  "alertTextDelayInMs": {
+    "name": "Alert text delay"
+  },
+  "layoutPicker": {
+    "name": "Layout"
+  },
+  "scale": {
+    "name": "Scale"
+  },
+  "translateY": {
+    "name": "Move -Up / +Down"
+  },
+  "translateX": {
+    "name": "Move -Left / +Right"
+  },
+  "image": {
+    "name": "Image / Video(.webm)",
+    "setting": "Image / Video(.webm) settings"
+  },
+  "sound": {
+    "name": "Sound",
+    "setting": "Sound settings"
+  },
+  "soundVolume": {
+    "name": "Alert volume"
+  },
+  "enableAdvancedMode": "Enable advanced mode",
+  "font": {
+    "setting": "Font settings",
+    "name": "Font family",
+    "overrideGlobal": "Override global font settings",
+    "align": {
+      "name": "Alignment",
+      "left": "Left",
+      "center": "Center",
+      "right": "Right"
+    },
+    "size": {
+      "name": "Font size"
+    },
+    "weight": {
+      "name": "Font weight"
+    },
+    "borderPx": {
+      "name": "Font border"
+    },
+    "borderColor": {
+      "name": "Font border color"
+    },
+    "color": {
+      "name": "Font color"
+    },
+    "highlightcolor": {
+      "name": "Font highlight color"
+    }
+  },
+  "minAmountToShow": {
+    "name": "Minimal amount to show"
+  },
+  "minAmountToPlay": {
+    "name": "Minimal amount to play"
+  },
+  "allowEmotes": {
+    "name": "Allow emotes"
+  },
+  "message": {
+    "setting": "Message settings"
+  },
+  "voice": "Voice",
+  "keepAlertShown": "Alert keeps visible during TTS",
+  "skipUrls": "Skip URLs during TTS",
+  "volume": "Volume",
+  "rate": "Rate",
+  "pitch": "Pitch",
+  "test": "Test",
+  "tts": {
+    "setting": "TTS settings"
+  }
+}
