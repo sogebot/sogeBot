@@ -1,0 +1,14 @@
+{
+  "song-not-found": "Sorry, $sender, track was not found on spotify",
+  "song-requested": "$sender, you requested song $name from $artist",
+  "not-banned-song-not-playing": "$sender, no song is currently playing to ban.",
+  "song-banned": "$sender, song $name from $artist is banned.",
+  "song-unbanned": "$sender, song $name from $artist is unbanned.",
+  "song-not-found-in-banlist": "$sender, song by spotifyURI $uri was not found in ban list.",
+  "cannot-request-song-is-banned": "$sender, cannot request banned song $name from $artist.",
+  "no-songs-found-in-history": "$sender, there is currently no song in history list.",
+  "return-one-song-from-history": "$sender, previous song was $name from $artist.",
+  "return-multiple-song-from-history": "$sender, $count previous songs were:",
+  "return-multiple-song-from-history-item": "$index - $name from $artist",
+  "song-notify": "Current playing song is $name by $artist."
+}
