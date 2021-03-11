@@ -1,5 +1,5 @@
 {
-  "list": "List of your permissions:",
+  "list": "Lista dei tuoi permessi:",
   "excludeAddSuccessful": "$sender, you added $username to exclude list for permission $permissionName",
   "excludeRmSuccessful": "$sender, you removed $username from exclude list for permission $permissionName",
   "userNotFound": "$sender, user $username was not found in database.",
