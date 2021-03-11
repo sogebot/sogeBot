@@ -2,7 +2,7 @@
   <span>
     <b-form-group
       :label="translate('registry.overlays.allowedIPs.name')"
-      :description="translate('registry.alerts.allowedIPs.help')"
+      :description="translate('registry.overlays.allowedIPs.help')"
     >
       <b-textarea
         :value="options.allowedIPs.join('\n')"

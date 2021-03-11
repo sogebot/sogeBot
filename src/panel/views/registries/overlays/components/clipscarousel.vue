@@ -23,7 +23,7 @@ import {
 import translate from 'src/panel/helpers/translate';
 
 const prepareOpts = (data: any) => {
-  if (data.volume === null || typeof data.volume === 'undefined') {
+  if (!data || data.volume === null || typeof data.volume === 'undefined') {
     return { volume: 0 };
   } else {
     return { volume: data.volume as number };
