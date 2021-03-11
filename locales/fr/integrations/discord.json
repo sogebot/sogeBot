@@ -7,6 +7,6 @@
   "help-message": "$sender, to link your account on Discord: 1. Go to Discord server and send $command in bot channel. | 2. Wait for PM from bot | 3. Send command from your Discord PM here in twitch chat.",
   "started-at": "Démarré à",
   "streamed-at": "Diffusé à",
-  "link-whisper": "Hello $tag, to link this Discord account with your Twitch account on $broadcaster channel, go to https://twitch.tv/$broadcaster, login to your account and send this command to chat \n\n\t\t`$command $id`\n\nNOTE: This expires in 10 minutes.",
+  "link-whisper": "Hello $tag, to link this Discord account with your Twitch account on $broadcaster channel, go to <https://twitch.tv/$broadcaster>, login to your account and send this command to chat \n\n\t\t`$command $id`\n\nNOTE: This expires in 10 minutes.",
   "check-your-dm": "vérifiez vos DMs pour les étapes à suivre afin de lier votre compte."
 }
