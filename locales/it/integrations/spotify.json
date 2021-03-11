@@ -2,13 +2,13 @@
   "song-not-found": "Mi spiace, $sender, la traccia non è stata trovata su spotify",
   "song-requested": "$sender, hai richiesto il brano $name di $artist",
   "not-banned-song-not-playing": "$sender, nessuna canzone da bannare è attualmente in riproduzione.",
-  "song-banned": "$sender, song $name from $artist is banned.",
-  "song-unbanned": "$sender, song $name from $artist is unbanned.",
-  "song-not-found-in-banlist": "$sender, song by spotifyURI $uri was not found in ban list.",
-  "cannot-request-song-is-banned": "$sender, cannot request banned song $name from $artist.",
-  "no-songs-found-in-history": "$sender, there is currently no song in history list.",
-  "return-one-song-from-history": "$sender, previous song was $name from $artist.",
-  "return-multiple-song-from-history": "$sender, $count previous songs were:",
-  "return-multiple-song-from-history-item": "$index - $name from $artist",
-  "song-notify": "Current playing song is $name by $artist."
+  "song-banned": "$sender, la canzone $name di $artist è bannata.",
+  "song-unbanned": "$sender, la canzone $name di $artist è stata sbannata.",
+  "song-not-found-in-banlist": "$sender, canzone di spotifyURI $uri non è stata trovata nella lista ban.",
+  "cannot-request-song-is-banned": "$sender, non puoi richiedere il brano $name di $artist perchè è bannato.",
+  "no-songs-found-in-history": "$sender, al momento non c'è nessuna canzone nella cronologia.",
+  "return-one-song-from-history": "$sender, la canzone precedente era $name di $artist.",
+  "return-multiple-song-from-history": "$sender, le $count canzoni precedenti erano:",
+  "return-multiple-song-from-history-item": "$index - $name di $artist",
+  "song-notify": "Il brano attualmente in riproduzione è $name di $artist."
 }
