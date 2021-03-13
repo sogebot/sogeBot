@@ -197,49 +197,49 @@
           "placeholder": "Numero di comandi prima che l'evento venga attivato"
         },
         "runEveryXKeywords": {
-          "label": "Run Every X Keywords",
-          "placeholder": "Number of keywords before event is triggered"
+          "label": "Esegui Ogni X Keywords",
+          "placeholder": "Numero di parole chiave prima che l'evento venga attivato"
         },
         "commandToWatch": {
-          "label": "Command To Watch",
-          "placeholder": "Set your !commandToWatch"
+          "label": "Comando Da Osservare",
+          "placeholder": "Imposta il tuo !comandoDaOsservare"
         },
         "keywordToWatch": {
-          "label": "Keyword To Watch",
-          "placeholder": "Set your keywordToWatch"
+          "label": "Parola Chiave Da Osservare",
+          "placeholder": "Imposta la parolaChiaveDaOsservare"
         },
         "resetCountEachMessage": {
-          "label": "Reset count each message",
-          "true": "Reset count",
-          "false": "Keep count"
+          "label": "Resetta contatore ad ogni messaggio",
+          "true": "Resetta contatore",
+          "false": "Mantieni il conteggio"
         },
         "viewersAtLeast": {
-          "label": "Viewers At Least",
-          "placeholder": "How many viewers at least to trigger event"
+          "label": "Numero minimo di spettatori",
+          "placeholder": "Numero minimo spettatori per attivare l'evento"
         },
         "runInterval": {
-          "label": "Run Interval (0 = run once per stream)",
-          "placeholder": "Trigger event every x seconds"
+          "label": "Intervallo d'esecuzione (0 = esegui una volta per stream)",
+          "placeholder": "Attiva l'evento ogni x secondi"
         },
         "runAfterXMinutes": {
-          "label": "Run After X Minutes",
-          "placeholder": "Trigger event after x minutes"
+          "label": "Esegui Dopo X Minuti",
+          "placeholder": "Attiva evento dopo x minuti"
         },
         "runEveryXMinutes": {
-          "label": "Run Every X Minutes",
-          "placeholder": "Trigger event every x minutes"
+          "label": "Esegui Ogni X Minuti",
+          "placeholder": "Attiva l'evento ogni x minuti"
         },
         "messageToSend": {
-          "label": "Message To Send",
-          "placeholder": "Set your message"
+          "label": "Messaggio Da Inviare",
+          "placeholder": "Imposta il tuo messaggio"
         },
         "channel": {
-          "label": "Channel",
-          "placeholder": "Channelname or ID"
+          "label": "Canale",
+          "placeholder": "NomeCanale o ID"
         },
         "commandToRun": {
-          "label": "Command To Run",
-          "placeholder": "Set your !commandToRun"
+          "label": "Comando Da Eseguire",
+          "placeholder": "Imposta il tuo !comandoDaEseguire"
         },
         "isCommandQuiet": {
           "label": "Should be command quiet",
@@ -326,56 +326,56 @@
         "keyword": "Keyword",
         "response": "Response",
         "list": "Populated list",
-        "type": "Type",
-        "days": "Days",
-        "hours": "Hours",
-        "minutesName": "Singular or Plural of word minute",
-        "minutes": "Minutes",
-        "seconds": "Seconds",
-        "description": "Description",
-        "quiet": "Quiet (bool)",
+        "type": "Tipo",
+        "days": "Giorni",
+        "hours": "Ore",
+        "minutesName": "Singolare o plurale della parola minuto",
+        "minutes": "Minuti",
+        "seconds": "Secondi",
+        "description": "Descrizione",
+        "quiet": "Silenzioso (bool)",
         "id": "ID",
-        "name": "Name",
-        "messages": "Messages",
-        "amount": "Amount",
-        "amountInBotCurrency": "Amount in bot currency",
-        "currency": "Currency",
-        "currencyInBot": "Currency in bot",
-        "pointsName": "Points name",
-        "points": "Points",
-        "rank": "Rank",
-        "nextrank": "Next rank",
-        "username": "Username",
-        "value": "Value",
-        "variable": "Variable",
-        "count": "Count",
-        "link": "Link (translated)",
-        "winner": "Winner",
-        "loser": "Loser",
-        "challenger": "Challenger",
-        "min": "Minimum",
-        "max": "Maximum",
-        "eligibility": "Eligibility",
-        "probability": "Probability",
-        "time": "Time",
-        "options": "Options",
-        "option": "Option",
-        "when": "When",
-        "diff": "Difference",
-        "users": "Users",
-        "user": "User",
-        "bank": "Bank",
-        "nextBank": "Next bank",
-        "cooldown": "Cooldown",
+        "name": "Nome",
+        "messages": "Messaggi",
+        "amount": "Importo",
+        "amountInBotCurrency": "Importo nella valuta del bot",
+        "currency": "Valuta",
+        "currencyInBot": "Valuta del bot",
+        "pointsName": "Nome dei punti",
+        "points": "Punti",
+        "rank": "Rango",
+        "nextrank": "Rango successivo",
+        "username": "Nome Utente",
+        "value": "Valore",
+        "variable": "Variabile",
+        "count": "Conteggio",
+        "link": "Link (tradotto)",
+        "winner": "Vincitore",
+        "loser": "Perdente",
+        "challenger": "Sfidante",
+        "min": "Minimo",
+        "max": "Massimo",
+        "eligibility": "Ammissibilità",
+        "probability": "Probabilità",
+        "time": "Tempo",
+        "options": "Opzioni",
+        "option": "Opzione",
+        "when": "Quando",
+        "diff": "Differenza",
+        "users": "Utenti",
+        "user": "Utente",
+        "bank": "Banca",
+        "nextBank": "Prossima banca",
+        "cooldown": "Tempo di attesa",
         "tickets": "Tickets",
-        "ticketsName": "Tickets name",
-        "fromUsername": "From username",
-        "toUsername": "To username",
-        "items": "Items",
+        "ticketsName": "Nome ticket",
+        "fromUsername": "Dal nome utente",
+        "toUsername": "Al nome utente",
+        "items": "Oggetti",
         "bits": "Bits",
-        "subgifts": "Subgifts",
-        "subStreakShareEnabled": "Is substreak share enabled (true/false)",
-        "subStreak": "Current sub streak",
+        "subgifts": "Abbonamenti regalo",
+        "subStreakShareEnabled": "È abilitata la condivisione di substreak (true/false)",
+        "subStreak": "Substreak attuale",
         "subStreakName": "localized name of month (1 month, 2 months) for current sub strek",
         "subCumulativeMonths": "Cumulative subscribe months",
         "subCumulativeMonthsName": "localized name of month (1 month, 2 months) for cumulative subscribe months",
@@ -435,14 +435,14 @@
           "moderator": "Is recipient mod? (bool)",
           "subscriber": "Is recipient sub? (bool)",
           "vip": "Is recipient vip? (bool)",
-          "follower": "Is recipient follower? (bool)",
-          "broadcaster": "Is recipient broadcaster? (bool)",
-          "bot": "Is recipient bot? (bool)",
-          "owner": "Is recipient bot owner? (bool)"
+          "follower": "Il destinatario è follower? (bool)",
+          "broadcaster": "Il destinatario è streamer? (bool)",
+          "bot": "Il destinatario è bot? (bool)",
+          "owner": "Il destinatario è proprietario del bot? (bool)"
         },
         "tweet": {
-          "text": "Text of tweet",
-          "username": "Username on Twitter",
+          "text": "Testo da tweettare",
+          "username": "Nome utente su Twitter",
           "displayname": "Screen name on twitter",
           "url": "Tweet link"
         },
