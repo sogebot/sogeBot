@@ -1,9 +1,9 @@
 {
   "core": {
-    "loaded": "is loaded and",
-    "enabled": "enabled",
-    "disabled": "disabled",
-    "usage": "Usage",
+    "loaded": "è caricato e",
+    "enabled": "abilitato",
+    "disabled": "disattivato",
+    "usage": "Utilizzo",
     "lang-selected": "Bot language is currently set to english",
     "refresh-panel": "You will need to refresh UI to see changes.",
     "command-parse": "Sorry, $sender, but this command is not correct, use",
