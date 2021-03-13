@@ -443,75 +443,75 @@
         "tweet": {
           "text": "Testo da tweettare",
           "username": "Nome utente su Twitter",
-          "displayname": "Screen name on twitter",
-          "url": "Tweet link"
+          "displayname": "Nome visualizzato su Twitter",
+          "url": "Twitta link"
         },
-        "sceneName": "Name of scene"
+        "sceneName": "Nome della scena"
       }
     },
     "page-settings": {
       "systems": {
         "others": {
-          "title": "Others",
-          "currency": "Currency"
+          "title": "Altri",
+          "currency": "Valuta"
         },
         "whispers": {
-          "title": "Whispers",
+          "title": "Messaggi privati",
           "toggle": {
-            "listener": "Listen commands on whisper",
-            "settings": "Whispers on settings change",
-            "raffle": "Whispers on raffle join",
-            "permissions": "Whispers on insufficient permissions",
-            "cooldowns": "Whispers on cooldown (if set as notify)"
+            "listener": "Ascolta i comandi nei messaggi privati",
+            "settings": "Messaggi privati sulla modifica delle impostazioni",
+            "raffle": "Messaggi privati per iscriversi alla riffa",
+            "permissions": "Messaggi privati sui permessi insufficienti",
+            "cooldowns": "Sussurri sui tempi di ricarica (se impostati come notifica)"
           }
         }
       }
     },
     "page-logger": {
       "buttons": {
-        "messages": "Messages",
-        "follows": "Follows",
-        "subs": "Subs & Resubs",
+        "messages": "Messaggi",
+        "follows": "Segue",
+        "subs": "Abbonamenti & Abbonamenti Rinnovati",
         "cheers": "Bits",
-        "responses": "Bot responses",
-        "whispers": "Whispers",
-        "bans": "Bans",
+        "responses": "Risposte Bot",
+        "whispers": "Messaggi privati",
+        "bans": "Ban",
         "timeouts": "Timeouts"
       },
       "range": {
-        "day": "a day",
-        "week": "a week",
-        "month": "a month",
-        "year": "an year",
-        "all": "All time"
+        "day": "un giorno",
+        "week": "una settimana",
+        "month": "un mese",
+        "year": "un anno",
+        "all": "Per sempre"
       },
       "order": {
-        "asc": "Ascending",
-        "desc": "Descending"
+        "asc": "Crescente",
+        "desc": "Decrescente"
       },
       "labels": {
-        "order": "ORDER",
-        "range": "RANGE",
-        "filters": "FILTERS"
+        "order": "ORDINE",
+        "range": "INTERVALLO",
+        "filters": "FILTRI"
       }
     },
     "stats-panel": {
-      "show": "Show stats",
-      "hide": "Hide stats"
+      "show": "Mostra statistiche",
+      "hide": "Nascondi statistiche"
     },
-    "translations": "Custom translations",
-    "bot-responses": "Bot responses",
-    "duration": "Duration",
-    "viewers-reset-attributes": "Reset attributes",
-    "viewers-points-of-all-users": "Points of all users",
-    "viewers-watchtime-of-all-users": "Watch time of all users",
-    "viewers-messages-of-all-users": "Messages of all users",
-    "events-game-after-change": "game after change",
-    "events-game-before-change": "game before change",
-    "events-user-triggered-event": "user triggered event",
-    "events-method-used-to-subscribe": "method used to subscribe",
-    "events-months-of-subscription": "months of subscription",
-    "events-monthsName-of-subscription": "word 'month' by number (1 month, 2 months)",
+    "translations": "Traduzioni personalizzate",
+    "bot-responses": "Risposte Bot",
+    "duration": "Durata",
+    "viewers-reset-attributes": "Reimposta gli attributi",
+    "viewers-points-of-all-users": "Punti di tutti gli utenti",
+    "viewers-watchtime-of-all-users": "Tempo da spettatore per tutti gli utenti",
+    "viewers-messages-of-all-users": "Messaggi di tutti gli utenti",
+    "events-game-after-change": "gioco dopo il cambiamento",
+    "events-game-before-change": "gioco prima del cambiamento",
+    "events-user-triggered-event": "evento attivato dall'utente",
+    "events-method-used-to-subscribe": "metodo usato per iscriversi",
+    "events-months-of-subscription": "mesi di abbonamento",
+    "events-monthsName-of-subscription": "parola 'mese' per numero (1 mese, 2 mesi)",
     "events-user-message": "user message",
     "events-bits-user-sent": "bits user sent",
     "events-reason-for-ban-timeout": "reason for ban/timeout",
