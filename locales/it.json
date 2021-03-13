@@ -173,28 +173,28 @@
           "label": "Filtro"
         },
         "linkFilter": {
-          "label": "Link Overlay Filter",
-          "placeholder": "If using overlay, add link or id of your overlay"
+          "label": "Link filtro Overlay",
+          "placeholder": "Se si utilizzi un overlay, aggiungi il link o l'id del tuo overlay"
         },
         "hashtag": {
-          "label": "Hashtag or Keyword",
-          "placeholder": "#yourHashtagHere or Keyword"
+          "label": "Hashtag o Parola chiave",
+          "placeholder": "#tuoHashtagQui o Parola chiave"
         },
         "fadeOutXCommands": {
-          "label": "Fade Out X Commands",
-          "placeholder": "Number of commands subtracted every fade out interval"
+          "label": "Dissolvenza X Comandi",
+          "placeholder": "Numero di comandi sottratti ogni intervallo di dissolvenza"
         },
         "fadeOutXKeywords": {
-          "label": "Fade Out X Keywords",
-          "placeholder": "Number of keywords subtracted every fade out interval"
+          "label": "Dissolvenza X Parole Chiave",
+          "placeholder": "Numero di parole chiave sottratte ad ogni intervallo di dissolvenza"
         },
         "fadeOutInterval": {
-          "label": "Fade Out Interval (seconds)",
-          "placeholder": "Fade out interval subtracting"
+          "label": "Intervallo di Dissolvenza (secondi)",
+          "placeholder": "Intervallo di dissolvenza sottratto"
         },
         "runEveryXCommands": {
-          "label": "Run Every X Commands",
-          "placeholder": "Number of commands before event is triggered"
+          "label": "Esegui Ogni X Comandi",
+          "placeholder": "Numero di comandi prima che l'evento venga attivato"
         },
         "runEveryXKeywords": {
           "label": "Run Every X Keywords",
