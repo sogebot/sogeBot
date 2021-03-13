@@ -44,30 +44,30 @@
     "this-may-take-a-while": "Questo <strong>potrebbe</strong> richiedere un po' di tempo",
     "display-as": "Visualizza come",
     "go-to-admin": "Vai ad Admin",
-    "go-to-public": "Go to Public",
+    "go-to-public": "Vai a Pubblico",
     "logout": "Logout",
     "popout": "Popout",
-    "not-logged-in": "Not logged in",
-    "remove-widget": "Remove <strong>$name</strong> widget",
-    "join-channel": "Join bot to channel",
-    "leave-channel": "Leave bot from channel",
-    "set-default": "Set default",
-    "add": "Add",
+    "not-logged-in": "Login non effettuato",
+    "remove-widget": "Rimuovi il widget <strong>$name</strong>",
+    "join-channel": "Fai entrare il bot nel canale",
+    "leave-channel": "Fai uscire il bot dal canale",
+    "set-default": "Imposta come predefinito",
+    "add": "Aggiungi",
     "placeholders": {
-      "text-url-generator": "Paste your text or html to generate base64 below and URL above",
-      "text-decode-base64": "Paste your base64 to generate URL and text above",
-      "creditsSpeed": "Set speed of credits rolling, lower = faster"
+      "text-url-generator": "Incolla il tuo testo o html per generare il base64 qui sotto e l'URL qui sopra",
+      "text-decode-base64": "Incolla il tuo base64 per generare URL ed il testo qui sopra",
+      "creditsSpeed": "Imposta la velocità di scorrimento dei titoli di coda, lentissimo ---> velocissimo"
     },
     "custom-variables": {
-      "set-your-variables-to-watch-here": "Set your variables to watch here",
-      "type": "type",
-      "unwatch": "Unwatch",
-      "watch": "Watch",
-      "options": "options",
-      "number": "number",
-      "text": "text",
-      "options-placeholder": "option1, option2, option3, here is option 4",
-      "no-options-set": "You didn't set your options yet"
+      "set-your-variables-to-watch-here": "Imposta qui le variabili da tenere presente",
+      "type": "tipo",
+      "unwatch": "Smetti di Osservare",
+      "watch": "Osserva",
+      "options": "opzioni",
+      "number": "numero",
+      "text": "testo",
+      "options-placeholder": "opzione1, opzione2, opzione3, ed infine l'opzione 4",
+      "no-options-set": "Non hai ancora impostato le opzioni"
     },
     "timers": {
       "title": "Timers",
@@ -145,32 +145,32 @@
       "errors": {
         "command_must_start_with_!": "Command must start with !",
         "this_value_must_be_a_positive_number_or_0": "This value must be a positive number or 0",
-        "value_cannot_be_empty": "Value cannot be empty"
+        "value_cannot_be_empty": "Il valore non può essere vuoto"
       },
       "dialog": {
         "title": {
-          "new": "New event listener",
-          "edit": "Edit event listener"
+          "new": "Nuovo registratore eventi",
+          "edit": "Modifica registratore di eventi"
         },
         "placeholders": {
-          "name": "Set name of your event listener (if empty, name will be generated)"
+          "name": "Imposta il nome del tuo registratore di eventi (se vuoto, verrà generato un nome casuale)"
         },
         "alerts": {
-          "success": "Event was <strong>successfully</strong> saved.",
-          "fail": "Something went <strong>wrong</strong>."
+          "success": "L'evento è stato <strong>correttamente</strong> salvato.",
+          "fail": "Qualcosa è andato <strong>storto</strong>."
         },
-        "close": "Close",
-        "save-changes": "Save changes",
-        "event": "Event",
-        "name": "Name",
-        "usable-events-variables": "Usable events variables",
-        "settings": "Settings",
-        "filters": "Filters",
-        "operations": "Operations"
+        "close": "Chiudi",
+        "save-changes": "Salvare le modifiche",
+        "event": "Evento",
+        "name": "Nome",
+        "usable-events-variables": "Variabili utilizzabili dagli eventi",
+        "settings": "Impostazioni",
+        "filters": "Filtri",
+        "operations": "Operazioni"
       },
       "definitions": {
         "filter": {
-          "label": "Filter"
+          "label": "Filtro"
         },
         "linkFilter": {
           "label": "Link Overlay Filter",
