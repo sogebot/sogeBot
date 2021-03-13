@@ -4,46 +4,46 @@
     "enabled": "abilitato",
     "disabled": "disattivato",
     "usage": "Utilizzo",
-    "lang-selected": "Bot language is currently set to english",
-    "refresh-panel": "You will need to refresh UI to see changes.",
-    "command-parse": "Sorry, $sender, but this command is not correct, use",
-    "error": "Sorry, $sender, but something went wrong!",
+    "lang-selected": "La lingua del bot è attualmente impostata in italiano",
+    "refresh-panel": "Sarà necessario aggiornare l'interfaccia utente per vedere le modifiche.",
+    "command-parse": "Siamo spiacenti, $sender, ma questo comando non è corretto, usa",
+    "error": "Siamo spiacenti, $sender, ma qualcosa è andato storto!",
     "no-response": "",
     "no-response-bool": {
       "true": "",
       "false": ""
     },
     "api": {
-      "error": "$sender, API is not responding correctly!",
-      "not-available": "not available"
+      "error": "$sender, l'API non risponde correttamente!",
+      "not-available": "non disponibile"
     },
     "percentage": {
       "true": "",
       "false": ""
     },
-    "years": "year|years",
-    "months": "month|months",
-    "days": "day|days",
-    "hours": "hour|hours",
-    "minutes": "minute|minutes",
-    "seconds": "second|seconds",
-    "messages": "message|messages",
+    "years": "anno|anni",
+    "months": "mese|mesi",
+    "days": "giorno|giorni",
+    "hours": "ora|ore",
+    "minutes": "minuto|minuti",
+    "seconds": "secondo|secondi",
+    "messages": "messaggio|messaggi",
     "bits": "bit|bits",
     "links": "link|links",
-    "entries": "entry|entries",
-    "empty": "empty",
-    "isRegistered": "$sender, you cannot use !$keyword, because is already in use for another action!"
+    "entries": "voce|voci",
+    "empty": "vuoto",
+    "isRegistered": "$sender, non puoi usare!$keyword, perché è già in uso per un'altra azione!"
   },
   "uptime": {
-    "online": "Stream is online for (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)",
-    "offline": "Stream is currently offline for (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
+    "online": "Lo stream è online da (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)",
+    "offline": "Lo stream è offline da (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
   },
   "webpanel": {
-    "this-system-is-disabled": "This system is disabled",
-    "loading": "Loading",
-    "this-may-take-a-while": "This <strong>may</strong> take a while",
-    "display-as": "Display as",
-    "go-to-admin": "Go to Admin",
+    "this-system-is-disabled": "Questo sitema è disattivato",
+    "loading": "Caricamento",
+    "this-may-take-a-while": "Questo <strong>potrebbe</strong> richiedere un po' di tempo",
+    "display-as": "Visualizza come",
+    "go-to-admin": "Vai ad Admin",
     "go-to-public": "Go to Public",
     "logout": "Logout",
     "popout": "Popout",
