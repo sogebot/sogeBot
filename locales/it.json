@@ -881,16 +881,16 @@
     "alias-group-set": "$sender, l'alias $alias è stato impostato sul gruppo $group",
     "alias-group-unset": "$sender, il gruppo di alias $alias è stato disattivato",
     "alias-group-list": "$sender, elenco dei gruppi di alias: $list",
-    "alias-group-list-aliases": "$sender, list of aliases in $group: $list",
-    "alias-group-list-enabled": "$sender, aliases in $group are enabled.",
-    "alias-group-list-disabled": "$sender, aliases in $group are disabled."
+    "alias-group-list-aliases": "$sender, elenco di alias in $group: $list",
+    "alias-group-list-enabled": "$sender, gli alias tra $group sono abilitati.",
+    "alias-group-list-disabled": "$sender, gli alias in $group sono disabilitati."
   },
   "customcmds": {
     "commands-parse-failed": "{core.command-parse} $command",
-    "command-was-not-found": "$sender, command $command was not found in database",
-    "response-was-not-found": "$sender, response #$response of command $command was not found in database",
-    "command-was-edited": "$sender, command $command is changed to '$response'",
-    "command-was-added": "$sender, command $command was added",
+    "command-was-not-found": "$sender, il comando $command non è stato trovato nel database",
+    "response-was-not-found": "$sender, la risposta #$response del comando $command non è stata trovata nel database",
+    "command-was-edited": "$sender, il comando $command è stato cambiato in '$response'",
+    "command-was-added": "$sender, il comando $command è stato aggiunto",
     "list-is-not-empty": "$sender, list of commands: $list",
     "list-is-empty": "$sender, list of commands is empty",
     "command-was-enabled": "$sender, command $command was enabled",
