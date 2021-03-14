@@ -2,7 +2,7 @@
 
 require('dotenv').config();
 
-const exec = require('child_process').exec;
+const spawn = require('child_process').spawn;
 const fs = require('fs');
 const os = require('os');
 
@@ -75,28 +75,36 @@ async function runMigration() {
   }
 
   console.log('\n... Migration in progress, please wait (see logs/migration.log for progress and error) ...');
-  exec('npx typeorm migration:run', {
-    maxBuffer: Number.MAX_SAFE_INTEGER,
-    env:       {
-      ...process.env,
-      'TYPEORM_ENTITIES':   'dest/database/entity/*.js',
-      'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
-    },
-  }, (error, stdout, stderr) => {
-    fs.writeFileSync(logFile, stdout + os.EOL, { flag: 'a' });
-    fs.writeFileSync(logFile, stderr + os.EOL, { flag: 'a' });
 
-    if(error) {
-      fs.writeFileSync(logFile, error + os.EOL, { flag: 'a' });
-      console.error('\n!!! Migration FAILED, please check your logs/migration.log for additional information !!! \n');
-      process.exit(1);
-    } else {
-      console.log('\n ... Migration done\n');
-      process.exit(0);
-    }
+  const exitCode = await new Promise(resolve => {
+    const migration = spawn('npx',  ['typeorm', 'migration:run'], {
+      shell: true,
+      env:   {
+        ...process.env,
+        'TYPEORM_ENTITIES':   'dest/database/entity/*.js',
+        'TYPEORM_MIGRATIONS': `dest/database/migration/${getMigrationType(process.env.TYPEORM_CONNECTION)}/**/*.js`,
+      },
+    }).on('error', function( err ){
+      throw err; 
+    });
+    migration.stdout.on('data', (data) => {
+      fs.writeFileSync(logFile, data, { flag: 'a' });
+    });
+
+    migration.stderr.on('data', (data) => {
+      fs.writeFileSync(logFile, data, { flag: 'a' });
+    });
+
+    migration.on('close', (code) => {
+      resolve(code);
+    });
   });
+
+  if (exitCode !== 0) {
+    console.error('\n!!! Migration FAILED, please check your logs/migration.log for additional information !!! \n');
+  } else {
+    console.log('\n ... Migration done\n');
+  }
+  process.exit(exitCode);
 }
 runMigration();
-/*
-typeorm migration:run
-*/
