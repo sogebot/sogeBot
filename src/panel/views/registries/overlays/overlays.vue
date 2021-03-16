@@ -212,7 +212,7 @@ export default defineComponent({
     }, { deep: true });
     watch(copied, (val) => {
       if (val.length > 0) {
-        navigator.clipboard.writeText(`https://${document.location.host}/overlays/${val}`);
+        navigator.clipboard.writeText(`${document.location.protocol}//${document.location.host}/overlays/${val}`);
         setTimeout(() => {
           copied.value = '';
           ctx.root.$emit('bv::hide::tooltip');
