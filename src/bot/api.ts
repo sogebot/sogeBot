@@ -921,6 +921,10 @@ class API extends Core {
         // correct status and we've got a data - stream online
         const streamData = request.data.data[0];
 
+        if (isStreamOnline.value) {
+          eventEmitter.emit('every-x-minutes-of-stream', { reset: false } );
+        }
+
         if (dayjs(streamData.started_at).valueOf() >=  dayjs(streamStatusChangeSince.value).valueOf()) {
           streamStatusChangeSince.value = (new Date(streamData.started_at)).getTime();
         }
