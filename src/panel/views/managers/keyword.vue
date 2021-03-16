@@ -419,6 +419,7 @@ import { isNil, orderBy } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 import { validationMixin } from 'vuelidate';
 import { minLength, required } from 'vuelidate/lib/validators';
+import XRegExp from 'xregexp';
 
 import type { KeywordInterface } from 'src/bot/database/entity/keyword';
 import type { PermissionsInterface } from 'src/bot/database/entity/permissions';
@@ -437,9 +438,10 @@ const socket = {
 } as const;
 const isValidRegex = (val: string) => {
   try {
-    new RegExp(val);
+    XRegExp(val);
     return true;
   } catch (e) {
+    error(e);
     return false;
   }
 };
