@@ -20,7 +20,8 @@
             },
             "preLaunchTask": "npm: build",
             "sourceMaps": true,
-            "port": 9229
+            "port": 9229,
+            "outFiles": ["${workspaceFolder}/dest/**/*"]
         },
         {
             "type": "node",
@@ -40,7 +41,8 @@
             },
             "preLaunchTask": "npm: build",
             "sourceMaps": true,
-            "port": 9229
+            "port": 9229,
+            "outFiles": ["${workspaceFolder}/dest/**/*"]
         }
     ]
 }
