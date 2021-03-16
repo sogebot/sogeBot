@@ -763,12 +763,12 @@
     "command-send-x-times": "kommando blev sendt x gange",
     "keyword-send-x-times": "keyword was send x times",
     "number-of-viewers-is-at-least-x": "number of viewers is at least x",
-    "stream-started": "stream started",
+    "stream-started": "stream startet",
     "reward-redeemed": "belønning indløst",
-    "stream-stopped": "stream stopped",
-    "stream-is-running-x-minutes": "stream is running x minutes",
-    "every-x-minutes-of-stream": "every x minutes of stream",
-    "game-changed": "game changed",
+    "stream-stopped": "stream afsluttet",
+    "stream-is-running-x-minutes": "stream kører x minutter",
+    "every-x-minutes-of-stream": "hvert x minutter af stream",
+    "game-changed": "spil ændret",
     "cheer": "bit modtaget",
     "clearchat": "chatten blev ryddet",
     "action": "bruger brugte /me",
@@ -813,16 +813,16 @@
     "create-a-clip": "opret et klip",
     "create-a-clip-and-play-replay": "opret et klip og afspil som genafspilning (overlay/alerts)",
     "increment-custom-variable": "increment a custom variable",
-    "set-custom-variable": "set a custom variable",
+    "set-custom-variable": "sæt en brugerdefineret variabel",
     "decrement-custom-variable": "decrement a custom variable",
-    "omit": "omit",
+    "omit": "omgå",
     "comply": "comply",
-    "visible": "visible",
-    "hidden": "hidden",
-    "gamblingChanceToWin": "Chance to win !gamble",
-    "gamblingMinimalBet": "Minimal bet for !gamble",
-    "duelDuration": "Duration of !duel",
-    "duelMinimalBet": "Minimal bet for !duel"
+    "visible": "synlig",
+    "hidden": "skjult",
+    "gamblingChanceToWin": "Chance for at vinde !gamble",
+    "gamblingMinimalBet": "Minimal indsats for !gamble",
+    "duelDuration": "Varighed af !duel",
+    "duelMinimalBet": "Minimal indsats for !duel"
   },
   "raffles": {
     "announceInterval": "Opened raffles will be announced every $value minute",
@@ -954,12 +954,12 @@
   "songs": {
     "playlist-is-empty": "$sender, playlist to import is empty",
     "playlist-imported": "$sender, imported $imported and skipped $skipped to playlist",
-    "not-playing": "Not Playing",
+    "not-playing": "Afspiller Ikke",
     "song-was-banned": "Song $name was banned and will never play again!",
     "song-was-banned-timeout-message": "You've got timeout for posting banned song",
     "song-was-unbanned": "Song was succesfully unbanned",
-    "song-was-not-banned": "This song was not banned",
-    "no-song-is-currently-playing": "No song is currently playing",
+    "song-was-not-banned": "Denne sang blev ikke udelukket",
+    "no-song-is-currently-playing": "Ingen sang spiller i øjeblikket",
     "current-song-from-playlist": "Current song is $name from playlist",
     "current-song-from-songrequest": "Current song is $name requested by $username",
     "songrequest-disabled": "Sorry, $sender, song requests are disabled",
@@ -1115,19 +1115,19 @@
     "cooldown-was-unset": "$sender, cooldown for $command blev ikke sat",
     "cooldown-triggered": "$sender, du kan ikke benytte $command, før om $secondss",
     "cooldown-not-found": "$sender, cooldown for $command blev ikke fundet",
-    "cooldown-was-enabled": "$sender, cooldown for $command er aktiveret",
-    "cooldown-was-disabled": "$sender, cooldown for $command er deaktiveret",
-    "cooldown-was-enabled-for-moderators": "$sender, cooldown for $command was enabled for moderators",
-    "cooldown-was-disabled-for-moderators": "$sender, cooldown for $command was disabled for moderators",
-    "cooldown-was-enabled-for-owners": "$sender, cooldown for $command was enabled for owners",
-    "cooldown-was-disabled-for-owners": "$sender, cooldown for $command was disabled for owners",
-    "cooldown-was-enabled-for-subscribers": "$sender, cooldown for $command was enabled for subscribers",
-    "cooldown-was-disabled-for-subscribers": "$sender, cooldown for $command was disabled for subscribers",
-    "cooldown-was-enabled-for-followers": "$sender, cooldown for $command was enabled for followers",
-    "cooldown-was-disabled-for-followers": "$sender, cooldown for $command was disabled for followers"
+    "cooldown-was-enabled": "$sender, cooldown for $command blev slået til",
+    "cooldown-was-disabled": "$sender, cooldown for $command blev slået fra",
+    "cooldown-was-enabled-for-moderators": "$sender, nedkøling for $command blev slået til for moderatorer",
+    "cooldown-was-disabled-for-moderators": "$sender, nedkøling for $command blev slået fra for moderatorer",
+    "cooldown-was-enabled-for-owners": "$sender, nedkøling for $command blev slået til for ejere",
+    "cooldown-was-disabled-for-owners": "$sender, nedkøling for $command blev slået fra for ejere",
+    "cooldown-was-enabled-for-subscribers": "$sender, nedkøling for $command blev slået til for abonnenter",
+    "cooldown-was-disabled-for-subscribers": "$sender, nedkøling for $command blev slået fra for abonnenter",
+    "cooldown-was-enabled-for-followers": "$sender, nedkøling for $command blev slået til for følgere",
+    "cooldown-was-disabled-for-followers": "$sender, nedkøling for $command blev slået fra for følgere"
   },
   "timers": {
-    "id-must-be-defined": "$sender, response id must be defined.",
+    "id-must-be-defined": "$sender, svar-id skal defineres.",
     "id-or-name-must-be-defined": "$sender, response id or timer name must be defined.",
     "name-must-be-defined": "$sender, timer name must be defined.",
     "response-must-be-defined": "$sender, timer response must be defined.",
@@ -1143,8 +1143,8 @@
     "response-deleted": "$sender, response (id: $id) was deleted.",
     "response-was-added": "$sender, response (id: $id) for timer (name: $name) was added - '$response'",
     "response-not-found": "$sender, response (id: $id) was not found in database",
-    "response-enabled": "$sender, response (id: $id) was enabled",
-    "response-disabled": "$sender, response (id: $id) was disabled"
+    "response-enabled": "$sender, svar (id: $id) blev aktiveret",
+    "response-disabled": "$sender, svar (id: $id) blev deaktiveret"
   },
   "gambling": {
     "duel": {
@@ -1214,30 +1214,30 @@
         "false": "Bot will send permissions insufficient errors through whispers"
       },
       "disableCooldownWhispers": {
-        "true": "Bot won't send cooldown notifications",
-        "false": "Bot will send cooldown notifications through whispers"
+        "true": "Bot sender ikke nedkølingsmeddelelser",
+        "false": "Bot vil sende nedkølingsmeddelelser via whispers"
       }
     }
   },
   "phillipsHue": {
-    "list": "$sender, List of Phillips Hue connected lights: "
+    "list": "$sender, Liste over Phillips Hue tilsluttede lys: "
   },
-  "time": "Current streamers time in his timezone is $time",
-  "subs": "$sender, there is currently $onlineSubCount online subscribers. Last sub/resub was $lastSubUsername $lastSubAgo",
-  "followers": "$sender, there is currently $onlineFollowersCount online followers. Last follow was $lastFollowUsername $lastFollowAgo",
+  "time": "Streamerens tid i dennes tidszone er $time",
+  "subs": "$sender, der er i øjeblikket $onlineSubCount abonnenter online. Sidste abonnerende var $lastSubUsername $lastSubAgo",
+  "followers": "$sender, der er i øjeblikket $onlineFollowersCount følgere online. Sidste følger var $lastFollowUsername $lastFollowAgo",
   "ignore": {
     "user": {
       "is": {
         "not": {
-          "ignored": "$sender, user $username is not ignored by bot"
+          "ignored": "$sender, bruger $username ignoreres ikke af bot"
         },
-        "added": "$sender, user $username is added to bot ignorelist",
-        "removed": "$sender, user $username is removed from bot ignorelist",
-        "ignored": "$sender, user $username is ignored by bot"
+        "added": "$sender, bruger $username er tilføjet til bottens ignoreringsliste",
+        "removed": "$sender, bruger $username er fjernet fra bottens ignoreringsliste",
+        "ignored": "$sender, bruger $username ignoreres af bot"
       }
     }
   },
   "filters": {
-    "setVariable": "$sender, $variable was set to $value."
+    "setVariable": "$sender, $variable blev sat til $value."
   }
 }

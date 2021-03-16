@@ -3,7 +3,7 @@
     "enabled": "Status",
     "accessBy": {
       "title": "Tilgængelig for",
-      "help": "Direct - connect directly from a bot | Overlay - connect via overlay browser source"
+      "help": "Direkte - tilslut direkte fra en bot | Overlag - tilslut via overlag browserkilde"
     },
     "address": "Adresse",
     "password": "Adgangskode"

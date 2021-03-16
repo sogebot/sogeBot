@@ -446,7 +446,7 @@
           "displayname": "Name auf Twitter",
           "url": "Tweet Link"
         },
-        "sceneName": "Name of scene"
+        "sceneName": "Name der Szene"
       }
     },
     "page-settings": {
@@ -754,7 +754,7 @@
     "user-parted-channel": "Benutzer hat einen Kanal verlassen",
     "follow": "Neuer Follower",
     "tip": "Neue Spende",
-    "obs-scene-changed": "OBS scene changed",
+    "obs-scene-changed": "OBS Szene geändert",
     "unfollow": "Entfolgen",
     "subscription": "Neuer Abonnent",
     "subgift": "Neuer verschenkter Sub",

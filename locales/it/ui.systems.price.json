@@ -1,0 +1,21 @@
+{
+  "new": "New Price",
+  "empty": "No price were created yet.",
+  "emptyAfterSearch": "No price were found by your search for <strong>\"$search\"</strong>.",
+  "emitRedeemEvent": "Emit redeem event if bits are used",
+  "command": {
+    "name": "command",
+    "placeholder": ""
+  },
+  "price": {
+    "name": "price",
+    "placeholder": ""
+  },
+  "error": {
+    "isEmpty": "This value cannot be empty"
+  },
+  "warning": "This action cannot be reverted!",
+  "settings": {
+    "enabled": "Status"
+  }
+}

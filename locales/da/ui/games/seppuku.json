@@ -2,8 +2,8 @@
   "settings": {
     "enabled": "Status",
     "timeout": {
-      "title": "Timeout duration",
-      "help": "Seconds"
+      "title": "Timeout varighed",
+      "help": "Sekunder"
     }
   }
 }

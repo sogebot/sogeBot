@@ -13,47 +13,47 @@
   "empty": "No action sets were created yet.",
   "emptyAfterSearch": "No action sets were found by your search for <strong>\"$search\"</strong>.",
   "command": "Command",
-  "new": "Create new OBS Websocket action set",
-  "actions": "Actions",
+  "new": "Neue OBS Websocket Aktion erstellen",
+  "actions": "Aktionen",
   "name": {
     "name": "Name"
   },
-  "mute": "Mute",
-  "unmute": "Unmute",
+  "mute": "Stumm schalten",
+  "unmute": "Stummschaltung aufheben",
   "SetCurrentScene": {
-    "name": "SetCurrentScene"
+    "name": "Aktuelle Szene setzen"
   },
   "StartReplayBuffer": {
-    "name": "StartReplayBuffer"
+    "name": "Replaypuffer starten"
   },
   "StopReplayBuffer": {
-    "name": "StopReplayBuffer"
+    "name": "Replaypuffer stoppen"
   },
   "SaveReplayBuffer": {
-    "name": "SaveReplayBuffer"
+    "name": "Replaypuffer speichern"
   },
   "WaitMs": {
-    "name": "Wait X miliseconds"
+    "name": "Warte X Millisekunden"
   },
   "Log": {
-    "name": "Log message"
+    "name": "Log-Meldung"
   },
   "StartRecording": {
-    "name": "StartRecording"
+    "name": "Aufnahme starten"
   },
   "StopRecording": {
-    "name": "StopRecording"
+    "name": "Aufnahme stoppen"
   },
   "PauseRecording": {
-    "name": "PauseRecording"
+    "name": "Aufnahme pausieren"
   },
   "ResumeRecording": {
-    "name": "ResumeRecording"
+    "name": "Aufnahme fortsetzen"
   },
   "SetMute": {
-    "name": "SetMute"
+    "name": "Stummschaltung setzen"
   },
   "SetVolume": {
-    "name": "SetVolume"
+    "name": "Lautstärke setzen"
   }
 }

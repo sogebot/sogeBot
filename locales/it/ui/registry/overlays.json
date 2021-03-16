@@ -1,0 +1,8 @@
+{
+  "newMapping": "Create new overlay link mapping",
+  "emptyMapping": "No overlay link mapping were created yet.",
+  "allowedIPs": {
+    "name": "Allowed IPs",
+    "help": "Allow access from set IPs separated by new line"
+  }
+}

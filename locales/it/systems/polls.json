@@ -1,0 +1,15 @@
+{
+  "opened_normal": "Poll opened for \"$title\"! You can vote by $command X",
+  "opened_numbers": "Poll by numbers opened for \"$title\"! You can vote by typing number into chat.",
+  "opened_tips": "Poll by tips opened for \"$title\"! You can vote by adding hashtag #voteX into tip message",
+  "opened_bits": "Poll by bits opened for \"$title\"! You can vote by adding hashtag #voteX into bit message",
+  "alreadyOpened_normal": "Error! Poll was already opened for \"$title\"! You can vote by $command X",
+  "alreadyOpened_numbers": "Error! Poll was already opened for \"$title\"! You can vote by typing number into chat.",
+  "alreadyOpened_tips": "Error! Poll by tips was already opened for \"$title\"! You can vote by adding hashtag #voteX into tip message",
+  "alreadyOpened_bits": "Error! Poll by bits was already opened for \"$title\"! You can vote by adding hashtag #voteX into bit message",
+  "notEnoughOptions": "$sender, new poll must have at least 2 options!",
+  "notInProgress": "$sender, there is currently no poll in progress!",
+  "status": "$sender, current status of poll \"$title\":",
+  "status_closed": "Poll \"$title\" closed, status of voting:",
+  "votes": "vote|votes"
+}

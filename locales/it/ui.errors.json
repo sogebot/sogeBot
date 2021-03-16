@@ -1,0 +1,21 @@
+{
+  "this_value_must_be_a_positive_number_and_greater_then_0": "This value must be a positive number or greater then 0",
+  "command_must_start_with_!": "Command must start with !",
+  "this_value_must_be_a_positive_number_or_0": "This value must be a positive number or 0",
+  "value_cannot_be_empty": "Value cannot be empty",
+  "minLength_of_value_is": "Minimal length is $value.",
+  "this_currency_is_not_supported": "This currency is not supported",
+  "something_went_wrong": "Something went wrong",
+  "permission_must_exist": "Permission must exist",
+  "minValue_of_value_is": "Minimal value is $value",
+  "value_cannot_be": "Value cannot be $value.",
+  "invalid_format": "Invalid value format.",
+  "invalid_regexp_format": "This is not valid regex.",
+  "owner_and_broadcaster_oauth_is_not_set": "Owner and broadcaster oauth is not set",
+  "channel_is_not_set": "Channel is not set",
+  "please_set_your_broadcaster_oauth_or_owners": "Please set your <a href=\"#/settings/core/oauth\">broadcaster oauth or owners</a>, or all users <strong>will have access</strong> to this dashboard and will be considered as <strong>casters</strong>.",
+  "please_set_your_channel": "Please set your <a href=\"#/settings/core/oauth\">channel</a>, or bot <strong>won't know</strong> where to connect and <strong>will not be working</strong>.",
+  "new_update_available": "New update available",
+  "new_bot_version_available_at": "New bot version $version available at <a href=\"https://github.com/sogehige/sogeBot/releases/tag/$version\">GitHub</a>.",
+  "one_of_inputs_must_be_set": "One of inputs must be set"
+}
