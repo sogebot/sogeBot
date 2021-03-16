@@ -625,12 +625,6 @@ class API extends Core {
     const cid = channelId.value;
     const url = `https://api.twitch.tv/helix/channels?broadcaster_id=${cid}`;
 
-    // getChannelInformation only if stream is offline - we are using getCurrentStreamData for online stream title/game
-    if (isStreamOnline.value) {
-      retries.getChannelInformation = 0;
-      return { state: true, opts };
-    }
-
     const token = oauth.botAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
     if (needToWait) {
@@ -662,7 +656,7 @@ class API extends Core {
           return { state: true, opts };
         } else if (request.data.data[0].title !== title && !opts.forceUpdate) {
           // check if title is same as updated title
-          const numOfRetries = twitch.isTitleForced ? 1 : 15;
+          const numOfRetries = twitch.isTitleForced ? 1 : 5;
           if (retries.getChannelInformation >= numOfRetries) {
             retries.getChannelInformation = 0;
 
@@ -941,31 +935,6 @@ class API extends Core {
 
         setCurrentRetries(0);
         this.saveStreamData(streamData);
-
-        if (!gameOrTitleChangedManually.value) {
-          let _rawStatus = rawStatus.value;
-          const status = await parseTitle(null);
-          const game = await getGameNameFromId(Number(streamData.game_id));
-
-          apiStats.value.currentTitle = streamData.title;
-          apiStats.value.currentGame = game;
-
-          if (streamData.title !== status) {
-            // check if status is same as updated status
-            if (retries.getCurrentStreamData >= 12) {
-              retries.getCurrentStreamData = 0;
-              _rawStatus = streamData.title;
-              rawStatus.value = _rawStatus;
-            } else {
-              retries.getCurrentStreamData++;
-              return { state: false, opts };
-            }
-          } else {
-            retries.getCurrentStreamData = 0;
-          }
-          gameCache.value = game;
-          rawStatus.value = _rawStatus;
-        }
       } else {
         if (isStreamOnline.value && curRetries < maxRetries) {
           // retry if it is not just some network / twitch issue
