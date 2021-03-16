@@ -4,7 +4,7 @@ import axios from 'axios';
 import { defaults, isNil } from 'lodash';
 
 import {
-  calls, gameCache, gameOrTitleChangedManually, rawStatus, retries, setRateLimit, stats,
+  calls, gameCache, gameOrTitleChangedManually, rawStatus, setRateLimit, stats,
 } from '../helpers/api';
 import { parseTitle } from '../helpers/api/parseTitle';
 import { eventEmitter } from '../helpers/events/emitter';
@@ -130,7 +130,6 @@ async function setTitleAndGame (args: { title?: string | null; game?: string | 
       stats.value.currentTitle = args.title;
     }
     gameOrTitleChangedManually.value = true;
-    retries.getCurrentStreamData = 0;
     return responses;
   }
   return { response: '', status: false };
