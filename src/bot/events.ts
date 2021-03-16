@@ -297,6 +297,7 @@ class Events extends Core {
       if ((!shouldRunByFilter || !shouldRunByDefinition)) {
         continue;
       }
+      info(`Event ${eventId} with attributes ${JSON.stringify(attributes)} is triggered and running of operations.`);
 
       for (const operation of event.operations) {
         const isOperationSupported = typeof this.supportedOperationsList.find((o) => o.id === operation.name) !== 'undefined';
