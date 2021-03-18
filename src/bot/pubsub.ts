@@ -2,7 +2,8 @@ import { setInterval } from 'timers';
 
 import WebSocket from 'ws';
 
-import { SECOND } from './constants';
+import { MINUTE, SECOND } from './constants';
+import { isStreamOnline } from './helpers/api';
 import { eventEmitter } from './helpers/events';
 import {
   ban, debug, error, info, redeem, timeout, unban, warning,
@@ -22,6 +23,15 @@ let heartbeatHandle: NodeJS.Timeout | undefined;
 let connectionHash = '';
 
 let ERR_BADAUTH = false;
+
+const rewardsRedeemed = new Set();
+
+setInterval(() => {
+  console.log(rewardsRedeemed.keys());
+  if (!isStreamOnline.value) {
+    rewardsRedeemed.clear();
+  }
+}, 10 * MINUTE);
 
 setInterval(() => {
   try {
@@ -79,6 +89,11 @@ const connect = () => {
     if (message.type === 'MESSAGE') {
       const dataMessage: any = JSON.parse(message.data.message);
       if (dataMessage.type === 'reward-redeemed') {
+        if (rewardsRedeemed.has(dataMessage.data.redemption.id)) {
+          return;
+        } else {
+          rewardsRedeemed.add(dataMessage.data.redemption.id);
+        }
         // trigger reward-redeemed event
         if (dataMessage.data.redemption.user_input) {
           redeem(`${dataMessage.data.redemption.user.login}#${dataMessage.data.redemption.user.id} redeemed ${dataMessage.data.redemption.reward.title}: ${dataMessage.data.redemption.user_input}`);
