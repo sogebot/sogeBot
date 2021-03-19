@@ -27,7 +27,6 @@ let ERR_BADAUTH = false;
 const rewardsRedeemed = new Set();
 
 setInterval(() => {
-  console.log(rewardsRedeemed.keys());
   if (!isStreamOnline.value) {
     rewardsRedeemed.clear();
   }
