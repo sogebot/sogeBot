@@ -102,7 +102,7 @@
   "default": "Standard",
   "frequently": "Häufig",
   "very-frequently": "Sehr häufig",
-  "exclusive": "Exclusive",
+  "exclusive": "Exklusiv",
   "messageTemplate": {
     "name": "Nachrichtenvorlage",
     "placeholder": "Nachrichtenvorlage festlegen",
@@ -127,7 +127,7 @@
     "name": "Layout"
   },
   "scale": {
-    "name": "Scale"
+    "name": "Skalieren"
   },
   "translateY": {
     "name": "Move -Up / +Down"
@@ -144,7 +144,7 @@
     "setting": "Sound settings"
   },
   "soundVolume": {
-    "name": "Alert volume"
+    "name": "Alert Lautstärke"
   },
   "enableAdvancedMode": "Erweiterten Modus aktivieren",
   "font": {
