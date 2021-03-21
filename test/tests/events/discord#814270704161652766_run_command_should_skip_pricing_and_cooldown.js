@@ -11,6 +11,7 @@ require('../../general.js');
 const { Event } = require('../../../dest/database/entity/event');
 const { User } = require('../../../dest/database/entity/user');
 const events = (require('../../../dest/events')).default;
+const defaultPermissions = (require('../../../dest/helpers/permissions/defaultPermissions')).defaultPermissions;
 const alias = (require('../../../dest/systems/alias')).default;
 const commercial = (require('../../../dest/systems/commercial')).default;
 const cooldown = (require('../../../dest/systems/cooldown')).default;
