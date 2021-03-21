@@ -11,6 +11,7 @@ require('../../general.js');
 const { Event } = require('../../../dest/database/entity/event');
 const { User } = require('../../../dest/database/entity/user');
 const events = (require('../../../dest/events')).default;
+const defaultPermissions = (require('../../../dest/helpers/permissions/defaultPermissions')).defaultPermissions;
 const alias = (require('../../../dest/systems/alias')).default;
 const commercial = (require('../../../dest/systems/commercial')).default;
 const cooldown = (require('../../../dest/systems/cooldown')).default;
@@ -41,7 +42,7 @@ describe('Events - event run command should be able to skip pricing and cooldown
       },
     }];
     await getRepository(Event).save(event);
-    await alias.add({ sender: user.owner, parameters: '-a !test -c !commercial' });
+    await alias.add({ sender: user.owner, parameters: '-a !test -c !commercial -p ' + defaultPermissions.CASTERS });
 
     const r = await cooldown.main({ sender: user.owner, parameters: '!test global 20 true' });
     assert.strictEqual(r[0].response, '$sender, global cooldown for !test was set to 20s');
