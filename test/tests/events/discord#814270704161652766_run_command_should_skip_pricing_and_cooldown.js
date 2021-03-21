@@ -41,7 +41,7 @@ describe('Events - event run command should be able to skip pricing and cooldown
       },
     }];
     await getRepository(Event).save(event);
-    await alias.add({ sender: user.owner, parameters: '-a !test -c !commercial' });
+    await alias.add({ sender: user.owner, parameters: '-a !test -c !commercial -p ' + defaultPermissions.CASTERS });
 
     const r = await cooldown.main({ sender: user.owner, parameters: '!test global 20 true' });
     assert.strictEqual(r[0].response, '$sender, global cooldown for !test was set to 20s');

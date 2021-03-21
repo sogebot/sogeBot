@@ -9,6 +9,7 @@ require('../../general.js');
 const { Event } = require('../../../dest/database/entity/event');
 const { User } = require('../../../dest/database/entity/user');
 const events = (require('../../../dest/events')).default;
+const defaultPermissions = (require('../../../dest/helpers/permissions/defaultPermissions')).defaultPermissions;
 const alias = (require('../../../dest/systems/alias')).default;
 const commercial = (require('../../../dest/systems/commercial')).default;
 const db = require('../../general.js').db;
@@ -16,7 +17,7 @@ const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 const user = require('../../general.js').user;
 
-describe('Events - event run command should be able to run caster command - https://discord.com/channels/317348946144002050/317349069024395264/812872046077411328', () => {
+describe('Events - event run command should be able to run caster command and alias - https://discord.com/channels/317348946144002050/317349069024395264/812872046077411328', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
@@ -45,7 +46,7 @@ describe('Events - event run command should be able to run caster command - http
         isCommandQuiet: false,
       },
     }];
-    await alias.add({ sender: user.owner, parameters: '-a !test2 -c !command' });
+    const a = await alias.add({ sender: user.owner, parameters: '-a !test2 -c !command -p ' + defaultPermissions.CASTERS });
     await getRepository(Event).save(event);
   });
 
@@ -63,8 +64,11 @@ describe('Events - event run command should be able to run caster command - http
       });
     });
 
-    it('commands should be triggered', async () => {
+    it('command should be triggered', async () => {
       await message.isSentRaw(`Usage: !test [duration] [optional-message]`, follower);
+    });
+
+    it('alias should be triggered', async () => {
       await message.isSentRaw(`Usage => http://sogehige.github.io/sogeBot/#/_master/systems/custom-commands`, follower);
     });
 

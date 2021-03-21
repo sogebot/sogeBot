@@ -133,7 +133,7 @@ class Alias extends System {
         if (typeof getFromViewersCache(opts.sender.userId, alias.permission) === 'undefined') {
           addToViewersCache(opts.sender.userId, alias.permission, (await check(opts.sender.userId, alias.permission, false)).access);
         }
-        if (getFromViewersCache(opts.sender.userId, alias.permission)) {
+        if (opts.skip || getFromViewersCache(opts.sender.userId, alias.permission)) {
           // process custom variables
           const response = await executeVariablesInText(
             opts.message.replace(replace, alias.command), {
