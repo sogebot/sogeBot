@@ -284,7 +284,7 @@ class OAuth extends Core {
         debug('oauth.validate', JSON.stringify(request.data));
       } catch (e) {
         if (e.isAxiosError) {
-          if (e.response.status !== 401 && retry < 5) {
+          if ((typeof e.response === 'undefined' || e.response.status !== 401) && retry < 5) {
             // retry validation if error is different than 401 Invalid Access Token
             await new Promise<void>((resolve) => {
               setTimeout(() => resolve(), 1000 + (retry ** 2));
