@@ -151,7 +151,6 @@ class StreamElements extends Integration {
     const { username, amount, message } = eventData.data;
     const DONATION_CURRENCY = eventData.data.currency;
 
-    const user = await users.getUserByUsername(username);
     const newTip: UserTipInterface = {
       amount:        Number(amount),
       currency:      DONATION_CURRENCY,
@@ -160,14 +159,21 @@ class StreamElements extends Integration {
       tippedAt:      Date.now(),
       exchangeRates: currency.rates,
     };
-    user.tips.push(newTip);
-    getRepository(User).save(user);
 
     if (isStreamOnline.value) {
       stats.value.currentTips = stats.value.currentTips + currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value);
     }
 
-    tip(`${username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(amount).toFixed(2)}${DONATION_CURRENCY}, message: ${message}`);
+    users.getUserByUsername(username)
+      .then(user => {
+        user.tips.push(newTip);
+        getRepository(User).save(user);
+        tip(`${username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(amount).toFixed(2)}${DONATION_CURRENCY}, message: ${message}`);
+      })
+      .catch(() => {
+        // user not found on Twitch
+        tip(`${username.toLowerCase()}#__anonymous__, amount: ${Number(amount).toFixed(2)}${DONATION_CURRENCY}, message: ${message}`);
+      });
 
     eventlist.add({
       event:     'tip',
