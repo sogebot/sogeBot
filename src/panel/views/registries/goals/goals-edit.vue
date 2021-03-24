@@ -55,7 +55,7 @@
     </panel>
 
     <div class="pt-3">
-      <form :key="'goals-edit-form-' + currentGoal.id">
+      <form :key="'goals-edit-form-' + group.id">
         <div class="form-group col-md-12">
           <label for="name_input">{{ translate('registry.goals.input.nameGroup.title') }}</label>
           <input
@@ -651,8 +651,9 @@ export default Vue.extend({
           console.error(err);
           return;
         }
-        if (Object.keys(d).length === 0) {
+        if (d === null || Object.keys(d).length === 0) {
           this.$router.push({ name: 'GoalsRegistryList' });
+          return;
         }
         this.groupId = String(d.id);
 

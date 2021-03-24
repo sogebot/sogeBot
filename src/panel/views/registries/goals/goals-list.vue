@@ -1,66 +1,148 @@
 <template>
-  <div class="container-fluid" ref="window">
+  <div
+    ref="window"
+    class="container-fluid"
+  >
     <div class="row">
       <div class="col-12">
         <span class="title text-default mb-2">
           {{ translate('menu.registry') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.goals') }}
         </span>
       </div>
     </div>
 
-    <panel cards search @search="search = $event">
-      <template v-slot:left>
-        <button-with-icon class="btn-primary btn-reverse" icon="plus" href="#/registry/goals/edit">{{translate('registry.goals.addGoalGroup')}}</button-with-icon>
+    <panel
+      cards
+      search
+      @search="search = $event"
+    >
+      <template #left>
+        <button-with-icon
+          class="btn-primary btn-reverse"
+          icon="plus"
+          href="#/registry/goals/edit"
+        >
+          {{ translate('registry.goals.addGoalGroup') }}
+        </button-with-icon>
       </template>
     </panel>
 
-    <div class="card-deck" v-for="(chunk, index) of chunk(orderBy(groupsFiltered, 'createdAt', 'desc'), itemsPerPage)" :key="index">
-      <div class="card mb-2 p-0" :class="['col-' + (12 / itemsPerPage)]" v-for="group of chunk" :key="group.id">
+    <div
+      v-for="(chunk, index) of chunk(orderBy(groupsFiltered, 'createdAt', 'desc'), itemsPerPage)"
+      :key="index"
+      class="card-deck"
+    >
+      <div
+        v-for="group of chunk"
+        :key="group.id"
+        class="card mb-2 p-0"
+        :class="['col-' + (12 / itemsPerPage)]"
+      >
         <div class="card-header">
-          <strong>{{group.name}}</strong> <small class="text-muted">{{group.id}}</small>
+          <strong>{{ group.name }}</strong> <small class="text-muted">{{ group.id }}</small>
         </div>
         <div class="card-body">
           <dl class="row">
-            <dt class="col-6">{{translate('registry.goals.input.displayAs.title')}}</dt>
-            <dd class="col-6">{{group.display.type}}</dd>
+            <dt class="col-6">
+              {{ translate('registry.goals.input.displayAs.title') }}
+            </dt>
+            <dd class="col-6">
+              {{ group.display.type }}
+            </dd>
             <template v-if="group.display.type === 'fade'">
-              <dt class="col-6">{{translate('registry.goals.input.durationMs.title')}}</dt>
-              <dd class="col-6">{{group.display.durationMs}}ms</dd>
-              <dt class="col-6">{{translate('registry.goals.input.animationInMs.title')}}</dt>
-              <dd class="col-6">{{group.display.animationInMs}}ms</dd>
-              <dt class="col-6">{{translate('registry.goals.input.animationOutMs.title')}}</dt>
-              <dd class="col-6">{{group.display.animationOutMs}}ms</dd>
+              <dt class="col-6">
+                {{ translate('registry.goals.input.durationMs.title') }}
+              </dt>
+              <dd class="col-6">
+                {{ group.display.durationMs }}ms
+              </dd>
+              <dt class="col-6">
+                {{ translate('registry.goals.input.animationInMs.title') }}
+              </dt>
+              <dd class="col-6">
+                {{ group.display.animationInMs }}ms
+              </dd>
+              <dt class="col-6">
+                {{ translate('registry.goals.input.animationOutMs.title') }}
+              </dt>
+              <dd class="col-6">
+                {{ group.display.animationOutMs }}ms
+              </dd>
             </template>
           </dl>
           <ul class="list-group list-group-flush border-top-0">
-            <li v-for="goal of group.goals" :key="goal.id" class="list-group-item">
+            <li
+              v-for="goal of group.goals"
+              :key="goal.id"
+              class="list-group-item"
+            >
               <dl class="row">
-                <h5 class="col-12">{{goal.name}}</h5>
-                <dt class="col-6">{{translate('registry.goals.input.type.title')}}</dt>
-                <dd class="col-6">{{goal.type}}</dd>
-
-                <dt class="col-6" v-if="goal.type === 'tips'">{{translate('registry.goals.input.countBitsAsTips.title')}}</dt>
-                <dd class="col-6" v-if="goal.type === 'tips'">{{!!goal.countBitsAsTips}}</dd>
-
-                <dt class="col-6">{{translate('registry.goals.input.goalAmount.title')}}</dt>
-                <dd class="col-6">{{goal.goalAmount}}</dd>
-
-                <dt class="col-6">{{translate('registry.goals.input.endAfter.title')}}</dt>
+                <h5 class="col-12">
+                  {{ goal.name }}
+                </h5>
+                <dt class="col-6">
+                  {{ translate('registry.goals.input.type.title') }}
+                </dt>
                 <dd class="col-6">
-                  <fa icon="infinity" fixed-width v-if="goal.endAfterIgnore"></fa>
-                  <template v-else>{{new Date(goal.endAfter).toLocaleString()}}</template>
+                  {{ goal.type }}
+                </dd>
+
+                <dt
+                  v-if="goal.type === 'tips'"
+                  class="col-6"
+                >
+                  {{ translate('registry.goals.input.countBitsAsTips.title') }}
+                </dt>
+                <dd
+                  v-if="goal.type === 'tips'"
+                  class="col-6"
+                >
+                  {{ !!goal.countBitsAsTips }}
+                </dd>
+
+                <dt class="col-6">
+                  {{ translate('registry.goals.input.goalAmount.title') }}
+                </dt>
+                <dd class="col-6">
+                  {{ goal.goalAmount }}
+                </dd>
+
+                <dt class="col-6">
+                  {{ translate('registry.goals.input.endAfter.title') }}
+                </dt>
+                <dd class="col-6">
+                  <fa
+                    v-if="goal.endAfterIgnore"
+                    icon="infinity"
+                    fixed-width
+                  />
+                  <template v-else>
+                    {{ new Date(goal.endAfter).toLocaleString() }}
+                  </template>
                 </dd>
               </dl>
             </li>
           </ul>
         </div>
         <div class="card-footer text-right">
-          <button-with-icon class="btn-only-icon btn-secondary btn-reverse" icon="clone" @click="clone(group)"/>
-          <hold-button class="btn-danger btn-only-icon" @trigger="removeGoal(group)" icon="trash">
-            <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-            <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+          <button-with-icon
+            class="btn-only-icon btn-secondary btn-reverse"
+            icon="clone"
+            @click="clone(group)"
+          />
+          <hold-button
+            class="btn-danger btn-only-icon"
+            icon="trash"
+            @trigger="removeGoal(group)"
+          >
+            <template slot="title">
+              {{ translate('dialog.buttons.delete') }}
+            </template>
+            <template slot="onHoldTitle">
+              {{ translate('dialog.buttons.hold-to-delete') }}
+            </template>
           </hold-button>
           <button-with-icon
             :text="'/overlays/goals/' + group.id"
@@ -68,19 +150,24 @@
             class="btn-dark btn-only-icon"
             icon="link"
             target="_blank"
-            />
+          />
           <button-with-icon
             :text="translate('dialog.buttons.edit')"
             :href="'#/registry/goals/edit/' + group.id"
             class="btn-primary btn-only-icon"
             icon="edit"
-            />
+          />
         </div>
       </div>
 
       <!-- add empty cards -->
       <template v-if="chunk.length !== itemsPerPage">
-        <div class="card col-4" style="visibility: hidden" v-for="i in itemsPerPage - (chunk.length % itemsPerPage)" v-bind:key="i"></div>
+        <div
+          v-for="i in itemsPerPage - (chunk.length % itemsPerPage)"
+          :key="i"
+          class="card col-4"
+          style="visibility: hidden"
+        />
       </template>
     </div>
   </div>
@@ -90,7 +177,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faClone } from '@fortawesome/free-solid-svg-icons';
 import {
-  chunk, filter, orderBy, 
+  chunk, filter, orderBy,
 } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 import Vue from 'vue';
@@ -187,7 +274,7 @@ export default Vue.extend({
         id:    clonedGroupId,
         name:  group.name + ' (clone)',
         goals: group.goals.map(goal => ({
-          ...goal, id: uuid(), groupId: clonedGroupId, 
+          ...goal, id: uuid(), groupId: clonedGroupId,
         })),
       };
       this.socket.emit('goals::save', clonedGroup, (err: string | null) => {
@@ -204,7 +291,7 @@ export default Vue.extend({
         if (err) {
           console.error(err);
         } else {
-          this.groups = this.groups.filter(o => o.id != group.id);          
+          this.groups = this.groups.filter(o => o.id != group.id);
         }
       });
     },
