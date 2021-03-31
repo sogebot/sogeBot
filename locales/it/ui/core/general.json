@@ -1,10 +1,10 @@
 {
   "settings": {
-    "lang": "Bot language",
+    "lang": "Lingua del bot",
     "gracefulExitEachXHours": {
-      "title": "Graceful exit each X hours",
-      "help": "0 - disabled"
+      "title": "Uscita graziosa ogni X ore",
+      "help": "0 - disattivato"
     },
-    "shouldGracefulExitHelp": "Enabling of graceful exit is <strong>recommended</strong> if your bot is running endlessly on server. You should have bot running on pm2 (or similar service) or have it dockerized to ensure automatic bot restart. Bot <strong>won't</strong> gracefully exit when stream is online."
+    "shouldGracefulExitHelp": "Abilitare l'uscita graziosa è <strong>raccomandato</strong> se il tuo bot è in esecuzione senza fine sul server. Dovresti avere bot in esecuzione su pm2 (o servizio simile) o averlo dockerizzato per garantire il riavvio automatico del bot. Il bot <strong>non</strong> uscirà con grazia quando lo stream è online."
   }
 }
