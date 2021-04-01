@@ -1,20 +1,20 @@
 {
-  "name": "Heist",
+  "name": "Rapina",
   "settings": {
-    "enabled": "Status",
-    "showMaxUsers": "Max users to show in payout",
+    "enabled": "Stato",
+    "showMaxUsers": "Numero massimo di utenti da mostrare nel pagamento",
     "copsCooldownInMinutes": {
-      "title": "Cooldown between heists",
-      "help": "Minutes"
+      "title": "Attesa tra rapine",
+      "help": "Minuti"
     },
     "entryCooldownInSeconds": {
-      "title": "Time to entry heist",
-      "help": "Seconds"
+      "title": "Tempo per entrare nella rapina",
+      "help": "Secondi"
     },
-    "started": "Heist start message",
-    "nextLevelMessage": "Message when next level is reached",
-    "maxLevelMessage": "Message when max level is reached",
-    "copsOnPatrol": "Response of bot when heist is still on cooldown",
+    "started": "Messaggio iniziale della rapina",
+    "nextLevelMessage": "Messaggio quando viene raggiunto il livello successivo",
+    "maxLevelMessage": "Messaggio quando viene raggiunto il livello massimo",
+    "copsOnPatrol": "Risposta del bot quando la rapina è ancora in fase di attesa",
     "copsCooldown": "Bot announcement when heist can be started",
     "singleUserSuccess": "Success message for one user",
     "singleUserFailed": "Fail message for one user",
