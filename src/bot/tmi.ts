@@ -17,7 +17,7 @@ import { User, UserBitInterface } from './database/entity/user';
 import { settings, ui } from './decorators';
 import { command, default_permission } from './decorators';
 import {
-  getFunctionList, onChange, onLoad,
+  getFunctionList, onChange, onLoad, onStreamStart,
 } from './decorators/on';
 import Expects from './expects';
 import { isStreamOnline, stats } from './helpers/api';
@@ -232,6 +232,7 @@ class TMI extends Core {
   /* will connect/reconnect bot and broadcaster
    * this is called from oauth when channel is changed or initialized
    */
+  @onStreamStart()
   async reconnect (type: 'bot' | 'broadcaster') {
     try {
       if (!this.shouldConnect) {
