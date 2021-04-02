@@ -1,7 +1,7 @@
 {
   "settings": {
-    "enabled": "Status",
-    "itemsArray": "List"
+    "enabled": "Stato",
+    "itemsArray": "Lista"
   },
-  "check": "Checklist"
+  "check": "Lista di controllo"
 }
