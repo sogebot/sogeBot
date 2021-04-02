@@ -22,9 +22,9 @@
   },
   "message": "Messaggio",
   "winPercentage": "Percentuale di vincita",
-  "payoutMultiplier": "Payout multiplier",
-  "maxUsers": "Max users for level",
-  "percentage": "Percentage",
-  "noResultsFound": "No results found. Click button below to add new result.",
-  "noLevelsFound": "No levels found. Click button below to add new level."
+  "payoutMultiplier": "Moltiplicatore di pagamento",
+  "maxUsers": "Numero massimo di utenti per livello",
+  "percentage": "Percentuale",
+  "noResultsFound": "Nessun risultato trovato. Clicca il pulsante qui sotto per aggiungere un nuovo risultato.",
+  "noLevelsFound": "Nessun livello trovato. Fare clic sul pulsante qui sotto per aggiungere un nuovo livello."
 }
