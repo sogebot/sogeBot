@@ -1,26 +1,26 @@
 {
   "settings": {
-    "enabled": "Status",
-    "guild": "Guild",
-    "listenAtChannels": "Listen for commands on this channel",
-    "sendOnlineAnnounceToChannel": "Send online announcement to this channel",
-    "sendAnnouncesToChannel": "Setup sending of announcements to channels",
-    "deleteMessagesAfterWhile": "Delete message after while",
+    "enabled": "Stato",
+    "guild": "Gilda",
+    "listenAtChannels": "Ascolta i comandi su questo canale",
+    "sendOnlineAnnounceToChannel": "Invia un annuncio online a questo canale",
+    "sendAnnouncesToChannel": "Imposta l'invio di annunci ai canali",
+    "deleteMessagesAfterWhile": "Elimina il messaggio dopo un po di tempo",
     "clientId": "ClientId",
     "token": "Token",
-    "joinToServerBtn": "Click to join bot to your server",
-    "cannotJoinToServerBtn": "Set token and clientId to be able to join bot to your server",
-    "noChannelSelected": "no channel selected",
-    "noRoleSelected": "no role selected",
-    "noGuildSelected": "no guild selected",
-    "noGuildSelectedBox": "Select guild where bot should work and you'll see more settings",
-    "onlinePresenceStatusDefault": "Default Status",
-    "onlinePresenceStatusDefaultName": "Default Status Message",
-    "onlinePresenceStatusOnStream": "Status when Streaming",
-    "onlinePresenceStatusOnStreamName": "Status Message when Streaming",
+    "joinToServerBtn": "Clicca per unirti al bot sul tuo server",
+    "cannotJoinToServerBtn": "Imposta token e clientId per essere in grado di unirsi al bot sul tuo server",
+    "noChannelSelected": "nessun canale selezionato",
+    "noRoleSelected": "nessun ruolo selezionato",
+    "noGuildSelected": "nessuna gilda selezionata",
+    "noGuildSelectedBox": "Seleziona la gilda dove il bot dovrebbe funzionare e vedrai più impostazioni",
+    "onlinePresenceStatusDefault": "Stato Predefinito",
+    "onlinePresenceStatusDefaultName": "Messaggio Di Stato Predefinito",
+    "onlinePresenceStatusOnStream": "Stato durante la trasmissione",
+    "onlinePresenceStatusOnStreamName": "Messaggio di stato durante la trasmissione",
     "ignorelist": {
-      "title": "Ignore list",
-      "help": "username, username#0000 or userID"
+      "title": "Lista degli utenti ignorati",
+      "help": "username, username#0000 o userID"
     }
   }
 }
