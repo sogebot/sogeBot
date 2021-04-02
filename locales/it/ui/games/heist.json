@@ -16,12 +16,12 @@
     "maxLevelMessage": "Messaggio quando viene raggiunto il livello massimo",
     "copsOnPatrol": "Risposta del bot quando la rapina è ancora in fase di attesa",
     "copsCooldown": "Annuncio del bot quando la rapina può essere avviata",
-    "singleUserSuccess": "Success message for one user",
-    "singleUserFailed": "Fail message for one user",
-    "noUser": "Message if no user participated"
+    "singleUserSuccess": "Messaggio di successo per un utente",
+    "singleUserFailed": "Messaggio di errore per un utente",
+    "noUser": "Messaggio se nessun utente ha partecipato"
   },
-  "message": "Message",
-  "winPercentage": "Win percentage",
+  "message": "Messaggio",
+  "winPercentage": "Percentuale di vincita",
   "payoutMultiplier": "Payout multiplier",
   "maxUsers": "Max users for level",
   "percentage": "Percentage",
