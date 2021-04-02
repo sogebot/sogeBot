@@ -1,8 +1,8 @@
 {
   "settings": {
     "key": {
-      "title": "Key",
-      "help": "Get your key at http://responsivevoice.org"
+      "title": "Chiave",
+      "help": "Ottieni la tua chiave Api su http://responsivevoice.org"
     }
   }
 }
