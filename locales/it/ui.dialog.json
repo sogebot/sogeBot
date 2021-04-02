@@ -56,15 +56,15 @@
     "delete": "Elimina",
     "play": "Esegui",
     "stop": "Arresta",
-    "hold-to-delete": "Hold to delete",
-    "yes": "Yes",
+    "hold-to-delete": "Tieni premuto per eliminare",
+    "yes": "Si",
     "no": "No",
-    "permission": "Permission",
-    "group": "Group",
-    "visibility": "Visibility",
+    "permission": "Permesso",
+    "group": "Gruppo",
+    "visibility": "Visibilità",
     "reset": "Reset "
   },
-  "changesPending": "Your changes was not saved.",
-  "formNotValid": "Form is invalid.",
-  "nothingToShow": "Nothing to show here."
+  "changesPending": "Le modifiche non sono state salvate.",
+  "formNotValid": "Modulo non valido.",
+  "nothingToShow": "Niente da mostrare qui."
 }
