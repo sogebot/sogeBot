@@ -1,40 +1,40 @@
 {
-  "enabled": "Enabled",
+  "enabled": "Abilitato",
   "testDlg": {
-    "alertTester": "Alert tester",
-    "command": "Command",
-    "username": "Username",
-    "recipient": "Recipient",
-    "message": "Message",
-    "tier": "Tier",
-    "amountOfViewers": "Amount of viewers",
-    "amountOfBits": "Amount of bits",
-    "amountOfGifts": "Amount of gifts",
-    "amountOfMonths": "Amount of months",
+    "alertTester": "Tester allerta",
+    "command": "Comando",
+    "username": "Nome Utente",
+    "recipient": "Destinatario",
+    "message": "Messaggio",
+    "tier": "Livello",
+    "amountOfViewers": "Quantità di spettatori",
+    "amountOfBits": "Quantità di bit",
+    "amountOfGifts": "Quantità di doni",
+    "amountOfMonths": "Ammontare mesi",
     "amountOfTips": "Tip",
-    "event": "Event"
+    "event": "Evento"
   },
-  "empty": "Alerts registry is empty, create new alerts.",
-  "emptyAfterSearch": "Alerts registry is empty in searching for \"<strong>$search</strong>\"",
-  "revertcode": "Revert code to defaults",
+  "empty": "Il registro degli avvisi è vuoto, crea nuovi avvisi.",
+  "emptyAfterSearch": "Il registro degli avvisi è vuoto nella ricerca di \"<strong>$search</strong>\"",
+  "revertcode": "Ripristina il codice predefinito",
   "name": {
-    "name": "Name",
-    "placeholder": "Set name of your alerts"
+    "name": "Nome",
+    "placeholder": "Imposta il nome dei tuoi avvisi"
   },
   "alertDelayInMs": {
-    "name": "Alert delay"
+    "name": "Ritardo di allarme"
   },
   "profanityFilterType": {
-    "name": "Profanity filter",
-    "disabled": "Disabled",
-    "replace-with-asterisk": "Replace with asterisk",
-    "replace-with-happy-words": "Replace with happy words",
-    "hide-messages": "Hide messages",
-    "disable-alerts": "Disable alerts"
+    "name": "Filtro profanità",
+    "disabled": "Disattivato",
+    "replace-with-asterisk": "Sostituisci con l'asterisco",
+    "replace-with-happy-words": "Sostituisci con parole felici",
+    "hide-messages": "Nascondi messaggi",
+    "disable-alerts": "Disattiva avvisi"
   },
-  "loadStandardProfanityList": "Load standard profanity list",
+  "loadStandardProfanityList": "Carica lista di profanità standard",
   "customProfanityList": {
-    "name": "Custom profanity list",
+    "name": "Lista di profanità personalizzata",
     "help": "Words should be separated with comma."
   },
   "event": {
