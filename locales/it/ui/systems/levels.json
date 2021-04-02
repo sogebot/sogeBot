@@ -1,21 +1,21 @@
 {
   "settings": {
-    "enabled": "Status",
-    "conversionRate": "Conversion rate 1 XP for x Points",
-    "firstLevelStartsAt": "First level starts at XP",
+    "enabled": "Stato",
+    "conversionRate": "Tasso di conversione 1 XP per x Punti",
+    "firstLevelStartsAt": "Il primo livello inizia da XP",
     "nextLevelFormula": {
-      "title": "Next level calculation formula",
-      "help": "Available variables: $prevLevel, $prevLevelXP"
+      "title": "Formula di calcolo del livello successivo",
+      "help": "Variabili disponibili: $prevLevel, $prevLevelXP"
     },
-    "levelShowcaseHelp": "Levels example will be refreshed on save",
-    "xpName": "Name",
-    "interval": "Minutes interval to add xp to online users when stream online",
-    "offlineInterval": "Minutes interval to add xp to online users when stream offline",
-    "messageInterval": "How many messages to add xp",
-    "messageOfflineInterval": "How many messages to add xp when stream offline",
-    "perInterval": "How many xp to add per online interval",
-    "perOfflineInterval": "How many xp to add per offline interval",
-    "perMessageInterval": "How many xp to add per message interval",
-    "perMessageOfflineInterval": "How many xp to add per message offline interval"
+    "levelShowcaseHelp": "L'esempio dei livelli verrà aggiornato al salvataggio",
+    "xpName": "Nome",
+    "interval": "Intervallo di minuti per aggiungere xp agli utenti online quando lo stream è online",
+    "offlineInterval": "Intervallo di minuti per aggiungere xp agli utenti online quando lo stream è offline",
+    "messageInterval": "Quanti messaggi aggiungere xp",
+    "messageOfflineInterval": "Quanti messaggi aggiungere xp quando la diretta è offline",
+    "perInterval": "Quanti exp aggiungere per intervallo online",
+    "perOfflineInterval": "Quanti xp aggiungere per intervallo offline",
+    "perMessageInterval": "Quanti xp aggiungere per intervallo di messaggio",
+    "perMessageOfflineInterval": "Quanti xp aggiungere per ogni messaggio offline"
   }
 }
