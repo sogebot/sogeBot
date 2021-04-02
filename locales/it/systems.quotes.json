@@ -1,30 +1,30 @@
 {
   "add": {
-    "ok": "$sender, quote $id '$quote' was added. (tags: $tags)",
-    "error": "$sender, $command is not correct or missing -quote parameter"
+    "ok": "$sender, preventivo $id '$quote' è stato aggiunto. (tag: $tags)",
+    "error": "$sender, $command non è corretto o manca il parametro -quote"
   },
   "remove": {
-    "ok": "$sender, quote $id was successfully deleted.",
-    "error": "$sender, quote ID is missing.",
-    "not-found": "$sender, quote $id was not found."
+    "ok": "$sender, il preventivo $id è stato eliminato con successo.",
+    "error": "$sender, l'ID del preventivo è mancante.",
+    "not-found": "$sender, preventivo $id non trovato."
   },
   "show": {
-    "ok": "Quote $id by $quotedBy '$quote'",
+    "ok": "Preventivo $id di $quotedBy '$quote'",
     "error": {
-      "no-parameters": "$sender, $command is missing -id or -tag.",
-      "not-found-by-id": "$sender, quote $id was not found.",
-      "not-found-by-tag": "$sender, no quotes with tag $tag was not found."
+      "no-parameters": "$sender, $command è mancante -id o -tag.",
+      "not-found-by-id": "$sender, preventivo $id non trovato.",
+      "not-found-by-tag": "$sender, nessun preventivo con tag $tag non è stato trovato."
     }
   },
   "set": {
-    "ok": "$sender, quote $id tags were set. (tags: $tags)",
+    "ok": "$sender, sono stati impostati i tag del preventivo $id. (tag: $tags)",
     "error": {
-      "no-parameters": "$sender, $command is missing -id or -tag.",
-      "not-found-by-id": "$sender, quote $id was not found."
+      "no-parameters": "$sender, $command è mancante -id o -tag.",
+      "not-found-by-id": "$sender, preventivo $id non trovato."
     }
   },
   "list": {
-    "ok": "$sender, You can find quote list at http://$urlBase/public/#/quotes",
-    "is-localhost": "$sender, quote list url is not properly specified."
+    "ok": "$sender, Puoi trovare la lista delle quotazioni su http://$urlBase/public/#/quotes",
+    "is-localhost": "$sender, l'url della lista delle citazioni non è specificato correttamente."
   }
 }
