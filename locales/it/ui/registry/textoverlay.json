@@ -1,7 +1,7 @@
 {
-  "new": "Create new text overlay",
-  "title": "text overlay",
+  "new": "Crea una nuova sovrapposizione di testo",
+  "title": "testo Sovrapposto",
   "name": {
-    "placeholder": "Set your text overlay name"
+    "placeholder": "Imposta il tuo nome di sovrapposizione testo"
   }
 }
