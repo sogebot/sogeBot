@@ -94,28 +94,28 @@
   "tier-exact-amount": "Il livello è esattamente",
   "tier-greater-than-or-equal-to-amount": "Il livello è superiore o uguale a",
   "months-exact-amount": "La quantità di mesi è esattamente",
-  "months-greater-than-or-equal-to-amount": "Months amount is higher or equal to",
-  "gifts-exact-amount": "Gifts amount is exactly",
-  "gifts-greater-than-or-equal-to-amount": "Gifts amount is higher or equal to",
-  "very-rarely": "Very rarely",
-  "rarely": "Rarely",
-  "default": "Default",
-  "frequently": "Frequently",
-  "very-frequently": "Very frequently",
-  "exclusive": "Exclusive",
+  "months-greater-than-or-equal-to-amount": "L'importo mensile è superiore o uguale a",
+  "gifts-exact-amount": "La quantità delle donazioni è esattamente",
+  "gifts-greater-than-or-equal-to-amount": "L'importo delle donazioni è superiore o uguale a",
+  "very-rarely": "Molto raramente",
+  "rarely": "Raramente",
+  "default": "Predefinito",
+  "frequently": "Frequentemente",
+  "very-frequently": "Molto frequentemente",
+  "exclusive": "Esclusivo",
   "messageTemplate": {
-    "name": "Message template",
-    "placeholder": "Set your message template",
-    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
+    "name": "Modello messaggio",
+    "placeholder": "Imposta il tuo modello di messaggi",
+    "help": "Variabili disponibili: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "animationText": {
-    "name": "Animation text"
+    "name": "Testo animazione"
   },
   "animationIn": {
-    "name": "Animation in"
+    "name": "Animazione in entrata"
   },
   "animationOut": {
-    "name": "Animation out"
+    "name": "Animazione in uscita"
   },
   "alertDurationInMs": {
     "name": "Alert duration"
