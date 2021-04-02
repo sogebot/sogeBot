@@ -1,31 +1,31 @@
 {
   "settings": {
-    "enabled": "Status",
-    "songRequests": "Song Requests",
+    "enabled": "Stato",
+    "songRequests": "Richieste Brano",
     "fetchCurrentSongWhenOffline": {
-      "title": "Fetch current song when stream is offline",
-      "help": "It's advised to have this disabled to avoid reach API limits"
+      "title": "Recupera il brano corrente quando la diretta è offline",
+      "help": "Si consiglia di avere questo disabilitato per evitare di raggiungere i limiti delle API"
     },
     "queueWhenOffline": {
-      "title": "Queue songs when stream is offline",
-      "help": "It's advised to have this disabled to avoid queueing when you are just listening music"
+      "title": "Accoda i brani quando la diretta è offline",
+      "help": "Si consiglia di disabilitare questo per evitare la coda quando si sta solo ascoltando musica"
     },
     "clientId": "clientId",
     "clientSecret": "clientSecret",
     "redirectURI": "redirectURI",
     "format": {
-      "title": "Format",
-      "help": "Available variables: $song, $artist, $artists"
+      "title": "Formato",
+      "help": "Variabili disponibili: $song, $artist, $artists"
     },
-    "username": "Authorized user",
-    "revokeBtn": "Revoke user authorization",
-    "authorizeBtn": "Authorize user",
-    "scopes": "Scopes",
+    "username": "Utente autorizzato",
+    "revokeBtn": "Revoca autorizzazione utente",
+    "authorizeBtn": "Autorizza utente",
+    "scopes": "Campi",
     "playlistToPlay": {
-      "title": "Spotify URI of main playlist",
-      "help": "If set, after request finished this playlist will continue"
+      "title": "Spotify URI della scaletta principale",
+      "help": "Se impostata, una volta completata la richiesta, questa scaletta continuerà"
     },
-    "continueOnPlaylistAfterRequest": "Continue on playing of playlist after song request",
-    "notify": "Send message on song change"
+    "continueOnPlaylistAfterRequest": "Continua a riprodurre la scaletta dopo la richiesta del brano",
+    "notify": "Invia messaggio al cambiamento del brano"
   }
 }
