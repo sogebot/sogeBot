@@ -21,13 +21,13 @@
     "cTextCheer": "Bit da",
     "cTextSub": "Abbonato da",
     "cTextResub": "Riabbonato da",
-    "cTextSubgift": "Gifted subs",
-    "cTextSubcommunitygift": "Subs gifted to community",
-    "cTextTip": "Tips by",
-    "cClipsPeriod": "Time interval",
-    "cClipsCustomPeriodInDays": "Custom time interval (days)",
-    "cClipsNumOfClips": "Number of clips",
-    "cClipsShouldPlay": "Clips should be played",
+    "cTextSubgift": "Abbonamenti regalati",
+    "cTextSubcommunitygift": "Abbonamenti donati alla comunità",
+    "cTextTip": "Donazioni da",
+    "cClipsPeriod": "Intervallo di tempo",
+    "cClipsCustomPeriodInDays": "Intervallo di tempo personalizzato (giorni)",
+    "cClipsNumOfClips": "Numero di clip",
+    "cClipsShouldPlay": "Le clip dovrebbero essere avviate",
     "cClipsVolume": "Volume"
   }
 }
