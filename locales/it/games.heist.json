@@ -8,17 +8,17 @@
   "maxLevelMessage": "Con questa squadra, possiamo rapinare $bank! Non può andare meglio di cosi!",
   "started": "Bene ragazzi, controllate la vostra attrezzatura, è quello per cui ci siamo allenati. Questo non è un gioco, questa è la vita reale. Prenderemo il denaro da $bank!",
   "noUser": "Nessuno si unisce a una squadra da rapire.",
-  "singleUserSuccess": "$user was like a ninja. Nobody noticed missing money.",
-  "singleUserFailed": "$user failed to get rid of police and will be spending his time in jail.",
+  "singleUserSuccess": "$user era come un ninja. Nessuno ha notato i soldi mancanti.",
+  "singleUserFailed": "$user non è riuscito a sbarazzarsi della polizia e passerà il suo tempo in prigione.",
   "result": {
-    "0": "Everyone was mercilessly obliterated. This is slaughter.",
-    "33": "Only 1/3rd of team get its money from heist.",
-    "50": "Half of heist team was killed or catched by police.",
-    "99": "Some loses of heist team is nothing of what remaining crew have in theirs pockets.",
-    "100": "God divinity, nobody is dead, everyone won!"
+    "0": "Tutti sono stati annientati senza pietà. Questo è un massacro.",
+    "33": "Solo 1/3 di squadra ottiene i suoi soldi dalla rapina.",
+    "50": "La metà della squadra di rapina è stata uccisa o catturata dalla polizia.",
+    "99": "Alcune perdire della squadra di rapina non è nulla di ciò che i rimanenti membri hanno nelle loro tasche.",
+    "100": "Dio divino, nessuno è morto, tutti hanno vinto!"
   },
   "levels": {
-    "bankVan": "Bank van",
+    "bankVan": "Van della Banca",
     "cityBank": "City bank",
     "stateBank": "State bank",
     "nationalReserve": "National reserve",
