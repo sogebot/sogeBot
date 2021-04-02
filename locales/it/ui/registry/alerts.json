@@ -118,38 +118,38 @@
     "name": "Animazione in uscita"
   },
   "alertDurationInMs": {
-    "name": "Alert duration"
+    "name": "Durata dell'avviso"
   },
   "alertTextDelayInMs": {
-    "name": "Alert text delay"
+    "name": "Ritardo testo dell'avviso"
   },
   "layoutPicker": {
-    "name": "Layout"
+    "name": "Disposizione"
   },
   "scale": {
-    "name": "Scale"
+    "name": "Scala"
   },
   "translateY": {
-    "name": "Move -Up / +Down"
+    "name": "Sposta -Su / +Giù"
   },
   "translateX": {
-    "name": "Move -Left / +Right"
+    "name": "Sposta -Sinistra / +Destra"
   },
   "image": {
-    "name": "Image / Video(.webm)",
-    "setting": "Image / Video(.webm) settings"
+    "name": "Immagine / Video(.webm)",
+    "setting": "Impostazioni immagine / video (.webm)"
   },
   "sound": {
-    "name": "Sound",
-    "setting": "Sound settings"
+    "name": "Suono",
+    "setting": "Impostazioni suono"
   },
   "soundVolume": {
-    "name": "Alert volume"
+    "name": "Volume dell'avviso"
   },
-  "enableAdvancedMode": "Enable advanced mode",
+  "enableAdvancedMode": "Abilita modalità avanzata",
   "font": {
-    "setting": "Font settings",
-    "name": "Font family",
+    "setting": "Impostazioni carattere",
+    "name": "Famiglia di caratteri",
     "overrideGlobal": "Ignora le impostazioni globali dei caratteri",
     "align": {
       "name": "Allinemento",
@@ -173,29 +173,29 @@
       "name": "Colore del carattere"
     },
     "highlightcolor": {
-      "name": "Font highlight color"
+      "name": "Colore evidenziazione carattere"
     }
   },
   "minAmountToShow": {
-    "name": "Minimal amount to show"
+    "name": "Quantità minima da mostrare"
   },
   "minAmountToPlay": {
-    "name": "Minimal amount to play"
+    "name": "Quantità minima da riprodurre"
   },
   "allowEmotes": {
-    "name": "Allow emotes"
+    "name": "Consenti emotes"
   },
   "message": {
-    "setting": "Message settings"
+    "setting": "Impostazioni dei messaggi"
   },
-  "voice": "Voice",
-  "keepAlertShown": "Alert keeps visible during TTS",
-  "skipUrls": "Skip URLs during TTS",
+  "voice": "Voce",
+  "keepAlertShown": "Avviso mantenuto visibile durante il TTS",
+  "skipUrls": "Salta URL durante TTS",
   "volume": "Volume",
-  "rate": "Rate",
-  "pitch": "Pitch",
+  "rate": "Ritmo",
+  "pitch": "Tono",
   "test": "Test",
   "tts": {
-    "setting": "TTS settings"
+    "setting": "Impostazioni TTS"
   }
 }
