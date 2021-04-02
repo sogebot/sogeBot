@@ -67,20 +67,20 @@
       "placeholder": "Per quanto tempo dovrebbe essere mostrato l'obiettivo"
     },
     "animationInMs": {
-      "title": "Animation In duration",
-      "help": "This value is in milliseconds",
-      "placeholder": "Set your animation In duration"
+      "title": "Durata animazione",
+      "help": "Questo valore è in millisecondi",
+      "placeholder": "Imposta la tua animazione In durata"
     },
     "animationOutMs": {
-      "title": "Animation Out duration",
-      "help": "This value is in milliseconds",
-      "placeholder": "Set your animation Out duration"
+      "title": "Durata animazione in uscita",
+      "help": "Questo valore è in millisecondi",
+      "placeholder": "Imposta durata dell'animazione in uscita"
     },
     "spaceBetweenGoalsInPx": {
-      "title": "Space between goals",
-      "help": "This value is in pixels",
-      "placeholder": "Set your space between goals"
+      "title": "Spazio tra gli obiettivi",
+      "help": "Questo valore è in pixel",
+      "placeholder": "Imposta il tuo spazio tra gli obiettivi"
     }
   },
-  "groupSettings": "Group Settings"
+  "groupSettings": "Impostazioni di gruppo"
 }
