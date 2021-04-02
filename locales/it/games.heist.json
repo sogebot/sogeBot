@@ -18,12 +18,12 @@
     "100": "Dio divino, nessuno è morto, tutti hanno vinto!"
   },
   "levels": {
-    "bankVan": "Van della Banca",
-    "cityBank": "City bank",
-    "stateBank": "State bank",
-    "nationalReserve": "National reserve",
-    "federalReserve": "Federal reserve"
+    "bankVan": "Trasportatore della banca",
+    "cityBank": "Banca della città",
+    "stateBank": "Banca di Stato",
+    "nationalReserve": "Riserva nazionale",
+    "federalReserve": "Riserva federale"
   },
-  "results": "The heist payouts are: $users",
-  "andXMore": "and $count more..."
+  "results": "Le vincite della rapina sono: $users",
+  "andXMore": "e $count in più..."
 }
