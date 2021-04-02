@@ -35,37 +35,37 @@
   "loadStandardProfanityList": "Carica lista di profanità standard",
   "customProfanityList": {
     "name": "Lista di profanità personalizzata",
-    "help": "Words should be separated with comma."
+    "help": "Le parole dovrebbero essere separate da virgole."
   },
   "event": {
     "follows": "Follows",
     "cheers": "Cheers",
-    "subs": "Subs",
-    "resubs": "Resubs",
-    "subgifts": "Subgifts",
-    "subcommunitygifts": "Subgifts to community",
-    "tips": "Tips",
-    "hosts": "Hosts",
-    "raids": "Raids",
-    "cmdredeems": "Command Redeems",
-    "rewardredeems": "Reward Redeems"
+    "subs": "Abbonati",
+    "resubs": "Riabbonati",
+    "subgifts": "Abbonamenti donati",
+    "subcommunitygifts": "Abbonamenti regalati alla comunità",
+    "tips": "Donazioni",
+    "hosts": "Host",
+    "raids": "Raid",
+    "cmdredeems": "Riscatta Comando",
+    "rewardredeems": "Riscatta Ricompensa"
   },
   "title": {
-    "name": "Variant name",
-    "placeholder": "Set your variant name"
+    "name": "Nome variante",
+    "placeholder": "Imposta il nome della tua variante"
   },
   "variant": {
-    "name": "Variant occurence"
+    "name": "Variante di occorrenza"
   },
   "filter": {
-    "name": "Occurence filter",
-    "operator": "Operator",
-    "rule": "Rule",
-    "addRule": "Add rule",
-    "addGroup": "Add group",
-    "comparator": "Comparator",
-    "value": "Value",
-    "valueSplitByComma": "Values split by comma (e.g. val1, val2)",
+    "name": "Filtro occorrenza",
+    "operator": "Operatore",
+    "rule": "Regola",
+    "addRule": "Aggiungi regola",
+    "addGroup": "Aggiungi gruppo",
+    "comparator": "Comparatore",
+    "value": "Valore",
+    "valueSplitByComma": "Valori divisi per virgola (ad es. val1, val2)",
     "isEven": "is even",
     "isOdd": "is odd",
     "lessThan": "less than",
@@ -150,12 +150,12 @@
   "font": {
     "setting": "Font settings",
     "name": "Font family",
-    "overrideGlobal": "Override global font settings",
+    "overrideGlobal": "Ignora le impostazioni globali dei caratteri",
     "align": {
-      "name": "Alignment",
-      "left": "Left",
-      "center": "Center",
-      "right": "Right"
+      "name": "Allinemento",
+      "left": "Sinistra",
+      "center": "Centro",
+      "right": "Destra"
     },
     "size": {
       "name": "Font size"
