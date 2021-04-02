@@ -1,6 +1,6 @@
 {
-  "new": "New Keyword",
-  "empty": "No keywords were created yet.",
+  "new": "Nuova Parola Chiave",
+  "empty": "Nessuna parola chiave è stata ancora creata.",
   "emptyAfterSearch": "No keywords were found by your search for <strong>\"$search\"</strong>.",
   "keyword": {
     "name": "Keyword / Regular Expression",
