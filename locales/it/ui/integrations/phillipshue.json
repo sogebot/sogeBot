@@ -1,12 +1,12 @@
 {
   "settings": {
-    "enabled": "Status",
-    "user": "User",
-    "port": "Port",
+    "enabled": "Stato",
+    "user": "Utente",
+    "port": "Porta",
     "host": {
-      "title": "Host",
-      "help": "its mandatory to have PhillipsHue on same network as a bot"
+      "title": "Ospite",
+      "help": "il suo obbligo di avere PhillipsHue sulla stessa rete di un bot"
     },
-    "timeout": "Timeout"
+    "timeout": "Tempo di attesa"
   }
 }
