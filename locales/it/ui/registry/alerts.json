@@ -158,13 +158,13 @@
       "right": "Destra"
     },
     "size": {
-      "name": "Font size"
+      "name": "Dimensione carattere"
     },
     "weight": {
-      "name": "Font weight"
+      "name": "Spessore carattere"
     },
     "borderPx": {
-      "name": "Font border"
+      "name": "Bordi del carattere"
     },
     "borderColor": {
       "name": "Font border color"
