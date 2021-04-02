@@ -1,24 +1,24 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Stato",
     "apiKey": {
-      "title": "API Key",
-      "help": "Get your API Key at https://developer.pubg.com/"
+      "title": "Chiave API",
+      "help": "Ottieni la tua chiave API su https://developer.pubg.com/"
     },
-    "platform": "Platform",
-    "playerName": "Player Name",
-    "playerId": "Player ID",
+    "platform": "Piattaforma",
+    "playerName": "Nome del giocatore",
+    "playerId": "ID Giocatore",
     "seasonId": {
-      "title": "Season ID",
-      "help": "Current season ID is being fetch every hour."
+      "title": "ID Stagione",
+      "help": "L'ID della stagione corrente viene recuperato ogni ora."
     },
-    "rankedGameModeStatsCustomization": "Customized message for ranked stats",
-    "gameModeStatsCustomization": "Customized message for normal stats"
+    "rankedGameModeStatsCustomization": "Messaggio personalizzato per statistiche classificate",
+    "gameModeStatsCustomization": "Messaggio personalizzato per le statistiche normali"
   },
-  "click_to_fetch": "Click to fetch",
-  "something_went_wrong": "Something went wrong!",
+  "click_to_fetch": "Clicca per recuperare",
+  "something_went_wrong": "Qualcosa è andato storto!",
   "ok": "OK!",
-  "stats_are_automatically_refreshed_every_10_minutes": "Stats are automatically refreshed every 10 minutes.",
-  "player_stats_ranked": "Player stats (ranked)",
-  "player_stats": "Player stats"
+  "stats_are_automatically_refreshed_every_10_minutes": "Le statistiche vengono aggiornate automaticamente ogni 10 minuti.",
+  "player_stats_ranked": "Statistiche giocatore (classificato)",
+  "player_stats": "Statistiche giocatore"
 }
