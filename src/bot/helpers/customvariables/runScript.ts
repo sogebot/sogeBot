@@ -90,6 +90,9 @@ async function runScript (script: string, opts: { sender: { userId: string; user
   script = (await new Message(script).global({ escape: '\'' }));
 
   const context = {
+    waitMs: (ms: number) => {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    },
     url: async (url: string, urlOpts?: { url: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', headers: undefined, data: undefined }) => {
       if (typeof urlOpts === 'undefined') {
         urlOpts = {
