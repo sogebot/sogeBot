@@ -8,17 +8,17 @@
     "fix_your_errors_first": "Correggi errori prima di salvare"
   },
   "errors": {
-    "number_greater_or_equal_than_0": "Value must be a number >= 0",
-    "value_must_not_be_empty": "Value must not be empty"
+    "number_greater_or_equal_than_0": "Il valore deve essere un numero >= 0",
+    "value_must_not_be_empty": "Il valore non deve essere vuoto"
   },
   "titles": {
-    "waitBefore": "Wait before image show (in ms)",
-    "waitAfter": "Wait after image disappear (in ms)",
-    "duration": "How long image should be shown (in ms)",
-    "animationIn": "Animation In",
-    "animationOut": "Animation Out",
-    "animationInDuration": "Animation In duration (in ms)",
-    "animationOutDuration": "Animation Out duration (in ms)",
-    "showOnlyOncePerStream": "Show only once per stream"
+    "waitBefore": "Attendere prima di mostrare l'immagine (in m)",
+    "waitAfter": "Attendere dopo che l'immagine sparisce (in ms)",
+    "duration": "Quanto tempo deve essere mostrato (in ms)",
+    "animationIn": "Animazione In Entrata",
+    "animationOut": "Animazione Uscita",
+    "animationInDuration": "Durata animazione (in ms)",
+    "animationOutDuration": "Durata uscita animazione (in ms)",
+    "showOnlyOncePerStream": "Mostra solo una volta per stream"
   }
 }
