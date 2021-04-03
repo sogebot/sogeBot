@@ -26,16 +26,16 @@
       "help": "in minuti"
     },
     "raffleAnnounceMessageInterval": {
-      "title": "Announce message interval",
-      "help": "How many messages must be sent to chat until announce can be posted."
+      "title": "Intervallo annunci messaggi",
+      "help": "Quanti messaggi devono essere inviati in chat fino a quando annunciare può essere pubblicato."
     },
     "subscribersPercent": {
-      "title": "Additional subscribers luck",
-      "help": "in percents"
+      "title": "Fortuna abbonati aggiuntiva",
+      "help": "in percentuale"
     },
     "followersPercent": {
-      "title": "Additional followers luck",
-      "help": "in percents"
+      "title": "Fortuna followers aggiuntiva",
+      "help": "in percentuale"
     }
   }
 }
