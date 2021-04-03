@@ -1,29 +1,29 @@
 {
   "widget": {
-    "subscribers-luck": "Subscribers luck",
-    "followers-luck": "Followers luck"
+    "subscribers-luck": "Abbonati fortunati",
+    "followers-luck": "Fortuna dei seguaci"
   },
   "settings": {
     "enabled": "Status",
     "announceNewEntries": {
-      "title": "Announce new entries",
-      "help": "If users joins raffle, announce message will be send to chat after while."
+      "title": "Annunciare nuove voci",
+      "help": "Se gli utenti si uniscono alla lotteria, il messaggio di annuncio verrà inviato alla chat dopo tempo."
     },
     "announceNewEntriesBatchTime": {
-      "title": "How long to wait before announce new entries (in seconds)",
-      "help": "Longer time will keep chat cleaner, entries will be aggregated together."
+      "title": "Per quanto tempo attendere prima di annunciare nuove voci (in secondi)",
+      "help": "Più tempo manterrà la chat più pulita, le voci saranno aggregate insieme."
     },
     "deleteRaffleJoinCommands": {
-      "title": "Delete user raffle join command",
-      "help": "This will delete user message if they use !yourraffle command. Should keep chat cleaner."
+      "title": "Elimina il comando join della lotteria utente",
+      "help": "Questo eliminerà il messaggio dell'utente se userà il comando !yourraffle. Dovrebbe mantenere la chat più pulita."
     },
     "allowOverTicketing": {
-      "title": "Allow over ticketing",
-      "help": "Allow user join raffle with over ticket of his points. E.g. user have 10 points but can join with !raffle 100 which will use all of his points."
+      "title": "Consenti la sovra-emissione di biglietti",
+      "help": "Consenti all'utente di unirsi alla lotteria con sovraemissione del biglietto dei suoi punti. l'utente ha 10 punti ma può unirsi con !lotteria 100 che userà tutti i suoi punti."
     },
     "raffleAnnounceInterval": {
-      "title": "Announce interval",
-      "help": "in minutes"
+      "title": "Intervallo annunci",
+      "help": "in minuti"
     },
     "raffleAnnounceMessageInterval": {
       "title": "Announce message interval",
