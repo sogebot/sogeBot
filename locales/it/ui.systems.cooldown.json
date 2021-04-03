@@ -1,7 +1,7 @@
 {
-  "new": "New Cooldown",
-  "empty": "No cooldowns were created yet.",
-  "emptyAfterSearch": "No cooldown were found by your search for <strong>\"$search\"</strong>.",
+  "new": "Nuovo Tempo d'attesa",
+  "empty": "Nessun tempo di attesa ancora creato.",
+  "emptyAfterSearch": "Nessun tempo di attesa è stato trovato dalla tua ricerca per <strong>\"$search\"</strong>.",
   "notify-as-whisper": "Notify as whisper",
   "settings": {
     "enabled": "Status",
