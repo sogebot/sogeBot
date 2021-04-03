@@ -1,11 +1,11 @@
 {
-  "options": "options",
+  "options": "opzioni",
   "popover": {
-    "are_you_sure_you_want_to_delete_this_image": "Are you sure to <strong class='text-danger'>delete</strong> this image?"
+    "are_you_sure_you_want_to_delete_this_image": "Sei sicuro di <strong class='text-danger'>eliminare</strong> questa immagine?"
   },
   "button": {
-    "update": "Update",
-    "fix_your_errors_first": "Fix errors before save"
+    "update": "Aggiornamento",
+    "fix_your_errors_first": "Correggi errori prima di salvare"
   },
   "errors": {
     "number_greater_or_equal_than_0": "Value must be a number >= 0",
