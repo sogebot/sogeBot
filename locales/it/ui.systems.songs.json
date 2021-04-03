@@ -1,10 +1,10 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Stato",
     "volume": "Volume",
-    "calculateVolumeByLoudness": "Dynamic volume by loudness",
+    "calculateVolumeByLoudness": "Volume dinamico per intensità",
     "duration": {
-      "title": "Max song duration",
+      "title": "Durata massima del brano",
       "help": "In minutes"
     },
     "shuffle": "Shuffle",
