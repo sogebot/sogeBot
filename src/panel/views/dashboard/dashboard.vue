@@ -134,7 +134,6 @@ import {
 } from '@vue/composition-api';
 import { sortBy } from 'lodash-es';
 import VueGridLayout from 'vue-grid-layout';
-import { vueWindowSizeMixin } from 'vue-window-size';
 
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { getSocket } from 'src/panel/helpers/socket';
@@ -164,7 +163,6 @@ export default defineComponent({
     GridLayout:      VueGridLayout.GridLayout,
     GridItem:        VueGridLayout.GridItem,
   },
-  mixins: [ vueWindowSizeMixin ],
   setup(props, ctx) {
     const dashboards = ref([]);
     const dashboardName = ref('');
