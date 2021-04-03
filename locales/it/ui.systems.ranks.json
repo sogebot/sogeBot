@@ -1,20 +1,20 @@
 {
-  "new": "New Rank",
-  "empty": "No ranks were created yet.",
-  "emptyAfterSearch": "No ranks were found by your search for <strong>\"$search\"</strong>.",
+  "new": "Nuovo Rango",
+  "empty": "Nessun rango è stato ancora creato.",
+  "emptyAfterSearch": "Non sono stati trovati ranghi dalla tua ricerca per <strong>\"$search\"</strong>.",
   "rank": {
-    "name": "rank",
+    "name": "rango",
     "placeholder": ""
   },
   "value": {
-    "name": "hours",
+    "name": "ore",
     "placeholder": ""
   },
   "error": {
-    "isEmpty": "This value cannot be empty"
+    "isEmpty": "Questo valore non può essere vuoto"
   },
-  "warning": "This action cannot be reverted!",
+  "warning": "Questa azione non può essere annullata!",
   "settings": {
-    "enabled": "Status"
+    "enabled": "Stato"
   }
 }
