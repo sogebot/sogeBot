@@ -5,25 +5,25 @@
     "calculateVolumeByLoudness": "Volume dinamico per intensità",
     "duration": {
       "title": "Durata massima del brano",
-      "help": "In minutes"
+      "help": "In minuti"
     },
-    "shuffle": "Shuffle",
-    "songrequest": "Play from song request",
-    "playlist": "Play from playlist",
-    "onlyMusicCategory": "Allow only category music",
-    "notify": "Send message on song change"
+    "shuffle": "Casuale",
+    "songrequest": "Riproduci dalla richiesta del brano",
+    "playlist": "Riproduci dalla scaletta",
+    "onlyMusicCategory": "Permetti solo musica di categoria",
+    "notify": "Invia messaggio al cambiamento del brano"
   },
   "error": {
-    "isEmpty": "This value cannot be empty"
+    "isEmpty": "Questo valore non può essere vuoto"
   },
-  "startTime": "Start song at",
-  "endTime": "End song at",
-  "add_song": "Add song",
-  "add_or_import": "Add song or import from playlist",
-  "importing": "Importing",
-  "importing_done": "Importing Done",
-  "seconds": "Seconds",
-  "calculated": "Calculated",
+  "startTime": "Avvia il brano alle",
+  "endTime": "Termina brano alle",
+  "add_song": "Aggiungi brano",
+  "add_or_import": "Aggiungi brano o importa dalla scaletta",
+  "importing": "Importazione",
+  "importing_done": "Importazione Completata",
+  "seconds": "Secondi",
+  "calculated": "Calcolato",
   "set_manually": "Set manually",
   "bannedSongsEmptyAfterSearch": "No banned songs were found by your search for <strong>\"$search\"</strong>.",
   "emptyAfterSearch": "No songs were found by your search for <strong>\"$search\"</strong>.",
