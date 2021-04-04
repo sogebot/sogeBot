@@ -252,51 +252,51 @@
         },
         "emotesToExplode": {
           "label": "Emote Da Esplodere",
-          "placeholder": "List of emotes to explode, e.g. Kappa PurpleHeart"
+          "placeholder": "Elenco di emotes da far esplodere, ad esempio Kappa PurpleHeart"
         },
         "emotesToFirework": {
-          "label": "Emotes To Firework",
-          "placeholder": "List of emotes to firework, e.g. Kappa PurpleHeart"
+          "label": "Emotes per Fuochi D'Artificio",
+          "placeholder": "Elenco delle emotes per fuoco d'artificio, ad esempio Kappa PurpleHeart"
         },
         "announce": {
-          "label": "Announce in chat",
-          "true": "Will be announced",
-          "false": "Will not be announced"
+          "label": "Annuncio in chat",
+          "true": "Sarà annunciato",
+          "false": "Non sarà annunciato"
         },
         "hasDelay": {
-          "label": "Clip should have slight delay (to be closer what viewer see)",
-          "true": "Will have delay",
-          "false": "Will not have delay"
+          "label": "Clip dovrebbe avere un leggero ritardo (per essere più vicino a ciò che lo spettatore vede)",
+          "true": "Avrà dei ritardi",
+          "false": "Non avrà ritardi"
         },
         "durationOfCommercial": {
-          "label": "Duration Of Commercial",
-          "placeholder": "Available durations - 30, 60, 90, 120, 150, 180"
+          "label": "Durata della pubblicità",
+          "placeholder": "Durate disponibili - 30, 60, 90, 120, 150, 180"
         },
         "customVariable": {
           "label": "$_",
-          "placeholder": "Custom variable to update"
+          "placeholder": "Variabile personalizzata da aggiornare"
         },
         "numberToIncrement": {
-          "label": "Number to increment",
+          "label": "Numero da aumentare",
           "placeholder": ""
         },
         "value": {
-          "label": "Value",
+          "label": "Valore",
           "placeholder": ""
         },
         "numberToDecrement": {
-          "label": "Number to decrement",
+          "label": "Numero da diminuire",
           "placeholder": ""
         },
         "": "",
         "titleOfReward": {
-          "label": "Title of redeemed reward",
+          "label": "Titolo del premio riscattato",
           "placeholder": ""
         }
       }
     },
     "eventlist-events": {
-      "follow": "<strong>followed</strong> you",
+      "follow": "<strong>ti ha seguito</strong>",
       "host": "<strong>hosted</strong> you with $viewers viewers",
       "raid": "<strong>raided</strong> you with $viewers viewers",
       "sub": "<strong>subbed</strong> you | $tier",
