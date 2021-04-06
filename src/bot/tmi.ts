@@ -229,10 +229,15 @@ class TMI extends Core {
     }
   }
 
+  @onStreamStart()
+  reconnectOnStreamStart() {
+    this.part('bot').then(() => this.join('bot', this.channel));
+    this.part('broadcaster').then(() => this.join('broadcaster', this.channel));
+  }
+
   /* will connect/reconnect bot and broadcaster
    * this is called from oauth when channel is changed or initialized
    */
-  @onStreamStart()
   async reconnect (type: 'bot' | 'broadcaster') {
     try {
       if (!this.shouldConnect) {
