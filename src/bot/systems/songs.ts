@@ -669,6 +669,7 @@ class Songs extends System {
         });
         this.refreshPlaylistVolume();
         this.getMeanLoudness();
+        isCachedTagsValid = false;
         return [{ response: prepare('songs.song-was-added-to-playlist', { name: videoInfo.videoDetails.title }), ...opts }];
       } else {
         return [{ response: translate('songs.youtube-is-not-responding-correctly'), ...opts }];
@@ -688,6 +689,7 @@ class Songs extends System {
     if (song) {
       getRepository(SongPlaylist).delete({ videoId: videoID });
       const response = prepare('songs.song-was-removed-from-playlist', { name: song.title });
+      isCachedTagsValid = false;
       return [{ response, ...opts }];
     } else {
       return [{ response: translate('songs.song-was-not-found'), ...opts }];
@@ -759,6 +761,7 @@ class Songs extends System {
       await this.refreshPlaylistVolume();
       await this.getMeanLoudness();
       info(`=> Playlist import done, ${imported} imported, ${done - imported} skipped`);
+      isCachedTagsValid = false;
       return [{
         response: prepare('songs.playlist-imported', { imported, skipped: done - imported }), imported, skipped: done - imported, ...opts,
       }];
