@@ -173,6 +173,7 @@ export default defineComponent({
     const isLoaded =  ref(false);
     const layout =  ref({ 'null': [] });
     const isLayoutInitialized =  ref(false);
+    const windowWidth = ref(window.width);
 
     const refreshWidgets = () => {
       const _layout = {};
@@ -252,6 +253,7 @@ export default defineComponent({
     };
 
     onMounted(async () => {
+      window.onresize = () => windowWidth.value = window.innerWidth;
       isLoaded.value = await Promise.race([
         new Promise(resolve => {
           socket.emit('panel::dashboards', { userId: ctx.root.$store.state.loggedUser.id, type: 'admin' }, (err, dashboardsFromSocket) => {
@@ -301,6 +303,7 @@ export default defineComponent({
       removeDashboard,
       addWidget,
       createDashboard,
+      windowWidth,
     };
   },
 });
