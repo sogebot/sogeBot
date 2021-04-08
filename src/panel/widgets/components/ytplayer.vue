@@ -177,6 +177,7 @@ import VuePlyr from 'vue-plyr';
 import 'vue-plyr/dist/vue-plyr.css';
 
 import type { SongRequestInterface } from 'src/bot/database/entity/song';
+import { error } from 'src/panel/helpers/error';
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { getSocket } from 'src/panel/helpers/socket';
 import translate from 'src/panel/helpers/translate';
@@ -198,7 +199,6 @@ export default defineComponent({
     const currentTag = ref('general');
     const availableTags = ref ([] as string[]);
     const autoplay = ref(false);
-    const waitingForNext = ref(false);
     const currentSong = ref(null as null | any);
     const requests = ref([] as SongRequestInterface[]);
     const playerRef = ref(null as null | any);
@@ -277,13 +277,10 @@ export default defineComponent({
 
     const next = () => {
       currentSong.value = null;
-      if (!waitingForNext.value) {
-        waitingForNext.value = true;
-        if (player.value) {
-          player.value.pause();
-        }
-        socket.emit('next');
+      if (player.value) {
+        player.value.pause();
       }
+      socket.emit('next');
     };
 
     const pause = () => {
@@ -309,7 +306,6 @@ export default defineComponent({
     };
 
     const playThisSong = async (item: any, retry = 0) => {
-      waitingForNext.value = false;
       if (!item) {
         currentSong.value = null;
         return;
@@ -388,6 +384,9 @@ export default defineComponent({
 
       intervals.push(window.setInterval(() => {
         socket.emit('songs::getAllRequests', {}, (err: any, items: SongRequestInterface[]) => {
+          if (err) {
+            error(err);
+          }
           if (!isEqual(requests.value, items)) {
             if (currentSong.value === null && autoplay.value) {
               next();
@@ -411,7 +410,6 @@ export default defineComponent({
       currentTag,
       availableTags,
       autoplay,
-      waitingForNext,
       currentSong,
       requests,
       playerRef,
