@@ -1,74 +1,165 @@
 <template>
   <div class="widget">
-    <b-card class="border-0 h-100" no-body>
-      <b-tabs class="h-100" pills card style="overflow:hidden" fill content-class="blackbg">
-        <template v-slot:tabs-start>
+    <b-card
+      class="border-0 h-100"
+      no-body
+    >
+      <b-tabs
+        class="h-100"
+        pills
+        card
+        style="overflow:hidden"
+        fill
+        content-class="blackbg"
+      >
+        <template #tabs-start>
           <template v-if="!popout">
-            <li class="nav-item px-2 grip text-secondary align-self-center shrink" v-if="!nodrag">
-              <fa icon="grip-vertical" fixed-width></fa>
+            <li
+              v-if="!nodrag"
+              class="nav-item px-2 grip text-secondary align-self-center shrink"
+            >
+              <fa
+                icon="grip-vertical"
+                fixed-width
+              />
             </li>
           </template>
           <li class="nav-item shrink">
-            <b-dropdown ref="dropdown" boundary="window" no-caret :text="translate('widget-title-ytplayer') + ' - ' + currentTag" variant="outline-primary" toggle-class="border-0">
+            <b-dropdown
+              ref="dropdown"
+              boundary="window"
+              no-caret
+              :text="translate('widget-title-ytplayer') + ' - ' + currentTag"
+              variant="outline-primary"
+              toggle-class="border-0"
+            >
               <b-dropdown-form class="form">
                 <label>Playlist</label>
                 <b-select v-model="currentTag">
-                  <b-form-select-option v-for="tag of availableTags" v-bind:key="tag" :value="tag">{{tag}}</b-form-select-option>
+                  <b-form-select-option
+                    v-for="tag of availableTags"
+                    :key="tag"
+                    :value="tag"
+                  >
+                    {{ tag }}
+                  </b-form-select-option>
                 </b-select>
               </b-dropdown-form>
-              <b-dropdown-item @click="nextAndRemoveFromPlaylist">skip &amp; remove from playlist</b-dropdown-item>
+              <b-dropdown-item @click="nextAndRemoveFromPlaylist">
+                skip &amp; remove from playlist
+              </b-dropdown-item>
               <template v-if="!popout">
-                <b-dropdown-divider></b-dropdown-divider>
-                <b-dropdown-item><a class="text-danger" href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'ytplayer'))" v-html="translate('remove-widget').replace('$name', translate('widget-title-ytplayer'))"></a></b-dropdown-item>
+                <b-dropdown-divider />
+                <b-dropdown-item>
+                  <a
+                    class="text-danger"
+                    href="#"
+                    @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'ytplayer'))"
+                    v-html="translate('remove-widget').replace('$name', translate('widget-title-ytplayer'))"
+                  />
+                </b-dropdown-item>
               </template>
             </b-dropdown>
           </li>
         </template>
         <b-tab title-item-class="shrink">
-          <template v-slot:title><small>{{ requests.length }} &nbsp;</small>
-            <fa icon="list"></fa>
+          <template #title>
+            <small>{{ requests.length }} &nbsp;</small>
+            <fa icon="list" />
           </template>
           <b-card-text>
             <b-table-simple small>
-              <b-tr v-for="(request, index) of requests" :key="index">
-                <b-td style="vertical-align: middle">{{request.title}}</b-td>
-                <b-td style="vertical-align: middle">{{request.username}}</b-td>
-                <b-td style="vertical-align: middle">{{formatTime(request.length)}}</b-td>
-                <b-td style="vertical-align: middle" class="text-right">
-                  <b-button variant="outline-danger" class="border-0" @click="removeSongRequest(String(request.id))">
-                    <fa :icon="'times'" fixed-width small/>
+              <b-tr
+                v-for="(request, index) of requests"
+                :key="index"
+              >
+                <b-td style="vertical-align: middle">
+                  {{ request.title }}
+                </b-td>
+                <b-td style="vertical-align: middle">
+                  {{ request.username }}
+                </b-td>
+                <b-td style="vertical-align: middle">
+                  {{ formatTime(request.length) }}
+                </b-td>
+                <b-td
+                  style="vertical-align: middle"
+                  class="text-right"
+                >
+                  <b-button
+                    variant="outline-danger"
+                    class="border-0"
+                    @click="removeSongRequest(String(request.id))"
+                  >
+                    <fa
+                      :icon="'times'"
+                      fixed-width
+                      small
+                    />
                   </b-button>
                 </b-td>
               </b-tr>
             </b-table-simple>
           </b-card-text>
         </b-tab>
-        <b-tab active title-link-class="p-0 text-left overflow" title-item-class="widthmincontent">
-          <template v-slot:title>
+        <b-tab
+          active
+          title-link-class="p-0 text-left overflow"
+          title-item-class="widthmincontent"
+        >
+          <template #title>
             <b-button-group>
-              <button class="btn nav-btn btn-success" @click="play" v-if="!autoplay">
-                <fa icon="play"></fa>
+              <button
+                v-if="!autoplay"
+                class="btn nav-btn btn-success"
+                @click="play"
+              >
+                <fa icon="play" />
               </button>
-              <button class="btn nav-btn btn-danger" @click="pause" v-else>
-                <fa icon="pause"></fa>
+              <button
+                v-else
+                class="btn nav-btn btn-danger"
+                @click="pause"
+              >
+                <fa icon="pause" />
               </button>
-              <button class="btn nav-btn btn-secondary" @click="next">
-                <fa icon="forward"></fa>
+              <button
+                class="btn nav-btn btn-secondary"
+                @click="next"
+              >
+                <fa icon="forward" />
               </button>
             </b-button-group>
-            <span class="align-self-center mx-2" style="position:relative; top: 2px;">
-              <fa icon="play" v-if="autoplay"></fa>
-              <fa icon="pause" v-else></fa></span>
+            <span
+              class="align-self-center mx-2"
+              style="position:relative; top: 2px;"
+            >
+              <fa
+                v-if="autoplay"
+                icon="play"
+              />
+              <fa
+                v-else
+                icon="pause"
+              /></span>
           </template>
           <b-card-text class="vcenter">
-            <vue-plyr
-              v-if="currentSong"
-              ref="playerRef"
-              @timeupdate="videoTimeUpdated"
-              @ended="videoEnded"
-              :options="{ controls: ['volume', 'progress', 'current-time', 'restart', 'mute'], fullscreen: { enabled: false }, clickToPlay: false }">
-              <div data-plyr-provider="youtube" :data-plyr-embed-id="currentSong.videoId"></div> <!-- this is only needed for first init of player -->
-            </vue-plyr>
+            <div
+              v-if="currentSong !== null"
+              :key="JSON.stringify(currentSong)"
+            >
+              <vue-plyr
+                ref="playerRef"
+                :options="{ controls: ['volume', 'progress', 'current-time', 'restart', 'mute'], fullscreen: { enabled: false }, clickToPlay: false }"
+                @timeupdate="videoTimeUpdated"
+                @ended="videoEnded"
+              >
+                <div
+                  data-plyr-provider="youtube"
+                  :data-plyr-embed-id="currentSong.videoId"
+                /> <!-- this is only needed for first init of player -->
+              </vue-plyr>
+            </div>
           </b-card-text>
         </b-tab>
       </b-tabs>
@@ -185,6 +276,7 @@ export default defineComponent({
     };
 
     const next = () => {
+      currentSong.value = null;
       if (!waitingForNext.value) {
         waitingForNext.value = true;
         if (player.value) {
@@ -244,7 +336,7 @@ export default defineComponent({
       ctx.root.$nextTick(async () => {
         try {
           // change only if something is changed
-          if (!player.value.source.includes(item.videoId)) {
+          if (!player.value.source || !player.value.source.includes(item.videoId)) {
             player.value.source = {
               type:    'video',
               sources: [
@@ -267,10 +359,12 @@ export default defineComponent({
           ctx.root.$nextTick(async () => {
             player.value.muted = false;
           });
+          player.value.play();
         } catch (e) {
           return setTimeout(() => {
             console.log('Retrying playThisSong');
             console.log('If song is not playing and you are on Chrome, disable adblockers or popup blockers - https://github.com/sampotts/plyr/issues/1538');
+            console.error(e);
             playThisSong(item, retry++); //retry after while
           }, 1000);
         }
