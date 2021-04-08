@@ -1,86 +1,86 @@
 {
-  "addGoalGroup": "Add Goal Group",
-  "addGoal": "Add Goal",
-  "newGoal": "new Goal",
-  "newGoalGroup": "new Goal Group",
-  "goals": "Goals",
-  "general": "General",
-  "display": "Display",
-  "fontSettings": "Font Settings",
-  "barSettings": "Bar Settings",
-  "selectGoalOnLeftSide": "Select or add goal on left side",
+  "addGoalGroup": "Aggiungi Gruppo Obiettivi",
+  "addGoal": "Aggiungi Obiettivo",
+  "newGoal": "nuovo Obiettivo",
+  "newGoalGroup": "nuovo Gruppo Obiettivo",
+  "goals": "Obiettivi",
+  "general": "Generale",
+  "display": "Visualizza",
+  "fontSettings": "Impostazioni Carattere",
+  "barSettings": "Impostazioni Della Barra",
+  "selectGoalOnLeftSide": "Selezionare o aggiungere un obiettivo sul lato sinistro",
   "input": {
     "description": {
-      "title": "Description"
+      "title": "Descrizione"
     },
     "goalAmount": {
-      "title": "Goal Amount"
+      "title": "Importo Obiettivo"
     },
     "countBitsAsTips": {
-      "title": "Count Bits as Tips"
+      "title": "Conta bit come suggerimenti"
     },
     "currentAmount": {
-      "title": "Current Amount"
+      "title": "Importo Corrente"
     },
     "endAfter": {
-      "title": "End After"
+      "title": "Termina dopo"
     },
     "endAfterIgnore": {
-      "title": "Goal will not expire"
+      "title": "L'obiettivo non scadrà"
     },
     "borderPx": {
-      "title": "Border",
-      "help": "Border size is in pixels"
+      "title": "Bordo",
+      "help": "La dimensione del bordo è in pixel"
     },
     "barHeight": {
-      "title": "Bar Height",
-      "help": "Bar height is in pixels"
+      "title": "Altezza Barra",
+      "help": "L'altezza della barra è in pixel"
     },
     "color": {
-      "title": "Color"
+      "title": "Colore"
     },
     "borderColor": {
-      "title": "Border Color"
+      "title": "Colore dei margini"
     },
     "backgroundColor": {
-      "title": "Background Color"
+      "title": "Colore sfondo"
     },
     "type": {
-      "title": "Type"
+      "title": "Tipo"
     },
     "nameGroup": {
-      "title": "Name of this goal group",
-      "placeholder": "Set name of this goal group",
-      "help": "If kept empty, name will be randomly generated"
+      "title": "Nome di questo gruppo di obiettivi",
+      "placeholder": "Imposta il nome di questo gruppo di obiettivi",
+      "help": "Se mantenuto vuoto, il nome verrà generato in modo casuale"
     },
     "name": {
-      "title": "Name of this goal",
-      "placeholder": "Set name of this goal"
+      "title": "Nome di questo gruppo di obiettivi",
+      "placeholder": "Imposta il nome di questo gruppo di obiettivi"
     },
     "displayAs": {
-      "title": "Display as",
-      "help": "Sets how goal group will be shown"
+      "title": "Visualizza come",
+      "help": "Imposta come verrà mostrato il gruppo di obiettivi"
     },
     "durationMs": {
-      "title": "Duration",
-      "help": "This value is in milliseconds",
-      "placeholder": "How long goal should be shown"
+      "title": "Durata",
+      "help": "Questo valore è in millisecondi",
+      "placeholder": "Per quanto tempo dovrebbe essere mostrato l'obiettivo"
     },
     "animationInMs": {
-      "title": "Animation In duration",
-      "help": "This value is in milliseconds",
-      "placeholder": "Set your animation In duration"
+      "title": "Durata animazione",
+      "help": "Questo valore è in millisecondi",
+      "placeholder": "Imposta la tua animazione In durata"
     },
     "animationOutMs": {
-      "title": "Animation Out duration",
-      "help": "This value is in milliseconds",
-      "placeholder": "Set your animation Out duration"
+      "title": "Durata animazione in uscita",
+      "help": "Questo valore è in millisecondi",
+      "placeholder": "Imposta durata dell'animazione in uscita"
     },
     "spaceBetweenGoalsInPx": {
-      "title": "Space between goals",
-      "help": "This value is in pixels",
-      "placeholder": "Set your space between goals"
+      "title": "Spazio tra gli obiettivi",
+      "help": "Questo valore è in pixel",
+      "placeholder": "Imposta il tuo spazio tra gli obiettivi"
     }
   },
-  "groupSettings": "Group Settings"
+  "groupSettings": "Impostazioni di gruppo"
 }

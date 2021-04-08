@@ -1,9 +1,9 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Stato",
     "secretToken": {
-      "title": "Secret token",
-      "help": "Get secret token at Qiwi Donate dashboard settings->click show secret token"
+      "title": "Token segreto",
+      "help": "Ottieni un token segreto su Qiwi Dona impostazioni dashboard->clicca mostra token segreto"
     }
   }
 }

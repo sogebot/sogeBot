@@ -2,7 +2,7 @@
   "settings": {
     "enabled": "Status",
     "accessBy": {
-      "title": "Access by",
+      "title": "Zugriff durch",
       "help": "Direct - connect directly from a bot | Overlay - connect via overlay browser source"
     },
     "address": "Address",

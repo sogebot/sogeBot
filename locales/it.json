@@ -72,79 +72,79 @@
     "timers": {
       "title": "Timers",
       "timer": "Timer",
-      "messages": "messages",
-      "seconds": "seconds",
+      "messages": "messaggi",
+      "seconds": "secondi",
       "badges": {
-        "enabled": "Enabled",
-        "disabled": "Disabled"
+        "enabled": "Abilitato",
+        "disabled": "Disabilitato"
       },
       "errors": {
-        "timer_name_must_be_compliant": "This value can contain only a-zA-Z09_",
-        "this_value_must_be_a_positive_number_or_0": "This value must be a positive number or 0",
-        "value_cannot_be_empty": "Value cannot be empty"
+        "timer_name_must_be_compliant": "Questo valore può contenere solo a-zA-Z09_",
+        "this_value_must_be_a_positive_number_or_0": "Questo valore deve essere un numero positivo o 0",
+        "value_cannot_be_empty": "Il valore non può essere vuoto"
       },
       "dialog": {
         "timer": "Timer",
-        "name": "Name",
-        "tickOffline": "Should tick if stream offline",
-        "interval": "Interval",
-        "responses": "Responses",
-        "messages": "Trigger every X Messages",
-        "seconds": "Trigger every X Seconds",
+        "name": "Nome",
+        "tickOffline": "Fallo funzionare se lo streaming è offline",
+        "interval": "Intervallo",
+        "responses": "Risposte",
+        "messages": "Attiva ogni X Messaggi",
+        "seconds": "Attiva ogni X Secondi",
         "title": {
-          "new": "New timer",
-          "edit": "Edit timer"
+          "new": "Nuovo timer",
+          "edit": "Modifica timer"
         },
         "placeholders": {
-          "name": "Set name of your timer, can contain only these characters a-zA-Z0-9_",
-          "messages": "Trigger timer each X messages",
-          "seconds": "Trigger timer each X seconds"
+          "name": "Imposta il nome del tuo timer, può contenere solo questi caratteri a-zA-Z0-9_",
+          "messages": "Esegui timer ogni X messaggi",
+          "seconds": "Esegui timer ogni X secondi"
         },
         "alerts": {
-          "success": "Timer was <strong>successfully</strong> saved.",
-          "fail": "Something went <strong>wrong</strong>."
+          "success": "Il timer è stato salvato <strong>correttamente</strong>.",
+          "fail": "Qualcosa è andato <strong>storto</strong>."
         }
       },
       "buttons": {
-        "close": "Close",
-        "save-changes": "Save changes",
-        "disable": "Disable",
-        "enable": "Enable",
-        "edit": "Edit",
-        "delete": "Delete",
-        "yes": "Yes",
+        "close": "Chiudi",
+        "save-changes": "Salva modifiche",
+        "disable": "Disattiva",
+        "enable": "Attiva",
+        "edit": "Modifica",
+        "delete": "Elimina",
+        "yes": "Si",
         "no": "No"
       },
       "popovers": {
-        "are_you_sure_you_want_to_delete_timer": "Are you sure you want to <strong class='text-danger'>delete</strong> timer"
+        "are_you_sure_you_want_to_delete_timer": "Sei sicuro di voler <strong class='text-danger'>eliminare</strong> il timer"
       }
     },
     "events": {
-      "event": "Event",
-      "noEvents": "No events found in database.",
-      "whatsthis": "what's this?",
-      "myRewardIsNotListed": "My reward is not listed!",
-      "redeemAndClickRefreshToSeeReward": "If you are missing your created reward in a list, refresh by clicking on refresh icon.",
+      "event": "Evento",
+      "noEvents": "Nessun evento trovato nel database.",
+      "whatsthis": "cos'è questo?",
+      "myRewardIsNotListed": "La mia ricompensa non è elencata!",
+      "redeemAndClickRefreshToSeeReward": "Se manca la ricompensa creata in una lista, aggiorna facendo clic sull'icona di aggiornamento.",
       "badges": {
-        "enabled": "Enabled",
-        "disabled": "Disabled"
+        "enabled": "Abilitato",
+        "disabled": "Disabilitato"
       },
       "buttons": {
         "test": "Test",
-        "enable": "Enable",
-        "disable": "Disable",
-        "edit": "Edit",
-        "delete": "Delete",
-        "yes": "Yes",
+        "enable": "Attiva",
+        "disable": "Disattiva",
+        "edit": "Modifica",
+        "delete": "Elimina",
+        "yes": "Si",
         "no": "No"
       },
       "popovers": {
-        "are_you_sure_you_want_to_delete_event": "Are you sure you want to <strong class='text-danger'>delete</strong> event",
-        "example_of_user_object_data": "Example of user object data"
+        "are_you_sure_you_want_to_delete_event": "Sei sicuro di voler <strong class='text-danger'>eliminare</strong> l'evento",
+        "example_of_user_object_data": "Esempio di dati di oggetto utente"
       },
       "errors": {
-        "command_must_start_with_!": "Command must start with !",
-        "this_value_must_be_a_positive_number_or_0": "This value must be a positive number or 0",
+        "command_must_start_with_!": "Il comando deve iniziare con !",
+        "this_value_must_be_a_positive_number_or_0": "Questo valore deve essere un numero positivo o 0",
         "value_cannot_be_empty": "Il valore non può essere vuoto"
       },
       "dialog": {
@@ -242,90 +242,90 @@
           "placeholder": "Imposta il tuo !comandoDaEseguire"
         },
         "isCommandQuiet": {
-          "label": "Should be command quiet",
-          "true": "Command will be quiet",
-          "false": "Command won't be quiet"
+          "label": "Dovrebbe essere silenzioso il comando",
+          "true": "Il comando sarà silenzioso",
+          "false": "Il comando non sarà silenzioso"
         },
         "urlOfSoundFile": {
-          "label": "Url Of Your Sound File",
+          "label": "Url Del Tuo File Audio",
           "placeholder": "http://www.pathToYour.url/where/is/file.mp3"
         },
         "emotesToExplode": {
-          "label": "Emotes To Explode",
-          "placeholder": "List of emotes to explode, e.g. Kappa PurpleHeart"
+          "label": "Emote Da Esplodere",
+          "placeholder": "Elenco di emotes da far esplodere, ad esempio Kappa PurpleHeart"
         },
         "emotesToFirework": {
-          "label": "Emotes To Firework",
-          "placeholder": "List of emotes to firework, e.g. Kappa PurpleHeart"
+          "label": "Emotes per Fuochi D'Artificio",
+          "placeholder": "Elenco delle emotes per fuoco d'artificio, ad esempio Kappa PurpleHeart"
         },
         "announce": {
-          "label": "Announce in chat",
-          "true": "Will be announced",
-          "false": "Will not be announced"
+          "label": "Annuncio in chat",
+          "true": "Sarà annunciato",
+          "false": "Non sarà annunciato"
         },
         "hasDelay": {
-          "label": "Clip should have slight delay (to be closer what viewer see)",
-          "true": "Will have delay",
-          "false": "Will not have delay"
+          "label": "Clip dovrebbe avere un leggero ritardo (per essere più vicino a ciò che lo spettatore vede)",
+          "true": "Avrà dei ritardi",
+          "false": "Non avrà ritardi"
         },
         "durationOfCommercial": {
-          "label": "Duration Of Commercial",
-          "placeholder": "Available durations - 30, 60, 90, 120, 150, 180"
+          "label": "Durata della pubblicità",
+          "placeholder": "Durate disponibili - 30, 60, 90, 120, 150, 180"
         },
         "customVariable": {
           "label": "$_",
-          "placeholder": "Custom variable to update"
+          "placeholder": "Variabile personalizzata da aggiornare"
         },
         "numberToIncrement": {
-          "label": "Number to increment",
+          "label": "Numero da aumentare",
           "placeholder": ""
         },
         "value": {
-          "label": "Value",
+          "label": "Valore",
           "placeholder": ""
         },
         "numberToDecrement": {
-          "label": "Number to decrement",
+          "label": "Numero da diminuire",
           "placeholder": ""
         },
         "": "",
         "titleOfReward": {
-          "label": "Title of redeemed reward",
+          "label": "Titolo del premio riscattato",
           "placeholder": ""
         }
       }
     },
     "eventlist-events": {
-      "follow": "<strong>followed</strong> you",
-      "host": "<strong>hosted</strong> you with $viewers viewers",
-      "raid": "<strong>raided</strong> you with $viewers viewers",
-      "sub": "<strong>subbed</strong> you | $tier",
-      "subgift": "have <strong>gifted</strong> sub from $username",
-      "subcommunitygift": "have <strong>gifted</strong> subs for $count viewers",
-      "resub": "<strong>resubbed</strong> you for $subStreak $subStreakName | $tier",
-      "resubWithoutStreak": "<strong>resubbed</strong> | $tier | in total of $subCumulativeMonths $subCumulativeMonthsName",
-      "cheer": "<strong>cheered</strong> you for $bits bits",
-      "tip": "<strong>tipped</strong> you for $formatted_amount"
+      "follow": "<strong>ti ha seguito</strong>",
+      "host": "<strong>hai ospitato</strong> con $viewers spettatori",
+      "raid": "<strong> ha fatto il raid a </strong> con $viewers spettatori",
+      "sub": "<strong>si è abbonato a</strong> <unk> $tier",
+      "subgift": "ha <strong>regalato</strong> abbonamenti da $username",
+      "subcommunitygift": "hanno <strong>regalato</strong> abbonamenti per $count spettatori",
+      "resub": "<strong>ti ha riabbonato a</strong> per $subStreak $subStreakName <unk> $tier",
+      "resubWithoutStreak": "<strong>ti ha riabbonato</strong> <unk> $tier <unk> in totale di $subCumulativeMonths $subCumulativeMonthsName",
+      "cheer": "<strong>ti ha rallegrato</strong> per $bits bit",
+      "tip": "<strong>ti ha dato una mancia</strong> per $formatted_amount"
     },
     "responses": {
       "variable": {
-        "sender": "User who initiated",
-        "title": "Current title",
-        "game": "Current game",
-        "language": "Current stream language",
-        "viewers": "Current viewers count",
-        "views": "Current views count",
-        "followers": "Current followers count",
-        "subscribers": "Current subscribers count",
-        "arg": "Argument",
-        "param": "Parameter (required)",
-        "touser": "Username parameter",
-        "!param": "Parameter (not required)",
+        "sender": "Utente che ha iniziato",
+        "title": "Titolo attuale",
+        "game": "Gioco attuale",
+        "language": "Lingua della diretta attuale",
+        "viewers": "Conteggio spettatori attuali",
+        "views": "Conteggio visualizzazioni attuali",
+        "followers": "Numero di follower attuali",
+        "subscribers": "Conteggio abbonati attuali",
+        "arg": "Argomento",
+        "param": "Parametro (obbligatorio)",
+        "touser": "Parametro nome utente",
+        "!param": "Parametro (non obbligatorio)",
         "alias": "Alias",
-        "command": "Command",
-        "keyword": "Keyword",
-        "response": "Response",
-        "list": "Populated list",
+        "command": "Comando",
+        "keyword": "Parola chiave",
+        "response": "Risposta",
+        "list": "Lista popolata",
         "type": "Tipo",
         "days": "Giorni",
         "hours": "Ore",
@@ -376,65 +376,65 @@
         "subgifts": "Abbonamenti regalo",
         "subStreakShareEnabled": "È abilitata la condivisione di substreak (true/false)",
         "subStreak": "Substreak attuale",
-        "subStreakName": "localized name of month (1 month, 2 months) for current sub strek",
-        "subCumulativeMonths": "Cumulative subscribe months",
-        "subCumulativeMonthsName": "localized name of month (1 month, 2 months) for cumulative subscribe months",
-        "message": "Message",
-        "reason": "Reason",
-        "target": "Target",
-        "duration": "Duration",
-        "method": "Method",
-        "tier": "Tier",
-        "months": "Months",
-        "monthsName": "localized name of month (1 month, 2 months)",
-        "oldGame": "Game before change",
-        "recipientObject": "Full recipient object",
-        "recipient": "Recipient",
-        "ytSong": "Current song on YouTube",
-        "spotifySong": "Current song on Spotify",
-        "latestFollower": "Latest Follower",
-        "latestSubscriber": "Latest Subscriber",
-        "latestSubscriberMonths": "Latest Subscriber cumulative months",
-        "latestSubscriberStreak": "Latest Subscriber months streak",
-        "latestTipAmount": "Latest Tip (amount)",
-        "latestTipCurrency": "Latest Tip (currency)",
-        "latestTipMessage": "Latest Tip (message)",
-        "latestTip": "Latest Tip (username)",
+        "subStreakName": "nome localizzato del mese (1 mese, 2 mesi) per substrek corrente",
+        "subCumulativeMonths": "Mesi cumulativi di abbonamento",
+        "subCumulativeMonthsName": "nome localizzato del mese (1 mese, 2 mesi) per mesi cumulativi abbonamenti",
+        "message": "Messaggio",
+        "reason": "Motivazione",
+        "target": "Obiettivo",
+        "duration": "Durata",
+        "method": "Metodo",
+        "tier": "Livello",
+        "months": "Mesi",
+        "monthsName": "nome localizzato del mese (1 mese, 2 mesi)",
+        "oldGame": "Gioco prima del cambiamento",
+        "recipientObject": "Oggetto completo del destinatario",
+        "recipient": "Destinatario",
+        "ytSong": "Canzone corrente su YouTube",
+        "spotifySong": "Canzone corrente su Spotify",
+        "latestFollower": "Ultimo Follower",
+        "latestSubscriber": "Ultimo Abbonato",
+        "latestSubscriberMonths": "Mesi cumulativi dell'Ultimo Abbonato",
+        "latestSubscriberStreak": "Serie dei mesi Ultimo Abbonato",
+        "latestTipAmount": "Ultima Donazione (importo)",
+        "latestTipCurrency": "Ultima Donazione (valuta)",
+        "latestTipMessage": "Ultima Donazione (messaggio)",
+        "latestTip": "Ultima Donazione (username)",
         "toptip": {
           "overall": {
-            "username": "Top Tip - overall (username)",
-            "amount": "Top Tip - overall (amount)",
-            "currency": "Top Tip - overall (currency)",
-            "message": "Top Tip - overall (message)"
+            "username": "Top Donazione - di sempre (username)",
+            "amount": "Top Donazione - di sempre (importo)",
+            "currency": "Top Donazione - di sempre (valuta)",
+            "message": "Top Donazione - di sempre (messaggio)"
           },
           "stream": {
-            "username": "Top Tip - during stream (username)",
-            "amount": "Top Tip - during stream (amount)",
-            "currency": "Top Tip - during stream (currency)",
-            "message": "Top Tip - during stream (message)"
+            "username": "Top Donazione - durante lo streaming (username)",
+            "amount": "Top Donazione - durante lo streaming (importo)",
+            "currency": "Top Donazione - durante lo streaming (valuta)",
+            "message": "Top Donazione - durante lo streaming (messaggio)"
           }
         },
-        "latestCheerAmount": "Latest Bits (amount)",
-        "latestCheerMessage": "Latest Bits (message)",
-        "latestCheer": "Latest Bits (username)",
-        "version": "Bot version",
-        "haveParam": "Have command parameter? (bool)",
-        "source": "Current source (twitch or discord)",
-        "userInput": "User input during reward redeem",
-        "isBotSubscriber": "Is bot subscriber (bool)",
+        "latestCheerAmount": "Ultimi Bits (quantità)",
+        "latestCheerMessage": "Ultimi Bits (messaggio)",
+        "latestCheer": "Ultimi Bits (username)",
+        "version": "Versione Bot",
+        "haveParam": "Ha il parametro di comando? (bool)",
+        "source": "Sorgente corrente (twitch o discord)",
+        "userInput": "Inserimento utente durante il riscatto dei premi",
+        "isBotSubscriber": "È abbonato al bot (bool)",
         "is": {
-          "moderator": "Is user mod? (bool)",
-          "subscriber": "Is user sub? (bool)",
-          "vip": "Is user vip? (bool)",
-          "follower": "Is user follower? (bool)",
-          "broadcaster": "Is user broadcaster? (bool)",
-          "bot": "Is user bot? (bool)",
-          "owner": "Is user bot owner? (bool)"
+          "moderator": "L'utente è mod? (bool)",
+          "subscriber": "L'utente è abbonato? (bool)",
+          "vip": "L'utente è vip? (bool)",
+          "follower": "L'utente è follower? (bool)",
+          "broadcaster": "L'utente è emittente? (bool)",
+          "bot": "L'utente è bot? (bool)",
+          "owner": "L'utente è il proprietario del bot (bool)"
         },
         "recipientis": {
-          "moderator": "Is recipient mod? (bool)",
-          "subscriber": "Is recipient sub? (bool)",
-          "vip": "Is recipient vip? (bool)",
+          "moderator": "Il destinatario è moderatore? (bool)",
+          "subscriber": "Il destinatario è abbonato? (bool)",
+          "vip": "Il destinatario è vip? (bool)",
           "follower": "Il destinatario è follower? (bool)",
           "broadcaster": "Il destinatario è streamer? (bool)",
           "bot": "Il destinatario è bot? (bool)",
@@ -512,40 +512,40 @@
     "events-method-used-to-subscribe": "metodo usato per iscriversi",
     "events-months-of-subscription": "mesi di abbonamento",
     "events-monthsName-of-subscription": "parola 'mese' per numero (1 mese, 2 mesi)",
-    "events-user-message": "user message",
-    "events-bits-user-sent": "bits user sent",
-    "events-reason-for-ban-timeout": "reason for ban/timeout",
-    "events-duration-of-timeout": "duration of timeout",
-    "events-duration-of-commercial": "duration of commercial",
-    "events-target-of-your-hosting": "target of your hosting",
-    "events-viewers-of-hosting": "viewers of hosting",
-    "overlays-eventlist-resub": "resub",
-    "overlays-eventlist-subgift": "subgift",
-    "overlays-eventlist-subcommunitygift": "subcommunitygift",
-    "overlays-eventlist-host": "host",
-    "overlays-eventlist-sub": "sub",
+    "events-user-message": "messaggio dell'utente",
+    "events-bits-user-sent": "bit inviati all'utente",
+    "events-reason-for-ban-timeout": "motivo del divieto/sospensione",
+    "events-duration-of-timeout": "durata della sospensione",
+    "events-duration-of-commercial": "durata della pubblicità",
+    "events-target-of-your-hosting": "obiettivo del tuo hosting",
+    "events-viewers-of-hosting": "spettatori dell' hosting",
+    "overlays-eventlist-resub": "riabbonati",
+    "overlays-eventlist-subgift": "abbonamenti regalo",
+    "overlays-eventlist-subcommunitygift": "abbonamenti-comunità-in-regalo",
+    "overlays-eventlist-host": "ospite",
+    "overlays-eventlist-sub": "abbonati",
     "overlays-eventlist-follow": "follow",
     "overlays-eventlist-cheer": "bits",
-    "overlays-eventlist-tip": "tip",
+    "overlays-eventlist-tip": "donazione",
     "overlays-eventlist-raid": "raid",
-    "requested-by": "Requested by",
-    "description": "Description",
-    "raffle-type": "Raffle type",
-    "raffle-type-keywords": "Only keyword",
-    "raffle-type-tickets": "With tickets",
-    "raffle-tickets-range": "Tickets range",
-    "video_id": "Video ID",
-    "highlights": "Highlights",
-    "cooldown-quiet-header": "Show cooldown message",
-    "cooldown-quiet-toggle-no": "Notify",
-    "cooldown-quiet-toggle-yes": "Won't notify",
-    "cooldown-moderators": "Moderators",
-    "cooldown-owners": "Owners",
-    "cooldown-subscribers": "Subscribers",
+    "requested-by": "Richiesto da",
+    "description": "Descrizione",
+    "raffle-type": "Tipo di lotteria",
+    "raffle-type-keywords": "Solo parola chiave",
+    "raffle-type-tickets": "Con i biglietti",
+    "raffle-tickets-range": "Intervallo di biglietti",
+    "video_id": "ID video",
+    "highlights": "Punti salienti",
+    "cooldown-quiet-header": "Mostra messaggio di attesa",
+    "cooldown-quiet-toggle-no": "Notificare",
+    "cooldown-quiet-toggle-yes": "Non notificare",
+    "cooldown-moderators": "Moderatori",
+    "cooldown-owners": "Proprietari",
+    "cooldown-subscribers": "Abbonati",
     "cooldown-followers": "Followers",
-    "in-seconds": "in seconds",
-    "songs": "Songs",
-    "show-usernames-with-at": "Show usernames with @",
+    "in-seconds": "in secondi",
+    "songs": "Brani",
+    "show-usernames-with-at": "Mostra nomi utente con @",
     "twitter-send-message": "Tweet",
     "send-message-as-a-bot": "Send message as a bot",
     "chat-as-bot": "Chat (as bot)",

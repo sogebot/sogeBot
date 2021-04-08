@@ -1,81 +1,81 @@
 {
   "urls": "URLs",
-  "generateurl": "Generate new URL",
-  "show-examples": "show CURL examples",
+  "generateurl": "Genera un nuovo URL",
+  "show-examples": "mostra esempi CURL",
   "response": {
-    "show": "Show response after POST",
-    "name": "Response after variable set",
-    "default": "Default",
-    "default-placeholder": "Set your bot response",
-    "default-help": "Use $value to get new variable value",
-    "custom": "Custom",
-    "command": "Command"
+    "show": "Mostra risposta dopo POST",
+    "name": "Risposta dopo impostazione variabile",
+    "default": "Predefinito",
+    "default-placeholder": "Imposta la tua risposta del bot",
+    "default-help": "Usa $value per ottenere un nuovo valore variabile",
+    "custom": "Personalizzato",
+    "command": "Comando"
   },
-  "useIfInCommand": "Use if you use variable in command. Will return only updated variable without response.",
-  "permissionToChange": "Permission to change",
-  "isReadOnly": "read-only in chat",
-  "isNotReadOnly": "can be changed through chat",
-  "no-variables-found": "No variables found",
-  "additional-info": "Additional info",
-  "run-script": "Run script",
-  "last-run": "Last run at",
+  "useIfInCommand": "Usa se usi la variabile nel comando. Restituirà solo la variabile aggiornata senza risposta.",
+  "permissionToChange": "Permesso di modifica",
+  "isReadOnly": "sola lettura in chat",
+  "isNotReadOnly": "può essere modificato attraverso la chat",
+  "no-variables-found": "Nessuna variabile trovata",
+  "additional-info": "Informazioni supplementari",
+  "run-script": "Esegui script",
+  "last-run": "Ultima esecuzione il",
   "variable": {
-    "name": "Variable name",
-    "help": "Variable name must be unique, e.g. $_wins, $_loses, $_top3",
-    "placeholder": "Enter your unique variable name",
+    "name": "Nome della variabile",
+    "help": "Il nome della variabile deve essere unico, ad esempio $_wins, $_loses, $_top3",
+    "placeholder": "Inserisci il nome della variabile univoco",
     "error": {
-      "isNotUnique": "Variable must have <strong>unique</strong> name.",
-      "isEmpty": "Variable name must not be empty."
+      "isNotUnique": "La variabile deve avere il nome <strong>univoco</strong>.",
+      "isEmpty": "Il nome della variabile non deve essere vuoto."
     }
   },
   "description": {
-    "name": "Description",
-    "help": "Optional description",
-    "placeholder": "Enter your optional description"
+    "name": "Descrizione",
+    "help": "Descrizione facoltativa",
+    "placeholder": "Inserisci la tua descrizione opzionale"
   },
   "type": {
-    "name": "Type",
+    "name": "Tipo",
     "error": {
-      "isNotSelected": "Please choose a variable type."
+      "isNotSelected": "Scegliere un tipo di variabile."
     }
   },
   "currentValue": {
-    "name": "Current value",
-    "help": "If type is set to <strong>Evaluated script</strong>, value cannot be manually changed"
+    "name": "Valore attuale",
+    "help": "Se il tipo è impostato su <strong>Script valutato</strong>, il valore non può essere modificato manualmente"
   },
   "usableOptions": {
-    "name": "Usable options",
-    "placeholder": "Enter, your, options, here",
-    "help": "Options, which can be used with this variable, example: <strong>SOLO, DUO, 3-SQ, SQUAD</strong>",
+    "name": "Opzioni utilizzabili",
+    "placeholder": "Invia, le tue, opzioni, qui",
+    "help": "Opzioni, che possono essere utilizzate con questa variabile, esempio: <strong>SOLO, DUO, 3-SQ, SQUAD</strong>",
     "error": {
-      "atLeastOneValue": "You need to set at least 1 value."
+      "atLeastOneValue": "È necessario impostare almeno 1 valore."
     }
   },
-  "scriptToEvaluate": "Script to evaluate",
+  "scriptToEvaluate": "Script da valutare",
   "runScript": {
-    "name": "Run script",
+    "name": "Esegui script",
     "error": {
-      "isNotSelected": "Please choose an option."
+      "isNotSelected": "Scegliere un'opzione."
     }
   },
   "testCurrentScript": {
-    "name": "Test current script",
-    "help": "Click <strong>Test current script</strong> to see value in <strong>Current value</strong> input"
+    "name": "Prova script attuale",
+    "help": "Clicca <strong>Prova lo script corrente</strong> per vedere il valore in <strong>Valore corrente</strong> input"
   },
-  "history": "History",
-  "historyIsEmpty": "History for this variable is empty!",
-  "warning": "<strong>Warning:</strong> All data of this variable will be discarded!",
-  "choose": "Choose...",
+  "history": "Storico",
+  "historyIsEmpty": "La cronologia di questa variabile è vuota!",
+  "warning": "<strong>Attenzione:</strong> Tutti i dati di questa variabile saranno scartati!",
+  "choose": "Scegli...",
   "types": {
-    "number": "Number",
-    "text": "Text",
-    "options": "Options",
+    "number": "Numero",
+    "text": "Testo",
+    "options": "Opzioni",
     "eval": "Script"
   },
   "runEvery": {
-    "isUsed": "When variable is used",
-    "seconds": "Seconds",
-    "minutes": "Minutes",
+    "isUsed": "Quando la variabile è usata",
+    "seconds": "Secondi",
+    "minutes": "Minuti",
     "hours": "Hours",
     "days": "Days"
   }

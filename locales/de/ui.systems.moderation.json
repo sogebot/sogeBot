@@ -10,10 +10,10 @@
     "cColorEnabled": "Erzwinge die Regel",
     "cEmotesEnabled": "Erzwinge die Regel",
     "cListsWhitelist": {
-      "title": "Allowed words",
+      "title": "Erlaubte Wörter",
       "help": "To allow domains use \"domain:prtzl.io\""
     },
-    "cListsBlacklist": "Forbidden words",
+    "cListsBlacklist": "Verbotene Wörter",
     "cListsTimeout": "Dauer der Zeitüberschreitung",
     "cLinksTimeout": "Dauer der Zeitüberschreitung",
     "cSymbolsTimeout": "Dauer der Zeitüberschreitung",

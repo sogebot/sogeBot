@@ -1,10 +1,10 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Stato",
     "access_token": {
-      "title": "Access token",
-      "help": "Get your access token at https://www.sogebot.xyz/integrations/#DonationAlerts"
+      "title": "Token di accesso",
+      "help": "Ottieni il tuo token di accesso su https://www.sogebot.xyz/integrations/#DonationAlerts"
     },
-    "accessTokenBtn": "DonationAlerts access token generator"
+    "accessTokenBtn": "Generatore di token di accesso DonationAlerts"
   }
 }

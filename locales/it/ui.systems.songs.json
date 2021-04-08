@@ -1,32 +1,32 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Stato",
     "volume": "Volume",
-    "calculateVolumeByLoudness": "Dynamic volume by loudness",
+    "calculateVolumeByLoudness": "Volume dinamico per intensità",
     "duration": {
-      "title": "Max song duration",
-      "help": "In minutes"
+      "title": "Durata massima del brano",
+      "help": "In minuti"
     },
-    "shuffle": "Shuffle",
-    "songrequest": "Play from song request",
-    "playlist": "Play from playlist",
-    "onlyMusicCategory": "Allow only category music",
-    "notify": "Send message on song change"
+    "shuffle": "Casuale",
+    "songrequest": "Riproduci dalla richiesta del brano",
+    "playlist": "Riproduci dalla scaletta",
+    "onlyMusicCategory": "Permetti solo musica di categoria",
+    "notify": "Invia messaggio al cambiamento del brano"
   },
   "error": {
-    "isEmpty": "This value cannot be empty"
+    "isEmpty": "Questo valore non può essere vuoto"
   },
-  "startTime": "Start song at",
-  "endTime": "End song at",
-  "add_song": "Add song",
-  "add_or_import": "Add song or import from playlist",
-  "importing": "Importing",
-  "importing_done": "Importing Done",
-  "seconds": "Seconds",
-  "calculated": "Calculated",
-  "set_manually": "Set manually",
-  "bannedSongsEmptyAfterSearch": "No banned songs were found by your search for <strong>\"$search\"</strong>.",
-  "emptyAfterSearch": "No songs were found by your search for <strong>\"$search\"</strong>.",
-  "empty": "No songs were added yet.",
-  "bannedSongsEmpty": "No songs were added to banlist yet."
+  "startTime": "Avvia il brano alle",
+  "endTime": "Termina brano alle",
+  "add_song": "Aggiungi brano",
+  "add_or_import": "Aggiungi brano o importa dalla scaletta",
+  "importing": "Importazione",
+  "importing_done": "Importazione Completata",
+  "seconds": "Secondi",
+  "calculated": "Calcolato",
+  "set_manually": "Imposta manualmente",
+  "bannedSongsEmptyAfterSearch": "Non sono stati trovati brani banditi dalla tua ricerca per <strong>\"$search\"</strong>.",
+  "emptyAfterSearch": "Non sono stati trovati brani dalla tua ricerca per <strong>\"$search\"</strong>.",
+  "empty": "Non sono stati ancora aggiunti brani.",
+  "bannedSongsEmpty": "Nessun brano è stato ancora aggiunto alla lista brani banditi."
 }

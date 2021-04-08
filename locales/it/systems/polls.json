@@ -1,15 +1,15 @@
 {
-  "opened_normal": "Poll opened for \"$title\"! You can vote by $command X",
-  "opened_numbers": "Poll by numbers opened for \"$title\"! You can vote by typing number into chat.",
-  "opened_tips": "Poll by tips opened for \"$title\"! You can vote by adding hashtag #voteX into tip message",
-  "opened_bits": "Poll by bits opened for \"$title\"! You can vote by adding hashtag #voteX into bit message",
-  "alreadyOpened_normal": "Error! Poll was already opened for \"$title\"! You can vote by $command X",
-  "alreadyOpened_numbers": "Error! Poll was already opened for \"$title\"! You can vote by typing number into chat.",
-  "alreadyOpened_tips": "Error! Poll by tips was already opened for \"$title\"! You can vote by adding hashtag #voteX into tip message",
-  "alreadyOpened_bits": "Error! Poll by bits was already opened for \"$title\"! You can vote by adding hashtag #voteX into bit message",
-  "notEnoughOptions": "$sender, new poll must have at least 2 options!",
-  "notInProgress": "$sender, there is currently no poll in progress!",
-  "status": "$sender, current status of poll \"$title\":",
-  "status_closed": "Poll \"$title\" closed, status of voting:",
-  "votes": "vote|votes"
+  "opened_normal": "Sondaggio aperto per \"$title\"! Puoi votare da $command X",
+  "opened_numbers": "Sondaggio per numeri aperti per \"$title\"! Puoi votare digitando il numero in chat.",
+  "opened_tips": "Sondaggio dai suggerimenti aperti per \"$title\"! Puoi votare aggiungendo l'hashtag #voteX al messaggio di punta",
+  "opened_bits": "Sondaggio da bit aperto per \"$title\"! Puoi votare aggiungendo l'hashtag #voteX al bit message",
+  "alreadyOpened_normal": "Errore! Il sondaggio è già stato aperto per \"$title\"! Puoi votare da $command X",
+  "alreadyOpened_numbers": "Errore! Il sondaggio è già stato aperto per \"$title\"! Puoi votare digitando il numero in chat.",
+  "alreadyOpened_tips": "Errore! Il sondaggio dei suggerimenti è già stato aperto per \"$title\"! Puoi votare aggiungendo l'hashtag #voteX al messaggio di suggerimento",
+  "alreadyOpened_bits": "Errore! Il sondaggio per bit è stato già aperto per \"$title\"! Puoi votare aggiungendo l'hashtag #voteX al bit message",
+  "notEnoughOptions": "$sender, il nuovo sondaggio deve avere almeno 2 opzioni!",
+  "notInProgress": "$sender, al momento non c'è nessun sondaggio in corso!",
+  "status": "$sender, stato attuale del sondaggio \"$title\":",
+  "status_closed": "Sondaggio \"$title\" chiuso, status di voto:",
+  "votes": "voto|voti"
 }

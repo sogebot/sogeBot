@@ -1,70 +1,70 @@
 {
   "title": {
-    "edit": "Edit",
-    "add": "Add"
+    "edit": "Modifica",
+    "add": "Aggiungi"
   },
   "position": {
-    "settings": "Position settings",
-    "anchorX": "Anchor X position",
-    "anchorY": "Anchor Y position",
-    "left": "Left",
-    "right": "Right",
-    "middle": "Middle",
-    "top": "Top",
-    "bottom": "Bottom",
+    "settings": "Impostazioni posizione",
+    "anchorX": "Posizione ancoraggio X",
+    "anchorY": "Posizione ancoraggio Y",
+    "left": "Sinistra",
+    "right": "Destra",
+    "middle": "Medio",
+    "top": "Alto",
+    "bottom": "Basso",
     "x": "X",
     "y": "Y"
   },
   "font": {
-    "shadowShiftRight": "Shift Right",
-    "shadowShiftDown": "Shift Down",
-    "shadowBlur": "Blur",
-    "shadowOpacity": "Opacity",
-    "color": "Color"
+    "shadowShiftRight": "Sposta A Destra",
+    "shadowShiftDown": "Scorri in basso",
+    "shadowBlur": "Sfocatura",
+    "shadowOpacity": "Opacità",
+    "color": "Colore"
   },
   "errors": {
-    "required": "This input cannot be empty.",
-    "minValue": "Lowest value of this input is $value."
+    "required": "Questo campo non può essere vuoto.",
+    "minValue": "Il valore più basso di questo input è $value."
   },
   "buttons": {
-    "reorder": "Reorder",
+    "reorder": "Riordina",
     "upload": {
-      "idle": "Upload",
-      "progress": "Uploading",
-      "done": "Uploaded"
+      "idle": "Carica",
+      "progress": "Caricamento",
+      "done": "Caricato"
     },
-    "cancel": "Cancel",
-    "close": "Close",
+    "cancel": "Annulla",
+    "close": "Chiudi",
     "test": {
-      "idle": "Test",
-      "progress": "Testing in progress",
-      "done": "Testing done"
+      "idle": "Prova",
+      "progress": "Prove in corso",
+      "done": "Test effettuato"
     },
     "saveChanges": {
-      "idle": "Save changes",
-      "invalid": "Cannot save changes",
-      "progress": "Saving changes",
-      "done": "Changes saved"
+      "idle": "Salva modifiche",
+      "invalid": "Impossibile salvare le modifiche",
+      "progress": "Salvataggio delle modifiche",
+      "done": "Modifiche salvate"
     },
-    "something-went-wrong": "Something went wrong",
-    "mark-to-delete": "Mark to delete",
-    "disable": "Disable",
-    "enable": "Enable",
-    "disabled": "Disabled",
-    "enabled": "Enabled",
-    "edit": "Edit",
-    "delete": "Delete",
-    "play": "Play",
-    "stop": "Stop",
-    "hold-to-delete": "Hold to delete",
-    "yes": "Yes",
+    "something-went-wrong": "Qualcosa è andato storto",
+    "mark-to-delete": "Segna per eliminare",
+    "disable": "Disattiva",
+    "enable": "Attiva",
+    "disabled": "Disabilitato",
+    "enabled": "Attivato",
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "play": "Esegui",
+    "stop": "Arresta",
+    "hold-to-delete": "Tieni premuto per eliminare",
+    "yes": "Si",
     "no": "No",
-    "permission": "Permission",
-    "group": "Group",
-    "visibility": "Visibility",
+    "permission": "Permesso",
+    "group": "Gruppo",
+    "visibility": "Visibilità",
     "reset": "Reset "
   },
-  "changesPending": "Your changes was not saved.",
-  "formNotValid": "Form is invalid.",
-  "nothingToShow": "Nothing to show here."
+  "changesPending": "Le modifiche non sono state salvate.",
+  "formNotValid": "Modulo non valido.",
+  "nothingToShow": "Niente da mostrare qui."
 }

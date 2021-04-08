@@ -1,13 +1,13 @@
 {
   "settings": {
-    "theme": "Default theme",
+    "theme": "Tema predefinito",
     "domain": {
-      "title": "Domain",
-      "help": "Format without http/https: yourdomain.com or your.domain.com"
+      "title": "Dominio",
+      "help": "Formato senza http/https: yourdomain.com o your.domain.com"
     },
-    "percentage": "Percentage difference for stats",
-    "shortennumbers": "Short format of numbers",
-    "stickystats": "Stick stats to top",
-    "showdiff": "Show difference"
+    "percentage": "Differenza percentuale per le statistiche",
+    "shortennumbers": "Breve formato dei numeri",
+    "stickystats": "Blocca le statistiche sopra",
+    "showdiff": "Mostra differenza"
   }
 }

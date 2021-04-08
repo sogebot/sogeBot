@@ -1,13 +1,13 @@
 {
   "settings": {
-    "enabled": "Status",
+    "enabled": "Stato",
     "username": {
-      "title": "Username",
-      "help": "Your username on tipeeestream"
+      "title": "Nome Utente",
+      "help": "Il tuo nome utente su tipeeestream"
     },
     "apiKey": {
-      "title": "Api key",
-      "help": "Get socket token from tipeeestream dashboard -> API -> Your API Key"
+      "title": "Chiave Api",
+      "help": "Ottieni il token del socket dalla dashboard tipeeestream -> API -> La tua chiave API"
     }
   }
 }

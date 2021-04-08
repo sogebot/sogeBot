@@ -1,13 +1,13 @@
 {
   "settings": {
-    "enabled": "Status",
-    "cooldown": "Cooldown",
+    "enabled": "Stato",
+    "cooldown": "Tempo di attesa",
     "timeout": {
-      "title": "Timeout duration",
-      "help": "Seconds"
+      "title": "Durata dell'intervallo",
+      "help": "Secondi"
     },
-    "bypassCooldownByOwnerAndMods": "Bypass cooldown by owner and mods",
-    "winnerWillGet": "How many points will be added on win",
-    "loserWillLose": "How many points will be lost on lose"
+    "bypassCooldownByOwnerAndMods": "Ignora attesa dal proprietario e mod",
+    "winnerWillGet": "Quanti punti saranno aggiunti alla vincita",
+    "loserWillLose": "Quanti punti andranno persi alla perdita"
   }
 }

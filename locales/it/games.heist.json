@@ -1,29 +1,29 @@
 {
-  "copsOnPatrol": "$sender, cops are still searching for last heist team. Try again after $cooldown.",
-  "copsCooldownMessage": "Alright guys, looks like police forces are eating donuts and we can get that sweet money!",
-  "entryMessage": "$sender has started planning a bank heist! Looking for a bigger crew for a bigger score. Join in! Type $command <points> to enter.",
-  "lateEntryMessage": "$sender, heist is currently in progress!",
-  "entryInstruction": "$sender, type $command <points> to enter.",
-  "levelMessage": "With this crew, we can heist $bank! Let's see if we can get enough crew to heist $nextBank",
-  "maxLevelMessage": "With this crew, we can heist $bank! It cannot be any better!",
-  "started": "Alright guys, check your equipment, this is what we trained for. This is not a game, this is real life. We will get money from $bank!",
-  "noUser": "Nobody joins a crew to heist.",
-  "singleUserSuccess": "$user was like a ninja. Nobody noticed missing money.",
-  "singleUserFailed": "$user failed to get rid of police and will be spending his time in jail.",
+  "copsOnPatrol": "$sender, i poliziotti sono ancora alla ricerca dell'ultima squadra di rapina. Riprova dopo $cooldown.",
+  "copsCooldownMessage": "Bene ragazzi, sembra che le forze di polizia stiano mangiando ciambelle e possiamo ottenere quel dolce denaro!",
+  "entryMessage": "$sender ha iniziato a pianificare una rapina in banca! Alla ricerca di una squadra più grande per un punteggio più grande. Unisciti! Digita $command <points> per entrare.",
+  "lateEntryMessage": "$sender, rapina è attualmente in corso!",
+  "entryInstruction": "$sender, digita $command <points> per entrare.",
+  "levelMessage": "Con questa squadra, possiamo rapinare la $bank! Vediamo se riusciamo a ottenere abbastanza equipaggio per rapinare $nextBank",
+  "maxLevelMessage": "Con questa squadra, possiamo rapinare $bank! Non può andare meglio di cosi!",
+  "started": "Bene ragazzi, controllate la vostra attrezzatura, è quello per cui ci siamo allenati. Questo non è un gioco, questa è la vita reale. Prenderemo il denaro da $bank!",
+  "noUser": "Nessuno si unisce a una squadra da rapire.",
+  "singleUserSuccess": "$user era come un ninja. Nessuno ha notato i soldi mancanti.",
+  "singleUserFailed": "$user non è riuscito a sbarazzarsi della polizia e passerà il suo tempo in prigione.",
   "result": {
-    "0": "Everyone was mercilessly obliterated. This is slaughter.",
-    "33": "Only 1/3rd of team get its money from heist.",
-    "50": "Half of heist team was killed or catched by police.",
-    "99": "Some loses of heist team is nothing of what remaining crew have in theirs pockets.",
-    "100": "God divinity, nobody is dead, everyone won!"
+    "0": "Tutti sono stati annientati senza pietà. Questo è un massacro.",
+    "33": "Solo 1/3 di squadra ottiene i suoi soldi dalla rapina.",
+    "50": "La metà della squadra di rapina è stata uccisa o catturata dalla polizia.",
+    "99": "Alcune perdire della squadra di rapina non è nulla di ciò che i rimanenti membri hanno nelle loro tasche.",
+    "100": "Dio divino, nessuno è morto, tutti hanno vinto!"
   },
   "levels": {
-    "bankVan": "Bank van",
-    "cityBank": "City bank",
-    "stateBank": "State bank",
-    "nationalReserve": "National reserve",
-    "federalReserve": "Federal reserve"
+    "bankVan": "Trasportatore della banca",
+    "cityBank": "Banca della città",
+    "stateBank": "Banca di Stato",
+    "nationalReserve": "Riserva nazionale",
+    "federalReserve": "Riserva federale"
   },
-  "results": "The heist payouts are: $users",
-  "andXMore": "and $count more..."
+  "results": "Le vincite della rapina sono: $users",
+  "andXMore": "e $count in più..."
 }

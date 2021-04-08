@@ -1,13 +1,13 @@
 {
-  "new": "New Cooldown",
-  "empty": "No cooldowns were created yet.",
-  "emptyAfterSearch": "No cooldown were found by your search for <strong>\"$search\"</strong>.",
-  "notify-as-whisper": "Notify as whisper",
+  "new": "Nuovo Tempo d'attesa",
+  "empty": "Nessun tempo di attesa ancora creato.",
+  "emptyAfterSearch": "Nessun tempo di attesa è stato trovato dalla tua ricerca per <strong>\"$search\"</strong>.",
+  "notify-as-whisper": "Notifica come sussurro",
   "settings": {
-    "enabled": "Status",
-    "cooldownNotifyAsWhisper": "Whisper cooldown informations",
-    "cooldownNotifyAsChat": "Chat message cooldown informations",
-    "defaultCooldownOfCommandsInSeconds": "Default cooldown for commands (in seconds)",
-    "defaultCooldownOfKeywordsInSeconds": "Default cooldown for keywords (in seconds)"
+    "enabled": "Stato",
+    "cooldownNotifyAsWhisper": "Sussurra informazioni della ricarica",
+    "cooldownNotifyAsChat": "Messaggio chat su informazioni della ricarica",
+    "defaultCooldownOfCommandsInSeconds": "Ricarica predefinita per i comandi (in secondi)",
+    "defaultCooldownOfKeywordsInSeconds": "Ricarica predefinita per le parole chiave (in secondi)"
   }
 }

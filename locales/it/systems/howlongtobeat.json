@@ -1,5 +1,5 @@
 {
-  "error": "$sender, $game not found in db.",
-  "game": "$sender, $game | Main: $currentMain/$hltbMainh - $percentMain% | Main+Extra: $currentMainExtra/$hltbMainExtrah - $percentMainExtra% | Completionist: $currentCompletionist/$hltbCompletionisth - $percentCompletionist%",
-  "multiplayer-game": "$sender, $game | Main: $currentMainh | Main+Extra: $currentMainExtrah | Completionist: $currentCompletionisth"
+  "error": "$sender, $game non è stato trovato nel db.",
+  "game": "$sender, $game <unk> Principale: $currentMain/$hltbMainh - $percentMain% <unk> Principale+Extra: $currentMainExtra/$hltbMainExtrah - $percentMainExtra% <unk> Completista: $currentCompletionist/$hltbCompletionisth - $percentCompletionist%",
+  "multiplayer-game": "$sender, $game <unk> Principale: $currentMainh <unk> Principale+Extra: $currentMainExtrah <unk> Completista: $currentCompletionisth"
 }

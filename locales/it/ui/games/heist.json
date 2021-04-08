@@ -1,30 +1,30 @@
 {
-  "name": "Heist",
+  "name": "Rapina",
   "settings": {
-    "enabled": "Status",
-    "showMaxUsers": "Max users to show in payout",
+    "enabled": "Stato",
+    "showMaxUsers": "Numero massimo di utenti da mostrare nel pagamento",
     "copsCooldownInMinutes": {
-      "title": "Cooldown between heists",
-      "help": "Minutes"
+      "title": "Attesa tra rapine",
+      "help": "Minuti"
     },
     "entryCooldownInSeconds": {
-      "title": "Time to entry heist",
-      "help": "Seconds"
+      "title": "Tempo per entrare nella rapina",
+      "help": "Secondi"
     },
-    "started": "Heist start message",
-    "nextLevelMessage": "Message when next level is reached",
-    "maxLevelMessage": "Message when max level is reached",
-    "copsOnPatrol": "Response of bot when heist is still on cooldown",
-    "copsCooldown": "Bot announcement when heist can be started",
-    "singleUserSuccess": "Success message for one user",
-    "singleUserFailed": "Fail message for one user",
-    "noUser": "Message if no user participated"
+    "started": "Messaggio iniziale della rapina",
+    "nextLevelMessage": "Messaggio quando viene raggiunto il livello successivo",
+    "maxLevelMessage": "Messaggio quando viene raggiunto il livello massimo",
+    "copsOnPatrol": "Risposta del bot quando la rapina è ancora in fase di attesa",
+    "copsCooldown": "Annuncio del bot quando la rapina può essere avviata",
+    "singleUserSuccess": "Messaggio di successo per un utente",
+    "singleUserFailed": "Messaggio di errore per un utente",
+    "noUser": "Messaggio se nessun utente ha partecipato"
   },
-  "message": "Message",
-  "winPercentage": "Win percentage",
-  "payoutMultiplier": "Payout multiplier",
-  "maxUsers": "Max users for level",
-  "percentage": "Percentage",
-  "noResultsFound": "No results found. Click button below to add new result.",
-  "noLevelsFound": "No levels found. Click button below to add new level."
+  "message": "Messaggio",
+  "winPercentage": "Percentuale di vincita",
+  "payoutMultiplier": "Moltiplicatore di pagamento",
+  "maxUsers": "Numero massimo di utenti per livello",
+  "percentage": "Percentuale",
+  "noResultsFound": "Nessun risultato trovato. Clicca il pulsante qui sotto per aggiungere un nuovo risultato.",
+  "noLevelsFound": "Nessun livello trovato. Fare clic sul pulsante qui sotto per aggiungere un nuovo livello."
 }

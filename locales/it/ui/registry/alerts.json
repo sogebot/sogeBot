@@ -1,201 +1,201 @@
 {
-  "enabled": "Enabled",
+  "enabled": "Abilitato",
   "testDlg": {
-    "alertTester": "Alert tester",
-    "command": "Command",
-    "username": "Username",
-    "recipient": "Recipient",
-    "message": "Message",
-    "tier": "Tier",
-    "amountOfViewers": "Amount of viewers",
-    "amountOfBits": "Amount of bits",
-    "amountOfGifts": "Amount of gifts",
-    "amountOfMonths": "Amount of months",
+    "alertTester": "Tester allerta",
+    "command": "Comando",
+    "username": "Nome Utente",
+    "recipient": "Destinatario",
+    "message": "Messaggio",
+    "tier": "Livello",
+    "amountOfViewers": "Quantità di spettatori",
+    "amountOfBits": "Quantità di bit",
+    "amountOfGifts": "Quantità di doni",
+    "amountOfMonths": "Ammontare mesi",
     "amountOfTips": "Tip",
-    "event": "Event"
+    "event": "Evento"
   },
-  "empty": "Alerts registry is empty, create new alerts.",
-  "emptyAfterSearch": "Alerts registry is empty in searching for \"<strong>$search</strong>\"",
-  "revertcode": "Revert code to defaults",
+  "empty": "Il registro degli avvisi è vuoto, crea nuovi avvisi.",
+  "emptyAfterSearch": "Il registro degli avvisi è vuoto nella ricerca di \"<strong>$search</strong>\"",
+  "revertcode": "Ripristina il codice predefinito",
   "name": {
-    "name": "Name",
-    "placeholder": "Set name of your alerts"
+    "name": "Nome",
+    "placeholder": "Imposta il nome dei tuoi avvisi"
   },
   "alertDelayInMs": {
-    "name": "Alert delay"
+    "name": "Ritardo di allarme"
   },
   "profanityFilterType": {
-    "name": "Profanity filter",
-    "disabled": "Disabled",
-    "replace-with-asterisk": "Replace with asterisk",
-    "replace-with-happy-words": "Replace with happy words",
-    "hide-messages": "Hide messages",
-    "disable-alerts": "Disable alerts"
+    "name": "Filtro profanità",
+    "disabled": "Disattivato",
+    "replace-with-asterisk": "Sostituisci con l'asterisco",
+    "replace-with-happy-words": "Sostituisci con parole felici",
+    "hide-messages": "Nascondi messaggi",
+    "disable-alerts": "Disattiva avvisi"
   },
-  "loadStandardProfanityList": "Load standard profanity list",
+  "loadStandardProfanityList": "Carica lista di profanità standard",
   "customProfanityList": {
-    "name": "Custom profanity list",
-    "help": "Words should be separated with comma."
+    "name": "Lista di profanità personalizzata",
+    "help": "Le parole dovrebbero essere separate da virgole."
   },
   "event": {
     "follows": "Follows",
     "cheers": "Cheers",
-    "subs": "Subs",
-    "resubs": "Resubs",
-    "subgifts": "Subgifts",
-    "subcommunitygifts": "Subgifts to community",
-    "tips": "Tips",
-    "hosts": "Hosts",
-    "raids": "Raids",
-    "cmdredeems": "Command Redeems",
-    "rewardredeems": "Reward Redeems"
+    "subs": "Abbonati",
+    "resubs": "Riabbonati",
+    "subgifts": "Abbonamenti donati",
+    "subcommunitygifts": "Abbonamenti regalati alla comunità",
+    "tips": "Donazioni",
+    "hosts": "Host",
+    "raids": "Raid",
+    "cmdredeems": "Riscatta Comando",
+    "rewardredeems": "Riscatta Ricompensa"
   },
   "title": {
-    "name": "Variant name",
-    "placeholder": "Set your variant name"
+    "name": "Nome variante",
+    "placeholder": "Imposta il nome della tua variante"
   },
   "variant": {
-    "name": "Variant occurence"
+    "name": "Variante di occorrenza"
   },
   "filter": {
-    "name": "Occurence filter",
-    "operator": "Operator",
-    "rule": "Rule",
-    "addRule": "Add rule",
-    "addGroup": "Add group",
-    "comparator": "Comparator",
-    "value": "Value",
-    "valueSplitByComma": "Values split by comma (e.g. val1, val2)",
-    "isEven": "is even",
-    "isOdd": "is odd",
-    "lessThan": "less than",
-    "lessThanOrEqual": "less than or equal",
-    "contain": "contains",
-    "equal": "equal",
-    "notEqual": "not equal",
-    "present": "is present",
-    "includes": "includes",
-    "greaterThan": "greater than",
-    "greaterThanOrEqual": "greater than or equal",
-    "noFilter": "no filter"
+    "name": "Filtro occorrenza",
+    "operator": "Operatore",
+    "rule": "Regola",
+    "addRule": "Aggiungi regola",
+    "addGroup": "Aggiungi gruppo",
+    "comparator": "Comparatore",
+    "value": "Valore",
+    "valueSplitByComma": "Valori divisi per virgola (ad es. val1, val2)",
+    "isEven": "è pari",
+    "isOdd": "è dispari",
+    "lessThan": "meno di",
+    "lessThanOrEqual": "minore o uguale a",
+    "contain": "contiene",
+    "equal": "uguale",
+    "notEqual": "non uguale",
+    "present": "è presente",
+    "includes": "include",
+    "greaterThan": "piú grande di",
+    "greaterThanOrEqual": "maggiore o uguale a",
+    "noFilter": "nessun filtro"
   },
   "speed": {
-    "name": "Speed"
+    "name": "Velocità"
   },
   "maxTimeToDecrypt": {
-    "name": "Max time to decrypt"
+    "name": "Tempo massimo per decifrare"
   },
   "characters": {
-    "name": "Characters"
+    "name": "Caratteri"
   },
-  "random": "Random",
-  "exact-amount": "Exact amount",
-  "greater-than-or-equal-to-amount": "Greater than or equal to amount",
-  "tier-exact-amount": "Tier is exactly",
-  "tier-greater-than-or-equal-to-amount": "Tier is higher or equal to",
-  "months-exact-amount": "Months amount is exactly",
-  "months-greater-than-or-equal-to-amount": "Months amount is higher or equal to",
-  "gifts-exact-amount": "Gifts amount is exactly",
-  "gifts-greater-than-or-equal-to-amount": "Gifts amount is higher or equal to",
-  "very-rarely": "Very rarely",
-  "rarely": "Rarely",
-  "default": "Default",
-  "frequently": "Frequently",
-  "very-frequently": "Very frequently",
-  "exclusive": "Exclusive",
+  "random": "Casuale",
+  "exact-amount": "Importo esatto",
+  "greater-than-or-equal-to-amount": "Maggiore o uguale all’importo",
+  "tier-exact-amount": "Il livello è esattamente",
+  "tier-greater-than-or-equal-to-amount": "Il livello è superiore o uguale a",
+  "months-exact-amount": "La quantità di mesi è esattamente",
+  "months-greater-than-or-equal-to-amount": "L'importo mensile è superiore o uguale a",
+  "gifts-exact-amount": "La quantità delle donazioni è esattamente",
+  "gifts-greater-than-or-equal-to-amount": "L'importo delle donazioni è superiore o uguale a",
+  "very-rarely": "Molto raramente",
+  "rarely": "Raramente",
+  "default": "Predefinito",
+  "frequently": "Frequentemente",
+  "very-frequently": "Molto frequentemente",
+  "exclusive": "Esclusivo",
   "messageTemplate": {
-    "name": "Message template",
-    "placeholder": "Set your message template",
-    "help": "Available variables: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
+    "name": "Modello messaggio",
+    "placeholder": "Imposta il tuo modello di messaggi",
+    "help": "Variabili disponibili: {name}, {amount} (cheers, subs, tips, subgifts, sub community gifts, command redeems), {recipient} (subgifts, command redeems), {monthsName} (subs, subgifts), {currency} (tips)"
   },
   "animationText": {
-    "name": "Animation text"
+    "name": "Testo animazione"
   },
   "animationIn": {
-    "name": "Animation in"
+    "name": "Animazione in entrata"
   },
   "animationOut": {
-    "name": "Animation out"
+    "name": "Animazione in uscita"
   },
   "alertDurationInMs": {
-    "name": "Alert duration"
+    "name": "Durata dell'avviso"
   },
   "alertTextDelayInMs": {
-    "name": "Alert text delay"
+    "name": "Ritardo testo dell'avviso"
   },
   "layoutPicker": {
-    "name": "Layout"
+    "name": "Disposizione"
   },
   "scale": {
-    "name": "Scale"
+    "name": "Scala"
   },
   "translateY": {
-    "name": "Move -Up / +Down"
+    "name": "Sposta -Su / +Giù"
   },
   "translateX": {
-    "name": "Move -Left / +Right"
+    "name": "Sposta -Sinistra / +Destra"
   },
   "image": {
-    "name": "Image / Video(.webm)",
-    "setting": "Image / Video(.webm) settings"
+    "name": "Immagine / Video(.webm)",
+    "setting": "Impostazioni immagine / video (.webm)"
   },
   "sound": {
-    "name": "Sound",
-    "setting": "Sound settings"
+    "name": "Suono",
+    "setting": "Impostazioni suono"
   },
   "soundVolume": {
-    "name": "Alert volume"
+    "name": "Volume dell'avviso"
   },
-  "enableAdvancedMode": "Enable advanced mode",
+  "enableAdvancedMode": "Abilita modalità avanzata",
   "font": {
-    "setting": "Font settings",
-    "name": "Font family",
-    "overrideGlobal": "Override global font settings",
+    "setting": "Impostazioni carattere",
+    "name": "Famiglia di caratteri",
+    "overrideGlobal": "Ignora le impostazioni globali dei caratteri",
     "align": {
-      "name": "Alignment",
-      "left": "Left",
-      "center": "Center",
-      "right": "Right"
+      "name": "Allinemento",
+      "left": "Sinistra",
+      "center": "Centro",
+      "right": "Destra"
     },
     "size": {
-      "name": "Font size"
+      "name": "Dimensione carattere"
     },
     "weight": {
-      "name": "Font weight"
+      "name": "Spessore carattere"
     },
     "borderPx": {
-      "name": "Font border"
+      "name": "Bordi del carattere"
     },
     "borderColor": {
-      "name": "Font border color"
+      "name": "Colore bordi del carattere"
     },
     "color": {
-      "name": "Font color"
+      "name": "Colore del carattere"
     },
     "highlightcolor": {
-      "name": "Font highlight color"
+      "name": "Colore evidenziazione carattere"
     }
   },
   "minAmountToShow": {
-    "name": "Minimal amount to show"
+    "name": "Quantità minima da mostrare"
   },
   "minAmountToPlay": {
-    "name": "Minimal amount to play"
+    "name": "Quantità minima da riprodurre"
   },
   "allowEmotes": {
-    "name": "Allow emotes"
+    "name": "Consenti emotes"
   },
   "message": {
-    "setting": "Message settings"
+    "setting": "Impostazioni dei messaggi"
   },
-  "voice": "Voice",
-  "keepAlertShown": "Alert keeps visible during TTS",
-  "skipUrls": "Skip URLs during TTS",
+  "voice": "Voce",
+  "keepAlertShown": "Avviso mantenuto visibile durante il TTS",
+  "skipUrls": "Salta URL durante TTS",
   "volume": "Volume",
-  "rate": "Rate",
-  "pitch": "Pitch",
+  "rate": "Ritmo",
+  "pitch": "Tono",
   "test": "Test",
   "tts": {
-    "setting": "TTS settings"
+    "setting": "Impostazioni TTS"
   }
 }
