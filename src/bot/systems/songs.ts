@@ -31,18 +31,19 @@ import System from './_interface';
 let importInProgress = false;
 const cachedTags = new Set<string>();
 let isCachedTagsValid = false;
+const emptyCurrentSong = {
+  videoId: null, title: '', type: '', username: '', volume: 0, loudness: 0, forceVolume: false, startTime: 0, endTime: Number.MAX_SAFE_INTEGER,
+};
 
-type currentSongType = {
-  videoId: null | string, title: string, type: string, username: string, volume: number; loudness: number; forceVolume: boolean;
+export type currentSongType = {
+  videoId: null | string, title: string, type: string, username: string, volume: number; loudness: number; forceVolume: boolean; startTime: number; endTime: number;
 };
 
 class Songs extends System {
   interval: { [id: string]: NodeJS.Timeout } = {};
 
   meanLoudness = -15;
-  currentSong = JSON.stringify({
-    videoId: null, title: '', type: '', username: '', volume: 0, loudness: 0, forceVolume: false,
-  } as currentSongType);
+  currentSong = JSON.stringify(emptyCurrentSong as currentSongType);
   isPlaying: {[socketId: string]: boolean } = {};
   @persistent()
   currentTag = 'general';
@@ -104,6 +105,9 @@ class Songs extends System {
       setTimeout(() => this.sockets(), 100);
       return;
     }
+    adminEndpoint(this.nsp, 'songs::currentSong', async (cb) => {
+      cb(null, JSON.parse(this.currentSong));
+    });
     adminEndpoint(this.nsp, 'set.playlist.tag', async (tag) => {
       if (this.currentTag !== tag) {
         info(`SONGS: Playlist changed to ${tag}`);
@@ -367,6 +371,8 @@ class Songs extends System {
   @command('!skipsong')
   @default_permission(defaultPermissions.CASTERS)
   async sendNextSongID (): Promise<CommandResponse[]> {
+    this.currentSong = JSON.stringify(emptyCurrentSong);
+
     // check if there are any requests
     if (this.songrequest) {
       const sr = await getRepository(SongRequest).findOne({ order: { addedAt: 'ASC' } });
@@ -378,9 +384,6 @@ class Songs extends System {
 
         if (this.notify) {
           this.notifySong();
-        }
-        if (this.socket) {
-          this.socket.emit('videoID', currentSong);
         }
         await getRepository(SongRequest).delete({ videoId: sr.videoId });
         return [];
@@ -396,9 +399,6 @@ class Songs extends System {
       const order: any = this.shuffle ? { seed: 'ASC' } : { lastPlayedAt: 'ASC' };
       const pl = await getRepository(SongPlaylist).findOne({ order });
       if (!pl) {
-        if (this.socket) {
-          this.socket.emit('videoID', null); // send null and skip to next empty song
-        }
         return []; // don't do anything if no songs in playlist
       }
 
@@ -424,22 +424,15 @@ class Songs extends System {
         forceVolume: updatedItem.forceVolume,
         loudness:    updatedItem.loudness,
         volume:      await this.getVolume(updatedItem),
+        endTime:     updatedItem.endTime,
+        startTime:   updatedItem.startTime,
       };
       this.currentSong = JSON.stringify(currentSong);
 
       if (this.notify) {
         this.notifySong();
       }
-
-      if (this.socket) {
-        this.socket.emit('videoID', currentSong);
-      }
       return [];
-    }
-
-    // nothing to send
-    if (this.socket) {
-      this.socket.emit('videoID', null);
     }
     return [];
   }

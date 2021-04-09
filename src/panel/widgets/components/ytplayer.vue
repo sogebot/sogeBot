@@ -145,7 +145,7 @@
           </template>
           <b-card-text class="vcenter">
             <div
-              v-if="currentSong !== null"
+              v-if="currentSong.videoId !== null"
               :key="JSON.stringify(currentSong)"
             >
               <vue-plyr
@@ -177,6 +177,7 @@ import VuePlyr from 'vue-plyr';
 import 'vue-plyr/dist/vue-plyr.css';
 
 import type { SongRequestInterface } from 'src/bot/database/entity/song';
+import type { currentSongType } from 'src/bot/systems/songs';
 import { error } from 'src/panel/helpers/error';
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { getSocket } from 'src/panel/helpers/socket';
@@ -189,6 +190,10 @@ type Props = {
   nodrag: boolean;
 };
 
+const emptyCurrentSong = {
+  videoId: null, title: '', type: '', username: '', volume: 0, loudness: 0, forceVolume: false, startTime: 0, endTime: Number.MAX_SAFE_INTEGER,
+};
+
 const socket = getSocket('/systems/songs');
 export default defineComponent({
   props: {
@@ -199,7 +204,7 @@ export default defineComponent({
     const currentTag = ref('general');
     const availableTags = ref ([] as string[]);
     const autoplay = ref(false);
-    const currentSong = ref(null as null | any);
+    const currentSong = ref(emptyCurrentSong as  currentSongType);
     const requests = ref([] as SongRequestInterface[]);
     const playerRef = ref(null as null | any);
     const player = computed(() => {
@@ -208,6 +213,9 @@ export default defineComponent({
     const updateTime = ref(Date.now());
     const intervals = [] as number[];
 
+    watch(currentSong, () => {
+      playThisSong(0);
+    }, { deep: true });
     watch(currentTag, (val) => socket.emit('set.playlist.tag', val));
     watch(autoplay, async (val) => {
       await waitForPlayerReady();
@@ -270,13 +278,13 @@ export default defineComponent({
 
     const nextAndRemoveFromPlaylist = () => {
       if (currentSong.value) {
-        socket.emit('delete.playlist', currentSong.value.id);
+        socket.emit('delete.playlist', currentSong.value.videoId);
         next();
       }
     };
 
     const next = () => {
-      currentSong.value = null;
+      currentSong.value = emptyCurrentSong;
       if (player.value) {
         player.value.pause();
       }
@@ -289,7 +297,7 @@ export default defineComponent({
 
     const play = async () => {
       autoplay.value = true;
-      if (currentSong.value === null) {
+      if (currentSong.value.videoId === null) {
         socket.emit('next');
       }
     };
@@ -305,16 +313,10 @@ export default defineComponent({
       ].filter(a => a).join(':');
     };
 
-    const playThisSong = async (item: any, retry = 0) => {
-      if (!item) {
-        currentSong.value = null;
+    const playThisSong = async (retry = 0) => {
+      if (retry > 10) {
+        console.error('Time of retries exceeded to play this song.');
         return;
-      }
-
-      if (retry > 10 && currentSong.value && currentSong.value.videoId !== item.videoId) {
-        return;
-      } else {
-        currentSong.value = item;
       }
 
       const waitForPlayer = () => new Promise<void>(resolve => {
@@ -332,12 +334,12 @@ export default defineComponent({
       ctx.root.$nextTick(async () => {
         try {
           // change only if something is changed
-          if (!player.value.source || !player.value.source.includes(item.videoId)) {
+          if (!player.value.source || !player.value.source.includes(currentSong.value.videoId)) {
             player.value.source = {
               type:    'video',
               sources: [
                 {
-                  src:      item.videoId,
+                  src:      currentSong.value.videoId,
                   provider: 'youtube',
                 },
               ],
@@ -345,12 +347,12 @@ export default defineComponent({
           }
           await waitForPlayerReady();
 
-          if (item.startTime) {
-            console.log(`Setting start time to ${item.startTime}s`);
-            player.value.forward(item.startTime);
+          if (currentSong.value.startTime) {
+            console.log(`Setting start time to ${currentSong.value.startTime}s`);
+            player.value.forward(currentSong.value.startTime);
           }
 
-          player.value.volume = item.volume / 100;
+          player.value.volume = currentSong.value.volume / 100;
           player.value.muted = true;
           ctx.root.$nextTick(async () => {
             player.value.muted = false;
@@ -361,7 +363,7 @@ export default defineComponent({
             console.log('Retrying playThisSong');
             console.log('If song is not playing and you are on Chrome, disable adblockers or popup blockers - https://github.com/sampotts/plyr/issues/1538');
             console.error(e);
-            playThisSong(item, retry++); //retry after while
+            playThisSong(retry++); //retry after while
           }, 1000);
         }
       });
@@ -369,10 +371,6 @@ export default defineComponent({
 
     onMounted(() => {
       refreshPlaylist();
-
-      socket.on('videoID', async (item: any) => {
-        playThisSong(item);
-      });
 
       socket.on('isPlaying', (cb: (isPlaying: boolean) => void) => {
         if (player.value) {
@@ -383,14 +381,19 @@ export default defineComponent({
       });
 
       intervals.push(window.setInterval(() => {
+        if (autoplay.value) {
+          socket.emit('songs::currentSong', (err: null, botCurrentSong: currentSongType) => {
+            if (!isEqual(currentSong.value, botCurrentSong)) {
+              currentSong.value = botCurrentSong;
+            }
+          });
+        }
         socket.emit('songs::getAllRequests', {}, (err: any, items: SongRequestInterface[]) => {
           if (err) {
             error(err);
           }
-          if (!isEqual(requests.value, items)) {
-            if (currentSong.value === null && autoplay.value) {
-              next();
-            }
+          if (currentSong.value.videoId === null && autoplay.value) {
+            next();
           }
           requests.value = items;
         });
