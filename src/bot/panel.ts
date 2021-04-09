@@ -441,13 +441,27 @@ export const init = () => {
     });
 
     adminEndpoint('/', 'panel::dashboards', async (opts, cb) => {
-      getRepository(Widget).delete({ dashboardId: IsNull() });
-      const dashboards = await getRepository(Dashboard).find({
-        where:     { userId: opts.userId, type: opts.type },
-        relations: ['widgets'],
-        order:     { createdAt: 'ASC' },
-      });
-      cb(null, dashboards);
+      const userId = opts.userId;
+      const dashboards = async () => {
+        getRepository(Widget).delete({ dashboardId: IsNull() });
+        return getRepository(Dashboard).find({
+          where:     { userId: opts.userId, type: opts.type },
+          relations: ['widgets'],
+          order:     { createdAt: 'ASC' },
+        });
+      };
+
+      if ((await dashboards()).length === 0) {
+        const mainDashboard = await getRepository(Dashboard).findOne({
+          userId, name: 'Main', type: 'admin',
+        });
+        if (!mainDashboard) {
+          await getRepository(Dashboard).save({
+            name: 'Main', createdAt: 0, userId, type: 'admin',
+          });
+        }
+      }
+      cb(null, await dashboards());
     });
 
     adminEndpoint('/', 'panel::dashboards::remove', async (opts, cb) => {

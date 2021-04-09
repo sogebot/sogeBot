@@ -7,7 +7,6 @@ import { v4 as uuid } from 'uuid';
 
 import Core from './_interface';
 import { DAY } from './constants';
-import { Dashboard } from './database/entity/dashboard';
 import { User } from './database/entity/user';
 import {
   persistent, settings, ui,
@@ -34,44 +33,6 @@ type Unpacked<T> =
     T extends (...args: any[]) => infer R ? R :
       T extends Promise<infer E> ? E :
         T;
-
-const createDashboardIfNeeded = async (userId: string, opts: { haveAdminPrivileges: Authorized; haveModPrivileges: Authorized; haveViewerPrivileges: Authorized }) => {
-  // create main admin dashboard if needed;
-  if (opts.haveAdminPrivileges === Authorized.isAuthorized) {
-    const mainDashboard = await getRepository(Dashboard).findOne({
-      userId, name: 'Main', type: 'admin',
-    });
-    if (!mainDashboard) {
-      await getRepository(Dashboard).save({
-        name: 'Main', createdAt: 0, userId, type: 'admin',
-      });
-    }
-  }
-
-  // create main admin dashboard if needed;
-  if (opts.haveModPrivileges === Authorized.isAuthorized) {
-    const mainDashboard = await getRepository(Dashboard).findOne({
-      userId, name: 'Main', type: 'mod',
-    });
-    if (!mainDashboard) {
-      await getRepository(Dashboard).save({
-        name: 'Main', createdAt: 0, userId, type: 'mod',
-      });
-    }
-  }
-
-  // create main viewer dashboard if needed;
-  if (opts.haveViewerPrivileges === Authorized.isAuthorized) {
-    const mainDashboard = await getRepository(Dashboard).findOne({
-      userId, name: 'Main', type: 'viewer',
-    });
-    if (!mainDashboard) {
-      await getRepository(Dashboard).save({
-        name: 'Main', createdAt: 0, userId, type: 'viewer',
-      });
-    }
-  }
-};
 
 const getPrivileges = async(type: 'admin' | 'viewer' | 'public', userId: string) => {
   try {
@@ -255,7 +216,6 @@ class Socket extends Core {
             userId: string; username: string; privileges: Unpacked<ReturnType<typeof getPrivileges>>;
           };
           debug('socket', JSON.stringify(token, null, 4));
-          await createDashboardIfNeeded(token.userId, token.privileges);
           initEndpoints(socket, token.privileges);
         } catch (e) {
           next(Error(e));
