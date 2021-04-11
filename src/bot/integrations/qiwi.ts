@@ -101,6 +101,7 @@ class Qiwi extends Integration {
       tip(`${username ? username : 'Anonymous'}${id ? '#' + id : ''}, amount: ${Number(amount).toFixed(2)}${DONATION_CURRENCY}, ${message ? 'message: ' + message : ''}`);
 
       eventEmitter.emit('tip', {
+        isAnonymous:         username ? false : true,
         username:            username || 'Anonymous',
         amount:              String(amount),
         currency:            DONATION_CURRENCY,

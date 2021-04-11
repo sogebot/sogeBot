@@ -240,6 +240,7 @@ class Streamlabs extends Integration {
           isTest:    event.isTest,
         });
         eventEmitter.emit('tip', {
+          isAnonymous:         false,
           username:            event.from.toLowerCase(),
           amount:              parseFloat(event.amount).toFixed(2),
           currency:            event.currency,

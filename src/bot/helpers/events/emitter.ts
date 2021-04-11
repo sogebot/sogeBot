@@ -27,7 +27,7 @@ interface Events {
   'stream-is-running-x-minutes': (opts: { reset: boolean }) => void;
   'subgift': (opts: { username: string; recipient: string; tier: number; }) => void;
   'number-of-viewers-is-at-least-x': (opts: { reset: boolean }) => void;
-  'tip': (opts: { username: string, amount: string; currency: string; amountInBotCurrency: string; currencyInBot: string; message: string; }) => void;
+  'tip': (opts: { isAnonymous: boolean, username: string, amount: string; currency: string; amountInBotCurrency: string; currencyInBot: string; message: string; }) => void;
   // Twitter integration
   'tweet-post-with-hashtag': (opts: { tweet: any }) => void;
   // OBS Websocket integration

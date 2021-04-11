@@ -161,6 +161,7 @@ class Donationalerts extends Integration {
     });
 
     eventEmitter.emit('tip', {
+      isAnonymous:         false,
       username:            data.username.toLowerCase(),
       amount:              data.amount.toFixed(2),
       currency:            data.currency,

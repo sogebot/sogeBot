@@ -164,50 +164,61 @@ class StreamElements extends Integration {
       stats.value.currentTips = stats.value.currentTips + currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value);
     }
 
+    let isAnonymous = false;
     users.getUserByUsername(username)
-      .then(user => {
+      .then(async(user) => {
         user.tips.push(newTip);
         getRepository(User).save(user);
         tip(`${username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(amount).toFixed(2)}${DONATION_CURRENCY}, message: ${message}`);
+        eventlist.add({
+          event:     'tip',
+          amount,
+          currency:  DONATION_CURRENCY,
+          userId:    user.userId,
+          message,
+          timestamp: Date.now(),
+        });
       })
       .catch(() => {
         // user not found on Twitch
         tip(`${username.toLowerCase()}#__anonymous__, amount: ${Number(amount).toFixed(2)}${DONATION_CURRENCY}, message: ${message}`);
+        eventlist.add({
+          event:     'tip',
+          amount,
+          currency:  DONATION_CURRENCY,
+          userId:    `${username}#__anonymous__`,
+          message,
+          timestamp: Date.now(),
+        });
+        isAnonymous = true;
+      }).finally(() => {
+        eventEmitter.emit('tip', {
+          username:            username.toLowerCase(),
+          amount:              Number(amount).toFixed(2),
+          currency:            DONATION_CURRENCY,
+          amountInBotCurrency: Number(currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value)).toFixed(2),
+          currencyInBot:       mainCurrency.value,
+          message,
+          isAnonymous,
+        });
+        alerts.trigger({
+          event:      'tips',
+          name:       username.toLowerCase(),
+          amount:     Number(Number(eventData.data.amount).toFixed(2)),
+          tier:       null,
+          currency:   DONATION_CURRENCY,
+          monthsName: '',
+          message,
+        });
+
+        triggerInterfaceOnTip({
+          username:  username.toLowerCase(),
+          amount,
+          message,
+          currency:  DONATION_CURRENCY,
+          timestamp: Date.now(),
+        });
       });
-
-    eventlist.add({
-      event:     'tip',
-      amount,
-      currency:  DONATION_CURRENCY,
-      userId:    String(await users.getIdByName(username.toLowerCase())),
-      message,
-      timestamp: Date.now(),
-    });
-    eventEmitter.emit('tip', {
-      username:            username.toLowerCase(),
-      amount:              Number(amount).toFixed(2),
-      currency:            DONATION_CURRENCY,
-      amountInBotCurrency: Number(currency.exchange(amount, DONATION_CURRENCY, mainCurrency.value)).toFixed(2),
-      currencyInBot:       mainCurrency.value,
-      message,
-    });
-    alerts.trigger({
-      event:      'tips',
-      name:       username.toLowerCase(),
-      amount:     Number(Number(eventData.data.amount).toFixed(2)),
-      tier:       null,
-      currency:   DONATION_CURRENCY,
-      monthsName: '',
-      message,
-    });
-
-    triggerInterfaceOnTip({
-      username:  username.toLowerCase(),
-      amount,
-      message,
-      currency:  DONATION_CURRENCY,
-      timestamp: Date.now(),
-    });
   }
 }
 

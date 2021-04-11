@@ -154,6 +154,7 @@ class TipeeeStream extends Integration {
 
       eventEmitter.emit('tip', {
         username,
+        isAnonymous:         false,
         amount:              Number(amount).toFixed(2),
         currency:            donationCurrency,
         amountInBotCurrency: Number(currency.exchange(amount, donationCurrency, mainCurrency.value)).toFixed(2),

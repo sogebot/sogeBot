@@ -224,38 +224,40 @@ class Events extends Core {
     attributes = _.cloneDeep(attributes) || {};
     debug('events', JSON.stringify({ eventId, attributes }));
 
-    if (attributes.username !== null && typeof attributes.username !== 'undefined' && (!attributes.userId && !excludedUsers.has(attributes.username))) {
-      excludedUsers.delete(attributes.username); // remove from excluded users if passed first if
+    if (!attributes.isAnonymous) {
+      if (attributes.username !== null && typeof attributes.username !== 'undefined' && (!attributes.userId && !excludedUsers.has(attributes.username))) {
+        excludedUsers.delete(attributes.username); // remove from excluded users if passed first if
 
-      const user = attributes.userId
-        ? await getRepository(User).findOne({ userId: attributes.userId })
-        : await getRepository(User).findOne({ username: attributes.username });
+        const user = attributes.userId
+          ? await getRepository(User).findOne({ userId: attributes.userId })
+          : await getRepository(User).findOne({ username: attributes.username });
 
-      if (!user) {
-        try {
-          await getRepository(User).save({
-            userId:   attributes.userId ? attributes.userId : await getIdFromTwitch(attributes.username),
-            username: attributes.username,
-          });
-          return this.fire(eventId, attributes);
-        } catch (e) {
-          excludedUsers.add(attributes.username);
-          warning(`User ${attributes.username} triggered event ${eventId} was not found on Twitch.`);
-          warning(`User ${attributes.username} will be excluded from events, until stream restarts or user writes in chat and his data will be saved.`);
-          warning(e);
-          return;
+        if (!user) {
+          try {
+            await getRepository(User).save({
+              userId:   attributes.userId ? attributes.userId : await getIdFromTwitch(attributes.username),
+              username: attributes.username,
+            });
+            return this.fire(eventId, attributes);
+          } catch (e) {
+            excludedUsers.add(attributes.username);
+            warning(`User ${attributes.username} triggered event ${eventId} was not found on Twitch.`);
+            warning(`User ${attributes.username} will be excluded from events, until stream restarts or user writes in chat and his data will be saved.`);
+            warning(e);
+            return;
+          }
         }
-      }
 
-      // add is object
-      attributes.is = {
-        moderator:   isModerator(user),
-        subscriber:  isSubscriber(user),
-        vip:         isVIP(user),
-        broadcaster: isBroadcaster(attributes.username),
-        bot:         isBot(attributes.username),
-        owner:       isOwner(attributes.username),
-      };
+        // add is object
+        attributes.is = {
+          moderator:   isModerator(user),
+          subscriber:  isSubscriber(user),
+          vip:         isVIP(user),
+          broadcaster: isBroadcaster(attributes.username),
+          bot:         isBot(attributes.username),
+          owner:       isOwner(attributes.username),
+        };
+      }
     }
     if (!_.isNil(_.get(attributes, 'recipient', null))) {
       const user = await getRepository(User).findOne({ username: attributes.recipient });

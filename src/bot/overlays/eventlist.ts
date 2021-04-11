@@ -94,7 +94,7 @@ class EventList extends Overlay {
   }
 
   async add (data: EventList.Event) {
-    if (isBot(await users.getNameById(data.userId))) {
+    if (!data.userId.includes('__anonymous__') && isBot(await users.getNameById(data.userId))) {
       return;
     } // don't save event from a bot
 

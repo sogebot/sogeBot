@@ -142,8 +142,12 @@ class EventList extends Widget {
             mapping.set(values.fromId, await users.getNameById(values.fromId));
           }
         }
-        if (!mapping.has(event.userId)) {
-          mapping.set(event.userId, await users.getNameById(event.userId));
+        if (!event.userId.includes('__anonymous__')) {
+          if (!mapping.has(event.userId)) {
+            mapping.set(event.userId, await users.getNameById(event.userId));
+          }
+        } else {
+          mapping.set(event.userId, event.userId.replace('#__anonymous__', ''));
         }
       }
       this.emit('update',
