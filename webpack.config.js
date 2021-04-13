@@ -39,7 +39,6 @@ const webpackConfig = {
     main: './src/panel/index.ts',
     popout: './src/panel/popout.ts',
     overlay: './src/overlay/index.ts',
-    login: './src/login/index.ts',
     public: './src/public/index.ts',
     spotify: './src/oauth/spotify.ts',
   },
@@ -88,9 +87,6 @@ const webpackConfig = {
     }),
     new HtmlWebpackPlugin({
       filename: '../../overlays.html', template: 'src/overlay/index.html', chunks: ['overlay']
-    }),
-    new HtmlWebpackPlugin({
-      filename: '../../login.html', template: 'src/login/index.html', chunks: ['login']
     }),
     new HtmlWebpackPlugin({
       filename: '../../oauth.html', template: 'src/oauth/index.html', chunks: []
