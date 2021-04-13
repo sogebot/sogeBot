@@ -43,6 +43,12 @@ class Spotify extends Integration {
   userId: string | null = null;
 
   @persistent()
+  lastActiveDeviceId = '';
+  @settings('connection')
+  @ui({ type: 'spotify-device-input' })
+  manualDeviceId = '';
+
+  @persistent()
   songsHistory: string[] = [];
   currentSong = JSON.stringify(null as null | {
     started_at: number; song: string; artist: string; artists: string, uri: string; is_playing: boolean; is_enabled: boolean;
@@ -78,6 +84,7 @@ class Spotify extends Integration {
 
   scopes: string[] = [
     'user-read-currently-playing',
+    'user-read-playback-state',
     'user-read-private',
     'user-read-email',
     'playlist-modify-public',
@@ -85,7 +92,8 @@ class Spotify extends Integration {
     'playlist-read-collaborative',
     'playlist-modify-private',
     'playlist-read-private',
-    'user-modify-playback-state' ];
+    'user-modify-playback-state',
+  ];
 
   @ui({
     type:  'btn-emit',
@@ -111,7 +119,10 @@ class Spotify extends Integration {
     });
 
     this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
-    this.timeouts.ICurrentSong = global.setTimeout(() => this.ICurrentSong(), 10000);
+    this.timeouts.ICurrentSong = global.setTimeout(() => {
+      this.getActiveDevice();
+      this.ICurrentSong();
+    }, 10000);
     this.timeouts.getMe = global.setTimeout(() => this.getMe(), 10000);
   }
 
@@ -229,16 +240,47 @@ class Spotify extends Integration {
     return [];
   }
 
+  get deviceId () {
+    if (this.manualDeviceId.length > 0) {
+      return this.manualDeviceId;
+    }
+
+    if (this.lastActiveDeviceId.length > 0) {
+      return this.lastActiveDeviceId;
+    }
+
+    return undefined;
+  }
+
   @command('!spotify skip')
   @default_permission(null)
   async cSkipSong() {
     if (this.client) {
-      this.client.skipToNext();
+      this.client.skipToNext({ device_id: this.deviceId });
       ioServer?.emit('api.stats', {
         method: 'POST', data: 'n/a', timestamp: Date.now(), call: 'spotify::skip', api: 'other', endpoint: 'n/a', code: 200,
       });
     }
     return [];
+  }
+
+  async getActiveDevice() {
+    try {
+      if (this.enabled && !this.isUnauthorized) {
+        this.client?.getMyDevices()
+          .then((data) => {
+            const activeDevice = data.body.devices.find(o => o.is_active);
+            if (activeDevice && this.lastActiveDeviceId !== activeDevice.id) {
+              info(`SPOTIFY: new active device found, set to ${activeDevice.id}`);
+              this.lastActiveDeviceId = activeDevice.id ?? 'n/a';
+            }
+          }, function(err) {
+            error('SPOTIFY: cannot get active device, please reauthenticate to include scope user-read-playback-state');
+          });
+      }
+    } catch (e) {
+      error(e);
+    }
   }
 
   async getMe () {
@@ -247,6 +289,7 @@ class Spotify extends Integration {
     try {
       if ((this.enabled) && !_.isNil(this.client) && !this.isUnauthorized) {
         const data = await this.client.getMe();
+
         this.username = data.body.display_name ? data.body.display_name : data.body.id;
         if (this.userId !== data.body.id) {
           info(chalk.yellow('SPOTIFY: ') + `Logged in as ${this.username}#${data.body.id}`);
@@ -419,9 +462,9 @@ class Spotify extends Integration {
       };
 
       this.currentSong = JSON.stringify(null);
-      this.isUnauthorized = false;
       this.connect({ token });
       await waitForUsername();
+      setTimeout(() => this.isUnauthorized = false, 10000);
       cb(null, true);
     });
     adminEndpoint(this.nsp, 'spotify::revoke', async (cb) => {
@@ -675,7 +718,7 @@ class Spotify extends Integration {
           return false;
         }
 
-        const queueResponse = await this.client.addToQueue(uri);
+        const queueResponse = await this.client.addToQueue(uri, { device_id: this.deviceId });
         ioServer?.emit('api.stats', {
           method: 'POST', data: queueResponse.body, timestamp: Date.now(), call: 'spotify::queue', api: 'other', endpoint: 'https://api.spotify.com/v1/me/player/queue?uri=' + uri, code: queueResponse.statusCode,
         });

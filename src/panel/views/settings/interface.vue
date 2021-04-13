@@ -1,23 +1,42 @@
 <template>
-  <div class="container-fluid" ref="window">
+  <div
+    ref="window"
+    class="container-fluid"
+  >
     <loading v-if="!$route.params.id" />
-    <div class="row" v-else>
+    <div
+      v-else
+      class="row"
+    >
       <div class="col-lg-9 col-md-8 col-sm-6">
         <span class="title text-default mb-2">
           {{ translate('menu.settings') }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.' + $route.params.type) }}
-          <small><fa icon="angle-right"/></small>
+          <small><fa icon="angle-right" /></small>
           {{ translate('menu.' + $route.params.id) }}
         </span>
 
         <loading v-if="state.loaded !== 2 /* State.DONE */" />
-        <template v-else v-for="(value, category) of settingsWithoutPermissions">
-          <h6 :key="category + '#1'" >{{ translate('categories.' + category) }}</h6>
-          <div class="card mb-2" :key="category + '#2'" v-if="value !== null">
+        <template
+          v-for="(value, category) of settingsWithoutPermissions"
+          v-else
+        >
+          <h6 :key="category + '#1'">
+            {{ translate('categories.' + category) }}
+          </h6>
+          <div
+            v-if="value !== null"
+            :key="category + '#2'"
+            class="card mb-2"
+          >
             <div class="card-body">
               <template v-for="(currentValue, defaultValue) of value">
-                <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " :key="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue">
+                <div
+                  v-if="typeof value === 'object' && !defaultValue.startsWith('_')"
+                  :key="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
+                  class="p-0 pl-2 pr-2 "
+                >
                   <template v-if="typeof ui[category] !== 'undefined' && typeof ui[category][defaultValue] !== 'undefined'">
                     <sortable-list
                       v-if="ui[category][defaultValue].type === 'sortable-list'"
@@ -26,22 +45,29 @@
                       :toggleonicon="ui[category][defaultValue].toggleOnIcon"
                       :toggleofficon="ui[category][defaultValue].toggleOffIcon"
                       :title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
+                      class="pt-1 pb-1"
                       @update="value[ui[category][defaultValue].toggle] = $event.toggle; value[defaultValue] = $event.value; triggerDataChange()"
-                      class="pt-1 pb-1"></sortable-list>
+                    />
                     <highlights-url-generator
                       v-else-if="ui[category][defaultValue].type === 'highlights-url-generator'"
                       :values="currentValue"
                       :title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
-                      v-on:update="value[defaultValue] = $event.value; triggerDataChange()"
+                      @update="value[defaultValue] = $event.value; triggerDataChange()"
                     />
-                    <a v-else-if="ui[category][defaultValue].type === 'link'" :href="ui[category][defaultValue].href" class="mt-1 mb-1" :class="ui[category][defaultValue].class" :target="ui[category][defaultValue].target">
+                    <a
+                      v-else-if="ui[category][defaultValue].type === 'link'"
+                      :href="ui[category][defaultValue].href"
+                      class="mt-1 mb-1"
+                      :class="ui[category][defaultValue].class"
+                      :target="ui[category][defaultValue].target"
+                    >
                       <template v-if="ui[category][defaultValue].rawText">{{ ui[category][defaultValue].rawText }}</template>
                       <template v-else>{{ translate(ui[category][defaultValue].text) }}</template>
                     </a>
                     <component
-                      v-else
-                      :fullObject.sync="ui[category][defaultValue]"
                       :is="ui[category][defaultValue].type"
+                      v-else
+                      :full-object.sync="ui[category][defaultValue]"
                       :readonly="ui[category][defaultValue].readOnly"
                       :secret="ui[category][defaultValue].secret"
                       :step="ui[category][defaultValue].step"
@@ -52,55 +78,56 @@
                       :settings="settingsWithoutPermissions"
                       :value="currentValue"
                       :values="ui[category][defaultValue].values"
-                      :defaultValue="defaultValues[defaultValue]"
-                      @update="value[defaultValue] = $event.value; triggerDataChange()"
+                      :default-value="defaultValues[defaultValue]"
                       :title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
                       :current="value[ui[category][defaultValue].current]"
-                      class="pt-1 pb-1"></component>
+                      class="pt-1 pb-1"
+                      @update="value[defaultValue] = $event.value; triggerDataChange()"
+                    />
                   </template>
                   <template v-else>
                     <command-input-with-permission
                       v-if="category === 'commands'"
                       class="pt-1 pb-1"
-                      v-bind:type="typeof currentValue"
-                      v-bind:value="currentValue"
-                      v-bind:command="defaultValue"
+                      :type="typeof currentValue"
+                      :value="currentValue"
+                      :command="defaultValue"
                       :permissions="settings._permissions[defaultValue]"
-                      v-on:update="value[defaultValue] = $event.value; settings._permissions[defaultValue] = $event.permissions; triggerDataChange()"
-                    ></command-input-with-permission>
+                      @update="value[defaultValue] = $event.value; settings._permissions[defaultValue] = $event.permissions; triggerDataChange()"
+                    />
                     <toggle-enable
-                      class="pt-1 pb-1"
-                      v-bind:title="translate($route.params.type + '.' + $route.params.id + '.settings.' + defaultValue)"
                       v-else-if="typeof currentValue === 'boolean'"
-                      v-bind:value="currentValue"
-                      v-on:update="value[defaultValue] = !value[defaultValue]; triggerDataChange()"
-                    ></toggle-enable>
-                    <textarea-from-array
                       class="pt-1 pb-1"
+                      :title="translate($route.params.type + '.' + $route.params.id + '.settings.' + defaultValue)"
+                      :value="currentValue"
+                      @update="value[defaultValue] = !value[defaultValue]; triggerDataChange()"
+                    />
+                    <textarea-from-array
                       v-else-if="currentValue.constructor === Array"
-                      v-bind:value="currentValue"
-                      v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
-                      v-on:update="value[defaultValue] = $event.value; triggerDataChange()"
-                    ></textarea-from-array>
+                      class="pt-1 pb-1"
+                      :value="currentValue"
+                      :title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
+                      @update="value[defaultValue] = $event.value; triggerDataChange()"
+                    />
                     <number-input
                       v-else-if="typeof currentValue === 'number'"
                       class="pt-1 pb-1"
-                      v-bind:type="typeof currentValue"
-                      v-bind:defaultValue="defaultValues[defaultValue]"
-                      v-bind:value="currentValue"
+                      :type="typeof currentValue"
+                      :default-value="defaultValues[defaultValue]"
+                      :value="currentValue"
                       min="0"
-                      v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
-                      v-on:update="value[defaultValue] = $event.value; triggerDataChange()">
-                    </number-input>
+                      :title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
+                      @update="value[defaultValue] = $event.value; triggerDataChange()"
+                    />
                     <text-input
                       v-else
                       class="pt-1 pb-1"
-                      v-bind:type="typeof currentValue"
-                      v-bind:value="currentValue"
-                      v-bind:defaultValue="defaultValues[defaultValue]"
-                      v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
-                      v-on:update="value[defaultValue] = $event.value; triggerDataChange()"
-                    ></text-input>
+                      :type="typeof currentValue"
+                      :value="currentValue"
+                      :default-value="defaultValues[defaultValue]"
+                      :title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
+                      @update="value[defaultValue] = $event.value; triggerDataChange()"
+                    />
                   </template>
                 </div>
               </template>
@@ -109,50 +136,73 @@
           <template v-if="permissions.length > 0 && Object.keys(settings).includes('__permission_based__') && settings['__permission_based__'][category]">
             <div :key="category + '__permission_based__#1'">
               <b-card no-body>
-                <b-tabs pills card vertical lazy> <!-- set lazy as it will force to repaint on click -->
-                  <b-tab v-for="permission of orderBy(getNotIgnoredPermissions(permissions, settings['__permission_based__'][category]), 'order', 'desc')" :key="'b-tab' + category + permission.id" :title="permission.name">
+                <b-tabs
+                  pills
+                  card
+                  vertical
+                  lazy
+                >
+                  <!-- set lazy as it will force to repaint on click -->
+                  <b-tab
+                    v-for="permission of orderBy(getNotIgnoredPermissions(permissions, settings['__permission_based__'][category]), 'order', 'desc')"
+                    :key="'b-tab' + category + permission.id"
+                    :title="permission.name"
+                  >
                     <b-card-text :key="'b-card-text' + category + permission.id">
                       <template v-for="(currentValue, defaultValue) of settings['__permission_based__'][category]">
-                        <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " :key="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue + String(currentValue[permission.id] === null)">
+                        <div
+                          v-if="typeof value === 'object' && !defaultValue.startsWith('_')"
+                          :key="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue + String(currentValue[permission.id] === null)"
+                          class="p-0 pl-2 pr-2 "
+                        >
                           <div class="d-flex pt-1 pb-1">
                             <textarea-from-array
                               v-if="currentValue.constructor === Array"
-                              v-bind:value="getPermissionSettingsValue(permission.id, currentValue)"
-                              v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
-                              v-on:update="settings['__permission_based__'][category][defaultValue][permission.id] = $event.value; triggerDataChange()"
+                              :value="getPermissionSettingsValue(permission.id, currentValue)"
+                              :title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
                               :readonly="currentValue[permission.id] === null"
-                            ></textarea-from-array>
+                              @update="settings['__permission_based__'][category][defaultValue][permission.id] = $event.value; triggerDataChange()"
+                            />
                             <toggle-enable
-                              v-bind:title="translate($route.params.type + '.' + $route.params.id + '.settings.' + defaultValue)"
                               v-else-if="typeof getPermissionSettingsValue(permission.id, currentValue) === 'boolean'"
-                              v-bind:value="getPermissionSettingsValue(permission.id, currentValue)"
-                              v-on:update="settings['__permission_based__'][category][defaultValue][permission.id] = $event.value; triggerDataChange()"
+                              :title="translate($route.params.type + '.' + $route.params.id + '.settings.' + defaultValue)"
+                              :value="getPermissionSettingsValue(permission.id, currentValue)"
                               :disabled="currentValue[permission.id] === null"
-                            ></toggle-enable>
+                              @update="settings['__permission_based__'][category][defaultValue][permission.id] = $event.value; triggerDataChange()"
+                            />
                             <number-input
                               v-else-if="typeof getPermissionSettingsValue(permission.id, currentValue) === 'number'"
-                              v-bind:type="typeof getPermissionSettingsValue(permission.id, currentValue)"
-                              v-bind:value="getPermissionSettingsValue(permission.id, currentValue)"
-                              v-bind:defaultValue="defaultValues[defaultValue]"
+                              :type="typeof getPermissionSettingsValue(permission.id, currentValue)"
+                              :value="getPermissionSettingsValue(permission.id, currentValue)"
+                              :default-value="defaultValues[defaultValue]"
                               min="0"
                               :readonly="currentValue[permission.id] === null"
-                              v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
-                              v-on:update="settings['__permission_based__'][category][defaultValue][permission.id] = $event.value; triggerDataChange()">
-                            </number-input>
+                              :title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
+                              @update="settings['__permission_based__'][category][defaultValue][permission.id] = $event.value; triggerDataChange()"
+                            />
                             <text-input
                               v-else
-                              v-bind:type="typeof getPermissionSettingsValue(permission.id, currentValue)"
-                              v-bind:value="getPermissionSettingsValue(permission.id, currentValue)"
-                              v-bind:defaultValue="defaultValues[defaultValue]"
-                              v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
+                              :type="typeof getPermissionSettingsValue(permission.id, currentValue)"
+                              :value="getPermissionSettingsValue(permission.id, currentValue)"
+                              :default-value="defaultValues[defaultValue]"
+                              :title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
                               :readonly="currentValue[permission.id] === null"
-                              v-on:update="settings['__permission_based__'][category][defaultValue][permission.id] = $event.value; triggerDataChange()"
-                            ></text-input>
-                            <button class="btn" :class="[ currentValue[permission.id] === null ? 'btn-primary' : 'btn-secondary' ]"
+                              @update="settings['__permission_based__'][category][defaultValue][permission.id] = $event.value; triggerDataChange()"
+                            />
+                            <button
                               v-if="permission.id !== '0efd7b1c-e460-4167-8e06-8aaf2c170311' /* VIEWERS */"
-                              @click="togglePermissionLock(permission, currentValue); triggerDataChange()">
-                              <fa v-if="currentValue[permission.id] === null" icon="lock"></fa>
-                              <fa v-else icon="lock-open"></fa>
+                              class="btn"
+                              :class="[ currentValue[permission.id] === null ? 'btn-primary' : 'btn-secondary' ]"
+                              @click="togglePermissionLock(permission, currentValue); triggerDataChange()"
+                            >
+                              <fa
+                                v-if="currentValue[permission.id] === null"
+                                icon="lock"
+                              />
+                              <fa
+                                v-else
+                                icon="lock-open"
+                              />
                             </button>
                           </div>
                         </div>
@@ -180,42 +230,111 @@
             overflow: $store.state.configuration.core.ui.stickystats ? 'scroll' : 'inherit',
             'overflow-x': 'hidden',
             'z-index': 0
-            }">
-          <div class="widget border-0 bg-light" style="height: auto">
-          <div class="pl-2 pr-2 pb-4">
-            <transition name="fade">
-              <div v-show="isDataChanged" class="alert alert-warning" style="cursor: initial">
-                <fa icon="exclamation-circle" class="mr-1"></fa>
-                {{translate('dialog.changesPending')}}
-              </div>
-            </transition>
-            <transition name="fade">
-              <div class="alert alert-danger" v-show="error && showError" style="cursor: initial">
-                <fa icon="exclamation-triangle" class="mr-1"></fa>
-                {{ error }}
-              </div>
-            </transition>
-            <button class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 0">{{ translate('dialog.buttons.saveChanges.idle') }}</button>
-            <button disabled="disabled" class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 1">
-              <fa icon="circle-notch" spin></fa> {{ translate('dialog.buttons.saveChanges.progress') }}</button>
-            <button disabled="disabled" class="btn btn-block btn-success" v-on:click="saveSettings" v-if="state.settings === 2">
-              <svg width="1.3em" height="1.3em" viewBox="0 0 16 16" class="bi bi-check2-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L8 9.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
-                <path fill-rule="evenodd" d="M8 2.5A5.5 5.5 0 1 0 13.5 8a.5.5 0 0 1 1 0 6.5 6.5 0 1 1-3.25-5.63.5.5 0 1 1-.5.865A5.472 5.472 0 0 0 8 2.5z"/>
-              </svg>
-              {{ translate('dialog.buttons.saveChanges.done') }}</button>
-            <button disabled="disabled" class="btn btn-block btn-danger" v-on:click="saveSettings" v-if="state.settings === 3">
-              <svg width="1.3em" height="1.3em" viewBox="0 0 16 16" class="bi bi-exclamation" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
-              </svg>
-              {{ translate('dialog.buttons.something-went-wrong') }}</button>
-          </div>
+          }"
+        >
+          <div
+            class="widget border-0 bg-light"
+            style="height: auto"
+          >
+            <div class="pl-2 pr-2 pb-4">
+              <transition name="fade">
+                <div
+                  v-show="isDataChanged"
+                  class="alert alert-warning"
+                  style="cursor: initial"
+                >
+                  <fa
+                    icon="exclamation-circle"
+                    class="mr-1"
+                  />
+                  {{ translate('dialog.changesPending') }}
+                </div>
+              </transition>
+              <transition name="fade">
+                <div
+                  v-show="error && showError"
+                  class="alert alert-danger"
+                  style="cursor: initial"
+                >
+                  <fa
+                    icon="exclamation-triangle"
+                    class="mr-1"
+                  />
+                  {{ error }}
+                </div>
+              </transition>
+              <button
+                v-if="state.settings === 0"
+                class="btn btn-block btn-primary"
+                @click="saveSettings"
+              >
+                {{ translate('dialog.buttons.saveChanges.idle') }}
+              </button>
+              <button
+                v-if="state.settings === 1"
+                disabled="disabled"
+                class="btn btn-block btn-primary"
+                @click="saveSettings"
+              >
+                <fa
+                  icon="circle-notch"
+                  spin
+                /> {{ translate('dialog.buttons.saveChanges.progress') }}
+              </button>
+              <button
+                v-if="state.settings === 2"
+                disabled="disabled"
+                class="btn btn-block btn-success"
+                @click="saveSettings"
+              >
+                <svg
+                  width="1.3em"
+                  height="1.3em"
+                  viewBox="0 0 16 16"
+                  class="bi bi-check2-circle"
+                  fill="currentColor"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M15.354 2.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L8 9.293l6.646-6.647a.5.5 0 0 1 .708 0z"
+                  />
+                  <path
+                    fill-rule="evenodd"
+                    d="M8 2.5A5.5 5.5 0 1 0 13.5 8a.5.5 0 0 1 1 0 6.5 6.5 0 1 1-3.25-5.63.5.5 0 1 1-.5.865A5.472 5.472 0 0 0 8 2.5z"
+                  />
+                </svg>
+                {{ translate('dialog.buttons.saveChanges.done') }}
+              </button>
+              <button
+                v-if="state.settings === 3"
+                disabled="disabled"
+                class="btn btn-block btn-danger"
+                @click="saveSettings"
+              >
+                <svg
+                  width="1.3em"
+                  height="1.3em"
+                  viewBox="0 0 16 16"
+                  class="bi bi-exclamation"
+                  fill="currentColor"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z" />
+                </svg>
+                {{ translate('dialog.buttons.something-went-wrong') }}
+              </button>
+            </div>
 
-            <div class="pl-2 pr-2" v-for="system of list" :key="system.name">
+            <div
+              v-for="system of list"
+              :key="system.name"
+              class="pl-2 pr-2"
+            >
               <button
                 class="btn btn-block text-left btn-outline-dark"
                 :style="getBorderStyle(system.name)"
-                v-on:click="setSelected(system.name)"
+                @click="setSelected(system.name)"
               >
                 {{ translate('menu.' + system.name) }}
 
@@ -224,12 +343,12 @@
                   :class="[ system.enabled && !system.isDisabledByEnv && system.areDependenciesEnabled ? 'text-success' : 'text-danger' ]"
                   style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"
                 >
-                <template v-if="system.enabled === null"></template>
-                <template v-else-if="system.isDisabledByEnv">DISABLED BY ENV</template>
-                <template v-else-if="!system.areDependenciesEnabled">DEPENDENCIES DISABLED</template>
-                <template v-else-if="system.enabled === false">{{ translate('disabled') }}</template>
-                <template v-else>{{ translate('enabled') }}</template>
-              </small>
+                  <template v-if="system.enabled === null" />
+                  <template v-else-if="system.isDisabledByEnv">DISABLED BY ENV</template>
+                  <template v-else-if="!system.areDependenciesEnabled">DEPENDENCIES DISABLED</template>
+                  <template v-else-if="system.enabled === false">{{ translate('disabled') }}</template>
+                  <template v-else>{{ translate('enabled') }}</template>
+                </small>
               </button>
             </div>
           </div>
@@ -243,10 +362,10 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import {
-  cloneDeep, filter, get, orderBy, pickBy, set, size, 
+  cloneDeep, filter, get, orderBy, pickBy, set, size,
 } from 'lodash-es';
 import {
-  Component, Prop, Vue, Watch, 
+  Component, Prop, Vue, Watch,
 } from 'vue-property-decorator';
 
 import { PermissionsInterface } from 'src/bot/database/entity/permissions';
@@ -285,6 +404,7 @@ enum State {
     'number-input':                  () => import('./components/interface/number-input.vue'),
     'selector':                      () => import('./components/interface/selector.vue'),
     'sortable-list':                 () => import('./components/interface/sortable-list.vue'),
+    'spotify-device-input':          () => import('./components/interface/spotify-device-input.vue'),
     'streamelements-jwt':            () => import('./components/interface/streamelements-jwt.vue'),
     'text-input':                    () => import('./components/interface/text-input.vue'),
     'textarea-from-array':           () => import('./components/interface/textarea-from-array.vue'),
@@ -471,7 +591,7 @@ export default class interfaceSettings extends Vue {
         for (const [category, obj] of filter(settingsEntries, o => o[0][0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && !Array.isArray(o[1]))) {
           for (const [name, value] of Object.entries(obj)) {
             set(settings, `${category}.${name}`, (value as any)[0]);
-            this.defaultValues[name] = (value as any)[1];          
+            this.defaultValues[name] = (value as any)[1];
           }
         }
 
