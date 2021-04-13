@@ -5,7 +5,7 @@ import { Brackets, getRepository } from 'typeorm';
 
 import { EventList as EventListEntity } from '../database/entity/eventList';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
-import { isBot } from '../helpers/user/isBot';
+import { isBotId } from '../helpers/user/isBot';
 import users from '../users';
 import eventlist from '../widgets/eventlist';
 import Overlay from './_interface';
@@ -94,7 +94,7 @@ class EventList extends Overlay {
   }
 
   async add (data: EventList.Event) {
-    if (!data.userId.includes('__anonymous__') && isBot(await users.getNameById(data.userId))) {
+    if (!data.userId.includes('__anonymous__') && isBotId(data.userId)) {
       return;
     } // don't save event from a bot
 
